@@ -2,7 +2,16 @@ Is width even the right unit? -- the price re-examined
 ======================================================
 
 Script: experiments/g1_11_right_unit.py
-Status: RUN on Actions, 36/36 cells. Predictions 1 and 2 REFUTED, 3 held and
+Status: RETRACTED. g1-12 found attention was UNDERTRAINED, not capacity-
+        limited: width 8 at seq_len 384 goes 0.252 at 3000 steps and 1.000 at
+        6000. Both conclusions below are artifacts of that, and both
+        corrections go AGAINST the local rule -- the width ratio grows 2.7x to
+        5.9x rather than being flat at 3.1x, and the memory advantage tops out
+        at 2.72x rather than 5.12x. The predictions this note recorded as
+        refuted were right. Left in place as the record of a favourable result
+        that did not survive its own pre-registered check.
+
+        Originally: RUN on Actions, 36/36 cells. Predictions 1 and 2 REFUTED, 3 held and
         exceeded. THE RESULT IS FAVOURABLE AND THEREFORE PROVISIONAL -- this
         note pre-registered a check for undertrained attention, the condition
         that would trigger it has occurred, and g1-12 is running it. Nothing

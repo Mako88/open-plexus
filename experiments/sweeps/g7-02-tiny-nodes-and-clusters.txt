@@ -1,0 +1,122 @@
+How small can a node be, if a few of them may pool?
+===================================================
+
+Script: experiments/g7_02_clusters.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+The billions of devices on the internet are mostly tiny, so the number that
+decides whether any of this is worth doing is not accuracy -- it is **how small
+one device can be and still be worth including**.
+
+Two things have been found that help, each in a quick probe, neither properly
+measured:
+
+- **Clusters.** A handful of nearby devices can pool their answers and act as one
+  wider device without any of them being wide.
+- **Selective storage.** Our system writes down every consecutive pair it sees --
+  383 facts in a 384-step problem, when the problem asks about four. An oracle
+  that keeps only the four makes the task trivial.
+
+The probe suggested neither is enough alone and both together are complete: at
+384 steps with devices holding a single number, clustering all 240 of them
+reached 0.404 without a gate, one device with a gate reached 0.258, and both
+together reached 1.000.
+
+**That probe was undertrained** -- 150 sequences and 4 epochs against the 400 and
+8 this project uses everywhere else -- so its levels are not comparable to
+anything. This measures it properly.
+
+
+QUESTION
+--------
+Fix devices at the smallest they can be and ask what cluster size is needed.
+
+  total width  240
+  partitions   240, so every device holds exactly ONE number
+  cluster      1, 2, 4, 8, 16, 32, 64, 240
+  gate         off (store every pair) and oracle (store only pair bindings)
+  seq_len      96, 192, 288, 384
+  lr           0.02, 0.05, 0.1, 0.2
+  seeds        1, 2, 3
+
+**Cluster size is a read-time choice, so one trained model is evaluated at every
+cluster size.** That collapses what looks like a 256-cell grid into 32 jobs, and
+it also removes a confound: every cluster size in a row shares the identical
+trained model, so differences between them cannot be training noise.
+
+Costed: 6.7 hours serial, 32 jobs, worst job about 13 minutes.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **Without the gate, no cluster size reaches 0.9 at seq_len 384.** g5-04
+   measured the full pool at 240 devices there at 0.572 with the same budget, and
+   a cluster cannot beat the full pool. This is the replication control: if the
+   240-device cluster does not land near 0.572, something differs between the two
+   experiments and nothing else here can be read.
+
+2. **With the gate, the cluster size needed grows with sequence length**, because
+   the gate reduces stored bindings from `seq_len - 1` to `2 x n_pairs` -- a
+   constant -- while the *interference among those bindings* is unchanged. Guess:
+   4 devices suffice at 96, 8 at 192, 16 at 288, 32 at 384.
+
+3. **The two compose multiplicatively, not additively.** The probe showed a
+   cluster of 8 going from 0.258 to 0.825 when the gate was added, which is not a
+   fixed offset. If instead the gate adds a roughly constant amount at every
+   cluster size, the mechanisms are independent and the "they complete each
+   other" reading was over-stated.
+
+4. **A one-device cluster with the gate still fails at 384.** The probe put it at
+   0.258. A single number cannot hold four bindings' worth of answer no matter how
+   clean the memory is, so the gate does not remove the need to cluster.
+
+> **The replication control ran before dispatch and passed exactly -- after I
+> nearly misread it.** g5-04 puts the 240-device pool at seq_len 384 at 0.572, and
+> the control came back 0.408, which looked like a failure. It is not: 0.572 is
+> g5-04's mean over three seeds, whose per-seed values are [0.408, 0.640, 0.669].
+> The control used seed 1 alone and reproduces **0.408** to three decimals.
+>
+> So the replication is exact, and the near-miss is the useful part. Comparing a
+> single seed against a published mean would have failed a control that had
+> actually passed -- and that cell's spread, 0.408 to 0.669 on one configuration,
+> is wide enough that any single-seed reading of it means very little. g5-04
+> flagged the bottom-left of its tables as noisy; this is what that looks like
+> from close up.
+
+Most likely wrong: (2). The gate makes stored bindings a constant, so it is
+possible the required cluster size becomes constant too -- **which would be the
+first quantity in this project that does not grow with sequence length, and
+therefore the single most important thing that could come out of this sweep.**
+It is also the favourable direction, so it gets checked: that the 288 and 384
+rows are genuinely at the same cluster size rather than one grid step apart, and
+that the per-seed spread does not straddle the bar.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- gated cluster size constant in
+  seq_len                          -> the wall is gone, not postponed. Check hard
+- gated cluster size grows          -> the gate lowers the constant and the
+                                      exponent survives; tiny devices work up to
+                                      a length, as before
+- 240-device cluster disagrees
+  with g5-04                       -> replication failed; stop and explain it
+- gate adds a constant at every
+  cluster size                     -> the mechanisms are independent and the
+                                      composition claim is withdrawn
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+**The gate is an oracle.** It reads `position_kinds()`, which no running system
+has. Everything here measures a ceiling. Whether a local rule can approximate it
+is the open question, and on this benchmark it may not be answerable at all --
+nothing available at storage time distinguishes a pair from filler, and surprise
+would actively prefer the filler.
+
+Nor does it test whether a cluster is *affordable*. Pooling costs a vocab-sized
+reduction among cluster members; that is cheap for eight nearby devices and not
+obviously cheap for 240 scattered ones.

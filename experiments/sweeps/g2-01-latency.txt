@@ -1,0 +1,106 @@
+G2 -- does the local rule survive a network that is late and out of order?
+===========================================================================
+
+Script: experiments/g2_01_latency.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+This is where the project's central promise about the internet finally gets
+measured instead of argued.
+
+The claim, made back when the learning method was chosen: a slow network should
+cost us MEMORY, not accuracy. If a message takes a fifth of a second to cross the
+Atlantic, the receiver just waits and holds onto what it was doing. Nothing is
+lost, nothing is rushed, and the answer comes out exactly the same as if the
+message had been instant.
+
+That is a strong claim -- not "it degrades gracefully" but "below a stated delay,
+the network makes NO difference AT ALL." We wrote it down as an argument months
+of work ago. Now there is something to run it against.
+
+There is also a cost hiding in it that nobody has stated, and this run should
+surface it: if you have to wait a fifth of a second before acting on anything,
+then you cannot act sooner than that. For a system meant to think in real time,
+that is not free. It is worth knowing exactly what it buys and what it costs.
+
+
+QUESTION
+--------
+docs/notes/002 §4 argues the predictive objective converts latency from a RACE
+into a BUFFER DEPTH: there is no signal in transit that can arrive late, so a
+delay costs memory rather than credit precision.
+
+openplexus/transport.py implements emission-time indexing with a bounded buffer
+and its own tests pin the reassembly property. What has never been measured is
+the LEARNING RULE running through it.
+
+Three things, at n_pairs=4, d_model=64 (comfortably above the crossing, so any
+damage is the network rather than capacity), 6 seeds:
+
+  A. BIT-IDENTITY. Below the bound, are the learned weights bit-identical to a
+     run with no network at all? Not close -- identical.
+  B. DEGRADATION. Above the bound, how does accuracy fall as jitter grows past
+     max_delay?
+  C. DROPS. A preview of C3: events lost entirely rather than late.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. BIT-IDENTICAL below the bound, for every (max_delay, jitter) with
+   jitter <= max_delay. Exactly equal weight matrices, not almost.
+
+   This should be true almost trivially, because the transport reassembles the
+   true order and the model then sees the identical sequence. That is the point:
+   the property is bought by the indexing scheme rather than by anything the
+   model does, which is why it holds regardless of what the learning rule is.
+   If it FAILS, something in the model carries state across the delivery seam
+   that should not.
+
+2. Above the bound, accuracy falls roughly with the FRACTION OF EVENTS LOST. A
+   late event misses its slot and is dropped, so jitter/max_delay of 2 loses
+   roughly half the stream. Guess: accuracy tracks the surviving fraction rather
+   than collapsing faster than it.
+
+3. Drops hurt about as much as equivalent lateness. A dropped event and a
+   too-late event are the same thing from the receiver's side, so a 20% drop
+   should look like whatever jitter loses 20%.
+
+4. THE HIDDEN COST, and the thing worth stating plainly: a buffer of depth
+   max_delay means nothing can be acted on until max_delay steps after it was
+   emitted. At the ~150 steps an intercontinental round trip needs, and sequences
+   of 96 steps, THE BUFFER IS DEEPER THAN THE WHOLE SEQUENCE. That is not a
+   failure -- accuracy should be untouched -- but it means the system is batching
+   rather than streaming, and "latency is free" is true only for throughput, not
+   for latency-to-first-action.
+
+   This prediction is about a fact of the design rather than about a number the
+   run produces, and it is written here so it cannot be quietly skipped when the
+   accuracy column comes back clean.
+
+Most likely to be wrong: (2). Losing a random half of a sequence may be much
+worse than halving it, because MQAR needs a key's PAIR and its QUERY both to
+survive -- lose either and that question is unanswerable. If so, accuracy should
+fall roughly as the SQUARE of the surviving fraction, and that would be a
+genuine finding about how this task interacts with an unreliable network.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- not bit-identical below bound -> the model carries state across the delivery
+                                   seam; C2's exactness claim fails and the
+                                   reason is a bug worth finding
+- accuracy falls faster than the
+  surviving fraction             -> the task compounds losses, because a pair and
+                                   its query must BOTH survive. Real, and it
+                                   would change how much loss the design can take
+- drops much worse than lateness -> the two failure modes are not equivalent and
+                                   C3 needs separate treatment from C2
+- accuracy damaged below bound   -> contradicts (1); the strongest possible
+                                   negative for the whole latency argument
+
+
+RESULT
+------
+(not yet run)

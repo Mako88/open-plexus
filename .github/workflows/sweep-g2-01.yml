@@ -1,0 +1,94 @@
+name: sweep-g2-01-latency
+
+# G2: the local rule run through a network that is late, jittered and lossy.
+#
+# Split by seed rather than by condition, because each job re-trains its own
+# clean baseline to compare against — the bit-identity check needs a reference
+# built in the same process with the same seed, and shipping weight matrices
+# between jobs to compare them would be a lot of machinery for no gain.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "openplexus/transport.py"
+      - "experiments/g2_01_latency.py"
+      - ".github/workflows/sweep-g2-01.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  latency:
+    strategy:
+      fail-fast: false
+      matrix:
+        sweep: [identity, degrade, drops]
+        seed: [1, 2, 3, 4, 5, 6]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: ${{ matrix.sweep }}, seed ${{ matrix.seed }}
+        run: python experiments/g2_01_latency.py --sweep ${{ matrix.sweep }} --seed ${{ matrix.seed }} --json out/${{ matrix.sweep }}-${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g2-01-${{ matrix.sweep }}-${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: latency
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g2-01-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          {
+            echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 18"
+            echo
+            python experiments/harness.py --aggregate "out/*.json"
+            echo
+            echo "=== bit-identity below the bound, and events kept ==="
+            python - <<'PY'
+          import glob, json
+          rows = [r for f in glob.glob("out/*.json") for r in json.load(open(f))]
+          by = {}
+          for r in rows:
+              by.setdefault(r["condition"], []).append(r)
+          print(f"{'condition':<16}{'within':>8}{'identical':>12}{'kept':>8}"
+                f"{'acc':>8}{'baseline':>10}")
+          for name, rs in sorted(by.items()):
+              ident = [r for r in rs if "identical" in r]
+              flag = (f"{sum(r['identical'] for r in ident)}/{len(ident)}"
+                      if ident else "-")
+              print(f"{name:<16}{str(rs[0].get('within_bound','-')):>8}{flag:>12}"
+                    f"{sum(r['kept'] for r in rs)/len(rs):>8.3f}"
+                    f"{sum(r['accuracy'] for r in rs)/len(rs):>8.3f}"
+                    f"{sum(r['baseline'] for r in rs)/len(rs):>10.3f}")
+          PY
+          } | tee summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g2-01-summary
+          path: |
+            summary.txt
+            out/*.json

@@ -38,7 +38,14 @@ def parse_args(description: str) -> argparse.Namespace:
                         help="run this n_pairs only; omit to run all of them")
     parser.add_argument("--decay", type=float, default=None,
                         help="run this memory decay only")
-    parser.add_argument("--sweep", default=None, choices=("widths", "decay"),
+    parser.add_argument("--jitter", type=int, default=None,
+                        help="delivery jitter in steps")
+    parser.add_argument("--max-delay", type=int, default=4,
+                        help="receiver buffer depth in steps")
+    parser.add_argument("--drop", type=float, default=None,
+                        help="fraction of events lost entirely")
+    parser.add_argument("--sweep", default=None,
+                        choices=("widths", "decay", "identity", "degrade", "drops"),
                         help="which sub-sweep to run when a script has more than one")
     parser.add_argument("--json", type=Path, default=None,
                         help="write results here as JSON instead of a table")

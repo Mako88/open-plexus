@@ -239,3 +239,115 @@ be a real null.
 This is a defect in our task design found by a probe aimed at something else,
 which is the second time a control has been worth more than the measurement it
 was guarding.
+
+
+
+================================================================================
+RE-RUN, AUTOREGRESSIVE LAYOUT -- the gate asked properly
+================================================================================
+
+The first run was invalid as a test of the gate: the answer was never emitted
+into the token stream, so "predict your next input" was not the task. The
+generator now has an autoregressive mode where each query is immediately
+followed by its answer, which is what docs/notes/001 P2 requires and had claimed
+without checking. The `answer` column below is scored at exactly those emitted
+answer positions, so at horizon 1 it IS the task.
+
+--- filler=structured, autoregressive ---
+horizon                   all              filler              answer
+---------------------------------------------------------------------
+0          0.997 (base 0.037)  1.000 (base 0.042)  1.000 (base 0.140)
+1          0.694 (base 0.037)  0.824 (base 0.042)  0.135 (base 0.140)
+2          0.575 (base 0.037)  0.675 (base 0.042)  0.144 (base 0.140)
+5          0.356 (base 0.038)  0.403 (base 0.042)  0.125 (base 0.140)
+
+--- filler=random, autoregressive ---
+horizon                   all              filler              answer
+---------------------------------------------------------------------
+0          0.998 (base 0.032)  1.000 (base 0.035)  1.000 (base 0.140)
+1          0.030 (base 0.032)  0.029 (base 0.035)  0.140 (base 0.140)
+2          0.031 (base 0.032)  0.030 (base 0.035)  0.154 (base 0.140)
+5          0.032 (base 0.032)  0.032 (base 0.035)  0.156 (base 0.140)
+
+
+THE GATE IS SHUT, AND IT WAS NEVER GOING TO BE OTHERWISE
+---------------------------------------------------------
+Answer positions at horizon 1: 0.135 against a base of 0.140 under structured
+filler, 0.140 against 0.140 under random. At base rate. The control at horizon 0
+is 1.000, so the probe works.
+
+But look at what the question became once P2 was satisfied. At a query position
+the state holds the key; predicting the next token means producing the value.
+THAT IS THE RECALL TASK. g0-02 already measured a frozen substrate at 0.180 on
+exactly that, and this is the same measurement wearing different clothes.
+
+So this run is CONSISTENT with everything already known and adds no information
+about the substrate. Fixing P2 made the probe correct and simultaneously made it
+circular: at answer positions, "is there signal to learn from" and "have you
+already solved the task" are the same question.
+
+That is worth stating plainly because it was not obvious in advance, and because
+it means the gate as originally posed cannot be answered this way.
+
+
+THE FINDING THAT IS NEW, AND IT CORRECTS docs/notes/002 §7
+-----------------------------------------------------------
+Read the filler column against the answer column.
+
+  filler, structured, horizon 1:   0.824   (base 0.042)
+  answer, structured, horizon 1:   0.135   (base 0.140)
+
+There IS abundant predictable structure in this task. It is all in the filler,
+and it is worth nothing.
+
+docs/notes/002 §7 recorded a tension: note 001 wants irrelevant material because
+a random substrate cannot discard selectively; note 002 objects that random
+material is unpredictable and starves a predictive objective. Its proposed
+resolution was STRUCTURED FILLER -- irrelevant but predictable, so the objective
+has signal.
+
+MEASURED, THAT RESOLUTION DOES NOT WORK. It does not fix starvation; it replaces
+starvation with distraction:
+
+  - random filler     -> 0.029. No signal at all. The objective starves.
+  - structured filler -> 0.824. Abundant signal, ALL of it task-irrelevant.
+
+A predictive objective trained here would spend almost all of its gradient
+learning to continue a counting cycle. The proposed fix separated
+"hard-to-retain" from "impossible-to-predict" exactly as intended, and produced a
+third problem nobody named: EASY-AND-USELESS.
+
+Both filler modes are bad for a predictive objective, for opposite reasons, and
+the note treated one of them as the solution.
+
+
+WHAT THIS IMPLIES, STATED AS A PROBLEM RATHER THAN A FIX
+---------------------------------------------------------
+A predictive objective needs a task whose TASK-RELEVANT content is predictable
+in principle from context, but not already solved by the untrained substrate.
+MQAR does not obviously provide that:
+
+  - its keys and values are drawn at random, so the only predictable
+    task-relevant token is the answer;
+  - and the answer is predictable only by an agent that has already done the
+    retrieval.
+
+There is no gradual slope here. It is a step: you cannot predict the answer at
+all until you can retrieve, at which point you can predict it perfectly. A
+predictive objective learns from a slope.
+
+That is a real problem for the task/objective pairing and it is NOT resolved by
+this note. Three directions, none of them measured, and none to be adopted
+before being argued properly:
+
+  a. A task with graded predictable structure -- language-like statistics, where
+     partial context yields partial predictability, rather than random symbols.
+  b. Keep MQAR for G0 as a capability benchmark and use a DIFFERENT task to
+     drive the predictive objective. This breaks P2 on purpose and honestly,
+     rather than believing it while it is false.
+  c. Accept that the predictive objective needs a bootstrapping signal that MQAR
+     cannot supply, and reconsider docs/notes/002's mechanism ranking.
+
+docs/notes/002 §8 already lists "it does not establish that any of this learns"
+as an open item. This narrows it: the scheme may be sound and simply have been
+paired with a task that cannot train it.

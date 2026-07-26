@@ -205,10 +205,16 @@ options rather than resolving it here:
   G0 gap and the learnability of the predictive objective, and take the
   operating point where both are acceptable. There may be no such point, which
   is itself a finding.
-- **Make the noise structured rather than random**, so it is predictable but
-  irrelevant. This separates "hard to retain selectively" from "impossible to
-  predict", which is what actually collides. Currently the most promising
-  option, and it is free at task-design time.
+- ~~**Make the noise structured rather than random**, so it is predictable but
+  irrelevant.~~ **MEASURED, AND IT DOES NOT WORK** —
+  [g1-01](../../experiments/sweeps/g1-01-predictability.txt). It separates the
+  two properties exactly as intended and produces a third problem nobody named:
+  structured filler is predictable at **0.824** while task content sits at
+  **0.135 against a base of 0.140**. The objective no longer starves; it drowns
+  in easy, task-irrelevant signal and would spend almost all its gradient
+  learning to continue a counting cycle. *Random filler starves it, structured
+  filler distracts it.* Both are bad, for opposite reasons, and this note
+  proposed one of them as the fix.
 - **Score prediction only on predictable positions.** Rejected on sight: it
   requires knowing which positions those are, which is global knowledge about
   the task, and it would not survive contact with real data.

@@ -76,6 +76,78 @@ class TestTaskIsWellPosed(unittest.TestCase):
         self.assertNotIn(IGNORE, seq.scored_targets())
 
 
+class TestAutoregressiveMode(unittest.TestCase):
+    """The layout that makes docs/notes/001 P2 actually true.
+
+    P2 claimed the self-supervised objective and the task metric are one
+    quantity. g1-01 found that false in the classification layout: the answer
+    is a label beside the stream and never appears in it, so "predict your next
+    input" and "answer the query" are different questions. These tests pin the
+    property P2 needs.
+    """
+
+    AR = replace(BASE, autoregressive=True, seq_len=48)
+
+    def test_the_next_token_after_a_query_is_that_query_s_answer(self):
+        """P2, as an executable assertion rather than a claim in a note."""
+        seq = generate(self.AR)
+        for position in seq.query_positions:
+            self.assertEqual(seq.tokens[position + 1], seq.targets[position])
+
+    def test_classification_mode_never_emits_the_answer_positionally(self):
+        """The contrast that makes the flag mean something. Without this, an
+        autoregressive-only generator would pass every test above while the
+        flag did nothing."""
+        seq = generate(replace(self.AR, autoregressive=False))
+        self.assertEqual(seq.answer_positions, ())
+
+    def test_answer_positions_are_classified_as_answers_not_filler(self):
+        """The emitted answer is the single most task-relevant position in the
+        sequence. Defaulting it to "filler" would exclude it from exactly the
+        measurement it exists for, and the predictability probe splits on
+        precisely this classification."""
+        seq = generate(self.AR)
+        kinds = seq.position_kinds()
+        for position in seq.answer_positions:
+            self.assertEqual(kinds[position], "answer")
+        self.assertEqual(len(seq.answer_positions), self.AR.n_pairs)
+
+    def test_answer_positions_follow_query_positions(self):
+        seq = generate(self.AR)
+        self.assertEqual(seq.answer_positions,
+                         tuple(p + 1 for p in seq.query_positions))
+
+    def test_autoregressive_needs_more_room_per_pair(self):
+        self.assertEqual(replace(BASE, n_pairs=4).min_seq_len, 12)
+        self.assertEqual(replace(BASE, n_pairs=4, autoregressive=True).min_seq_len, 16)
+        with self.assertRaises(ValueError):
+            replace(BASE, n_pairs=4, seq_len=14, autoregressive=True)
+
+    def test_the_flag_changes_the_sequence(self):
+        a = generate(replace(self.AR, autoregressive=False))
+        b = generate(self.AR)
+        self.assertNotEqual(a.tokens, b.tokens)
+
+    def test_autoregressive_sequences_are_exactly_seq_len(self):
+        """The mutation `autoregressive-flag-inert` survived the whole suite
+        until this existed.
+
+        Setting the query width back to 1 while still emitting an answer per
+        query makes every sequence *longer* than requested — the layout silently
+        overruns. Nothing asserted the length in autoregressive mode: the
+        existing length test only ran the classification layout, so a region of
+        the generator was covered by tests that could never see it. Rule 10's
+        failure mode, third instance.
+        """
+        for n_pairs, seq_len in ((2, 24), (4, 48), (6, 80)):
+            for autoregressive in (False, True):
+                with self.subTest(n_pairs=n_pairs, autoregressive=autoregressive):
+                    seq = generate(replace(BASE, n_pairs=n_pairs, seq_len=seq_len,
+                                           autoregressive=autoregressive))
+                    self.assertEqual(len(seq.tokens), seq_len)
+                    self.assertEqual(len(seq.targets), seq_len)
+
+
 class TestConfigurationIsConnected(unittest.TestCase):
     """Rule 6: perturb the input, assert the output moves.
 

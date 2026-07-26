@@ -61,8 +61,8 @@ MUTATIONS = [
         name="query-only-the-first-pair",
         breaks="the multi-query property that makes the benchmark discriminating",
         path=MQAR,
-        old="query_offsets = sorted(rng.sample(range(body_len), config.n_pairs))",
-        new="query_offsets = sorted(rng.sample(range(body_len), 1))",
+        old="    slots = [True] * config.n_pairs + [False] * n_filler",
+        new="    slots = [True] + [False] * (n_filler + config.n_pairs - 1)",
     ),
     Mutation(
         name="ignore-the-seed",
@@ -126,6 +126,20 @@ MUTATIONS = [
         path=BASELINES,
         old="        for position in sequence.query_positions:",
         new="        for position in range(len(sequence.tokens)):",
+    ),
+    Mutation(
+        name="autoregressive-flag-inert",
+        breaks="the autoregressive layout, so docs/notes/001 P2 is silently unsatisfied again",
+        path=MQAR,
+        old="    query_width = 2 if config.autoregressive else 1",
+        new="    query_width = 1",
+    ),
+    Mutation(
+        name="answer-positions-classified-as-filler",
+        breaks="the answer's classification, excluding it from the task column of the probe",
+        path=MQAR,
+        old='            kinds[i] = "answer"',
+        new='            kinds[i] = "filler"',
     ),
     Mutation(
         name="lookup-uses-first-occurrence",

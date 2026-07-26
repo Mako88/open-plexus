@@ -48,7 +48,7 @@ N_TRAIN, N_TEST = 200, 120
 TASK = MqarConfig(n_pairs=4, seq_len=64, n_keys=32, n_values=8, seed=20260725)
 SUBSTRATE = ReservoirConfig(n_units=64, spectral_radius=0.9, leak=0.3, seed=1)
 HORIZONS = (0, 1, 2, 5)
-KINDS = ("all", "filler", "task")
+KINDS = ("all", "filler", "answer")
 
 
 def probe(task: MqarConfig, horizon: int, kind: str) -> tuple[float, float]:
@@ -75,7 +75,7 @@ def probe(task: MqarConfig, horizon: int, kind: str) -> tuple[float, float]:
                 target_kind = kinds[t + horizon]
                 if kind == "filler" and target_kind != "filler":
                     continue
-                if kind == "task" and target_kind == "filler":
+                if kind == "answer" and target_kind != "answer":
                     continue
                 rows.append(states[t])
                 labels.append(sequence.tokens[t + horizon])
@@ -98,7 +98,7 @@ def main() -> int:
           "next-token at those same positions.\n")
 
     for filler in ("structured", "random"):
-        task = replace(TASK, filler=filler)
+        task = replace(TASK, filler=filler, autoregressive=True, seq_len=96)
         print(f"--- filler={filler} ---")
         header = f"{'horizon':<9}" + "".join(f"{k:>20}" for k in KINDS)
         print(header)
@@ -112,6 +112,10 @@ def main() -> int:
             print(f"{horizon:<9}" + "".join(cells))
         print()
 
+    print("AUTOREGRESSIVE layout: each query is followed by its answer, so the")
+    print("'answer' column at horizon 1 is the task itself -- predicting the next")
+    print("token at a query position IS answering the query (docs/notes/001 P2).")
+    print()
     print("horizon 0 is the connection control: decoding the CURRENT token.")
     print("If it is not near 1.000 the probe is broken and no other row means")
     print("anything. 'task' excludes filler positions -- structured filler is a")

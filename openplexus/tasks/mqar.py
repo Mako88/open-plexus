@@ -51,6 +51,17 @@ class MqarConfig:
             has to be discarded, but predictable. These three exist so that the
             conflict recorded in docs/notes/002 §7 is a measurable condition
             rather than an argument.
+        autoregressive: When True, each query is immediately followed by its
+            answer token in the stream, so that predicting the next token at a
+            query position **is** the task. When False (the default, since new
+            mechanisms default to off) the answer exists only as a label beside
+            the stream and never appears in it.
+
+            This distinction is not cosmetic. docs/notes/001 P2 chose this task
+            on the grounds that the self-supervised objective and the task
+            metric are one quantity — and that is true only in the
+            autoregressive layout. g1-01 found the classification layout does
+            not satisfy P2, after the note had claimed it did.
         seed: Determines the sequence completely. Two configs with the same seed
             produce identical output.
     """
@@ -60,6 +71,7 @@ class MqarConfig:
     n_keys: int = 32
     n_values: int = 16
     filler: str = "structured"
+    autoregressive: bool = False
     seed: int = 0
 
     def __post_init__(self) -> None:
@@ -90,9 +102,10 @@ class MqarConfig:
     def min_seq_len(self) -> int:
         """Shortest sequence that fits the pairs and their queries.
 
-        Each pair costs two positions to present and one to query.
+        Each pair costs two positions to present, plus one to query — or two in
+        autoregressive mode, where the answer follows the question.
         """
-        return self.n_pairs * 3
+        return self.n_pairs * (4 if self.autoregressive else 3)
 
     @property
     def trivial_floor(self) -> float:
@@ -148,12 +161,21 @@ class MqarSequence:
         pairs: The key-value mapping this sequence encodes, for tests and
             diagnostics. Not available to a model.
         query_positions: Indices where `targets` is not `IGNORE`, in order.
+        answer_positions: In autoregressive mode, the index immediately after
+            each query, where that query's answer is emitted. Empty otherwise.
+
+            Recorded explicitly rather than inferred. Inferring it from
+            `tokens[p+1] == targets[p]` would silently misfire in the
+            classification layout whenever a filler token coincided with the
+            answer, and would classify the single most important position in the
+            sequence by accident.
     """
 
     tokens: tuple[int, ...]
     targets: tuple[int, ...]
     pairs: dict[int, int]
     query_positions: tuple[int, ...]
+    answer_positions: tuple[int, ...] = ()
 
     def position_kinds(self) -> tuple[str, ...]:
         """What each position is: `"pair"`, `"query"`, or `"filler"`.
@@ -176,6 +198,11 @@ class MqarSequence:
             kinds[i] = "pair"
         for i in self.query_positions:
             kinds[i] = "query"
+        # The emitted answer is the most task-relevant position in the whole
+        # sequence and would otherwise default to "filler", excluding it from
+        # exactly the measurement it exists for.
+        for i in self.answer_positions:
+            kinds[i] = "answer"
         return tuple(kinds)
 
     def scored_targets(self) -> tuple[int, ...]:
@@ -198,7 +225,8 @@ def generate(config: MqarConfig) -> MqarSequence:
 
     Layout: the `n_pairs` key-value bigrams are presented first, then the
     remainder of the sequence is filler with the queries placed at random
-    positions among it. Every key is queried exactly once.
+    positions among it. Every key is queried exactly once. In autoregressive
+    mode each query is immediately followed by its answer.
 
     This is a simplification of the interleaved layout used in the source that
     introduced the task; pairs-first is easier to reason about and preserves the
@@ -225,19 +253,39 @@ def generate(config: MqarConfig) -> MqarSequence:
     # calibration on rule 6 in CLAUDE.md.
     spare_keys = tuple(k for k in range(config.n_keys) if k not in pairs)
 
-    body_len = config.seq_len - len(tokens)
-    query_offsets = sorted(rng.sample(range(body_len), config.n_pairs))
+    # The body is laid out as a shuffled sequence of slots: one slot per query,
+    # the rest filler. A query slot is 1 position wide normally and 2 in
+    # autoregressive mode, where the answer follows the question. One code path
+    # with the difference as a named parameter, rather than two layouts that
+    # could drift (rule 9).
+    body_start = len(tokens)
+    body_len = config.seq_len - body_start
+    query_width = 2 if config.autoregressive else 1
+    n_filler = body_len - config.n_pairs * query_width
+
+    slots = [True] * config.n_pairs + [False] * n_filler
+    rng.shuffle(slots)
     query_order = keys[:]
     rng.shuffle(query_order)
-    at_offset = dict(zip(query_offsets, query_order))
 
-    for offset in range(body_len):
-        key = at_offset.get(offset)
-        if key is not None:
+    pending = iter(query_order)
+    answer_positions: list[int] = []
+    for is_query in slots:
+        if is_query:
+            key = next(pending)
             tokens.append(key)
             targets.append(pairs[key])
+            if config.autoregressive:
+                answer_positions.append(len(tokens))
+                # The answer, emitted into the stream. This is what makes
+                # next-token prediction at a query position *be* the task —
+                # docs/notes/001 P2, which the classification layout does not
+                # satisfy and was believed to.
+                tokens.append(pairs[key])
+                targets.append(IGNORE)
         else:
-            tokens.append(_filler_token(config, rng, offset, spare_keys))
+            tokens.append(_filler_token(
+                config, rng, len(tokens) - body_start, spare_keys))
             targets.append(IGNORE)
 
     query_positions = tuple(i for i, t in enumerate(targets) if t != IGNORE)
@@ -246,6 +294,7 @@ def generate(config: MqarConfig) -> MqarSequence:
         targets=tuple(targets),
         pairs=pairs,
         query_positions=query_positions,
+        answer_positions=tuple(answer_positions),
     )
 
 

@@ -1,0 +1,85 @@
+name: sweep-g8-01-a-gate-without-an-oracle
+
+# How much of the oracle gate's advantage can a real mechanism recover?
+#
+# Three headline results -- g7-02, g7-03 and the tiny-node claim -- run through a
+# gate that reads position_kinds(). This measures what is left without it.
+#
+# CONTROLS RAN BEFORE DISPATCH, and changed the grid twice.
+#
+#   At seq 192 the oracle's advantage over no gate is 0.043. The reported
+#   quantity is a RATIO with that advantage as its denominator, so 192 is close
+#   to vacuous and is reported as undefined rather than as a large number with a
+#   caveat beside it. At seq 768 the advantage is 0.293 and the grid is sound.
+#
+#   1536 was added afterwards. Prediction 3 says recovery FALLS with length, and
+#   a grid that stops where the effect is still growing cannot test its own
+#   prediction.
+#
+#   The controls also show the likely answer: at 768, one seed, lr 0.05, the two
+#   real arms land within 0.02 of doing nothing, twice on the wrong side.
+#
+# 36 jobs. Costed from the measured control: 24m23s for three half-lives x four
+# arms x one seed at 768, so ~8.1 min per (half-life, seed) there and ~24 min per
+# job, scaling with sequence length. Worst job is 1536 at ~49 min, inside the
+# 90-minute timeout. ~13.7 hours serial.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  recovery:
+    strategy:
+      fail-fast: false
+      matrix:
+        seqlen: [192, 384, 768, 1536]
+        decay: ["0.5", "0.25", "0.125"]
+        lr: ["0.02", "0.05", "0.1"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: seq ${{ matrix.seqlen }} half-life ${{ matrix.decay }} lr ${{ matrix.lr }}
+        run: python experiments/g8_01_real_gate.py --seqlen ${{ matrix.seqlen }} --decay ${{ matrix.decay }} --lr ${{ matrix.lr }} --json out/X-${{ matrix.seqlen }}-${{ matrix.decay }}-${{ matrix.lr }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g8-01-${{ matrix.seqlen }}-${{ matrix.decay }}-${{ matrix.lr }}
+          path: out/*.json
+
+  aggregate:
+    needs: [recovery]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g8-01-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 36" | tee summary.txt
+          python tools/summarise_g8_01.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g8-01-summary
+          path: |
+            summary.txt
+            out/*.json

@@ -492,8 +492,17 @@ So, concretely:
 - **After a block of verification work, the next block builds something** — even
   if it is likely to fail. A null from a new mechanism is worth more than a
   fifth confirmed audit.
-- **No more than two investigations open at once.** The queue is where creep
-  accumulates. If a third is worth running, something else gets dropped.
+- **Never open a new investigation while an existing one still has work in it.**
+  This replaces a flat cap of two, which John retired once the runs got long
+  enough that the cap was mostly enforcing idleness. The queue is still where
+  creep accumulates, so the test is no longer "how many are open" but **"is
+  there anything I could be doing on something already open?"** If yes, do that.
+  If everything open is genuinely blocked — on a sweep, on a build, on a
+  decision only John can make — starting something new beats waiting, and
+  carries no urgency with it.
+- **Waiting is not a state this project has any use for.** Long runs go to the
+  background and something else gets built while they run. `tools/mutate.py` is
+  seven minutes of nothing; a sweep is hours of it.
 - **Retire a condition in the same change that adds it.**
 - **When in doubt, ask what would move the goal**, not what would make the
   record more accurate.

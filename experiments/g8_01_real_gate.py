@@ -46,7 +46,13 @@ BASE = MqarConfig(n_pairs=4, seq_len=192, n_keys=32, n_values=8,
                   autoregressive=True, filler="random", seed=20260726,
                   queries_per_pair=3)
 
-SEQ_LENS = (192, 384, 768)
+# 1536 added after the controls. At 192 the oracle's advantage is 0.043, which
+# is too small a denominator for a recovery ratio to mean anything; at 768 it is
+# 0.293. Prediction 3 says recovery FALLS with length, and a grid that stops
+# where the effect is still growing cannot test that -- a sweep that does not
+# contain its own answer has not swept. 192 is kept so the row where the gate
+# barely matters is visible rather than assumed.
+SEQ_LENS = (192, 384, 768, 1536)
 HALF_LIVES = (0.5, 0.25, 0.125)
 LEARNING_RATES = (0.02, 0.05, 0.1)
 SEEDS = (1, 2, 3)

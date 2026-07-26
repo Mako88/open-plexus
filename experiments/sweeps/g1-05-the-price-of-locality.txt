@@ -1,0 +1,118 @@
+G1 -- what does a LOCAL rule need, against what backprop needs?
+================================================================
+
+Script: experiments/g1_05_local.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+This is the actual bet the whole project rests on.
+
+Everything that has solved our memory test so far did it in a way that could
+never run on strangers' computers: every part of the model looks at every other
+part, and learning works by sending information backwards through the whole
+thing. That is what needs a data centre.
+
+So we built the alternative -- a system where every update a connection makes
+depends only on what its own two ends are doing. Nothing looks at everything.
+Nothing travels backwards.
+
+Does it work? And if it works, how much bigger does it have to be?
+
+That second question is the useful one. The unrestricted model needs somewhere
+between 8 and 16 numbers to think with. If ours needs 64, then "four to eight
+times bigger" is the price of running on ordinary machines -- a real number we can
+argue about. If it never works at any size, that is a different and much worse
+answer.
+
+
+QUESTION
+--------
+g1-04 established that difficulty for a competent model lives in MODEL WIDTH, not
+in the task parameters, and gave the attention model's threshold: 0/8 solved at
+d_model 4 and 8, 8/8 at 16 and above.
+
+So: sweep d_model for the local rule on the same task, at the same success
+criterion, and compare where each crosses.
+
+THE LOCAL RULE
+  store      M += v(x_t) (x) k(x_{t-1})      Hebbian outer product. Entry [i,j]
+                                             changes by the product of a signal
+                                             at its output side and one at its
+                                             input side. Nothing else consulted.
+  retrieve   r = M k(x_t)                    matrix-vector; each output sums over
+                                             its own incoming connections
+  predict    y = Wo r
+  learn      Wo += lr (target - y) (x) r      delta rule; the error is the unit's
+                                             own, against its own next input
+
+No softmax over positions. No backward pass. Wk and Wv are frozen random -- only
+Wo learns, which is the strictest version of the question.
+
+Reported as SOLVED / STUCK counts (g1-03: outcomes are bimodal, so a mean
+describes a mixture of two populations and no actual run).
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. It works at SOME width. The mechanism is a fast-weight associative memory,
+   which is what content-addressed retrieval looks like when built out of local
+   operations, and g0-03 showed one hand-written lookup closes the entire gap.
+   This is that lookup, learned Hebbianly instead of written down.
+
+2. It needs MORE width than attention -- this is the central prediction and the
+   number the experiment exists to produce. Guess: crosses somewhere between 64
+   and 256, so a 4x-16x penalty.
+
+   The reason to expect a penalty rather than parity: this computation is what a
+   LINEAR-attention layer does, and docs/notes/006 records that linear attention
+   fails MQAR unless its state is large while softmax attention does not. A
+   softmax picks one match; an outer-product store superposes every binding it
+   has seen and the retrieval returns the right one plus interference from all
+   the others. Width is what buys the room for those to stay separable.
+
+3. The penalty grows with n_pairs. More bindings superposed in one matrix means
+   more interference, and unlike attention -- which g1-04 measured as completely
+   flat in n_pairs -- this rule should care. If so, **n_pairs becomes a real
+   difficulty dial for the first time**, for exactly the reason it was not one
+   before.
+
+4. decay < 1.0 does not help at the reference size. It bounds interference by
+   forgetting, but MQAR needs every binding retained until its query arrives, so
+   forgetting should cost more than the interference it prevents.
+
+Most likely to be wrong: (2)'s magnitude. The honest range is wide. Two outcomes
+would each be more interesting than the middle:
+   (a) parity with attention, meaning locality is free on this task, which would
+       be a surprisingly good result and would need checking hard for a leak;
+   (b) never crosses at any width tested, meaning superposition interference is
+       not something width fixes, and the rule needs a mechanism for keeping
+       bindings apart rather than more room.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- crosses at 8-16            -> parity. Locality free here. Check for a leak
+                                before believing it
+- crosses at 64-256          -> as predicted; the ratio is the price of locality
+- never crosses              -> width is the wrong remedy; interference needs
+                                addressing directly. NOT a refutation of the
+                                project, but a much harder road
+- n_pairs flat for this rule -> superposition interference is not the mechanism
+                                and prediction 2's reasoning is wrong even if its
+                                number is right
+
+
+A NOTE ON WHAT THIS IS NOT
+---------------------------
+This is a locality-RESPECTING computation running in one process. It is not
+distributed and nothing here tests delay or churn -- those are G2 and G3. What is
+being tested is whether the C1 constraint is affordable at all, which has to come
+first: a rule that cannot learn in one process will not learn spread over
+thousands.
+
+
+RESULT
+------
+(not yet run)

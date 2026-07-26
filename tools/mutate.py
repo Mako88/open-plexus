@@ -29,6 +29,7 @@ MQAR = ROOT / "openplexus" / "tasks" / "mqar.py"
 BASELINES = ROOT / "openplexus" / "baselines.py"
 INDUCTION = ROOT / "openplexus" / "models" / "induction.py"
 ATTENTION = ROOT / "openplexus" / "models" / "attention.py"
+LOCAL = ROOT / "openplexus" / "models" / "local_memory.py"
 
 
 @dataclass(frozen=True)
@@ -176,6 +177,34 @@ MUTATIONS = [
         path=ATTENTION,
         old="            self.params[name] -= self.lr * m_hat / (np.sqrt(v_hat) + self.eps)",
         new="            self.params[name] -= 0.0 * m_hat / (np.sqrt(v_hat) + self.eps)",
+    ),
+    Mutation(
+        name="local-store-binds-the-current-token-to-itself",
+        breaks="the induction binding, storing (t -> t) rather than (t-1 -> t)",
+        path=LOCAL,
+        old="                memory += np.outer(value, previous_key)",
+        new="                memory += np.outer(value, key)",
+    ),
+    Mutation(
+        name="local-memory-never-stores",
+        breaks="the Hebbian store, so retrieval always returns zero",
+        path=LOCAL,
+        old="            if previous_key is not None:",
+        new="            if False:",
+    ),
+    Mutation(
+        name="local-delta-rule-inert",
+        breaks="the delta rule, so the readout never learns and sits at its initialisation",
+        path=LOCAL,
+        old="                self.wo += self.config.lr * np.outer(target - readout, retrieved)",
+        new="                self.wo += 0.0 * np.outer(target - readout, retrieved)",
+    ),
+    Mutation(
+        name="local-memory-persists-across-sequences",
+        breaks="per-sequence reset, letting the model accumulate the training set",
+        path=LOCAL,
+        old="        memory = np.zeros((d, d))",
+        new="        memory = getattr(self, '_leak', np.zeros((d, d))); self._leak = memory",
     ),
     Mutation(
         name="lookup-uses-first-occurrence",

@@ -420,10 +420,11 @@ is for the *model* layer only. Anything in `openplexus/tasks/` or
 `openplexus/baselines.py` importing it is a defect: those are the ruler, and the
 ruler stays dependency-free. The consumer-device runtime remains undecided.
 
-- **Run both checks before every commit:**
+- **Run all three checks before every commit:**
   ```
   python -m unittest discover -s tests -t . -q
   python tools/mutate.py
+  python tools/check_workflows.py
   ```
   The second is not optional and not a nice-to-have: **rule 10 is unenforceable
   without it.** It breaks each named mechanism on purpose and requires the suite
@@ -439,7 +440,19 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
 - **A check that guards a long job must run in a second, not at the end.** A
   configuration error that kills a twenty-minute run on its first line should be
   caught before launch; a guard that fires when the run finishes has already
-  spent it.
+  spent it. `tools/check_workflows.py` is that check for CI: it reads every
+  `python experiments/*.py` line out of every workflow and compares the flags
+  against the script's own `--help`. It takes about a second, and it turns a
+  spent matrix into an error before anything is dispatched.
+- **One sweep matrix in flight at a time.** A matrix takes every runner, so a
+  second sweep pushed while one is running does not overlap — its jobs queue,
+  seize the runners the moment the first finishes, and starve the first's
+  aggregate step. Enforced by a shared `concurrency` group rather than
+  remembered.
+- **A sweep that loses seeds still reports.** Aggregation runs on `always()` and
+  prints how many seeds returned. A matrix where two jobs died is a result with
+  two seeds missing; reporting the survivors as though they were the whole
+  matrix is worse than either reporting nothing or reporting the loss.
 - **A tool that edits source in place needs an out-of-process backup.**
   `try`/`finally` does not run when the process is killed, and a timeout will
   eventually leave an edit in the working tree.

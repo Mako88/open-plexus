@@ -1,0 +1,26 @@
+name: checks
+
+# The two commands CLAUDE.md names, on every push. The second is the one that
+# matters: rule 10 is unenforceable without a harness that verifies the tests can
+# actually fail, and a suite nobody has seen go red is not evidence.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: Test suite
+        run: python -m unittest discover -s tests -t . -q
+      - name: Verify the tests can fail
+        run: python tools/mutate.py
+      - name: Verify every workflow flag is one its script accepts
+        run: python tools/check_workflows.py

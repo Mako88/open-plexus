@@ -1,0 +1,70 @@
+name: sweep-g1-05-price-of-locality
+
+# One job per seed, run concurrently, then recombined. The seeds of a sweep are
+# independent, so this is the whole of the parallelism available and it is worth
+# taking: eight seeds serially is eight times the wall clock of eight seeds at
+# once, and the answer is identical.
+#
+# `concurrency` below is not optional. A second sweep pushed while this one runs
+# does not overlap with it — its jobs queue, seize the runners the moment these
+# finish, and starve the aggregate step of the first. The predecessor project hit
+# that three times before enforcing it.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "openplexus/models/local_memory.py"
+      - "experiments/g1_05_local.py"
+      - ".github/workflows/sweep-g1-05.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  seed:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [1, 2, 3, 4, 5, 6, 7, 8]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: Run seed ${{ matrix.seed }}
+        run: python experiments/g1_05_local.py --seed ${{ matrix.seed }} --json out/${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-05-seed-${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: seed
+    # `always()` so a partial matrix still reports. A sweep where two seeds died
+    # is a result with two seeds missing, not nothing — and silently reporting
+    # the survivors as if they were the whole matrix is worse than either.
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g1-05-seed-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "seeds returned: $(ls out/*.json | wc -l) of 8"
+          python experiments/harness.py --aggregate "out/*.json" | tee summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY

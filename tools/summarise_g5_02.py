@@ -24,6 +24,43 @@ TOTAL_WIDTH = None
 WIDTH_EXPONENT = 0.37     # g1-10, for TOTAL width, measured at P=1
 
 
+
+def fit_one(criterion, fits, width_exponent):
+    """Fit and report one criterion, or say why it cannot be fitted."""
+    print()
+    if len(fits) < 2:
+        print(f"'{criterion}': fewer than two rows had a LOCATED minimum width, "
+              f"so no exponent can be fitted. The rest hit the grid floor, which "
+              f"bounds the minimum width without measuring it.")
+        return
+    print(f"'{criterion}', {len(fits)} located rows: "
+          + ", ".join(f"{s}:({lo},{hi}]" for s, (hi, lo) in sorted(fits.items())))
+    order = sorted(fits)
+    xs = [math.log(s) for s in order]
+    ys = [math.log(fits[s][0]) for s in order]
+    n = len(xs)
+    mx, my = sum(xs) / n, sum(ys) / n
+    alpha = (sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+             / sum((x - mx) ** 2 for x in xs))
+    span = math.log(max(order) / min(order))
+    bracket = max(hi / lo for hi, lo in fits.values() if lo)
+    slack = math.log(bracket) / span if span else float("inf")
+    print(f"  minimum machine width grows as seq_len^{alpha:.2f}, resolved to "
+          f"+/-{slack:.2f}, so the exponent lies in "
+          f"[{max(0.0, alpha - slack):.2f}, {alpha + slack:.2f}]")
+    print(f"  against seq_len^{width_exponent} for TOTAL width (g1-10), so the "
+          f"usable machine COUNT goes as seq_len^{width_exponent - alpha:+.2f}")
+    if alpha - slack <= width_exponent <= alpha + slack:
+        print("  UNRESOLVED -- that range spans g1-10's exponent, so this grid "
+              "cannot say whether the machine count is flat or shrinking.")
+    elif alpha > width_exponent:
+        print("  MACHINE COUNT SHRINKS as problems grow: capability is bought by "
+              "making machines bigger, not by adding more.")
+    else:
+        print("  MACHINE COUNT GROWS. Favourable, therefore suspect -- check the "
+              "floors are spread across grid points rather than bunched.")
+
+
 def main() -> int:
     rows = [r for f in glob.glob(sys.argv[1] if len(sys.argv) > 1 else "out/*.json")
             for r in json.load(open(f))]
@@ -110,69 +147,12 @@ def main() -> int:
                   f"is in ({floor}, {TOTAL_WIDTH // top}]")
 
     print()
-    # Prefer whichever criterion the grid actually resolved. `alone` is the one
-    # C1 needs -- a machine that cannot afford to pool -- and being the harder
-    # bar it saturates less, so it is usually the better resolved of the two.
-    fits = {s: w for s, w in min_width_alone.items() if s not in ceiling_failed}
-    criterion = "alone"
-    if len(fits) < 2:
-        fits = {s: w for s, w in min_width.items() if s not in ceiling_failed}
-        criterion = "pooled"
-    if len(fits) < 2:
-        print("Fewer than two rows had a LOCATED minimum width: no exponent can "
-              "be fitted. The others hit the grid floor, which bounds the "
-              "minimum width without measuring it.")
-    else:
-        print(f"Fitting on the '{criterion}' criterion, {len(fits)} located "
-              f"rows: " + ", ".join(f"{s}:({lo},{hi}]" for s, (hi, lo)
-                                    in sorted(fits.items())))
-        order = sorted(fits)
-        xs = [math.log(s) for s in order]
-        ys = [math.log(fits[s][0]) for s in order]
-        n = len(xs)
-        mx, my = sum(xs) / n, sum(ys) / n
-        denom = sum((x - mx) ** 2 for x in xs)
-        alpha = (sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / denom
-                 if denom else 0.0)
-        # Each width is known only to within a factor of two, so the exponent
-        # carries a range rather than a value. Quoting the point estimate alone
-        # is how a factor-of-two grid gets published as a scaling law.
-        # Slack is set by the widest bracket the grid actually left around a
-        # crossing, not by an assumed step. The worst case for the slope is the
-        # shortest row sitting at the top of its bracket while the longest sits
-        # at the bottom, or the reverse.
-        span = math.log(max(order) / min(order))
-        bracket = max(hi / lo for hi, lo in fits.values() if lo)
-        slack = math.log(bracket) / span if span else float("inf")
-        print(f"MINIMUM MACHINE WIDTH grows as seq_len^{alpha:.2f}, and this "
-              f"grid resolves it only to +/-{slack:.2f}")
-        print(f"  so the exponent lies in "
-              f"[{max(0.0, alpha - slack):.2f}, {alpha + slack:.2f}]")
-        print(f"  against seq_len^{WIDTH_EXPONENT} for TOTAL width (g1-10)")
-        print(f"  so usable machine COUNT goes as seq_len^"
-              f"{WIDTH_EXPONENT - alpha:+.2f}")
-        print()
-        if alpha - slack <= WIDTH_EXPONENT <= alpha + slack:
-            print("  UNRESOLVED. That range spans g1-10's 0.37, so this grid "
-                  "cannot say whether the usable machine count is flat or "
-                  "shrinking. A finer width grid, or a longer lever arm in "
-                  "seq_len, is the follow-up -- not a claim.")
-        elif alpha <= WIDTH_EXPONENT + 0.1:
-            print("  Machine width scales like total width: the usable machine "
-                  "count is roughly CONSTANT with problem size. Favourable, so "
-                  "check the crossings are spread rather than bunched at one "
-                  "grid point.")
-        elif WIDTH_EXPONENT - alpha < -0.15:
-            print("  USABLE MACHINE COUNT SHRINKS as problems grow. Past some "
-                  "size, capability is bought by making machines bigger, not by "
-                  "adding more -- which is the outcome G5 exists to detect.")
-        else:
-            print("  Machine count is close to flat; the grid cannot separate "
-                  "shrinking from constant.")
-
-        if len(fits) == len({v for v in fits.values()}) and len(set(fits.values())) == 1:
-            print("  WARNING: every row gave the same machine width, so the "
-                  "exponent is an artefact of grid resolution.")
+    # Report BOTH criteria wherever the grid resolved them, rather than picking.
+    # Picking meant a sweep aimed at one criterion could silently be fitted on
+    # the other, and it put a choice in the tool that belongs in the sweep note.
+    for criterion, source in (("alone", min_width_alone), ("pooled", min_width)):
+        fit_one(criterion, {s: w for s, w in source.items()
+                            if s not in ceiling_failed}, WIDTH_EXPONENT)
 
     print()
     # Per row, not pooled across rows. One interior choice anywhere would

@@ -41,7 +41,11 @@ TOTAL_WIDTH = 240
 # that row would be a bound rather than a value, the span would collapse from 8x
 # back to 4x, and the resolution with it. P=4 dropped to stay under GitHub's
 # 256-job matrix cap -- width 60 is far above any floor observed.
-PARTITIONS = (1, 6, 8, 10, 12, 15, 16, 20, 24, 30, 40)
+# Extended upward for g5-04, which hunts the POOLED floor -- g5-03 found it
+# below width 6 at three of four lengths, i.e. off the bottom of that grid. The
+# workflow passes --partitions explicitly, so each sweep pins its own subset and
+# g5-03 reproduces unchanged; this list is only the default when none is given.
+PARTITIONS = (1, 6, 8, 10, 12, 15, 16, 20, 24, 30, 40, 48, 60, 80)
 SEQ_LENS = (48, 96, 192, 384)
 KEY_SCALE = 0.5
 EPOCHS = 8   # g5-01 measured that nothing moves after this

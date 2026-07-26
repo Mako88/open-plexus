@@ -39,16 +39,35 @@ storage time what mattered, revisit the traces later, when you can.**
 
 We have no offline phase, no replay, and no mechanism that revisits anything.
 
-### 2. Multiple timescales, of which we implemented one
+### 2. Multiple timescales — NO LONGER SPECULATIVE, it is a live bug
 
 Zenke & Gerstner (2017) is titled *Hebbian plasticity requires compensatory
-processes on multiple timescales*. `lasting_cap` came from this paper and took
-only the compensation half.
+processes on multiple timescales*. `lasting_cap` came from this paper, applied
+the compensation to **one** store, and left the other unbounded.
 
-We have exactly two stores: one that decays at a fixed rate and one that never
-decays. The paper's claim is that stability wants a **cascade** of them. That is
-a concrete architectural change with a concrete prediction, and it has never been
-tested.
+[Note 018](docs/notes/018-the-fast-store-has-no-brakes.md) is the consequence.
+The fast store is a geometric series in `decay`, so a recurring token drives its
+entry toward `1 / (1 - decay)` — about **277×** a single binding at the half-life
+these sweeps use. Retrieval is linear in that, and the delta-rule update is
+**quadratic**. Measured without training:
+
+    zipf_s 0.0   |memory| 114   max |retrieved|  137
+    zipf_s 2.0   |memory| 967   max |retrieved| 3452
+
+The readout then diverges to NaN, reproducibly, and it already contaminated
+g8-02's bottom rows.
+
+**This is not about Zipf.** Zipf supplies repetition; so does real language, so
+does a sensor reporting the same reading twice, so does a quiet period on a node.
+
+Next: a cap on the fast store, same shape as `lasting_cap` — scale the whole
+store, never an entry — default off, with the four predictions in note 018
+registered first. The loudest of them is that **it must NOT improve the gating
+result**; stability is not selectivity, and a fix that quietly lifts the headline
+number is the most dangerous kind.
+
+The cascade the paper actually argues for — more than two timescales — remains
+untested and is a separate item.
 
 ### 3. Sequential neuromodulation — our gate may be too crude a copy
 

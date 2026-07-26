@@ -7,7 +7,9 @@ name: sweep-g6-01-forgetting
 # the model forgets everything (0.779 -> 0.008); at 240 it forgets nothing
 # (0.927 -> 0.923), dense either way.
 #
-# 72 jobs. Costed: 4.4 hours serial, worst job 6.3 minutes.
+# 96 jobs. Costed: 2.6 hours serial, worst job 3.4 minutes -- cheaper than the
+# first grid despite more cells, because the wide rows where nothing happens are
+# dropped and the band where the transition actually sits is sampled eight times.
 
 on:
   workflow_dispatch:
@@ -21,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        width: [64, 96, 128, 160, 192, 240]
+        width: [48, 56, 64, 72, 80, 96, 112, 128]
         scale: ["0", "4", "8", "16"]
         lr: ["0.02", "0.05", "0.1"]
     runs-on: ubuntu-latest
@@ -55,7 +57,7 @@ jobs:
           merge-multiple: true
       - name: Combine
         run: |
-          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 72" | tee summary.txt
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 96" | tee summary.txt
           python tools/summarise_g6_01.py | tee -a summary.txt
       - name: Summary
         run: |

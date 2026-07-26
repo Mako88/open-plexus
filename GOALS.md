@@ -579,6 +579,39 @@ So selective storage removes both the sequence-length scaling *and* the allocati
 problem, which means heterogeneous hardware needs no policy. The caveat: the gated
 arm saturates at capacity 16, so that comparison lives in a narrow band below it.
 
+> ## THESE THREE ARE CEILINGS, NOT FINDINGS — measured, not suspected
+>
+> **[g8-01](experiments/sweeps/g8-01-a-gate-without-an-oracle.txt) asked how much
+> of the oracle's advantage an implementable mechanism recovers. The answer is
+> none.** Across 36 cells — four sequence lengths, three forgetting rates, three
+> learning rates, three seeds — the largest recovery anywhere is **0.05**, and
+> seven of twelve cells are **negative**, meaning the mechanism is worse than not
+> having it. Both candidates fail: consolidate-on-confirmed-use, which is tagging
+> and capture, and consolidate-on-surprise, which is the salience gate.
+>
+> And the advantage being forgone is enormous. The oracle scores **0.998–1.000 in
+> every cell**, at every length, while the ungated floor falls from 0.385 at
+> seq 192 to **0.000 at 1536**. The gap reaches **0.996**.
+>
+> **Recovery also falls as sequences get longer** — 0.05 at seq 192, −0.00 at
+> 1536 — so the failure is worst exactly where the gate matters most. That was
+> pre-registered as the outcome that would hurt the most, and it held.
+>
+> So the three findings below describe **what a device could do if something told
+> it which of its inputs mattered.** Nothing tried can tell it. They are not
+> withdrawn — the arithmetic is real and the ceiling is worth knowing — but they
+> are not claims about a system anyone can build today, and this section used to
+> read as though they were.
+>
+> **What is not settled:** that no mechanism *can*. Two failures do not empty the
+> class, and two untried candidates are recorded in [BACKLOG.md](../BACKLOG.md) —
+> the most interesting being **replay**, an offline phase that revisits stored
+> traces later, since every mechanism tried so far must decide at the one moment
+> the least is known. Nor is it settled that the benchmark is innocent: note 013
+> blames a base rate that only MQAR has, and
+> [g8-02](experiments/sweeps/g8-02-when-the-statistics-are-real.txt) tests that
+> directly.
+
 > **What every gated result rests on, in one line.** The three findings above —
 > length stops mattering, allocation stops mattering, forgetting stops — are all
 > measured with an **oracle** that reads task structure no running system has.
@@ -586,7 +619,8 @@ arm saturates at capacity 16, so that comparison lives in a narrow band below it
 > one place, because each finding states it once and a reader assembling the
 > position from here would reasonably conclude it was minor. It is not: the one
 > implementable substitute, consolidate-on-use, works mechanically and is
-> **harmful** in practice. What *is* implementable and does help is plain decay —
+> **harmful** in practice — now measured across a full grid in g8-01 and found to
+> recover nothing at all. What *is* implementable and does help is plain decay —
 > 0.672 against 0.526 at seq_len 768 — and the gap between that and the oracle is
 > the honest size of what remains unsolved.
 >

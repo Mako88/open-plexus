@@ -39,6 +39,8 @@ SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 CHURN = ROOT / "experiments" / "g4_02_machine_churn.py"
 TRANSPORT = ROOT / "openplexus" / "transport.py"
 DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
+NODE_MAIN = ROOT / "openplexus" / "node_main.py"
+TESTBED = ROOT / "testbed" / "run.py"
 
 
 @dataclass(frozen=True)
@@ -61,6 +63,42 @@ class Mutation:
 
 
 MUTATIONS = [
+    Mutation(
+        name="the-node-ignores-the-decoder-switch",
+        breaks="the only thing that makes nodes distinguishable. wo is learned "
+               "and starts at zeros, so without it every node predicts token 0 "
+               "forever, a departure changes nothing, and a latency experiment "
+               "produces clean meaningless curves",
+        path=NODE_MAIN,
+        old='    if os.environ.get(DECODER_VAR) == "1":',
+        new="    if False:",
+    ),
+    Mutation(
+        name="every-node-claims-the-first-slice",
+        breaks="slice assignment, so the network covers a quarter of its width "
+               "four times over instead of covering all of it once",
+        path=NODE_MAIN,
+        old="    own = slices_for(config.d_model, nodes)[index]",
+        new="    own = slices_for(config.d_model, nodes)[0]",
+    ),
+    Mutation(
+        name="the-node-ignores-the-vocabulary-it-was-given",
+        breaks="config plumbing from the environment, which is the entrypoint's "
+               "entire job. A node with the wrong vocabulary still runs, still "
+               "votes and still produces a number",
+        path=NODE_MAIN,
+        old='        vocab_size=int(os.environ.get(VOCAB_VAR, "41")),',
+        new="        vocab_size=41,",
+    ),
+    Mutation(
+        name="a-failed-tc-lets-the-node-join-anyway",
+        breaks="the guarantee that an impaired run was impaired. The node would "
+               "join with a clean link and its vote would be recorded as a "
+               "latency measurement",
+        path=TESTBED,
+        old='    return " ".join(parts) + " || exit 3; "',
+        new='    return " ".join(parts) + " ; "',
+    ),
     Mutation(
         name="the-zipf-law-is-inverted",
         breaks="which end of the alphabet is heavy. The filler would still be "

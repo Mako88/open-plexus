@@ -34,7 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from experiments.g8_01_real_gate import (  # noqa: E402
     ARMS, BASE, N_TEST, N_TRAIN, build, run)
-from experiments.harness import emit, parse_args  # noqa: E402
+from experiments.harness import emit, parse_args, spread  # noqa: E402
 
 # Pinned rather than swept, and this is a real narrowing of the question. 768 is
 # where g8-01's control put the oracle's advantage at 0.293, large enough for a
@@ -52,25 +52,35 @@ LEARNING_RATES = (0.02, 0.05, 0.1)
 SEEDS = (1, 2, 3)
 
 
+def one_seed(work: tuple) -> list[dict]:
+    """Everything for one (exponent, seed): build the data, run every arm.
+
+    Module-level and taking a single picklable argument because `spread` uses
+    the spawn start method. The seed is the parallel unit because seeds share
+    nothing -- each builds its own dataset and its own model -- so there is no
+    state to synchronise and no dataset to ship between processes.
+    """
+    zipf_s, seed, rates = work
+    task = replace(BASE, seq_len=SEQ_LEN, filler="zipf", zipf_s=zipf_s)
+    # One dataset per (exponent, seed), shared by every arm, so the arms differ
+    # only in the mechanism and never in the data they saw.
+    train_set = build(task, N_TRAIN, seed)
+    test_set = build(replace(task, seed=task.seed + 99_991), N_TEST, seed)
+    return [run(task, HALF_LIFE, lr, arm, seed, train_set, test_set,
+                extra={"zipf_s": zipf_s})
+            for lr in rates for arm in ARMS]
+
+
 def main() -> int:
     args = parse_args(__doc__.splitlines()[0])
     exponents = (args.scale,) if args.scale is not None else EXPONENTS
     rates = (args.lr,) if args.lr else LEARNING_RATES
     seeds = (args.seed,) if args.seed else SEEDS
 
-    records = []
-    for zipf_s in exponents:
-        task = replace(BASE, seq_len=SEQ_LEN, filler="zipf", zipf_s=zipf_s)
-        for seed in seeds:
-            # One dataset per (exponent, seed), shared by every arm, so the arms
-            # differ only in the mechanism and never in the data they saw.
-            train_set = build(task, N_TRAIN, seed)
-            test_set = build(replace(task, seed=task.seed + 99_991), N_TEST, seed)
-            for lr in rates:
-                for arm in ARMS:
-                    records.append(run(task, HALF_LIFE, lr, arm, seed,
-                                       train_set, test_set,
-                                       extra={"zipf_s": zipf_s}))
+    work = [(zipf_s, seed, tuple(rates))
+            for zipf_s in exponents for seed in seeds]
+    records = [record for batch in spread(one_seed, work, args.workers)
+               for record in batch]
     emit(records, Path(args.json) if args.json else None)
     return 0
 

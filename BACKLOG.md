@@ -85,12 +85,27 @@ result resting on the oracle has to be relabelled a ceiling in GOALS, and replay
 
 ## Built but not finished
 
-**The Docker/tc-netem testbed.** The prerequisites are all done: netem verified
-working in Docker Desktop and available on Actions runners, `Network(spawn=False)`
-accepts nodes it did not start, and the slice handshake that this would have
-silently corrupted is fixed. What does not exist yet: a node entrypoint, a
-Dockerfile, a compose or run script, and an experiment. **It turns G2, G3 and G4
-from modelled into measured**, which is the whole reason to want it.
+**The Docker/tc-netem testbed — BUILT, and it has produced two results.** See
+[note 014](docs/notes/014-the-first-real-packets.md). Correctness survives 80ms
+delay with 20ms jitter and 2% loss, bit-identical; and lock-step costs a round
+trip per token, which a window of 8 recovers at 7.3x. **Window 1 is the global
+synchronisation C1 forbids, so obeying C1 is worth 7.3x on that link** rather
+than being only a constraint to satisfy.
+
+What it still owes:
+
+- **Repeats.** Those are SINGLE RUNS. No seeds, no error bars, and timing is the
+  noisiest quantity measured here. The 7.3x is an observation, not a measured
+  effect, which is why it is in a note and not in GOALS. A repeated sweep on
+  Actions is the fix and has not been costed.
+- **Churn over an impaired link**, which is the measurement the slice handshake
+  was fixed to make meaningful and the obvious next one. `testbed/driver.py` does
+  not expose `absent` or `leave_at` yet.
+- **Scale.** Width 16, four nodes, 40 steps. Nothing here reaches the widths the
+  tiny-node results are about.
+- **A real topology.** A Docker bridge has no NAT, no competing congestion, and
+  netem is applied to each node's egress only, so the round trip is impaired in
+  one direction.
 
 **Per-job parallelism in sweeps.** Every sweep job trains its models one after
 another on a runner with about four cores, so it uses roughly one of them. This
@@ -103,9 +118,16 @@ Costed nowhere yet; measure before believing the factor.
 
 ## Deployment
 
-**A node entrypoint.** `openplexus/deployment.py` decides capacity and allocation
-and nothing consumes it yet. The thing John actually asked for — a process that
-starts, sizes itself to whatever machine it landed on, and joins — does not exist.
+**A node entrypoint — BUILT.** `openplexus/node_main.py` starts from nothing but
+environment variables, sizes itself with the cgroup-aware planner, rebuilds its
+arrays from the shared seed rather than being handed a matrix, and joins. A
+network assembled from entrypoints agrees with the single-process model exactly,
+which is the check that notices a node working perfectly on the wrong arrays.
+
+Still static by design: slice assignment comes from `OPENPLEXUS_NODE_INDEX`
+rather than being negotiated, which is John's explicit choice. A node that
+negotiates its own slice is a coordination protocol, and no measurement needs one
+yet.
 
 **Uneven slices.** `slices_for` refuses any split that does not divide evenly.
 Real machines will not offer round numbers, and heterogeneity (above) needs this

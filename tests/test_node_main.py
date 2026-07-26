@@ -88,6 +88,46 @@ class AnEntrypointNetworkMatchesOneProcess(unittest.TestCase):
             "model, so at least one node is computing on different arrays")
 
 
+class TheEnvironmentReachesTheConfig(unittest.TestCase):
+    """Asserted against literals, deliberately.
+
+    The agreement test above cannot catch a field that ignores its environment
+    variable, because it builds its own reference with the same function -- so a
+    hardcoded value lands on both sides and they agree on the wrong number. The
+    mutation harness found exactly that by hardcoding the vocabulary, and the
+    answer is a direct assertion rather than a cleverer end-to-end one.
+
+    A node with the wrong vocabulary still runs, still votes and still produces a
+    number, which is why this is worth pinning field by field.
+    """
+
+    def test_vocabulary(self):
+        with mock.patch.dict("os.environ",
+                             environment(1, 0, **{node_main.VOCAB_VAR: "31"}),
+                             clear=False):
+            self.assertEqual(node_main.config_from_env().vocab_size, 31)
+
+    def test_width(self):
+        with mock.patch.dict("os.environ",
+                             environment(1, 0, **{node_main.D_MODEL_VAR: "12"}),
+                             clear=False):
+            self.assertEqual(node_main.config_from_env().d_model, 12)
+
+    def test_seed(self):
+        with mock.patch.dict("os.environ",
+                             environment(1, 0, **{node_main.SEED_VAR: "9"}),
+                             clear=False):
+            self.assertEqual(node_main.config_from_env().seed, 9)
+
+    def test_the_defaults_are_not_what_the_tests_set(self):
+        """Otherwise the three tests above could pass on the defaults."""
+        with mock.patch.dict("os.environ", {}, clear=True):
+            config = node_main.config_from_env()
+        self.assertNotEqual(config.vocab_size, 31)
+        self.assertNotEqual(config.d_model, 12)
+        self.assertNotEqual(config.seed, 9)
+
+
 class TheDecoderSwitchIsLoadBearing(unittest.TestCase):
     """Without it every node is interchangeable and the testbed measures nothing.
 

@@ -83,11 +83,36 @@ def parse_args(description: str) -> argparse.Namespace:
     parser.add_argument("--sweep", default=None,
                         choices=("widths", "decay", "identity", "degrade", "drops"),
                         help="which sub-sweep to run when a script has more than one")
+    parser.add_argument("--workers", type=int, default=1,
+                        help="processes to spread seeds across; 1 runs serially\n"
+                             "                             and is the default")
     parser.add_argument("--json", type=Path, default=None,
                         help="write results here as JSON instead of a table")
     parser.add_argument("--aggregate", nargs="+", metavar="FILE",
                         help="combine JSON files from a matrix run into a table")
     return parser.parse_args()
+
+
+def spread(function, items: list, workers: int) -> list:
+    """Map `function` over `items`, in separate processes when asked.
+
+    `workers <= 1` runs in this process and is the default everywhere, so a
+    sweep behaves exactly as it did unless it is asked not to. **The results must
+    not depend on the worker count**, which is what tests/test_spread.py checks:
+    a sweep whose numbers move when it is parallelised is not faster, it is
+    broken.
+
+    `function` has to be importable by name, because the spawn start method
+    pickles it -- fork would inherit the parent's memory instead, but it does not
+    exist on Windows and a harness that only parallelises on one platform is a
+    harness nobody trusts.
+    """
+    if workers <= 1:
+        return [function(item) for item in items]
+    import multiprocessing as mp
+
+    with mp.get_context("spawn").Pool(workers) as pool:
+        return pool.map(function, items)
 
 
 def emit(records: list[dict], path: Path | None) -> None:

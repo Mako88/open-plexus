@@ -2,9 +2,12 @@ Can any real mechanism replace the oracle gate?
 ===============================================
 
 Script: experiments/g8_01_real_gate.py
-Status: PREDICTIONS WRITTEN, NOT YET DISPATCHED. Written before the script
-        exists, before the controls have run, and before any number from
-        this grid has been seen. Recorded here so the order is checkable.
+Status: RUN on Actions, 36/36 cells. Predictions 1, 3 and 4 HELD;
+        2 is UNRESOLVED. **No mechanism tried recovers the oracle.** The
+        largest recovery anywhere in the grid is 0.05 and most cells are
+        at or below zero. Every result that rests on the gate is a CEILING.
+        Predictions were written before the script existed, before the
+        controls ran, and before any number from this grid was seen.
 
 
 WHY THIS IS THE ONE THAT MATTERS
@@ -133,3 +136,96 @@ of the sequence and maximally unpredictable. Real language is the opposite -- th
 rare token is both surprising AND informative. **A negative result here is
 therefore weak evidence about language and strong evidence about MQAR**, and must
 be written up that way.
+
+
+RESULT
+------
+Recovery, `(arm - none) / (oracle - none)`, at each cell's best learning rate.
+Three seeds. The seed spread is printed beside the oracle's advantage so the
+denominator can be checked against the noise rather than assumed.
+
+ seq_len  half-life  oracle gap  seed spread    on-use  salience
+     192        0.5       0.041        0.019     -0.02     -0.02
+     192       0.25       0.081        0.022      0.00     -0.01
+     192      0.125       0.212        0.022      0.05      0.04
+     384        0.5       0.092        0.045     -0.03     -0.03
+     384       0.25       0.137        0.035      0.01      0.01
+     384      0.125       0.275        0.054      0.04      0.04
+     768        0.5       0.612        0.152     -0.05     -0.05
+     768       0.25       0.536        0.137     -0.02     -0.05
+     768      0.125       0.538        0.097     -0.00     -0.01
+    1536        0.5       0.996        0.004     -0.00     -0.00
+    1536       0.25       0.985        0.012     -0.00     -0.00
+    1536      0.125       0.959        0.012     -0.01     -0.01
+
+**The largest recovery in the entire grid is 0.05.** Seven of twelve cells are
+negative -- the mechanism is worse than not having it. Nothing here is
+distinguishable from a gate that never fires.
+
+Meanwhile the oracle scores 0.998 to 1.000 in EVERY cell, at every length and
+every forgetting rate, while the ungated floor falls from 0.385 at seq 192 to
+0.000 at 1536. That is g7-02 reproduced on a different grid: selective storage
+removes sequence length as a difficulty dial, completely.
+
+So the advantage is real, it is enormous -- up to 0.996 -- and none of it is
+reachable by anything implementable that has been tried.
+
+
+THE PREDICTIONS
+----------------
+1. **Both real arms recover less than half, salience under 0.25 -- HELD**, and
+   by a margin that makes the guess look timid. Nothing exceeded 0.05.
+
+2. **on-use beats salience at every length -- UNRESOLVED.** on-use is ahead or
+   level in ten of twelve cells, but by 0.00 to 0.03 against seed spreads of
+   0.004 to 0.152. **The differences are inside the noise and this is not a
+   result.** It was named before the run as most likely wrong; it is not wrong,
+   it is unmeasurable at this grid's resolution, which is a different outcome
+   and is recorded as one.
+
+3. **Recovery falls with sequence length -- HELD.** The best cell at seq 192 is
+   0.05; at 1536 the best is -0.00. The gap widens exactly where the gate is
+   most needed, which is the outcome named in advance as the one that would hurt
+   most.
+
+4. **Control: the oracle beats none by more than the seed spread -- HELD in all
+   twelve cells**, so no row is undefined and the grid is not vacuous.
+
+   **The pre-dispatch control was wrong about this**, and in the favourable
+   direction. It predicted seq 192 would be undefined because a single-seed
+   probe put the gap at 0.043 against an unmeasured spread. With three seeds the
+   spread is 0.019 and the gap 0.041, so the row is defined after all. A control
+   run at one seed cannot estimate a spread, which is the whole reason the
+   summariser refuses to divide rather than guessing.
+
+
+WHAT THIS SETTLES, AND IT IS THE UNFAVOURABLE ANSWER
+------------------------------------------------------
+**Selective storage is not reachable by any local rule tried here.** Consolidate
+on confirmed use and consolidate on surprise both fail, at every length, every
+forgetting rate and every learning rate in the grid, and they fail by recovering
+nothing rather than by recovering a little.
+
+Which means, plainly: **g7-02, g7-03 and the tiny-node result are ceilings, not
+findings.** They describe what a device could do if something told it which of
+its inputs mattered. Nothing tried can tell it.
+
+That has to be written into GOALS as a relabelling, not a footnote.
+
+
+WHAT IT DOES NOT SETTLE
+------------------------
+**Whether a better mechanism exists.** Two candidates failing does not empty the
+class. The honest statement is that no local rule tried so far recovers the
+oracle -- not that none can. Two specific untried candidates are recorded in
+BACKLOG.md, and one of them is now the most interesting thing in the project:
+**replay**, an offline phase that revisits stored traces later. The gating
+problem is that the storage decision must be made at the moment the least is
+known; every mechanism tried here makes that decision at exactly that moment.
+
+**Whether MQAR is the reason.** Note 013 diagnosed the failure as a base-rate
+problem: filler is 92% of the sequence and, being uniform, is also the most
+surprising content in it. **That diagnosis is untested and g8-02 tests it** --
+same arms, same metric, Zipfian filler. If recovery moves there, this result is
+about the benchmark rather than about gating, and this file will need a header
+saying so.

@@ -1,0 +1,115 @@
+Is width even the right unit? -- the price re-examined
+======================================================
+
+Script: experiments/g1_11_right_unit.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+We have been reporting that our approach costs four times more than the
+conventional one. That number is measured honestly and it may still be the wrong
+thing to measure.
+
+The two systems do not hold the same kind of thing. The conventional one keeps a
+copy of everything it has seen -- longer input, more storage, without limit. Ours
+keeps one fixed grid, and the grid does not get bigger when the input does; it
+only has to be a bit wider.
+
+So "four times the width" compares one number that grows with the input against
+one that mostly does not. On a short input that flatters us not at all; on a long
+one it may badly understate us. Or the reverse -- we have only ever measured the
+conventional side at ONE input length, so this is currently a suspicion rather
+than a finding.
+
+This measures the conventional side across input lengths, so the comparison can
+finally be made in a unit that means something: **total working memory**.
+
+
+QUESTION
+--------
+g1-10 measured the local rule crossing at widths 21.8, 26.0, 34.0 and 47.5 for
+seq_len 48, 96, 192, 384 -- an exponent of 0.37.
+
+The attention crossing has only ever been measured at seq_len=96, where g1-08 put
+it at 8. g1-04 found attention flat across seq_len 32-128, but at a fixed width
+of 64, which says nothing about where its crossing sits.
+
+So: sweep attention across seq_len x width, and report both ratios.
+
+  WIDTH ratio    d_local / d_attention
+  MEMORY ratio   what each actually holds:
+                    attention  2 * T * d      (keys and values for every position)
+                    local      d * d          (one matrix, rebuilt per sequence)
+
+The projections (vocab x d) are excluded from both: they are parameters rather
+than working state, and attention has the equivalent in its embedding table.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **The attention crossing is roughly FLAT in seq_len.** Attention retrieves by
+   comparing against every stored position rather than superposing them, so
+   nothing crowds. Guess: stays at 8 across all four lengths, perhaps rising to
+   16 at 384 as more positions compete for the softmax.
+
+2. Therefore the WIDTH ratio GROWS with sequence length: 2.7x at 48, 3.2x at 96,
+   4.2x at 192, 5.9x at 384. **The 4.0x headline is a point on a curve**, as
+   g1-10 said, and the curve rises.
+
+3. **The MEMORY ratio goes the other way, and this is the interesting one.**
+   Arithmetic on the measured local crossings against a flat attention crossing
+   of 8:
+
+        seq_len   local d*d   attention 2*T*d   memory ratio
+             48         475               768          1.62x
+             96         676              1536          2.27x
+            192        1156              3072          2.66x
+            384        2256              6144          2.72x
+
+   If prediction 1 holds, **the local rule already uses less working memory than
+   attention at every length tested, and the advantage widens.**
+
+4. So both statements are true at once and they point opposite ways:
+   *four to six times the width* and *roughly a third to a half the memory*.
+   Neither is dishonest; they are different resources. The honest report gives
+   both and says which matters for which purpose.
+
+Most likely to be wrong: (1). If the attention crossing GROWS with seq_len -- and
+there is a real reason it might, since softmax over more positions dilutes the
+match -- then the width ratio stays flat and the memory ratio improves even
+further in our favour. That would be a better result for us, which is exactly why
+it deserves the most suspicion. If attention's crossing grows, check the
+attention training is not simply undertrained at long sequences before believing
+anything.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- attention crossing flat, memory
+  ratio > 1 throughout            -> as predicted. Report BOTH numbers, and stop
+                                     quoting width alone
+- attention crossing grows        -> width ratio flat, memory ratio better still.
+                                     Check for undertrained attention FIRST
+- memory ratio < 1                -> the local rule is more expensive on both
+                                     counts and the 4.0x headline was, if
+                                     anything, generous
+- attention fails to cross at all
+  at long seq_len                 -> almost certainly undertrained rather than
+                                     incapable; not a result until ruled out
+
+
+A NOTE ON WHAT IS BEING COMPARED
+----------------------------------
+Working state only. Attention's 2*T*d is what it must hold to answer a query
+about position T. The local rule's d*d is its memory matrix. Both exclude the
+learned parameters, which are comparable in kind and do not grow with input.
+
+This is a like-for-like comparison of the thing that has to live on a machine
+while a sequence is being processed -- which is the quantity that decides whether
+this can run on a phone.
+
+
+RESULT
+------
+(not yet run)

@@ -1,0 +1,73 @@
+name: sweep-g1-11-right-unit
+
+# Is width the right unit for the price? Attention keeps every position it has
+# seen; the local rule holds one fixed matrix. This measures the attention
+# crossing across sequence lengths — it has only ever been measured at 96 — so
+# the comparison can be made in working memory as well as width.
+#
+# One job per (seq_len, width, seed). Attention is QUADRATIC in sequence length,
+# so the 384 cells cost ~64x the 48 ones and must not share a job with anything.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/g1_11_right_unit.py"
+      - ".github/workflows/sweep-g1-11.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  attention:
+    strategy:
+      fail-fast: false
+      matrix:
+        seqlen: [48, 96, 192, 384]
+        width: [4, 8, 16]
+        seed: [1, 2, 3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: seq ${{ matrix.seqlen }}, d ${{ matrix.width }}, seed ${{ matrix.seed }}
+        run: python experiments/g1_11_right_unit.py --seqlen ${{ matrix.seqlen }} --width ${{ matrix.width }} --seed ${{ matrix.seed }} --json out/s${{ matrix.seqlen }}-w${{ matrix.width }}-r${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-11-s${{ matrix.seqlen }}-w${{ matrix.width }}-r${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: attention
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g1-11-s*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 36" | tee summary.txt
+          python tools/summarise_g1_11.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-11-summary
+          path: |
+            summary.txt
+            out/*.json

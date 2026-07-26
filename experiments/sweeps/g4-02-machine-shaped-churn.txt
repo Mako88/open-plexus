@@ -2,7 +2,9 @@ Churn shaped like a machine
 ===========================
 
 Script: experiments/g4_02_machine_churn.py
-Status: PREDICTIONS WRITTEN, HELD until g4-01's matrix clears the runners
+Status: RUN on Actions, 18/18 cells. Predictions 1, 2 and 3 held.
+        PREDICTION 4 REFUTED -- the gap SHRINKS with P rather than growing.
+        And unlike g4-01, this grid contained its own answer.
 
 
 IN PLAIN TERMS
@@ -110,3 +112,107 @@ WHAT THIS DOES NOT SETTLE
 Churn during a sequence. Removal happens between sequences here, as in G3, so no
 sequence is ever half-processed by a machine that vanishes mid-way. That is the
 harder case and it is untouched.
+
+
+RESULT
+------
+3 seeds, each arm at its own best lr. The equal-size control is asserted inside
+the run, so all 18 jobs succeeding means both arms removed identical amounts
+everywhere.
+
+ width   P  churn  scattered    block   block-scat
+    64   4   0.25      0.979    0.983       +0.003
+    64   4    0.5      0.899    0.951       +0.052
+    64   8   0.25      0.960    0.969       +0.010
+    64   8    0.5      0.867    0.881       +0.014
+   128   4   0.25      1.000    1.000       +0.000
+   128   4    0.5      0.992    0.998       +0.006
+   128   8   0.25      0.999    0.999       -0.001
+   128   8    0.5      0.984    0.994       +0.010
+
+P=1 runs scattered only: block churn has no fractional setting when the machine
+is the whole model. Its numbers (0.999 / 0.997 / 0.967 at d=64) are the tie back
+to G3.
+
+
+PREDICTIONS 1, 2 AND 3 HELD
+----------------------------
+1. **Equal size.** Asserted in-run at every cell; no job aborted.
+
+2. **BLOCK beats SCATTERED**, 7 of 8 cells positive and the eighth at -0.001.
+   Mean +0.012.
+
+3. **But not by much, because the shared key floors it.** Confirmed, and this is
+   the prediction that turned out to matter most. Both arms lose the same number
+   of KEY dimensions, and every surviving group reads the full key regardless of
+   who owned the missing part. That is the correction this project made to note
+   009 after a test failed, and it does exactly the work predicted: it puts a
+   ceiling on how much the shape of the damage can matter.
+
+**Where the effect actually lives is the worst case, not the mean.** The largest
+gap, d=64 P=4 churn 0.5, per seed:
+
+    scattered  [0.842, 0.917, 0.938]
+    block      [0.940, 0.946, 0.967]
+
+Block is not merely better on average -- it is far tighter. Scattered churn's bad
+seed is 0.842 against block's 0.940. **A deployment cares about its worst machine
+configuration, not its average one**, so reporting only the +0.052 mean would
+understate this cell.
+
+
+PREDICTION 4 REFUTED
+---------------------
+    P=4   mean gap +0.015 over 4 cells
+    P=8   mean gap +0.008 over 4 cells
+
+The gap **shrinks** with P. The prediction said it would grow, reasoning that
+narrower groups mean a scattered hole takes a larger fraction of any one group.
+That much is true and it is not the whole mechanism.
+
+What it missed: at higher P the pooled answer is a larger ensemble, so it is more
+robust to *both* damage shapes at once, which compresses the difference between
+them. Meanwhile the shared-key damage -- identical in both arms by construction --
+becomes a larger share of the total harm as groups get narrower. Both effects
+push the gap down, and together they beat the one effect the prediction
+considered.
+
+**The reasoning was not wrong, it was partial**, which is the harder failure to
+notice: a correct mechanism that is outvoted by mechanisms nobody listed.
+
+
+THE PRE-REGISTERED CHECK, AND IT PASSES
+-----------------------------------------
+Prediction 2 coming out positive is the favourable direction -- partitioning being
+a robustness gain as well as a C1 fix -- so this note required, in advance, a
+check that scattered damage is genuinely biting rather than being shrugged off:
+
+    d=64, P=4:  churn 0.0 -> 0.995,  churn 0.5 scattered -> 0.899
+
+A persistent 0.096 loss after full retraining. The ablation bites. The check
+passes.
+
+
+AND THIS GRID CONTAINED ITS ANSWER
+------------------------------------
+g4-01's learning-rate grid pinned at an edge in all six of its rows, with the
+interior value chosen zero times in twenty-four. Run through the same check
+(`tools/grid.py`), g4-02 chose the interior value **11 times out of 25**.
+
+So unlike g4-01's, these numbers are not carrying a tuning caveat. Worth stating
+because the two sweeps used the identical grid -- the difference is the regime,
+not the diligence, and that is precisely why the check has to be mechanical
+rather than a habit.
+
+
+WHAT THIS SETTLES
+------------------
+**G3's churn number transfers, and was mildly pessimistic.** Removing dimensions
+at random is a slightly harsher test than machines leaving cleanly, by about
+0.012 on average and rather more in the worst case. Nothing in G3 needs redoing.
+
+**Shape matters less than the shared key.** The dominant term in churn damage is
+that a departing machine takes part of a quantity everyone reads -- not that it
+takes its own share. That is a fact about the row-split, and it is the same fact
+that made a group better than a narrow model in g4-01: the key is shared, and
+that cuts both ways.

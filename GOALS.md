@@ -488,7 +488,14 @@ machine's answer stands up alone (0.949 at eight-way, 0.996 at four-way), so the
 pooling step is optional rather than required — which is the claim C1 actually
 needs.
 
-The penalty numbers away from ceiling are provisional: the learning-rate grid
+[g4-02](experiments/sweeps/g4-02-machine-shaped-churn.txt) then checked whether
+G3 measured the right *shape* of failure — it removed dimensions at random, where
+a departing machine takes a contiguous block. It did: machine-shaped churn is
+easier by about **0.012** on average and more in the worst case, so G3's number
+transfers and was mildly pessimistic. The dominant term in churn damage turns out
+not to be *which* machine left but that it took part of the shared key with it.
+
+The g4-01 penalty numbers away from ceiling are provisional: the learning-rate grid
 pinned at an edge in **all six** rows — its interior value was never once chosen —
 so every arm everywhere is under-tuned.
 

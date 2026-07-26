@@ -1,0 +1,75 @@
+name: sweep-g5-01-does-scale-help
+
+# Does adding machines buy capability, or only capacity?
+#
+# g4-01 grew the network against a FIXED problem and everything improved, which
+# is not the question. G5 asks whether a bigger network takes a proportionally
+# bigger problem. Fix each machine at 16 dimensions, grow the network 1 to 16,
+# and compare the machine-count exponent against g1-10's width exponent of 0.37.
+#
+# 100 jobs, 3 seeds each. Costed before dispatch: 8.5 hours serial, worst job
+# (d=256, seq_len=384) ~24 minutes.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/g5_01_scaling.py"
+      - ".github/workflows/sweep-g5-01.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  scaling:
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [16, 32, 64, 128, 256]
+        seqlen: [48, 96, 192, 384]
+        lr: ["0.01", "0.02", "0.05", "0.1", "0.2"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: d ${{ matrix.width }} seq ${{ matrix.seqlen }} lr ${{ matrix.lr }}
+        run: python experiments/g5_01_scaling.py --width ${{ matrix.width }} --seqlen ${{ matrix.seqlen }} --lr ${{ matrix.lr }} --json out/S-${{ matrix.width }}-${{ matrix.seqlen }}-${{ matrix.lr }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g5-01-${{ matrix.width }}-${{ matrix.seqlen }}-${{ matrix.lr }}
+          path: out/*.json
+
+  aggregate:
+    needs: [scaling]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g5-01-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 100" | tee summary.txt
+          python tools/summarise_g5_01.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g5-01-summary
+          path: |
+            summary.txt
+            out/*.json

@@ -61,6 +61,21 @@ What it needs is the **full `k` vector**, every step, at every machine.
 > architectural fact, and everything below is about whether the broadcast is
 > affordable.
 
+**Both halves are now tested rather than argued** (`tests/test_partitioned_readout.py`).
+Perturbing another group's *values* leaves this group's retrieval bit-identical;
+perturbing another group's *keys* changes it. The second half is not a defect to
+be explained away — it is the broadcast, and a decomposition that passed the
+first check while failing the second would not be doing content-addressed
+retrieval across the full width at all.
+
+**And it has a consequence for churn that was not anticipated here.** Because the
+key is shared, a departing machine takes a slice of a quantity every surviving
+machine reads. **Churn degrades every group, not only the group that left.** Not
+by making anyone wait — nothing synchronises — but the damage is global even
+though the computation is not. [G3](../../experiments/sweeps/g3-01-churn.txt)
+measured that the system recovers from exactly this; what was missing was the
+mechanism, and this note previously implied the damage was local.
+
 ## 2. The naive broadcast is impossible, and not marginally
 
 If the machine holding the input sends `k` to all the others directly, that one
@@ -131,6 +146,16 @@ So the reduction is a property of the thing built to measure the mechanism, not
 of the mechanism. **But it has never been built without one**, and until it has,
 that claim is an argument. It is the largest untested assumption in this note.
 
+> **Now being tested.** `LocalMemoryConfig.partitions` splits the width into
+> independent groups, each learning from its own error alone.
+> [g4-01](../../experiments/sweeps/g4-01-no-global-readout.txt) measures what
+> that costs and, more importantly, whether a *single* group's answer stands up —
+> if it does, the pooling step is optional rather than mandatory and this
+> section's argument holds. Note what partitioning does **not** do: it does not
+> abolish the reduction, it shrinks it from `d`-sized and every-step to
+> `vocab`-sized and only at query positions. The claim being tested is
+> *optional*, not *absent*.
+
 **Also not covered:** how `W_k` and `W_v` (vocab × d) are distributed; the
 bandwidth of the heartbeat channel that [note 003](003-the-churn-model.md)
 requires; and any measurement whatsoever. Note 004's heartbeat arithmetic came
@@ -138,15 +163,21 @@ out negligible and probably still does, but "probably" is doing work there.
 
 ## 5. What would settle it
 
-1. **Build the row-split and check it is bit-identical to the single-process
-   version.** The same test g2-01 used for delivery: not "close", identical.
-   If it is not, the decomposition is wrong somewhere.
-2. **Build a version with no global readout** — per-unit prediction — and check
-   it still learns. That is the claim §4 rests on and it is currently unsupported.
+1. ~~**Build the row-split and check it is bit-identical.**~~ **Done.** The
+   ownership half is bit-identical and the broadcast half is confirmed to be a
+   real dependency rather than a slack one. What remains untested is the row-split
+   under *delay* — g2-01 covered delivery against the unpartitioned model.
+2. **Build a version with no global readout** — *partly done.* The readout is now
+   partitionable and g4-01 measures the cost. This is not yet note 002's
+   per-unit prediction, where each unit predicts its own next input and there is
+   no token-level classifier anywhere; it is the smaller step of making the
+   classifier per-group. Whether the pooling that remains is affordable is the
+   measurement; whether it can be removed entirely is still open.
 3. **Measure the step rate the task actually needs**, since the whole affordable
    region in §3 is a `d · rate` product and nothing here has measured `rate`.
 
-Until at least (1), this note is a design argument with arithmetic attached. It
-belongs in the record because the row/column distinction is genuinely load-
-bearing and was not obvious — the natural implementation is the one that breaks
-C1 — but it should not be cited as a result.
+With (1) done and (2) under way, this note has moved from design argument to
+partly-measured. The row/column distinction held up under test, which is the part
+that was most likely to be wrong. The bandwidth arithmetic in §3 is still
+arithmetic: nothing here has measured a step rate, and the affordable region is a
+`d · rate` product with one term unmeasured.

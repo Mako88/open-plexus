@@ -175,6 +175,10 @@ def serve(config: LocalMemoryConfig, own: Slice, host: str, port: int,
     step = 0
     with socket.create_connection((host, port)) as sock:
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        # Announce which slice this is, before anything else crosses the wire.
+        # The driver cannot infer it: accept order is arrival order, and arrival
+        # order is whatever the network felt like. See Network.__enter__.
+        send(sock, struct.pack("!ii", own.lo, own.hi))
         while True:
             try:
                 message = receive(sock)
@@ -208,23 +212,39 @@ class Network:
     """
 
     def __init__(self, config: LocalMemoryConfig, nodes: int,
-                 values: np.ndarray, readout: np.ndarray) -> None:
+                 values: np.ndarray, readout: np.ndarray,
+                 host: str = "127.0.0.1", port: int = 0,
+                 spawn: bool = True) -> None:
+        """`spawn=False` waits for nodes started elsewhere to connect.
+
+        The default starts them locally and is what every existing measurement
+        used. Turning it off is what lets a node be a container on the other end
+        of an emulated link, which is the only way G2, G3 and G4 stop being
+        modelled -- and, less obviously, the only way to make a node connect in
+        an order the driver did not choose, which is what the slice handshake
+        exists to survive.
+        """
         self.config = config
         self.slices = slices_for(config.d_model, nodes)
+        self.port = port
         self._values = values
         self._readout = readout
+        self._host = host
+        self._spawn = spawn
         self._listener: socket.socket | None = None
         self._connections: list[socket.socket] = []
         self._processes: list = []
 
     def __enter__(self) -> "Network":
-        import multiprocessing as mp
-
         self._listener = socket.socket()
         self._listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self._listener.bind(("127.0.0.1", 0))
+        self._listener.bind((self._host, self.port))
         self._listener.listen(len(self.slices))
-        port = self._listener.getsockname()[1]
+        self.port = port = self._listener.getsockname()[1]
+        if not self._spawn:
+            return self._accept()
+
+        import multiprocessing as mp
 
         context = mp.get_context("spawn")
         for own in self.slices:
@@ -237,12 +257,32 @@ class Network:
             process.start()
             self._processes.append(process)
 
-        # Accept in connection order, then ask each who it is -- accept order is
-        # not slice order and assuming it would silently permute the network.
-        pending = [self._listener.accept()[0] for _ in self.slices]
-        for sock in pending:
+        return self._accept()
+
+    def _accept(self) -> "Network":
+        # Accept in arrival order, then ask each who it is. **This comment used
+        # to describe a handshake that was not implemented**: connections were
+        # kept in accept order and indexed as though that were slice order.
+        #
+        # Summing votes is order-independent, so bit-identity could never catch
+        # it -- but `absent` names nodes BY INDEX, so a departure test removed
+        # whichever node happened to connect third rather than the third slice.
+        # On loopback that is usually spawn order and usually right. Under a
+        # network with delay it is neither, and the error is invisible: the run
+        # still completes and still looks plausible.
+        pending = []
+        for _ in self.slices:
+            sock = self._listener.accept()[0]
             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        self._connections = pending
+            pending.append((struct.unpack("!ii", receive(sock)), sock))
+
+        order = {(s.lo, s.hi): i for i, s in enumerate(self.slices)}
+        if sorted(k for k, _ in pending) != sorted(order):
+            raise ValueError(
+                f"nodes announced {sorted(k for k, _ in pending)}, "
+                f"expected {sorted(order)}")
+        self._connections = [sock for _, sock
+                             in sorted(pending, key=lambda p: order[p[0]])]
         return self
 
     def __exit__(self, *exc) -> None:

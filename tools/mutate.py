@@ -38,6 +38,7 @@ SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 # than crashing, which is how a sweep becomes a confident wrong answer.
 CHURN = ROOT / "experiments" / "g4_02_machine_churn.py"
 TRANSPORT = ROOT / "openplexus" / "transport.py"
+DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 
 
 @dataclass(frozen=True)
@@ -60,6 +61,53 @@ class Mutation:
 
 
 MUTATIONS = [
+    Mutation(
+        name="the-host-outranks-the-container",
+        breaks="the only thing this module exists for: a container allowed one "
+               "core of forty would read the HOST's memory and plan for a "
+               "machine it is not running on",
+        path=DEPLOYMENT,
+        old="              else _cgroup_memory() or _meminfo_available() or ASSUMED_MEMORY)",
+        new="              else _meminfo_available() or _cgroup_memory() or ASSUMED_MEMORY)",
+    ),
+    Mutation(
+        name="gated-deployment-takes-one-wide-node",
+        breaks="the g7-03 allocation policy, inverting it. Gated, allocation is "
+               "worth at most 0.031 and the smallest node reaches the most "
+               "devices, which is the whole priority; one wide node abandons it "
+               "for a measured gain of nothing",
+        path=DEPLOYMENT,
+        old="        width = 1\n        basis +=",
+        new="        width = capacity\n        basis +=",
+    ),
+    Mutation(
+        name="capacity-need-not-divide-into-nodes",
+        breaks="the exact partition, handing slices_for a split it refuses "
+               "rather than one it can serve",
+        path=DEPLOYMENT,
+        old="        capacity -= capacity % width",
+        new="        pass",
+    ),
+    Mutation(
+        name="connections-kept-in-arrival-order",
+        breaks="the slice handshake, restoring the bug exactly as it shipped: "
+               "connections indexed by when they arrived rather than by which "
+               "slice they announced. Summing votes is order-independent so no "
+               "bit-identity test can see it, and it only bites where a node is "
+               "named BY INDEX -- every departure and churn result",
+        path=DISTRIBUTED,
+        old="        self._connections = [sock for _, sock\n"
+            "                             in sorted(pending, key=lambda p: order[p[0]])]",
+        new="        self._connections = [sock for _, sock in pending]",
+    ),
+    Mutation(
+        name="driver-accepts-any-slice",
+        breaks="the check that the nodes which turned up are the ones asked "
+               "for, so a network of the wrong shape runs and reports numbers",
+        path=DISTRIBUTED,
+        old="        if sorted(k for k, _ in pending) != sorted(order):",
+        new="        if False:",
+    ),
     Mutation(
         name="surprise-is-the-margin-again",
         breaks="the meaning of surprise, restoring the measure that read only "

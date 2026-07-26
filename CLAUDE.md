@@ -113,6 +113,22 @@ undetectable from outside, because the result looks carefully measured.
 > doubled relative to the one-sided version
 > ([g1-08](experiments/sweeps/g1-08-the-honest-price.txt)).
 
+**And a sweep that does not contain its own answer has not swept.** If every arm
+chooses a value at an *edge* of the grid, the optimum lies outside it, every arm
+is under-tuned, and the rule above was satisfied while the number stayed
+provisional. Check it mechanically — `tools/grid.py`.
+
+> *Calibration.* [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) swept the
+> learning rate on all four arms, as required, over `{0.02, 0.05, 0.1}`. The
+> interior value was chosen **zero times in twenty-four** arm-choices: every row
+> pinned at an edge. Worse, the write-up called two of those rows healthy
+> *because their arms disagreed* — but they disagreed by sitting at opposite
+> edges, which is a grid too narrow in both directions rather than a grid working.
+> The count went from "four of six" to "six of six" only once the check existed as
+> code. **Printing a diagnostic is not a check; it is a hope that someone reads
+> the line correctly — and here the person who wrote the line was the one who
+> misread it.**
+
 **3. Reproduce before you believe.** One green run, one fast benchmark, one
 successful manual click is an anecdote. Anything that will be acted on gets
 repeated — enough times to separate the effect from the noise, and on input you

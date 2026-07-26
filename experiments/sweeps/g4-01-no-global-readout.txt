@@ -215,25 +215,35 @@ visible. It is:
   seq=384 d=64    all 0.02                                 <- pinned at the BOTTOM
   seq=384 d=128   P=1:0.1  P=2:0.1  P=4:0.1  P=8:0.02      <- varies
 
-**Four of six rows pin at an edge of the grid**, which means the optimum is
-outside it and every arm in those rows is under-tuned. The lr was swept on all
-arms, which was the rule; the rule did not say the sweep had to CONTAIN the
-optimum, and this is the second failure mode of the same family.
+**All six rows pin at an edge of the grid**, and the interior value 0.05 was
+chosen **zero times out of twenty-four**. The optimum is outside the grid
+everywhere and every arm is under-tuned. The lr was swept on all arms, which was
+the rule; the rule did not say the sweep had to CONTAIN the optimum.
+
+*This paragraph originally said four of six.* The two rows marked "varies" above
+were counted as healthy because their arms disagreed -- but they disagree by
+sitting at OPPOSITE edges, which is a grid too narrow in both directions rather
+than a grid doing its job. The error was caught by `tools/grid.py`, written
+afterwards to turn this check into an assertion instead of a line of output
+someone has to read correctly. It found the mistake on its first run, against the
+very sweep that motivated it.
 
 What survives it:
 
 - **The ceiling results.** 1.000 against 1.000 at d=128 seq 96 cannot be improved
   by tuning. The finding that the readout costs nothing at adequate width stands
   regardless of the grid.
-- **The direction**, which is consistent across all six rows including both rows
-  where lr varied internally.
+- **The direction**, which is consistent across all six rows, and which a
+  uniformly under-tuned grid is unlikely to invent: every arm within a row sat at
+  the same edge, so the arms are compared like for like even though none is at
+  its own optimum.
 - **Prediction 1**, which compares against g1-13's separately-tuned numbers.
 
 What does not:
 
-- **The exact penalties in the four pinned rows.** They could move either way.
-  A lower lr might help the P=8 arm more than P=1, or less; nothing here
-  distinguishes those.
+- **The exact penalties, in every row.** They could move either way. A different
+  lr might help the P=8 arm more than P=1, or less; nothing here distinguishes
+  those.
 
 **Not re-running.** The claims that matter are at ceiling, where tuning cannot
 move them, and the direction is 6 rows for 6. Recording the bound rather than

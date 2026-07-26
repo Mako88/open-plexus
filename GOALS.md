@@ -489,7 +489,8 @@ pooling step is optional rather than required — which is the claim C1 actually
 needs.
 
 The penalty numbers away from ceiling are provisional: the learning-rate grid
-pinned at an edge in four of six rows, so those rows are under-tuned on every arm.
+pinned at an edge in **all six** rows — its interior value was never once chosen —
+so every arm everywhere is under-tuned.
 
 **The price, and a caveat that is now permanent.** Upward of **5.6×–8.2× the
 width**, growing with sequence length; in *working memory*, worse than attention

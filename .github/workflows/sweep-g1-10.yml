@@ -10,10 +10,6 @@ name: sweep-g1-10-real-load
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g1_10_seqlen.py"
-      - ".github/workflows/sweep-g1-10.yml"
 
 concurrency:
   group: open-plexus-sweeps

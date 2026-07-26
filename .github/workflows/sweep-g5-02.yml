@@ -14,10 +14,6 @@ name: sweep-g5-02-how-finely-can-it-split
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g5_02_how_fine.py"
-      - ".github/workflows/sweep-g5-02.yml"
 
 concurrency:
   group: open-plexus-sweeps

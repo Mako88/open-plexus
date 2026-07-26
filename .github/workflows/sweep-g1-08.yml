@@ -10,10 +10,6 @@ name: sweep-g1-08-honest-price
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g1_08_honest_price.py"
-      - ".github/workflows/sweep-g1-08.yml"
 
 concurrency:
   group: open-plexus-sweeps

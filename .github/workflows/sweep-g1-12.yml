@@ -9,10 +9,6 @@ name: sweep-g1-12-starved
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g1_12_starved.py"
-      - ".github/workflows/sweep-g1-12.yml"
 
 concurrency:
   group: open-plexus-sweeps

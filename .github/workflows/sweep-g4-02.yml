@@ -12,10 +12,6 @@ name: sweep-g4-02-machine-shaped-churn
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g4_02_machine_churn.py"
-      - ".github/workflows/sweep-g4-02.yml"
 
 concurrency:
   group: open-plexus-sweeps

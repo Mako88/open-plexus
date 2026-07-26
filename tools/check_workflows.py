@@ -42,6 +42,32 @@ def accepted_flags(script: Path) -> set[str]:
     return set(FLAG.findall(result.stdout))
 
 
+def push_triggered_sweeps() -> list[str]:
+    """Sweeps that fire on push, which they must not.
+
+    Every sweep shares one `concurrency` group, so at most one matrix runs at a
+    time. Ten of them watched `openplexus/` or `tools/` on push, which meant
+    **editing the model re-ran sweeps that finished weeks ago** -- and since a
+    concurrency group holds only one pending run, a freshly dispatched matrix
+    could be cancelled before starting by a re-run of old work.
+
+    That is what happened to g5-04. A commit touching the shared experiment
+    script re-triggered g5-03, and g5-04 was cancelled without running a single
+    job. What it left behind was a workflow marked `completed` with zero jobs and
+    no artifact, which reads as success until someone looks.
+
+    A finished sweep is a record. Re-running it because an unrelated file moved
+    is waste at best and interference at worst.
+    """
+    offenders = []
+    for path in sorted(WORKFLOWS.glob("sweep-*.yml")):
+        block = re.search(r"^on:\n(?:[ \t].*\n|\n)*",
+                          path.read_text(encoding="utf-8"), re.MULTILINE)
+        if block and "push:" in block.group(0):
+            offenders.append(path.name)
+    return offenders
+
+
 def main() -> int:
     if not WORKFLOWS.is_dir():
         print("no workflows to check")
@@ -78,8 +104,13 @@ def main() -> int:
         print(f"\n{len(problems)} problem(s). Every job in an affected matrix "
               "would die on its first line.")
         return 1
+    offenders = push_triggered_sweeps()
+    if offenders:
+        print("these sweeps fire on push and can cancel a dispatched matrix "
+              "before it starts: " + ", ".join(offenders))
+        return 1
     print(f"ok - {checked} invocation(s) across "
-          f"{len(list(WORKFLOWS.glob('*.yml')))} workflow(s)")
+          f"{len(list(WORKFLOWS.glob('*.yml')))} workflow(s), sweeps dispatch-only")
     return 0
 
 

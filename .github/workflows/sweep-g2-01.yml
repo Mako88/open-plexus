@@ -9,11 +9,6 @@ name: sweep-g2-01-latency
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "openplexus/transport.py"
-      - "experiments/g2_01_latency.py"
-      - ".github/workflows/sweep-g2-01.yml"
 
 concurrency:
   group: open-plexus-sweeps

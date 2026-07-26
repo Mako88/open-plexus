@@ -12,9 +12,6 @@ name: sweep-g5-04-how-far-does-pooling-stretch
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/sweep-g5-04.yml"
 
 concurrency:
   group: open-plexus-sweeps

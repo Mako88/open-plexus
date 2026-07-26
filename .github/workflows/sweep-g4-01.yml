@@ -12,10 +12,6 @@ name: sweep-g4-01-no-global-readout
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g4_01_partitions.py"
-      - ".github/workflows/sweep-g4-01.yml"
 
 concurrency:
   group: open-plexus-sweeps

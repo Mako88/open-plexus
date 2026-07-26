@@ -10,10 +10,6 @@ name: sweep-g1-11-right-unit
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g1_11_right_unit.py"
-      - ".github/workflows/sweep-g1-11.yml"
 
 concurrency:
   group: open-plexus-sweeps

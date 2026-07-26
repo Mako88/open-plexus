@@ -16,10 +16,6 @@ name: sweep-g5-03-a-finer-ruler
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g5_03_finer.py"
-      - ".github/workflows/sweep-g5-03.yml"
 
 concurrency:
   group: open-plexus-sweeps

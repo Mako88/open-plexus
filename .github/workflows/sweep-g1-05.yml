@@ -14,11 +14,6 @@ name: sweep-g1-05-price-of-locality
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "openplexus/models/local_memory.py"
-      - "experiments/g1_05_local.py"
-      - ".github/workflows/sweep-g1-05.yml"
 
 concurrency:
   group: open-plexus-sweeps

@@ -12,10 +12,6 @@ name: sweep-g5-01-does-scale-help
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g5_01_scaling.py"
-      - ".github/workflows/sweep-g5-01.yml"
 
 concurrency:
   group: open-plexus-sweeps

@@ -8,10 +8,6 @@ name: sweep-g1-07-convergence
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g1_07_convergence.py"
-      - ".github/workflows/sweep-g1-07.yml"
 
 concurrency:
   group: open-plexus-sweeps

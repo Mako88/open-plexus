@@ -12,10 +12,6 @@ name: sweep-g1-06-interference
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g1_06_interference.py"
-      - ".github/workflows/sweep-g1-06.yml"
 
 concurrency:
   group: open-plexus-sweeps

@@ -10,10 +10,6 @@ name: sweep-g1-13-both-arms-fed
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g1_13_both_fed.py"
-      - ".github/workflows/sweep-g1-13.yml"
 
 concurrency:
   group: open-plexus-sweeps

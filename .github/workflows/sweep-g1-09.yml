@@ -8,10 +8,6 @@ name: sweep-g1-09-alphabet
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g1_09_alphabet.py"
-      - ".github/workflows/sweep-g1-09.yml"
 
 concurrency:
   group: open-plexus-sweeps

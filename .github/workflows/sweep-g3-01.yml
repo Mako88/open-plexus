@@ -7,10 +7,6 @@ name: sweep-g3-01-churn
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "experiments/g3_01_churn.py"
-      - ".github/workflows/sweep-g3-01.yml"
 
 concurrency:
   group: open-plexus-sweeps

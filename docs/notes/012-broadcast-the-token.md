@@ -80,7 +80,14 @@ column:** each node's answer is `vocab`-sized, and pooling still has to move tho
 somewhere. Broadcasting tokens makes the *input* side free; it says nothing about
 the output side, which g4-01 established is optional but not absent.
 
-Nor has the per-token projection been substituted into the model and re-measured.
-It is statistically equivalent, which is not the same as verified — and this
-project has been caught before by "statistically equivalent" changes that moved a
-result.
+~~Nor has the per-token projection been substituted into the model and
+re-measured.~~ **Done.** `derived_keys` implements it, and on the task at three
+widths with three seeds each: 0.870 against 0.881 at width 24, 0.968 against
+0.959 at 32, 0.990 against 0.993 at 48. Every difference is inside the seed
+spread, which reaches 0.038 at the narrowest width. The projections are
+interchangeable in practice, not merely in their summary statistics.
+
+The test that carries the weight is reconstruction **out of order** — rebuilding
+token 17 without touching tokens 0 to 16. A single stream over the whole table
+makes row `t` depend on every draw before it, so a node could only rebuild the
+table by rebuilding all of it, which is the storage the scheme exists to avoid.

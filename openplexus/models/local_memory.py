@@ -87,6 +87,27 @@ class LocalMemoryConfig:
             an answer is wanted — and *optional*, because each group emits a
             complete answer by itself. Whether one group's answer alone is good
             enough is the measurement, not an assumption.
+        derived_keys: Draw each key row from its own seed rather than the whole
+            table from one. Off by default, which reproduces every earlier
+            result exactly.
+
+            **This is what lets a node be sent a token instead of a key vector.**
+            `Wk` is a frozen random projection that never learns, so it does not
+            have to be stored: with a per-token seed, any node can regenerate any
+            row it needs from the token id alone. Broadcasting a token costs 32
+            bytes per step at fan-out 8 whatever the width, against `8·d·4` for
+            the key — a factor of four thousand at `d = 4096`.
+
+            [Note 012](../../docs/notes/012-broadcast-the-token.md) works through
+            the trade: it roughly triples a node's compute, which
+            `tools/step_rate.py` shows is 21× to 380× under-used, in exchange for
+            removing the width term from the bandwidth cost, which is binding.
+
+            The two projections are statistically indistinguishable — row norms
+            0.9912 against 0.9925, mean absolute overlap 0.04987 against 0.04854
+            — but that is not the same as verified, so `tests/test_derived_keys.py`
+            checks the model scores the same on the task rather than trusting the
+            statistics.
         consolidation: Rate at which a *successful* retrieval is written into a
             second, non-decaying memory. 0 disables it and reproduces every
             earlier result exactly.
@@ -142,6 +163,7 @@ class LocalMemoryConfig:
     key_scale: float = 1.0
     key_active: int = 0
     consolidation: float = 0.0
+    derived_keys: bool = False
     seed: int = 0
 
     def __post_init__(self) -> None:
@@ -155,6 +177,10 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if self.derived_keys and self.key_active:
+            raise ValueError(
+                "derived_keys and key_active both build Wk and would conflict; "
+                "sparse keys have no per-token derivation yet")
         if self.consolidation < 0.0:
             raise ValueError("consolidation must not be negative")
         if self.consolidation and self.decay >= 1.0:
@@ -200,6 +226,14 @@ class LocalAssociativeMemory:
                 active = rng.choice(d, config.key_active, replace=False)
                 self.wk[token, active] = config.key_scale / np.sqrt(
                     config.key_active)
+        elif config.derived_keys:
+            # One draw per token, so a node holding only the seed can rebuild any
+            # row on demand. Deliberately NOT taken from `rng`: the point is that
+            # row `t` depends on `(seed, t)` alone and on nothing drawn before it,
+            # which is what makes it reconstructible out of order.
+            self.wk = np.stack([
+                np.random.default_rng((config.seed, token)).normal(0.0, spread, d)
+                for token in range(v)])
         else:
             self.wk = rng.normal(0.0, spread, (v, d))
         self.wv = rng.normal(0.0, spread, (v, d))

@@ -59,6 +59,23 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="derived-keys-share-one-stream",
+        breaks="reconstructibility -- a row would depend on every draw before "
+               "it, so a node could only rebuild the table by rebuilding all of "
+               "it, which is the storage the scheme exists to avoid",
+        path=LOCAL,
+        old="                np.random.default_rng((config.seed, token)).normal(0.0, spread, d)",
+        new="                rng.normal(0.0, spread, d)",
+    ),
+    Mutation(
+        name="derived-keys-ignore-the-token",
+        breaks="distinctness -- every token would get the same key, so no two "
+               "things could ever be told apart",
+        path=LOCAL,
+        old="                np.random.default_rng((config.seed, token)).normal(0.0, spread, d)",
+        new="                np.random.default_rng((config.seed, 0)).normal(0.0, spread, d)",
+    ),
+    Mutation(
         name="consolidation-ignores-confirmation",
         breaks="the gate -- it would promote every retrieval rather than the "
                "confirmed ones, making it a second memory wearing a gate's name",

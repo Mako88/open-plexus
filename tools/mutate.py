@@ -59,6 +59,31 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="consolidation-ignores-confirmation",
+        breaks="the gate -- it would promote every retrieval rather than the "
+               "confirmed ones, making it a second memory wearing a gate's name",
+        path=LOCAL,
+        old="                if predictions[t - 1] == token:",
+        new="                if True:",
+    ),
+    Mutation(
+        name="consolidation-reads-ahead",
+        breaks="causality -- confirming against the CURRENT token rather than "
+               "the one that has just arrived lets the answer at t depend on "
+               "information from t itself, which no running system would have",
+        path=LOCAL,
+        old="                if predictions[t - 1] == token:",
+        new="                if predictions[t - 1] == tokens[t - 1]:",
+    ),
+    Mutation(
+        name="consolidated-store-is-never-read",
+        breaks="the point of consolidating at all, since the lasting store "
+               "would be written and then ignored at retrieval",
+        path=LOCAL,
+        old="            retrieved = memory @ key if lasting is None else (memory + lasting) @ key",
+        new="            retrieved = memory @ key",
+    ),
+    Mutation(
         name="storage-mask-off-by-one",
         breaks="which binding the mask gates -- a binding written at t is "
                "(t-1 -> t), so gating on t-1 keeps the wrong ones while every "

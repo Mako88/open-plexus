@@ -87,6 +87,27 @@ class LocalMemoryConfig:
             an answer is wanted — and *optional*, because each group emits a
             complete answer by itself. Whether one group's answer alone is good
             enough is the measurement, not an assumption.
+        consolidation: Rate at which a *successful* retrieval is written into a
+            second, non-decaying memory. 0 disables it and reproduces every
+            earlier result exactly.
+
+            **This is the implementable replacement for the oracle gate.**
+            [g7-01](../../experiments/sweeps/g7-01-the-oracle-gate.txt) showed
+            that keeping only the useful bindings makes the task trivial —
+            devices of one dimension go from 0.404 to 1.000 — but the oracle
+            reads task structure no running system has. The blocker was that
+            nothing at storage time separates a useful binding from filler.
+
+            [Note 010](../../docs/notes/010-tagging-and-capture.md) took the
+            answer from synaptic tagging and capture: **do not decide at storage
+            time.** Write everything weakly into a fast, decaying store; when a
+            retrieval later turns out to have been right, promote what was
+            retrieved into a store that does not decay.
+
+            The signal is the model's own prediction against the next token that
+            arrives, so it is self-supervised and entirely local — no labels, no
+            coordination, no lookahead. It needs `decay` below 1 to be meaningful,
+            since a fast store that never fades is not fast.
         key_active: Non-zero dimensions per key, or 0 for dense signed keys.
 
             **Biology's standard answer to interference is a sparse, non-negative
@@ -120,6 +141,7 @@ class LocalMemoryConfig:
     partitions: int = 1
     key_scale: float = 1.0
     key_active: int = 0
+    consolidation: float = 0.0
     seed: int = 0
 
     def __post_init__(self) -> None:
@@ -133,6 +155,12 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if self.consolidation < 0.0:
+            raise ValueError("consolidation must not be negative")
+        if self.consolidation and self.decay >= 1.0:
+            raise ValueError(
+                "consolidation needs decay < 1: with a memory that never fades "
+                "there is no fast store for it to rescue anything from")
         if not 0 <= self.key_active <= self.d_model:
             raise ValueError(
                 f"key_active must be in [0, {self.d_model}], got "
@@ -294,7 +322,12 @@ class LocalAssociativeMemory:
 
         d = self.config.d_model
         memory = np.zeros((d, d))
+        # The consolidated store. Written only when a retrieval is confirmed
+        # useful by the token that arrives next, and never decayed -- which is
+        # the whole difference between it and `memory`.
+        lasting = np.zeros((d, d)) if self.config.consolidation else None
         previous_key = None
+        previous_retrieval = None
         predictions = np.zeros(len(tokens), dtype=np.int64)
 
         for t, token in enumerate(tokens):
@@ -313,10 +346,24 @@ class LocalAssociativeMemory:
                     memory *= self.config.decay
                 memory += np.outer(value, previous_key)
 
+            # CONSOLIDATE. The prediction made one step ago was a guess at the
+            # token that has just arrived, so this is where it gets marked right
+            # or wrong -- self-supervised, local, and available to any node.
+            #
+            # What gets promoted is the retrieved vector itself rather than the
+            # binding that produced it. A superposed memory cannot name which of
+            # its bindings answered; it can only be asked again and told whether
+            # the answer held up. Promoting the answer is the operation that is
+            # actually available.
+            if lasting is not None and previous_retrieval is not None:
+                if predictions[t - 1] == token:
+                    lasting += self.config.consolidation * np.outer(
+                        previous_retrieval, previous_key_for_retrieval)
+
             # RETRIEVE, then read an answer off each group independently.
             # `parts` is (groups, vocab): row g is the complete prediction group
             # g makes from its own dimensions, owing nothing to any other group.
-            retrieved = memory @ key
+            retrieved = memory @ key if lasting is None else (memory + lasting) @ key
             sliced = retrieved.reshape(groups, -1)
             parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)
             answer = parts.sum(0) if members is None else parts[members].sum(0)
@@ -332,4 +379,6 @@ class LocalAssociativeMemory:
                     "gv,gd->vgd", target - parts, sliced)
 
             previous_key = key
+            previous_retrieval = retrieved
+            previous_key_for_retrieval = key
         return predictions

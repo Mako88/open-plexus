@@ -1,0 +1,93 @@
+name: sweep-g1-08-honest-price
+
+# Re-measuring the price of locality with BOTH arms tuned.
+#
+# The error being corrected is that a number was reported from an untuned
+# hyperparameter. Tuning only the local rule and comparing against an untuned
+# attention baseline would reproduce that error with a friendlier face, and would
+# be undetectable from outside because the result would look carefully measured.
+# So both matrices are here, and both get the same treatment.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/g1_08_honest_price.py"
+      - ".github/workflows/sweep-g1-08.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  local:
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [16, 24, 32, 48, 64]
+        scale: ["0.25", "0.5", "0.71", "1.0", "1.41"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: local d=${{ matrix.width }} scale=${{ matrix.scale }}
+        run: python experiments/g1_08_honest_price.py --mode local --width ${{ matrix.width }} --scale ${{ matrix.scale }} --json out/L-${{ matrix.width }}-${{ matrix.scale }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-08-local-${{ matrix.width }}-${{ matrix.scale }}
+          path: out/*.json
+
+  attention:
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [4, 8, 16, 32]
+        scale: ["0.025", "0.05", "0.1", "0.2", "0.4"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: attention d=${{ matrix.width }} scale=${{ matrix.scale }}
+        run: python experiments/g1_08_honest_price.py --mode attention --width ${{ matrix.width }} --scale ${{ matrix.scale }} --json out/A-${{ matrix.width }}-${{ matrix.scale }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-08-attention-${{ matrix.width }}-${{ matrix.scale }}
+          path: out/*.json
+
+  aggregate:
+    needs: [local, attention]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g1-08-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 45" | tee summary.txt
+          python tools/summarise_g1_08.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-08-summary
+          path: |
+            summary.txt
+            out/*.json

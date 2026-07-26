@@ -136,6 +136,29 @@ class TestEachPartIsConnected(unittest.TestCase):
         b = LocalAssociativeMemory(LocalMemoryConfig(vocab_size=9, d_model=16, seed=2))
         self.assertGreater(np.abs(a.wk - b.wk).max(), 0.0)
 
+    def test_key_scale_changes_the_projection_magnitude(self):
+        """Rule 6, on the parameter that turned out to matter most.
+
+        This was implicitly 1.0 and unswept, and g3-02 found it worth 0.263 vs
+        0.960 at width 32. A key_scale the constructor ignored would silently
+        re-pin the very degree of freedom that mistake was made in.
+        """
+        small = LocalAssociativeMemory(LocalMemoryConfig(
+            vocab_size=9, d_model=32, seed=1, key_scale=0.5))
+        big = LocalAssociativeMemory(LocalMemoryConfig(
+            vocab_size=9, d_model=32, seed=1, key_scale=2.0))
+        ratio = np.linalg.norm(big.wk) / np.linalg.norm(small.wk)
+        self.assertAlmostEqual(ratio, 4.0, places=6)
+
+    def test_key_scale_one_is_the_historical_default(self):
+        """Every result before g3-02 was measured at this scale. If the default
+        moved, the whole existing record would silently stop being comparable
+        (rule 12)."""
+        model = LocalAssociativeMemory(LocalMemoryConfig(vocab_size=9, d_model=64,
+                                                         seed=1))
+        self.assertAlmostEqual(float(np.linalg.norm(model.wk, axis=1).mean()),
+                               1.0, delta=0.15)
+
     def test_decay_changes_behaviour(self):
         """A decay that did nothing would make the parameter a lie, and it is
         the one knob available for bounding interference in long sequences."""

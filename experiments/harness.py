@@ -42,6 +42,8 @@ def parse_args(description: str) -> argparse.Namespace:
                         help="delivery jitter in steps")
     parser.add_argument("--max-delay", type=int, default=4,
                         help="receiver buffer depth in steps")
+    parser.add_argument("--scale", type=float, default=None,
+                        help="initialisation scale for the model under test")
     parser.add_argument("--mode", default=None,
                         help="which variant to run")
     parser.add_argument("--epochs", type=int, default=None,

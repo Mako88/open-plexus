@@ -72,6 +72,17 @@ class LocalMemoryConfig:
         decay: Per-step multiplier on the memory. 1.0 keeps everything;
             below 1.0 forgets older bindings, which bounds the interference a
             long sequence accumulates.
+        key_scale: Multiplier on the frozen projections, on top of the
+            `1/sqrt(d_model)` that keeps keys at unit norm.
+
+            **This exists because it was silently 1.0 and that was the wrong
+            value.** g3-02 measured a width-32 model at 0.263 with unit-norm keys
+            and 0.960 with the same keys multiplied by 0.71 — nothing else
+            changed. Retrieval magnitude goes as the cube of this, against a
+            fixed learning rate, so it and `lr` are not independent and neither
+            can be left untuned while the other is swept. The width curve in
+            g1-05 and g1-06 was measured with this pinned at 1.0 and is a curve
+            about that choice as much as about width.
         seed: Determines the frozen projections completely.
     """
 
@@ -79,6 +90,7 @@ class LocalMemoryConfig:
     d_model: int = 64
     lr: float = 0.05
     decay: float = 1.0
+    key_scale: float = 1.0
     seed: int = 0
 
     def __post_init__(self) -> None:
@@ -90,6 +102,8 @@ class LocalMemoryConfig:
             raise ValueError("lr must be positive")
         if not 0.0 < self.decay <= 1.0:
             raise ValueError("decay must be in (0, 1]")
+        if self.key_scale <= 0.0:
+            raise ValueError("key_scale must be positive")
 
 
 class LocalAssociativeMemory:
@@ -107,8 +121,9 @@ class LocalAssociativeMemory:
         # Rows scaled to roughly unit norm, so retrieval needs no normalisation
         # step. Normalising `k` at run time would be a per-vector operation and
         # defensible, but avoiding it entirely keeps the C1 argument simple.
-        self.wk = rng.normal(0.0, 1.0 / np.sqrt(d), (v, d))
-        self.wv = rng.normal(0.0, 1.0 / np.sqrt(d), (v, d))
+        spread = config.key_scale / np.sqrt(d)
+        self.wk = rng.normal(0.0, spread, (v, d))
+        self.wv = rng.normal(0.0, spread, (v, d))
         self.wo = np.zeros((v, d))
 
     def ablate(self, dimensions) -> None:

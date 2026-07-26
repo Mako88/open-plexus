@@ -180,6 +180,13 @@ MUTATIONS = [
         new="            self.params[name] -= 0.0 * m_hat / (np.sqrt(v_hat) + self.eps)",
     ),
     Mutation(
+        name="key-scale-ignored",
+        breaks="the scale parameter, re-pinning the degree of freedom g3-02 found mattered most",
+        path=LOCAL,
+        old="        spread = config.key_scale / np.sqrt(d)",
+        new="        spread = 1.0 / np.sqrt(d)",
+    ),
+    Mutation(
         name="ablation-spares-the-key-projection",
         breaks="churn permanence, letting a departed machine keep contributing",
         path=LOCAL,

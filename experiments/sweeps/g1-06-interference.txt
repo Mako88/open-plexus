@@ -1,0 +1,120 @@
+Does the price of locality grow with the number of things remembered?
+======================================================================
+
+Script: experiments/g1_06_interference.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+Our local rule stores every association by layering it into the same grid of
+numbers. Retrieving one gives the right answer plus a faint smear of every other
+association stored alongside it. More room means less smear -- that is why it
+needed four to six times the width of the unrestricted version.
+
+The obvious next question: what happens when there is MORE to remember?
+
+The unrestricted model did not care at all. Four things to remember or sixteen,
+it scored a perfect 1.000 either way -- 56 runs, no difference. It looks things up
+rather than storing them, so quantity is free.
+
+Ours should care, because the smear is made of the other things. If it does,
+then "how many things to remember" becomes a genuine difficulty dial for the
+first time in this project -- and it becomes one for exactly the reason it was
+useless before.
+
+This also decides how the cost scales. If doubling the things to remember doubles
+the room needed, that is a manageable price. If it squares it, it is not.
+
+
+QUESTION
+--------
+g1-05 measured the local rule crossing between d_model 48 and 64 at n_pairs=4,
+against attention's 8-16. Does that crossing MOVE as n_pairs changes?
+
+Sweep n_pairs x d_model, 6 seeds per cell, on Actions.
+  n_pairs  2, 4, 8
+  d_model  24, 32, 48, 64, 96, 128, 192
+
+Per-seed values reported, not just aggregates.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. THE CROSSING GROWS WITH n_pairs. This is prediction 3 from g1-05, and the
+   central one here.
+
+2. IT GROWS ROUGHLY LINEARLY, and this is the sharp version worth committing to.
+
+   A linear associative memory holding K bindings on random keys of width d
+   retrieves with a signal-to-noise ratio going like sqrt(d/K): the wanted term
+   is one binding, the interference is a sum of K-1 others adding incoherently.
+   Holding retrieval quality fixed therefore needs d proportional to K.
+
+   g1-05 puts the crossing at ~56 for n_pairs=4. Linear scaling predicts:
+
+        n_pairs=2   crossing near 28   (between 24 and 32)
+        n_pairs=4   crossing near 56   (between 48 and 64)  <- known
+        n_pairs=8   crossing near 112  (between 96 and 128)
+
+   The widths above were chosen to bracket exactly those three points. If the
+   crossings land there, the scaling law is linear and the cost of remembering
+   more is affordable.
+
+3. If it is worse than linear -- say the n_pairs=8 crossing lands at 192 or does
+   not appear at all -- then interference compounds faster than incoherent
+   addition predicts, and width is not a sufficient remedy at scale. That would
+   be the most consequential negative result available here, because the whole
+   distribution story assumes many bindings per machine.
+
+4. The graded transition seen in g1-05 persists at every n_pairs. Interference is
+   continuous, so there should be no bimodality anywhere in this table. If some
+   cell goes all-or-nothing, the mechanism is not what §"THE FINDING NOBODY
+   PREDICTED" in g1-05 claims it is.
+
+Most likely to be wrong: (2)'s exponent. Linear is the clean theoretical answer
+for random incoherent interference, but the keys here are frozen random
+projections of a 32-token alphabet rather than fresh random vectors, so the same
+key recurs across sequences and the interference is not fully incoherent. That
+could push it either way, and the direction would be informative:
+  - better than linear -> the structure in the key set is helping
+  - worse than linear  -> key reuse is making interference add coherently
+
+
+AND A SECOND, CHEAPER QUESTION
+-------------------------------
+g1-05's prediction 4, untested: does `decay` help? The memory can multiply
+itself down each step, which bounds how much interference accumulates but also
+fades bindings before their query arrives.
+
+  n_pairs=8, d_model=48 (deliberately just below the crossing, where a real
+  effect has room to show), decay in 1.0, 0.99, 0.95, 0.9. 6 seeds.
+
+PREDICTION 5: decay does not help, and hurts as it strengthens. MQAR needs every
+binding retained until its query arrives, and queries are placed at random
+offsets well after the pair block, so forgetting costs more than the
+interference it prevents.
+
+PREDICTION 6: the damage is monotonic in the decay strength. If instead there is
+an optimum at some intermediate value, that would mean interference genuinely is
+the binding constraint at this width and forgetting the oldest bindings is worth
+their loss -- which would be a small but real mechanism for the design, and would
+matter for long sequences where the alternative is unbounded accumulation.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- crossing flat in n_pairs   -> superposition interference is NOT the mechanism.
+                                g1-05's explanation of its own result is wrong,
+                                and the graded transition needs another account
+- crossing ~ linear          -> as predicted; cost of scale is manageable
+- crossing worse than linear -> width is not a sufficient remedy; the rule needs
+                                a way to keep bindings apart, not just more room
+- any bimodal cell           -> contradicts g1-05's continuity claim
+- decay helps                -> prediction 5 wrong, and there is a free knob for
+                                bounding interference in long sequences
+
+
+RESULT
+------
+(not yet run)

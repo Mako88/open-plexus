@@ -34,6 +34,12 @@ def parse_args(description: str) -> argparse.Namespace:
                         help="run this seed only; omit to run all of them")
     parser.add_argument("--width", type=int, default=None,
                         help="run this d_model only; omit to run all of them")
+    parser.add_argument("--pairs", type=int, default=None,
+                        help="run this n_pairs only; omit to run all of them")
+    parser.add_argument("--decay", type=float, default=None,
+                        help="run this memory decay only")
+    parser.add_argument("--sweep", default=None, choices=("widths", "decay"),
+                        help="which sub-sweep to run when a script has more than one")
     parser.add_argument("--json", type=Path, default=None,
                         help="write results here as JSON instead of a table")
     parser.add_argument("--aggregate", nargs="+", metavar="FILE",

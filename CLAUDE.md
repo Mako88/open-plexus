@@ -167,6 +167,20 @@ not mention how it is computed.
 > class of check than the ones around it, **not a guarantee** — and a meaning
 > test that passes on the first run deserves suspicion, not satisfaction.
 
+**Commit messages go through `-F <file>`, never `-m`.** Backticks inside a
+double-quoted shell argument are command substitution. A message containing
+`` `none` `` runs `none`, prints "command not found" to the terminal, and commits
+the sentence with the word silently deleted — so the shell edits the permanent
+record and the only symptom is an error about something you never ran.
+
+> *Calibration.* Commit `18388e5`. The line "PREDICTION 3 REFUTED BACKWARDS.
+> `none` was predicted to rise" was committed as "PREDICTION 3 REFUTED BACKWARDS.
+>  was predicted to rise". Every other commit that day used `-F` and was fine;
+> this one used `-m` because the message felt short enough to inline. **The rule
+> that only applies when the content looks risky is a rule that fails on the
+> content you did not think was risky.** This is the same failure as the heredoc
+> rule and belongs next to it.
+
 **A caveat printed next to a number does not attach to the number.** If a value
 is a *bound* — a crossing that sat at the edge of the grid, a run that hit its
 budget — the code has to refuse to use it as a value. Annotating it and computing

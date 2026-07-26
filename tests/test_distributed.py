@@ -1,0 +1,150 @@
+"""The split, run for real across processes.
+
+Every result in this project until now came from one process holding one array and
+calling slices of it nodes. That is a faithful model of the arithmetic and says
+nothing about whether the arithmetic survives being spread out, because no packet
+had ever been sent.
+
+These send packets. Each node is a separate OS process with its own memory,
+reached over loopback TCP, receiving a four-byte token id and replying with a
+complete vote.
+
+**The claim is exactness, not similarity.** If running across `n` processes gave
+merely close answers, every earlier measurement would need redoing against the
+distributed version. It gives identical ones.
+"""
+
+from __future__ import annotations
+
+import unittest
+
+import numpy as np
+
+from openplexus.distributed import Network, Slice, slices_for
+from openplexus.models.local_memory import (
+    LocalAssociativeMemory, LocalMemoryConfig)
+
+TOKENS = np.array([3, 9, 1, 7, 3, 5, 11, 2, 9, 4])
+
+
+def configured(partitions: int, width: int = 32):
+    config = LocalMemoryConfig(
+        vocab_size=14, d_model=width, partitions=partitions, key_scale=0.5,
+        derived_keys=True, seed=5)
+    model = LocalAssociativeMemory(config)
+    model.wo[:] = np.random.default_rng(0).normal(0.0, 0.1, (14, width))
+    return config, model
+
+
+class TheSplitIsExact(unittest.TestCase):
+
+    def test_processes_reproduce_the_single_process_model_exactly(self):
+        """Not close. Identical, at every node count that divides the width.
+
+        A difference here of any size would mean the distributed system is a
+        different model from the one every sweep measured, and the whole record
+        would have to be re-earned against it.
+        """
+        for nodes in (1, 2, 4, 8):
+            with self.subTest(nodes=nodes):
+                config, model = configured(nodes)
+                expected = model.run(TOKENS)
+                with Network(config, nodes, model.wv, model.wo) as network:
+                    np.testing.assert_array_equal(network.run(TOKENS), expected)
+
+    def test_pooling_every_node_is_partition_independent(self):
+        """One node and eight give the SAME answers, and that is correct.
+
+        Summing every node reconstructs the full matrix product exactly, so with
+        a fixed readout the pooled answer cannot depend on how the width was
+        cut. Partitioning matters for LEARNING, where each group fits its own
+        error, and for reading one node alone. It does not matter here.
+
+        Written as a test because the first version of it asserted the opposite
+        and failed -- a good reminder that "the split must change something" is
+        an intuition, not a theorem.
+        """
+        answers = []
+        for nodes in (1, 8):
+            config, model = configured(nodes)
+            with Network(config, nodes, model.wv, model.wo) as network:
+                answers.append(network.run(TOKENS))
+        np.testing.assert_array_equal(*answers)
+
+    def test_the_predictions_are_not_degenerate(self):
+        """The real vacuity guard: a broken driver returning zeros would still
+        match a broken single-process model if both were equally broken."""
+        config, model = configured(4)
+        with Network(config, 4, model.wv, model.wo) as network:
+            predictions = network.run(TOKENS)
+        self.assertGreater(len(set(predictions.tolist())), 2,
+                           "predictions barely vary, so the comparison above "
+                           "could pass on a model that computes nothing")
+
+    def test_running_twice_gives_the_same_answer(self):
+        """A node process outlives the sequence; its memory must not.
+
+        The first version of the departure test failed with answers changing
+        BEFORE the departure step, which is not something a departure can do.
+        The cause was nodes carrying their memory into the next sequence.
+        """
+        config, model = configured(4)
+        with Network(config, 4, model.wv, model.wo) as network:
+            first = network.run(TOKENS)
+            second = network.run(TOKENS)
+        np.testing.assert_array_equal(first, second)
+
+
+class NodesLeaveOverTheWire(unittest.TestCase):
+    """A departure the driver experiences rather than one it simulates."""
+
+    def test_answers_change_once_a_node_stops_being_asked(self):
+        config, model = configured(4)
+        with Network(config, 4, model.wv, model.wo) as network:
+            intact = network.run(TOKENS)
+            partial = network.run(TOKENS, absent={0, 1}, leave_at=4)
+        self.assertTrue(np.array_equal(intact[:4], partial[:4]),
+                        "answers before the departure must be untouched")
+        self.assertFalse(np.array_equal(intact[4:], partial[4:]),
+                         "answers after it must not be")
+
+    def test_a_departure_before_the_first_step_removes_them_throughout(self):
+        config, model = configured(4)
+        with Network(config, 4, model.wv, model.wo) as network:
+            early = network.run(TOKENS, absent={0}, leave_at=0)
+            late = network.run(TOKENS, absent={0}, leave_at=len(TOKENS) - 1)
+        self.assertFalse(np.array_equal(early, late),
+                         "when a node stopped answering made no difference")
+
+
+class SlicesAreExactOrRefused(unittest.TestCase):
+
+    def test_uneven_splits_raise_rather_than_round(self):
+        """Rounding would make the exactness claim above untestable."""
+        with self.assertRaises(ValueError):
+            slices_for(32, 5)
+
+    def test_slices_tile_the_width_without_gaps_or_overlap(self):
+        pieces = slices_for(240, 16)
+        self.assertEqual(pieces[0].lo, 0)
+        self.assertEqual(pieces[-1].hi, 240)
+        for before, after in zip(pieces, pieces[1:]):
+            self.assertEqual(before.hi, after.lo)
+        self.assertEqual(sum(p.width for p in pieces), 240)
+
+
+class TheWireCostIsWhatWasClaimed(unittest.TestCase):
+    """note 012 said a token is enough. This is what a node actually receives."""
+
+    def test_inbound_is_a_handful_of_bytes_at_any_width(self):
+        narrow, narrow_model = configured(4, width=32)
+        wide, wide_model = configured(4, width=256)
+        with Network(narrow, 4, narrow_model.wv, narrow_model.wo) as small:
+            with Network(wide, 4, wide_model.wv, wide_model.wo) as large:
+                self.assertEqual(small.bytes_per_step_inbound,
+                                 large.bytes_per_step_inbound)
+                self.assertLessEqual(small.bytes_per_step_inbound, 16)
+
+
+if __name__ == "__main__":
+    unittest.main()

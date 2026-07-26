@@ -22,7 +22,7 @@ import unittest
 import numpy as np
 
 from openplexus.models.local_memory import (
-    LocalAssociativeMemory, LocalMemoryConfig)
+    LocalAssociativeMemory, LocalMemoryConfig, admit)
 
 VOCAB, WIDTH = 16, 24
 TOKENS = np.random.default_rng(7).integers(0, VOCAB, 200)
@@ -36,6 +36,56 @@ def build(slots: int = 0, consolidation: float = 1.0, salience: float = 0.0,
         lasting_cap=cap, seed=4))
     model.wo[:] = model.wv           # a decoder, so predictions track the memory
     return model
+
+
+class TheAdmissionPolicy(unittest.TestCase):
+    """Tested directly, because through the model it was not tested at all.
+
+    Two mutations survived the first version of this file -- keep the most
+    RECENT k, and evict the STRONGEST -- and both survived for one reason: every
+    test here checked that the pool's CAPACITY binds, and none checked which
+    items it keeps. A pool that admits everything and a pool that keeps the worst
+    are both bounded, so all of those tests pass on either.
+
+    Reaching the policy through predictions means hunting for fixtures where the
+    difference happens to surface. The decision is three lines of pure
+    arithmetic, so it is a function now and is tested as one.
+    """
+
+    def test_room_means_the_candidate_is_appended(self):
+        self.assertEqual(admit([], 0.5, 3), 0)
+        self.assertEqual(admit([9.0, 9.0], 0.001, 3), 2,
+                         "a candidate weaker than everything must still be "
+                         "taken while the pool has room -- the competition is "
+                         "for SPACE, and there is space")
+
+    def test_a_full_pool_refuses_a_weaker_candidate(self):
+        """The case that has to exist. A pool where everything gets in is a pool
+        in name only, and is exactly the `admits-everything` mutation."""
+        self.assertIsNone(admit([1.0, 2.0, 3.0], 0.5, 3))
+        self.assertIsNone(admit([1.0, 2.0, 3.0], 0.999, 3))
+
+    def test_a_stronger_candidate_displaces_the_WEAKEST(self):
+        """Not the strongest, and not the oldest."""
+        self.assertEqual(admit([5.0, 1.0, 3.0], 4.0, 3), 1)
+        self.assertEqual(admit([1.0, 5.0, 3.0], 4.0, 3), 0)
+        self.assertEqual(admit([3.0, 5.0, 1.0], 4.0, 3), 2)
+
+    def test_ties_go_to_the_incumbent(self):
+        """Otherwise a run of equal-strength candidates churns forever, each
+        evicting the last and the pool never settling."""
+        self.assertIsNone(admit([2.0, 2.0, 2.0], 2.0, 3))
+
+    def test_the_position_of_the_weakest_is_what_decides_it_not_the_order(self):
+        """The same multiset in any arrangement must evict the same VALUE."""
+        for arrangement in ([1.0, 7.0, 4.0], [7.0, 4.0, 1.0], [4.0, 1.0, 7.0]):
+            index = admit(arrangement, 5.0, 3)
+            self.assertEqual(arrangement[index], 1.0)
+
+    def test_a_pool_of_one_keeps_the_best_thing_it_has_seen(self):
+        self.assertEqual(admit([], 1.0, 1), 0)
+        self.assertIsNone(admit([9.0], 1.0, 1))
+        self.assertEqual(admit([1.0], 9.0, 1), 0)
 
 
 class ZeroIsTheOldRule(unittest.TestCase):

@@ -70,7 +70,7 @@ MUTATIONS = [
                "sequence length again, which is exactly the failure g8-01 "
                "measured",
         path=LOCAL,
-        old="                            lasting -= slots[weakest][1]",
+        old="                            lasting -= slots[index][1]",
         new="                            pass",
     ),
     Mutation(
@@ -80,16 +80,16 @@ MUTATIONS = [
                "than the best k -- a different policy, and one nothing here "
                "argued for",
         path=LOCAL,
-        old="                        if strength > slots[weakest][0]:",
-        new="                        if True:",
+        old="    return weakest if strength > strengths[weakest] else None",
+        new="    return weakest",
     ),
     Mutation(
         name="capture-evicts-the-strongest",
         breaks="which end of the pool loses, so the store fills with the "
                "weakest traces it has seen",
         path=LOCAL,
-        old="                                      key=lambda i: slots[i][0])",
-        new="                                      key=lambda i: -slots[i][0])",
+        old="    weakest = min(range(len(strengths)), key=lambda i: strengths[i])",
+        new="    weakest = max(range(len(strengths)), key=lambda i: strengths[i])",
     ),
     Mutation(
         name="the-node-ignores-the-decoder-switch",

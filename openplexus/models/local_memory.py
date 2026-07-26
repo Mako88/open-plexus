@@ -84,6 +84,27 @@ def surprise(scores: np.ndarray, token: int) -> float:
     return -float(np.log(weights[token] / weights.sum() + 1e-12))
 
 
+def admit(strengths, strength: float, capacity: int) -> int | None:
+    """Which slot a candidate of this strength takes, or None if it is refused.
+
+    The competition in competitive capture. Synaptic capture is winner-take-all
+    over a finite pool of plasticity-related proteins: tagged synapses contend
+    and most lose. `capacity` is the pool.
+
+    Returns an index into `strengths` -- the end of it when there is room, or the
+    weakest incumbent when there is not and the candidate beats it. **None means
+    the candidate loses**, which is the case that has to exist: a pool where
+    everything gets in is a pool in name only.
+
+    Ties go to the incumbent, because a strictly-greater test is what makes a
+    long run of equal-strength candidates settle instead of churning.
+    """
+    if len(strengths) < capacity:
+        return len(strengths)
+    weakest = min(range(len(strengths)), key=lambda i: strengths[i])
+    return weakest if strength > strengths[weakest] else None
+
+
 @dataclass(frozen=True)
 class LocalMemoryConfig:
     """Shape and learning settings.
@@ -623,19 +644,18 @@ class LocalAssociativeMemory:
                     strength = float(np.linalg.norm(previous_retrieval))
                     contribution = self.config.consolidation * np.outer(
                         previous_retrieval, previous_key_for_retrieval)
-                    if len(slots) < self.config.capture_slots:
-                        slots.append((strength, contribution))
-                        lasting += contribution
-                    else:
-                        weakest = min(range(len(slots)),
-                                      key=lambda i: slots[i][0])
-                        if strength > slots[weakest][0]:
+                    index = admit([s for s, _ in slots], strength,
+                                  self.config.capture_slots)
+                    if index is not None:
+                        if index < len(slots):
                             # Displacement, not addition. Subtracting the loser
                             # is what holds N at k -- without it this is a
                             # threshold gate with extra bookkeeping.
-                            lasting -= slots[weakest][1]
-                            slots[weakest] = (strength, contribution)
-                            lasting += contribution
+                            lasting -= slots[index][1]
+                            slots[index] = (strength, contribution)
+                        else:
+                            slots.append((strength, contribution))
+                        lasting += contribution
                 elif fires:
                     lasting += self.config.consolidation * np.outer(
                         previous_retrieval, previous_key_for_retrieval)

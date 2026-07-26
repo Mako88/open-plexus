@@ -141,3 +141,103 @@ WHAT WOULD REFUTE WHAT
 - `alone` floors disagree with
   g5-03                           -> a bug or seed sensitivity; nothing else here
                                      can be read until it is explained
+
+
+RESULT
+------
+Total width 240, 3 seeds, 8 epochs. Minimum machine width, bracketed by adjacent
+grid points:
+
+    seq_len    pooled        alone        pooling's advantage
+       96      <= 1          (8, 10]      about 13x
+      128      <= 1          (12, 15]     about 13x
+      192      (4, 6]        (15, 20]     about 3.3x
+      256      (12, 15]      (24, 30]     about 2x
+      384      (20, 24]      (24, 30]     about 1.25x
+
+    alone    exponent 0.82, +/-0.21, so [0.61, 1.03]
+    pooled   exponent 1.94, +/-0.58, so [1.36, 2.53]
+
+Both exclude g1-10's 0.37 for total width. Machine count shrinks as seq_len^-0.45
+by the lone-machine criterion and seq_len^-1.57 by the pooled one.
+
+
+THE ANSWER, IN THE TERMS THAT MATTER
+--------------------------------------
+The premise of this project is that capability could run on the machines people
+already own, and **the machines people already own are mostly tiny**. So the
+figure of merit is not aggregate accuracy, it is *how small a machine can be and
+still be worth including*.
+
+  > **At sequence length 128, a machine holding ONE number is enough.** Two
+  > hundred and forty of them, each storing a single value, pool to 0.978.
+
+That is as small as a node can possibly get, and it works. The problem is not the
+current size. **The problem is the growth rate**: by 384 steps the same pooled
+arrangement needs machines of 20 to 24, and an exponent near 1.94 means node size
+grows roughly with the SQUARE of sequence length.
+
+Extrapolating the pooled fit, machines of 64 would carry sequences to about 640
+steps -- but that is one step beyond the measured range with an exponent whose
+interval spans 1.36 to 2.53, so it is an indication rather than a number.
+
+
+THE PREDICTIONS
+----------------
+1. **Pooled floor located at 128, 192, 256, 384 and unlocatable at 96 -- HELD IN
+   PART.** 128 also bottomed out: width 1 still scores 0.978 there, so two rows
+   are bounds rather than values and the fit rests on three points.
+
+2. **Pooled exponent steeper than `alone`'s, guess 1.8 to 2.6 -- HELD, and
+   precisely.** Measured 1.94. The guess came from two local slopes in the
+   control data and landed inside its own range, which is the first time in this
+   project a magnitude guess has done that.
+
+3. **Pooling still wins in absolute terms at every length -- HELD.** It is always
+   the better option; the margin simply collapses from 13x to 1.25x. Conflating
+   "worse slope" with "worse choice" would have been an error and the note said so
+   in advance.
+
+4. **`alone` floors reproduce g5-03's -- HELD.** 96 gives (8, 10] against (8, 10];
+   384 gives (24, 30] against (24, 30]; 192 gives (15, 20] against (16, 20], the
+   same upper bound on a finer grid. Different seeds, different learning-rate
+   grid, same answer. The fitted exponent moves from 0.67 to 0.82 because two new
+   lengths join the fit, and the two intervals overlap comfortably.
+
+**So the optimistic remark made when g5-03 was reported is now properly
+retracted.** Pooling was called "the most promising direction". It is the better
+of two options at every length and it is not a direction -- it degrades roughly
+twice as fast as the thing it improves on, so it postpones the wall rather than
+removing it.
+
+
+WHERE THE EXPONENT COMES FROM, AND WHY THAT IS THE OPENING
+------------------------------------------------------------
+Every exponent in this project is an exponent in *sequence length*, and there is
+one reason for that: **the store binds every consecutive pair, so the number of
+things in memory IS the sequence length.** The measured `sqrt(d/N)` retrieval law
+then turns sequence length into the source of all interference.
+
+The task asks about four pairs. A 384-step sequence stores 383. **Over 98% of the
+interference comes from bindings no query will ever touch.**
+
+So the exponent is not a fact about distributed computation, or about the local
+rule, or about pooling. It is a fact about storing everything. Nothing here has
+tested a system that stores selectively, and by the sqrt(d/N) law, cutting N from
+383 to 4 is worth about a tenfold improvement in retrieval -- which acts directly
+on the quantity that sets the minimum machine size.
+
+**That is the next experiment, and it is now the most important one in the
+project.**
+
+
+CAVEATS
+--------
+- **Two of five pooled rows are bounds**, so the pooled exponent rests on three
+  points and carries the widest interval of anything measured here.
+- **seq_len 96 pinned at the bottom of the learning-rate grid**, all twelve arms
+  at 0.02. That row is at ceiling for pooled so it changes nothing there, but its
+  `alone` floor should be treated as provisional.
+- Per-seed spread widens sharply at the low-width end of the long rows -- 384 at
+  width 1 gives [0.408, 0.640, 0.669]. The floors sit above that region, but it
+  is a reminder that the bottom-left of every table here is noisy.

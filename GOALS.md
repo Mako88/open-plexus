@@ -528,12 +528,24 @@ costs about 19% of the machine count — but for a goal whose whole premise is t
 machine *count* is the elastic quantity and machine *size* is fixed by what people
 already own, the elastic quantity is the one that stops helping.
 
-**The most promising unmeasured direction:** the `pooled` criterion is far more
-forgiving — at `seq_len 192` it still works with 6-wide machines where a lone
-machine needs 20 — and g4-01 established that pooling costs only a vocab-sized
-reduction at query positions, not a `d`-sized one every step. If that reduction is
-affordable in deployment, the machine-count limit is much looser than `T^-0.30`.
-Three of its four rows are floor-limited, so no exponent could be fitted here.
+**[g5-04](experiments/sweeps/g5-04-how-far-does-pooling-stretch.txt) measured the
+pooled criterion, and it is not the escape it looked like.** Pooling is the better
+option at every length — its advantage runs 13×, 13×, 3.3×, 2×, 1.25× as sequences
+lengthen — but it *degrades roughly twice as fast*: exponent **1.94 [1.36, 2.53]**
+against **0.82 [0.61, 1.03]** for a lone machine. It postpones the wall rather
+than removing it, and the earlier description of it as "the most promising
+direction" is withdrawn.
+
+**In the terms that matter — how small can a node be:** at `seq_len 128`, a machine
+holding **one number** is enough; 240 of them pool to 0.978. Node size is not the
+problem today. The growth rate is: by 384 steps the same arrangement needs 20–24.
+
+**And every exponent here is an exponent in sequence length for one reason.** The
+store binds every consecutive pair, so the number of things in memory *is* the
+sequence length, and the measured `√(d/N)` retrieval law turns that into all the
+interference there is. The task asks about four pairs; a 384-step sequence stores
+383. **Over 98% of the interference comes from bindings no query will ever touch** —
+which makes selective storage the most important untested idea in the project.
 
 G4 (bandwidth) remains — but G4's central assumption is no longer
 an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the

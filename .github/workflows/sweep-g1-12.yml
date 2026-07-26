@@ -1,0 +1,94 @@
+name: sweep-g1-12-starved
+
+# The check g1-11 pre-registered against its own favourable result.
+#
+# g1-11's memory advantage rests on attention scoring 0.252 at width 8,
+# seq_len 384 — trained for a fixed 3000 steps while the scored positions per
+# sequence stayed at 4. This trains it 4x longer with checkpoints, to separate
+# "too small" from "starved".
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/g1_12_starved.py"
+      - ".github/workflows/sweep-g1-12.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  starved:
+    strategy:
+      fail-fast: false
+      matrix:
+        seqlen: [192, 384]
+        width: [8, 16]
+        seed: [1, 2, 3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: seq ${{ matrix.seqlen }}, d ${{ matrix.width }}, seed ${{ matrix.seed }}
+        run: python experiments/g1_12_starved.py --seqlen ${{ matrix.seqlen }} --width ${{ matrix.width }} --seed ${{ matrix.seed }} --json out/s${{ matrix.seqlen }}-w${{ matrix.width }}-r${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-12-s${{ matrix.seqlen }}-w${{ matrix.width }}-r${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: starved
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g1-12-s*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          {
+            echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 12"
+            echo
+            python - <<'PY'
+          import glob, json
+          from collections import defaultdict
+          rows = [r for f in glob.glob("out/*.json") for r in json.load(open(f))]
+          by = defaultdict(list)
+          for r in rows:
+              by[(r["seq_len"], r["d_model"], r["step"])].append(r["accuracy"])
+          steps = sorted({s for _, _, s in by})
+          print("attention accuracy by training budget")
+          print(f"{'seq_len':>9}{'width':>7}" + "".join(f"{s:>9}" for s in steps))
+          for sl, w in sorted({(a, b) for a, b, _ in by}):
+              cells = []
+              for s in steps:
+                  a = by.get((sl, w, s))
+                  cells.append(f"{sum(a)/len(a):>9.3f}" if a else f"{'-':>9}")
+              print(f"{sl:>9}{w:>7}" + "".join(cells))
+          print()
+          print("g1-11 measured these at 3000 steps. If the 12000 column is much")
+          print("higher, attention was STARVED and g1-11's memory ratios are inflated.")
+          PY
+          } | tee summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-12-summary
+          path: |
+            summary.txt
+            out/*.json

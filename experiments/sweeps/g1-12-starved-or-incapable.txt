@@ -1,0 +1,80 @@
+Is attention undertrained at long sequences, or genuinely too small?
+=====================================================================
+
+Script: experiments/g1_12_starved.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+The last experiment produced a result in our favour: measured by memory rather
+than width, our approach uses a fifth of what the conventional one does on long
+inputs.
+
+Before that goes anywhere, it has to survive an obvious objection. The favourable
+number came from the conventional model doing BADLY on long inputs. But we gave
+it the same amount of training at every length -- and a longer input has the same
+handful of questions buried in far more padding, so the useful part of each
+training step is diluted.
+
+So it might not be too small. It might just be under-trained, and we would be
+taking credit for our own stopwatch.
+
+This trains it four times longer and finds out. We wrote down before the previous
+run that we would do exactly this if the result came out in our favour, and it
+did, so here it is.
+
+
+QUESTION
+--------
+g1-11 measured attention at width 8 scoring 0.985, 0.999, 0.850, 0.252 as seq_len
+goes 48, 96, 192, 384 -- all at a fixed 3000 training steps. That degradation
+drove its crossing from 7.4 to 15.1 and produced g1-11's 5.12x memory advantage.
+
+Train attention at seq_len 192 and 384, widths 8 and 16, for 12000 steps with
+checkpoints at 1500, 3000, 6000 and 12000. 3 seeds.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **d=8 at seq_len=384 climbs substantially with more steps.** This is the
+   uncomfortable prediction and it is the one I expect. The gradient signal is
+   diluted rather than absent, and dilution is a rate problem.
+
+2. It reaches 0.9 by 12000 steps. If so, attention's crossing at 384 is ~8 rather
+   than 15.1, prediction 1 of g1-11 was right after all, and **g1-11's memory
+   ratios are inflated and must be recomputed.** The corrected ratio at 384 would
+   be 2*384*8 / 2256 = 2.72x rather than 5.12x -- still favourable, still growing,
+   but half what was reported.
+
+3. seq_len=192 at d=8 also climbs, from 0.850 to above 0.9. It is much closer to
+   the line so this should be quick.
+
+4. The local rule is NOT exposed to the same confound in the same way, but this
+   is worth stating rather than assuming: g1-10 trained it for a fixed 8 epochs
+   over 400 sequences at every seq_len, so it has the same fixed-budget structure.
+   Its accuracy did NOT collapse at long sequences at adequate width -- 0.992 at
+   d=48, seq_len=384 -- so it is not obviously starved. But if attention turns out
+   to have been starved, the honest follow-up is to check the local rule at a
+   longer budget too, and that is recorded here as owed.
+
+Most likely to be wrong: (2)'s endpoint. d=8 may climb and plateau below 0.9,
+which would mean the crossing genuinely grows and g1-11 stands. That is the
+outcome I would prefer and therefore the one to hold most loosely.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- d=8 at 384 reaches 0.9    -> attention was STARVED. g1-11's memory ratios are
+                               inflated, must be recomputed, and the width ratio
+                               becomes the more reliable of the two numbers
+- d=8 plateaus below 0.9    -> attention is genuinely capacity-limited at long
+                               sequences. g1-11 stands as written
+- d=8 still climbing at
+  12000                     -> no plateau demonstrated; report a bound, not a
+                               number, and say the budget was insufficient
+
+
+RESULT
+------
+(not yet run)

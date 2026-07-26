@@ -1,0 +1,136 @@
+Does a weak machine drag down a strong one?
+===========================================
+
+Script: experiments/g7_05_mixed.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+Real networks are not uniform. A phone holds a few nodes, a desktop holds
+hundreds. Everything measured here has assumed every machine is the same size,
+which is the one thing a network of ordinary devices certainly is not.
+
+g7-03 answered half of it: a machine of capacity `C` gets a certain score, and
+gated it barely matters how it spends `C`. Read as a table of "what does a machine
+of this size achieve", that already describes a mixed population of machines
+working **independently**.
+
+**The half it does not answer is what happens when they pool.** Our machines
+combine by adding their answers together. A tiny machine's answer is mostly
+noise. Adding noise to a good answer can make it worse. So:
+
+  > **Does including a weak machine in the pool help, or hurt?**
+
+If it hurts, a real deployment cannot simply let everyone join -- it needs to
+weight or exclude, which is coordination, which is the thing this project exists
+to avoid.
+
+
+THE QUESTION IS NEW AND NEEDS NO NEW MECHANISM
+------------------------------------------------
+Heterogeneity does not require unequal node widths. Nodes stay identical -- one
+dimension each -- and **machines differ in how many they host**, which is exactly
+John's framing and exactly what `run(partition=[...])` already supports.
+
+Two-level pooling adds nothing mathematically: pooling nodes 0-7 and then pooling
+that with 8-15 is pooling 0-15, because addition is associative. So the structure
+to test is not hierarchy, it is **membership** -- who is allowed into the sum.
+
+
+QUESTION
+--------
+Take a trained network of 256 width-1 nodes. Form a strong machine of `S` nodes
+and a weak machine of `W` nodes, disjoint, and compare:
+
+    strong alone          nodes 0..S-1
+    strong + weak         nodes 0..S-1 plus W more
+    strong + strong       nodes 0..S-1 plus S more, as the fair control
+
+The third arm is what makes the second interpretable. If strong+weak beats strong
+alone, adding the weak machine helped -- but the honest question is whether it
+helped as much as adding an equally-sized strong machine would have, and whether
+a *fixed budget* is better spent on one good machine than two mixed ones.
+
+  strong S       1, 2, 4, 8, 16   (capped so strong+strong stays under
+  weak W         1, 2, 4, 8, 16    the saturation the control found)
+  gate           off and oracle
+  seq_len        384
+  lr             0.02, 0.05, 0.1, 0.2
+  seeds          1, 2, 3
+
+All pairs come from ONE trained model per (gate, lr, seed), since membership is a
+read-time choice. 24 jobs.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **Adding a weak machine never hurts.** Each node's readout is trained to
+   predict the answer, so even a poor one is biased toward the right token rather
+   than toward a wrong one. Summing biased-but-noisy votes should still add
+   signal. **If this is wrong -- if a weak machine drags a strong one down -- it
+   is the most consequential negative in the project**, because it means open
+   participation needs gatekeeping.
+
+2. **But it helps less than an equally-sized strong machine.** Obviously, since
+   the weak machine has fewer nodes. The number worth having is the ratio: does a
+   32-node machine plus a 1-node machine get most of what 33 nodes would?
+
+3. **Gated, mixing barely matters**, as g7-03 found for allocation -- everything
+   above capacity 16 is at ceiling, so a strong machine has nothing to lose.
+
+4. **Ungated and with a large strong machine, the weak machine is nearly
+   invisible.** At seq 384 ungated, g7-03 puts a 32-node machine at 0.585 and a
+   1-node machine at 0.087. Adding one node to thirty-two should move almost
+   nothing, and if it moves a lot, the pooling is not doing what is assumed.
+
+> **The control fired the refutation condition this note wrote for itself.**
+> Ungated at seq 384, one seed:
+>
+>     strong 32 alone        0.558
+>     strong 32 + weak 1     0.567
+>     strong 32 + weak 2     0.546
+>     strong 32 + strong 32  0.521
+>
+> **Adding a second strong machine makes it worse.** The note said in advance
+> that if strong+strong fails to help, "pooling has saturated; the comparison is
+> void and the grid needs smaller machines". It has, it is, and it does.
+>
+> This is consistent with g7-03, whose ungated column is flat from capacity 32
+> upward -- 0.585, 0.583, 0.575, 0.585 across capacities 32 to 256. **Ungated
+> pooling stops paying at around 32 nodes**, which nothing had stated plainly
+> before, and it is a fact about the mechanism rather than about this sweep.
+>
+> The grid is capped at 16 so the strong+strong control tops out at 32, under the
+> ceiling. The question is only answerable below saturation, because above it
+> nothing changes anything.
+>
+> Also visible: from a *small* strong machine, adding nodes helps enormously --
+> 0.133 alone, 0.567 with 32 more. So the effect is entirely about where on the
+> curve the machine already sits, which is what the revised grid measures.
+
+Most likely wrong: (1). It is the favourable direction and the assumption behind
+every pooling result so far. **Check before believing:** that the strong+strong
+control scales as expected, since if adding a second strong machine also fails to
+help, the pooling itself has saturated and neither arm means anything.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- weak machines never hurt        -> open participation is safe; anyone can join
+                                     and the network only improves
+- weak machines hurt              -> deployment needs weighting or admission
+                                     control, which is coordination. The most
+                                     consequential negative available here
+- strong+strong also fails to
+  help                            -> pooling has saturated; the comparison is
+                                     void and the grid needs smaller machines
+- gated shows no effect at all    -> as expected; the interesting arm is ungated
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+Machines here differ only in *how many* identical nodes they host. A real
+population also differs in reliability, uptime and latency, and note 009's
+bandwidth argument assumes every machine can carry the key broadcast -- which the
+weakest ones may not.

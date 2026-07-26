@@ -1,0 +1,166 @@
+Does consolidation ever beat simply not forgetting?
+===================================================
+
+Script: experiments/g7_04_crossover.py
+Status: REFRAMED BY ITS OWN CONTROLS, NOT YET RUN. Three pre-dispatch
+        controls: the first found the decay grid meaningless, the second
+        fixed it, and the third answered the headline question NO --
+        consolidation is monotonically harmful once forgetting is set
+        sensibly. What it found instead is that FORGETTING ALONE beats
+        not-forgetting at seq 768, which is what the sweep now measures.
+
+
+IN PLAIN TERMS
+--------------
+We built a real replacement for the oracle gate: write everything down weakly in
+ink that fades, and when something you remembered turns out to have been right,
+copy it into ink that does not. The confirming signal is the system's own guess
+against what actually arrives next, so nothing external is needed.
+
+**It works.** On repeated questions it lifts the last answer by 0.18 while barely
+touching the first, which is the exact shape it should have -- the first question
+is what confirms a memory was worth keeping, and only later ones can spend that.
+
+**But it loses to the obvious alternative.** Not fading at all scores 0.981 where
+the best consolidating run reaches 0.694. Fading costs more than consolidation
+recovers.
+
+That is not surprising and it is not the end. Fading exists to stop the memory
+filling up, and on a short problem there is nothing to fill. **The question is
+whether there is a length at which not-fading finally drowns in its own notes,
+and consolidation wins.** If there is not, the mechanism is elegant and useless.
+
+
+QUESTION
+--------
+Sweep sequence length far past anything measured here, and find the crossover.
+
+  seq_len        192, 384, 768, 1536
+  half-life      none, and 1/2, 1/4, 1/8 of the sequence
+  consolidation  0.0 and 1.0, where decay allows it
+  queries        3 per pair, so consolidation has a second occasion
+  d_model        32
+  lr             0.02, 0.05, 0.1, 0.2
+  seeds          1, 2, 3
+
+48 jobs. The comparison that matters is one number: **the best score achievable
+without fading, against the best achievable with fading plus consolidation, at
+each length.**
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **Not-fading degrades with length and eventually falls below consolidation.**
+   Its memory accumulates `seq_len - 1` bindings and the measured `sqrt(d/N)` law
+   says retrieval quality falls as the square root of that. Consolidation's store
+   holds only what was confirmed, which is bounded by the number of questions --
+   a constant. So one curve falls and the other should not.
+
+   Guess: the crossover is between 768 and 1536.
+
+2. **Consolidation's advantage grows with length past the crossover**, for the
+   same reason: one side scales with the problem and the other does not.
+
+3. **At seq 192 not-fading still wins**, reproducing the probe. This is the
+   replication control -- if it does not, the probe and the sweep disagree and
+   nothing else here can be read.
+
+4. **The best decay is length-dependent**, milder for short sequences and harsher
+   for long ones, since the right amount of forgetting is however much keeps the
+   memory from saturating. If a single decay wins everywhere, the mechanism is
+   less interesting than it looks and the grid is doing no work.
+
+> **A pre-dispatch control found the first grid meaningless and it has been
+> replaced.** It swept absolute decay rates -- 0.99 and 0.95 -- at every length.
+> But 0.95 per step over 768 steps halves the memory every fourteen steps, so
+> that arm scored 0.191 against 0.526 for no decay: a measurement of the grid,
+> not of the mechanism. **A sweep whose whole point is varying length cannot hold
+> a per-step rate fixed**, because the same rate is a gentle fade at 192 and an
+> erasure at 1536.
+>
+> Decay is now set by HALF-LIFE as a fraction of the sequence, so "forget half of
+> what you know by the time you are a quarter of the way through" means the same
+> thing at every length. At seq 768 a half-life of 1/4 is a per-step decay of
+> 0.9964, against the 0.95 originally swept.
+>
+> What the control did confirm is that the mechanism works at that length:
+> consolidation lifted its own arm from 0.191 to 0.285, with the by-ask signature
+> intact (0.215, 0.273, 0.369 -- growing with each ask). It is the comparison
+> that was broken, not the effect.
+
+> **A THIRD CONTROL FOUND THE ANSWER TO THE HEADLINE QUESTION, AND IT IS NO.**
+> With decay expressed properly, at seq_len 768 with a half-life of a quarter of
+> the sequence:
+>
+>     no decay,      no consolidation    0.526
+>     decay,         no consolidation    0.672     <- forgetting alone already wins
+>     decay,         consolidation 1.0   0.510     <- consolidation makes it worse
+>
+> And sweeping the rate, consolidation is **monotonically harmful** here:
+>
+>     rate    0.0    0.02   0.1    0.3    1.0
+>     score   0.625  0.625  0.623  0.603  0.482
+>
+> **The mechanism is self-defeating when it works.** The lasting store never
+> decays -- that is what makes it lasting -- so every confirmed retrieval adds to
+> it permanently. Where accuracy is decent, confirmations are frequent, and the
+> lasting store accumulates exactly the saturation the fast store was fading to
+> avoid. Consolidation trades one accumulation problem for another.
+>
+> Which explains the earlier positive result. At an absolute decay of 0.95 the
+> fast memory is nearly empty, so anything added helps; but that whole regime
+> scores 0.285 against 0.672 for sensible forgetting. **Consolidation rescues
+> over-aggressive forgetting, and sensible forgetting beats both.**
+>
+> The predictions below are left as written. Prediction 1 -- that a crossover
+> exists between not-fading and consolidation -- is already contradicted at 768.
+> What survives is stranger and more useful, and the sweep is reframed around it.
+
+**THE QUESTION HAS CHANGED, AND SO HAS THE HEADLINE**
+------------------------------------------------------
+Buried in the same control is a positive result nobody was looking for:
+**forgetting alone beats not-forgetting at seq_len 768** -- 0.672 against 0.526.
+
+[g1-06](g1-06-interference.txt) measured decay as unhelpful at seq_len 96 and
+wrote, in its own words, that it "may still matter for sequences long enough that
+unbounded accumulation is the problem, which this task is not." That condition is
+now met, and the note was right.
+
+So the sweep keeps its grid and changes its purpose. **It is no longer primarily
+about consolidation; it is about where forgetting starts to pay, and by how
+much.** Consolidation rides along as a second arm and is expected to lose, which
+is worth recording properly rather than concluding from three probe runs at one
+seed and one learning rate.
+
+Most likely wrong: (1), and specifically the *existence* of a crossover rather
+than its position. Consolidation only fires on a confirmed retrieval, so on a
+long sequence where the first question is already answered badly, there is
+nothing to confirm and nothing to promote. **The mechanism may need the task to
+be easy in order to help, which would mean it cannot rescue the regime it was
+built for.** That is the failure mode to watch, and it would show as
+consolidation gaining nothing at exactly the lengths where not-fading is failing.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- a crossover exists            -> forgetting plus consolidation is a real
+                                   scaling mechanism, and its position is the
+                                   number that matters
+- no crossover by 1536          -> the mechanism works but never pays. Report it
+                                   as built, measured, and not useful here
+- consolidation gains nothing
+  where not-fading is failing   -> it needs the task already working to help,
+                                   which is the failure mode named above
+- seq 192 disagrees with the
+  probe                         -> replication failed; stop and explain
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+`queries_per_pair` is 3 throughout. Real recurrence is not uniform -- some things
+are asked about constantly and most never again -- and a mechanism that needs
+every fact queried three times is weaker than one that exploits a heavy tail.
+
+Nor does it test consolidation against the ORACLE ceiling, which remains the
+thing to beat: the oracle reaches 1.000 with devices of one dimension, and
+nothing implementable has come close.

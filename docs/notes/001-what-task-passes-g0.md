@@ -166,8 +166,21 @@ In order. Each step gates the next.
 1. **The base rate.** What a constant predictor scores — always guess the most
    common answer. Reported alongside every other number, permanently. Without
    it, a weak positive is indistinguishable from a strong nothing.
-2. **The random frozen substrate**, with a trained readout. This is the floor
-   that matters, and it is *not* the base rate — it is usually much higher.
+2. **The random frozen substrate**, with a trained readout.
+
+   > **CORRECTED by [g0-02](../../experiments/sweeps/g0-02-frozen-reservoir.txt).**
+   > This step originally called the frozen substrate "the floor that matters".
+   > On MQAR it is not: it scores **0.180**, *below* the 0.344 one-line-heuristic
+   > floor and barely above the 0.125 base rate. **The bar is
+   > `max(trivial_floor, frozen)`**, and here that is the heuristic. Reporting a
+   > model against the frozen substrate alone would credit as progress something
+   > a five-line function already beats.
+
+   Whatever the numbers, this step needs a **connection control**: fit the same
+   pipeline to decode information the state provably holds, such as the token
+   currently being presented. A broken pipeline and a substrate that genuinely
+   cannot do the task produce identical output, and the second is what we
+   expect — which is exactly when nobody looks harder.
 3. **A strong non-local reference**, trained with a global backward pass, on the
    same data budget. This establishes that the information is present and the
    task is learnable at all. A reference that also fails means the task is

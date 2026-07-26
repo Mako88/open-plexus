@@ -194,10 +194,16 @@ connections would not: same destinations, same packet count, different weights.
 
 - **The capacity results in §2** are from search summaries. Dambre et al. (2012)
   has not been read.
-- **Reservoir computing specifically.** The Zoology results concern gated
-  convolutions, linear attention and state-space models — architecturally
-  adjacent to a reservoir but not the same thing. **A random frozen reservoir
-  with a trained linear readout was not among the models tested**, so its
-  position on this benchmark is inferred, not measured. That inference is
-  reasonable and it is still an inference.
+- ~~**Reservoir computing specifically.**~~ **CLOSED — measured, and the
+  inference was right.** The Zoology results concern gated convolutions, linear
+  attention and state-space models; a random frozen reservoir with a trained
+  linear readout was not among them, so its position here was reasoned by
+  analogy. It has now been measured on our own generator:
+  [g0-02](../../experiments/sweeps/g0-02-frozen-reservoir.txt) puts it at
+  **0.180 against a base rate of 0.125** — at chance, and *below* the 0.344
+  one-line-heuristic floor. Doubling the substrate from 64 to 128 units buys
+  0.008, which is §5's scaling argument showing up directly: width does not
+  supply content-addressed retrieval. A connection control decoding the current
+  token from the same states scores **1.000**, so this is the substrate and not
+  the pipeline.
 - **SORN, Forward-Forward, SWIM, gossip protocols, CRDTs** remain unread.

@@ -97,11 +97,56 @@ def main() -> int:
     alpha = (sum((x - mx) * (y - my) for x, y in zip(xs, ys))
              / sum((x - mx) ** 2 for x in xs))
 
+    intercept = my - alpha * mx
+
+    # A crossing that was NOT located is the most informative point there is: it
+    # says the requirement ran off the end of the grid. Fitting only the lengths
+    # that happened to cross, and then reporting the fit as a scaling law, is how
+    # a saturating curve gets published as an exponent.
+    missing = [s for s in lengths if crossings.get(s) is None]
     print(f"MACHINE-COUNT EXPONENT: {alpha:.2f}  (from {n} crossings)")
     print(f"  g1-10's width exponent, measured at P=1: {WIDTH_EXPONENT}")
     print(f"  resolution of this grid, stated before the run: +/-{RESOLUTION}")
     print()
-    if alpha >= 0.9:
+    broken = False
+    for seq_len in missing:
+        predicted = math.exp(intercept) * seq_len ** alpha
+        top = max(m for m in machines if (seq_len, m, rates[0]) in cells
+                  or any((seq_len, m, r) in cells for r in rates))
+        broken = True
+        print(f"  HELD-OUT CHECK FAILS at seq_len {seq_len}: the fit predicts "
+              f"{predicted:.1f} machines, and {top} machines did not reach "
+              f"{SOLVED}. The power law does not extrapolate one step.")
+
+    for seq_len in lengths:
+        scores = {}
+        for groups in machines:
+            got = [cells[(seq_len, groups, r)] for r in rates
+                   if (seq_len, groups, r) in cells]
+            if got:
+                scores[groups] = max(
+                    sum(x["pooled"] for x in g) / len(g) for g in got)
+        points = sorted(scores)
+        if len(points) < 3:
+            continue
+        gains = [scores[b] - scores[a] for a, b in zip(points, points[1:])]
+        # Saturation: the last doubling bought less than a twentieth of the
+        # first, and the curve never reached the bar. That is the shape G5 names
+        # as its refutation -- the margin shrinking with scale.
+        if gains[0] > 0 and gains[-1] < gains[0] / 20 and scores[points[-1]] < SOLVED:
+            broken = True
+            print(f"  SATURATION at seq_len {seq_len}: doubling {points[-2]} -> "
+                  f"{points[-1]} machines bought {gains[-1]:+.3f}, against "
+                  f"{gains[0]:+.3f} for the first doubling, and the curve tops "
+                  f"out at {scores[points[-1]]:.3f} without reaching {SOLVED}.")
+
+    if broken:
+        print()
+        print("  G5 DOES NOT PASS AS MEASURED. Machines compound at the shorter "
+              "lengths and stop compounding at the longest one, so the fitted "
+              "exponent describes a regime rather than a law. Report the wall, "
+              "not the exponent.")
+    elif alpha >= 0.9:
         print("  G5 REFUTED: machines do not compound. Doubling the problem "
               "roughly doubles the network.")
     elif abs(alpha - WIDTH_EXPONENT) <= RESOLUTION:

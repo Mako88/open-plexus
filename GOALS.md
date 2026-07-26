@@ -478,7 +478,28 @@ changed. **g1-08 has now re-measured it with both arms tuned, and the honest pri
 own best scale. Tuning both made the price *worse*: like-for-like at the old
 untuned settings it was 3.0×, so the retracted figure was not conservative but
 unfounded, and landing near the right answer was luck.
-G4 (bandwidth) and G5 (scale) remain — but G4's central assumption is no longer
+**G5 does not pass as measured, and it is the first gate that does not.**
+[g5-01](experiments/sweeps/g5-01-does-scale-help.txt) fixed each machine at 16
+dimensions and grew the network. Machines compound at 48, 96 and 192 steps — a
+fitted exponent of 0.69 against g1-10's width exponent of 0.37, so partitioning
+taxes scale but does not break it. At **384 steps they stop compounding**:
+doubling from 8 to 16 machines buys 0.021, and the curve saturates around 0.79
+without reaching the bar. The fit predicts 5.6 machines there; 16 are not enough.
+
+The decisive comparison is against the unpartitioned rule. g1-13 measured it
+crossing at width 46.8 on 384-step sequences and reaching 0.994 at width 64.
+Sixteen machines here total 256 dimensions. **256 dimensions in one piece solve
+the task; the same 256 split sixteen ways reach 0.769.** So the wall belongs to
+the partitioning, not to the local rule — which makes it a question about the
+decomposition rather than about the mechanism, and the most likely way it is
+wrong is that 16-wide machines are simply too narrow (untested; g4-01 found the
+penalty shrinking sharply with width).
+
+Checked before believing: every arm converged (no cell moved more than 0.014 when
+the budget doubled), and an independent sweep agrees — g4-01 got 0.741 where this
+got 0.748 on the same configuration.
+
+G4 (bandwidth) remains — but G4's central assumption is no longer
 an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the
 global readout, which [note 009](docs/notes/009-splitting-the-memory.md) §4 had
 identified as the largest untested claim in the project and as a standing C1

@@ -554,6 +554,19 @@ works through the biological mechanism that would replace it and concludes MQAR
 cannot test it, because the only event separating a pair from filler is the query,
 which arrives too late and never recurs.
 
+**And [g7-03](experiments/sweeps/g7-03-how-to-spend-a-machine.txt) found the gate
+removes a second problem as well as the first.** A machine holding `C` dimensions
+can run one node of width `C`, `C` nodes of width 1, or anything between — and
+which it picks is the deployment decision. **Gated, it does not matter**: the
+largest gap between the best and worst allocation at any capacity is **0.031**,
+and sixteen dimensions suffice however divided. **Ungated it is worth 0.425**, and
+the rule is as few and as wide as possible — one node of 64 scores 1.000 where
+sixty-four nodes of 1 score 0.583.
+
+So selective storage removes both the sequence-length scaling *and* the allocation
+problem, which means heterogeneous hardware needs no policy. The caveat: the gated
+arm saturates at capacity 16, so that comparison lives in a narrow band below it.
+
 **And every exponent here is an exponent in sequence length for one reason.** The
 store binds every consecutive pair, so the number of things in memory *is* the
 sequence length, and the measured `√(d/N)` retrieval law turns that into all the

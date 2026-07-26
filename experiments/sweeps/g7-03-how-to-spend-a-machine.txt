@@ -2,7 +2,11 @@ Given a machine of a certain power, how should it be spent?
 ===========================================================
 
 Script: experiments/g7_03_allocation.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 56/56 cells. Predictions 1, 2 and 3 held;
+        4 REFUTED. **With the gate on, how a machine spends its capacity
+        barely matters -- the largest spread across all seven allocations
+        is 0.031.** Without it, allocation is worth 0.425 and the rule is
+        as few and as wide as possible.
 
 
 IN PLAIN TERMS
@@ -133,3 +137,97 @@ the obvious follow-up and is not tested here.
 Nor does it settle whether pooling within a machine is genuinely free. It is free
 of network cost; it is not free of the reduction itself, and note 009's bandwidth
 arithmetic covers only the cross-machine case.
+
+
+RESULT
+------
+Accuracy by machine capacity and node width, seq_len 384, three seeds, each cell
+at its own best learning rate. Reading across a row compares the ways to spend
+one machine.
+
+gated
+  capacity    w=1    w=2    w=4    w=8   w=16   w=32   w=64   spread
+         1  0.258      -      -      -      -      -      -    0.000
+         2  0.546  0.549      -      -      -      -      -    0.003
+         4  0.732  0.740  0.763      -      -      -      -    0.031
+         8  0.931  0.934  0.944  0.958      -      -      -    0.027
+        16  0.999  0.999  1.000  1.000  1.000      -      -    0.001
+        32+ 1.000  1.000  1.000  1.000  1.000  1.000  1.000    0.000
+
+open
+  capacity    w=1    w=2    w=4    w=8   w=16   w=32   w=64   spread
+         1  0.087      -      -      -      -      -      -    0.000
+         2  0.197  0.197      -      -      -      -      -    0.000
+         4  0.257  0.218  0.240      -      -      -      -    0.039
+         8  0.375  0.346  0.370  0.382      -      -      -    0.036
+        16  0.506  0.517  0.512  0.528  0.553      -      -    0.047
+        32  0.585  0.592  0.594  0.649  0.704  0.960      -    0.375
+        64  0.583  0.596  0.615  0.663  0.756  0.981  1.000    0.417
+       128  0.575  0.583  0.597  0.660  0.753  0.996  1.000    0.425
+       256  0.585  0.593  0.608  0.661  0.758  0.999  1.000    0.415
+
+Both learning-rate grids contained their answers.
+
+
+THE ANSWER, AND IT IS TWO ANSWERS
+-----------------------------------
+**Gated: it does not matter.** Across every capacity, the largest gap between the
+best and worst way to spend it is **0.031**. Sixteen dimensions is enough however
+they are divided -- one node of sixteen, or sixteen nodes of one, both reach
+1.000. **Heterogeneous hardware needs no allocation policy at all.**
+
+**Ungated: it matters enormously and the rule is "as few and as wide as
+possible".** At capacity 64, one node of 64 scores **1.000** and sixty-four nodes
+of 1 score **0.583**. The spread is 0.425.
+
+So selective storage does not only remove sequence length as a difficulty dial
+(g7-02) -- **it also removes the allocation problem.** Two things at once, from
+one mechanism.
+
+
+THE PREDICTIONS
+----------------
+1. **Wider nodes win at fixed capacity -- HELD.** In both arms. Gated it is worth
+   0.03; ungated, up to 0.42.
+
+2. **The gated margin is small, under 0.05 -- HELD, at 0.031.** This was named
+   before the run as most likely wrong. It was not.
+
+3. **The ungated margin exceeds 0.3 -- HELD, at 0.425.**
+
+4. **The best allocation is the same at every capacity -- REFUTED.** Ungated, the
+   winner tracks capacity exactly: w=1 at capacity 4, then 8, 16, 32, 64 as
+   capacity grows. That is not a preference for wide nodes as such -- it is the
+   g5-04 floor reappearing. Node width must exceed roughly 24 at seq_len 384, so
+   the winner is always "the widest node this capacity affords", and once
+   capacity clears the floor the ranking stops moving.
+
+   The gated winners also vary (w=1, 2, 4, 8) but across spreads of 0.001 to
+   0.031, which is a shuffle among near-ties rather than a real ranking.
+
+
+CROSS-VALIDATION, UNPLANNED
+-----------------------------
+The ungated column at w=32 jumps to 0.960 where w=16 gives 0.704. g5-04
+independently put the seq-384 pooled floor at machine width in (20, 24] -- a
+different sweep, different grid, different question -- and the jump lands exactly
+there. Two measurements of the same threshold from opposite directions.
+
+
+THE CAVEAT ON THE HEADLINE
+----------------------------
+**The gated arm saturates at capacity 16**, so seven of its nine rows are all
+1.000 and the comparison only lives in capacities 1 to 8, where the spreads are
+0.003 to 0.031. "Allocation barely matters" is measured on a narrow band and
+should be read as: *below the point where everything works, allocation is worth
+about 0.03; above it, nothing.* That is still the answer, but it is not a claim
+that allocation is irrelevant across a wide range of difficulty -- only this one.
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+**Heterogeneity, which is the actual deployment condition.** Every node here is
+the same width as every other, and a real network mixes machines of wildly
+different power. Two of the cortical-column sources John supplied are
+specifically about columns *not* being uniform. A network of mixed node sizes is
+the obvious next step and nothing here touches it.

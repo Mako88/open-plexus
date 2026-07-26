@@ -2,7 +2,11 @@ Is the crossing set by the alphabet or by the load?
 ===================================================
 
 Script: experiments/g1_09_alphabet.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 25/25 cells. PREDICTION 1 REFUTED -- the crossing is
+        flat in the alphabet too. BOTH hypotheses are dead, which this note
+        called the most informative and least comfortable outcome. And
+        reading the code afterwards showed why, and what the real load
+        variable is.
 
 
 IN PLAIN TERMS
@@ -91,4 +95,97 @@ WHAT WOULD REFUTE WHAT
 
 RESULT
 ------
-(not yet run)
+5 seeds per cell, key_scale 0.5, n_pairs 4.
+
+  n_keys     d=16     d=24     d=32     d=48     d=64
+       8    0.703    0.882    0.932    0.995    0.997
+      16    0.633    0.929    0.973    0.995    0.998
+      32    0.562    0.875    0.975    0.992    0.999
+      64    0.664    0.862    0.950    0.988    0.998
+     128    0.626    0.843    0.940    0.983    0.995
+
+crossing width (mean >= 0.9):
+  n_keys=8 -> 32,  16 -> 24,  32 -> 32,  64 -> 32,  128 -> 32
+
+**A SIXTEENFOLD CHANGE IN ALPHABET MOVES THE CROSSING BY NOTHING.** The 24 at
+n_keys=16 is a single cell at 0.929 against a 0.9 threshold and is noise, not a
+trend -- at n_keys=8, the smaller alphabet, the crossing is 32.
+
+
+BOTH HYPOTHESES ARE DEAD
+-------------------------
+g1-06 refuted the load account: n_pairs from 2 to 8 barely moved the crossing,
+and at small widths more was better.
+
+g1-09 refutes the alphabet account, which was g1-06's replacement.
+
+So the project has **no account of what sets the crossing**. That was named in
+advance as the least comfortable outcome and it is the one that happened.
+
+
+AND THEN READING THE CODE EXPLAINED IT
+----------------------------------------
+The store binds EVERY consecutive pair of tokens:
+
+    if previous_key is not None:
+        memory += np.outer(value, previous_key)
+
+Every step, not only the key-value ones. So the number of bindings superposed
+into the memory is **seq_len - 1**, not n_pairs.
+
+    seq_len=96, n_pairs=2   ->  95 bindings, of which 2 matter (2.1%)
+    seq_len=96, n_pairs=8   ->  95 bindings, of which 8 matter (8.4%)
+
+Which explains both flat results at once:
+
+  - n_pairs is flat because 2 against 8 out of 95 is nothing. The interference a
+    query has to survive is 95 other bindings either way.
+  - n_keys is flat because it does not change the count at all.
+
+**So the interference account in g1-05 may have been right in mechanism and wrong
+only in which variable carries the load.** It named n_pairs. The load is
+seq_len -- which has been pinned at 96 for every sweep this project has ever run,
+including the one that "refuted" interference.
+
+That is a third distinct way to be wrong about the same question, and the same
+shape as g3-02's: a variable held fixed everywhere, doing the work, invisible
+because nothing ever moved it.
+
+
+WHAT THIS PREDICTS, AND IT IS SHARP
+-------------------------------------
+If interference is the mechanism and seq_len is the load, then **the crossing
+must grow with seq_len**, at roughly d proportional to seq_len by the same
+signal-to-noise argument g1-06 made and had refuted for the wrong variable.
+
+At seq_len=96 the crossing is 32. So:
+
+    seq_len=48   -> crossing near 16
+    seq_len=96   -> crossing near 32   (known)
+    seq_len=192  -> crossing near 64
+    seq_len=384  -> crossing near 128
+
+That is g1-10, and it is the cheapest decisive test available.
+
+If it is ALSO flat, then nothing about the task sets the crossing, the constraint
+is intrinsic to the mechanism, and the honest position is that we do not
+understand our own model. Worth saying now, before the run, so that outcome
+cannot be quietly absorbed.
+
+
+THE CONFOUND, AS PROMISED
+--------------------------
+Prediction 3 named in advance that raising n_keys also widens the vocabulary and
+therefore the readout. Since the crossing did not move, the confound never became
+load-bearing -- but it would have been the first thing to raise had it moved, and
+recording that it was named before the result is the point.
+
+
+A NOTE ON EXPECTATION-SETTING THAT WORKED
+-------------------------------------------
+This note deliberately weakened confidence in the exponent while keeping it in
+the direction, on the grounds that the last scaling law predicted here from a
+signal-to-noise argument was refuted outright. The direction was wrong too. That
+is worth recording as a case where hedging was not enough -- the honest lesson is
+not "hedge harder" but that a mechanism nobody has isolated should not be
+generating quantitative predictions at all.

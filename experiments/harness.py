@@ -42,6 +42,8 @@ def parse_args(description: str) -> argparse.Namespace:
                         help="delivery jitter in steps")
     parser.add_argument("--max-delay", type=int, default=4,
                         help="receiver buffer depth in steps")
+    parser.add_argument("--seqlen", type=int, default=None,
+                        help="sequence length, which sets how many bindings\n                             the memory superposes")
     parser.add_argument("--keys", type=int, default=None,
                         help="size of the key alphabet")
     parser.add_argument("--scale", type=float, default=None,

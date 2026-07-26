@@ -1,0 +1,111 @@
+Is the load sequence length? -- the variable nobody moved
+=========================================================
+
+Script: experiments/g1_10_seqlen.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+We have now failed twice to explain why our rule needs the amount of room it
+needs. We thought it was how many things you ask it to remember. It is not. We
+thought it was how many different symbols exist. It is not.
+
+Then we read our own code and found something neither of us had looked at.
+
+The rule stores an association between every consecutive pair of things it sees.
+Not just the pairs that matter -- EVERY pair, including all the meaningless
+padding. So in a 96-step sequence it is holding 95 associations, of which maybe
+four are ones anyone will ask about.
+
+Which explains both failures at once. Asking about four things instead of eight
+barely changes anything when the memory is holding ninety-five either way.
+
+So the thing that determines how crowded the memory gets is not what we were
+asking about. It is **how long the sequence is** -- and that has been fixed at 96
+in every single experiment this project has run, including the ones that
+supposedly refuted the crowding explanation.
+
+
+QUESTION
+--------
+g1-05 explained the graded transition as superposition interference. g1-06
+refuted it by sweeping n_pairs. g1-09 refuted its replacement by sweeping n_keys.
+
+Reading `LocalAssociativeMemory.run` afterwards:
+
+    if previous_key is not None:
+        memory += np.outer(value, previous_key)
+
+Every step. So the bindings in memory number seq_len-1, and n_pairs is a small
+fraction of them:
+
+    seq_len=96, n_pairs=2   ->  95 bindings, 2 of them relevant
+    seq_len=96, n_pairs=8   ->  95 bindings, 8 of them relevant
+
+**The interference account may have been right in mechanism and wrong only in
+which variable carries the load.**
+
+Sweep seq_len against d_model at tuned key_scale, holding n_pairs at 4.
+
+  seq_len  48, 96, 192, 384
+  d_model  16, 24, 32, 48, 64, 96, 128
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **The crossing grows with seq_len.** The central prediction. If it is flat,
+   nothing about the task sets the crossing at all and the honest position is
+   that we do not understand our own model.
+
+2. Roughly proportional: d approximately linear in seq_len, by the same
+   signal-to-noise argument g1-06 made and had refuted for the wrong variable --
+   one wanted binding against seq_len-2 others adding incoherently, so holding
+   retrieval quality fixed needs d proportional to the count.
+
+   At seq_len=96 the crossing is 32, so:
+
+       seq_len=48   -> near 16
+       seq_len=96   -> near 32   (known)
+       seq_len=192  -> near 64
+       seq_len=384  -> near 128
+
+   The widths above bracket exactly those four points.
+
+3. If (2) holds, the local rule's memory requirement is **linear in the length of
+   what it has to process**, which is a genuinely important number for the
+   project: it is the same scaling attention has in state, without attention's
+   quadratic time. Worth stating carefully rather than celebrated, because it
+   also means the rule cannot process an arbitrarily long stream at fixed width.
+
+4. And a consequence worth flagging before it is measured: if the load is
+   seq_len, then **most of the memory is spent on padding**. Only n_pairs of the
+   seq_len-1 bindings are ever queried. A rule that could avoid storing bindings
+   nobody will ask about would need dramatically less room -- but knowing which
+   those are in advance is exactly the problem, and any mechanism that guessed
+   would be a form of attention smuggled back in.
+
+Most likely to be wrong: (2)'s exponent again, and this note is explicit that the
+project has now predicted three scaling laws from signal-to-noise arguments and
+had all three fail. The direction is worth predicting. The exponent is being
+stated so it can be checked, not because there is any track record supporting it.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- crossing grows ~linearly with
+  seq_len                        -> interference confirmed, load identified, and
+                                    the scaling law is the deliverable
+- crossing grows sub-linearly    -> better news; the rule scales more gracefully
+                                    with stream length than expected
+- crossing FLAT in seq_len too   -> nothing about the task sets it. The constraint
+                                    is intrinsic to the mechanism, three
+                                    explanations have now failed, and the honest
+                                    report is that we do not understand it
+- crossing grows faster          -> the rule cannot handle long streams and the
+                                    distribution story needs rethinking
+
+
+RESULT
+------
+(not yet run)

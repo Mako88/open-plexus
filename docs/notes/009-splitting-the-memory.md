@@ -57,6 +57,16 @@ needs `v[i]` for its own rows, which is local.
 
 What it needs is the **full `k` vector**, every step, at every machine.
 
+> **Superseded in one respect by [note 012](012-broadcast-the-token.md).** The
+> broadcast below is assumed to carry the KEY VECTOR, and everything in §3 follows
+> from that. A node can instead receive the **token id** and derive the key from
+> it, since `Wk` is a frozen random projection and can be drawn per-token from a
+> shared seed rather than stored. That costs about three times a node's compute —
+> which `tools/step_rate.py` shows is 21× to 380× under-used — and takes the
+> per-step wire cost from `8·d·4` bytes to **32 bytes at any width**. The
+> affordable region below is therefore too pessimistic: it is `rate ≤ 39,000 Hz`
+> independent of `d`, not `d · rate ≤ 40,000`.
+
 > **Row-split trades a reduction for a broadcast.** That is the central
 > architectural fact, and everything below is about whether the broadcast is
 > affordable.

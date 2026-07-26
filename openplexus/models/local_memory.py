@@ -87,6 +87,18 @@ class LocalMemoryConfig:
             an answer is wanted — and *optional*, because each group emits a
             complete answer by itself. Whether one group's answer alone is good
             enough is the measurement, not an assumption.
+        key_active: Non-zero dimensions per key, or 0 for dense signed keys.
+
+            **Biology's standard answer to interference is a sparse, non-negative
+            code**, and this is that. With `a` active dimensions out of `d`, two
+            random keys share about `a²/d` of them, so distinct addresses
+            interfere less as `a` falls.
+
+            What it cannot help with is *same*-address collisions — one token
+            bound to different values at different positions — and on this task
+            those dominate, because every token recurs many times in a sequence.
+            0 keeps the dense signed projection every earlier result was measured
+            with.
         key_scale: Multiplier on the frozen projections, on top of the
             `1/sqrt(d_model)` that keeps keys at unit norm.
 
@@ -107,6 +119,7 @@ class LocalMemoryConfig:
     decay: float = 1.0
     partitions: int = 1
     key_scale: float = 1.0
+    key_active: int = 0
     seed: int = 0
 
     def __post_init__(self) -> None:
@@ -120,6 +133,10 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if not 0 <= self.key_active <= self.d_model:
+            raise ValueError(
+                f"key_active must be in [0, {self.d_model}], got "
+                f"{self.key_active}")
         if self.partitions < 1:
             raise ValueError("partitions must be at least 1")
         if self.d_model % self.partitions:
@@ -144,7 +161,19 @@ class LocalAssociativeMemory:
         # step. Normalising `k` at run time would be a per-vector operation and
         # defensible, but avoiding it entirely keeps the C1 argument simple.
         spread = config.key_scale / np.sqrt(d)
-        self.wk = rng.normal(0.0, spread, (v, d))
+        if config.key_active:
+            # Sparse, non-negative, unit-norm: `key_active` ones per row, scaled
+            # so every key has the same length as a dense one. Non-negative is
+            # the biologically faithful part -- firing rates do not go below zero
+            # -- and it is also what makes sparsity worth anything, since a DENSE
+            # non-negative code has every pair of keys strongly overlapping.
+            self.wk = np.zeros((v, d))
+            for token in range(v):
+                active = rng.choice(d, config.key_active, replace=False)
+                self.wk[token, active] = config.key_scale / np.sqrt(
+                    config.key_active)
+        else:
+            self.wk = rng.normal(0.0, spread, (v, d))
         self.wv = rng.normal(0.0, spread, (v, d))
         self.wo = np.zeros((v, d))
         # A view, not a copy: writes through `grouped_wo` land in `wo`, so the

@@ -58,6 +58,30 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="sparse-keys-are-not-actually-sparse",
+        breaks="sparsity, so a sweep over key_active would measure nothing and "
+               "report the dense result at every setting",
+        path=LOCAL,
+        old="                active = rng.choice(d, config.key_active, replace=False)",
+        new="                active = rng.choice(d, d, replace=False)",
+    ),
+    Mutation(
+        name="sparse-keys-drift-in-length",
+        breaks="the norm control -- key scale would move with sparsity, and "
+               "g3-02 showed scale alone swings accuracy from 0.263 to 0.960",
+        path=LOCAL,
+        old="active] = config.key_scale / np.sqrt(",
+        new="active] = config.key_scale * (",
+    ),
+    Mutation(
+        name="sparse-keys-may-repeat-a-dimension",
+        breaks="distinctness of active sets, so a token can end up with fewer "
+               "active dimensions than requested",
+        path=LOCAL,
+        old="                active = rng.choice(d, config.key_active, replace=False)",
+        new="                active = rng.choice(d, config.key_active, replace=True)",
+    ),
+    Mutation(
         name="round-a-fractional-machine",
         breaks="block churn's granularity -- the ORIGINAL bug, which turned a "
                "request to remove half the width at P=1 into removing all of it "

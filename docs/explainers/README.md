@@ -24,6 +24,7 @@ explainer, and saying so is the most useful thing you can do.
 | [05](05-what-makes-a-fair-test.md) | What makes a fair test? |
 | [06](06-who-is-to-blame.md) | When it gets something wrong, who's to blame? |
 | [07](07-machines-keep-leaving.md) | Machines keep leaving. How bad is that? |
+| [08](08-does-it-fit-down-the-pipe.md) | Does it fit down the pipe? |
 
 More get added as the project introduces new ideas. Anything here that turns out
 to be wrong gets corrected, not softened — same rule as everywhere else.

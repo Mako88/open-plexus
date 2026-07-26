@@ -385,10 +385,44 @@ In the order they need answering. Each is a question, not a task.
    where a slow link is declared dead, which wants measuring.
 4. **What fraction of connections crosses the network, and is that a free
    parameter or forced by the design?** G4 turns on this number.
-5. **Does the distributed-systems literature already answer C3?** Cheap to find
-   out, and expensive to have skipped.
+
+   **Answered in [docs/notes/004](docs/notes/004-the-bandwidth-budget.md), and
+   the question named the wrong parameter.** The fraction crossing the network is
+   **forced to ~1** under uniform placement — each machine holds 1/31,000th of
+   the network, so a target is local with probability 3 × 10⁻⁵. The free
+   quantity is **`D`, the number of distinct destination *machines* per emitting
+   unit**, because delivery is one packet per destination machine, not per
+   connection. Both `p` and `D` are consequences of one real variable:
+   **placement locality**.
+
+   **The budget:** upload binds, being 5–20× slower than download on consumer
+   connections. `D` ≤ 3.7 at 10 Mbps up, `D` ≤ 14.7 at 40 Mbps. **`D` must be
+   single digits to low tens.**
+
+   **This forces an architectural property:** connectivity must be
+   local-dominant with sparse long-range links, since ~1,000 targets have to
+   land on ~15 machines. Derived from a bandwidth budget, not from biology. **The
+   cost — whether clustered islands are less capable than a well-mixed network —
+   is unmeasured and is the most important open item in the note.**
+
+   **Two side results.** Batching is mandatory (72% framing overhead unbatched),
+   and it is affordable only because C2 already tolerates delay — at 150 ms the
+   overhead is 0.1%, so **C2 pays for itself twice**. And note 003's heartbeat
+   worry is dismissed: under 5% of budget in the worst configuration, because
+   heartbeats are per machine pair rather than per unit.
+5. ~~**Does the distributed-systems literature already answer C3?**~~
+   **Partly, and it was cheap — as predicted.** Answered as a side effect of
+   [note 003](docs/notes/003-the-churn-model.md): the churn measurements
+   transferred directly and changed the design target, while federated
+   learning's architecture did not transfer at all (round-based, central
+   aggregator — a C1 violation twice over) though its straggler/dropout taxonomy
+   did. **Still unread and now the highest-value gap: gossip protocols,
+   SWIM-style failure detectors, and CRDTs.** SWIM in particular exists to avoid
+   exactly the false positives that note 003 §5 names as the cost of unifying
+   `d_max`.
 
 ---
 
-*Status: goals only. No plan, no architecture, no code. Nothing in this document
+*Status: goals and five design notes. No plan, no architecture, no code. Nothing
+in this document
 has been measured by this project.*

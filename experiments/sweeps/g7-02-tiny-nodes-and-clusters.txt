@@ -2,7 +2,11 @@ How small can a node be, if a few of them may pool?
 ===================================================
 
 Script: experiments/g7_02_clusters.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 32/32 cells. Predictions 1, 3 and 4 held.
+        **PREDICTION 2 REFUTED** -- the gated requirement is CONSTANT across
+        a 4x range of sequence length. With the gate on, sequence length
+        stops being a difficulty dial at all. The pre-registered check fired
+        and found a real weakness: the per-seed spread straddles the bar.
 
 
 IN PLAIN TERMS
@@ -120,3 +124,115 @@ would actively prefer the filler.
 Nor does it test whether a cluster is *affordable*. Pooling costs a vocab-sized
 reduction among cluster members; that is cheap for eight nearby devices and not
 obviously cheap for 240 scattered ones.
+
+
+RESULT
+------
+Devices of ONE dimension, 240 of them, 3 seeds, each arm at its own best lr.
+
+gated -- accuracy by cluster size
+  seq_len       1       2       4       8      16      32      64     240
+       96   0.238   0.464   0.776   0.919   0.919   1.000   1.000   1.000
+      192   0.238   0.460   0.774   0.920   0.922   1.000   1.000   1.000
+      288   0.238   0.463   0.779   0.917   0.921   1.000   1.000   1.000
+      384   0.238   0.465   0.776   0.918   0.921   1.000   1.000   1.000
+
+open -- accuracy by cluster size
+  seq_len       1       2       4       8      16      32      64     240
+       96   0.122   0.292   0.484   0.700   0.880   0.987   0.998   1.000
+      192   0.120   0.219   0.317   0.451   0.581   0.699   0.752   0.795
+      288   0.115   0.200   0.262   0.383   0.495   0.582   0.599   0.627
+      384   0.112   0.183   0.245   0.358   0.453   0.542   0.560   0.572
+
+  smallest cluster reaching 0.9:  gated 8 at every length; open 32 at seq 96 and
+  never at 192, 288 or 384.
+
+
+SEQUENCE LENGTH STOPS BEING A DIFFICULTY DIAL
+-----------------------------------------------
+**The four gated rows are the same numbers to three decimals.** Not similar --
+identical, at every cluster size, across a fourfold range of sequence length.
+
+The mechanism is exactly the arithmetic that motivated the gate. With it on, the
+memory holds `2 x n_pairs` bindings whatever the sequence length: the filler
+contributes nothing because it is never written. So the state a query retrieves
+from is the same however much filler it waded through, and accuracy can only
+depend on cluster size.
+
+  > **Every scaling exponent in this project is an exponent in sequence length,
+  > and every one of them comes from storing the filler.** Stop storing it and
+  > sequence length leaves the problem.
+
+Against the open arm, where the same 240 devices reach only 0.572 at seq 384 and
+fall steadily with length, this is the sharpest contrast measured here.
+
+
+THE PREDICTIONS
+----------------
+1. **No cluster reaches 0.9 at seq 384 without the gate -- HELD.** The full
+   240-device pool tops out at 0.572. This was also the replication control, and
+   it is exact: g5-04 measured that same configuration at **0.572**.
+
+2. **Gated cluster requirement grows with sequence length -- REFUTED.** It is 8
+   at every length. This was named before the run as the most likely wrong
+   prediction, for the right reason -- the gate makes stored bindings a constant,
+   so the requirement might become constant too -- and it did.
+
+3. **The two compose multiplicatively rather than additively -- HELD.** At seq
+   384 the gate multiplies a one-device cluster by 2.1x and an eight-device
+   cluster by 2.6x. Not a fixed offset, so the mechanisms are not independent.
+
+4. **A one-device cluster with the gate still fails -- HELD.** 0.238 at every
+   length. **The gate does not remove the need to cluster**, which is the honest
+   qualification on the headline: one number per device is not enough however
+   clean the memory is.
+
+
+THE PRE-REGISTERED CHECK FIRED, AND IT FOUND SOMETHING
+--------------------------------------------------------
+Because a constant requirement is the favourable answer, this note required in
+advance that the per-seed spread be checked at the smallest passing cluster.
+It straddles the bar at **every length**:
+
+    seq  96   [0.833, 0.946, 0.977]
+    seq 192   [0.833, 0.942, 0.985]
+    seq 288   [0.842, 0.933, 0.977]
+    seq 384   [0.833, 0.940, 0.981]
+
+**So "8 devices" means "8 devices on two seeds out of three".** One seed sits at
+0.833 in every row -- consistently, not randomly, which suggests a property of
+that seed's projections rather than noise.
+
+The conservative reading is the first cluster size where every seed clears the
+bar, and that is **32**, where all four rows reach 1.000. Thirty-two devices of
+one dimension each, constant across a fourfold range of sequence length, is still
+a far stronger statement than anything measured before it.
+
+There is also an unexplained plateau: 8 and 16 devices give almost identical
+accuracy (0.919 and 0.921) and then 32 jumps to 1.000. Doubling the cluster buys
+nothing and then doubling again buys everything. No account of that is offered
+here.
+
+**And the gated learning-rate grid pinned at its bottom in all four rows**, all
+choosing 0.02. The ceiling results cannot move, but every number below 1.000 in
+the gated table is under-tuned, including the cluster-8 figures the headline
+rests on.
+
+
+WHAT THIS DOES AND DOES NOT SHOW
+----------------------------------
+It shows that **if** storage were selective, tiny devices would work at any
+sequence length tested, needing a cluster of tens rather than a network of
+hundreds, and the whole sequence-length scaling problem would disappear rather
+than being postponed.
+
+It does not show that selective storage is achievable. The gate is an oracle
+reading `position_kinds()`. [Note 010](../../docs/notes/010-tagging-and-capture.md)
+works through the biological mechanism that would replace it -- tag now, decide
+later, consolidate on the conjunction -- and concludes it is the right mechanism
+and MQAR the wrong benchmark, because the only event separating a pair from
+filler is the query, which arrives after the pair is needed and never recurs.
+
+**So the next step is not a better gate. It is a benchmark where relevance
+recurs**, which would make consolidation-on-use meaningful while keeping every
+result so far comparable.

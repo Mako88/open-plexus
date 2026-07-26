@@ -540,6 +540,20 @@ direction" is withdrawn.
 holding **one number** is enough; 240 of them pool to 0.978. Node size is not the
 problem today. The growth rate is: by 384 steps the same arrangement needs 20–24.
 
+**[g7-02](experiments/sweeps/g7-02-tiny-nodes-and-clusters.txt) then showed what
+happens if that storage is selective: sequence length stops being a difficulty
+dial at all.** With an oracle gate, devices holding *one number each* score
+identically — to three decimals — at 96, 192, 288 and 384 steps, needing a cluster
+of 8 (conservatively 32, where every seed clears the bar) rather than a network of
+hundreds. Ungated, the same 240 devices reach 0.572 at 384 and fall with length.
+
+The mechanism is the arithmetic below: with the gate on, memory holds `2·n_pairs`
+bindings whatever the length, because the filler is never written. **The gate is
+an oracle and this is a ceiling** — [note 010](docs/notes/010-tagging-and-capture.md)
+works through the biological mechanism that would replace it and concludes MQAR
+cannot test it, because the only event separating a pair from filler is the query,
+which arrives too late and never recurs.
+
 **And every exponent here is an exponent in sequence length for one reason.** The
 store binds every consecutive pair, so the number of things in memory *is* the
 sequence length, and the measured `√(d/N)` retrieval law turns that into all the

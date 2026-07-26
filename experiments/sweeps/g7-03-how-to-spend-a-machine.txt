@@ -1,0 +1,135 @@
+Given a machine of a certain power, how should it be spent?
+===========================================================
+
+Script: experiments/g7_03_allocation.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+Real machines are not all the same size. A phone can hold a little, a desktop a
+lot, and a machine that can hold a lot could run one big node or many small ones.
+Nothing here has ever asked which is better.
+
+The reason it matters: **the nodes one machine hosts can pool for free.** They
+share a process. Nodes on *different* machines have to talk over the network. So
+"how many nodes does this machine run" and "where does a cluster end" are the
+same question, and the answer decides how the whole thing is deployed.
+
+
+THE SHARP FORM OF THE QUESTION
+--------------------------------
+A machine that can hold `C` dimensions has a choice. At `C = 64` there are seven
+ways to spend it:
+
+    one node of width 64          two of 32        four of 16       eight of 8
+    sixteen of 4                  thirty-two of 2  sixty-four of 1
+
+All seven use the same memory and the same arithmetic. They differ only in how
+many independent readouts the machine maintains and therefore how its answers are
+pooled. **Which of the seven is best is unmeasured, and it is the deployment
+decision.**
+
+Every sweep so far pinned one of these axes. g5-02 through g5-04 varied node
+width with the cluster fixed at one or at everything; g7-02 pinned nodes at width
+one and varied the cluster. **The interior of the grid has never been touched.**
+
+
+QUESTION
+--------
+Total network width 256 -- a power of two, chosen deliberately here because the
+question is about FACTORISATIONS rather than about locating a crossing, and
+powers of two factorise cleanly. (g5-03 moved off 256 for the opposite reason:
+its divisors are too sparse to resolve a threshold.)
+
+  node width   1, 2, 4, 8, 16, 32, 64      -> 256, 128, 64, 32, 16, 8, 4 nodes
+  cluster      1 up to the node count, in powers of two
+  gate         off and oracle
+  seq_len      384, where node size is most contested
+  lr           0.02, 0.05, 0.1, 0.2
+  seeds        1, 2, 3
+
+Cluster size is a read-time choice, so one trained model is evaluated at every
+cluster size. 56 jobs.
+
+**The reported quantity is accuracy at fixed MACHINE CAPACITY** -- width times
+cluster -- so the seven allocations of 64 dimensions appear side by side.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **At fixed capacity, fewer and wider nodes beat many narrow ones.** g4-01
+   measured that splitting a fixed width into more independent readouts costs
+   accuracy, and this is the same effect seen from the deployment end. So one
+   node of 64 should beat sixty-four of 1.
+
+   **This is the unfavourable direction for the tiny-device story** and it is
+   what the existing evidence points at, so it is stated plainly rather than
+   hedged.
+
+2. **But the margin is small, and shrinks when the gate is on.** g7-02 showed
+   width-1 nodes reaching 1.000 with a gate at cluster 32. If a machine's own
+   nodes pool for free, a narrow-node allocation loses little. Guess: under 0.05
+   between the best and worst allocation of 64 dimensions, gated.
+
+3. **Ungated, the margin is large.** Without a gate, g5-04 put the seq-384 pooled
+   floor at width 20-24, so allocations below that should fail outright while
+   wide ones survive. Guess: over 0.3 between best and worst.
+
+4. **The best allocation is the same at every capacity**, i.e. the ranking of
+   width-versus-count does not itself depend on how much the machine can hold.
+   If it does depend on capacity, deployment needs a rule rather than a constant,
+   which is a more complicated and more interesting world.
+
+> **The vacuity control ran before dispatch and passed, and it already answers
+> half the question.** Width-1 nodes, gated, at seq_len 384, by machine capacity:
+>
+>     capacity   1      2      4      8     16     32     64    128    256
+>     accuracy   0.240  0.504  0.627  0.844  1.000  1.000  1.000  1.000  1.000
+>
+> So the comparison is not vacuous -- there is real spread from capacity 1 to 8 --
+> but it **saturates at 16**. A machine with sixteen dimensions of capacity,
+> spent as sixteen nodes of width one, is already perfect on the hardest length
+> tested.
+>
+> That bounds where the allocation question can matter at all: **below capacity
+> 16 for the gated arm**, and wherever the ungated arm has not saturated, which
+> from g5-04 is everywhere. Node widths 32 and 64 therefore earn their place in
+> the grid mainly through the ungated arm, and the gated table is expected to be
+> mostly ones -- which is itself the answer, not a wasted row.
+
+Most likely wrong: (2). If the gated margin is large, then even with perfect
+storage a tiny machine is meaningfully worse than a share of a large one, and the
+"billions of tiny devices" premise takes real damage. That is the unfavourable
+direction, so it gets reported without the usual extra scrutiny -- **but the
+FAVOURABLE half of (2), a margin near zero, does get checked**: that the smallest
+allocations are not simply at ceiling everywhere, which would make the comparison
+vacuous.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- wide nodes win by a lot, gated    -> tiny machines are second-class even with
+                                       perfect storage. The premise needs
+                                       rethinking, not tuning
+- margin near zero, gated           -> how a machine spends its capacity barely
+                                       matters, so heterogeneous hardware is fine
+                                       and deployment is simple. Check it is not
+                                       vacuous ceiling
+- ranking flips with capacity       -> no constant rule; allocation depends on
+                                       machine size and needs a policy
+- narrow nodes win                  -> splitting HELPS, contradicting g4-01, and
+                                       one of the two measurements is wrong
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+**Heterogeneity.** Every node here is the same width as every other. Real
+networks mix machines of wildly different power, and the biology John's sources
+point at is explicit that cortical columns are *not* uniform -- two of those
+papers are specifically about their inequality. A network of mixed node sizes is
+the obvious follow-up and is not tested here.
+
+Nor does it settle whether pooling within a machine is genuinely free. It is free
+of network cost; it is not free of the reduction itself, and note 009's bandwidth
+arithmetic covers only the cross-machine case.

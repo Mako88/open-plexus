@@ -59,6 +59,23 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="storage-mask-off-by-one",
+        breaks="which binding the mask gates -- a binding written at t is "
+               "(t-1 -> t), so gating on t-1 keeps the wrong ones while every "
+               "count and shape stays identical",
+        path=LOCAL,
+        old="(store is None or store[t])",
+        new="(store is None or store[t - 1])",
+    ),
+    Mutation(
+        name="storage-mask-ignored",
+        breaks="selective storage entirely, so the oracle gate silently becomes "
+               "the ungated model and g7-02's headline evaporates",
+        path=LOCAL,
+        old="if previous_key is not None and (store is None or store[t]):",
+        new="if previous_key is not None:",
+    ),
+    Mutation(
         name="repeats-are-ignored",
         breaks="recurrence, so every key is queried once however many repeats "
                "are asked for and consolidation has nothing to pay off against",

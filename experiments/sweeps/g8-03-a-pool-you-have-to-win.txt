@@ -133,6 +133,41 @@ WHAT WOULD REFUTE WHAT
                                           competition, and prediction 3 is wrong
 
 
+PRE-DISPATCH CONTROL -- and it already points at refutation
+------------------------------------------------------------
+One seed, lr 0.05, half-life 0.25, at the two ends of the length range.
+
+    seq_len   none   oracle    gap   capture-0   capture-4   capture-16
+        192  0.918    0.998  0.080       0.922       0.919        0.922
+        768  0.697    0.998  0.301       0.690       0.690        0.686
+
+As recovery:
+
+    seq_len   capture-0   capture-4   capture-16
+        192        0.05        0.01         0.05
+        768       -0.02       -0.02        -0.04
+
+**The bounded pools fall with length just as the unbounded one does.** That is
+prediction 1 failing, at one seed and one learning rate, before the grid has run.
+
+Two checks that the control is worth reading at all: the oracle's advantage of
+0.080 at seq 192 matches g8-01's 0.081 at the same half-life, so the grids agree
+where they overlap; and prediction 4's control holds, since 0.080 and 0.301 both
+exceed any plausible seed spread.
+
+**The sweep is dispatched anyway, and this is recorded before it runs.** One seed
+cannot estimate a spread -- that exact mistake was made in g8-01's control, which
+declared seq 192 vacuous on a single-seed gap and was wrong once three seeds
+tightened it. And a pre-registered prediction is worth testing properly even when
+a cheap probe has already leaned on it, because the alternative is a project that
+only finishes the experiments it expects to win.
+
+What this control does NOT do is distinguish the two failure modes named in the
+refutation table: whether the pool fails to hold `N` constant (a misconfiguration)
+or holds it constant to no benefit (N-constancy is insufficient). The slope
+column across four lengths and three seeds is what separates those.
+
+
 WHAT THIS CANNOT SETTLE
 ------------------------
 **Whether the ranking signal is any good.** Strength here is the norm of the

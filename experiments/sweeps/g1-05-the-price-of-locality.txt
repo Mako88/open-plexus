@@ -158,7 +158,25 @@ rule crosses between 48 and 64; attention crosses between 8 and 16 (g1-04).
 
     THE PRICE OF LOCALITY IS ROUGHLY 4x TO 6x IN WIDTH.
 
-*** THIS NUMBER IS IN DOUBT. *** g3-01 found that a model ablated DOWN to width
+*** IN DOUBT AGAIN, FROM A DIFFERENT DIRECTION -- see g3-02. *** A native
+width-32 model scores 0.263. The SAME model with its frozen projections
+multiplied by 0.71 scores 0.960. Nothing else changed: same width, same data,
+same epochs, cold readout. The width curve this number comes from is therefore
+substantially an artifact of the initialisation scale chosen for the
+projections (1/sqrt(d_model)) interacting with a fixed learning rate.
+THE 4-6x FIGURE MUST NOT BE QUOTED. What the local rule actually costs is
+unknown until the width sweep is re-run with the scale properly handled.
+
+An earlier annotation read:
+
+*** DOUBT RESOLVED IN THE NUMBER'S FAVOUR -- see g1-07. *** Training from
+scratch at width 32 for 64 epochs leaves accuracy flat at 0.18, so the crossing
+is a genuine CAPACITY threshold and this figure stands. The doubt is recorded
+below as raised and answered rather than deleted. What remains unexplained is
+why an ABLATED model reaches 0.924 at the same width, which g1-07 hands to a
+deciding experiment.
+
+The original annotation read: g3-01 found that a model ablated DOWN to width
 32 recovers to 0.924, where a model trained from scratch at width 32 reaches
 0.225. Since only the readout learns and the projections are frozen random, both
 face the same problem with the same tools -- which suggests the crossing measured

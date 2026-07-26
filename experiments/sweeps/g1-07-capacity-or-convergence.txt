@@ -2,7 +2,10 @@ Is the crossing a capacity limit or just a convergence limit?
 =============================================================
 
 Script: experiments/g1_07_convergence.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 18/18 cells. PREDICTION 1 REFUTED. It is a CAPACITY
+        limit -- the 4-6x price stands -- and that leaves g3-01's ablated 0.924
+        at width 32 UNEXPLAINED, which is the outcome flagged in advance as the
+        more interesting one.
 
 
 IN PLAIN TERMS
@@ -107,4 +110,100 @@ that no downstream experiment ever contradicts.
 
 RESULT
 ------
-(not yet run)
+6 seeds per width, trained from scratch to 64 epochs, scored at nine checkpoints.
+
+  epoch      d=24      d=32      d=48
+      1     0.027     0.185     0.902
+      2     0.027     0.188     0.913
+      4     0.024     0.182     0.905
+      8     0.026     0.225     0.908
+     16     0.028     0.204     0.898
+     24     0.009     0.173     0.908
+     32     0.037     0.192     0.912
+     48     0.017     0.198     0.916
+     64     0.021     0.180     0.898
+
+per-seed at 64 epochs:
+  d=24   0.00 0.01 0.01 0.02 0.03 0.05
+  d=32   0.12 0.12 0.16 0.17 0.18 0.33
+  d=48   0.82 0.86 0.90 0.92 0.94 0.95
+
+
+PREDICTION 1 REFUTED -- IT IS CAPACITY, NOT CONVERGENCE
+--------------------------------------------------------
+d=32 does not climb. It is FLAT: 0.185 at one epoch, 0.180 at sixty-four. Eight
+times the training budget buys nothing whatever, and the same is true at 24 and
+48. Every width converges within about one epoch and then sits there.
+
+So:
+
+  **THE 4-6x PRICE OF LOCALITY STANDS.** The crossing measured in g1-05 and
+  g1-06 is a real capacity threshold, and the doubt g3-01 raised against it is
+  resolved in the number's favour. g1-05's IN DOUBT annotation can be lifted.
+
+  *** THIS PARAGRAPH IS WRONG. *** g3-02 ran the deciding experiment set out
+  below and the answer was (a): initialisation scale. A native width-32 model
+  scores 0.263; the same model with its projections scaled by 0.71 scores
+  0.960. It is not capacity. The 4-6x figure is back in doubt and must not be
+  quoted. This paragraph is left standing rather than deleted, because it was
+  written from the evidence available at the time, and the sequence of being
+  right, wrong and wrong again about the same number is the useful record.
+
+Prediction 5 -- that gains would still be arriving at 64 epochs -- is refuted in
+the strongest possible way. There is no trajectory here at all.
+
+That also disposes of the methodological worry this note raised: if every width
+converges in one epoch, then matching epochs between attention and the local rule
+was not comparing two learners at different points on their own curves. Both were
+converged. The comparison was fair.
+
+
+AND NOW THE PUZZLE
+------------------
+Which leaves the thing this run was supposed to explain, unexplained:
+
+  from scratch at width 32, any budget    0.18
+  ablated DOWN to width 32 (g3-01)        0.924
+
+Same architecture. Same number of live dimensions. Same data. Only the readout
+learns, and the projections are frozen random. **A random 32 of 64 random columns
+is statistically just 32 random columns**, so the two should be solving the same
+problem with the same tools -- and one of them scores five times the other.
+
+Convergence is now ruled out as the explanation, because there is nothing to
+converge to: the from-scratch model reaches its ceiling in one epoch and stays.
+
+This note said in advance what such a result would mean, and it is worth quoting
+because it is uncomfortable: "something survives ablation that this project does
+not understand, and 'only the readout persists' is a claim the whole design rests
+on."
+
+Two candidates, and they are cleanly separable by one experiment:
+
+  (a) INITIALISATION SCALE. The projections are drawn with standard deviation
+      1/sqrt(d_model). A d=64 model ablated to 32 live dimensions therefore has
+      keys of norm ~0.71, where a native d=32 model has norm ~1.0. Signal-to-noise
+      arithmetic says a uniform rescaling should cancel out of a *learned*
+      readout, but arithmetic said a lot of things in g1-06 that measurement
+      disagreed with.
+
+  (b) THE TRAINED READOUT. The ablated model's readout spent four epochs learning
+      at width 64 before losing half its input. If what it retained on the
+      surviving columns is better than anything a cold start finds, then a wider
+      model is distilling something into its own subspace -- and "only the readout
+      persists" would be *true* while badly understating what persisting costs.
+
+THE DECIDING EXPERIMENT, which is cheap: build a d=64 model, ablate 32 dimensions
+**at initialisation, before any training**, and train it. It then has the ablated
+model's initialisation scale and the from-scratch model's cold readout.
+
+  reaches ~0.92  -> (a). It is the initialisation, and the width curve is
+                    partly an artifact of how the projections are scaled --
+                    which would put the 4-6x number back in doubt from a
+                    completely different direction
+  reaches ~0.18  -> (b). The trained readout carries real information into a
+                    smaller space, which is a genuine and unplanned finding
+                    about the design
+
+Recorded rather than guessed. The last two times this project explained a result
+before testing the explanation, the explanation was wrong.

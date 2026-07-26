@@ -1,0 +1,112 @@
+Churn shaped like a machine
+===========================
+
+Script: experiments/g4_02_machine_churn.py
+Status: PREDICTIONS WRITTEN, HELD until g4-01's matrix clears the runners
+
+
+IN PLAIN TERMS
+--------------
+When we tested what happens if machines drop out, we removed a random scattering
+of the model's parts. That was the honest thing to do at the time, because there
+were no machines -- the parts were not assigned to anybody.
+
+Now they are. Each machine owns a contiguous block, and when a machine leaves it
+takes its own block and nothing else. **A random scatter and a solid block are
+not the same damage**, and only the scatter was ever measured.
+
+The difference should matter. Under a scatter, every machine is left slightly
+broken. Under a block, the machines that remain are perfectly intact -- there are
+just fewer of them.
+
+
+QUESTION
+--------
+G3 removed dimensions uniformly at random. In a partitioned deployment that is
+the wrong shape: a departing machine takes its own contiguous block of the width,
+which is exactly one group.
+
+Compare, at the same fraction removed:
+
+  SCATTERED  dimensions chosen uniformly at random   <- what G3 measured
+  BLOCK      whole groups removed                    <- what actually happens
+
+  width      64, 128
+  P          1, 4, 8
+  churn      0.0, 0.25, 0.5
+  seq_len    96
+  lr         0.02, 0.05, 0.1     <- swept on every arm
+  seeds      1, 2, 3
+
+Removal is permanent and happens after 8 epochs of training, then training
+continues to 24 -- G3's protocol, so the numbers are comparable.
+
+**BLOCK only runs where the churn fraction is a whole number of machines.** At
+P=1 a machine is the entire model, so the only block levels are none and all;
+P=1 therefore appears in the SCATTERED arm alone, as the tie back to G3. At P=4
+and P=8 every level in the grid is exact.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **The two arms leave the same width standing at every cell.** This is the
+   connection control, and it is asserted inside the experiment rather than
+   checked at aggregation, because a comparison where one arm removes more than
+   the other is measuring size and calling it shape.
+
+   *The original version of this prediction was different and it was wrong.* It
+   said SCATTERED and BLOCK would agree at P=1 -- but at P=1 a machine IS the
+   model, so block churn has no fractional setting. The first run of the control
+   removed the whole model where scattered removed half, and would have reported
+   block churn as catastrophic. **The control fired before the matrix was
+   dispatched, which is the only reason it cost nothing.**
+
+2. **At P>1, BLOCK beats SCATTERED.** Under BLOCK the surviving groups keep
+   intact readouts, trained on dimensions they still have. Under SCATTERED every
+   group is holed, and a group that has lost a third of its features has a
+   readout fitted to features that no longer arrive.
+
+3. **But not by as much as the story suggests**, because both lose the same
+   number of KEY dimensions, and the key is shared -- every surviving group reads
+   the full key regardless of which group owned the missing part. That is the
+   correction this project made to note 009 after a test failed, and it puts a
+   floor under BLOCK's advantage.
+
+4. **The gap between BLOCK and SCATTERED grows with P.** More groups means each
+   group is narrower, so a scattered hole takes a larger fraction of any one
+   group's features.
+
+Most likely to be wrong: (2). If BLOCK and SCATTERED come out equal at P>1, the
+shared key dominates and *which* machine's dimensions went missing barely
+matters -- which would be a cleaner and more robust story than the one predicted,
+and therefore the favourable direction, and therefore the one to distrust.
+
+**If BLOCK does not beat SCATTERED, check before believing:** that the readout
+damage is actually being modelled -- `ablate` zeroes the readout columns as well
+as the projections, so a group under SCATTERED does have a partly-zeroed readout,
+and if it recovers instantly the ablation is not biting.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- surviving widths differ         -> the control fails and the run aborts; the
+                                     arms are removing different amounts and
+                                     nothing here can be read
+- BLOCK beats SCATTERED, gap
+  grows with P                    -> partitioning is a robustness gain as well as
+                                     a C1 fix, and G3's number is pessimistic for
+                                     a real deployment
+- BLOCK equals SCATTERED          -> the shared key dominates the damage. G3's
+                                     number transfers unchanged, and the churn
+                                     story is simpler than predicted
+- BLOCK is WORSE than SCATTERED   -> losing a whole voter costs more than holing
+                                     every voter. Pooling is doing more work than
+                                     the g4-01 framing assumes, and both notes
+                                     need revising
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+Churn during a sequence. Removal happens between sequences here, as in G3, so no
+sequence is ever half-processed by a machine that vanishes mid-way. That is the
+harder case and it is untouched.

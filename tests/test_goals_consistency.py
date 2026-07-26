@@ -1,0 +1,65 @@
+"""GOALS.md must not quote a superseded measurement as current.
+
+With a dozen sweeps and forty explainers, the largest document in this project
+accumulates numbers faster than anyone re-reads them. An audit found it presenting
+`T^0.67` as the answer for minimum machine width while quoting `T^0.82` for the
+same quantity two paragraphs later, with the consequences — how much wider, how
+many fewer machines — still computed from the older figure.
+
+Nothing was wrong in either sweep. The document simply grew a second answer and
+kept the first. These tests are cheap and catch that class of drift.
+"""
+
+from __future__ import annotations
+
+import pathlib
+import re
+import unittest
+
+GOALS = (pathlib.Path(__file__).resolve().parent.parent / "GOALS.md"
+         ).read_text(encoding="utf-8")
+
+
+class SupersededFiguresAreMarked(unittest.TestCase):
+
+    def test_the_older_width_exponent_is_named_as_superseded(self):
+        """0.67 may appear, but not as the live answer."""
+        if "0.67" not in GOALS:
+            self.skipTest("the older figure is no longer mentioned at all")
+        self.assertIn("superseded", GOALS,
+                      "GOALS still quotes the 0.67 width exponent without "
+                      "saying 0.82 replaced it")
+
+    def test_the_current_width_exponent_appears_with_its_interval(self):
+        self.assertRegex(
+            GOALS, r"0\.82.{0,40}\[0\.61, 1\.03\]",
+            "the current minimum-width exponent should appear with the "
+            "interval it was measured to")
+
+    def test_the_derived_machine_count_matches_the_current_exponent(self):
+        """0.37 − 0.82 = −0.45. A stale document said −0.30, from 0.67.
+
+        The derived number is the one a reader acts on, and it is the one that
+        silently goes stale when the measurement it came from is updated.
+        """
+        self.assertIn("T^-0.45", GOALS,
+                      "the machine-count exponent should be 0.37 - 0.82 = -0.45")
+        self.assertNotIn("`T^-0.30`", GOALS,
+                         "GOALS still carries the machine-count exponent "
+                         "derived from the superseded 0.67")
+
+
+class EveryGateHasAVerdict(unittest.TestCase):
+    """A gate table with a blank row is a gate nobody noticed was unanswered."""
+
+    def test_no_gate_row_is_left_empty(self):
+        rows = re.findall(r"^\| \*\*G\d.*$", GOALS, re.MULTILINE)
+        self.assertGreaterEqual(len(rows), 5, "the gate table is missing rows")
+        for row in rows:
+            cells = [c.strip() for c in row.strip("|").split("|")]
+            self.assertTrue(all(cells),
+                            f"a gate row has an empty cell: {row}")
+
+
+if __name__ == "__main__":
+    unittest.main()

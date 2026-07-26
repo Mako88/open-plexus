@@ -515,18 +515,30 @@ approach is bounded. **Those are opposite conclusions and the grid separates the
 not at all** — factor-of-two width steps cannot measure a quantity whose
 interesting range is a factor of two wide.
 
-**[g5-03](experiments/sweeps/g5-03-a-finer-ruler.txt) settles it.** Moving the
+**[g5-03](experiments/sweeps/g5-03-a-finer-ruler.txt) resolves it.** Moving the
 total width from 256 to 240 — a number with divisors where a power of two has
 none — and adding `seq_len 48` at the cheap end took the resolution from ±0.50 to
-±0.14. Minimum machine width grows as **`T^0.67`, range [0.53, 0.81]**, which
-excludes 0.37. So the usable machine count goes as **`T^-0.30`**: to handle a
-problem ten times longer you need machines ~4.7× wider while total capacity grows
-only 2.3×, and the number of machines you can split across **halves**.
+±0.14. Minimum machine width grows as `T^0.67`, range [0.53, 0.81], which excludes
+0.37.
+
+**[g5-04](experiments/sweeps/g5-04-how-far-does-pooling-stretch.txt) later refined
+that to `T^0.82`, range [0.61, 1.03]**, fitting five located rows against g5-03's
+four by adding `seq_len` 128 and 256. The intervals overlap, so this is a
+refinement rather than a contradiction — but **0.82 is the current figure and 0.67
+is superseded.** The numbers below are computed from 0.82; an earlier version of
+this document quoted the consequences of 0.67 and was not updated when the
+measurement moved, which is exactly the drift the record-keeping standard exists
+to catch.
+
+So the usable machine count goes as **`T^-0.45`**: to handle a problem ten times
+longer you need machines about **6.6× wider** while total capacity grows only
+2.3×, and the number of machines you can split across falls to roughly **a
+third**.
 
 That is G5's refutation condition met. It is not a cliff — doubling the problem
-costs about 19% of the machine count — but for a goal whose whole premise is that
-machine *count* is the elastic quantity and machine *size* is fixed by what people
-already own, the elastic quantity is the one that stops helping.
+costs about a quarter of the machine count — but for a goal whose whole premise is
+that machine *count* is the elastic quantity and machine *size* is fixed by what
+people already own, the elastic quantity is the one that stops helping.
 
 **[g5-04](experiments/sweeps/g5-04-how-far-does-pooling-stretch.txt) measured the
 pooled criterion, and it is not the escape it looked like.** Pooling is the better

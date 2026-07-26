@@ -34,6 +34,18 @@ this task ever produced.
 
 Distinct cues fix it: each query is a different token, so nothing carries over.
 
+## Scoring: first asks and repeats are different quantities
+
+In autoregressive mode the answer follows the query, so the **first** query of a
+cue re-binds it. Every later query about that cue is answerable from a binding
+written a few steps earlier, which measures short-term echo rather than
+retention.
+
+The headroom search made the size of that difference concrete: at one
+configuration an ungated model scored **0.369 over all queries and 0.225 on first
+asks**. Averaging them hides the number that matters, so anything measuring this
+task reports both.
+
 ## What it does not test
 
 Acting. There is no policy, no choice and no cost for being wrong, so calling
@@ -77,12 +89,21 @@ class RewardConfig:
         seed: Generator seed.
     """
 
-    n_pairs: int = 8
-    n_rewarded: int = 2
-    n_cues: int = 32
+    # VERIFIED AGAINST experiments/g9_01_answerable.py, and these are not the
+    # first defaults. The first set -- 8 pairs, 2 rewarded, seq_len 192 -- scored
+    # ungated 1.000 against oracle 1.000: no room for a gate to matter, and every
+    # arm of every sweep would have read 1.000. At the values below the gap is
+    # 0.744 and an ungated model sits AT the trivial floor on first asks (0.119
+    # against 0.125), which is the whole range available.
+    #
+    # A default that cannot test anything is worse than no default, because it
+    # looks like a starting point.
+    n_pairs: int = 24
+    n_rewarded: int = 4
+    n_cues: int = 64
     n_values: int = 8
-    seq_len: int = 192
-    delay: int = 4
+    seq_len: int = 768
+    delay: int = 8
     queries_per_reward: int = 3
     autoregressive: bool = True
     seed: int = 0

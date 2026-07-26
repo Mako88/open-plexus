@@ -108,6 +108,35 @@ class TheSplitIsExact(unittest.TestCase):
 
 
 @skip_if_fast
+@skip_if_fast
+class RunningAheadChangesNothing(unittest.TestCase):
+    """C2, over real sockets instead of a permuted array.
+
+    A window of 1 is lock-step: every node answers before anyone advances, which
+    is the global synchronisation C1 forbids. Above 1 the nodes proceed at their
+    own pace and the operating system decides what arrives when.
+
+    g2-01 established bit-identity under simulated delay. This is the same claim
+    where the delay is real.
+    """
+
+    def test_every_window_gives_the_lock_step_answer(self):
+        config, model = configured(8)
+        expected = model.run(TOKENS)
+        with Network(config, 8, model.wv, model.wo) as network:
+            for window in (1, 2, 4, 8, len(TOKENS)):
+                with self.subTest(window=window):
+                    np.testing.assert_array_equal(
+                        network.run(TOKENS, window=window), expected)
+
+    def test_a_window_below_one_is_refused(self):
+        config, model = configured(4)
+        with Network(config, 4, model.wv, model.wo) as network:
+            with self.assertRaises(ValueError):
+                network.run(TOKENS, window=0)
+
+
+@skip_if_fast
 class NodesLeaveOverTheWire(unittest.TestCase):
     """A departure the driver experiences rather than one it simulates."""
 

@@ -61,6 +61,15 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="votes-lose-their-step",
+        breaks="reassembly -- votes would be matched to steps by arrival "
+               "order, so running ahead would scramble which answer belongs "
+               "to which position, and only at windows above 1",
+        path=DISTRIBUTED,
+        old='                (step,) = struct.unpack("!i", message[:4])',
+        new="                step = settled",
+    ),
+    Mutation(
         name="nodes-keep-memory-between-sequences",
         breaks="the per-sequence contract -- the REAL bug this harness was "
                "extended to cover, found when a departure test showed answers "
@@ -71,11 +80,11 @@ MUTATIONS = [
     ),
     Mutation(
         name="driver-ignores-a-node",
-        breaks="the sum -- one node's vote would silently vanish, which looks "
-               "exactly like a smaller network and nothing else",
+        breaks="the sum -- one node's vote would silently vanish, which "
+               "looks exactly like a smaller network and nothing else",
         path=DISTRIBUTED,
-        old="            for index, sock in enumerate(self._connections):\n                if index in gone:\n                    continue\n                votes += np.frombuffer(receive(sock), dtype=\">f8\")",
-        new="            for index, sock in enumerate(self._connections):\n                if index in gone:\n                    continue\n                votes += np.frombuffer(receive(sock), dtype=\">f8\") * (index > 0)",
+        old='                slot[0] += np.frombuffer(message[4:], dtype=">f8")',
+        new='                slot[0] += np.frombuffer(message[4:], dtype=">f8") * 0.5',
     ),
     Mutation(
         name="derived-key-ignores-the-seed",

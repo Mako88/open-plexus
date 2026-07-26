@@ -41,6 +41,7 @@ loss and churn come after, and are meaningless until this holds.
 
 from __future__ import annotations
 
+import select
 import socket
 import struct
 from dataclasses import dataclass
@@ -171,6 +172,7 @@ def serve(config: LocalMemoryConfig, own: Slice, host: str, port: int,
     question with its own failure modes.
     """
     node = Node(config, own, values, readout)
+    step = 0
     with socket.create_connection((host, port)) as sock:
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         while True:
@@ -185,8 +187,15 @@ def serve(config: LocalMemoryConfig, own: Slice, host: str, port: int,
                 return
             if token == _RESET:
                 node.reset()
+                step = 0
                 continue
-            send(sock, node.step(token).astype(">f8").tobytes())
+            # The step index rides with the vote. Without it the driver can
+            # only match votes to steps by counting, which forces it to wait for
+            # everyone before moving on -- the lock-step this window exists to
+            # remove.
+            vote = node.step(token)
+            send(sock, struct.pack("!i", step) + vote.astype(">f8").tobytes())
+            step += 1
 
 
 class Network:
@@ -251,32 +260,73 @@ class Network:
             self._listener.close()
 
     def run(self, tokens: np.ndarray, absent: set[int] | None = None,
-            leave_at: int | None = None) -> np.ndarray:
+            leave_at: int | None = None, window: int = 1) -> np.ndarray:
         """Broadcast each token, sum the votes, return a prediction per position.
 
         `absent` names nodes that stop answering from `leave_at` onward -- a real
         departure, in the sense that the driver never hears from them again and
         their share of the memory goes with their process.
+
+        `window` is how far ahead the driver may run. **At 1 this is lock-step:
+        every node must answer before anyone moves, which is precisely the
+        global synchronisation C1 forbids.** Above 1, nodes proceed at their own
+        pace and votes arrive interleaved, reassembled by the step index each one
+        carries.
+
+        [g2-01](../experiments/sweeps/g2-01-latency.txt) established in
+        simulation that below a bound, delay changes nothing bit-for-bit. This is
+        where that claim meets real sockets, real process scheduling and real
+        arrival order.
         """
+        if window < 1:
+            raise ValueError("a window below 1 cannot make progress")
         absent = absent or set()
         # Every sequence starts clean, matching the single-process contract.
         for sock in self._connections:
             send(sock, struct.pack("!i", _RESET))
         predictions = np.zeros(len(tokens), dtype=np.int64)
         gone: set[int] = set()
-        for step, token in enumerate(tokens):
+        pending: dict[int, list] = {}
+        expected: dict[int, int] = {}
+        sent = settled = 0
+
+        def dispatch(step: int) -> None:
+            nonlocal gone
             if leave_at is not None and step == leave_at:
                 gone = set(absent)
-            votes = np.zeros(self.config.vocab_size)
-            for index, sock in enumerate(self._connections):
-                if index in gone:
-                    continue
-                send(sock, struct.pack("!i", int(token)))
-            for index, sock in enumerate(self._connections):
-                if index in gone:
-                    continue
-                votes += np.frombuffer(receive(sock), dtype=">f8")
-            predictions[step] = int(votes.argmax())
+            live = [i for i in range(len(self._connections)) if i not in gone]
+            expected[step] = len(live)
+            pending[step] = [np.zeros(self.config.vocab_size), 0]
+            for index in live:
+                send(self._connections[index], struct.pack("!i", int(tokens[step])))
+
+        while settled < len(tokens):
+            while sent < len(tokens) and sent - settled < window:
+                dispatch(sent)
+                sent += 1
+
+            # Read from whichever node is ready. Arrival order is the operating
+            # system's business, not ours -- which is the point: the answer must
+            # not depend on it.
+            live = [self._connections[i] for i in range(len(self._connections))
+                    if i not in gone]
+            ready, _, _ = select.select(live, [], [], 30.0)
+            if not ready:
+                raise TimeoutError(
+                    f"no node answered within 30s at step {settled}")
+            for sock in ready:
+                message = receive(sock)
+                (step,) = struct.unpack("!i", message[:4])
+                if step not in pending:
+                    continue          # a vote for a step already settled
+                slot = pending[step]
+                slot[0] += np.frombuffer(message[4:], dtype=">f8")
+                slot[1] += 1
+
+            while settled < sent and pending[settled][1] >= expected[settled]:
+                predictions[settled] = int(pending[settled][0].argmax())
+                del pending[settled], expected[settled]
+                settled += 1
         return predictions
 
     @property

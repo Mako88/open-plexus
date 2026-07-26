@@ -87,6 +87,51 @@ class LocalMemoryConfig:
             an answer is wanted — and *optional*, because each group emits a
             complete answer by itself. Whether one group's answer alone is good
             enough is the measurement, not an assumption.
+        salience: How many standard deviations of surprise a step must carry
+            before consolidation fires. 0 keeps the original rule — consolidate
+            whenever the previous prediction was right — which
+            [g7-04](../../experiments/sweeps/g7-04-when-does-forgetting-pay.txt)
+            measured as monotonically harmful.
+
+            **This is John's observation, and it names the failure exactly.** A
+            brain floods with neuromodulator on *external* events, and the flood
+            is stronger for outcomes that are very good and very bad. Our gate
+            fired on every correct prediction instead, which once the model works
+            is most of them — so the lasting store, which never decays, filled up
+            with the routine and accumulated the saturation the fast store was
+            fading to avoid.
+
+            Salience is measured against the node's own running experience: it
+            keeps an estimate of its typical surprise and consolidates only when
+            the current step departs from it by more than `salience` deviations,
+            **in either direction**. Very wrong and very right both count; the
+            unremarkable middle does not. That is local, needs no signal from
+            anywhere else, and fires on the tail rather than the bulk.
+
+            Lehr et al. put the same structure in the protein threshold,
+            `θ_pro(NM) = 1/(NM + 0.001)` — more neuromodulator, lower bar. Here
+            the bar is fixed and the surprise has to clear it.
+        lasting_cap: Largest norm the consolidated store may reach. 0 leaves it
+            unbounded, which diverges.
+
+            **A salience gate cannot run without this, and finding out why was
+            the useful part.** Consolidating on *correct* predictions is
+            self-limiting: being correct means the retrieval was already good, so
+            promoting it adds nothing extreme. Consolidating on *surprise* is
+            positive feedback — a large surprise promotes a large retrieval,
+            which enlarges the store, which enlarges later retrievals and later
+            surprises. Left alone it reaches NaN.
+
+            Zenke and Gerstner, in the sources that prompted this, put the point
+            in a title: *Hebbian plasticity requires compensatory processes on
+            multiple timescales*. Hebbian storage is unstable by construction and
+            biology pairs it with something that pulls the total back down —
+            synaptic scaling, which normalises a cell's weights rather than
+            editing any one of them.
+
+            This is that, in its crudest form: when the consolidated store
+            exceeds the cap, scale the whole thing back. It is a single
+            multiplication over one node's own rows, so it stays local.
         derived_keys: Draw each key row from its own seed rather than the whole
             table from one. Off by default, which reproduces every earlier
             result exactly.
@@ -163,6 +208,8 @@ class LocalMemoryConfig:
     key_scale: float = 1.0
     key_active: int = 0
     consolidation: float = 0.0
+    salience: float = 0.0
+    lasting_cap: float = 0.0
     derived_keys: bool = False
     seed: int = 0
 
@@ -181,6 +228,17 @@ class LocalMemoryConfig:
             raise ValueError(
                 "derived_keys and key_active both build Wk and would conflict; "
                 "sparse keys have no per-token derivation yet")
+        if self.lasting_cap < 0.0:
+            raise ValueError("lasting_cap must not be negative")
+        if self.salience and not self.lasting_cap:
+            raise ValueError(
+                "a salience gate without a cap diverges: promoting on surprise "
+                "enlarges the store, which enlarges later surprises")
+        if self.salience < 0.0:
+            raise ValueError("salience must not be negative")
+        if self.salience and not self.consolidation:
+            raise ValueError(
+                "salience gates consolidation and does nothing without it")
         if self.consolidation < 0.0:
             raise ValueError("consolidation must not be negative")
         if self.consolidation and self.decay >= 1.0:
@@ -417,6 +475,11 @@ class LocalAssociativeMemory:
         # useful by the token that arrives next, and never decayed -- which is
         # the whole difference between it and `memory`.
         lasting = np.zeros((d, d)) if self.config.consolidation else None
+        # A running estimate of this node's own typical surprise, so "unusual"
+        # means unusual for it rather than against some global constant. Welford,
+        # because a two-pass mean is not available to something that has to
+        # decide as it goes.
+        seen, mean_surprise, m2 = 0, 0.0, 0.0
         previous_key = None
         previous_retrieval = None
         predictions = np.zeros(len(tokens), dtype=np.int64)
@@ -457,9 +520,36 @@ class LocalAssociativeMemory:
             # the answer held up. Promoting the answer is the operation that is
             # actually available.
             if lasting is not None and previous_retrieval is not None:
-                if predictions[t - 1] == token:
+                # Surprise: how far the arriving token was from what was
+                # predicted, as a probability-free magnitude. Available to the
+                # node from its own last output and its own next input.
+                surprise = abs(float(previous_scores.max()
+                                      - previous_scores[token]))
+
+                seen += 1
+                delta = surprise - mean_surprise
+                mean_surprise += delta / seen
+                m2 += delta * (surprise - mean_surprise)
+                deviation = (m2 / seen) ** 0.5 if seen > 1 else 0.0
+
+                if not self.config.salience:
+                    fires = predictions[t - 1] == token
+                else:
+                    # Both tails. Very wrong and very right are both worth
+                    # keeping; the unremarkable middle is not.
+                    fires = (deviation > 0.0
+                             and abs(surprise - mean_surprise)
+                             > self.config.salience * deviation)
+                if fires:
                     lasting += self.config.consolidation * np.outer(
                         previous_retrieval, previous_key_for_retrieval)
+                    if self.config.lasting_cap:
+                        # Scale the whole store, never one entry. Editing
+                        # individual weights to fit a budget would be a
+                        # different mechanism and a non-local one.
+                        size = float(np.linalg.norm(lasting))
+                        if size > self.config.lasting_cap:
+                            lasting *= self.config.lasting_cap / size
 
             # RETRIEVE, then read an answer off each group independently.
             # `parts` is (groups, vocab): row g is the complete prediction group
@@ -482,4 +572,5 @@ class LocalAssociativeMemory:
             previous_key = key
             previous_retrieval = retrieved
             previous_key_for_retrieval = key
+            previous_scores = answer
         return predictions

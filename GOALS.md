@@ -330,6 +330,16 @@ In the order they need answering. Each is a question, not a task.
    the one that sank the predecessor. It must be something a frozen random
    substrate cannot do, that a strong non-local reference *can*, with a large
    measured gap between them.
+
+   **Analysed in [docs/notes/001](docs/notes/001-what-task-passes-g0.md); still
+   open, because nothing has been run.** That note argues the corrective action
+   is not "a harder task" but *a task whose difficulty lies where a random
+   substrate has no answer*; recommends associative recall; argues for a task
+   **family with a difficulty dial** rather than a single task, because a gap no
+   local rule could ever close is as useless as no gap at all; and records its
+   predictions in advance. Three sub-questions it raises are unresolved — the
+   data budget, how a discrete-token task is encoded for an event-based
+   substrate, and whether the reference model must be strong or merely non-local.
 2. **Which credit-assignment scheme, and what is the argument that it satisfies
    C1 and C2?** Written on paper before anything is built.
 3. **What is the churn model?** What does "a machine left" mean concretely —

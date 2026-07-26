@@ -32,6 +32,8 @@ def parse_args(description: str) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--seed", type=int, default=None,
                         help="run this seed only; omit to run all of them")
+    parser.add_argument("--width", type=int, default=None,
+                        help="run this d_model only; omit to run all of them")
     parser.add_argument("--json", type=Path, default=None,
                         help="write results here as JSON instead of a table")
     parser.add_argument("--aggregate", nargs="+", metavar="FILE",

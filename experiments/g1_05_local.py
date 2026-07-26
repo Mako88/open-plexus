@@ -33,7 +33,19 @@ BASE = MqarConfig(n_pairs=4, seq_len=96, n_keys=32, n_values=8,
                   autoregressive=True, filler="random", seed=20260725)
 EPOCHS, N_TRAIN, N_TEST = 8, 400, 120
 SEEDS = tuple(range(1, 9))
-WIDTHS = (16, 32, 64, 128, 256, 512)
+# Bracketing the crossing point rather than sprawling past it. Seed 1 put the
+# transition between 32 and 64 and showed 128 already saturated at 1.000, so the
+# original (16..512) spent 74% of its budget at widths whose answer was already
+# known. These cost 16x less AND resolve the transition better -- the cheap
+# version is the more informative one, which is worth noticing.
+WIDTHS = (16, 24, 32, 48, 64, 96)
+
+#: Rough cost of one (seed, width) cell relative to the smallest, from the
+#: d*d outer product and matvec that dominate. Printed before anything runs:
+#: a job whose cost nobody estimated is how the first attempt at this sweep
+#: consumed the machine it was running on.
+def relative_cost(d: int) -> float:
+    return (2 * d * d + 41 * d) / (2 * 16 * 16 + 41 * 16)
 
 
 def run(task: MqarConfig, d_model: int, seed: int, decay: float = 1.0,
@@ -70,9 +82,14 @@ def run(task: MqarConfig, d_model: int, seed: int, decay: float = 1.0,
 def main() -> int:
     args = parse_args(__doc__)
     seeds = (args.seed,) if args.seed is not None else SEEDS
+    widths = (args.width,) if args.width is not None else WIDTHS
+
+    total = sum(relative_cost(d) for d in widths) * len(seeds)
+    print(f"{len(widths)} width(s) x {len(seeds)} seed(s); "
+          f"cost ~{total:.0f} units where the d_model=16 cell is 1", flush=True)
 
     records = []
-    for d_model in WIDTHS:
+    for d_model in widths:
         for seed in seeds:
             accuracy = run(BASE, d_model=d_model, seed=seed)
             records.append(dict(condition=f"d_model={d_model}", seed=seed,

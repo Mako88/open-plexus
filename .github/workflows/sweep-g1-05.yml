@@ -1,14 +1,16 @@
 name: sweep-g1-05-price-of-locality
 
-# One job per seed, run concurrently, then recombined. The seeds of a sweep are
-# independent, so this is the whole of the parallelism available and it is worth
-# taking: eight seeds serially is eight times the wall clock of eight seeds at
-# once, and the answer is identical.
+# One job per (seed, width) CELL rather than per seed.
 #
-# `concurrency` below is not optional. A second sweep pushed while this one runs
-# does not overlap with it — its jobs queue, seize the runners the moment these
-# finish, and starve the aggregate step of the first. The predecessor project hit
-# that three times before enforcing it.
+# Splitting on both axes matters for two reasons. It gets 20-way parallelism
+# instead of 8 on the free tier, and — more importantly — it stops the most
+# expensive width from setting the wall clock for everything. The d_model=96
+# cell costs ~19x the d_model=16 cell, so a per-seed job spends most of its life
+# in one condition while the cheap ones sit finished.
+#
+# `concurrency` is not optional. A second sweep pushed while this one runs does
+# not overlap with it — its jobs queue, seize the runners the moment these
+# finish, and starve the aggregate step of the first.
 
 on:
   workflow_dispatch:
@@ -23,30 +25,33 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  seed:
+  cell:
     strategy:
       fail-fast: false
       matrix:
         seed: [1, 2, 3, 4, 5, 6, 7, 8]
+        width: [16, 24, 32, 48, 64, 96]
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
       - run: pip install numpy
-      - name: Run seed ${{ matrix.seed }}
-        run: python experiments/g1_05_local.py --seed ${{ matrix.seed }} --json out/${{ matrix.seed }}.json
+      - name: seed ${{ matrix.seed }}, width ${{ matrix.width }}
+        run: python experiments/g1_05_local.py --seed ${{ matrix.seed }} --width ${{ matrix.width }} --json out/s${{ matrix.seed }}-w${{ matrix.width }}.json
       - uses: actions/upload-artifact@v4
         with:
-          name: g1-05-seed-${{ matrix.seed }}
+          name: g1-05-s${{ matrix.seed }}-w${{ matrix.width }}
           path: out/*.json
 
   aggregate:
-    needs: seed
-    # `always()` so a partial matrix still reports. A sweep where two seeds died
-    # is a result with two seeds missing, not nothing — and silently reporting
-    # the survivors as if they were the whole matrix is worse than either.
+    needs: cell
+    # `always()` so a partial matrix still reports. A sweep where three cells
+    # died is a result with three cells missing, not nothing — and silently
+    # reporting the survivors as if they were the whole matrix is worse than
+    # either. The count is printed so the loss cannot pass unnoticed.
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -56,15 +61,21 @@ jobs:
           python-version: "3.13"
       - uses: actions/download-artifact@v4
         with:
-          pattern: g1-05-seed-*
+          pattern: g1-05-s*
           path: out
           merge-multiple: true
       - name: Combine
         run: |
-          echo "seeds returned: $(ls out/*.json | wc -l) of 8"
-          python experiments/harness.py --aggregate "out/*.json" | tee summary.txt
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 48" | tee summary.txt
+          python experiments/harness.py --aggregate "out/*.json" | tee -a summary.txt
       - name: Summary
         run: |
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat summary.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-05-summary
+          path: |
+            summary.txt
+            out/*.json

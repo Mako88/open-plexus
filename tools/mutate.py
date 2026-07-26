@@ -343,10 +343,10 @@ MUTATIONS = [
     ),
     Mutation(
         name="local-memory-never-stores",
-        breaks="the Hebbian store, so retrieval always returns zero",
+        breaks="the store, so the memory stays empty and retrieval returns zero",
         path=LOCAL,
-        old="            if previous_key is not None:",
-        new="            if False:",
+        old="                memory += np.outer(value, previous_key)",
+        new="                memory += 0.0 * np.outer(value, previous_key)",
     ),
     Mutation(
         name="local-delta-rule-inert",

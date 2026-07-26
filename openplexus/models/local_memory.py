@@ -223,7 +223,7 @@ class LocalAssociativeMemory:
 
     def run(self, tokens: np.ndarray, targets: np.ndarray | None = None,
             scored: np.ndarray | None = None, learn: bool = False,
-            partition: int | None = None,
+            partition=None,
             store: np.ndarray | None = None) -> np.ndarray:
         """Process one sequence; return the predicted next token per position.
 
@@ -253,11 +253,22 @@ class LocalAssociativeMemory:
                 locally available signals at the moment of storage, and whether
                 such a signal exists on this task is a separate and harder
                 question.
-            partition: Read the answer off this partition alone, ignoring the
-                others. `None` pools them, which is what a deployment would do
-                when it can afford to. This exists to measure whether pooling is
-                load-bearing or merely an ensemble — a single machine's answer is
-                the one that has to stand up if the pool is unaffordable.
+            partition: Which machines answer. An integer reads one machine
+                alone; an iterable of integers reads a **cluster** of them pooled
+                together; `None` pools every machine.
+
+                The three cases are one dial, and it is the dial that decides how
+                small a machine can be. A lone machine has to be wide enough to
+                answer by itself. Pooling everything is the other extreme and
+                costs a reduction across the whole network, affordable only if the
+                network is small or answers are rare.
+
+                **A cluster is the middle, and it is the interesting case.** A
+                handful of machines that pool locally — because they are near each
+                other, or cheap to reach — act as one wider machine without any of
+                them being wide. Whether a small cluster recovers most of what
+                full pooling buys decides whether genuinely tiny devices can
+                take part at all.
 
         Returns:
             `argmax` of the readout at each position.
@@ -265,9 +276,21 @@ class LocalAssociativeMemory:
         if learn and (targets is None or scored is None):
             raise ValueError("learning needs targets and scored positions")
         groups = self.config.partitions
-        if partition is not None and not 0 <= partition < groups:
-            raise ValueError(
-                f"partition outside [0, {groups}): {partition}")
+        members = None
+        if partition is not None:
+            members = ([int(partition)]
+                       if isinstance(partition, (int, np.integer))
+                       else [int(g) for g in partition])
+            if not members:
+                raise ValueError("a cluster must contain at least one machine")
+            for member in members:
+                if not 0 <= member < groups:
+                    raise ValueError(
+                        f"partition outside [0, {groups}): {member}")
+            if len(set(members)) != len(members):
+                raise ValueError(
+                    f"a machine appears twice in the cluster {members}, which "
+                    f"would double-count its answer")
 
         d = self.config.d_model
         memory = np.zeros((d, d))
@@ -296,7 +319,7 @@ class LocalAssociativeMemory:
             retrieved = memory @ key
             sliced = retrieved.reshape(groups, -1)
             parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)
-            answer = parts[partition] if partition is not None else parts.sum(0)
+            answer = parts.sum(0) if members is None else parts[members].sum(0)
             predictions[t] = int(answer.argmax())
 
             if learn and scored[t]:

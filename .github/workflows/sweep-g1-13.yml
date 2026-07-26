@@ -1,0 +1,94 @@
+name: sweep-g1-13-both-arms-fed
+
+# The price, with both arms actually finished training.
+#
+# g1-12 found attention starved at a fixed 3000 steps. The local rule was
+# measured under the same fixed-budget condition and has never been checked at
+# long sequences. Repairing one arm and not the other is what CLAUDE.md forbids,
+# so both are re-measured with 4x the budget and checkpoints, and a crossing is
+# only read where the two largest checkpoints agree.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/g1_13_both_fed.py"
+      - ".github/workflows/sweep-g1-13.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  attention:
+    strategy:
+      fail-fast: false
+      matrix:
+        seqlen: [48, 96, 192, 384]
+        width: [2, 4, 6, 8]
+        seed: [1, 2, 3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: attention seq ${{ matrix.seqlen }} d ${{ matrix.width }} seed ${{ matrix.seed }}
+        run: python experiments/g1_13_both_fed.py --mode attention --seqlen ${{ matrix.seqlen }} --width ${{ matrix.width }} --seed ${{ matrix.seed }} --json out/A-${{ matrix.seqlen }}-${{ matrix.width }}-${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-13-A-${{ matrix.seqlen }}-${{ matrix.width }}-${{ matrix.seed }}
+          path: out/*.json
+
+  local:
+    strategy:
+      fail-fast: false
+      matrix:
+        seqlen: [48, 96, 192, 384]
+        width: [16, 24, 32, 48, 64]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: local seq ${{ matrix.seqlen }} d ${{ matrix.width }}
+        run: python experiments/g1_13_both_fed.py --mode local --seqlen ${{ matrix.seqlen }} --width ${{ matrix.width }} --json out/L-${{ matrix.seqlen }}-${{ matrix.width }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-13-L-${{ matrix.seqlen }}-${{ matrix.width }}
+          path: out/*.json
+
+  aggregate:
+    needs: [attention, local]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g1-13-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 68" | tee summary.txt
+          python tools/summarise_g1_13.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-13-summary
+          path: |
+            summary.txt
+            out/*.json

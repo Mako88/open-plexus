@@ -54,6 +54,40 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="pool-the-error-across-groups",
+        breaks="partition independence -- every group's update would read every "
+               "other group's prediction, restoring the global reduction C1 "
+               "forbids while leaving the pooled output looking correct",
+        path=LOCAL,
+        old="                    \"gv,gd->vgd\", target - parts, sliced)",
+        new="                    \"gv,gd->vgd\", target - parts.sum(0), sliced)",
+    ),
+    Mutation(
+        name="ignore-the-requested-partition",
+        breaks="reading an answer off one machine, so a measurement of whether "
+               "pooling is load-bearing would silently measure the pool",
+        path=LOCAL,
+        old="            answer = parts[partition] if partition is not None else parts.sum(0)",
+        new="            answer = parts.sum(0)",
+    ),
+    Mutation(
+        name="split-the-retrieved-vector-the-wrong-way",
+        breaks="which dimensions belong to which group -- the groups would "
+               "interleave rather than partition, so no group owns a contiguous "
+               "slice and the row-split argument does not apply",
+        path=LOCAL,
+        old="            sliced = retrieved.reshape(groups, -1)",
+        new="            sliced = retrieved.reshape(-1, groups).T",
+    ),
+    Mutation(
+        name="copy-the-readout-instead-of-viewing-it",
+        breaks="the aliasing between wo and grouped_wo, so learning updates a "
+               "detached copy and ablate stops reaching the readout",
+        path=LOCAL,
+        old="        self.grouped_wo = self.wo.reshape(v, config.partitions, -1)",
+        new="        self.grouped_wo = self.wo.reshape(v, config.partitions, -1).copy()",
+    ),
+    Mutation(
         name="filler-collides-with-keys",
         breaks="filler may reuse a key this sequence queries, making the task ill-posed",
         path=MQAR,
@@ -239,8 +273,8 @@ MUTATIONS = [
         name="local-delta-rule-inert",
         breaks="the delta rule, so the readout never learns and sits at its initialisation",
         path=LOCAL,
-        old="                self.wo += self.config.lr * np.outer(target - readout, retrieved)",
-        new="                self.wo += 0.0 * np.outer(target - readout, retrieved)",
+        old="                self.grouped_wo += self.config.lr * np.einsum(",
+        new="                self.grouped_wo += 0.0 * np.einsum(",
     ),
     Mutation(
         name="local-memory-persists-across-sequences",

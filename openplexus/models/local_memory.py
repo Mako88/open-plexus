@@ -72,6 +72,21 @@ class LocalMemoryConfig:
         decay: Per-step multiplier on the memory. 1.0 keeps everything;
             below 1.0 forgets older bindings, which bounds the interference a
             long sequence accumulates.
+        partitions: How many independent groups the width is split into. **This
+            is the C1 dial.** With 1 the readout is a single `vocab × d_model`
+            matrix whose error term sums over every dimension — which, once
+            `d_model` is spread across machines, is a globally synchronised step
+            of exactly the kind C1 forbids (note 009 §4). With P > 1 the width is
+            cut into P equal groups, each with its own readout over its own
+            dimensions only, each learning from its own prediction error. No
+            machine's update depends on any other machine's activity.
+
+            **This does not make the reduction vanish, and claiming so would be
+            wrong.** What it changes is the reduction's shape: from `d`-sized and
+            every step and mandatory, to `vocab`-sized and only at positions where
+            an answer is wanted — and *optional*, because each group emits a
+            complete answer by itself. Whether one group's answer alone is good
+            enough is the measurement, not an assumption.
         key_scale: Multiplier on the frozen projections, on top of the
             `1/sqrt(d_model)` that keeps keys at unit norm.
 
@@ -90,6 +105,7 @@ class LocalMemoryConfig:
     d_model: int = 64
     lr: float = 0.05
     decay: float = 1.0
+    partitions: int = 1
     key_scale: float = 1.0
     seed: int = 0
 
@@ -104,6 +120,12 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if self.partitions < 1:
+            raise ValueError("partitions must be at least 1")
+        if self.d_model % self.partitions:
+            raise ValueError(
+                f"d_model {self.d_model} does not divide into "
+                f"{self.partitions} partitions")
 
 
 class LocalAssociativeMemory:
@@ -125,6 +147,12 @@ class LocalAssociativeMemory:
         self.wk = rng.normal(0.0, spread, (v, d))
         self.wv = rng.normal(0.0, spread, (v, d))
         self.wo = np.zeros((v, d))
+        # A view, not a copy: writes through `grouped_wo` land in `wo`, so the
+        # readout has exactly one representation and `ablate` keeps working
+        # unchanged. Reshaping a freshly allocated C-contiguous array never
+        # copies, and the assertion says so rather than trusting it.
+        self.grouped_wo = self.wo.reshape(v, config.partitions, -1)
+        assert self.grouped_wo.base is self.wo, "grouped_wo must alias wo"
 
     def ablate(self, dimensions) -> None:
         """Permanently remove these dimensions — a machine has left, for good.
@@ -165,8 +193,8 @@ class LocalAssociativeMemory:
         return int((np.abs(self.wk).sum(axis=0) > 0).sum())
 
     def run(self, tokens: np.ndarray, targets: np.ndarray | None = None,
-            scored: np.ndarray | None = None,
-            learn: bool = False) -> np.ndarray:
+            scored: np.ndarray | None = None, learn: bool = False,
+            partition: int | None = None) -> np.ndarray:
         """Process one sequence; return the predicted next token per position.
 
         Args:
@@ -178,12 +206,21 @@ class LocalAssociativeMemory:
                 step. It exists so that this rule can be compared against the
                 attention model under the same objective.
             learn: Whether to update `Wo` online.
+            partition: Read the answer off this partition alone, ignoring the
+                others. `None` pools them, which is what a deployment would do
+                when it can afford to. This exists to measure whether pooling is
+                load-bearing or merely an ensemble — a single machine's answer is
+                the one that has to stand up if the pool is unaffordable.
 
         Returns:
             `argmax` of the readout at each position.
         """
         if learn and (targets is None or scored is None):
             raise ValueError("learning needs targets and scored positions")
+        groups = self.config.partitions
+        if partition is not None and not 0 <= partition < groups:
+            raise ValueError(
+                f"partition outside [0, {groups}): {partition}")
 
         d = self.config.d_model
         memory = np.zeros((d, d))
@@ -206,15 +243,23 @@ class LocalAssociativeMemory:
                     memory *= self.config.decay
                 memory += np.outer(value, previous_key)
 
-            # RETRIEVE and predict.
+            # RETRIEVE, then read an answer off each group independently.
+            # `parts` is (groups, vocab): row g is the complete prediction group
+            # g makes from its own dimensions, owing nothing to any other group.
             retrieved = memory @ key
-            readout = self.wo @ retrieved
-            predictions[t] = int(readout.argmax())
+            sliced = retrieved.reshape(groups, -1)
+            parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)
+            answer = parts[partition] if partition is not None else parts.sum(0)
+            predictions[t] = int(answer.argmax())
 
             if learn and scored[t]:
                 target = np.zeros(self.config.vocab_size)
                 target[targets[t]] = 1.0
-                self.wo += self.config.lr * np.outer(target - readout, retrieved)
+                # Each group's error is its OWN prediction error. With one group
+                # this is the plain delta rule; with more, no group's update
+                # reads any other group's activity, which is the whole point.
+                self.grouped_wo += self.config.lr * np.einsum(
+                    "gv,gd->vgd", target - parts, sliced)
 
             previous_key = key
         return predictions

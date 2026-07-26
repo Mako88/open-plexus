@@ -1,0 +1,145 @@
+How fast does the minimum machine size grow?
+============================================
+
+Script: experiments/g5_03_finer.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+g5-02 asked how small each machine can be before the system stops working, and
+whether that floor rises as problems get harder. It came back 0.50 give or take
+0.50 -- a range so wide it contains both the good answer and the bad one.
+
+The reason was a ruler marked in doublings. Every machine size tested was twice
+the last, and the thing being measured moves by about a doubling across the whole
+range. You cannot measure a 2x difference with 2x graduations.
+
+This runs the same question with a finer ruler, and a longer run-up.
+
+
+WHY THE RULER WAS COARSE, WHICH WAS NOT OBVIOUS
+------------------------------------------------
+Machine width has to divide total width exactly. g5-02 held the total at **256**,
+and 256 has almost no divisors in the range that matters:
+
+    divisors of 256 between 8 and 64:   8, 16, 32, 64        (factor-of-two steps)
+    divisors of 240 between 8 and 64:   8, 10, 12, 15, 16, 20, 24, 30, 40, 48, 60
+
+**The coarse grid was not a sampling choice. It was forced by picking a power of
+two for the total**, which looked like a neutral, tidy default and quietly set the
+resolution of the whole experiment. A round number is not a free choice when
+something else has to divide it.
+
+Switching the total to 240 -- almost the same capacity -- takes the worst step
+from 2.00x to 1.33x.
+
+
+AND A LONGER RUN-UP, AT THE CHEAP END
+---------------------------------------
+Resolution in the exponent is `log(width step) / log(sequence span)`, so the span
+helps as much as the step. g5-02 spanned 96 to 384, a factor of 4.
+
+Adding **seq_len 48** stretches that to a factor of 8, and 48 is the cheapest
+row in the sweep rather than the most expensive.
+
+    240 grid, span 4x  ->  +/-0.21     still contains 0.37; not decisive
+    240 grid, span 8x  ->  +/-0.14     decisive against 0.6, tight around 0.37
+
+The previous note said a longer lever arm mattered more than finer steps and
+would cost roughly four times as much. **The first half was right and the second
+was wrong** -- it assumed extending the span meant longer sequences, when
+extending it downward works just as well and is nearly free.
+
+
+QUESTION
+--------
+Hold total width at 240, cut it P ways, and locate the smallest machine width
+that still reaches 0.9 -- then fit how that floor grows with sequence length.
+
+  total width  240 (fixed)
+  P            1, 6, 8, 10, 12, 15, 16, 20, 24, 30, 40
+               -> machine width 240, 40, 30, 24, 20, 16, 15, 12, 10, 8, 6
+  seq_len      48, 96, 192, 384
+  lr           0.01, 0.02, 0.05, 0.1, 0.2
+  seeds        1, 2, 3
+  budget       8 epochs
+
+220 jobs. Costed: 20.7 hours serial, worst job 12 minutes, about an hour of wall
+clock. Under GitHub's 256-job matrix cap, which is worth stating because a matrix
+that silently truncates would drop exactly the cells at the end of the grid.
+
+**Pre-registered: the fit is on the `alone` criterion**, a single machine
+answering without pooling, because that is the one C1 needs and because g5-02
+found it the better resolved of the two. `pooled` is reported alongside. Choosing
+between them after seeing which gave a tidier exponent would be the same error as
+fitting through a bound.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **The floor is located at every length, none at a grid edge.** *(Already
+   partly established: the pre-dispatch control locates seq 48 in (6, 8].)* g5-02 bounded
+   it to (8,16] at seq 96 and (16,32] at 192 and 384, and this grid has five
+   points inside those intervals. If any row still lands at the floor, the total
+   width of 240 is too small for that row and the design failed again.
+
+2. **The floor rises with sequence length.** Guess: about 10-12 at seq 48, 14-16
+   at 96, 20-24 at 192, 24-30 at 384.
+
+3. **Therefore the exponent comes out near 0.4** -- close to g1-10's 0.37 for
+   total width, so **the usable machine count is roughly FLAT with problem size,
+   not shrinking.** From the guessed floors, log(27/11)/log(8) = 0.43.
+
+   **That is the favourable answer and it is the one to distrust.** Pre-registered
+   checks if it lands near 0.37: that the located floors are spread across
+   distinct grid points rather than bunched on two; that P=1 is at ceiling for
+   every length, so no row is capacity-limited rather than division-limited; and
+   that the learning-rate grid is unpinned **per row**, since g5-02's pooled
+   check called a pinned row clean.
+
+4. **P=1 reaches 1.000 at every length.** The ceiling control. 240 undivided is
+   five times g1-13's crossing of 46.8 at seq 384.
+
+Most likely wrong: (2), specifically at seq 48. The floor there may sit below 8,
+which was this grid's smallest machine, in which case that row is bounded rather
+than located and the span collapses back to 4x -- taking the resolution with it.
+**If that happens the honest report is the 4x number, not a fit through the
+bound.**
+
+> **That is exactly what happened, and it was caught before dispatch.** The
+> control run put seq 48 at machine width 8 scoring **0.975** alone -- comfortably
+> above the bar, so the floor was outside the grid and that row would have been
+> unfittable. Extending downward found it: width 6 scores **0.777**, so the floor
+> at seq 48 lies in **(6, 8]**. `P=40` was added and `P=4` dropped to stay under
+> the 256-job cap.
+>
+> The prediction that named this as the likeliest failure was written before the
+> control was run, and the control was run before 220 jobs were dispatched. The
+> whole cost was three short runs on the cheapest row in the sweep.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- exponent clearly below 0.37     -> usable machine count GROWS with problem
+                                     size. Better than hoped, so check hardest
+- exponent 0.3 to 0.45            -> count is flat; partitioning scales. G5
+                                     passes and the earlier wall was entirely an
+                                     artefact of 16-wide machines
+- exponent above 0.55             -> count shrinks; past some size capability is
+                                     bought by bigger machines, not more of them.
+                                     G5 fails, this time with the resolution to
+                                     say so
+- any row bounded, not located    -> report the reduced span honestly and say
+                                     which row failed, rather than fitting
+
+
+WHAT THIS STILL DOES NOT SETTLE
+---------------------------------
+The floor is measured at ONE total width. g4-01 hints the two interact -- 32-wide
+machines scored 0.903 at total 64 and 0.992 at total 128 -- so "minimum machine
+width" is really "minimum machine width at generous total capacity". Whether it
+moves when capacity is tight is untested.
+
+Nor does it touch the step RATE, still the last unmeasured term in note 009's
+`d . rate` bandwidth product.

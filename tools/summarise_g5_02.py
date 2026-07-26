@@ -17,7 +17,10 @@ sys.path.insert(0, ".")
 from tools.grid import pinned  # noqa: E402
 
 SOLVED = 0.9
-TOTAL_WIDTH = 256
+# Read from the records rather than hard-coded: g5-02 used 256 and g5-03 uses
+# 240, and a total width baked into the reporting tool would silently mislabel
+# every machine width in the second sweep.
+TOTAL_WIDTH = None
 WIDTH_EXPONENT = 0.37     # g1-10, for TOTAL width, measured at P=1
 
 
@@ -27,6 +30,15 @@ def main() -> int:
     if not rows:
         print("no records matched")
         return 1
+
+    global TOTAL_WIDTH
+    widths = {r["d_model"] for r in rows}
+    if len(widths) != 1:
+        print(f"records mix total widths {sorted(widths)}; machine width is not "
+              f"comparable across them")
+        return 1
+    TOTAL_WIDTH = widths.pop()
+    print(f"total width {TOTAL_WIDTH} throughout")
 
     cells = defaultdict(list)
     for r in rows:

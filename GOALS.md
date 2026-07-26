@@ -463,7 +463,17 @@ changed. **g1-08 has now re-measured it with both arms tuned, and the honest pri
 own best scale. Tuning both made the price *worse*: like-for-like at the old
 untuned settings it was 3.0×, so the retracted figure was not conservative but
 unfounded, and landing near the right answer was luck.
-G4 (bandwidth) and G5 (scale) remain.*
+G4 (bandwidth) and G5 (scale) remain.
+
+**And one scaling law is now measured.** The width the local rule needs grows as
+roughly the **cube root** of the stream length it must hold (exponent 0.37 across
+an eightfold range) — where attention's state grows *linearly* in stream length
+and its time quadratically. That took four attempts: `n_pairs` and `n_keys` are
+both flat, and the load turned out to be `seq_len`, because the store binds every
+consecutive pair rather than only the meaningful ones. It also means the 4.0×
+price is a point on a curve rather than a constant, since the two architectures
+must diverge in stream length — re-measuring it across `seq_len` is the natural
+next step.*
 
 *Previously: **G0 passed.** MQAR is answerable (oracle 1.000, checked mechanically
 across a grid), reachable (one hand-written lookup, 1.000), and **learnable** (a

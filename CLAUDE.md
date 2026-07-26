@@ -82,6 +82,23 @@ end-to-end result as a summary, not a diagnosis.
 > *Calibration.* — unfilled. Record the first time a proxy metric hid a broken
 > component: how many runs went by before a direct probe found it.
 
+**A variable that never changes does not look like a variable — it looks like
+the background.** Before concluding that a mechanism is refuted, list what was
+held constant across every experiment that tested it. A constant chosen once,
+early, for a plausible reason, and never varied since is the likeliest place for
+a wrong answer to hide, because nothing downstream can contradict it and every
+individual experiment remains sound.
+
+> *Calibration.* Twice. The projection scale was pinned at a value one step from
+> where the mechanism diverges, and silently produced the width curve the
+> project's headline came from ([g3-02](experiments/sweeps/g3-02-whats-carried.txt)).
+> And an interference account was "refuted" by two correct, well-designed sweeps
+> that moved `n_pairs` and `n_keys` — neither of which touches the load, because
+> the store binds every consecutive pair and the real load is `seq_len`, held at
+> 96 in every sweep the project had ever run
+> ([g1-10](experiments/sweeps/g1-10-the-real-load.txt)). The account was right
+> for four experiments while looking refuted for two of them.
+
 **A hyperparameter swept on one arm of a comparison must be swept on all of
 them.** Tuning your own side and comparing against an untuned baseline produces a
 better number by exactly the mechanism that produced the wrong one — and it is

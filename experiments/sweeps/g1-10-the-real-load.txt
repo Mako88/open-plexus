@@ -2,7 +2,10 @@ Is the load sequence length? -- the variable nobody moved
 =========================================================
 
 Script: experiments/g1_10_seqlen.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 28/28 cells. PREDICTION 1 HELD -- the crossing grows
+        with seq_len. Interference is the mechanism and seq_len is the load,
+        after three sweeps moved the wrong variable. PREDICTION 2 REFUTED in
+        the good direction: the scaling is sub-linear, exponent 0.37.
 
 
 IN PLAIN TERMS
@@ -108,4 +111,98 @@ WHAT WOULD REFUTE WHAT
 
 RESULT
 ------
-(not yet run)
+5 seeds per cell, key_scale 0.5, n_pairs 4.
+
+  seq_len  bindings   d=16    d=24    d=32    d=48    d=64    d=96   d=128
+       48        47  0.806   0.936   0.979   0.997   0.998   1.000   1.000
+       96        95  0.562   0.875   0.975   0.992   0.999   1.000   1.000
+      192       191  0.094   0.483   0.887   0.992   1.000   1.000   1.000
+      384       383  0.004   0.045   0.353   0.918   0.985   1.000   1.000
+
+Crossing width, interpolated to the 0.9 threshold rather than rounded to the
+grid, because the grid is coarse enough that rounding hides the trend:
+
+  seq_len=48    ->  21.8
+  seq_len=96    ->  26.0
+  seq_len=192   ->  34.0
+  seq_len=384   ->  47.5
+
+
+PREDICTION 1 HELD -- THE LOAD IS SEQUENCE LENGTH
+--------------------------------------------------
+The crossing moves, monotonically, and it is the first task variable in this
+project that does. n_pairs was flat across a fourfold change (g1-06). n_keys was
+flat across a sixteenfold change (g1-09). seq_len moves the crossing by 2.2x
+across an eightfold change.
+
+**So g1-05's interference account was right about the mechanism all along**, and
+three sweeps failed to see it because they were all moving variables that barely
+touch the load. The store binds every consecutive pair, so what a query competes
+against is `seq_len - 1` other bindings; n_pairs and n_keys change almost nothing
+about that count.
+
+That closes a question that has been open since g1-05 and has produced three
+wrong answers on the way. The record of those is left in place in g1-05, g1-06
+and g1-09 rather than tidied, because the useful part is not the answer but how
+long a correct mechanism can look refuted when the wrong knob is being turned.
+
+
+PREDICTION 2 REFUTED, AND IN THE GOOD DIRECTION
+------------------------------------------------
+Predicted d proportional to the load -- 16, 32, 64, 128 across the four lengths --
+from the signal-to-noise argument: one wanted binding against K-1 others adding
+incoherently gives SNR ~ sqrt(d/K), so holding quality fixed needs d ~ K.
+
+Measured: **exponent 0.37**, between a cube root and a square root.
+
+    8x the sequence costs 2.2x the width.
+
+The signal-to-noise argument is therefore wrong, or rather incomplete, for the
+fourth time in this project. The most likely reason it is too pessimistic is that
+it assumes the interference is random. It is not: keys come from a fixed alphabet
+of 32 that recurs in every sequence, so the interference is systematic, and a
+TRAINED readout can cancel systematic structure in a way it cannot cancel noise.
+That is the mechanism g1-09 proposed for the wrong quantity, and it may be
+operating here as a correction to the exponent rather than as the primary cause.
+
+**Recorded as a hypothesis, and explicitly not tested.** This project has now
+proposed four mechanisms for this crossing and had three refuted; the appropriate
+confidence in a fifth, offered in the same breath as a result, is low.
+
+
+WHAT THE NUMBER IS WORTH
+-------------------------
+This is the most practically useful scaling result the project has produced.
+
+  **A locality-respecting associative memory needs width growing as roughly the
+  cube root of the stream length it must hold.**
+
+Prediction 3 said a linear law would mean the rule "cannot process an arbitrarily
+long stream at fixed width". That remains true -- the width does grow -- but at
+0.37 the growth is gentle enough to be affordable. Going from 384 steps to 384
+thousand is a thousandfold increase in load and, extrapolated, about a tenfold
+increase in width. Extrapolating three decades beyond the measured range is not
+evidence and is flagged as arithmetic rather than a finding, but the shape is
+encouraging where linear would have been fatal.
+
+For comparison, attention holds every position it has seen: its state grows
+LINEARLY in stream length and its time quadratically. On this axis the local rule
+is not merely competitive but structurally better, which is worth stating
+carefully rather than loudly -- it is one axis, on one task, and the 4.0x width
+penalty from g1-08 is measured at a single sequence length.
+
+Which raises the obvious follow-up: **the 4.0x price was measured at seq_len=96.
+If the two architectures scale differently in stream length, that ratio is a
+point on a curve rather than a constant** -- and attention's linear state growth
+against this rule's 0.37 exponent says they must diverge. Re-measuring the price
+across seq_len is the natural next experiment, and it could move the headline
+again in either direction.
+
+
+PREDICTION 4, CONFIRMED STRUCTURALLY
+--------------------------------------
+Most of the memory is spent on bindings nobody will ever query: 4 of 95 at the
+reference, 4 of 383 at the longest. A mechanism that stored only what would be
+asked about would need dramatically less room -- and, as the prediction said,
+knowing which those are in advance is the whole problem, and anything that
+guessed would be attention smuggled back in.

@@ -200,6 +200,17 @@ re-run against a width that has been measured rather than assumed.
 
 THE FINDING NOBODY PREDICTED, AND IT MATTERS MORE
 --------------------------------------------------
+*** THE EXPLANATION BELOW IS RESTORED BY g1-10, WITH ONE VARIABLE CHANGED. ***
+Interference IS the mechanism. What this section got wrong is which quantity
+carries the load: it named n_pairs, and the store binds EVERY consecutive
+pair, so the real load is seq_len. g1-10 sweeps it and the crossing moves
+monotonically -- the first task variable in this project that does. The
+scaling is sub-linear (exponent 0.37) rather than the linear law argued here.
+The intermediate refutations in g1-06 and g1-09 stand as written: they
+correctly showed n_pairs and n_keys do not move the crossing.
+
+The annotation added when this looked refuted read:
+
 *** THE OBSERVATION BELOW STANDS. THE EXPLANATION OF IT IS REFUTED. ***
 g1-06 tested this section's account directly. If the graded transition were
 superposition interference, the crossing width would grow with the number of

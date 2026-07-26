@@ -2,7 +2,10 @@ Does a weak machine drag down a strong one?
 ===========================================
 
 Script: experiments/g7_05_mixed.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 8/8 cells. **ALL FOUR PREDICTIONS HELD, and the
+        answer is the favourable one: admitting a weak machine never
+        hurts.** Of forty cells, one is negative, at -0.006. Open
+        participation needs no gatekeeping and therefore no coordination.
 
 
 IN PLAIN TERMS
@@ -161,3 +164,86 @@ Machines here differ only in *how many* identical nodes they host. A real
 population also differs in reliability, uptime and latency, and note 009's
 bandwidth argument assumes every machine can carry the key broadcast -- which the
 weakest ones may not.
+
+
+RESULT
+------
+What a strong machine gains by admitting a weaker one. Three seeds, each arm at
+its own best learning rate. `+strong` is the fair control: a second machine of
+the same size.
+
+gated (lr 0.05)
+  strong   alone  +strong    +w=1    +w=2    +w=4    +w=8   +w=16
+       1   0.251   +0.293  +0.293  +0.363  +0.569  +0.688  +0.749
+       2   0.544   +0.168  +0.069  +0.168  +0.363  +0.401  +0.456
+       4   0.713   +0.221  +0.108  +0.194  +0.221  +0.257  +0.287
+       8   0.933   +0.067  +0.006  +0.012  +0.036  +0.067  +0.067
+      16   1.000   +0.000  +0.000  +0.000  +0.000  +0.000  +0.000
+
+open (lr 0.02)
+  strong   alone  +strong    +w=1    +w=2    +w=4    +w=8   +w=16
+       1   0.089   +0.089  +0.089  +0.135  +0.208  +0.287  +0.406
+       2   0.178   +0.072  +0.046  +0.072  +0.175  +0.247  +0.336
+       4   0.250   +0.119  +0.047  +0.103  +0.119  +0.214  +0.278
+       8   0.369   +0.131  +0.007  +0.056  +0.094  +0.131  +0.158
+      16   0.500   +0.062  -0.006  +0.014  +0.028  +0.028  +0.062
+
+
+THE ANSWER: ANYONE CAN JOIN
+-----------------------------
+Of forty cells, **one is negative, at -0.006** -- a third of the noise threshold.
+Everywhere else, admitting a weaker machine makes the pool better or leaves it
+unchanged.
+
+  > **Open participation needs no weighting and no admission control**, and
+  > therefore no coordination. A machine that can contribute almost nothing still
+  > contributes nothing *harmful*, so the network can accept whoever turns up.
+
+That matters more than its size suggests. The alternative -- that weak machines
+have to be excluded or down-weighted -- would have required someone to decide who
+counts, which is a coordinator by another name and the thing C1 exists to forbid.
+
+
+A CONSISTENCY CHECK THAT PASSED WITHOUT BEING ASKED FOR
+---------------------------------------------------------
+Where the weak machine happens to be the same size as the strong one, the mixed
+arm and the doubling control are the same experiment. They agree exactly at every
+size: `+w=1` equals `+strong` at strong=1, `+w=2` equals `+strong` at strong=2,
+`+w=4` at 4, `+w=8` at 8. Both columns are computed by separate code paths from
+separate member lists, so their agreeing on the diagonal is evidence that neither
+is mislabelled.
+
+
+THE PREDICTIONS -- ALL FOUR HELD
+----------------------------------
+1. **Adding a weak machine never hurts -- HELD.** Named before the run as the
+   most likely to be wrong and as the most consequential negative available.
+   It is neither.
+
+2. **It helps less than an equally-sized strong machine -- HELD.** At strong=8
+   ungated, one extra node gains +0.007 where eight gain +0.131.
+
+3. **Gated, mixing barely matters -- HELD.** At strong=16 every entry is +0.000,
+   because that arm is at 1.000 and has nothing left to gain.
+
+4. **Ungated with a large strong machine, the weak one is nearly invisible --
+   HELD.** strong=16 admitting one node moves -0.006.
+
+**And unlike [g7-04](g7-04-when-does-forgetting-pay.txt), these predictions were
+written before the controls ran**, so the clean scorecard is not the artefact
+CLAUDE.md now warns about. The saturation control came afterwards and changed the
+grid, not the predictions.
+
+
+CAVEATS
+--------
+- **The gated arm saturates at strong=16**, where doubling gains nothing, so
+  those rows carry no information about membership. The summariser reports them
+  as excluded rather than averaging them in.
+- **The ungated arm's learning rate pinned at the bottom of the grid**, so its
+  levels are under-tuned. The *differences* are what this sweep measures and they
+  are unlikely to reverse sign, but the absolute numbers are low.
+- **Machines here differ only in how many identical nodes they host.** A real
+  population also differs in uptime, latency and reliability, none of which is
+  modelled. A machine that contributes nothing harmful while *present* may still
+  do harm by vanishing mid-sequence, which G3 does not cover either.

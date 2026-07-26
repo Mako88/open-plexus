@@ -631,6 +631,17 @@ gated headline sits at ceiling, so the open arm is where the claim has teeth
 at its bottom in both arms; and the decisive open-arm cell spans [0.442, 0.644]
 across three seeds.
 
+**And open participation is safe** ([g7-05](experiments/sweeps/g7-05-mixed-machines.txt)).
+Real networks mix machines of wildly different power, and our machines combine by
+adding their answers — so a tiny machine's mostly-noise vote could in principle
+drag a good one down. Of forty cells testing exactly that, **one is negative, at
+-0.006.** Admitting a weaker machine makes the pool better or leaves it unchanged,
+everywhere else.
+
+That matters more than its size suggests: the alternative would have required
+someone to decide who counts, which is a coordinator by another name and the thing
+C1 exists to forbid. **The network can accept whoever turns up.**
+
 G4 (bandwidth) remains — but G4's central assumption is no longer
 an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the
 global readout, which [note 009](docs/notes/009-splitting-the-memory.md) §4 had

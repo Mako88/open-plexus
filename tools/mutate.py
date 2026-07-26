@@ -64,6 +64,34 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="capture-never-displaces",
+        breaks="the only thing the pool is for. Without subtracting the loser "
+               "this is a threshold gate with extra bookkeeping: N grows with "
+               "sequence length again, which is exactly the failure g8-01 "
+               "measured",
+        path=LOCAL,
+        old="                            lasting -= slots[weakest][1]",
+        new="                            pass",
+    ),
+    Mutation(
+        name="capture-admits-everything",
+        breaks="the competition. A newcomer would evict an incumbent whether or "
+               "not it was stronger, so the pool holds the most RECENT k rather "
+               "than the best k -- a different policy, and one nothing here "
+               "argued for",
+        path=LOCAL,
+        old="                        if strength > slots[weakest][0]:",
+        new="                        if True:",
+    ),
+    Mutation(
+        name="capture-evicts-the-strongest",
+        breaks="which end of the pool loses, so the store fills with the "
+               "weakest traces it has seen",
+        path=LOCAL,
+        old="                                      key=lambda i: slots[i][0])",
+        new="                                      key=lambda i: -slots[i][0])",
+    ),
+    Mutation(
         name="the-node-ignores-the-decoder-switch",
         breaks="the only thing that makes nodes distinguishable. wo is learned "
                "and starts at zeros, so without it every node predicts token 0 "

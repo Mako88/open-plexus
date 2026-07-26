@@ -74,10 +74,41 @@ biology and the systems engineering converge on the same answer — **finite
 capacity plus a replacement policy** — and the CS version comes with fifty years
 of analysis attached.
 
-It also costs the thing that matters. `k` slots of `(key, value)` is `2 * k * d`
-numbers per node, against a superposed store's `d * d`. For small `k` that is
-*cheaper* than what we have, which matters because the figure of merit is
-minimum viable node size.
+### The cost, corrected — and the correction changed the design
+
+**A first version of this note said `k` slots cost `2 * k * d` against a
+superposed `d * d`, and called that cheaper. That arithmetic was network-wide,
+and per node it inverts.**
+
+A node owns rows `[lo, hi)` of the `(d, d)` memory, so its superposed slice is
+`w * d` numbers, where `w` is its width. A slot holding a retrieval slice and a
+key *vector* costs `w + d` — and the key vector is full width, because retrieval
+sums over every dimension. So:
+
+    d = 256, w = 1     superposed = 256 numbers     slots affordable = 0
+    d = 256, w = 4     superposed = 1024            slots affordable = 3
+    d = 256, w = 32    superposed = 8192            slots affordable = 28
+
+**A width-1 node cannot afford a single slot.** For exactly the nodes this
+project exists for, slots are strictly more expensive than superposition. That
+kills the mechanism as first described.
+
+What saves it is work already done. [Note 012](012-broadcast-the-token.md)
+established that a node need not store the key table at all: with `derived_keys`,
+row `t` is regenerated from `(seed, token)` on demand, which is why a four-byte
+token is enough to broadcast. **So a slot stores the token id, not the key
+vector** — cost `w + 1` instead of `w + d`:
+
+    d = 256, w = 1     superposed = 256 numbers     slots affordable = 128
+    d = 256, w = 4     superposed = 1024            slots affordable = 204
+    d = 256, w = 32    superposed = 8192            slots affordable = 248
+
+A width-1 node affords **128 slots** where it could not afford one. The mechanism
+is cheap, and it is cheap *only because keys are derived*.
+
+That is a hard dependency and it is worth naming: competitive capture is not
+independently implementable. It rests on derived keys, and if that ever has to be
+withdrawn this goes with it.
 
 ## What has to be true for this to be wrong
 
@@ -87,12 +118,18 @@ minimum viable node size.
   competition, then 7.6× enrichment was never the problem and note 013's
   diagnosis is wrong in a way g8-02 will also fail to detect.
 - **If exact slots break the locality argument.** Superposition is what lets a
-  node hold a fraction of a memory; slots may want whole bindings, which is a
-  different distribution story and needs checking against C1 before anything is
-  measured on top of it.
+  node hold a fraction of a memory; slots might want whole bindings.
 
-That last one is the real risk and it is a design question, not a tuning
-question. It gets answered before the mechanism is built, not after.
+**That last risk was checked before building, and it survives — but only just,
+and not in the form it was first written.** A slot holds this node's own slice of
+a retrieval, `w` numbers, plus a token id. It does not hold a whole binding and
+it does not reference any other node's dimensions, so nothing is shared and
+nothing is synchronised: C1 holds. The token id is already on the wire, so the
+protocol does not change either.
+
+The cost check is what nearly killed it, and is recorded above: the obvious
+implementation is *more* expensive than superposition for precisely the nodes
+this project cares about.
 
 ## Status
 

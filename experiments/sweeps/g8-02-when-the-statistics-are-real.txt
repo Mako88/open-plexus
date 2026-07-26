@@ -2,7 +2,14 @@ Does a gate work when the statistics stop being adversarial?
 ============================================================
 
 Script: experiments/g8_02_zipf_gate.py
-Status: SCRIPT WRITTEN, CONTROL RUN, NOT DISPATCHED. **The predictions below
+Status: RUN on Actions, 15/15 cells, 10m10s wall clock. **PREDICTIONS 1, 3
+        AND 4 ALL REFUTED**, and 3 was refuted in the opposite direction to the
+        one guessed. 2 held vacuously. The base-rate diagnosis is NOT
+        supported. The sweep also found something nobody was looking for:
+        **skewed input collapses the model onto a single token**, which is a
+        direct warning about the real-text benchmark this was meant to justify.
+
+        Previously: SCRIPT WRITTEN, CONTROL RUN, NOT DISPATCHED. **The predictions below
         were written before the script existed and before any number from
         this grid had been seen** -- the script and the control came after,
         in that order, and the control's numbers appear further down in a
@@ -195,3 +202,106 @@ the corpus benchmark, not a substitute for it.
 **Whether the exponent is realistic.** Word frequencies sit near `s = 1`, but
 that is measured over a vocabulary of tens of thousands. The same exponent over
 28 tokens is a different distribution with the same name.
+
+
+RESULT
+------
+Recovery, `(arm - none) / (oracle - none)`, at each exponent's best learning
+rate, three seeds.
+
+ zipf_s     none   oracle      gap   spread    on-use   salience
+    0.0    0.464    0.999    0.536    0.161     -0.03      -0.05
+    0.5    0.428    0.999    0.571    0.198     -0.05      -0.04
+    1.0    0.295    0.980    0.684    0.217     -0.34      -0.02
+    1.5    0.000    0.903    0.903    0.160      0.00       0.00
+    2.0    0.000    0.803    0.803    0.321      0.00       0.00
+
+
+THE PREDICTIONS
+----------------
+1. **Recovery for `salience` rises with the exponent -- REFUTED.** It goes
+   -0.05, -0.04, -0.02, 0.00, 0.00. The apparent upward drift is 0.05 across the
+   whole grid against seed spreads of 0.160 to 0.321, so it is not a trend, it is
+   noise. The guess was recovery above 0.2 at the top exponent. It is 0.00, and
+   the 0.00 arrives only because everything below the oracle has collapsed.
+
+2. **Recovery for `on-use` does not rise -- HELD, VACUOUSLY.** It does not rise.
+   Neither does anything else. The prediction was designed as the control half of
+   an asymmetry, and an asymmetry needs one side to move.
+
+3. **The `none` arm improves with the exponent -- REFUTED, AND BACKWARDS.** It
+   was predicted to rise "by a lot" because predictable filler is easier to
+   predict and most positions are filler. It **falls**, 0.464 to 0.000.
+
+   The pre-dispatch control is what made this look safe, and the control was
+   measuring the right quantity and drawing the wrong conclusion from it. Filler
+   self-information does fall, exactly as reported -- 3.485 to 1.707. What does
+   not follow, and what was assumed, is that a more predictable stream is an
+   easier task. See below.
+
+4. **The oracle is almost unmoved -- REFUTED.** 0.999, 0.999, 0.980, 0.903,
+   0.803. It falls by 0.196. The reasoning was that a gate which never stores
+   filler cannot be reached by filler statistics. It is reached anyway, because
+   filler still passes through the READOUT even when it is never written to the
+   memory -- the delta rule learns from every position, gated or not. The gate
+   controls storage, not learning, and that distinction had not been noticed.
+
+
+WHAT ACTUALLY HAPPENED -- the model collapses onto one token
+--------------------------------------------------------------
+Accuracy of exactly 0.000, on every seed, is not a hard task. Chance alone lands
+near the trivial floor. A follow-up probe at the same settings, counting what the
+trained model emits over 30 test sequences:
+
+    zipf_s   accuracy   distinct predictions   share of the commonest
+       0.0      0.700                     40                   12.8%
+       1.0      0.581                     40                   13.6%
+       1.5      0.000                      1                  100.0%
+       2.0      0.000                      1                  100.0%
+
+**At exponent 1.5 and above the model emits token 0 at all 23,040 positions.**
+Not a degraded answer: one answer. Accuracy is zero by construction, because the
+answer alphabet is disjoint from the filler alphabet, so a model that has learned
+to say "the commonest thing" can never be right at a query.
+
+So the bottom two rows of the table measure degeneracy, not gating, and the
+honest usable range is `zipf_s` 0.0 to 1.0. Across that range recovery is flat at
+approximately zero, with every difference inside the seed spread.
+
+
+WHAT THIS SETTLES
+------------------
+**The base-rate diagnosis is not supported.** Note 013 explained the salience
+gate's failure by the base rate: filler is 92% of the sequence and, being
+uniform, is also the most surprising content. Making filler predictable was
+supposed to lift the gate. It does not, anywhere the measurement is meaningful.
+
+That does not make note 013's *measurement* wrong -- queries do fire at 7.6x the
+filler rate -- but its **explanation of why that is not enough** no longer has
+support, and should be read as an unconfirmed hypothesis rather than as the
+reason.
+
+It also sharpens what g8-01 settled. The failure of both gates is now measured
+under two very different filler distributions, which makes "MQAR is the problem"
+a considerably weaker escape route than it was this morning.
+
+
+THE UNPLANNED FINDING, WHICH MATTERS MORE THAN THE PLANNED ONE
+----------------------------------------------------------------
+**Our learning rule collapses onto the modal token under skewed input, and real
+language is skewed.**
+
+The plan of record was: Zipfian synthetic first, then a small real corpus at
+character level, measured against a bigram baseline. That plan just acquired a
+blocker, and acquired it cheaply -- in a 15-job sweep rather than after building a
+corpus pipeline.
+
+Zipf's law for words sits near exponent 1, which is the last column where
+anything works here, and character-level English is more skewed still. So the
+corpus benchmark cannot simply be attempted; the collapse has to be understood
+and handled first. Frequency-normalised learning, a loss that does not reward the
+majority class, and per-token learning-rate scaling are all candidates and none
+is chosen.
+
+**This is the most useful thing the sweep produced and it is not what the sweep
+was for.**

@@ -112,6 +112,32 @@ class LocalMemoryConfig:
             an answer is wanted — and *optional*, because each group emits a
             complete answer by itself. Whether one group's answer alone is good
             enough is the measurement, not an assumption.
+        capture_slots: How many promotions the lasting store may hold at once.
+            0 keeps the original rule — every step that clears the gate is
+            promoted, and nothing is ever displaced.
+
+            **This is the scarcity that note 010 left out.** Synaptic capture is
+            competitive: tagged synapses contend for a finite pool of
+            plasticity-related proteins and most of them lose. We built the tag
+            and the later signal and gave the pool no limit.
+
+            It matters because a threshold fires at a *rate*, so promotions grow
+            with sequence length, so the number of things superposed grows, so
+            retrieval — which goes as `sqrt(d / N)` — decays with length. That is
+            g8-01's measured result: recovery fell from 0.05 at seq 192 to −0.00
+            at 1536. The oracle wins by holding `N` **constant**, and a fixed
+            number of slots is the only tried mechanism that also does.
+
+            It is also why the base rate stops mattering. A bar drowns when 92%
+            of the sequence is filler, because 92% of a large number is large. A
+            budget of `k` promotes `k` things whatever the base rate.
+
+            A slot costs `w + 1` numbers — this node's own slice of a retrieval,
+            plus the **token id**. Not the key vector: with `derived_keys` the key
+            is regenerated from `(seed, token)`, and without that a width-1 node
+            could not afford a single slot. See
+            docs/notes/015-we-implemented-the-tag-and-not-the-competition.md,
+            where the first version of the arithmetic was wrong.
         salience: How many standard deviations of surprise a step must carry
             before consolidation fires. 0 keeps the original rule — consolidate
             whenever the previous prediction was right — which
@@ -233,6 +259,7 @@ class LocalMemoryConfig:
     key_scale: float = 1.0
     key_active: int = 0
     consolidation: float = 0.0
+    capture_slots: int = 0
     salience: float = 0.0
     lasting_cap: float = 0.0
     derived_keys: bool = False
@@ -253,6 +280,11 @@ class LocalMemoryConfig:
             raise ValueError(
                 "derived_keys and key_active both build Wk and would conflict; "
                 "sparse keys have no per-token derivation yet")
+        if self.capture_slots < 0:
+            raise ValueError("capture_slots must not be negative")
+        if self.capture_slots and not self.consolidation:
+            raise ValueError(
+                "capture_slots bounds consolidation and does nothing without it")
         if self.lasting_cap < 0.0:
             raise ValueError("lasting_cap must not be negative")
         if self.salience and not self.lasting_cap:
@@ -500,6 +532,14 @@ class LocalAssociativeMemory:
         # useful by the token that arrives next, and never decayed -- which is
         # the whole difference between it and `memory`.
         lasting = np.zeros((d, d)) if self.config.consolidation else None
+        # Occupied slots, weakest first is not maintained -- the pool is small
+        # enough that a linear scan for the weakest is cheaper than keeping order.
+        # Each entry is (strength, retrieval, key), and `key` is kept here rather
+        # than the token only because the model already holds it; a deployed node
+        # would store the token and re-derive. The COST argument is about what a
+        # node must keep, and that is the token; this is an implementation of the
+        # same thing in a process that already has the key in hand.
+        slots: list = []
         # A running estimate of this node's own typical surprise, so "unusual"
         # means unusual for it rather than against some global constant. Welford,
         # because a two-pass mean is not available to something that has to
@@ -574,7 +614,29 @@ class LocalAssociativeMemory:
                     fires = (deviation > 0.0
                              and abs(step_surprise - mean_surprise)
                              > self.config.salience * deviation)
-                if fires:
+                if fires and self.config.capture_slots:
+                    # COMPETITIVE CAPTURE. Tagging decides who is a candidate;
+                    # the pool decides who wins. Strength is the size of the
+                    # trace being promoted, which is local, available and
+                    # arm-agnostic -- the gate above already applied whatever
+                    # selectivity it has, and this ranks among what it passed.
+                    strength = float(np.linalg.norm(previous_retrieval))
+                    contribution = self.config.consolidation * np.outer(
+                        previous_retrieval, previous_key_for_retrieval)
+                    if len(slots) < self.config.capture_slots:
+                        slots.append((strength, contribution))
+                        lasting += contribution
+                    else:
+                        weakest = min(range(len(slots)),
+                                      key=lambda i: slots[i][0])
+                        if strength > slots[weakest][0]:
+                            # Displacement, not addition. Subtracting the loser
+                            # is what holds N at k -- without it this is a
+                            # threshold gate with extra bookkeeping.
+                            lasting -= slots[weakest][1]
+                            slots[weakest] = (strength, contribution)
+                            lasting += contribution
+                elif fires:
                     lasting += self.config.consolidation * np.outer(
                         previous_retrieval, previous_key_for_retrieval)
                     if self.config.lasting_cap:

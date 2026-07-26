@@ -1,0 +1,77 @@
+name: sweep-g5-02-how-finely-can-it-split
+
+# How finely can a fixed capacity be divided, and does that get harder?
+#
+# g5-01 found a wall with 16-wide machines. Re-reading g4-01 by machine WIDTH
+# rather than machine COUNT showed why: the same 128 dimensions score 0.741 as
+# eight machines and 0.992 as four. So this holds total width fixed at 256 and
+# varies only how finely it is cut, which removes g5-01's confound of growing the
+# network and its capacity together.
+#
+# 90 jobs, 3 seeds each. Costed before dispatch: 11.7 hours serial, worst job
+# (seq_len 384) ~13 minutes. 8 epochs because g5-01 measured that nothing moves
+# after that, not to save time.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/g5_02_how_fine.py"
+      - ".github/workflows/sweep-g5-02.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  splitting:
+    strategy:
+      fail-fast: false
+      matrix:
+        seqlen: [96, 192, 384]
+        partitions: [1, 2, 4, 8, 16, 32]
+        lr: ["0.01", "0.02", "0.05", "0.1", "0.2"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: seq ${{ matrix.seqlen }} P ${{ matrix.partitions }} lr ${{ matrix.lr }}
+        run: python experiments/g5_02_how_fine.py --seqlen ${{ matrix.seqlen }} --partitions ${{ matrix.partitions }} --lr ${{ matrix.lr }} --json out/F-${{ matrix.seqlen }}-${{ matrix.partitions }}-${{ matrix.lr }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g5-02-${{ matrix.seqlen }}-${{ matrix.partitions }}-${{ matrix.lr }}
+          path: out/*.json
+
+  aggregate:
+    needs: [splitting]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g5-02-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 90" | tee summary.txt
+          python tools/summarise_g5_02.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g5-02-summary
+          path: |
+            summary.txt
+            out/*.json

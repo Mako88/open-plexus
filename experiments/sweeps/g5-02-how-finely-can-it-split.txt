@@ -1,0 +1,115 @@
+How finely can a fixed capacity be divided, and does that get harder?
+=====================================================================
+
+Script: experiments/g5_02_how_fine.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+g5-01 found a wall: with machines of 16 slots each, adding more of them stopped
+helping on the longest problem. Sixteen machines got 0.769 where the bar is 0.90,
+and doubling from eight to sixteen bought two percentage points.
+
+Re-reading an earlier experiment answered why. The same 128 slots of capacity
+score 0.741 when split into eight machines and **0.992** when split into four.
+Identical capacity, identical problem -- only the size of each piece differs. So
+the wall is about how SMALL each machine is, not how many there are.
+
+That turns the question into a much better one. Take a fixed amount of capacity
+and cut it into more and more pieces. At some point it breaks. **Does that
+breaking point get worse as problems get harder?**
+
+If it does, then this whole approach buys scale by making machines BIGGER rather
+than by adding MORE of them -- which for a system meant to run on ordinary
+computers scattered across the internet is the thing that matters most.
+
+
+QUESTION
+--------
+Hold total width at 256. Split it P ways -- so each machine gets 256/P
+dimensions -- and find the largest P that still reaches 0.9.
+
+  total width  256 (fixed)
+  P            1, 2, 4, 8, 16, 32   -> machine width 256, 128, 64, 32, 16, 8
+  seq_len      96, 192, 384
+  lr           0.01, 0.02, 0.05, 0.1, 0.2
+  seeds        1, 2, 3
+  budget       8 epochs
+
+**8 epochs, not 16, and that is a measurement rather than a saving.** g5-01
+checkpointed every arm at 8 and 16 and nothing moved by more than 0.014, so the
+second half of its budget bought nothing anywhere. Costed: 11.7 hours serial, 90
+jobs, worst job 13 minutes.
+
+At fixed total width, P and machine width are the same variable seen from two
+ends. That is deliberate: it removes the confound that made g5-01 hard to read,
+where growing the network grew the capacity at the same time.
+
+
+WHAT IS ALREADY KNOWN, AND WHY IT IS NOT ENOUGH
+------------------------------------------------
+  seq 192   machine width 16 works (g5-01: 0.993 at sixteen machines)
+  seq 384   machine width 16 fails (0.769), machine width 32 works (0.992)
+
+Two points, at factor-of-two resolution, from two different sweeps. They are
+consistent with the minimum machine width doubling when the sequence doubles --
+an exponent of **1.0** against the **0.37** that g1-10 measured for TOTAL width --
+and they are equally consistent with anything from about 0.5 upward. That gap
+matters enormously and cannot be closed by staring at the existing numbers.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **The largest usable P falls as the sequence lengthens.** Guess: 32 or more at
+   seq 96, about 16 at seq 192, about 8 at seq 384. That is a halving per
+   doubling.
+
+2. **So minimum machine width grows with an exponent near 1.0**, far worse than
+   the 0.37 for total width. Guess: 0.8 to 1.0.
+
+3. **Therefore the number of useful machines is roughly FIXED, not growing.**
+   Total width needed grows as T^0.37 and machine width as T^0.8-1.0, so their
+   ratio -- the machine count -- *shrinks*. **This is the decisive G5 statement
+   and it is unfavourable:** past some problem size you cannot buy capability by
+   adding machines, only by making each one bigger.
+
+4. **P=1 solves every length tested** (256 undivided, against g1-13's crossing of
+   46.8 at seq 384). The ceiling control: if P=1 ever fails, the total width is
+   too small and every P above it is measuring the wrong thing.
+
+Most likely wrong: (2). If the exponent comes back near 0.37 -- machine width
+scaling like total width -- then machine count is roughly constant with problem
+size rather than shrinking, which is a materially better world and the one to
+distrust. **Check before believing:** that the crossings are not all pinned to
+one grid point, and that P=1 is genuinely at ceiling rather than being rescued by
+a lucky learning rate.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- max P falls with seq_len             -> confirms the wall is machine width and
+                                          quantifies how fast it closes. G5's
+                                          refutation stands and is now specific
+- max P is flat across seq_len         -> machines compound after all; g5-01's
+                                          wall was an artefact of growing the
+                                          network and the problem at once
+- max P is 32 everywhere               -> the grid does not reach the breaking
+                                          point; nothing is measured and finer
+                                          splits are needed
+- P=1 fails anywhere                   -> the ceiling control fails; 256 is too
+                                          narrow for that length and its row must
+                                          be dropped
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+Whether a different DECOMPOSITION escapes the wall. Every machine here owns a
+contiguous block, chosen once, holding a fixed slice of one shared memory. Nothing
+tests overlapping assignments, machines that specialise, or hierarchical grouping
+-- and the wall is a fact about this decomposition rather than about distributed
+computation.
+
+Nor does it revisit bandwidth. If machines must be large, note 009's affordable
+region tightens, since its `d . rate` product uses the FULL width for the key
+broadcast regardless of how it is split.

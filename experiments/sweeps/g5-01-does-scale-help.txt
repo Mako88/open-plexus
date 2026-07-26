@@ -1,0 +1,118 @@
+Does adding machines buy capability, or only capacity?
+======================================================
+
+Script: experiments/g5_01_scaling.py
+Status: PREDICTIONS WRITTEN, HELD until g4-02's matrix clears the runners
+
+
+IN PLAIN TERMS
+--------------
+g4-01 showed that a machine gets better the more company it has: hold one machine
+at 16 slots and grow the network from 2 to 8, and that single machine goes from
+0.861 to 0.949.
+
+That sounds like scale helping, and it is easy to stop there. But the problem was
+held FIXED while the network grew. A bigger team against the same puzzle will of
+course do better. The question that actually matters is whether a bigger team can
+take on a proportionally bigger puzzle -- and nothing so far has asked that.
+
+There is already a reason to worry. g4-01 measured the cost of splitting the work
+up, and that cost was near zero on short problems and large on long ones. If that
+pattern continues, machines get less useful to each other exactly as the problems
+get harder, which is the failure this gate is named for.
+
+
+QUESTION
+--------
+G5's refutation condition, from GOALS: *the margin shrinks with scale.*
+
+g1-10 measured the scaling law for a single unpartitioned model: the width needed
+to solve MQAR grows as **SEQ_LEN^0.37**, roughly a cube root. That exponent was
+measured at P=1 and is the yardstick.
+
+So: fix each machine at 16 dimensions, grow the network, and ask how many
+MACHINES are needed to hold accuracy at 0.9 as the sequence lengthens.
+
+  per-machine width  16 (fixed)
+  P                  1, 2, 4, 8, 16      -> total width 16, 32, 64, 128, 256
+  seq_len            48, 96, 192, 384
+  lr                 0.01, 0.02, 0.05, 0.1, 0.2
+  seeds              1, 2, 3
+  budget             16 epochs, checkpointed
+
+Fit P_crossing against seq_len and compare the exponent to 0.37.
+
+**The lr grid is five wide and deliberately spans both edges g4-01 pinned
+against.** g4-01 chose 0.1 (its top) in some rows and 0.02 (its bottom) in
+others, which means its optimum lay outside the grid in four of six rows. Sweeping
+a parameter on every arm is not enough if the sweep does not contain the answer.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **The exponent is WORSE than 0.37.** g4-01's penalty for eight-way splitting
+   was 0.000 at seq 96 and 0.259 at seq 384 at the same width. If splitting costs
+   more on longer sequences, then machines needed must grow faster than width
+   needed. Guess: 0.45 to 0.6.
+
+2. **But it is still sub-linear** -- comfortably below 1.0. Doubling the problem
+   should not double the machines. If it does, the architecture has no scaling
+   advantage worth the trouble and G5 fails outright.
+
+3. **Single-machine accuracy at the crossing FALLS as the network grows.** At
+   seq 96, eight-way gave one machine 0.949 -- but that was a network with plenty
+   of headroom. At the crossing there is none by construction, so the pooling
+   step should become less optional exactly where the network is largest. This is
+   the prediction that would most complicate the g4-01 story, and it is the one
+   worth wanting to be wrong about.
+
+4. **P=1 fails at every sequence length tested.** A 16-wide model scores 0.833 at
+   seq 48 and 0.559 at seq 96 (g1-13), both under 0.9. So every crossing lies
+   strictly inside the grid rather than at its floor, which is the connection
+   control -- a crossing pinned to the smallest P would mean the grid starts
+   above the answer and no exponent can be fitted.
+
+Most likely wrong: (1). If the exponent comes back AT 0.37, partitioning is free
+with respect to scale, which is the best outcome available here and therefore the
+one to distrust. **Check before believing:** that the crossings are not all
+sitting at the same grid point, which would make the fit an artefact of
+resolution rather than a measurement.
+
+
+A PRECISION LIMIT, STATED UP FRONT
+------------------------------------
+Five grid points at doubling intervals locate a crossing to roughly +/-15% after
+interpolation. Across an 8x range of sequence length that is about +/-0.07 on the
+fitted exponent.
+
+**So this can distinguish 0.37 from 0.6. It cannot distinguish 0.37 from 0.45.**
+If the answer lands in that band the honest report is "consistent with 0.37, not
+resolved", and a finer P grid would be the follow-up rather than a claim.
+
+Writing that down now, before the number exists, because a precision limit
+discovered after seeing the result is indistinguishable from an excuse.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- exponent near or above 1.0    -> G5 FAILS. Machines do not compound; this is a
+                                   small-model curiosity, as GOALS puts it
+- exponent 0.5 to 0.8           -> G5 passes weakly. Scale helps but partitioning
+                                   taxes it, and the tax is quantified
+- exponent indistinguishable
+  from 0.37                     -> partitioning is free with respect to scale.
+                                   Distrust, check the crossings are spread
+- crossings all at one grid
+  point                         -> no exponent can be read; the grid is too
+                                   coarse and this measured nothing
+- P=1 solves any length         -> the grid floor is above the crossing there and
+                                   that length must be dropped from the fit
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+Sixteen machines is not a network. Nothing here tests delay or churn at scale,
+and both were only ever measured on the unpartitioned model. Nor does it touch
+bandwidth: note 009's affordable region is a `d . rate` product and `rate` remains
+unmeasured, so a favourable exponent here says nothing about whether the traffic
+fits a home connection.

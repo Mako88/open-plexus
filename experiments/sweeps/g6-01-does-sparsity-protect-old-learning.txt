@@ -2,7 +2,11 @@ Does sparsity protect old learning from new?
 ============================================
 
 Script: experiments/g6_01_forgetting.py
-Status: REDESIGNED TWICE BY ITS OWN CONTROLS, NOT YET RUN. The headline the
+Status: RUN on Actions, 96/96 cells. **PREDICTIONS 2 AND 3 REFUTED --
+        JOHN WAS RIGHT.** Sparse keys beat dense on retained accuracy at
+        widths 64, 80 and 96, by 0.06 to 0.08. Prediction 4 held for a=8 and
+        a=16 but its stated MECHANISM is wrong, since a=4 helps at widths
+        where its codes cannot separate. Below, the pre-run text. The headline the
         controls already produced is not about sparsity at all: **forgetting
         is a function of WIDTH.** At width 64 the model forgets everything
         (0.779 -> 0.008); at width 240 it forgets nothing (0.927 -> 0.923),
@@ -256,3 +260,88 @@ devices can hold a task within a sequence and then lose it the moment a differen
 body of data arrives, they are not usable, and nothing here tests that. **Does a
 cluster of width-1 devices forget?** is the follow-up, and it is a different
 sweep rather than a wider grid on this one.
+
+
+RESULT
+------
+Retained ABSOLUTE accuracy on task A after training on task B, each arm at its
+own best learning rate, three seeds.
+
+  width    dense    a=4     a=8    a=16      best
+     48    0.004   0.002   0.001   0.012     a=16 (+0.008, but everything is noise here)
+     56    0.051   0.044   0.024   0.001     dense
+     64    0.078   0.160   0.030   0.001     **a=4  (+0.083)**
+     72    0.369   0.269   0.117   0.012     dense
+     80    0.499   0.558   0.331   0.101     **a=4  (+0.059)**
+     96    0.745   0.819   0.577   0.209     **a=4  (+0.074)**
+    112    0.942   0.917   0.767   0.532     dense
+    128    0.996   0.961   0.836   0.599     dense
+
+The learning-rate grid contained its answer.
+
+
+JOHN WAS RIGHT, AND THE BAND MATTERS
+--------------------------------------
+The earlier negative result on sparsity tested interference *within* a sequence.
+John's point was that sparse codes are famous for something else -- protecting old
+learning from new -- and that the within-sequence test did not cover it. It did
+not, and he is right that it helps.
+
+**Sparse keys at a=4 beat dense on retained accuracy at widths 64, 80 and 96**,
+by margins well outside the seed spread. The mechanism is the one he named: a
+sparse retrieved vector means each delta-rule update touches fewer readout
+columns, so learning task B overwrites less of task A.
+
+**But only in the transition band.** Below 56 everything forgets and the
+differences are noise; above 112 dense already retains nearly everything and has
+nothing to gain. Sparsity buys retention exactly where retention is contested.
+
+**How much is it worth?** Dense at 80 retains 0.499 and sparse a=4 retains 0.558;
+dense at 96 retains 0.745. So sparsity at a given width buys roughly a *third* of
+a step up the width grid -- real, and modest. It is not a substitute for capacity.
+
+
+PREDICTION 4 HELD AND ITS MECHANISM IS WRONG
+----------------------------------------------
+The prediction was that sparsity turns harmful where `a x tokens > width`, since
+the codes cannot separate. a=8 and a=16 need 256 and 512 column-slots for at most
+128 columns, and both are worse than dense at every width. So the prediction
+holds.
+
+**But a=4 needs 128 slots and wins at width 64, where only 64 exist.** Its codes
+cannot separate either, and it helps anyway.
+
+So the separation threshold is not the mechanism. What is happening is simpler and
+weaker: **fewer touched columns means less overwriting even without full
+separation.** Partial overlap still leaves some of task A's columns unvisited by
+task B. The benefit is graded rather than switched on at a threshold.
+
+Getting a prediction right for the wrong reason is worth recording as such,
+because the reason is what gets reused.
+
+
+THE TRADE, WHICH THE PRE-REGISTERED MEASURE EXISTS TO EXPOSE
+--------------------------------------------------------------
+Sparse arms learn task A *less well* and keep more of it:
+
+    width 64:   dense learns 0.959, keeps 0.078
+                a=4   learns 0.708, keeps 0.160
+
+Ranked by fraction kept, a=4 looks twice as good. Ranked by what actually
+survives -- the pre-registered measure -- it is ahead by 0.083, which is the
+honest figure and a much smaller claim. The fraction would also have crowned a=16
+at width 48, where it "kept" six times what it learned because it learned
+essentially nothing (0.002 to 0.012, both noise).
+
+**That is exactly why the measure was fixed before the run**, and it is the
+second time this project has needed that discipline.
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+The regime tested is four partitions of a 48-to-128 total, which is not where the
+project now lives. g7-02 has since shown that with selective storage, devices of
+ONE dimension work at every sequence length in clusters of tens. **Whether a
+cluster of width-1 devices forgets -- and whether sparsity protects it -- is
+untested**, and it is the question that decides whether tiny devices are usable
+for more than one body of data.

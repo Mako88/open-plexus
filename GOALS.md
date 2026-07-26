@@ -561,6 +561,16 @@ interference there is. The task asks about four pairs; a 384-step sequence store
 383. **Over 98% of the interference comes from bindings no query will ever touch** —
 which makes selective storage the most important untested idea in the project.
 
+**Catastrophic forgetting is a function of width, and sparse keys buy some of it
+back.** [g6-01](experiments/sweeps/g6-01-does-sparsity-protect-old-learning.txt)
+trained on one body of data, then a disjoint one, and re-tested the first. Dense
+keys retain 0.004 at width 48 and 0.996 at 128 — the transition is the whole
+story. **Sparse keys at 4 active dimensions beat dense on retained accuracy at
+widths 64, 80 and 96**, by 0.06–0.08, which is John's hypothesis confirmed: fewer
+touched readout columns means new learning overwrites less of the old. It is worth
+roughly a third of a step up the width grid — real, modest, and not a substitute
+for capacity.
+
 G4 (bandwidth) remains — but G4's central assumption is no longer
 an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the
 global readout, which [note 009](docs/notes/009-splitting-the-memory.md) §4 had

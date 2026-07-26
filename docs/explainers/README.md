@@ -26,6 +26,7 @@ explainer, and saying so is the most useful thing you can do.
 | [07](07-machines-keep-leaving.md) | Machines keep leaving. How bad is that? |
 | [08](08-does-it-fit-down-the-pipe.md) | Does it fit down the pipe? |
 | [09](09-checking-our-homework.md) | Checking our homework |
+| [10](10-the-test-we-nearly-built.md) | The test we nearly built |
 
 More get added as the project introduces new ideas. Anything here that turns out
 to be wrong gets corrected, not softened — same rule as everywhere else.

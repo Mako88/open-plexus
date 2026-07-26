@@ -129,6 +129,15 @@ Consequences:
 
 ## 5. Candidate task families
 
+> **CORRECTED by [note 006](006-verifying-the-reservoir-claims.md) §3.** The
+> row below specifies **a single query**, and that variant is *already solved*
+> by models much weaker than attention — building it would have produced a
+> benchmark everything passes, which is the exact G0 failure this note exists to
+> prevent. The discriminating variant is **multi-query associative recall
+> (MQAR)**: `K` pairs embedded in a sequence, with *all `K`* queried. **`K` is
+> not one dial among four — it is what makes the task discriminating at all.**
+> The recommendation in this section stands with that amendment.
+
 | family | what it demands | reservoir *predicted* to | strong reference | dials |
 |---|---|---|---|---|
 | **Associative recall** — pairs appear, then one is queried | content-addressed retrieval | fail | transformers and LSTMs are documented to solve it | vocabulary size, sequence length, query distance, number of pairs |

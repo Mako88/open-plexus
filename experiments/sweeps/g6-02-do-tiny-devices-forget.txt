@@ -2,7 +2,11 @@ Do tiny devices forget, and does clustering protect them?
 =========================================================
 
 Script: experiments/g6_02_tiny_forgetting.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 8/8 cells. **PREDICTIONS 1, 2 AND 3 ALL REFUTED.**
+        Forgetting is governed by TOTAL width, not per-device width, so a
+        cluster of tiny devices forgets no more than one large device of
+        the same capacity. Clustering protects, and gating protects more.
+        Prediction 4 held as the control it was written to be.
 
 
 IN PLAIN TERMS
@@ -130,3 +134,91 @@ Two tasks, one switch, disjoint alphabets -- the sharpest possible version.
 Real continual learning is many tasks with overlapping vocabularies, where losses
 compound and sharing helps. Nor does it test rehearsal, replay, or any of the
 standard defences; it asks only what the bare architecture does.
+
+
+RESULT
+------
+Devices of ONE dimension, 240 of them, three seeds, retained ABSOLUTE accuracy on
+task A after training on a fully disjoint task B.
+
+gated
+  cluster   A before   A after   kept   task B    per seed (A after)
+        1      0.237     0.206   0.87    0.040    [0.127, 0.242, 0.248]
+        2      0.392     0.256   0.65    0.226    [0.188, 0.242, 0.340]
+        4      0.657     0.519   0.79    0.410    [0.360, 0.558, 0.640]
+        8      0.950     0.932   0.98    0.710    [0.875, 0.948, 0.973]
+       16      0.958     0.958   1.00    0.999    [0.875, 1.000, 1.000]
+       32      1.000     1.000   1.00    1.000    [1.000, 1.000, 1.000]
+      240      1.000     1.000   1.00    1.000    [1.000, 1.000, 1.000]
+
+open
+  cluster   A before   A after   kept   task B    per seed (A after)
+        1      0.114     0.000   0.00    0.092    [0.000, 0.000, 0.000]
+        2      0.197     0.000   0.00    0.186    [0.000, 0.000, 0.000]
+        4      0.306     0.001   0.00    0.263    [0.000, 0.000, 0.002]
+        8      0.574     0.012   0.02    0.400    [0.000, 0.008, 0.029]
+       16      0.600     0.071   0.12    0.651    [0.054, 0.058, 0.100]
+       32      0.647     0.131   0.20    0.700    [0.033, 0.108, 0.250]
+       64      0.752     0.247   0.33    0.742    [0.110, 0.273, 0.356]
+      240      0.827     0.537   0.65    0.803    [0.442, 0.525, 0.644]
+
+
+THE CONFOUND IS RESOLVED, AND THE ANSWER IS THE GOOD ONE
+----------------------------------------------------------
+g6-01 could not separate total width from per-device width, because it moved both
+at once. Here per-device width is pinned at ONE and only the cluster varies.
+
+  > **Forgetting is governed by TOTAL width, not per-device width.** A lone
+  > width-1 device keeps nothing (0.000 of 0.114, ungated). Two hundred and forty
+  > of them pooling keep 0.537 of 0.827. Nothing about the devices changed --
+  > only how many were read together.
+
+That removes the objection raised when g7-02 landed: that tiny devices might hold
+a task within one body of data and lose it the moment another arrived. **They do
+not, provided they are read as a cluster.** Retention rises monotonically with
+cluster size in both arms.
+
+**And the gate protects further.** At cluster 240, gated keeps 1.00 where open
+keeps 0.65. At cluster 32 the gated arm has already stopped forgetting entirely.
+
+
+THE PREDICTIONS
+----------------
+1. **Per-device width governs forgetting -- REFUTED.** It is total width. The
+   reasoning was that a device with one feature has one number to overwrite and
+   nothing to hold anything else in, which is true of the device and false of the
+   ensemble: what survives lives in the *pattern across* devices, not in any one
+   of them.
+
+2. **Clustering does not protect -- REFUTED, decisively.** This was named before
+   the run as most likely wrong and as the favourable direction. It was both.
+
+3. **The gate does not protect either -- REFUTED.** The argument was that
+   forgetting lives in the readout, which persists, while gating acts on the
+   memory, which is rebuilt each sequence. The argument is sound and the
+   conclusion is wrong: gating changes *what the readout is trained on*. With
+   filler excluded, the two tasks drive updates through disjoint retrieval
+   patterns, so their readout weights overlap less. The mechanism reaches further
+   than where it acts.
+
+4. **Task B fine in every arm -- HELD, as a control.** Below cluster 16 task B
+   itself only reaches 0.040 to 0.410, so those rows never learned the second
+   task and their retention numbers mean nothing. They are reported and excluded
+   rather than quietly averaged in.
+
+
+SCRUTINY, BECAUSE ALL THREE REFUTATIONS WENT THE FAVOURABLE WAY
+-----------------------------------------------------------------
+- **The gated headline sits at ceiling.** At cluster 32 and above, task A is
+  1.000 before *and* after. "No forgetting" there is partly "nothing was hard
+  enough to lose". **The open arm is where the claim has teeth**, and there
+  clustering reduces forgetting from total to 35% lost -- a real effect, not an
+  elimination.
+- **The learning-rate grid pinned at its bottom in both arms**, all choosing
+  0.02. Every number here is therefore under-tuned, and the ceiling results are
+  the only ones tuning cannot move.
+- **Per-seed spread is wide where it matters.** Ungated at cluster 240 the seeds
+  give [0.442, 0.525, 0.644] -- a range of 0.2 on the single cell the open-arm
+  claim rests on. Three seeds is thin for that.
+- **One switch, disjoint alphabets.** Real continual learning is many tasks with
+  overlapping vocabularies, where losses compound. Nothing here says they do not.

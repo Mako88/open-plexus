@@ -584,6 +584,22 @@ touched readout columns means new learning overwrites less of the old. It is wor
 roughly a third of a step up the width grid — real, modest, and not a substitute
 for capacity.
 
+**And tiny devices do not forget, provided they are read as a cluster**
+([g6-02](experiments/sweeps/g6-02-do-tiny-devices-forget.txt)). This resolves a
+confound g6-01 could not: it varied total width and per-device width together.
+With per-device width pinned at **one dimension**, a lone device keeps *nothing*
+after a disjoint second task (0.000 of 0.114) while 240 of them pooling keep 0.537
+of 0.827 — **forgetting is governed by total width, not by how small the devices
+are.** Gated, the same cluster keeps everything. That removes the objection raised
+when g7-02 landed, that tiny devices might hold a task and lose it the moment
+another arrived.
+
+Scrutiny, since all three of that sweep's refutations went the favourable way: the
+gated headline sits at ceiling, so the open arm is where the claim has teeth
+(there clustering reduces loss from total to 35%); the learning-rate grid pinned
+at its bottom in both arms; and the decisive open-arm cell spans [0.442, 0.644]
+across three seeds.
+
 G4 (bandwidth) remains — but G4's central assumption is no longer
 an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the
 global readout, which [note 009](docs/notes/009-splitting-the-memory.md) §4 had

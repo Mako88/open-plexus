@@ -1,17 +1,33 @@
-"""Is the reward-recall task answerable, and is it non-trivially so?
+"""Is the reward-recall task answerable, and is there room between floor and ceiling?
 
 Run BEFORE anything is measured on this task. [Note 006](../docs/notes/006-verifying-the-reservoir-claims.md)
 exists because a benchmark was adopted without this check and turned out to be
 already solved in the variant specified.
 
-Three numbers, and all three have to land where they should:
+**The first configuration failed this check**, and it is worth recording how,
+because the number that failed looked excellent:
 
-  trivial floor       1 / n_values -- what guessing gives
-  frozen substrate    an untrained model. Must sit AT the floor, or the task is
-                      answerable without learning anything
-  oracle-gated        a model told which bindings matter. Must reach high, or
-                      the task is not answerable at all and no mechanism result
-                      measured on it means anything
+    trivial floor  0.125    frozen 0.000    trained-ungated 0.999    ORACLE 1.000
+
+An ungated model -- no selectivity of any kind, storing every consecutive pair --
+scored 0.999 against the oracle's 1.000. **A gating experiment needs the gate to
+be worth something**, and there was nothing to recover. Every arm would have
+scored 1.000 and the sweep would have reported a clean, meaningless flat line.
+
+Two causes:
+
+1. **The memory was not under load.** d_model 64, decay 1.0, 8 pairs over 192
+   steps. Nothing had to be forgotten, so nothing had to be chosen.
+2. **Repeat queries answer themselves in autoregressive mode.** The answer
+   follows the query in the stream, so the first query of a cue RE-BINDS it. With
+   two rewarded cues asked three times each, four of six queries were asked about
+   a binding that had just been rewritten a few steps earlier. That is the same
+   trap that killed the first design of the task, wearing a different hat.
+
+So this now searches for a configuration with real headroom rather than asserting
+one, and reports the frozen baseline honestly: an untrained model has `wo = 0`,
+predicts token 0 forever, and scores 0.000 rather than the floor. That is not a
+fair floor -- it is a degenerate model -- and it is labelled as such.
 
     python experiments/g9_01_answerable.py
 """
@@ -30,9 +46,7 @@ from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
 from openplexus.tasks.reward_recall import RewardConfig, dataset  # noqa: E402
 
-BASE = RewardConfig(n_pairs=8, n_rewarded=2, n_cues=32, n_values=8,
-                    seq_len=192, delay=4, seed=20260726)
-D_MODEL, N_TRAIN, N_TEST, EPOCHS, LR, KEY_SCALE = 64, 300, 120, 8, 0.05, 0.5
+N_TRAIN, N_TEST, EPOCHS, LR, KEY_SCALE = 200, 80, 6, 0.05, 0.5
 
 
 def build(config: RewardConfig, count: int, seed: int):
@@ -47,42 +61,79 @@ def build(config: RewardConfig, count: int, seed: int):
         # cue of a REWARDED pair. Reads what no running system can read.
         keep = np.array([i > 0 and kinds[i - 1] == "rewarded"
                          for i in range(len(tokens))])
-        built.append((tokens, targets, scored, keep, sequence.query_positions))
+        built.append((tokens, targets, scored, keep, sequence.query_positions,
+                      sequence))
     return built
 
 
-def score(model, test_set, keep_masks: bool) -> float:
-    right = total = 0
-    for tokens, _, _, keep, queries in test_set:
-        predicted = model.run(tokens, store=keep if keep_masks else None)
-        for q in queries:
-            right += predicted[q] == tokens[q + 1]
-            total += 1
-    return right / total
+def first_asks(entry) -> list[int]:
+    """Query positions asking a cue for the FIRST time.
+
+    A repeat is answerable from the re-binding the previous answer performed, so
+    scoring repeats measures short-term echo rather than retention.
+    """
+    tokens, _, _, _, queries, _ = entry
+    seen: set[int] = set()
+    firsts = []
+    for q in queries:
+        cue = int(tokens[q])
+        if cue not in seen:
+            firsts.append(q)
+            seen.add(cue)
+    return firsts
 
 
-def run(gated: bool, train: bool, seed: int = 1) -> float:
-    train_set = build(BASE, N_TRAIN, seed)
-    test_set = build(BASE, N_TEST, seed + 99_991)
+def measure(config: RewardConfig, d_model: int, decay: float, gated: bool,
+            train: bool, seed: int) -> tuple[float, float]:
+    train_set = build(config, N_TRAIN, seed)
+    test_set = build(config, N_TEST, seed + 99_991)
     model = LocalAssociativeMemory(LocalMemoryConfig(
-        vocab_size=BASE.vocab_size, d_model=D_MODEL, lr=LR,
-        key_scale=KEY_SCALE, decay=1.0, seed=seed))
+        vocab_size=config.vocab_size, d_model=d_model, lr=LR,
+        key_scale=KEY_SCALE, decay=decay, seed=seed))
     if train:
         rng = np.random.default_rng(seed)
         order = np.arange(len(train_set))
         for _ in range(EPOCHS):
             rng.shuffle(order)
             for index in order:
-                tokens, targets, scored, keep, _ = train_set[index]
+                tokens, targets, scored, keep, _, _ = train_set[index]
                 model.run(tokens, targets, scored, learn=True,
                           store=keep if gated else None)
-    return score(model, test_set, gated)
+
+    right = total = right_first = total_first = 0
+    for entry in test_set:
+        tokens, _, _, keep, queries, _ = entry
+        predicted = model.run(tokens, store=keep if gated else None)
+        firsts = set(first_asks(entry))
+        for q in queries:
+            hit = predicted[q] == tokens[q + 1]
+            right += hit
+            total += 1
+            if q in firsts:
+                right_first += hit
+                total_first += 1
+    return right / total, right_first / max(1, total_first)
 
 
-print(f"trivial floor         {BASE.trivial_floor:.3f}")
-for seed in (1, 2, 3):
-    frozen = run(gated=False, train=False, seed=seed)
-    gated = run(gated=True, train=True, seed=seed)
-    open_ = run(gated=False, train=True, seed=seed)
-    print(f"seed {seed}   frozen {frozen:.3f}   trained-ungated {open_:.3f}   "
-          f"trained-ORACLE {gated:.3f}")
+CANDIDATES = [
+    ("as first written", RewardConfig(n_pairs=8, n_rewarded=2, n_cues=32,
+                                      n_values=8, seq_len=192, delay=4,
+                                      seed=20260726), 64, 1.0),
+    ("narrower", RewardConfig(n_pairs=8, n_rewarded=2, n_cues=32, n_values=8,
+                              seq_len=192, delay=4, seed=20260726), 16, 1.0),
+    ("longer + more pairs", RewardConfig(n_pairs=24, n_rewarded=4, n_cues=64,
+                                         n_values=8, seq_len=768, delay=8,
+                                         seed=20260726), 32, 1.0),
+    ("longer + narrow", RewardConfig(n_pairs=24, n_rewarded=4, n_cues=64,
+                                     n_values=8, seq_len=768, delay=8,
+                                     seed=20260726), 16, 1.0),
+]
+
+print(f"{'configuration':<22}{'floor':>7}{'ungated':>9}{'oracle':>8}"
+      f"{'gap':>7}   {'ungated(1st)':>13}{'oracle(1st)':>12}")
+for name, config, d_model, decay in CANDIDATES:
+    ungated, ungated_first = measure(config, d_model, decay, False, True, 1)
+    oracle, oracle_first = measure(config, d_model, decay, True, True, 1)
+    print(f"{name:<22}{config.trivial_floor:>7.3f}{ungated:>9.3f}"
+          f"{oracle:>8.3f}{oracle - ungated:>7.3f}   "
+          f"{ungated_first:>13.3f}{oracle_first:>12.3f}")

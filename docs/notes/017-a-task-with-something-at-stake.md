@@ -31,17 +31,38 @@ something at stake.
    a local delta rule. It has no action selection and no policy gradient, and a
    task requiring those would be measuring their absence.
 
-## The design: cued recall with delayed reward
+## The design as first written, and why it did not survive contact
 
-A sequence presents items. A few are followed by a **reward token**. Later, a
-query asks which item the reward followed.
+The first version had no cues. A sequence presented items, one was followed by a
+reward token, and a query asked which item the reward had followed:
 
-    item_7  item_3  REWARD  item_9  item_2  item_5  REWARD  item_1  ...  QUERY -> ?
+    item_7  item_3  REWARD  item_9  item_2  ...  QUERY -> item_3
 
-- **Items** are drawn from an alphabet, most of them never rewarded.
-- **REWARD** is a distinct token, in the stream, that the agent receives like any
-  other input.
-- **The query** asks for a rewarded item.
+**Reading the first generated sequence killed it.** With one rewarded item every
+query is the same token, and this memory is keyed on the current token — so
+`QUERY` retrieves whatever was last bound to `QUERY`, and the second and third
+queries are answerable by repetition rather than recall. It would have inflated
+every number the task ever produced.
+
+## The design that was built: reward-gated cued recall
+
+Cue→value bindings, some followed after a **delay** by a reward token. Only
+rewarded cues are ever queried.
+
+    b→7   f→3   REWARD   k→9   c→2   REWARD   m→5  ...  f -> 3     c -> 2
+
+- **Bindings** are cue→value pairs, most never rewarded.
+- **REWARD** is a distinct token, in the stream, received like any other input.
+- **Queries** present a cue and ask for its value — and only rewarded cues are
+  ever asked, so the task is to work out from a late signal which bindings will
+  be needed.
+
+Distinct cues are what fixes the repetition hole: each query is a different
+token, so nothing carries over from the last answer.
+
+Filler is drawn from cues the sequence does **not** bind, so a filler token can
+never be byte-identical to a query needing a different answer — the same trap
+MQAR's `spare_keys` exists to avoid, found there the same way.
 
 ### Why this is not the oracle wearing a hat
 
@@ -64,17 +85,17 @@ for four negative results than "the mechanism does not work".
 
 ### The trivial floor
 
-Guessing uniformly among items that appeared: `1 / n_items`. Guessing among the
-rewarded ones requires already knowing which they are, which is the task. The
-floor is computable and must be printed beside every number, as with MQAR.
+Guessing uniformly among values: `1 / n_values`. Computable, and printed beside
+every number this task produces.
 
 ### The difficulty dials
 
-- **delay** between an item and its reward — the core dial, and the one MQAR has
-  no analogue for
-- **reward rate** — how many of the items are rewarded, which sets the base rate
-  that note 013 blamed and g8-02 failed to move
-- **sequence length** and **item alphabet size**, as now
+- **delay** between a binding and its reward — the core dial, and the one MQAR
+  has no analogue for
+- **reward rate**, `n_rewarded / n_pairs` — the base rate note 013 blamed and
+  g8-02 could not move, which is a dial here rather than a fixed property of the
+  generator
+- **sequence length**, **pair count** and **alphabet sizes**, as now
 
 ## What it can settle that MQAR cannot
 
@@ -94,10 +115,53 @@ floor is computable and must be printed beside every number, as with MQAR.
   corpus benchmark is a separate problem and is currently blocked on the collapse
   finding from g8-02.
 
+## The first configuration failed its own answerability check
+
+Written after the design above, and left here rather than folded into it, because
+the failure is more instructive than the design.
+
+The generator was built, its tests passed, and then
+`experiments/g9_01_answerable.py` ran the check
+[note 006](006-verifying-the-reservoir-claims.md) exists to demand:
+
+    trivial floor  0.125     frozen 0.000     trained-ungated 0.999     ORACLE 1.000
+
+**An ungated model — no selectivity of any kind, storing every consecutive pair —
+scored 0.999 against the oracle's 1.000.** There was nothing for a gate to
+recover. Every arm of every sweep would have scored 1.000, and the result would
+have been a clean flat line meaning nothing.
+
+Two causes, and the second is a lesson repeating itself:
+
+1. **The memory was never under load.** `d_model` 64, no decay, 8 pairs over 192
+   steps. Nothing had to be forgotten, so nothing had to be chosen. The whole
+   reason selectivity matters is `SNR = sqrt(d / N)`, and this configuration sat
+   nowhere near the part of that curve where `N` hurts.
+
+2. **Repeat queries answer themselves.** In autoregressive mode the answer
+   follows the query in the stream, so the *first* query of a cue re-binds it.
+   With two rewarded cues asked three times each, four of six queries were about
+   a binding rewritten a few steps earlier. **This is the same trap that killed
+   the first design of this task**, in a different costume: there it was one
+   repeated query token, here it is a repeated query *subject*.
+
+The fix is not a better number, it is a configuration under load plus a scoring
+split: accuracy is now reported separately for **first asks** and for repeats,
+because a repeat measures short-term echo and a first ask measures retention.
+Those are different quantities and averaging them hides the one that matters.
+
+**Also worth recording: `frozen 0.000` is not a floor.** An untrained model has
+`wo = 0`, scores every token zero and predicts token 0 forever — which is a cue,
+never a value, so it is wrong by construction. It is a degenerate model rather
+than a fair baseline, and reporting it as "below the floor" would be a third
+instance of the same mistake this project keeps finding.
+
 ## Status
 
-**Design only. Nothing implemented, nothing measured, no predictions registered.**
-Written before the generator exists so the order is checkable.
+**Design implemented, first configuration REFUTED by its own control, search for
+a workable one in progress. No sweep designed, no predictions registered.** The
+design above was written before the generator existed; this section was written
+after the control ran, and the order is preserved deliberately.
 
 The risk worth naming in advance: **a reward token is trivially detectable**, so a
 gate could learn "store the thing before the obvious marker" without learning

@@ -33,7 +33,11 @@ from experiments.g8_01_real_gate import (  # noqa: E402
     ARMS as BASE_ARMS, BASE, CONSOLIDATION, N_TEST, N_TRAIN, build, run)
 from experiments.harness import emit, parse_args, spread  # noqa: E402
 
-HALF_LIFE = 0.25                 # pinned, mid-range from g7-04
+HALF_LIFE = 0.125                # NOT mid-range: this is where the decline is.
+# g8-03 first ran at 0.25 and could not test its own hypothesis, because g8-01's
+# recovery was ALREADY FLAT there -- 0.00/0.01/-0.02/-0.00 across the four
+# lengths. The 0.05-to-0.00 decline the pool is supposed to flatten lives at
+# 0.125. A grid that freezes the load-bearing axis cannot contain its own answer.
 SEQ_LENS = (192, 384, 768, 1536)
 POOLS = (0, 4, 16)               # 0 is unbounded: g8-01's failing on-use arm
 LEARNING_RATES = (0.02, 0.05, 0.1)

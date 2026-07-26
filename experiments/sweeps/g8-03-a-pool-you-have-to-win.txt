@@ -2,10 +2,15 @@ Does a finite pool hold N constant, and does that recover anything?
 ==================================================================
 
 Script: experiments/g8_03_capture.py
-Status: PREDICTIONS WRITTEN. Script not written, controls not run, nothing
-        dispatched, no number from this grid seen. Recorded in this order
-        because a prediction written after the controls is a weaker test
-        than it looks.
+Status: RUN on Actions, 12/12 cells. **PREDICTION 1 IS UNTESTABLE IN THIS
+        GRID, because of a design error in the grid.** Half-life was pinned
+        at 0.25 -- the value at which g8-01's recovery was ALREADY FLAT. The
+        decline the whole sweep was built to explain lives at half-life
+        0.125. There was no slope to flatten, so the central comparison had
+        nothing to compare. Predictions 2 and 4 held; 3 is unresolvable.
+        Every pool recovers approximately zero.
+        Predictions were written before the script, before the controls and
+        before any number from this grid was seen.
 
 
 WHY THIS EXISTS
@@ -183,3 +188,97 @@ and more promising mechanism, recorded in BACKLOG.md and untouched here.
 **Whether `k` transfers.** The right pool size on a task with four pairs is
 almost certainly not the right size on real data, and nothing here says how it
 scales.
+
+
+RESULT
+------
+Recovery by pool size and sequence length, half-life 0.25, three seeds, each
+length at its best learning rate.
+
+        pool      192      384      768     1536    slope
+   capture-0     0.00     0.01    -0.02    -0.00    -0.01
+   capture-4    -0.01    -0.02    -0.01    -0.00     0.01
+  capture-16     0.00     0.00    -0.02    -0.00    -0.01
+
+Every cell is within 0.02 of zero. Nothing recovers anything.
+
+
+THE DESIGN ERROR, WHICH IS THE MAIN FINDING
+---------------------------------------------
+`capture-0` is unbounded consolidation -- g8-01's failing arm -- and it was put in
+this grid precisely so the comparison would be internal. Its row reads
+0.00 / 0.01 / -0.02 / -0.00.
+
+g8-01's recovery table, at half-life 0.25:
+
+    192   0.25    0.00
+    384   0.25    0.01
+    768   0.25   -0.02
+   1536   0.25   -0.00
+
+**Identical.** Which is a genuine cross-validation -- two grids, different code
+paths, an arm-spec refactor in between, and they agree to three decimals where
+they overlap -- and is also the problem.
+
+The decline that motivated this entire sweep, 0.05 at seq 192 falling to -0.00 at
+1536, comes from g8-01's **half-life 0.125** row:
+
+    192   0.125   0.05
+    384   0.125   0.04
+    768   0.125  -0.00
+   1536   0.125  -0.01
+
+**This grid pinned half-life at 0.25, which is where recovery was already flat.**
+Prediction 1 asks whether a bounded pool flattens a curve that falls. In this
+grid nothing falls, including the unbounded arm it was supposed to be contrasted
+against. There is no slope to remove, so a flat result says nothing about whether
+the pool would have removed one.
+
+The pre-registration named the pinning and defended it: "this asks whether the
+exponent moves recovery at ONE operating point". That defence was about the
+learning rate and the length. **Nobody checked which operating point the effect
+being explained actually lived at**, and the answer was: not this one.
+
+**This is the sweep-that-does-not-contain-its-own-answer failure, arrived at from
+a new direction.** The grid was checked for having enough range in the axes it
+swept and never checked for whether the axis it froze was the load-bearing one.
+
+
+THE PREDICTIONS
+----------------
+1. **A bounded pool does not fall with length while k=0 does -- UNTESTABLE.**
+   Not refuted: untested. Both arms are flat because the configuration has no
+   length dependence to begin with. Scoring this as a refutation would be
+   claiming a measurement that was not made.
+
+2. **Recovery is still small, under 0.25 everywhere -- HELD**, and by a wide
+   margin. Every cell is within 0.02 of zero.
+
+3. **There is an interior optimum in k -- UNRESOLVABLE.** capture-4 and
+   capture-16 differ by 0.00 to 0.02 against seed spreads far larger. No ordering
+   is measurable.
+
+4. **Control: the oracle beats none by more than the seed spread -- HELD** in
+   every cell, so no row is undefined.
+
+
+WHAT IT DOES ESTABLISH
+-----------------------
+A bounded pool recovers nothing at half-life 0.25, at four lengths and three
+learning rates. That is a real negative result at one operating point, and it
+adds a fifth mechanism-configuration to the four already failing.
+
+It does **not** establish that N-constancy fails to do what note 015 argues,
+because the argument is about removing a length-dependence and this grid has
+none.
+
+
+WHAT HAPPENS NEXT
+------------------
+Re-run pinned at **half-life 0.125**, where the decline exists. Same script, same
+arms, one changed constant: 12 jobs, and the contrast prediction 1 needs is
+present by construction.
+
+Recording the order: this correction was identified from the returned data, not
+predicted. The prediction that failed was mine about the grid, not about the
+mechanism.

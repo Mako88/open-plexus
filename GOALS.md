@@ -478,7 +478,7 @@ changed. **g1-08 has now re-measured it with both arms tuned, and the honest pri
 own best scale. Tuning both made the price *worse*: like-for-like at the old
 untuned settings it was 3.0×, so the retracted figure was not conservative but
 unfounded, and landing near the right answer was luck.
-**G5 is unresolved.**
+**G5 is resolved, and it fails — gently, and with a number.**
 [g5-01](experiments/sweeps/g5-01-does-scale-help.txt) fixed each machine at 16
 dimensions and grew the network. Machines compound at 48, 96 and 192 steps — a
 fitted exponent of 0.69 against g1-10's width exponent of 0.37, so partitioning
@@ -514,6 +514,26 @@ and partitioning scales freely; at the high end it falls as `T^-0.63` and the
 approach is bounded. **Those are opposite conclusions and the grid separates them
 not at all** — factor-of-two width steps cannot measure a quantity whose
 interesting range is a factor of two wide.
+
+**[g5-03](experiments/sweeps/g5-03-a-finer-ruler.txt) settles it.** Moving the
+total width from 256 to 240 — a number with divisors where a power of two has
+none — and adding `seq_len 48` at the cheap end took the resolution from ±0.50 to
+±0.14. Minimum machine width grows as **`T^0.67`, range [0.53, 0.81]**, which
+excludes 0.37. So the usable machine count goes as **`T^-0.30`**: to handle a
+problem ten times longer you need machines ~4.7× wider while total capacity grows
+only 2.3×, and the number of machines you can split across **halves**.
+
+That is G5's refutation condition met. It is not a cliff — doubling the problem
+costs about 19% of the machine count — but for a goal whose whole premise is that
+machine *count* is the elastic quantity and machine *size* is fixed by what people
+already own, the elastic quantity is the one that stops helping.
+
+**The most promising unmeasured direction:** the `pooled` criterion is far more
+forgiving — at `seq_len 192` it still works with 6-wide machines where a lone
+machine needs 20 — and g4-01 established that pooling costs only a vocab-sized
+reduction at query positions, not a `d`-sized one every step. If that reduction is
+affordable in deployment, the machine-count limit is much looser than `T^-0.30`.
+Three of its four rows are floor-limited, so no exponent could be fitted here.
 
 G4 (bandwidth) remains — but G4's central assumption is no longer
 an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the

@@ -113,6 +113,19 @@ undetectable from outside, because the result looks carefully measured.
 > doubled relative to the one-sided version
 > ([g1-08](experiments/sweeps/g1-08-the-honest-price.txt)).
 
+**A tool that hard-codes a property of one experiment will be wrong about the
+next one, and the direction of the error is not predictable.** Read the grid.
+
+> *Calibration.* The same reporting tool was wrong three times about the same
+> sweep family. Twice it was over-confident, fitting an exponent through crossings
+> that were bounds. Then, fixed, it was *under*-confident: it computed its own
+> resolution as `log(2) / log(span)` — a factor of two hard-coded from the first
+> sweep's power-of-two widths — and reported `±0.33, UNRESOLVED` for
+> [g5-03](experiments/sweeps/g5-03-a-finer-ruler.txt), whose grid steps are
+> 1.25–1.33× and which actually resolves to `±0.14`. **The under-confident failure
+> is the more dangerous one**: an over-confident number invites checking, while
+> "unresolved" invites another sweep that was never needed.
+
 **A caveat printed next to a number does not attach to the number.** If a value
 is a *bound* — a crossing that sat at the edge of the grid, a run that hit its
 budget — the code has to refuse to use it as a value. Annotating it and computing

@@ -97,10 +97,17 @@ def main() -> int:
                       f"minimum width is only known to be <= "
                       f"{TOTAL_WIDTH // top}. NOT USABLE FOR A FIT.")
                 continue
-            store[seq_len] = TOTAL_WIDTH // top
+            # The interval comes from the ADJACENT GRID POINT, not from halving.
+            # Assuming factor-of-two steps was right for g5-02's grid and wrong
+            # for g5-03's, where the steps near the crossings are 1.25-1.33x --
+            # and it made the tool overstate its own uncertainty by more than
+            # twofold, reporting UNRESOLVED for data that resolves.
+            beaten = [q for q in parts if q > top]
+            floor = TOTAL_WIDTH // beaten[0] if beaten else 0
+            store[seq_len] = (TOTAL_WIDTH // top, floor)
             max_useful[seq_len] = top
             print(f"  {label}: largest usable P {top}, so minimum machine width "
-                  f"is in ({TOTAL_WIDTH // top // 2}, {TOTAL_WIDTH // top}]")
+                  f"is in ({floor}, {TOTAL_WIDTH // top}]")
 
     print()
     # Prefer whichever criterion the grid actually resolved. `alone` is the one
@@ -116,11 +123,12 @@ def main() -> int:
               "be fitted. The others hit the grid floor, which bounds the "
               "minimum width without measuring it.")
     else:
-        print(f"Fitting on the '{criterion}' criterion, "
-              f"{len(fits)} located rows: {fits}")
+        print(f"Fitting on the '{criterion}' criterion, {len(fits)} located "
+              f"rows: " + ", ".join(f"{s}:({lo},{hi}]" for s, (hi, lo)
+                                    in sorted(fits.items())))
         order = sorted(fits)
         xs = [math.log(s) for s in order]
-        ys = [math.log(fits[s]) for s in order]
+        ys = [math.log(fits[s][0]) for s in order]
         n = len(xs)
         mx, my = sum(xs) / n, sum(ys) / n
         denom = sum((x - mx) ** 2 for x in xs)
@@ -129,8 +137,13 @@ def main() -> int:
         # Each width is known only to within a factor of two, so the exponent
         # carries a range rather than a value. Quoting the point estimate alone
         # is how a factor-of-two grid gets published as a scaling law.
+        # Slack is set by the widest bracket the grid actually left around a
+        # crossing, not by an assumed step. The worst case for the slope is the
+        # shortest row sitting at the top of its bracket while the longest sits
+        # at the bottom, or the reverse.
         span = math.log(max(order) / min(order))
-        slack = math.log(2.0) / span if span else float("inf")
+        bracket = max(hi / lo for hi, lo in fits.values() if lo)
+        slack = math.log(bracket) / span if span else float("inf")
         print(f"MINIMUM MACHINE WIDTH grows as seq_len^{alpha:.2f}, and this "
               f"grid resolves it only to +/-{slack:.2f}")
         print(f"  so the exponent lies in "

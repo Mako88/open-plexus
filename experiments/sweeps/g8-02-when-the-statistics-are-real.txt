@@ -2,10 +2,14 @@ Does a gate work when the statistics stop being adversarial?
 ============================================================
 
 Script: experiments/g8_02_zipf_gate.py
-Status: PREDICTIONS WRITTEN, SCRIPT NOT YET WRITTEN, NOT DISPATCHED. Written
-        before the script exists and before any number from this grid has
-        been seen. g8-01 is in flight and its full result is not yet known;
-        only its pre-dispatch controls are, and they are quoted below.
+Status: SCRIPT WRITTEN, CONTROL RUN, NOT DISPATCHED. **The predictions below
+        were written before the script existed and before any number from
+        this grid had been seen** -- the script and the control came after,
+        in that order, and the control's numbers appear further down in a
+        section of their own rather than mixed into the predictions.
+        Recording the order because a prediction written after the controls
+        is a weaker test than it looks.
+        g8-01 is in flight; one sweep matrix runs at a time, so this waits.
 
 
 WHY THIS EXISTS
@@ -120,6 +124,64 @@ WHAT WOULD REFUTE WHAT
                                            013's explanation must be withdrawn
 - the oracle moves                      -> filler is reaching the memory through
                                            a path the gate was believed to close
+
+
+PRE-DISPATCH CONTROL -- the near end of the causal chain
+--------------------------------------------------------
+The hypothesis is a chain: skewed filler -> filler becomes predictable -> filler
+stops clearing the surprise bar -> enrichment improves. The sweep measures the
+far end and costs hours. This measures the near end and costs seconds, and if the
+near end does not move the far end cannot.
+
+**It measures the DATA, not a model.** A first draft replayed the model's inner
+loop to recover a surprise trace, which is the reimplementation pattern that has
+produced three vacuous tests here already -- and it was unnecessary, because the
+claim is about the statistics of the sequences. Unigram self-information,
+`-log p(token)` under the empirical distribution, is the honest floor on what any
+model can find predictable.
+
+Mean self-information by position kind, 40 sequences at seq_len 768:
+
+    filler exponent      filler    query     pair   answer   answer-filler gap
+    uniform               3.485    3.507    4.723    5.938               2.453
+    zipf s=0.5            3.369    3.604    4.771    5.938               2.569
+    zipf s=1.0            2.948    3.933    4.936    5.938               2.990
+    zipf s=1.5            2.304    4.509    5.224    5.938               3.634
+    zipf s=2.0            1.707    5.174    5.556    5.938               4.231
+
+**The precondition holds.** Filler self-information falls monotonically and by
+half, 3.485 to 1.707, while the answer alphabet is untouched at exactly 5.938 --
+which is the design working as intended, since values were deliberately left
+uniform to keep the trivial floor valid. The gap between task content and filler
+widens by 72%.
+
+An unplanned effect, in the same direction: query and pair self-information
+RISE, 3.507 to 5.174 and 4.723 to 5.556. Keys become relatively rarer as filler
+mass concentrates on a few tokens, so task content becomes more surprising as
+well as filler becoming less. The separation improves from both ends at once,
+which was not predicted.
+
+> **The control also disqualifies one of its own columns.** It reported firing
+> rates against a bar set from the overall mean and deviation, and those rates
+> are NOT monotone -- no filler clears the bar at s=0.5 or s=1.0, then 2.1% does
+> at s=2.0, and the answer rate wanders 1.00 / 0.71 / 0.19 / 0.85. The bar moves
+> as the distribution moves, so the columns are not comparable across rows. The
+> apparent "24x enrichment" at s=2.0 is that artefact and is not reported as a
+> finding. Self-information is the measure that survives; the rates are not.
+
+That the unigram measure understates how predictable task content is -- a query's
+answer is predictable from its binding, not from its frequency -- biases AGAINST
+the hypothesis, so the confirmation above is conservative.
+
+
+COST
+----
+15 jobs: 5 exponents x 3 learning rates, each running 3 seeds x 4 arms at
+seq_len 768. Costed from g8-01's measured control at 8.1 minutes per
+(cell, seed) with four arms: about 24 minutes per job, roughly 6 hours serial,
+worst job well inside the 90-minute timeout.
+
+NOT DISPATCHED. g8-01 is in flight and one sweep matrix runs at a time.
 
 
 WHAT THIS CANNOT SETTLE

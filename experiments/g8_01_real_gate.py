@@ -99,11 +99,19 @@ def build(task: MqarConfig, count: int, seed: int):
     return built
 
 
-def run(seq_len: int, half_life: float, lr: float, arm: str, seed: int,
-        train_set, test_set) -> dict:
+def run(task: MqarConfig, half_life: float, lr: float, arm: str, seed: int,
+        train_set, test_set, extra: dict | None = None) -> dict:
+    """One arm, one cell. `task` carries the length and the filler statistics.
+
+    Taking the task rather than a bare length is what lets g8-02 reuse this: the
+    two sweeps ask the same question of different data, and their numbers are
+    only comparable if the arms, the metric and the shared-dataset discipline are
+    literally the same code rather than two copies of it.
+    """
+    seq_len = task.seq_len
     gated, consolidation, salience, cap = ARMS[arm]
     model = LocalAssociativeMemory(LocalMemoryConfig(
-        vocab_size=BASE.vocab_size, d_model=D_MODEL, lr=lr,
+        vocab_size=task.vocab_size, d_model=D_MODEL, lr=lr,
         key_scale=KEY_SCALE, decay=decay_for(seq_len, half_life),
         consolidation=consolidation, salience=salience, lasting_cap=cap,
         seed=seed))
@@ -129,7 +137,7 @@ def run(seq_len: int, half_life: float, lr: float, arm: str, seed: int,
           f"arm={arm:<9} seed={seed}  {accuracy:.3f}", flush=True)
     return dict(condition=f"seq={seq_len} half={half_life} lr={lr} arm={arm}",
                 seed=seed, seq_len=seq_len, half_life=half_life, lr=lr,
-                arm=arm, accuracy=accuracy)
+                arm=arm, accuracy=accuracy, **(extra or {}))
 
 
 def main() -> int:
@@ -150,7 +158,7 @@ def main() -> int:
             for half_life in half_lives:
                 for lr in rates:
                     for arm in ARMS:
-                        records.append(run(seq_len, half_life, lr, arm, seed,
+                        records.append(run(task, half_life, lr, arm, seed,
                                            train_set, test_set))
     emit(records, Path(args.json) if args.json else None)
     return 0

@@ -41,6 +41,7 @@ explainer, and saying so is the most useful thing you can do.
 | [22](22-a-good-story-that-was-wrong.md) | A good story that was wrong |
 | [23](23-the-network-makes-no-difference.md) | The network makes no difference at all |
 | [24](24-the-number-was-a-setting.md) | The number was a setting we picked |
+| [25](25-measuring-it-properly-made-it-worse.md) | Measuring it properly made it worse |
 
 More get added as the project introduces new ideas. Anything here that turns out
 to be wrong gets corrected, not softened — same rule as everywhere else.

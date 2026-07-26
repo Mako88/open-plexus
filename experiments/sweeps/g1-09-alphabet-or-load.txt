@@ -1,0 +1,94 @@
+Is the crossing set by the alphabet or by the load?
+===================================================
+
+Script: experiments/g1_09_alphabet.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+Our rule stores things by layering them into one grid of numbers. The obvious
+worry is crowding: the more you store, the more they smear into each other.
+
+We tested that and it was wrong. Storing four things or sixteen made almost no
+difference to how much room was needed -- and at small sizes, storing MORE was
+actually BETTER.
+
+The replacement guess was that what matters is not how many things you store but
+how many DIFFERENT SYMBOLS exist to store. The symbols come from a fixed
+alphabet that repeats in every sequence, so the crowding is regular rather than
+random -- and a trained reader can learn to cancel regular crowding. What it
+cannot do is tell apart two symbols that are not distinct enough in the space
+available.
+
+That guess has been sitting untested since. This is the test, and it is cheap.
+
+It also matters practically. If room scales with the alphabet, then a system
+meant to handle language -- tens of thousands of words -- needs to know how that
+scales before anyone designs for it.
+
+
+QUESTION
+--------
+g1-06 held n_keys at 32 throughout and found the crossing flat in n_pairs. Sweep
+n_keys instead, at the tuned key_scale from g1-08 rather than the untuned default
+that made the earlier curves unreliable.
+
+  n_keys    8, 16, 32, 64, 128
+  d_model   16, 24, 32, 48, 64
+  key_scale 0.5 (best at widths 24-32 in g1-08; the crossing region)
+  n_pairs   4, fixed
+  5 seeds
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **The crossing GROWS with n_keys.** This is the hypothesis and the whole point.
+   If it is flat, the replacement guess is as wrong as the one it replaced, and
+   we have no account of what sets the crossing at all.
+
+2. It grows roughly LINEARLY, or slower. Distinguishing keys is about their
+   pairwise overlap, and d dimensions can hold d mutually distinguishable
+   directions -- so d proportional to n_keys is the pessimistic reading. Random
+   vectors stay nearly orthogonal at far higher counts than d, so sub-linear is
+   quite possible and would be much better news.
+
+   At n_keys=32 the crossing is 32 (g1-08). Linear predicts 8, 16, 32, 64, 128
+   across the five settings.
+
+3. **A confound is named in advance and cannot be removed.** Raising n_keys also
+   raises the vocabulary, so the readout gets wider and there are more tokens to
+   predict at every position, not just more keys to distinguish. The two cannot
+   be separated in this design. If the crossing moves, "the alphabet sets it" is
+   the honest reading only in the loose sense of alphabet-including-vocabulary.
+   Saying so now rather than after seeing the number.
+
+4. Sub-linear specifically at the top end: the jump from 64 to 128 keys costs
+   less than the jump from 8 to 16 relative to the base. Random directions get
+   cheaper per key as the space fills.
+
+Most likely to be wrong: (2)'s exponent, again. The last two times this project
+predicted a scaling law from a signal-to-noise argument -- g1-06's linear
+interference law -- it was refuted outright. That is a reason to weaken
+confidence in the exponent while keeping confidence in the direction, and to
+treat a flat result as genuinely possible rather than unthinkable.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- crossing grows with n_keys  -> the replacement hypothesis survives; the scaling
+                                 law is the deliverable
+- crossing flat               -> BOTH hypotheses dead. Neither load nor alphabet
+                                 sets the crossing, and we do not know what does.
+                                 That would be the most informative outcome and
+                                 the least comfortable
+- crossing grows FASTER than
+  linear                      -> bad news for the language goal: an alphabet of
+                                 tens of thousands would need a prohibitive width
+- crossing sub-linear         -> good news, and the number to quote for any
+                                 vocabulary estimate
+
+
+RESULT
+------
+(not yet run)

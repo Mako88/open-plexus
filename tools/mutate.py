@@ -30,6 +30,10 @@ BASELINES = ROOT / "openplexus" / "baselines.py"
 INDUCTION = ROOT / "openplexus" / "models" / "induction.py"
 ATTENTION = ROOT / "openplexus" / "models" / "attention.py"
 LOCAL = ROOT / "openplexus" / "models" / "local_memory.py"
+# Experiment code is not usually mutated -- experiments are read once and
+# discarded. This one is, because its generator returned a wrong SET rather
+# than crashing, which is how a sweep becomes a confident wrong answer.
+CHURN = ROOT / "experiments" / "g4_02_machine_churn.py"
 TRANSPORT = ROOT / "openplexus" / "transport.py"
 
 
@@ -53,6 +57,40 @@ class Mutation:
 
 
 MUTATIONS = [
+    Mutation(
+        name="round-a-fractional-machine",
+        breaks="block churn's granularity -- the ORIGINAL bug, which turned a "
+               "request to remove half the width at P=1 into removing all of it "
+               "and reporting 0.000 as a finding about churn",
+        path=CHURN,
+        old="    return removed > 0 and abs(removed / per_group - round(removed / per_group)) < 1e-9",
+        new="    return removed > 0",
+    ),
+    Mutation(
+        name="block-churn-removes-the-wrong-count",
+        breaks="the equal-size control, so the two arms differ in how much they "
+               "remove and any gap between them is size rather than shape",
+        path=CHURN,
+        old="    chosen = rng.choice(groups, size=n // per_group, replace=False)",
+        new="    chosen = rng.choice(groups, size=max(1, n // per_group - 1), replace=False)",
+    ),
+    Mutation(
+        name="block-churn-may-repeat-a-group",
+        breaks="distinctness, so block removes fewer distinct dimensions than "
+               "scattered while appearing to remove the same number",
+        path=CHURN,
+        old="    chosen = rng.choice(groups, size=n // per_group, replace=False)",
+        new="    chosen = rng.choice(groups, size=n // per_group, replace=True)",
+    ),
+    Mutation(
+        name="scattered-churn-is-secretly-block-churn",
+        breaks="the contrast the whole experiment measures -- both arms would "
+               "remove whole machines and the comparison would be an expensive "
+               "way of running one condition twice",
+        path=CHURN,
+        old='    if shape == "scattered":\n        return rng.choice(width, size=n, replace=False)',
+        new='    if shape == "scattered" and False:\n        return rng.choice(width, size=n, replace=False)',
+    ),
     Mutation(
         name="pool-the-error-across-groups",
         breaks="partition independence -- every group's update would read every "

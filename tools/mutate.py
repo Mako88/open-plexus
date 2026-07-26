@@ -142,12 +142,21 @@ MUTATIONS = [
         new="                    \"gv,gd->vgd\", target - parts.sum(0), sliced)",
     ),
     Mutation(
-        name="ignore-the-requested-partition",
-        breaks="reading an answer off one machine, so a measurement of whether "
-               "pooling is load-bearing would silently measure the pool",
+        name="ignore-the-requested-cluster",
+        breaks="reading an answer off one machine or one cluster, so a "
+               "measurement of how small a node can be would silently measure "
+               "the whole network pooled instead",
         path=LOCAL,
-        old="            answer = parts[partition] if partition is not None else parts.sum(0)",
+        old="            answer = parts.sum(0) if members is None else parts[members].sum(0)",
         new="            answer = parts.sum(0)",
+    ),
+    Mutation(
+        name="cluster-may-double-count-a-machine",
+        breaks="the distinctness guard, so a cluster can list the same machine "
+               "twice and count its vote twice, inflating small clusters",
+        path=LOCAL,
+        old="            if len(set(members)) != len(members):",
+        new="            if False:",
     ),
     Mutation(
         name="split-the-retrieved-vector-the-wrong-way",

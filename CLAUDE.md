@@ -409,10 +409,35 @@ So, concretely:
 - **Retire a condition in the same change that adds it.**
 - **When in doubt, ask what would move the goal**, not what would make the
   record more accurate.
+- **A measurement revised twice is no longer the bottleneck.** Stop measuring it
+  and go build the thing it was measuring. Three revisions is a signal about the
+  *measurement* — that it is harder to make fairly than it looks — not about the
+  quantity being measured. Publish the bound, name the caveat as permanent, and
+  move.
+- **Scaffolding that is not labelled scaffolding becomes load-bearing.** A
+  component that exists only because the benchmark needs it gets named as such
+  in the commit that adds it, and checked against the project's own constraints
+  *before* anything is measured on top of it.
 
-> *Calibration.* — unfilled. Record the first stretch of work where the
-> most-changed files were the docs, the tests, and the tooling rather than the
-> thing being built. Count the commits.
+> *Calibration.* Nineteen commits, from `8e1393c` to `a236ab9`: **5,082 lines
+> added, 55 of them in `openplexus/`.** One percent. The rest was sweep notes,
+> explainers and experiment scripts — five successive measurements of a single
+> ratio, which was corrected four times, every correction moving the same way.
+>
+> Every individual round cleared this bar. Each had a prediction written first, a
+> confound that was real, a correction that was necessary, and a build step
+> somewhere in it. **The rule as originally written is local, and a local rule
+> cannot see a run of five.** That is why the two bullets above are counters
+> rather than principles.
+>
+> The deeper cost is what went unbuilt. The model carries a single global readout
+> because MQAR asks for one answer per query, and that readout sums across every
+> dimension — which, once the memory is split across machines, is exactly the
+> globally synchronised step C1 forbids. So four gates were passed and five
+> sweeps run on a model that violates this project's first constraint, and it
+> surfaced in a footnote to the bandwidth arithmetic
+> ([note 009](docs/notes/009-splitting-the-memory.md) §4). Rigour on the wrong
+> question is still the wrong question.
 
 ---
 

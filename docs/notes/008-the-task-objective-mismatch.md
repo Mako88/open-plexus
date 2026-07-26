@@ -84,6 +84,16 @@ literature.
 
 The symptom stands. The explanation was decoration.
 
+> **SETTLED LATER, AND THE STRUCK CLAIM WAS RIGHT.**
+> [g1-03](../../experiments/sweeps/g1-03-without-the-hint.txt) trained 60 models.
+> Every single run scored either ~1.00 or ~0.04, with **no intermediate outcome
+> anywhere**. Training either lands in the basin or never approaches it, exactly
+> as the struck claim asserted.
+>
+> Striking it was still correct. It was unsupported when made, and the
+> experiment that could settle it is the one this paragraph said would be
+> required. A claim being true does not make asserting it without evidence right.
+
 ## 3. The reframe: reducible loss, not "signal"
 
 Dropping the overstatement leaves a sharper question, and it is the useful one.

@@ -14,9 +14,24 @@ import unittest
 
 import numpy as np
 
-from openplexus.models.attention import Adam, AttentionConfig, ShiftedAttention
+from openplexus.models.attention import (
+    Adam, AttentionConfig, ShiftedAttention, _gather_offsets,
+)
 
 CFG = AttentionConfig(vocab_size=11, d_model=8, seed=3)
+
+#: Gradient checks run at a deliberately larger init_scale than training uses.
+#:
+#: Finite differences have an absolute noise floor near 1e-10, so the check is
+#: only meaningful where gradients sit well above it. At the training init_scale
+#: of 0.1 the largest gradient entries fall to ~1e-7 and the strict check ends up
+#: measuring the noise rather than the derivation -- which is exactly what
+#: happened when `offset_mix` was added and attenuated the value path.
+#:
+#: The point of a gradient check is to verify the derivation, and the derivation
+#: does not depend on the scale. So it is checked in a regime the instrument can
+#: resolve. Widening the tolerance instead would have hidden the next real bug.
+GRADCHECK_CFG = AttentionConfig(vocab_size=11, d_model=8, seed=3, init_scale=1.0)
 
 
 def a_batch(seed: int = 0, length: int = 9):
@@ -30,7 +45,7 @@ def a_batch(seed: int = 0, length: int = 9):
 
 class TestGradients(unittest.TestCase):
     def _fd_check(self, indices_for, rtol, atol, label):
-        model = ShiftedAttention(CFG)
+        model = ShiftedAttention(GRADCHECK_CFG)
         tokens, targets, scored = a_batch()
         logits, cache = model.forward(tokens)
         _, grads = model.loss_and_backward(logits, cache, targets, scored)
@@ -106,6 +121,70 @@ class TestGradients(unittest.TestCase):
         for name in model.PARAM_NAMES:
             with self.subTest(param=name):
                 self.assertGreater(np.abs(grads[name]).max(), 0.0)
+
+
+class TestValueOffsets(unittest.TestCase):
+    """The dial that removes the architectural hint.
+
+    g1-02 was run with the shift hardcoded, so the model was told where to look.
+    These pin the machinery that lets it be discovered instead.
+    """
+
+    def test_no_offset_lets_a_position_read_its_own_target(self):
+        """The check that made this mechanism safe to add at all.
+
+        An offset of +2 under a strictly-causal mask lets position t attend to
+        s = t-1 and read h[t+1] — its own target. Training would reach a perfect
+        score and mean nothing, and it would look exactly like the result we are
+        hoping for. The mask is pulled back by `reach` to prevent it.
+        """
+        for offsets in ((1,), (0, 1), (0, 1, 2), (-1, 0, 1, 2, 3)):
+            with self.subTest(offsets=offsets):
+                model = ShiftedAttention(AttentionConfig(
+                    vocab_size=9, d_model=4, seed=0, value_offsets=offsets))
+                base = np.array([1, 2, 3, 4, 5, 6, 7, 8])
+                changed = base.copy()
+                changed[5:] = 0
+                a, _ = model.forward(base)
+                b, _ = model.forward(changed)
+                np.testing.assert_allclose(a[:5], b[:5], atol=1e-12)
+
+    def test_output_is_finite_at_every_reach(self):
+        """The first `reach` rows attend to nothing and are all -inf. The nan
+        guard was hardcoded to row 0 while reach was always 1; making offsets
+        configurable made that false and every reach>1 config returned nan."""
+        for offsets in ((1,), (0, 1, 2), (-1, 0, 1, 2, 3)):
+            with self.subTest(offsets=offsets):
+                logits, _ = ShiftedAttention(AttentionConfig(
+                    vocab_size=9, d_model=4, seed=0,
+                    value_offsets=offsets)).forward(np.arange(8))
+                self.assertTrue(np.isfinite(logits).all())
+
+    def test_the_mixture_weights_change_the_output(self):
+        """Rule 6. A mixture the forward pass ignored would leave the model
+        permanently reading whatever offset happened to be first."""
+        model = ShiftedAttention(AttentionConfig(
+            vocab_size=9, d_model=4, seed=0, value_offsets=(0, 1)))
+        tokens = np.array([1, 2, 3, 4, 5, 6])
+        before, _ = model.forward(tokens)
+        model.params["offset_mix"][:] = np.array([5.0, -5.0])
+        after, _ = model.forward(tokens)
+        self.assertGreater(np.abs(before - after).max(), 0.0)
+
+    def test_gathering_reads_the_named_positions(self):
+        h = np.arange(10.0).reshape(5, 2)
+        out = _gather_offsets(h, (0, 1, -1))
+        np.testing.assert_array_equal(out[0], h)
+        np.testing.assert_array_equal(out[1][:-1], h[1:])
+        np.testing.assert_array_equal(out[1][-1], [0.0, 0.0])
+        np.testing.assert_array_equal(out[2][1:], h[:-1])
+        np.testing.assert_array_equal(out[2][0], [0.0, 0.0])
+
+    def test_rejects_duplicate_or_empty_offsets(self):
+        with self.assertRaises(ValueError):
+            AttentionConfig(vocab_size=8, value_offsets=())
+        with self.assertRaises(ValueError):
+            AttentionConfig(vocab_size=8, value_offsets=(1, 1))
 
 
 class TestForwardIsCausal(unittest.TestCase):

@@ -1,0 +1,183 @@
+Does the objective still bootstrap without the architectural hint?
+==================================================================
+
+Script: experiments/g1_03_no_hint.py
+Status: RUN, 5 seeds then 20. Predictions 1, 2 and 4 held. Prediction 3
+        REFUTED -- failure is not graded, it is BIMODAL, and adding candidates
+        makes it LESS likely to fail rather than more.
+
+
+IN PLAIN TERMS
+--------------
+Last time, a model taught itself our memory task perfectly just by predicting
+what came next. But we had quietly helped it: its wiring was built so that
+"look back at where you saw this before, and report what came NEXT" was the
+natural thing for it to do. We handed it the shape of the answer.
+
+This takes the hint away by degrees. Instead of being wired to look one step
+ahead, the model gets several candidate places to look and has to work out for
+itself which one is useful.
+
+If it still succeeds, the earlier result was about the learning method rather
+than about our helpful wiring. If it fails, we learn how much of that result we
+were supplying ourselves -- which is worth knowing before building anything on
+top of it.
+
+
+QUESTION
+--------
+g1-02 hardcoded the value source to offset +1: attending to position s retrieved
+the token at s+1. That is the induction shape, given rather than learned.
+
+`value_offsets` now makes it a learned mixture. Conditions:
+
+  (1,)              the hint, exactly as g1-02. Control.
+  (0, 1)            two candidates. Must learn to prefer +1 over "read the token
+                    you attended to" -- the single most confusable alternative.
+  (-1, 0, 1)        three, including a backwards read.
+  (-1, 0, 1, 2)     four. +2 is causally masked further back, so choosing it
+                    costs reach as well as being wrong.
+  (-2,-1, 0, 1, 2)  five.
+
+Objective is `all` -- pure next-token prediction over every position, random
+filler, exactly the configuration that reached 1.000 in g1-02. 5 seeds each.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. (1,) reproduces 1.000. It is the same model g1-02 ran, reached through the
+   new mixture code with a single weight near 1.0. If it does not reproduce, the
+   refactor changed behaviour and the whole comparison is void. This is the
+   connection control.
+
+2. (0, 1) still reaches high, above 0.9. Two candidates, one useful, and the
+   gradient signal distinguishing them is strong -- offset 0 retrieves the key
+   itself, which predicts nothing, while +1 retrieves the answer.
+
+3. Accuracy falls as candidates are added, but slowly. Guess: ~1.0, ~0.95, ~0.9,
+   ~0.85 across the five conditions. The search is over a handful of scalars, not
+   a hard combinatorial problem.
+
+4. The learned mixture ends up concentrated on +1 in every successful run. This
+   is the mechanistic check: a high score with the weight NOT on +1 would mean
+   the model found some other route and the interpretation is wrong.
+
+Most likely to be wrong: (3). Two ways it could fail that are worth separating
+in advance --
+   (a) accuracy collapses immediately at (0,1), which would mean g1-02's result
+       was mostly the hint and the objective is weaker than it looked;
+   (b) accuracy holds at 1.000 for every condition, which would mean the mixture
+       is trivially easy to learn and this experiment was not a real test. If so
+       the honest follow-up is a harder relaxation -- a second layer, so the
+       shift has to be composed rather than selected.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- (1,) not 1.000            -> refactor broke something; discard the table
+- (0,1) at the floor        -> g1-02's result was substantially the hint
+- all conditions at 1.000   -> the relaxation was too easy to count as removing
+                               the hint; needs a harder version before claiming
+- high score with mixture   -> the model is solving it some other way and our
+  weight not on +1             mechanistic story is wrong
+
+
+
+RESULT
+------
+5 seeds per condition:
+
+value_offsets       query acc          spread  argmax offset
+-------------------------------------------------------------
+(1,)                    1.000       all equal   5/5 chose +1
+(0, 1)                  0.809     0.045-1.000   3/5 chose +1
+(-1, 0, 1)              1.000       all equal   5/5 chose +1
+(-1, 0, 1, 2)           1.000       all equal   5/5 chose +1
+(-2, -1, 0, 1, 2)       1.000       all equal   5/5 chose +1
+
+The (0,1) spread was 0.045-1.000, so the mean is describing a mixture of two
+populations rather than a typical run. Re-run at 20 seeds on the three
+conditions that matter, reporting every seed:
+
+offsets=(1,)         mean 1.000   solved 20/20   stuck  0/20   between  0/20
+     1.00 x20
+offsets=(0, 1)       mean 0.615   solved 12/20   stuck  8/20   between  0/20
+     0.03 0.03 0.04 0.04 0.04 0.04 0.04 0.05 1.00 1.00 1.00 1.00 1.00 1.00
+     1.00 1.00 1.00 1.00 1.00 1.00
+offsets=(-1, 0, 1)   mean 0.951   solved 19/20   stuck  1/20   between  0/20
+     0.02 1.00 x19
+
+
+WHAT HELD
+---------
+1. (1,) reproduces 1.000 at 20/20. The refactor from a hardcoded shift to a
+   learned mixture did not change behaviour, so the comparison is valid.
+
+2. The hint is NOT what produced g1-02's result. Every relaxation still solves
+   the task in the majority of runs, and three of the four solve it in 19/20 or
+   better. **The objective finds the task without being told where to look.**
+
+4. The learned mixture concentrates on +1 in every successful run, across every
+   condition. The mechanistic story holds: the model is doing induction, not
+   finding some other route.
+
+
+REFUTED, AND THIS IS THE FINDING
+---------------------------------
+3. Predicted a gradual decline as candidates were added: ~1.0, ~0.95, ~0.9,
+   ~0.85. Both halves are wrong.
+
+**FAILURE IS BIMODAL, NOT GRADED.** Across 60 runs there is not one intermediate
+outcome. Every run is either ~1.00 or ~0.04. The "between" column is 0/20 in
+every condition. A run either finds the induction solution completely or never
+gets near it.
+
+**AND MORE CANDIDATES IS NOT HARDER.** The failure rate is non-monotonic:
+
+    (1,)          0/20 stuck
+    (0, 1)        8/20 stuck     <- the worst condition, with the FEWEST choices
+    (-1, 0, 1)    1/20 stuck
+
+Adding a third candidate that is useless on its own -- offset -1, reading the
+token before -- takes the failure rate from 40% to 5%. That is the opposite of
+the prediction and it is not a small effect.
+
+**The mechanism is unknown and is recorded as unknown.** A plausible story is
+that offset 0 -- retrieving the key you attended to -- is a plausible-looking
+attractor that predicts nothing, and that with only two candidates a run
+initialised toward it cannot escape. That is a story, not a measurement, and it
+should not be written into the code as if it were understood.
+
+
+WHAT THIS SETTLES THAT WAS PREVIOUSLY UNSUPPORTED
+--------------------------------------------------
+docs/notes/008 §2 struck a claim from an earlier summary -- that the task "has a
+step, not a slope" -- on the grounds that it was a statement about optimisation
+landscapes and nothing had measured one. That was the right call at the time.
+
+**Something has now been trained, and the step is real.** 60 runs, two outcomes,
+nothing between them. Partial retrieval buying partial prediction -- the slope
+the note argued probably existed in output space -- is not what training
+traverses. Training either lands in the basin or it does not.
+
+The note's correction stands as written: the claim was unsupported when made.
+It is supported now, by the experiment the note said would be required.
+
+
+WHAT IT MEANS FOR G1
+---------------------
+This changes the question G1 should ask, and the change is worth acting on.
+
+The plan was: design a local rule, measure how close it gets to 1.000. With
+bimodal outcomes that framing is wrong -- an average over seeds describes a
+mixture of two populations and no individual run, exactly as the (0,1) mean of
+0.615 does above.
+
+**G1 should measure HOW OFTEN a rule finds the solution, not how close it gets.**
+Report solved/stuck counts, not means. A local rule that solves it 3 times in 20
+is a very different result from one that reaches 0.15 every time, and a mean
+would render them identical.
+
+And a caution for expectations: this is a backprop learner with global
+information, and it still fails 40% of the time in one configuration. A local
+rule has strictly less to work with.

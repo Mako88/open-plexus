@@ -35,6 +35,7 @@ explainer, and saying so is the most useful thing you can do.
 | [16](16-signal-that-teaches-nothing.md) | Abundant signal that teaches nothing |
 | [17](17-a-decision-with-the-sign-wrong.md) | A decision with the sign wrong |
 | [18](18-the-one-word-that-decided-it.md) | The one word that decided it |
+| [19](19-all-or-nothing.md) | All or nothing |
 
 More get added as the project introduces new ideas. Anything here that turns out
 to be wrong gets corrected, not softened — same rule as everywhere else.

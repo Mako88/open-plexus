@@ -30,6 +30,25 @@ from dataclasses import dataclass
 import numpy as np
 
 
+def _gather_offsets(h: np.ndarray, offsets: tuple[int, ...]) -> np.ndarray:
+    """Stack shifted copies of `h`, one per offset, zero-padded at the edges.
+
+    `out[j, s] = h[s + offsets[j]]`, or zeros where that falls outside the
+    sequence. Zeros are the honest encoding of "no token there" — wrapping would
+    let the last position read the first, which is not a shift but a leak.
+    """
+    T = len(h)
+    out = np.zeros((len(offsets), *h.shape))
+    for j, offset in enumerate(offsets):
+        if offset > 0:
+            out[j, :-offset] = h[offset:]
+        elif offset < 0:
+            out[j, -offset:] = h[:offset]
+        else:
+            out[j] = h
+    return out
+
+
 @dataclass(frozen=True)
 class AttentionConfig:
     """Shape and training settings.
@@ -39,12 +58,25 @@ class AttentionConfig:
         d_model: Width of embeddings and of the attention projections.
         seed: Determines initialisation completely.
         init_scale: Standard deviation of the initial weights.
+        value_offsets: Which positions the value at `s` may be drawn from,
+            relative to `s`. The model learns a weight per offset and mixes them.
+
+            `(1,)` — the default — hands the model the induction shape: the value
+            at `s` is the token at `s+1`, so attending to `s` retrieves what
+            followed it. That is a **hint**, and g1-02 was run with it.
+
+            `(0, 1)` or `(-1, 0, 1, 2)` remove the hint by degrees: the model
+            must *discover* that `+1` is the useful offset, among alternatives
+            that are not. This is the dial that separates "the objective can find
+            the task" from "the objective can find the task when told where to
+            look".
     """
 
     vocab_size: int
     d_model: int = 32
     seed: int = 0
     init_scale: float = 0.1
+    value_offsets: tuple[int, ...] = (1,)
 
     def __post_init__(self) -> None:
         if self.vocab_size < 2:
@@ -53,6 +85,10 @@ class AttentionConfig:
             raise ValueError("d_model must be at least 1")
         if self.init_scale <= 0.0:
             raise ValueError("init_scale must be positive")
+        if not self.value_offsets:
+            raise ValueError("value_offsets must name at least one offset")
+        if len(set(self.value_offsets)) != len(self.value_offsets):
+            raise ValueError(f"value_offsets has duplicates: {self.value_offsets}")
 
 
 class ShiftedAttention:
@@ -64,10 +100,13 @@ class ShiftedAttention:
     `self.params` and are updated in place by an optimiser.
     """
 
-    PARAM_NAMES = ("embed", "wq", "wk", "wv", "wo")
+    PARAM_NAMES = ("embed", "wq", "wk", "wv", "wo", "offset_mix")
 
     def __init__(self, config: AttentionConfig) -> None:
         self.config = config
+        #: How far ahead the furthest value offset reads. The attention mask is
+        #: pulled back by this much so nothing can reach past the current step.
+        self.reach = max(1, max(config.value_offsets))
         rng = np.random.default_rng(config.seed)
         d, v, s = config.d_model, config.vocab_size, config.init_scale
         self.params: dict[str, np.ndarray] = {
@@ -76,6 +115,16 @@ class ShiftedAttention:
             "wk": rng.normal(0.0, s, (d, d)),
             "wv": rng.normal(0.0, s, (d, d)),
             "wo": rng.normal(0.0, s, (d, v)),
+            # One weight per candidate offset, centred on uniform mixing with
+            # noise added. Centring keeps the value path at full magnitude --
+            # initialising at ~0.1 attenuates it tenfold and visibly slows
+            # training. The noise is what breaks symmetry: exactly equal weights
+            # are a stationary point the gradient cannot leave, and the model
+            # would sit there looking like it had learned nothing about where to
+            # look. With the default (1,) this reduces to a weight near 1.0,
+            # which is the hardcoded shift it replaces.
+            "offset_mix": rng.normal(1.0 / len(config.value_offsets), s,
+                                     (len(config.value_offsets),)),
         }
 
     def forward(self, tokens: np.ndarray) -> tuple[np.ndarray, dict]:
@@ -91,32 +140,48 @@ class ShiftedAttention:
         T = len(tokens)
 
         h = p["embed"][tokens]                       # (T, d)
-        shifted = np.zeros_like(h)
-        shifted[:-1] = h[1:]                         # value source: token at s+1
+        # Value source: a learned mixture over candidate offsets. With the
+        # default (1,) this is exactly "the token at s+1" and the mixture weight
+        # is a scalar Wv absorbs. With several offsets the model must find +1.
+        sources = _gather_offsets(h, self.config.value_offsets)   # (J, T, d)
+        shifted = np.tensordot(p["offset_mix"], sources, axes=(0, 0))
 
         q = h @ p["wq"]
         k = h @ p["wk"]
         v = shifted @ p["wv"]
 
         scores = (q @ k.T) / np.sqrt(d)
-        mask = np.tril(np.ones((T, T), dtype=bool), k=-1)
+        # Position t may attend to s only if every offset it reads from stays at
+        # or before t: s + max(offsets) <= t. With the default offset of +1 this
+        # is the familiar strictly-causal mask.
+        #
+        # This is NOT a detail. An offset of +2 under a k=-1 mask lets position t
+        # attend to s = t-1 and read h[t+1] -- its own target. Training would
+        # reach a perfect score and mean nothing, and it would look exactly like
+        # the result we are hoping for.
+        mask = np.tril(np.ones((T, T), dtype=bool), k=-self.reach)
         scores = np.where(mask, scores, -np.inf)
-        # A row with nothing to attend to (position 0) is all -inf; softmax would
-        # produce nan. Zero it explicitly rather than letting a nan propagate
-        # into the loss, where it would look like divergence.
-        scores[0, :] = 0.0
+        # The first `reach` rows have nothing to attend to and are all -inf;
+        # softmax would produce nan. Zero them explicitly rather than letting a
+        # nan propagate into the loss, where it would look like divergence.
+        #
+        # This was hardcoded to row 0 while `reach` was always 1. Making the
+        # offsets configurable made that assumption false and every reach>1
+        # configuration returned nan -- the same class of bug as the mask above,
+        # found by the same check.
+        scores[:self.reach, :] = 0.0
 
         shifted_max = scores.max(axis=1, keepdims=True)
         exp = np.exp(scores - shifted_max)
         exp = np.where(mask, exp, 0.0)
         denom = exp.sum(axis=1, keepdims=True)
-        denom[0] = 1.0
+        denom[:self.reach] = 1.0
         attn = exp / denom
 
         out = attn @ v
         logits = out @ p["wo"]
         cache = dict(tokens=tokens, h=h, shifted=shifted, q=q, k=k, v=v,
-                     attn=attn, out=out, mask=mask)
+                     attn=attn, out=out, mask=mask, sources=sources)
         return logits, cache
 
     def loss_and_backward(
@@ -166,7 +231,15 @@ class ShiftedAttention:
 
         d_h = d_q @ p["wq"].T + d_k @ p["wk"].T
         d_shifted = d_v @ p["wv"].T
-        d_h[1:] += d_shifted[:-1]          # undo the value shift
+        grads["offset_mix"] = np.tensordot(c["sources"], d_shifted, axes=([1, 2], [0, 1]))
+        # Scatter the value gradient back to the positions each offset read from.
+        for weight, offset in zip(p["offset_mix"], self.config.value_offsets):
+            if offset > 0:
+                d_h[offset:] += weight * d_shifted[:-offset]
+            elif offset < 0:
+                d_h[:offset] += weight * d_shifted[-offset:]
+            else:
+                d_h += weight * d_shifted
 
         np.add.at(grads["embed"], c["tokens"], d_h)
         return float(loss), grads

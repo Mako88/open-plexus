@@ -229,3 +229,70 @@ surprising content in it. **That diagnosis is untested and g8-02 tests it** --
 same arms, same metric, Zipfian filler. If recovery moves there, this result is
 about the benchmark rather than about gating, and this file will need a header
 saying so.
+
+
+CORRECTION -- THE SEQ-1536 ROW IS WITHDRAWN
+=============================================
+Found while auditing assumptions after note 018, and it invalidates the most
+quoted numbers in this file.
+
+**Every one of the nine cells at seq_len 1536 has the `none` arm BELOW the
+trivial floor of 0.34375.** Per seed:
+
+    half   lr      none per seed        mean    above floor?
+     0.5  0.02  0.247/0.199/0.164      0.203       NO
+     0.5  0.05  0.051/0.051/0.021      0.041       NO
+     0.5   0.1  0.004/0.004/0.000      0.003       NO
+    0.25  0.02  0.316/0.255/0.242      0.271       NO
+    0.25  0.05  0.086/0.083/0.074      0.081       NO
+    0.25   0.1  0.010/0.022/0.010      0.014       NO
+   0.125  0.02  0.385/0.304/0.292      0.327       NO
+   0.125  0.05  0.182/0.143/0.151      0.159       NO
+   0.125   0.1  0.034/0.042/0.044      0.040       NO
+
+seq 192, 384 and 768 are all fine -- 9 of 9 cells above the floor at each.
+
+So at 1536 the recovery denominator, `oracle - none`, is the distance between a
+working ceiling and a **broken floor**. That is not an advantage a mechanism
+could recover; it is the gap between something and nothing. **g7-04 caught
+exactly this and this project wrote it down** -- "its largest margin, +0.249 at
+1536, is between two failures, both at/below the 0.344 floor". g8-01 repeated it
+one sweep later.
+
+**And the tool preferred those cells.** The summariser selected the learning rate
+that MAXIMISES `oracle - none`, and a broken floor arm is what maximises it. So
+the reporting rule actively sought out the cells where the floor had failed: at
+1536 it chose lr 0.1, where `none` is 0.003.
+
+Corrected table, with cells whose floor arm is below the trivial floor excluded:
+
+ seq_len  half-life  oracle gap  seed spread    on-use  salience
+     192        0.5       0.041        0.019     -0.02     -0.02
+     192       0.25       0.081        0.022      0.00     -0.01
+     192      0.125       0.212        0.022      0.05      0.04
+     384        0.5       0.092        0.045     -0.03     -0.03
+     384       0.25       0.137        0.035      0.01      0.01
+     384      0.125       0.275        0.054      0.04      0.04
+     768        0.5       0.612        0.152     -0.05     -0.05
+     768       0.25       0.536        0.137     -0.02     -0.05
+     768      0.125       0.538        0.097     -0.00     -0.01
+
+WHAT SURVIVES. The headline is unchanged: **no mechanism recovers the oracle.**
+The largest recovery over the usable range is 0.05 and most cells are at or below
+zero, exactly as before.
+
+**Prediction 3 also survives, with a shorter reach.** Recovery still falls with
+length at every half-life across 192 to 768 -- 0.05 / 0.04 / -0.00 at half-life
+0.125, and similar declines at 0.25 and 0.5. What is withdrawn is the ENDPOINT.
+The decline runs to seq 768, not to 1536.
+
+WHAT IS WITHDRAWN.
+- "the ungated floor falls to 0.000 at 1536" -- true and meaningless; the model
+  is not doing the task there at all
+- "the gap reaches 0.996" -- withdrawn. The largest gap over a usable range is
+  0.612
+- "recovery 0.05 at 192 to -0.00 at 1536" -- restate as 0.05 at 192 to -0.00 at
+  768
+
+Note 015's argument was built on the withdrawn phrasing. Its direction is intact
+-- recovery does fall with length -- but its most dramatic evidence is not.

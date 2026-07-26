@@ -32,7 +32,14 @@ so the number of promotions is a rate times a length:
 
 `N` grows with length, so `SNR` falls with length, so **recovery must fall with
 length**. g8-01 pre-registered that prediction and measured it: 0.05 at seq 192,
-−0.00 at 1536.
+−0.00 at **768**.
+
+> **Corrected.** This note originally cited the decline as running to seq 1536.
+> A later audit found every cell at 1536 has the ungated arm *below the trivial
+> floor* — the denominator there is the gap between a working ceiling and a
+> broken floor, and the row is withdrawn. The decline itself survives across 192
+> to 768 at all three half-lives, so the argument below stands; its most
+> dramatic number does not.
 
 That result was read as "the mechanism fails hardest where it is needed most". It
 is better read as: **a threshold cannot hold `N` constant, and holding `N`

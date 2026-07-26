@@ -24,6 +24,28 @@ import sys
 from collections import defaultdict
 
 
+#: Trivial floor for the MQAR configuration these sweeps use: n_pairs 4,
+#: n_values 8, so `1/n_pairs + (1 - 1/n_pairs)/n_values`.
+#:
+#: A tool that hard-codes a property of one experiment will be wrong about the
+#: next one, and the direction of the error is not predictable -- which this
+#: repository has recorded happening three times in one reporting tool. So it is
+#: named, derived in the open, and checked against the grid it is used on.
+TRIVIAL_FLOOR = 1 / 4 + (1 - 1 / 4) / 8
+
+
+def floor_arm_works(mean_none: float, floor: float = TRIVIAL_FLOOR) -> bool:
+    """Is this cell measuring a difficulty, or two failures?
+
+    A recovery ratio divides by `oracle - none`. If `none` sits at or below the
+    trivial floor, the model with no gate is not doing the task at all, and the
+    denominator is the distance between a working ceiling and a broken floor.
+    That is not an advantage a mechanism could recover; it is the gap between
+    something and nothing.
+    """
+    return mean_none > floor
+
+
 def main() -> int:
     rows = [r for f in glob.glob(sys.argv[1] if len(sys.argv) > 1 else "out/*.json")
             for r in json.load(open(f))]
@@ -72,6 +94,11 @@ def main() -> int:
             if not means:
                 continue
             gap = means["oracle"] - means["none"]
+            if not floor_arm_works(means["none"]):
+                # Not a candidate at any gap. Selecting the largest gap
+                # would otherwise PREFER this cell, because a broken
+                # floor arm is what maximises it.
+                continue
             if best is None or gap > best[0]:
                 best = (gap, spread, means)
         for pool in pools:

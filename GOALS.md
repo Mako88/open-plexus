@@ -589,13 +589,19 @@ arm saturates at capacity 16, so that comparison lives in a narrow band below it
 > having it. Both candidates fail: consolidate-on-confirmed-use, which is tagging
 > and capture, and consolidate-on-surprise, which is the salience gate.
 >
-> And the advantage being forgone is enormous. The oracle scores **0.998–1.000 in
-> every cell**, at every length, while the ungated floor falls from 0.385 at
-> seq 192 to **0.000 at 1536**. The gap reaches **0.996**.
+> And the advantage being forgone is large. The oracle scores **0.998–1.000 in
+> every cell**, at every length, while the ungated arm falls to 0.46 at seq 768.
+> The largest usable gap is **0.612**.
 >
 > **Recovery also falls as sequences get longer** — 0.05 at seq 192, −0.00 at
-> 1536 — so the failure is worst exactly where the gate matters most. That was
+> 768 — so the failure is worst where the gate matters most. That was
 > pre-registered as the outcome that would hurt the most, and it held.
+>
+> *Corrected after an audit:* the seq-1536 row is withdrawn. Every one of its
+> nine cells has the ungated arm **below the trivial floor of 0.344**, so its
+> denominator was the gap between a working ceiling and a broken floor — the
+> same error g7-04 caught and recorded, repeated one sweep later. The headline
+> and the direction are unchanged; the figures 0.000 and 0.996 are not.
 >
 > So the three findings below describe **what a device could do if something told
 > it which of its inputs mattered.** Nothing tried can tell it. They are not

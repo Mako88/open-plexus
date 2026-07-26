@@ -1,0 +1,96 @@
+name: sweep-g1-07-convergence
+
+# Is the crossing a capacity limit or a convergence limit? This decides whether
+# the project's headline number is measuring what it claims to.
+#
+# One job per (width, seed) running to the full budget, scored at checkpoints
+# along the way. Splitting by budget would repeat the same trajectory four times.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/g1_07_convergence.py"
+      - ".github/workflows/sweep-g1-07.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  converge:
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [24, 32, 48]
+        seed: [1, 2, 3, 4, 5, 6]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: width ${{ matrix.width }}, seed ${{ matrix.seed }}
+        run: python experiments/g1_07_convergence.py --width ${{ matrix.width }} --seed ${{ matrix.seed }} --json out/w${{ matrix.width }}-s${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-07-w${{ matrix.width }}-s${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: converge
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g1-07-w*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          {
+            echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 18"
+            echo
+            python - <<'PY'
+          import glob, json
+          rows = [r for f in glob.glob("out/*.json") for r in json.load(open(f))]
+          widths = sorted({r["d_model"] for r in rows})
+          epochs = sorted({r["epoch"] for r in rows})
+          print("mean accuracy by width and training budget")
+          print(f"{'epoch':>7}" + "".join(f"d={w}".rjust(10) for w in widths))
+          for e in epochs:
+              cells = []
+              for w in widths:
+                  rs = [r["accuracy"] for r in rows if r["epoch"] == e and r["d_model"] == w]
+                  cells.append(f"{sum(rs)/len(rs):.3f}".rjust(10) if rs else "-".rjust(10))
+              print(f"{e:>7}" + "".join(cells))
+          print()
+          print("per-seed at the final checkpoint:")
+          last = max(epochs)
+          for w in widths:
+              rs = sorted(r["accuracy"] for r in rows if r["epoch"] == last and r["d_model"] == w)
+              print(f"  d={w:<4} " + " ".join(f"{a:.2f}" for a in rs))
+          print()
+          print("reference points this is being read against:")
+          print("  8 epochs from scratch (g1-06): d=24 0.027  d=32 0.225  d=48 0.910")
+          print("  ablated DOWN to width (g3-01): d=32 0.924  d=48 0.986")
+          PY
+          } | tee summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g1-07-summary
+          path: |
+            summary.txt
+            out/*.json

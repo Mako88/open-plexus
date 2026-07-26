@@ -42,6 +42,8 @@ def parse_args(description: str) -> argparse.Namespace:
                         help="delivery jitter in steps")
     parser.add_argument("--max-delay", type=int, default=4,
                         help="receiver buffer depth in steps")
+    parser.add_argument("--epochs", type=int, default=None,
+                        help="training budget in epochs")
     parser.add_argument("--churn", type=float, default=None,
                         help="fraction of dimensions a departing machine takes")
     parser.add_argument("--drop", type=float, default=None,

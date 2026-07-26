@@ -1,0 +1,110 @@
+Is the crossing a capacity limit or just a convergence limit?
+=============================================================
+
+Script: experiments/g1_07_convergence.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+This decides whether the headline number of this whole project is right.
+
+We reported that a locality-respecting rule needs four to six times more room
+than the unrestricted version. That was the price of running on ordinary
+machines, and it is the number everything else has been argued against.
+
+Then the churn experiment produced something that does not fit. A model shrunk
+DOWN to a small size scored 0.92. A model of that same small size, trained from
+scratch, scored 0.22. Same design, same amount of training, same data. The only
+difference is where it started.
+
+Which raises an uncomfortable possibility. Maybe the small model is not too small
+at all. Maybe it is just SLOW -- and we stopped training before it got there.
+
+If that is what is going on, then "needs four to six times more room" is not
+about room. It is about patience, and the number is measuring the wrong thing.
+
+This is the cheapest possible way to find out: take the small models and train
+them for much longer.
+
+
+QUESTION
+--------
+g1-05 and g1-06 both trained for 8 epochs and located a crossing between widths
+48 and 64. g3-01 then found ablated models reaching 0.924 at surviving width 32
+where from-scratch reaches 0.225.
+
+Only the readout learns; wk and wv are frozen random. A random 32 of 64 random
+columns is statistically just 32 random columns, so both models face the same
+problem with the same tools. The difference must be the readout's starting state.
+
+So: train from scratch at widths 24, 32 and 48 for 8, 16, 32 and 64 epochs.
+6 seeds. Does accuracy climb with budget, or plateau?
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **d=32 climbs substantially with more epochs.** This is the central
+   prediction and I expect it to hold, because the ablated model demonstrates
+   that 0.92 is reachable at that width -- it is an existence proof that the
+   capacity is there. What has not been shown is that a cold start can find it.
+
+2. It gets most of the way there, but perhaps not all. Guess: d=32 reaches
+   0.75-0.92 by 64 epochs, against 0.225 at 8. If it lands short of 0.92 the
+   honest reading is that BOTH effects are real -- some capacity limit and some
+   convergence limit -- and the price of locality is smaller than 4-6x but not
+   zero.
+
+3. d=48 also climbs, from 0.910 toward 0.99. Less dramatically, since it starts
+   much closer.
+
+4. d=24 climbs least. At some width there genuinely is not enough room, and 24
+   is the best candidate for it among those tested -- g1-05 put it at 0.027 and
+   g1-06 at 0.027.
+
+5. The gains are still arriving at 64 epochs rather than flat, at least for
+   d=32. If accuracy is still rising when the budget runs out, no plateau has
+   been demonstrated and the honest answer is "we do not know where it stops".
+
+Most likely to be wrong: (2)'s magnitude, in either direction. And there is a
+real chance of (1) failing outright, which would be the more interesting result:
+if d=32 from scratch plateaus at 0.3 no matter the budget, then the difference
+with the ablated model is NOT about convergence, and something else is being
+carried across the ablation that this project does not currently understand. That
+would need chasing, because "only the readout persists" is a claim the design
+rests on.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- d=32 reaches ~0.92        -> CONVERGENCE limit. The 4-6x price is about
+                               training budget, not room, and g1-05's headline
+                               must be restated
+- d=32 plateaus well below  -> CAPACITY limit stands, AND the ablated model's
+                               0.924 becomes unexplained -- something survives
+                               ablation that we have not accounted for
+- d=32 lands in between     -> both effects real; price smaller than 4-6x and
+                               larger than zero, and the honest number is
+                               whatever the plateau says
+- still climbing at 64      -> no plateau demonstrated; the answer is "unknown,
+                               and here is the lower bound"
+
+
+WHY THIS MATTERS BEYOND THE NUMBER
+------------------------------------
+If the crossing is about convergence, then the comparison in g1-05 was unfair in
+a specific and fixable way: attention and the local rule were given the same
+number of epochs, but they are not the same kind of learner. Attention updates
+every parameter through a global gradient; the local rule updates a readout by a
+delta rule over frozen features. There is no reason those should converge at the
+same rate, and matching epochs rather than matching convergence would compare
+two things at different points on their own curves.
+
+That would be a methodological error rather than an arithmetic one, and worth
+recording as such -- the sort of thing that produces a confidently wrong number
+that no downstream experiment ever contradicts.
+
+
+RESULT
+------
+(not yet run)

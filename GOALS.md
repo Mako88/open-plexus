@@ -397,6 +397,21 @@ In the order they need answering. Each is a question, not a task.
 4. **What fraction of connections crosses the network, and is that a free
    parameter or forced by the design?** G4 turns on this number.
 
+   **Re-asked for the architecture the project actually has**, in
+   [note 009](docs/notes/009-splitting-the-memory.md). The local rule has no
+   fan-out — it has one `d × d` matrix — so the question becomes how to split
+   that matrix. **Splitting by columns forces an all-reduce every step and
+   violates C1; splitting by rows does not**, at the cost of broadcasting the
+   full key vector to every machine. Broadcasting from an origin is impossible at
+   any usable rate; broadcasting as a tree costs `F · d · 4` bytes per machine per
+   step and `log_F(M)` hops of depth — and that depth is exactly what g2-01
+   measured as free. Affordable region on a 10 Mbps upload at fan-out 8 is
+   roughly `d · rate ≤ 40,000`.
+
+   **Still analysis, not measurement**, and the largest untested assumption is
+   that the global readout is a benchmark artefact rather than part of the
+   design.
+
    **Answered in [docs/notes/004](docs/notes/004-the-bandwidth-budget.md), and
    the question named the wrong parameter.** The fraction crossing the network is
    **forced to ~1** under uniform placement — each machine holds 1/31,000th of

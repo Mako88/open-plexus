@@ -165,8 +165,12 @@ out negligible and probably still does, but "probably" is doing work there.
 
 1. ~~**Build the row-split and check it is bit-identical.**~~ **Done.** The
    ownership half is bit-identical and the broadcast half is confirmed to be a
-   real dependency rather than a slack one. What remains untested is the row-split
-   under *delay* — g2-01 covered delivery against the unpartitioned model.
+   real dependency rather than a slack one. **And the row-split under delay is
+   now covered too** (`tests/test_partitioned_delivery.py`): below the buffer
+   bound a scrambled, jittered network leaves the weights bit-identical at P = 1,
+   2, 4 and 8, and past the bound every partition count breaks together. Delivery
+   and partitioning are orthogonal — which was the expectation, and this project
+   has been wrong about two such expectations already.
 2. **Build a version with no global readout** — *partly done.* The readout is now
    partitionable and g4-01 measures the cost. This is not yet note 002's
    per-unit prediction, where each unit predicts its own next input and there is

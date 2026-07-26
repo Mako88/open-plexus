@@ -59,6 +59,22 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="repeats-are-ignored",
+        breaks="recurrence, so every key is queried once however many repeats "
+               "are asked for and consolidation has nothing to pay off against",
+        path=MQAR,
+        old="    query_order = keys * config.queries_per_pair",
+        new="    query_order = keys[:]",
+    ),
+    Mutation(
+        name="repeats-do-not-reserve-room",
+        breaks="the filler count, so the extra queries eat into filler without "
+               "the layout knowing and the sequence silently changes length",
+        path=MQAR,
+        old="    n_queries = config.n_pairs * config.queries_per_pair",
+        new="    n_queries = config.n_pairs",
+    ),
+    Mutation(
         name="task-split-folds-keys-together",
         breaks="well-posedness -- the ORIGINAL bug, which made keys k and k+16 "
                "the same token so 3% of queries had two correct answers",
@@ -186,8 +202,8 @@ MUTATIONS = [
         name="query-only-the-first-pair",
         breaks="the multi-query property that makes the benchmark discriminating",
         path=MQAR,
-        old="    slots = [True] * config.n_pairs + [False] * n_filler",
-        new="    slots = [True] + [False] * (n_filler + config.n_pairs - 1)",
+        old="    slots = [True] * n_queries + [False] * n_filler",
+        new="    slots = [True] + [False] * (n_filler + n_queries - 1)",
     ),
     Mutation(
         name="ignore-the-seed",

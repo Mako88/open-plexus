@@ -1,0 +1,113 @@
+Do tiny devices forget, and does clustering protect them?
+=========================================================
+
+Script: experiments/g6_02_tiny_forgetting.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+g7-02 showed that with selective storage, devices holding **one number** work at
+every problem length tested, in clusters of a few dozen. That is the best news
+this project has produced, and it is about a single body of data.
+
+Real devices see more than one. So the question that decides whether any of it is
+usable: **if a tiny device learns one thing and then meets a different thing, does
+it keep the first?**
+
+We already know large models here forget catastrophically below a certain size --
+total loss at width 48, almost none at 112. What nobody has separated is *which*
+size matters: the size of the whole network, or the size of one device.
+
+
+THE CONFOUND g6-01 CANNOT RESOLVE
+-----------------------------------
+g6-01 varies total width from 48 to 128 while holding partitions at four, so
+per-device width moves with total width, 12 to 32. Its answer is therefore about
+both at once and cannot be split.
+
+That confound is invisible in that sweep and fatal to the question this one asks,
+because the two possibilities point opposite ways:
+
+- **If forgetting is governed by TOTAL width**, a 240-wide network of width-1
+  devices does not forget, and tiny devices are fine.
+- **If it is governed by PER-DEVICE width**, every width-1 device forgets
+  completely, a cluster pools 240 devices that have all forgotten, and tiny
+  devices cannot hold two tasks at all.
+
+Those are opposite conclusions about the central claim, and no measurement
+distinguishes them.
+
+
+QUESTION
+--------
+Hold total width at 240 and put every device at ONE dimension. Train on task A,
+then task B, then re-test A -- at every cluster size.
+
+  total width  240
+  partitions   240, so each device holds one number
+  cluster      1, 2, 4, 8, 16, 32, 64, 240
+  gate         off and oracle
+  lr           0.02, 0.05, 0.1, 0.2
+  seeds        1, 2, 3
+  phases       8 epochs on A, 8 on B; disjoint keys AND values
+  measured     A before B, A after B, B after B
+
+Cluster size is a read-time choice, so one trained model is measured at every
+size -- 24 runs across 8 jobs. Costed: about an hour serial, worst job 7 minutes.
+
+**Figure of merit: retained ABSOLUTE accuracy on A**, as in g6-01. A
+fraction-kept ranking rewards whichever arm learned least.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **Forgetting is governed by per-device width, not total width.** The delta
+   rule updates each group from its own error over its own features, so a device
+   with one feature has one number to overwrite and nothing to hold anything
+   else in. Total width never enters that update.
+
+   So width-1 devices should forget essentially everything, at every cluster
+   size, and the retained accuracy on A should be near chance.
+
+2. **Clustering does not protect.** A cluster pools members that have each been
+   overwritten; pooling forgotten answers gives a forgotten answer. **If a
+   cluster of 240 retains what a single device does not, prediction 1 is wrong
+   and total width matters after all** -- which would be far better news.
+
+3. **The gate does not protect either.** Selective storage acts on the memory,
+   which is rebuilt every sequence; forgetting lives in the readout, which
+   persists. Different mechanisms, so the gate should shift the *level* of task A
+   accuracy without changing how much survives task B.
+
+4. **Task B ends up fine in every arm.** It is trained last, so nothing has
+   overwritten it. The connection control: if B is poor, that arm never learned
+   and its retention number means nothing.
+
+Most likely wrong: (2). It is the favourable direction and the one to distrust --
+if clustering protects, the tiny-device story survives contact with multiple
+tasks, and that is exactly the result this project would most like to see.
+**Check before believing:** that A-before is high in the same arm, since a
+cluster that never learned A cannot be said to have kept it, and that per-seed
+values do not straddle.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- width-1 devices retain A          -> total width governs forgetting. Tiny
+                                       devices survive task switching and the
+                                       g7-02 story holds. Distrust, then check
+- they forget at every cluster size  -> per-device width governs it. Tiny devices
+                                       work within one body of data and cannot
+                                       hold two, which bounds the whole approach
+- retention rises with cluster size  -> partial protection; measure the curve and
+                                       find the cluster size that suffices
+- task B poor in some arm            -> that arm never learned and is excluded
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+Two tasks, one switch, disjoint alphabets -- the sharpest possible version.
+Real continual learning is many tasks with overlapping vocabularies, where losses
+compound and sharing helps. Nor does it test rehearsal, replay, or any of the
+standard defences; it asks only what the bare architecture does.

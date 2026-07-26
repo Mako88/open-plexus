@@ -1,6 +1,9 @@
 """Multi-query associative recall (MQAR) — the G0 benchmark.
 
 The task: a sequence presents `n_pairs` key-value pairs, then queries keys again.
+With `queries_per_pair` above 1 each key is queried several times, so a binding
+that proved useful once can be useful again — which is what makes
+consolidate-on-use measurable at all.
 At each query position the correct output is the value that key was paired with.
 All pairs are queried, which is what makes the task discriminating — the
 single-query variant is solved by architectures much weaker than attention, and
@@ -34,7 +37,29 @@ class MqarConfig:
     no gap at all (docs/notes/001, P3).
 
     Attributes:
-        n_pairs: How many key-value pairs appear, and therefore how many queries.
+        queries_per_pair: How many times each pair is queried. 1 is the original
+            task and reproduces it **bit-identically**, which every result before
+            this depended on.
+
+            **Above 1, relevance recurs, and that is the point.** In the original
+            task each binding is asked about exactly once, at the end — so
+            nothing a system could notice at storage time, and nothing it learns
+            from a query, can ever pay off. A mechanism that consolidates what
+            proved useful has no second occasion to be useful on.
+
+            [Note 010](../../docs/notes/010-tagging-and-capture.md) works through
+            the biological mechanism this blocks — tag a change now, let a later
+            signal decide whether it survives — and concludes that the mechanism
+            is right and this benchmark cannot test it. With repeats, the first
+            query on a key reveals that the binding matters and later queries can
+            benefit, so consolidation-on-use becomes measurable.
+
+            A system that does *not* consolidate scores the same as before: every
+            query is independently as hard as it was. So this adds a way to win
+            without making the original task easier, which is what keeps the two
+            comparable.
+        n_pairs: How many key-value pairs appear, and therefore how many distinct
+            bindings. The number of QUERIES is `n_pairs * queries_per_pair`.
             This is the dial that makes the task discriminating at all, rather
             than one dial among several (docs/notes/006).
         seq_len: Total sequence length. Must leave room for the pairs and their
@@ -70,6 +95,7 @@ class MqarConfig:
     seq_len: int = 64
     n_keys: int = 32
     n_values: int = 16
+    queries_per_pair: int = 1
     filler: str = "structured"
     autoregressive: bool = False
     seed: int = 0
@@ -92,6 +118,8 @@ class MqarConfig:
             )
         if self.n_values < 1:
             raise ValueError("n_values must be at least 1")
+        if self.queries_per_pair < 1:
+            raise ValueError("queries_per_pair must be at least 1")
         if self.seq_len < self.min_seq_len:
             raise ValueError(
                 f"seq_len ({self.seq_len}) is below the minimum "
@@ -102,10 +130,11 @@ class MqarConfig:
     def min_seq_len(self) -> int:
         """Shortest sequence that fits the pairs and their queries.
 
-        Each pair costs two positions to present, plus one to query — or two in
-        autoregressive mode, where the answer follows the question.
+        Each pair costs two positions to present, plus one position per query —
+        or two in autoregressive mode, where the answer follows the question.
         """
-        return self.n_pairs * (4 if self.autoregressive else 3)
+        query_width = 2 if self.autoregressive else 1
+        return self.n_pairs * (2 + query_width * self.queries_per_pair)
 
     @property
     def trivial_floor(self) -> float:
@@ -261,11 +290,16 @@ def generate(config: MqarConfig) -> MqarSequence:
     body_start = len(tokens)
     body_len = config.seq_len - body_start
     query_width = 2 if config.autoregressive else 1
-    n_filler = body_len - config.n_pairs * query_width
+    n_queries = config.n_pairs * config.queries_per_pair
+    n_filler = body_len - n_queries * query_width
 
-    slots = [True] * config.n_pairs + [False] * n_filler
+    # At queries_per_pair == 1 this is the original layout exactly: the same
+    # number of slots and the same list length handed to `shuffle`, so the
+    # generator consumes the random stream identically and every earlier result
+    # still describes the same sequences. Tested rather than asserted.
+    slots = [True] * n_queries + [False] * n_filler
     rng.shuffle(slots)
-    query_order = keys[:]
+    query_order = keys * config.queries_per_pair
     rng.shuffle(query_order)
 
     pending = iter(query_order)

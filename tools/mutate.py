@@ -30,6 +30,7 @@ BASELINES = ROOT / "openplexus" / "baselines.py"
 INDUCTION = ROOT / "openplexus" / "models" / "induction.py"
 ATTENTION = ROOT / "openplexus" / "models" / "attention.py"
 LOCAL = ROOT / "openplexus" / "models" / "local_memory.py"
+SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 # Experiment code is not usually mutated -- experiments are read once and
 # discarded. This one is, because its generator returned a wrong SET rather
 # than crashing, which is how a sweep becomes a confident wrong answer.
@@ -57,6 +58,22 @@ class Mutation:
 
 
 MUTATIONS = [
+    Mutation(
+        name="task-split-folds-keys-together",
+        breaks="well-posedness -- the ORIGINAL bug, which made keys k and k+16 "
+               "the same token so 3% of queries had two correct answers",
+        path=SPLIT,
+        old="    out[is_key] = tokens[is_key] + half * GEN.n_keys",
+        new="    out[is_key] = tokens[is_key] % (GEN.n_keys // 2) + half * GEN.n_keys",
+    ),
+    Mutation(
+        name="task-split-shares-its-values",
+        breaks="disjointness of the value alphabets, so the two tasks answer "
+               "with the same tokens and there is nothing left to forget",
+        path=SPLIT,
+        old="out[is_value] = (BASE.n_keys + half * GEN.n_values",
+        new="out[is_value] = (BASE.n_keys + 0 * GEN.n_values",
+    ),
     Mutation(
         name="sparse-keys-are-not-actually-sparse",
         breaks="sparsity, so a sweep over key_active would measure nothing and "

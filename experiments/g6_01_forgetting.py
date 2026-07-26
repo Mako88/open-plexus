@@ -28,10 +28,13 @@ from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
 from openplexus.tasks.mqar import MqarConfig, dataset  # noqa: E402
 
-# n_values=16 so the alphabet splits cleanly into two disjoint halves of 8.
+# BASE describes the MODEL's vocabulary: two tasks' worth of keys and values.
+# GEN describes what is actually generated -- one task's worth -- which is then
+# shifted into whichever half it belongs to. Generating small and shifting is
+# what keeps the two alphabets disjoint without folding anything together.
 BASE = MqarConfig(n_pairs=4, seq_len=96, n_keys=32, n_values=16,
                   autoregressive=True, filler="random", seed=20260726)
-HALF = 8
+GEN = replace(BASE, n_keys=16, n_values=8)
 N_TRAIN, N_TEST, EPOCHS = 400, 120, 8
 D_MODEL, PARTITIONS, KEY_SCALE = 64, 4, 0.5
 SEEDS = (1, 2, 3)
@@ -40,38 +43,40 @@ SPARSITIES = (0, 32, 16, 8, 4)
 
 
 def remap(tokens: np.ndarray, half: int) -> np.ndarray:
-    """Fold a sequence into one half of BOTH alphabets -- keys and values.
+    """Translate generator tokens into one task's private half of the vocabulary.
 
-    **Keys as well as values, and that is the whole design.** The first version
-    split only the values, leaving A and B sharing the key alphabet. A control
-    run showed both dense and sparse forgetting equally and completely, 0.990 ->
-    0.008 and 0.781 -> 0.010, and the reason is that sparsity separates
-    ADDRESSES: if two tasks address the same keys they retrieve through the same
-    columns, and no amount of sparsity keeps their learning apart.
+    **A bijection, not a fold, and that distinction is the whole correctness of
+    this experiment.** The first version folded the full 32-key alphabet down to
+    16 with a modulo, which quietly made keys `k` and `k + 16` the same token. In
+    600 sampled sequences, *every one* contained two distinct keys that collided,
+    and 82 of 2400 queries ended up with two different correct answers.
 
-    Splitting the keys is what gives the two tasks distinct active columns, which
-    is the only condition under which the mechanism can work at all. Caught by
-    running the control before dispatching, at a cost of two thirty-second runs.
+    That is [g1-01](../experiments/sweeps/g1-01-predictability.txt)'s bug exactly:
+    a benchmark that cannot be answered, producing numbers that look like a
+    result. Caught by checking well-posedness before dispatching, which is the
+    rule that experience wrote.
 
-    Keys occupy `[0, n_keys)` and values `[n_keys, n_keys + n_values)`; each is
-    folded into its own half. Done outside the generator, so the task itself is
-    untouched and every earlier result still describes the same MQAR.
+    So sequences are GENERATED over a small alphabet (`GEN`) and then shifted
+    into a task-specific range of the model's larger vocabulary. Nothing folds,
+    nothing collides, and the two tasks share no token at all.
     """
     out = np.array(tokens)
-    key_half = BASE.n_keys // 2
-    is_key = out < BASE.n_keys
-    out[is_key] = (out[is_key] % key_half) + half * key_half
-
-    lo, hi = BASE.n_keys, BASE.n_keys + BASE.n_values
+    is_key = tokens < GEN.n_keys
+    lo, hi = GEN.n_keys, GEN.n_keys + GEN.n_values
     is_value = (tokens >= lo) & (tokens < hi)
-    out[is_value] = lo + (tokens[is_value] - lo) % HALF + half * HALF
+
+    out[is_key] = tokens[is_key] + half * GEN.n_keys
+    out[is_value] = (BASE.n_keys + half * GEN.n_values
+                     + (tokens[is_value] - lo))
+    # Anything else is padding and belongs to neither task.
+    out[~(is_key | is_value)] = BASE.pad_token
     return out
 
 
 def sequences(half: int, count: int, seed: int):
     """Sequences for one task, as (tokens, targets, scored, query positions)."""
     built = []
-    for sequence in dataset(replace(BASE, seed=seed), count):
+    for sequence in dataset(replace(GEN, seed=seed), count):
         tokens = remap(np.asarray(sequence.tokens), half)
         targets = np.roll(tokens, -1)
         scored = np.ones(len(tokens), dtype=bool)

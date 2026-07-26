@@ -50,8 +50,29 @@ docstring, not in a commit message, not in the README. If it has not been run
 and watched, say so, and say what would settle it. "Should work" and "this
 fixes it" are predictions; label them as such until something confirms them.
 
-> *Calibration.* — unfilled. Record the first claim in this repo that was
-> written confidently and turned out to be false, and how long it stood.
+**This applies to borrowed claims too, and that is where it gets violated.** A
+statement about what someone else measured is a claim about behaviour like any
+other. Read the source before letting it carry a decision — a summary tells you
+what a result *is called*, not what was actually run, and the gap between those
+two is where the expensive errors live. Cite what you read; mark what you only
+summarised; never let the second kind gate a design choice.
+
+The reason this needs saying, when rule 1 arguably covers it already: an
+unverified borrowed claim does not fail like an unverified local claim. A wrong
+claim about our own code gets caught the moment something exercises it. A wrong
+claim about the literature is filed under *established*, sits upstream of every
+experiment, and **no downstream measurement will ever reach it** — because every
+measurement is conditioned on it being true.
+
+> *Calibration.* Two verification passes, two catches, both cheap and both
+> upstream of everything. The evidence recommending our credit-assignment scheme
+> turned out to describe a *supervised* variant this project cannot use
+> ([note 005](docs/notes/005-verifying-the-borrowed-claims.md)). The benchmark
+> chosen to have headroom turned out to be *already solved* in the variant
+> specified — one query rather than many — which is the exact failure the note
+> proposing it was written to prevent
+> ([note 006](docs/notes/006-verifying-the-reservoir-claims.md)). Neither would
+> have been caught by any experiment downstream of it.
 
 **2. Observe the quantity the change claims to move, not a downstream proxy.**
 A green end-to-end run cannot tell you which of six components is working. When
@@ -100,8 +121,18 @@ Ask it of every seam: does this config value change behaviour if I change it?
 Does this cache return something different when populated? Does this parameter
 appear in the result?
 
-> *Calibration.* — unfilled. Record the first mechanism found to be inert: what
-> it appeared to control, what it actually controlled, and for how long.
+> *Calibration.* The MQAR generator's filler drew from the whole key range, so a
+> filler token could be byte-identical to a query token while requiring a
+> different output. The mechanism *appeared* to be creating difficulty —
+> distracting material a model has to learn to discard — and was actually
+> creating **impossibility**: no model could have told the two apart, and the
+> benchmark would have pinned everything at the base rate for a reason having
+> nothing to do with recall. Found in the **first sequence ever generated**, by
+> printing it and reading it, before any test existed. Age: minutes, because it
+> was looked at. Had it not been, every G0 number would have been a measurement
+> of an impossible task, and the flatness would have looked like a result.
+> `test_a_used_key_never_appears_as_filler` now guards it and
+> `filler-collides-with-keys` in `tools/mutate.py` confirms that guard bites.
 
 **7. Distrust any criterion that cancels its own input.** If a decision divides
 by, normalises against, or subtracts something that moves *with* the variable it
@@ -378,23 +409,28 @@ someone who was not there what to do next time. So:
 
 ## Conventions
 
-> **There is no stack yet, and that is deliberate** — the implementation
-> language follows the plan, which follows [GOALS.md](GOALS.md). The conventions
-> below are the ones already decided; the rest fill in as the project acquires
-> the things they govern.
+**Python 3.14, standard library only** for the task and measurement layer — see
+[note 007](docs/notes/007-the-stack-and-the-first-code.md). numpy is *not*
+installed and is not a dependency; adding it is a decision to take on purpose
+when models arrive, not something that creeps in. The consumer-device runtime is
+a separate question and is not decided.
 
+- **Run both checks before every commit:**
+  ```
+  python -m unittest discover -s tests -t . -q
+  python tools/mutate.py
+  ```
+  The second is not optional and not a nice-to-have: **rule 10 is unenforceable
+  without it.** It breaks each named mechanism on purpose and requires the suite
+  to go red; a mutation that survives marks a vacuous region of the test set. It
+  also fails loudly when a refactor moves a line it targets, rather than going
+  quietly green while checking nothing.
 - **New mechanisms default to off**, so existing results stay reproducible and
   the comparison against not-having-it is free.
-- **Run the full check before every commit.** Name the commands here as soon as
-  they exist, so there is never ambiguity about what "the checks" means:
-  ```
-  # <test command>                            — not yet chosen
-  # <lint / typecheck command>                — not yet chosen
-  # <the check that verifies tests can fail>  — not yet chosen
-  ```
-  The third is not optional and is not a nice-to-have: rule 10 is unenforceable
-  without it, and it is the check that caught four vacuous tests in the
-  predecessor project.
+- **Add a mutation when you add a mechanism.** A mechanism with no mutation has
+  tests nobody has seen fail.
+- **A reference implementation stays dependency-free and obviously correct.**
+  Any faster path is asserted against it rather than replacing it.
 - **A check that guards a long job must run in a second, not at the end.** A
   configuration error that kills a twenty-minute run on its first line should be
   caught before launch; a guard that fires when the run finishes has already

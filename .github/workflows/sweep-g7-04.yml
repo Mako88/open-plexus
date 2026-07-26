@@ -1,0 +1,72 @@
+name: sweep-g7-04-when-does-forgetting-pay
+
+# Where does forgetting start to pay, and by how much?
+#
+# Three pre-dispatch controls reframed this sweep. The first found the decay grid
+# meaningless -- an absolute per-step rate means a gentle fade at seq 192 and an
+# erasure at 1536 -- so decay is now set by HALF-LIFE as a fraction of the
+# sequence. The third found that consolidation is monotonically harmful once
+# forgetting is set sensibly, and that FORGETTING ALONE beats not-forgetting at
+# seq 768 (0.672 against 0.526), which is what this now measures.
+#
+# 48 jobs. Costed: 7.2 hours serial, worst job 23 minutes.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  crossover:
+    strategy:
+      fail-fast: false
+      matrix:
+        seqlen: [192, 384, 768, 1536]
+        decay: ["0", "0.5", "0.25", "0.125"]
+        lr: ["0.02", "0.05", "0.1", "0.2"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: seq ${{ matrix.seqlen }} half-life ${{ matrix.decay }} lr ${{ matrix.lr }}
+        run: python experiments/g7_04_crossover.py --seqlen ${{ matrix.seqlen }} --decay ${{ matrix.decay }} --lr ${{ matrix.lr }} --json out/X-${{ matrix.seqlen }}-${{ matrix.decay }}-${{ matrix.lr }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g7-04-${{ matrix.seqlen }}-${{ matrix.decay }}-${{ matrix.lr }}
+          path: out/*.json
+
+  aggregate:
+    needs: [crossover]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g7-04-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 64" | tee summary.txt
+          python tools/summarise_g7_04.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g7-04-summary
+          path: |
+            summary.txt
+            out/*.json

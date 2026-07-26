@@ -31,6 +31,13 @@ VOCAB = int(os.environ.get("OPENPLEXUS_VOCAB_SIZE", "41"))
 SEED = int(os.environ.get("OPENPLEXUS_SEED", "5"))
 STEPS = int(os.environ.get("OPENPLEXUS_STEPS", "60"))
 WINDOW = int(os.environ.get("OPENPLEXUS_WINDOW", "1"))
+# Departure. `absent` names nodes BY INDEX, which is exactly what the slice
+# handshake exists to make meaningful: before it, the driver indexed connections
+# by arrival order, and under a delayed link arrival order is whatever the
+# network decides. A churn measurement taken then would have removed a node
+# chosen at random and reported it as node 0.
+ABSENT = os.environ.get("OPENPLEXUS_ABSENT", "")
+LEAVE_AT = int(os.environ.get("OPENPLEXUS_LEAVE_AT", "0"))
 
 
 def main() -> int:
@@ -48,10 +55,20 @@ def main() -> int:
     with net:
         joined = time.monotonic() - waiting
         started = time.monotonic()
-        predictions = net.run(tokens, window=WINDOW)
+        absent = {int(i) for i in ABSENT.split(",") if i.strip()}
+        predictions = net.run(tokens, window=WINDOW,
+                              absent=absent or None,
+                              leave_at=LEAVE_AT or None)
         elapsed = time.monotonic() - started
 
+    # With nodes departing, agreement with the whole network is NOT expected --
+    # the network really has lost part of its memory. What is reported is where
+    # the answers diverge, and the honest check is that they are identical
+    # BEFORE the departure step and only differ after it. A difference before
+    # `leave_at` means something other than the departure caused it.
     agree = bool(np.array_equal(predictions, expected))
+    early = (0 if not LEAVE_AT
+             else int((predictions[:LEAVE_AT] != expected[:LEAVE_AT]).sum()))
     print(json.dumps({
         "nodes": NODES,
         "d_model": D_MODEL,
@@ -64,8 +81,15 @@ def main() -> int:
         # wrong, and only this separates them.
         "agrees_with_one_process": agree,
         "mismatches": int((predictions != expected).sum()),
+        "absent": sorted({int(i) for i in ABSENT.split(",") if i.strip()}),
+        "leave_at": LEAVE_AT,
+        # Divergence before the departure step. Must be zero whatever else
+        # happens: a departure cannot change an answer that was already given.
+        "mismatches_before_departure": early,
     }), flush=True)
-    return 0 if agree else 1
+    # A run WITH a departure is not required to agree -- it is required not to
+    # diverge early.
+    return 0 if (agree if not LEAVE_AT else early == 0) else 1
 
 
 if __name__ == "__main__":

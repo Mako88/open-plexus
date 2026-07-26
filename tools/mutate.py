@@ -64,6 +64,23 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="departed-nodes-are-not-read-from",
+        breaks="causality and liveness at once. A departure stops a node being "
+               "SENT to; it cannot un-send a vote already transmitted. Dropping "
+               "departed nodes from the read set discards answers still sitting "
+               "in their sockets, so a step never reaches its expected count "
+               "and the run times out BEFORE the departure it was testing. "
+               "Invisible at window 1, where nothing is ever in flight across "
+               "the departure -- which is why every in-process test passed and "
+               "the container testbed found it on the first run combining C1 "
+               "asynchrony with C3 churn",
+        path=DISTRIBUTED,
+        old="            live = [sock for i, sock in enumerate(self._connections)\n"
+            "                    if i not in dead]",
+        new="            live = [sock for i, sock in enumerate(self._connections)\n"
+            "                    if i not in dead and i not in gone]",
+    ),
+    Mutation(
         name="capture-never-displaces",
         breaks="the only thing the pool is for. Without subtracting the loser "
                "this is a threshold gate with extra bookkeeping: N grows with "

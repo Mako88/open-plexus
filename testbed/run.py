@@ -60,6 +60,10 @@ def main() -> int:
     parser.add_argument("--delay", default=None, help="e.g. 80ms")
     parser.add_argument("--jitter", default=None, help="e.g. 20ms")
     parser.add_argument("--loss", default=None, help="e.g. 2%%")
+    parser.add_argument("--absent", default=None,
+                        help="comma-separated node indices that stop answering")
+    parser.add_argument("--leave-at", type=int, default=0,
+                        help="step at which those nodes go silent")
     parser.add_argument("--keep", action="store_true",
                         help="leave containers behind for inspection")
     args = parser.parse_args()
@@ -86,7 +90,9 @@ def main() -> int:
               "-e", f"OPENPLEXUS_NODES={args.nodes}",
               "-e", f"OPENPLEXUS_DRIVER_PORT={PORT}",
               "-e", f"OPENPLEXUS_STEPS={args.steps}",
-              "-e", f"OPENPLEXUS_WINDOW={args.window}"]
+              "-e", f"OPENPLEXUS_WINDOW={args.window}",
+              "-e", f"OPENPLEXUS_ABSENT={args.absent or ''}",
+              "-e", f"OPENPLEXUS_LEAVE_AT={args.leave_at}"]
 
     started = run(["docker", "run", "-d", "--name", DRIVER,
                    "--network", NETWORK, *shared,

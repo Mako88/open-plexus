@@ -326,6 +326,9 @@ class Network:
             send(sock, struct.pack("!i", _RESET))
         predictions = np.zeros(len(tokens), dtype=np.int64)
         gone: set[int] = set()
+        # Connections that have actually hung up, as opposed to nodes we have
+        # stopped sending to. Only these are removed from the read set.
+        dead: set[int] = set()
         pending: dict[int, list] = {}
         expected: dict[int, int] = {}
         sent = settled = 0
@@ -348,14 +351,34 @@ class Network:
             # Read from whichever node is ready. Arrival order is the operating
             # system's business, not ours -- which is the point: the answer must
             # not depend on it.
-            live = [self._connections[i] for i in range(len(self._connections))
-                    if i not in gone]
+            #
+            # **Read from EVERY connection, including departed ones.** `gone`
+            # stops a node being sent to; it cannot un-send a vote already
+            # transmitted. Excluding departed nodes here was a deadlock: with a
+            # window above 1 the driver runs ahead, so a node can have answered
+            # steps 20-29 and then be dropped at step 30 -- and those answers,
+            # still unread in the socket, would never be collected. The step
+            # would never reach its expected count and the run would time out
+            # BEFORE the departure it was testing.
+            #
+            # It was invisible at window 1, where nothing is ever in flight
+            # across the departure, so every in-process test passed. The
+            # container testbed found it in the first run that combined a
+            # window with a departure -- which is C1 and C3 at the same time,
+            # i.e. the only configuration this project actually cares about.
+            live = [sock for i, sock in enumerate(self._connections)
+                    if i not in dead]
             ready, _, _ = select.select(live, [], [], 30.0)
             if not ready:
                 raise TimeoutError(
                     f"no node answered within 30s at step {settled}")
             for sock in ready:
                 message = receive(sock)
+                if not message:
+                    # A real hang-up, not a simulated departure. Stop selecting
+                    # on it or select() returns it ready forever.
+                    dead.add(self._connections.index(sock))
+                    continue
                 (step,) = struct.unpack("!i", message[:4])
                 if step not in pending:
                     continue          # a vote for a step already settled

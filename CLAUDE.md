@@ -283,6 +283,24 @@ Three constraints keep it from bloating into something nobody reads:
 > *Calibration.* — unfilled. Record the first behaviour that had to be
 > re-derived from scratch because nobody wrote it down the first time.
 
+**And externalize it for the non-specialist too.** Every concept the project
+introduces gets a plain-language explainer in `docs/explainers/`, written for
+someone who does not work in this field: no jargon without a definition, no
+number that needs another document to interpret, short enough to read on a
+phone. Rule 13's `IN PLAIN TERMS` paragraph keeps an individual note readable;
+this keeps the *project* readable.
+
+This is not outreach, and it is not a courtesy. **A project its owner cannot
+follow is a project where nobody can tell it that it is wrong.** Every safeguard
+in this document depends on a claim being challengeable, and a claim nobody can
+read cannot be challenged — so the explainers are load-bearing for the method,
+not decoration on top of it. They are also the cheapest available check on
+one's own understanding: an idea that cannot be explained without jargon is
+usually an idea that is not yet understood.
+
+An explainer that stops making sense is a defect in the explainer. Fix it there
+rather than expecting the reader to work harder.
+
 **15. Document the contract, not the implementation.** A doc comment says what
 a caller can rely on. A good one stays true after the internals are rewritten;
 if a rewrite falsifies it, it was describing implementation. Put one on every

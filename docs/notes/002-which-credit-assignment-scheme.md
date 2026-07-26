@@ -205,6 +205,13 @@ options rather than resolving it here:
   G0 gap and the learnability of the predictive objective, and take the
   operating point where both are acceptable. There may be no such point, which
   is itself a finding.
+- **Accept it and use RANDOM filler** — the opposite of what this section
+  originally recommended. See
+  [note 008 §4](008-the-task-objective-mismatch.md): irreducible loss
+  contributes no gradient, so unpredictable filler is a constant added to the
+  objective rather than a competitor for it. Starving the objective of *useless*
+  signal costs nothing. **This section's whole premise had the sign wrong.**
+
 - ~~**Make the noise structured rather than random**, so it is predictable but
   irrelevant.~~ **MEASURED, AND IT DOES NOT WORK** —
   [g1-01](../../experiments/sweeps/g1-01-predictability.txt). It separates the

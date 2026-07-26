@@ -359,7 +359,18 @@ In the order they need answering. Each is a question, not a task.
 
    **It also surfaced a conflict with note 001** that has to be resolved at task
    design time — a noise dial widens the G0 gap but starves a predictive
-   objective. See note 002 §7.
+   objective. See note 002 §7. **Resolved, and the note had the sign backwards:**
+   [note 008 §4](docs/notes/008-the-task-objective-mismatch.md) shows irreducible
+   loss contributes no gradient, so *random* filler is the correct choice and the
+   proposed structured-filler fix was the harmful one. Measured at 0.824
+   predictable versus 0.135 for task content, with 83% of positions being filler.
+
+   **A larger mismatch is open**, argued in
+   [note 008](docs/notes/008-the-task-objective-mismatch.md): MQAR's task content
+   is uniformly random, so the only predictable task-relevant token is the answer,
+   and that is predictable only after retrieval works. Three directions are laid
+   out with a recommendation; **the choice is a project-direction call and has not
+   been made.**
 3. **What is the churn model?** What does "a machine left" mean concretely —
    at what granularity, with what warning, and what is the system's obligation
    when it happens? C3 is currently a principle without a definition.

@@ -1,0 +1,150 @@
+Does a finite pool hold N constant, and does that recover anything?
+==================================================================
+
+Script: experiments/g8_03_capture.py
+Status: PREDICTIONS WRITTEN. Script not written, controls not run, nothing
+        dispatched, no number from this grid seen. Recorded in this order
+        because a prediction written after the controls is a weaker test
+        than it looks.
+
+
+WHY THIS EXISTS
+---------------
+[Note 015](../../docs/notes/015-we-implemented-the-tag-and-not-the-competition.md)
+found that the mechanism this project borrowed was implemented with its selection
+step missing. Synaptic capture is **competitive over a finite pool** of
+plasticity-related proteins -- tagged synapses contend and most lose. Note 010
+took the tag and the later signal and gave the pool no limit.
+
+The argument that this is not a detail is arithmetic:
+
+    retrieval quality  ~  sqrt(d / N)
+
+The oracle wins because it holds `N` **constant** -- filler is never written, so
+the store holds `2 * n_pairs` bindings at any length. A **threshold** fires at a
+rate, so promotions are rate x length, `N` grows with length, and recovery must
+fall with length.
+
+**[g8-01](g8-01-a-gate-without-an-oracle.txt) measured exactly that:** recovery
+0.05 at seq 192 falling to -0.00 at 1536. It was written up as "the mechanism
+fails hardest where it is needed most". Note 015 rereads it as "a threshold sets
+a RATE and the oracle sets a QUANTITY, and no tuning of the bar converts one into
+the other".
+
+A fixed pool of `k` slots sets a quantity. That is the whole hypothesis.
+
+
+WHAT IS BEING TESTED, PRECISELY
+--------------------------------
+Not "does capture work" but **"does holding `N` constant produce the
+length-independence that is the oracle's whole advantage"**.
+
+That makes the SHAPE of the recovery curve the measurement, not its height.
+Recovery could stay flat at 0.02 and still confirm the mechanism does what it was
+built to do while failing to be useful -- and those are different findings that
+must not be merged.
+
+
+THE ARMS
+--------
+  none            store everything, fade by decay              the FLOOR
+  oracle          store only real bindings, read from the task the CEILING
+  capture k=0     unbounded consolidation                      = g8-01's on-use
+  capture k=4     a pool of four
+  capture k=16    a pool of sixteen
+
+The tag is confirmation-on-use throughout, so the ONLY thing varying across the
+capture arms is the size of the pool. Salience is deliberately absent: note 015
+separates tagging from capture, and mixing both dials in one grid would confound
+which one moved anything.
+
+`k=0` is not a control bolted on; it **is** g8-01's failing arm, so this grid
+contains the result it is trying to beat.
+
+
+THE GRID
+--------
+  seq_len     192, 384, 768, 1536     the same lengths as g8-01, so the two
+                                      recovery curves are directly comparable
+  k           0, 4, 16
+  half-life   0.25                    pinned, mid-range from g7-04
+  lr          0.02, 0.05, 0.1
+  seeds       1, 2, 3
+
+12 jobs of (seq_len, lr), five arms x three seeds each. Reported quantity is
+recovery, `(arm - none) / (oracle - none)`, refusing to divide when the oracle's
+advantage is not larger than the seed spread.
+
+
+PREDICTIONS -- written before the script, before the controls, before any run
+------------------------------------------------------------------------------
+1. **Recovery for a bounded pool does NOT fall with sequence length, and the
+   unbounded arm's does.** This is the hypothesis and the only prediction that
+   matters. `k=0` should reproduce g8-01: about 0.05 at 192 falling to about 0.00
+   at 1536. `k=4` and `k=16` should stay roughly flat across the four lengths,
+   whatever height they sit at.
+
+   **The comparison is within this grid**, between capture arms and the k=0 arm
+   beside them, not against g8-01's numbers -- those were measured at a different
+   half-life grid and are not a fair baseline.
+
+2. **Recovery is still small.** Under 0.25 everywhere. Three independent
+   mechanisms have now failed on this task and one architectural fix is a modest
+   lever against that. Stated plainly because it is the unfavourable direction
+   and it is what the evidence supports.
+
+3. **There is an interior optimum in `k`.** Too small discards bindings that were
+   worth keeping; too large is unbounded consolidation with bookkeeping. So k=4
+   and k=16 should not be ordered the same way at every length -- and if one
+   dominates everywhere, the pool size is not doing what the argument says.
+
+4. **Control, expected to hold trivially:** at `seq_len 192`, where the oracle's
+   advantage is smallest, the oracle still beats `none` by more than the seed
+   spread. g8-01 measured that gap at 0.041 against a spread of 0.019, which is
+   defined but not comfortable. If it fails, the shortest row is undefined and the
+   length curve loses its left-hand end -- which would damage prediction 1
+   specifically, since that prediction is about a SHAPE.
+
+Most likely wrong: (1). Not because the arithmetic is wrong -- `N = k` really is
+constant -- but because it assumes the thing limiting a bounded store is the same
+thing limiting an unbounded one. If what actually caps performance is WHICH
+bindings get in rather than how many, then holding the count constant changes
+nothing and the curve stays flat at zero for a reason that has nothing to do with
+the mechanism.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- flat recovery, bounded; falling, k=0 -> the note 015 argument is right about
+                                          the MECHANISM, whatever the height. The
+                                          first structural win against g8-01
+- flat AND materially higher            -> a real gate exists. Best available
+                                          outcome and the least likely
+- both curves fall together             -> the pool is not holding N constant,
+                                          which given the unit tests would mean
+                                          the sweep is misconfigured rather than
+                                          the idea refuted. Check before believing
+- flat at zero for every k              -> N-constancy is NOT sufficient. What
+                                          limits the store is which bindings get
+                                          in, not how many, and note 015's
+                                          argument is sound and irrelevant
+- k=16 beats k=4 beats k=0 monotonically-> more is simply better, so the pool is
+                                          acting as capacity rather than as
+                                          competition, and prediction 3 is wrong
+
+
+WHAT THIS CANNOT SETTLE
+------------------------
+**Whether the ranking signal is any good.** Strength here is the norm of the
+trace being promoted, chosen because it is local, cheap and arm-agnostic. It is
+not argued to be the right ranking, only an available one. A null result leaves
+open that a better ranking over the same pool would work, and that is a separate
+sweep.
+
+**Anything about replay.** The pool still decides at storage time, using only
+what is known then. An offline phase that revisits traces later is a different
+and more promising mechanism, recorded in BACKLOG.md and untouched here.
+
+**Whether `k` transfers.** The right pool size on a task with four pairs is
+almost certainly not the right size on real data, and nothing here says how it
+scales.

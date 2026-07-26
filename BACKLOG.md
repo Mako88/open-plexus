@@ -75,6 +75,53 @@ this as the obvious next step and not touching it. `slices_for` currently
 
 ---
 
+## Cross-checks against work that already exists
+
+John asked whether any fully modelled digital-neuron project could be compared
+against. The most useful answer turned out not to be a neuron simulator.
+
+### The capacity of a superposed store has an analytic theory, and we derived ours by hand
+
+`SNR = sqrt(d / N)` is the single most load-bearing equation in this project. It
+is why tiny nodes need selective storage, why the oracle works, and why note 015
+predicts a bounded pool should flatten the recovery curve. **It was obtained
+empirically here** — measured within 5% across a 16x range — and never checked
+against anything.
+
+It has a literature. Hyperdimensional computing / vector symbolic architectures
+studies exactly this object: bundle many bound pairs into one vector, then ask
+how many can be recovered. The degradation has a name there — the **superposition
+catastrophe** — and there is formal work on capacity, e.g.
+[Capacity Analysis of Vector Symbolic Architectures](https://arxiv.org/abs/2301.10352).
+
+**Worth doing because it can only be informative.** If the analytic result agrees
+with `sqrt(d / N)`, the most important equation here stops being a local
+observation and starts being an instance of a known law, with its assumptions and
+its failure conditions already worked out. If it disagrees, one of the two is
+wrong about our regime and finding out which is worth more than another sweep.
+
+> **READ THE PAPER.** The above is from search results and abstracts. Rule 1: a
+> summary tells you what a result is *called*, not what was run. Note 005 exists
+> because a borrowed claim that gated a design decision turned out to describe a
+> variant this project cannot use.
+
+### Digital neuron models, for the record
+
+- **Spaun** (Eliasmith, on Nengo) is the closest thing to what was asked for: a
+  large spiking model with an actual *behavioural battery* — digit recognition,
+  serial working memory, and an inductive-reasoning task. The only large neuron
+  model with published per-task behaviour rather than biophysics alone.
+- **OpenWorm** — the complete *C. elegans* connectome with locomotion as
+  measurable behaviour. Complete, and too far from anything here to compare.
+- **Blue Brain**-style cortical column simulations — highly detailed, no
+  behavioural battery.
+
+None of these is a benchmark we could adopt. Their value would be as a sanity
+check on capacity and scaling claims, and the VSA literature above does that job
+more directly.
+
+---
+
 ## Blocked on a result
 
 **A real gate, if g8-01 leaves one possible.** If recovery is near zero, every

@@ -67,12 +67,17 @@ D_MODEL, N_TRAIN, N_TEST, EPOCHS, KEY_SCALE = 32, 400, 120, 8, 0.5
 # of the constants, which the write-up must say plainly.
 CONSOLIDATION, SALIENCE, LASTING_CAP = 0.1, 2.5, 0.2
 
-#: name -> (uses the oracle, consolidation rate, salience bar, cap)
+#: name -> (uses the oracle, consolidation rate, salience bar, cap, pool size)
+#
+# The fifth field is the competitive-capture pool, 0 meaning unbounded, which is
+# what every arm here was measured with. It is spelled out per arm rather than
+# defaulted so that a sweep varying it -- g8-03 -- does not have to reach into
+# this table and change it.
 ARMS = {
-    "none":     (False, 0.0, 0.0, 0.0),          # the FLOOR
-    "oracle":   (True, 0.0, 0.0, 0.0),           # the CEILING, and a cheat
-    "on-use":   (False, CONSOLIDATION, 0.0, 0.0),
-    "salience": (False, CONSOLIDATION, SALIENCE, LASTING_CAP),
+    "none":     (False, 0.0, 0.0, 0.0, 0),       # the FLOOR
+    "oracle":   (True, 0.0, 0.0, 0.0, 0),        # the CEILING, and a cheat
+    "on-use":   (False, CONSOLIDATION, 0.0, 0.0, 0),
+    "salience": (False, CONSOLIDATION, SALIENCE, LASTING_CAP, 0),
 }
 
 
@@ -100,7 +105,8 @@ def build(task: MqarConfig, count: int, seed: int):
 
 
 def run(task: MqarConfig, half_life: float, lr: float, arm: str, seed: int,
-        train_set, test_set, extra: dict | None = None) -> dict:
+        train_set, test_set, extra: dict | None = None,
+        spec: tuple | None = None) -> dict:
     """One arm, one cell. `task` carries the length and the filler statistics.
 
     Taking the task rather than a bare length is what lets g8-02 reuse this: the
@@ -109,12 +115,14 @@ def run(task: MqarConfig, half_life: float, lr: float, arm: str, seed: int,
     literally the same code rather than two copies of it.
     """
     seq_len = task.seq_len
-    gated, consolidation, salience, cap = ARMS[arm]
+    # `spec` lets a caller define an arm this table has never heard of, which is
+    # what g8-03 needs and what it would otherwise get by mutating the table.
+    gated, consolidation, salience, cap, slots = spec or ARMS[arm]
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=task.vocab_size, d_model=D_MODEL, lr=lr,
         key_scale=KEY_SCALE, decay=decay_for(seq_len, half_life),
         consolidation=consolidation, salience=salience, lasting_cap=cap,
-        seed=seed))
+        capture_slots=slots, seed=seed))
 
     rng = np.random.default_rng(seed)
     order = np.arange(len(train_set))

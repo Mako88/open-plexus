@@ -2,7 +2,9 @@ G3 -- what happens when a machine leaves and never comes back?
 ===============================================================
 
 Script: experiments/g3_01_churn.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 36/36 cells. Predictions 1, 2 and 5 held. PREDICTION 3
+        REFUTED in direction (b), and hard -- which casts doubt on the number
+        g1-05 reports as the headline price of locality. See THE DOUBT below.
 
 
 IN PLAIN TERMS
@@ -109,4 +111,99 @@ WHAT WOULD REFUTE WHAT
 
 RESULT
 ------
-(not yet run)
+6 seeds per cell, d_model=64, 8 epochs with ablation at the halfway point.
+
+  churn  width   before  immediately  recovered  recovery
+  0.000     64    0.992        0.992      0.992    -0.001
+  0.125     56    0.992        0.970      0.991    +0.020
+  0.250     48    0.992        0.943      0.986    +0.043
+  0.375     40    0.992        0.857      0.980    +0.122
+  0.500     32    0.992        0.749      0.924    +0.175
+  0.750     16    0.992        0.365      0.578    +0.214
+
+per-seed recovered at churn=0.5:   0.85 0.93 0.94 0.94 0.94 0.94
+per-seed recovered at churn=0.75:  0.52 0.52 0.58 0.58 0.59 0.69
+
+
+HELD
+----
+1. Immediate damage is real and grows with the loss: -0.02, -0.05, -0.14, -0.24,
+   -0.63. The readout is calibrated against a signal that stopped arriving.
+
+2. It recovers, at every level. Recovery grows with the damage, from +0.02 to
+   +0.21 -- the more that was lost, the more relearning there is to do.
+
+5. No catastrophic forgetting. Half the substrate can vanish and the model comes
+   back to 0.924 within four epochs. Consistent with the claim that only the
+   readout persists and the associative memory is rebuilt per sequence, so a
+   departing machine takes capacity rather than memories.
+
+**Losing half the machines costs 0.068 of accuracy.** For a system designed to
+run on hardware that leaves without warning, that is the result C3 was written
+to ask for.
+
+
+PREDICTION 3 REFUTED -- RECOVERY LANDS FAR ABOVE THE WIDTH CURVE
+------------------------------------------------------------------
+Predicted recovered accuracy would track the from-scratch curve at the surviving
+width. It does not, and the gap is enormous:
+
+  width   from scratch (g1-06)   ablated to it   difference
+     64                  0.991           0.992       +0.001
+     48                  0.910           0.986       +0.076
+     32                  0.225           0.924       +0.699
+     16                  0.019           0.578       +0.559
+
+At width 32 an ablated model reaches **0.924** where a model trained from scratch
+at that width reaches **0.225**. Four times better. Same architecture, same total
+epochs, same data.
+
+The pre-written note called this direction (b) and said it "would be surprising
+and would suggest the model is over-provisioned at 64". That reading is too mild.
+
+
+THE DOUBT THIS RAISES, WHICH IS THE IMPORTANT PART
+----------------------------------------------------
+Only the readout learns here. `wk` and `wv` are frozen random projections, and a
+random 32 of 64 random columns is statistically just 32 random columns. So an
+ablated model and a from-scratch model at width 32 should be facing the *same
+problem* with the same tools.
+
+They are not getting the same answer. The difference has to come from the state
+the readout was in when the machines left -- it starts warm, already trained on
+those very dimensions, whereas from-scratch starts at zero.
+
+Which suggests an uncomfortable possibility:
+
+  **THE CROSSING MEASURED IN g1-05 AND g1-06 MAY BE A CONVERGENCE THRESHOLD
+  RATHER THAN A CAPACITY THRESHOLD.**
+
+If width 32 is *capable* of 0.92 and merely takes longer to get there from a cold
+start, then "the local rule needs 4-6x the width of attention" is a statement
+about optimisation speed, not about how much room the mechanism requires. The
+headline number of this project would be measuring the wrong thing.
+
+The distinguishing experiment is cheap and obvious: **train from scratch at width
+32 for many more epochs and see whether it reaches 0.92 or plateaus below it.**
+
+  plateaus low  -> capacity limit; the 4-6x price stands
+  reaches 0.92  -> convergence limit; the price is about training budget, and
+                   g1-05's headline needs restating
+
+Nothing about the price of locality should be quoted until that has been run.
+Recorded here rather than corrected in g1-05, because at this point it is a
+doubt rather than a refutation -- and manufacturing certainty in either direction
+would be the error.
+
+
+AND A CONSEQUENCE THAT SURVIVES EITHER WAY
+--------------------------------------------
+Whatever the answer, one thing here is already useful: **a system that has been
+trained and then damaged is far better off than one that started small.** The
+survivors carry something, even though the only trained component is a linear
+readout over frozen random features.
+
+For the distribution story that is good news of a kind nobody planned for. A
+network that grows, trains, loses machines and continues is a *different and
+better* proposition than one sized for its worst-case membership -- and it argues
+for over-provisioning early rather than sizing for the expected steady state.

@@ -158,6 +158,15 @@ rule crosses between 48 and 64; attention crosses between 8 and 16 (g1-04).
 
     THE PRICE OF LOCALITY IS ROUGHLY 4x TO 6x IN WIDTH.
 
+*** THIS NUMBER IS IN DOUBT. *** g3-01 found that a model ablated DOWN to width
+32 recovers to 0.924, where a model trained from scratch at width 32 reaches
+0.225. Since only the readout learns and the projections are frozen random, both
+face the same problem with the same tools -- which suggests the crossing measured
+here may be a CONVERGENCE threshold rather than a CAPACITY one. If so this
+number is about optimisation speed, not about how much room the mechanism needs.
+The distinguishing run -- train from scratch at width 32 for many more epochs --
+has not been done, and this figure should not be quoted until it has.
+
 That is a number worth having. It is not "locality is free" and it is not
 "locality is impossible" -- it is a cost, in a unit that can be multiplied by a
 machine count and argued about. Note 004's bandwidth arithmetic can now be

@@ -27,6 +27,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MQAR = ROOT / "openplexus" / "tasks" / "mqar.py"
 BASELINES = ROOT / "openplexus" / "baselines.py"
+INDUCTION = ROOT / "openplexus" / "models" / "induction.py"
 
 
 @dataclass(frozen=True)
@@ -125,6 +126,27 @@ MUTATIONS = [
         path=BASELINES,
         old="        for position in sequence.query_positions:",
         new="        for position in range(len(sequence.tokens)):",
+    ),
+    Mutation(
+        name="lookup-uses-first-occurrence",
+        breaks="most-recent lookup, silently answering from stale evidence",
+        path=INDUCTION,
+        old="        last_seen[token] = position",
+        new="        last_seen.setdefault(token, position)",
+    ),
+    Mutation(
+        name="lookup-off-by-one",
+        breaks="the lookup, returning what the token WAS rather than what followed it",
+        path=INDUCTION,
+        old="            one_hot[tokens[previous + 1]] = 1.0",
+        new="            one_hot[tokens[previous]] = 1.0",
+    ),
+    Mutation(
+        name="lookup-ignores-the-current-token",
+        breaks="input-dependence, turning the lookup into a fixed filter",
+        path=INDUCTION,
+        old="        previous = last_seen.get(token)",
+        new="        previous = position - 1 if position else None",
     ),
 ]
 

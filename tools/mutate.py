@@ -30,6 +30,7 @@ BASELINES = ROOT / "openplexus" / "baselines.py"
 INDUCTION = ROOT / "openplexus" / "models" / "induction.py"
 ATTENTION = ROOT / "openplexus" / "models" / "attention.py"
 LOCAL = ROOT / "openplexus" / "models" / "local_memory.py"
+TRANSPORT = ROOT / "openplexus" / "transport.py"
 
 
 @dataclass(frozen=True)
@@ -177,6 +178,27 @@ MUTATIONS = [
         path=ATTENTION,
         old="            self.params[name] -= self.lr * m_hat / (np.sqrt(v_hat) + self.eps)",
         new="            self.params[name] -= 0.0 * m_hat / (np.sqrt(v_hat) + self.eps)",
+    ),
+    Mutation(
+        name="buffer-releases-a-slot-too-early",
+        breaks="the buffer depth, so events still in flight are treated as lost",
+        path=TRANSPORT,
+        old="        release = step - config.max_delay",
+        new="        release = step - config.max_delay + 1",
+    ),
+    Mutation(
+        name="late-events-appended-out-of-order",
+        breaks="emission ordering, corrupting the sequence rather than showing a gap",
+        path=TRANSPORT,
+        old="    landed.sort(key=lambda pair: pair[0])",
+        new="    landed.sort(key=lambda pair: pair[1])",
+    ),
+    Mutation(
+        name="arrivals-recorded-after-release",
+        breaks="the tie at exactly max_delay, silently moving the stated bound by one",
+        path=TRANSPORT,
+        old="        return self.jitter <= self.max_delay",
+        new="        return self.jitter < self.max_delay",
     ),
     Mutation(
         name="local-store-binds-the-current-token-to-itself",

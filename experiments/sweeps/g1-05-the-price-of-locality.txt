@@ -166,6 +166,14 @@ re-run against a width that has been measured rather than assumed.
 
 THE FINDING NOBODY PREDICTED, AND IT MATTERS MORE
 --------------------------------------------------
+*** THE OBSERVATION BELOW STANDS. THE EXPLANATION OF IT IS REFUTED. ***
+g1-06 tested this section's account directly. If the graded transition were
+superposition interference, the crossing width would grow with the number of
+bindings held. It does not: at n_pairs 2, 4 and 8 the crossing sits between 48
+and 64 in every case, and at small widths MORE bindings is BETTER -- the opposite
+sign. See experiments/sweeps/g1-06-interference.txt. The gradedness is measured
+and real; "because interference is continuous" is not why.
+
 Look at the `between` column.
 
     attention (g1-03):   60 runs, 0 intermediate outcomes. Strictly bimodal.

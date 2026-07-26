@@ -2,7 +2,9 @@ Does the price of locality grow with the number of things remembered?
 ======================================================================
 
 Script: experiments/g1_06_interference.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 150/150 cells. Predictions 4, 5 and 6 held.
+        PREDICTIONS 1 AND 2 REFUTED -- and their refutation invalidates the
+        explanation g1-05 gave for its own headline result.
 
 
 IN PLAIN TERMS
@@ -117,4 +119,101 @@ WHAT WOULD REFUTE WHAT
 
 RESULT
 ------
-(not yet run)
+6 seeds per cell, 126 interference cells + 24 decay cells, all returned.
+Mean accuracy per cell shown; per-seed values are in the run artifact and in the
+aggregate output, and the graded spread is visible throughout.
+
+width      n_pairs=2   n_pairs=4   n_pairs=8
+------------------------------------------------
+24             0.004       0.027       0.067
+32             0.098       0.225       0.298
+48             0.922       0.910       0.890
+64             0.995       0.991       0.975
+96             1.000       0.999       0.997
+128            1.000       1.000       0.999
+192            1.000       1.000       1.000
+
+
+PREDICTIONS 1 AND 2 ARE REFUTED
+--------------------------------
+Predicted crossings under a linear law: 28, 56, 112. Observed: all three sit
+between 48 and 64. Quadrupling the number of bindings held moves the crossing
+essentially not at all.
+
+At the crossing width of 48 the accuracies are 0.922, 0.910 and 0.890 -- a
+decline so mild it is nothing like the 4x width increase predicted.
+
+AND AT SMALL WIDTHS MORE PAIRS IS BETTER. At width 24: 0.004, 0.027, 0.067. At
+width 32: 0.098, 0.225, 0.298. Quadrupling the bindings roughly TRIPLES accuracy.
+That is not a weak version of the predicted effect. It is the opposite sign.
+
+
+WHAT THIS BREAKS
+----------------
+g1-05's section "THE FINDING NOBODY PREDICTED" explained its graded transition
+as superposition interference: every binding layered into one matrix, retrieval
+returning the wanted one plus a sum of the others, and width buying room for
+them to stay separable.
+
+That explanation made a prediction. The prediction is wrong, and wrong in sign at
+small widths. **The explanation is refuted and has been corrected in place.**
+
+What is NOT refuted is the observation. The transition really is graded -- 9 of
+48 cells in g1-05, and the same pattern throughout this table. Attention really
+was bimodal across 60 runs. Both measurements stand. It is the account of *why*
+that fails, which is the distinction rule 5 exists to keep straight: falsified
+claims get fixed, and the claim here was the mechanism, not the number.
+
+
+A CANDIDATE REPLACEMENT, LABELLED AS A CANDIDATE
+-------------------------------------------------
+Two effects plausibly oppose each other, and the data is consistent with both:
+
+  MORE BINDINGS MEANS MORE INTERFERENCE. Real, but apparently weak here.
+  MORE BINDINGS MEANS MORE TRAINING SIGNAL. Each sequence carries n_pairs scored
+  answers, so n_pairs=8 gives four times the learnable positions per sequence
+  that n_pairs=2 does, at identical cost. At widths where the model is starved,
+  that dominates -- which is exactly where the sign flips.
+
+And a candidate account of what the crossing is actually set by: **the alphabet,
+not the load.** The keys are frozen random projections of 32 tokens, so the same
+32 keys recur in every sequence. Interference from a fixed key set is systematic
+rather than random, and a *trained* readout can learn to undo systematic
+structure. What it cannot undo is two keys being insufficiently separable at
+width d -- and that depends on n_keys, which was held at 32 throughout this
+entire sweep.
+
+If that is right, sweeping n_keys moves the crossing and sweeping n_pairs does
+not. That is a sharp, cheap, falsifiable test and it is the obvious next run.
+Nothing above should be written into the code as understood until it is run --
+the previous explanation was also plausible.
+
+
+PREDICTION 4 HELD
+-----------------
+No bimodality anywhere. Every condition near the transition shows a graded
+spread, and the "between" band is populated at 32 and 48 for all three n_pairs.
+g1-05's continuity observation survives its own explanation being wrong.
+
+
+DECAY: PREDICTIONS 5 AND 6 BOTH HELD
+-------------------------------------
+condition       worst   best      per-seed
+decay=1.0       0.840  0.940      0.84 0.88 0.89 0.89 0.90 0.94
+decay=0.99      0.876  0.917      0.88 0.88 0.89 0.89 0.90 0.92
+decay=0.95      0.440  0.476      0.44 0.45 0.46 0.47 0.47 0.48
+decay=0.9       0.205  0.231      0.21 0.21 0.22 0.22 0.22 0.23
+
+5. Decay does not help. 0.99 is indistinguishable from 1.0 -- the ranges overlap
+   almost entirely -- and everything stronger is catastrophic.
+6. The damage is monotonic. No intermediate optimum, so there is no width at
+   which forgetting the oldest bindings is worth their loss.
+
+Which is consistent with the interference account being weak: if interference
+were the binding constraint, bounding it by forgetting would buy something
+somewhere. It buys nothing anywhere. **The decay result and the n_pairs result
+agree, and they agree against the explanation g1-05 gave.**
+
+`decay` stays in the model as an off-by-default knob, now with a measurement
+saying not to reach for it on this task. It may still matter for sequences long
+enough that unbounded accumulation is the problem, which this task is not.

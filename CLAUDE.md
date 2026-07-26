@@ -113,6 +113,24 @@ undetectable from outside, because the result looks carefully measured.
 > doubled relative to the one-sided version
 > ([g1-08](experiments/sweeps/g1-08-the-honest-price.txt)).
 
+**A caveat printed next to a number does not attach to the number.** If a value
+is a *bound* — a crossing that sat at the edge of the grid, a run that hit its
+budget — the code has to refuse to use it as a value. Annotating it and computing
+through it produces a figure that looks measured and is not.
+
+> *Calibration.* Twice, one sweep apart, in the same tool.
+> [g5-01](experiments/sweeps/g5-01-does-scale-help.txt) fitted a scaling exponent
+> to the sequence lengths that crossed the bar and silently dropped the one that
+> did not — the most informative point in the sweep, since it said the
+> requirement had run off the end of the grid. That was fixed by making the tool
+> extrapolate its own fit to every missing point. Then
+> [g5-02](experiments/sweeps/g5-02-how-finely-can-it-split.txt) printed *"AT THE
+> EDGE OF THE GRID, breaking point not located"* against two of its three rows
+> and fitted an exponent through them anyway, reporting `seq_len^1.00` for a
+> quantity the grid bounds only to `[0.00, 1.00]`. **The first fix did not
+> generalise because it was written against the specific shape of the first
+> mistake.**
+
 **And a sweep that does not contain its own answer has not swept.** If every arm
 chooses a value at an *edge* of the grid, the optimum lies outside it, every arm
 is under-tuned, and the rule above was satisfied while the number stayed

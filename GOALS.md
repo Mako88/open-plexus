@@ -478,7 +478,7 @@ changed. **g1-08 has now re-measured it with both arms tuned, and the honest pri
 own best scale. Tuning both made the price *worse*: like-for-like at the old
 untuned settings it was 3.0×, so the retracted figure was not conservative but
 unfounded, and landing near the right answer was luck.
-**G5 does not pass as measured, and it is the first gate that does not.**
+**G5 is unresolved.**
 [g5-01](experiments/sweeps/g5-01-does-scale-help.txt) fixed each machine at 16
 dimensions and grew the network. Machines compound at 48, 96 and 192 steps — a
 fitted exponent of 0.69 against g1-10's width exponent of 0.37, so partitioning
@@ -498,6 +498,22 @@ penalty shrinking sharply with width).
 Checked before believing: every arm converged (no cell moved more than 0.014 when
 the budget doubled), and an independent sweep agrees — g4-01 got 0.741 where this
 got 0.748 on the same configuration.
+
+**Then [g5-02](experiments/sweeps/g5-02-how-finely-can-it-split.txt) withdrew the
+verdict.** Holding total width at 256 and varying only how finely it is cut, at
+seq_len 384 **eight machines of 32 dimensions score 0.999 pooled and 0.911
+alone** — both clear. g5-01 had pinned machine width at 16, which is below the
+minimum at that length, so its wall was a property of the chosen machine size
+rather than of partitioning. What survives is narrower and still true: *machines
+cannot be arbitrarily small, and the floor rises with sequence length.*
+
+How fast it rises is the open question, and g5-02 does not answer it: minimum
+machine width comes out at `T^0.50` with a resolution of `±0.50`, a range that
+contains g1-10's `T^0.37`. At the low end the usable machine count is constant
+and partitioning scales freely; at the high end it falls as `T^-0.63` and the
+approach is bounded. **Those are opposite conclusions and the grid separates them
+not at all** — factor-of-two width steps cannot measure a quantity whose
+interesting range is a factor of two wide.
 
 G4 (bandwidth) remains — but G4's central assumption is no longer
 an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the

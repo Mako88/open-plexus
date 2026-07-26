@@ -1,0 +1,12 @@
+# Local, non-shared context. Personal working notes and environment specifics.
+CLAUDE.local.md
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Stack-specific entries are deliberately absent — no stack has been chosen yet
+# (see GOALS.md §7). Add them in the same change that introduces the stack.

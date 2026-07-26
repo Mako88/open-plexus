@@ -1,0 +1,358 @@
+# Engineering standards for Open Plexus
+
+This project is trying to find out whether a neural network can learn using only
+local information and bounded asynchrony — so that it can run on consumer
+devices that are unreliable, heterogeneous, and constantly leaving. It fails if
+no such rule can be found, and it fails *worse* if one appears to be found and
+the measurement was wrong. See [GOALS.md](GOALS.md) for what would refute it.
+
+That only means anything if the measurements are trustworthy, so the standards
+below are about one thing: **making the code deserve the conclusions drawn from
+it.**
+
+They are written as commitments, not as warnings. Everyone building something
+non-trivial ships a value that turns out to be disconnected, a bound looser than
+they meant, or a claim that outran its evidence — that is what building at the
+edge of what you understand feels like from the inside. The answer is not more
+care. It is a system that catches those things regardless of how careful anyone
+was feeling that day, so that attention can go to the actual problem.
+
+Each rule carries a **calibration** note: a concrete number from this project
+showing where the bar has to sit. **They start empty on purpose.** A standard
+without a number attached drifts within a month, and "wide enough to admit the
+broken case" is far more useful when you can see how wide that turned out to be.
+Each unfilled calibration says what kind of instance belongs in it — when one
+happens here, write it down. They are reference data, not a record of anyone's
+mistakes.
+
+---
+
+## The standard
+
+**Every claim about how the system works is backed by a test or a
+measurement.** Everything below is a way of making that true in a specific
+situation.
+
+The failure mode this document is built against is not the crash. It is the
+*thing that looks connected and is not* — a mechanism that runs, produces
+plausible output, and is doing nothing. A flag read once and never applied. A
+cache that never hits. A retry on a call that cannot fail. A validation that
+runs after the write. Those cost more than crashes, because they invalidate
+every observation taken while they were present, silently and retroactively —
+and unlike a crash, nothing announces them.
+
+---
+
+## Making claims
+
+**1. State no behaviour that has not been observed.** Not in chat, not in a
+docstring, not in a commit message, not in the README. If it has not been run
+and watched, say so, and say what would settle it. "Should work" and "this
+fixes it" are predictions; label them as such until something confirms them.
+
+> *Calibration.* — unfilled. Record the first claim in this repo that was
+> written confidently and turned out to be false, and how long it stood.
+
+**2. Observe the quantity the change claims to move, not a downstream proxy.**
+A green end-to-end run cannot tell you which of six components is working. When
+you change a specific thing, measure that thing directly — then treat the
+end-to-end result as a summary, not a diagnosis.
+
+> *Calibration.* — unfilled. Record the first time a proxy metric hid a broken
+> component: how many runs went by before a direct probe found it.
+
+**3. Reproduce before you believe.** One green run, one fast benchmark, one
+successful manual click is an anecdote. Anything that will be acted on gets
+repeated — enough times to separate the effect from the noise, and on input you
+did not choose to make it pass.
+
+> *Calibration.* — unfilled. Record the first result that shrank or vanished on
+> repetition: what it measured at first, and what it measured once repeated.
+
+**4. Report negative results as results.** Keep one file per investigation
+recording *question, prediction, outcome* — including the outcomes that refuted
+the prediction. Write the prediction down **before** the run so it cannot be
+retrofitted. A refutation that narrows the search is worth more than an
+unmeasured success, and it is the only thing that stops the same dead end being
+explored twice.
+
+> *Calibration.* — unfilled. Record the first dead end that was entered twice
+> because the first attempt was never written down.
+
+**5. Correct the record when an observation refutes a written claim.**
+Falsified claims get fixed, not softened. If the README says the system does X
+and it does not do X, the README changes — it does not become "the system aims
+to do X".
+
+> *Calibration.* — unfilled. Record the first documented claim that measurement
+> contradicted, and what the document says now.
+
+---
+
+## Building
+
+**6. Ship the connection test with the mechanism.** Not a test that it runs
+without raising — a test that its *input reaches its output*. Perturb the
+input; assert the output moves. This is the single highest-value test you will
+write, because it is the only one that catches the failure mode named above.
+
+Ask it of every seam: does this config value change behaviour if I change it?
+Does this cache return something different when populated? Does this parameter
+appear in the result?
+
+> *Calibration.* — unfilled. Record the first mechanism found to be inert: what
+> it appeared to control, what it actually controlled, and for how long.
+
+**7. Distrust any criterion that cancels its own input.** If a decision divides
+by, normalises against, or subtracts something that moves *with* the variable it
+is meant to respond to, it is blind by construction and will look fine. Ask this
+of every ratio, threshold-relative-to-baseline, and percentage-change gate,
+explicitly, when you write it.
+
+> *Calibration.* — unfilled. Record the first criterion that cancelled what was
+> supposed to drive it — and which direction it ended up pointing.
+
+**8. Measure at the granularity of the decision.** A statistic collected over
+one kind of object does not describe an object of another kind. A per-request
+average does not describe a user's session. A distribution over all rows does
+not describe the one row being scored. Whenever a number crosses from where it
+was gathered to where it is used, say out loud what it is a statistic *of*.
+
+Watch especially for accumulators reporting their own initial value: any running
+average, EMA, or rolling window must either carry a sample count or be
+explicitly named as something other than a measurement.
+
+> *Calibration.* — unfilled. Record the first statistic used at the wrong
+> granularity: what it read, and what the correct-granularity value was.
+
+---
+
+## Tests
+
+**9. A test must fail when the thing it names is broken — verify that it
+does.** Passing is not evidence; a test has never demonstrated anything until
+you have seen it go red for the right reason. Break the mechanism deliberately,
+confirm the test notices, then put it back. Automate this where you can, so a
+new mechanism arrives with a check that its test is real.
+
+Watch particularly for an assertion on a quantity that something *else* pins,
+and for bounds so wide they admit the broken case.
+
+> *Calibration.* — unfilled. Record the first test that survived deliberate
+> breakage: what it asserted, and what the value actually was.
+
+**The same applies to any experimental condition or A/B arm.** Before running
+it, ask what outcome would *refute* the prediction attached to it. If the
+predicted outcome is guaranteed by how the condition is built, it is not
+evidence however it comes out — and it will read as confirmation.
+
+**10. A failing test is a claim about the production code until shown
+otherwise.** Fix the code so the assertion holds. Widening a bound, deleting an
+assertion, or special-casing the input converts a caught bug into a silent one
+*and* destroys the evidence that it existed.
+
+Changing the test is right when the intended behaviour genuinely changed. Then
+say which decision changed it, and **split rather than loosen** — keep an
+assertion for the old path where it still applies, add one for the new.
+
+A test that passes while *vacuous* is the opposite problem: there the test is
+what is wrong, and strengthening it is the fix. Rule 9 covers those.
+
+> *Calibration.* — unfilled. Record the first assertion that was loosened
+> instead of investigated, and what it was later found to have been hiding.
+
+---
+
+## Keeping the record straight
+
+**11. A bug fix is not finished when the tests pass.** It is finished when the
+audit file records what the fix invalidated, and each affected decision is
+marked re-validated, superseded, or pending. A fix does not only correct the
+future; it removes the evidence under choices already made, and those choices
+stay in force because **nothing in a default value points back at the run that
+chose it.**
+
+Sort before assuming the worst — work out which past results the broken code
+path could actually have touched, and say so. Be equally careful in the other
+direction: a direction abandoned because it "did not help" may have been tested
+through a broken mechanism. **Discarding a good idea on an invalid measurement
+is the most expensive error available.**
+
+**Changing a default invalidates the comparison set** — the same rule applied to
+a parameter rather than a bug. A known-better setting can be worth deliberately
+*not* adopting until you are ready to re-baseline: list the results that stop
+being comparable, and re-run the ones that still matter.
+
+**Then fix the class, not the instance.** Before closing a bug, ask what *kind*
+of mistake it is, enumerate the other places that kind could live, and write the
+check over the enumeration rather than over the one case — so the next instance
+fails the suite instead of waiting to be noticed.
+
+> *Calibration.* — unfilled. Record the first mistake that recurred: how many
+> times it was fixed as a one-off before anyone swept for the class.
+
+**12. Put the reasoning where the reader will be standing.** Someone about to
+change a threshold reads the test that guards it, not the design note. To keep
+one rationale from drifting across five files:
+
+| where | what belongs there |
+|---|---|
+| Code comment | Why *this line* is this way. Short, and only where it would otherwise read as arbitrary. Local, single-call-site gotchas belong here rather than in a doc. |
+| Doc comment / `<summary>` | The contract the caller can rely on. See rule 14. |
+| Scope-local `ARCHITECTURE.md` | Stable, cross-cutting understanding of this area. See rule 13. |
+| Investigation note | Question, prediction made before the run, result. Never edited afterwards except to record the outcome. |
+| Audit file | What a later fix invalidated, and which decisions still rest on it. |
+
+When a number appears in more than one, **the test docstring is canonical** — it
+is the one under continuous execution. What breaks if the assertion stops
+holding, with the concrete number from when it did, belongs there; that is where
+the history lives.
+
+**And every investigation note and open item opens in plain language.** One
+short paragraph, headed `IN PLAIN TERMS`, before the technical body: what is
+being asked, why anyone should care, and what a yes or a no would mean. No
+jargon, no numbers that need prior context to parse.
+
+This is not a courtesy. Anyone picking this repo up — including you after a
+break, and including an assistant after a context reset — needs to reconstruct
+*what question is live* without reading twenty files in order. Write it before
+the prediction, not after the result: if the plain-language version cannot be
+written without the answer in hand, the question is not sharp enough to run yet.
+
+---
+
+## Documentation and planning
+
+**13. Externalize hard-won understanding, into the nearest doc.** When effort
+went into figuring out a non-obvious behaviour, capture it so it does not have
+to be re-derived — and so it stops living only in someone's head or a chat log.
+**The trigger is not only shipped code.** Discoveries and corrections made while
+investigating or debugging count, and are the most valuable kind.
+
+Three constraints keep it from bloating into something nobody reads:
+
+- **Scope-local only.** It goes in the `ARCHITECTURE.md` nearest the code, never
+  ballooning a higher-level one — only the relevant doc is loaded for a given
+  task, and a top-level doc that knows everything is a top-level doc that is
+  always stale.
+- **Navigation, not catalogue.** No volatile lists of class, queue, or method
+  names; no exact counts written as though they were invariants. Document what
+  is stable and cross-cutting.
+- **A doc update is a change like any other.** Surface it for review. Do not
+  rewrite silently.
+
+> *Calibration.* — unfilled. Record the first behaviour that had to be
+> re-derived from scratch because nobody wrote it down the first time.
+
+**14. Document the contract, not the implementation.** A doc comment says what
+a caller can rely on. A good one stays true after the internals are rewritten;
+if a rewrite falsifies it, it was describing implementation. Put one on every
+public type and method.
+
+**No ticket numbers in code comments.** They add nothing for a reader of the
+code, and the tracker outlives neither the code nor its own schema. The same
+default extends to notes and design files — unless the reference is genuinely
+the useful anchor, such as naming the change a note is tracking.
+
+**15. A plan opens with the problem, and reads at three zoom levels.** Purpose
+first, structure follows.
+
+- **Standalone summary first.** Plain language, readable by someone with zero
+  knowledge of the codebase, before any technical body.
+- **Three deliberate zoom levels** — mental model, scope at a glance, full
+  detail — and a reader must never be forced down a level to understand the one
+  above. Split the high-level story from deep per-change detail rather than
+  interleaving them. Cut context the audience already has. Keep only diagrams
+  that are load-bearing.
+- **Standalone voice.** Impersonal, present tense, declarative: "This change
+  adds X." "Chosen: X. Rejected: Y, because Z." It is the artifact, not meeting
+  minutes — no references to the conversation or to who produced it.
+
+A plan is the *input* to an implementation plan, not the full spec itself.
+
+---
+
+## Keeping the work pointed at the goal
+
+**16. Alternate between verifying and building.** These standards reward
+verification, and that is a real hazard rather than a virtue. Every audit yields
+a satisfying, recordable, provably-correct result; a new mechanism most likely
+yields a null. There is a gradient here, it points away from the goal, and
+following it feels like productive work the whole time.
+
+So, concretely:
+
+- **After a block of verification work, the next block builds something** — even
+  if it is likely to fail. A null from a new mechanism is worth more than a
+  fifth confirmed audit.
+- **No more than two investigations open at once.** The queue is where creep
+  accumulates. If a third is worth running, something else gets dropped.
+- **Retire a condition in the same change that adds it.**
+- **When in doubt, ask what would move the goal**, not what would make the
+  record more accurate.
+
+> *Calibration.* — unfilled. Record the first stretch of work where the
+> most-changed files were the docs, the tests, and the tooling rather than the
+> thing being built. Count the commits.
+
+---
+
+## Adding to this document
+
+**17. Write the standard, not the incident.** A rule earns its place by telling
+someone who was not there what to do next time. So:
+
+- **Lead with the commitment.** "Statistics are gathered at the granularity of
+  the decision" — not "we once averaged the wrong thing."
+- **Attach the calibration, keep it subordinate.** The number is what makes a
+  rule enforceable; put it in the aside, not the headline.
+- **Prefer a rule that makes the mistake structurally impossible** over one that
+  asks for more care. An automated check is worth more than a rule saying "write
+  good assertions." If a proposed rule cannot be turned into a check, say so
+  plainly rather than pretending vigilance will hold.
+- **Assume good faith and real constraints.** These standards exist because the
+  work is genuinely hard, not because anyone was careless. A document that reads
+  as a list of accusations gets defended against; one that reads as a bar worth
+  clearing gets upheld.
+- **Retire a rule when it stops paying.** A standard nobody applies is worse
+  than no standard, because it makes the others look optional.
+
+---
+
+## Conventions
+
+> **There is no stack yet, and that is deliberate** — the implementation
+> language follows the plan, which follows [GOALS.md](GOALS.md). The conventions
+> below are the ones already decided; the rest fill in as the project acquires
+> the things they govern.
+
+- **New mechanisms default to off**, so existing results stay reproducible and
+  the comparison against not-having-it is free.
+- **Run the full check before every commit.** Name the commands here as soon as
+  they exist, so there is never ambiguity about what "the checks" means:
+  ```
+  # <test command>                            — not yet chosen
+  # <lint / typecheck command>                — not yet chosen
+  # <the check that verifies tests can fail>  — not yet chosen
+  ```
+  The third is not optional and is not a nice-to-have: rule 9 is unenforceable
+  without it, and it is the check that caught four vacuous tests in the
+  predecessor project.
+- **A check that guards a long job must run in a second, not at the end.** A
+  configuration error that kills a twenty-minute run on its first line should be
+  caught before launch; a guard that fires when the run finishes has already
+  spent it.
+- **A tool that edits source in place needs an out-of-process backup.**
+  `try`/`finally` does not run when the process is killed, and a timeout will
+  eventually leave an edit in the working tree.
+- **A long-running job is not a reason to stop working.** While one is in
+  flight, pick up something that does not depend on its result — a probe to
+  build, a claim in the repo that has never been checked, a mechanism that lacks
+  a test. There is always local work.
+- **Arm the wake-up in the same action that launches the job.** A finished run
+  looks identical to a running one until someone asks. Launching and watching
+  are one step, not two.
+- **Never end a turn with neither more work nor an armed wake-up.** Writing
+  "continuing on the next thing" and then stopping is a dead stop that nothing
+  recovers from. Either keep going, or schedule the return. Prose is not a third
+  option.

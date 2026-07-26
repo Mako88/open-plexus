@@ -26,6 +26,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MQAR = ROOT / "openplexus" / "tasks" / "mqar.py"
+BASELINES = ROOT / "openplexus" / "baselines.py"
 
 
 @dataclass(frozen=True)
@@ -89,6 +90,41 @@ MUTATIONS = [
         path=MQAR,
         old="pairs = {k: _value_token(config, rng.randrange(config.n_values)) for k in keys}",
         new="pairs = {k: _value_token(config, rng.randrange(1)) for k in keys}",
+    ),
+    Mutation(
+        name="query-order-not-shuffled",
+        breaks="the shuffle, so query order leaks pair order and `positional` solves the task",
+        path=MQAR,
+        old="    rng.shuffle(query_order)",
+        new="    pass",
+    ),
+    Mutation(
+        name="trivial-floor-is-the-base-rate",
+        breaks="the floor, reverting it to the flattering 1/n_values a model must NOT be judged against",
+        path=MQAR,
+        old="        return 1 / self.n_pairs + (1 - 1 / self.n_pairs) / self.n_values",
+        new="        return 1 / self.n_values",
+    ),
+    Mutation(
+        name="oracle-off-by-one",
+        breaks="the oracle, which is the only check that the task is answerable at all",
+        path=BASELINES,
+        old="    return sequence.pairs[sequence.tokens[position]]",
+        new="    return sequence.pairs[sequence.tokens[position]] + 1",
+    ),
+    Mutation(
+        name="constant-baseline-not-fitted",
+        breaks="fitting, so the base rate stops tracking the data it is meant to describe",
+        path=BASELINES,
+        old="    most_common = counts.most_common(1)[0][0]",
+        new="    most_common = min(counts)",
+    ),
+    Mutation(
+        name="accuracy-scores-every-position",
+        breaks="scoring, diluting every measurement with positions where no answer is required",
+        path=BASELINES,
+        old="        for position in sequence.query_positions:",
+        new="        for position in range(len(sequence.tokens)):",
     ),
 ]
 

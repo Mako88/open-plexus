@@ -8,5 +8,11 @@ CLAUDE.local.md
 .DS_Store
 Thumbs.db
 
-# Stack-specific entries are deliberately absent — no stack has been chosen yet
-# (see GOALS.md §7). Add them in the same change that introduces the stack.
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Mutation-harness backups. Should never persist; if one is here, a run was
+# killed mid-edit and tools/mutate.py will restore it on next start.
+*.py.bak

@@ -95,6 +95,29 @@ class MqarConfig:
         return self.n_pairs * 3
 
     @property
+    def trivial_floor(self) -> float:
+        """The score a one-line heuristic achieves. **Not** the base rate.
+
+        Filler is drawn from spare *keys*, so the only value tokens anywhere in a
+        sequence are the `n_pairs` pair values. A strategy that emits any value
+        it has already seen is therefore right whenever it happens to name the
+        queried pair (`1/n_pairs`), or when some other pair carries the same
+        value by chance (`(1 - 1/n_pairs) / n_values`).
+
+        `1/n_values` — the constant-predictor base rate — is a much lower and
+        much more flattering number, and comparing a model against it would
+        credit as learning anything above pure guessing when the real bar is
+        here. Measured against two independent shortcut baselines across eight
+        conditions, this expression fits to within 0.016
+        (experiments/sweeps/g0-01-baselines.txt).
+
+        Note `n_pairs = 1` gives exactly 1.0: with a single pair the task is
+        solved by naming the only value present. That configuration is
+        diagnostic only and must never carry a result.
+        """
+        return 1 / self.n_pairs + (1 - 1 / self.n_pairs) / self.n_values
+
+    @property
     def pad_token(self) -> int:
         """A token that is neither a key nor a value.
 

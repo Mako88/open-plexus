@@ -28,6 +28,7 @@ explainer, and saying so is the most useful thing you can do.
 | [09](09-checking-our-homework.md) | Checking our homework |
 | [10](10-the-test-we-nearly-built.md) | The test we nearly built |
 | [11](11-the-first-code.md) | The first code — and the bug in the first thing it printed |
+| [12](12-what-does-knowing-nothing-score.md) | What does knowing nothing score? |
 
 More get added as the project introduces new ideas. Anything here that turns out
 to be wrong gets corrected, not softened — same rule as everywhere else.

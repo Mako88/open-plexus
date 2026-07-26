@@ -61,6 +61,27 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="salience-fires-on-one-tail-only",
+        breaks="the two-tailed rule, leaving only surprise and dropping the very-good outcomes John's framing turns on",
+        path=LOCAL,
+        old="                             and abs(surprise - mean_surprise)",
+        new="                             and (surprise - mean_surprise)",
+    ),
+    Mutation(
+        name="the-cap-never-binds",
+        breaks="the compensatory process, restoring the divergence that made a salience gate reach NaN",
+        path=LOCAL,
+        old="                        if size > self.config.lasting_cap:",
+        new="                        if False:",
+    ),
+    Mutation(
+        name="the-cap-edits-entries-instead-of-scaling",
+        breaks="synaptic scaling: clipping individual weights is a different and non-local mechanism",
+        path=LOCAL,
+        old="                            lasting *= self.config.lasting_cap / size",
+        new="                            np.clip(lasting, -1e-3, 1e-3, out=lasting)",
+    ),
+    Mutation(
         name="votes-lose-their-step",
         breaks="reassembly -- votes would be matched to steps by arrival "
                "order, so running ahead would scramble which answer belongs "

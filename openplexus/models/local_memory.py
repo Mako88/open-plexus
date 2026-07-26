@@ -523,8 +523,20 @@ class LocalAssociativeMemory:
                 # Surprise: how far the arriving token was from what was
                 # predicted, as a probability-free magnitude. Available to the
                 # node from its own last output and its own next input.
-                surprise = abs(float(previous_scores.max()
-                                      - previous_scores[token]))
+                # Scale-free, and it has to be. The obvious measure -- the
+                # margin between the best score and the arriving token's -- grows
+                # with the SIZE of the scores, so a memory that is filling up
+                # reads as steadily more surprised even while its predictions
+                # improve. Measured on a repeating cycle, margin surprise ROSE
+                # 266% over eight repeats where it should have fallen.
+                #
+                # The negative log of the normalised score falls with repetition,
+                # which is what surprise is supposed to do. Caught by John asking
+                # why a repeated pattern was not becoming less surprising.
+                shifted = previous_scores - previous_scores.max()
+                weights = np.exp(shifted)
+                surprise = -float(np.log(
+                    weights[token] / weights.sum() + 1e-12))
 
                 seen += 1
                 delta = surprise - mean_surprise

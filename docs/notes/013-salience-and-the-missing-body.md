@@ -45,7 +45,76 @@ Better than the ungated version, worse than not consolidating at all — and
 **monotonically worse the more the store is allowed to hold.** The trend points at
 a cap of zero, which is no consolidation.
 
-## 3. And here is why: it promotes filler, exclusively
+## 3. THE MEASURE WAS BROKEN — corrected below
+
+**Everything in the original section 3 was measured with a surprise definition
+that does not measure surprise.** John asked why a repeating pattern was not
+becoming less surprising with each repeat, which is what surprise is supposed to
+do. It was not, and here is the trace that shows it — mean surprise per repeat of
+one 16-token cycle:
+
+    margin surprise, decay 1.0      0.042  0.064  0.091  0.119  0.146  0.174  0.201
+    normalised surprise, decay 1.0  2.764  2.687  2.613  2.541  2.471  2.405  2.342
+
+The measure in use was the **margin** between the best score and the arriving
+token's. Scores grow as the memory fills, so the margin grows with them: it **rose
+266%** across eight repeats of an identical cycle, while the model's predictions
+were getting better. It was measuring how big the numbers had become.
+
+The negative log of the normalised score is scale-free and falls monotonically,
+which is what John expected and what surprise means. The model now uses it.
+
+## 3 (corrected). It is selective, and not selective enough
+
+With scale-free surprise, over six sequences at salience 2.5:
+
+    binding from a    positions    fired      rate
+              pair           48        0    0.0000
+             query           72       25    0.3472
+            answer           72        2    0.0278
+            filler         4410      201    0.0456
+
+  > **Query positions fire at 7.6× the filler rate.** That is a real signal, and
+  > it is the right one: in autoregressive MQAR the binding at a query position is
+  > the key paired with its answer, which is exactly what a later query needs.
+
+But filler is 92% of the sequence, so 88% of promotions are still filler by sheer
+volume. Enrichment of 7.6× is not enough when the base rate is that lopsided.
+
+Performance follows, and improves monotonically as the bar rises:
+
+    no consolidation                    0.625
+    fires on every correct prediction   0.482
+    salience 2.0                        0.488
+    salience 2.5                        0.505
+    salience 3.0                        0.537
+    salience 4.0                        0.562
+
+Still below not consolidating at all, and the trend points at 0.625 in the limit
+of never firing.
+
+## What the correction changes, and what it does not
+
+**Changed:** the original claim that the gate promotes filler *exclusively*, with
+zero enrichment for anything useful. That was an artefact of a measure tracking
+magnitude rather than error, and it is withdrawn. The gate is genuinely selective.
+
+**Unchanged:** consolidation still does not beat plain forgetting on this task.
+Every threshold tested loses, and the trend is monotone toward the no-consolidation
+number.
+
+**Sharpened:** the requirement is no longer "surprise is anti-correlated with
+usefulness here", which was too strong. It is that **the base rate is against
+it** — a 7.6× enriched signal drowns when the uninformative class is 92% of the
+data. A task with a heavier tail of genuinely informative rare events would give
+the same mechanism a far better ratio to work with, which is the same conclusion
+as before but for a defensible reason.
+
+---
+
+*Original section 3, retained because the correction is the point:*
+
+## 3 (original, withdrawn): it promotes filler, exclusively
 
 Replaying one sequence and recording which positions the gate fires on, by what
 kind of position produced the binding:
@@ -58,13 +127,9 @@ kind of position produced the binding:
 
   > **Every single promotion came from filler. Not one from a pair.**
 
-That is not a tuning problem and no cap fixes it. On MQAR, **surprise is
-anti-correlated with usefulness**: filler is drawn at random and is therefore
-maximally unpredictable, while the pair bindings — the only things any query ever
-asks about — are the least surprising content in the sequence once learned.
-
-A gate that promotes what surprises it will, on this task, reliably keep the noise
-and discard the signal.
+*This was read as surprise being anti-correlated with usefulness. With a working
+measure it is not: queries fire at 7.6× the filler rate. The zeros above are what
+a scale-dependent measure produces, not what the mechanism does.*
 
 ## What this does and does not say about the idea
 

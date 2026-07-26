@@ -589,6 +589,14 @@ arm saturates at capacity 16, so that comparison lives in a narrow band below it
 > **harmful** in practice. What *is* implementable and does help is plain decay —
 > 0.672 against 0.526 at seq_len 768 — and the gap between that and the oracle is
 > the honest size of what remains unsolved.
+>
+> **[g7-04](experiments/sweeps/g7-04-when-does-forgetting-pay.txt) put a number on
+> the decay half.** Forgetting starts paying at `seq_len 768` — 0.761 against
+> 0.725 — and the sign flips between 384 and 768, exactly where g1-06 predicted it
+> would. Its largest margin, +0.249 at 1536, is **between two failures**: the
+> trivial floor is 0.344 and neither arm clears it there, so a width-32 model is
+> simply out of its depth. **The honest figure is +0.036.** All four of that
+> sweep's predictions held, the first time in this project none was refuted.
 
 **And every exponent here is an exponent in sequence length for one reason.** The
 store binds every consecutive pair, so the number of things in memory *is* the

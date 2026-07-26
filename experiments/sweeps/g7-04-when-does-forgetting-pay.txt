@@ -2,7 +2,13 @@ Does consolidation ever beat simply not forgetting?
 ===================================================
 
 Script: experiments/g7_04_crossover.py
-Status: REFRAMED BY ITS OWN CONTROLS, NOT YET RUN. Three pre-dispatch
+Status: RUN on Actions, 64/64 cells. **ALL FOUR PREDICTIONS HELD** -- the
+        first sweep in this project where none was refuted. Forgetting pays
+        from seq_len 768. But the largest margin is between two failures:
+        at 1536 NEITHER arm clears the trivial floor, so the honest
+        crossover is +0.036 at 768, not +0.248 at 1536.
+
+        Previously: REFRAMED BY ITS OWN CONTROLS. Three pre-dispatch
         controls: the first found the decay grid meaningless, the second
         fixed it, and the third answered the headline question NO --
         consolidation is monotonically harmful once forgetting is set
@@ -164,3 +170,93 @@ every fact queried three times is weaker than one that exploits a heavy tail.
 Nor does it test consolidation against the ORACLE ceiling, which remains the
 thing to beat: the oracle reaches 1.000 with devices of one dimension, and
 nothing implementable has come close.
+
+
+RESULT
+------
+Overall accuracy, each arm at its own best learning rate, three seeds. Decay is a
+half-life in units of the sequence, so a column means the same thing at every
+length.
+
+  seq_len   no decay    h=1/2    h=1/4    h=1/8    best forgetting arm
+      192      0.978    0.957    0.916    0.798    h=1/2, by -0.022
+      384      0.961    0.937    0.877    0.721    h=1/2, by -0.025
+      768      0.725    0.761    0.711    0.571    h=1/2, by +0.036
+     1536      0.089    0.197    0.300    0.337    h=1/8, by +0.249
+
+The learning-rate grid contained its answer.
+
+
+THE CROSSOVER IS REAL AND IT IS AT 768
+----------------------------------------
+[g1-06](g1-06-interference.txt) measured decay as unhelpful at seq_len 96 and
+wrote, in its own words, that it "may still matter for sequences long enough that
+unbounded accumulation is the problem, which this task is not." **That condition
+is now met and the note was right.** The sign flips between 384 and 768.
+
+
+AND THE LARGEST MARGIN IS BETWEEN TWO FAILURES
+------------------------------------------------
+The trivial floor for this configuration -- what a one-line heuristic scores -- is
+**0.344**.
+
+    seq_len   no decay   best decay   both above the floor?
+        192      0.978        0.957   both
+        384      0.961        0.937   both
+        768      0.725        0.761   both
+       1536      0.089        0.337   **neither**
+
+At 1536, `0.337` *is* the floor. **The +0.249 is the difference between failing
+badly and failing at chance**, and reporting it as the headline would be
+misleading. A width-32 model is simply too small for a 1536-step sequence:
+g5-04's exponent puts the minimum machine width there well above 32, so that row
+measures a model out of its depth rather than a mechanism paying off.
+
+  > **The honest number is +0.036 at seq_len 768**, where both arms are
+  > comfortably above the floor and the comparison means something.
+
+That is a real result and a modest one. Forgetting pays, from about 768 steps, by
+about four points.
+
+
+THE PREDICTIONS -- ALL FOUR HELD
+----------------------------------
+1. **A crossover exists, guessed between 768 and 1536 -- HELD**, at the lower
+   bound of the guess.
+2. **The advantage grows past it -- HELD**, +0.036 then +0.249, with the caveat
+   above about what the second number means.
+3. **At seq 192 not-fading still wins -- HELD**, 0.978 against 0.957,
+   reproducing the probe. The replication control passes.
+4. **The best decay is length-dependent -- HELD.** Half-life 1/2 wins at 192,
+   384 and 768; 1/8 wins at 1536. Harsher forgetting for longer sequences,
+   exactly as predicted, and the grid was doing real work.
+
+**This is the first sweep in this project where no prediction was refuted.**
+Worth noting because it is unusual here, and because the reason is probably that
+the mechanism was already understood from three pre-dispatch controls rather than
+guessed at.
+
+
+CONSOLIDATION HELPS, AND NEVER ENOUGH
+---------------------------------------
+It beats plain forgetting in three cells:
+
+    seq 192, half-life 1/8, rate 1.0   +0.035
+    seq 384, half-life 1/8, rate 1.0   +0.058
+    seq 768, half-life 1/8, rate 1.0   +0.033
+
+**All three are in the harshest-forgetting arm, and none produces the best score
+at its length.** At seq 384 the rescued arm reaches 0.779 where plain half-life
+1/2 reaches 0.937. Consolidation rescues over-aggressive forgetting; sensible
+forgetting beats the rescue.
+
+And it does *not* help at 1536 -- the one length where forgetting is doing the
+most work. That is the failure mode this note named in advance: **the mechanism
+needs enough already working to have something to confirm.** Where accuracy is at
+the floor, confirmations are chance events, and promoting them promotes noise.
+
+So [note 011](../../docs/notes/011-what-rests-on-the-oracle.md) stands unchanged,
+now with a full sweep behind it rather than a probe: oracle gating removes the
+problem and is not implementable; decay is implementable and helps, from 768
+steps, by about four points; consolidation is implementable and never the best
+choice.

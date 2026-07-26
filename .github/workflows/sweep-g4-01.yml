@@ -1,0 +1,76 @@
+name: sweep-g4-01-no-global-readout
+
+# What does dropping the global readout cost?
+#
+# Note 009 4 named it the largest untested assumption here: y = Wo r sums over
+# every dimension, so once the width is spread across machines the readout is the
+# globally synchronised step C1 forbids. Four gates were passed on a model with
+# one.
+#
+# 54 jobs, 4 runs each (one per P). Costed before dispatch: the worst cell
+# (d=128, seq_len=384) is ~25 minutes.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/g4_01_partitions.py"
+      - ".github/workflows/sweep-g4-01.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  partitions:
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [32, 64, 128]
+        seqlen: [96, 384]
+        seed: [1, 2, 3]
+        lr: ["0.02", "0.05", "0.1"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: d ${{ matrix.width }} seq ${{ matrix.seqlen }} lr ${{ matrix.lr }} seed ${{ matrix.seed }}
+        run: python experiments/g4_01_partitions.py --width ${{ matrix.width }} --seqlen ${{ matrix.seqlen }} --lr ${{ matrix.lr }} --seed ${{ matrix.seed }} --json out/P-${{ matrix.width }}-${{ matrix.seqlen }}-${{ matrix.lr }}-${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g4-01-${{ matrix.width }}-${{ matrix.seqlen }}-${{ matrix.lr }}-${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: [partitions]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g4-01-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 54" | tee summary.txt
+          python tools/summarise_g4_01.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g4-01-summary
+          path: |
+            summary.txt
+            out/*.json

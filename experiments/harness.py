@@ -56,6 +56,10 @@ def parse_args(description: str) -> argparse.Namespace:
                         help="fraction of dimensions a departing machine takes")
     parser.add_argument("--drop", type=float, default=None,
                         help="fraction of events lost entirely")
+    parser.add_argument("--lr", type=float, default=None,
+                        help="learning rate; omitted means the script's own set")
+    parser.add_argument("--partitions", type=int, default=None,
+                        help="independent readout groups the width splits into")
     parser.add_argument("--sweep", default=None,
                         choices=("widths", "decay", "identity", "degrade", "drops"),
                         help="which sub-sweep to run when a script has more than one")

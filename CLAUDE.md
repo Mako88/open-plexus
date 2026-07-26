@@ -113,6 +113,21 @@ undetectable from outside, because the result looks carefully measured.
 > doubled relative to the one-sided version
 > ([g1-08](experiments/sweeps/g1-08-the-honest-price.txt)).
 
+**A prediction written after the controls have run is a weaker test than it
+looks.** Record which came first. When a control has already shown how the
+mechanism behaves, the prediction is a summary rather than a commitment, and it
+should not be counted as evidence that the mechanism was understood in advance.
+
+> *Calibration.* [g7-04](experiments/sweeps/g7-04-when-does-forgetting-pay.txt) is
+> the first sweep here where **all four predictions held**, which reads as a
+> milestone and is mostly an artefact. Three pre-dispatch controls had already
+> established that the decay grid was mis-parameterised, what the corrected one
+> did, and that consolidation was harmful once forgetting was sensible. By the
+> time the predictions were written they were not guesses. The discipline still
+> paid — the controls cost minutes and saved a wasted matrix — but the clean
+> scorecard is not the achievement it appears to be, and saying so is cheaper than
+> letting a run of successes accumulate unexamined.
+
 **A tool that hard-codes a property of one experiment will be wrong about the
 next one, and the direction of the error is not predictable.** Read the grid.
 

@@ -109,6 +109,33 @@ PREDICTIONS -- written before the run
 > 0.133 alone, 0.567 with 32 more. So the effect is entirely about where on the
 > curve the machine already sits, which is what the revised grid measures.
 
+> **A second control, on the capped grid, explains WHY pooling saturates and
+> narrows where the question can be asked.** At seq 384, one seed:
+>
+>     strong  alone   +strong   +w=1    +w=2    +w=4    +w=8    +w=16
+>          8  0.354    +0.192  -0.008  +0.100  +0.163  +0.192  +0.133
+>         16  0.546    +0.013  -0.025  -0.021  -0.012  -0.058  +0.013
+>
+> At strong=8 doubling gains +0.192 and the comparison is live. At strong=16
+> doubling gains +0.013 -- below the noise threshold -- so that row is already
+> saturated and its small negatives cannot be read as weak machines doing harm.
+>
+> **The mechanism is now clear and it ties three sweeps together.** g5-04 put the
+> seq-384 pooled floor at machine width (20, 24]. Pooling  width-1 nodes gives
+> an effective width of . So **pooling saturates exactly when the pooled width
+> reaches the floor for that sequence length** -- around 24 to 32 nodes at seq
+> 384. Nothing was mysterious about the ceiling; it is the same threshold measured
+> from a third direction.
+>
+> Which means the membership question is only answerable **below** the floor --
+> among machines too small to solve the task alone. That is precisely the regime
+> tiny devices live in, so the restriction is not a limitation of the experiment
+> so much as a description of where the question exists at all.
+>
+> **The preliminary answer is favourable**: in the live row, admitting a weak
+> machine costs at most 0.008, which is noise. Rows at strong=16 are reported and
+> excluded.
+
 Most likely wrong: (1). It is the favourable direction and the assumption behind
 every pooling result so far. **Check before believing:** that the strong+strong
 control scales as expected, since if adding a second strong machine also fails to

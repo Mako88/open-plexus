@@ -579,6 +579,17 @@ So selective storage removes both the sequence-length scaling *and* the allocati
 problem, which means heterogeneous hardware needs no policy. The caveat: the gated
 arm saturates at capacity 16, so that comparison lives in a narrow band below it.
 
+> **What every gated result rests on, in one line.** The three findings above —
+> length stops mattering, allocation stops mattering, forgetting stops — are all
+> measured with an **oracle** that reads task structure no running system has.
+> [Note 011](docs/notes/011-what-rests-on-the-oracle.md) gathers the dependency in
+> one place, because each finding states it once and a reader assembling the
+> position from here would reasonably conclude it was minor. It is not: the one
+> implementable substitute, consolidate-on-use, works mechanically and is
+> **harmful** in practice. What *is* implementable and does help is plain decay —
+> 0.672 against 0.526 at seq_len 768 — and the gap between that and the oracle is
+> the honest size of what remains unsolved.
+
 **And every exponent here is an exponent in sequence length for one reason.** The
 store binds every consecutive pair, so the number of things in memory *is* the
 sequence length, and the measured `√(d/N)` retrieval law turns that into all the

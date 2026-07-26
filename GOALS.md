@@ -642,6 +642,16 @@ That matters more than its size suggests: the alternative would have required
 someone to decide who counts, which is a coordinator by another name and the thing
 C1 exists to forbid. **The network can accept whoever turns up.**
 
+**And a machine that vanishes mid-sequence costs less than one that never joined.**
+G3 removed machines between sequences; the realistic failure is a drop-out
+partway through, which takes the departing node rows of the memory *including what
+it stored earlier in that same sequence*. Measured at seq 192 with half the nodes
+leaving: 0.592 if they go at step 0, 0.625 at step 64, 0.696 at step 180, against
+0.704 if nobody leaves. **Leaving at step 0 is bit-identical to never having
+joined**, so G3 measured the worst case and reality is strictly milder — which was
+not obvious, since a network might reasonably have come to depend on a machine it
+then loses.
+
 G4 (bandwidth) remains — but G4's central assumption is no longer
 an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the
 global readout, which [note 009](docs/notes/009-splitting-the-memory.md) §4 had

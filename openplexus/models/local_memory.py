@@ -313,7 +313,7 @@ class LocalAssociativeMemory:
     def run(self, tokens: np.ndarray, targets: np.ndarray | None = None,
             scored: np.ndarray | None = None, learn: bool = False,
             partition=None,
-            store: np.ndarray | None = None) -> np.ndarray:
+            store: np.ndarray | None = None, leave=None) -> np.ndarray:
         """Process one sequence; return the predicted next token per position.
 
         Args:
@@ -325,6 +325,20 @@ class LocalAssociativeMemory:
                 step. It exists so that this rule can be compared against the
                 attention model under the same objective.
             learn: Whether to update `Wo` online.
+            leave: `(step, nodes)` — those nodes vanish permanently at that
+                step, mid-sequence. `None` means nobody leaves.
+
+                **This is the failure a real network actually has, and the one
+                nothing here measured.** `ablate` models a machine gone *between*
+                sequences, which is a tidy world where every sequence starts with
+                a known set of participants. A machine that drops out halfway
+                through takes its rows of the memory with it — including whatever
+                was stored in them earlier in this very sequence — and the
+                answers after that point are produced without them.
+
+                The survivors keep their own rows and, with `derived_keys`, their
+                full key, so they carry on unaffected except that part of the
+                memory has gone dark.
             store: Which positions write into the memory. `None` stores every
                 consecutive pair, which is what everything before this measured.
 
@@ -382,6 +396,22 @@ class LocalAssociativeMemory:
                     f"would double-count its answer")
 
         d = self.config.d_model
+        # Which dimensions are still held by somebody. Local to this call: a
+        # departure is a fact about one run, not a permanent edit, so one model
+        # can be asked what happens under many different failures.
+        alive = np.ones(d)
+        leave_at, leaving = None, ()
+        if leave is not None:
+            leave_at, leaving = leave
+            for node in leaving:
+                if not 0 <= node < groups:
+                    raise ValueError(
+                        f"departing node outside [0, {groups}): {node}")
+            if not 0 <= leave_at < len(tokens):
+                raise ValueError(
+                    f"departure step {leave_at} outside a sequence of "
+                    f"{len(tokens)}")
+
         memory = np.zeros((d, d))
         # The consolidated store. Written only when a retrieval is confirmed
         # useful by the token that arrives next, and never decayed -- which is
@@ -395,8 +425,18 @@ class LocalAssociativeMemory:
             if not 0 <= token < self.config.vocab_size:
                 raise ValueError(
                     f"token {token} outside vocab of {self.config.vocab_size}")
+            if leave_at is not None and t == leave_at:
+                # Permanent, and it takes what those rows were holding. Clearing
+                # the memory rows rather than only silencing the vote is the
+                # point: a departed machine does not keep answering quietly, and
+                # what it had stored is not recoverable from the survivors.
+                per_group = d // groups
+                for node in leaving:
+                    alive[node * per_group:(node + 1) * per_group] = 0.0
+                memory *= alive[:, None]
+
             key = self.wk[token]
-            value = self.wv[token]
+            value = self.wv[token] * alive
 
             # STORE: bind the previous token to this one. Doing this before the
             # retrieval below is what makes the association available later

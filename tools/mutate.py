@@ -59,6 +59,23 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="departure-keeps-what-it-stored",
+        breaks="the severity of mid-sequence loss -- a node would stop voting "
+               "but leave its bindings behind, a far gentler failure than the "
+               "real one and the whole reason this case is measured separately",
+        path=LOCAL,
+        old="                memory *= alive[:, None]",
+        new="                memory *= 1.0",
+    ),
+    Mutation(
+        name="departure-is-only-a-dropped-message",
+        breaks="permanence -- the node would fall silent for one step and come "
+               "back, which is C2's failure rather than C3's",
+        path=LOCAL,
+        old="            value = self.wv[token] * alive",
+        new="            value = self.wv[token]",
+    ),
+    Mutation(
         name="departure-takes-derived-keys-too",
         breaks="the correction note 012 earned -- a node that derives its keys "
                "holds none, so blanking key columns on departure would report "

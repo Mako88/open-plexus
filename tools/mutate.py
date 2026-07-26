@@ -62,6 +62,25 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="the-zipf-law-is-inverted",
+        breaks="which end of the alphabet is heavy. The filler would still be "
+               "skewed, so any test that only checks concentration passes -- but "
+               "the RARE tokens become the common ones, which is the opposite of "
+               "the language statistic this mode exists to imitate",
+        path=MQAR,
+        old="        weights = [1.0 / (rank + 1) ** config.zipf_s",
+        new="        weights = [1.0 * (rank + 1) ** config.zipf_s",
+    ),
+    Mutation(
+        name="the-zipf-exponent-is-ignored",
+        breaks="the dial. Every setting would give the same distribution, so a "
+               "sweep over zipf_s would measure nothing and report it as a "
+               "flat line rather than as a broken knob",
+        path=MQAR,
+        old="        weights = [1.0 / (rank + 1) ** config.zipf_s",
+        new="        weights = [1.0 / (rank + 1) ** 1.0",
+    ),
+    Mutation(
         name="the-host-outranks-the-container",
         breaks="the only thing this module exists for: a container allowed one "
                "core of forty would read the HOST's memory and plan for a "

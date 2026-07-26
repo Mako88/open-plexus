@@ -25,7 +25,7 @@ from dataclasses import dataclass
 IGNORE = -1
 
 #: Filler modes. See `MqarConfig.filler`.
-FILLERS = ("none", "random", "structured")
+FILLERS = ("none", "random", "structured", "zipf")
 
 
 @dataclass(frozen=True)
@@ -76,6 +76,19 @@ class MqarConfig:
             has to be discarded, but predictable. These three exist so that the
             conflict recorded in docs/notes/002 §7 is a measurable condition
             rather than an argument.
+            `"zipf"` draws filler from a power law over the same alphabet, so a
+            few tokens are common and most are rare. **This exists to attack one
+            specific diagnosis.** Note 013 found the salience gate genuinely
+            selective — query positions fire at 7.6x the filler rate — and losing
+            anyway, because uniform filler is 92% of the sequence *and*
+            maximally surprising, so the enrichment drowns in the base rate.
+            Under a power law most filler becomes predictable and stops
+            competing for the gate's attention. Real language is Zipfian; uniform
+            filler is the adversarial case for any surprise-driven mechanism,
+            and it was chosen for reasons that had nothing to do with that.
+        zipf_s: Exponent of the `"zipf"` filler law, by rank over the filler
+            alphabet. Larger concentrates more mass on the commonest tokens; 0
+            is uniform, so the mode contains its own control.
         autoregressive: When True, each query is immediately followed by its
             answer token in the stream, so that predicting the next token at a
             query position **is** the task. When False (the default, since new
@@ -97,6 +110,7 @@ class MqarConfig:
     n_values: int = 16
     queries_per_pair: int = 1
     filler: str = "structured"
+    zipf_s: float = 1.0
     autoregressive: bool = False
     seed: int = 0
 
@@ -105,7 +119,9 @@ class MqarConfig:
             raise ValueError(f"filler must be one of {FILLERS}, got {self.filler!r}")
         if self.n_pairs < 1:
             raise ValueError("n_pairs must be at least 1")
-        if self.filler in ("random", "structured") and self.n_keys <= self.n_pairs:
+        if self.zipf_s < 0.0:
+            raise ValueError("zipf_s must not be negative")
+        if self.filler in ("random", "structured", "zipf") and self.n_keys <= self.n_pairs:
             raise ValueError(
                 f"n_keys ({self.n_keys}) must exceed n_pairs ({self.n_pairs}) "
                 f"when filler is {self.filler!r}: filler is drawn from the keys "
@@ -345,6 +361,14 @@ def _filler_token(
     """
     if config.filler == "random":
         return spare_keys[rng.randrange(len(spare_keys))]
+    if config.filler == "zipf":
+        # Rank-frequency by token id, so a token that is common in one sequence
+        # is common in all of them -- a distribution the model can actually
+        # learn, rather than a fresh reshuffle each time that would be uniform
+        # in expectation and would test nothing.
+        weights = [1.0 / (rank + 1) ** config.zipf_s
+                   for rank in range(len(spare_keys))]
+        return rng.choices(spare_keys, weights=weights)[0]
     if config.filler == "structured":
         # A deterministic cycle: irrelevant to the answer, but perfectly
         # predictable from position, so a predictive objective has signal here

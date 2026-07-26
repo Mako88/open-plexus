@@ -1,0 +1,135 @@
+Does a gate work when the statistics stop being adversarial?
+============================================================
+
+Script: experiments/g8_02_zipf_gate.py
+Status: PREDICTIONS WRITTEN, SCRIPT NOT YET WRITTEN, NOT DISPATCHED. Written
+        before the script exists and before any number from this grid has
+        been seen. g8-01 is in flight and its full result is not yet known;
+        only its pre-dispatch controls are, and they are quoted below.
+
+
+WHY THIS EXISTS
+---------------
+[Note 013](../../docs/notes/013-salience-and-the-missing-body.md) measured the
+salience gate as **genuinely selective** -- query positions fire at 7.6x the
+filler rate -- and losing anyway. The diagnosis was the base rate: filler is 92%
+of an MQAR sequence, and because it is drawn UNIFORMLY it is also the most
+surprising content in the sequence. A 7.6x enrichment does not survive a class
+that is both the overwhelming majority and maximally unpredictable.
+
+That diagnosis has never been tested. It is the difference between
+
+  (a) surprise-driven storage does not work, and
+  (b) surprise-driven storage does not work ON THIS BENCHMARK,
+
+and every result in g8-01 rests on which of those is true.
+
+**Uniform filler is the adversarial case for any surprise-driven mechanism, and
+it was chosen for reasons that had nothing to do with surprise.** It was chosen
+because structured filler starves a predictive objective (note 008 §4, measured
+at 0.824 predictable versus 0.135 for task content). Nobody asked what it does to
+a gate, because there was no gate yet.
+
+Real language is Zipfian, and the two facts that matter are that the common word
+is common everywhere and **the rare word is the informative one**. That is the
+opposite of MQAR's arrangement, where the rare thing is noise by construction.
+
+
+WHAT CHANGES, AND WHAT DELIBERATELY DOES NOT
+----------------------------------------------
+`MqarConfig` gains `filler="zipf"` and `zipf_s`. Filler tokens are drawn from a
+power law by rank over the same alphabet they were always drawn from.
+
+**Only the filler distribution changes.** Values stay uniform. This is the
+central design decision and it is worth stating why: the trivial floor is
+`1/n_pairs + (1 - 1/n_pairs)/n_values`, which assumes the answer alphabet is
+uniform. Making VALUES Zipfian would break that -- guessing the commonest value
+would beat the floor -- and every baseline, every answerability check and every
+frozen-substrate control in this repository would need recomputing. Changing
+filler alone attacks the diagnosis while leaving all of it valid.
+
+`zipf_s = 0` is uniform, so **the mode contains its own control** and the sweep
+does not need a separate arm to establish that the dial is doing something.
+
+
+THE ARMS AND THE GRID
+----------------------
+The four arms of g8-01, unchanged: `none`, `oracle`, `on-use`, `salience`.
+Crossed with the filler exponent.
+
+  zipf_s      0.0, 0.5, 1.0, 1.5, 2.0      0.0 is the uniform control
+  seq_len     768                          where g8-01's oracle gap is 0.293
+  half-life   0.25                         mid-range from g7-04
+  lr          0.02, 0.05, 0.1
+  seeds       1, 2, 3
+
+The reported quantity is **recovery**, `(arm - none) / (oracle - none)`, as in
+g8-01, with the same refusal to divide when the oracle's advantage is not larger
+than the spread across seeds.
+
+Sequence length and half-life are PINNED rather than swept, and that is a real
+narrowing: this asks whether the exponent moves recovery at one operating point,
+not whether it moves it everywhere. Sweeping all four would be several hundred
+jobs to answer a question that a single column answers if the effect exists at
+all.
+
+
+PREDICTIONS -- written before the script, before the controls, before any run
+-------------------------------------------------------------------------------
+1. **Recovery for `salience` rises with `zipf_s`.** This is the whole hypothesis.
+   Skewed filler is predictable filler, so filler stops clearing a surprise
+   threshold, so the enrichment ratio improves. Guess: recovery above 0.2 at
+   `zipf_s = 2.0` against approximately 0 at `zipf_s = 0`.
+
+2. **Recovery for `on-use` does NOT rise with `zipf_s`.** Confirmation asks
+   whether a retrieval was correct; it does not consult token frequency at all.
+   **This asymmetry is what makes the sweep a test rather than a hope** -- if
+   both arms rise together, something has changed the task's difficulty rather
+   than the gate's selectivity, and the result means nothing about gating.
+
+3. **The `none` arm improves with `zipf_s` too, and by a lot.** Predictable
+   filler is easier to predict, and most positions are filler. **This is the
+   trap in the whole design**: raw accuracy will rise for every arm, which is
+   why the reported quantity is a ratio. If recovery is read off raw accuracy
+   this sweep will produce a spurious success.
+
+4. **The oracle is almost unmoved by `zipf_s`.** It never stores filler, so
+   filler statistics should barely reach it. g8-01's control already shows the
+   oracle at 0.998 across every half-life, unmoved by a dial that moves every
+   other arm. If the oracle DOES move here, filler is reaching the memory by
+   some path the gate was believed to close, and that is a finding about the
+   implementation rather than about statistics.
+
+Most likely wrong: (1). Everything measured so far says these gates do not work,
+and one distributional change is a small lever against three independent
+negative results.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- salience recovery rises, on-use flat  -> the base-rate diagnosis was RIGHT.
+                                           MQAR was hiding a working mechanism,
+                                           and the task, not the gate, was the
+                                           problem
+- both arms rise together               -> the task got easier; nothing has been
+                                           learned about gating. Check arm 3
+                                           before believing anything
+- neither moves                         -> the base-rate diagnosis was WRONG.
+                                           Surprise-driven storage fails for a
+                                           reason not yet identified, and note
+                                           013's explanation must be withdrawn
+- the oracle moves                      -> filler is reaching the memory through
+                                           a path the gate was believed to close
+
+
+WHAT THIS CANNOT SETTLE
+------------------------
+**Whether real language behaves like this.** A power law over a 28-token filler
+alphabet shares one property with language and almost none of the others -- no
+grammar, no long-range dependency, no compositional structure, and an alphabet
+three orders of magnitude too small. A positive result here is a reason to build
+the corpus benchmark, not a substitute for it.
+
+**Whether the exponent is realistic.** Word frequencies sit near `s = 1`, but
+that is measured over a vocabulary of tens of thousands. The same exponent over
+28 tokens is a different distribution with the same name.

@@ -59,6 +59,31 @@ from dataclasses import dataclass
 import numpy as np
 
 
+def surprise(scores: np.ndarray, token: int) -> float:
+    """How unexpected `token` was, given the scores predicted before it arrived.
+
+    The negative log of the token's share of the scores, after they are turned
+    into a distribution. **The property that makes this surprise rather than
+    some other number is that it depends on the WHOLE prediction** -- on every
+    alternative the node considered and rejected, not only on the best one.
+    tests/test_surprise_means_surprise.py checks exactly that.
+
+    The measure this replaced -- the margin between the best score and the
+    arriving token's -- reads two numbers and ignores the rest. So it cannot see
+    the thing learning actually does, which is to suppress the alternatives: a
+    node can go from "these five were nearly tied" to "it was clearly this one"
+    with the margin unmoved. Measured on eight repeats of one identical cycle
+    the margin ROSE 266%, where surprise must fall. John caught it by asking why
+    a repeating pattern was not becoming less surprising.
+
+    Available to a node from its own last output and its own next input, so it
+    costs no communication and satisfies C1.
+    """
+    shifted = scores - scores.max()          # overflow only, exp is shift-free
+    weights = np.exp(shifted)
+    return -float(np.log(weights[token] / weights.sum() + 1e-12))
+
+
 @dataclass(frozen=True)
 class LocalMemoryConfig:
     """Shape and learning settings.
@@ -533,15 +558,12 @@ class LocalAssociativeMemory:
                 # The negative log of the normalised score falls with repetition,
                 # which is what surprise is supposed to do. Caught by John asking
                 # why a repeated pattern was not becoming less surprising.
-                shifted = previous_scores - previous_scores.max()
-                weights = np.exp(shifted)
-                surprise = -float(np.log(
-                    weights[token] / weights.sum() + 1e-12))
+                step_surprise = surprise(previous_scores, token)
 
                 seen += 1
-                delta = surprise - mean_surprise
+                delta = step_surprise - mean_surprise
                 mean_surprise += delta / seen
-                m2 += delta * (surprise - mean_surprise)
+                m2 += delta * (step_surprise - mean_surprise)
                 deviation = (m2 / seen) ** 0.5 if seen > 1 else 0.0
 
                 if not self.config.salience:
@@ -550,7 +572,7 @@ class LocalAssociativeMemory:
                     # Both tails. Very wrong and very right are both worth
                     # keeping; the unremarkable middle is not.
                     fires = (deviation > 0.0
-                             and abs(surprise - mean_surprise)
+                             and abs(step_surprise - mean_surprise)
                              > self.config.salience * deviation)
                 if fires:
                     lasting += self.config.consolidation * np.outer(

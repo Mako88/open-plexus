@@ -141,6 +141,32 @@ next one, and the direction of the error is not predictable.** Read the grid.
 > is the more dangerous one**: an over-confident number invites checking, while
 > "unresolved" invites another sweep that was never needed.
 
+**Tests check code against claim. Nothing here checked claim against sense.**
+Unit tests check the code does what the docstring says; the mutation harness
+checks the tests would notice if it stopped. A quantity that is computed exactly
+as described, described exactly as implemented, and named something the
+implementation does not earn passes every one of those layers, because they all
+agree with each other. **For each derived quantity, write down the property that
+makes it that quantity and test that property directly** — in a form that does
+not mention how it is computed.
+
+> *Calibration.* `surprise` was the margin between the best score and the
+> arriving token's. The code computed a margin, the docstring said margin, the
+> tests checked margin, and 67 mutations passed. It was published as a finding —
+> that the salience gate promotes filler exclusively — and the finding was an
+> artefact. **John caught it by asking why a repeating pattern was not becoming
+> less surprising.** The measure grew 266% across eight repeats of one identical
+> cycle. No test in this repository was positioned to notice, because none of
+> them was about the meaning of the word.
+>
+> The first meaning test written afterwards **asserted the wrong meaning** — that
+> surprise must be unchanged when every score is scaled, which is false, since
+> scaling scores is a temperature change. It failed on its first run and was
+> replaced by the true property: surprise depends on the whole prediction, not
+> only on the best score and the arriving one. So the discipline is a better
+> class of check than the ones around it, **not a guarantee** — and a meaning
+> test that passes on the first run deserves suspicion, not satisfaction.
+
 **A caveat printed next to a number does not attach to the number.** If a value
 is a *bound* — a crossing that sat at the edge of the grid, a run that hit its
 budget — the code has to refuse to use it as a value. Annotating it and computing

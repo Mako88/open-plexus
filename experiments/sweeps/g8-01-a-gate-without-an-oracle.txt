@@ -1,0 +1,135 @@
+Can any real mechanism replace the oracle gate?
+===============================================
+
+Script: experiments/g8_01_real_gate.py
+Status: PREDICTIONS WRITTEN, NOT YET DISPATCHED. Written before the script
+        exists, before the controls have run, and before any number from
+        this grid has been seen. Recorded here so the order is checkable.
+
+
+WHY THIS IS THE ONE THAT MATTERS
+---------------------------------
+Three of the project's best findings run through a gate that reads the answer
+key. g7-02 (length stops mattering), g7-03 (allocation stops mattering) and the
+tiny-node result itself all depend on `run(store=mask)`, and that mask comes from
+`position_kinds()` -- the task telling the model which positions are worth
+storing. **It is a ceiling, not a mechanism**, and note 011 named the gap between
+it and plain decay as the honest size of what remains unsolved.
+
+The reason it is load-bearing rather than incidental is one equation. Retrieval
+quality goes as `SNR = sqrt(d/N)` -- node width over things stored -- measured
+within 5% across a 16x range. Ungated, every consecutive pair is written, so `N`
+is the sequence length and holding quality fixed as sequences grow means growing
+`d` with them. **That is what kills tiny nodes.** Gated, `N` is twice the number
+of real bindings whatever the length, which is why the four rows of g7-02 were
+identical to three decimals.
+
+So the tiny-node thesis and the gating problem are the same problem, and this
+sweep asks the only question that settles it: **how much of the oracle's
+advantage can a mechanism that reads nothing it should not read actually
+recover?**
+
+
+THE ARMS
+--------
+All four are the same model on the same data, differing only in what gets
+written into the lasting store.
+
+  none          store every consecutive pair, fade by decay      the FLOOR
+  oracle        store only real bindings, read from the task     the CEILING
+  on-use        promote a retrieval that was confirmed correct   real
+  salience      promote a step whose surprise is unusual         real
+
+`on-use` is tagging and capture (note 010, from Lehr et al. 2022): tag now,
+cheaply, and let a LATER signal decide what survives. It needs a second occasion
+to be confirmed on, which plain MQAR never provides because each binding is asked
+about exactly once, at the end. **Recurrent MQAR is what makes this arm
+testable at all** -- `queries_per_pair=3`, already built and pinned
+bit-identical to the old generator by a golden digest.
+
+`salience` fires on the tails of its own surprise distribution. Note 013 measured
+it as genuinely selective -- query positions fire at 7.6x the filler rate -- and
+still losing, because filler is 92% of the sequence and a 7.6x enrichment does
+not survive that base rate.
+
+
+THE QUESTION IS A RATIO, NOT AN ACCURACY
+-----------------------------------------
+The reported quantity is **recovery**: (arm - none) / (oracle - none), per
+sequence length. 0 means the mechanism bought nothing the floor did not already
+have; 1 means it matched a gate that cheats.
+
+Reporting raw accuracy would hide the thing being asked, because all four arms
+rise and fall together with length and learning rate. **A caveat next to the
+number does not attach to the number**, so the ratio is what the summariser
+prints and the raw accuracies go beside it, not the other way round.
+
+Where `oracle - none` is smaller than the seed spread, recovery is undefined and
+must be printed as undefined rather than as a large number with a note. That is
+the failure mode g5-01 produced twice.
+
+
+PREDICTIONS -- written before the run, before the script, before the controls
+-----------------------------------------------------------------------------
+1. **Both real arms recover less than half the oracle's advantage at every
+   length.** Everything measured so far points here: consolidate-on-use lost to
+   plain decay in g7-04, and salience lost at every threshold in note 013. Guess:
+   recovery under 0.5 in all cells, and under 0.25 for salience.
+
+   This is the unfavourable direction and it is the one the evidence supports, so
+   it is stated first and plainly.
+
+2. **on-use beats salience at every length.** Confirmation is a signal about
+   whether a binding was USEFUL; surprise is a signal about whether a token was
+   PREDICTABLE, and note 013 established those are not the same thing on this
+   task. Recurrent MQAR gives on-use the second occasion it was missing and gives
+   salience nothing new.
+
+3. **Recovery FALLS as sequence length grows.** The oracle's advantage comes from
+   holding `N` constant, and the longer the sequence the more filler a real
+   mechanism has to reject to keep up. A fixed per-step selectivity cannot hold a
+   constant `N` against a growing sequence -- it can only hold a constant
+   FRACTION. Guess: recovery at 768 is below half of recovery at 192.
+
+   **This is the prediction that would hurt most if it holds**, because it says
+   the gap widens exactly where the gate is most needed.
+
+4. **Control, expected to hold trivially:** `oracle` beats `none` by a margin
+   larger than the seed spread at every length tested. If this fails the sweep is
+   vacuous -- there is no advantage to recover -- and nothing else in the table
+   means anything.
+
+Most likely wrong: (2). If salience wins, then usefulness is not the right signal
+and the tagging-and-capture reading of note 010 is wrong about this system.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- recovery near 1 for either arm     -> the oracle is replaceable and the tiny
+                                        node results survive intact. The best
+                                        outcome available and the least likely
+- recovery 0.5-0.9                   -> partial. The gate is real but lossy, and
+                                        the tiny-node claim needs restating with
+                                        a measured penalty attached
+- recovery near 0 for both           -> selective storage is not reachable by any
+                                        local rule tried, and every result that
+                                        depends on the gate must be re-labelled a
+                                        CEILING in GOALS, not a finding
+- recovery falls with length (3)     -> worse than a constant loss: the mechanism
+                                        fails where it is needed most
+- oracle does not beat none (4)      -> vacuous grid, discard and redesign
+
+
+WHAT THIS CANNOT SETTLE
+------------------------
+**Whether a better mechanism exists.** Two candidates lose does not mean the
+class is empty, and a negative result here bounds what has been tried rather than
+what is possible. The honest statement in that case is that no local rule tried
+so far recovers the oracle -- not that none can.
+
+**Anything about real data.** MQAR's filler is uniformly random, which note 013
+identified as the specific reason salience drowns: the uninformative class is 92%
+of the sequence and maximally unpredictable. Real language is the opposite -- the
+rare token is both surprising AND informative. **A negative result here is
+therefore weak evidence about language and strong evidence about MQAR**, and must
+be written up that way.

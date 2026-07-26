@@ -61,11 +61,25 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="surprise-is-the-margin-again",
+        breaks="the meaning of surprise, restoring the measure that read only "
+               "the best score and the arriving one. It cannot see learning "
+               "suppress the alternatives, and it grows with the size of the "
+               "scores, so a filling memory reports rising surprise while its "
+               "predictions improve. Shipped, published a conclusion, and was "
+               "caught by John asking why a repeat was not getting less "
+               "surprising -- not by any test here, which is why the meaning "
+               "tests exist",
+        path=LOCAL,
+        old="    return -float(np.log(weights[token] / weights.sum() + 1e-12))",
+        new="    return float(scores.max() - scores[token])",
+    ),
+    Mutation(
         name="salience-fires-on-one-tail-only",
         breaks="the two-tailed rule, leaving only surprise and dropping the very-good outcomes John's framing turns on",
         path=LOCAL,
-        old="                             and abs(surprise - mean_surprise)",
-        new="                             and (surprise - mean_surprise)",
+        old="                             and abs(step_surprise - mean_surprise)",
+        new="                             and (step_surprise - mean_surprise)",
     ),
     Mutation(
         name="the-cap-never-binds",
@@ -101,11 +115,15 @@ MUTATIONS = [
     ),
     Mutation(
         name="driver-ignores-a-node",
-        breaks="the sum -- one node's vote would silently vanish, which "
-               "looks exactly like a smaller network and nothing else",
+        breaks="the sum -- votes overwrite instead of accumulating, so "
+               "every node but the last to answer is silently discarded. "
+               "The previous form of this mutation scaled every vote by "
+               "one half, which survived because a uniform positive scale "
+               "cannot change an argmax: it was a false mutation testing "
+               "nothing, not a vacuous test",
         path=DISTRIBUTED,
         old='                slot[0] += np.frombuffer(message[4:], dtype=">f8")',
-        new='                slot[0] += np.frombuffer(message[4:], dtype=">f8") * 0.5',
+        new='                slot[0] = np.frombuffer(message[4:], dtype=">f8")',
     ),
     Mutation(
         name="derived-key-ignores-the-seed",
@@ -180,8 +198,8 @@ MUTATIONS = [
         breaks="the gate -- it would promote every retrieval rather than the "
                "confirmed ones, making it a second memory wearing a gate's name",
         path=LOCAL,
-        old="                if predictions[t - 1] == token:",
-        new="                if True:",
+        old="                    fires = predictions[t - 1] == token",
+        new="                    fires = True",
     ),
     Mutation(
         name="consolidation-reads-ahead",
@@ -189,8 +207,8 @@ MUTATIONS = [
                "the one that has just arrived lets the answer at t depend on "
                "information from t itself, which no running system would have",
         path=LOCAL,
-        old="                if predictions[t - 1] == token:",
-        new="                if predictions[t - 1] == tokens[t - 1]:",
+        old="                    fires = predictions[t - 1] == token",
+        new="                    fires = predictions[t - 1] == tokens[t - 1]",
     ),
     Mutation(
         name="consolidated-store-is-never-read",

@@ -261,6 +261,26 @@ class LocalAssociativeMemory:
         without needing to be masked — the machine cannot come back by accident,
         which is the property being modelled.
 
+        **What a departing node takes depends on whether it held keys.** With
+        `derived_keys` off, `Wk` is a stored table and each node owns its columns
+        of it, so a departure removes key dimensions every *surviving* node
+        needed — the shared-broadcast loss that made churn damage global rather
+        than local. With `derived_keys` on, no node holds any of `Wk`: each
+        computes the full key from the token, so a departure takes only that
+        node's own values and readout and the survivors are untouched.
+
+        The difference is large and grows with churn. At seq_len 192, width 64,
+        three seeds:
+
+            removed    holds keys    derives keys    gain
+                25%         0.961           0.982   +0.021
+                50%         0.808           0.919   +0.111
+                75%         0.504           0.760   +0.256
+
+        So this reads `derived_keys` rather than taking a flag: whether a
+        departing node had keys to take is a property of the configuration, not a
+        choice the caller should be able to get wrong.
+
         **Note what is NOT lost.** The associative memory is per-sequence working
         state, rebuilt from scratch every sequence. Only the readout persists
         across sequences. So a departing machine costs *capacity*, and costs
@@ -271,7 +291,8 @@ class LocalAssociativeMemory:
         if index.size and (index.min() < 0 or index.max() >= self.config.d_model):
             raise ValueError(
                 f"dimension outside [0, {self.config.d_model}): {index}")
-        self.wk[:, index] = 0.0
+        if not self.config.derived_keys:
+            self.wk[:, index] = 0.0
         self.wv[:, index] = 0.0
         self.wo[:, index] = 0.0
 
@@ -281,7 +302,13 @@ class LocalAssociativeMemory:
         The honest denominator after churn. Reporting a score against the
         original `d_model` would credit the model with room it no longer has.
         """
-        return int((np.abs(self.wk).sum(axis=0) > 0).sum())
+        # Counted through the VALUES, not the keys. A departing node always
+        # takes its own values; it takes key columns only when keys are a stored
+        # table. Counting through `wk` therefore reported a derived-key network
+        # as fully intact after half of it had left -- caught by
+        # tests/test_departure.py the moment ablate() learned to respect
+        # derived_keys, and wrong in the direction that flatters churn survival.
+        return int((np.abs(self.wv).sum(axis=0) > 0).sum())
 
     def run(self, tokens: np.ndarray, targets: np.ndarray | None = None,
             scored: np.ndarray | None = None, learn: bool = False,

@@ -78,6 +78,13 @@ be explained away — it is the broadcast, and a decomposition that passed the
 first check while failing the second would not be doing content-addressed
 retrieval across the full width at all.
 
+> **Softened by [note 012](012-broadcast-the-token.md).** What follows is true
+> when `Wk` is a stored table each node owns a slice of. With derived keys no node
+> holds any of it, so a departure takes only its own values and the survivors keep
+> the full key. Measured at seq 192, width 64: losing half the network costs 0.919
+> against 0.808, and losing three quarters costs 0.760 against 0.504. **Churn
+> damage is local after all, given the right key scheme.**
+
 **And it has a consequence for churn that was not anticipated here.** Because the
 key is shared, a departing machine takes a slice of a quantity every surviving
 machine reads. **Churn degrades every group, not only the group that left.** Not

@@ -59,6 +59,23 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="departure-takes-derived-keys-too",
+        breaks="the correction note 012 earned -- a node that derives its keys "
+               "holds none, so blanking key columns on departure would report "
+               "churn as up to 0.256 more damaging than it is",
+        path=LOCAL,
+        old="        if not self.config.derived_keys:\n            self.wk[:, index] = 0.0",
+        new="        if True:\n            self.wk[:, index] = 0.0",
+    ),
+    Mutation(
+        name="departure-leaves-the-readout-behind",
+        breaks="permanence -- a departed node would keep voting through a "
+               "readout nobody zeroed",
+        path=LOCAL,
+        old="        self.wo[:, index] = 0.0",
+        new="        self.wo[:, index] *= 1.0",
+    ),
+    Mutation(
         name="derived-keys-share-one-stream",
         breaks="reconstructibility -- a row would depend on every draw before "
                "it, so a node could only rebuild the table by rebuilding all of "
@@ -392,10 +409,19 @@ MUTATIONS = [
     ),
     Mutation(
         name="surviving-width-reports-the-original",
-        breaks="the honest denominator, crediting the model with room it lost",
+        breaks="the honest denominator after churn -- a departed network would "
+               "be scored against room it no longer has",
         path=LOCAL,
-        old="        return int((np.abs(self.wk).sum(axis=0) > 0).sum())",
+        old="        return int((np.abs(self.wv).sum(axis=0) > 0).sum())",
         new="        return self.config.d_model",
+    ),
+    Mutation(
+        name="surviving-width-counts-through-keys",
+        breaks="liveness detection under derived keys -- keys are never zeroed "
+               "there, so a half-departed network would report itself intact",
+        path=LOCAL,
+        old="        return int((np.abs(self.wv).sum(axis=0) > 0).sum())",
+        new="        return int((np.abs(self.wk).sum(axis=0) > 0).sum())",
     ),
     Mutation(
         name="buffer-releases-a-slot-too-early",

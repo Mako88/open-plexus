@@ -22,7 +22,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from experiments.g6_01_forgetting import BASE, sequences  # noqa: E402
-from experiments.harness import emit, parse_args  # noqa: E402
+from experiments.harness import oracle_mask, emit, parse_args  # noqa: E402
 from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
 
@@ -33,12 +33,6 @@ MODES = ("open", "gated")
 LEARNING_RATES = (0.02, 0.05, 0.1, 0.2)
 SEEDS = (1, 2, 3)
 N_TRAIN, N_TEST, EPOCHS, KEY_SCALE = 400, 120, 8, 0.5
-
-
-def mask_for(tokens, kinds) -> np.ndarray:
-    """Oracle storage mask: keep a binding only where the previous position was a
-    pair. Reads task structure a deployed system would not have."""
-    return np.array([i > 0 and kinds[i - 1] == "pair" for i in range(len(tokens))])
 
 
 def build(half: int, count: int, seed: int, gated: bool):
@@ -58,7 +52,7 @@ def build(half: int, count: int, seed: int, gated: bool):
         targets = np.roll(tokens, -1)
         scored = np.ones(len(tokens), dtype=bool)
         scored[-1] = False
-        keep = mask_for(tokens, sequence.position_kinds()) if gated else None
+        keep = oracle_mask(sequence.position_kinds()) if gated else None
         built.append((tokens, targets, scored, keep, sequence.query_positions))
     return built
 

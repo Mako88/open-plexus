@@ -23,7 +23,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from experiments.harness import emit, parse_args  # noqa: E402
+from experiments.harness import oracle_mask, emit, parse_args  # noqa: E402
 from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
 from openplexus.tasks.mqar import MqarConfig, dataset  # noqa: E402
@@ -51,8 +51,7 @@ def prepare(count: int, seed: int, gated: bool):
         scored = np.ones(len(tokens), dtype=bool)
         scored[-1] = False
         kinds = sequence.position_kinds()
-        keep = (np.array([i > 0 and kinds[i - 1] == "pair"
-                          for i in range(len(tokens))]) if gated else None)
+        keep = oracle_mask(kinds) if gated else None
         built.append((tokens, targets, scored, keep, sequence.query_positions))
     return built
 

@@ -28,6 +28,26 @@ from pathlib import Path
 SOLVED, STUCK = 0.9, 0.2
 
 
+def oracle_mask(kinds) -> "np.ndarray":
+    """Positions whose arriving binding is worth storing. **AN ORACLE.**
+
+    Keeps a binding only where the PREVIOUS position was a pair, which is the
+    task telling the model which of its own positions matter. A deployed system
+    has no such signal, so every number measured through this is a **ceiling on
+    what a real gate could achieve, not a result about one**.
+
+    It is why the g7-02 rows are identical across sequence length: gating holds
+    the number of stored bindings at twice the pair count whatever the length,
+    and retrieval goes as sqrt(width / stored). Removing it is the whole subject
+    of g8-01.
+
+    Lives here rather than in each sweep because it had been copied verbatim
+    into three of them, and a caveat this heavy should not have four homes.
+    """
+    import numpy as np
+    return np.array([i > 0 and kinds[i - 1] == "pair" for i in range(len(kinds))])
+
+
 def parse_args(description: str) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--seed", type=int, default=None,

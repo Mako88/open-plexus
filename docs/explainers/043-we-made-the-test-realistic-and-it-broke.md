@@ -78,9 +78,12 @@ attempted, and it is now a known problem with a name rather than an ambush.
 
 ## The honest scorecard
 
-- The excuse **did not hold**. Surprise-based memory failed on realistic
-  statistics too, so "our test was unfair" is a much weaker defence than it was
-  yesterday.
+- The excuse **is still standing, weakly**. *(Corrected after an audit.)* We
+  could only measure two of the five settings — at the more realistic ones the
+  model breaks down so badly that there is nothing left to compare against, and
+  a comparison against a broken baseline measures nothing. So "our test was
+  unfair" has not been ruled out; it has been left untested at exactly the
+  settings that matter, because **the model cannot survive them yet.**
 - We also learned our gate **doesn't control what we thought**. It decides what
   gets *stored*, but the model keeps *learning* from everything either way — which
   is why the cheating version was affected by a change that should not have

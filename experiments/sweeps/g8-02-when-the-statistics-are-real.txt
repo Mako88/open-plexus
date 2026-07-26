@@ -305,3 +305,58 @@ is chosen.
 
 **This is the most useful thing the sweep produced and it is not what the sweep
 was for.**
+
+
+CORRECTION -- THE USABLE RANGE IS NARROWER THAN CLAIMED, AND THE CONCLUSION
+WEAKENS WITH IT
+============================================================================
+Found by tools/audit_floor.py while auditing g8-01 for the same fault.
+
+**Seven of fifteen cells have the `none` arm at or below the trivial floor of
+0.34375**, so their recovery ratios divide by the gap between a working ceiling
+and a broken floor. Per seed, at the best learning rate for each exponent:
+
+    zipf_s 0.0    0.560/0.401/0.430    mean 0.464    usable
+    zipf_s 0.5    0.553/0.362/0.370    mean 0.428    usable
+    zipf_s 1.0    0.413/0.277/0.196    mean 0.295    NO
+    zipf_s 1.5    0.000/0.000/0.000    mean 0.000    NO
+    zipf_s 2.0    0.000/0.000/0.000    mean 0.000    NO
+
+The write-up above states that "the honest usable range is `zipf_s` 0.0 to 1.0".
+**That was wrong.** The usable range is 0.0 and 0.5 — two points.
+
+WHAT THIS DOES TO THE CONCLUSION. The sweep concluded that the base-rate
+diagnosis is not supported: making filler predictable did not lift the gate. That
+conclusion now rests on **two exponents, 0.0 and 0.5**, over which salience
+recovery moves from -0.05 to -0.04.
+
+That is not evidence that skew fails to help. It is evidence that a *small amount
+of skew* fails to help, measured over a range that does not reach the interesting
+part. **Word frequencies sit near exponent 1.0** — the first cell this sweep
+cannot use.
+
+So the honest status of the base-rate hypothesis is **largely untested**, not
+refuted. The claim in the RESULT section that it is "NOT supported" is withdrawn
+and replaced by: *no effect was detectable across the narrow band of skew where
+the floor arm still works, and the band stops short of realistic skew.*
+
+WHAT SURVIVES UNCHANGED.
+
+- **The collapse finding.** At exponent 1.5 and above the model emits one token
+  at every position. That is a property of the model under skewed input and does
+  not depend on any recovery ratio.
+- **The divergence.** Note 018 traces it to the fast store's geometric growth,
+  measured without training.
+- **Prediction 3 refuted backwards.** `none` falls rather than rises with skew.
+  The floor arm's collapse IS that finding, not a confound of it.
+- **Prediction 4 refuted.** The oracle moves because the delta rule learns from
+  every position whether or not it was stored.
+
+WHY THE BAND IS SO NARROW, WHICH IS THE USEFUL PART. The floor arm fails at
+exponent 1.0 for the reason note 018 identifies: repetition drives the fast store
+up, and the readout update is quadratic in it. **So this sweep could not test
+realistic skew because the model cannot survive realistic skew** — which is a
+better statement of the blocker than "the corpus benchmark needs care", and it
+puts the fast-store cap ahead of any re-run.
+
+Re-running this grid before that cap exists would produce the same broken cells.

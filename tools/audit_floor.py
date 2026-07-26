@@ -1,56 +1,94 @@
-"""Which g8-01 cells were measured BETWEEN TWO FAILURES?
+"""Which cells were measured BETWEEN TWO FAILURES?
 
-g7-04 already taught this lesson: its largest margin, +0.249 at seq 1536, sat
-between two arms both at or below the trivial floor, and the honest figure was
-+0.036. The project wrote that down.
+A recovery ratio divides by `oracle - none`. If the ungated arm sits at or below
+the **trivial floor**, it is not doing the task at all, and that denominator is
+the distance between a working ceiling and a broken floor — the gap between
+something and nothing, not an advantage a mechanism could recover.
 
-g8-01 then computed recovery = (arm - none) / (oracle - none) at every length
-without checking whether `none` was above the floor at all. If it is not, the
-denominator is the distance between a working ceiling and a BROKEN floor, and
-the ratio is not a recovery of anything.
+[g7-04](../experiments/sweeps/g7-04-when-does-forgetting-pay.txt) caught this and
+the project recorded it: *"its largest margin, +0.249 at 1536, is between two
+failures, both at/below the 0.344 floor"*. g8-01 repeated it one sweep later, and
+its summariser made it worse by choosing the learning rate that **maximises** the
+gap — which is exactly what a broken floor arm does.
 
-Worse, the summariser picks the learning rate that MAXIMISES that gap -- and a
-broken floor maximises it. So the selection rule actively prefers the cells where
-the floor arm has failed.
+So this exists to be run over every sweep's artefacts, not only the one where the
+problem happened to be noticed.
 
-Trivial floor for MQAR with n_pairs=4, n_values=8:
-    1/n_pairs + (1 - 1/n_pairs)/n_values = 0.25 + 0.09375 = 0.34375
+    python tools/audit_floor.py "out/*.json"
+    python tools/audit_floor.py "out/*.json" --floor 0.125
+
+**The floor is an argument, not a constant.** It depends on the task: MQAR at
+`n_pairs 4, n_values 8` gives `1/4 + (3/4)/8 = 0.34375`; reward-recall gives
+`1/n_values`. A tool that hard-codes one experiment's property will be wrong about
+the next one and the direction of the error is not predictable, so the default is
+derived in the open and overridable.
 """
+
+from __future__ import annotations
+
+import argparse
 import glob
 import json
 from collections import defaultdict
 
-FLOOR = 1 / 4 + (1 - 1 / 4) / 8
-BASE = ("C:/Users/John/AppData/Local/Temp/claude/D--repos-submenu/"
-        "c14e22fe-06ee-43a1-83b7-05ae6d95924b/scratchpad/g801/*/*.json")
+#: MQAR at n_pairs 4, n_values 8. Derived here so it can be checked.
+MQAR_FLOOR = 1 / 4 + (1 - 1 / 4) / 8
 
-rows = [r for f in glob.glob(BASE) for r in json.load(open(f))]
-cells = defaultdict(dict)
-for r in rows:
-    cells[(r["seq_len"], r["half_life"], r["lr"], r["arm"])][r["seed"]] = \
-        r["accuracy"]
 
-print(f"trivial floor = {FLOOR:.5f}\n")
-print(f"{'seq_len':>8}{'half':>7}{'lr':>6}{'none (per seed)':>26}"
-      f"{'mean':>8}{'above floor?':>14}")
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("pattern", help="glob for the sweep's JSON artefacts")
+    parser.add_argument("--floor", type=float, default=MQAR_FLOOR,
+                        help=f"trivial floor for the task (default "
+                             f"{MQAR_FLOOR:.5f}, MQAR n_pairs=4 n_values=8)")
+    parser.add_argument("--arm", default="none",
+                        help="name of the floor arm (default 'none')")
+    args = parser.parse_args()
 
-usable = defaultdict(list)
-for seq_len in sorted({k[0] for k in cells}):
-    for half in sorted({k[1] for k in cells}, reverse=True):
-        for lr in sorted({k[2] for k in cells}):
-            by_seed = cells.get((seq_len, half, lr, "none"), {})
-            if not by_seed:
-                continue
-            values = [by_seed[s] for s in sorted(by_seed)]
-            mean = sum(values) / len(values)
-            ok = mean > FLOOR
-            usable[seq_len].append(ok)
-            print(f"{seq_len:>8}{half:>7}{lr:>6}"
-                  f"{'/'.join(f'{v:.3f}' for v in values):>26}"
-                  f"{mean:>8.3f}{('yes' if ok else 'NO'):>14}")
+    rows = [r for f in glob.glob(args.pattern) for r in json.load(open(f))]
+    if not rows:
+        print("no records matched")
+        return 1
 
-print("\nlengths where ANY cell has a working floor arm:")
-for seq_len in sorted(usable):
-    n_ok = sum(usable[seq_len])
-    verdict = "usable" if n_ok else "**EVERY CELL BROKEN**"
-    print(f"  seq_len {seq_len:>5}: {n_ok}/{len(usable[seq_len])} cells  {verdict}")
+    # Group by every field that is not the seed, the arm or the accuracy, so this
+    # works on any sweep without being told its axes.
+    axes = [k for k in rows[0]
+            if k not in ("seed", "arm", "accuracy", "condition")]
+    cells: dict[tuple, dict[int, float]] = defaultdict(dict)
+    for r in rows:
+        if r["arm"] != args.arm:
+            continue
+        cells[tuple(r[a] for a in axes)][r["seed"]] = r["accuracy"]
+
+    if not cells:
+        print(f"no records for arm {args.arm!r}; arms present: "
+              f"{sorted({r['arm'] for r in rows})}")
+        return 1
+
+    print(f"floor = {args.floor:.5f}   floor arm = {args.arm!r}")
+    print(f"axes  = {axes}\n")
+    print("".join(f"{a:>12}" for a in axes)
+          + f"{'per seed':>26}{'mean':>8}{'usable?':>10}")
+
+    broken = 0
+    for key in sorted(cells):
+        values = [cells[key][s] for s in sorted(cells[key])]
+        mean = sum(values) / len(values)
+        ok = mean > args.floor
+        broken += not ok
+        print("".join(f"{v!s:>12}" for v in key)
+              + f"{'/'.join(f'{v:.3f}' for v in values):>26}"
+              + f"{mean:>8.3f}{('yes' if ok else 'NO'):>10}")
+
+    print(f"\n{broken} of {len(cells)} cells have a floor arm at or below the "
+          f"trivial floor.")
+    if broken:
+        print("Recovery ratios in those cells divide by the gap between a "
+              "working\nceiling and a broken floor. They must be WITHDRAWN "
+              "rather than caveated:\na caveat printed next to a number does "
+              "not attach to the number.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -125,11 +125,50 @@ explicitly named as something other than a measurement.
 > *Calibration.* — unfilled. Record the first statistic used at the wrong
 > granularity: what it read, and what the correct-granularity value was.
 
+**9. One implementation per behaviour, behind the smallest surface that does
+the job.** Two halves of one habit, and both of them are cheaper here than the
+usual arguments for them suggest.
+
+**Do not duplicate logic.** Rule 13 says a rationale lives in exactly one place;
+this is the same commitment for code. The ordinary cost of duplication is that
+a change has to be made twice. The cost *here* is worse and is a direct
+consequence of rule 12: when a bug is fixed in one copy and not the other, the
+surviving copy keeps producing plausible numbers, and every measurement taken
+through it is invalid while looking exactly like the corrected ones. A
+duplicated code path is a fix that did not land, wearing the appearance of one
+that did.
+
+So: extract the shared thing rather than parallelising it. If two call sites
+genuinely need to differ, make the difference a parameter and name it, so that
+the divergence is visible in one place instead of implied by two files drifting.
+Copying a block is occasionally right — when the two are about to diverge for
+real reasons — and then it is worth a comment saying so, because otherwise the
+next reader will helpfully merge them back.
+
+**Keep the public surface minimal.** Every public type, method and field is a
+promise, and rule 15 makes that literal: a doc comment states the contract a
+caller may rely on. Default to the narrowest thing that works — private until
+something outside genuinely needs it, one obvious way to do each thing, no
+parameter that exists only because it was easy to pass through, no accessor
+exposing internal state so a test can reach it.
+
+This is not tidiness. **A small surface is what makes the internals replaceable,
+and this project will need to replace internals repeatedly** — the gate ladder
+in `GOALS.md` is a plan for finding out that things are wrong. A mechanism whose
+guts can be rewritten without touching a caller can be refuted cheaply. One with
+a wide surface has to be argued about instead, and mechanisms that are expensive
+to remove are the ones that stay in past their evidence.
+
+> *Calibration.* — unfilled. Record the first bug that had to be fixed in more
+> than one place, and whether every copy was found the first time. Then record
+> the first mechanism that was kept longer than its evidence justified because
+> removing it meant changing its callers.
+
 ---
 
 ## Tests
 
-**9. A test must fail when the thing it names is broken — verify that it
+**10. A test must fail when the thing it names is broken — verify that it
 does.** Passing is not evidence; a test has never demonstrated anything until
 you have seen it go red for the right reason. Break the mechanism deliberately,
 confirm the test notices, then put it back. Automate this where you can, so a
@@ -146,7 +185,7 @@ it, ask what outcome would *refute* the prediction attached to it. If the
 predicted outcome is guaranteed by how the condition is built, it is not
 evidence however it comes out — and it will read as confirmation.
 
-**10. A failing test is a claim about the production code until shown
+**11. A failing test is a claim about the production code until shown
 otherwise.** Fix the code so the assertion holds. Widening a bound, deleting an
 assertion, or special-casing the input converts a caught bug into a silent one
 *and* destroys the evidence that it existed.
@@ -156,7 +195,7 @@ say which decision changed it, and **split rather than loosen** — keep an
 assertion for the old path where it still applies, add one for the new.
 
 A test that passes while *vacuous* is the opposite problem: there the test is
-what is wrong, and strengthening it is the fix. Rule 9 covers those.
+what is wrong, and strengthening it is the fix. Rule 10 covers those.
 
 > *Calibration.* — unfilled. Record the first assertion that was loosened
 > instead of investigated, and what it was later found to have been hiding.
@@ -165,7 +204,7 @@ what is wrong, and strengthening it is the fix. Rule 9 covers those.
 
 ## Keeping the record straight
 
-**11. A bug fix is not finished when the tests pass.** It is finished when the
+**12. A bug fix is not finished when the tests pass.** It is finished when the
 audit file records what the fix invalidated, and each affected decision is
 marked re-validated, superseded, or pending. A fix does not only correct the
 future; it removes the evidence under choices already made, and those choices
@@ -191,15 +230,15 @@ fails the suite instead of waiting to be noticed.
 > *Calibration.* — unfilled. Record the first mistake that recurred: how many
 > times it was fixed as a one-off before anyone swept for the class.
 
-**12. Put the reasoning where the reader will be standing.** Someone about to
+**13. Put the reasoning where the reader will be standing.** Someone about to
 change a threshold reads the test that guards it, not the design note. To keep
 one rationale from drifting across five files:
 
 | where | what belongs there |
 |---|---|
 | Code comment | Why *this line* is this way. Short, and only where it would otherwise read as arbitrary. Local, single-call-site gotchas belong here rather than in a doc. |
-| Doc comment / `<summary>` | The contract the caller can rely on. See rule 14. |
-| Scope-local `ARCHITECTURE.md` | Stable, cross-cutting understanding of this area. See rule 13. |
+| Doc comment / `<summary>` | The contract the caller can rely on. See rule 15. |
+| Scope-local `ARCHITECTURE.md` | Stable, cross-cutting understanding of this area. See rule 14. |
 | Investigation note | Question, prediction made before the run, result. Never edited afterwards except to record the outcome. |
 | Audit file | What a later fix invalidated, and which decisions still rest on it. |
 
@@ -223,7 +262,7 @@ written without the answer in hand, the question is not sharp enough to run yet.
 
 ## Documentation and planning
 
-**13. Externalize hard-won understanding, into the nearest doc.** When effort
+**14. Externalize hard-won understanding, into the nearest doc.** When effort
 went into figuring out a non-obvious behaviour, capture it so it does not have
 to be re-derived — and so it stops living only in someone's head or a chat log.
 **The trigger is not only shipped code.** Discoveries and corrections made while
@@ -244,17 +283,17 @@ Three constraints keep it from bloating into something nobody reads:
 > *Calibration.* — unfilled. Record the first behaviour that had to be
 > re-derived from scratch because nobody wrote it down the first time.
 
-**14. Document the contract, not the implementation.** A doc comment says what
+**15. Document the contract, not the implementation.** A doc comment says what
 a caller can rely on. A good one stays true after the internals are rewritten;
 if a rewrite falsifies it, it was describing implementation. Put one on every
-public type and method.
+public type and method — which is cheap, because rule 9 keeps that set small.
 
 **No ticket numbers in code comments.** They add nothing for a reader of the
 code, and the tracker outlives neither the code nor its own schema. The same
 default extends to notes and design files — unless the reference is genuinely
 the useful anchor, such as naming the change a note is tracking.
 
-**15. A plan opens with the problem, and reads at three zoom levels.** Purpose
+**16. A plan opens with the problem, and reads at three zoom levels.** Purpose
 first, structure follows.
 
 - **Standalone summary first.** Plain language, readable by someone with zero
@@ -274,7 +313,7 @@ A plan is the *input* to an implementation plan, not the full spec itself.
 
 ## Keeping the work pointed at the goal
 
-**16. Alternate between verifying and building.** These standards reward
+**17. Alternate between verifying and building.** These standards reward
 verification, and that is a real hazard rather than a virtue. Every audit yields
 a satisfying, recordable, provably-correct result; a new mechanism most likely
 yields a null. There is a gradient here, it points away from the goal, and
@@ -299,7 +338,7 @@ So, concretely:
 
 ## Adding to this document
 
-**17. Write the standard, not the incident.** A rule earns its place by telling
+**18. Write the standard, not the incident.** A rule earns its place by telling
 someone who was not there what to do next time. So:
 
 - **Lead with the commitment.** "Statistics are gathered at the granularity of
@@ -335,7 +374,7 @@ someone who was not there what to do next time. So:
   # <lint / typecheck command>                — not yet chosen
   # <the check that verifies tests can fail>  — not yet chosen
   ```
-  The third is not optional and is not a nice-to-have: rule 9 is unenforceable
+  The third is not optional and is not a nice-to-have: rule 10 is unenforceable
   without it, and it is the check that caught four vacuous tests in the
   predecessor project.
 - **A check that guards a long job must run in a second, not at the end.** A

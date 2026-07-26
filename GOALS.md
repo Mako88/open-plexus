@@ -480,12 +480,20 @@ untuned settings it was 3.0×, so the retracted figure was not conservative but
 unfounded, and landing near the right answer was luck.
 G4 (bandwidth) and G5 (scale) remain.
 
-**The price, currently.** ~2.7x the width at short sequences rising to ~5.9x at
-384 steps, against ~2.7x *less* working memory at that length — attention keeps
-every position (2·T·d) while the local rule holds one d×d matrix. Both figures
-are provisional pending g1-13, which re-measures both crossings at training
-budgets verified adequate on each side: g1-12 found attention had been starved,
-and the local rule was measured under the same fixed-budget condition.
+**The price, and a caveat that is now permanent.** Upward of **5.6×–8.2× the
+width**, growing with sequence length; in *working memory*, worse than attention
+below ~96 steps and about **2× better** at 384. Both are **bounds, not points** —
+attention had still not converged at four times the budget already thought
+sufficient, and **all four revisions of this comparison have moved against the
+local rule** ([g1-13](experiments/sweeps/g1-13-both-arms-fed.txt)). The ratio is
+not being chased further: it has a systematic bias toward whichever side was
+measured less carefully, which has been ours every time.
+
+*What is not in doubt are the properties rather than the ratios — no backward
+pass, no softmax over positions, bit-identical under a scrambled network,
+survives half its machines leaving, converges in one epoch where attention needs
+thousands of steps, and working memory that does not grow with sequence length.
+None of those has been revised once.*
 
 **And one scaling law is now measured.** The width the local rule needs grows as
 roughly the **cube root** of the stream length it must hold (exponent 0.37 across

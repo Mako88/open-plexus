@@ -2,7 +2,11 @@ The price, with both arms actually finished training
 ====================================================
 
 Script: experiments/g1_13_both_fed.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 68/68 cells. ALL FIVE PREDICTIONS HELD, including
+        prediction 5 that both numbers would move against us again. They did,
+        for the fourth time running. AND THE BUDGET WAS STILL NOT ENOUGH --
+        attention had not converged at 12000 steps, so these are BOUNDS. The
+        clause this note wrote against itself is invoked below.
 
 
 IN PLAIN TERMS

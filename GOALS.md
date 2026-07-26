@@ -181,7 +181,7 @@ and no gate is passed on a single run** (rule 3).
 | **G0 — the instrument** ✅ **PASSED** | Is there a task that a random, untrained substrate *cannot already do*, and that is learnable from local information at all? | No such task can be constructed. Then nothing downstream can be measured, and the project has no instrument. |
 | **G1 — does it learn** ✅ **PASSED** | Does a purely local objective beat the random substrate on that task? | The margin is null across seeds. The central bet is wrong. |
 | **G2 — asynchrony** ✅ **PASSED** | Does the margin survive realistic delay, jitter and reordering, up to a stated bound? | The margin vanishes below the bound the internet actually imposes. |
-| **G3 — churn** | Does the margin survive nodes leaving mid-run and rejoining? | Losing a node degrades the whole rather than a part, or recovery costs more than the node was worth. |
+| **G3 — churn** ✅ **PASSED** | Does the margin survive nodes leaving mid-run and rejoining? | Losing a node degrades the whole rather than a part, or recovery costs more than the node was worth. |
 | **G4 — bandwidth** | Does the required cross-machine traffic fit consumer broadband? | The traffic needed for the margin exceeds what a home connection carries. |
 | **G5 — scale** | Does the margin hold or grow as the network grows? | The margin shrinks with scale. Then it is a small-model curiosity, not a route to either goal. |
 
@@ -449,7 +449,19 @@ behind it. Two costs measured: loss *compounds* (a binding needs its pair and it
 query to both survive, so accuracy falls as a product not a fraction), and a
 buffer deep enough for intercontinental lag is deeper than these sequences — the
 system batches rather than streams, so "latency is free" holds for throughput and
-not for time-to-first-response. G3 (churn) is next.*
+not for time-to-first-response. **G3 is passed**: half the substrate removed permanently, mid-training, recovers
+to 0.924 against a 0.992 baseline within a few epochs; a quarter costs 0.006.
+Nothing persists but the readout, so a departing machine takes capacity rather
+than memories.
+
+**One number is retracted.** g3-02 found the width curve — and therefore the
+"locality costs 4–6× in width" figure — was substantially measuring the frozen
+projections' initialisation scale, a constant chosen once and never swept: a
+native width-32 model scores 0.263 at scale 1.0 and 0.960 at 0.71, nothing else
+changed. The figure **must not be quoted** until g1-08 re-measures it with the
+scale tuned **on both arms** — the attention baseline has the same untuned knob,
+and repairing one side only would reproduce the error with a friendlier face.
+G4 (bandwidth) and G5 (scale) remain.*
 
 *Previously: **G0 passed.** MQAR is answerable (oracle 1.000, checked mechanically
 across a grid), reachable (one hand-written lookup, 1.000), and **learnable** (a

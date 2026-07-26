@@ -21,8 +21,11 @@ global picture and a machine leaving mid-thought is a normal event.
 **Goals only.** No plan, no architecture, no code, no stack chosen. Nothing here
 has been measured.
 
+- **[docs/explainers/](docs/explainers/)** — plain-language explanations of
+  everything here, in reading order, written for someone who does not work in
+  this field. **Start here if you want the ideas rather than the specification.**
 - **[GOALS.md](GOALS.md)** — what this is for, the three constraints that define
-  the design space, and the gate ladder that would refute it. Start here.
+  the design space, and the gate ladder that would refute it.
 - **[CLAUDE.md](CLAUDE.md)** — the engineering standards the project runs under.
 
 ## The three constraints

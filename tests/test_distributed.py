@@ -16,6 +16,7 @@ distributed version. It gives identical ones.
 
 from __future__ import annotations
 
+import os
 import unittest
 
 import numpy as np
@@ -25,6 +26,16 @@ from openplexus.models.local_memory import (
     LocalAssociativeMemory, LocalMemoryConfig)
 
 TOKENS = np.array([3, 9, 1, 7, 3, 5, 11, 2, 9, 4])
+
+# These spawn OS processes, which costs about half a second each. Run inside the
+# mutation harness -- once per mutation, sixty times over -- that turned a five
+# minute check into a ten minute one, and a check slow enough to skip is a check
+# that eventually is. The harness therefore skips them EXCEPT when the mutation
+# is in distributed.py itself, which is the only case where they are the tests
+# that can catch it.
+SKIP_SLOW = os.environ.get("OPENPLEXUS_SKIP_PROCESS_TESTS") == "1"
+skip_if_fast = unittest.skipIf(
+    SKIP_SLOW, "process-spawning tests skipped for an unrelated mutation")
 
 
 def configured(partitions: int, width: int = 32):
@@ -36,6 +47,7 @@ def configured(partitions: int, width: int = 32):
     return config, model
 
 
+@skip_if_fast
 class TheSplitIsExact(unittest.TestCase):
 
     def test_processes_reproduce_the_single_process_model_exactly(self):
@@ -95,6 +107,7 @@ class TheSplitIsExact(unittest.TestCase):
         np.testing.assert_array_equal(first, second)
 
 
+@skip_if_fast
 class NodesLeaveOverTheWire(unittest.TestCase):
     """A departure the driver experiences rather than one it simulates."""
 
@@ -133,6 +146,7 @@ class SlicesAreExactOrRefused(unittest.TestCase):
         self.assertEqual(sum(p.width for p in pieces), 240)
 
 
+@skip_if_fast
 class TheWireCostIsWhatWasClaimed(unittest.TestCase):
     """note 012 said a token is enough. This is what a node actually receives."""
 

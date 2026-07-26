@@ -19,6 +19,7 @@ tree — so on startup any leftover `.bak` is restored before anything else.
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -30,6 +31,7 @@ BASELINES = ROOT / "openplexus" / "baselines.py"
 INDUCTION = ROOT / "openplexus" / "models" / "induction.py"
 ATTENTION = ROOT / "openplexus" / "models" / "attention.py"
 LOCAL = ROOT / "openplexus" / "models" / "local_memory.py"
+DISTRIBUTED = ROOT / "openplexus" / "distributed.py"
 SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 # Experiment code is not usually mutated -- experiments are read once and
 # discarded. This one is, because its generator returned a wrong SET rather
@@ -58,6 +60,40 @@ class Mutation:
 
 
 MUTATIONS = [
+    Mutation(
+        name="nodes-keep-memory-between-sequences",
+        breaks="the per-sequence contract -- the REAL bug this harness was "
+               "extended to cover, found when a departure test showed answers "
+               "changing before the departure step, which a departure cannot do",
+        path=DISTRIBUTED,
+        old="            if token == _RESET:\n                node.reset()",
+        new="            if token == _RESET:\n                pass",
+    ),
+    Mutation(
+        name="driver-ignores-a-node",
+        breaks="the sum -- one node's vote would silently vanish, which looks "
+               "exactly like a smaller network and nothing else",
+        path=DISTRIBUTED,
+        old="            for index, sock in enumerate(self._connections):\n                if index in gone:\n                    continue\n                votes += np.frombuffer(receive(sock), dtype=\">f8\")",
+        new="            for index, sock in enumerate(self._connections):\n                if index in gone:\n                    continue\n                votes += np.frombuffer(receive(sock), dtype=\">f8\") * (index > 0)",
+    ),
+    Mutation(
+        name="derived-key-ignores-the-seed",
+        breaks="agreement between nodes and the single-process model -- every "
+               "node would still agree with every OTHER node, so only the "
+               "comparison against the reference implementation can catch it",
+        path=DISTRIBUTED,
+        old="        return np.random.default_rng((self.config.seed, int(token))).normal(",
+        new="        return np.random.default_rng((0, int(token))).normal(",
+    ),
+    Mutation(
+        name="slices-overlap",
+        breaks="the partition -- dimensions would be owned twice and counted "
+               "twice, inflating the pooled answer",
+        path=DISTRIBUTED,
+        old="    return [Slice(i * width, (i + 1) * width) for i in range(nodes)]",
+        new="    return [Slice(i * width, (i + 1) * width + 1) for i in range(nodes)]",
+    ),
     Mutation(
         name="departure-keeps-what-it-stored",
         breaks="the severity of mid-sequence loss -- a node would stop voting "
@@ -522,10 +558,24 @@ def restore_any_leftovers() -> None:
         bak.unlink()
 
 
-def suite_passes() -> bool:
+def suite_passes(mutation: "Mutation | None" = None) -> bool:
+    """Run the suite, skipping process-spawning tests where they cannot help.
+
+    Those tests cost about half a second each because they fork OS processes.
+    Across sixty mutations that doubled the harness runtime, and **a check slow
+    enough to skip is a check that eventually is**. They are therefore run only
+    when the mutation is in `distributed.py` itself — the only file whose faults
+    they are positioned to catch — and skipped otherwise.
+
+    Passing `None` runs everything, which is what the baseline check before any
+    mutation does: if the full suite is red, nothing below means anything.
+    """
+    environment = dict(os.environ)
+    if mutation is not None and mutation.path != DISTRIBUTED:
+        environment["OPENPLEXUS_SKIP_PROCESS_TESTS"] = "1"
     result = subprocess.run(
         [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-t", ".", "-q"],
-        cwd=ROOT, capture_output=True, text=True,
+        cwd=ROOT, capture_output=True, text=True, env=environment,
     )
     return result.returncode == 0
 
@@ -564,7 +614,7 @@ def main() -> int:
             print(f"SOURCE MOVED  {mutation.name}: {problem}")
             continue
         try:
-            caught = not suite_passes()
+            caught = not suite_passes(mutation)
         finally:
             revert(mutation)
         if caught:

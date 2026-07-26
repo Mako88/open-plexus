@@ -155,6 +155,29 @@ class MqarSequence:
     pairs: dict[int, int]
     query_positions: tuple[int, ...]
 
+    def position_kinds(self) -> tuple[str, ...]:
+        """What each position is: `"pair"`, `"query"`, or `"filler"`.
+
+        Needed because "can the state predict its next input?" has a very
+        different answer at each. Structured filler is a deterministic cycle and
+        is predictable by construction; pair and query positions carry the
+        task's actual content and are not. Averaging over all three would report
+        a high number that is almost entirely the filler being easy, which says
+        nothing about whether the substrate has learned anything predictive
+        about the task.
+
+        The predecessor project made exactly this mistake — its probe conflated
+        a schedule-driven cue, identical in every episode, with the cue groups
+        carrying random content, and scored 0.797 while predicting no content
+        whatever.
+        """
+        kinds = ["filler"] * len(self.tokens)
+        for i in range(2 * len(self.pairs)):
+            kinds[i] = "pair"
+        for i in self.query_positions:
+            kinds[i] = "query"
+        return tuple(kinds)
+
     def scored_targets(self) -> tuple[int, ...]:
         """The targets at query positions only, in order.
 

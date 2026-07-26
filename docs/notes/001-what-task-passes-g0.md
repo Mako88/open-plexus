@@ -99,6 +99,23 @@ metric. That ambiguity is expensive and avoidable.
 **Choosing a task whose native metric is next-symbol prediction collapses it.**
 The thing being optimised and the thing being scored become the same number.
 
+> **CORRECTED by [g1-01](../../experiments/sweeps/g1-01-predictability.txt).**
+> The generator built from this note **does not satisfy P2**, and the claim above
+> was made without checking that it would. At a query position the target is the
+> paired value — but that value is *never emitted into the token stream*; the
+> next token after a query is filler. So "predict your next input" and "answer
+> the query" are different questions in this generator, and the objective and
+> the metric are **not** one quantity.
+>
+> The literature's framing is autoregressive: the query is *followed by its
+> answer* in the sequence, so next-token prediction at a query position **is**
+> the task. Ours is a classification framing — targets as labels beside the
+> stream rather than tokens within it. Both are legitimate; only the first
+> satisfies P2, and P2 is the reason this task was chosen.
+>
+> **Fix:** an autoregressive mode that emits the value token after each query.
+> Until then the predictability gate has not actually been asked.
+
 It also serves the secondary goal directly: next-token prediction is what a
 language model does, so a result here is a result about that objective family
 rather than an analogy to it.

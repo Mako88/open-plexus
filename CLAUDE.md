@@ -409,11 +409,16 @@ someone who was not there what to do next time. So:
 
 ## Conventions
 
-**Python 3.14, standard library only** for the task and measurement layer — see
-[note 007](docs/notes/007-the-stack-and-the-first-code.md). numpy is *not*
-installed and is not a dependency; adding it is a decision to take on purpose
-when models arrive, not something that creeps in. The consumer-device runtime is
-a separate question and is not decided.
+**Python 3.14.** The task and measurement layer takes **no dependencies** — see
+[note 007](docs/notes/007-the-stack-and-the-first-code.md); a generator with no
+library semantics to reason about is auditable line by line, and that layer is
+the reference implementation everything else is asserted against.
+
+**numpy 2.5.1 is installed** (approved 2026-07-25, when training a model from
+scratch became the blocking step and pure Python stopped being reasonable). It
+is for the *model* layer only. Anything in `openplexus/tasks/` or
+`openplexus/baselines.py` importing it is a defect: those are the ruler, and the
+ruler stays dependency-free. The consumer-device runtime remains undecided.
 
 - **Run both checks before every commit:**
   ```

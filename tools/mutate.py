@@ -673,8 +673,13 @@ def main() -> int:
 
     print(f"\n{len(MUTATIONS) - len(survived) - len(stale)}/{len(MUTATIONS)} caught")
     if stale:
+        # The names are repeated here even though each was printed above, so a
+        # truncated capture cannot hide WHICH mutation went stale. `tail -4` of
+        # this run once cost a diagnosis: the summary said one could not be
+        # applied and the line naming it had scrolled away.
         print(f"{len(stale)} mutation(s) could not be applied — the harness is stale "
-              "and is not checking what it claims to.")
+              "and is not checking what it claims to: "
+              + ", ".join(m.name for m in stale))
     if survived:
         print("A surviving mutation means the tests covering that mechanism are "
               "vacuous. Strengthen them (rule 10), do not delete the mutation.")

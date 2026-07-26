@@ -178,7 +178,7 @@ and no gate is passed on a single run** (rule 3).
 
 | gate | the question, plainly | refuted if |
 |---|---|---|
-| **G0 — the instrument** | Is there a task that a random, untrained substrate *cannot already do*, and that is learnable from local information at all? | No such task can be constructed. Then nothing downstream can be measured, and the project has no instrument. |
+| **G0 — the instrument** ✅ **PASSED** | Is there a task that a random, untrained substrate *cannot already do*, and that is learnable from local information at all? | No such task can be constructed. Then nothing downstream can be measured, and the project has no instrument. |
 | **G1 — does it learn** | Does a purely local objective beat the random substrate on that task? | The margin is null across seeds. The central bet is wrong. |
 | **G2 — asynchrony** | Does the margin survive realistic delay, jitter and reordering, up to a stated bound? | The margin vanishes below the bound the internet actually imposes. |
 | **G3 — churn** | Does the margin survive nodes leaving mid-run and rejoining? | Losing a node degrades the whole rather than a part, or recovery costs more than the node was worth. |
@@ -434,6 +434,12 @@ In the order they need answering. Each is a question, not a task.
 
 ---
 
-*Status: goals and five design notes. No plan, no architecture, no code. Nothing
-in this document
+*Status: **G0 passed.** MQAR is answerable (oracle 1.000, checked mechanically
+across a grid), reachable (one hand-written lookup, 1.000), and **learnable** (a
+model trained from scratch, 1.000 on 5/5 seeds). Its trivial floor is measured
+and has a closed form; a frozen substrate sits at 0.180, leaving **0.82 of
+verified headroom**. G1 is next and is the actual bet: whether a **local** rule
+can reach what an all-to-all one just did.*
+
+*Nothing in this document
 has been measured by this project.*

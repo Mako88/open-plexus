@@ -1,5 +1,22 @@
 # Note 008 — The task/objective mismatch, and the three ways out
 
+> **SUPERSEDED BY MEASUREMENT, and this note's own §6 said how.**
+> [g1-02](../../experiments/sweeps/g1-02-can-prediction-bootstrap.txt) ran the
+> cheap test §6 recommended trying first: a trained model on MQAR with **random**
+> filler, pure next-token prediction over every position, no indication of which
+> positions matter. It reaches **1.000 on 5/5 seeds — identical to being told the
+> answers.**
+>
+> **There is no mismatch.** The three directions below are moot and none is being
+> taken. What survives, and survives strongly, is **§4**: the same objective with
+> *structured* filler scores **0.009**. A one-word change is the difference
+> between the project's central bet looking confirmed and looking dead.
+>
+> The argument in §5 is left intact rather than deleted, because it is the record
+> of what was believed and why, and because §6's instinct — try the cheap
+> measurement before committing to the expensive argument — is the part worth
+> keeping.
+
 [g1-01](../../experiments/sweeps/g1-01-predictability.txt) found that the
 predictive objective and MQAR are mismatched. That sweep note said each way out
 needs arguing before anything is built. This is that argument.

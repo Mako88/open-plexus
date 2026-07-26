@@ -2,7 +2,9 @@ G2 -- does the local rule survive a network that is late and out of order?
 ===========================================================================
 
 Script: experiments/g2_01_latency.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 18/18 cells. Prediction 1 held EXACTLY -- bit-identical
+        weights, 6/6 seeds, every within-bound condition. Prediction 3 held.
+        Prediction 2 refuted, in the direction flagged in advance.
 
 
 IN PLAIN TERMS
@@ -103,4 +105,116 @@ WHAT WOULD REFUTE WHAT
 
 RESULT
 ------
-(not yet run)
+6 seeds, d_model=64, 6 epochs over 300 sequences. Baseline (no network) 0.989.
+
+BELOW THE BOUND
+condition        within  identical    kept     acc   baseline
+--------------------------------------------------------------
+d=4  j=0           True        6/6   1.000   0.989     0.989
+d=4  j=2           True        6/6   1.000   0.989     0.989
+d=4  j=4           True        6/6   1.000   0.989     0.989
+d=16 j=8           True        6/6   1.000   0.989     0.989
+d=16 j=16          True        6/6   1.000   0.989     0.989
+d=64 j=64          True        6/6   1.000   0.989     0.989
+
+ABOVE THE BOUND
+d=4  j=8          False          -   0.556   0.379     0.989
+d=4  j=16         False          -   0.294   0.018     0.989
+d=4  j=32         False          -   0.150   0.011     0.989
+d=16 j=64         False          -   0.261   0.020     0.989
+d=8  j=64         False          -   0.137   0.005     0.989
+
+DROPS
+drop=0.00                              1.000   0.989
+drop=0.05                              0.950   0.982
+drop=0.10                              0.900   0.963
+drop=0.20                              0.800   0.856
+drop=0.40                              0.600   0.391
+
+
+PREDICTION 1 HELD, EXACTLY
+---------------------------
+**Bit-identical weight matrices. 6/6 seeds. Every within-bound condition.**
+
+Not close. Not within tolerance. `np.array_equal` on the learned weights against
+a run with no network at all, and it returns True every time.
+
+The most striking cell is `d=64 j=64`: every event delayed by up to 64 steps, on
+sequences 96 steps long, arriving thoroughly out of order -- and the model learns
+**the same weights, bit for bit**, as one that saw a perfect stream.
+
+That is what docs/notes/002 §4 claimed and GOALS.md C2 asked for: not graceful
+degradation but a stated bound with exactness below it. It has now been measured
+rather than argued.
+
+Worth being precise about why it holds, because it is not a property of the
+learning rule. The transport reassembles the true emission order, so the model
+sees an identical sequence and cannot do otherwise. **The exactness is bought by
+emission-time indexing, and it therefore holds for ANY learning rule** -- which
+is exactly why it is worth having. Nothing about the model had to be designed
+for it.
+
+
+PREDICTION 3 HELD -- DROPS AND LATENESS ARE THE SAME FAILURE
+--------------------------------------------------------------
+At matched surviving fraction the two are indistinguishable:
+
+    drop=0.4    keeps 0.600  ->  0.391
+    d=4 j=8     keeps 0.556  ->  0.379
+
+A dropped event and a too-late event are the same thing from the receiver's
+side, and the learning cannot tell them apart either. **C3's loss mode needs no
+separate treatment from C2's**, at least at this granularity, which is a real
+simplification for the design.
+
+And loss is more survivable than expected. 10% of events lost costs 0.026
+(0.989 -> 0.963); 20% costs 0.133. On consumer hardware where packet loss is
+routine, that is an encouraging preview of G3.
+
+
+PREDICTION 2 REFUTED, IN THE DIRECTION FLAGGED
+------------------------------------------------
+Predicted accuracy would track the surviving fraction. It does not -- it falls
+much faster:
+
+condition          kept p     acc       p     p^2     p^3
+d=4 j=8             0.556   0.379   0.556   0.309   0.172
+d=4 j=16            0.294   0.018   0.294   0.086   0.025
+drop=0.2            0.800   0.856   0.800   0.640   0.512
+drop=0.4            0.600   0.391   0.600   0.360   0.216
+
+Accuracy sits between p and p^2 in the mild regime and collapses below p^3 in
+the severe one. **Loss compounds.**
+
+The "most likely to be wrong" note said exactly why this would happen: MQAR needs
+a key's PAIR and its QUERY to BOTH survive. Lose either and that question is
+unanswerable, so the probability of an answerable question is a product rather
+than a fraction. The prediction was wrong and the reason it was wrong was written
+down before the run, which is the useful case.
+
+**This matters for the design.** It means tolerance to loss is not the linear
+thing a "we can afford 20% packet loss" intuition suggests. A system built on
+this rule needs its bindings to survive as UNITS -- pair and query together --
+and that is an argument for keeping a binding's participants on the same machine
+rather than spreading them, which lines up with note 004's bandwidth conclusion
+and note 003's failure-domain conclusion from a third direction.
+
+
+PREDICTION 4 -- THE COST NOBODY HAD STATED
+--------------------------------------------
+Written before the run so it could not be skipped when the accuracy column came
+back clean, and it did come back clean.
+
+`d=64 j=64` is bit-identical on 96-step sequences. So a buffer two thirds the
+length of the whole sequence costs **nothing in accuracy**. Good.
+
+But a buffer of depth `d` means **nothing can be acted on until `d` steps after
+it was emitted.** At the ~150 steps an intercontinental round trip needs, the
+buffer is deeper than these sequences are long. Accuracy is untouched and the
+system is **batching, not streaming**.
+
+So "latency is free" is true for THROUGHPUT and false for
+LATENCY-TO-FIRST-ACTION. For the goals in GOALS.md §1 that is probably an
+acceptable trade -- training a model is a throughput problem -- but it is a real
+constraint on anything interactive, and it should be stated in the design rather
+than discovered by someone expecting a response.

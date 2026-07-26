@@ -180,7 +180,7 @@ and no gate is passed on a single run** (rule 3).
 |---|---|---|
 | **G0 — the instrument** ✅ **PASSED** | Is there a task that a random, untrained substrate *cannot already do*, and that is learnable from local information at all? | No such task can be constructed. Then nothing downstream can be measured, and the project has no instrument. |
 | **G1 — does it learn** ✅ **PASSED** | Does a purely local objective beat the random substrate on that task? | The margin is null across seeds. The central bet is wrong. |
-| **G2 — asynchrony** | Does the margin survive realistic delay, jitter and reordering, up to a stated bound? | The margin vanishes below the bound the internet actually imposes. |
+| **G2 — asynchrony** ✅ **PASSED** | Does the margin survive realistic delay, jitter and reordering, up to a stated bound? | The margin vanishes below the bound the internet actually imposes. |
 | **G3 — churn** | Does the margin survive nodes leaving mid-run and rejoining? | Losing a node degrades the whole rather than a part, or recovery costs more than the node was worth. |
 | **G4 — bandwidth** | Does the required cross-machine traffic fit consumer broadband? | The traffic needed for the margin exceeds what a home connection carries. |
 | **G5 — scale** | Does the margin hold or grow as the network grows? | The margin shrinks with scale. Then it is a small-model curiosity, not a route to either goal. |
@@ -434,14 +434,22 @@ In the order they need answering. Each is a question, not a task.
 
 ---
 
-*Status: **G0 and G1 passed.** A rule with no backward pass and no softmax over
+*Status: **G0, G1 and G2 passed.** A rule with no backward pass and no softmax over
 positions — every update a product of two signals at the synapse — solves MQAR
 at 8/8 seeds, against 0.180 for a frozen substrate and 0.344 for a one-line
 heuristic. **The price of locality is roughly 4–6× in width** (crossing at
 48–64, against attention's 8–16). Unexpectedly, the local rule is **graded**
 where attention was all-or-nothing, because superposition interference eases
 continuously while circuit discovery does not — which makes it better shaped for
-a learning rule than the thing it replaces. G2 (asynchrony) is next.*
+a learning rule than the thing it replaces. **G2 is passed too**: below a stated delay bound the learned weights are
+**bit-identical** to a run with no network at all — 6/6 seeds, including every
+event delayed by up to 64 steps on 96-step sequences. That exactness is bought by
+emission-time indexing rather than by the learning rule, so it holds for any rule
+behind it. Two costs measured: loss *compounds* (a binding needs its pair and its
+query to both survive, so accuracy falls as a product not a fraction), and a
+buffer deep enough for intercontinental lag is deeper than these sequences — the
+system batches rather than streams, so "latency is free" holds for throughput and
+not for time-to-first-response. G3 (churn) is next.*
 
 *Previously: **G0 passed.** MQAR is answerable (oracle 1.000, checked mechanically
 across a grid), reachable (one hand-written lookup, 1.000), and **learnable** (a

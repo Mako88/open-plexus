@@ -39,6 +39,7 @@ explainer, and saying so is the most useful thing you can do.
 | [20](20-the-knobs-that-do-nothing.md) | The knobs that do nothing |
 | [21](21-the-price-of-locality.md) | The price of locality |
 | [22](22-a-good-story-that-was-wrong.md) | A good story that was wrong |
+| [23](23-the-network-makes-no-difference.md) | The network makes no difference at all |
 
 More get added as the project introduces new ideas. Anything here that turns out
 to be wrong gets corrected, not softened — same rule as everywhere else.

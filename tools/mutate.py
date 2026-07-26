@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parent.parent
 MQAR = ROOT / "openplexus" / "tasks" / "mqar.py"
 BASELINES = ROOT / "openplexus" / "baselines.py"
 INDUCTION = ROOT / "openplexus" / "models" / "induction.py"
+ATTENTION = ROOT / "openplexus" / "models" / "attention.py"
 
 
 @dataclass(frozen=True)
@@ -140,6 +141,34 @@ MUTATIONS = [
         path=MQAR,
         old='            kinds[i] = "answer"',
         new='            kinds[i] = "filler"',
+    ),
+    Mutation(
+        name="attention-can-read-its-own-target",
+        breaks="strict causality, letting position t attend to t and read the token it must predict",
+        path=ATTENTION,
+        old="        mask = np.tril(np.ones((T, T), dtype=bool), k=-1)",
+        new="        mask = np.tril(np.ones((T, T), dtype=bool), k=0)",
+    ),
+    Mutation(
+        name="value-shift-removed",
+        breaks="the induction shape: attending to s retrieves s rather than what followed it",
+        path=ATTENTION,
+        old="        shifted[:-1] = h[1:]                         # value source: token at s+1",
+        new="        shifted[:-1] = h[:-1]",
+    ),
+    Mutation(
+        name="backward-shift-off-by-one",
+        breaks="the gradient through the value shift, so training optimises a different objective",
+        path=ATTENTION,
+        old="        d_h[1:] += d_shifted[:-1]          # undo the value shift",
+        new="        d_h[:-1] += d_shifted[:-1]",
+    ),
+    Mutation(
+        name="optimiser-does-not-step",
+        breaks="the Adam update, so training runs and nothing changes",
+        path=ATTENTION,
+        old="            self.params[name] -= self.lr * m_hat / (np.sqrt(v_hat) + self.eps)",
+        new="            self.params[name] -= 0.0 * m_hat / (np.sqrt(v_hat) + self.eps)",
     ),
     Mutation(
         name="lookup-uses-first-occurrence",

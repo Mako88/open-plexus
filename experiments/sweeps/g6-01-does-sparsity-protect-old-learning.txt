@@ -1,0 +1,207 @@
+Does sparsity protect old learning from new?
+============================================
+
+Script: experiments/g6_01_forgetting.py
+Status: REDESIGNED TWICE BY ITS OWN CONTROLS, NOT YET RUN. The headline the
+        controls already produced is not about sparsity at all: **forgetting
+        is a function of WIDTH.** At width 64 the model forgets everything
+        (0.779 -> 0.008); at width 240 it forgets nothing (0.927 -> 0.923),
+        dense either way.
+
+
+IN PLAIN TERMS
+--------------
+Sparse codes were tried once here and came out worse, so the knob was left off
+with a measurement saying not to reach for it.
+
+That measurement asked the wrong question. It tested whether sparsity helps
+inside a single problem, where lots of facts are crowded into one memory at once.
+It does not: the crowding there comes from one address holding several different
+values, and spreading the addresses further apart does nothing about that.
+
+**But that is not what sparse codes are famous for.** Their classic job is
+stopping *new* learning from wiping out *old* learning — which is a question about
+what happens when the system moves from one body of data to another, and nothing
+here has ever tested that.
+
+The reason to expect it to work is mechanical. With dense codes every piece of
+learning touches every part of the readout, so anything learned later smears over
+everything learned earlier. With sparse codes each piece of learning touches only
+a few parts, so two bodies of data that use different parts can coexist.
+
+
+QUESTION
+--------
+Train on task A, then on task B, then re-test A.
+
+  A and B share the key alphabet and the sequence structure, and use **disjoint
+  value alphabets** -- A answers with the low eight values, B with the high eight.
+  Nothing about the task changes; value tokens are remapped after generation.
+
+  key_active   0 (dense), 32, 16, 8, 4
+  lr           0.02, 0.05, 0.1
+  seeds        1, 2, 3
+  phases       8 epochs on A, then 8 epochs on B
+  measured     A after A, A after B, B after B
+
+Disjoint values are what makes forgetting possible at all: the delta rule pushes
+the target row up and every other row down, so training on B actively suppresses
+the rows A relies on. Shared values would leave nothing to forget.
+
+
+THE TRADE, WHICH IS THE WHOLE POINT
+-------------------------------------
+Sparse keys are **worse at the task itself** -- 0.604 against 0.938 dense, measured
+at d=64 with four machines. So this is not a search for a free win. It is a
+question of whether better retention is worth worse peak accuracy, and the honest
+figure of merit is **what accuracy on A survives at the end**, not how much was
+lost.
+
+A method that scores 0.95 and forgets down to 0.30 beats one that scores 0.60 and
+holds 0.55. Reporting only the drop would rank them the other way round, so both
+numbers are reported and the retained absolute is the one that decides.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. **Dense keys forget substantially.** Task A falls from about 0.95 to below
+   0.50 after training on B. If it does not, there is no forgetting to prevent
+   and this experiment measures nothing -- which is the connection control and is
+   checked before dispatch.
+
+2. **Sparse keys forget less, monotonically in sparsity.** a=4 retains the most,
+   a=32 the least, dense least of all. This is the mechanism John pointed at and
+   the one thing here worth being confident about.
+
+3. **On RETAINED ACCURACY the winner is an intermediate sparsity, not the
+   extreme.** Dense starts high and falls hard; a=4 starts low and holds. Guess:
+   a=8 or a=16 ends highest. If dense still wins on the retained absolute despite
+   forgetting most, sparsity is not worth having here even though prediction 2
+   held -- and that would be the honest headline.
+
+4. **Task B ends up fine in every arm.** B is trained last, so nothing has had a
+   chance to overwrite it. If B is poor at high sparsity, the arm is simply too
+   weak to learn the task and its retention number means nothing.
+
+Most likely wrong: (3). It is the only one that requires two effects to trade off
+in a particular direction, and this project's guesses about magnitudes have been
+poor even when the directions held.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- dense does not forget          -> control fails; disjoint values are not
+                                    producing interference and the design is
+                                    wrong before any arm is compared
+- sparse retains more AND ends
+  higher in absolute terms       -> sparsity earns its place for task switching,
+                                    exactly as John suggested, and the earlier
+                                    negative result was answering a different
+                                    question
+- sparse retains more but ends
+  LOWER                          -> the mechanism is real and the trade is bad.
+                                    Report both and keep the knob off
+- B is poor at high sparsity     -> that arm is too weak to be compared at all
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+Two tasks, one switch. Real continual learning is many tasks in sequence, where
+small per-switch losses compound. Nor does it test sparse VALUES, only sparse
+keys -- values stay dense, which keeps the readout's job unchanged and isolates
+the addressing.
+
+
+THREE CONTROLS, AND EACH ONE CHANGED THE DESIGN
+=================================================
+All run before dispatch, at a total cost of about ten minutes.
+
+**Control 1 -- disjoint values were not enough.** The first design gave A and B
+disjoint VALUE alphabets and shared keys. Both dense and sparse forgot completely
+(0.990 -> 0.008 and 0.781 -> 0.010). The reason is that sparsity separates
+*addresses*: two tasks addressing the same keys retrieve through the same
+columns, so there is nothing for sparsity to keep apart. Keys were split too.
+
+**Control 2 -- there has to be room to separate.** With keys split, everything
+still forgot. At width 64, 32 keys with 8 active dimensions each need 256 column
+slots for 64 columns, so every column is shared by several tokens and the codes
+are not separated at all. Sparsity cannot protect what it cannot separate, and
+`a x tokens <= d` is the condition. Width 240 with `a=4` satisfies it.
+
+**Control 3 -- and then it was width, not sparsity.** At width 240 with `a=4`,
+task A survived at 0.919 of 0.929 -- 99% kept, against 1% at width 64. That looked
+like sparsity working. **It was not: dense at width 240 keeps 100% too**
+(0.927 -> 0.923). The protective variable is capacity. One favourable cell had
+been read as a mechanism, and the control that ruled it out cost two minutes.
+
+
+WHAT THE CONTROLS LEAVE, at one seed and one learning rate
+------------------------------------------------------------
+    width    dense kept    sparse a=4 kept
+       64          0.01               0.00
+       96          0.34               0.13
+      128          0.68               0.80
+      240          1.00               0.99
+
+Sparse is worse at 96, better at 128, level at 240. **That is not a result** --
+one seed, one rate, and the two arms cross over in the middle of the range, which
+is exactly the shape that noise produces.
+
+
+THE QUESTION, REVISED
+----------------------
+Not "does sparsity protect old learning" but **"at what width does forgetting
+stop, and does sparsity move that width?"**
+
+  width        64, 96, 128, 160, 192, 240
+  key_active   0 (dense), 4, 8, 16
+  lr           0.02, 0.05, 0.1
+  seeds        1, 2, 3
+  phases       8 epochs on A, 8 on B; A and B have disjoint keys AND values
+
+72 jobs. Costed: 4.4 hours serial, worst job 6.3 minutes.
+
+**Pre-registered: the figure of merit is RETAINED ABSOLUTE accuracy on A**, not
+the fraction kept. Sparse arms start lower, so a fraction favours whichever arm
+learned least in the first place -- an arm that scores 0.20 and keeps all of it
+would top a "kept" ranking while being useless.
+
+
+PREDICTIONS -- written before the run, replacing those above
+--------------------------------------------------------------
+1. **Forgetting falls off with width in every arm**, from near-total at 64 to
+   negligible at 240. Already visible in the controls and the one thing here that
+   is not in doubt.
+
+2. **Sparsity does NOT move the width at which forgetting stops.** The controls
+   show dense and sparse level at both ends, and the middle disagreement is one
+   seed. Guess: the curves lie within seed noise of each other everywhere.
+
+3. **On retained absolute accuracy, dense wins at every width**, because it is
+   better at the task and no worse at holding on. If so, John's hypothesis is
+   right about the mechanism -- sparse codes do separate learning -- and wrong
+   about it mattering here, because capacity already solves the problem before
+   sparsity gets a chance to.
+
+4. **Where `a x 32 > width`, sparsity is actively harmful**, since the codes
+   cannot separate but the representation is still degraded. That predicts a=16
+   is worst everywhere below width 512, and a=8 worst below 256.
+
+Most likely wrong: (2). If sparse arms hold on at a width where dense has already
+collapsed -- say 96 or 128 -- then sparsity buys capacity, which is worth having
+precisely because capacity is the thing G5 says we run out of.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- sparse holds at a width where
+  dense has collapsed            -> sparsity buys capacity for task switching.
+                                    John right, and it matters
+- curves within seed noise       -> the mechanism is real and irrelevant here;
+                                    width already does the job
+- dense wins on retained
+  absolute everywhere            -> keep the knob off, now for a second and
+                                    better-founded reason
+- forgetting does not fall with
+  width                          -> controls were misleading and nothing here can
+                                    be read

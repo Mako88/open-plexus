@@ -1,0 +1,141 @@
+Does a gate work when the relevance signal is real?
+===================================================
+
+Script: experiments/g9_02_reward_gate.py  (NOT WRITTEN)
+Status: PREDICTIONS WRITTEN. No mechanism implemented, no script, no controls
+        run, nothing dispatched, no number seen. Written in this order
+        deliberately: the mechanism this sweep tests does not exist yet, so
+        these predictions cannot have been fitted to anything.
+
+
+WHY THIS IS THE ONE THAT MATTERS
+---------------------------------
+Five mechanism-configurations have now failed to recover the oracle: consolidate
+on confirmed use, consolidate on surprise, both again under Zipfian filler, and
+competitive capture at two pool sizes. Every one of them tried to work out, **from
+the statistics of the stream alone**, which of its contents would matter later.
+
+[Note 016](../../docs/notes/016-who-supplies-relevance.md) argues that is a
+harder question than biology solves. Neuromodulatory signals are not derived by
+cortex from its inputs; they arrive from elsewhere, driven by outcomes the
+organism cares about. **The cortex does not infer what mattered. It is told.**
+
+MQAR cannot test that, because a sequence of random symbols contains nothing that
+is good or bad for anything. `openplexus/tasks/reward_recall.py` can: a reward
+token arrives **in the stream**, **after** the binding it refers to, and only
+rewarded bindings are ever queried.
+
+So this asks the question the last five sweeps could not: **not whether a memory
+can infer relevance, but whether it can use relevance when relevance is
+actually present.**
+
+
+THE ARM THAT DOES NOT EXIST YET
+--------------------------------
+`reward` — consolidate the binding that preceded a reward token.
+
+It is not the oracle. The oracle reads `position_kinds()`, a property of the
+generator. This reads a token, from the same input stream every node already
+receives, using the same broadcast that carries everything else. A deployed agent
+has exactly this and does not have the other.
+
+**What makes it non-trivial is the delay.** At delay 1 the marker is adjacent and
+the rule degenerates to "keep the previous step", which learns nothing about
+value. At delay 8 or 20 the storage decision cannot wait for the marker — the
+binding is long past by the time the reward arrives — and something has to have
+been *tagged* in the meantime. **That is tagging and capture in the form the paper
+describes, and this is the first task here that can pose it.**
+
+
+THE ARMS
+--------
+  none        store everything, fade by decay                  the FLOOR
+  oracle      store only rewarded bindings, from position_kinds the CEILING
+  on-use      consolidate confirmed retrievals                 failed on MQAR
+  salience    consolidate surprising steps                     failed on MQAR
+  reward      consolidate what preceded a reward token         NEW
+
+`on-use` and `salience` are carried over unchanged so that this grid contains the
+mechanisms it is trying to beat, rather than a description of them.
+
+
+THE GRID
+--------
+  delay          1, 4, 8, 20      the dial this task exists for
+  reward rate    4/24, 12/24      the base rate note 013 blamed, as a dial
+  lr             0.02, 0.05, 0.1
+  seeds          1, 2, 3
+
+Configuration is the verified one from `experiments/g9_01_answerable.py`:
+24 pairs, 64 cues, 8 values, seq_len 768, d_model 32 — where an ungated model
+sits AT the trivial floor on first asks (0.119 against 0.125) and the oracle
+reaches 1.000. **The first configuration tried had a gap of 0.000 and would have
+made every arm read 1.000**; that failure is recorded in note 017.
+
+Reported quantity is recovery, `(arm - none) / (oracle - none)`, refusing to
+divide when the oracle's advantage is not larger than the seed spread — and
+reported **separately for first asks and repeats**, because in autoregressive
+mode the first query of a cue re-binds it, so a repeat measures short-term echo
+rather than retention. At one configuration that difference was 0.369 against
+0.225.
+
+
+PREDICTIONS -- written before the mechanism exists
+---------------------------------------------------
+1. **`reward` recovers substantially more than any stream-derived gate.** Over
+   0.5 at delay 1, and above `on-use` and `salience` at every delay. This is the
+   hypothesis. If a gate cannot work when the signal is handed to it in the
+   input, the problem is not the signal and note 016 is wrong.
+
+2. **`reward` recovery FALLS as delay grows**, and this is the interesting part
+   rather than a caveat. At delay 1 the rule is "keep the previous step" and
+   should be near the ceiling. At delay 20 the binding is long gone when the
+   marker arrives, so recovery should drop sharply — **and the size of that drop
+   is the measurement**, because it is exactly the gap that tagging and capture
+   exists to close. Guess: over 0.5 at delay 1, under 0.2 at delay 20.
+
+3. **`on-use` and `salience` are near zero at every delay**, reproducing five
+   previous results on a different task. If they suddenly work here, something
+   about this task is easier than intended and the answerability check missed it.
+
+4. **Raising the reward rate helps every arm and helps `none` most.** More
+   rewarded bindings means more queries answerable from recent memory. This is
+   the trap: raw accuracy will rise for everything, which is why the reported
+   quantity is a ratio. Same trap as g8-02's prediction 3, which was refuted
+   backwards, so it is stated with less confidence than the others.
+
+Most likely wrong: (1). Every prediction of the form "this mechanism will work"
+made in this project so far has been refuted.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- reward high at delay 1, falling     -> the signal works and the LATENESS is the
+                                         unsolved part. Tagging and capture is
+                                         the right target and now has a
+                                         measurable gap to close
+- reward high at every delay          -> suspect the task. A marker 20 steps
+                                         later should not be free, and if it is,
+                                         something is leaking
+- reward near zero everywhere         -> the gate cannot use relevance even when
+                                         handed it. That is a finding about the
+                                         ARCHITECTURE rather than about the
+                                         signal, and it is much worse news than
+                                         five failed inference mechanisms
+- on-use or salience suddenly works   -> the task is easier than the
+                                         answerability check established. Do not
+                                         report anything until that is understood
+
+
+WHAT THIS CANNOT SETTLE
+------------------------
+**Whether the reward signal is "the agent's own value system".** It is a token
+supplied by a generator. Note 016 distinguishes an application flag from an
+evaluative subsystem, and *this task does not tell them apart either* — it only
+moves the signal from metadata into the input stream, which is a necessary step
+and not the whole distinction.
+
+**Anything about acting.** No policy, no choice, no cost for being wrong.
+
+**Anything about language.** Still synthetic, still a small alphabet, and still
+blocked behind the divergence in note 018.

@@ -179,7 +179,7 @@ and no gate is passed on a single run** (rule 3).
 | gate | the question, plainly | refuted if |
 |---|---|---|
 | **G0 — the instrument** ✅ **PASSED** | Is there a task that a random, untrained substrate *cannot already do*, and that is learnable from local information at all? | No such task can be constructed. Then nothing downstream can be measured, and the project has no instrument. |
-| **G1 — does it learn** | Does a purely local objective beat the random substrate on that task? | The margin is null across seeds. The central bet is wrong. |
+| **G1 — does it learn** ✅ **PASSED** | Does a purely local objective beat the random substrate on that task? | The margin is null across seeds. The central bet is wrong. |
 | **G2 — asynchrony** | Does the margin survive realistic delay, jitter and reordering, up to a stated bound? | The margin vanishes below the bound the internet actually imposes. |
 | **G3 — churn** | Does the margin survive nodes leaving mid-run and rejoining? | Losing a node degrades the whole rather than a part, or recovery costs more than the node was worth. |
 | **G4 — bandwidth** | Does the required cross-machine traffic fit consumer broadband? | The traffic needed for the margin exceeds what a home connection carries. |
@@ -434,7 +434,16 @@ In the order they need answering. Each is a question, not a task.
 
 ---
 
-*Status: **G0 passed.** MQAR is answerable (oracle 1.000, checked mechanically
+*Status: **G0 and G1 passed.** A rule with no backward pass and no softmax over
+positions — every update a product of two signals at the synapse — solves MQAR
+at 8/8 seeds, against 0.180 for a frozen substrate and 0.344 for a one-line
+heuristic. **The price of locality is roughly 4–6× in width** (crossing at
+48–64, against attention's 8–16). Unexpectedly, the local rule is **graded**
+where attention was all-or-nothing, because superposition interference eases
+continuously while circuit discovery does not — which makes it better shaped for
+a learning rule than the thing it replaces. G2 (asynchrony) is next.*
+
+*Previously: **G0 passed.** MQAR is answerable (oracle 1.000, checked mechanically
 across a grid), reachable (one hand-written lookup, 1.000), and **learnable** (a
 model trained from scratch, 1.000 on 5/5 seeds). Its trivial floor is measured
 and has a closed form; a frozen substrate sits at 0.180, leaving **0.82 of

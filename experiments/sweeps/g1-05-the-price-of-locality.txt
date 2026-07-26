@@ -2,7 +2,9 @@ G1 -- what does a LOCAL rule need, against what backprop needs?
 ================================================================
 
 Script: experiments/g1_05_local.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on GitHub Actions, 48/48 cells. Predictions 1 and 2 HELD -- the
+        local rule works, at roughly 4-6x the width. And an unpredicted finding
+        that matters more than either: THIS RULE IS NOT BIMODAL.
 
 
 IN PLAIN TERMS
@@ -113,6 +115,108 @@ first: a rule that cannot learn in one process will not learn spread over
 thousands.
 
 
+
 RESULT
 ------
-(not yet run)
+8 epochs over 400 sequences, 8 seeds x 6 widths as one job per cell on GitHub
+Actions. 48/48 cells returned. Every individual accuracy is printed, sorted,
+because g1-03's headline only became visible when the seeds were.
+
+condition            solved    stuck   between   worst   best
+-------------------------------------------------------------
+d_model=16              0/8      8/8       0/8   0.000  0.037
+    0.00 0.00 0.00 0.00 0.00 0.03 0.04 0.04
+d_model=24              0/8      8/8       0/8   0.004  0.092
+    0.00 0.01 0.01 0.02 0.03 0.05 0.06 0.09
+d_model=32              0/8      2/8       6/8   0.148  0.344
+    0.15 0.20 0.21 0.21 0.22 0.23 0.34 0.34
+d_model=48              5/8      0/8       3/8   0.846  0.969
+    0.85 0.88 0.89 0.92 0.93 0.94 0.97 0.97
+d_model=64              8/8      0/8       0/8   0.981  0.996
+    0.98 0.99 0.99 0.99 0.99 1.00 1.00 1.00
+d_model=96              8/8      0/8       0/8   0.998  1.000
+    1.00 1.00 1.00 1.00 1.00 1.00 1.00 1.00
+
+
+PREDICTION 1 HELD -- THE LOCAL RULE WORKS
+------------------------------------------
+8/8 at d_model=64 and above, with worst-case 0.981.
+
+A rule in which every update is a product of two signals present at the synapse,
+with no softmax over positions and no backward pass anywhere in the code, solves
+a task that a frozen substrate scores 0.180 on and a one-line heuristic scores
+0.344 on. **C1 is affordable on this task.**
+
+That is the first evidence in this project that the central constraint is not
+fatal, and it is what G1 existed to find out.
+
+
+PREDICTION 2 HELD, AT THE OPTIMISTIC END
+-----------------------------------------
+Predicted a crossing between 64 and 256, a 4x-16x penalty. Measured: the local
+rule crosses between 48 and 64; attention crosses between 8 and 16 (g1-04).
+
+    THE PRICE OF LOCALITY IS ROUGHLY 4x TO 6x IN WIDTH.
+
+That is a number worth having. It is not "locality is free" and it is not
+"locality is impossible" -- it is a cost, in a unit that can be multiplied by a
+machine count and argued about. Note 004's bandwidth arithmetic can now be
+re-run against a width that has been measured rather than assumed.
+
+
+THE FINDING NOBODY PREDICTED, AND IT MATTERS MORE
+--------------------------------------------------
+Look at the `between` column.
+
+    attention (g1-03):   60 runs, 0 intermediate outcomes. Strictly bimodal.
+    this rule:           9 of 48 cells land between stuck and solved, and the
+                         transition is smooth: 0.02 -> 0.09 -> 0.22 -> 0.91 ->
+                         0.99 -> 1.00 as width doubles.
+
+**The local rule has a slope where backprop had a step.**
+
+The mechanism is not mysterious once stated. Attention has to *discover a
+circuit*: either the query/key projections align into a working induction head
+or they do not, and that is a discrete event -- which is why g1-03 saw two
+outcomes and nothing between. The Hebbian store performs the correct operation
+from the first update; it never has to find anything. What limits it is
+INTERFERENCE, because every binding is superposed into one matrix and retrieval
+returns the right one plus a sum of all the others. Interference falls smoothly
+as width grows.
+
+    Circuit discovery is discrete. Superposition interference is continuous.
+
+**This inverts the expectation set in g1-03 and g1-04, and in the project's
+favour.** Those notes concluded that a mean is a fiction here and that G1 should
+count solved/stuck rather than average. That reasoning was right for attention
+and is wrong for this rule: for a graded mechanism a mean is meaningful, and the
+whole apparatus of "how close did it get" -- which g1-04 declared malformed --
+becomes the right question again for the thing the project actually proposes to
+build.
+
+It also bears on docs/notes/002 §4's argument. A predictive objective needs
+something to descend. A mechanism whose error falls off smoothly with capacity
+gives it one; a mechanism that must find a discrete circuit does not. **The
+local rule is better shaped for local learning than the global one was**, which
+is not what anyone would have guessed.
+
+Recorded with the caution it deserves: one task, one configuration, one rule.
+The claim is about this mechanism on this benchmark, not about locality in
+general.
+
+
+NOT YET TESTED
+--------------
+Predictions 3 (does the penalty grow with n_pairs) and 4 (does decay help) are
+untouched. 3 is the more interesting: attention was completely flat in n_pairs
+across 56 runs, and superposition interference should not be, which would make
+n_pairs a real difficulty dial for the first time -- for exactly the reason it
+was not one before.
+
+
+COST NOTE
+---------
+48 cells in ~2 minutes wall clock on Actions, against a local attempt that was
+projected at 30+ minutes and had to be killed for consuming the machine. The
+matrix is per (seed, width) rather than per seed so the expensive d_model=96
+cell -- ~19x the cheapest -- does not set the wall clock for everything else.

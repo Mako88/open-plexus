@@ -458,9 +458,11 @@ than memories.
 "locality costs 4–6× in width" figure — was substantially measuring the frozen
 projections' initialisation scale, a constant chosen once and never swept: a
 native width-32 model scores 0.263 at scale 1.0 and 0.960 at 0.71, nothing else
-changed. The figure **must not be quoted** until g1-08 re-measures it with the
-scale tuned **on both arms** — the attention baseline has the same untuned knob,
-and repairing one side only would reproduce the error with a friendlier face.
+changed. **g1-08 has now re-measured it with both arms tuned, and the honest price is
+4.0× in width** — the local rule crosses at 32 and attention at 8, each at its
+own best scale. Tuning both made the price *worse*: like-for-like at the old
+untuned settings it was 3.0×, so the retracted figure was not conservative but
+unfounded, and landing near the right answer was luck.
 G4 (bandwidth) and G5 (scale) remain.*
 
 *Previously: **G0 passed.** MQAR is answerable (oracle 1.000, checked mechanically

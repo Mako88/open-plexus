@@ -158,6 +158,13 @@ rule crosses between 48 and 64; attention crosses between 8 and 16 (g1-04).
 
     THE PRICE OF LOCALITY IS ROUGHLY 4x TO 6x IN WIDTH.
 
+*** SUPERSEDED BY g1-08, WHICH RE-MEASURED IT WITH BOTH ARMS TUNED. ***
+The honest price is 4.0x: the local rule crosses at width 32 and attention
+at width 8, each at its own best initialisation scale. The figure below was
+measured with both scales pinned at untuned defaults, where the like-for-like
+ratio was 3.0x -- so it was not conservative, it was unfounded, and landing
+near the right answer was a coincidence.
+
 *** IN DOUBT AGAIN, FROM A DIFFERENT DIRECTION -- see g3-02. *** A native
 width-32 model scores 0.263. The SAME model with its frozen projections
 multiplied by 0.71 scores 0.960. Nothing else changed: same width, same data,

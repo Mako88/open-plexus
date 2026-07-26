@@ -2,7 +2,9 @@ The honest price of locality -- both sides tuned this time
 ===========================================================
 
 Script: experiments/g1_08_honest_price.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 45/45 cells. ALL FIVE PREDICTIONS HELD -- the first
+        sweep in this project where none was refuted. And the correction went
+        AGAINST us: tuning both arms moved the price from 3.0x to 4.0x.
 
 
 IN PLAIN TERMS
@@ -106,4 +108,106 @@ in CLAUDE.md.
 
 RESULT
 ------
-(not yet run)
+5 seeds per cell. Mean accuracy by width and initialisation scale.
+
+=== local ===
+  width     0.25      0.5     0.71      1.0     1.41     BEST
+     16    0.599    0.562    0.095    0.007    0.000    0.599
+     24    0.779    0.875    0.663    0.030    0.000    0.875
+     32    0.894    0.975    0.957    0.240    0.000    0.975
+     48    0.963    0.992    0.994    0.902    0.000    0.994
+     64    0.973    0.999    0.999    0.995    0.004    0.999
+  crossing at best scale: 32
+
+=== attention ===
+  width    0.025     0.05      0.1      0.2      0.4     BEST
+      4    0.005    0.007    0.005    0.015    0.119    0.119
+      8    0.007    0.007    0.023    0.925    1.000    1.000
+     16    0.010    0.033    0.935    0.992    1.000    1.000
+     32    0.067    0.796    1.000    1.000    1.000    1.000
+  crossing at best scale: 8
+
+
+THE INTERNAL CONSISTENCY CHECK, FIRST
+--------------------------------------
+Before reading anything else off this table: it reproduces both prior results at
+their original settings.
+
+  local at scale 1.0, width 48   -> 0.902.  g1-06 measured 0.910.
+  attention at scale 0.1, width 16 -> 0.935. g1-04 measured 8/8 solved at 16 and
+                                     0/8 at 8; this table gives 0.023 at width 8.
+
+Two independent experiments, months of work apart, landing on the same numbers
+where they overlap. That is what makes the rest of the table worth reading.
+
+
+ALL FIVE PREDICTIONS HELD
+--------------------------
+1. The local rule crosses lower once its scale is tuned. Predicted 24 or 32;
+   measured **32**, down from 48.
+
+2. The best scale moves with width. It does, monotonically: 0.25 at width 16,
+   0.5 at 24 and 32, 0.71 at 48. Narrower models want smaller keys. So this was
+   never fixable by a better constant -- it is a real interaction, and pinning it
+   at any single value mismeasures every width but one.
+
+3. Attention also improves, and by less. Predicted the crossing stays 8-16 and
+   possibly reaches 8; it reaches **8**. Its default of 0.1 was badly wrong too:
+   at width 8 it scores 0.023 at 0.1 and 1.000 at 0.4.
+
+4. The honest price. Predicted 2-4x. Measured **4.0x** -- at the top of the range.
+
+5. Attention's conclusions are unchanged in substance, only in the width at which
+   they start.
+
+
+AND THE CORRECTION WENT AGAINST US
+------------------------------------
+This is the part that matters and it is the outcome this note promised to report
+as loudly as the favourable one.
+
+Using one consistent criterion (mean >= 0.9) on both arms:
+
+    at the original untuned scales:  local 48, attention 16  ->  3.0x
+    at each model best scale:        local 32, attention  8  ->  4.0x
+
+**Tuning both arms made the price WORSE, from 3.0x to 4.0x.**
+
+The local rule improved -- 48 down to 32 -- but attention improved *more* in
+proportion, 16 down to 8. Prediction 3 named exactly this risk: "if attention
+improves a lot at a better scale then the ratio barely improves and the headline
+correction is much smaller than hoped."
+
+So the honest number is:
+
+    ***  THE PRICE OF LOCALITY IS 4x IN WIDTH.  ***
+
+The previously reported "4-6x" was in the right region and arrived there by luck.
+Measured like-for-like at the settings it was actually taken at, it was 3.0x --
+two untuned knobs that happened to roughly cancel. The old figure was not
+conservative; it was unfounded, and being close was a coincidence.
+
+
+WHAT THE SCALE ACTUALLY DOES
+-----------------------------
+The local rule collapses completely at scale 1.41 -- 0.000 at every width up to
+64. Retrieval magnitude goes as the cube of the key scale against a fixed
+learning rate, so a 1.41x key is a ~2.8x step and the delta rule diverges. At
+1.0 it survives only because width 48+ has enough room to be forgiving.
+
+That the default sat at exactly the value where the mechanism is about to break
+is worth recording as luck rather than judgement.
+
+
+THE RULE THIS EARNS
+--------------------
+The candidate rule stated before the run has now been tested by being followed,
+and it changed the answer in the unfavourable direction, which is the strongest
+evidence it is worth having:
+
+  **A hyperparameter swept on one arm of a comparison must be swept on all of
+  them.**
+
+Had only the local rule been tuned, this sweep would have reported the price
+falling from 4-6x to about 2x, and it would have looked carefully measured. The
+真 number is twice that. Promoting to CLAUDE.md.

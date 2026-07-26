@@ -82,6 +82,20 @@ end-to-end result as a summary, not a diagnosis.
 > *Calibration.* — unfilled. Record the first time a proxy metric hid a broken
 > component: how many runs went by before a direct probe found it.
 
+**A hyperparameter swept on one arm of a comparison must be swept on all of
+them.** Tuning your own side and comparing against an untuned baseline produces a
+better number by exactly the mechanism that produced the wrong one — and it is
+undetectable from outside, because the result looks carefully measured.
+
+> *Calibration.* The project's headline figure — the price of locality — was
+> measured with the local rule's projection scale and the attention baseline's
+> initialisation scale both pinned at untuned defaults. Sweeping only the local
+> side would have reported the price falling from "4–6×" to about 2×. Sweeping
+> **both** put it at **4.0×**, against a like-for-like 3.0× at the old settings:
+> the correction went *against* the favoured hypothesis, and the number nearly
+> doubled relative to the one-sided version
+> ([g1-08](experiments/sweeps/g1-08-the-honest-price.txt)).
+
 **3. Reproduce before you believe.** One green run, one fast benchmark, one
 successful manual click is an anecdote. Anything that will be acted on gets
 repeated — enough times to separate the effect from the noise, and on input you

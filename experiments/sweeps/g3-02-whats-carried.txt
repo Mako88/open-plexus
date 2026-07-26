@@ -76,6 +76,8 @@ well-conditioned: the delta rule runs at a fixed rate against a retrieved vector
 whose magnitude goes as the cube of the key scale, so norm-1.0 keys with lr=0.05
 are badly tuned together, and norm-0.7 keys are much better.
 
+*** RESOLVED by g1-08: the honest price, both arms tuned, is 4.0x. ***
+
 **The width curve in g1-05 and g1-06 is therefore substantially a curve about an
 initialisation choice, not about how much room the mechanism needs.** The 4-6x
 price of locality is back in doubt and must not be quoted.

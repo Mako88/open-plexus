@@ -144,6 +144,19 @@ Consequences:
   still invalidates the comparison set (rule 12), so it stays a deliberate
   re-baseline rather than a quiet edit.
 
+> **MEASURED, and the curve is flat for a capable model** —
+> [g1-04](../../experiments/sweeps/g1-04-difficulty-curve.txt). Across an
+> eightfold change in `n_pairs` and a fourfold change in `seq_len`, a trained
+> model scored **1.000 in all 56 runs**. The dials set the *trivial floor* (0.562
+> → 0.180) and separate weak from strong, which is what G0 needed. **They do not
+> grade strong**, because content-addressed retrieval is insensitive to how many
+> items there are and how far away they sit.
+>
+> P3's curve exists, but not along the task axes. What bites is **model width** —
+> a sharp cliff between 8 and 16 — and **how much the architecture is told**
+> (g1-03). Both are properties of the learner rather than the task, which is
+> where G1's difficulty axis has to come from.
+
 ## 5. Candidate task families
 
 > **CORRECTED by [note 006](006-verifying-the-reservoir-claims.md) §3.** The

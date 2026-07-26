@@ -1,0 +1,176 @@
+The difficulty curve -- do the dials bite a model that can actually do the task?
+================================================================================
+
+Script: experiments/g1_04_dials.py
+Status: RUN. Predictions 1, 2 and 3 held exactly. The task dials are FLAT --
+        56 runs, every one at 1.000. A follow-up found what does bite.
+
+
+IN PLAIN TERMS
+--------------
+Our memory test has knobs: how many pairs to remember, and how long a stretch of
+junk sits between seeing a pair and being asked about it. Turning them up is
+supposed to make the test harder.
+
+We have never checked that against something that can actually do the test. We
+only ever checked it against things that fail regardless -- an untrained network,
+and a one-line heuristic. Those get worse in the obvious way.
+
+A capable model might not care at all. If it looks things up by content, it does
+not matter whether there are four things to look through or sixteen, or whether
+they are near or far. If that is what we find, then our knobs separate weak from
+strong -- which is what they were for -- but they do NOT give us a way to make a
+competent thing struggle. And we will need that shortly, because the whole point
+of the next stage is finding where a restricted learner breaks.
+
+
+QUESTION
+--------
+Note 001's property P3 asked for a CURVE, not a point: G0's output should be
+performance as a function of difficulty, so an operating point can be chosen
+where the gap is widest. That was measured for the floor (g0-01) and for a frozen
+substrate (g0-02). It has never been measured for a trained model.
+
+Sweep n_pairs and seq_len against the trained attention model. 8 seeds per cell,
+reporting SOLVED / STUCK counts rather than means -- g1-03 established outcomes
+are bimodal, so a mean describes a mixture of two populations and no actual run.
+
+Run with value_offsets=(1,), the hint given. That is deliberate: g1-03 showed the
+no-hint configurations add a search-failure mode of their own (8/20 stuck at one
+setting), and mixing that in would make it impossible to tell task difficulty
+from optimisation luck. With the hint the model solved 20/20, so any failure here
+is attributable to the dial.
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. n_pairs barely bites. The model does content-addressed lookup, which is
+   insensitive to how many items there are to look through. Guess: 8/8 solved at
+   every setting from 2 to 16.
+
+   Note 006 called n_pairs "the load-bearing dial" and g0-01 confirmed it sets
+   the trivial floor. Both remain true. But those are statements about what a
+   WEAK strategy scores. This asks a different question and both can be right.
+
+2. seq_len barely bites either. More junk between a pair and its query is more
+   things to not attend to, which costs an attention model very little.
+   Guess: 8/8 at 32, 64 and 128.
+
+3. Therefore THE CURVE IS FLAT. This is the real prediction and it is
+   uncomfortable: it would mean we do not currently possess a dial that makes
+   this task harder for something competent.
+
+4. If anything does bite, seq_len bites before n_pairs, because attention scores
+   are spread over more positions as the sequence grows and the correct match
+   must win against more competitors.
+
+Most likely to be wrong: (3), in the direction of something biting at the largest
+settings. n_pairs=16 with d_model=64 starts to press on the width available to
+represent distinct keys, so a failure there would be about MODEL CAPACITY rather
+than task difficulty -- and that distinction needs stating in the result rather
+than being read as the dial working.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- a dial drops solved counts     -> we HAVE a working difficulty dial and note
+                                    001's P3 curve exists; pick the operating
+                                    point where it starts to bend
+- everything stays 8/8           -> THE CURVE IS FLAT. The existing dials cannot
+                                    make a competent model struggle, and G1 needs
+                                    a different one before it can find where a
+                                    local rule breaks
+- failures only at n_pairs=16    -> likely capacity, not difficulty. Distinguish
+                                    by re-running that cell at larger d_model:
+                                    if it recovers, it was the model
+
+
+RESULT
+------
+3000 steps, 8 seeds per cell, value_offsets=(1,).
+
+--- n_pairs (seq_len fixed at 96) ---
+setting           floor    solved     stuck   between   worst   best
+---------------------------------------------------------------------
+n_pairs=2         0.562       8/8       0/8       0/8   1.000  1.000
+n_pairs=4         0.344       8/8       0/8       0/8   1.000  1.000
+n_pairs=8         0.234       8/8       0/8       0/8   1.000  1.000
+n_pairs=16        0.180       8/8       0/8       0/8   1.000  1.000
+
+--- seq_len (n_pairs fixed at 4) ---
+seq_len=32        0.344       8/8       0/8       0/8   1.000  1.000
+seq_len=64        0.344       8/8       0/8       0/8   1.000  1.000
+seq_len=128       0.344       8/8       0/8       0/8   1.000  1.000
+
+56 runs. Every single one scored exactly 1.000.
+
+
+THE CURVE IS FLAT
+-----------------
+Predictions 1, 2 and 3 all held, and 3 was the uncomfortable one.
+
+**The task dials do not make this task harder for a model that can do it.** Not
+slightly harder. Not harder at the extremes. Identical, to three decimals, across
+an eightfold change in n_pairs and a fourfold change in seq_len.
+
+This is not a contradiction of g0-01 or docs/notes/006, and the distinction is
+worth keeping straight. Those established that n_pairs sets the TRIVIAL FLOOR --
+from 0.562 at two pairs to 0.180 at sixteen, visible in the floor column above --
+and that multi-query is what makes the task discriminating at all. Both remain
+true. They are statements about what a WEAK strategy scores.
+
+What is now measured is that the same dials do nothing to a STRONG one. The
+dials separate weak from strong, which is what G0 needed them for. They do not
+grade strong.
+
+**The mechanism is not mysterious.** Content-addressed lookup is insensitive to
+how many items there are to look through, and to how far away they are. That is
+the whole point of retrieval as opposed to storage -- g0-03 saw the same thing
+when a hand-written lookup stayed at 1.000 while n_pairs doubled.
+
+
+WHAT DOES BITE: MODEL WIDTH
+----------------------------
+Follow-up at n_pairs=8, seq_len=96, 8 seeds, varying d_model:
+
+d_model      solved   stuck  between   worst   best
+----------------------------------------------------
+4               0/8     8/8      0/8   0.011  0.028
+8               0/8     8/8      0/8   0.043  0.143
+16              8/8     0/8      0/8   0.969  1.000
+32              8/8     0/8      0/8   1.000  1.000
+64              8/8     0/8      0/8   1.000  1.000
+
+**A sharp threshold between 8 and 16.** Below it nothing works; above it
+everything does. No gradual degradation across the boundary -- one cell fails
+completely and the next succeeds completely.
+
+Worth one qualification to g1-03's strict bimodality claim: d_model=16 produced
+a 0.969, the only intermediate value seen in 120 runs across both sweeps. Right
+at the capacity threshold there is a narrow band of partial performance. Away
+from it, the two-outcome pattern holds absolutely.
+
+
+WHAT THIS MEANS FOR G1, AND IT IS A BETTER PLAN THAN THE ONE WE HAD
+--------------------------------------------------------------------
+Difficulty, for a competent model, does not live in the task parameters. It lives
+in the model and in the learning problem. Two dials are now known to bite:
+
+  - MODEL WIDTH, measured here: a sharp capacity threshold.
+  - HOW MUCH THE ARCHITECTURE IS TOLD, measured in g1-03: giving or withholding
+    the induction shape moved the failure rate from 0/20 to 8/20.
+
+Neither is a property of the task. Both are properties of what the learner is
+working with, which is exactly what G1 is about.
+
+**So G1 gets a sharper design than "how close does a local rule get to 1.000".**
+
+  Measure the WIDTH A LOCAL RULE NEEDS against the width backprop needs, on the
+  same task, at the same success criterion.
+
+Backprop crosses the threshold between 8 and 16. If a local rule needs 64, that
+ratio IS the price of locality, in a unit that means something. If it never
+crosses at any width, that is a different and much more serious result, and the
+two are distinguishable -- which "it scored 0.4" would not be.
+
+This also inherits g1-03's reporting rule: solved/stuck counts, not means.

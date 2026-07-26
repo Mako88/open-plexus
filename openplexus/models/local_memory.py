@@ -223,7 +223,8 @@ class LocalAssociativeMemory:
 
     def run(self, tokens: np.ndarray, targets: np.ndarray | None = None,
             scored: np.ndarray | None = None, learn: bool = False,
-            partition: int | None = None) -> np.ndarray:
+            partition: int | None = None,
+            store: np.ndarray | None = None) -> np.ndarray:
         """Process one sequence; return the predicted next token per position.
 
         Args:
@@ -235,6 +236,23 @@ class LocalAssociativeMemory:
                 step. It exists so that this rule can be compared against the
                 attention model under the same objective.
             learn: Whether to update `Wo` online.
+            store: Which positions write into the memory. `None` stores every
+                consecutive pair, which is what everything before this measured.
+
+                **This is the dial for selective storage.** The store binds every
+                consecutive pair, so the number of things in memory *is* the
+                sequence length -- and by the measured `sqrt(d/N)` retrieval law
+                that is where every scaling exponent in this project comes from.
+                On MQAR a 384-step sequence stores 383 bindings and the task asks
+                about 4, so over 98% of the interference is bindings no query will
+                ever touch.
+
+                Supplying a mask here is an *oracle*: it uses knowledge a running
+                system would not have, and exists to measure the ceiling before
+                anything is built to reach it. A real gate has to decide from
+                locally available signals at the moment of storage, and whether
+                such a signal exists on this task is a separate and harder
+                question.
             partition: Read the answer off this partition alone, ignoring the
                 others. `None` pools them, which is what a deployment would do
                 when it can afford to. This exists to measure whether pooling is
@@ -267,7 +285,7 @@ class LocalAssociativeMemory:
             # retrieval below is what makes the association available later
             # without ever letting position t see position t+1 — the binding
             # written now is (t-1 → t), entirely in the past.
-            if previous_key is not None:
+            if previous_key is not None and (store is None or store[t]):
                 if self.config.decay < 1.0:
                     memory *= self.config.decay
                 memory += np.outer(value, previous_key)

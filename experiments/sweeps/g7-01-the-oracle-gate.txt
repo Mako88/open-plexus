@@ -1,0 +1,104 @@
+What is selective storage worth? The ceiling, measured first
+============================================================
+
+Script: inline probe; the mechanism is `LocalAssociativeMemory.run(store=...)`
+Status: ORACLE PROBE RUN. **The ceiling is total.** At the hardest length
+        measured, machines holding ONE number go from 0.404 to 1.000.
+
+
+IN PLAIN TERMS
+--------------
+Our system writes down every consecutive pair it sees. In a 384-step problem that
+is 383 facts. The problem only ever asks about four.
+
+So most of the interference -- the babble that forces machines to be bigger --
+comes from facts nobody will ever ask about.
+
+Before building anything clever to decide what is worth writing down, the cheap
+question is: **how much would perfect judgement be worth?** Give the system an
+oracle that keeps only the facts that matter, and see what changes.
+
+
+THE RESULT
+-----------
+seq_len 384, total width 240, lr 0.05, 200 training sequences x 4 epochs:
+
+    machines   node width   store everything   oracle gate
+          40            6              0.479         1.000
+         120            2              0.433         1.000
+         240            1              0.404         1.000
+
+Bindings stored fall from 383 to 8, a 48x cut. The measured `sqrt(d/N)` law
+predicted about a **6.9x** improvement in retrieval quality.
+
+**What actually happened is that the problem stopped being hard at all.** Machines
+holding a single number -- the smallest a machine can physically be -- score a
+perfect 1.000 at the sequence length where storing everything needs machines of
+20 to 24.
+
+
+THIS IS A CEILING, NOT A RESULT, AND THE DIFFERENCE MATTERS
+-------------------------------------------------------------
+The oracle reads `position_kinds()`, which tells it which positions carry pairs.
+**A running system does not have that.** It is knowledge about the benchmark
+supplied from outside, and the number above is what perfect judgement would buy,
+not what any implementable rule achieves.
+
+Being favourable, it gets the scrutiny this project reserves for favourable
+results:
+
+- **Does the oracle leak the answer?** No. It removes noise rather than supplying
+  the mapping. The model still stores, retrieves and decodes, and the readout is
+  still learned. What it is handed is *which bindings are worth keeping*, not what
+  they contain.
+- **Does it make the task trivial?** **Yes, and that is the honest description.**
+  With four bindings in a 240-dimensional memory, retrieval is essentially
+  interference-free. The right reading is not "gating solves it" but "essentially
+  all the difficulty in this benchmark is self-inflicted noise".
+- **Is 1.000 suspicious?** It is what a clean associative memory should give with
+  four items and this much room, so it is consistent rather than surprising.
+
+
+THE HARD PART, STATED PLAINLY
+-------------------------------
+**On this task a causal gate probably cannot match the oracle**, and it is worth
+saying so before building one.
+
+At the moment a binding is stored, nothing locally distinguishes a pair from
+filler. Both are unpredictable the first time they are seen -- so surprise-gating
+would store filler *preferentially*, since filler is random and therefore
+maximally surprising, and filler is exactly what we want to discard. Novelty
+fails for the same reason.
+
+What does separate them is **later use**: a pair key is queried, filler is not.
+That information arrives after the storage decision, so exploiting it needs credit
+assignment across time -- an eligibility trace held at the binding and resolved
+when the query arrives. That is a standard biological motif and it is local, since
+the trace and its later reinforcement both live at the synapse.
+
+So the question this probe raises is not "should we gate" -- the ceiling settles
+that -- but:
+
+  > **Is there a locally computable signal, available at storage time, that
+  > predicts whether a binding will ever be queried?**
+
+On MQAR the honest answer may be no, in which case this benchmark cannot test
+gating fairly and a task where usefulness IS locally predictable is needed. That
+would be a finding about the benchmark rather than the mechanism, and this project
+has had to make that kind before.
+
+
+WHAT WOULD COME NEXT
+---------------------
+1. **Decay, retested where its own note said to.** g1-06 measured decay as
+   unhelpful at seq_len 96 and wrote that it "may still matter for sequences long
+   enough that unbounded accumulation is the problem". At 384 steps with 383
+   bindings that condition is met. Decay is a crude but entirely local
+   approximation to gating, it costs nothing to try, and it has never been
+   retested in the regime its own note named. **This is the cheapest next step by
+   a wide margin.**
+2. **An eligibility trace.** Hold a decaying tag on each binding; reinforce it
+   when a retrieval through that key turns out to help. Local, biologically
+   standard, and a real build.
+3. **A harder benchmark.** If gating cannot be tested fairly here, the ceiling
+   above is an argument for changing the task, not the model.

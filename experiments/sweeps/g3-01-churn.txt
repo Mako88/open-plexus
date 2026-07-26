@@ -1,0 +1,112 @@
+G3 -- what happens when a machine leaves and never comes back?
+===============================================================
+
+Script: experiments/g3_01_churn.py
+Status: PREDICTIONS WRITTEN, NOT YET RUN
+
+
+IN PLAIN TERMS
+--------------
+People close their laptops. On the hardware this project is aimed at, machines
+leaving is not an accident -- it is the normal background condition, and the whole
+design has been built on the assumption that any machine can vanish at any moment
+and the rest carries on.
+
+That has been a principle for the entire project and has never once been tested.
+Nothing has ever left.
+
+This is different from the last experiment, which lost individual MESSAGES. A
+lost message is transient -- the next one arrives. A machine leaving takes its
+share of the system with it and never comes back.
+
+The interesting question is not just "how much damage" but "does it heal". And
+there is a reason to think it might: this design keeps almost nothing permanent.
+The working memory is rebuilt from scratch for every sequence, so a departing
+machine does not carry away any stored memories -- there are none to carry. What
+it takes is ROOM, plus whatever the readout had learned in that room.
+
+If that is right, the damage should be predictable in advance from a curve we
+already measured -- and that is the sharp version worth committing to.
+
+
+QUESTION
+--------
+Train, remove a fraction of the machines partway through, and keep going.
+
+  d_model=64, n_pairs=4, 6 seeds. Ablate a fraction f of the dimensions at the
+  halfway point. Measure accuracy IMMEDIATELY after (before any further
+  training), and again after the remaining epochs.
+
+  f       0.0   0.125  0.25   0.375  0.5    0.75
+  surviving width  64    56     48     40     32     16
+
+
+PREDICTIONS -- written before the run
+--------------------------------------
+1. IMMEDIATE damage is severe, and much worse than the surviving width alone
+   would suggest. The readout is tuned to a space that has just lost part of
+   itself, so its remaining weights are calibrated against a signal that no
+   longer arrives. Even f=0.125 should hurt noticeably.
+
+2. IT RECOVERS with continued training. The readout relearns on what is left,
+   and the associative memory needs no recovery at all because it is rebuilt per
+   sequence.
+
+3. THE SHARP ONE: **recovered accuracy tracks the width curve at the SURVIVING
+   width.** From g1-06 at n_pairs=4:
+
+        width   64     56*    48     40*    32     16
+        acc     0.991  ~0.95  0.910  ~0.55  0.225  0.000
+        (* interpolated between measured points)
+
+   So the predictions are, after recovery:
+
+        f=0.0    -> ~0.99
+        f=0.125  -> ~0.95
+        f=0.25   -> ~0.91
+        f=0.375  -> ~0.55
+        f=0.5    -> ~0.22
+        f=0.75   -> ~0.00
+
+   If that holds, **churn tolerance is readable straight off a curve we already
+   have**, and "how many machines can we lose" becomes an arithmetic question
+   rather than an experimental one. That is worth a great deal for the design.
+
+4. Therefore tolerable churn at d_model=64 is about 25%: losing a quarter leaves
+   48, which is at the crossing. Anything beyond that falls off a cliff, because
+   the width curve does.
+
+5. No catastrophic forgetting. Because only the readout persists, there is very
+   little for a departing machine to destroy. The recovery in (2) should be
+   quick -- most of the way back within the remaining epochs rather than needing
+   a fresh start.
+
+Most likely to be wrong: (3). Two ways it could fail, and they mean opposite
+things --
+   (a) recovery lands BELOW the width curve: ablating a trained model is worse
+       than training that width from scratch, because the surviving dimensions
+       were shaped to cooperate with ones that no longer exist. Plausible, and it
+       would mean churn tolerance must be measured rather than derived.
+   (b) recovery lands ABOVE the width curve: the surviving dimensions kept
+       something useful from the larger model. Would be surprising and would
+       suggest the model is over-provisioned at 64.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- recovery matches the width curve  -> churn tolerance is arithmetic. Best case
+- recovery below the width curve    -> ablation damage is worse than starting
+                                       small; tolerance must be measured
+- recovery above the width curve    -> the model is over-provisioned; the
+                                       crossing measured in g1-05 may be soft
+- no recovery at all                -> something persistent IS being destroyed,
+                                       contradicting the claim that only the
+                                       readout carries across sequences
+- immediate damage negligible       -> prediction 1 wrong, and the readout is
+                                       more robust to losing its input space than
+                                       expected
+
+
+RESULT
+------
+(not yet run)

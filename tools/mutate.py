@@ -180,6 +180,20 @@ MUTATIONS = [
         new="            self.params[name] -= 0.0 * m_hat / (np.sqrt(v_hat) + self.eps)",
     ),
     Mutation(
+        name="ablation-spares-the-key-projection",
+        breaks="churn permanence, letting a departed machine keep contributing",
+        path=LOCAL,
+        old="        self.wk[:, index] = 0.0",
+        new="        pass",
+    ),
+    Mutation(
+        name="surviving-width-reports-the-original",
+        breaks="the honest denominator, crediting the model with room it lost",
+        path=LOCAL,
+        old="        return int((np.abs(self.wk).sum(axis=0) > 0).sum())",
+        new="        return self.config.d_model",
+    ),
+    Mutation(
         name="buffer-releases-a-slot-too-early",
         breaks="the buffer depth, so events still in flight are treated as lost",
         path=TRANSPORT,

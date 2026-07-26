@@ -1,0 +1,89 @@
+name: sweep-g3-01-churn
+
+# G3: machines leaving permanently, one job per (churn fraction, seed).
+#
+# Each cell trains a full model twice over — half the epochs, ablate, half again —
+# so the split is per cell rather than per seed to keep any one job short.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "experiments/g3_01_churn.py"
+      - ".github/workflows/sweep-g3-01.yml"
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  churn:
+    strategy:
+      fail-fast: false
+      matrix:
+        churn: ["0.0", "0.125", "0.25", "0.375", "0.5", "0.75"]
+        seed: [1, 2, 3, 4, 5, 6]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: churn ${{ matrix.churn }}, seed ${{ matrix.seed }}
+        run: python experiments/g3_01_churn.py --churn ${{ matrix.churn }} --seed ${{ matrix.seed }} --json out/c${{ matrix.churn }}-s${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g3-01-c${{ matrix.churn }}-s${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: churn
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g3-01-c*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          {
+            echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 36"
+            echo
+            python - <<'PY'
+          import glob, json
+          rows = [r for f in glob.glob("out/*.json") for r in json.load(open(f))]
+          by = {}
+          for r in rows:
+              by.setdefault(r["churn"], []).append(r)
+          print(f"{'churn':>7}{'width':>7}{'before':>9}{'immediately':>13}"
+                f"{'recovered':>11}{'recovery':>10}")
+          for churn in sorted(by):
+              rs = by[churn]
+              m = lambda k: sum(r[k] for r in rs) / len(rs)
+              print(f"{churn:>7.3f}{rs[0]['surviving_width']:>7}"
+                    f"{m('before'):>9.3f}{m('immediately_after'):>13.3f}"
+                    f"{m('accuracy'):>11.3f}"
+                    f"{m('accuracy') - m('immediately_after'):>+10.3f}")
+              print("        per-seed recovered: "
+                    + " ".join(f"{r['accuracy']:.2f}" for r in sorted(rs, key=lambda r: r["accuracy"])))
+          PY
+          } | tee summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g3-01-summary
+          path: |
+            summary.txt
+            out/*.json

@@ -111,6 +111,44 @@ class LocalAssociativeMemory:
         self.wv = rng.normal(0.0, 1.0 / np.sqrt(d), (v, d))
         self.wo = np.zeros((v, d))
 
+    def ablate(self, dimensions) -> None:
+        """Permanently remove these dimensions — a machine has left, for good.
+
+        This is C3's failure, and it is a different thing from C2's. A dropped
+        message is transient: the next one arrives. A departed machine takes its
+        share of the state with it and never comes back.
+
+        If the `d_model` dimensions were spread across machines, one machine
+        leaving is a slice of them gone. Zeroing the corresponding columns of the
+        frozen projections is enough to model that: with `wv[:, j]` zero the
+        memory's row `j` is empty, with `wk[:, j]` zero its column `j` is, and
+        the retrieved vector is therefore zero in those dimensions. The delta
+        rule then multiplies by that zero, so the readout's columns stay dead
+        without needing to be masked — the machine cannot come back by accident,
+        which is the property being modelled.
+
+        **Note what is NOT lost.** The associative memory is per-sequence working
+        state, rebuilt from scratch every sequence. Only the readout persists
+        across sequences. So a departing machine costs *capacity*, and costs
+        whatever the readout had learned in those dimensions — it does not take
+        away stored memories, because there are none to take.
+        """
+        index = np.asarray(list(dimensions), dtype=int)
+        if index.size and (index.min() < 0 or index.max() >= self.config.d_model):
+            raise ValueError(
+                f"dimension outside [0, {self.config.d_model}): {index}")
+        self.wk[:, index] = 0.0
+        self.wv[:, index] = 0.0
+        self.wo[:, index] = 0.0
+
+    def surviving_width(self) -> int:
+        """How many dimensions still carry signal.
+
+        The honest denominator after churn. Reporting a score against the
+        original `d_model` would credit the model with room it no longer has.
+        """
+        return int((np.abs(self.wk).sum(axis=0) > 0).sum())
+
     def run(self, tokens: np.ndarray, targets: np.ndarray | None = None,
             scored: np.ndarray | None = None,
             learn: bool = False) -> np.ndarray:

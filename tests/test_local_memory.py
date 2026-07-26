@@ -150,6 +150,64 @@ class TestEachPartIsConnected(unittest.TestCase):
         self.assertFalse(np.array_equal(outs[0], outs[1]))
 
 
+class TestChurn(unittest.TestCase):
+    """A machine leaving permanently — C3's failure, not C2's.
+
+    A dropped message is transient; the next one arrives. A departed machine
+    takes its share of the state and never comes back. The tests that matter are
+    that it really is permanent, and that what it takes is capacity rather than
+    stored memories.
+    """
+
+    def test_a_departed_machine_cannot_come_back(self):
+        """The property that makes this churn rather than a dropout.
+
+        The delta rule multiplies by the retrieved vector, which is zero in dead
+        dimensions, so the readout's columns there stay zero without masking. If
+        they ever refilled, the model would be quietly recovering capacity that
+        no longer exists and every churn measurement would be too optimistic.
+        """
+        model = LocalAssociativeMemory(CFG)
+        tokens, targets, scored = a_sequence(seed=9)
+        for _ in range(20):
+            model.run(tokens, targets, scored, learn=True)
+        model.ablate(range(8))
+        for _ in range(40):
+            model.run(tokens, targets, scored, learn=True)
+        np.testing.assert_array_equal(model.wo[:, :8], np.zeros_like(model.wo[:, :8]))
+        np.testing.assert_array_equal(model.wk[:, :8], np.zeros_like(model.wk[:, :8]))
+
+    def test_surviving_width_reports_the_honest_denominator(self):
+        model = LocalAssociativeMemory(CFG)
+        self.assertEqual(model.surviving_width(), CFG.d_model)
+        model.ablate([0, 1, 2])
+        self.assertEqual(model.surviving_width(), CFG.d_model - 3)
+
+    def test_ablation_changes_predictions(self):
+        """Rule 6. An ablation the forward pass ignored would make every churn
+        result a measurement of nothing."""
+        model = LocalAssociativeMemory(CFG)
+        tokens, targets, scored = a_sequence(seed=11)
+        for _ in range(30):
+            model.run(tokens, targets, scored, learn=True)
+        before = model.run(tokens)
+        model.ablate(range(CFG.d_model // 2))
+        self.assertFalse(np.array_equal(before, model.run(tokens)))
+
+    def test_ablating_nothing_changes_nothing(self):
+        model = LocalAssociativeMemory(CFG)
+        tokens, targets, scored = a_sequence(seed=12)
+        for _ in range(20):
+            model.run(tokens, targets, scored, learn=True)
+        before = model.wo.copy()
+        model.ablate([])
+        np.testing.assert_array_equal(model.wo, before)
+
+    def test_rejects_a_dimension_outside_the_model(self):
+        with self.assertRaises(ValueError):
+            LocalAssociativeMemory(CFG).ablate([CFG.d_model])
+
+
 class TestValidation(unittest.TestCase):
     def test_rejects_impossible_configurations(self):
         for bad in (dict(vocab_size=1), dict(vocab_size=8, d_model=0),

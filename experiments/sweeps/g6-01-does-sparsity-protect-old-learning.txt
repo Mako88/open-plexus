@@ -198,6 +198,17 @@ PREDICTIONS -- written before the run, replacing those above
    cannot separate but the representation is still degraded. That predicts a=16
    is worst everywhere below width 512, and a=8 worst below 256.
 
+> **The edge control ran before dispatch and the grid brackets the transition.**
+> Width 48 keeps **0.00** of task A -- total forgetting -- and width 112 keeps
+> **0.91**. So the transition is fully inside the grid, with a floor row that
+> forgets everything and a ceiling row that keeps nearly all of it.
+>
+> Prediction 1 worried that total forgetting at 48 would mean "the lower edge is
+> off the grid". **That worry was misplaced and is withdrawn.** Where forgetting
+> *begins* to be total does not matter; what matters is where it *stops*, and
+> that is bracketed. A floor row pinned at zero is the correct shape for this
+> grid, not a defect in it.
+
 Most likely wrong: (2). If sparse arms hold on at a width where dense has already
 collapsed -- somewhere in 64 to 96 now, since 128 is settled -- then sparsity buys
 capacity, which is worth having precisely because capacity is the thing G5 says we
@@ -223,3 +234,25 @@ WHAT WOULD REFUTE WHAT
 - forgetting does not fall with
   width                          -> controls were misleading and nothing here can
                                     be read
+
+
+WHAT g7-02 CHANGED ABOUT THIS QUESTION
+----------------------------------------
+This sweep was designed before g7-02, and g7-02 reframes it without invalidating
+it.
+
+g7-02 showed that with selective storage, devices holding **one number** work at
+any sequence length tested, in clusters of tens. So the regime this project now
+cares about is not "total width 48 to 128 split four ways" -- it is **width-1
+devices pooling in small clusters**.
+
+This sweep measures forgetting at four partitions of a 48-to-128 total, which is
+the regime that existed when it was written. That is still worth knowing: it
+answers John's question about whether sparsity protects old learning, and it does
+so in the setting where the forgetting transition actually sits.
+
+**But the question it leaves open is sharper than the one it answers.** If tiny
+devices can hold a task within a sequence and then lose it the moment a different
+body of data arrives, they are not usable, and nothing here tests that. **Does a
+cluster of width-1 devices forget?** is the follow-up, and it is a different
+sweep rather than a wider grid on this one.

@@ -177,11 +177,29 @@ out negligible and probably still does, but "probably" is doing work there.
    no token-level classifier anywhere; it is the smaller step of making the
    classifier per-group. Whether the pooling that remains is affordable is the
    measurement; whether it can be removed entirely is still open.
-3. **Measure the step rate the task actually needs**, since the whole affordable
-   region in §3 is a `d · rate` product and nothing here has measured `rate`.
+3. ~~**Measure the step rate.**~~ **Done, and the answer is that the network
+   binds and it is not close** (`tools/step_rate.py`). `rate` has two ceilings —
+   what a machine can compute and what its upload can carry — and the lower wins:
 
-With (1) done and (2) under way, this note has moved from design argument to
-partly-measured. The row/column distinction held up under test, which is the part
+   | `d` | machine `w` | compute | network | binds | margin |
+   |---|---|---|---|---|---|
+   | 240 | 16 | 62,000 Hz | 163 Hz | network | 380× |
+   | 1024 | 64 | 2,510 Hz | 38 Hz | network | 66× |
+   | 4096 | 256 | 202 Hz | 9.5 Hz | network | 21× |
+
+   So §3's `d · rate ≤ 40,000` is the real constraint and the arithmetic there
+   stands unmodified. **The margin narrows as machines widen** — compute per step
+   grows as `w·d` while the broadcast grows as `d`, so the ratio goes as `w` —
+   but nothing in the tested range comes near crossing.
+
+   Two caveats, both in the safe direction. This is NumPy under Python, so a real
+   implementation would compute faster and the network would bind harder. And
+   §3's byte count assumes float32 keys; quantising them buys rate proportionally,
+   which is the obvious lever if 163 Hz at `d = 240` ever proves too slow.
+
+With (1) and (3) done and (2) under way, this note has moved from design argument
+to mostly-measured. The row/column distinction held up under test, which is the part
 that was most likely to be wrong. The bandwidth arithmetic in §3 is still
-arithmetic: nothing here has measured a step rate, and the affordable region is a
-`d · rate` product with one term unmeasured.
+arithmetic — no packet has been sent — but it is no longer arithmetic with an
+unknown in it: the step rate is measured, the network is the binding ceiling at
+every width tested, and the affordable region is therefore the one §3 describes.

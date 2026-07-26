@@ -84,6 +84,25 @@ PREDICTIONS -- written before the run
    overwritten it. The connection control: if B is poor, that arm never learned
    and its retention number means nothing.
 
+> **The control ran before dispatch and prediction 1 already looks wrong.**
+> Gated, one seed, at lr 0.05:
+>
+>     cluster    1      2      4      8     16     32     64    240
+>     A before  0.221  0.346  0.556  0.979  1.000  1.000  1.000  1.000
+>     A after   0.127  0.306  0.558  0.956  1.000  1.000  1.000  1.000
+>     task B    0.119  0.144  0.383  0.637  0.998  1.000  1.000  1.000
+>
+> At cluster 16 and above the system learns task A, learns a **fully disjoint**
+> task B, and keeps task A at 1.000. Prediction 1 said width-1 devices would
+> forget essentially everything at every cluster size. They do not.
+>
+> Two things this does not yet settle. It is the GATED arm, and g6-01 measured
+> catastrophic forgetting without a gate -- so the open arm is the comparison
+> that matters and it is not run. And below cluster 8, task B itself only reaches
+> 0.119 to 0.383, which is prediction 4 firing: those rows never learned the
+> second task, so their retention numbers mean nothing and the summariser
+> excludes them.
+
 Most likely wrong: (2). It is the favourable direction and the one to distrust --
 if clustering protects, the tiny-device story survives contact with multiple
 tasks, and that is exactly the result this project would most like to see.

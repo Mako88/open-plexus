@@ -1,0 +1,71 @@
+name: sweep-g6-02-do-tiny-devices-forget
+
+# g7-02 showed devices of ONE dimension work at every sequence length tested, in
+# clusters of tens -- for a single body of data. This asks what happens when a
+# second arrives.
+#
+# g6-01 cannot answer it: that sweep varies total width while holding partitions
+# at four, so per-device width moves with total width and the two cannot be
+# separated. Here total width is pinned at 240 and every device holds one number,
+# so anything observed is about per-device width alone.
+#
+# 8 jobs. Costed: about an hour serial, worst job 7 minutes.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  forgetting:
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [open, gated]
+        lr: ["0.02", "0.05", "0.1", "0.2"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: ${{ matrix.mode }} lr ${{ matrix.lr }}
+        run: python experiments/g6_02_tiny_forgetting.py --mode ${{ matrix.mode }} --lr ${{ matrix.lr }} --json out/T-${{ matrix.mode }}-${{ matrix.lr }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g6-02-${{ matrix.mode }}-${{ matrix.lr }}
+          path: out/*.json
+
+  aggregate:
+    needs: [forgetting]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g6-02-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 8" | tee summary.txt
+          python tools/summarise_g6_02.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g6-02-summary
+          path: |
+            summary.txt
+            out/*.json

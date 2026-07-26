@@ -363,6 +363,26 @@ In the order they need answering. Each is a question, not a task.
 3. **What is the churn model?** What does "a machine left" mean concretely —
    at what granularity, with what warning, and what is the system's obligation
    when it happens? C3 is currently a principle without a definition.
+
+   **Defined in [docs/notes/003](docs/notes/003-the-churn-model.md), and this one
+   rests partly on a primary source that was read.** Granularity: the machine is
+   the failure domain, all its units go together. Warning: assume none. Detection
+   is a *separate liveness channel*, because on a sparse event substrate silence
+   is normal and absence of data cannot signal absence of a machine. Obligation:
+   nothing global — no barrier, no reconstruction, each affected unit notices
+   locally and continues.
+
+   **Two findings changed the picture.** Measured session lengths are Weibull
+   with shape `k` well below 1, so the hazard rate *decreases* — the longer a
+   machine has been up, the less likely it is to leave, and uptime predicts
+   remaining uptime. And the inspection paradox: a randomly chosen *session* is
+   short, but a randomly chosen *currently-active peer* is long-lived. The
+   frightening median-session numbers answer a question we are not asking.
+
+   **Architectural result:** `d_max` is simultaneously the C2 asynchrony bound
+   and the C3 churn timeout — within it a source is a straggler, beyond it a
+   dropout. Two constraints, one parameter. The cost is a false-positive zone
+   where a slow link is declared dead, which wants measuring.
 4. **What fraction of connections crosses the network, and is that a free
    parameter or forced by the design?** G4 turns on this number.
 5. **Does the distributed-systems literature already answer C3?** Cheap to find

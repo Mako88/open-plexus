@@ -22,6 +22,7 @@ explainer, and saying so is the most useful thing you can do.
 | [03](03-the-three-rules.md) | What are the three rules everything has to obey? |
 | [04](04-how-well-know-if-were-wrong.md) | How will we know if this doesn't work? |
 | [05](05-what-makes-a-fair-test.md) | What makes a fair test? |
+| [06](06-who-is-to-blame.md) | When it gets something wrong, who's to blame? |
 
 More get added as the project introduces new ideas. Anything here that turns out
 to be wrong gets corrected, not softened — same rule as everywhere else.

@@ -342,6 +342,24 @@ In the order they need answering. Each is a question, not a task.
    substrate, and whether the reference model must be strong or merely non-local.
 2. **Which credit-assignment scheme, and what is the argument that it satisfies
    C1 and C2?** Written on paper before anything is built.
+
+   **Answered in [docs/notes/002](docs/notes/002-which-credit-assignment-scheme.md),
+   subject to one untested gate.** Recommendation: **self-supervised temporal
+   prediction** — each unit predicts its own next input and learns from the
+   difference. The argument is that this converts latency from a *race* into a
+   *buffer depth*: there is no signal in transit that can be late, so a delay
+   costs memory rather than credit precision. The note also separates **error
+   sources** from **error delivery** and argues the predecessor was stuck
+   because it only ever varied the latter, and distinguishes temporal prediction
+   from relaxation-based hierarchical predictive coding, which violates C1.
+
+   **The gate:** does a unit's own state predict its next input above chance? If
+   not, the scheme has nothing to learn from. One probe settles it, and it must
+   run before anything is built on this choice.
+
+   **It also surfaced a conflict with note 001** that has to be resolved at task
+   design time — a noise dial widens the G0 gap but starves a predictive
+   objective. See note 002 §7.
 3. **What is the churn model?** What does "a machine left" mean concretely —
    at what granularity, with what warning, and what is the system's obligation
    when it happens? C3 is currently a principle without a definition.

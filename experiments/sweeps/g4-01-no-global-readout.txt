@@ -2,7 +2,11 @@ The price of dropping the global readout
 ========================================
 
 Script: experiments/g4_01_partitions.py
-Status: PREDICTIONS WRITTEN, NOT YET RUN
+Status: RUN on Actions, 54/54 cells. ALL FOUR PREDICTIONS HELD. At adequate
+        width the global readout costs NOTHING to remove, and a single
+        machine's answer stands up on its own -- so note 009 4's argument
+        holds. But the lr grid hit its boundary in 4 of 6 rows, so the
+        penalty numbers are provisional. See THE GRID PROBLEM below.
 
 
 IN PLAIN TERMS
@@ -122,3 +126,135 @@ compute, exactly as G1 was before G2 and G3 tested it. Delay and churn against a
 partitioned readout are separate questions, and the churn one already has a known
 complication: a departing machine takes a slice of the shared key with it, so it
 degrades every surviving group and not only its own.
+
+
+RESULT
+------
+3 seeds, 16 epochs, converged (no cell moved more than 0.02 between epoch 8 and
+16). Each arm read at its own best lr. Format: pooled / one group alone / worst
+group.
+
+seq_len 96
+  width          P=1                P=2                P=4                P=8
+     32   0.971/0.971/.971   0.930/0.861/.852   0.919/0.650/.610   0.892/0.412/.308
+     64   0.999/0.999/.999   0.997/0.994/.993   0.995/0.918/.859   0.989/0.681/.573
+    128   1.000/1.000/1.00   1.000/1.000/1.00   1.000/0.996/.990   1.000/0.949/.875
+
+seq_len 384
+  width          P=1                P=2                P=4                P=8
+     32   0.626/0.626/.626   0.317/0.238/.212   0.284/0.143/.115   0.262/0.104/.068
+     64   0.998/0.998/.998   0.903/0.857/.838   0.645/0.450/.376   0.546/0.252/.161
+    128   1.000/1.000/1.00   1.000/1.000/1.00   0.992/0.883/.776   0.741/0.543/.440
+
+The price of dropping the global readout (pooled, against P=1):
+
+  seq_len  width      P=2      P=4      P=8
+       96     32   -0.041   -0.051   -0.079
+       96     64   -0.002   -0.003   -0.010
+       96    128   +0.000   +0.000   +0.000
+      384     32   -0.308   -0.342   -0.364
+      384     64   -0.094   -0.353   -0.452
+      384    128   +0.000   -0.008   -0.259
+
+
+ALL FOUR PREDICTIONS HELD
+--------------------------
+1. **A group beats the standalone model of its own width, and not narrowly.**
+   g1-13 measured standalone local accuracy at seq 96: d=16 gives 0.559.
+
+     d=32, P=2  -> 16 features -> 0.861
+     d=64, P=4  -> 16 features -> 0.918
+     d=128, P=8 -> 16 features -> 0.949
+
+   All three hold 16 features and all three beat 0.559 by a wide margin. **The
+   addressing resolution, not the feature count, was doing most of the work** --
+   which is the structural point this note was written around and the reason
+   partitioning is not the same as shrinking.
+
+2. **Pooling beats a single group everywhere it is not at ceiling.** The groups
+   have not converged on the same function; the partition buys diversity.
+
+3. **Pooled degrades as P grows, and the gap grows with P.** Every row is
+   monotone. But the guessed magnitudes were badly pessimistic: at d=64 seq 96
+   the guess was 0.999/0.99/0.97/0.90 and the measurement is
+   0.999/0.997/0.995/0.989. **Eight-way partitioning at that width costs 0.010,
+   not 0.10.**
+
+4. **The gap is far larger at seq 384 than at 96.** -0.010 against -0.452 at
+   d=64. Confirmed, and by a wider margin than expected.
+
+Prediction 3 was flagged as most likely to be wrong, with a pre-registered check
+to run if P>1 came out ahead. It did not, so that check does not fire.
+
+
+WHAT THIS SETTLES
+------------------
+**The global readout was scaffolding, and at adequate width it costs nothing to
+remove.** At d=128, seq 96, P=8: pooled 1.000, identical to the unpartitioned
+model. Note 009 4's claim -- that the reduction is a property of the benchmark
+rather than of the mechanism -- is supported.
+
+**And a single machine's answer stands up.** 0.949 at d=128/P=8, 0.996 at P=4.
+So the pooling step is *optional* in that regime, which is the stronger claim and
+the one that matters for C1: a machine that cannot afford to pool still answers.
+
+**The cost is bought off with width, and cheaply.** Doubling from 64 to 128 takes
+the P=8 penalty at seq 96 from 0.010 to 0.000, and at seq 384 from 0.452 to
+0.259.
+
+
+THE GRID PROBLEM -- why the penalty numbers are provisional
+-------------------------------------------------------------
+The summariser prints each arm's chosen lr precisely so a one-sided grid is
+visible. It is:
+
+  seq=96  d=32    P=1:0.1   P=2:0.02  P=4:0.02  P=8:0.02   <- varies
+  seq=96  d=64    all 0.1                                  <- pinned at the TOP
+  seq=96  d=128   all 0.1                                  <- pinned at the TOP
+  seq=384 d=32    all 0.02                                 <- pinned at the BOTTOM
+  seq=384 d=64    all 0.02                                 <- pinned at the BOTTOM
+  seq=384 d=128   P=1:0.1  P=2:0.1  P=4:0.1  P=8:0.02      <- varies
+
+**Four of six rows pin at an edge of the grid**, which means the optimum is
+outside it and every arm in those rows is under-tuned. The lr was swept on all
+arms, which was the rule; the rule did not say the sweep had to CONTAIN the
+optimum, and this is the second failure mode of the same family.
+
+What survives it:
+
+- **The ceiling results.** 1.000 against 1.000 at d=128 seq 96 cannot be improved
+  by tuning. The finding that the readout costs nothing at adequate width stands
+  regardless of the grid.
+- **The direction**, which is consistent across all six rows including both rows
+  where lr varied internally.
+- **Prediction 1**, which compares against g1-13's separately-tuned numbers.
+
+What does not:
+
+- **The exact penalties in the four pinned rows.** They could move either way.
+  A lower lr might help the P=8 arm more than P=1, or less; nothing here
+  distinguishes those.
+
+**Not re-running.** The claims that matter are at ceiling, where tuning cannot
+move them, and the direction is 6 rows for 6. Recording the bound rather than
+chasing it -- which is the rule this project adopted after the g1-11 to g1-13 arc
+cost five sweeps for one number.
+
+
+AN UNPLANNED G5 OBSERVATION, AND WHY TO DISTRUST IT
+-----------------------------------------------------
+Hold per-machine width at 16 and grow the network:
+
+    2 machines   pooled 0.930   one machine 0.861
+    4 machines   pooled 0.995   one machine 0.918
+    8 machines   pooled 1.000   one machine 0.949
+
+**Both numbers rise as the network grows.** G5 asks whether the margin holds or
+grows with scale, and its refutation condition is that the margin shrinks. This
+is the opposite.
+
+It is also three points, at most 8 machines, on a task whose difficulty was held
+fixed while the network grew -- so it is measuring a growing model against a
+constant problem, which is the easiest possible version of the question. **G5
+asks whether capability grows with scale, and this shows only that capacity does
+not collapse.** It is an observation to design G5 around, not a result.

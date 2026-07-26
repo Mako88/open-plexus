@@ -478,7 +478,18 @@ changed. **g1-08 has now re-measured it with both arms tuned, and the honest pri
 own best scale. Tuning both made the price *worse*: like-for-like at the old
 untuned settings it was 3.0×, so the retracted figure was not conservative but
 unfounded, and landing near the right answer was luck.
-G4 (bandwidth) and G5 (scale) remain.
+G4 (bandwidth) and G5 (scale) remain — but G4's central assumption is no longer
+an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the
+global readout, which [note 009](docs/notes/009-splitting-the-memory.md) §4 had
+identified as the largest untested claim in the project and as a standing C1
+violation hiding inside a benchmark convenience. **At adequate width it costs
+nothing: 1.000 against 1.000 with the width split eight ways.** And a single
+machine's answer stands up alone (0.949 at eight-way, 0.996 at four-way), so the
+pooling step is optional rather than required — which is the claim C1 actually
+needs.
+
+The penalty numbers away from ceiling are provisional: the learning-rate grid
+pinned at an edge in four of six rows, so those rows are under-tuned on every arm.
 
 **The price, and a caveat that is now permanent.** Upward of **5.6×–8.2× the
 width**, growing with sequence length; in *working memory*, worse than attention

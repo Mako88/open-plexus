@@ -133,9 +133,23 @@ process: messages pass up and down repeatedly until the state converges.
 That settling loop is many round trips through the network per input. Over
 links with a 150 ms round trip it is ruinous, and while it is not a global
 barrier in the strict sense, it is a repeated global back-and-forth — the thing
-C1 exists to forbid. **The literature result that predictive coding approximates
-backpropagation depends on that settling.** Taking the result without the
-settling is not supported by it.
+C1 exists to forbid.
+
+> **CORRECTED by [note 005](005-verifying-the-borrowed-claims.md) §3–4.** This
+> section originally claimed the backprop-equivalence result *depends* on the
+> settling. It does not: relaxation is one of two sufficient conditions, the
+> other being that activities stay near their feedforward values; full
+> convergence is empirically unnecessary; and an exact variant (Z-IL) avoids
+> relaxation at the cost of explicit cross-layer **synchronisation**, which is a
+> different C1 violation rather than an escape.
+>
+> **And the larger point the original missed:** those results train with the
+> output layer **clamped to a label**. They are results about *supervised*
+> predictive coding — a broadcast source in this note's own taxonomy — and
+> therefore say little about the self-supervised temporal variant recommended
+> below. The conclusion of this section is unchanged; its support is
+> substantially weaker, and §4's structural argument is now carrying more of the
+> weight than when this was written.
 
 **Temporal prediction** — predict the *next input in time*, compare when it
 arrives — needs no relaxation. One pass. The target is supplied by the future

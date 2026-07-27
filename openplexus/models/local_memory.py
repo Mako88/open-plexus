@@ -305,6 +305,24 @@ class LocalMemoryConfig:
             value. That split is the one the biology describes and the only one
             available here.
             docs/notes/022-the-signal-was-there-and-pointing-backwards.md.
+            **Setting this AND `reward_window` >= 1 runs the combined gate**,
+            which protects the union of what each keeps. `reward_window` 0
+            alongside a tag is TAG-ONLY, because 0 is also the default and every
+            g9-05 to g9-07 cell was measured with the tag alone -- a default
+            must not silently change an arm's identity. The cost is that "a tag
+            plus a one-write window" cannot be expressed. They were mutually exclusive
+            while each was being measured apart, which was right then and is
+            exactly what a gate reading both signals has to change.
+            [Note 023](../../docs/notes/023-two-signals-and-only-one-of-them-is-about-value.md)
+            is the argument: weak retrieval says *this write is a binding* and
+            recency says *this binding is the rewarded one*, because the reward
+            token sits a fixed distance after the cue. Each mechanism has one
+            answer and a gate needs both.
+
+            The union keeps more, so it pays in interference -- retrieval goes
+            as `sqrt(d / N)` -- and that is the whole question. It cannot capture
+            LESS than either alone, so anything below the better of the two is
+            the interference cost showing up, measurably.
         tag_relative: Rank the tag on retrieval strength divided by the size
             of the store that produced it, instead of on the raw strength.
 
@@ -559,11 +577,6 @@ class LocalMemoryConfig:
             raise ValueError(
                 "the tag is captured by the reward token and does nothing "
                 "without it")
-        if self.tag_slots and self.reward_window:
-            raise ValueError(
-                "reward_window and tag_slots are two answers to the same "
-                "question -- how the gate chooses what to keep when the reward "
-                "arrives -- and enabling both runs an arm that is neither")
         if not 0.0 < self.tag_decay <= 1.0:
             raise ValueError("tag_decay must be in (0, 1]")
         if self.tag_decay < 1.0 and not self.tag_slots:
@@ -962,19 +975,26 @@ class LocalAssociativeMemory:
             # The signal arrives AFTER the binding, so the decision cannot be
             # made at write time. That is the difficulty, not an inconvenience.
             if self.config.reward_token >= 0 and token == self.config.reward_token:
+                # CAPTURE. Two ways to choose what survives, and with both
+                # set the survivors are the UNION -- a write is kept if either
+                # mechanism claimed it.
+                #
+                # The tag chose its members from a local signal at write time,
+                # so it adds no selectivity here; the reward supplies the value.
+                # The window ranks on recency, which g9-04 put at AUC 0.479 for
+                # telling a binding from filler -- no information -- and which
+                # is nonetheless almost all the information about which binding
+                # was REWARDED, since the token sits a fixed distance after the
+                # cue. Note 023.
+                protected: set = set()
                 if self.config.tag_slots:
-                    # CAPTURE. What is still tagged survives; everything else
-                    # written since the last reward comes back out. The tag chose
-                    # its members from a local signal at write time, so this step
-                    # adds no selectivity of its own -- it supplies the value.
-                    protected = {index for _, index in tagged}
-                else:
-                    # The most recent `reward_window + 1` writes, by recency and
-                    # nothing else. g9-04 put recency at AUC 0.479, which is no
-                    # information: a window's only virtue was ever REACHING the
-                    # binding, never selecting it.
+                    protected |= {index for _, index in tagged}
+                if self.config.reward_window or not self.config.tag_slots:
+                    # A window of 0 keeps the write at the reward step itself,
+                    # which is why this arm runs whenever there is no tag --
+                    # `reward_window` defaulting to 0 is still a gate.
                     keep = self.config.reward_window + 1
-                    protected = set(
+                    protected |= set(
                         range(max(0, len(pending) - keep), len(pending)))
                 captured = tuple(sorted(protected & set(range(len(pending)))))
                 for index, entry in enumerate(pending):

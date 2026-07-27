@@ -69,6 +69,11 @@ ARMS = {
     "reward": (False, True, False, False),
     "tag": (False, False, True, False),
     "tag-strongest": (False, False, True, True),
+    # Both mechanisms at once, protecting the union of what each keeps. Note 023:
+    # weak retrieval says "this write is a binding", recency says "this binding
+    # is the rewarded one". It cannot capture LESS than either alone, so
+    # anything below the better of the two is the interference cost showing up.
+    "combined": (False, True, True, False),
 }
 
 

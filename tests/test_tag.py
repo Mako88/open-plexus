@@ -144,11 +144,19 @@ class OffByDefault(unittest.TestCase):
         with self.assertRaises(ValueError):
             LocalMemoryConfig(vocab_size=VOCAB, tag_slots=4)
 
-    def test_a_tag_and_a_window_together_are_refused(self):
-        """Two answers to one question. An arm running both is neither arm."""
-        with self.assertRaises(ValueError):
-            LocalMemoryConfig(vocab_size=VOCAB, reward_token=REWARD,
-                              reward_window=4, tag_slots=4)
+    def test_a_tag_and_a_window_together_are_now_the_combined_gate(self):
+        """This pair used to be REFUSED, and the refusal was right at the time.
+
+        They were mutually exclusive while each was being measured apart, so
+        that no arm could be a hybrid of the two. Note 023 is why that changed:
+        weak retrieval says *this write is a binding* and recency says *this
+        binding is the rewarded one*, each mechanism has one answer, and a gate
+        needs both. Enabling both now protects the union.
+        """
+        config = LocalMemoryConfig(vocab_size=VOCAB, reward_token=REWARD,
+                                   reward_window=4, tag_slots=4)
+        self.assertEqual(config.reward_window, 4)
+        self.assertEqual(config.tag_slots, 4)
 
     def test_a_fade_outside_the_unit_interval_is_refused(self):
         for value in (0.0, -0.5, 1.5):
@@ -217,6 +225,75 @@ class TheTagChoosesWhatSurvives(unittest.TestCase):
         tokens = np.array(_filler(60, rng) + [CUE, VALUE] + _filler(20, rng))
         np.testing.assert_array_equal(build(slots=2).run(tokens),
                                       build(reward=-1).run(tokens))
+
+
+class TheCombinedGateKeepsTheUnion(unittest.TestCase):
+    """A write survives if EITHER mechanism claimed it.
+
+    Note 023: the two select different things. Weak retrieval finds a binding;
+    recency finds the one the reward was about, because the token sits a fixed
+    distance after the cue. g9-06 measured them reaching almost the same
+    recovery by different routes -- the tag +0.16 flat across delay, the window
+    +0.23 where matched and -0.24 where not.
+
+    The union cannot capture LESS than either alone. What it can do is keep more
+    and pay for it in interference, since retrieval goes as `sqrt(d / N)`. That
+    is the measurement, not these tests.
+    """
+
+    #: One interval, so nothing has been captured yet when the marks are made
+    #: and the three arms see an identical store. Over several intervals the
+    #: arms diverge -- each has subtracted different writes at earlier captures
+    #: -- and the union stops being a set operation on the other two.
+    def _one_interval(self):
+        rng = np.random.default_rng(5)
+        return np.array(_filler(50, rng) + [CUE, VALUE] + _filler(30, rng)
+                        + [REWARD])
+
+    def test_it_keeps_exactly_the_union(self):
+        tokens = self._one_interval()
+        tag_only = captures(build(slots=4, decay_tag=0.9), tokens)[0]
+        window_only = captures(build(window=3), tokens)[0]
+        both = captures(build(slots=4, decay_tag=0.9, window=3), tokens)[0]
+        self.assertEqual(both, sorted(set(tag_only) | set(window_only)))
+
+    def test_the_two_arms_do_not_already_agree(self):
+        """Guard: if the tag and the window kept the same writes, the union
+        would be trivially equal to both and the test above would be vacuous."""
+        tokens = self._one_interval()
+        self.assertNotEqual(set(captures(build(slots=4, decay_tag=0.9), tokens)[0]),
+                            set(captures(build(window=3), tokens)[0]))
+
+    def test_it_keeps_at_least_as_much_as_either(self):
+        tokens = self._one_interval()
+        both = len(captures(build(slots=4, decay_tag=0.9, window=3), tokens)[0])
+        self.assertGreaterEqual(
+            both, len(captures(build(slots=4, decay_tag=0.9), tokens)[0]))
+        self.assertGreaterEqual(both, len(captures(build(window=3), tokens)[0]))
+
+    def test_a_window_of_zero_alongside_a_tag_means_tag_only(self):
+        """An ambiguity, pinned rather than papered over.
+
+        `reward_window` 0 is a real one-write window on its own -- it keeps the
+        write at the reward step. But 0 is also its DEFAULT, so a tag arm
+        configured without touching it would silently become a combined gate,
+        and every g9-05, g9-06 and g9-07 cell was measured with the tag alone.
+
+        So a tag with `reward_window` 0 is tag-only, and the combined gate needs
+        `reward_window` at least 1. The cost is that "tag plus a one-write
+        window" cannot be expressed; the benefit is that the published arms stay
+        reproducible and no default silently changes an arm's identity.
+        """
+        tokens = self._one_interval()
+        self.assertEqual(captures(build(slots=4, decay_tag=0.9, window=0), tokens),
+                         captures(build(slots=4, decay_tag=0.9), tokens))
+
+    def test_one_is_the_smallest_window_the_combined_gate_can_use(self):
+        tokens = self._one_interval()
+        tag_only = captures(build(slots=4, decay_tag=0.9), tokens)[0]
+        both = captures(build(slots=4, decay_tag=0.9, window=1), tokens)[0]
+        self.assertEqual(both, sorted(set(tag_only)
+                                      | set(captures(build(window=1), tokens)[0])))
 
 
 class TheMarkFades(unittest.TestCase):

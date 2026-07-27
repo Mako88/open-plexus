@@ -192,6 +192,30 @@ MUTATIONS = [
         new="    return rank * factor",
     ),
     Mutation(
+        name="the-combined-gate-forgets-the-tag",
+        breaks="the union, leaving a plain window. A write the tag marked and "
+               "the window did not is discarded, so a gate configured to read "
+               "both signals reads one -- and scores like the window, which is "
+               "a number that looks entirely reasonable",
+        path=LOCAL,
+        old="                    protected |= set(\n"
+            "                        range(max(0, len(pending) - keep), len(pending)))",
+        new="                    protected = set(\n"
+            "                        range(max(0, len(pending) - keep), len(pending)))",
+    ),
+    Mutation(
+        name="the-combined-gate-intersects",
+        breaks="which set operation combines the two mechanisms. An "
+               "intersection keeps only what BOTH claimed, which is a policy "
+               "nothing here argued for and which is strictly more selective "
+               "than either alone -- the opposite of the intended trade",
+        path=LOCAL,
+        old="                    protected |= set(\n"
+            "                        range(max(0, len(pending) - keep), len(pending)))",
+        new="                    protected &= set(\n"
+            "                        range(max(0, len(pending) - keep), len(pending)))",
+    ),
+    Mutation(
         name="the-tag-ranks-on-raw-strength",
         breaks="the normalisation, restoring the confound it exists to remove. "
                "A retrieval's size scales with the store's size, so an "

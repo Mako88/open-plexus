@@ -24,7 +24,7 @@ import warnings
 import numpy as np
 
 from openplexus.models.local_memory import (
-    LocalAssociativeMemory, LocalMemoryConfig)
+    LocalAssociativeMemory, LocalMemoryConfig, scale_to)
 
 VOCAB, WIDTH = 16, 24
 
@@ -41,6 +41,54 @@ def build(cap: float = 0.0, decay: float = 0.999):
         memory_cap=cap, seed=4))
     model.wo[:] = model.wv           # a decoder, so predictions track the memory
     return model
+
+
+class ScalingIsNotClipping(unittest.TestCase):
+    """The distinction, tested where it is visible: in the arithmetic.
+
+    A mutation replacing the scale with `np.clip(store, -1e-3, 1e-3)` SURVIVED
+    every test that went through the model's predictions. The reason is that
+    clipping is gated on `norm > cap` exactly as scaling is, so the cap's *value*
+    still decides when it fires, and "two binding caps give different answers"
+    passes for both mechanisms.
+
+    What separates them cannot be seen in an argmax. Scaling multiplies the whole
+    store by one factor and preserves every ratio in it; clipping flattens the
+    large entries and destroys them. So it is tested as arithmetic.
+    """
+
+    def test_it_scales_to_exactly_the_cap(self):
+        store = np.array([[3.0, 4.0], [0.0, 0.0]])      # norm 5
+        scale_to(store, 1.0)
+        self.assertAlmostEqual(float(np.linalg.norm(store)), 1.0)
+
+    def test_it_preserves_every_ratio(self):
+        """The property clipping destroys, and the reason it is the wrong
+        mechanism: the store's opinion about which of its contents are strong
+        must survive being made smaller."""
+        store = np.array([[10.0, 1.0], [0.5, 0.25]])
+        before = store / store[0, 0]
+        scale_to(store, 0.5)
+        np.testing.assert_allclose(store / store[0, 0], before, rtol=1e-12)
+
+    def test_a_single_large_entry_is_not_flattened_onto_the_others(self):
+        """Clipping would bring 10.0 and 1.0 to the same value. Scaling keeps
+        the first ten times the second, however small both become."""
+        store = np.array([[10.0, 1.0]])
+        scale_to(store, 0.001)
+        self.assertAlmostEqual(store[0, 0] / store[0, 1], 10.0, places=9)
+
+    def test_a_store_already_under_the_cap_is_untouched(self):
+        store = np.array([[0.1, 0.2]])
+        scale_to(store, 100.0)
+        np.testing.assert_array_equal(store, np.array([[0.1, 0.2]]))
+
+    def test_a_cap_of_zero_is_off_rather_than_a_cap_of_zero(self):
+        """0 means unbounded, which is how every earlier result was measured.
+        Reading it as a literal bound would erase the store."""
+        store = np.array([[3.0, 4.0]])
+        scale_to(store, 0.0)
+        np.testing.assert_array_equal(store, np.array([[3.0, 4.0]]))
 
 
 class ZeroIsWhatEverythingWasMeasuredWith(unittest.TestCase):

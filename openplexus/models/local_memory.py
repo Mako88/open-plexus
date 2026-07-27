@@ -105,6 +105,32 @@ def admit(strengths, strength: float, capacity: int) -> int | None:
     return weakest if strength > strengths[weakest] else None
 
 
+def scale_to(store: np.ndarray, cap: float) -> None:
+    """Shrink `store` in place until its norm is at most `cap`. No-op if `cap` is 0.
+
+    **Scales the whole store, never an entry.** That distinction is the whole
+    mechanism: synaptic scaling multiplies a neuron's synapses by a common
+    factor, preserving what the store has learned about the *relative* strength
+    of its contents while bounding the total. Clipping individual weights to a
+    budget bounds the total too, and is a different and non-local operation --
+    it inspects entries rather than one number, and it destroys the ratios.
+
+    The difference is invisible in the model's predictions, because both are
+    gated on `norm > cap` so both make the cap's value decide *when* they fire.
+    That is why this is a function: the property that separates them is
+    arithmetic, and arithmetic is testable directly.
+
+    Used by both stores. Zenke & Gerstner (2017) is titled *Hebbian plasticity
+    requires compensatory processes on multiple timescales*, and for a while this
+    project had implemented one.
+    """
+    if not cap:
+        return
+    size = float(np.linalg.norm(store))
+    if size > cap:
+        store *= cap / size
+
+
 @dataclass(frozen=True)
 class LocalMemoryConfig:
     """Shape and learning settings.
@@ -133,6 +159,31 @@ class LocalMemoryConfig:
             an answer is wanted — and *optional*, because each group emits a
             complete answer by itself. Whether one group's answer alone is good
             enough is the measurement, not an assumption.
+        memory_cap: Largest norm the FAST store may reach. 0 leaves it
+            unbounded, which is how every earlier result was measured.
+
+            **The fast store had no brakes and the paper said it should.**
+            `lasting_cap` bounds the consolidated store and cites Zenke &
+            Gerstner (2017), whose title is *Hebbian plasticity requires
+            compensatory processes on multiple timescales*. We took the
+            compensatory process, applied it to one store, and left the other
+            unbounded.
+
+            The consequence is arithmetic. `memory = decay * memory + outer(...)`
+            is a geometric series, so a recurring token drives it toward
+            `1 / (1 - decay)` — about **277x** a single binding at the half-life
+            these sweeps use. Retrieval is linear in that and the delta-rule
+            update is **quadratic**, so it diverges to NaN. Measured without
+            training: the memory norm goes 114 to 967 and the largest retrieval
+            137 to 3452 as filler skew rises.
+
+            This is not about skewed data. Skew supplies repetition, and so does
+            real language, a sensor reporting the same reading twice, or a quiet
+            period on a node.
+
+            Scales the whole store, never an entry — see `lasting_cap`, where
+            the same distinction is pinned by a mutation.
+            docs/notes/018-the-fast-store-has-no-brakes.md.
         capture_slots: How many promotions the lasting store may hold at once.
             0 keeps the original rule — every step that clears the gate is
             promoted, and nothing is ever displaced.
@@ -279,6 +330,7 @@ class LocalMemoryConfig:
     partitions: int = 1
     key_scale: float = 1.0
     key_active: int = 0
+    memory_cap: float = 0.0
     consolidation: float = 0.0
     capture_slots: int = 0
     salience: float = 0.0
@@ -301,6 +353,8 @@ class LocalMemoryConfig:
             raise ValueError(
                 "derived_keys and key_active both build Wk and would conflict; "
                 "sparse keys have no per-token derivation yet")
+        if self.memory_cap < 0.0:
+            raise ValueError("memory_cap must not be negative")
         if self.capture_slots < 0:
             raise ValueError("capture_slots must not be negative")
         if self.capture_slots and not self.consolidation:
@@ -595,6 +649,7 @@ class LocalAssociativeMemory:
                 if self.config.decay < 1.0:
                     memory *= self.config.decay
                 memory += np.outer(value, previous_key)
+                scale_to(memory, self.config.memory_cap)
 
             # CONSOLIDATE. The prediction made one step ago was a guess at the
             # token that has just arrived, so this is where it gets marked right
@@ -659,13 +714,7 @@ class LocalAssociativeMemory:
                 elif fires:
                     lasting += self.config.consolidation * np.outer(
                         previous_retrieval, previous_key_for_retrieval)
-                    if self.config.lasting_cap:
-                        # Scale the whole store, never one entry. Editing
-                        # individual weights to fit a budget would be a
-                        # different mechanism and a non-local one.
-                        size = float(np.linalg.norm(lasting))
-                        if size > self.config.lasting_cap:
-                            lasting *= self.config.lasting_cap / size
+                    scale_to(lasting, self.config.lasting_cap)
 
             # RETRIEVE, then read an answer off each group independently.
             # `parts` is (groups, vocab): row g is the complete prediction group

@@ -20,7 +20,31 @@ jobs:
       - run: pip install numpy
       - name: Test suite
         run: python -m unittest discover -s tests -t . -q
-      - name: Verify the tests can fail
-        run: python tools/mutate.py
       - name: Verify every workflow flag is one its script accepts
         run: python tools/check_workflows.py
+
+  # The harness runs one full suite per mutation, so it is serial time and
+  # nothing else — 85 mutations at roughly fifteen seconds each. Sharded it is
+  # about two minutes a job instead of twenty in one.
+  #
+  # It was ALSO being run locally, which was pure duplication and was the thing
+  # blocking local work: experiments refuse to run while the source is mutated
+  # (experiments/harness.py), so an eight-minute harness run stopped everything
+  # else. Locally the right command is now `--only <the mutations I just added>`.
+  #
+  # Shards are by position, not by hash, so the same mutation lands in the same
+  # shard across runs and two logs can be compared line for line.
+  mutations:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: Verify the tests can fail (shard ${{ matrix.shard }} of 6)
+        run: python tools/mutate.py --shard ${{ matrix.shard }}/6

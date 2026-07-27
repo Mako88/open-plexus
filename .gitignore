@@ -16,3 +16,4 @@ __pycache__/
 # Mutation-harness backups. Should never persist; if one is here, a run was
 # killed mid-edit and tools/mutate.py will restore it on next start.
 *.py.bak
+.mutate.lock

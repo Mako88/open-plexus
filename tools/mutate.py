@@ -64,6 +64,26 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="the-fast-store-cap-never-binds",
+        breaks="the compensatory process on the fast store, restoring the "
+               "geometric runaway: repetition drives the store toward "
+               "1/(1-decay), retrieval is linear in that and the readout update "
+               "is quadratic, so it reaches NaN",
+        path=LOCAL,
+        old="    if size > cap:",
+        new="    if False:",
+    ),
+    Mutation(
+        name="the-fast-store-cap-clips-entries",
+        breaks="synaptic scaling on the fast store. Clipping individual weights "
+               "to a budget is a different mechanism and a non-local one -- it "
+               "inspects entries rather than a single total. Already pinned for "
+               "the lasting store; the same distinction applies here",
+        path=LOCAL,
+        old="        store *= cap / size",
+        new="        np.clip(store, -1e-3, 1e-3, out=store)",
+    ),
+    Mutation(
         name="departed-nodes-are-not-read-from",
         breaks="causality and liveness at once. A departure stops a node being "
                "SENT to; it cannot un-send a vote already transmitted. Dropping "
@@ -235,15 +255,15 @@ MUTATIONS = [
         name="the-cap-never-binds",
         breaks="the compensatory process, restoring the divergence that made a salience gate reach NaN",
         path=LOCAL,
-        old="                        if size > self.config.lasting_cap:",
-        new="                        if False:",
+        old="    if not cap:",
+        new="    if False:",
     ),
     Mutation(
         name="the-cap-edits-entries-instead-of-scaling",
         breaks="synaptic scaling: clipping individual weights is a different and non-local mechanism",
         path=LOCAL,
-        old="                            lasting *= self.config.lasting_cap / size",
-        new="                            np.clip(lasting, -1e-3, 1e-3, out=lasting)",
+        old="    size = float(np.linalg.norm(store))",
+        new="    size = cap",
     ),
     Mutation(
         name="votes-lose-their-step",
@@ -797,15 +817,115 @@ def revert(mutation: Mutation) -> None:
         bak.unlink()
 
 
-def main() -> int:
+def selected(argv: list[str]) -> list:
+    """The mutations to run, from `--only` or `--shard`, defaulting to all.
+
+    `--only` is for the local case: after adding a mechanism, run the mutations
+    that touch it rather than all eighty-five. `--shard i/n` is for CI, which can
+    then run n jobs at once.
+
+    Sharding is by POSITION, not by hash of the name, so the same mutation lands
+    in the same shard across runs and two CI logs can be compared.
+    """
+    chosen = list(MUTATIONS)
+    for index, argument in enumerate(argv):
+        if argument == "--only" and index + 1 < len(argv):
+            wanted = {n.strip() for n in argv[index + 1].split(",")}
+            unknown = wanted - {m.name for m in MUTATIONS}
+            if unknown:
+                raise SystemExit(f"no such mutation: {', '.join(sorted(unknown))}")
+            chosen = [m for m in MUTATIONS if m.name in wanted]
+        elif argument == "--shard" and index + 1 < len(argv):
+            part, _, total = argv[index + 1].partition("/")
+            part, total = int(part), int(total)
+            if not 0 <= part < total:
+                raise SystemExit(f"--shard {part}/{total} is out of range")
+            chosen = [m for i, m in enumerate(MUTATIONS) if i % total == part]
+    return chosen
+
+
+LOCK = ROOT / ".mutate.lock"
+
+
+def claim_the_lock() -> None:
+    """Refuse to start if another harness is already running.
+
+    A `.bak` file means the source is edited. It CANNOT say whether a run died
+    and left it, or a run is using it right now -- and the two want opposite
+    responses: restore, or keep away. Startup restore is right for the first and
+    destroys the second.
+
+    That is not hypothetical. A second run started while a background one was
+    going, restored its in-flight mutation, and both sets of results became
+    meaningless while the second printed a confident "4/4 caught".
+
+    The lock holds a PID. A lock whose process is gone is stale and is cleared;
+    a lock whose process is alive stops us.
+    """
+    if LOCK.exists():
+        try:
+            owner = int(LOCK.read_text(encoding="utf-8").strip())
+        except (OSError, ValueError):
+            owner = None
+        if owner is not None and _is_running(owner):
+            raise SystemExit(
+                f"REFUSING TO RUN: another mutation harness is running "
+                f"(pid {owner}).\n"
+                f"Two harnesses editing the same files produce results that "
+                f"look fine and mean nothing.\n"
+                f"Wait for it, or stop it and delete {LOCK.name}.")
+        print(f"clearing a stale lock from pid {owner}")
+    LOCK.write_text(str(os.getpid()), encoding="utf-8")
+
+
+def release_the_lock() -> None:
+    try:
+        LOCK.unlink()
+    except OSError:
+        pass
+
+
+def _is_running(pid: int) -> bool:
+    """Is this pid alive? Conservative: unknown counts as alive.
+
+    A false "alive" costs a wait. A false "dead" costs two harnesses running at
+    once, which is the failure this exists to prevent.
+    """
+    if os.name == "nt":
+        out = subprocess.run(["tasklist", "/FI", f"PID eq {pid}"],
+                             capture_output=True, text=True)
+        return str(pid) in out.stdout
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
+    claim_the_lock()
+    try:
+        return _main(argv)
+    finally:
+        release_the_lock()
+
+
+def _main(argv: list[str]) -> int:
     restore_any_leftovers()
+
+    mutations = selected(argv)
+    if len(mutations) != len(MUTATIONS):
+        print(f"running {len(mutations)} of {len(MUTATIONS)} mutations")
 
     if not suite_passes():
         print("The suite is red before any mutation. Fix that first.")
         return 2
 
     survived, stale = [], []
-    for mutation in MUTATIONS:
+    for mutation in mutations:
         problem = apply(mutation)
         if problem:
             stale.append(mutation)
@@ -821,7 +941,7 @@ def main() -> int:
             survived.append(mutation)
             print(f"SURVIVED      {mutation.name} — breaks {mutation.breaks}")
 
-    print(f"\n{len(MUTATIONS) - len(survived) - len(stale)}/{len(MUTATIONS)} caught")
+    print(f"\n{len(mutations) - len(survived) - len(stale)}/{len(mutations)} caught")
     if stale:
         # The names are repeated here even though each was printed above, so a
         # truncated capture cannot hide WHICH mutation went stale. `tail -4` of

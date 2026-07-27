@@ -2,10 +2,16 @@ Does a gate work when the relevance signal is real?
 ===================================================
 
 Script: experiments/g9_02_reward_gate.py  (NOT WRITTEN)
-Status: PREDICTIONS WRITTEN. No mechanism implemented, no script, no controls
-        run, nothing dispatched, no number seen. Written in this order
-        deliberately: the mechanism this sweep tests does not exist yet, so
-        these predictions cannot have been fitted to anything.
+Status: RUN, 12/12. **The first mechanism to recover anything: 0.19-0.23
+        against a previous best of 0.05 across six.** on-use and salience sit
+        at 0.00 in the same cells, which is what makes it credible.
+
+        **But the delay result is void, by my own construction.** The window
+        was set to `task.delay`, so the gate was told exactly how far back to
+        reach. Prediction 2 was untestable and the flat curve is the
+        configuration, not the mechanism. See the correction at the end.
+
+        Predictions were written before the mechanism existed.
 
 
 WHY THIS IS THE ONE THAT MATTERS
@@ -139,3 +145,85 @@ and not the whole distinction.
 
 **Anything about language.** Still synthetic, still a small alphabet, and still
 blocked behind the divergence in note 018.
+
+
+RESULT
+------
+Recovery of the oracle's advantage, first asks, three seeds, at each delay's best
+learning rate. Trivial floor 0.125.
+
+  delay    none  oracle    gap  spread   on-use  salience   reward
+      1   0.167   0.999  0.832   0.112    -0.00     -0.01     0.23
+      4   0.175   0.999  0.824   0.100     0.00     -0.02     0.23
+      8   0.168   0.999  0.831   0.094     0.00     -0.00     0.23
+     20   0.163   0.999  0.836   0.088    -0.00     -0.01     0.19
+
+**A gate has recovered something for the first time.** 0.19 to 0.23, against a
+previous best of 0.05 across six mechanisms and two tasks.
+
+And the reason to believe it is not the 0.23. It is that **on-use and salience
+score 0.00 in the same cells** -- they reproduce their failure exactly, on a new
+task, with the same code paths. A configuration in which everything suddenly
+worked would be a configuration to distrust.
+
+
+THE PREDICTIONS
+----------------
+1. **`reward` recovers substantially more than any stream-derived gate -- HELD in
+   direction, REFUTED in magnitude.** It does beat them, by every margin the grid
+   can resolve. The guess was "over 0.5 at delay 1"; it is 0.23.
+
+2. **Recovery falls as delay grows -- UNTESTABLE, because of a flaw in the
+   script.** See below. The measured curve is flat and that flatness is mine.
+
+3. **`on-use` and `salience` near zero at every delay -- HELD**, to two decimals
+   in all twelve cells.
+
+4. **Reward rate helps every arm -- NOT TESTED.** The rate axis was dropped when
+   the grid was costed, and dropping it was not recorded at the time. It should
+   have been.
+
+
+THE FLAW, WHICH IS THE SAME ERROR AS THE ORACLE
+-------------------------------------------------
+The script sets
+
+    reward_window = task.delay
+
+with the comment "the window reaches exactly as far back as the binding it must
+keep". That is true, and it is the problem: **the gate was told how far back to
+look.** At every delay the window was exactly the distance to the binding, so the
+lateness that this whole mechanism exists to solve was removed by configuration.
+
+`task.delay` is a property of the generator. A deployed node does not know how
+long ago the thing that mattered happened -- **that is the entire difficulty**, and
+it is what tagging and capture is a solution to. Passing it in is the same class
+of error as `position_kinds()`, arriving through a parameter instead of a mask.
+
+So the flat curve is not evidence that lateness is free. It is evidence that a
+gate which is told the delay does not care what the delay is, which is
+arithmetic.
+
+**The pre-registration called this**: "reward high at every delay -> suspect the
+task. A marker 20 steps later should not be free." The suspicion was right and
+the cause was one line of my own script rather than the task.
+
+What survives: at a *known* delay, a reward token recovers 0.19-0.23 where six
+intrinsic mechanisms recover nothing. That is a real result about the SIGNAL. It
+says nothing yet about whether a gate can handle a signal whose lag it does not
+know.
+
+
+THE CORRECTION
+---------------
+Re-run with the window FIXED across delays, so the gate has one reach and the
+delay decides whether that reach is enough. A fixed window of 8 covers delays 1
+and 4 comfortably, covers 8 exactly, and cannot reach 20.
+
+That is the experiment prediction 2 was written for, and it is what the shape of
+the curve was supposed to measure. Registered here before it runs.
+
+Prediction, before the re-run: recovery falls with delay once the window is
+fixed, and falls sharply past the window -- **above 0.2 at delays 1 and 4, and
+near zero at 20.** If it stays flat even with a fixed window, then something else
+is carrying the result and the reward token is not doing what this note claims.

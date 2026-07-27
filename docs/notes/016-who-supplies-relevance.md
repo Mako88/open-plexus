@@ -54,6 +54,55 @@ predictions. That is still the memory grading its own homework. The body in the
 proposal was a source of value **outside** the predictive machinery, and that
 part was never built.
 
+## (c) The agent's own output, marked by consequence
+
+John asked whether an **indirect** output could serve as the reward — not the
+model grading itself, which obviously breaks, but something downstream of its
+behaviour, so it can shape itself.
+
+The distinction that decides it is not direct-versus-indirect. It is **whether
+the loop passes through something the model cannot control.**
+
+**Intrinsic signals have failed six times.** Confirmation, surprise, both again
+under skew, and competitive capture at two pool sizes are all quantities the
+model computes from its own state. However indirectly they are derived, a model
+that can influence the signal can satisfy the signal, and the six failures are
+not obviously separable from that. Anything the model calculates about itself is
+in this category no matter how many steps of arithmetic sit between.
+
+**But a consequence is not intrinsic.** If the model acts, and the *environment*
+responds, and the response is the signal, then the model has shaped the signal
+without being able to choose it. That is the same structure as the reward token
+in `reward_recall` — extrinsic, late, and in the input — except the model
+influences *which* reward arrives rather than only receiving one.
+
+So the answer is yes, with a specific condition: **the output can generate the
+reward as long as the world is in the loop.** Self-shaping is fine; self-certifying
+is not.
+
+### What that would take, concretely
+
+A task where the model's prediction changes what it later sees. Then "was that
+binding worth keeping" is answered by what happens next, and the model cannot
+answer it for itself.
+
+`reward_recall` deliberately does not do this — the reward is scripted, and the
+model is a passive receiver. That was the right first step, because it isolates
+*can a gate use a real relevance signal* from *can an agent generate one*. The
+first is now measurable and looks positive at 0.34 recovery on a control. The
+second is a different task and a different mechanism.
+
+### The near-term version, which is cheap and probably wrong
+
+Bootstrapping: train with the reward gate, then use the trained model's own
+confident retrievals as pseudo-rewards for a second round. It is self-shaping,
+the loop is short, and it is the kind of thing that either compounds or drifts.
+
+**Recorded as a candidate rather than a plan**, because it is exactly the shape
+of the six failures — a signal the model computes about itself — and the only
+thing that distinguishes it is that the first round's gate was extrinsic. That
+may be enough or it may be laundering.
+
 ## So the decision is not "accept the oracle or don't"
 
 It is **which of (a) or (b) the accepted signal is**, and they demand different

@@ -48,6 +48,13 @@ BASE = RewardConfig(n_pairs=24, n_rewarded=4, n_cues=64, n_values=8,
                     seq_len=768, delay=8, queries_per_reward=3, seed=20260726)
 D_MODEL, N_TRAIN, N_TEST, EPOCHS, KEY_SCALE, DECAY = 32, 200, 80, 6, 0.5, 0.997
 DELAYS = (1, 4, 8, 20)
+#: How far back the gate can reach, FIXED rather than derived from the delay.
+#: A node does not know how long ago the thing that mattered happened, and that
+#: is the entire difficulty tagging and capture exists to address.
+#:
+#: 8 covers delays 1 and 4 comfortably, covers 8 exactly, and CANNOT reach 20 --
+#: so the delay decides whether the reach is enough, which is the question.
+REWARD_WINDOW = 8
 LEARNING_RATES = (0.02, 0.05, 0.1)
 SEEDS = (1, 2, 3)
 
@@ -93,10 +100,14 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int,
         vocab_size=task.vocab_size, d_model=D_MODEL, lr=lr,
         key_scale=KEY_SCALE, decay=DECAY,
         consolidation=consolidation, salience=salience, lasting_cap=lasting,
-        # The window reaches exactly as far back as the binding it must keep.
-        # Shorter cannot reach it; longer keeps more filler for no reason.
+        # A FIXED reach, not task.delay. The first version used the delay,
+        # which told the gate exactly how far back the binding was -- a property
+        # of the generator no deployed node has, and the same class of error as
+        # position_kinds() arriving through a parameter instead of a mask. It
+        # made the delay axis measure nothing: the reach always matched, so the
+        # curve was flat by construction.
         reward_token=task.reward_token if reward else -1,
-        reward_window=task.delay if reward else 0,
+        reward_window=REWARD_WINDOW if reward else 0,
         seed=seed))
     rng = np.random.default_rng(seed)
     order = np.arange(len(train_set))

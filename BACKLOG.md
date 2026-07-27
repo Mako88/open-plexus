@@ -909,6 +909,45 @@ In the order they would be built. See
 2. **A small real corpus**, character level, measured as perplexity against a
    bigram baseline. The first evidence for goal 2, and the first time anything
    here sees language. Vocabulary scale is untested and is the known risk.
+
+   **THE MEASURING MACHINERY IS BUILT** — `openplexus/ngram.py`, 19 tests, three
+   mutations. Order-`n` counts with add-k smoothing, `uniform_bits`, and
+   cross-entropy in **bits per character**, which reads the whole distribution
+   where next-character accuracy would be dominated by spaces and `e`.
+
+   Three reference points rather than one, because real text has no stated
+   trivial floor the way MQAR (0.34375) and `reward_recall` (0.125) do:
+
+       uniform   log2(V)         knowing nothing, including the alphabet
+       unigram   the base rate   knowing which characters are common
+       bigram    the real bar    knowing which character follows which
+
+   **Beating uniform is not evidence of anything** — note 013's base-rate
+   confusion in a new setting — so all three print. A test pins the gap: on an
+   alternating stream a bigram costs under 0.1 bits where a unigram costs a
+   full 1.0.
+
+   Bigram is a fair bar for this model specifically: **binding the previous
+   token to the current one IS a bigram in vector form**, so a result at or
+   below it says the memory is doing what counting does, and above it says
+   something is being carried that a count cannot carry.
+
+   **WHAT IS LEFT IS THE TEXT, and one part of it is John's call.**
+
+   - **Available with no decision at all: the repo's own prose.** `docs/notes`
+     is 229,344 characters over 124 distinct symbols. That is a real
+     character-level corpus with real Zipfian statistics, needs no download and
+     adds no data to the repo, and its vocabulary of 124 against MQAR's 73 tests
+     the scale risk named above at the same time. It is **not** a standard
+     benchmark and a headline drawn from it would be weak — but it is enough to
+     find out whether this memory beats a bigram at all, which is the question,
+     and it can run this cycle.
+   - **John's call: whether to bundle a standard corpus.** A public-domain text
+     (enwik8's opening, a Gutenberg book) makes the number comparable to
+     published ones instead of only to itself. It means downloading data and
+     committing it, which is not a decision to take unilaterally. Everything
+     else is ready for it — `ngram.py` takes token streams and does not care
+     where they came from.
 3. **bAbI task 2.** Task 1 is MQAR wearing a hat and should pass for free, which
    makes it a calibration. Task 2 needs chained retrieval — querying the memory
    with the result of a previous retrieval — and is the first item on this page

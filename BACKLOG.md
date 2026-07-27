@@ -1019,6 +1019,24 @@ In the order they would be built. See
      benchmark and a headline drawn from it would be weak — but it is enough to
      find out whether this memory beats a bigram at all, which is the question,
      and it can run this cycle.
+   **RAN, and the first attempt found a stability bug rather than a language
+   result.** [g10-01](experiments/sweeps/g10-01-does-this-memory-beat-a-bigram.txt)
+   dispatched; its chunk-64 cells are sound and its chunk-256 and chunk-1024
+   cells measured a divergence. `memory_cap` defaults to OFF and the corpus run
+   never set it, so the readout reached 1e72 with accuracy below chance. Fixed,
+   swept, guarded, and needs a re-run.
+
+   **[g10-02](experiments/sweeps/g10-02-underfit-or-undertrained.txt) answered
+   the epoch question and it is not the budget.** At width 32 the model peaks at
+   epoch ONE and oscillates without improving, and on text it has ALREADY SEEN it
+   reaches 5.78 bits where a bigram on that same text reaches 3.638. It is 2.1
+   bits short on material it has memorised access to, which is neither a
+   generalisation failure nor a budget failure. Train and test sit on top of each
+   other, so there is no overfitting either: it is not learning the text.
+
+   Whether that is architectural or width-limited is what the g10-01 re-run
+   decides.
+
    - **John's call: whether to bundle a standard corpus.** A public-domain text
      (enwik8's opening, a Gutenberg book) makes the number comparable to
      published ones instead of only to itself. It means downloading data and

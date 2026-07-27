@@ -2,7 +2,43 @@ Does this memory beat a bigram on real text?
 ============================================
 
 Script: experiments/g10_01_first_language.py
-Status: PRE-REGISTERED.
+Status: RUN ONCE, AND ITS CHUNK AXIS WAS INVALID. Needs a re-run.
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30256816869
+
+**THE CHUNK AXIS MEASURED A DIVERGENCE, NOT A MODEL.** At chunk 256 the run
+reported 37 bits per character and at chunk 1024 it reported NaN, over an
+86-symbol vocabulary whose uniform cost is 6.426. Those are not bad models.
+
+The fast store accumulates across a chunk, retrievals grow, the delta rule feeds
+on the retrievals, and `Wo` reached **1e72 with next-character accuracy of
+0.005 -- below the 1/86 chance rate**. The cross-entropy was identical at all 30
+temperatures because scores that large make the softmax a hard one-hot whatever
+it is divided by, so the "temperature pinned at the grid minimum" was a tie among
+thirty equal values rather than a preference.
+
+**The chunk-64 cells are sound**; chunk 256 and 1024 are void.
+
+The fix is a setting the model already had: `memory_cap`, synaptic scaling on the
+fast store, which **defaults to off** and which this experiment never set.
+
+    memory_cap    max |Wo|   test bits  test acc
+           0.0   1.693e+72      39.544     0.005    diverged
+          20.0   9.759e+71      39.544     0.005    diverged
+           5.0      0.5268       5.856     0.182    stable
+           1.0        1.47       5.723     0.176    stable
+
+`memory_cap` is now a swept axis rather than a pinned constant: 5.0 and 1.0
+already disagree by 0.13 bits, and freezing the value found in the one cell where
+the divergence appeared is the mistake this project keeps catching.
+
+**Why it bites here and not in the g9 line.** `reward_recall` applies the delta
+rule only at query positions. A language model applies it at EVERY position, so
+the retrieval-update feedback loop gets hundreds of times more chances per
+sequence. Dense supervision is the condition, not sequence length alone.
+
+`openplexus/ngram.absurd` now refuses any cross-entropy that is non-finite or
+more than a bit worse than uniform, naming the ceiling it used. Eight tests, two
+mutations. It fired correctly on the first re-run.
 
 
 IN PLAIN TERMS

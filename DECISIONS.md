@@ -1293,3 +1293,81 @@ agreeing is evidence the individual comparisons do not carry alone. So *the best
 capacity tracks the delay* survives as a pattern, and *this capacity is best at
 this cell* does not. The pins actually taken from g9-10 were the pattern's
 values, so the use was sound even though the per-cell justification was not.
+
+## 40. The corpus benchmark ran, and its first result was a stability bug
+
+**BACKLOG item 5 is started and goal 2 has its first measurements**, though not
+yet its answer. Three things happened and the middle one is the important one.
+
+### The corpus needed no decision
+
+`docs/notes` gives 210,216 training characters over 86 symbols after folding
+rare ones into UNKNOWN. Real English, real Zipfian statistics, no download, no
+data committed. It is explicitly NOT a standard benchmark; bundling one is a
+decision about what to commit and remains John's.
+
+Three ways such a benchmark quietly cheats, each with a test: the same document
+on both sides, a vocabulary built from test text, and a positional split (which
+on notes numbered in time measures drift rather than generalisation, so files are
+assigned by hash of name).
+
+Bars measured before anything was built: **uniform 6.426, unigram 4.756, bigram
+3.711, trigram 2.934**. Bigram is the bar and it is the fair one -- binding the
+previous token to the current one IS a bigram in vector form.
+
+### g10-02: not undertrained, underfitting
+
+g10-01 pre-registered `EPOCHS 2` as the frozen axis most likely to be wrong and
+registered the follow-up in advance. Run: the model **peaks at epoch 1** and then
+oscillates without improving, and on text it has already seen it reaches 5.78
+bits where a bigram on that text reaches 3.638. Train and test sit on top of each
+other, so it is not overfitting either. It is not learning the text.
+
+The script originally printed *"the conclusion is about the architecture"*. That
+is stronger than one cell supports and I corrected it **in the script**, not only
+in the write-up -- a script printing a claim its own sweep file calls unsupported
+is worse than either alone.
+
+### The part worth reviewing: three attempts, two of them wrong
+
+g10-01's chunk axis returned 37 bits per character and NaN. Over an 86-symbol
+vocabulary whose uniform cost is 6.426, those are broken numbers, not bad models.
+
+**First guess: divergence.** I wrote a diagnostic, trained it on 40 chunks, saw
+nothing exceed 2, and concluded the store was fine. **That check was
+under-powered** -- the real run trains on 645 chunks -- and I acted on its false
+negative.
+
+**Second guess: a leaky calibration.** The held-out calibration chunks came from
+documents that had been trained on. That IS a real flaw, and it is exactly what
+`corpus.py`'s own docstring demands for the train/test split, which I had then
+got wrong in the calibration split. I fixed it. **It did not fix the numbers.**
+
+**Third: measure instead of guessing.** Bits were identical at all thirty
+temperatures and score magnitude was 2.3e72. The readout had run away, and
+"temperature pinned at the grid minimum" was a tie among thirty equal values.
+
+So the first guess was right and my own weak check had concealed it. **The
+lesson is not "guess better" -- it is that a diagnostic needs the scale of the
+thing it is diagnosing.** Forty chunks against six hundred was not a small
+shortcut; it inverted the answer.
+
+**The fix was a setting the model already had.** `memory_cap` bounds the fast
+store's norm and defaults to OFF. With it, chunk 256 gives 5.72 bits and accuracy
+0.18. It is now a swept axis, because 5.0 and 1.0 disagree by 0.13 bits and
+freezing the value found in the one diverging cell is the frozen-constant mistake
+this project keeps catching.
+
+**Why it bites here and not in the g9 line**: `reward_recall` applies the delta
+rule only at query positions; a language model applies it at every position, so
+the feedback loop gets hundreds of times more chances per sequence. **Dense
+supervision is the condition, not sequence length.** That is worth knowing before
+any future task with dense targets is built.
+
+`openplexus/ngram.absurd` now refuses a non-finite cross-entropy or one more than
+a bit worse than uniform, and it lives beside `uniform_bits` rather than in the
+experiment, with eight tests and two mutations. Its vacuity guard matters: a rule
+that refused everything would pass every other test in the class while making the
+benchmark useless.
+
+546 tests, 115 mutations.

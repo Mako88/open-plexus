@@ -9,6 +9,20 @@ on:
   pull_request:
   workflow_dispatch:
 
+# One checks run per ref at a time, and a new push CANCELS the previous one.
+#
+# This is not tidiness. Each run is seven jobs -- the suite plus six mutation
+# shards -- and a session that commits ten times queues seventy jobs against a
+# sweep's fifteen. Measured: four superseded `checks` runs were sitting in front
+# of sweep-g9-11 while it had not started a single job, and the sweeps have their
+# own concurrency group so they cannot jump the line.
+#
+# Cancelling a superseded run loses nothing: the commit that superseded it
+# contains the code the cancelled run was checking, and its own run covers it.
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     runs-on: ubuntu-latest

@@ -683,6 +683,16 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   structural hash. So it is PREVENTION and not detection, and the thing that
   catches a drifted copy is still `tools/mutate.py`: a mutation in one path the
   tests do not notice.
+- **Commit frequency is a resource decision, not only a hygiene one.** Every
+  push runs `checks.yml`, which is seven jobs -- the suite plus six mutation
+  shards. A session that commits ten times queues seventy jobs, and a sweep's
+  fifteen sit behind them. Measured: four superseded `checks` runs were sitting
+  in front of `sweep-g9-11` while it had not started a single job.
+
+  `checks.yml` now cancels superseded runs for the same ref, which fixes the
+  recurrence. It does not fix the underlying habit — **batch related work into
+  one commit when a sweep is in flight**, and cancel superseded runs by hand if
+  one is already starving.
 - **One sweep matrix in flight at a time.** A matrix takes every runner, so a
   second sweep pushed while one is running does not overlap — its jobs queue,
   seize the runners the moment the first finishes, and starve the first's

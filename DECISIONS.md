@@ -728,3 +728,34 @@ under-rating a mechanism, which is the safer direction but not a safe one.
 8 everywhere. Reach 1 would add two writes per capture instead of nine. Logged in
 BACKLOG rather than dispatched, because it needs predictions written first and
 the control above explicitly cannot settle it.
+
+## 28. My own commit frequency was starving the sweep
+
+**What I found.** g9-11 sat with zero jobs started for a long stretch. The cause
+was not GitHub being busy in general — it was four superseded `checks` runs ahead
+of it, each seven jobs (the suite plus six mutation shards). I have pushed
+roughly ten times this session; that is seventy jobs queued against a sweep's
+fifteen, and sweeps have their own concurrency group so they cannot jump the
+line.
+
+**Chosen: cancel the superseded runs, then stop it recurring.** `checks.yml` now
+carries `concurrency: checks-${{ github.ref }}` with `cancel-in-progress: true`.
+A new push cancels the previous run for the same ref, which loses nothing — the
+superseding commit contains the code the cancelled run was checking, and its own
+run covers it.
+
+**And a convention in CLAUDE.md**, because the config fixes the recurrence and
+not the habit: commit frequency is a resource decision when a sweep is in
+flight, and related work should be batched into one commit rather than pushed
+piecemeal.
+
+**Worth review.** `cancel-in-progress` on a checks workflow is a trade: if two
+commits land close together and the first would have failed, its run is
+cancelled and only the combined state is checked. That is standard practice and I
+believe it is right here, but it is a deliberate reduction in coverage and should
+be an explicit choice rather than something I slipped in while unblocking myself.
+
+**The uncomfortable part** is that I spent several cycles reporting "g9-11 is
+queued, runners are congested" as though it were weather. It was a consequence of
+my own behaviour, visible in `gh run list` the whole time, and I did not look
+until the fourth cycle.

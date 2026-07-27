@@ -786,3 +786,36 @@ and the remedy did not follow from it — I reached for the visible structural
 feature (the lattice) rather than the one doing the work (the constant offset).
 Measuring the proposed fix before recommending it cost four minutes; acting on it
 would have cost nine sweeps and left the leak in place.
+
+## 30. g9-11 answered its question, and I made the error I had flagged
+
+**The finding, and it recasts the mechanism.** `combined − reward` in the same
+cell is **+1.19 to +1.23 at reaches 1, 2 and 4**, and **−0.01 at reach 8**. At
+reach 8 the window is matched to delay 8 and the tag adds nothing; at shorter
+reaches the window is catastrophic at −1.53 and the tag drags it back to −0.31.
+
+So the combined gate is not "two signals combining". **It is a floor under a
+badly set reach** — which is the useful reading, because a node cannot know the
+delay and therefore cannot set the reach. The tag's contribution is precisely
+that it covers a wrong guess.
+
+**Four of five predictions held**, including both wiring checks: the window's
+cliff sits exactly at the matching reach (reproducing g9-03 on a new axis months
+later), and the `tag` row is flat across reach to 0.000 spread, so the arms are
+independent.
+
+**The error.** I fixed `slots` at 4 because it was g9-10's best for the combined
+arm — *at node 32*. This grid runs at node 64, where g9-10's own trend predicts
+`slots` 4 is badly wrong, and the tag alone duly scores −0.35. **That is the
+error I named as g9-09's standing risk and then repeated one sweep later.**
+Naming a risk in a sweep file does not stop it recurring in the next.
+
+**What I checked before deciding the run was salvageable.** The reported quantity
+is a difference within a cell, and both arms share the capacity — so it isolates
+the tag's contribution whatever the capacity is. That is why the summariser was
+written to print it. The finding stands; the absolute recoveries do not, and the
+sweep file says no number in the arm tables should be quoted.
+
+**Worth review:** whether "name the frozen axis as a risk" is worth anything at
+all, given it has now failed twice in a row. A check that refused to run a sweep
+whose fixed parameters came from a different width would have caught both.

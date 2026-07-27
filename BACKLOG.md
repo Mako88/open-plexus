@@ -28,8 +28,14 @@ looking for work should start here.
    whatever the spacing does. The fix that would work is randomising the delay
    **per rewarded pair**, which stops `delay` being a swept axis at all — so it
    changes what the task is, not just its numbers. Bigger than a re-baseline.
-2. **`g9-11` is running**: how far the union's window needs to reach. The last
-   untested dial on the best mechanism here.
+2. **`g9-11` RAN and needs one cheap re-run.** The finding stands: the tag's
+   marks are worth **+1.2** against an unmatched window and **nothing** against a
+   matched one, so the combined gate is insurance against a reach a node cannot
+   set correctly. But `slots` was fixed at 4 — g9-10's best *at node 32* — and
+   that grid runs at node 64, where the tag alone scores -0.35. **The relative
+   number survives (both arms share the capacity); the absolute ones do not.**
+   Re-run at `slots` 16 for numbers worth quoting. Its reach axis also pinned at
+   the top, so anything above reach 8 is a bound.
 3. **Can anything identify WHICH binding without being told the delay?** The
    sharpest open question and it needs a probe, not a sweep. See *The sharpest
    open question BEFORE 027*.

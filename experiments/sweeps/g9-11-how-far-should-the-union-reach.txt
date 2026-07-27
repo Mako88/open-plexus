@@ -2,7 +2,97 @@ How far should the union reach?
 ===============================
 
 Script: experiments/g9_05_the_tag.py, with --window swept
-Status: PRE-REGISTERED. The last untested dial on the combined gate.
+Status: RUN. 15 of 15 cells, no refusals. Both wiring checks passed. The
+        capacity was MISTUNED by my own error -- see THE DESIGN ERROR.
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30248615080
+
+ANSWER: the tag's marks are worth +1.2 when the window is unmatched and NOTHING
+        when it is matched. The combined gate is not two signals combining --
+        it is insurance against a reach you cannot set correctly.
+
+
+THE RESULT
+-----------
+`combined` minus `reward` in the SAME cell. Both arms use the same reach and the
+same capacity, so the difference is exactly what the tag's marks add.
+
+    reach    delay 1   delay 8   delay 20
+        1      -0.01     +1.19      +0.09
+        2      -0.01     +1.21      +0.11
+        4      -0.01     +1.23      +0.10
+        8      +0.01     -0.01      +0.11
+       16      -0.01     +0.00      +0.13
+
+And the arms themselves at delay 8:
+
+    reach        reward   combined       tag
+        1         -1.53      -0.34     -0.35
+        2         -1.53      -0.32     -0.35
+        4         -1.54      -0.31     -0.35
+        8         +0.23      +0.22     -0.35
+       16           --       +0.23     -0.35
+
+**At reach 8 the window is matched to delay 8 and the tag adds nothing** --
+-0.01, which is the degeneracy every earlier control found. **At reaches 1, 2 and
+4 the window is unmatched and catastrophic at -1.53, and the tag drags it back to
+-0.31.** That is the entire value of the union, and it appears only where the
+window is wrong.
+
+So the combined gate is not "one signal says it is a binding, the other says it
+is the rewarded one". It is **a floor under a badly set reach**. Which is the
+useful reading for a deployed system, because a node cannot know the delay and
+therefore cannot set the reach -- the tag's contribution is precisely that it
+covers the case where the guess was wrong.
+
+
+PREDICTIONS, SCORED
+--------------------
+1. **CONFIRMED, far beyond the guess.** Predicted the union's advantage survives
+   at reach 1 and 2 at "+0.20 or better". It is +1.19 and +1.21. The reasoning
+   was right and the magnitude was not imagined: the advantage is not an
+   improvement on a good result, it is the rescue of a catastrophic one.
+
+2. **CONFIRMED exactly.** Predicted combined at delay 20 lands within 0.05 of the
+   tag alone at reach 1. Both are -1.51. Nothing here reaches delay 20, so the
+   window contributes nothing and the union IS the tag.
+
+3. **CONFIRMED, and it is a sharp cliff.** The window's collapse sits exactly at
+   the reach that matches the delay: -1.53 at reaches 1, 2 and 4, +0.23 at reach
+   8. That reproduces g9-03 on a new axis, at a different width, months later.
+
+4. **REFUTED.** Predicted the best combined reach is interior. `tools/grid.py`:
+   *all 3 arms chose an edge of the grid [1, 2, 4, 8, 16] (2 at the top, 16)*.
+   The delay-20 row is uniformly catastrophic so its "best" is arbitrary, but the
+   check fired honestly and the numbers above 8 are bounds.
+
+5. **CONFIRMED.** The `tag` row is flat across reach to **0.000** spread -- it
+   never reads the dial. The arms are independent and the run counts.
+
+
+THE DESIGN ERROR, WHICH IS MINE AND IS THE SAME ONE I FLAGGED
+--------------------------------------------------------------
+`slots` was fixed at 4 because that was g9-10's best for the combined arm. **It
+was g9-10's best AT NODE 32.** This grid runs at width 64 with one partition, so
+the node is 64, and g9-10's own numbers show `slots` 4 getting worse as the node
+grows: +0.06 at node 8, +0.06 at 16, -0.02 at 32. At node 64 the tag alone scores
+-0.35, which is exactly that trend continuing.
+
+So every absolute number here is at a badly mistuned capacity, and the tag's
+arm in particular is nowhere near its best.
+
+**This is the error I named as g9-09's standing risk and then repeated** -- a
+working point carried from one width to another. Naming a risk in a sweep file
+does not stop it recurring in the next one.
+
+**What survives it.** The reported quantity is `combined - reward` within a cell,
+and both arms share the capacity. The difference isolates the tag's contribution
+whatever the capacity is, which is why the summariser prints it. So the finding
+-- marks are worth +1.2 against an unmatched window and nothing against a matched
+one -- stands. **The absolute recoveries do not**, and no number in the arm
+tables should be quoted as the tag's or the union's performance.
+
+A re-run at `slots` 16, which g9-10 puts near the optimum at delay 8, would give
+absolute numbers worth quoting. It is cheap and it is in BACKLOG.
 
 
 IN PLAIN TERMS

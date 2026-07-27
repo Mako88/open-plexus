@@ -138,11 +138,19 @@ generic would have found either.
 
 **Worth building.**
 
-- **Duplication across summarisers and experiments.** AST-normalise function
-  bodies (strip names, literals, comments), hash, flag near-identical bodies in
-  different files. This would have found the five copied refusals *before* one of
-  them lost its floor check. Restrict it to `tools/` and `experiments/`, where
-  copy-paste is the actual working style.
+- **Duplication across summarisers and experiments — BUILT, and the
+  justification above was wrong.** `tools/check_duplication.py` AST-normalises
+  function bodies, hashes them, and ratchets against a baseline. Run over the
+  pre-port tree at `9457c16` it finds **zero** of the five copied refusals: they
+  had already diverged, and divergence is what defeats a structural hash. So it
+  catches copies that have NOT drifted — the harmless ones — and is blind to the
+  ones that have. Prevention, not detection.
+
+  It earns its place anyway: within minutes of being written it caught
+  `load_baseline` copied between it and `check_rails.py`, by the author of a tool
+  for finding copies. Seven legacy pairs in `experiments/` are exempt and are
+  real — four `score` functions sharing one shape, two `main`s, two `epoch`s.
+  Worth collapsing when one of them next needs editing, not before.
 - **Repo-specific rails**, which are where the value is, because generic lint is
   a solved problem and these encode the failures that have already cost results:
   every summariser computing a recovery ratio imports `tools.recovery`; every

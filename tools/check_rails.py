@@ -102,11 +102,22 @@ def current() -> dict[str, list[str]]:
     }
 
 
+def read_baseline(path: Path, rails) -> dict[str, list[str]]:
+    """The exemptions for these rails, or empty ones if the file is absent.
+
+    Shared with `check_duplication.py`, which is where it started as a copy --
+    caught by that tool, on the day it was written, against its own author. The
+    rails are passed in rather than read from a module-level `current()` so the
+    two callers can have different ones.
+    """
+    if not path.exists():
+        return {rail: [] for rail in rails}
+    stored = json.loads(path.read_text(encoding="utf-8"))
+    return {rail: list(stored.get(rail, [])) for rail in rails}
+
+
 def load_baseline() -> dict[str, list[str]]:
-    if not BASELINE.exists():
-        return {rail: [] for rail in current()}
-    stored = json.loads(BASELINE.read_text(encoding="utf-8"))
-    return {rail: list(stored.get(rail, [])) for rail in current()}
+    return read_baseline(BASELINE, current())
 
 
 def compare(found: dict[str, list[str]], baseline: dict[str, list[str]]

@@ -623,6 +623,7 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   python -m unittest discover -s tests -t . -q
   python tools/check_workflows.py
   python tools/check_rails.py
+  python tools/check_duplication.py
   ```
   The full mutation harness runs in CI, sharded; locally it is
   `python tools/mutate.py --only <the mutations just added>`, because a full
@@ -669,6 +670,19 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   so the list can only shrink without a visible diff. Generic lint is a solved
   problem; these encode the specific failures, which is the only reason they
   earn a check.
+- **A copy that has not drifted is catchable; one that has is not.**
+  `tools/check_duplication.py` AST-normalises function bodies and flags two that
+  share a shape. It caught `load_baseline` copied between it and
+  `check_rails.py` within minutes of being written.
+
+  **Its stated justification was wrong and the tool measured that.** BACKLOG
+  asked for it on the grounds that it would have found the five hand-copied
+  recovery refusals; run over the pre-port tree it finds none of them, because
+  those copies had already diverged — one had lost its floor check, three chose
+  the learning rate differently — and divergence is exactly what defeats a
+  structural hash. So it is PREVENTION and not detection, and the thing that
+  catches a drifted copy is still `tools/mutate.py`: a mutation in one path the
+  tests do not notice.
 - **One sweep matrix in flight at a time.** A matrix takes every runner, so a
   second sweep pushed while one is running does not overlap — its jobs queue,
   seize the runners the moment the first finishes, and starve the first's

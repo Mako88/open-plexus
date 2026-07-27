@@ -31,6 +31,8 @@ jobs:
         run: python tools/check_workflows.py
       - name: Repo-specific rails (ratchet -- new violations only)
         run: python tools/check_rails.py
+      - name: Duplicated function bodies (ratchet -- new copies only)
+        run: python tools/check_duplication.py
 
   # The harness runs one full suite per mutation, so it is serial time and
   # nothing else — 85 mutations at roughly fifteen seconds each. Sharded it is

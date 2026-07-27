@@ -81,8 +81,74 @@ numbered in time and a positional split would measure drift as much as
 generalisation. The vocabulary is built from TRAINING text only.
 
 
-THE GRID
----------
+THE GRID -- RE-RUN, width x memory_cap
+----------------------------------------
+Run: https://github.com/Mako88/open-plexus/actions/runs/30258752468
+
+  width    32, 64, 128       THE LIVE QUESTION. g10-02 found the model underfits
+                             at width 32; whether that is structural or just a
+                             narrow node is what this decides
+  cap      1.0, 5.0          `memory_cap`, synaptic scaling on the fast store.
+                             SWEPT, because the two values already disagree by
+                             0.13 bits and the one that was measured came from
+                             the single cell where the divergence appeared
+  chunk    256, FIXED        the widest setting known to be stable. A frozen
+                             axis, named: chunk was swept in the first run and
+                             that axis is what diverged, so it returns only once
+                             the width question has an answer
+  epochs   2, FIXED          g10-02 measured this is NOT the binding constraint
+                             at width 32 -- the curve is flat from epoch 1 -- so
+                             freezing it is now evidence-backed rather than
+                             convenient. It is still unmeasured at width 128
+  seeds    1, 2, 3           inside each job
+
+6 jobs.
+
+
+PREDICTIONS FOR THE RE-RUN
+---------------------------
+Registered while the run is queued and before any cell has returned. The first
+run's valid chunk-64 cells gave 5.973 at width 32 and 5.896 at width 64, so a
+width effect of about 0.08 bits per doubling is the only prior.
+
+R1. **No cell beats the bigram (3.711).** Confidence: very high.
+
+R2. **No cell beats the unigram (4.756) either.** Confidence: high. The best
+    number seen anywhere is 5.72 and the gap is a full bit.
+
+R3. **THE ONE THAT DECIDES THE LINE: width 128 does not come within 0.5 bits of
+    the unigram.** If it does, g10-02's underfitting is WIDTH-LIMITED and the
+    honest next move is a width sweep rather than an architectural conclusion.
+    If it does not, the ceiling is not capacity.
+
+R4. **Width moves bits by less than 0.4 bits across the fourfold range.**
+    Extrapolating the 0.08 per doubling seen at chunk 64 gives about 0.16.
+
+R5. **The cap matters less than width** -- under 0.2 bits between 1.0 and 5.0 --
+    making it a stability requirement rather than a dial. Measured at 0.13 in
+    one cell, so this is close to already known and is the weakest prediction.
+
+R6. **Accuracy stays below 0.25 everywhere.** The commonest character is about
+    0.16 of the text.
+
+Most likely wrong: R4. The first run's width effect was measured at chunk 64,
+where the store accumulates far less, so context and width may interact.
+
+
+WHAT WOULD REFUTE WHAT -- RE-RUN
+----------------------------------
+- width 128 near the unigram   -> WIDTH-LIMITED. Sweep width upward before
+                                  concluding anything about the architecture
+- width buys almost nothing    -> the ceiling is structural at every width
+                                  tested, and the next question is what the
+                                  model is missing rather than how big to make it
+- the cap is a real dial       -> it is a frozen axis everywhere else it is set,
+                                  including any future dense-supervision task
+- any cell beats the bigram    -> goal 2 has its first positive evidence
+
+
+THE GRID AS FIRST RUN, superseded
+-----------------------------------
   width    32, 64, 128       d_model. The first axis that could plausibly matter
   chunk    64, 256, 1024     how much context the store has accumulated when a
                              prediction is made. The memory resets per sequence,

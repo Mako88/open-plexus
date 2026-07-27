@@ -26,7 +26,7 @@ MASK = np.zeros(len(TOKENS), dtype=bool)
 MASK[::4] = True
 
 KEYS = {"t", "token", "surprise", "mean", "deviation", "strength", "hit",
-        "captured", "write_index", "pending_now"}
+        "captured", "write_index", "pending_now", "scores"}
 #: A salience gate needs a cap or it diverges -- promoting on surprise enlarges
 #: the store, which enlarges later surprises. The model refuses the pair without
 #: one, which is why `lasting_cap` is here rather than a tidier two arguments.
@@ -62,10 +62,24 @@ class ItChangesNothing(unittest.TestCase):
             build(**SALIENT).run(TOKENS))
 
     def test_the_same_model_traced_twice_gives_the_same_trace(self):
+        """Compared field by field because `scores` is an array.
+
+        `assertEqual` on dicts holding arrays raises rather than failing, so a
+        plain comparison here would pass on any change that also happened to
+        make the comparison throw — the test has to know about the array.
+        """
         first, second = [], []
         build().run(TOKENS, trace=first)
         build().run(TOKENS, trace=second)
-        self.assertEqual(first, second)
+        self.assertEqual(len(first), len(second))
+        self.assertTrue(first)
+        for one, two in zip(first, second):
+            self.assertEqual(set(one), set(two))
+            for field in one:
+                if field == "scores":
+                    np.testing.assert_array_equal(one[field], two[field])
+                else:
+                    self.assertEqual(one[field], two[field])
 
 
 class WhatItReports(unittest.TestCase):
@@ -152,6 +166,43 @@ class TheSignalsMeanWhatTheyAreCalled(unittest.TestCase):
         miss = [e["surprise"] for e in trace if not e["hit"]]
         self.assertTrue(hit and miss)
         self.assertGreater(max(hit), min(miss))
+
+    def test_scores_are_the_distribution_surprise_was_taken_from(self):
+        """The meaning test, and the one that matters for a calibrated
+        cross-entropy.
+
+        `surprise` is the negative log of the arriving token's share of these
+        scores. If `scores` were the CURRENT step's prediction rather than the
+        one made before the token arrived, every bits-per-character number would
+        be computed against a distribution that had already seen the answer —
+        and it would look excellent.
+        """
+        trace = []
+        build().run(TOKENS, trace=trace)
+        for entry in trace:
+            scores = np.asarray(entry["scores"], dtype=float)
+            shifted = scores - scores.max()
+            weights = np.exp(shifted)
+            share = weights[entry["token"]] / weights.sum()
+            self.assertAlmostEqual(entry["surprise"], -np.log(share + 1e-12),
+                                   places=9)
+
+    def test_scores_span_the_whole_vocabulary(self):
+        """A prediction over fewer symbols than exist would make every
+        cross-entropy a number about a smaller problem."""
+        trace = []
+        build().run(TOKENS, trace=trace)
+        for entry in trace:
+            self.assertEqual(len(entry["scores"]), VOCAB)
+
+    def test_scores_are_not_constant_across_steps(self):
+        """A frozen prediction vector would give a plausible flat perplexity
+        and would mean the readout was never being consulted."""
+        trace = []
+        build().run(TOKENS, trace=trace)
+        self.assertFalse(
+            np.allclose(np.asarray(trace[0]["scores"], dtype=float),
+                        np.asarray(trace[-1]["scores"], dtype=float)))
 
     def test_deviation_is_zero_only_at_the_very_first_traced_step(self):
         trace = []

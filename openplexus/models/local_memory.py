@@ -1155,6 +1155,16 @@ class LocalAssociativeMemory:
                         # the first four writes after every reward.
                         "captured": captured,
                         "write_index": wrote_at,
+                        # The prediction itself, over the whole vocabulary, as
+                        # it stood before this token arrived. OBSERVATION ONLY.
+                        #
+                        # `surprise` above is already the negative log of this
+                        # distribution at the arriving token, so nothing here
+                        # needs it -- but a CALIBRATED cross-entropy does, since
+                        # fitting a temperature means rescaling the scores and
+                        # a scalar summary cannot be rescaled after the fact.
+                        # Copied because the array is reused each step.
+                        "scores": previous_scores.copy(),
                         # What each pending write's key retrieves from the store
                         # AS IT STANDS at this step, one number per candidate,
                         # empty on every step that is not a capture. See the

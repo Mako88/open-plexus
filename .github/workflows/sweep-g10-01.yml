@@ -1,0 +1,79 @@
+name: sweep-g10-01-does-this-memory-beat-a-bigram
+
+# The first time anything in this project sees language, and the first evidence
+# either way for goal 2 -- a language model that does not need a data centre.
+#
+# The bar, measured on the actual corpus before this was written:
+#   uniform 6.426   unigram 4.756   bigram 3.711   trigram 2.934 bits/char
+#
+# Bigram is the bar and it is the fair one: binding the previous token to the
+# current one IS a bigram in vector form.
+#
+# The pre-dispatch control reached 5.891 bits/char calibrated at width 32,
+# chunk 64 -- above uniform, well short of unigram. Predictions are registered
+# knowing that, and say so.
+#
+# A temperature is fitted on held-out TRAINING chunks, never on test, because a
+# delta-rule readout is discriminative and its scores are not on a softmax's
+# scale. Both raw and calibrated numbers are reported.
+#
+# 9 jobs: width x chunk, three seeds inside each.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  language:
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [32, 64, 128]
+        chunk: [64, 256, 1024]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: width ${{ matrix.width }} chunk ${{ matrix.chunk }}
+        run: python experiments/g10_01_first_language.py --width ${{ matrix.width }} --scale ${{ matrix.chunk }} --workers 3 --json out/X-${{ matrix.width }}-${{ matrix.chunk }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g10-01-${{ matrix.width }}-${{ matrix.chunk }}
+          path: out/*.json
+
+  aggregate:
+    needs: [language]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g10-01-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 9" | tee summary.txt
+          python -m tools.summarise_g10_01 | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g10-01-summary
+          path: |
+            summary.txt
+            out/*.json

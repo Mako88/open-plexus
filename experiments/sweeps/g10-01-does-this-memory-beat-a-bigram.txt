@@ -1,0 +1,146 @@
+Does this memory beat a bigram on real text?
+============================================
+
+Script: experiments/g10_01_first_language.py
+Status: PRE-REGISTERED.
+
+
+IN PLAIN TERMS
+---------------
+Everything measured here so far has been on puzzles built to isolate one
+question. This is the first time the thing sees English.
+
+The test is the standard one for character-level models: how many bits does it
+take to encode the next character. Three reference points, all measured before
+this was written, on the actual corpus:
+
+    uniform   6.426 bits/char   knowing nothing, including the alphabet
+    unigram   4.756 bits/char   knowing which characters are common
+    bigram    3.711 bits/char   knowing which character follows which
+    trigram   2.934 bits/char
+
+**Beating uniform means nothing.** Beating unigram means only that the base rate
+was learned. **Bigram is the bar**, and it is the fair one for this model: binding
+the previous token to the current one IS a bigram in vector form, so at or below
+it the memory is doing what counting does, and above it something is being
+carried that counting cannot carry.
+
+This is the first evidence either way for goal 2 -- a language model that does
+not need a data centre.
+
+
+THE CORPUS, AND WHAT IT IS NOT
+--------------------------------
+This project's own `docs/notes`: 210,216 training characters, 28,584 test, over a
+vocabulary of 86 after folding symbols rarer than 20 occurrences into UNKNOWN.
+
+**It is not a standard benchmark and a number from it is not comparable to
+published ones.** It is real English with real Zipfian statistics, needs no
+download, and adds no data to the repository. Bundling a standard corpus is a
+decision about what to commit and is John's; this needed none and could run now.
+
+Split by whole FILE, never by offset, so no document appears on both sides. File
+assignment is by hash of the name rather than by position, because the notes are
+numbered in time and a positional split would measure drift as much as
+generalisation. The vocabulary is built from TRAINING text only.
+
+
+THE GRID
+---------
+  width    32, 64, 128       d_model. The first axis that could plausibly matter
+  chunk    64, 256, 1024     how much context the store has accumulated when a
+                             prediction is made. The memory resets per sequence,
+                             so this IS the context length and it is swept rather
+                             than frozen
+  seeds    1, 2, 3           inside each job
+  lr       0.05, FIXED       g9-12 measured the rate costing nothing on
+                             `reward_recall` at 2 SE; that is a DIFFERENT TASK
+                             and the transfer is an assumption, named here
+  decay    0.997, FIXED      arrives by import in the g9 line and is pinned
+                             explicitly here. Note 028
+  epochs   2, FIXED          two passes over 210k characters. A frozen axis and
+                             a suspect one -- see WHAT WOULD REFUTE WHAT
+
+9 jobs.
+
+
+CALIBRATION, WHICH IS A REAL PROBLEM AND IS HANDLED OPENLY
+------------------------------------------------------------
+`Wo` is trained by the delta rule against one-hot targets, so it is a
+discriminative readout and not a probability model. Its scores have no reason to
+sit on the scale a softmax expects, and cross-entropy is very sensitive to that.
+Comparing raw scores against an n-gram would understate this model for a reason
+unrelated to what it learned.
+
+So one scalar temperature is fitted **on held-out TRAINING chunks, never on
+test**, and both numbers are reported. One parameter cannot encode anything about
+the text, and the gap between raw and calibrated is itself informative: a large
+gap means badly scaled rather than badly informed.
+
+**The first control pinned the temperature at the bottom of its grid**, so the
+grid now spans 0.01 to 13.8 and the control's chosen value is interior. A pinned
+calibration would make the reported bits a bound rather than a value.
+
+
+PREDICTIONS
+------------
+The pre-dispatch control ran at width 32, chunk 64, one seed, and reached
+**5.891 bits/char calibrated, accuracy 0.157**. That is above uniform and well
+short of unigram. So these predictions are made knowing the shape at one corner,
+which is stated rather than hidden.
+
+1. **The memory does NOT beat the bigram at any cell.** Confidence: high. The
+   control is 2.2 bits short and the gap is far too large for width or context
+   to close.
+
+2. **It does not beat the UNIGRAM either, at any cell.** Confidence: moderate.
+   This is the sharper claim and the more damaging one -- failing to learn the
+   base rate of English characters is a different kind of failure from failing to
+   learn transitions.
+
+3. **Bits improve with width.** Guess: monotone, and by less than 0.5 bits from
+   32 to 128. If width buys nothing at all, the bottleneck is not capacity.
+
+4. **Chunk length matters little.** Guess: under 0.3 bits across 64 to 1024. The
+   store accumulates within a chunk, so a longer one should help if the model is
+   using context at all -- and if it does NOT help, that is evidence the model is
+   not using context, which is the most diagnostic outcome available here.
+
+5. **Accuracy stays near 0.16 everywhere**, which is roughly the frequency of the
+   commonest character. Predicting the base rate and nothing else.
+
+Most likely wrong: 3. Width may buy nothing, in which case the ceiling is
+structural.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- beats bigram anywhere        -> goal 2 has its first positive evidence and
+                                  this becomes the most important result in the
+                                  project
+- beats unigram, not bigram    -> it learns base rates and not transitions,
+                                  which is a specific and fixable diagnosis
+- beats neither                -> a single associative store with an online
+                                  delta-rule readout is not a language model at
+                                  this scale, and the honest next question is
+                                  what is missing rather than what to tune
+- chunk buys nothing           -> the model is not using context at all, and the
+                                  memory is doing no work on this task
+- EPOCHS 2 is the binding constraint. This is the frozen axis most likely to be
+  wrong: two passes is very little, and a model still improving at epoch 2 would
+  make every number here a bound. If the result is negative, re-run one cell at
+  many more epochs BEFORE concluding anything structural.
+
+
+COST
+-----
+9 jobs. The control took minutes at width 32; width 128 is the risk and the
+90-minute timeout is the guard.
+
+
+WHAT THIS CANNOT SHOW
+----------------------
+**Nothing here is about the gate.** No reward token, no tag, no window --
+`reward_recall` has a late signal and text does not. This measures the memory and
+its readout, which is what goal 2 rests on, and a negative result says nothing
+about the g9 line.

@@ -174,6 +174,47 @@ overstates the case.
 
 That arm is cheap and it is the honest next measurement on this line.
 
+## CONFIRMED FROM THE OTHER SIDE: the gap is binding-detection, exactly
+
+[g9-13](../../experiments/sweeps/g9-13-can-anything-find-which-binding.txt) asked
+the same question with the first step handed over. Instead of ranking what the
+TAG marked, it ranked what the ORACLE says are bindings, and scored how well a
+node-local quantity picks the rewarded one out of them:
+
+    among BINDINGS, pooled across delays 1/4/8/20
+
+        pending_now   AUC 0.972        what each pending key retrieves NOW
+        write_order   AUC 0.924        recency among candidates
+        age           AUC 0.000        perfect, inverted
+        ------------------------------------------------------------
+        strength      AUC 0.526        nothing
+        surprise      AUC 0.483        nothing
+        hit           AUC 0.498        nothing
+
+**Given the bindings, the leak is worth almost everything; given only the tag's
+marks, it is worth nothing past delay 1.** The two measurements bracket it, and
+the whole difference is the step in between.
+
+So the sentence above — *"exploiting it needs binding-detection far better than
+anything this project has"* — is not an inference any more. It is the measured
+location of the bottleneck, and it is worth stating in the sharper form:
+**which-binding is not hard; finding bindings is.** Only the first of those is a
+property of this task, which is the part that bears on whether the generator gets
+fixed.
+
+**And `age` at 0.000 pooled kills the delay framing.** The rewarded binding is
+not "the write `delay` steps back" — it is the most recent binding before the
+reward at EVERY delay, because bindings sit about 31 steps apart and every delay
+tested is shorter than that. A gate does not need to know the delay to exploit
+this layout. It never did, and the "matched window" reading of g9-03 has been
+describing a harder problem than the one the generator poses.
+
+**One new thing is reachable that was not before.** This note measured the
+generator's offsets, which no running system can read. `pending_now` is what a
+pending write's key retrieves from the node's own store, so the 0.972 above is
+the first demonstration that the layout is visible to a MECHANISM rather than
+only to an analyst.
+
 ---
 
 *Related: [017 — a task with something at stake](017-a-task-with-something-at-stake.md),

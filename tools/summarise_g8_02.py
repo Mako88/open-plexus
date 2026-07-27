@@ -17,24 +17,18 @@ which is why the `none` column is printed first and largest.
 
 from __future__ import annotations
 
-import glob
-import json
-import sys
-from collections import defaultdict
+from tools.recovery import MQAR_FLOOR, assess, by_cell, load
 
 ARMS = ("none", "oracle", "on-use", "salience")
 
 
 def main() -> int:
-    rows = [r for f in glob.glob(sys.argv[1] if len(sys.argv) > 1 else "out/*.json")
-            for r in json.load(open(f))]
+    rows = load()
     if not rows:
         print("no records matched")
         return 1
 
-    cells: dict[tuple, dict[int, float]] = defaultdict(dict)
-    for r in rows:
-        cells[(r["zipf_s"], r["lr"], r["arm"])][r["seed"]] = r["accuracy"]
+    cells = by_cell(rows, "zipf_s", "lr")
 
     exponents = sorted({r["zipf_s"] for r in rows})
     rates = sorted({r["lr"] for r in rows})
@@ -56,35 +50,30 @@ def main() -> int:
     print("\n=== RECOVERY, and the floor it is measured against ===")
     print("If `none` rises with the exponent, the TASK got easier -- that is")
     print("prediction 3 and it is expected. Only the ratio speaks to gating.")
-    print(f"{'zipf_s':>7}  {'none':>7}  {'oracle':>7}  {'gap':>7}  "
-          f"{'spread':>7}  {'on-use':>8}  {'salience':>9}")
+    print(f"{'zipf_s':>7}{'lr':>7}  {'none':>7}  {'oracle':>7}  {'gap':>7}  "
+          f"{'spread':>7}  {'on-use':>9}  {'salience':>9}")
+    refusals: list[str] = []
     for zipf_s in exponents:
-        best = None
         for lr in rates:
-            means, spread = {}, 0.0
-            for arm in ARMS:
-                by_seed = cells.get((zipf_s, lr, arm), {})
-                if not by_seed:
-                    means = {}
-                    break
-                values = list(by_seed.values())
-                means[arm] = sum(values) / len(values)
-                spread = max(spread, max(values) - min(values))
-            if not means:
+            verdict = assess(cells, (zipf_s, lr), ARMS, MQAR_FLOOR)
+            if verdict is None:
+                print(f"{zipf_s:>7}{lr:>7}   no result returned")
                 continue
-            gap = means["oracle"] - means["none"]
-            if best is None or gap > best[0]:
-                best = (gap, spread, means)
-        if best is None:
-            continue
-        gap, spread, means = best
-        if gap <= spread:
-            verdict = f"{'undefined':>8}  {'undefined':>9}"
-        else:
-            verdict = (f"{(means['on-use'] - means['none']) / gap:>8.2f}  "
-                       f"{(means['salience'] - means['none']) / gap:>9.2f}")
-        print(f"{zipf_s:>7}  {means['none']:>7.3f}  {means['oracle']:>7.3f}  "
-              f"{gap:>7.3f}  {spread:>7.3f}  {verdict}")
+            print(f"{zipf_s:>7}{lr:>7}  {verdict.means['none']:>7.3f}  "
+                  f"{verdict.means['oracle']:>7.3f}  {verdict.gap:>7.3f}  "
+                  f"{verdict.spread:>7.3f}  {verdict.text('on-use')}  "
+                  f"{verdict.text('salience')}")
+            if verdict.refused:
+                refusals.append(f"  zipf_s {zipf_s} lr {lr}: {verdict.refused}")
+
+    # Every learning rate is printed rather than the best one. An earlier
+    # version kept the lr with the largest `oracle - none`, which is the single
+    # rule guaranteed to prefer cells whose floor arm had collapsed -- collapse
+    # IS a large gap. It also had no floor check at all, under a heading that
+    # named one. See tools/recovery.py.
+    if refusals:
+        print("\nrefused, and why:")
+        print("\n".join(refusals))
 
     print("\nsalience rises and on-use does not  -> the base-rate diagnosis was "
           "right,\n  and g8-01's negative result is about MQAR rather than about "

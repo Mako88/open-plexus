@@ -40,6 +40,7 @@ CHURN = ROOT / "experiments" / "g4_02_machine_churn.py"
 TRANSPORT = ROOT / "openplexus" / "transport.py"
 DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 NODE_MAIN = ROOT / "openplexus" / "node_main.py"
+RECOVERY = ROOT / "tools" / "recovery.py"
 TESTBED = ROOT / "testbed" / "run.py"
 
 
@@ -416,6 +417,24 @@ MUTATIONS = [
         path=LOCAL,
         old="            retrieved = memory @ key if lasting is None else (memory + lasting) @ key",
         new="            retrieved = memory @ key",
+    ),
+    Mutation(
+        name="the-floor-refusal-does-nothing",
+        breaks="the rail that withdrew g8-01's seq-1536 row -- a cell whose "
+               "floor arm has collapsed below chance gets a ratio again, and it "
+               "is a large and impressive-looking one",
+        path=RECOVERY,
+        old='    if means["none"] <= floor:',
+        new='    if False:',
+    ),
+    Mutation(
+        name="selection-prefers-the-largest-gap",
+        breaks="the rule that a cell is chosen AFTER the refusals -- picking on "
+               "the gap prefers exactly the cells whose floor arm collapsed, "
+               "because collapse IS a large gap",
+        path=RECOVERY,
+        old='    return max(usable, key=lambda pair: pair[1].ratios[arm])',
+        new='    return max(usable, key=lambda pair: pair[1].gap)',
     ),
     Mutation(
         name="storage-mask-off-by-one",

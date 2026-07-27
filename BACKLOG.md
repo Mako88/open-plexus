@@ -120,38 +120,23 @@ person will try the same mutation.
 
 ---
 
-## Five copies of a safety rail, and one of them has already drifted
+## Port the last four summarisers onto the shared rail
 
-John asked where duplicate code could be consolidated. The experiment drivers are
-fine — 44 of them already share `experiments/harness.py`. The summarisers are
-not.
+`tools/recovery.py` now holds the two refusals, `tools/summarise_g8_02.py` is
+ported, and the drift that prompted it is fixed — it had **no floor check at
+all** under a heading that named one, and selected cells by maximising
+`oracle - none`, which prefers exactly the cells whose floor arm collapsed.
 
-Thirteen of the twenty repeat the same load boilerplate, and **five carry
-hand-copied versions of the two refusals**: no ratio when the floor arm is at or
-below the trivial floor, and none when the oracle's advantage is not larger than
-the seed spread. Both rails exist because both failures have already cost this
-project a result.
+Still carrying their own copies: `summarise_g8_01.py`, `summarise_g8_03.py`,
+`summarise_g9_02.py`, `summarise_g9_03.py`. They agree with the shared version
+today; the point of porting them is that nothing keeps them agreeing tomorrow.
 
-**One copy is already wrong.** `tools/summarise_g8_02.py` has the seed-spread
-refusal and **no trivial-floor refusal at all**, while printing the header
-*"RECOVERY, and the floor it is measured against"*. That is the summariser for
-the sweep whose usable range had to be cut back to zipf 0.0–0.5 by hand — the
-cut a working floor check would have made automatically.
-
-So this is not tidying. A safety rail copied five times is five chances for one
-to rot, and one already has.
-
-**The shape:** a `tools/recovery.py` holding `load(pattern)`, and a
-`recovery(cells, key, floor)` that returns `None` for each refusal with a reason
-attached, so a summariser can print *why* a cell is undefined instead of just
-that it is. The trivial floor stays a **parameter** — it is legitimately
-`1/4 + (3/4)/8 = 0.34375` for MQAR and `1/8` for `reward_recall`, and freezing
-one of them into the shared module would be the same class of mistake as the
-drift it fixes.
-
-**Do it with a mutation:** delete the floor check in the shared module and
-confirm at least one summariser test fails. Otherwise the consolidated rail is
-as unchecked as the five copies were.
+Each port is: swap the loader for `load()`/`by_cell()`, swap the hand-rolled
+means-and-spread block for `assess()`, pass the right floor (**0.34375 for MQAR,
+0.125 for `reward_recall`** — do not let one of them become the default), and
+change the workflow line to `python -m tools.summarise_X` so the import resolves.
+Thirteen summarisers also repeat the `glob`/`json` loader and can take `load()`
+without touching their logic at all.
 
 ---
 

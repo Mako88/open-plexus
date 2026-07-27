@@ -2274,3 +2274,78 @@ expensive to attack in exactly the situation where it is the live question.
 
 No change made. This is a measurement and a pending decision, recorded because
 the number is the argument.
+
+---
+
+## 59. g11-05: the model does not learn from more text, and now the control fired
+
+**The most decision-relevant number this project has produced.** Run
+`30302728532`, 15 of 15 cells, and unlike g11-04 it is admissible: the backprop
+control fits `b = -0.0243` at R2 0.96 across a 16x data range, where the same
+baseline was flat across an 8x width range. Changing the axis was the right
+diagnosis — that contrast is direct evidence the baseline was data-limited.
+
+    arm           n=62,500     n=125,000     n=250,000     n=500,000   n=1,000,000
+    backprop   4.306+/-0.021 4.283+/-0.036 4.157+/-0.013 4.091+/-0.015 4.049+/-0.028
+    context    5.775+/-0.014 5.770+/-0.009 5.759+/-0.011 5.764+/-0.011 5.763+/-0.009
+    single     5.529+/-0.020 5.530+/-0.004 5.505+/-0.001 5.513+/-0.001 5.518+/-0.010
+
+      backprop   b = -0.0243   R2 = 0.96
+      context    b = -0.0008   R2 = 0.60   FLAT
+      single     b = -0.0010   R2 = 0.33   FLAT
+
+**Sixteen times the data buys 0.012 bits on one arm and nothing on the other.**
+The single-token arm ends slightly WORSE than it started.
+
+**Three of four predictions refuted, and they agree with each other.** P1
+confirmed (the control fires). P2 refuted — both arms flat, an order of magnitude
+below the 0.02 threshold, not a near miss. P4 refuted — the context arm was
+predicted to keep improving where the single-token arm flattened, and it is flat
+at a *worse* loss, so this is not an arm running out of ceiling. P3 confirmed but
+badly understated: it was written expecting a shallower negative slope.
+
+**This is not the Filipovich shape.** Filipovich's local rule lost the exponent
+but kept one — DFA -0.040 against backprop -0.071. Ours is zero. "Shallower" and
+"none" are different claims and the second is what the data supports.
+
+### What it does and does not say
+
+**It does not condemn local learning.** The delta rule on `Wo` is the exact
+gradient for a single linear readout; nothing is being approximated badly.
+
+**It does say the architecture is saturated on every axis tried** — not
+data-limited, not width-limited. This removes "we are just small" as an
+explanation for the gap to the baselines, which was the last available one.
+
+**And the protective reading of the width result does not transfer.** Note 035
+excused a flat width exponent because the store is a rank-3 bigram table. There
+is no rank argument on the data axis. An arm that does not improve with more text
+has stopped extracting information from text.
+
+**It is consistent with the through-line rather than a new mystery.** The store
+holds a bigram count table (note 033, cosine 0.9455); an actual bigram model
+scores 3.583 bits where we score 5.5. More text sharpens those counts and the
+sharpening never reaches the output, because `r = M @ key` is a SUM and per-item
+information is destroyed before the readout sees it. **A bottleneck downstream of
+the statistics cannot be widened by improving the statistics** — which is exactly
+the shape of a flat data exponent.
+
+### What it makes urgent
+
+The next measurement is the one the exact cache gestures at: **the same model
+given the same amount of state WITHOUT superposition, on the data axis.** If an
+exact store scales with data where the superposed store does not, the sum is
+*identified* as the binding constraint rather than inferred from it. That is now
+the highest-value sweep available, and it is the cache sweep John has already
+prioritised — with a data axis added to it.
+
+### A re-analysis trap found while checking this
+
+`gh run download` of a completed sweep yields the matrix artifacts **and** the
+`*-summary` artifact, which re-uploads every `out/*.json`. A recursive glob over
+the download therefore reads every record twice. Means are unaffected by exact
+duplication, so the table looks right; **standard errors shrink by 1/sqrt(3)**.
+CI is not affected, because the summary artifact does not exist when the
+aggregate job downloads. `tools/recovery.load()` calls `glob.glob` without
+`recursive=True`, so a `**` pattern silently matches one level — which is what
+kept the g11-04 re-check honest, by accident rather than by design.

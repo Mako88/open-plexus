@@ -2,7 +2,17 @@ Does our loss fall with DATA the way a backprop model's does?
 =============================================================
 
 Script: experiments/g11_04_scaling_exponent.py, with --chars as the axis
-Status: DISPATCHED, awaiting results.
+Status: RUN, 15 of 15 cells, run 30302728532. ADMISSIBLE -- the control fired.
+
+ANSWER: **Our model does not learn from more text. At all.** Sixteen times the
+        data moves the context arm by 0.012 bits and the single-token arm by
+        nothing (it ends slightly WORSE). Fitted exponents -0.0008 and -0.0010
+        against a backprop control of -0.0243 at R2 0.96.
+
+        This is not the Filipovich shape. Filipovich's local rule lost the
+        exponent but kept one: DFA -0.040 against backprop -0.071. **Ours is
+        zero.** "Shallower slope" and "no slope" are different claims, and the
+        second is the one the data supports.
 
 
 IN PLAIN TERMS
@@ -133,4 +143,69 @@ logits are used raw, since fitting a temperature for it would flatter it.
 
 THE NUMBERS
 ------------
-Awaiting the run.
+    arm           n=62,500     n=125,000     n=250,000     n=500,000   n=1,000,000
+    backprop   4.306+/-0.021 4.283+/-0.036 4.157+/-0.013 4.091+/-0.015 4.049+/-0.028
+    context    5.775+/-0.014 5.770+/-0.009 5.759+/-0.011 5.764+/-0.011 5.763+/-0.009
+    single     5.529+/-0.020 5.530+/-0.004 5.505+/-0.001 5.513+/-0.001 5.518+/-0.010
+
+    fitted exponent, bits ~ chars^b
+      backprop   b = -0.0243   R2 = 0.96     the control, and it FIRED
+      context    b = -0.0008   R2 = 0.60     FLAT
+      single     b = -0.0010   R2 = 0.33     FLAT
+
+IDENTITY CHECK, FROM THE DATA. The 250,000 column is g11-04's width-64 column,
+independently re-run: backprop 4.157, context 5.759, single 5.505 -- matching the
+published values to three decimals on all three arms. Records carry a `condition`
+string and every cell reports width 64 and seeds {1, 2}.
+
+
+SCORED
+-------
+P1 CONFIRMED. backprop b = -0.0243, R2 = 0.96, against a threshold of 0.02. The
+   control fires, so unlike g11-04 this sweep is admissible. Changing the axis
+   was the right diagnosis: the same baseline that was flat across an 8x width
+   range is cleanly monotone across a 16x data range, which is the direct
+   evidence that it was data-limited all along.
+
+P2 REFUTED, and this is the result. Both our arms are flat, |b| < 0.002 -- an
+   order of magnitude below the threshold, not a near miss. **The prediction was
+   that data would buy what width could not, and it buys nothing.**
+
+P3 CONFIRMED but understated. Our arms are shallower than backprop's; they are
+   also shallower than the LOCAL rule Filipovich measured. This was written
+   expecting a shallower negative slope and the measurement is no slope.
+
+P4 REFUTED. The context arm was predicted to keep improving where the
+   single-token arm flattened, because a trigram ceiling has more to absorb than
+   a bigram one. Both are flat and the context arm is flat at a WORSE loss
+   (5.763 against 5.518). So this is not an arm running out of ceiling.
+
+**Three of four refuted, and the refutations agree with each other.** The
+protective reading of the width result -- note 035's "the store is rank ~3, so
+width cannot help" -- does not transfer. There is no rank argument on the data
+axis. An arm that does not improve with more text has stopped extracting
+information from text.
+
+
+WHAT THIS DOES AND DOES NOT SAY
+--------------------------------
+**It does not condemn local learning**, and the distinction matters as much here
+as it did in g11-04. The delta rule on `Wo` is the exact gradient for a single
+linear readout; there is nothing being approximated badly.
+
+**It does say the architecture is saturated on every axis tried.** Not
+data-limited, not width-limited. More of anything is not the missing ingredient,
+which removes "we are just small" as an explanation for the gap to the baselines.
+
+**And it is consistent with the through-line rather than a new mystery.** The
+store holds a bigram count table (note 033, cosine 0.9455) and an actual bigram
+model scores 3.583 bits where we score 5.5. More text sharpens those counts, and
+the sharpening does not reach the output, because `r = M @ key` is a SUM and the
+per-item information is destroyed before the readout sees it. **A bottleneck
+after the statistics cannot be widened by improving the statistics.** That is
+exactly the shape of a flat data exponent.
+
+The measurement this now demands is the one the exact cache already gestures at:
+compare against a model given the same state WITHOUT the superposition. If an
+exact store scales with data where the superposed one does not, the sum is
+identified as the binding constraint rather than inferred from it.

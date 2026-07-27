@@ -361,6 +361,24 @@ the whole mechanism and the signal was a detour.
 [g9-07](experiments/sweeps/g9-07-a-tag-that-knows-how-big-its-store-is.txt) asks
 exactly that, with `tag_relative`.
 
+## Nobody has run a gate at a width this project cares about
+
+[Note 024](docs/notes/024-what-the-gate-costs-a-tiny-node.md) costs the gate and
+finds it affordable — a width-1 node at `d_model` 256 pays about as much again
+for the gate as for its memory, and much less at any larger size. It also finds
+the whole g9 line resting on `derived_keys`, which was adopted for bandwidth and
+turns out to be load-bearing for storage too: without it a tiny node pays **187x**.
+
+**But every g9 cell is `d_model` 32 in one process.** The recovery figures are
+not measurements about tiny nodes at all, and the cost table says nothing about
+whether +0.16 survives at width 1. g7-02 and g7-03 did this for the ORACLE gate
+and found selective storage removes the sequence-length scaling and the
+allocation problem; nothing equivalent exists for an implementable gate.
+
+That is the sweep John's priority actually wants, and it is cheap: the tag at its
+working point, swept over `partitions` or `d_model`, against the same oracle
+ceiling. It should wait for g9-07 only because one matrix runs at a time.
+
 ## The gate that reads both signals — still unbuilt, now less urgent
 
 [g9-05](experiments/sweeps/g9-05-a-tag-that-fades.txt) ran, 32 of 32 cells, no

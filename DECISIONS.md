@@ -349,3 +349,35 @@ dispatch rather than applied silently.
 prints it as missing rather than undefined, which is the distinction the port in
 decision 11 added. It does not affect the conclusion — slots 64 is worse than 32
 at every other cell.
+
+## 17. Costed the gate per node, because nothing in the g9 line ever had
+
+**Chosen.** With g9-07 queued and the tag work blocked behind it, wrote
+`tools/gate_cost.py` and note 024 rather than starting a new investigation.
+
+**Why this and not something else.** John's stated priority is minimum viable
+node size. Every g9 result is a recovery number at `d_model` 32 in one process —
+none of them says what the mechanism costs a machine. Note 015 is the standing
+warning: its hand-done cost model made competitive capture look cheap and was
+wrong in the direction that flattered it. The same arithmetic had never been done
+for the reward gate or the tag, which the whole line rests on.
+
+**The finding.** A late signal must remember what it might undo, and that record
+does not shrink when the node does — so it crosses the store's `w × d`. At
+`d = 256` the crossover is width 1.45. A width-1 node pays 320 numbers against a
+256-number store; at width 8 it pays 18%. Affordable, and costed for the first
+time.
+
+**The finding that matters more.** Without `derived_keys` a tiny node pays 187×,
+because a pending entry must carry the full key. Note 015 named that dependency
+for competitive capture; it is now true of the entire g9 line, and nothing said
+so until now. `derived_keys` was adopted to remove the width term from
+*bandwidth*. It is load-bearing for storage for an unrelated reason.
+
+**In code with tests, not in prose.** Precisely because the last hand-done
+version of this was wrong.
+
+**What it does not do, and I want this read as a limit rather than modesty.** It
+costs the gate, not the gain. Whether +0.16 is worth 1.25× the store at width 1
+needs the recovery figure AT width 1, and no sweep has run one. That is now the
+top BACKLOG item and it is the sweep John's priority actually wants.

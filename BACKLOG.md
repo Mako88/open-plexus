@@ -174,9 +174,26 @@ generic would have found either.
   through `experiments/harness.py` so `refuse_if_mutating()` cannot be skipped;
   every workflow under `sweep-*.yml` is `workflow_dispatch` only (this one exists
   as `tools/check_workflows.py` and is the model for the rest).
-- **A test-quality check with teeth**: flag test methods with no assertion at
-  all, and ones whose only assertion is `assertIsNotNone` or `assertTrue` on a
-  call result. Both are shapes that pass while measuring nothing.
+- **A test-quality check with teeth — BUILT as R4 in `tools/check_rails.py`,
+  and it found a real one immediately.** Flags test methods containing nothing
+  that can fail, following `self._helper(...)` into the same class so the
+  gradient tests in `test_attention.py` are not false-positived for putting
+  their assertion in a shared `_fd_check`.
+
+  Two real hits, both FIXED rather than exempted, so R4 keeps zero exemptions:
+  `test_the_first_position_can_never_consolidate` built a model, ran it and
+  asserted nothing under a docstring naming a real property; and
+  `test_releasing_a_lock_that_is_gone_is_not_an_error` passed by not raising.
+
+  The second clause — flagging tests whose ONLY assertion is `assertIsNotNone`
+  or `assertTrue` on a call result — is **not built**. No instance exists in the
+  repository today, so it would be a rail with nothing to hold and no way to
+  know it works. Worth adding the first time one appears.
+
+**All three meta-tests are now built**, and the honest scorecard is mixed: the
+duplication check refuted its own justification, R4 found one real defect, and
+the repo-specific rails found a stale mutation on their first run. The caveat
+below survives all three.
 
 **Not worth building as written.** Method length and parameter count are style
 rules, and a fixed threshold turns into noise that gets suppressed. If they go in

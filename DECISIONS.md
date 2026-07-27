@@ -551,3 +551,37 @@ sentence may appear as a quotation but not without "CORRECTED"; +0.16 must appea
 within 200 characters of "delay 20", because a figure without the condition that
 makes it interesting is how this document drifted the first time; and it must
 still say the tag recovers a fraction and "not all of it".
+
+## 23. R4 found a vacuous test, and the guard it needed was the real lesson
+
+**Chosen.** Built the last named meta-test as a rail on `check_rails` rather than
+a fourth tool.
+
+**Sorting the four hits was the work.** Two were false positives — the gradient
+tests in `test_attention.py` delegate to a shared `_fd_check`, and they are among
+the most careful tests in the repo. Flagging those is exactly the false positive
+that gets a check switched off, so the rail follows `self._helper(...)` into the
+same class.
+
+**Two were real, and both are fixed rather than baselined**, so R4 keeps zero
+exemptions and stays strict like R1. `test_the_first_position_can_never_
+consolidate` built a model, ran it, and asserted nothing — under a docstring
+naming a real property and warning that the difference would be invisible in
+aggregate accuracy.
+
+**The guard is the part worth reading.** Writing the missing assertion, I checked
+whether consolidation is observable at all on the fixture: on a 2-token stream, a
+6-token stream and a repeating cycle it changes *nothing anywhere*, because it
+fires on a confirmed retrieval and short streams rarely have one. So the obvious
+fix — assert step 0 agrees with and without consolidation — would have passed on
+a model where the mechanism was inert everywhere. It now has a companion asserting
+the mechanism moves predictions at all, and the two inert fixtures are kept
+deliberately.
+
+That is the fifth time tonight a test needed a guard to not be vacuous, and the
+second time I nearly shipped one without it.
+
+**Not built, deliberately.** BACKLOG's second clause — flag tests whose only
+assertion is `assertIsNotNone` or `assertTrue` on a call result — has no instance
+in the repository, so it would be a rail with nothing to hold and no way to know
+it works. Recorded as worth adding the first time one appears.

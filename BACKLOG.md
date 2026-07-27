@@ -14,6 +14,30 @@ record of what was settled. Nothing below is deleted, because the reasoning in
 the settled sections is why the open ones are shaped as they are. But a reader
 looking for work should start here.
 
+**THE BASELINE IS IN, AND IT IS BELOW A UNIGRAM.**
+[g10-12](experiments/sweeps/g10-12-the-standard-benchmark.txt) on Tiny
+Shakespeare, the standard char-level corpus at this scale:
+
+    uniform 6.000 | **the model 5.466** | unigram 4.829 | bigram 3.583 |
+    trigram 2.951 | published char LSTM ~1.45
+
+The model beats uniform and **loses to counting letter frequencies by 0.64
+bits**. Four bits from a small neural network anyone can train in minutes.
+
+[Note 031](docs/notes/031-a-design-pass-against-the-goals.md) is the design pass
+John asked for, and its central observation is that the three measured walls --
+capacity about `d`, no generalisation, no overwriting -- **trace to two decisions
+rather than five**: independent per-token keys, and linear retrieval. The keys
+decision is still correct (note 024's 187x), so it is a cost to see rather than a
+mistake to undo.
+
+**Its recommended order, awaiting John:** (4) a write gate, using surprise and
+the gating machinery that already exist; then (3) the readout, the only component
+that learns across sequences and the only one no experiment has ever varied; then
+(1) structured keys. **It recommends AGAINST (2)**, a retrieval nonlinearity,
+because the high-capacity formulations keep patterns separately, which is a table
+with extra steps and g10-07 already measured what a table does here.
+
 **ACTUALLY OPEN RIGHT NOW.** The numbered list below was written as "open, in
 order" and four of its items have since been answered IN PLACE -- their entries
 now carry the answers, which is why they are still there. This is the current

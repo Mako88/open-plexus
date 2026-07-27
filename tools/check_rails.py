@@ -12,9 +12,16 @@ more were picking the learning rate that MAXIMISES `oracle - none`, which a
 collapsed floor arm maximises. This rail is strict: every summariser passes today
 and a new one has no excuse.
 
-**R2 — a sweep file has a PREDICTIONS section and a COST section.** A prediction
-written after the run is a summary, not a commitment, and a sweep with no costing
-is how "a quick control" became a ten-minute experiment on the local machine.
+**R2 — a sweep file has PREDICTIONS, COST, and MEASURED ON sections.** A
+prediction written after the run is a summary, not a commitment, and a sweep with
+no costing is how "a quick control" became a ten-minute experiment on the local
+machine.
+
+**MEASURED ON is the newest and has the clearest provenance.** Seven times in one
+week a conclusion rested on a number measured on one thing and applied to
+another, and five of those were caught a cycle late. The section asks what each
+number in the file was measured on, and what it is being compared against, at the
+moment the writer is best placed to answer.
 
 **R4 — a test method asserts something.** A test with no assertion runs the
 code and reports success, which is the shape that passes while measuring
@@ -66,7 +73,22 @@ BASELINE = ROOT / "tools" / "rails_baseline.json"
 #: A summariser that mentions either of these is computing a recovery ratio.
 RATIO_HINTS = ("oracle", "recovery")
 #: Sections a sweep file must carry, as line-initial headings.
-REQUIRED_SECTIONS = ("PREDICTIONS", "COST")
+#: A sweep file must say what it predicted, what it cost, and -- newest --
+#: what its numbers were MEASURED ON.
+#:
+#: The third exists because the same error occurred seven times in one week and
+#: was caught a cycle late five of those times: a number measured on one thing
+#: and applied to another. A bigram's 210k-character context applied to a model
+#: holding 64. A counter's available gain applied to a mechanism that captures a
+#: quarter of it. A global write budget applied to a per-key problem. A cache
+#: failure mode that a cache does not have. Two accuracies with chance floors
+#: five hundred times apart.
+#:
+#: **Resolving to be careful failed five times. A section a rail can check for
+#: does not depend on remembering.** It does not stop the error -- nothing here
+#: can -- but it puts the question in front of whoever writes the file, at the
+#: moment they are most able to answer it.
+REQUIRED_SECTIONS = ("PREDICTIONS", "COST", "MEASURED ON")
 #: Calls that count as asserting something. `assertRaises` appears as a context
 #: manager rather than a bare call, and `np.testing.assert_*` is how the array
 #: comparisons in this repo are written -- a check that only knew about
@@ -167,8 +189,15 @@ def experiments_bypassing_the_harness() -> list[str]:
 def current() -> dict[str, list[str]]:
     return {
         "R1-summariser-imports-recovery": summarisers_missing_the_rail(),
-        "R2-sweep-has-predictions-and-cost":
-            sorted(sweeps_missing_a_section()),
+        # Reported per (file, SECTION) rather than per file, so an exemption
+        # covers only the section actually missing. Baselining whole files
+        # would have exempted 26 sweeps from PREDICTIONS and COST as the price
+        # of adding MEASURED ON -- a rail that quietly stops checking the two
+        # things it was built for is worse than not adding the third.
+        "R2-sweep-has-predictions-and-cost": sorted(
+            f"{path} :: {section}"
+            for path, sections in sweeps_missing_a_section().items()
+            for section in sections),
         "R3-experiment-goes-through-harness":
             experiments_bypassing_the_harness(),
         "R4-test-asserts-something": tests_that_assert_nothing(),

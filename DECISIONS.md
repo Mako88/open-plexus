@@ -1779,3 +1779,62 @@ because no task in the repository rebinds. That is now a known gap rather than a
 unknown one.
 
 565 tests, 118 mutations.
+
+## 48. The baseline on a public yardstick, and a design pass
+
+**[g10-12](experiments/sweeps/g10-12-the-standard-benchmark.txt): 5.466 bits per
+character on Tiny Shakespeare. It does not beat a unigram.**
+
+    uniform                        6.000   beaten by 0.53
+    THE MODEL                      5.466   --
+    unigram (letter frequency)     4.829   MISSED by 0.64
+    bigram (letter pairs)          3.583   missed by 1.88
+    character LSTM (published)     ~1.45   missed by ~4.0
+
+I predicted "starkly bad" and expected it between unigram and bigram. **It is
+below unigram** — the memory predicts worse than ignoring context entirely. The
+notes-corpus reading was not an artefact of using our own prose: 5.47 here
+against 5.73 there, different text, vocabulary and split rule.
+
+The temperature chosen was 0.0627, interior to its grid, so the figure is a value
+and not a bound.
+
+### Choosing the corpus, and bending a rule to do it
+
+John approved committing data. I chose **Tiny Shakespeare over enwik8's first
+1MB**, because published enwik8 numbers use the standard split of the *full*
+100MB — a 1MB slice is comparable to nothing, which was the entire point.
+
+`corpus.py` splits by whole FILE and its docstring explains why offset splits are
+dishonest. A single-file benchmark cannot be split that way, so `build_stream`
+does an offset split **and says in its own docstring that it breaks the module's
+rule deliberately, for one case**, because matching the published convention is
+why a standard corpus is worth having. The caveat stands and is stated: the tail
+shares an author and register with the head. Every published number for these
+corpora carries it. The vocabulary still comes from the head only, with a test.
+
+### Note 031, the design pass
+
+Asked for by John after the cache results. Its central observation:
+
+**The three measured walls trace to two decisions, not five.** Independent
+per-token keys mean nothing resembles anything, so there is nothing to generalise
+over; linear superposition of near-orthogonal keys caps capacity at about `d`.
+`derived_keys` is still the right call — note 024 measured the alternative at
+187x for a width-1 node — so this is a cost to see clearly, not a mistake.
+
+Recommended order: **(4) a write gate** (cheap, uses surprise and gating that
+already exist, and decouples overwriting from forgetting now that decay prices
+them together); **(3) the readout** (the only thing that learns across sequences
+and the only component never varied in any experiment); **(1) structured keys**
+(biggest prize, biggest locality risk, should follow evidence).
+
+**It recommends against (2)**, a retrieval nonlinearity, and saying so is the
+point of listing it: the high-capacity formulations keep patterns separately,
+which is a table with extra steps.
+
+**The note marks itself as an argument, not a measurement.** Five conclusions
+this week were drawn from reasoning and refuted by runs, so nothing in it should
+be believed before it is tested.
+
+570 tests, 118 mutations.

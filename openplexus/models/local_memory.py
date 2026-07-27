@@ -570,7 +570,8 @@ class LocalAssociativeMemory:
     def run(self, tokens: np.ndarray, targets: np.ndarray | None = None,
             scored: np.ndarray | None = None, learn: bool = False,
             partition=None,
-            store: np.ndarray | None = None, leave=None) -> np.ndarray:
+            store: np.ndarray | None = None, leave=None,
+            trace: list | None = None) -> np.ndarray:
         """Process one sequence; return the predicted next token per position.
 
         Args:
@@ -613,6 +614,18 @@ class LocalAssociativeMemory:
                 locally available signals at the moment of storage, and whether
                 such a signal exists on this task is a separate and harder
                 question.
+            trace: If given, one dict appended per step carrying the signals a
+                gate could actually consult — `surprise`, the node's running
+                `mean` and `deviation` of it, and the size of the trace being
+                written. **Observation only**: nothing here reads it back, and
+                `tests/test_trace_observes.py` pins that a traced run and an
+                untraced one produce identical predictions.
+
+                It exists because "is there a local signal that separates a real
+                binding from filler" is a question about the model's own
+                quantities, and the alternative is a probe that recomputes them
+                — which is how the 150/300 cap values came from a
+                reimplementation whose store never bound.
             partition: Which machines answer. An integer reads one machine
                 alone; an iterable of integers reads a **cluster** of them pooled
                 together; `None` pools every machine.
@@ -766,7 +779,13 @@ class LocalAssociativeMemory:
             # its bindings answered; it can only be asked again and told whether
             # the answer held up. Promoting the answer is the operation that is
             # actually available.
-            if lasting is not None and previous_retrieval is not None:
+            # Surprise and its running estimate sit OUTSIDE the `lasting` guard
+            # because they are properties of this step, not of consolidation --
+            # `seen`, `mean_surprise` and `m2` are read only below, so hoisting
+            # them changes nothing and lets a probe watch a plain run. Leaving
+            # them inside would have made every traced number a number about a
+            # model with a lasting store, which is not the model being gated.
+            if previous_retrieval is not None:
                 # Surprise: how far the arriving token was from what was
                 # predicted, as a probability-free magnitude. Available to the
                 # node from its own last output and its own next input.
@@ -788,6 +807,27 @@ class LocalAssociativeMemory:
                 m2 += delta * (step_surprise - mean_surprise)
                 deviation = (m2 / seen) ** 0.5 if seen > 1 else 0.0
 
+                if trace is not None:
+                    trace.append({
+                        "t": t,
+                        "token": int(token),
+                        "surprise": float(step_surprise),
+                        "mean": float(mean_surprise),
+                        "deviation": float(deviation),
+                        # What a capture rule would rank on, so the probe ranks
+                        # on the same number the mechanism would.
+                        "strength": float(np.linalg.norm(previous_retrieval)),
+                        # Predict the future and compare, in its literal form:
+                        # did the guess made one step ago name the token that
+                        # arrived. This is what `consolidate-on-use` fires on and
+                        # it is NOT the same quantity as surprise -- one is a
+                        # binary hit on the argmax, the other a continuous
+                        # measure over the whole prediction. A signal can carry
+                        # information in either without the other.
+                        "hit": bool(predictions[t - 1] == token),
+                    })
+
+            if lasting is not None and previous_retrieval is not None:
                 if not self.config.salience:
                     fires = predictions[t - 1] == token
                 else:

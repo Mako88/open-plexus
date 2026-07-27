@@ -1,0 +1,81 @@
+name: sweep-g9-04-is-there-a-local-signal
+
+# Before building the tag: is there anything local for it to hang on?
+#
+# reward_recall picks rewarded cues uniformly from the same alphabet as the
+# filler, so nothing local can predict reward -- that half of a tag is
+# impossible here by construction. The other half, the one the biology actually
+# describes, is a cheap decaying marker on everything worth marking, and it
+# depends on one measurable thing: can a node tell a binding-write from a
+# filler-write from its own signals?
+#
+# At 31 steps per binding, a 64-step window holds two bindings and sixty-two
+# steps of filler. A capacity over ADMITTED items reaches an arbitrary delay;
+# a capacity over STEPS cannot. If no signal separates, admission is a random
+# subset and a small tag is worse than a small window.
+#
+# Labels come from position_kinds(), which is an ORACLE, used only to score
+# signals the model computed without it. Nothing measured is fed back.
+#
+# 12 jobs of (width, seed). The pilot ran a cell in seconds; this is the
+# cheapest thing dispatched in weeks, which is the point -- a measurement
+# standing in front of a build.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  signal:
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [32, 64]
+        seed: [1, 2, 3, 4, 5, 6]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: width ${{ matrix.width }} seed ${{ matrix.seed }}
+        run: python -m experiments.g9_04_is_there_a_local_signal --width ${{ matrix.width }} --seed ${{ matrix.seed }} --json out/X-${{ matrix.width }}-${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-04-${{ matrix.width }}-${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: [signal]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g9-04-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 12" | tee summary.txt
+          python -m tools.summarise_g9_04 | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-04-summary
+          path: |
+            summary.txt
+            out/*.json

@@ -419,6 +419,25 @@ MUTATIONS = [
         new="            retrieved = memory @ key",
     ),
     Mutation(
+        name="trace-reports-the-neighbouring-token",
+        breaks="which position every traced signal belongs to -- the counts, the "
+               "ordering and the number of entries all stay right, so a "
+               "separability number computed from it would be about the wrong "
+               "positions and nothing downstream could tell",
+        path=LOCAL,
+        old='                        "token": int(token),',
+        new='                        "token": int(tokens[t - 1]),',
+    ),
+    Mutation(
+        name="trace-reports-the-mean-as-the-surprise",
+        breaks="the signal the probe ranks on, replacing a per-step quantity "
+               "with a running average of it -- still monotone, still falling on "
+               "repetition, and useless for separating one step from another",
+        path=LOCAL,
+        old='                        "surprise": float(step_surprise),',
+        new='                        "surprise": float(mean_surprise),',
+    ),
+    Mutation(
         name="the-floor-refusal-does-nothing",
         breaks="the rail that withdrew g8-01's seq-1536 row -- a cell whose "
                "floor arm has collapsed below chance gets a ratio again, and it "

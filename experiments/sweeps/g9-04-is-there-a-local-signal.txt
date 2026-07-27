@@ -1,0 +1,157 @@
+Is there anything local for a tag to hang on?
+=============================================
+
+Script: experiments/g9_04_is_there_a_local_signal.py
+Status: PRE-REGISTERED, with a pilot already seen. See DISCLOSURE below.
+
+
+WHY THIS COMES BEFORE THE TAG
+------------------------------
+[g9-03](g9-03-is-the-cliff-reach-or-cost.txt) settled that a window has to be
+MATCHED to a lag nobody knows in advance, which is what makes a tag a mechanism
+rather than a saving. The obvious next move is to build it.
+
+**Reading the generator first says one of the two things a tag could do is
+impossible here, by construction.** `reward_recall` chooses which cues get
+rewarded with `rng.sample(cues, n_rewarded)` -- uniformly, from cues drawn out of
+the same alphabet as the filler. A rewarded binding and an unrewarded one are
+statistically identical until the reward token arrives. **Nothing local can
+predict reward**, and a tag that claimed to would be reading `position_kinds()`
+in disguise.
+
+That leaves the other thing a tag can do, and it is the one the biology actually
+describes: set a cheap marker on everything worth marking, let it decay, and let
+the late signal capture whatever is still tagged. The tag is not selective about
+value. It is selective about BEING A BINDING AT ALL.
+
+Which matters here more than it sounds, because of a number nobody had printed:
+
+    body 744 steps / 24 bindings  ~=  31 steps per binding
+
+A window of 64 steps holds about **two bindings and sixty-two steps of filler**.
+That is the whole of g9-03's fall-off, and it says a span-based reach is doomed
+at this density however it is tuned. A capacity of four BINDINGS spans ~124
+steps; a capacity of four STEPS spans four.
+
+So: can a node tell a binding-write from a filler-write, from its own signals?
+
+
+DISCLOSURE
+-----------
+A one-cell pilot was run locally before these predictions were written, at width
+32 seed 1. It is reported here as part of the record rather than described
+afterwards as a hunch. The predictions are written to be about what the pilot
+does NOT settle -- whether it holds across widths and seeds.
+
+First at 8 sequences, then again at 32 after `hit` was added:
+
+           signal     b-vs-f (8)  rew (8)     b-vs-f (32)  rew (32)
+         surprise          0.464    0.453           0.487     0.497
+         strength          0.306    0.466           0.298     0.490
+    dev-from-mean          0.377    0.489           0.378     0.506
+              hit              -        -           0.494     0.500
+         position          0.480    0.617           0.480     0.541
+
+    steps per binding: 31.0
+
+**Four times the data moved `position` vs rewarded from 0.617 to 0.541**, which
+is prediction 3 already half-answered and the reason the grid runs 32 sequences.
+It is also why the 8-sequence row is left in: it is what an under-powered cell
+looks like next to the same cell with more data, and the difference is larger
+than several results this project has taken seriously.
+
+
+THE GRID
+--------
+  width     32, 64            does the answer depend on how full the store is
+  seed      1..6
+  sequences 32 per cell       the pilot's shakiest number came from 32 positives
+
+Signals scored: surprise, strength (the norm of the retrieved trace, which is
+what competitive capture already ranks on), absolute deviation from the node's
+running mean surprise, and POSITION -- a deliberate ringer, because a window
+ranks on recency and nothing else, so position says how much of any separation
+recency alone already had.
+
+AUC is rank-based with ties at half, and is deliberately NOT folded to
+`max(a, 1-a)`: a signal that separates the classes backwards is still a usable
+signal, and hiding the direction would hide the mechanism.
+
+
+PREDICTIONS
+------------
+1. **`strength` separates binding from filler, in the INVERTED direction, and it
+   holds at both widths.** Guess: 0.25-0.40 at every cell. The reason is
+   structural rather than empirical -- filler is drawn with replacement from 40
+   spare cues over ~700 positions, so a filler key has been bound many times and
+   retrieves strongly, while a binding's cue is fresh and retrieves weakly. So
+   the admission rule a tag wants is **admit the WEAK retrievals**, which is the
+   opposite of what competitive capture does, and that inversion is a finding
+   about the six failed mechanisms rather than only about this one.
+
+2. **`surprise` stays useless, within 0.45-0.55 everywhere.** It is the signal
+   four previous mechanisms were built on. If it were the answer it would not
+   have taken this long.
+
+2b. **`hit` -- predict the future and compare, in its literal form -- carries
+   nothing either, within 0.45-0.55 everywhere.** John asked whether this was
+   worth revisiting given everything fixed since it last failed, and the answer
+   is that it IS worth revisiting and this is the cheapest possible form of the
+   revisit: score the raw signal against the label directly, instead of inferring
+   its quality from a mechanism that failed for any of six other reasons.
+   `consolidate-on-use` fires on exactly this quantity and has never been
+   measured apart from the machinery around it.
+
+   It is scored as a separate column from `surprise` on purpose. One is a binary
+   hit on the argmax and the other is continuous over the whole prediction, and
+   a signal can carry information in either without the other.
+
+3. **`position` vs rewarded collapses to ~0.5 with more data.** The pilot's 0.617
+   came from 32 positives against 160 negatives in a single cell. The generator
+   shuffles cue order before assigning rewards, so there is no mechanism for a
+   real effect. **If it does NOT collapse, this probe has a leak and every number
+   in it is suspect** -- that is the outcome that stops the tag rather than
+   starting it.
+
+4. **Every `rewarded vs unrewarded` AUC sits within noise of 0.5, for every
+   signal.** This is the control that says what the tag can and cannot be. It is
+   near-tautological given the generator, and it is here because the generator is
+   the thing being trusted -- a task that leaked reward identity into local
+   statistics would make a tag look like it worked for the wrong reason.
+
+Most likely wrong: (1), specifically the "holds at both widths" half. Retrieval
+norm scales with how much is stored, and 64 dimensions over the same bindings is
+a different signal-to-noise regime; the direction should survive, the size may
+not.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- some signal separates binding from filler   -> a fixed capacity over ADMITTED
+                                                 items reaches an arbitrary
+                                                 delay. BUILD THE TAG, and admit
+                                                 on that signal
+- every signal near 0.5                       -> admission is a random subset, so
+                                                 a small tag is WORSE than a
+                                                 small window. That is a result
+                                                 about this whole line of work,
+                                                 arriving before the mechanism
+                                                 instead of after it
+- rewarded vs not away from 0.5               -> a leak in the probe or the
+                                                 generator. Fix that first;
+                                                 nothing else in the file counts
+
+
+COST
+-----
+2 widths x 6 seeds = 12 jobs. The pilot ran 8 sequences at width 32 in a few
+seconds; 32 sequences at width 64 is roughly 16x that, so well under a minute a
+job. This is the cheapest thing dispatched in weeks, which is the point -- it is
+a measurement standing in front of a build.
+
+
+THE ORACLE, SAID TWICE
+-----------------------
+Labels come from `position_kinds()`. It scores signals the model computed without
+it, and nothing measured is fed back into anything. That distinction is the
+entire difference between this and cheating.

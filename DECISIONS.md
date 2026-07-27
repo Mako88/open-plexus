@@ -2751,3 +2751,72 @@ computed on the CENTRED retrieved vectors from a settled model with learning off
 Reproduced at three seeds. The probe needs no edit to `run` — it is a wrapper
 around the retrieval seam, which is now the second time that seam has paid for
 itself in a day.
+
+---
+
+## 66. Two different "effective ranks" in one repository, and I refuted a correct
+## hypothesis by switching between them
+
+**Decision 65 contains an error and this corrects it.** The headline survives;
+one of its sub-claims does not.
+
+Note 035 measures **stable rank**, `er(S) = ‖S‖_F² / ‖S‖₂²`. Decision 65 measured
+**participation rank**, `exp(H(σ))`. Both are called "effective rank", neither
+was labelled, and they answer different questions: stable rank is dominated by
+the largest singular value and asks *how many directions rival the biggest one*;
+participation rank asks *how many carry appreciable energy at all*.
+
+Measured on the same retrieved vectors, same model, same run:
+
+    value_lr    stable rank    participation rank
+       0.0             4.06                 30.56
+       0.02            1.88                 19.47
+
+**Decision 65 said "not rank 3 — about 30" and called the rank-3 hypothesis
+refuted. Under note 035's own measure the retrievals are at 4.06, which is the
+hypothesis, confirmed.** The refutation was an artefact of changing the ruler
+without saying so — and it is exactly the failure CLAUDE.md warns about, a
+quantity computed exactly as described and named something it does not earn.
+
+### What survives, and it is the important half
+
+**The dissociation holds under BOTH measures.** Training `Wv` adds 4,096
+persistent parameters and drops stable rank 4.06 → 1.88 and participation rank
+30.6 → 19.5, while bits go 5.505 → 5.956. Parameters up, rank down, performance
+down, on either ruler. Decision 65's conclusion — *performance follows the rank
+of the retrieval, not the parameter count* — is now better supported than when
+it was written, because it is measure-independent.
+
+### And the corrected sub-claim is the SHARPER one
+
+The readout is not reading a 30-dimensional signal. **It is reading about four
+dimensions that matter**, so `Wo`'s usable capacity is on the order of
+`vocab x 4 ≈ 256` numbers, not 2,000. A 256-number linear map converging on
+16,000 characters (decision 63) is not surprising at all — it is expected.
+
+So the account tightens rather than loosens: the store faithfully holds a
+character bigram table, that table is genuinely low-rank because English is, the
+retrieval inherits it, and the readout can only use what the retrieval carries.
+**Every flat exponent this project has measured follows from one number, and the
+number is about four.**
+
+### The rule this buys
+
+**Name the measure next to the number.** "Effective rank" has meant two things
+here for two notes, and the ambiguity produced a wrong refutation of a correct
+finding within a day of both being written. Any rank reported from now on says
+which one, and a comparison between two ranks says whether they are the same
+ruler.
+
+`tools/` should carry one implementation of each rather than each probe rolling
+its own, which is rule 9 applied to a measurement rather than to code.
+
+### Reconciling the last loose end
+
+Within one chunk the participation rank of retrievals is 17.3, pooled across
+chunks 30.6. That is consistent: each chunk's store spans its own small
+subspace, and the subspaces differ between chunks, so the pooled set spans more
+than any single one. `Wo` is fixed across chunks and must serve the pooled
+directions while any single prediction is made from one chunk's few — which is a
+second, independent reason the readout is worse off than its parameter count
+suggests.

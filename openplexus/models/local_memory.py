@@ -810,6 +810,13 @@ class LocalMemoryConfig:
     #: characters moves is the measurement that separates decision 59's
     #: explanation from decision 62's.
     value_lr: float = 0.0
+    #: Keep the store between `run` calls instead of resetting it.
+    #:
+    #: Correct only when consecutive calls are consecutive TEXT. On the recall
+    #: tasks each sequence is independent and this would let the model answer
+    #: from the training set -- which is what
+    #: `local-memory-persists-across-sequences` exists to catch.
+    carry_store: bool = False
     cache_slots: int = 0
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
@@ -1020,6 +1027,8 @@ class LocalAssociativeMemory:
         #: Held-back readout updates, when `orthogonal_every` is on.
         self.pending_update = np.zeros_like(self.grouped_wo)
         self.since_orthogonal = 0
+        #: The store carried between runs when `carry_store` is on, else None.
+        self._carried = None
 
     def ablate(self, dimensions) -> None:
         """Permanently remove these dimensions — a machine has left, for good.
@@ -1236,6 +1245,21 @@ class LocalAssociativeMemory:
                     f"{len(tokens)}")
 
         memory = np.zeros((d, d))
+        # CARRYING THE STORE BETWEEN SEQUENCES.
+        #
+        # The reset above is deliberate and is guarded by
+        # `local-memory-persists-across-sequences`: on MQAR and reward_recall
+        # each sequence is independent, and a store that accumulated across
+        # them would be answering from the training set rather than from the
+        # sequence in front of it.
+        #
+        # **A corpus is not that.** Chunk 41 of Shakespeare continues chunk 40,
+        # and resetting between them gives the model a memory 128 characters
+        # long -- a limit inherited from the synthetic tasks and never chosen
+        # for text. Off by default, because every earlier number was measured
+        # with the reset in place, and it must stay off for the recall tasks.
+        if self.config.carry_store and self._carried is not None:
+            memory = self._carried
         # The consolidated store. Written only when a retrieval is confirmed
         # useful by the token that arrives next, and never decayed -- which is
         # the whole difference between it and `memory`.
@@ -1679,4 +1703,6 @@ class LocalAssociativeMemory:
                 previous_store_size = float(np.linalg.norm(memory))
             previous_key_for_retrieval = key
             previous_scores = answer
+        if self.config.carry_store:
+            self._carried = memory
         return predictions

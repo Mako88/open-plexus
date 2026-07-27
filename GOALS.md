@@ -625,19 +625,77 @@ arm saturates at capacity 16, so that comparison lives in a narrow band below it
 > and the direction are unchanged; the figures 0.000 and 0.996 are not.
 >
 > So the three findings below describe **what a device could do if something told
-> it which of its inputs mattered.** Nothing tried can tell it. They are not
-> withdrawn — the arithmetic is real and the ceiling is worth knowing — but they
-> are not claims about a system anyone can build today, and this section used to
-> read as though they were.
+> it which of its inputs mattered.** They are not withdrawn — the arithmetic is
+> real and the ceiling is worth knowing — but they are not claims about a system
+> anyone can build today, and this section used to read as though they were.
 >
-> **What is not settled:** that no mechanism *can*. Two failures do not empty the
-> class, and two untried candidates are recorded in [BACKLOG.md](../BACKLOG.md) —
-> the most interesting being **replay**, an offline phase that revisits stored
-> traces later, since every mechanism tried so far must decide at the one moment
-> the least is known. Nor is it settled that the benchmark is innocent: note 013
-> blames a base rate that only MQAR has, and
+> ## CORRECTED: something CAN tell it, and this section said otherwise
+>
+> This read *"Nothing tried can tell it"*. That was true when written and is now
+> false. The sentence is quoted rather than quietly deleted because it gated the
+> reading of everything below it.
+>
+> **What changed is the task, not a cleverer mechanism.** MQAR contains no event
+> that separates a pair from filler in time to act on — the query arrives too
+> late and never recurs, which [note 010](docs/notes/010-tagging-and-capture.md)
+> identified as the reason tagging-and-capture could not be tested here at all.
+> `reward_recall` supplies one: a reward token **in the stream**, after the
+> binding it refers to, on the same broadcast every node already receives.
+> `position_kinds()` is an oracle; a token in the input is not.
+>
+> **[g9-02](experiments/sweeps/g9-02-a-gate-that-reads-its-own-input.txt) — the
+> first implementable gate to recover anything.** A reward gate on the FAST
+> store recovers **0.23 / 0.23 / 0.24** at delays 1, 4 and 8, and **-0.13** at
+> delay 20. Six mechanisms had recovered approximately zero before it.
+>
+> **[g9-03](experiments/sweeps/g9-03-is-the-cliff-reach-or-cost.txt) — and it has
+> to be told the delay.** The cliff is exactly the diagonal: positive wherever
+> the window covers the delay, about -0.22 wherever it does not, and every
+> doubling past the smallest covering window costs about a fifth of what is left.
+> A window of 64 recovers 0.09 at every delay. **A node does not know the delay**,
+> so this is a saving rather than a mechanism.
+>
+> **[g9-06](experiments/sweeps/g9-06-is-the-tag-capacity-starved.txt) — a gate
+> that does NOT have to be told.** A bounded capacity over WRITES rather than a
+> span over steps, with marks that fade: at 32 slots and fade 0.95 it recovers
+> **+0.16 at delays 1, 4, 8 and 20, spread 0.01**. The +0.16 at delay 20 is the
+> **first positive result at that delay anywhere in this project**, where the
+> window is -0.24. It does not beat a MATCHED window (0.16 against 0.23); it
+> beats an unmatched one by 0.40, and nothing tells a node which case it is in.
+>
+> **The catch, which keeps this section's caveat alive.** At that same cell,
+> admitting the STRONGEST retrievals scores identically (+0.003 apart) — so
+> bounded capacity plus a fade is the mechanism, and the local signal
+> [g9-04](experiments/sweeps/g9-04-is-there-a-local-signal.txt) found (retrieval
+> strength, inverted, AUC 0.22) buys height only where the pool is starved:
+> +0.222 at 16 slots.
+> [g9-07](experiments/sweeps/g9-07-a-tag-that-knows-how-big-its-store-is.txt)
+> found the same shape for normalising that signal — worth +0.09 at 8 slots and
+> +0.01 at 32.
+>
+> **So the honest statement is 0.16 of the oracle's advantage, not all of it.**
+> The ceiling remains a ceiling and the three findings below remain ceiling
+> results. What is no longer true is that the gap is unreachable.
+>
+> **And none of it is yet about tiny nodes.** Every g9 cell is `d_model` 32 in
+> one process.
+> [g9-08](experiments/sweeps/g9-08-how-small-a-node-can-run-the-gate.txt) tried
+> to fix that by sweeping `d_model` and asked the question on the wrong axis — a
+> narrow NETWORK is not a small NODE, and nine of its fifteen cells refused
+> because the task became impossible.
+> [g9-09](experiments/sweeps/g9-09-a-small-node-in-a-wide-network.txt) asks it on
+> g7-02's axis and is running.
+>
+> **What is still not settled:** whether any mechanism reaches the whole
+> advantage. **Replay** — an offline phase that revisits stored traces later —
+> remains the most interesting untried candidate in
+> [BACKLOG.md](../BACKLOG.md), and remains interesting for the same reason as
+> before: every mechanism tried so far must decide at the one moment the least is
+> known, and the tag only softens that rather than removing it. Nor is it settled
+> that MQAR is innocent: note 013 blames a base rate only it has, and
 > [g8-02](experiments/sweeps/g8-02-when-the-statistics-are-real.txt) tests that
-> directly.
+> directly — with a usable range of only zipf 0.0 to 0.5, so largely untested
+> rather than refuted.
 
 > **What every gated result rests on, in one line.** The three findings above —
 > length stops mattering, allocation stops mattering, forgetting stops — are all

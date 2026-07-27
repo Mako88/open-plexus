@@ -7,6 +7,43 @@ Ordered by what would change the most if it turned out well.
 
 ---
 
+## READ THIS FIRST — what is open, what is settled
+
+This file grew a great deal in one session and now mixes a todo list with a
+record of what was settled. Nothing below is deleted, because the reasoning in
+the settled sections is why the open ones are shaped as they are. But a reader
+looking for work should start here.
+
+**OPEN, in order of what would change the most:**
+
+1. **A decision only John can take: fix `reward_recall`'s layout?**
+   [Note 027](docs/notes/027-the-task-leaks-the-answer-through-its-layout.md).
+   The nearest binding before a reward is always the rewarded one, 160/160. The
+   fix is one line and costs a re-run of nine sweeps. **Measured as inert** — our
+   binding-detection cannot exploit it past delay 1 — so this is correctness,
+   not urgency. See *THE TASK LEAKS THE ANSWER*.
+2. **`g9-11` is running**: how far the union's window needs to reach. The last
+   untested dial on the best mechanism here.
+3. **Can anything identify WHICH binding without being told the delay?** The
+   sharpest open question and it needs a probe, not a sweep. See *The sharpest
+   open question BEFORE 027*.
+4. **A decision only John can take: what belongs in GOALS.md?** Its gating
+   section is corrected but is now the largest live-investigation block in a
+   document that may be meant for settled results only. See *GOALS.md gating
+   section — CORRECTED*.
+5. **Everything under *Tasks beyond MQAR*** — the corpus benchmark is the first
+   evidence for goal 2 and nothing on this page is closer to the actual aim.
+6. **The testbed has never run a gated model.** Everything measured is one
+   process. See *Built but not finished*.
+
+**SETTLED THIS SESSION** — kept below for their reasoning, not as work:
+the width question (*ANSWERED: eight dimensions*), why g9-08 asked it wrong
+(*A small NODE, not a narrow NETWORK*), the combined gate being built
+(*The gate that reads both signals*), the summariser port, the three meta-tests,
+the masked-fade no-op, and both GOALS corrections.
+
+---
+
 ## From the sources, not yet acted on
 
 Four ideas mined from [John's source list](https://sites.google.com/view/sources-memory/).
@@ -402,7 +439,11 @@ the whole mechanism and the signal was a detour.
 [g9-07](experiments/sweeps/g9-07-a-tag-that-knows-how-big-its-store-is.txt) asks
 exactly that, with `tag_relative`.
 
-## g9-11 WAS NOT DISPATCHED, and the control is why
+## A SMALL-SLOTS COMBINED SWEEP WAS NOT DISPATCHED, and the control is why
+
+> **Naming note.** This section is about a sweep that was proposed and dropped.
+> The name `g9-11` was later used for a DIFFERENT sweep — the union's reach —
+> which IS dispatched. Nothing below refers to that one.
 
 g9-10's best cell is `combined` at `slots` 4, +0.26 -- the highest tag-family
 recovery anywhere here -- and `slots` 4 is the BOTTOM EDGE of that grid. By the

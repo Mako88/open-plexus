@@ -83,8 +83,8 @@ What survives from g10-02 unchanged: epochs are not the constraint, and width is
 not the constraint. Both were measured and both still hold.
 
 
-WHAT TO BUILD, IN ORDER
--------------------------
+WHAT TO BUILD, IN ORDER -- **THIS ORDERING WAS WRONG, SEE BELOW**
+-------------------------------------------------------------------
 1. **A store that persists across chunks.** Worth up to 1.6-2.3 bits, which is
    the single largest number on this page. It is also what BACKLOG's replay item
    is about, arriving from a completely different direction.
@@ -93,6 +93,26 @@ WHAT TO BUILD, IN ORDER
    slots does -- and the g9 line has already built one.
 
 Neither of these is a tuning change and neither is about node size.
+
+**CORRECTED BY [g10-04](g10-04-does-context-help-this-model.txt): THE ORDER IS
+THE OTHER WAY ROUND.**
+
+The 1.6-2.3 bits above is what a COUNTER gains from more context. It is not what
+this mechanism gains. Handed chunks of 64, 128, 256 and 512, the model's own
+curve is nearly flat -- 5.927, 5.804, 5.856, 5.687 -- while counting improves
+from 5.988 to 4.976. **It captures 24% of what the extra context is worth, and
+the gap widens at every step.**
+
+Chunk length IS the persistence horizon, so a store that survived between chunks
+would hand this mechanism more of exactly what it already fails to use.
+
+**The error is one this project keeps catching in other forms: a number measured
+on one thing, applied to another.** The gap was real and the recommendation drawn
+from it was not, because nothing checked whether the mechanism could close it.
+The check cost minutes and should have come before the recommendation rather
+than one cycle after it.
+
+Superposition goes first.
 
 
 COST

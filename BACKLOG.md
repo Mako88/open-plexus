@@ -402,7 +402,40 @@ the whole mechanism and the signal was a detour.
 [g9-07](experiments/sweeps/g9-07-a-tag-that-knows-how-big-its-store-is.txt) asks
 exactly that, with `tag_relative`.
 
-## THE SHARPEST OPEN QUESTION: can anything find WHICH binding without the delay?
+## THE TASK LEAKS THE ANSWER, and this outranks everything below it
+
+[Note 027](docs/notes/027-the-task-leaks-the-answer-through-its-layout.md).
+`reward_recall` lays bindings on a lattice — `generate` uses a CONSTANT gap, 31
+at every sweep's settings — and places each reward `delay` steps after its cue,
+where `delay` is at most 20. **A distance of 20 cannot reach past a spacing of
+31**, so the nearest binding before any reward is ALWAYS the rewarded one.
+Measured: 160 of 160, at delays 1, 8 and 20.
+
+So "detect a binding, keep the most recent one before each reward" solves the
+task exactly, from local signals only. No mechanism here uses that rule.
+
+**No measurement is invalidated. The believed DIFFICULTY is.** g9-03's diagonal
+cliff is a real fact about a window counting in STEPS while the answer lives at a
+fixed number of BINDINGS. Note 026's 16.7% precision ceiling bounds gates that
+rank on binding-ness alone, and a gate that also takes the most recent reaches
+100% precision with one write per capture.
+
+### What to do, in order
+
+1. **Measure what the leak is worth.** A `nearest-binding` arm — detect bindings
+   with the existing signal, keep the most recent before each reward. If it
+   approaches the oracle, the leak is the whole story. If binding-detection is
+   too weak to exploit it, the fix is merely correct rather than urgent. Cheap,
+   and it is the honest next measurement.
+2. **Then decide about the generator.** The fix is one line — randomise the gap —
+   and it would invalidate the comparison set for nine sweeps. Rule 12 says a
+   known-better setting can be worth deliberately NOT adopting until there is
+   time to re-baseline. **That is John's call and the note does not make it.**
+
+Three tests in `test_reward_recall.py` pin the leak as PRESENT, with a docstring
+saying they are meant to fail once the generator is fixed.
+
+## The sharpest open question BEFORE 027: can anything find WHICH binding?
 
 [Note 026](docs/notes/026-the-tags-precision-comes-from-its-fade.md) puts a
 ceiling on this line. One binding in six is rewarded and nothing local separates

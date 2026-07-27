@@ -182,5 +182,75 @@ class TheShapeIsSane(unittest.TestCase):
 GOLDEN = "29beb9f989cce869"
 
 
+class TheLayoutLeaksWhichBindingWasRewarded(unittest.TestCase):
+    """A DEFECT, pinned so it is not rediscovered or silently fixed.
+
+    Bindings sit on a lattice — `generate` uses a CONSTANT gap — and the reward
+    is placed `delay` steps after its cue, where every sweep uses a delay far
+    below the spacing. So the nearest binding before any reward is always the
+    rewarded one, and "detect a binding, keep the most recent before a reward"
+    solves the task exactly, using only local signals.
+
+    That is not what note 017 built this task to pose. These tests assert the
+    leak EXISTS rather than that it is absent, because the numbers in g9-02 to
+    g9-10 were measured with it present and a test claiming otherwise would be
+    false. See docs/notes/027-the-task-leaks-the-answer-through-its-layout.md.
+
+    **When the generator is fixed, these tests should FAIL** — that is their
+    purpose. Replace them then, and re-baseline what depends on them.
+    """
+
+    def _bindings_and_rewards(self, delay):
+        config = RewardConfig(n_pairs=24, n_rewarded=4, n_cues=64, n_values=8,
+                              seq_len=768, delay=delay, queries_per_reward=3,
+                              seed=20260726)
+        return [generate(config, seed=i) for i in range(12)]
+
+    def test_the_nearest_binding_before_a_reward_is_always_the_rewarded_one(self):
+        for delay in (1, 8, 20):
+            with self.subTest(delay=delay):
+                hits = total = 0
+                for sequence in self._bindings_and_rewards(delay):
+                    kinds = sequence.position_kinds()
+                    values = [t for t, k in enumerate(kinds) if k == "value"]
+                    for r, kind in enumerate(kinds):
+                        if kind != "reward":
+                            continue
+                        before = [t for t in values if t < r]
+                        if not before:
+                            continue
+                        total += 1
+                        hits += kinds[before[-1] - 1] == "rewarded"
+                self.assertEqual(
+                    hits, total,
+                    f"delay {delay}: the nearest binding before a reward was "
+                    f"NOT always the rewarded one ({hits}/{total}). If the "
+                    f"generator has been fixed, this test has done its job and "
+                    f"should be replaced")
+
+    def test_bindings_sit_on_a_regular_lattice(self):
+        """The cause. A constant gap is what puts every unrewarded binding out
+        of reach of a reward that is not its own."""
+        sequence = self._bindings_and_rewards(8)[0]
+        kinds = sequence.position_kinds()
+        values = [t for t, k in enumerate(kinds) if k == "value"]
+        gaps = {b - a for a, b in zip(values, values[1:])}
+        self.assertEqual(
+            len(gaps), 1,
+            f"bindings are no longer evenly spaced (gaps {sorted(gaps)}), so "
+            f"the lattice is broken and the leak above should be gone too")
+
+    def test_the_spacing_exceeds_every_delay_the_sweeps_use(self):
+        """Why the leak is exact rather than usual: a delay of at most 20
+        cannot reach past a spacing of 31."""
+        sequence = self._bindings_and_rewards(8)[0]
+        kinds = sequence.position_kinds()
+        values = [t for t, k in enumerate(kinds) if k == "value"]
+        spacing = values[1] - values[0]
+        self.assertGreater(spacing, 20,
+                           "the spacing no longer exceeds the largest delay "
+                           "any sweep uses, so the leak is not exact")
+
+
 if __name__ == "__main__":
     unittest.main()

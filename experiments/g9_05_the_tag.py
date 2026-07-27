@@ -31,6 +31,7 @@ the first writes of every interval. See g9-07.
     python experiments/g9_05_the_tag.py --sweep degrade          # control
     python experiments/g9_05_the_tag.py --slots 8 --fade 0.99 --scale 8 --lr 0.05
     python experiments/g9_05_the_tag.py --mode relative --slots 8 --fade 0.99
+    python experiments/g9_05_the_tag.py --width 4 --slots 32 --fade 0.95
 """
 
 from __future__ import annotations
@@ -72,11 +73,11 @@ ARMS = {
 
 
 def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
-          test_set, slots: int, fade: float,
-          relative: bool = False) -> tuple[float, float]:
+          test_set, slots: int, fade: float, relative: bool = False,
+          width: int = D_MODEL) -> tuple[float, float]:
     gated, window, tagged, strongest = ARMS[arm]
     model = LocalAssociativeMemory(LocalMemoryConfig(
-        vocab_size=task.vocab_size, d_model=D_MODEL, lr=lr,
+        vocab_size=task.vocab_size, d_model=width, lr=lr,
         key_scale=KEY_SCALE, decay=DECAY,
         # A FIXED reach on both gated arms, not one derived from task.delay.
         # A node does not know how long ago the thing that mattered happened,
@@ -111,7 +112,7 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
 
 
 def one_seed(work: tuple) -> list[dict]:
-    delay, seed, rates, slots, fade, relative = work
+    delay, seed, rates, slots, fade, relative, width = work
     task = replace(BASE, delay=delay)
     train_set = build(task, N_TRAIN, seed)
     test_set = build(replace(task, seed=task.seed + 99_991), N_TEST, seed)
@@ -119,12 +120,12 @@ def one_seed(work: tuple) -> list[dict]:
     for lr in rates:
         for arm in ARMS:
             overall, first = score(task, arm, lr, seed, train_set, test_set,
-                                   slots, fade, relative)
+                                   slots, fade, relative, width)
             records.append(dict(
-                condition=f"delay={delay} slots={slots} fade={fade} lr={lr} "
-                          f"relative={relative} arm={arm}",
+                condition=f"delay={delay} width={width} slots={slots} "
+                          f"fade={fade} lr={lr} relative={relative} arm={arm}",
                 seed=seed, delay=delay, slots=slots, fade=fade, lr=lr, arm=arm,
-                relative=relative,
+                relative=relative, width=width,
                 accuracy=first,        # first asks: retention, not echo
                 accuracy_all=overall))
     return records
@@ -144,7 +145,7 @@ def control(relative: bool = False) -> int:
     print(f"{'arm':>15}{'first asks':>12}{'all asks':>10}")
     for arm in ARMS:
         overall, first = score(task, arm, 0.05, 1, train_set, test_set,
-                               SLOTS, FADE, relative)
+                               SLOTS, FADE, relative, D_MODEL)
         print(f"{arm:>15}{first:>12.3f}{overall:>10.3f}", flush=True)
     return 0
 
@@ -164,7 +165,12 @@ def main() -> int:
     relative = args.mode == "relative"
     if args.mode not in (None, "relative"):
         raise SystemExit(f"--mode must be 'relative' if given, got {args.mode}")
-    work = [(delay, seed, tuple(rates), slots, fade, relative)
+    # Width is the node's own dimension count. Every g9 cell so far ran at
+    # D_MODEL in one process, so no gating result here has been about node SIZE
+    # -- which is the question g7-02 and g7-03 answered for the ORACLE gate and
+    # nobody has asked of an implementable one.
+    width = args.width if args.width is not None else D_MODEL
+    work = [(delay, seed, tuple(rates), slots, fade, relative, width)
             for delay in delays for seed in seeds]
     records = [r for batch in spread(one_seed, work, args.workers) for r in batch]
     emit(records, Path(args.json) if args.json else None)

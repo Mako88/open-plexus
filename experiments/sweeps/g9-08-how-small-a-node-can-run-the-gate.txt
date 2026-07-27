@@ -1,0 +1,151 @@
+How small can a node be and still run an implementable gate?
+============================================================
+
+Script: experiments/g9_05_the_tag.py, with --width swept
+Status: PRE-REGISTERED. Not dispatched -- g9-07 holds the matrix.
+
+
+IN PLAIN TERMS
+---------------
+This project exists for machines that have almost nothing: phones, laptops, old
+hardware sitting idle. Everything measured about the memory-filtering mechanism
+so far was run on one machine of a fixed, comfortable size. So none of it
+actually says whether a small device can do it.
+
+We already know the answer for a cheating version of the filter, which was
+measured two months ago: with it, device size stops mattering almost entirely,
+and machines holding a single number each do as well as one big machine. That
+was the most encouraging result this project has produced, and it was about a
+filter that reads the answer key.
+
+Now there is a filter that does not cheat. This asks the same question of it.
+
+If small devices keep the benefit, the mechanism scales down to the hardware this
+whole project is aimed at. If the benefit needs a big machine, then it works and
+it is not for us, and that is worth knowing before anything else is built on it.
+
+
+WHY THIS RUN EXISTS
+--------------------
+[Note 024](../../docs/notes/024-what-the-gate-costs-a-tiny-node.md) costs the
+gate and finds it affordable -- a width-1 node at `d_model` 256 pays 320 numbers
+against a 256-number store, and much less at any larger size. **Cost is not
+gain.** Whether the recovery survives at that width has never been measured.
+
+**Every cell in g9-02 through g9-07 is `d_model` 32 in one process.** So the
+entire gating line, including g9-06's flat-and-positive +0.16, is silent on the
+question this project is about.
+
+The oracle version of this was answered:
+[g7-02](g7-02-tiny-nodes-and-clusters.txt) found that with an oracle gate,
+devices holding **one number each** score identically to three decimals at 96,
+192, 288 and 384 steps, and g7-03 found the allocation decision stops mattering
+-- largest gap 0.031 at any capacity. Both are CEILINGS. This asks whether an
+implementable gate keeps any of it.
+
+
+WHAT IS ALREADY KNOWN AND IS NOT RE-ASKED
+------------------------------------------
+[g9-06](g9-06-is-the-tag-capacity-starved.txt), at `d_model` 32:
+
+    slots 32 fade 0.95   +0.16 +0.16 +0.17 +0.16   spread 0.01
+    window 8             +0.23 +0.23 +0.23 -0.24   spread 0.47
+
+The tag's working point is `slots 32, fade 0.95`, and it is flat across delay.
+The signal's direction is worth +0.003 there and +0.222 at `slots 16, fade 0.99`
+-- so bounded capacity plus a fade is the mechanism, and g9-04's signal buys
+height only where the pool is starved.
+
+**That last fact is why this sweep matters more than it looks.** A narrow node is
+a starved node in a different sense, and if the signal starts paying again as
+width falls, the two findings meet.
+
+
+THE GRID
+---------
+  width     4, 8, 16, 32, 64    node dimensions. 32 is where every earlier g9
+                                cell ran, so one column reproduces them and is
+                                the wiring check
+  delay     1, 8, 20            1 and 20 are the extremes that separated the
+                                window from the tag; 8 is the interior
+  arms      none, oracle, reward, tag, tag-strongest
+  slots     32, fade 0.95       the working point, FIXED
+  seeds     1, 2, 3
+  lr        0.05, FIXED on every arm
+
+15 jobs. `slots` and `fade` are frozen deliberately: this sweep is about width,
+and sweeping four axes at once would leave no cell with enough seeds to mean
+anything. **The freeze is the risk** -- CLAUDE.md says to check the frozen axes
+and not only the swept ones, and the working point was chosen at width 32. If the
+tag's best capacity moves with width, this grid measures a mistuned tag at every
+other width and will understate it. That is prediction 5.
+
+
+PREDICTIONS
+------------
+1. **The tag's recovery falls with width, and faster than the oracle's.** The
+   oracle holds `N` constant by construction; the tag holds `slots` constant but
+   still writes everything between captures, so its store carries more junk per
+   dimension as dimensions get scarce. Guess: +0.16 at width 32 falling below
+   +0.05 at width 4.
+
+2. **The window falls too, and stays worse at delay 20.** Its -0.24 there is
+   about reach, not width, so it should be roughly flat in width and stay
+   negative. If the window IMPROVES at small width, something is wrong with the
+   comparison rather than with the window.
+
+3. **The oracle stays high at every width**, reproducing g7-02's finding on this
+   task. Guess: above 0.95 at width 4. **This is the wiring check** -- g7-02 got
+   identical-to-three-decimals scores at width 1 with an oracle, so if the
+   oracle degrades sharply here the task or the harness differs from that sweep
+   in a way nothing has named, and no other row counts.
+
+4. **The tag stays flat ACROSS DELAY at every width**, even as it falls in
+   height. Flatness is a property of counting in bindings rather than steps, and
+   nothing about narrowing a node changes what is being counted. Guess: spread
+   under 0.10 at every width where the cell is not refused.
+
+5. **The signal starts paying again as width falls.** `tag` minus
+   `tag-strongest` is +0.003 at width 32; guess above +0.05 at width 4. A narrow
+   node is starved in a different way, and g9-06 established the signal buys
+   height exactly when the pool is scarce relative to the demand.
+
+Most likely wrong: **5.** The reasoning treats "starved by capacity" and
+"starved by width" as the same kind of scarcity, and they are not obviously the
+same thing -- capacity limits how many bindings survive, width limits how well
+any of them can be told apart.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- tag holds up at width 4 or 8      -> an implementable gate that works on the
+                                       hardware this project is for. The most
+                                       important result the g9 line could have
+- tag collapses, oracle does not    -> selective storage still removes the size
+                                       problem, and no implementable mechanism
+                                       reaches it. The ceiling stands and the
+                                       tiny-node story stays hypothetical
+- oracle collapses too              -> this task cannot ask the question g7-02
+                                       asked. Nothing in the run counts, and the
+                                       difference from g7-02 has to be found
+                                       before anything else
+- everything refused at low width   -> the floor arm fell to the trivial floor,
+                                       which means the TASK became impossible
+                                       rather than the gate failing. Report the
+                                       refusals, do not report a ratio
+
+
+COST
+-----
+15 jobs of (width, delay). Five arms x three seeds x one rate = 15 cells a job.
+Narrow widths are cheaper than the d_model-32 cells g9-05 costed at ~7 minutes,
+and width 64 is roughly four times a width-32 cell, so call it 10 minutes a job
+at the top end. Dispatched after g9-07 -- one matrix at a time.
+
+
+THE ORACLE, SAID TWICE
+-----------------------
+The `oracle` arm reads `position_kinds()`. Every recovery figure is a fraction of
+an advantage no deployed system has, and g7-02's tiny-node result is a ceiling of
+exactly this kind. The whole point of this sweep is that the ceiling has never
+been checked against something a node could actually run.

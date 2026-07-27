@@ -141,9 +141,22 @@ def run_one(args) -> list[dict]:
     # This is precisely the failure `corpus.py` warns about for the train/test
     # split, made in the calibration split by the same hand that wrote the
     # warning. Whole documents, disjoint.
-    held = max(1, len(corpus.train) // 5)
-    fitting = chunks(corpus.train[:-held], chunk)
-    calibration = chunks(corpus.train[-held:], chunk)
+    if len(corpus.train) > 1:
+        held = max(1, len(corpus.train) // 5)
+        fitting = chunks(corpus.train[:-held], chunk)
+        calibration = chunks(corpus.train[-held:], chunk)
+    else:
+        # A single-stream corpus has one training document, so holding out
+        # DOCUMENTS is impossible. Hold out a contiguous tail of the training
+        # stream instead -- the same convention `corpus.build_stream` uses for
+        # the train/test split, and disjoint from the fitting text either way.
+        #
+        # Splitting the CHUNK LIST would put calibration text inside the region
+        # trained on, which is the leak that produced 39 bits per character.
+        stream = corpus.train[0]
+        cut = int(len(stream) * 0.8)
+        fitting = chunks((stream[:cut],), chunk)
+        calibration = chunks((stream[cut:],), chunk)
     if not fitting or not calibration:
         raise SystemExit(
             f"chunk {chunk} leaves {len(fitting)} training and "

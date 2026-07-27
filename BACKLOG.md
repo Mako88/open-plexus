@@ -1215,3 +1215,28 @@ store and an exact keyed structure. g10-07 (a hash table wins), note 033 (the
 ceiling), note 034 (the price of lifting it) and g11-03 (whether that price is
 payable) are four measurements pointing at the same decision. That decision is
 John's and should be taken on those four numbers together, not one at a time.
+
+---
+
+## `--changed` should select by HUNK, not by file
+
+`mutate.py --changed` (decision 60) selects every mutation whose target FILE the
+current work touches. For a peripheral file that is a handful. For
+`openplexus/models/local_memory.py` it is **60 of 134**, which is about twenty
+minutes — the same long local run the convention exists to avoid, so the rule
+degenerates precisely where the work usually happens.
+
+**The fix is line ranges.** `git diff -U0` gives the changed line numbers; a
+mutation is at risk if its target line falls inside a changed hunk, or within a
+small context window of one. A one-line edit to the value projection would then
+select the two or three mutations that actually touch it rather than every
+mutation in a 1,700-line file.
+
+Keep the whole-file behaviour as the fallback when line information is
+unavailable (a new file, a rename), because under-selecting is the failure mode
+that matters: the tool exists to catch a mutation that a change quietly
+invalidated.
+
+Not urgent — the current version is correct, just slow. It is worth doing before
+the rule gets skipped for being expensive, which is how a standard stops being
+one.

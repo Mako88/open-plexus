@@ -800,7 +800,16 @@ class LocalMemoryConfig:
     #: converges at about 16,000 characters (decision 63). This is the cheapest
     #: test of whether a LEARNED value projection moves that, and it adds no
     #: parameters: `Wo` and the value projection become one matrix.
-    learn_values: bool = False
+    value_from_readout: bool = False
+    #: Learning rate for the value projection. 0 leaves `Wv` frozen.
+    #:
+    #: **This is the one that adds persistent capacity.** `Wv` is `vocab x d`
+    #: of frozen random numbers; training it doubles what the model carries
+    #: across a corpus, where `value_from_readout` merely merged `Wv` into `Wo`
+    #: and was refuted (decision 64). Whether the saturation point at 16,000
+    #: characters moves is the measurement that separates decision 59's
+    #: explanation from decision 62's.
+    value_lr: float = 0.0
     cache_slots: int = 0
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
@@ -824,6 +833,15 @@ class LocalMemoryConfig:
             raise ValueError(
                 "derived_keys and key_active both build Wk and would conflict; "
                 "sparse keys have no per-token derivation yet")
+        if self.value_lr < 0.0:
+            raise ValueError("value_lr is a learning rate and cannot be "
+                             "negative; 0 leaves the projection frozen")
+        if self.value_lr and self.value_from_readout:
+            raise ValueError(
+                "value_from_readout writes Wo as the value, so training Wv "
+                "would train a matrix nothing reads -- a mechanism that runs "
+                "and does nothing, which is the failure this repo is built "
+                "against")
         if self.cache_slots < 0:
             raise ValueError(
                 f"cache_slots is a number of exact bindings and cannot be "
@@ -1289,14 +1307,14 @@ class LocalAssociativeMemory:
             #
             # `Wv` is drawn once and never updated, so with the store rebuilt
             # every chunk the ONLY thing this model learns across a corpus is
-            # `Wo` -- one `vocab x d` linear map (decision 62). `learn_values`
+            # `Wo` -- one `vocab x d` linear map (decision 62). `value_from_readout`
             # writes the learned readout row instead of the frozen draw, which
             # costs no extra state and makes what is stored track what the
             # readout has learned to want.
             #
             # Off by default: it changes every stored value, so every earlier
             # number is measured without it.
-            value = (self.wo[token] if self.config.learn_values
+            value = (self.wo[token] if self.config.value_from_readout
                      else self.wv[token]) * alive
 
             # STORE: bind the previous token to this one. Doing this before the
@@ -1615,6 +1633,28 @@ class LocalAssociativeMemory:
                 # this is the plain delta rule; with more, no group's update
                 # reads any other group's activity, which is the whole point.
                 update = np.einsum("gv,gd->vgd", target - parts, sliced)
+                if self.config.value_lr:
+                    # UNFREEZING THE VALUE PROJECTION -- the real version.
+                    #
+                    # `Wv` has always been drawn once and never updated, so with
+                    # the store rebuilt every chunk, `Wo` was the ONLY thing
+                    # learning across a corpus: one linear map, converged by
+                    # 16,000 characters (decisions 62, 63). This ADDS persistent
+                    # parameters rather than re-using the readout's, which is
+                    # what `value_from_readout` did and why that was refuted.
+                    #
+                    # The rule is the readout's own error carried one step back.
+                    # A retrieval should land on the target's value, so
+                    #
+                    #     dL/d(Wv[target]) = Wo^T (p - y)
+                    #
+                    # and group g's share of it uses only group g's readout
+                    # columns and group g's prediction error -- the same
+                    # locality the delta rule beside it already has, and no
+                    # wider than the readout update above.
+                    self.wv[targets[t]] += self.config.value_lr * np.einsum(
+                        "gv,vgd->gd", target - parts,
+                        self.grouped_wo).reshape(-1) * alive
                 if self.config.orthogonal_every:
                     # Hold the update back and orthogonalise a batch of them.
                     # See `orthogonal_every`: the point is the RANK of what gets

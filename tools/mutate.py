@@ -563,13 +563,13 @@ MUTATIONS = [
         new="                     else self.wv[token])",
     ),
     Mutation(
-        name="learn-values-is-read-and-never-applied",
+        name="value-from-readout-is-read-and-never-applied",
         breaks="the mechanism entirely -- the frozen draw would be written "
                "whatever the flag said, so the measurement refuting a learned "
                "value projection would have been the frozen model twice",
         path=LOCAL,
-        old="            value = (self.wo[token] if self.config.learn_values",
-        new="            value = (self.wv[token] if self.config.learn_values",
+        old="            value = (self.wo[token] if self.config.value_from_readout",
+        new="            value = (self.wv[token] if self.config.value_from_readout",
     ),
     Mutation(
         name="departure-takes-derived-keys-too",

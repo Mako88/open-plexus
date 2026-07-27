@@ -2634,7 +2634,7 @@ assumed: these experiments initialise `wo` to `wv`, so the mechanism can only
 bite once the readout has moved away, and at 4,000 characters it has barely
 moved. The connection test in `tests/test_learned_values.py` shows 53 of 160
 predictions differing, and
-`learn-values-is-read-and-never-applied` is the mutation that fails if the flag
+`value-from-readout-is-read-and-never-applied` is the mutation that fails if the flag
 stops being applied.
 
 **Why it hurts is worth stating, because it is informative.** The stored value
@@ -2661,3 +2661,93 @@ it must ADD parameters, not re-use `Wo`'s.
 That is twice today that a one-line edit silently invalidated a mutation, which
 is the case for `--verify` running FIRST and for `--changed` existing at all
 (decision 60).
+
+---
+
+## 65. Performance follows the RANK of the retrieval, not the parameter count
+
+**The best-supported result of the session, and it comes from a dissociation
+rather than another null.**
+
+Decision 62 proposed that the flat exponents were about persistent capacity: the
+model learns one `vocab x d` linear map and has nothing for more data to fill.
+Decision 59 proposed the sum. **Every measurement before today confounded them**,
+because width raises the parameter count and the retrieval rank together.
+
+Training `Wv` separates them. It ADDS 4,096 persistent parameters — doubling
+what the model carries across a corpus — and it does this:
+
+    value_lr   persistent params   retrieval rank        bits @ 250k chars
+       0.0                 4,096   30.5 / 32.2 / 30.5                5.505
+       0.02                8,192   19.5 / 20.5 / 19.4                5.956
+
+    (rank at width 64 on 60,000 characters, three seeds, no overlap between
+     the two groups; bits are two seeds)
+
+**Parameters up, rank down, performance down.** Capacity is not what is binding.
+A model given twice the persistent parameters lands at 5.956 bits, nearly the
+6.000 of a uniform distribution.
+
+The full data curve, width 64, two seeds:
+
+    chars   frozen  lr=.005   lr=.02   lr=.05
+     4,000   5.565    5.540    5.653    5.837
+    16,000   5.519    5.601    5.812    5.927
+    62,500   5.529    5.806    5.937    5.960
+   250,000   5.505    5.930    5.956    5.939
+
+It gets worse with MORE data, which is the opposite of a capacity mechanism and
+exactly what a collapse mechanism predicts: more updates, more alignment.
+
+### Why training `Wv` collapses the rank
+
+The update is `Wv[target] += lr * Wo^T (y - p)`. **Every token's value is pushed
+along directions the shared readout error favours**, and those directions are
+shared across tokens. So the value vectors align with each other, the stored
+values span fewer directions, and the retrievals span fewer still. A delta rule
+driven by a common error signal is an alignment process, and alignment is rank
+collapse.
+
+This is a better explanation than the one offered in decision 64 for
+`value_from_readout` — "the stored value becomes a moving target" — which was
+hand-waving that happened to point the right way. **Both refuted value-projection
+mechanisms have the same measurable cause, and it is not instability, it is
+rank.**
+
+### What now has one account instead of three
+
+    width 16 -> 128     rank 13.5 -> 33.3, SATURATING     bits 5.730 -> 5.494
+    data 4k -> 250k     rank unchanged                    bits flat after 16k
+    trained Wv          rank 30.5 -> 19.8                 bits 5.505 -> 5.956
+    exact cache         rank 30.6 -> 32.8                 bits better
+
+**The readout can only use as many dimensions as its input actually has**, and
+every intervention's effect on bits tracks its effect on rank, including the two
+that made things worse. The flat width exponent is the rank saturating near 32.
+The flat data exponent is a linear map over ~30 dimensions converging at 16,000
+characters. Neither needs a separate explanation.
+
+**Decision 62 is refuted** — not by a confounded null but by a dissociation.
+**Decision 59 is sharpened rather than confirmed**: the sum is bad *because it
+produces a low-rank retrieval*, which is a claim with a number attached and a
+design target attached to it.
+
+### The design target this gives, which is the useful part
+
+**Raise the rank of the retrieval.** That is now the explicit objective, and it
+is measurable in minutes with a recording wrapper on the retrieval seam rather
+than in hours with a matrix.
+
+It also reframes the exact cache: it is not merely "storage that does not sum",
+it is the only mechanism so far that raised the rank at all — and it raised it
+by 2.2, from 30.6 to 32.8, which is small. **That is a caution about the cache,
+not an endorsement**, and it is worth holding next to g11-06's numbers when they
+arrive.
+
+### Measurement notes
+
+Rank is the participation number `exp(H(singular values))`, note 035's measure,
+computed on the CENTRED retrieved vectors from a settled model with learning off.
+Reproduced at three seeds. The probe needs no edit to `run` — it is a wrapper
+around the retrieval seam, which is now the second time that seam has paid for
+itself in a day.

@@ -1,4 +1,4 @@
-"""`learn_values` writes the learned readout row instead of a frozen draw.
+"""`value_from_readout` writes the learned readout row instead of a frozen draw.
 
 **Why it exists.** The store is rebuilt every chunk and `Wk`/`Wv` are never
 updated, so `Wo` is the only thing this model learns across a corpus — one
@@ -31,10 +31,10 @@ from openplexus.models.local_memory import (
     LocalAssociativeMemory, LocalMemoryConfig)
 
 
-def model_for(learn_values: bool, seed: int = 3) -> LocalAssociativeMemory:
+def model_for(value_from_readout: bool, seed: int = 3) -> LocalAssociativeMemory:
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=17, d_model=16, seed=seed, derived_keys=True,
-        learn_values=learn_values))
+        value_from_readout=value_from_readout))
     model.wo[:] = model.wv
     return model
 
@@ -65,10 +65,10 @@ class TheFlagReachesTheOutput(unittest.TestCase):
     def test_it_is_off_by_default(self):
         """Every earlier number on this corpus was measured without it."""
         self.assertFalse(
-            LocalMemoryConfig(vocab_size=5, d_model=4).learn_values)
+            LocalMemoryConfig(vocab_size=5, d_model=4).value_from_readout)
 
     def test_the_frozen_draw_is_untouched_either_way(self):
-        """`learn_values` changes WHICH matrix supplies the value, not whether
+        """`value_from_readout` changes WHICH matrix supplies the value, not whether
         `Wv` is trained. If it silently started updating `Wv`, this would be a
         different mechanism wearing this one's name and its refutation would
         not apply to it."""

@@ -275,6 +275,27 @@ through it produces a figure that looks measured and is not.
 > generalise because it was written against the specific shape of the first
 > mistake.**
 
+**A local timing measured on one seed does not convert to runner time by a
+factor anyone has guessed.** `ubuntu-latest` has 2 vCPU. A job running
+`--workers 2` gives each seed ONE core, while the same code timed locally had
+the whole machine and numpy's threading. Measure the ratio, do not assume it.
+
+> *Calibration.* g11-06's `matched` arm, estimated from a local single-seed
+> timing with "a 3x allowance for a slower hosted runner":
+>
+>     chars      estimated wall     actual wall
+>     62,500              ~2 min       18.4 min
+>     125,000             ~5 min       29.1 min
+>     250,000             ~9 min       53.9 min
+>     1,000,000          ~39 min      ~190 min (extrapolated)
+>
+> **The real factor is about 7.6x, not 3x**, and the 1,000,000 cell came within
+> sight of a 300-minute timeout that was set assuming 39 minutes. Two of the
+> three previous cost mistakes in this repo were timeouts (g11-03 lost four of
+> six cells) and one was the cap introduced to prevent one (g11-04). Use ~8x
+> local single-seed time for a 2-worker job on `ubuntu-latest` until something
+> better is measured.
+
 **Before fitting a scaling exponent, probe the BOTTOM of the range and confirm
 the arm is still moving there.** A control that cannot fire and an arm that has
 already converged are the same defect — the grid does not contain the phenomenon

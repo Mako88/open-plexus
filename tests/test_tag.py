@@ -65,6 +65,24 @@ def stream(before: int = 25, after: int = 20, intervals: int = 1,
     return np.array(tokens)
 
 
+def capture_sizes(model, tokens: np.ndarray) -> list[tuple[int, int]]:
+    """Per capture: (writes offered in that interval, writes kept).
+
+    Raw trace numbers, no step mapping, because the invariant being checked is
+    about counts and a mapping bug would be indistinguishable from a real one.
+    """
+    trace: list = []
+    model.run(tokens, trace=trace)
+    sizes, offered = [], 0
+    for entry in trace:
+        if entry["write_index"] >= 0:
+            offered = entry["write_index"] + 1
+        if entry["captured"]:
+            sizes.append((offered, len(entry["captured"])))
+            offered = 0
+    return sizes
+
+
 def captures(model, tokens: np.ndarray) -> list[list[int]]:
     """The steps each capture kept, one list per reward.
 
@@ -240,6 +258,47 @@ class TheTagIsClearedByCapture(unittest.TestCase):
     earliest writes after a reward, which nothing here argued for and which looks
     fine from outside.
     """
+
+    def test_a_capture_keeps_as_many_writes_as_it_had_room_for(self):
+        """The invariant a stale mark breaks, and the only one that catches it.
+
+        The pool fills unconditionally while there is room, so after `n` writes
+        it holds `min(n, slots)` -- every time, at every fade. A mark that
+        outlived its capture holds a position from the PREVIOUS interval, and
+        when the next interval is shorter that position does not exist, so the
+        capture protects fewer writes than it had room for.
+
+        **The obvious assertion misses this entirely.** Checking that a capture
+        keeps steps inside its own interval passes while broken, because a stale
+        index still lands inside the current interval whenever it is in range --
+        it protects the WRONG write, not an out-of-range one. That version of
+        this test was written first and `the-tag-outlives-its-capture` survived
+        it in CI.
+
+        **And the fade hides the bug**, which is why the long fade cases here are
+        not sufficient on their own: a stale mark keeps ageing, so it is
+        displaced within a few steps and the contamination flushes itself. With
+        no fade the stale ranks are the near-zero ones from the cold start of the
+        previous interval, which nothing displaces.
+        """
+        rng = np.random.default_rng(2)
+        # Long, then SHORT: a short interval is what puts a stale position out
+        # of range. Equal-length intervals hide it.
+        tokens = np.array(_filler(60, rng) + [REWARD] + _filler(9, rng)
+                          + [REWARD] + _filler(40, rng) + [REWARD])
+        for slots in (2, 4):
+            for decay_tag in (1.0, 0.99, 0.9):
+                with self.subTest(slots=slots, fade=decay_tag):
+                    sizes = capture_sizes(
+                        build(slots=slots, decay_tag=decay_tag), tokens)
+                    self.assertEqual(len(sizes), 3, "not every reward captured")
+                    for offered, kept in sizes:
+                        self.assertEqual(
+                            kept, min(slots, offered),
+                            f"an interval offering {offered} writes to a pool "
+                            f"of {slots} kept {kept}; the pool fills while there "
+                            f"is room, so anything else means it was holding "
+                            f"positions from a previous interval")
 
     def test_every_capture_keeps_only_its_own_interval(self):
         tokens = stream(intervals=3)

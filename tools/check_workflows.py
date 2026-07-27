@@ -68,6 +68,138 @@ def push_triggered_sweeps() -> list[str]:
     return offenders
 
 
+#: `python … | tee f` reports tee's status. The python failure is discarded.
+TEE = re.compile(r"\|\s*tee\b")
+#: `python -m tools.thing` or `python tools/thing.py`, in a workflow step.
+TOOL_INVOCATION = re.compile(r"python\s+-m\s+(tools\.[\w.]+)"
+                             r"|python\s+(tools/[\w/]+\.py)")
+PIP_INSTALL = re.compile(r"pip\s+install\s+([^\n|&;]+)")
+#: Import roots that resolve inside this repository rather than to a package.
+LOCAL_PACKAGES = {"tools", "openplexus", "experiments", "tests"}
+
+
+def run_blocks(text: str) -> list[tuple[int, str]]:
+    """Every `run: |` body in a workflow, with the line its `run:` sits on."""
+    lines = text.split("\n")
+    blocks = []
+    for index, line in enumerate(lines):
+        match = re.match(r"^(\s*)run: \|\s*$", line)
+        if not match:
+            continue
+        indent = len(match.group(1))
+        body = []
+        for following in lines[index + 1:]:
+            if following.strip() and len(following) - len(following.lstrip()) <= indent:
+                break
+            body.append(following)
+        blocks.append((index + 1, "\n".join(body)))
+    return blocks
+
+
+def job_blocks(text: str) -> dict[str, str]:
+    """Each top-level job's YAML, keyed by job name.
+
+    Split by indentation rather than parsed, because this tool must run in the
+    aggregate job of every workflow it checks and PyYAML is not installed there
+    — which is the exact class of failure it now checks for.
+    """
+    lines = text.split("\n")
+    try:
+        start = next(i for i, line in enumerate(lines) if line.rstrip() == "jobs:")
+    except StopIteration:
+        return {}
+    starts = [(index, match.group(1))
+              for index, line in enumerate(lines[start + 1:], start + 1)
+              if (match := re.match(r"^  ([\w-]+):\s*$", line))]
+    return {name: "\n".join(lines[index:(starts[position + 1][0]
+                                         if position + 1 < len(starts)
+                                         else len(lines))])
+            for position, (index, name) in enumerate(starts)}
+
+
+def third_party_imports(module: Path, seen: set[Path] | None = None) -> set[str]:
+    """Packages a tool needs installed, following imports within the repo.
+
+    Only column-zero imports count: those run at import time, which is when the
+    failure this guards against happens. Imports of repo-local packages are
+    followed, so a summariser that reaches numpy through a helper is still
+    covered.
+    """
+    seen = set() if seen is None else seen
+    if module in seen or not module.is_file():
+        return set()
+    seen.add(module)
+    found: set[str] = set()
+    for match in re.finditer(r"^(?:import|from)\s+([\w.]+)",
+                             module.read_text(encoding="utf-8"), re.MULTILINE):
+        dotted = match.group(1)
+        root = dotted.split(".")[0]
+        if root in sys.stdlib_module_names:
+            continue
+        if root in LOCAL_PACKAGES:
+            found |= third_party_imports(
+                ROOT / (dotted.replace(".", "/") + ".py"), seen)
+            continue
+        found.add(root)
+    return found
+
+
+def module_for(reference: str) -> Path:
+    """The file `-m tools.thing` or `tools/thing.py` resolves to."""
+    return ROOT / (reference if reference.endswith(".py")
+                   else reference.replace(".", "/") + ".py")
+
+
+def silent_failures(name: str, text: str, needs) -> list[str]:
+    """Steps that can fail while the job stays green, in both known shapes.
+
+    **A summariser that dies prints nothing and the step passes.** Both halves
+    are needed for that: an import the job never installed, and a pipe into
+    `tee` that discards the exit status.
+
+    > *Calibration.* g11-04, run `30295529865`. All twelve cells returned;
+    > the aggregate job ran `python -m tools.summarise_g11_04 | tee -a
+    > summary.txt` without `pip install numpy`, so the summariser died on
+    > `ModuleNotFoundError` and `tee` exited 0. The step is marked **success**
+    > and `summary.txt` holds one line: `cells returned: 12 of 12`. The
+    > sweep's numbers were recovered by hand. `summarise_g11_04` is the only
+    > summariser importing numpy, and its was the only aggregate job missing
+    > the install — so a single check over the enumeration covers the class.
+
+    The package name is compared against the import root, which is right for
+    everything this repo installs and would need a mapping for a package whose
+    import name differs from its pip name. `needs` maps a tool reference to the
+    packages it needs installed, so the rule can be tested without the tree.
+    """
+    offenders = []
+    for line_number, body in run_blocks(text):
+        if TEE.search(body) and "pipefail" not in body:
+            offenders.append(
+                f"{name}:{line_number} pipes into `tee` without `set -o "
+                f"pipefail`, so the command before it can die and the step "
+                f"still passes")
+    for job, body in job_blocks(text).items():
+        installed = {token.lower() for group in PIP_INSTALL.findall(body)
+                     for token in group.split() if not token.startswith("-")}
+        for dotted, script in TOOL_INVOCATION.findall(body):
+            reference = dotted or script
+            for package in sorted(needs(reference)):
+                if package.lower() not in installed:
+                    offenders.append(
+                        f"{name}: job `{job}` runs {reference}, which imports "
+                        f"{package}, and never installs it -- the step will "
+                        f"die at import and print nothing")
+    return offenders
+
+
+def silently_failing_steps() -> list[str]:
+    """`silent_failures` over every workflow in the tree."""
+    return [problem for path in sorted(WORKFLOWS.glob("*.yml"))
+            for problem in silent_failures(
+                path.name, path.read_text(encoding="utf-8"),
+                lambda reference: third_party_imports(module_for(reference)))]
+
+
 def refuse_if_mutating() -> None:
     """Stop if tools/mutate.py currently has a file edited.
 
@@ -127,6 +259,14 @@ def main() -> int:
     if offenders:
         print("these sweeps fire on push and can cancel a dispatched matrix "
               "before it starts: " + ", ".join(offenders))
+        return 1
+    silent = silently_failing_steps()
+    for problem in silent:
+        print(f"FAIL  {problem}")
+    if silent:
+        print(f"\n{len(silent)} step(s) that can fail while the job reports "
+              "success. A green run with an empty summary is how a sweep gets "
+              "read as having no result.")
         return 1
     print(f"ok - {checked} invocation(s) across "
           f"{len(list(WORKFLOWS.glob('*.yml')))} workflow(s), sweeps dispatch-only")

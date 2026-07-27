@@ -90,6 +90,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+      # summarise_g11_04 fits the exponent with numpy. The scaling job installs
+      # it and this one did not, so the summariser died at import and `tee`
+      # returned 0 -- a green step with an empty summary.
+      - run: pip install numpy
       - uses: actions/download-artifact@v4
         with:
           pattern: g11-04-*
@@ -97,14 +101,17 @@ jobs:
           merge-multiple: true
       - name: Combine
         run: |
+          set -o pipefail
           echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 12" | tee summary.txt
           python -m tools.summarise_g11_04 | tee -a summary.txt
       - name: Summary
+        if: always()
         run: |
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat summary.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: g11-04-summary
           path: |

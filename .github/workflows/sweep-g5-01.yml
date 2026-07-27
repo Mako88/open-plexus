@@ -56,14 +56,17 @@ jobs:
           merge-multiple: true
       - name: Combine
         run: |
+          set -o pipefail
           echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 100" | tee summary.txt
           python tools/summarise_g5_01.py | tee -a summary.txt
       - name: Summary
+        if: always()
         run: |
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat summary.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: g5-01-summary
           path: |

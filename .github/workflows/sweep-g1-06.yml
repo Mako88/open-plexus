@@ -83,6 +83,7 @@ jobs:
           merge-multiple: true
       - name: Combine
         run: |
+          set -o pipefail
           {
             echo "interference cells: $(ls interference/*.json 2>/dev/null | wc -l) of 126"
             python experiments/harness.py --aggregate "interference/*.json"
@@ -91,11 +92,13 @@ jobs:
             python experiments/harness.py --aggregate "decay/*.json"
           } | tee summary.txt
       - name: Summary
+        if: always()
         run: |
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat summary.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: g1-06-summary
           path: |

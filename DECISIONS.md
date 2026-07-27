@@ -1838,3 +1838,51 @@ this week were drawn from reasoning and refuted by runs, so nothing in it should
 be believed before it is tested.
 
 570 tests, 118 mutations.
+
+## 49. The test audit: mutation coverage, and the task generator had none
+
+John asked whether the tests validate the real model or reimplementations of it,
+after that trap bit twice — note 012's cap values, and `test_corrective_writes`
+asserting exactness against its own copy of the write rule.
+
+**A static check cannot answer it.** In the bad test the asserted values *did*
+derive from model attributes; only the computation was duplicated. Any rule
+strong enough to catch that would flag most legitimate tests.
+
+**Mutation testing is the audit, and it is the thing that caught it.** A test
+reimplementing logic survives a mutation of the real code. So the question is
+coverage, and `tools/mutation_coverage.py` answers it without running anything:
+it reads `mutate.py`, locates each mutation's target line, and lists the
+functions containing none.
+
+    24 of 59 audited functions carry at least one mutation (41%)
+
+    openplexus/tasks/reward_recall.py    0 of 7    generate is 81 lines
+    openplexus/tasks/corpus.py           0 of 9    build_stream is 37
+    openplexus/distributed.py            4 of 14   step unaudited
+
+**`reward_recall` at zero is the finding.** Every g9 number rests on that
+generator. `mutate.py`'s own docstring explains why generators need mutations —
+one "returned a wrong SET rather than crashing, which is how a sweep becomes a
+confident wrong answer" — and note 027's leak was found by reading the generator,
+not by a test.
+
+Four mutations added; three confirmed caught so far:
+
+- `rewarded-cues-are-not-chosen-uniformly` — takes the first `n` cues instead of
+  a random sample, making reward predictable from position. **Caught.**
+- `the-reward-lands-at-the-wrong-offset` — reward one step after its binding
+  regardless of `delay`, collapsing every delay to the trivial case. **Caught.**
+- `the-corpus-vocabulary-comes-from-the-test-text` — the leak `corpus.py` exists
+  to prevent. **Caught.**
+- `the-stream-split-overlaps` — running.
+
+**Three caught is genuinely reassuring**: the `reward_recall` tests do validate
+the generator, they had just never been challenged. The gap was in the harness,
+not in those tests.
+
+**The tool states its own limit.** A function *with* a mutation is not proven
+well tested — one mutation covers one line and `run()` is six hundred. It is a
+floor, and the per-function counts matter more than the percentage.
+
+582 tests, 124 mutations.

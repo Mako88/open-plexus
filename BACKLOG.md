@@ -38,6 +38,25 @@ that learns across sequences and the only one no experiment has ever varied; the
 because the high-capacity formulations keep patterns separately, which is a table
 with extra steps and g10-07 already measured what a table does here.
 
+**THE TEST AUDIT, asked for by John, found one real hole.**
+`tools/mutation_coverage.py` reports which functions no mutation has ever
+pointed at -- **24 of 59 (41%)** carry one.
+
+    openplexus/tasks/reward_recall.py    0 of 7    generate is 81 lines
+    openplexus/tasks/corpus.py           0 of 9    build_stream is 37
+    openplexus/distributed.py            4 of 14   step unaudited
+    openplexus/ngram.py                  4 of 9
+    tools/recovery.py                    7 of 11
+
+**`reward_recall` having zero is the finding**: every g9 number rests on that
+generator, and note 027's layout leak was found by READING it rather than by any
+test. Four mutations added for the biggest gaps and three confirmed caught, so
+those tests do validate the generator -- they had simply never been challenged.
+
+**Still unaudited and worth doing**: `distributed.Node.step` (the reimplementation
+of the model's inner loop, which BACKLOG item 6 is about), `corpus.chunks`, and
+`recovery.by_cell` -- the function every summariser goes through.
+
 **ACTUALLY OPEN RIGHT NOW.** The numbered list below was written as "open, in
 order" and four of its items have since been answered IN PLACE -- their entries
 now carry the answers, which is why they are still there. This is the current

@@ -126,7 +126,7 @@ def bits(scores: np.ndarray, targets: np.ndarray, temperature: float) -> float:
 
 
 def run_one(args) -> list[dict]:
-    seed, width, chunk, cap, which = args
+    seed, width, chunk, cap, which, corrective = args
     corpus = corpus_named(which)
     # Held-out DOCUMENTS, not held-out chunks of training documents.
     #
@@ -166,6 +166,7 @@ def run_one(args) -> list[dict]:
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=corpus.vocab_size, d_model=width, lr=0.05,
         key_scale=0.5, decay=0.997, derived_keys=True,
+        corrective_writes=corrective,
         # THE FAST STORE'S CAP, and it defaults to OFF in the model.
         #
         # Without it a 256-step chunk with a delta-rule update at EVERY position
@@ -214,7 +215,7 @@ def run_one(args) -> list[dict]:
             f"calibration wanted something the grid does not contain.")
     return [{
         "seed": seed, "width": width, "chunk": chunk, "cap": cap,
-        "corpus": which or "notes",
+        "corpus": which or "notes", "corrective": corrective,
         "vocab_size": corpus.vocab_size,
         "temperature": temperature,
         "bits_raw": bits(test_scores, test_targets, 1.0),
@@ -238,7 +239,7 @@ def control() -> int:
           f"characters, {corpus.test_tokens} test")
     print(f"uniform {uniform_bits(corpus.vocab_size):.3f}   "
           f"bigram {NGram(corpus.vocab_size, 1).fit(corpus.train).bits_per_token(corpus.test):.3f}")
-    record = run_one((1, 32, 64, 5.0, None))[0]
+    record = run_one((1, 32, 64, 5.0, None, False))[0]
     print(f"model raw {record['bits_raw']:.3f}, calibrated "
           f"{record['bits_calibrated']:.3f} at temperature "
           f"{record['temperature']}, accuracy {record['accuracy']:.3f}")
@@ -254,7 +255,8 @@ def main() -> int:
     chunk = int(args.scale) if args.scale is not None else 256
     cap = args.cap if args.cap is not None else 5.0
 
-    jobs = [(seed, width, chunk, cap, args.corpus) for seed in seeds]
+    jobs = [(seed, width, chunk, cap, args.corpus, args.mode == "corrective")
+            for seed in seeds]
     records = [r for batch in harness.spread(run_one, jobs, args.workers)
                for r in batch]
 

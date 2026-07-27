@@ -12,53 +12,43 @@ reported as `undefined` -- not as a number with a caveat beside it, which is the
 failure this project has produced twice. At seq 192 the pre-dispatch control put
 that advantage at 0.043, so that row is expected to be undefined and its being
 undefined is a result rather than a gap.
+
+The refusals and the MQAR floor come from `tools/recovery.py` rather than being
+copied here.
+
+> **Two reporting changes, and both can move the table.**
+>
+> **The learning rate is chosen differently.** This used to pick, per cell, the
+> rate with the largest `oracle - none`. It skipped collapsed floors first, but
+> among surviving cells maximising the gap still prefers whichever rate left the
+> floor arm lowest. Unlike g8-03 there is no arm here that no prediction is about
+> -- `on-use` and `salience` are both under test -- so the rate is chosen where
+> the **floor arm scores highest**. That is a baseline choice rather than a
+> mechanism choice, and it is the exact opposite bias to maximising the gap.
+>
+> **Refused and missing rows are now printed.** They used to be skipped
+> entirely, so a cell whose denominator was noise vanished from the table rather
+> than appearing as `undefined`, and a reader could not tell it from a
+> combination that was never run.
+>
+> **The g8-01 sweep file is not edited to match.** It records what was reported
+> at the time.
 """
 
 from __future__ import annotations
 
-import glob
-import json
-import sys
-from collections import defaultdict
-
-#: Trivial floor for the MQAR configuration these sweeps use: n_pairs 4,
-#: n_values 8, so `1/n_pairs + (1 - 1/n_pairs)/n_values`.
-#:
-#: A tool that hard-codes a property of one experiment will be wrong about the
-#: next one, and the direction of the error is not predictable -- which this
-#: repository has recorded happening three times in one reporting tool. So it is
-#: named, derived in the open, and checked against the grid it is used on.
-TRIVIAL_FLOOR = 1 / 4 + (1 - 1 / 4) / 8
-
-
-def floor_arm_works(mean_none: float, floor: float = TRIVIAL_FLOOR) -> bool:
-    """Is this cell measuring a difficulty, or two failures?
-
-    A recovery ratio divides by `oracle - none`. If `none` sits at or below the
-    trivial floor, the model with no gate is not doing the task at all, and the
-    denominator is the distance between a working ceiling and a broken floor.
-    That is not an advantage a mechanism could recover; it is the gap between
-    something and nothing.
-    """
-    return mean_none > floor
-
+from tools.recovery import MQAR_FLOOR, assess, by_cell, load
 
 ARMS = ("none", "oracle", "on-use", "salience")
 
 
 def main() -> int:
-    rows = [r for f in glob.glob(sys.argv[1] if len(sys.argv) > 1 else "out/*.json")
-            for r in json.load(open(f))]
+    rows = load()
     if not rows:
         print("no records matched")
         return 1
 
-    # (seq_len, half_life, lr, arm) -> {seed: accuracy}
-    cells: dict[tuple, dict[int, float]] = defaultdict(dict)
-    for r in rows:
-        cells[(r["seq_len"], r["half_life"], r["lr"], r["arm"])][r["seed"]] = \
-            r["accuracy"]
-
+    cells = by_cell(rows, "seq_len", "half_life", "lr")
     seq_lens = sorted({r["seq_len"] for r in rows})
     half_lives = sorted({r["half_life"] for r in rows}, reverse=True)
     rates = sorted({r["lr"] for r in rows})
@@ -75,51 +65,37 @@ def main() -> int:
                     if not by_seed:
                         line.append(f"{arm}=--")
                         continue
-                    values = [by_seed[s] for s in sorted(by_seed)]
-                    line.append(f"{arm}=" + "/".join(f"{v:.3f}" for v in values))
+                    line.append(f"{arm}=" + "/".join(
+                        f"{by_seed[s]:.3f}" for s in sorted(by_seed)))
                 print("  ".join(line))
 
     print("\n=== RECOVERY of the oracle's advantage ===")
-    print("(arm - none) / (oracle - none), at each cell's best learning rate")
-    print(f"{'seq_len':>8}  {'half-life':>9}  {'oracle gap':>10}  "
+    print("(arm - none) / (oracle - none), at the rate where the FLOOR arm is")
+    print("highest -- a baseline choice, so the rate cannot be picked to suit a")
+    print("mechanism under test.")
+    print(f"{'seq_len':>8}  {'half-life':>9}  {'lr':>5}  {'oracle gap':>10}  "
           f"{'seed spread':>11}  {'on-use':>8}  {'salience':>8}")
     for seq_len in seq_lens:
         for half in half_lives:
-            best = None
-            for lr in rates:
-                means = {}
-                spread = 0.0
-                for arm in ARMS:
-                    by_seed = cells.get((seq_len, half, lr, arm), {})
-                    if not by_seed:
-                        means = {}
-                        break
-                    values = list(by_seed.values())
-                    means[arm] = sum(values) / len(values)
-                    spread = max(spread, max(values) - min(values))
-                if not means:
-                    continue
-                gap = means["oracle"] - means["none"]
-                if not floor_arm_works(means["none"]):
-                    # Not a candidate at any gap. Selecting the largest
-                    # gap would otherwise PREFER this cell, because a
-                    # broken floor arm is what maximises it.
-                    continue
-                if best is None or gap > best[0]:
-                    best = (gap, spread, means)
-            if best is None:
+            graded = [(lr, assess(cells, (seq_len, half, lr), ARMS, MQAR_FLOOR))
+                      for lr in rates]
+            usable = [(lr, got) for lr, got in graded
+                      if got is not None and got.refused is None]
+            if not usable:
+                # Printed rather than skipped. A cell that cannot be interpreted
+                # is a result; one that was never run is a dispatch failure; and
+                # a row that simply vanishes is indistinguishable from both.
+                why = next((got.refused for _, got in graded if got is not None),
+                           "no records")
+                print(f"{seq_len:>8}  {half:>9}  {'--':>5}  {why}")
                 continue
-            gap, spread, means = best
-            if gap <= spread:
-                # The denominator is not larger than the noise. Printing a ratio
-                # here would be inventing precision the grid does not have.
-                verdict = f"{'undefined':>8}  {'undefined':>8}"
-            else:
-                verdict = "".join(
-                    f"{(means[arm] - means['none']) / gap:>10.2f}"
-                    for arm in ("on-use", "salience"))
-            print(f"{seq_len:>8}  {half:>9}  {gap:>10.3f}  {spread:>11.3f}  "
-                  f"{verdict}")
+            # Highest floor arm, NOT the largest gap. The two disagree exactly
+            # where it matters: the largest gap is produced by the rate that
+            # broke the floor arm most.
+            lr, got = max(usable, key=lambda pair: pair[1].means["none"])
+            print(f"{seq_len:>8}  {half:>9}  {lr:>5}  {got.gap:>10.3f}  "
+                  f"{got.spread:>11.3f}  {got.ratios['on-use']:>8.2f}  "
+                  f"{got.ratios['salience']:>8.2f}")
 
     print("\nRecovery near 0 for both arms means selective storage is not "
           "reachable\nby any local rule tried, and every result that depends on "

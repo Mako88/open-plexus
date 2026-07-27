@@ -51,16 +51,23 @@ def load(pattern: str | None = None) -> list[dict]:
             for record in json.load(open(path))]
 
 
-def by_cell(rows: Iterable[dict], *fields: str) -> dict[tuple, dict[int, float]]:
-    """Accuracy per seed, keyed by the swept fields and then the arm.
+def by_cell(rows: Iterable[dict], *fields: str,
+            metric: str = "accuracy") -> dict[tuple, dict[int, float]]:
+    """One metric per seed, keyed by the swept fields and then the arm.
 
     The arm is always the last key, because every caller needs to compare arms
     within a cell and none needs to compare cells within an arm.
+
+    `metric` names the quantity, and it is a parameter rather than a second
+    function because g9-02 reports two of them -- `accuracy` is first asks, which
+    is retention, and `accuracy_all` includes repeats, which is short-term echo.
+    Averaging them hides the number that matters, so that sweep prints both and
+    calls this twice. Every other caller wants the default.
     """
     cells: dict[tuple, dict[int, float]] = defaultdict(dict)
     for row in rows:
         key = tuple(row[field] for field in fields) + (row["arm"],)
-        cells[key][row["seed"]] = row["accuracy"]
+        cells[key][row["seed"]] = row[metric]
     return cells
 
 

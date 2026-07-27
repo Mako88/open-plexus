@@ -177,9 +177,26 @@ ported, and the drift that prompted it is fixed — it had **no floor check at
 all** under a heading that named one, and selected cells by maximising
 `oracle - none`, which prefers exactly the cells whose floor arm collapsed.
 
-Still carrying their own copies: `summarise_g8_01.py`, `summarise_g8_03.py`,
-`summarise_g9_02.py`, `summarise_g9_03.py`. They agree with the shared version
-today; the point of porting them is that nothing keeps them agreeing tomorrow.
+**Done — all four are ported.** `summarise_g8_01.py`, `summarise_g8_03.py`,
+`summarise_g9_02.py` and `summarise_g9_03.py` now use `load`/`by_cell`/`assess`,
+and their workflow lines run as `python -m tools.X` so the import resolves.
+`by_cell` gained a named `metric` parameter, because g9-02 reports first-asks and
+all-asks and averaging them hides the number that matters.
+
+**It was not only deduplication.** Three of the four picked their learning rate
+by maximising `oracle - none` — the third rule in `tools/recovery.py`, the one
+that actively seeks out cells whose floor arm collapsed. All three skipped
+collapsed floors first, so none was the worst version of it, but among surviving
+cells the bias is still there. They now pick on an arm no prediction is about:
+`capture-0` for g8-03, and for g8-01, which has no such arm, the rate where the
+FLOOR arm scores highest — the exact opposite bias. g8-01 also used to SKIP
+refused rows entirely, so a cell whose denominator was noise vanished rather than
+printing `undefined`.
+
+The published sweep files are NOT edited to match. They record what was reported
+at the time. **Re-summarising the archived JSON for g8-01, g8-03 and g9-02 would
+say whether any headline actually moves, and has not been done** — the artifacts
+are in Actions, not in the repo.
 
 Each port is: swap the loader for `load()`/`by_cell()`, swap the hand-rolled
 means-and-spread block for `assess()`, pass the right floor (**0.34375 for MQAR,

@@ -13,65 +13,49 @@ Two readings, and they want different next projects:
 - **Large window always fine** — reach is free if affordable, and a tag is a cost
   optimisation for tiny nodes rather than a capability.
 
-The same two refusals as every other summariser here: no ratio when the floor arm
-is at or below the trivial floor, and none when the oracle's advantage is not
-larger than the seed spread. Both have already cost this project a result.
+The two refusals come from `tools/recovery.py` rather than being copied here: no
+ratio when the floor arm is at or below the trivial floor, and none when the
+oracle's advantage does not beat the seed spread. Both have already cost this
+project a result, and five hand-copies had already drifted before the shared
+version existed.
 """
 
 from __future__ import annotations
 
-import glob
-import json
-import sys
-from collections import defaultdict
+from tools.recovery import (
+    REWARD_RECALL_FLOOR, assess, best_by, by_cell, load)
 
 ARMS = ("none", "oracle", "on-use", "salience", "reward")
-#: reward_recall with n_values 8.
-TRIVIAL_FLOOR = 1 / 8
 
 
 def main() -> int:
-    rows = [r for f in glob.glob(sys.argv[1] if len(sys.argv) > 1 else "out/*.json")
-            for r in json.load(open(f))]
+    rows = load()
     if not rows:
         print("no records matched")
         return 1
 
-    cells: dict[tuple, dict[int, float]] = defaultdict(dict)
-    for r in rows:
-        cells[(r["window"], r["delay"], r["arm"])][r["seed"]] = r["accuracy"]
-
+    cells = by_cell(rows, "window", "delay")
     windows = sorted({r["window"] for r in rows})
     delays = sorted({r["delay"] for r in rows})
 
-    def recovery(window: int, delay: int) -> float | None:
-        means, spread = {}, 0.0
-        for arm in ARMS:
-            by_seed = cells.get((window, delay, arm), {})
-            if not by_seed:
-                return None
-            values = list(by_seed.values())
-            means[arm] = sum(values) / len(values)
-            spread = max(spread, max(values) - min(values))
-        if means["none"] <= TRIVIAL_FLOOR:
-            return None                      # two failures, not a difficulty
-        gap = means["oracle"] - means["none"]
-        if gap <= spread:
-            return None                      # denominator inside the noise
-        return (means["reward"] - means["none"]) / gap
+    def cell(window: int, delay: int):
+        return assess(cells, (window, delay), ARMS, REWARD_RECALL_FLOOR)
 
-    print(f"\ntrivial floor {TRIVIAL_FLOOR:.3f}")
+    print(f"\ntrivial floor {REWARD_RECALL_FLOOR:.3f}")
     print("\n=== RECOVERY of the reward gate, by reach and delay ===")
     print("Rows are how far the gate can reach; columns are how far back the")
     print("binding is. On and above the diagonal the reach covers the delay.")
     print(f"{'window':>8}" + "".join(f"{d:>9}" for d in delays) + "   best delay")
     for window in windows:
-        values = [recovery(window, d) for d in delays]
-        cells_text = "".join("undefined".rjust(9) if v is None else f"{v:>9.2f}"
-                             for v in values)
-        known = [(v, d) for v, d in zip(values, delays) if v is not None]
-        best = f"{max(known)[1]:>12}" if known else "         n/a"
-        print(f"{window:>8}{cells_text}{best}")
+        row = [(delay, cell(window, delay)) for delay in delays]
+        # `missing` and `undefined` are printed differently on purpose: a job
+        # that did not return is a dispatch failure, and a cell that cannot be
+        # interpreted is a result. The hand-rolled version printed both as
+        # "undefined", which hides the first inside the second.
+        text = "".join("  missing" .rjust(9) if got is None else got.text("reward")
+                       for _, got in row)
+        best = best_by(row, "reward")
+        print(f"{window:>8}{text}" + (f"{best[0]:>12}" if best else "         n/a"))
 
     print("\n=== IS THERE AN INTERIOR BEST? ===")
     print("For each delay, the reach that recovers most. If it sits at roughly")
@@ -80,15 +64,32 @@ def main() -> int:
     print(f"{'delay':>7}{'best window':>13}{'recovery':>10}"
           f"{'at largest window':>19}")
     for delay in delays:
-        known = [(recovery(w, delay), w) for w in windows
-                 if recovery(w, delay) is not None]
-        if not known:
-            print(f"{delay:>7}   every cell undefined")
+        best = best_by(((window, cell(window, delay)) for window in windows),
+                       "reward")
+        if best is None:
+            print(f"{delay:>7}   every cell undefined or missing")
             continue
-        value, window = max(known)
-        largest = recovery(windows[-1], delay)
-        largest_text = "undefined" if largest is None else f"{largest:.2f}"
-        print(f"{delay:>7}{window:>13}{value:>10.2f}{largest_text:>19}")
+        window, got = best
+        largest = cell(windows[-1], delay)
+        largest_text = ("missing" if largest is None
+                        else f"{largest.ratios['reward']:.2f}"
+                        if largest.refused is None else "undefined")
+        print(f"{delay:>7}{window:>13}{got.ratios['reward']:>10.2f}"
+              f"{largest_text:>19}")
+
+    print("\n=== REFUSALS ===")
+    quiet = True
+    for window in windows:
+        for delay in delays:
+            got = cell(window, delay)
+            if got is None:
+                print(f"  window {window} delay {delay}: no records")
+                quiet = False
+            elif got.refused:
+                print(f"  window {window} delay {delay}: {got.refused}")
+                quiet = False
+    if quiet:
+        print("  none")
 
     print("\nbest window ~ delay        -> reach must be matched to an unknown")
     print("                              lag. Build the tag; it is a mechanism.")

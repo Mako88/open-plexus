@@ -1,13 +1,9 @@
 """Does a reward token recover what six stream-derived gates could not?
 
 Recovery is `(arm - none) / (oracle - none)`, the same quantity as g8-01 and
-g8-03 so the numbers are comparable across tasks — and with the same two
-refusals, because both have already cost this project a result:
-
-- **refuse when the floor arm is at or below the trivial floor.** A ratio whose
-  denominator is the gap between a working ceiling and a broken floor is not a
-  recovery of anything (g8-01's seq-1536 row, withdrawn).
-- **refuse when the oracle's advantage is not larger than the seed spread.**
+g8-03 so the numbers are comparable across tasks, with the two refusals from
+`tools/recovery.py`: no ratio when the floor arm is at or below the trivial
+floor, and none when the oracle's advantage does not beat the seed spread.
 
 **Accuracy here is FIRST ASKS.** In autoregressive mode the first query of a cue
 re-binds it, so later queries about that cue measure short-term echo rather than
@@ -17,89 +13,90 @@ retention. Both are reported, and the ratio uses the first.
 so this grid contains the mechanisms it is trying to beat rather than a
 description of them. If they suddenly work here, suspect the task before
 celebrating.
+
+> **The learning rate is now chosen differently, and it can move the numbers.**
+> This summariser used to pick, per delay, the rate with the LARGEST
+> `oracle - none`. It skipped collapsed floors first, so it was not the worst
+> version of that mistake — but among the cells that survive, maximising the gap
+> still prefers whichever rate left the floor arm lowest, which is the third rule
+> in `tools/recovery.py` and the one that bit hardest. It now picks by what the
+> `reward` arm actually recovers, via `best_by`, which selects after the refusals
+> rather than before them. **The table this prints may therefore differ from the
+> one in the g9-02 sweep file**; that file records what was reported at the time
+> and is not edited to match.
 """
 
 from __future__ import annotations
 
-import glob
-import json
-import sys
-from collections import defaultdict
+from tools.recovery import (
+    REWARD_RECALL_FLOOR, assess, best_by, by_cell, load)
 
 ARMS = ("none", "oracle", "on-use", "salience", "reward")
-#: reward_recall with n_values 8: guessing uniformly among values.
-TRIVIAL_FLOOR = 1 / 8
 
 
 def main() -> int:
-    rows = [r for f in glob.glob(sys.argv[1] if len(sys.argv) > 1 else "out/*.json")
-            for r in json.load(open(f))]
+    rows = load()
     if not rows:
         print("no records matched")
         return 1
 
-    cells: dict[tuple, dict[int, tuple]] = defaultdict(dict)
-    for r in rows:
-        cells[(r["delay"], r["lr"], r["arm"])][r["seed"]] = (
-            r["accuracy"], r["accuracy_all"])
-
+    first = by_cell(rows, "delay", "lr")
     delays = sorted({r["delay"] for r in rows})
     rates = sorted({r["lr"] for r in rows})
 
-    print(f"\ntrivial floor {TRIVIAL_FLOOR:.3f}")
+    print(f"\ntrivial floor {REWARD_RECALL_FLOOR:.3f}")
     print("\n=== FIRST-ASK accuracy per seed ===")
     for delay in delays:
         print(f"\ndelay {delay}")
         for lr in rates:
             line = [f"  lr={lr:<5}"]
             for arm in ARMS:
-                by_seed = cells.get((delay, lr, arm), {})
+                by_seed = first.get((delay, lr, arm), {})
                 if not by_seed:
                     line.append(f"{arm}=--")
                     continue
-                values = [by_seed[s][0] for s in sorted(by_seed)]
-                line.append(f"{arm}=" + "/".join(f"{v:.3f}" for v in values))
+                line.append(f"{arm}=" + "/".join(
+                    f"{by_seed[s]:.3f}" for s in sorted(by_seed)))
             print("  ".join(line))
 
     print("\n=== RECOVERY of the oracle's advantage, by delay ===")
     print("The delay is the point: at 1 the marker is adjacent and the rule is")
     print("'keep the step before the obvious token', which learns nothing about")
     print("value. At 20 the binding is long past when the reward arrives.")
-    print(f"{'delay':>7}{'none':>8}{'oracle':>8}{'gap':>7}{'spread':>8}"
+    print(f"{'delay':>7}{'lr':>7}{'none':>8}{'oracle':>8}{'gap':>7}{'spread':>8}"
           f"{'on-use':>9}{'salience':>10}{'reward':>9}")
     for delay in delays:
-        best = None
-        for lr in rates:
-            means, spread = {}, 0.0
-            for arm in ARMS:
-                by_seed = cells.get((delay, lr, arm), {})
-                if not by_seed:
-                    means = {}
-                    break
-                values = [by_seed[s][0] for s in sorted(by_seed)]
-                means[arm] = sum(values) / len(values)
-                spread = max(spread, max(values) - min(values))
-            if not means or means["none"] <= TRIVIAL_FLOOR:
-                # A broken floor is not a candidate at any gap -- and choosing
-                # the LARGEST gap would actively prefer it.
-                continue
-            gap = means["oracle"] - means["none"]
-            if best is None or gap > best[0]:
-                best = (gap, spread, means)
+        best = best_by(
+            ((lr, assess(first, (delay, lr), ARMS, REWARD_RECALL_FLOOR))
+             for lr in rates), "reward")
         if best is None:
-            print(f"{delay:>7}   every cell has a floor arm at or below the "
-                  f"trivial floor")
+            print(f"{delay:>7}   every rate refused or missing")
+            for lr in rates:
+                got = assess(first, (delay, lr), ARMS, REWARD_RECALL_FLOOR)
+                why = "no records" if got is None else got.refused
+                print(f"          lr={lr}: {why}")
             continue
-        gap, spread, means = best
-        if gap <= spread:
-            verdict = f"{'undefined':>9}{'undefined':>10}{'undefined':>9}"
-        else:
-            verdict = "".join(
-                f"{(means[arm] - means['none']) / gap:>9.2f}" if arm != "salience"
-                else f"{(means[arm] - means['none']) / gap:>10.2f}"
-                for arm in ("on-use", "salience", "reward"))
-        print(f"{delay:>7}{means['none']:>8.3f}{means['oracle']:>8.3f}"
-              f"{gap:>7.3f}{spread:>8.3f}{verdict}")
+        lr, got = best
+        print(f"{delay:>7}{lr:>7}{got.means['none']:>8.3f}"
+              f"{got.means['oracle']:>8.3f}{got.gap:>7.3f}{got.spread:>8.3f}"
+              f"{got.ratios['on-use']:>9.2f}{got.ratios['salience']:>10.2f}"
+              f"{got.ratios['reward']:>9.2f}")
+
+    print("\n=== ALL ASKS, the same table ===")
+    print("Repeats included, so this is short-term echo as well as retention.")
+    everything = by_cell(rows, "delay", "lr", metric="accuracy_all")
+    for delay in delays:
+        best = best_by(
+            ((lr, assess(everything, (delay, lr), ARMS, REWARD_RECALL_FLOOR))
+             for lr in rates), "reward")
+        if best is None:
+            print(f"{delay:>7}   every rate refused or missing")
+            continue
+        lr, got = best
+        print(f"{delay:>7}{lr:>7}{got.means['none']:>8.3f}"
+              f"{got.means['oracle']:>8.3f}{got.gap:>7.3f}{got.spread:>8.3f}"
+              f"{got.ratios['on-use']:>9.2f}{got.ratios['salience']:>10.2f}"
+              f"{got.ratios['reward']:>9.2f}")
 
     print("\nreward high at delay 1 and falling  -> the signal works and the")
     print("  LATENESS is the unsolved part, which is what tagging and capture")

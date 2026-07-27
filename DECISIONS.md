@@ -162,3 +162,31 @@ fades including 1.0.
 subject was broken, and both times the tests were written before the behaviour
 was understood. The pattern to watch: an assertion phrased over the *domain* of a
 quantity (which interval, which range) rather than over its *value*.
+
+## 11. Ported the four remaining summarisers, and it was a correctness fix
+
+**Chosen.** `summarise_g8_01`, `g8_03`, `g9_02`, `g9_03` now use the shared
+`tools/recovery.py` rail. `by_cell` gained a named `metric` parameter so g9-02
+can report first-asks and all-asks without a second loader.
+
+**It was not just deduplication.** Three of the four chose their learning rate by
+maximising `oracle - none`. That is the third rule in `recovery.py` — the one it
+says bit hardest — because among cells that survive the floor check, the largest
+gap is produced by whichever rate left the floor arm lowest. All three did skip
+collapsed floors first, so none was the worst version, but the bias was live.
+
+**What replaced it, and why the two differ.** g8-03 now picks on `capture-0`, the
+unbounded arm its prediction is not about. g8-01 has no such arm — `on-use` and
+`salience` are both under test — so it picks the rate where the FLOOR arm scores
+highest, which is a baseline choice and the exact opposite bias to maximising the
+gap. g9-02 and g9-03 pick by what the arm under test recovers, via `best_by`,
+which selects after the refusals rather than before them.
+
+**g8-01 also stopped hiding rows.** A cell refused for a noisy denominator used to
+be skipped entirely, so it was indistinguishable from a combination never run.
+Both are now printed, with the reason.
+
+**Left undone deliberately.** The published sweep files are not edited to match —
+they record what was reported at the time. Whether any headline actually moves
+needs the archived JSON re-summarised, and those artifacts live in Actions rather
+than the repo. Logged in BACKLOG.

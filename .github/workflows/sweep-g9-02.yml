@@ -72,7 +72,7 @@ jobs:
       - name: Combine
         run: |
           echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 12" | tee summary.txt
-          python tools/summarise_g9_02.py | tee -a summary.txt
+          python -m tools.summarise_g9_02 | tee -a summary.txt
       - name: Summary
         run: |
           echo '```' >> $GITHUB_STEP_SUMMARY

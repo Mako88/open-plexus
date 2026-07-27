@@ -13,11 +13,13 @@ those situations out.
 
 from __future__ import annotations
 
+import contextlib
+import io
 import unittest
 
 from tools.recovery import (MQAR_FLOOR, REWARD_RECALL_FLOOR, Cell, assess,
                             best_by, by_cell, margin, mean_and_error,
-                            per_seed, winner)
+                            per_seed, require, winner)
 
 ARMS = ("none", "oracle", "on-use")
 
@@ -366,6 +368,57 @@ class PairingWithinASeed(unittest.TestCase):
 
     def test_a_missing_cell_yields_no_ratios_rather_than_raising(self):
         self.assertEqual(per_seed({}, ("x",), "on-use", REWARD_RECALL_FLOOR), [])
+
+
+class ForeignRecordsInTheSameDirectory(unittest.TestCase):
+    """One stray file poisons every artifact of every sweep.
+
+    The workflows upload `out/*.json` wholesale and `load` reads whatever
+    matches. A local diagnostic's output was committed to `out/`, and from then
+    on each artifact held eight files where four were results — the foreign ones
+    carrying `epoch` and `test_bits` where a sweep expects `cap` and
+    `bits_calibrated`.
+
+    A summariser reading those either raises mid-run or, worse, computes a
+    confident number from whatever happened to survive.
+    """
+
+    def setUp(self):
+        self.mixed = [
+            {"width": 32, "cap": 1.0, "bits_calibrated": 5.9},
+            {"width": 64, "cap": 1.0, "bits_calibrated": 5.8},
+            {"epoch": 3, "train_bits": 5.8},          # a different experiment
+        ]
+
+    def test_only_the_records_with_every_field_survive(self):
+        kept = require(self.mixed, "width", "cap", "bits_calibrated")
+        self.assertEqual(len(kept), 2)
+        self.assertTrue(all("epoch" not in row for row in kept))
+
+    def test_a_record_missing_ONE_field_is_dropped(self):
+        """Partial matches are the dangerous ones: they survive a shallow check
+        and then raise on the field nobody thought to look for."""
+        rows = [{"width": 32, "cap": 1.0}]
+        self.assertEqual(require(rows, "width", "cap", "bits_calibrated"), [])
+
+    def test_clean_input_is_returned_unchanged(self):
+        """The vacuity guard. A filter that dropped everything would satisfy
+        every test above while making each summariser report nothing."""
+        clean = self.mixed[:2]
+        self.assertEqual(require(clean, "width", "cap", "bits_calibrated"),
+                         clean)
+
+    def test_it_SAYS_what_it_dropped(self):
+        """Silence here is the failure mode. A summariser that quietly discards
+        half its input still prints a confident table."""
+        with contextlib.redirect_stdout(io.StringIO()) as said:
+            require(self.mixed, "width", "cap", "bits_calibrated")
+        self.assertIn("dropped 1 of 3", said.getvalue())
+
+    def test_it_stays_quiet_when_nothing_was_dropped(self):
+        with contextlib.redirect_stdout(io.StringIO()) as said:
+            require(self.mixed[:2], "width", "cap", "bits_calibrated")
+        self.assertEqual(said.getvalue(), "")
 
 
 class GroupingRecords(unittest.TestCase):

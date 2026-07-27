@@ -658,6 +658,16 @@ MUTATIONS = [
         new="                        for _, _, key_written in reversed(pending))",
     ),
     Mutation(
+        name="foreign-records-are-dropped-in-silence",
+        breaks="the announcement, not the filtering. A summariser that quietly "
+               "discards half its input still prints a confident table, and "
+               "nobody learns that a stray file is being uploaded with every "
+               "artifact of every sweep -- which is how this was found",
+        path=RECOVERY,
+        old="    if len(kept) != len(rows):",
+        new="    if False:",
+    ),
+    Mutation(
         name="the-error-does-not-shrink-with-seeds",
         breaks="the entire reason for running more seeds. Reporting the "
                "standard DEVIATION instead of the standard error of the mean "

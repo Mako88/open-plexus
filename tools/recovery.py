@@ -51,6 +51,30 @@ def load(pattern: str | None = None) -> list[dict]:
             for record in json.load(open(path))]
 
 
+def require(rows: Iterable[dict], *fields: str) -> list[dict]:
+    """Only the records carrying every named field, saying what it dropped.
+
+    Every workflow here uploads `out/*.json` wholesale and `load` reads whatever
+    matches, so one stray file puts foreign records into a sweep's results. That
+    happened: a local diagnostic's output was committed to `out/`, and from then
+    on EVERY artifact of every sweep carried it. Each artifact held eight files
+    where four were results.
+
+    Filtered rather than refused, because a job may legitimately write more than
+    one kind of record — and **printed rather than silently dropped**, because a
+    summariser that quietly discards half its input reports a confident number
+    computed from whatever survived.
+    """
+    rows = list(rows)
+    fields = tuple(fields)
+    kept = [row for row in rows if all(field in row for field in fields)]
+    if len(kept) != len(rows):
+        print(f"  !! dropped {len(rows) - len(kept)} of {len(rows)} records "
+              f"lacking {', '.join(fields)} -- something else wrote to the same "
+              f"output directory")
+    return kept
+
+
 def by_cell(rows: Iterable[dict], *fields: str,
             metric: str = "accuracy") -> dict[tuple, dict[int, float]]:
     """One metric per seed, keyed by the swept fields and then the arm.

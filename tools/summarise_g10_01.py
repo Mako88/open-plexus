@@ -22,14 +22,14 @@ printed rather than left for a reader to notice.
 
 from __future__ import annotations
 
-from tools.recovery import load, mean_and_error
+from tools.recovery import load, mean_and_error, require
 
 #: Must match experiments/g10_01_first_language.py.
 TEMPERATURES = tuple(round(0.01 * 1.3 ** i, 4) for i in range(0, 30))
 
 
 def main() -> int:
-    rows = load()
+    rows = require(load(), "width", "cap", "bits_calibrated", "uniform")
     if not rows:
         print("no records matched")
         return 1

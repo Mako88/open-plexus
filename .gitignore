@@ -17,3 +17,8 @@ __pycache__/
 # killed mid-edit and tools/mutate.py will restore it on next start.
 *.py.bak
 .mutate.lock
+
+# Sweep output. Written by every experiment via --json and uploaded as an
+# artifact by the workflows; a stray file here gets bundled into EVERY artifact
+# of every sweep, where it is indistinguishable from a result. g10-01 caught one.
+out/

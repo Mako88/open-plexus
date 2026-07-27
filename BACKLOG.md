@@ -1034,8 +1034,49 @@ In the order they would be built. See
    generalisation failure nor a budget failure. Train and test sit on top of each
    other, so there is no overfitting either: it is not learning the text.
 
-   Whether that is architectural or width-limited is what the g10-01 re-run
-   decides.
+   **NOT width-limited.** The same curve at width 128, a fourfold wider node,
+   is the same curve to 0.005 bits on training text. Both peak at epoch 1, both
+   end 2.18 bits short of a bigram on text they have already seen.
+
+   **AND "UNDERFITTING" WAS THE WRONG WORD.**
+   [g10-03](experiments/sweeps/g10-03-what-is-the-ceiling.txt) compared the model
+   against counters carrying the SAME handicap -- allowed to see only the same
+   chunk, because the store resets between chunks:
+
+                          chunk 64   chunk 256
+       bigram (full)         3.711       3.711   all training text
+       bigram (chunk)        5.988       5.349   THIS CHUNK only
+       last-occurrence       6.221       6.113   newest successor, this chunk
+       THE MODEL             5.830       5.734
+
+   **At chunk 64 the model BEATS within-chunk counting by 0.158 bits.** It is
+   learning, up to the limit of what a per-chunk store can know, and past
+   counting within that limit. The 2.1-bit gap was measured against a counter
+   with 210,000 characters of context where the model has 64.
+
+   At chunk 256 counting overtakes it by 0.385, because counting gains 0.639
+   bits from the extra context and the model gains 0.096. So the two handicaps
+   swap places:
+
+       the per-chunk reset costs   2.277 bits at chunk 64, 1.637 at chunk 256
+       superposition costs         0.232 bits at chunk 64, 0.765 at chunk 256
+
+   **TWO THINGS TO BUILD, AND WHICH COMES FIRST IS BEING MEASURED.**
+
+   - **A store that persists across chunks** -- the largest gap on the page, and
+     the same thing the replay item asks for, arriving from a different
+     direction.
+   - **Something that keeps a distribution rather than an average.** Occurrences
+     of `e` collapse into one vector and the model gets an average successor
+     where counting keeps a distribution. A bounded set of slots does this, and
+     **the g9 line has already built one.**
+
+   [g10-04](experiments/g10_04_does_context_help_this_model.py) decides the
+   order, and it exists because the first recommendation rested on the SIZE of a
+   gap rather than on this mechanism's ability to close it. Chunk length is the
+   persistence horizon, so if the model flattens while counting climbs, then
+   persistence hands it more of what it already cannot use and the ordering above
+   is backwards.
 
    - **John's call: whether to bundle a standard corpus.** A public-domain text
      (enwik8's opening, a Gutenberg book) makes the number comparable to

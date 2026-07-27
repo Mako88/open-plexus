@@ -65,9 +65,18 @@ class TheLockStopsAConcurrentRun(unittest.TestCase):
         self.assertFalse(mutate.LOCK.exists())
 
     def test_releasing_a_lock_that_is_gone_is_not_an_error(self):
-        """`finally: release()` runs even when the claim never happened."""
+        """`finally: release()` runs even when the claim never happened.
+
+        The assertion was implicit -- the test passed by not raising -- which R4
+        in tools/check_rails.py flagged. Made explicit: releasing twice leaves no
+        lock behind, which is the property that matters, since a lock left on
+        disk stops every harness run after it.
+        """
         mutate.release_the_lock()
         mutate.release_the_lock()
+        self.assertFalse(mutate.LOCK.exists(),
+                         'a lock file survived being released twice, so a '
+                         'killed run would block every harness after it')
 
 
 class LivenessIsConservative(unittest.TestCase):

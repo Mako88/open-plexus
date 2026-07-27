@@ -73,6 +73,28 @@ class TheRailsHoldToday(unittest.TestCase):
         its reason. `--write-baseline` is the deliberate fix for the second."""
         self.assertEqual(check_rails.main([]), 0)
 
+    def test_no_test_method_asserts_nothing(self):
+        """R4 is strict, like R1, and got that way by fixing rather than
+        exempting.
+
+        On its first run it flagged four methods. Two were false positives --
+        the gradient tests in test_attention.py delegate to a shared _fd_check
+        helper, and flagging them would have been the false positive that gets a
+        check switched off, so the rail follows self._helper calls into the same
+        class. The other two were real: a consolidation test that built a model,
+        ran it and asserted nothing under a docstring naming a real property,
+        and a lock test whose assertion was implicit in not raising. Both are
+        fixed.
+        """
+        self.assertEqual(check_rails.tests_that_assert_nothing(), [],
+                         'a test method contains nothing that can fail')
+
+    def test_the_baseline_does_not_excuse_r4(self):
+        self.assertEqual(
+            check_rails.load_baseline()['R4-test-asserts-something'], [],
+            'R4 has acquired an exemption; it had two real hits and both were '
+            'fixed, so an entry here means a new test asserts nothing')
+
     def test_the_baseline_does_not_excuse_r1(self):
         self.assertEqual(
             check_rails.load_baseline()["R1-summariser-imports-recovery"], [],

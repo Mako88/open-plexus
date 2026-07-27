@@ -51,5 +51,6 @@
     "experiments/g8_02_control.py",
     "experiments/g8_02_runaway.py",
     "experiments/g9_01_answerable.py"
-  ]
+  ],
+  "R4-test-asserts-something": []
 }

@@ -16,6 +16,17 @@ and a new one has no excuse.
 written after the run is a summary, not a commitment, and a sweep with no costing
 is how "a quick control" became a ten-minute experiment on the local machine.
 
+**R4 — a test method asserts something.** A test with no assertion runs the
+code and reports success, which is the shape that passes while measuring
+nothing. BACKLOG asked for this alongside the other two.
+
+**Its reach is narrow and worth stating.** The failure that has actually cost
+this project results is a test asserting a property the quantity does not have,
+and no linter can tell a true property from a false one — four of them were
+written in a single night here and every one was caught by running it, three by a
+deliberate guard case and one by the mutation harness. R4 catches the cruder
+thing only.
+
 **R3 — an experiment goes through `experiments/harness.py`.** That is where
 `refuse_if_mutating()` lives, and it is the one place the check cannot be
 forgotten. An experiment that parses its own arguments can be run against a
@@ -43,6 +54,7 @@ Shrinking the baseline is the point. Growing it should be visible in review.
 
 from __future__ import annotations
 
+import ast
 import json
 import re
 import sys
@@ -55,6 +67,11 @@ BASELINE = ROOT / "tools" / "rails_baseline.json"
 RATIO_HINTS = ("oracle", "recovery")
 #: Sections a sweep file must carry, as line-initial headings.
 REQUIRED_SECTIONS = ("PREDICTIONS", "COST")
+#: Calls that count as asserting something. `assertRaises` appears as a context
+#: manager rather than a bare call, and `np.testing.assert_*` is how the array
+#: comparisons in this repo are written -- a check that only knew about
+#: `self.assert...` would flag most of the model tests and be switched off.
+ASSERTION_PREFIXES = ("assert", "fail")
 
 
 def summarisers_missing_the_rail() -> list[str]:
@@ -80,6 +97,61 @@ def sweeps_missing_a_section() -> dict[str, list[str]]:
     return offenders
 
 
+def _asserts(node: "ast.AST", helpers=None, seen=None) -> bool:
+    """Does this function contain anything that can fail?
+
+    Counts `self.assertX(...)`, `np.testing.assert_x(...)`, bare `assert`, and
+    `self.skipTest(...)` -- a test that skips is declaring it measures nothing
+    here, which is honest and is not the failure this rail is about.
+
+    **Follows `self._helper(...)` calls into the same class**, because the two
+    gradient tests in `test_attention.py` put their assertion in a shared
+    `_fd_check` and are among the most carefully written tests in the
+    repository. Flagging them would have been the false positive that gets a
+    check switched off. `seen` guards mutual recursion.
+    """
+    helpers = helpers or {}
+    seen = seen or set()
+    for child in ast.walk(node):
+        if isinstance(child, ast.Assert):
+            return True
+        if not isinstance(child, ast.Call):
+            continue
+        name = child.func.attr if isinstance(
+            child.func, ast.Attribute) else getattr(child.func, "id", "")
+        if name.startswith(ASSERTION_PREFIXES) or name == "skipTest":
+            return True
+        if name in helpers and name not in seen:
+            seen.add(name)
+            if _asserts(helpers[name], helpers, seen):
+                return True
+    return False
+
+
+def tests_that_assert_nothing() -> list[str]:
+    """R4. A test method whose body cannot fail."""
+    offenders = []
+    for path in sorted((ROOT / "tests").glob("*.py")):
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except SyntaxError:
+            continue
+        for holder in ast.walk(tree):
+            if not isinstance(holder, ast.ClassDef):
+                continue
+            helpers = {n.name: n for n in holder.body
+                       if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+            for node in holder.body:
+                if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    continue
+                if not node.name.startswith("test"):
+                    continue
+                if not _asserts(node, helpers):
+                    offenders.append(
+                        f"{path.relative_to(ROOT).as_posix()}::{node.name}")
+    return offenders
+
+
 def experiments_bypassing_the_harness() -> list[str]:
     """R3. An experiment script that never imports the harness."""
     offenders = []
@@ -99,6 +171,7 @@ def current() -> dict[str, list[str]]:
             sorted(sweeps_missing_a_section()),
         "R3-experiment-goes-through-harness":
             experiments_bypassing_the_harness(),
+        "R4-test-asserts-something": tests_that_assert_nothing(),
     }
 
 

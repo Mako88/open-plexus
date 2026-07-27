@@ -150,11 +150,43 @@ class TheSignalComesFromTheNextTokenNotAheadOfIt(unittest.TestCase):
         A mechanism that consolidated at the first step would be using
         information it cannot have, and the difference would be invisible in
         aggregate accuracy.
+
+        **This test asserted nothing until R4 in `tools/check_rails.py` found
+        it.** It built a model, ran it, and reported success -- the exact shape
+        that passes while measuring nothing, under a docstring naming a real
+        property. The property IS observable: consolidation cannot move the
+        prediction at step 0, because there is no previous retrieval to promote.
         """
-        tokens = np.array([4, 4])
-        model = build(1.0)
-        model.wo[:] = model.wv
-        model.run(tokens)          # must not raise, must not look back past 0
+        for tokens in (np.array([4, 4]),
+                       np.array([4, 4, 7, 4, 7, 7]),
+                       np.random.default_rng(1).integers(0, VOCAB, 30)):
+            with self.subTest(length=len(tokens)):
+                off, on = self._pair(tokens)
+                self.assertEqual(
+                    off[0], on[0],
+                    "consolidation changed the prediction at step 0, where "
+                    "there is no earlier prediction to confirm")
+
+    def test_and_consolidation_can_move_predictions_at_all(self):
+        """Guard. Without it the test above passes on a model where
+        consolidation does nothing anywhere -- which is most short sequences,
+        since it fires on a confirmed retrieval and short random streams rarely
+        have one. Two fixtures above are of exactly that kind, deliberately."""
+        tokens = np.random.default_rng(1).integers(0, VOCAB, 30)
+        off, on = self._pair(tokens)
+        self.assertFalse(
+            np.array_equal(off, on),
+            "consolidation changed no prediction anywhere on this stream, so "
+            "step 0 agreeing says nothing about step 0")
+
+    def _pair(self, tokens):
+        """The same sequence with consolidation off and on, as a decoder."""
+        runs = []
+        for rate in (0.0, 1.0):
+            model = build(rate)
+            model.wo[:] = model.wv
+            runs.append(model.run(np.asarray(tokens)))
+        return runs
 
     def test_predictions_depend_only_on_the_past(self):
         """Truncating the future must not change any earlier prediction.

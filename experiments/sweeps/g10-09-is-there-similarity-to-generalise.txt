@@ -4,12 +4,45 @@ Does this store have similarity generalisation, or nothing to generalise over?
 Script: experiments/g10_09_is_there_similarity_to_generalise.py
 Status: RUN. Arithmetic and 200 retrievals per cell. Seconds, local.
 
-ANSWER: **the first measured property where the superposed store beats a cache
-        decisively.** A half-destroyed query still retrieves the right value 93%
-        of the time; a cache returns nothing for a corrupted key at all.
+ANSWER: **RETRACTED.** The store does retrieve from a half-destroyed key at
+        0.93-0.97, and that number stands. The claim that this beats a cache
+        does not: a cache is indexed by TOKEN ID and scores 1.000 on the same
+        condition, because the corrupted key exists only inside the store.
 
-        But it is robustness to a DEGRADED QUERY, not similarity between
-        different items -- and no task in this project has ever presented one.
+        See RETRACTED below. What survives is far smaller.
+
+RETRACTED -- THE COMPARISON WAS ILL-POSED
+===========================================
+**A cache is indexed by TOKEN ID, so it never receives a corrupted key at all.**
+Measured, same store, same bindings:
+
+              query condition    store    cache
+                        exact    1.000    1.000
+    key vector half corrupted    0.970    1.000
+     WRONG TOKEN (corrupt id)    0.090    0.015
+
+The middle row is what this run measured. **The cache scores 1.000 there**,
+because the corruption exists only inside the store's own representation -- the
+token id is intact and a lookup on an intact id cannot fail.
+
+So "a cache returns nothing for a corrupted key" was comparing the store against
+a failure mode the cache does not have. The property is not discriminating; it is
+a handicap that only the store is exposed to.
+
+**What actually survives is much smaller.** With a genuinely corrupted TOKEN --
+which is what a damaged transmission produces, since `derived_keys` sends ids and
+not vectors -- the store reaches 0.090 against the cache's 0.015. Six times
+chance against chance. Real, tiny, and on inputs that are essentially garbage.
+
+**And the deployment story does not produce corrupted keys.** The wire carries a
+token id; the node regenerates the key from `(seed, token)`. There is no stage at
+which a partially damaged key vector crosses anything.
+
+The numbers below are correct. The conclusion drawn from them was not, and it was
+published to John as good news before this check was run. The check cost one
+script and should have preceded the claim -- **the same error as g10-08's churn
+measurement, three hours later.**
+
 
 
 IN PLAIN TERMS

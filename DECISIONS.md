@@ -1628,3 +1628,61 @@ not a value. And this says nothing about the other three runs — the cache stil
 wins on every task currently in the repository.
 
 565 tests, 118 mutations.
+
+## 45. I retracted entry 44 within the hour, and it was published as good news
+
+Entry 44 called corrupted-key retrieval **"the first property that survives
+measurement"** and told John the viability picture had improved. **It was wrong**
+and the check that showed it cost one script.
+
+              query condition    store    cache
+                        exact    1.000    1.000
+    key vector half corrupted    0.970    1.000
+     WRONG TOKEN (corrupt id)    0.090    0.015
+
+**A cache is indexed by TOKEN ID.** It never receives a corrupted key vector, so
+it scores 1.000 on the condition where the store scores 0.97. The corruption
+exists only inside the store's own representation. "A cache returns nothing for a
+corrupted key" compared the store against a failure mode the cache does not have.
+
+**And the deployment story cannot produce one.** `derived_keys` sends token ids;
+the node regenerates the key from `(seed, token)`. No partially damaged key
+vector ever crosses anything. The realistic damage is a WRONG id, where the store
+reaches 0.090 against the cache's 0.015 — six times chance against chance, on
+inputs that are garbage either way.
+
+### The pattern, now five deep and accelerating
+
+Every one is the same shape: **a number measured on one thing, applied to
+another.**
+
+- g10-02 applied a bigram's 210k-character context to a model holding 64
+- g10-03 applied a counter's available gain to a mechanism capturing a quarter
+- g10-04 applied a global write budget to a per-key storage problem
+- g10-08 measured churn on a task already known not to discriminate
+- **g10-09 compared the store's damaged-key score against a cache failure that
+  does not exist**
+
+g10-08's lesson was written three hours before g10-09 repeated it. I wrote *"the
+check cost minutes and should have preceded the conclusion"* and then did not run
+the check before publishing the next conclusion.
+
+### What I am changing rather than resolving to do better
+
+The instinct that caught all five was asking **what was this number measured ON**.
+That question now goes in the sweep-file template as a required section, next to
+PREDICTIONS and COST — not as a resolution, which has demonstrably failed four
+times, but as a thing a rail can check for.
+
+### What survives of note 030
+
+Property 1 is empty in both halves: no similarity between items, and no
+discriminating advantage on damaged queries. Property 2 (graceful degradation)
+was refuted by g10-08. **Properties 3 and 4 are untested**: slicing by dimension
+where the two are competitive intact, and compositional binding, which is bAbI
+task 2.
+
+The viability picture I gave John an hour ago was too optimistic and is corrected
+in the same breath as this entry.
+
+565 tests, 118 mutations.

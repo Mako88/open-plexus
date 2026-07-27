@@ -87,15 +87,22 @@ discriminate.
    > against a diagonal of 0.2522. Token 5 does not resemble token 6 and no task
    > exercising that can be built while keys are per-token.
    >
-   > *Of a degraded query:* **real, and the first property to survive
-   > measurement.** Half the query replaced by noise still retrieves the right
-   > value **93%** of the time, and three quarters destroyed still gives 0.665
-   > against a chance of 0.014. A cache has no partial credit: a wrong key is a
-   > miss.
+   > *Of a degraded query:* the store retrieves at **0.93-0.97** from a
+   > half-destroyed key, and that number stands.
    >
-   > **So the discriminating task is now specified rather than hoped for** — one
-   > where the query arrives damaged, which is what a node on a lossy link or
-   > holding a partial slice actually faces.
+   > **But the comparison was ill-posed and is RETRACTED.** A cache is indexed
+   > by TOKEN ID, so it never receives a corrupted key — it scores **1.000** on
+   > the same condition. The corruption exists only inside the store's own
+   > representation. "A cache has no partial credit" compared the store against
+   > a failure mode the cache does not have.
+   >
+   > With a genuinely corrupted TOKEN — what a damaged transmission actually
+   > produces, since `derived_keys` sends ids and not vectors — the store gets
+   > 0.090 against the cache's 0.015. Six times chance against chance: real,
+   > tiny, and on garbage inputs.
+   >
+   > **So property 1 is empty in both halves**, and no discriminating task
+   > follows from it.
 2. **Graceful degradation.** A full table evicts an entry entirely; a store gets
    uniformly noisier. Neither task removes anything.
 3. **Slicing by DIMENSION.** The whole distribution story is that a node holds

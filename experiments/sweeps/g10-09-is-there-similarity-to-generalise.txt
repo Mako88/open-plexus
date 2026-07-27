@@ -1,0 +1,116 @@
+Does this store have similarity generalisation, or nothing to generalise over?
+=============================================================================
+
+Script: experiments/g10_09_is_there_similarity_to_generalise.py
+Status: RUN. Arithmetic and 200 retrievals per cell. Seconds, local.
+
+ANSWER: **the first measured property where the superposed store beats a cache
+        decisively.** A half-destroyed query still retrieves the right value 93%
+        of the time; a cache returns nothing for a corrupted key at all.
+
+        But it is robustness to a DEGRADED QUERY, not similarity between
+        different items -- and no task in this project has ever presented one.
+
+
+IN PLAIN TERMS
+---------------
+Everything measured in the last few runs went against the blended store: a lookup
+table beat it on language, beat it on the project's own test, and beat it when a
+machine was taken away.
+
+This is the thing the table cannot do. Ask the store a question with half the
+question missing and it still gives the right answer nine times out of ten. Ask a
+lookup table with half the key wrong and it says "not found".
+
+That is a real advantage and it is the first one that has survived measurement.
+The catch is that nothing we test ever asks a damaged question.
+
+
+THE RESULT
+-----------
+1. **Is there structure in the key overlaps?** No, and by construction.
+
+       a key with itself                     0.2522
+       with any other, mean                 +0.0005
+       with any other, sd                    0.0309
+       largest off-diagonal / diagonal        0.597
+
+   `derived_keys` draws each token's key from `(seed, token)`, independently. Any
+   overlap is accidental. **There is no sense in which token 5 resembles token
+   6**, so there is no similarity BETWEEN ITEMS for the store to exploit.
+
+2. **Does a corrupted key still retrieve its value?** Yes, and strongly.
+
+       corruption   accuracy        8 bindings in one store,
+             0.00      1.000        chance is 1/73 = 0.014
+             0.10      1.000
+             0.25      1.000
+             0.50      0.930
+             0.75      0.665
+             1.00      0.100
+
+   **Half the query replaced by noise and it is still right 93% of the time.**
+   At three quarters destroyed it is still at 0.665, forty-seven times chance.
+
+
+WHAT THIS IS AND IS NOT
+-------------------------
+**IS:** graceful degradation of the QUERY. The store's answer depends on the
+whole key vector, so damaging part of it leaves the rest pointing the right way.
+A hash table has no partial credit: a wrong key is a miss, full stop. This is
+structural and a cache cannot be patched to have it.
+
+**IS NOT:** generalising between related items. That would need keys where
+similar things have similar vectors, and `derived_keys` guarantees the opposite.
+Note 030's property 1 conflated the two, and this separates them.
+
+**So the discriminating task is now SPECIFIED rather than hoped for**: one where
+the query arrives damaged. That is not artificial for this project -- it is what
+a node reading from a lossy link, or holding a partial slice, actually faces.
+Note 024's whole cost argument assumes a node reconstructs keys it does not
+store, and reconstruction is exactly where corruption enters.
+
+
+PREDICTIONS -- REGISTERED BEFORE THE RUN
+------------------------------------------
+Two questions in the script's docstring, the second conditional on the first:
+
+    is there structure in the overlaps?   -> if no, similarity generalisation
+                                             between items is unavailable and
+                                             that task cannot be built
+    does a corrupted key retrieve?        -> this is the property itself
+
+**Question 1 came back NO and question 2 came back YES**, which is the
+combination I did not anticipate: the property is real but is a different
+property from the one note 030 named. I expected them to stand or fall together.
+
+
+WHY IT WAS WORTH DOING FIRST
+------------------------------
+Note 030 proposed building a task that exercises similarity generalisation.
+**Had the store possessed none, that task could not have been built** -- and
+discovering it after building would have repeated g10-08's error exactly:
+measuring on a task that could not settle the question.
+
+The cost of asking first was one matrix multiply.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- overlaps carry structure          -> generalisation between items is on the
+                                       table. NOT OBSERVED, and cannot be while
+                                       keys are drawn per token
+- a corrupted key retrieves at
+  chance                            -> the store has no advantage here either
+                                       and property 1 is empty. NOT OBSERVED
+- accuracy holds to 100% corruption -> the measurement is broken, since a pure
+                                       noise key should retrieve nothing
+                                       particular. NOT OBSERVED: 0.100, which is
+                                       above chance but far below the rest
+
+
+COST
+-----
+Seconds. 8 bindings, one width, one seed. **The load is light** -- 8 bindings in
+a width-64 store is far from saturated, and the corruption tolerance will fall as
+the store fills. The shape is the finding; the exact percentages are not values.

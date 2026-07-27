@@ -1575,3 +1575,56 @@ rather than fixed, because `leave_at` defaults to 0 and existing results came
 through that path — changing the signature would silently alter what they mean.
 
 565 tests, 118 mutations.
+
+## 44. The first property that survives measurement, and it is not the one named
+
+Four runs in a row went against the superposed store: a cache beat it on
+language, beat it on `reward_recall`, and beat it under node loss. Note 030
+listed four properties that might separate them and put similarity generalisation
+first. [g10-09](experiments/sweeps/g10-09-is-there-similarity-to-generalise.txt)
+asked whether the store has it, **before building a task to test it** — because
+if it did not, that task could not be built, and finding out afterwards would
+have repeated g10-08's error exactly.
+
+**It turned out to be two properties wearing one name.**
+
+*Between items:* unavailable, by construction. `derived_keys` draws each token's
+key independently, so off-diagonal overlaps are accidental — mean +0.0005 against
+a diagonal of 0.2522. Token 5 does not resemble token 6, and no task exercising
+that can be built while keys are per-token.
+
+*Of a degraded query:* **real, and decisive.**
+
+    corruption   accuracy        chance = 1/73 = 0.014
+          0.00      1.000
+          0.50      0.930        half the query destroyed
+          0.75      0.665
+          1.00      0.100
+
+A cache has no partial credit — a wrong key is a miss, and no amount of
+engineering changes that. **This is the first measured advantage of the store
+that a cache structurally cannot have.**
+
+### Why it matters more than the number
+
+It converts *"find a task where the store is competitive"* from a hope into a
+specification: **a task where the query arrives damaged.** And that is not
+contrived for this project — note 024's cost argument turns on a node
+reconstructing keys it does not store, and reconstruction is exactly where
+corruption enters. A node on a lossy link is the deployment story, not a
+thought experiment.
+
+### What I did not anticipate
+
+I expected the two questions to stand or fall together — either the keys carry
+structure and the store generalises, or neither. They came back NO and YES, which
+is why asking both separately was worth the extra three lines.
+
+### The caveat, stated because the number invites overreading
+
+Eight bindings in a width-64 store is a light load, far from saturated, and
+corruption tolerance will fall as it fills. The SHAPE is the finding; 0.930 is
+not a value. And this says nothing about the other three runs — the cache still
+wins on every task currently in the repository.
+
+565 tests, 118 mutations.

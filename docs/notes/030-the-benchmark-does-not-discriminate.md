@@ -78,6 +78,24 @@ discriminate.
 1. **Generalisation by similarity.** A store returns something for a key it has
    never seen; a table returns nothing. Every query in `reward_recall` is an
    exact cue.
+
+   > **MEASURED, and this was TWO properties wearing one name.**
+   > [g10-09](../../experiments/sweeps/g10-09-is-there-similarity-to-generalise.txt).
+   >
+   > *Between items:* **unavailable.** `derived_keys` draws each token's key
+   > independently, so off-diagonal overlaps are accidental — mean +0.0005
+   > against a diagonal of 0.2522. Token 5 does not resemble token 6 and no task
+   > exercising that can be built while keys are per-token.
+   >
+   > *Of a degraded query:* **real, and the first property to survive
+   > measurement.** Half the query replaced by noise still retrieves the right
+   > value **93%** of the time, and three quarters destroyed still gives 0.665
+   > against a chance of 0.014. A cache has no partial credit: a wrong key is a
+   > miss.
+   >
+   > **So the discriminating task is now specified rather than hoped for** — one
+   > where the query arrives damaged, which is what a node on a lossy link or
+   > holding a partial slice actually faces.
 2. **Graceful degradation.** A full table evicts an entry entirely; a store gets
    uniformly noisier. Neither task removes anything.
 3. **Slicing by DIMENSION.** The whole distribution story is that a node holds

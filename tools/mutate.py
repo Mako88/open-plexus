@@ -41,6 +41,7 @@ TRANSPORT = ROOT / "openplexus" / "transport.py"
 DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 NODE_MAIN = ROOT / "openplexus" / "node_main.py"
 NGRAM = ROOT / "openplexus" / "ngram.py"
+SLOT_COST = ROOT / "tools" / "slot_cost.py"
 RECOVERY = ROOT / "tools" / "recovery.py"
 TESTBED = ROOT / "testbed" / "run.py"
 
@@ -579,6 +580,27 @@ MUTATIONS = [
         path=RECOVERY,
         old='    if means["none"] <= floor:',
         new='    if False:',
+    ),
+    Mutation(
+        name="slot-cost-forgets-the-node-is-sliced",
+        breaks="the finding that vector slots never get cheaper on a small "
+               "node. Dropping `w` makes them a fixed cost like token ids, so "
+               "the two options look alike and the ONE reason to prefer "
+               "derived keys disappears -- which is note 015's error exactly, "
+               "in a cost model for a different mechanism",
+        path=SLOT_COST,
+        old="    return vocab * slots * w",
+        new="    return vocab * slots",
+    ),
+    Mutation(
+        name="slot-cost-ignores-the-vocabulary",
+        breaks="the axis that decides everything past character level. A "
+               "word-level vocabulary is a thousand times larger and the table "
+               "reverses; a cost model blind to it would recommend the same "
+               "mechanism at every scale",
+        path=SLOT_COST,
+        old="    return vocab * slots\n\n\ndef report(",
+        new="    return slots\n\n\ndef report(",
     ),
     Mutation(
         name="the-absurdity-guard-lets-everything-through",

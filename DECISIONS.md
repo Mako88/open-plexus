@@ -819,3 +819,40 @@ sweep file says no number in the arm tables should be quoted.
 **Worth review:** whether "name the frozen axis as a risk" is worth anything at
 all, given it has now failed twice in a row. A check that refused to run a sweep
 whose fixed parameters came from a different width would have caught both.
+
+## 31. The provenance habit found a frozen learning rate in seven sweeps
+
+**What happened.** Last cycle I wrote a calibration into CLAUDE.md ending with a
+habit: when a sweep pins a value from an earlier sweep, write down which cell it
+came from, next to the pin. Applying it to g9-11 immediately surfaced that `fade`
+was also carried across configurations. Applying it to the whole line surfaced
+something larger.
+
+**`lr 0.05` is FIXED on every arm in all seven sweeps g9-05 through g9-11.** It
+was chosen for g9-03's workflow at `d_model` 32 in one process, and carried
+through every subsequent change of width, node count, capacity, fade and reach.
+The scripts can sweep it — `(0.02, 0.05, 0.1)` is their default — and every
+workflow passes `--lr 0.05` and turns it off.
+
+**Why it matters.** g8-01's re-summarisation, done earlier tonight, measured the
+learning rate moving the floor arm by a factor of three: gap 0.196 at lr 0.02
+against 0.612 at lr 0.1. That is the denominator of every recovery ratio, and
+GOALS was corrected for precisely that overstatement. So the g9 line has been
+dividing by a quantity whose scale nobody has checked at any of its
+configurations.
+
+**What I checked before writing it up.** Whether the ordinal findings survive.
+They do: every arm in a cell shares the rate, so `tag` against `window` against
+`combined` is fair whatever 0.05 turns out to be. What is at risk is the *scale*
+— "recovers a fifth of the oracle" — not the *ordering*. Note 028 separates those
+explicitly rather than implying everything is in doubt.
+
+**Not dispatched.** The fix is one deleted flag and costs 3x the jobs of whatever
+grid it joins, and the g9-11 re-run is holding the matrix. Logged as BACKLOG item
+0 with the cheapest useful version named: g9-09's shape with the rate swept,
+because node width is the axis where the floor arm moves most.
+
+**Worth review, and it is the reason to keep the habit.** Seven sweeps named
+"check the frozen axes" in their own files and none of them looked at `lr`. Two
+cycles of writing provenance down found it. That is an argument that warnings do
+not work and inventories do — and it generalises past this project.

@@ -16,6 +16,26 @@ looking for work should start here.
 
 **OPEN, in order of what would change the most:**
 
+0. **THE LEARNING RATE HAS BEEN FROZEN FOR SEVEN SWEEPS.**
+   [Note 028](docs/notes/028-the-learning-rate-has-been-frozen-for-seven-sweeps.md).
+   `lr 0.05` is pinned in g9-05 through g9-11, chosen for g9-03's configuration
+   at `d_model` 32 in one process, and carried through every change of width,
+   node count, capacity, fade and reach since.
+
+   g8-01 measured the learning rate moving the FLOOR arm — the denominator of
+   every recovery ratio — by a **factor of three** (gap 0.196 at lr 0.02 against
+   0.612 at lr 0.1). GOALS was corrected for exactly that.
+
+   **Ordinal findings survive** (every arm in a cell shares the rate), **scale
+   claims may not**. "The tag recovers a fifth of the oracle" is at risk;
+   "A beats B here and not there" is not.
+
+   The fix is deleting `--lr 0.05` from one workflow — the scripts already sweep
+   `(0.02, 0.05, 0.1)` and `best_by` already chooses among rates on an arm no
+   prediction is about. It costs 3x the jobs. Cheapest useful version: re-run
+   g9-09's shape with the rate swept, because node width is where the floor arm
+   moves most and a mis-chosen rate does the most damage.
+
 1. **A decision only John can take: fix `reward_recall`, and how?**
    [Note 027](docs/notes/027-the-task-leaks-the-answer-through-its-layout.md).
    The nearest binding before a reward is always the rewarded one, 160/160.

@@ -5,9 +5,23 @@ Script: experiments/g10_02_underfit_or_undertrained.py
 Status: RUN. One cell, width 32, chunk 64, one seed, seven points on a curve.
         Local, minutes, no runner.
 
-ANSWER: UNDERFITTING, at this width. It peaks at epoch ONE and gets worse after,
-        and its best number on text it has ALREADY SEEN is 2.1 bits short of a
-        bigram on the same text. More epochs buy nothing.
+ANSWER: epochs are not the constraint and width is not the constraint. It peaks
+        at epoch ONE, and a fourfold wider node gives the same curve.
+
+**"UNDERFITTING" WAS THE WRONG WORD, AND
+[g10-03](g10-03-what-is-the-ceiling.txt) CORRECTS IT.** This measured the model
+against a bigram fitted to all 210,000 training characters, while the model's
+store holds only the last 64 and resets between chunks. Losing that comparison
+says almost nothing.
+
+Against counting with the SAME handicap -- allowed to see only the same chunk --
+the model at chunk 64 is **0.158 bits BETTER**, and 0.391 better than keeping
+only the most recent successor. It is learning, up to the limit of what a
+per-chunk store can know, and beyond counting within that limit.
+
+The 2.1 bits below is real arithmetic and the wrong comparison. What survives
+unchanged is the part this run was actually for: **epochs are not the binding
+constraint**, and (below) neither is width.
 
 
 IN PLAIN TERMS

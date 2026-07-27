@@ -1,0 +1,112 @@
+What is actually stopping it?
+=============================
+
+Script: experiments/g10_03_what_is_the_ceiling.py
+Status: RUN, at chunk 64 and chunk 256. Pure counting -- no model, no training,
+        seconds, local.
+
+ANSWER: most of the "underfitting" is the PER-CHUNK RESET, not a failure to
+        learn. At chunk 64 the model BEATS counting inside the same window. At
+        chunk 256 counting overtakes it, and the thing that overtakes it is
+        superposition.
+
+
+IN PLAIN TERMS
+---------------
+The device was being compared against a counter that had read two hundred
+thousand characters, while the device itself only ever remembers the last sixty
+four. Losing that comparison says almost nothing about the device.
+
+So this builds counters with the same handicap -- allowed to see only the same
+short window -- and asks where the device lands against those instead.
+
+Against a counter with its own memory limits, the device is **better**. The
+enormous gap to the full counter is the price of forgetting between windows.
+
+But when the window is made longer, the counter improves quickly and the device
+barely moves. That is the real limit, and it is a specific one.
+
+
+PREDICTIONS -- A DECISION RULE, WRITTEN BEFORE THE RUN
+------------------------------------------------------------------
+No numbers were predicted -- this is counting, and guessing counts is not
+informative. What was registered in advance, in the script's docstring before it
+was run, is the rule for reading the answer:
+
+    matching `bigram (chunk)`      -> the per-chunk reset is the whole story
+    matching `last-occurrence`     -> superposition is costing the distribution
+    below both                     -> the limit is the readout
+
+That rule is what makes this a measurement rather than a description, and it is
+recorded here as written rather than reconstructed.
+
+
+THE RESULT
+-----------
+                       chunk 64     chunk 256    what it may know
+    uniform               6.426         6.426    nothing at all
+    unigram               4.756         4.756    base rates, all training text
+    bigram (full)         3.711         3.711    transitions, all training text
+    bigram (chunk)        5.988         5.349    transitions, THIS CHUNK only
+    last-occurrence       6.221         6.113    newest successor, this chunk
+    ------------------------------------------------------------------------
+    THE MODEL             5.830         5.734    measured at each chunk
+
+**At chunk 64 the model beats within-chunk counting by 0.158 bits** and beats
+keeping-only-the-newest by 0.391. Given what it is allowed to remember, it is
+doing better than counting, not worse.
+
+**At chunk 256 counting overtakes it by 0.385 bits.** Between the two chunk
+lengths, counting improves by **0.639** bits and the model by **0.096**.
+
+So the two handicaps swap places as context grows:
+
+    the per-chunk reset costs   2.277 bits at chunk 64, 1.637 at chunk 256
+    superposition costs         0.232 bits at chunk 64, 0.765 at chunk 256
+
+**Superposition is the binding limit as soon as there is enough context to
+superpose.** Several past occurrences of `e` collapse into one vector, and the
+model gets an average successor where counting keeps a distribution. At a short
+window there is little to collapse and the model's trained readout wins; at a
+longer one the collapse costs more than the readout gains.
+
+
+WHAT THIS CORRECTS
+-------------------
+[g10-02](g10-02-underfit-or-undertrained.txt) concluded *"it is not learning the
+text"*. That was measured against `bigram (full)`, which sees 210,000 characters
+of context where the model sees 64. **It is misleading and it is corrected
+there**: the model is learning, up to the limit of what a per-chunk store can
+know, and at chunk 64 it exceeds counting within that limit.
+
+What survives from g10-02 unchanged: epochs are not the constraint, and width is
+not the constraint. Both were measured and both still hold.
+
+
+WHAT TO BUILD, IN ORDER
+-------------------------
+1. **A store that persists across chunks.** Worth up to 1.6-2.3 bits, which is
+   the single largest number on this page. It is also what BACKLOG's replay item
+   is about, arriving from a completely different direction.
+2. **Something that keeps a distribution rather than an average.** Worth 0.77
+   bits at chunk 256 and growing with context. This is what a bounded set of
+   slots does -- and the g9 line has already built one.
+
+Neither of these is a tuning change and neither is about node size.
+
+
+COST
+-----
+Seconds, local, no runner. Counting only.
+
+
+A NUMBER THAT WAS NEARLY WRONG
+--------------------------------
+The first version carried ONE model number, 5.83, measured at chunk 64, and
+applied it at chunk 256 as well -- where the true value is 5.734 and the verdict
+flips from "beats counting" to "loses to counting". The comment above it said
+where it came from, and that did not help: a caveat next to a number does not
+attach to the number when the number is used elsewhere.
+
+It is now a table keyed by chunk, and the script REFUSES a chunk it has no
+matching measurement for rather than reaching for the nearest one.

@@ -120,6 +120,54 @@ person will try the same mutation.
 
 ---
 
+## Meta-tests: what is worth checking about the tests themselves
+
+John asked whether the suite could police its own quality — duplication, methods
+too long or over-parameterised, tests that do not validate what they claim.
+Split by whether it would catch anything real here.
+
+**Already built, and it is the strongest one.** `tools/mutate.py` is exactly
+"tests that do not validate what they claim": 95 mutations, each a plausible
+wrong version of a mechanism, each required to make the suite fail. It caught two
+real things in a single afternoon — a stale target the source had moved out from
+under, and a test that checked refused cells were excluded from selection while
+missing that selecting on the gap is wrong among cells that *pass*. Nothing
+generic would have found either.
+
+**Worth building.**
+
+- **Duplication across summarisers and experiments.** AST-normalise function
+  bodies (strip names, literals, comments), hash, flag near-identical bodies in
+  different files. This would have found the five copied refusals *before* one of
+  them lost its floor check. Restrict it to `tools/` and `experiments/`, where
+  copy-paste is the actual working style.
+- **Repo-specific rails**, which are where the value is, because generic lint is
+  a solved problem and these encode the failures that have already cost results:
+  every summariser computing a recovery ratio imports `tools.recovery`; every
+  sweep file has a PREDICTIONS section and a COST section; every experiment goes
+  through `experiments/harness.py` so `refuse_if_mutating()` cannot be skipped;
+  every workflow under `sweep-*.yml` is `workflow_dispatch` only (this one exists
+  as `tools/check_workflows.py` and is the model for the rest).
+- **A test-quality check with teeth**: flag test methods with no assertion at
+  all, and ones whose only assertion is `assertIsNotNone` or `assertTrue` on a
+  call result. Both are shapes that pass while measuring nothing.
+
+**Not worth building as written.** Method length and parameter count are style
+rules, and a fixed threshold turns into noise that gets suppressed. If they go in
+at all they should be a **ratchet** — fail only when a number gets worse than
+today's value, recorded in a checked-in baseline. `run()` currently takes eight
+parameters and every one of them earns its place; a rule that failed on it would
+be wrong, and a rule tuned to permit it would permit nine.
+
+**The honest caveat:** none of these can check the thing that has actually gone
+wrong most often here, which is a test that asserts a property the quantity does
+not have. The scale-invariance meaning test asserted something false about
+softmax and failed on first run; no linter can tell a true property from a false
+one. Mutation testing is the closest available substitute and it is already in
+place.
+
+---
+
 ## Port the last four summarisers onto the shared rail
 
 `tools/recovery.py` now holds the two refusals, `tools/summarise_g8_02.py` is

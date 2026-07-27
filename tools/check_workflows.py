@@ -183,7 +183,19 @@ def silent_failures(name: str, text: str, needs) -> list[str]:
                      for token in group.split() if not token.startswith("-")}
         for dotted, script in TOOL_INVOCATION.findall(body):
             reference = dotted or script
-            for package in sorted(needs(reference)):
+            # `needs` returns None for a reference that resolves to no file. A
+            # missing module otherwise reads as "imports nothing", so a renamed
+            # summariser would switch this check off in the same change that
+            # broke the workflow -- which the rename to
+            # summarise_scaling_exponent did, and two tests caught.
+            required = needs(reference)
+            if required is None:
+                offenders.append(
+                    f"{name}: job `{job}` runs {reference}, which does not "
+                    f"exist -- the step will die and nothing here can check "
+                    f"what it needed installed")
+                continue
+            for package in sorted(required):
                 if package.lower() not in installed:
                     offenders.append(
                         f"{name}: job `{job}` runs {reference}, which imports "
@@ -192,12 +204,17 @@ def silent_failures(name: str, text: str, needs) -> list[str]:
     return offenders
 
 
+def packages_needed(reference: str) -> set[str] | None:
+    """What a tool needs installed, or None if the reference resolves nowhere."""
+    module = module_for(reference)
+    return third_party_imports(module) if module.is_file() else None
+
+
 def silently_failing_steps() -> list[str]:
     """`silent_failures` over every workflow in the tree."""
     return [problem for path in sorted(WORKFLOWS.glob("*.yml"))
             for problem in silent_failures(
-                path.name, path.read_text(encoding="utf-8"),
-                lambda reference: third_party_imports(module_for(reference)))]
+                path.name, path.read_text(encoding="utf-8"), packages_needed)]
 
 
 def refuse_if_mutating() -> None:

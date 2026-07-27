@@ -103,7 +103,7 @@ jobs:
         run: |
           set -o pipefail
           echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 12" | tee summary.txt
-          python -m tools.summarise_g11_04 | tee -a summary.txt
+          python -m tools.summarise_scaling_exponent | tee -a summary.txt
       - name: Summary
         if: always()
         run: |

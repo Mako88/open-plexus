@@ -75,29 +75,37 @@ EPOCHS = 2
 #: from the cheapest cell that had been run locally, which is exactly the wrong
 #: one.
 #:
-#: Capping the stream is the right fix here rather than a compromise: this
+#: Capping the stream looked like the right fix rather than a compromise: this
 #: experiment fits loss against WIDTH at fixed data, which is a standard
 #: model-size scaling curve, and holding the data fixed is what makes the
 #: exponent comparable across arms. What it forfeits is any claim about
 #: data scaling, which this sweep was never going to make.
+#:
+#: **That reasoning was wrong, and the sweep it produced answered nothing.**
+#: The backprop control reached 4.20 bits by width 16 and did not improve —
+#: fitted exponent -0.0021, R2 0.13. It was DATA-limited, not width-limited, so
+#: the reference had no trend to compare against and the whole matrix was spent
+#: on an unresolvable comparison. This is the default, not the value: `--chars`
+#: is the axis g11-05 moves, and 250_000 is kept here so g11-04 reproduces.
 TRAIN_CHARS = 250_000
 
 
-def split(corpus, chunk: int):
+def split(corpus, chunk: int, chars: int = TRAIN_CHARS):
     """Fitting text, calibration text, test text — the same rule as g10-01."""
-    stream = corpus.train[0][:TRAIN_CHARS]
+    stream = corpus.train[0][:chars]
     cut = int(len(stream) * 0.8)
     return (chunks((stream[:cut],), chunk), chunks((stream[cut:],), chunk),
             chunks(corpus.test, chunk))
 
 
-def ours(corpus, width: int, chunk: int, seed: int, context: bool) -> float:
+def ours(corpus, width: int, chunk: int, seed: int, context: bool,
+         chars: int = TRAIN_CHARS) -> float:
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=corpus.vocab_size, d_model=width, lr=0.05, key_scale=0.5,
         decay=0.997, derived_keys=True, context_keys=context, memory_cap=5.0,
         seed=seed))
     model.wo[:] = model.wv
-    fitting, calibration, test = split(corpus, chunk)
+    fitting, calibration, test = split(corpus, chunk, chars)
     rng = np.random.default_rng(seed)
     order = np.arange(len(fitting))
     for _ in range(EPOCHS):
@@ -115,7 +123,8 @@ def ours(corpus, width: int, chunk: int, seed: int, context: bool) -> float:
     return bits(test_scores, test_targets, temperature)
 
 
-def backprop(corpus, width: int, chunk: int, seed: int) -> float:
+def backprop(corpus, width: int, chunk: int, seed: int,
+             chars: int = TRAIN_CHARS) -> float:
     """The reference. Softmax attention, trained by actual backpropagation.
 
     Deliberately given every advantage our model does not have: a real
@@ -125,7 +134,7 @@ def backprop(corpus, width: int, chunk: int, seed: int) -> float:
     model = ShiftedAttention(AttentionConfig(
         vocab_size=corpus.vocab_size, d_model=width, seed=seed))
     optimiser = Adam(model.params, lr=3e-3)
-    fitting, _, test = split(corpus, chunk)
+    fitting, _, test = split(corpus, chunk, chars)
     rng = np.random.default_rng(seed)
     order = np.arange(len(fitting))
     for _ in range(EPOCHS):
@@ -151,19 +160,30 @@ def backprop(corpus, width: int, chunk: int, seed: int) -> float:
 
 
 def run_one(args) -> list[dict]:
-    seed, width, chunk, which, arm = args
+    seed, width, chunk, which, arm, chars = args
     corpus = corpus_named(which)
+    available = len(corpus.train[0])
+    if chars > available:
+        raise SystemExit(
+            f"asked for {chars} training characters and the corpus holds "
+            f"{available}. A cell silently truncated to the corpus length is a "
+            f"cell at a different point on the axis than the grid says.")
     if arm == "backprop":
-        value = backprop(corpus, width, chunk, seed)
+        value = backprop(corpus, width, chunk, seed, chars)
     else:
-        value = ours(corpus, width, chunk, seed, arm == "context")
+        value = ours(corpus, width, chunk, seed, arm == "context", chars)
     broken = absurd(value, corpus.vocab_size)
     if broken:
-        raise SystemExit(f"{arm} width {width} seed {seed}: {broken}")
+        raise SystemExit(f"{arm} width {width} chars {chars} seed {seed}: {broken}")
+    # `condition` is written from what actually ran, so a summariser can assert
+    # a run's identity from the DATA rather than from the directory it came out
+    # of -- CLAUDE.md rule 11b, bought by g9-11's near-miss.
     return [{"seed": seed, "width": width, "chunk": chunk, "arm": arm,
-             "bits_calibrated": value, "vocab_size": corpus.vocab_size,
+             "chars": chars, "bits_calibrated": value,
+             "vocab_size": corpus.vocab_size,
              "uniform": uniform_bits(corpus.vocab_size),
-             "corpus": which or "notes"}]
+             "corpus": which or "notes",
+             "condition": f"{arm}-w{width}-c{chars}-s{seed}"}]
 
 
 def main() -> int:
@@ -172,7 +192,8 @@ def main() -> int:
     width = args.width if args.width else 64
     chunk = int(args.scale) if args.scale is not None else 256
     arm = args.mode or "single"
-    jobs = [(seed, width, chunk, args.corpus, arm) for seed in seeds]
+    chars = args.chars if args.chars else TRAIN_CHARS
+    jobs = [(seed, width, chunk, args.corpus, arm, chars) for seed in seeds]
     records = [r for batch in harness.spread(run_one, jobs, args.workers)
                for r in batch]
     if args.json:

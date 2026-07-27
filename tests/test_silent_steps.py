@@ -105,12 +105,28 @@ jobs:
             check_workflows.silent_failures("x.yml", NO_INSTALL, needs_nothing),
             [])
 
+    def test_a_tool_that_does_not_exist_is_reported(self):
+        """A reference resolving to no file reads as 'imports nothing', so a
+        rename would switch the dependency check off in the same change that
+        broke the workflow. That is not hypothetical: renaming
+        summarise_g11_04 to summarise_scaling_exponent turned two tests in this
+        file red, and this is the case that would have caught the workflow."""
+        problems = check_workflows.silent_failures(
+            "x.yml", CLEAN, lambda reference: None)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("does not exist", problems[0])
+
+    def test_a_real_reference_resolves_and_a_renamed_one_does_not(self):
+        self.assertIsNotNone(
+            check_workflows.packages_needed("tools.summarise_scaling_exponent"))
+        self.assertIsNone(check_workflows.packages_needed("tools.summarise_g11_04"))
+
 
 class ReadingTheImportsOffTheTree(unittest.TestCase):
 
     def test_numpy_is_found_in_the_summariser_that_imports_it(self):
         found = check_workflows.third_party_imports(
-            check_workflows.module_for("tools.summarise_g11_04"))
+            check_workflows.module_for("tools.summarise_scaling_exponent"))
         self.assertEqual(found, {"numpy"})
 
     def test_a_pure_stdlib_tool_needs_nothing(self):
@@ -120,12 +136,12 @@ class ReadingTheImportsOffTheTree(unittest.TestCase):
             set())
 
     def test_an_import_reached_through_a_repo_module_still_counts(self):
-        """`summarise_g11_04` imports `tools.recovery`, which is stdlib-only —
+        """The summariser imports `tools.recovery`, which is stdlib-only —
         but the walk has to follow repo-local imports, or a summariser that
         reaches numpy through a helper reports as needing nothing."""
         seen: set = set()
         check_workflows.third_party_imports(
-            check_workflows.module_for("tools.summarise_g11_04"), seen)
+            check_workflows.module_for("tools.summarise_scaling_exponent"), seen)
         self.assertIn(check_workflows.module_for("tools.recovery"), seen)
 
 

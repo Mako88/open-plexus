@@ -129,6 +129,13 @@ def parse_args(description: str) -> argparse.Namespace:
                              "it unbounded, which is the default in the model "
                              "and which lets a long sequence with dense "
                              "supervision drive the readout to 1e72 (g10-01)")
+    parser.add_argument("--chars", type=int, default=None,
+                        help="training characters -- the DATA axis. g11-04 "
+                             "capped this at 250k to fit its budget and that "
+                             "cap is what made its backprop control flat: the "
+                             "baseline was data-limited, not width-limited, so "
+                             "the reference could not scale and the sweep "
+                             "resolved nothing")
     parser.add_argument("--fade", type=float, default=None,
                         help="per-step multiplier ageing a tag's marks toward "
                              "eviction; 1.0 never ages them")

@@ -1,0 +1,96 @@
+name: sweep-g11-05-does-our-loss-fall-with-data-like-backprops
+
+# THE RE-RUN OF g11-04 ON THE AXIS THAT CAN ANSWER IT.
+#
+# g11-04 swept WIDTH at 250k characters and was inadmissible: the backprop
+# control fitted b = -0.0021 with an R2 of 0.13. The baseline reaches 4.20 bits
+# by width 16 and does not improve, because 250k characters is not enough text
+# for a wider attention model to have more to learn -- it was DATA-limited, not
+# width-limited. And 250k was exactly the cap introduced to stop the sweep
+# timing out the way g11-03 had, so the cost fix removed the phenomenon.
+#
+# Data is also the axis Filipovich et al. (arXiv:2210.14593) actually used.
+#
+# PREDICTIONS (full text and refutation conditions in the sweep file):
+#   P1  THE CONTROL FIRES -- backprop |b| > 0.02 on data. Admissibility.
+#   P2  both our arms improve with data, |b| > 0.02. No rank argument protects
+#       this axis the way note 035 protects the width axis.
+#   P3  our arms are shallower than backprop -- the Filipovich shape.
+#   P4  the single-token arm flattens at the top and the context arm does not:
+#       a bigram ceiling cannot absorb more text, a trigram ceiling can.
+#
+# COST: 15 jobs, 5 data points x 3 arms, two seeds each on two workers. Estimated
+# from the MOST EXPENSIVE CELL per g11-03's rule: `single` at 1,000,000
+# characters is ~640s per seed locally, ~11 min wall for the pair, ~33 min at a
+# 3x runner allowance, against a 300-minute timeout.
+#
+# Width is pinned at 64, from g11-04's own grid at 250k characters, where all
+# three arms were measured: backprop 4.157, context 5.759, single 5.505. The
+# 250,000 cell here has a published value to land on -- disagreement there is a
+# dispatch error, not a finding.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  data:
+    strategy:
+      fail-fast: false
+      matrix:
+        chars: [62500, 125000, 250000, 500000, 1000000]
+        arm: [single, context, backprop]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: ${{ matrix.arm }} on ${{ matrix.chars }} characters
+        run: python experiments/g11_04_scaling_exponent.py --corpus shakespeare --width 64 --chars ${{ matrix.chars }} --scale 128 --mode ${{ matrix.arm }} --workers 2 --json out/X-${{ matrix.arm }}-${{ matrix.chars }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g11-05-${{ matrix.arm }}-${{ matrix.chars }}
+          path: out/*.json
+
+  aggregate:
+    needs: [data]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      # summarise_scaling_exponent fits the exponent with numpy. g11-04's
+      # aggregate job omitted this, the summariser died at import, and `tee`
+      # returned 0 -- a green step with an empty summary.
+      - run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g11-05-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 15" | tee summary.txt
+          python -m tools.summarise_scaling_exponent | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g11-05-summary
+          path: |
+            summary.txt
+            out/*.json

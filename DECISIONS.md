@@ -414,3 +414,33 @@ predictions have to be registered before a run. BACKLOG carries the cheap
 pre-dispatch control that should come first: if the union does not capture
 strictly more than either arm, the implementation is wrong before any recovery
 number is spent on it.
+
+## 19. Built the duplication check, and it refuted the reason for building it
+
+**Chosen.** With g9-08 queued and the gating line blocked on it, built the
+remaining named meta-test from BACKLOG rather than opening a new investigation.
+
+**It does not do what BACKLOG said it would.** The item justified itself as
+"would have found the five copied refusals before one of them lost its floor
+check". Run over the pre-port tree it finds zero of them — those copies had
+already diverged, and divergence is what defeats a structural hash. So it catches
+copies that have *not* drifted, which are the harmless ones. Prevention, not
+detection.
+
+**Chosen: keeping it anyway, with the claim corrected in three places.** It
+caught `load_baseline` copied between it and `check_rails.py` within minutes of
+being written — by me, while writing a tool for finding copies. That is the
+prevention case, demonstrated rather than argued. If the morning view is that
+prevention alone does not earn a CI step, deleting it costs one line in
+checks.yml and one in CLAUDE.md.
+
+**The threshold was set by measurement.** At 5 statements it found nothing in
+`tools/`; at 4 it found my copy. A threshold that misses the copy inside the
+copy-detector is too high, and that is the whole justification for the number.
+
+**What I want reviewed.** This is the second tool tonight whose stated purpose
+turned out wider than its reach — `--verify` was the first, and it was fine
+because its purpose was narrow to begin with. The pattern worth watching is that
+BACKLOG entries carry justifications written before anything was built, and those
+justifications are claims about behaviour like any other. Two have now been
+tested and one was false.

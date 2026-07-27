@@ -115,10 +115,26 @@ isolated — where bindings lose *different* numbers of fades and the effect is 
 reweighting rather than a rescale. Sketched by hand: with writes at
 `{10, 11, 60}`, the early pair lose two fades each and the lone write loses one.
 
-**Decide it before adding the mutation back:** if asymmetric masks make it
-visible, write that test and restore the mutation. If nothing makes it visible,
-it is a no-op and does not belong in the harness — record why, because the next
-person will try the same mutation.
+**DECIDED: it is a no-op, and the asymmetric-mask guess was wrong.**
+
+Take consecutive writes at `a` and `b`. The mechanism fades on masked steps,
+which in `(a, b]` are `(a, b)` — `b - a - 1` of them. The mutation fades where
+the PREVIOUS step was masked, which in `(a, b]` are `(a + 1, b]` — also
+`b - a - 1`. **The total decay applied before every write is identical, whatever
+the mask.** Between writes the two stores differ by at most one factor of
+`decay`, and a uniform rescale cannot move an argmax.
+
+So the branch is genuinely unobservable through predictions and the mutation does
+not belong in the harness. `test_shifting_the_fade_guard_by_one_step_is_a_NO_OP`
+records it over three mask shapes, so the next person does not rediscover it.
+
+The route to that answer is worth keeping too: the first test written for this
+compared two different MASKS, which changes what is stored rather than which step
+the guard reads. It passed under the mutation. No black-box comparison can see
+this branch — the mutation shifts the fades while leaving the writes in place,
+and no mask reproduces that pairing — so it took a reference implementation of
+the update rule, which is now in the test file and is the only check here that
+reads the fade schedule directly.
 
 ---
 

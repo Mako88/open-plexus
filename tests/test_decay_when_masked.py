@@ -122,6 +122,84 @@ class ItReweightsEarlyAgainstLate(unittest.TestCase):
             "the gaps between them faded, so the flag is not reweighting "
             "anything")
 
+    def _reference(self, model, tokens, mask, decay, fade_on):
+        """The update rule, written out, so the fade SCHEDULE is inspectable.
+
+        No black-box comparison can see which step the fade guard reads: the
+        mutation shifts the fades by one while leaving the writes where they
+        are, and no mask reproduces that pairing. A comparison between two masks
+        changes what is STORED, which is a different thing and is what a first
+        attempt at this test measured -- it passed under the mutation, which is
+        how the mistake surfaced.
+
+        `fade_on` picks the step the masked fade is decided by: `t` is the
+        mechanism, `t - 1` is the mutation.
+        """
+        memory = np.zeros((WIDTH, WIDTH))
+        predictions = np.zeros(len(tokens), dtype=np.int64)
+        for t, token in enumerate(tokens):
+            if t and fade_on(t) and decay < 1.0:
+                memory = memory * decay
+            if t and mask[t]:
+                if decay < 1.0:
+                    memory = memory * decay
+                memory = memory + np.outer(model.wv[token],
+                                           model.wk[tokens[t - 1]])
+            predictions[t] = int((model.wo @ (memory @ model.wk[token])).argmax())
+        return predictions
+
+    def test_shifting_the_fade_guard_by_one_step_is_a_NO_OP(self):
+        """BACKLOG's open question, settled: it is a no-op, for ANY mask.
+
+        The fade `decay_when_masked` adds sits behind `not store[t]`. A mutation
+        pointing it at `store[t - 1]` survives the whole suite, and BACKLOG
+        guessed that an ASYMMETRIC mask would expose it -- some writes adjacent,
+        some isolated, so bindings lose different numbers of fades. **That guess
+        is wrong and the counting shows why.**
+
+        Take consecutive writes at `a` and `b`. The mechanism fades on masked
+        steps, which in `(a, b]` are the steps `(a, b)` -- `b - a - 1` of them.
+        The mutation fades where the PREVIOUS step was masked, which in `(a, b]`
+        are `(a + 1, b]` -- also `b - a - 1`. **The total decay applied before
+        every write is identical, whatever the mask.**
+
+        Between writes the two stores differ by at most one factor of `decay`,
+        and a uniform rescale cannot move an argmax -- the same fact
+        `test_fades_after_every_write_are_invisible` rests on.
+
+        So `masked-fade-reads-the-previous-step` was REMOVED from
+        tools/mutate.py rather than kept as a failing check. This test exists so
+        the next person does not spend the afternoon rediscovering it: the
+        branch is genuinely untestable through predictions, and that is a fact
+        about the mechanism, not a hole in the suite.
+        """
+        for name, writes in (("adjacent pair and a lone write", [10, 11, 60]),
+                             ("uneven runs", [5, 6, 7, 40, 90, 91]),
+                             ("one write only", [30])):
+            with self.subTest(name):
+                mask = np.zeros(len(TOKENS), dtype=bool)
+                mask[writes] = True
+                model = build(decay_when_masked=True)
+                np.testing.assert_array_equal(
+                    self._reference(model, TOKENS, mask, 0.97,
+                                    fade_on=lambda t: not mask[t]),
+                    self._reference(model, TOKENS, mask, 0.97,
+                                    fade_on=lambda t: not mask[t - 1]),
+                    f"{name}: the two fade schedules disagreed, so the branch "
+                    f"IS observable and the mutation should be restored")
+
+    def test_the_model_matches_the_update_rule_written_out(self):
+        """And the reference is worth having on its own: it is the only check
+        here that reads the fade schedule rather than a difference between two
+        configurations."""
+        mask = np.zeros(len(TOKENS), dtype=bool)
+        mask[[10, 11, 60]] = True
+        model = build(decay_when_masked=True)
+        np.testing.assert_array_equal(
+            model.run(TOKENS, store=mask),
+            self._reference(model, TOKENS, mask, 0.97,
+                            fade_on=lambda t: not mask[t]))
+
     def test_both_masks_store_the_same_number_of_steps(self):
         """Otherwise the pair above differ in how much they stored, not in
         where the fades fell, and the comparison says nothing."""

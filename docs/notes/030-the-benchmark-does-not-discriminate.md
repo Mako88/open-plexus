@@ -93,6 +93,29 @@ key-sharded table loses those keys completely. **That is a measurable difference
 between the two architectures, on machinery that exists**, and no benchmark in
 this project currently measures it.
 
+> **MEASURED, AND THE IMPLICATION ABOVE IS REFUTED.**
+> [g10-08](../../experiments/sweeps/g10-08-which-degrades-better.txt):
+>
+>              structure    intact   one node lost    fall   relative
+>       dimension-sliced     0.656           0.469  -0.188        29%
+>       key-sharded (24)     1.000           0.776  -0.224        22%
+>
+> The MECHANISM is as described — the store falls smoothly, the table loses a
+> quarter of its keys outright. **The outcome is the opposite of what this
+> section implies.** The cache ends far higher, and it also falls by a smaller
+> *fraction* of what it had. "Graceful" was doing no work: the store is not even
+> relatively more robust.
+>
+> **And this section had the ordering wrong.** `reward_recall` was already known
+> not to discriminate, so a cache starting 0.34 ahead is still ahead after both
+> lose something. Churn can only be a tiebreaker on a task where the two are
+> competitive INTACT, and no such task exists here. Churn was put first because
+> the machinery existed — and machinery existing is not the same as the
+> measurement being interpretable.
+>
+> The corrected ordering: **(1) find a task where the superposed store is
+> competitive intact, (2) then ask whether it degrades better.**
+
 The fourth is bAbI task 2, already on BACKLOG as the first item needing a new
 mechanism rather than a new measurement.
 

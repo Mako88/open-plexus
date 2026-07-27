@@ -1524,3 +1524,54 @@ both known, and the g9 line's tag is an analogy for it rather than an
 implementation of it.
 
 564 tests, 118 mutations.
+
+## 43. The churn measurement landed and refuted the claim I made to justify it
+
+[Note 030](docs/notes/030-the-benchmark-does-not-discriminate.md) named four
+properties that would discriminate a superposed store from a cache, put **churn**
+first because the machinery already existed, and asserted how it would come out.
+[g10-08](experiments/sweeps/g10-08-which-degrades-better.txt) measured it:
+
+             structure    intact   one node lost    fall   relative
+      dimension-sliced     0.656           0.469  -0.188        29%
+      key-sharded (24)     1.000           0.776  -0.224        22%
+
+The **mechanism** was as described: the store falls smoothly, the table loses a
+quarter of its keys outright. The **outcome** is the opposite. The cache ends far
+higher and falls by a smaller *fraction* of what it had, so the store is not even
+relatively more robust. "Graceful" was doing no work in that sentence.
+
+### The more useful finding is that the measurement was premature
+
+`reward_recall` was already known not to discriminate — g10-07's 48-integer table
+answers it perfectly. A cache starting 0.34 ahead is still ahead after both lose
+something, so this cannot show dimension-slicing is worse in general. It shows
+churn does not rescue the store on a task where it was already losing.
+
+**Churn is only a tiebreaker where the two are competitive intact, and no such
+task exists in this project.** I put it first because the machinery existed.
+Machinery existing is not the same as the measurement being interpretable, and
+that is the lesson worth keeping.
+
+Corrected ordering, now at the top of BACKLOG: **(1) a task where the store is
+competitive intact, (2) then churn.** That makes the `reward_recall` decision the
+one that gates everything rather than something to defer.
+
+### Four attempts, and the fourth had no guard
+
+1. Untrained readout — scored 0.031, below the trivial floor. Caught by the floor
+   guard added for exactly this.
+2. Wrong test format — trained on `build()`, evaluated on `dataset()`. Same
+   length, same query positions, half the accuracy. Floor guard again.
+3. Wrong width — `d_model` 32 really is about 0.25; the 0.65 quoted everywhere is
+   node width 64. Caught by cross-checking a number written down elsewhere.
+4. **`absent` without `leave_at` is silently ignored.** Reported a fall of exactly
+   +0.000, which I read as robustness. **No guard caught this.** It took checking
+   whether any prediction changed at all — 0 of 3072 had.
+
+The fourth is the one to remember: every summary statistic looked reasonable and
+only the raw predictions showed a parameter had never applied. Pinned as a test
+rather than fixed, because `leave_at` defaults to 0 and existing results came
+through that path — changing the signature would silently alter what they mean.
+
+565 tests, 118 mutations.

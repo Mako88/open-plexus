@@ -97,7 +97,76 @@ absolute numbers worth quoting. It is cheap and it is in BACKLOG.
 
 SECOND RUN, at `slots` 16
 --------------------------
-Status: DISPATCHED. Same grid, same predictions, capacity corrected.
+Status: RUN. 15 of 15 cells, no refusals, reach chosen INTERIOR.
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30249953943
+
+ANSWER: all five predictions confirmed, and the one the first run refuted failed
+        only because of the mistuned capacity.
+
+THE RESULT
+-----------
+    tag        d1      d8     d20     (never reads the reach; flat by design)
+     any    +0.24   +0.23   -0.14
+
+    reward     d1      d8     d20
+       1     +0.26   -1.53   -1.61
+       2     +0.25   -1.53   -1.62
+       4     +0.25   -1.54   -1.62
+       8     +0.22   +0.23   -1.62
+      16     +0.24   +0.23   -1.63
+
+    combined   d1      d8     d20
+       1     +0.24   +0.23   -0.12
+       4     +0.24   +0.23   -0.13
+       8     +0.24   +0.23   -0.13
+      16     +0.23   +0.23   -0.13
+
+    combined - reward, same cell
+       1     -0.02   +1.76   +1.48
+       4     -0.01   +1.77   +1.49
+       8     +0.02   +0.00   +1.50
+      16     -0.01   +0.01   +1.50
+
+**THE TRIPWIRE FIRED IN THE GOOD DIRECTION.** The second-run section below
+registered that if the `tag` row came back flat at -0.35 the capacity change had
+not taken. It is +0.23. **One constant carried from another configuration was
+worth 0.58 of recovery at delay 8 and about 1.4 at delay 20** -- more than twice
+the largest effect any mechanism in this line has produced. That number is now
+the calibration on CLAUDE.md's frozen-axis rule.
+
+**The union never loses and the tag is what carries it.** `combined` tracks the
+tag everywhere the window is unmatched (+0.23 against +0.23 at delay 8; -0.13
+against -0.14 at delay 20) and tracks the window where it is matched. At delay 20
+NO reach in this grid covers the delay, so the tag's marks are worth +1.5 at
+every single reach.
+
+**And delay 20 is negative here where g9-06 had it positive**, which is not a
+contradiction: g9-06 used `slots` 32 and g9-10 established that 32 is the best
+capacity AT DELAY 20 while 16 is best at delay 8. This grid froze 16. So the
+-0.14 is what g9-10 predicts for a capacity tuned to the wrong delay, and the two
+sweeps agree.
+
+PREDICTIONS, SCORED -- ALL FIVE
+--------------------------------
+1. **CONFIRMED, by an order of magnitude.** Predicted the union's advantage
+   survives at reach 1 and 2 at "+0.20 or better". It is +1.76.
+
+2. **CONFIRMED.** Predicted combined at delay 20 within 0.05 of the tag alone at
+   reach 1. Combined -0.12, tag -0.14.
+
+3. **CONFIRMED exactly.** The window's cliff sits at the reach matching the
+   delay: -1.53 at reaches 1, 2 and 4, +0.23 at reach 8. g9-03 on a new axis.
+
+4. **CONFIRMED -- and it was REFUTED in the first run.** `tools/grid.py` reports
+   the chosen reaches interior (4, 16, 1 across the three delays), where the
+   first run pinned at the top. **The mistuned capacity was what broke it**, not
+   the grid, which is worth knowing: a frozen constant can make an unrelated
+   axis look pinned.
+
+5. **CONFIRMED.** `tag` flat across reach to 0.000 spread.
+
+Five of five, against four of five in the first run. The prediction that changed
+is the one the capacity error had corrupted.
 
 The first run's numbers above are NOT deleted -- they are the record of what was
 measured, and the relative finding taken from them stands. This run exists to put

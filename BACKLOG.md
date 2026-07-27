@@ -61,14 +61,22 @@ looking for work should start here.
    whatever the spacing does. The fix that would work is randomising the delay
    **per rewarded pair**, which stops `delay` being a swept axis at all — so it
    changes what the task is, not just its numbers. Bigger than a re-baseline.
-2. **`g9-11` RAN and needs one cheap re-run.** The finding stands: the tag's
+2. **`g9-11` RAN TWICE and is DONE.** The finding stands: the tag's
    marks are worth **+1.2** against an unmatched window and **nothing** against a
    matched one, so the combined gate is insurance against a reach a node cannot
    set correctly. But `slots` was fixed at 4 — g9-10's best *at node 32* — and
    that grid runs at node 64, where the tag alone scores -0.35. **The relative
    number survives (both arms share the capacity); the absolute ones do not.**
-   Re-run at `slots` 16 for numbers worth quoting. Its reach axis also pinned at
-   the top, so anything above reach 8 is a bound.
+   **Re-run at `slots` 16 is complete and all five predictions confirmed**, where
+   the mistuned run had four. The reach axis is now INTERIOR, so these are
+   values: the tag's marks are worth **+1.77** against an unmatched window at
+   delay 8 and **+1.50 at every reach** at delay 20, where nothing covers the
+   delay. `combined` never loses and tracks the tag wherever the window is
+   unmatched.
+
+   The capacity correction alone was worth **+0.58** at delay 8 — more than twice
+   the largest effect any mechanism here has produced — which is now the measured
+   calibration on CLAUDE.md's frozen-axis rule.
 3. **Can anything identify WHICH binding without being told the delay?** The
    sharpest open question and it needs a probe, not a sweep. See *The sharpest
    open question BEFORE 027*.

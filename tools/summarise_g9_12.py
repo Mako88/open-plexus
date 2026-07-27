@@ -27,7 +27,8 @@ not refuse a broken ceiling**.
 from __future__ import annotations
 
 from tools.recovery import (
-    REWARD_RECALL_FLOOR, assess, best_by, by_cell, load, margin, winner)
+    REWARD_RECALL_FLOOR, assess, best_by, by_cell, load, margin, mean_and_error,
+    per_seed, winner)
 
 ARMS = ("none", "oracle", "reward", "tag", "tag-strongest", "combined")
 #: The rate every published number in the g9 line was taken at.
@@ -223,6 +224,45 @@ def main() -> int:
         else:
             print("        every swap is between arms within the seed spread")
             print("        of each other: a tie broken twice, not a reordering")
+
+    print("\n== the same question PAIRED, which is the tighter test ==")
+    print("   `margin` divides the seed RANGE by the gap, so it charges the")
+    print("   mechanism for seeds that were simply harder. Scoring each seed")
+    print("   against ITS OWN floor and ceiling removes that.")
+    print(f"{'node':>6}{'lr':>7}{'paired':>9}{'+/- SE':>9}{'seeds':>7}"
+          f"{'range-margin':>14}")
+    for n in nodes:
+        for r in rates:
+            ratios = per_seed(cells, (n, r), "tag", floor)
+            got = cell(n, r)
+            if not ratios or got is None:
+                print(f"{n:>6}{r:>7}   missing")
+                continue
+            mean, error = mean_and_error(ratios)
+            short = "  <- SEEDS DROPPED" if len(ratios) < len(
+                cells.get((n, r, "none"), {})) else ""
+            print(f"{n:>6}{r:>7}{mean:>9.2f}{error:>9.2f}{len(ratios):>7}"
+                  f"{margin(got):>14.2f}{short}")
+    print("  a dropped seed is one whose own oracle did not beat its own floor")
+    print("  -- that seed measured nothing, and averaging it in would hide it")
+
+    print("\n  and the rate verdict, paired, at two standard errors:")
+    for n in nodes:
+        scored = {}
+        for r in rates:
+            ratios = per_seed(cells, (n, r), "tag", floor)
+            if ratios:
+                scored[r] = mean_and_error(ratios)
+        if INCUMBENT not in scored or len(scored) < 2:
+            print(f"  node {n:>3}: not comparable")
+            continue
+        rate = max(scored, key=lambda k: scored[k][0])
+        lead = scored[rate][0] - scored[INCUMBENT][0]
+        # The error on a difference of two independent means.
+        bound = 2 * (scored[rate][1] ** 2 + scored[INCUMBENT][1] ** 2) ** 0.5
+        print(f"  node {n:>3}: best {rate} leads {INCUMBENT} by {lead:+.3f}, "
+              f"2 SE = {bound:.3f}   "
+              f"{'REAL' if abs(lead) > bound else 'inside 2 SE'}")
 
     print("\n== prediction 4: does the rate move the floor arm? ==")
     for n in nodes:

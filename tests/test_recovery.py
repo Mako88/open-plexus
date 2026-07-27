@@ -16,7 +16,8 @@ from __future__ import annotations
 import unittest
 
 from tools.recovery import (MQAR_FLOOR, REWARD_RECALL_FLOOR, Cell, assess,
-                            best_by, by_cell, margin, winner)
+                            best_by, by_cell, margin, mean_and_error,
+                            per_seed, winner)
 
 ARMS = ("none", "oracle", "on-use")
 
@@ -255,6 +256,116 @@ class ALeadInsideTheNoiseIsNotALead(unittest.TestCase):
         key, lead, _ = winner(worse, "on-use", 0.05)
         self.assertIn(key, (0.05, 0.1))
         self.assertGreaterEqual(lead, 0.0)
+
+
+class TheRANGEGrowsWithSeedsAndTheERRORShrinks(unittest.TestCase):
+    """The distinction that would have made a twelve-seed re-run unreadable.
+
+    `margin` divides the seed RANGE by the gap. A range is a maximum minus a
+    minimum, so drawing more samples can only widen it — a run at twelve seeds
+    reports a larger one than the same experiment at three even when nothing
+    about the underlying variability changed.
+
+    BACKLOG item 0b proposes exactly that re-run, to find out which differences
+    survive more seeds. Read through `margin` it would have reported every
+    difference as LESS significant the more evidence was collected, which is
+    backwards, and the conclusion would have been the opposite of the truth.
+    """
+
+    def test_the_range_does_not_shrink_when_more_seeds_are_added(self):
+        few = [0.40, 0.50, 0.60]
+        many = few + [0.35, 0.65, 0.45, 0.55, 0.48, 0.52, 0.44, 0.56, 0.51]
+        self.assertGreaterEqual(max(many) - min(many), max(few) - min(few))
+
+    def test_the_standard_error_DOES_shrink(self):
+        """Same underlying spread, four times the seeds, roughly half the error.
+
+        This is the property the re-run is being done for, and the one `margin`
+        does not have.
+        """
+        few = [0.4, 0.5, 0.6]
+        many = few * 4
+        _, small = mean_and_error(few)
+        _, smaller = mean_and_error(many)
+        self.assertLess(smaller, small)
+        self.assertAlmostEqual(smaller, small / 2.0, places=2)
+
+    def test_one_value_has_an_infinite_error(self):
+        """So no caller can conclude a difference is real from a single seed."""
+        mean, error = mean_and_error([0.42])
+        self.assertEqual(mean, 0.42)
+        self.assertEqual(error, float("inf"))
+
+    def test_averaging_nothing_is_refused(self):
+        with self.assertRaises(ValueError):
+            mean_and_error([])
+
+
+class PairingWithinASeed(unittest.TestCase):
+    """`per_seed` divides inside a seed; `assess` averages then divides.
+
+    They answer different questions and the difference is not cosmetic: a seed
+    whose floor ran low and whose oracle ran high has a large gap for reasons
+    that have nothing to do with the arm being scored.
+    """
+
+    def built(self, rows):
+        """`rows` is (seed, none, oracle, arm) -> the by_cell shape."""
+        cells = {}
+        for seed, none, oracle, arm_value in rows:
+            for name, value in (("none", none), ("oracle", oracle),
+                                ("on-use", arm_value)):
+                cells.setdefault(("x", name), {})[seed] = value
+        return cells
+
+    def test_a_seed_is_scored_against_its_OWN_floor_and_ceiling(self):
+        """Two seeds, identical arm placement, wildly different difficulty.
+
+        Seed 1 recovers (0.5-0.4)/(0.9-0.4) = 0.2. Seed 2 recovers
+        (0.7-0.6)/(1.1-0.6) = 0.2. The arm did the same thing twice and paired
+        scoring says so.
+        """
+        cells = self.built([(1, 0.4, 0.9, 0.5), (2, 0.6, 1.1, 0.7)])
+        ratios = per_seed(cells, ("x",), "on-use", REWARD_RECALL_FLOOR)
+        self.assertEqual(len(ratios), 2)
+        for ratio in ratios:
+            self.assertAlmostEqual(ratio, 0.2)
+        self.assertAlmostEqual(mean_and_error(ratios)[1], 0.0)
+
+    def test_the_UNPAIRED_route_reports_variation_that_is_not_there(self):
+        """The same two seeds through `assess`, for contrast.
+
+        The arm did exactly the same thing in both seeds — the paired error is
+        zero. `assess` nonetheless reports a seed spread of 0.2, entirely
+        because the two seeds sat at different absolute difficulty.
+
+        That 0.2 is what `margin` divides by the gap and calls a noise floor, so
+        an effect smaller than it is declared unmeasurable on data where the
+        measurement was in fact exact. A first version of this test claimed the
+        spread would be large enough to trip the refusal outright; it is not,
+        and the overstatement is recorded rather than quietly corrected.
+        """
+        cells = self.built([(1, 0.4, 0.9, 0.5), (2, 0.6, 1.1, 0.7)])
+        verdict = assess(cells, ("x",), ARMS, REWARD_RECALL_FLOOR)
+        paired = per_seed(cells, ("x",), "on-use", REWARD_RECALL_FLOOR)
+        self.assertAlmostEqual(verdict.spread, 0.2)
+        self.assertAlmostEqual(mean_and_error(paired)[1], 0.0)
+        self.assertGreater(margin(verdict), 0.3)
+
+    def test_a_seed_whose_oracle_did_not_beat_the_floor_is_dropped(self):
+        """One such seed would otherwise divide by something near zero and
+        dominate the mean with an enormous ratio."""
+        cells = self.built([(1, 0.4, 0.9, 0.5), (2, 0.4, 0.4, 0.9)])
+        self.assertEqual(
+            len(per_seed(cells, ("x",), "on-use", REWARD_RECALL_FLOOR)), 1)
+
+    def test_a_seed_below_the_trivial_floor_is_dropped(self):
+        cells = self.built([(1, 0.4, 0.9, 0.5), (2, 0.05, 0.9, 0.5)])
+        self.assertEqual(
+            len(per_seed(cells, ("x",), "on-use", REWARD_RECALL_FLOOR)), 1)
+
+    def test_a_missing_cell_yields_no_ratios_rather_than_raising(self):
+        self.assertEqual(per_seed({}, ("x",), "on-use", REWARD_RECALL_FLOOR), [])
 
 
 class GroupingRecords(unittest.TestCase):

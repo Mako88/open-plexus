@@ -635,6 +635,29 @@ MUTATIONS = [
         new="                        for _, _, key_written in reversed(pending))",
     ),
     Mutation(
+        name="the-error-does-not-shrink-with-seeds",
+        breaks="the entire reason for running more seeds. Reporting the "
+               "standard DEVIATION instead of the standard error of the mean "
+               "gives a number that does not fall as evidence accumulates, so "
+               "a twelve-seed re-run would conclude its comparisons were no "
+               "sharper than at three -- the exact backwards reading BACKLOG "
+               "item 0b exists to avoid",
+        path=RECOVERY,
+        old="    return mean, (variance / len(values)) ** 0.5",
+        new="    return mean, variance ** 0.5",
+    ),
+    Mutation(
+        name="the-ratio-is-not-paired-to-its-own-seed",
+        breaks="the pairing, which is the whole point of a per-seed ratio. "
+               "Dividing by a shared constant instead of THIS seed's own gap "
+               "puts each seed's difficulty back into the numerator, which is "
+               "the variance the pairing exists to remove -- and it still "
+               "returns plausible ratios in the right rough range",
+        path=RECOVERY,
+        old="        usable.append((value - none) / gap)",
+        new="        usable.append((value - none) / (oracle - floor))",
+    ),
+    Mutation(
         name="the-noise-floor-is-in-the-wrong-units",
         breaks="the comparison between a lead and the error on it -- the spread "
                "is measured in accuracy and the lead in recovery, so dropping "

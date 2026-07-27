@@ -35,7 +35,7 @@ import glob
 import json
 import sys
 from collections import defaultdict
-from typing import Iterable, NamedTuple
+from typing import Iterable, NamedTuple, Sequence
 
 #: MQAR with 4 pairs and 8 values: name one of the pairs, or guess a value.
 MQAR_FLOOR = 1 / 4 + (1 - 1 / 4) / 8
@@ -120,6 +120,66 @@ def assess(cells: dict[tuple, dict[int, float]], key: tuple, arms: Iterable[str]
                     f"spread {spread:.3f}: the denominator is noise")
     return Cell({arm: (means[arm] - means["none"]) / gap for arm in arms},
                 means, spread, gap, None)
+
+
+def per_seed(cells: dict[tuple, dict[int, float]], key: tuple, arm: str,
+             floor: float) -> list[float]:
+    """The recovery ratio computed SEPARATELY for each seed, then returned.
+
+    `assess` averages accuracies across seeds and divides once. That mixes two
+    different things into one number: how much better this arm is, and how hard
+    this seed's data happened to be. A seed whose `none` ran low and whose
+    `oracle` ran high has a large gap for reasons that have nothing to do with
+    the arm being scored.
+
+    Computing the ratio within a seed — against THAT seed's own floor and its
+    own ceiling — pairs the comparison and removes the second thing entirely.
+    CLAUDE.md's rule about per-seed values rather than means says to do this;
+    the ratio was the one place it had not been done, because the ratio was
+    defined on the means before the rule existed.
+
+    Seeds whose own gap is at or below zero are dropped rather than returned as
+    enormous ratios. A seed where the oracle did not beat the floor is a seed
+    that measured nothing, and one of them can otherwise dominate a mean.
+    """
+    usable: list[float] = []
+    seeds = cells.get(key + ("none",), {})
+    for seed in sorted(seeds):
+        try:
+            none = cells[key + ("none",)][seed]
+            oracle = cells[key + ("oracle",)][seed]
+            value = cells[key + (arm,)][seed]
+        except KeyError:
+            continue
+        gap = oracle - none
+        if none <= floor or gap <= 0.0:
+            continue
+        usable.append((value - none) / gap)
+    return usable
+
+
+def mean_and_error(values: Sequence[float]) -> tuple[float, float]:
+    """Mean and the standard error OF THAT MEAN, which shrinks with more seeds.
+
+    This is the quantity `margin` is not. `margin` divides the seed RANGE by
+    the gap, and a range grows with sample size — so a run at twelve seeds
+    reports a wider one than the same experiment at three even when nothing
+    about the underlying variability changed.
+
+    That is fine for what `margin` is used for, comparing arms measured at the
+    same seed count, and wrong for the thing it looks like it does. Anything
+    asking whether MORE SEEDS would sharpen a comparison has to use this.
+
+    A single value has no error to report and gets `inf`, so a caller comparing
+    against it can never conclude a difference is real from one seed.
+    """
+    if not values:
+        raise ValueError("no values to average")
+    mean = sum(values) / len(values)
+    if len(values) < 2:
+        return mean, float("inf")
+    variance = sum((v - mean) ** 2 for v in values) / (len(values) - 1)
+    return mean, (variance / len(values)) ** 0.5
 
 
 def margin(cell: Cell) -> float:

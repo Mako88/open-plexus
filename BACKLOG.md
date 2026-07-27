@@ -78,7 +78,47 @@ looking for work should start here.
      on 0.997. The warning was published from an argument and corrected by
      measurement the same cycle.
 
-0b. **THREE SEEDS IS NOT ENOUGH TO BOUND A SMALL EFFECT, ANYWHERE IN THIS
+0b. **CORRECTED, SAME CYCLE: most of that "noise" was an ARTEFACT OF
+   UNPAIRED SCORING, and three seeds bound rather more than I said.**
+
+   The claim below was published from `margin`, which divides the seed RANGE by
+   the gap. Re-reading g9-12's own records with the ratio computed **inside each
+   seed** — against that seed's own floor and its own ceiling — gives:
+
+       node    range-margin    paired SE     2 SE on a difference
+         64        0.28          0.03-0.06         0.137
+         32        0.18          0.01-0.02         0.041
+         16        0.15          0.02-0.03         0.067
+          8        0.10          0.03-0.05         0.103
+
+   **At node 32 the measurement is fifteen times tighter than the range said.**
+   The rate verdict is unchanged — every lead is inside 2 SE — but g9-12 bounds
+   the rate effect below **0.04** there, not below 0.18.
+
+   Why: averaging accuracies across seeds and dividing once charges the
+   mechanism for seeds whose data was simply harder. A seed whose `none` ran low
+   and whose `oracle` ran high has a big gap for reasons that have nothing to do
+   with the arm. Pairing removes that, and CLAUDE.md's own *per-seed values not
+   means* rule already said to — the ratio was the one place it had not been
+   done, because the ratio predates the rule.
+
+   **So the twelve-seed re-run is no longer the top item.** What it was going to
+   buy is mostly already available in the records that exist. The remaining case
+   for more seeds is real but narrower: an SE estimated from three samples is
+   itself noisy, and node 64 and node 8 are still loose at 0.10-0.14.
+
+   **One thing the pairing exposed that the mean was hiding:** at node 8, lr 0.05
+   and 0.1, a seed is DROPPED because its own oracle did not beat its own floor.
+   That seed measured nothing, and averaging it in concealed it. Node 8 is at the
+   edge of where this task works at all, which is worth knowing given it is the
+   width John's priority is about.
+
+   ---
+
+   The original claim, kept because it was published and because the correction
+   is the interesting part:
+
+   **THREE SEEDS IS NOT ENOUGH TO BOUND A SMALL EFFECT, ANYWHERE IN THIS
    LINE.** g9-12 is the first sweep to print the seed spread in recovery units
    and it is large:
 

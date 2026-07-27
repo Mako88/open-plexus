@@ -1111,3 +1111,60 @@ showing that shape, and the clearest, because node width is the only axis moving
 **A process note.** I reached for a bash heredoc twice this session despite the
 standing rule against it, and both times it hung the shell and had to be killed.
 The rule is right and I should stop testing it.
+
+## 37. I overstated the seed problem, and the correction arrived within a cycle
+
+Entry 36 concluded that **three seeds cannot bound any difference smaller than
+about 0.15** anywhere in the g9 line, and recorded it as BACKLOG item 0b with a
+recommendation to re-run a settled grid at twelve seeds.
+
+**That was read off the wrong statistic.** `margin` divides the seed RANGE by the
+gap. Re-reading g9-12's own records — free, they were already downloaded — with
+the ratio computed INSIDE each seed gives standard errors of 0.01 to 0.06:
+
+    node    range-margin    paired SE    2 SE on a difference
+      64        0.28         0.03-0.06        0.137
+      32        0.18         0.01-0.02        0.041
+      16        0.15         0.02-0.03        0.067
+       8        0.10         0.03-0.05        0.103
+
+At node 32 the measurement is **fifteen times tighter** than I said. The rate
+verdict is unchanged — every lead is inside 2 SE — but g9-12 bounds the rate
+effect below 0.04 there rather than below 0.18.
+
+**Why the range was wrong for this.** Averaging accuracies across seeds and
+dividing once charges the mechanism for seeds whose data was simply harder. A
+seed whose `none` ran low and whose `oracle` ran high has a large gap for reasons
+that have nothing to do with the arm being scored. Pairing inside the seed
+removes it entirely, and **CLAUDE.md's own rule — per-seed values, not means —
+already said to do this.** The ratio was the single place it had never been
+applied, because the ratio was defined before the rule existed.
+
+**How it was caught, which is the part worth keeping.** I was about to dispatch
+the twelve-seed re-run when checking the statistic I would read it with showed
+the range GROWS with sample size. A twelve-seed run scored through `margin` would
+have reported every difference as *less* significant the more evidence was
+collected. The re-run would have concluded the opposite of the truth, and it
+would have looked like a result.
+
+That check cost nothing and saved twelve jobs plus a wrong conclusion. It is the
+same shape as the g9-13 smoke run and the vacuous `pending_now` test: **the
+instrument was wrong in a way that produced plausible numbers**, and only
+examining the instrument found it.
+
+**Item 0b is downgraded rather than deleted.** An SE from three samples is itself
+noisy, and node 64 and node 8 remain loose at 0.10-0.14. More seeds would still
+help there; they are no longer urgent, and they are no longer the top item.
+
+**One finding the pairing exposed that the mean was hiding.** At node 8, lr 0.05
+and 0.1, a seed is DROPPED because its own oracle did not beat its own floor —
+that seed measured nothing, and averaging it in concealed it. **Node 8 is at the
+edge of where `reward_recall` works at all**, and node 8 is the width John's
+priority is about. That is a better-targeted worry than the one entry 36 raised.
+
+Two mutations pin the new arithmetic, both caught:
+`the-error-does-not-shrink-with-seeds` reports a standard deviation instead of a
+standard error, so more evidence never sharpens anything;
+`the-ratio-is-not-paired-to-its-own-seed` divides by a shared constant and puts
+each seed's difficulty straight back into the numerator, still returning
+plausible ratios in the right rough range.

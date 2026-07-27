@@ -59,7 +59,35 @@ PREDICTIONS, SCORED -- NONE CONFIRMED
    different task, delay and sequence length -- so that finding is narrower than
    the general warning built on it.
 
-POWER: WHAT THIS CAN AND CANNOT RULE OUT
+POWER: CORRECTED, AND THE BOUND IS MUCH TIGHTER THAN FIRST WRITTEN
+--------------------------------------------------------------------
+The section below was written from `margin`, the seed RANGE divided by the gap.
+Re-reading these same records with the ratio computed INSIDE each seed gives
+standard errors of **0.01 to 0.06**, not 0.10 to 0.29:
+
+    node    range-margin    paired SE    2 SE on a difference
+      64        0.28         0.03-0.06        0.137
+      32        0.18         0.01-0.02        0.041
+      16        0.15         0.02-0.03        0.067
+       8        0.10         0.03-0.05        0.103
+
+**At node 32 the measurement is fifteen times tighter than the range said.** The
+verdict does not change — every rate lead is inside 2 SE — but the bound does:
+the rate effect is under **0.04** at node 32, not under 0.18.
+
+The range was charging the mechanism for seeds whose data was simply harder.
+Scoring each seed against its own floor and its own ceiling removes that, and
+CLAUDE.md's *per-seed values not means* rule already required it; the ratio was
+the one place it had not been applied.
+
+**And the pairing exposed something the mean hid.** At node 8, lr 0.05 and 0.1,
+one seed is DROPPED: its own oracle did not beat its own floor, so it measured
+nothing. Averaged in, it was invisible. Node 8 is at the edge of where this task
+works, which matters because node 8 is the width the tiny-node priority is about.
+
+The original section follows, kept because it was published.
+
+POWER: WHAT THIS CAN AND CANNOT RULE OUT (AS FIRST WRITTEN, SUPERSEDED)
 ------------------------------------------
 **The noise floors are large and the bound is correspondingly loose.** A seed
 spread of 0.29 recovery units at node 64 is not a detail: the tag's ENTIRE effect

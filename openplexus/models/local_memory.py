@@ -152,7 +152,7 @@ def tag(tagged: list, strength: float, index: int, capacity: int,
     doing the work and the signal is decoration -- which is the outcome that
     would refute the reason this mechanism was built.
     """
-    rank = strength
+    rank = strength if strongest else -strength
     slot = admit([held for held, _ in tagged], rank, capacity)
     if slot is None:
         return

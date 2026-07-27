@@ -18,6 +18,13 @@ jobs:
         with:
           python-version: "3.13"
       - run: pip install numpy
+      # First, because it takes a second and it is the only check that names
+      # WHICH mutation is live when the source on disk is not the source anyone
+      # means. Commit 3634a23 shipped `rank = strength` -- a live mutation --
+      # because `git add -A` ran while a background harness had the file open,
+      # and the suite was never run against the tree being committed.
+      - name: Verify the source is not mutated
+        run: python tools/mutate.py --verify
       - name: Test suite
         run: python -m unittest discover -s tests -t . -q
       - name: Verify every workflow flag is one its script accepts

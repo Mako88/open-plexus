@@ -525,8 +525,8 @@ MUTATIONS = [
         breaks="selective storage entirely, so the oracle gate silently becomes "
                "the ungated model and g7-02's headline evaporates",
         path=LOCAL,
-        old="if previous_key is not None and (store is None or store[t]):",
-        new="if previous_key is not None:",
+        old="            wrote = previous_key is not None and (store is None or store[t])",
+        new="            wrote = previous_key is not None",
     ),
     Mutation(
         name="repeats-are-ignored",
@@ -1027,8 +1027,57 @@ def _is_running(pid: int) -> bool:
     return True
 
 
+def verify(quiet: bool = False) -> int:
+    """Assert every mutation's ORIGINAL text is present. One second, no edits.
+
+    A `.bak` file says a file is edited RIGHT NOW. This says something a `.bak`
+    cannot: that the source on disk is the source everyone means, whatever
+    happened earlier. The two failures it separates want the same response and
+    arrive by different routes -- a run killed mid-edit and hand-restored to the
+    wrong version, and a `git add -A` issued while a background harness had a
+    file open.
+
+    The second is not hypothetical. Commit 3634a23 shipped `rank = strength` --
+    `the-tag-admits-the-strongest`, live in the source -- inside the change whose
+    entire argument is that admitting the strongest is backwards. Nothing ran the
+    suite against the tree being committed, so nothing objected. CI caught it on
+    push, which is the right backstop and the wrong place to find out.
+
+    Cheap enough to run before every commit, and it names WHICH mutation is
+    present, which a red test does not.
+    """
+    missing = []
+    for mutation in MUTATIONS:
+        try:
+            source = mutation.path.read_text(encoding="utf-8")
+        except OSError as problem:
+            missing.append((mutation, str(problem)))
+            continue
+        found = source.count(mutation.old)
+        if found != 1:
+            missing.append((mutation, f"original text appears {found} times"))
+    if not missing:
+        if not quiet:
+            print(f"source clean: all {len(MUTATIONS)} originals present")
+        return 0
+    print("SOURCE IS NOT THE SOURCE ANYONE MEANS.")
+    print()
+    for mutation, why in missing:
+        print(f"  {mutation.name}: {why}")
+        print(f"    in {mutation.path.relative_to(ROOT)}")
+    print()
+    print("Either a mutation is live on disk -- do not commit, do not measure,")
+    print("restore it -- or the harness is stale because a refactor moved the")
+    print("line it targets, and the mutation needs re-pointing.")
+    return 1
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    if "--verify" in argv:
+        # Deliberately outside the lock: it edits nothing, and the case it most
+        # needs to cover is "is a harness halfway through right now".
+        return verify()
     claim_the_lock()
     try:
         return _main(argv)

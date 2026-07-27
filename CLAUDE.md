@@ -619,10 +619,24 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
 
 - **Run all three checks before every commit:**
   ```
+  python tools/mutate.py --verify
   python -m unittest discover -s tests -t . -q
-  python tools/mutate.py
   python tools/check_workflows.py
   ```
+  The full mutation harness runs in CI, sharded; locally it is
+  `python tools/mutate.py --only <the mutations just added>`, because a full
+  run edits the source for twenty minutes and every experiment refuses to run
+  while it does.
+
+  **`--verify` comes first and takes a second.** It asserts every mutation’s
+  ORIGINAL text is present, which is the only check that catches the source on
+  disk not being the source anyone means. Commit `3634a23` shipped
+  `rank = strength` — `the-tag-admits-the-strongest`, live — inside the change
+  whose entire argument is that admitting the strongest is backwards, because
+  `git add -A` ran while a background harness had the file open. Nothing ran the
+  suite against the tree being committed, so nothing objected. It also catches
+  the harness going stale: on its first run it found `storage-mask-ignored`
+  pointing at a line a refactor had moved.
   The second is not optional and not a nice-to-have: **rule 10 is unenforceable
   without it.** It breaks each named mechanism on purpose and requires the suite
   to go red; a mutation that survives marks a vacuous region of the test set. It

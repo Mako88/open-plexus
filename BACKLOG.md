@@ -760,7 +760,7 @@ signal or bounds the line.
 0.01 against the window's 1.85, 0.82, 0.45, 0.27. That is the property the tag
 exists for and it now holds across an eightfold range rather than at one setting.
 
-**Height peaks at node 32 and declines.** The hoped-for "better on small nodes"
+**Height peaks at node 32 and declines — BUT THE FALL FROM 32 TO 64 IS NOT SUPPORTED**, per [note 029](docs/notes/029-the-headlines-re-read-with-a-paired-ratio.md): paired, node 32 leads node 64 by +0.061, +0.019 and +0.029 against combined 2 SE of 0.066, 0.079 and 0.034. Node 32 over node 8 and node 16 over node 8 ARE real by many standard errors, so the tiny-node part holds and the peak's location does not. The hoped-for "better on small nodes"
 does not happen. **The smallest node that can run the task at all is 8**, where
 the gate still recovers +0.11.
 

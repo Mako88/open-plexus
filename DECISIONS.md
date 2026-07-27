@@ -1168,3 +1168,57 @@ standard error, so more evidence never sharpens anything;
 `the-ratio-is-not-paired-to-its-own-seed` divides by a shared constant and puts
 each seed's difficulty straight back into the numerator, still returning
 plausible ratios in the right rough range.
+
+## 38. The two headline claims, re-read from archived records -- one got
+##     stronger, one shrank, and I had written a direction backwards
+
+`per_seed` made it possible to re-read finished sweeps without re-running them.
+Both headline claims of the g9 line were checked against records still on
+Actions. No new jobs. [Note 029](docs/notes/029-the-headlines-re-read-with-a-paired-ratio.md).
+
+**g9-06's +0.16 flat row is CONFIRMED and now has an error bar**: +0.159, +0.164,
++0.172, +0.162 with standard errors of 0.010 to 0.020 at delays 1, 4, 8 and 20.
+Every delay is within one standard error of every other, so the flatness is not
+an artefact of averaging. The project's main claim stands and stands better.
+
+**THE CATCH is confirmed and upgraded from a point estimate to a measurement.**
+It rested on `tag-strongest` scoring +0.003 away from `tag` at the working point.
+Paired: at slots 32 fade 0.95 the difference is -0.008, +0.002, +0.016, +0.005,
+every one inside 2 SE. At the starved pool, slots 16 fade 0.99, it is +0.180,
++0.204, +0.219, +0.283, every one far outside. **Both halves now hold**, where
+before there was one number being close to another.
+
+**g9-09's "height peaks at node 32 and falls" is only half supported.** Node 32
+over node 64 is +0.061, +0.019, +0.029 against combined 2 SE of 0.066, 0.079,
+0.034 -- two comfortably inside, one on the line, so the fall is not
+distinguishable from a plateau. Node 32 over node 8, and node 16 over node 8, are
+real by many standard errors, so what the tiny-node question needs survives:
+recovery falls off between node 16 and node 8, and node 8 still recovers about
++0.10. Where the peak sits does not.
+
+### The part worth reviewing: I wrote a direction backwards last cycle
+
+g9-12 closed with an observation that `tag-strongest` runs -0.51, -0.10, +0.02,
++0.05 as the node narrows, and I concluded *"the inverted signal's direction is
+worth nothing at a wide node and turns positive at a narrow one."*
+
+That reads `tag-strongest`'s own absolute recovery. **The value of the DIRECTION
+is the gap between the two arms**, and in the same data it runs 0.74, 0.35, 0.17,
+0.10 from node 64 down to node 8 -- worth **most at the widest node**, the exact
+opposite of what I wrote. g9-09 agrees independently: +0.222 at node 64 against
++0.028 at node 8, at delay 20.
+
+**Why it matters more than a slip.** This line has repeated that g9-04's signal
+"pays where something is scarce", which is true for the axis it was established
+on -- a starved capacity, now measured at 0.18 to 0.28 outside 2 SE -- and does
+not carry over to node width, a different scarcity pointing the other way. One
+sentence was covering two axes, and that is how a real finding becomes a slogan
+that quietly stops being checked.
+
+Corrected in the g9-12 sweep file in place, with the original quoted.
+
+**What this does not do.** It adds no seeds. Every number is three seeds and a
+standard error from three samples is itself uncertain. Pairing extracts more from
+the same records; it does not manufacture evidence. Node 4 in g9-09 has one
+usable seed and an infinite error, which is the honest report of a mostly-refused
+cell.

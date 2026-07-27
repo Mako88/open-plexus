@@ -34,6 +34,24 @@ the one thing this mechanism was built to be, and it now holds across an
 eightfold range of node sizes rather than at a single one.
 
 **Height peaks at node 32 and falls.** +0.18, +0.21, +0.16, +0.11. So the gate is
+**THE FALL FROM 32 TO 64 IS NOT SUPPORTED.**
+[Note 029](../../docs/notes/029-the-headlines-re-read-with-a-paired-ratio.md)
+re-read these records with the ratio computed inside each seed:
+
+    tag, paired          delay 1          delay 8         delay 20
+    node 32         +0.215 +/- 0.023  +0.207 +/- 0.027  +0.217 +/- 0.005
+    node 64         +0.154 +/- 0.024  +0.188 +/- 0.029  +0.188 +/- 0.016
+
+Node 32 over node 64 is +0.061, +0.019 and +0.029 against combined 2 SE of about
+0.066, 0.079 and 0.034 -- two comfortably inside, the third on the line. **The
+peak is not distinguishable from a plateau.**
+
+What survives is the part the tiny-node question needs: node 32 over node 8
+(+0.21 against +0.10) and node 16 over node 8 are both real by many standard
+errors. Recovery does fall off between node 16 and node 8. Where the peak sits
+does not.
+
+ORIGINAL READING, kept: the gate is
 mildly better on half a network than on a whole one, and worse below that. It
 degrades gracefully rather than collapsing.
 

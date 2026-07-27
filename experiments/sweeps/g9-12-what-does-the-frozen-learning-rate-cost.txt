@@ -124,13 +124,29 @@ seven sweeps of numbers taken at one unexamined rate -- and replaces it with a
 smaller and better-specified one: **three seeds is not enough to bound a small
 effect, anywhere in this line.**
 
-AN OBSERVATION NOBODY ASKED FOR
----------------------------------
+AN OBSERVATION NOBODY ASKED FOR -- AND I READ IT BACKWARDS
+------------------------------------------------------------
 `tag-strongest` runs -0.51, -0.10, +0.02, +0.05 as the node narrows from 64 to 8.
-The inverted signal's direction is worth nothing at a wide node and turns
-positive at a narrow one, which is the third setting showing that shape (g9-08,
-g9-09, and now here). It is the clearest statement of it so far because node
-width is the only axis moving. One grid, three seeds, so an observation.
+
+**What I wrote first:** *"the inverted signal's direction is worth nothing at a
+wide node and turns positive at a narrow one."* That reads `tag-strongest`'s own
+absolute recovery, which is not what the direction is worth.
+
+**The value of the DIRECTION is the gap between `tag` and `tag-strongest`**, and
+in this same data it runs
+
+    node 64   0.74      node 32   0.35      node 16   0.17      node  8   0.10
+
+so the direction is worth **most at the widest node and least at the narrowest**,
+which is the opposite. g9-09 agrees independently: `tag - tag-strongest` at delay
+20 is +0.222 at node 64 against +0.028 at node 8.
+
+**And it matters beyond the slip.** This line has repeated that g9-04's signal
+"pays where something is scarce". That holds for the axis it was established on --
+a starved CAPACITY, where g9-06 puts it at 0.18 to 0.28 outside 2 SE -- and it
+does not carry over to node width, which is a different scarcity pointing the
+other way. One sentence was covering two axes.
+[Note 029](../../docs/notes/029-the-headlines-re-read-with-a-paired-ratio.md).
 
 
 IN PLAIN TERMS

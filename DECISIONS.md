@@ -1371,3 +1371,72 @@ that refused everything would pass every other test in the class while making th
 benchmark useless.
 
 546 tests, 115 mutations.
+
+## 41. A stray file was riding along in every artifact of every sweep
+
+**Found by an invariant written for something else.** Two cycles ago a
+contaminated scratch directory nearly made me retract a correct result, and the
+fix was CLAUDE.md rule 11b: fetch into a fresh directory, never suppress the
+fetcher's errors, and **verify a run's identity from the DATA before reading a
+number off it**.
+
+Reading g10-01's re-run, that check refused the download: *"records lack `cap`:
+this is the OLD run, not the re-run"*. It was not the old run. Each artifact held
+**eight files where four were results**.
+
+`out/g10-02.json` — a local diagnostic's output — had been committed by a
+`git add -A`, and every workflow uploads `path: out/*.json`. From that commit
+onward every sweep artifact carried a foreign record set, with `epoch` and
+`test_bits` where a sweep expects `cap` and `bits_calibrated`.
+
+**The invariant was written to catch a stale download and caught a completely
+different failure.** That is the argument for cheap general invariants over
+targeted ones, and it is the second time this session that a guard has paid for
+itself on a problem it was not designed for.
+
+### What it would have done
+
+An aggregate step reading those records raises `KeyError` mid-run, which is the
+good case. The bad case is a summariser that tolerates the extra records and
+reports a confident table computed from whichever survived.
+
+### Three fixes, at three depths
+
+1. **The root.** `out/` untracked and gitignored, with the reason written beside
+   it rather than left as a bare pattern.
+2. **The guard.** `tools/recovery.require(rows, *fields)` keeps only records
+   carrying every named field and **prints what it dropped**. Filtered rather
+   than refused, because a job may legitimately write more than one kind of
+   record; printed rather than silent, because quiet discarding is how a
+   confident number gets computed from half the input.
+3. **The placement, which is the part worth reviewing.** I first wired the guard
+   into `summarise_g10_01` alone. That protects one summariser out of twenty,
+   all of which call `load()` and read whatever matches `out/*.json`. So it moved
+   into **`by_cell`**, the single function every summariser goes through — one
+   change, no callers edited, and no chance of protecting whichever nineteen were
+   remembered.
+
+Moving it also deleted a duplicate: the filtering I had written into `by_cell`
+and `require` itself were near-identical, which is precisely the drift
+`tools/recovery.py` exists to prevent — that module exists because five
+hand-copies of the same two refusals had already diverged.
+
+One mutation, `foreign-records-are-dropped-in-silence`, breaks the ANNOUNCEMENT
+rather than the filtering. Caught. Three tests on the guarantee, including the
+vacuity guard: a filter that dropped everything would satisfy the other two while
+making every summariser report nothing.
+
+### Also this cycle
+
+**The re-run's predictions were registered before its results landed.** The sweep
+file still described the old width x chunk grid, and pre-registration that
+arrives after the numbers is not pre-registration. Six predictions, with R3 named
+as the one that decides the line: whether width 128 comes within 0.5 bits of the
+unigram, separating *g10-02's underfitting is width-limited* from *the ceiling is
+not capacity*.
+
+Four of six cells are home and **width is buying almost nothing** — 0.058 bits
+from doubling 32 to 64, against a 0.98-bit gap to the unigram. R3 would need
+about seventeen times that effect from the last doubling.
+
+554 tests, 116 mutations.

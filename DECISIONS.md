@@ -477,3 +477,43 @@ the signal's direction starts paying once something else is scarce.
 and the frozen axes were not the problem — the swept one was. Naming a risk is
 not the same as checking the axis means what you think it means, and nothing in
 the checklist catches "this parameter is not the quantity you are asking about".
+
+## 21. Rebuilt the tiny-node sweep on the right axis, and ran the control first
+
+**Chosen.** g9-09 holds the network at 64 and sweeps `partitions`, asking one
+group to answer alone — g7-02's axis. `--partitions` is wired into the existing
+script with `partition=0` applied at TEST time only, so training is untouched:
+the delta rule reads every group's own error regardless, which makes this the
+deployment question rather than a different training regime. Records now carry
+`node_width` beside `width`, because conflating those is exactly what g9-08 did.
+
+**The discipline change is the point.** g9-08 spent fifteen jobs discovering its
+floor arm was below chance. A three-minute control would have said so. This time
+the control ran first, with its own predictions registered, and all three held.
+Every row is usable down to a node of four numbers.
+
+**What the control suggests, and why I am not believing it yet.** Implied
+recovery is higher at every split than at one — 0.42 at two groups against 0.16
+at one. The mechanism would be that a narrower reader is hurt more by
+interference, so the floor arm falls faster than the gated arms and the same gate
+recovers a larger share of a larger gap. If it survives three seeds and three
+delays it is the best available outcome: the gate works better on the hardware
+this project is for than on the hardware it has been measured on.
+
+I have registered it as prediction 1 and named it most likely wrong, because the
+arm that moved most across settings is the FLOOR arm — the denominator — and a
+ratio whose denominator is what changed is the shape that has already cost this
+project a result twice.
+
+**A new failure mode, found by the control and not previously possible.** The
+ORACLE breaks at 16 groups, falling to 0.608. First time a cheating gate has
+failed anywhere here. `tools/recovery.py` refuses on the floor arm and the seed
+spread and does *not* refuse a broken ceiling — so those cells will print ratios
+that are fractions of a failing advantage. Registered as prediction 2, and
+`summarise_g9_09.py` prints the oracle beside every ratio with a CEILING BROKEN
+flag.
+
+**Worth review:** whether `recovery.py` should refuse a collapsed ceiling the way
+it refuses a collapsed floor. I did not add that — it would change the meaning of
+every existing summariser and invalidate comparisons across the whole project on
+my own judgement overnight. Flagging instead.

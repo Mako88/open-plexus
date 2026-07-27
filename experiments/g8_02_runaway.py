@@ -1,5 +1,10 @@
 """Why does the readout diverge under skewed input?
 
+**READ THE CAVEAT AT THE END BEFORE USING ANY NUMBER HERE.** This builds its own
+`wk`/`wv` and its own update loop. The RATIOS it reports are the finding; its
+ABSOLUTE norms are on a different scale from the model's and do not transfer --
+cap values taken from them were about 50x too large and never bound.
+
 Reproducible: with warnings as errors, training raises at zipf_s 1.5 in the
 readout update, `invalid value encountered in add`.
 
@@ -67,3 +72,21 @@ for zipf_s in (0.0, 0.5, 1.0, 1.5, 2.0):
     share = counts.max() / counts.sum()
     print(f"{zipf_s:>7}{share:>17.1%}{np.linalg.norm(memory):>16.1f}"
           f"{biggest:>17.1f}")
+
+
+# CAVEAT, added after the numbers here were used and did not transfer.
+#
+# This reimplements the store: its own projections, its own scales, its own loop.
+# That was deliberate -- it isolates the memory growth from the learning path, so
+# the runaway can be shown without training. But it means the ABSOLUTE norms
+# below are this script's, not the model's.
+#
+# Measured through the model's own interface by bisection, the fast store's norm
+# is 2-5 at uniform filler and 10-50 at zipf_s 2.0 -- roughly fifty times smaller
+# than the 114 and 967 reported here. Caps chosen from these numbers never bound,
+# and the g8-04 control caught it: three cap values, identical accuracy to three
+# decimals, NaN still firing.
+#
+# What survives is the RATIO. The store grows several-fold under repetition, in
+# both the reimplementation and the model, and the readout update is quadratic in
+# it. That is the mechanism note 018 describes and it is unaffected.

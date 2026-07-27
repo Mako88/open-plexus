@@ -2,8 +2,13 @@
 
 [Note 018](../docs/notes/018-the-fast-store-has-no-brakes.md): the fast store is
 a geometric series in `decay`, repetition drives it toward `1 / (1 - decay)`, and
-the delta-rule update is quadratic in it. Measured without training, as filler
-skew rises, the memory norm goes 114 -> 967 and the largest retrieval 137 -> 3452.
+the delta-rule update is quadratic in it, so it diverges.
+
+Measured **through the model** by bisection, the store's norm is 2-5 at uniform
+filler and 10-50 at `zipf_s` 2.0. (`g8_02_runaway.py` reports 114 and 967 for the
+same thing; it reimplements the store with its own scales, so its ratios transfer
+and its absolute numbers do not. Cap values taken from them were fifty times too
+large and never bound -- caught by this file's own control.)
 
 [g8-02](sweeps/g8-02-when-the-statistics-are-real.txt) could use only two of its
 five cells for exactly that reason: at `zipf_s` 1.0 and above the ungated arm
@@ -42,10 +47,27 @@ EXPONENTS = (0.0, 0.5, 1.0, 1.5, 2.0)
 LEARNING_RATES = (0.02, 0.05, 0.1)
 SEEDS = (1, 2, 3)
 
-# Chosen from the MEASURED runaway rather than guessed. The memory norm reaches
-# 114 at uniform filler and 967 at zipf_s 2.0, so a cap of 150 cannot bind at
-# uniform and must bind under skew. 0 is off, and is how g8-02 was measured.
-CAPS = (0.0, 150.0, 300.0)
+# Measured THROUGH THE MODEL, after the first attempt failed.
+#
+# The first values, 150 and 300, came from experiments/g8_02_runaway.py -- which
+# builds its own `wk`/`wv` and its own loop. **A reimplementation has its own
+# scales, and those did not transfer.** The control ran and found caps of 150 and
+# 300 changing nothing at any exponent: identical accuracy to three decimals,
+# NaN still firing. The cap was never binding.
+#
+# Bisected through the model's public interface instead, which is the only
+# measurement that can be wrong in the same way the model is:
+#
+#     zipf_s 0.0   binds at 2.0, not at 5.0     -> store norm is 2-5
+#     zipf_s 2.0   binds at 10.0, not at 50.0   -> store norm is 10-50
+#
+# So the runaway probe was out by roughly 50x in absolute terms while its RATIO
+# -- the store growing several-fold under repetition -- held. The ratio was the
+# finding; the absolute numbers were never the model's.
+#
+# 5.0 therefore cannot bind at uniform and must bind under skew, which is what
+# prediction 3 requires. 10.0 binds only at the skewed end. 0 is off.
+CAPS = (0.0, 5.0, 10.0)
 
 #: MQAR at n_pairs 4, n_values 8. A cell whose ungated arm is at or below this is
 #: not measuring a difficulty, it is measuring two failures.

@@ -64,6 +64,35 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="the-reward-gate-never-prunes",
+        breaks="the gate. Everything written stays written, so the fast store "
+               "accumulates one binding per step exactly as it did ungated -- "
+               "which is what six previous mechanisms did wrong",
+        path=LOCAL,
+        old="                for weight, value_written, key_written in pending[:-keep or None]:",
+        new="                for weight, value_written, key_written in []:",
+    ),
+    Mutation(
+        name="the-reward-window-is-ignored",
+        breaks="the reach of the gate, pinning it to the step immediately "
+               "before the reward. That is 'keep the thing before the obvious "
+               "marker', which learns nothing about value and is exactly the "
+               "trivial case the delay dial exists to avoid",
+        path=LOCAL,
+        old="                keep = self.config.reward_window + 1",
+        new="                keep = 1",
+    ),
+    Mutation(
+        name="pending-contributions-do-not-fade",
+        breaks="the bookkeeping. A contribution is removed as it went in rather "
+               "than as it now stands, so the subtraction takes out more than "
+               "is there and drives the store negative -- silently, since "
+               "nothing checks the store's sign",
+        path=LOCAL,
+        old="                    _fade(pending, self.config.decay)",
+        new="                    pass",
+    ),
+    Mutation(
         name="the-fast-store-cap-never-binds",
         breaks="the compensatory process on the fast store, restoring the "
                "geometric runaway: repetition drives the store toward "

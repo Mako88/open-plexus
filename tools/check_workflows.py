@@ -68,7 +68,26 @@ def push_triggered_sweeps() -> list[str]:
     return offenders
 
 
+def refuse_if_mutating() -> None:
+    """Stop if tools/mutate.py currently has a file edited.
+
+    This tool reads and parses the source, so a mutated tree makes it report
+    problems that are not there. It did: "33 problem(s)" during a harness run,
+    "ok" once the run finished.
+
+    Duplicated from experiments/harness.py rather than imported, because a
+    checking tool that depends on the package it checks fails in the one
+    situation it exists for.
+    """
+    leftovers = sorted(ROOT.glob("**/*.py.bak"))
+    if leftovers:
+        raise SystemExit(
+            "REFUSING TO RUN: tools/mutate.py has the source edited.\n"
+            + "\n".join(f"  {p.relative_to(ROOT)}" for p in leftovers))
+
+
 def main() -> int:
+    refuse_if_mutating()
     if not WORKFLOWS.is_dir():
         print("no workflows to check")
         return 0

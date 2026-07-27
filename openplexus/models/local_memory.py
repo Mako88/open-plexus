@@ -105,6 +105,18 @@ def admit(strengths, strength: float, capacity: int) -> int | None:
     return weakest if strength > strengths[weakest] else None
 
 
+def _fade(pending: list, factor: float) -> None:
+    """Record that the fast store was multiplied by `factor`.
+
+    Everything waiting on a reward was scaled along with the store, so its
+    recorded weight has to follow. Without this, taking a contribution back out
+    would remove what it was when it went in rather than what it is now — and
+    the store would drift away from the sum of what is actually in it.
+    """
+    for entry in pending:
+        entry[0] *= factor
+
+
 def scale_to(store: np.ndarray, cap: float) -> None:
     """Shrink `store` in place until its norm is at most `cap`. No-op if `cap` is 0.
 
@@ -159,6 +171,34 @@ class LocalMemoryConfig:
             an answer is wanted — and *optional*, because each group emits a
             complete answer by itself. Whether one group's answer alone is good
             enough is the measurement, not an assumption.
+        reward_token: Token id whose arrival means *the recent past mattered*.
+            -1 disables the gate, which is how every earlier result was
+            measured.
+
+            **This gates the fast store, which is the only thing the oracle
+            does.** g8-03 established that: `run(store=mask)` prevents writing,
+            holding the number of stored bindings constant at any length, and
+            six mechanisms failed because they acted on the lasting store
+            instead.
+
+            It is not the oracle. The oracle reads `position_kinds()`, a
+            property of the generator no running system can see. This reads a
+            token off the same input every node already receives.
+
+        reward_window: How many steps before a reward token are kept. 0 keeps
+            only the step immediately before it.
+
+            **This is the whole difficulty.** The reward arrives after the
+            binding it refers to, so at write time the node does not yet know
+            whether to keep anything. It writes everything into the fast store
+            as usual and, when a reward arrives, keeps the last
+            `reward_window + 1` steps and discards the rest of what it wrote
+            since the previous reward.
+
+            A window that always covers the gap makes the gate trivial -- "keep
+            the thing before the obvious marker" -- and learns nothing about
+            value. A window shorter than the delay cannot reach the binding at
+            all. The interesting region is between, and it is what g9-02 sweeps.
         memory_cap: Largest norm the FAST store may reach. 0 leaves it
             unbounded, which is how every earlier result was measured.
 
@@ -330,6 +370,8 @@ class LocalMemoryConfig:
     partitions: int = 1
     key_scale: float = 1.0
     key_active: int = 0
+    reward_token: int = -1
+    reward_window: int = 0
     memory_cap: float = 0.0
     consolidation: float = 0.0
     capture_slots: int = 0
@@ -353,6 +395,12 @@ class LocalMemoryConfig:
             raise ValueError(
                 "derived_keys and key_active both build Wk and would conflict; "
                 "sparse keys have no per-token derivation yet")
+        if self.reward_window < 0:
+            raise ValueError("reward_window must not be negative")
+        if self.reward_window and self.reward_token < 0:
+            raise ValueError(
+                "reward_window is the reach of the reward gate and does nothing "
+                "without reward_token")
         if self.memory_cap < 0.0:
             raise ValueError("memory_cap must not be negative")
         if self.capture_slots < 0:
@@ -606,6 +654,11 @@ class LocalAssociativeMemory:
         # The consolidated store. Written only when a retrieval is confirmed
         # useful by the token that arrives next, and never decayed -- which is
         # the whole difference between it and `memory`.
+        # Written into the fast store but not yet vouched for by a reward.
+        # Each entry is [weight, value, key]; the weight tracks every scaling
+        # the store has had since, so a contribution is removed as it now
+        # stands rather than as it went in.
+        pending: list = []
         lasting = np.zeros((d, d)) if self.config.consolidation else None
         # Occupied slots, weakest first is not maintained -- the pool is small
         # enough that a linear scan for the weakest is cheaper than keeping order.
@@ -648,8 +701,33 @@ class LocalAssociativeMemory:
             if previous_key is not None and (store is None or store[t]):
                 if self.config.decay < 1.0:
                     memory *= self.config.decay
+                    _fade(pending, self.config.decay)
                 memory += np.outer(value, previous_key)
+                if self.config.reward_token >= 0:
+                    # Held so it can be taken back out if no reward vouches for
+                    # it. Two vectors per step, not a d x d matrix.
+                    pending.append([1.0, value, previous_key])
+                before = float(np.linalg.norm(memory))
                 scale_to(memory, self.config.memory_cap)
+                if self.config.memory_cap and before:
+                    # The cap scales the store, so everything pending was scaled
+                    # with it. Without this the subtraction below would remove
+                    # more than is actually there.
+                    _fade(pending, float(np.linalg.norm(memory)) / before)
+
+            # THE REWARD GATE. A token in the input says the recent past
+            # mattered. Everything written since the last reward and outside its
+            # window is taken back out, so the fast store keeps only what
+            # something vouched for -- which is the one thing the oracle does
+            # (g8-03) and the one thing no previous mechanism attempted.
+            #
+            # The signal arrives AFTER the binding, so the decision cannot be
+            # made at write time. That is the difficulty, not an inconvenience.
+            if self.config.reward_token >= 0 and token == self.config.reward_token:
+                keep = self.config.reward_window + 1
+                for weight, value_written, key_written in pending[:-keep or None]:
+                    memory -= weight * np.outer(value_written, key_written)
+                pending.clear()
 
             # CONSOLIDATE. The prediction made one step ago was a guess at the
             # token that has just arrived, so this is where it gets marked right

@@ -167,6 +167,22 @@ not mention how it is computed.
 > class of check than the ones around it, **not a guarantee** — and a meaning
 > test that passes on the first run deserves suspicion, not satisfaction.
 
+**Search for prior art when the requirements are written, not when the code
+is.** A list of properties a task or mechanism must have is a search query. Run
+it before building, because the version in the literature is better specified
+than the one derived at a desk, and because discovering it afterwards costs the
+build twice — once to write and once to reconcile.
+
+> *Calibration.* Three times, each cheaper to catch than the last.
+> [Note 010](docs/notes/010-tagging-and-capture.md): tagging and capture read
+> properly only after the mechanism was half-built, and the reading changed it.
+> [Note 020](docs/notes/020-the-capacity-equation-checked.md): `SNR = sqrt(d/N)`
+> derived empirically and checked against an analytic bound many sweeps later,
+> which agreed *and* named a term never varied. `reward_recall`: built from note
+> 017's five-point requirements list, which turns out to describe **bsuite's
+> Memory Length test** — a T-maze parameterised by length, testing how many steps
+> an agent can hold one bit. The list was a search query and was not used as one.
+
 **An experiment is a sweep even when it is called a control.** Sweeps go to
 Actions; the test suite and targeted mutation runs stay local because they are
 seconds. The line is not "is it a sweep" — it is **how long does it hold the

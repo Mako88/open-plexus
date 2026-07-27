@@ -94,6 +94,134 @@ this as the obvious next step and not touching it. `slices_for` currently
 
 ---
 
+## Nothing notices if the masked fade reads the wrong step
+
+Fixing the stale `storage-mask-off-by-one` mutation exposed a second branch with
+no mutation at all: the fade `decay_when_masked` adds. A mutation pointing it at
+`store[t - 1]` **survives the whole suite**.
+
+It is not obviously a real gap. Under the masks
+[the tests use](tests/test_decay_when_masked.py) — periodic, `MASK[::5]` — every
+write loses exactly one fade, and a uniform rescale of the store provably cannot
+change an argmax. That is the same fact
+[the tests already pin](tests/test_decay_when_masked.py) in
+`test_fades_after_every_write_are_invisible`. So the mutation may be a genuine
+no-op on symmetric masks rather than a hole in the tests.
+
+The distinguishing case is an **asymmetric** mask — some writes adjacent, some
+isolated — where bindings lose *different* numbers of fades and the effect is a
+reweighting rather than a rescale. Sketched by hand: with writes at
+`{10, 11, 60}`, the early pair lose two fades each and the lone write loses one.
+
+**Decide it before adding the mutation back:** if asymmetric masks make it
+visible, write that test and restore the mutation. If nothing makes it visible,
+it is a no-op and does not belong in the harness — record why, because the next
+person will try the same mutation.
+
+---
+
+## Five copies of a safety rail, and one of them has already drifted
+
+John asked where duplicate code could be consolidated. The experiment drivers are
+fine — 44 of them already share `experiments/harness.py`. The summarisers are
+not.
+
+Thirteen of the twenty repeat the same load boilerplate, and **five carry
+hand-copied versions of the two refusals**: no ratio when the floor arm is at or
+below the trivial floor, and none when the oracle's advantage is not larger than
+the seed spread. Both rails exist because both failures have already cost this
+project a result.
+
+**One copy is already wrong.** `tools/summarise_g8_02.py` has the seed-spread
+refusal and **no trivial-floor refusal at all**, while printing the header
+*"RECOVERY, and the floor it is measured against"*. That is the summariser for
+the sweep whose usable range had to be cut back to zipf 0.0–0.5 by hand — the
+cut a working floor check would have made automatically.
+
+So this is not tidying. A safety rail copied five times is five chances for one
+to rot, and one already has.
+
+**The shape:** a `tools/recovery.py` holding `load(pattern)`, and a
+`recovery(cells, key, floor)` that returns `None` for each refusal with a reason
+attached, so a summariser can print *why* a cell is undefined instead of just
+that it is. The trivial floor stays a **parameter** — it is legitimately
+`1/4 + (3/4)/8 = 0.34375` for MQAR and `1/8` for `reward_recall`, and freezing
+one of them into the shared module would be the same class of mistake as the
+drift it fixes.
+
+**Do it with a mutation:** delete the floor check in the shared module and
+confirm at least one summariser test fails. Otherwise the consolidated rail is
+as unchecked as the five copies were.
+
+---
+
+## Standard tests that already exist at this size
+
+John asked whether anyone else has needed these test shapes. They have, and the
+answer changes how the next tasks should be chosen.
+
+### We are already using one, and did not say so
+
+**MQAR is not ours.** It comes from the Zoology line of work on recall in
+efficient language models, and was designed as exactly what this project needed
+it to be: *a small synthetic whose behaviour predicts large-scale recall.* The
+"is a tiny synthetic legitimate" worry was answered before we arrived.
+
+### bsuite is our gate ladder, built by someone else
+
+DeepMind's [Behaviour Suite for RL](https://arxiv.org/pdf/1908.03568v1) is a set
+of **targeted unit tests, each isolating one capability**, with **smooth variation
+in problem complexity rather than fixed-size challenges**. That is the gate ladder
+and the difficulty dials, arrived at independently.
+
+Two of its tests overlap what has been built here from scratch:
+
+- **Memory Length** — how many sequential steps an agent can hold one bit, via a
+  T-maze **parameterised by length**. That is `reward_recall`'s delay dial. It was
+  derived here from note 017's requirements list; it already existed.
+- **Credit assignment** — the paper's own illustration is *"an algorithm might
+  completely fail at credit assignment beyond n = 20 steps."*
+  [g9-02](experiments/sweeps/g9-02-a-gate-that-reads-its-own-input.txt)'s cliff is
+  at delay 20. Coincidence in the number, but the shape of the finding is the
+  shape their instrument was built to produce.
+
+**The fit caveat is real:** bsuite assumes an agent with actions and a policy, and
+this project has neither. The *task shapes* transfer; the suite does not. Running
+it would measure the absence of a policy, which is already known.
+
+**Worth taking:** the parameterised-length T-maze framing, so the delay results
+are comparable to a literature rather than only to themselves.
+
+### Toy models of superposition
+
+Elhage et al.'s toy-models work is the closest existing treatment of
+`SNR = sqrt(d/N)` and of the false-positive question note 020 could not test —
+and it is **real-valued rather than binarised**, which is precisely the caveat
+that made Theorem 20 only partly transferable to this store.
+
+> **Read the paper first.** All of the above is from search results and one
+> abstract. This entry exists to be acted on by reading, not by citing.
+
+### The pattern, which is the actual finding
+
+Three times now the sequence has been: derive a requirement from first
+principles, build the thing, then discover the requirement describes something
+that already exists.
+
+- note 010 — tagging and capture, read properly *after* the mechanism was
+  half-built
+- note 020 — the capacity equation, derived empirically and checked a year of
+  sweeps later
+- this entry — a task built from a requirements list that turned out to describe
+  bsuite's Memory Length
+
+Each time the borrowed version was better specified than ours. **The cheap move
+is to search for prior art at the point the requirements list is written, not
+after the code is.** That is now a rule in CLAUDE.md rather than an observation
+here.
+
+---
+
 ## Cross-checks against work that already exists
 
 John asked whether any fully modelled digital-neuron project could be compared

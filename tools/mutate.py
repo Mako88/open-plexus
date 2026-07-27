@@ -423,8 +423,11 @@ MUTATIONS = [
                "(t-1 -> t), so gating on t-1 keeps the wrong ones while every "
                "count and shape stays identical",
         path=LOCAL,
-        old="(store is None or store[t])",
-        new="(store is None or store[t - 1])",
+        # Qualified with the write guard because `decay_when_masked` added a
+        # second reading of the same mask, and an ambiguous target is a stale
+        # target: without this the harness cannot tell which branch it broke.
+        old="previous_key is not None and (store is None or store[t])",
+        new="previous_key is not None and (store is None or store[t - 1])",
     ),
     Mutation(
         name="storage-mask-ignored",

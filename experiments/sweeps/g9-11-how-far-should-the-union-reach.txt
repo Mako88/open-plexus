@@ -95,6 +95,26 @@ A re-run at `slots` 16, which g9-10 puts near the optimum at delay 8, would give
 absolute numbers worth quoting. It is cheap and it is in BACKLOG.
 
 
+SECOND RUN, at `slots` 16
+--------------------------
+Status: DISPATCHED. Same grid, same predictions, capacity corrected.
+
+The first run's numbers above are NOT deleted -- they are the record of what was
+measured, and the relative finding taken from them stands. This run exists to put
+absolute numbers on the same question at a capacity that is not badly wrong.
+
+**The predictions are unchanged and are not re-registered.** Predictions 1 to 5
+above were written before the first run and are about the SHAPE of the reach
+axis, which a capacity change should not alter. If they score differently here,
+that is itself the finding -- it would mean the shape depends on the capacity,
+which nothing so far suggests and which would matter more than the numbers.
+
+One thing to watch: the first run's `tag` row is flat at -0.35 across every
+reach, which is the wiring check passing. At `slots` 16 it should be flat at a
+much better value. **If it is flat at -0.35 again, the capacity change did not
+take** and the whole re-run is measuring the first run.
+
+
 IN PLAIN TERMS
 ---------------
 Two filters were combined and the pair beat either alone. One of them has a
@@ -146,9 +166,16 @@ THE GRID
                                the wiring check
   delay       1, 8, 20         1 is where note 027's leak makes the task trivial
                                and is included ONLY as a control on that
-  slots       4, FIXED         g9-10's best for the combined arm
-  fade        0.95, FIXED
-  width       64, partitions 1
+  slots       16, FIXED        from g9-10, at delay 8, AT EVERY NODE WIDTH it
+                               tested. Written with its provenance because the
+                               first run of this sweep pinned `slots` 4 -- which
+                               was g9-10's best AT NODE 32 -- and ran at node 64,
+                               where the tag alone scores -0.35. The value was
+                               right for a configuration this grid does not use.
+  fade        0.95, FIXED      from g9-06, at d_model 32 in one process. STILL
+                               carried across configurations, and still a risk
+                               by exactly the argument above
+  width       64, partitions 1 so the node is 64
   arms        none, oracle, reward, tag, tag-strongest, combined
   seeds       1, 2, 3
   lr          0.05, FIXED on every arm

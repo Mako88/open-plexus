@@ -98,6 +98,30 @@ individual experiment remains sound.
 > 96 in every sweep the project had ever run
 > ([g1-10](experiments/sweeps/g1-10-the-real-load.txt)). The account was right
 > for four experiments while looking refuted for two of them.
+>
+> *Calibration, second kind: a constant CARRIED from another configuration.*
+> Twice in consecutive sweeps, and the second time after the first was written
+> up as a named risk.
+> [g9-09](experiments/sweeps/g9-09-a-small-node-in-a-wide-network.txt) froze
+> `slots` 32 and `fade` 0.95 at values chosen for `d_model` 32 in one process,
+> then swept node width — and its own file named that as the standing risk before
+> dispatch. It was real: g9-10 found the best capacity is not 32 anywhere, and
+> g9-09's decline from +0.16 to +0.11 was partly a mistuned tag.
+>
+> Then [g9-11](experiments/sweeps/g9-11-how-far-should-the-union-reach.txt) froze
+> `slots` 4 — g9-10's best **at node 32** — and ran at node 64, where the tag
+> alone scores -0.35. Every absolute number in it is at a mistuned capacity.
+>
+> **So naming the frozen axis as a risk demonstrably does not prevent it.** The
+> failure is not forgetting to look; it is looking at the value and not at the
+> configuration it came from. What saved g9-11 was that its reported quantity was
+> a DIFFERENCE within a cell, so the mistuning cancelled — which was luck in the
+> summariser's design rather than care in the grid's.
+>
+> The cheap habit that would catch it: **when a sweep pins a value taken from an
+> earlier sweep, write down which cell it came from, next to the pin.** A line
+> reading `slots 4, from g9-10 at NODE 32` sitting above `width 64` is visible in
+> a way that `slots 4, FIXED` is not.
 
 **A hyperparameter swept on one arm of a comparison must be swept on all of
 them.** Tuning your own side and comparing against an untuned baseline produces a

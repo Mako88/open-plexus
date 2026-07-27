@@ -45,7 +45,7 @@ jobs:
           python-version: "3.13"
       - run: pip install numpy
       - name: reach ${{ matrix.window }} delay ${{ matrix.delay }}
-        run: python experiments/g9_05_the_tag.py --width 64 --slots 4 --fade 0.95 --window ${{ matrix.window }} --scale ${{ matrix.delay }} --lr 0.05 --workers 3 --json out/X-${{ matrix.window }}-${{ matrix.delay }}.json
+        run: python experiments/g9_05_the_tag.py --width 64 --slots 16 --fade 0.95 --window ${{ matrix.window }} --scale ${{ matrix.delay }} --lr 0.05 --workers 3 --json out/X-${{ matrix.window }}-${{ matrix.delay }}.json
       - uses: actions/upload-artifact@v4
         with:
           name: g9-11-${{ matrix.window }}-${{ matrix.delay }}

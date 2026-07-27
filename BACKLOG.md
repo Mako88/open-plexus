@@ -402,6 +402,43 @@ the whole mechanism and the signal was a detour.
 [g9-07](experiments/sweeps/g9-07-a-tag-that-knows-how-big-its-store-is.txt) asks
 exactly that, with `tag_relative`.
 
+## ANSWERED: eight dimensions, and the tag is not better on small nodes
+
+[g9-09](experiments/sweeps/g9-09-a-small-node-in-a-wide-network.txt) ran, 15 of
+15, node width chosen INTERIOR so the numbers are values rather than bounds.
+
+    node        d1      d8     d20   spread     mean
+      64     +0.16   +0.19   +0.19     0.04    +0.18
+      32     +0.21   +0.21   +0.22     0.01    +0.21
+      16     +0.14   +0.16   +0.17     0.03    +0.16
+       8     +0.10   +0.10   +0.11     0.01    +0.11
+       4   refused refused refused       --       --
+
+**The flatness holds at every usable node size** -- spreads 0.04, 0.01, 0.03,
+0.01 against the window's 1.85, 0.82, 0.45, 0.27. That is the property the tag
+exists for and it now holds across an eightfold range rather than at one setting.
+
+**Height peaks at node 32 and declines.** The hoped-for "better on small nodes"
+does not happen. **The smallest node that can run the task at all is 8**, where
+the gate still recovers +0.11.
+
+**And the window's catastrophe is a WIDE-node phenomenon**: -0.10, -0.23, -0.56,
+-1.62 at nodes 8, 16, 32, 64. Monotone, and backwards from the prediction.
+
+### What is still open on this line, in order
+
+1. **The working point was frozen at values chosen for `d_model` 32 in one
+   process.** Named as the standing risk before dispatch and still untested: the
+   decline from node 16 to 8 is exactly where a mistuned capacity shows first.
+   A `slots` x `node` sweep at fixed delay would settle it, and is cheap.
+2. **The combined gate has never been measured.** Built, tested, mutated, and its
+   pre-dispatch control says it only differs from the tag at SMALL capacity --
+   which is now known to be the regime that matters least for node size and most
+   for the signal. Fold a `combined` arm into (1) rather than giving it a matrix.
+3. **Nothing here has run on a real network.** One process with a split readout.
+   The testbed exists, works over an impaired link, and has never run a gated
+   model.
+
 ## A small NODE, not a narrow NETWORK -- g9-08 asked it wrong
 
 [g9-08](experiments/sweeps/g9-08-how-small-a-node-can-run-the-gate.txt) ran and

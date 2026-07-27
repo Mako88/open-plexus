@@ -585,3 +585,35 @@ second time I nearly shipped one without it.
 assertion is `assertIsNotNone` or `assertTrue` on a call result — has no instance
 in the repository, so it would be a rail with nothing to hold and no way to know
 it works. Recorded as worth adding the first time one appears.
+
+## 24. g9-09 answered John's priority, and the answer is "no, but"
+
+**The result.** The tag is NOT better on small nodes. Recovery peaks at node 32
+(+0.21) and declines to +0.11 at node 8; node 4 is refused with both floor and
+ceiling broken. The smallest node that can run this task at all is **eight
+dimensions**.
+
+**What survives is the thing that matters.** Spread across delay is 0.04, 0.01,
+0.03, 0.01 at nodes 64 down to 8, against the window's 1.85, 0.82, 0.45, 0.27.
+The flatness — not having to be told the delay — holds across an eightfold range
+of node sizes. That was prediction 3 and it is the only one confirmed strongly.
+
+**Two predictions were refuted and both had their reasoning pre-registered as
+suspect.** Prediction 1's level: the control implied 0.42 and the sweep gives
+0.21, and the difference is the FLOOR arm, which is what "most likely wrong"
+named before dispatch. Prediction 5: the signal's direction does not pay more on
+a small node — the gap *shrinks* — and I had written that treating "starved by
+capacity" and "starved by width" as the same scarcity was the reason it might
+fail. It was.
+
+**Chosen: marking the pre-dispatch IN PLAIN TERMS paragraph as wrong in place**
+rather than deleting it. It told a plain-language reader that filtering matters
+*more* as the device shrinks. That is false and it was the sweep's own
+motivation, so it is quoted and corrected where it stands — same treatment as
+note 023 and GOALS.
+
+**What I would flag.** The working point (`slots` 32, `fade` 0.95) was frozen at
+values chosen for `d_model` 32 in one process. I named that as the standing risk
+before dispatch and it is still untested — the decline from node 16 to 8 is
+exactly where a mistuned capacity would show up first. That is now the top item
+on the line, and it is cheap.

@@ -2,7 +2,131 @@ Does the gate get BETTER as the node gets smaller?
 ==================================================
 
 Script: experiments/g9_05_the_tag.py, with --partitions swept
-Status: PRE-REGISTERED, with a pre-dispatch control disclosed below.
+Status: RUN. 15 of 15 cells, three refused, node width chosen INTERIOR.
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30244075029
+
+ANSWER: no, it does not get better as the node shrinks -- it degrades
+        gracefully and then stops. But the FLATNESS survives at every node
+        size, which is the property the tag exists for, and the smallest node
+        that can run the task at all is EIGHT dimensions.
+
+
+THE RESULT
+-----------
+Recovery, by what ONE node holds, in a network that stays 64 wide.
+
+    node        d1      d8     d20   spread     tag mean
+      64     +0.16   +0.19   +0.19     0.04        +0.18
+      32     +0.21   +0.21   +0.22     0.01        +0.21
+      16     +0.14   +0.16   +0.17     0.03        +0.16
+       8     +0.10   +0.10   +0.11     0.01        +0.11
+       4   refused refused refused       --           --
+
+    window   +0.22   +0.23   -1.62     1.85     (node 64)
+             +0.26   +0.26   -0.56     0.82     (node 32)
+             +0.22   +0.23   -0.23     0.45     (node 16)
+             +0.16   +0.17   -0.10     0.27     (node 8)
+
+**The flatness holds at every usable node size.** Spreads of 0.04, 0.01, 0.03
+and 0.01 against the window's 1.85, 0.82, 0.45 and 0.27. Splitting a readout
+eight ways does not change what a capacity over bindings is counting, which is
+the one thing this mechanism was built to be, and it now holds across an
+eightfold range of node sizes rather than at a single one.
+
+**Height peaks at node 32 and falls.** +0.18, +0.21, +0.16, +0.11. So the gate is
+mildly better on half a network than on a whole one, and worse below that. It
+degrades gracefully rather than collapsing.
+
+**The smallest node that can run the task is 8.** At node 4 the floor arm is
+0.116-0.125 against a trivial floor of 0.125 AND the oracle falls to 0.743 --
+both ends broken at once, refused and flagged.
+
+
+THE WINDOW'S CATASTROPHE IS A WIDE-NODE PHENOMENON
+---------------------------------------------------
+    node     8      16      32      64
+    d20  -0.10   -0.23   -0.56   -1.62
+
+Monotone across four sizes, and **backwards from what was predicted**. An
+unmatched window is most destructive on the WIDEST node, not the narrowest. The
+reading that fits: a wider readout leans harder on what the store holds, so
+keeping the wrong nine writes costs more, not less. At node 8 it is -0.10 and
+merely bad.
+
+That is a four-point relationship rather than the single -1.62 cell g9-08
+produced, and it turns that observation into something with a shape.
+
+
+PREDICTIONS, SCORED
+--------------------
+1. **SHAPE CONFIRMED, LEVEL REFUTED, and the reason was registered.** Predicted
+   recovery rises then falls, above 0.25 from 2 to 8 groups, peaking between 2
+   and 4. It does rise then fall and does peak at 2 groups (node 32) -- but at
+   +0.21, and it is never above 0.25 anywhere.
+
+   The control implied 0.16/0.42/0.35/0.28/0.43 and the sweep gives
+   0.18/0.21/0.16/0.11. **The control was one seed with reduced training and its
+   floor arm ran 0.894 down to 0.406; the sweep's runs 0.648 down to 0.116.** The
+   denominator is what differed, which is exactly what "most likely wrong" named
+   before dispatch: *a ratio whose denominator is what changed is the shape that
+   has already cost this project a result twice*.
+
+2. **REFUTED, and the guard that replaced it worked.** Predicted
+   `tools/recovery.py` would NOT refuse the node-4 cells, since its refusals are
+   about the floor and the seed spread rather than the ceiling, and that the
+   summary would print a number that should not be used. In fact the FLOOR broke
+   there too -- 0.116, 0.125, 0.123 against a trivial floor of 0.125 -- so it
+   refused on its own terms. The CEILING BROKEN flag added for this fired anyway
+   and is visible beside all three cells, which is the outcome that mattered.
+
+3. **CONFIRMED, strongly, and it is the finding.** Spread under 0.10 at every
+   usable node size; under 0.04 at all four.
+
+4. **REFUTED, exactly backwards.** Predicted the window's delay-20 collapse gets
+   worse as the node shrinks, below -0.5 at 8 groups. It is -0.10 at node 8 and
+   -1.62 at node 64.
+
+5. **REFUTED.** Predicted `tag` beats `tag-strongest` by MORE as the node
+   shrinks, above +0.10 at 8 groups and near zero at 1. The gap runs +0.05,
+   +0.03, +0.02, +0.02 from node 64 down to 8 -- it SHRINKS, and never reaches
+   +0.10.
+
+   The reasoning was named as the reason it might fail: *it treats "starved by
+   capacity" and "starved by width" as the same kind of scarcity, and they are
+   not obviously the same thing*. They are not. The direction's value in g9-06
+   was spread across all four delays at a starved capacity; here it is
+   concentrated almost entirely at delay 20 and is near zero at delays 1 and 8.
+
+Two refuted outright, one refuted backwards, one confirmed strongly, one split.
+The two whose reasoning was pre-registered as suspect are the two that failed.
+
+
+THE GRID CONTAINED ITS OWN ANSWER
+----------------------------------
+`tools/grid.py` on the node width chosen at each delay: interior at 32, with 64
+above and 16, 8, 4 below. So these are values rather than bounds -- the second
+sweep in this family to manage that, after g9-07.
+
+
+WHAT THIS SETTLES, AND WHAT IT DOES NOT
+----------------------------------------
+**Settled: the tag is not better on small nodes.** The best available outcome
+named in WHAT WOULD REFUTE WHAT does not happen. What happens is the second one:
+recovery is roughly flat from node 64 to 16 and then declines, which is "the gate
+is largely indifferent to node size" over a 4x range and "it degrades" below
+that.
+
+**Settled: eight dimensions.** The smallest node that can answer this task at
+all, with the gate recovering +0.11 there and the flatness intact.
+
+**Not settled: whether the working point is right for a small node.** `slots` 32
+and `fade` 0.95 were frozen at values chosen for `d_model` 32 in one process, and
+that was named as this grid's standing risk before dispatch. Every cell here may
+understate a tag tuned for its own node size, and the decline from node 16 to 8
+is exactly where a mistuned capacity would show up first.
+
+**Not settled: anything about a real network.** This is one process with a split
+readout. The testbed exists and has never run a gated model.
 
 
 IN PLAIN TERMS
@@ -20,6 +144,14 @@ size of device this project is actually for.
 The early sign is the opposite of what was feared. A smaller piece is a weaker
 reader, and a weaker reader is hurt MORE by remembering junk -- so filtering
 matters more, not less, as the device shrinks.
+
+> **That paragraph was written before the run and is WRONG.** It is kept because
+> it is what the pre-dispatch control implied and because the reasoning in it is
+> the reasoning the sweep tested. Filtering does not matter more as the device
+> shrinks: the benefit peaks at half a network, then declines, and below eight
+> numbers the device cannot do the task at all. What DOES survive all the way
+> down is the thing the filter was built for -- it works equally well whether the
+> important thing happened four steps ago or forty, at every size measured.
 
 
 WHY THIS RUN EXISTS

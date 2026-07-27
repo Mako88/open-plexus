@@ -319,10 +319,22 @@ class LocalMemoryConfig:
             token sits a fixed distance after the cue. Each mechanism has one
             answer and a gate needs both.
 
-            The union keeps more, so it pays in interference -- retrieval goes
-            as `sqrt(d / N)` -- and that is the whole question. It cannot capture
-            LESS than either alone, so anything below the better of the two is
-            the interference cost showing up, measurably.
+            The union keeps more, so it pays in interference -- retrieval
+            goes as `sqrt(d / N)` -- and that is the whole question.
+
+            **It CAN capture less than either arm alone, and that surprised
+            me.** Within one interval the survivors really are the set union, and
+            `tests/test_tag.py` pins that on a single-interval stream. Across
+            intervals they are not: protecting more writes leaves a larger store,
+            a larger store returns stronger retrievals, and the tag ranks on
+            retrieval strength -- so the union's own marks diverge from the ones
+            a tag-only run would have made. Measured at `slots` 8, `tag_decay`
+            0.95, delay 20: the union captured the rewarded binding in 6 of 32
+            captures where the tag alone managed 8.
+
+            So this is a feedback loop between what a capture keeps and what the
+            next interval marks, not a set operation, and "at least as good as
+            both" is not available as an argument.
         tag_relative: Rank the tag on retrieval strength divided by the size
             of the store that produced it, instead of on the raw strength.
 

@@ -387,15 +387,27 @@ The `tag_slots`/`reward_window` exclusion is lifted; a tag with `reward_window`
 the combined gate needs `reward_window` at least 1. Tests and two mutations are
 in.
 
-**It cannot capture less than either alone**, so the only way it loses is
-interference — it keeps more, and retrieval goes as `sqrt(d / N)`. That is the
-whole measurement and it has not been run: g9-07 holds the matrix and g9-08 is
-queued behind it. Predictions must be registered before it is dispatched.
+**The pre-dispatch control has been run, and it changed what this is.**
 
-A cheap pre-dispatch control exists and should be run first, the same one g9-05
-and g9-07 used: count rewarded-binding capture for `combined` against `tag` and
-`reward` at delays 1, 8 and 20. If the union does not capture strictly more, the
-implementation is wrong before any recovery number is spent on it.
+**At the tag's working point the union degenerates into the tag.** At `slots` 32,
+`fade` 0.95 the tag already captures 32 of 32 rewarded bindings at delays 1, 8
+AND 20, and keeps 929-965 writes; adding a window of 8 changes neither number. So
+a combined-gate sweep at the working point would have measured the tag, twice, at
+15 jobs. **The control cost seconds and saved that.**
+
+**And "at least as good as both" is false.** At `slots` 8, `fade` 0.95, delay 20
+the union captured 6 of 32 where the tag alone managed 8. Within an interval the
+survivors are the set union; across intervals protecting more writes leaves a
+larger store, which returns stronger retrievals, which changes what the tag marks
+next. It is a feedback loop, not a set operation — corrected in the config
+docstring and the arm comment, both of which claimed otherwise.
+
+**Where it is still worth running: small capacity.** At `slots` 4 and 8 with
+`fade` 0.99 the union beats the better arm by +3 of 32 at delay 20, which is the
+only regime where the two mechanisms hold different writes. That is also the
+tiny-node regime, so it belongs with the width question rather than as its own
+sweep — fold a `combined` arm into a g9-08 follow-up rather than spending a
+matrix on it now.
 
 [g9-05](experiments/sweeps/g9-05-a-tag-that-fades.txt) ran, 32 of 32 cells, no
 refusals. **The tag's rows that are flat are flat at zero, and its rows that are

@@ -22,6 +22,8 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent.parent
+
 #: A run at or above this counts as having solved the task; at or below STUCK,
 #: as never having got near it. The band between is reported separately rather
 #: than being split, because how often runs land in it is itself a finding.
@@ -48,7 +50,38 @@ def oracle_mask(kinds) -> "np.ndarray":
     return np.array([i > 0 and kinds[i - 1] == "pair" for i in range(len(kinds))])
 
 
+def refuse_if_mutating() -> None:
+    """Stop if tools/mutate.py currently has a file edited.
+
+    The harness writes a sibling `.py.bak` before each edit and removes it
+    after, so one lying around means either a run is in flight or a run was
+    killed. Either way the source on disk is not the source anyone means to
+    measure.
+
+    This exists because a control was nearly run against a deliberately broken
+    model. It would have produced numbers, they would have looked plausible, and
+    **nothing in the output would have said otherwise** -- which is the failure
+    mode this project's standards are written against.
+    """
+    leftovers = sorted(ROOT.glob("**/*.py.bak"))
+    if leftovers:
+        raise SystemExit(
+            "REFUSING TO RUN: tools/mutate.py has the source edited.\n"
+            + "\n".join(f"  {p.relative_to(ROOT)}" for p in leftovers)
+            + "\n\nWait for the harness to finish, or if it was killed, run it "
+              "again -- it restores any leftover .bak on startup before doing "
+              "anything else."
+        )
+
+
 def parse_args(description: str) -> argparse.Namespace:
+    """Parse the shared experiment arguments.
+
+    Refuses to proceed while the mutation harness has the source edited, because
+    every experiment in this project goes through here and that is the one place
+    the check cannot be forgotten.
+    """
+    refuse_if_mutating()
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--seed", type=int, default=None,
                         help="run this seed only; omit to run all of them")

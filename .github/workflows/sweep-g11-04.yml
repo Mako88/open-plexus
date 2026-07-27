@@ -1,0 +1,102 @@
+name: sweep-g11-04-does-our-loss-fall-with-width-like-backprops
+
+# THE MEASUREMENT THAT COULD SAY GOAL 1 IS UNREACHABLE.
+#
+# Filipovich et al. (arXiv:2210.14593) fit compute-optimal scaling laws for
+# Direct Feedback Alignment against backpropagation and found the local rule does
+# not merely lose a constant -- it loses the EXPONENT. Backprop -0.071, DFA
+# -0.040, a shallow network -0.019. A rule that fails to propagate credit deeply
+# behaves like a shallower model, the gap WIDENS with scale, and it is invisible
+# at small scale. Every number this project has is at small scale.
+#
+# So this fits `bits ~ width^b` for three arms on the same corpus, same split,
+# same widths, and compares b:
+#
+#   single     our model, one key per token         ceiling is a bigram
+#   context    our model, keys from a token pair    ceiling is a trigram
+#   backprop   softmax attention, trained by actual backpropagation, with a real
+#              optimiser and gradients reaching every parameter
+#
+# WHAT A FLAT EXPONENT WOULD NOT MEAN, because confusing the two readings is the
+# trap this experiment exists to avoid: the delta rule on Wo IS the exact
+# gradient for a single linear readout. We are not approximating backprop badly;
+# there is no hidden layer to propagate through. A flat exponent is a statement
+# about the ARCHITECTURE, and note 035 already predicts one for the single-token
+# arm -- the store holds a bigram count table whose effective rank is about 3 at
+# every width.
+#
+# The arm that bears on the learning rule is CONTEXT. If width buys nothing even
+# when the ceiling moves, the ceiling was not what was binding.
+#
+# PREDICTIONS:
+#   P1  the single-token arm is FLAT, |b| < 0.02
+#   P2  the backprop arm has a clearly negative exponent -- this is the CONTROL,
+#       and if it is flat too the width range resolves nothing and the sweep
+#       says nothing
+#   P3  the context arm is steeper than the single-token arm
+#   P4  neither of our arms reaches the backprop arm's exponent
+#
+# Pre-dispatch control: backprop at width 16, chunk 64, notes corpus reached
+# 4.707 bits, against our 5.897 at width 32. The reference is meaningful and it
+# already beats us.
+#
+# 12 jobs: 4 widths x 3 arms, two seeds inside each.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  scaling:
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [32, 64, 128, 256]
+        arm: [single, context, backprop]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: ${{ matrix.arm }} at width ${{ matrix.width }}
+        run: python experiments/g11_04_scaling_exponent.py --corpus shakespeare --width ${{ matrix.width }} --scale 256 --mode ${{ matrix.arm }} --workers 2 --json out/X-${{ matrix.arm }}-${{ matrix.width }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g11-04-${{ matrix.arm }}-${{ matrix.width }}
+          path: out/*.json
+
+  aggregate:
+    needs: [scaling]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g11-04-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 12" | tee summary.txt
+          python -m tools.summarise_g11_04 | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g11-04-summary
+          path: |
+            summary.txt
+            out/*.json

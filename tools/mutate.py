@@ -596,6 +596,15 @@ MUTATIONS = [
         new="                np.random.default_rng((config.seed, 0)).normal(0.0, spread, d)",
     ),
     Mutation(
+        name="a-single-read-secretly-settles-once",
+        breaks="every result in the project -- `retrieval_steps` defaults to 1 "
+               "and one settling step is measured to drop recall from 0.924 to "
+               "0.600, so this would silently degrade every earlier number",
+        path=LOCAL,
+        old="            for _ in range(self.config.retrieval_steps - 1):",
+        new="            for _ in range(self.config.retrieval_steps):",
+    ),
+    Mutation(
         name="the-write-gate-is-ignored",
         breaks="the whole finding -- every corrective write would apply the "
                "full correction whatever the gate said, so a sweep over the "
@@ -671,8 +680,8 @@ MUTATIONS = [
         breaks="the point of consolidating at all, since the lasting store "
                "would be written and then ignored at retrieval",
         path=LOCAL,
-        old="            retrieved = memory @ key if lasting is None else (memory + lasting) @ key",
-        new="            retrieved = memory @ key",
+        old="            readable = memory if lasting is None else memory + lasting",
+        new="            readable = memory",
     ),
     Mutation(
         name="trace-reports-the-neighbouring-token",

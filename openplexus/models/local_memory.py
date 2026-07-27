@@ -516,6 +516,36 @@ class LocalMemoryConfig:
             — but that is not the same as verified, so `tests/test_derived_keys.py`
             checks the model scores the same on the task rather than trusting the
             statistics.
+        retrieval_steps: How many times to re-read the store per query. 1 — the
+            default — is a single linear read and reproduces every earlier
+            result exactly.
+
+            **This is the one thing the capacity literature agrees on and we did
+            not have.** `r = M @ key` is a weighted SUM: every stored value,
+            weighted by how much its key overlaps this one. Nothing selects, so
+            retrieval returns an average. That is precisely what separates linear
+            associative capacity O(d) from a competitive read's O(e^{d/2}), and
+            Xu et al. (arXiv:2602.01744) measure +15.5 points on hardest-case
+            retrieval from reinstating competition on linear-attention baselines.
+
+            A step maps the retrieval back through the store, renormalises, and
+            reads again:
+
+                back = M.T @ r ;  r = M @ (back / ||back|| · ||key||)
+
+            Since `M = Σ value_i ⊗ key_i`, the returned weights become
+            `⟨key_i, key⟩·⟨value_i, r⟩` — a PRODUCT of two similarities. A value
+            matching on both key and content survives; one matching on neither
+            fades. That is Hopfield settling, and it is why iterating sharpens
+            rather than merely rescaling.
+
+            **It is local, and it is not free.** A step re-reads the node's own
+            store, so C1 holds — no barrier, no population statistic, no other
+            node's contents. But `M.T @ r` sums over the VALUE dimensions where
+            `M @ key` sums over the key dimensions, so a partitioned network
+            needs a second pooling round per step. **Under C2 that doubles the
+            communication per token**, which is the real price and is not visible
+            in a single-process run.
         write_gate: How much of the corrective write to apply, in (0, 1]. Does
             nothing unless `corrective_writes` is on. **1.0 reproduces every
             earlier result and is the wrong default**, kept only for that reason.
@@ -650,6 +680,7 @@ class LocalMemoryConfig:
     lasting_cap: float = 0.0
     corrective_writes: bool = False
     write_gate: float = 1.0
+    retrieval_steps: int = 1
     readout_bias: bool = False
     derived_keys: bool = False
     context_keys: bool = False
@@ -670,6 +701,11 @@ class LocalMemoryConfig:
             raise ValueError(
                 "derived_keys and key_active both build Wk and would conflict; "
                 "sparse keys have no per-token derivation yet")
+        if self.retrieval_steps < 1:
+            raise ValueError(
+                f"retrieval_steps is how many times the store is read and must "
+                f"be at least 1; got {self.retrieval_steps}. Zero would mean "
+                f"answering without reading the memory at all")
         if not 0.0 < self.write_gate <= 1.0:
             raise ValueError(
                 f"write_gate is a fraction of the correction and must be in "
@@ -1369,7 +1405,23 @@ class LocalAssociativeMemory:
             # RETRIEVE, then read an answer off each group independently.
             # `parts` is (groups, vocab): row g is the complete prediction group
             # g makes from its own dimensions, owing nothing to any other group.
-            retrieved = memory @ key if lasting is None else (memory + lasting) @ key
+            # NOT named `store` -- that is the write mask parameter, and
+            # shadowing it silently turned `if wrote:` into an array test.
+            readable = memory if lasting is None else memory + lasting
+            retrieved = readable @ key
+            # COMPETITION, by settling. One step reproduces every earlier result.
+            #
+            # `retrieved` is a weighted SUM -- every stored value, weighted by
+            # how much its key overlaps this one. Nothing selects. Mapping back
+            # through the store and reading again multiplies the two
+            # similarities, so a value that matches on both key AND content
+            # survives where one that matches on neither fades.
+            for _ in range(self.config.retrieval_steps - 1):
+                back = readable.T @ retrieved
+                size = float(np.linalg.norm(back))
+                if size <= 0.0:
+                    break
+                retrieved = readable @ (back / size * np.linalg.norm(key))
             sliced = retrieved.reshape(groups, -1)
             parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)
             answer = parts.sum(0) if members is None else parts[members].sum(0)

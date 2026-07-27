@@ -596,6 +596,24 @@ MUTATIONS = [
         new="                np.random.default_rng((config.seed, 0)).normal(0.0, spread, d)",
     ),
     Mutation(
+        name="the-cache-admits-by-RECENCY-not-residual",
+        breaks="the admission policy, which is the whole claim -- the cache "
+               "would keep the last N bindings rather than the ones the store "
+               "could not absorb, and HOLA measured that as 0.34 absolute worse",
+        path=LOCAL,
+        old="                if residual > cache_score[weakest]:",
+        new="                if True:",
+    ),
+    Mutation(
+        name="the-cache-read-is-not-gated-by-the-MATCH",
+        breaks="the guard against contributing noise -- an unmatched query "
+               "would still pull a full-magnitude vector out of the cache, "
+               "which measurably made synthetic recall worse",
+        path=LOCAL,
+        old="                    if match > 0.0:",
+        new="                    if True:",
+    ),
+    Mutation(
         name="a-single-read-secretly-settles-once",
         breaks="every result in the project -- `retrieval_steps` defaults to 1 "
                "and one settling step is measured to drop recall from 0.924 to "

@@ -553,6 +553,54 @@ class LocalMemoryConfig:
             — but that is not the same as verified, so `tests/test_derived_keys.py`
             checks the model scores the same on the task rather than trusting the
             statistics.
+        cache_slots: How many bindings to also keep EXACTLY, alongside the
+            superposed store. 0 — the default — reproduces every earlier result.
+
+            **This is the one lever four refutations have all pointed at.**
+            Readout bias, competitive retrieval and orthogonal updates each
+            failed for the same underlying reason: `r = M @ key` is a SUM, and
+            no operation applied after a sum recovers the per-item information
+            the sum destroyed. Note 035 measured the consequence — the store's
+            effective rank is about 3 whatever its width.
+
+            So the fix is not to read differently. It is **to stop summing some
+            of it.** A bounded set of `(key, value)` pairs is held verbatim and
+            read by similarity, which is where competition finally becomes
+            possible: the entries exist separately, so a softmax over them
+            selects rather than averages.
+
+            **Admission is by `‖value − M @ key‖` — what the superposed store
+            FAILED to absorb.** That is novelty times commitment, and it is two
+            things at once: HOLA (arXiv:2607.02303) ablated it against the
+            alternatives and found `β‖e‖` beats `‖e‖`, `β‖v‖` and recency, the
+            last by 0.34 absolute at 32k context. And it is **synaptic tagging
+            and capture** — the g9 line's mechanism, which this project already
+            built from the biology. The policy came from biology and the
+            structure from the literature, which is exactly the split John
+            proposed.
+
+            **Locality.** The cache is one node's own, holding its own slice of
+            the value dimensions. The softmax runs over at most `cache_slots`
+            node-resident entries: no barrier, no other node, nothing pooled.
+            It is legal under the amended C1 and would have been legal under the
+            original.
+
+            **Why this is a hash table, and why that is now fine.** g10-07
+            measured a plain hash table answering `reward_recall` perfectly
+            where the store could not, and I recorded that as a threat. It was
+            a signpost. The 2026 answer is that the compressed store and the
+            exact cache should COEXIST, routed by what the compression lost —
+            and eviction degrades rather than deletes, because an evicted
+            binding is still in the superposed store.
+        cache_sharpness: Inverse temperature on the cache read. Cosine
+            similarities live in [-1, 1], so a softmax over them is nearly
+            uniform without scaling — HOLA measured exactly this failure, where
+            unit-norm keys gave ~3.5% weight per entry over 64 entries and
+            retrieval degenerated into soft averaging. Rescaling was **the
+            single largest design lever in their paper**, worth ~10 perplexity
+            points. 8.0 is a starting point, not a measured optimum.
+        cache_weight: How much the cache contributes to the retrieval, relative
+            to the superposed store. 1.0 adds it at full strength.
         orthogonal_every: Accumulate this many readout updates, orthogonalise
             the sum, then apply it. 0 — the default — applies each update
             immediately and reproduces every earlier result exactly.
@@ -744,6 +792,9 @@ class LocalMemoryConfig:
     write_gate: float = 1.0
     retrieval_steps: int = 1
     orthogonal_every: int = 0
+    cache_slots: int = 0
+    cache_sharpness: float = 8.0
+    cache_weight: float = 1.0
     readout_bias: bool = False
     derived_keys: bool = False
     context_keys: bool = False
@@ -764,6 +815,15 @@ class LocalMemoryConfig:
             raise ValueError(
                 "derived_keys and key_active both build Wk and would conflict; "
                 "sparse keys have no per-token derivation yet")
+        if self.cache_slots < 0:
+            raise ValueError(
+                f"cache_slots is a number of exact bindings and cannot be "
+                f"negative; got {self.cache_slots}. 0 disables the cache")
+        if self.cache_slots and self.cache_sharpness <= 0.0:
+            raise ValueError(
+                "cache_sharpness is an inverse temperature and must be "
+                "positive; at or below zero the read is uniform or inverted, "
+                "which is the soft-averaging failure the cache exists to avoid")
         if self.orthogonal_every < 0:
             raise ValueError(
                 f"orthogonal_every is a window length and cannot be negative; "
@@ -1165,6 +1225,15 @@ class LocalAssociativeMemory:
         # because a two-pass mean is not available to something that has to
         # decide as it goes.
         seen, mean_surprise, m2 = 0, 0.0, 0.0
+        # The exact cache, per sequence like the fast store it sits beside. A
+        # score of 0 marks a slot never filled, which is why admission compares
+        # against `argmin` rather than tracking a count.
+        # NOT named `slots` -- that is the capture-slot list a few lines above,
+        # and shadowing it silently disabled the reward gate.
+        held = max(self.config.cache_slots, 1)
+        cache_key = np.zeros((held, d))
+        cache_value = np.zeros((held, d))
+        cache_score = np.zeros(held)
         previous_key = None
         previous_retrieval = None
         # The size of the store that produced `previous_retrieval`, so a
@@ -1218,6 +1287,23 @@ class LocalAssociativeMemory:
             # is silent when a capture keeps thirty writes and fatal when it
             # keeps one.
             wrote_at = -1
+            if wrote and self.config.cache_slots:
+                # ADMIT BY WHAT THE SUPERPOSED STORE FAILED TO ABSORB.
+                #
+                # The residual is this binding's novelty: near zero when the
+                # store already answers that key correctly, large when it does
+                # not. Taken BEFORE the write, so it measures what the store
+                # knew rather than what it is about to be told, and scaled by
+                # `write_gate` so it is novelty times commitment rather than
+                # novelty alone -- the distinction HOLA ablated and found to
+                # matter.
+                residual = float(np.linalg.norm(
+                    value - memory @ previous_key)) * self.config.write_gate
+                weakest = int(cache_score.argmin())
+                if residual > cache_score[weakest]:
+                    cache_key[weakest] = previous_key
+                    cache_value[weakest] = value
+                    cache_score[weakest] = residual
             if wrote:
                 if self.config.decay < 1.0:
                     memory *= self.config.decay
@@ -1495,6 +1581,40 @@ class LocalAssociativeMemory:
             # shadowing it silently turned `if wrote:` into an array test.
             readable = memory if lasting is None else memory + lasting
             retrieved = readable @ key
+            if self.config.cache_slots:
+                # THE SELECTIVE READ, and the only place in this model where
+                # one is possible. The entries exist separately, so a softmax
+                # over them SELECTS; over a superposed store it could only
+                # rescale an average that had already been taken.
+                #
+                # Cosine rather than raw dot product, because a softmax over
+                # unscaled similarities is nearly uniform -- the soft-averaging
+                # failure `cache_sharpness` exists to prevent.
+                sizes = np.linalg.norm(cache_key, axis=1)
+                live = cache_score > 0.0
+                if live.any():
+                    cosine = (cache_key @ key) / np.maximum(
+                        sizes * np.linalg.norm(key), 1e-12)
+                    logits = np.where(live, cosine * self.config.cache_sharpness,
+                                      -np.inf)
+                    weights = np.exp(logits - logits.max())
+                    weights /= weights.sum()
+                    # GATED BY HOW WELL THE BEST ENTRY MATCHES.
+                    #
+                    # A softmax returns a convex combination whatever it is
+                    # given, so without this the cache contributes a
+                    # full-magnitude vector even when the query matches nothing
+                    # it holds -- noise, by construction. Caught by
+                    # `test_exact_cache.py`, where an ungated cache made
+                    # synthetic recall WORSE while still helping on text.
+                    #
+                    # `max(0, best cosine)` is the crudest honest gate: no match,
+                    # no contribution, and a perfect match contributes fully.
+                    match = float(np.max(np.where(live, cosine, -1.0)))
+                    if match > 0.0:
+                        retrieved = retrieved + (
+                            self.config.cache_weight * match
+                            * (weights @ cache_value))
             # COMPETITION, by settling. One step reproduces every earlier result.
             #
             # `retrieved` is a weighted SUM -- every stored value, weighted by

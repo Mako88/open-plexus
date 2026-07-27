@@ -427,6 +427,39 @@ class GroupingRecords(unittest.TestCase):
         rows = [{"zipf_s": 0.5, "arm": "none", "seed": 1, "accuracy": 0.4}]
         self.assertEqual(list(by_cell(rows, "zipf_s")), [(0.5, "none")])
 
+    def test_a_foreign_record_does_not_take_the_whole_summariser_down(self):
+        """The guarantee that protects every summariser at once.
+
+        `by_cell` is the one function all of them go through, so the filtering
+        lives there rather than in twenty callers — patching callers protects
+        whichever nineteen were remembered. Before this, a stray file in `out/`
+        raised `KeyError` in the middle of an aggregate step.
+        """
+        rows = [{"d": 1, "arm": "none", "seed": 1, "accuracy": 0.4},
+                {"epoch": 3, "train_bits": 5.8}]        # another experiment
+        with contextlib.redirect_stdout(io.StringIO()) as said:
+            cells = by_cell(rows, "d")
+        self.assertEqual(cells, {(1, "none"): {1: 0.4}})
+        self.assertIn("dropped 1 of 2", said.getvalue())
+
+    def test_a_record_missing_the_METRIC_is_skipped_too(self):
+        """Not just the swept fields. A record with the right shape and no
+        `accuracy` would raise on the last lookup rather than the first."""
+        rows = [{"d": 1, "arm": "none", "seed": 1, "accuracy": 0.4},
+                {"d": 1, "arm": "oracle", "seed": 1}]
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(len(by_cell(rows, "d")), 1)
+
+    def test_clean_records_pass_through_silently(self):
+        """The vacuity guard: a filter that dropped everything would satisfy
+        both tests above while making every summariser report nothing."""
+        rows = [{"d": 1, "arm": "none", "seed": s, "accuracy": 0.1 * s}
+                for s in (1, 2, 3)]
+        with contextlib.redirect_stdout(io.StringIO()) as said:
+            cells = by_cell(rows, "d")
+        self.assertEqual(len(cells[(1, "none")]), 3)
+        self.assertEqual(said.getvalue(), "")
+
     def test_seeds_land_in_the_same_cell(self):
         rows = [{"d": 1, "arm": "none", "seed": s, "accuracy": 0.1 * s}
                 for s in (1, 2, 3)]

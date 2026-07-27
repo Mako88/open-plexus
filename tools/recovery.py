@@ -87,9 +87,20 @@ def by_cell(rows: Iterable[dict], *fields: str,
     is retention, and `accuracy_all` includes repeats, which is short-term echo.
     Averaging them hides the number that matters, so that sweep prints both and
     calls this twice. Every other caller wants the default.
+
+    **Records that do not carry every field this asks for are skipped**, and the
+    count is printed. Every workflow uploads `out/*.json` wholesale and `load`
+    reads whatever matches, so one stray file puts foreign records into a
+    sweep's results — which happened, when a local diagnostic's output was
+    committed to `out/` and from then on rode along in EVERY artifact of every
+    sweep.
+
+    The filtering lives here rather than in each summariser because this is the
+    one function all of them go through, and patching twenty callers protects
+    whichever nineteen were remembered.
     """
     cells: dict[tuple, dict[int, float]] = defaultdict(dict)
-    for row in rows:
+    for row in require(rows, *fields, "arm", "seed", metric):
         key = tuple(row[field] for field in fields) + (row["arm"],)
         cells[key][row["seed"]] = row[metric]
     return cells

@@ -40,6 +40,7 @@ CHURN = ROOT / "experiments" / "g4_02_machine_churn.py"
 TRANSPORT = ROOT / "openplexus" / "transport.py"
 DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 NODE_MAIN = ROOT / "openplexus" / "node_main.py"
+NGRAM = ROOT / "openplexus" / "ngram.py"
 RECOVERY = ROOT / "tools" / "recovery.py"
 TESTBED = ROOT / "testbed" / "run.py"
 
@@ -578,6 +579,41 @@ MUTATIONS = [
         path=RECOVERY,
         old='    if means["none"] <= floor:',
         new='    if False:',
+    ),
+    Mutation(
+        name="the-baseline-is-measured-in-nats",
+        breaks="the UNIT of every corpus number. Natural log instead of log2 "
+               "reports 0.693 of the bits, which is a plausible number, is "
+               "smaller in the flattering direction, and makes the memory look "
+               "like it beat a bigram it did not beat",
+        path=NGRAM,
+        old="                probability = self.probability(\n"
+            "                    self._context(tokens, position), token)\n"
+            "                total -= math.log2(probability)",
+        new="                probability = self.probability(\n"
+            "                    self._context(tokens, position), token)\n"
+            "                total -= math.log(probability)",
+    ),
+    Mutation(
+        name="smoothing-inflates-the-numerator-only",
+        breaks="normalisation. Adding k to every count without adding "
+               "k * vocab_size to the total leaves a distribution summing to "
+               "more than one, so every probability is too large and every "
+               "cross-entropy too small -- the baseline gets stronger, which "
+               "makes the model being compared to it look worse, so this one "
+               "errs against the interesting result rather than for it",
+        path=NGRAM,
+        old="        return (seen + self.k) / (total + self.k * self.vocab_size)",
+        new="        return (seen + self.k) / (total + self.k)",
+    ),
+    Mutation(
+        name="the-normalisation-check-does-nothing",
+        breaks="the guard on scoring a model by its own distributions. An "
+               "unnormalised one yields a SMALLER cross-entropy, so it reads "
+               "as a better model rather than as a broken one",
+        path=NGRAM,
+        old="        if not 0.999 <= mass <= 1.001:",
+        new="        if False:",
     ),
     Mutation(
         name="every-candidate-gets-the-same-number",

@@ -186,7 +186,10 @@ def serve(config: LocalMemoryConfig, own: Slice, host: str, port: int,
                 return
             if not message:
                 return
-            (token,) = struct.unpack("!i", message)
+            # A token, and whether the driver wants to hear back. Five bytes
+            # rather than four: the flag is what lets a node stay silent
+            # without the driver waiting for a vote that is never coming.
+            token, wanted = struct.unpack("!i?", message)
             if token == _DONE:
                 return
             if token == _RESET:
@@ -198,7 +201,12 @@ def serve(config: LocalMemoryConfig, own: Slice, host: str, port: int,
             # everyone before moving on -- the lock-step this window exists to
             # remove.
             vote = node.step(token)
-            send(sock, struct.pack("!i", step) + vote.astype(">f8").tobytes())
+            if wanted:
+                send(sock, struct.pack("!i", step)
+                     + vote.astype(">f8").tobytes())
+            # The step advances either way. A silent node has still heard the
+            # token and still updated its own store -- it has simply not paid to
+            # say so.
             step += 1
 
 
@@ -288,7 +296,7 @@ class Network:
     def __exit__(self, *exc) -> None:
         for sock in self._connections:
             try:
-                send(sock, struct.pack("!i", _DONE))
+                send(sock, struct.pack("!i?", _DONE, False))
             except OSError:
                 pass
             sock.close()
@@ -300,7 +308,8 @@ class Network:
             self._listener.close()
 
     def run(self, tokens: np.ndarray, absent: set[int] | None = None,
-            leave_at: int | None = None, window: int = 1) -> np.ndarray:
+            leave_at: int | None = None, window: int = 1,
+            speak: float = 1.0) -> np.ndarray:
         """Broadcast each token, sum the votes, return a prediction per position.
 
         `absent` names nodes that stop answering from `leave_at` onward -- a real
@@ -323,7 +332,7 @@ class Network:
         absent = absent or set()
         # Every sequence starts clean, matching the single-process contract.
         for sock in self._connections:
-            send(sock, struct.pack("!i", _RESET))
+            send(sock, struct.pack("!i?", _RESET, False))
         predictions = np.zeros(len(tokens), dtype=np.int64)
         gone: set[int] = set()
         # Connections that have actually hung up, as opposed to nodes we have
@@ -338,10 +347,21 @@ class Network:
             if leave_at is not None and step == leave_at:
                 gone = set(absent)
             live = [i for i in range(len(self._connections)) if i not in gone]
-            expected[step] = len(live)
+            # Who answers this step. Round-robin rather than random: it is
+            # deterministic, it spreads the cost evenly, and it guarantees the
+            # count exactly rather than in expectation -- which matters because
+            # a step that happens to draw zero speakers has no answer at all.
+            wanted = max(1, int(round(speak * len(live)))) if live else 0
+            start = (step * wanted) % len(live) if live else 0
+            speaking = {live[(start + n) % len(live)] for n in range(wanted)}
+            expected[step] = len(speaking)
             pending[step] = [np.zeros(self.config.vocab_size), 0]
             for index in live:
-                send(self._connections[index], struct.pack("!i", int(tokens[step])))
+                # Everyone HEARS the token -- a node that stopped listening
+                # would stop updating its own store and leave the network in
+                # all but name. Only some are asked to answer.
+                send(self._connections[index],
+                     struct.pack("!i?", int(tokens[step]), index in speaking))
 
         while settled < len(tokens):
             while sent < len(tokens) and sent - settled < window:
@@ -394,5 +414,27 @@ class Network:
 
     @property
     def bytes_per_step_inbound(self) -> int:
-        """What one node receives per step. Four bytes, at any width."""
-        return _HEADER.size + 4
+        """What one node receives per step. Five bytes, at any width.
+
+        A token id and a flag saying whether an answer is wanted. Independent of
+        width, of vocabulary and of how many nodes there are, because it is a
+        broadcast of the same message -- which is the whole point of
+        [note 012](../docs/notes/012-broadcast-the-token.md).
+        """
+        return _HEADER.size + struct.calcsize("!i?")
+
+    @property
+    def bytes_per_vote(self) -> int:
+        """What one node sends when it answers. **This is the expensive one.**
+
+        A step index and a complete vote, one float64 per token in the
+        vocabulary. It scales with the VOCABULARY, which nothing inbound does:
+
+            vocab     41  ->     ~336 bytes
+            vocab 50,000  ->  ~400,000 bytes
+
+        So the outbound cost of a network is `bytes_per_vote * votes per step`,
+        and G4 turns on how few votes a step can get away with rather than on how
+        small a vote is.
+        """
+        return _HEADER.size + 4 + 8 * self.config.vocab_size

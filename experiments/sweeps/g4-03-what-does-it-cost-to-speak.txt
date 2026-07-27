@@ -1,0 +1,207 @@
+G4 — does the traffic fit a home connection?
+============================================
+
+Script: experiments/g4_03_bandwidth.py
+Status: RUN. **Prediction 3 REFUTED, and badly.** Silence is not graceful:
+        halving the speaking rate costs 0.31 agreement immediately. 1 and 2
+        held. The refutation identifies the fix, and the fix is a protocol
+        change rather than a tuning: a node with its own complete readout
+        sends a TOKEN, not a distribution.
+
+
+WHAT G4 ASKS
+------------
+"Does the required cross-machine traffic fit consumer broadband? Refuted if the
+traffic needed for the margin exceeds what a home connection carries."
+
+Two directions, and only one of them has ever been accounted for.
+
+**Inbound is settled and cheap.** `Network.bytes_per_step_inbound` returns
+`header + 4`: a node receives a token id and nothing else, at any width, because
+[note 012](../../docs/notes/012-broadcast-the-token.md) established that a node
+can derive any key it needs from `(seed, token)`. Four bytes per step per node is
+not a bandwidth problem on any connection.
+
+**Outbound is not accounted for anywhere, and it is the expensive one.** A node
+replies with a complete vote: `vocab_size` float64s.
+
+    vocab     41  ->     328 bytes per node per step        MQAR
+    vocab  1,000  ->   8,000 bytes
+    vocab 50,000  -> 400,000 bytes per node per step        real language
+
+At 400 KB per node per step, **one node at ten steps per second saturates a home
+uplink on its own.** If every node must vote every step, G4 fails at any
+realistic vocabulary and it fails by three orders of magnitude, not by a margin
+that tuning closes.
+
+**But voting may not be required.**
+[g4-01](g4-01-no-global-readout.txt) removed the global readout and found a
+single machine's answer stands alone — 0.949 at eight-way, 0.996 at four-way —
+so pooling is *optional rather than required*, which is the claim C1 actually
+needs. If a node need not speak every step, the outbound cost is not
+`vocab x rate x nodes`; it is whatever the speaking rate turns out to be.
+
+**So G4 is not "how big is a vote". It is "how often must a node speak, and what
+does accuracy cost when it speaks less".** That is the sweep.
+
+
+WHAT GETS MEASURED
+-------------------
+1. **Outbound bytes per node per step**, counted in the container testbed rather
+   than computed. The testbed sends real packets, so this is an observation and
+   not arithmetic dressed up as one.
+2. **Accuracy against speaking rate.** A node votes on a fraction `p` of steps
+   and stays silent otherwise; the driver sums whatever arrives. `p = 1` is
+   today's behaviour.
+3. **The same, against vocabulary size**, since the cost per vote scales with it
+   and the accuracy cost of silence may not.
+
+
+PREDICTIONS -- written before any measurement
+-----------------------------------------------
+1. **Inbound is trivially within budget at every configuration.** Four bytes per
+   step per node, and it is a broadcast, so it is the same four bytes however
+   many nodes there are. Stated because it is the half already argued and it
+   should be confirmed rather than assumed.
+
+2. **Outbound at `p = 1` fails G4 for any vocabulary above a few thousand.** This
+   is arithmetic and I expect it to hold exactly. Reporting it as a finding would
+   be reporting a multiplication, so the sweep's job is the next prediction.
+
+3. **Accuracy degrades gracefully as `p` falls, and much more slowly than
+   linearly.** g4-01 found one machine of eight already scores 0.949 alone, so
+   the pooled answer is heavily redundant. Guess: `p = 0.1` costs under 0.05
+   accuracy at eight nodes. **If this holds, G4 passes** — a tenth of the votes
+   is a tenth of the bytes.
+
+4. **The tolerable `p` falls as node count rises.** More nodes means each
+   contributes less, so silence from any one matters less — but the driver needs
+   *some* votes per step, and with many nodes each voting rarely, a step may
+   receive none at all. Guess: there is a floor around a handful of votes per
+   step regardless of how many nodes exist, which would make outbound traffic
+   scale with **steps**, not with **nodes**. That would be the strongest possible
+   G4 result and it is the one I would most like to be true, so it gets the most
+   scrutiny.
+
+Most likely wrong: (4). It is the favourable direction and it is the one where
+wanting the answer could shape the measurement.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- p=0.1 costs little, floor exists    -> G4 PASSES, and outbound scales with
+                                         steps rather than nodes
+- p=0.1 costs a lot                   -> pooling is not as optional as g4-01
+                                         implied, and G4 fails at language scale
+- no floor; votes needed per node     -> traffic scales with nodes and the
+                                         tiny-node story has a bandwidth wall
+                                         underneath its accuracy wall
+- inbound is not 4 bytes              -> note 012 is wrong about what crosses the
+                                         wire, which would be a bigger finding
+                                         than G4
+
+
+WHAT THIS CANNOT SETTLE
+------------------------
+**Training traffic.** Everything here is inference. The delta rule learns from a
+target at every scored position, and how *that* is distributed has never been
+designed, let alone measured. G4 as written asks about running, not learning, and
+the ladder does not currently have a gate for the second.
+
+**Real network conditions on the byte counts.** The testbed measures on a Docker
+bridge. Retransmission under loss changes bytes on the wire, and the 2% loss
+figure used in note 014 is a guess at a bad link rather than a measurement of
+one.
+
+
+RESULT
+------
+Agreement with the whole network's answer, by speaking rate. 1.000 means the
+silence changed nothing.
+
+ nodes       1.0       0.5      0.25     0.125       0.0
+     2     1.000     0.692     0.692     0.692     0.692
+     4     1.000     0.692     0.375     0.375     0.375
+     8     1.000     0.692     0.375     0.258     0.258
+    16     1.000     0.692     0.375     0.258     0.067
+
+Cost per node per step:
+
+  listening            9 bytes   independent of vocabulary
+  one vote           336 bytes   at vocab 41
+  one vote         8,008 bytes   at vocab 1,000
+  one vote       400,008 bytes   at vocab 50,000
+
+Steps per second a 10 Mbit/s uplink supports, for ONE speaking node:
+
+  vocab      41        3,720 steps/s
+  vocab   1,000          156 steps/s
+  vocab  50,000            3 steps/s
+
+
+THE PREDICTIONS
+----------------
+1. **Inbound is trivially within budget -- HELD.** Nine bytes per step per node,
+   independent of width, vocabulary and node count, because it is a broadcast of
+   a token id and a flag.
+
+2. **Outbound at p=1 fails for any real vocabulary -- HELD**, and it is
+   arithmetic. Three steps per second at vocab 50,000 is not a margin that tuning
+   closes.
+
+3. **Accuracy degrades gracefully as p falls -- REFUTED, emphatically.** The
+   guess was that p=0.1 would cost under 0.05 at eight nodes. Measured: p=0.125
+   at eight nodes gives **0.258** agreement, so three quarters of the answers
+   changed. Halving the rate costs 0.31 at every node count.
+
+4. **A floor of a few votes per step -- REFUTED with it.** There is no floor;
+   at 16 nodes speaking once per step, agreement is 0.067. Fewer speakers is
+   simply a worse answer, not a noisier one.
+
+**Both refuted predictions were the favourable direction, and I named (4) in
+advance as the one where wanting the answer could shape the measurement.** It did
+not survive contact, and neither did (3).
+
+
+WHY, AND I MISREAD g4-01 TO GET HERE
+--------------------------------------
+The predictions rested on "pooling is optional -- one machine of eight scores
+0.949 alone". That is g4-01's finding and it is true, **but it is about a
+different architecture than the one being measured here.**
+
+g4-01 gave each machine its **own complete readout**, so its answer is a whole
+answer. The distributed driver does something else: each node returns a partial
+contribution and the driver SUMS them, so the sum over every node reconstructs
+the full matrix product. Dropping half the terms of a sum does not give a noisier
+estimate of the same quantity -- **it gives a different quantity**, and there is
+no reason for its argmax to match.
+
+So silence is not sampling. It is amputation.
+
+
+WHAT THIS ACTUALLY SETTLES, WHICH IS MORE THAN A GATE
+-------------------------------------------------------
+**G4 fails as the system is currently built**, at any realistic vocabulary, and
+the speaking-rate escape does not exist. But the refutation names the fix
+precisely, and it is one this project has already validated.
+
+If each node carries its own complete readout -- which `partitions` implements
+and g4-01 measured as costing nothing at adequate width, 1.000 against 1.000 --
+then a node's answer is a whole answer. And a whole answer is a **token id**, not
+a distribution over the vocabulary.
+
+    today, per speaking node per step:   8 + 8 * vocab bytes
+    with a complete readout:             4 bytes
+
+**That is a factor of a hundred thousand at vocab 50,000**, and it removes the
+vocabulary from the bandwidth equation entirely -- the same move note 012 made
+for the inbound direction, applied to the outbound one.
+
+It also changes what pooling means. Summing partial contributions requires
+everyone; combining whole answers is a vote, and a vote tolerates absence by
+construction. That is what C3 wants and what the current protocol cannot give.
+
+**Not built, not measured.** The claim above is arithmetic plus g4-01's accuracy
+figure, and the accuracy of a token-vote network at low speaking rates is a
+different measurement that has not been made. G4 stays open, with a named
+candidate rather than an open question.

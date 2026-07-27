@@ -275,6 +275,28 @@ through it produces a figure that looks measured and is not.
 > generalise because it was written against the specific shape of the first
 > mistake.**
 
+**Before fitting a scaling exponent, probe the BOTTOM of the range and confirm
+the arm is still moving there.** A control that cannot fire and an arm that has
+already converged are the same defect — the grid does not contain the phenomenon
+— and both produce a flat line that looks measured.
+
+> *Calibration.* Three consecutive sweeps, and the rule as previously written
+> caught only the first. [g11-04](experiments/sweeps/g11-04-does-our-loss-fall-with-width-like-backprops.txt)
+> lost its CONTROL: the backprop baseline was data-limited at the capped corpus
+> and fitted `b = -0.0021`, R² 0.13. g11-05 was re-scoped onto a data axis, the
+> control fired — and then its ARMS turned out to have converged at **16,000
+> characters**, while the sweep's smallest point was 62,500. Five points,
+> fifteen jobs, every one of them past saturation, so a flat exponent was
+> guaranteed by the grid. g11-06 was dispatched with the same lower bound before
+> this was known.
+>
+> **The probe that would have caught it costs three minutes locally**: run the
+> arm at 4k, 8k, 16k, 32k characters and look at where it stops moving. Against
+> roughly two hours of runner time per matrix, and it produced a better sentence
+> than the sweep did — *this model extracts everything it can from sixteen
+> thousand characters, and sixty times more text adds nothing* — where the sweep
+> produced `b = -0.0010`.
+
 **And a sweep that does not contain its own answer has not swept.** If every arm
 chooses a value at an *edge* of the grid, the optimum lies outside it, every arm
 is under-tuned, and the rule above was satisfied while the number stayed

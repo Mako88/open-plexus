@@ -793,6 +793,14 @@ class LocalMemoryConfig:
     write_gate: float = 1.0
     retrieval_steps: int = 1
     orthogonal_every: int = 0
+    #: Write the LEARNED readout row as the value, instead of a frozen draw.
+    #:
+    #: The store is rebuilt every chunk and `Wk`/`Wv` are never updated, so
+    #: `Wo` is the only thing that learns across a corpus -- and the model
+    #: converges at about 16,000 characters (decision 63). This is the cheapest
+    #: test of whether a LEARNED value projection moves that, and it adds no
+    #: parameters: `Wo` and the value projection become one matrix.
+    learn_values: bool = False
     cache_slots: int = 0
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
@@ -1277,7 +1285,19 @@ class LocalAssociativeMemory:
             # a pair makes the store a trigram table without touching the write,
             # the retrieval or the readout.
             key = self.key_source.key(tokens, t)
-            value = self.wv[token] * alive
+            # THE VALUE PROJECTION, FROZEN OR LEARNED.
+            #
+            # `Wv` is drawn once and never updated, so with the store rebuilt
+            # every chunk the ONLY thing this model learns across a corpus is
+            # `Wo` -- one `vocab x d` linear map (decision 62). `learn_values`
+            # writes the learned readout row instead of the frozen draw, which
+            # costs no extra state and makes what is stored track what the
+            # readout has learned to want.
+            #
+            # Off by default: it changes every stored value, so every earlier
+            # number is measured without it.
+            value = (self.wo[token] if self.config.learn_values
+                     else self.wv[token]) * alive
 
             # STORE: bind the previous token to this one. Doing this before the
             # retrieval below is what makes the association available later

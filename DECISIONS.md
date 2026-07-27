@@ -2521,3 +2521,143 @@ with identical 4,096-number readouts, and that pair is what P3 is about. But the
 its LEVEL, which is what it was designed for.
 
 Written down now rather than after the numbers arrive.
+
+---
+
+## 63. Our model converges at 16,000 characters, so g11-05 swept entirely above saturation
+
+A three-minute local probe, and it changes how g11-05 must be read.
+
+    single, width 64, three seeds        backprop, width 64, one seed
+    chars     mean   spread              chars    bits
+     4,000   5.570    0.019               2,000   5.000
+     8,000   5.543    0.017               8,000   4.813
+    16,000   5.527    0.039              16,000   4.625
+    32,000   5.523    0.036              62,500   4.327
+    62,500   5.531    0.040           1,000,000   4.049  (from g11-05)
+   125,000   5.531    0.008
+
+**Our model stops improving at about 16,000 characters.** Everything after that
+moves by less than the seed spread. Total movement from 4,000 to 125,000 is 0.039
+bits against a seed spread of 0.04 — it is noise. The backprop baseline improves
+by 0.95 bits over the same kind of range and is still improving at 1,000,000.
+
+**g11-05's smallest data point was 62,500.** The entire sweep — five points,
+fifteen jobs — sat above the saturation point of the thing it was measuring.
+
+### This does not overturn g11-05, it sharpens and demotes it
+
+The finding stands as a fact: more text does not help. But **the sweep could not
+have found anything else**, because every point was past convergence. By this
+project's own standard — *ask what outcome would refute the prediction; if the
+predicted outcome is guaranteed by how the condition is built, it is not
+evidence* — g11-05's flat exponent is not evidence. The flatness was in the grid.
+
+The honest statement is stronger than the one g11-05 made, and cheaper to get:
+**this model extracts everything it can from sixteen thousand characters, and
+sixty times more text adds nothing.** That is a better sentence than "the fitted
+exponent is -0.0010", and a three-minute local run produced it where a
+fifteen-job matrix did not.
+
+### The rule, which is the third instance of one pattern
+
+    g11-04   the CONTROL could not fire        -- baseline flat over the range
+    g11-05   the ARMS had already converged    -- flat over the range by construction
+    g11-06   same lower bound, same problem    -- dispatched before this was known
+
+All three are one failure: **the grid did not contain the phenomenon.** The rule
+already in CLAUDE.md covers the control; it does not cover the arms.
+
+**Before fitting a scaling exponent, run the cheapest possible probe at the
+BOTTOM of the intended range and confirm the arm is still moving there.** Minutes
+locally against hours of runner time, and it is the difference between measuring
+a slope and measuring a plateau.
+
+### What it does to g11-06, which is still running
+
+Its smallest point is 62,500 too, so **its EXPONENT question is compromised in
+the same way** and its arms will very likely all read flat. Recorded before the
+numbers arrive.
+
+Its LEVEL comparison is unaffected and is still worth having: whether the exact
+cache beats a state-matched superposed store at equal numbers held does not
+depend on either being unconverged. That was the original hybrid-store claim and
+this re-tests it at five data sizes.
+
+### Where the diagnosis stands now
+
+Decision 59 said the sum; decision 62 said persistent capacity. **Neither is
+settled and this measurement does not settle it** — it relocates the question.
+The sharp form is now: *why does a model with ~1,956 effective readout numbers
+converge at 16,000 characters?*
+
+One hypothesis is refuted already. The readout was suspected of seeing a rank-3
+signal, since note 035 measured the STORE at effective rank ~3. Measured directly
+on the RETRIEVED VECTORS, via a recording wrapper on the new retrieval seam:
+
+    width    effective rank of retrievals    Wo numbers    Wo effective
+       16                          13.5           1,024             863
+       32                          22.9           2,048           1,466
+       64                          30.6           4,096           1,956
+      128                          33.3           8,192           2,130
+
+**Not rank 3 — about 30.** The readout is not starved of dimensions. But the rank
+SATURATES near 32: doubling width from 64 to 128 buys 2.7 more effective
+dimensions and 4,096 more parameters that have nothing to read. That is a clean
+account of the flat WIDTH exponent, and it is not an account of the data one.
+
+The probe took minutes and needed no edit to `run` — it is a wrapper around the
+retrieval seam, which is the first time that seam has paid for itself.
+
+---
+
+## 64. A learned value projection, in its cheapest form, is refuted
+
+Decision 62 identified the value projections as the discriminating experiment,
+and John had already queued them. The cheapest version costs one line: write the
+LEARNED readout row as the value instead of the frozen draw, so `Wo` and the
+value projection become one matrix.
+
+**Measured on Tiny Shakespeare, width 64, two seeds, against the frozen draw:**
+
+    chars       frozen    learned     delta
+     4,000       5.565      5.565    +0.000
+    16,000       5.519      5.533    +0.014
+    62,500       5.529      5.597    +0.068
+   250,000       5.505      5.528    +0.023
+
+**Neutral at the smallest size and worse everywhere else.** Refuted, kept behind
+a default-off flag with the numbers attached.
+
+The `+0.000` at 4,000 characters is not a dead flag and was checked rather than
+assumed: these experiments initialise `wo` to `wv`, so the mechanism can only
+bite once the readout has moved away, and at 4,000 characters it has barely
+moved. The connection test in `tests/test_learned_values.py` shows 53 of 160
+predictions differing, and
+`learn-values-is-read-and-never-applied` is the mutation that fails if the flag
+stops being applied.
+
+**Why it hurts is worth stating, because it is informative.** The stored value
+becomes a moving target: `Wo` is updated by the delta rule at every scored
+position, so a binding written at step t is read back against a readout that has
+since changed. The frozen draw is a fixed target, and a fixed target is easier to
+learn a linear map onto than a target chasing the map.
+
+### What this does NOT refute
+
+**A genuinely separate `Wv` with its own update and its own parameters.** That
+adds persistent capacity, which this version explicitly does not — it merges two
+matrices rather than training a second. Decision 62's hypothesis is about
+capacity, and this measurement does not test it.
+
+So the discriminating experiment is still open, and it is now better specified:
+it must ADD parameters, not re-use `Wo`'s.
+
+### A mutation was re-pointed, and this is the second time in a day
+
+`departure-is-only-a-dropped-message` targeted the exact line this change edited.
+`--verify` caught it. Both it and the new mutation are confirmed caught.
+
+That is twice today that a one-line edit silently invalidated a mutation, which
+is the case for `--verify` running FIRST and for `--changed` existing at all
+(decision 60).

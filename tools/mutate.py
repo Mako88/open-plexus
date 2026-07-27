@@ -559,8 +559,17 @@ MUTATIONS = [
         breaks="permanence -- the node would fall silent for one step and come "
                "back, which is C2's failure rather than C3's",
         path=LOCAL,
-        old="            value = self.wv[token] * alive",
-        new="            value = self.wv[token]",
+        old="                     else self.wv[token]) * alive",
+        new="                     else self.wv[token])",
+    ),
+    Mutation(
+        name="learn-values-is-read-and-never-applied",
+        breaks="the mechanism entirely -- the frozen draw would be written "
+               "whatever the flag said, so the measurement refuting a learned "
+               "value projection would have been the frozen model twice",
+        path=LOCAL,
+        old="            value = (self.wo[token] if self.config.learn_values",
+        new="            value = (self.wv[token] if self.config.learn_values",
     ),
     Mutation(
         name="departure-takes-derived-keys-too",

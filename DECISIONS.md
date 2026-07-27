@@ -2447,3 +2447,77 @@ item-sharding delivers the same deployability without inheriting the sum.
 No change made yet. The cache sweep on a data axis is the measurement that bears
 on it: if an exact store scales with data where the superposed one is flat, that
 identifies the sum as the binding constraint AND argues for the partitioning.
+
+---
+
+## 62. The store does not persist, and g11-05 has a second explanation
+
+Found while designing the composition task, and it is the most consequential
+thing this session turned up.
+
+**`memory = np.zeros((d, d))` is inside `run`.** The associative store is
+rebuilt from scratch on every call, and `run` is called once per chunk — 128
+characters. `Wk` and `Wv` are drawn in `__init__` and never updated. So:
+
+    Wo (learned by the delta rule)      4,096      <- the ONLY thing that learns
+    Wk (frozen random)                  4,096
+    Wv (frozen random)                  4,096
+    store, d x d                        4,096      <- REBUILT EVERY 128 CHARACTERS
+
+    backprop attention, same width     20,481      persistent parameters, all trained
+
+**Everything this model learns across a corpus is one `vocab x d` linear map.**
+At width 64 that is 4,096 numbers against the baseline's 20,481, and the
+baseline's are not a single linear layer.
+
+Confirmed empirically rather than by reading: with `learn=False`, predictions on
+a sequence are byte-identical whether or not another sequence was run first —
+so nothing carries. And after a learning run, `Wk` and `Wv` are unchanged while
+`Wo` is not.
+
+### Why this matters, and what it does to decision 59
+
+g11-05 measured a flat data exponent and **decision 59 attributed it to the
+sum** — a bottleneck downstream of the statistics cannot be widened by improving
+the statistics. That explanation is still available. But there is now a second,
+simpler one:
+
+**A model whose only persistent parameter is one linear readout of 4,096 numbers
+has almost nothing for more data to fill.** A linear map saturates fast, and 16x
+more text cannot help a capacity that small. On that reading the flat exponent is
+about persistent capacity, not about superposition at all.
+
+Decision 59 said "consistent with the through-line", which was accurate, but it
+named one cause where there are two and did not say so. **The individual facts
+were known** — CLAUDE.md has said all along that the delta rule on `Wo` is the
+exact gradient for a single linear readout — but the connection to the flat
+exponent is made nowhere, and the two explanations have very different
+consequences.
+
+### The experiment that separates them
+
+**Unfreeze the value projections**, which is John's own queued item and is now
+the discriminating measurement rather than merely the next one. `Wv` is
+`vocab x d` of frozen random numbers. Learning it adds persistent capacity
+**without touching the sum at all.**
+
+    if the data exponent goes negative  -> the flatness was CAPACITY
+    if it stays flat                    -> the flatness is the SUM, as 59 said
+
+Either answer is worth more than another mechanism, because every result on this
+corpus is currently ambiguous between the two.
+
+### A confound in g11-06, recorded before its results land
+
+g11-06's `matched` arm is matched on TOTAL numbers held (20,449 against the
+cache arm's 20,480). It is **not** matched on persistent capacity: at width 143
+its readout is 9,152 numbers against the cache arm's 4,096.
+
+So `matched` could show a steeper data exponent for a reason that has nothing to
+do with superposition — it simply has 2.2x the persistent parameters. **The
+primary comparison is unaffected**: `single` and `cache128` are both width 64
+with identical 4,096-number readouts, and that pair is what P3 is about. But the
+`matched` arm's EXPONENT must not be read as evidence about superposition, only
+its LEVEL, which is what it was designed for.
+
+Written down now rather than after the numbers arrive.

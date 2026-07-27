@@ -122,6 +122,28 @@ individual experiment remains sound.
 > earlier sweep, write down which cell it came from, next to the pin.** A line
 > reading `slots 4, from g9-10 at NODE 32` sitting above `width 64` is visible in
 > a way that `slots 4, FIXED` is not.
+>
+> **And here is what it cost, measured.** g9-11 was re-run with the identical
+> grid and `slots` corrected from 4 to 16, which is g9-10's best at every node
+> width it tested. The `tag` arm at delay 8, flat across all four reaches in both
+> runs:
+>
+>     slots 4, carried from node 32    -0.35
+>     slots 16, chosen for this grid   +0.23
+>
+> **A single constant carried from another configuration was worth 0.58 of
+> recovery** — more than twice the largest effect any mechanism in the g9 line
+> has produced. At delay 20 the same correction is worth about 1.4.
+>
+> So the failure is not cosmetic and it is not rare: it has now happened twice in
+> consecutive sweeps, and the one time it was measured it dominated every
+> mechanism being compared.
+>
+> Writing provenance next to the pin also found `fade` carried from `d_model` 32,
+> then `lr` frozen across seven sweeps, then `KEY_SCALE` and `DECAY` arriving by
+> import and appearing in no grid at all
+> ([note 028](docs/notes/028-the-learning-rate-has-been-frozen-for-seven-sweeps.md)).
+> Two cycles of inventory found what seven sweeps of warnings did not.
 
 **A hyperparameter swept on one arm of a comparison must be swept on all of
 them.** Tuning your own side and comparing against an untuned baseline produces a

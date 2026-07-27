@@ -2118,3 +2118,59 @@ orthogonalisation on this model, and under the goal it would not be usable
 anyway.
 
 636 tests, 131 mutations, five checks clean.
+
+---
+
+## 55. g11-04 was fully spent and answered nothing, because my own fix broke it
+
+**The control failed.** The backprop baseline's fitted exponent is **-0.0021
+with an R2 of 0.13** — flat. If the reference does not scale with width, no
+comparison against it means anything, and the summariser refuses the result
+rather than reporting three exponents as agreement.
+
+    arm            d=16              d=32              d=64             d=128
+    backprop   4.197 +/-0.006   4.150 +/-0.024   4.157 +/-0.013   4.175 +/-0.010
+    context    5.917 +/-0.035   5.827 +/-0.027   5.759 +/-0.011   5.703 +/-0.016
+    single     5.730 +/-0.022   5.624 +/-0.000   5.505 +/-0.001   5.494 +/-0.025
+
+One prediction of four survived, and the one that decided admissibility failed.
+P1 (our arm flat) refuted **barely** — b = -0.0213 against a threshold of 0.02 I
+had written down. P3 refuted: the context arm is shallower, not steeper. P4 is
+vacuously true and worthless, since both our arms beat a flat baseline.
+
+**Why the control failed is my doing, and it is the second cost mistake in two
+sweeps.** The baseline is already at 4.20 bits by width 16 and does not improve:
+it is **data-limited, not width-limited.** 250,000 characters is not enough text
+for a wider attention model to have more to learn — and 250,000 characters is
+exactly the cap I introduced to stop g11-04 timing out the way g11-03 had.
+
+**The fix for the cost problem removed the phenomenon the experiment was built
+to measure.** The two failure modes traded directly against each other and I did
+not see the trade while making it.
+
+**The rule: when re-scoping a sweep to fit a budget, check that the control can
+still fire.** A cheaper sweep that cannot resolve its own reference is worth
+less than no sweep, because it costs the same and invites a conclusion.
+
+### What is real anyway
+
+**Pair keys lose at every width from 16 to 128, and the gap does not narrow** —
+0.187 bits at width 16, 0.209 at width 128. This answers what g11-03 could not:
+its P2 predicted the gap would close with width, and across four widths it does
+not. **The pair key is not waiting for a width we have not tried.** Note 034's
+ceiling result stands; paying for it needs something other than width, and the
+exact cache is the candidate.
+
+**Backprop attention beats a unigram at width 16** — 4.20 against 4.829, on
+roughly ten thousand parameters, where our best is 5.49. The reference is not a
+strawman.
+
+### A second bug
+
+`tools/summarise_g11_04.py` produced **no output at all** in the CI aggregate
+step, though it runs correctly on the same downloaded artifacts locally. The
+numbers above were recovered by hand. A silent summariser is how a sweep gets
+mis-transcribed, and it is fixed before the re-run.
+
+The re-run needs **data on the x-axis, not width** — which is the axis
+Filipovich et al. actually used, and the one where the reference still moves.

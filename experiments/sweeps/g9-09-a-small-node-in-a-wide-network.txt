@@ -1,0 +1,158 @@
+Does the gate get BETTER as the node gets smaller?
+==================================================
+
+Script: experiments/g9_05_the_tag.py, with --partitions swept
+Status: PRE-REGISTERED, with a pre-dispatch control disclosed below.
+
+
+IN PLAIN TERMS
+---------------
+The last attempt at this question shrank the whole network and found that a
+four-dimensional network cannot do the task -- which is true and is not what was
+being asked. A small device in a big network is a different thing entirely: the
+network stays wide, it is cut into pieces, and each piece answers using only its
+own share.
+
+So this cuts a 64-wide network into 1, 2, 4, 8 and 16 pieces and asks a single
+piece to answer alone. The pieces get down to four numbers each, which is the
+size of device this project is actually for.
+
+The early sign is the opposite of what was feared. A smaller piece is a weaker
+reader, and a weaker reader is hurt MORE by remembering junk -- so filtering
+matters more, not less, as the device shrinks.
+
+
+WHY THIS RUN EXISTS
+--------------------
+[g9-08](g9-08-how-small-a-node-can-run-the-gate.txt) swept `d_model` and refused
+nine of fifteen cells: below width 32 the ungated model scores below chance, so
+the task was impossible rather than the gate failing. **A narrow NETWORK is not
+a small NODE.**
+
+[g7-02](g7-02-tiny-nodes-and-clusters.txt) had it right and this copies it:
+`partitions` cuts `d_model` into groups, each carrying its own readout over its
+own dimensions, and `run(partition=g)` asks group `g` alone. Training is
+unchanged -- the delta rule reads every group's own error whatever `partition`
+says -- so this is the DEPLOYMENT question, not a different training regime.
+
+[Note 024](../../docs/notes/024-what-the-gate-costs-a-tiny-node.md) keeps the two
+quantities apart and always did: it costs a node's slice `w` against a network
+width `d`, and its crossover is `w * d`. This sweep varies `w` with `d` fixed,
+which is what that note was about.
+
+
+THE PRE-DISPATCH CONTROL, DISCLOSED
+------------------------------------
+Width 64, delay 8, one seed, reduced training. Shape only. **This is the check
+g9-08 did not run**, and it is why that sweep is not being repeated blind.
+
+    groups  node     none   oracle      tag     gap   implied recovery
+         1    64    0.894    1.000    0.911   0.106              0.16
+         2    32    0.789    1.000    0.878   0.211              0.42
+         4    16    0.714    1.000    0.814   0.286              0.35
+         8     8    0.408    0.992    0.569   0.583              0.28
+        16     4    0.406    0.608    0.494   0.203              0.43
+
+Every row is USABLE -- the floor arm stays far above the trivial floor of 0.125
+all the way to a node of four numbers, where g9-08's equivalent had collapsed to
+0.037. The axis was the whole problem.
+
+Its three predictions were registered before it ran and all three held: the floor
+survives further than g9-08's widths (it survives everywhere), the oracle holds
+further down than the floor does, and everything degrades monotonically.
+
+**The oracle itself breaks at 16 groups**, falling to 0.608. That is the first
+time a cheating gate has failed anywhere in this project, and it bounds the
+question: below a node of about eight numbers there is no ceiling left to recover
+a fraction of.
+
+
+THE GRID
+---------
+  partitions  1, 2, 4, 8, 16      node holds 64, 32, 16, 8, 4
+  delay       1, 8, 20            the control ran delay 8 only
+  width       64, FIXED           the NETWORK. The node is width // partitions
+  slots 32, fade 0.95, FIXED      g9-06's working point
+  arms        none, oracle, reward, tag, tag-strongest
+  seeds       1, 2, 3
+  lr          0.05, FIXED on every arm
+
+15 jobs. `slots` and `fade` are frozen at a working point chosen at `d_model` 32
+in one process, and that is this grid's standing risk -- named here rather than
+discovered afterwards. If the tag's best capacity moves with node size, every
+cell here understates it.
+
+
+PREDICTIONS
+------------
+Predictions 1 and 2 are readings of the control above and count as weak. **3, 4
+and 5 are not in it** -- the control ran one delay, and neither flatness nor the
+window nor the direction arm can be read off a single column.
+
+1. **Recovery RISES as the node shrinks, then falls.** Guess: above 0.25 at
+   every partition count from 2 to 8, peaking between 2 and 4, against 0.16 at
+   1 partition. The reason is mechanical rather than hopeful: a narrower reader
+   is hurt more by interference, so the floor arm falls faster than the gated
+   arms and the same gate recovers a larger share of a larger gap.
+
+2. **The 16-group cells are reported but not believed.** The oracle is 0.608
+   there, so the ceiling is broken and the ratio is a fraction of an advantage
+   that is itself failing. Predict `tools/recovery.py` does NOT refuse them --
+   its refusals are about the floor arm and the seed spread, not the ceiling --
+   which means the summary will print a number that should not be used. Naming
+   it here is the only thing that stops it being quoted later.
+
+3. **The tag stays flat across delay at every partition count.** Spread under
+   0.10 wherever the cell is usable. Flatness is a property of counting in
+   bindings, and splitting the readout does not change what is counted. This is
+   the same prediction g9-08 confirmed at two widths, now asked where it might
+   actually break.
+
+4. **The window's delay-20 collapse gets WORSE as the node shrinks.** It is
+   -0.24 at `d_model` 32 and -1.62 at 64. If an unmatched window's damage scales
+   with how much the reader depends on what it kept, a narrower reader should
+   suffer more. Guess: below -0.5 at 8 groups.
+
+5. **`tag` beats `tag-strongest` by more as the node shrinks.** THE INTERESTING
+   ONE. The direction was worth +0.003 at g9-06's working point, +0.22 at a
+   starved capacity, and +0.22 at `d_model` 64 delay 20. A small node is a
+   fourth kind of scarcity, so the same shape should appear. Guess: above +0.10
+   at 8 groups and near zero at 1.
+
+Most likely wrong: **1**, and specifically its ceiling. The control is one seed
+with reduced training, and the arm that moved most between settings is the FLOOR
+arm -- which is the denominator. A ratio whose denominator is what changed is
+the exact shape that has already cost this project a result twice.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- recovery rises as the node shrinks  -> the mechanism is BETTER on the hardware
+                                         this project is for than on the
+                                         hardware it was measured on. The best
+                                         outcome available and the one to check
+                                         hardest
+- recovery flat in node size          -> the gate is indifferent to node size,
+                                         which is g7-02's oracle result holding
+                                         for an implementable gate
+- recovery falls                      -> it works and it is not for us, and the
+                                         tiny-node story needs a different
+                                         mechanism
+- floor arm collapses at some split   -> the task stops being answerable by one
+                                         node, and the honest report is where
+                                         that happens rather than a ratio
+
+
+COST
+-----
+15 jobs of (partitions, delay). Five arms x three seeds x one rate = 15 cells a
+job. Same shape as g9-08, which ran comfortably inside 90 minutes; the wider
+network makes each cell about four times a `d_model`-32 cell, so call it 10
+minutes a job.
+
+
+THE ORACLE, SAID TWICE
+-----------------------
+The `oracle` arm reads `position_kinds()`. Every recovery figure is a fraction of
+an advantage no deployed system has -- and at 16 groups that advantage is itself
+only 0.608, which is why prediction 2 exists.

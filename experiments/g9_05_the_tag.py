@@ -20,6 +20,11 @@ Two dials, and they are separate here in a way the window's were not:
     slots   how many writes survive a capture      -- capacity
     fade    how fast a mark ages out of the pool   -- reach
 
+`--partitions` splits the network into that many nodes and asks ONE of them to
+answer, which is how g7-02 measured tiny devices. `--width` is the NETWORK; the
+node holds `width // partitions`. g9-08 swept the first believing it was the
+second and refused nine cells for it.
+
 `tag-strongest` is the control. Same capacity, same fade, same everything, with
 only the end of the ranking that wins reversed. If it scores the same, the
 capacity is doing the work and g9-04's signal is decoration.
@@ -32,6 +37,7 @@ the first writes of every interval. See g9-07.
     python experiments/g9_05_the_tag.py --slots 8 --fade 0.99 --scale 8 --lr 0.05
     python experiments/g9_05_the_tag.py --mode relative --slots 8 --fade 0.99
     python experiments/g9_05_the_tag.py --width 4 --slots 32 --fade 0.95
+    python experiments/g9_05_the_tag.py --width 64 --partitions 16   # node of 4
 """
 
 from __future__ import annotations
@@ -84,7 +90,7 @@ ARMS = {
 
 def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
           test_set, slots: int, fade: float, relative: bool = False,
-          width: int = D_MODEL) -> tuple[float, float]:
+          width: int = D_MODEL, groups: int = 1) -> tuple[float, float]:
     gated, window, tagged, strongest = ARMS[arm]
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=task.vocab_size, d_model=width, lr=lr,
@@ -98,6 +104,7 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
         tag_decay=fade if tagged else 1.0,
         tag_strongest=strongest,
         tag_relative=relative and tagged,
+        partitions=groups,
         seed=seed))
     rng = np.random.default_rng(seed)
     order = np.arange(len(train_set))
@@ -108,9 +115,15 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
             model.run(tokens, targets, scored, learn=True,
                       store=keep if gated else None)
 
+    # ONE machine answers. Training above is unchanged -- the delta rule reads
+    # every group's own error whatever this says -- so this is the deployment
+    # question and not a different training regime: each node learned locally,
+    # and now a single node is asked on its own.
+    alone = 0 if groups > 1 else None
     right = total = first_right = first_total = 0
     for tokens, _, _, keep, queries, firsts in test_set:
-        predicted = model.run(tokens, store=keep if gated else None)
+        predicted = model.run(tokens, store=keep if gated else None,
+                              partition=alone)
         for q in queries:
             hit = predicted[q] == tokens[q + 1]
             right += hit
@@ -122,7 +135,7 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
 
 
 def one_seed(work: tuple) -> list[dict]:
-    delay, seed, rates, slots, fade, relative, width = work
+    delay, seed, rates, slots, fade, relative, width, groups = work
     task = replace(BASE, delay=delay)
     train_set = build(task, N_TRAIN, seed)
     test_set = build(replace(task, seed=task.seed + 99_991), N_TEST, seed)
@@ -130,12 +143,16 @@ def one_seed(work: tuple) -> list[dict]:
     for lr in rates:
         for arm in ARMS:
             overall, first = score(task, arm, lr, seed, train_set, test_set,
-                                   slots, fade, relative, width)
+                                   slots, fade, relative, width, groups)
             records.append(dict(
-                condition=f"delay={delay} width={width} slots={slots} "
-                          f"fade={fade} lr={lr} relative={relative} arm={arm}",
+                condition=f"delay={delay} width={width} groups={groups} "
+                          f"slots={slots} fade={fade} lr={lr} "
+                          f"relative={relative} arm={arm}",
                 seed=seed, delay=delay, slots=slots, fade=fade, lr=lr, arm=arm,
-                relative=relative, width=width,
+                relative=relative, width=width, groups=groups,
+                # What ONE node holds, which is the quantity note 024 costs and
+                # the quantity g9-08 failed to vary. width is the network.
+                node_width=width // groups,
                 accuracy=first,        # first asks: retention, not echo
                 accuracy_all=overall))
     return records
@@ -180,7 +197,10 @@ def main() -> int:
     # -- which is the question g7-02 and g7-03 answered for the ORACLE gate and
     # nobody has asked of an implementable one.
     width = args.width if args.width is not None else D_MODEL
-    work = [(delay, seed, tuple(rates), slots, fade, relative, width)
+    groups = args.partitions if args.partitions is not None else 1
+    if width % groups:
+        raise SystemExit(f"width {width} does not divide into {groups} groups")
+    work = [(delay, seed, tuple(rates), slots, fade, relative, width, groups)
             for delay in delays for seed in seeds]
     records = [r for batch in spread(one_seed, work, args.workers) for r in batch]
     emit(records, Path(args.json) if args.json else None)

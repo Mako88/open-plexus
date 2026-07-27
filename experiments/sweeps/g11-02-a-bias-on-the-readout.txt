@@ -1,0 +1,86 @@
+A bias on the readout
+=====================
+
+Script: experiments/g10_01_first_language.py --mode bias
+Status: PRE-REGISTERED. Not yet run.
+
+WHAT IT CHANGES
+----------------
+The readout computes `answer = Wo @ retrieved` with **no constant term**. So a
+near-zero retrieval gives all-zero scores and a uniform distribution, and there
+is no way for the model to express "e is common and q is not".
+
+**A unigram baseline IS a bias over tokens.** g10-12 measured the model at 5.466
+bits against a unigram's 4.829 and I called that "worse than ignoring context
+entirely". That reading was right and the cause was not identified: the model
+could not represent the thing it was losing to.
+
+    answer = Wo @ retrieved + bias
+    bias  += lr * (target - answer)
+
+Each output unit's own prediction error, applied to itself. As local as the delta
+rule beside it, so C1 is untouched.
+
+**This is item (3) from [note 031](../../docs/notes/031-a-design-pass-against-the-goals.md)**,
+which observed that the readout is the only component learning across sequences
+and the only one no experiment has ever varied.
+
+
+MEASURED ON
+------------
+- **bits per character** on Tiny Shakespeare, comparable ONLY with
+  [g10-12](g10-12-the-standard-benchmark.txt)'s 5.466 and
+  [g11-01](g11-01-corrective-writes.txt)'s 5.256 -- same corpus, split, width 64,
+  chunk 256, cap 5.0, one seed, differing only in which flags are set.
+- **`reward_recall` first-ask accuracy**, comparable only with the g9 line's
+  ungated arm at the same width. It is a DIFFERENT task with a different floor
+  and nothing in it may be compared with a bits figure.
+
+The unigram and bigram figures quoted are from the same corpus and split, fitted
+on the training text only.
+
+
+PREDICTIONS
+------------
+1. **THE ONE THAT MATTERS: bits fall below the unigram's 4.829.** A bias alone
+   can represent a unigram exactly, so a model that has one and also a store
+   should not lose to a model that is only a prior. Confidence: high. If it does
+   not clear 4.829 the diagnosis is wrong and something else is capping it.
+
+2. **The improvement is larger than corrective writes bought.** That was 0.211
+   bits. Guess: 0.5 or more, because a prior over 64 characters is a much bigger
+   share of the remaining gap than an overwrite fix.
+
+3. **Accuracy improves**, because an uninformed step can now guess the commonest
+   character instead of index 0. Guess: from 0.155 to above 0.18.
+
+4. **A NEGATIVE PREDICTION, to test the diagnosis rather than the outcome:
+   `reward_recall` gains little or nothing.** Its answers are drawn uniformly
+   from the value alphabet by construction, so a prior over values carries no
+   information. If the bias helps THERE, it is not doing what this file claims --
+   it would be papering over some other deficiency, and the account above is
+   wrong even if the text number improves.
+
+5. **Every existing test passes with the flag off.** Confirmed before writing
+   this: 582 of 582.
+
+Most likely wrong: 2. The store's contribution and the prior are not additive in
+bits, and the readout may already be capturing some of the prior through
+whichever retrieval directions correlate with frequency.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- bits still above 4.829         -> the missing prior was not the binding
+                                    constraint and note 031's item (3) is
+                                    answered in the negative
+- `reward_recall` improves too   -> the mechanism is not doing what is claimed;
+                                    see prediction 4
+- accuracy falls                 -> the bias is dominating a retrieval that was
+                                    carrying real information
+
+
+COST
+-----
+Two cells of roughly ten minutes each on Shakespeare, plus seconds for
+`reward_recall`. Local.

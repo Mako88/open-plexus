@@ -582,6 +582,7 @@ class LocalMemoryConfig:
     salience: float = 0.0
     lasting_cap: float = 0.0
     corrective_writes: bool = False
+    readout_bias: bool = False
     derived_keys: bool = False
     seed: int = 0
 
@@ -710,6 +711,16 @@ class LocalAssociativeMemory:
             self.wk = rng.normal(0.0, spread, (v, d))
         self.wv = rng.normal(0.0, spread, (v, d))
         self.wo = np.zeros((v, d))
+        # A constant term on the readout, off by default.
+        #
+        # Without it `answer` is a pure matrix product, so a near-zero retrieval
+        # gives all-zero scores and a uniform distribution. **A unigram is
+        # exactly a bias over tokens**, which is why the model scoring below one
+        # (g10-12) is not a mystery: it had no way to express a prior.
+        #
+        # Updated by each output unit's own prediction error, which is the same
+        # locality the delta rule beside it already has.
+        self.bias = np.zeros(v)
         # A view, not a copy: writes through `grouped_wo` land in `wo`, so the
         # readout has exactly one representation and `ablate` keeps working
         # unchanged. Reshaping a freshly allocated C-contiguous array never
@@ -1243,6 +1254,8 @@ class LocalAssociativeMemory:
             sliced = retrieved.reshape(groups, -1)
             parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)
             answer = parts.sum(0) if members is None else parts[members].sum(0)
+            if self.config.readout_bias:
+                answer = answer + self.bias
             predictions[t] = int(answer.argmax())
 
             if learn and scored[t]:
@@ -1253,6 +1266,11 @@ class LocalAssociativeMemory:
                 # reads any other group's activity, which is the whole point.
                 self.grouped_wo += self.config.lr * np.einsum(
                     "gv,gd->vgd", target - parts, sliced)
+                if self.config.readout_bias:
+                    # The whole prediction's error, not one group's: the bias is
+                    # a single shared constant rather than a per-group weight,
+                    # so there is no group whose own error it could use.
+                    self.bias += self.config.lr * (target - answer)
 
             previous_key = key
             previous_retrieval = retrieved

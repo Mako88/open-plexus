@@ -43,11 +43,19 @@ def config(vocab: int = VOCAB) -> LocalMemoryConfig:
                              seed=5)
 
 
-def measure(nodes: int, speak: float, tokens: np.ndarray) -> tuple:
+def measure(nodes: int, speak: float, tokens: np.ndarray,
+            combine: str = "sum") -> tuple:
+    """Agreement with the single-process answer, and what the protocol costs.
+
+    The reference is always the whole network's exact answer. Under `sum` that
+    is what a full-speaking network reproduces bit for bit; under `vote` it is a
+    target rather than an identity, since a vote discards everything except each
+    node's argmax.
+    """
     model = LocalAssociativeMemory(config())
     model.wo[:] = model.wv          # or every node is interchangeable
     reference = model.run(tokens)
-    with Network(config(), nodes, model.wv, model.wo) as net:
+    with Network(config(), nodes, model.wv, model.wo, combine=combine) as net:
         answer = net.run(tokens, speak=speak)
         per_vote = net.bytes_per_vote
         per_listen = net.bytes_per_step_inbound
@@ -71,13 +79,25 @@ def main() -> int:
             row.append(f"{agreement:>10.3f}")
         print("".join(row), flush=True)
 
+    print("\nSAME, WITH combine='vote' -- each node sends its OWN answer,")
+    print("not a distribution. Absence costs a voter, not a term of a sum.")
+    print(f"{'nodes':>6}" + "".join(f"{r:>10}" for r in RATES))
+    for nodes in NODE_COUNTS:
+        row = [f"{nodes:>6}"]
+        for rate in RATES:
+            agreement, *_ = measure(nodes, rate, tokens, combine="vote")
+            row.append(f"{agreement:>10.3f}")
+        print("".join(row), flush=True)
+
     print("\nWHAT IT COSTS TO SPEAK, per node per step")
     _, _, per_vote, per_listen = measure(2, 1.0, tokens)
+    _, _, token_vote, _ = measure(2, 1.0, tokens, combine="vote")
     print(f"  listening   {per_listen:>10,} bytes   (independent of vocabulary)")
     print(f"  one vote    {per_vote:>10,} bytes   at vocab {VOCAB}")
     for vocab in (1_000, 50_000):
         net_bytes = 4 + 4 + 8 * vocab
         print(f"  one vote    {net_bytes:>10,} bytes   at vocab {vocab:,}")
+    print(f"  TOKEN vote  {token_vote:>10,} bytes   at ANY vocabulary")
 
     print("\nSTEPS PER SECOND A 10 Mbit/s UPLINK SUPPORTS, one speaking node")
     for vocab in (VOCAB, 1_000, 50_000):

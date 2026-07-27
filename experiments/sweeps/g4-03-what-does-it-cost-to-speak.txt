@@ -205,3 +205,40 @@ construction. That is what C3 wants and what the current protocol cannot give.
 figure, and the accuracy of a token-vote network at low speaking rates is a
 different measurement that has not been made. G4 stays open, with a named
 candidate rather than an open question.
+
+
+THE FIX, BUILT -- PREDICTIONS BEFORE MEASURING
+================================================
+`combine="vote"` is implemented. A node sends `argmax` of its own score vector --
+four bytes plus a step index -- and the driver tallies. Summing remains the
+default, because it is bit-identical to the single-process model and voting is an
+approximation by construction.
+
+Predictions, written after the code and **before any number from it**:
+
+5. **Voting costs accuracy at full speaking rate.** Summing reconstructs the
+   exact product; voting throws away everything except each node's argmax. g4-01
+   put a lone eight-way machine at 0.949, so a plurality of eight such opinions
+   should be better than one and worse than the exact sum. Guess: agreement
+   0.85-0.98 at `p = 1`, eight nodes.
+
+6. **Voting degrades far more gracefully than summing.** This is the whole point.
+   Summing lost 0.31 when half the nodes went quiet, because a partial sum is a
+   different quantity. A vote missing half its voters is the same kind of thing
+   with fewer voters. Guess: at `p = 0.5`, voting loses under 0.10 where summing
+   lost 0.31.
+
+7. **More nodes helps voting and does not help summing.** Sixteen opinions
+   outvote noise better than four. Under summing, node count was irrelevant to
+   the damage -- every rate cost the same 0.692/0.375/0.258 regardless. If
+   voting shows the same flatness, the tally is not doing what a tally should.
+
+8. **Outbound drops to 12 bytes per speaking node per step**, independent of
+   vocabulary. Arithmetic, stated so the sweep confirms rather than assumes it.
+
+Most likely wrong: (6), and it is the favourable direction again -- the same
+place predictions 3 and 4 died. The specific way it could fail: if the nodes'
+argmaxes are highly correlated, a vote carries little more information than one
+node, and losing voters costs as much as losing terms. That would mean the
+partition is not producing independent opinions, which is a finding about the
+decomposition rather than about the protocol.

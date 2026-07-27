@@ -164,7 +164,8 @@ class Node:
 
 
 def serve(config: LocalMemoryConfig, own: Slice, host: str, port: int,
-          values: np.ndarray, readout: np.ndarray) -> None:
+          values: np.ndarray, readout: np.ndarray,
+          combine: str = "sum") -> None:
     """Run one node against a driver. Blocks until the driver hangs up.
 
     Values and readout are handed over rather than learned here: this milestone
@@ -202,8 +203,15 @@ def serve(config: LocalMemoryConfig, own: Slice, host: str, port: int,
             # remove.
             vote = node.step(token)
             if wanted:
-                send(sock, struct.pack("!i", step)
-                     + vote.astype(">f8").tobytes())
+                if combine == "vote":
+                    # This node's own complete answer, in four bytes. Its score
+                    # vector already spans the whole vocabulary -- its slice's
+                    # retrieval through its own readout columns -- so the argmax
+                    # is a whole opinion rather than a fragment of one.
+                    send(sock, struct.pack("!ii", step, int(vote.argmax())))
+                else:
+                    send(sock, struct.pack("!i", step)
+                         + vote.astype(">f8").tobytes())
             # The step advances either way. A silent node has still heard the
             # token and still updated its own store -- it has simply not paid to
             # say so.
@@ -222,7 +230,7 @@ class Network:
     def __init__(self, config: LocalMemoryConfig, nodes: int,
                  values: np.ndarray, readout: np.ndarray,
                  host: str = "127.0.0.1", port: int = 0,
-                 spawn: bool = True) -> None:
+                 spawn: bool = True, combine: str = "sum") -> None:
         """`spawn=False` waits for nodes started elsewhere to connect.
 
         The default starts them locally and is what every existing measurement
@@ -232,8 +240,11 @@ class Network:
         an order the driver did not choose, which is what the slice handshake
         exists to survive.
         """
+        if combine not in ("sum", "vote"):
+            raise ValueError(f"combine must be 'sum' or 'vote', got {combine!r}")
         self.config = config
         self.slices = slices_for(config.d_model, nodes)
+        self._combine = combine
         self.port = port
         self._values = values
         self._readout = readout
@@ -260,7 +271,8 @@ class Network:
                 target=serve,
                 args=(self.config, own, "127.0.0.1", port,
                       self._values[:, own.lo:own.hi].copy(),
-                      self._readout[:, own.lo:own.hi].copy()),
+                      self._readout[:, own.lo:own.hi].copy(),
+                      self._combine),
                 daemon=True)
             process.start()
             self._processes.append(process)
@@ -403,7 +415,13 @@ class Network:
                 if step not in pending:
                     continue          # a vote for a step already settled
                 slot = pending[step]
-                slot[0] += np.frombuffer(message[4:], dtype=">f8")
+                if self._combine == "vote":
+                    # One count per answer. Absence costs a voter, not a term of
+                    # a sum, which is why this degrades where summing amputates.
+                    (choice,) = struct.unpack("!i", message[4:8])
+                    slot[0][choice] += 1.0
+                else:
+                    slot[0] += np.frombuffer(message[4:], dtype=">f8")
                 slot[1] += 1
 
             while settled < sent and pending[settled][1] >= expected[settled]:
@@ -437,4 +455,6 @@ class Network:
         and G4 turns on how few votes a step can get away with rather than on how
         small a vote is.
         """
+        if self._combine == "vote":
+            return _HEADER.size + struct.calcsize("!ii")
         return _HEADER.size + 4 + 8 * self.config.vocab_size

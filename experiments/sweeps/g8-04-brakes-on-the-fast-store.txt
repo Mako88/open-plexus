@@ -1,10 +1,12 @@
 Does bounding the fast store make skew measurable, and does it flatter anything?
 ================================================================================
 
-Script: experiments/g8_04_capped.py  (NOT WRITTEN)
-Status: PREDICTIONS REGISTERED IN NOTE 018 BEFORE THE MECHANISM WAS BUILT.
-        The cap is now implemented and unit-tested; this sweep has not been
-        written, costed or dispatched, and no number from it has been seen.
+Script: experiments/g8_04_capped.py
+Status: **ANSWERED BY ITS OWN CONTROL, AND NOT DISPATCHED.** Prediction 1
+        held, 3 held, and **2 is refuted in the direction that matters**: the
+        cap does not increase the number of usable cells, it decreases them.
+        Predictions were registered in note 018 before the mechanism existed.
+        The full grid is not being run -- see the last section for why.
 
 
 WHY
@@ -20,6 +22,8 @@ fast store is a geometric series in `decay`; repetition drives it toward
 `1 / (1 - decay)`, about 277x a single binding here. Retrieval is linear in that
 and the delta-rule update is quadratic, so it diverges. Measured without
 training, as skew rises: memory norm 114 → 967, largest retrieval 137 → 3452.
+(Those are the RUNAWAY PROBE's scales, not the model's -- see below. Measured
+through the model the store is 2-5 at uniform and 10-50 at zipf 2.0.)
 
 **So g8-02 could not test realistic skew because the model cannot survive
 realistic skew.** Re-running it before fixing that reproduces the same broken
@@ -92,3 +96,73 @@ nowhere near sufficient.
 **Anything about gating.** Six mechanisms have failed and g8-03 established they
 all acted on the wrong store. This sweep is about stability, and if it appears to
 say anything about gating, see prediction 4.
+
+
+RESULT -- from the pre-dispatch control, one seed, lr 0.02
+============================================================
+Ungated accuracy, which is what decides whether a cell is usable at all.
+Trivial floor 0.34375.
+
+    zipf_s   uncapped    cap 5    cap 10
+       0.0      0.782    0.782     0.782
+       0.5      0.763    0.763     0.763
+       1.0      0.713    0.715     0.713
+       1.5      0.351    0.290     0.328
+       2.0      0.000    0.197     0.259
+
+THE PREDICTIONS
+----------------
+1. **It stops the NaN -- HELD.** Uncapped at `zipf_s` 2.0 the readout diverges
+   and the arm scores 0.000; capped it completes and scores 0.197 and 0.259.
+   The divergence is real, reproducible, and the cap prevents it.
+
+2. **It stops or delays the collapse -- REFUTED, in the direction that matters.**
+   The measurement was **how many cells become usable**, and the answer is
+   *fewer*. At `zipf_s` 1.5 the uncapped arm clears the floor at 0.351; capped it
+   scores 0.290 and 0.328, both **below** it. A cell that was usable is now not.
+
+   At 2.0 the cap lifts 0.000 to 0.259, which is a large rescue and still below
+   the floor. Rescuing a broken cell into a differently broken cell does not add
+   a usable one.
+
+3. **It changes little at uniform statistics -- HELD, exactly.** 0.782 and 0.763
+   to three decimals at `zipf_s` 0.0 and 0.5, capped or not. The cap is not
+   binding where nothing is wrong, which is what a correctly-set bound should do.
+
+4. **It does not rescue the gating result -- NOT TESTED.** The control measures
+   only the ungated arm. It was the loudest prediction and it remains unanswered,
+   which is a gap and not a pass.
+
+WHY THE GRID IS NOT BEING RUN
+------------------------------
+The sweep existed to answer one question: does bounding the fast store make
+realistic skew measurable? **The control answers it, and the answer is no.**
+
+Running 45 more cells would produce recovery ratios in cells whose floor arm is
+below the trivial floor -- which is exactly the error withdrawn from g8-01 and
+g8-02 earlier today. The grid cannot contain a usable answer, so it is not worth
+runner time. Recorded here rather than quietly dropped: a sweep that is not run
+is a decision, and decisions belong in the file.
+
+WHAT IT COSTS AND WHAT IT BUYS
+--------------------------------
+Costs: the fast-store cap is not the unblocker for realistic skew. **The corpus
+benchmark stays blocked**, and it is now blocked by something better understood
+rather than by something merely diagnosed.
+
+Buys: two things worth having.
+
+**The divergence and the collapse are different failures.** The cap removes the
+divergence completely and the collapse barely at all, so a NaN and a
+degeneracy-onto-one-token were never the same event. Note 018 said they might be
+and that separating them was the point of prediction 2; they are separate.
+
+**Bounding magnitude is not the mechanism.** The store growing large is a symptom
+of repetition, not the cause of the failure. Something else about a dominant
+class defeats the delta rule, and it survives the store being held small. That is
+a sharper statement of the blocker than note 018 could make, and it rules out the
+cheapest candidate fix.
+
+The cap stays in, default off, because preventing a NaN is worth having on its
+own -- and because g8-02's bottom rows can now be re-run without the divergence
+confounding whatever else is happening there.

@@ -444,6 +444,38 @@ what is wrong, and strengthening it is the fix. Rule 10 covers those.
 
 ## Keeping the record straight
 
+**11b. Fetch into a fresh directory, never suppress the fetcher's errors, and
+verify a run's identity FROM THE DATA before reading a number off it.**
+
+This cost a near-miss of the worst available kind. Re-reading g9-11's artifacts
+with
+
+    gh run download <id> -D "$SCRATCH/g911" >/dev/null 2>&1
+
+landed on a directory that already held a DIFFERENT run's artifacts from an
+earlier cycle. Artifact names repeat between runs of the same workflow, so `gh`
+failed with "file exists", `2>&1` swallowed it, and the analysis ran cleanly on
+the wrong run. It produced a coherent story: a fabricated results table, a
+tripwire recorded backwards, a bad calibration propagated into this file.
+
+All of it was wrong. A pristine re-download confirmed the published numbers to
+three decimals.
+
+**Stale data is worse than missing data, because it analyses cleanly.** A failed
+download announces itself; a silently skipped one does not, and everything
+downstream looks like a finding.
+
+The check that costs nothing: every sweep record carries a `condition` string
+written by the script from the parameters it actually ran with. Assert on that
+before reading anything. The workflow file says what SHOULD have run and the
+directory name says what you MEANT to fetch; only the data says what happened.
+
+**And the failure mode to fear here is retraction, not error.** Publishing a
+wrong number is recoverable. Retracting a correct finding destroys a real result
+and the record of how it was reached, and it does so with all the outward
+appearance of rigour.
+
+
 **12. A bug fix is not finished when the tests pass.** It is finished when the
 audit file records what the fix invalidated, and each affected decision is
 marked re-validated, superseded, or pending. A fix does not only correct the

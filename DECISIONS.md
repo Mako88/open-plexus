@@ -1222,3 +1222,74 @@ standard error from three samples is itself uncertain. Pairing extracts more fro
 the same records; it does not manufacture evidence. Node 4 in g9-09 has one
 usable seed and an infinite error, which is the honest report of a mostly-refused
 cell.
+
+## 39. I nearly published a false correction to a correct result
+
+Continuing note 029 across g9-10 and g9-11, the paired read of g9-11 came back
+wildly different from what had been published -- `tag` at -1.527 against a
+recorded -0.14. The run's own `summary.txt`, read from the same directory, agreed
+with the alarming version. The records said `slots 4` where the workflow said 16.
+
+It looked like a fabricated results table, a tripwire recorded backwards, and a
+bad calibration propagated into CLAUDE.md. I was one step from writing all of
+that up.
+
+**It was my own contaminated directory.** The download command was
+
+    gh run download 30249953943 -D "$S/g911" >/dev/null 2>&1
+
+and that directory already held a DIFFERENT run's artifacts from an earlier
+cycle. `gh` failed with "file exists", `2>&1` swallowed it, and the analysis ran
+happily on the wrong run.
+
+**Re-downloading each run into a fresh temporary directory, with errors NOT
+suppressed, confirms the published results exactly:**
+
+    tag, paired            published
+    delay  1   +0.237 ± 0.022     +0.24
+    delay  8   +0.221 ± 0.060     +0.23
+    delay 20   -0.146 ± 0.075     -0.14
+
+The union's value is +1.791 ± 0.162 at delay 8 and +1.490 ± 0.059 at delay 20,
+REAL by more than ten standard errors. The 0.58 capacity calibration stands.
+**Nothing needed correcting.**
+
+### What actually went wrong, and the rule that comes out of it
+
+Two habits combined into a near-miss:
+
+- **Suppressing stderr on a fetch.** `>/dev/null 2>&1` on `gh run download` turns
+  a hard failure into stale data, and stale data is worse than no data because it
+  analyses cleanly.
+- **Reusing a scratch directory across cycles.** Artifact names repeat between
+  runs of the same workflow, so a reused directory silently mixes runs.
+
+**The rule: fetch into a fresh directory, never suppress the fetcher's errors,
+and verify the run's identity from the DATA before reading any number.** The
+script writes a `condition` string carrying its actual parameters; that is the
+authority, not the workflow file and not the folder a zip landed in. The clean
+script does this and would have refused immediately.
+
+**And the near-miss is the point.** Every check this session -- the g9-13 smoke
+run, the vacuous `pending_now` test, the range-versus-error mix-up -- caught an
+instrument that produced plausible numbers. This one caught the same class of
+failure in my own analysis pipeline, and the consequence would have been the
+worst kind: **retracting a correct finding**, which is more damaging than
+publishing a wrong one because it destroys a real result and the record of it.
+
+I have deliberately not deleted the alarm from this log. A correction that turns
+out to be unnecessary is exactly as informative as one that is.
+
+### One real finding did come out of it
+
+**g9-10's capacity choices are mostly ties.** Only one of six cells picks a
+capacity distinguishable from its rivals at 2 SE. Cell by cell, g9-10 chose on
+differences inside the noise, and every sweep that pinned `slots` from it
+inherited that.
+
+**But the pattern across cells is perfectly consistent** -- all three node widths
+pick 16 at delay 8 and all three pick 32 at delay 20. Six independent cells
+agreeing is evidence the individual comparisons do not carry alone. So *the best
+capacity tracks the delay* survives as a pattern, and *this capacity is best at
+this cell* does not. The pins actually taken from g9-10 were the pattern's
+values, so the use was sound even though the per-cell justification was not.

@@ -193,10 +193,31 @@ FLOOR arm scores highest — the exact opposite bias. g8-01 also used to SKIP
 refused rows entirely, so a cell whose denominator was noise vanished rather than
 printing `undefined`.
 
-The published sweep files are NOT edited to match. They record what was reported
-at the time. **Re-summarising the archived JSON for g8-01, g8-03 and g9-02 would
-say whether any headline actually moves, and has not been done** — the artifacts
-are in Actions, not in the repo.
+**Re-summarised, and exactly one headline moved.** The archived JSON was pulled
+from Actions and run through both versions.
+
+- **g8-01 — the size of the prize was overstated by about 3x, and GOALS said so.**
+  Its "largest usable gap is 0.612" and "ungated arm falls to 0.46 at seq 768"
+  both come from lr = 0.1, the rate that most depresses the ungated arm: at seq
+  768, half-life 0.5 it means 0.387 against a trivial floor of 0.344. At lr = 0.02
+  the same cell means **0.80** and the gap is **0.196**. GOALS is corrected. The
+  finding is unchanged — recovery is approximately zero at every rate.
+- **g8-03 — numbers shift slightly, conclusion unchanged.** capture-0 at 768 moves
+  from -0.00 to 0.02 and capture-16 from -0.01 to 0.02. Every curve still falls;
+  bounded pools still do not flatten relative to the unbounded one.
+- **g9-02 — essentially unchanged.** Recovery 0.21/0.20/0.23/-0.13 becomes
+  0.23/0.23/0.24/-0.13. The floor arm was being depressed by the rate choice
+  (0.167 to 0.238 at delay 1) and the RATIO was robust to it anyway. Everything
+  g9-03, g9-04 and the tag rest on stands.
+
+The sweep files themselves are still not edited: they record what was reported at
+the time, and the corrections live here and in GOALS.
+
+**Open, and noticed while doing this: g8-03 picks a different learning rate per
+sequence length**, so its `slope` column compares cells trained at different
+rates. That was true before the port and is still true. Either the slope should
+be computed within a single rate, or it should be named as a cross-configuration
+comparison. It does not change the current conclusion, since every rate falls.
 
 Each port is: swap the loader for `load()`/`by_cell()`, swap the hand-rolled
 means-and-spread block for `assess()`, pass the right floor (**0.34375 for MQAR,

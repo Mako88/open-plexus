@@ -589,9 +589,30 @@ arm saturates at capacity 16, so that comparison lives in a narrow band below it
 > having it. Both candidates fail: consolidate-on-confirmed-use, which is tagging
 > and capture, and consolidate-on-surprise, which is the salience gate.
 >
-> And the advantage being forgone is large. The oracle scores **0.998–1.000 in
-> every cell**, at every length, while the ungated arm falls to 0.46 at seq 768.
-> The largest usable gap is **0.612**.
+> And the advantage being forgone is large, though **smaller than this section
+> used to say**. The oracle scores **0.998–1.000 in every cell**, at every
+> length. The ungated arm is where the correction lands.
+>
+> *Corrected after re-summarising the archived run.* This read "the ungated arm
+> falls to 0.46 at seq 768" and "the largest usable gap is 0.612". **Both
+> numbers come from lr = 0.1**, the rate that most depresses the ungated arm —
+> at seq 768, half-life 0.5, it scores 0.478/0.351/0.332, a mean of 0.387
+> against a trivial floor of 0.344. The cell passes the floor check and the gap
+> is real; it is also the cell where the baseline most nearly broke, and
+> "largest usable gap" is a maximum taken over exactly the axis that rewards
+> that.
+>
+> At **lr = 0.02** the same cell's ungated arm scores 0.831/0.824/0.752 — a mean
+> of **0.80** — and the gap is **0.196**. Choosing the rate where the floor arm
+> is highest, which is a baseline choice rather than a mechanism choice, the
+> largest gap anywhere in the grid is **0.397** (seq 768, half-life 0.125).
+>
+> So the advantage forgone at seq 768 is **0.20 to 0.61 depending on the
+> learning rate**, and the top of that range is not the honest headline. **The
+> finding below is unchanged**: `on-use` and `salience` recover approximately
+> nothing at every rate, so which rate is reported does not rescue either
+> mechanism. What changes is how much gating is worth, and it was overstated by
+> about a factor of three.
 >
 > **Recovery also falls as sequences get longer** — 0.05 at seq 192, −0.00 at
 > 768 — so the failure is worst where the gate matters most. That was

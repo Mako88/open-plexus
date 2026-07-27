@@ -190,3 +190,31 @@ Both are now printed, with the reason.
 they record what was reported at the time. Whether any headline actually moves
 needs the archived JSON re-summarised, and those artifacts live in Actions rather
 than the repo. Logged in BACKLOG.
+
+## 12. Re-summarised the archived sweeps, and corrected a number in GOALS
+
+**Chosen.** Pulled g8-01, g8-03 and g9-02's archived JSON out of Actions and ran
+both the old and ported summarisers on it, rather than leaving decision 11's open
+half open.
+
+**One headline moved.** GOALS said the oracle's advantage at seq 768 was 0.612
+and the ungated arm fell to 0.46. Both come from lr = 0.1 — the rate that most
+depresses the ungated arm, which at that cell means 0.387 against a trivial floor
+of 0.344. It passes the floor check, so the number is real; it is also the cell
+where the baseline most nearly broke, and "largest usable gap" maximises over
+exactly the axis that rewards that. At lr = 0.02 the same cell means 0.80 and the
+gap is 0.196. GOALS now states the range and why.
+
+**What did not move.** g8-03's conclusion (every curve falls, pools do not
+flatten) and g9-02's recovery (0.23/0.23/0.24/-0.13) both survive. That matters
+more than the correction: g9-03, g9-04 and tonight's tag all rest on g9-02, and
+they are unaffected.
+
+**The tool now shows its own refusals.** g8-01's 1536 row — the one withdrawn by
+a later audit after being published — used to be silently skipped. It now prints
+with the reason, at all three half-lives. That is the class fixed rather than the
+instance: the row got published in the first place because nothing in the output
+said it had been dropped.
+
+**Undo.** The GOALS edit is one block and quotes both numbers, so reverting it
+loses nothing that was there before.

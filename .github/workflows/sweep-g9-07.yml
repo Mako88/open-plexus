@@ -22,7 +22,10 @@ name: sweep-g9-07-a-tag-that-knows-how-big-its-store-is
 # Three values on both swept axes, because g9-05 pinned with two. Delay 4 is
 # dropped -- g9-05 has it tracking delay 1 to within 0.03 in every row.
 #
-# 27 jobs of (slots, fade, delay), about 7 minutes each.
+# fade 0.9 is carried because g9-06's fade axis pinned at the bottom of
+# [0.95, 0.99], so its +0.16 is a lower bound the same way g9-05's numbers were.
+#
+# 36 jobs of (slots, fade, delay), about 7 minutes each.
 
 on:
   workflow_dispatch:
@@ -37,7 +40,7 @@ jobs:
       fail-fast: false
       matrix:
         slots: [8, 16, 32]
-        fade: ["1.0", "0.99", "0.95"]
+        fade: ["1.0", "0.99", "0.95", "0.9"]
         delay: [1, 8, 20]
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -70,7 +73,7 @@ jobs:
           merge-multiple: true
       - name: Combine
         run: |
-          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 27" | tee summary.txt
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 36" | tee summary.txt
           python -m tools.summarise_g9_05 | tee -a summary.txt
       - name: Summary
         run: |

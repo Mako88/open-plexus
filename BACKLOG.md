@@ -342,7 +342,26 @@ more directly.
 
 ---
 
-## The gate that reads both signals — the next mechanism, and it does not exist
+## Can a better signal buy a smaller pool? — the live question
+
+[g9-06](experiments/sweeps/g9-06-is-the-tag-capacity-starved.txt) found the tag
+works on its own: **slots 32, fade 0.95 recovers +0.16 at every delay, spread
+0.01**, and +0.16 at delay 20 is the first positive result at that delay anywhere
+here. It does not beat a MATCHED window (0.16 against 0.23) and it beats an
+unmatched one by 0.40, which is the case a node cannot distinguish.
+
+**But the signal is not what makes it work.** `tag` minus `tag-strongest` is
++0.003 at that cell and +0.222 at `slots 16, fade 0.99`. The direction g9-04
+measured buys height only where the pool is too small.
+
+That turns the question into John's: **a pool of 32 is not a tiny node.** If a
+better signal reaches +0.16 at slots 8 or 16, the mechanism scales down to the
+devices this project exists for. If it does not, bounded capacity plus a fade is
+the whole mechanism and the signal was a detour.
+[g9-07](experiments/sweeps/g9-07-a-tag-that-knows-how-big-its-store-is.txt) asks
+exactly that, with `tag_relative`.
+
+## The gate that reads both signals — still unbuilt, now less urgent
 
 [g9-05](experiments/sweeps/g9-05-a-tag-that-fades.txt) ran, 32 of 32 cells, no
 refusals. **The tag's rows that are flat are flat at zero, and its rows that are

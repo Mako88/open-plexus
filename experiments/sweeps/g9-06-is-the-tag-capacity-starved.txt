@@ -2,7 +2,119 @@ Is the tag capacity-starved, or is flat-and-positive impossible?
 ================================================================
 
 Script: experiments/g9_05_the_tag.py, with --slots swept upward
-Status: PRE-REGISTERED. Dispatched without results in hand.
+Status: RUN. 23 of 24 cells (slots 64 fade 0.95 delay 8 did not return).
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30240589408
+
+ANSWER: yes, starved -- and g9-05's refutation is OVERTURNED. There is a row
+        that is both flat and positive. It is also the row where the signal's
+        direction stops mattering, which is the other half of the answer.
+
+
+THE RESULT
+-----------
+Recovery, tag arm. g9-05's best rows are included for comparison and were run
+under identical settings.
+
+    slots fade      d1      d4      d8     d20   spread
+        8 0.99   +0.00   -0.00   -0.02   -0.03     0.03   (g9-05)
+        8 0.95   +0.24   +0.21   +0.15   -0.17     0.41   (g9-05)
+       16 0.99   +0.11   +0.12   +0.09   +0.09     0.03
+       16 0.95   +0.21   +0.21   +0.19   +0.03     0.18
+       32 0.99   +0.16   +0.16   +0.16   +0.13     0.03
+       32 0.95   +0.16   +0.16   +0.17   +0.16   **0.01**
+       64 0.99   +0.10   +0.12   +0.11   +0.11     0.02
+       64 0.95   +0.09   +0.11       --   +0.10     0.02
+     window     +0.23   +0.23   +0.23   -0.24     0.47
+
+Every returned cell is healthy: floor arm 0.238-0.249 against a trivial floor of
+0.125, gap 0.750-0.761, seed spread 0.062-0.113, nothing refused.
+
+**slots 32, fade 0.95: +0.16 at every delay, spread 0.01.** Flat and positive.
+That is the cell g9-05 could not find and concluded did not exist, and g9-05 was
+wrong for exactly the reason its own grid check flagged -- it was measuring a
+starved pool.
+
+**+0.16 at delay 20 is the first positive result at that delay anywhere in this
+project.** The window is -0.24 there. Every mechanism before this one was either
+negative at delay 20 or had to be told the delay in advance.
+
+It does not beat a MATCHED window: 0.16 against 0.23 at delays 1 to 8. It beats
+one that is not matched by 0.40, and nothing tells a node which case it is in.
+
+
+AND THE SIGNAL STOPS MATTERING WHERE THE MECHANISM STARTS WORKING
+------------------------------------------------------------------
+`tag` minus `tag-strongest`, per row -- the control that separates "the signal
+works" from "any capacity works":
+
+    slots 16 fade 0.99   +0.222   [+0.18, +0.20, +0.22, +0.28]
+    slots 32 fade 0.99   +0.146   [+0.12, +0.12, +0.16, +0.19]
+    slots 16 fade 0.95   +0.087   [+0.01, +0.01, +0.07, +0.26]
+    slots 64 fade 0.99   +0.044   [+0.02, +0.05, +0.04, +0.06]
+    slots 64 fade 0.95   +0.008   [+0.00, +0.01, +0.01]
+    slots 32 fade 0.95   +0.003   [-0.01, +0.00, +0.02, +0.00]
+
+**The flat-and-positive row is the row where admitting the strongest scores the
+same as admitting the weakest.** g9-05's own refutation table named this outcome:
+*capacity is the whole mechanism and the signal is decoration*. Here it is true
+of one cell and false of others -- at slots 16 fade 0.99 the direction is worth
++0.22, which is the difference between working and not.
+
+So the honest split, and it is not the one either sweep set out to test:
+
+    the MECHANISM   bounded capacity over writes, plus a fade
+                    -> flat across delay and positive. Real, and new
+    the SIGNAL      g9-04's inverted retrieval strength
+                    -> buys height where capacity is SCARCE, and buys
+                       nothing at the capacity where the mechanism works best
+
+A gate does not get to choose scarce capacity for the sake of the signal, so the
+operative reading is that the signal is not carrying the result. What it is
+carrying is a way to do more with less, which is John's tiny-node question and
+not this sweep's.
+
+
+PREDICTIONS, SCORED
+--------------------
+1. **CONFIRMED.** Recovery rises then falls: at fade 0.99, +0.11 at 16, +0.16 at
+   32, +0.10 at 64. The peak is interior and `tools/grid.py` now passes on the
+   capacity axis.
+
+2. **REFUTED, in the direction that vindicates the mechanism.** Predicted the
+   fade-0.99 row stays near zero, spread under 0.10 and mean between -0.05 and
+   +0.10. Spread held at 0.03, but the mean is +0.15 at slots 32 -- above the
+   band and above the +0.15 threshold registered as the outcome that would
+   overturn g9-05. It did.
+
+3. **REFUTED, and it was named most likely wrong.** Predicted delay 20 stays
+   negative at fade 0.95 at every capacity, on the reasoning that the fade sets
+   reach in steps and capacity cannot buy reach. It is +0.16 at slots 32. The
+   two dials are not separable: with more room a mark that would have been
+   displaced survives longer, so capacity does buy reach.
+
+4. **CONFIRMED.** The window is +0.23/+0.23/+0.23/-0.24 in every row, unmoved by
+   dials that do not touch it. The arms are independent and the wiring holds.
+
+5. **PARTLY REFUTED.** Predicted `tag` beats `tag-strongest` by a mean above
+   +0.05 at every delay. True in four rows of six; at slots 32 fade 0.95 the gap
+   is +0.003 and at slots 64 fade 0.95 it is +0.008. See above -- this is the
+   most important thing the run found.
+
+Two confirmed, two refuted, one partly. The two refutations are the result.
+
+
+THE FADE AXIS PINNED THIS TIME
+-------------------------------
+`tools/grid.py`:
+
+    slots: (clean -- an interior optimum at 16 to 32)
+    fade:  all 4 arms chose an edge of the grid [0.95, 0.99] (4 at the bottom,
+           0.95); the optimum is outside it and every arm is under-tuned
+
+Fixing one pinned axis exposed another, which is what dropping fade 0.9 and 1.0
+from this grid cost. The +0.16 is therefore a lower bound in the same way
+g9-05's numbers were. [g9-07](g9-07-a-tag-that-knows-how-big-its-store-is.txt)
+carries fade 0.9 for this reason as well as its own.
 
 
 IN PLAIN TERMS

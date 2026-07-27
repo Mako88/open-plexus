@@ -1,9 +1,9 @@
 # 023 — Two signals, and only one of them is about value
 
-**Status:** [g9-05](../../experiments/sweeps/g9-05-a-tag-that-fades.txt) RUN,
-32 of 32 cells. The account below was written from a pre-dispatch control and the
-sweep did not overturn it. One axis pinned, so
-[g9-06](../../experiments/sweeps/g9-06-is-the-tag-capacity-starved.txt) is running.
+**Status:** **PARTLY CORRECTED by
+[g9-06](../../experiments/sweeps/g9-06-is-the-tag-capacity-starved.txt).** The
+title still holds and the central claim below does not: the tag DOES work on its
+own, at a capacity g9-05 never reached. See *What g9-06 corrected* at the end.
 **Changes:** what [022](022-the-signal-was-there-and-pointing-backwards.md) implied
 the tag would do.
 
@@ -99,8 +99,14 @@ binding in **32 of 32** captures and the tag in 14. Where it does not, the windo
 captures **none** and the tag still captures 11.
 
 **They are not a better and a worse selector of one thing. They select different
-things.** The tag was proposed as the fix for the window's cliff, and it is not —
-it is the other half of a gate whose first half already worked.
+things.**
+
+> **This next sentence was wrong and g9-06 refuted it.** It read: *the tag was
+> proposed as the fix for the window's cliff, and it is not — it is the other
+> half of a gate whose first half already worked.* At `slots 32, fade 0.95` the
+> tag recovers +0.16 at every delay including 20, where the window is -0.24. It
+> IS a fix for the cliff. What was measured when this was written was a pool
+> four times too small.
 
 ## What that costs the tag's billing
 
@@ -148,6 +154,38 @@ none. That is the fade earning its place twice.
 `slots 8`, the top of the grid, so these are lower bounds. If a larger pool
 produces a row that is both flat and positive, this note is wrong and the tag is
 a mechanism after all. That is g9-06's prediction 2.
+
+## What g9-06 corrected
+
+Raising the capacity to 16, 32 and 64 found the cell g9-05 concluded did not
+exist: **slots 32, fade 0.95, recovering +0.16 at delays 1, 4, 8 and 20, spread
+0.01.** Flat and positive. **+0.16 at delay 20 is the first positive result at
+that delay anywhere in this project**, against the window's -0.24.
+
+So a bounded capacity over writes, with a fade, is a gate that does not have to
+be told the delay. That is new and this note said it was not possible.
+
+**What survives, and it is the part worth keeping.** g9-06 also ran
+`tag-strongest` at every cell, and the gap between admitting the weakest and
+admitting the strongest is **+0.003 at the winning cell** — while being +0.222 at
+`slots 16, fade 0.99`. The signal's direction buys a great deal where capacity is
+scarce and nothing at all where the mechanism works best.
+
+    the MECHANISM   bounded capacity plus a fade -> flat and positive. Real
+    the SIGNAL      g9-04's inverted strength    -> buys height only when the
+                                                   pool is too small
+
+So the two-signals account above is still the right description of *what each
+thing knows*. What it got wrong is the conclusion drawn from it: the tag does not
+need the window's signal to work, it needs room. The open question the account
+now points at is John's, not this note's — **can a better signal buy the same
+result with a smaller pool?** That is what `tag_relative` and
+[g9-07](../../experiments/sweeps/g9-07-a-tag-that-knows-how-big-its-store-is.txt)
+are for.
+
+**And +0.16 is itself a lower bound.** g9-06's fade axis pinned at the bottom of
+its grid, exactly as g9-05's capacity axis did. Fixing one pinned axis exposed
+another.
 
 ## What would make this note wrong
 

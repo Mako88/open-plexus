@@ -5,6 +5,26 @@ Script: experiments/g9_05_the_tag.py --mode relative
 Status: PRE-REGISTERED. Predictions written after a pre-dispatch control, which
         is disclosed below, and before any sweep.
 
+        REVISED after g9-06 returned, BEFORE dispatch: fade 0.9 added, because
+        g9-06's fade axis pinned at the bottom of its grid. The predictions
+        below are unchanged -- none of them was about fade 0.9 -- and the
+        revision is recorded here rather than made silently.
+
+        **g9-06 changes what this run is for.** It found a row that is both flat
+        and positive (slots 32, fade 0.95: +0.16 at every delay, spread 0.01),
+        so prediction 2 below has ALREADY been answered for the absolute tag and
+        is no longer this run's reason to exist. What g9-06 also found is that
+        the flat-and-positive row is the row where `tag-strongest` scores the
+        same, +0.003 -- so the mechanism works there and g9-04's signal is not
+        what makes it work.
+
+        That sharpens this run rather than retiring it. `tag_relative` is a
+        SIGNAL improvement, and g9-06 says the signal pays where capacity is
+        scarce: +0.222 at slots 16 fade 0.99, +0.003 at slots 32 fade 0.95. So
+        the question here is now **whether a better signal moves the working
+        point to a smaller pool** -- which is John's tiny-node question, and the
+        one thing a capacity argument alone cannot answer.
+
 
 IN PLAIN TERMS
 ---------------
@@ -75,7 +95,10 @@ THE GRID
 ---------
   slots     8, 16, 32           three values, so `tools/grid.py` can find an
                                 interior -- g9-05 pinned with only two
-  fade      1.0, 0.99, 0.95     1.0 is the question, not a control, this time
+  fade      1.0, 0.99, 0.95, 0.9   1.0 is the question, not a control, this
+                                time; 0.9 because g9-06's fade axis PINNED at
+                                the bottom of [0.95, 0.99] and its +0.16 is a
+                                lower bound for the same reason g9-05's were
   delay     1, 8, 20            delay 4 dropped: g9-05 has it tracking delay 1
                                 to within 0.03 in every row. A deliberate
                                 narrowing, recorded rather than left invisible
@@ -113,6 +136,13 @@ PREDICTIONS
 
 5. **`tag` still beats `tag-strongest`**, mean above +0.05 at every delay.
 
+6. **Registered after g9-06 and before dispatch, so it is a weaker test than
+   1-5 and is marked as one: the relative tag reaches g9-06's +0.16 at a
+   SMALLER capacity than 32.** Guess: +0.14 or better at slots 16. This is the
+   tiny-node question. If a better signal does not buy a smaller pool, then the
+   signal is not worth its division and bounded capacity plus a fade is the
+   whole mechanism.
+
 Most likely wrong: **4.** Capture is not recovery -- g9-05's un-faded arm
 captured 9% and scored -0.20, and its fade-0.95 arm captured 100% at delay 1 and
 scored exactly what the window scored. A capture rate at delay 20 that beats zero
@@ -137,7 +167,7 @@ WHAT WOULD REFUTE WHAT
 
 COST
 -----
-27 jobs of (slots, fade, delay). Five arms x three seeds x one rate = 15 cells a
+36 jobs of (slots, fade, delay). Five arms x three seeds x one rate = 15 cells a
 job; g9-05 ran the same shape in about 7 minutes a job. Dispatched only after
 g9-06 finishes -- one matrix at a time.
 

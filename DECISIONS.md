@@ -314,3 +314,38 @@ not recovery and g9-05 demonstrated the gap twice.
 
 **Queued, not dispatched.** g9-06 is still running and the repo allows one matrix
 at a time.
+
+## 16. g9-06 overturned g9-05, and the win is not where the argument said
+
+**The result.** `slots 32, fade 0.95` recovers +0.16 at every delay, spread 0.01
+— flat and positive, the cell g9-05 concluded did not exist. +0.16 at delay 20 is
+the first positive result at that delay anywhere in this project. g9-05 was
+measuring a pool four times too small, which its own grid check had flagged.
+
+**The catch, and it is the more important half.** The flat-and-positive row is
+the row where `tag-strongest` scores the same: +0.003. The signal's direction is
+worth +0.222 at `slots 16, fade 0.99` and nothing at the winning cell. So the
+mechanism is bounded capacity plus a fade; g9-04's inverted signal buys height
+only where the pool is starved.
+
+**Chosen: correcting note 023 rather than softening it.** It claimed the tag "is
+not a fix for the window's cliff — it is the other half of a gate". That is
+false and the sentence is quoted and marked refuted in place, per rule 5.
+
+**Chosen: repurposing g9-07 rather than cancelling it.** Its original reason —
+find a flat-and-positive row — is answered. But `tag_relative` is a *signal*
+improvement and g9-06 says the signal pays exactly where capacity is scarce, so
+the run now asks whether a better signal reaches +0.16 at a smaller pool. That is
+John's tiny-node priority and the one thing a capacity argument cannot answer.
+Prediction 6 was added for it and is explicitly marked as registered after
+g9-06, so it counts as weaker evidence than 1–5.
+
+**Chosen: adding fade 0.9 to g9-07's grid.** g9-06's fade axis pinned at the
+bottom of `[0.95, 0.99]`, so its +0.16 is itself a lower bound. Fixing one pinned
+axis exposed another. Recorded in the sweep file as a revision made before
+dispatch rather than applied silently.
+
+**One cell missing.** `slots 64 fade 0.95 delay 8` did not return. The summariser
+prints it as missing rather than undefined, which is the distinction the port in
+decision 11 added. It does not affect the conclusion — slots 64 is worse than 32
+at every other cell.

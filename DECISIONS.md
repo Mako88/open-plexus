@@ -2174,3 +2174,103 @@ mis-transcribed, and it is fixed before the re-run.
 
 The re-run needs **data on the x-axis, not width** — which is the axis
 Filipovich et al. actually used, and the one where the reference still moves.
+
+---
+
+## 56. A green run with an empty summary, and the two things that made it one
+
+The g11-04 summariser "produced no output in CI though it ran locally" was two
+independent defects lining up, and the second is repo-wide.
+
+**The instance.** The aggregate job ran `python -m tools.summarise_g11_04`
+without `pip install numpy`. It died on `ModuleNotFoundError` at import.
+Confirmed in the log of run `30295529865`, not inferred.
+
+**The class, which nobody had looked at.** That crash was invisible because the
+command is piped into `tee`, and a shell pipeline reports the status of its
+LAST command. **Forty workflows piped into `tee` and none used `set -o
+pipefail`.** So this was never about numpy: any summariser crash, for any
+reason, would have produced a green step and a `summary.txt` containing only its
+header line. A crashed summariser reads as "the sweep found nothing" rather than
+"the summariser never ran", and nothing distinguishes them from outside.
+
+    cells returned: 12 of 12     <- the entire summary of a 48-minute matrix
+
+**The fix, over the enumeration.** `pipefail` in all forty; `if: always()` on
+every Summary step and every `*-summary` upload, because pipefail alone would
+have traded a silent wrong answer for **lost artifacts** — a failing Combine step
+skips the upload and the raw data goes with it, which is worse than the bug.
+`tools/check_workflows.py` now refuses both shapes, per JOB rather than per
+file: a whole-file search for `pip install numpy` finds the scaling job's copy
+and concludes g11-04 was fine, which is exactly how this survived.
+
+**And the hand-recovered numbers were right.** Re-downloading run 30295529865
+into a fresh directory and running the rewritten summariser over it reproduces
+decision 55's table to three decimals. Decision 55 stands as published.
+
+---
+
+## 57. There was no data axis to sweep, and the flag that looks like one is not
+
+g11-05 was going to re-run g11-04 on data. **There was no way to do that.**
+`TRAIN_CHARS` was a module constant, and `--cap` — the flag whose name suggests
+the corpus — is the memory store's *norm* cap, unrelated to the text.
+
+`tools/check_workflows.py` validates that a flag is **accepted**, not that it is
+**read**. So dispatching `--cap` as a data axis would have passed every
+pre-flight check, run five identical cells, and reported a flat exponent —
+which is indistinguishable from the real result, and would have been the second
+consecutive matrix spent on an unanswerable question.
+
+`--chars` is new and wired through, with `tests/test_data_axis.py` as the
+connection test: fewer characters means fewer fitting chunks, the fitting text
+is ACTUALLY the requested length rather than merely smaller, and the held-out
+test text does **not** move with the axis. The default stays 250,000 so g11-04
+reproduces. A cell asking for more text than the corpus holds now refuses rather
+than truncating.
+
+**The summariser reads the grid instead of assuming it.** `summarise_g11_04` is
+now `summarise_scaling_exponent`: it detects whether `chars` or `width` varies
+and fits against that, and refuses when both do.
+
+**A hole the rename exposed, in the act of exposing it.** The new dependency
+check returned "imports nothing" for a module that does not exist — so renaming
+a summariser switches the check off in the same change that breaks the workflow.
+Two tests went red on precisely that. It now reports an unresolvable reference.
+
+Dispatched as run `30302728532`: 15 jobs, 5 data points x 3 arms, width pinned
+at 64 **from g11-04's own grid at 250k characters**, where all three arms have
+published values (backprop 4.157, context 5.759, single 5.505). That cell has
+something to land on, so disagreement there is a dispatch error rather than a
+finding. Predictions are registered in the sweep file before dispatch; P1 is the
+admissibility test that failed last time.
+
+---
+
+## 58. One seam exists, and it is the only one
+
+John asked whether the seams idea — components testable in isolation and
+swappable for experimenting with alternatives — was ever done. Measured, not
+recalled:
+
+    Protocol seams in openplexus/       1   (KeySource, openplexus/keys.py)
+    LocalMemoryConfig fields           31
+    LocalAssociativeMemory.run()      584 lines
+      branch points within it          51
+      reads of self.config.*           53
+
+So it was started and stopped at one component. `keys.py` says so itself —
+"keys were the obvious place to start" — and its own argument for existing
+applies unchanged to the write rule, the retrieval, the readout and the gates:
+each variation currently costs a config flag, a branch inside a 584-line method,
+and a threading of that flag through every experiment script.
+
+**This is not only an ergonomics point, and that is the part worth deciding on.**
+The project's headline problem is that every component passes its capability
+test in isolation while the whole fails. A model whose parts are 31 flags
+branching inside one method is a model where "swap the retrieval and re-measure"
+is a refactor rather than an experiment — so the composition question is
+expensive to attack in exactly the situation where it is the live question.
+
+No change made. This is a measurement and a pending decision, recorded because
+the number is the argument.

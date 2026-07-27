@@ -67,10 +67,25 @@ from openplexus.tasks.corpus import chunks  # noqa: E402
 TEMPERATURES = tuple(round(0.01 * 1.3 ** i, 4) for i in range(0, 30))
 EPOCHS = 2
 
+#: Training characters, capped well below the corpus.
+#:
+#: g11-03 lost four of six cells to a 240-minute timeout because the store is
+#: `d x d` and the per-step work is a matvec, so cost goes as **d squared** --
+#: width 256 is sixteen times width 64, not four. The estimate had been taken
+#: from the cheapest cell that had been run locally, which is exactly the wrong
+#: one.
+#:
+#: Capping the stream is the right fix here rather than a compromise: this
+#: experiment fits loss against WIDTH at fixed data, which is a standard
+#: model-size scaling curve, and holding the data fixed is what makes the
+#: exponent comparable across arms. What it forfeits is any claim about
+#: data scaling, which this sweep was never going to make.
+TRAIN_CHARS = 250_000
+
 
 def split(corpus, chunk: int):
     """Fitting text, calibration text, test text — the same rule as g10-01."""
-    stream = corpus.train[0]
+    stream = corpus.train[0][:TRAIN_CHARS]
     cut = int(len(stream) * 0.8)
     return (chunks((stream[:cut],), chunk), chunks((stream[cut:],), chunk),
             chunks(corpus.test, chunk))

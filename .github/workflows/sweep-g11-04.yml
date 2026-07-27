@@ -40,6 +40,16 @@ name: sweep-g11-04-does-our-loss-fall-with-width-like-backprops
 # 4.707 bits, against our 5.897 at width 32. The reference is meaningful and it
 # already beats us.
 #
+# RE-SCOPED BEFORE DISPATCH, because of how g11-03 failed. That sweep lost four
+# of six cells to its timeout: the store is d x d and the per-step work is a
+# matvec, so cost goes as d SQUARED, and width 256 is sixteen times width 64
+# rather than four. The estimate had been taken from the cheapest cell.
+#
+# So: widths 16-128 rather than 32-256 (an 8x range, still enough to fit a
+# slope), two seeds, chunk 128, and a training stream capped at 250k characters.
+# The most expensive cell here -- backprop at width 128 -- is roughly the cost
+# of the g11-03 cell that DID finish.
+#
 # 12 jobs: 4 widths x 3 arms, two seeds inside each.
 
 on:
@@ -54,7 +64,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        width: [32, 64, 128, 256]
+        width: [16, 32, 64, 128]
         arm: [single, context, backprop]
     runs-on: ubuntu-latest
     timeout-minutes: 300
@@ -65,7 +75,7 @@ jobs:
           python-version: "3.13"
       - run: pip install numpy
       - name: ${{ matrix.arm }} at width ${{ matrix.width }}
-        run: python experiments/g11_04_scaling_exponent.py --corpus shakespeare --width ${{ matrix.width }} --scale 256 --mode ${{ matrix.arm }} --workers 2 --json out/X-${{ matrix.arm }}-${{ matrix.width }}.json
+        run: python experiments/g11_04_scaling_exponent.py --corpus shakespeare --width ${{ matrix.width }} --scale 128 --mode ${{ matrix.arm }} --workers 2 --json out/X-${{ matrix.arm }}-${{ matrix.width }}.json
       - uses: actions/upload-artifact@v4
         with:
           name: g11-04-${{ matrix.arm }}-${{ matrix.width }}

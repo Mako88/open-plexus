@@ -1994,3 +1994,69 @@ the pair key more than the single-token one. The sweep must vary it rather than
 inherit it.
 
 Note 034 has the tables. 602 tests, 127 mutations, five checks clean.
+
+---
+
+## 52. C1 was a proxy, and John replaced it with the thing it stood for
+
+**John's ruling: "our real constraints are just *does it work over the
+internet* — if something still meets that, it's good to go."**
+
+C1 said no operation may require globally synchronised state. That was adopted
+because backpropagation is a global barrier moving data proportional to
+parameter count, which is why deep networks need tightly-coupled hardware — so
+"no global state" looked like the same requirement stated structurally.
+
+**Note 036 is where it became clear they are not the same requirement.** Edmond
+& Kadmon report error-feedback dimensionality scaling with task complexity
+rather than network size — rank 10 matched backprop on CIFAR-10 across an MLP, a
+CNN and a ViT. That is still a backward chain, so the old rule forbids it. But
+the message is **tens of floats per hop**, and a backward sweep carrying forty
+bytes over a 150 ms link is not what forces a data centre. **The structural rule
+was ruling out designs the actual goal permits.**
+
+**What the amendment does not license**, and this is the part that keeps it from
+being a licence to do anything: a global all-reduce is still out, *even a
+twelve-byte one*. Note 036 records zeroth-order and evolution-strategy methods
+looking local right up until you notice their scalar broadcast is a barrier
+wearing a small payload. **The question is whether progress stalls when one
+participant is slow or gone**, not how many bytes moved.
+
+Every result before today was measured under the stricter rule, so none is
+invalidated — they were achieved with one hand tied. GOALS.md carries the
+amendment with the date and the reasoning.
+
+---
+
+## 53. g11-03 lost four of six cells, and the reason is a rule worth keeping
+
+**At width 64 the pair key LOSES by 0.216 +/- 0.028 bits** — the ceiling moved
+and the store cannot afford the resolution. P1 and P4 confirmed; P2 and P3, the
+crossover question the sweep existed to answer, **never ran.** Widths 128 and
+256 hit the 240-minute timeout.
+
+**The estimate was wrong in a way worth naming.** The store is `d x d` and the
+per-step work is a matvec, so cost goes as **d squared**: width 256 is sixteen
+times width 64, not four. I estimated from the one cell I had run locally, which
+was the cheapest one.
+
+**The rule: when a sweep axis enters the cost quadratically, estimate from the
+MOST expensive cell and state the estimate per cell rather than for the matrix.**
+
+g11-04 was already written with widths to 256 plus an extra backprop arm and
+would have failed identically. It was re-scoped **before** dispatch — widths
+16–128, two seeds, chunk 128, training capped at 250k characters — and the
+worst cell then ran locally in under ten minutes. That is the only reason this
+mistake cost one sweep rather than two.
+
+**The re-scope produced a number on its way past.** Backprop attention at width
+128 scores **4.165 bits** on Tiny Shakespeare, against our 5.427 at width 64.
+It clears the unigram bar of 4.829, which nothing this project has built ever
+has. That is the reference g11-04 measures an exponent against, and it is
+already a bit and a quarter ahead.
+
+I should also record what the partial result does NOT say. The single-token arm
+at 5.427 matches the g10-12 baseline of 5.466, so the run was sound; the pair
+arm simply has more to store and less room. **This is weak evidence against pair
+keys and should not be cited as strong**, because the confirmed predictions were
+the easy ones and the hard one timed out.

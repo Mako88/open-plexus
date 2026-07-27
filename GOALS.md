@@ -138,12 +138,45 @@ These are the project. Everything else is negotiable.
 
 A mechanism needing a population sort, a global mean, a pooled matrix, or a
 barrier is a violation, and gets flagged as one **even when it improves the
-numbers.** Backpropagation violates this by construction: the backward pass is a
-global barrier moving data proportional to parameter count, which is precisely
-why deep networks need tightly-coupled hardware.
+numbers.**
 
 If an exception is ever admitted, it is named as an exception, in one place, with
 what depends on it — never absorbed silently.
+
+#### AMENDED 2026-07-27 — C1 is a means, and this is the end
+
+**John's ruling, in his words: "our real constraints are just *does it work over
+the internet* — if something still meets that, it's good to go."**
+
+C1 as written above was a *proxy*. It was adopted because backpropagation is a
+global barrier moving data proportional to parameter count, which is why deep
+networks need tightly-coupled hardware — so "no global state" seemed like the
+same requirement stated structurally. **It is not the same requirement, and note
+036 is where that became clear.**
+
+Edmond & Kadmon (arXiv:2502.20580) report that error-feedback dimensionality
+scales with **task complexity, not network size** — rank 10 sufficed to match
+backprop on CIFAR-10 across an MLP, a CNN and a ViT. That is still a backward
+chain, so old-C1 forbids it. But the message is **tens of floats per hop**, and
+a backward sweep carrying forty bytes over a 150 ms link is not the thing that
+forces a data centre. **The structural rule was ruling out designs the actual
+goal permits.**
+
+**So the test is now:** can this run across consumer machines over ordinary
+internet links — bounded bytes per step, no dependence on a barrier that stalls
+when one machine is slow, and correct behaviour when a machine vanishes?
+
+**What this does NOT license.** A global all-reduce is still out, even a
+twelve-byte one: note 036 records that zeroth-order and evolution-strategy
+methods look local until you notice their scalar broadcast is a barrier wearing
+a small payload. **The distinguishing question is whether progress stalls when
+one participant is slow or gone**, not how many bytes moved. A bounded one-hop
+message to a named neighbour passes; a collective everyone must join does not.
+
+Every result recorded before this date was measured under the stricter rule, so
+none of them is invalidated by the amendment — they were simply achieved with
+one hand tied. **Any design admitted under the amended rule must say so
+explicitly**, exactly as the old exception clause required.
 
 ### C2 — Bounded asynchrony
 

@@ -1,0 +1,96 @@
+Does the pair key pay for itself in bits per character?
+========================================================
+
+Script: experiments/g10_01_first_language.py --corpus shakespeare --mode context
+Status: PARTIAL. 2 of 6 cells. Widths 128 and 256 hit the 240-minute timeout
+        and were cancelled; only width 64 returned. My cost estimate was wrong
+        and the re-scope is at the bottom.
+
+ANSWER: **At width 64 the pair key LOSES by 0.216 +/- 0.028 bits.** The ceiling
+        moved and the store cannot afford the resolution. Whether it crosses
+        over at a larger width is UNANSWERED, because those cells never ran.
+
+
+THE NUMBERS
+------------
+Paired per-seed differences, three seeds, Tiny Shakespeare, chunk 256, cap 5.0.
+
+    width      single-token         pair key      paired difference
+       64     5.427 +/-0.020   5.643 +/-0.008        +0.216 +/-0.028
+    raw       5.944 +/-0.002   5.975 +/-0.002        +0.031 +/-0.002
+    accuracy  0.178 +/-0.005   0.149 +/-0.002        -0.029 +/-0.006
+
+The bars on this corpus: uniform 6.000, unigram 4.829, bigram 3.583,
+trigram 2.951.
+
+
+COST
+-----
+6 jobs dispatched, 2 returned. Widths 64/128/256 x single/context, three seeds
+inside each, 240-minute timeout. The four cells at widths 128 and 256 were
+cancelled at the timeout, so roughly 16 runner-hours were spent for nothing.
+
+
+MEASURED ON
+------------
+Tiny Shakespeare, 1,115,394 characters, 64 symbols after folding. 1,003,854
+train and 110,925 test, split as a contiguous tail -- the published convention
+for this corpus. Chunk 256, memory_cap 5.0, decay 0.997, two training epochs.
+Temperature fitted on a held-out tail of the TRAINING stream, never on test.
+
+
+PREDICTIONS, SCORED
+--------------------
+P1  width 64 still LOSES, because 469 distinct keys in 64 dimensions is far
+    past capacity.
+    **CONFIRMED.** It loses by 0.216 bits, eight times the paired error.
+
+P2  the gap narrows monotonically with width.
+    **NOT TESTED.** Only one width returned.
+
+P3  at width 256 the pair key is within 0.2 bits and may pass.
+    **NOT TESTED.** This was the point of the sweep.
+
+P4  NEITHER arm beats the bigram bar of 3.583 at any width here.
+    **CONFIRMED at width 64.** 5.427 and 5.643 against 3.583. The ceiling
+    moving did not make the model good; it made it not forbidden, which is
+    what the workflow said in advance and is worth repeating now that the
+    number is in.
+
+Two of four confirmed, two unrun. **The two that were confirmed are the two
+that were easy to confirm**, and the sweep's actual question -- the crossover --
+is exactly the one that timed out. This is a weak result and should not be
+cited as evidence against pair keys in general.
+
+
+WHAT IT DOES AND DOES NOT SAY
+------------------------------
+**Does:** at a width where the store holds far fewer dimensions than there are
+distinct pair keys, raising the ceiling costs more than it returns. Note 034
+predicted this and measured the mechanism -- 469 distinct pairs in 4000
+characters against 66 tokens, and a cosine plateau of 0.53 where the
+single-token version held 0.88.
+
+**Does not:** that the pair key is a bad idea. The single-token arm at 5.427 is
+consistent with the g10-12 baseline of 5.466, so the run is sound; the pair arm
+simply has more to store and less room. Note 035's effective-rank measurement
+says the single-token store behaves as though it had ~3 dimensions at ANY width,
+which predicts its own arm is flat in width -- and that prediction also went
+untested here.
+
+
+THE COST ESTIMATE WAS WRONG, AND HOW
+-------------------------------------
+Width 64 with three seeds finished inside 240 minutes. Width 128 and 256 did
+not. The store is d x d and the per-step work is a matvec, so cost goes as d^2:
+256 is **sixteen times** width 64, not four. Estimating from the one cell that
+had been run locally hid that, because the local control was the cheapest cell.
+
+**The rule this earns:** when a sweep's axis enters the cost quadratically,
+estimate from the MOST expensive cell, not the cheapest, and state the estimate
+per cell rather than for the matrix.
+
+g11-04 was already written with widths to 256 and an extra backprop arm, and
+would have failed the same way. It has been re-scoped before dispatch rather
+than after -- widths 16-128, two seeds, and a capped training stream -- which is
+the only reason this failure cost one sweep instead of two.

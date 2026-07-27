@@ -516,6 +516,37 @@ class LocalMemoryConfig:
             — but that is not the same as verified, so `tests/test_derived_keys.py`
             checks the model scores the same on the task rather than trusting the
             statistics.
+        write_gate: How much of the corrective write to apply, in (0, 1]. Does
+            nothing unless `corrective_writes` is on. **1.0 reproduces every
+            earlier result and is the wrong default**, kept only for that reason.
+
+            g11-01 measured corrective writes fixing rebinding completely
+            (0.125 → 1.000 at decay 0.997) and COSTING capacity (0.70×), and we
+            recorded that as a trade. The 2026 linear-attention literature says
+            the delta rule is a strictly better estimator of the same object than
+            the Hebbian outer product — not a trade — and the difference turned
+            out to be this scalar. Every published delta-rule variant gates the
+            correction; ours applied all of it.
+
+            A full correction forces the store to reproduce `value` at `key`
+            exactly, at this step. It gets there by editing every direction
+            correlated with `key`, and with random keys **every other key is
+            slightly correlated with it**. So a full correction is a small
+            overwrite of everything else in the store, applied on every write.
+
+            Measured at width 128, 8 seeds — rebinding accuracy, and the share of
+            bindings still retrievable at a load of 256:
+
+                gate     rebinding   capacity
+                Hebbian      0.500      0.997
+                0.25         0.922      0.986
+                0.50         1.000      0.922
+                0.75         1.000      0.768
+                1.00         1.000      0.618
+
+            **0.25 keeps 92% of the rebinding win for 1% of the capacity**, where
+            the full correction pays 38%. The trade recorded in g11-01 was an
+            artefact of the implementation, not a property of corrective storage.
         context_keys: Derive the key from the token PAIR `(t-1, t)` rather than
             from token `t` alone. Off by default, which reproduces every earlier
             result exactly. Requires `derived_keys`.
@@ -618,6 +649,7 @@ class LocalMemoryConfig:
     salience: float = 0.0
     lasting_cap: float = 0.0
     corrective_writes: bool = False
+    write_gate: float = 1.0
     readout_bias: bool = False
     derived_keys: bool = False
     context_keys: bool = False
@@ -638,6 +670,11 @@ class LocalMemoryConfig:
             raise ValueError(
                 "derived_keys and key_active both build Wk and would conflict; "
                 "sparse keys have no per-token derivation yet")
+        if not 0.0 < self.write_gate <= 1.0:
+            raise ValueError(
+                f"write_gate is a fraction of the correction and must be in "
+                f"(0, 1]; got {self.write_gate}. Above 1 overshoots the target "
+                f"and the store oscillates; at or below 0 nothing is written")
         if self.context_keys and not self.derived_keys:
             raise ValueError(
                 "context_keys derives a key from a token PAIR and rests on the "
@@ -1081,12 +1118,19 @@ class LocalAssociativeMemory:
                     # population statistic, no barrier, no other node. C1 holds.
                     #
                     # The division is by the key's own squared norm, which makes
-                    # the update exact for that key: a fresh binding lands on
+                    # a FULL correction exact for that key: the binding lands on
                     # `value` in one step instead of asymptotically.
+                    #
+                    # `write_gate` is how much of that correction to apply, and
+                    # 1.0 -- landing exactly -- turns out to be the wrong
+                    # default. See the field's documentation: a full correction
+                    # edits every direction correlated with this key, and with
+                    # random keys that is every other binding in the store.
                     scale = float(previous_key @ previous_key)
                     if scale > 0.0:
                         error = value - memory @ previous_key
-                        memory += np.outer(error, previous_key) / scale
+                        memory += (self.config.write_gate
+                                   * np.outer(error, previous_key) / scale)
                 else:
                     memory += np.outer(value, previous_key)
                 if self.config.reward_token >= 0:

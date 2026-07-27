@@ -130,8 +130,8 @@ MUTATIONS = [
                "so how much of a binding is stored depends on which key it was "
                "stored under -- and every key differs",
         path=LOCAL,
-        old="                        memory += np.outer(error, previous_key) / scale",
-        new="                        memory += np.outer(error, previous_key)",
+        old="                                   * np.outer(error, previous_key) / scale)",
+        new="                                   * np.outer(error, previous_key))",
     ),
     Mutation(
         name="the-reward-gate-never-prunes",
@@ -594,6 +594,15 @@ MUTATIONS = [
         path=LOCAL,
         old="                np.random.default_rng((config.seed, token)).normal(0.0, spread, d)",
         new="                np.random.default_rng((config.seed, 0)).normal(0.0, spread, d)",
+    ),
+    Mutation(
+        name="the-write-gate-is-ignored",
+        breaks="the whole finding -- every corrective write would apply the "
+               "full correction whatever the gate said, so a sweep over the "
+               "gate would report one number six times and call it flat",
+        path=LOCAL,
+        old="                        memory += (self.config.write_gate\n                                   * np.outer(error, previous_key) / scale)",
+        new="                        memory += (1.0\n                                   * np.outer(error, previous_key) / scale)",
     ),
     Mutation(
         name="the-table-source-takes-a-COPY-of-the-key-table",

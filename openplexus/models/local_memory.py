@@ -581,6 +581,7 @@ class LocalMemoryConfig:
     capture_slots: int = 0
     salience: float = 0.0
     lasting_cap: float = 0.0
+    corrective_writes: bool = False
     derived_keys: bool = False
     seed: int = 0
 
@@ -976,7 +977,32 @@ class LocalAssociativeMemory:
                 if self.config.decay < 1.0:
                     memory *= self.config.decay
                     _fade(pending, self.config.decay)
-                memory += np.outer(value, previous_key)
+                if self.config.corrective_writes:
+                    # THE DELTA RULE FOR STORAGE, rather than the Hebbian one.
+                    #
+                    # Hebbian storage adds `outer(value, key)` whatever the
+                    # store already holds, so rebinding a key ACCUMULATES: the
+                    # old value is still in there and retrieval returns their
+                    # sum. g10-11 measured that as 0.0x chance after 512
+                    # rebindings of 8 cues.
+                    #
+                    # Subtracting what the key currently retrieves stores only
+                    # the ERROR, so `memory @ key` lands on `value` rather than
+                    # on `value` plus whatever was there. Rebinding replaces.
+                    #
+                    # **It is local.** The correction needs the node's own store
+                    # and the key it is writing under, and nothing else -- no
+                    # population statistic, no barrier, no other node. C1 holds.
+                    #
+                    # The division is by the key's own squared norm, which makes
+                    # the update exact for that key: a fresh binding lands on
+                    # `value` in one step instead of asymptotically.
+                    scale = float(previous_key @ previous_key)
+                    if scale > 0.0:
+                        error = value - memory @ previous_key
+                        memory += np.outer(error, previous_key) / scale
+                else:
+                    memory += np.outer(value, previous_key)
                 if self.config.reward_token >= 0:
                     # Held so it can be taken back out if no reward vouches for
                     # it. Two vectors per step, not a d x d matrix.

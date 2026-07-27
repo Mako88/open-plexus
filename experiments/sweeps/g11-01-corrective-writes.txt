@@ -1,0 +1,92 @@
+Storing the error instead of the value
+=====================================
+
+Script: experiments/g11_01_corrective_writes.py
+Status: PRE-REGISTERED. Not yet run.
+
+WHAT IT CHANGES
+----------------
+Hebbian storage adds `outer(value, key)` whatever the store already holds:
+
+    memory += outer(value, key)
+
+so rebinding a key ACCUMULATES. [g10-11](g10-11-does-structure-help-the-store.txt)
+measured that at **0.0x chance** after 512 rebindings of 8 cues, and the
+correction to it measured decay 0.95 fixing it only by forgetting eighteen times
+faster.
+
+Corrective storage subtracts what the key already retrieves and stores the
+remainder:
+
+    memory += outer(value - memory @ key, key) / (key @ key)
+
+**It is local.** The correction reads the node's own store and the key being
+written under. No population statistic, no barrier, no other node. C1 holds, and
+that is the whole reason this is the first item rather than an interesting idea
+from the literature.
+
+This is the delta rule applied to STORAGE. The project already uses the delta
+rule for the readout, so the machinery and the justification are both familiar.
+
+
+MEASURED ON
+------------
+Numbers in this file will come from three places and they are not interchangeable:
+
+- **rebinding** is `reward_recall`-style synthetic cues rebound repeatedly, the
+  same construction g10-11 used, measured as accuracy against a chance of
+  1/vocab. It is the thing corrective writes are FOR.
+- **capacity** is `n` random pairs stored and queried, as in g10-10, measured
+  against the same chance. It shares no data with the rebinding condition.
+- **bits per character** is Tiny Shakespeare through `g10_01`, comparable ONLY
+  with g10-12's 5.466 -- same corpus, same split, same width, same chunk. It is
+  not comparable with the notes-corpus figures, which use a different vocabulary
+  and a different split rule.
+
+The g9 recovery ratios are NOT measured here and nothing in this file should be
+compared against them.
+
+
+PREDICTIONS
+------------
+1. **Rebinding is fixed at the decay the project actually uses.** At decay 0.997,
+   where Hebbian storage scores 0.0x chance after 512 rebindings, corrective
+   storage should recover most of the last binding. Confidence: high -- this is
+   what the arithmetic does, and if it fails the implementation is wrong rather
+   than the idea.
+
+2. **Capacity improves on random pairs.** The projection rule reduces
+   interference between stored items, so more than `d` items should survive. This
+   is the claim I am least sure of: the correction is applied once at write time
+   rather than iterated to convergence, so it is not the full pseudo-inverse.
+   Guess: an improvement, smaller than doubling.
+
+3. **THE ONE THAT MATTERS: bits per character improves on Shakespeare.**
+   g10-12 measured 5.466 against a unigram's 4.829. Corrective writes attack
+   interference, and g10-03 measured interference as what stops the model
+   carrying what it extracts. Guess: an improvement of 0.2 to 0.8 bits, still
+   short of the unigram.
+
+4. **The g9 gating results are unchanged when the flag is off.** It defaults to
+   off and no existing configuration sets it, so every published number must be
+   bit-identical. This is a correctness check rather than a prediction.
+
+Most likely wrong: 2. The single-shot correction is not the pseudo-inverse and
+capacity may barely move.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- rebinding still fails          -> the implementation is wrong, not the idea
+- capacity unchanged             -> the correction only helps repeated keys, so
+                                    it is an overwrite fix and not a capacity fix
+- bits unchanged or worse        -> interference was not what limited the model
+                                    on text, and g10-03's reading needs revising
+- any g9 number moves with the
+  flag off                       -> the change is not the opt-in it claims to be
+
+
+COST
+-----
+Local, minutes. Three conditions, one seed each to start. **The Shakespeare cell
+is the expensive one** at roughly ten minutes; the other two are seconds.

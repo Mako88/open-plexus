@@ -67,6 +67,26 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="corrective-writes-forget-to-subtract",
+        breaks="the whole mechanism, leaving Hebbian storage scaled by the "
+               "key's norm. Rebinding accumulates again, and because a uniform "
+               "rescaling of the store does not move an argmax, the model "
+               "still RUNS and still predicts -- it simply stops replacing",
+        path=LOCAL,
+        old="                        error = value - memory @ previous_key",
+        new="                        error = value",
+    ),
+    Mutation(
+        name="corrective-writes-skip-the-normalisation",
+        breaks="the exactness. Without dividing by the key's squared norm the "
+               "write lands on `value * (key @ key)` rather than on `value`, "
+               "so how much of a binding is stored depends on which key it was "
+               "stored under -- and every key differs",
+        path=LOCAL,
+        old="                        memory += np.outer(error, previous_key) / scale",
+        new="                        memory += np.outer(error, previous_key)",
+    ),
+    Mutation(
         name="the-reward-gate-never-prunes",
         breaks="the gate. Everything written stays written, so the fast store "
                "accumulates one binding per step exactly as it did ungated -- "

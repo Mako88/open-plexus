@@ -47,6 +47,7 @@ explainer, and saying so is the most useful thing you can do.
 | [28](28-a-window-has-to-be-the-right-size.md) | A window has to be the right size |
 | [29](29-the-signal-was-pointing-backwards.md) | The signal was there, pointing backwards |
 | [30](30-two-ways-to-pick-what-to-keep.md) | Two ways to pick what to keep |
+| [31](31-what-the-filter-turned-out-to-be.md) | What the filter turned out to be |
 
 More get added as the project introduces new ideas. Anything here that turns out
 to be wrong gets corrected, not softened — same rule as everywhere else.

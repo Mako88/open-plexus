@@ -1,0 +1,86 @@
+name: sweep-g9-02-a-gate-that-reads-its-own-input
+
+# Does a gate work when the relevance signal is real and arrives late?
+#
+# Six mechanisms have failed to recover the oracle, all of them inferring
+# relevance from the statistics of the stream. This one reads a REWARD TOKEN
+# from its own input -- which a deployed node receives and position_kinds() is
+# not -- and gates the FAST store, which g8-03 established is the only thing the
+# oracle does.
+#
+# PRE-DISPATCH CONTROL RAN, deliberately small (one delay, one seed, reduced
+# training, 86 seconds). First asks, trivial floor 0.125:
+#
+#     none 0.283   oracle 1.000   on-use 0.300   salience 0.283   REWARD 0.525
+#
+# Recovery 0.34 against a previous best of 0.05 across six mechanisms, with
+# on-use and salience reproducing their failure at the same cell -- which is what
+# makes the setup credible rather than the number.
+#
+# Accuracy is reported for FIRST ASKS. In autoregressive mode the first query of
+# a cue re-binds it, so every later query about that cue measures short-term echo
+# rather than retention. At one configuration that difference was 0.369 against
+# 0.225.
+#
+# 12 jobs of (delay, lr): five arms x three seeds each, seeds across 3 workers.
+# Costed from the control at ~57s per cell after scaling training back up, so
+# ~14 minutes serial per job and ~7 with workers. About 2.9 hours serial total.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  reward:
+    strategy:
+      fail-fast: false
+      matrix:
+        delay: [1, 4, 8, 20]
+        lr: ["0.02", "0.05", "0.1"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: delay ${{ matrix.delay }} lr ${{ matrix.lr }}
+        run: python experiments/g9_02_reward_gate.py --scale ${{ matrix.delay }} --lr ${{ matrix.lr }} --workers 3 --json out/X-${{ matrix.delay }}-${{ matrix.lr }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-02-${{ matrix.delay }}-${{ matrix.lr }}
+          path: out/*.json
+
+  aggregate:
+    needs: [reward]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g9-02-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 12" | tee summary.txt
+          python tools/summarise_g9_02.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-02-summary
+          path: |
+            summary.txt
+            out/*.json

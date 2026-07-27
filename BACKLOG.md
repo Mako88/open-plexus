@@ -490,6 +490,21 @@ currently mutually exclusive by construction (decision 1 in DECISIONS.md), which
 was right for measuring them apart and is exactly what a combined gate has to
 change. Three lines.
 
+## GOALS.md gating section — CORRECTED
+
+Its closing claim, *"Nothing tried can tell it"*, was true when written and
+g9-02 made it false. The section now carries g9-02, g9-03, g9-06's flat +0.16,
+the tag-strongest catch that keeps its caveat alive, and the fact that none of it
+is yet about tiny nodes. The refuted sentence is quoted and marked rather than
+deleted, because it gated how everything below it was read. Three guards in
+`tests/test_goals_consistency.py`.
+
+**What was NOT taken on, and is still John's call:** the rest of GOALS. This
+corrected one false claim in one section. Whether a live investigation belongs in
+that document at all — or whether GOALS should record only settled results and
+point at the sweeps — is a structural decision, and the corrected section is now
+the largest live-investigation block in it.
+
 ## GOALS.md stops at g8-01 on the gating line
 
 Its gating section ends with "nothing tried can tell it", which was true when

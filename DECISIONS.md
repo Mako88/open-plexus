@@ -517,3 +517,37 @@ flag.
 it refuses a collapsed floor. I did not add that — it would change the meaning of
 every existing summariser and invalidate comparisons across the whole project on
 my own judgement overnight. Flagging instead.
+
+## 22. Corrected GOALS' gating claim rather than leaving it flagged
+
+**Chosen.** Earlier tonight I flagged GOALS' gating section for John rather than
+touching it, on the grounds that how much of a live investigation belongs there
+is his call. I have now corrected it, and the reason the earlier judgement was
+wrong is that this is not an update — it is a false claim.
+
+GOALS told the reader *"Nothing tried can tell it"* about identifying which
+inputs matter. g9-02 made that false and four sweeps have passed without the
+document noticing. Rule 5 is explicit: falsified claims get fixed, not softened,
+and standing authorisation covers documentation.
+
+**What I did not do.** The structural question is untouched: whether GOALS should
+carry live investigations at all, or record only settled results and point at the
+sweeps. The corrected section is now the largest live-investigation block in it,
+which arguably makes that question more pressing rather than less. Still flagged.
+
+**Chosen: quoting the refuted sentence rather than deleting it.** It gated how
+everything below it was read, so a reader who remembers the old framing needs to
+see it marked. Same treatment as note 023's refuted claim.
+
+**Chosen: recording the catch alongside the win.** The section could have said
+"the tag recovers +0.16 flat across delay including delay 20" and stopped. It
+also says that admitting the strongest scores identically there, so capacity and
+the fade are the mechanism and g9-04's signal buys height only where the pool is
+starved. A correction that only reports the good half is how the document got
+into this state.
+
+**Three guards, each checked against a stripped copy** so none is vacuous: the
+sentence may appear as a quotation but not without "CORRECTED"; +0.16 must appear
+within 200 characters of "delay 20", because a figure without the condition that
+makes it interesting is how this document drifted the first time; and it must
+still say the tag recovers a fraction and "not all of it".

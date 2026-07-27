@@ -116,6 +116,8 @@ def parse_args(description: str) -> argparse.Namespace:
     parser.add_argument("--sweep", default=None,
                         choices=("widths", "decay", "identity", "degrade", "drops"),
                         help="which sub-sweep to run when a script has more than one")
+    parser.add_argument("--window", type=int, default=None,
+                        help="how far back a gate may reach")
     parser.add_argument("--workers", type=int, default=1,
                         help="processes to spread seeds across; 1 runs serially\n"
                              "                             and is the default")

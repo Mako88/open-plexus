@@ -94,7 +94,7 @@ def build(task: RewardConfig, count: int, seed: int):
 
 
 def score(task: RewardConfig, arm: str, lr: float, seed: int,
-          train_set, test_set) -> tuple[float, float]:
+          train_set, test_set, window: int = REWARD_WINDOW) -> tuple[float, float]:
     gated, consolidation, salience, lasting, reward = ARMS[arm]
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=task.vocab_size, d_model=D_MODEL, lr=lr,
@@ -107,7 +107,7 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int,
         # made the delay axis measure nothing: the reach always matched, so the
         # curve was flat by construction.
         reward_token=task.reward_token if reward else -1,
-        reward_window=REWARD_WINDOW if reward else 0,
+        reward_window=window if reward else 0,
         seed=seed))
     rng = np.random.default_rng(seed)
     order = np.arange(len(train_set))
@@ -132,17 +132,18 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int,
 
 
 def one_seed(work: tuple) -> list[dict]:
-    delay, seed, rates = work
+    delay, seed, rates, window = work
     task = replace(BASE, delay=delay)
     train_set = build(task, N_TRAIN, seed)
     test_set = build(replace(task, seed=task.seed + 99_991), N_TEST, seed)
     records = []
     for lr in rates:
         for arm in ARMS:
-            overall, first = score(task, arm, lr, seed, train_set, test_set)
+            overall, first = score(task, arm, lr, seed, train_set, test_set,
+                                   window)
             records.append(dict(
-                condition=f"delay={delay} lr={lr} arm={arm}", seed=seed,
-                delay=delay, lr=lr, arm=arm,
+                condition=f"delay={delay} window={window} lr={lr} arm={arm}",
+                seed=seed, delay=delay, window=window, lr=lr, arm=arm,
                 accuracy=first,        # first asks: retention, not echo
                 accuracy_all=overall))
     return records
@@ -175,7 +176,9 @@ def main() -> int:
     delays = (int(args.scale),) if args.scale is not None else DELAYS
     rates = (args.lr,) if args.lr else LEARNING_RATES
     seeds = (args.seed,) if args.seed else SEEDS
-    work = [(delay, seed, tuple(rates)) for delay in delays for seed in seeds]
+    window = args.window if args.window is not None else REWARD_WINDOW
+    work = [(delay, seed, tuple(rates), window)
+            for delay in delays for seed in seeds]
     records = [r for batch in spread(one_seed, work, args.workers) for r in batch]
     emit(records, Path(args.json) if args.json else None)
     return 0

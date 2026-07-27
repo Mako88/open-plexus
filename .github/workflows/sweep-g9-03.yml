@@ -1,0 +1,76 @@
+name: sweep-g9-03-is-the-cliff-reach-or-cost
+
+# g9-02 measured a cliff: with the gate's reach fixed at 8, recovery is 0.21,
+# 0.20, 0.23 at delays 1, 4, 8 and -0.13 at delay 20 -- past its reach the gate
+# keeps the wrong nine steps and discards the right one, which is worse than
+# storing everything.
+#
+# The obvious reading is that tagging and capture fixes this. That reading skips
+# a cheaper question: a window of 32 ALSO reaches a binding 20 steps back. If
+# that works, the cliff is about what reach COSTS rather than about reach, and a
+# tag is an optimisation rather than a capability.
+#
+# Those are different projects, and one changed constant separates them.
+#
+# 20 jobs of (window, delay), five arms x three seeds each, seeds across 3
+# workers. Costed from the delay grid at roughly 28 seconds a cell: ~15 cells and
+# ~7 minutes per job.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  reach:
+    strategy:
+      fail-fast: false
+      matrix:
+        window: [4, 8, 16, 32, 64]
+        delay: [1, 4, 8, 20]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: window ${{ matrix.window }} delay ${{ matrix.delay }}
+        run: python experiments/g9_02_reward_gate.py --window ${{ matrix.window }} --scale ${{ matrix.delay }} --lr 0.05 --workers 3 --json out/X-${{ matrix.window }}-${{ matrix.delay }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-03-${{ matrix.window }}-${{ matrix.delay }}
+          path: out/*.json
+
+  aggregate:
+    needs: [reach]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g9-03-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 20" | tee summary.txt
+          python tools/summarise_g9_03.py | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-03-summary
+          path: |
+            summary.txt
+            out/*.json

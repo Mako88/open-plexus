@@ -1,0 +1,104 @@
+Is the cliff about REACH, or about what reach costs?
+====================================================
+
+Script: experiments/g9_02_reward_gate.py, with --window swept
+Status: PREDICTIONS WRITTEN. Not dispatched, no number seen.
+
+
+WHY THIS COMES BEFORE THE TAG
+-------------------------------
+[g9-02](g9-02-a-gate-that-reads-its-own-input.txt) measured a cliff. With the
+gate's reach fixed at 8:
+
+    delay      1      4      8     20
+    reward  0.21   0.20   0.23  -0.13
+
+Within reach it recovers a fifth of the oracle's advantage — the first recovery
+of anything in this project. Past its reach it is **worse than storing
+everything**, because it keeps the wrong nine steps and discards the right one.
+
+The obvious reading is that this is what tagging and capture exists to fix: mark
+the binding cheaply when it happens, let the late signal decide. **But that
+reading skips a question, and the question is cheaper than the mechanism.**
+
+A window of 32 also reaches a binding 20 steps back. If that works, the cliff is
+not about reach at all — it is about **what reach costs**, and a tag is a cost
+optimisation rather than a new capability. If it does not work, then reaching
+further is not enough and something has to mark *which* binding, which is a
+mechanism.
+
+Those are different projects, and the sweep that separates them is one changed
+constant.
+
+**And the cost is not incidental**, given the priority is minimum node size. The
+current gate holds `(value, key)` per pending step — `2d` numbers, so reach 32 at
+width 32 costs 2048 numbers, twice the fast store itself. A tag can be a **token
+id**: keys are derived from `(seed, token)` and values from `wv[:, token]`, so
+every pending contribution is re-derivable from one integer. Reach 32 would cost
+32 numbers instead of 2048.
+
+So if reach is what matters, the tag makes long reach affordable and the answer
+is engineering. If reach is not what matters, no amount of cheap reach helps.
+
+
+THE GRID
+--------
+  window     4, 8, 16, 32, 64      the reach, previously frozen at 8
+  delay      1, 4, 8, 20           unchanged
+  lr         0.05                  pinned; the delay grid showed little movement
+  seeds      1, 2, 3
+
+`none`, `oracle`, `on-use` and `salience` are unaffected by the window and carry
+over as the same floor, ceiling and failures.
+
+
+PREDICTIONS
+------------
+1. **Recovery is high whenever `window >= delay`, and negative whenever
+   `window < delay`.** The cliff follows the reach rather than sitting at any
+   fixed delay. Guess: above 0.15 on and above the diagonal, negative below it.
+
+2. **A window well beyond the delay is WORSE than one that just covers it.** At
+   delay 1 a window of 64 keeps 63 steps of filler along with the binding, which
+   is most of a sequence and close to not gating at all. So each delay should
+   have an interior best at roughly `window = delay`, and recovery should fall
+   off on both sides.
+
+   **This is the prediction that decides the next project.** If it holds, reach
+   must be *matched* to a delay nobody knows in advance — and a tag, which marks
+   one binding rather than a span, is the mechanism that removes the need to
+   know. If instead a large window is simply always fine, the tag is only a cost
+   saving.
+
+3. **At `window = 64` and delay 20, recovery is positive but small** — it reaches
+   the binding, and drowns it in filler.
+
+4. **Control:** the `none`, `oracle`, `on-use` and `salience` arms do not move
+   with the window, since none of them reads it. If they do, the window is
+   reaching something it should not.
+
+Most likely wrong: (2). It is the one that assumes filler inside the window costs
+something measurable, and the fast store may be tolerant enough at this width
+that thirty steps of filler barely register.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- cliff tracks the diagonal, interior best  -> reach must be matched to an unknown
+                                               delay. **Build the tag**, and it is
+                                               a mechanism rather than a saving
+- large window always fine                  -> reach is free if you can afford it.
+                                               The tag is a COST optimisation and
+                                               belongs with the tiny-node work
+                                               rather than the gating work
+- large window never fine                   -> the gate cannot use a late signal
+                                               at all, and 0.2 at short delays was
+                                               about adjacency rather than reward
+
+
+COST
+-----
+5 windows x 4 delays x 1 lr x 3 seeds x 5 arms = 300 cells. The delay grid ran
+12 jobs of 15 cells in about 7 minutes each with workers, so a cell is roughly
+28 seconds: about 20 jobs of 15 cells, ~7 minutes each. Dispatched as
+(window, delay) jobs.

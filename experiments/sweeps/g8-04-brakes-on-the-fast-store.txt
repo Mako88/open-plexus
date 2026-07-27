@@ -1,0 +1,94 @@
+Does bounding the fast store make skew measurable, and does it flatter anything?
+================================================================================
+
+Script: experiments/g8_04_capped.py  (NOT WRITTEN)
+Status: PREDICTIONS REGISTERED IN NOTE 018 BEFORE THE MECHANISM WAS BUILT.
+        The cap is now implemented and unit-tested; this sweep has not been
+        written, costed or dispatched, and no number from it has been seen.
+
+
+WHY
+---
+[g8-02](g8-02-when-the-statistics-are-real.txt) could only use two of its five
+cells. At `zipf_s` 1.0 and above the ungated arm falls below the trivial floor,
+so seven of fifteen cells divide by the gap between a working ceiling and a
+broken floor. **Word frequencies sit near exponent 1.0 — the first cell it cannot
+use.**
+
+[Note 018](../../docs/notes/018-the-fast-store-has-no-brakes.md) says why. The
+fast store is a geometric series in `decay`; repetition drives it toward
+`1 / (1 - decay)`, about 277x a single binding here. Retrieval is linear in that
+and the delta-rule update is quadratic, so it diverges. Measured without
+training, as skew rises: memory norm 114 → 967, largest retrieval 137 → 3452.
+
+**So g8-02 could not test realistic skew because the model cannot survive
+realistic skew.** Re-running it before fixing that reproduces the same broken
+cells, which is why this comes first.
+
+
+THE GRID
+--------
+  memory_cap   0 (off), and three values that bind
+  zipf_s       0.0, 0.5, 1.0, 1.5, 2.0     the same axis g8-02 could not use
+  arms         none, oracle, on-use, salience   unchanged from g8-02
+  lr           0.02, 0.05, 0.1
+  seeds        1, 2, 3
+
+The cap values are chosen from the measured runaway, not guessed: the memory norm
+reaches 114 at uniform filler, so a cap far above that cannot bind and a cap near
+it binds only under repetition. **A pre-dispatch control must confirm each
+candidate binds where intended and nowhere else**, because a cap that fires at
+uniform statistics is mis-set rather than safe.
+
+
+PREDICTIONS -- registered in note 018 before the mechanism existed
+-------------------------------------------------------------------
+1. **It stops the NaN.** Weak, close to arithmetic, and already shown at unit
+   scale: with warnings as errors, a repeated-token sequence raises without the
+   cap and completes with it.
+
+2. **It stops or delays the collapse onto one token.** The collapse and the
+   divergence may be the same event or two, and this separates them. **The
+   measurement is how many cells become usable** — how far up the skew axis the
+   ungated arm stays above the trivial floor. If it reaches `zipf_s` 1.0, the
+   base-rate hypothesis becomes testable at realistic skew for the first time.
+
+3. **It changes little at uniform statistics**, where the memory norm is 114 and
+   a cap well above that never binds. If uniform results move, the cap is binding
+   where nothing was wrong and the value is wrong.
+
+4. **It does NOT rescue the gating result.** Recovery for `on-use` and `salience`
+   should stay near zero wherever cells were already usable. **This is the
+   loudest prediction and the reason the sweep is worth running carefully:**
+   stability is not selectivity, and a fix that quietly improves the headline
+   number is the most dangerous kind. If recovery rises in cells that were
+   already valid, something is confounded and note 018 is wrong about what the
+   cap does.
+
+Most likely wrong: (2). The collapse may be a property of the delta rule under a
+dominant class rather than of the store's magnitude, in which case bounding the
+store changes the divergence and not the degeneracy.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- more cells usable, recovery flat -> the cap does its job and only its job. g8-02
+                                      can be re-run and the base-rate hypothesis
+                                      tested at realistic skew
+- no more cells usable             -> collapse is not caused by magnitude.
+                                      Prediction 2 wrong, and the corpus
+                                      benchmark needs a different fix
+- recovery RISES in usable cells   -> the cap is doing something other than
+                                      bounding. Suspect it before celebrating
+- uniform results move             -> mis-set cap; re-choose from the control
+
+
+WHAT THIS CANNOT SETTLE
+------------------------
+**Whether the corpus benchmark will work.** A power law over a 28-token filler
+alphabet shares one property with language. Surviving skew here is necessary and
+nowhere near sufficient.
+
+**Anything about gating.** Six mechanisms have failed and g8-03 established they
+all acted on the wrong store. This sweep is about stability, and if it appears to
+say anything about gating, see prediction 4.

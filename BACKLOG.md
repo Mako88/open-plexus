@@ -36,6 +36,19 @@ looking for work should start here.
    g9-09's shape with the rate swept, because node width is where the floor arm
    moves most and a mis-chosen rate does the most damage.
 
+   **And `lr` is the one that was at least WRITTEN DOWN.** Every g9-05+ sweep
+   also imports `D_MODEL, N_TRAIN, N_TEST, EPOCHS, KEY_SCALE, DECAY = 32, 200,
+   80, 6, 0.5, 0.997` from `g9_02_reward_gate.py`, and **none of those six
+   appears in any grid, in any sweep file, ever.** Two matter:
+
+   - **`KEY_SCALE = 0.5` has already caused a headline error here**, and
+     CLAUDE.md carries its calibration: g3-02 measured 0.263 against 0.960 from
+     the projection scale alone. Pinned again across the whole g9 line.
+   - **`DECAY = 0.997` is the other multiplicative time constant** on the store
+     the tag's `fade` acts on. Seven sweeps moved `fade` and none moved `decay`,
+     and *the fade is a reach dial* was concluded with the other reach dial held
+     still.
+
 1. **A decision only John can take: fix `reward_recall`, and how?**
    [Note 027](docs/notes/027-the-task-leaks-the-answer-through-its-layout.md).
    The nearest binding before a reward is always the rewarded one, 160/160.

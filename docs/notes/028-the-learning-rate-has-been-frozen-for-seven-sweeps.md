@@ -88,6 +88,40 @@ node width against the arms — with the rate swept, because node width is the
 axis where the floor arm moves most (0.648 down to 0.171) and therefore where a
 mis-chosen rate does the most damage to the denominator.
 
+## AND THE ONES THAT NEVER APPEAR IN A GRID AT ALL
+
+The audit above looked at GRID sections. Every g9-05 sweep also imports this line
+from `g9_02_reward_gate.py`:
+
+    D_MODEL, N_TRAIN, N_TEST, EPOCHS, KEY_SCALE, DECAY = 32, 200, 80, 6, 0.5, 0.997
+
+**None of those six appears in any grid, in any sweep file, ever.** `lr` at least
+was written down as FIXED and could be audited by reading. These cannot: they
+arrive by import and are invisible to anyone reading the experiment's own
+description of itself.
+
+Two of them are not innocuous.
+
+**`KEY_SCALE = 0.5` has already caused a headline error in this project, and
+CLAUDE.md carries the calibration for it.** g3-02 measured a width-32 model at
+**0.263** with unit-norm keys and **0.960** with the same keys multiplied by
+0.71 — nothing else changed. The rule's own calibration reads: *the projection
+scale was pinned at a value one step from where the mechanism diverges, and
+silently produced the width curve the project's headline came from.* It is
+pinned again, at 0.5, in every sweep of the g9 line, and it is not in a single
+grid.
+
+**`DECAY = 0.997` is the fast store's half-life — about 231 steps — and it is the
+other multiplicative time constant on the store the tag's `fade` acts on.** g9-05
+through g9-11 swept `fade` extensively and never moved `decay`. Two constants
+multiply into the same quantity; sweeping one and freezing the other is the
+"swept on one arm and not the others" failure wearing a different coat, and the
+conclusion *the fade is a reach dial* was drawn with the other reach dial held
+still.
+
+`EPOCHS = 6` and `N_TRAIN = 200` set the training budget, which decides whether
+any arm has converged. Nothing in the line has checked that either.
+
 ## What this is an instance of
 
 CLAUDE.md's frozen-axis rule now carries a calibration about constants **carried

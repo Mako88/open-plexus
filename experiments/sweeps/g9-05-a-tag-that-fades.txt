@@ -2,9 +2,68 @@ Does a capacity over bindings beat a span over steps?
 =====================================================
 
 Script: experiments/g9_05_the_tag.py
-Status: PRE-REGISTERED. Not dispatched. Predictions below were written after the
-        pre-dispatch control in WHAT IS ALREADY KNOWN and before any sweep, and
-        that control is disclosed rather than described afterwards as intuition.
+Status: RUN. 32 of 32 cells, no refusals.
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30239580807
+
+ANSWER: the flat rows are flat at ZERO and the positive rows have the window's
+        cliff. No cell is both -- and being both was the entire claim. Held back
+        from being final by a pinned capacity axis; see THE GRID DID NOT CONTAIN
+        ITS OWN ANSWER.
+
+Predictions were written after the pre-dispatch control in WHAT IS ALREADY KNOWN
+and before any sweep, and that control is disclosed rather than described
+afterwards as intuition.
+
+
+THE RESULT
+-----------
+Recovery, `(arm - none) / (oracle - none)`, tag arm. `spread` is the range across
+delay, which is what the mechanism claims to shrink.
+
+    slots fade      d1      d4      d8     d20   spread    mean
+        4  1.0   -0.20   -0.21   -0.22   -0.21     0.02   -0.21
+        4 0.99   -0.08   -0.09   -0.13   -0.11     0.05   -0.10
+        4 0.95   +0.17   +0.13   -0.01   -0.19     0.36   +0.02
+        4  0.9   +0.24   +0.18   -0.12   -0.22     0.45   +0.02
+        8  1.0   -0.19   -0.21   -0.22   -0.18     0.04   -0.20
+        8 0.99   +0.00   -0.00   -0.02   -0.03     0.03   -0.02
+        8 0.95   +0.24   +0.21   +0.15   -0.17     0.41   +0.11
+        8  0.9   +0.24   +0.23   +0.16   -0.22     0.46   +0.10
+     window     +0.23   +0.23   +0.23   -0.24     0.47
+
+Every cell is healthy: floor arm 0.238-0.249 against a trivial floor of 0.125,
+oracle gap 0.750-0.761, seed spread 0.062-0.113. Nothing was refused, so nothing
+here is a ratio taken on noise.
+
+**Read the spread column.** A tag that does not have to be told the delay is the
+whole proposition, and it delivers that exactly where it has nothing to deliver:
+fade 0.99 spans 0.03 and sits at -0.02. Where it is worth having -- fade 0.95 and
+0.9 -- it spans 0.41 and 0.46, which is the window's 0.47 in a different costume.
+
+**The tie is the interesting part.** At delays 1 and 4 the tag matches the window
+(0.24/0.23 against 0.23/0.23) while keeping roughly a quarter as much. The
+pre-dispatch control could not settle whether a gate capturing a third as often
+while storing a quarter as much comes out ahead; it comes out level. So the two
+mechanisms reach the same recovery from different signals, which is the case for
+combining them rather than choosing between them.
+
+
+THE GRID DID NOT CONTAIN ITS OWN ANSWER
+----------------------------------------
+`tools/grid.py`, on the capacity chosen at each delay:
+
+    slots: all 4 arms chose an edge of the grid [4, 8] (4 at the top, 8);
+           the optimum is outside it and every arm is under-tuned
+
+The fade axis is clean by the same check. So **every tag number above is a lower
+bound**, and a caveat printed beside a number does not attach to the number. The
+refutation stands only in the specific sense that no cell IN THIS GRID is both
+flat and positive.
+
+[g9-06](g9-06-is-the-tag-capacity-starved.txt) is registered and dispatched to
+settle it at slots 16, 32 and 64. Its prediction 2 names the outcome that would
+overturn this one: a fade-0.99 mean above +0.15 with a spread under 0.10 means
+the mechanism works and this run measured a starved version of it.
 
 
 IN PLAIN TERMS
@@ -136,6 +195,40 @@ PREDICTIONS
 Most likely wrong: **prediction 2.** The fade is a time constant, and a time
 constant is a span with a soft edge. The claim that its reach is set by the
 density of bindings rather than by the clock has not been measured, only argued.
+
+
+PREDICTIONS, SCORED
+--------------------
+1. **PARTLY REFUTED.** Predicted the tag loses at delays 1, 4 and 8 and beats the
+   window at 20, within 0.05-0.20. It TIES at 1 and 4, loses at 8, and at 20 is
+   -0.03 against the window's -0.24 -- much less harmful, still harmful. The band
+   was wrong in both directions: the actual range is -0.22 to +0.24.
+
+2. **CONFIRMED, and it was named most likely wrong.** fade 0.99 spans 0.03 at
+   slots 8 and 0.05 at slots 4, against the window's 0.47. The tag genuinely does
+   not need to be told the delay. It has nothing to offer once it does not.
+
+3. **CONFIRMED exactly.** fade 0.95 and 0.9 cliff in the window's own shape:
+   positive at delays 1-8, negative at 20. The fade is a reach dial with a soft
+   edge, which is what makes prediction 2 hollow rather than a vindication.
+
+4. **CONFIRMED strongly.** The un-faded tag is -0.18 to -0.22 everywhere, at both
+   capacities -- worse than not gating, at every delay. The fade is not a
+   refinement; without it the mechanism is harmful.
+
+5. **MOSTLY CONFIRMED.** tag beats tag-strongest in 28 of 32 cells, mean +0.10.
+   All four exceptions are at fade 1.0, where prediction 4 says there is no
+   working mechanism -- so the direction holds wherever there is one. The second
+   half is half right: the mean gap by delay is +0.10, +0.12, +0.14, +0.06, so
+   bigger at 8 than at 1 but smaller at 20.
+
+6. **CONFIRMED at 0.24 against 0.25 -- and it is a bound, not a value.** See the
+   pinned capacity axis above. This is the prediction most likely to be overturned
+   by g9-06 and the one it would be best to be wrong about.
+
+Four of six held, one partly, one is provisional on a grid that pinned. The
+prediction named most likely wrong is the one that held, and it held in the way
+that made it worthless: flat, at zero.
 
 
 WHAT WOULD REFUTE WHAT

@@ -1,0 +1,82 @@
+name: sweep-g9-06-is-the-tag-capacity-starved
+
+# g9-05 returned 32 of 32 cells and tools/grid.py says the capacity axis did not
+# contain its own answer: every delay chose slots 8, the top of [4, 8]. So the
+# tag's numbers there are BOUNDS, not values, and CLAUDE.md is explicit that a
+# caveat printed next to a number does not attach to the number.
+#
+# The direction is already visible inside that grid -- at fade 0.99 the row mean
+# goes -0.10 at slots 4 to -0.02 at slots 8, and at fade 0.95 it goes +0.02 to
+# +0.11. More room helped at every fade tested.
+#
+# The question this decides: g9-05's rows that are FLAT are flat at zero, and its
+# rows that are POSITIVE have the window's cliff. No cell is both, which is the
+# mechanism's whole claim. Is that a property of the mechanism, or of a starved
+# pool?
+#
+# fade 1.0 and 0.9 are dropped deliberately -- 1.0 is harmful at every capacity
+# tested, and 0.9 and 0.95 differ by less than the seed spread wherever both are
+# positive. Recorded in the sweep file rather than left invisible in the matrix.
+#
+# 24 jobs of (slots, fade, delay). Five arms x three seeds x one rate = 15 cells
+# a job; g9-05 ran the same shape in about 7 minutes a job.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  capacity:
+    strategy:
+      fail-fast: false
+      matrix:
+        slots: [16, 32, 64]
+        fade: ["0.99", "0.95"]
+        delay: [1, 4, 8, 20]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: slots ${{ matrix.slots }} fade ${{ matrix.fade }} delay ${{ matrix.delay }}
+        run: python experiments/g9_05_the_tag.py --slots ${{ matrix.slots }} --fade ${{ matrix.fade }} --scale ${{ matrix.delay }} --lr 0.05 --workers 3 --json out/X-${{ matrix.slots }}-${{ matrix.fade }}-${{ matrix.delay }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-06-${{ matrix.slots }}-${{ matrix.fade }}-${{ matrix.delay }}
+          path: out/*.json
+
+  aggregate:
+    needs: [capacity]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g9-06-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 24" | tee summary.txt
+          python -m tools.summarise_g9_05 | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-06-summary
+          path: |
+            summary.txt
+            out/*.json

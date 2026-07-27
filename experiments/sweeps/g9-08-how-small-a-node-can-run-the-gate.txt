@@ -2,7 +2,95 @@ How small can a node be and still run an implementable gate?
 ============================================================
 
 Script: experiments/g9_05_the_tag.py, with --width swept
-Status: PRE-REGISTERED. Not dispatched -- g9-07 holds the matrix.
+Status: RUN. 15 of 15 cells returned and NINE OF THEM ARE REFUSED.
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30242475250
+
+ANSWER: this sweep cannot ask its own question, and the reason is a design error
+        in it rather than a fact about the gate. Below width 32 the TASK is
+        impossible, and the tiny-node question was posed on the wrong axis.
+
+
+THE RESULT
+-----------
+    width   floor arm (none)         tag              window
+        4   0.036 0.040 0.037   refused            refused
+        8   0.040 0.041 0.041   refused            refused
+       16   0.060 0.062 0.062   refused            refused
+       32   0.238 0.249 0.246   +0.16 +0.17 +0.16  +0.23 +0.23 -0.24
+       64   0.648 0.650 0.659   +0.16 +0.19 +0.19  +0.22 +0.23 -1.62
+
+Trivial floor is 0.125. **At widths 4, 8 and 16 the ungated model scores 0.036
+to 0.062 -- BELOW chance.** So the denominator of every ratio there is the gap
+between a working ceiling and a broken floor, which is not an advantage a
+mechanism could recover, and `tools/recovery.py` refuses all nine cells.
+
+The refusal is the result working, not failing. The fourth clause of WHAT WOULD
+REFUTE WHAT registered exactly this: *everything refused at low width -> the
+floor arm fell to the trivial floor, which means the TASK became impossible
+rather than the gate failing. Report the refusals, do not report a ratio.*
+
+
+THE DESIGN ERROR, WHICH IS THE REAL FINDING
+--------------------------------------------
+**A narrow NETWORK is not a small NODE, and this sweep swept the wrong one.**
+
+`--width` sets `d_model`, the width of the whole network. A `d_model` of 4 is not
+a tiny device taking part in a network; it is a network with four dimensions in
+total, against a vocabulary of 73. Of course it cannot do the task.
+
+[g7-02](g7-02-tiny-nodes-and-clusters.txt), whose result this was meant to check
+against, did NOT do that. It held the network wide and split it: `partitions`
+cuts `d_model` into groups, each with its own readout over its own dimensions,
+and `run(partition=...)` asks one machine -- or a cluster -- to answer alone.
+That is how it measured "devices holding one number each".
+
+[Note 024](../../docs/notes/024-what-the-gate-costs-a-tiny-node.md) had the two
+quantities separated correctly -- it costs a node's slice `w` against a network
+width `d`, and its whole crossover argument is about `w * d`. This sweep
+collapsed them into one number, which is CLAUDE.md's "measure at the granularity
+of the decision" failing at the point where the decision is what a NODE holds.
+
+
+PREDICTIONS, SCORED
+--------------------
+1, 2 and 5 are UNSCORABLE: they are about how recovery falls with width, and
+   three of five widths returned no usable ratio.
+
+3. **CONFIRMED where it can be evaluated, which is the wiring check passing.**
+   The oracle is 1.000 at widths 32 and 64 at every delay. Below that it is
+   1.000 as well, but against a floor arm below chance, so those cells say
+   nothing.
+
+4. **CONFIRMED.** The tag stays flat across delay at every width where the cell
+   is usable: spread 0.01 at width 32 and 0.04 at width 64. Flatness is a
+   property of counting in bindings, and widening the network did not change
+   what is being counted.
+
+The frozen axes were named as the risk in this file before dispatch -- `slots`
+and `fade` were pinned at a working point chosen at width 32. That risk was
+real and is now untestable here, because the cells that would have shown it are
+the refused ones.
+
+
+WHAT IS STILL WORTH READING IN IT
+----------------------------------
+**The window collapses at width 64, delay 20, to -1.62.** Not -0.24 as at width
+32: one and a half times the oracle's whole advantage, spent making things worse.
+The tag is +0.19 in the same cell. Whatever an unmatched window does wrong, a
+wider network does not fix it and appears to amplify it. That is a single cell
+and three seeds, so it is an observation rather than a finding, and it is the
+sharpest illustration so far of the cliff the tag does not have.
+
+**`tag-strongest` at width 64 delay 20 is -0.03 against the tag's +0.19.** The
+signal's direction pays again at the wider network, having been worth +0.003 at
+the working point in g9-06. That is the third setting in which the direction
+matters exactly where something else is scarce.
+
+
+WHAT REPLACES IT
+-----------------
+[g9-09](g9-09-a-small-node-in-a-wide-network.txt) asks the question on the axis
+g7-02 used: hold `d_model` wide, sweep `partitions`, and read one machine.
 
 
 IN PLAIN TERMS

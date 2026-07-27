@@ -385,6 +385,36 @@ the whole mechanism and the signal was a detour.
 [g9-07](experiments/sweeps/g9-07-a-tag-that-knows-how-big-its-store-is.txt) asks
 exactly that, with `tag_relative`.
 
+## A small NODE, not a narrow NETWORK -- g9-08 asked it wrong
+
+[g9-08](experiments/sweeps/g9-08-how-small-a-node-can-run-the-gate.txt) ran and
+**nine of its fifteen cells are refused**: below `d_model` 32 the ungated model
+scores 0.036 to 0.062 against a trivial floor of 0.125, so the task is impossible
+there and no ratio means anything.
+
+The error is in the sweep. `--width` sets `d_model`, the width of the WHOLE
+network; a `d_model` of 4 is not a tiny device in a network, it is a four-
+dimensional network facing a vocabulary of 73. [g7-02](experiments/sweeps/g7-02-tiny-nodes-and-clusters.txt)
+did not do that: it held the network wide and split it with `partitions`, each
+group carrying its own readout over its own dimensions, then asked one machine to
+answer with `run(partition=...)`. Note 024 keeps the two quantities apart
+correctly -- its crossover is `w * d` -- and the sweep collapsed them.
+
+**g9-09 is the replacement and it needs a small build first.** Hold `d_model` at
+64 or 128, sweep `partitions` over 1, 2, 4, 8, 16 so a node's slice falls from 64
+to 4, and read ONE machine. `experiments/g9_05_the_tag.py` does not pass
+`partition` to `run()` yet; that is the build. `--partitions` already exists in
+the shared arg parser.
+
+Two things from g9-08 survive and are worth carrying into it:
+
+- **The window collapses to -1.62 at `d_model` 64, delay 20** -- one and a half
+  times the oracle's whole advantage, spent making things worse, against the
+  tag's +0.19 in the same cell. One cell, three seeds, so an observation.
+- **`tag-strongest` is -0.03 there against the tag's +0.19.** The signal's
+  direction pays again once something else is scarce, which is now the third
+  setting showing that shape.
+
 ## Nobody has run a gate at a width this project cares about
 
 [Note 024](docs/notes/024-what-the-gate-costs-a-tiny-node.md) costs the gate and

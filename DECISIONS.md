@@ -444,3 +444,36 @@ because its purpose was narrow to begin with. The pattern worth watching is that
 BACKLOG entries carry justifications written before anything was built, and those
 justifications are claims about behaviour like any other. Two have now been
 tested and one was false.
+
+## 20. g9-08 asked the tiny-node question on the wrong axis
+
+**What happened.** Nine of fifteen cells refused. Below `d_model` 32 the ungated
+model scores below chance, so the task is impossible and every ratio there is the
+gap between a working ceiling and a broken floor.
+
+**The refusals worked exactly as registered.** The fourth clause of the sweep's
+WHAT WOULD REFUTE WHAT named this outcome before dispatch, and the summariser I
+wrote for it prints the floor arm per cell precisely so it would be diagnosable
+rather than mysterious. That part I am happy with.
+
+**The design error is mine and it is the real finding.** `--width` sets
+`d_model`, the width of the whole network. A narrow network is not a small node.
+g7-02 — the sweep this was meant to check against — held the network wide and
+split it with `partitions`, then read one machine. Note 024 had the two
+quantities separated correctly; the sweep collapsed them into one number.
+
+**Chosen: record it as a failed sweep rather than quietly re-running.** The file
+now opens with "this sweep cannot ask its own question", scores the two
+predictions that survive, and points at g9-09. Fifteen jobs spent, and the write
+-up is worth more than the cells would have been.
+
+**Two observations worth carrying forward.** The window collapses to -1.62 at
+`d_model` 64, delay 20 — one and a half times the oracle's entire advantage spent
+making things worse, against the tag's +0.19 in the same cell. And
+`tag-strongest` is -0.03 there against the tag's +0.19, the third setting where
+the signal's direction starts paying once something else is scarce.
+
+**What I would flag.** I pre-registered the frozen axes as the risk in that file
+and the frozen axes were not the problem — the swept one was. Naming a risk is
+not the same as checking the axis means what you think it means, and nothing in
+the checklist catches "this parameter is not the quantity you are asking about".

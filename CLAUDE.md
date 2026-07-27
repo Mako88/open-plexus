@@ -167,6 +167,20 @@ not mention how it is computed.
 > class of check than the ones around it, **not a guarantee** — and a meaning
 > test that passes on the first run deserves suspicion, not satisfaction.
 
+**An experiment is a sweep even when it is called a control.** Sweeps go to
+Actions; the test suite and targeted mutation runs stay local because they are
+seconds. The line is not "is it a sweep" — it is **how long does it hold the
+machine** — and the way it gets crossed is by calling something a control, a
+probe or a quick check and skipping the costing that a sweep would have had.
+
+> *Calibration.* `g8_05_which_advantage.py` ran locally for **over ten minutes**
+> and was described, in the same breath, as "a quick control at one cell before
+> the full run". It was an experiment: three arms, three half-lives, three seeds,
+> a trained model per cell. Nothing about it needed the local machine, it had no
+> costing, and John caught it rather than the rule. Two of the three
+> pre-dispatch controls before it were seconds and belonged where they ran; this
+> one was not and did not.
+
 **Commit messages go through `-F <file>`, never `-m`.** Backticks inside a
 double-quoted shell argument are command substitution. A message containing
 `` `none` `` runs `none`, prints "command not found" to the terminal, and commits

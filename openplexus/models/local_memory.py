@@ -171,6 +171,24 @@ class LocalMemoryConfig:
             an answer is wanted — and *optional*, because each group emits a
             complete answer by itself. Whether one group's answer alone is good
             enough is the measurement, not an assumption.
+        decay_when_masked: Whether the fast store fades on steps the `store`
+            mask excludes. False keeps the original behaviour, which is how
+            every result in this project was measured.
+
+            **The decay lives inside the `store[t]` guard**, so a masked-out
+            position is not merely un-written — it is un-faded. On MQAR with 92%
+            filler, an oracle-gated arm therefore skips the fade on 92% of steps
+            and runs at an effective half-life roughly an order of magnitude
+            longer than the ungated arm at the same nominal `decay`.
+
+            So the oracle has been doing two things and only one was named: it
+            stores less **and** it forgets more slowly. Six mechanisms have
+            failed to match it, all of them aimed at selectivity alone.
+
+            Setting this True gives an oracle its selectivity without its
+            retention bonus, which is the only way to find out how much of the
+            gap is which. See
+            docs/notes/019-the-oracle-also-slows-forgetting.md.
         reward_token: Token id whose arrival means *the recent past mattered*.
             -1 disables the gate, which is how every earlier result was
             measured.
@@ -370,6 +388,7 @@ class LocalMemoryConfig:
     partitions: int = 1
     key_scale: float = 1.0
     key_active: int = 0
+    decay_when_masked: bool = False
     reward_token: int = -1
     reward_window: int = 0
     memory_cap: float = 0.0
@@ -698,6 +717,15 @@ class LocalAssociativeMemory:
             # retrieval below is what makes the association available later
             # without ever letting position t see position t+1 — the binding
             # written now is (t-1 → t), entirely in the past.
+            # The fade, and whether a masked step gets one. Outside the write
+            # guard when `decay_when_masked` is set, so selectivity can be
+            # measured without the retention that has been riding along with it.
+            if (self.config.decay_when_masked and self.config.decay < 1.0
+                    and previous_key is not None
+                    and not (store is None or store[t])):
+                memory *= self.config.decay
+                _fade(pending, self.config.decay)
+
             if previous_key is not None and (store is None or store[t]):
                 if self.config.decay < 1.0:
                     memory *= self.config.decay

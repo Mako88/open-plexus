@@ -2,7 +2,106 @@ Does the tag's best capacity track the node's width?
 ====================================================
 
 Script: experiments/g9_05_the_tag.py, with --partitions and --slots swept
-Status: PRE-REGISTERED, with a pre-dispatch control disclosed below.
+Status: RUN. 24 of 24 cells, no refusals, capacities chosen INTERIOR.
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30246508165
+
+ANSWER: no -- the best capacity tracks the DELAY, not the node. And the tag's
+        delay-independence belongs to `slots` 32 alone, which the addendum
+        predicted from a no-training control and 24 trained cells confirmed.
+
+
+THE RESULT
+-----------
+Recovery, tag arm.
+
+    delay 8              slots 4   slots 8  slots 16  slots 32    best
+      node 32              -0.02     +0.21     +0.25     +0.21      16
+      node 16              +0.06     +0.19     +0.19     +0.16      16
+      node  8              +0.06     +0.15     +0.15     +0.10      16
+
+    delay 20             slots 4   slots 8  slots 16  slots 32    best
+      node 32              -0.49     -0.36     +0.09     +0.22      32
+      node 16              -0.19     -0.12     +0.15     +0.17      32
+      node  8              -0.09     -0.04     +0.08     +0.11      32
+
+**The best capacity is 16 at delay 8 and 32 at delay 20, at EVERY node width.**
+`node / best` runs 2.00, 1.00, 1.00, 0.50, 0.50, 0.25 -- no rule there. The delay
+term dominates and the node term is not visible.
+
+**And the flatness is a property of `slots` 32, exactly as the addendum said.**
+Read a column down, then across the two tables:
+
+    slots 32   +0.21 at delay 8, +0.22 at delay 20   spread 0.01   FLAT
+    slots 16   +0.25            , +0.09             spread 0.16
+    slots  8   +0.21            , -0.36             spread 0.57   CLIFF
+    slots  4   -0.02            , -0.49             spread 0.47
+
+So the tag does not have to be told the delay **only at the capacity that keeps
+essentially everything**, which note 026 measured at 3.4% precision -- the worst
+of any setting. It buys delay-independence by admitting so much that the delay
+stops mattering, and that is now measured with training rather than inferred
+from a capture count.
+
+**THE COMBINED GATE IS THE RESULT NOBODY EXPECTED TO MATTER.**
+
+    combined, delay 8    slots 4   slots 8  slots 16  slots 32
+      node 32              +0.26     +0.26     +0.25     +0.21
+      node 16              +0.23     +0.23     +0.20     +0.16
+      node  8              +0.16     +0.17     +0.15     +0.10
+
+At `slots` 4 the tag scores **-0.02** and the combined gate scores **+0.26**. At
+`slots` 32 they are identical at +0.21, which is the degeneracy its own control
+predicted. So the window's recency rescues the tag exactly where the tag is
+starved, and costs nothing where it is not. **+0.26 is the highest tag-family
+recovery measured anywhere in this project**, and it is at the SMALLEST capacity
+tried.
+
+
+PREDICTIONS, SCORED
+--------------------
+1. **REFUTED.** The best capacity does not track node width; it tracks the
+   delay. `sqrt(d / N)` is presumably still true and is swamped by a term the
+   prediction did not include.
+
+2. **REFUTED, marginally, and it was named most likely wrong.** At each node's
+   own best capacity: +0.23, +0.18, +0.13. The decline survives retuning -- it
+   is shallower than g9-09's 0.16 to 0.11 but it is still 0.10 across the range,
+   against a guess of "within 0.05". The registered reason was that `fade` stays
+   frozen, and that remains the live suspect.
+
+3. **CONFIRMED as stated, and the statement was too weak.** Spread across delay
+   at each node's best capacity is 0.03, 0.02, 0.04. But the best capacity
+   DIFFERS between the delays, so that number compares two configurations. At a
+   FIXED capacity the flatness only exists at 32 -- see the table above. The
+   prediction should have said "at one setting" and did not.
+
+4. **CONFIRMED, exactly.** `combined` beats both arms at `slots` 4 and 8 and
+   equals `tag` at 32. Registered before dispatch for a mechanism that had never
+   been swept.
+
+5. Not scored here; the `tag-strongest` tables are in the run's summary.
+
+ADDENDUM, registered after dispatch and before any cell returned:
+
+**A1. HALF RIGHT.** Predicted peaks at `slots` 8 for delay 8 and `slots` 32 for
+delay 20, from the recall x precision product. Delay 20 is exact. Delay 8 peaks
+at 16 rather than 8 -- one grid step out, and in the direction the product
+ranked second.
+
+**A2. CONFIRMED, exactly.** "g9-10 shows flatness at `slots` 32 and a cliff at
+`slots` 8." Spread 0.01 against 0.57.
+
+**A3. CONFIRMED.** Prediction 1 did not survive as stated.
+
+**The mechanism-derived addendum outscored the pre-dispatch predictions**, which
+is the argument for spending two minutes on a counting control before writing
+guesses.
+
+
+THE GRID CONTAINED ITS OWN ANSWER
+----------------------------------
+`tools/grid.py` on the chosen capacities: interior. Third sweep in this family to
+manage it.
 
 
 IN PLAIN TERMS

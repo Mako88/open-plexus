@@ -1886,3 +1886,58 @@ well tested — one mutation covers one line and `run()` is six hundred. It is a
 floor, and the per-function counts matter more than the percentage.
 
 582 tests, 124 mutations.
+
+---
+
+## 50. The bar was the ceiling: the architecture cannot exceed a bigram
+
+**The architecture pass John asked for produced one finding that reframes every
+corpus result so far.** The write rule is `M += value(t) x key(t-1)`, so a
+retrieval is the sum of the values of every token that has followed this token.
+That is a bigram count table in superposition. **No trigram is ever written
+down, so none can be represented.**
+
+The bar the project has measured itself against for weeks — beat a bigram,
+3.583 bits per character — is therefore **the model's ceiling, not a target.**
+"Does not beat a bigram" was never a disappointing result; it was arithmetic.
+
+**I did not let the derivation stand as an argument.** This project's failure
+mode this week has been reasoning that ran and then got refuted, seven times, so
+the derivation got a run. It compared each retrieval against the bigram count
+vector it predicts, as a cosine, with a pre-registered threshold of mean 0.9.
+
+**It came back 0.8703 and refused my own claim.** That left two readings with
+opposite consequences: the residual is interference, and the ceiling stands, or
+it is extra signal, and note 033 is wrong. A second run distinguished them by
+varying how much is superposed:
+
+    writes    cosine against a bigram count table
+        20    0.9455
+        40    0.9036
+        80    0.8817
+       160    0.8795
+       320    0.8784
+       640    0.8866
+
+**Falling with load, then plateauing, is the interference signature.** Extra
+structure would not depend on load that way; noise from non-matching keys does,
+by construction. So the precise claim — the one in the note — is that the
+retrieval is a bigram count vector plus interference, the interference carries
+no information about what follows, and the distance from 3.583 to the model's
+5.256 is what interference costs.
+
+**The loose version was too strong and the measurement is what made it
+precise.** That is the second time this week a threshold I set in advance
+refused a claim I wanted, and both times the corrected version was better.
+
+**What it changes.** The highest-value unexplored change in the project is
+binding over a two-token context via a fixed hash — local, derivable, and it
+lifts a *proven* limit rather than a suspected one. It was invisible while the
+bar was mistaken for a goal. This supersedes the previously-agreed order in
+which structured keys were item 1; **John's call, and it is on his decision
+list.**
+
+Note 033 also records the component map, six ranked assumptions, and a
+literature pass, all marked as arguments rather than findings.
+
+592 tests, 124 mutations, five checks clean.

@@ -59,6 +59,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from openplexus.keys import KeySource, PairKeys, TableKeys
+from openplexus.retrieval import Retrieval, build as build_retrieval
 
 #: Newton-Schulz coefficients, from Keller Jordan's Muon. The quintic
 #: `3.4445x - 4.7750x^3 + 2.0315x^5` pushes every singular value toward 1
@@ -962,6 +963,16 @@ class LocalAssociativeMemory:
         self.key_source: KeySource = (
             PairKeys(config.seed, spread, d, config.vocab_size)
             if config.context_keys else TableKeys(self.wk))
+        # HOW THE STORE IS READ IS A REPLACEABLE COMPONENT, for the same reason
+        # and with more at stake. `openplexus/retrieval.py` holds the seam.
+        #
+        # `r = M @ key` is a SUM, and it is the common cause of every mechanism
+        # this project has refuted. g11-05 then measured the consequence: 16x
+        # the training text buys 0.012 bits against a backprop control that
+        # moves cleanly. **A suspect you cannot swap out is a suspect you cannot
+        # test**, so the sum, the exact cache and the settling loop are three
+        # composed objects rather than four config fields and two branches.
+        self.retrieval: Retrieval = build_retrieval(config)
         self.wv = rng.normal(0.0, spread, (v, d))
         self.wo = np.zeros((v, d))
         # A constant term on the readout, off by default.
@@ -1230,10 +1241,11 @@ class LocalAssociativeMemory:
         # against `argmin` rather than tracking a count.
         # NOT named `slots` -- that is the capture-slot list a few lines above,
         # and shadowing it silently disabled the reward gate.
-        held = max(self.config.cache_slots, 1)
-        cache_key = np.zeros((held, d))
-        cache_value = np.zeros((held, d))
-        cache_score = np.zeros(held)
+        # The retrieval strategy owns whatever per-run state it needs -- the
+        # exact cache's entries live in it, not here. `openplexus/retrieval.py`
+        # holds the seam and says why. Assign a different strategy to
+        # `self.retrieval` and nothing in this method changes.
+        self.retrieval.begin(d)
         previous_key = None
         previous_retrieval = None
         # The size of the store that produced `previous_retrieval`, so a
@@ -1287,23 +1299,11 @@ class LocalAssociativeMemory:
             # is silent when a capture keeps thirty writes and fatal when it
             # keeps one.
             wrote_at = -1
-            if wrote and self.config.cache_slots:
-                # ADMIT BY WHAT THE SUPERPOSED STORE FAILED TO ABSORB.
-                #
-                # The residual is this binding's novelty: near zero when the
-                # store already answers that key correctly, large when it does
-                # not. Taken BEFORE the write, so it measures what the store
-                # knew rather than what it is about to be told, and scaled by
-                # `write_gate` so it is novelty times commitment rather than
-                # novelty alone -- the distinction HOLA ablated and found to
-                # matter.
-                residual = float(np.linalg.norm(
-                    value - memory @ previous_key)) * self.config.write_gate
-                weakest = int(cache_score.argmin())
-                if residual > cache_score[weakest]:
-                    cache_key[weakest] = previous_key
-                    cache_value[weakest] = value
-                    cache_score[weakest] = residual
+            if wrote:
+                # Told BEFORE the write, so a strategy scoring novelty measures
+                # what the store knew rather than what it is about to be told.
+                self.retrieval.observe(memory, previous_key, value,
+                                       self.config.write_gate)
             if wrote:
                 if self.config.decay < 1.0:
                     memory *= self.config.decay
@@ -1580,54 +1580,7 @@ class LocalAssociativeMemory:
             # NOT named `store` -- that is the write mask parameter, and
             # shadowing it silently turned `if wrote:` into an array test.
             readable = memory if lasting is None else memory + lasting
-            retrieved = readable @ key
-            if self.config.cache_slots:
-                # THE SELECTIVE READ, and the only place in this model where
-                # one is possible. The entries exist separately, so a softmax
-                # over them SELECTS; over a superposed store it could only
-                # rescale an average that had already been taken.
-                #
-                # Cosine rather than raw dot product, because a softmax over
-                # unscaled similarities is nearly uniform -- the soft-averaging
-                # failure `cache_sharpness` exists to prevent.
-                sizes = np.linalg.norm(cache_key, axis=1)
-                live = cache_score > 0.0
-                if live.any():
-                    cosine = (cache_key @ key) / np.maximum(
-                        sizes * np.linalg.norm(key), 1e-12)
-                    logits = np.where(live, cosine * self.config.cache_sharpness,
-                                      -np.inf)
-                    weights = np.exp(logits - logits.max())
-                    weights /= weights.sum()
-                    # GATED BY HOW WELL THE BEST ENTRY MATCHES.
-                    #
-                    # A softmax returns a convex combination whatever it is
-                    # given, so without this the cache contributes a
-                    # full-magnitude vector even when the query matches nothing
-                    # it holds -- noise, by construction. Caught by
-                    # `test_exact_cache.py`, where an ungated cache made
-                    # synthetic recall WORSE while still helping on text.
-                    #
-                    # `max(0, best cosine)` is the crudest honest gate: no match,
-                    # no contribution, and a perfect match contributes fully.
-                    match = float(np.max(np.where(live, cosine, -1.0)))
-                    if match > 0.0:
-                        retrieved = retrieved + (
-                            self.config.cache_weight * match
-                            * (weights @ cache_value))
-            # COMPETITION, by settling. One step reproduces every earlier result.
-            #
-            # `retrieved` is a weighted SUM -- every stored value, weighted by
-            # how much its key overlaps this one. Nothing selects. Mapping back
-            # through the store and reading again multiplies the two
-            # similarities, so a value that matches on both key AND content
-            # survives where one that matches on neither fades.
-            for _ in range(self.config.retrieval_steps - 1):
-                back = readable.T @ retrieved
-                size = float(np.linalg.norm(back))
-                if size <= 0.0:
-                    break
-                retrieved = readable @ (back / size * np.linalg.norm(key))
+            retrieved = self.retrieval.read(readable, key)
             sliced = retrieved.reshape(groups, -1)
             parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)
             answer = parts.sum(0) if members is None else parts[members].sum(0)

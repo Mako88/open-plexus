@@ -33,6 +33,7 @@ ATTENTION = ROOT / "openplexus" / "models" / "attention.py"
 LOCAL = ROOT / "openplexus" / "models" / "local_memory.py"
 DISTRIBUTED = ROOT / "openplexus" / "distributed.py"
 KEYS = ROOT / "openplexus" / "keys.py"
+RETRIEVAL = ROOT / "openplexus" / "retrieval.py"
 SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 # Experiment code is not usually mutated -- experiments are read once and
 # discarded. This one is, because its generator returned a wrong SET rather
@@ -600,27 +601,27 @@ MUTATIONS = [
         breaks="the admission policy, which is the whole claim -- the cache "
                "would keep the last N bindings rather than the ones the store "
                "could not absorb, and HOLA measured that as 0.34 absolute worse",
-        path=LOCAL,
-        old="                if residual > cache_score[weakest]:",
-        new="                if True:",
+        path=RETRIEVAL,
+        old="        if residual > self.score[weakest]:",
+        new="        if True:",
     ),
     Mutation(
         name="the-cache-read-is-not-gated-by-the-MATCH",
         breaks="the guard against contributing noise -- an unmatched query "
                "would still pull a full-magnitude vector out of the cache, "
                "which measurably made synthetic recall worse",
-        path=LOCAL,
-        old="                    if match > 0.0:",
-        new="                    if True:",
+        path=RETRIEVAL,
+        old="        if match <= 0.0:",
+        new="        if False:",
     ),
     Mutation(
         name="a-single-read-secretly-settles-once",
         breaks="every result in the project -- `retrieval_steps` defaults to 1 "
                "and one settling step is measured to drop recall from 0.924 to "
                "0.600, so this would silently degrade every earlier number",
-        path=LOCAL,
-        old="            for _ in range(self.config.retrieval_steps - 1):",
-        new="            for _ in range(self.config.retrieval_steps):",
+        path=RETRIEVAL,
+        old="        for _ in range(self.steps - 1):",
+        new="        for _ in range(self.steps):",
     ),
     Mutation(
         name="the-write-gate-is-ignored",

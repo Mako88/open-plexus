@@ -218,3 +218,31 @@ said it had been dropped.
 
 **Undo.** The GOALS edit is one block and quotes both numbers, so reverting it
 loses nothing that was there before.
+
+## 13. Built the repo-specific rails as a ratchet, not a rule
+
+**Chosen.** `tools/check_rails.py` with three rails and a checked-in baseline of
+48 legacy exemptions. R1 (summarisers import `tools.recovery`) is strict and has
+none. R2 (sweeps carry PREDICTIONS and COST) and R3 (experiments go through the
+harness) are ratcheted, because 37 sweeps and 11 scripts predate those
+conventions.
+
+**Why a ratchet.** A check that fails on every legacy file gets suppressed, and a
+suppressed check makes the others look optional. BACKLOG had already reached this
+conclusion for the style-shaped rules; it applies here for the same reason.
+
+**The design decision worth reviewing.** A stale exemption — one naming a file
+that now complies or no longer exists — is an *error*, not a warning. That is
+deliberate: an exemption list nobody prunes eventually covers whatever is added
+to that path later, leaving a check that passes while checking nothing. The cost
+is that legitimately fixing a legacy file makes CI red until the baseline is
+regenerated with `--write-baseline`. I judged that acceptable because the fix is
+one command and the diff is the record of what got better.
+
+**Verified red.** Each rail was fired deliberately and caught by name, with the
+tree restored afterwards. A check nobody has seen fail is not evidence.
+
+**What this does not do.** It cannot check the thing that has gone wrong most
+often here — a test asserting a property the quantity does not have. Nothing
+mechanical can. Mutation testing remains the closest substitute and is already in
+place.

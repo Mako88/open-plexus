@@ -622,6 +622,7 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   python tools/mutate.py --verify
   python -m unittest discover -s tests -t . -q
   python tools/check_workflows.py
+  python tools/check_rails.py
   ```
   The full mutation harness runs in CI, sharded; locally it is
   `python tools/mutate.py --only <the mutations just added>`, because a full
@@ -655,6 +656,19 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   `python experiments/*.py` line out of every workflow and compares the flags
   against the script's own `--help`. It takes about a second, and it turns a
   spent matrix into an error before anything is dispatched.
+- **Repo-specific rails are a ratchet, not a rule.** `tools/check_rails.py`
+  enforces three conventions that have already cost a result: a summariser
+  reporting a recovery ratio imports `tools.recovery`; a sweep file carries
+  PREDICTIONS and COST sections; an experiment goes through
+  `experiments/harness.py`, which is where `refuse_if_mutating()` lives.
+
+  Legacy violations are exempt in `tools/rails_baseline.json` — thirty-seven
+  sweeps predate the COST convention and eleven scripts predate the harness —
+  because a check that fails on everything gets suppressed. **A file not in the
+  baseline must comply, and an exemption that no longer applies is an error**,
+  so the list can only shrink without a visible diff. Generic lint is a solved
+  problem; these encode the specific failures, which is the only reason they
+  earn a check.
 - **One sweep matrix in flight at a time.** A matrix takes every runner, so a
   second sweep pushed while one is running does not overlap — its jobs queue,
   seize the runners the moment the first finishes, and starve the first's

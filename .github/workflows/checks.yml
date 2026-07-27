@@ -29,6 +29,8 @@ jobs:
         run: python -m unittest discover -s tests -t . -q
       - name: Verify every workflow flag is one its script accepts
         run: python tools/check_workflows.py
+      - name: Repo-specific rails (ratchet -- new violations only)
+        run: python tools/check_rails.py
 
   # The harness runs one full suite per mutation, so it is serial time and
   # nothing else — 85 mutations at roughly fifteen seconds each. Sharded it is

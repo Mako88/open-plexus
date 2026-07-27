@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import os
 import unittest
+from dataclasses import replace
 
 import numpy as np
 
@@ -45,6 +46,66 @@ def configured(partitions: int, width: int = 32):
     model = LocalAssociativeMemory(config)
     model.wo[:] = np.random.default_rng(0).normal(0.0, 0.1, (14, width))
     return config, model
+
+
+@skip_if_fast
+class TheSplitDoesNotCARRY_THE_GATE(unittest.TestCase):
+    """The scope of every "the split is exact" result, written down.
+
+    `Node.step` is a REIMPLEMENTATION of the model's inner loop, not a call into
+    it. It holds a memory, a previous key and a readout, and that is all — there
+    is no `pending` list, no reward token, no tag, no consolidation. So a config
+    carrying gate settings is accepted, ignored, and produces a confident wrong
+    answer rather than an error.
+
+    That matters because the whole g9 line is about gates, John's priority is
+    tiny nodes, and BACKLOG has carried *"the testbed has never run a gated
+    model"* as a one-line item. It is worse than never having run one: the
+    distributed path cannot run one, and nothing said so.
+
+    These tests pin the boundary in both directions, so that when the gate is
+    implemented on the node the first of them starts failing and says why.
+    """
+
+    def gated(self, nodes: int):
+        """The same configuration twice, once with the reward gate switched on.
+
+        The reward token is inside the vocabulary and appears in TOKENS, so the
+        gate genuinely fires rather than being configured and never reached —
+        which would make this test pass for the wrong reason.
+        """
+        config, model = configured(nodes)
+        gate = replace(config, reward_token=int(TOKENS[5]), reward_window=1)
+        gated = LocalAssociativeMemory(gate)
+        gated.wo[:] = model.wo
+        return gate, gated
+
+    def test_the_gate_changes_the_single_process_answer_at_all(self):
+        """The guard on the test below. If the gate were inert here, the
+        agreement test would pass while measuring nothing."""
+        config, model = configured(2)
+        gate, gated = self.gated(2)
+        self.assertFalse(
+            np.array_equal(model.run(TOKENS), gated.run(TOKENS)),
+            "the reward gate changed no prediction, so the divergence test "
+            "below would be vacuous")
+
+    def test_a_gated_config_is_ACCEPTED_and_then_IGNORED_by_the_nodes(self):
+        """The finding, stated as the failure it would cause.
+
+        A network handed a gated config still runs, still votes, and still
+        returns an answer. It is simply not the model it was configured as —
+        and `Node.step` has no gate, so what comes back is the UNGATED answer.
+        """
+        gate, gated = self.gated(2)
+        ungated, plain = configured(2)
+        with Network(gate, 2, gated.wv, gated.wo) as network:
+            got = network.run(TOKENS)
+        np.testing.assert_array_equal(got, plain.run(TOKENS))
+        self.assertFalse(
+            np.array_equal(got, gated.run(TOKENS)),
+            "the distributed run matched the GATED model, so the gate has "
+            "reached the node -- delete this test and its class docstring")
 
 
 @skip_if_fast

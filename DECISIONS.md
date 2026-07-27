@@ -1011,3 +1011,45 @@ DETECTION is weak, not because which-binding is hard — and only one of those i
 a property of the task.
 
 487 tests, 106 mutations, five checks clean.
+
+## 35. The testbed cannot run a gated model, and BACKLOG understated it
+
+BACKLOG carried *"the testbed has never run a gated model"* as a one-line item.
+Reading `distributed.Node.step` while plumbing the gate into the driver showed it
+is worse than that.
+
+**`Node.step` is a REIMPLEMENTATION of the model's inner loop, not a call into
+it.** A memory, a previous key, a readout. No `pending` list, no reward token, no
+tag, no consolidation. A config carrying gate settings is accepted, ignored, and
+answered anyway — so the network does not fail, it returns a confident wrong
+number.
+
+**Measured rather than asserted.** A network handed `reward_token` and
+`reward_window` returns a result identical to the UNGATED single-process model
+and different from the gated one. Two tests pin it, with a guard that the gate
+changes the single-process answer at all, so the comparison cannot pass because
+the gate was inert.
+
+**This scopes every "the split is exact" claim in the project.** That exactness
+was measured on the ungated inner loop, where it holds. It has never been
+measured for any mechanism the entire g9 line is about, and nothing in the record
+said which of the two it covered.
+
+**Chosen: stop here rather than start the build.** The fix is not plumbing.
+Either the gate is implemented a second time on `Node` — duplicating logic that
+`test_tag.py`'s mutations protect, in a file those mutations do not touch — or
+`LocalAssociativeMemory` grows a step-wise API the node calls. The second is
+right and the first is what will be tempting, because the first is an hour and
+the second is a refactor of the loop every sweep runs through.
+
+Starting that with a sweep about to land and finishing it half-done would be the
+worse outcome. It is written up with the boundary pinned by tests, so the first
+of them fails the moment the gate reaches the node and says why.
+
+**Also fixed on the way past:** `testbed/driver.py` builds its own
+`LocalMemoryConfig` rather than calling `node_main.config_from_env`, which is the
+silent-drift risk that function's own docstring warns about — the two currently
+agree by coincidence of matching literals. Left alone deliberately: changing it
+belongs with the refactor above, not ahead of it.
+
+489 tests, 108 mutations.

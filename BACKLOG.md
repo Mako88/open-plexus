@@ -116,8 +116,32 @@ looking for work should start here.
    section — CORRECTED*.
 5. **Everything under *Tasks beyond MQAR*** — the corpus benchmark is the first
    evidence for goal 2 and nothing on this page is closer to the actual aim.
-6. **The testbed has never run a gated model.** Everything measured is one
-   process. See *Built but not finished*.
+6. **WORSE THAN NEVER: the distributed path CANNOT run a gated model, and
+   nothing said so.** `distributed.Node.step` is a REIMPLEMENTATION of the
+   model's inner loop, not a call into it — a memory, a previous key and a
+   readout, and that is all. No `pending` list, no reward token, no tag, no
+   consolidation.
+
+   So a config carrying gate settings is **accepted, ignored, and answered
+   anyway**. Measured, not read: a network handed `reward_token` and
+   `reward_window` returns a result identical to the UNGATED single-process
+   model and different from the gated one. Two tests in `test_distributed.py`
+   pin it, with a guard that the gate changes the single-process answer at all
+   so the comparison cannot pass vacuously.
+
+   **This scopes every "the split is exact" claim in the project.** Exactness
+   was measured on the ungated inner loop and holds there; it has never been
+   measured for any mechanism the g9 line is about.
+
+   The build is not plumbing. Either the gate is implemented a second time on
+   `Node` — duplicating the logic that `test_tag.py`'s mutations protect, in a
+   file those mutations do not touch — or the model grows a step-wise API the
+   node calls. **The second is right and the first is what will be tempting.**
+   `LocalAssociativeMemory.run` currently owns the loop, so this is a real
+   refactor and wants its own cycle rather than being wedged into one.
+
+   Until then, John's tiny-node priority is answered only in one process with a
+   split readout.
 
 **SETTLED THIS SESSION** — kept below for their reasoning, not as work:
 the width question (*ANSWERED: eight dimensions*), why g9-08 asked it wrong

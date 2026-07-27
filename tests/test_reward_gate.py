@@ -54,6 +54,28 @@ def stream(gap: int, rewards: int = 4, seed: int = 3) -> np.ndarray:
 TOKENS = stream(gap=4)
 
 
+def _survivors(tokens: np.ndarray, window: int) -> np.ndarray:
+    """Which steps the gate leaves in the store, as a `store=` mask.
+
+    Contributions accumulate until a reward arrives; then the last
+    `window + 1` are kept and the rest removed. Whatever is still pending when
+    the sequence ends is never pruned, because no reward vouched against it.
+    """
+    keep = np.zeros(len(tokens), dtype=bool)
+    pending: list[int] = []
+    for step, token in enumerate(tokens):
+        if step > 0:
+            pending.append(step)
+        if token == REWARD:
+            survivors = pending[-(window + 1):] if pending else []
+            for index in survivors:
+                keep[index] = True
+            pending = []
+    for index in pending:            # never vouched against, so never removed
+        keep[index] = True
+    return keep
+
+
 class OffByDefault(unittest.TestCase):
 
     def test_the_default_is_disabled(self):
@@ -121,6 +143,50 @@ class TheSubtractionIsExact(unittest.TestCase):
     by any capping. Removing the original outer product would take out more than
     is actually there and drive the store negative.
     """
+
+    def test_a_pruned_prefix_leaves_no_trace(self):
+        """The test the fade bookkeeping actually needs.
+
+        Two streams that differ ONLY in content the gate throws away must agree
+        on everything after the reward that threw it away. That is what "removed"
+        means. Without the weight tracking, the subtraction takes out each
+        contribution as it went IN rather than as it now stands, so the residue
+        depends on what was written — and two different prefixes leave two
+        different residues.
+
+        The previous version of this test compared a gated run against a
+        `store=`-masked one. It failed for a reason worth keeping: `memory *=
+        decay` sits inside the `if store[t]` guard, so a masked step does not
+        decay while a pruned one does. They were never equivalent, and the oracle
+        arm in every gating sweep is therefore doing two things at once — storing
+        less, and decaying less often.
+        """
+        rng = np.random.default_rng(21)
+        suffix = [int(x) for x in rng.integers(0, REWARD, 40)]
+        # The binding kept at window=0 is the one written AT the reward step, so
+        # the token immediately before it must match across both streams.
+        for decay in (1.0, 0.99, 0.9):
+            with self.subTest(decay=decay):
+                answers = []
+                for prefix_seed in (1, 2):
+                    noise = np.random.default_rng(prefix_seed).integers(
+                        0, REWARD, 25)
+                    tokens = np.array([int(x) for x in noise] + [5, REWARD]
+                                      + suffix)
+                    answers.append(
+                        build(reward=REWARD, window=0, decay=decay).run(tokens))
+                tail = len(suffix)
+                np.testing.assert_array_equal(
+                    answers[0][-tail:], answers[1][-tail:],
+                    "two streams differing only in pruned content disagreed "
+                    "after the pruning, so the removed contributions left a "
+                    "residue that depends on what they were")
+
+    def test_the_prefixes_really_do_differ(self):
+        """Guard: if the two streams were the same, the equality is vacuous."""
+        one = np.random.default_rng(1).integers(0, REWARD, 25)
+        two = np.random.default_rng(2).integers(0, REWARD, 25)
+        self.assertFalse(np.array_equal(one, two))
 
     def test_it_holds_under_decay(self):
         """With a window past everything, the gate is a no-op — but only if the

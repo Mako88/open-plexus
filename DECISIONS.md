@@ -1440,3 +1440,87 @@ from doubling 32 to 64, against a 0.98-bit gap to the unigram. R3 would need
 about seventeen times that effect from the last doubling.
 
 554 tests, 116 mutations.
+
+## 42. The corpus line, end to end -- and it corrected itself three times
+
+Goal 2 now has measurements rather than an intention. The arc is worth reading as
+one thing because **each run refuted the previous run's conclusion**, and the
+refutations were the point rather than an embarrassment.
+
+### What was measured, in order
+
+**g10-01** put the model on real text for the first time. 210,216 training
+characters of this project's own notes over 86 symbols -- not a standard
+benchmark, and bundling one remains John's call. Bars measured before anything
+was built: uniform 6.426, unigram 4.756, **bigram 3.711**, trigram 2.934. Its
+first run's chunk axis turned out to measure a divergence rather than a model.
+
+**g10-02** asked whether the model was undertrained. It is not: the curve peaks
+after ONE pass and oscillates. And a fourfold wider node gives the same curve to
+0.005 bits, so it is not width-limited either. It concluded "it is not learning
+the text."
+
+**g10-03** refuted that. The comparison was against a bigram holding 210,000
+characters of context while the model's store holds the last 64 and resets. Given
+counters carrying the SAME handicap, **at chunk 64 the model BEATS within-chunk
+counting by 0.158 bits.** The 2.1-bit "underfitting" was the wrong comparison.
+It recommended building a store that persists across chunks, worth up to 2.3
+bits.
+
+**g10-04** refuted THAT. The 2.3 bits is what a counter would gain. Chunk length
+IS the persistence horizon, so handing the model 64, 128, 256 and 512 tests the
+recommendation directly: **it captures 24% of what the extra context is worth,
+and the gap widens at every step.** Persistence would hand it more of what it
+already cannot use. Superposition is the binding limit -- occurrences of `e`
+collapse into one averaged vector where counting keeps a distribution, which is
+exactly why the shortfall GROWS with context. It pointed at bounded slots and
+said the g9 line had already built them.
+
+**g10-05** refuted that last part. `tag_slots` bounds WRITES globally across an
+interval; the corpus needs slots **per character**, which at 86 symbols is 688
+stored successors rather than 8. Same idea, different granularity. It also sized
+the mechanism: **8 slots per character recovers 83-97%** of the prize, and the
+slots needed grows with context, as keeping distinct occurrences predicts.
+
+**slot_cost.py** priced it. Vector slots are a constant 2.7x the store at every
+width -- both scale with `w`, so shrinking the node never helps, which is note
+015's finding arriving at a new mechanism. Token-id slots do not scale with `w`
+at all: 688 numbers, crossover at width 2.7, so **any node wider than about 3
+holds the slots more cheaply than its own store**. Affordable, and only because
+keys are derived -- the third unrelated reason that dependency has proven
+load-bearing.
+
+### The pattern in the three corrections
+
+All three were the same error: **a number measured on one thing, applied to
+another.**
+
+- g10-02 applied a bigram's 210k-character context to a model with 64.
+- g10-03 applied a counter's available gain to a mechanism that captures a
+  quarter of it.
+- g10-04 applied a global write budget to a per-key storage problem.
+
+Each was caught by asking what the number was measured ON, and each check cost
+minutes. **The checks should have preceded the conclusions rather than following
+them by one cycle each.** That is the process finding, and it is more useful than
+any single number above.
+
+The nearest miss was in g10-03's own code: one model number, 5.83, measured at
+chunk 64 and applied at chunk 256 where the true value is 5.734 and the verdict
+FLIPS. A comment recorded where it came from and that did not help. It is now a
+table keyed by chunk, and the script refuses a chunk it has no measurement for.
+
+### Where this leaves goal 2
+
+**The model is not a language model at character level, and the reason is
+specific rather than general.** It is not the epoch budget, not the node width,
+and not a failure to learn -- given its own context window it beats counting. It
+is superposition: one averaged successor where a distribution is needed.
+
+That is a mechanism-shaped problem with a costed answer, which is a much better
+position than "it underfits". Whether a per-key slot store actually reaches its
+ceiling is unmeasured and is the next question; the ceiling and the cost are now
+both known, and the g9 line's tag is an analogy for it rather than an
+implementation of it.
+
+564 tests, 118 mutations.

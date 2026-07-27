@@ -1,0 +1,119 @@
+name: sweep-g11-06-does-exact-storage-scale-with-data
+
+# THE MEASUREMENT g11-05 DEMANDS.
+#
+# g11-05 measured both our arms FLAT on data -- -0.0008 and -0.0010 against a
+# backprop control of -0.0243 at R2 0.96. The architecture is saturated on data
+# as well as width. The through-line says why: `r = M @ key` is a SUM, and a
+# bottleneck downstream of the statistics cannot be widened by improving the
+# statistics. That is an INFERENCE. This tries to make it a measurement, by
+# running the one component that does not sum -- the exact cache -- along the
+# same data axis.
+#
+# THE STATE-MATCHED ARM IS WHAT MAKES THIS A COMPARISON. A cache is not free
+# state. Measuring "with cache" against "without" at equal width compares a
+# bigger model to a smaller one, which is the mistake g10-08 made with width and
+# g10-09 made with a cache and was RETRACTED for.
+#
+#   arm               width  slots   numbers held
+#   single               64      0          4,096
+#   cache128             64    128         20,480
+#   single-matched      143      0         20,449
+#   backprop             64      -              -
+#
+# Slots 128 comes from the hybrid-store result (commit 88c9c12) AT WIDTH 64.
+#
+# A STRUCTURAL FACT, recorded before the run so no explanation of the result is
+# unfalsifiable: the cache is reset on every `run` call and `run` is called once
+# per 128-token chunk. It is a within-sequence working memory and cannot
+# accumulate across the corpus; only `Wo` persists between chunks.
+#
+# PREDICTIONS (full text and refutation conditions in the sweep file):
+#   P1  the control fires, backprop |b| > 0.02 -- admissibility, near-known
+#   P2  `single` is flat and its 250k cell lands on g11-05's 5.505
+#   P3  the CACHE arm is also flat -- the pessimistic call, on the reset above
+#   P4  the cache's advantage is a CONSTANT ~0.15-0.25 bits, not a slope
+#
+# Informative either way. Refuting P3 IDENTIFIES the sum as the constraint and
+# argues for item-partitioning the distributed model (decision 61). Confirming
+# P3 locates the flatness in the PERSISTENT path and names the next mechanism:
+# make the cache survive across chunks.
+#
+# COST, from the MOST EXPENSIVE CELL per g11-03's rule. Measured locally at
+# 30,000 characters: single-matched is 2.31 ms/char, so 1,000,000 characters is
+# ~2,310 s per seed, two seeds on two workers, ~39 min wall against a 300-minute
+# timeout. ~123 min of local-equivalent job time across all 20 jobs; g11-05's
+# runners came in faster than local, so that is an upper bound.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  exact:
+    strategy:
+      fail-fast: false
+      matrix:
+        chars: [62500, 125000, 250000, 500000, 1000000]
+        # `variant` must be a REAL matrix axis, not only an `include` key. An
+        # include entry whose keys are all new is merged into EVERY combination,
+        # so four of them overwrite each other and the matrix collapses to one
+        # arm repeated five times -- a grid that runs, returns 5 of 5, and
+        # compares an arm against itself.
+        variant: [single, cache, matched, backprop]
+        include:
+          - {variant: single,   arm: single,   width: 64,  slots: 0}
+          - {variant: cache,    arm: cache,    width: 64,  slots: 128}
+          - {variant: matched,  arm: matched,  width: 143, slots: 0}
+          - {variant: backprop, arm: backprop, width: 64,  slots: 0}
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: ${{ matrix.arm }} w${{ matrix.width }} k${{ matrix.slots }} on ${{ matrix.chars }}
+        run: python experiments/g11_04_scaling_exponent.py --corpus shakespeare --width ${{ matrix.width }} --chars ${{ matrix.chars }} --slots ${{ matrix.slots }} --scale 128 --mode ${{ matrix.arm }} --workers 2 --json out/X-${{ matrix.arm }}-${{ matrix.width }}-${{ matrix.chars }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g11-06-${{ matrix.arm }}-${{ matrix.width }}-${{ matrix.chars }}
+          path: out/*.json
+
+  aggregate:
+    needs: [exact]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g11-06-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 20" | tee summary.txt
+          python -m tools.summarise_scaling_exponent | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g11-06-summary
+          path: |
+            summary.txt
+            out/*.json

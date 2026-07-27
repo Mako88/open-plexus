@@ -69,16 +69,29 @@ AXES = ("chars", "width")
 def axis_of(rows: list[dict]) -> str:
     """The field this grid moved, read from the records rather than assumed.
 
-    Refuses when more than one candidate varies: a grid moving two axes at once
-    cannot have a single exponent fitted through it, and picking one silently
-    would report a slope confounded by the other.
+    **Variation is judged WITHIN an arm, not across the whole file**, because
+    the exponent is fitted per arm and that is the only scope in which a second
+    moving axis can confound it. Across arms a difference is the comparison
+    itself: g11-06 runs a cache arm against a WIDER superposed arm holding the
+    same number of values, so `width` differs between arms by design and is
+    constant inside each one. A global check would refuse that grid, and the
+    obvious repair — dropping the check — would also stop refusing the grids it
+    was written for.
+
+    Refuses when more than one candidate varies inside a single arm: a slope
+    fitted through that is confounded, and picking an axis silently would report
+    it as though it were not.
     """
+    by_arm: dict[str, list[dict]] = {}
+    for row in rows:
+        by_arm.setdefault(row.get("arm", ""), []).append(row)
     moved = [name for name in AXES
-             if len({row[name] for row in rows if name in row}) > 1]
+             if any(len({r[name] for r in group if name in r}) > 1
+                    for group in by_arm.values())]
     if len(moved) > 1:
         raise SystemExit(
-            f"{' and '.join(moved)} both vary in these records. A single "
-            f"exponent through a two-axis grid is confounded; sweep one.")
+            f"{' and '.join(moved)} both vary within a single arm. A slope "
+            f"fitted through that is confounded; sweep one axis per arm.")
     return moved[0] if moved else "width"
 
 

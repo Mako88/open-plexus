@@ -98,12 +98,34 @@ def split(corpus, chunk: int, chars: int = TRAIN_CHARS):
             chunks(corpus.test, chunk))
 
 
+#: `matched` is the SAME MODEL as `single`, under a different name.
+#:
+#: It exists because the state-matched control runs at a wider width, and an arm
+#: is identified by its name: two `single` rows at widths 64 and 143 would be
+#: averaged into one column, and `width` would then vary WITHIN an arm, which is
+#: the confound `summarise_scaling_exponent.axis_of` refuses. A separate name
+#: keeps the control a control instead of contaminating the thing it controls.
+ARMS = frozenset({"single", "context", "cache", "matched", "backprop"})
+
+
+def numbers_held(width: int, slots: int) -> int:
+    """State the model carries: the `d x d` store, plus the cache's pairs.
+
+    **The cache is not free state**, and comparing "with cache" against
+    "without" at equal width compares a bigger model to a smaller one -- the
+    mistake g10-08 made with width and g10-09 made with a cache, and the latter
+    had to be retracted for it. Every arm reports this so a comparison can be
+    read against equal state rather than equal width.
+    """
+    return width * width + 2 * slots * width
+
+
 def ours(corpus, width: int, chunk: int, seed: int, context: bool,
-         chars: int = TRAIN_CHARS) -> float:
+         chars: int = TRAIN_CHARS, slots: int = 0) -> float:
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=corpus.vocab_size, d_model=width, lr=0.05, key_scale=0.5,
         decay=0.997, derived_keys=True, context_keys=context, memory_cap=5.0,
-        seed=seed))
+        cache_slots=slots, seed=seed))
     model.wo[:] = model.wv
     fitting, calibration, test = split(corpus, chunk, chars)
     rng = np.random.default_rng(seed)
@@ -160,7 +182,7 @@ def backprop(corpus, width: int, chunk: int, seed: int,
 
 
 def run_one(args) -> list[dict]:
-    seed, width, chunk, which, arm, chars = args
+    seed, width, chunk, which, arm, chars, slots = args
     corpus = corpus_named(which)
     available = len(corpus.train[0])
     if chars > available:
@@ -168,10 +190,26 @@ def run_one(args) -> list[dict]:
             f"asked for {chars} training characters and the corpus holds "
             f"{available}. A cell silently truncated to the corpus length is a "
             f"cell at a different point on the axis than the grid says.")
+    if arm not in ARMS:
+        raise SystemExit(
+            f"unknown arm {arm!r}; expected one of {', '.join(sorted(ARMS))}. "
+            f"An unrecognised mode would otherwise fall through to the "
+            f"single-token model and be recorded under its own name.")
+    # THE ARM NAME AND THE CACHE HAVE TO AGREE, both ways.
+    #
+    # A `cache` arm with no slots is a cache arm that never had a cache. A
+    # `single` arm WITH slots records itself as `single` and lands in the same
+    # column as the no-cache arm, so the summariser averages two different
+    # models into one number. Both run cleanly and neither announces itself.
+    if (arm == "cache") != bool(slots):
+        raise SystemExit(
+            f"arm {arm!r} with slots {slots}: the arm name and the cache must "
+            f"agree. `cache` needs --slots, and any other arm must not have "
+            f"them, or two different models are recorded under one name.")
     if arm == "backprop":
         value = backprop(corpus, width, chunk, seed, chars)
     else:
-        value = ours(corpus, width, chunk, seed, arm == "context", chars)
+        value = ours(corpus, width, chunk, seed, arm == "context", chars, slots)
     broken = absurd(value, corpus.vocab_size)
     if broken:
         raise SystemExit(f"{arm} width {width} chars {chars} seed {seed}: {broken}")
@@ -179,11 +217,12 @@ def run_one(args) -> list[dict]:
     # a run's identity from the DATA rather than from the directory it came out
     # of -- CLAUDE.md rule 11b, bought by g9-11's near-miss.
     return [{"seed": seed, "width": width, "chunk": chunk, "arm": arm,
-             "chars": chars, "bits_calibrated": value,
+             "chars": chars, "slots": slots, "bits_calibrated": value,
+             "numbers_held": numbers_held(width, slots),
              "vocab_size": corpus.vocab_size,
              "uniform": uniform_bits(corpus.vocab_size),
              "corpus": which or "notes",
-             "condition": f"{arm}-w{width}-c{chars}-s{seed}"}]
+             "condition": f"{arm}-w{width}-k{slots}-c{chars}-s{seed}"}]
 
 
 def main() -> int:
@@ -193,7 +232,9 @@ def main() -> int:
     chunk = int(args.scale) if args.scale is not None else 256
     arm = args.mode or "single"
     chars = args.chars if args.chars else TRAIN_CHARS
-    jobs = [(seed, width, chunk, args.corpus, arm, chars) for seed in seeds]
+    slots = args.slots or 0
+    jobs = [(seed, width, chunk, args.corpus, arm, chars, slots)
+            for seed in seeds]
     records = [r for batch in harness.spread(run_one, jobs, args.workers)
                for r in batch]
     if args.json:

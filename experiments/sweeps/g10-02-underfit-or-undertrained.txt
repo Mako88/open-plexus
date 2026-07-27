@@ -79,7 +79,39 @@ Registered in g10-01 before this ran, and scored here.
    measured here, and it is a candidate explanation rather than a finding.
 
 
-WHAT THIS DOES NOT SHOW, AND IT IS A REAL LIMIT
+RUN AGAIN AT WIDTH 128, AND THE CAVEAT BELOW IS NOW CLOSED
+------------------------------------------------------------
+The section below said this was one cell and that a wider node fitting the
+training text would make the diagnosis width-limited rather than structural.
+So the same curve was run at width 128, a FOURFOLD wider node:
+
+    epoch      width 32              width 128
+             train    test          train    test
+        0    6.240   6.210          6.181   6.197
+        1    5.780   5.847          5.785   5.826     <- both peak here
+        2    5.795   5.891          5.781   5.883
+        3    5.809   5.932          5.803   5.911
+        4    5.824   5.916          5.801   5.844
+        5    5.779   5.843          5.810   5.846
+        6    5.827   5.962          5.817   5.956
+
+**The two curves are the same curve.** Four times the width buys 0.005 bits on
+training text at the epoch where each peaks. Both stop improving after one pass.
+Both end 2.18 bits short of a bigram fitted to the text they have already seen.
+
+**So the underfitting is not width-limited.** The caveat below is answered, by
+measurement, at the width it named. Whatever is stopping this model is not the
+size of the node -- which is the answer the tiny-node priority wanted, arriving
+from the direction nobody hoped for: node size does not matter here because
+nothing about the node is the binding constraint.
+
+**What it still does not settle.** Both curves are at chunk 64. g10-01's re-run
+is measuring chunk 256 across widths 32, 64 and 128 with the store capped, and
+its partial cells show width buying 0.058 bits from 32 to 64 -- the same
+near-nothing, on a different chunk. If its width-128 cells agree, the finding
+holds on both context lengths tested.
+
+WHAT THIS DOES NOT SHOW, AND IT IS A REAL LIMIT (as first written)
 -------------------------------------------------
 **This is ONE cell: width 32, chunk 64, one seed.** The script prints
 "the conclusion is about the architecture", and that is stronger than one cell

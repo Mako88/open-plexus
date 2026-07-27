@@ -1686,3 +1686,54 @@ The viability picture I gave John an hour ago was too optimistic and is correcte
 in the same breath as this entry.
 
 565 tests, 118 mutations.
+
+## 46. I tested my own hypothesis one run after writing it, and it was wrong
+
+g10-10 found no crossover and explained it: *superposition is a compression
+scheme, the task suite is deliberately incompressible, so this measures it where
+it cannot pay.* Plausible, and exactly the kind of claim that became doctrine in
+g10-03 before g10-04 had to refute it.
+
+[g10-11](experiments/sweeps/g10-11-does-structure-help-the-store.txt) tested it
+immediately. As a multiple of chance:
+
+      items         random    few values    few cues
+         64           58.7           6.4         0.0
+        512           98.8           2.8         0.0
+
+**Structure in the values makes the store relatively WORSE.** Capacity is set by
+how many KEYS must be separated in `d` dimensions, which is note 020's law, and
+shrinking the answer set does not shrink the number of keys. **The compression
+explanation is refuted** and g10-10's finding stands on its own.
+
+### The error caught before publication, for once
+
+The first version reported RAW accuracy — random 0.207 against few-values 0.350 —
+and printed *"fewer distinct values helps, the compression story stands"*.
+
+The conditions have different chance levels: eight prototypes means guessing
+scores 0.125 where four thousand values means 0.00024. Comparing them compares
+numbers measured against floors five hundred times apart, and the conclusion
+inverts once corrected.
+
+**Sixth instance this session of the same error, and the first caught before the
+write-up rather than a cycle after.** What made the difference was writing the
+reason to DOUBT the hypothesis into the same file as the hypothesis, so the run
+had something to fail against rather than something to confirm.
+
+### A second finding nobody was looking for: the store cannot overwrite
+
+`few cues` rebinds the same 8 cues repeatedly and scores **0.0x chance**. The
+store accumulates — `memory += outer(value, key)` — so rebinding adds a term
+rather than replacing one, and retrieval returns the sum of every value ever
+bound to that cue. The argmax of a sum of unrelated vectors is noise.
+
+A table overwrites in one line. **This is a third structural difference from a
+cache and it was not on note 030's list of four.**
+
+And it raises a question about the g9 line: MQAR and `reward_recall` present each
+cue ONCE per sequence, so **no result in this project has ever depended on
+rebinding**. Any workload that revisits a key is outside what has been measured,
+which is most real workloads.
+
+565 tests, 118 mutations.

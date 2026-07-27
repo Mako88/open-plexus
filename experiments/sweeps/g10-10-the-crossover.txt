@@ -89,6 +89,24 @@ structure -- and it is NOT a claim this run supports. Stated here because the
 reading "superposition is useless" would be the natural one and is not warranted
 by random pairs alone.
 
+**TESTED AND REFUTED, one run later.**
+[g10-11](g10-11-does-structure-help-the-store.txt) ran the same comparison with
+the values drawn from 8 prototypes instead of 4,096. Reported as a multiple of
+chance, because the conditions have different floors:
+
+    items         random    few values
+      64            58.7           6.4
+     512            98.8           2.8
+
+**Structure in the values makes the store relatively WORSE.** Capacity is set by
+how many KEYS must be separated in `d` dimensions -- note 020's law -- and
+shrinking the answer set does not shrink the number of keys. Compressible data
+buys the store nothing.
+
+So the explanation offered above is wrong, and the finding stands on its own: at
+a fixed budget a table is better for exact recall, and not because of what the
+data happens to look like.
+
 
 WHAT THIS CANNOT SAY
 ----------------------

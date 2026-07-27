@@ -128,6 +128,45 @@ def build(texts: dict[str, str], test_share: float = 0.25,
                   tuple(encode(n) for n in test_names))
 
 
+def build_stream(text: str, test_share: float = 0.1,
+                 min_count: int = MIN_COUNT) -> Corpus:
+    """One continuous text, split at an OFFSET rather than by document.
+
+    **This breaks the rule the module docstring gives**, and does so
+    deliberately for one case: a single-file benchmark where the published
+    convention is a contiguous tail. Tiny Shakespeare, enwik8 and text8 are all
+    scored that way, and matching the convention is the entire reason for using
+    a standard corpus — a different split makes the number incomparable, which
+    is the problem it was adopted to solve.
+
+    The caveat the by-document rule exists to avoid is real and remains: the
+    tail shares an author, a vocabulary and a register with the head. It is
+    unseen text, not unseen *style*. Every published number for these corpora
+    carries the same caveat, so the comparison is fair even though the absolute
+    figure is easier than a truly held-out author would be.
+    """
+    if not 0.0 < test_share < 1.0:
+        raise ValueError(f"test_share must be in (0, 1), got {test_share}")
+    cut = int(len(text) * (1.0 - test_share))
+    head, tail = text[:cut], text[cut:]
+    if not head or not tail:
+        raise ValueError(
+            f"a text of {len(text)} characters at share {test_share} leaves "
+            f"{len(head)} train and {len(tail)} test; one side is empty")
+
+    counts: dict[str, int] = {}
+    for character in head:
+        counts[character] = counts.get(character, 0) + 1
+    symbols = (UNKNOWN,) + tuple(sorted(c for c, n in counts.items()
+                                        if n >= min_count))
+    index = {c: i for i, c in enumerate(symbols)}
+
+    def encode(part: str) -> np.ndarray:
+        return np.array([index.get(c, 0) for c in part], dtype=np.int64)
+
+    return Corpus(symbols, (encode(head),), (encode(tail),))
+
+
 def read(directory: Path, pattern: str = "*.md") -> dict[str, str]:
     """Every matching file's text, keyed by file name."""
     found = {p.name: p.read_text(encoding="utf-8")

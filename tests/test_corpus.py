@@ -19,7 +19,8 @@ import unittest
 
 import numpy as np
 
-from openplexus.tasks.corpus import UNKNOWN, _is_test, build, chunks
+from openplexus.tasks.corpus import (
+    UNKNOWN, _is_test, build, build_stream, chunks)
 
 TEXTS = {f"note-{i}.md": ("the quick brown fox " * 40) + chr(97 + i % 20) * 30
          for i in range(12)}
@@ -103,6 +104,50 @@ class TheVocabularyComesFromTRAININGTextOnly(unittest.TestCase):
         for document in corpus.train + corpus.test:
             self.assertTrue((document >= 0).all())
             self.assertTrue((document < corpus.vocab_size).all())
+
+
+class ASingleStreamSplitAtAnOffset(unittest.TestCase):
+    """`build_stream` breaks the by-document rule on purpose, for one case.
+
+    Tiny Shakespeare, enwik8 and text8 are all published with a contiguous
+    tail as the test set. Matching that convention is the whole reason for
+    adopting a standard corpus, so a different split would defeat it.
+    """
+
+    def setUp(self):
+        self.text = "".join(f"line {i} of the play\n" for i in range(400))
+        self.corpus = build_stream(self.text, test_share=0.1, min_count=1)
+
+    def test_the_two_sides_do_not_overlap(self):
+        total = self.corpus.train_tokens + self.corpus.test_tokens
+        self.assertEqual(total, len(self.text))
+
+    def test_the_test_side_is_the_TAIL(self):
+        tail = self.corpus.test[0]
+        expected = self.text[len(self.text) - len(tail):]
+        decoded = "".join(self.corpus.symbols[t] for t in tail)
+        self.assertEqual(decoded, expected)
+
+    def test_the_share_is_respected(self):
+        self.assertAlmostEqual(
+            self.corpus.test_tokens / len(self.text), 0.1, places=2)
+
+    def test_the_vocabulary_still_comes_from_the_HEAD_only(self):
+        """The one guarantee that does NOT get relaxed here."""
+        corpus = build_stream("aaaa" * 50 + "zzzz", test_share=0.1,
+                              min_count=1)
+        self.assertNotIn("z", corpus.symbols)
+
+    def test_an_empty_side_is_refused(self):
+        """Reachable by a large share on a short text, where the HEAD empties.
+
+        A tiny share cannot empty the tail — `int(n * (1 - share))` never
+        reaches `n` for share above zero — so the first version of this test
+        asserted a failure that could not happen and passed for the wrong
+        reason had it been written the other way round.
+        """
+        with self.assertRaises(ValueError):
+            build_stream("a", test_share=0.5, min_count=1)
 
 
 class Chunking(unittest.TestCase):

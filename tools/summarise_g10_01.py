@@ -120,10 +120,15 @@ def main() -> int:
     spread = [mean_and_error(cells(width, c, "bits_calibrated"))[0]
               for c in chunks if cells(width, c, "bits_calibrated")]
     if len(spread) > 1:
-        print(f"\n  chunk length moves the best width by "
-              f"{max(spread) - min(spread):.3f} bits")
-        print("  near zero -> the model is not using context at all, and the")
-        print("    memory is doing no work on this task")
+        moved = max(spread) - min(spread)
+        print(f"\n  chunk length moves the best width by {moved:.3f} bits")
+        if moved < 0.05:
+            print("  -> the model is not using context AT ALL. The store")
+            print("     accumulates within a chunk, so a longer chunk that")
+            print("     changes nothing means the memory is doing no work here")
+        else:
+            print("  -> context is worth something, so the memory is being")
+            print("     used even if the total is short of the bar")
     return 0
 
 

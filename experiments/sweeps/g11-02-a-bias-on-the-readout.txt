@@ -2,7 +2,101 @@ A bias on the readout
 =====================
 
 Script: experiments/g10_01_first_language.py --mode bias
-Status: PRE-REGISTERED. Not yet run.
+Status: RUN. Two conditions, one seed. Local.
+
+ANSWER: **two of five predictions, and the main one is REFUTED.** A bias does not
+        reach the unigram and does not beat corrective writes. On
+        `reward_recall` it is CATASTROPHIC, which the negative prediction caught
+        and which matters more than the text number.
+
+THE RESULT
+-----------
+    Tiny Shakespeare, width 64, chunk 256, cap 5.0, one seed
+
+                        bits   accuracy
+    Hebbian           5.4662     0.1756
+    corrective        5.2556     0.1549
+    **bias**          5.3115     0.1837
+    unigram           4.8292     --
+
+    reward_recall, first asks, width 64, floor 0.125
+
+    no bias            0.656
+    **bias**           0.200     -0.456
+
+PREDICTIONS, SCORED
+--------------------
+1. **REFUTED.** Bits do not fall below the unigram's 4.829. They reach 5.312,
+   which is 0.48 short. The diagnosis was wrong: a missing prior was not what
+   capped the model.
+
+2. **REFUTED.** The improvement is 0.155 bits, LESS than corrective writes' 0.211
+   and less than the 0.5 guessed.
+
+3. **CONFIRMED.** Accuracy rises from 0.176 to 0.184, and it is the only cell
+   where accuracy improved -- corrective writes lowered it.
+
+4. **REFUTED, and this is the important one.** `reward_recall` was predicted to
+   gain little or nothing. It **collapses**, 0.656 to 0.200, barely above the
+   0.125 floor.
+
+5. **CONFIRMED.** All 582 tests pass with the flag off.
+
+WHY A PRIOR DOES NOT BUY THE PRIOR
+------------------------------------
+A bias alone would be a unigram. A bias PLUS a noisy retrieval is not, because
+the retrieval term does not go away:
+
+    answer = Wo @ retrieved + bias
+
+To score like a unigram the model would have to IGNORE the retrieval, and it
+cannot learn to -- both terms are trained together against the same error, and
+nothing drives `Wo` toward zero where the store is uninformative. **Adding a
+prior to a noisy signal gives the prior corrupted by the noise**, which is worth
+0.155 bits rather than the 0.64 that separates the model from the unigram.
+
+WHY IT DESTROYS `reward_recall`, WHICH IS THE REAL FINDING
+------------------------------------------------------------
+The bias learns the MARGINAL distribution of everything it is scored on. In
+`reward_recall` that is 767 positions of which almost all are filler and cues,
+and only a handful are the queried values. So the bias learns "expect filler",
+and at a query position it adds a large constant favouring tokens that are never
+the answer.
+
+**This is the base rate, and note 013 already blamed exactly this for the
+salience gate's apparent success.** It has arrived from the other direction: the
+same statistic that flattered one mechanism destroys another.
+
+So the honest account of a readout bias is:
+
+> **It adds the marginal. That helps where the marginal is informative about the
+> answer, and hurts where it is not — and neither case lets the model reach the
+> marginal-only baseline, because the retrieval term keeps adding noise.**
+
+Text is the first case, weakly. `reward_recall` is the second, severely.
+
+WHAT THE NEGATIVE PREDICTION BOUGHT
+-------------------------------------
+Prediction 4 tested the DIAGNOSIS rather than the outcome, and it is the reason
+this file says something useful. Had only Shakespeare been measured, 5.31 against
+5.47 would have read as a modest win and the mechanism would have been kept,
+defaulted on, and carried into the g9 line -- where it costs 0.46 of accuracy.
+
+**A prediction that the mechanism should NOT help somewhere is worth more than
+another prediction that it should.** That is the lesson to keep from this run,
+above anything about biases.
+
+RECOMMENDATION
+---------------
+**Do not default this on.** Keep the flag, off, for the text line only, and
+never for `reward_recall` or any task whose answers are uniform by construction.
+It is not a component improvement; it is a task-dependent prior with a large
+downside.
+
+Note 031's item (3) -- "the readout is the least examined component" -- is
+answered in the negative for the first thing tried. The readout is not
+underpowered for want of a constant term.
+
 
 WHAT IT CHANGES
 ----------------

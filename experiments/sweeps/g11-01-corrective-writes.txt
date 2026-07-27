@@ -2,7 +2,87 @@ Storing the error instead of the value
 =====================================
 
 Script: experiments/g11_01_corrective_writes.py
-Status: PRE-REGISTERED. Not yet run.
+Status: RUN. Three conditions, one seed. Local.
+
+ANSWER: **rebinding is fixed completely and capacity is the price.** Bits on
+        Shakespeare improve by 0.211, which is the bottom of the predicted range
+        and still 0.43 short of a unigram.
+
+THE RESULT
+-----------
+    REBINDING -- 8 cues bound repeatedly, is the LAST binding retrieved?
+
+       decay  rebindings     Hebbian   corrective
+         1.0          64       0.250        1.000
+         1.0         512       0.125        1.000
+       0.997          64       0.125        1.000
+       0.997         512       0.125        1.000
+
+    CAPACITY -- n distinct pairs, as a multiple of chance
+
+       items     Hebbian   corrective
+          64        4016         3168
+         256        2034          915
+         512         778          546
+
+    SHAKESPEARE -- bits per character, width 64, chunk 256, cap 5.0
+
+                       Hebbian   corrective
+       calibrated       5.4662       5.2556      -0.211
+       raw              5.9441       5.9336
+       accuracy         0.1756       0.1549      WORSE
+       unigram          4.8292                   still 0.43 short
+
+PREDICTIONS, SCORED
+--------------------
+1. **CONFIRMED, completely.** Rebinding goes from 0.125 to 1.000 at every decay,
+   including the 0.997 the g9 line uses. Overwriting no longer costs retention,
+   which the decay dial made impossible.
+
+2. **REFUTED, in the direction I did not consider.** I guessed a small
+   improvement in capacity. It gets WORSE, to 0.70x at 512 items. The
+   single-shot correction subtracts `memory @ key`, which contains interference
+   from OTHER bindings as well as this key's stale value, so every write erases
+   a share of its neighbours. **The mechanism is a trade, not an improvement** --
+   overwriting bought with capacity, the same shape as decay buying it with
+   retention.
+
+3. **CONFIRMED, at the bottom of the range.** I guessed 0.2 to 0.8 bits and it
+   is 0.211, still far short of the unigram. Worth noting that it improved AT
+   ALL given prediction 2: the capacity loss did not swamp it.
+
+4. **CONFIRMED.** All 570 pre-existing tests pass unchanged with the flag off.
+
+WHY TEXT GAINS DESPITE LOSING CAPACITY
+----------------------------------------
+The two conditions pull opposite ways and text sits on the side that wins.
+
+**Sixty-four symbols in a 256-character chunk means every key is rebound
+constantly.** A character recurs every few steps, so the store spends its time in
+exactly the regime corrective writes fix and only rarely in the regime they cost.
+The capacity loss is real and mostly not exercised.
+
+That predicts the gain shrinks as the vocabulary grows -- a word-level corpus
+would rebind far less and pay the capacity cost far more. **Not measured**, and
+it is the obvious next question rather than a claim.
+
+THE DISSOCIATION WORTH KEEPING
+--------------------------------
+**Bits improve while accuracy falls**, 0.176 to 0.155. The calibrated
+distribution is better while the argmax is worse, which is precisely why this
+project reports both -- an accuracy-only reading would have called this a
+regression, and a bits-only reading would have missed that the top-1 got worse.
+
+MEASURED ON
+------------
+Already stated before the run and unchanged: the three conditions share no data
+and their numbers are not interchangeable. The Shakespeare figures are comparable
+ONLY with [g10-12](g10-12-the-standard-benchmark.txt) -- same corpus, split,
+width, chunk and cap, differing only in the flag. The rebinding and capacity
+figures are synthetic and comparable only with g10-10 and g10-11.
+
+No g9 recovery ratio is measured here and none should be compared against these.
+
 
 WHAT IT CHANGES
 ----------------

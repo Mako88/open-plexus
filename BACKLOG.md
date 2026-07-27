@@ -342,22 +342,34 @@ more directly.
 
 ---
 
-## The tag is built and pre-registered, not measured
+## The gate that reads both signals — the next mechanism, and it does not exist
 
-`tag_slots`, `tag_decay` and `tag_strongest` are in the model, tested and
-mutated. [g9-05](experiments/sweeps/g9-05-a-tag-that-fades.txt) is written with
-its predictions registered and **is not dispatched**.
+[g9-05](experiments/sweeps/g9-05-a-tag-that-fades.txt) ran, 32 of 32 cells, no
+refusals. **The tag's rows that are flat are flat at zero, and its rows that are
+positive have the window's cliff.** No cell is both, which was the entire claim.
 
-A pre-dispatch control already counted what each gate keeps, and
-[note 023](docs/notes/023-two-signals-and-only-one-of-them-is-about-value.md) is
-what it found: weak retrieval says *this write is a binding*, recency says *this
-binding is the rewarded one*, and a gate needs both answers. The tag supplies the
-half the window lacked; the window already supplied the half the tag lacks.
+But the tie is the thing to build on. At delays 1 and 4 the tag matches the
+window — 0.24/0.23 against 0.23/0.23 — while keeping about a quarter as much.
+Two mechanisms, the same recovery, **different signals**:
 
-**A gate reading both signals is the obvious next mechanism and does not exist.**
-It should wait for g9-05: if the tag's contribution turns out to be inside the
-noise there is nothing to combine, and building it first would be a mechanism
-resting on a control.
+    weak retrieval  ->  this write is a binding           (AUC 0.22)
+    recency         ->  this binding is the rewarded one  (the delay, exactly)
+
+[Note 023](docs/notes/023-two-signals-and-only-one-of-them-is-about-value.md) is
+the argument. A gate that reads both is the obvious next mechanism. The shape is
+already implied: rank admission on weak retrieval **within** the window's reach,
+or equivalently let the window's recency break ties among what the tag marked.
+
+**Blocked on [g9-06](experiments/sweeps/g9-06-is-the-tag-capacity-starved.txt)**,
+which is running. g9-05's capacity axis pinned — every delay chose `slots 8`, the
+top of the grid — so its tag numbers are lower bounds. If a bigger pool produces
+a row that is both flat and positive, the tag stands on its own and the combined
+gate is not the right next thing.
+
+**And it needs the validation lifted.** `tag_slots` and `reward_window` are
+currently mutually exclusive by construction (decision 1 in DECISIONS.md), which
+was right for measuring them apart and is exactly what a combined gate has to
+change. Three lines.
 
 ## GOALS.md stops at g8-01 on the gating line
 

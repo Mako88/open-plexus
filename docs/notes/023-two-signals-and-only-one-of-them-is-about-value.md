@@ -1,8 +1,9 @@
 # 023 — Two signals, and only one of them is about value
 
-**Status:** mechanism built and tested; [g9-05](../../experiments/sweeps/g9-05-a-tag-that-fades.txt)
-pre-registered, not dispatched. The measurements below are a pre-dispatch
-control, not a sweep.
+**Status:** [g9-05](../../experiments/sweeps/g9-05-a-tag-that-fades.txt) RUN,
+32 of 32 cells. The account below was written from a pre-dispatch control and the
+sweep did not overturn it. One axis pinned, so
+[g9-06](../../experiments/sweeps/g9-06-is-the-tag-capacity-starved.txt) is running.
 **Changes:** what [022](022-the-signal-was-there-and-pointing-backwards.md) implied
 the tag would do.
 
@@ -112,6 +113,41 @@ What is not yet known, and what the sweep is for: the tag stores about a quarter
 as much as a window that reaches as far, and retrieval goes as `sqrt(d / N)`. A
 gate that captures a third as often but stores a quarter as much is not obviously
 worse, and no capture count can settle it.
+
+## What the sweep said
+
+The control's account survived contact with 32 trained cells, and the table is
+sharper than the account was.
+
+| slots | fade | d1 | d4 | d8 | d20 | spread |
+|---|---|---:|---:|---:|---:|---:|
+| 8 | 1.0 | -0.19 | -0.21 | -0.22 | -0.18 | 0.04 |
+| 8 | 0.99 | +0.00 | -0.00 | -0.02 | -0.03 | **0.03** |
+| 8 | 0.95 | +0.24 | +0.21 | +0.15 | -0.17 | 0.41 |
+| 8 | 0.9 | +0.24 | +0.23 | +0.16 | -0.22 | 0.46 |
+| window | | +0.23 | +0.23 | +0.23 | -0.24 | 0.47 |
+
+**The rows that are flat are flat at zero. The rows that are positive have the
+window's cliff.** No cell is both, and being both was the entire claim.
+
+Two things in that table were not in the control.
+
+**The tie.** At delays 1 and 4 the tag matches the window while keeping about a
+quarter as much. The control could not settle whether a gate capturing a third as
+often but storing a quarter as much comes out ahead; it comes out level. So the
+storage saving does pay for the lower capture rate, and the two mechanisms reach
+the same recovery **from different signals** — which is the argument for
+combining them rather than choosing.
+
+**The un-faded tag is actively harmful**, -0.18 to -0.22 at every delay and both
+capacities, worse than not gating at all. The control said it captured almost
+nothing; the sweep says capturing the wrong writes costs more than capturing
+none. That is the fade earning its place twice.
+
+**Held back by a pinned axis.** `tools/grid.py` reports every delay choosing
+`slots 8`, the top of the grid, so these are lower bounds. If a larger pool
+produces a row that is both flat and positive, this note is wrong and the tag is
+a mechanism after all. That is g9-06's prediction 2.
 
 ## What would make this note wrong
 

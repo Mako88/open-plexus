@@ -246,3 +246,33 @@ tree restored afterwards. A check nobody has seen fail is not evidence.
 often here — a test asserting a property the quantity does not have. Nothing
 mechanical can. Mutation testing remains the closest substitute and is already in
 place.
+
+## 14. g9-05 landed; dispatched g9-06 rather than concluding
+
+**The result.** The tag's flat rows are flat at zero and its positive rows carry
+the window's cliff. No cell is both, which was the whole claim. Four of six
+predictions held, one partly, one is provisional.
+
+**Chosen: not writing the refutation as final.** `tools/grid.py` reports the
+capacity axis pinned — every delay chose `slots 8`, the top of `[4, 8]` — so
+every tag number is a lower bound. The repo's own rule is that a caveat printed
+beside a number does not attach to the number, so g9-06 is registered and
+dispatched at slots 16, 32, 64.
+
+**Chosen: dropping two fade values from g9-06.** 1.0 is harmful at every capacity
+tested and 0.9 differs from 0.95 by less than the seed spread wherever both are
+positive. That halves the matrix. It is a deliberate narrowing and is stated in
+the sweep file rather than left invisible — a silent cap reads as "we covered
+everything".
+
+**What I would flag for review.** g9-06's prediction 2 is the one that matters:
+if the fade-0.99 mean rises above +0.15 while its spread stays under 0.10, the
+tag is vindicated and g9-05 measured a starved version. I think that unlikely —
+the fade sets reach in steps and capacity should not buy reach — and I have
+written that as the prediction most likely to be wrong, because the reasoning
+assumes the two dials are separable and they may not be.
+
+**The next build is already specified** either way: a gate reading both signals,
+which needs the `tag_slots`/`reward_window` exclusion lifted. Logged in BACKLOG
+rather than started, because starting it before g9-06 returns would be a
+mechanism resting on a bound.

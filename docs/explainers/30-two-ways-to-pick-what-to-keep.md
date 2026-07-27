@@ -73,12 +73,40 @@ It turned out we were fading marks in the wrong direction: instead of letting ol
 marks expire, we were making them permanent. Fixed, fading matters enormously —
 it is the difference between finding the right item 9% of the time and 44%.
 
-## What happens next
+## What the real test said
 
-We have written down what we expect before running the real test, which is the
-rule here: a prediction made after seeing the answer is not a prediction.
+We wrote down what we expected before running it, which is the rule here: a
+prediction made after seeing the answer is not a prediction. Then we ran it
+properly — 32 combinations, each trained from scratch three times.
 
-We expect the mark to lose to a well-set clock, and to beat a badly-set one. If
-that is what comes back, the honest conclusion is that we spent this round
-building the *second* half of a gate whose first half already worked — and the
-next thing to build is the one that uses both.
+The marking method has a dial controlling how fast marks expire. Turn it one way
+and the method becomes indifferent to *when* the important thing happened, which
+is exactly what we wanted. Turn it the other way and it gets good results.
+
+**It will not do both at once.** Set to be indifferent, it scores zero. Set to
+score well, it goes back to caring when things happened — the same weakness as
+the clock, in a softer form. Every setting we tried was one or the other.
+
+Two things surprised us.
+
+**When the gap is short, the two methods tie** — and marking gets there while
+keeping about a quarter as much material. So it is not a worse method. It is an
+equally good one that works off a completely different signal, which is a
+reasonable argument for using both together rather than picking.
+
+**Marks that never expire are worse than no filtering at all.** We expected them
+to be useless. They are actively harmful: keeping the wrong things costs more
+than keeping everything. That is a genuinely useful thing to learn, and it came
+from a setting we only included as a control.
+
+## One thing we got wrong about our own test
+
+We only tried budgets of 4 and 8, and 8 won every time — which means we never
+found the right number, only that it is at least 8. Everything above is really a
+statement about a *starved* version of the method. A follow-up at 16, 32 and 64
+is running now, and if a bigger budget makes it both good and indifferent at the
+same time, the conclusion above is wrong and we will say so.
+
+That is not us hedging. A number at the edge of what you tried is a lower bound,
+not an answer, and treating it as an answer is one of the specific ways this
+project has been wrong before.

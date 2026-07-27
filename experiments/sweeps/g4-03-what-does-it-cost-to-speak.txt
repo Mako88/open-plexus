@@ -2,7 +2,14 @@ G4 — does the traffic fit a home connection?
 ============================================
 
 Script: experiments/g4_03_bandwidth.py
-Status: RUN. **Prediction 3 REFUTED, and badly.** Silence is not graceful:
+Status: RUN, twice. **G4 PASSES** -- but not via the escape it was built to
+        test. Predictions 3, 4 and 6 all chased "speak less often" and all
+        three were refuted; it did not matter, because a TOKEN vote is 12
+        bytes at any vocabulary against 400,008 for a distribution, so a
+        node can speak every step and use a thousandth of a home uplink.
+        Voting is free at eight nodes (0.658 against 0.658). ONE SEED.
+
+        Previously: **Prediction 3 REFUTED, and badly.** Silence is not graceful:
         halving the speaking rate costs 0.31 agreement immediately. 1 and 2
         held. The refutation identifies the fix, and the fix is a protocol
         change rather than a tuning: a node with its own complete readout
@@ -242,3 +249,75 @@ argmaxes are highly correlated, a vote carries little more information than one
 node, and losing voters costs as much as losing terms. That would mean the
 partition is not producing independent opinions, which is a finding about the
 decomposition rather than about the protocol.
+
+
+THE FIX, MEASURED -- G4 PASSES, AND NOT FOR THE REASON PREDICTED
+=================================================================
+Two invalid attempts preceded this one and both are recorded above and in
+experiments/g4_04_token_votes.py. The valid measurement trains with
+`partitions = nodes`, so each node's readout has learned to answer alone, and
+refuses to report anything if the single-process reference is at or below the
+trivial floor.
+
+Accuracy, seq_len 192, width 128, one seed. Trivial floor 0.344.
+
+    nodes  one process      1.0      0.5     0.25    0.125     combine
+        2        0.892    0.854    0.892    0.892    0.892     vote
+        4        0.754    0.700    0.571    0.675    0.675     vote
+        8        0.658    0.658    0.542    0.317    0.433     vote
+
+        2                 0.892    0.892    0.892    0.892     sum
+        4                 0.754    0.733    0.675    0.675     sum
+        8                 0.658    0.617    0.579    0.433     sum
+
+5. **Voting costs accuracy at full speaking rate -- HELD, and less than
+   guessed.** 0.854 against 0.892 at two nodes and 0.700 against 0.754 at four,
+   so about 0.04-0.05. **At eight nodes it costs nothing at all: 0.658 against
+   0.658.** The guess was 0.85-0.98 agreement; the cost is real at small node
+   counts and vanishes at eight.
+
+6. **Voting degrades more gracefully than summing -- REFUTED.** It does not. At
+   eight nodes and half rate, summing gives 0.617 and voting 0.542; at quarter
+   rate, 0.579 against 0.317. **Summing is the more graceful of the two**, which
+   is the opposite of the argument that motivated building the vote at all.
+
+   Named in advance as most likely wrong, and as the favourable direction. Three
+   predictions in this file have now died in that direction.
+
+7. **More nodes helps voting -- REFUTED.** Accuracy falls with node count, 0.854
+   to 0.658. It falls for the single-process model too (0.892 to 0.658), because
+   more partitions means narrower groups, so relative to the reference voting is
+   roughly flat rather than improving. More voters does not buy accuracy here.
+
+8. **Outbound drops to 12 bytes per speaking node per step -- HELD**, at any
+   vocabulary.
+
+WHY G4 PASSES ANYWAY
+----------------------
+**The bandwidth problem was the SIZE of a vote, not its frequency.**
+
+    a distribution, vocab 50,000    400,008 bytes    3 steps/s on 10 Mbit/s
+    a token, any vocabulary              12 bytes    ~104,000 steps/s
+
+Predictions 3, 4 and 6 all chased the same escape -- speak less often -- and all
+three were refuted. It did not matter: **at twelve bytes a node can speak every
+single step and still use a thousandth of a home uplink.** The question the sweep
+was built around turned out not to need answering.
+
+That is the result, and it is worth separating from the reasoning that reached
+it. The reasoning was wrong three times. The arithmetic that ended up mattering
+was the one prediction nobody had to test.
+
+WHAT IS STILL OWED
+--------------------
+**One seed, and the numbers are visibly noisy** -- 0.317 at quarter rate against
+0.433 at eighth rate is not a monotone curve, and nothing here has error bars.
+The headline (voting is free at eight nodes, 12 bytes at any vocabulary) rests on
+a single run and should be repeated before it goes into GOALS.
+
+**Training traffic is still unmeasured**, and the ladder still has no gate for
+it. Everything here is inference.
+
+**The accuracy cost at small node counts is real** -- 0.04 to 0.05 at two and
+four nodes -- and unexplained. It vanishing at eight is the sort of
+non-monotonicity that usually means something else is moving.

@@ -41,7 +41,18 @@ from openplexus.tasks.mqar import MqarConfig, dataset  # noqa: E402
 
 TASK = MqarConfig(n_pairs=4, seq_len=192, n_keys=32, n_values=8,
                   autoregressive=True, filler="random", seed=20260726)
-WIDTH, N_TRAIN, N_TEST, EPOCHS, LR = 32, 300, 60, 6, 0.05
+# 128 wide so that eight partitions still leave 16 dimensions each. g5-04 put
+# the per-node width floor near 20-24 at seq 384; four dimensions, which
+# d_model 32 over eight nodes gives, is nowhere near it.
+WIDTH, N_TRAIN, N_TEST, EPOCHS, LR = 128, 300, 60, 6, 0.05
+
+#: Decay as a HALF-LIFE fraction of the sequence, never an absolute rate. A flat
+#: 0.9 halves the store every seven steps, which is fine over the forty-step
+#: sequences in the distributed tests and erases everything over 192. That is the
+#: mistake this file was first written with, and g7-04 exists because the same
+#: one cost a whole sweep.
+HALF_LIFE = 0.25
+DECAY = float(0.5 ** (1.0 / (HALF_LIFE * TASK.seq_len)))
 NODE_COUNTS = (2, 4, 8)
 RATES = (1.0, 0.5, 0.25, 0.125)
 #: Guessing among values, the floor every number here sits against.
@@ -63,7 +74,7 @@ def trained(partitions: int, seed: int = 1) -> LocalAssociativeMemory:
     """A model whose every partition has learned to answer on its own."""
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=TASK.vocab_size, d_model=WIDTH, lr=LR, key_scale=0.5,
-        decay=0.9, derived_keys=True, partitions=partitions, seed=seed))
+        decay=DECAY, derived_keys=True, partitions=partitions, seed=seed))
     rng = np.random.default_rng(seed)
     train_set = build(N_TRAIN, seed)
     order = np.arange(len(train_set))
@@ -95,6 +106,15 @@ def main() -> int:
     for nodes in NODE_COUNTS:
         model = trained(partitions=nodes)
         alone = accuracy(lambda t: model.run(t), test_set)
+        if alone <= TRIVIAL_FLOOR:
+            # REFUSE. A distributed answer is measured against this one, so if
+            # this has not learned the task there is nothing to be distributed
+            # and every number below would be noise about noise. Three
+            # measurements in this line were invalid before this check existed.
+            print(f"{nodes:>6}{alone:>13.3f}   REFUSING: the single-process "
+                  f"model is at or below the trivial floor, so nothing "
+                  f"distributed from it can mean anything")
+            continue
         row = [f"{nodes:>6}{alone:>13.3f}"]
         for rate in RATES:
             with Network(model.config, nodes, model.wv, model.wo,

@@ -182,7 +182,7 @@ and no gate is passed on a single run** (rule 3).
 | **G1 — does it learn** ✅ **PASSED** | Does a purely local objective beat the random substrate on that task? | The margin is null across seeds. The central bet is wrong. |
 | **G2 — asynchrony** ✅ **PASSED** | Does the margin survive realistic delay, jitter and reordering, up to a stated bound? | The margin vanishes below the bound the internet actually imposes. |
 | **G3 — churn** ✅ **PASSED** | Does the margin survive nodes leaving mid-run and rejoining? | Losing a node degrades the whole rather than a part, or recovery costs more than the node was worth. |
-| **G4 — bandwidth** | Does the required cross-machine traffic fit consumer broadband? | The traffic needed for the margin exceeds what a home connection carries. |
+| **G4 — bandwidth** ⚠️ **PASSES ON ONE SEED** | Does the required cross-machine traffic fit consumer broadband? | The traffic needed for the margin exceeds what a home connection carries. |
 | **G5 — scale** | Does the margin hold or grow as the network grows? | The margin shrinks with scale. Then it is a small-model curiosity, not a route to either goal. |
 
 **G0 is first for a reason, and it is the correction of the predecessor's single
@@ -692,8 +692,36 @@ joined**, so G3 measured the worst case and reality is strictly milder — which
 not obvious, since a network might reasonably have come to depend on a machine it
 then loses.
 
-G4 (bandwidth) remains — but G4's central assumption is no longer
-an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the
+> **G4 HAS AN ANSWER, ON ONE SEED, AND IT TURNS ON THE SIZE OF A MESSAGE.**
+> [g4-03](experiments/sweeps/g4-03-what-does-it-cost-to-speak.txt) measured both
+> directions for the first time. Inbound is **9 bytes** per node per step at any
+> width and any vocabulary. Outbound was never counted, and a vote is one float64
+> per token: **400,008 bytes** at a vocabulary of 50,000, which is *three steps
+> per second* on a 10 Mbit/s uplink. As built, G4 failed by three orders of
+> magnitude.
+>
+> The fix is a **token vote**. Each node carries its own complete readout —
+> `partitions`, which g4-01 measured as costing nothing at adequate width — so
+> its answer is a whole answer, and a whole answer is a token id. **12 bytes, at
+> any vocabulary**, and at eight nodes it costs no accuracy at all: 0.658 against
+> the single-process 0.658.
+>
+> It also changes what pooling *means*. Summing partial contributions needs
+> everyone; combining whole answers is a vote, and a vote tolerates absence by
+> construction — which is what C3 wants.
+>
+> **Three predictions died to get here**, all chasing "nodes could speak less
+> often", all in the favourable direction. None of it mattered: at twelve bytes a
+> node can speak every step and use a thousandth of a home uplink. The escape
+> route was never needed.
+>
+> **One seed, no error bars, and visibly noisy** — 0.317 at quarter rate against
+> 0.433 at eighth rate is not a monotone curve. This is a gate that *appears*
+> passed rather than one that has been passed by this project's own standard,
+> which is why it is marked as such and not simply ticked. Training traffic
+> remains unmeasured and the ladder still has no gate for it.
+
+G4's central assumption is no longer an assumption. [g4-01](experiments/sweeps/g4-01-no-global-readout.txt) removed the
 global readout, which [note 009](docs/notes/009-splitting-the-memory.md) §4 had
 identified as the largest untested claim in the project and as a standing C1
 violation hiding inside a benchmark convenience. **At adequate width it costs

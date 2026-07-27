@@ -160,7 +160,37 @@ It also explains the one case where the product failed: comparing `combined`
 against `reward` in g9-11, `kept` differs BETWEEN the arms, so the constant does
 not cancel and the product stops being a monotone function of recall.
 
-## This is being measured
+## MEASURED: it cost nothing, and this note's headline was too strong
+
+[g9-12](../../experiments/sweeps/g9-12-what-does-the-frozen-learning-rate-cost.txt)
+ran the rate at node widths 64, 32, 16 and 8. **The largest recovery left on the
+table by holding 0.05, that beats its own noise floor, is +0.00.** The raw
+largest is +0.03. The floor arm moves by at most 0.072, so g8-01's factor of
+three does not reproduce at this configuration.
+
+The ORDERING question this note answered with an argument now has a measurement,
+and the argument holds — with a wrinkle worth keeping. The raw ordering changes
+at every node width. Every swap is between arms within the seed spread of each
+other, so it is a tie broken three ways. **Both the reassurance and the naive
+check that would have contradicted it are therefore correct about different
+things**, and the difference is entirely whether the noise floor is applied.
+
+So this note was right that the rate was unexamined and wrong about what that was
+worth. Stated plainly because the warning was stated plainly.
+
+## AND THE REAL PROBLEM TURNED OUT TO BE SEEDS
+
+g9-12 is the first sweep in this line to print the seed spread in recovery units:
+**0.29, 0.18, 0.15 and 0.12** at node 64, 32, 16 and 8. At node 64 the tag's
+entire effect is 0.23, so the sweep could not have detected a rate effect smaller
+than the whole mechanism.
+
+Every sweep from g9-05 to g9-12 used three seeds. **Any difference in this line
+smaller than about 0.15 was never distinguishable from zero**, and that is a
+larger and more general problem than the one this note was written about. It is
+BACKLOG item 0b.
+
+## What this note asked for, kept for the reasoning
 
 [g9-12](../../experiments/sweeps/g9-12-what-does-the-frozen-learning-rate-cost.txt)
 sweeps the rate at node widths 64, 32, 16 and 8, at delay 8, and asks the three

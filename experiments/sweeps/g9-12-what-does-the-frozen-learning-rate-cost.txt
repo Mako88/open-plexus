@@ -2,7 +2,107 @@ What does the frozen learning rate cost?
 ========================================
 
 Script: experiments/g9_05_the_tag.py, with --lr OMITTED so the script sweeps it
-Status: PRE-REGISTERED.
+Status: RUN. 4 of 4 jobs, 54 cells each, no refusals.
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30251816417
+
+ANSWER: NOTHING. The frozen constant cost nothing detectable, at any node width.
+        Four predictions, none confirmed, and the negative result is the useful
+        one -- but read the POWER section, because the bound is loose.
+
+THE RESULT
+-----------
+    tag         lr .02   lr .05   lr .1     best
+    node 64      0.18     0.23     0.26     tied
+    node 32      0.22     0.25     0.27     tied
+    node 16      0.21     0.19     0.22     tied
+    node  8      0.16     0.15     0.14     tied
+
+    tag-strongest
+    node 64     -0.51    -0.43    -0.39
+    node 32     -0.10    -0.08    -0.02
+    node 16      0.02     0.03     0.05
+    node  8      0.05     0.06     0.05
+
+    floor arm (`none`)          oracle
+    node 64   0.635..0.658      1.000
+    node 32   0.374..0.442      1.000
+    node 16   0.218..0.290      1.000
+    node  8   0.148..0.182      0.984..0.999
+
+"tied" is not a formatting choice. Every apparent lead is inside the seed spread
+expressed in recovery units, so naming a winner would be publishing noise.
+
+PREDICTIONS, SCORED -- NONE CONFIRMED
+--------------------------------------
+1. **REFUTED.** Predicted the best rate differs by node width, falling as the
+   node narrows. Every width is TIED: leads of +0.03, +0.02, +0.03, +0.01
+   against noise floors of 0.29, 0.18, 0.15, 0.12. The direction was flagged as
+   the guess most likely to be backwards; it was not backwards, it was absent.
+
+2. **REFUTED, and this is the one that mattered.** Predicted recovery at the
+   best rate would differ from its value at 0.05 by more than 0.05 somewhere.
+   The largest cost anywhere is +0.03 and the largest that beats its own noise
+   floor is **+0.00**. Note 028's concern is real in principle and **negligible
+   in practice**, and that deserves saying as plainly as the warning was said.
+
+3. **REFUTED LITERALLY, CONFIRMED IN SUBSTANCE, and the distinction is the
+   point.** Predicted the arm ordering is unchanged at every rate. The raw
+   ordering changes at EVERY node width. But every swap is between arms sitting
+   within the seed spread of each other -- `reward`, `tag` and `combined` are
+   within 0.01-0.03 of one another throughout -- so it is one tie broken three
+   ways, not a reordering. Note 028's reassurance survives; the naive version of
+   the check would have reported it broken at all four widths.
+
+4. **REFUTED.** Predicted the floor arm moves by more than 0.15 across rates
+   somewhere, reproducing g8-01. Largest movement is **0.072** at node 16.
+   g8-01's factor of three does not reproduce at this configuration, which is a
+   different task, delay and sequence length -- so that finding is narrower than
+   the general warning built on it.
+
+POWER: WHAT THIS CAN AND CANNOT RULE OUT
+------------------------------------------
+**The noise floors are large and the bound is correspondingly loose.** A seed
+spread of 0.29 recovery units at node 64 is not a detail: the tag's ENTIRE effect
+there is 0.23, so this sweep could not have detected a rate effect smaller than
+the whole mechanism.
+
+    node 64   noise 0.29   the bound is nearly vacuous
+    node 32   noise 0.18
+    node 16   noise 0.15
+    node  8   noise 0.12   the tightest, and still half the tag's effect
+
+So the honest claim is **"no rate effect larger than the seed spread"**, not "no
+rate effect". Three seeds is what every sweep in this line uses, and this is the
+first time the cost of that choice has been visible as a number.
+
+**The raw best rate sits at a grid EDGE at three of four widths** (0.1, 0.1, 0.1,
+then 0.02). Under ties that means nothing, but it means the grid would not have
+bounded an effect if there had been one -- so a future run that wants a tight
+bound needs both more seeds and a wider rate range, and more seeds first.
+
+WHAT WOULD REFUTE WHAT, SCORED
+--------------------------------
+- best rate varies and recovery moves  -> NOT OBSERVED
+- best rate varies, recovery does not  -> NOT OBSERVED
+- 0.05 is best everywhere              -> NOT OBSERVED either: 0.05 is not best
+                                          anywhere, it is merely never worse by
+                                          more than noise
+- the arm ORDERING changes with rate   -> observed RAW, and shown to be ties
+
+WHAT IT COST AND WHAT IT BOUGHT
+---------------------------------
+Four jobs. It retires the largest standing methodological worry in the project --
+seven sweeps of numbers taken at one unexamined rate -- and replaces it with a
+smaller and better-specified one: **three seeds is not enough to bound a small
+effect, anywhere in this line.**
+
+AN OBSERVATION NOBODY ASKED FOR
+---------------------------------
+`tag-strongest` runs -0.51, -0.10, +0.02, +0.05 as the node narrows from 64 to 8.
+The inverted signal's direction is worth nothing at a wide node and turns
+positive at a narrow one, which is the third setting showing that shape (g9-08,
+g9-09, and now here). It is the clearest statement of it so far because node
+width is the only axis moving. One grid, three seeds, so an observation.
 
 
 IN PLAIN TERMS

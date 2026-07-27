@@ -16,8 +16,20 @@ looking for work should start here.
 
 **OPEN, in order of what would change the most:**
 
-0. **THE LEARNING RATE WAS FROZEN FOR SEVEN SWEEPS — g9-12 IS MEASURING IT.**
-   [Run 30251816417](https://github.com/Mako88/open-plexus/actions/runs/30251816417).
+0. **ANSWERED: THE FROZEN LEARNING RATE COST NOTHING DETECTABLE.**
+   [g9-12](experiments/sweeps/g9-12-what-does-the-frozen-learning-rate-cost.txt)
+   ran, 4 of 4, no refusals. **None of its four predictions was confirmed**, and
+   the negative result is the useful one: the largest recovery left on the table
+   by holding 0.05 that beats its own noise floor is **+0.00**, at any node
+   width. The floor arm moves by at most 0.072, so g8-01's factor of three does
+   not reproduce here either.
+
+   The arm ORDERING changes at every width in raw terms and every swap is
+   between arms within the seed spread of each other — a tie broken three ways,
+   not a reordering. Note 028's reassurance survives, and the naive version of
+   that check would have reported it broken four times.
+
+   **REPLACED BY A SMALLER AND BETTER-SPECIFIED WORRY — see item 0b.**
    [Note 028](docs/notes/028-the-learning-rate-has-been-frozen-for-seven-sweeps.md).
    `lr 0.05` is pinned in g9-05 through g9-11, chosen for g9-03's configuration
    at `d_model` 32 in one process, and carried through every change of width,
@@ -65,6 +77,31 @@ looking for work should start here.
      *the fade is a reach dial* survives, with its calibration mildly conditional
      on 0.997. The warning was published from an argument and corrected by
      measurement the same cycle.
+
+0b. **THREE SEEDS IS NOT ENOUGH TO BOUND A SMALL EFFECT, ANYWHERE IN THIS
+   LINE.** g9-12 is the first sweep to print the seed spread in recovery units
+   and it is large:
+
+       node 64   0.29        the tag's ENTIRE effect there is 0.23
+       node 32   0.18
+       node 16   0.15
+       node  8   0.12        the tightest, and still half the tag's effect
+
+   So g9-12's answer is honestly *"no rate effect larger than the seed spread"*,
+   not *"no rate effect"* — and the same bound applies to every comparison in
+   g9-05 through g9-12, all of which used three seeds. **Any published
+   difference in this line smaller than about 0.15 is inside the noise and was
+   never distinguishable from zero.**
+
+   Two of the tag's live claims sit near that boundary and should be re-read
+   with it in mind: the +0.16 flat row (g9-06) and the tag-versus-matched-window
+   gap of 0.07.
+
+   The fix is seeds, and seeds are the cheapest axis there is — they parallelise
+   perfectly and add no cells to reason about. **Before any further mechanism
+   sweep**, re-run one settled grid at 12 seeds and see which of its differences
+   survive. That is a better use of a matrix than a new mechanism measured to the
+   same tolerance.
 
 1. **A decision only John can take: fix `reward_recall`, and how?**
    [Note 027](docs/notes/027-the-task-leaks-the-answer-through-its-layout.md).

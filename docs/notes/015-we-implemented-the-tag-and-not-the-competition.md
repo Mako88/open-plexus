@@ -1,5 +1,31 @@
 # Note 015 — We implemented the tag and not the competition
 
+> ## REFUTED, and the flaw is in the argument rather than the build
+>
+> [g8-03](../../experiments/sweeps/g8-03-a-pool-you-have-to-win.txt), re-run at
+> the half-life where the decline actually lives, found **every curve still
+> falls**: unbounded 0.05 → −0.00, a pool of four 0.02 → −0.01, a pool of
+> sixteen 0.05 → −0.01. Bounding `N` flattened nothing.
+>
+> The pool binds — the unit tests pin that a pool larger than the demand
+> reproduces unbounded consolidation exactly while a small one does not — so this
+> refutes the reasoning below, not the implementation.
+>
+> **The reasoning confuses two stores.** The oracle is `run(store=mask)`: it
+> gates the **fast store**, so `memory` holds `2 * n_pairs` bindings whatever the
+> sequence length. That is where its `N` is constant and that is its entire
+> advantage. Competitive capture bounds the **lasting store**, and leaves the
+> fast store accumulating one binding per step exactly as before. Capping the
+> lasting store cannot reproduce a mechanism that gates the fast one.
+>
+> The arithmetic below is correct. It is about the wrong `N`.
+>
+> What it buys is the first clear statement of what the oracle does — *gating
+> admission to the fast store* — which no mechanism tried so far has attempted.
+> All six operate on the lasting store or on what is promoted out of the fast
+> one. See the end of g8-03 for what that implies.
+
+
 [Note 010](010-tagging-and-capture.md) read Lehr et al. 2022 and took the shape of
 synaptic tagging and capture: **tag now, cheaply; let a later signal decide what
 survives.** That is what `consolidation` implements, and

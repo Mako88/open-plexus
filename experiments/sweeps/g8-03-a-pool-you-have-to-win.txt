@@ -2,8 +2,13 @@ Does a finite pool hold N constant, and does that recover anything?
 ==================================================================
 
 Script: experiments/g8_03_capture.py
-Status: RUN on Actions, 12/12 cells. **PREDICTION 1 IS UNTESTABLE IN THIS
-        GRID, because of a design error in the grid.** Half-life was pinned
+Status: RUN TWICE. The re-run at half-life 0.125 REFUTES prediction 1 and,
+        with it, note 015's argument: bounding the lasting store cannot
+        reproduce a mechanism that gates the FAST one. Details at the end.
+        The first run, below, could not test its own hypothesis.
+
+        First run: **PREDICTION 1 UNTESTABLE IN THIS GRID, because of a
+        design error in the grid.** Half-life was pinned
         at 0.25 -- the value at which g8-01's recovery was ALREADY FLAT. The
         decline the whole sweep was built to explain lives at half-life
         0.125. There was no slope to flatten, so the central comparison had
@@ -282,3 +287,91 @@ present by construction.
 Recording the order: this correction was identified from the returned data, not
 predicted. The prediction that failed was mine about the grid, not about the
 mechanism.
+
+
+RE-RUN AT HALF-LIFE 0.125 -- PREDICTION 1 REFUTED, AND NOTE 015 IS WRONG
+=========================================================================
+Same arms, same lengths, one changed constant. The contrast prediction 1 needed
+is present this time: capture-0 reproduces g8-01's decline exactly.
+
+        pool      192      384      768     1536    slope
+   capture-0     0.05     0.04    -0.00undefined      n/a
+   capture-4     0.02     0.01    -0.01undefined      n/a
+  capture-16     0.05     0.04    -0.01undefined      n/a
+
+(1536 is undefined for every pool because its floor arm is below the trivial
+floor -- the summariser now refuses those cells rather than preferring them.)
+
+**Every curve falls.** The unbounded arm falls 0.05 to -0.00, which is the
+decline note 015 set out to explain. The bounded pools fall too: 0.02 to -0.01
+and 0.05 to -0.01. Holding `N` constant did not flatten anything.
+
+THE PRE-REGISTERED CHECK, WHICH IS WHY THIS IS A REFUTATION AND NOT A MYSTERY
+------------------------------------------------------------------------------
+The refutation table said: *"both curves fall together -> the pool is not holding
+N constant, which given the unit tests would mean the sweep is misconfigured
+rather than the idea refuted. Check before believing."*
+
+Checked. The pool **is** binding: capture-4 differs from capture-0 at every
+length (0.02 against 0.05 at seq 192), and `tests/test_competitive_capture.py`
+pins that a pool larger than the demand reproduces unbounded consolidation
+*exactly* while a small one does not. The mechanism does what it says.
+
+So this is the other pre-registered branch: **N-constancy is not sufficient.**
+
+WHY -- AND THE ARGUMENT HAS A HOLE IN IT
+------------------------------------------
+Note 015 reasoned: retrieval goes as `sqrt(d / N)`, the oracle wins by holding
+`N` constant, a threshold lets `N` grow with length, so bound `N` and the
+length-dependence goes away.
+
+**It confused two different stores.**
+
+The oracle is `run(store=mask)`. It gates the **fast store** -- filler is never
+written into `memory` at all, so the fast store holds `2 * n_pairs` bindings
+whatever the sequence length. That is where its `N` is held constant, and that is
+the whole of its advantage.
+
+Competitive capture bounds the **lasting store**. It has no effect on the fast
+store, which still accumulates one binding per step regardless. So `N_fast` grows
+with sequence length exactly as before, retrieval degrades exactly as before, and
+a bounded lasting store is a small additive term on top of a memory that is
+already saturating.
+
+**Capping the lasting store cannot reproduce a mechanism that gates the fast
+one.** The arithmetic in note 015 is correct and is about the wrong `N`.
+
+THE PREDICTIONS
+----------------
+1. **Bounded pools stay flat while k=0 falls -- REFUTED.** All three fall, and by
+   similar amounts. The pool binds, so this is a refutation of the argument
+   rather than of the implementation.
+
+2. **Recovery under 0.25 everywhere -- HELD.** Maximum 0.05.
+
+3. **An interior optimum in k -- REFUTED, and informatively.** capture-16 tracks
+   capture-0 almost exactly (0.05/0.04/-0.01 against 0.05/0.04/-0.00) while
+   capture-4 is *worse* than both (0.02/0.01/-0.01). A larger pool behaves like
+   no pool; a smaller one discards useful bindings. Monotone in the unhelpful
+   direction, with no interior optimum.
+
+4. **Control: the oracle beats none by more than the seed spread -- HELD** at
+   192, 384 and 768; undefined at 1536 for the floor reason above.
+
+WHAT THIS COSTS AND WHAT IT BUYS
+----------------------------------
+Costs: competitive capture is a sixth failed mechanism, and note 015's central
+argument is withdrawn.
+
+Buys: **the first clear statement of what the oracle actually does.** It is not
+"selective consolidation". It is *gating admission to the fast store*, and no
+mechanism tried so far has attempted that -- every one of the six operates on the
+lasting store or on what gets promoted out of the fast one.
+
+That reframes what to try next. A gate that could work has to decide, at write
+time, whether a binding enters `memory` at all. `run(store=...)` already has that
+shape; the open problem has always been what fills the mask, and note 016 argues
+the signal has to come from outside the statistics of the stream. The
+reward-recall task exists to supply exactly that, and
+[g9-02](g9-02-a-gate-that-reads-its-own-input.txt) is pre-registered to test it
+**as a fast-store gate**, which is now the only version worth testing.

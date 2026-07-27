@@ -32,6 +32,7 @@ INDUCTION = ROOT / "openplexus" / "models" / "induction.py"
 ATTENTION = ROOT / "openplexus" / "models" / "attention.py"
 LOCAL = ROOT / "openplexus" / "models" / "local_memory.py"
 DISTRIBUTED = ROOT / "openplexus" / "distributed.py"
+KEYS = ROOT / "openplexus" / "keys.py"
 SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 # Experiment code is not usually mutated -- experiments are read once and
 # discarded. This one is, because its generator returned a wrong SET rather
@@ -595,31 +596,49 @@ MUTATIONS = [
         new="                np.random.default_rng((config.seed, 0)).normal(0.0, spread, d)",
     ),
     Mutation(
+        name="the-table-source-takes-a-COPY-of-the-key-table",
+        breaks="churn, partitions and ablation all at once -- they work by "
+               "editing `Wk` in place, and a key source reading a stale copy "
+               "would keep answering with dimensions their node took away",
+        path=KEYS,
+        old="        self.table = table",
+        new="        self.table = np.array(table)",
+    ),
+    Mutation(
+        name="the-key-seam-ignores-what-was-plugged-into-it",
+        breaks="the whole point of the seam -- a replacement key source would "
+               "be accepted and silently unused, so an experiment would report "
+               "the stock scheme's numbers under a new scheme's name",
+        path=LOCAL,
+        old="            key = self.key_source.key(tokens, t)",
+        new="            key = self.wk[token]",
+    ),
+    Mutation(
         name="context-keys-ignore-the-CONTEXT",
         breaks="the whole point -- the pair key would depend only on the current "
                "token, which is a bigram wearing a trigram's name and would "
                "report the ceiling as lifted when nothing changed",
-        path=LOCAL,
-        old="                (self.config.seed, previous, token)).normal(",
-        new="                (self.config.seed, token)).normal(",
+        path=KEYS,
+        old="                (self.seed, previous, token)).normal(",
+        new="                (self.seed, token)).normal(",
     ),
     Mutation(
         name="context-keys-forget-the-ORDER",
         breaks="the distinction between `(a, b)` and `(b, a)` -- two different "
                "contexts would collide, so half the trigram table would be "
                "written on top of the other half",
-        path=LOCAL,
-        old="                (self.config.seed, previous, token)).normal(",
-        new="                (self.config.seed, min(previous, token), max(previous, token))).normal(",
+        path=KEYS,
+        old="                (self.seed, previous, token)).normal(",
+        new="                (self.seed, min(previous, token), max(previous, token))).normal(",
     ),
     Mutation(
         name="the-context-key-queries-the-WRONG-pair",
         breaks="the alignment between what is written and what is read -- the "
                "query would be one step behind the store, so every retrieval "
                "would answer a question nobody asked",
-        path=LOCAL,
-        old="                    int(tokens[t - 1]) if t else self.config.vocab_size,\n                    int(token))",
-        new="                    int(tokens[t - 2]) if t > 1 else self.config.vocab_size,\n                    int(token))",
+        path=KEYS,
+        old="        return self.pair(int(tokens[t - 1]) if t else self.start,",
+        new="        return self.pair(int(tokens[t - 2]) if t > 1 else self.start,",
     ),
     Mutation(
         name="consolidation-ignores-confirmation",

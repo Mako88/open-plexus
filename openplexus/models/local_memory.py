@@ -58,6 +58,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from openplexus.keys import KeySource, PairKeys, TableKeys
+
 
 def surprise(scores: np.ndarray, token: int) -> float:
     """How unexpected `token` was, given the scores predicted before it arrived.
@@ -749,11 +751,17 @@ class LocalAssociativeMemory:
                 for token in range(v)])
         else:
             self.wk = rng.normal(0.0, spread, (v, d))
-        # Pair keys are derived on demand and cached, never tabulated: the table
-        # is vocab^2 rows, and not needing to hold it is the same argument that
-        # `derived_keys` rests on.
-        self._pair_spread = spread
-        self._pair_keys: dict[tuple[int, int], np.ndarray] = {}
+        # WHERE A KEY COMES FROM IS A REPLACEABLE COMPONENT.
+        #
+        # `openplexus/keys.py` holds the seam and says why. Assign a different
+        # `KeySource` after construction and `run` uses it -- no config flag, no
+        # branch here, no edit to any experiment script. That is the point:
+        # keys have been varied twice already and each variation cost a flag
+        # threaded through the whole tree, which is the tax that stops a third
+        # idea being tried.
+        self.key_source: KeySource = (
+            PairKeys(config.seed, spread, d, config.vocab_size)
+            if config.context_keys else TableKeys(self.wk))
         self.wv = rng.normal(0.0, spread, (v, d))
         self.wo = np.zeros((v, d))
         # A constant term on the readout, off by default.
@@ -840,13 +848,7 @@ class LocalAssociativeMemory:
                 "context_key is only meaningful with context_keys set; without "
                 "it the model binds single tokens and this vector is in no key "
                 "space the store uses")
-        cached = self._pair_keys.get((previous, token))
-        if cached is None:
-            cached = np.random.default_rng(
-                (self.config.seed, previous, token)).normal(
-                    0.0, self._pair_spread, self.config.d_model)
-            self._pair_keys[(previous, token)] = cached
-        return cached
+        return self.key_source.pair(previous, token)
 
     def surviving_width(self) -> int:
         """How many dimensions still carry signal.
@@ -1030,16 +1032,11 @@ class LocalAssociativeMemory:
                     alive[node * per_group:(node + 1) * per_group] = 0.0
                 memory *= alive[:, None]
 
-            # One line is the whole architectural change. `previous_key` below is
-            # simply this key one step back, so binding on a pair makes the
-            # store a trigram table without touching the write, the retrieval or
-            # the readout.
-            if self.config.context_keys:
-                key = self.context_key(
-                    int(tokens[t - 1]) if t else self.config.vocab_size,
-                    int(token))
-            else:
-                key = self.wk[token]
+            # The single point where a key enters the model. `previous_key`
+            # below is simply this key one step back, so a key source that binds
+            # a pair makes the store a trigram table without touching the write,
+            # the retrieval or the readout.
+            key = self.key_source.key(tokens, t)
             value = self.wv[token] * alive
 
             # STORE: bind the previous token to this one. Doing this before the

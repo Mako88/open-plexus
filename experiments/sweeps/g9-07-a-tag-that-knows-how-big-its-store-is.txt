@@ -2,8 +2,96 @@ Does normalising the signal give a row that is both flat and positive?
 ======================================================================
 
 Script: experiments/g9_05_the_tag.py --mode relative
-Status: PRE-REGISTERED. Predictions written after a pre-dispatch control, which
-        is disclosed below, and before any sweep.
+Status: RUN. 36 of 36 cells, no refusals, BOTH swept axes clean by tools/grid.py.
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30241433898
+
+ANSWER: normalising buys a lot at a small pool and nothing at a large one --
+        +0.09 at slots 8, +0.06 at 16, +0.01 at 32. The same shape as the
+        signal's direction. It does NOT rescue an un-faded tag, so note 023's
+        reach argument survives.
+
+
+THE RESULT
+-----------
+Recovery, tag arm, `--mode relative`. The absolute figures are g9-05's and
+g9-06's at identical settings.
+
+    slots fade      d1      d8     d20        absolute d1/d8/d20
+        8  1.0   -0.13   -0.14   -0.14        -0.19 / -0.22 / -0.18
+        8 0.99   +0.09   +0.06   +0.01        +0.00 / -0.02 / -0.03
+        8 0.95   +0.24   +0.15   -0.18        +0.24 / +0.15 / -0.17
+       16  1.0   -0.06   -0.08   -0.05
+       16 0.99   +0.17   +0.14   +0.09        +0.11 / +0.09 / +0.09
+       16 0.95   +0.21   +0.20   +0.03        +0.21 / +0.19 / +0.03
+       32  1.0   -0.00   -0.01   -0.00
+       32 0.99   +0.17   +0.17   +0.16        +0.16 / +0.16 / +0.13
+       32 0.95   +0.15   +0.17   +0.16        +0.16 / +0.17 / +0.16
+       32  0.9   +0.15   +0.17   +0.17
+     window     +0.23   +0.23   -0.24
+
+**What normalising is worth, by capacity, at fade 0.99:**
+
+    slots 8    +0.09  +0.08  +0.04
+    slots 16   +0.06  +0.05  +0.00
+    slots 32   +0.01  +0.01  +0.03
+
+It makes an 8-slot pool WORK where the absolute version sat at zero, and it does
+essentially nothing at 32 where the tag already works. That is the third time
+this line has produced the same shape: **every improvement to the SIGNAL pays
+only when the pool is starved.** g9-06 found it for the ranking's direction
+(+0.222 at slots 16 fade 0.99, +0.003 at the working point); this is the same
+curve for the ranking's units.
+
+That is not a disappointment. It is the tiny-node result: the things that look
+like decoration at a comfortable capacity are exactly what make a small pool
+viable, and a small pool is the only kind this project can deploy.
+
+**And at fade 1.0 it is transformative without being enough.** -0.19/-0.22/-0.18
+becomes -0.00/-0.01/-0.00 at slots 32: the cold-start confound was worth about
+0.19, and removing it takes an actively harmful arm to exactly neutral. It does
+not take it positive at any capacity. So the fade is doing something the
+normalisation cannot, which is prediction 3 and which keeps note 023's reach
+argument standing.
+
+
+PREDICTIONS, SCORED
+--------------------
+1. **CONFIRMED.** Relative beats absolute at every delay at fade 0.99, by +0.09,
+   +0.08, +0.04 at slots 8 against a guess of "+0.05 or better".
+
+2. **CONFIRMED, and it was already known.** slots 32 fade 0.99 is +0.17/+0.17/
+   +0.16, spread 0.01. g9-06 got there first with the absolute tag, which is why
+   this run was repurposed before dispatch rather than after.
+
+3. **CONFIRMED.** fade 1.0 is negative or zero at every capacity -- best is
+   -0.00 at slots 32. Normalising removes the store-size confound; it does not
+   give a mark a reason to expire. The registered consequence was that if fade
+   1.0 came out positive, note 023's reach argument was wrong about its own
+   mechanism. It did not.
+
+4. **CONFIRMED, and it was named most likely wrong.** Delay 20 reaches +0.16 and
+   +0.17. The reasoning behind naming it -- capture is not recovery -- was sound
+   and the prediction held anyway, which is worth recording as luck rather than
+   foresight: g9-06 had already shown delay 20 positive at slots 32, so by
+   dispatch this was no longer a guess.
+
+5. **PARTLY CONFIRMED.** Mean gap +0.127 overall, worst -0.010, best +0.300 --
+   but at slots 32 fade 0.95 and 0.9 it degenerates to zero, exactly as in
+   g9-06. The direction pays where capacity is scarce and nowhere else.
+
+6. **PARTLY REFUTED**, which matters because it was the reason for the run. At
+   slots 16 the relative tag reaches +0.17 and +0.14 at delays 1 and 8 -- above
+   the +0.14 guess -- but only +0.09 at delay 20, so it does NOT reproduce
+   g9-06's flat +0.16 at half the capacity. Normalising moves the working point
+   down, and not by a factor of two.
+
+
+THE GRID CONTAINED ITS OWN ANSWER, FOR THE FIRST TIME IN THIS FAMILY
+---------------------------------------------------------------------
+`tools/grid.py` passes on both swept axes: the chosen capacities are 8, 16 and 32
+across the three delays, and the chosen fades are 0.95, 0.95 and 0.9. g9-05
+pinned on capacity and g9-06 pinned on fade; this one pins on neither, so its
+numbers are values rather than bounds.
 
         REVISED after g9-06 returned, BEFORE dispatch: fade 0.9 added, because
         g9-06's fade axis pinned at the bottom of its grid. The predictions

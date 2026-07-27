@@ -617,3 +617,39 @@ values chosen for `d_model` 32 in one process. I named that as the standing risk
 before dispatch and it is still untested — the decline from node 16 to 8 is
 exactly where a mistuned capacity would show up first. That is now the top item
 on the line, and it is cheap.
+
+## 25. The frozen working point was mistuned, and there may be a rule underneath
+
+**The control.** At node 8, `slots` 8 recovers 0.48 where `slots` 32 recovers
+0.30. The prediction was registered before it ran. So g9-09's small-node cells
+measured a mistuned tag, and its decline from +0.16 to +0.11 is at least partly a
+tuning artefact — which is exactly what I named as that grid's standing risk
+before dispatching it.
+
+**The reason g9-10 is worth more than a re-tune.** Retrieval goes as
+`sqrt(d / N)`; note 020 measured that within 5% across a 16× range and checked it
+against an analytic bound. `N` is precisely what the tag bounds. So the capacity
+a node can carry should scale with the width it reads through — and if the best
+`slots` tracks the node, **the tag has a tuning rule derived from a law this
+project already measured, rather than a constant chosen once.** Every node would
+set it from something it knows about itself. That is prediction 1.
+
+**Chosen: naming prediction 2 as most likely wrong.** It says recovery stops
+falling with node size once each node uses its own best capacity — the thing that
+would change g9-09's conclusion. `fade` stays frozen at 0.95 for cost, so if the
+best fade also moves with node size, a tuned-capacity-but-mistuned-fade cell
+still declines and 2 fails for a reason that has nothing to do with capacity.
+That is this grid's standing risk in turn, stated in the file.
+
+**A near-miss worth logging.** The first version of the control ran 12 cells × 6
+arms at width 64 and was still going after fourteen minutes. That is heavy local
+work, which the standing rules forbid, and it is precisely the failure `g8-05`
+recorded — "a quick control at one cell" that held the machine for ten minutes.
+Killed and cut to six trainings at one node, which answered the question in two
+minutes. Recorded in the sweep file's COST section rather than only here, because
+the next person sizing a control will read that and not this.
+
+**Also confirmed in passing:** the `combined` arm runs, and at `slots` 32 it
+scores identically to the tag — the same degeneracy its own control found. Small
+capacity is the one regime where the two mechanisms hold different writes, which
+is why it is in this grid and not its own.

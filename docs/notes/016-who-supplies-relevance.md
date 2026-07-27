@@ -92,6 +92,49 @@ model is a passive receiver. That was the right first step, because it isolates
 first is now measurable and looks positive at 0.34 recovery on a control. The
 second is a different task and a different mechanism.
 
+### Correction: "intrinsic versus extrinsic" was the wrong axis
+
+John's follow-up — *many problems have built-in incremental-success values that
+can be fed back as the world* — breaks the framing above, and the break is
+useful.
+
+He is right that such signals are everywhere and are free: distance to a goal,
+inversions remaining in a sort, pieces correctly placed, digits correct, bits
+saved. None of them needs an environment to be built. **The task already computes
+them, and the model cannot fake them.**
+
+But that exposes a problem with the account above, because **consolidate-on-use
+is already one of these.** It fires when a prediction was correct — and whether a
+prediction was correct is decided by the token that *arrives*, which the model
+does not choose. By the intrinsic/extrinsic test it is extrinsic, world-supplied,
+ungameable. **And it is one of the six failures.**
+
+So that axis does not separate what works from what does not. A second one does:
+
+> **Does the signal carry information about FUTURE usefulness, or only about
+> present correctness?**
+
+- `on-use` says *this retrieval was right just now*. It is extrinsic and it is
+  about the present. It failed.
+- The reward token says *this binding will be asked about*. It is extrinsic and
+  it is about the future. It recovers 0.19–0.23 where the others recover nothing.
+
+The two-by-two makes the six failures look less like six attempts at one idea and
+more like a systematic exploration of one quadrant. Everything tried before
+`reward` was **present-tense**, whatever its source.
+
+That reframes John's suggestion rather than diminishing it. Incremental-success
+values are exactly the right family to draw from — **provided the increment is
+about progress toward something not yet achieved.** Distance-to-goal qualifies:
+it falls because of a step taken now and it is defined by an outcome not yet
+reached. "Was that last move legal" does not.
+
+**Status of this: argument only.** The two-by-two is a reading of results already
+in hand, not a new measurement, and it was written after seeing them — which
+makes it a hypothesis about why the six failed, not a finding. What would test it
+is a present-tense signal that is unusually strong, or a future-tense one that is
+weak; either would separate the axis from the source.
+
 ### The near-term version, which is cheap and probably wrong
 
 Bootstrapping: train with the reward gate, then use the trained model's own

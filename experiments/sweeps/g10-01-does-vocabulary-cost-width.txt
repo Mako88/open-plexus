@@ -1,9 +1,13 @@
 Does a bigger vocabulary cost width, and does it cost log(vocabulary)?
 ======================================================================
 
-Script: experiments/g10_01_vocabulary.py  (NOT WRITTEN)
-Status: PREDICTIONS REGISTERED IN NOTE 020 BEFORE THIS FILE EXISTED, and
-        before the script. Nothing measured.
+Script: experiments/g10_01_vocabulary.py
+Status: **NOT DISPATCHED. The bracketing control invalidated the design.**
+        Growing `n_keys` makes the task EASIER, not harder, because it also
+        thins the filler -- so the axis measures interference rather than
+        capacity. And the theorem's `log d` is a bound on FALSE POSITIVES
+        across the universe, which this sweep's accuracy metric never probes.
+        Predictions were registered in note 020 before the script existed.
 
 
 WHY
@@ -98,3 +102,65 @@ corpus benchmark is blocked behind the collapse finding regardless.
 **The constant.** Theorem 20 is a sufficiency bound, `O(...)`, for a binarised
 architecture. It fixes the *shape* and not the multiplier, so a measured 1.7x or
 2.4x are both consistent with it and neither confirms the theorem for this store.
+
+
+THE CONTROL, AND WHY THE SWEEP IS NOT BEING RUN
+=================================================
+Bracketing check, one seed, reduced training, bar 0.60:
+
+    n_keys  vocab   log       8      16      32      64     128
+        32     41   3.7   0.017   0.208   0.450   0.775   0.842
+      2048   2057   7.6   0.042   0.300   0.658   0.833   0.967
+
+The grid does bracket the crossing at both ends, so prediction 4 holds. Every
+other prediction is void, because **the larger vocabulary is easier at every
+width**. The crossing moves from between 32 and 64 down to between 16 and 32 --
+the opposite direction to prediction 1, and a direction prediction 2 did not
+even consider.
+
+TWO REASONS, AND BOTH KILL THE DESIGN.
+
+**1. `n_keys` is not a clean axis.** Filler is drawn from *spare keys* -- the
+keys a sequence did not bind. With 32 keys and 4 pairs there are 28 spare, reused
+constantly, so filler collides with itself and crowds the store with a few
+repeated bindings. With 2048 keys the filler is spread across a thousand-odd
+symbols and barely repeats. So growing the alphabet **thins the interference**,
+and that effect is larger than whatever capacity costs.
+
+The axis moves the universe and the filler statistics together, which is exactly
+the confound `n_values` was pinned to avoid -- and I pinned the wrong one.
+
+**2. The metric cannot see the term anyway.** Theorem 20's `log(d/delta)` comes
+from a union bound over the universe: it bounds the chance that some binding
+*not* in the bundle passes the membership test. It is a **false-positive** cost.
+
+This sweep measures accuracy on queries about bindings that ARE present. A false
+positive on one of the 2000 keys that were never bound would never appear in the
+number. **The experiment could not have detected the term it was built to
+detect**, whatever the filler did.
+
+
+WHAT WOULD ACTUALLY TEST IT
+-----------------------------
+Measure the false-positive rate directly: present a cue that was **never bound in
+this sequence** and ask whether the store returns a confident answer for it. The
+theorem predicts spurious matches rise with the size of the universe, at fixed
+`N` and fixed width.
+
+That is a different measurement from anything this project has taken -- every
+number here is accuracy on questions that have answers. It also has an obvious
+first check: the rate must be above zero at small vocabularies, or there is
+nothing to grow.
+
+Note 020's estimate that a language-sized vocabulary costs about 2.9x width is
+therefore **unsupported and not refuted**. It rests on a term this project has
+not measured and, as of this control, has not yet built the means to measure.
+
+
+COST OF FINDING OUT
+--------------------
+The control ran 5m16s locally, which is at the edge of the rule added earlier
+today about experiments that hold the machine. It should have been smaller: two
+vocabularies and five widths at reduced training was more than bracketing needed.
+Recorded because the rule is one commit old and this is the first thing to test
+it.

@@ -2,14 +2,15 @@ Does a gate work when the relevance signal is real?
 ===================================================
 
 Script: experiments/g9_02_reward_gate.py  (NOT WRITTEN)
-Status: RUN, 12/12. **The first mechanism to recover anything: 0.19-0.23
-        against a previous best of 0.05 across six.** on-use and salience sit
-        at 0.00 in the same cells, which is what makes it credible.
+Status: RUN TWICE, 12/12 each. **The first mechanism to recover anything,
+        and the delay is a CLIFF.** With the reach fixed at 8: recovery 0.21,
+        0.20, 0.23 at delays 1, 4 and 8, and **-0.13 at delay 20** -- past its
+        reach the gate is not useless but actively harmful. on-use and
+        salience sit at 0.00 in every cell of both runs.
 
-        **But the delay result is void, by my own construction.** The window
-        was set to `task.delay`, so the gate was told exactly how far back to
-        reach. Prediction 2 was untestable and the flat curve is the
-        configuration, not the mechanism. See the correction at the end.
+        The first run set the window to `task.delay`, which told the gate how
+        far back to look and made the delay axis measure nothing. Both runs
+        are recorded; the correction is at the end.
 
         Predictions were written before the mechanism existed.
 
@@ -227,3 +228,63 @@ Prediction, before the re-run: recovery falls with delay once the window is
 fixed, and falls sharply past the window -- **above 0.2 at delays 1 and 4, and
 near zero at 20.** If it stays flat even with a fixed window, then something else
 is carrying the result and the reward token is not doing what this note claims.
+
+
+THE RE-RUN, WITH THE REACH FIXED AT 8
+=======================================
+Same grid, one changed constant: `reward_window` is 8 at every delay rather than
+`task.delay`. So the reach covers delays 1 and 4 comfortably, covers 8 exactly,
+and cannot reach 20 -- and the delay decides whether the reach is enough, which
+is what prediction 2 was written to measure.
+
+  delay    none  oracle    gap  spread   on-use  salience   reward
+      1   0.167   0.999  0.832   0.072    -0.00     -0.01     0.21
+      4   0.175   0.999  0.824   0.091     0.00     -0.02     0.20
+      8   0.168   0.999  0.831   0.094     0.00     -0.00     0.23
+     20   0.163   0.999  0.836   0.088    -0.00     -0.01    -0.13
+
+**Prediction 2, in its corrected form, HELD.** The registered guess before the
+re-run was "above 0.2 at delays 1 and 4, and near zero at 20". Measured 0.21 and
+0.20, and **-0.13** at 20 -- worse than near zero.
+
+That negative is the interesting number. Past its reach the gate does not merely
+fail to help: it **keeps the wrong nine steps and discards the right one**, so it
+is worse than storing everything. A gate that cannot reach the thing it is
+vouching for is not a weak gate, it is an anti-gate.
+
+
+WHAT THE THREE RESULTS SAY TOGETHER
+-------------------------------------
+    six intrinsic mechanisms, present-tense signal     0.00
+    reward gate, signal within reach                   0.20 - 0.23
+    reward gate, signal beyond reach                  -0.13
+
+The middle line is the first time anything in this project has recovered part of
+the oracle. The third line says exactly what remains unsolved, and names it
+precisely: **the gap between a signal arriving within a fixed reach and one
+arriving after it.**
+
+That gap is what tagging and capture is a solution to, in the form
+[Lehr et al.](../../docs/notes/010-tagging-and-capture.md) describe it. A tag is
+set at the moment of the binding, cheaply, and costs nothing to hold; the late
+signal decides whether it is captured. **A fixed window is the crudest possible
+substitute for a tag** -- it holds everything for a fixed time instead of marking
+the one thing worth holding -- and the cliff at delay 20 is the price of that
+crudeness, measured.
+
+So the mechanism to build next is not another gate. It is the tag: a per-binding
+marker that survives longer than the window and is resolved when a reward
+arrives. That is a different data structure, not a different threshold.
+
+
+WHAT IS STILL OWED
+--------------------
+**Prediction 4 was never tested.** The reward-rate axis was dropped when the grid
+was costed and the drop was not recorded at the time. It should have been, and
+the base rate remains a dial nobody has turned on this task.
+
+**The magnitude is unexplained.** 0.2 is a real recovery and it is a fifth of the
+oracle's advantage, not most of it. Where the other four fifths go -- filler kept
+inside the window, bindings evicted by later rewards, or the readout simply not
+learning from a smaller store -- is not measured, and the three candidates would
+point at different next steps.

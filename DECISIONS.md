@@ -276,3 +276,41 @@ assumes the two dials are separable and they may not be.
 which needs the `tag_slots`/`reward_window` exclusion lifted. Logged in BACKLOG
 rather than started, because starting it before g9-06 returns would be a
 mechanism resting on a bound.
+
+## 15. Built `tag_relative` rather than the combined gate, and why
+
+**Chosen.** Entry 14 named the combined gate as next. I built something else
+first: a one-division fix to the tag's ranking signal.
+
+**Why.** Note 023 blamed the un-faded tag's failure on the store's size
+confounding the strength signal. That was an argument. Measuring it made it a
+fact — an absolute tag of four marks the final interval of a three-interval
+stream at offsets 0.00, 0.01, 0.03 and 0.05. Literally the first four writes. A
+diagnosis that specific has a fix that specific, and it is cheaper than a new
+mechanism: no new signal, no new dial, no clock.
+
+**It also tests note 023's own reasoning.** If normalising alone made the tag
+work, the fade was only ever a cold-start corrector and the reach story in that
+note is wrong about its own mechanism. That is g9-07's prediction 3. Building the
+combined gate first would have left that untested underneath it.
+
+**The control says it is real but not sufficient.** Rewarded-binding capture at
+slots 8 goes 9/9/16% absolute-unfaded to 31/28/19% relative-unfaded, and
+44/44/34% to 66/59/44% with a fade. So both dials do work and neither replaces
+the other. The combined gate is still queued.
+
+**A vacuous test, caught by its own guard.** The first meaning test asserted that
+a relative ranking survives scaling every stored value by a constant while an
+absolute one does not. Both survive: a constant rescale multiplies every
+retrieval by the same factor and `admit` compares ranks. The guard I wrote to
+stop the test being vacuous is the only reason it is not still passing. Replaced
+with the temporal property, which is what actually separates them.
+
+**Worth review.** g9-07 has five predictions and the one it exists for is
+prediction 2 — a row that is both flat across delay and positive, which nothing
+in this project has produced. I would not bet on it. Prediction 4 (delay 20
+positive for the first time) is named as most likely wrong, because capture is
+not recovery and g9-05 demonstrated the gap twice.
+
+**Queued, not dispatched.** g9-06 is still running and the repo allows one matrix
+at a time.

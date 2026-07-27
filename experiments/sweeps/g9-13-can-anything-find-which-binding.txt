@@ -1,0 +1,161 @@
+Can anything identify WHICH binding, without being told the delay?
+==================================================================
+
+Script: experiments/g9_13_which_binding.py
+Status: RUN. A probe, not a sweep -- scoring only, no training, local, minutes.
+        4 delays x 6 seeds x 24 sequences = 11,788 candidate writes, 2,304 of
+        them rewarded.
+
+ANSWER: yes, and it is note 027's leak wearing a node-local disguise. Nothing
+        that is NOT recency identifies which binding: 0.53, 0.48, 0.50.
+
+
+IN PLAIN TERMS
+---------------
+The device can already tell roughly which pieces of the stream are worth keeping.
+What it cannot do is tell which of those pieces the late "this mattered" signal
+is actually about — unless somebody tells it how long the signal takes to arrive.
+
+This asks whether anything the device can compute for itself picks out the right
+one. The answer is that one thing does, perfectly, at every delay — but only
+because the test lays its items out so that the right one is always the most
+recent. That is a flaw in the test, already written down as note 027, and this
+shows for the first time that a real device could actually exploit it rather than
+it merely being present in the layout.
+
+Everything else the device knows is worth nothing at all here.
+
+
+THE RESULT
+-----------
+                            POOLED    d1      d4      d8     d20
+
+    age                      0.000   0.000   0.000   0.000   0.000
+    write_order              0.924   0.964   0.961   0.942   0.857
+    pending_now              0.972   0.995   0.993   0.986   0.927
+    pending_now_rank         0.933   0.976   0.971   0.953   0.847
+    ---------------------------------------------------------------
+    strength                 0.526   0.523   0.526   0.528   0.527
+    surprise                 0.483   0.482   0.481   0.483   0.487
+    hit                      0.498   0.499   0.499   0.498   0.498
+
+AUC 0.5 is no separation. Below 0.5 separates the other way round and is just as
+much information, which is why `age` at 0.000 is a PERFECT signal and not a dead
+one: the rewarded binding always has the SMALLEST age among binding candidates.
+
+The line divides the signals into recency and everything else, and there is
+nothing in between.
+
+
+THE TRIPWIRE FIRED, AND IT FIRED AT MY OWN DESIGN
+--------------------------------------------------
+This probe was built on the assumption that pooling several delays would make the
+delay effectively unknown, and it registered the check in advance: *"age near 1.0
+WITHIN a delay and near 0.5 POOLED -> the pooling did what it claims."*
+
+**Age is 0.000 pooled.** Pooling did nothing, and the reason is the finding.
+
+The rewarded binding is not "the write `delay` steps back". It is **the most
+recent binding before the reward, at every delay**, because bindings sit about 31
+steps apart and every delay tested is shorter than that. Recency identifies it
+without any reference to the delay at all. There was no delay dependence for the
+pooling to remove.
+
+So the design was wrong and the instrument said so. Recorded rather than quietly
+repaired, because the wrong assumption is the same one that made this question
+look open: *being told the delay* was never what a window was really using here.
+
+
+ALL THREE HIGH SIGNALS ARE ONE FACT
+------------------------------------
+`age`, `write_order` and `pending_now` are not three findings. Note 027 measured
+the layout directly — the nearest binding before a reward IS the rewarded one,
+160 of 160 — so **any quantity monotone in recency scores near the ceiling.**
+`pending_now` is monotone in recency because a fresher key has been decayed fewer
+times.
+
+What is new is only that it is monotone in recency **from inside the node**.
+Note 027 read the generator's offsets, which no running system can do.
+`pending_now` is what a pending write's key retrieves from the node's own store,
+and a node holds `pending`, so this is the first demonstration that the leak is
+**reachable by a mechanism** rather than merely present in the data.
+
+
+WHAT THIS ANSWERS
+------------------
+BACKLOG item 3, *"can anything identify WHICH binding without being told the
+delay"*, in two parts:
+
+- **Recency can, and it is the leak.** Delay-agnostic, node-local, AUC 0.97.
+- **Nothing else can at all.** Every signal that is not recency sits within 0.03
+  of chance: `strength` 0.526, `surprise` 0.483, `hit` 0.498. That is consistent
+  with g9-04, which found the same three uninformative for rewarded-vs-unrewarded
+  at write time, and extends it to the capture step where the reward is in hand.
+
+So **once the generator is fixed there is no second signal waiting behind the
+leak.** Note 026's ceiling stands, and with it the reading that the tag scores
+about what a delay-agnostic gate can score on this task.
+
+
+WHAT IT DOES NOT ANSWER, AND WHY THE NUMBER IS NOT A LICENCE
+--------------------------------------------------------------
+**The candidates here are BINDINGS, chosen with the oracle.** A real gate has to
+find bindings first, and g9-04 put that at AUC 0.22 — real but weak. So 0.97
+among bindings does not become 0.97 in a running gate, and this does NOT overturn
+BACKLOG item 1's finding that the leak is inert in practice. It sharpens it: the
+leak is inert because binding-DETECTION is weak, not because which-binding is
+hard. Those are different bottlenecks and only one of them is a property of the
+task.
+
+**It is also not a measurement of any arm.** No model was trained. This scores
+signals, and a signal with AUC 0.97 that no mechanism reads changes no number in
+any sweep.
+
+
+PREDICTIONS
+------------
+**Only one of these was pre-registered, and this section says which.** A probe
+runs in minutes on a laptop, so this one was written, run, and read in a single
+sitting — which is exactly the situation the pre-registration rule exists for,
+and the honest record is the one that admits the order things happened in.
+
+1. **PRE-REGISTERED, and REFUTED.** The script's own docstring, written before
+   the run, registered: *"age near 1.0 WITHIN a delay and near 0.5 POOLED -> the
+   pooling did what it claims."* Age is **0.000 at every delay and pooled**. The
+   pooling did not do what it claims, because there was no delay dependence to
+   remove — see THE TRIPWIRE FIRED below. The prediction was the design's own
+   assumption and the instrument refused it.
+
+2. **PRE-REGISTERED, and CONFIRMED.** Same docstring: *"nothing above 0.5 POOLED
+   -> the tag is at the TASK's ceiling."* Every non-recency signal is within
+   0.03 of chance.
+
+3. **POST-HOC, stated as such.** That `age`, `write_order` and `pending_now` are
+   one fact rather than three. This is an explanation of the numbers arrived at
+   after seeing them, supported by note 027's independent measurement of the
+   layout, and it should be read as an interpretation rather than a result.
+
+4. **POST-HOC.** That the leak's inertness is about binding-DETECTION rather than
+   about which-binding. Follows from 0.97 among oracle-selected bindings against
+   g9-04's 0.22 for finding bindings at all; not separately measured here.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- a non-recency signal above 0.6 pooled -> there is room past note 026's ceiling,
+                                           and this line has somewhere to go. NOT
+                                           OBSERVED: the best is 0.526
+- age near 0.5 pooled                   -> the delay was what recency was using,
+                                           and the leak is delay-shaped. REFUTED:
+                                           age is 0.000 at every delay
+- pending_now near 0.5 while age is not -> the store does not expose the layout
+                                           and the leak stays theoretical.
+                                           REFUTED: 0.972
+
+
+COST
+-----
+Local, minutes, no runner. The model change is one observation-only trace field,
+`pending_now`, pinned by five tests in `test_tag.py` -- including one that it is
+measured BEFORE the unprotected writes are removed, since a gate cannot consult
+the result of its own decision.

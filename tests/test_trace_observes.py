@@ -26,7 +26,7 @@ MASK = np.zeros(len(TOKENS), dtype=bool)
 MASK[::4] = True
 
 KEYS = {"t", "token", "surprise", "mean", "deviation", "strength", "hit",
-        "captured", "write_index"}
+        "captured", "write_index", "pending_now"}
 #: A salience gate needs a cap or it diverges -- promoting on surprise enlarges
 #: the store, which enlarges later surprises. The model refuses the pair without
 #: one, which is why `lasting_cap` is here rather than a tidier two arguments.

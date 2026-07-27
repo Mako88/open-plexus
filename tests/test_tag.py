@@ -127,6 +127,69 @@ def _mean_offset(steps: list[int], tokens: np.ndarray) -> float:
     return sum((step - opening) / span for step in steps) / len(steps)
 
 
+class WhatEachPendingKeyRetrievesNow(unittest.TestCase):
+    """`pending_now` exists because everything else at a capture step is a
+    property of the STEP.
+
+    Surprise, strength and the running mean are all identical for every
+    candidate at the moment of capture, so none of them can rank candidates.
+    Only two candidate-specific things are available: what was recorded at the
+    write, and how long ago it was. `pending_now` is the third — a node holds
+    `pending`, so it can ask its own store what each pending key retrieves now.
+
+    Whether it says anything the AGE does not already say is g9-13's question.
+    These tests only pin that the field means what its comment claims, because
+    a probe built on a field that is secretly a step property would answer that
+    question with an artefact.
+    """
+
+    def setUp(self):
+        self.trace: list = []
+        build(window=1).run(stream(intervals=3, before=2, after=2),
+                            trace=self.trace)
+        self.captures = [e for e in self.trace if e["pending_now"]]
+
+    def test_it_is_empty_on_every_step_that_is_not_a_capture(self):
+        for entry in self.trace:
+            if not entry["captured"]:
+                self.assertEqual(entry["pending_now"], ())
+
+    def test_there_is_one_number_per_pending_write(self):
+        """Indices into `pending_now` have to line up with `captured`'s, or a
+        probe reading them together silently scores the wrong candidate."""
+        self.assertTrue(self.captures)
+        for entry in self.captures:
+            self.assertTrue(max(entry["captured"]) < len(entry["pending_now"]))
+
+    def test_the_candidates_do_not_all_carry_the_same_number(self):
+        """The whole point. If every candidate got the same value it would be a
+        step property wearing a per-candidate shape, and ranking on it would be
+        ranking on nothing."""
+        varied = [e for e in self.captures if len(set(e["pending_now"])) > 1]
+        self.assertTrue(varied, "every capture gave its candidates one value")
+
+    def test_it_is_measured_BEFORE_the_unprotected_writes_are_removed(self):
+        """A number taken after the removal would describe the store the
+        capture produced, not the one the decision was made from — and a gate
+        cannot consult the result of its own decision.
+
+        Checked by a magnitude argument that does not depend on the arithmetic:
+        removing writes only shrinks the store, so a reading taken afterwards
+        would be no larger than one taken before. A strictly positive value at
+        an index the capture DROPPED can only come from the earlier reading.
+        """
+        dropped = [(e, i) for e in self.captures
+                   for i in range(len(e["pending_now"]))
+                   if i not in e["captured"]]
+        self.assertTrue(dropped, "no capture dropped anything to check")
+        self.assertTrue(any(e["pending_now"][i] > 0.0 for e, i in dropped))
+
+    def test_collecting_it_does_not_change_what_the_model_predicts(self):
+        tokens = stream(intervals=3, before=2, after=2)
+        np.testing.assert_array_equal(
+            build(window=1).run(tokens, trace=[]), build(window=1).run(tokens))
+
+
 class OffByDefault(unittest.TestCase):
 
     def test_the_default_is_disabled(self):

@@ -955,3 +955,59 @@ finding in it — is cheap and I should do it for every summariser, not just thi
 one.
 
 482 tests, 106 mutations, five checks clean. Run 30251816417.
+
+## 34. The sharpest open question is answered, and the probe's own tripwire
+##     refuted the design it was built on
+
+**BACKLOG item 3 — can anything identify WHICH binding without being told the
+delay — is answered.** Only recency can, and recency is note 027's leak. Every
+signal that is not recency sits within 0.03 of chance: `strength` 0.526,
+`surprise` 0.483, `hit` 0.498. So there is no second signal waiting behind the
+leak, and note 026's ceiling stands.
+
+**Chosen: one observation-only trace field rather than a new probe-only code
+path.** At a capture step every quantity the trace already carried — surprise,
+strength, the running mean — is a property of THE STEP, identical for every
+candidate, so none of them can rank candidates. Only two candidate-specific
+things existed: what was recorded at the write, and how long ago it was.
+`pending_now` is the third: a node holds `pending`, so it can ask its own store
+what each pending key retrieves now. Nothing reads it back, and five tests in
+`test_tag.py` pin what it means — including that it is measured BEFORE the
+unprotected writes are removed, since a gate cannot consult the result of its
+own decision.
+
+**What is new is that the leak is reachable from inside a node.** Note 027 read
+the generator's offsets, which no running system can do. `pending_now` separates
+the rewarded binding at **AUC 0.972 pooled across delays**, which is the first
+demonstration that a mechanism could actually exploit the layout rather than the
+flaw merely being present in the data.
+
+### The part worth reviewing
+
+**The probe pre-registered a check and the check refuted the probe's own design.**
+It assumed that pooling four delays would make the delay effectively unknown, and
+registered *"age near 1.0 WITHIN a delay and near 0.5 POOLED"* as the
+confirmation that the pooling had worked.
+
+**Age is 0.000 pooled** — perfect, inverted, at every delay.
+
+The rewarded binding is not "the write `delay` steps back". It is the most recent
+binding before the reward at ANY delay, because bindings sit about 31 steps apart
+and every delay tested is shorter than that. There was no delay dependence for
+the pooling to remove, and **"being told the delay" was never what a window was
+really using here.** The whole framing of this question, carried in BACKLOG for
+several cycles, rested on that assumption.
+
+Recorded rather than quietly repaired. The wrong assumption is the interesting
+part, and it is the second time this session that an instrument has caught a
+claim I was about to make from an argument rather than a measurement.
+
+**What it does NOT show, stated because the number invites overreading.** The
+candidates were BINDINGS, selected with the oracle. A real gate must find
+bindings first, and g9-04 put that at AUC 0.22. So 0.97 among bindings is not
+0.97 in a running gate, and this does not overturn item 1's finding that the leak
+is inert. It relocates the bottleneck: the leak is inert because binding
+DETECTION is weak, not because which-binding is hard — and only one of those is
+a property of the task.
+
+487 tests, 106 mutations, five checks clean.

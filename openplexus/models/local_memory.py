@@ -933,8 +933,9 @@ class LocalAssociativeMemory:
         predictions = np.zeros(len(tokens), dtype=np.int64)
 
         captured: tuple = ()
+        pending_now: tuple = ()
         for t, token in enumerate(tokens):
-            captured = ()
+            captured = pending_now = ()
             if not 0 <= token < self.config.vocab_size:
                 raise ValueError(
                     f"token {token} outside vocab of {self.config.vocab_size}")
@@ -1062,6 +1063,25 @@ class LocalAssociativeMemory:
                     protected |= set(
                         range(max(0, len(pending) - keep), len(pending)))
                 captured = tuple(sorted(protected & set(range(len(pending)))))
+                # OBSERVATION ONLY, like `captured` and `write_index`. Nothing
+                # below reads it and no gate consults it.
+                #
+                # At a capture step every quantity the trace already carries is
+                # a property of the STEP -- surprise, strength, the running mean
+                # -- so it is identical for every candidate and cannot rank
+                # them. The only candidate-specific things available are what
+                # was recorded when the write happened, and how long ago that
+                # was. This is the one exception: a node holds `pending`, so it
+                # can ask its own store what each pending key retrieves NOW, and
+                # that is a different number per candidate.
+                #
+                # Whether it says anything the AGE does not already say is the
+                # open question g9-13 asks. It is recorded here rather than
+                # asserted either way.
+                if trace is not None:
+                    pending_now = tuple(
+                        float(np.linalg.norm(memory @ key_written))
+                        for _, _, key_written in pending)
                 for index, entry in enumerate(pending):
                     if index not in protected:
                         weight, value_written, key_written = entry
@@ -1135,6 +1155,14 @@ class LocalAssociativeMemory:
                         # the first four writes after every reward.
                         "captured": captured,
                         "write_index": wrote_at,
+                        # What each pending write's key retrieves from the store
+                        # AS IT STANDS at this step, one number per candidate,
+                        # empty on every step that is not a capture. See the
+                        # comment at the capture site: it is the only
+                        # candidate-specific signal that is not fixed at write
+                        # time, and so the only new place a delay-agnostic gate
+                        # could find WHICH binding was rewarded.
+                        "pending_now": pending_now,
                     })
 
             if lasting is not None and previous_retrieval is not None:

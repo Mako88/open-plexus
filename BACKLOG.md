@@ -94,9 +94,22 @@ looking for work should start here.
    The capacity correction alone was worth **+0.58** at delay 8 — more than twice
    the largest effect any mechanism here has produced — which is now the measured
    calibration on CLAUDE.md's frozen-axis rule.
-3. **Can anything identify WHICH binding without being told the delay?** The
-   sharpest open question and it needs a probe, not a sweep. See *The sharpest
-   open question BEFORE 027*.
+3. **ANSWERED: only recency can, and recency is note 027's leak.**
+   [g9-13](experiments/sweeps/g9-13-can-anything-find-which-binding.txt) ran.
+   Every signal that is not recency sits within 0.03 of chance — `strength`
+   0.526, `surprise` 0.483, `hit` 0.498 — so **there is no second signal waiting
+   behind the leak**, and note 026's ceiling stands.
+
+   What is new is that the leak is **reachable from inside a node**. Note 027
+   read the generator's offsets, which no running system can do; `pending_now`
+   is what a pending write's key retrieves from the node's own store, and it
+   separates the rewarded binding at **AUC 0.972 pooled across delays**.
+
+   It does NOT overturn item 1's "inert" finding — the candidates were bindings
+   chosen by the oracle, and finding bindings at all is g9-04's weak 0.22. But it
+   relocates the bottleneck: the leak is inert because binding-DETECTION is weak,
+   not because which-binding is hard, and only one of those is a property of the
+   task.
 4. **A decision only John can take: what belongs in GOALS.md?** Its gating
    section is corrected but is now the largest live-investigation block in a
    document that may be meant for settled results only. See *GOALS.md gating
@@ -575,6 +588,14 @@ rank on binding-ness alone, and a gate that also takes the most recent reaches
    approaches the oracle, the leak is the whole story. If binding-detection is
    too weak to exploit it, the fix is merely correct rather than urgent. Cheap,
    and it is the honest next measurement.
+
+   **[g9-13](experiments/sweeps/g9-13-can-anything-find-which-binding.txt) did
+   half of this and it is the half nobody had done.** Given the bindings, picking
+   the rewarded one is AUC **0.972** from a node-local quantity, at every delay,
+   without being told the delay. So the *second* step of a nearest-binding arm is
+   essentially free and the whole cost sits in the *first*. The arm is still
+   worth building, but its result is now predictable from two numbers, which
+   lowers what it is worth.
 2. **Then decide about the generator.** The fix is one line — randomise the gap —
    and it would invalidate the comparison set for nine sweeps. Rule 12 says a
    known-better setting can be worth deliberately NOT adopting until there is
@@ -583,7 +604,21 @@ rank on binding-ness alone, and a gate that also takes the most recent reaches
 Three tests in `test_reward_recall.py` pin the leak as PRESENT, with a docstring
 saying they are meant to fail once the generator is fixed.
 
-## The sharpest open question BEFORE 027: can anything find WHICH binding?
+## ANSWERED: nothing but recency finds WHICH binding, and recency is the leak
+
+[g9-13](experiments/sweeps/g9-13-can-anything-find-which-binding.txt) ran. The
+section below is the reasoning that set it up and is kept for that; the answer is
+in item 3 of the index and in the sweep file.
+
+**The probe's own pre-registered check refuted its design.** It assumed pooling
+several delays would make the delay effectively unknown, and registered *"age
+near 0.5 POOLED"* as the confirmation. Age is 0.000 pooled. The rewarded binding
+is not "the write `delay` steps back" — it is **the most recent binding before
+the reward at every delay**, because bindings sit about 31 steps apart and every
+delay tested is shorter than that. There was no delay dependence to remove, and
+*being told the delay* was never what a window was really using here.
+
+## The reasoning that set it up: can anything find WHICH binding?
 
 [Note 026](docs/notes/026-the-tags-precision-comes-from-its-fade.md) puts a
 ceiling on this line. One binding in six is rewarded and nothing local separates

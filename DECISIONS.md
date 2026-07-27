@@ -1941,3 +1941,56 @@ Note 033 also records the component map, six ranked assumptions, and a
 literature pass, all marked as arguments rather than findings.
 
 592 tests, 124 mutations, five checks clean.
+
+---
+
+## 51. The ceiling moved: 0.533 to 1.000 on a step a bigram cannot do
+
+Entry 50 established that the architecture could not represent a trigram. This
+is the fix, implemented behind `context_keys`, off by default: derive the key
+from the token PAIR `(t-1, t)` rather than from `t`. **One line in `run`
+changes.** `previous_key` becomes the key of `(t-2, t-1)`, so the same write
+rule that made a bigram table now makes a trigram one.
+
+**The discriminating test.** Blocks `A B C` and `D B E` in balanced random
+order. Every step follows from its predecessor except `B`, which is followed by
+`C` or `E` depending on what came before it. Scoring only the `B` steps:
+
+    single-token key     0.533     (chance is 0.5)
+    pair key             1.000
+
+**A bigram model is at chance here and cannot leave it however long it trains.**
+This is the first task in the project that a hash table does not answer
+trivially — `reward_recall` is solved perfectly by one (g10-07), and this is not.
+
+**A mutation caught a flaw in my own test design.** The first version used a
+repeating `A B C D B E` cycle, in which every position is predictable from any
+other at a fixed offset. `the-context-key-queries-the-WRONG-pair` — querying
+`(t-2, t)` instead of `(t-1, t)` — scored perfectly on an alignment it never
+had, and survived. Shuffling the blocks kills it. **This is the mutation harness
+finding a vacuous test rather than a code bug, which is the second time this
+week it has done that.**
+
+A second artefact was worth removing: drawing blocks independently put seven
+`D B E` before the first `A B C` at that seed, and the store is emptied between
+sequences, so the model was being asked to resolve a context it had not met.
+Balanced-then-shuffled, and scored on the second half.
+
+**The price is measured and it is not small.** The number of distinct keys goes
+from 66 to 469 in 4000 characters of Shakespeare — real text is Zipfian, so far
+below the 4356 that uniform tokens would give, but still sevenfold. Capacity
+goes as `sqrt(d/N)`, and the cosine against the true count table plateaus at
+0.53 where the single-token version held 0.88.
+
+**What I am NOT claiming.** That the model now beats a bigram. Only that it is
+no longer forbidden from doing so. A higher ceiling with a noisier store could
+land either side of 5.256, and a cosine cannot answer a bits-per-character
+question. g10-09 was retracted this week for exactly the gap between "can
+represent" and "does predict".
+
+Every probe used `decay = 1.0`, which is the worst case for a scheme whose
+problem is key count — decay bounds how many items superpose, so it should help
+the pair key more than the single-token one. The sweep must vary it rather than
+inherit it.
+
+Note 034 has the tables. 602 tests, 127 mutations, five checks clean.

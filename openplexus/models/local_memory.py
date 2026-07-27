@@ -514,6 +514,40 @@ class LocalMemoryConfig:
             — but that is not the same as verified, so `tests/test_derived_keys.py`
             checks the model scores the same on the task rather than trusting the
             statistics.
+        context_keys: Derive the key from the token PAIR `(t-1, t)` rather than
+            from token `t` alone. Off by default, which reproduces every earlier
+            result exactly. Requires `derived_keys`.
+
+            **This lifts a ceiling that [note 033](../../docs/notes/033-the-architecture-pass.md)
+            proved was there.** With a per-token key the write rule binds
+            `value(t)` to `key(t-1)`, so a retrieval is the sum of the values of
+            every token that has ever followed this one — a bigram count table in
+            superposition. Measured: cosine 0.9455 against exactly that table at
+            low load, falling to 0.88 as items superpose, which is the
+            interference signature. **Nothing in that architecture can represent
+            a trigram, because no trigram is ever written down**, so "beat a
+            bigram" was the model's ceiling rather than its target.
+
+            With a pair key, `previous_key` is the key of `(t-2, t-1)` and the
+            query at `t` is the key of `(t-1, t)`, so the same three lines make
+            the retrieval a *trigram* count vector. Nothing else in `run` changes.
+
+            **It is not free, and the price is measured.** The number of distinct
+            keys goes from `vocab` to the number of pairs that actually occur —
+            469 in 4000 characters of Shakespeare against 4356 possible, so real
+            text is far kinder than uniform tokens, but it is still seven times
+            more keys. Since capacity goes as `sqrt(d/N)` (note 020), the store
+            fills sooner: the cosine against a trigram table plateaus near 0.53
+            where the bigram version held 0.88. **Whether the higher ceiling is
+            worth the lower signal-to-noise is a bits-per-character question that
+            a cosine cannot answer**, which is why this is a flag and not a
+            change of default.
+
+            The derivation is per pair, from `(seed, t-1, t)`, cached rather than
+            tabulated: a `vocab^2` table would be 16 million rows at `vocab
+            4096`, and not storing it is the whole point. Position 0 uses
+            `vocab_size` as a start-of-sequence token so every key lives in one
+            space.
         consolidation: Rate at which a *successful* retrieval is written into a
             second, non-decaying memory. 0 disables it and reproduces every
             earlier result exactly.
@@ -584,6 +618,7 @@ class LocalMemoryConfig:
     corrective_writes: bool = False
     readout_bias: bool = False
     derived_keys: bool = False
+    context_keys: bool = False
     seed: int = 0
 
     def __post_init__(self) -> None:
@@ -601,6 +636,11 @@ class LocalMemoryConfig:
             raise ValueError(
                 "derived_keys and key_active both build Wk and would conflict; "
                 "sparse keys have no per-token derivation yet")
+        if self.context_keys and not self.derived_keys:
+            raise ValueError(
+                "context_keys derives a key from a token PAIR and rests on the "
+                "same argument as derived_keys, which must be on; a stored "
+                "vocab^2 table is what the derivation exists to avoid")
         if self.reward_window < 0:
             raise ValueError("reward_window must not be negative")
         if self.reward_window and self.reward_token < 0:
@@ -709,6 +749,11 @@ class LocalAssociativeMemory:
                 for token in range(v)])
         else:
             self.wk = rng.normal(0.0, spread, (v, d))
+        # Pair keys are derived on demand and cached, never tabulated: the table
+        # is vocab^2 rows, and not needing to hold it is the same argument that
+        # `derived_keys` rests on.
+        self._pair_spread = spread
+        self._pair_keys: dict[tuple[int, int], np.ndarray] = {}
         self.wv = rng.normal(0.0, spread, (v, d))
         self.wo = np.zeros((v, d))
         # A constant term on the readout, off by default.
@@ -778,6 +823,30 @@ class LocalAssociativeMemory:
             self.wk[:, index] = 0.0
         self.wv[:, index] = 0.0
         self.wo[:, index] = 0.0
+
+    def context_key(self, previous: int, token: int) -> np.ndarray:
+        """The key for a token PAIR, derived from `(seed, previous, token)`.
+
+        The same argument as `derived_keys`, one token wider: a node handed two
+        token ids can rebuild this vector without holding any table, and the
+        table it would otherwise hold has `vocab^2` rows.
+
+        `previous` is `vocab_size` at the start of a sequence, so the first step
+        has a key in the same space as every other step rather than a special
+        case that would have to be excluded from the store.
+        """
+        if not self.config.context_keys:
+            raise ValueError(
+                "context_key is only meaningful with context_keys set; without "
+                "it the model binds single tokens and this vector is in no key "
+                "space the store uses")
+        cached = self._pair_keys.get((previous, token))
+        if cached is None:
+            cached = np.random.default_rng(
+                (self.config.seed, previous, token)).normal(
+                    0.0, self._pair_spread, self.config.d_model)
+            self._pair_keys[(previous, token)] = cached
+        return cached
 
     def surviving_width(self) -> int:
         """How many dimensions still carry signal.
@@ -961,7 +1030,16 @@ class LocalAssociativeMemory:
                     alive[node * per_group:(node + 1) * per_group] = 0.0
                 memory *= alive[:, None]
 
-            key = self.wk[token]
+            # One line is the whole architectural change. `previous_key` below is
+            # simply this key one step back, so binding on a pair makes the
+            # store a trigram table without touching the write, the retrieval or
+            # the readout.
+            if self.config.context_keys:
+                key = self.context_key(
+                    int(tokens[t - 1]) if t else self.config.vocab_size,
+                    int(token))
+            else:
+                key = self.wk[token]
             value = self.wv[token] * alive
 
             # STORE: bind the previous token to this one. Doing this before the

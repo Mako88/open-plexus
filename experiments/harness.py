@@ -120,6 +120,10 @@ def parse_args(description: str) -> argparse.Namespace:
                         help="how far back a gate may reach")
     parser.add_argument("--slots", type=int, default=None,
                         help="how many writes a tag may hold at once")
+    parser.add_argument("--corpus", type=str, default=None,
+                        help="which text to read: 'notes' for this project's "
+                             "own docs/notes, or 'shakespeare' for the "
+                             "standard char-level benchmark under data/")
     parser.add_argument("--cap", type=float, default=None,
                         help="largest norm the FAST store may reach; 0 leaves "
                              "it unbounded, which is the default in the model "

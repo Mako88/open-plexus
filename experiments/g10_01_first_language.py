@@ -66,9 +66,26 @@ from experiments import harness  # noqa: E402
 from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
 from openplexus.ngram import NGram, absurd, uniform_bits  # noqa: E402
-from openplexus.tasks.corpus import build, chunks, read  # noqa: E402
+from openplexus.tasks.corpus import (  # noqa: E402
+    build, build_stream, chunks, read)
 
 NOTES = Path(__file__).resolve().parent.parent / "docs" / "notes"
+SHAKESPEARE = (Path(__file__).resolve().parent.parent / "data"
+               / "tinyshakespeare.txt")
+
+
+def corpus_named(name: str | None):
+    """The notes, or the standard benchmark.
+
+    `shakespeare` is split at an offset rather than by document, which is what
+    every published number for that corpus does -- see `corpus.build_stream`,
+    which explains why it breaks this module's own rule on purpose.
+    """
+    if name in (None, "notes"):
+        return build(read(NOTES))
+    if name == "shakespeare":
+        return build_stream(SHAKESPEARE.read_text(encoding="utf-8"))
+    raise SystemExit(f"unknown corpus {name!r}; use 'notes' or 'shakespeare'")
 #: Spanning three orders of magnitude, because the first control pinned at the
 #: BOTTOM of a 0.25-to-8 grid: a delta-rule readout's scores are far flatter than
 #: a softmax expects, so the useful temperatures are small. A pinned calibration
@@ -109,8 +126,8 @@ def bits(scores: np.ndarray, targets: np.ndarray, temperature: float) -> float:
 
 
 def run_one(args) -> list[dict]:
-    seed, width, chunk, cap = args
-    corpus = build(read(NOTES))
+    seed, width, chunk, cap, which = args
+    corpus = corpus_named(which)
     # Held-out DOCUMENTS, not held-out chunks of training documents.
     #
     # The first version split the chunk list, which holds text out of training
@@ -184,6 +201,7 @@ def run_one(args) -> list[dict]:
             f"calibration wanted something the grid does not contain.")
     return [{
         "seed": seed, "width": width, "chunk": chunk, "cap": cap,
+        "corpus": which or "notes",
         "vocab_size": corpus.vocab_size,
         "temperature": temperature,
         "bits_raw": bits(test_scores, test_targets, 1.0),
@@ -202,12 +220,12 @@ def run_one(args) -> list[dict]:
 
 def control() -> int:
     """Shape only: one seed, one width, a short chunk, reduced training."""
-    corpus = build(read(NOTES))
+    corpus = corpus_named(None)
     print(f"vocabulary {corpus.vocab_size}; {corpus.train_tokens} train "
           f"characters, {corpus.test_tokens} test")
     print(f"uniform {uniform_bits(corpus.vocab_size):.3f}   "
           f"bigram {NGram(corpus.vocab_size, 1).fit(corpus.train).bits_per_token(corpus.test):.3f}")
-    record = run_one((1, 32, 64, 5.0))[0]
+    record = run_one((1, 32, 64, 5.0, None))[0]
     print(f"model raw {record['bits_raw']:.3f}, calibrated "
           f"{record['bits_calibrated']:.3f} at temperature "
           f"{record['temperature']}, accuracy {record['accuracy']:.3f}")
@@ -223,7 +241,7 @@ def main() -> int:
     chunk = int(args.scale) if args.scale is not None else 256
     cap = args.cap if args.cap is not None else 5.0
 
-    jobs = [(seed, width, chunk, cap) for seed in seeds]
+    jobs = [(seed, width, chunk, cap, args.corpus) for seed in seeds]
     records = [r for batch in harness.spread(run_one, jobs, args.workers)
                for r in batch]
 

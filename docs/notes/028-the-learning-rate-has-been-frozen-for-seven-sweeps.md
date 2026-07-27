@@ -113,14 +113,52 @@ grid.
 
 **`DECAY = 0.997` is the fast store's half-life — about 231 steps — and it is the
 other multiplicative time constant on the store the tag's `fade` acts on.** g9-05
-through g9-11 swept `fade` extensively and never moved `decay`. Two constants
-multiply into the same quantity; sweeping one and freezing the other is the
-"swept on one arm and not the others" failure wearing a different coat, and the
-conclusion *the fade is a reach dial* was drawn with the other reach dial held
-still.
+through g9-11 swept `fade` extensively and never moved `decay`.
+
+> **MEASURED, and this warning was overstated.** Rewarded-binding recall at
+> `slots` 16, counting only, no training:
+>
+> | delay | fade | decay 0.99 | decay 0.997 | decay 0.999 |
+> |---|---|---:|---:|---:|
+> | 8 | 0.99 | 59% | 66% | 66% |
+> | 8 | 0.95 | 100% | 100% | 100% |
+> | 20 | 0.99 | 56% | 56% | 56% |
+> | 20 | 0.95 | 53% | 62% | 66% |
+>
+> `decay` moves recall by **at most 13 points**, and only in the corner where
+> recall is not already saturated. At delay 8 with `fade` 0.95 it does nothing
+> whatever. So freezing it shifted some numbers and **did not invalidate a
+> conclusion** — *the fade is a reach dial* survives, with its calibration mildly
+> conditional on 0.997.
+>
+> The original wording here implied the conclusion might be wrong. It said so
+> without measuring, which is the rule this project puts first, and it is
+> corrected rather than softened.
 
 `EPOCHS = 6` and `N_TRAIN = 200` set the training budget, which decides whether
 any arm has converged. Nothing in the line has checked that either.
+
+## A correction to a tool this session leaned on
+
+Reading the table above showed something about the recall x precision product
+used to predict g9-06, g9-10 and g9-11. **A capacity-bound tag keeps a constant
+number of writes** — `min(slots, writes)` per capture — so `kept` does not vary
+with anything except the capacity. In the table above it is 496 and 512 at every
+decay and fade.
+
+Which means precision is recall divided by a constant, and the "product" is
+
+    recall x precision  =  recall^2 x TOTAL / kept  ~  recall^2 / slots
+
+**So it was never two independent quantities.** It is recall squared, penalised
+by capacity. That is still a reasonable ranking function — it is why it ordered
+g9-10's peaks correctly — but the reasoning attached to it, that a mechanism
+trades recall against precision, does not describe a capacity-bound tag. The two
+cannot move independently there.
+
+It also explains the one case where the product failed: comparing `combined`
+against `reward` in g9-11, `kept` differs BETWEEN the arms, so the constant does
+not cancel and the product stops being a monotone function of recall.
 
 ## What this is an instance of
 

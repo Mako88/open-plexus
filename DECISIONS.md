@@ -856,3 +856,37 @@ because node width is the axis where the floor arm moves most.
 "check the frozen axes" in their own files and none of them looked at `lr`. Two
 cycles of writing provenance down found it. That is an argument that warnings do
 not work and inventories do — and it generalises past this project.
+
+## 32. I overstated a warning, measured it, and corrected it the same cycle
+
+**The claim.** Note 028 said `DECAY` being frozen meant *"the conclusion 'the fade
+is a reach dial' was drawn with the other reach dial held still"* — implying the
+conclusion might be wrong. I wrote that from an argument, not a measurement.
+
+**The measurement.** Counting only, no training: `decay` moves rewarded-binding
+recall by at most 13 points, and only where recall is not already saturated. At
+delay 8 with `fade` 0.95 it does nothing at all. So freezing it shifted some
+numbers and **did not invalidate the conclusion**.
+
+**Chosen: correcting the note rather than softening it.** The warning was
+published in the same cycle it was written, on an argument, and CLAUDE.md's first
+rule is to state no behaviour that has not been observed. The corrected text says
+plainly that the original wording overstated it.
+
+**And reading the table caught something about a tool I leaned on three times.**
+A capacity-bound tag keeps a constant number of writes — `min(slots, writes)` per
+capture — so precision is recall divided by a constant, and the "recall ×
+precision product" I used to predict g9-06, g9-10 and g9-11 is really
+**recall² / slots**. It was never two independent quantities.
+
+That is still a usable ranking function, and it is why it ordered g9-10's peaks
+correctly. But the *reasoning* attached to it — that a mechanism trades recall
+against precision — does not describe a capacity-bound tag, where the two cannot
+move independently. It also explains the single case where it failed: comparing
+`combined` against `reward`, `kept` differs between the arms, the constant stops
+cancelling, and the product stops being monotone in recall.
+
+**Worth review.** Two of my last three notes contained a claim stronger than what
+had been measured, and both were caught by measuring within a cycle. The pattern
+is that a diagnosis and its implications get written in one sitting, and the
+implications do not get the same scrutiny as the diagnosis.

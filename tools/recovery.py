@@ -122,6 +122,33 @@ def assess(cells: dict[tuple, dict[int, float]], key: tuple, arms: Iterable[str]
                 means, spread, gap, None)
 
 
+def margin(cell: Cell) -> float:
+    """The seed spread in ratio units: how much of a LEAD means nothing.
+
+    `assess` refuses a cell whose gap is inside the seed spread. This is the
+    same quantity one step further on: a *difference between two ratios* is
+    noise by the same standard. Without it, taking `max` over a swept axis
+    breaks near-ties arbitrarily and reports a moving optimum from numbers that
+    are the same number — which g9-12's summariser did on its first smoke run,
+    on fabricated records where every rate was identical by construction.
+    """
+    return cell.spread / cell.gap if cell.gap else float("inf")
+
+
+def winner(cells: dict, arm: str, incumbent) -> tuple:
+    """(best key, its lead over `incumbent`, the noise floor on that lead).
+
+    `cells` maps the swept value to its Cell. Returns None when the incumbent
+    is missing, because a lead has to be a lead over something. A caller that
+    finds `lead <= noise` must say "tied" rather than name a winner.
+    """
+    if incumbent not in cells:
+        return None
+    key = max(cells, key=lambda k: cells[k].ratios[arm])
+    return key, cells[key].ratios[arm] - cells[incumbent].ratios[arm], \
+        margin(cells[incumbent])
+
+
 def best_by(candidates: Iterable[tuple[object, Cell | None]], arm: str):
     """The candidate an arm recovers most from, among those not refused.
 

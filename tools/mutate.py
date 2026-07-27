@@ -580,6 +580,29 @@ MUTATIONS = [
         new='    if False:',
     ),
     Mutation(
+        name="the-noise-floor-is-in-the-wrong-units",
+        breaks="the comparison between a lead and the error on it -- the spread "
+               "is measured in accuracy and the lead in recovery, so dropping "
+               "the division compares two different quantities. It still "
+               "returns a plausible small number, and at a gap near 1.0 it is "
+               "very nearly the right one",
+        path=RECOVERY,
+        old='    return cell.spread / cell.gap if cell.gap else float("inf")',
+        new='    return cell.spread',
+    ),
+    Mutation(
+        name="a-tie-still-names-a-winner",
+        breaks="the guard against reading a difference smaller than the "
+               "measurement error -- `max` over a swept axis always names "
+               "something, so without a noise floor three identical numbers "
+               "become a trend. This is how g9-12's summariser first reported "
+               "'the best rate MOVES with node width' from fabricated records "
+               "where every rate was identical by construction",
+        path=RECOVERY,
+        old='    return key, cells[key].ratios[arm] - cells[incumbent].ratios[arm], \\\n        margin(cells[incumbent])',
+        new='    return key, cells[key].ratios[arm] - cells[incumbent].ratios[arm], 0.0',
+    ),
+    Mutation(
         name="selection-prefers-the-largest-gap",
         breaks="the rule that a cell is chosen AFTER the refusals -- picking on "
                "the gap prefers exactly the cells whose floor arm collapsed, "

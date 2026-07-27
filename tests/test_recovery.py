@@ -16,7 +16,7 @@ from __future__ import annotations
 import unittest
 
 from tools.recovery import (MQAR_FLOOR, REWARD_RECALL_FLOOR, Cell, assess,
-                            best_by, by_cell)
+                            best_by, by_cell, margin, winner)
 
 ARMS = ("none", "oracle", "on-use")
 
@@ -186,6 +186,75 @@ class SelectionHappensAfterTheRefusals(unittest.TestCase):
     def test_best_by_skips_missing_candidates(self):
         label, _ = best_by([("gone", None), ("good", self.working)], "on-use")
         self.assertEqual(label, "good")
+
+
+class ALeadInsideTheNoiseIsNotALead(unittest.TestCase):
+    """`max` over a swept axis will always name a winner. Usually it should not.
+
+    This is `assess`'s second refusal one step further on. `assess` refuses when
+    the DENOMINATOR is inside the seed spread; these refuse when a DIFFERENCE
+    BETWEEN TWO RATIOS is. Both are the same mistake — reading a number smaller
+    than the measurement error — and the second one had already happened: the
+    first smoke run of g9-12's summariser announced *"the best rate MOVES with
+    node width"* from three rates whose ratios were identical by construction,
+    because `max` broke the exact tie arbitrarily.
+    """
+
+    def setUp(self):
+        # Three swept values whose arm sits at the same place, measured with a
+        # seed spread of 0.08. Any apparent winner here is the tie being broken.
+        self.tied = {v: assess(cell(0.40, 0.90, 0.65, spread=0.08), ("x",),
+                               ARMS, REWARD_RECALL_FLOOR)
+                     for v in (0.02, 0.05, 0.1)}
+
+    def test_an_exact_tie_reports_a_lead_of_zero(self):
+        _, lead, noise = winner(self.tied, "on-use", 0.05)
+        self.assertEqual(lead, 0.0)
+        self.assertGreater(noise, lead)
+
+    def test_the_noise_floor_is_the_spread_in_RATIO_units(self):
+        """0.08 of accuracy across a gap of 0.50 is 0.16 of recovery.
+
+        The spread is measured in accuracy and the lead in recovery, so
+        comparing them directly would compare two different quantities. That
+        division is the whole content of `margin`.
+        """
+        self.assertAlmostEqual(margin(self.tied[0.05]), 0.08 / 0.50)
+
+    def test_a_lead_larger_than_the_noise_survives(self):
+        moved = dict(self.tied)
+        moved[0.1] = assess(cell(0.40, 0.90, 0.79, spread=0.08), ("x",), ARMS,
+                            REWARD_RECALL_FLOOR)
+        key, lead, noise = winner(moved, "on-use", 0.05)
+        self.assertEqual(key, 0.1)
+        self.assertGreater(lead, noise)
+
+    def test_a_lead_smaller_than_the_noise_does_not(self):
+        """The case that matters: a real difference, too small to mean anything.
+
+        0.02 of accuracy IS a difference. Against a seed spread of 0.08 it is
+        not evidence of one, and a summariser that names 0.1 the winner here is
+        publishing noise with a decimal point on it.
+        """
+        moved = dict(self.tied)
+        moved[0.1] = assess(cell(0.40, 0.90, 0.67, spread=0.08), ("x",), ARMS,
+                            REWARD_RECALL_FLOOR)
+        key, lead, noise = winner(moved, "on-use", 0.05)
+        self.assertEqual(key, 0.1)
+        self.assertGreater(lead, 0.0)
+        self.assertLessEqual(lead, noise)
+
+    def test_there_is_no_lead_without_an_incumbent_to_lead(self):
+        self.assertIsNone(winner(self.tied, "on-use", 0.5))
+
+    def test_a_negative_lead_means_the_incumbent_won(self):
+        """`winner` names the best value, which can BE the incumbent."""
+        worse = dict(self.tied)
+        worse[0.02] = assess(cell(0.40, 0.90, 0.50, spread=0.08), ("x",), ARMS,
+                             REWARD_RECALL_FLOOR)
+        key, lead, _ = winner(worse, "on-use", 0.05)
+        self.assertIn(key, (0.05, 0.1))
+        self.assertGreaterEqual(lead, 0.0)
 
 
 class GroupingRecords(unittest.TestCase):

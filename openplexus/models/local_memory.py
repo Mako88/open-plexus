@@ -335,6 +335,27 @@ class LocalMemoryConfig:
             So this is a feedback loop between what a capture keeps and what the
             next interval marks, not a set operation, and "at least as good as
             both" is not available as an argument.
+        tag_newest: Of the writes the tag marked, protect only this many of
+            the most RECENT. 0 protects all of them, which is how every earlier
+            result was measured.
+
+            **This exists to measure a defect in the task, not as a proposal.**
+            [Note 027](../../docs/notes/027-the-task-leaks-the-answer-through-its-layout.md)
+            found that `reward_recall` lays bindings on a lattice of spacing 31
+            and places each reward at most 20 steps after its cue, so **the
+            nearest binding before a reward is always the rewarded one** --
+            measured at 160 of 160. "Detect a binding, keep the most recent"
+            therefore solves the task exactly, from local signals only.
+
+            Setting this to 1 is that rule: the tag supplies binding-detection,
+            and this takes the last of what it found. If the arm approaches the
+            oracle, the leak is the whole story and the generator has to be
+            fixed before any further result on this task means what it says. If
+            binding-detection is too weak to exploit the leak, the fix is merely
+            correct rather than urgent.
+
+            Either way the number is wanted before anyone decides about
+            re-baselining nine sweeps.
         tag_relative: Rank the tag on retrieval strength divided by the size
             of the store that produced it, instead of on the raw strength.
 
@@ -553,6 +574,7 @@ class LocalMemoryConfig:
     tag_slots: int = 0
     tag_decay: float = 1.0
     tag_relative: bool = False
+    tag_newest: int = 0
     tag_strongest: bool = False
     memory_cap: float = 0.0
     consolidation: float = 0.0
@@ -594,6 +616,16 @@ class LocalMemoryConfig:
         if self.tag_decay < 1.0 and not self.tag_slots:
             raise ValueError(
                 "tag_decay fades marks and does nothing without tag_slots")
+        if self.tag_newest < 0:
+            raise ValueError("tag_newest must not be negative")
+        if self.tag_newest and not self.tag_slots:
+            raise ValueError(
+                "tag_newest narrows what the tag marked and does nothing "
+                "without tag_slots")
+        if self.tag_newest > self.tag_slots:
+            raise ValueError(
+                f"tag_newest {self.tag_newest} exceeds tag_slots "
+                f"{self.tag_slots}, so it would narrow nothing")
         if self.tag_relative and not self.tag_slots:
             raise ValueError(
                 "tag_relative changes how the tag ranks and does nothing "
@@ -933,6 +965,12 @@ class LocalAssociativeMemory:
                 _fade(pending, self.config.decay)
 
             wrote = previous_key is not None and (store is None or store[t])
+            # Captured here rather than read off `pending` in the trace block:
+            # the reward gate below empties `pending`, so by then a write made
+            # at a capture step reports -1 and is invisible to every probe. That
+            # is silent when a capture keeps thirty writes and fatal when it
+            # keeps one.
+            wrote_at = -1
             if wrote:
                 if self.config.decay < 1.0:
                     memory *= self.config.decay
@@ -942,6 +980,7 @@ class LocalAssociativeMemory:
                     # Held so it can be taken back out if no reward vouches for
                     # it. Two vectors per step, not a d x d matrix.
                     pending.append([1.0, value, previous_key])
+                    wrote_at = len(pending) - 1
                     if self.config.tag_slots:
                         # `previous_retrieval` is the retrieval made when the
                         # PREVIOUS token arrived -- the cue of the binding being
@@ -1000,7 +1039,21 @@ class LocalAssociativeMemory:
                 # cue. Note 023.
                 protected: set = set()
                 if self.config.tag_slots:
-                    protected |= {index for _, index in tagged}
+                    marked = sorted(index for _, index in tagged)
+                    # The LAST of what the tag found, not the best of it.
+                    # A higher pending index is a later write, so this is
+                    # recency among candidates rather than rank among them.
+                    #
+                    # The write made AT this step binds the previous token to
+                    # the reward token, and a reward does not vouch for the
+                    # write that carried it. Note 027's rule is the most recent
+                    # binding BEFORE the reward, so it is dropped -- which the
+                    # node can do without knowing anything it does not already
+                    # know, since it has just seen the reward token itself.
+                    if self.config.tag_newest:
+                        marked = [i for i in marked if i != wrote_at]
+                        marked = marked[-self.config.tag_newest:]
+                    protected |= set(marked)
                 if self.config.reward_window or not self.config.tag_slots:
                     # A window of 0 keeps the write at the reward step itself,
                     # which is why this arm runs whenever there is no tag --
@@ -1081,7 +1134,7 @@ class LocalAssociativeMemory:
                         # cannot tell a tag holding bindings from a tag holding
                         # the first four writes after every reward.
                         "captured": captured,
-                        "write_index": len(pending) - 1 if wrote else -1,
+                        "write_index": wrote_at,
                     })
 
             if lasting is not None and previous_retrieval is not None:

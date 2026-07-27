@@ -192,6 +192,38 @@ MUTATIONS = [
         new="    return rank * factor",
     ),
     Mutation(
+        name="the-newest-marks-are-the-oldest",
+        breaks="which end of the marks survives. Taking the first instead of "
+               "the last makes the arm keep whatever was written just after the "
+               "previous capture, which is a recency policy pointing backwards "
+               "and is exactly what an un-faded tag already does",
+        path=LOCAL,
+        old="                        marked = marked[-self.config.tag_newest:]",
+        new="                        marked = marked[:self.config.tag_newest]",
+    ),
+    Mutation(
+        name="the-reward-step-write-is-not-excluded",
+        breaks="the one thing that makes the arm measure anything. The write "
+               "made AT a capture binds the previous token to the reward token, "
+               "is always the most recent, and is never what a reward vouches "
+               "for -- so without excluding it the arm keeps that write every "
+               "time and scores zero. That is what the first version did",
+        path=LOCAL,
+        old="                        marked = [i for i in marked if i != wrote_at]",
+        new="                        marked = list(marked)",
+    ),
+    Mutation(
+        name="the-write-index-is-read-after-the-gate",
+        breaks="the trace, silently. `pending` is emptied by the reward gate, "
+               "so reading the index there reports -1 at every capture step and "
+               "the write made at that step becomes invisible to every probe. "
+               "Harmless when a capture keeps thirty writes; it made the "
+               "newest-mark arm report zero kept",
+        path=LOCAL,
+        old="                    wrote_at = len(pending) - 1",
+        new="                    wrote_at = -1",
+    ),
+    Mutation(
         name="the-combined-gate-forgets-the-tag",
         breaks="the union, leaving a plain window. A write the tag marked and "
                "the window did not is discarded, so a gate configured to read "

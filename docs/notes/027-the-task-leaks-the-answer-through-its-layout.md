@@ -107,14 +107,45 @@ can be worth deliberately *not* adopting until there is time to re-baseline.
 
 So this note records the defect and proposes the fix. **It does not apply it.**
 
-## What should happen before anything is re-run
+## MEASURED: the leak is real and this project cannot exploit it
 
-1. **Measure how much the leak is worth.** Add a `nearest-binding` arm — detect
-   bindings by the existing signal, keep the most recent before each reward — and
-   see what it scores. If it approaches the oracle, the leak is the whole story
-   and the fix is urgent. If it does not, binding-detection is too weak to
-   exploit the leak and the fix is merely correct.
-2. **Then decide about re-baselining**, with that number in hand.
+The arm proposed below was built (`tag_newest`: of what the tag marked, protect
+only the most recent, excluding the write made at the reward itself). Recall and
+precision of rewarded bindings, 8 sequences, no training:
+
+| delay | arm | kept | recall | precision |
+|---|---|---:|---:|---:|
+| 1 | tag 32/0.95 | 961 | 100% | 3.3% |
+| 1 | **newest 1 of 32** | 32 | **100%** | **100%** |
+| 8 | newest 1 of 32 | 32 | 0% | 0% |
+| 20 | newest 1 of 32 | 32 | 0% | 0% |
+
+**At delay 1 the rule is exact** — one write kept per capture and it is always
+the rewarded binding, which is the leak in its purest form. **At delay 8 and 20
+it finds nothing at all.**
+
+The reason is the gap between "most recent MARK" and "most recent BINDING". At
+delay 8 there are seven filler writes between the binding and its reward, and the
+tag marks filler too — g9-04's signal gives about 4.5x enrichment over the base
+rate, nowhere near enough for the last mark to be the binding. At delay 1 there
+are no intervening writes, so the distinction vanishes.
+
+**So the leak is real and inert.** Exploiting it needs binding-detection far
+better than anything this project has, and the delay-1 column is the only place
+it bites — where a window of reach 1 also gets it, and where g9-02 already
+described the gate as trivial for exactly that reason.
+
+**That downgrades the fix from urgent to correct.** The g9 numbers at delay 4, 8
+and 20 are not inflated by the leak, because nothing measured can reach it. The
+generator should still be fixed — a task that affords a perfect local rule is not
+posing what it claims — but it does not invalidate the comparison set, and
+re-baselining nine sweeps for it would buy accuracy in the write-up rather than
+in the numbers.
+
+**What remains true and uncomfortable:** the difficulty at delay 1 is not real,
+and every "delay 1" cell in g9-02 through g9-10 is measuring a task with a
+trivial solution available. Reading those columns as evidence about short delays
+overstates the case.
 
 That arm is cheap and it is the honest next measurement on this line.
 

@@ -37,13 +37,13 @@ CUE, VALUE = 10, 11
 
 
 def build(slots: int = 0, window: int = 0, decay_tag: float = 1.0,
-          strongest: bool = False, relative: bool = False,
+          strongest: bool = False, relative: bool = False, newest: int = 0,
           reward: int = REWARD, decay: float = 0.99):
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=VOCAB, d_model=WIDTH, lr=0.05, key_scale=0.5, decay=decay,
         reward_token=reward, reward_window=window, tag_slots=slots,
         tag_decay=decay_tag, tag_relative=relative, tag_strongest=strongest,
-        seed=7))
+        tag_newest=newest, seed=7))
     # A decoder, so a prediction reads the memory rather than an untrained
     # readout -- the same choice g9-04's probe made, for the same reason.
     model.wo[:] = model.wv
@@ -294,6 +294,80 @@ class TheCombinedGateKeepsTheUnion(unittest.TestCase):
         both = captures(build(slots=4, decay_tag=0.9, window=1), tokens)[0]
         self.assertEqual(both, sorted(set(tag_only)
                                       | set(captures(build(window=1), tokens)[0])))
+
+
+class KeepingOnlyTheNewestMark(unittest.TestCase):
+    """`tag_newest` narrows what a capture keeps to the most recent marks.
+
+    Built to MEASURE a defect rather than to propose a mechanism: note 027 found
+    the nearest binding before a reward is always the rewarded one, so "detect a
+    binding, keep the most recent" would solve the task exactly. It turns out
+    this project's binding-detection cannot reach it past delay 1 — but the dial
+    is kept because that measurement is the reason the generator fix is not
+    urgent, and it should be re-runnable.
+    """
+
+    def test_it_is_off_by_default(self):
+        self.assertEqual(LocalMemoryConfig(vocab_size=VOCAB).tag_newest, 0)
+
+    def test_it_is_refused_without_a_tag(self):
+        with self.assertRaises(ValueError):
+            LocalMemoryConfig(vocab_size=VOCAB, reward_token=REWARD,
+                              tag_newest=1)
+
+    def test_it_is_refused_when_it_would_narrow_nothing(self):
+        with self.assertRaises(ValueError):
+            LocalMemoryConfig(vocab_size=VOCAB, reward_token=REWARD,
+                              tag_slots=4, tag_newest=8)
+
+    def test_a_capture_keeps_at_most_that_many(self):
+        tokens = stream(intervals=3)
+        for newest in (1, 2):
+            with self.subTest(newest=newest):
+                sizes = capture_sizes(
+                    build(slots=8, decay_tag=0.9, newest=newest), tokens)
+                self.assertTrue(sizes)
+                for _, kept in sizes:
+                    self.assertLessEqual(kept, newest)
+
+    def test_it_keeps_the_LATEST_marks_not_the_best(self):
+        """The property, not the arithmetic: what survives is a suffix of what
+        was marked, ordered by when it was written.
+
+        **First capture only.** After one capture the two runs have protected
+        different writes, so their stores differ, so their later marks differ --
+        the same feedback the combined gate showed. Comparing a later interval
+        across runs compares two different histories.
+
+        The reward-step write is dropped from the expected set because the
+        narrowed arm excludes it by design.
+        """
+        tokens = stream(intervals=2)
+        reward_at = int(np.flatnonzero(tokens == REWARD)[0])
+        all_marks = captures(build(slots=8, decay_tag=0.9), tokens)[0]
+        kept = captures(build(slots=8, decay_tag=0.9, newest=2), tokens)[0]
+        expected = [s for s in sorted(all_marks) if s != reward_at][-len(kept):]
+        self.assertEqual(kept, expected,
+                         "the surviving marks are not the latest of the marks, "
+                         "so this is ranking rather than recency")
+
+    def test_the_write_made_AT_the_reward_is_excluded(self):
+        """A reward does not vouch for the write that carried it.
+
+        The write at a capture step binds the previous token to the reward
+        token. Note 027's rule is the most recent binding BEFORE the reward, and
+        a write made at the reward is not before it. Without this the arm keeps
+        that write every single time and measures nothing — which is what the
+        first version did.
+        """
+        tokens = stream(intervals=3)
+        rewards = [int(t) for t in np.flatnonzero(tokens == REWARD)]
+        for kept, reward_at in zip(
+                captures(build(slots=8, decay_tag=0.9, newest=1), tokens),
+                rewards):
+            self.assertNotIn(reward_at, kept,
+                             "the capture kept the write made at the reward "
+                             "step itself")
 
 
 class TheMarkFades(unittest.TestCase):

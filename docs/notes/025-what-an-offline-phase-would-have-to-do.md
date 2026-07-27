@@ -33,6 +33,33 @@ node widths from 64 down to 8
 ([g9-06](../../experiments/sweeps/g9-06-is-the-tag-capacity-starved.txt),
 [g9-09](../../experiments/sweeps/g9-09-a-small-node-in-a-wide-network.txt)).
 
+> # THE PREMISE BELOW IS WRONG, AND IT WAS MEASURED THE SAME DAY
+>
+> The paragraph that followed said the tag's shortfall is write-time ignorance —
+> that it cannot tell which bindings will matter. **It can. It keeps every one of
+> them.** Counted over 8 sequences at `slots` 32, `fade` 0.95:
+>
+> | arm | writes kept | rewarded kept | recall | precision |
+> |---|---:|---:|---:|---:|
+> | oracle | 32 | 32 | 100% | **100%** |
+> | tag | 929–965 | 32 | **100%** | **3.4%** |
+>
+> Identical at delays 1, 8 and 20 — including delay 20, where the window keeps
+> **none**. The tag has perfect recall of what matters and keeps about
+> twenty-nine useless writes for every useful one.
+>
+> **So the missing four fifths are interference, not ignorance.** Retrieval goes
+> as `sqrt(d / N)`, and the tag's `N` is thirty times the oracle's while
+> containing everything the oracle contains.
+>
+> That redirects this note. **Replay addresses write-time ignorance and there is
+> no write-time ignorance left to address.** What is needed is PRECISION: the
+> same recall with fewer passengers. An offline phase might still deliver that —
+> revisiting could discard as well as rescue — but it is no longer the obvious
+> mechanism, and R1–R5 below were written against the wrong problem. They are
+> kept because the constraints (R3 cost, R4 locality, R5 measured against the
+> tag) survive the change of target.
+
 **It recovers about a fifth of what the oracle gets, and the remaining four
 fifths have a name.** The oracle knows at write time which writes will matter.
 The tag does not, and cannot: `reward_recall` chooses rewarded cues uniformly out

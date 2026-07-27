@@ -118,6 +118,52 @@ with node size, a tuned-capacity-but-mistuned-fade cell will still decline and
 prediction 2 will fail for a reason that is not about capacity at all.
 
 
+ADDENDUM: PREDICTIONS FROM A MECHANISM, REGISTERED AFTER DISPATCH
+------------------------------------------------------------------
+Written after the matrix was dispatched and **before any cell returned**, which
+makes them weaker than 1-5 above and stronger than a reading of the results. They
+come from a no-training control that counts what the tag keeps.
+
+Recall and precision of rewarded bindings, `fade` 0.95, 8 sequences, 32 available:
+
+    delay  slots   kept   recall  precision   recall x precision
+        8      2     56      22%      12.5%                0.027
+        8      4    110      47%      13.6%                0.064
+        8      8    230      84%      11.7%              **0.099**
+        8     16    465     100%       6.9%                0.069
+        8     32    941     100%       3.4%                0.034
+
+       20      2     54       6%       3.7%                0.002
+       20      4    112       6%       1.8%                0.001
+       20      8    230      25%       3.5%                0.009
+       20     16    481      62%       4.2%                0.026
+       20     32    965     100%       3.3%              **0.033**
+
+**A1. Recovery peaks at `slots` 8 at delay 8, and at `slots` 32 at delay 20.**
+The product of recall and precision peaks there, and retrieval goes as
+`sqrt(d / N)` where `N` is what the tag admits. If recovery peaks elsewhere, this
+product is not what recovery tracks and the account is wrong.
+
+**A2. THE BEST CAPACITY DEPENDS ON THE DELAY, which the tag was not supposed to
+need.** That is the uncomfortable one. g9-06 and g9-09's headline is that the tag
+does not have to be told the delay -- and it is measured at `slots` 32, where
+recall is 100% at both delays and the product is 0.034 against 0.033. **That
+equality is why the row is flat.** At `slots` 8 the product is 0.099 against
+0.009, a factor of ten.
+
+So the prediction is that **g9-10 shows flatness at `slots` 32 and a cliff at
+`slots` 8** -- and if it does, the tag's central property belongs to the capacity
+that keeps everything, which is also the capacity with the worst precision. The
+flatness would be bought by admitting so much that the delay stops mattering.
+
+**A3. This makes prediction 1 above unlikely as stated.** "Best capacity tracks
+node width" competes with "best capacity tracks delay", and the control says the
+delay term is large. Prediction 1 may survive as a second-order effect at fixed
+delay; it will not survive as the whole story.
+
+Registered so the sweep can refute an account rather than only report numbers.
+
+
 WHAT WOULD REFUTE WHAT
 -----------------------
 - best slots tracks node width      -> the tag has a tuning rule derived from

@@ -694,3 +694,37 @@ can identify *which* of the six bindings without being told the delay. It needs 
 probe in g9-04's shape — AUC against "is the rewarded binding", among bindings
 only — and that has never been asked. It either finds the signal or bounds the
 line at about 20% of the oracle, which would close it honestly.
+
+## 27. g9-10 landed, and I did not dispatch the obvious follow-up
+
+**The result.** The best capacity tracks the DELAY, not the node — 16 at delay 8
+and 32 at delay 20, at every node width. Prediction 1 refuted. And the tag's
+flatness belongs to `slots` 32 alone: spread 0.01 there against 0.57 at `slots`
+8. That was addendum A2, derived from a two-minute counting control and confirmed
+by 24 trained cells. **The mechanism-derived addendum outscored the pre-dispatch
+predictions**, which is the argument for counting before guessing.
+
+**The surprise.** `combined` scores +0.26 at `slots` 4 where the tag alone scores
+−0.02 — the highest tag-family recovery in the project, at the smallest capacity
+tried. Prediction 4 called it exactly, for a mechanism that had never been swept.
+
+**Chosen: NOT dispatching g9-11.** `slots` 4 is the bottom edge, which is a
+pinned axis by the rule that caught g9-05, so a follow-up is indicated. A
+counting control says it would find a flat row: at delay 8 the union's recall is
+pinned at 100% by the window and its precision approaches window-alone from
+below, so smaller capacities change nothing; at delay 20 the union is worse than
+the tag alone. Four minutes of control against a 24-job matrix.
+
+**What I want reviewed, because it is a limit on a tool I have been leaning
+on.** The recall × precision product got g9-10's peaks right across capacities
+and gets this comparison wrong across mechanisms — it ranks window-alone above
+combined at delay 8 (0.112 vs 0.106) where training measured the reverse (+0.23
+vs +0.26). So whatever the union adds is in *which* writes it keeps, not how
+many, and the product cannot see that. I have used it three times tonight and
+this is the first case where it fails; the failure is in the direction of
+under-rating a mechanism, which is the safer direction but not a safe one.
+
+**The one axis nobody has swept** is the combined gate's window reach, frozen at
+8 everywhere. Reach 1 would add two writes per capture instead of nine. Logged in
+BACKLOG rather than dispatched, because it needs predictions written first and
+the control above explicitly cannot settle it.

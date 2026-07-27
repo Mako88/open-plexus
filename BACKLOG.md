@@ -402,6 +402,43 @@ the whole mechanism and the signal was a detour.
 [g9-07](experiments/sweeps/g9-07-a-tag-that-knows-how-big-its-store-is.txt) asks
 exactly that, with `tag_relative`.
 
+## g9-11 WAS NOT DISPATCHED, and the control is why
+
+g9-10's best cell is `combined` at `slots` 4, +0.26 -- the highest tag-family
+recovery anywhere here -- and `slots` 4 is the BOTTOM EDGE of that grid. By the
+rule that caught g9-05, that is a pinned axis and wants a follow-up.
+
+A counting control says the follow-up would find flatness. Recall x precision,
+window reach 8:
+
+    delay 8    window alone 0.112   combined 1/2/4/8: 0.109 0.108 0.106 0.096
+    delay 20   window alone 0.000   tag 8 alone 0.008   combined 8: 0.003
+
+**At delay 8 the combined gate IS the window.** Recall is pinned at 100% by the
+window -- a union cannot subtract -- and precision approaches window-alone from
+below, so adding tag marks only dilutes. **At delay 20 it is WORSE than the tag
+alone**, because the union adds the window's nine useless writes per capture
+without adding recall.
+
+So a matrix over `slots` 1-8 would measure a flat row. Not dispatched. The
+control cost four minutes and the rule it serves -- controls before dispatch --
+is exactly what it is for.
+
+**One thing the control does NOT explain and it is worth chasing.** It ranks
+window-alone above combined at delay 8 (0.112 against 0.106), but g9-10 measured
+combined at +0.26 against the window's +0.23. So recall x precision is a good
+ordinal predictor across capacities and NOT across mechanisms -- it got g9-10's
+peaks right and this comparison wrong. Whatever the union adds at delay 8 is not
+visible in what it keeps, which means it is in WHICH writes rather than how many.
+
+### The axis nobody has swept
+
+`REWARD_WINDOW` is frozen at 8 in every combined cell. A combined gate with reach
+1 adds two writes per capture instead of nine, so it should keep the union's
+delay-8 advantage while paying far less at delay 20. That is one dial, it is the
+last untested one on this mechanism, and the control above cannot settle it
+because the effect it would test is the one the control cannot see.
+
 ## THE TASK LEAKS THE ANSWER, and this outranks everything below it
 
 [Note 027](docs/notes/027-the-task-leaks-the-answer-through-its-layout.md).

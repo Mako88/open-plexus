@@ -14,7 +14,29 @@ record of what was settled. Nothing below is deleted, because the reasoning in
 the settled sections is why the open ones are shaped as they are. But a reader
 looking for work should start here.
 
-**OPEN, in order of what would change the most:**
+**ACTUALLY OPEN RIGHT NOW.** The numbered list below was written as "open, in
+order" and four of its items have since been answered IN PLACE -- their entries
+now carry the answers, which is why they are still there. This is the current
+state:
+
+| what | where | who |
+|---|---|---|
+| **A per-key slot store, and whether it reaches its ceiling** | g10-05 sized it at 8 slots for 83-97%; `slot_cost.py` says any node wider than 3 affords it via token ids. **Unbuilt, unmeasured, and the highest-value thing on this page** | mine |
+| **The distributed path cannot run a gated model** | item 6. Needs a step-wise API on `LocalAssociativeMemory`, not a second gate implementation on `Node` | mine, deferred with reasons |
+| **bAbI task 2** | *Tasks beyond MQAR*. The first item needing a new mechanism (chained retrieval) rather than a new measurement | mine |
+| **More seeds on one settled grid** | item 0b, downgraded: paired scoring already tightened the bounds 15x, so this is worth doing and no longer urgent | mine |
+| **Fix `reward_recall`'s layout?** | item 1. The leak is real and measured inert; the fix changes what the task IS and invalidates nine sweeps' comparison set | **John's** |
+| **What belongs in GOALS.md?** | item 4. Its corrected gating section is now the largest live-investigation block in a document that may be meant for settled results | **John's** |
+| **Bundle a standard corpus?** | item 5. `docs/notes` needed no decision and answered the blocking question; a standard corpus would make the number comparable to published ones | **John's** |
+
+**ANSWERED THIS SESSION**, kept below for their reasoning: item 0 (the frozen
+learning rate cost nothing detectable), item 0b (most of that "noise" was an
+artefact of unpaired scoring), item 2 (g9-11 ran twice and is done), item 3 (only
+recency finds WHICH binding, and recency is the leak). The corpus benchmark under
+item 5 went from unstarted to a costed mechanism-shaped diagnosis -- see
+[DECISIONS 42](DECISIONS.md) for that arc end to end.
+
+**The numbered list, several answered in place:**
 
 0. **ANSWERED: THE FROZEN LEARNING RATE COST NOTHING DETECTABLE.**
    [g9-12](experiments/sweeps/g9-12-what-does-the-frozen-learning-rate-cost.txt)

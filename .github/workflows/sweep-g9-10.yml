@@ -1,0 +1,90 @@
+name: sweep-g9-10-does-the-best-capacity-track-the-node
+
+# g9-09 measured recovery falling from +0.16 at node 16 to +0.11 at node 8, and
+# named the frozen working point as its standing risk before dispatch: slots 32
+# and fade 0.95 were chosen at d_model 32 in one process.
+#
+# PRE-DISPATCH CONTROL, node 8, delay 8, one seed, 40 sequences:
+#
+#     none 0.362   oracle 1.000   gap 0.637
+#       slots 8    tag 0.667   recovery 0.48
+#       slots 32   tag 0.554   recovery 0.30
+#
+# So the small-node cells in g9-09 measured a mistuned tag. Registered before
+# that control ran and confirmed by it.
+#
+# THE QUESTION IS WHETHER THERE IS A RULE. Retrieval goes as sqrt(d / N) --
+# note 020 measured it within 5% across a 16x range -- and N is exactly what the
+# tag bounds. So the best capacity should track the width the node reads
+# through, which would give the tag a tuning rule derived from a measured law
+# instead of a constant chosen once.
+#
+# slots reaches down to 4 because the control has 8 beating 32 and the optimum
+# may be lower still. fade stays at 0.95 for cost, and that is this grid's
+# standing risk in turn.
+#
+# `combined` is in a sweep for the first time: its own control found it
+# degenerate at the working point, and small capacity is the one regime where
+# the tag and the window hold different writes.
+#
+# 24 jobs, six arms x three seeds x one rate = 18 cells a job at width 64.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  capacity:
+    strategy:
+      fail-fast: false
+      matrix:
+        partitions: [2, 4, 8]
+        slots: [4, 8, 16, 32]
+        delay: [8, 20]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: node ${{ 64 }}/${{ matrix.partitions }} slots ${{ matrix.slots }} delay ${{ matrix.delay }}
+        run: python experiments/g9_05_the_tag.py --width 64 --partitions ${{ matrix.partitions }} --slots ${{ matrix.slots }} --fade 0.95 --scale ${{ matrix.delay }} --lr 0.05 --workers 3 --json out/X-${{ matrix.partitions }}-${{ matrix.slots }}-${{ matrix.delay }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-10-${{ matrix.partitions }}-${{ matrix.slots }}-${{ matrix.delay }}
+          path: out/*.json
+
+  aggregate:
+    needs: [capacity]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g9-10-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 24" | tee summary.txt
+          python -m tools.summarise_g9_10 | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-10-summary
+          path: |
+            summary.txt
+            out/*.json

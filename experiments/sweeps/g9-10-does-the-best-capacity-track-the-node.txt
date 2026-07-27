@@ -1,0 +1,152 @@
+Does the tag's best capacity track the node's width?
+====================================================
+
+Script: experiments/g9_05_the_tag.py, with --partitions and --slots swept
+Status: PRE-REGISTERED, with a pre-dispatch control disclosed below.
+
+
+IN PLAIN TERMS
+---------------
+The filter has one setting: how many things it is allowed to keep. Every result
+so far used the same number, 32, chosen once on a full-sized machine and never
+changed. The last run found the filter getting worse on small devices, and that
+number is the obvious suspect -- a small device being told to keep 32 things may
+simply be being told to keep too many.
+
+A two-minute check says yes: on the smallest device that works, keeping 8 things
+recovers half again as much as keeping 32.
+
+So the real question is whether there is a RULE. If the right number is just
+"about as many as the device has room for", then the filter has no magic constant
+in it and tunes itself from something every device already knows about itself.
+That would matter more than any single number this project has measured.
+
+
+WHY THIS RUN EXISTS
+--------------------
+[g9-09](g9-09-a-small-node-in-a-wide-network.txt) measured recovery falling from
++0.16 at node 16 to +0.11 at node 8, and named the frozen working point as its
+standing risk before dispatch: `slots` 32 and `fade` 0.95 were chosen at
+`d_model` 32 in one process, so every small-node cell may have measured a
+mistuned tag.
+
+**The control says it did.** At node 8, delay 8, one seed, 40 sequences:
+
+    none 0.362   oracle 1.000   gap 0.637
+
+      slots     tag   recovery
+          8   0.667       0.48
+         32   0.554       0.30
+
+Registered before it ran: *at node 8, `slots` 8 beats `slots` 32, because a
+narrower reader has less room for superposed content.* Confirmed, and by more
+than expected.
+
+**And there is an equation that predicts the shape.** Retrieval quality goes as
+`sqrt(d / N)` -- [note 020](../../docs/notes/020-the-capacity-equation-checked.md)
+measured it within 5% across a 16x range and checked it against an analytic
+bound. `N` is exactly what the tag bounds. So the capacity a node can carry
+before retrieval degrades should scale with the width it reads through, and the
+tag's best `slots` should track the node.
+
+If that holds, the tag has a TUNING RULE rather than a constant, derived from a
+law this project already measured, and every node sets it from something it knows
+about itself without being told anything.
+
+
+THE GRID
+---------
+  partitions  2, 4, 8         node holds 32, 16, 8 of a network fixed at 64
+  slots       4, 8, 16, 32    four values, so grid.py can find an interior, and
+                              reaching BELOW 8 because the control has 8 beating
+                              32 and the optimum may be lower still
+  delay       8, 20           g9-09 measured the tag flat across delay at every
+                              node size (spreads 0.01 to 0.04), so two delays
+                              suffice -- and 20 is where the window is
+                              catastrophic, so it is the interesting one
+  fade        0.95, FIXED     the other half of the frozen working point. NOT
+                              swept, and that is this grid's standing risk in
+                              turn: if the best fade moves with node size too,
+                              these cells measure a half-tuned tag
+  arms        none, oracle, reward, tag, tag-strongest, combined
+  seeds       1, 2, 3
+  lr          0.05, FIXED on every arm
+
+24 jobs. `node 32, slots 32` reproduces g9-09's cells exactly and is the wiring
+check, free.
+
+**`combined` is in a sweep for the first time.** Its own control found it
+degenerate at the working point -- identical to the tag, because the tag's marks
+already contain the window's writes -- and it appears here because small capacity
+is the one regime where the two hold different writes. At `slots` 4 and 8 it
+should finally differ from both.
+
+
+PREDICTIONS
+------------
+1. **THE ONE THIS RUN EXISTS FOR: the best `slots` tracks the node width.**
+   Guess: the best capacity is within a factor of two of the node's width at all
+   three node sizes -- so about 32 at node 32, about 16 at node 16, about 8 at
+   node 8. The reason is `sqrt(d / N)`, not intuition: `N` is what the tag
+   bounds and `d` is what the node reads through.
+
+   If it holds, the tag tunes itself from a quantity every node knows.
+
+2. **Recovery at the tuned capacity does NOT fall with node size.** g9-09's
+   decline from +0.16 to +0.11 was a mistuned tag, so at its own best `slots`
+   each node should recover about the same. Guess: within 0.05 across the three
+   node sizes. **This is the one that would change what g9-09 concluded.**
+
+3. **The flatness survives retuning.** Spread between delays 8 and 20 under 0.10
+   at every tuned cell. g9-09 got 0.01 to 0.04 at a fixed capacity; if changing
+   the capacity breaks flatness, the property was an artefact of that setting
+   rather than of counting bindings.
+
+4. **`combined` beats both `tag` and `reward` at `slots` 4 and 8, and equals
+   `tag` at 32.** The degeneracy at large capacity is measured; the whole reason
+   to keep the arm is that small capacity is where the two mechanisms hold
+   different writes.
+
+5. **`tag` beats `tag-strongest` by more at small `slots` than at 32**, at every
+   node size. g9-06 measured +0.222 at 16 slots against +0.003 at 32. This asks
+   whether that is about capacity alone, now that g9-09 has ruled out node width
+   as a second kind of scarcity.
+
+Most likely wrong: **2.** It assumes the ONLY thing wrong at node 8 was the
+capacity, and `fade` is frozen at 0.95 here for cost. If the best fade also moves
+with node size, a tuned-capacity-but-mistuned-fade cell will still decline and
+prediction 2 will fail for a reason that is not about capacity at all.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- best slots tracks node width      -> the tag has a tuning rule derived from
+                                       sqrt(d/N), not a constant. Every node
+                                       sets it from what it already knows
+- best slots is 32 everywhere       -> the control was a one-seed artefact, and
+                                       g9-09's decline is real. Say so and stop
+                                       blaming the working point
+- best slots is flat but NOT 32     -> there is a constant and it is the wrong
+                                       one. Cheap to fix and worth knowing
+- flatness breaks when retuned      -> the tag's central property belongs to one
+                                       setting rather than to the mechanism,
+                                       which would undo most of g9-05 to g9-09
+
+
+COST
+-----
+24 jobs of (partitions, slots, delay). Six arms x three seeds x one rate = 18
+cells a job at width 64. g9-09 ran 15 cells a job at the same width comfortably
+inside 90 minutes, so this is about a fifth more per job.
+
+**Local cost, recorded because it was nearly a mistake.** The first version of the
+control ran 12 cells x 6 arms at width 64 and was still going after fourteen
+minutes. It was killed and cut to six trainings at one node. That is the failure
+g8-05 recorded -- "a quick control at one cell" that held the machine for ten
+minutes -- and it very nearly repeated.
+
+
+THE ORACLE, SAID TWICE
+-----------------------
+The `oracle` arm reads `position_kinds()` and is a CEILING. Every recovery figure
+is a fraction of an advantage no deployed system has.

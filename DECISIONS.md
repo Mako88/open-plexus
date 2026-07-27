@@ -1737,3 +1737,45 @@ rebinding**. Any workload that revisits a key is outside what has been measured,
 which is most real workloads.
 
 565 tests, 118 mutations.
+
+## 47. "The store cannot overwrite" was wrong, and the corrected version is better
+
+Entry 46 reported that rebinding a cue destroys it, and called that a third
+structural difference from a cache. **It was measured at `decay=1.0`, a constant
+I chose**, where the g9 line's default is 0.997 and the model accepts any value.
+
+Rebinding 8 cues, accuracy against a chance of 0.00024:
+
+       decay   64 rebindings   512 rebindings
+         1.0           0.250            0.000
+       0.997           0.125            0.000   <- the g9 default
+        0.99           0.125            0.375
+        0.95           0.875            0.750
+
+**It can overwrite, at decay 0.95.** What it cannot do is overwrite at the decay
+this project actually uses — so the finding holds for every configuration
+measured in the repository, and the mechanism is not missing. It is priced.
+
+**The price is retention.** Decay 0.95 has a half-life of about 13 steps against
+0.997's 231. **Overwriting and remembering are the same dial pulled in opposite
+directions**, and a table does both at once for nothing. That is a sharper claim
+than "cannot", and it survives scrutiny where the original would not have.
+
+### The process point, which is now the main thing I am tracking
+
+This is the seventh instance of the recurring error and the **second caught
+before publication**. The catch came from the same habit as the last one: asking
+*what did I fix that I did not have to fix?* — here, a decay constant chosen for
+convenience in a file about a different question.
+
+Two catches in a row, both from interrogating my own frozen choices rather than
+from being careful in general. Being careful in general has failed five times;
+this specific question has now worked twice.
+
+**It also means g9's `decay=0.997` is a frozen axis with a newly visible cost.**
+Note 028 flagged `DECAY` as arriving by import and never swept, and measured it
+moving recall by at most 13 points. It never asked what it costs in REBINDING,
+because no task in the repository rebinds. That is now a known gap rather than an
+unknown one.
+
+565 tests, 118 mutations.

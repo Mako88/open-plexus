@@ -89,6 +89,27 @@ is noise.
 cache, alongside capacity and exact recall, and it was not on note 030's list of
 four.
 
+> **CORRECTED: "cannot overwrite" was measured at `decay=1.0`, which I chose.**
+> The g9 line's default is 0.997 and the model supports any value. Rebinding 8
+> cues, accuracy against a chance of 0.00024:
+>
+>        decay   64 rebindings   512 rebindings
+>          1.0           0.250            0.000
+>        0.997           0.125            0.000   <- the g9 default
+>         0.99           0.125            0.375
+>         0.95           0.875            0.750
+>
+> **It CAN overwrite, at decay 0.95.** What it cannot do is overwrite at the
+> decay this project actually uses. So the finding holds for every configuration
+> measured here, and the mechanism is not missing -- it is priced.
+>
+> **And the price is retention.** Decay 0.95 has a half-life of about 13 steps
+> against 0.997's 231. Overwriting and remembering are the same dial pulled in
+> opposite directions, which is a sharper statement than "cannot" and is the one
+> that belongs in any comparison with a table -- a table does both at once and
+> pays nothing.
+
+
 It also raises a question about the g9 line worth asking separately: MQAR and
 `reward_recall` present each cue ONCE per sequence, so no result in this project
 has ever depended on rebinding. **Any workload that revisits a key is outside

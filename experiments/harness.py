@@ -120,6 +120,11 @@ def parse_args(description: str) -> argparse.Namespace:
                         help="how far back a gate may reach")
     parser.add_argument("--slots", type=int, default=None,
                         help="how many writes a tag may hold at once")
+    parser.add_argument("--cap", type=float, default=None,
+                        help="largest norm the FAST store may reach; 0 leaves "
+                             "it unbounded, which is the default in the model "
+                             "and which lets a long sequence with dense "
+                             "supervision drive the readout to 1e72 (g10-01)")
     parser.add_argument("--fade", type=float, default=None,
                         help="per-step multiplier ageing a tag's marks toward "
                              "eviction; 1.0 never ages them")

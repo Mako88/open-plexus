@@ -33,7 +33,9 @@ model for a reason that has nothing to do with what it learned.
 
 So a single scalar **temperature** is fitted, and:
 
-- it is fitted on **held-out TRAINING chunks**, never on test
+- it is fitted on **held-out training DOCUMENTS**, never on test, and never on
+  chunks of documents that were trained on — see `run_one`, where the first
+  version got exactly that wrong
 - it is **one parameter**, which cannot encode anything about the text
 - both numbers are reported, raw and calibrated, because the gap between them
   is itself informative — a large one means the readout is badly scaled rather
@@ -67,8 +69,6 @@ from openplexus.ngram import NGram, uniform_bits  # noqa: E402
 from openplexus.tasks.corpus import build, chunks, read  # noqa: E402
 
 NOTES = Path(__file__).resolve().parent.parent / "docs" / "notes"
-#: Held back from TRAINING to fit the temperature. Never test.
-CALIBRATION_SHARE = 0.1
 #: Spanning three orders of magnitude, because the first control pinned at the
 #: BOTTOM of a 0.25-to-8 grid: a delta-rule readout's scores are far flatter than
 #: a softmax expects, so the useful temperatures are small. A pinned calibration
@@ -108,17 +108,71 @@ def bits(scores: np.ndarray, targets: np.ndarray, temperature: float) -> float:
     return float(-np.log2(np.maximum(probability, 1e-12)).mean())
 
 
+def absurd(value: float, vocab_size: int) -> str | None:
+    """Why this number cannot be a model's cross-entropy, or None if it can.
+
+    **A value far above `uniform` is not a bad model, it is a broken number.**
+    Uniform is what assigning equal probability to everything costs, so beating
+    it requires no knowledge at all and losing to it by a wide margin requires
+    being confidently, specifically wrong — which a fitted temperature can
+    manufacture and a model cannot.
+
+    g10-01's first run reported 37 bits per character over an 86-symbol
+    vocabulary and NaN, and both were read off a table as though they were
+    results. This exists so the next one announces itself.
+    """
+    ceiling = uniform_bits(vocab_size)
+    if not np.isfinite(value):
+        return f"not finite ({value})"
+    if value > ceiling + 1.0:
+        return (f"{value:.3f} bits is more than a whole bit worse than uniform "
+                f"({ceiling:.3f}); a model cannot be this wrong by accident, so "
+                f"this is the calibration or the arithmetic, not the model")
+    return None
+
+
 def run_one(args) -> list[dict]:
-    seed, width, chunk = args
+    seed, width, chunk, cap = args
     corpus = build(read(NOTES))
-    train = chunks(corpus.train, chunk)
-    held = max(1, int(len(train) * CALIBRATION_SHARE))
-    fitting, calibration = train[:-held], train[-held:]
+    # Held-out DOCUMENTS, not held-out chunks of training documents.
+    #
+    # The first version split the chunk list, which holds text out of training
+    # but leaves it inside documents the model was trained on. The temperature
+    # then gets fitted where the model is far more confident than it has any
+    # right to be on unseen prose, and it chose the SHARPEST temperature the
+    # grid offered -- 0.01, the minimum -- which on test text put ~1e-11 on the
+    # token that actually arrived and reported 37 bits per character over an
+    # 86-symbol vocabulary.
+    #
+    # This is precisely the failure `corpus.py` warns about for the train/test
+    # split, made in the calibration split by the same hand that wrote the
+    # warning. Whole documents, disjoint.
+    held = max(1, len(corpus.train) // 5)
+    fitting = chunks(corpus.train[:-held], chunk)
+    calibration = chunks(corpus.train[-held:], chunk)
+    if not fitting or not calibration:
+        raise SystemExit(
+            f"chunk {chunk} leaves {len(fitting)} training and "
+            f"{len(calibration)} calibration chunks; nothing to fit")
     test = chunks(corpus.test, chunk)
 
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=corpus.vocab_size, d_model=width, lr=0.05,
-        key_scale=0.5, decay=0.997, derived_keys=True, seed=seed))
+        key_scale=0.5, decay=0.997, derived_keys=True,
+        # THE FAST STORE'S CAP, and it defaults to OFF in the model.
+        #
+        # Without it a 256-step chunk with a delta-rule update at EVERY position
+        # runs away: the store accumulates, retrievals grow, the updates feed on
+        # the retrievals, and `Wo` reached 1e72 with next-character accuracy of
+        # 0.005 -- BELOW the 1/86 chance rate. The reported cross-entropy was
+        # 39.5 bits, identical at every temperature, because scores that large
+        # make the softmax a hard one-hot whatever it is divided by.
+        #
+        # Swept rather than pinned. A value chosen from the one cell where the
+        # divergence was found would be the frozen-constant mistake this project
+        # keeps catching, and 5.0 and 1.0 already disagree by 0.13 bits.
+        memory_cap=cap,
+        seed=seed))
     model.wo[:] = model.wv
 
     rng = np.random.default_rng(seed)
@@ -143,12 +197,20 @@ def run_one(args) -> list[dict]:
 
     test_scores, test_targets = scores_and_targets(model, test)
     predicted = test_scores.argmax(axis=1)
+    calibrated = bits(test_scores, test_targets, temperature)
+    broken = absurd(calibrated, corpus.vocab_size)
+    if broken:
+        raise SystemExit(
+            f"width {width} chunk {chunk} seed {seed}: {broken}. Temperature "
+            f"chosen was {temperature} (grid {TEMPERATURES[0]}.."
+            f"{TEMPERATURES[-1]}); a value at the grid edge means the "
+            f"calibration wanted something the grid does not contain.")
     return [{
-        "seed": seed, "width": width, "chunk": chunk,
+        "seed": seed, "width": width, "chunk": chunk, "cap": cap,
         "vocab_size": corpus.vocab_size,
         "temperature": temperature,
         "bits_raw": bits(test_scores, test_targets, 1.0),
-        "bits_calibrated": bits(test_scores, test_targets, temperature),
+        "bits_calibrated": calibrated,
         "accuracy": float((predicted == test_targets).mean()),
         "uniform": uniform_bits(corpus.vocab_size),
         "unigram": NGram(corpus.vocab_size, 0).fit(
@@ -168,7 +230,7 @@ def control() -> int:
           f"characters, {corpus.test_tokens} test")
     print(f"uniform {uniform_bits(corpus.vocab_size):.3f}   "
           f"bigram {NGram(corpus.vocab_size, 1).fit(corpus.train).bits_per_token(corpus.test):.3f}")
-    record = run_one((1, 32, 64))[0]
+    record = run_one((1, 32, 64, 5.0))[0]
     print(f"model raw {record['bits_raw']:.3f}, calibrated "
           f"{record['bits_calibrated']:.3f} at temperature "
           f"{record['temperature']}, accuracy {record['accuracy']:.3f}")
@@ -182,8 +244,9 @@ def main() -> int:
     seeds = [args.seed] if args.seed is not None else list(SEEDS)
     width = args.width if args.width else 64
     chunk = int(args.scale) if args.scale is not None else 256
+    cap = args.cap if args.cap is not None else 5.0
 
-    jobs = [(seed, width, chunk) for seed in seeds]
+    jobs = [(seed, width, chunk, cap) for seed in seeds]
     records = [r for batch in harness.spread(run_one, jobs, args.workers)
                for r in batch]
 

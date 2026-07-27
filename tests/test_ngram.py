@@ -18,7 +18,8 @@ import math
 import unittest
 
 from openplexus.ngram import (
-    DEFAULT_K, NGram, bits_from_distributions, perplexity, uniform_bits)
+    DEFAULT_K, NGram, absurd, bits_from_distributions, perplexity,
+    uniform_bits)
 
 
 class CountingIsWhatItClaims(unittest.TestCase):
@@ -124,6 +125,61 @@ class WaysCrossEntropyGoesQUIETLYWrong(unittest.TestCase):
     def test_scoring_nothing_is_refused(self):
         with self.assertRaises(ValueError):
             NGram(vocab_size=4, order=1).fit([[0, 1]]).bits_per_token([])
+
+
+class ANumberWorseThanUniformIsBROKENNotBad(unittest.TestCase):
+    """The guard that g10-01 needed and did not have.
+
+    It reported **39.5 bits per character over an 86-symbol vocabulary, and
+    NaN**, and both were read off a results table as though they measured a
+    language model. They were a readout that had reached 1e72 with
+    next-character accuracy of 0.005 — below the 1/86 chance rate.
+
+    Uniform is what knowing nothing costs. Being far worse than that requires
+    being confidently and specifically wrong, which a runaway readout or a
+    mis-fitted temperature can manufacture and a model cannot reach by being
+    poor at its job.
+    """
+
+    def test_the_number_that_actually_got_through(self):
+        self.assertIsNotNone(absurd(39.544, 86))
+
+    def test_nan_is_refused(self):
+        self.assertIn("not finite", absurd(float("nan"), 86))
+
+    def test_infinity_is_refused(self):
+        self.assertIn("not finite", absurd(float("inf"), 86))
+
+    def test_a_plausible_bad_model_is_ALLOWED(self):
+        """The vacuity guard on the tests above.
+
+        A rule that refused everything would pass them all while making the
+        benchmark useless. 5.9 bits over 86 symbols is a genuinely poor model
+        and a genuinely real measurement, and it must survive.
+        """
+        self.assertIsNone(absurd(5.891, 86))
+
+    def test_uniform_itself_is_allowed(self):
+        self.assertIsNone(absurd(uniform_bits(86), 86))
+
+    def test_slightly_worse_than_uniform_is_allowed(self):
+        """A miscalibrated model can sit a little above uniform and still be
+        worth reporting. Only the wild values are refused."""
+        self.assertIsNone(absurd(uniform_bits(86) + 0.5, 86))
+
+    def test_the_threshold_scales_with_the_VOCABULARY(self):
+        """13 bits is absurd for 86 symbols and unremarkable for 100,000.
+
+        A constant cut-off would refuse real results on a large vocabulary,
+        which is exactly the corpus this project would move to next.
+        """
+        self.assertIsNotNone(absurd(13.0, 86))
+        self.assertIsNone(absurd(13.0, 100_000))
+
+    def test_the_message_names_the_ceiling_it_used(self):
+        """A refusal that does not say what it compared against cannot be
+        argued with -- the same rule tools/recovery.py follows."""
+        self.assertIn(f"{uniform_bits(86):.3f}", absurd(39.544, 86))
 
 
 class TheTwoSCORERSAgree(unittest.TestCase):

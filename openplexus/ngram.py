@@ -167,6 +167,37 @@ def bits_from_distributions(distributions: Iterable[Sequence[float]],
     return total / count
 
 
+def absurd(value: float, vocab_size: int, slack: float = 1.0) -> str | None:
+    """Why this cannot be a model's cross-entropy, or None if it can.
+
+    **A value far above `uniform_bits` is not a bad model, it is a broken
+    number.** Uniform is what assigning equal probability to everything costs,
+    so beating it requires no knowledge at all. Losing to it by a wide margin
+    requires being confidently, *specifically* wrong — putting almost all the
+    mass on characters that did not arrive — which a runaway readout or a
+    mis-fitted temperature can manufacture and a model cannot reach by being
+    poor at its job.
+
+    This exists because g10-01 reported **39.5 bits per character over an
+    86-symbol vocabulary, and NaN**, and both were read off a results table as
+    though they were measurements of a language model. They were a readout that
+    had reached 1e72 with next-character accuracy of 0.005, below the 1/86
+    chance rate.
+
+    `slack` is the margin allowed above uniform before refusing. It is a
+    parameter because a genuinely miscalibrated model can sit slightly above
+    uniform and still be worth reporting; nothing can sit 40 bits above it.
+    """
+    ceiling = uniform_bits(vocab_size)
+    if value != value or value in (float("inf"), float("-inf")):
+        return f"not finite ({value})"
+    if value > ceiling + slack:
+        return (f"{value:.3f} bits is more than {slack} above uniform "
+                f"({ceiling:.3f}); a model cannot be this wrong by accident, "
+                f"so this is the calibration or the arithmetic, not the model")
+    return None
+
+
 def perplexity(bits: float) -> float:
     """`2 ** bits`. Reported because the literature uses it; adds nothing."""
     return 2.0 ** bits

@@ -65,7 +65,7 @@ import numpy as np  # noqa: E402
 from experiments import harness  # noqa: E402
 from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
-from openplexus.ngram import NGram, uniform_bits  # noqa: E402
+from openplexus.ngram import NGram, absurd, uniform_bits  # noqa: E402
 from openplexus.tasks.corpus import build, chunks, read  # noqa: E402
 
 NOTES = Path(__file__).resolve().parent.parent / "docs" / "notes"
@@ -106,29 +106,6 @@ def bits(scores: np.ndarray, targets: np.ndarray, temperature: float) -> float:
     weights = np.exp(scaled)
     probability = weights[np.arange(len(targets)), targets] / weights.sum(axis=1)
     return float(-np.log2(np.maximum(probability, 1e-12)).mean())
-
-
-def absurd(value: float, vocab_size: int) -> str | None:
-    """Why this number cannot be a model's cross-entropy, or None if it can.
-
-    **A value far above `uniform` is not a bad model, it is a broken number.**
-    Uniform is what assigning equal probability to everything costs, so beating
-    it requires no knowledge at all and losing to it by a wide margin requires
-    being confidently, specifically wrong — which a fitted temperature can
-    manufacture and a model cannot.
-
-    g10-01's first run reported 37 bits per character over an 86-symbol
-    vocabulary and NaN, and both were read off a table as though they were
-    results. This exists so the next one announces itself.
-    """
-    ceiling = uniform_bits(vocab_size)
-    if not np.isfinite(value):
-        return f"not finite ({value})"
-    if value > ceiling + 1.0:
-        return (f"{value:.3f} bits is more than a whole bit worse than uniform "
-                f"({ceiling:.3f}); a model cannot be this wrong by accident, so "
-                f"this is the calibration or the arithmetic, not the model")
-    return None
 
 
 def run_one(args) -> list[dict]:

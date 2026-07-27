@@ -581,6 +581,29 @@ MUTATIONS = [
         new='    if False:',
     ),
     Mutation(
+        name="the-absurdity-guard-lets-everything-through",
+        breaks="the check that a cross-entropy far worse than uniform is a "
+               "BROKEN number rather than a bad model. g10-01 reported 39.5 "
+               "bits over an 86-symbol vocabulary and NaN, both read off a "
+               "table as measurements; they were a readout at 1e72 with "
+               "accuracy below chance",
+        path=NGRAM,
+        old="    if value > ceiling + slack:",
+        new="    if False:",
+    ),
+    Mutation(
+        name="the-absurdity-threshold-ignores-the-vocabulary",
+        breaks="the scaling of that check. A constant cut-off refuses real "
+               "results on a large vocabulary -- 13 bits is absurd for 86 "
+               "symbols and unremarkable for 100,000 -- so the guard would "
+               "start rejecting the very corpus this project would move to",
+        path=NGRAM,
+        old="    ceiling = uniform_bits(vocab_size)\n"
+            "    if value != value or value in (float(\"inf\"), float(\"-inf\")):",
+        new="    ceiling = 7.0\n"
+            "    if value != value or value in (float(\"inf\"), float(\"-inf\")):",
+    ),
+    Mutation(
         name="the-baseline-is-measured-in-nats",
         breaks="the UNIT of every corpus number. Natural log instead of log2 "
                "reports 0.693 of the bits, which is a plausible number, is "

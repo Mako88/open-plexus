@@ -21,7 +21,9 @@ state:
 
 | what | where | who |
 |---|---|---|
-| **A per-key slot store, and whether it reaches its ceiling** | g10-05 sized it at 8 slots for 83-97%; `slot_cost.py` says any node wider than 3 affords it via token ids. **Unbuilt, unmeasured, and the highest-value thing on this page** | mine |
+| **A benchmark that DISCRIMINATES a superposed store from a cache** | [note 030](docs/notes/030-the-benchmark-does-not-discriminate.md). A 48-integer table answers `reward_recall` perfectly and beats the store by 1.58 bits on text. **Neither task can show the store is right, so neither can justify it.** This is now the highest-value thing on this page | mine |
+| **Churn is the discriminating axis already built** | losing a node from a DIMENSION-sliced store degrades every answer slightly; losing one from a KEY-sharded table loses those keys entirely. `testbed/` runs impaired links and `distributed.py` supports mid-sequence departure — and nothing measures this | mine |
+| **A per-key slot store, and whether it reaches its ceiling** | g10-05 sized it at 8 slots for 83-97%; `slot_cost.py` says any node wider than 3 affords it via token ids. Unbuilt — and note 030 makes it less urgent, since the thing it would win at is a task that does not discriminate | mine |
 | **The distributed path cannot run a gated model** | item 6. Needs a step-wise API on `LocalAssociativeMemory`, not a second gate implementation on `Node` | mine, deferred with reasons |
 | **bAbI task 2** | *Tasks beyond MQAR*. The first item needing a new mechanism (chained retrieval) rather than a new measurement | mine |
 | **More seeds on one settled grid** | item 0b, downgraded: paired scoring already tightened the bounds 15x, so this is worth doing and no longer urgent | mine |

@@ -2349,3 +2349,101 @@ CI is not affected, because the summary artifact does not exist when the
 aggregate job downloads. `tools/recovery.load()` calls `glob.glob` without
 `recursive=True`, so a `**` pattern silently matches one level — which is what
 kept the g11-04 re-check honest, by accident rather than by design.
+
+---
+
+## 60. The exact cache's two defining claims were untested, for at least two commits
+
+CI found two surviving mutations at `b480926`, and both are on the exact cache:
+
+    the-cache-admits-by-RECENCY-not-residual   SURVIVED
+    the-cache-read-is-not-gated-by-the-MATCH   SURVIVED
+
+**The cache is the project's first controlled improvement on the corpus** —
+0.244 bits against 0.089 for quadrupling the width — and admission-by-residual
+and the match gate are the two claims that make it that mechanism rather than a
+recency buffer with an ungated softmax. Nothing in the suite would have noticed
+either one breaking.
+
+**This does not retract the cache's number.** The code was correct; the tests
+were vacuous. The measurement stands and what was missing was the guarantee that
+it would keep standing. Both are caught now, by
+`tests/test_retrieval_seam.py` — admission needed one slot and two *deliberately
+unequal* writes, because by-residual and by-recency are identical whenever a
+later write happens to be the more novel one, which in random data it usually is.
+
+### Why it took two commits to notice, which is the real finding
+
+The five pre-commit checks run `mutate.py --verify`. **`--verify` only asserts
+that every mutation's ORIGINAL text is still present.** It says nothing about
+whether the suite would catch the mechanism breaking — that is the full harness,
+which edits the source for twenty minutes and therefore lives in CI, sharded.
+
+So a vacuous test region passes every local check, and is reported later, on a
+run nobody is watching, attached to whichever commit happened to be pushed next.
+Here it took an unrelated refactor making `--verify` fail before anyone looked
+at the mutation results at all.
+
+**`mutate.py --changed`** now runs the mutations whose target file the current
+work touches — union of uncommitted changes and everything since master. Seconds
+rather than twenty minutes, and exactly the set that can have been invalidated.
+It is added to the pre-commit list in CLAUDE.md. Verified: with
+`openplexus/retrieval.py` dirty it selects those three mutations and no others.
+
+---
+
+## 61. Node size is not what is binding, and the assumption worth questioning is a different one
+
+John asked whether the small-node assumption is a limit the project is running
+into, and whether information should be split across nodes differently.
+
+**On size, the evidence says no.** g11-04 swept width 16 to 128 **in a single
+process** — the whole model, not a node — and got a flat exponent. g11-05 swept
+data 16x and got a flat exponent. If capacity were binding, width would have
+bought something; across an 8x range it bought 0.089 bits. Making a node bigger
+cannot be the answer when making the entire model bigger is not.
+
+**The assumption worth questioning is not node SIZE but what a node HOLDS.**
+`partitions` splits the store by DIMENSION: every node holds a slice of the same
+superposed matrix and computes the same `r = M_slice @ key_slice`, and
+`answer = parts.sum(0)` adds the slices back together.
+
+So the current scheme is a **parallelisation of one algorithm, not a
+decomposition into roles.** Every node inherits the sum. More nodes means more,
+narrower copies of the operation that g11-05 has just shown to be saturated —
+and no arrangement of operands rescues a bad operation.
+
+### The alternative, and why it is the same idea as the cache
+
+Partition by **item** instead: nodes hold *different bindings*, and a read is a
+SELECTION across nodes rather than a SUM within one.
+
+**That is exactly what the exact cache already does inside one process** —
+entries kept separately so a softmax can select, rather than rescale an average
+that has already been taken. The cache and "shard across machines by item" are
+one idea at two scales, which makes the cache sweep a single-process proxy for a
+distributed-architecture question rather than a tuning exercise.
+
+Three consequences, and the second is the strongest:
+
+1. **It fits the hardware goal better.** A small device holding a handful of
+   exact bindings is a natural participant. Holding a slice of the dimensions of
+   one large matrix requires every node in every read.
+2. **It is partial-tolerant by construction, and dimension-splitting is not.**
+   Lose a node holding DIMENSIONS and the retrieved vector has holes in it. Lose
+   a node holding ITEMS and you simply do not get those items, and take the best
+   of whoever answered. The amended C1 — no barrier that stalls when a
+   participant is slow or gone — falls out of the data layout instead of being
+   engineered on top of it.
+3. **It is the CS answer to a solved problem.** Shard by key, route the query,
+   take the best answer. Distributed key-value stores settled this long ago,
+   which is the steer about taking mechanisms from computer science where the
+   problem is well understood.
+
+On one-neuron-per-device: that is a REPRESENTATION choice. The policy worth
+keeping from the biological framing is local updates with no global barrier, and
+item-sharding delivers the same deployability without inheriting the sum.
+
+No change made yet. The cache sweep on a data axis is the measurement that bears
+on it: if an exact store scales with data where the superposed one is flat, that
+identifies the sum as the binding constraint AND argues for the partitioning.

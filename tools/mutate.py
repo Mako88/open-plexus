@@ -1325,19 +1325,65 @@ def revert(mutation: Mutation) -> None:
         bak.unlink()
 
 
+def changed_files() -> set[Path]:
+    """Every file this work touches: uncommitted, plus committed since master.
+
+    Union of both, because "what am I about to push" is the question `--changed`
+    answers, and either half alone misses the case that motivated it -- a hole
+    opened in one commit and noticed two commits later.
+    """
+    touched: set[Path] = set()
+    status = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT,
+                            capture_output=True, text=True)
+    for line in status.stdout.splitlines():
+        name = line[3:].strip().split(" -> ")[-1]
+        if name:
+            touched.add((ROOT / name).resolve())
+    for base in ("origin/master", "master"):
+        diff = subprocess.run(["git", "diff", "--name-only", f"{base}...HEAD"],
+                              cwd=ROOT, capture_output=True, text=True)
+        if diff.returncode == 0:
+            touched.update((ROOT / n).resolve()
+                           for n in diff.stdout.split() if n)
+            break
+    return touched
+
+
 def selected(argv: list[str]) -> list:
-    """The mutations to run, from `--only` or `--shard`, defaulting to all.
+    """The mutations to run, from `--only`, `--changed` or `--shard`.
 
     `--only` is for the local case: after adding a mechanism, run the mutations
     that touch it rather than all eighty-five. `--shard i/n` is for CI, which can
     then run n jobs at once.
 
+    **`--changed` exists because a surviving mutation was invisible locally.**
+    The five pre-commit checks run `--verify`, which only asserts that every
+    mutation's ORIGINAL text is still present; the full harness is CI-only and
+    sharded, because it edits the source for twenty minutes. So a vacuous test
+    region survives every local check and is reported later, on a run nobody is
+    watching, attached to whichever commit happened to be pushed.
+
+    > *Calibration.* Two mutations on the exact cache --
+    > `the-cache-admits-by-RECENCY-not-residual` and
+    > `the-cache-read-is-not-gated-by-the-MATCH` -- survived at `b480926` and at
+    > least one commit before it. The cache is the project's **first controlled
+    > improvement on the corpus**, and its two defining claims, admission by
+    > residual and the match gate, had nothing asserting them. Both were found
+    > by CI while a refactor was already in flight, and the refactor's own
+    > `--verify` failure is what caused anyone to look.
+
+    `--changed` runs only the mutations whose target file this work touches,
+    which is seconds rather than twenty minutes and is exactly the set that can
+    have been invalidated.
     Sharding is by POSITION, not by hash of the name, so the same mutation lands
     in the same shard across runs and two CI logs can be compared.
     """
     chosen = list(MUTATIONS)
     for index, argument in enumerate(argv):
-        if argument == "--only" and index + 1 < len(argv):
+        if argument == "--changed":
+            touched = changed_files()
+            chosen = [m for m in MUTATIONS if m.path.resolve() in touched]
+        elif argument == "--only" and index + 1 < len(argv):
             wanted = {n.strip() for n in argv[index + 1].split(",")}
             unknown = wanted - {m.name for m in MUTATIONS}
             if unknown:

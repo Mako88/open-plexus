@@ -695,14 +695,31 @@ is for the *model* layer only. Anything in `openplexus/tasks/` or
 `openplexus/baselines.py` importing it is a defect: those are the ruler, and the
 ruler stays dependency-free. The consumer-device runtime remains undecided.
 
-- **Run all three checks before every commit:**
+- **Run all these checks before every commit:**
   ```
   python tools/mutate.py --verify
+  python tools/mutate.py --changed
   python -m unittest discover -s tests -t . -q
   python tools/check_workflows.py
   python tools/check_rails.py
   python tools/check_duplication.py
   ```
+
+  **`--changed` is here because `--verify` does not catch a vacuous test
+  region.** `--verify` asserts every mutation's original text is present; it
+  says nothing about whether the suite would notice the mechanism breaking.
+  That question is the full harness, which is twenty minutes and therefore
+  CI-only — so a surviving mutation passes every local check and is reported
+  later, on a run nobody is watching, against whichever commit was pushed next.
+
+  > *Calibration.* `the-cache-admits-by-RECENCY-not-residual` and
+  > `the-cache-read-is-not-gated-by-the-MATCH` both survived at `b480926` and at
+  > least one commit before. The exact cache is the project's **first
+  > controlled improvement on the corpus**, and its two defining claims —
+  > admission by residual, and the match gate — had nothing asserting them. They
+  > were found only because an unrelated refactor made `--verify` fail and
+  > someone went looking. `--changed` runs the mutations whose target file this
+  > work touches, which is seconds and is exactly the set at risk.
   The full mutation harness runs in CI, sharded; locally it is
   `python tools/mutate.py --only <the mutations just added>`, because a full
   run edits the source for twenty minutes and every experiment refuses to run

@@ -1,0 +1,102 @@
+name: sweep-g11-03-does-the-pair-key-pay-for-itself
+
+# Note 033 proved the store binds only adjacent tokens, so it is a bigram count
+# table and CANNOT represent a trigram. The 3.583-bit bigram bar on Tiny
+# Shakespeare was therefore the model's CEILING, not its target.
+#
+# Note 034 lifted it. `context_keys` derives the key from the token PAIR
+# (t-1, t), which makes `previous_key` the key of (t-2, t-1) and the store a
+# trigram table. One line in `run` changes. On a step a bigram cannot resolve --
+# blocks `A B C` and `D B E`, scored only at `B` -- it goes from 0.533 (chance
+# is 0.5) to 1.000.
+#
+# AND IT IS NOT FREE. The number of distinct keys goes from 66 to 469 in 4000
+# characters of Shakespeare. Capacity goes as sqrt(d/N) (note 020), so the store
+# fills seven times sooner, and the cosine against the true count table plateaus
+# at 0.53 where the single-token version held 0.88.
+#
+# A higher ceiling and a noisier store are in different units. Bits per
+# character is the unit that contains both, and this sweep is the only way to
+# get it.
+#
+# THE PRE-DISPATCH CONTROL SAYS THE PAIR KEY LOSES AT SMALL WIDTH. On the notes
+# corpus at width 32, chunk 64: 6.289 bits with context keys against 5.897
+# without. That is the capacity cost, visible immediately, and it is why WIDTH
+# is the axis here rather than cap. The live question is whether there is a
+# crossover at a width we can reach.
+#
+# PREDICTIONS, registered knowing that control:
+#   P1  width 64 still LOSES -- 469 keys in 64 dimensions is far past capacity
+#   P2  the gap narrows monotonically with width
+#   P3  at 256 the pair key is within 0.2 bits of the single-token arm, and may
+#       pass it
+#   P4  NEITHER arm beats the bigram bar of 3.583 at any width here. The ceiling
+#       moving does not make the model good; it makes it not forbidden.
+#
+# P4 is the one that matters for honesty. g10-09 was retracted this week for the
+# gap between "can represent" and "does predict", and a pair key that beats the
+# single-token arm while still losing to letter-pair counting is a real result
+# that must not be reported as beating the bar.
+#
+# Baseline for comparison: g10-12, width 64 chunk 256 cap 5.0, 5.466 bits.
+#
+# 6 jobs: width x context, three seeds inside each.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  language:
+    strategy:
+      fail-fast: false
+      matrix:
+        width: [64, 128, 256]
+        context: ["single", "context"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: width ${{ matrix.width }} ${{ matrix.context }}
+        run: python experiments/g10_01_first_language.py --corpus shakespeare --width ${{ matrix.width }} --scale 256 --cap 5.0 --mode ${{ matrix.context }} --workers 3 --json out/X-${{ matrix.width }}-${{ matrix.context }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g11-03-${{ matrix.width }}-${{ matrix.context }}
+          path: out/*.json
+
+  aggregate:
+    needs: [language]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g11-03-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 6" | tee summary.txt
+          python -m tools.summarise_g11_03 | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g11-03-summary
+          path: |
+            summary.txt
+            out/*.json

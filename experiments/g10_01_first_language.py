@@ -126,7 +126,7 @@ def bits(scores: np.ndarray, targets: np.ndarray, temperature: float) -> float:
 
 
 def run_one(args) -> list[dict]:
-    seed, width, chunk, cap, which, corrective, bias = args
+    seed, width, chunk, cap, which, corrective, bias, context = args
     corpus = corpus_named(which)
     # Held-out DOCUMENTS, not held-out chunks of training documents.
     #
@@ -167,6 +167,17 @@ def run_one(args) -> list[dict]:
         vocab_size=corpus.vocab_size, d_model=width, lr=0.05,
         key_scale=0.5, decay=0.997, derived_keys=True,
         corrective_writes=corrective, readout_bias=bias,
+        # Bind on the token PAIR rather than the token.
+        #
+        # Note 033 proved the single-token store is a bigram count table and
+        # CANNOT represent a trigram, so the 3.583-bit bigram bar was a ceiling
+        # rather than a target. Note 034 lifts it -- 0.533 to 1.000 on a step a
+        # bigram cannot resolve -- and measures the price: seven times as many
+        # distinct keys on this corpus, so a store that fills sooner.
+        #
+        # Those two effects are in different units and only bits per character
+        # puts them in the same one. That is what this axis is for.
+        context_keys=context,
         # THE FAST STORE'S CAP, and it defaults to OFF in the model.
         #
         # Without it a 256-step chunk with a delta-rule update at EVERY position
@@ -216,6 +227,7 @@ def run_one(args) -> list[dict]:
     return [{
         "seed": seed, "width": width, "chunk": chunk, "cap": cap,
         "corpus": which or "notes", "corrective": corrective, "bias": bias,
+        "context": context,
         "vocab_size": corpus.vocab_size,
         "temperature": temperature,
         "bits_raw": bits(test_scores, test_targets, 1.0),
@@ -239,7 +251,7 @@ def control() -> int:
           f"characters, {corpus.test_tokens} test")
     print(f"uniform {uniform_bits(corpus.vocab_size):.3f}   "
           f"bigram {NGram(corpus.vocab_size, 1).fit(corpus.train).bits_per_token(corpus.test):.3f}")
-    record = run_one((1, 32, 64, 5.0, None, False, False))[0]
+    record = run_one((1, 32, 64, 5.0, None, False, False, False))[0]
     print(f"model raw {record['bits_raw']:.3f}, calibrated "
           f"{record['bits_calibrated']:.3f} at temperature "
           f"{record['temperature']}, accuracy {record['accuracy']:.3f}")
@@ -256,7 +268,7 @@ def main() -> int:
     cap = args.cap if args.cap is not None else 5.0
 
     jobs = [(seed, width, chunk, cap, args.corpus, args.mode == "corrective",
-             args.mode in ("bias", "both"))
+             args.mode in ("bias", "both"), args.mode == "context")
             for seed in seeds]
     records = [r for batch in harness.spread(run_one, jobs, args.workers)
                for r in batch]

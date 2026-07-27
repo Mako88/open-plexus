@@ -60,11 +60,13 @@ g8-02's bottom rows.
 **This is not about Zipf.** Zipf supplies repetition; so does real language, so
 does a sensor reporting the same reading twice, so does a quiet period on a node.
 
-Next: a cap on the fast store, same shape as `lasting_cap` — scale the whole
-store, never an entry — default off, with the four predictions in note 018
-registered first. The loudest of them is that **it must NOT improve the gating
-result**; stability is not selectivity, and a fix that quietly lifts the headline
-number is the most dangerous kind.
+**Built, and answered without the grid.** `memory_cap` is in, with the four
+predictions from note 018 registered first. Predictions 1 and 3 held and
+**prediction 2 is refuted in the direction that matters**: the cap does not
+increase the number of usable cells, it decreases them, which is why the full
+matrix was never dispatched — see
+[g8-04](experiments/sweeps/g8-04-brakes-on-the-fast-store.txt). The loudest
+prediction was that it must NOT improve the gating result. It did not.
 
 The cascade the paper actually argues for — more than two timescales — remains
 untested and is a separate item.
@@ -301,6 +303,37 @@ check on capacity and scaling claims, and the VSA literature above does that job
 more directly.
 
 ---
+
+## The tag is built and pre-registered, not measured
+
+`tag_slots`, `tag_decay` and `tag_strongest` are in the model, tested and
+mutated. [g9-05](experiments/sweeps/g9-05-a-tag-that-fades.txt) is written with
+its predictions registered and **is not dispatched**.
+
+A pre-dispatch control already counted what each gate keeps, and
+[note 023](docs/notes/023-two-signals-and-only-one-of-them-is-about-value.md) is
+what it found: weak retrieval says *this write is a binding*, recency says *this
+binding is the rewarded one*, and a gate needs both answers. The tag supplies the
+half the window lacked; the window already supplied the half the tag lacks.
+
+**A gate reading both signals is the obvious next mechanism and does not exist.**
+It should wait for g9-05: if the tag's contribution turns out to be inside the
+noise there is nothing to combine, and building it first would be a mechanism
+resting on a control.
+
+## GOALS.md stops at g8-01 on the gating line
+
+Its gating section ends with "nothing tried can tell it", which was true when
+written. Since then g9-02 measured a reward gate recovering 0.21/0.20/0.23 at
+delays 1, 4 and 8, g9-03 found the cliff is reach and has to be matched, and
+g9-04 found the local signal and its direction. **None of that is in GOALS**, so
+the largest document in the project currently reads as though the g8-01 null were
+the end of the line.
+
+This is a record correction rather than new work, and it wants John's call on how
+much of a live investigation belongs in GOALS at all — the alternative is that
+GOALS records only settled results and points at the sweeps for the rest, which
+is arguably what it should have been doing since g8.
 
 ## Blocked on a result
 

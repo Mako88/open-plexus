@@ -1,0 +1,85 @@
+name: sweep-g9-05-a-tag-that-fades
+
+# g9-03 measured the reward gate's reach as a diagonal cliff -- about 0.2
+# recovered wherever the window covers the delay, about -0.22 wherever it does
+# not, and a node does not know the delay. g9-04 then found what a mark could
+# hang on: retrieval strength separates a binding-write from a filler-write at
+# AUC 0.22, INVERTED, so the rule is admit the weak retrievals.
+#
+# This runs the mechanism those two imply. A capacity over WRITES rather than a
+# span over steps, admission on weak retrieval, and marks that FADE -- the part
+# note 010 took from Lehr et al. and the first build of this left out.
+#
+# A pre-dispatch control already counted what each gate keeps, against
+# position_kinds(), before any of this was costed. An un-faded tag captures the
+# rewarded binding in 2 of 32 captures at every capacity and delay; a faded one
+# reaches 44% at fade 0.99 and holds it across delay where the window falls to
+# zero. The predictions in the sweep file are registered against that.
+#
+# `tag-strongest` is the control arm, same capacity and fade with only the
+# winning end of the ranking reversed. It is the only thing here that can
+# separate "the signal works" from "any capacity works".
+#
+# 32 jobs of (slots, fade, delay). Five arms x three seeds x one rate = 15 cells
+# a job; g9-03 costed the same cell shape at roughly 28 seconds, so about 7
+# minutes a job.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    strategy:
+      fail-fast: false
+      matrix:
+        slots: [4, 8]
+        fade: ["1.0", "0.99", "0.95", "0.9"]
+        delay: [1, 4, 8, 20]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: slots ${{ matrix.slots }} fade ${{ matrix.fade }} delay ${{ matrix.delay }}
+        run: python experiments/g9_05_the_tag.py --slots ${{ matrix.slots }} --fade ${{ matrix.fade }} --scale ${{ matrix.delay }} --lr 0.05 --workers 3 --json out/X-${{ matrix.slots }}-${{ matrix.fade }}-${{ matrix.delay }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-05-${{ matrix.slots }}-${{ matrix.fade }}-${{ matrix.delay }}
+          path: out/*.json
+
+  aggregate:
+    needs: [tag]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g9-05-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 32" | tee summary.txt
+          python -m tools.summarise_g9_05 | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-05-summary
+          path: |
+            summary.txt
+            out/*.json

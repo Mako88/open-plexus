@@ -105,6 +105,63 @@ def admit(strengths, strength: float, capacity: int) -> int | None:
     return weakest if strength > strengths[weakest] else None
 
 
+def fade(rank: float, factor: float) -> float:
+    """Move a mark one step closer to losing its slot.
+
+    `admit` keeps the LARGEST rank, so a mark fades by its rank falling -- and
+    which arithmetic does that depends on which end of the ranking is winning.
+    A tag admitting weak retrievals holds negative ranks, where falling means
+    growing in magnitude; one admitting strong retrievals holds positive ranks,
+    where falling means shrinking. Multiplying both by `factor` fades one and
+    ENTRENCHES the other, which is the first version of this and it changed
+    nothing measurable in either direction -- the marks it was supposed to
+    release became the ones that could never be displaced.
+
+    A mark that never fades ranks the whole interval since the last reward at
+    once, and the writes made when the store was smallest are the weakest
+    retrievals it will ever see. So an un-faded tag fills with the first few
+    writes after every capture, which is a recency policy pointing backwards.
+    """
+    return rank * factor if rank > 0 else rank / factor
+
+
+def tag(tagged: list, strength: float, index: int, capacity: int,
+        strongest: bool) -> None:
+    """Offer the write at `index` to the tag, keeping it if it beats an incumbent.
+
+    The tag is a fixed number of marks over WRITES, not a span over steps. That
+    distinction is the mechanism: at 31 steps per binding a 64-step window holds
+    two bindings and sixty-two steps of filler, while four marks span about 124
+    steps and hold four bindings. A capacity over admitted items reaches an
+    arbitrary delay; a capacity over steps reaches exactly that many steps.
+
+    **The rank is negated, and the negation is the finding.** `admit` keeps the
+    largest values, so ranking by `-strength` keeps the WEAKEST retrievals.
+    [g9-04](../../experiments/sweeps/g9-04-is-there-a-local-signal.txt) scored
+    retrieval strength at AUC 0.293 and 0.215 separating a binding-write from a
+    filler-write -- below 0.5, so separating them backwards. Filler is drawn with
+    replacement from a small spare alphabet, so a filler key has been bound many
+    times and retrieves strongly; a binding's cue is fresh and retrieves weakly.
+
+    Competitive capture ranks on this same quantity and admits the strongest
+    (`capture_slots`). It was pointed backwards, which is a mechanistic account
+    of one of the six failures rather than another guess about base rates.
+
+    `strongest` reverses it back, and exists to be run as an arm. If admitting
+    the strongest scores the same as admitting the weakest, the capacity is
+    doing the work and the signal is decoration -- which is the outcome that
+    would refute the reason this mechanism was built.
+    """
+    rank = strength
+    slot = admit([held for held, _ in tagged], rank, capacity)
+    if slot is None:
+        return
+    if slot < len(tagged):
+        tagged[slot] = (rank, index)
+    else:
+        tagged.append((rank, index))
+
+
 def _fade(pending: list, factor: float) -> None:
     """Record that the fast store was multiplied by `factor`.
 
@@ -217,6 +274,46 @@ class LocalMemoryConfig:
             the thing before the obvious marker" -- and learns nothing about
             value. A window shorter than the delay cannot reach the binding at
             all. The interesting region is between, and it is what g9-02 sweeps.
+        tag_slots: How many writes the tag may hold at once. 0 keeps the
+            window rule above, which is how every earlier result was measured.
+
+            **This is `reward_window` measured in bindings instead of steps**,
+            and that is the whole of the mechanism. Both gates keep a small set
+            of writes when the reward arrives and discard the rest; they differ
+            only in how that set is chosen. The window takes the most recent
+            `reward_window + 1` writes. The tag takes the `tag_slots` writes with
+            the WEAKEST retrieval, wherever in the interval they fell.
+
+            [g9-03](../../experiments/sweeps/g9-03-is-the-cliff-reach-or-cost.txt)
+            is why that matters. Its table is a diagonal cliff: every cell where
+            the window covers the delay recovers about 0.2, every cell where it
+            does not sits at about -0.22, and a node does not know the delay.
+            Widening the window does not fix it, because reach is bought in
+            steps -- a window of 64 recovers 0.09 at every delay, since
+            sixty-two of those steps are filler.
+
+            The tag has no such cliff to have. Its reach is however far back the
+            weakest write it still holds was made, so it is set by the density
+            of bindings rather than by a span somebody has to guess.
+
+            **What it does NOT do is predict reward.** `reward_recall` picks
+            rewarded cues uniformly out of the same alphabet as the filler, so a
+            rewarded binding and an unrewarded one are statistically identical
+            until the reward token arrives, and a tag claiming to tell them
+            apart would be reading `position_kinds()` in disguise. The tag is
+            selective about being a binding at all; the reward token supplies the
+            value. That split is the one the biology describes and the only one
+            available here.
+            docs/notes/022-the-signal-was-there-and-pointing-backwards.md.
+        tag_strongest: Rank the tag by the strongest retrieval instead of the
+            weakest. **A control, not a setting.**
+
+            g9-04 measured the signal as inverted, so the tag admits weak
+            retrievals. This arm admits strong ones instead, holding capacity,
+            timing and every other quantity fixed. If it scores the same, the
+            capacity is doing the work and the signal is decoration -- the reason
+            this mechanism exists would be refuted while its headline number
+            still looked fine. Nothing else in the sweep separates those two.
         memory_cap: Largest norm the FAST store may reach. 0 leaves it
             unbounded, which is how every earlier result was measured.
 
@@ -391,6 +488,9 @@ class LocalMemoryConfig:
     decay_when_masked: bool = False
     reward_token: int = -1
     reward_window: int = 0
+    tag_slots: int = 0
+    tag_decay: float = 1.0
+    tag_strongest: bool = False
     memory_cap: float = 0.0
     consolidation: float = 0.0
     capture_slots: int = 0
@@ -420,6 +520,26 @@ class LocalMemoryConfig:
             raise ValueError(
                 "reward_window is the reach of the reward gate and does nothing "
                 "without reward_token")
+        if self.tag_slots < 0:
+            raise ValueError("tag_slots must not be negative")
+        if self.tag_slots and self.reward_token < 0:
+            raise ValueError(
+                "the tag is captured by the reward token and does nothing "
+                "without it")
+        if self.tag_slots and self.reward_window:
+            raise ValueError(
+                "reward_window and tag_slots are two answers to the same "
+                "question -- how the gate chooses what to keep when the reward "
+                "arrives -- and enabling both runs an arm that is neither")
+        if not 0.0 < self.tag_decay <= 1.0:
+            raise ValueError("tag_decay must be in (0, 1]")
+        if self.tag_decay < 1.0 and not self.tag_slots:
+            raise ValueError(
+                "tag_decay fades marks and does nothing without tag_slots")
+        if self.tag_strongest and not self.tag_slots:
+            raise ValueError(
+                "tag_strongest picks which end of the tag wins and does nothing "
+                "without tag_slots")
         if self.memory_cap < 0.0:
             raise ValueError("memory_cap must not be negative")
         if self.capture_slots < 0:
@@ -691,6 +811,10 @@ class LocalAssociativeMemory:
         # the store has had since, so a contribution is removed as it now
         # stands rather than as it went in.
         pending: list = []
+        # Which of those writes are marked. Each entry is (rank, index into
+        # `pending`), and it is cleared with `pending` at every reward -- so an
+        # index can never outlive the list it points into.
+        tagged: list = []
         lasting = np.zeros((d, d)) if self.config.consolidation else None
         # Occupied slots, weakest first is not maintained -- the pool is small
         # enough that a linear scan for the weakest is cheaper than keeping order.
@@ -709,7 +833,9 @@ class LocalAssociativeMemory:
         previous_retrieval = None
         predictions = np.zeros(len(tokens), dtype=np.int64)
 
+        captured: tuple = ()
         for t, token in enumerate(tokens):
+            captured = ()
             if not 0 <= token < self.config.vocab_size:
                 raise ValueError(
                     f"token {token} outside vocab of {self.config.vocab_size}")
@@ -739,7 +865,8 @@ class LocalAssociativeMemory:
                 memory *= self.config.decay
                 _fade(pending, self.config.decay)
 
-            if previous_key is not None and (store is None or store[t]):
+            wrote = previous_key is not None and (store is None or store[t])
+            if wrote:
                 if self.config.decay < 1.0:
                     memory *= self.config.decay
                     _fade(pending, self.config.decay)
@@ -748,6 +875,32 @@ class LocalAssociativeMemory:
                     # Held so it can be taken back out if no reward vouches for
                     # it. Two vectors per step, not a d x d matrix.
                     pending.append([1.0, value, previous_key])
+                    if self.config.tag_slots:
+                        # `previous_retrieval` is the retrieval made when the
+                        # PREVIOUS token arrived -- the cue of the binding being
+                        # written now -- which is exactly the quantity g9-04
+                        # scored. It is already in hand, so a mark costs one norm
+                        # and no extra state.
+                        #
+                        # At the sequence's first write the store is still empty,
+                        # so that retrieval is zero and the write is tagged
+                        # whatever it is. The signal is honestly uninformative
+                        # there, and it holds one slot until the first reward
+                        # clears the tag.
+                        # THE MARK FADES. Note 010 took the shape of synaptic
+                        # tagging from Lehr et al., where the tag is a decaying
+                        # marker -- and a tag that does not fade ranks the whole
+                        # interval at once, which prefers the writes made when
+                        # the store was smallest rather than the writes that
+                        # look like bindings. Fading a rank toward zero makes it
+                        # losable, whichever end of the ranking wins, so this is
+                        # one multiplication and no special case.
+                        if self.config.tag_decay < 1.0:
+                            tagged[:] = [(fade(rank, self.config.tag_decay),
+                                          index) for rank, index in tagged]
+                        tag(tagged, float(np.linalg.norm(previous_retrieval)),
+                            len(pending) - 1, self.config.tag_slots,
+                            self.config.tag_strongest)
                 before = float(np.linalg.norm(memory))
                 scale_to(memory, self.config.memory_cap)
                 if self.config.memory_cap and before:
@@ -765,10 +918,27 @@ class LocalAssociativeMemory:
             # The signal arrives AFTER the binding, so the decision cannot be
             # made at write time. That is the difficulty, not an inconvenience.
             if self.config.reward_token >= 0 and token == self.config.reward_token:
-                keep = self.config.reward_window + 1
-                for weight, value_written, key_written in pending[:-keep or None]:
-                    memory -= weight * np.outer(value_written, key_written)
+                if self.config.tag_slots:
+                    # CAPTURE. What is still tagged survives; everything else
+                    # written since the last reward comes back out. The tag chose
+                    # its members from a local signal at write time, so this step
+                    # adds no selectivity of its own -- it supplies the value.
+                    protected = {index for _, index in tagged}
+                else:
+                    # The most recent `reward_window + 1` writes, by recency and
+                    # nothing else. g9-04 put recency at AUC 0.479, which is no
+                    # information: a window's only virtue was ever REACHING the
+                    # binding, never selecting it.
+                    keep = self.config.reward_window + 1
+                    protected = set(
+                        range(max(0, len(pending) - keep), len(pending)))
+                captured = tuple(sorted(protected & set(range(len(pending)))))
+                for index, entry in enumerate(pending):
+                    if index not in protected:
+                        weight, value_written, key_written = entry
+                        memory -= weight * np.outer(value_written, key_written)
                 pending.clear()
+                tagged.clear()
 
             # CONSOLIDATE. The prediction made one step ago was a guess at the
             # token that has just arrived, so this is where it gets marked right
@@ -825,6 +995,17 @@ class LocalAssociativeMemory:
                         # measure over the whole prediction. A signal can carry
                         # information in either without the other.
                         "hit": bool(predictions[t - 1] == token),
+                        # Which writes a capture kept at this step, as indices
+                        # into the pending list, empty on every step that is not
+                        # a reward -- and where this step's own write landed in
+                        # that list, -1 when it did not write. Together they say
+                        # WHICH STEPS SURVIVED, which is the claim the gate
+                        # makes. Scoring the gate by its accuracy instead is the
+                        # downstream proxy CLAUDE.md rule 2 is about, and it
+                        # cannot tell a tag holding bindings from a tag holding
+                        # the first four writes after every reward.
+                        "captured": captured,
+                        "write_index": len(pending) - 1 if wrote else -1,
                     })
 
             if lasting is not None and previous_retrieval is not None:

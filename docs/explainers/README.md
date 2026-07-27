@@ -43,6 +43,10 @@ explainer, and saying so is the most useful thing you can do.
 | [24](24-the-number-was-a-setting.md) | The number was a setting we picked |
 | [25](25-measuring-it-properly-made-it-worse.md) | Measuring it properly made it worse |
 | [26](26-three-wrong-answers-and-a-right-one.md) | Three wrong answers and a right one |
+| [27](27-somebody-already-built-the-ruler.md) | Somebody already built the ruler |
+| [28](28-a-window-has-to-be-the-right-size.md) | A window has to be the right size |
+| [29](29-the-signal-was-pointing-backwards.md) | The signal was there, pointing backwards |
+| [30](30-two-ways-to-pick-what-to-keep.md) | Two ways to pick what to keep |
 
 More get added as the project introduces new ideas. Anything here that turns out
 to be wrong gets corrected, not softened — same rule as everywhere else.

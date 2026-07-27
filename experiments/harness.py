@@ -118,6 +118,11 @@ def parse_args(description: str) -> argparse.Namespace:
                         help="which sub-sweep to run when a script has more than one")
     parser.add_argument("--window", type=int, default=None,
                         help="how far back a gate may reach")
+    parser.add_argument("--slots", type=int, default=None,
+                        help="how many writes a tag may hold at once")
+    parser.add_argument("--fade", type=float, default=None,
+                        help="per-step multiplier ageing a tag's marks toward "
+                             "eviction; 1.0 never ages them")
     parser.add_argument("--workers", type=int, default=1,
                         help="processes to spread seeds across; 1 runs serially\n"
                              "                             and is the default")

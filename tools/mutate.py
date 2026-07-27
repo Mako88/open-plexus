@@ -70,8 +70,8 @@ MUTATIONS = [
                "accumulates one binding per step exactly as it did ungated -- "
                "which is what six previous mechanisms did wrong",
         path=LOCAL,
-        old="                for weight, value_written, key_written in pending[:-keep or None]:",
-        new="                for weight, value_written, key_written in []:",
+        old="                    if index not in protected:",
+        new="                    if False:",
     ),
     Mutation(
         name="the-reward-window-is-ignored",
@@ -80,8 +80,8 @@ MUTATIONS = [
                "marker', which learns nothing about value and is exactly the "
                "trivial case the delay dial exists to avoid",
         path=LOCAL,
-        old="                keep = self.config.reward_window + 1",
-        new="                keep = 1",
+        old="                    keep = self.config.reward_window + 1",
+        new="                    keep = 1",
     ),
     Mutation(
         name="pending-contributions-do-not-fade",
@@ -157,6 +157,59 @@ MUTATIONS = [
         path=LOCAL,
         old="    weakest = min(range(len(strengths)), key=lambda i: strengths[i])",
         new="    weakest = max(range(len(strengths)), key=lambda i: strengths[i])",
+    ),
+    Mutation(
+        name="the-tag-admits-the-strongest",
+        breaks="the direction, which is the whole finding. g9-04 measured "
+               "retrieval strength separating a binding-write from a "
+               "filler-write at AUC 0.22 -- BELOW 0.5, so inverted. Admitting "
+               "the strongest is what competitive capture already did, and it "
+               "is the failure this mechanism is the correction to",
+        path=LOCAL,
+        old="    rank = strength if strongest else -strength",
+        new="    rank = strength",
+    ),
+    Mutation(
+        name="the-mark-never-fades",
+        breaks="ageing. Without it the tag ranks the whole interval at once, "
+               "and the weakest retrievals it will ever see are the writes made "
+               "when the store was nearly empty -- so the pool fills with the "
+               "first few writes after every capture. Measured: the same 8 "
+               "bindings out of 32 captures at every capacity and every delay",
+        path=LOCAL,
+        old="                            tagged[:] = [(fade(rank, self.config.tag_decay),",
+        new="                            tagged[:] = [(rank,",
+    ),
+    Mutation(
+        name="the-fade-entrenches-instead-of-releasing",
+        breaks="which way a mark ages. `admit` keeps the largest rank, so "
+               "fading means the rank FALLS -- and the arithmetic that does "
+               "that depends on the sign. Multiplying both ends releases one "
+               "and makes the other immortal. This was the first version, and "
+               "it produced numbers identical to no fade at every setting",
+        path=LOCAL,
+        old="    return rank * factor if rank > 0 else rank / factor",
+        new="    return rank * factor",
+    ),
+    Mutation(
+        name="the-tag-outlives-its-capture",
+        breaks="the one invariant the indices rest on. `tagged` holds positions "
+               "in `pending`, which empties at every reward, so a mark that "
+               "survives its capture points into the NEXT interval and protects "
+               "whatever landed at those positions -- a gate keeping the "
+               "earliest writes after a reward, which looks fine from outside",
+        path=LOCAL,
+        old="                tagged.clear()",
+        new="                pass",
+    ),
+    Mutation(
+        name="the-tag-never-displaces",
+        breaks="the competition, for the tag rather than for the lasting pool. "
+               "A winning candidate is computed and then dropped, so the pool "
+               "holds the first k marks of each interval whatever arrives after",
+        path=LOCAL,
+        old="        tagged[slot] = (rank, index)",
+        new="        pass",
     ),
     Mutation(
         name="the-node-ignores-the-decoder-switch",

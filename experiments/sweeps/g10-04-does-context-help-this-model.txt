@@ -85,6 +85,23 @@ Two lines arriving at the same mechanism from opposite directions is worth more
 than either arriving alone, and it is the first structural connection between the
 gating work and goal 2.
 
+**CORRECTED BY [g10-05](g10-05-how-many-slots.txt): THEY ARE NOT THE SAME
+STRUCTURE.** `tag_slots` is documented as *"how many WRITES the tag may hold at
+once"* -- one budget across the whole interval. What the corpus needs is slots
+**per character**: 8 of them at a vocabulary of 86 is up to 688 stored
+successors, not 8.
+
+They share an idea and not an implementation. "The g9 line has already built
+one" was too strong, and the honest version is that the g9 line has built
+something with the same shape at a different granularity.
+
+g10-05 also sizes it: 8 slots per character recovers 83-97% of the prize, and
+whether that is affordable turns entirely on whether a slot holds a VECTOR
+(22,016 numbers at width 32, twenty-one times the store) or a TOKEN ID (688
+integers, with the vector regenerated from `(seed, token)`). That is
+`derived_keys` -- the standing dependency of the entire g9 line -- load-bearing
+again for a different reason.
+
 **Not a claim that it will work.** The tag was built to select writes, not to
 represent a distribution, and the corpus task has no reward signal at all. What
 this says is where to look, not what will be found.

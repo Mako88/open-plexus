@@ -75,20 +75,31 @@ MODEL_BITS = {64: 5.830, 256: 5.734}
 
 
 def within_chunk(pieces, vocab_size: int, k: float = DEFAULT_K,
-                 newest_only: bool = False) -> float:
+                 newest_only: bool = False, slots: int | None = None) -> float:
     """Bits per character using ONLY what is visible inside each chunk.
 
     The store resets between chunks, so a prediction at position `t` can rest on
     nothing before the start of this one. `newest_only` keeps just the most
     recent successor of the current character rather than counting them all,
     which is superposition's handicap in its harshest form.
+
+    `slots` keeps the most recent N successors instead of one or all, which is
+    what a capacity-bounded set of distinct items would hold. It sits between
+    the two extremes above and says **how many slots would be needed** to
+    recover most of counting's advantage — a question worth answering by
+    counting before anything is built, the way note 024 costed the gate.
     """
     distributions, targets = [], []
     for tokens in pieces:
         seen: dict[int, list[int]] = defaultdict(list)
         for t in range(len(tokens) - 1):
             here, following = int(tokens[t]), int(tokens[t + 1])
-            history = seen[here][-1:] if newest_only else seen[here]
+            if newest_only:
+                history = seen[here][-1:]
+            elif slots is not None:
+                history = seen[here][-slots:]
+            else:
+                history = seen[here]
             counts = [k] * vocab_size
             for value in history:
                 counts[value] += 1.0

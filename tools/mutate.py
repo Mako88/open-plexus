@@ -580,6 +580,25 @@ MUTATIONS = [
         new='    if False:',
     ),
     Mutation(
+        name="every-candidate-gets-the-same-number",
+        breaks="the only candidate-specific signal available at a capture step "
+               "-- the store's own norm is a property of the STEP, so every "
+               "pending write gets one value and ranking on it ranks on "
+               "nothing. Lengths, counts and magnitudes all stay plausible",
+        path=LOCAL,
+        old="                        float(np.linalg.norm(memory @ key_written))",
+        new="                        float(np.linalg.norm(memory))",
+    ),
+    Mutation(
+        name="the-candidates-are-listed-backwards",
+        breaks="the alignment between `pending_now`'s indices and `captured`'s "
+               "-- anything reading them together then scores the wrong "
+               "candidate, and every length, count and magnitude is unchanged",
+        path=LOCAL,
+        old="                        for _, _, key_written in pending)",
+        new="                        for _, _, key_written in reversed(pending))",
+    ),
+    Mutation(
         name="the-noise-floor-is-in-the-wrong-units",
         breaks="the comparison between a lead and the error on it -- the spread "
                "is measured in accuracy and the lead in recovery, so dropping "

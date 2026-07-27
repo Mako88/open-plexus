@@ -161,6 +161,38 @@ class WhatEachPendingKeyRetrievesNow(unittest.TestCase):
         for entry in self.captures:
             self.assertTrue(max(entry["captured"]) < len(entry["pending_now"]))
 
+    def test_this_steps_own_write_is_the_LAST_candidate(self):
+        """The reward step writes too, and its write is the most recent."""
+        self.assertTrue(self.captures)
+        for entry in self.captures:
+            self.assertEqual(entry["write_index"], len(entry["pending_now"]) - 1)
+
+    def test_the_candidates_are_in_PENDING_ORDER(self):
+        """Pins the position of each value, which the length cannot.
+
+        `captured` and `pending_now` are indexed into together by anything
+        reading them, so a reversed or rotated `pending_now` scores the wrong
+        candidate while every length, count and magnitude stays exactly as it
+        is. The first version of this test asserted `write_index ==
+        len(pending_now) - 1`, which is a claim about SHAPE — the mutation
+        harness reversed the list and the test passed.
+
+        The handle is that `pending_now` is computed at ONE moment against ONE
+        store, so two writes whose keys are the same token get exactly the same
+        value. A stream whose key tokens are [A, A, B] must therefore give
+        [x, x, y]; reversed it gives [y, x, x]. No assumption about which key
+        retrieves more strongly — only that equal keys give equal values.
+        """
+        trace: list = []
+        # Writes bind the previous token to the current one, so these tokens
+        # give keys [3, 3, 5] and the reward closes the interval.
+        build(window=1).run(np.array([3, 3, 5, REWARD]), trace=trace)
+        now = [e["pending_now"] for e in trace if e["pending_now"]]
+        self.assertEqual(len(now), 1)
+        first, second, third = now[0]
+        self.assertEqual(first, second)
+        self.assertNotEqual(second, third)
+
     def test_the_candidates_do_not_all_carry_the_same_number(self):
         """The whole point. If every candidate got the same value it would be a
         step property wearing a per-candidate shape, and ranking on it would be

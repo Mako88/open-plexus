@@ -1161,3 +1161,57 @@ In the order they would be built. See
 **ARC-AGI is the honest long-range target and is not near.** It tests
 composition and inference over memory; we have built a memory. Recording it here
 so the gap is written down rather than implied.
+
+---
+
+## Where should mechanisms come from — biology, or computer science?
+
+**John's steer, 2026-07-27**, and it deserves to be a standing question rather
+than a passing thought:
+
+> biology is the one example we have that we know works ... however, we know
+> biology requires trillions of neurons to get the level of intelligence we're
+> looking for. So maybe pursuing biology as *the* example isn't the best course,
+> and looking for computer-science-specific solutions where the problem is well
+> known might make more sense.
+
+**The evidence in this repository already leans his way in one specific place.**
+
+- The one biological mechanism that WORKED here is synaptic tagging and capture
+  (the g9 line). It is a *control policy* — what to keep, and when to decide.
+- The places we are STUCK are the biological *representation* choices:
+  superposition, Hebbian outer products, frozen random projections. g10-07
+  measured a plain hash table answering `reward_recall` perfectly where the
+  store does not, and note 033 proved the store's ceiling is a bigram.
+
+**So the split that matters is not biology vs computer science; it is policy vs
+representation.** Biology has been a good source of policies and a poor source
+of representations, on this project's own measurements.
+
+**The sharpest form of the argument.** Biology's solutions are optimised for a
+substrate we do not have — slow, noisy, wet, cheap synapses, expensive long
+wires, no random access. Ours is fast, exact, has cheap wires and expensive
+parallelism. Copying an answer across substrates is answering a different
+question. The neuron-count observation is a symptom of that, not the argument
+itself.
+
+**And our actual constraints are distributed-systems constraints, not
+biological ones.** C1 locality, C2 bounded asynchrony, C3 churn are the
+conditions a datacentre-free network runs under. Biology satisfies them, which
+is why it is a useful existence proof — but the set of designs that satisfy them
+is far larger than biology's corner of it, and computer science has spent fifty
+years there: consistent hashing, DHTs, CRDTs, gossip, LSM trees, bloom filters,
+sketches. Those are engineered for partial failure and no global clock, which is
+exactly our problem statement.
+
+**What this does NOT license.** Dropping the biological line wholesale. Emergence
+is the original hypothesis and note 033 records it as untested rather than
+disfavoured — a two-layer linear system is not where anyone should expect it.
+Abandoning an untested hypothesis because a different family looks tractable is
+how a project ends up with a good database and no model.
+
+**Concrete next step, once g11-03 reports:** a fork is due between the superposed
+store and an exact keyed structure. g10-07 (a hash table wins), note 033 (the
+ceiling), note 034 (the price of lifting it) and g11-03 (whether that price is
+payable) are four measurements pointing at the same decision. That decision is
+John's and should be taken on those four numbers together, not one at a time.

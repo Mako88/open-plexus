@@ -1,0 +1,131 @@
+How far should the union reach?
+===============================
+
+Script: experiments/g9_05_the_tag.py, with --window swept
+Status: PRE-REGISTERED. The last untested dial on the combined gate.
+
+
+IN PLAIN TERMS
+---------------
+Two filters were combined and the pair beat either alone. One of them has a
+setting nobody has ever changed: how far back it looks. It has been fixed at
+"the last nine things" for every measurement ever taken here.
+
+Nine is generous. Each of those nine is kept whether it looks useful or not, so
+eight of them are usually junk that crowds the memory. If looking back at only
+the last one or two works nearly as well, the pair gets most of its benefit at a
+fraction of the cost — and the setting that has been silently carried through
+ten sweeps was simply too big.
+
+If instead the benefit disappears when the reach shrinks, then the pair is
+working for a reason nobody has yet named, and that is worth knowing before
+anything else is built on it.
+
+
+WHY THIS RUN EXISTS
+--------------------
+[g9-10](g9-10-does-the-best-capacity-track-the-node.txt) found the combined gate
+scoring **+0.26 at `slots` 4** where the tag alone scores -0.02 -- the highest
+tag-family recovery anywhere in this project. `REWARD_WINDOW` is frozen at 8 in
+that cell and in every other combined cell ever run.
+
+**A counting control says the union is dominated by that reach.** Recall x
+precision, 8 sequences, no training:
+
+    delay 8    window alone 0.112   combined 1/2/4/8: 0.109 0.108 0.106 0.096
+    delay 20   window alone 0.000   tag 8 alone 0.008   combined 8: 0.003
+
+At delay 8 the union's recall is pinned at 100% BY THE WINDOW -- a union cannot
+subtract -- and its precision approaches window-alone from below, so the tag's
+marks only dilute. At delay 20 the union is WORSE than the tag alone, because it
+adds nine writes per capture and no recall.
+
+**And that control cannot settle this sweep**, which is why the sweep exists. It
+ranks window-alone ABOVE combined at delay 8 (0.112 against 0.106) where g9-10
+measured the reverse (+0.23 against +0.26). So whatever the union adds is in
+WHICH writes it keeps rather than how many, and a count of what is kept is blind
+to it. That is a stated limit of a tool used three times tonight, and the first
+case where it failed.
+
+
+THE GRID
+---------
+  reach       1, 2, 4, 8, 16   the window's span, on BOTH the window arm and the
+                               combined one. Five values so grid.py can find an
+                               interior; 8 reproduces every earlier cell and is
+                               the wiring check
+  delay       1, 8, 20         1 is where note 027's leak makes the task trivial
+                               and is included ONLY as a control on that
+  slots       4, FIXED         g9-10's best for the combined arm
+  fade        0.95, FIXED
+  width       64, partitions 1
+  arms        none, oracle, reward, tag, tag-strongest, combined
+  seeds       1, 2, 3
+  lr          0.05, FIXED on every arm
+
+15 jobs. `tag` does not use the reach at all, so its row is a second wiring
+check: it must be flat across the whole grid, and if it is not, the arms are not
+independent.
+
+
+PREDICTIONS
+------------
+1. **The combined gate's advantage over the window SURVIVES at reach 1 and 2.**
+   Guess: +0.20 or better at delay 8, against the window's own score at the same
+   reach. The reasoning is that the union's gain is in which writes it adds --
+   the tag contributes binding-like writes the window missed -- and that
+   contribution does not depend on how far the window reaches.
+
+2. **The combined gate at delay 20 improves as the reach SHRINKS.** At reach 8
+   it is worse than the tag alone, because nine useless writes per capture cost
+   more than the window contributes when it cannot reach the binding. At reach 1
+   it adds two, so it should approach the tag alone from below rather than
+   sitting well beneath it. Guess: within 0.05 of the tag at reach 1.
+
+3. **The window arm alone has its cliff at the reach that matches the delay**,
+   reproducing g9-03 on a new axis and at a different width. Positive at delays
+   1 and 8 for reach >= 8, negative at delay 20 for every reach here. This is a
+   wiring check against a sweep run months ago.
+
+4. **The best combined reach is INTERIOR**, between 1 and 8 rather than at
+   either end. Too small and the window contributes nothing; too large and it
+   contributes junk.
+
+5. **The `tag` row is flat across reach**, because the tag arm never reads it.
+   If it moves, the arms share state and nothing in the run counts.
+
+Most likely wrong: **1.** It assumes the union's benefit is additive in the
+tag's contribution, and the counting control already shows the union behaves
+non-monotonically across intervals -- protecting more changes the store, which
+changes what the tag marks next. That feedback has already produced a union that
+captured LESS than one of its own arms, so "the tag's contribution does not
+depend on the reach" may simply be false.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- advantage survives at reach 1     -> the union is cheap, and every combined
+                                       cell measured so far paid eight writes
+                                       per capture for nothing
+- advantage needs reach 8           -> the union is not adding binding-like
+                                       writes, it is adding SPAN, and the
+                                       combined gate is a window with a longer
+                                       arm rather than two signals
+- combined never beats the window   -> g9-10's +0.26 was noise or a width
+  at any reach                         artefact, and the cheapest explanation of
+                                       the whole combined result is wrong
+- the tag row moves with reach      -> the arms are not independent. Nothing in
+                                       the run counts; fix the wiring first
+
+
+COST
+-----
+15 jobs of (reach, delay). Six arms x three seeds x one rate = 18 cells a job at
+width 64, which g9-09 and g9-10 both ran comfortably inside 90 minutes.
+
+
+THE ORACLE, SAID TWICE
+-----------------------
+The `oracle` arm reads `position_kinds()` and is a CEILING. And note 027: at
+delay 1 this task has a trivial exact solution, so that column is a control on
+the leak rather than evidence about short delays.

@@ -38,6 +38,7 @@ the first writes of every interval. See g9-07.
     python experiments/g9_05_the_tag.py --mode relative --slots 8 --fade 0.99
     python experiments/g9_05_the_tag.py --width 4 --slots 32 --fade 0.95
     python experiments/g9_05_the_tag.py --width 64 --partitions 16   # node of 4
+    python experiments/g9_05_the_tag.py --slots 4 --window 1   # combined, reach 1
 """
 
 from __future__ import annotations
@@ -90,7 +91,8 @@ ARMS = {
 
 def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
           test_set, slots: int, fade: float, relative: bool = False,
-          width: int = D_MODEL, groups: int = 1) -> tuple[float, float]:
+          width: int = D_MODEL, groups: int = 1,
+          reach: int = REWARD_WINDOW) -> tuple[float, float]:
     gated, window, tagged, strongest = ARMS[arm]
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=task.vocab_size, d_model=width, lr=lr,
@@ -99,7 +101,11 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
         # A node does not know how long ago the thing that mattered happened,
         # and handing it the delay is position_kinds() arriving as a parameter.
         reward_token=task.reward_token if (window or tagged) else -1,
-        reward_window=REWARD_WINDOW if window else 0,
+        # How far back the window reaches, on BOTH the window arm and the
+        # combined one. Frozen at REWARD_WINDOW everywhere until g9-11: it is
+        # the last untested dial on the combined gate, and the one that decides
+        # how many useless writes the union adds per capture.
+        reward_window=reach if window else 0,
         tag_slots=slots if tagged else 0,
         tag_decay=fade if tagged else 1.0,
         tag_strongest=strongest,
@@ -135,7 +141,7 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
 
 
 def one_seed(work: tuple) -> list[dict]:
-    delay, seed, rates, slots, fade, relative, width, groups = work
+    delay, seed, rates, slots, fade, relative, width, groups, reach = work
     task = replace(BASE, delay=delay)
     train_set = build(task, N_TRAIN, seed)
     test_set = build(replace(task, seed=task.seed + 99_991), N_TEST, seed)
@@ -143,11 +149,12 @@ def one_seed(work: tuple) -> list[dict]:
     for lr in rates:
         for arm in ARMS:
             overall, first = score(task, arm, lr, seed, train_set, test_set,
-                                   slots, fade, relative, width, groups)
+                                   slots, fade, relative, width, groups, reach)
             records.append(dict(
                 condition=f"delay={delay} width={width} groups={groups} "
-                          f"slots={slots} fade={fade} lr={lr} "
+                          f"slots={slots} fade={fade} reach={reach} lr={lr} "
                           f"relative={relative} arm={arm}",
+                reach=reach,
                 seed=seed, delay=delay, slots=slots, fade=fade, lr=lr, arm=arm,
                 relative=relative, width=width, groups=groups,
                 # What ONE node holds, which is the quantity note 024 costs and
@@ -200,8 +207,9 @@ def main() -> int:
     groups = args.partitions if args.partitions is not None else 1
     if width % groups:
         raise SystemExit(f"width {width} does not divide into {groups} groups")
-    work = [(delay, seed, tuple(rates), slots, fade, relative, width, groups)
-            for delay in delays for seed in seeds]
+    reach = args.window if args.window is not None else REWARD_WINDOW
+    work = [(delay, seed, tuple(rates), slots, fade, relative, width, groups,
+             reach) for delay in delays for seed in seeds]
     records = [r for batch in spread(one_seed, work, args.workers) for r in batch]
     emit(records, Path(args.json) if args.json else None)
     return 0

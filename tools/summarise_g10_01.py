@@ -1,6 +1,6 @@
 """Does this memory beat a bigram on real text?
 
-The table is **width x chunk**, in bits per character, against three reference
+The table is **width x memory_cap**, in bits per character, against three reference
 points measured on the same corpus and the same split.
 
 Three things print separately because a single headline merges them:
@@ -35,7 +35,7 @@ def main() -> int:
         return 1
 
     widths = sorted({r["width"] for r in rows})
-    chunks = sorted({r["chunk"] for r in rows})
+    chunks = sorted({r["cap"] for r in rows})
     first = rows[0]
     bars = {name: first[name]
             for name in ("uniform", "unigram", "bigram", "trigram")}
@@ -48,11 +48,11 @@ def main() -> int:
 
     def cells(width, chunk, field):
         return [r[field] for r in rows
-                if r["width"] == width and r["chunk"] == chunk]
+                if r["width"] == width and r["cap"] == chunk]
 
     for field in ("bits_calibrated", "bits_raw", "accuracy"):
         print(f"\n== {field} ==")
-        print(f"{'width':>7}" + "".join(f"{'chunk ' + str(c):>18}" for c in chunks))
+        print(f"{'width':>7}" + "".join(f"{'cap ' + str(c):>18}" for c in chunks))
         for width in widths:
             line = f"{width:>7}"
             for chunk in chunks:
@@ -69,12 +69,12 @@ def main() -> int:
         for chunk in chunks:
             values = cells(width, chunk, "bits_calibrated")
             if not values:
-                print(f"  width {width:>4} chunk {chunk:>5}: missing")
+                print(f"  width {width:>4} cap {chunk:>5}: missing")
                 continue
             mean, error = mean_and_error(values)
             cleared = [n for n, v in bars.items() if mean < v]
             best = cleared[-1] if cleared else "NOTHING, not even uniform"
-            print(f"  width {width:>4} chunk {chunk:>5}: {mean:.3f} +/- {error:.3f}"
+            print(f"  width {width:>4} cap {chunk:>5}: {mean:.3f} +/- {error:.3f}"
                   f"   clears {best}")
 
     print("\n== is the calibration PINNED at a grid edge? ==")
@@ -88,7 +88,7 @@ def main() -> int:
                        if t in (TEMPERATURES[0], TEMPERATURES[-1])]
             if at_edge:
                 edges += 1
-                print(f"  width {width:>4} chunk {chunk:>5}: PINNED at "
+                print(f"  width {width:>4} cap {chunk:>5}: PINNED at "
                       f"{sorted(set(at_edge))} -- the bits above are a BOUND")
     if not edges:
         print("  no cell pinned; every calibrated number is a value")
@@ -102,7 +102,7 @@ def main() -> int:
         print("  no usable cell")
         return 1
     width, chunk, bits = best
-    print(f"  best cell: width {width} chunk {chunk} at {bits:.3f} bits/char")
+    print(f"  best cell: width {width} cap {chunk} at {bits:.3f} bits/char")
     if bits < bars["bigram"]:
         print("  -> IT BEATS THE BIGRAM. Goal 2 has its first positive evidence")
         print("     and this is the most important result in the project")
@@ -121,14 +121,24 @@ def main() -> int:
               for c in chunks if cells(width, c, "bits_calibrated")]
     if len(spread) > 1:
         moved = max(spread) - min(spread)
-        print(f"\n  chunk length moves the best width by {moved:.3f} bits")
+        print(f"\n  the cap moves the best width by {moved:.3f} bits")
         if moved < 0.05:
-            print("  -> the model is not using context AT ALL. The store")
-            print("     accumulates within a chunk, so a longer chunk that")
-            print("     changes nothing means the memory is doing no work here")
+            print("  -> the cap's VALUE does not matter once it binds at all,")
+            print("     so it is a stability requirement rather than a dial")
         else:
-            print("  -> context is worth something, so the memory is being")
-            print("     used even if the total is short of the bar")
+            print("  -> the cap is a real dial and not just a safety rail; it")
+            print("     is a frozen axis anywhere else it is set")
+
+    by_width = [mean_and_error(
+        [v for c in chunks for v in cells(w, c, "bits_calibrated")])[0]
+        for w in widths
+        if any(cells(w, c, "bits_calibrated") for c in chunks)]
+    if len(by_width) > 1:
+        print(f"\n  WIDTH moves it by {max(by_width) - min(by_width):.3f} bits, "
+              f"from {max(by_width):.3f} to {min(by_width):.3f}")
+        print("  -> this is the axis that decides whether g10-02's underfitting")
+        print("     is structural or width-limited. Little movement across an")
+        print("     fourfold width means the ceiling is not capacity")
     return 0
 
 

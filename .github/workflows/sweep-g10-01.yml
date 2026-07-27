@@ -17,7 +17,24 @@ name: sweep-g10-01-does-this-memory-beat-a-bigram
 # delta-rule readout is discriminative and its scores are not on a softmax's
 # scale. Both raw and calibrated numbers are reported.
 #
-# 9 jobs: width x chunk, three seeds inside each.
+# RE-RUN. The first attempt's chunk axis measured a DIVERGENCE: the fast store
+# accumulates across a chunk, the delta rule feeds on the retrievals, and Wo
+# reached 1e72 with next-character accuracy of 0.005 -- below the 1/86 chance
+# rate. It reported 37 bits/char and NaN, over a vocabulary whose uniform cost is
+# 6.426.
+#
+# `memory_cap` is synaptic scaling on the fast store. It DEFAULTS TO OFF and the
+# first run never set it. With it, chunk 256 is stable and gives 5.72 bits.
+#
+# So `cap` is now an axis rather than a pinned constant: 1.0 and 5.0 already
+# disagree by 0.13 bits, and freezing the value found in the one diverging cell
+# is the frozen-constant mistake this project keeps catching.
+#
+# Chunk is fixed at 256 for this re-run -- the widest setting known to be stable
+# -- because width is the axis that decides whether g10-02's underfitting is
+# structural or width-limited, and that is the live question.
+#
+# 6 jobs: width x cap, three seeds inside each.
 
 on:
   workflow_dispatch:
@@ -32,7 +49,7 @@ jobs:
       fail-fast: false
       matrix:
         width: [32, 64, 128]
-        chunk: [64, 256, 1024]
+        cap: [1.0, 5.0]
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -41,11 +58,11 @@ jobs:
         with:
           python-version: "3.13"
       - run: pip install numpy
-      - name: width ${{ matrix.width }} chunk ${{ matrix.chunk }}
-        run: python experiments/g10_01_first_language.py --width ${{ matrix.width }} --scale ${{ matrix.chunk }} --workers 3 --json out/X-${{ matrix.width }}-${{ matrix.chunk }}.json
+      - name: width ${{ matrix.width }} cap ${{ matrix.cap }}
+        run: python experiments/g10_01_first_language.py --width ${{ matrix.width }} --scale 256 --cap ${{ matrix.cap }} --workers 3 --json out/X-${{ matrix.width }}-${{ matrix.cap }}.json
       - uses: actions/upload-artifact@v4
         with:
-          name: g10-01-${{ matrix.width }}-${{ matrix.chunk }}
+          name: g10-01-${{ matrix.width }}-${{ matrix.cap }}
           path: out/*.json
 
   aggregate:
@@ -64,7 +81,7 @@ jobs:
           merge-multiple: true
       - name: Combine
         run: |
-          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 9" | tee summary.txt
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 6" | tee summary.txt
           python -m tools.summarise_g10_01 | tee -a summary.txt
       - name: Summary
         run: |

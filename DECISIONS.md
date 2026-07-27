@@ -653,3 +653,44 @@ the next person sizing a control will read that and not this.
 scores identically to the tag — the same degeneracy its own control found. Small
 capacity is the one regime where the two mechanisms hold different writes, which
 is why it is in this grid and not its own.
+
+## 26. Two cheap controls changed the account of the whole g9 line
+
+**What happened.** With g9-10 in flight I ran four no-training controls, minutes
+of compute, counting what each gate keeps against `position_kinds()`. They
+overturned a note I wrote this session and deflated g9-06's explanation.
+
+**First: the tag has 100% recall and 3.4% precision.** Note 025 said its
+shortfall is write-time ignorance. It keeps every rewarded binding at every
+delay, including delay 20 where the window keeps none. The missing four fifths
+are interference, not ignorance — so replay, which addresses ignorance, was aimed
+at a problem that does not exist. Marked at the top of note 025 rather than
+rewritten away.
+
+**Second: there is a ceiling and it belongs to the task.** One binding in six is
+rewarded, so a perfect binding-detector still keeps six writes per useful one —
+16.7% precision. The tag at its best capacity is at 70% of that; a matched window
+is at 76%. Binding-detection is nearly exhausted, which retroactively explains
+why every signal improvement (the inverted ranking, `tag_relative`) only paid
+where capacity was starved: they were competing for 30% of a 16.7% ceiling.
+
+**Third, and the one I would want checked: the tag keeps 33 bindings at delay 8
+and 27 are rewarded.** Nothing local predicts reward, so it is not selecting
+rewarded bindings — it is selecting bindings *near the reward*, because the fade
+is a soft window anchored at the capture. **The tag is a soft window with a
+capacity bound.** g9-06's flatness is measured at `slots` 32, where recall is
+100% at every delay because the pool keeps essentially everything — the worst
+precision of any setting. It buys delay-independence by admitting so much that
+the delay stops mattering.
+
+**What I did NOT do.** g9-06 and g9-09's recoveries were measured with training
+and stand; only the account of *why* changes, and note 026 says so explicitly.
+These are 8 sequences at one seed with an untrained readout, and g9-05 already
+demonstrated that what a gate keeps and what a trained model scores can diverge
+sharply — the un-faded tag captured 9% and scored −0.20.
+
+**Where it leaves the line.** The sharpest open question is now whether anything
+can identify *which* of the six bindings without being told the delay. It needs a
+probe in g9-04's shape — AUC against "is the rewarded binding", among bindings
+only — and that has never been asked. It either finds the signal or bounds the
+line at about 20% of the oracle, which would close it honestly.

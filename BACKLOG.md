@@ -402,6 +402,31 @@ the whole mechanism and the signal was a detour.
 [g9-07](experiments/sweeps/g9-07-a-tag-that-knows-how-big-its-store-is.txt) asks
 exactly that, with `tag_relative`.
 
+## THE SHARPEST OPEN QUESTION: can anything find WHICH binding without the delay?
+
+[Note 026](docs/notes/026-the-tags-precision-comes-from-its-fade.md) puts a
+ceiling on this line. One binding in six is rewarded and nothing local separates
+them, so a PERFECT binding-detector tops out at **16.7% precision** — a property
+of the task, not of any mechanism. The tag at its best capacity is at **70% of
+that ceiling** and a matched window is at **76%**.
+
+So binding-detection is close to exhausted, and a better signal competes for at
+most another 30% of 16.7%. **The remaining room is entirely in identifying WHICH
+of the six**, and only two things do that today: a window, by being told the
+delay, and the tag's fade, by guessing a time constant.
+
+**Nothing does it from the data.** If nothing can, then `reward_recall`'s ceiling
+for any delay-agnostic gate is about 20% of the oracle's advantage — which is
+approximately what the tag scores — and that is a result about the TASK rather
+than about any mechanism, which would close this line honestly.
+
+**It needs a probe, not a sweep**, and the shape is g9-04's: score candidate
+local signals by AUC against the label "is the rewarded binding", among BINDINGS
+only rather than against filler. g9-04 asked binding-vs-filler and found
+retrieval strength; nobody has asked rewarded-binding-vs-unrewarded-binding with
+the reward's arrival available as an anchor. Cheap, and it either finds the
+signal or bounds the line.
+
 ## ANSWERED: eight dimensions, and the tag is not better on small nodes
 
 [g9-09](experiments/sweeps/g9-09-a-small-node-in-a-wide-network.txt) ran, 15 of

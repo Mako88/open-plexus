@@ -1,0 +1,148 @@
+Does normalising the signal give a row that is both flat and positive?
+======================================================================
+
+Script: experiments/g9_05_the_tag.py --mode relative
+Status: PRE-REGISTERED. Predictions written after a pre-dispatch control, which
+        is disclosed below, and before any sweep.
+
+
+IN PLAIN TERMS
+---------------
+The marking rule was "mark the writes whose lookup came back weak", because a
+fresh piece of information has nothing stored under it yet. That works, but it
+was measuring the wrong thing: a lookup also comes back weak when the *memory* is
+nearly empty, and the memory is nearly emptiest right after it has just been
+cleared out. So the rule spent its whole budget marking the first few things
+after every clear-out, every time, regardless of what they were.
+
+The fix is one division. Ask not "was this lookup small" but "was this lookup
+small **for a memory this size**". No new signal, no new dial, no clock.
+
+If it works, the method finally does the thing it was built for: work well AND
+not care how long ago the important thing happened. Every version so far has done
+one or the other.
+
+
+WHY THIS EXISTS
+----------------
+[g9-05](g9-05-a-tag-that-fades.txt) is the reason and its result was clean:
+**the tag's rows that are flat are flat at zero, and its rows that are positive
+carry the window's cliff.** No cell is both.
+
+The un-faded tag is the extreme case, at -0.18 to -0.22 everywhere -- worse than
+not gating. [Note 023](../../docs/notes/023-two-signals-and-only-one-of-them-is-about-value.md)
+diagnosed why: retrieval magnitude scales with store size, the store is smallest
+just after a capture, so an absolute ranking reads the opening writes of every
+interval as the weakest it will ever see.
+
+Measured on a three-interval stream, an absolute tag of four marks the final
+interval at offsets **0.00, 0.01, 0.03 and 0.05**. Not approximately the start.
+The start. `tests/test_tag.py` pins it.
+
+`tag_decay` was hiding that rather than fixing it -- a fade ages the cold-start
+marks out, which is why fading rescued the mechanism and why the fade ends up
+doing two jobs and can be tuned for only one at a time.
+
+`tag_relative` divides the strength by the norm of the store **that produced the
+retrieval**, one step before the write being ranked. CLAUDE.md rule 7 read in the
+direction it usually is not: a criterion that fails to normalise against
+something moving with it is blind the same way as one that cancels its own input.
+
+
+THE PRE-DISPATCH CONTROL, DISCLOSED
+------------------------------------
+Rewarded-binding capture, 32 captures over 8 sequences, no training. Same probe
+as g9-05's.
+
+                              delay 1   delay 8   delay 20
+    window 8                     100%      100%         0%
+    absolute, no fade, slots 8      9%        9%        16%
+    RELATIVE, no fade, slots 8     31%       28%        19%
+    absolute + fade 0.99           44%       44%        34%
+    RELATIVE + fade 0.99, slots 8  66%       59%        44%
+
+Normalising roughly triples the un-faded tag and lifts the faded one by half
+again at every delay. **It is not a substitute for the fade** -- relative with no
+fade is 31/28/19, which is better than 9/9/16 and still far below the faded
+arms. The two do different things and both help.
+
+Its predictions were registered before it ran: 1 held at slots 8 (above 8 of 32
+at two delays of three), 2 was close and slightly out (12 points of spread
+against a guess of 10), 3 held.
+
+
+THE GRID
+---------
+  slots     8, 16, 32           three values, so `tools/grid.py` can find an
+                                interior -- g9-05 pinned with only two
+  fade      1.0, 0.99, 0.95     1.0 is the question, not a control, this time
+  delay     1, 8, 20            delay 4 dropped: g9-05 has it tracking delay 1
+                                to within 0.03 in every row. A deliberate
+                                narrowing, recorded rather than left invisible
+  arms      none, oracle, reward, tag, tag-strongest
+  seeds     1, 2, 3
+  lr        0.05, FIXED on every arm
+
+Cells are directly comparable with g9-05's, which ran the same arms at the same
+rate on the same task.
+
+
+PREDICTIONS
+------------
+1. **Relative beats absolute at every delay at fade 0.99.** The control says it
+   captures more at every delay, and g9-05 says capture and recovery move
+   together everywhere except the un-faded arm. Guess: +0.05 or better against
+   g9-05's +0.00/-0.02/-0.03 at slots 8.
+
+2. **There is a row that is both flat and positive.** THE PREDICTION THIS RUN
+   EXISTS FOR. Guess: at fade 0.99 and some capacity, mean above +0.10 with a
+   spread under 0.20, against the window's spread of 0.47. If no row manages
+   both, the tag is not a gate that can ignore the delay and note 023's
+   combined-gate conclusion stands unchallenged.
+
+3. **Relative with NO fade is still not usable, and stays at or below zero.**
+   The control has it at 31/28/19 against a faded 66/59/44. Normalising removes
+   the store-size confound; it does not give a mark any reason to expire. If
+   fade 1.0 comes out positive, the fade was ONLY ever a cold-start corrector
+   and the reach argument in note 023 is wrong.
+
+4. **Delay 20 is positive somewhere, for the first time in this line of work.**
+   Nothing has managed it: the window is -0.24, the best absolute tag -0.03.
+   The control puts relative+fade at 44% capture there against the window's 0%.
+   Guess: above +0.05 in at least one cell.
+
+5. **`tag` still beats `tag-strongest`**, mean above +0.05 at every delay.
+
+Most likely wrong: **4.** Capture is not recovery -- g9-05's un-faded arm
+captured 9% and scored -0.20, and its fade-0.95 arm captured 100% at delay 1 and
+scored exactly what the window scored. A capture rate at delay 20 that beats zero
+is a low bar when the alternative kept nothing at all.
+
+
+WHAT WOULD REFUTE WHAT
+-----------------------
+- flat AND positive at some cell     -> the tag is a gate that does not need to
+                                        be told the delay, which nothing in this
+                                        project has been. Take it forward
+- relative helps but still trades    -> the store-size confound was real and was
+  flatness against height               not the binding constraint. Note 023's
+                                        combined gate is the next build
+- fade 1.0 comes out positive        -> the fade was only ever correcting the
+                                        cold start, and the reach story in note
+                                        023 is wrong about its own mechanism
+- relative changes nothing at all    -> the divisor is not connected. Nothing
+                                        else in the run counts; check the
+                                        mutation first
+
+
+COST
+-----
+27 jobs of (slots, fade, delay). Five arms x three seeds x one rate = 15 cells a
+job; g9-05 ran the same shape in about 7 minutes a job. Dispatched only after
+g9-06 finishes -- one matrix at a time.
+
+
+THE ORACLE, SAID TWICE
+-----------------------
+The `oracle` arm reads `position_kinds()` and is a CEILING. The control's labels
+come from the same place and score writes the model chose without them.

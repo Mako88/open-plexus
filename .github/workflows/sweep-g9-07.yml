@@ -1,0 +1,85 @@
+name: sweep-g9-07-a-tag-that-knows-how-big-its-store-is
+
+# g9-05: the tag's rows that are flat are flat at zero, and its rows that are
+# positive carry the window's cliff. No cell is both, which was the whole claim.
+#
+# Note 023 diagnosed why the un-faded tag is actively harmful: retrieval
+# magnitude scales with store size, the store is smallest just after a capture,
+# so an absolute ranking reads the opening writes of every interval as the
+# weakest it will ever see. Measured, an absolute tag of four marks the final
+# interval of a three-interval stream at offsets 0.00, 0.01, 0.03 and 0.05.
+#
+# tag_relative divides the strength by the norm of the store that PRODUCED the
+# retrieval. One division, no new signal, no new dial, no clock.
+#
+# Pre-dispatch control, rewarded-binding capture over 32 captures:
+#   window 8                      100% / 100% /  0%   (delays 1 / 8 / 20)
+#   absolute, no fade               9% /   9% / 16%
+#   RELATIVE, no fade              31% /  28% / 19%
+#   absolute + fade 0.99           44% /  44% / 34%
+#   RELATIVE + fade 0.99           66% /  59% / 44%
+#
+# Three values on both swept axes, because g9-05 pinned with two. Delay 4 is
+# dropped -- g9-05 has it tracking delay 1 to within 0.03 in every row.
+#
+# 27 jobs of (slots, fade, delay), about 7 minutes each.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  relative:
+    strategy:
+      fail-fast: false
+      matrix:
+        slots: [8, 16, 32]
+        fade: ["1.0", "0.99", "0.95"]
+        delay: [1, 8, 20]
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: slots ${{ matrix.slots }} fade ${{ matrix.fade }} delay ${{ matrix.delay }}
+        run: python experiments/g9_05_the_tag.py --mode relative --slots ${{ matrix.slots }} --fade ${{ matrix.fade }} --scale ${{ matrix.delay }} --lr 0.05 --workers 3 --json out/X-${{ matrix.slots }}-${{ matrix.fade }}-${{ matrix.delay }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-07-${{ matrix.slots }}-${{ matrix.fade }}-${{ matrix.delay }}
+          path: out/*.json
+
+  aggregate:
+    needs: [relative]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g9-07-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 27" | tee summary.txt
+          python -m tools.summarise_g9_05 | tee -a summary.txt
+      - name: Summary
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g9-07-summary
+          path: |
+            summary.txt
+            out/*.json

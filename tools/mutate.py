@@ -192,6 +192,30 @@ MUTATIONS = [
         new="    return rank * factor",
     ),
     Mutation(
+        name="the-tag-ranks-on-raw-strength",
+        breaks="the normalisation, restoring the confound it exists to remove. "
+               "A retrieval's size scales with the store's size, so an "
+               "un-normalised tag reads every write made just after a capture "
+               "as weak and fills with them. Measured: rewarded-binding capture "
+               "falls from 10 of 32 to 3 of 32 at slots 8",
+        path=LOCAL,
+        old="                        if self.config.tag_relative and previous_store_size:",
+        new="                        if False:",
+    ),
+    Mutation(
+        name="the-relative-tag-divides-by-the-wrong-store",
+        breaks="WHICH store the strength is relative to. Using the norm after "
+               "this step's write divides by a store that already contains the "
+               "write being ranked, so the quantity stops being 'weak for the "
+               "store that produced this retrieval' and silently becomes "
+               "something with no name",
+        path=LOCAL,
+        old="            if self.config.tag_relative:\n"
+            "                previous_store_size = float(np.linalg.norm(memory))",
+        new="            if self.config.tag_relative:\n"
+            "                previous_store_size = 1.0",
+    ),
+    Mutation(
         name="the-tag-outlives-its-capture",
         breaks="the one invariant the indices rest on. `tagged` holds positions "
                "in `pending`, which empties at every reward, so a mark that "

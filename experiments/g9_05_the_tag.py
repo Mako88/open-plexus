@@ -24,8 +24,13 @@ Two dials, and they are separate here in a way the window's were not:
 only the end of the ranking that wins reversed. If it scores the same, the
 capacity is doing the work and g9-04's signal is decoration.
 
+`--mode relative` ranks the tag on retrieval strength divided by the size of the
+store that produced it, which removes the term that made an un-faded tag prefer
+the first writes of every interval. See g9-07.
+
     python experiments/g9_05_the_tag.py --sweep degrade          # control
     python experiments/g9_05_the_tag.py --slots 8 --fade 0.99 --scale 8 --lr 0.05
+    python experiments/g9_05_the_tag.py --mode relative --slots 8 --fade 0.99
 """
 
 from __future__ import annotations
@@ -67,7 +72,8 @@ ARMS = {
 
 
 def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
-          test_set, slots: int, fade: float) -> tuple[float, float]:
+          test_set, slots: int, fade: float,
+          relative: bool = False) -> tuple[float, float]:
     gated, window, tagged, strongest = ARMS[arm]
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=task.vocab_size, d_model=D_MODEL, lr=lr,
@@ -80,6 +86,7 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
         tag_slots=slots if tagged else 0,
         tag_decay=fade if tagged else 1.0,
         tag_strongest=strongest,
+        tag_relative=relative and tagged,
         seed=seed))
     rng = np.random.default_rng(seed)
     order = np.arange(len(train_set))
@@ -104,7 +111,7 @@ def score(task: RewardConfig, arm: str, lr: float, seed: int, train_set,
 
 
 def one_seed(work: tuple) -> list[dict]:
-    delay, seed, rates, slots, fade = work
+    delay, seed, rates, slots, fade, relative = work
     task = replace(BASE, delay=delay)
     train_set = build(task, N_TRAIN, seed)
     test_set = build(replace(task, seed=task.seed + 99_991), N_TEST, seed)
@@ -112,17 +119,18 @@ def one_seed(work: tuple) -> list[dict]:
     for lr in rates:
         for arm in ARMS:
             overall, first = score(task, arm, lr, seed, train_set, test_set,
-                                   slots, fade)
+                                   slots, fade, relative)
             records.append(dict(
                 condition=f"delay={delay} slots={slots} fade={fade} lr={lr} "
-                          f"arm={arm}",
+                          f"relative={relative} arm={arm}",
                 seed=seed, delay=delay, slots=slots, fade=fade, lr=lr, arm=arm,
+                relative=relative,
                 accuracy=first,        # first asks: retention, not echo
                 accuracy_all=overall))
     return records
 
 
-def control() -> int:
+def control(relative: bool = False) -> int:
     """One delay, one rate, one seed, reduced training. Shape, not a result.
 
     Deliberately small. A control that holds the machine for ten minutes is a
@@ -136,7 +144,7 @@ def control() -> int:
     print(f"{'arm':>15}{'first asks':>12}{'all asks':>10}")
     for arm in ARMS:
         overall, first = score(task, arm, 0.05, 1, train_set, test_set,
-                               SLOTS, FADE)
+                               SLOTS, FADE, relative)
         print(f"{arm:>15}{first:>12.3f}{overall:>10.3f}", flush=True)
     return 0
 
@@ -144,13 +152,19 @@ def control() -> int:
 def main() -> int:
     args = parse_args(__doc__.splitlines()[0])
     if args.sweep == "degrade":
-        return control()
+        return control(args.mode == "relative")
     delays = (int(args.scale),) if args.scale is not None else DELAYS
     rates = (args.lr,) if args.lr else LEARNING_RATES
     seeds = (args.seed,) if args.seed else SEEDS
     slots = args.slots if args.slots is not None else SLOTS
     fade = args.fade if args.fade is not None else FADE
-    work = [(delay, seed, tuple(rates), slots, fade)
+    # `--mode relative` ranks the tag on retrieval strength divided by the size
+    # of the store that produced it. One variant of one arm, so it is a mode on
+    # this script rather than a second script that would drift from it.
+    relative = args.mode == "relative"
+    if args.mode not in (None, "relative"):
+        raise SystemExit(f"--mode must be 'relative' if given, got {args.mode}")
+    work = [(delay, seed, tuple(rates), slots, fade, relative)
             for delay in delays for seed in seeds]
     records = [r for batch in spread(one_seed, work, args.workers) for r in batch]
     emit(records, Path(args.json) if args.json else None)

@@ -37,11 +37,13 @@ CUE, VALUE = 10, 11
 
 
 def build(slots: int = 0, window: int = 0, decay_tag: float = 1.0,
-          strongest: bool = False, reward: int = REWARD, decay: float = 0.99):
+          strongest: bool = False, relative: bool = False,
+          reward: int = REWARD, decay: float = 0.99):
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=VOCAB, d_model=WIDTH, lr=0.05, key_scale=0.5, decay=decay,
         reward_token=reward, reward_window=window, tag_slots=slots,
-        tag_decay=decay_tag, tag_strongest=strongest, seed=7))
+        tag_decay=decay_tag, tag_relative=relative, tag_strongest=strongest,
+        seed=7))
     # A decoder, so a prediction reads the memory rather than an untrained
     # readout -- the same choice g9-04's probe made, for the same reason.
     model.wo[:] = model.wv
@@ -101,6 +103,28 @@ def captures(model, tokens: np.ndarray) -> list[list[int]]:
             kept.append(sorted(where[i] for i in entry["captured"] if i in where))
             where = {}
     return kept
+
+
+def _intervals(count: int, length: int = 80, seed: int = 4) -> np.ndarray:
+    """`count` equal stretches of filler, each closed by a reward.
+
+    Equal lengths on purpose: the quantity under test is WHERE in an interval a
+    mark lands, so the intervals have to be comparable.
+    """
+    rng = np.random.default_rng(seed)
+    tokens: list[int] = []
+    for _ in range(count):
+        tokens += _filler(length, rng) + [REWARD]
+    return np.array(tokens)
+
+
+def _mean_offset(steps: list[int], tokens: np.ndarray) -> float:
+    """Mean position of these steps within their own interval, as a fraction."""
+    rewards = [int(t) for t in np.flatnonzero(tokens == REWARD)]
+    closing = min(r for r in rewards if r >= max(steps))
+    opening = max([0] + [r for r in rewards if r < min(steps)])
+    span = closing - opening
+    return sum((step - opening) / span for step in steps) / len(steps)
 
 
 class OffByDefault(unittest.TestCase):
@@ -247,6 +271,81 @@ class TheMarkFades(unittest.TestCase):
         for rank in (-3.0, -0.5, 0.0, 0.5, 3.0):
             with self.subTest(rank=rank):
                 self.assertEqual(fade(rank, 1.0), rank)
+
+
+class StrengthIsRelativeToTheStore(unittest.TestCase):
+    """Rank on how weak a retrieval is FOR THIS STORE, not on how small it is.
+
+    A retrieval's magnitude scales with how much is in the store, so right after
+    a capture -- when the store holds only what survived -- everything retrieves
+    weakly. An absolute tag therefore reads the first writes of every interval as
+    the most binding-like ones it will ever see, and fills with them.
+    `tag_decay` hides that by ageing them out rather than fixing it, which is why
+    the fade ends up doing two jobs and can be tuned for only one.
+    """
+
+    def test_it_changes_what_survives(self):
+        """The connection test. A flag that is read, divided by, and changes
+        nothing is the failure mode this repository is written against."""
+        tokens = stream(intervals=2)
+        self.assertNotEqual(captures(build(slots=4), tokens),
+                            captures(build(slots=4, relative=True), tokens))
+
+    def test_it_is_off_by_default(self):
+        self.assertFalse(LocalMemoryConfig(vocab_size=VOCAB).tag_relative)
+
+    def test_it_is_refused_without_a_tag(self):
+        with self.assertRaises(ValueError):
+            LocalMemoryConfig(vocab_size=VOCAB, reward_token=REWARD,
+                              tag_relative=True)
+
+    def test_it_still_keeps_exactly_what_it_had_room_for(self):
+        """The invariant must survive the change of ranking quantity. Dividing
+        by a store norm cannot make the pool fill differently -- only fill with
+        different writes."""
+        rng = np.random.default_rng(2)
+        tokens = np.array(_filler(60, rng) + [REWARD] + _filler(9, rng)
+                          + [REWARD] + _filler(40, rng) + [REWARD])
+        for slots in (2, 4):
+            with self.subTest(slots=slots):
+                for offered, kept in capture_sizes(
+                        build(slots=slots, relative=True), tokens):
+                    self.assertEqual(kept, min(slots, offered))
+
+    def test_an_absolute_tag_marks_the_first_writes_of_every_interval(self):
+        """The failure, measured. This is what the normalisation is for.
+
+        A first attempt at a meaning test here asserted that a relative ranking
+        survives scaling every stored value by a constant while an absolute one
+        does not. **It was vacuous**: a constant rescale multiplies every
+        retrieval by the same factor, and `admit` compares ranks, so neither
+        ranking moves. Its guard caught it, which is the only reason it is not
+        still there passing.
+
+        The property that actually separates them is temporal. The store's size
+        varies WITHIN a run -- it is smallest just after a capture -- so an
+        absolute tag reads the opening writes of every interval as the weakest
+        retrievals it will ever see. Measured on a three-interval stream, it
+        marks writes at offsets 0.00, 0.01, 0.03 and 0.05 of the final interval.
+        Not approximately the start: the start.
+        """
+        tokens = _intervals(3)
+        absolute = _mean_offset(captures(build(slots=4), tokens)[-1], tokens)
+        self.assertLess(
+            absolute, 0.10,
+            "the absolute tag did not cluster at the start of the interval, so "
+            "this stream does not pose the problem tag_relative solves")
+
+    def test_a_relative_tag_does_not(self):
+        tokens = _intervals(3)
+        absolute = _mean_offset(captures(build(slots=4), tokens)[-1], tokens)
+        relative = _mean_offset(
+            captures(build(slots=4, relative=True), tokens)[-1], tokens)
+        self.assertGreater(
+            relative, 2 * absolute,
+            f"relative marks sat at {relative:.2f} of the way through the "
+            f"interval against the absolute tag's {absolute:.2f}; dividing by "
+            f"the store did not free the ranking from when the store was small")
 
 
 class TheTagIsClearedByCapture(unittest.TestCase):

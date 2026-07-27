@@ -305,6 +305,38 @@ class LocalMemoryConfig:
             value. That split is the one the biology describes and the only one
             available here.
             docs/notes/022-the-signal-was-there-and-pointing-backwards.md.
+        tag_relative: Rank the tag on retrieval strength divided by the size
+            of the store that produced it, instead of on the raw strength.
+
+            **The raw strength confounds two things and one of them is not
+            about the write.** A retrieval's magnitude scales with how much is
+            in the store, so right after a capture -- when `memory` holds only
+            what survived -- every retrieval is small. The weakest retrievals an
+            un-faded tag will ever see are therefore the writes made just after
+            the previous capture, and it fills with those:
+            [g9-05](../../experiments/sweeps/g9-05-a-tag-that-fades.txt)
+            measures `tag_decay` 1.0 at -0.18 to -0.22, worse than not gating at
+            all, at every delay and both capacities.
+
+            `tag_decay` hides that rather than fixing it. A fade releases old
+            marks, so the cold-start writes are eventually displaced -- which is
+            why fading rescues the mechanism, and also why the fade ends up
+            doing two jobs and can be tuned for only one at a time. That is
+            g9-05's whole result: the fade settings that are flat across delay
+            are flat at zero, and the ones that score have become a window.
+
+            Dividing by the store's norm is CLAUDE.md rule 7 in the direction it
+            is usually not read: a criterion that fails to normalise against a
+            quantity moving with it is blind in the same way as one that cancels
+            its own input. It asks "is this retrieval weak FOR THIS STORE"
+            rather than "is this retrieval small", which is what the signal was
+            always supposed to mean.
+
+            The divisor is the store's norm **at the moment the retrieval was
+            made**, one step before the write being ranked -- not the norm now,
+            which already contains that write. One number per step, local, and
+            no time constant. Off by default, which reproduces every earlier
+            result exactly.
         tag_strongest: Rank the tag by the strongest retrieval instead of the
             weakest. **A control, not a setting.**
 
@@ -490,6 +522,7 @@ class LocalMemoryConfig:
     reward_window: int = 0
     tag_slots: int = 0
     tag_decay: float = 1.0
+    tag_relative: bool = False
     tag_strongest: bool = False
     memory_cap: float = 0.0
     consolidation: float = 0.0
@@ -536,6 +569,10 @@ class LocalMemoryConfig:
         if self.tag_decay < 1.0 and not self.tag_slots:
             raise ValueError(
                 "tag_decay fades marks and does nothing without tag_slots")
+        if self.tag_relative and not self.tag_slots:
+            raise ValueError(
+                "tag_relative changes how the tag ranks and does nothing "
+                "without tag_slots")
         if self.tag_strongest and not self.tag_slots:
             raise ValueError(
                 "tag_strongest picks which end of the tag wins and does nothing "
@@ -831,6 +868,11 @@ class LocalAssociativeMemory:
         seen, mean_surprise, m2 = 0, 0.0, 0.0
         previous_key = None
         previous_retrieval = None
+        # The size of the store that produced `previous_retrieval`, so a
+        # relative tag divides by what the retrieval could have returned rather
+        # than by a store that already contains the write being ranked. Computed
+        # only when something reads it -- it is a d x d norm every step.
+        previous_store_size = 0.0
         predictions = np.zeros(len(tokens), dtype=np.int64)
 
         captured: tuple = ()
@@ -898,9 +940,11 @@ class LocalAssociativeMemory:
                         if self.config.tag_decay < 1.0:
                             tagged[:] = [(fade(rank, self.config.tag_decay),
                                           index) for rank, index in tagged]
-                        tag(tagged, float(np.linalg.norm(previous_retrieval)),
-                            len(pending) - 1, self.config.tag_slots,
-                            self.config.tag_strongest)
+                        strength = float(np.linalg.norm(previous_retrieval))
+                        if self.config.tag_relative and previous_store_size:
+                            strength /= previous_store_size
+                        tag(tagged, strength, len(pending) - 1,
+                            self.config.tag_slots, self.config.tag_strongest)
                 before = float(np.linalg.norm(memory))
                 scale_to(memory, self.config.memory_cap)
                 if self.config.memory_cap and before:
@@ -1063,6 +1107,8 @@ class LocalAssociativeMemory:
 
             previous_key = key
             previous_retrieval = retrieved
+            if self.config.tag_relative:
+                previous_store_size = float(np.linalg.norm(memory))
             previous_key_for_retrieval = key
             previous_scores = answer
         return predictions

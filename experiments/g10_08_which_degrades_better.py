@@ -58,7 +58,11 @@ from openplexus.models.local_memory import (  # noqa: E402
 from openplexus.tasks.reward_recall import RewardConfig, dataset  # noqa: E402
 
 NODES = 4
-N_SEQUENCES = 8
+N_SEQUENCES = 40
+#: d_model 64, NOT 32. The ungated arm reaches about 0.65 at node width 64 and
+#: about 0.25 at 32 -- measured, not assumed, after a first version compared a
+#: cache against a store running at a width where the store barely works.
+WIDTH = 64
 
 
 def cache_under_loss(sequences, capacity: int, nodes: int, lost: int,
@@ -128,31 +132,41 @@ def trained(config: RewardConfig, width: int):
     return memory, model
 
 
-def store_under_loss(sequences, config: RewardConfig, width: int,
-                     nodes: int, absent: set[int] | None,
-                     prepared=None) -> float:
-    """First-ask accuracy for a dimension-sliced store missing one node."""
-    memory, model = prepared if prepared else trained(config, width)
+def store_under_loss(test_set, nodes: int, absent: set[int] | None,
+                     prepared) -> float:
+    """First-ask accuracy for a dimension-sliced store missing one node.
+
+    Scored on BUILD-format test data with its own `firsts`, which is how every
+    g9 number was produced. A first version scored `dataset()` sequences
+    instead; both are 768 tokens with identical query positions, and the
+    accuracy differed by half.
+    """
+    memory, model = prepared
     right = total = 0
     with Network(memory, nodes, model.wv, model.wo) as network:
-        for sequence in sequences:
-            predicted = network.run(np.asarray(sequence.tokens), absent=absent)
-            asked: set[int] = set()
-            for q in sequence.query_positions:
-                cue = sequence.tokens[q]
-                if cue in asked:
-                    continue
-                asked.add(cue)
-                right += predicted[q] == sequence.tokens[q + 1]
-                total += 1
+        for tokens, _, _, _, queries, firsts in test_set:
+            # `leave_at` is REQUIRED for `absent` to do anything. Passing
+            # `absent` alone is accepted and silently ignored -- measured: 0 of
+            # 3072 predictions changed. With `leave_at=1`, 2358 of 3072 change.
+            #
+            # A third version of this file lost a day's worth of conclusions to
+            # that, and it is pinned in tests/test_distributed.py so the next
+            # caller learns it from a test rather than from a wrong result.
+            predicted = network.run(np.asarray(tokens), absent=absent,
+                                    leave_at=1 if absent else 0)
+            for q in queries:
+                if q in firsts:
+                    right += predicted[q] == tokens[q + 1]
+                    total += 1
     return right / max(1, total)
 
 
 def main() -> int:
     args = parse_args(__doc__.splitlines()[0])
-    width = args.width if args.width else 32
+    width = args.width if args.width else WIDTH
     config = RewardConfig(delay=8)
     sequences = dataset(config, n_sequences=N_SEQUENCES)
+    test_set = build(config, N_SEQUENCES, 99_991)
     floor = config.trivial_floor
 
     print(f"{NODES} nodes, width {width}, {N_SEQUENCES} sequences, "
@@ -161,8 +175,8 @@ def main() -> int:
 
     records = []
     prepared = trained(config, width)
-    whole = store_under_loss(sequences, config, width, NODES, None, prepared)
-    hurt = store_under_loss(sequences, config, width, NODES, {0}, prepared)
+    whole = store_under_loss(test_set, NODES, None, prepared)
+    hurt = store_under_loss(test_set, NODES, {0}, prepared)  # see leave_at below
     if whole <= floor:
         raise SystemExit(
             f"the intact store scores {whole:.3f}, at or below the trivial "

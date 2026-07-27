@@ -211,6 +211,34 @@ class NodesLeaveOverTheWire(unittest.TestCase):
         self.assertFalse(np.array_equal(intact[4:], partial[4:]),
                          "answers after it must not be")
 
+    def test_absent_WITHOUT_leave_at_is_silently_IGNORED(self):
+        """The footgun, pinned rather than fixed.
+
+        `absent={0}` with no `leave_at` is accepted and does nothing at all --
+        measured at 0 of 3072 predictions changed on `reward_recall`, where
+        adding `leave_at=1` changes 2358 of them.
+
+        g10-08 lost three successive versions to this: it reported a
+        dimension-sliced store degrading by exactly +0.000 under node loss, and
+        the number was not robustness but a parameter that had never applied.
+
+        Pinned rather than made to raise, because `leave_at` defaults to 0 and
+        several existing results were produced through this path; changing the
+        signature would silently alter what they mean. **A test that documents
+        a trap is worth more than a fix that moves it.**
+        """
+        config, model = configured(4)
+        with Network(config, 4, model.wv, model.wo) as network:
+            intact = network.run(TOKENS)
+            ignored = network.run(TOKENS, absent={0})
+            applied = network.run(TOKENS, absent={0}, leave_at=1)
+        np.testing.assert_array_equal(
+            intact, ignored,
+            "absent without leave_at now does something -- if that is a "
+            "deliberate fix, delete this test and say so")
+        self.assertFalse(np.array_equal(intact, applied),
+                         "leave_at must make absent take effect")
+
     def test_a_departure_before_the_first_step_removes_them_throughout(self):
         config, model = configured(4)
         with Network(config, 4, model.wv, model.wo) as network:

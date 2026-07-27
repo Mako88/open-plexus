@@ -379,7 +379,23 @@ That is the sweep John's priority actually wants, and it is cheap: the tag at it
 working point, swept over `partitions` or `d_model`, against the same oracle
 ceiling. It should wait for g9-07 only because one matrix runs at a time.
 
-## The gate that reads both signals — still unbuilt, now less urgent
+## The gate that reads both signals — BUILT, not measured
+
+`combined` protects the union of what the tag marks and what the window keeps.
+The `tag_slots`/`reward_window` exclusion is lifted; a tag with `reward_window`
+0 stays tag-only so the published g9-05 to g9-07 cells remain reproducible, and
+the combined gate needs `reward_window` at least 1. Tests and two mutations are
+in.
+
+**It cannot capture less than either alone**, so the only way it loses is
+interference — it keeps more, and retrieval goes as `sqrt(d / N)`. That is the
+whole measurement and it has not been run: g9-07 holds the matrix and g9-08 is
+queued behind it. Predictions must be registered before it is dispatched.
+
+A cheap pre-dispatch control exists and should be run first, the same one g9-05
+and g9-07 used: count rewarded-binding capture for `combined` against `tag` and
+`reward` at delays 1, 8 and 20. If the union does not capture strictly more, the
+implementation is wrong before any recovery number is spent on it.
 
 [g9-05](experiments/sweeps/g9-05-a-tag-that-fades.txt) ran, 32 of 32 cells, no
 refusals. **The tag's rows that are flat are flat at zero, and its rows that are

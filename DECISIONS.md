@@ -381,3 +381,36 @@ version of this was wrong.
 costs the gate, not the gain. Whether +0.16 is worth 1.25× the store at width 1
 needs the recovery figure AT width 1, and no sweep has run one. That is now the
 top BACKLOG item and it is the sweep John's priority actually wants.
+
+## 18. Built the combined gate while g9-07 held the matrix
+
+**Chosen.** With the sweep queue full and rule 17 saying a build should follow a
+block of verification, implemented note 023's combined gate rather than starting
+a new investigation. It is inside the live g9 line, not a new one.
+
+**What it does.** A write survives a capture if *either* mechanism claimed it —
+the tag's marks or the window's last `w+1` writes. It cannot capture less than
+either alone, so the only way it loses is interference, and that is exactly the
+measurement.
+
+**Lifting the exclusion was the three-line part, as predicted in decision 1.**
+
+**The ambiguity I had to resolve, and I want this reviewed.** `reward_window` 0
+is a real one-write window *and* the default. So "tag with default window" is
+either tag-only or a combined gate, and it cannot be both. I chose tag-only,
+because every g9-05 to g9-07 cell was measured that way and a default must not
+silently change an arm's identity. The cost is that "tag plus a one-write window"
+is now inexpressible. If that combination ever matters, this needs a separate
+flag rather than an overloaded zero.
+
+**A test that asserted past the ambiguity.** My first version claimed window 0
+must differ from tag-only. It failed — the tag had already marked the write at
+the reward step. The replacement pins the semantics in both directions instead.
+That is the third time this session a test I wrote asserted something other than
+what I meant, and all three were caught by running them rather than by review.
+
+**Not dispatched, and deliberately so.** g9-07 is running, g9-08 is queued, and
+predictions have to be registered before a run. BACKLOG carries the cheap
+pre-dispatch control that should come first: if the union does not capture
+strictly more than either arm, the implementation is wrong before any recovery
+number is spent on it.

@@ -2060,3 +2060,61 @@ at 5.427 matches the g10-12 baseline of 5.466, so the run was sound; the pair
 arm simply has more to store and less room. **This is weak evidence against pair
 keys and should not be cited as strong**, because the confirmed predictions were
 the easy ones and the hard one timed out.
+
+---
+
+## 54. Our rank collapse is real, and it is NOT the disease Muon cures
+
+Note 036 named Muon-style orthogonalisation as the intervention with the largest
+measured effect in the whole literature scan: Boeshertz et al. recovered
+CIFAR-100 ResNet-18 from **1.4% to 46.1%** by fixing updates that had collapsed
+to effective rank 12 where backprop reaches 100. Note 035 had already measured
+our own store at effective rank ~3 at every width. It looked like the same
+disease, and John approved trying the cure.
+
+**Measured on Tiny Shakespeare, width 64, window 32:**
+
+    accumulated update, effective rank raw              2.22
+    accumulated update, effective rank orthogonalised  11.29
+    window length                                      32
+
+    orthogonal_every     bits per character
+                   0     5.588
+                   8     5.716
+                  32     5.976
+                 128     5.867
+
+**P1 confirmed** — the collapse is severe, rank 2.22 out of a possible 32.
+**P2 confirmed** — orthogonalising raises it fivefold.
+**P3 refuted** — and P3 was the one that mattered. Prediction gets worse at every
+window length tried.
+
+**The reason is the finding.** Boeshertz's rank collapse is a *learning rule*
+failing to explore directions that carry signal. **Ours is the data genuinely
+having few directions.** Note 035 established the store is a bigram count table
+over 66 characters, and such a table is low-rank because English is. Forcing
+rank onto an update whose target is low-rank spreads its magnitude into
+directions that carry nothing, so the extra rank is noise by construction.
+
+**Same symptom, different cause, and the cure for theirs actively hurts ours.**
+"Effective rank is low" now has two readings in this repository and only one of
+them is a defect — which is exactly the sort of thing that gets forgotten, so it
+is pinned in `tests/test_orthogonal_updates.py` rather than left in a note.
+
+**A property I did not know before writing the test.** Orthogonalisation
+*equalises* the singular values a matrix already has; **it cannot invent
+directions.** A single delta-rule step is `error ⊗ retrieval` — rank one — and
+stays rank one however hard it is orthogonalised. That is why the updates have
+to be accumulated before there is anything to do, and it is not obvious from the
+name of the operation. Two of my first tests asserted the opposite and failed;
+the code was right and the tests were wrong.
+
+**On the amended constraint.** Orthogonalisation is applied per GROUP, since a
+node holds only `vocab x d/groups` of the readout. Doing it across groups would
+need every node's columns at once — a barrier, which the amended C1 still
+forbids. That restriction may be why this buys less here than elsewhere, and it
+is a real confound rather than an excuse: nobody has measured whole-matrix
+orthogonalisation on this model, and under the goal it would not be usable
+anyway.
+
+636 tests, 131 mutations, five checks clean.

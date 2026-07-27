@@ -60,6 +60,43 @@ import numpy as np
 
 from openplexus.keys import KeySource, PairKeys, TableKeys
 
+#: Newton-Schulz coefficients, from Keller Jordan's Muon. The quintic
+#: `3.4445x - 4.7750x^3 + 2.0315x^5` pushes every singular value toward 1
+#: without needing an SVD -- five iterations of matrix products, which is why
+#: this is affordable per node.
+_NS = (3.4445, -4.7750, 2.0315)
+_NS_STEPS = 5
+
+
+def _orthogonalise(matrix: np.ndarray) -> np.ndarray:
+    """The nearest orthogonal matrix, approximately, via Newton-Schulz.
+
+    Boeshertz et al. (arXiv:2606.11123) measured local feedback rules failing
+    because their updates COLLAPSE IN RANK -- effective rank 12 where backprop
+    reaches 100 -- and recovered CIFAR-100 from 1.4% to 46.1% with this plus
+    normalisation. Note 035 measured our own store at effective rank ~3, which
+    is the same disease at a different site.
+
+    Orthogonalising spreads an update's magnitude evenly across its singular
+    directions, so a direction the delta rule barely moved still gets a step.
+    """
+    scale = float(np.linalg.norm(matrix))
+    if scale <= 0.0:
+        return matrix
+    # Iterating on the shorter side keeps the products small; the quintic acts
+    # on the singular values either way.
+    flip = matrix.shape[0] > matrix.shape[1]
+    x = (matrix.T if flip else matrix) / (scale + 1e-7)
+    a, b, c = _NS
+    for _ in range(_NS_STEPS):
+        gram = x @ x.T
+        x = a * x + (b * gram + c * (gram @ gram)) @ x
+    out = x.T if flip else x
+    # Restore the original magnitude: orthogonalising is meant to change the
+    # update's SHAPE, not its size, and letting it change both would confound
+    # the measurement with a learning-rate change.
+    return out * scale / (float(np.linalg.norm(out)) + 1e-12)
+
 
 def surprise(scores: np.ndarray, token: int) -> float:
     """How unexpected `token` was, given the scores predicted before it arrived.
@@ -516,6 +553,31 @@ class LocalMemoryConfig:
             — but that is not the same as verified, so `tests/test_derived_keys.py`
             checks the model scores the same on the task rather than trusting the
             statistics.
+        orthogonal_every: Accumulate this many readout updates, orthogonalise
+            the sum, then apply it. 0 — the default — applies each update
+            immediately and reproduces every earlier result exactly.
+
+            **This is the one intervention in note 036 with a large measured
+            effect elsewhere.** Boeshertz et al. (arXiv:2606.11123) found local
+            feedback rules fail because their updates collapse in rank —
+            effective rank 12 where backprop reaches 100 — and recovered
+            CIFAR-100 ResNet-18 from 1.4% to 46.1% with Muon-style
+            orthogonalisation plus normalisation. Note 035 measured our own
+            store at effective rank ~3 at every width, which is the same disease
+            at a different site.
+
+            A single delta-rule step is `error ⊗ retrieval` — **rank one by
+            construction**, so there is nothing to orthogonalise until several
+            have been summed. That is what the window is for, and it is the
+            cost: the update is no longer applied at every token.
+
+            **Orthogonalisation is per GROUP.** A group owns a slice of the
+            dimensions, so its node holds only `vocab × d/groups` of the matrix.
+            Orthogonalising across groups would need every node's columns at
+            once — a barrier, which the amended C1 still forbids. Whether a
+            per-slice orthogonalisation buys what a whole-matrix one does is
+            exactly what this flag exists to measure, and it is not obvious that
+            it does.
         retrieval_steps: How many times to re-read the store per query. 1 — the
             default — is a single linear read and reproduces every earlier
             result exactly.
@@ -681,6 +743,7 @@ class LocalMemoryConfig:
     corrective_writes: bool = False
     write_gate: float = 1.0
     retrieval_steps: int = 1
+    orthogonal_every: int = 0
     readout_bias: bool = False
     derived_keys: bool = False
     context_keys: bool = False
@@ -701,6 +764,10 @@ class LocalMemoryConfig:
             raise ValueError(
                 "derived_keys and key_active both build Wk and would conflict; "
                 "sparse keys have no per-token derivation yet")
+        if self.orthogonal_every < 0:
+            raise ValueError(
+                f"orthogonal_every is a window length and cannot be negative; "
+                f"got {self.orthogonal_every}. 0 disables it")
         if self.retrieval_steps < 1:
             raise ValueError(
                 f"retrieval_steps is how many times the store is read and must "
@@ -853,6 +920,9 @@ class LocalAssociativeMemory:
         # copies, and the assertion says so rather than trusting it.
         self.grouped_wo = self.wo.reshape(v, config.partitions, -1)
         assert self.grouped_wo.base is self.wo, "grouped_wo must alias wo"
+        #: Held-back readout updates, when `orthogonal_every` is on.
+        self.pending_update = np.zeros_like(self.grouped_wo)
+        self.since_orthogonal = 0
 
     def ablate(self, dimensions) -> None:
         """Permanently remove these dimensions — a machine has left, for good.
@@ -904,6 +974,22 @@ class LocalAssociativeMemory:
             self.wk[:, index] = 0.0
         self.wv[:, index] = 0.0
         self.wo[:, index] = 0.0
+
+    def _apply_orthogonal(self) -> None:
+        """Orthogonalise each group's accumulated update, then apply it.
+
+        **Per group, not across groups.** A group owns a slice of the
+        dimensions, so `pending_update[:, g, :]` is the only part of the matrix
+        its node holds. Orthogonalising the whole `vocab x d` matrix would need
+        every group's columns at once, which is the barrier the amended C1 still
+        forbids. Whether a per-slice orthogonalisation buys what a whole-matrix
+        one does is exactly what this flag exists to measure.
+        """
+        for group in range(self.config.partitions):
+            self.grouped_wo[:, group, :] += (
+                self.config.lr * _orthogonalise(self.pending_update[:, group, :]))
+        self.pending_update[:] = 0.0
+        self.since_orthogonal = 0
 
     def context_key(self, previous: int, token: int) -> np.ndarray:
         """The key for a token PAIR, derived from `(seed, previous, token)`.
@@ -1435,8 +1521,19 @@ class LocalAssociativeMemory:
                 # Each group's error is its OWN prediction error. With one group
                 # this is the plain delta rule; with more, no group's update
                 # reads any other group's activity, which is the whole point.
-                self.grouped_wo += self.config.lr * np.einsum(
-                    "gv,gd->vgd", target - parts, sliced)
+                update = np.einsum("gv,gd->vgd", target - parts, sliced)
+                if self.config.orthogonal_every:
+                    # Hold the update back and orthogonalise a batch of them.
+                    # See `orthogonal_every`: the point is the RANK of what gets
+                    # applied, and a single step's update is rank one by
+                    # construction, so there is nothing to orthogonalise until
+                    # several have been summed.
+                    self.pending_update += update
+                    self.since_orthogonal += 1
+                    if self.since_orthogonal >= self.config.orthogonal_every:
+                        self._apply_orthogonal()
+                else:
+                    self.grouped_wo += self.config.lr * update
                 if self.config.readout_bias:
                     # The whole prediction's error, not one group's: the bias is
                     # a single shared constant rather than a per-group weight,

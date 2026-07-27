@@ -990,8 +990,8 @@ MUTATIONS = [
                "other group's prediction, restoring the global reduction C1 "
                "forbids while leaving the pooled output looking correct",
         path=LOCAL,
-        old="                    \"gv,gd->vgd\", target - parts, sliced)",
-        new="                    \"gv,gd->vgd\", target - parts.sum(0), sliced)",
+        old="                update = np.einsum(\"gv,gd->vgd\", target - parts, sliced)",
+        new="                update = np.einsum(\"gv,gd->vgd\", target - parts.sum(0), sliced)",
     ),
     Mutation(
         name="ignore-the-requested-cluster",
@@ -1222,8 +1222,8 @@ MUTATIONS = [
         name="local-delta-rule-inert",
         breaks="the delta rule, so the readout never learns and sits at its initialisation",
         path=LOCAL,
-        old="                self.grouped_wo += self.config.lr * np.einsum(",
-        new="                self.grouped_wo += 0.0 * np.einsum(",
+        old="                    self.grouped_wo += self.config.lr * update",
+        new="                    self.grouped_wo += 0.0 * update",
     ),
     Mutation(
         name="local-memory-persists-across-sequences",

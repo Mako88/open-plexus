@@ -68,6 +68,7 @@ def main() -> int:
     width = args.width if args.width else 32
     chunk = int(args.scale) if args.scale is not None else 64
     epochs = args.epochs if args.epochs else EPOCHS
+    cap = args.cap if args.cap is not None else 5.0
 
     corpus = build(read(NOTES))
     train = chunks(corpus.train, chunk)
@@ -85,6 +86,12 @@ def main() -> int:
           f"(bigram ON TRAIN {bigram.bits_per_token(corpus.train):.3f})")
 
     model = LocalAssociativeMemory(LocalMemoryConfig(
+        # The fast store's cap. The first run of this diagnostic left it at the
+        # model's default of OFF, which was safe at chunk 64 and is NOT safe at
+        # any longer chunk -- g10-01's chunk-256 cells reached 1e72 with
+        # accuracy below chance. Defaulting it on here means a re-run at a
+        # longer chunk measures a model rather than a runaway.
+        memory_cap=cap,
         vocab_size=corpus.vocab_size, d_model=width, lr=0.05,
         key_scale=0.5, decay=0.997, derived_keys=True, seed=seed))
     model.wo[:] = model.wv
@@ -111,6 +118,7 @@ def main() -> int:
         test_scores, test_targets = scores_and_targets(model, test)
         record = {
             "epoch": epoch, "seed": seed, "width": width, "chunk": chunk,
+            "cap": cap,
             "temperature": temperature,
             "train_bits": bits(train_scores, train_targets, temperature),
             "test_bits": bits(test_scores, test_targets, temperature),

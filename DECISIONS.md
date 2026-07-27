@@ -759,3 +759,30 @@ be an explicit choice rather than something I slipped in while unblocking myself
 queued, runners are congested" as though it were weather. It was a consequence of
 my own behaviour, visible in `gh run list` the whole time, and I did not look
 until the fourth cycle.
+
+## 29. The fix I proposed for the task leak would not have fixed it
+
+**Chosen.** Before anyone spends a nine-sweep re-baseline on note 027's proposed
+one-line fix, I built the fixed variant locally and measured it.
+
+**It does not work.** Randomising the gap between bindings leaves the leak intact
+at every jitter up to 0.9 — the nearest-binding rule stays at 100% until the
+spacing is wildly irregular, and *zero* unrewarded bindings land at the rewarded
+offset in any condition.
+
+**The reason is that I named the wrong cause.** Note 027 blamed the lattice. The
+lattice is why the *nearest* rule is exact, but the discriminator is that the
+reward sits a constant `delay - 1` after its own binding — which randomising the
+spacing does not touch at all.
+
+**The fix that would work is randomising the delay per rewarded pair**, so the
+offset becomes a distribution instead of a constant. That stops `delay` being a
+swept axis, which means it changes what the task *is* rather than just
+re-baselining its numbers. A materially bigger decision, and still John's.
+
+**What I want noted about the process.** Note 027 proposed a fix in the same
+breath as diagnosing the defect, and the fix was wrong. The diagnosis was right
+and the remedy did not follow from it — I reached for the visible structural
+feature (the lattice) rather than the one doing the work (the constant offset).
+Measuring the proposed fix before recommending it cost four minutes; acting on it
+would have cost nine sweeps and left the leak in place.

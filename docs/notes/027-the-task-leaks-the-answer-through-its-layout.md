@@ -90,22 +90,47 @@ the *spacing* of what the generator emitted, only at what it contained.
 `tests/test_reward_recall.py` checks the sequence contains what it should. It
 does not check that the layout withholds what it should.
 
-## The fix, which is one line and is not mine to make
+## The fix I first proposed WOULD NOT HAVE WORKED, and it was measured
 
-Randomise the gap between bindings so the lattice is broken:
+The obvious fix is to randomise the gap between bindings so the lattice breaks:
 
     gap = rng.randrange(low, high)      # per binding, not once
 
-With variable spacing, a binding can fall within `delay` of a reward that is not
-its own, and "most recent binding" stops being exact. The delay axis would then
-measure what it was built to measure.
+**That does not fix it.** Built as a local variant and measured over 40
+sequences per setting, with `jitter` as the fraction by which the gap varies:
 
-**It would also invalidate the comparison set for nine sweeps.** Every g9 number
-would need re-running to stay comparable, and CLAUDE.md rule 12 is explicit that
-changing a default invalidates the comparison set and that a known-better setting
-can be worth deliberately *not* adopting until there is time to re-baseline.
+| jitter | nearest-binding rule | rewarded modal offset | unrewarded at that offset |
+|---:|---|---|---:|
+| 0.0 (shipped) | 160/160 = **100%** | 7, 100% of them | **0 of 651** |
+| 0.25 | 159/159 = 100% | 7, 100% | 0 of 650 |
+| 0.5 | 158/158 = 100% | 7, 100% | 0 of 648 |
+| 0.9 | 140/156 = 90% | 7, 92% | 0 of 644 |
 
-So this note records the defect and proposes the fix. **It does not apply it.**
+Even with the gap varying between roughly 3 and 59, **no unrewarded binding
+lands at offset 7**, and the nearest-binding rule stays exact until the jitter is
+extreme.
+
+**Because the lattice was never the discriminator.** The reward is placed at
+`cue_position + delay` and nudged to the next filler slot, so the offset from a
+rewarded binding to its own reward is `delay - 1` — a CONSTANT — whatever the
+spacing does. Randomising the gap changes how far apart the *other* bindings sit;
+it does not stop the rewarded one sitting at a known distance.
+
+## The fix that would work
+
+**Randomise the delay per rewarded pair**, not per task:
+
+    reward_due[position + rng.randint(low, high)] = ...
+
+Then the offset from a rewarded binding to its reward is a distribution rather
+than a constant, and no fixed offset identifies it. `delay` stops being a task
+parameter and becomes a task *property* — which also means the delay axis every
+g9 sweep is built on would have to be re-thought, not just re-run.
+
+That is a bigger change than one line and a bigger decision than re-baselining.
+
+**Still not mine to make**, and now for a better reason: the cheap fix is
+useless, and the real one changes what the task is.
 
 ## MEASURED: the leak is real and this project cannot exploit it
 

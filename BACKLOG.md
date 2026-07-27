@@ -16,12 +16,18 @@ looking for work should start here.
 
 **OPEN, in order of what would change the most:**
 
-1. **A decision only John can take: fix `reward_recall`'s layout?**
+1. **A decision only John can take: fix `reward_recall`, and how?**
    [Note 027](docs/notes/027-the-task-leaks-the-answer-through-its-layout.md).
-   The nearest binding before a reward is always the rewarded one, 160/160. The
-   fix is one line and costs a re-run of nine sweeps. **Measured as inert** — our
-   binding-detection cannot exploit it past delay 1 — so this is correctness,
-   not urgency. See *THE TASK LEAKS THE ANSWER*.
+   The nearest binding before a reward is always the rewarded one, 160/160.
+   **Measured as inert** — our binding-detection cannot exploit it past delay 1 —
+   so this is correctness, not urgency.
+
+   **And the one-line fix does not work.** Randomising the gap was measured and
+   leaves the leak intact at every jitter up to 0.9, because the discriminator is
+   not the lattice: the reward sits a CONSTANT `delay - 1` after its own binding
+   whatever the spacing does. The fix that would work is randomising the delay
+   **per rewarded pair**, which stops `delay` being a swept axis at all — so it
+   changes what the task is, not just its numbers. Bigger than a re-baseline.
 2. **`g9-11` is running**: how far the union's window needs to reach. The last
    untested dial on the best mechanism here.
 3. **Can anything identify WHICH binding without being told the delay?** The

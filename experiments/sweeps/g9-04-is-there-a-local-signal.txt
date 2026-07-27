@@ -2,7 +2,85 @@ Is there anything local for a tag to hang on?
 =============================================
 
 Script: experiments/g9_04_is_there_a_local_signal.py
-Status: PRE-REGISTERED, with a pilot already seen. See DISCLOSURE below.
+Status: RUN. 12 of 12 cells.
+Run:    https://github.com/Mako88/open-plexus/actions/runs/30234852691
+
+ANSWER: yes -- retrieval STRENGTH, inverted. Admit the weak retrievals.
+
+
+THE RESULT
+-----------
+AUC per seed, binding-write against filler-write. 0.5 is no information.
+
+           signal  width   per-seed                                mean
+         surprise     32   0.487 0.500 0.492 0.499 0.512 0.507     0.499  noise
+         surprise     64   0.484 0.484 0.483 0.500 0.504 0.496     0.492  noise
+         strength     32   0.298 0.294 0.289 0.314 0.274 0.291     0.293  INVERTED
+         strength     64   0.218 0.220 0.213 0.211 0.219 0.211     0.215  INVERTED
+    dev-from-mean     32   0.378 0.367 0.380 0.379 0.387 0.386     0.379  INVERTED
+    dev-from-mean     64   0.343 0.333 0.312 0.326 0.328 0.327     0.328  INVERTED
+              hit     32   0.494 0.490 0.493 0.489 0.495 0.490     0.492  noise
+              hit     64   0.490 0.492 0.488 0.489 0.488 0.492     0.490  noise
+         position     32   0.480 0.479 0.479 0.479 0.479 0.479     0.479  noise
+         position     64   0.480 0.479 0.479 0.479 0.479 0.479     0.479  noise
+
+Every rewarded-vs-unrewarded cell, all five signals at both widths, is noise
+around 0.5 -- the control holds and there is no leak.
+
+    steps per binding: 31.0
+
+
+WHAT IS IN THAT TABLE
+----------------------
+**There is a signal, and it is the one nothing was built on.** Retrieval strength
+separates a binding-write from a filler-write at 0.29 and 0.22 -- inverted, so
+the rule is ADMIT THE WEAK RETRIEVALS. Filler is drawn with replacement from 40
+spare cues over ~700 positions, so a filler key has been bound many times and
+retrieves strongly; a binding's cue is fresh and retrieves weakly.
+
+**Competitive capture ranks on exactly this quantity, in exactly the wrong
+direction.** g8-03 admitted the STRONGEST traces. That is a mechanistic account
+of a failure that had been filed under base rates.
+
+**It gets better with width, not worse.** 0.293 at 32 and 0.215 at 64. This was
+the half named most likely wrong. Seed spread is +/-0.02, which is the tightest
+anything in this project has produced.
+
+**Predict-the-future-and-compare carries nothing.** `hit` is 0.49 at every cell.
+John asked whether it was worth revisiting given everything fixed since it last
+failed; it was worth revisiting, and this is the first time the raw signal has
+been scored against the label rather than inferred from a mechanism that could
+have failed six other ways. It is not the mechanisms that were wrong about it.
+
+**Surprise carries nothing EITHER, but its deviation does -- inverted.** So
+binding-writes sit CLOSER to the node's typical surprise and filler sits in both
+tails. The salience gate fires on both tails. **The salience gate was firing
+preferentially on filler**, which is the second mechanism this table explains
+rather than merely records.
+
+**Recency carries nothing: position is 0.479.** A window ranks on recency and
+nothing else, so its only virtue was ever REACHING the binding, never SELECTING
+it. That is g9-03's fall-off from the other side: past the point where reach
+covers the delay, every extra step is admitted by a signal with no information in
+it.
+
+
+WHAT IT DOES NOT SETTLE
+------------------------
+- **A separable signal is not a working mechanism.** 0.22 is a good AUC and it is
+  not 0. A capacity-limited tag admitting on weak retrieval still has to beat the
+  window's 0.25 recovery, and nothing here says it will.
+- **This is one task at one filler density.** The separation exists BECAUSE
+  filler repeats and bindings do not. A corpus where the informative tokens are
+  also the frequent ones would reverse the inversion, and note 013's
+  collapse-onto-modal-token finding says that case is real.
+- **Strength was measured on an untrained readout** (`wo = wv`), as everything
+  here is. A trained readout changes what retrieval returns.
+- The trace is observation only, but it was added for this, and no result yet
+  depends on a mechanism reading it.
+
+
+
 
 
 WHY THIS COMES BEFORE THE TAG

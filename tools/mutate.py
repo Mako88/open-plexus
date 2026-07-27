@@ -41,6 +41,8 @@ TRANSPORT = ROOT / "openplexus" / "transport.py"
 DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 NODE_MAIN = ROOT / "openplexus" / "node_main.py"
 NGRAM = ROOT / "openplexus" / "ngram.py"
+REWARD_RECALL = ROOT / "openplexus" / "tasks" / "reward_recall.py"
+CORPUS = ROOT / "openplexus" / "tasks" / "corpus.py"
 SLOT_COST = ROOT / "tools" / "slot_cost.py"
 RECOVERY = ROOT / "tools" / "recovery.py"
 TESTBED = ROOT / "testbed" / "run.py"
@@ -66,6 +68,50 @@ class Mutation:
 
 
 MUTATIONS = [
+    Mutation(
+        name="rewarded-cues-are-not-chosen-uniformly",
+        breaks="the property the whole g9 line rests on -- that a rewarded "
+               "binding is statistically identical to an unrewarded one until "
+               "the reward arrives. Taking the FIRST n cues instead of a random "
+               "sample makes reward predictable from position, so a gate could "
+               "score by reading the layout, and every recovery number would be "
+               "measuring that instead",
+        path=REWARD_RECALL,
+        old="    rewarded = rng.sample(cues, config.n_rewarded)",
+        new="    rewarded = cues[:config.n_rewarded]",
+    ),
+    Mutation(
+        name="the-reward-lands-at-the-wrong-offset",
+        breaks="the delay, which is the dial the task exists for. Placing the "
+               "reward token one step from its binding regardless of `delay` "
+               "makes every delay the trivial case g9-02 described, and the "
+               "cliff g9-03 measured would vanish",
+        path=REWARD_RECALL,
+        old="            reward_due[position + config.delay] = config.reward_token",
+        new="            reward_due[position + 1] = config.reward_token",
+    ),
+    Mutation(
+        name="the-corpus-vocabulary-comes-from-the-test-text",
+        breaks="the leak `corpus.py` is written to prevent. A symbol appearing "
+               "only in the test set would get its own index, so the model is "
+               "scored over a vocabulary it never had reason to predict -- "
+               "which lowers cross-entropy and reads as a better model",
+        path=CORPUS,
+        old="    for name in train_names:\n"
+            "        for character in texts[name]:",
+        new="    for name in sorted(texts):\n"
+            "        for character in texts[name]:",
+    ),
+    Mutation(
+        name="the-stream-split-overlaps",
+        breaks="the disjointness of a single-stream corpus. An off-by-one "
+               "overlap puts the same characters on both sides, and the test "
+               "figure improves for a reason that has nothing to do with the "
+               "model",
+        path=CORPUS,
+        old="    head, tail = text[:cut], text[cut:]",
+        new="    head, tail = text[:cut + 1], text[cut:]",
+    ),
     Mutation(
         name="corrective-writes-forget-to-subtract",
         breaks="the whole mechanism, leaving Hebbian storage scaled by the "

@@ -16,7 +16,8 @@ looking for work should start here.
 
 **OPEN, in order of what would change the most:**
 
-0. **THE LEARNING RATE HAS BEEN FROZEN FOR SEVEN SWEEPS.**
+0. **THE LEARNING RATE WAS FROZEN FOR SEVEN SWEEPS — g9-12 IS MEASURING IT.**
+   [Run 30251816417](https://github.com/Mako88/open-plexus/actions/runs/30251816417).
    [Note 028](docs/notes/028-the-learning-rate-has-been-frozen-for-seven-sweeps.md).
    `lr 0.05` is pinned in g9-05 through g9-11, chosen for g9-03's configuration
    at `d_model` 32 in one process, and carried through every change of width,
@@ -30,11 +31,23 @@ looking for work should start here.
    claims may not**. "The tag recovers a fifth of the oracle" is at risk;
    "A beats B here and not there" is not.
 
-   The fix is deleting `--lr 0.05` from one workflow — the scripts already sweep
-   `(0.02, 0.05, 0.1)` and `best_by` already chooses among rates on an arm no
-   prediction is about. It costs 3x the jobs. Cheapest useful version: re-run
-   g9-09's shape with the rate swept, because node width is where the floor arm
-   moves most and a mis-chosen rate does the most damage.
+   **The cost estimate here was wrong by 4x, and that is most of why this went
+   undone for seven sweeps.** This said "it costs 3x the jobs". It does not:
+   `g9_05_the_tag.py` sweeps `LEARNING_RATES` *inside* a job whenever `--lr` is
+   omitted, so dropping the flag triples the compute PER JOB and adds no jobs at
+   all. The whole thing is **four jobs**. The assumption that sweeping an axis
+   multiplies the matrix was never checked against the script.
+
+   [g9-12](experiments/sweeps/g9-12-what-does-the-frozen-learning-rate-cost.txt)
+   runs g9-09's shape (node width 64/32/16/8) with the rate swept, at delay 8
+   only — `slots` 16 is g9-10's best at delay 8 and **not** at delay 20, and
+   running both would measure a mistuned capacity and confound the question, the
+   way g9-11 already did once.
+
+   It asks the three questions separately: does the best rate move with width,
+   does the RATIO move (the only one that matters — it divides by the gap, so it
+   can be stable while both ends move), and does the arm ORDERING move, which is
+   the reassurance below stated as an argument rather than a measurement.
 
    **And `lr` is the one that was at least WRITTEN DOWN.** Every g9-05+ sweep
    also imports `D_MODEL, N_TRAIN, N_TEST, EPOCHS, KEY_SCALE, DECAY = 32, 200,
@@ -45,9 +58,13 @@ looking for work should start here.
      CLAUDE.md carries its calibration: g3-02 measured 0.263 against 0.960 from
      the projection scale alone. Pinned again across the whole g9 line.
    - **`DECAY = 0.997` is the other multiplicative time constant** on the store
-     the tag's `fade` acts on. Seven sweeps moved `fade` and none moved `decay`,
-     and *the fade is a reach dial* was concluded with the other reach dial held
-     still.
+     the tag's `fade` acts on. Seven sweeps moved `fade` and none moved `decay`.
+     **MEASURED, and this was overstated when written**: `decay` moves
+     rewarded-binding recall by at most 13 points, and only where recall is not
+     already saturated — at delay 8 with `fade` 0.95 it does nothing at all. So
+     *the fade is a reach dial* survives, with its calibration mildly conditional
+     on 0.997. The warning was published from an argument and corrected by
+     measurement the same cycle.
 
 1. **A decision only John can take: fix `reward_recall`, and how?**
    [Note 027](docs/notes/027-the-task-leaks-the-answer-through-its-layout.md).

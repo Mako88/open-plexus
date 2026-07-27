@@ -890,3 +890,68 @@ cancelling, and the product stops being monotone in recall.
 had been measured, and both were caught by measuring within a cycle. The pattern
 is that a diagnosis and its implications get written in one sitting, and the
 implications do not get the same scrutiny as the diagnosis.
+
+## 33. I swept the frozen learning rate, and the summariser's smoke run found a
+##     hole in how this project reads a difference
+
+**Chosen: g9-12, four jobs, the rate swept.** `lr 0.05, FIXED on every arm` sat
+in the grid of g9-05 through g9-11 — every sweep in the line — chosen for g9-03
+at `d_model` 32 and carried through every change of width, node count, capacity,
+fade and reach since. g8-01 had already measured the rate moving the FLOOR arm,
+the denominator of every recovery ratio, by a factor of three.
+
+**Why now rather than earlier: the cost turned out to be a quarter of what it
+looked like.** `g9_05_the_tag.py` sweeps `LEARNING_RATES` *inside* a job whenever
+`--lr` is omitted, so dropping the flag triples the compute per job and adds no
+jobs at all. Four jobs. There was never a good excuse for not doing this, and
+the reason it went undone for seven sweeps was an unexamined assumption that
+sweeping an axis multiplies the matrix.
+
+**Chosen: delay 8 only.** g9-10 established `slots` 16 is best at delay 8 and 32
+at delay 20. Running both delays under one capacity would measure a mistuned cell
+and confound the rate question with the capacity question — which is exactly the
+error g9-11 made once already.
+
+**Chosen: `reach` pinned on the command line at 8, though `REWARD_WINDOW` would
+supply the same value by import.** A constant that is right by luck is still a
+constant nobody checked, and the import path is how `KEY_SCALE` and `DECAY` got
+into seven sweeps without appearing in any grid.
+
+### The part worth reviewing
+
+**I smoke-tested the summariser on fabricated records before spending four jobs,
+and it reported a finding that was not there.** It announced *"the best rate
+MOVES with node width"* from three rates whose ratios were identical by
+construction. `max` over a swept axis always names something, and it was breaking
+exact ties arbitrarily.
+
+Real data will not tie exactly. It will tie *nearly*, and then the same line
+prints the same claim and nothing looks wrong.
+
+**The fix is `assess`'s second refusal one step further on.** That refusal
+already rejects a cell whose DENOMINATOR is inside the seed spread. A DIFFERENCE
+BETWEEN TWO RATIOS is noise by the same standard. So `margin()` and `winner()`
+went into `tools/recovery.py` beside the refusals rather than into one
+summariser — that module exists precisely because five hand-copies of this
+reasoning had already drifted apart.
+
+`margin()` divides the spread by the gap because **the spread is measured in
+accuracy and a lead is measured in recovery**. Comparing them undivided compares
+two different quantities, and at a gap near 1.0 it very nearly works, which is
+what makes it the dangerous version. It is pinned as a mutation for that reason.
+
+The guard now applies in three places: the per-arm tables print `tied/noise`
+rather than naming a winner, prediction 2's verdict fires only on a cost that
+beats its own noise floor, and an ordering change is reported as one only when
+the swapped pair is separated by more than the spread — otherwise it is the same
+tie broken twice.
+
+**The general lesson, and it is the third time this pattern has appeared.** The
+last two entries here were about claims stronger than what had been measured.
+This is the same failure moved into a tool: a summariser that always produces a
+verdict will produce one from noise, and the verdict reads exactly like a result.
+Smoke-running it on fabricated data — including data fabricated to have NO
+finding in it — is cheap and I should do it for every summariser, not just this
+one.
+
+482 tests, 106 mutations, five checks clean. Run 30251816417.

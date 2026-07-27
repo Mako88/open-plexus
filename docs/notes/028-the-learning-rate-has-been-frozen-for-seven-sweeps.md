@@ -160,6 +160,21 @@ It also explains the one case where the product failed: comparing `combined`
 against `reward` in g9-11, `kept` differs BETWEEN the arms, so the constant does
 not cancel and the product stops being a monotone function of recall.
 
+## This is being measured
+
+[g9-12](../../experiments/sweeps/g9-12-what-does-the-frozen-learning-rate-cost.txt)
+sweeps the rate at node widths 64, 32, 16 and 8, at delay 8, and asks the three
+questions this note raises separately: whether the best rate moves with node
+width, whether the RATIO moves (the only one that matters, since the ratio
+divides by the gap and can be stable while both ends move), and whether the arm
+ORDERING moves — which is the reassurance this note offered as an argument
+rather than a measurement.
+
+It costs four jobs. `g9_05_the_tag.py` sweeps `LEARNING_RATES` *inside* a job
+when `--lr` is omitted, so the rate axis triples the compute per job and adds no
+jobs at all. The assumption that sweeping an axis multiplies the matrix is most
+of why this went unmeasured for seven sweeps.
+
 ## What this is an instance of
 
 CLAUDE.md's frozen-axis rule now carries a calibration about constants **carried

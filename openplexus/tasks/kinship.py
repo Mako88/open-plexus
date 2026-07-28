@@ -49,50 +49,75 @@ from dataclasses import dataclass
 #: Positions that are not questions carry no target.
 IGNORE = -1
 
-#: The relations a fact can state. `SELF` is not stated; it exists so that
-#: composition is total and a path that doubles back has a name.
+#: The relations a fact can state. **Gender-free on purpose.**
+#:
+#: The first version of this used gendered names -- mother, father, son,
+#: daughter, and so on, sixteen of them. That was the cause of the prefix
+#: shortcut measured in decision 99: `mother` and `father` compose IDENTICALLY
+#: (both give a grandparent), so gender multiplied the inventory without adding
+#: any compositional structure, and every first relation was left with exactly
+#: two reachable answers. Guessing from the prefix alone was worth 0.546.
+#:
+#: Keeping gender orthogonal is CLUTRR's design (Sinha et al., 2019,
+#: https://github.com/facebookresearch/clutrr) and it is the fix: `child` now
+#: reaches five different answers depending on what follows it. Gender, if it is
+#: ever wanted, belongs as a separate attribute of a person rather than as part
+#: of a relation's name.
+#:
+#: `inv-` is the inverse direction: `child` is "X is a child of Y", `inv-child`
+#: is "X is a parent of Y". Naming the inverse rather than adding `parent`,
+#: `grandparent` and so on keeps the table's symmetry visible.
 RELATIONS = (
-    "mother", "father", "daughter", "son",
-    "sister", "brother", "wife", "husband",
-    "grandmother", "grandfather", "granddaughter", "grandson",
-    "aunt", "uncle", "niece", "nephew",
+    "child", "inv-child",
+    "SO", "sibling",
+    "grand", "inv-grand",
+    "un", "inv-un",
+    "in-law", "inv-in-law",
 )
 
 #: `COMPOSE[(a, b)]` is the relation that holds when X is `a` of Y and Y is `b`
 #: of Z. Read left to right: `("mother", "mother")` is X is mother of Y, Y is
 #: mother of Z, so X is grandmother of Z.
 #:
-#: Deliberately PARTIAL. Many pairs compose to something ambiguous or to a
-#: relation outside this inventory -- a mother's husband is a father only under
-#: assumptions this task does not make -- and inventing an answer for those
+#: Deliberately PARTIAL, and CLUTRR reached the same conclusion independently.
+#: Many pairs compose to something ambiguous, and inventing an answer for those
 #: would be inventing a rule the model is then scored on. A pair with no entry
 #: is never generated.
+#:
+#: Their `rules_store.yaml` carries a commented-out rule with the reasoning:
+#: `grand` then `inv-child` is not `child`, because the person reached could be
+#: an in-law. That is the same argument, arrived at from the same problem, and
+#: it is worth recording that a partial table is the considered position rather
+#: than an unfinished one.
 COMPOSE: dict[tuple[str, str], str] = {
-    ("mother", "mother"): "grandmother",
-    ("mother", "father"): "grandmother",
-    ("father", "mother"): "grandfather",
-    ("father", "father"): "grandfather",
-    ("daughter", "daughter"): "granddaughter",
-    ("daughter", "son"): "granddaughter",
-    ("son", "daughter"): "grandson",
-    ("son", "son"): "grandson",
-    ("sister", "mother"): "aunt",
-    ("sister", "father"): "aunt",
-    ("brother", "mother"): "uncle",
-    ("brother", "father"): "uncle",
-    ("daughter", "brother"): "niece",
-    ("daughter", "sister"): "niece",
-    ("son", "brother"): "nephew",
-    ("son", "sister"): "nephew",
-    ("mother", "sister"): "mother",
-    ("mother", "brother"): "mother",
-    ("father", "sister"): "father",
-    ("father", "brother"): "father",
-    ("sister", "sister"): "sister",
-    ("brother", "sister"): "brother",
-    ("sister", "brother"): "sister",
-    ("brother", "brother"): "brother",
+    ("child", "child"): "grand",
+    ("child", "SO"): "in-law",
+    ("child", "sibling"): "child",
+    ("child", "inv-un"): "sibling",
+    ("child", "inv-grand"): "inv-child",
+    ("inv-child", "child"): "sibling",
+    ("inv-child", "inv-child"): "inv-grand",
+    ("inv-child", "sibling"): "inv-un",
+    ("SO", "inv-child"): "inv-in-law",
+    ("SO", "grand"): "grand",
+    ("SO", "child"): "child",
+    ("sibling", "sibling"): "sibling",
+    ("sibling", "inv-grand"): "inv-grand",
+    ("sibling", "child"): "un",
+    ("sibling", "inv-child"): "inv-child",
+    ("grand", "sibling"): "grand",
 }
+
+#: Relations that are their own inverse, and pairs that invert each other. Not
+#: used by the generator -- recorded because the table above is only readable
+#: alongside them, and because a future rule can be checked against them.
+SYMMETRIC = ("sibling", "SO")
+INVERSES = (
+    ("child", "inv-child"),
+    ("grand", "inv-grand"),
+    ("un", "inv-un"),
+    ("in-law", "inv-in-law"),
+)
 
 
 def compose(path: tuple[str, ...]) -> str | None:
@@ -215,6 +240,27 @@ _NEXT: dict[str, tuple[str, ...]] = {
 }
 
 
+def paths_of_length(hops: int) -> dict[str, tuple[tuple[str, ...], ...]]:
+    """Every composable path of `hops` steps, grouped by what it composes to.
+
+    Enumerated rather than sampled. The table is small — 16 rules — so the whole
+    set is cheap at the depths this task uses, and having it in hand is what
+    makes balanced sampling possible.
+    """
+    reached: dict[str, list[tuple[str, ...]]] = {}
+    frontier: list[tuple[tuple[str, ...], str]] = [
+        ((relation,), relation) for relation in RELATIONS]
+    for _ in range(hops - 1):
+        nxt = []
+        for path, current in frontier:
+            for step in _NEXT.get(current, ()):
+                nxt.append((path + (step,), COMPOSE[(current, step)]))
+        frontier = nxt
+    for path, answer in frontier:
+        reached.setdefault(answer, []).append(path)
+    return {answer: tuple(paths) for answer, paths in reached.items()}
+
+
 def _composable_path(rng: random.Random, hops: int,
                      tries: int = 200) -> tuple[str, ...] | None:
     """A relation path of `hops` steps that composes to something named.
@@ -282,12 +328,25 @@ def generate(config: KinshipConfig) -> KinshipSequence:
     """
     rng = random.Random(config.seed)
 
-    path = _composable_path(rng, config.hops)
-    if path is None:
+    # BALANCED ON THE ANSWER, not on the path.
+    #
+    # Walking the table and taking whatever answer falls out skews the answer
+    # distribution hard, because some relations are reachable by many more paths
+    # than others. Measured that way: the majority answer was 0.433 of all
+    # three-hop questions, and guessing from the LAST relation alone was worth
+    # 0.708. Both are shortcuts that need no composition at all.
+    #
+    # Choosing the answer uniformly and then a path that reaches it makes the
+    # majority floor 1/(reachable answers) by construction, and weakens every
+    # conditional shortcut with it -- knowing one relation of the path no longer
+    # tells you which answer is a priori likely, because none of them is.
+    by_answer = paths_of_length(config.hops)
+    if not by_answer:
         raise ValueError(
             f"no {config.hops}-hop path composes; the rule table cannot reach "
             f"that depth")
-    answer = compose(path)
+    answer = rng.choice(sorted(by_answer))
+    path = rng.choice(by_answer[answer])
 
     # The chain of people the path runs along. X is path[0] of p1, p1 is path[1]
     # of p2, and so on -- so the question is about (p0, p_last).
@@ -419,10 +478,55 @@ def shortcut_floor(config: KinshipConfig, n_sequences: int = 900) -> float:
     (0.290), which is worth knowing: the leak is specifically that paths are
     prefix-determined, not that the answer is generally predictable.
     """
+    floors = shortcut_floors(config, n_sequences)
+    # ACHIEVABLE ones only. `last` and `ends` need the far end of the path,
+    # which is the work this task is asking for -- see `shortcut_floors`.
+    return max(floors["majority"], floors["first"])
+
+
+def shortcut_floors(config: KinshipConfig,
+                    n_sequences: int = 900) -> dict[str, float]:
+    """Score of guessing from each part of the path.
+
+    ## Only two of these are FLOORS. The others are information bounds.
+
+    A floor is what a model can reach *without composing*. The path is **not
+    observable** — the model sees facts and two people, and would have to search
+    the graph to learn any of the path's relations. So:
+
+    - `majority` is a floor: it needs nothing at all.
+    - `first` is a floor: retrieving the relation stated for the queried subject
+      gives `path[0]` directly, which is exactly what a one-hop model does. It
+      predicted 0.465 at two hops and the model scored 0.407.
+    - `last` is **not** a floor. Reaching the far end of the path is the work.
+    - `ends` is **not** a floor, and at two hops it is 1.000 by definition —
+      the path *is* its two ends there, so that number is a tautology rather
+      than a leak.
+
+    `shortcut_floor` returns the max of the achievable ones only. The bounds are
+    reported alongside because they say how much of the answer lives in the ends
+    versus the middle — at three hops `ends` is 0.724 and at four 0.629, so the
+    middle carries real information and the depth axis is worth having.
+
+    The first version of this treated all four as floors, which would have set
+    an impossible bar and made any honest result look like a failure.
+    """
     from collections import Counter, defaultdict
-    by_first: dict[str, Counter] = defaultdict(Counter)
     data = dataset(config, n_sequences)
+    tables: dict[str, dict] = {
+        "majority": defaultdict(Counter),
+        "first": defaultdict(Counter),
+        "last": defaultdict(Counter),
+        "ends": defaultdict(Counter),
+    }
     for sequence in data:
-        by_first[sequence.path[0]][sequence.answer] += 1
-    hits = sum(counts.most_common(1)[0][1] for counts in by_first.values())
-    return hits / len(data)
+        path, answer = sequence.path, sequence.answer
+        tables["majority"][()][answer] += 1
+        tables["first"][path[0]][answer] += 1
+        tables["last"][path[-1]][answer] += 1
+        tables["ends"][(path[0], path[-1])][answer] += 1
+    return {
+        name: sum(counts.most_common(1)[0][1]
+                  for counts in table.values()) / len(data)
+        for name, table in tables.items()
+    }

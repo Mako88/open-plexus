@@ -4970,3 +4970,92 @@ exists and is honest about its own ceiling; the experiment comes next.
 Enriching the rule table would raise the ceiling and is the obvious improvement,
 but inventing kinship rules risks encoding ones that are wrong, which is a worse
 failure than a stated-and-bounded shortcut.
+
+## 100. The published rules exist, and using their STRUCTURE fixes decision 99's leak
+
+John asked whether a pre-published version of the benchmark should be used
+instead of a hand-made one. It should, and the answer changes the task.
+
+CLUTRR's rules are public (`rules_store.yaml`, facebookresearch/clutrr). Reading
+them named my defect immediately: **CLUTRR's relations are gender-free** —
+`child`, `SO`, `sibling`, `grand`, `un`, `in-law`, each with an inverse — and
+gender is applied later, at language realisation.
+
+Decision 99's table baked gender into the relation names. `mother` and `father`
+compose **identically**, so sixteen gendered relations carried no more
+compositional structure than eight, every prefix had exactly two reachable
+answers, and guessing from the prefix was worth 0.546. Gender was multiplying
+the inventory while contributing nothing to composition.
+
+**Their table is also deliberately partial**, with a commented-out rule and the
+reasoning attached: `grand` then `inv-child` is not `child`, because the person
+reached could be an in-law. That is the same argument decision 99 made
+independently, which is worth recording — a partial table is the considered
+position and not an unfinished one.
+
+### On licensing, because it is John's call and not mine
+
+CLUTRR is **CC BY-NC 4.0 — non-commercial only**. Fine for research and a
+problem if Open Plexus ever has a commercial dimension. So the rules were
+**not** vendored: kinship composition facts are not copyrightable, the valuable
+part is the structural insight, and the table here is written independently with
+CLUTRR cited as the design source. Using their generator for
+published-comparable numbers is a separate decision that would accept the NC
+term.
+
+### The second defect: sampling, not rules
+
+Gender-free relations alone made things *worse* in aggregate — the majority
+floor rose to 0.433 at three hops and a **suffix** shortcut appeared at 0.708 —
+because walking the table takes whatever answer falls out and the reachable
+answers concentrate hard.
+
+Fixed by **sampling the answer uniformly** and then a path that reaches it,
+which makes the majority floor `1/(reachable answers)` by construction.
+
+    hops   reachable  majority  first   last    ends
+       1          10     0.109  1.000  1.000   1.000
+       2           9     0.116  0.465  0.559   1.000
+       3           8     0.133  0.261  0.549   0.724
+       4           8     0.133  0.223  0.550   0.629
+
+### And a framing error of mine, which `ends` exposed
+
+`ends` is 1.000 at two hops. That is not a leak — **at two hops the path IS its
+two ends**, so the number is a tautology.
+
+More importantly, **the path is not observable**. The model sees facts and two
+people; learning any relation of the path requires searching the graph. So only
+two of those columns are *floors*:
+
+- `majority` needs nothing.
+- `first` is reachable: retrieving the relation stated for the queried subject
+  gives `path[0]` directly, which is exactly what a one-hop model does.
+- `last` and `ends` require reaching the far end, **which is the work the task
+  is asking for**.
+
+Treating all four as floors — which the first version did — would have set an
+impossible bar and made an honest result look like a failure. `ends` remains
+reported as an information bound: 0.724 at three hops and 0.629 at four, so the
+middle of the path carries real information and the depth axis is worth having.
+
+### G0 on the rebuilt task
+
+    hops 1 (majority floor 0.120)    object last 0.033   subject last 0.713
+    hops 2 (floor to beat 0.465)     object last 0.060   subject last 0.227
+
+**G0 passes** — one hop clears its floor 5.9×, so the architecture can address
+this task's shape. Two hops sits at 0.227, *below* the 0.465 a non-composing
+model could reach, against a ceiling of 1.000.
+
+### What this licenses
+
+A valid instrument with the bar stated **before** the experiment rather than
+after: floor 0.465, ceiling 1.000, positive control 0.713. The hop mechanism and
+gate have not been run on it — the G0 probe is a one-hop model and cannot
+compose by construction. That run is the next thing.
+
+### What it does NOT license
+
+Decision 99's numbers. The 0.546 shortcut, the 0.407, and the three floors there
+were all measured on the gendered table and are **superseded**, not refined.

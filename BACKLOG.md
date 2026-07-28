@@ -1315,3 +1315,39 @@ with it as a fourth `write` or `readout` choice.
 
 Deliberately NOT bundled into g11-08. Implementing a mechanism and re-checking a
 refutation in the same sweep produces a number nobody can attribute.
+
+---
+
+## The four approved un-constraints, as work items
+
+Decision 78 audited what limits this project more tightly than the goal does.
+All four are approved. Ordered by cost of finding out, cheapest first.
+
+**1. Re-examine `answer = parts.sum(0)` against AMENDED C1.** Costs a reading,
+not a run. It is 64 floats per group per step, and the amended test is whether
+progress stalls when a participant is slow or gone — not whether a sum happens.
+If it passes, note 009 §4's "outstanding violation" is retired and the
+partitioned readout stops being a known bug. If it fails, say which clause it
+fails and the record is finally precise.
+
+**2. Let the store carry across chunks on a corpus, properly measured.** The
+per-chunk reset is right for the recall tasks and inherited by the corpus ones.
+`carry_store` exists (decision 66) and was measured as HARMFUL in training —
+but that measurement used the shuffled chunk order the corpus experiments use,
+so it carried across unrelated text rather than continuing it. **The honest
+version needs sequential chunks**, which is a different experiment than the one
+that refuted it.
+
+**3. Allow replay.** C4 forbids stopping, not revisiting (decision 78). Replay
+is one of the few known answers to catastrophic forgetting, which C4 makes
+first-class, and the single-pass reading ruled it out for no reason. Cheap to
+try: a bounded buffer of past chunks, resampled.
+
+**4. Move off character level.** The largest and the most expensive. A character
+bigram table is low-rank because English is, so part of the measured ceiling is
+the task. Concepts cannot be represented over characters, which puts it directly
+against the relational-objective direction.
+
+**This one needs its own plan.** Changing the task invalidates every number in
+the comparison set — decision 74 at a larger scale — so it should happen once,
+deliberately, with the re-validation costed in advance rather than discovered.

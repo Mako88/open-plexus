@@ -207,10 +207,19 @@ what it sees for as long as it runs.
 **This is a constraint, not an aspiration, and it rules things out.** Three
 consequences follow immediately and each one has already changed a decision:
 
-- **The deployed regime is ONLINE and SINGLE-PASS.** A result obtained with many
-  epochs over a fixed dataset, or with a full-batch optimiser, is evidence about
-  what the features CONTAIN and not about what this system can reach. Note 037's
-  offline result is exactly that, and it is why the online rerun exists.
+- **The deployed regime is ONLINE.** A result obtained with a full-batch
+  optimiser over a fixed dataset is evidence about what the features CONTAIN,
+  not about what this system can reach. Note 037's offline result is exactly
+  that, and it is why the online rerun exists.
+
+  **CORRECTED 2026-07-28.** This first read "online and SINGLE-PASS", which is
+  stricter than C4 requires and was my derivation rather than John's
+  constraint. **C4 forbids stopping, not revisiting.** A system with a replay
+  buffer that never freezes satisfies it completely; people revisit constantly
+  and are not frozen checkpoints. The stricter reading made decision 71's
+  two-pass result look compromised when it was admissible, and would have ruled
+  out replay — which is one of the few known answers to the catastrophic
+  forgetting C4 makes first-class.
 - **Catastrophic forgetting becomes a first-class failure mode**, not a side
   quest. A model that learns forever also forgets forever.
   [g6-01](../experiments/sweeps/g6-01-does-sparsity-protect-old-learning.txt)

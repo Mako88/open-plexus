@@ -3627,3 +3627,75 @@ composed readout: the write gate, consolidation, readout bias, orthogonal
 updates. Two of the two refuted mechanisms that WERE re-checked moved. **That is
 not a reassuring base rate**, and the remaining four should be assumed
 conditional until measured.
+
+---
+
+## 78. Four things limiting us that are not constraints — audited, and approved
+
+John asked whether anything constrains this project more tightly than *"it runs
+on all sorts of devices across the internet"* does. **C1–C4 themselves are
+sound** — C1 was already amended for exactly this reason and C2, C3 and C4 each
+state something the internet or the goal genuinely requires. The over-constraints
+are not in the constraints. They are in things being TREATED as constraints that
+never were.
+
+All four are approved for action.
+
+### 1. Single-pass training — my error, from a few hours earlier
+
+I derived "the deployed regime is online and single-pass" from C4 and wrote it
+into GOALS.md. **C4 forbids stopping, not revisiting.** A system with a replay
+buffer that never freezes satisfies it completely.
+
+The cost was immediate and I did not see it: decision 71's two-pass result was
+described as "still not the deployed regime" and decision 72's single-pass run
+was treated as the stricter, better measurement. The stricter reading also rules
+out **replay**, which is one of the few known answers to the catastrophic
+forgetting C4 makes first-class. **Corrected in GOALS.md.**
+
+### 2. Character-level modelling — probably the largest, and not a constraint at all
+
+A benchmark choice. Note 035 measured the store faithfully holding a character
+bigram table, and **a character bigram table over 66 symbols is genuinely
+low-rank because English is** — so some of the ceiling fought all day is the
+TASK, not the architecture.
+
+It also sits directly against the goal. John's relational-objective proposal is
+about relationships between ideas, and **concepts cannot be represented over
+characters.** No change of objective helps while the units are letters.
+
+Approved, and it needs its own plan rather than a quick swap: changing the task
+changes every number in the comparison set, which is decision 74 all over again
+at a larger scale.
+
+### 3. The readout's cross-group sum, carried as a fatal violation
+
+`answer = parts.sum(0)` has been recorded as an outstanding C1 violation since
+note 009 §4, and described as one repeatedly today.
+
+**Under AMENDED C1 that deserves re-examination.** It is vocab-length — 64
+floats per group per step — which is bounded. The amended test is *"does
+progress stall when one participant is slow or gone"*, and a node predicting
+from whoever answered in time is eventually-consistent rather than a barrier.
+
+It may be admissible now. It has been carried as a known bug under a rule that
+no longer applies, which is the exact failure the amendment was written to
+prevent.
+
+### 4. The per-chunk store reset
+
+Correct for MQAR and `reward_recall`, where sequences are independent and
+accumulating would be answering from the training set. Carried into the corpus
+experiments unexamined, where it caps the model's memory at **128 characters**.
+Deliberate and guarded, but a default inherited from another context — not a
+constraint.
+
+### The pattern, which is decision 74 one level up
+
+Three of these four are defaults inherited from a context that no longer
+applies, and the fourth is a rule I derived too strictly. **Decision 74 found
+that measurements were conditional and the condition had moved. This finds the
+same of constraints.**
+
+The habit that follows: when a constraint is invoked to rule something out, say
+which of C1–C4 it comes from. Three of these four could not have named one.

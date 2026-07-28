@@ -1,0 +1,100 @@
+name: sweep-g13-03-does-search-pay
+
+# TWO REFUSALS RE-TESTED AT ONCE.
+#
+# Decision 107 declined the pair-key traversal -- "a perfect traversal buys
+# 0.05" -- because steps 1 and 3 were 0.710 and 0.677 and compounding did the
+# rest. Decision 111 then declined search -- "you cannot search your way out of
+# noisy primitives, because the verifier is built from the primitives."
+#
+# Both were correct arithmetic on the numbers available then. g13-01 measured
+# step 1 at 1.000 at out-degree 1 and g13-02 measured step 2 at 1.000 at a
+# unique pair, so both conditions have been measured away.
+#
+# THE CONTROL IS `walk`, NOT `concat`. `walk` is traversal with no search on
+# top, so without it any gain would be credited to search when traversal might
+# have supplied all of it. That is why search_branches=0 means off and 1 means a
+# greedy walk -- the control had to be expressible.
+#
+# PREDICTIONS (full text in the script and the sweep file):
+#   P1  walk beats concat by more than 0.10
+#   P2  search4 beats walk            <- THE DECISION
+#   P3  search4 clears the shortcut floor, which nothing here ever has
+#   P4  search8 is within 0.02 of search4
+#   P5  every arm falls short of the 1.000 ceiling
+#
+# WIDTH IS FIXED AT 256. g13-01 and g13-02 both measured width moving these
+# numbers by under 0.03, so cells spent on it would buy nothing; seeds pay.
+#
+# COST, estimated FROM THE MOST EXPENSIVE ARM (search8 -- eight branches each
+# walking two relations, every step a retrieval): measured by --cost at 23.6 ms
+# per training sequence and 0.6 min per cell. Four arms per job, so ~3 min per
+# job even if every arm were the dear one. 8 jobs.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweep
+  cancel-in-progress: false
+
+jobs:
+  search:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2, 3, 4, 5, 6, 7]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - name: seed ${{ matrix.seed }}, four arms at width 256
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python experiments/g13_03_does_search_pay.py \
+            --seed ${{ matrix.seed }} --json out/seed-${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g13-03-seed-${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: [search]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g13-03-seed-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "seeds returned: $(ls out/*.json 2>/dev/null | wc -l) of 8" | tee summary.txt
+          python -m tools.summarise_g13_03 | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g13-03-summary
+          path: |
+            summary.txt
+            out/*.json

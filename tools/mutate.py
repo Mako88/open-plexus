@@ -27,6 +27,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MQAR = ROOT / "openplexus" / "tasks" / "mqar.py"
+CHAINS = ROOT / "openplexus" / "tasks" / "chains.py"
 BASELINES = ROOT / "openplexus" / "baselines.py"
 INDUCTION = ROOT / "openplexus" / "models" / "induction.py"
 ATTENTION = ROOT / "openplexus" / "models" / "attention.py"
@@ -650,6 +651,35 @@ MUTATIONS = [
         path=LOCAL,
         old='                    through = np.einsum("gv,vgh->gh", error, self.grouped_wo)',
         new='                    through = np.einsum("gv,vgh->gh", error.sum(0, keepdims=True) + 0*error, self.grouped_wo)',
+    ),
+    Mutation(
+        name="one-separator-still-consumes-a-random-draw",
+        breaks="the reproducibility of every chain number ever measured. "
+               "`rng.choice` consumes a draw even from a ONE-element sequence, "
+               "so taking this branch unconditionally shifts the random stream "
+               "and silently regenerates every single-separator sequence. The "
+               "task stays perfectly valid -- same shape, same separator, no "
+               "false links, every structural test still passes -- and every "
+               "figure measured before `n_separators` existed quietly stops "
+               "reproducing, with nothing to show it happened",
+        path=CHAINS,
+        old="        tokens.append(separators[0] if len(separators) == 1\n"
+            "                      else rng.choice(separators))",
+        new="        tokens.append(rng.choice(separators))",
+    ),
+    Mutation(
+        name="a-chain-reuses-one-separator-throughout",
+        breaks="the point of several terminators. Drawing once per SEQUENCE "
+               "instead of once per chain means every chain in a sequence ends "
+               "the same way, so a model sees one terminator at a time and the "
+               "question of whether it learns a CLASS cannot be asked -- while "
+               "the pool still looks used across the dataset as a whole",
+        path=CHAINS,
+        old="        tokens.append(separators[0] if len(separators) == 1\n"
+            "                      else rng.choice(separators))\n"
+            "        tokens.extend(chain)",
+        new="        tokens.append(separators[0])\n"
+            "        tokens.extend(chain)",
     ),
     Mutation(
         name="the-gate-scores-its-own-hop-not-the-next",

@@ -24,6 +24,7 @@ pre-separator design.
 
 from __future__ import annotations
 
+import hashlib
 import unittest
 
 from openplexus.tasks.chains import ChainConfig, ChainSequence, dataset, generate
@@ -182,6 +183,91 @@ class TheShapeIsWhatItClaims(unittest.TestCase):
         self.assertGreaterEqual(config.query_token, config.n_symbols)
         self.assertGreaterEqual(config.separator_token, config.n_symbols)
         self.assertNotEqual(config.query_token, config.separator_token)
+
+
+class SeveralTerminatorsAreAvailable(unittest.TestCase):
+    """`n_separators > 1` exists to ask whether a model learns a CLASS of
+    terminator or one specific token. Decision 89 measured the halting gate
+    sitting +8.3 sd on a single value vector, which cannot transfer, and
+    decision 93 traced that to `Wv` being frozen and random.
+    """
+
+    def test_one_separator_generates_exactly_what_it_always_did(self):
+        """**A regression pin, not a description.**
+
+        `rng.choice` consumes a draw even from a one-element sequence, so the
+        obvious implementation would shift the random stream and silently change
+        every sequence the single-separator task has ever produced — every
+        number measured before this option existed would stop reproducing with
+        nothing to show it had happened. This digest is that guarantee.
+        """
+        digest = hashlib.sha256()
+        for hops in (1, 2, 3):
+            for n_chains in (4, 6):
+                config = ChainConfig(n_chains=n_chains, hops=hops,
+                                     n_symbols=48, seq_len=96, seed=7)
+                for sequence in dataset(config, 40):
+                    digest.update(bytes(str(sequence.tokens), "utf8"))
+                    digest.update(bytes(str(sequence.targets), "utf8"))
+                    digest.update(bytes(str(sequence.asked), "utf8"))
+        self.assertEqual(
+            digest.hexdigest(),
+            "a6d496e18fdd54798895d91673a19b3f522d137853186ec7962711be88aecc0a")
+
+    def test_every_separator_in_the_pool_gets_used(self):
+        config = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=64,
+                             n_separators=4, seed=5)
+        seen = set()
+        for sequence in dataset(config, 40):
+            seen |= set(sequence.tokens) & set(config.separator_tokens)
+        self.assertEqual(seen, set(config.separator_tokens))
+
+    def test_a_held_out_separator_never_appears(self):
+        """The whole point of `use_separators`: train on some, test on one the
+        model has never seen, with the vocabulary unchanged so the two models
+        stay comparable."""
+        trained = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=64,
+                              n_separators=4, use_separators=(0, 1, 2), seed=5)
+        held_out = trained.separator_tokens[0] + 3
+        for sequence in dataset(trained, 40):
+            self.assertNotIn(held_out, sequence.tokens)
+
+    def test_holding_one_out_does_not_change_the_vocabulary(self):
+        whole = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=64,
+                            n_separators=4)
+        part = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=64,
+                           n_separators=4, use_separators=(0, 1, 2))
+        self.assertEqual(whole.vocab_size, part.vocab_size)
+        self.assertEqual(len(part.separator_tokens), 3)
+
+    def test_separators_stay_outside_the_symbol_alphabet(self):
+        config = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=64,
+                             n_separators=5)
+        for token in config.separator_tokens:
+            self.assertGreaterEqual(token, config.n_symbols)
+            self.assertNotEqual(token, config.query_token)
+            self.assertLess(token, config.vocab_size)
+
+    def test_no_false_link_with_several_separators(self):
+        """The original defect, re-asserted on the new shape: more separators
+        must not create an adjacency a chain does not contain."""
+        config = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=64,
+                             n_separators=4, seed=17)
+        for sequence in dataset(config, 25):
+            symbols = {s for chain in sequence.chains for s in chain}
+            false = {pair for pair in adjacent_pairs(sequence)
+                     if pair[0] in symbols and pair[1] in symbols}
+            self.assertEqual(false - stated_links(sequence, 2), set())
+
+    def test_an_empty_use_separators_is_refused(self):
+        with self.assertRaises(ValueError):
+            ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=64,
+                        n_separators=3, use_separators=())
+
+    def test_a_separator_index_outside_the_pool_is_refused(self):
+        with self.assertRaises(ValueError):
+            ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=64,
+                        n_separators=2, use_separators=(0, 5))
 
 
 class ImpossibleShapesAreRefused(unittest.TestCase):

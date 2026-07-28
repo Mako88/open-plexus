@@ -80,6 +80,31 @@ class ChainConfig:
     seq_len: int = 96
     seed: int = 0
 
+    #: How many DISTINCT tokens can act as a chain separator.
+    #:
+    #: 1 is the original task and every earlier number was measured with it.
+    #: More than one exists to ask whether a model learns a *class* of
+    #: terminator rather than one specific token — decision 89 measured the
+    #: halting gate sitting +8.3 sd on a single value vector, which cannot
+    #: transfer, and decision 93 traced that to `Wv` being frozen and random.
+    n_separators: int = 1
+
+    #: Which separators this dataset is allowed to use, as indices into the
+    #: pool. `None` means all of them.
+    #:
+    #: The point is a HELD-OUT terminator: train on `(0, 1, 2)` and test on
+    #: `(3,)` with the vocabulary unchanged, so a gate that memorised specific
+    #: tokens and one that learned a class give different answers.
+    use_separators: tuple[int, ...] | None = None
+
+    @property
+    def separator_tokens(self) -> tuple[int, ...]:
+        """The separators this dataset may actually emit."""
+        pool = tuple(self.n_symbols + 1 + i for i in range(self.n_separators))
+        if self.use_separators is None:
+            return pool
+        return tuple(pool[i] for i in self.use_separators)
+
     @property
     def separator_token(self) -> int:
         """Sits between CHAINS so that laying them end to end states no link
@@ -132,7 +157,10 @@ class ChainConfig:
 
     @property
     def vocab_size(self) -> int:
-        return self.n_symbols + 2
+        # Symbols, the query marker, and every separator in the POOL -- not just
+        # the ones in use, so a held-out terminator does not change the
+        # vocabulary and the two models stay comparable.
+        return self.n_symbols + 1 + self.n_separators
 
     @property
     def symbols_used(self) -> int:
@@ -153,6 +181,18 @@ class ChainConfig:
     def __post_init__(self) -> None:
         if self.hops < 1:
             raise ValueError("hops is a number of links and must be at least 1")
+        if self.n_separators < 1:
+            raise ValueError("a chain needs a separator before it")
+        if self.use_separators is not None:
+            if not self.use_separators:
+                raise ValueError(
+                    "use_separators is empty, so no chain could be written; "
+                    "None means 'all of them', an empty tuple means nothing")
+            if not all(0 <= i < self.n_separators
+                       for i in self.use_separators):
+                raise ValueError(
+                    f"use_separators indexes outside a pool of "
+                    f"{self.n_separators}: {self.use_separators}")
         if self.n_chains < 2:
             raise ValueError(
                 "one chain makes the answer the only chain-ending symbol, so "
@@ -215,9 +255,19 @@ def generate(config: ChainConfig) -> ChainSequence:
     order = list(chains)
     rng.shuffle(order)
 
+    # A separator is drawn PER CHAIN, so one sequence can carry several
+    # different terminators and no chain's terminator is predictable from
+    # another's.
+    # NOT `rng.choice` when there is only one. `choice` consumes a draw even
+    # from a one-element sequence, which would shift the random stream and
+    # silently change every sequence the single-separator task has ever
+    # generated -- so every number measured before this option existed would
+    # stop reproducing, with nothing to show it had happened.
+    separators = config.separator_tokens
     tokens: list[int] = []
     for chain in order:
-        tokens.append(config.separator_token)
+        tokens.append(separators[0] if len(separators) == 1
+                      else rng.choice(separators))
         tokens.extend(chain)
 
     asked = chains[rng.randrange(config.n_chains)]

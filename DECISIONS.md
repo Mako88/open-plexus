@@ -4577,3 +4577,76 @@ worth knowing on its own.
 Five features is not every feature. This rules out the retrieval *statistics*
 that were available, not every identity-free signal that could exist — a feature
 computed across hops rather than within one, for instance, was not tried.
+
+## 94. `value_lr` does not build a terminator class — and the gate learns whatever depth dominates training
+
+Decision 93 predicted that unfreezing `Wv` and training with several
+terminators would make those markers' value vectors converge, giving a gate
+something to generalise over. **The prediction is refuted, and the route to
+testing it is blocked twice over.** `n_separators` and `use_separators` are
+added to the task so the question can be asked at all; `n_separators=1` is
+pinned byte-identical by a digest test.
+
+### First blocker, from the code rather than a measurement
+
+`value_lr` updates `self.wv[targets[t]]` at **scored positions only**, and the
+chain task scores exactly one position whose target is always a chain symbol. A
+separator is never a target, so its value vector **can never move**. Decision
+93's experiment is not merely hard to run — as written it is a no-op.
+
+### Second blocker: making separators targets breaks the gate
+
+The fix is to score every position — next-token prediction, which is also how
+the model would train on real text. It costs almost everything:
+
+    separators        scored   depth-2 accuracy
+             1   answer only              1.000
+             1   every position           0.117
+             4   answer only              0.992
+             4   every position           0.683
+
+**Four separators cost 0.008. All-position training costs 0.883.** The
+diagnosis, checked rather than assumed — weight the gate puts on hop 1 at the
+answer position of a depth-2 question, where a working gate puts it near zero:
+
+    trained on answer only      0.0102
+    trained on every position   0.3034
+
+**At almost every position the next token is exactly one hop away.** The answer
+position is a rare exception competing against a large majority, so the gate
+learns the dominant depth and drags hop 1 up thirtyfold.
+
+### And `value_lr` itself does not do what was hoped
+
+    value_lr  accuracy   sep cos  base cos  sep-base
+           0     0.683     0.064    -0.015    +0.080
+       0.001     0.300     0.068     0.090    -0.023
+        0.01     0.058     0.126     0.191    -0.065
+        0.05     0.025     0.535     0.382    +0.153
+
+The separator-minus-baseline contrast does not rise with `value_lr`. At the
+largest rate **everything** converges — ordinary symbols reach 0.382 — which is
+the representation collapsing globally, not terminators forming a class, and it
+matches decision 65's trained projection collapsing the rank. Accuracy falls
+monotonically to 0.025 alongside it.
+
+### What this licenses — and it is the most important thing here
+
+**The gate is trained by the same error as the readout, so it learns the depth
+that dominates the training distribution rather than the depth a question
+needs.** On the answer-only objective that distribution *is* the task. On
+next-token over every position it is overwhelmingly one hop.
+
+That is a serious obstacle on the path to real data, and it was invisible while
+every experiment scored one position. Real text is trained at every position, so
+a gate learning by this route would settle on "one hop" and **composition would
+be built, correct, and never used**. Any future result on text has to show the
+gate is actually gating, not just that accuracy moved.
+
+### What it does NOT license
+
+That all-position training is unusable — only that it is unusable *with the gate
+learning from the same undifferentiated error*. A gate with its own objective, or
+one trained only where depth is ambiguous, is untried. And 4 separators beating 1
+under all-position training (0.683 against 0.117) is unexplained; it is a real
+gap in the account, not a detail.

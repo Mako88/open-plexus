@@ -93,15 +93,34 @@ value vectors are independent draws and there is no structure for a "class of
 terminators" to live in. Nothing to generalise over. That is a limitation of
 frozen random embeddings, not of gating.
 
-### The single most promising next experiment
+### That experiment has now been run, and it failed twice over (decision 94)
 
-`value_lr` already exists, and "unfreeze the value projections" is already one of
-the four approved un-constraints in BACKLOG. Decision 93 gives it a sharper
-purpose than capacity, and a falsifiable prediction: **train with several
-different terminators and `value_lr` on, then check whether those markers' value
-vectors converge toward each other more than chance.** Only if they do can a gate
-trained on some recognise a held-out one. If they do not, the delta rule on
-values is not doing representational work — which is worth knowing on its own.
+`value_lr` updates `wv[target]` at **scored positions only**, and the chain task
+scores one position whose target is always a chain symbol — so a separator's
+value vector can never move. As written the experiment was a no-op.
+
+Scoring every position fixes that and **costs almost everything**: depth-2
+accuracy 1.000 → 0.117. Four separators cost 0.008; all-position training costs
+0.883. And `value_lr` does not build a class either — at high rates *everything*
+converges (ordinary symbols 0.382), which is global collapse, not role structure.
+
+## READ THIS BEFORE TAKING ANY OF IT TO REAL TEXT
+
+**The gate is trained by the same error as the readout, so it learns the depth
+that dominates the training distribution — not the depth a question needs.**
+Measured: gate weight on hop 1 at a depth-2 answer position is 0.0102 under
+answer-only training and **0.3034** under all-position training, because at
+almost every position the next token is exactly one hop away.
+
+Real text is trained at every position. So a gate learning by this route settles
+on "one hop", and **composition would be built, correct, and never used**. Any
+future result on text must show the gate is actually gating, not merely that
+accuracy moved.
+
+Untried, and the obvious next moves: a gate with its own objective, or one
+trained only at positions where depth is ambiguous. Also unexplained — 4
+separators beat 1 under all-position training (0.683 against 0.117), which is a
+real gap in the account rather than a detail.
 
 **C4 is still untested, and that is now the open problem.** Two attempts failed
 to build a case where continued learning helps: decision 91 because a departure

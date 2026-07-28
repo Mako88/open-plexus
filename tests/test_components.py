@@ -49,6 +49,34 @@ class ASpecBecomesAConfig(unittest.TestCase):
             self.assertEqual(config.d_model, 64)
 
 
+class TheBaselineSpecIsStillASpec(unittest.TestCase):
+    """**The empty override dict is the trap, and it caught the sweep.**
+
+    `keys=dense,retrieval=plain,readout=linear` is a perfectly good spec whose
+    overrides happen to be `{}`. Code branching on `if overrides:` treats it as
+    "no spec given" -- so the ONE combination that is the baseline takes a
+    different path from the seventeen that are not.
+
+    That is the worst possible cell to lose: the identity check, whose job is to
+    prove the grid reproduces a known number. g11-07's first dispatch lost
+    exactly that cell and nothing else.
+    """
+
+    def test_the_baseline_spec_has_no_overrides(self):
+        self.assertEqual(parse("keys=dense,retrieval=plain,readout=linear")[0],
+                         {})
+
+    def test_but_it_still_has_a_label(self):
+        """Emptiness of the overrides must not be confused with absence of a
+        spec. The label is how a caller tells the two apart."""
+        overrides, name = parse("keys=dense,retrieval=plain,readout=linear")
+        self.assertFalse(overrides)
+        self.assertTrue(name)
+
+    def test_an_empty_spec_and_the_baseline_spec_agree(self):
+        self.assertEqual(parse(""), parse("keys=dense,retrieval=plain,readout=linear"))
+
+
 class TwoModelsCannotShareAName(unittest.TestCase):
 
     def test_the_label_is_complete_even_when_the_spec_is_not(self):

@@ -198,7 +198,7 @@ def run_one(args) -> list[dict]:
             f"asked for {chars} training characters and the corpus holds "
             f"{available}. A cell silently truncated to the corpus length is a "
             f"cell at a different point on the axis than the grid says.")
-    if extra:
+    if extra is not None:
         # A spec names its own model, so the arm-name checks below -- which
         # exist to stop `--mode` being misused -- do not apply to it.
         value = ours(corpus, width, chunk, seed, False, chars, 0, **extra)
@@ -256,7 +256,13 @@ def main() -> int:
     # `--mode` conflated which arm a row belongs to with what the model is made
     # of, which is why g11-06 needed a duplicate arm to keep a control out of
     # the column it was controlling.
-    extra: dict = {}
+    # None means "no spec given". An EMPTY DICT means "a spec was given and it
+    # happens to need no overrides" -- which is exactly the baseline,
+    # keys=dense,retrieval=plain,readout=linear. Branching on truthiness sent
+    # that one cell down the arm-name path and killed it, while all seventeen
+    # cells that differ from the baseline ran fine. The identity check was the
+    # only casualty, which is the cell whose failure says least and matters most.
+    extra: dict | None = None
     if args.components:
         extra, arm = components.parse(args.components)
     chars = args.chars if args.chars else TRAIN_CHARS

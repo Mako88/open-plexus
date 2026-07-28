@@ -106,6 +106,38 @@ class AddingAComponentChangesEveryLabel(unittest.TestCase):
         self.assertEqual(len(name.split(",")), len(CHOICES))
 
 
+class ASpecMayOverrideAScriptDefault(unittest.TestCase):
+    """A choice that sets a field the experiment also sets must not collide.
+
+    `consolidating` carries `decay` 0.997 because the model refuses
+    consolidation with a memory that never fades. `ours()` also passed `decay`
+    as a keyword, so `LocalMemoryConfig` received it twice and **four of
+    g11-08's twelve cells died** -- the eight that did not override a default
+    ran fine, which is why it looked like a consolidation problem rather than a
+    plumbing one.
+    """
+
+    def test_consolidating_carries_the_fields_it_requires(self):
+        overrides, _ = parse("write=consolidating")
+        self.assertLess(overrides["decay"], 1.0)
+        self.assertGreater(overrides["lasting_cap"], 0.0)
+
+    def test_every_choice_builds_when_merged_over_the_script_defaults(self):
+        """The real shape of the failure: a spec is merged INTO a dict of
+        defaults, so a collision is a duplicate keyword rather than a bad
+        value, and it only fires for choices that overlap."""
+        defaults = dict(derived_keys=True, decay=0.997, memory_cap=5.0)
+        for component, choices in CHOICES.items():
+            for choice in choices:
+                overrides, _ = parse(f"{component}={choice}")
+                if overrides.get("key_active") and overrides.get("context_keys"):
+                    continue
+                merged = dict(defaults)
+                merged.update(overrides)
+                config = LocalMemoryConfig(vocab_size=17, d_model=64, **merged)
+                self.assertEqual(config.vocab_size, 17)
+
+
 class TwoModelsCannotShareAName(unittest.TestCase):
 
     def test_the_label_is_complete_even_when_the_spec_is_not(self):

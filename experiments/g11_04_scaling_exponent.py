@@ -122,12 +122,17 @@ def numbers_held(width: int, slots: int) -> int:
 
 def ours(corpus, width: int, chunk: int, seed: int, context: bool,
          chars: int = TRAIN_CHARS, slots: int = 0, **extra) -> float:
+    # Every default this script sets goes in the dict, so a component spec can
+    # OVERRIDE one rather than collide with it. `decay` was passed as a keyword
+    # AND carried by the `consolidating` choice -- which needs decay < 1 -- and
+    # LocalMemoryConfig got it twice. Four of twelve cells died; the eight that
+    # did not override a default were fine.
     settings = dict(derived_keys=True, context_keys=context,
-                    cache_slots=slots)
+                    cache_slots=slots, decay=0.997, memory_cap=5.0)
     settings.update(extra)
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=corpus.vocab_size, d_model=width, lr=0.05, key_scale=0.5,
-        decay=0.997, memory_cap=5.0, seed=seed, **settings))
+        seed=seed, **settings))
     # Start the readout AT the value projection, so a retrieval that lands on
     # `wv[token]` already scores that token. Meaningless with a hidden layer --
     # `wo` then reads hidden units, not retrieval dimensions, and the shapes do

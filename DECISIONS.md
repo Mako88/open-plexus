@@ -5833,4 +5833,63 @@ concrete, falsifiable account of decision 63 this project has had.
 
 Treating the hypothesis as established. It is arithmetic plus one ablation on a
 different task, and decision 63 was measured on text with a different key
-scheme. The sweep has not been run.
+scheme. The sweep has not been run. **Decision 113 withdraws it.**
+
+## 113. Decision 112's saturation hypothesis was aimed at the wrong axis — WIDTH ALREADY HELPS
+
+Before costing the sweep decision 112 proposed, I read the record it was built
+on. It does not say what I said it says.
+
+**Width is not flat.** g11-04, on Tiny Shakespeare:
+
+    arm         d=16     d=32     d=64    d=128     fitted b      R²
+    single     5.730    5.624    5.505    5.494      -0.0213    0.92
+    context    5.917    5.827    5.759    5.703      -0.0176    0.99
+    backprop   4.197    4.150    4.157    4.175      -0.0021    0.13
+
+Our arms **improve with width**. The *baseline* is the flat one over that range,
+which is why g11-04 was ruled inadmissible as a comparison — not because our
+model failed to scale.
+
+**The flat axis is DATA.** Decision 63: the model stops improving at about
+16,000 characters, and total movement from 4,000 to 125,000 is 0.039 bits
+against a seed spread of 0.04. Noise.
+
+So decision 112's proposed two-axis sweep would have tested a claim nobody
+makes. **Withdrawn before dispatch**, which is the only reason it cost nothing.
+
+### What decision 112 got right, and it is not nothing
+
+The ablation stands on its own terms: retrieval fidelity on kinship is a width
+limit, decay costs 0.012 and the store cap costs 0.000. Both suspects cleared,
+and 44 bindings measured rather than guessed. That is a fact about **this task's
+retrieval**, not about text scaling, and conflating the two was the error.
+
+### And the data saturation is not mysterious — it is already explained
+
+**The store is per-sequence working memory, rebuilt every chunk.** So `Wo` is
+the only thing that persists across the corpus, and a single linear map
+converges fast — decision 63 measured that as 16,000 characters.
+
+More data cannot help a model whose only durable parameter has already
+converged. That is not a capacity limit and not an architectural mystery; it is
+arithmetic about what learns.
+
+### What this licenses
+
+**The target is persistent learnable capacity**, and it is the same target
+decisions 93 and 94 already identified from the other direction: `Wv` and `Wk`
+are frozen random, `Wo` is one linear map, and `value_lr` — the mechanism meant
+to unfreeze the values — collapses the representation instead of organising it.
+
+So the line from here is not a scaling sweep. It is: **make something other than
+one linear map learn across sequences, without collapsing it.** Every other
+thread now points there.
+
+### The habit that caught this
+
+Decision 63 itself records three sweeps whose grids did not contain the
+phenomenon, and the rule it added was to probe cheaply before fitting an
+exponent. This is the same failure one level up — **a hypothesis whose premise
+was not checked against the record it cited.** Reading the source cost ten
+minutes; the sweep would have cost twelve jobs and answered nothing.

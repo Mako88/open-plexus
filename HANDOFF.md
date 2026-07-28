@@ -37,20 +37,37 @@ Decay costs 0.012, the cap costs 0.000, **width fixes it completely.**
 > load**, and why is unmeasured. Its keys are hashed pairs and its values repeat
 > heavily; either could reduce effective capacity.
 
-### THE FIRST FALSIFIABLE ACCOUNT OF SATURATION (decision 63)
+### SATURATION IS ON THE DATA AXIS, NOT WIDTH (decision 113)
 
-Text runs used sequences up to **1536 tokens** → ~1536 bindings, against a
-width-128 capacity of ~384. **Four times over capacity**; width 64 is sixteen
-times over.
+**Width already helps.** g11-04 on Tiny Shakespeare:
 
-That explains "more width does not help" exactly — 64 → 128 moves capacity
-96 → 384 while the load stays 1536, so the model is far past saturation either
-way and the doubling is invisible. And "more data does not help" follows too,
-since the store is per-sequence working memory.
+    arm         d=16     d=32     d=64    d=128    fitted b      R²
+    single     5.730    5.624    5.505    5.494     -0.0213    0.92
+    backprop   4.197    4.150    4.157    4.175     -0.0021    0.13
 
-**The test:** a two-axis sweep of width × sequence length. At SHORT sequences,
-where load is under capacity, width should help. At long ones it should not
-until width is large enough. Not yet run.
+Our arms scale with width; the *baseline* is the flat one over that range, which
+is why g11-04 was inadmissible as a comparison. **The flat axis is DATA** —
+decision 63: the model stops improving at ~16,000 characters, and 4k → 125k
+moves 0.039 bits against a 0.04 seed spread.
+
+> A hypothesis in decision 112 proposed a width × sequence-length sweep to
+> explain "width doesn't help". Nobody claims that. **Withdrawn before
+> dispatch** — reading the source cost ten minutes, the sweep would have cost
+> twelve jobs and answered nothing.
+
+**And the data saturation is already explained.** The store is per-sequence
+working memory, so `Wo` is the only thing persisting across the corpus, and one
+linear map converges fast. More data cannot help a model whose only durable
+parameter has already converged.
+
+### SO THE TARGET IS PERSISTENT LEARNABLE CAPACITY
+
+Same target decisions 93 and 94 reached from the other side: `Wv`/`Wk` frozen
+random, `Wo` one linear map, and `value_lr` collapses the representation rather
+than organising it.
+
+**Make something other than one linear map learn across sequences, without
+collapsing it.** Every thread now points there.
 
 ---
 

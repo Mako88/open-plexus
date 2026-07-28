@@ -78,23 +78,37 @@ not exist here.
 
 **The values move a long way, stay spread out, and the plateau does not budge.**
 
-### THREE CAPACITY EXPLANATIONS NOW ELIMINATED
+### SATURATION IS CLOSED (decision 115) — STOP TREATING IT AS OPEN
 
-    store capacity                    decision 109
-    readout capacity                  decision 110
-    persistent representation         decision 114
+Note 035 already had the account; what it lacked was the exclusion of rivals.
+Three are now measured out:
 
-**The data plateau is not a capacity limit of any component measured so far.**
+    store capacity                    decision 109   ~96 bindings @ d=64, d² scaling
+    readout capacity                  decision 110   2.00 items per dimension
+    persistent representation         decision 114   Wv learnable, no collapse, no gain
 
-What is left unexamined is the **shape** of what the store can represent rather
-than how much. Note 035 claims the store holds a bigram count table of effective
-rank ~3 whatever the width — a claim about shape, never re-checked, and the kind
-of thing that would explain a plateau no capacity touches.
+And the account itself re-checked on current code — stable rank
+`‖S‖²_F/‖S‖²₂`, **the measure named** because conflating it with participation
+rank refuted a correct hypothesis here once:
 
-> Sobering cross-check for whoever picks this up: a bigram scores **3.583** on
-> Tiny Shakespeare and this model scores **5.494**. We are well short of a
-> bigram, so "the ceiling is bigram-shaped" does not yet explain the level —
-> only, possibly, the flatness.
+     d     er(S)   share of d
+    32      2.75         8.6%
+   256      3.05         1.2%
+
+**Effective rank ~3 whatever the width.** The store faithfully holds a bigram
+count table (note 033, cosine 0.88+), and a character bigram table over 66
+symbols is intrinsically low-rank. Width buys little because rank does not grow
+with `d`; more data buys nothing because bigram counts converge fast — decision
+63's 16,000 characters is how long estimating a bigram table takes.
+
+**This is what note 038 already argued and decision 83 already acted on:**
+character-level bits is the wrong target, which is why the relational task
+exists. The live work is on the relational side, where the blocker is retrieval
+fidelity (112).
+
+> Still unexplained, and worth someone's attention: this model scores **5.494**
+> on Tiny Shakespeare where a plain bigram scores **3.583**. Being
+> bigram-*shaped* does not explain being well *short* of a bigram.
 
 ---
 

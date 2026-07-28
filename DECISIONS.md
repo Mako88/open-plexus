@@ -5957,3 +5957,66 @@ flat after ~16,000 — is what reproduces, not the level.
 Nor does it license removing `value_lr`. It is correct, it is cheap, and the
 finding is that it does not pay *on this axis* — a task where representation
 sharing matters is untested.
+
+## 115. Saturation is CLOSED — note 035 had it, and three alternatives are now eliminated
+
+Re-checked on current code, stable rank `‖S‖²_F/‖S‖²₂` — **naming the measure**,
+because conflating it with participation rank refuted a correct hypothesis in
+this project once:
+
+     d     er(S)   minus mean   share of d
+    32      2.75         2.96         8.6%
+    64      3.25         3.09         5.1%
+   128      2.96         3.21         2.3%
+   256      3.05         3.34         1.2%
+
+**Effective rank ~3 whatever the width**, matching note 035's 2.0–2.2. The share
+of available dimensions falls from 8.6% to 1.2% as width grows.
+
+### The account, which was already written
+
+Note 033 measured the store faithfully holding a bigram count table (cosine
+0.88+). Note 035's corrected reading follows: **a character bigram table over 66
+symbols is intrinsically low-rank** — English is dominated by a few very
+frequent characters — so *"the store is not failing to use its width. There is
+nothing there to use."*
+
+That explains both axes at once. Width buys little because rank does not grow
+with `d`. **And more data buys nothing because bigram counts converge fast** —
+decision 63's 16,000 characters is how long it takes to estimate a bigram table,
+not a mysterious architectural wall.
+
+### What this session added, which is elimination rather than discovery
+
+The account was already there. What it lacked was the exclusion of competitors,
+and three are now measured out:
+
+    store capacity                 decision 109   ~96 bindings at width 64, d² scaling
+    readout capacity               decision 110   2.00 items per dimension
+    persistent representation      decision 114   Wv learnable, no collapse, no gain
+
+So "the model is bigram-shaped at character level" is no longer the most
+plausible story among several — **it is the one left standing**, and the others
+failed on their own measurements rather than by argument.
+
+Worth stating plainly: several hours went into re-deriving something the project
+already knew. The value is that the alternatives are now closed, not that the
+conclusion is new.
+
+### What this licenses — and it is what the project already did
+
+**Character-level bits is the wrong target**, which is exactly note 038's
+argument for the relational task: a character bigram table cannot represent a
+concept, so the task itself is part of the ceiling. Decision 83 acted on that
+before any of this was measured.
+
+**So saturation is not an open problem and should stop being treated as one.**
+It is a property of the objective, the objective was already changed, and the
+live work is on the relational side — where the blocker is retrieval fidelity
+(decision 112) and the ceiling is a real one.
+
+### What it does NOT license
+
+Complacency about the level. This model scores **5.494** on Tiny Shakespeare
+where a plain bigram scores **3.583**. Being bigram-*shaped* does not explain
+being well short of a bigram, and that gap is unexplained by anything here.

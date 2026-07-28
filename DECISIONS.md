@@ -3935,3 +3935,60 @@ permanent, and move."*
 The usable figures: **window 16 is worth 11.97x over lock-step on an 80 ms link
 losing 2%**, agreeing exactly, at a 40-step run. That is the number to quote,
 with the run length stated beside it because it is part of the measurement.
+
+---
+
+## 83. G0 for the chain task: one hop is perfect, two hops answers the intermediate 100% of the time
+
+**The cleanest instrument result this project has produced**, and the one that
+makes the hop mechanism worth building.
+
+     hops  chains   floor   linear  hidden128
+        1       4   0.250    1.000      0.555
+        1       8   0.125    1.000      0.510
+        2       4   0.250    0.000      0.020
+        2       8   0.125    0.000      0.030
+
+**G0 passes.** One hop is 1.000 with a linear readout — the task is wired
+correctly, the model solves it, and note 038's positive control holds. A zero at
+two hops is therefore readable rather than ambiguous.
+
+**Two hops scores BELOW chance, and that is the finding.** A model guessing
+scores 0.250. Scoring 0.000 means it is confidently producing a specific wrong
+answer, every time. Which one:
+
+    100.0%   the INTERMEDIATE (b) -- one hop, then stopped
+
+**Every single test sequence.** The store binds `a -> b`, retrieval with `a`
+returns `b`, and the readout emits it. The model performs exactly one hop,
+correctly, and has no mechanism to take the second.
+
+That is not "the task is too hard" and not "the task is broken". It is a precise
+statement of the architectural gap, and a random-looking failure would have left
+the mechanism unmotivated. **Decode-and-re-encode now has a number to beat: any
+2-hop accuracy above 0.000 is progress, and the ceiling is the 1.000 the model
+already reaches at one hop.**
+
+### The composed readout LOSES here, which is the fifth instance of one pattern
+
+`hidden128` scores 0.51-0.56 at one hop where the linear readout scores 1.000.
+On text it won 9 of 9 cells in g11-07 and was the largest single factor in the
+grid. On exact retrieval it halves accuracy.
+
+The reading: a hidden layer helps when the answer is a STATISTICAL function of a
+superposed retrieval, and hurts when the retrieval already contains the exact
+answer and only needs reading off. Composition buys generalisation and costs
+fidelity.
+
+This is decision 74's pattern for the fifth time — sparse keys, the cache, the
+write gate, readout bias, and now the composed readout itself. **A mechanism's
+effect is a property of the configuration, not of the mechanism**, and the
+configuration now includes the task. Worth holding before any hop mechanism is
+built on the assumption that hidden layers help.
+
+### What this licenses
+
+The hop axis is a valid instrument. One hop is a known-good positive control,
+two hops is a known-zero with a diagnosed cause, and anything between them is
+measurable. That is what note 038 said had to exist before the mechanism was
+worth writing, and it now does.

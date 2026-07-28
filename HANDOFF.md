@@ -2,15 +2,20 @@
 
 **For the next session.** Read this, then `GOALS.md`, then `BACKLOG.md`. The
 notes in `docs/notes/` are the reasoning; `DECISIONS.md` is the running log John
-reads — entries 56–61 are from this session and are the current state. This file
+reads — entries 56–69 are from this session and are the current state. This file
 is a snapshot and goes stale — trust the notes and DECISIONS over it.
 
 ---
 
-## The one result that matters most
+## The headline result, and the correction that demoted it
 
 **g11-05: our model does not learn from more text.** Sixteen times the training
-data, on the standard benchmark, with a control that fired:
+data, on the standard benchmark, with a control that fired.
+
+**Read decision 63 before quoting this.** The finding is TRUE and the sweep is
+not evidence for it: every point sat above the model's saturation point, so a
+flat exponent was guaranteed by the grid. The honest version — cheaper and
+stronger — is the saturation curve two sections down.
 
     arm           n=62,500     n=125,000     n=250,000     n=500,000   n=1,000,000
     backprop   4.306+/-0.021 4.283+/-0.036 4.157+/-0.013 4.091+/-0.015 4.049+/-0.028
@@ -29,10 +34,6 @@ gradient for a single linear readout. **It says the architecture is saturated on
 every axis tried**, which removes "we are just small" as an explanation for the
 gap to the baselines. That was the last one available.
 
-And note 035's excuse for the flat WIDTH result — the store is a rank-3 bigram
-table, so width cannot help — **does not transfer.** There is no rank argument on
-a data axis.
-
 ## Where the model is
 
     uniform                        6.000 bits/char
@@ -50,27 +51,53 @@ downstream needs.
 
 ## READ THIS BEFORE INTERPRETING ANY RESULT ON THIS CORPUS
 
-**The store does not persist.** `memory = np.zeros((d, d))` is inside `run`, and
-`run` is called once per 128-character chunk. `Wk` and `Wv` are frozen random.
+**The model is frozen random features into a linear probe. That is not an
+analogy, it is the architecture.**
 
-    Wo (learned)        4,096   <- the ONLY thing that learns across the corpus
-    Wk (frozen)         4,096
-    Wv (frozen)         4,096
-    store d x d         4,096   <- REBUILT EVERY 128 CHARACTERS
-    backprop, same width       20,481 persistent parameters, all trained
+`r = M @ key` depends only on `Wv` and the keys, both drawn once and never
+updated. So the retrieval is completely independent of `Wo`, and `Wo` — a single
+`vocab x d` linear map — is the only thing that learns across a corpus. The
+store itself is `np.zeros((d, d))` inside `run`, rebuilt every 128-character
+chunk (a deliberate, guarded property: `local-memory-persists-across-sequences`,
+correct for the recall tasks, inherited unexamined by the corpus experiments).
 
-So **everything this model learns from a corpus is one linear map of 4,096
-numbers.** Confirmed empirically: with `learn=False`, predictions on a sequence
-are identical whether or not another ran first.
+**The model converges at about 16,000 characters and then stops.** Three seeds:
 
-**This gives g11-05 a second explanation** (decision 62). A single linear readout
-has almost nothing for more data to fill, so the flat exponent may be about
-persistent CAPACITY rather than about the sum. Decision 59 named only the sum.
+    chars     4,000   8,000  16,000  32,000  62,500  125,000
+    bits      5.570   5.543   5.527   5.523   5.531    5.531   (spread ~0.04)
 
-**The experiment that separates them is unfreezing `Wv`** — it adds persistent
-capacity without touching the sum. Data exponent goes negative → it was capacity.
-Stays flat → it is the sum. **Every result on this corpus is currently ambiguous
-between the two, which makes this the highest-value next mechanism.**
+A linear probe on fixed features converges once it has enough samples to
+estimate its coefficients, and no amount of further data changes the features.
+**g11-05 swept 62,500 upward — entirely above saturation — so its flat exponent
+was guaranteed by the grid** (decision 63). The rule now in CLAUDE.md: probe the
+BOTTOM of a scaling range locally before spending a matrix on it.
+
+## The synthesis that should drive what comes next (decision 69)
+
+    mechanism            effect on LEVEL      effect on SLOPE
+    width, 4x                    +0.089                 none
+    exact cache, 128 slots       +0.19                  none
+    sparse keys, k=4             +0.15                  none
+    pair keys                    -0.23                  none
+    trained Wv                   -0.45                  none
+    carry store (training)       -0.15                  none
+
+**Six mechanisms, three helpful, and not one changes the shape.** Stacking every
+positive result reaches roughly 5.1 bits — still worse than a unigram at 4.829,
+and still flat. The backprop baseline moves 0.95 bits over the same range and is
+still moving at 1,000,000.
+
+So the question is no longer *what raises the score*. It is **what would make the
+loss keep falling with data at all** — and the one arm that does keep falling
+differs in exactly one respect nothing here has varied: its parameters are
+trained through a COMPOSED function. Ours are not.
+
+**Two rank measures are in play and confusing them cost a wrong conclusion.**
+Note 035 uses stable rank `‖S‖_F²/‖S‖₂²`; decision 65 used participation rank
+`exp(H(σ))`. Under note 035's measure the retrievals sit at 4.06 — the "rank ~3"
+reading is right. **Name the measure next to the number** (decision 66). And rank
+does NOT predict bits in general: sparse keys have the lowest rank and beat the
+baseline, pair keys have near the highest and are the worst (decision 67).
 
 ## The through-line, which now has two measurements behind it
 

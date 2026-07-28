@@ -2820,3 +2820,89 @@ than any single one. `Wo` is fixed across chunks and must serve the pooled
 directions while any single prediction is made from one chunk's few — which is a
 second, independent reason the readout is worse off than its parameter count
 suggests.
+
+---
+
+## 67. Rank does not predict bits, and sparse keys are a free 0.18
+
+Two results from one probe, and the first retracts a claim made two hours ago.
+
+### Decision 65's general claim is refuted
+
+Decision 65 concluded *performance follows the rank of the retrieval*. It held
+across the interventions that produced it — width, trained `Wv`, the cache — and
+**it fails as soon as a different class of intervention is tried.** Seven schemes,
+width 64, 60,000 characters, both rank measures:
+
+    scheme          stable  partic   bits
+    table keys        4.06   30.56  5.539
+    pair keys         5.92   32.89  5.765   <- near-highest rank, WORST bits
+    dense (drawn)     6.10   31.53  5.527
+    sparse k=16       2.08   28.99  5.466   <- LOWEST rank, better than table
+    sparse k=8        2.96   29.84  5.383
+    sparse k=4        4.04   31.24  5.370
+    cache 128         6.09   32.79  5.344   <- best bits
+
+**There is no monotone relationship.** The lowest-rank scheme beats the baseline
+and the second-highest-rank scheme is the worst thing on the list. Four aligned
+observations were generalised into a law and the fifth class of intervention
+broke it.
+
+What survives is the narrower statement, which is still worth having: **training
+`Wv` collapses the rank and costs 0.45 bits**, and that dissociation is a fact
+about that mechanism. It is not a general principle, and decision 65 should be
+read as the former.
+
+The likely reason rank alone cannot carry it: pair keys raise rank by producing
+469 distinct keys against 66 tokens (note 034), so each key is seen far less
+often and every entry is estimated from far less evidence. **Rank bought at the
+cost of evidence per key is not worth having** — which is a bias/variance
+statement, not a rank statement, and no rank measure can see it.
+
+### Sparse keys buy 0.18 bits and cost nothing
+
+Three seeds, 60,000 characters, width 64:
+
+    scheme            mean   spread
+    table keys       5.528    0.027
+    dense (drawn)    5.524    0.053
+    sparse k=8       5.346    0.074
+    sparse k=4       5.342    0.067
+    cache 128        5.294    0.088
+
+The effect is about 0.18 bits against spreads of 0.05–0.07, so roughly three
+times the noise. **And it is free**: the same `d x d` store, the same parameter
+count, just sparse key vectors. Against the exact cache's 0.23 bits for FIVE
+TIMES the numbers held (20,480 against 4,096), sparse keys are far and away the
+better trade per unit of state.
+
+**They also cut what a node has to send.** A key with 4 active dimensions out of
+64 is cheaper on the wire than a dense one, so this is the rare mechanism that
+helps the loss and the C1 budget at the same time.
+
+### Why nobody had this number
+
+`key_active` is not new. It was measured in
+[g6-01](experiments/sweeps/g6-01-does-sparsity-protect-old-learning.txt) — **on
+MQAR**, for retention under forgetting — and that sweep's own opening says
+sparse codes "came out worse, so the knob was left off with a measurement saying
+not to reach for it."
+
+**It was never measured on the corpus.** This is exactly the hazard CLAUDE.md
+names: a mechanism measured only on the task it was designed for is not
+measured, and a direction abandoned because it "did not help" may have been
+tested on the wrong question. The knob has been sitting default-off, with a
+discouraging measurement attached, through every language result this project
+has produced.
+
+### What to do about it
+
+Sparse keys are the cheapest improvement available and they have not been swept:
+`key_active` was tried at 4, 8 and 16 here at one width and one data size. The
+grid worth running is `key_active` x width, because g6-01's headline was that
+sparsity's effect is a function of WIDTH, and everything above is at width 64.
+
+Before that grid, probe the bottom of the range locally — decision 63's rule —
+and check `key_active` interacts with `derived_keys`, which currently conflict:
+sparse keys have no per-token derivation, so a node cannot rebuild a sparse key
+from a seed, and that is a C1 problem the sweep would inherit.

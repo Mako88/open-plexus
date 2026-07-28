@@ -128,10 +128,34 @@ unclaimed win here.**
 > Shakespeare (66 symbols). Different regime, corpus and vocabulary — **not
 > admissible**, the same defect g11-04 was ruled out for.
 
-**Cheap resolution, not yet run:** measure the best configuration
-(`hidden` + `carry_store`) prequentially on Shakespeare, the way 4.540 was
-measured. Until then no comparable number for this model's best configuration
-against the n-gram baselines exists.
+### THAT MEASUREMENT WAS RUN AND FAILED TO REPRODUCE (decision 117)
+
+250,000 characters of Shakespeare, 62 symbols, single pass, **n-grams scored
+prequentially too**:
+
+    uniform                            5.954
+    unigram, prequential               4.776
+    bigram, prequential                3.554
+    model, hidden 128                  5.665   (temperature 0.1)
+    model, hidden 128 + carry_store    5.737   (temperature 0.1)
+
+**1.1 bits away from the recorded 4.540**, using the configuration that record
+names.
+
+> **A temperature is REQUIRED and its absence is a trap.** Scored without one it
+> read 5.920 against a uniform 5.954 — apparently learning nothing. The delta
+> rule targets a one-hot, so raw scores sit in ~[0,1] and a softmax over that
+> range is near-uniform whatever the model knows. The number measured the SCALE
+> of the scores, not their information.
+
+**⚠ TREAT 4.540 AS UNVERIFIED.** It is this project's headline text result and
+the basis for "unigram BEATEN" in the table above. It now has a failed
+reproduction against it. Either measurement could be the error — mine is newer,
+one seed, and less carefully built.
+
+**Next step is archaeology, not experiment:** find the script that produced
+4.540 and read its configuration. Chasing hyperparameters until one matches
+would be fitting a number rather than measuring one.
 
 ---
 

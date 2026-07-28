@@ -6069,4 +6069,61 @@ against the n-gram baselines exists.
 Any claim that the gap to a unigram is real or that it is not. That is now a
 known-unknown with a cheap resolution — run the best configuration
 prequentially on Shakespeare, the way 4.540 was measured — rather than a finding
-in either direction.
+in either direction. **Decision 117 attempted that and could not reproduce it.**
+
+## 117. The prequential reproduction FAILED — 4.540 could not be reobtained, and that is the finding
+
+Decision 116 queued one measurement: the best configuration, prequentially, on
+Shakespeare, everything in one regime. Run at 250,000 characters, 62 symbols,
+single pass, with the **n-grams scored prequentially too** — a bigram fitted on
+the whole corpus is not a fair opponent for a model given one online pass.
+
+    uniform                            5.954
+    unigram, prequential               4.776
+    bigram, prequential                3.554
+    model, default                     5.742   (temperature 0.1)
+    model, hidden 128                  5.665   (temperature 0.1)
+    model, hidden 128 + carry_store    5.737   (temperature 0.1)
+
+**1.1 bits away from the recorded 4.540**, with the configuration that record
+names. The reproduction failed.
+
+### The first attempt was broken, and the way it broke is worth keeping
+
+Scored without a temperature it read **5.920** against a uniform 5.954 — the
+model apparently learning nothing. **The delta rule targets a one-hot, so raw
+scores sit in about [0, 1], and a softmax over that range is nearly uniform
+whatever the model knows.** The number measured the SCALE of the scores, not the
+information in them.
+
+The temperature is fitted on the first fifth and applied to the rest, so nothing
+is calibrated on text it is then scored against. That moved it to 5.665 — real,
+and still nowhere near 4.540.
+
+### What this establishes, which is narrow
+
+**Not** that the model is worse than a unigram. It establishes that **the
+recorded 4.540 does not reproduce from its stated description**, and that
+whatever produced it differs from "hidden readout, prequential, Shakespeare" in
+some way not written down — corpus slice, chunk size, learning rate, the exact
+cache, or the temperature treatment.
+
+Chasing hyperparameters until one matches would be fitting a number rather than
+measuring one, so it was not attempted.
+
+### What this licenses
+
+**Treat 4.540 as unverified until its setup is identified.** It sits in HANDOFF
+as the model's headline text result and is the basis for "unigram BEATEN"; that
+claim now has a failed reproduction against it and should not be quoted without
+one.
+
+The cheap next step is finding the script that produced it and reading its
+configuration, rather than any new experiment.
+
+### What it does NOT license
+
+Concluding the record is wrong. A failed reproduction is a discrepancy between
+two measurements, and mine is the newer and less carefully built of the two —
+250,000 characters, one seed, a temperature grid of eight points. **Either could
+be the error.**

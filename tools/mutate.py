@@ -1594,17 +1594,18 @@ MUTATIONS = [
             "                       config.relation_token(relation), obj))",
     ),
     Mutation(
-        name="entailed-facts-are-never-shuffled-in",
-        breaks="the layout guarantee. Stated edges are generated first and "
-               "implied ones appended, so without the shuffle every entailed "
-               "fact sits at the END of the stream and POSITION predicts the "
-               "split. That is note 027's defect exactly -- reward_recall's "
-               "constant gap made the nearest binding before a reward always "
-               "the rewarded one, 160 of 160 -- and it was found by reading "
-               "the generator rather than by any test",
+        name="an-entailed-edge-can-precede-its-premises",
+        breaks="ANSWERABILITY, which is the property the whole task rests on. "
+               "An entailed edge is placed after both the facts that imply it, "
+               "because every model here is causal. Letting it land anywhere "
+               "puts 59% of them before a premise -- measured -- so the half "
+               "the task exists to measure becomes unreachable by any model at "
+               "all, and the ceiling drops to about 0.53. g14-01 read that as "
+               "the task FAILING G0 before the cause was found",
         path=CLOSURE,
-        old="    order = stated + implied\n    rng.shuffle(order)",
-        new="    order = stated + implied",
+        old="        after = max(order.index(first_premise), "
+            "order.index(second_premise))",
+        new="        after = -1",
     ),
     Mutation(
         name="the-deadline-fires-immediately",

@@ -164,7 +164,10 @@ def generate(config: ClosureConfig) -> ClosureSequence:
     for subject, obj, relation in stated:
         by_subject.setdefault(subject, []).append((obj, relation))
 
-    implied: list[tuple[int, int, str]] = []
+    # Each implication remembers the PAIR that produced it, because an entailed
+    # edge has to be placed after both of them -- see below.
+    implied: list[tuple[tuple[int, int, str], tuple, tuple]] = []
+    stated_by_pair = {(s, o): (s, o, r) for s, o, r in stated}
     for subject, obj, first in stated:
         for middle, second in by_subject.get(obj, ()):
             composed = COMPOSE.get((first, second))
@@ -173,23 +176,59 @@ def generate(config: ClosureConfig) -> ClosureSequence:
             if (subject, middle) in used:
                 continue          # already stated; not an inference
             used.add((subject, middle))
-            implied.append((subject, middle, composed))
+            implied.append(((subject, middle, composed),
+                            stated_by_pair[(subject, obj)],
+                            stated_by_pair[(obj, middle)]))
     rng.shuffle(implied)
     implied = implied[:config.n_entailed]
 
-    order = stated + implied
+    # AN ENTAILED EDGE GOES AFTER BOTH ITS PREMISES, and this is not tidiness.
+    #
+    # Every model here is causal -- it predicts from what it has already seen.
+    # Shuffling everything together left **only 41% of entailed edges with both
+    # premises earlier**, so 59% of the half that the task exists to measure
+    # were unanswerable by any model at all, and the ceiling sat near 0.53.
+    #
+    # g14-01 measured a backprop attention reference at 0.147 on that version,
+    # BELOW the 0.198 majority floor -- a G0 failure whose largest single cause
+    # was this. A task that cannot be answered is not a hard task.
+    #
+    # The position is random among the slots after the later premise, so
+    # entailed edges do not cluster at the end. They still skew later, which is
+    # unavoidable and harmless: knowing a fact is entailed does not say WHICH
+    # relation it is, so position leaks the split without leaking the answer.
+    # That is the distinction note 027's `reward_recall` leak did not have.
+    order = list(stated)
     rng.shuffle(order)
-    entailed_set = set(implied)
+    for edge, first_premise, second_premise in implied:
+        after = max(order.index(first_premise), order.index(second_premise))
+        order.insert(rng.randint(after + 1, len(order)), edge)
+    entailed_set = {edge for edge, _, _ in implied}
 
     tokens: list[int] = []
     targets: list[int] = []
     entailed_positions: list[int] = []
     for subject, obj, relation in order:
-        at = len(tokens) + RELATION
+        # SCORED AT THE OBJECT, not at the relation.
+        #
+        # Every model here predicts the NEXT token at each position -- the
+        # convention is `targets = tokens[1:]`. Scoring at the relation's own
+        # position asks "what token is here", which any model that can see the
+        # current token answers for free: a causal attention reference reached
+        # **0.904 on STATED relations**, which are drawn at random and appear
+        # once and cannot be predicted at all. That number was the leak, not a
+        # result.
+        #
+        # At the object position the key is `(S, O)` and the question is "what
+        # relation comes next", which is the task. The binding `key(S, O) -> R`
+        # is written one step LATER, so a stated fact is not recallable within
+        # its own sequence -- which is correct and is why the stated half is a
+        # floor rather than a second measurement.
+        at = len(tokens) + OBJECT
         tokens.extend((config.fact_token, subject, obj,
                        config.relation_token(relation)))
-        targets.extend((IGNORE, IGNORE, IGNORE,
-                        config.relation_token(relation)))
+        targets.extend((IGNORE, IGNORE, config.relation_token(relation),
+                        IGNORE))
         if (subject, obj, relation) in entailed_set:
             entailed_positions.append(at)
 

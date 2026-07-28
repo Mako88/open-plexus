@@ -49,7 +49,7 @@ class TheSplitIsSoundAndCovers(unittest.TestCase):
             sequence = generate(config)
             edges = {(s, o): r for s, o, r in sequence.facts}
             for position in sequence.entailed:
-                start = position - RELATION
+                start = position - OBJECT
                 subject = sequence.tokens[start + SUBJECT]
                 obj = sequence.tokens[start + OBJECT]
                 relation = RELATIONS[sequence.targets[position]
@@ -76,38 +76,91 @@ class TheSplitIsSoundAndCovers(unittest.TestCase):
                              "of them can be answered by recall")
 
 
+class EveryEntailedEdgeIsANSWERABLE(unittest.TestCase):
+    """Both premises must appear EARLIER, or no causal model can compose it.
+
+    This is the property g14-01 was built to rest on and nothing tested. The
+    first version of the generator shuffled everything together, which left
+    **41% of entailed edges with both premises earlier** -- so 59% of the half
+    the task exists to measure were unanswerable by any model at all, and the
+    ceiling sat near 0.53.
+
+    A task that cannot be answered is not a hard task, it is a broken one, and
+    the difference is invisible in an accuracy number.
+    """
+
+    def test_both_premises_appear_before_the_entailed_edge(self):
+        checked = 0
+        for seed in range(60):
+            sequence = generate(ClosureConfig(seed=seed))
+            blocks = [(sequence.tokens[start + SUBJECT],
+                       sequence.tokens[start + OBJECT])
+                      for start in range(0, len(sequence.tokens), WIDTH)]
+            place = {pair: index for index, pair in enumerate(blocks)}
+            for position in sequence.entailed:
+                index = position // WIDTH
+                subject, obj = blocks[index]
+                # Some middle person whose two edges both sit earlier.
+                answerable = any(
+                    place.get((subject, middle), 10 ** 6) < index
+                    and place.get((middle, obj), 10 ** 6) < index
+                    for _, middle in blocks)
+                checked += 1
+                self.assertTrue(
+                    answerable,
+                    f"seed {seed}: an entailed edge at block {index} has a "
+                    f"premise appearing LATER, so no causal model can compose "
+                    f"it and it is scored on something unreachable")
+        self.assertGreater(checked, 100, "too few entailed edges to judge")
+
+
 class TheLayOUTGivesNothingAway(unittest.TestCase):
     """Note 027's defect, checked for rather than discovered later."""
 
-    def test_entailed_facts_are_not_at_predictable_positions(self):
-        """If entailed edges clustered at the end, position would be the answer.
+    def test_position_does_not_predict_the_ANSWER(self):
+        """The property that matters, and it is narrower than it first looks.
 
-        `reward_recall` leaked exactly this way -- a constant gap meant the
-        nearest binding before a reward was always the rewarded one, 160/160 --
-        and no mechanism used it only because binding-detection was too weak.
+        **Position DOES predict the split.** An entailed edge is placed after
+        both its premises, so entailed facts sit at a mean relative position of
+        0.80 and 68% of them fall in the last quarter. That is a deliberate,
+        measured trade: shuffling everything together left only **41% of
+        entailed edges answerable at all** by a causal model, and g14-01
+        measured a backprop reference below the majority floor on that version.
+        A task that cannot be answered is not a hard task.
 
-        **Measured as the MEAN relative position, not as a share of the final
-        block.** The first version of this test checked only the last block and
-        a mutation removing the shuffle SURVIVED it: entailed edges are
-        appended, so six of them spread across the last six blocks and only one
-        lands in the final one. A leak that fills the back third is still a
-        leak.
+        What must NOT leak is the ANSWER. Knowing where a fact sits may tell a
+        model to compose rather than recall -- a hint about strategy -- but it
+        must not tell it WHICH relation. Measured: 0.121 against a 0.115
+        majority, a gain of 0.006.
+
+        That is the distinction `reward_recall` did not have. There, position
+        identified the rewarded binding itself, 160 of 160.
         """
-        places = []
+        from collections import Counter, defaultdict
+
+        by_place: dict[float, Counter] = defaultdict(Counter)
         for seed in range(80):
             sequence = generate(ClosureConfig(seed=seed))
             blocks = len(sequence.tokens) // WIDTH
             if blocks < 2:
                 continue
-            for position in sequence.entailed:
-                places.append((position // WIDTH) / (blocks - 1))
-        self.assertGreater(len(places), 100, "too few entailed edges to judge")
-        mean = sum(places) / len(places)
+            for index, start in enumerate(range(0, len(sequence.tokens),
+                                                WIDTH)):
+                target = sequence.targets[start + OBJECT]
+                if target != IGNORE:
+                    by_place[round(index / (blocks - 1) * 4) / 4][target] += 1
+
+        total = sum(sum(c.values()) for c in by_place.values())
+        best = sum(c.most_common(1)[0][1] for c in by_place.values())
+        overall: Counter = Counter()
+        for counts in by_place.values():
+            overall.update(counts)
+        majority = overall.most_common(1)[0][1] / total
         self.assertLess(
-            abs(mean - 0.5), 0.12,
-            f"entailed edges sit at a mean relative position of {mean:.2f} "
-            f"rather than the middle; position predicts the split and the task "
-            f"leaks the way reward_recall did")
+            best / total - majority, 0.05,
+            f"knowing where a fact sits predicts its relation at "
+            f"{best / total:.3f} against a {majority:.3f} majority; position "
+            f"leaks the ANSWER, which is note 027's defect")
 
     def test_every_fact_block_has_the_same_shape(self):
         """A marker, a subject, an object, a relation -- and nothing else that
@@ -132,12 +185,19 @@ class TheObjectPrecedesTheRelation(unittest.TestCase):
     recallable from its subject and relation, which is `kinship.py`.
     """
 
-    def test_the_relation_is_the_last_token_of_its_block(self):
+    def test_the_relation_is_scored_AT_THE_OBJECT_not_at_itself(self):
+        """Every model here predicts the NEXT token, so a target at the
+        relation's own position asks "what token is here" -- which a causal
+        attention reference answered at 0.904 on relations that are drawn at
+        random and cannot be predicted at all. That was a leak, not a result.
+        """
         sequence = generate(ClosureConfig(seed=2))
         for start in range(0, len(sequence.tokens), WIDTH):
-            self.assertEqual(sequence.targets[start + RELATION],
-                             sequence.tokens[start + RELATION])
-            for offset in (0, SUBJECT, OBJECT):
+            self.assertEqual(sequence.targets[start + OBJECT],
+                             sequence.tokens[start + RELATION],
+                             "the target at the object must be the relation "
+                             "that FOLLOWS it")
+            for offset in (0, SUBJECT, RELATION):
                 self.assertEqual(sequence.targets[start + offset], IGNORE)
 
 

@@ -652,6 +652,32 @@ MUTATIONS = [
         new='                    through = np.einsum("gv,vgh->gh", error.sum(0, keepdims=True) + 0*error, self.grouped_wo)',
     ),
     Mutation(
+        name="the-gate-scores-its-own-hop-not-the-next",
+        breaks="the only signal the gate has. Decision 86 separates PAST THE "
+               "END from ON THE CHAIN, which says whether hop k+1 has walked "
+               "off -- not which of two on-chain hops is the answer. Scored by "
+               "its own hop the gate takes depth-1 questions to 1.000 and "
+               "leaves depth-2 at 0.547, so it still beats every fixed hop "
+               "count and still looks like a working mechanism",
+        path=LOCAL,
+        old='                    "gd,kgd->kg", self.halt_w, ahead)',
+        new='                    "gd,kgd->kg", self.halt_w, stack)',
+    ),
+    Mutation(
+        name="the-gate-never-learns",
+        breaks="the gate, leaving it at its zero initialisation -- which is a "
+               "UNIFORM softmax, so the model silently becomes a flat average "
+               "over hops. Measured, that still scores 0.707 on mixed depths "
+               "against 0.500 for either fixed hop count, because the readout "
+               "learns to cope with the blend. A mechanism that does nothing "
+               "and still beats the baseline is the hardest kind to notice",
+        path=LOCAL,
+        old="                    self.halt_w += (\n"
+            "                        self.config.lr * self.config.gate_sharpness",
+        new="                    self.halt_w += (\n"
+            "                        0.0 * self.config.gate_sharpness",
+    ),
+    Mutation(
         name="a-hop-key-escapes-into-the-write-path",
         breaks="the invariant that hops change what is READ and never what is "
                "written, and this is the bug that actually happened. `key` is "

@@ -34,6 +34,7 @@ from openplexus.models.local_memory import (
     LocalAssociativeMemory,
     LocalMemoryConfig,
 )
+from openplexus.tasks.chains import ChainConfig, dataset
 
 
 def config(**overrides):
@@ -62,11 +63,15 @@ class KeyRecorder:
         return self.inner.observe(store, key, value, commitment)
 
 
-def keys_used(model, tokens):
+def keys_used(model, tokens, per_position=None):
     recorder = KeyRecorder(model.retrieval)
     model.retrieval = recorder
     model.run(np.asarray(tokens), learn=False)
     model.retrieval = recorder.inner
+    if per_position is not None:
+        assert len(recorder.keys) == len(tokens) * per_position, (
+            "reads per position is not what the caller assumed, so any index "
+            "computed from it is meaningless")
     return recorder.keys
 
 
@@ -253,6 +258,145 @@ class TheDecodeIsActuallySharpened(unittest.TestCase):
             model.grouped_wo *= scale
             keys.append(keys_used(model, TOKENS)[1])
         np.testing.assert_allclose(keys[0], keys[1], atol=1e-8)
+
+
+class TheGateChoosesWhichHopToRead(unittest.TestCase):
+    """A fixed `hops` must match the question exactly (decision 85), so the gate
+    learns which hop to read from instead. Decision 86 measured that the signal
+    is in the CONTENT, not confidence.
+
+    Both of the gate's defects are asserted here because both produced a
+    plausible number rather than an error: an inert gate scored 0.707 on mixed
+    depths by letting the readout cope with a flat average, and a gate scored by
+    its OWN hop rather than the next one scored 0.773 by solving depth-1
+    perfectly and depth-2 not at all.
+    """
+
+    def test_the_gate_needs_more_than_one_hop_to_choose_between(self):
+        with self.assertRaises(ValueError):
+            config(halt_gate=True, hops=1)
+
+    def test_the_gate_is_refused_with_a_hidden_layer(self):
+        """The gate mixes RETRIEVALS, which equals mixing predictions only
+        through a linear readout. Through a relu the two differ and the
+        gradient would be quietly wrong -- so it is refused rather than
+        approximated."""
+        with self.assertRaises(ValueError):
+            config(halt_gate=True, hops=2, hidden=8)
+
+    def test_gating_reads_one_hop_further_than_it_reports(self):
+        """**The lookahead.** Hop k is scored by what hop k+1 returns, so a
+        `hops=k` gated model performs k+1 retrievals. Without the extra read the
+        last hop has nothing scoring it."""
+        for hops in (2, 3):
+            gated = LocalAssociativeMemory(config(hops=hops, halt_gate=True))
+            plain = LocalAssociativeMemory(config(hops=hops))
+            with self.subTest(hops=hops):
+                self.assertEqual(len(keys_used(gated, TOKENS, hops + 1)),
+                                 len(TOKENS) * (hops + 1))
+                self.assertEqual(len(keys_used(plain, TOKENS, hops)),
+                                 len(TOKENS) * hops)
+
+    def test_a_zero_gain_gate_is_a_flat_average(self):
+        """The control that makes the gate's result a claim. Gain 0 is a uniform
+        softmax however well the vector has learned, so the model must equal a
+        plain mean over hops -- which is what the gate was accidentally doing
+        before the gain existed."""
+        model = LocalAssociativeMemory(
+            config(hops=2, halt_gate=True, gate_sharpness=0.0))
+        model.wo[:] = model.wv
+        model.halt_w += 5.0  # would dominate any softmax that read it
+        gated = np.asarray(model.run(np.asarray(TOKENS), learn=False))
+
+        same = LocalAssociativeMemory(
+            config(hops=2, halt_gate=True, gate_sharpness=0.0))
+        same.wo[:] = same.wv
+        np.testing.assert_array_equal(
+            gated, np.asarray(same.run(np.asarray(TOKENS), learn=False)))
+
+    def test_the_gate_solves_depths_a_fixed_hop_count_cannot(self):
+        """**The test the structural ones could not replace.**
+
+        Everything else here asserts shape -- read counts, refusals, a zero-gain
+        control -- and two mutations survived all of it:
+        `the-gate-scores-its-own-hop-not-the-next` and `the-gate-never-learns`.
+        Both leave a model that still beats every fixed hop count (0.773 and
+        0.707 against 0.500) while doing the wrong thing or nothing at all.
+
+        So this trains on MIXED depths, where a fixed count must fail by
+        construction, and asserts the half that both defects give up on. Depth 2
+        is the discriminating number: a working gate reaches 1.000, an
+        own-hop-scored gate 0.547, an unlearned gate 0.553.
+        """
+        depths = (1, 2)
+        n_chains, n_symbols, seq_len = 4, 48, 48
+        vocab = ChainConfig(n_chains=n_chains, hops=1, n_symbols=n_symbols,
+                            seq_len=seq_len).vocab_size
+
+        def examples(seed, count):
+            out = []
+            for depth in depths:
+                out.extend((depth, s) for s in dataset(ChainConfig(
+                    n_chains=n_chains, hops=depth, n_symbols=n_symbols,
+                    seq_len=seq_len, seed=seed + depth * 7919), count))
+            np.random.default_rng(seed).shuffle(out)
+            return out
+
+        model = LocalAssociativeMemory(LocalMemoryConfig(
+            vocab_size=vocab, d_model=64, lr=0.05, key_scale=0.5, decay=0.997,
+            derived_keys=True, memory_cap=5.0, hops=2, hop_sharpness=6.0,
+            halt_gate=True, gate_sharpness=200.0, seed=1))
+        model.wo[:] = model.wv
+        for _ in range(2):
+            for _, s in examples(1, 150):
+                targets = np.asarray(s.targets)
+                scored = targets != -1
+                model.run(np.asarray(s.tokens),
+                          np.where(scored, targets, 0), scored, learn=True)
+
+        right = {d: 0 for d in depths}
+        total = {d: 0 for d in depths}
+        for depth, s in examples(10_001, 40):
+            predicted = int(np.asarray(
+                model.run(np.asarray(s.tokens), learn=False))[
+                    s.answer_position])
+            total[depth] += 1
+            right[depth] += int(predicted == s.asked[-1])
+
+        for depth in depths:
+            with self.subTest(depth=depth):
+                # A fixed hop count gets one of these two and 0.000 on the
+                # other; both gate defects land near 0.55 on depth 2.
+                self.assertGreater(right[depth] / total[depth], 0.85)
+
+    def test_the_gate_does_not_touch_the_store(self):
+        """The same invariant the hop loop broke, now for the extra lookahead
+        read: gating adds a retrieval and must still write nothing new."""
+        written = {}
+        for gate in (False, True):
+            model = LocalAssociativeMemory(config(hops=2, halt_gate=gate))
+            model.wo[:] = model.wv
+            keys = []
+            inner = model.retrieval
+
+            class Watch:
+                def begin(self, width):
+                    return inner.begin(width)
+
+                def read(self, readable, key):
+                    return inner.read(readable, key)
+
+                def observe(self, store, key, value, commitment):
+                    keys.append(np.array(key))
+                    return inner.observe(store, key, value, commitment)
+
+            model.retrieval = Watch()
+            model.run(np.asarray(TOKENS), learn=False)
+            written[gate] = keys
+
+        self.assertEqual(len(written[True]), len(written[False]))
+        for off, on in zip(written[False], written[True]):
+            np.testing.assert_allclose(off, on, atol=1e-12)
 
 
 class ImpossibleSettingsAreRefused(unittest.TestCase):

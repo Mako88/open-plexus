@@ -846,6 +846,27 @@ class LocalMemoryConfig:
     #: ``"encoder"`` uses the transpose of the frozen `Wv`; ``"readout"`` reuses
     #: the learned `Wo`. Only read when `hops > 1`.
     hop_decoder: str = "encoder"
+
+    #: Learn WHICH hop to read from, instead of always reading the last one.
+    #:
+    #: With this off, `hops` is an exact depth and must match the question --
+    #: overshoot scores 0.000 in every direction (decision 85). With it on,
+    #: `hops` is a MAXIMUM and each group learns a linear score over its own
+    #: slice of each hop, softmaxed across hops. Adds one vector per group.
+    #:
+    #: Refused together with `hidden`: mixing retrievals and mixing predictions
+    #: are the same thing only through a linear readout.
+    halt_gate: bool = False
+
+    #: Gain on the gate's scores before the softmax over hops.
+    #:
+    #: Without it the gate is INERT: the learned vector stays far smaller than
+    #: the retrievals it scores, so the softmax is a flat average and the
+    #: readout simply learns to live with the blend. Measured at gain 1, the
+    #: gate put 0.5020 on hop 1 for depth-1 questions and 0.5000 for depth-2 --
+    #: the right direction, and 0.2% of the way there. Only read when
+    #: `halt_gate` is on.
+    gate_sharpness: float = 1.0
     cache_slots: int = 0
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
@@ -865,6 +886,15 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if self.halt_gate and self.hops < 2:
+            raise ValueError(
+                "halt_gate chooses among hops and there is nothing to choose "
+                "with hops=1; set hops to the MAXIMUM depth to consider")
+        if self.halt_gate and self.hidden:
+            raise ValueError(
+                "halt_gate mixes RETRIEVALS, which equals mixing predictions "
+                "only through a linear readout; with a hidden layer the two "
+                "differ and the gate's gradient would be quietly wrong")
         if self.hop_decoder not in ("encoder", "readout"):
             raise ValueError(
                 "hop_decoder must be 'encoder' or 'readout', not "
@@ -1105,6 +1135,12 @@ class LocalAssociativeMemory:
             self.wo = np.zeros((v, config.partitions * config.hidden))
         self.grouped_wo = self.wo.reshape(v, config.partitions, -1)
         assert self.grouped_wo.base is self.wo, "grouped_wo must alias wo"
+        #: Per-group score for "read from this hop", or None when the gate is
+        #: off. ZERO-initialised on purpose: a zero score is a uniform softmax,
+        #: so the gate starts as a plain average over hops and every hop gets
+        #: gradient. Random init would pick a hop before seeing any data.
+        self.halt_w = (np.zeros((config.partitions, d // config.partitions))
+                       if config.halt_gate else None)
         #: Held-back readout updates, when `orthogonal_every` is on.
         self.pending_update = np.zeros_like(self.grouped_wo)
         self.since_orthogonal = 0
@@ -1732,7 +1768,13 @@ class LocalAssociativeMemory:
             # destroyed the 1-hop case that already worked. Same shadowing class
             # as `store` above, and just as quiet.
             hop_key = key
-            for _ in range(self.config.hops - 1):
+            # Only collected when the gate is on, so the ungated path allocates
+            # nothing and stays bit-identical to what every earlier result used.
+            per_hop = [retrieved] if self.halt_w is not None else None
+            # One EXTRA retrieval when gating: the gate scores hop k by what hop
+            # k+1 returns, so the last readable hop still needs a lookahead.
+            extra = 1 if self.halt_w is not None else 0
+            for _ in range(self.config.hops - 1 + extra):
                 # DECODE AND RE-ENCODE, which is how a retrieval becomes a key.
                 #
                 # `retrieved` lives in VALUE space and keys live in KEY space:
@@ -1800,7 +1842,71 @@ class LocalAssociativeMemory:
                 # between the two, and high enough approaches argmax.
                 hop_key = weights @ self.wk
                 retrieved = self.retrieval.read(readable, hop_key)
-            sliced = retrieved.reshape(groups, -1)
+                if per_hop is not None:
+                    per_hop.append(retrieved)
+
+            # WHICH HOP TO READ FROM, decided per group from its own slice.
+            #
+            # A fixed `hops` has to match the question exactly -- decision 85
+            # measured overshoot at 0.000 in every direction -- so a model that
+            # does not know how deep a question is cannot use one. Decision 86
+            # measured where the signal to decide lives: NOT in confidence,
+            # which does not separate at all (every d' <= 1.01, and the model is
+            # 0.94-confident after walking off the end), but in the CONTENT --
+            # the first hop past the end lands on a structural marker 100% of
+            # the time and an on-chain hop never does.
+            #
+            # So the gate is a LINEAR score on the retrieval, which is the shape
+            # that measurement says is available, and a SOFTMAX over hops rather
+            # than a stopping rule. A mixture is differentiable, so the gate
+            # trains from the readout's own error and needs no halting label --
+            # and there is none to be had, because the depth of a question is
+            # not written anywhere in it.
+            #
+            # Mixing the RETRIEVALS, not the predictions. For a linear readout
+            # those are the same thing, since `Wo @ sum(g_k r_k)` is
+            # `sum(g_k Wo @ r_k)`, and mixing the inputs leaves every line below
+            # untouched. They are NOT the same through a hidden layer, which is
+            # why the two are refused together rather than silently averaged.
+            #
+            # Per group, and the softmax is per group too: group g scores its
+            # own slice of each hop and weighs its own hops. Nothing crosses a
+            # group, and groups may disagree because the answer sums over them.
+            if per_hop is None:
+                sliced = retrieved.reshape(groups, -1)
+            else:
+                # GAIN, because the first version of this gate was INERT.
+                # Measured: the learned vector reached norm 0.089 against
+                # retrieval slices of ~0.13, so scores were ~0.01 and a 2-way
+                # softmax over them put 0.5020 on hop 1 for depth-1 questions
+                # and 0.5000 for depth-2. The direction was right and the
+                # magnitude was 0.2%. Same shape as the unsharpened hop decode:
+                # a correct signal flattened into a uniform average.
+                #
+                # Applied to the gradient as well, a few lines down, or the
+                # chain rule is wrong and the gate learns at the wrong rate.
+                # HOP k IS SCORED BY WHAT HOP k+1 RETURNS, which is the only
+                # thing the signal actually supports.
+                #
+                # Scoring hop k by its own content was measured and is only half
+                # a mechanism: it took depth-1 questions to 1.000 and left
+                # depth-2 at 0.547. Decision 86's signal separates PAST THE END
+                # from ON THE CHAIN, and for a depth-2 question hop 1 is `b` and
+                # hop 2 is `c` -- both on the chain, both chain symbols, nothing
+                # to tell them apart by. The gate split them and averaged.
+                #
+                # What the signal does support is "the last hop before the first
+                # marker". So hop k is weighed by hop k+1: if the NEXT retrieval
+                # has walked off the end, this one is the answer. Still one
+                # linear score on one retrieval, still inside a group.
+                ahead = np.stack([r.reshape(groups, -1) for r in per_hop[1:]])
+                stack = np.stack([r.reshape(groups, -1) for r in per_hop[:-1]])
+                scores = self.config.gate_sharpness * np.einsum(
+                    "gd,kgd->kg", self.halt_w, ahead)
+                scores = scores - scores.max(axis=0, keepdims=True)
+                gate = np.exp(scores)
+                gate /= gate.sum(axis=0, keepdims=True)
+                sliced = np.einsum("kg,kgd->gd", gate, stack)
             if self.hidden_w is None:
                 parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)
             else:
@@ -1808,6 +1914,28 @@ class LocalAssociativeMemory:
                 active = np.maximum(
                     0.0, np.einsum("ghd,gd->gh", self.hidden_w, sliced))
                 parts = np.einsum("vgh,gh->gv", self.grouped_wo, active)
+            # WHICH HOP TO READ FROM, decided per group from its own slice.
+            #
+            # A fixed `hops` has to match the question exactly: decision 85
+            # measured overshoot at 0.000 in every direction, so a model that
+            # does not know how deep a question is cannot use one. Decision 86
+            # measured where the signal to decide is: NOT in confidence, which
+            # does not separate at all (every d' <= 1.01, and the model is
+            # 0.94-confident after walking off the end), but in the CONTENT --
+            # the first hop past the end lands on a structural marker 100% of
+            # the time and an on-chain hop never does.
+            #
+            # So the gate is a linear score on the retrieval, which is exactly
+            # the shape that measurement says is available, and a SOFTMAX over
+            # hops rather than a stopping rule: a mixture is differentiable, so
+            # the gate trains from the readout's own error with no halting
+            # label, and there is no label to be had -- the depth of a question
+            # is not marked anywhere in it.
+            #
+            # PER GROUP, and the softmax is per group too, so group g scores
+            # group g's slice of each hop and weighs its own hops. Nothing
+            # crosses a group, and groups are free to disagree because the
+            # answer sums over them anyway.
             answer = parts.sum(0) if members is None else parts[members].sum(0)
             if self.config.readout_bias:
                 answer = answer + self.bias
@@ -1820,6 +1948,34 @@ class LocalAssociativeMemory:
                 # this is the plain delta rule; with more, no group's update
                 # reads any other group's activity, which is the whole point.
                 error = target - parts
+                if self.halt_w is not None:
+                    # THE GATE LEARNS FROM THE READOUT'S OWN ERROR.
+                    #
+                    # `sliced` is the gate-weighted mixture, so the error
+                    # reaches the gate through it: carry the error back to the
+                    # mixture, ask each hop how much it agrees with that
+                    # direction, and the softmax derivative turns those into a
+                    # score update. A hop that points where the error wants to
+                    # go gains weight and the rest lose it.
+                    #
+                    # Every term is group g's own: its error, its readout
+                    # columns, its slice of each hop. No group reads another's,
+                    # which is the same argument the hidden layer's gradient
+                    # makes one layer down.
+                    # `agree` asks how much each hop's READ points where the
+                    # error wants to go; the update lands on `ahead`, because
+                    # that is what the score was computed from. Mixing the two
+                    # up would train the gate on the wrong vector and still
+                    # descend, which is the kind of wrong that produces a curve.
+                    back = np.einsum("gv,vgd->gd", error, self.grouped_wo)
+                    agree = np.einsum("gd,kgd->kg", back, stack)
+                    self.halt_w += (
+                        self.config.lr * self.config.gate_sharpness
+                        * np.einsum(
+                            "kg,kgd->gd",
+                            gate * (agree
+                                    - (gate * agree).sum(0, keepdims=True)),
+                            ahead))
                 if self.hidden_w is None:
                     update = np.einsum("gv,gd->vgd", error, sliced)
                 else:

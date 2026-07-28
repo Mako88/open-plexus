@@ -4222,3 +4222,68 @@ task whose terminator was never designed in.
 
 Recorded before building, because the gate's own result will be much harder to
 read once the mechanism can move the number.
+
+## 87. The gate learns which hop to read, and mixed depths go to 1.000
+
+Questions of depth 1 and depth 2 shuffled together, nothing marking which is
+which. **A fixed hop count must fail half of them by construction**, and that is
+what makes the gate's number readable:
+
+    model                overall   depth 1   depth 2
+    fixed hops=1           0.500     1.000     0.000
+    fixed hops=2           0.507     0.013     1.000
+    GATE gain=1            0.720     0.887     0.553
+    GATE gain=10           0.987     1.000     0.973
+    GATE gain=50           1.000     1.000     1.000
+    GATE gain=200          1.000     1.000     1.000
+    GATE gain=1000         1.000     1.000     1.000
+
+**1.000 on both depths**, from a single learned vector per group, stable across
+a 20× range of gain. The model answers questions whose depth it is not told,
+which is the limitation decision 85 ended on.
+
+### Two defects, each of which looked like a working mechanism
+
+**The gate was inert.** The learned vector reached norm 0.089 against retrieval
+slices of ~0.13, so the scores were ~0.01 and a two-way softmax over them is a
+flat average. Measured directly: weight on hop 1 was **0.5020** for depth-1
+questions and **0.5000** for depth-2 — the right direction, and 0.2% of the way
+there. It still scored **0.707**, beating both fixed models, because the readout
+learned to cope with a fixed blend. Same shape as the unsharpened hop decode:
+a correct signal flattened into uniformity.
+
+**The gate was scoring the wrong hop.** With gain it reached 0.773 — depth 1 at
+1.000 and depth 2 at 0.547 — and that split is the diagnosis. Decision 86's
+signal separates *past the end* from *on the chain*. For a depth-1 question hop
+2 is the separator, so the gate can reject it. For a depth-2 question hop 1 is
+`b` and hop 2 is `c`, **both on the chain, both chain symbols**, and the gate has
+nothing to tell them apart by. It split them and averaged.
+
+The rule the signal actually supports is *the last hop before the first marker*,
+so **hop k is scored by what hop k+1 returns**. One extra lookahead retrieval,
+same linear score, still inside a group. That is the change from 0.773 to 1.000.
+
+### What the mutation harness caught that the tests did not
+
+The first test pass asserted read counts, refusals, a zero-gain control and
+store invariance — and **both mutations survived all of it**. Every structural
+property held while the mechanism did the wrong thing.
+
+They survived because each defect leaves a model that still beats the baseline:
+0.707 and 0.773 against 0.500. **A mechanism that does nothing and still beats
+the baseline is the hardest kind to notice**, and structural tests cannot see
+it. `test_the_gate_solves_depths_a_fixed_hop_count_cannot` trains on mixed
+depths and asserts the depth-2 half, which is where both defects give up
+(0.553 and 0.547 against 1.000). Both are caught now.
+
+### What this does NOT license
+
+The gate is trained and tested on the **same terminator**. Decision 86 already
+recorded that this task lays down its own structural markers, and the gate has
+now learned this task's terminal class — not a general one. **The first real
+test is a task whose terminator was never designed in.**
+
+`hops` is still a ceiling: the gate chooses among hops 1..k and cannot choose a
+depth beyond k. Nothing here tests depth 3 mixed with depth 1, and the lookahead
+means a `hops=k` gated model pays k+1 retrievals — the cost of not knowing the
+depth, which is one extra hop over knowing it.

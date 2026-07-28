@@ -4167,3 +4167,58 @@ both failure directions are measured and the ceiling at every depth is 1.000.
 The separator finding in decision 84 stands on its own: it was measured at
 `hops=1`, on an uncorrupted store, and took the lookup from 54% to 100%. Both
 fixes were needed and neither would have been enough alone.
+
+## 86. A halting signal exists, and it is not confidence
+
+Overshoot is total, so the model must decide when to stop hopping. Before
+designing a mechanism, the question is whether the information to do it is
+present locally at all. Four candidates, each computable by one node from its
+own slice with no barrier, measured on a depth-2 chain and split into hops still
+ON the chain and the hop that has walked PAST the end:
+
+     signal    on chain (k<d)    past end (k>d)   separated?
+       peak    1.0000 ±0.000      0.9357 ±0.136    no  d=0.67
+     spread    0.0123 ±0.003      0.0171 ±0.006    no  d=0.95
+       norm    0.1323 ±0.027      0.1849 ±0.069  weak  d=1.01
+        gap    3.1119 ±0.705      2.1462 ±1.369    no  d=0.89
+
+**Confidence says nothing.** Every d′ is at or below 1.01, and the model is
+0.94-confident *after* it has walked off the end.
+
+That is not a quirk. Past the end, `key(c) → value(separator)` is a **real
+binding** — the store has a genuine answer for that query, so the decode is
+sharp and correct. The model is confidently answering a question nobody asked,
+which is why overshoot scored a clean 0.000 rather than something noisy. **A
+confident retrieval is not evidence that the retrieval was wanted.**
+
+### What does separate is the CONTENT
+
+    hop 1: asked[1] 100%
+    hop 2: asked[2] 100%                        <- the answer
+    hop 3: SEPARATOR 73%, QUERY 27%             <- past end
+    hop 4: other chain symbol 55%, asked[0] 45%
+
+The first hop past the end lands on a **structural marker 100% of the time**,
+and an on-chain hop never does. The two classes are perfectly separable by what
+is retrieved, while being inseparable by how strongly it is retrieved.
+
+### What this licenses
+
+A halting gate is worth building, and it is a **linear function of the
+retrieval** — a per-group vector scoring "does this look terminal", which stays
+inside a group and adds one vector per group rather than a matrix. The gate does
+not need to be told which token is the separator; it needs to learn that some
+retrievals mean *stop*, and the measurement says that class is linearly
+available.
+
+### What it does NOT license
+
+**That this generalises is untested.** Structural markers exist here because the
+task lays them down, and the honest general claim is narrower: *a chain ends at
+something structurally different from its links*, which is true of prose
+punctuation and of record delimiters but is not proven for either. A gate
+trained here learns this task's terminal class, and the first real test is a
+task whose terminator was never designed in.
+
+Recorded before building, because the gate's own result will be much harder to
+read once the mechanism can move the number.

@@ -1240,3 +1240,47 @@ invalidated.
 Not urgent — the current version is correct, just slow. It is worth doing before
 the rule gets skipped for being expensive, which is how a standard stops being
 one.
+
+---
+
+## Three gaps John found by asking, 2026-07-27
+
+### 1. The Docker testbed is built, validated, and not in CI
+
+`testbed/` stands up a driver and N nodes in containers with `tc netem` on the
+link. [Note 014](docs/notes/014-the-first-real-packets.md) validated it: four
+nodes over 80 ms ± 20 ms losing 2% of packets, **bit-identical to the
+single-process model**. Its own docstring says it runs on Actions runners and
+was verified there.
+
+**No workflow runs it.** It was built, proved once, and never wired up — so
+every distributed claim since rests on a harness nobody re-runs, and a
+regression in `distributed.py` or `transport.py` would surface only when someone
+next ran it by hand.
+
+The fix is a dispatch-only workflow asserting note 014's identity. **Add churn to
+it** — kill a container mid-run — because C3 says departure is the normal case
+and it is the one thing the single-process model cannot honestly simulate.
+
+### 2. Keys need the conformance suite retrieval now has
+
+`tests/test_retrieval_conformance.py` runs the shared contract over every
+strategy and includes a deliberately-broken one asserted to FAIL, because a
+conformance suite that passes everything proves nothing.
+
+`KeySource` has only part of this: `TheStockSourcesHonourTheSeam` checks the
+protocol and purity across both implementations, and has no shape check, no
+"does not mutate its input" check, and nothing proving the suite bites. It should
+be brought to the same standard **before the combinatorial sweep**, since a
+broken implementation inside a grid does not announce itself — it produces a
+number, the number goes in a table, and the table is read.
+
+### 3. A recurring simplification pass, with thresholds rather than intentions
+
+`run()` is 526 lines with 46 branch points. `LocalMemoryConfig` carries 34
+fields. `check_duplication.py` catches copies and nothing catches accumulation.
+
+Proposed as a CLAUDE.md rule rather than a one-off: **when a file crosses a size
+or branch threshold, the next change to it either reduces that or says why not.**
+A threshold fires without anyone deciding to look, which is the property rule 17
+already relies on for the verify/build alternation.

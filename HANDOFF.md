@@ -60,14 +60,41 @@ working memory, so `Wo` is the only thing persisting across the corpus, and one
 linear map converges fast. More data cannot help a model whose only durable
 parameter has already converged.
 
-### SO THE TARGET IS PERSISTENT LEARNABLE CAPACITY
+### AND PERSISTENT CAPACITY IS NOT IT EITHER (decision 114)
 
-Same target decisions 93 and 94 reached from the other side: `Wv`/`Wk` frozen
-random, `Wo` one linear map, and `value_lr` collapses the representation rather
-than organising it.
+That was decision 113's conclusion and it did not survive its own first test.
 
-**Make something other than one linear map learn across sequences, without
-collapsing it.** Every thread now points there.
+    chars      frozen Wv   value_lr   value_lr+centre
+     4,000         6.163      6.144            6.152
+    16,000         6.094      6.061            6.073
+    64,000         6.072      6.065            6.080
+
+    value vectors after 64k chars:  cosine 0.003 (was -0.003), |ΔWv| 6.34
+
+**`value_lr` does not collapse at a sane rate** — decision 94 measured collapse
+at 0.05; this is 0.002 and the cosine does not move. So 94 was a statement about
+a learning RATE, not the mechanism, and `value_centre` fixes a problem that does
+not exist here.
+
+**The values move a long way, stay spread out, and the plateau does not budge.**
+
+### THREE CAPACITY EXPLANATIONS NOW ELIMINATED
+
+    store capacity                    decision 109
+    readout capacity                  decision 110
+    persistent representation         decision 114
+
+**The data plateau is not a capacity limit of any component measured so far.**
+
+What is left unexamined is the **shape** of what the store can represent rather
+than how much. Note 035 claims the store holds a bigram count table of effective
+rank ~3 whatever the width — a claim about shape, never re-checked, and the kind
+of thing that would explain a plateau no capacity touches.
+
+> Sobering cross-check for whoever picks this up: a bigram scores **3.583** on
+> Tiny Shakespeare and this model scores **5.494**. We are well short of a
+> bigram, so "the ceiling is bigram-shaped" does not yet explain the level —
+> only, possibly, the flatness.
 
 ---
 

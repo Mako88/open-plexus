@@ -5893,3 +5893,67 @@ phenomenon, and the rule it added was to probe cheaply before fitting an
 exponent. This is the same failure one level up — **a hypothesis whose premise
 was not checked against the record it cited.** Reading the source cost ten
 minutes; the sweep would have cost twelve jobs and answered nothing.
+
+## 114. `value_lr` does not collapse at a sane rate — it works, and it does not help
+
+Decision 113 concluded the target was persistent learnable capacity, because
+`Wo` is the only thing that persists and one linear map converges at 16,000
+characters. `value_lr` makes `Wv` persist too, and decision 94 said it collapsed
+the representation. So `value_centre` was built to remove the shared drift.
+
+Both halves of that turn out to be wrong.
+
+### There is no collapse to fix
+
+After 64,000 characters, width 64:
+
+    arm                  cosine     was     norm     was    |ΔWv|
+    frozen               -0.003  -0.003    0.499   0.499     0.00
+    value_lr              0.003  -0.003    0.718   0.499     6.34
+    value_lr + centre     0.007  -0.003    0.725   0.499     6.37
+
+**The values move a long way and stay spread out.** Decision 94 measured collapse
+at `value_lr=0.05`; this is 0.002, twenty-five times smaller, and the cosine does
+not move. So **decision 94's finding is a statement about a learning RATE, not
+about the mechanism** — and `value_centre` is a fix for a problem that does not
+exist in this range. It is kept, refused without `value_lr`, and unused.
+
+### And the mechanism works without helping
+
+    chars      frozen Wv   value_lr   value_lr+centre
+     4,000         6.163      6.144            6.152
+     8,000         6.100      6.027            6.033
+    16,000         6.094      6.061            6.073
+    32,000         6.058      6.059            6.085
+    64,000         6.072      6.065            6.080
+
+All three flatten together. Making `Wv` learnable — well-behaved, moving
+substantially, not collapsing — **does not break the plateau at all**.
+
+So decision 113's conclusion does not survive its own first test. Persistent
+learnable capacity was added and the data axis did not move, which means the
+plateau is not explained by "only one linear map learns".
+
+### What this licenses
+
+Not much, and saying so is the point. Three explanations for the data plateau
+have now been eliminated: store capacity (109), readout capacity (110), and
+persistent representation capacity (here). **The plateau is not a capacity limit
+of any component measured so far.**
+
+What remains unexamined is the *shape* of what the store can represent rather
+than how much. Note 035's claim — that the store holds a bigram count table of
+effective rank about 3 whatever the width — is a statement about shape, has
+never been re-checked, and would explain a plateau that no amount of capacity
+touches.
+
+### What it does NOT license
+
+Comparing these bits to decision 63's. This ran on the project's own notes and
+reads 6.09 where decision 63 reads 5.53 on its corpus. **Only the within-run
+comparison of the three arms is a measurement here**, and the plateau's shape —
+flat after ~16,000 — is what reproduces, not the level.
+
+Nor does it license removing `value_lr`. It is correct, it is cheap, and the
+finding is that it does not pay *on this axis* — a task where representation
+sharing matters is untested.

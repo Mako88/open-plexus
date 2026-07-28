@@ -810,6 +810,19 @@ class LocalMemoryConfig:
     #: characters moves is the measurement that separates decision 59's
     #: explanation from decision 62's.
     value_lr: float = 0.0
+
+    #: Subtract the mean value vector after each `value_lr` update.
+    #:
+    #: `value_lr` is the correct gradient and it still collapses the
+    #: representation rather than organising it (decision 94): every target
+    #: moves toward a direction `Wo` chooses, so they all move the same way, and
+    #: at `value_lr=0.05` the cosine among ordinary tokens reached 0.382 while
+    #: accuracy fell to 0.025.
+    #:
+    #: Centring removes the component every value shares, which is what drift
+    #: accumulates. It does not prevent two tokens converging for a reason —
+    #: that is the representation learning this exists for.
+    value_centre: bool = False
     #: Keep the store between `run` calls instead of resetting it.
     #:
     #: Correct only when consecutive calls are consecutive TEXT. On the recall
@@ -1015,6 +1028,10 @@ class LocalMemoryConfig:
                 "orthogonal_every orthogonalises the readout update, which is "
                 "shaped by the LINEAR readout; it has no meaning across two "
                 "layers and would silently orthogonalise the wrong matrix")
+        if self.value_centre and not self.value_lr:
+            raise ValueError(
+                "value_centre re-centres what value_lr moves and does nothing "
+                "without it; Wv is frozen otherwise")
         if self.value_lr < 0.0:
             raise ValueError("value_lr is a learning rate and cannot be "
                              "negative; 0 leaves the projection frozen")
@@ -2223,6 +2240,22 @@ class LocalAssociativeMemory:
                     self.wv[targets[t]] += self.config.value_lr * np.einsum(
                         "gv,vgd->gd", target - parts,
                         self.grouped_wo).reshape(-1) * alive
+                    if self.config.value_centre:
+                        # REMOVE THE SHARED DRIFT. The update above is the right
+                        # gradient and it still collapses (decision 94): `Wv`
+                        # and `Wo` co-adapt with nothing holding the values
+                        # apart, and every target moves toward a direction `Wo`
+                        # picks -- so they all move the SAME way. Measured, the
+                        # collapse is directional, not magnitude: cosine among
+                        # ordinary tokens rose to 0.382 while accuracy fell to
+                        # 0.025.
+                        #
+                        # Centring subtracts whatever the value vectors have in
+                        # common, which is exactly the component that drift
+                        # accumulates. It cannot stop two tokens converging for
+                        # a REASON -- that is the representation learning this
+                        # is for -- it only removes the part every token shares.
+                        self.wv -= self.wv.mean(axis=0)
                 if self.config.orthogonal_every:
                     # Hold the update back and orthogonalise a batch of them.
                     # See `orthogonal_every`: the point is the RANK of what gets

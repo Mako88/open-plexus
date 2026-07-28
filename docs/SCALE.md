@@ -80,3 +80,14 @@ Two rules that keep it honest:
 | **Measured at** | sequences ≤ 200 tokens, width ≤ 128 |
 | **Why it may not travel** | The cap bounds total stored magnitude, so the number of bindings it can hold before old ones are crowded out scales with width but the cap does not |
 | **Trigger to revisit** | Sequences long enough that early bindings are unreadable by the end — testable directly by querying the first binding at the last position |
+
+## Raw store capacity, uncapped (decision 109)
+
+| | |
+|---|---|
+| **Measured** | Bindings recoverable at 90%, writing outer products directly with **no decay and no cap** |
+| **The finding** | width 32 → 16 bindings; width 64 → 96; width 128 → 384. Roughly **d²**, quadrupling as width doubles |
+| **What it settles** | The store is **not** the saturation bottleneck at the sizes used — tasks here write 10–30 bindings against a width-64 ceiling of ~96 |
+| **Why it may not travel** | This is the ceiling *without* the model's own write path. `decay` and `memory_cap` both reduce it and neither was active |
+| **Trigger to revisit** | Any task writing more than ~1 binding per dimension, or any use of the capped/decayed path at scale |
+| **Measure it properly by** | Re-running the same sweep through `model.run` rather than direct outer products |

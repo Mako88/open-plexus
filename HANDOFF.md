@@ -108,6 +108,34 @@ GPT-2-large scale, *not* frontier scale. Frontier needs ~65k nodes at width 1M.
 So "the reduction is affordable" holds for the regime tested and is
 extrapolation outside it.
 
+## SATURATION: the store is NOT the bottleneck (decision 109)
+
+Decision 63 — more data and more width both buy nothing — is the oldest
+unresolved result here and it undercuts the distributed premise. One of its
+three candidate causes is now eliminated.
+
+    bindings held at 90% recovery, no learning, no task
+      width  32     16     0.50 per dimension
+      width  64     96     1.50 per dimension
+      width 128    384     3.00 per dimension
+
+**Capacity scales roughly with d²**, and at width 64 the store holds ~96
+bindings where this project's tasks write 10–30. **Nowhere near the ceiling.**
+
+So the search narrows to what is left, neither of which has been tested:
+
+- **The single linear readout.** `Wo` is the only thing learning across
+  sequences; one linear map has a ceiling whatever the store does.
+- **Frozen random representations** (93), which `value_lr` failed to fix (94).
+
+> The first version of this probe concluded the OPPOSITE — that capacity
+> plateaus — because it sampled keys with replacement and wrote contradictory
+> bindings. The tell was widths 128 and 256 agreeing to three decimals across
+> four loads: an exact tie across a doubling is a bug, not a finding.
+
+Also settles a cross-reference: kinship's 0.915 at out-degree 1 is **not**
+capacity, since ten facts is an order of magnitude below the ceiling.
+
 ## READ THIS FIRST (decision 103)
 
 **The store cannot hold an entity that appears in two facts.**

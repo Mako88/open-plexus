@@ -5584,3 +5584,71 @@ question, not a measurement.
 
 Nor does it excuse the per-step fidelity at out-degree 1 — 0.915, not 1.000 —
 which is still short and is still the capacity question decision 107 pointed at.
+
+## 109. The store is not the saturation bottleneck — capacity scales with d²
+
+Decision 63 is the oldest unresolved result here: more data does not help and
+more width does not help. It undercuts the distributed premise directly, since
+the argument for many nodes is that more nodes means more capability.
+
+Measured at the substrate, with no learning and no task: write N random
+`(key, value)` bindings into a width-`d` store, retrieve each key, decode by
+nearest value.
+
+    width      8      16      32      64     128     256
+       16  0.500   0.276   0.174   0.057   0.029   0.012
+       32  0.979   0.901   0.750   0.461   0.212   0.086
+       64  1.000   1.000   0.997   0.987   0.873   0.568
+      128  1.000   1.000   1.000   1.000   0.999   0.997
+      256  1.000   1.000   1.000   1.000   1.000   1.000
+
+    bindings held at 90% recovery
+      width  32     16     0.50 per dimension
+      width  64     96     1.50 per dimension
+      width 128    384     3.00 per dimension
+
+**Capacity scales roughly with d², not linearly** — quadrupling as width
+doubles. (Width 256 reads 384 only because the sweep stopped there; it was at
+1.000 throughout, so its capacity is higher and unmeasured.)
+
+**At width 64 the store holds ~96 bindings and this project's tasks write about
+10 to 30.** We are nowhere near the ceiling, so the store is not what saturates.
+
+### The first version of this probe said the opposite, and the tell was an exact tie
+
+It sampled key tokens **with replacement** from a 200-token vocabulary, so at
+256 bindings most keys were written twice with different values —
+**contradictory by construction**, unrecoverable for reasons unrelated to width.
+It produced a clean plateau with widths 128 and 256 identical to three decimals
+across four loads.
+
+An exact tie across a doubling of width is a bug, not a finding. Chasing it
+found that the probe had reproduced **decision 108's ambiguity by accident**, in
+the experiment meant to measure something else — and the wrong conclusion would
+have been "the store is the ceiling", which is the opposite of the truth and
+would have redirected the project.
+
+### What this licenses
+
+Saturation is **not** a superposition-capacity limit at the sizes used, and the
+search for it narrows to what remains:
+
+- **The single linear readout.** `Wo` is the only thing that learns across
+  sequences, and one linear map has a ceiling regardless of how wide the store
+  beneath it is.
+- **Frozen random representations.** Decision 93 showed these block learning any
+  *class* of token, and decision 94 measured `value_lr` failing to fix it.
+
+Both are testable separately and neither has been.
+
+It also settles a cross-reference: kinship's 0.915 at out-degree 1 is **not**
+capacity. Ten facts in a width-64 store is an order of magnitude below the
+measured ceiling, so that residual is something else — most likely decode
+confusability at this vocabulary size.
+
+### What it does NOT license
+
+Any claim about capacity under the model's own write path. This wrote outer
+products directly; the model applies `decay` and a `memory_cap` on the store's
+norm, and **neither was active here**. Capacity under those is a different
+number and is the one that matters in practice.

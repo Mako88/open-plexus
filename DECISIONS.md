@@ -65,6 +65,7 @@ a report to John, not a gate.
 | 118 | the unigram was never beaten — 4.540 is an offline backprop probe |
 | 119 | the superposed store EARNS ITS PLACE — note 030's question, answered |
 | 120 | four documents were doing each other's jobs; John asked for three |
+| 121 | width does NOT fix fidelity on the task — and search's blocker has expired |
 
 ---
 
@@ -2479,3 +2480,111 @@ documents intact.
 specified three documents and their jobs; the split point, the naming, retiring
 `HANDOFF.md` and `BACKLOG.md` rather than keeping them as stubs, and the
 structural test were mine.
+
+---
+
+## 121. Width does NOT fix retrieval fidelity on the task, and decision 112 was never a bound on it
+
+g13-01, 48 cells, 8 seeds, run 30389532519. **Three of five predictions refuted,
+including the control**, and the refutation of the control is the finding.
+
+    hop1-pair      d64 0.726 +/-0.012   d128 0.746 +/-0.010   d256 0.746 +/-0.009
+      out-degree 1     1.000 +/-0.000        1.000 +/-0.000        1.000 +/-0.000
+      out-degree 2     0.516 +/-0.018        0.548 +/-0.024        0.558 +/-0.014
+      out-degree 3+    0.388 +/-0.030        0.435 +/-0.036        0.418 +/-0.032
+                 1/k   1.000 / 0.500 / 0.333
+
+**A fourfold width increase buys 0.020 overall and saturates between 128 and
+256.** Out-degree 1 is perfect at width 64 already, at +/-0.000 across eight
+seeds. There was never anything at that out-degree for width to fix.
+
+### Decision 112's 0.915 does not reproduce end-to-end, and neither number is wrong
+
+112 measured **raw retrieval**, ablated, with no readout learning. This trains
+`Wo` over 400 x 4 sequences, and a linear readout recovers the argmax from a
+retrieval that is not itself clean.
+
+That is note 037's distinction arriving on the relational task: **the retrieval
+CARRIES the information and the question is what can extract it.** A trained
+readout extracts it perfectly at out-degree 1.
+
+**The consequence is the important part. Decision 112's number was never a bound
+on task performance**, and STATE.md made width the critical path on the strength
+of it. That was my error, made in the same session, and it is now corrected.
+
+### What it says about search — and P3's letter disagrees with its substance
+
+P3 predicted out-degree >= 2 would stay within 0.10 of 1/k at every width. Gaps:
++0.016, +0.054, +0.048, **+0.102**, +0.058, +0.084. **One cell of six exceeds the
+threshold, by 0.002.** Mechanically refuted, and recorded as refuted.
+
+The 0.10 was mine, chosen before any data, and too tight for a quantity whose
+seed SE runs 0.014 to 0.036. What P3 was reaching for does hold: accuracy sits
+just above 1/k at every width and no width closes it — +0.058 at the best cell,
+on a quantity that would need +0.442.
+
+**So the primitives are reliable-but-ambiguous, which is the regime decision 111
+named as the condition for search being worth building.** 111 refused search
+because *"you cannot search your way out of noisy primitives, because the
+verifier is built from the primitives."* At out-degree 1 the primitive is 1.000,
+so a verifier built from it is trustworthy. **That refusal has expired.**
+
+John approved the direction in advance: *"any functionality and/or adjustments
+that get us closer to our goals ... as long as it doesn't contradict with
+those."*
+
+### Two things that are not explained
+
+**P4 refuted, backwards.** `hop2-concat` gains MORE from width than `hop1-pair`
+— +0.051 against +0.021 — from a far lower base, and still lands below its own
+floor. Composition benefiting from width where the primitive does not is the
+opposite of the compounding story and nothing here accounts for it.
+
+**`hop2-concat` is below the floor that matters.** 0.327 at width 256 against a
+first-relation floor of 0.466. It clears the majority floor (0.118) and loses to
+"retrieve the queried subject's own relation and guess". Decision 102 recorded
+concat *matching* the one-hop model; on this instrument it is worse than the
+one-hop shortcut.
+
+### The instrument, and why it did not exist before
+
+**Decisions 99 through 119 — the entire live relational line — were measured by
+inline probes that left no script behind.** `kinship` appeared only in its task
+module and its unit test; no experiment script existed. That is why a churn probe
+from the same line returned on 2026-07-28 with no condition string, no seed count
+and no pre-registered prediction, and had to be set aside under rule 11b.
+
+`experiments/g13_01_does_width_fix_fidelity.py` is the first committed instrument
+on this line. It measures **through `model.run()` only** and splits by out-degree
+using `sequence.facts`, deliberately building no retrieval probe: reimplementing
+one is the mistake `run()`'s own docstring records, where the 150/300 cap values
+came from a reimplementation whose store never bound.
+
+### A vacuous confirmation in my own summariser, caught after the run
+
+The first version took floors from `records[0]` regardless of arm. The arms run
+at different depths, and at hops=1 `shortcut_floors["first"]` is **1.000 by
+construction** — the path is a single relation, so guessing from the first
+relation is the answer.
+
+P5 was therefore scored as "does not clear 1.000", which nothing can clear, and
+printed CONFIRMED. **A check that passes because it cannot fail** — the class R4
+exists for, appearing in a summariser rather than a test. Fixed to per-arm
+floors; the corrected comparison is 0.327 against 0.466.
+
+### What this licenses
+
+- **Building search.** Its blocking condition is measured gone.
+- **Retiring width as the critical path**, and with it the reading of decision
+  112 that STATE.md carried for one session.
+
+### What it does NOT license
+
+Treating 0.915 as refuted. It is a correct measurement of raw retrieval; it is
+simply not a statement about what the model scores. And this is one task, one
+depth, one key scheme — `chains.py` was not re-run here.
+
+**Taken without asking**, under standing authorisation and John's advance
+approval of the direction: building the instrument, dispatching at 8 seeds
+rather than 3, and recording P1 as refuted rather than restating it once the
+smoke seed contradicted it.

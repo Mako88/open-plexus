@@ -74,11 +74,24 @@ def main() -> None:
             for width in widths)
         print(f"  {arm:14s} {row}")
 
-    floors = records[0]["floors"]
-    print(f"\nfloors: first {floors['first']:.3f}  "
-          f"majority {floors['majority']:.3f}  "
-          f"(last {floors['last']:.3f} and ends {floors['ends']:.3f} are "
-          f"BOUNDS, not floors -- they need the far end of the path)")
+    # PER ARM. The two arms run the task at DIFFERENT DEPTHS, so they do not
+    # share a floor -- and taking floors from records[0] scored P5 against
+    # 1.000, which nothing can clear and which therefore passed vacuously.
+    #
+    # At hops=1 the path IS a single relation, so "guess from the first
+    # relation" is the answer by construction and `first` is 1.000. That is a
+    # property of the depth, not a leak, and it makes `first` meaningless as a
+    # floor for the one-hop arm -- there `majority` is the floor that bites.
+    floors_by_arm = {arm: cells[(arm, widths[0])][0]["floors"] for arm in arms}
+    print("\nfloors, PER ARM -- the arms run at different depths and do not "
+          "share one")
+    for arm, floors in floors_by_arm.items():
+        note = ("  <- first is 1.000 BY CONSTRUCTION at hops=1; use majority"
+                if floors["first"] > 0.999 else "")
+        print(f"  {arm:14s} first {floors['first']:.3f}  "
+              f"majority {floors['majority']:.3f}  "
+              f"(last {floors['last']:.3f}, ends {floors['ends']:.3f} are "
+              f"BOUNDS not floors){note}")
 
     print("\nby out-degree of the queried subject")
     for arm in arms:
@@ -165,10 +178,17 @@ def main() -> None:
 
     hop2_256 = [r["accuracy"] for r in cells.get(("hop2-concat", 256), [])]
     if hop2_256:
-        floor = max(floors["majority"], floors["first"])
-        print(f"  P5  hop2-concat at 256 does not clear the shortcut floor "
-              f"{floor:.3f}: {statistics.mean(hop2_256):.3f} -> "
-              f"{'CONFIRMED' if statistics.mean(hop2_256) <= floor else 'REFUTED'}")
+        hop2_floors = floors_by_arm["hop2-concat"]
+        floor = max(hop2_floors["majority"], hop2_floors["first"])
+        scored = statistics.mean(hop2_256)
+        print(f"  P5  hop2-concat at 256 does not clear its OWN shortcut floor "
+              f"{floor:.3f}: {scored:.3f} -> "
+              f"{'CONFIRMED' if scored <= floor else 'REFUTED'}")
+        if scored < hop2_floors["majority"]:
+            print("      AND IT IS BELOW THE MAJORITY FLOOR, which is worse "
+                  "than the prediction says: a model scoring under 'always "
+                  "answer the commonest relation' is not weakly composing, it "
+                  "is actively mispredicting.")
 
 
 if __name__ == "__main__":

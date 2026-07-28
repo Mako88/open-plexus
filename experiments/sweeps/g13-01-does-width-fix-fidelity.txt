@@ -2,9 +2,91 @@ Does width fix retrieval fidelity on the task, and does that unblock composition
 =================================================================================
 
 Script: experiments/g13_01_does_width_fix_fidelity.py
-Status: DISPATCHED. Predictions below were registered before the matrix ran.
+Status: RUN, 48 of 48 cells, 8 of 8 seeds, run 30389532519.
 
-ANSWER: pending.
+ANSWER: **NO. Width does not fix retrieval fidelity on the task, and decision
+        112's width story does not transfer to it.** Out-degree 1 is 1.000 at
+        EVERY width including 64 -- there was never anything there for width to
+        fix. Everything left sits at out-degree >= 2, close to the 1/k line, and
+        a fourfold width increase moves the overall number by 0.020 and
+        saturates between 128 and 256.
+
+        THREE OF FIVE PREDICTIONS REFUTED, including the control.
+
+
+RESULTS
+-------
+overall accuracy, paired within seed, 8 seeds
+
+  hop1-pair      d64 0.726 +/-0.012   d128 0.746 +/-0.010   d256 0.746 +/-0.009
+  hop2-concat    d64 0.276 +/-0.021   d128 0.323 +/-0.011   d256 0.327 +/-0.014
+
+by out-degree of the queried subject
+
+  hop1-pair    d64   k=1 1.000 +/-0.000   k=2 0.516 +/-0.018   k=3+ 0.388 +/-0.030
+  hop1-pair    d128  k=1 1.000 +/-0.000   k=2 0.548 +/-0.024   k=3+ 0.435 +/-0.036
+  hop1-pair    d256  k=1 1.000 +/-0.000   k=2 0.558 +/-0.014   k=3+ 0.418 +/-0.032
+                     1/k     1.000            0.500                 0.333
+
+  hop2-concat  d64   overall 0.276    d128 0.323    d256 0.327
+                     against its own floors: first 0.466, majority 0.118
+
+floors are PER ARM. At hops=1 the path IS a single relation, so `first` is
+1.000 by construction and only `majority` (0.104) bites there.
+
+
+SCORING
+-------
+  P1  REFUTED, and in the unexpected direction. Out-degree 1 does not rise with
+      width because it is ALREADY 1.000 at width 64, at +/-0.000 across eight
+      seeds. Decision 112's 0.915 does not reproduce end-to-end.
+
+      Neither measurement is wrong. 112 ablated RAW RETRIEVAL with no readout
+      learning; this trains Wo over 400 x 4 sequences, and a linear readout
+      recovers the argmax from a retrieval that is not itself clean. It is note
+      037's distinction again -- the retrieval CARRIES the information and the
+      question is what can extract it. **The consequence is that decision 112's
+      number was never a bound on task performance**, and STATE.md was wrong to
+      make width the critical path on the strength of it.
+
+  P2  CONFIRMED. 0.746 at width 256, not 1.000.
+
+  P3  REFUTED AS WRITTEN, and the letter and the substance disagree. Gaps above
+      1/k: +0.016, +0.054, +0.048, +0.102, +0.058, +0.084. **One cell of six
+      exceeds the 0.10 threshold, by 0.002.**
+
+      The 0.10 was chosen by me before any data and was too tight for a quantity
+      whose seed SE runs 0.014-0.036. The mechanical verdict is refuted and is
+      recorded as refuted. The substance P3 was reaching for -- accuracy sitting
+      just above 1/k at every width, with no width closing the gap -- holds
+      everywhere: the margin is 1 SE at d64, and though it grows to ~4 SE at
+      d256 it is still only +0.058 on a quantity that would need +0.442.
+
+      **So decision 108's ambiguity account is supported and the store is not
+      noisy.** Stated as a bound rather than a threshold next time.
+
+  P4  REFUTED. hop2-concat gains MORE from width than hop1-pair, +0.051 against
+      +0.021 -- the opposite of predicted. Composition benefits from width more
+      than the primitive does, from a far lower base, and still lands below its
+      own floor. Unexplained, and the most interesting loose end here.
+
+  P5  CONFIRMED, against the corrected floor. hop2-concat reaches 0.327 at width
+      256 against a first-relation floor of 0.466. It clears the majority floor
+      (0.118) and does not clear the floor that matters.
+
+
+A DEFECT IN THIS SWEEP'S OWN SUMMARISER, CAUGHT AFTER THE RUN
+--------------------------------------------------------------
+The first version took floors from `records[0]` regardless of arm. The two arms
+run the task at DIFFERENT DEPTHS, so they do not share a floor -- and at hops=1
+`shortcut_floors["first"]` is 1.000 by construction.
+
+So P5 was first scored as "does not clear 1.000", which NOTHING can clear. It
+printed CONFIRMED and the confirmation was vacuous.
+
+Fixed to compute floors per arm, and the corrected comparison (0.327 against
+0.466) is the one above. This is the class R4 exists for -- a check that passes
+because it cannot fail -- appearing in a summariser rather than a test.
 
 
 IN PLAIN TERMS

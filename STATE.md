@@ -53,57 +53,97 @@ which is every end-to-end kinship result.
 **Do not build a fifth mechanism on top of this.** All four were measured before
 being built, which is the only reason three were never written.
 
-**And decision 112 says width fixes it outright:**
+**Decision 112 said width fixes it outright:**
 
     as configured   0.915      no decay   0.927      no cap   0.915
     width 128       1.000      width 256  1.000
 
-Decay costs 0.012, the cap costs 0.000, width closes the gap completely.
+### ⚠ REFUTED ON THE TASK — g13-01 landed, decision 121
 
-> **Why 112 has not already unblocked everything.** Kinship is 45 tokens and
-> **44 bindings** — *under* the ~96 that decision 109 measured as width 64's
-> capacity, which predicts ~0.99. So kinship's bindings are harder than random
-> ones at the same load, and **why is unmeasured.** Its keys are hashed pairs and
-> its values repeat heavily; either could reduce effective capacity.
+[g13-01](experiments/sweeps/g13-01-does-width-fix-fidelity.txt), 48 cells, 8
+seeds. **Three of five predictions refuted, including the control.**
 
-**This is item 1 below and it is the whole of the critical path.**
+    hop1-pair      d64 0.726 +/-0.012   d128 0.746 +/-0.010   d256 0.746 +/-0.009
+      out-degree 1     1.000 +/-0.000        1.000 +/-0.000        1.000 +/-0.000
+      out-degree 2     0.516 +/-0.018        0.548 +/-0.024        0.558 +/-0.014
+      out-degree 3+    0.388 +/-0.030        0.435 +/-0.036        0.418 +/-0.032
+                 1/k   1.000 / 0.500 / 0.333
+
+**A fourfold width increase buys 0.020 and saturates between 128 and 256.**
+Out-degree 1 is perfect at width 64 already — there was never anything there for
+width to fix.
+
+**Decision 112's 0.915 does not reproduce end-to-end, and neither number is
+wrong.** 112 ablated *raw retrieval*; this trains `Wo`, and a linear readout
+recovers the argmax from a retrieval that is not itself clean. So **112 was never
+a bound on task performance**, and an earlier version of this document made width
+the critical path on the strength of it. That was wrong and is retracted.
+
+**Everything left sits at out-degree ≥ 2, just above 1/k, and no width closes
+it** — +0.058 at the best cell on a quantity needing +0.442. The blocker is
+decision 108's **ambiguity**, not capacity.
 
 ---
 
 ## Open work, in order
 
-### 1. Re-run the relational tasks at width 128 and 256
+### 1. BUILD SEARCH — its blocking condition is measured gone
 
-Decision 112 measured fidelity in isolation. Nothing has re-run `kinship.py` or
-the multi-appearance chain layouts end-to-end at a width where fidelity is 1.000.
-If the compounding argument is right, three of the four failed mechanisms above
-become worth revisiting *in that order*, starting with the accumulator (102),
-which matched the one-hop model exactly and was diagnosed as reading a hop that
-carried no information.
+Decision 111 refused search on one ground: *"you cannot search your way out of
+noisy primitives, because the verifier is built from the primitives."*
 
-Two things to settle in the same pass, both cheap and both currently guesses:
+**g13-01 measured the primitive at 1.000 (±0.000, 8 seeds) at out-degree 1.** A
+verifier built from a retrieval that is right every time is trustworthy. The
+refusal was conditional and **the condition has expired** — this is sequencing
+catching up, exactly as decision 111 said it would ("revisit it the moment
+retrieval fidelity moves").
 
-- **Why kinship's bindings are harder than random ones at the same load.** Hashed
-  pair keys and repeated values are the two candidates.
-- **What width costs on the wire.** Nodes ≈ width ÷ 16 (below ~16 dimensions a
-  node stops having a standalone opinion), so width 256 is ~16 nodes, and hops
-  multiply the reads. The bandwidth arithmetic below was measured at width ≤ 128
-  with no hops.
+What remains is ambiguity: at out-degree ≥ 2 the store returns *a* relation the
+subject genuinely holds, and nothing in the question says which one leads to the
+target. Search is the mechanism that resolves that — try a branch, retrieve its
+endpoint, check it against the asked object.
 
-### 2. `carry_store` + `hidden` — the cheapest unclaimed win
+**Approved in advance by John.** The design question to settle first is what a
+branch costs on the wire, because a search that multiplies retrievals multiplies
+messages, and amended C1 bounds bytes per hop. Decision 111's beam numbers
+(0.485 / 0.510 / 0.495 at beams 1/2/4) were measured with noisy primitives and
+should be re-derived, not reused.
 
-Decision 116, on the notes corpus:
+### 1b. Two loose ends from g13-01, both cheap and both unexplained
+
+- **`hop2-concat` gains MORE from width than the primitive does** (+0.051 against
+  +0.021), from a far lower base. That is backwards from the compounding story
+  and nothing accounts for it.
+- **`hop2-concat` is below the floor that matters** — 0.327 against a
+  first-relation floor of 0.466. Decision 102 recorded concat *matching* the
+  one-hop model; on this instrument it loses to the one-hop shortcut.
+
+### 2. `carry_store` — two measurements with OPPOSITE SIGNS, and nobody has reconciled them
+
+Decision 116, notes corpus, train-then-test — `carry_store` **helps a lot**, and
+superadditively with `hidden` (0.26 and 0.45 alone, **0.88 together**):
 
     chunk    linear   linear+carry   hidden 128   hidden+carry
        64     6.024          5.765        5.574          5.140
       256     5.914          5.755        5.393          5.137
 
-**Superadditive** — 0.26 and 0.45 alone, **0.88 together**. `carry_store` is off
-by default, and its docstring says it is correct when consecutive calls carry
-consecutive text, which is the text case. It has never been the default because
-it was measured as harmful under the *shuffled* chunk order the corpus
-experiments use. **The honest version needs sequential chunks**, and that is a
-different experiment from the one that refuted it.
+Decision 117, Shakespeare, prequential, 250k chars — `carry_store` **hurts**:
+
+    model, hidden 128                  5.665
+    model, hidden 128 + carry_store    5.737
+
+**An earlier version of this document called it "the cheapest unclaimed win",
+citing 116 and not 117.** That is the same error the 2026-07-28 restructure was
+about — quoting one measurement as current while another qualifies it.
+
+The two differ in corpus, vocabulary, regime *and* chunk order, so neither
+refutes the other and no one-line fix is available. The discriminating
+measurement is a 2×2 — `{carry off, on} × {shuffled, sequential chunks}` — in
+**one** regime, on Shakespeare, prequential. `carry_store`'s own docstring says
+it is correct only when consecutive calls carry consecutive text, so chunk order
+is the hypothesis and it has never been the swept axis.
+
+Needs a committed instrument, same as kinship did.
 
 ### 3. A relational self-supervised objective
 
@@ -145,6 +185,41 @@ participant is slow or gone, not whether a sum happens. This is 64 floats per
 group per step. **Re-examining it costs a reading, not a run**, and either
 retires the violation or states precisely which clause it fails. Cheapest item on
 this page.
+
+### 6b. CONCURRENCY COSTS d² PER CONVERSATION, and that inverts the usual picture
+
+Raised by John on 2026-07-28: *"assuming ~65,000 nodes and a chat interface,
+would we need another 65,000 nodes for each concurrent interaction?"*
+
+**No — but the reason concurrency is expensive is worse than node count.** Read
+from `openplexus/distributed.py`, a node holds three things:
+
+    values    vocab x own.width     shared parameter, read-only
+    readout   vocab x own.width     the learned parameter, shared
+    memory    own.width x d_model   PER-SEQUENCE working state
+
+The parameters are shared across conversations; only `memory` is per-conversation
+— its docstring says so directly, *"per-sequence working state, not a
+parameter"*. So a second conversation needs a second store, not a second network.
+
+**The arithmetic is the problem.** Per node the store is `(d/P)·d`, so across the
+network it is **d² per conversation**. At width 1M that is ~4 TB of aggregate
+store for *one* conversation — 64 MB on each of 65,000 nodes — against a shared
+readout of ~3 MB per node at a 50k vocabulary.
+
+**The per-conversation state is roughly twenty times the shared parameters.**
+That is the inverse of a transformer, where weights dominate and the KV cache is
+secondary, and it means **concurrency is bounded by node RAM rather than by node
+count.**
+
+Two things follow, and neither is measured:
+
+- It is the same d² that decision 109 measured capacity scaling by. A bounded
+  cache is `slots × d`, not `d²` — so item 7 below is not only about churn
+  tolerance, it is about whether concurrent serving is affordable at all.
+- **Nothing serves two conversations today.** `Node` holds exactly one `memory`
+  with a `reset()`, so multi-session serving is unimplemented, unmeasured, and
+  not costed. This entry is architecture read off the code, not a result.
 
 ### 7. Item-partitioning vs dimension-partitioning
 
@@ -342,7 +417,7 @@ again** — this list exists because several of these were proposed twice.
 |---|---|---|
 | Anything that recovers per-item information *after* the sum | `r = M @ key` is a SUM. Readout bias, competitive retrieval, orthogonal updates and pair keys all failed for this one reason | 69, and the g11 line |
 | Another mechanism on top of noisy retrieval | Four have failed against the same 0.915/0.35. Fidelity first | 102, 105, 107, 111 |
-| Search / beam over branches | You cannot search your way out of noisy primitives, because the verifier is built from the primitives. +0.03 for k² the retrievals. **Right answer to branching ambiguity, wrong sequencing** — revisit the moment fidelity moves | 111 |
+| ~~Search / beam over branches~~ | **NO LONGER ON THIS LIST (decision 121).** 111 refused it because the verifier was built from noisy primitives; g13-01 measured the primitive at 1.000 at out-degree 1. The condition expired and search is item 1 | 111, 121 |
 | Transfer of the halting gate to new terminator tokens | `halt_w` sits +8.3 sd on one token's value vector. Two markers have unrelated random value vectors, so transfer is **impossible by construction** | 89 |
 | A width × sequence-length sweep to explain "width doesn't help" | Nobody claims that. Our arms *do* scale with width; the flat axis is DATA. Withdrawn before dispatch after ten minutes of reading source | 112, 113 |
 | More data on the text corpus | The model converges at ~16,000 characters. The store is per-sequence working memory, so `Wo` is the only durable parameter and one linear map converges fast | 63, 115 |

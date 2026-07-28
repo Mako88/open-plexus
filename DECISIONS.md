@@ -75,6 +75,7 @@ a report to John, not a gate.
 | 128 | d_max is ~640 ms measured; the in-process figure was measuring Windows |
 | 129 | ambiguity is detectable before searching; the expensive signal is below chance |
 | 130 | the gate pays (+0.020 over search-everywhere); the search line closes |
+| 131 | the persistence test tested a SATURATED store; lasting_cap is what binds |
 
 ---
 
@@ -3407,3 +3408,76 @@ the most likely place for it to hide.
 
 **Taken without asking**, under standing authorisation and John's advance
 approval of the direction.
+
+---
+
+## 131. The persistence test did not test persistence — the store was full before it started
+
+g15-01, 54 cells, 3 seeds, run 30408859908. **The headline is that P3's
+"CONFIRMED" is an artefact and must not be quoted.**
+
+    arm                4,000       8,000      16,000      32,000      62,500     125,000
+    baseline          5.5989      5.5709      5.5353      5.5327      5.5255      5.5261
+    consolidate       5.6349      5.6142      5.5694      5.5749      5.5647      5.5610
+    persist           5.7733      5.7562      5.7838      5.7338      5.8448      5.7101
+    decision 63       5.5700      5.5430      5.5270      5.5230      5.5310      5.5310
+
+**`persist` is worse than `baseline` at every single data point**, by 0.18 to
+0.32 bits.
+
+### The diagnosis, and it is the only reason this sweep is worth anything
+
+**The slow store's norm is 5.00 at every data size, including 4,000
+characters.** `lasting_cap` is 5.0 and `scale_to` rescales the whole store to it.
+
+So the persistent store **saturates before the smallest data point and stays
+saturated**. It is a fixed-size bucket, full from the start, and every later
+write rescales what is already in it. That also explains why it is *worse* than
+no store: it adds a constant-norm blob of increasingly-overwritten material to
+every read.
+
+**This experiment tested a saturated store, not an accumulating one.** Note 042's
+claim is that a map needs somewhere to accumulate. Nothing accumulated.
+
+### What the registered rail bought
+
+P4 was written to distinguish "persistence is wrong" from "the gate never
+opened", because consolidation fires on `predictions[t-1] == token` and promotes
+only what the model already got right.
+
+**The gate opened**: 16,470 consolidations at 4,000 characters rising to 51,713
+at 125,000. So the null cannot be blamed on an empty store — which eliminates the
+risk that was registered in advance and points the next experiment at the cap
+instead.
+
+### Three of five predictions were badly specified, all the same way
+
+- **P1 and P2** asked for total movement from 4,000 to 125,000 under 0.05 bits.
+  That measures *across* the wall and counts the pre-wall improvement decision 63
+  never disputed. Split at the wall, the control reproduces exactly: **0.064 bits
+  before 16,000 and 0.009 after.** The control is sound; the test of it was not.
+- **P3** asked whether `persist` improves from 62,500 to 125,000 by more than the
+  seed spread. It does — because 62,500 was a high outlier in a row with no trend
+  at all. **A one-pair difference cannot detect a trend**, which is what noise
+  satisfies.
+
+A statistic chosen for convenience rather than for what it would detect.
+**Registering a bad test in advance is not the same as registering a good one**,
+and pre-registration protects against moving the goalposts, not against picking
+the wrong measure.
+
+### What this settles
+
+- **`lasting_cap` is the binding constraint on persistence.** Not the gate.
+- **Note 042's item 1 is UNTESTED, not refuted**, and item 2 must not be built on
+  it until it is.
+
+### What comes next
+
+Sweep `lasting_cap` with persistence on — 5, 50, 500, unbounded — reading the
+norm beside the bits. The cap exists because a salience gate without one
+diverges, so unbounded may be unusable; the question is whether any setting lets
+the store grow with the corpus instead of saturating at the first data point.
+
+**Taken without asking**, under standing authorisation. John approved items 1 and
+2; this reports that item 1's test has to be re-run before item 2 starts.

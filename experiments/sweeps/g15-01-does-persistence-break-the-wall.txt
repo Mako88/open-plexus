@@ -2,9 +2,112 @@ Does a persistent slow store break decision 63's 16,000-character wall?
 =======================================================================
 
 Script: experiments/g15_01_does_persistence_break_the_wall.py
-Status: DISPATCHED. Predictions registered before the matrix ran.
+Status: RUN, 54 of 54 cells, 9 of 9 jobs, run 30408859908.
 
-ANSWER: pending.
+ANSWER: **INCONCLUSIVE, and P3's "CONFIRMED" is an artefact — do not quote it.**
+        Persistence made the model WORSE at every data point. But the slow
+        store's norm was pinned at the `lasting_cap` of 5.00 from 4,000
+        characters onward, so this measured a store that was FULL BEFORE THE
+        EXPERIMENT STARTED, not a map accumulating. **The question was not
+        asked.**
+
+
+RESULTS
+-------
+bits per character, lower is better, 3 seeds
+
+  arm                4,000       8,000      16,000      32,000      62,500     125,000
+  baseline          5.5989      5.5709      5.5353      5.5327      5.5255      5.5261
+  consolidate       5.6349      5.6142      5.5694      5.5749      5.5647      5.5610
+  persist           5.7733      5.7562      5.7838      5.7338      5.8448      5.7101
+  decision 63       5.5700      5.5430      5.5270      5.5230      5.5310      5.5310
+
+  slow-store norm, persist:  5.00 at EVERY data size
+  consolidations, persist:   16,470 -> 51,713 across the range
+
+
+SCORING, AND THREE OF THE PREDICTIONS WERE BADLY SPECIFIED
+------------------------------------------------------------
+  P1  REFUTED AS WRITTEN, and the statistic was wrong. It asked for total
+      movement from 4,000 to 125,000 under 0.05 bits; `baseline` moved 0.0728.
+
+      **But decision 63 reproduces.** Its shape is that movement is FRONT-LOADED
+      and stops at the wall, and that is exactly what this shows:
+
+          4,000 -> 16,000     0.064 bits      before the wall
+          16,000 -> 125,000   0.009 bits      after it
+
+      The prediction measured across the wall instead of past it, so it counted
+      the pre-wall improvement decision 63 never disputed. **The control is
+      sound and the test of it was not.**
+
+  P2  REFUTED for the same reason and with the same correction: `consolidate`
+      moves 0.0739 in total and 0.008 after 16,000.
+
+  P3  "CONFIRMED" AND IT IS AN ARTEFACT. It asked whether `persist` improves
+      from 62,500 to 125,000 by more than the seed spread. It does, by +0.1347
+      -- because **62,500 was a high outlier**, not because anything improved:
+
+          5.7733  5.7562  5.7838  5.7338  5.8448  5.7101
+
+      That row has no trend. It bounces around 5.75, and a single pairwise
+      difference is exactly what noise satisfies. **A one-pair test cannot
+      detect a trend**, and this one was written by me before the run.
+
+      The honest reading of the row: **`persist` is worse than `baseline` at
+      every single data point**, by 0.18 to 0.32 bits.
+
+  P4  CONFIRMED, and it is the reason this sweep is worth anything.
+      Consolidations run 16,470 to 51,713 and rise with data, so **the gate
+      opened**. A null cannot be blamed on an empty store, which was the
+      registered risk.
+
+  P5  CONFIRMED. 5.7101 against the backprop baseline's 4.049.
+
+
+THE DIAGNOSIS, FROM THE ONE DIAGNOSTIC THAT WORKED
+----------------------------------------------------
+**The slow store's norm is 5.00 at every data size, including 4,000
+characters.** `lasting_cap` is 5.0 and `scale_to` rescales the whole store to it.
+
+So the persistent store **saturates almost immediately and stays saturated**. It
+is a fixed-size bucket that is full before the smallest data point, and every
+subsequent write rescales what is already there. More text cannot help a store
+that cannot hold more, and the constant rescaling explains why it is worse than
+no store at all: it is adding a fixed-norm blob of increasingly-overwritten
+material to every read.
+
+**This experiment did not test note 042's claim.** It tested a saturated store.
+The claim is that a map needs somewhere to ACCUMULATE, and nothing accumulated.
+
+
+WHAT THIS DOES AND DOES NOT SETTLE
+------------------------------------
+**Does not settle:** whether a persistent slow store breaks the wall. The
+mechanism never got the chance.
+
+**Does settle:** that `lasting_cap` is the binding constraint on persistence, and
+that the consolidation gate is NOT the problem -- which was the registered risk
+and is now eliminated. The gate fires tens of thousands of times.
+
+**And it settles that three of these five predictions were badly specified**, all
+in the same way: a statistic chosen for convenience rather than for what it would
+detect. Total movement cannot see a wall; one pairwise difference cannot see a
+trend. Both were written before the run, which is the point of registering them
+-- and registering a bad test in advance is not the same as registering a good
+one.
+
+
+NEXT
+----
+Sweep `lasting_cap` with persistence on -- 5, 50, 500, and unbounded -- and read
+the norm alongside the bits. The cap exists because a salience gate with no cap
+diverges, so unbounded may be unusable; the question is whether there is a
+setting where the store grows with the corpus instead of saturating at the first
+data point.
+
+**Until that runs, note 042's item 1 is untested rather than refuted**, and item
+2 should not be built on it.
 
 
 IN PLAIN TERMS

@@ -46,7 +46,8 @@ jobs:
       fail-fast: false
       matrix:
         seed: [1, 2, 3]
-        arm: [baseline, consolidate, persist]
+        arm: [baseline, consolidate, persist, persist-cap50, persist-cap500,
+              persist-uncapped]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -87,7 +88,7 @@ jobs:
       - name: Combine
         run: |
           set -o pipefail
-          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 9" | tee summary.txt
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 18" | tee summary.txt
           python -m tools.summarise_g15_01 | tee -a summary.txt
       - name: Summary
         if: always()

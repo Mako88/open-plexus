@@ -103,6 +103,30 @@ ARMS = {
     "consolidate": dict(consolidation=0.5, lasting_cap=5.0),
     "persist": dict(consolidation=0.5, lasting_cap=5.0,
                     persistent_lasting=True),
+    # THE CAP IS WHAT BOUND THE FIRST RUN, and these exist because of it.
+    #
+    # g15-01's first pass measured the slow store's norm at **5.00 at every
+    # data size, including 4,000 characters** -- `lasting_cap` is 5.0 and
+    # `scale_to` rescales the whole store to it, so the store was FULL BEFORE
+    # THE SMALLEST DATA POINT and every later write rescaled what was already
+    # there. That is why `persist` came out worse than no store at all: a
+    # constant-norm blob of increasingly-overwritten material added to every
+    # read.
+    #
+    # The claim under test is that a map needs somewhere to ACCUMULATE, and
+    # nothing accumulated. These arms give it room.
+    #
+    # `persist-uncapped` may diverge -- the cap exists because a salience gate
+    # without one does, and `memory_cap`'s own note records the fast store
+    # reaching 3452 on a repeating token. It is included BECAUSE it is the
+    # limiting case: if it diverges, the cap is not an arbitrary constant and
+    # the question becomes what shape it should have rather than how large.
+    "persist-cap50": dict(consolidation=0.5, lasting_cap=50.0,
+                          persistent_lasting=True),
+    "persist-cap500": dict(consolidation=0.5, lasting_cap=500.0,
+                           persistent_lasting=True),
+    "persist-uncapped": dict(consolidation=0.5, lasting_cap=1e9,
+                             persistent_lasting=True),
 }
 
 

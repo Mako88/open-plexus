@@ -1577,6 +1577,37 @@ MUTATIONS = [
         old="    walks.sort(key=lambda w: w.score, reverse=True)",
         new="    walks.sort(key=lambda w: w.score, reverse=False)",
     ),
+    Mutation(
+        name="the-deadline-fires-immediately",
+        breaks="the only thing that makes a deadline safe. Settling as soon as "
+               "ONE vote arrives, rather than after the stated wait, turns "
+               "every run into a race -- the answer becomes whichever node "
+               "replied first, and it would still look like a working "
+               "distributed model. The healthy path must be bit-identical to "
+               "strict mode or every earlier result is measured under a "
+               "different system",
+        path=DISTRIBUTED,
+        old="                           and time.monotonic() - asked_at[settled] "
+            ">= deadline)",
+        new="                           and time.monotonic() - asked_at[settled] "
+            ">= 0)",
+    ),
+    Mutation(
+        name="strict-mode-tolerates-a-dead-node",
+        breaks="the boundary between the two modes. Without a deadline the "
+               "caller has opted into the regime every earlier result was "
+               "measured under, where a gone node is an ERROR. Tolerating it "
+               "there turns a crash into silent degradation by default, which "
+               "hides real faults behind a fault-tolerance feature -- and the "
+               "numbers would still come out",
+        path=DISTRIBUTED,
+        old="            except (ConnectionError, OSError):\n"
+            "                if deadline is None:\n"
+            "                    raise\n"
+            "                starting_unreachable.add(index)",
+        new="            except (ConnectionError, OSError):\n"
+            "                starting_unreachable.add(index)",
+    ),
 ]
 
 

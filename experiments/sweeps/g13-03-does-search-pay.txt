@@ -31,6 +31,24 @@ RESULTS
     search8 - search4                    -0.024 +/-0.004
 
 
+PREDICTIONS
+-----------
+Registered in experiments/g13_03_does_search_pay.py before the matrix ran.
+
+  P1  `walk` beats `concat` by more than 0.10. Decision 107's "traversal buys
+      0.05" was computed with steps 1 and 3 at 0.710 and 0.677; they are 1.000
+      at out-degree 1 now.
+  P2  `search4` beats `walk`. THE DECISION -- that choosing among branches by
+      checking which reaches the named target is worth more than committing to
+      the loudest one.
+  P3  `search4` clears the shortcut floor, about 0.466. Nothing on this task
+      ever has.
+  P4  `search8` is within 0.02 of `search4`; only two or three relations are
+      plausible candidates for any subject.
+  P5  Every arm falls short of 1.000, because the g13-02 ceiling holds steps 1
+      and 3 at their out-degree-1 value and search has to FIND that regime.
+
+
 SCORING
 -------
   P1  CONFIRMED, and it is the headline. `walk` beats `concat` by **+0.269**.

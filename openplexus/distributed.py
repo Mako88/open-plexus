@@ -44,6 +44,7 @@ from __future__ import annotations
 import select
 import socket
 import struct
+import time
 from dataclasses import dataclass
 
 import numpy as np
@@ -245,6 +246,11 @@ class Network:
         self.config = config
         self.slices = slices_for(config.d_model, nodes)
         self._combine = combine
+        #: step -> how many expected votes were missing when it settled.
+        #: Empty unless `run(deadline=...)` forced a step through short, and
+        #: reset by every `run`. **Observation only** -- nothing reads it back,
+        #: exactly as the model's `trace` is observation only.
+        self.steps_settled_short: dict[int, int] = {}
         self.port = port
         self._values = values
         self._readout = readout
@@ -321,7 +327,7 @@ class Network:
 
     def run(self, tokens: np.ndarray, absent: set[int] | None = None,
             leave_at: int | None = None, window: int = 1,
-            speak: float = 1.0) -> np.ndarray:
+            speak: float = 1.0, deadline: float | None = None) -> np.ndarray:
         """Broadcast each token, sum the votes, return a prediction per position.
 
         `absent` names nodes that stop answering from `leave_at` onward -- a real
@@ -338,13 +344,63 @@ class Network:
         simulation that below a bound, delay changes nothing bit-for-bit. This is
         where that claim meets real sockets, real process scheduling and real
         arrival order.
+
+        ## `deadline` -- the difference between a declared departure and a real one
+
+        **None (the default) waits for every expected vote.** That is what every
+        result in this project was measured under and it is correct while nobody
+        leaves unannounced: `absent` and `leave_at` lower `expected`, so a
+        DECLARED departure settles normally, which is what g12-02 measured across
+        18 cells.
+
+        **An UNDECLARED departure stalls it.** The step never reaches its count,
+        the window fills, the driver stops sending, and 30 seconds later the
+        select below raises. That is a barrier that stalls when a participant is
+        slow or gone, which is exactly what amended C1 forbids -- and C3 says
+        departure arrives without warning, so the declared case is the easy one.
+
+        Setting `deadline` to a number of seconds settles a step once that long
+        has passed since it was dispatched, with whatever votes arrived. This is
+        note 003's design: `d_max` is simultaneously the C2 asynchrony bound and
+        the C3 churn timeout, so a source inside it is a straggler and a source
+        beyond it is a dropout. Two constraints, one parameter.
+
+        **It costs bit-identity, and that is not a detail.** With a deadline the
+        answer depends on who replied in time, so the property G2 was passed on
+        -- weights bit-identical to a run with no network at all -- cannot hold.
+        That is why it is off by default rather than simply better: the two modes
+        answer different questions, and every earlier number belongs to the
+        first.
+
+        `steps_settled_short` records what it cost, per run, so a degraded answer
+        is visible rather than silent.
+
+        Args:
+            deadline: Seconds to wait for a step before settling on whatever
+                arrived. `None` waits for every expected vote.
+
+        Raises:
+            ValueError: If `deadline` is not positive.
         """
         if window < 1:
             raise ValueError("a window below 1 cannot make progress")
+        if deadline is not None and deadline <= 0:
+            raise ValueError("a deadline of zero settles every step on nothing")
         absent = absent or set()
         # Every sequence starts clean, matching the single-process contract.
-        for sock in self._connections:
-            send(sock, struct.pack("!i?", _RESET, False))
+        #
+        # A node already gone when the sequence starts fails HERE, before any
+        # dispatch -- which is the common case for a machine switched off
+        # between sequences rather than during one. Same rule as in `dispatch`:
+        # tolerated only when a deadline was asked for.
+        starting_unreachable: set[int] = set()
+        for index, sock in enumerate(self._connections):
+            try:
+                send(sock, struct.pack("!i?", _RESET, False))
+            except (ConnectionError, OSError):
+                if deadline is None:
+                    raise
+                starting_unreachable.add(index)
         predictions = np.zeros(len(tokens), dtype=np.int64)
         gone: set[int] = set()
         # Connections that have actually hung up, as opposed to nodes we have
@@ -352,13 +408,24 @@ class Network:
         dead: set[int] = set()
         pending: dict[int, list] = {}
         expected: dict[int, int] = {}
+        #: When each pending step was dispatched, so its deadline can be judged
+        #: from when it was ASKED rather than from when the driver last looped.
+        asked_at: dict[int, float] = {}
+        #: Nodes whose connection failed on the way out. Distinct from `gone`,
+        #: which is a DECLARED departure, and from `dead`, which is a hang-up
+        #: noticed while reading -- this is one noticed while writing.
+        unreachable: set[int] = set(starting_unreachable)
         sent = settled = 0
+        self.steps_settled_short = {}
+        self.nodes_unreachable = unreachable
 
         def dispatch(step: int) -> None:
             nonlocal gone
             if leave_at is not None and step == leave_at:
                 gone = set(absent)
-            live = [i for i in range(len(self._connections)) if i not in gone]
+            asked_at[step] = time.monotonic()
+            live = [i for i in range(len(self._connections))
+                    if i not in gone and i not in unreachable]
             # Who answers this step. Round-robin rather than random: it is
             # deterministic, it spreads the cost evenly, and it guarantees the
             # count exactly rather than in expectation -- which matters because
@@ -366,14 +433,37 @@ class Network:
             wanted = max(1, int(round(speak * len(live)))) if live else 0
             start = (step * wanted) % len(live) if live else 0
             speaking = {live[(start + n) % len(live)] for n in range(wanted)}
-            expected[step] = len(speaking)
             pending[step] = [np.zeros(self.config.vocab_size), 0]
             for index in live:
                 # Everyone HEARS the token -- a node that stopped listening
                 # would stop updating its own store and leave the network in
                 # all but name. Only some are asked to answer.
-                send(self._connections[index],
-                     struct.pack("!i?", int(tokens[step]), index in speaking))
+                try:
+                    send(self._connections[index],
+                         struct.pack("!i?", int(tokens[step]),
+                                     index in speaking))
+                except (ConnectionError, OSError):
+                    # A NODE THAT IS ALREADY GONE, discovered on the way out.
+                    #
+                    # A machine switched off mid-session resets its connection,
+                    # so the failure surfaces on SEND rather than as silence.
+                    # Both are the same event -- a participant is gone -- and a
+                    # design that survives one and crashes on the other has not
+                    # survived churn.
+                    #
+                    # **Only tolerated when a deadline was asked for.** Without
+                    # one the caller has opted into the strict mode every
+                    # earlier result was measured under, where this raised; and
+                    # turning a crash into silent degradation by default would
+                    # hide real faults behind a fault-tolerance feature.
+                    if deadline is None:
+                        raise
+                    unreachable.add(index)
+                    speaking.discard(index)
+            # AFTER the sends, so a node discovered unreachable while
+            # dispatching is not counted as a voter this step. Counting it would
+            # recreate the barrier one step at a time.
+            expected[step] = len(speaking)
 
         while settled < len(tokens):
             while sent < len(tokens) and sent - settled < window:
@@ -400,12 +490,35 @@ class Network:
             # i.e. the only configuration this project actually cares about.
             live = [sock for i, sock in enumerate(self._connections)
                     if i not in dead]
-            ready, _, _ = select.select(live, [], [], 30.0)
-            if not ready:
+            # Never block past the next deadline. Selecting for the full 30
+            # seconds would make the deadline advisory -- a step could be due to
+            # settle while the driver sat waiting for a node that is not coming,
+            # which is the stall this parameter exists to remove.
+            wait = 30.0
+            if deadline is not None and settled in asked_at:
+                wait = max(0.0, deadline - (time.monotonic()
+                                            - asked_at[settled]))
+            ready, _, _ = select.select(live, [], [], wait)
+            if not ready and deadline is None:
                 raise TimeoutError(
                     f"no node answered within 30s at step {settled}")
             for sock in ready:
-                message = receive(sock)
+                try:
+                    message = receive(sock)
+                except (ConnectionError, OSError):
+                    # A RESET IS A HANG-UP, and the two arrive differently.
+                    #
+                    # A peer that closes cleanly gives an empty read; a peer
+                    # whose process was killed resets the connection, which
+                    # RAISES. The branch below has always handled the first and
+                    # the second escaped it entirely -- so on any platform that
+                    # reports a dead peer as a reset, the hang-up path never
+                    # fired and a killed node took the run down with it.
+                    #
+                    # Unconditional, unlike the send-side guards: this is not
+                    # fault tolerance being opted into, it is a case the
+                    # existing branch always meant to cover.
+                    message = b""
                 if not message:
                     # A real hang-up, not a simulated departure. Stop selecting
                     # on it or select() returns it ready forever.
@@ -424,9 +537,25 @@ class Network:
                     slot[0] += np.frombuffer(message[4:], dtype=">f8")
                 slot[1] += 1
 
-            while settled < sent and pending[settled][1] >= expected[settled]:
+            while settled < sent:
+                votes = pending[settled][1]
+                complete = votes >= expected[settled]
+                # OVERDUE, and it settles on what arrived. At least one vote is
+                # required: settling on none would emit `argmax` of a zero
+                # vector, which is token 0 wearing the appearance of an answer.
+                overdue = (deadline is not None and votes >= 1
+                           and time.monotonic() - asked_at[settled] >= deadline)
+                if not (complete or overdue):
+                    break
+                if not complete:
+                    # Recorded rather than logged. A degraded answer that leaves
+                    # no trace is indistinguishable from a good one, and the
+                    # whole point of a deadline is that the degradation is the
+                    # thing being measured.
+                    self.steps_settled_short[settled] = (
+                        expected[settled] - votes)
                 predictions[settled] = int(pending[settled][0].argmax())
-                del pending[settled], expected[settled]
+                del pending[settled], expected[settled], asked_at[settled]
                 settled += 1
         return predictions
 

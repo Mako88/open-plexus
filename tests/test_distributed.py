@@ -248,6 +248,72 @@ class NodesLeaveOverTheWire(unittest.TestCase):
                          "when a node stopped answering made no difference")
 
 
+class ADepartureNOBODYDECLARED(unittest.TestCase):
+    """The failure C3 actually describes, and the one nothing here tested.
+
+    Every churn result in this project was measured with `absent` and `leave_at`
+    -- departures announced to the driver IN ADVANCE, which lower `expected` so a
+    step still settles. C3 says the opposite: *"any node can vanish
+    mid-computation"*, without warning.
+
+    Undeclared, the driver waits for a vote that is never coming. That is a
+    barrier that stalls when a participant is gone, which is precisely what
+    amended C1 forbids -- so this is C1 and C3 failing in the same place.
+    """
+
+    def test_a_deadline_does_not_change_the_answer_when_everyone_replies(self):
+        """The regression rail. If a deadline moved the healthy answer, every
+        earlier result would be measured under a different model."""
+        config, model = configured(4)
+        with Network(config, 4, model.wv, model.wo) as network:
+            strict = network.run(TOKENS, window=2)
+            timed = network.run(TOKENS, window=2, deadline=5.0)
+            self.assertEqual(network.steps_settled_short, {},
+                             "a healthy run settled a step short, so the "
+                             "deadline is firing when it should not")
+        np.testing.assert_array_equal(
+            strict, timed,
+            "a deadline changed the answer on a run where every node replied")
+
+    def test_a_deadline_of_zero_is_refused(self):
+        config, model = configured(2)
+        with Network(config, 2, model.wv, model.wo) as network:
+            with self.assertRaises(ValueError):
+                network.run(TOKENS, deadline=0.0)
+
+    def test_an_undeclared_death_completes_WITH_a_deadline(self):
+        """A node killed without telling the driver. The run must finish."""
+        config, model = configured(4)
+        with Network(config, 4, model.wv, model.wo) as network:
+            healthy = network.run(TOKENS, window=2)
+            network._processes[1].terminate()
+            network._processes[1].join(timeout=5)
+
+            degraded = network.run(TOKENS, window=2, deadline=1.0)
+
+            self.assertIn(1, network.nodes_unreachable,
+                          "the dead node was not noticed at all")
+            self.assertFalse(
+                np.array_equal(healthy, degraded),
+                "losing a quarter of the store changed nothing, which means "
+                "the node was still being counted")
+
+    def test_an_undeclared_death_still_RAISES_without_a_deadline(self):
+        """Strict mode is preserved deliberately.
+
+        Turning a crash into silent degradation by default would hide real
+        faults behind a fault-tolerance feature -- and every existing result was
+        measured in strict mode, so it has to keep meaning what it meant.
+        """
+        config, model = configured(4)
+        with Network(config, 4, model.wv, model.wo) as network:
+            network.run(TOKENS, window=2)
+            network._processes[1].terminate()
+            network._processes[1].join(timeout=5)
+            with self.assertRaises((ConnectionError, OSError, TimeoutError)):
+                network.run(TOKENS, window=2)
+
+
 class SlicesAreExactOrRefused(unittest.TestCase):
 
     def test_uneven_splits_raise_rather_than_round(self):

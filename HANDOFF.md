@@ -127,9 +127,35 @@ vector. **There is nowhere for `R1` to be while `R2` is fetched.**
 This narrows decision 92 rather than contradicting it: zero-shot depth
 generalisation is real and is generalisation over *repeating one replace*.
 
-**Next mechanism, named:** carry state across hops instead of overwriting it.
-It is the first thing on this project's path that requires holding two things at
-once.
+**That mechanism is now built** (`hop_accumulate="concat"`, decision 102) and it
+holds both. `replace` is still the default so every earlier number stands.
+
+    task hops 2, floor 0.470      hops 1  0.347   hops 2 replace  0.027
+                                  hops 2 concat   0.347
+    task hops 3, floor 0.282      hops 1  0.120   hops 3 concat   0.180
+
+Concat matches the one-hop model exactly at two hops, and that is diagnostic
+rather than disappointing: hop 2 retrieves a PERSON, which says nothing about
+the second relation, so the readout learns to ignore it and the model reduces to
+its one-hop self.
+
+### TRAVERSAL IS NOW THE ONLY BLOCKER, and its cause is known
+
+To reach the second fact the model needs `M`, the middle person, which lives in
+fact `[S, R1, M]`; then `key(M) -> R2`. The obstacle: **`key(R1)` is superposed
+across every fact sharing that relation**, so following it retrieves an average
+of every such object.
+
+`context_keys` already binds `(previous, token)` pairs, which would make
+`key(S, R1) -> M` a distinct binding. Whether a hop can *construct* that pair
+key is the next design question.
+
+> Also worth knowing: **concatenation was expected to fail and does not.** The
+> argument — a linear readout over `[r1, r2]` is additive, composition is not —
+> confuses a functional form with a classification problem. Measured over the
+> whole rule table: concat **1.000**, product 0.812, convolve 0.812. Sixteen
+> rules in a wide space are linearly separable whatever the labels do. Whether
+> that holds with far more rules is unsettled.
 
 ## The sharpest thing to know, from decisions 89 and 92 together
 

@@ -568,6 +568,63 @@ class TheGateChoosesWhichHopToRead(unittest.TestCase):
             np.testing.assert_allclose(off, on, atol=1e-12)
 
 
+class AccumulatingAcrossHops(unittest.TestCase):
+    """Decision 101: composing needs BOTH retrievals, and `replace` keeps one.
+
+    `concat` was expected to fail on the argument that a linear readout over
+    `[r1, r2]` is additive while composition is not. Measured over the whole
+    rule table, that argument is wrong — 1.000 for concat against 0.812 for a
+    product — because a handful of rules in a wide space are linearly separable
+    whatever structure the labels have.
+    """
+
+    def test_concat_widens_the_readout_by_the_hop_count(self):
+        for hops in (2, 3):
+            plain = LocalAssociativeMemory(config(hops=hops))
+            wide = LocalAssociativeMemory(
+                config(hops=hops, hop_accumulate="concat"))
+            with self.subTest(hops=hops):
+                self.assertEqual(wide.wo.shape[1], plain.wo.shape[1] * hops)
+                self.assertEqual(wide.grouped_wo.base is wide.wo, True)
+
+    def test_a_hop_decodes_from_the_LATEST_fetch_not_the_accumulator(self):
+        """**The bug this nearly shipped with.** Under `bind` the accumulator
+        and the newest retrieval differ, and decoding the bound product would
+        ask "what token is R1-and-R2 together" — which names nothing, so the
+        traversal wanders off after hop 1 while still looking like it runs.
+
+        Asserted by keys: `replace` and `bind` must issue the SAME sequence of
+        hop keys, because binding changes what the readout sees and must not
+        change where the hops go.
+        """
+        keys = {}
+        for accumulate in ("replace", "bind"):
+            model = LocalAssociativeMemory(
+                config(hops=3, hop_accumulate=accumulate))
+            model.wo[:] = model.wv
+            keys[accumulate] = keys_used(model, TOKENS, 3)
+        for one, other in zip(keys["replace"], keys["bind"]):
+            np.testing.assert_allclose(one, other, atol=1e-12)
+
+    def test_accumulating_needs_something_to_accumulate(self):
+        for accumulate in ("bind", "concat"):
+            with self.subTest(accumulate=accumulate):
+                with self.assertRaises(ValueError):
+                    config(hops=1, hop_accumulate=accumulate)
+
+    def test_concat_and_the_gate_are_refused_together(self):
+        """The gate chooses WHICH hop to read; concat gives the readout all of
+        them. Together the gate would be selecting among inputs the readout
+        already has, which is not a mechanism, it is a contradiction."""
+        with self.assertRaises(ValueError):
+            config(hops=2, hop_accumulate="concat", halt_gate=True,
+                   gate_reads_key=False)
+
+    def test_an_unknown_accumulator_is_refused(self):
+        with self.assertRaises(ValueError):
+            config(hops=2, hop_accumulate="average")
+
+
 class ImpossibleSettingsAreRefused(unittest.TestCase):
 
     def test_zero_hops_is_refused(self):

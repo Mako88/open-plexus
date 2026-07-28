@@ -5132,3 +5132,72 @@ and identified. An accumulator has not been tried.
 Nor is the traversal problem separately settled: even a mechanism that combines
 would still need to reach the second fact, and `key(relation)` is superposed
 across every fact sharing that relation. Two problems, not one.
+
+## 102. The accumulator is built, my reason for choosing it was wrong, and traversal is now the only blocker
+
+Decision 101 named the missing mechanism: carry state across hops instead of
+overwriting it. `hop_accumulate` does that, with `replace` the default so every
+earlier number is unchanged and the golden values are bit-identical.
+
+### I picked the wrong combiner, for a reason that does not hold
+
+The argument was that concatenation cannot work — a linear readout over
+`[r1, r2]` learns only `f(r1) + g(r2)`, and composition is not additive, since
+`child` then `sibling` is `child` while `child` then `SO` is `in-law`. So an
+elementwise product was chosen to carry the interaction.
+
+Fitting a linear map from a combined pair to the answer, over the entire rule
+table, with no model or store involved:
+
+    product   0.812      concat   1.000      convolve   0.812
+
+**Concatenation is perfect and the multiplicative bindings lose information.**
+The argument confused a functional form with a classification problem: sixteen
+rules in a 128-wide space are linearly separable whatever structure the labels
+have, and a product of two random vectors does not keep its operands
+recoverable. `bind` is kept as the measured alternative rather than deleted.
+
+Whether concat still wins with far more than sixteen rules is a scale question
+and is **not** settled by this.
+
+### On the task
+
+    task hops 2   floor 0.470        task hops 3   floor 0.282
+      hops 1 replace     0.347         hops 1 replace     0.120
+      hops 2 replace     0.027         hops 3 replace     0.047
+      hops 2 bind        0.067         hops 3 bind        0.060
+      hops 2 concat      0.347         hops 3 concat      0.180
+
+**Concat exactly matches the one-hop model at two hops** — 0.347 to three
+decimals — and that is not luck. Hop 2 retrieves a *person*, which carries no
+information about the second relation, so the readout learns to ignore those
+columns and the model reduces to its one-hop self. At three hops concat does
+beat one hop (0.180 against 0.120), so there is some signal deeper in.
+
+So the accumulator now does its job and no longer *harms* the way `replace` and
+`bind` did. **What it holds is still the wrong second thing.**
+
+### What this licenses
+
+Traversal is the single remaining blocker and its cause is identified. To reach
+the second fact the model needs `M`, the middle person — which lives in fact
+`[S, R1, M]` — and then `key(M) -> R2`. The obstacle is that `key(R1)` is
+superposed across every fact sharing that relation, so following it retrieves an
+average of every such object.
+
+`context_keys` already binds `(previous, token)` pairs, which would make
+`key(S, R1) -> M` a distinct binding. Whether a hop can *construct* that pair
+key is the next design question.
+
+### What it does NOT license
+
+Any claim that concat helps on tasks the traversal already serves. On chains it
+would be extra parameters with nothing new to see, and it is refused alongside
+the gate and the hidden layer rather than silently composed with them.
+
+The near-miss worth recording: under `bind` the accumulator and the newest
+retrieval differ, and the decode must read the **newest**. Decoding the
+accumulator asks what token `R1`-and-`R2`-together names, which is nothing —
+and because the two are the same vector under `replace`, every default result
+and every structural test would have passed anyway.
+`a-hop-decodes-from-the-accumulator` is the mutation, verified caught.

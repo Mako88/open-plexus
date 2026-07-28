@@ -896,6 +896,35 @@ class LocalMemoryConfig:
     #: does not — so the body stops outvoting the query and merely supplies more
     #: examples of one class.
     gate_objective: str = "mixture"
+
+    #: What a hop does with the retrieval it already had.
+    #:
+    #: ``"replace"`` keeps only the newest, which is what every earlier result
+    #: used. It is right for following a pointer -- a transitive chain only ever
+    #: needs where you landed -- and decision 101 measured it failing on typed
+    #: relations for a structural reason: composing `R1` with `R2` needs BOTH
+    #: held at once, and replacing leaves nowhere for `R1` to be.
+    #:
+    #: ``"concat"`` gives the readout every hop's retrieval side by side.
+    #: ``"bind"`` multiplies them elementwise.
+    #:
+    #: **`concat` was expected to fail and does not.** The argument against it
+    #: was that a linear readout over `[r1, r2]` can only learn `f(r1) + g(r2)`,
+    #: and composition is not additive. That is true of the functional FORM and
+    #: irrelevant to the task: fitting a linear map from the bound pair to the
+    #: answer over the whole rule table gives
+    #:
+    #:     product   0.812      concat   1.000      convolve   0.812
+    #:
+    #: because sixteen rules in a space this wide are linearly separable
+    #: whatever structure the labels have. The multiplicative bindings LOSE
+    #: information -- a product of two random vectors does not keep its
+    #: operands recoverable -- and score worse than the option that keeps both.
+    #:
+    #: `bind` is kept as the measured alternative, not as a fallback. Whether
+    #: concat still wins with far more rules than sixteen is a scale question
+    #: and is not settled here.
+    hop_accumulate: str = "replace"
     cache_slots: int = 0
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
@@ -915,6 +944,24 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if self.hop_accumulate not in ("replace", "bind", "concat"):
+            raise ValueError(
+                "hop_accumulate must be 'replace', 'bind' or 'concat', not "
+                f"{self.hop_accumulate!r}")
+        if self.hop_accumulate == "concat" and self.halt_gate:
+            raise ValueError(
+                "concat gives the readout every hop at once, so there is no "
+                "hop left to choose between -- halt_gate would be selecting "
+                "among inputs the readout already has")
+        if self.hop_accumulate == "concat" and self.hidden:
+            raise ValueError(
+                "concat resizes the readout's input and `hidden` sits between "
+                "them; the two have not been made to compose and silently "
+                "mis-shaping the hidden layer would be worse than refusing")
+        if self.hop_accumulate != "replace" and self.hops < 2:
+            raise ValueError(
+                "hop_accumulate says what to do with a PREVIOUS retrieval and "
+                "there is none with hops=1")
         if self.gate_objective not in ("mixture", "which_hop"):
             raise ValueError(
                 "gate_objective must be 'mixture' or 'which_hop', not "
@@ -1174,6 +1221,15 @@ class LocalAssociativeMemory:
                 0.0, 1.0 / np.sqrt(per), (config.partitions, config.hidden, per))
             # The output weights now read the HIDDEN units, not the retrieval.
             self.wo = np.zeros((v, config.partitions * config.hidden))
+        if config.hop_accumulate == "concat":
+            # THE READOUT'S INPUT IS `hops` TIMES WIDER, because it sees every
+            # hop side by side rather than only the last. Columns
+            # `[0 : d // partitions]` of each group are hop 1, so a caller that
+            # seeds the readout from `Wv` writes into that slice and leaves the
+            # later hops at zero -- which starts the model as the one-hop model
+            # and lets the extra hops earn their weight.
+            self.wo = np.zeros((v, config.partitions * config.hops
+                                * (d // config.partitions)))
         self.grouped_wo = self.wo.reshape(v, config.partitions, -1)
         assert self.grouped_wo.base is self.wo, "grouped_wo must alias wo"
         #: Per-group score for "read from this hop", or None when the gate is
@@ -1820,9 +1876,16 @@ class LocalAssociativeMemory:
             # destroyed the 1-hop case that already worked. Same shadowing class
             # as `store` above, and just as quiet.
             hop_key = key
+            # `latest` is what the NEXT hop decodes from; `retrieved` is what
+            # the readout eventually consumes. Identical under `replace`, and
+            # under `bind` they are two different jobs sharing a loop.
+            latest = retrieved
             # Only collected when the gate is on, so the ungated path allocates
             # nothing and stays bit-identical to what every earlier result used.
-            per_hop = [retrieved] if self.halt_w is not None else None
+            # Collected for the gate, and for `concat` which needs every hop.
+            keep_hops = (self.halt_w is not None
+                         or self.config.hop_accumulate == "concat")
+            per_hop = [retrieved] if keep_hops else None
             # One EXTRA retrieval when gating: the gate scores hop k by what hop
             # k+1 returns, so the last readable hop still needs a lookahead.
             extra = 1 if self.halt_w is not None else 0
@@ -1859,11 +1922,16 @@ class LocalAssociativeMemory:
                 # parameter. Both are kept because which one wins is a property
                 # of the configuration (decision 74) and this is the axis that
                 # measures it.
+                # DECODED FROM THE LATEST FETCH, never from the accumulator.
+                # Under `bind` those differ, and decoding the bound product
+                # would ask "what token is R1-and-R2 together", which names
+                # nothing -- the traversal would wander off after the first
+                # hop while still looking like it was running.
                 if self.config.hop_decoder == "encoder":
-                    pooled = self.wv @ retrieved
+                    pooled = self.wv @ latest
                 else:
                     scores = np.einsum("vgd,gd->gv", self.grouped_wo,
-                                       retrieved.reshape(groups, -1))
+                                       latest.reshape(groups, -1))
                     pooled = scores.sum(0)
 
                 # SHARPEN, SCALE-FREE. Measured before this line existed: the
@@ -1893,7 +1961,26 @@ class LocalAssociativeMemory:
                 # asserted rather than hedged. `hop_sharpness` is the dial
                 # between the two, and high enough approaches argmax.
                 hop_key = weights @ self.wk
-                retrieved = self.retrieval.read(readable, hop_key)
+                fetched = self.retrieval.read(readable, hop_key)
+                if self.config.hop_accumulate == "bind":
+                    # HOLD BOTH, by binding them into one vector.
+                    #
+                    # Rescaled to the norm of what was just fetched. An
+                    # elementwise product of two small vectors is much smaller
+                    # than either -- magnitudes here run around 0.13, so an
+                    # unscaled product lands near 0.017 and shrinks again every
+                    # hop, which would starve the readout and the delta rule
+                    # both. The DIRECTION carries the binding; the magnitude
+                    # only has to stay in the range the rest of the model works
+                    # in.
+                    bound = retrieved * fetched
+                    size = float(np.linalg.norm(bound))
+                    if size > 0.0:
+                        bound *= float(np.linalg.norm(fetched)) / size
+                    retrieved = bound
+                else:
+                    retrieved = fetched
+                latest = fetched
                 if per_hop is not None:
                     per_hop.append(retrieved)
 
@@ -1924,7 +2011,14 @@ class LocalAssociativeMemory:
             # Per group, and the softmax is per group too: group g scores its
             # own slice of each hop and weighs its own hops. Nothing crosses a
             # group, and groups may disagree because the answer sums over them.
-            if per_hop is None:
+            if self.config.hop_accumulate == "concat":
+                # Every hop's slice for this group, side by side. Per group
+                # still -- a group sees its OWN dimensions across all hops and
+                # no other group's, so the locality argument is unchanged and
+                # only the width of each group's view grows.
+                sliced = np.concatenate(
+                    [r.reshape(groups, -1) for r in per_hop], axis=1)
+            elif per_hop is None:
                 sliced = retrieved.reshape(groups, -1)
             else:
                 # GAIN, because the first version of this gate was INERT.

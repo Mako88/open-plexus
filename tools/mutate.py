@@ -756,6 +756,19 @@ MUTATIONS = [
         new="                    self.halt_w += 0.0 * shared",
     ),
     Mutation(
+        name="a-hop-decodes-from-the-accumulator",
+        breaks="the traversal, only under `bind`, which is the quietest place "
+               "for it. The accumulator and the newest retrieval are the same "
+               "vector under `replace`, so every default result is unchanged "
+               "and every structural test still passes -- but under `bind` the "
+               "decode would ask what token R1-and-R2 together names, which is "
+               "nothing, and the hops wander off after the first while still "
+               "looking like they run",
+        path=LOCAL,
+        old="                    pooled = self.wv @ latest",
+        new="                    pooled = self.wv @ retrieved",
+    ),
+    Mutation(
         name="a-hop-key-escapes-into-the-write-path",
         breaks="the invariant that hops change what is READ and never what is "
                "written, and this is the bug that actually happened. `key` is "

@@ -3341,3 +3341,77 @@ If learned wins, structural plasticity has a number and the larger version is
 worth building. If it ties, random sparsity already captures the benefit and
 evolution is complexity for nothing. Either answer is worth having and neither
 needs a full plasticity mechanism to obtain.
+
+---
+
+## 74. Sparse keys were compensating for a weak readout, and one chosen topology lost
+
+**A crossover interaction, and it re-scopes decisions 67 and 68.** Prequential
+tail, 120,000 characters, three seeds, learning rate swept in every cell:
+
+       readout      keys    mean  spread
+        linear     dense   5.222   0.133
+        linear   sparse4   4.794   0.076    sparse WINS by 0.428
+       2-layer     dense   4.487   0.034
+       2-layer   sparse4   4.586   0.045    sparse LOSES by 0.099
+
+Both differences clear their spreads. **Sparse keys help a linear readout
+substantially and hurt a composed one.**
+
+The reading: sparsity reduces interference between tokens, and interference only
+costs you if the readout cannot disentangle superposed features. **A linear map
+cannot; a composed one can** — so once the readout is capable, it prefers the
+denser and more informative representation. Sparse keys were never a
+representational improvement. They were a workaround for a readout that could
+not cope with overlap.
+
+**Best configuration measured so far: 2-layer with DENSE keys, 4.487 bits** —
+better than the 4.540 recorded in decision 72, at less than half the data,
+because the learning rate was swept over four values here rather than two.
+
+### What this does to decisions 67 and 68
+
+Not retracted, re-scoped. Their numbers were measured with the model's LINEAR
+readout and are correct for it. **Their recommendation does not survive the
+readout change**, and it was a standing recommendation, which is worse.
+
+Sparse keys keep two arguments that this measurement does not touch: they are
+cheaper on the wire (C1), and g6-01 measured them protecting old learning from
+new, which C4 makes load-bearing. So the position is now a TRADE — 0.099 bits
+against bandwidth and forgetting-resistance — rather than a free win. Decision 68
+made them derivable per token, which stands regardless.
+
+### John's topology question, answered narrowly and in the negative
+
+    sparse k=4 DRAWN        4.629
+    sparse k=4 ALLOCATED    4.736
+
+Allocating each token's active dimensions by frequency, round-robin so frequent
+tokens get disjoint address space, is WORSE than drawing them at random.
+
+**This is one hand-designed static topology failing, not a refutation of
+structural plasticity.** Round-robin-by-frequency also places addresses
+systematically, which imposes structure uncorrelated with the corpus, and a
+static allocation cannot adapt — which is the entire point of the proposal it
+was standing in for. What it does establish is that *merely choosing* addresses
+is not free improvement, so a plasticity mechanism has to earn its result rather
+than inherit one.
+
+### The methodological finding, which may outlast the numbers
+
+**Three times today a mechanism turned out to be configuration-specific rather
+than good or bad.** Sparse keys were dismissed on MQAR (g6-01), revived on the
+corpus (decision 67), and are now re-scoped again by the readout (here). The
+exact cache's advantage is measured against a linear readout and has not been
+re-checked against a composed one. Nor has the retrieval seam's whole comparison
+set.
+
+The standing rule — *a mechanism measured only on the task it was designed for is
+not measured* — needs a companion: **a mechanism measured only against the
+readout it was tuned beside is not measured either.** Every number in this
+project's comparison set was taken with a linear readout, and the readout is the
+thing that just changed.
+
+That is a large invalidation and it should be stated plainly rather than
+discovered piecemeal. It does not mean the numbers were wrong; it means they were
+conditional, and the condition moved.

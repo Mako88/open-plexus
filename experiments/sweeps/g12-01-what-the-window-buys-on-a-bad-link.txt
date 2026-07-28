@@ -1,0 +1,111 @@
+What does the asynchrony window actually buy on a bad link?
+==========================================================
+
+Script: testbed/run.py, in real containers with `tc netem` on the link
+Status: DISPATCHED, awaiting results.
+
+
+IN PLAIN TERMS
+---------------
+Our machines have to talk to each other over ordinary internet links, which are
+slow and lose packets. There are two ways to run: **lock-step**, where everyone
+waits for everyone before the next step, and **windowed**, where a machine may
+run a few steps ahead of the news it has received.
+
+Lock-step is simple and obviously correct. It is also exactly the waiting-for-
+everyone that the whole project is built to avoid. This measures what running
+ahead is worth, and — more importantly — **whether the answers stay right when
+you do it.**
+
+Fast and wrong is worthless here, so the headline number is not the speed. It is
+whether the network still agrees, exactly, with the same model run in one
+process.
+
+
+WHY THIS EXISTS
+----------------
+[Note 014](../../docs/notes/014-the-first-real-packets.md) measured this once and
+**said plainly that it should not be trusted**:
+
+> *"These are single runs. One measurement per configuration, no repeats, no
+> seeds, no error bars. Timing is the noisiest thing this project has ever
+> measured... The 7.3x is an observation, not a measured effect, and it needs a
+> proper repeated sweep before it goes in GOALS."*
+
+That sweep was never run. The 7.3x has sat in a note for months, correctly
+marked as unreliable, and it is the number behind the claim that **obeying C1 is
+not merely a constraint but the thing that makes the design usable.** A claim
+that load-bearing should not rest on one unrepeated run.
+
+This is that sweep, with repeats.
+
+
+PREDICTIONS
+------------
+Registered before dispatch.
+
+  P1  **AGREEMENT HOLDS AT EVERY WINDOW AND EVERY IMPAIRMENT.** The receiver
+      buffers by step index so late arrivals are reassembled rather than
+      misfiled. If this fails the window is not a performance knob, it is a
+      correctness bug, and every other number here is void.
+
+  P2  **THE SPEEDUP IS REAL AND SURVIVES REPEATS**, window 1 to window 8, on the
+      impaired link. Note 014 saw 7.3x once.
+
+  P3  **THE SPEEDUP IS MUCH SMALLER ON A CLEAN LINK.** The window hides latency;
+      with no latency to hide there is little to win. Note 014's clean-link
+      figure is 0.00048 s/step against 0.125 at lock-step on the bad link, so
+      most of the 7.3x should be the link rather than the protocol.
+
+  P4  **SECONDS PER STEP FALLS MONOTONICALLY WITH WINDOW** and flattens once the
+      window exceeds the number of round trips in flight the link can hold.
+
+WHAT WOULD REFUTE EACH: P1 by any cell reporting `agrees_with_one_process` false
+or a non-zero mismatch count. P2 by the impaired-link speedup falling inside the
+spread across repeats. P3 by the clean-link speedup matching the impaired one.
+P4 by a non-monotone curve outside the spread.
+
+**P1 is the one that matters and P2 is the one that is quoted.** If P1 fails, the
+project's asynchrony story is wrong at the protocol level rather than the model
+level, which nothing measured so far would have caught.
+
+
+COST
+-----
+24 jobs: 4 windows x 2 links x 3 repeats. Four nodes, width 16, 40 steps.
+
+    window       1, 2, 4, 8
+    link         clean; 80 ms delay, 20 ms jitter, 2% loss
+    repeats      3, because TIMING IS THE NOISIEST THING HERE and note 014's
+                 own caveat is that it had none
+
+Measured locally: container join is ~0.7 s per node and the model work is under
+0.2 s even at 64 nodes, so a four-node cell is seconds. The matrix is minutes,
+dominated entirely by starting containers.
+
+**Repeats are separate JOBS rather than a loop inside one**, so a cell that dies
+loses one repeat rather than three, and so the per-run values are visible
+individually — which is this project's per-seed rule applied to wall-clock.
+
+
+MEASURED ON
+------------
+Real containers on a Docker bridge, `tc netem` applied to each node's EGRESS
+only. Note 014's limits are inherited and restated rather than assumed away:
+
+- **No NAT, no asymmetric routes, no competing congestion.** A real link is
+  worse in ways this cannot show.
+- **The impairment is one-way.** The driver's packets are undelayed, so a round
+  trip here is half as impaired as a real one.
+- **It is small.** Four nodes, width 16. Nothing here speaks to the widths the
+  tiny-node results are about.
+
+The link settings are NAMED VALUES, not randomness. A run under ambient random
+loss fails for reasons unrelated to the change under test, and the answer is
+always to re-run it, which is how a suite stops being believed. C2 asks for a
+stated bound; this states it.
+
+
+THE NUMBERS
+------------
+Awaiting the run.

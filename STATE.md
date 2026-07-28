@@ -272,10 +272,21 @@ running. Two related bugs fell out: a send to a reset peer propagated, and **a
 reset was never treated as a hang-up at all**, so on any platform reporting a
 dead peer as a reset the existing hang-up branch never fired.
 
-**Still short of SWIM, and notes 039/040 say how.** Detection runs on the data
-path rather than a probe channel; there is no indirect probing, so a slow node
-and a gone node are indistinguishable; and the driver is the sole detector, which
-is a coordinator by another name. Suspicion-with-recovery is in; the rest is not.
+**Still short of SWIM, and note 039 — now read from the paper — says how.**
+Detection runs on the data path rather than a probe channel; there is no indirect
+probing, so a slow node and a gone node are indistinguishable; and the driver is
+the sole detector, a coordinator by another name. Suspicion-with-recovery is in.
+
+**The next item is a MEASUREMENT, not a mechanism.** SWIM's periods are time
+derived from a measured round-trip distribution, with `T' ≥ 3 × RTT`. Ours
+(`RETRY_AFTER_STEPS = 8`) counts *steps*, and a step has no fixed duration — a
+guess in the wrong unit. **Measure RTT on the testbed**: it is the same number
+note 003's `d_max` has always needed, C2 requires a stated bound, and no detector
+tuned in steps can state one.
+
+> SWIM also achieves **≤135 bytes per packet regardless of group size**, by
+> separating detection from dissemination. That is amended C1's requirement met
+> in a published system — an existence proof, not a trade-off to haggle over.
 
 **Every churn result in the project was measured with departures announced in
 advance.**

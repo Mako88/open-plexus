@@ -24,11 +24,16 @@ is"*, and it was not followed here.
 
 ## What SWIM does
 
-Source: the protocol as described on
-[Wikipedia](https://en.wikipedia.org/wiki/SWIM_Protocol), which is a summary and
-not the paper. **The paper (Das, Gupta & Motivala, 2002) is still unread** — the
-PDF fetch returned unparseable binary. Rule 1 applies: nothing below may be
-quoted as a property of SWIM until the paper is read.
+**Source: the paper itself** — Das, Gupta & Motivala, *SWIM*, DSN 2002, from
+[Cornell](https://www.cs.cornell.edu/projects/Quicksilver/public_pdfs/SWIM.pdf).
+
+> *An earlier version of this note read the Wikipedia summary and recorded the
+> paper as unread, because the fetch returned "unparseable binary". It was not
+> unparseable — the console was cp1252 and a single `fi` ligature killed the
+> extraction. `pypdf` reads it fine to a UTF-8 file.* **Ten pages were sitting on
+> disk behind an encoding error**, and the note carried a rule-1 caveat that a
+> two-line script removed. Worth remembering the next time a source is written
+> off as unavailable.
 
 1. **Detection runs on its own channel.** Every node pings a random other node
    every `T'`. Liveness is never inferred from the absence of application data.
@@ -44,6 +49,44 @@ quoted as a property of SWIM until the paper is read.
    dead; another spreads that news, piggybacked on the probes.
 5. It claims **strong completeness** — every live node eventually learns of a
    crash.
+
+## The paper describes our bug in its own words
+
+§4.2, on why the Suspicion subprotocol exists:
+
+> a perfectly healthy process suffers a very heavy penalty, by being forced to
+> drop out of the group at the very first instance that it is mistakenly
+> detected as failed
+
+That is exactly what the first version of `distributed.py`'s `unreachable` set
+did, arrived at independently and for the same reason — one missed send was
+treated as proof. The paper's causes are ours too: packet loss, a process that
+was asleep, or a *slow* process.
+
+## The parameters, which are measured rather than chosen
+
+This is the part a summary cannot give, and it is the part that bears on our
+code:
+
+- **Two parameters only**: protocol period `T'`, and `k`, the size of the
+  failure-detection subgroup.
+- **No synchronised clocks.** The properties hold if `T'` is the *average*
+  protocol period across members — which matters here, because a network of
+  strangers' machines has no common clock.
+- **The timeout before indirect probing is an estimate of the round-trip
+  distribution** — the paper names the average or the 99th percentile. Measured,
+  not picked.
+- **`T'` must be at least three times the round-trip estimate.** A concrete
+  ratio, and we have nothing like it.
+- **Packets are at most 135 bytes regardless of group size.** That is precisely
+  the property amended C1 asks for — bounded bytes per hop, independent of how
+  many participants there are — and SWIM achieves it by separating detection
+  from dissemination rather than by sending less often.
+
+**`RETRY_AFTER_STEPS = 8` is a guess in the wrong unit.** SWIM's periods are
+*time* derived from *measured* round-trip times; ours is a count of steps, and a
+step has no fixed duration. Note 003's `d_max` is where a measured bound would
+live, and it is still not measured.
 
 ## What that says about `distributed.py`
 
@@ -76,12 +119,13 @@ do not have.
 
 ## What to do, in order
 
-1. **Add a suspicion state**, so a node that misses a deadline is suspect rather
-   than gone, and can return. Cheapest, and it fixes a wrong behaviour rather
-   than adding a capability.
-2. **Read the actual paper** before building anything shaped like SWIM. Note 005
-   exists because a borrowed claim that gated a design decision turned out to
-   describe a variant this project cannot use.
+1. ~~**Add a suspicion state**~~ **DONE** (decision 126) — a node that fails a
+   send is suspect rather than gone, retried, and cleared by a successful send.
+   It fixed a wrong behaviour rather than adding a capability.
+2. **Put the retry interval in the right unit.** `RETRY_AFTER_STEPS` counts
+   steps; SWIM's periods are time derived from a measured round-trip
+   distribution, with `T' ≥ 3 × RTT`. Measuring RTT on the testbed is the
+   prerequisite, and it is the same measurement `d_max` has always needed.
 3. **Then decide whether the driver should detect at all.** A single detector is
    a coordinator, and C1 exists to forbid those. SWIM's detection is peer-to-peer
    by design, and our driver is an artefact of the benchmark rather than of the

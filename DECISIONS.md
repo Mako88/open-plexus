@@ -71,6 +71,7 @@ a report to John, not a gate.
 | 124 | the objective is the thesis; the driver has no failure detector |
 | 125 | traversal is the win (+0.269); search helps only where ambiguity is |
 | 126 | SWIM and CRDTs read; the detector ejected nodes permanently, now fixed |
+| 127 | the SWIM paper was never unreadable; the retry interval is in the wrong unit |
 
 ---
 
@@ -3091,3 +3092,85 @@ reconciliation around additive deltas rather than averaging.
 Quoting either note as established. Both rest on encyclopaedia summaries, and
 note 005 exists because a borrowed claim that gated a design decision turned out
 to describe a variant this project cannot use.
+
+---
+
+## 127. The SWIM paper was never unreadable, and it describes our bug in its own words
+
+Note 039 was published against a Wikipedia summary with a rule-1 caveat: *"the
+paper is still unread — the PDF fetch returned unparseable binary."*
+
+**It was not unparseable.** The PDF was fine and had been on disk the whole time.
+The console here is cp1252, a single `fi` ligature aborted the extraction, and an
+**encoding error looked like a bad download**. Ten pages of primary source were
+behind a two-line fix: write to a UTF-8 file instead of printing.
+
+`tools/pdf_text.py` exists so the next source is not written off the same way.
+Its docstring carries the lesson rather than the incident: **a tool that dies on
+the first character it cannot print will make a readable source look
+unavailable.**
+
+### The paper describes decision 126's bug in its own words
+
+§4.2, on why the Suspicion subprotocol exists:
+
+> a perfectly healthy process suffers a very heavy penalty, by being forced to
+> drop out of the group at the very first instance that it is mistakenly
+> detected as failed
+
+That is exactly what `unreachable` did before decision 126 — arrived at
+independently and for the same reason, one missed send treated as proof. The
+paper's causes are ours: packet loss, a sleeping process, or a **slow** one.
+
+### The parameters, which are measured rather than chosen
+
+The part a summary cannot give, and the part that bears on our code:
+
+    two parameters only        protocol period T', subgroup size k
+    no synchronised clocks     properties hold if T' is the AVERAGE period
+    indirect-probe timeout     an estimate of the ROUND-TRIP DISTRIBUTION --
+                               the average, or the 99th percentile
+    T' >= 3 x RTT              a concrete ratio; we have nothing like it
+    packets <= 135 bytes       REGARDLESS OF GROUP SIZE
+
+**No synchronised clocks matters here specifically**, because a network of
+strangers' machines has no common clock and several designs quietly assume one.
+
+**The packet bound is amended C1's requirement, achieved.** Bounded bytes per hop
+independent of participant count — and SWIM gets it by separating detection from
+dissemination, not by sending less often. That is an existence proof that the
+property is reachable rather than a trade-off to be haggled over.
+
+### So the next item on this line changes
+
+`RETRY_AFTER_STEPS = 8` is **a guess in the wrong unit**. SWIM's periods are time
+derived from measured round-trip times; ours counts steps, and a step has no
+fixed duration.
+
+**Measuring RTT on the testbed is now the concrete next item**, ahead of adding
+indirect probing — and it is the same measurement note 003's `d_max` has always
+needed and never had. A detector tuned in steps cannot state a bound, and C2 is
+the constraint that requires one.
+
+### The other half is still unread, and the asymmetry is the point
+
+Shapiro et al. (2011) could not be fetched: HAL is behind Anubis, `lip6.fr`
+refuses connections, Semantic Scholar returned an empty body. **Note 040 keeps
+its rule-1 caveat**, so the pair is now one note on a paper and one note on an
+encyclopaedia entry, and they should not be quoted with equal confidence.
+
+Given what reading the SWIM paper changed, that gap is worth closing rather than
+noting. Someone with the PDF can drop it anywhere on disk and
+`tools/pdf_text.py` will do the rest.
+
+### What this licenses
+
+Nothing new to build. It sharpens what to measure and it upgrades note 039 from
+summary to source.
+
+### What it does NOT license
+
+Treating note 040 as settled. And a caution that generalises past this entry: the
+first version of note 039 was **wrong about why it was limited**, which is worse
+than being limited, because a caveat that names the wrong obstacle stops anyone
+trying the thing that would have worked.

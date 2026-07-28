@@ -1,0 +1,144 @@
+Does the closure task pass G0?
+==============================
+
+Script: experiments/g14_01_does_closure_pass_g0.py
+Status: DISPATCHED. Predictions registered before the matrix ran.
+
+ANSWER: pending. A single seed is recorded below and it passes.
+
+
+IN PLAIN TERMS
+---------------
+Before spending any effort on a learning rule, check the test is worth taking. A
+test is worth taking if a system that has learned nothing does badly on it, and a
+strong conventional system does well. If both do badly the test is impossible; if
+both do well it measures nothing.
+
+The predecessor project skipped this and spent about a year measuring a learning
+rule against a ceiling that was never there.
+
+
+WHY THIS EXISTS
+----------------
+GOALS section 4:
+
+    before any learning mechanism is written, the task must be shown to have
+    substantial headroom between what a random frozen substrate achieves and
+    what a strong non-local reference achieves, with both measured, multi-seed,
+    and with the base rate of a constant predictor reported alongside.
+
+`closure.py` was designed by this project rather than borrowed, which makes the
+test MORE necessary. A task built to have a property tends to be measured as
+though it has it.
+
+
+THE ARMS
+--------
+    majority    always answer the commonest relation      the base rate
+    frozen      our model, random Wo, NO LEARNING         the substrate
+    local       our model under the delta rule            the candidate
+    attention   backprop, Adam, softmax over positions    the strong reference
+
+`attention` is given every advantage the local rule does not have. That is the
+point: it measures what the TASK admits, not what our rule achieves.
+
+
+THE SPLIT IS THE MEASUREMENT
+-----------------------------
+**The ENTAILED half is the task.** A stated fact's relation is drawn at random
+and its binding `key(S, O) -> R` is written one step AFTER the prediction point,
+so a stated fact is not recallable within its own sequence and the stated half is
+a FLOOR by construction.
+
+Every arm should sit near `majority` on stated. An arm well above it would mean a
+leak rather than learning -- which is exactly how the first version of this
+experiment was caught.
+
+
+PREDICTIONS
+-----------
+  P1  On ENTAILED, `frozen` sits at or below `majority`. A random substrate that
+      already composed would mean the task is answerable without learning, which
+      is the predecessor's failure exactly.
+
+  P2  On ENTAILED, `attention` beats `majority` by more than 0.15. If a model
+      with every advantage cannot compose here, the task is not learnable and
+      nothing downstream is worth running.
+
+  P3  THE GATE. Headroom on ENTAILED (`attention` minus `frozen`) exceeds 0.15.
+
+  P4  On STATED every arm except `majority` clears 0.60.
+
+      **This prediction is WRONG AS WRITTEN and is kept because it was
+      registered.** It assumed stated facts were recallable. They are not: the
+      binding is written one step after the prediction point. The corrected
+      expectation -- every arm within 0.05 of majority on stated -- is what the
+      summariser scores as a rail, and the original is recorded as refuted.
+
+  P5  `local` lands between `frozen` and `attention` on ENTAILED. Above frozen
+      because the delta rule learns something; below attention because it has no
+      backward pass.
+
+
+TWO DEFECTS FOUND BEFORE DISPATCH, both mine
+---------------------------------------------
+1. **The target was at the wrong position.** Every model here predicts the NEXT
+   token, and scoring at the relation's own position asks "what token is here" --
+   which a causal attention reference answered at **0.904 on STATED relations**
+   that are drawn at random and cannot be predicted at all. That was the leak,
+   not a result. Moved to the object position, where the key is `(S, O)`.
+
+2. **The reference was undersized and undertrained:**
+
+       width  64, 4 epochs    0.148    BELOW the 0.198 floor
+       width  64, 16 epochs   0.186    still below
+       width 128, 16 epochs   0.277    clears it
+       width 128, 40 epochs   0.284    saturating
+
+   At the first setting this experiment reported the task FAILING G0. **A G0
+   verdict is a statement about the REFERENCE as much as about the task** --
+   decision 63's lesson from the opposite direction, where a grid sat entirely
+   above saturation and here a reference sat entirely below it.
+
+**And one wrong diagnosis in between, recorded because it was acted on.** Only
+41% of entailed edges had both premises earlier, so 59% were unanswerable by any
+causal model. Fixing that took answerability to 100% and moved attention from
+0.147 to 0.148 -- **the ordering was not the cause.** The fix is kept because the
+property is required, not because it explained anything.
+
+
+THE SINGLE SEED, RUN BEFORE DISPATCH
+-------------------------------------
+    arm         stated    entailed
+    majority     0.100      0.198
+    frozen       0.000      0.000
+    local        0.103      0.097
+    attention    0.101      0.277
+
+Passes: headroom 0.277 against a frozen 0.000, clearing the majority floor by
+0.079. Modest rather than enormous.
+
+**`local` at 0.097 is BELOW the majority floor** on the half that matters. One
+seed, and it is the number the matrix exists to check.
+
+
+COST
+----
+4 arms x 8 seeds = 32 cells, in 8 jobs.
+
+Estimated from the MOST EXPENSIVE arm -- `attention` at width 128 for 16 epochs.
+`majority` and `frozen` are nearly free.
+
+    measured by --cost:  24.7 ms per training sequence
+                         0.5 min to train one cell
+    worst job:           ~2 min
+
+
+MEASURED ON
+-----------
+openplexus/tasks/closure.py at its calibrated defaults -- 10 people, 24 stated
+edges, 6 entailed, ~4.5 implied per sequence.
+
+Width 256 for the local arms deliberately: the task writes ~119 bindings per
+sequence, above decision 109's ~96 capacity for width 64, so a narrower arm would
+measure capacity rather than composition.

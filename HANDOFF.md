@@ -108,7 +108,44 @@ GPT-2-large scale, *not* frontier scale. Frontier needs ~65k nodes at width 1M.
 So "the reduction is affordable" holds for the regime tested and is
 extrapolation outside it.
 
-## THE SHARPEST THING TO KNOW (decision 101)
+## READ THIS FIRST (decision 103)
+
+**The store cannot hold an entity that appears in two facts.**
+
+    hop 1 finds the queried subject's own relation:
+      person appears in 1 fact    0.959
+      person appears in 2 facts   0.366
+      person appears in 3 facts   0.321
+
+`key(person)` accumulates one binding per appearance and a retrieval returns
+their **sum**. A person who is the subject of one fact and the object of another
+gets a superposition of both.
+
+**This is not a defect in the task — it is what relational data is.** Every
+knowledge graph has entities in many relations. Decision 84 hit the same wall on
+chains and the fix was to make each symbol appear once, by laying chains out
+contiguously. That worked only because a chain is a path; **a graph cannot be
+laid out that way.**
+
+It puts decisions 101 and 102 downstream of something more basic: composition
+assumes the individual retrievals are right, and at two appearances they are
+right a third of the time. An oracle handing hop 2 the correct relation still
+caps at 0.560 — exactly the `last`-relation bound — because hop 1 contributes
+nothing.
+
+### THE NEXT THING, and it is now the blocker rather than an optimisation
+
+**`context_keys`** already binds `(previous, token)` rather than `token`, giving
+an entity one key per ROLE instead of one key total. Falsifiable prediction:
+**hop-1 accuracy at two-or-more appearances should rise toward the 0.959 that
+one appearance already reaches.**
+
+> **And it casts doubt backwards.** Every chain result was measured with a
+> contiguous layout that guaranteed one appearance per symbol — the degenerate
+> case. How much of decision 92's 1.000 survives an entity appearing twice is
+> **not known**.
+
+## The hop mechanism (decision 101)
 
 **The hop mechanism REPLACES retrievals, it does not COMBINE them.**
 

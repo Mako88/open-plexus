@@ -5201,3 +5201,76 @@ accumulator asks what token `R1`-and-`R2`-together names, which is nothing —
 and because the two are the same vector under `replace`, every default result
 and every structural test would have passed anyway.
 `a-hop-decodes-from-the-accumulator` is the mutation, verified caught.
+
+## 103. The store cannot hold an entity that appears in two facts
+
+Traversal was supposed to be the last blocker. An oracle says otherwise, and
+what it says is more fundamental than traversal.
+
+### The oracle, and the number that gave it away
+
+Hop 2 was handed the correct second relation and nothing else changed:
+
+    accumulate    real hop 2   ORACLE hop 2
+    replace            0.027          0.560
+    concat             0.347          0.560
+
+**Identical.** If concat were using hop 1, holding both `R1` and `R2` should
+reach about 1.000 — that is what fitting a linear map over the whole rule table
+scores. 0.560 is instead exactly the `last`-relation information bound (0.559
+in decision 100). The readout is getting **nothing** from hop 1.
+
+### Why, and it is not about hops at all
+
+Hop 1 finds the queried subject's own relation, split by how many facts that
+person appears in anywhere:
+
+    appearances   sequences   hop 1 correct
+              1         146          0.959
+              2         145          0.366
+              3          81          0.321
+              4          23          0.348
+
+**One appearance is near perfect. Two collapses it.**
+
+`key(person)` accumulates one binding per appearance and a retrieval returns
+their **sum**. A person who is the subject of one fact and the object of another
+has both bindings on the same key, and the store hands back a superposition of
+"the relation I am the subject of" and "whatever followed my other mention".
+
+### This is not a defect in the task
+
+It is what relational data *is*. Every knowledge graph has entities in many
+relations; an entity in exactly one is a degenerate case. Decision 84 hit the
+same wall on chains and the fix there was to make every symbol appear **once**,
+by laying chains out contiguously — which worked only because a chain is a path.
+**A graph cannot be laid out that way**, and there is nothing to redesign.
+
+### What this does to decisions 101 and 102
+
+It puts them downstream of something more basic. Composition needs two
+retrievals held together (101) and reached correctly (102), and **both assume
+the individual retrievals are right**. At two appearances they are right about a
+third of the time. Fixing traversal on top of a store that cannot answer a
+single-fact question would not have produced a working model, and would have
+looked like the mechanism failing.
+
+### What this licenses
+
+**Pair keys are no longer an optimisation, they are the blocker.**
+`context_keys` already binds `(previous, token)` rather than `token`, which
+makes `key(S, R1)` distinct from `key(X, S)` and gives an entity one key per
+role rather than one key total. That is the mechanism to measure next, and the
+prediction is specific and falsifiable: **hop-1 accuracy at two-or-more
+appearances should rise toward the 0.959 that one appearance already reaches.**
+
+It also raises a question about every earlier result on chains, where the
+contiguous layout guaranteed one appearance per symbol. Those numbers were
+measured in the degenerate case, and how much of decision 92's 1.000 survives an
+entity appearing twice is **not known**.
+
+### What it does NOT license
+
+Concluding the architecture cannot do relational work. What is measured is that
+**single-token keys** cannot, and the reason is arithmetic rather than
+mysterious. `context_keys` exists and is untried on this.

@@ -167,7 +167,39 @@ is what matters:
 **Step 2 — the pair-key traversal — is 0.960 and works.** Steps 1 and 3 are both
 `key(FACT, X) → X's relation`, and they are what caps everything.
 
-### THE ACTUAL BLOCKER: the same-role collision
+### AND THE BLOCKER IS NOT A KEY PROBLEM AT ALL (decision 108)
+
+    out-degree   seqs   correct    1/k    ANY relation S holds
+             1    316     0.915  1.000                   0.915
+             2    149     0.349  0.500                   0.960
+             3     31     0.355  0.333                   0.968
+
+**The store returns a relation S genuinely holds 96% of the time**, and
+"correct" tracks 1/k. It is answering *"what relation does S hold"* correctly;
+the question needs *"which of S's relations leads to T"*, which it was never
+asked.
+
+**Superposition and ambiguity are different and only one was fixable.** Single-
+token keys really did lose information (0.303) and pair keys really did recover
+it (0.915 at out-degree 1). What remains is underdetermination, and no key fixes
+that.
+
+Decisions 103, 104 and 107 all measured "correct" and conflated the two — the
+store was never as broken as those numbers looked.
+
+> **The sharpest statement of this whole line:** multi-hop reasoning over a
+> BRANCHING graph requires SEARCH — try a branch, see where it lands, backtrack
+> — and an associative store does RETRIEVAL. Nothing in this architecture
+> searches. That is a missing capability, not a defect.
+>
+> The chain task hid it completely: a chain has **out-degree 1 by
+> construction**, which is exactly the row scoring 0.915. Every composition
+> result on chains was measured where no search was needed.
+>
+> **Open project question, not a measurement:** whether to add search, or to
+> state "this architecture does retrieval, not search" as an honest boundary.
+
+### The same-role collision, now understood as ambiguity
 
 An entity that is the subject of SEVERAL facts puts several bindings back on
 `key(FACT, X)`. Take steps 1 and 3 to the 0.95 step 2 already reaches and the

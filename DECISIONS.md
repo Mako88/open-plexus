@@ -5525,3 +5525,62 @@ decisions 103, 104 and 106 are all measurements of the same curve.
 Discarding pair keys. Step 2 at 0.960 is the pair-key mechanism working, and it
 is the only step that does work — the finding is that the traversal HOP is not
 worth building, not that pair keys were a mistake.
+
+## 108. The store is not losing information. The question is ambiguous, and resolving it is SEARCH
+
+Decision 107 made the same-role collision the blocker and proposed a better key.
+Measuring first says **no key fixes this**, because nothing is being lost.
+
+Step 1 — `key(FACT, S)` → the relation S holds — split by S's **out-degree**,
+the number of facts in which S is the subject:
+
+    out-degree   seqs   correct    1/k    ANY relation S holds
+             1    316     0.915  1.000                   0.915
+             2    149     0.349  0.500                   0.960
+             3     31     0.355  0.333                   0.968
+
+**The retrieval returns a relation S genuinely holds 96% of the time**, at every
+out-degree. And "correct" tracks **1/k** — chance among the valid options.
+
+So the store is answering *"what relation does S hold"* correctly. The question
+needs *"which of S's relations leads to T"*, and the store was never asked that.
+
+### Superposition and ambiguity are different, and only one was ever fixable
+
+This reconciles the whole line rather than overturning it:
+
+- **Single-token keys lost information.** A subject-role and an object-role
+  binding on one key, summed: 0.303 at two appearances. Real, and pair keys
+  recovered it — 0.915 at out-degree 1.
+- **What remains is ambiguity.** Several facts, all with S as subject, all
+  correct answers to the question the key encodes. Nothing is lost; the answer
+  is underdetermined.
+
+Decisions 103, 104 and 107 all measured "correct" and so conflated the two.
+**The store was never as broken as those numbers made it look**, and the
+`ANY relation S holds` column is what separates them.
+
+### What this licenses, and it is the sharpest architectural statement of the line
+
+**Multi-hop reasoning over a BRANCHING graph requires search, and an associative
+store does retrieval.** Resolving which of S's relations to follow means trying
+one, seeing where it lands, and backtracking — a fundamentally different
+operation from a keyed lookup, and one nothing in this architecture performs.
+
+That is not a defect to fix with a better key or a better hop. It is a missing
+capability, and naming it is worth more than the four mechanisms that were built
+while it was invisible.
+
+The chain task hid it entirely: a chain has **out-degree 1 by construction**,
+which is exactly the row that scores 0.915. Every composition result on chains
+was measured where no search was needed.
+
+### What it does NOT license
+
+Concluding search must be added. **Branching may simply be out of scope**, and
+"this architecture does retrieval, not search" is a legitimate and honest
+boundary to state rather than a gap to close. Deciding that is a project
+question, not a measurement.
+
+Nor does it excuse the per-step fidelity at out-degree 1 — 0.915, not 1.000 —
+which is still short and is still the capacity question decision 107 pointed at.

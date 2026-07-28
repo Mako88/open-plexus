@@ -62,7 +62,71 @@ goals. "Would a single GPU beat this" is a footnote, not a blocker.
 What matters instead is whether the thing works on **consumer devices that are
 unreliable, heterogeneous, and constantly leaving.**
 
-### 1.2 The operative research question
+### 1.2 What the model is trained to DO — relationships, not text
+
+**Stated by John, 2026-07-28, and it is the thesis the project exists to test.**
+
+> Most models currently just train on next-token prediction, and therefore at the
+> end of the day they're taught to predict text — that's what they're doing. My
+> idea here is, instead of focusing on predicting text, train the model to
+> understand the relationships between things: to associate a given thing in the
+> context of all other things.
+
+The human analogy he gives is the mechanism, not decoration: we learn because
+something *matters* — a positive or negative feeling marks an episode worth
+keeping, and what gets stored is "doing this leads to that." Association under
+salience, not sequence continuation.
+
+**This is a claim about the OBJECTIVE, and it is load-bearing in a way the
+architecture already reflects.** An associative store binding `(a, b)` pairs is a
+relational substrate; training it to predict token `t+1` asks it to be a language
+model built out of the wrong parts. That mismatch is measured, not argued —
+character-level bits saturate at ~16,000 characters (decision 63) and the store's
+effective rank sits near 3 whatever the width (decision 115), because a character
+bigram table is intrinsically low-rank. **Chasing text is chasing the thing this
+substrate is worst at.**
+
+#### ⚠ This CONTRADICTS §5's recorded candidate, and §5 is the older document
+
+§5 carries **self-supervised temporal prediction** — each unit predicts its own
+next input — as the credit-assignment candidate, argued in
+[note 002](docs/notes/002-which-credit-assignment-scheme.md). One of its three
+stated advantages is *"it is the same objective family as an LLM."*
+
+**That advantage is now a liability under this section**, and the conflict is
+recorded here rather than quietly resolved because both documents were written
+deliberately. The reconciliation is that note 002 was choosing how credit is
+DELIVERED — locally, with no signal in transit that can be late — and that
+argument survives intact. What does not survive is next-input prediction as the
+thing being *learned*.
+
+**The replacement is relational self-supervision**: state facts, hide one,
+predict it. Fully self-supervised, no marked questions, no labels — so it still
+satisfies the "needs no labels" requirement §5 rests on — but relational rather
+than sequential. That is the live work and it is tracked in
+[STATE.md](STATE.md).
+
+### 1.3 Scale is a first-class consideration, and benchmarks at this scale are not the goal
+
+**Stated by John, 2026-07-28.** Something that works at one scale routinely fails
+at another, and the target scale is far above the one every measurement here has
+been taken at.
+
+- **Do not optimise for a benchmark at the current scale** unless the result
+  transfers to the scale being aimed at. Meeting a bar at small scale to prove a
+  mechanism works before scaling it is legitimate and often necessary; tuning to
+  a bar that will not matter later is waste.
+- **When a decision is scale-specific, say so where it is made**, with the
+  condition that should trigger a re-evaluation. A decision that silently becomes
+  wrong at scale is worse than one that was never taken.
+- **Give scale-specific choices a seam.** A component that will need replacing at
+  scale should be replaceable without touching its callers —
+  `openplexus/keys.py`, `openplexus/retrieval.py` and `openplexus/search.py` are
+  the existing pattern.
+
+`docs/SCALE.md` is where scale-dependent decisions are registered.
+
+### 1.4 The operative research question
 
 The goals above are a direction, not something a run can settle. The question
 that experiments actually answer is:
@@ -291,6 +355,14 @@ the substrate is chosen to serve it.**
    work. Not a catalogue of interesting mechanisms.
 4. **Distribution** — the transport and the churn model, against a substrate
    that has already passed G1.
+
+> **⚠ SUPERSEDED IN PART, 2026-07-28. Read §1.2 first.** The candidate below is
+> next-INPUT prediction, and §1.2 records John's ruling that predicting the next
+> thing is precisely what this project is not for. What survives is the argument
+> about credit DELIVERY — no signal in transit, so latency costs memory rather
+> than credit precision. What does not survive is the second bullet, *"it is the
+> same objective family as an LLM"*, which was written as an advantage and is now
+> the objection.
 
 The current best candidate for step 2, carried forward as a *hypothesis* and not
 a decision, is a **predictive / self-supervised local objective**: each unit's

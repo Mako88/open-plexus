@@ -194,7 +194,16 @@ is the hypothesis and it has never been the swept axis.
 
 Needs a committed instrument, same as kinship did.
 
-### 3. A relational self-supervised objective
+### 3. A relational self-supervised objective — RAISED, on John's question
+
+> *"Would it make sense to move this up higher, since it seems like it might
+> shift a lot of things?"* — John, 2026-07-28. **Yes.** GOALS §1.2 now records
+> the objective as the project's thesis rather than an implementation detail,
+> and §5's recorded candidate (next-INPUT prediction) is marked as contradicting
+> it. Everything below this point is measured under an objective the goals no
+> longer endorse, which is exactly the "old assumption still being acted on"
+> failure mode. It moves above the housekeeping and below only the two items
+> that block it mechanically.
 
 All-position (next-token) training was never required by the goal — it was
 imported from how LLMs train, and it costs composition 1.000 → 0.40. Decision 98
@@ -224,16 +233,40 @@ Related and unbuilt: **replay**. C4 forbids stopping, not revisiting (decision
 78), and replay is one of the few known answers to the catastrophic forgetting
 C4 makes first-class. A bounded buffer of past chunks, resampled. Cheap to try.
 
-### 6. The readout still violates C1 — and it may not, under the amendment
+### 6. RESOLVED — and the real C1 gap is somewhere else entirely
 
-`answer = parts.sum(0)` sums across every partition. Known since note 009 §4,
-still outstanding, and it is a current bug rather than a design question.
+**The sum is not the problem.** `answer = parts.sum(0)` is the numpy reference's
+convenience. The deployed path sends each node's **argmax in 8 bytes**
+(`combine="vote"`), and `distributed.py:419` says why that is different in kind:
+*"Absence costs a voter, not a term of a sum, which is why this degrades where
+summing amputates."* Bounded bytes per hop, and a missing node degrades the vote.
+**Amended C1 is satisfied by the wire format.**
 
-**But C1 was amended** (GOALS §3): the test is now whether progress stalls when a
-participant is slow or gone, not whether a sum happens. This is 64 floats per
-group per step. **Re-examining it costs a reading, not a run**, and either
-retires the violation or states precisely which clause it fails. Cheapest item on
-this page.
+#### ⚠ But the DRIVER has no failure detector, and that IS a barrier
+
+`distributed.py:427` settles a step only when it has a vote from every node it
+expects:
+
+    while settled < sent and pending[settled][1] >= expected[settled]:
+
+A **declared** departure works — `absent` and `leave_at` adjust `expected`, which
+is what g12-02 measured across 18 cells with no hang. An **undeclared** one does
+not: the step never reaches its count, the window fills, the driver stops
+sending, and 30 seconds later `select` raises `TimeoutError`.
+
+**That is precisely what amended C1 forbids** — a barrier that stalls when a
+participant is slow or gone. And C3 says departure is the normal case, arriving
+without warning.
+
+**The design already exists and is not implemented.** Note 003 specified a
+separate liveness channel, because on a sparse substrate silence is normal and
+absence of data cannot signal absence of a machine — and it unified `d_max` as
+both the C2 asynchrony bound and the C3 churn timeout. What the driver needs is
+to settle a step on a **quorum plus a deadline** rather than on a full count.
+
+**This is the largest gap between the code and the goal**, it was hidden behind a
+claim about summing that turned out to be about the wrong thing, and every churn
+result in the project was measured with departures announced in advance.
 
 ### 6b. CONCURRENCY COSTS d² PER CONVERSATION, and that inverts the usual picture
 
@@ -296,10 +329,14 @@ a real refactor and wants its own cycle.
 
 ### 9. Housekeeping, none of it blocking
 
-- **The Docker testbed is not in CI.** Built, validated bit-identical over 80 ms
-  ± 20 ms losing 2%, and no workflow runs it. Add churn to it when wiring it up —
-  killing a container mid-run is the one thing a single process cannot honestly
-  simulate.
+- ~~**The Docker testbed is not in CI.**~~ **WRONG, and it was carried into this
+  document from the archived backlog without being checked.** Three sweeps run
+  the testbed on Actions in real containers — `sweep-g12-01`, `sweep-g12-02`
+  (churn, 18 of 18 cells, nodes vanishing mid-run) and `sweep-g12-03` — plus
+  `testbed-identity.yml`. **The model has run distributed across containers, in
+  CI and locally.** What has *not* run distributed is the relational work:
+  kinship, hops and search are single-process only, and `Node.step` still cannot
+  run a gated model at all (item 8).
 - **`KeySource` needs the conformance suite retrieval has** — no shape check, no
   purity check, and nothing proving the suite bites. Before any combinatorial
   sweep over keys, because a broken implementation inside a grid does not
@@ -319,6 +356,22 @@ a real refactor and wants its own cycle.
 - **Uneven slices.** `slices_for` refuses any split that does not divide evenly.
   Real machines will not offer round numbers, and heterogeneous node sizes need
   this first.
+
+### 10. Self-imposed limits found in the 2026-07-28 audit
+
+John's standing test: **the only real constraints are that it runs across devices
+over the internet, and that the model is as capable as possible.** Anything else
+limiting the design is self-imposed and has to justify itself. Decision 78
+audited four; these are what a fresh pass found still standing.
+
+| limit | is it real? |
+|---|---|
+| `hop_accumulate="concat"` is **refused alongside `hidden`** | **Self-imposed, and it costs something measurable.** Decision 116 put `hidden` at 0.45 bits, and `concat` is what lets a readout see every hop — so the best readout and the composition mechanism cannot currently be used together. The refusal says only that "the two have not been made to compose", which is a to-do wearing a constraint's clothes |
+| The store is **rebuilt every chunk** | Inherited from the recall tasks, where it is correct, and never re-examined for anything else. `carry_store` exists and its two measurements disagree (item 2) |
+| `orthogonal_every` refused alongside `hidden` | **Correct** — it would orthogonalise a different matrix than the one it was measured on. But it blocks re-checking decision 54, which was refuted *because* there was no per-layer structure and now there is |
+| Character level | Approved for removal by decision 78 and by John again on 2026-07-28. Still not done; needs its own plan because it invalidates the comparison set |
+| `hops` + `context_keys` | **Was** self-imposed past its evidence. Lifted on 2026-07-28 exactly where search supplies the pair-key walk, and it still stands everywhere else |
+| `slices_for` refusing uneven splits | Self-imposed. Real machines are not round numbers |
 
 ---
 
@@ -397,11 +450,15 @@ decide, proceed, and say which calls were made without him.
    direction. **It invalidates every number in the comparison set**, so it should
    happen once, deliberately, with the re-validation costed in advance rather
    than discovered. This one needs its own plan.
-3. **`reward_recall`'s layout leak.** The nearest binding before a reward is
-   always the rewarded one, 160/160. Measured as **inert** — binding-detection is
-   too weak to exploit it past delay 1 — so this is correctness, not urgency. The
-   one-line fix (randomise the gap) does not work; the fix that would work
-   changes what the task *is* and invalidates nine sweeps' comparison set.
+3. ~~**`reward_recall`'s layout leak.**~~ **CLOSED 2026-07-28 — John: "if it's
+   just a failure in a test (not the model itself), and the test is no longer
+   useful, definitely just abandon it."** The leak is real (nearest binding
+   before a reward is always the rewarded one, 160/160) and measured **inert**.
+   The task is not fixed and not re-baselined. `reward_recall` is retired as an
+   instrument: decision 119 showed it does not discriminate the mechanisms the
+   g9 line measured on it, and the live work is relational. The three tests in
+   `test_reward_recall.py` that pin the leak stay, now as documentation of a
+   retired task rather than as a pending fix.
 
 ---
 

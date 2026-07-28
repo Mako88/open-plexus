@@ -68,6 +68,7 @@ a report to John, not a gate.
 | 121 | width does NOT fix fidelity on the task — and search's blocker has expired |
 | 122 | step 2 reproduces at 0.971, the traversal ceiling is 1.000, build it |
 | 123 | search is built and proved on its own; beam 4 costs 3.2x the traffic |
+| 124 | the objective is the thesis; the driver has no failure detector |
 
 ---
 
@@ -2803,3 +2804,120 @@ decay and a cap is exactly what the next measurement is for.
 
 **Taken without asking**, under standing authorisation and John's advance approval
 of the direction.
+
+---
+
+## 124. The objective is the thesis, the sum was never the C1 problem, and the driver has no failure detector
+
+John raised five things on 2026-07-28. Three changed a document, one closed an
+open decision, and one found the largest gap between this code and its goal.
+
+### The objective is the thesis, and GOALS contradicted it
+
+In his words: *"Most models currently just train on next-token prediction, and
+therefore at the end of the day they're taught to predict text. My idea here is,
+instead of focusing on predicting text, train the model to understand the
+relationships between things: to associate a given thing in the context of all
+other things."*
+
+**GOALS §5 recorded the opposite.** Its credit-assignment candidate is
+self-supervised *temporal prediction* — each unit predicts its own next input —
+and one of the three stated advantages is *"it is the same objective family as an
+LLM."* That was written as a recommendation and is now the objection.
+
+Recorded as GOALS §1.2, with §5 marked as superseded in part rather than
+rewritten. **The delivery argument survives** — no signal in transit means
+latency costs memory rather than credit precision, which is note 002's real
+contribution. What does not survive is next-input prediction as the thing being
+learned.
+
+This is the "old assumption still being acted on" failure John is worried about,
+found in the founding document, and it was pointing the whole project at the axis
+decisions 63 and 115 already measured as closed.
+
+### Scale is now a stated goal-level concern
+
+Also his: do not optimise for a benchmark at this scale unless the result
+transfers to the target scale; when a decision IS scale-specific say so where it
+is made, with the trigger to revisit; give those choices a seam.
+
+Recorded as GOALS §1.3. **`docs/SCALE.md` already existed and already does this**
+— one row per scale-dependent choice, with what was chosen, at what size, the
+trigger, and what to try instead. It is now pointed at from the goals rather than
+being a file nobody was sent to.
+
+### `reward_recall` is retired, not fixed
+
+John: *"if it's just a failure in a test (not the model itself), and the test is
+no longer useful, definitely just abandon it."* The leak is real and measured
+inert; the task is not fixed, not re-baselined, and retired as an instrument.
+Decision 119 had already shown it does not discriminate what the g9 line measured
+on it.
+
+### The sum was never the C1 problem
+
+STATE.md and note 009 §4 carried `answer = parts.sum(0)` as an outstanding C1
+violation. **It is the numpy reference's convenience.** The deployed path sends
+each node's argmax in 8 bytes, and `distributed.py` already says why that differs
+in kind: *"Absence costs a voter, not a term of a sum, which is why this degrades
+where summing amputates."*
+
+Bounded bytes per hop, and a missing node degrades the vote. **Amended C1 is
+satisfied by the wire format**, and the item is retired.
+
+### ⚠ But the driver settles a step only on a FULL COUNT, and that is a barrier
+
+    distributed.py:427
+    while settled < sent and pending[settled][1] >= expected[settled]:
+
+A **declared** departure works — `absent` and `leave_at` adjust `expected`, which
+is what g12-02 measured across 18 cells with no hang. An **undeclared** one does
+not: the step never reaches its count, the window fills, the driver stops
+sending, and 30 seconds later `select` raises `TimeoutError`.
+
+**That is exactly what amended C1 forbids** — a barrier that stalls when a
+participant is slow or gone — and C3 says departure arrives without warning.
+
+**The design exists and is not implemented.** Note 003 specified a separate
+liveness channel, because on a sparse substrate silence is normal and absence of
+data cannot signal absence of a machine, and it unified `d_max` as both the C2
+bound and the C3 timeout. The driver needs to settle on a **quorum plus a
+deadline** rather than on a full count.
+
+**Every churn result in this project was measured with departures announced in
+advance.** That is not wrong — g12-02 is a real measurement of what it measured —
+but it is not the failure C3 describes, and the gap was hidden behind a claim
+about summing that turned out to be about something else.
+
+### And a correction of my own, which John caught
+
+I wrote in STATE.md that *"the Docker testbed is not in CI, no workflow runs
+it"*, carried from the archived backlog without checking. **Three sweeps run it
+on Actions in real containers** — g12-01, g12-02 and g12-03 — plus
+`testbed-identity.yml`. The model HAS run distributed across containers.
+
+What has not is the **relational** work: kinship, hops and search are
+single-process only, and `Node.step` cannot run a gated model at all. The precise
+claim is much narrower than the one I made, and the imprecise version was the
+kind of stale inheritance the 2026-07-28 restructure was supposed to stop.
+
+### The self-imposed limits still standing
+
+Audited against John's test — the only real constraints are that it runs across
+devices over the internet and that the model is as capable as possible. Recorded
+as STATE.md item 10. The one worth naming here: **`hop_accumulate="concat"` is
+refused alongside `hidden`**, so the best readout (decision 116, 0.45 bits) and
+the composition mechanism cannot be used together, on the grounds that "the two
+have not been made to compose" — a to-do wearing a constraint's clothes.
+
+### What this licenses
+
+Building the liveness path, and treating the objective as the next major work
+rather than as item 4.
+
+### What it does NOT license
+
+Assuming the driver fix is small. Settling on a quorum changes what a run means:
+answers become dependent on who replied in time, so bit-identity — the property
+G2 was passed on — cannot survive it unchanged. That needs its own plan and its
+own predictions.

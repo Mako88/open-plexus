@@ -145,6 +145,54 @@ individual experiment remains sound.
 > ([note 028](docs/notes/028-the-learning-rate-has-been-frozen-for-seven-sweeps.md)).
 > Two cycles of inventory found what seven sweeps of warnings did not.
 
+**A measurement is conditional on the configuration it was taken in. Name the
+condition, and re-validate the comparison set when the condition moves.**
+
+A mechanism does not have an effect. It has an effect *given* a task, a readout,
+an optimiser and a set of defaults — and when one of those changes, every number
+measured beside it becomes a claim about a configuration that no longer exists.
+Those numbers are not wrong. They are **conditional**, and the condition moved.
+
+The practice, in order:
+
+- **When a load-bearing component changes, enumerate what it invalidates BEFORE
+  building anything on top of it.** Say it out loud in the record, as a list.
+  The failure mode is not discovering the invalidation; it is discovering it
+  piecemeal, months later, one surprised result at a time.
+- **Re-check in order of BLAST RADIUS, not convenience.** The number to re-run
+  first is the one that other *arguments* rest on, not the one that is cheapest
+  or most recent.
+- **Do not stack a new mechanism on a number whose condition has moved.** That
+  is how a project accumulates a comparison set it cannot interpret.
+- **Seams make this affordable**, which is the real argument for them.
+  `openplexus/keys.py` and `openplexus/retrieval.py` exist so a component can be
+  swapped in a file rather than a refactor — and re-validation is exactly the
+  situation where that stops being tidiness and starts being the difference
+  between a re-check and a rewrite.
+
+> *Calibration.* Three times in one day, all in the same direction, and the third
+> was found only because the first two had been written down.
+>
+> **Sparse keys** were measured on MQAR, came out worse, and the knob was left
+> off "with a measurement saying not to reach for it". On the corpus they are
+> worth 0.18 bits (decision 67). Then the readout changed and they REVERSE — a
+> clean crossover, three seeds: linear readout 5.222 dense against 4.794 sparse,
+> two-layer readout 4.487 dense against 4.586 sparse (decision 74). Sparsity was
+> never a representational improvement; it was compensation for a readout that
+> could not disentangle overlap.
+>
+> **Then the enumeration paid.** Once that pattern was named, the obvious next
+> question was which OTHER numbers were taken beside the linear readout — and the
+> answer is *all of them*: the exact cache's 0.19 bits, every refutation in the
+> comparison set, and the whole g11 line. The cache re-check was run
+> deliberately rather than stumbled into, and it was chosen first because
+> decision 61's argument for item-partitioning the distributed model rests on it.
+>
+> **The cost of not doing this** is visible in the same day's record: g11-06
+> spent four hours of runner time answering an exponent question that its grid
+> could not answer, because the arm had converged below the grid's lower bound
+> and nobody had probed for it.
+
 **A hyperparameter swept on one arm of a comparison must be swept on all of
 them.** Tuning your own side and comparing against an untuned baseline produces a
 better number by exactly the mechanism that produced the wrong one — and it is
@@ -467,6 +515,18 @@ and for bounds so wide they admit the broken case.
 it, ask what outcome would *refute* the prediction attached to it. If the
 predicted outcome is guaranteed by how the condition is built, it is not
 evidence however it comes out — and it will read as confirmation.
+
+**A test that something did NOT change needs a companion asserting that
+something DID.** An unchanged-assertion passes whenever the mechanism is
+disconnected, which is precisely the case it exists to catch.
+
+> *Calibration.* The C1 locality test for the composed readout perturbed group
+> 1's output weights and asserted group 0's hidden layer did not move. It
+> passed — and it passed because the fixture zeroes `wo`, so multiplying group
+> 1's weights by three multiplied **zero** by three and nothing moved anywhere.
+> The companion assertion, that the perturbed group DID move, is what caught it.
+> Every locality, isolation or independence test in this repository has this
+> shape and needs the pair.
 
 **11. A failing test is a claim about the production code until shown
 otherwise.** Fix the code so the assertion holds. Widening a bound, deleting an

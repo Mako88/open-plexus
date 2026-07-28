@@ -73,6 +73,26 @@ it.** The blocker is decision 108's **ambiguity**, not capacity.
 
 ---
 
+## Which instrument, and why — asked by John 2026-07-28
+
+Six task modules exist and that is two too many to be honest about. The split:
+
+| task | role now |
+|---|---|
+| **`closure.py`** | **THE PRIMARY INSTRUMENT.** Unmarked stream of facts, some implied by others. Matches the stated goal — relational, no question marker, self-supervised in form. Passes G0 (decision g14-01): entailed headroom 0.277 against a frozen 0.000 |
+| `kinship.py` | **the mechanism testbed.** Marked questions, so it isolates a mechanism cleanly — the whole search line (g13-01…05) is measured on it and those numbers stay comparable. Kept for that, not as the goal |
+| `chains.py` | solved at 1.000, out-degree 1 by construction. A control, not a target |
+| `mqar.py` | G0–G5 were passed on it. History; not a live instrument |
+| `corpus.py` | the text line, closed by decisions 115 and 118 |
+| `reward_recall.py` | **retired** (John's call, decision 126) |
+
+**The gap I should name rather than let sit:** *everything above is
+self-designed.* **CLUTRR is the only external benchmark that would make a number
+comparable to anyone else's, and it has been "next" for several cycles without
+being run.** `kinship.py` borrows CLUTRR's design and says in its own docstring
+that calling a number here a "CLUTRR score" would be wrong. Until that runs, every
+result is this project grading its own homework.
+
 ## Open work, in order
 
 ### 1. ✅ CLOSED — the search line landed. Decision 130

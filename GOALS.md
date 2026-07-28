@@ -208,6 +208,22 @@ project.
   sub-problem gets used and cited. The contribution, if there is one, is the
   system that works under these constraints — not the individual parts.
 
+  **AMENDED 2026-07-28, and the amendment matters.** John: *"if there is a
+  solution to a certain problem that meets our stated goals better than any
+  existing work does, definitely go for it — at least try it out."*
+
+  The rule forbids novelty as a *goal*, not novelty as an *answer*. Where the
+  literature's solution was built for different constraints, taking it is the
+  mistake and inventing is the correct move. This project is already doing it:
+  `openplexus/search.py` — commit to a branch, follow it, and score it by
+  whether its endpoint matches the entity the question names — is not from a
+  paper, and neither is gating that search on the decode margin. Both were
+  measured before being trusted, which is the part that must not be skipped.
+
+  **The bar for a novel mechanism is the same as for a borrowed one**, and it is
+  the only thing keeping this honest: predictions registered first, a control
+  that could fire, and a null reported as a null.
+
 - **Not a working product.** This is a research project whose first job is to
   find out whether the central bet is wrong, as cheaply as possible.
 

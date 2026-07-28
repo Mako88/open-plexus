@@ -757,6 +757,29 @@ existed two directories away.
 > rather than by any test, and both had propagated into work that was planned
 > around them.
 
+**14c. A refuted alternative stays in the tree, behind its own switch.** John's
+instruction, 2026-07-28: *"any time you build multiple potential solutions for a
+given component, keep them around to swap between down the road if needed."*
+
+This is already the practice and it is worth naming so it survives a tidy-up:
+`keys.py` holds `TableKeys` beside `PairKeys`; `retrieval.py` holds
+`SuperposedRead`, `ExactCache` and `SettlingRead`; `hop_accumulate` keeps `bind`
+*"as the measured alternative, not as a fallback"*; `search_branches` keeps 0, 1
+and n as off, greedy and branching.
+
+**The reason is that refutations expire.** Decision 107 declined a traversal and
+decision 111 declined search, both on correct arithmetic, and both conditions
+were measured away later — the mechanisms became right when their inputs moved.
+A deleted alternative cannot be re-measured when that happens; a switched-off one
+costs a config field.
+
+Two things keep it from becoming clutter:
+
+- **The default is the measured winner**, and every alternative is off by
+  default, so no earlier result changes when one is added.
+- **A kept alternative carries WHY it lost**, at its definition, with the
+  decision number. An option nobody can date is an option nobody can retire.
+
 **15. Document the contract, not the implementation.** A doc comment says what
 a caller can rely on. A good one stays true after the internals are rewritten;
 if a rewrite falsifies it, it was describing implementation. Put one on every

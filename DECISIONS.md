@@ -74,6 +74,7 @@ a report to John, not a gate.
 | 127 | the SWIM paper was never unreadable; the retry interval is in the wrong unit |
 | 128 | d_max is ~640 ms measured; the in-process figure was measuring Windows |
 | 129 | ambiguity is detectable before searching; the expensive signal is below chance |
+| 130 | the gate pays (+0.020 over search-everywhere); the search line closes |
 
 ---
 
@@ -3341,6 +3342,68 @@ own scale rather than tuned.
 And **the number to beat is search4's overall, not walk's.** A gate that merely
 matches search-everywhere has bought compute savings and no accuracy, which is
 worth having and is not what this was for.
+
+**Taken without asking**, under standing authorisation and John's advance
+approval of the direction.
+
+---
+
+## 130. The gate pays: +0.020 over search-everywhere, and the search line closes
+
+g13-05, 40 cells, 8 seeds, run 30403497440. **Five of five predictions
+confirmed**, including the rail.
+
+    arm        overall            k=1                k>=2               fired
+    walk       0.596 +/-0.018     0.702 +/-0.025     0.446 +/-0.010      --
+    search4    0.604 +/-0.013     0.649 +/-0.021     0.539 +/-0.024      --
+    gate-q50   0.624 +/-0.014     0.684 +/-0.024     0.539 +/-0.025     48%
+
+    gate-q50 - search4   +0.020 +/-0.005      gate-q50 - walk   +0.028
+
+### It does what the design argument said, which is new on this line
+
+    out-degree 1     gate 0.684   walk 0.702   search4 0.649
+    out-degree >= 2  gate 0.539   walk 0.446   search4 0.539
+
+**At out-degree ≥ 2 the gate matches `search4` exactly** — all of search's gain
+kept where ambiguity lives. **At out-degree 1 it recovers most of the way back to
+`walk`**, giving back most of the damage search does where there is nothing to
+choose between.
+
+That is exactly the trade g13-03's split said was available, and +0.020 against a
+perfect-gate ceiling of 0.03 is about **two thirds of it** — which is what AUC
+0.803 rather than 1.000 buys.
+
+### The line, end to end
+
+    concat      0.327    what we had -- BELOW the 0.466 shortcut floor
+    walk        0.596    pair-key traversal, which decision 107 declined
+    search4     0.604    search everywhere, which decision 111 declined
+    gate-q50    0.624    search where it helps
+
+**Both refusals were correct arithmetic on the numbers of their day**, and both
+conditions were measured away before either was rebuilt. Nothing had to be
+undone, because 107 and 111 declined to *build* — which is precisely what
+measuring a ceiling before building buys, and it has now paid three times on this
+line.
+
+### The threshold generalises; the number does not
+
+`gate-q50` fires at a margin of 0.663 at width 256. **That constant is not the
+mechanism** — it is the median training margin, and the margin distribution moves
+with width and key scheme. What transfers is "the median of this model's own
+training margins", computed with no labels and without touching the test set.
+
+Registered as width-dependent: g13-04 measured the signal at AUC 0.710 at width
+64, below the 0.75 usability bar. **This is a width-256 result.**
+
+### What this does NOT license
+
+Quoting 0.624 as the approach's ceiling. Fixed depth 2, one task, one width — and
+g13-02's retrieval-chain ceiling is **1.000**. The gap between 0.624 and that is
+unaccounted for, and nothing here decomposes it. Composition on top of clean
+retrievals is still inherited from decision 102 rather than re-measured, which is
+the most likely place for it to hide.
 
 **Taken without asking**, under standing authorisation and John's advance
 approval of the direction.

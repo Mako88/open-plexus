@@ -75,7 +75,36 @@ it.** The blocker is decision 108's **ambiguity**, not capacity.
 
 ## Open work, in order
 
-### 1. BUILD SEARCH — its blocking condition is measured gone
+### 1. ✅ CLOSED — the search line landed. Decision 130
+
+    concat      0.327    what we had -- BELOW the 0.466 shortcut floor
+    walk        0.596    pair-key traversal, which decision 107 declined
+    search4     0.604    search everywhere, which decision 111 declined
+    gate-q50    0.624    search where it helps  (+0.020 +/-0.005 over search4)
+
+**The gate keeps `search4`'s accuracy at out-degree ≥ 2 exactly (0.539) and
+recovers most of `walk`'s at out-degree 1** — the trade g13-03 said was
+available. Five of five predictions confirmed.
+
+Both refusals — 107 and 111 — were correct arithmetic on the numbers of their
+day, and both conditions were measured away before anything was rebuilt.
+**Nothing had to be undone**, because both declined to *build*.
+
+> **The threshold generalises; the number does not.** `gate-q50` fires at a
+> margin of 0.663 at width 256, and that constant is not the mechanism — it is
+> the median of the model's own training margins, computed without labels and
+> without touching the test set. Width-dependent (`docs/SCALE.md`); this is a
+> width-256 result.
+
+**Still unaccounted for: 0.624 against g13-02's retrieval-chain ceiling of
+1.000.** Nothing decomposes that gap. Composition on top of clean retrievals is
+still inherited from decision 102 rather than re-measured, which is the most
+likely place for it to hide.
+
+<details>
+<summary>How the line got here (superseded detail)</summary>
+
+### BUILD SEARCH — its blocking condition is measured gone
 
 Decision 111 refused search on one ground: *"you cannot search your way out of
 noisy primitives, because the verifier is built from the primitives."*
@@ -189,6 +218,8 @@ Also still open: **re-measure composition** rather than inheriting decision 102'
 - **`hop2-concat` is below the floor that matters** — 0.327 against a
   first-relation floor of 0.466. Decision 102 recorded concat *matching* the
   one-hop model; on this instrument it loses to the one-hop shortcut.
+
+</details>
 
 ### 2. `carry_store` — two measurements with OPPOSITE SIGNS, and nobody has reconciled them
 

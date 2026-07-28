@@ -2,9 +2,99 @@ Does gating search on ambiguity beat searching everywhere?
 ==========================================================
 
 Script: experiments/g13_05_does_the_gate_pay.py
-Status: DISPATCHED. Predictions registered before the matrix ran.
+Status: RUN, 40 of 40 cells, 8 of 8 seeds, run 30403497440.
 
-ANSWER: pending. A smoke seed is recorded below and it is encouraging.
+ANSWER: **YES. gate-q50 beats search-everywhere by +0.020 +/-0.005 -- four
+        standard errors -- and beats a greedy walk by +0.028. FIVE OF FIVE
+        PREDICTIONS CONFIRMED**, including the rail.
+
+
+RESULTS
+-------
+8 seeds, width 256, floor to clear 0.466.
+
+  arm        overall            k=1                k>=2               fired   thr
+  walk       0.596 +/-0.018     0.702 +/-0.025     0.446 +/-0.010      --      --
+  search4    0.604 +/-0.013     0.649 +/-0.021     0.539 +/-0.024      --      --
+  gate-q25   0.616 +/-0.018     0.695 +/-0.023     0.503 +/-0.026     23%    0.130
+  gate-q50   0.624 +/-0.014     0.684 +/-0.024     0.539 +/-0.025     48%    0.663
+  gate-q75   0.614 +/-0.014     0.665 +/-0.025     0.541 +/-0.024     74%    0.832
+
+  paired, within seed:
+    gate-q25 - search4   +0.012 +/-0.009
+    gate-q50 - search4   +0.020 +/-0.005
+    gate-q75 - search4   +0.010 +/-0.004
+    gate-q50 - walk      +0.028
+
+
+SCORING
+-------
+  P1  CONFIRMED, and decisively. `gate-q50` beats `search4` by **+0.020
+      +/-0.005** -- four standard errors, not a tie reported as a win. All three
+      gate arms beat it.
+
+  P2  CONFIRMED. Every gate beats `walk`: +0.020, +0.028, +0.018.
+
+  P3  CONFIRMED. The best gate fires on **48%** of positions, against a measured
+      out-degree mix of about 60/40. It is gating rather than searching
+      everywhere under a threshold.
+
+  P4  CONFIRMED, the rail. Firing rate rises with the quantile: 23%, 48%, 74%.
+      The threshold does what its name says, so the rest is readable.
+
+  P5  CONFIRMED. +0.020 against the perfect-gate 0.03 from g13-03's split. The
+      gate captures about **two thirds** of what a perfect one would, which is
+      what AUC 0.803 rather than 1.000 buys.
+
+
+THE MECHANISM DOES WHAT IT WAS BUILT TO DO
+-------------------------------------------
+    out-degree 1     gate 0.684   walk 0.702   search4 0.649
+    out-degree >= 2  gate 0.539   walk 0.446   search4 0.539
+
+**At out-degree >= 2 the gate matches `search4` exactly** -- it keeps all of
+search's gain where ambiguity lives. **At out-degree 1 it recovers most of the
+way back to `walk`** (0.684 against 0.702, where `search4` sits at 0.649), giving
+back most of the damage search does where there is nothing to choose between.
+
+That is precisely the trade g13-03's split predicted was available, and it is the
+first time on this line that a mechanism has done what its design argument said
+it would rather than something adjacent.
+
+
+THE LINE, END TO END
+---------------------
+    concat      0.327    what we had -- BELOW the 0.466 floor
+    walk        0.596    pair-key traversal (decision 107 declined this)
+    search4     0.604    search everywhere (decision 111 declined this)
+    gate-q50    0.624    search where it helps
+
+Two refusals were correct arithmetic on the numbers of their day, and both
+conditions were measured away before either was rebuilt. **Nothing was undone**
+-- 107 and 111 declined to build, so there was nothing to undo, which is what
+measuring a ceiling before building buys.
+
+
+WHAT THIS DOES NOT LICENSE
+---------------------------
+Quoting 0.624 as the approach's ceiling. Fixed depth 2, one task, one width, and
+g13-02's retrieval-chain ceiling is 1.000 -- the gap between 0.624 and that is
+still unaccounted for and nothing here decomposes it.
+
+**And the threshold is a quantile, not a constant.** `gate-q50` fires at 0.663 at
+width 256; the same quantile at another width or key scheme gives a different
+number, because the margin distribution moves. What generalises is "the median
+training margin", not "0.663".
+
+The width dependence is real and registered: g13-04 measured the signal at AUC
+0.710 at width 64, below the 0.75 usability bar. **This result is a width-256
+result.**
+
+
+COST
+----
+5 arms x 8 seeds at width 256 = 40 cells, in 8 jobs, and the matrix returned in
+under four minutes.
 
 
 IN PLAIN TERMS

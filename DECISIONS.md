@@ -4284,6 +4284,49 @@ now learned this task's terminal class — not a general one. **The first real
 test is a task whose terminator was never designed in.**
 
 `hops` is still a ceiling: the gate chooses among hops 1..k and cannot choose a
-depth beyond k. Nothing here tests depth 3 mixed with depth 1, and the lookahead
-means a `hops=k` gated model pays k+1 retrievals — the cost of not knowing the
-depth, which is one extra hop over knowing it.
+depth beyond k. Nothing here tests depth 3 mixed with depth 1 — **decision 88
+does** — and the lookahead means a `hops=k` gated model pays k+1 retrievals, the
+cost of not knowing the depth, which is one extra hop over knowing it.
+
+## 88. Three depths at once, and the gain has an upper edge
+
+Decision 87 explicitly did not license three depths: the gate must pick one hop
+of three, the softmax has more ways to split, and the lookahead has to reject a
+marker two hops further out for the deepest questions.
+
+    model                  overall     d1      d2      d3
+    fixed hops=1             0.333   1.000   0.000   0.000
+    fixed hops=2             0.339   0.017   1.000   0.000
+    fixed hops=3             0.353   0.000   0.058   1.000
+    GATE max=3 gain=50       0.997   1.000   1.000   0.992
+    GATE max=3 gain=200      1.000   1.000   1.000   1.000
+    GATE max=3 gain=1000     0.986   1.000   0.983   0.975
+
+**It scales.** 1.000 on all three depths, against fixed counts pinned at 0.333
+because each solves only its own third. Reported per depth on purpose: an
+overall number would hide a gate that solved two depths and abandoned the third,
+which is the exact shape the own-hop-scored gate failed in.
+
+**The gain has an upper edge**, which two depths did not show. At 1000 the model
+loses 0.986, and the loss is on the deeper questions (d2 0.983, d3 0.975) while
+d1 stays perfect. A very large gain makes the hop softmax effectively an argmax,
+so a single mis-scored hop is taken outright instead of being averaged against
+its neighbours — and deeper questions have more hops to mis-score. So the gain
+is a real dial with a middle, not a "larger is safer" knob, and 200 is where
+both grids agree.
+
+### What this licenses
+
+The mechanism is not a two-hop special case. Depth is now a property of the
+question rather than of the configuration, up to a ceiling the caller sets.
+
+### What it still does not license
+
+The terminator. Every result so far trains and tests on the **same** structural
+marker, and with random value vectors there is nothing shared between two
+different marker tokens for a linear gate to latch onto — so the honest
+prediction is that it does **not** transfer, and the interesting question is
+whether anything survives at all. Decision 86 measured retrieval `norm` as the
+one signal with any separation (d′=1.01), and a norm is not tied to a token's
+identity. That is the thread worth pulling: it is the difference between a
+mechanism and a fit.

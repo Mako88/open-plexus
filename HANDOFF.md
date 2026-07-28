@@ -1,9 +1,84 @@
-# Handoff — state of play, 2026-07-27 (evening)
+# Handoff — state of play, 2026-07-28 (overnight)
 
 **For the next session.** Read this, then `GOALS.md`, then `BACKLOG.md`. The
 notes in `docs/notes/` are the reasoning; `DECISIONS.md` is the running log John
-reads — entries 56–69 are from this session and are the current state. This file
-is a snapshot and goes stale — trust the notes and DECISIONS over it.
+reads — **entries 84–88 are the newest and are the current state**. This file is
+a snapshot and goes stale — trust the notes and DECISIONS over it.
+
+---
+
+## THE OVERNIGHT RESULT: the model composes, at a depth it is not told
+
+This is new capability, not a tuning gain. It was 0.000 before.
+
+    2-hop chain, fixed hops=2                 1.000   (was 0.000)
+    3-hop chain, fixed hops=3                 1.000
+    depths 1+2 mixed, gated                   1.000   on both halves
+    depths 1+2+3 mixed, gated                 1.000   on all three
+    1-hop model on a 2-hop chain              0.000   <- the control still fails
+
+The last row is what makes the rest readable: a one-hop model still answers the
+intermediate 100% of the time, so the task genuinely requires composition and
+nothing leaked when it started working.
+
+**Three defects had to be cleared, in this order.**
+
+1. **The hop loop reassigned `key`** (decision 85). `key` is carried into
+   `previous_key`, which is what the NEXT position writes its binding with — so
+   with `hops > 1` every binding in the store was written with a re-encoded hop
+   key. *The hop mechanism was corrupting the memory it was reading.* One line.
+   Four probes and two refuted hypotheses went past it, because every one of
+   them measured retrieval and the damage was in the write.
+
+2. **The task stated each link as its own triple** (decision 84), so an
+   intermediate symbol appeared twice and `key(b)` carried two bindings — the
+   real one and one to the separator. Retrieval put the answer first 54% of the
+   time. Chains are contiguous now: 100%.
+
+3. **Two flattened signals** (decisions 84, 87). The hop decode and then the
+   gate each computed the right thing and threw it away in a near-uniform
+   softmax — decode entropy 3.912 against a uniform 3.912, and the gate putting
+   0.5020 vs 0.5000 on the hop it should have chosen. Both needed a gain, and
+   both have a gain-0 control proving the fix was the fix.
+
+**The gate** (decisions 86, 87, 88) learns which hop to read from: one linear
+score per group, softmaxed across hops, where **hop k is scored by what hop k+1
+returns**. Scoring a hop by its own content is only half a mechanism — it solves
+depth-1 perfectly and depth-2 at 0.547 — because the available signal separates
+*past the end* from *on the chain*, not *the answer* from *an intermediate*.
+
+### Be sceptical of
+
+- **The gate learned THIS task's terminator.** It works because chains end at a
+  structural marker the task lays down, and with random value vectors there is
+  nothing shared between two marker tokens for a linear gate to latch onto. The
+  honest prediction is that it does not transfer. **This is the next experiment**
+  and it is the difference between a mechanism and a fit.
+- **`hops` is a ceiling** the caller sets; the gate chooses within it.
+- **Contiguity fixed the offset** from query symbol to answer at exactly `hops`.
+  Harmless for this model, which has no positional access — but the instrument
+  needs filler interleaved before it can be pointed at one that does.
+- **`gate_sharpness` has a middle.** 200 is where both grids agree; 1000 loses
+  accuracy on the deeper questions.
+
+### Operational lessons, now rules in CLAUDE.md
+
+All learned the expensive way in one night:
+
+- The mutation harness **takes the tree exclusively** — a concurrent test run
+  reported 7 phantom failures in a file nobody had touched, then 3, a different
+  set. The tell was that the failures moved.
+- **Stopping the background task does not stop the harness.** It kills the shell
+  wrapper and leaves the Python process editing source. Two full check runs
+  passed against a tree that was still being mutated; passing under a live
+  harness is luck, not evidence.
+- Killing it mid-swap **leaves a mutation live on disk**. `--verify` caught it.
+- **Renaming a variable can leave a mutation stale**, which reports as `65/66`
+  rather than as a failure. A mutation that cannot be applied is not passing.
+- **Structural tests could not see either gate defect.** Read counts, refusals,
+  a zero-gain control and store invariance all held while the mechanism did the
+  wrong thing — because each defect still beat the baseline (0.707 and 0.773
+  against 0.500). It took a behavioural test on the half that fails.
 
 ---
 

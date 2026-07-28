@@ -1,0 +1,104 @@
+name: sweep-g15-01-does-persistence-break-the-wall
+
+# NOTE 042's FALSIFIER, run before anything is built on top of it.
+#
+# The note argues the model has nowhere to keep a concept map -- the store is
+# rebuilt every sequence and the only durable parameter is one vocab x d linear
+# map (decision 62) -- and that this one fact explains decision 63 (data stops
+# helping at 16k characters), decision 115 (effective rank ~3 whatever the
+# width) and g14-01 (the local rule at 0.097 where attention reaches 0.277).
+#
+# If a persistent slow store does not move that wall, the account is WRONG and
+# the architectural proposal resting on it goes with it. Cheaper now than after
+# building concept-partitioning on top.
+#
+# THE MIDDLE ARM IS WHY THIS IS READABLE. `consolidate` turns consolidation on
+# WITHOUT persistence, so a positive result cannot be consolidation helping
+# rather than persistence -- two changes in one arm is the confound decision 79
+# was caught by.
+#
+# PREDICTIONS (full text in the script and the sweep file):
+#   P1  CONTROL -- baseline reproduces decision 63, under 0.05 bits of movement
+#   P2  consolidate is also flat; it is a within-sequence mechanism
+#   P3  THE GATE -- persist keeps improving past 16,000 characters
+#   P4  RAIL -- consolidations grow with data and are well above zero
+#   P5  persist does not reach the backprop baseline of 4.049
+#
+# P4 IS WHAT MAKES A REFUTED P3 INTERPRETABLE. Consolidation fires on
+# `predictions[t-1] == token` -- it promotes what the model ALREADY GOT RIGHT --
+# so "persistence does not help" and "the gate never opened" would be the same
+# number without the counter. Registered before the run, not after a null.
+#
+# COST from the dearest cell (persist at 125,000 characters), measured by
+# --cost: 10.2 s at 8,000 characters, ~2.7 min extrapolated to 125,000. Split by
+# (seed, arm) rather than by seed alone so a job is ~5 min rather than ~16.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweep
+  cancel-in-progress: false
+
+jobs:
+  wall:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [1, 2, 3]
+        arm: [baseline, consolidate, persist]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - name: seed ${{ matrix.seed }}, arm ${{ matrix.arm }}
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python experiments/g15_01_does_persistence_break_the_wall.py \
+            --seed ${{ matrix.seed }} --arm ${{ matrix.arm }} \
+            --json out/${{ matrix.arm }}-${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g15-01-${{ matrix.arm }}-${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: [wall]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g15-01-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 9" | tee summary.txt
+          python -m tools.summarise_g15_01 | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g15-01-summary
+          path: |
+            summary.txt
+            out/*.json

@@ -1,0 +1,116 @@
+Does a persistent slow store break decision 63's 16,000-character wall?
+=======================================================================
+
+Script: experiments/g15_01_does_persistence_break_the_wall.py
+Status: DISPATCHED. Predictions registered before the matrix ran.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+The model stops getting better after about sixteen thousand characters of text,
+no matter how much more it is shown. The claim being tested is that this happens
+because it has nowhere to put what it learns: the part that holds relationships
+is wiped clean every few hundred characters, and the only thing that survives is
+a single flat table.
+
+This gives it somewhere to put things and checks whether the wall moves. If it
+does not, the explanation is wrong and a large piece of planned work is wrong
+with it.
+
+
+WHY THIS EXISTS
+----------------
+Note 042 argues that decision 62's finding -- `memory = np.zeros((d, d))` is
+inside `run`, so nothing durable exists but `Wo` -- explains three separate
+measured results at once:
+
+    decision 63    data stops helping at ~16,000 characters
+    decision 115   effective rank ~3 whatever the width
+    g14-01         the local rule at 0.097 where attention reaches 0.277
+
+**One fact explaining three results is what makes it architectural.** It is also
+what makes it worth falsifying before building on: note 042's items 1 and 2 are
+the same design, and item 2 (concept partitioning) rests on item 1 being right.
+
+Decision 63's control numbers, same width, chunk and corpus:
+
+    chars     4,000   8,000  16,000  32,000  62,500  125,000
+    bits      5.570   5.543   5.527   5.523   5.531    5.531   spread ~0.04
+
+
+THE ARMS
+--------
+    baseline      consolidation OFF, persistence OFF     decision 63's model
+    consolidate   consolidation ON,  persistence OFF     the control that matters
+    persist       consolidation ON,  persistence ON      the proposal
+
+**The middle arm is why a positive result would be readable.** Without it,
+`persist` beating `baseline` could be consolidation helping rather than
+persistence -- two changes in one arm, the confound decision 79 was caught by.
+The claim is specifically that the store must SURVIVE THE SEQUENCE.
+
+
+THE RISK, REGISTERED BEFORE THE RUN RATHER THAN AFTER A NULL
+--------------------------------------------------------------
+Consolidation fires on `predictions[t-1] == token`. **It promotes what the model
+already got right.** So a persistent store cannot bootstrap a model that predicts
+badly, and a null here would have two completely different readings:
+
+    the store did not help          persistence is the wrong idea
+    the store stayed empty          the GATE is the problem, not the store
+
+Those are the same number without a counter. `model.consolidations` was added
+for this and P4 is the rail built on it. **This risk was written down before the
+matrix ran** -- it is not a hedge composed after seeing a result.
+
+
+PREDICTIONS
+-----------
+  P1  CONTROL. `baseline` reproduces decision 63 -- total movement from 4,000 to
+      125,000 characters under 0.05 bits. If it does not, this instrument
+      disagrees with the record and nothing else here is readable.
+
+  P2  `consolidate` is also flat. Consolidation without persistence is a
+      within-sequence mechanism, so more data cannot help it either.
+
+  P3  THE GATE. `persist` keeps improving past 16,000 characters: its 62,500 to
+      125,000 movement exceeds the 0.04 seed spread, where `baseline`'s does
+      not.
+
+  P4  RAIL. `consolidations` grows with characters seen and is well above zero
+      at every point. If it is near zero, a refuted P3 says nothing about
+      persistence.
+
+  P5  `persist` does not reach the backprop baseline (4.049 at 1,000,000
+      characters). A single linear readout plus a slow store is not a
+      transformer, and a result at or past it would suggest a leak.
+
+
+COST
+----
+3 arms x 6 data points x 3 seeds = 54 cells, in 9 jobs of (seed, arm).
+
+Estimated from the MOST EXPENSIVE cell -- `persist` at 125,000 characters, the
+largest stream through the heaviest write path.
+
+    measured by --cost:  10.2 s at 8,000 characters
+                         ~2.7 min extrapolated to 125,000
+    per job:             ~5 min
+
+Split by (seed, arm) rather than by seed alone deliberately: one job per seed
+would be ~16 minutes against a timeout, and this project has lost cells to that
+before (g11-03, four of six).
+
+
+MEASURED ON
+-----------
+Tiny Shakespeare, width 64, chunk 128, two epochs -- decision 63's exact
+configuration, so its table is a REPRODUCTION rather than a re-derivation.
+
+The temperature is fitted on calibration text and applied to test text, so
+nothing is tuned on what it is scored against. Decision 117: without a
+temperature the delta rule's scores sit in about [0, 1] and a softmax over them
+is near-uniform whatever the model knows, so the number would measure the SCALE
+of the scores rather than their information.

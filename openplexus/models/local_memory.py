@@ -1360,6 +1360,15 @@ class LocalAssociativeMemory:
         #: nothing clears it implicitly, because a store that quietly resets is
         #: indistinguishable from one that never worked.
         self._lasting: np.ndarray | None = None
+        #: How many times consolidation has fired, over the model's whole life.
+        #: **Observation only**, like `trace` -- nothing reads it back.
+        #:
+        #: It exists so a null result can be attributed. The gate is
+        #: `predictions[t-1] == token`, so it opens only where the model was
+        #: already correct; a persistent store that does not help because
+        #: nothing was ever promoted into it is a different finding from one
+        #: that does not help because persistence is the wrong idea.
+        self.consolidations: int = 0
         self.wv = rng.normal(0.0, spread, (v, d))
         self.wo = np.zeros((v, d))
         # A constant term on the readout, off by default.
@@ -2061,6 +2070,13 @@ class LocalAssociativeMemory:
                     fires = (deviation > 0.0
                              and abs(step_surprise - mean_surprise)
                              > self.config.salience * deviation)
+                # COUNTED so a null can be attributed. Consolidation fires on
+                # `predictions[t-1] == token` -- it promotes what the model
+                # ALREADY GOT RIGHT -- so a persistent store cannot bootstrap a
+                # model that predicts badly. Without this counter, "the
+                # persistent store did not help" and "the gate never opened"
+                # are the same number.
+                self.consolidations += int(bool(fires))
                 if fires and self.config.capture_slots:
                     # COMPETITIVE CAPTURE. Tagging decides who is a candidate;
                     # the pool decides who wins. Strength is the size of the

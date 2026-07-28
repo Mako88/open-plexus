@@ -959,8 +959,8 @@ MUTATIONS = [
         breaks="sparsity, so a sweep over key_active would measure nothing and "
                "report the dense result at every setting",
         path=LOCAL,
-        old="                active = rng.choice(d, config.key_active, replace=False)",
-        new="                active = rng.choice(d, d, replace=False)",
+        old="                active = draw.choice(d, config.key_active, replace=False)",
+        new="                active = draw.choice(d, d, replace=False)",
     ),
     Mutation(
         name="sparse-keys-drift-in-length",
@@ -975,8 +975,8 @@ MUTATIONS = [
         breaks="distinctness of active sets, so a token can end up with fewer "
                "active dimensions than requested",
         path=LOCAL,
-        old="                active = rng.choice(d, config.key_active, replace=False)",
-        new="                active = rng.choice(d, config.key_active, replace=True)",
+        old="                active = draw.choice(d, config.key_active, replace=False)",
+        new="                active = draw.choice(d, config.key_active, replace=True)",
     ),
     Mutation(
         name="round-a-fractional-machine",

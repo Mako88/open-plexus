@@ -2906,3 +2906,63 @@ Before that grid, probe the bottom of the range locally — decision 63's rule �
 and check `key_active` interacts with `derived_keys`, which currently conflict:
 sparse keys have no per-token derivation, so a node cannot rebuild a sparse key
 from a seed, and that is a C1 problem the sweep would inherit.
+
+---
+
+## 68. Sparse keys are now derivable, which is what makes the 0.18 bits usable
+
+Decision 67 found sparse keys worth about 0.18 bits on the corpus for no extra
+state. **A distributed node could not have used them.**
+
+Under C1 a node holds only its own slice and cannot be sent a key table. Dense
+keys have been rebuildable from `(seed, token)` alone since note 012 — that is
+what `derived_keys` is for. Sparse keys were not, and the two settings were
+REFUSED as conflicting:
+
+    "derived_keys and key_active both build Wk and would conflict;
+     sparse keys have no per-token derivation yet"
+
+**They do not conflict.** The message says so itself — "yet" — and nobody had
+written the per-token draw. So the scheme that is both better on the loss AND
+cheaper on the wire was the one scheme a node could not reconstruct, and the
+refusal made that look like a design decision rather than an unwritten function.
+
+Four lines: draw the active set from `default_rng((seed, token))` when
+`derived_keys` is on, rather than from the shared sequential generator.
+
+**Measured, three seeds, width 64, 60,000 characters:**
+
+    dense derived          5.528   (spread 0.027)
+    sparse k=4 drawn       5.342   (spread 0.067)
+    sparse k=4 DERIVED     5.359   (spread 0.073)
+
+The win survives derivation — 0.17 bits against dense, inside the spread of the
+sequentially-drawn version. **So the cheap improvement and the C1 property can be
+had at the same time**, which was not true an hour ago.
+
+### The test that matters is not the reconstruction one
+
+Rebuilding a row from `(seed, token)` is the obvious assertion and it is the
+weaker one. The property a late-arriving node actually needs is that a row does
+**not depend on the rows drawn before it** — a sequential draw satisfies "I can
+rebuild row 3" only if rows 0–2 are rebuilt first, and it looks identical from
+outside. `test_a_row_does_not_depend_on_the_rows_drawn_before_it` builds a
+40-token model and an 8-token model at the same seed and requires the first eight
+rows to match exactly.
+
+### Records corrected, per rule 5
+
+`tests/test_sparse_keys.py` opened with "the result is negative: on this task
+sparse keys are worse than dense signed ones at every sparsity tested". True on
+MQAR, and it is the sentence that kept the knob off. It now carries the corpus
+numbers next to it.
+
+`tests/test_derived_keys.py::ConflictingKeySchemesAreRefused` asserted the
+refusal. **Replaced rather than loosened**, per rule 11: what mattered about it
+was that neither setting silently wins, and that is now asserted directly — the
+row must be BOTH sparse and order-independent.
+
+Two mutations needed re-pointing and both are caught. **A repo rail caught a test
+of mine that asserted nothing** — `test_both_together_are_accepted` relied on "no
+exception raised", which R4 refuses. That is the third automated check today to
+catch something I would not have.

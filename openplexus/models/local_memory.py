@@ -836,10 +836,6 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
-        if self.derived_keys and self.key_active:
-            raise ValueError(
-                "derived_keys and key_active both build Wk and would conflict; "
-                "sparse keys have no per-token derivation yet")
         if self.value_lr < 0.0:
             raise ValueError("value_lr is a learning rate and cannot be "
                              "negative; 0 leaves the projection frozen")
@@ -970,9 +966,20 @@ class LocalAssociativeMemory:
             # the biologically faithful part -- firing rates do not go below zero
             # -- and it is also what makes sparsity worth anything, since a DENSE
             # non-negative code has every pair of keys strongly overlapping.
+            #
+            # DERIVED SPARSE KEYS. With `derived_keys` the active set for token
+            # `t` is drawn from `(seed, t)` alone, so a node holding only the
+            # seed can rebuild any row on demand and never has to be sent one.
+            # These two used to be refused as conflicting; they do not conflict,
+            # nobody had written the per-token draw, and without it sparse keys
+            # -- which are worth 0.18 bits on the corpus and are CHEAPER on the
+            # wire than dense ones -- could not be used by a distributed node at
+            # all.
             self.wk = np.zeros((v, d))
             for token in range(v):
-                active = rng.choice(d, config.key_active, replace=False)
+                draw = (np.random.default_rng((config.seed, token))
+                        if config.derived_keys else rng)
+                active = draw.choice(d, config.key_active, replace=False)
                 self.wk[token, active] = config.key_scale / np.sqrt(
                     config.key_active)
         elif config.derived_keys:

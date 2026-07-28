@@ -132,17 +132,39 @@ class ItScoresTheSameOnTheTask(unittest.TestCase):
             f"of {spread:.3f} -- larger than noise")
 
 
-class ConflictingKeySchemesAreRefused(unittest.TestCase):
+class DerivedAndSparseCompose(unittest.TestCase):
+    """They used to be refused as conflicting. **They do not conflict.**
 
-    def test_derived_and_sparse_cannot_both_be_asked_for(self):
-        """Both build `Wk`, and sparse has no per-token derivation yet.
+    The refusal said "sparse keys have no per-token derivation yet", which was
+    true and was never a conflict -- nobody had written the per-token draw.
+    Changed by decision 67: sparse keys are worth about 0.18 bits on the corpus
+    and are CHEAPER on the wire than dense ones, so the one scheme a C1 node
+    would most want was the one it could not rebuild without being sent a table.
 
-        Silently letting one win would give a model that is not what either
-        setting describes.
-        """
-        with self.assertRaises(ValueError):
-            LocalMemoryConfig(vocab_size=VOCAB, d_model=WIDTH,
-                              derived_keys=True, key_active=4)
+    The old assertion is not loosened, it is replaced: what mattered about it
+    was that neither setting silently wins, and that is now asserted by
+    `tests/test_sparse_keys.py::DerivedSparseKeys`, which checks the row is BOTH
+    sparse and reconstructible from `(seed, token)` alone.
+    """
+
+    def test_both_together_are_accepted(self):
+        config = LocalMemoryConfig(vocab_size=VOCAB, d_model=WIDTH,
+                                   derived_keys=True, key_active=4)
+        self.assertTrue(config.derived_keys)
+        self.assertEqual(config.key_active, 4)
+
+    def test_neither_setting_silently_wins(self):
+        """Sparse-and-derived must be sparse AND derived. If `derived_keys`
+        won, rows would be dense; if `key_active` won, rows would depend on the
+        draws before them and a late node could not rebuild one."""
+        model = LocalAssociativeMemory(LocalMemoryConfig(
+            vocab_size=VOCAB, d_model=WIDTH, derived_keys=True, key_active=4,
+            seed=11))
+        self.assertEqual(int((model.wk[3] != 0).sum()), 4)
+        fewer = LocalAssociativeMemory(LocalMemoryConfig(
+            vocab_size=3, d_model=WIDTH, derived_keys=True, key_active=4,
+            seed=11))
+        np.testing.assert_array_equal(model.wk[:3], fewer.wk)
 
 
 if __name__ == "__main__":

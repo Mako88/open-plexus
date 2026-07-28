@@ -3036,3 +3036,93 @@ Worth keeping and worth finishing — 0.15 bits for no state, derivable per toke
 (decision 68), and cheaper on the wire. But it should be understood as **making
 the plateau lower, not later**, and the `key_active` x width grid should be
 costed against that expectation rather than a hope of a slope.
+
+---
+
+## 70. The readout was the ceiling all along
+
+**The most consequential measurement of the session, and it reverses the working
+diagnosis.**
+
+`r = M @ key` depends only on `Wv` and the keys, both frozen. So the retrieval is
+independent of `Wo` and the features can be extracted once and any readout
+trained on them offline. Four data sizes, scored on features from the corpus's
+own held-out test split:
+
+    chars  samples   linear   MLP-128   MLP-512
+     4,000    3,937    5.579     5.388     6.320
+    16,000   15,875    5.436     4.865     5.214
+    62,500   61,976    5.351     4.757     5.097
+   250,000  248,031    5.320     4.525     4.659
+
+      linear     b = -0.0115   R2 0.93
+      MLP-128    b = -0.0397   R2 0.92
+      MLP-512    b = -0.0681   R2 0.89
+
+      our model in situ         b = -0.0010   FLAT
+      backprop attention        b = -0.0243
+      published: DFA -0.040, backprop -0.071
+
+**On identical frozen features a two-layer readout recovers a backprop-like data
+exponent.** MLP-512 at -0.0681 is indistinguishable from published backprop, and
+steeper than our own attention baseline. The gap over linear widens
+monotonically: 0.19, 0.57, 0.59, 0.80 bits.
+
+**MLP-128 reaches 4.525 bits, past the unigram at 4.829** — a bar this project
+has never cleared — on features that never learn anything.
+
+### Why nobody looked here
+
+Every previous diagnosis blamed something upstream. Decision 59 blamed the sum.
+Decision 62 blamed persistent capacity. Decision 65 blamed rank; decision 67
+refuted that. **The readout was never suspected because it is exactly right** —
+the delta rule on `Wo` IS the exact gradient for a single linear readout, which
+CLAUDE.md has said all along and which was read as "so it cannot be the problem".
+
+It was doing its job perfectly. **A perfect linear readout is still linear.**
+
+That reading also disposes of a claim I have repeated all day: "every component
+passes its capability test in isolation and the whole fails". The readout passed
+its test because its test asked whether it was the correct linear map. Nothing
+asked whether a linear map was the right thing to be.
+
+### What it does not say
+
+**Nothing about local learning.** These readouts were trained by ordinary
+backpropagation, offline, Adam, many epochs, fixed dataset. The deployed model
+learns online in one pass by a local rule. This shows the information is present
+and that a composed function extracts it — not that one can be trained the way
+this project needs. Note 037 pre-registered that limit before the run.
+
+About 0.19 bits of the offline gain is better optimisation, not architecture: the
+offline LINEAR arm reaches 5.320 against the in-model 5.505. **The remaining 0.80
+is composition**, and that comparison is clean — same features, same optimiser,
+same epochs, same test set.
+
+### Why this is C1-compatible, which is what makes it the main line
+
+`partitions` already splits the readout by dimension: each node holds its own
+`vocab x d/groups` slice and computes its own `parts[g]`. **If a node's slice
+became two layers instead of one, backpropagating through those two layers uses
+only that node's own activity and its own error.** No other node's state enters.
+A composed readout inside a node is not a locality violation — it is the same
+locality applied twice.
+
+So note 036, filed as background reading, is now the main line, and the next
+measurement is specific: **a per-node two-layer readout, trained by local
+backprop within the node, online**, on the data axis with the bottom of the range
+probed first (decision 63).
+
+### And it reframes John's question from this evening
+
+He proposed that the project is training the wrong thing — prediction rather
+than understanding relationships between ideas. **The ordering objection I gave
+him is now weaker than it was an hour ago.** I argued the model could not
+represent relationships even in principle, so changing the objective would
+produce an uninterpretable null. That argument rested on the ceiling being the
+representation. It is not; it is the readout. A model whose readout can express
+composition is a much better candidate for a relational objective than the one I
+was describing.
+
+The ordering still holds — fix the readout, then change the objective — but the
+gap between the two steps is far smaller than I told him.

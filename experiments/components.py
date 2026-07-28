@@ -63,7 +63,13 @@ CHOICES: dict[str, dict[str, dict]] = {
     # a caller has to remember.
     "write": {
         "plain": {},
-        "gated": {"write_gate": 0.5},
+        # `write_gate` DOES NOTHING without `corrective_writes` -- the field's
+        # own docstring says so, and g11-08's first run set the gate alone. The
+        # arm produced numbers identical to the baseline to the last decimal in
+        # all four cells, which is what a disconnected flag looks like and what
+        # a small real effect does not.
+        "gated": {"corrective_writes": True, "write_gate": 0.5},
+        "corrective": {"corrective_writes": True},
         "consolidating": {"consolidation": 0.5, "lasting_cap": 5.0,
                           "decay": 0.997},
     },

@@ -96,9 +96,51 @@ def main() -> int:
             print(line)
         print()
 
+    dead = disconnected(cells, parts, others, index, groupings)
+    if dead:
+        print("== A CHOICE THAT CHANGED NOTHING, ANYWHERE ==")
+        for part, choice in dead:
+            print(f"  {part}={choice} is bit-identical to its baseline in every")
+            print(f"  cell. **That is what a DISCONNECTED flag looks like**, and")
+            print(f"  what a small real effect does not -- a null has noise in")
+            print(f"  it. Check the mechanism is reachable before reading this")
+            print(f"  as a result.")
+        print()
+
     print("A contrast that reverses or collapses between readouts was never a")
     print("property of the mechanism -- decisions 74, 76 and 77.")
     return 0
+
+
+def disconnected(cells, parts, others, index, groupings) -> list[tuple]:
+    """Choices whose every cell exactly equals its baseline's.
+
+    **g11-08's first run reported the write gate as having no effect at all**,
+    +0.000 in four cells across two seeds. It was not a null: `write_gate` does
+    nothing unless `corrective_writes` is on, which the field's own docstring
+    says, and the arm never enabled it. A real null wobbles; an exact zero
+    everywhere is a flag that never reached the model.
+
+    Reported rather than raised, because a genuinely inert setting is possible
+    and the reader should decide -- but it must never pass unremarked.
+    """
+    found = []
+    for part in others:
+        at = parts.index(part)
+        base = BASELINE.get(part)
+        for choice in sorted({key[at] for key in cells} - {base}):
+            gaps = []
+            for key in cells:
+                if key[at] != choice:
+                    continue
+                reference = tuple(base if i == at else v
+                                  for i, v in enumerate(key))
+                if reference in cells:
+                    gaps.append(mean_and_error(cells[reference])[0]
+                                - mean_and_error(cells[key])[0])
+            if gaps and all(gap == 0.0 for gap in gaps):
+                found.append((part, choice))
+    return found
 
 
 if __name__ == "__main__":

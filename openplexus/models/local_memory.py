@@ -976,6 +976,25 @@ class LocalMemoryConfig:
     #: is the reason search is a mechanism rather than a ceiling.
     search_query_token: int | None = None
 
+    #: Branch only where the first decode's top-two gap is BELOW this. `None`
+    #: searches at every answerable position, which is what g13-03 measured.
+    #:
+    #: **A wide margin means one relation dominates**, so there is nothing to
+    #: choose between and branching can only replace a correct greedy pick with
+    #: a lucky endpoint — measured at −0.054 where the queried subject holds one
+    #: relation, against +0.092 where it holds several.
+    #:
+    #: **The threshold must not be fitted on the data it is scored against.**
+    #: g13-04 measured separability (AUC 0.803 at width ≥ 128) across ALL
+    #: thresholds; picking one by trying them on a test set would be fitting a
+    #: number rather than measuring one. `experiments/g13_05_*` derives it from
+    #: a quantile of the TRAINING margins, which needs no labels at all.
+    #:
+    #: **Width-dependent** — the signal reaches AUC 0.710 at width 64 and 0.858
+    #: at 256, because a wider store holds a cleaner superposition. Registered
+    #: in `docs/SCALE.md`.
+    search_gate_margin: float | None = None
+
     cache_slots: int = 0
 
     #: Read from the cache ALONE, dropping the superposed store's contribution.
@@ -1020,6 +1039,11 @@ class LocalMemoryConfig:
                 "decision 123). Without it the refusal stands")
         if self.search_branches < 0:
             raise ValueError("search_branches is a count and 0 means off")
+        if self.search_gate_margin is not None and self.search_branches < 2:
+            raise ValueError(
+                "a gate on search decides whether to BRANCH, and there is "
+                "nothing to decide with fewer than 2 branches. Set "
+                "search_branches >= 2 or leave search_gate_margin unset")
         if self.search_branches >= 1:
             # Every one of these is a thing a walk cannot do without, and each
             # would otherwise fail QUIETLY -- decision 105's exact failure mode,
@@ -2031,11 +2055,33 @@ class LocalAssociativeMemory:
             searching = (self.config.search_branches >= 1
                          and search_target is not None)
             if searching:
+                branches = self.config.search_branches
+                if self.config.search_gate_margin is not None:
+                    # THE GATE. g13-03 measured search gaining +0.092 where the
+                    # queried subject holds several relations and losing 0.054
+                    # where it holds one, so running it everywhere is close to a
+                    # wash. g13-04 measured the decode margin separating those
+                    # cases at AUC 0.803 -- against decision 93's 0.628 for
+                    # identity-free confidence signals fitted WITH the labels.
+                    #
+                    # A WIDE margin means one relation dominates, so there is
+                    # nothing to choose between and branching can only replace a
+                    # correct greedy pick with a lucky endpoint. Narrow means
+                    # several compete, which is what search is for.
+                    #
+                    # Decided BEFORE walking, which is not merely cheaper: the
+                    # endpoint margin, available only after paying for the
+                    # walks, measured BELOW CHANCE at every width (g13-04 P3).
+                    scored = search_candidates(
+                        readable, self.retrieval, self.key_source, self.wv,
+                        int(self.config.search_fact_token), int(tokens[t]),
+                        self.config.search_branches)
+                    if search_margin(scored) >= self.config.search_gate_margin:
+                        branches = 1
                 walks = run_search(
                     readable, self.retrieval, self.key_source, self.wv,
                     int(self.config.search_fact_token), int(tokens[t]),
-                    search_target, self.config.hops,
-                    self.config.search_branches)
+                    search_target, self.config.hops, branches)
                 if walks:
                     # The winning walk's per-relation retrievals ARE the hops the
                     # readout consumes, in order, which is why `concat` is

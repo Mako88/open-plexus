@@ -16,36 +16,9 @@ from __future__ import annotations
 import statistics
 from collections import defaultdict
 
-from tools.recovery import load
+from tools.recovery import load, paired_difference as paired, spread
 
 ARM_ORDER = ("concat", "walk", "search4", "search8")
-
-
-def spread(values: list[float]) -> str:
-    if not values:
-        return "--"
-    if len(values) < 2:
-        return f"{values[0]:.3f} (1 seed)"
-    return (f"{statistics.mean(values):.3f} "
-            f"+/-{statistics.stdev(values) / len(values) ** 0.5:.3f}")
-
-
-def paired(cells: dict, a: str, b: str) -> tuple[float, float]:
-    """`a` minus `b`, computed INSIDE each seed and then averaged.
-
-    A seed whose data ran easy inflates every arm in it; dividing once at the end
-    charges the mechanism for that. CLAUDE.md's per-seed-values rule.
-    """
-    left = {r["seed"]: r["accuracy"] for r in cells.get(a, [])}
-    right = {r["seed"]: r["accuracy"] for r in cells.get(b, [])}
-    shared = sorted(set(left) & set(right))
-    if not shared:
-        return 0.0, 0.0
-    diffs = [left[s] - right[s] for s in shared]
-    if len(diffs) < 2:
-        return diffs[0], 0.0
-    return (statistics.mean(diffs),
-            statistics.stdev(diffs) / len(diffs) ** 0.5)
 
 
 def main() -> None:

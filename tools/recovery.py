@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import glob
 import json
+import statistics
 import sys
 from collections import defaultdict
 from typing import Iterable, NamedTuple, Sequence
@@ -242,6 +243,51 @@ def winner(cells: dict, arm: str, incumbent) -> tuple:
     key = max(cells, key=lambda k: cells[k].ratios[arm])
     return key, cells[key].ratios[arm] - cells[incumbent].ratios[arm], \
         margin(cells[incumbent])
+
+
+def spread(values: list[float], places: int = 3) -> str:
+    """Mean and standard error, or a plain value when there is only one.
+
+    Every g13 summariser wrote this and two of them wrote it identically, which
+    `check_duplication` caught. It lives here for the same reason `load` does:
+    the shared thing gets extracted rather than parallelised.
+
+    NaN is dropped rather than propagated -- an AUC over an empty bucket is not
+    a measurement, and one such cell should not erase seven good ones.
+    """
+    clean = [v for v in values if v is not None and v == v]
+    if not clean:
+        return "--"
+    if len(clean) < 2:
+        return f"{clean[0]:.{places}f} (1 seed)"
+    error = statistics.stdev(clean) / len(clean) ** 0.5
+    return f"{statistics.mean(clean):.{places}f} +/-{error:.{places}f}"
+
+
+def paired_difference(cells: dict, a: str, b: str,
+                      field: str = "accuracy") -> tuple[float, float]:
+    """`a` minus `b`, computed INSIDE each seed and then averaged.
+
+    **Not the difference of the means.** A seed whose data ran easy inflates
+    every arm in it, so dividing once at the end charges the mechanism for
+    variation that has nothing to do with it. CLAUDE.md's *per-seed values, not
+    means* rule -- and the correction that found it (the retired backlog's item
+    0b) measured the paired bound fifteen times tighter than the unpaired one.
+
+    Returns `(mean difference, standard error)`; the error is 0.0 when only one
+    seed is shared, which is honest rather than convenient -- there is no
+    spread to report from a single pair.
+    """
+    left = {r["seed"]: r[field] for r in cells.get(a, [])}
+    right = {r["seed"]: r[field] for r in cells.get(b, [])}
+    shared = sorted(set(left) & set(right))
+    if not shared:
+        return 0.0, 0.0
+    diffs = [left[s] - right[s] for s in shared]
+    if len(diffs) < 2:
+        return diffs[0], 0.0
+    return (statistics.mean(diffs),
+            statistics.stdev(diffs) / len(diffs) ** 0.5)
 
 
 def best_by(candidates: Iterable[tuple[object, Cell | None]], arm: str):

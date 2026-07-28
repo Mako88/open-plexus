@@ -1,0 +1,128 @@
+Does gating search on ambiguity beat searching everywhere?
+==========================================================
+
+Script: experiments/g13_05_does_the_gate_pay.py
+Status: DISPATCHED. Predictions registered before the matrix ran.
+
+ANSWER: pending. A smoke seed is recorded below and it is encouraging.
+
+
+IN PLAIN TERMS
+---------------
+The model can try several possibilities and check which works out. That helps
+when the question is genuinely ambiguous and hurts when it is not -- trying
+alternatives to something already correct can only replace a right answer with a
+lucky-looking wrong one.
+
+The previous two runs established that both halves are real, and that the model
+can tell which half it is in before doing the work. This asks whether acting on
+that actually helps.
+
+
+WHY THIS EXISTS
+----------------
+g13-03: search is a wash overall, +0.008 +/-0.018 against a greedy walk, while
+gaining **+0.092** where the queried subject holds several relations and losing
+**0.054** where it holds one.
+
+g13-04: the decode margin separates those cases at **AUC 0.803** at width >= 128
+-- against decision 93's 0.628 for identity-free confidence signals fitted WITH
+the labels -- and the rival endpoint margin is BELOW CHANCE, so the decision must
+be taken before walking rather than after.
+
+A gate should therefore keep the gain and give back the loss.
+
+
+THE THRESHOLD, WHICH IS THE HONEST PROBLEM
+-------------------------------------------
+AUC measures separability across ALL thresholds. A gate needs ONE, and choosing
+it by trying values on the test set would be **fitting a number rather than
+measuring one** -- which this project has a rule about and has broken anyway
+(g11-05 swept a range chosen after seeing where the answer was).
+
+**The threshold is a QUANTILE OF THE TRAINING MARGINS**, computed after training
+and before any test sequence is touched. It uses **no labels at all**: it asks
+only how wide a typical margin is for this model, which is a property of the
+trained model rather than of the answers.
+
+The quantile is the swept axis, so sensitivity is visible rather than assumed. A
+gate that works at only one quantile is a tuned constant.
+
+**Every arm trains identically, without the gate.** The threshold is chosen for a
+model that already exists, which makes gating purely an inference-time decision
+-- what a deployed system would actually be choosing.
+
+
+THE ARMS
+--------
+    walk       search_branches=1                    no search at all
+    search4    search_branches=4                    search everywhere
+    gate-q25   branch where margin < 25th pct of training margins
+    gate-q50   ... 50th
+    gate-q75   ... 75th
+
+**The number to beat is `search4`, not `walk`.** A gate that merely matches
+search-everywhere has bought compute savings and no accuracy -- worth having, and
+not what this was for.
+
+
+PREDICTIONS
+-----------
+  P1  THE DECISION. At least one gate arm beats `search4` overall. If none does,
+      the +0.092 / -0.054 split is not separable by this signal in practice,
+      whatever the AUC said in isolation.
+
+  P2  Every gate arm beats `walk`. Gating cannot be worse than not searching,
+      because at worst it searches nowhere and reduces to `walk`.
+
+  P3  The best gate arm searches on fewer than half the positions. The measured
+      out-degree mix is about 60/40, so a gate firing everywhere has not gated.
+
+  P4  THE RAIL. gate-q25 fires least and gate-q75 most, monotonically. If the
+      quantile does not order the firing rate, the threshold is not doing what
+      its name says and nothing else here is readable.
+
+  P5  The gain over `search4` is under 0.03 -- the perfect-gate figure from
+      g13-03's split -- because AUC 0.803 is not 1.000. Refuted would mean
+      beating a ceiling derived from g13-03's own numbers, which would put one
+      of the two measurements in question rather than being good news.
+
+
+THE SMOKE SEED, RUN BEFORE DISPATCH
+------------------------------------
+Width 256, seed 0, 200 test sequences:
+
+    arm        overall   fired    k=1     k>=2
+    walk         0.645     --    0.758    0.475
+    search4      0.650     --    0.733    0.525
+    gate-q25     0.660    24%    0.775    0.487
+    gate-q50     0.670    50%    0.767    0.525
+    gate-q75     0.665    74%    0.758    0.525
+
+**The mechanism does what it was designed to do.** `gate-q50` holds 0.767 at
+out-degree 1, near `walk`'s 0.758 and above `search4`'s 0.733; and 0.525 at
+out-degree >= 2, matching `search4` exactly. It keeps each arm's strength on the
+half where that arm is right.
+
+Firing rates 24% / 50% / 74% track the quantiles, so P4's rail is wired.
+
+One seed. The matrix runs eight, and the differences here are 0.02, which is the
+size three-seed grids in this project have twice failed to bound.
+
+
+COST
+----
+5 arms x 8 seeds at width 256 = 40 cells, in 8 jobs of 5 arms.
+
+Estimated from the MOST EXPENSIVE arm -- `search4`, which walks four branches at
+every answerable position. The gate arms are strictly cheaper: they walk one
+branch wherever they do not fire, which is most positions at q25.
+
+    ~0.6 min to train one cell, ~3 min per job
+
+
+MEASURED ON
+-----------
+openplexus/tasks/kinship.py, hops 2, 12 people, 10 facts, width 256 -- where
+g13-04 measured the signal at AUC 0.858. It is weak at width 64 (0.710) and that
+is a scale property registered in docs/SCALE.md, not a defect being hidden.

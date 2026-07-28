@@ -6020,3 +6020,53 @@ live work is on the relational side — where the blocker is retrieval fidelity
 Complacency about the level. This model scores **5.494** on Tiny Shakespeare
 where a plain bigram scores **3.583**. Being bigram-*shaped* does not explain
 being well short of a bigram, and that gap is unexplained by anything here.
+
+## 116. `carry_store` and `hidden` are superadditive, and I was quoting a superseded configuration
+
+Chasing the level, on the project's own notes corpus (uniform 6.508, unigram
+4.721, bigram 3.695), train-then-test:
+
+    chunk    linear   linear+carry   hidden 128   hidden+carry
+       64     6.024          5.765        5.574          5.140
+      256     5.914          5.755        5.393          5.137
+
+**They compose better than either alone.** At chunk 64, `carry_store` is worth
+0.26 and `hidden` 0.45 — and together they are worth **0.88**, not 0.71.
+
+`carry_store` is off by default and its own docstring says it is correct when
+consecutive calls are consecutive text, which is exactly the text case. It is
+the cheapest unclaimed win measured here.
+
+### The framing error, which is mine
+
+I described the model as "worse than a bigram" and treated that as unexplained.
+The 5.494 figure is the **linear** readout, and this project already established
+the readout as the ceiling — note 037 and decision 83 record a two-layer readout
+recovering 0.63 bits. Quoting the linear number as the model's level was
+quoting a configuration the project had already superseded.
+
+### And the remaining gap is not established, because the regimes differ
+
+The best configuration here reads **5.137** against a unigram's 4.721, which
+would still be short. But the project's recorded 4.540 is **prequential** — one
+pass, predict then learn — on **Tiny Shakespeare**, and this is train-then-test
+on the notes corpus, which has 91 symbols against 66.
+
+Different regime, different corpus, different vocabulary. **The comparison is
+not admissible** and neither number refutes the other. Saying "the model is
+worse than a unigram" would repeat exactly the mistake g11-04 was ruled
+inadmissible for.
+
+### What this licenses
+
+Turning `carry_store` on for text work, and re-measuring the level **in one
+regime** before anyone concludes anything about it. The honest current statement
+is that no single comparable measurement of this model's best configuration
+against the n-gram baselines exists.
+
+### What it does NOT license
+
+Any claim that the gap to a unigram is real or that it is not. That is now a
+known-unknown with a cheap resolution — run the best configuration
+prequentially on Shakespeare, the way 4.540 was measured — rather than a finding
+in either direction.

@@ -106,9 +106,32 @@ character-level bits is the wrong target, which is why the relational task
 exists. The live work is on the relational side, where the blocker is retrieval
 fidelity (112).
 
-> Still unexplained, and worth someone's attention: this model scores **5.494**
-> on Tiny Shakespeare where a plain bigram scores **3.583**. Being
-> bigram-*shaped* does not explain being well *short* of a bigram.
+### THE LEVEL IS A KNOWN-UNKNOWN, NOT A FINDING (decision 116)
+
+    notes corpus: uniform 6.508  unigram 4.721  bigram 3.695
+
+    chunk    linear   linear+carry   hidden 128   hidden+carry
+       64     6.024          5.765        5.574          5.140
+      256     5.914          5.755        5.393          5.137
+
+**`carry_store` + `hidden` are superadditive** — 0.26 and 0.45 alone, **0.88
+together**. `carry_store` is off by default and its docstring says it is correct
+when consecutive calls are consecutive text, which is the text case. **Cheapest
+unclaimed win here.**
+
+> **Do not repeat my error.** "The model is worse than a bigram" quoted the
+> LINEAR readout — a configuration the project superseded when note 037 and
+> decision 83 established the readout as the ceiling.
+>
+> And the remaining gap is **not established**: 5.137 here is train-then-test on
+> the notes corpus (91 symbols); the recorded 4.540 is *prequential* on Tiny
+> Shakespeare (66 symbols). Different regime, corpus and vocabulary — **not
+> admissible**, the same defect g11-04 was ruled out for.
+
+**Cheap resolution, not yet run:** measure the best configuration
+(`hidden` + `carry_store`) prequentially on Shakespeare, the way 4.540 was
+measured. Until then no comparable number for this model's best configuration
+against the n-gram baselines exists.
 
 ---
 

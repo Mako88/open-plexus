@@ -1,0 +1,107 @@
+name: sweep-g12-03-where-does-the-window-stop-paying
+
+# g12-01's GRID DID NOT CONTAIN ITS OWN ANSWER, and this is the correction.
+#
+# It swept windows 1, 2, 4, 8 on an impaired link and found 6.26x at window 8 --
+# which was the LARGEST value tested, the BEST, and still improving 1.65x per
+# doubling. tools/grid.py exists to catch exactly that: "a sweep that does not
+# contain its own answer has not swept; if an arm chooses a value at an edge of
+# the grid, the optimum lies outside it."
+#
+# I wrote that grid, predicted flattening in P4, and did not check the prediction
+# against the grid's own range before dispatching. The cost of the extra cells
+# would have been minutes.
+#
+# So: 1, 8, 16, 32, 64. Window 1 is the reference the speedup is measured
+# against, and re-measuring it is an identity check -- g12-01 put it at
+# 0.12411 +/- 0.00570 s/step on this link.
+#
+# IMPAIRED LINK ONLY. g12-01 showed the clean-link win is 1.66x with two of three
+# comparisons INSIDE their own spread, so a clean arm here would spend cells to
+# measure noise. The window hides latency; with no latency there is nothing to
+# hide.
+#
+# PREDICTIONS:
+#   P1  agreement holds at every window, including 64. A window is how far ahead
+#       a node may run before it must have heard; a large one is where
+#       reassembly-by-step-index would break if it were going to.
+#   P2  the curve FLATTENS somewhere in this range -- there are only so many
+#       round trips a link can hold in flight, and past that the window is
+#       buying nothing.
+#   P3  the flattening point is between 8 and 32. An 80 ms link at ~0.02 s/step
+#       has roughly four to eight steps in flight.
+#   P4  window 1 reproduces 0.124 +/- 0.006, the figure g12-01 measured.
+#
+# P2 IS THE ONE THAT WAS WRONG LAST TIME, stated again with a wider range. If it
+# is still climbing at 64 the honest reading is that the model work is so small
+# that the window is bounded by something else entirely, and the sweep should
+# stop chasing it.
+#
+# COST: 15 jobs, four nodes each, dominated by container startup. Minutes.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-testbed
+  cancel-in-progress: false
+
+jobs:
+  window:
+    strategy:
+      fail-fast: false
+      matrix:
+        window: [1, 8, 16, 32, 64]
+        repeat: [1, 2, 3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: window ${{ matrix.window }}, run ${{ matrix.repeat }}
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python testbed/run.py --nodes 4 --width 16 --steps 40 \
+            --window ${{ matrix.window }} \
+            --delay 80ms --jitter 20ms --loss 2% \
+            | tee out/X-impaired-w${{ matrix.window }}-r${{ matrix.repeat }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g12-03-w${{ matrix.window }}-r${{ matrix.repeat }}
+          path: out/*.json
+
+  aggregate:
+    needs: [window]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g12-03-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 15" | tee summary.txt
+          python -m tools.summarise_g12_01 | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g12-03-summary
+          path: |
+            summary.txt
+            out/*.json

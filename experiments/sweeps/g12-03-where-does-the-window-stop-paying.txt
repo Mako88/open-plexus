@@ -1,0 +1,97 @@
+Where does the asynchrony window stop paying?
+=============================================
+
+Script: testbed/run.py, real containers, `tc netem` on the link
+Status: DISPATCHED, awaiting results.
+
+
+IN PLAIN TERMS
+---------------
+A machine may run a few steps ahead of the news it has received rather than
+waiting for everyone. Running further ahead is faster, up to a point — past some
+distance the link is already as full as it can be and looking further ahead buys
+nothing.
+
+The last sweep never found that point. It tried 1, 2, 4 and 8, and 8 was both
+the largest tried and the best, still improving. So the useful setting is
+somewhere above the range that was measured, and nobody knows where.
+
+
+WHY THIS EXISTS
+----------------
+**g12-01's grid did not contain its own answer**, and `tools/grid.py` exists to
+catch exactly that:
+
+> *"A sweep that does not contain its own answer has not swept. If every arm
+> chooses a value at an EDGE of the grid, the optimum lies outside it, every arm
+> is under-tuned, and the rule above was satisfied while the number stayed
+> provisional."*
+
+g12-01 reported 6.26x at window 8, improving 1.65x per doubling at the top of
+its range. I wrote that grid, wrote P4 predicting the curve would flatten, and
+never checked the prediction against the grid's own range before dispatching
+twenty-four jobs. The extra cells would have cost minutes.
+
+This is the correction: 1, 8, 16, 32, 64.
+
+
+PREDICTIONS
+------------
+Registered before dispatch.
+
+  P1  **AGREEMENT HOLDS AT EVERY WINDOW, INCLUDING 64.** The window is how far
+      ahead a node may run before it must have heard, and a large one is where
+      reassembly-by-step-index would break if it were going to. Probed locally
+      at 64 before dispatch and it agreed, so this is now near-known rather than
+      open.
+
+  P2  **THE CURVE FLATTENS SOMEWHERE IN THIS RANGE.** A link holds only so many
+      round trips in flight, and past that the window buys nothing. **This is
+      the prediction that was wrong last time**, restated with a range wide
+      enough to be refutable.
+
+  P3  **THE FLATTENING POINT IS BETWEEN 8 AND 32.** An 80 ms link running at
+      ~0.02 s/step has roughly four to eight steps in flight.
+
+  P4  **WINDOW 1 REPRODUCES 0.124 +/- 0.006**, which g12-01 measured. Identity,
+      not discovery — disagreement means the harness moved.
+
+WHAT WOULD REFUTE EACH: P1 by any disagreement. P2 by the curve still improving
+by more than the spread at 64. P3 by flattening outside 8-32. P4 by a window-1
+figure away from g12-01's.
+
+**If P2 fails again**, the honest reading is not "use an even bigger window". It
+is that the model work here is so small the window is bounded by something other
+than the link — and this sweep should stop chasing it rather than widen a third
+time.
+
+
+COST
+-----
+15 jobs: 5 windows x 3 repeats. Four nodes, width 16, 40 steps, impaired link.
+
+**Impaired link only.** g12-01 measured the clean-link win at 1.66x with two of
+three comparisons INSIDE their own spread, so a clean arm here would spend cells
+measuring noise. The window hides latency; with no latency there is nothing to
+hide.
+
+Three repeats, because timing is the noisiest thing this project measures and
+that is the caveat note 014 was written around.
+
+Container join is ~0.7 s per node, so every cell is seconds and the matrix is
+minutes — which is what makes g12-01's omission worse rather than better.
+
+
+MEASURED ON
+------------
+Real containers on a Docker bridge, `tc netem` on each node's egress only.
+Note 014's limits are inherited: no NAT, no asymmetric routes, no competing
+congestion, and the impairment is ONE-WAY, so a round trip here is half as
+impaired as a real one.
+
+Named impairment, not ambient randomness.
+
+
+THE NUMBERS
+------------
+Awaiting the run.

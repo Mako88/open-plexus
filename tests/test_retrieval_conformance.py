@@ -43,15 +43,36 @@ from openplexus.retrieval import (
 WIDTH = 8
 
 
+#: How to build each strategy. Wrappers take an inner strategy, so they are
+#: given one rather than being constructed bare.
+BUILD = {
+    "SuperposedRead": lambda: SuperposedRead(),
+    "ExactCache": lambda: ExactCache(SuperposedRead(), 4, 8.0, 1.0),
+    "SettlingRead": lambda: SettlingRead(SuperposedRead(), 2),
+    "SettlingRead(ExactCache)":
+        lambda: SettlingRead(ExactCache(SuperposedRead(), 4, 8.0, 1.0), 2),
+}
+
+
+def declared_strategies() -> set[str]:
+    """Every concrete strategy `openplexus.retrieval` defines, by introspection.
+
+    **A hand-written list is a coverage hole that passes.** Add a strategy,
+    forget to add it here, and the suite tests one fewer thing than it did
+    yesterday while still going green -- which is the same class of failure as a
+    mutation nobody notices, one level up.
+    """
+    import inspect
+
+    import openplexus.retrieval as module
+    return {name for name, value in vars(module).items()
+            if inspect.isclass(value) and value.__module__ == module.__name__
+            and not getattr(value, "_is_protocol", False)}
+
+
 def implementations() -> list[tuple[str, object]]:
     """Every strategy the model can be built with, including compositions."""
-    return [
-        ("SuperposedRead", SuperposedRead()),
-        ("ExactCache", ExactCache(SuperposedRead(), 4, 8.0, 1.0)),
-        ("SettlingRead", SettlingRead(SuperposedRead(), 2)),
-        ("SettlingRead(ExactCache)",
-         SettlingRead(ExactCache(SuperposedRead(), 4, 8.0, 1.0), 2)),
-    ]
+    return [(name, build()) for name, build in BUILD.items()]
 
 
 class Sloppy:
@@ -134,6 +155,24 @@ class EveryStrategyHonoursTheContract(unittest.TestCase):
                 np.testing.assert_allclose(
                     strategy.read(self.store, self.key),
                     strategy.read(self.store, self.key))
+
+
+class TheSuiteCoversEverything(unittest.TestCase):
+
+    def test_every_declared_strategy_is_exercised(self):
+        """The hole a conformance suite cannot see in itself: a new strategy
+        that nobody added to the list. The suite stays green and quietly checks
+        less than it did before."""
+        covered = {name.split("(")[0] for name in BUILD}
+        missing = declared_strategies() - covered
+        self.assertEqual(missing, set(),
+                         f"not exercised by the conformance suite: {missing}")
+
+    def test_the_coverage_check_can_fail(self):
+        """If `declared_strategies` returned nothing, the check above would pass
+        against an empty suite -- so it has to find the real ones."""
+        self.assertIn("SuperposedRead", declared_strategies())
+        self.assertIn("ExactCache", declared_strategies())
 
 
 class TheSuiteBites(unittest.TestCase):

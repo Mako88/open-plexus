@@ -4843,3 +4843,47 @@ ordering are measurements here.**
 
 `n_queries=1` is pinned byte-identical by the same digest test as
 `n_separators`, so every earlier chain number still reproduces.
+
+## 98. Giving the gate its own objective removes the decay
+
+Decisions 96 and 97 ruled out more inputs and more density. What was left was
+the objective itself: the gate learns from the readout's error carried back
+through the mixture, so **conflicting demands get averaged**. In the body the
+error says "take hop 1", at a query it says "take a later one", and one shared
+vector pulled by both drifts toward whichever supplies more gradient.
+
+`which_hop` asks a question with the **same answer in both places** — *which hop
+would have been right here?* At a scored position that label is locally
+available: each hop's own readout either names the target or does not, decidable
+from what the group already holds. The body then stops outvoting the query and
+merely supplies more examples of one class, which a classifier handles.
+
+    mixture                                which_hop
+    queries  100x1 200x1 400x1 400x2 decay  100x1 200x1 400x1 400x2  decay
+          1  0.150 0.033 0.017 0.033 +.117  0.233 0.500 0.383 0.600  -0.367
+          4  0.567 0.392 0.375 0.379 +.188  0.571 0.475 0.550 0.517  +0.054
+          8  0.515 0.333 0.290 0.346 +.169  0.404 0.406 0.412 0.404  +0.000
+
+**The decay is gone**, and the objective is better on both axes — no decay *and*
+a higher level at every density. At density 8 the trajectory is flat to three
+decimals; at density 1 accuracy now *rises* with training where the mixture
+objective collapsed it to 0.033, below the 0.125 floor.
+
+### It also undoes decision 97's reading
+
+With a working objective, **one question per sequence is the best row, not the
+worst**. Density was compensating for a broken objective rather than fixing a
+property of the task — which is worth stating plainly, because decision 97
+recommended keeping the density and that recommendation is now weaker.
+
+### What this does NOT license
+
+**The claim rests on the flat row, not the dramatic one.** Density 1 scores 60
+questions per evaluation and is visibly noisy — 0.233, 0.500, 0.383, 0.600 is
+not monotone, and the −0.367 "improvement" is mostly that noise. Density 8
+scores 480 and is flat. Quote the flat row.
+
+Nor is ~0.40 good. It clears the 0.125 floor comfortably and no longer rots, but
+answer-only training still reaches 1.000. **The gap between a marked question
+and an unmarked stream is still most of the problem**, and this decision only
+shows that the gap stops widening.

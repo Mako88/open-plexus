@@ -478,6 +478,62 @@ class TheGateChoosesWhichHopToRead(unittest.TestCase):
                 model.run(np.asarray(TOKENS), learn=False))
         self.assertFalse(np.array_equal(outputs[0.0], outputs[4.0]))
 
+    def test_which_hop_teaches_nothing_when_no_hop_is_right(self):
+        """When the answer was not reachable at any depth there is no label —
+        any target would be inventing one — so the gate must be left alone.
+        Asserted because the alternative is silent: pushing toward hop 0 by
+        default would be a plausible-looking bias with no justification."""
+        model = LocalAssociativeMemory(config(
+            hops=2, halt_gate=True, gate_reads_key=True,
+            gate_objective="which_hop", gate_sharpness=200.0))
+        model.wo[:] = model.wv
+        before = model.halt_w.copy()
+
+        tokens = np.asarray(TOKENS)
+        targets = np.full(len(tokens), model.config.vocab_size - 1)
+        scored = np.zeros(len(tokens), dtype=bool)
+        # A target no retrieval can produce: nothing was ever bound to it.
+        scored[2] = True
+        model.run(tokens, targets, scored, learn=True)
+        np.testing.assert_allclose(model.halt_w, before, atol=1e-12)
+
+    def test_which_hop_moves_the_gate_toward_the_hop_that_was_right(self):
+        """The objective's whole content. If some hop names the target, the gate
+        must move — otherwise `which_hop` is an expensive way to do nothing."""
+        model = LocalAssociativeMemory(config(
+            hops=2, halt_gate=True, gate_reads_key=True,
+            gate_objective="which_hop", gate_sharpness=200.0))
+        # A REAL chain sequence, not an arbitrary token list. On arbitrary
+        # tokens every key is a first occurrence, so nothing is retrievable, no
+        # hop can name the target, and the gate correctly does nothing — which
+        # is what the first version of this test actually measured.
+        config_ = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=64,
+                              seed=3)
+        model = LocalAssociativeMemory(LocalMemoryConfig(
+            vocab_size=config_.vocab_size, d_model=64, lr=0.05, key_scale=0.5,
+            decay=0.997, derived_keys=True, memory_cap=5.0, hops=2,
+            hop_sharpness=6.0, halt_gate=True, gate_reads_key=True,
+            gate_objective="which_hop", gate_sharpness=200.0, seed=1))
+        model.wo[:] = model.wv
+        before = model.halt_w.copy()
+
+        moved = 0.0
+        for sequence in dataset(config_, 20):
+            tokens = np.asarray(sequence.tokens)
+            scored = np.ones(len(tokens), dtype=bool)
+            scored[-1] = False
+            model.run(tokens, np.roll(tokens, -1), scored, learn=True)
+            moved = max(moved, float(np.abs(model.halt_w - before).max()))
+        self.assertGreater(moved, 0.0)
+
+    def test_an_unknown_gate_objective_is_refused(self):
+        with self.assertRaises(ValueError):
+            config(hops=2, halt_gate=True, gate_objective="whatever")
+
+    def test_a_gate_objective_without_a_gate_is_refused(self):
+        with self.assertRaises(ValueError):
+            config(hops=2, gate_objective="which_hop")
+
     def test_reading_the_key_without_a_gate_is_refused(self):
         with self.assertRaises(ValueError):
             config(hops=2, gate_reads_key=True)

@@ -834,12 +834,27 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
 - **Run all these checks before every commit:**
   ```
   python tools/mutate.py --verify
-  python tools/mutate.py --changed
   python -m unittest discover -s tests -t . -q
   python tools/check_workflows.py
   python tools/check_rails.py
   python tools/check_duplication.py
   ```
+
+  **`--changed` is NOT in that list any more — mutations run in CI.** John asked
+  for this on 2026-07-28: a local `--changed` was costing ten to twenty minutes
+  per commit and blocking every experiment while it ran, and `checks.yml`
+  already runs the FULL harness sharded six ways on every push. Running it
+  locally was buying a few minutes of earliness for a large share of the
+  session's wall-clock.
+
+  **What that trades away, stated so it is a choice and not a drift.** A
+  surviving mutation now surfaces in CI after the push rather than before it, so
+  a vacuous test region can be committed. The mitigation is that CI is *watched*
+  — if a push goes red on the mutation shards, that is the same signal arriving
+  a few minutes later, and it must be treated as blocking rather than noted.
+  Two mutations survived on 2026-07-28 (`the-selector-never-reaches-the-rule`,
+  and both gate mutations before it) and each needed a behavioural test; that
+  class of finding is exactly what now arrives late.
 
   **`--changed` is here because `--verify` does not catch a vacuous test
   region.** `--verify` asserts every mutation's original text is present; it
@@ -901,6 +916,16 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   then delete the lock and `--verify`. Two full check runs happened against a
   tree that process was still mutating, and both passed — passing under a live
   harness is luck, not evidence.
+
+  **`tasklist` filtering lies often enough not to trust it, and NEVER delete the
+  lock to "clear" it.** A `tasklist //FI "PID eq ..."` came back empty for a pid
+  that was in fact alive; the lock was deleted as stale on that basis, a second
+  harness started, and TWO were then editing the same file. The tell was that
+  `--verify` named a *different* live mutation on each run — a live mutation
+  does not move, so a moving one means something is still cycling. Enumerate
+  with `Get-CimInstance Win32_Process -Filter "Name='python.exe'"` and read the
+  command lines; that shows the truth. Delete the lock only after the pid it
+  names is confirmed dead.
 
   > *Note.* `mutate.py` exits **1** on a lock refusal, correctly. It looked like
   > 0 because the invocation ended in `| tail`, which is the same masking the

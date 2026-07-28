@@ -879,6 +879,23 @@ class LocalMemoryConfig:
     #: rule rather than adding to the score, because an added key term is
     #: identical across hops and the softmax would remove it exactly.
     gate_reads_key: bool = False
+
+    #: What the gate learns from. ``"mixture"`` is the readout's error carried
+    #: back through the weighted sum; ``"which_hop"`` is a separate objective.
+    #:
+    #: The mixture objective AVERAGES conflicting demands. In the body the next
+    #: token is one hop away and the error says "take hop 1"; at a query it is
+    #: several and says "take a later one". One shared vector pulled by both
+    #: drifts toward whichever supplies more gradient, which is why composition
+    #: is learned and then unlearned (decisions 96, 97) — and neither more
+    #: inputs nor more density stops it.
+    #:
+    #: ``"which_hop"`` asks a question that has the SAME answer in both places:
+    #: *which hop would have been right here?* At a scored position that label
+    #: is locally available — each hop's own readout either names the target or
+    #: does not — so the body stops outvoting the query and merely supplies more
+    #: examples of one class.
+    gate_objective: str = "mixture"
     cache_slots: int = 0
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
@@ -898,6 +915,14 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if self.gate_objective not in ("mixture", "which_hop"):
+            raise ValueError(
+                "gate_objective must be 'mixture' or 'which_hop', not "
+                f"{self.gate_objective!r}")
+        if self.gate_objective != "mixture" and not self.halt_gate:
+            raise ValueError(
+                "gate_objective describes how the halting gate learns and "
+                "does nothing without halt_gate")
         if self.gate_reads_key and not self.halt_gate:
             raise ValueError(
                 "gate_reads_key is an input to the halting gate and does "
@@ -2020,9 +2045,32 @@ class LocalAssociativeMemory:
                     # that is what the score was computed from. Mixing the two
                     # up would train the gate on the wrong vector and still
                     # descend, which is the kind of wrong that produces a curve.
-                    back = np.einsum("gv,vgd->gd", error, self.grouped_wo)
-                    agree = np.einsum("gd,kgd->kg", back, stack)
-                    step = gate * (agree - (gate * agree).sum(0, keepdims=True))
+                    if self.config.gate_objective == "which_hop":
+                        # WHICH HOP WOULD HAVE BEEN RIGHT HERE?
+                        #
+                        # Each hop's own readout either names the target or does
+                        # not, and that is decidable at a scored position with
+                        # nothing the group does not already hold. The hops that
+                        # got it right are the label; the gate is pushed toward
+                        # them and away from the rest.
+                        #
+                        # When NO hop is right there is nothing to teach -- the
+                        # answer was not reachable at any depth, so any label
+                        # would be inventing one -- and the gate is left alone.
+                        # `where` keeps that per group rather than per position,
+                        # because groups disagree and one group's silence should
+                        # not silence the others.
+                        every = np.einsum("vgd,kgd->kgv", self.grouped_wo,
+                                          stack)
+                        hit = (every.argmax(axis=2) == targets[t]).astype(float)
+                        total = hit.sum(0, keepdims=True)
+                        step = np.where(total > 0.0, hit / np.maximum(
+                            total, 1e-12) - gate, 0.0)
+                    else:
+                        back = np.einsum("gv,vgd->gd", error, self.grouped_wo)
+                        agree = np.einsum("gd,kgd->kg", back, stack)
+                        step = gate * (
+                            agree - (gate * agree).sum(0, keepdims=True))
                     rate = self.config.lr * self.config.gate_sharpness
                     shared = np.einsum("kg,kgd->gd", step, ahead)
                     self.halt_w += rate * shared

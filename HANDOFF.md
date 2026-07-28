@@ -165,12 +165,42 @@ stabilise near 0.38. Keep the density; it is not the fix.
 > a task change has looked inert and been wrong — write the guard before the
 > measurement, not after.**
 
-### THE NEXT THING TO CHASE
+### The decay is FIXED — the gate needed its own objective (decision 98)
 
-**Decouple the gate's error from the readout's.** A mechanism learned and then
-unlearned is one whose gradient is outvoted at a rate that grows with exposure.
-More inputs have been tried (decision 96) and more density has been tried
-(decision 97); neither stops it.
+More inputs (96) and more density (97) both failed. What worked was changing
+what the gate learns from. The mixture objective **averages conflicting
+demands**; `gate_objective="which_hop"` asks a question with the same answer
+everywhere — *which hop would have been right here?* — from a label available
+locally at any scored position.
+
+    density 8, all-position    100x1  200x1  400x1  400x2   decay
+    mixture                    0.515  0.333  0.290  0.346  +0.169
+    which_hop                  0.404  0.406  0.412  0.404  +0.000
+
+**Flat.** Better on both axes at every density, and it undoes 97's advice: with
+a working objective, one question per sequence is the *best* row, so density was
+compensating for a broken objective rather than fixing the task. (Quote the
+density-8 row — density 1 is 60 samples and visibly noisy.)
+
+**~0.40 is still not good.** Answer-only training reaches 1.000. The gap between
+a marked question and an unmarked stream is still most of the problem; this only
+stops it widening.
+
+### THE NEXT THING — and it is a question about the OBJECTIVE, not the mechanism
+
+All-position (next-token) training was never required by the goal. It was
+imported from how LLMs train, and it costs 1.000 → 0.40. The goal is relational
+reasoning, so the self-supervised signal should be relational too:
+
+**Masked-link prediction** — state facts, hide one, predict it. Fully
+self-supervised (no marked questions), but relational rather than sequential.
+That is a different objective from "predict token t+1" and much closer to what
+the task is about.
+
+Benchmarks should follow the same logic: **CLUTRR** (train short chains, test
+longer — the external check on our 0.992 zero-shot depth result), **bAbI**, and
+knowledge-graph link prediction. Keep bits/char as a diagnostic that the
+substrate works, not as the score that matters.
 
 Also unexplained — 4 separators beat 1 under all-position training (0.683 against
 0.117), a real gap in the account rather than a detail.

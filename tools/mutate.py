@@ -720,6 +720,19 @@ MUTATIONS = [
         new='                    "gd,kgd->kg", rule, stack)',
     ),
     Mutation(
+        name="which-hop-invents-a-label-when-none-is-right",
+        breaks="the one restraint the objective has. When no hop names the "
+               "target the answer was not reachable at any depth and there is "
+               "nothing to teach; dropping the guard pushes the gate toward "
+               "hop 0 every time that happens, which is a bias with no "
+               "justification wearing the shape of a gradient -- and it points "
+               "at exactly the hop the decay was already pulling toward",
+        path=LOCAL,
+        old="                        step = np.where(total > 0.0, hit / np.maximum(\n"
+            "                            total, 1e-12) - gate, 0.0)",
+        new="                        step = hit / np.maximum(total, 1e-12) - gate",
+    ),
+    Mutation(
         name="the-selector-never-reaches-the-rule",
         breaks="`gate_reads_key` entirely, leaving the one-rule gate wearing "
                "the name of the two-rule one. The extra parameters still exist "

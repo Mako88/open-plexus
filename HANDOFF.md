@@ -1,4 +1,26 @@
-# Handoff — state of play, 2026-07-28 (overnight)
+# Handoff — state of play, 2026-07-28
+
+## THE ONE THING: retrieval fidelity is the prerequisite for everything
+
+**Four mechanisms have now failed against the same number**, each correct in
+itself and each capped by how often a single retrieval is right:
+
+| mechanism | decision | capped at |
+|---|---|---|
+| the accumulator (hold both retrievals) | 102 | matched the 1-hop model exactly |
+| pair keys, beyond their own collision | 105 | unusable with hops at all |
+| traversal (a hop that builds pair keys) | 107 | +0.05 over a broken one |
+| search (generate and verify) | 111 | +0.03 for k² the compute |
+
+The number itself: **0.915** when an entity appears in one fact as a subject,
+**~0.35** when it appears in several. Three chained retrievals at 0.7 compound
+to 0.46, which is every end-to-end kinship result.
+
+**Do not build another mechanism on top of this.** Each of the four was
+well-motivated, and all four were measured *before* being built, which is the
+only reason three of them were never written. Fidelity first.
+
+---
 
 **For the next session.** Read this, then `GOALS.md`, then `BACKLOG.md`. The
 notes in `docs/notes/` are the reasoning; `DECISIONS.md` is the running log John
@@ -247,8 +269,21 @@ store was never as broken as those numbers looked.
 > construction**, which is exactly the row scoring 0.915. Every composition
 > result on chains was measured where no search was needed.
 >
-> **Open project question, not a measurement:** whether to add search, or to
-> state "this architecture does retrieval, not search" as an honest boundary.
+> **John answered: add any capability that gets closer to the goal.** So
+> search's ceiling was measured before building it — and **it does not pay yet**
+> (decision 111).
+>
+>     beam 1  0.485    beam 2  0.510    beam 4  0.495
+>     oracle first relation  0.545      floor   0.475
+>
+> **+0.03 for k² the retrievals.** To verify a branch reaches T you must
+> RETRIEVE its endpoint, and that retrieval is as unreliable as the one that
+> made the branch. **You cannot search your way out of noisy primitives,
+> because the verifier is built from the primitives.**
+>
+> This is sequencing, not rejection — search is still the right answer to
+> branching ambiguity, and nothing was built, so nothing has to be undone.
+> Revisit it the moment retrieval fidelity moves.
 
 ### The same-role collision, now understood as ambiguity
 

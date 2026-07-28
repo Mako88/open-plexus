@@ -5714,3 +5714,61 @@ Reading these as the model's real capacities. Both probes measure components in
 isolation, with random data, no decay, no cap and no interference between them.
 The composed system is what saturates and it has **not** been measured this way
 — what is established is only that neither part is individually at its limit.
+
+## 111. Search does not pay, because the verifier is built from the same noisy retrievals
+
+John's answer to decision 108's open question was to add any capability that
+gets closer to the goal. Search is that capability, so its ceiling was measured
+before building it — the discipline that saved the traversal hop in decision 107.
+
+The ideal search, by hand: branch over the top-k candidate relations at **both**
+hops, follow each to an endpoint, and keep the branch whose endpoint is the
+target the question named. **That target is already in the question and the
+model currently ignores it**, so verification costs no new information, only
+computation.
+
+    2-hop kinship, floor to beat 0.475
+    ideal traversal without search (decision 107)   0.485
+
+      beam 1                                       0.485
+      beam 2                                       0.510
+      beam 3                                       0.510
+      beam 4                                       0.495
+      oracle first relation                        0.545
+
+**Search plateaus at ~0.51**, barely above the floor, and beam 4 is worse than
+beam 2. About **+0.03 for k² the retrievals.**
+
+### Why, and it is not that search is the wrong idea
+
+To verify that a branch reaches T you must **retrieve its endpoint** — and that
+retrieval is exactly as unreliable as the one that produced the branch. Step 3
+was measured at 0.677 in decision 107 and the verifier is made of the same
+parts.
+
+**You cannot search your way out of noisy primitives, because the verifier is
+built from the primitives.** Generate-and-verify needs the verify half to be
+better than the generate half, and here they are the same operation.
+
+The oracle row is the confirmation: a **perfect** first relation still only
+reaches 0.545, so even removing step 1's ambiguity entirely leaves most of the
+gap. The ambiguity was never the binding constraint.
+
+### What this licenses
+
+**Retrieval fidelity is the prerequisite for everything else**, and this is the
+fourth mechanism to fail against it — traversal (107), the accumulator (102),
+pair keys beyond their own collision (105), and now search. Each was correct in
+itself and each was capped by the same number.
+
+The dependency is explicit and gives a threshold to aim at: at out-degree 1
+retrieval is **0.915** and at higher out-degrees it is ~0.35. Search would work
+if retrieval were reliable — so the order is fidelity first, search second, and
+search is worth revisiting the moment fidelity moves.
+
+### What it does NOT license
+
+Concluding search is unnecessary. It remains the right answer to branching
+ambiguity and the measurement says only that it cannot pay **yet**. This is a
+sequencing result, not a rejection — and the implementation was deliberately not
+built, so nothing has to be undone when it is.

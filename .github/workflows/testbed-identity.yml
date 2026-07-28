@@ -1,0 +1,81 @@
+name: testbed-identity-real-containers-agree-with-one-process
+
+# THE CHECK THAT WAS BUILT, PROVED ONCE, AND NEVER RE-RUN.
+#
+# `testbed/` stands up a driver and N nodes in real containers on a real network.
+# Note 014 established the property that matters -- a network of containers must
+# agree with the single-process model EXACTLY, or every later number is measuring
+# the harness rather than the model.
+#
+# No workflow ran it. It was verified in July and left, so every distributed
+# claim since has rested on a harness nobody re-executes, and a regression in
+# `distributed.py` or `transport.py` would surface only when someone next ran it
+# by hand. It was re-run on 2026-07-28 after a day of changes to
+# `local_memory.py` and still agreed -- which is luck confirmed, not luck
+# removed.
+#
+# CLEAN LINK ON PURPOSE. Impairment is a SWEPT PARAMETER, not ambient noise: a
+# test under random loss fails for reasons unrelated to the change under test,
+# and the response is always to re-run it, which is how a suite stops being
+# believed. This asserts bit-identity with no impairment. The impairment sweep is
+# a separate, dispatch-only grid with delay, jitter and loss as named axes.
+#
+# WHAT IT ASSERTS
+#   agrees_with_one_process == true, at every node count
+#   mismatches == 0
+#
+# Node counts must divide the width; `slices_for` refuses uneven splits. At 32
+# nodes and width 64 each container holds two dimensions, which is close to the
+# smallest slice that means anything.
+#
+# COST: containers, not compute. Measured locally at width 64 -- join time is
+# ~0.55 s per node and run time is under 0.1 s at every count, so the whole job
+# is dominated by starting containers. 2/8/16/32 is about a minute of that.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly, so a regression surfaces on its own rather than waiting for
+    # someone to wonder. Deliberately NOT on push: it takes minutes of container
+    # startup and would queue behind every sweep.
+    - cron: "0 6 * * 1"
+
+concurrency:
+  group: open-plexus-testbed
+  cancel-in-progress: false
+
+jobs:
+  identity:
+    strategy:
+      fail-fast: false
+      matrix:
+        nodes: [2, 8, 16, 32]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: ${{ matrix.nodes }} containers must agree with one process
+        run: |
+          set -o pipefail
+          python testbed/run.py --nodes ${{ matrix.nodes }} --width 64 \
+            --steps 40 | tee result-${{ matrix.nodes }}.json
+      - name: Assert the identity
+        run: |
+          set -o pipefail
+          python - <<'CHECK'
+          import json, pathlib, sys, re
+          text = pathlib.Path("result-${{ matrix.nodes }}.json").read_text()
+          report = json.loads(text[text.index("{"):])
+          print(json.dumps(report, indent=1))
+          if not report["agrees_with_one_process"] or report["mismatches"]:
+              sys.exit("REAL CONTAINERS DISAGREE WITH THE SINGLE-PROCESS MODEL. "
+                       "Every distributed number in this project assumes they do.")
+          CHECK
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: testbed-identity-${{ matrix.nodes }}
+          path: result-${{ matrix.nodes }}.json

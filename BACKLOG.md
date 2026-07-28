@@ -1351,3 +1351,34 @@ against the relational-objective direction.
 **This one needs its own plan.** Changing the task invalidates every number in
 the comparison set — decision 74 at a larger scale — so it should happen once,
 deliberately, with the re-validation costed in advance rather than discovered.
+
+---
+
+## Impairment is a swept parameter, not ambient noise
+
+John's own correction, made while proposing the testbed, and it is right enough
+to record as a principle rather than a preference:
+
+> *"We don't want to add that randomness in our testing. But we do want to
+> measure it."*
+
+A test running under random loss is a flaky test — it fails sometimes, for
+reasons unrelated to the change under test, and the response is always to re-run
+it, which is how a suite stops being believed. A test running at a **stated**
+loss rate is a measurement.
+
+This is C2's distinction already: *"a design that merely degrades gracefully is
+weaker than one with a stated, tested bound, because only the latter can be
+engineered against."* The same applies to the harness that measures it.
+
+So the testbed has two modes and they must not be confused:
+
+- **The identity check** runs on a CLEAN link and asserts bit-identity with the
+  single-process model. Deterministic, in CI, fails loudly. Note 014 established
+  this and nothing re-runs it.
+- **The impairment sweep** runs at NAMED delay, jitter and loss values, and
+  reports how the margin moves. Dispatch-only, a grid like any other, with the
+  impairment as the swept axis rather than as background noise.
+
+A run with "some random loss, roughly like the internet" is neither, and would
+produce numbers that cannot be compared to each other or to anything else.

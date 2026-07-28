@@ -103,11 +103,33 @@ subject genuinely holds, and nothing in the question says which one leads to the
 target. Search is the mechanism that resolves that — try a branch, retrieve its
 endpoint, check it against the asked object.
 
-**Approved in advance by John.** The design question to settle first is what a
-branch costs on the wire, because a search that multiplies retrievals multiplies
-messages, and amended C1 bounds bytes per hop. Decision 111's beam numbers
-(0.485 / 0.510 / 0.495 at beams 1/2/4) were measured with noisy primitives and
-should be re-derived, not reused.
+**The ceiling is now measured, and it justifies the build** (g13-02, decision
+122, 8 seeds, five of five predictions confirmed):
+
+    step 1 at out-degree 1   1.000     search's job is to get here
+    step 2 at a unique pair  1.000     0.971 overall; decision 107's 0.960 reproduces
+    step 3 at out-degree 1   1.000     same operation as step 1
+                             -----
+    traversal with search    1.000     against the 0.87 that justified it
+
+**The asymmetry is why it works.** Step 2's ambiguity is 5.1% of sequences where
+step 1's is 50% — a `(subject, relation)` pair names one person almost always,
+where `(FACT, subject)` names one of several relations half the time. The
+traversal's weak steps are its two ends and its middle is sound, which is exactly
+what makes a verifier built from step 2 trustworthy.
+
+**Approved in advance by John.** Two things to settle as part of the build:
+
+- **What a branch costs on the wire.** Search over `b` branches multiplies
+  retrievals. That is bounded bytes per hop with no barrier, so amended C1 is
+  satisfied — but the traffic multiplier is real and must be costed before the
+  mechanism is called affordable.
+- **Composition on top of clean retrievals is assumed, not measured.** Decision
+  102 put it at 1.000 over the whole rule table, on a different configuration.
+  Re-run it rather than inheriting it.
+
+Decision 111's beam numbers (0.485 / 0.510 / 0.495) were measured with noisy
+primitives and should be re-derived, not reused.
 
 ### 1b. Two loose ends from g13-01, both cheap and both unexplained
 
@@ -456,9 +478,11 @@ again** — this list exists because several of these were proposed twice.
   Nothing heavy runs locally.
 - **Never use bash heredocs.** **Never `git commit -m` with backticks** — write
   the message to a file and use `git commit -F`.
-- **Six checks before every commit:** `mutate.py --verify`, `mutate.py --changed`,
-  `unittest discover`, `check_workflows.py`, `check_rails.py`,
-  `check_duplication.py`.
+- **Run `python tools/check_all.py` before every commit**, then `mutate.py
+  --changed` separately. **Do not run the checks as one compound shell command** —
+  a shell reports only the last statement's exit code, and on 2026-07-28 that
+  reported success while two of the five were failing. `check_all.py` runs each
+  as its own subprocess and fails if any fails.
 - **Batch commits when a sweep is in flight** — every push queues seven check jobs
   ahead of the matrix, and a second push cancels the first run.
 - **The mutation harness takes the tree exclusively.** Stopping the background

@@ -66,6 +66,7 @@ a report to John, not a gate.
 | 119 | the superposed store EARNS ITS PLACE — note 030's question, answered |
 | 120 | four documents were doing each other's jobs; John asked for three |
 | 121 | width does NOT fix fidelity on the task — and search's blocker has expired |
+| 122 | step 2 reproduces at 0.971, the traversal ceiling is 1.000, build it |
 
 ---
 
@@ -2588,3 +2589,106 @@ depth, one key scheme — `chains.py` was not re-run here.
 approval of the direction: building the instrument, dispatching at 8 seeds
 rather than 3, and recording P1 as refuted rather than restating it once the
 smoke seed contradicted it.
+
+---
+
+## 122. Step 2 reproduces at 0.971, the traversal ceiling is 1.000, and the build is justified
+
+g13-02, 24 cells, 8 seeds, run 30391374763. **Five of five predictions
+confirmed**, one run after g13-01 refuted three of five.
+
+    step 2, key(S, R) -> O
+      d64   overall 0.971 +/-0.003   unique 0.997 +/-0.001   shared 0.478 +/-0.043
+      d128  overall 0.972 +/-0.003   unique 1.000 +/-0.000   shared 0.456 +/-0.063
+      d256  overall 0.975 +/-0.003   unique 1.000 +/-0.000   shared 0.508 +/-0.047
+
+**Decision 107's 0.960 reproduces**, off by 0.011 — and it is the first number on
+the relational line ever reproduced from a committed script rather than from an
+inline probe.
+
+### The ceiling that decides the build
+
+    step 1 at out-degree 1   1.000   (g13-01, 8 seeds, +/-0.000)
+    step 2 at a unique pair  1.000   (here)
+    step 3 at out-degree 1   1.000   (same operation as step 1)
+                             -----
+    traversal with search    1.000   against decision 107's hand-derived 0.87
+
+**Build it.** 107 declined the traversal because a perfect one bought 0.05 over a
+broken one; that was true when steps 1 and 3 were 0.710 and 0.677. Search's whole
+job is to put those two steps into the out-degree-1 regime, and there they are
+1.000.
+
+### The asymmetry is the reason it works, and it is worth stating plainly
+
+    step 2's ambiguity     81/1600 sequences    5.1%
+    step 1's out-degree>=2  ~800/1600           50%
+
+A `(subject, relation)` pair names one person almost always; `(FACT, subject)`
+names one of several relations half the time. **So the traversal's weak steps are
+its two ends and its middle is sound** — which is exactly the shape that makes a
+verifier built out of step 2 trustworthy, and it is the condition decision 111
+named as missing.
+
+Where step 2 *is* ambiguous it sits at 0.481 against a 1/2 bound: decision 108's
+ambiguity again, on a third mechanism, tracking 1/m every time.
+
+### What the ceiling is NOT
+
+**It is conditional on the mechanism working.** Steps 1 and 3 are held at their
+out-degree-1 value because putting them there is what search is for. If search
+does not reach that regime the ceiling is not reached either. This is an upper
+bound given a working mechanism, not a prediction of what the mechanism scores.
+
+Composition on top of clean retrievals is a **separate, unmeasured factor**.
+Decision 102 put it at 1.000 over the whole rule table, but on a different
+configuration, and it is an assumption until re-run.
+
+### A near-miss in how the checks were being run, and the structural fix
+
+The five pre-commit checks were being run as one compound shell command. **A
+shell reports only the last statement's exit code**, so that line said nothing
+about the first four. Run separately, `unittest` and `check_duplication` were
+both FAILING while the combined command reported success.
+
+Interleaved output made it worse: several checks print reassuring lines of their
+own — `rails ok` appears twice, because a test shells out to the rails checker —
+so the tail of a failing run looked exactly like a passing one.
+
+The real defect it hid was small and legitimate: `load` copied between the two
+new summarisers, where `tools/recovery.load` already existed. Both now import it.
+
+`tools/check_all.py` runs every check as a separate subprocess, captures output
+rather than interleaving it, prints the verdict **before** the failing output so
+it cannot be buried, and exits non-zero if any check failed. Rule 18: prefer a
+rule that makes the mistake structurally impossible over one that asks for more
+care. Reading five exit codes correctly is care.
+
+`--changed` is deliberately excluded from it — it edits source, and the mutation
+harness takes the tree exclusively.
+
+### And kinship has mutations for the first time
+
+`openplexus/tasks/kinship.py` carried **no mutation at all** before this, the
+same gap that left decisions 99–119 without a committed instrument. Two are added
+and both are caught: `the-object-question-ends-on-the-wrong-pair` (querying a
+pair nothing ever wrote, which would read as a weak store rather than a broken
+question — the defect decision 100 measured at 0.020 against 0.713) and
+`the-object-question-follows-a-distractor` (an easier question wearing the same
+name, which would inflate the very ceiling this decision rests on).
+
+### What this licenses
+
+Building **traversal with search** as the next mechanism: enumerate candidate
+relations for the queried subject, follow each through `key(S, R)`, and keep the
+branch whose endpoint matches the object the question names.
+
+### What it does NOT license
+
+Assuming the ceiling is reached. And the wire cost is still unmeasured — a
+search over `b` branches multiplies retrievals, and though that is bounded bytes
+per hop with no barrier (so amended C1 is satisfied), the traffic multiplier is
+real and should be costed before the mechanism is called affordable.
+
+**Taken without asking**, under standing authorisation and John's advance
+approval of the direction.

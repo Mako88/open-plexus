@@ -2,9 +2,66 @@ What is step 2 of the traversal actually worth, and does search now pay?
 ========================================================================
 
 Script: experiments/g13_02_what_the_traversal_step_costs.py
-Status: DISPATCHED. Predictions below were registered before the matrix ran.
+Status: RUN, 24 of 24 cells, 8 of 8 seeds, run 30391374763.
 
-ANSWER: pending. A smoke seed is recorded below and it reproduces the record.
+ANSWER: **Step 2 is 0.971 overall and 1.000 at a unique pair key. Decision 107's
+        0.960 reproduces, and the traversal-with-search ceiling is 1.000 against
+        the 0.87 that justified building it. BUILD IT.**
+
+        FIVE OF FIVE PREDICTIONS CONFIRMED.
+
+
+RESULTS
+-------
+step 2, key(S, R) -> O, 8 seeds
+
+  d64   overall 0.971 +/-0.003   unique 0.997 +/-0.001   shared 0.478 +/-0.043
+  d128  overall 0.972 +/-0.003   unique 1.000 +/-0.000   shared 0.456 +/-0.063
+  d256  overall 0.975 +/-0.003   unique 1.000 +/-0.000   shared 0.508 +/-0.047
+
+  shared is 81/1600 = 5.1% of sequences, at every width
+
+
+SCORING
+-------
+  P1  CONFIRMED. 0.971 at width 64 against decision 107's 0.960, off by 0.011.
+      **The record reproduces**, and this is the first number on the relational
+      line ever reproduced from a committed script.
+
+  P2  CONFIRMED. Unique (S, R) reaches 0.997 / 1.000 / 1.000. The pair key is
+      clean when nothing collides on it, which is what decision 104 built it for.
+
+  P3  CONFIRMED. Shared (S, R) sits at 0.481 against a 1/2 bound of 0.500 --
+      decision 108's ambiguity arriving on the traversal step, tracking 1/m the
+      way step 1 does. Small bucket, 24 cell-values, directional only.
+
+  P4  CONFIRMED. +0.004 from width 64 to 256. Width is not the axis, agreeing
+      with g13-01.
+
+  P5  CONFIRMED, and it is the decision. 1.000 x 1.000 x 1.000 = **1.000**
+      against decision 107's hand-derived 0.87.
+
+
+WHAT THE CEILING IS AND IS NOT
+-------------------------------
+It is the RETRIEVAL CHAIN under the assumption search does its job -- steps 1
+and 3 held at their out-degree-1 value, because putting them into that regime is
+precisely what search is for. **If search does not reach that regime, this
+ceiling is not reached either.** It is an upper bound conditional on the
+mechanism working, not a prediction of what the mechanism will score.
+
+Composition on top of clean retrievals is a separate factor and is NOT measured
+here. Decision 102 measured it at 1.000 over the whole rule table -- "sixteen
+rules in a wide space are linearly separable whatever the labels do" -- so it is
+not expected to bind, but that was measured with `concat` on a different
+configuration and it is an assumption until re-run.
+
+**The asymmetry is the real finding.** Step 2's ambiguity is 5.1% of sequences;
+step 1's out-degree >= 2 was 50%. The middle step is reliable because a
+(subject, relation) pair names one person almost always, where (FACT, subject)
+names one of several relations half the time. That is why the traversal's weak
+steps are its ends and not its middle, and it is what makes a verifier built from
+step 2 trustworthy.
 
 
 IN PLAIN TERMS

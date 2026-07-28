@@ -756,6 +756,19 @@ MUTATIONS = [
         new="                    self.halt_w += 0.0 * shared",
     ),
     Mutation(
+        name="hops-are-allowed-to-use-pair-keys",
+        breaks="the only thing standing between a plausible number and a "
+               "meaningless one. A hop re-encodes through Wk, a single-token "
+               "table; context_keys derives the store's keys from pairs, and "
+               "the two spaces are orthogonal (measured cosine -0.069). "
+               "Allowing the combination lets every hop after the first query "
+               "a key space nothing was written to -- and the model still "
+               "returns answers, still trains, and still reports accuracies",
+        path=LOCAL,
+        old="        if self.hops > 1 and self.context_keys:",
+        new="        if False and self.hops > 1 and self.context_keys:",
+    ),
+    Mutation(
         name="a-hop-decodes-from-the-accumulator",
         breaks="the traversal, only under `bind`, which is the quietest place "
                "for it. The accumulator and the newest retrieval are the same "

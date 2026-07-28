@@ -620,6 +620,36 @@ class AccumulatingAcrossHops(unittest.TestCase):
             config(hops=2, hop_accumulate="concat", halt_gate=True,
                    gate_reads_key=False)
 
+    def test_hops_and_context_keys_are_refused_together(self):
+        """**A configuration that produced numbers without meaning.**
+
+        A hop re-encodes a decoded token through `Wk`, a single-token table.
+        `context_keys` derives the store's keys from `(previous, token)` pairs
+        instead. Measured cosine between `context_key(5, 7)` and `wk[7]`:
+        **-0.069** — orthogonal. So every hop after the first queried a key
+        space the store never writes to, got noise, and the model still
+        returned answers and accuracies.
+
+        Refused rather than silently allowed, because a hop that constructs a
+        PAIR key is the mechanism this needs and it does not exist yet.
+        """
+        with self.assertRaises(ValueError):
+            config(hops=2, context_keys=True)
+        # One hop is fine: the key comes from the key source, not from a
+        # re-encode, so there is nothing in the wrong space.
+        LocalAssociativeMemory(config(hops=1, context_keys=True))
+
+    def test_the_two_key_spaces_really_are_unrelated(self):
+        """The measurement the guard rests on. If these ever became aligned the
+        guard could be relaxed — so this records why it is there rather than
+        asserting the refusal is permanent."""
+        model = LocalAssociativeMemory(config(hops=1, context_keys=True))
+        pair = model.context_key(5, 7)
+        single = model.wk[7]
+        cosine = float(pair @ single
+                       / (np.linalg.norm(pair) * np.linalg.norm(single)))
+        self.assertLess(abs(cosine), 0.2)
+
     def test_an_unknown_accumulator_is_refused(self):
         with self.assertRaises(ValueError):
             config(hops=2, hop_accumulate="average")

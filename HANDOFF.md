@@ -133,12 +133,28 @@ right a third of the time. An oracle handing hop 2 the correct relation still
 caps at 0.560 — exactly the `last`-relation bound — because hop 1 contributes
 nothing.
 
-### THE NEXT THING, and it is now the blocker rather than an optimisation
+### Pair keys fix it (104) — and cannot be used with hops (105)
 
-**`context_keys`** already binds `(previous, token)` rather than `token`, giving
-an entity one key per ROLE instead of one key total. Falsifiable prediction:
-**hop-1 accuracy at two-or-more appearances should rise toward the 0.959 that
-one appearance already reaches.**
+`context_keys` binds `(previous, token)`, giving an entity one key per ROLE. With
+a fact marker before every fact it takes hop 1 from 0.480 to 0.710 overall, and
+from 0.087 to 0.565 at four appearances.
+
+**But hops and pair keys are orthogonal key spaces.** A hop re-encodes through
+`Wk`, a single-token table; the store keys on pairs. Measured cosine: **−0.069**.
+With both on, every hop after the first queried a key space nothing was written
+to — and the model still returned answers and accuracies. That combination now
+**raises**, and the mechanism to fix it does not exist yet.
+
+So the two fixes are individually correct and **mutually unusable**, and whether
+the accumulator works given a reliable hop 1 is still unanswered.
+
+### THE NEXT MECHANISM, forced and narrow
+
+**A hop must re-encode into the store's own key space** — with pair keys, build
+`context_key(marker, decoded)` instead of `wk[decoded]`. The decoded token is in
+hand; *what to pair it with* is the design question. Hardcoding the task's fact
+marker works and puts task knowledge in the model; learning which context to
+pair with is the honest version.
 
 > **And it casts doubt backwards.** Every chain result was measured with a
 > contiguous layout that guaranteed one appearance per symbol — the degenerate

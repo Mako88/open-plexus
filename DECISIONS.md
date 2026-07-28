@@ -5338,3 +5338,69 @@ An end-to-end number. This measures **hop 1 in isolation** — whether the store
 can answer a single-fact question about a repeated entity. Composition on top of
 it has not been re-run, and decisions 101 and 102 were both measured on the
 single-key task where hop 1 was right under half the time.
+
+## 105. Hops and pair keys do not compose, and the combination produced numbers anyway
+
+Re-running decisions 101 and 102 on pair keys was supposed to say whether their
+conclusions survive a reliable hop 1. It says something else first.
+
+    task hops 2, floor 0.470      single key   PAIR key
+      hops 1 replace                   0.280       0.413
+      hops 2 replace                   0.080       0.040
+      hops 2 concat                    0.327       0.413
+
+    task hops 3, floor 0.282
+      hops 1 replace                   0.147       0.100
+      hops 3 concat                    0.180       0.120
+
+Pair keys improve hop 1 as decision 104 said. But concat again **exactly**
+matches the one-hop model (0.413), and the three-hop numbers get *worse* — which
+is the tell.
+
+### The two key spaces are orthogonal
+
+A hop re-encodes its decoded token through `Wk`, a **single-token** table.
+`context_keys` derives the store's keys from `(previous, token)` **pairs**.
+Measured cosine between `context_key(5, 7)` and `wk[7]`:
+
+    -0.069
+
+So with both on, **every hop after the first queries a key space nothing was
+ever written to.** It gets noise back, and the model still returns answers,
+still trains, and still reports accuracies. Nothing errors.
+
+**The multi-hop `PAIR key` column above is therefore meaningless**, and reading
+those numbers as "worse" was wrong — they are not measurements. The hop-1 rows
+stand.
+
+### Refused rather than left available
+
+`hops > 1` with `context_keys` now raises. A hop that constructs a **pair** key
+is the mechanism this needs and it does not exist; until it does, the
+combination is a configuration that produces plausible output without meaning,
+which is the failure class this project exists to catch.
+`hops-are-allowed-to-use-pair-keys` is the mutation, verified caught, and
+`test_the_two_key_spaces_really_are_unrelated` records the measurement the guard
+rests on so it can be relaxed if that ever changes.
+
+### So decisions 101 and 102 stand, and the question they were re-run to answer is still open
+
+Whether the accumulator works given a reliable hop 1 **cannot be answered
+yet** — the only way to get a reliable hop 1 is pair keys, and hops cannot use
+them. The two fixes are individually correct and mutually unusable.
+
+### What this licenses
+
+The next mechanism is now forced and narrow: **a hop must re-encode into the
+store's own key space.** With pair keys that means constructing
+`context_key(marker, decoded)` rather than `wk[decoded]` — the decoded token is
+already in hand, and what it must be paired with is the question. Hardcoding the
+task's fact marker would work and would be task knowledge in the model; learning
+which context to pair with is the honest version and is a real design problem.
+
+### What it does NOT license
+
+Any claim about which of the two fixes matters more. They have never run
+together, so their interaction is unmeasured — and the one number that looked
+like an interaction (three hops getting worse) was noise from an unwritten key
+space.

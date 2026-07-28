@@ -944,6 +944,15 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if self.hops > 1 and self.context_keys:
+            raise ValueError(
+                "hops re-encode a decoded token through Wk, a SINGLE-TOKEN key "
+                "table, and context_keys makes the store's keys derive from "
+                "(previous, token) pairs instead -- measured cosine between "
+                "the two is -0.069, so every hop after the first would query a "
+                "key space the store never writes to and get noise back. It "
+                "would still produce numbers. A hop that constructs a PAIR key "
+                "is the mechanism this needs and it does not exist yet")
         if self.hop_accumulate not in ("replace", "bind", "concat"):
             raise ValueError(
                 "hop_accumulate must be 'replace', 'bind' or 'concat', not "

@@ -144,6 +144,31 @@ def main() -> int:
     print(json.dumps(result, indent=1))
     if not args.keep:
         run(["docker", "rm", "-f", *cleanup])
+    return verdict(result)
+
+
+def verdict(result: dict) -> int:
+    """0 if the run met the bar that applies to it, 1 otherwise.
+
+    **A run WITH a departure is not required to agree**, and demanding that it
+    does is demanding the wrong thing: losing a quarter of the store's
+    dimensions should change later answers. What it must not do is diverge
+    BEFORE the departure step -- a machine switching off cannot reach back and
+    change an answer already given.
+
+    `testbed/driver.py` has always applied that rule. This file did not: it
+    returned 1 whenever `agrees_with_one_process` was false, so **every churn
+    run reported failure for behaving correctly**, and g12-02's first two
+    dispatches lost all eighteen cells to it.
+
+    The reason it took two dispatches to find: the local check ran
+    `run.py ... | tail`, and a pipeline reports the LAST command's status, so
+    the JSON looked right and the exit code was `tail`'s. That is the same
+    masking as the `tee` pipelines fixed earlier today, in a file that had no
+    `pipefail` to fix.
+    """
+    if result.get("leave_at"):
+        return 0 if result["mismatches_before_departure"] == 0 else 1
     return 0 if result["agrees_with_one_process"] else 1
 
 

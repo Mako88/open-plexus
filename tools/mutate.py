@@ -46,6 +46,7 @@ NODE_MAIN = ROOT / "openplexus" / "node_main.py"
 NGRAM = ROOT / "openplexus" / "ngram.py"
 REWARD_RECALL = ROOT / "openplexus" / "tasks" / "reward_recall.py"
 KINSHIP = ROOT / "openplexus" / "tasks" / "kinship.py"
+CLOSURE = ROOT / "openplexus" / "tasks" / "closure.py"
 SEARCH = ROOT / "openplexus" / "search.py"
 CORPUS = ROOT / "openplexus" / "tasks" / "corpus.py"
 SLOT_COST = ROOT / "tools" / "slot_cost.py"
@@ -1576,6 +1577,34 @@ MUTATIONS = [
         path=SEARCH,
         old="    walks.sort(key=lambda w: w.score, reverse=True)",
         new="    walks.sort(key=lambda w: w.score, reverse=False)",
+    ),
+    Mutation(
+        name="the-object-comes-after-the-relation",
+        breaks="the design decision the whole closure task rests on. "
+               "`FACT S O R` makes the store write key(S, O) -> R, which "
+               "decision 107 named as the binding the task needed and could "
+               "not form. Reversed to `FACT S R O` it writes key(S, R) -> O "
+               "and EVERY fact becomes recallable from its subject and "
+               "relation -- so the entailed half stops requiring composition "
+               "and the task silently becomes kinship.py",
+        path=CLOSURE,
+        old="        tokens.extend((config.fact_token, subject, obj,\n"
+            "                       config.relation_token(relation)))",
+        new="        tokens.extend((config.fact_token, subject,\n"
+            "                       config.relation_token(relation), obj))",
+    ),
+    Mutation(
+        name="entailed-facts-are-never-shuffled-in",
+        breaks="the layout guarantee. Stated edges are generated first and "
+               "implied ones appended, so without the shuffle every entailed "
+               "fact sits at the END of the stream and POSITION predicts the "
+               "split. That is note 027's defect exactly -- reward_recall's "
+               "constant gap made the nearest binding before a reward always "
+               "the rewarded one, 160 of 160 -- and it was found by reading "
+               "the generator rather than by any test",
+        path=CLOSURE,
+        old="    order = stated + implied\n    rng.shuffle(order)",
+        new="    order = stated + implied",
     ),
     Mutation(
         name="the-deadline-fires-immediately",

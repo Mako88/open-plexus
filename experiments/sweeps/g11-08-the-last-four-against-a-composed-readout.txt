@@ -2,7 +2,14 @@ The last four mechanisms, re-checked against a composed readout
 ==============================================================
 
 Script: experiments/g11_04_scaling_exponent.py, --components spec per cell
-Status: DISPATCHED, awaiting results.
+Status: RUN, 16 of 16 cells, run 30330836119. The FIRST dispatch had a
+        disconnected write-gate arm -- `write_gate` does nothing without
+        `corrective_writes` and the choice set only the gate -- which showed as
+        +0.000 in every cell. See decision 79.
+
+ANSWER: **Four of five mechanisms re-checked across g11-07 and g11-08 moved.**
+        Only consolidation's verdict survived. Best cell in either grid is
+        readout=hidden128 with write=gated at 5.149.
 
 
 IN PLAIN TERMS
@@ -120,4 +127,19 @@ nothing about slope.
 
 THE NUMBERS
 ------------
-Awaiting the run.
+    write against plain, positive means BETTER
+                    linear   hidden128   bias   hidden128+bias
+    gated           +0.183      +0.092  +0.056         +0.078
+    corrective      +0.120      +0.037  +0.003         +0.041
+    consolidating   -0.040      -0.026  -0.017         -0.053
+
+    readout bias, from the raw cells
+      linear 5.525 -> bias 5.328              +0.197  HELPS
+      hidden128 5.242 -> hidden128+bias 5.311 -0.069  HURTS
+
+P1 confirmed, 5.525 for a fourth time. P2 confirmed at every write setting.
+P3 confirmed -- the gate shrinks 0.183 -> 0.092, and separating `corrective`
+from `gated` shows corrective writes are worth 0.120 with the GATE adding 0.063
+on top. P4 confirmed, consolidation harmful everywhere. P5 REFUTED both ways.
+
+Scored in full in decision 79.

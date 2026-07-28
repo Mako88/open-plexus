@@ -3699,3 +3699,50 @@ same of constraints.**
 
 The habit that follows: when a constraint is invoked to rule something out, say
 which of C1–C4 it comes from. Three of these four could not have named one.
+
+---
+
+## 79. g11-08: the write gate is real and shrinks, consolidation stays refuted, bias reverses
+
+16 of 16 cells, run `30330836119`, after the first attempt's write-gate arm
+turned out to be disconnected.
+
+    write against plain, positive means BETTER
+                    linear   hidden128   bias   hidden128+bias
+    gated           +0.183      +0.092  +0.056         +0.078
+    corrective      +0.120      +0.037  +0.003         +0.041
+    consolidating   -0.040      -0.026  -0.017         -0.053
+
+**Best cell in either grid: `readout=hidden128, write=gated` at 5.149**, beating
+g11-07's best of 5.172. And the two have not been combined — g11-07's winner used
+the cache with plain writes, this one uses gated writes with plain retrieval.
+
+**P1 confirmed** — the baseline is 5.525 again, a fourth independent reproduction.
+
+**P2 confirmed** — the composed readout wins at every write setting, and at every
+setting with the bias too.
+
+**P3 confirmed.** The write gate's effect shrinks under a composed readout,
+0.183 -> 0.092. Separating `corrective` from `gated` is what makes this readable:
+corrective writes alone are worth 0.120 under linear, and the GATE adds a further
+0.063 on top. Without that separation the gate and the mechanism it gates would
+have been one number.
+
+**P4 confirmed.** Consolidation does not recover — harmful under every readout,
+-0.017 to -0.053. It is a claim about RETENTION rather than about information a
+linear map could not read, and the readout does not change its verdict. **The
+only mechanism of five whose verdict survived intact.**
+
+**P5 refuted, in both directions.** Readout bias HELPS a linear readout by 0.197
+and HURTS a composed one by 0.069. It was refuted in g11-02 on `reward_recall`;
+on text it is a substantial help to a linear readout. And a hidden layer can
+already represent a constant, so adding a bias on top costs rather than being
+redundant — which is the half I predicted and the wrong half.
+
+### The tally across both grids
+
+Five mechanisms re-checked against a composed readout. **Four moved:** pair keys
+recovered 60-80%, settling went from -0.14 to +0.03, the write gate shrank by
+half, readout bias reversed sign. **One held:** consolidation.
+
+That is the answer to whether the re-validation was worth it.

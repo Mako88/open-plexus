@@ -4420,4 +4420,51 @@ individual cells at the noisy end are not worth quoting to three decimals.
 Ablation is a **frozen** departure — dimensions zeroed once, after training.
 Decision 81's containers measured real join and leave; this did not, and a model
 that keeps learning while nodes come and go (C4 crossed with C3) is untested
-for hops.
+for hops. **Decision 91 tests it.**
+
+## 91. Perpetual learning does not heal churn, because churn costs capacity
+
+Decision 90 measured survival of a frozen departure. C4 says the model never
+stops learning, so the different question is whether continued learning **claws
+back** what a departure cost. Half the nodes leave after 400 sequences and 800
+more follow; every arm sees the same number of sequences, so a gain cannot be
+"more training" rather than "better training".
+
+    arm            depth 1   depth 2   depth 3
+    intact           1.000     1.000     0.989
+    frozen           0.983     0.969     0.942
+    learning         0.992     0.978     0.950
+
+    recovered        +0.008    +0.008    +0.008
+
+**Continued learning recovers +0.008 against the ~0.047 lost at depth 3.** Close
+to nothing.
+
+The reading: a departure costs **capacity**, and capacity is not a thing
+learning can rebuild. The readout was already near-optimal on the dimensions
+that survived — the delta rule on `Wo` is the exact gradient for a linear
+readout — so there was very little left for further training to fix. Nothing was
+stale; there was simply less machine.
+
+### Treat the +0.008 as a direction, not a number
+
+It is **identical to three decimals at all three depths**, which is about 3
+sequences out of 360 per depth. Three seeds, no spread reported. That pattern is
+consistent with coincidence at a small effect size, and the claim here rests on
+the effect being *small*, which does not depend on its exact value.
+
+### What this licenses
+
+**Do not expect C4 to pay for C3.** They are independent requirements and this
+result separates them: churn tolerance has to come from capacity and redundancy,
+and perpetual learning has to earn its keep somewhere else.
+
+### What it does NOT license
+
+Nothing about what C4 is actually for. This run holds the data distribution
+**fixed**, so continued learning had nothing new to learn — it could only
+re-fit what it already knew on fewer dimensions. The test that would show C4's
+value is a distribution that *changes* after the departure, where a frozen model
+must fall behind and a learning one need not. That is the experiment to run next,
+and it is the one that speaks to "always learning as it goes" rather than to
+repair.

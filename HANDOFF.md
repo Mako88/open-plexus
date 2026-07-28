@@ -64,6 +64,13 @@ depth-1 perfectly and depth-2 at 0.547 — because the available signal separate
   needs filler interleaved before it can be pointed at one that does.
 - **`gate_sharpness` has a middle.** 200 is where both grids agree; 1000 loses
   accuracy on the deeper questions.
+- **C4 does not pay for C3** (decision 91). With half the nodes gone, continued
+  learning recovers **+0.008** against ~0.047 lost — churn costs *capacity*, and
+  capacity is not something learning rebuilds. The two requirements are
+  independent. That run held the data distribution fixed, so it says nothing
+  about what C4 IS for; **the next experiment is a distribution that changes
+  after the departure**, where a frozen model must fall behind and a learning
+  one need not.
 
 ### Operational lessons, now rules in CLAUDE.md
 

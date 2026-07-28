@@ -67,6 +67,7 @@ a report to John, not a gate.
 | 120 | four documents were doing each other's jobs; John asked for three |
 | 121 | width does NOT fix fidelity on the task — and search's blocker has expired |
 | 122 | step 2 reproduces at 0.971, the traversal ceiling is 1.000, build it |
+| 123 | search is built and proved on its own; beam 4 costs 3.2x the traffic |
 
 ---
 
@@ -2692,3 +2693,113 @@ real and should be costed before the mechanism is called affordable.
 
 **Taken without asking**, under standing authorisation and John's advance
 approval of the direction.
+
+---
+
+## 123. Search is built and proved on its own, and the wire cost says it is affordable
+
+`openplexus/search.py`. The capability decision 108 named as missing — *"multi-hop
+reasoning over a BRANCHING graph requires SEARCH ... nothing in this architecture
+searches"* — now exists as a tested unit.
+
+### What it does, and the one line that makes it search rather than retrieval
+
+    1  read key(FACT, S)       -> a superposition of S's relations
+    2  take the top `branches` of that decode as CANDIDATES
+    3  for each candidate, walk the graph COMMITTING to it
+    4  score each walk by how well its endpoint matches T's value vector
+    5  return the walks, best first
+
+**A branch commits to a hard token.** Everywhere else in this model a decode is
+softened and blended — `hop_sharpness` exists for that, and decision 86 records
+what a flattened decode cost. Search is the one place the opposite is right: the
+point is to assert a candidate and find out. Hedging would reproduce the
+superposition search exists to escape.
+
+**And the score is the endpoint, not confidence.** Decision 93 measured every
+identity-free confidence signal — norm, entropy, peak, gap, kurtosis — and the
+best linear separator over all five, *fitted with the labels*, reached 0.628
+against 0.500 for guessing. Matching the named target is a different kind of
+signal: it asks whether the walk arrived, not whether it felt sure. That
+distinction has its own mutation.
+
+### The disambiguator was in the question the whole time
+
+Decision 108: the store answers *"what relation does S hold"* correctly and the
+question needs *"which of S's relations leads to T"*. **T is stated in the
+question and nothing had ever used it.** That is the entire content of the fix.
+
+The sharpest test says so directly: same store, same start, only the target
+changed, and the other branch must win. If it does not, search is reading
+something about the store rather than about the question.
+
+### The wire cost, and it is the good news
+
+`tools/search_cost.py`, arithmetic over the two constants in `distributed.py`
+(5-byte broadcast, 8-byte reply):
+
+    branches   decodes   bytes/position   x greedy   positions/s
+           1         4           32,788       1.0x        39,062
+           4        13          106,561       3.2x        12,019
+          16        49          401,653      12.2x         3,189
+
+    nodes 1024, depth 2, 10 Mbps uplink per node
+
+**Beam 4 costs 3.2x the decode traffic and still supports ~12,000 answered
+positions per second.** Depth is the harsher axis and only mildly — 3.2x at depth
+2 rising to 3.7x at depth 5, because a walk costs `2d - 1` decodes.
+
+So **bandwidth is not what binds search.** That was the open worry and it is
+answered before the mechanism was wired in rather than after.
+
+**What the cost tool does NOT say.** The pooled decode is a collective, and note
+009 §4 has carried that as an outstanding C1 item since long before search. Search
+does not create it — the readout already requires it — but it makes it
+`b(2d-1)/d` times more frequent, which raises the stakes on the un-constraint
+STATE.md lists as costing a reading rather than a run. And none of it is measured:
+the model has never run a search on more than one machine.
+
+### Why it is NOT wired into `run()` yet, and why that is said out loud
+
+`run()` is 526 lines with 46 branch points and there is a standing item about
+exactly that. The mechanism is built and proved on its own first, and wiring is
+its own change.
+
+**Labelled as unfinished rather than left to look finished.** CLAUDE.md: scaffolding
+that is not named as scaffolding becomes load-bearing.
+
+### The test that carries the claim
+
+`TheAmbiguousCaseIsWhereSearchEarnsItsPlace` builds a store where the
+superposition's own argmax is the WRONG relation — FRIEND written at twice the
+weight of PARENT, and only PARENT reaching the target. So a greedy traversal is
+not merely uncertain, it is **confidently wrong**, and there is a control asserting
+exactly that so the rest cannot pass vacuously.
+
+The store is written by hand with the model's own rule rather than trained,
+because the point is control over the AMBIGUITY, which a trained store would
+supply only by luck. `test_decay_when_masked` is the precedent and the reason is
+the same: no black-box comparison can see the property under test.
+
+### Mutations
+
+`openplexus/search.py` gets two, both caught:
+`search-scores-by-confidence-not-by-the-target` (which would make search greedy
+wearing a beam) and `search-keeps-the-worst-branch` (the direction, which gets its
+own mutation because decision 87 records this project shipping a gate whose sign
+was wrong and beating the baseline anyway).
+
+### What this licenses
+
+Wiring it into `run()` and measuring it end-to-end on kinship against the 1.000
+ceiling g13-02 established.
+
+### What it does NOT license
+
+Any claim that search works on the task. **It has been proved on a hand-built
+store of four facts and has never seen a generated sequence.** The unit test says
+the mechanism is correct; whether it survives a real store with distractors,
+decay and a cap is exactly what the next measurement is for.
+
+**Taken without asking**, under standing authorisation and John's advance approval
+of the direction.

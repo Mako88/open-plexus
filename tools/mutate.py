@@ -46,6 +46,7 @@ NODE_MAIN = ROOT / "openplexus" / "node_main.py"
 NGRAM = ROOT / "openplexus" / "ngram.py"
 REWARD_RECALL = ROOT / "openplexus" / "tasks" / "reward_recall.py"
 KINSHIP = ROOT / "openplexus" / "tasks" / "kinship.py"
+SEARCH = ROOT / "openplexus" / "search.py"
 CORPUS = ROOT / "openplexus" / "tasks" / "corpus.py"
 SLOT_COST = ROOT / "tools" / "slot_cost.py"
 RECOVERY = ROOT / "tools" / "recovery.py"
@@ -1547,6 +1548,30 @@ MUTATIONS = [
         old="    obj = next(o for s, r, o in base.facts "
             "if s == subject and r == relation)",
         new="    obj = base.facts[0][2]",
+    ),
+    Mutation(
+        name="search-scores-by-confidence-not-by-the-target",
+        breaks="the one thing search adds. Scoring a branch by how STRONG its "
+               "endpoint is, rather than by whether that endpoint is the "
+               "entity the question named, reproduces exactly the failure "
+               "decision 93 measured: every identity-free confidence signal "
+               "fitted WITH the labels reached 0.628 against 0.500 for "
+               "guessing. The branch with the loudest binding would win and "
+               "the search would be greedy wearing a beam",
+        path=SEARCH,
+        old="        score = float(walk.endpoint @ target)",
+        new="        score = float(walk.endpoint @ walk.endpoint)",
+    ),
+    Mutation(
+        name="search-keeps-the-worst-branch",
+        breaks="the selection. Sorting the other way returns the branch that "
+               "matched the target LEAST, so every number would be a search "
+               "run backwards -- and decision 87 records this project shipping "
+               "a gate whose sign was wrong and beating the baseline anyway, "
+               "which is why the direction gets its own mutation",
+        path=SEARCH,
+        old="    walks.sort(key=lambda w: w.score, reverse=True)",
+        new="    walks.sort(key=lambda w: w.score, reverse=False)",
     ),
 ]
 

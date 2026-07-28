@@ -118,15 +118,42 @@ where `(FACT, subject)` names one of several relations half the time. The
 traversal's weak steps are its two ends and its middle is sound, which is exactly
 what makes a verifier built from step 2 trustworthy.
 
-**Approved in advance by John.** Two things to settle as part of the build:
+### 1a. BUILT, and not yet wired — decision 123
 
-- **What a branch costs on the wire.** Search over `b` branches multiplies
-  retrievals. That is bounded bytes per hop with no barrier, so amended C1 is
-  satisfied — but the traffic multiplier is real and must be costed before the
-  mechanism is called affordable.
-- **Composition on top of clean retrievals is assumed, not measured.** Decision
-  102 put it at 1.000 over the whole rule table, on a different configuration.
-  Re-run it rather than inheriting it.
+`openplexus/search.py` exists, with 10 tests and 2 mutations, both caught. It
+takes the top `b` candidates from the first decode, **commits** to each, walks
+the graph, and scores each walk by whether its endpoint matches the object the
+question names — the disambiguator that was in the question all along and that
+nothing had ever used.
+
+**The wire cost is answered and it is affordable** (`tools/search_cost.py`):
+
+    branches   decodes   x greedy   positions/s   (1024 nodes, depth 2, 10 Mbps)
+           1         4       1.0x        39,062
+           4        13       3.2x        12,019
+          16        49      12.2x         3,189
+
+Beam 4 costs **3.2×** the decode traffic and still supports ~12,000 answered
+positions per second. Depth is harsher and only mildly: 3.2× at depth 2 to 3.7×
+at depth 5. **Bandwidth is not what binds search.**
+
+> The pooled decode is a collective, and note 009 §4 has carried that as an
+> outstanding C1 item since long before search. Search does not create it — the
+> readout already requires it — but it makes it `b(2d-1)/d` times more frequent,
+> which raises the stakes on item 6 below.
+
+**It has never seen a generated sequence.** The tests run on a hand-built store
+of four facts. The unit test says the mechanism is correct; whether it survives
+distractors, decay and a cap is the next measurement.
+
+**Next, in order:**
+
+1. **Wire it into `run()`** — deliberately deferred, because `run()` is 526 lines
+   with 46 branch points and item 9 is about that.
+2. **Measure it end-to-end on kinship** against g13-02's 1.000 ceiling, with
+   `branches=1` as the control that says whether searching bought anything.
+3. **Re-measure composition** rather than inheriting it. Decision 102 put it at
+   1.000 over the whole rule table, on a different configuration.
 
 Decision 111's beam numbers (0.485 / 0.510 / 0.495) were measured with noisy
 primitives and should be re-derived, not reused.

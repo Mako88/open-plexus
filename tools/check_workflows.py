@@ -144,6 +144,73 @@ def third_party_imports(module: Path, seen: set[Path] | None = None) -> set[str]
     return found
 
 
+#: `${{ matrix.thing }}` anywhere in a workflow.
+MATRIX_USE = re.compile(r"matrix\.([\w-]+)")
+
+
+def matrix_keys(job: str) -> set[str]:
+    """Every key a job's matrix defines, including via `include:` entries.
+
+    **Reading only the top-level keys is wrong and was the first version.**
+    g11-06 declares `chars` as an axis and supplies `arm`, `width` and `slots`
+    through `include:` -- a grid that ran twenty cells correctly -- and a check
+    that missed those would have flagged a working workflow while the broken one
+    was the point. So this takes every `name:` inside the matrix block, at any
+    depth.
+
+    Over-inclusive on purpose. A key that exists and is never used costs
+    nothing; a key that is used and does not exist expands to the empty string.
+    """
+    lines = job.splitlines()
+    try:
+        start = next(i for i, line in enumerate(lines)
+                     if line.strip() == "matrix:")
+    except StopIteration:
+        return set()
+    indent = len(lines[start]) - len(lines[start].lstrip())
+    keys = set()
+    for line in lines[start + 1:]:
+        if line.strip() and len(line) - len(line.lstrip()) <= indent:
+            break
+        keys.update(re.findall(r"([\w-]+)\s*:", line))
+    return keys
+
+
+def undeclared_matrix_keys() -> list[str]:
+    """Every `matrix.X` a job uses that its own matrix does not declare.
+
+    **An undeclared key expands to the EMPTY STRING**, silently. The job runs, a
+    flag arrives with no value, and the failure surfaces as an argparse error in
+    every cell at once — which reads like the script being broken rather than
+    the workflow.
+
+    > *Calibration.* g12-02 was written by copying g12-01 and editing it. The
+    > edit to the run step did not apply — a `str.replace` that matched nothing
+    > and returned the original — so the churn sweep kept g12-01's command,
+    > referencing `matrix.window`, `matrix.link` and `matrix.repeat` against a
+    > matrix declaring `nodes`, `lost` and `leave_at`. **All eighteen cells
+    > failed with `--window: expected one argument`.** The step's own NAME
+    > rendered as "window  on a  link, run " in the job list and nobody read it.
+    >
+    > This check reads every workflow in about a second and would have refused
+    > the dispatch.
+
+    Job-scoped rather than file-scoped: two jobs in one file legitimately have
+    different matrices, and a key declared by one is not available to the other.
+    """
+    offenders = []
+    for path in sorted(WORKFLOWS.glob("*.yml")):
+        for job, body in job_blocks(path.read_text(encoding="utf-8")).items():
+            declared = matrix_keys(body)
+            for used in sorted(set(MATRIX_USE.findall(body))):
+                if used not in declared:
+                    offenders.append(
+                        f"{path.name}: job `{job}` uses matrix.{used}, which "
+                        f"its matrix does not declare -- it will expand to an "
+                        f"empty string in every cell")
+    return offenders
+
+
 def module_for(reference: str) -> Path:
     """The file `-m tools.thing` or `tools/thing.py` resolves to."""
     return ROOT / (reference if reference.endswith(".py")
@@ -277,7 +344,7 @@ def main() -> int:
         print("these sweeps fire on push and can cancel a dispatched matrix "
               "before it starts: " + ", ".join(offenders))
         return 1
-    silent = silently_failing_steps()
+    silent = silently_failing_steps() + undeclared_matrix_keys()
     for problem in silent:
         print(f"FAIL  {problem}")
     if silent:

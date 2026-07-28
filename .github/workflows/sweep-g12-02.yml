@@ -56,20 +56,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
-      - name: window ${{ matrix.window }} on a ${{ matrix.link }} link, run ${{ matrix.repeat }}
+      - name: ${{ matrix.nodes }} nodes, ${{ matrix.lost }} leaving at step ${{ matrix.leave_at }}
         run: |
           set -o pipefail
           mkdir -p out
-          if [ "${{ matrix.link }}" = "clean" ]; then
-            python testbed/run.py --nodes 4 --width 16 --steps 40 \
-              --window ${{ matrix.window }} \
-              | tee out/X-clean-w${{ matrix.window }}-r${{ matrix.repeat }}.json
+          # `one` removes node 0; `quarter` removes the first quarter BY INDEX,
+          # which the slice handshake makes meaningful -- before it the driver
+          # indexed by arrival order and would have removed whichever node the
+          # network happened to deliver first.
+          if [ "${{ matrix.lost }}" = "one" ]; then
+            ABSENT=0
           else
-            python testbed/run.py --nodes 4 --width 16 --steps 40 \
-              --window ${{ matrix.window }} \
-              --delay 80ms --jitter 20ms --loss 2% \
-              | tee out/X-impaired-w${{ matrix.window }}-r${{ matrix.repeat }}.json
+            ABSENT=$(python -c "print(','.join(str(i) for i in range(${{ matrix.nodes }} // 4)))")
           fi
+          echo "removing node indices: $ABSENT"
+          python testbed/run.py --nodes ${{ matrix.nodes }} --width 16 --steps 40 \
+            --absent "$ABSENT" --leave-at ${{ matrix.leave_at }} \
+            | tee out/X-n${{ matrix.nodes }}-${{ matrix.lost }}-at${{ matrix.leave_at }}.json
       - uses: actions/upload-artifact@v4
         with:
           name: g12-02-n${{ matrix.nodes }}-${{ matrix.lost }}-at${{ matrix.leave_at }}

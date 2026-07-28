@@ -5059,3 +5059,76 @@ compose by construction. That run is the next thing.
 
 Decision 99's numbers. The 0.546 shortcut, the 0.407, and the three floors there
 were all measured on the gendered table and are **superseded**, not refined.
+
+## 101. The hop mechanism REPLACES retrievals, it does not COMBINE them
+
+The bar was set in decision 100 before the run: floor 0.470, control 0.713,
+ceiling 1.000. The result:
+
+    task hops 2   floor to beat 0.470
+      model hops 1                0.347
+      model hops 2                0.027    <- not even a relation, 79%
+      model hops 2 + gate         0.187
+
+    task hops 3   floor to beat 0.282
+      model hops 1                0.120
+      model hops 3                0.047
+      model hops 3 + gate         0.093
+
+**Turning hops on makes it thirteen times worse**, and the gate recovers only
+part of that. Nothing here clears the floor.
+
+### Where the hops actually go
+
+A fact is laid down as `[subject, relation, object]`, so from the subject:
+
+    hop 1: RELATION (on the path) 48%
+    hop 2: PERSON 90%
+    hop 3: PERSON 61%
+
+Hop 1 is right. **Hop 2 lands on a person** — it re-encodes the relation it just
+decoded and retrieves what follows *that*, which is the object of the same fact.
+The mechanism walks **along a fact**, not **across the graph** to the next one.
+
+### The deeper reason, which the traversal bug was hiding
+
+Fixing the traversal would not fix this. Composing `R1` with `R2` requires
+**holding both and applying a binary function**. But each hop *replaces*
+`retrieved`, and the readout maps **one** retrieval to an answer. There is
+nowhere for `R1` to be while `R2` is fetched.
+
+So the mechanism does **sequential retrieval**, not composition:
+
+    replace   follow a pointer, keep only where you land   -- chains
+    combine   hold two things and apply a rule to them     -- kinship
+
+### What this does to decision 92
+
+It narrows it rather than contradicting it. Zero-shot generalisation to unseen
+depth is real, and it is generalisation over **how many times to repeat one
+replace**. On chains, token adjacency *is* the relation graph, so replacing is
+sufficient and the task reached 1.000. That result stands with its scope
+corrected: **the hop mechanism composes pointers, not relations.**
+
+Worth saying plainly that this is the outcome kinship was built to expose, and
+it exposed it on the first run — which is what a second task is for. A model
+perfect at "follow the arrow k times" with no way to represent "these two
+relation types combine into a third" is exactly the gap decision 99 predicted.
+
+### What this licenses
+
+A named next mechanism: **carry state across hops instead of overwriting it.**
+Something that accumulates — the retrievals so far, or a running composed value
+— and a readout that consumes it. That is a bigger change than the gate and it
+is the first thing on this project's path that requires holding two things at
+once.
+
+### What it does NOT license
+
+Concluding that this architecture *cannot* compose typed relations. What is
+measured is that **this hop mechanism** does not, and the reason is structural
+and identified. An accumulator has not been tried.
+
+Nor is the traversal problem separately settled: even a mechanism that combines
+would still need to reach the second fact, and `key(relation)` is superposed
+across every fact sharing that relation. Two problems, not one.

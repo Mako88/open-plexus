@@ -108,6 +108,29 @@ GPT-2-large scale, *not* frontier scale. Frontier needs ~65k nodes at width 1M.
 So "the reduction is affordable" holds for the regime tested and is
 extrapolation outside it.
 
+## THE SHARPEST THING TO KNOW (decision 101)
+
+**The hop mechanism REPLACES retrievals, it does not COMBINE them.**
+
+    replace   follow a pointer, keep only where you land   -- chains, works
+    combine   hold two things and apply a rule to them     -- kinship, absent
+
+On `chains.py` token adjacency *is* the relation graph, so replacing is
+sufficient and it reaches 1.000. On `kinship.py` — typed relations that compose
+by rule — turning hops on makes it **thirteen times worse** (0.347 → 0.027), and
+90% of hop 2's landings are a *person* rather than the next fact's relation.
+
+Fixing the traversal would not fix it. Composing `R1` with `R2` needs both held
+at once, and each hop overwrites `retrieved` while the readout consumes one
+vector. **There is nowhere for `R1` to be while `R2` is fetched.**
+
+This narrows decision 92 rather than contradicting it: zero-shot depth
+generalisation is real and is generalisation over *repeating one replace*.
+
+**Next mechanism, named:** carry state across hops instead of overwriting it.
+It is the first thing on this project's path that requires holding two things at
+once.
+
 ## The sharpest thing to know, from decisions 89 and 92 together
 
     over DEPTH        generalises ZERO-SHOT to a depth never trained on (0.992)

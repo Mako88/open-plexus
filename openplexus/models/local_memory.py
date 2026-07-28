@@ -60,7 +60,9 @@ import numpy as np
 
 from openplexus.keys import KeySource, PairKeys, TableKeys
 from openplexus.retrieval import Retrieval, build as build_retrieval
-from openplexus.search import search as run_search
+from openplexus.search import (candidates as search_candidates,
+                               decode_margin as search_margin,
+                               search as run_search)
 
 #: Newton-Schulz coefficients, from Keller Jordan's Muon. The quintic
 #: `3.4445x - 4.7750x^3 + 2.0315x^5` pushes every singular value toward 1
@@ -2040,6 +2042,37 @@ class LocalAssociativeMemory:
                     # required: one vector per relation, all of them visible.
                     per_hop = list(walks[0].retrieved)
                     retrieved = per_hop[-1]
+                if trace is not None:
+                    # THE SIGNALS A GATE ON SEARCH WOULD CONSULT, recorded on
+                    # the channel that exists for exactly that question.
+                    #
+                    # g13-03 measured search gaining +0.092 where the queried
+                    # subject holds several relations and losing 0.054 where it
+                    # holds one, so running it everywhere is close to free and
+                    # close to worthless. A gate needs to know which case it is
+                    # in BEFORE walking, and `decode_margin` is the candidate:
+                    # wide gap for one relation, narrow for several.
+                    #
+                    # Observation only, like every other trace field -- nothing
+                    # reads it back, and `test_trace_observes.py` pins that a
+                    # traced run and an untraced one agree.
+                    scored = search_candidates(
+                        readable, self.retrieval, self.key_source, self.wv,
+                        int(self.config.search_fact_token), int(tokens[t]),
+                        self.config.search_branches)
+                    trace.append({
+                        "position": t,
+                        "search_decode_margin": search_margin(scored),
+                        "search_top_score": scored[0][1] if scored else 0.0,
+                        "search_candidates": len(scored),
+                        # The verification margin, which is the OTHER candidate
+                        # signal and is only available after paying for the
+                        # walks. Recorded so the two can be compared on the same
+                        # sequences rather than in separate probes.
+                        "search_endpoint_margin": (
+                            walks[0].score - walks[1].score
+                            if len(walks) > 1 else 0.0),
+                    })
             # One EXTRA retrieval when gating: the gate scores hop k by what hop
             # k+1 returns, so the last readable hop still needs a lookahead.
             extra = 1 if self.halt_w is not None else 0

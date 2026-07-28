@@ -183,6 +183,46 @@ def walk_from(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
                 endpoint, 0.0)
 
 
+def candidates(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
+               fact_token: int, start: int, branches: int,
+               allowed: np.ndarray | None = None) -> list[tuple[int, float]]:
+    """The branches worth trying from `start`, with their decode scores.
+
+    Split out of `search` so **the decision to search can be taken without
+    searching.** g13-03 measured search gaining +0.092 where the queried subject
+    holds several relations and losing 0.054 where it holds one, so the two
+    nearly cancel — the mechanism is right and running it unconditionally is
+    not. A gate needs this decode, and only this decode, before committing to
+    the walks.
+
+    Returned with scores rather than as bare tokens because **the margin between
+    the top two is the quantity a gate would read**: a subject with one relation
+    should show a wide gap, and one with several a narrow one. Whether that
+    holds is measured, not assumed — decision 93 found every identity-free
+    confidence signal reaching 0.628 against 0.500 for guessing, so a signal
+    that merely sounds plausible has a poor record here.
+    """
+    first = retrieval.read(readable, keys.pair(fact_token, start))
+    scores = _decode(wv, first)
+    return [(token, float(scores[token]))
+            for token in _top(scores, branches, allowed)]
+
+
+def decode_margin(scored: list[tuple[int, float]]) -> float:
+    """Gap between the best and second-best candidate. Zero if fewer than two.
+
+    Zero rather than infinity for a single candidate: a gate reading this
+    decides "ambiguous" on a small margin, and a lone candidate is the case
+    where searching is *least* useful. Returning a large number would gate it
+    exactly backwards — which is the failure decision 87 records this project
+    shipping once already, a gate whose sign was wrong that beat the baseline
+    anyway.
+    """
+    if len(scored) < 2:
+        return 0.0
+    return scored[0][1] - scored[1][1]
+
+
 def search(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
            fact_token: int, start: int, target: np.ndarray, depth: int,
            branches: int = 4,
@@ -229,11 +269,11 @@ def search(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     if branches < 1:
         raise ValueError("branches must be at least 1")
 
-    first = retrieval.read(readable, keys.pair(fact_token, start))
-    candidates = _top(_decode(wv, first), branches, allowed)
+    scored = candidates(readable, retrieval, keys, wv, fact_token, start,
+                        branches, allowed)
 
     walks = []
-    for candidate in candidates:
+    for candidate, _ in scored:
         walk = walk_from(readable, retrieval, keys, wv, fact_token, start,
                          candidate, depth)
         # SCORED BY THE ENDPOINT, not by confidence anywhere along the way.

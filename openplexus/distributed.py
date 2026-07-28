@@ -61,6 +61,15 @@ _HEADER = struct.Struct("!I")
 _DONE = -1
 _RESET = -2
 
+#: How long a node stays suspect before the driver tries it again, in steps.
+#:
+#: SWIM's suspicion timeout, in the only clock this driver has. The value is a
+#: guess and is **not** measured: too short and a genuinely departed node is
+#: retried every few steps for nothing; too long and a node that recovered stays
+#: dark. SWIM tunes the equivalent against a target false-positive rate, which
+#: needs a failure model this project does not yet have -- see note 039.
+RETRY_AFTER_STEPS = 8
+
 
 def send(sock: socket.socket, payload: bytes) -> None:
     sock.sendall(_HEADER.pack(len(payload)) + payload)
@@ -251,6 +260,10 @@ class Network:
         #: reset by every `run`. **Observation only** -- nothing reads it back,
         #: exactly as the model's `trace` is observation only.
         self.steps_settled_short: dict[int, int] = {}
+        #: node -> the step at which it last failed a send, for nodes currently
+        #: under suspicion. A node absent from this is being spoken to
+        #: normally; one present is retried every `RETRY_AFTER_STEPS`.
+        self.nodes_suspect: dict[int, int] = {}
         self.port = port
         self._values = values
         self._readout = readout
@@ -393,13 +406,20 @@ class Network:
         # dispatch -- which is the common case for a machine switched off
         # between sequences rather than during one. Same rule as in `dispatch`:
         # tolerated only when a deadline was asked for.
+        # Nodes already gone when the sequence starts. Seeded into `suspect`
+        # below rather than treated as a separate state.
         starting_unreachable: set[int] = set()
         for index, sock in enumerate(self._connections):
             try:
                 send(sock, struct.pack("!i?", _RESET, False))
             except (ConnectionError, OSError):
-                if deadline is None:
-                    raise
+                # RECORDED, NOT DECIDED ON. Whether a gone node is an error is
+                # one rule and it lives in ONE place, in `dispatch` below.
+                # Checking the mode here as well left two guards implementing
+                # the same rule, and a mutation removing either one survived --
+                # the other raised a line later and the test could not tell.
+                # In strict mode dispatch reaches this same node and raises
+                # there, so the observable behaviour is unchanged.
                 starting_unreachable.add(index)
         predictions = np.zeros(len(tokens), dtype=np.int64)
         gone: set[int] = set()
@@ -411,13 +431,31 @@ class Network:
         #: When each pending step was dispatched, so its deadline can be judged
         #: from when it was ASKED rather than from when the driver last looped.
         asked_at: dict[int, float] = {}
-        #: Nodes whose connection failed on the way out. Distinct from `gone`,
-        #: which is a DECLARED departure, and from `dead`, which is a hang-up
-        #: noticed while reading -- this is one noticed while writing.
-        unreachable: set[int] = set(starting_unreachable)
+        #: SUSPECT, not gone: node -> the step at which it last failed a send.
+        #: Distinct from `gone`, a DECLARED departure, and from `dead`, a
+        #: hang-up noticed while reading -- this is one noticed while writing.
+        #:
+        #: **Suspicion rather than ejection is SWIM's design, and note 039 is
+        #: why this is a dict rather than a set.** The first version put a node
+        #: in a set and never took it out, so a machine whose network blipped
+        #: for a single send was removed for the rest of the sequence with no
+        #: path back, and its share of the store stayed dark. SWIM marks an
+        #: unresponsive member *suspect*, keeps probing, and clears the mark if
+        #: it answers -- because transient trouble is the common case, and
+        #: permanent ejection turns a blip into permanent damage.
+        # Seeded at step 0, NOT at minus the interval. A node that has just
+        # failed serves its suspicion like any other; seeding it further back
+        # would retry it immediately, which is both the wrong behaviour and --
+        # measured by a surviving mutation -- makes the guard above unreachable,
+        # because dispatch would then hit the same failure one line later.
+        # Seeded BEFORE the interval so dispatch tries them at step 0. That is
+        # what carries a node already gone at the start into the single guard
+        # in `dispatch`, where the strict-versus-tolerant decision is made.
+        suspect: dict[int, int] = {index: -RETRY_AFTER_STEPS
+                                   for index in starting_unreachable}
         sent = settled = 0
         self.steps_settled_short = {}
-        self.nodes_unreachable = unreachable
+        self.nodes_suspect = suspect
 
         def dispatch(step: int) -> None:
             nonlocal gone
@@ -425,7 +463,9 @@ class Network:
                 gone = set(absent)
             asked_at[step] = time.monotonic()
             live = [i for i in range(len(self._connections))
-                    if i not in gone and i not in unreachable]
+                    if i not in gone
+                    and step - suspect.get(i, -RETRY_AFTER_STEPS)
+                    >= RETRY_AFTER_STEPS]
             # Who answers this step. Round-robin rather than random: it is
             # deterministic, it spreads the cost evenly, and it guarantees the
             # count exactly rather than in expectation -- which matters because
@@ -458,8 +498,13 @@ class Network:
                     # hide real faults behind a fault-tolerance feature.
                     if deadline is None:
                         raise
-                    unreachable.add(index)
+                    suspect[index] = step
                     speaking.discard(index)
+                else:
+                    # IT ANSWERED, so the mark clears. SWIM multicasts an
+                    # `alive` to do this; here the successful send IS the
+                    # evidence, because a reset peer cannot accept one.
+                    suspect.pop(index, None)
             # AFTER the sends, so a node discovered unreachable while
             # dispatching is not counted as a voter this step. Counting it would
             # recreate the barrier one step at a time.

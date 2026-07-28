@@ -291,12 +291,46 @@ class ADepartureNOBODYDECLARED(unittest.TestCase):
 
             degraded = network.run(TOKENS, window=2, deadline=1.0)
 
-            self.assertIn(1, network.nodes_unreachable,
+            self.assertIn(1, network.nodes_suspect,
                           "the dead node was not noticed at all")
             self.assertFalse(
                 np.array_equal(healthy, degraded),
                 "losing a quarter of the store changed nothing, which means "
                 "the node was still being counted")
+
+    def test_a_suspect_node_is_RETRIED_rather_than_ejected(self):
+        """SWIM's suspicion mechanism, and the behaviour that was wrong first.
+
+        The first version put a failed node in a set and never took it out, so a
+        machine whose network blipped for one send was gone for the rest of the
+        sequence with no path back. Note 039: transient trouble is the common
+        case, and permanent ejection turns a blip into permanent damage.
+
+        A genuinely dead node is retried every RETRY_AFTER_STEPS and fails each
+        time, which is the cost; the point is that the door is not locked.
+        """
+        from openplexus.distributed import RETRY_AFTER_STEPS
+
+        config, model = configured(4)
+        long_enough = np.tile(TOKENS, 3)
+        self.assertGreater(len(long_enough), RETRY_AFTER_STEPS * 2,
+                           "the sequence must outlast a retry interval or "
+                           "this measures nothing")
+        with Network(config, 4, model.wv, model.wo) as network:
+            network.run(long_enough, window=2)
+            network._processes[1].terminate()
+            network._processes[1].join(timeout=5)
+
+            network.run(long_enough, window=2, deadline=1.0)
+
+            # It stays suspect because it really is dead -- what matters is
+            # that the mark was REFRESHED at a later step than the first
+            # failure, which only happens if the driver tried it again.
+            self.assertIn(1, network.nodes_suspect)
+            self.assertGreater(
+                network.nodes_suspect[1], 0,
+                "the node was marked suspect at step 0 and never retried, "
+                "which is the permanent ejection this test exists to prevent")
 
     def test_an_undeclared_death_still_RAISES_without_a_deadline(self):
         """Strict mode is preserved deliberately.

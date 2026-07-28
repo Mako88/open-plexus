@@ -1601,12 +1601,10 @@ MUTATIONS = [
                "hides real faults behind a fault-tolerance feature -- and the "
                "numbers would still come out",
         path=DISTRIBUTED,
-        old="            except (ConnectionError, OSError):\n"
-            "                if deadline is None:\n"
-            "                    raise\n"
-            "                starting_unreachable.add(index)",
-        new="            except (ConnectionError, OSError):\n"
-            "                starting_unreachable.add(index)",
+        old="                    if deadline is None:\n"
+            "                        raise\n"
+            "                    suspect[index] = step",
+        new="                    suspect[index] = step",
     ),
 ]
 

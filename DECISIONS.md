@@ -3254,3 +3254,90 @@ there is no end of training at which to anneal. A learner whose step size decays
 to nothing has stopped, whatever its architecture. Note 036's item 3 — scale a
 step size to its own estimator's variance — is the only unexplored entry on the
 literature scan, and it is now pointed at directly by two independent results.
+
+---
+
+## 73. The step size is not the obstacle. The FEATURES being frozen is.
+
+**Decision 72 named the step size as the open question. This refutes that**, and
+what it leaves is sharper.
+
+Three step-size rules, all local, all online, prequential over 248,000
+characters, learning rate swept within each rule, reported by quintile because
+the question is whether it is still descending when the data runs out:
+
+        rule      lr      Q1      Q2      Q3      Q4      Q5    Q5-Q1
+       fixed     0.2   4.727   4.539   4.497   4.555   4.540   -0.187
+  normalised   0.001   4.663   4.560   4.529   4.736   4.696   +0.032
+   idbd-lite    0.05   4.944   4.656   4.577   4.606   4.593   -0.351
+
+**All three plateau by Q3 and then wobble.** IDBD — Sutton's incremental
+delta-bar-delta, designed for exactly this setting — improves the most across
+the stream and still lands worse than a fixed rate. RMS normalisation actively
+degrades after Q3. The best absolute number, 4.540, belongs to the simplest rule.
+
+So an adaptive step size does not produce a learner that keeps learning, and the
+falling-learning-rate pattern that suggested it (decision 71) was a symptom, not
+the disease.
+
+### What the plateau actually is, and it should have been obvious
+
+**The features are frozen.** `Wk` and `Wv` are drawn once; the store is rebuilt
+each chunk from those frozen projections. So the readout — however deep, however
+trained, whatever its step size — is fitting a function of a FIXED feature map.
+
+**A fixed feature map has a best achievable loss, and once the readout reaches
+it, more data cannot help by construction.** That is not a defect of the
+optimiser. It is what "fixed features" means. Every arm above converges to about
+4.5 because that is approximately the best a function of these particular
+features can do.
+
+Decision 70 found the readout was the ceiling and composition raised it by 0.63
+bits. **The ceiling did not disappear; it moved up one level.** It is now the
+feature map, and no amount of work downstream of it will move it again.
+
+### Why this is not a return to decision 65
+
+Decision 65 tried to make the features adapt by training `Wv` with a delta rule
+and it was catastrophic — stable rank 4.06 to 1.88, bits 5.505 to 5.956 —
+because a delta rule driven by a shared error signal ALIGNS every value vector
+along the directions that error favours, and alignment is collapse.
+
+So the problem is now precisely stated and it is not the one we have been
+solving: **make the feature map adapt without collapsing it.** Weight-adjustment
+on the value projection is measured and refuted. Something else is required.
+
+### Which is exactly where John's question lands
+
+He asked whether letting the interconnections evolve would raise the ceiling.
+When he asked it, my answer was "probably efficiency rather than ceiling,
+because the ceiling is the functional form". **That answer is now wrong, and his
+instinct is better than my reply.**
+
+Evolving WHICH connections exist is a different operation from adjusting their
+weights, and it is not obviously subject to the alignment collapse that killed
+decision 65 — a structural change reallocates capacity rather than dragging
+every vector toward a common direction. It is the only proposal on the table
+that changes the feature map by a mechanism that is not the one already refuted.
+
+The evidence was there before the argument: the two things that worked today
+were both structural rather than scalar.
+
+    composition, a new KIND of connection      +0.63
+    sparse keys, a connectivity PATTERN        +0.15
+    width 16 -> 128, more of the same          +0.089
+
+**Structure beat scale roughly seven to one, and both structural wins beat every
+weight-level intervention tried.**
+
+### The measurement, and it is cheap
+
+We know random sparse keys beat dense by 0.15. The minimal form of the question
+is whether **learned** sparse beats **random** sparse at the same sparsity
+budget and the same wire cost — the only difference being whether the active set
+is chosen or drawn.
+
+If learned wins, structural plasticity has a number and the larger version is
+worth building. If it ties, random sparsity already captures the benefit and
+evolution is complexity for nothing. Either answer is worth having and neither
+needs a full plasticity mechanism to obtain.

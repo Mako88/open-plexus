@@ -198,6 +198,33 @@ node can vanish mid-computation and that the remainder continues.
 
 This has never been tested in the predecessor project, because nothing ever left.
 
+### C4 — Perpetual learning
+
+**Stated by John, 2026-07-27.** The system never freezes. There is no training
+phase that ends and no deployed checkpoint that stops adapting: it learns from
+what it sees for as long as it runs.
+
+**This is a constraint, not an aspiration, and it rules things out.** Three
+consequences follow immediately and each one has already changed a decision:
+
+- **The deployed regime is ONLINE and SINGLE-PASS.** A result obtained with many
+  epochs over a fixed dataset, or with a full-batch optimiser, is evidence about
+  what the features CONTAIN and not about what this system can reach. Note 037's
+  offline result is exactly that, and it is why the online rerun exists.
+- **Catastrophic forgetting becomes a first-class failure mode**, not a side
+  quest. A model that learns forever also forgets forever.
+  [g6-01](../experiments/sweeps/g6-01-does-sparsity-protect-old-learning.txt)
+  measured sparse keys protecting old learning from new, which was filed as a
+  negative result on a different question and is now directly load-bearing.
+- **Evaluation should be PREQUENTIAL** — predict the next item, then learn from
+  it, and score the predictions made along the way. A train/test split measures a
+  system that stops, which is the thing C4 forbids. Every number in this project
+  so far comes from a split.
+
+C4 does not conflict with C1–C3 and sharpens them: a node that must keep learning
+forever cannot rely on ever having seen the whole corpus, which is the same
+situation a node joining late is already in.
+
 ---
 
 ## 4. Falsification — the gate ladder

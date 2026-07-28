@@ -3065,7 +3065,12 @@ own held-out test split:
 
 **On identical frozen features a two-layer readout recovers a backprop-like data
 exponent.** MLP-512 at -0.0681 is indistinguishable from published backprop, and
-steeper than our own attention baseline. The gap over linear widens
+steeper than our own attention baseline.
+
+> **AMENDED by decision 71.** This holds with Adam and many epochs and does NOT
+> hold in the online single-pass regime C4 requires, where the composed arm fits
+> -0.0152 against the baseline's -0.0243. Composition still doubles the exponent
+> and still beats the unigram; "backprop-like" was the optimiser talking. The gap over linear widens
 monotonically: 0.19, 0.57, 0.59, 0.80 bits.
 
 **MLP-128 reaches 4.525 bits, past the unigram at 4.829** — a bar this project
@@ -3126,3 +3131,70 @@ was describing.
 
 The ordering still holds — fix the readout, then change the objective — but the
 gap between the two steps is far smaller than I told him.
+
+---
+
+## 71. Composition survives the online regime, and decision 70 overstated by how much
+
+**Decision 70 is amended here, not retracted.** It claimed a two-layer readout
+"recovers a backprop-like data exponent". That is true with Adam and many epochs.
+It is not true in the regime C4 requires.
+
+Online, single sample at a time, plain SGD, no momentum, learning rate swept on
+BOTH arms and chosen on held-out calibration text, temperature calibrated the way
+the model does it:
+
+    chars   linear     lr   2-layer     lr    gain
+    16,000   5.284    0.5     4.860    0.2  +0.424
+    62,500   5.228    0.5     4.802    0.2  +0.426
+   250,000   5.185    0.2     4.661   0.05  +0.524
+
+    fitted over the same 16k-250k range as the offline arms
+      online linear      b = -0.0069   R2 0.99
+      online 2-layer     b = -0.0152   R2 0.95
+      offline linear     b = -0.0078   R2 0.93
+      offline MLP-128    b = -0.0264   R2 0.96
+
+      backprop attention                b = -0.0243
+      our model in situ                 b = -0.0010
+
+### What holds
+
+**Composition is a large, real win in the deployed regime.** 0.42 to 0.52 bits
+over a linear readout on identical features with identical training, and the gain
+grows across the range rather than shrinking.
+
+**It roughly doubles the data exponent** — -0.0152 against -0.0069 — so it moves
+the SLOPE and not only the level. That makes it the first mechanism out of seven
+to do so. Decision 69 listed six that moved the level and none the slope.
+
+**4.661 bits beats the unigram at 4.829.** This project has never cleared that
+bar, and the sweep table in HANDOFF has carried `<- WE STILL LOSE TO THIS` next
+to it for months.
+
+### What does not hold, and it is decision 70's claim
+
+**The online exponent is 58% of the offline one** — -0.0152 against -0.0264 — and
+falls well short of the backprop attention baseline at -0.0243. So "recovers a
+backprop-like exponent" is a statement about Adam-with-epochs, not about a rule
+this project can deploy. The optimiser is worth roughly as much as the
+architecture here, which is precisely the confound CLAUDE.md's rule about
+sweeping a hyperparameter on every arm exists to expose — and which I failed to
+apply twice before applying it.
+
+Note the learning rates: the linear arm wants 0.5 and 0.2, the composed arm wants
+0.2 and 0.05, and the best rate FALLS as data grows. A fixed learning rate is
+leaving something on the table, and under C4 there is no "end of training" at
+which to anneal one. **How to set a step size in a system that never stops is now
+an open question with a number attached** — and it is note 036's item 3, the one
+unexplored entry on that scan's carry-forward list: scale a step size to its own
+estimator's variance.
+
+### Still not the deployed regime, and this is the next honest step
+
+These runs used TWO passes. C4's regime is ONE. A second pass over a corpus is
+already a mild violation of "learns from what it sees as it goes", and the gap
+between two passes and one is exactly the kind of thing that has swallowed a
+result here before. **The next measurement is single-pass**, and it should be
+prequential — predict, then learn, score what was predicted — because a
+train/test split measures a system that stops.

@@ -653,6 +653,19 @@ MUTATIONS = [
         new='                    through = np.einsum("gv,vgh->gh", error.sum(0, keepdims=True) + 0*error, self.grouped_wo)',
     ),
     Mutation(
+        name="linking-chains-does-nothing",
+        breaks="the only arm that removes the store's easiest guarantee. "
+               "Disjoint contiguous chains give every symbol exactly one "
+               "appearance, which is the case decision 103 showed the store "
+               "handles and every other case it does not. With the join gone "
+               "the task generates, validates, and scores 0.995 where the real "
+               "linked task scores 0.630 -- so the headline number silently "
+               "comes back and the degenerate case looks general",
+        path=CHAINS,
+        old="            listed[i + 1][0] = listed[i][-1]",
+        new="            listed[i + 1][0] = listed[i + 1][0]",
+    ),
+    Mutation(
         name="a-chain-can-be-asked-twice",
         breaks="the hop axis, by leaking. A query block writes `a` next to `c`, "
                "so it STATES the link a -> c; asking a chain twice means the "

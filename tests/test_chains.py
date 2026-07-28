@@ -316,6 +316,46 @@ class SeveralTerminatorsAreAvailable(unittest.TestCase):
                     with self.subTest(n_queries=n_queries, chain=chain):
                         self.assertNotIn((chain[0], chain[-1]), stated)
 
+    def test_a_linked_chain_makes_its_shared_symbol_appear_twice(self):
+        """**The guarantee `linked_chains` removes, asserted so it is removed on
+        purpose.**
+
+        Disjoint contiguous chains give every symbol exactly one appearance,
+        which decision 103 showed is the only case the store handles well —
+        0.884 at one appearance against 0.303 at two. Every chain result was
+        measured there. A join makes the shared symbol a target in one chain and
+        a source in the next, while leaving the answer determined.
+        """
+        config = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=96,
+                             linked_chains=2, seed=41)
+        for sequence in dataset(config, 20):
+            body = sequence.tokens[:sequence.queries[0][0] - 1]
+            counts: dict[int, int] = {}
+            for token in body:
+                counts[token] = counts.get(token, 0) + 1
+            shared = [s for chain in sequence.chains for s in chain
+                      if counts.get(s, 0) > 1]
+            self.assertTrue(shared, "no symbol repeats, so nothing was linked")
+
+    def test_linking_does_not_make_the_answer_ambiguous(self):
+        """A join must stress the STORE, not the task. Following a link stays
+        deterministic — each symbol still has exactly one chain successor — so a
+        low score is the store failing to disambiguate rather than the question
+        having two answers."""
+        config = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=96,
+                             linked_chains=2, seed=42)
+        for sequence in dataset(config, 20):
+            successors: dict[int, set[int]] = {}
+            for chain in sequence.chains:
+                for i in range(len(chain) - 1):
+                    successors.setdefault(chain[i], set()).add(chain[i + 1])
+            self.assertTrue(all(len(v) == 1 for v in successors.values()))
+
+    def test_linking_more_chains_than_exist_is_refused(self):
+        with self.assertRaises(ValueError):
+            ChainConfig(n_chains=3, hops=2, n_symbols=40, seq_len=96,
+                        linked_chains=3)
+
     def test_no_chain_is_asked_twice(self):
         """What makes the guard above hold, asserted directly so a future change
         to the sampling cannot quietly reintroduce the leak."""

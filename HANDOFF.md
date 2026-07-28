@@ -156,10 +156,15 @@ hand; *what to pair it with* is the design question. Hardcoding the task's fact
 marker works and puts task knowledge in the model; learning which context to
 pair with is the honest version.
 
-> **And it casts doubt backwards.** Every chain result was measured with a
-> contiguous layout that guaranteed one appearance per symbol — the degenerate
-> case. How much of decision 92's 1.000 survives an entity appearing twice is
-> **not known**.
+> **And it cast doubt backwards — now resolved (decision 106).** Every chain
+> result used a layout guaranteeing one appearance per symbol. With chains
+> linked end-to-start, composition falls from 0.995 to **0.630** at four joins
+> in six, while single-hop retrieval barely moves (1.000 → 0.975) and the
+> one-hop control stays at 0.000. So **1.000 is the disjoint-chain number** and
+> should be quoted with the repetition rate attached — but composition degrades
+> gracefully rather than collapsing, and stays 3.8× the floor.
+>
+> Still unre-run linked: churn (90–91) and zero-shot depth transfer (92).
 
 ## The hop mechanism (decision 101)
 

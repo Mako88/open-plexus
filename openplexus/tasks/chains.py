@@ -112,6 +112,22 @@ class ChainConfig:
     #: single-question task lacks.
     n_queries: int = 1
 
+    #: How many chains START at another chain's END.
+    #:
+    #: **This exists to remove a guarantee, not to add difficulty.** Every chain
+    #: result so far was measured with disjoint chains laid out contiguously,
+    #: which makes each symbol appear EXACTLY ONCE — and decision 103 showed
+    #: that is the one case the store handles well: retrieval is 0.884 at one
+    #: appearance and 0.303 at two, because `key(x)` accumulates a binding per
+    #: appearance and returns their sum.
+    #:
+    #: So decision 92's 1.000, the zero-shot depth generalisation and the churn
+    #: results were all measured in the degenerate case. A linked chain makes
+    #: the shared symbol appear twice — once as a target, once as a source —
+    #: while leaving the answer perfectly determined. It is a real graph, not a
+    #: corrupted one.
+    linked_chains: int = 0
+
     @property
     def separator_tokens(self) -> tuple[int, ...]:
         """The separators this dataset may actually emit."""
@@ -202,6 +218,13 @@ class ChainConfig:
             raise ValueError(
                 "a sequence with no question scores nothing and measures "
                 "nothing")
+        if self.linked_chains < 0:
+            raise ValueError("linked_chains counts joins and cannot be negative")
+        if self.linked_chains >= self.n_chains:
+            raise ValueError(
+                f"{self.linked_chains} joins need more than {self.n_chains} "
+                f"chains; every chain would start at another's end and the "
+                f"first would have nowhere to start")
         if self.n_queries > self.n_chains:
             raise ValueError(
                 f"{self.n_queries} questions need {self.n_queries} distinct "
@@ -280,6 +303,20 @@ def generate(config: ChainConfig) -> ChainSequence:
     chains = tuple(
         tuple(symbols[i * (config.hops + 1):(i + 1) * (config.hops + 1)])
         for i in range(config.n_chains))
+
+    if config.linked_chains:
+        # Chain i+1 starts where chain i ended, for the first `linked_chains`
+        # joins. The shared symbol then appears twice in the presentation and
+        # `key(shared)` carries two bindings: to its successor in the later
+        # chain, and to the separator that follows it in the earlier one.
+        #
+        # Queries are still answerable and still unambiguous -- following the
+        # link is deterministic, it is only the STORE that now has to
+        # disambiguate.
+        listed = [list(chain) for chain in chains]
+        for i in range(min(config.linked_chains, config.n_chains - 1)):
+            listed[i + 1][0] = listed[i][-1]
+        chains = tuple(tuple(chain) for chain in listed)
 
     order = list(chains)
     rng.shuffle(order)

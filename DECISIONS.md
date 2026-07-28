@@ -5404,3 +5404,61 @@ Any claim about which of the two fixes matters more. They have never run
 together, so their interaction is unmeasured — and the one number that looked
 like an interaction (three hops getting worse) was noise from an unwritten key
 space.
+
+## 106. Composition degrades under repeated entities, gracefully, and 1.000 was the degenerate case
+
+Decision 103 raised a doubt over every chain result: contiguous disjoint chains
+give each symbol **exactly one appearance**, which is the one case the store
+handles well. `linked_chains` joins chains end-to-start, so the shared symbol is
+a target in one and a source in the next, while the answer stays determined —
+stressing the store rather than the task.
+
+    task  model  gate   linked 0   linked 2   linked 4
+       1      1     -      1.000      0.950      0.975
+       2      1     -      0.000      0.000      0.000
+       2      2     -      0.995      0.815      0.630
+       2      2   yes      0.970      0.790      0.610
+       3      3   yes      0.955      0.775      0.645
+
+**The doubt was justified.** Composition falls from 0.995 to **0.630** with four
+of six chains linked — so decision 92's 1.000 is the number for a layout that
+guaranteed away the store's hardest case, and it should not be quoted as the
+model's composition ability without that condition attached.
+
+**But it degrades rather than collapsing.** 0.630 is still 3.8× the 0.167 floor,
+and the negative control holds at every link level: a one-hop model stays at
+**0.000** on the two-hop task, so composition is still required and still
+happening.
+
+### Why chains survive what kinship does not
+
+Single-hop retrieval barely moves — 1.000 to 0.975 — against kinship's cliff
+from 0.884 to 0.303. Two reasons, and both are properties of the data rather
+than of the model:
+
+- On a chain a repeated symbol has one binding to its **successor** and one to
+  the **separator**. A marker is easy to tell from a symbol. In kinship both
+  bindings are meaningful tokens.
+- A linked chain symbol appears **twice**. A kinship entity appears up to five
+  times, and decision 103's curve is steepest over exactly that range.
+
+So the two results agree: the store degrades with the number of bindings on a
+key and with how confusable they are. Chains are the mild end of that and
+kinship the harsh end.
+
+### What this licenses
+
+Quoting composition results **with the repetition rate attached**, the way
+window results are quoted with the run length after decision 82. "1.000" is
+true of disjoint chains; "0.630" is true at four joins in six; neither is *the*
+number on its own.
+
+It also weakens the case for treating the pair-key work as urgent for chains —
+the mechanism there is not what is failing.
+
+### What it does NOT license
+
+Any claim about churn or depth generalisation under repetition. Decisions 90 to
+92 were all measured on disjoint chains and **none has been re-run linked**.
+This says composition survives; it says nothing about whether zero-shot depth
+transfer or the 0.928-at-half-the-machine result do.

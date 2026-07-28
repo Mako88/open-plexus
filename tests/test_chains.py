@@ -27,7 +27,13 @@ from __future__ import annotations
 import hashlib
 import unittest
 
-from openplexus.tasks.chains import ChainConfig, ChainSequence, dataset, generate
+from openplexus.tasks.chains import (
+    IGNORE,
+    ChainConfig,
+    ChainSequence,
+    dataset,
+    generate,
+)
 
 
 def stated_links(sequence: ChainSequence, hops: int) -> set[tuple[int, int]]:
@@ -258,6 +264,76 @@ class SeveralTerminatorsAreAvailable(unittest.TestCase):
             false = {pair for pair in adjacent_pairs(sequence)
                      if pair[0] in symbols and pair[1] in symbols}
             self.assertEqual(false - stated_links(sequence, 2), set())
+
+    def test_every_question_is_scored(self):
+        """With several questions the sequence must score all of them —
+        scoring only the last would make `n_queries` raise the *difficulty*
+        without raising the density of composition in the training signal,
+        which is the entire point of the dial (decision 97)."""
+        config = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=96,
+                             n_queries=4, seed=21)
+        for sequence in dataset(config, 15):
+            scored = [t for t in sequence.targets if t != IGNORE]
+            self.assertEqual(len(scored), 4)
+            for position, chain in sequence.queries:
+                self.assertEqual(sequence.targets[position], chain[-1])
+
+    def test_the_last_question_is_still_the_reported_one(self):
+        """`asked` and `answer_position` predate `queries` and must keep
+        meaning what they meant, or every caller written for the
+        single-question task silently reads the wrong block."""
+        config = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=96,
+                             n_queries=4, seed=22)
+        sequence = generate(config)
+        position, chain = sequence.queries[-1]
+        self.assertEqual(sequence.answer_position, position)
+        self.assertEqual(sequence.asked, chain)
+
+    def test_no_answer_is_stated_before_its_own_question(self):
+        """**The defect several questions introduced, and the reason they are
+        drawn without replacement.**
+
+        A block writes `a` next to `c`, so it STATES the link `a -> c`. With one
+        question that is harmless — the block is last, and the answer is read
+        before the binding is written. With several, an early block would state
+        the answer to a chain a later block asks about, and the later question
+        would be a ONE-HOP LOOKUP of a link already in the store. The whole hop
+        axis would be measuring nothing, exactly as if `a -> c` had been written
+        into the body.
+
+        Each block's own `(a, c)` is not a leak and is not counted — that pair
+        IS the task. What must never happen is the pair appearing *before* the
+        question that needs it.
+        """
+        for n_queries in (2, 3, 4):
+            config = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=96,
+                                 n_queries=n_queries, seed=23)
+            for sequence in dataset(config, 15):
+                for position, chain in sequence.queries:
+                    before = sequence.tokens[:position]
+                    stated = {(before[i], before[i + 1])
+                              for i in range(len(before) - 1)}
+                    with self.subTest(n_queries=n_queries, chain=chain):
+                        self.assertNotIn((chain[0], chain[-1]), stated)
+
+    def test_no_chain_is_asked_twice(self):
+        """What makes the guard above hold, asserted directly so a future change
+        to the sampling cannot quietly reintroduce the leak."""
+        config = ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=96,
+                             n_queries=4, seed=24)
+        for sequence in dataset(config, 20):
+            asked = [chain for _, chain in sequence.queries]
+            self.assertEqual(len(set(asked)), len(asked))
+
+    def test_more_questions_than_chains_is_refused(self):
+        with self.assertRaises(ValueError):
+            ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=96,
+                        n_queries=5)
+
+    def test_no_questions_is_refused(self):
+        with self.assertRaises(ValueError):
+            ChainConfig(n_chains=4, hops=2, n_symbols=40, seq_len=96,
+                        n_queries=0)
 
     def test_an_empty_use_separators_is_refused(self):
         with self.assertRaises(ValueError):

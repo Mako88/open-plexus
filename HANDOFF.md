@@ -147,13 +147,30 @@ The model does not fail to learn composition under all-position training — it
 **progressively unlearns it**, as the body's error accumulates and drags the
 shared gate toward one hop. The selector slows this; it does not stop it.
 
+### The decay is REAL, not a task artifact (decision 97)
+
+The obvious suspect was density — with one question per sequence, ~98% of the
+next-token error says "take one hop". `n_queries` raises that share. It does
+**not** remove the decay (+0.117, +0.188, +0.169 across densities, no trend).
+
+What it does is raise the **level**: one question per sequence collapses to
+0.033, *below* the 0.125 floor — confidently wrong — while four or eight
+stabilise near 0.38. Keep the density; it is not the fix.
+
+> **A first run of this leaked and its numbers were reported before the guard
+> caught them.** A query block writes `a` beside `c`, so it STATES `a -> c`;
+> with several blocks an early one answered a chain a later one asked about.
+> The leak grew along the very axis being swept and produced a clean, plausible,
+> wrong curve. Fixed by sampling asked chains without replacement. **Third time
+> a task change has looked inert and been wrong — write the guard before the
+> measurement, not after.**
+
 ### THE NEXT THING TO CHASE
 
-The decay, which is a sharper target than "all-position is worse". A mechanism
-that is learned and then unlearned is one whose gradient is being outvoted at a
-rate that grows with exposure — so the question is whether **the gate's error
-can be decoupled from the readout's**, not whether the gate needs more inputs.
-More inputs have now been tried.
+**Decouple the gate's error from the readout's.** A mechanism learned and then
+unlearned is one whose gradient is outvoted at a rate that grows with exposure.
+More inputs have been tried (decision 96) and more density has been tried
+(decision 97); neither stops it.
 
 Also unexplained — 4 separators beat 1 under all-position training (0.683 against
 0.117), a real gap in the account rather than a detail.

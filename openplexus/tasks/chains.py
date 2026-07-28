@@ -97,6 +97,21 @@ class ChainConfig:
     #: tokens and one that learned a class give different answers.
     use_separators: tuple[int, ...] | None = None
 
+    #: How many questions one sequence asks. 1 is the original task.
+    #:
+    #: **This is a density dial, and it exists to remove a confound.** With one
+    #: question, exactly one position in the sequence needs composition and
+    #: every other needs a single hop — roughly 1 in 50. Decision 96 measured
+    #: composition *decaying* under next-token training over every position, and
+    #: that ratio is the obvious suspect: 98% of the error says "always take one
+    #: hop". Real text is not that lopsided, so the decay may be a property of
+    #: this task's uniformity rather than of the gate.
+    #:
+    #: Raising this raises the share of positions where the next token is
+    #: genuinely several hops away, which is the property real text has and the
+    #: single-question task lacks.
+    n_queries: int = 1
+
     @property
     def separator_tokens(self) -> tuple[int, ...]:
         """The separators this dataset may actually emit."""
@@ -183,6 +198,16 @@ class ChainConfig:
             raise ValueError("hops is a number of links and must be at least 1")
         if self.n_separators < 1:
             raise ValueError("a chain needs a separator before it")
+        if self.n_queries < 1:
+            raise ValueError(
+                "a sequence with no question scores nothing and measures "
+                "nothing")
+        if self.n_queries > self.n_chains:
+            raise ValueError(
+                f"{self.n_queries} questions need {self.n_queries} distinct "
+                f"chains and only {self.n_chains} exist; asking one twice "
+                f"would STATE its answer in the first block and make the "
+                f"second a one-hop lookup")
         if self.use_separators is not None:
             if not self.use_separators:
                 raise ValueError(
@@ -210,9 +235,9 @@ class ChainConfig:
 
     @property
     def min_seq_len(self) -> int:
-        """Every chain as a separator plus its symbols, then the query marker,
-        the queried symbol and the answer."""
-        return self.n_chains * (self.hops + 2) + 3
+        """Every chain as a separator plus its symbols, then three positions
+        for each question: the marker, the queried symbol and the answer."""
+        return self.n_chains * (self.hops + 2) + 3 * self.n_queries
 
 
 @dataclass(frozen=True)
@@ -233,6 +258,10 @@ class ChainSequence:
     chains: tuple[tuple[int, ...], ...]
     asked: tuple[int, ...]
     answer_position: int
+    #: Every question in the sequence as `(position, chain)`. `asked` and
+    #: `answer_position` are the LAST of these, kept as fields so that every
+    #: caller written when a sequence asked one question still works.
+    queries: tuple[tuple[int, tuple[int, ...]], ...] = ()
 
     def scored_targets(self) -> tuple[int, ...]:
         """The one target a score is computed over."""
@@ -270,10 +299,26 @@ def generate(config: ChainConfig) -> ChainSequence:
                       else rng.choice(separators))
         tokens.extend(chain)
 
-    asked = chains[rng.randrange(config.n_chains)]
-    tokens.extend((config.query_token, asked[0]))
-    answer_position = len(tokens) - 1
-    tokens.append(asked[-1])
+    # One block per question: marker, the symbol asked about, then its answer.
+    # Blocks sit end to end, so the token after an answer is the next marker --
+    # never a chain symbol, so no block states a link.
+    # WITHOUT REPLACEMENT, and that is load-bearing. A block writes `a` next to
+    # `c`, so it STATES the link `a -> c` -- which is the shortcut this task
+    # exists to forbid. With one question that is harmless: the block sits at
+    # the end and the answer is read before the binding is written. With
+    # several, an early block would state the answer to a chain a later block
+    # asks about, turning a two-hop question into a one-hop lookup.
+    #
+    # Sampling each chain at most once means no chain's answer is ever stated
+    # before it is asked. `test_question_blocks_state_no_link` is the guard, and
+    # it caught this after the multi-question layout was already measured.
+    asked_chains = rng.sample(list(chains), config.n_queries)
+    queries: list[tuple[int, tuple[int, ...]]] = []
+    for chain in asked_chains:
+        tokens.extend((config.query_token, chain[0]))
+        queries.append((len(tokens) - 1, chain))
+        tokens.append(chain[-1])
+    answer_position, asked = queries[-1]
 
     # Filler drawn ONLY from symbols no chain uses. A filler token equal to a
     # chain symbol would state a link that does not exist, which is the MQAR
@@ -282,10 +327,13 @@ def generate(config: ChainConfig) -> ChainSequence:
     while len(tokens) < config.seq_len and spare:
         tokens.append(rng.choice(spare))
 
+    # EVERY question is scored, not just the last. With one question this is
+    # exactly what it always was.
     targets = [IGNORE] * len(tokens)
-    targets[answer_position] = asked[-1]
+    for position, chain in queries:
+        targets[position] = chain[-1]
     return ChainSequence(tuple(tokens), tuple(targets), chains, asked,
-                         answer_position)
+                         answer_position, tuple(queries))
 
 
 def dataset(config: ChainConfig, n_sequences: int) -> list[ChainSequence]:

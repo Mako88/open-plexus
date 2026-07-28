@@ -4774,3 +4774,72 @@ something outside the gate entirely — all untested.
 usually a mechanism whose gradient is being outvoted at a rate that grows with
 exposure — so the next question is whether the gate's own error can be
 decoupled from the readout's, rather than whether the gate needs more inputs.
+**Decision 97 tests it. The answer is that the decay is real.**
+
+## 97. Density raises the level and does NOT remove the decay — and the first run of this was leaking
+
+Decision 96 measured composition being learned and then progressively unlearned
+under next-token training — 0.750 falling to 0.100. The obvious suspect was
+density: with one question per sequence, about 1 position in 50 needs
+composition and every other needs a single hop, so ~98% of the error says
+"always take one hop". **Real text is not that lopsided.** `n_queries` raises
+the share of positions where the next token is genuinely several hops away.
+
+### The first run of this leaked, and the guard was written after it
+
+`n_queries` was added, the experiment run, and *then* the tests written. One of
+them failed, and it was right to: **a query block writes `a` next to `c`, so it
+STATES the link `a -> c`.** With one question that is harmless — the block is
+last and the answer is read before the binding is written. With several, an
+early block stated the answer to a chain a later block asked about, making that
+question a **one-hop lookup of a link already in the store**.
+
+The leak grew along exactly the axis being measured: more questions meant more
+repeated chains meant more free answers. It produced a clean, plausible,
+completely wrong curve — a decay collapsing from +0.517 to +0.029 — which was
+reported in-session before the guard caught it. **Those numbers are discarded.**
+
+Fixed by sampling asked chains **without replacement**, which caps `n_queries`
+at `n_chains`. Guarded by `test_no_answer_is_stated_before_its_own_question`,
+which checks the precise property — a chain's answer never appears before the
+question that needs it — rather than the over-broad one the first version
+checked, which flagged each block's own `(a, c)` and would have condemned the
+task itself.
+
+### The corrected measurement
+
+Eight chains, so the floor is 0.125.
+
+    queries     100x1     200x1     400x1     400x2     decay
+          1     0.150     0.033     0.017     0.033    +0.117
+          4     0.567     0.392     0.375     0.379    +0.188
+          8     0.515     0.333     0.290     0.346    +0.169
+
+**Density does not remove the decay.** +0.117, +0.188, +0.169 — no trend, and
+the smallest value belongs to the row that has already collapsed to the floor
+and has nothing left to lose.
+
+**What density does is raise the level.** One question per sequence falls to
+0.033, *below* the 0.125 floor, which means confidently wrong rather than
+guessing. Four or eight stabilise around 0.35–0.38, well clear of it. That is a
+real effect and a useful one — it is simply not the effect claimed.
+
+### What this licenses
+
+**Decision 96's proposed next step stands.** The decay is a property of the
+mechanism and not of the instrument's uniformity, so decoupling the gate's error
+from the readout's is back on the table as the thing to try.
+
+And density is worth keeping regardless: it is the difference between a model
+that is confidently wrong and one that is meaningfully above the floor under the
+training regime real text requires.
+
+### What it does NOT license
+
+Levels are not comparable to any earlier chain result: `n_chains` is 8 here, so
+the floor is 0.125 rather than 0.250, and every question in the sequence is
+scored rather than one. **Only the within-row decay and the across-row level
+ordering are measurements here.**
+
+`n_queries=1` is pinned byte-identical by the same digest test as
+`n_separators`, so every earlier chain number still reproduces.

@@ -653,6 +653,32 @@ MUTATIONS = [
         new='                    through = np.einsum("gv,vgh->gh", error.sum(0, keepdims=True) + 0*error, self.grouped_wo)',
     ),
     Mutation(
+        name="a-chain-can-be-asked-twice",
+        breaks="the hop axis, by leaking. A query block writes `a` next to `c`, "
+               "so it STATES the link a -> c; asking a chain twice means the "
+               "first block answers the second, and the second question is a "
+               "ONE-HOP LOOKUP of a link already in the store. The leak grows "
+               "with `n_queries`, which is the axis it would be swept along, "
+               "and it produces a clean plausible curve -- it did, and the "
+               "numbers were reported before the guard caught them",
+        path=CHAINS,
+        old="    asked_chains = rng.sample(list(chains), config.n_queries)",
+        new="    asked_chains = [rng.choice(list(chains))\n"
+            "                    for _ in range(config.n_queries)]",
+    ),
+    Mutation(
+        name="only-the-last-question-is-scored",
+        breaks="the point of `n_queries`. Scoring one question raises the "
+               "DIFFICULTY of a sequence without raising the density of "
+               "composition in the training signal, which is the whole reason "
+               "the dial exists -- and the task would still generate, still "
+               "validate, and still produce a curve along the axis",
+        path=CHAINS,
+        old="    for position, chain in queries:\n"
+            "        targets[position] = chain[-1]",
+        new="    targets[answer_position] = asked[-1]",
+    ),
+    Mutation(
         name="one-separator-still-consumes-a-random-draw",
         breaks="the reproducibility of every chain number ever measured. "
                "`rng.choice` consumes a draw even from a ONE-element sequence, "

@@ -652,6 +652,20 @@ MUTATIONS = [
         new='                    through = np.einsum("gv,vgh->gh", error.sum(0, keepdims=True) + 0*error, self.grouped_wo)',
     ),
     Mutation(
+        name="a-hop-key-escapes-into-the-write-path",
+        breaks="the invariant that hops change what is READ and never what is "
+               "written, and this is the bug that actually happened. `key` is "
+               "carried out to `previous_key`, which is what the next position "
+               "writes its binding with, so reassigning it here makes every "
+               "binding in the store use a re-encoded hop key instead of the "
+               "token's. The hop mechanism then corrupts the memory it is "
+               "trying to read, and it looks like a retrieval failure -- four "
+               "probes and two refuted hypotheses went past before it was found",
+        path=LOCAL,
+        old="                hop_key = weights @ self.wk",
+        new="                hop_key = key = weights @ self.wk",
+    ),
+    Mutation(
         name="the-hop-decode-is-never-sharpened",
         breaks="the re-encode, and this is the bug that actually happened. "
                "Without the standardisation the decode's logits are so flat "
@@ -675,8 +689,8 @@ MUTATIONS = [
                "still produce a plausible vector of the right shape, and every "
                "hop would look like it was running",
         path=LOCAL,
-        old="                key = weights @ self.wk",
-        new="                key = weights @ self.wv",
+        old="                hop_key = weights @ self.wk",
+        new="                hop_key = weights @ self.wv",
     ),
     Mutation(
         name="a-workers-refusal-hangs-the-pool",

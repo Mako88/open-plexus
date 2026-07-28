@@ -4087,3 +4087,83 @@ it appears once the offset is constant.
 
 **No hop number from before this fix means anything**, including the 0.035. The
 mechanism has not yet been measured on an uncontaminated instrument.
+
+## 85. The hop mechanism composes — and the bug was in the WRITE path all along
+
+**Two hops and three hops both score 1.000, from 0.000.** The model follows a
+relational chain no single stated fact answers.
+
+    task  model  sharp  accuracy   answered
+       2      1      —     0.000   intermediate 100%
+       2      2    0.0     0.015   other 96%
+       2      2    2.0     1.000   answer 100%
+       2      2   30.0     1.000   answer 100%
+       3      1      —     0.000   intermediate 100%
+       3      3    2.0     1.000   answer 100%
+
+Every control holds. A **1-hop model still scores 0.000** and still answers the
+intermediate 100% of the time, so the task genuinely requires composition and
+nothing leaked when it started working. **Sharpness 0 still fails** at 0.015, so
+the standardisation is still load-bearing. And 2 through 30 all give 1.000, so
+it is not a tuned knob.
+
+### The bug
+
+`key` is the token's key, and it is carried out of the retrieval block into
+`previous_key` — which is what the NEXT position writes its binding with. The
+hop loop reassigned that same `key`. So with `hops > 1`, **every binding in the
+store was written using a re-encoded hop key instead of the token's**.
+
+The hop mechanism was corrupting the memory it was trying to read.
+
+One line, `hop_key = weights @ self.wk`, and it is the same shadowing class the
+code three blocks up already carries a warning about — `store` was renamed for
+exactly this reason, after shadowing it turned `if wrote:` into an array test.
+
+### Why it took four probes to find
+
+Every measurement pointed at retrieval and the damage was in the write:
+
+- the decode was **correct** (argmax 1.000) — so not the decoder
+- the decoder axis was a **null** (0.030 vs 0.035) — so not the drag
+- sharpness 2–30 all sat at **0.01–0.04** — so not the temperature
+- an oracle KEY gave **0.135** and an oracle VALUE gave **1.000** — which
+  correctly localised it to the second lookup, and the second lookup was
+  reading a store the hops had corrupted
+
+The tell was a contradiction I could not explain away: `argmax(wv @ r2)` was `c`
+in 100% of sequences measured outside the run, and 12% measured inside it, with
+prediction and decode agreeing 1.000. Two measurements of the same quantity
+disagreeing is not noise — **it means the two runs are not the same run**, and
+the only thing that differed was `hops`.
+
+`test_the_store_is_identical_at_every_hop_count` is the invariant, stated so it
+cannot come back: **hops change what is read, never what is written.**
+`a-hop-key-escapes-into-the-write-path` is the mutation, verified caught.
+
+### What this does NOT license
+
+**`hops` is a fixed count and must match the question exactly.** Measured:
+
+    task  model     acc   answered
+       1      2   0.000   other 100%
+       1      3   0.000   other 100%
+       2      3   0.000   other 100%
+       3      2   0.000   intermediate 100%
+
+Overshoot is total, not graceful. A model with more hops than the question needs
+walks past the answer into whatever the answer points at; one with fewer stops
+early and answers the intermediate. A model that does not know in advance how
+deep a question is **cannot use this**, and a mixed workload contains both
+depths by definition.
+
+So this is composition with the depth supplied from outside. The next problem is
+a halting signal — deciding *when to stop hopping* from something the model can
+compute locally — and it is well posed now in a way it was not before, because
+both failure directions are measured and the ceiling at every depth is 1.000.
+
+### What it does license
+
+The separator finding in decision 84 stands on its own: it was measured at
+`hops=1`, on an uncorrupted store, and took the lookup from 54% to 100%. Both
+fixes were needed and neither would have been enough alone.

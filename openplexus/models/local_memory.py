@@ -1724,6 +1724,14 @@ class LocalAssociativeMemory:
             # shadowing it silently turned `if wrote:` into an array test.
             readable = memory if lasting is None else memory + lasting
             retrieved = self.retrieval.read(readable, key)
+            # NOT `key`. `key` is the TOKEN's key and it is carried out of this
+            # loop to `previous_key`, which is what the next position WRITES
+            # with. Reassigning it here made every binding in the store use a
+            # re-encoded hop key instead of the token's -- so turning hops on
+            # corrupted the memory the hops were trying to read, and `hops=2`
+            # destroyed the 1-hop case that already worked. Same shadowing class
+            # as `store` above, and just as quiet.
+            hop_key = key
             for _ in range(self.config.hops - 1):
                 # DECODE AND RE-ENCODE, which is how a retrieval becomes a key.
                 #
@@ -1790,8 +1798,8 @@ class LocalAssociativeMemory:
                 # gradient of confidence, so a wrong first hop is silently
                 # asserted rather than hedged. `hop_sharpness` is the dial
                 # between the two, and high enough approaches argmax.
-                key = weights @ self.wk
-                retrieved = self.retrieval.read(readable, key)
+                hop_key = weights @ self.wk
+                retrieved = self.retrieval.read(readable, hop_key)
             sliced = retrieved.reshape(groups, -1)
             if self.hidden_w is None:
                 parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)

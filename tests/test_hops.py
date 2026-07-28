@@ -115,6 +115,55 @@ class OneHopIsExactlyTheOldPath(unittest.TestCase):
                 np.testing.assert_array_equal(out, baseline)
 
 
+class HopsChangeReadingAndNeverWriting(unittest.TestCase):
+    """**The defect that cost the most to find.**
+
+    `key` is the token's key, and it is carried out of the retrieval block into
+    `previous_key`, which is what the NEXT position writes its binding with. The
+    hop loop reassigned that same `key`, so with `hops > 1` every binding in the
+    store was written using a re-encoded hop key instead of the token's.
+
+    The hop mechanism was corrupting the memory it was trying to read, and the
+    symptom was that turning hops on destroyed the 1-hop case that already
+    worked. Four probes, two refuted hypotheses and a real instrument fix went
+    past before this was found, because every one of them measured RETRIEVAL and
+    the damage was in the WRITE.
+
+    The invariant, stated so it cannot come back: **hops changes what is read,
+    never what is written.**
+    """
+
+    def test_the_store_is_identical_at_every_hop_count(self):
+        stores = {}
+        for hops in (1, 2, 3):
+            model = LocalAssociativeMemory(config(hops=hops))
+            model.wo[:] = model.wv
+            written = []
+
+            inner = model.retrieval
+
+            class Watch:
+                def begin(self, width):
+                    return inner.begin(width)
+
+                def read(self, readable, key):
+                    return inner.read(readable, key)
+
+                def observe(self, store, key, value, commitment):
+                    written.append(np.array(key))
+                    return inner.observe(store, key, value, commitment)
+
+            model.retrieval = Watch()
+            model.run(np.asarray(TOKENS), learn=False)
+            stores[hops] = written
+
+        for hops in (2, 3):
+            with self.subTest(hops=hops):
+                self.assertEqual(len(stores[hops]), len(stores[1]))
+                for one, many in zip(stores[1], stores[hops]):
+                    np.testing.assert_allclose(one, many, atol=1e-12)
+
+
 class TheDecodeIsActuallySharpened(unittest.TestCase):
 
     def test_a_flat_decode_produces_the_mean_key(self):

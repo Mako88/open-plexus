@@ -853,6 +853,18 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   it is going, and do not edit source while it is going either — it restores
   from what it read at the start.
 
+  **Do not `git add` or commit while it runs.** Staging reads the working tree,
+  so a commit made mid-run can capture a live mutation — the same failure as
+  `3634a23` shipping `rank = strength`, arrived at from the other direction.
+  Wait for it, then `--verify`, then stage.
+
+  **Renaming a variable can make a mutation stale, and stale is not caught.**
+  Repointing `key` to `hop_key` left `the-hop-re-encodes-into-value-space`
+  targeting text that no longer existed; the run reported `65/66 caught` and
+  named the one it could not apply. A mutation that cannot be applied is not a
+  passing mutation — it is a claim nothing is checking, which is what `--verify`
+  exists to surface. Re-point it in the same commit as the rename.
+
   > *Calibration.* A background `--changed` was left running while a full suite
   > ran against the same tree. It reported **7 failures in `test_reward_gate`**,
   > none of them real and none of them in the files being changed. A second run

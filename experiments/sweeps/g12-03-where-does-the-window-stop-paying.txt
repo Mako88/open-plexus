@@ -2,7 +2,13 @@ Where does the asynchrony window stop paying?
 =============================================
 
 Script: testbed/run.py, real containers, `tc netem` on the link
-Status: DISPATCHED, awaiting results.
+Status: RUN, 15 of 15 cells, run 30335087486.
+
+ANSWER: **The grid does not contain its answer either, and the reason is a
+        constant nobody varied.** Every run is 40 steps, so a window of 64 does
+        not bind at all -- it is the no-synchronisation limit wearing a window
+        setting. The curve was walking off the end of its own axis. Usable
+        figure: window 16 is worth 11.97x over lock-step, agreeing exactly.
 
 
 IN PLAIN TERMS
@@ -94,4 +100,28 @@ Named impairment, not ambient randomness.
 
 THE NUMBERS
 ------------
-Awaiting the run.
+                       w=1        w=8       w=16       w=32       w=64
+    80ms/20ms/2%   0.11865    0.01779    0.00991    0.01479    0.00571
+                  +/-.0065   +/-.0021   +/-.0007   +/-.0038   +/-.0005
+
+    w1->w8 6.67x   w1->w16 11.97x   w1->w32 8.02x   w1->w64 20.77x
+
+P1 confirmed: all 15 agree, including at window 64.
+P4 confirmed: window 1 at 0.11865 +/- 0.00654 against g12-01's 0.12411 +/-
+   0.00570, overlapping, so the harness has not moved.
+P2 and P3 REFUTED for the second time -- no flattening, and not even monotone,
+   with window 32 worse than window 16 by more than 16's error bar.
+
+THE CAUSE IS A CONSTANT I NEVER VARIED. Every run in this line is 40 steps, and
+a window is how far ahead a node may run before it must have heard. Once the
+window exceeds the run length it stops binding: window 64 on a 40-step run is
+the NO-SYNCHRONISATION limit, not a window setting. The top of the grid measures
+a different experiment, and window 32 sitting between them, noisy and
+non-monotone, is what a barely-binding cell looks like.
+
+CLAUDE.md says it: a variable that never changes does not look like a variable,
+it looks like the background. `steps` has been 40 in every window measurement
+this project has made, note 014 included.
+
+NO THIRD WIDENING, per the pre-registered reading and rule 17: a measurement
+revised twice is no longer the bottleneck. Scored in full in decision 82.

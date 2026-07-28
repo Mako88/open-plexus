@@ -3863,3 +3863,75 @@ key that expanded to empty in all 18 cells, then a `verdict` function that
 failed a churn run for behaving correctly. Neither told us anything about C3.
 Both are now caught by a check or a test rather than by my remembering, which is
 the only reason the count stops at three.
+
+---
+
+## 82. The window sweep ran into a constant nobody varied, twice
+
+g12-03 was the correction to g12-01's grid not containing its own answer. **It
+does not contain its answer either**, and this time the reason is more
+instructive than the numbers. 15 of 15 cells, run `30335087486`:
+
+                       w=1        w=8       w=16       w=32       w=64
+    80ms/20ms/2%   0.11865    0.01779    0.00991    0.01479    0.00571
+                  +/-.0065   +/-.0021   +/-.0007   +/-.0038   +/-.0005
+
+    w1 -> w8  6.67x    w1 -> w16  11.97x    w1 -> w32  8.02x    w1 -> w64  20.77x
+
+**P1 confirmed** — all 15 agree, including at window 64. Reassembly by step index
+holds however far ahead a node runs.
+
+**P4 confirmed** — window 1 measures 0.11865 +/- 0.00654 against g12-01's
+0.12411 +/- 0.00570. Overlapping, so the harness has not moved.
+
+**P2 and P3 refuted, for the second time.** The curve does not flatten. It is
+also not monotone: window 32 is WORSE than window 16, by more than window 16's
+error bar.
+
+### The cause is a constant I never varied
+
+**Every run in this line is 40 steps.** The window is how far ahead a node may
+run before it must have heard — so **once the window exceeds the run length it
+stops binding at all.** Window 64 on a 40-step run is not a window setting. It is
+the no-synchronisation limit wearing one.
+
+    window   1  binds
+    window   8  binds
+    window  16  binds
+    window  32  binds, barely
+    window  64  EXCEEDS THE RUN
+
+So the top of the grid measures something else entirely, and the "still
+improving at 64" that refuted P2 is the curve walking off the end of its own
+axis into a different experiment. Window 32 sitting between them, noisy and
+non-monotone, is what a barely-binding cell looks like.
+
+**This is CLAUDE.md's own rule and I did not apply it:** *a variable that never
+changes does not look like a variable, it looks like the background.* `steps` has
+been 40 in every window measurement this project has made, including note 014's.
+I widened the window axis twice without once asking what it was widening
+against.
+
+### What the honest reading is
+
+I pre-registered it, so it stands: *"If P2 fails again, the honest reading is not
+'use an even bigger window'. It is that the model work here is so small the
+window is bounded by something other than the link, and this sweep should stop
+chasing it."*
+
+That is what happened, and the something is the run length.
+
+**The right quantity is not where the curve flattens.** It is what fraction of
+the no-synchronisation limit a given window achieves — because that limit is what
+the curve is approaching, and it is reachable trivially by setting the window
+above the run. Reframed that way, window 16 gets to 58% of the unsynchronised
+speed while still requiring a node to have heard within 16 steps.
+
+**No third widening.** A fourth sweep on this axis would be the measurement
+revised three times that rule 17 says to stop making: *"a measurement revised
+twice is no longer the bottleneck. Publish the bound, name the caveat as
+permanent, and move."*
+
+The usable figures: **window 16 is worth 11.97x over lock-step on an 80 ms link
+losing 2%**, agreeing exactly, at a 40-step run. That is the number to quote,
+with the run length stated beside it because it is part of the measurement.

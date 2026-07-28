@@ -68,6 +68,46 @@ depth-1 perfectly and depth-2 at 0.547 — because the available signal separate
   learning recovers **+0.008** against ~0.047 lost — churn costs *capacity*, and
   capacity is not something learning rebuilds. The two are independent.
 
+## What is actually known about SCALE and communication
+
+Asked on 2026-07-28 and answered from existing evidence rather than new
+measurement — but the first answer given was **wrong** and worth recording so it
+is not re-derived.
+
+**The wrong answer.** Reading `parts.sum(0)` in the numpy reference and
+concluding each node ships a vocabulary-sized vector per token: ~205 MB per
+token at 1024 nodes, apparently a showstopper. That is not what the distributed
+implementation sends.
+
+**What `openplexus/distributed.py` actually puts on the wire:**
+
+    token broadcast to all nodes            5 bytes
+    each node's reply, combine="vote"       8 bytes  (step + its argmax)
+    per answered position, 1024 nodes      ~8 KB
+
+**~25,000× less.** A node's readout spans the whole vocabulary from its own
+slice, so its argmax is a *complete opinion*, not a fragment — which is why four
+bytes is legitimate rather than lossy.
+
+**g4-01 measured that the pooling is optional** (pooled / one group alone):
+
+    seq_len 96, width 128     P=4  1.000 / 0.996     P=8  1.000 / 0.949
+
+**And it gives the real scaling constraint, which is DIMENSIONS PER NODE, not
+node count:**
+
+    16 dims/node → lone node 0.949
+     8 dims/node → lone node 0.681
+     4 dims/node → lone node 0.412
+
+Below ~16 dimensions a node stops having a standalone opinion, so **nodes ≈
+width ÷ 16**. At width 8192 that is ~512 nodes and ~410M learned parameters —
+GPT-2-large scale, *not* frontier scale. Frontier needs ~65k nodes at width 1M.
+
+**Still open:** g4-01 was MQAR, width ≤128, no hops. Hops multiply the reads.
+So "the reduction is affordable" holds for the regime tested and is
+extrapolation outside it.
+
 ## The sharpest thing to know, from decisions 89 and 92 together
 
     over DEPTH        generalises ZERO-SHOT to a depth never trained on (0.992)

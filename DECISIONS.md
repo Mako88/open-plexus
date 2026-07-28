@@ -4887,3 +4887,86 @@ Nor is ~0.40 good. It clears the 0.125 floor comfortably and no longer rots, but
 answer-only training still reaches 1.000. **The gap between a marked question
 and an unmarked stream is still most of the problem**, and this decision only
 shows that the gap stops widening.
+
+## 99. A typed-relation task, three defects found by reading it, and a floor of 0.546
+
+`openplexus/tasks/kinship.py`, modelled on
+[CLUTRR](https://arxiv.org/abs/1908.06177). **Not CLUTRR** — its rules, not its
+dataset, and a number here is not a CLUTRR score.
+
+### Why a second task at all
+
+`chains.py` is **pure transitive chaining**: `a -> b -> c` means the answer is
+`c`, and following an edge is the whole operation. Decision 92's zero-shot depth
+generalisation is real but it is generalisation over *how many times to repeat
+one operation*.
+
+Kinship is not that. `mother` of `brother` is `mother`; `mother` of `mother` is
+`grandmother`. **Composition is a lookup in a table the model must learn**, so
+two paths of equal length compose to different relations. A model can be perfect
+at "follow the arrow k times" and have no way to represent that.
+
+### Three defects, all found by generating sequences and reading them
+
+The habit that caught every chain-task defect, applied before any test existed.
+
+1. **A distractor stated the asked pair directly in 7.0% of sequences.** One in
+   three hundred handed over the answer; the rest **contradicted** it, making
+   the task inconsistent rather than merely easier.
+2. **Three-hop paths could not be generated.** Only 24 of 256 relation pairs
+   compose, so rejection sampling raised "no 3-hop path composes" on an ordinary
+   seed — the generator failing, not the depth being impossible. Paths are
+   constructed by walking the table now.
+3. **The floor was wrong.** 1/16 = 0.062 was assumed; the majority-class
+   strategy actually scores 0.080, 0.108, 0.150 at one, two and three hops,
+   because composition contracts the answer space (16 → 12 → 8 reachable
+   relations).
+
+### G0: the QUESTION ORDER decides whether the task is addressable at all
+
+    hops 1 (floor 0.090)        hops 2 (floor 0.130)
+      object last    0.020        object last    0.027
+      subject last   0.700        subject last   0.407
+
+**0.020 against 0.700 on the same task.** This store binds adjacent pairs, so
+the retrieval key at the scored position is whichever person the question block
+ends with. End it with the object and the model is keyed on the wrong token and
+cannot address the task at all. That is a free choice of the task presenting
+itself as a model failure, and measuring only one order would have recorded it
+as one.
+
+**G0 passes at one hop**: 0.700 against 0.090.
+
+### But two hops demonstrates NO composition, and the reason is my rule table
+
+    majority floor (no information)      0.130
+    best guess from the FIRST relation   0.546
+    a one-hop model actually scored      0.407
+    distinct answers per first relation  2, 2, 2, 2, 2, 2
+
+**Every first relation admits exactly two answers.** `mother` of anything in
+this table is `grandmother` or `mother`. So the second relation barely matters,
+the prefix nearly determines the answer, and 0.407 sits *below* what guessing
+from the prefix is worth — the one-hop model's score is fully explained by a
+shortcut and shows no composition whatever.
+
+That is a property of `COMPOSE` being small and regular (16 relations, 24
+rules); CLUTRR's larger inventory weakens the same shortcut.
+
+### What this licenses
+
+**The floor for any composition claim on this task is `shortcut_floor` —
+0.546 — not `majority_floor`.** Raising the floor is the honest response to a
+leak that cannot be cheaply removed, and the three floors are asserted in strict
+order so the weak one cannot be quoted by accident. g8-01's seq-1536 row was
+withdrawn for exactly that mistake.
+
+### What it does NOT license
+
+Any statement about whether this model can compose typed relations. **That has
+not been measured** — 0.407 is below the floor that matters. The instrument
+exists and is honest about its own ceiling; the experiment comes next.
+
+Enriching the rule table would raise the ceiling and is the obvious improvement,
+but inventing kinship rules risks encoding ones that are wrong, which is a worse
+failure than a stated-and-bounded shortcut.

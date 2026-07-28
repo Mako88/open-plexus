@@ -1,0 +1,99 @@
+name: sweep-g11-07-what-is-actually-best-now
+
+# THE RE-VALIDATION, AS A GRID RATHER THAN A STREAM OF SURPRISES.
+#
+# Decision 74: every number in this project's comparison set was measured beside
+# a LINEAR readout. Decision 75 put a composed one in the model. Decision 76 was
+# the first re-check and it moved a headline result -- the exact cache's
+# advantage at equal state fell from 0.236 bits to 0.060.
+#
+# Re-checking one mechanism at a time produces a stream of surprises. This
+# produces a table.
+#
+# THE REFUTED MECHANISMS ARE IN THE GRID ON PURPOSE. `pair` keys were measured
+# 0.23 worse and `settle2` was refuted at 0.924 -> 0.128, both against a linear
+# readout. A mechanism refuted for adding information a linear map could not use
+# is not refuted for a readout that can, and leaving them out would re-validate
+# only the half of the record that currently looks good.
+#
+# PREDICTIONS (full text and refutation conditions in the sweep file):
+#   P1  identity: dense/plain/linear lands near 5.53 at 60k characters
+#   P2  the readout dominates: hidden128 wins at EVERY keys x retrieval cell
+#   P3  the cache shrinks everywhere under hidden128
+#   P4  the sparse crossover replicates -- sparse4 wins under linear, loses
+#       under hidden128
+#   P5  PAIR KEYS RECOVER at least partly. The open one, and the reason the
+#       refuted arms are here: a pair key's ceiling is a trigram, so it carries
+#       MORE information, and losing while carrying more information is exactly
+#       what a linear readout would produce.
+#
+# COST, from the most expensive cell and using the 7.6x local-to-runner factor
+# MEASURED on g11-06 rather than guessed. Locally at 60,000 characters:
+# dense/plain/linear 18.1 s, pair/cache128/hidden128 45.4 s. So the worst cell is
+# ~6 minutes of wall clock against a 300-minute timeout, and the whole matrix is
+# about 18 minutes of local-equivalent job time -- less than the ONE g11-06 cell
+# that ran for 190 minutes, for an answer about eighteen combinations.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweeps
+  cancel-in-progress: false
+
+jobs:
+  combinations:
+    strategy:
+      fail-fast: false
+      matrix:
+        keys: [dense, sparse4, pair]
+        retrieval: [plain, cache128, settle2]
+        readout: [linear, hidden128]
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: ${{ matrix.keys }} / ${{ matrix.retrieval }} / ${{ matrix.readout }}
+        run: python experiments/g11_04_scaling_exponent.py --corpus shakespeare --width 64 --chars 60000 --scale 128 --workers 2 --components "keys=${{ matrix.keys }},retrieval=${{ matrix.retrieval }},readout=${{ matrix.readout }}" --json out/X-${{ matrix.keys }}-${{ matrix.retrieval }}-${{ matrix.readout }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g11-07-${{ matrix.keys }}-${{ matrix.retrieval }}-${{ matrix.readout }}
+          path: out/*.json
+
+  aggregate:
+    needs: [combinations]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g11-07-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 18" | tee summary.txt
+          python -m tools.summarise_g11_07 | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g11-07-summary
+          path: |
+            summary.txt
+            out/*.json

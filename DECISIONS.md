@@ -3198,3 +3198,59 @@ between two passes and one is exactly the kind of thing that has swallowed a
 result here before. **The next measurement is single-pass**, and it should be
 prequential — predict, then learn, score what was predicted — because a
 train/test split measures a system that stops.
+
+---
+
+## 72. 4.540 bits, prequential, single pass, no temperature — past the unigram
+
+The strictest regime this project has measured in, and the best number it has
+produced.
+
+    PREQUENTIAL, one pass, no split, no temperature calibration
+             arm     lr   whole stream   last 20%
+          linear    0.5          5.183      5.174
+     2-layer 128    0.2          4.572      4.540
+
+    unigram 4.829   bigram 3.583   backprop attention ~4.05 (on a split)
+
+**Every character is scored by a model that has not seen it, and then becomes
+training data.** No held-out set, no second pass, and no temperature — the
+model's usual temperature is fitted on text it has not reached, which C4
+forbids, so the readout learns its own scale instead. All three choices make the
+number harder to achieve, not easier.
+
+**4.540 beats the unigram at 4.829.** `HANDOFF.md` has carried
+`<- WE STILL LOSE TO THIS` against that line for months; it is removed.
+
+Composition is worth **0.63 bits** here — larger than in any other regime tested,
+and larger than the exact cache (0.19) and sparse keys (0.15) combined.
+
+### The question C4 actually asks, and the answer is not yet yes
+
+Whole-stream against last-20% is the cheap test of whether a learner is still
+learning:
+
+    linear     5.183 -> 5.174    improved 0.009 over the stream
+    2-layer    4.572 -> 4.540    improved 0.032
+
+**Both are close to converged.** The composed arm is improving about three and a
+half times faster at the tail, which is a direction rather than a result. So the
+honest statement is: **composition converges LOWER and slightly LATER — it is not
+yet a system that keeps learning.**
+
+That is the distinction C4 makes load-bearing. A perpetual learner that settles
+on a better constant is still a settled system, and this one settles.
+
+### What that leaves
+
+The gains are now stacked in the right order and each is measured in the
+deployed regime: composed readout (0.63), sparse keys (0.15, and they also
+resist forgetting, which C4 makes matter), exact cache (0.19 but at 5x the
+state). None of them has produced a learner that does not converge.
+
+**The open question is the step size**, and it is the same one decision 71 raised
+from the learning-rate column: the best rate falls as data grows, and under C4
+there is no end of training at which to anneal. A learner whose step size decays
+to nothing has stopped, whatever its architecture. Note 036's item 3 — scale a
+step size to its own estimator's variance — is the only unexplored entry on the
+literature scan, and it is now pointed at directly by two independent results.

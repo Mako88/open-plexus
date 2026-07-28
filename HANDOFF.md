@@ -39,7 +39,8 @@ gap to the baselines. That was the last one available.
     uniform                        6.000 bits/char
     OUR MODEL, width 128           5.494
     OUR MODEL + exact cache        5.311   (width 128, 128 slots)
-    unigram (letter frequency)     4.829   <- WE STILL LOSE TO THIS
+    unigram (letter frequency)     4.829   <- BEATEN, see below
+    2-LAYER READOUT, prequential   4.540   single pass, no split, no temperature
     backprop attention, width 16   4.197   (our own baseline, ~10k params)
     bigram                         3.583
     trigram                        2.951

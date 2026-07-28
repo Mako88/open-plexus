@@ -652,6 +652,33 @@ MUTATIONS = [
         new='                    through = np.einsum("gv,vgh->gh", error.sum(0, keepdims=True) + 0*error, self.grouped_wo)',
     ),
     Mutation(
+        name="the-hop-decode-is-never-sharpened",
+        breaks="the re-encode, and this is the bug that actually happened. "
+               "Without the standardisation the decode's logits are so flat "
+               "the softmax is UNIFORM -- measured entropy 3.912 against "
+               "log(50) = 3.912 -- so `weights @ wk` is the mean of every key "
+               "row: the same constant vector no matter what was decoded. The "
+               "decode itself stays correct (argmax finds the intermediate "
+               "1.000 of the time), so nothing looks broken and every hop "
+               "silently lands in the same wrong place",
+        path=LOCAL,
+        old="                    pooled = ((pooled - pooled.mean()) / spread\n"
+            "                              * self.config.hop_sharpness)",
+        new="                    pooled = (pooled - pooled.mean()) / spread",
+    ),
+    Mutation(
+        name="the-hop-re-encodes-into-value-space",
+        breaks="the whole point of decode-and-re-encode. A retrieval lives in "
+               "VALUE space and the next hop needs a KEY: for token c a "
+               "retrieval gives about wv[c] and the next lookup needs wk[c], "
+               "which is a different random vector. Feeding values back would "
+               "still produce a plausible vector of the right shape, and every "
+               "hop would look like it was running",
+        path=LOCAL,
+        old="                key = weights @ self.wk",
+        new="                key = weights @ self.wv",
+    ),
+    Mutation(
         name="a-workers-refusal-hangs-the-pool",
         breaks="every fail-fast guard in the project, in the configuration "
                "sweeps actually run in -- SystemExit is a BaseException, so a "

@@ -3992,3 +3992,98 @@ The hop axis is a valid instrument. One hop is a known-good positive control,
 two hops is a known-zero with a diagnosed cause, and anything between them is
 measurable. That is what note 038 said had to exist before the mechanism was
 worth writing, and it now does.
+
+## 84. The hop mechanism is built, and the instrument it was built for is contaminated
+
+Decode-and-re-encode is implemented: a hop decodes its retrieval to a token
+distribution and re-encodes it as a key, using `Wo`/`Wv` and `Wk`, which already
+exist. **No new parameters.** `hops=1` is the default and every golden value is
+bit-identical, so nothing earlier moved.
+
+It does not work yet, and the reason is not in the mechanism.
+
+### One real bug, found by measuring instead of reasoning
+
+First attempt scored 0.000 at two hops, and `task=1, model=2` fell from **1.000
+to 0.005** — the extra hop destroyed the case that already worked, which was
+pre-registered as disqualifying. The diagnosis:
+
+    frozen decoder  (wv @ r) finds the intermediate : 1.000
+    learned readout (wo @ r) finds the intermediate : 1.000
+    softmax entropy                                 : 3.912
+    uniform would be                                : 3.912
+
+**The decode was right and the re-encode threw it away.** argmax found the
+intermediate every time, and the softmax over those logits was uniform to three
+decimals because top-1 beat top-2 by 0.0388. `weights @ wk` on a flat weight
+vector is the *mean of every key row* — one constant vector regardless of what
+was decoded.
+
+Fixed by standardising the logits before the softmax rather than by tuning a
+temperature. The logit scale moves with `key_scale`, `d_model`, `decay` and
+`memory_cap`, so a constant would have worked in this cell and failed silently
+elsewhere — decision 74 again. `hop_sharpness=0` reproduces 0.000 exactly, which
+is what makes the fix a claim rather than a coincidence.
+
+It bought 0.000 → **0.035**. Real, and nowhere near the 0.250 floor.
+
+### Two hypotheses of mine, both refuted, both by the same method
+
+**"The readout is dragged off decoding by the answer gradient."** Refuted. A
+`hop_decoder` axis between the learned `Wo` and the frozen `Wv` transpose is a
+null: 0.030 vs 0.035. Worth recording that the first probe appeared to refute
+this too but did not — it trained at `hops=1`, which is not the regime where the
+drag could happen. A refutation from the wrong regime is not a refutation.
+
+**"Sharpness needs tuning."** Refuted. 2.0 / 6.0 / 12.0 / 30.0 all sit at
+0.01–0.04, and 30.0 is effectively argmax.
+
+### Where it actually fails: a four-rung bisection
+
+    A  real mechanism            0.035
+    B  oracle KEY for hop 2      0.100
+    C  oracle VALUE for hop 2    1.000
+    D  one hop, want b           1.000
+
+**C is 1.000.** Handed the correct value vector, the readout produces the answer
+perfectly — so the readout, the training budget and everything downstream of
+retrieval are fine. The failure is entirely in the **second lookup**, and an
+oracle is an upper bound on every proposal that shares it.
+
+### The cause, and it is the instrument
+
+Retrieving with the exact `wk[b]`:
+
+    rank 0 in 54.0% of sequences
+    FIRST:   c (THE ANSWER) 54.0%   SEPARATOR 39.5%
+    SECOND:  SEPARATOR      45.0%   c (THE ANSWER) 44.5%
+
+**The separator competes with the answer for the same key.** Stating each link
+as its own triple makes `b` appear twice — once as a target followed by the next
+`sep`, once as a source followed by `c` — so `key(b)` carries two bindings and
+the store returns their sum. `a` is never anyone's target, which is exactly why
+one hop scores 1.000 and two hops collapse.
+
+**This is decision 82's shape and the false-link bug's shape at once.** The
+separator was introduced to fix the false-link defect and it created a second
+one, and `test_no_false_chain_link_is_ever_stated` cannot see it: that test only
+inspects pairs where *both* tokens are chain symbols, so the separator is exempt
+by construction. The guard has a hole exactly where the new defect lives.
+
+### What this licenses
+
+The fix is forced, not chosen. A key with two bindings returns their sum — that
+is what a superposed store *is*, not a defect in it. So `b` must appear once,
+which means chains must be laid down contiguously (`sep a b c`) with separators
+between *chains* rather than between links. That also restores the no-false-link
+property, since chain-internal adjacencies are all real links.
+
+It costs something and the cost should be stated: contiguity fixes the offset
+from the query symbol to the answer at exactly `hops`. This model has no
+positional access so it cannot exploit that, but the instrument would need
+interleaving before it could be pointed at a positional model. Contiguity and
+shuffling trade off directly — if `b` appears twice the bindings compete, and if
+it appears once the offset is constant.
+
+**No hop number from before this fix means anything**, including the 0.035. The
+mechanism has not yet been measured on an uncontaminated instrument.

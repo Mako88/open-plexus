@@ -825,6 +825,27 @@ class LocalMemoryConfig:
     #: THROUGH THE GROUP'S OWN TWO MATRICES, which is the same locality the
     #: delta rule beside it already has.
     hidden: int = 0
+    #: Retrievals chained before the readout reads. 1 is the current behaviour.
+    #:
+    #: The model performs exactly ONE hop and stops: on the chain task at two
+    #: hops it answers the intermediate 100% of the time (decision 83). Each
+    #: extra hop decodes the retrieval to a token distribution and re-encodes it
+    #: as a key, which needs no new parameters.
+    hops: int = 1
+
+    #: How sharply a hop's decode is read before it is re-encoded as a key.
+    #:
+    #: Applied to logits standardised to unit spread, so it means the same
+    #: thing regardless of `key_scale`, `d_model`, `decay` or `memory_cap`. 0
+    #: is a uniform decode -- which is what the unsharpened hop was doing by
+    #: accident -- and large approaches argmax. Only read when `hops > 1`.
+    hop_sharpness: float = 6.0
+
+    #: Which matrix turns a hop's retrieval back into a token distribution.
+    #:
+    #: ``"encoder"`` uses the transpose of the frozen `Wv`; ``"readout"`` reuses
+    #: the learned `Wo`. Only read when `hops > 1`.
+    hop_decoder: str = "encoder"
     cache_slots: int = 0
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
@@ -844,6 +865,18 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if self.hop_decoder not in ("encoder", "readout"):
+            raise ValueError(
+                "hop_decoder must be 'encoder' or 'readout', not "
+                f"{self.hop_decoder!r}")
+        if self.hop_sharpness < 0.0:
+            raise ValueError(
+                "hop_sharpness is a softmax gain and cannot be negative; "
+                "a negative gain decodes to the LEAST likely token")
+        if self.hops < 1:
+            raise ValueError(
+                "hops is a number of retrievals and must be at least 1; "
+                "1 is the single-retrieval behaviour every earlier result used")
         if self.hidden < 0:
             raise ValueError("hidden is a layer width and cannot be negative")
         if self.hidden and self.d_model % self.partitions:
@@ -1691,6 +1724,74 @@ class LocalAssociativeMemory:
             # shadowing it silently turned `if wrote:` into an array test.
             readable = memory if lasting is None else memory + lasting
             retrieved = self.retrieval.read(readable, key)
+            for _ in range(self.config.hops - 1):
+                # DECODE AND RE-ENCODE, which is how a retrieval becomes a key.
+                #
+                # `retrieved` lives in VALUE space and keys live in KEY space:
+                # for token c a retrieval gives about `wv[c]` and the next hop
+                # needs `wk[c]`, which are different random vectors. They cannot
+                # simply be fed back.
+                #
+                # So decode to a distribution over tokens and re-encode that
+                # distribution as a key. **No new parameters** -- it uses `Wo`
+                # and the key source, both of which already exist. Tying
+                # `Wk = Wv` would be one line and changes the model everywhere;
+                # learning a value-to-key map adds parameters, and decision 65
+                # measured a trained projection collapsing the rank and costing
+                # 0.45 bits.
+                #
+                # Each group decodes from its own slice and the votes are then
+                # POOLED ACROSS GROUPS, which is one vector of `vocab` numbers
+                # per hop -- the same shape and the same crossing that
+                # `parts.sum(0)` already makes at the readout, not a new one.
+                # Whether that sum is affordable over the internet is the first
+                # of the four approved un-constraints in BACKLOG, and a hop
+                # makes it cost `hops` times as much.
+                # WHICH MATRIX DECODES. `readout` reuses `Wo`, which is also
+                # what produces the answer -- and at `hops > 1` the answer
+                # gradient flows through it, pulling it toward emitting the
+                # FINAL token exactly where the hop needs the INTERMEDIATE one.
+                # `encoder` uses the transpose of the frozen `Wv` instead: `Wv`
+                # encodes token to value, so it decodes value to token, and
+                # being frozen nothing can drag it off that job. Neither adds a
+                # parameter. Both are kept because which one wins is a property
+                # of the configuration (decision 74) and this is the axis that
+                # measures it.
+                if self.config.hop_decoder == "encoder":
+                    pooled = self.wv @ retrieved
+                else:
+                    scores = np.einsum("vgd,gd->gv", self.grouped_wo,
+                                       retrieved.reshape(groups, -1))
+                    pooled = scores.sum(0)
+
+                # SHARPEN, SCALE-FREE. Measured before this line existed: the
+                # decode is RIGHT -- argmax finds the intermediate token 1.000
+                # of the time, trained or untrained -- and the softmax over it
+                # was UNIFORM to three decimals (entropy 3.912 against log(50)
+                # = 3.912), because top-1 beat top-2 by 0.0388. A flat weight
+                # vector makes `weights @ wk` the mean of every key row: noise
+                # wearing a key. The hop was throwing away a correct decode.
+                #
+                # Standardised rather than given a temperature constant. The
+                # logit scale moves with `key_scale`, `d_model`, `decay` and
+                # `memory_cap`, so a tuned constant would work here and fail
+                # silently when any of those changed -- decision 74's pattern,
+                # where a mechanism's effect is a property of the configuration.
+                # Dividing by the spread makes the sharpness mean the same
+                # thing in every cell.
+                spread = float(pooled.std())
+                if spread > 0.0:
+                    pooled = ((pooled - pooled.mean()) / spread
+                              * self.config.hop_sharpness)
+                pooled = pooled - pooled.max()
+                weights = np.exp(pooled)
+                weights /= weights.sum()
+                # SOFT rather than argmax: a hard decode gives the next hop no
+                # gradient of confidence, so a wrong first hop is silently
+                # asserted rather than hedged. `hop_sharpness` is the dial
+                # between the two, and high enough approaches argmax.
+                key = weights @ self.wk
+                retrieved = self.retrieval.read(readable, key)
             sliced = retrieved.reshape(groups, -1)
             if self.hidden_w is None:
                 parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)

@@ -847,6 +847,40 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   run edits the source for twenty minutes and every experiment refuses to run
   while it does.
 
+  **Mutation testing takes the tree EXCLUSIVELY.** It edits source in place,
+  mutation by mutation, so anything else running against the repo meanwhile
+  reads a mutated file. Do not start a test run, an experiment or a probe while
+  it is going, and do not edit source while it is going either — it restores
+  from what it read at the start.
+
+  > *Calibration.* A background `--changed` was left running while a full suite
+  > ran against the same tree. It reported **7 failures in `test_reward_gate`**,
+  > none of them real and none of them in the files being changed. A second run
+  > reported 3, a different set — the tell was that the failures moved.
+  > Phantom failures cost more than the serialised wait: they look exactly like
+  > a regression in code nobody touched.
+
+  **And if it is killed, `--verify` before anything else.** A mutation is live
+  on disk between the edit and the restore, so an interrupted run leaves one
+  there. Killing a stale `--changed` left `the-candidates-are-listed-backwards`
+  applied in `local_memory.py` — a `reversed(pending)` that changes no length,
+  no count and no magnitude. `--verify` names the mutation and the file, and the
+  fix is to apply the entry's `new` → `old` swap by hand.
+
+  **Stopping the background TASK does not stop the harness.** It kills the shell
+  wrapper and leaves the Python process running, still editing source. The tell
+  is `.mutate.lock`: the harness holds it and a second run refuses with the live
+  pid, which is the only reason this was noticed rather than committed. Confirm
+  with `tasklist //FI "PID eq <pid>"`, kill with `taskkill //F //PID <pid>`,
+  then delete the lock and `--verify`. Two full check runs happened against a
+  tree that process was still mutating, and both passed — passing under a live
+  harness is luck, not evidence.
+
+  > *Note.* `mutate.py` exits **1** on a lock refusal, correctly. It looked like
+  > 0 because the invocation ended in `| tail`, which is the same masking the
+  > workflows were fixed for. `set -o pipefail` applies to local shell
+  > invocations too, not just CI.
+
   **`--verify` comes first and takes a second.** It asserts every mutation’s
   ORIGINAL text is present, which is the only check that catches the source on
   disk not being the source anyone means. Commit `3634a23` shipped

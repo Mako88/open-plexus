@@ -63,10 +63,10 @@ class TheTaskIsNotSecretlySolvable(unittest.TestCase):
     def test_no_false_chain_link_is_ever_stated(self):
         """**The defect this file exists for.** Every adjacent pair of two chain
         symbols must be a link some chain contains. Without the separator,
-        laying links end to end states a link at every boundary."""
+        laying chains end to end states a link at every boundary."""
         for hops in (1, 2, 3):
             config = ChainConfig(n_chains=4, hops=hops, n_symbols=40,
-                                 seq_len=hops * 16 + 16, seed=3)
+                                 seq_len=hops * 16 + 24, seed=3)
             for sequence in dataset(config, 25):
                 symbols = {s for chain in sequence.chains for s in chain}
                 false = {pair for pair in adjacent_pairs(sequence)
@@ -74,6 +74,39 @@ class TheTaskIsNotSecretlySolvable(unittest.TestCase):
                 false -= stated_links(sequence, hops)
                 with self.subTest(hops=hops):
                     self.assertEqual(false, set())
+
+    def test_a_hop_source_is_followed_by_exactly_one_token_ever(self):
+        """**The hole in the test above, and the defect that hid in it.**
+
+        That test exempts any pair involving a non-chain token, so a chain
+        symbol binding to the SEPARATOR was invisible to it. Decision 84
+        measured the consequence: with links stated one at a time, an
+        intermediate symbol appeared twice — once as a target followed by the
+        next separator, once as a source followed by its real successor — and a
+        superposed store returned the sum. Retrieving with the exact key put the
+        answer first only 54% of the time, against the separator at 39.5%.
+
+        The property with no exemption: **a symbol that a hop must pass through
+        is followed by exactly one distinct token in the entire presentation.**
+        Not "one chain symbol" — one token, separators and filler included,
+        because the store does not know which tokens are scaffolding.
+
+        Chain-FINAL symbols are excluded: nothing hops out of them, so their
+        binding to whatever follows competes with nothing.
+        """
+        for hops in (2, 3, 4):
+            config = ChainConfig(n_chains=4, hops=hops, n_symbols=40,
+                                 seq_len=hops * 16 + 24, seed=13)
+            for sequence in dataset(config, 25):
+                body = sequence.tokens[:sequence.answer_position - 1]
+                successors: dict[int, set[int]] = {}
+                for first, second in zip(body, body[1:]):
+                    successors.setdefault(first, set()).add(second)
+                for chain in sequence.chains:
+                    for symbol in chain[:-1]:
+                        with self.subTest(hops=hops, symbol=symbol):
+                            self.assertEqual(len(successors.get(symbol, set())),
+                                             1)
 
     def test_filler_never_uses_a_chain_symbol(self):
         """The MQAR filler bug exactly: filler drawn from the whole alphabet

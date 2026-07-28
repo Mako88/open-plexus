@@ -8,11 +8,16 @@ structure worth borrowing — entities, relations, and **train on short chains,
 test on longer ones** — without its natural-language layer, which the authors'
 own result says a symbolic model does better without.
 
-A sequence states links and then asks one question:
+A sequence states chains and then asks one question:
 
-    a1 -> b1    b1 -> c1    a2 -> b2    b2 -> c2   ...   ? a1    c1
+    | a2 b2 c2    | a1 b1 c1    | a3 b3 c3   ...   ? a1    c1
 
-with `hops = 2`. At `hops = 1` the question is `? a1` answered by `b1`, which is
+with `hops = 2`, where `|` is the separator. Each chain is contiguous and the
+CHAIN ORDER is shuffled; see `separator_token` for why stating each link
+separately instead — which was the first design — makes the task unanswerable
+for reasons that look like a model limitation.
+
+At `hops = 1` the question is `? a1` answered by `b1`, which is
 plain cued recall — the thing MQAR already measures and this model demonstrably
 does.
 
@@ -77,18 +82,45 @@ class ChainConfig:
 
     @property
     def separator_token(self) -> int:
-        """Sits between links so that laying them end to end states no link
+        """Sits between CHAINS so that laying them end to end states no link
         that was not intended.
 
-        **This store binds every ADJACENT PAIR.** Writing links as bare pairs
-        `a b c d` also states `b -> c`, which is a link no chain contains — and
-        with one boundary per link the sequence carries as many false links as
-        true ones. Found by generating one sequence and reading it, which is the
-        habit the MQAR filler bug bought: there a filler token could equal a
-        query token and made the task IMPOSSIBLE rather than hard.
+        **This store binds every ADJACENT PAIR.** Writing chains as bare
+        symbols `a b c d` also states `c -> d` across a chain boundary, which is
+        a link no chain contains. Found by generating one sequence and reading
+        it, which is the habit the MQAR filler bug bought: there a filler token
+        could equal a query token and made the task IMPOSSIBLE rather than hard.
 
         The separator is outside the symbol alphabet, so a false pair always
         involves a token no chain uses and cannot be mistaken for a chain link.
+
+        ## Why chains are contiguous, and what that costs
+
+        The first version of this fix stated each LINK as its own separated
+        triple — `sep a b`, `sep b c` — in shuffled order. That is worse, and
+        decision 84 measured why. An intermediate symbol then appears TWICE:
+        once as a target, followed by the next separator, and once as a source,
+        followed by its real successor. So `key(b)` carries two bindings and a
+        superposed store returns their SUM. Retrieving with the exact `wk[b]`:
+
+            FIRST:   c (the answer) 54.0%   SEPARATOR 39.5%
+            SECOND:  SEPARATOR      45.0%   c (the answer) 44.5%
+
+        A dead heat between the answer and a scaffolding token. Chain STARTS are
+        never anyone's target, which is exactly why one hop scored 1.000 and two
+        hops collapsed to 0.000 — and why that looked like a model limitation.
+
+        This is forced rather than chosen. A key with two bindings returns their
+        sum; that is what a superposed store *is*. So a symbol must appear once,
+        and a chain must therefore be contiguous.
+
+        **The cost, stated because it is real:** contiguity fixes the distance
+        from the queried symbol to its answer at exactly `hops`. This model has
+        no positional access so it cannot exploit that, but a positional model
+        could, and this instrument would need filler interleaved between chain
+        symbols before it could be pointed at one. Contiguity and shuffling
+        trade off directly — shuffled links make bindings compete, contiguous
+        chains make the offset constant. There is no layout with neither.
         """
         return self.n_symbols + 1
 
@@ -138,9 +170,9 @@ class ChainConfig:
 
     @property
     def min_seq_len(self) -> int:
-        """Every link as a separated pair, plus the query marker, symbol and
-        answer."""
-        return self.n_chains * self.hops * 3 + 3
+        """Every chain as a separator plus its symbols, then the query marker,
+        the queried symbol and the answer."""
+        return self.n_chains * (self.hops + 2) + 3
 
 
 @dataclass(frozen=True)
@@ -170,9 +202,9 @@ class ChainSequence:
 def generate(config: ChainConfig) -> ChainSequence:
     """One relational-chain example.
 
-    Links are stated as adjacent pairs in shuffled order, so a chain's own links
-    are not contiguous and the model cannot follow one by reading forwards. The
-    question comes last.
+    Each chain is stated CONTIGUOUSLY, in shuffled chain order, with a separator
+    before each chain. See `separator_token` for why the earlier
+    link-at-a-time layout could not work.
     """
     rng = random.Random(config.seed)
     symbols = rng.sample(range(config.n_symbols), config.symbols_used)
@@ -180,13 +212,13 @@ def generate(config: ChainConfig) -> ChainSequence:
         tuple(symbols[i * (config.hops + 1):(i + 1) * (config.hops + 1)])
         for i in range(config.n_chains))
 
-    links = [(chain[step], chain[step + 1])
-             for chain in chains for step in range(config.hops)]
-    rng.shuffle(links)
+    order = list(chains)
+    rng.shuffle(order)
 
     tokens: list[int] = []
-    for source, target in links:
-        tokens.extend((config.separator_token, source, target))
+    for chain in order:
+        tokens.append(config.separator_token)
+        tokens.extend(chain)
 
     asked = chains[rng.randrange(config.n_chains)]
     tokens.extend((config.query_token, asked[0]))

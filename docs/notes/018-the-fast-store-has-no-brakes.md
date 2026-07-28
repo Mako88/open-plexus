@@ -42,7 +42,7 @@ citing Zenke & Gerstner (2017) — whose title is *Hebbian plasticity requires
 compensatory processes on multiple timescales.*
 
 **Multiple.** We read that paper, took the compensatory process, applied it to
-one store, and left the other unbounded. [BACKLOG.md](../../BACKLOG.md) has been
+one store, and left the other unbounded. [BACKLOG.md](../archive/backlog-2026-07-28.md) has been
 carrying "multiple timescales, of which we implemented one" as a speculative
 architectural idea for a while. It is not speculative. The unimplemented half is
 the direct cause of a reproducible divergence that has already contaminated a

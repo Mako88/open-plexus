@@ -709,6 +709,43 @@ usually an idea that is not yet understood.
 An explainer that stops making sense is a defect in the explainer. Fix it there
 rather than expecting the reader to work harder.
 
+**14b. Three top-level documents, three jobs, and no document does two.** A
+document that carries intent *and* results *and* a todo list goes stale in all
+three at once, and a reader cannot tell which part is which.
+
+| document | holds | never holds |
+|---|---|---|
+| `GOALS.md` | intent, the constraints, the gate ladder, what would refute the project | any measurement. The only numbers permitted are arithmetic or inherited from the predecessor, and both are labelled |
+| `DECISIONS.md` | a chronological log — what was chosen, what it ruled out, how to undo it | anything presented as current. Entries are **never rewritten** when later work overturns them |
+| `STATE.md` | what is true now, what is open, what is running | reasoning that belongs in a note, or history that belongs in the log |
+
+Two rules keep it from re-collapsing:
+
+- **When something is settled it LEAVES `STATE.md`**, and an entry goes in the
+  log. Settled work accumulating in the current-state document is exactly how the
+  last two grew to 46,000 and 78,000 characters.
+- **`STATE.md` wins over the log.** Say so where a reader will be standing: if
+  the two disagree, the log is the stale one by construction.
+
+Superseded documents go to `docs/archive/` with a header saying what replaced
+them, rather than being deleted — the retractions in them are usually the useful
+part, and several are cited from elsewhere.
+
+> *Calibration.* On 2026-07-28 the four top-level documents totalled **503,000
+> characters**, of which `DECISIONS.md` was 318,000. `GOALS.md` opened with
+> *"nothing below is a measurement"* and closed with 405 lines of running
+> results, carrying `T^0.67` as the live answer for minimum machine width while
+> quoting `T^0.82` for the same quantity two paragraphs later, with the
+> consequences still computed from the older figure. `HANDOFF.md` carried
+> *"prequential 4.540 ... unigram BEATEN"* as the project's headline text result
+> for weeks; decision 118 established it was an offline backprop probe on frozen
+> features, was not prequential, and was not the model.
+>
+> **The failure mode is not size, it is a stale claim wearing a current
+> document's authority.** Both errors above were found by reading the source
+> rather than by any test, and both had propagated into work that was planned
+> around them.
+
 **15. Document the contract, not the implementation.** A doc comment says what
 a caller can rely on. A good one stays true after the internals are rewritten;
 if a rewrite falsifies it, it was describing implementation. Put one on every

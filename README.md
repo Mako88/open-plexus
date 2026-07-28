@@ -16,17 +16,39 @@ internet. This project asks whether a network can be built for *those* machines:
 not a faster network, a differently-shaped one, where no part ever waits for a
 global picture and a machine leaving mid-thought is a normal event.
 
-## Status
+## The documents, and which one to read
 
-**Goals only.** No plan, no architecture, no code, no stack chosen. Nothing here
-has been measured.
+Three documents carry the project, and they are deliberately kept from doing each
+other's jobs — a document that holds intent *and* results *and* a todo list goes
+stale in all three at once, which is how this repository once ended up quoting two
+different answers for the same exponent two paragraphs apart.
+
+| document | what it holds | when |
+|---|---|---|
+| **[STATE.md](STATE.md)** | what is true now, what is open, what is running | **first, and every session** |
+| **[GOALS.md](GOALS.md)** | what this is for, the constraints, what would refute it | before deciding whether a mechanism belongs here at all |
+| **[DECISIONS.md](DECISIONS.md)** | a chronological log of what was chosen and why — history, never rewritten | when you need the reasoning behind one past choice |
+
+**STATE.md is the only one kept current.** Where it and the log disagree, it wins.
 
 - **[docs/explainers/](docs/explainers/)** — plain-language explanations of
   everything here, in reading order, written for someone who does not work in
   this field. **Start here if you want the ideas rather than the specification.**
-- **[GOALS.md](GOALS.md)** — what this is for, the three constraints that define
-  the design space, and the gate ladder that would refute it.
+- **[docs/notes/](docs/notes/)** — the reasoning: question, prediction made before
+  the run, result. Never edited afterwards except to record the outcome.
+- **[experiments/sweeps/](experiments/sweeps/)** — every measurement, with the
+  predictions registered before dispatch and scored honestly, including the
+  refuted ones.
+- **[docs/archive/](docs/archive/)** — superseded records, kept for their
+  reasoning and clearly marked as history.
 - **[CLAUDE.md](CLAUDE.md)** — the engineering standards the project runs under.
+
+## Status
+
+**G0–G3 passed; G4 passes on one seed; G5 is contested.** The live work is
+relational reasoning — composition over chained facts — and the current blocker is
+retrieval fidelity, which decision 112 measured as a width limit. See
+[STATE.md](STATE.md).
 
 ## The three constraints
 

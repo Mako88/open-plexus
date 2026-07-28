@@ -1,13 +1,19 @@
-"""GOALS.md must not quote a superseded measurement as current.
+"""The three top-level documents must not do each other's jobs.
 
-With a dozen sweeps and forty explainers, the largest document in this project
-accumulates numbers faster than anyone re-reads them. An audit found it presenting
-`T^0.67` as the answer for minimum machine width while quoting `T^0.82` for the
-same quantity two paragraphs later, with the consequences — how much wider, how
-many fewer machines — still computed from the older figure.
+The original version of this file guarded individual numbers inside `GOALS.md`,
+because an audit found it presenting `T^0.67` as the answer for minimum machine
+width while quoting `T^0.82` for the same quantity two paragraphs later, with the
+consequences still computed from the older figure. Nothing was wrong in either
+sweep; the document grew a second answer and kept the first.
 
-Nothing was wrong in either sweep. The document simply grew a second answer and
-kept the first. These tests are cheap and catch that class of drift.
+Guarding the numbers one at a time was the weaker fix, and it was the one
+available at the time. **The structural fix is that `GOALS.md` does not carry
+measurements at all** — so there is no second answer for it to grow. That
+narrative now lives in `docs/archive/goals-results-log.md`, where
+`test_archive_consistency.py` still guards the figures.
+
+CLAUDE.md rule 14b is the standard these enforce. Rule 18: prefer a rule that
+makes the mistake structurally impossible over one that asks for more care.
 """
 
 from __future__ import annotations
@@ -16,75 +22,82 @@ import pathlib
 import re
 import unittest
 
-GOALS = (pathlib.Path(__file__).resolve().parent.parent / "GOALS.md"
-         ).read_text(encoding="utf-8")
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+GOALS = (ROOT / "GOALS.md").read_text(encoding="utf-8")
+STATE = (ROOT / "STATE.md").read_text(encoding="utf-8")
+DECISIONS = (ROOT / "DECISIONS.md").read_text(encoding="utf-8")
+
+#: A sweep record is where every measurement this project has made actually
+#: lives, so a citation of one is the reliable tell that a document has started
+#: carrying results. Matches the `g11-06` naming every sweep uses.
+SWEEP_ID = re.compile(r"\bg\d+-\d{2}\b")
+
+#: A markdown link INTO the sweep records. The bare path may be named — rule 14b
+#: itself has to say where measurements live — but linking one is a citation.
+SWEEP_LINK = re.compile(r"\]\([^)]*experiments/sweeps/[^)]*\)")
 
 
-class TheGatingClaimIsNotStillTheOldOne(unittest.TestCase):
-    """GOALS said "Nothing tried can tell it" about selective storage.
+class GoalsHoldsNoMeasurements(unittest.TestCase):
+    """`GOALS.md` opens with "nothing below is a measurement" and once closed
+    with 405 lines of running results. These make the opening line true.
 
-    That was true when written and g9-02 made it false: a reward token in the
-    stream recovers 0.23, and g9-06's tag recovers 0.16 flat across delay
-    including at delay 20, where every window is negative. The sentence gated how
-    everything below it was read, so it is quoted and marked rather than deleted
-    — and these stop it drifting back to being a live claim.
+    The permitted numbers are arithmetic (a 150 ms round trip) and results
+    inherited from the predecessor project, which §6.1 tabulates and labels. Both
+    are stable. What is forbidden is this project's own sweep output, because
+    that is the thing that moves and then disagrees with itself.
     """
 
-    def test_the_refuted_sentence_is_marked_as_corrected(self):
-        """It may appear as a QUOTATION. It may not appear as an assertion."""
-        if "Nothing tried can tell it" not in GOALS:
-            self.skipTest("the sentence is gone entirely, which is also fine")
+    def test_no_sweep_is_cited(self):
+        found = sorted(set(SWEEP_ID.findall(GOALS)))
+        self.assertEqual(
+            found, [],
+            f"GOALS.md cites sweep records {found}. Measurements belong in "
+            "STATE.md (if live) or docs/archive/ (if not) — GOALS states intent")
+
+    def test_no_link_into_the_sweep_records(self):
+        found = SWEEP_LINK.findall(GOALS)
+        self.assertEqual(
+            found, [],
+            f"GOALS.md links into experiments/sweeps/: {found}. A document that "
+            "links a measurement is a document that will outlive it")
+
+    def test_it_still_says_so_out_loud(self):
+        """The rule is only enforceable if a reader can see it is the rule."""
+        self.assertIn("Nothing below is a measurement", GOALS)
+
+
+class TheDocumentsPointAtEachOther(unittest.TestCase):
+    """A reader landing on any one of the three has to be able to find the
+    other two, and has to be told which one wins when they disagree.
+
+    Without that, the log's newest entries get read as the current state — which
+    is what happened, because they usually ARE, right up until they are not.
+    """
+
+    def test_goals_sends_a_reader_to_the_current_state(self):
+        self.assertIn("STATE.md", GOALS,
+                      "GOALS.md should point at STATE.md for what is live")
+
+    def test_the_log_declares_itself_history(self):
         self.assertIn(
-            "CORRECTED", GOALS,
-            "GOALS still says nothing can tell a device which inputs matter, "
-            "without saying that g9-02 and g9-06 refuted it")
+            "not the current state", DECISIONS,
+            "DECISIONS.md must say plainly that it is not the current state, "
+            "or its newest entry gets read as one")
 
-    def test_the_recovery_that_replaced_it_appears_with_its_delay(self):
-        """0.16 on its own is a number; 0.16 at delay 20, where the window is
-        negative, is the finding. A figure quoted without the condition that
-        makes it interesting is how this document drifted the first time."""
-        self.assertRegex(
-            GOALS, r"\+0\.16.{0,200}delay 20",
-            "the tag's recovery should appear alongside the delay that makes it "
-            "a result rather than a number")
+    def test_the_log_names_the_document_that_beats_it(self):
+        self.assertIn(
+            "STATE.md wins", DECISIONS,
+            "the log should say which document wins a disagreement, at the "
+            "point where a reader is standing in the log")
 
-    def test_it_does_not_claim_the_gap_is_closed(self):
-        """The ceiling is still a ceiling. 0.16 of the oracle's advantage is not
-        the oracle's advantage, and the section's whole point is that the three
-        findings under it are ceiling results."""
-        self.assertIn("not all of it", GOALS,
-                      "the corrected section should say plainly that the tag "
-                      "recovers a fraction, or the reader will take the "
-                      "correction as closing the gap")
-
-
-class SupersededFiguresAreMarked(unittest.TestCase):
-
-    def test_the_older_width_exponent_is_named_as_superseded(self):
-        """0.67 may appear, but not as the live answer."""
-        if "0.67" not in GOALS:
-            self.skipTest("the older figure is no longer mentioned at all")
-        self.assertIn("superseded", GOALS,
-                      "GOALS still quotes the 0.67 width exponent without "
-                      "saying 0.82 replaced it")
-
-    def test_the_current_width_exponent_appears_with_its_interval(self):
-        self.assertRegex(
-            GOALS, r"0\.82.{0,40}\[0\.61, 1\.03\]",
-            "the current minimum-width exponent should appear with the "
-            "interval it was measured to")
-
-    def test_the_derived_machine_count_matches_the_current_exponent(self):
-        """0.37 − 0.82 = −0.45. A stale document said −0.30, from 0.67.
-
-        The derived number is the one a reader acts on, and it is the one that
-        silently goes stale when the measurement it came from is updated.
-        """
-        self.assertIn("T^-0.45", GOALS,
-                      "the machine-count exponent should be 0.37 - 0.82 = -0.45")
-        self.assertNotIn("`T^-0.30`", GOALS,
-                         "GOALS still carries the machine-count exponent "
-                         "derived from the superseded 0.67")
+    def test_state_says_settled_work_leaves(self):
+        """The failure mode is accumulation, not absence. STATE.md has to
+        carry the instruction that keeps it small."""
+        self.assertIn(
+            "When something here is settled it leaves",
+            " ".join(STATE.split()),
+            "STATE.md should say that settled items leave it for the log — "
+            "that sentence is the whole reason it stays readable")
 
 
 class EveryGateHasAVerdict(unittest.TestCase):
@@ -97,6 +110,11 @@ class EveryGateHasAVerdict(unittest.TestCase):
             cells = [c.strip() for c in row.strip("|").split("|")]
             self.assertTrue(all(cells),
                             f"a gate row has an empty cell: {row}")
+
+    def test_the_gate_table_is_the_only_place_a_verdict_is_written(self):
+        """G4 and G5 both had their verdicts restated elsewhere in GOALS at one
+        point, and restating a verdict is how two of them drift apart."""
+        self.assertIn("only place a gate verdict is written", GOALS)
 
 
 if __name__ == "__main__":

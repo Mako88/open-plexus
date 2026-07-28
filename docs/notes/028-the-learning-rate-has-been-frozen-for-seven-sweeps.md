@@ -42,7 +42,7 @@ it.
 
 ## Why this is not a small point
 
-[g8-01's re-summarisation](../../BACKLOG.md) measured the learning rate moving
+[g8-01's re-summarisation](../archive/backlog-2026-07-28.md) measured the learning rate moving
 the FLOOR arm, which is the denominator, by a factor of three:
 
     seq 768, half-life 0.5

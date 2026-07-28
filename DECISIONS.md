@@ -4650,3 +4650,58 @@ learning from the same undifferentiated error*. A gate with its own objective, o
 one trained only where depth is ambiguous, is untried. And 4 separators beating 1
 under all-position training (0.683 against 0.117) is unexplained; it is a real
 gap in the account, not a detail.
+
+## 95. The gate is not outvoted, it is CONFLICTED — and that is a mechanism problem
+
+Decision 94 left two explanations for why all-position training breaks the gate,
+and they call for different work:
+
+- **outvoted** — the rule is right everywhere and the answer position is rare, so
+  reweight the training signal.
+- **conflicted** — the rule is right at the query and wrong in the body, so no
+  reweighting can help and the gate needs different inputs.
+
+Take the gate trained **answer-only**, where it reaches 1.000, and ask what it
+says at ordinary body positions, where the correct next token is one hop away:
+
+    at the QUERY position   0.0171   want LOW  -- the answer is two hops out
+    at BODY positions       0.4712   want HIGH -- the next token is one hop out
+
+**It is conflicted.** In the body the gate is essentially uninformative — 0.47,
+a coin flip, where serving the body requires close to 1.0. It is not doing the
+body's job at all.
+
+So under all-position training the body supplies the overwhelming majority of
+the error, pulls the shared vector toward hop 1, and wrecks the query behaviour
+that worked. That is exactly the 0.0102 → 0.3034 shift decision 94 measured, and
+it is not a sampling problem.
+
+### Why one gate cannot do both
+
+The gate is a linear score on the **lookahead retrieval** and nothing else. At a
+body position and at a query position that lookahead can look the same, while
+the right answer differs — hop 1 in the body, hop 2 at the query. A function of
+the lookahead alone cannot separate cases it cannot see apart.
+
+**The missing input is where the model is, not what it retrieved.** The query
+marker sits in the input at the query position, so the information exists; the
+gate simply has no access to it.
+
+### What this licenses
+
+A specific, small mechanism change to try next: **give the gate the current
+position's key alongside the lookahead retrieval**, so it can learn "at a query,
+use the marker rule; otherwise take one hop". That is one more vector per group,
+the same locality, and it is the smallest change that could resolve a conflict
+this measurement says is real.
+
+It is worth being clear that this is now a *design* claim and not yet a result.
+The measurement establishes the conflict; it does not establish that the extra
+input fixes it.
+
+### What it does NOT license
+
+The body number is *uninformative* (0.47), not *confidently wrong* (near 0). The
+gate is failing to serve the body rather than actively fighting it, which is a
+weaker statement than "the rule inverts" — and the distinction matters, because
+a uninformative gate degrades gracefully while an inverted one would not.

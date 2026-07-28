@@ -117,10 +117,26 @@ on "one hop", and **composition would be built, correct, and never used**. Any
 future result on text must show the gate is actually gating, not merely that
 accuracy moved.
 
-Untried, and the obvious next moves: a gate with its own objective, or one
-trained only at positions where depth is ambiguous. Also unexplained — 4
-separators beat 1 under all-position training (0.683 against 0.117), which is a
-real gap in the account rather than a detail.
+**Decision 95 pins down why, and it is a mechanism problem.** The gate trained
+answer-only puts 0.0171 on hop 1 at the query (correct) and **0.4712 in the
+body** — a coin flip where serving the body needs ~1.0. It is not outvoted, it
+is **conflicted**: the body wants hop 1, the query wants hop 2, and the gate is a
+linear score on the *lookahead retrieval alone*, which can look identical in both
+cases. Reweighting the training signal cannot fix a function that cannot see the
+cases apart.
+
+### THE NEXT THING TO BUILD
+
+**Give the gate the current position's key alongside the lookahead retrieval.**
+The query marker is in the input at the query position, so the information
+exists — the gate just has no access to it. One more vector per group, same
+locality. It is the smallest change that could resolve the conflict.
+
+This is a design claim, not a result: the measurement establishes the conflict,
+not that the extra input fixes it.
+
+Also unexplained — 4 separators beat 1 under all-position training (0.683 against
+0.117), a real gap in the account rather than a detail.
 
 **C4 is still untested, and that is now the open problem.** Two attempts failed
 to build a case where continued learning helps: decision 91 because a departure

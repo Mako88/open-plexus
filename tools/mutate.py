@@ -633,6 +633,25 @@ MUTATIONS = [
         new="        for _ in range(self.steps):",
     ),
     Mutation(
+        name="the-hidden-layer-never-learns",
+        breaks="the mechanism that recovered 0.63 bits -- the hidden layer "
+               "would stay at its random initialisation, which is a FIXED "
+               "projection wearing a learned layer's name, and it would still "
+               "change every prediction so a smoke test could not tell",
+        path=LOCAL,
+        old="                    self.hidden_w += self.config.lr * np.einsum(",
+        new="                    self.hidden_w += 0.0 * np.einsum(",
+    ),
+    Mutation(
+        name="the-hidden-gradient-crosses-groups",
+        breaks="the C1 argument, not the loss -- group g would take its hidden "
+               "gradient from every group's readout, so the model would still "
+               "learn and the locality claim would silently be false",
+        path=LOCAL,
+        old='                    through = np.einsum("gv,vgh->gh", error, self.grouped_wo)',
+        new='                    through = np.einsum("gv,vgh->gh", error.sum(0, keepdims=True) + 0*error, self.grouped_wo)',
+    ),
+    Mutation(
         name="the-write-gate-is-ignored",
         breaks="the whole finding -- every corrective write would apply the "
                "full correction whatever the gate said, so a sweep over the "
@@ -1018,8 +1037,8 @@ MUTATIONS = [
                "other group's prediction, restoring the global reduction C1 "
                "forbids while leaving the pooled output looking correct",
         path=LOCAL,
-        old="                update = np.einsum(\"gv,gd->vgd\", target - parts, sliced)",
-        new="                update = np.einsum(\"gv,gd->vgd\", target - parts.sum(0), sliced)",
+        old="                error = target - parts",
+        new="                error = target - parts.sum(0)",
     ),
     Mutation(
         name="ignore-the-requested-cluster",

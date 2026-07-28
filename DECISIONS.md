@@ -3415,3 +3415,73 @@ thing that just changed.
 That is a large invalidation and it should be stated plainly rather than
 discovered piecemeal. It does not mean the numbers were wrong; it means they were
 conditional, and the condition moved.
+
+---
+
+## 75. The composed readout is in the model
+
+Note 037 and decisions 70–72 measured it offline. It is now a config field,
+default off, with the locality claim asserted rather than argued.
+
+    hidden   lr      bits (in-model, 60k chars, two seeds)
+         0   0.05    5.525
+       128   0.05    5.242    +0.283
+       128   0.01    5.289
+       128   0.002   5.395
+
+**+0.283 bits in the model's own protocol**, which is less than the 0.63 measured
+offline and should be. The offline probe initialised and tuned the two layers
+separately; here both share the model's single learning rate, and the model
+trains two epochs over a train/test split rather than sweeping. The gap between
+those two numbers is the value of tuning the layers apart, and it is worth
+knowing rather than closing by fiat.
+
+### How it works, and why it does not widen C1
+
+Each group already holds its own `d / partitions` slice of the retrieval and
+computes its own `parts[g]`. With `hidden` set, that slice becomes two matrices
+the same node owns:
+
+    active[g] = relu(hidden_w[g] @ sliced[g])
+    parts[g]  = grouped_wo[:, g, :] @ active[g]
+
+and the backward pass takes group g's hidden gradient from group g's own output
+weights and group g's own error. **Nothing crosses a group**, so a node computes
+this from what it already holds. That is the same locality the delta rule beside
+it has, applied twice.
+
+`orthogonal_every` is refused alongside it: that mechanism orthogonalises an
+update whose shape is defined by the LINEAR readout, and across two layers it
+would silently orthogonalise a different matrix than the one it was measured on.
+
+### Verification
+
+**Golden values identical across all nine configurations** — plain, context
+keys, cache at two settings, settling, consolidation, cache-with-settling,
+decay, partitions — so the `hidden = 0` path is untouched and every earlier
+number still reproduces. 722 tests, six checks clean.
+
+Two new mutations, both caught:
+
+- `the-hidden-layer-never-learns` — the layer would stay at its random
+  initialisation, which is a FIXED projection wearing a learned layer's name,
+  and it would still change every prediction, so a smoke test could not tell.
+- `the-hidden-gradient-crosses-groups` — group g would take its hidden gradient
+  from every group's readout. **The model would still learn and the loss would
+  still fall**; only the C1 argument would be false. That is the failure this
+  whole file exists to make impossible to miss.
+
+Two existing mutations needed re-pointing (`pool-the-error-across-groups`,
+`copy-the-readout-instead-of-viewing-it`) and both are caught.
+
+### A locality test that tested nothing, caught by its own companion
+
+The first version perturbed group 1's readout and checked group 0's hidden layer
+did not move. It passed. It also passed for the wrong reason: the fixture zeroes
+`wo`, so multiplying group 1's weights by three multiplied zero by three and
+nothing moved anywhere.
+
+`test_the_perturbed_group_did_move` is the companion that caught it — the
+assertion that the perturbed group DID change. **A locality test without one
+passes whenever the mechanism is disconnected**, which is precisely when it
+should fail.

@@ -817,6 +817,14 @@ class LocalMemoryConfig:
     #: from the training set -- which is what
     #: `local-memory-persists-across-sequences` exists to catch.
     carry_store: bool = False
+    #: Units in a per-group hidden layer on the readout. 0 keeps it linear.
+    #:
+    #: The readout was the ceiling (note 037, decision 70): a linear map cannot
+    #: extract what the retrieval carries, and a two-layer one recovers 0.63
+    #: bits prequentially in the deployed regime. Trained by backpropagation
+    #: THROUGH THE GROUP'S OWN TWO MATRICES, which is the same locality the
+    #: delta rule beside it already has.
+    hidden: int = 0
     cache_slots: int = 0
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
@@ -836,6 +844,17 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if self.hidden < 0:
+            raise ValueError("hidden is a layer width and cannot be negative")
+        if self.hidden and self.d_model % self.partitions:
+            raise ValueError(
+                "a hidden layer is built per group, so d_model must divide "
+                "into partitions")
+        if self.hidden and self.orthogonal_every:
+            raise ValueError(
+                "orthogonal_every orthogonalises the readout update, which is "
+                "shaped by the LINEAR readout; it has no meaning across two "
+                "layers and would silently orthogonalise the wrong matrix")
         if self.value_lr < 0.0:
             raise ValueError("value_lr is a learning rate and cannot be "
                              "negative; 0 leaves the projection frozen")
@@ -1029,6 +1048,28 @@ class LocalAssociativeMemory:
         # readout has exactly one representation and `ablate` keeps working
         # unchanged. Reshaping a freshly allocated C-contiguous array never
         # copies, and the assertion says so rather than trusting it.
+        # A HIDDEN LAYER INSIDE EACH GROUP, off by default.
+        #
+        # `Wo` was the only thing this model learned across a corpus, and it is
+        # a single LINEAR map onto a retrieval it does not influence. Note 037
+        # measured what that costs: a two-layer readout on the SAME frozen
+        # features is worth 0.63 bits prequentially, one pass, no split, no
+        # temperature -- and it is the first mechanism here to move the data
+        # exponent rather than the level.
+        #
+        # **It does not widen the C1 argument.** A group already holds its own
+        # `d / partitions` slice and computes its own `parts[g]`; making that
+        # slice two layers means backpropagating through two matrices that the
+        # same node already owns, using its own activity and its own error. No
+        # other group's state enters, which `test_composed_readout.py` asserts
+        # rather than assumes.
+        self.hidden_w = None
+        if config.hidden:
+            per = d // config.partitions
+            self.hidden_w = rng.normal(
+                0.0, 1.0 / np.sqrt(per), (config.partitions, config.hidden, per))
+            # The output weights now read the HIDDEN units, not the retrieval.
+            self.wo = np.zeros((v, config.partitions * config.hidden))
         self.grouped_wo = self.wo.reshape(v, config.partitions, -1)
         assert self.grouped_wo.base is self.wo, "grouped_wo must alias wo"
         #: Held-back readout updates, when `orthogonal_every` is on.
@@ -1651,7 +1692,13 @@ class LocalAssociativeMemory:
             readable = memory if lasting is None else memory + lasting
             retrieved = self.retrieval.read(readable, key)
             sliced = retrieved.reshape(groups, -1)
-            parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)
+            if self.hidden_w is None:
+                parts = np.einsum("vgd,gd->gv", self.grouped_wo, sliced)
+            else:
+                # Group g's own two matrices. `active` is (groups, hidden).
+                active = np.maximum(
+                    0.0, np.einsum("ghd,gd->gh", self.hidden_w, sliced))
+                parts = np.einsum("vgh,gh->gv", self.grouped_wo, active)
             answer = parts.sum(0) if members is None else parts[members].sum(0)
             if self.config.readout_bias:
                 answer = answer + self.bias
@@ -1663,7 +1710,19 @@ class LocalAssociativeMemory:
                 # Each group's error is its OWN prediction error. With one group
                 # this is the plain delta rule; with more, no group's update
                 # reads any other group's activity, which is the whole point.
-                update = np.einsum("gv,gd->vgd", target - parts, sliced)
+                error = target - parts
+                if self.hidden_w is None:
+                    update = np.einsum("gv,gd->vgd", error, sliced)
+                else:
+                    # BACKPROPAGATION, CONFINED TO ONE GROUP.
+                    #
+                    # Group g's hidden gradient uses group g's own output
+                    # weights and group g's own error. Nothing crosses a group,
+                    # so a node computing this needs only what it already holds.
+                    update = np.einsum("gv,gh->vgh", error, active)
+                    through = np.einsum("gv,vgh->gh", error, self.grouped_wo)
+                    self.hidden_w += self.config.lr * np.einsum(
+                        "gh,gd->ghd", through * (active > 0.0), sliced)
                 if self.config.value_lr:
                     # UNFREEZING THE VALUE PROJECTION -- the real version.
                     #

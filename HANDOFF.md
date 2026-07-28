@@ -49,11 +49,14 @@ depth-1 perfectly and depth-2 at 0.547 — because the available signal separate
 
 ### Be sceptical of
 
-- **The gate learned THIS task's terminator.** It works because chains end at a
-  structural marker the task lays down, and with random value vectors there is
-  nothing shared between two marker tokens for a linear gate to latch onto. The
-  honest prediction is that it does not transfer. **This is the next experiment**
-  and it is the difference between a mechanism and a fit.
+- **The gate is a token detector, and this is measured** (decision 89). Cosine
+  between `halt_w` and the value vectors: SEPARATOR **+0.563 (+8.3 sd)**, QUERY
+  **+0.518 (+7.7 sd)**, every other token mean −0.068. It has latched onto two
+  specific tokens. Two markers have unrelated random value vectors, so transfer
+  is **impossible by construction** — do not spend a session confirming it.
+  The open question is whether a gate can run on a signal that is not token
+  identity; retrieval `norm` is the only candidate with any separation
+  (d′=1.01), and it is weak where the current signal is overwhelming.
 - **`hops` is a ceiling** the caller sets; the gate chooses within it.
 - **Contiguity fixed the offset** from query symbol to answer at exactly `hops`.
   Harmless for this model, which has no positional access — but the instrument

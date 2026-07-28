@@ -4330,3 +4330,48 @@ whether anything survives at all. Decision 86 measured retrieval `norm` as the
 one signal with any separation (d′=1.01), and a norm is not tied to a token's
 identity. That is the thread worth pulling: it is the difference between a
 mechanism and a fit.
+
+## 89. The gate is a token detector, measured — and the sign was not what I predicted
+
+Decision 88 predicted the gate has learned this task's terminator rather than a
+general notion of one. That is a claim about `halt_w`, so it is checkable by
+looking at the vector instead of running a transfer experiment.
+
+Cosine between the gate vector and each token's **value** vector:
+
+    SEPARATOR      +0.563      +8.3 sd from the rest
+    QUERY          +0.518      +7.7 sd from the rest
+    every other    mean -0.068, sd 0.076, range [-0.290, +0.078]
+
+**The gate has latched onto two specific tokens**, eight standard deviations
+clear of the other forty-eight. This is no longer a suspicion about transfer: it
+is a measurement of what the parameter contains. Two different marker tokens
+have unrelated random value vectors, so a linear gate trained on one **cannot**
+recognise the other. Transfer is impossible by construction, not merely
+unlikely, and the experiment to confirm it would only restate the arithmetic.
+
+### The sign was the opposite of what I predicted, and the mechanism is right
+
+I expected strongly NEGATIVE — "reject anything that looks like a marker". It is
+strongly positive, and positive is correct. The gate scores the **lookahead**, so
+a high score on hop k means *take* hop k. For a depth-1 question hop 1 is the
+answer and its lookahead is the separator, so the separator must score HIGH.
+
+The rule the gate learned states cleanly: **take the hop whose next hop is a
+marker** — the last hop before the end. That is the rule decision 87 designed
+the lookahead for, arrived at from data rather than assumed, and the sign error
+was in my prediction rather than in the mechanism.
+
+### What this licenses
+
+Nothing new about capability. It converts decision 88's caveat from a guess into
+a fact, and it means **the next experiment is not a transfer test** — that
+result is already determined. The open question is a different one: whether a
+gate can be given a signal that is not token identity at all.
+
+Decision 86 measured retrieval `norm` as the only candidate with any separation
+(d′=1.01, past-end 0.185 against on-chain 0.132), and a norm is a property of
+how a key was bound rather than of which token was stored. That is worth trying,
+and it is a weak signal being asked to do a job a very strong one currently
+does — so the honest expectation is that it degrades accuracy and the question
+is by how much.

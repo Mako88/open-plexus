@@ -291,11 +291,30 @@ probe or a quick check and skipping the costing that a sweep would have had.
 > pre-dispatch controls before it were seconds and belonged where they ran; this
 > one was not and did not.
 
-**Commit messages go through `-F <file>`, never `-m`.** Backticks inside a
+**Commit messages go through `-F <file>`, and the FILE is built by the Write
+tool or a quoted heredoc — never by `printf`, never by an unquoted heredoc.**
+
+The hazard was never `-m`. It is letting a shell interpret the text at all, and
+`printf`'s format string is the same class of interpreter as double-quote
+expansion. Backticks inside a
 double-quoted shell argument are command substitution. A message containing
 `` `none` `` runs `none`, prints "command not found" to the terminal, and commits
 the sentence with the word silently deleted — so the shell edits the permanent
 record and the only symptom is an error about something you never ran.
+
+> *Calibration, the same failure through a different interpreter.* Commit
+> `6d72e11` was written with `printf ... > file` and `git commit -F file`, which
+> obeys the rule as it was previously worded. Its message contains
+> `80ms/20ms/2%`, `printf` read the `%` as a format specifier, hit the `+` of a
+> following `+/-`, called it an invalid format character and **stopped after
+> writing everything before it**. 549 bytes of about 2,500 were committed. Every
+> prediction scored, the corrected figure and a criticism of the grid's own range
+> were lost from the permanent record.
+>
+> `printf` exited non-zero and `git commit` ran anyway, so the only symptom was a
+> warning line above a successful commit. **A rule that names one mechanism does
+> not protect against the class**, which is the second time that sentence has had
+> to be written about this one rule.
 
 > *Calibration.* Commit `18388e5`. The line "PREDICTION 3 REFUTED BACKWARDS.
 > `none` was predicted to rise" was committed as "PREDICTION 3 REFUTED BACKWARDS.

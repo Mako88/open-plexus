@@ -185,6 +185,104 @@ class ItRefusesWhatItCannotDo(unittest.TestCase):
             fixture.find(ALICE, CAROL, depth=2, branches=0)
 
 
+class TheModelRefusesWhatAWalkCannotDo(unittest.TestCase):
+    """Every one of these would otherwise fail QUIETLY.
+
+    Decision 105 is the calibration: with hops and pair keys both on, every hop
+    queried a key space the store never wrote to, **and the model still returned
+    answers and accuracies.** A wrong number is worse than an error, so each
+    missing prerequisite raises instead.
+    """
+
+    def base(self, **overrides):
+        from openplexus.models.local_memory import LocalMemoryConfig
+        settings = dict(d_model=64, vocab_size=VOCAB, hops=2,
+                        hop_accumulate="concat", derived_keys=True,
+                        context_keys=True, search_branches=2,
+                        search_fact_token=FACT, search_query_token=1)
+        settings.update(overrides)
+        return lambda: LocalMemoryConfig(**settings)
+
+    def test_single_token_keys_are_refused(self):
+        with self.assertRaises(ValueError):
+            self.base(context_keys=False)()
+
+    def test_depth_one_is_refused(self):
+        with self.assertRaises(ValueError):
+            self.base(hops=1)()
+
+    def test_replace_is_refused_because_it_discards_every_step_but_the_last(self):
+        with self.assertRaises(ValueError):
+            self.base(hop_accumulate="replace")()
+
+    def test_a_missing_fact_marker_is_refused(self):
+        with self.assertRaises(ValueError):
+            self.base(search_fact_token=None)()
+
+    def test_a_missing_query_marker_is_refused(self):
+        """Without a target a walk would have to score by confidence, which
+        decision 93 measured at 0.628 against 0.500 for guessing."""
+        with self.assertRaises(ValueError):
+            self.base(search_query_token=None)()
+
+    def test_hops_with_pair_keys_is_STILL_refused_when_search_is_off(self):
+        """Decision 105's refusal stands wherever search is not the mechanism.
+
+        Lifting it unconditionally would re-open exactly the failure it was
+        written for -- a hop re-encoding through Wk into a pair-keyed store.
+        """
+        with self.assertRaises(ValueError):
+            self.base(search_branches=0)()
+
+
+class TheModelActuallyWalksWhenToldTo(unittest.TestCase):
+
+    def test_more_branches_changes_the_answer(self):
+        """If branches did nothing the wiring would be inert -- which is the
+        state decision 79 caught a write gate in, producing numbers identical
+        to the baseline to the last decimal.
+
+        **The readout has to be trained for this to say anything.** Untrained,
+        `Wo` is zero and every position returns token 0 whatever the retrieval
+        was, so the two arms agree trivially -- the first version of this test
+        compared thirty zeros against thirty zeros and would have passed under
+        any wiring at all, including none.
+        """
+        import numpy as np
+
+        from openplexus.models.local_memory import (LocalAssociativeMemory,
+                                                    LocalMemoryConfig)
+        from openplexus.tasks.kinship import IGNORE, KinshipConfig, dataset
+
+        task = KinshipConfig(hops=2, seed=3)
+        train = dataset(task, 60)
+        test = dataset(KinshipConfig(hops=2, seed=90_000), 30)
+
+        def answers(branches):
+            model = LocalAssociativeMemory(LocalMemoryConfig(
+                d_model=128, vocab_size=task.vocab_size, seed=0, hops=2,
+                hop_accumulate="concat", derived_keys=True, context_keys=True,
+                search_branches=branches, search_fact_token=task.fact_token,
+                search_query_token=task.query_token))
+            for sequence in train:
+                tokens = np.array(sequence.tokens, dtype=np.int64)
+                targets = np.array(sequence.targets, dtype=np.int64)
+                model.run(tokens, targets, targets != IGNORE, learn=True)
+            return [int(model.run(np.array(s.tokens, dtype=np.int64))[
+                s.answer_position]) for s in test]
+
+        greedy = answers(1)
+        self.assertGreater(len(set(greedy)), 1,
+                           "the readout is degenerate -- every answer is the "
+                           "same token, so this test cannot distinguish "
+                           "anything and would pass under any wiring")
+        self.assertNotEqual(
+            greedy, answers(4),
+            "a greedy walk and a four-branch search returned identical answers "
+            "on every one of thirty sequences, which means the branches are "
+            "not reaching the readout")
+
+
 class TheMarginIsHonestAboutOneBranch(unittest.TestCase):
 
     def test_a_single_branch_has_no_margin(self):

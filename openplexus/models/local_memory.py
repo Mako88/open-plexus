@@ -60,6 +60,7 @@ import numpy as np
 
 from openplexus.keys import KeySource, PairKeys, TableKeys
 from openplexus.retrieval import Retrieval, build as build_retrieval
+from openplexus.search import search as run_search
 
 #: Newton-Schulz coefficients, from Keller Jordan's Muon. The quintic
 #: `3.4445x - 4.7750x^3 + 2.0315x^5` pushes every singular value toward 1
@@ -938,6 +939,41 @@ class LocalMemoryConfig:
     #: concat still wins with far more rules than sixteen is a scale question
     #: and is not settled here.
     hop_accumulate: str = "replace"
+
+    #: How many candidate branches to try at an answerable position.
+    #:
+    #: **0 is OFF** and every number this project recorded before decision 123
+    #: was measured with it off. **1 is a GREEDY WALK** -- pair-key traversal
+    #: committing to the single best candidate, which is decision 107's
+    #: mechanism without the search on top. That is the control that says
+    #: whether SEARCHING bought anything, as opposed to traversal buying it, and
+    #: it is the reason 0 rather than 1 means off.
+    #:
+    #: Search is the capability decision 108 named as missing: *"multi-hop
+    #: reasoning over a BRANCHING graph requires SEARCH -- try a branch, see
+    #: where it lands, backtrack -- and an associative store does RETRIEVAL."*
+    #:
+    #: It REPLACES the hop loop rather than sitting beside it. A hop decodes a
+    #: retrieval and re-encodes it through `Wk`; a walk commits to a token and
+    #: keys on `(entity, relation)` pairs directly. Those are different
+    #: mechanisms and running both would re-encode pointlessly, so the hop loop
+    #: is skipped when this is on. See `openplexus/search.py`.
+    search_branches: int = 0
+
+    #: The marker that precedes every fact, making `key(FACT, X)` mean "X in
+    #: subject role". Needed because a walk alternates `key(FACT, entity)` with
+    #: `key(entity, relation)` and has to build both.
+    search_fact_token: int | None = None
+
+    #: The marker after which the next token is the entity the question names as
+    #: the far end -- the target a branch is checked against.
+    #:
+    #: **This is read from the STREAM, not from task structure.** A token in the
+    #: input is what g9-02 established as implementable, where
+    #: `position_kinds()` is an oracle; the same distinction applies here and it
+    #: is the reason search is a mechanism rather than a ceiling.
+    search_query_token: int | None = None
+
     cache_slots: int = 0
 
     #: Read from the cache ALONE, dropping the superposed store's contribution.
@@ -969,7 +1005,7 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
-        if self.hops > 1 and self.context_keys:
+        if self.hops > 1 and self.context_keys and self.search_branches < 1:
             raise ValueError(
                 "hops re-encode a decoded token through Wk, a SINGLE-TOKEN key "
                 "table, and context_keys makes the store's keys derive from "
@@ -977,7 +1013,45 @@ class LocalMemoryConfig:
                 "the two is -0.069, so every hop after the first would query a "
                 "key space the store never writes to and get noise back. It "
                 "would still produce numbers. A hop that constructs a PAIR key "
-                "is the mechanism this needs and it does not exist yet")
+                "is the mechanism this needs, and it now exists: set "
+                "search_branches >= 1 to use it (openplexus/search.py, "
+                "decision 123). Without it the refusal stands")
+        if self.search_branches < 0:
+            raise ValueError("search_branches is a count and 0 means off")
+        if self.search_branches >= 1:
+            # Every one of these is a thing a walk cannot do without, and each
+            # would otherwise fail QUIETLY -- decision 105's exact failure mode,
+            # where an unwritten key space "still returned answers and
+            # accuracies". A wrong number is worse than an error.
+            if not self.context_keys:
+                raise ValueError(
+                    "search walks key on (entity, relation) pairs and a "
+                    "single-token table has no such key. Set context_keys")
+            if not self.derived_keys:
+                raise ValueError(
+                    "context_keys requires derived_keys, and a walk rebuilds "
+                    "each pair key from two token ids rather than looking one "
+                    "up -- that is what makes it local")
+            if self.hops < 2:
+                raise ValueError(
+                    "a search of depth 1 is a single retrieval with extra "
+                    "steps; there is no branch to choose between")
+            if self.hop_accumulate != "concat":
+                raise ValueError(
+                    "a walk produces one retrieval per relation and the "
+                    "readout has to see all of them, which is what concat "
+                    "does. `replace` would discard every step but the last")
+            if self.search_fact_token is None:
+                raise ValueError(
+                    "search needs search_fact_token: a walk alternates "
+                    "key(FACT, entity) with key(entity, relation) and cannot "
+                    "build the first without the marker")
+            if self.search_query_token is None:
+                raise ValueError(
+                    "search needs search_query_token to find the target it "
+                    "checks a branch against. Without a target it would have "
+                    "to score branches by confidence, which decision 93 "
+                    "measured at 0.628 against 0.500 for guessing")
         if self.hop_accumulate not in ("replace", "bind", "concat"):
             raise ValueError(
                 "hop_accumulate must be 'replace', 'bind' or 'concat', not "
@@ -1561,6 +1635,11 @@ class LocalAssociativeMemory:
         self.retrieval.begin(d)
         previous_key = None
         previous_retrieval = None
+        # None until the query marker is seen, which is also what turns search
+        # on: before the question names its far end there is nothing to check a
+        # branch against, so the walk would have to score by confidence -- the
+        # signal decision 93 measured at 0.628 against 0.500 for guessing.
+        search_target = None
         # The size of the store that produced `previous_retrieval`, so a
         # relative tag divides by what the retrieval could have returned rather
         # than by a store that already contains the write being ranked. Computed
@@ -1584,6 +1663,21 @@ class LocalAssociativeMemory:
                 for node in leaving:
                     alive[node * per_group:(node + 1) * per_group] = 0.0
                 memory *= alive[:, None]
+
+            # THE TARGET A BRANCH IS CHECKED AGAINST, read from the STREAM.
+            #
+            # The token after the query marker names the far end of the question,
+            # which is the disambiguator decision 108 found the store had never
+            # been given: it answers "what relation does S hold" correctly where
+            # the question needs "which of S's relations leads to T".
+            #
+            # Reading it from the input is what makes search a mechanism rather
+            # than a ceiling. g9-02 established that a token IN THE STREAM is
+            # implementable where `position_kinds()` is an oracle, and this is
+            # the same distinction.
+            if (self.config.search_query_token is not None and t > 0
+                    and int(tokens[t - 1]) == self.config.search_query_token):
+                search_target = self.wv[int(tokens[t])]
 
             # The single point where a key enters the model. `previous_key`
             # below is simply this key one step back, so a key source that binds
@@ -1924,10 +2018,32 @@ class LocalAssociativeMemory:
             keep_hops = (self.halt_w is not None
                          or self.config.hop_accumulate == "concat")
             per_hop = [retrieved] if keep_hops else None
+            # SEARCH REPLACES THE HOP LOOP, it does not run beside it.
+            #
+            # A hop decodes a retrieval and re-encodes it through `Wk`; a walk
+            # commits to a token and keys on `(entity, relation)` pairs
+            # directly. Running both would re-encode pointlessly and the walk's
+            # result would be overwritten by the hop's. `searching` is False in
+            # every configuration measured before decision 123, so the path
+            # below is bit-identical to what every earlier result used.
+            searching = (self.config.search_branches >= 1
+                         and search_target is not None)
+            if searching:
+                walks = run_search(
+                    readable, self.retrieval, self.key_source, self.wv,
+                    int(self.config.search_fact_token), int(tokens[t]),
+                    search_target, self.config.hops,
+                    self.config.search_branches)
+                if walks:
+                    # The winning walk's per-relation retrievals ARE the hops the
+                    # readout consumes, in order, which is why `concat` is
+                    # required: one vector per relation, all of them visible.
+                    per_hop = list(walks[0].retrieved)
+                    retrieved = per_hop[-1]
             # One EXTRA retrieval when gating: the gate scores hop k by what hop
             # k+1 returns, so the last readable hop still needs a lookahead.
             extra = 1 if self.halt_w is not None else 0
-            for _ in range(self.config.hops - 1 + extra):
+            for _ in range(0 if searching else self.config.hops - 1 + extra):
                 # DECODE AND RE-ENCODE, which is how a retrieval becomes a key.
                 #
                 # `retrieved` lives in VALUE space and keys live in KEY space:

@@ -778,9 +778,13 @@ MUTATIONS = [
                "the two spaces are orthogonal (measured cosine -0.069). "
                "Allowing the combination lets every hop after the first query "
                "a key space nothing was written to -- and the model still "
-               "returns answers, still trains, and still reports accuracies",
+               "returns answers, still trains, and still reports accuracies. "
+               "Decision 123 lifted the refusal ONLY where search supplies a "
+               "pair-key walk instead of a re-encoding hop; dropping the "
+               "search_branches clause re-opens it everywhere else",
         path=LOCAL,
-        old="        if self.hops > 1 and self.context_keys:",
+        old="        if self.hops > 1 and self.context_keys "
+            "and self.search_branches < 1:",
         new="        if False and self.hops > 1 and self.context_keys:",
     ),
     Mutation(

@@ -1,0 +1,109 @@
+name: sweep-g12-02-churn-over-a-real-network
+
+# C3 IS THE LEAST-TESTED CONSTRAINT IN THE PROJECT, and this is its first real
+# test. GOALS.md says departure "has never been tested in the predecessor
+# project, because nothing ever left", and note 014 says the same of this one:
+# "Churn is untested here. `absent` and `leave_at` work in-process, and the
+# slice handshake that makes them mean anything under a real network was only
+# just built."
+#
+# A four-node case was run by hand on 2026-07-28 and the property held. One run
+# of one departure is not a measurement.
+#
+# THE ASSERTION IS NOT "AGREES". A run with a departure should NOT agree with the
+# single-process model -- losing a quarter of the store's dimensions should
+# change later answers. It is required not to diverge EARLY:
+#
+#     mismatches_before_departure == 0
+#
+# A machine switching off may change what happens next. It must not change what
+# already happened. Asserting overall agreement would fail on correct behaviour,
+# and a test that has to be ignored is a test that gets deleted.
+#
+# PREDICTIONS (full text in the sweep file):
+#   P1  no early divergence anywhere -- the C3 property, one cell refutes it
+#   P2  mismatches after departure rise with the fraction lost
+#   P3  a later departure costs fewer mismatches, fewer steps left to be wrong in
+#   P4  the remainder keeps running in every cell, no hang
+#
+# P4 is the one that would be embarrassing: a hang is exactly what a barrier
+# looks like when a participant vanishes, and the absence of barriers is what C1
+# is for.
+#
+# CLEAN LINK ON PURPOSE -- mixing impairment in would mean a divergence could be
+# either departure or loss. Churn under impairment comes after both, if both
+# hold.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-testbed
+  cancel-in-progress: false
+
+jobs:
+  churn:
+    strategy:
+      fail-fast: false
+      matrix:
+        nodes: [4, 8, 16]
+        lost: [one, quarter]
+        leave_at: [10, 20, 30]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: window ${{ matrix.window }} on a ${{ matrix.link }} link, run ${{ matrix.repeat }}
+        run: |
+          set -o pipefail
+          mkdir -p out
+          if [ "${{ matrix.link }}" = "clean" ]; then
+            python testbed/run.py --nodes 4 --width 16 --steps 40 \
+              --window ${{ matrix.window }} \
+              | tee out/X-clean-w${{ matrix.window }}-r${{ matrix.repeat }}.json
+          else
+            python testbed/run.py --nodes 4 --width 16 --steps 40 \
+              --window ${{ matrix.window }} \
+              --delay 80ms --jitter 20ms --loss 2% \
+              | tee out/X-impaired-w${{ matrix.window }}-r${{ matrix.repeat }}.json
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g12-02-n${{ matrix.nodes }}-${{ matrix.lost }}-at${{ matrix.leave_at }}
+          path: out/*.json
+
+  aggregate:
+    needs: [churn]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g12-02-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 18" | tee summary.txt
+          python -m tools.summarise_g12_02 | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g12-02-summary
+          path: |
+            summary.txt
+            out/*.json

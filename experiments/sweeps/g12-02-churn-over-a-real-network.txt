@@ -1,0 +1,119 @@
+Churn over a real network, for the first time
+=============================================
+
+Script: testbed/run.py, real containers, nodes made to vanish mid-run
+Status: DISPATCHED, awaiting results.
+
+
+IN PLAIN TERMS
+---------------
+The whole project assumes machines switch off constantly and the rest carry on.
+That has been tested by *simulating* a machine leaving, inside one process.
+It has never been tested by actually having one go away.
+
+This does that. Containers on a real network, some of them told to stop
+answering partway through, and one question asked: **did the answers already
+given stay the same?** A machine leaving may change what happens next. It must
+not change what already happened.
+
+
+WHY THIS EXISTS
+----------------
+**C3 is the least-tested constraint in the project.** GOALS.md says so plainly —
+*"This has never been tested in the predecessor project, because nothing ever
+left"* — and [note 014](../../docs/notes/014-the-first-real-packets.md) says the
+same of this one:
+
+> *"Churn is untested here. `absent` and `leave_at` work in-process, and the
+> slice handshake that makes them mean anything under a real network was only
+> just [built]."*
+
+The machinery exists and has never been run over containers. A first run on
+2026-07-28 did the four-node case and the property held. **One run of one
+departure is not a measurement**, which is what this is for.
+
+**Why the slice handshake matters here**, from the driver's own comment: before
+it, the driver indexed connections by ARRIVAL ORDER, and under a delayed link
+arrival order is whatever the network decides. A churn measurement taken then
+would have removed a node chosen at random and reported it as node 0. So this
+sweep is only meaningful because that handshake exists, and it is the first
+thing to check if a cell reports something strange.
+
+
+THE ASSERTION, AND WHY IT IS NOT "AGREES"
+------------------------------------------
+A run with a departure **is not required to agree** with the single-process
+model. It is required not to diverge EARLY.
+
+    mismatches_before_departure == 0
+
+Losing a quarter of the store's dimensions should change later answers — that is
+what losing them means. Changing answers already given would mean a departure
+reaching backwards, and nothing about a machine switching off should do that.
+
+Asserting overall agreement would fail on correct behaviour, which is worse than
+not asserting at all: it would be a test that has to be ignored, and a test that
+is ignored is a test that gets deleted.
+
+
+PREDICTIONS
+------------
+Registered before dispatch.
+
+  P1  **NO EARLY DIVERGENCE, ANYWHERE.** `mismatches_before_departure` is zero
+      in every cell, at every node count, however many leave and however late.
+      This is the C3 property and a single non-zero cell refutes it.
+
+  P2  **MISMATCHES AFTER DEPARTURE RISE WITH THE FRACTION LOST.** Losing 1 of 8
+      costs less than losing 2 of 4. If they are equal, the departure is not
+      removing what it claims to.
+
+  P3  **A LATER DEPARTURE COSTS FEWER MISMATCHES**, simply because fewer steps
+      remain to be wrong in. A flat result would mean the count is not measuring
+      what it appears to.
+
+  P4  **THE REMAINDER KEEPS RUNNING IN EVERY CELL** — no hang, no timeout. The
+      run completes and reports. C3 says the remainder continues, and a
+      deadlocked driver is the most likely way that fails.
+
+WHAT WOULD REFUTE EACH: P1 by any non-zero `mismatches_before_departure`. P2 by
+mismatch counts flat across loss fractions. P3 by counts flat across
+`leave_at`. P4 by any cell timing out.
+
+**P1 is the whole point and P4 is the one that would be embarrassing**, because
+a hang is exactly what a barrier looks like when a participant vanishes — and
+the absence of barriers is what C1 is for.
+
+
+COST
+-----
+18 jobs: 3 node counts x 2 departure fractions x 3 departure steps, width 16,
+40 steps, clean link.
+
+    nodes        4, 8, 16
+    lost         one node; a quarter of them
+    leave_at     10, 20, 30   (of 40 steps)
+
+Clean link ON PURPOSE. Impairment is a separate axis and mixing it here would
+mean a divergence could be either departure or loss. The impairment sweep is
+g12-01; churn under impairment comes after both, if both hold.
+
+Container join is ~0.7 s per node and the model work is under 0.2 s even at 64
+nodes, so every cell is seconds and the matrix is minutes.
+
+
+MEASURED ON
+------------
+Real containers on a Docker bridge. Note 014's limits are inherited: no NAT, no
+asymmetric routes, no competing congestion, and a departure here is a process
+told to stop answering rather than a machine losing power — so it is a clean
+departure, which is the EASY case. A half-open socket that accepts and never
+replies is worse and is not tested here.
+
+Width 16 across up to 16 nodes means one dimension per node at the top, which is
+the smallest slice that exists.
+
+
+THE NUMBERS
+------------
+Awaiting the run.

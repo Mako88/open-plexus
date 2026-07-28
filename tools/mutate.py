@@ -1603,8 +1603,8 @@ MUTATIONS = [
         path=DISTRIBUTED,
         old="                    if deadline is None:\n"
             "                        raise\n"
-            "                    suspect[index] = step",
-        new="                    suspect[index] = step",
+            "                    suspect[index] = now",
+        new="                    suspect[index] = now",
     ),
 ]
 

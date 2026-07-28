@@ -61,14 +61,28 @@ _HEADER = struct.Struct("!I")
 _DONE = -1
 _RESET = -2
 
-#: How long a node stays suspect before the driver tries it again, in steps.
+#: How long a node stays suspect before the driver tries it again, IN SECONDS.
 #:
-#: SWIM's suspicion timeout, in the only clock this driver has. The value is a
-#: guess and is **not** measured: too short and a genuinely departed node is
-#: retried every few steps for nothing; too long and a node that recovered stays
-#: dark. SWIM tunes the equivalent against a target false-positive rate, which
-#: needs a failure model this project does not yet have -- see note 039.
-RETRY_AFTER_STEPS = 8
+#: **Derived from a measurement, which is the whole point of the change.** This
+#: was `RETRY_AFTER_STEPS = 8` until decision 128, and a step has no fixed
+#: duration: at 40 steps in 0.014 s on a clean link, eight steps is under 3 ms,
+#: while on an 80 ms link with jitter and loss the same eight steps span
+#: seconds. One constant meaning two things three orders of magnitude apart.
+#:
+#: g12-04 measured the vote round trip over real containers:
+#:
+#:     clean                            p50   0.61 ms   p99   2.54 ms
+#:     delay 80ms jitter 20ms loss 2%   p50  87.22 ms   p99 211.88 ms
+#:
+#: SWIM requires the protocol period to be at least three times the round-trip
+#: estimate, and 3 x p99 on the worst link tested is **636 ms**. That is
+#: note 003's `d_max` -- simultaneously the C2 asynchrony bound and the C3 churn
+#: timeout -- and this is the first time it has been a number.
+#:
+#: **A FLOOR from six links, not a universal constant.** Intercontinental paths,
+#: mobile networks and congested uplinks are all outside that grid, and a worse
+#: link raises it. Registered in `docs/SCALE.md`.
+RETRY_AFTER_SECONDS = 0.64
 
 
 def send(sock: socket.socket, payload: bytes) -> None:
@@ -262,7 +276,7 @@ class Network:
         self.steps_settled_short: dict[int, int] = {}
         #: node -> the step at which it last failed a send, for nodes currently
         #: under suspicion. A node absent from this is being spoken to
-        #: normally; one present is retried every `RETRY_AFTER_STEPS`.
+        #: normally; one present is retried after `retry_after` seconds.
         self.nodes_suspect: dict[int, int] = {}
         #: Seconds from a step being dispatched to each vote for it arriving.
         #: One entry per vote, reset by every `run`.
@@ -271,9 +285,9 @@ class Network:
         #: reason it is collected at all. The paper sets the indirect-probe
         #: timeout from an estimate of the round-trip distribution -- the mean
         #: or the 99th percentile -- and requires the protocol period to be at
-        #: least three times the round-trip estimate. `RETRY_AFTER_STEPS`
-        #: counts STEPS instead, which is a guess in the wrong unit because a
-        #: step has no fixed duration (note 039, decision 127).
+        #: least three times the round-trip estimate. g12-04 measured that
+        #: distribution and `RETRY_AFTER_SECONDS` is derived from it (decision
+        #: 128); this is what has to be re-measured when the link changes.
         #:
         #: **It is not a pure network round trip.** It includes the node's
         #: compute for that token, so it is an upper bound on link latency and
@@ -356,7 +370,8 @@ class Network:
 
     def run(self, tokens: np.ndarray, absent: set[int] | None = None,
             leave_at: int | None = None, window: int = 1,
-            speak: float = 1.0, deadline: float | None = None) -> np.ndarray:
+            speak: float = 1.0, deadline: float | None = None,
+            retry_after: float = RETRY_AFTER_SECONDS) -> np.ndarray:
         """Broadcast each token, sum the votes, return a prediction per position.
 
         `absent` names nodes that stop answering from `leave_at` onward -- a real
@@ -407,6 +422,17 @@ class Network:
         Args:
             deadline: Seconds to wait for a step before settling on whatever
                 arrived. `None` waits for every expected vote.
+            retry_after: Seconds a node stays suspect before being tried again.
+                Defaults to the measured `RETRY_AFTER_SECONDS`.
+
+                **A parameter rather than only a constant, because the default
+                is longer than a short run.** 40 steps take 14 ms on a clean
+                link and the measured interval is 640 ms, so inside a benchmark
+                a suspect node would never be retried and suspicion would be
+                indistinguishable from the ejection it replaced. Deployment runs
+                continuously and does not have that problem; tests do, and a
+                test that cannot observe the behaviour it is testing is the
+                vacuous-check class this project keeps finding.
 
         Raises:
             ValueError: If `deadline` is not positive.
@@ -467,8 +493,8 @@ class Network:
         # Seeded BEFORE the interval so dispatch tries them at step 0. That is
         # what carries a node already gone at the start into the single guard
         # in `dispatch`, where the strict-versus-tolerant decision is made.
-        suspect: dict[int, int] = {index: -RETRY_AFTER_STEPS
-                                   for index in starting_unreachable}
+        suspect: dict[int, float] = {index: float("-inf")
+                                     for index in starting_unreachable}
         sent = settled = 0
         self.steps_settled_short = {}
         self.vote_latencies = []
@@ -478,11 +504,11 @@ class Network:
             nonlocal gone
             if leave_at is not None and step == leave_at:
                 gone = set(absent)
-            asked_at[step] = time.monotonic()
+            now = time.monotonic()
+            asked_at[step] = now
             live = [i for i in range(len(self._connections))
                     if i not in gone
-                    and step - suspect.get(i, -RETRY_AFTER_STEPS)
-                    >= RETRY_AFTER_STEPS]
+                    and now - suspect.get(i, float("-inf")) >= retry_after]
             # Who answers this step. Round-robin rather than random: it is
             # deterministic, it spreads the cost evenly, and it guarantees the
             # count exactly rather than in expectation -- which matters because
@@ -515,7 +541,7 @@ class Network:
                     # hide real faults behind a fault-tolerance feature.
                     if deadline is None:
                         raise
-                    suspect[index] = step
+                    suspect[index] = now
                     speaking.discard(index)
                 else:
                     # IT ANSWERED, so the mark clears. SWIM multicasts an

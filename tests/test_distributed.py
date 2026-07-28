@@ -306,31 +306,35 @@ class ADepartureNOBODYDECLARED(unittest.TestCase):
         sequence with no path back. Note 039: transient trouble is the common
         case, and permanent ejection turns a blip into permanent damage.
 
-        A genuinely dead node is retried every RETRY_AFTER_STEPS and fails each
-        time, which is the cost; the point is that the door is not locked.
+        A genuinely dead node is retried every `retry_after` seconds and fails
+        each time, which is the cost; the point is that the door is not locked.
+
+        **`retry_after` is set explicitly here, far below the measured
+        default.** `RETRY_AFTER_SECONDS` is 0.64 s and this whole run takes
+        milliseconds, so at the default the node would never come up for a retry
+        and the test would pass without observing the behaviour it names.
         """
-        from openplexus.distributed import RETRY_AFTER_STEPS
+        import time
 
         config, model = configured(4)
         long_enough = np.tile(TOKENS, 3)
-        self.assertGreater(len(long_enough), RETRY_AFTER_STEPS * 2,
-                           "the sequence must outlast a retry interval or "
-                           "this measures nothing")
         with Network(config, 4, model.wv, model.wo) as network:
             network.run(long_enough, window=2)
             network._processes[1].terminate()
             network._processes[1].join(timeout=5)
+            started = time.monotonic()
 
-            network.run(long_enough, window=2, deadline=1.0)
+            network.run(long_enough, window=2, deadline=1.0,
+                        retry_after=0.0005)
 
             # It stays suspect because it really is dead -- what matters is
-            # that the mark was REFRESHED at a later step than the first
-            # failure, which only happens if the driver tried it again.
+            # that the mark was REFRESHED later than the run began, which only
+            # happens if the driver tried it again.
             self.assertIn(1, network.nodes_suspect)
             self.assertGreater(
-                network.nodes_suspect[1], 0,
-                "the node was marked suspect at step 0 and never retried, "
-                "which is the permanent ejection this test exists to prevent")
+                network.nodes_suspect[1], started,
+                "the node was marked suspect once and never retried, which is "
+                "the permanent ejection this test exists to prevent")
 
     def test_an_undeclared_death_still_RAISES_without_a_deadline(self):
         """Strict mode is preserved deliberately.
@@ -351,7 +355,7 @@ class ADepartureNOBODYDECLARED(unittest.TestCase):
 class TheRoundTripIsTIMEDRatherThanGuessed(unittest.TestCase):
     """Every waiting parameter in this project is tuned in STEPS.
 
-    A step has no fixed duration, so `RETRY_AFTER_STEPS` and note 003's `d_max`
+    A step has no fixed duration, so a step-counted interval and note 003's `d_max`
     cannot state a bound — and C2 is the constraint that requires one. SWIM sets
     its timeouts from a measured round-trip distribution and requires
     `T' >= 3 x RTT`, which is only computable once the round trip is a number.

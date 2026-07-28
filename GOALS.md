@@ -305,6 +305,18 @@ Intercontinental round trips are ~150 ms. A mechanism whose credit signal must
 arrive within a few milliseconds cannot be distributed, no matter how well it
 learns locally.
 
+**The bound is now stated, and it is `d_max` ≈ 640 ms** — the first time this
+constraint has had a number rather than a principle. It is one parameter doing
+two jobs, as note 003 argued: within it a slow source is a straggler, beyond it a
+dropout, so C2's bound and C3's churn timeout are the same quantity.
+
+**Measured, not chosen**, and the derivation belongs with the number: it is three
+times the 99th-percentile vote round trip on the worst link tested, following
+SWIM's rule that a protocol period must be at least 3 × RTT. See
+[docs/SCALE.md](docs/SCALE.md) for the grid it came from and what would move it —
+**it is a floor from six simulated links, not a universal constant**, and a real
+WAN raises it.
+
 ### C3 — Churn
 
 **Machines leaving is the normal case, not an edge case.** A consumer device is

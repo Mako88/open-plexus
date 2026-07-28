@@ -102,3 +102,23 @@ Two rules that keep it honest:
 | **Why it may not travel** | This is the ceiling *without* the model's own write path. `decay` and `memory_cap` both reduce it and neither was active |
 | **Trigger to revisit** | Any task writing more than ~1 binding per dimension, or any use of the capped/decayed path at scale |
 | **Measure it properly by** | Re-running the same sweep through `model.run` rather than direct outer products |
+
+## `d_max` — the asynchrony bound and the churn timeout (decision 128)
+
+| | |
+|---|---|
+| **Chosen** | `RETRY_AFTER_SECONDS = 0.64`, and with it C2's stated bound |
+| **Measured at** | g12-04 — 4 nodes, width 16, 40 steps, window 4, on a Docker bridge with `tc netem`. Six links from clean to 80 ms delay + 20 ms jitter + 2% loss |
+| **The finding** | Vote round trip p99 runs **2.54 ms** clean and **211.88 ms** on the worst link. SWIM requires the period to be ≥ 3× the round-trip estimate, giving **636 ms** |
+| **Why it may not travel** | Every link here is a container bridge on one host with impairment *simulated*. Intercontinental paths, mobile networks, congested consumer uplinks and NAT traversal are all outside the grid, and each raises it. **It is a floor, not a constant** |
+| **Trigger to revisit** | Any run over a real WAN; any node count above the four tested; any link worse than 80 ms / 20 ms / 2% |
+| **What to do then** | Re-run `sweep-g12-04` on the new links and take 3 × p99 again. The instrumentation (`Network.vote_latencies`) is permanent, so this is a re-measurement rather than a rebuild |
+| **What it does NOT say** | That 640 ms is right for a *deployed* system. It is the wait a driver must tolerate on these links, and note 039's remaining gaps — no probe channel, no indirect probing, a single detector — all still stand |
+
+> **Two shape facts from the same sweep, worth carrying wherever this number
+> goes.** Quote the **p99 − p50 gap**, not the p99/mean ratio: once a fixed delay
+> dominates, mean and p99 converge (1.01× at delay 80 ms) while the gap keeps
+> growing (1.0 → 16.0 → 124.7 ms as jitter then loss are added). And **loss is
+> multiplicative with delay, not additive** — 2% loss alone is invisible, but the
+> same 2% on an 80 ms link doubles the p99, because a retransmit costs a round
+> trip.

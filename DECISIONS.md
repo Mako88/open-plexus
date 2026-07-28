@@ -5652,3 +5652,65 @@ Any claim about capacity under the model's own write path. This wrote outer
 products directly; the model applies `decay` and a `memory_cap` on the store's
 norm, and **neither was active here**. Capacity under those is a different
 number and is the one that matters in practice.
+
+## 110. The readout is not at capacity either — so saturation is not a capacity limit
+
+Decision 109 eliminated the store. This measures the second candidate the same
+way, and the prediction written before the run was **wrong**.
+
+The prediction: a linear map separates about `d` points, so the readout should
+cap near `d` while the store holds `d²` — saturation with a number and a place.
+
+    items held at 90%          readout          store (decision 109)
+      width  32          64   2.00 / dim      16   0.50 / dim
+      width  64         128   2.00 / dim      96   1.50 / dim
+      width 128         256   2.00 / dim     384   3.00 / dim
+
+    hidden readout: 1.000 at every width and every load tested
+
+**The readout holds 2.00 items per dimension**, not dramatically less than the
+store — and at width 32 it is four times *larger*. The "much lower" half of the
+prediction was simply wrong.
+
+### What is right is the SCALING, and it matters later rather than now
+
+The readout grows **linearly** — 2d, flat per dimension. The store grows
+**quadratically** — 0.5, 1.5, 3.0 per dimension. They cross around width ~100,
+and above that the readout is the binding constraint: doubling the width doubles
+what the readout can hold while quadrupling what the store can.
+
+So a linear readout **will** become the ceiling as this scales, and a hidden
+layer removes that limit in this range entirely. That is the same mechanism
+decision 83 found was the largest single factor on text (+0.63 bits, 9 of 9
+cells), now with a reason attached.
+
+### But it does not explain decision 63
+
+At widths 64–128, where saturation was measured, **both capacities exceed what
+the tasks demand** — the store by an order of magnitude, the readout by several
+times. And both numbers are worst cases: these are *random* assignments, and a
+structured task should need less, not more.
+
+**So saturation is not a capacity limit in either component.** Both mechanical
+candidates are now eliminated.
+
+### What this licenses
+
+The search narrows to what is left, and it is no longer mechanical:
+
+- **Frozen random representations** — decision 93 showed they block learning any
+  *class* of token and decision 94 measured `value_lr` failing to fix it. This
+  is now the leading candidate by elimination rather than by evidence.
+- **The objective or the task itself** — that more data does not help may be a
+  statement about what next-character prediction offers a model of this shape,
+  rather than about the shape.
+
+It also puts a `hidden` readout on the scaling path for a reason beyond its text
+result: it is what keeps the readout from becoming the ceiling above width ~100.
+
+### What it does NOT license
+
+Reading these as the model's real capacities. Both probes measure components in
+isolation, with random data, no decay, no cap and no interference between them.
+The composed system is what saturates and it has **not** been measured this way
+— what is established is only that neither part is individually at its limit.

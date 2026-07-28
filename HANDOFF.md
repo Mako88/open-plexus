@@ -122,11 +122,34 @@ three candidate causes is now eliminated.
 **Capacity scales roughly with d²**, and at width 64 the store holds ~96
 bindings where this project's tasks write 10–30. **Nowhere near the ceiling.**
 
-So the search narrows to what is left, neither of which has been tested:
+**And the readout is not at capacity either** (decision 110):
 
-- **The single linear readout.** `Wo` is the only thing learning across
-  sequences; one linear map has a ceiling whatever the store does.
+    items held at 90%      readout            store
+      width  32       64   2.00 / dim    16   0.50 / dim
+      width  64      128   2.00 / dim    96   1.50 / dim
+      width 128      256   2.00 / dim   384   3.00 / dim
+    hidden readout: 1.000 everywhere
+
+At the widths where saturation was measured, **both capacities exceed what the
+tasks demand** — and these are random-assignment worst cases. **So saturation is
+not a capacity limit in either component.** Both mechanical candidates are gone.
+
+What the readout numbers *do* say is about scaling: it grows **linearly** where
+the store grows **quadratically**, so they cross near width ~100 and above that
+a linear readout becomes the ceiling. A `hidden` readout removes it — which is
+why decision 83 found it the largest single factor on text.
+
+### So what is left for saturation
+
 - **Frozen random representations** (93), which `value_lr` failed to fix (94).
+  Leading candidate now by elimination rather than evidence.
+- **The objective itself** — "more data does not help" may be a statement about
+  what next-character prediction offers a model of this shape, not about the
+  shape.
+
+> Both capacity probes measure components **in isolation**, random data, no
+> decay, no cap, no interference. The composed system is what saturates and has
+> not been measured this way.
 
 > The first version of this probe concluded the OPPOSITE — that capacity
 > plateaus — because it sampled keys with replacement and wrote contradictory

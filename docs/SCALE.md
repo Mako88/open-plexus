@@ -81,6 +81,17 @@ Two rules that keep it honest:
 | **Why it may not travel** | The cap bounds total stored magnitude, so the number of bindings it can hold before old ones are crowded out scales with width but the cap does not |
 | **Trigger to revisit** | Sequences long enough that early bindings are unreadable by the end — testable directly by querying the first binding at the last position |
 
+## Readout capacity, and where it crosses the store (decision 110)
+
+| | |
+|---|---|
+| **Measured** | Random `(retrieval → answer)` pairs a readout can learn, no store and no task |
+| **The finding** | Linear readout holds **2.00 items per dimension at every width** — 64, 128, 256 at widths 32, 64, 128. A hidden readout holds everything tested |
+| **Why it matters at scale** | The readout grows **linearly** where the store grows **quadratically** (0.50 → 1.50 → 3.00 per dimension). They cross near **width ~100**, and above that the linear readout is the binding constraint — doubling width doubles it while quadrupling the store |
+| **Trigger to revisit** | Any width above ~100 with a linear readout |
+| **What to do then** | `hidden` — which is also what decision 83 measured as the largest single factor on text |
+| **What it does NOT say** | That either is what saturates today. At widths 64–128 both exceed task demand, so decision 63 is not a capacity limit |
+
 ## Raw store capacity, uncapped (decision 109)
 
 | | |

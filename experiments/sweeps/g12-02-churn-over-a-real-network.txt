@@ -2,7 +2,13 @@ Churn over a real network, for the first time
 =============================================
 
 Script: testbed/run.py, real containers, nodes made to vanish mid-run
-Status: DISPATCHED, awaiting results.
+Status: RUN, 18 of 18 cells, run 30333987195. Two earlier dispatches were lost
+        to plumbing -- an undeclared matrix key, then a verdict function that
+        failed correct behaviour. See decision 81.
+
+ANSWER: **No departure ever reached backwards**, in any cell. And the damage
+        tracks the FRACTION of the store lost, not the node count: at a quarter
+        lost the mismatch counts are identical across 4, 8 and 16 nodes.
 
 
 IN PLAIN TERMS
@@ -116,4 +122,24 @@ the smallest slice that exists.
 
 THE NUMBERS
 ------------
-Awaiting the run.
+    mismatches_before_departure: ZERO in all 18 cells. That is the constraint.
+
+    mismatches AFTER departure, by fraction lost and departure step
+        fraction lost   at 10   at 20   at 30
+          0.062 (1/16)      7       4       1
+          0.125 (1/8)       9       7       2
+          0.250 (1/4)      11       5       1
+
+    At a quarter lost the counts are IDENTICAL across 4, 8 and 16 nodes --
+    11, 5 and 1, three times each. Losing one of four costs exactly what losing
+    four of sixteen costs.
+
+P1 confirmed: no early divergence anywhere.
+P2 confirmed, and sharpened: cost is a function of the FRACTION lost, not the
+   node count. Interchangeable slices, measured rather than assumed.
+P3 confirmed: a later departure costs fewer mismatches, monotonically.
+P4 confirmed: every cell completed, no hang. A hang is what a barrier looks like
+   when a participant vanishes, and there was none.
+
+Scored in full in decision 81. Caveats stand: a clean departure is the EASY
+case, most cells are single runs, and the link was clean.

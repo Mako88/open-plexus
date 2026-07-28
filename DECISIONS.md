@@ -3804,3 +3804,62 @@ Note 014's caveat is discharged: the number is now measured, repeated, and
 smaller than advertised. **The 7.3x should be replaced by 6.26x wherever it is
 quoted**, and GOALS may now carry it, with the standing caveat that the topology
 is a Docker bridge with one-way impairment and a real link is worse.
+
+---
+
+## 81. C3 measured over real containers, and the cost tracks the FRACTION lost
+
+**The least-tested constraint in the project, tested.** GOALS.md said departure
+*"has never been tested in the predecessor project, because nothing ever left"*,
+and note 014 said `absent`/`leave_at` had never run over a real network. 18 of 18
+cells, run `30333987195`.
+
+**P1 confirmed, and it is the constraint.** `mismatches_before_departure == 0` in
+every cell, at 4, 8 and 16 nodes, losing one node or a quarter, at three
+departure steps. **A machine switching off never changed an answer already
+given.**
+
+**P4 confirmed.** Every cell completed. No hang, no timeout — which matters more
+than it sounds, because a hang is exactly what a barrier looks like when a
+participant vanishes, and the absence of barriers is what C1 is for.
+
+**P2 and P3 confirmed, and more sharply than predicted:**
+
+    fraction lost   leave_at 10   leave_at 20   leave_at 30
+        0.062 (1/16)         7             4             1
+        0.125 (1/8)          9             7             2
+        0.250 (1/4)         11             5             1
+
+**At a quarter lost the counts are IDENTICAL across 4, 8 and 16 nodes** — 11, 5
+and 1, three times each. Losing one of four costs exactly what losing four of
+sixteen costs.
+
+So the damage is a function of **what fraction of the store went away and how
+many steps remained**, and not of how the network was divided. That is the
+property you would want from interchangeable slices and it had never been
+measured. It also means the tiny-node direction is not paying a penalty for
+being tiny: 16 nodes losing one is the CHEAPEST cell in the grid, because one
+node is a smaller share.
+
+### What this does not establish
+
+**A clean departure is the easy case.** These nodes are told to stop answering.
+A machine losing power leaves a half-open socket that accepts and never replies,
+and nothing here tests that.
+
+**Mostly single runs.** Only the 4-node/one-lost cells have two repeats; the
+rest are one, so the table shows `+/-inf`. The exact agreement across three node
+counts at equal fraction is worth more than the repeats would be — three
+independent configurations producing identical integers is not noise — but the
+per-cell numbers are unrepeated and should be read as such.
+
+**Clean link.** Churn under impairment is untested; a divergence there could be
+either cause, which is why they were separated. That grid comes next.
+
+### The cost of getting here
+
+Three dispatches. **Two were spent on my own plumbing** — an undeclared matrix
+key that expanded to empty in all 18 cells, then a `verdict` function that
+failed a churn run for behaving correctly. Neither told us anything about C3.
+Both are now caught by a check or a test rather than by my remembering, which is
+the only reason the count stops at three.

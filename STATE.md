@@ -146,17 +146,50 @@ at depth 5. **Bandwidth is not what binds search.**
 of four facts. The unit test says the mechanism is correct; whether it survives
 distractors, decay and a cap is the next measurement.
 
-**Next, in order:**
+### 1b. MEASURED — g13-03, decision 125. Traversal is the win; search needs a gate
 
-1. **Wire it into `run()`** — deliberately deferred, because `run()` is 526 lines
-   with 46 branch points and item 9 is about that.
-2. **Measure it end-to-end on kinship** against g13-02's 1.000 ceiling, with
-   `branches=1` as the control that says whether searching bought anything.
-3. **Re-measure composition** rather than inheriting it. Decision 102 put it at
-   1.000 over the whole rule table, on a different configuration.
+    arm       overall            out-degree 1       out-degree >= 2
+    concat    0.327 +/-0.014     0.348 +/-0.018     0.297 +/-0.017
+    walk      0.596 +/-0.018     0.702 +/-0.025     0.446 +/-0.010   CLEARS FLOOR
+    search4   0.604 +/-0.013     0.649 +/-0.021     0.539 +/-0.024   CLEARS FLOOR
+    search8   0.580 +/-0.014     0.619 +/-0.023     0.525 +/-0.024
 
-Decision 111's beam numbers (0.485 / 0.510 / 0.495) were measured with noisy
-primitives and should be re-derived, not reused.
+    walk - concat    +0.269 +/-0.024      search4 - walk   +0.008 +/-0.018
+
+**Traversal is worth +0.269** and clears the 0.466 first-relation floor that
+nothing on this task had ever cleared. Decision 107 declined it at a costed
+"+0.05"; that verdict did not survive the primitives moving.
+
+**Search overall is a tie** (inside 2 SE) — but the split says why, and it is the
+useful part:
+
+    search4 - walk at out-degree 1       -0.054
+    search4 - walk at out-degree >= 2    +0.092
+
+**It does exactly what it was built for and damages the case it was not.** At
+out-degree 1 there is nothing to choose between, so branching can only replace a
+correct greedy pick with a lucky endpoint. The two nearly cancel because the test
+set is half of each.
+
+**`search8` is 0.024 WORSE than `search4`, at 6 SE.** More branches actively
+hurt: each extra candidate is another chance for a wrong branch whose endpoint
+scores well. "Search wider" is not the way to close the gap.
+
+### THE NEXT MECHANISM: gate the search on ambiguity
+
+Run the walk greedily, branch only where the first decode is ambiguous. The split
+says that keeps +0.092 and gives back the −0.054.
+
+**Open question first, and it is measurable before anything is built:** is
+ambiguity detectable from the decode itself — the gap between its top two
+candidates — rather than from out-degree, which is task structure a running
+system cannot read? **Decision 93 is the warning**: every identity-free
+confidence signal it measured reached 0.628 against 0.500 for guessing. The
+quantity here is different, but measure it first. That habit has saved three
+builds.
+
+Also still open: **re-measure composition** rather than inheriting decision 102's
+1.000, which was taken on a different configuration.
 
 ### 1b. Two loose ends from g13-01, both cheap and both unexplained
 

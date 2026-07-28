@@ -69,6 +69,7 @@ a report to John, not a gate.
 | 122 | step 2 reproduces at 0.971, the traversal ceiling is 1.000, build it |
 | 123 | search is built and proved on its own; beam 4 costs 3.2x the traffic |
 | 124 | the objective is the thesis; the driver has no failure detector |
+| 125 | traversal is the win (+0.269); search helps only where ambiguity is |
 
 ---
 
@@ -2921,3 +2922,88 @@ Assuming the driver fix is small. Settling on a quorum changes what a run means:
 answers become dependent on who replied in time, so bit-identity — the property
 G2 was passed on — cannot survive it unchanged. That needs its own plan and its
 own predictions.
+
+---
+
+## 125. Traversal is the win. Search helps only where ambiguity is, and hurts where it is not
+
+g13-03, 32 cells, 8 seeds, run 30394574459.
+
+    arm       overall            out-degree 1       out-degree >= 2
+    concat    0.327 +/-0.014     0.348 +/-0.018     0.297 +/-0.017
+    walk      0.596 +/-0.018     0.702 +/-0.025     0.446 +/-0.010   CLEARS FLOOR
+    search4   0.604 +/-0.013     0.649 +/-0.021     0.539 +/-0.024   CLEARS FLOOR
+    search8   0.580 +/-0.014     0.619 +/-0.023     0.525 +/-0.024   CLEARS FLOOR
+
+    walk - concat      +0.269 +/-0.024
+    search4 - walk     +0.008 +/-0.018      <- inside 2 SE
+
+### Decision 107's verdict does not survive the primitives moving
+
+It declined the pair-key traversal because *"a perfect traversal buys 0.05"*,
+computed when steps 1 and 3 were 0.710 and 0.677. **They are 1.000 at out-degree
+1 now, and traversal is worth +0.269** — five times what it was costed at, and it
+is the whole of the gain here.
+
+**It also clears a floor nothing on this task had ever cleared.** `concat` sat at
+0.327 against a first-relation floor of 0.466 — worse than guessing from the
+queried subject's own relation. `walk` reaches 0.596 and `search4` 0.604.
+
+This is the second time in three decisions that a refusal turned out to be
+conditional on numbers that later moved, and both times the refusal was correct
+when made. The pattern worth keeping: **a ceiling measured before building is
+only valid while its inputs are.** Neither 107 nor 111 was wrong; both were
+answers to a question whose terms changed.
+
+### Search is a wash overall, and the out-degree split says exactly why
+
+    search4 - walk at out-degree 1       -0.054
+    search4 - walk at out-degree >= 2    +0.092
+
+**Search does precisely what it was built to do and damages the case it was not
+built for.** At out-degree 1 there is one relation and nothing to choose between,
+so searching can only replace a correct greedy pick with a branch whose endpoint
+scored higher by luck. At out-degree >= 2 it is worth +0.092, the largest single
+gain anything has produced on the ambiguous case — which is the case decision 108
+named as the blocker.
+
+The test set is about half of each, so they cancel. **The tie is therefore not
+evidence against search; it is evidence that search should not run
+unconditionally.**
+
+P2 was scored CONFIRMED by sign and is reported as a tie, because +0.008 +/-0.018
+is inside 2 SE and calling that a win would be exactly the kind of thing this
+project's own paired-scoring rule exists to prevent.
+
+### More branches actively hurt, which was predicted the other way
+
+P4 predicted `search8` within 0.02 of `search4`. It is **0.024 worse, at 6 SE** —
+refuted, and in a direction worth understanding: every extra candidate is another
+chance for a wrong branch whose endpoint happens to score well. The verifier is
+good and not perfect, and widening the beam samples its errors more often.
+
+That is a real constraint on the mechanism and it argues against "just search
+wider" as a way to close the remaining gap.
+
+### What to build next, and the warning attached to it
+
+**A gate on search**: run the walk greedily, and only branch where the first
+decode is ambiguous. The split above says that would keep +0.092 and give back
+the −0.054.
+
+The open question is whether ambiguity is detectable from the decode itself — the
+gap between its top two candidates — as opposed to from the out-degree, which is
+task structure a running system cannot read. **Decision 93 is the warning**: every
+identity-free confidence signal it measured reached 0.628 against 0.500 for
+guessing. The quantity here is different, but the precedent says measure it
+before building on it, which is what saved three builds already.
+
+### What this does NOT license
+
+Quoting 0.604 as the approach's ceiling. Every arm runs the walk unconditionally
+at a fixed depth of 2, on one task, at one width. And g13-02's 1.000 remains the
+retrieval-chain ceiling; the gap to 0.604 is how often the walk fails to reach
+the out-degree-1 regime, which nothing here has decomposed.
+
+**Taken without asking**, under standing authorisation and John's advance
+approval of the direction.

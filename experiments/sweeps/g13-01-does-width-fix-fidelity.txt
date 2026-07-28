@@ -1,6 +1,9 @@
 Does width fix retrieval fidelity on the task, and does that unblock composition?
 =================================================================================
 
+SUPERSEDED IN PART by g13-03: the `hop2-concat` arm below was the best composition
+mechanism available when this ran, and traversal now beats it by +0.269.
+
 Script: experiments/g13_01_does_width_fix_fidelity.py
 Status: RUN, 48 of 48 cells, 8 of 8 seeds, run 30389532519.
 

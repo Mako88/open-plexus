@@ -6191,3 +6191,75 @@ everyone reads and the least often re-derived.
 Treating 5.172 as a ceiling. It is the best of eighteen compositions at 60,000
 characters on a split protocol, above the ~16,000 saturation point — a LEVEL,
 not a slope, as g11-07 says of itself.
+
+## 119. The superposed store EARNS ITS PLACE — note 030's question, answered
+
+BACKLOG's highest-value open item: no benchmark discriminates a superposed store
+from a cache, so neither justifies the store. It could not be answered because
+**the cache only ever ADDED to the store** — every arm holding a cache also held
+the store, so nothing separated them. `cache_only` drops the superposed half of
+the read, which is the ablation that was missing.
+
+### Predictions, registered before the run, and three were wrong
+
+    P1  chains: cache-only MATCHES OR BEATS superposed at slots >= load
+    P2  the store wins only where bindings EXCEED the slots
+    P3  kinship: cache-only beats superposed, because superposition is what
+        the 0.915 -> 0.35 collapse is made of
+    P4  if P1 and P3 hold, the store has no measured task where it wins
+
+### The measurement
+
+    CHAINS, ~45 bindings written, floor 0.167
+      slots    superposed          both    cache only
+          8         0.995         0.845         0.120
+         16         0.995         0.865         0.270
+         32         0.995         1.000         1.000
+        128         0.995         1.000         1.000
+
+    KINSHIP, hop-1 fidelity      deg 1    deg 2+
+      superposed                 0.911     0.350
+      both, 64 slots             0.794     0.392
+      cache only, 64 slots       0.444     0.301
+
+**P2 CONFIRMED, decisively.** At 8 slots against ~45 bindings the store scores
+0.995 and the cache 0.120 — a factor of eight. The store's structural advantage
+is that it holds far more than its size in a degraded form, where a bounded
+cache holds exactly its slot count and then fails.
+
+**P3 REFUTED.** Cache-only is far *worse* on kinship at every out-degree
+(0.444 against 0.911). Superposition causes the collapse *and* is still better
+than the bounded alternative, because 44 bindings do not fit in the cache
+either.
+
+**P4 REFUTED, and it is the answer.** The store wins wherever load exceeds
+slots, which is most of the regimes this project runs in.
+
+**P1 only partially.** Cache-only ties at 1.000 once slots exceed load; it never
+beats.
+
+### This corrects the drift of decisions 103 to 112
+
+Those measured superposition as the fidelity blocker and I had begun treating it
+as a straight liability. It is a liability *and* the best option available: the
+comparison that matters is not "superposed against exact" but "superposed
+against exact-and-bounded", and bounded is what loses.
+
+**The hybrid is not uniformly best either.** On kinship at out-degree 1 the
+cache HURTS — 0.911 superposed against 0.794 with the cache added — so
+`cache_slots` is a setting to measure per task, not a free improvement.
+
+### What this licenses
+
+Note 030's item can close. The store is justified by a measured structural
+advantage rather than by assumption, and the shape of it is stated: **it wins
+exactly when bindings exceed slots, ties when they do not.**
+
+### What it does NOT license
+
+One seed, two tasks, a local probe. The effect at 8 slots is a factor of eight
+and far beyond noise, but the *crossover* — where slots stop mattering — is a
+single-seed estimate and would need a grid to state precisely.
+
+Nor does it justify the store on TEXT, where g11-07 measured `cache128` in the
+best arm and this probe did not run.

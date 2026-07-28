@@ -153,5 +153,101 @@ class TheFlagIsOffByDefaultAndGuarded(unittest.TestCase):
             build(cache_slots=32, cache_weight=0.0).run(tokens))
 
 
+class TheCacheCanBeReadAlone(unittest.TestCase):
+    """`cache_only` is the ablation note 030 asked for and could not have.
+
+    Nothing discriminated a superposed store from a cache because the cache only
+    ever ADDED to the store — every arm holding a cache also held the store. The
+    ablation drops the superposed half of the READ, and decision 119 used it to
+    answer the question: the store wins by a factor of eight when bindings
+    exceed the slots (0.995 against 0.120 at 8 slots on chains).
+    """
+
+    def test_a_matched_read_returns_the_CACHE_ALONE(self):
+        """**Asserted on the read, not on predictions.**
+
+        Comparing two models' predicted tokens passes vacuously here: the
+        ablation has a second branch for `match <= 0`, so predictions differ on
+        that path even when the matched path is wrong. A mutation removing the
+        `only` test from the matched return survived exactly that test.
+
+        So this checks the returned VECTOR on the path that matters — with a
+        real match, reading alone must equal the cache's contribution with no
+        component of the superposed store in it.
+        """
+        from openplexus.retrieval import ExactCache, SuperposedRead
+
+        width = 16
+        rng = np.random.default_rng(11)
+        key = rng.normal(0.0, 1.0, width)
+        value = rng.normal(0.0, 1.0, width)
+        store = np.outer(rng.normal(0.0, 1.0, width), key)
+
+        together = ExactCache(SuperposedRead(), 4, 8.0, 1.0, only=False)
+        alone = ExactCache(SuperposedRead(), 4, 8.0, 1.0, only=True)
+        for cache in (together, alone):
+            cache.begin(width)
+            cache.observe(store, key, value, 1.0)
+
+        superposed = SuperposedRead()
+        superposed.begin(width)
+        from_store = superposed.read(store, key)
+
+        got_together = together.read(store, key)
+        got_alone = alone.read(store, key)
+
+        # Reading alone drops exactly the store's contribution, and nothing
+        # else: the difference between the two IS what the store returned.
+        np.testing.assert_allclose(got_together - got_alone, from_store,
+                                   atol=1e-9)
+        self.assertGreater(float(np.abs(from_store).sum()), 1e-6,
+                           "the store returned nothing, so dropping it proves "
+                           "nothing")
+
+    def test_reading_alone_differs_from_reading_together(self):
+        """The end-to-end version, kept because it is what the experiment
+        actually runs — but see the test above for why it is not sufficient
+        on its own."""
+        tokens = np.random.default_rng(5).integers(0, VOCAB, 60).astype(np.int64)
+        self.assertFalse(np.array_equal(
+            build(cache_slots=16).run(tokens),
+            build(cache_slots=16, cache_only=True).run(tokens)))
+
+    def test_the_store_is_still_written_when_only_the_cache_is_read(self):
+        """Admission is by the store's RESIDUAL, so the store must still be
+        maintained — the ablation changes the read, not the write. If writing
+        stopped, the cache would be admitting against an empty store and would
+        hold a different set of bindings entirely."""
+        tokens = np.random.default_rng(6).integers(0, VOCAB, 60).astype(np.int64)
+        model = build(cache_slots=16, cache_only=True)
+        model.run(tokens, learn=False)
+        seen = []
+        inner = model.retrieval
+
+        class Watch:
+            def begin(self, width):
+                return inner.begin(width)
+
+            def read(self, readable, key):
+                seen.append(float(np.abs(readable).sum()))
+                return inner.read(readable, key)
+
+            def observe(self, store, key, value, commitment):
+                return inner.observe(store, key, value, commitment)
+
+        model.retrieval = Watch()
+        model.run(tokens, learn=False)
+        self.assertGreater(max(seen), 0.0,
+                           "the superposed store was never written")
+
+    def test_without_a_cache_the_flag_does_nothing(self):
+        """`cache_only` names how the cache is read; with no slots there is no
+        cache, and the model must be bit-identical to the plain one."""
+        tokens = np.random.default_rng(7).integers(0, VOCAB, 60).astype(np.int64)
+        np.testing.assert_array_equal(
+            build().run(tokens),
+            build(cache_only=True).run(tokens))
+
+
 if __name__ == "__main__":
     unittest.main()

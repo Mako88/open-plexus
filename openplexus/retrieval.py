@@ -132,11 +132,16 @@ class ExactCache:
     """
 
     def __init__(self, inner: Retrieval, slots: int, sharpness: float,
-                 weight: float) -> None:
+                 weight: float, only: bool = False) -> None:
         self.inner = inner
         self.slots = slots
         self.sharpness = sharpness
         self.weight = weight
+        #: Drop the superposed half entirely. An ABLATION for note 030's
+        #: question, not a deployment mode — the store is still written, and
+        #: admission still depends on its residual, because that is what the
+        #: cache selects on.
+        self.only = only
         self.begin(0)
 
     def begin(self, width: int) -> None:
@@ -162,8 +167,17 @@ class ExactCache:
         weights /= weights.sum()
         match = float(np.max(np.where(live, cosine, -1.0)))
         if match <= 0.0:
-            return retrieved
-        return retrieved + self.weight * match * (weights @ self.value)
+            return np.zeros_like(retrieved) if self.only else retrieved
+        picked = self.weight * match * (weights @ self.value)
+        # CACHE ONLY is an ABLATION, not a mechanism: it drops the superposed
+        # half so the two stores can be compared at all.
+        #
+        # Note 030 asks for a benchmark that discriminates a superposed store
+        # from a cache, and calls it the highest-value open item. It could not
+        # be answered while the cache only ever ADDED to the store -- every arm
+        # containing a cache also contained the store, so no measurement
+        # separated them.
+        return picked if self.only else retrieved + picked
 
     def observe(self, store: np.ndarray, key: np.ndarray, value: np.ndarray,
                 commitment: float) -> None:
@@ -222,7 +236,8 @@ def build(config) -> Retrieval:
     retrieval: Retrieval = SuperposedRead()
     if config.cache_slots:
         retrieval = ExactCache(retrieval, config.cache_slots,
-                               config.cache_sharpness, config.cache_weight)
+                               config.cache_sharpness, config.cache_weight,
+                               getattr(config, "cache_only", False))
     if config.retrieval_steps > 1:
         retrieval = SettlingRead(retrieval, config.retrieval_steps)
     return retrieval

@@ -939,6 +939,18 @@ class LocalMemoryConfig:
     #: and is not settled here.
     hop_accumulate: str = "replace"
     cache_slots: int = 0
+
+    #: Read from the cache ALONE, dropping the superposed store's contribution.
+    #:
+    #: An ablation for [note 030](../docs/notes/030-the-benchmark-does-not-discriminate.md),
+    #: which asks for a benchmark that discriminates a superposed store from a
+    #: cache and calls it the highest-value open question. It could not be
+    #: answered while the cache only ever ADDED to the store: every arm holding
+    #: a cache also held the store, so nothing separated them.
+    #:
+    #: The store is still written and admission still depends on its residual —
+    #: that is what the cache selects on. Only the READ changes.
+    cache_only: bool = False
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
     readout_bias: bool = False

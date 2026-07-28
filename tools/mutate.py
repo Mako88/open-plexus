@@ -809,6 +809,18 @@ MUTATIONS = [
         new="                hop_key = key = weights @ self.wk",
     ),
     Mutation(
+        name="cache-only-still-adds-the-store",
+        breaks="the only ablation that separates a superposed store from a "
+               "cache, and it breaks it INVISIBLY -- `cache_only` would become "
+               "the plain hybrid, so decision 119's three arms would be two "
+               "arms and a duplicate. The store-versus-cache comparison would "
+               "report the hybrid beating the hybrid, which looks like a clean "
+               "null rather than a broken experiment",
+        path=RETRIEVAL,
+        old="        return picked if self.only else retrieved + picked",
+        new="        return retrieved + picked",
+    ),
+    Mutation(
         name="the-hop-decode-is-never-sharpened",
         breaks="the re-encode, and this is the bug that actually happened. "
                "Without the standardisation the decode's logits are so flat "

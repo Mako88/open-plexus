@@ -41,16 +41,35 @@ nobody appears to have written it down.
 
 ## 1. The goals
 
-**Primary — AGI.** A neural network distributed across the internet at scale,
-with the potential to lead toward artificial general intelligence.
+**Primary — AGI, by way of a map of concepts.** A neural network distributed
+across the internet at scale, trained to learn **how concepts relate to one
+another** rather than to predict what comes next.
 
-**Secondary — an LLM replacement that does not need data centres.** Replace
-large language models, or pieces of them, to reduce the need for concentrated
-compute.
+John's statement of it, 2026-07-28:
+
+> The goal is a system that is able to learn the relationships between concepts
+> — with the goal being that once it has a good map of most all concepts, and is
+> able to be aware of how a given concept relates to some other concept, my hope
+> is that a model with that sort of training, rather than being based on
+> predicting things, will then be able to **reason** about things, and
+> potentially have something like original thoughts — to operate more similarly
+> to the way humans operate, and hopefully be close to AGI.
+
+**The bet, stated so it can fail:** a system whose training objective is
+*relational* rather than *sequential* will reason rather than continue. If a
+model with a good concept map turns out to reason no better than a next-token
+model of the same size, the central premise is wrong.
+
+**Secondary — an LLM replacement, and it is DEFERRED, not merely lower.** If the
+same architecture works as an LLM replacement, or if lessons from building it
+transfer to running conventional LLMs across devices without data centres, that
+is worth having. **John's ruling: explore it separately, after the main thing.**
+It is not a parallel track competing for decisions now.
 
 **The ordering is load-bearing.** Where the two conflict, the primary wins. A
 design that would make a better distributed LLM but forecloses generality is the
-wrong trade.
+wrong trade — and a measurement that only makes sense for the secondary goal is
+not a reason to change the architecture today.
 
 ### 1.1 The clarification that changes what counts as success
 
@@ -105,6 +124,39 @@ predict it. Fully self-supervised, no marked questions, no labels — so it stil
 satisfies the "needs no labels" requirement §5 rests on — but relational rather
 than sequential. That is the live work and it is tracked in
 [STATE.md](STATE.md).
+
+### 1.2a Directions John wants explored — not requirements, and not idle either
+
+**Stated 2026-07-28.** None of these is a constraint. Each is a direction he
+believes is worth pursuing, recorded so it is not rediscovered as a novelty and
+so a design that forecloses one is recognised as having done so.
+
+**Continuous input and output, rather than request-and-response.** In his words:
+*"as long as we're awake we have constant input and output, and frankly I would
+argue humans are just input-output machines."* A system running across devices on
+the internet has no reason to be idle between questions.
+
+This is not decoration on the architecture — **it changes what correctness
+means.** A request-response model owes an answer to each input. An always-on
+model has inputs arriving and outputs emitted continuously, and *"you don't
+expect: this input got in, and I'm going to get this output."* A participant
+being behind stops being a failure and becomes a normal state.
+
+> **It bears directly on the barrier problem.** John's framing: event sourcing
+> and event-driven design as the way to avoid needing a summation at all — take
+> whatever you have at a given time, aware that it may be behind. That is a
+> different answer from the deadline in `distributed.py`, which still settles a
+> step. **A stream has no step to settle.**
+
+**Self-modifying structure.** The network changing its own connectivity over
+time, rather than having a topology fixed at design time — *"being able to modify
+its own brain."* Explicitly not a top-level goal, and explicitly something he
+wants explored: a continuously-running distributed system that restructures
+itself as it learns is where he thinks the interesting behaviour is.
+
+**Both are compatible with C4** (perpetual learning) and neither is implied by
+it. C4 says the weights never freeze; these say the *inputs* never stop and the
+*structure* is not fixed either.
 
 ### 1.3 Scale is a first-class consideration, and benchmarks at this scale are not the goal
 

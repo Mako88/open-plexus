@@ -328,11 +328,41 @@ That is the inverse of a transformer, where weights dominate and the KV cache is
 secondary, and it means **concurrency is bounded by node RAM rather than by node
 count.**
 
-Two things follow, and neither is measured:
+#### ✅ AND IT CAN SCALE BY NODES AFTER ALL — John asked, and my first answer was too pessimistic
+
+John's requirement, 2026-07-28: *"we can't control what nodes are actually going
+to be running the code, so the requirements per node need to be as minimal as
+possible, and everything that is at all possible to scale by adding nodes should
+be the way we scale rather than requiring heavier nodes."*
+
+**The store is d² in TOTAL but d²/P per node, so splitting further already
+shrinks each node's share.** What stops that is the floor of ~16 dimensions per
+node, below which a node has no standalone opinion (g4-01: 16 dims → 0.949,
+8 → 0.681, 4 → 0.412). At width 1M that caps the split at ~62,500 nodes and
+~128 MB per node per conversation.
+
+**But concurrency does not have to reuse the same nodes.** Give conversation A to
+one set of ~62,500 and conversation B to a different set. Then:
+
+    per-node RAM        constant, one conversation's slice
+    concurrency         linear in node count
+    what is replicated  the LEARNED parameters, ~6 MB per node
+
+The parameters are three orders of magnitude smaller than the store, so
+replicating them across sets is cheap. **Concurrency scales by adding nodes, as
+required.**
+
+**The cost is real and it is a distributed-systems problem, not a modelling
+one.** Under C4 the readout never stops learning, so disjoint node sets drift
+apart — each set learns from its own conversations. Reconciling them is exactly
+gossip, CRDTs and anti-entropy, which GOALS §6.2 has flagged as **unread** since
+the beginning and which note 003 named as the highest-value gap.
+
+Two things still follow, and neither is measured:
 
 - It is the same d² that decision 109 measured capacity scaling by. A bounded
   cache is `slots × d`, not `d²` — so item 7 below is not only about churn
-  tolerance, it is about whether concurrent serving is affordable at all.
+  tolerance, it is about how cheap a conversation is.
 - **Nothing serves two conversations today.** `Node` holds exactly one `memory`
   with a `reset()`, so multi-session serving is unimplemented, unmeasured, and
   not costed. This entry is architecture read off the code, not a result.

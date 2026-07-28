@@ -72,6 +72,7 @@ a report to John, not a gate.
 | 125 | traversal is the win (+0.269); search helps only where ambiguity is |
 | 126 | SWIM and CRDTs read; the detector ejected nodes permanently, now fixed |
 | 127 | the SWIM paper was never unreadable; the retry interval is in the wrong unit |
+| 128 | d_max is ~640 ms measured; the in-process figure was measuring Windows |
 
 ---
 
@@ -3174,3 +3175,95 @@ Treating note 040 as settled. And a caution that generalises past this entry: th
 first version of note 039 was **wrong about why it was limited**, which is worse
 than being limited, because a caveat that names the wrong obstacle stops anyone
 trying the thing that would have worked.
+
+---
+
+## 128. d_max is ~640 ms, measured — and the number I published last cycle was measuring Windows
+
+g12-04, 6 of 6 cells, run 30399620805. Every cell agreed with the single-process
+model, so the timings are interpretable. **Three of six predictions refuted.**
+
+    cell                              mean      p50      p99      max   3 x p99
+    clean                             0.75     0.61     2.54     2.64       7.6
+    loss 2%                           0.82     0.76     2.32     2.65       7.0
+    delay 20ms                       20.55    20.45    21.10    21.15      63.3
+    delay 80ms                       80.55    80.51    81.53    81.58     244.6
+    delay 80ms jitter 20ms           82.74    84.40   100.38   100.42     301.1
+    delay 80ms jitter 20ms loss 2%   95.25    87.22   211.88   265.20     635.6
+
+### The number the project has never had
+
+**`d_max` = ~640 ms**, on an 80 ms link with 20 ms jitter and 2% loss.
+Simultaneously the C2 asynchrony bound and the C3 churn timeout — note 003's
+"two constraints, one parameter" — and the first time either has been a number
+instead of a count of steps.
+
+**`RETRY_AFTER_STEPS = 8` means two things three orders of magnitude apart.** At
+40 steps in 0.014 s on the clean link, eight steps is under 3 ms; on the worst
+link the same eight steps span seconds. C2 requires a *stated* bound and a
+constant in steps cannot be one.
+
+### The correction, and it is mine from one cycle ago
+
+Decision 127 quoted an in-process measurement — p50 0.38 ms, p99 24.19 ms — and
+argued from it that "the tail runs 64x the median on the easiest link available".
+It was the evidence for building percentile reporting at all.
+
+**The clean container link's p99 is 2.54 ms. The in-process figure was ten times
+larger, and it was measuring this development machine's process scheduler** —
+four Python processes on Windows, 120 votes. The containers give 160 votes at a
+fortieth of the tail.
+
+So *"64x the median on the easiest link available"* is **withdrawn**. The easiest
+link is 4x, and the 64x was Windows. The percentiles were still worth building,
+for a different reason — see P4 and P5 — but the argument that justified them was
+measuring the wrong machine.
+
+### P1 refuted, and the right statistic is the gap not the ratio
+
+p99 exceeds the mean by 3.4x on the clean link and by **1.01x** at delay 80 ms.
+**Once a fixed delay dominates, mean and p99 converge**, because a constant added
+to every sample moves both equally.
+
+The ratio measures variance relative to total, and a timeout does not care about
+that. What it must cover is the absolute gap `p99 - p50`: **1.0 ms** at delay 80,
+**16.0 ms** with jitter, **124.7 ms** with loss on top. Quote the gap.
+
+### Loss is multiplicative with delay, not additive
+
+P5 predicted 2% loss would move p99 far more than p50. **Alone it is invisible**
+— p99 went *down* 0.22 ms, which is noise. But adding the same 2% to the
+delay-80-jitter-20 link takes p99 from 100.4 ms to **211.9 ms**.
+
+**A retransmit costs a round trip, so the price of losing a packet is
+proportional to how long a round trip takes.** On a fast link that is nothing; on
+a slow one it doubles the tail. The prediction had the mechanism right and tested
+it in the one place it could not show.
+
+### Two defects in the sweep's own plumbing, neither touching the data
+
+**`testbed/run.py` printed progress to stdout** while the workflow piped stdout
+into a `.json` file, so all six artifacts had prose above the JSON and could not
+be parsed. A program whose stdout is a data format has no business printing
+anything else there. Progress now goes to stderr.
+
+**`summarise_g12_04.py` shipped with a syntax error and every local check
+passed**, because nothing imports a summariser at check time — the suite does not
+touch them, the mutation harness does not target them, and the rails read them
+only as text. It surfaced in CI *after* the matrix had run.
+
+A summariser is the one piece of code that runs exactly once, at the end, when
+the expensive thing has already happened. **R5 in `check_rails.py` now compiles
+every file under `tools/` and `experiments/`**, verified to bite by breaking one
+deliberately. Low bar on purpose: it does not check a summariser is right, only
+that it can start, which is exactly what failed.
+
+### What this licenses
+
+Replacing `RETRY_AFTER_STEPS` with a duration, and stating C2's bound.
+
+### What it does NOT license
+
+Treating 640 ms as universal. It is a floor from these six links; intercontinental
+paths, mobile networks and congested uplinks are all outside the grid, and a worse
+link raises it.

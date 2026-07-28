@@ -75,7 +75,14 @@ def main() -> int:
               file=sys.stderr)
         return 2
 
-    print(f"building {IMAGE} ...", flush=True)
+    # PROGRESS GOES TO STDERR. This script's stdout is a JSON document and a
+    # caller pipes it to a file -- g12-04 did exactly that and produced six
+    # artifacts that were not valid JSON, because two progress lines were
+    # sitting above the object. The aggregation could not read its own results.
+    #
+    # A program whose stdout is a data format has no business printing anything
+    # else there.
+    print(f"building {IMAGE} ...", flush=True, file=sys.stderr)
     built = run(["docker", "build", "-q", "-f", "testbed/Dockerfile",
                  "-t", IMAGE, "."])
     if built.returncode:
@@ -114,7 +121,7 @@ def main() -> int:
             print(launched.stderr, file=sys.stderr)
             return 1
 
-    print("waiting for the driver ...", flush=True)
+    print("waiting for the driver ...", flush=True, file=sys.stderr)
     deadline = time.monotonic() + 180
     result = None
     while time.monotonic() < deadline:

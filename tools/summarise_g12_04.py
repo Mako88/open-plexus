@@ -59,8 +59,12 @@ def main() -> None:
         print(f"!! {len(records) - len(timed)} of {len(records)} records have "
               f"no latency sample and are dropped")
 
+    # The apostrophe in "T' floor" lives in a variable rather than inline: an
+    # escaped quote inside an f-string expression is a syntax error, and this
+    # one reached CI because nothing imports a summariser at check time.
+    t_floor = "T' floor"
     print(f"\n{'cell':<28} {'n':>6} {'mean':>9} {'p50':>9} {'p99':>9} "
-          f"{'max':>9} {'T\\' floor':>10}")
+          f"{'max':>9} {t_floor:>10}")
     for record in sorted(timed, key=lambda r: (
             ORDER.index(name_of(r)) if name_of(r) in ORDER else 99)):
         print(f"{name_of(record):<28} {record['votes_timed']:>6} "

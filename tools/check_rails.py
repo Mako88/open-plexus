@@ -224,6 +224,37 @@ def runs_anything(source: str) -> bool:
     return False
 
 
+def files_that_do_not_parse() -> list[str]:
+    """R5. Anything under `tools/` or `experiments/` that will not compile.
+
+    ## The gap this closes, which cost a sweep's aggregation
+
+    `tools/summarise_g12_04.py` shipped with a syntax error -- an escaped quote
+    inside an f-string expression -- and every local check passed, because
+    **nothing imports a summariser at check time.** The suite does not touch
+    them, the mutation harness does not target them, and the rails only read
+    them as text. The error surfaced in CI, after the matrix had already run, in
+    the aggregation step: six cells returned and none could be read.
+
+    A summariser is the one piece of code that runs exactly once, at the end,
+    when the expensive thing has already happened. That is the worst possible
+    place for an error that a parser would have caught in milliseconds.
+
+    Compiling is a low bar deliberately. It does not check that a summariser is
+    correct -- only that it can start, which is precisely the failure that
+    happened.
+    """
+    broken = []
+    for folder in ("tools", "experiments"):
+        for path in sorted((ROOT / folder).rglob("*.py")):
+            try:
+                compile(path.read_text(encoding="utf-8"), str(path), "exec")
+            except SyntaxError as error:
+                broken.append(f"{path.relative_to(ROOT).as_posix()} :: "
+                              f"line {error.lineno}: {error.msg}")
+    return broken
+
+
 def current() -> dict[str, list[str]]:
     return {
         "R1-summariser-imports-recovery": summarisers_missing_the_rail(),
@@ -239,6 +270,7 @@ def current() -> dict[str, list[str]]:
         "R3-experiment-goes-through-harness":
             experiments_bypassing_the_harness(),
         "R4-test-asserts-something": tests_that_assert_nothing(),
+        "R5-tools-and-experiments-parse": files_that_do_not_parse(),
     }
 
 

@@ -277,12 +277,30 @@ Detection runs on the data path rather than a probe channel; there is no indirec
 probing, so a slow node and a gone node are indistinguishable; and the driver is
 the sole detector, a coordinator by another name. Suspicion-with-recovery is in.
 
-**The next item is a MEASUREMENT, not a mechanism.** SWIM's periods are time
-derived from a measured round-trip distribution, with `T' ≥ 3 × RTT`. Ours
-(`RETRY_AFTER_STEPS = 8`) counts *steps*, and a step has no fixed duration — a
-guess in the wrong unit. **Measure RTT on the testbed**: it is the same number
-note 003's `d_max` has always needed, C2 requires a stated bound, and no detector
-tuned in steps can state one.
+**MEASURED — g12-04, decision 128. `d_max` ≈ 640 ms.**
+
+    clean                            p50   0.61   p99   2.54   3xp99     7.6
+    delay 80ms jitter 20ms loss 2%   p50  87.22   p99 211.88   3xp99   635.6
+
+Full table in
+[the sweep record](experiments/sweeps/g12-04-what-is-the-round-trip.txt). This is
+simultaneously the C2 asynchrony bound and the C3 churn timeout — note 003's "two
+constraints, one parameter" — and the first time either has been a number rather
+than a count of steps. **A floor from six links, not a universal constant.**
+
+**Next: replace `RETRY_AFTER_STEPS` with a duration.** Eight steps is under 3 ms
+on the clean link and several seconds on the worst — one constant meaning two
+things three orders of magnitude apart.
+
+Two things worth carrying forward from that sweep:
+
+- **Quote the p99−p50 gap, not the p99/mean ratio.** Once a fixed delay
+  dominates, mean and p99 converge (1.01× at delay 80) because a constant moves
+  both. The gap is what a timeout must cover: 1.0 → 16.0 → 124.7 ms as jitter
+  then loss are added.
+- **Loss is multiplicative with delay, not additive.** 2% loss alone is
+  invisible; the same 2% on an 80 ms link doubles the p99, because a retransmit
+  costs a round trip.
 
 > SWIM also achieves **≤135 bytes per packet regardless of group size**, by
 > separating detection from dissemination. That is amended C1's requirement met

@@ -203,9 +203,10 @@ The parameters are shared across conversations; only `memory` is per-conversatio
 parameter"*. So a second conversation needs a second store, not a second network.
 
 **The arithmetic is the problem.** Per node the store is `(d/P)·d`, so across the
-network it is **d² per conversation**. At width 1M that is ~4 TB of aggregate
-store for *one* conversation — 64 MB on each of 65,000 nodes — against a shared
-readout of ~3 MB per node at a 50k vocabulary.
+network it is **d² per conversation**. At width 1M, and at the float64 the code
+actually allocates, that is **~8 TB of aggregate store for one conversation** —
+128 MB on each of 65,000 nodes — against a shared readout of ~6 MB per node at a
+50k vocabulary.
 
 **The per-conversation state is roughly twenty times the shared parameters.**
 That is the inverse of a transformer, where weights dominate and the KV cache is

@@ -16,6 +16,7 @@ This is new capability, not a tuning gain. It was 0.000 before.
     depths 1+2 mixed, gated                   1.000   on both halves
     depths 1+2+3 mixed, gated                 1.000   on all three
     1-hop model on a 2-hop chain              0.000   <- the control still fails
+    depth 3, gated, HALF the machine gone     0.928   <- C3 holds for hops too
 
 The last row is what makes the rest readable: a one-hop model still answers the
 intermediate 100% of the time, so the task genuinely requires composition and

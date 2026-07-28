@@ -4375,3 +4375,49 @@ how a key was bound rather than of which token was stored. That is worth trying,
 and it is a weak signal being asked to do a job a very strong one currently
 does — so the honest expectation is that it degrades accuracy and the question
 is by how much.
+
+## 90. Composition survives churn, and the per-hop cost compounds gently
+
+Every churn result before this was measured on **one-hop recall**. C3 is a
+premise of the whole project, so the question is whether the new capability
+survives it, and there was a specific reason to doubt: a depth-3 question needs
+three lookups to survive where a depth-1 question needs one.
+
+Width 64, gated, depths 1–3 mixed, dimensions zeroed **after** training — a
+model that learned on a whole machine and then lost part of it, which is the
+realistic order. Three seeds averaged.
+
+    removed   depth 1   depth 2   depth 3
+       0.0%     1.000     1.000     0.986
+      12.5%     1.000     1.000     0.975
+      25.0%     0.997     0.989     0.956
+      37.5%     0.981     0.989     0.961
+      50.0%     0.986     0.964     0.928
+      62.5%     0.928     0.886     0.831
+      75.0%     0.739     0.694     0.542
+
+**Half the machine gone and depth-3 chains still answer at 0.928.**
+
+The prediction was directionally right and wrong about the magnitude. Deeper
+questions do degrade faster — the depth-1 to depth-3 gap widens from 0.014 at
+full width to 0.197 at 75% removed — but the compounding is gentle until 62.5%
+and there is no cliff where composition stops working while recall keeps going.
+Relative to depth 1, depth 3 holds 0.986 at full width, 0.941 at half, and 0.733
+at three-quarters removed.
+
+### What this licenses
+
+Composition is not a fair-weather capability that only exists on an intact
+machine. C3 was measured on recall and now covers the hop mechanism too, at the
+churn fractions decision 81 measured over real containers.
+
+### What it does NOT license
+
+**Three seeds, and no spread reported.** The ordering is consistent and the
+trend is monotone in depth at every fraction, which is what the claim rests on;
+individual cells at the noisy end are not worth quoting to three decimals.
+
+Ablation is a **frozen** departure — dimensions zeroed once, after training.
+Decision 81's containers measured real join and leave; this did not, and a model
+that keeps learning while nodes come and go (C4 crossed with C3) is untested
+for hops.

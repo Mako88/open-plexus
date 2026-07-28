@@ -3485,3 +3485,67 @@ nothing moved anywhere.
 assertion that the perturbed group DID change. **A locality test without one
 passes whenever the mechanism is disconnected**, which is precisely when it
 should fail.
+
+---
+
+## 76. The cache was mostly compensation too, and the re-validation found it deliberately
+
+**The first instalment of decision 74's re-validation, chosen first because it
+has the largest blast radius.** Cache against its state-matched control, under
+both readouts, 60,000 characters, two seeds, learning rate swept per cell:
+
+      readout         arm width slots     bits  spread
+       linear       plain    64     0    5.507   0.009
+       linear    cache128    64   128    5.252   0.050
+       linear     matched   143     0    5.488   0.023
+      2-layer       plain    64     0    5.242   0.028
+      2-layer    cache128    64   128    5.165   0.035
+      2-layer     matched   143     0    5.225   0.020
+
+    the cache's advantage at EQUAL state (20,480 against 20,449)
+      linear readout    0.236     reproduces the published 0.244
+      2-layer readout   0.060     about 1.5x the seed spread
+
+**Three quarters of it is gone.** The linear row reproduces g11-06 and the
+hybrid-store result to within noise, so the measurement is sound and the change
+is the readout.
+
+This is the sparse-key story again, less extreme: the cache does not reverse, it
+shrinks to the edge of the seed spread. Both mechanisms reduce interference
+between superposed items — the cache by keeping some out of the sum, sparsity by
+making them overlap less — and **interference only costs you if the readout
+cannot disentangle it.**
+
+### The sentence that summarises the day
+
+    linear readout + cache, 20,480 numbers held     5.252
+    2-layer readout, no cache, 4,096 numbers held   5.242
+
+**A composed readout with no extra state beats a linear readout with five times
+the state.**
+
+### Blast radius, which is why this was re-checked first
+
+Decision 61 argued for partitioning the distributed model by ITEM rather than by
+DIMENSION, and its evidence was that the exact cache is that architecture at one
+machine's scale, worth 0.19–0.24 bits. **That evidence is now worth 0.06 bits at
+the edge of noise**, so the architectural argument stands on the C1 and C3
+reasoning — partial-tolerance, bounded bytes per hop — and no longer on a
+performance result. It is not refuted. It is unsupported, which is a different
+thing and has to be said differently.
+
+### The methodology worked, and that is the point
+
+Decision 74 named the invalidation and said to re-check by blast radius. This was
+run **deliberately, first, because of what rested on it** — not stumbled into
+three weeks later when a follow-up sweep produced a confusing number. The rule
+was written at 22:20 and paid for itself within the hour.
+
+### Still to re-validate against a composed readout
+
+Everything else in the comparison set, and it should be done by the combinatorial
+grid rather than one probe at a time: pair keys (refuted at 0.23 worse),
+competitive retrieval (refuted 0.924 → 0.128), orthogonal updates, the write
+gate, consolidation. **Each of those refutations was measured beside a linear
+readout.** A mechanism refuted for adding information a linear map could not use
+is not refuted for a readout that can.

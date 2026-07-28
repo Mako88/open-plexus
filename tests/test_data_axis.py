@@ -65,7 +65,7 @@ class AskingForMoreTextThanExists(unittest.TestCase):
         happens to hold, so the axis stops moving and the top cells collapse
         onto one point -- while the summary still prints the requested value."""
         with self.assertRaises(SystemExit) as raised:
-            run_one((1, 64, 128, "shakespeare", "single", 99_000_000, 0))
+            run_one((1, 64, 128, "shakespeare", "single", 99_000_000, 0, {}))
         self.assertIn("99000000", str(raised.exception).replace(",", ""))
 
 

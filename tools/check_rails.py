@@ -175,15 +175,53 @@ def tests_that_assert_nothing() -> list[str]:
 
 
 def experiments_bypassing_the_harness() -> list[str]:
-    """R3. An experiment script that never imports the harness."""
+    """R3. An experiment script that never imports the harness.
+
+    **A module with no entry point is not an experiment.** The rail exists so
+    that `refuse_if_mutating` cannot be forgotten -- an experiment run against a
+    mutated tree produces plausible numbers and says nothing about it. A helper
+    with no `__main__` block cannot be run, so there is nothing for it to
+    bypass, and flagging it would push a library into importing a guard it can
+    never reach.
+
+    Checked structurally rather than by an exemption list, because a name in a
+    baseline stops being read while a structural test keeps applying. First
+    instance: `experiments/components.py`, which parses a component spec and
+    runs nothing.
+
+    **"Has a `__main__` guard" is the WRONG test and was tried first.** Four
+    experiments here -- `g8_02_collapse_probe`, `g8_02_control`,
+    `g8_02_runaway`, `g9_01_answerable` -- run top-level code with no guard at
+    all, so that version silently exempted four real experiments from the rail.
+    The ratchet caught it: their exemptions went stale, which is the signal that
+    a change made something stop violating for the wrong reason.
+
+    The right test is whether the module DOES anything at import: a body of only
+    imports, definitions, assignments and docstrings cannot run an experiment.
+    """
     offenders = []
     for path in sorted((ROOT / "experiments").glob("*.py")):
         if path.name == "harness.py":
             continue
         source = path.read_text(encoding="utf-8")
+        if not runs_anything(source):
+            continue
         if "harness" not in source:
             offenders.append(path.relative_to(ROOT).as_posix())
     return offenders
+
+
+def runs_anything(source: str) -> bool:
+    """Whether a module's top level executes, rather than only defining."""
+    inert = (ast.Import, ast.ImportFrom, ast.FunctionDef, ast.AsyncFunctionDef,
+             ast.ClassDef, ast.Assign, ast.AnnAssign)
+    for node in ast.parse(source).body:
+        if isinstance(node, inert):
+            continue
+        if isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant):
+            continue                      # a docstring
+        return True
+    return False
 
 
 def current() -> dict[str, list[str]]:

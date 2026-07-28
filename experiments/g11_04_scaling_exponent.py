@@ -54,7 +54,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from experiments import harness  # noqa: E402
+from experiments import components, harness  # noqa: E402
 from experiments.g10_01_first_language import (  # noqa: E402
     bits, corpus_named, scores_and_targets)
 from openplexus.models.attention import (  # noqa: E402
@@ -121,12 +121,20 @@ def numbers_held(width: int, slots: int) -> int:
 
 
 def ours(corpus, width: int, chunk: int, seed: int, context: bool,
-         chars: int = TRAIN_CHARS, slots: int = 0) -> float:
+         chars: int = TRAIN_CHARS, slots: int = 0, **extra) -> float:
+    settings = dict(derived_keys=True, context_keys=context,
+                    cache_slots=slots)
+    settings.update(extra)
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=corpus.vocab_size, d_model=width, lr=0.05, key_scale=0.5,
-        decay=0.997, derived_keys=True, context_keys=context, memory_cap=5.0,
-        cache_slots=slots, seed=seed))
-    model.wo[:] = model.wv
+        decay=0.997, memory_cap=5.0, seed=seed, **settings))
+    # Start the readout AT the value projection, so a retrieval that lands on
+    # `wv[token]` already scores that token. Meaningless with a hidden layer --
+    # `wo` then reads hidden units, not retrieval dimensions, and the shapes do
+    # not even match. Left at zero in that case, which is what the offline
+    # probes used.
+    if not settings.get("hidden"):
+        model.wo[:] = model.wv
     fitting, calibration, test = split(corpus, chunk, chars)
     rng = np.random.default_rng(seed)
     order = np.arange(len(fitting))
@@ -182,7 +190,7 @@ def backprop(corpus, width: int, chunk: int, seed: int,
 
 
 def run_one(args) -> list[dict]:
-    seed, width, chunk, which, arm, chars, slots = args
+    seed, width, chunk, which, arm, chars, slots, extra = args
     corpus = corpus_named(which)
     available = len(corpus.train[0])
     if chars > available:
@@ -190,6 +198,19 @@ def run_one(args) -> list[dict]:
             f"asked for {chars} training characters and the corpus holds "
             f"{available}. A cell silently truncated to the corpus length is a "
             f"cell at a different point on the axis than the grid says.")
+    if extra:
+        # A spec names its own model, so the arm-name checks below -- which
+        # exist to stop `--mode` being misused -- do not apply to it.
+        value = ours(corpus, width, chunk, seed, False, chars, 0, **extra)
+        broken = absurd(value, corpus.vocab_size)
+        if broken:
+            raise SystemExit(f"{arm} chars {chars} seed {seed}: {broken}")
+        return [{"seed": seed, "width": width, "chunk": chunk, "arm": arm,
+                 "chars": chars, "slots": extra.get("cache_slots", 0),
+                 "bits_calibrated": value, "vocab_size": corpus.vocab_size,
+                 "uniform": uniform_bits(corpus.vocab_size),
+                 "corpus": which or "notes",
+                 "condition": f"{arm}-w{width}-c{chars}-s{seed}"}]
     if arm not in ARMS:
         raise SystemExit(
             f"unknown arm {arm!r}; expected one of {', '.join(sorted(ARMS))}. "
@@ -231,9 +252,16 @@ def main() -> int:
     width = args.width if args.width else 64
     chunk = int(args.scale) if args.scale is not None else 256
     arm = args.mode or "single"
+    # A COMPONENT SPEC OVERRIDES THE ARM NAME, because the spec IS the name.
+    # `--mode` conflated which arm a row belongs to with what the model is made
+    # of, which is why g11-06 needed a duplicate arm to keep a control out of
+    # the column it was controlling.
+    extra: dict = {}
+    if args.components:
+        extra, arm = components.parse(args.components)
     chars = args.chars if args.chars else TRAIN_CHARS
     slots = args.slots or 0
-    jobs = [(seed, width, chunk, args.corpus, arm, chars, slots)
+    jobs = [(seed, width, chunk, args.corpus, arm, chars, slots, extra)
             for seed in seeds]
     records = [r for batch in harness.spread(run_one, jobs, args.workers)
                for r in batch]

@@ -129,6 +129,13 @@ def parse_args(description: str) -> argparse.Namespace:
                              "it unbounded, which is the default in the model "
                              "and which lets a long sequence with dense "
                              "supervision drive the readout to 1e72 (g10-01)")
+    parser.add_argument("--components", type=str, default=None,
+                        help="name the model by what it is MADE OF, e.g. "
+                             "'keys=sparse4,retrieval=cache128,"
+                             "readout=hidden128'. The spec becomes the arm "
+                             "label, so two different models can never share "
+                             "one name -- which --mode allowed, and which "
+                             "g11-06 had to work around with a duplicate arm")
     parser.add_argument("--chars", type=int, default=None,
                         help="training characters -- the DATA axis. g11-04 "
                              "capped this at 250k to fit its budget and that "

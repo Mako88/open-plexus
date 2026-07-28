@@ -5772,3 +5772,65 @@ Concluding search is unnecessary. It remains the right answer to branching
 ambiguity and the measurement says only that it cannot pay **yet**. This is a
 sequencing result, not a rejection — and the implementation was deliberately not
 built, so nothing has to be undone when it is.
+
+## 112. Retrieval fidelity is a WIDTH limit, and both my binding counts were wrong
+
+Four mechanisms failed against retrieval fidelity, so the question is why a
+single unambiguous lookup is 0.915 rather than ~1.0. Ablated at out-degree 1,
+where there is no ambiguity to confuse it:
+
+    as configured                    0.915
+    no decay (1.0)                   0.927
+    no cap (1e9)                     0.915
+    neither decay nor cap            0.927
+    width 128                        1.000
+    width 256                        1.000
+    half the facts                   0.962
+
+**Width, and nothing else.** Decay costs 0.012 and the cap costs 0.000 — both
+were plausible suspects and both are cleared. Doubling the width takes fidelity
+to a clean 1.000.
+
+### Two wrong counts of mine, in opposite directions
+
+Decision 109 concluded the store was not the bottleneck on the grounds that
+"tasks write 10 to 30 bindings". That counted **facts**. The store binds every
+adjacent pair, so the count is per token.
+
+Correcting that, I then said a 160-token sequence writes ~160 bindings. That
+counted `seq_len`, which is a **maximum** — kinship has no filler, so the
+sequence is 45 tokens and writes **44 bindings**. Measured, not inferred.
+
+### And 44 is UNDER capacity, so the width effect is not simply load
+
+Decision 109 measured width 64 holding ~96 bindings, with 0.997 at a load of 32
+and 0.987 at 64. At 44 it predicts about 0.99. Kinship gets **0.915**.
+
+So kinship's bindings are **harder than random ones at the same load**, and why
+is not measured. Its keys are hashed `(previous, token)` pairs rather than rows
+of `Wk`, and its values repeat heavily — a handful of relations across 44
+bindings — either of which could reduce the effective capacity. **Unmeasured is
+the honest state of it.**
+
+### The saturation hypothesis this suggests, which IS testable
+
+Decision 63's text runs used sequences up to **1536 tokens**, so a load of
+~1536 bindings against a width-128 capacity of ~384. **Four times over
+capacity**, and width 64 is sixteen times over.
+
+That would explain "more width does not help" exactly: doubling 64 to 128 moves
+capacity from ~96 to ~384 while the load stays at 1536, so the model is far past
+saturation either way and the doubling is invisible. It also explains "more data
+does not help", since the store is per-sequence working memory and more corpus
+does not raise what a single sequence can hold.
+
+**The prediction that would test it:** at SHORT sequences, where load is below
+capacity, width should help — and at long ones it should not until width is
+large enough to matter. That is a clean two-axis sweep and it is the first
+concrete, falsifiable account of decision 63 this project has had.
+
+### What this does NOT license
+
+Treating the hypothesis as established. It is arithmetic plus one ablation on a
+different task, and decision 63 was measured on text with a different key
+scheme. The sweep has not been run.

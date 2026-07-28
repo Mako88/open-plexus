@@ -20,6 +20,38 @@ to 0.46, which is every end-to-end kinship result.
 well-motivated, and all four were measured *before* being built, which is the
 only reason three of them were never written. Fidelity first.
 
+### And fidelity is a WIDTH limit (decision 112)
+
+    as configured   0.915      no decay   0.927      no cap   0.915
+    width 128       1.000      width 256  1.000
+
+Decay costs 0.012, the cap costs 0.000, **width fixes it completely.**
+
+> **Two binding counts of mine were wrong, in opposite directions.** Decision
+> 109 said tasks write "10–30 bindings" — that counted FACTS, and the store
+> binds every adjacent pair. I then said ~160 — that counted `seq_len`, which is
+> a maximum. Measured: kinship is 45 tokens and **44 bindings**.
+>
+> 44 is *under* the ~96 decision 109 measured for width 64, which predicts
+> ~0.99 — so kinship's bindings are **harder than random ones at the same
+> load**, and why is unmeasured. Its keys are hashed pairs and its values repeat
+> heavily; either could reduce effective capacity.
+
+### THE FIRST FALSIFIABLE ACCOUNT OF SATURATION (decision 63)
+
+Text runs used sequences up to **1536 tokens** → ~1536 bindings, against a
+width-128 capacity of ~384. **Four times over capacity**; width 64 is sixteen
+times over.
+
+That explains "more width does not help" exactly — 64 → 128 moves capacity
+96 → 384 while the load stays 1536, so the model is far past saturation either
+way and the doubling is invisible. And "more data does not help" follows too,
+since the store is per-sequence working memory.
+
+**The test:** a two-axis sweep of width × sequence length. At SHORT sequences,
+where load is under capacity, width should help. At long ones it should not
+until width is large enough. Not yet run.
+
 ---
 
 **For the next session.** Read this, then `GOALS.md`, then `BACKLOG.md`. The

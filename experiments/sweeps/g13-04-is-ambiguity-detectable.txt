@@ -2,9 +2,94 @@ Can the model tell, before searching, whether searching would help?
 ===================================================================
 
 Script: experiments/g13_04_is_ambiguity_detectable.py
-Status: DISPATCHED. Predictions registered before the matrix ran.
+Status: RUN, 24 of 24 cells, 8 of 8 seeds, run 30401924214.
 
-ANSWER: pending. A smoke seed is recorded below.
+ANSWER: **YES at width 128 and above, and the cheap signal is the good one.**
+        Decode margin AUC 0.803 overall against decision 93's 0.628 ceiling --
+        but it is WIDTH-DEPENDENT (0.710 at d64, 0.858 at d256), and the
+        expensive rival is BELOW CHANCE.
+
+        Three of five confirmed.
+
+
+RESULTS
+-------
+AUC: P(a random out-degree-1 margin exceeds a random 2+ margin). 0.500 is chance.
+
+  decode margin
+    d64    AUC 0.710 +/-0.017   median one 0.538   median 2+ 0.235
+    d128   AUC 0.841 +/-0.012   median one 0.650   median 2+ 0.147
+    d256   AUC 0.858 +/-0.010   median one 0.769   median 2+ 0.118
+
+  endpoint margin
+    d64    AUC 0.480 +/-0.018   median one 0.392   median 2+ 0.433
+    d128   AUC 0.447 +/-0.020   median one 0.496   median 2+ 0.641
+    d256   AUC 0.448 +/-0.014   median one 0.606   median 2+ 0.743
+
+
+SCORING
+-------
+  P1  CONFIRMED. 0.803 overall, against a 0.75 bar and decision 93's 0.628 for
+      identity-free confidence signals fitted WITH the labels. **The gate is
+      worth building on this signal.**
+
+  P2  REFUTED, on an outlier. The MEAN ratios are 2.3x, 4.4x and 6.5x at d64,
+      d128 and d256 -- comfortably past the prediction. The smallest ratio in
+      any single one of the 24 cells is 1.5x, and the prediction was written
+      over cells rather than over means. Scored as written; the substance holds.
+
+  P3  CONFIRMED, and far more sharply than predicted. The endpoint margin does
+      not merely fail to beat the decode margin by 0.05 -- it comes in **0.345
+      BELOW it, and below chance in absolute terms** at every width: 0.480,
+      0.447, 0.448.
+
+      **The expensive signal is anti-correlated.** Out-degree 2+ shows a WIDER
+      endpoint margin than out-degree 1 (0.743 against 0.606 at d256), which is
+      the opposite of the intuition that motivated recording it. With one true
+      relation the junk branches apparently land on endpoints scoring
+      comparably to the real one; with several, the real branches separate.
+
+      So a gate must decide BEFORE walking, not after -- and that is also the
+      cheap direction. Both arguments now point the same way.
+
+  P4  REFUTED, and this is the caveat that matters. Separation does NOT hold at
+      every width: **d64 reaches only 0.710**, below the 0.75 bar, while d128
+      and d256 reach 0.841 and 0.858.
+
+      The signal STRENGTHENS with width, monotonically, and the reason is
+      visible in the medians: the out-degree-2+ median falls (0.235 -> 0.147 ->
+      0.118) while the out-degree-1 median rises (0.538 -> 0.650 -> 0.769). A
+      wider store holds a cleaner superposition, so a peaked decode gets more
+      peaked and a contested one more contested.
+
+      **A gate built on this is a width-dependent mechanism** and belongs in
+      docs/SCALE.md as one. At the widths this project now runs relational work
+      (256) it is sound; at 64 it would be weak.
+
+  P5  CONFIRMED. Best cell 0.894, below the 0.95 that would suggest the label
+      leaking into the measurement rather than being predicted.
+
+
+WHAT THIS LICENSES
+-------------------
+Building the gate: walk greedily, branch only where the decode margin is narrow.
+g13-03's split says a perfect gate keeps +0.092 and gives back -0.054, which at
+the measured out-degree mix is roughly **+0.03 over search-everywhere**, plus the
+compute saved by not walking where walking cannot help.
+
+AUC 0.803 is not 1.000, so the realised gain is less. **The number to beat is
+search4's overall**, not walk's -- a gate that merely matches search-everywhere
+has bought compute savings and no accuracy.
+
+
+WHAT IT DOES NOT
+-----------------
+Say where the threshold goes. AUC measures separability across all thresholds;
+a gate needs one, and choosing it on the test set would be fitting. That is the
+first thing the gate experiment has to handle honestly.
+
+And it does not transfer to width 64, which P4 refuted explicitly.
+
 
 
 IN PLAIN TERMS

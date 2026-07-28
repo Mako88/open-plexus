@@ -103,6 +103,18 @@ Two rules that keep it honest:
 | **Trigger to revisit** | Any task writing more than ~1 binding per dimension, or any use of the capped/decayed path at scale |
 | **Measure it properly by** | Re-running the same sweep through `model.run` rather than direct outer products |
 
+## The decode margin as an ambiguity signal (decision 129)
+
+| | |
+|---|---|
+| **Chosen** | Gate search on `search.decode_margin` — the gap between the first decode's top two candidates |
+| **Measured at** | g13-04, kinship hops 2, widths 64/128/256, 8 seeds |
+| **The finding** | AUC separating out-degree 1 from 2+ is **0.710 / 0.841 / 0.858** at d64 / d128 / d256 — it strengthens monotonically with width |
+| **Why it moves with scale** | A wider store holds a cleaner superposition. The out-degree-2+ median margin *falls* (0.235 → 0.147 → 0.118) while the out-degree-1 median *rises* (0.538 → 0.650 → 0.769), so both sides of the separation improve together |
+| **Trigger to revisit** | Any use below width 128, where it drops under the 0.75 usability bar; and any change to the key scheme, since the margin is a property of how bindings superpose |
+| **What to do then** | Widen, or find a signal that does not depend on the store being clean. The endpoint margin is **not** the fallback — g13-04 measured it below chance at every width |
+| **What it does NOT say** | That the gate helps. This is the signal's separability, not the mechanism's accuracy |
+
 ## `d_max` — the asynchrony bound and the churn timeout (decision 128)
 
 | | |

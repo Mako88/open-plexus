@@ -149,18 +149,34 @@ Full table in
 - **`search8` is 0.024 WORSE than `search4`, at 6 SE.** "Search wider" is not the
   way to close the gap.
 
-### THE NEXT MECHANISM: gate the search on ambiguity
+### THE NEXT MECHANISM: gate the search on ambiguity — signal MEASURED
 
-Run the walk greedily, branch only where the first decode is ambiguous. The split
-says that keeps +0.092 and gives back the −0.054.
+**g13-04, decision 129: yes, at width ≥ 128.** The decode margin — the gap
+between the first decode's top two candidates — separates ambiguous from
+unambiguous at **AUC 0.803**, against decision 93's 0.628 for identity-free
+confidence signals fitted *with* the labels.
 
-**Open question first, and it is measurable before anything is built:** is
-ambiguity detectable from the decode itself — the gap between its top two
-candidates — rather than from out-degree, which is task structure a running
-system cannot read? **Decision 93 is the warning**: every identity-free
-confidence signal it measured reached 0.628 against 0.500 for guessing. The
-quantity here is different, but measure it first. That habit has saved three
-builds.
+    decode margin      d64 0.710    d128 0.841    d256 0.858
+    endpoint margin    d64 0.480    d128 0.447    d256 0.448
+
+Two things to carry into the build:
+
+- **The expensive signal is below chance.** The endpoint margin — available only
+  after paying for the walks — is *anti*-correlated, so a gate must decide
+  **before** walking. That is also the cheap direction; both arguments agree.
+- **It is width-dependent** and belongs in `docs/SCALE.md` as such. A wider store
+  holds a cleaner superposition, so a peaked decode gets more peaked and a
+  contested one more contested. Sound at 256, weak at 64.
+
+**Build it: walk greedily, branch only where the margin is narrow.** A perfect
+gate is worth roughly **+0.03 over search-everywhere** plus the walks saved.
+
+> **The threshold is the honest problem.** AUC measures separability across all
+> thresholds; a gate needs one, and picking it on the test set would be fitting a
+> number rather than measuring one. Use a held-out split, or derive it from the
+> decode's own scale. **And the number to beat is `search4`'s overall, not
+> `walk`'s** — a gate that merely matches search-everywhere has bought compute
+> savings and no accuracy.
 
 Also still open: **re-measure composition** rather than inheriting decision 102's
 1.000, which was taken on a different configuration.

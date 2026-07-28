@@ -73,6 +73,7 @@ a report to John, not a gate.
 | 126 | SWIM and CRDTs read; the detector ejected nodes permanently, now fixed |
 | 127 | the SWIM paper was never unreadable; the retry interval is in the wrong unit |
 | 128 | d_max is ~640 ms measured; the in-process figure was measuring Windows |
+| 129 | ambiguity is detectable before searching; the expensive signal is below chance |
 
 ---
 
@@ -3267,3 +3268,79 @@ Replacing `RETRY_AFTER_STEPS` with a duration, and stating C2's bound.
 Treating 640 ms as universal. It is a floor from these six links; intercontinental
 paths, mobile networks and congested uplinks are all outside the grid, and a worse
 link raises it.
+
+---
+
+## 129. Ambiguity IS detectable before searching — and the expensive signal is below chance
+
+g13-04, 24 cells, 8 seeds, run 30401924214. Three of five confirmed.
+
+    decode margin      d64  AUC 0.710    d128  0.841    d256  0.858
+    endpoint margin    d64  AUC 0.480    d128  0.447    d256  0.448
+
+### The cheap signal works, at width 128 and above
+
+Decode margin AUC **0.803** overall, against a 0.75 bar and decision 93's
+**0.628** — the best any identity-free confidence signal reached there when
+*fitted with the labels*.
+
+The distinction that predicted this holds up: 93's signals ask *"does this
+retrieval feel reliable"*, and the margin asks something structural — one
+relation bound to a key gives a peaked decode, several give a contested one. It
+reads the superposition rather than guessing at it.
+
+### The expensive signal is ANTI-CORRELATED, which was not predicted
+
+P3 asked whether the endpoint margin — the gap between the best and second-best
+walk — beats the decode margin by more than 0.05 AUC. It comes in **0.345 below
+it, and below chance in absolute terms** at every width.
+
+**Out-degree 2+ shows a WIDER endpoint margin than out-degree 1** (0.743 against
+0.606 at d256), the opposite of the intuition that motivated recording it. With
+one true relation the junk branches apparently reach endpoints scoring comparably
+to the real one; with several, the real branches separate from each other.
+
+So a gate must decide **before** walking rather than after — which is also the
+cheap direction. Both arguments now point the same way, and the one that would
+have cost the walks is the one that does not work.
+
+### It is a WIDTH-DEPENDENT mechanism, and that is the caveat
+
+P4 refuted: **d64 reaches only 0.710**, below the bar, while d128 and d256 reach
+0.841 and 0.858. The signal strengthens monotonically with width, and the medians
+say why — the out-degree-2+ median *falls* (0.235 → 0.147 → 0.118) while the
+out-degree-1 median *rises* (0.538 → 0.650 → 0.769).
+
+**A wider store holds a cleaner superposition**, so a peaked decode gets more
+peaked and a contested one more contested. That is a real mechanism rather than
+noise, and it means a gate built on this belongs in `docs/SCALE.md` as
+width-dependent. At 256, where relational work now runs, it is sound; at 64 it
+would be weak.
+
+### P2 refuted on an outlier, and scored as written
+
+Mean ratios are 2.3×, 4.4× and 6.5× — comfortably past the prediction. The
+smallest ratio in any single cell of 24 is 1.5×, and the prediction was phrased
+over cells rather than over means. Recorded as refuted because that is what it
+says; the substance holds.
+
+### What this licenses
+
+Building the gate: walk greedily, branch only where the decode margin is narrow.
+g13-03's split puts a perfect gate at roughly **+0.03 over search-everywhere**,
+plus the walks saved where they cannot help.
+
+### What it does NOT
+
+**Say where the threshold goes.** AUC measures separability across all
+thresholds; a gate needs one, and choosing it on the test set would be fitting a
+number rather than measuring one. That is the first thing the gate experiment has
+to handle honestly — a held-out split, or a threshold derived from the decode's
+own scale rather than tuned.
+
+And **the number to beat is search4's overall, not walk's.** A gate that merely
+matches search-everywhere has bought compute savings and no accuracy, which is
+worth having and is not what this was for.
+
+**Taken without asking**, under standing authorisation and John's advance
+approval of the direction.

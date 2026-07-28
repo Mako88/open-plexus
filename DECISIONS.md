@@ -3549,3 +3549,81 @@ competitive retrieval (refuted 0.924 → 0.128), orthogonal updates, the write
 gate, consolidation. **Each of those refutations was measured beside a linear
 readout.** A mechanism refuted for adding information a linear map could not use
 is not refuted for a readout that can.
+
+---
+
+## 77. g11-07: two refuted mechanisms partially recover under a composed readout
+
+**The payoff of the whole re-validation thread, and it says the record needs more
+re-checking rather than less.** 18 of 18 cells, run `30329481170`.
+
+    readout = hidden128        cache128           plain         settle2
+        dense              5.172+/-.024    5.242+/-.014    5.232+/-.009
+        pair               5.434+/-.009    5.342+/-.009    5.278+/-.002
+        sparse4            5.188+/-.016    5.301+/-.004    5.276+/-.024
+
+    readout = linear           cache128           plain         settle2
+        dense              5.299+/-.044    5.525+/-.014    5.654+/-.009
+        pair               5.524+/-.001    5.775+/-.011    5.904+/-.016
+        sparse4            5.263+/-.034    5.374+/-.026    5.530+/-.017
+
+    best: keys=dense, retrieval=cache128, readout=hidden128   5.172
+
+**P1 confirmed exactly** — the baseline is 5.525 against a predicted ~5.53, so
+the grid reproduces what three separate probes reached today.
+
+**P2 confirmed, 9 of 9.** The composed readout wins at every keys x retrieval
+combination, margins 0.075 to 0.626. It is the largest single factor in the grid.
+
+**P4 confirmed.** The sparse crossover replicates across six cells, having been
+measured once at 120,000 characters.
+
+### P5 confirmed, and it is the result
+
+The pair-key penalty against dense keys:
+
+    retrieval    linear   hidden128
+    plain        -0.250      -0.100     recovers by 0.150
+    settle2      -0.249      -0.046     recovers by 0.203
+    cache128     -0.225      -0.262     does not recover
+
+**Pair keys were penalised for carrying information a linear readout could not
+use.** Give it a readout that can and 60-80% of the penalty disappears. The one
+exception is instructive: alongside the cache the penalty gets slightly worse,
+so those two mechanisms compete rather than compose.
+
+### And settling, refuted at 0.924 -> 0.128
+
+Plain minus settle2, positive meaning settling is BETTER:
+
+    linear      dense -0.129   pair -0.129   sparse4 -0.156
+    hidden128   dense +0.010   pair +0.064   sparse4 +0.025
+
+It goes from costing 0.13-0.16 bits to gaining 0.01-0.06, and its best showing is
+alongside pair keys — the other mechanism the linear readout was penalising.
+
+**Neither of these is a rehabilitation and it would be easy to overstate them.**
+Settling gains 0.06 at best, and its original refutation was measured on
+synthetic recall rather than on text, so this does not contradict that
+measurement — it says the refutation does not transfer here. What is established
+is narrower and more important: **a refutation taken beside a linear readout is
+not evidence about a composed one.**
+
+### P3 refuted, and the refutation is more interesting than the prediction
+
+The cache was predicted to shrink under `hidden128` at every keys setting. It
+shrinks with dense (0.226 -> 0.070), REVERSES with pair (0.251 -> -0.092), and is
+**unchanged with sparse keys** (0.111 -> 0.113).
+
+So the cache is not uniformly compensation for a weak readout. Alongside sparse
+keys it survives the readout change intact — which decision 76's single-setting
+measurement could not have shown, and which is a direct argument for grids over
+one-at-a-time probes.
+
+### What this costs
+
+Four mechanisms in the comparison set have still not been re-checked against a
+composed readout: the write gate, consolidation, readout bias, orthogonal
+updates. Two of the two refuted mechanisms that WERE re-checked moved. **That is
+not a reassuring base rate**, and the remaining four should be assumed
+conditional until measured.

@@ -2,7 +2,14 @@ What combination is actually best, now that the readout has changed?
 ====================================================================
 
 Script: experiments/g11_04_scaling_exponent.py, --components spec per cell
-Status: DISPATCHED, awaiting results.
+Status: RUN, 18 of 18 cells, run 30329481170.
+
+ANSWER: **The readout is the largest single factor and TWO REFUTED MECHANISMS
+        PARTIALLY RECOVER once it can compose.** Settling, refuted at
+        0.924 -> 0.128, is neutral-to-better under a composed readout. Pair keys,
+        measured 0.25 worse, lose only 0.10 with plain retrieval and 0.05 with
+        settling. Including the refuted arms was the right call and the record
+        needs more re-checking, not less.
 
 
 IN PLAIN TERMS
@@ -122,4 +129,77 @@ work around with a duplicate arm.
 
 THE NUMBERS
 ------------
-Awaiting the run.
+    readout = hidden128        cache128           plain         settle2
+        dense              5.172+/-.024    5.242+/-.014    5.232+/-.009
+        pair               5.434+/-.009    5.342+/-.009    5.278+/-.002
+        sparse4            5.188+/-.016    5.301+/-.004    5.276+/-.024
+
+    readout = linear           cache128           plain         settle2
+        dense              5.299+/-.044    5.525+/-.014    5.654+/-.009
+        pair               5.524+/-.001    5.775+/-.011    5.904+/-.016
+        sparse4            5.263+/-.034    5.374+/-.026    5.530+/-.017
+
+    best five combinations
+      5.172   dense    cache128   hidden128
+      5.188   sparse4  cache128   hidden128
+      5.232   dense    settle2    hidden128
+      5.242   dense    plain      hidden128
+      5.263   sparse4  cache128   linear
+
+
+SCORED
+-------
+P1 CONFIRMED exactly. dense/plain/linear is 5.525 against a predicted ~5.53, so
+   the grid reproduces the figure three separate probes reached today and the
+   dispatch is verified from the data.
+
+P2 CONFIRMED, 9 of 9. `hidden128` wins at EVERY keys x retrieval combination,
+   with no exceptions and margins from 0.075 to 0.626. **The readout is the
+   largest single factor in the grid.**
+
+P3 REFUTED. The cache's advantage was predicted smaller under `hidden128` at
+   every keys setting. It shrinks with dense (0.226 -> 0.070) and REVERSES with
+   pair (0.251 -> -0.092), but with sparse keys it is unchanged
+   (0.111 -> 0.113). **The cache is not uniformly compensation** -- alongside
+   sparse keys it survives the readout change intact, which decision 76's
+   single-setting measurement could not have shown.
+
+P4 CONFIRMED. The sparse crossover replicates at 60,000 characters: sparse beats
+   dense under `linear` at all three retrievals (+0.036, +0.151, +0.125) and
+   loses under `hidden128` at all three (-0.016, -0.059, -0.043). Decision 74
+   measured this once at 120,000 characters; it now holds at six cells.
+
+P5 CONFIRMED WHERE IT MATTERS, refuted in one cell. The pair-key penalty against
+   dense:
+
+       retrieval    linear   hidden128
+       plain        -0.250      -0.100     recovers by 0.150
+       settle2      -0.249      -0.046     recovers by 0.203
+       cache128     -0.225      -0.262     does not recover
+
+   **Pair keys were penalised for carrying information a linear readout could
+   not use.** Give it a readout that can and 60-80% of the penalty disappears.
+   The exception is instructive: alongside the cache the penalty gets worse, so
+   the two mechanisms compete rather than compose.
+
+
+THE FINDING THE GRID WAS FOR
+-----------------------------
+**Settling was refuted at 0.924 -> 0.128 and is neutral-to-better under a
+composed readout.** Plain minus settle2, positive meaning settling is better:
+
+       linear      dense -0.129   pair -0.129   sparse4 -0.156
+       hidden128   dense +0.010   pair +0.064   sparse4 +0.025
+
+It goes from costing 0.13-0.16 bits to gaining 0.01-0.06, and its best showing
+is alongside pair keys -- the other mechanism the linear readout was penalising.
+
+**Neither of these is a rehabilitation.** Settling gains 0.06 at best, and the
+original refutation was measured on synthetic recall rather than on text, so
+this does not contradict it -- it says the refutation does not transfer here.
+What it does establish is that **a refutation taken beside a linear readout is
+not evidence about a composed one**, which was the reason for including the
+refuted arms and is now measured rather than argued.
+
+The rest of the comparison set has the same problem and has not been re-checked:
+the write gate, consolidation, readout bias, orthogonal updates.

@@ -792,6 +792,29 @@ class LocalMemoryConfig:
     capture_slots: int = 0
     salience: float = 0.0
     lasting_cap: float = 0.0
+
+    #: Does the consolidated store SURVIVE the sequence? **`False` is what every
+    #: number in this project was measured under**, and it is the thing decision
+    #: 62 found and nobody acted on.
+    #:
+    #: `memory` is rebuilt inside `run` and so, until now, was `lasting` -- so
+    #: consolidation's two timescales both sat INSIDE one sequence and the only
+    #: thing carrying across a corpus was `Wo`, one `vocab x d` linear map.
+    #:
+    #: GOALS section 1.2 asks for *"a good map of most all concepts, and how a
+    #: given concept relates to some other concept"*. **A map needs somewhere to
+    #: live**, and this is the smallest change that gives it one: the same
+    #: machinery, promoted from per-sequence to per-model.
+    #:
+    #: **The falsifier is decision 63**, which measured this model converging at
+    #: ~16,000 characters and never improving after. If a persistent slow store
+    #: does not move that wall, the account in note 042 is wrong and the whole
+    #: architectural proposal goes with it. That is a cheap test and it comes
+    #: before anything is built on top.
+    #:
+    #: Requires `consolidation` -- there is nothing to persist without a
+    #: mechanism that promotes into it.
+    persistent_lasting: bool = False
     corrective_writes: bool = False
     write_gate: float = 1.0
     retrieval_steps: int = 1
@@ -1225,6 +1248,13 @@ class LocalMemoryConfig:
                 "capture_slots bounds consolidation and does nothing without it")
         if self.lasting_cap < 0.0:
             raise ValueError("lasting_cap must not be negative")
+        if self.persistent_lasting and not self.consolidation:
+            raise ValueError(
+                "persistent_lasting keeps the CONSOLIDATED store across "
+                "sequences, and without `consolidation` nothing is ever "
+                "promoted into it -- the flag would be silently inert, which "
+                "is how decision 79 caught a write gate producing numbers "
+                "identical to the baseline to the last decimal")
         if self.salience and not self.lasting_cap:
             raise ValueError(
                 "a salience gate without a cap diverges: promoting on surprise "
@@ -1321,6 +1351,15 @@ class LocalAssociativeMemory:
         # test**, so the sum, the exact cache and the settling loop are three
         # composed objects rather than four config fields and two branches.
         self.retrieval: Retrieval = build_retrieval(config)
+        #: The slow store, when `persistent_lasting` keeps it across sequences.
+        #: `None` until the first `run` sizes it. **This is the only state on
+        #: the model that accumulates across a corpus other than `Wo`**, which
+        #: is the point -- see decision 62 and note 042.
+        #:
+        #: Cleared by `forget_lasting()`, which a test or a new lifetime calls;
+        #: nothing clears it implicitly, because a store that quietly resets is
+        #: indistinguishable from one that never worked.
+        self._lasting: np.ndarray | None = None
         self.wv = rng.normal(0.0, spread, (v, d))
         self.wo = np.zeros((v, d))
         # A constant term on the readout, off by default.
@@ -1492,6 +1531,20 @@ class LocalAssociativeMemory:
         # derived_keys, and wrong in the direction that flatters churn survival.
         return int((np.abs(self.wv).sum(axis=0) > 0).sum())
 
+    def forget_lasting(self) -> None:
+        """Drop the persistent slow store, if there is one.
+
+        **Nothing calls this implicitly.** A store that quietly resets between
+        sequences is indistinguishable from one that never accumulated, and
+        that failure would look exactly like the null this mechanism is being
+        tested against — decision 62 was found by noticing that `learn=False`
+        predictions were byte-identical whether or not another sequence had run,
+        which is what "nothing carries" looks like from the outside.
+
+        So the reset is explicit and a caller has to mean it.
+        """
+        self._lasting = None
+
     def run(self, tokens: np.ndarray, targets: np.ndarray | None = None,
             scored: np.ndarray | None = None, learn: bool = False,
             partition=None,
@@ -1635,7 +1688,22 @@ class LocalAssociativeMemory:
         # `pending`), and it is cleared with `pending` at every reward -- so an
         # index can never outlive the list it points into.
         tagged: list = []
-        lasting = np.zeros((d, d)) if self.config.consolidation else None
+        # THE SLOW STORE, and whether it survives this call is the whole of
+        # decision 62's unaddressed finding.
+        #
+        # Built here, it is rebuilt every sequence like the fast one -- so the
+        # two-timescale machinery consolidation implements has both timescales
+        # INSIDE one sequence, and nothing at all carries across the corpus
+        # except `Wo`. `persistent_lasting` moves it onto the model, where a
+        # concept map could actually accumulate.
+        #
+        # Off by default, so every number recorded before this stands.
+        if self.config.persistent_lasting:
+            if self._lasting is None:
+                self._lasting = np.zeros((d, d))
+            lasting = self._lasting
+        else:
+            lasting = (np.zeros((d, d)) if self.config.consolidation else None)
         # Occupied slots, weakest first is not maintained -- the pool is small
         # enough that a linear scan for the weakest is cheaper than keeping order.
         # Each entry is (strength, retrieval, key), and `key` is kept here rather

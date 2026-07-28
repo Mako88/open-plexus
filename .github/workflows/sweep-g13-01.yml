@@ -1,0 +1,106 @@
+name: sweep-g13-01-does-width-fix-fidelity
+
+# THE GATE ON WHETHER SEARCH GETS REBUILT.
+#
+# Four mechanisms have failed against retrieval fidelity (decisions 102, 105,
+# 107, 111). Decision 112 ablated that number in isolation and found it a WIDTH
+# limit -- 0.915 at width 64, 1.000 at 128 and 256. Nothing has re-run the task
+# itself at those widths, and this does.
+#
+# Decision 111 refused to build search because "you cannot search your way out
+# of noisy primitives, because the verifier is built from the primitives". That
+# refusal is CONDITIONAL on the primitives being noisy. Decision 108 says the
+# residual at out-degree > 1 is not noise but AMBIGUITY -- the store returns a
+# relation the subject genuinely holds 96% of the time, and "correct" tracks
+# 1/k. If both hold, width leaves the primitives reliable-but-ambiguous, which
+# is exactly the regime where search is right and its verifier is trustworthy.
+#
+# PREDICTIONS (full text in experiments/g13_01_does_width_fix_fidelity.py and
+# in the sweep file):
+#   P1  CONTROL -- out-degree 1 rises with width and clears 0.99 at 256
+#   P2  hop1-pair overall rises but does not reach 1.000
+#   P3  out-degree >= 2 stays within 0.10 of 1/k at EVERY width  <- decides search
+#   P4  hop2-concat gains less from width than hop1-pair
+#   P5  hop2-concat at 256 still does not clear the shortcut floor
+#
+# P1 WAS ALREADY REFUTED BY A SMOKE SEED before this was dispatched, in the
+# unexpected direction: out-degree 1 is 1.000 at width 64 already. That is
+# recorded rather than quietly rewritten -- the difference from decision 112 is
+# a TRAINED READOUT, which the isolated ablation did not have.
+#
+# EIGHT SEEDS, not three. The cost probe put the most expensive cell at 0.6 min,
+# and the effect being looked for is 0.02 wide on the smoke seed. Three-seed
+# grids have twice been unable to bound an effect in this project.
+#
+# COST, estimated FROM THE MOST EXPENSIVE CELL (width 256, hop2-concat, where
+# the d^2 store cost and the doubled hop count meet): 21.0 ms per training
+# sequence, 0.6 min to train one cell at 400 x 4. Six cells per job, so a job is
+# ~3 min even if every cell were the dear one. 8 jobs.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweep
+  cancel-in-progress: false
+
+jobs:
+  fidelity:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2, 3, 4, 5, 6, 7]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - name: seed ${{ matrix.seed }}, both arms, widths 64/128/256
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python experiments/g13_01_does_width_fix_fidelity.py \
+            --seed ${{ matrix.seed }} --json out/seed-${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g13-01-seed-${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: [fidelity]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g13-01-seed-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "seeds returned: $(ls out/*.json 2>/dev/null | wc -l) of 8" | tee summary.txt
+          python -m tools.summarise_g13_01 | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g13-01-summary
+          path: |
+            summary.txt
+            out/*.json

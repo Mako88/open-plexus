@@ -247,6 +247,19 @@ Listed here because they are calls that are his rather than mine — but per the
 standing agreement this is **a report, not a gate**. If he does not answer, I
 decide, proceed, and say which calls were made without him.
 
+> **ANSWERED 2026-07-28, and it closes two of the three below.** John, in his
+> words: *"I'm good with any functionality and/or adjustments that get us closer
+> to our goals. As long as it doesn't contradict with those (primarily being:
+> runs on the internet, ideally results in AGI, but works as an LLM replacement
+> as a secondary goal [but when they conflict, the AGI goal takes priority])."*
+>
+> So **search and moving off character level are both approved in advance**, and
+> the test for any mechanism is the goals themselves rather than his sign-off:
+> does it run over the internet (amended C1), does it serve AGI first. Item 2
+> below is no longer a decision — it is a costed piece of work whose only
+> remaining requirement is that the re-baselining is planned rather than
+> discovered.
+
 1. **Input and output.** He wants to talk this through rather than have it
    decided. His framing: if the AGI goal wins, inputs should look like a body — a
    loop with consequences, not a passive feed. Related work of his own:

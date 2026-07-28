@@ -316,6 +316,20 @@ record and the only symptom is an error about something you never ran.
 > not protect against the class**, which is the second time that sentence has had
 > to be written about this one rule.
 
+> *Calibration, and this one is not a gap in the rule.* Commit `28e0ae7` was
+> written with `-m` and a double-quoted message containing `` `norm` `` and
+> `` `value_lr` ``. Both ran as commands, both printed "command not found", and
+> both words are **missing from the permanent record** — "reading of  at
+> d'=1.01", "This gives  -- already in the model". The paragraph above predicts
+> this outcome exactly, in those words.
+>
+> The rule was not unclear; it was **skipped because the message felt short**.
+> Four commits that session went through `-F` with a Write-built file and the
+> shorter ones drifted to `-m`. **There is no length below which `-m` is safe** —
+> the hazard is one backtick, and short messages are not less likely to contain
+> one. `DECISIONS.md` carried the correct text, which is the only reason this
+> cost nothing.
+
 > *Calibration.* Commit `18388e5`. The line "PREDICTION 3 REFUTED BACKWARDS.
 > `none` was predicted to rise" was committed as "PREDICTION 3 REFUTED BACKWARDS.
 >  was predicted to rise". Every other commit that day used `-F` and was fine;

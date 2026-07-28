@@ -5462,3 +5462,66 @@ Any claim about churn or depth generalisation under repetition. Decisions 90 to
 92 were all measured on disjoint chains and **none has been re-run linked**.
 This says composition survives; it says nothing about whether zero-shot depth
 transfer or the 0.928-at-half-the-machine result do.
+
+## 107. The traversal mechanism is not worth building, and the real blocker is per-step fidelity
+
+Decision 105 called a pair-key hop "forced and narrow" and made it the next
+mechanism. Measuring its ceiling first says **do not build it.**
+
+The ideal traversal, done by hand outside the model — `key(FACT,S) → R1`, then
+`key(S,R1) → M`, then `key(FACT,M) → R2`, then a linear readout on `[r1, r2]`:
+
+    2-hop kinship, floor to beat 0.475
+      current-style re-encode (single-token)   0.435
+      IDEAL pair-key traversal                 0.485
+
+**A perfect traversal buys 0.05** and lands barely above the floor. The
+mechanism would have been largely wasted work, and the only reason that is known
+is that the ceiling was measured before the build.
+
+### Why: compounding, and the breakdown is the useful part
+
+    step                      chained   given a perfect input
+    1  key(FACT,S) -> R1        0.710                   0.710
+    2  key(S,R1)   -> M         0.703                   0.960
+    3  key(FACT,M) -> R2        0.497                   0.677
+
+    product of the three isolated steps   0.462
+    end-to-end ideal traversal            0.485
+
+The product of the isolated steps **is** the end-to-end number. Compounding is
+the whole explanation, and no routing fixes it.
+
+**Step 2 — the pair-key traversal itself — is 0.960.** It works. The weak steps
+are 1 and 3, and both are the same operation: `key(FACT, X) → X's relation`.
+
+### So the blocker is the same-role collision, which I had just deprioritised
+
+Decision 104 fixed the subject-versus-object collision and left the
+subject-of-two-facts one, which I called a residual and put behind traversal.
+That was wrong. **It is the thing capping steps 1 and 3**, and therefore the
+thing capping everything.
+
+The arithmetic makes the case: at the current 0.710 / 0.960 / 0.677 the product
+is 0.462. Take the two entity-lookup steps to the 0.95 that step 2 already
+reaches and the product is **0.87**.
+
+### What this licenses
+
+A reordering, and a sharper target than "make retrieval better". The operation
+to fix is specifically *retrieve the relation an entity holds as a subject, when
+it is the subject of several facts*. The disambiguator exists in the question —
+it names the **object** — so a key over `(subject, object)` rather than
+`(marker, subject)` would be unique. Whether the model can form that key when
+the object is the far end of a multi-hop question is the design problem, and it
+is a different one from traversal.
+
+It also joins this line to the saturation question. Per-step fidelity falling as
+bindings-per-key rises is a **capacity** limit, not a mechanism gap, and
+decisions 103, 104 and 106 are all measurements of the same curve.
+
+### What it does NOT license
+
+Discarding pair keys. Step 2 at 0.960 is the pair-key mechanism working, and it
+is the only step that does work — the finding is that the traversal HOP is not
+worth building, not that pair keys were a mistake.

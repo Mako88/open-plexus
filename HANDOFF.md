@@ -148,13 +148,39 @@ to — and the model still returned answers and accuracies. That combination now
 So the two fixes are individually correct and **mutually unusable**, and whether
 the accumulator works given a reliable hop 1 is still unanswered.
 
-### THE NEXT MECHANISM, forced and narrow
+### DO NOT BUILD THE PAIR-KEY HOP (decision 107)
 
-**A hop must re-encode into the store's own key space** — with pair keys, build
-`context_key(marker, decoded)` instead of `wk[decoded]`. The decoded token is in
-hand; *what to pair it with* is the design question. Hardcoding the task's fact
-marker works and puts task knowledge in the model; learning which context to
-pair with is the honest version.
+Its ceiling was measured before building it, and it is not worth it:
+
+    ideal pair-key traversal  0.485   against a floor of 0.475
+    current broken re-encode  0.435
+
+**A perfect traversal buys 0.05.** The reason is compounding, and the breakdown
+is what matters:
+
+    step                      chained   given a perfect input
+    1  key(FACT,S) -> R1        0.710                   0.710
+    2  key(S,R1)   -> M         0.703                   0.960
+    3  key(FACT,M) -> R2        0.497                   0.677
+    product of isolated steps  0.462    end-to-end 0.485
+
+**Step 2 — the pair-key traversal — is 0.960 and works.** Steps 1 and 3 are both
+`key(FACT, X) → X's relation`, and they are what caps everything.
+
+### THE ACTUAL BLOCKER: the same-role collision
+
+An entity that is the subject of SEVERAL facts puts several bindings back on
+`key(FACT, X)`. Take steps 1 and 3 to the 0.95 step 2 already reaches and the
+product goes from 0.462 to **0.87**.
+
+The disambiguator exists in the question — it names the **object** — so a key
+over `(subject, object)` would be unique. Forming that key when the object is
+the far end of a multi-hop question is the design problem, and it is a different
+one from traversal.
+
+**This is also the saturation question in miniature.** Per-step fidelity falling
+as bindings-per-key rises is a capacity limit, not a mechanism gap, and
+decisions 103, 104, 106 and 107 are all measuring the same curve.
 
 > **And it cast doubt backwards — now resolved (decision 106).** Every chain
 > result used a layout guaranteeing one appearance per symbol. With chains

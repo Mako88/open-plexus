@@ -5274,3 +5274,67 @@ entity appearing twice is **not known**.
 Concluding the architecture cannot do relational work. What is measured is that
 **single-token keys** cannot, and the reason is arithmetic rather than
 mysterious. `context_keys` exists and is untried on this.
+
+## 104. Pair keys largely fix it, and a scale register now exists
+
+Decision 103's prediction, written before the run: pair keys should raise
+hop-1 accuracy at two-or-more appearances toward the 0.959 that one appearance
+already reaches.
+
+`context_keys` binds `(previous, token)`, which is only usable if what precedes
+a fact's subject is predictable — otherwise the question cannot reconstruct the
+key. So the task now writes a **fact marker** before every fact, and the
+question ends `FACT subject`. `key(FACT, S)` is then "S in **subject** role",
+distinct from `key(R, S)`, which is "S in object role" — exactly the two
+bindings that were colliding.
+
+    appearances   sequences   single key   PAIR key
+              1         146        0.884       0.918
+              2         145        0.303       0.628
+              3          81        0.198       0.568
+              4          23        0.087       0.565
+        overall                    0.480       0.710
+
+**The collapse largely goes.** 2.1× at two appearances, **6.5× at four**, and
+the curve flattens instead of falling off a cliff.
+
+### Confirmed, but not to the predicted level, and the residual has a cause
+
+The prediction said "toward 0.959". It reaches ~0.57–0.63, not ~0.92.
+
+Pair keys separate an entity's **roles**. They do nothing for an entity that
+appears twice in the **same** role — a person who is the subject of two facts
+puts two bindings back on `key(FACT, S)`, and the store sums them again. That
+part is genuine ambiguity in the question rather than a limitation of the store:
+"what relation does S hold" has two answers, and only the path says which.
+
+So the mechanism does what it was predicted to do, on the collision it was aimed
+at, and a second collision remains that it was never going to address.
+
+### Numbers here are not comparable to decision 103's
+
+The task changed to make pair keys usable — a marker before every fact, and a
+longer sequence. Single-key accuracy at one appearance reads 0.884 here against
+0.959 there for that reason. **Only the within-run comparison is a measurement.**
+
+### And a scale register, which John asked for
+
+[`docs/SCALE.md`](docs/SCALE.md) records every choice known to depend on the
+size it was measured at: what was chosen, at what scale, what would trigger
+revisiting it, and what to try instead. Six rows to start — the readout's
+pooling, dimensions per node, how a hop combines retrievals, single versus pair
+keys, gate sharpness, and store capacity.
+
+The rule in CLAUDE.md is that a row is added **when the choice is made**, and
+that the trigger also lives in the config docstring, since that is where someone
+reading the code will be. `hop_accumulate="concat"` is the motivating case: it
+beat a true binding 1.000 to 0.812, but only because sixteen rules in a
+128-wide space are linearly separable whatever the labels do — a property of
+having few rules, and nothing in the result says so.
+
+### What this does NOT license
+
+An end-to-end number. This measures **hop 1 in isolation** — whether the store
+can answer a single-fact question about a repeated entity. Composition on top of
+it has not been re-run, and decisions 101 and 102 were both measured on the
+single-key task where hop 1 was right under half the time.

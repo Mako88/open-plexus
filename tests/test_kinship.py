@@ -212,10 +212,40 @@ class TheShapeIsWhatItClaims(unittest.TestCase):
             self.assertLess(token, config.n_people + len(RELATIONS))
 
     def test_markers_sit_outside_both_ranges(self):
-        config = KinshipConfig(n_people=12, hops=2, n_facts=10, seq_len=120)
+        config = KinshipConfig(n_people=12, hops=2, n_facts=10, seq_len=140)
         self.assertEqual(config.query_token,
                          config.n_people + len(RELATIONS))
-        self.assertEqual(config.vocab_size, config.query_token + 1)
+        self.assertEqual(config.fact_token, config.query_token + 1)
+        self.assertEqual(config.vocab_size, config.fact_token + 1)
+
+    def test_a_fact_marker_precedes_every_subject(self):
+        """**What makes a pair key usable** (decision 103). With `context_keys`
+        the store binds `(previous, token)`, so a fact's subject is only
+        addressable if what precedes it is predictable. The marker makes
+        `key(FACT, S)` mean "S in subject role", distinct from `key(R, S)`
+        which is "S in object role" — and those are exactly the two bindings
+        that collide on a single-token key."""
+        config = KinshipConfig(n_people=12, hops=2, n_facts=8, seq_len=140,
+                               seed=31)
+        for sequence in dataset(config, 20):
+            for subject, relation, obj in sequence.facts:
+                triple = (config.fact_token, subject,
+                          config.relation_token(relation), obj)
+                joined = sequence.tokens
+                found = any(joined[i:i + 4] == triple
+                            for i in range(len(joined) - 3))
+                self.assertTrue(found, f"{triple} not laid down as a block")
+
+    def test_the_question_ends_with_a_marked_subject(self):
+        """The key at the scored position must be the pair a fact wrote. Ending
+        the question any other way keys the retrieval on a pair that was never
+        stored."""
+        config = KinshipConfig(n_people=12, hops=2, n_facts=8, seq_len=140,
+                               seed=32)
+        for sequence in dataset(config, 20):
+            at = sequence.answer_position
+            self.assertEqual(sequence.tokens[at], sequence.asked[0])
+            self.assertEqual(sequence.tokens[at - 1], config.fact_token)
 
 
 class ImpossibleShapesAreRefused(unittest.TestCase):

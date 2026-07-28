@@ -169,9 +169,30 @@ class KinshipConfig:
         return self.n_people + self.n_relations
 
     @property
-    def vocab_size(self) -> int:
-        # People, then relations, then the query marker.
+    def fact_token(self) -> int:
+        """Sits before every fact, and before the queried subject.
+
+        **This is what makes a pair key usable.** With `context_keys` the store
+        binds `(previous, token)` rather than `token`, and the binding written at
+        a fact's subject is `key(previous, S)` — where `previous` is whatever
+        preceded it, which is the last fact's object and therefore arbitrary. A
+        question could not reconstruct that key.
+
+        With a marker before every fact, `key(FACT, S)` is consistently "S in
+        SUBJECT role", and it is distinct from `key(R, S)`, which is "S in
+        object role". Those are exactly the two bindings that collide on a
+        single-token key and make an entity in two facts unreadable
+        (decision 103: 0.959 at one appearance, 0.366 at two).
+
+        The question block ends `... FACT subject` for the same reason: the key
+        at the scored position has to be the one the fact wrote.
+        """
         return self.n_people + self.n_relations + 1
+
+    @property
+    def vocab_size(self) -> int:
+        # People, then relations, then the query and fact markers.
+        return self.n_people + self.n_relations + 2
 
     def relation_token(self, name: str) -> int:
         return self.n_people + RELATIONS.index(name)
@@ -204,9 +225,9 @@ class KinshipConfig:
 
     @property
     def min_seq_len(self) -> int:
-        """Three positions per fact, then the query marker, two people and the
-        answer."""
-        return self.n_facts * 3 + 4
+        """Four positions per fact — marker, subject, relation, object — then
+        the query marker, the object, a fact marker, the subject, the answer."""
+        return self.n_facts * 4 + 5
 
 
 @dataclass(frozen=True)
@@ -406,9 +427,16 @@ def generate(config: KinshipConfig) -> KinshipSequence:
 
     tokens: list[int] = []
     for subject, relation, obj in order:
-        tokens.extend((subject, config.relation_token(relation), obj))
+        tokens.extend((config.fact_token, subject,
+                       config.relation_token(relation), obj))
 
-    tokens.extend((config.query_token, people[0], people[-1]))
+    # The question ends `FACT subject` so that the key at the scored position
+    # is the one a fact wrote for that person AS A SUBJECT. Ending it any other
+    # way keys the retrieval on a pair that was never stored -- and ending it
+    # on the OBJECT instead of the subject is the choice decision 100 measured
+    # at 0.020 against 0.713.
+    tokens.extend((config.query_token, people[-1],
+                   config.fact_token, people[0]))
     answer_position = len(tokens) - 1
     tokens.append(config.relation_token(answer))
 

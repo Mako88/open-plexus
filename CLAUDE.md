@@ -831,6 +831,25 @@ is for the *model* layer only. Anything in `openplexus/tasks/` or
 `openplexus/baselines.py` importing it is a defect: those are the ruler, and the
 ruler stays dependency-free. The consumer-device runtime remains undecided.
 
+- **A scale-dependent choice goes in [`docs/SCALE.md`](docs/SCALE.md) WHEN IT IS
+  MADE, and says so at its own definition.**
+
+  Every measurement here is made at one size, and a default chosen at width 64
+  carries no warning label when it is read at width 8192. The register records
+  what was chosen, at what size, what would trigger revisiting it, and what to
+  try instead.
+
+  The config docstring carries the trigger too, not just the register — that is
+  where someone reading the code will be. And the row is added when the choice
+  is made rather than when it breaks, because a register written afterwards is a
+  post-mortem.
+
+  > *Why this exists.* `hop_accumulate="concat"` beat a true binding 1.000 to
+  > 0.812 — but only because sixteen rules in a 128-wide space are linearly
+  > separable whatever the labels do. That is a property of having few rules,
+  > not of concatenation being right, and nothing in the result says so. John
+  > asked for these to be swappable and documented rather than discovered later.
+
 - **Run all these checks before every commit:**
   ```
   python tools/mutate.py --verify

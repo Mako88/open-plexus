@@ -1284,3 +1284,34 @@ Proposed as a CLAUDE.md rule rather than a one-off: **when a file crosses a size
 or branch threshold, the next change to it either reduces that or says why not.**
 A threshold fires without anyone deciding to look, which is the property rule 17
 already relies on for the verify/build alternation.
+
+---
+
+## `orthogonal_every` cannot be re-checked without being reimplemented
+
+Decision 77 named four mechanisms still measured only beside a LINEAR readout.
+g11-08 re-checks three. **The fourth cannot be re-checked as it stands**, and
+the reason makes it the most interesting of the four rather than the least.
+
+The model REFUSES `orthogonal_every` alongside `hidden`, deliberately: it
+orthogonalises an update whose shape is defined by the linear readout, and across
+two layers it would silently orthogonalise a different matrix than the one it was
+measured on. That refusal is correct.
+
+**But decision 54's refutation may not survive the change.** It concluded "our
+rank collapse is the DATA being low-rank, not the rule failing -- a cure for
+someone else's disease", and the comparison was to Boeshertz et al., who applied
+Muon **per layer in a deep network**, recovering CIFAR-100 from 1.4% to 46.1%.
+With a single linear map there was no per-layer structure to orthogonalise. With
+a hidden layer there is.
+
+So the mechanism that was refuted for being a cure for someone else's disease is
+now applied to a model that has, for the first time, the shape of the patient.
+
+**What it needs:** orthogonalise the OUTPUT layer's accumulated update, per
+group, with the hidden layer either left alone or handled separately — the
+choice matters and should be argued before it is coded. Then re-run g11-08's grid
+with it as a fourth `write` or `readout` choice.
+
+Deliberately NOT bundled into g11-08. Implementing a mechanism and re-checking a
+refutation in the same sweep produces a number nobody can attribute.

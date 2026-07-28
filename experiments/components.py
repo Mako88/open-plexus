@@ -50,11 +50,28 @@ CHOICES: dict[str, dict[str, dict]] = {
         "linear": {},
         "hidden64": {"hidden": 64},
         "hidden128": {"hidden": 128},
+        "bias": {"readout_bias": True},
+        "hidden128+bias": {"hidden": 128, "readout_bias": True},
+    },
+    # The write side, so the four mechanisms still measured only beside a LINEAR
+    # readout can be re-checked against a composed one (decision 77).
+    #
+    # `consolidation` needs `decay < 1` and a `lasting_cap`, which the model
+    # refuses without -- a salience gate with no cap diverges, and consolidation
+    # with a memory that never fades has no fast store to rescue anything from.
+    # Both are carried here so the choice is one word rather than three fields
+    # a caller has to remember.
+    "write": {
+        "plain": {},
+        "gated": {"write_gate": 0.5},
+        "consolidating": {"consolidation": 0.5, "lasting_cap": 5.0,
+                          "decay": 0.997},
     },
 }
 
 #: Used when a spec leaves a component out, so every label is complete.
-DEFAULTS = {"keys": "dense", "retrieval": "plain", "readout": "linear"}
+DEFAULTS = {"keys": "dense", "retrieval": "plain", "readout": "linear",
+            "write": "plain"}
 
 
 def parse(spec: str) -> tuple[dict, str]:
@@ -90,7 +107,18 @@ def parse(spec: str) -> tuple[dict, str]:
 
 
 def label(chosen: dict[str, str]) -> str:
-    """The canonical name of a combination, in a fixed component order."""
+    """The canonical name of a combination, in a fixed component order.
+
+    **Complete, and that has a cost.** A label naming every component is
+    self-describing: a table read cold says what each row is. It is also
+    unstable -- adding `write` to `CHOICES` turned every existing label into a
+    longer string for the same model, so **records from different component-set
+    versions must not be merged by arm name.**
+
+    The alternative, naming only non-default choices, is stable across additions
+    and unreadable cold. Completeness was chosen because a grid nobody can read
+    is worse than one that must be compared within a sweep.
+    """
     return ",".join(f"{c}={chosen[c]}" for c in DEFAULTS)
 
 

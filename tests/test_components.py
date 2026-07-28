@@ -23,7 +23,8 @@ class ASpecBecomesAConfig(unittest.TestCase):
     def test_an_empty_spec_is_the_baseline(self):
         overrides, name = parse("")
         self.assertEqual(overrides, {})
-        self.assertEqual(name, "keys=dense,retrieval=plain,readout=linear")
+        self.assertEqual(name, "keys=dense,retrieval=plain,readout=linear,"
+                               "write=plain")
 
     def test_choices_become_overrides(self):
         overrides, _ = parse("keys=sparse4,retrieval=cache128,readout=hidden128")
@@ -33,7 +34,8 @@ class ASpecBecomesAConfig(unittest.TestCase):
     def test_an_omitted_component_takes_its_default(self):
         overrides, name = parse("readout=hidden64")
         self.assertEqual(overrides, {"hidden": 64})
-        self.assertEqual(name, "keys=dense,retrieval=plain,readout=hidden64")
+        self.assertEqual(name, "keys=dense,retrieval=plain,readout=hidden64,"
+                               "write=plain")
 
     def test_the_overrides_actually_build(self):
         """A spec that names a combination the model refuses is a spec that
@@ -75,6 +77,33 @@ class TheBaselineSpecIsStillASpec(unittest.TestCase):
 
     def test_an_empty_spec_and_the_baseline_spec_agree(self):
         self.assertEqual(parse(""), parse("keys=dense,retrieval=plain,readout=linear"))
+
+
+class AddingAComponentChangesEveryLabel(unittest.TestCase):
+    """The cost of a COMPLETE label, stated so it is not discovered later.
+
+    A label naming every component is self-describing -- a table read cold says
+    what each row is. It is also unstable: adding `write` to the component set
+    turned `keys=dense,retrieval=plain,readout=linear` into that plus
+    `,write=plain`, so **records from different component-set versions must not
+    be merged by arm name**.
+
+    The alternative -- naming only non-default choices -- is stable across
+    additions and unreadable cold, because a row labelled `keys=sparse4` does not
+    say what the rest of the model was. Completeness was chosen; this is the
+    bill, and the tests below make it visible rather than surprising.
+    """
+
+    def test_the_label_names_every_component(self):
+        _, name = parse("")
+        self.assertEqual(sorted(name.split(",")), sorted(
+            f"{c}={v}" for c, v in DEFAULTS.items()))
+
+    def test_a_label_lists_as_many_parts_as_there_are_components(self):
+        """If this fails after a component is added, every stored arm name from
+        before that change is a different string for the same model."""
+        _, name = parse("keys=sparse4")
+        self.assertEqual(len(name.split(",")), len(CHOICES))
 
 
 class TwoModelsCannotShareAName(unittest.TestCase):

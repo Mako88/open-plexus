@@ -1,0 +1,95 @@
+name: sweep-g13-02-what-the-traversal-step-costs
+
+# THE ONE NUMBER THE TRAVERSAL BUILD RESTS ON, and it has no reproducible source.
+#
+# Decision 107 measured step 2 -- key(S, R1) -> M -- at 0.960 and derived the
+# whole case from the arithmetic: "take the two entity-lookup steps to the 0.95
+# that step 2 already reaches and the product is 0.87". That 0.960 came from an
+# inline probe that left no script behind, which is the same gap that left
+# decisions 99-119 without a committed instrument.
+#
+# Decision 111 refused search because "you cannot search your way out of noisy
+# primitives, because the verifier is built from the primitives". g13-01
+# measured the primitive at 1.000 +/-0.000 at out-degree 1, so that refusal has
+# expired. Every follow-and-check operation search performs IS step 2, so step
+# 2's accuracy is simultaneously the traversal's cost and the verifier's
+# reliability.
+#
+# PREDICTIONS (full text in the script and the sweep file):
+#   P1  CONTROL -- step 2 at width 64 within 0.10 of decision 107's 0.960
+#   P2  at a unique (S, R), step 2 clears 0.99 at every width
+#   P3  where several facts share (S, R), accuracy falls toward 1/m
+#   P4  step 2 gains less than 0.03 from width 64 to 256
+#   P5  THE DECISION -- the compounded traversal-with-search ceiling clears 0.87
+#
+# COST, estimated FROM THE MOST EXPENSIVE CELL (width 256; the store is d x d so
+# 256 is SIXTEEN times 64, not four): measured by --cost at 16.1 ms per training
+# sequence and 0.4 min per cell. Three cells per job, so ~1 min per job. 8 jobs.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweep
+  cancel-in-progress: false
+
+jobs:
+  traversal:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2, 3, 4, 5, 6, 7]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - name: seed ${{ matrix.seed }}, widths 64/128/256
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python experiments/g13_02_what_the_traversal_step_costs.py \
+            --seed ${{ matrix.seed }} --json out/seed-${{ matrix.seed }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g13-02-seed-${{ matrix.seed }}
+          path: out/*.json
+
+  aggregate:
+    needs: [traversal]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g13-02-seed-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "seeds returned: $(ls out/*.json 2>/dev/null | wc -l) of 8" | tee summary.txt
+          python -m tools.summarise_g13_02 | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g13-02-summary
+          path: |
+            summary.txt
+            out/*.json

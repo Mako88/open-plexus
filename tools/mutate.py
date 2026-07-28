@@ -45,6 +45,7 @@ DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 NODE_MAIN = ROOT / "openplexus" / "node_main.py"
 NGRAM = ROOT / "openplexus" / "ngram.py"
 REWARD_RECALL = ROOT / "openplexus" / "tasks" / "reward_recall.py"
+KINSHIP = ROOT / "openplexus" / "tasks" / "kinship.py"
 CORPUS = ROOT / "openplexus" / "tasks" / "corpus.py"
 SLOT_COST = ROOT / "tools" / "slot_cost.py"
 RECOVERY = ROOT / "tools" / "recovery.py"
@@ -1515,6 +1516,37 @@ MUTATIONS = [
         path=INDUCTION,
         old="        previous = last_seen.get(token)",
         new="        previous = position - 1 if position else None",
+    ),
+    # `kinship.py` carried NO mutation until 2026-07-28, which is the same gap
+    # that left decisions 99-119 with no committed instrument at all. These two
+    # cover the object question, because the traversal build rests on the number
+    # it measures.
+    Mutation(
+        name="the-object-question-ends-on-the-wrong-pair",
+        breaks="the only property that makes step 2 measurable. A fact writes "
+               "`key(S, R) -> O`, so the question must end `S R`; ending it "
+               "`R S` queries a pair nothing ever wrote. The model would score "
+               "near chance and it would read as a weak store rather than as a "
+               "broken question -- which is exactly the defect decision 100 "
+               "measured at 0.020 against 0.713",
+        path=KINSHIP,
+        old="    tokens.extend((config.query_token, config.fact_token,\n"
+            "                   subject, config.relation_token(relation)))",
+        new="    tokens.extend((config.query_token, config.fact_token,\n"
+            "                   config.relation_token(relation), subject))",
+    ),
+    Mutation(
+        name="the-object-question-follows-a-distractor",
+        breaks="the step being measured. Step 2 follows the FIRST RELATION OF "
+               "THE PATH from the queried subject; taking whichever fact was "
+               "shuffled first asks about an arbitrary distractor, whose "
+               "subject has no particular out-degree. That is an easier "
+               "question wearing the same name, and it would inflate the number "
+               "the traversal ceiling is computed from",
+        path=KINSHIP,
+        old="    obj = next(o for s, r, o in base.facts "
+            "if s == subject and r == relation)",
+        new="    obj = base.facts[0][2]",
     ),
 ]
 

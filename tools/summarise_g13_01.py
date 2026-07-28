@@ -14,22 +14,14 @@ the one place it had not been done.
 
 from __future__ import annotations
 
-import glob
-import json
 import statistics
 from collections import defaultdict
+
+from tools.recovery import load
 
 #: P3's tolerance. Decision 108 says "correct" TRACKS 1/k; within this of the
 #: bound is tracking, outside it is something else happening.
 NEAR_ONE_OVER_K = 0.10
-
-
-def load(pattern: str = "out/*.json") -> list[dict]:
-    records: list[dict] = []
-    for path in sorted(glob.glob(pattern)):
-        with open(path, encoding="utf-8") as handle:
-            records.extend(json.load(handle))
-    return records
 
 
 def by_cell(records: list[dict]) -> dict[tuple[str, int], list[dict]]:

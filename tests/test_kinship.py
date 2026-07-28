@@ -32,6 +32,7 @@ from openplexus.tasks.kinship import (
     compose,
     dataset,
     generate,
+    generate_object_question,
     majority_floor,
     shortcut_floor,
 )
@@ -265,6 +266,100 @@ class ImpossibleShapesAreRefused(unittest.TestCase):
     def test_a_sequence_too_short_to_hold_the_facts(self):
         with self.assertRaises(ValueError):
             KinshipConfig(n_people=12, hops=2, n_facts=10, seq_len=12)
+
+
+class TheObjectQuestionAsksTheStepNothingElseMeasURES(unittest.TestCase):
+    """`generate_object_question` is step 2 of decision 107's traversal.
+
+    The whole case for building a traversal rests on step 2 being ~0.96, and
+    that number came from an inline probe that left no script behind. These pin
+    the generator so the measurement is reproducible.
+
+    The property that matters is the KEY AT THE SCORED POSITION. A fact is laid
+    out `FACT S R O` and the store binds the previous position's key to the
+    current position's value, so the write at `O` binds `key(S, R)`. If the
+    question does not end on a position whose pair key is `(S, R)`, it queries a
+    binding that was never written -- which is the defect decision 100 measured
+    at 0.020 against 0.713, and it would look like a weak store rather than a
+    broken question.
+    """
+
+    def setUp(self):
+        self.config = KinshipConfig(n_people=12, hops=2, n_facts=10, seed=7)
+
+    def test_the_scored_position_carries_the_pair_key_the_fact_wrote(self):
+        """The two tokens before the answer must be exactly `S` then `R`."""
+        for seed in range(25):
+            sequence = generate_object_question(
+                KinshipConfig(n_people=12, hops=2, n_facts=10, seed=seed))
+            subject, _ = sequence.asked
+            relation = sequence.path[0]
+            at = sequence.answer_position
+            self.assertEqual(
+                sequence.tokens[at],
+                self.config.relation_token(relation),
+                "the scored position must BE the relation token")
+            self.assertEqual(
+                sequence.tokens[at - 1], subject,
+                "the token before the scored position must be the subject, or "
+                "the pair key is not the one the fact wrote")
+
+    def test_the_answer_is_the_object_of_a_stated_fact(self):
+        """Independently checked against the fact list, not against the
+        generator's own bookkeeping."""
+        for seed in range(25):
+            sequence = generate_object_question(
+                KinshipConfig(n_people=12, hops=2, n_facts=10, seed=seed))
+            subject, obj = sequence.asked
+            relation = sequence.path[0]
+            self.assertIn(
+                (subject, relation, obj), sequence.facts,
+                "the asked triple is not among the stated facts, so the "
+                "question is unanswerable from the sequence")
+
+    def test_the_answer_is_the_target_and_nothing_else_is(self):
+        sequence = generate_object_question(self.config)
+        scored = [(i, t) for i, t in enumerate(sequence.targets) if t != IGNORE]
+        self.assertEqual(len(scored), 1)
+        self.assertEqual(scored[0][0], sequence.answer_position)
+        self.assertEqual(scored[0][1], sequence.asked[1])
+
+    def test_it_asks_about_the_first_hop_of_the_path(self):
+        """Step 2 follows the FIRST relation. Asking about a distractor would
+        measure a different and easier thing -- a distractor's subject has no
+        particular out-degree, where the queried subject's is the whole
+        difficulty."""
+        for seed in range(25):
+            base_config = KinshipConfig(n_people=12, hops=2, n_facts=10,
+                                        seed=seed)
+            base = generate(base_config)
+            sequence = generate_object_question(base_config)
+            self.assertEqual(sequence.asked[0], base.asked[0],
+                             "the object question should ask about the same "
+                             "subject the composition question does")
+            self.assertEqual(sequence.path[0], base.path[0],
+                             "it should follow the first relation of the path")
+
+    def test_the_query_block_does_not_write_the_binding_it_reads(self):
+        """If the question's own tokens wrote `key(S, R)`, the retrieval would
+        be reading what it just put there and the measurement would be
+        circular. The write at the `R` position binds `key(FACT, S)`, and there
+        is no input position after `R`."""
+        sequence = generate_object_question(self.config)
+        at = sequence.answer_position
+        self.assertEqual(at, len(sequence.tokens) - 2,
+                         "the scored position must be the last INPUT token, "
+                         "with only the answer after it")
+
+    def test_the_composition_question_is_unchanged(self):
+        """A regression guard. `generate_object_question` calls `generate`, and
+        an edit to either must not move the other -- nine sweeps' comparison
+        set rests on `generate` producing what it produced."""
+        first = generate(self.config)
+        generate_object_question(self.config)
+        second = generate(self.config)
+        self.assertEqual(first.tokens, second.tokens)
+        self.assertEqual(first.targets, second.targets)
 
 
 if __name__ == "__main__":

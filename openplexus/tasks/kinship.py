@@ -447,10 +447,85 @@ def generate(config: KinshipConfig) -> KinshipSequence:
         (people[0], people[-1]), answer, answer_position)
 
 
+def generate_object_question(config: KinshipConfig) -> KinshipSequence:
+    """Same facts, but ask for the OBJECT of a stated fact: `S R -> ?`.
+
+    ## What this exists to measure, and why it is worth its own generator
+
+    This is **step 2 of the traversal** decision 107 costed by hand:
+
+        1  key(FACT,S) -> R1     the queried subject's own relation
+        2  key(S,R1)   -> M      FOLLOW that relation to the middle person
+        3  key(FACT,M) -> R2     the middle person's relation
+
+    Steps 1 and 3 are the same operation and `generate` already measures it.
+    **Step 2 is the one nothing measures, and the whole case for building a
+    traversal rests on it** -- 107 put it at 0.960 and derived the 0.87 ceiling
+    from that number, in an inline probe that left no script behind.
+
+    ## Why the question ends the way it does
+
+    A fact is laid out `FACT S R O`, and the store binds the previous position's
+    key to the current position's value. So the write at `O` binds
+    **`key(S, R) -> value(O)`** -- the pair key at `R`, whose previous token is
+    `S`.
+
+    To retrieve that binding the question must end on a position whose pair key
+    is `(S, R)`, which is why it ends `... S R` and the answer is `O`. Ending it
+    any other way keys the retrieval on a pair that was never stored, which is
+    the defect decision 100 measured at 0.020 against 0.713.
+
+    **Nothing the query block writes touches `key(S, R)`.** The write at the `R`
+    position binds `key(FACT, S) -> value(R)`, a different key, and there is no
+    input position after `R` -- the answer is a target, not a token. So the
+    binding being read is the one the fact wrote.
+
+    ## The ambiguity that is NOT excluded, on purpose
+
+    `generate` rejects a distractor that repeats a stated `(subject, object)`
+    pair, but nothing stops `S` holding the same relation to two different
+    people. That is a genuine `(S, R) -> ?` ambiguity of exactly the kind
+    decision 108 is about, and it is left in and counted rather than engineered
+    away -- excluding it would measure a cleaner store than the one that exists.
+
+    `path` and `answer` carry the ASKED relation rather than the composed one,
+    because at this depth there is nothing to compose; `asked` is `(S, O)`.
+    """
+    base = generate(config)
+    subject = base.asked[0]
+    relation = base.path[0]
+    # The first hop of the path, found by matching rather than by index: `facts`
+    # is shuffled, and relying on position here would silently follow the wrong
+    # edge the moment the layout changed.
+    obj = next(o for s, r, o in base.facts if s == subject and r == relation)
+
+    tokens: list[int] = []
+    for s, r, o in base.facts:
+        tokens.extend((config.fact_token, s, config.relation_token(r), o))
+    tokens.extend((config.query_token, config.fact_token,
+                   subject, config.relation_token(relation)))
+    answer_position = len(tokens) - 1
+    tokens.append(obj)
+
+    targets = [IGNORE] * len(tokens)
+    targets[answer_position] = obj
+    return KinshipSequence(
+        tuple(tokens), tuple(targets), base.facts, (relation,),
+        (subject, obj), relation, answer_position)
+
+
 def dataset(config: KinshipConfig, n_sequences: int) -> list[KinshipSequence]:
     """`n_sequences` examples, each with its own seed."""
     from dataclasses import replace
     return [generate(replace(config, seed=config.seed + i))
+            for i in range(n_sequences)]
+
+
+def object_dataset(config: KinshipConfig,
+                   n_sequences: int) -> list[KinshipSequence]:
+    """`n_sequences` object-questions, each with its own seed."""
+    from dataclasses import replace
+    return [generate_object_question(replace(config, seed=config.seed + i))
             for i in range(n_sequences)]
 
 

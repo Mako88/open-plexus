@@ -867,6 +867,18 @@ class LocalMemoryConfig:
     #: the right direction, and 0.2% of the way there. Only read when
     #: `halt_gate` is on.
     gate_sharpness: float = 1.0
+
+    #: Let the gate see WHERE it is, not only what it retrieved.
+    #:
+    #: Decision 95 measured the one-rule gate as conflicted rather than
+    #: outvoted: 0.0171 on hop 1 at a query, which is right, and 0.4712 in the
+    #: body, where serving the body needs ~1.0. A score on the lookahead alone
+    #: cannot separate the two cases because the lookahead can look the same.
+    #:
+    #: With this on, the current key blends a second rule in — it MODULATES the
+    #: rule rather than adding to the score, because an added key term is
+    #: identical across hops and the softmax would remove it exactly.
+    gate_reads_key: bool = False
     cache_slots: int = 0
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
@@ -886,6 +898,10 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
+        if self.gate_reads_key and not self.halt_gate:
+            raise ValueError(
+                "gate_reads_key is an input to the halting gate and does "
+                "nothing without halt_gate")
         if self.halt_gate and self.hops < 2:
             raise ValueError(
                 "halt_gate chooses among hops and there is nothing to choose "
@@ -1141,6 +1157,17 @@ class LocalAssociativeMemory:
         #: gradient. Random init would pick a hop before seeing any data.
         self.halt_w = (np.zeros((config.partitions, d // config.partitions))
                        if config.halt_gate else None)
+        #: The second rule, and the selector that blends it in from the current
+        #: key. Both None unless `gate_reads_key`. Zero-initialised so the gate
+        #: starts as exactly the one-rule gate — `halt_alt` contributes nothing
+        #: and `halt_select` sits at 0.5 — which makes this strictly an
+        #: extension rather than a different mechanism at step zero.
+        self.halt_alt = (np.zeros((config.partitions, d // config.partitions))
+                         if config.halt_gate and config.gate_reads_key
+                         else None)
+        self.halt_select = (
+            np.zeros((config.partitions, d // config.partitions))
+            if config.halt_gate and config.gate_reads_key else None)
         #: Held-back readout updates, when `orthogonal_every` is on.
         self.pending_update = np.zeros_like(self.grouped_wo)
         self.since_orthogonal = 0
@@ -1901,8 +1928,34 @@ class LocalAssociativeMemory:
                 # linear score on one retrieval, still inside a group.
                 ahead = np.stack([r.reshape(groups, -1) for r in per_hop[1:]])
                 stack = np.stack([r.reshape(groups, -1) for r in per_hop[:-1]])
+                rule = self.halt_w
+                if self.halt_select is not None:
+                    # THE POSITION SELECTS WHICH RULE TO APPLY.
+                    #
+                    # Decision 95: one gate cannot serve both jobs. In the body
+                    # the next token is one hop away and the gate should take
+                    # hop 1; at a query the answer is several hops out and it
+                    # should not. Measured on a gate trained answer-only, it
+                    # puts 0.0171 on hop 1 at the query -- correct -- and 0.4712
+                    # in the body, a coin flip where serving the body needs ~1.0.
+                    # It is CONFLICTED, not outvoted, so no reweighting helps.
+                    #
+                    # ADDING a key term would do nothing. The key is the same
+                    # for every hop at a position, so it shifts all of this
+                    # position's scores equally and the softmax removes it
+                    # exactly -- the same way a constant perturbation of
+                    # `grouped_wo` turned out to be invisible to the decode.
+                    # The key has to MODULATE, not contribute.
+                    #
+                    # So it picks between two rules: `halt_w` and
+                    # `halt_w + halt_alt`, blended by a scalar the current key
+                    # decides. One scalar per group, from that group's own slice
+                    # of the key, so nothing crosses a group.
+                    chosen = 1.0 / (1.0 + np.exp(-np.einsum(
+                        "gd,gd->g", self.halt_select, key.reshape(groups, -1))))
+                    rule = self.halt_w + chosen[:, None] * self.halt_alt
                 scores = self.config.gate_sharpness * np.einsum(
-                    "gd,kgd->kg", self.halt_w, ahead)
+                    "gd,kgd->kg", rule, ahead)
                 scores = scores - scores.max(axis=0, keepdims=True)
                 gate = np.exp(scores)
                 gate /= gate.sum(axis=0, keepdims=True)
@@ -1969,13 +2022,22 @@ class LocalAssociativeMemory:
                     # descend, which is the kind of wrong that produces a curve.
                     back = np.einsum("gv,vgd->gd", error, self.grouped_wo)
                     agree = np.einsum("gd,kgd->kg", back, stack)
-                    self.halt_w += (
-                        self.config.lr * self.config.gate_sharpness
-                        * np.einsum(
-                            "kg,kgd->gd",
-                            gate * (agree
-                                    - (gate * agree).sum(0, keepdims=True)),
-                            ahead))
+                    step = gate * (agree - (gate * agree).sum(0, keepdims=True))
+                    rate = self.config.lr * self.config.gate_sharpness
+                    shared = np.einsum("kg,kgd->gd", step, ahead)
+                    self.halt_w += rate * shared
+                    if self.halt_select is not None:
+                        # `halt_alt` enters the rule scaled by `chosen`, so its
+                        # gradient carries the same factor. `halt_select` gets
+                        # the error through `chosen`, which is where the KEY
+                        # finally reaches the gate -- the sigmoid's own
+                        # derivative and then the key slice.
+                        self.halt_alt += rate * chosen[:, None] * shared
+                        through = np.einsum("kg,kgd,gd->g", step, ahead,
+                                            self.halt_alt)
+                        self.halt_select += (
+                            rate * (through * chosen * (1.0 - chosen))[:, None]
+                            * key.reshape(groups, -1))
                 if self.hidden_w is None:
                     update = np.einsum("gv,gd->vgd", error, sliced)
                 else:

@@ -690,8 +690,19 @@ MUTATIONS = [
                "leaves depth-2 at 0.547, so it still beats every fixed hop "
                "count and still looks like a working mechanism",
         path=LOCAL,
-        old='                    "gd,kgd->kg", self.halt_w, ahead)',
-        new='                    "gd,kgd->kg", self.halt_w, stack)',
+        old='                    "gd,kgd->kg", rule, ahead)',
+        new='                    "gd,kgd->kg", rule, stack)',
+    ),
+    Mutation(
+        name="the-selector-never-reaches-the-rule",
+        breaks="`gate_reads_key` entirely, leaving the one-rule gate wearing "
+               "the name of the two-rule one. The extra parameters still exist "
+               "and still receive gradient, the config still validates, and "
+               "the answer-only number is 1.000 either way -- only the "
+               "all-position number moves, 0.400 back down to 0.117",
+        path=LOCAL,
+        old="                    rule = self.halt_w + chosen[:, None] * self.halt_alt",
+        new="                    rule = self.halt_w + 0.0 * self.halt_alt",
     ),
     Mutation(
         name="the-gate-never-learns",
@@ -702,10 +713,8 @@ MUTATIONS = [
                "learns to cope with the blend. A mechanism that does nothing "
                "and still beats the baseline is the hardest kind to notice",
         path=LOCAL,
-        old="                    self.halt_w += (\n"
-            "                        self.config.lr * self.config.gate_sharpness",
-        new="                    self.halt_w += (\n"
-            "                        0.0 * self.config.gate_sharpness",
+        old="                    self.halt_w += rate * shared",
+        new="                    self.halt_w += 0.0 * shared",
     ),
     Mutation(
         name="a-hop-key-escapes-into-the-write-path",

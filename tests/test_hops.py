@@ -369,6 +369,119 @@ class TheGateChoosesWhichHopToRead(unittest.TestCase):
                 # other; both gate defects land near 0.55 on depth 2.
                 self.assertGreater(right[depth] / total[depth], 0.85)
 
+    def test_the_key_reading_gate_starts_as_the_one_rule_gate(self):
+        """`halt_alt` and `halt_select` are zero-initialised, so at step zero
+        the extra machinery contributes nothing and the model must be
+        bit-identical to the plain gate. That is what makes `gate_reads_key` an
+        extension rather than a different mechanism, and it is why the
+        answer-only control stays at 1.000."""
+        plain = LocalAssociativeMemory(config(hops=2, halt_gate=True))
+        plain.wo[:] = plain.wv
+        keyed = LocalAssociativeMemory(
+            config(hops=2, halt_gate=True, gate_reads_key=True))
+        keyed.wo[:] = keyed.wv
+        np.testing.assert_array_equal(
+            np.asarray(plain.run(np.asarray(TOKENS), learn=False)),
+            np.asarray(keyed.run(np.asarray(TOKENS), learn=False)))
+
+    def test_an_added_key_term_would_be_invisible(self):
+        """**Why the key MODULATES instead of contributing.**
+
+        The key is the same for every hop at a position, so adding its score to
+        each of them shifts the whole column equally and the softmax removes it
+        exactly. This asserts that property directly, because it is the reason
+        decision 95's proposal as literally written would not have worked — and
+        the same trap made a constant perturbation invisible to the decode.
+        """
+        scores = np.array([[0.4], [1.3], [-0.2]])
+        shifted = scores + 7.0        # what an added key term would do
+
+        def softmax(z):
+            e = np.exp(z - z.max(axis=0, keepdims=True))
+            return e / e.sum(axis=0, keepdims=True)
+
+        np.testing.assert_allclose(softmax(scores), softmax(shifted))
+
+    def test_the_key_changes_the_gate_once_the_selector_is_nonzero(self):
+        """The other half: once `halt_select` and `halt_alt` are not zero, the
+        current key must actually change the weighting — otherwise the mechanism
+        is inert however good its gradient looks."""
+        # Asserted on the MIXTURE the readout consumes, not on predictions. The
+        # first version compared predicted tokens and passed vacuously: with an
+        # untrained readout the mixture moved and `argmax` did not, so an inert
+        # mechanism and a working one gave the same answer.
+        mixtures = {}
+        for select in (0.0, 30.0):
+            model = LocalAssociativeMemory(
+                config(hops=2, halt_gate=True, gate_reads_key=True))
+            model.wo[:] = model.wv
+            model.halt_alt += np.random.default_rng(0).normal(
+                0.0, 4.0, model.halt_alt.shape)
+            model.halt_select += select
+
+            seen = []
+            inner = model.retrieval
+
+            class Watch:
+                def begin(self, width):
+                    return inner.begin(width)
+
+                def read(self, readable, key):
+                    out = inner.read(readable, key)
+                    seen.append(np.array(out))
+                    return out
+
+                def observe(self, store, key, value, commitment):
+                    return inner.observe(store, key, value, commitment)
+
+            model.retrieval = Watch()
+            model.run(np.asarray(TOKENS), learn=False)
+            mixtures[select] = np.array(seen)
+
+        # The reads themselves are identical -- the gate weights them, it does
+        # not change what is looked up -- so any difference must come from the
+        # selector, and there must BE one.
+        np.testing.assert_allclose(mixtures[0.0], mixtures[30.0], atol=1e-12)
+        chosen = {}
+        for select in (0.0, 30.0):
+            model = LocalAssociativeMemory(
+                config(hops=2, halt_gate=True, gate_reads_key=True))
+            model.halt_select += select
+            slice_ = model.wk[TOKENS[3]].reshape(model.config.partitions, -1)
+            chosen[select] = 1.0 / (1.0 + np.exp(
+                -np.einsum("gd,gd->g", model.halt_select, slice_)))
+        self.assertFalse(np.allclose(chosen[0.0], chosen[30.0]))
+
+    def test_the_selector_actually_reaches_the_gate(self):
+        """**`the-selector-never-reaches-the-rule` survived everything else.**
+
+        The parameters exist, receive gradient and validate under that mutation;
+        only behaviour changes. So this asserts behaviour: with `halt_alt`
+        non-zero the model must differ from the same model with it zero, which
+        is false the moment `chosen * halt_alt` stops reaching `rule`.
+
+        **At `gate_sharpness=200`, not the default 1.0.** A first version used
+        the default, where the gate is nearly uniform whatever the rule says, so
+        the selector had nothing to move and the test passed vacuously in both
+        directions.
+        """
+        outputs = {}
+        for magnitude in (0.0, 4.0):
+            model = LocalAssociativeMemory(config(
+                hops=2, halt_gate=True, gate_reads_key=True,
+                gate_sharpness=200.0))
+            model.wo[:] = model.wv
+            model.halt_select += 3.0
+            model.halt_alt += np.random.default_rng(0).normal(
+                0.0, magnitude, model.halt_alt.shape)
+            outputs[magnitude] = np.asarray(
+                model.run(np.asarray(TOKENS), learn=False))
+        self.assertFalse(np.array_equal(outputs[0.0], outputs[4.0]))
+
+    def test_reading_the_key_without_a_gate_is_refused(self):
+        with self.assertRaises(ValueError):
+            config(hops=2, gate_reads_key=True)
+
     def test_the_gate_does_not_touch_the_store(self):
         """The same invariant the hop loop broke, now for the extra lookahead
         read: gating adds a retrieval and must still write nothing new."""

@@ -125,15 +125,35 @@ linear score on the *lookahead retrieval alone*, which can look identical in bot
 cases. Reweighting the training signal cannot fix a function that cannot see the
 cases apart.
 
-### THE NEXT THING TO BUILD
+### That is built (`gate_reads_key`, decision 96) and it is a delay, not a fix
 
-**Give the gate the current position's key alongside the lookahead retrieval.**
-The query marker is in the input at the query position, so the information
-exists — the gate just has no access to it. One more vector per group, same
-locality. It is the smallest change that could resolve the conflict.
+The key **modulates** which rule the gate applies rather than adding to the
+score — an added key term is identical across hops and the softmax removes it
+exactly, so the proposal as first written would have done nothing.
 
-This is a design claim, not a result: the measurement establishes the conflict,
-not that the extra input fixes it.
+It works in the intended direction: the one-rule gate separates query from body
+**backwards** under all-position training (−0.241) and the selector flips the
+sign (+0.118). All-position accuracy goes 0.117 → 0.400, answer-only stays
+1.000.
+
+**But the real finding is that accuracy DECAYS with training:**
+
+    per depth  epochs   one rule   reads key
+          100       1      0.750       0.833
+          400       1      0.250       0.683
+          400       2      0.100       0.383
+
+The model does not fail to learn composition under all-position training — it
+**progressively unlearns it**, as the body's error accumulates and drags the
+shared gate toward one hop. The selector slows this; it does not stop it.
+
+### THE NEXT THING TO CHASE
+
+The decay, which is a sharper target than "all-position is worse". A mechanism
+that is learned and then unlearned is one whose gradient is being outvoted at a
+rate that grows with exposure — so the question is whether **the gate's error
+can be decoupled from the readout's**, not whether the gate needs more inputs.
+More inputs have now been tried.
 
 Also unexplained — 4 separators beat 1 under all-position training (0.683 against
 0.117), a real gap in the account rather than a detail.

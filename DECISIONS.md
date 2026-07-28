@@ -4705,3 +4705,72 @@ The body number is *uninformative* (0.47), not *confidently wrong* (near 0). The
 gate is failing to serve the body rather than actively fighting it, which is a
 weaker statement than "the rule inverts" — and the distinction matters, because
 a uninformative gate degrades gracefully while an inverted one would not.
+
+## 96. Letting the gate see WHERE it is triples all-position accuracy — and is not enough
+
+Decision 95's proposal, built as `gate_reads_key`. **The proposal as literally
+written would not have worked**, and that is worth stating: "give the gate the
+current key" as an added term is identical across hops at a position, so the
+softmax removes it exactly — the same trap that made a constant perturbation
+invisible to the decode. The key has to **modulate** the rule, not contribute to
+the score. So it selects between two rules, blended by a scalar from that
+group's own slice of the key. Two vectors per group, both zero-initialised, so
+the model begins as exactly the one-rule gate.
+
+    depth-2 accuracy      one rule   reads key
+       answer only           1.000       1.000
+       every position        0.117       0.400
+
+**3.4× on all-position training, and the control holds** — answer-only stays at
+1.000, so the extra machinery does no harm where the old gate already worked.
+
+### But a single budget hides the real finding
+
+Quoting only that row would have been misleading. Across training budgets:
+
+    per depth  epochs   one rule   reads key      gap
+          100       1      0.750       0.833   +0.083
+          200       1      0.683       0.717   +0.033
+          400       1      0.250       0.683   +0.433
+          400       2      0.100       0.383   +0.283
+
+**Accuracy falls as training proceeds, in both arms.** The one-rule gate goes
+0.750 → 0.100 and the selector 0.833 → 0.383. Under all-position training the
+model does not fail to learn composition — it **progressively unlearns it**, as
+the body's error accumulates and drags the shared gate toward one hop.
+
+So the selector **slows the decay rather than preventing it**, and the gap is
+not stable either (+0.083, +0.033, +0.433, +0.283). The honest headline is the
+decay, not the 3.4×.
+
+### The gain is the intended mechanism, not the extra parameters
+
+Two vectors per group is more capacity, so the gain could have come from
+anywhere. The design says the key should make the gate behave *differently* at a
+query than in the body. Weight on hop 1, after all-position training:
+
+    gate        at query   in body   separation
+    one rule      0.7491    0.5081      -0.2411
+    reads key     0.3761    0.4945      +0.1184
+
+**The one-rule gate separates them backwards** — more hop-1 weight at the query,
+where the answer is two hops out, than in the body, where it is one. That is the
+conflict of decision 95 shown from the other side. The selector **flips the sign**.
+
+### What this does NOT license
+
+**It is a delay, not a fix.** The body sits at 0.4945 where serving the body
+wants ~1.0, and the query at 0.3761 where it wants ~0. The separation is correct
+in sign and weak in magnitude, and accuracy still decays with training. Something
+else is binding and this measurement does not say what.
+
+Nor does it license the conclusion that the remaining gap is more of the same. A
+gate strong enough to fix the sign but not the magnitude may be limited by the
+selector being a single scalar per group, by the two rules being too few, or by
+something outside the gate entirely — all untested.
+
+**The decay is the thing to chase next**, and it is a sharper target than
+"all-position is worse". A mechanism that is learned and then unlearned is
+usually a mechanism whose gradient is being outvoted at a rate that grows with
+exposure — so the next question is whether the gate's own error can be
+decoupled from the readout's, rather than whether the gate needs more inputs.

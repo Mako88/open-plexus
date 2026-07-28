@@ -2966,3 +2966,73 @@ Two mutations needed re-pointing and both are caught. **A repo rail caught a tes
 of mine that asserted nothing** — `test_both_together_are_accepted` relied on "no
 exception raised", which R4 refuses. That is the third automated check today to
 catch something I would not have.
+
+---
+
+## 69. Everything found so far moves the LEVEL. Nothing moves the SLOPE.
+
+The synthesis of the day, and it is the useful negative.
+
+    chars    dense  sparse k=4    gain
+     4,000   5.565       5.380  +0.185
+    16,000   5.519       5.367  +0.151
+    62,500   5.529       5.403  +0.126
+   250,000   5.505       5.370  +0.135
+
+**Sparse keys at 4,000 characters already beat dense keys at 250,000.** So they
+are a per-character efficiency win rather than a raised ceiling — and they
+saturate exactly as fast, flat from 4,000 onward within the seed spread.
+
+Putting every mechanism this project has measured on one axis:
+
+    mechanism            effect on LEVEL      effect on SLOPE
+    width, 4x                    +0.089                 none
+    exact cache, 128 slots       +0.19 (g11-06)         none
+    sparse keys, k=4             +0.15                  none
+    pair keys                    -0.23                  none
+    trained Wv                   -0.45                  none
+    carry store (training)       -0.15                  none
+
+**Six mechanisms, three of them helpful, and not one of them changes the fact
+that the model converges by about 16,000 characters and then stops.** They move
+where it converges TO. The backprop baseline over the same range moves 0.95 bits
+and is still moving at 1,000,000.
+
+### Why this is the finding rather than a disappointment
+
+It reframes what to look for. A level improvement is worth having and three of
+them stack to something real — but **no number of level improvements reaches the
+goal**, because the goal is a model that keeps learning as more of the internet
+is fed to it. Stacking every positive result found today gets to roughly 5.1
+bits, which is still worse than a unigram at 4.829, and it would still be flat.
+
+So the question stops being *what raises the score* and becomes:
+
+> **What would make the loss keep falling with data at all?**
+
+Everything measured today says the answer is not width, not state, not sparsity,
+and not more persistent parameters. The one arm that does keep falling is the
+backprop baseline, which differs in exactly one respect that has not been
+isolated: **its parameters are trained through a composed function, and ours are
+not.** `Wo` is a single linear map onto a retrieval it does not influence.
+
+### The measurement that would test that
+
+Not "make the model bigger" in any of the senses already refuted. **Give the
+model one trained stage that feeds another trained stage**, so there is a
+composition to learn, and see whether the data exponent moves off zero. That is
+the smallest thing that distinguishes us from the baseline, and it is the one
+axis nothing here has varied.
+
+**And it is exactly where C1 bites**, which is why it is the real question rather
+than a detour: training a stage that feeds another stage is what backpropagation
+does, and note 036 was written about whether that can be made local. The project
+has been measuring the consequences of not having it without testing for it
+directly.
+
+### Status of the sparse-key line
+
+Worth keeping and worth finishing — 0.15 bits for no state, derivable per token
+(decision 68), and cheaper on the wire. But it should be understood as **making
+the plateau lower, not later**, and the `key_active` x width grid should be
+costed against that expectation rather than a hope of a slope.

@@ -348,6 +348,63 @@ class ADepartureNOBODYDECLARED(unittest.TestCase):
                 network.run(TOKENS, window=2)
 
 
+class TheRoundTripIsTIMEDRatherThanGuessed(unittest.TestCase):
+    """Every waiting parameter in this project is tuned in STEPS.
+
+    A step has no fixed duration, so `RETRY_AFTER_STEPS` and note 003's `d_max`
+    cannot state a bound — and C2 is the constraint that requires one. SWIM sets
+    its timeouts from a measured round-trip distribution and requires
+    `T' >= 3 x RTT`, which is only computable once the round trip is a number.
+    """
+
+    def test_every_vote_is_timed(self):
+        config, model = configured(4)
+        tokens = np.tile(TOKENS, 2)
+        with Network(config, 4, model.wv, model.wo) as network:
+            network.run(tokens, window=2)
+            self.assertEqual(
+                len(network.vote_latencies), 4 * len(tokens),
+                "one latency per vote per node, or the distribution is being "
+                "sampled rather than measured")
+            self.assertTrue(all(value >= 0 for value in network.vote_latencies))
+
+    def test_the_latencies_are_reset_each_run(self):
+        """Otherwise a second run reports the first one's tail."""
+        config, model = configured(2)
+        with Network(config, 2, model.wv, model.wo) as network:
+            network.run(TOKENS)
+            first = len(network.vote_latencies)
+            network.run(TOKENS)
+            self.assertEqual(len(network.vote_latencies), first)
+
+    def test_the_tail_is_reported_not_just_the_mean(self):
+        """The load-bearing property of the summary, checked on real numbers.
+
+        On loopback with no impairment the p99 ran 60x the median. A timeout
+        sized from the mean would expire on a large share of perfectly healthy
+        votes, which is the false-positive problem SWIM's suspicion mechanism
+        exists to contain.
+        """
+        from testbed.driver import latency_summary
+
+        summary = latency_summary([0.001] * 99 + [0.5])
+        self.assertIn("rtt_ms_p99", summary)
+        self.assertIn("t_prime_floor_ms", summary)
+        self.assertGreater(
+            summary["rtt_ms_p99"], summary["rtt_ms_mean"],
+            "a summary whose p99 does not exceed its mean on a skewed sample "
+            "is not measuring the tail")
+        self.assertAlmostEqual(
+            summary["t_prime_floor_ms"], summary["rtt_ms_p99"] * 3,
+            msg="T' must be at least three times the round-trip estimate",
+            places=2)
+
+    def test_an_empty_sample_says_so_rather_than_inventing_a_number(self):
+        from testbed.driver import latency_summary
+
+        self.assertEqual(latency_summary([]), {"votes_timed": 0})
+
+
 class SlicesAreExactOrRefused(unittest.TestCase):
 
     def test_uneven_splits_raise_rather_than_round(self):

@@ -30,6 +30,36 @@ D_MODEL = int(os.environ.get("OPENPLEXUS_D_MODEL", "16"))
 VOCAB = int(os.environ.get("OPENPLEXUS_VOCAB_SIZE", "41"))
 SEED = int(os.environ.get("OPENPLEXUS_SEED", "5"))
 STEPS = int(os.environ.get("OPENPLEXUS_STEPS", "60"))
+
+
+def latency_summary(latencies: list[float]) -> dict:
+    """Percentiles of the vote round trip, in milliseconds.
+
+    A mean cannot size a timeout. SWIM sets its indirect-probe timeout from the
+    mean OR the 99th percentile of the round-trip distribution and requires the
+    protocol period to be at least three times the estimate -- so the tail is
+    the load-bearing part, and reporting only a mean would hide exactly the
+    samples a bound has to cover.
+
+    `t_prime_floor_ms` is SWIM's `T' >= 3 x RTT` evaluated at p99, which is the
+    first thing in this project to put a waiting parameter in a measured unit.
+    """
+    if not latencies:
+        return {"votes_timed": 0}
+    ordered = sorted(latencies)
+
+    def at(fraction: float) -> float:
+        index = min(len(ordered) - 1, int(fraction * len(ordered)))
+        return round(ordered[index] * 1000, 3)
+
+    return {
+        "votes_timed": len(ordered),
+        "rtt_ms_mean": round(sum(ordered) / len(ordered) * 1000, 3),
+        "rtt_ms_p50": at(0.50),
+        "rtt_ms_p99": at(0.99),
+        "rtt_ms_max": round(ordered[-1] * 1000, 3),
+        "t_prime_floor_ms": round(at(0.99) * 3, 3),
+    }
 WINDOW = int(os.environ.get("OPENPLEXUS_WINDOW", "1"))
 # Departure. `absent` names nodes BY INDEX, which is exactly what the slice
 # handshake exists to make meaningful: before it, the driver indexed connections
@@ -77,6 +107,15 @@ def main() -> int:
         "join_seconds": round(joined, 3),
         "run_seconds": round(elapsed, 3),
         "seconds_per_step": round(elapsed / max(1, STEPS), 5),
+        # THE ROUND-TRIP DISTRIBUTION, which is what a timeout has to be built
+        # from. SWIM sets its indirect-probe timeout from an estimate of this
+        # -- the mean or the 99th percentile -- and requires the protocol
+        # period to be at least three times it. Everything in this project that
+        # waits is currently tuned in STEPS, which have no fixed duration.
+        #
+        # Reported as percentiles rather than a mean alone: a mean cannot size
+        # a timeout, because the whole question is how far the tail runs.
+        **latency_summary(net.vote_latencies),
         # The load-bearing field. An impaired link can make a network slow or
         # wrong, and only this separates them.
         "agrees_with_one_process": agree,

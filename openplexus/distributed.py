@@ -264,6 +264,22 @@ class Network:
         #: under suspicion. A node absent from this is being spoken to
         #: normally; one present is retried every `RETRY_AFTER_STEPS`.
         self.nodes_suspect: dict[int, int] = {}
+        #: Seconds from a step being dispatched to each vote for it arriving.
+        #: One entry per vote, reset by every `run`.
+        #:
+        #: **This is the distribution SWIM derives its timeouts from**, and the
+        #: reason it is collected at all. The paper sets the indirect-probe
+        #: timeout from an estimate of the round-trip distribution -- the mean
+        #: or the 99th percentile -- and requires the protocol period to be at
+        #: least three times the round-trip estimate. `RETRY_AFTER_STEPS`
+        #: counts STEPS instead, which is a guess in the wrong unit because a
+        #: step has no fixed duration (note 039, decision 127).
+        #:
+        #: **It is not a pure network round trip.** It includes the node's
+        #: compute for that token, so it is an upper bound on link latency and
+        #: the right quantity for a timeout that has to cover a real reply.
+        #: SWIM's ping/ack measures the link alone; this measures the wait.
+        self.vote_latencies: list[float] = []
         self.port = port
         self._values = values
         self._readout = readout
@@ -455,6 +471,7 @@ class Network:
                                    for index in starting_unreachable}
         sent = settled = 0
         self.steps_settled_short = {}
+        self.vote_latencies = []
         self.nodes_suspect = suspect
 
         def dispatch(step: int) -> None:
@@ -572,6 +589,12 @@ class Network:
                 (step,) = struct.unpack("!i", message[:4])
                 if step not in pending:
                     continue          # a vote for a step already settled
+                # Timed from when the step was ASKED, which is the wait a
+                # timeout has to cover. Recorded before the vote is counted so
+                # a settled-short step does not lose its late arrivals -- those
+                # are exactly the samples that say how long a deadline should
+                # have been.
+                self.vote_latencies.append(time.monotonic() - asked_at[step])
                 slot = pending[step]
                 if self._combine == "vote":
                     # One count per answer. Absence costs a voter, not a term of

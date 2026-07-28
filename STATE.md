@@ -60,28 +60,16 @@ being built, which is the only reason three were never written.
 
 ### ⚠ REFUTED ON THE TASK — g13-01 landed, decision 121
 
-[g13-01](experiments/sweeps/g13-01-does-width-fix-fidelity.txt), 48 cells, 8
-seeds. **Three of five predictions refuted, including the control.**
-
-    hop1-pair      d64 0.726 +/-0.012   d128 0.746 +/-0.010   d256 0.746 +/-0.009
-      out-degree 1     1.000 +/-0.000        1.000 +/-0.000        1.000 +/-0.000
-      out-degree 2     0.516 +/-0.018        0.548 +/-0.024        0.558 +/-0.014
-      out-degree 3+    0.388 +/-0.030        0.435 +/-0.036        0.418 +/-0.032
-                 1/k   1.000 / 0.500 / 0.333
-
-**A fourfold width increase buys 0.020 and saturates between 128 and 256.**
-Out-degree 1 is perfect at width 64 already — there was never anything there for
-width to fix.
-
-**Decision 112's 0.915 does not reproduce end-to-end, and neither number is
-wrong.** 112 ablated *raw retrieval*; this trains `Wo`, and a linear readout
-recovers the argmax from a retrieval that is not itself clean. So **112 was never
-a bound on task performance**, and an earlier version of this document made width
-the critical path on the strength of it. That was wrong and is retracted.
+Full table in
+[the sweep record](experiments/sweeps/g13-01-does-width-fix-fidelity.txt). What
+is live: **a fourfold width increase buys 0.020 and saturates.** Out-degree 1 is
+perfect at width 64 already, so there was never anything there for width to fix,
+and **decision 112's 0.915 was never a bound on task performance** — it ablated
+raw retrieval where this trains `Wo`, and a linear readout recovers the argmax
+from a retrieval that is not itself clean.
 
 **Everything left sits at out-degree ≥ 2, just above 1/k, and no width closes
-it** — +0.058 at the best cell on a quantity needing +0.442. The blocker is
-decision 108's **ambiguity**, not capacity.
+it.** The blocker is decision 108's **ambiguity**, not capacity.
 
 ---
 
@@ -148,32 +136,18 @@ distractors, decay and a cap is the next measurement.
 
 ### 1b. MEASURED — g13-03, decision 125. Traversal is the win; search needs a gate
 
-    arm       overall            out-degree 1       out-degree >= 2
-    concat    0.327 +/-0.014     0.348 +/-0.018     0.297 +/-0.017
-    walk      0.596 +/-0.018     0.702 +/-0.025     0.446 +/-0.010   CLEARS FLOOR
-    search4   0.604 +/-0.013     0.649 +/-0.021     0.539 +/-0.024   CLEARS FLOOR
-    search8   0.580 +/-0.014     0.619 +/-0.023     0.525 +/-0.024
+Full table in
+[the sweep record](experiments/sweeps/g13-03-does-search-pay.txt). What is live:
 
-    walk - concat    +0.269 +/-0.024      search4 - walk   +0.008 +/-0.018
-
-**Traversal is worth +0.269** and clears the 0.466 first-relation floor that
-nothing on this task had ever cleared. Decision 107 declined it at a costed
-"+0.05"; that verdict did not survive the primitives moving.
-
-**Search overall is a tie** (inside 2 SE) — but the split says why, and it is the
-useful part:
-
-    search4 - walk at out-degree 1       -0.054
-    search4 - walk at out-degree >= 2    +0.092
-
-**It does exactly what it was built for and damages the case it was not.** At
-out-degree 1 there is nothing to choose between, so branching can only replace a
-correct greedy pick with a lucky endpoint. The two nearly cancel because the test
-set is half of each.
-
-**`search8` is 0.024 WORSE than `search4`, at 6 SE.** More branches actively
-hurt: each extra candidate is another chance for a wrong branch whose endpoint
-scores well. "Search wider" is not the way to close the gap.
+- **Traversal is worth +0.269** and clears the 0.466 first-relation floor that
+  nothing on this task had cleared. Decision 107 declined it at a costed "+0.05";
+  that verdict did not survive the primitives moving.
+- **Search overall is a tie** (+0.008 ±0.018) and the split says why:
+  **−0.054 at out-degree 1, +0.092 at out-degree ≥ 2.** It does exactly what it
+  was built for and damages the case it was not, and the test set is half of
+  each.
+- **`search8` is 0.024 WORSE than `search4`, at 6 SE.** "Search wider" is not the
+  way to close the gap.
 
 ### THE NEXT MECHANISM: gate the search on ambiguity
 

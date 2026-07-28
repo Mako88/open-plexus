@@ -731,6 +731,17 @@ Superseded documents go to `docs/archive/` with a header saying what replaced
 them, rather than being deleted — the retractions in them are usually the useful
 part, and several are cited from elsewhere.
 
+**And prefer MORE documents to LONGER ones.** John's instruction, 2026-07-28:
+keep each note small and add another rather than growing one. A note that grows
+is a note nobody re-reads, and the growth is always the same shape — a result
+table copied out of the sweep record it already lives in.
+
+The concrete rule: **`STATE.md` carries the CLAIM and links the table.** A
+measurement belongs to exactly one file, which is its sweep record; anywhere else
+quotes the one line that is currently load-bearing and links the rest. Within one
+session `STATE.md` went 21 KB → 36 KB entirely by duplicating tables that already
+existed two directories away.
+
 > *Calibration.* On 2026-07-28 the four top-level documents totalled **503,000
 > characters**, of which `DECISIONS.md` was 318,000. `GOALS.md` opened with
 > *"nothing below is a measurement"* and closed with 405 lines of running

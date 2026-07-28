@@ -66,11 +66,28 @@ depth-1 perfectly and depth-2 at 0.547 — because the available signal separate
   accuracy on the deeper questions.
 - **C4 does not pay for C3** (decision 91). With half the nodes gone, continued
   learning recovers **+0.008** against ~0.047 lost — churn costs *capacity*, and
-  capacity is not something learning rebuilds. The two requirements are
-  independent. That run held the data distribution fixed, so it says nothing
-  about what C4 IS for; **the next experiment is a distribution that changes
-  after the departure**, where a frozen model must fall behind and a learning
-  one need not.
+  capacity is not something learning rebuilds. The two are independent.
+
+## The sharpest thing to know, from decisions 89 and 92 together
+
+    over DEPTH        generalises ZERO-SHOT to a depth never trained on (0.992)
+    over TERMINATOR   does not generalise at all -- halt_w sits +8.3 sd on one
+                      specific token's value vector
+
+**Same gate, same vector, opposite answers.** The rule it applies is general —
+"take the hop whose lookahead is a marker" says nothing about depth, so a model
+trained on depths 1–2 answers depth-3 questions without ever seeing one. The
+feature it applies that rule to is a memorised token.
+
+So the next work is **not** in the hop machinery, which composes and
+generalises. It is in what makes a retrieval recognisable as terminal.
+
+**C4 is still untested, and that is now the open problem.** Two attempts failed
+to build a case where continued learning helps: decision 91 because a departure
+costs capacity rather than currency, decision 92 because the mechanism already
+generalises. Neither says perpetual learning is worthless — both say **this task
+is too easy to need it**. A real C4 test needs something the model genuinely
+cannot already do.
 
 ### Operational lessons, now rules in CLAUDE.md
 

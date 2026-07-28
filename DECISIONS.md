@@ -4467,4 +4467,55 @@ re-fit what it already knew on fewer dimensions. The test that would show C4's
 value is a distribution that *changes* after the departure, where a frozen model
 must fall behind and a learning one need not. That is the experiment to run next,
 and it is the one that speaks to "always learning as it goes" rather than to
-repair.
+repair. **Decision 92 runs it, and it does not come out as expected.**
+
+## 92. The gate generalises to a depth it never trained on — zero-shot
+
+The experiment was meant to show what C4 is for: train on depths 1 and 2, then
+let depth-3 questions start arriving, and score **only** on depth 3 — the kind
+the model did not have. A frozen model should fall behind and a learning one
+should not.
+
+    arm                  depth 3
+    never sees it          0.992
+    frozen at shift        0.992
+    keeps learning         0.992
+    always had it          0.992
+
+**Every arm identical.** The experiment measures nothing about adaptation,
+because a model trained only on depths 1 and 2 already answers depth-3 questions
+at 0.992 without ever having seen one.
+
+### The null is the result
+
+The gate learned a **rule**, not a table. "Take the hop whose lookahead is a
+marker" says nothing about how deep a question is, so once it is learned from
+depths 1 and 2 it applies at depth 3 unchanged — and the readout is shared
+across hops, so there are no depth-3-specific parameters to train. Nothing about
+a depth-3 question is new to this model except the number of times it goes
+round.
+
+That is worth more than the result the experiment was designed to get: it is
+direct evidence the mechanism is a mechanism rather than a fit, on the axis it
+was built for.
+
+### Read this against decision 89, because together they are precise
+
+    over DEPTH        generalises zero-shot to a depth never trained on
+    over TERMINATOR   does not generalise at all -- halt_w sits +8.3 sd on one
+                      specific token's value vector
+
+**Same gate, same vector, opposite answers.** The rule it applies is general;
+the feature it applies that rule to is a memorised token. That is a sharp
+description of what was built, and it says where the next work is: not in the
+hop machinery, which composes and generalises, but in what makes a retrieval
+recognisable as terminal.
+
+### What it does NOT license
+
+C4 is still untested. Two attempts have now failed to construct a case where
+continued learning helps — decision 91 because a departure costs capacity rather
+than currency, and this one because the mechanism already generalises. Neither
+is evidence that perpetual learning is worthless; both are evidence that **this
+task is too easy to need it**. A real test of C4 needs something the model
+genuinely cannot already do, and finding that case is the open problem.

@@ -82,6 +82,27 @@ feature it applies that rule to is a memorised token.
 So the next work is **not** in the hop machinery, which composes and
 generalises. It is in what makes a retrieval recognisable as terminal.
 
+**And decision 93 says that cannot be fixed with retrieval statistics.** The best
+linear separator over five identity-free features (norm, entropy, peak, gap,
+kurtosis), *fitted with the labels*, reaches **0.628** against 0.500 for
+guessing. The token-identity gate reaches 1.000. No gate learning from a
+downstream error beats a classifier that was given the answers.
+
+**The reason points somewhere useful: `Wv` is frozen and random**, so two tokens'
+value vectors are independent draws and there is no structure for a "class of
+terminators" to live in. Nothing to generalise over. That is a limitation of
+frozen random embeddings, not of gating.
+
+### The single most promising next experiment
+
+`value_lr` already exists, and "unfreeze the value projections" is already one of
+the four approved un-constraints in BACKLOG. Decision 93 gives it a sharper
+purpose than capacity, and a falsifiable prediction: **train with several
+different terminators and `value_lr` on, then check whether those markers' value
+vectors converge toward each other more than chance.** Only if they do can a gate
+trained on some recognise a held-out one. If they do not, the delta rule on
+values is not doing representational work — which is worth knowing on its own.
+
 **C4 is still untested, and that is now the open problem.** Two attempts failed
 to build a case where continued learning helps: decision 91 because a departure
 costs capacity rather than currency, decision 92 because the mechanism already

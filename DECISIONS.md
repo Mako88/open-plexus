@@ -4519,3 +4519,61 @@ than currency, and this one because the mechanism already generalises. Neither
 is evidence that perpetual learning is worthless; both are evidence that **this
 task is too easy to need it**. A real test of C4 needs something the model
 genuinely cannot already do, and finding that case is the open problem.
+
+## 93. There is no token-agnostic terminal signal — and that points at frozen `Wv`
+
+Decision 92 put the next work in "what makes a retrieval recognisable as
+terminal". The cheap version of that question is whether any identity-free
+feature carries the signal, measured **before** building a config flag, tests
+and mutations for a gate that might not work.
+
+Five features, every one a property of *how* a key was bound rather than *which*
+token was stored, so any of them would transfer to an unseen terminator by
+construction. Labels are "has this hop walked past the end", and the separator is
+fitted **with** the labels — a ceiling, not a mechanism.
+
+    norm      d = 0.60        BEST LINEAR SEPARATOR on all five:
+    entropy   d = 0.62          accuracy 0.628
+    peak      d = 0.54          against  0.500 for guessing
+    gap       d = 0.63
+    kurtosis  d = 0.46        the token-identity gate: 1.000
+
+**0.628 against a 0.500 baseline, with the labels handed to it.** No gate
+learning from a downstream error can beat a classifier that was given the
+answers, so this closes the approach rather than discouraging it. Note this also
+supersedes decision 86's hopeful reading of `norm` at d′=1.01: measured over
+three depths rather than one, it is 0.60 and it is not the outlier.
+
+### Why, and it is not a property of the task
+
+**`Wv` is frozen and random.** Two tokens' value vectors are independent draws,
+so there is no shared structure for a "class of terminators" to live in. A gate
+can memorise one vector — decision 89 measured exactly that, +8.3 sd — but there
+is nothing for it to generalise *over*, because in this representation
+`separator` and some other marker have no more in common than any two tokens.
+
+That is not a limitation of gating. It is a limitation of frozen random
+embeddings, and it would apply to any mechanism asked to recognise a *kind* of
+token rather than a specific one.
+
+### What this licenses
+
+**A concrete reason to unfreeze the value projection.** `value_lr` already
+exists in the model and "unfreezing the value projections" is already in
+BACKLOG as one of the four approved un-constraints — this gives it a purpose
+sharper than "more capacity": *tokens that play the same role can only become
+similar if the representation is learned*, and role-similarity is the thing the
+gate needs and cannot have.
+
+That makes a falsifiable prediction worth testing next: with `value_lr` on and
+training that includes **several different terminators**, the value vectors of
+those markers should move closer together than chance — and only then can a gate
+trained on some of them recognise a held-out one. If they do not converge, the
+delta-rule-on-values mechanism is not doing representational work and that is
+worth knowing on its own.
+
+### What it does NOT license
+
+Five features is not every feature. This rules out the retrieval *statistics*
+that were available, not every identity-free signal that could exist — a feature
+computed across hops rather than within one, for instance, was not tried.

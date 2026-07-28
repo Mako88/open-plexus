@@ -1261,6 +1261,15 @@ MUTATIONS = [
         new="        memory = getattr(self, '_leak', np.zeros((d, d))); self._leak = memory",
     ),
     Mutation(
+        name="carry-store-is-read-and-never-applied",
+        breaks="the mechanism -- the store would reset whatever the flag said, "
+               "so the measurement refuting it would have been the reset model "
+               "measured twice and reported as a comparison",
+        path=LOCAL,
+        old="        if self.config.carry_store and self._carried is not None:",
+        new="        if False and self._carried is not None:",
+    ),
+    Mutation(
         name="lookup-uses-first-occurrence",
         breaks="most-recent lookup, silently answering from stale evidence",
         path=INDUCTION,

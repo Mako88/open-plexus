@@ -3746,3 +3746,61 @@ recovered 60-80%, settling went from -0.14 to +0.03, the write gate shrank by
 half, readout bias reversed sign. **One held:** consolidation.
 
 That is the answer to whether the re-validation was worth it.
+
+## 80. g12-01: the window's 7.3x was 6.26x, and the grid did not contain its answer
+
+Note 014 measured the asynchrony window once and said in its own text that the
+number should not be trusted — no repeats, no error bars, *"timing is the
+noisiest thing this project has ever measured"*. It asked for a repeated sweep
+before the figure went into GOALS. It never got one, and the figure has been
+quoted since.
+
+24 of 24 cells, run `30332373446`, four nodes, width 16, three repeats:
+
+                          w=1                w=2                w=4                w=8
+    80ms/20ms/2%   0.12411+/-.0057   0.05191+/-.0054   0.03269+/-.0028   0.01983+/-.0043
+    clean          0.00053+/-.0000   0.00040+/-.0001   0.00043+/-.0001   0.00032+/-.0001
+
+    impaired  w1->w2  2.39x   w1->w4  3.80x   w1->w8  6.26x    all clear the spread
+    clean     w1->w2  1.31x   w1->w4  1.23x   w1->w8  1.66x    two of three INSIDE it
+
+**P1 confirmed, and it is the one that matters.** All 24 runs agree with the
+single-process model, at every window and both links. The window is a
+performance knob and not a correctness bug — which had never been established
+across repeats, and which everything else here depends on.
+
+**P2 confirmed, with the original number corrected.** The impaired-link speedup
+is **6.26x**, not 7.3x. The effect is real and large, and the unrepeated
+measurement was about 17% high. That is a modest error and exactly the size of
+thing repeats exist to catch; the claim it supports — that obeying C1 is what
+makes the design usable — survives.
+
+**P3 confirmed.** On a clean link the win is 1.66x, and two of the three
+comparisons sit **inside their own spread** and are therefore not measurable at
+all. Most of the impaired-link speedup is the LINK, not the protocol, which is
+what note 014 argued and could not show.
+
+**P4 half confirmed, and the other half is a criticism of my own grid.** The
+impaired curve is monotone. It has NOT flattened:
+
+    w1 -> w2   2.39x per doubling
+    w2 -> w4   1.59x
+    w4 -> w8   1.65x
+
+**Window 8 is the largest value tested, it is the best, and it is still
+improving 1.65x per doubling.** `tools/grid.py` exists to catch exactly this —
+*a sweep that does not contain its own answer has not swept; if an arm chooses a
+value at an edge of the grid, the optimum lies outside it.* I wrote the grid,
+predicted flattening, and did not check the prediction against the grid's own
+range before dispatching.
+
+So the useful window is somewhere above 8 and this sweep cannot say where. The
+re-run needs 16, 32, 64 — and the cost is trivial, which makes the omission
+worse rather than better.
+
+### What this settles
+
+Note 014's caveat is discharged: the number is now measured, repeated, and
+smaller than advertised. **The 7.3x should be replaced by 6.26x wherever it is
+quoted**, and GOALS may now carry it, with the standing caveat that the topology
+is a Docker bridge with one-way impairment and a real link is worse.

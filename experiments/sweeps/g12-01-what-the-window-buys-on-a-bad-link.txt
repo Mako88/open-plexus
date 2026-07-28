@@ -2,7 +2,13 @@ What does the asynchrony window actually buy on a bad link?
 ==========================================================
 
 Script: testbed/run.py, in real containers with `tc netem` on the link
-Status: DISPATCHED, awaiting results.
+Status: RUN, 24 of 24 cells, run 30332373446.
+
+ANSWER: **6.26x on the impaired link, not 7.3x**, and all 24 runs agree with the
+        single-process model. The clean-link win is 1.66x with two of three
+        comparisons inside their own spread. **The grid did not contain its own
+        answer**: window 8 is the largest tested, the best, and still improving
+        1.65x per doubling.
 
 
 IN PLAIN TERMS
@@ -108,4 +114,22 @@ stated bound; this states it.
 
 THE NUMBERS
 ------------
-Awaiting the run.
+                          w=1                w=2                w=4                w=8
+    80ms/20ms/2%   0.12411+/-.0057   0.05191+/-.0054   0.03269+/-.0028   0.01983+/-.0043
+    clean          0.00053+/-.0000   0.00040+/-.0001   0.00043+/-.0001   0.00032+/-.0001
+
+    impaired  w1->w2  2.39x   w1->w4  3.80x   w1->w8  6.26x   all clear the spread
+    clean     w1->w2  1.31x   w1->w4  1.23x   w1->w8  1.66x   two of three INSIDE it
+
+P1 confirmed, 24 of 24 agreeing -- the window is a performance knob, not a
+correctness bug, and that had never been established across repeats.
+P2 confirmed with the figure corrected: 6.26x, so note 014's unrepeated 7.3x was
+about 17% high. The effect is real and the claim it supports survives.
+P3 confirmed: 1.66x clean, two of three comparisons unmeasurable. Most of the
+impaired speedup is the LINK, which note 014 argued and could not show.
+P4 HALF confirmed. Monotone, but NOT flattened -- 2.39x, 1.59x, 1.65x per
+doubling. Window 8 is at the edge of the grid and still winning, which is the
+failure tools/grid.py exists to catch and which I did not check before dispatch.
+The re-run needs 16, 32, 64.
+
+Scored in full in decision 80.

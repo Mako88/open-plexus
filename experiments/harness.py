@@ -169,13 +169,46 @@ def spread(function, items: list, workers: int) -> list:
     pickles it -- fork would inherit the parent's memory instead, but it does not
     exist on Windows and a harness that only parallelises on one platform is a
     harness nobody trusts.
+
+    **A worker that raises `SystemExit` HANGS THE POOL FOREVER**, and every
+    guard in every experiment here raises exactly that. `SystemExit` inherits
+    from `BaseException`, not `Exception`; `Pool` catches `Exception` in a
+    worker and returns it as a result, while a `BaseException` kills the worker
+    silently and `map` waits for a result that never comes.
+
+    Measured: g11-07's baseline cell tripped a guard and sat for 23 minutes
+    against an expected 2, and would have burned the full 300-minute timeout.
+    **So every fail-fast guard in this project did the opposite in the
+    configuration sweeps actually run in** -- `--workers 2` -- turning a
+    one-second refusal into five hours of runner time and no diagnosis.
+
+    Fixed here rather than in each guard, because the guards are right and there
+    are a dozen of them.
     """
     if workers <= 1:
         return [function(item) for item in items]
     import multiprocessing as mp
 
     with mp.get_context("spawn").Pool(workers) as pool:
-        return pool.map(function, items)
+        return pool.map(_Guarded(function), items)
+
+
+class _Guarded:
+    """Turns a worker's `SystemExit` into an ordinary exception.
+
+    A class rather than a closure because `spawn` pickles what it is given, and
+    a closure is not picklable. The wrapped function still has to be importable
+    by name, which is the existing requirement.
+    """
+
+    def __init__(self, function) -> None:
+        self.function = function
+
+    def __call__(self, item):
+        try:
+            return self.function(item)
+        except SystemExit as refusal:
+            raise RuntimeError(f"worker refused: {refusal}") from None
 
 
 def emit(records: list[dict], path: Path | None) -> None:

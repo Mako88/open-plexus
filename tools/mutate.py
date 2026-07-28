@@ -652,6 +652,17 @@ MUTATIONS = [
         new='                    through = np.einsum("gv,vgh->gh", error.sum(0, keepdims=True) + 0*error, self.grouped_wo)',
     ),
     Mutation(
+        name="a-workers-refusal-hangs-the-pool",
+        breaks="every fail-fast guard in the project, in the configuration "
+               "sweeps actually run in -- SystemExit is a BaseException, so a "
+               "worker raising one dies silently and pool.map waits forever. "
+               "Measured: 23 minutes against an expected 2, heading for the "
+               "full 300-minute timeout",
+        path=ROOT / "experiments" / "harness.py",
+        old="        return pool.map(_Guarded(function), items)",
+        new="        return pool.map(function, items)",
+    ),
+    Mutation(
         name="the-write-gate-is-ignored",
         breaks="the whole finding -- every corrective write would apply the "
                "full correction whatever the gate said, so a sweep over the "

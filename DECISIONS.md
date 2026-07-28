@@ -6126,4 +6126,68 @@ configuration, rather than any new experiment.
 Concluding the record is wrong. A failed reproduction is a discrepancy between
 two measurements, and mine is the newer and less carefully built of the two —
 250,000 characters, one seed, a temperature grid of eight points. **Either could
-be the error.**
+be the error.** **Decision 118 found which.**
+
+## 118. The unigram was never beaten — 4.540 is an offline backprop probe, not the model
+
+Decision 117 could not reproduce 4.540 and recommended archaeology over
+hyperparameter search. The archaeology took ten minutes and the answer is that
+**there was nothing to reproduce**: that number is not a measurement of this
+model.
+
+### Provenance
+
+`4.540` appears **only in HANDOFF.md** — no sweep file, no experiment, no
+DECISIONS entry. Its source is note 037's **4.525**, and note 037 states its own
+conditions plainly:
+
+> the readouts here are trained with **ordinary backpropagation, offline,
+> deliberately** — the question is whether a composed readout would help AT ALL,
+> and there is no point asking whether it can be trained locally before knowing
+> that.
+
+So the line `2-LAYER READOUT, prequential 4.540 ... unigram BEATEN` was wrong
+twice: it is an **offline backprop probe on frozen features**, not the model
+under its own learning rule, and it is **not prequential** — it is the opposite
+of prequential.
+
+### What the model actually scores, three ways
+
+    g10-12, Tiny Shakespeare, split           5.466
+    g11-07, best of EIGHTEEN compositions     5.172   dense/cache128/hidden128
+    decision 117, prequential single pass     5.665
+    unigram                                   4.829
+
+**None reaches the unigram**, and g11-07 is the best result this project has
+ever measured under local learning — 0.34 bits short.
+
+That also explains decision 117 cleanly: I reproduced the model faithfully and
+compared it to a number the model never produced. The reproduction did not fail;
+the target was wrong.
+
+### Note 037's finding is not diminished — it is the interesting half
+
+**The retrieval carries enough information to beat a unigram, and a linear
+readout cannot extract it.** That is a statement about the FEATURES, it is why
+`hidden` exists, and it is the strongest positive result on this corpus.
+
+What it does not say is that the model achieves it. Whether a **local** rule can
+train such a readout is exactly the open question note 036 begins, and note 037
+says so in the sentence that was skipped when the number was copied forward.
+
+### What this licenses
+
+HANDOFF corrected: the table now names the model's best real number (5.172),
+marks the unigram **not beaten**, and keeps 4.525 in a clearly separated block
+labelled as offline backprop.
+
+**And a rule worth having:** a headline number in HANDOFF must cite a sweep file
+or a DECISIONS entry. This one cited nothing for long enough to become the
+project's summary of itself, and it survived because HANDOFF is the document
+everyone reads and the least often re-derived.
+
+### What it does NOT license
+
+Treating 5.172 as a ceiling. It is the best of eighteen compositions at 60,000
+characters on a split protocol, above the ~16,000 saturation point — a LEVEL,
+not a slope, as g11-07 says of itself.

@@ -692,13 +692,34 @@ gap to the baselines. That was the last one available.
 
     uniform                        6.000 bits/char
     OUR MODEL, width 128           5.494
+    OUR MODEL, BEST EVER MEASURED  5.172   g11-07: dense/cache128/hidden128
     OUR MODEL + exact cache        5.311   (width 128, 128 slots)
-    unigram (letter frequency)     4.829   <- BEATEN, see below
-    2-LAYER READOUT, prequential   4.540   single pass, no split, no temperature
+    unigram (letter frequency)     4.829   <- NOT beaten. See below.
     backprop attention, width 16   4.197   (our own baseline, ~10k params)
     bigram                         3.583
     trigram                        2.951
     char-LSTM (published)          ~1.45
+
+    NOT THE MODEL, kept because it is a real and important result:
+    MLP-128 on frozen features      4.525   note 037 — trained by ORDINARY
+                                            BACKPROPAGATION, OFFLINE
+
+**The unigram has never been beaten by this model** (decision 118). A line
+reading `2-LAYER READOUT, prequential 4.540 ... unigram BEATEN` stood here and
+was wrong twice over: the number is note 037's **offline backprop probe on
+frozen features**, not the model under its own learning rule, and it is not
+prequential — note 037 says "trained with ordinary backpropagation, offline,
+deliberately".
+
+Three independent measurements of the model agree: **5.466** (g10-12),
+**5.172** (g11-07, best of eighteen compositions), **5.665** (decision 117,
+prequential). None reaches 4.829.
+
+**What note 037 actually establishes is worth more than the mislabelled claim:**
+the retrieval *carries* enough information to beat a unigram, and a linear
+readout cannot extract it. That is a statement about the features, and it is why
+`hidden` exists. Whether a LOCAL rule can train such a readout is the open
+question note 036 starts on.
 
 **Every component passes its capability test in isolation and the whole fails.**
 The failure is the composition — superposition destroys the per-item information

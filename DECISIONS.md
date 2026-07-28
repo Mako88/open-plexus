@@ -70,6 +70,7 @@ a report to John, not a gate.
 | 123 | search is built and proved on its own; beam 4 costs 3.2x the traffic |
 | 124 | the objective is the thesis; the driver has no failure detector |
 | 125 | traversal is the win (+0.269); search helps only where ambiguity is |
+| 126 | SWIM and CRDTs read; the detector ejected nodes permanently, now fixed |
 
 ---
 
@@ -3007,3 +3008,86 @@ the out-degree-1 regime, which nothing here has decomposed.
 
 **Taken without asking**, under standing authorisation and John's advance
 approval of the direction.
+
+---
+
+## 126. SWIM and the CRDT literature, read at last — and the detector I built ejects nodes permanently
+
+GOALS §6.2 has listed gossip protocols, SWIM-style failure detectors and CRDTs as
+**unread** since the project began, and note 003 named them the highest-value
+gap. Read now — **after** building the detector, which is the wrong order and the
+third time this project has done it (note 010, note 020, this).
+
+**Both sources are summaries, not the papers.** Shapiro et al. (2011) and Das,
+Gupta & Motivala (2002) remain unread; the SWIM PDF fetch returned unparseable
+binary. Rule 1 applies to everything in notes 039 and 040.
+
+### What SWIM says about what I built — note 039
+
+| SWIM | decision 126's deadline |
+|---|---|
+| a dedicated probe channel | **liveness inferred from a missing vote**, which note 003 said cannot work |
+| indirect probing via `k` peers | none; a slow node and a gone node are indistinguishable |
+| suspect, then confirm, with recovery | **none — permanent ejection** |
+| detection distributed | the driver is the sole detector, a coordinator by another name |
+
+**The permanent ejection is a wrong behaviour, not a missing feature.** A machine
+whose network blipped for a single send was removed for the rest of the sequence
+with no path back, and its share of the store stayed dark. **Fixed**:
+`unreachable` is now `suspect`, a node → step map, retried every
+`RETRY_AFTER_STEPS`; a successful send clears the mark, because a reset peer
+cannot accept one.
+
+**The deadline is not refuted.** SWIM decides *who is alive*; a deadline decides
+*when an answer is due*. They are complementary, and note 003's `d_max`
+unification is better supported than before — SWIM separates probe period from
+suspicion timeout, which is the same shape.
+
+### What the CRDT literature says about reconciling node sets — note 040
+
+The delta rule updates the readout **additively**, and addition is commutative
+and associative, so the updates satisfy the operation-based (CmRDT) requirements
+exactly. **Reconciliation is possible in principle.**
+
+They are **not idempotent**, so this inherits the CmRDT obligation:
+**exactly-once delivery** over an unreliable network. Duplicate a delta and a
+weight is silently wrong; drop one and learning is silently lost.
+
+**And the obvious approach is the one the literature names as broken.**
+Averaging is explicitly not safely mergeable — and averaging model weights is
+exactly what federated averaging does. It works there only because of a central
+aggregator and synchronous rounds, which note 003 already found to be a C1
+violation twice over. **Do not reconcile node sets by averaging their readouts.**
+
+The idempotent state-based version exists — G-Counter's per-node slots — and
+costs `P` copies of the parameters, ~375 GB for a ~6 MB model at 62,500 nodes.
+The usable middle is per-**set** slots rather than per-node, of which there are
+as many as there are concurrent conversations.
+
+> **One assumption underneath all of it, and it is a goals question.** Under C4 a
+> node set that has seen different conversations legitimately knows different
+> things. Forcing convergence may discard exactly the specialisation that makes a
+> distributed system worth having. Not answered here.
+
+### A surviving mutation found a real duplication
+
+`strict-mode-tolerates-a-dead-node` stopped biting after the suspicion change.
+Rule 10 says strengthen the test rather than delete the mutation — and following
+it found the cause was neither: **two guards implemented the same rule at two
+sites**, so removing either left the other to raise a line later and no test
+could tell them apart.
+
+Collapsed to **one** guard, in `dispatch`, where the strict-versus-tolerant
+decision belongs. The RESET loop now records the failure and decides nothing.
+Both mutations bite again.
+
+### What this licenses
+
+Adding indirect probing and a real liveness channel, and designing set-level
+reconciliation around additive deltas rather than averaging.
+
+### What it does NOT license
+
+Quoting either note as established. Both rest on encyclopaedia summaries, and
+note 005 exists because a borrowed claim that gated a design decision turned out
+to describe a variant this project cannot use.

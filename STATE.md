@@ -265,15 +265,20 @@ sending, and 30 seconds later `select` raises `TimeoutError`.
 participant is slow or gone. And C3 says departure is the normal case, arriving
 without warning.
 
-**The design already exists and is not implemented.** Note 003 specified a
-separate liveness channel, because on a sparse substrate silence is normal and
-absence of data cannot signal absence of a machine — and it unified `d_max` as
-both the C2 asynchrony bound and the C3 churn timeout. What the driver needs is
-to settle a step on a **quorum plus a deadline** rather than on a full count.
+**BUILT (decision 126).** `run(deadline=...)` settles a step after a stated wait
+with whatever votes arrived; off by default, because it costs bit-identity — the
+property G2 was passed on. A node terminated without warning now leaves the run
+running. Two related bugs fell out: a send to a reset peer propagated, and **a
+reset was never treated as a hang-up at all**, so on any platform reporting a
+dead peer as a reset the existing hang-up branch never fired.
 
-**This is the largest gap between the code and the goal**, it was hidden behind a
-claim about summing that turned out to be about the wrong thing, and every churn
-result in the project was measured with departures announced in advance.
+**Still short of SWIM, and notes 039/040 say how.** Detection runs on the data
+path rather than a probe channel; there is no indirect probing, so a slow node
+and a gone node are indistinguishable; and the driver is the sole detector, which
+is a coordinator by another name. Suspicion-with-recovery is in; the rest is not.
+
+**Every churn result in the project was measured with departures announced in
+advance.**
 
 ### 6b. CONCURRENCY COSTS d² PER CONVERSATION, and that inverts the usual picture
 

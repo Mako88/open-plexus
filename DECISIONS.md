@@ -4024,3 +4024,64 @@ start.
 
 **Taken without asking**, under standing authorisation, with John asleep. This is
 the entry to read first: 136 and 137 are void, and this replaces them.
+
+## 140. g17-01's premise survives its own correction — the pivot was not an artefact
+
+g18-04, 4 of 4 cells, run 30433717766. g17-01's **exact** configuration — width
+256, two epochs, lr 0.05, no cap, key_scale 1.0, pair keys, 90,000 words — with
+the decision-138 target correction and nothing else changed.
+
+    bias0 floor     10.750      g17-01 recorded 10.721, off by 0.029
+    bias0 nostore   10.759      uniform, exactly
+    bias1 floor      9.932
+    bias1 nostore    9.364
+
+    word unigram 8.068     word bigram 7.848     uniform 10.759
+
+All three predictions confirmed. **The corrected model learns 0.009 bits over
+uniform where g17-01 reported 0.038** — if anything less.
+
+### What this settles, and it matters more than the number
+
+Decision 138 put g17-01's premise in question: *"the model does not learn
+word-level text at all"* was measured on a mistrained readout, and note 042's
+architecture pass — plus the entire week of addressing work — rests on it.
+
+**It reproduces.** So the pivot of 2026-07-28 was made on a real finding. **What
+was void was my measurement of it, not it.** That distinction is the whole point
+of running this rather than assuming either way.
+
+### And the half that is not a reproduction
+
+    bias1   floor 9.932 against nostore 9.364     the store is worth -0.568
+
+At g17-01's own configuration, **the store is 0.568 bits worse than not
+existing** once a prior is available. That is decision 139's claim in its strong
+form, stated where the project actually lived rather than at a tuned corner: not
+*"contributes nothing"* but *"actively costs"*, at `lr 0.05` — the rate every
+text sweep this project ever ran used.
+
+Tuned (139: lr 5e-6, cap 5.0) the same comparison is +0.002.
+
+> **So the learning rate decides whether the store is harmless or harmful, and
+> never whether it helps.** Across every configuration measured on a correct
+> harness — two units, two key schemes, two widths, seven rates — the store's
+> best contribution on text is +0.002 bits.
+
+### Where the line stands now
+
+| | |
+|---|---|
+| g17-01's premise | **stands** (140) |
+| the store's text contribution | **prior-shaped, ≤ +0.002 bits** (139) |
+| concept addressing as the fix | **not measured on a correct harness**, and its premise is intact |
+
+The third row is the honest gap. Decisions 136 and 137 refuted concept
+addressing on void numbers; g18-01's K sweep was withdrawn on those same numbers.
+**Neither the refutation nor the withdrawal is currently supported** — but the
+motivation for addressing is weaker than it was, because the thing it was meant
+to improve turns out to contribute ~nothing either way.
+
+**Taken without asking**, under standing authorisation. John's call, when he
+reads this: re-dispatch g18-01's K sweep on the corrected harness, or leave
+concept addressing unmeasured and ask what the store is for on text instead.

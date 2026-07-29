@@ -153,7 +153,46 @@ not learn word-level text at all"* was measured on a mistrained readout. What is
 true is narrower and duller: the model learns word-level text about as well as a
 prior does, 1.12 bits short of counting.
 
-### ⇒ The open question, and it is no longer addressing
+### g17-01's premise SURVIVES its own correction — decision 140
+
+g18-04, its exact configuration with only the target fixed:
+
+    bias0 floor     10.750      g17-01 recorded 10.721, off by 0.029
+    bias0 nostore   10.759      uniform, exactly
+    bias1 floor      9.932
+    bias1 nostore    9.364      the store is worth -0.568
+
+**The corrected model learns 0.009 bits over uniform where g17-01 reported
+0.038.** So note 042's architecture pass and the week of addressing work rest on
+a real finding. **What was void was my measurement of it, not it.**
+
+And the second half is decision 139's claim in its strong form, stated where the
+project actually lived: at `lr 0.05` — the rate every text sweep ever used — the
+store is **0.568 bits worse than not existing** once a prior is available. Tuned,
+the same comparison is +0.002.
+
+> **The learning rate decides whether the store is harmless or harmful, and never
+> whether it helps.** Across everything measured on a correct harness — two
+> units, two key schemes, two widths, seven rates — its best contribution on text
+> is +0.002 bits.
+
+### ⇒ WHERE THIS LEAVES THE LINE, and the call is John's
+
+| | |
+|---|---|
+| g17-01's premise | **stands** (140) |
+| the store's contribution on text | **prior-shaped, ≤ +0.002 bits** (139) |
+| concept addressing as the fix | **not measured on a correct harness** |
+
+The third row is the honest gap. Decisions 136 and 137 refuted concept
+addressing on void numbers, and g18-01's K sweep was withdrawn on those same
+numbers — **neither the refutation nor the withdrawal is currently supported.**
+
+The machinery is built and tested and the sweep is one dispatch away. What is
+weaker than it was: addressing was meant to improve something that turns out to
+contribute ~nothing either way.
+
+### ⇒ The other open question, and it is no longer addressing
 
 Note 042 turned this line toward *where facts are stored*. Three corrected
 sweeps say the store contributes nothing on text beyond a prior — so the question

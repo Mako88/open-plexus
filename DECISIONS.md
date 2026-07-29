@@ -4573,3 +4573,107 @@ measured negative is cheaper to read than to rediscover.
 
 **Built and measured under John's explicit greenlight**, including the freedom to
 try novel solutions. This one failed, and the failure is the useful part.
+
+## 148. "Is there anything here" — the first arm that is good at both
+
+Three seeds. `inherit` answers from the entity's own address when **anything** has
+been written there and from its neighbours' when nothing has:
+
+    with exceptions    direct  transfer  exception   wrong answer = a sibling's
+      ungrouped        0.7792    0.0608     0.7833        0.0084
+      concept          0.4492    0.4708     0.3708        0.8657
+      indexed (sum)    0.7158    0.2650     0.6875        0.3441
+      inherit          0.8100    0.4350     0.8183        0.0247
+
+    no exceptions      direct  transfer
+      ungrouped        0.6583    0.0867
+      concept          0.9967    0.9983
+      indexed (sum)    0.9733    0.7517
+      inherit          0.9233    0.9825
+
+**N1 CONFIRMED, exactly.** The gate defers on 1.0000 of TRANSFER queries and
+0.0000 of DIRECT and EXCEPTION ones, every seed. Not approximately — the sketch
+is exact, so the decision is too.
+
+**N2 CONFIRMED**, and it is the thing this whole line was for. EXCEPTION 0.8183
+is within 0.05 of `ungrouped`'s 0.7833 (above it), and TRANSFER 0.4350 is well
+past `indexed`'s 0.2650. **No previous arm was good at both.** Grouping bought
+transfer by destroying exceptions; plain addressing held exceptions and was at
+chance on transfer; summing landed between them on both.
+
+**N3 REFUTED, by 0.050.** On the task with no exceptions, DIRECT falls from
+`indexed`'s 0.9733 to 0.9233 while TRANSFER rises from 0.7517 to 0.9825. **That
+is the mechanism's price and it is the same fact as its win:** summing lets
+agreeing neighbours corroborate a fact the entity already has, and `inherit`
+refuses that corroboration on principle. Refusing it is exactly what keeps a
+contradicting fact intact when there IS a conflict. The trade is 0.050 of direct
+recall for 0.231 of transfer, and it is a trade rather than a free win.
+
+**And it is not answering in the family's voice.** When `concept` gets an
+exception wrong it says a sibling's value 86.6% of the time. `inherit`: 2.5%,
+below plain addressing's own error profile.
+
+### Three wrong answers before the right one, and each named the next
+
+**`norm`** (147) compared retrieval magnitudes. `||W k||` conflates *was this key
+ever written* with *how large the value there is*.
+
+**`margin`** (147) compared decode confidence. Confidence in AN answer is not
+evidence about WHICH read produced it.
+
+**`occupancy`** asked the right question in the wrong space — summing written
+keys in the store's own `d` dimensions. Its falsifier O4 fired on the first run:
+deferral 0.723 on DIRECT against 0.815 on TRANSFER, a separation of 0.09. The
+reason was computable and had been written into O4 in advance. A sum of `N`
+normalised near-orthogonal keys carries cross-talk of standard deviation
+`sqrt(N / d)`, which at `d = 64` and `N ~= 100` is **1.25 against a signal of
+1.0**. Widening the store separates the two faults cleanly:
+
+    d      defer on TRANSFER   defer on DIRECT
+      64             0.815              0.723
+     256             0.887              0.745
+    1024             0.963              0.603
+
+TRANSFER climbs toward the 1.0 it should always have been -- that is the floor
+receding, exactly as `sqrt(N/d)` says it should. DIRECT should have fallen to 0.0
+and does not. **Width fixed the floor and did nothing for the rule**, and 16x the
+store to get most of the way to one of two halves is the argument for not fixing
+it with width.
+
+**`sketch`** replaced the space. `AddressSketch` hashes a key by the sign pattern
+of 16 random hyperplanes — Charikar (2002), whose collision probability follows
+the angle between two vectors — so collisions fall as `2 ** -bits`, free of `d`.
+S1's transfer half came back at **1.000** immediately. Its direct half was 0.613
+against a predicted 0.1, and that was the rule, not the sketch: `sketch` still
+asked *who has MORE written*, and `decay` makes a sibling's later-stated fact
+outrank an entity's own.
+
+**`inherit`** stopped comparing. Membership is not "who has more", it is "is
+there anything here" — which is what note 049 wrote in the first place: *read the
+entity's own address first; if it holds a real binding, answer and stop*.
+
+### The part that matters beyond this task
+
+Note 049's P3 asked how "a real binding" could be decided without a fitted
+constant, and decision 147 could not answer it. **The bar is zero.** An address
+never written misses the hash table and reads exactly 0.0; one written once reads
+at worst `decay ** steps`, which is positive. Nothing is tuned, and nothing has to
+generalise across configurations, because the separation is structural.
+
+### What it costs, stated rather than buried
+
+The sketch is a **second memory and it is not superposed**, so it does not
+inherit the store's failure modes. That is the point and it is also the
+objection. What justifies it is the asymmetry Bloom filters exist for --
+membership is one bit, a value is `d` floats -- and the invariant that the sketch
+records only THAT an address was written. The moment it carries a value it has
+become a second store and the comparison proves nothing. `tests/test_sketch.py`
+holds that line, including a test that asserts `SumSketch` FAILS at `d = 64`, so
+the floor above is measured rather than argued.
+
+Decision 147 said storage was never the problem and selection was. **That was
+right, and the missing piece was a way to ask the membership question exactly.**
+
+**Built under John's greenlight to look up research or invent, staying inside
+concept-based learning.** Nothing here predicts a token; the gate decides which
+concept's address answers a query.

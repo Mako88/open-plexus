@@ -1,6 +1,7 @@
 # 049 — "Specific beats general" is a read policy, not a new representation
 
-**Status:** BUILT AND REFUTED — decision 147. **The falsifier at the bottom of this note is the thing that happened:** both reads were available and the model could not choose between them. Kept as written, because a design whose own refutation condition fires is worth more intact than edited.
+**Status:** BUILT AND CONFIRMED — decision 148, after three refuted attempts recorded in 147. **The design in this note was right and the missing piece was named in it:** P3 asked how "a real binding" could be decided without a fitted constant, and the answer turned out to be that an exact membership sketch puts the bar at ZERO. Kept as written, including the parts that were wrong.
+**Was, for one day:** BUILT AND REFUTED — decision 147. **The falsifier at the bottom of this note is the thing that happened:** both reads were available and the model could not choose between them. Kept as written, because a design whose own refutation condition fires is worth more intact than edited.
 **Was:** a design, nothing built. Written to correct something I told John
 about decision 144 an hour after telling him.
 **Answers:** the question STATE now carries — *can a store hold a family default
@@ -105,8 +106,22 @@ queried position, which matters for C1 and should be quoted rather than
 discovered. And `retrieval.py` already holds the seam for how a store is read, so
 it belongs there rather than in another branch inside `run`.
 
-**Built, and it does not work — decision 147.** Two signals were tried for "a
-real binding": the retrieval's norm and the decode's margin. Both lose to summing
-the two reads. P1 fails with both reads available, which is exactly the condition
-named above, so the problem is **selection rather than storage** and this design
-does not reach it.
+**Built. Three signals failed and the fourth works — decisions 147 and 148.**
+
+    the retrieval's norm       refuted    magnitude is not identity
+    the decode's margin        refuted    confidence in AN answer, not WHICH
+    occupancy summed in `d`    refuted    cross-talk `sqrt(N/d)` exceeds the
+                                          signal, and it compared instead of
+                                          asking
+    membership, hashed         WORKS      P1 holds: EXCEPTION 0.8183 against
+                                          `ungrouped`'s 0.7833, TRANSFER 0.4350
+                                          against `indexed`'s 0.2650
+
+**P1 HOLDS.** P2 does not — DIRECT costs 0.050 on the no-exception task, which is
+the price of refusing corroboration and the same fact as the win. **P3 is
+answered rather than dodged:** with an exact sketch the bar is structurally zero,
+so there is no constant to re-tune per configuration.
+
+The paragraph above about two weak reads summing to a confident wrong answer is
+why `inherit` requires BOTH sides — it defers only when this address holds
+nothing AND a neighbour holds something.

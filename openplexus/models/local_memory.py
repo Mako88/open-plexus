@@ -62,6 +62,7 @@ from openplexus.concepts import OneConceptPerToken, Surfaces
 from openplexus.keys import KeySource, PairKeys, TableKeys
 from openplexus.partitioned import ConceptStore
 from openplexus.retrieval import Retrieval, build as build_retrieval
+from openplexus.sketch import AddressSketch, SumSketch
 from openplexus.search import (candidates as search_candidates,
                                decode_margin as search_margin,
                                search as run_search)
@@ -1071,33 +1072,48 @@ class LocalMemoryConfig:
     cache_only: bool = False
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
-    #: PREFER the token's own read over the index's neighbours, instead of
-    #: summing them. Off by default, so every number measured before
-    #: 2026-07-29 is untouched -- decision 74's failure was a default that
-    #: moved.
+    #: HOW TO COMBINE the token's own read with the neighbours' the content
+    #: index proposed. Off by default, so every number measured before
+    #: 2026-07-29 is untouched -- decision 74's failure was a default that moved.
     #:
-    #: **Decision 146 is why this exists.** `index_branches` adds the
-    #: neighbours to the token's own read, and adding cannot choose: sweeping
+    #: **Decision 146 is why this exists.** `index_branches` ADDS the neighbours
+    #: to the token's own read, and adding cannot choose: sweeping
     #: `index_weight` moves TRANSFER and EXCEPTION accuracy monotonically
     #: against each other with their sum pinned at ~0.93. A model that must
-    #: answer "this bird does not fly" cannot afford to average that with what
-    #: birds usually do.
+    #: answer "birds fly, but not this one" cannot afford to average the two.
     #:
-    #: The rule is a comparison rather than a threshold, so there is no tuned
-    #: constant to generalise: **if the token's own read is the stronger
-    #: evidence, answer from it alone; otherwise answer from the neighbours.**
-    #: A token nothing was written about retrieves near zero, so it defers; a
-    #: token with its own stated fact does not.
-    #: `False` sums, as `index_branches` always has. `"norm"` prefers the
-    #: retrieval with the larger magnitude -- REFUTED, see below. `"margin"`
-    #: prefers the one whose decode is more confident, which is decision 130's
-    #: actual signal.
+    #: The settings are four attempts at the same question -- **which read
+    #: should this position answer from** -- and the first three are measured
+    #: negatives kept because they are cheaper to read than to rediscover:
     #:
-    #: **`"norm"` is kept because it is a measured negative.** It collapsed to
-    #: 0.247 on exceptions where plain addressing holds 0.783: magnitude says
-    #: how much was written at an address and says nothing about whether it is
-    #: the right address, so a hard choice on it discards the correct answer
-    #: about as often as the wrong one.
+    #: `False`      sum them, as `index_branches` always has.
+    #: `"norm"`     answer from whichever RETRIEVAL is larger. REFUTED (147).
+    #: `"margin"`   answer from whichever DECODE is more confident, which is
+    #:              decision 130's signal. REFUTED (147).
+    #: `"occupancy"` answer from whichever ADDRESS has had more written at it,
+    #:              summing written keys in the store's own space. REFUTED.
+    #: `"inherit"`  answer from this address if ANYTHING was ever written here,
+    #:              otherwise from the neighbours.
+    #:
+    #: **Why the first three failed, which is the whole argument for the
+    #: fourth.** `norm` conflates *was this key ever written* with *how large
+    #: the value there is*, and only the first is the question. `margin` is
+    #: confidence in AN answer, which is not evidence about WHICH read produced
+    #: it. `occupancy` asks the right question in the wrong space: a sum of `N`
+    #: normalised near-orthogonal keys carries cross-talk of standard deviation
+    #: `sqrt(N / d)`, which at `d = 64` and `N ~= 100` is larger than the signal
+    #: -- and it asks it as a comparison, so a sibling whose fact was stated
+    #: more recently outranks an entity that has its own.
+    #:
+    #: **`"inherit"` is not a comparison, and that is the point.** Membership is
+    #: not "who has more", it is "is there anything here", and `AddressSketch`
+    #: answers it exactly: an address never written misses the hash table and
+    #: reads 0.0. So the bar is structurally ZERO rather than fitted, which is
+    #: the answer note 049's P3 asked for and decision 147 could not give.
+    #:
+    #: The cost is a second, non-superposed memory -- stated in `sketch.py`
+    #: rather than buried. What justifies it is that membership is one bit while
+    #: a value is `d` floats, and the sketch must never record more than that.
     index_prefer: bool | str = False
     readout_bias: bool = False
     derived_keys: bool = False
@@ -1347,6 +1363,20 @@ class LocalMemoryConfig:
             raise ValueError(
                 "tag_strongest picks which end of the tag wins and does nothing "
                 "without tag_slots")
+        if self.index_prefer not in (False, True, "norm", "margin",
+                                     "occupancy", "sketch", "inherit"):
+            raise ValueError(
+                "index_prefer must be False, True or 'norm' (compare retrieval "
+                "norms), 'margin' (compare decode margins), 'occupancy' "
+                "(compare how much has been written at each address, summed in "
+                "the store's own space) or 'sketch' (the same question asked of "
+                "a hash whose collision rate is free of the store's width) "
+                "or 'inherit' (answer from your own address if ANYTHING was "
+                "written there, else from the neighbours), not "
+                f"{self.index_prefer!r}. An unknown string is truthy and would "
+                "have silently selected the norm rule, which decision 147 "
+                "refuted -- so a typo would have been measured as the one "
+                "setting already known not to work")
         if self.memory_cap < 0.0:
             raise ValueError("memory_cap must not be negative")
         if self.capture_slots < 0:
@@ -1565,6 +1595,18 @@ class LocalAssociativeMemory:
         #: nothing clears it implicitly, because a store that quietly resets is
         #: indistinguishable from one that never worked.
         self._lasting: np.ndarray | None = None
+        #: Which way `index_prefer="occupancy"` decided, as `(position,
+        #: deferred)` pairs. Appended across runs and cleared by whoever reads
+        #: it. The position is carried rather than implied, because the gate
+        #: only fires where the index proposed something and an index into a
+        #: dense list would quietly misalign with the sequence.
+        #:
+        #: **Recorded because accuracy alone cannot tell the two failures
+        #: apart.** If the gate defers on transfer queries and holds on direct
+        #: ones and accuracy still does not move, the retrieval is corrupted
+        #: rather than mis-selected -- and decision 147 was wrong about where
+        #: the problem is. That distinction is not visible in a score.
+        self.deferrals: list[tuple[int, bool]] = []
         #: How many times consolidation has fired, over the model's whole life.
         #: **Observation only**, like `trace` -- nothing reads it back.
         #:
@@ -1875,6 +1917,19 @@ class LocalAssociativeMemory:
                     f"{len(tokens)}")
 
         memory = np.zeros((d, d))
+        # THE OCCUPANCY SKETCH -- one d-vector beside a d x d store, so it is
+        # 1/d of the memory and nothing anyone would notice.
+        #
+        # Written keys accumulate here NORMALISED, so each write contributes 1.0
+        # to its own address and ~1/sqrt(d) to every other. Reading it is one
+        # dot product. It answers "has anything been written at this key",
+        # which is what the refuted norm rule was trying and failing to
+        # approximate through the value.
+        occupied = None
+        if self.config.index_prefer == "occupancy":
+            occupied = SumSketch(d)
+        elif self.config.index_prefer in ("sketch", "inherit"):
+            occupied = AddressSketch(d, seed=self.config.seed)
         # THE CONCEPT-PARTITIONED FAST STORE, when one is asked for.
         #
         # `memory` stays as the matrix a read is served FROM -- reassigned each
@@ -2056,6 +2111,11 @@ class LocalAssociativeMemory:
                     memory *= self.config.decay
                 else:
                     concepts.decay(self.config.decay)
+                if occupied is not None:
+                    # The sketch fades with the store it describes. An address
+                    # whose binding has decayed away must not still read as
+                    # occupied, or the gate defends a fact that is gone.
+                    occupied.decay(self.config.decay)
                 _fade(pending, self.config.decay)
 
             wrote = previous_key is not None and (store is None or store[t])
@@ -2072,6 +2132,8 @@ class LocalAssociativeMemory:
                                        self.config.write_gate)
             if wrote:
                 if self.config.decay < 1.0:
+                    if occupied is not None:
+                        occupied.decay(self.config.decay)
                     if concepts is None:
                         memory *= self.config.decay
                     else:
@@ -2115,6 +2177,14 @@ class LocalAssociativeMemory:
                                    * np.outer(error, previous_key) / scale)
                 else:
                     memory += np.outer(value, previous_key)
+                if occupied is not None:
+                    # ONE write per write. Not the value, not the error, not
+                    # the write gate -- the sketch records THAT an address was
+                    # written and deliberately nothing about what went in. That
+                    # is the whole reason it can separate cases the retrieval
+                    # norm could not, and the moment it carries a value it has
+                    # become a second store and the comparison is worthless.
+                    occupied.add(previous_key)
                 if self.config.reward_token >= 0:
                     # Held so it can be taken back out if no reward vouches for
                     # it. Two vectors per step, not a d x d matrix.
@@ -2371,6 +2441,7 @@ class LocalAssociativeMemory:
             retrieved = self.retrieval.read(readable, key)
             neighbours = None
             strongest = 0.0
+            occupancy_near = 0.0
             if self.config.index_branches:
                 # THE CONTENT INDEX, note 045. Similar concepts are asked as
                 # well, and each is an ORDINARY EXACT READ at a hard token id --
@@ -2424,6 +2495,9 @@ class LocalAssociativeMemory:
                                 readable = readable + lasting
                         raw = self.retrieval.read(readable, near)
                         contribution = (self.config.index_weight * weight * raw)
+                        if occupied is not None:
+                            occupancy_near = max(occupancy_near,
+                                                 occupied.count(near))
                         if self.config.index_prefer:
                             # THE COMPARISON MUST BE SCALE-FAIR, and the first
                             # version was not: it weighed the token's own RAW
@@ -2465,7 +2539,54 @@ class LocalAssociativeMemory:
                     # No threshold, so nothing here has to generalise across
                     # configurations -- which is what note 049's P3 was worried
                     # about and the reason this is a comparison at all.
-                    if self.config.index_prefer == "margin":
+                    if self.config.index_prefer in ("occupancy", "sketch",
+                                                    "inherit"):
+                        # THE SET-MEMBERSHIP QUESTION, and it is still a
+                        # comparison rather than a bar: whichever address has
+                        # had more written at it is the one answered from.
+                        #
+                        # An entity with its own stated fact reads ~1 here and
+                        # keeps its answer even when every sibling disagrees --
+                        # which is the exception case the grouped arm destroys.
+                        # An entity nothing was ever stated about reads at the
+                        # cross-talk floor and defers to its siblings -- which
+                        # is the transfer case plain addressing cannot do.
+                        #
+                        # Both directions fall out of one scalar, and the
+                        # scalar is blind to the value. That blindness is the
+                        # point: decision 147's norm rule failed because it
+                        # could not be.
+                        here = occupied.count(key)
+                        if self.config.index_prefer == "inherit":
+                            # MEMBERSHIP IS NOT A COMPARISON, which is what the
+                            # `sketch` arm got wrong. Asking whether the
+                            # neighbours have MORE written at them than this
+                            # address does defers whenever a sibling's fact was
+                            # stated more recently -- decay makes a later write
+                            # count for more -- so it threw away 0.613 of the
+                            # entity's OWN answers while getting every transfer
+                            # right.
+                            #
+                            # The question was never "who has more". It is
+                            # "does this address hold anything at all", and with
+                            # an exact hash the bar is structurally ZERO rather
+                            # than fitted: an address never written misses the
+                            # table and reads exactly 0.0, while one written
+                            # once reads at worst `decay ** steps`, which is
+                            # positive.
+                            #
+                            # Both sides are required. If nothing was written
+                            # here AND nothing was written at any neighbour,
+                            # deferring would answer from noise -- decision
+                            # 69's lesson about two weak reads summing to a
+                            # confident wrong answer.
+                            defer = here <= 0.0 < occupancy_near
+                        else:
+                            defer = occupancy_near > here
+                        if defer:
+                            retrieved = neighbours
+                        self.deferrals.append((t, defer))
+                    elif self.config.index_prefer == "margin":
                         # DECISION 130'S ACTUAL SIGNAL, and the reason this
                         # branch exists: the norm version claimed 130's
                         # precedent and did not implement it. 130 fires on the

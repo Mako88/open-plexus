@@ -63,38 +63,44 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Can anything tell which of two retrievals to trust?**
+**Does the read gate survive contact with anything that is not this task?**
 
-Decision 147 answered the previous question — *will a preference rule beat the
-averaging one* — with **no, twice.**
+Decision 148 answered the previous question — *can anything tell which of two
+retrievals to trust* — with **yes, once the question is asked exactly.**
 
-    with exceptions       direct  transfer  exception
-      ungrouped           0.7792    0.0608     0.7833
-      concept (grouped)   0.4492    0.4708     0.3708
-      indexed (B, summed) 0.7158    0.2650     0.6875
-      preferred (by norm) 0.2842    0.3442     0.2467
-      margin (by decode)  0.5833    0.1917     0.5808
+    with exceptions       direct  transfer  exception   wrong = a sibling's
+      ungrouped           0.7792    0.0608     0.7833        0.0084
+      concept (grouped)   0.4492    0.4708     0.3708        0.8657
+      indexed (B, summed) 0.7158    0.2650     0.6875        0.3441
+      inherit             0.8100    0.4350     0.8183        0.0247
 
-**Both hand-made selection rules lose to simply adding the retrievals.** Magnitude
-says how much was written, not whether it is the right address. Decode margin —
-decision 130's actual signal — does better and still loses.
+`inherit` answers from the entity's own address when **anything** was written
+there and from its neighbours' when nothing was. It is the **first arm that is
+good at both** — grouping bought transfer by destroying exceptions, plain
+addressing held exceptions and was at chance on transfer, summing landed between
+them on both.
 
-Decision 146 settled the addressing before this: option B, which John picked
-independently and which is note 045's July design — never share an address, read
-neighbours through the content index. Nothing is overwritten, so the specific fact
-**survives in the store**. It just does not survive to the answer.
+The gate is exact: it defers on **1.0000** of TRANSFER and **0.0000** of DIRECT
+and EXCEPTION, every seed.
 
-> The ceiling probe says at least one address holds the right answer on 0.853 of
-> exceptions. **The model holds both reads in the same step and cannot tell
-> which.** Storage was never the problem; selection is — and note 049 named that
-> as its own refutation condition before any of it was built.
+> Three rules failed first — the retrieval's norm, the decode's margin, and
+> occupancy summed in the store's own space — and each named the next. What
+> works is not a comparison at all. **Membership is "is there anything here",
+> not "who has more"**, and with a hashed sketch an unwritten address reads
+> exactly 0.0. That puts note 049's threshold at **structurally zero**, so
+> nothing is fitted and nothing has to generalise.
 
-**What that leaves.** Summing is the best combination measured and decision 146
-showed it is an exchange rate rather than an answer. A **learned** gate — trained
-to predict which read to trust, rather than a rule read off a quantity that
-happened to be lying around — is the next thing that could work. It is a larger
-change than this line has proposed and needs its own predictions before a
-keyboard.
+**The price, and it is real.** On the no-exception task DIRECT costs 0.050
+against summing while TRANSFER gains 0.231: summing lets agreeing neighbours
+corroborate, and `inherit` refuses that on principle. Refusing it is what keeps a
+contradicting fact intact when there is a conflict. The sketch is also a second,
+non-superposed memory — justified by membership being one bit against a value's
+`d` floats, and held to that by `tests/test_sketch.py`.
+
+**What is open.** Every number here is one task at one width. The gate has not
+met MQAR, kinship, closure, or chains, and `n_values` / `family_size` have not
+been varied since it started working — which is where a mechanism that is really
+a fitted constant would show itself.
 
 Decision 144 answers the previous question — *does grouping do anything harder
 than same-kind-same-answer* — with **no, and the failure is total**:

@@ -416,6 +416,24 @@ def generate(config: FamilyConfig, seed: int | None = None) -> Sequence:
     exceptional: list[bool] = []
     for entity, answer, is_transfer, is_exception in asked:
         tokens.append(QUERY)
+        if config.family_links:
+            # THE QUESTION MUST END ON THE PAIR THE FACT WROTE.
+            #
+            # `family_links` only pays with `context_keys`, where the key at a
+            # position is the PAIR (previous, current) -- that is the whole
+            # point, since it is what keeps `key(entity, FACT)` and
+            # `key(entity, LINK)` apart. But it also changes what the QUERY
+            # reads: `QUERY entity` keys on (QUERY, entity), while the fact
+            # wrote (FACT, entity). Measured: cosine 0.0701 between them, so
+            # the query would read an address nothing ever wrote.
+            #
+            # Kinship hit this first and its layout is the fix -- decision 100
+            # measured the wrong version at 0.020 against 0.713. So the
+            # question ends `... FACT entity`, and the pair matches.
+            #
+            # Only when links are on, so the link-free task keeps the layout
+            # decisions 143-151 measured, byte for byte.
+            tokens.append(FACT)
         positions.append(len(tokens))
         tokens.extend((entity, answer))
         transfer.append(is_transfer)

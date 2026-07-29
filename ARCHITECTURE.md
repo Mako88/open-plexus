@@ -74,8 +74,8 @@ verified
 | # | must be able to | verdict | evidence |
 |---|---|---|---|
 | D1 | Store a typed edge `(subject, relation) → object` | **PARTIAL** | `PairKeys` does exactly this and kinship uses it; decision 100 measured mis-keying at 0.020 vs 0.713. But nothing **chooses** the relation — it is whatever the layout supplies |
-| D2 | Keep two edge types about one subject apart | **FAILING** | 155: `LINK here there` and `FACT here value` both write `key(here)`. Every column collapsed to chance. **156 rules out capacity as the cause** — re-using one subject across 8 relation types costs nothing — so it is purely an addressing failure |
-| D3 | Follow *a specific* relation when reading | **FAILING** | the hop reads `key(concept)`, never `key(concept, relation)` — note 051. Phase 2 exists in storage with no counterpart in retrieval |
+| D2 | Keep two edge types about one subject apart | **PASSING** | **157**: with pair keys every column returns to within 0.05 of its link-free value (0.8333 / 0.4383 / 0.8150), where untyped they collapsed to 0.13 / 0.03 / 0.12. 156 had already ruled out capacity, leaving addressing as the only candidate |
+| D3 | Follow *a specific* relation when reading | **FAILING** | the hop reads `key(concept)`, never `key(concept, relation)` — note 051. **157 measured the consequence**: LINKED queries score 0.1275 against chance 0.125 while the gate correctly defers on 0.9933 of them. The model knows it does not know, and cannot follow the edge |
 
 **Depends on:** A1, A3, A4 (typing multiplies distinct addresses, so D costs A4).
 
@@ -115,15 +115,16 @@ and duplicating it is how two documents start disagreeing.
 
 ## What this ledger says right now
 
-**7 PASSING, 5 PARTIAL, 3 FAILING, 3 UNTESTED, 4 CLAIMED.**
+**8 PASSING, 5 PARTIAL, 2 FAILING, 3 UNTESTED, 4 CLAIMED.**
 
-The three FAILING rows are **D2, D3 and E4** — and they are one thing. Two edge
-types collide because the relation is not in the address; the hop cannot follow a
-named relation for the same reason; and the gate cannot combine with composition
-because of a guard whose premise turned out to be false. **All three are what
-[note 051](docs/notes/051-typed-edges-a-ground-up-pass.md) proposes to fix**, and
-that is the argument for typed edges being the next work rather than one option
-among several.
+**D2 was FAILING this morning and is PASSING now** — decision 157, typed
+addresses. The two that remain, **D3 and E4**, are one thing: typing the WRITE
+fixed the collision, and following a NAMED relation needs typing the READ. 157
+measured the consequence directly — LINKED queries sit at chance while the gate
+correctly defers on 0.9933 of them, so the model knows it does not know and
+cannot act on it. **That is the next work**, and
+[note 051](docs/notes/051-typed-edges-a-ground-up-pass.md) is where it is
+specified.
 
 The PARTIAL that matters most is **C2**. Typing addresses moves it: `key(entity,
 has-value)` reading empty is *"I don't know this entity's value"*, where

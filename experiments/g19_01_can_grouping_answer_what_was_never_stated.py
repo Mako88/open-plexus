@@ -426,6 +426,21 @@ read off a store corrupted upstream of anything they measure. The endpoint choic
 is what needs redesigning; the byte-identity rail and the index calibration are
 independent of it and both hold.
 
+**AND FIXED — DECISION 157, `--links --typed`.** The endpoint was never the
+problem; the ADDRESS was.
+
+    inherit, exceptions on   direct  transfer  exception   linked  defer_linked
+      links, UNTYPED (155)   0.1325    0.0342     0.1175   0.0142        0.7642
+      links, TYPED   (A1)    0.8333    0.4383     0.8150   0.1275        0.9933
+      no links       (148)   0.8100    0.4350     0.8183       --            --
+
+**T5 now HOLDS** — every column within 0.05 of its link-free value. **T1
+CONFIRMED**: LINKED sits at 0.1275 against chance 0.125, so the task really does
+need something the model lacks. **T4 CONFIRMED** at 0.9933 against 0.9.
+
+The gate knows it does not know, and cannot follow the edge — the hop is still
+untyped. That is ARCHITECTURE row D3.
+
 ## Settings, and why they are not inherited
 
 Single keys (`context_keys` off), because the binding is `entity -> value` and a
@@ -541,7 +556,7 @@ def silent(tokens: np.ndarray) -> np.ndarray:
 def one_cell(arm: str, seed: int, exceptions: int = 0,
              n_values: int | None = None,
              family_size: int | None = None,
-             links: bool = False) -> dict:
+             links: bool = False, typed: bool = False) -> dict:
     started = time.time()
     extra = {}
     if n_values is not None:
@@ -556,6 +571,14 @@ def one_cell(arm: str, seed: int, exceptions: int = 0,
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=config.vocab_size, d_model=WIDTH, lr=0.05,
         key_scale=0.5, decay=0.99, seed=seed,
+        # NOTE 051'S TYPED ADDRESS, and it only means anything with `--links`.
+        # The pair key is what keeps `key(entity, FACT)` and `key(entity, LINK)`
+        # apart, which is the collision decision 155 died on. The query layout
+        # gains a FACT marker under `family_links` so the question ends on the
+        # pair the fact wrote -- without that the query reads an address nothing
+        # wrote (measured: cosine 0.0701) and this arm would score at chance for
+        # a reason that has nothing to do with typing.
+        context_keys=typed, derived_keys=typed,
         index_branches=(BRANCHES
                         if arm in ("indexed", "preferred", "margin",
                                    "occupancy", "sketch", "inherit") else 0),
@@ -652,7 +675,7 @@ def one_cell(arm: str, seed: int, exceptions: int = 0,
                          4) if tallies["exception"][1] else None),
         linked=(round(tallies["linked"][0] / tallies["linked"][1], 4)
                 if tallies["linked"][1] else None),
-        links=links,
+        links=links, typed=typed,
         wrong_exception_said_sibling=(
             round(said_a_sibling / wrong_exceptions, 4)
             if wrong_exceptions else None),
@@ -711,8 +734,18 @@ def main() -> int:
                         help="note 050's instrument: state family links and ask "
                              "a fourth query kind whose answer is the LINKED "
                              "family's value")
+    parser.add_argument("--typed", action="store_true",
+                        help="note 051: pair keys, so an entity's FACT and its "
+                             "LINK land at different addresses")
     args = parser.parse_args()
 
+    if args.typed and not args.links:
+        # The FACT marker that makes the query's pair match is emitted only
+        # under `family_links`. Typed keys without it would read an address
+        # nothing ever wrote, and the arm would score at chance for a reason
+        # that looks exactly like the mechanism failing.
+        raise SystemExit("--typed requires --links: without it the query does "
+                         "not end on the pair the fact wrote")
     harness.refuse_if_mutating()
     seeds = (args.seed,) if args.seed is not None else SEEDS
     if args.width is not None:
@@ -725,7 +758,8 @@ def main() -> int:
     for seed in seeds:
         for arm in arms:
             record = one_cell(arm, seed, args.exceptions,
-                              args.n_values, args.family_size, args.links)
+                              args.n_values, args.family_size, args.links,
+                              args.typed)
             print(f"  {record['condition']:34s} "
                   f"direct {record['direct']:.4f}  "
                   f"transfer {record['transfer']:.4f}  "

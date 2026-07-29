@@ -320,8 +320,15 @@ class LinksAreOffAndInvisible(unittest.TestCase):
         for seed in range(20):
             sequence = generate(FamilyConfig(seed=seed, family_links=True))
             tokens = sequence.tokens
+            # A FACT MARKER NOW APPEARS IN TWO ROLES. With links on, the
+            # question ends `QUERY FACT entity` so its pair matches what the
+            # fact wrote -- so scanning for FACT alone counts query entities as
+            # stated. This test failed the moment that layout landed, which is
+            # the detector going stale rather than the task breaking, and it is
+            # exactly what ARCHITECTURE.md's rule 3 is about.
             stated = {tokens[i + 1] for i in range(len(tokens) - 2)
-                      if tokens[i] == FACT}
+                      if tokens[i] == FACT and (i == 0
+                                                or tokens[i - 1] != QUERY)}
             for at, flag in zip(sequence.query_positions, sequence.is_linked):
                 if flag:
                     self.assertNotIn(tokens[at], stated)

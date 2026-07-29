@@ -5163,3 +5163,62 @@ Note 051's build order put A3 first because a `1/r` cost would have ended the
 line. It does not. **A1 — does the collision disappear on decision 155's task —
 is now the next thing**, and ARCHITECTURE.md rows D2, D3 and E4 are what it would
 move.
+
+## 157. Typed addresses fix the collision and do not follow the link — exactly as split
+
+Note 051's A1, three seeds, and it separates two failures that looked like one:
+
+    inherit, exceptions on   direct  transfer  exception   linked  defer_linked
+      links, UNTYPED (155)   0.1325    0.0342     0.1175   0.0142        0.7642
+      links, TYPED   (A1)    0.8333    0.4383     0.8150   0.1275        0.9933
+      no links       (148)   0.8100    0.4350     0.8183       --            --
+
+**A1 CONFIRMED.** Every column is within 0.05 of its link-free value —
++0.023, +0.003, −0.003. Decision 155's collapse to chance is gone, and stating
+links now costs the existing columns nothing. **ARCHITECTURE row D2 moves FAILING
+→ PASSING.**
+
+The mechanism is the whole of it: with pair keys, `key(entity, FACT)` and
+`key(entity, LINK)` are different addresses. Decision 156 had already ruled out
+capacity as the cause, so addressing was the only candidate left, and it was.
+
+### The layout change this needed, which was not in note 051
+
+Turning on `context_keys` breaks the QUERY as well as fixing the link. The
+question was `QUERY entity`, keying on `(QUERY, entity)`, while the fact wrote
+`(FACT, entity)`. **Measured before building: cosine 0.0701 between them** — the
+query would have read an address nothing ever wrote, and the arm would have
+scored at chance for a reason with nothing to do with typing.
+
+Kinship hit this first and its layout is the fix, so the question now ends
+`... QUERY FACT entity` and the pair matches: **cosine 1.0000**. Decision 100
+measured the wrong version of this at 0.020 against 0.713, which is the size of
+the mistake avoided. **Only under `family_links`**, and the byte-identity rail
+still holds across 280 configurations.
+
+### And the LINKED column is the finding
+
+**0.1275 against a chance of 0.125.** Exactly chance.
+
+The gate is not the problem — it defers on **0.9933** of linked queries, so the
+model correctly notices it holds nothing at that address. It then cannot follow
+the link, because **the hop is untyped**: it reads `key(concept)`, never
+`key(concept, relation)`.
+
+> Typing the WRITE fixed the collision. Following a NAMED relation needs typing
+> the READ, and that is a different change.
+
+That is precisely the D2/D3 split note 051 proposed, arriving as two different
+numbers in one run rather than as an argument. **D3 stays FAILING, now with
+direct evidence rather than by inspection.**
+
+### What it also settles
+
+**Note 050's T1 is CONFIRMED**, and the instrument is real: `inherit` scores at
+chance on LINKED, so the task genuinely requires something the model does not
+have. **T4 CONFIRMED** at 0.9933 against a predicted 0.9. **T5**, which decision
+155 refuted, now holds — with typed keys the existing columns do not move.
+
+The next thing is D3: give the hop a relation. `argmax(wk @ hop_key)` names the
+concept it landed on (154, cosine 0.96), so the missing half is which relation to
+bind with it.

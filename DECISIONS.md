@@ -5422,3 +5422,48 @@ reads in three places, which is three more than existed this morning.
 is what the LINKED run needs. That run is the one that would tell us whether the
 day's mechanisms are individually correct and collectively useless, and it is no
 longer blocked.
+
+## 162. The LINKED run is still not informative, and the reason is one relation per model
+
+I recommended the LINKED run as the next thing twice, and checking the path
+before running it says it would come back at chance for a reason that has nothing
+to do with the mechanisms under test.
+
+**The path the task needs**, with typed keys:
+
+    key(FACT, entity)   empty -- the gate fires, correctly
+    key(LINK, rep)      -> rep of the linked family        <- hop 1, relation LINK
+    key(FACT, rep')     -> the linked family's value       <- hop 2, relation FACT
+
+**Two hops under two DIFFERENT relations.** `hop_relation` is a single
+configuration value used by every hop, so the chain can follow LINK-then-LINK or
+FACT-then-FACT and never LINK-then-FACT.
+
+Decision 158 named the limit as *"the relation is fixed, not chosen"*. That was
+true and it was not the whole of it. The sharper statement is **one relation per
+MODEL, not one per hop** — and it is the second that blocks this task. Even a
+correct chooser would not help until a hop can carry its own relation.
+
+### Why this is recorded instead of built
+
+The fix is small in code — `hop_relation` becomes a sequence indexed by hop
+depth. It is **not** small in what it implies, because "which relation at which
+depth" is a schedule, and a fixed schedule is a fitted constant wearing a
+mechanism's clothes unless the task supplies it. Note 052 §2 already lists
+choosing-the-relation as a cascading decision with three options, and this says
+the decision is more urgent than that note implies: **it is not an optimisation,
+it is what the composition task requires.**
+
+### The correction, plainly
+
+I recommended running LINKED as a cheap validation of the day's work, twice, and
+that recommendation was wrong. Everything the run needs exists **except** the
+ability to vary the relation across hops, and I did not check that before
+proposing it. The check cost ten minutes and the run would have cost an hour and
+produced a chance-level number that looked like the mechanisms failing.
+
+**What the day's mechanisms have actually been shown to do stands unchanged** —
+each works in isolation, with a unit test, and none has a task number. That was
+true before this entry and it is still true. What has changed is that the reason
+is now named: **not one of them is wrong, and the task needs a fourth thing
+nobody has built.**

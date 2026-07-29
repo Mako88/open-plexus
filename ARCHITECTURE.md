@@ -88,7 +88,7 @@ verified
 | E1 | Follow a chain of the same relation | **CLAIMED** | decision 92 measured the hop generalising to unseen depths zero-shot. Not re-verified here |
 | E2 | Compose relations that combine by rule | **PARTIAL** | kinship 2-hop 0.443 against 1-hop 0.777. Real but weak |
 | E3 | Know when to stop hopping | **CLAIMED** | `halt_gate`, learned. 153 showed occupancy cannot supply this for free |
-| E4 | Combine composition with C1's gate | **PARTIAL** | **159**: `index_at_hops` proposes neighbours at the hop's landing concept, gated on emptiness. `tests/test_index_at_hops.py` shows a chain reaching an answer through a dead end it could not reach without, and the fan-out costing 1 extra read where an ungated one would cost 56. **Mechanism only** — no task result yet, **161** unblocked combining it with `inherit`, so the LINKED run is now reachable |
+| E4 | Combine composition with C1's gate | **PARTIAL** | **159**: `index_at_hops` proposes neighbours at the hop's landing concept, gated on emptiness. `tests/test_index_at_hops.py` shows a chain reaching an answer through a dead end it could not reach without, and the fan-out costing 1 extra read where an ungated one would cost 56. **Mechanism only** — no task result yet, **161** unblocked combining it with `inherit`; **162**: the LINKED run still needs a hop to carry its OWN relation (LINK then FACT), and `hop_relation` is one value per model |
 
 **Depends on:** A1, D. **E4 depends on:** C1, D3.
 

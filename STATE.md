@@ -182,15 +182,53 @@ the same comparison is +0.002.
 |---|---|
 | g17-01's premise | **stands** (140) |
 | the store's contribution on text | **prior-shaped, ≤ +0.002 bits** (139) |
-| concept addressing as the fix | **not measured on a correct harness** |
+| concept addressing as the fix | **measured — worth 0.540 bits, and not because of concepts** (141) |
 
 The third row is the honest gap. Decisions 136 and 137 refuted concept
 addressing on void numbers, and g18-01's K sweep was withdrawn on those same
-numbers — **neither the refutation nor the withdrawal is currently supported.**
+numbers — **neither the refutation nor the withdrawal was supported.**
 
-The machinery is built and tested and the sweep is one dispatch away. What is
-weaker than it was: addressing was meant to improve something that turns out to
-contribute ~nothing either way.
+**g18-01 ran on the corrected harness and the sign was backwards — decision
+141.** 128 cells, three seeds,
+[run 30434436216](https://github.com/Mako88/open-plexus/actions/runs/30434436216):
+
+    bias 0 -- no prior, every character-level number's configuration
+      floor         10.700        concept-64    10.159      +0.540
+      shuffled-64   10.143        permuted-64   10.329
+
+    bias 1 -- a prior available
+      floor          9.186        concept-1024   9.279      -0.093
+
+**Address density is worth 0.540 bits where the store is the only learner** —
+the largest effect any addressing change has produced here. **And it does not
+need to mean anything:** a grouping built from a SCRAMBLED corpus reaches 10.143,
+slightly better than the learned one. The address count is doing the work, not
+the concepts.
+
+**A prior subsumes all of it.** At bias 1 no grouped arm beats the floor: 0.540
+without a prior is less than the 1.514 a prior buys alone, and they do not add.
+
+> So note 045 is **neither vindicated nor refuted**. Its claim is that addresses
+> derived from *meaning* pay; meaning contributes nothing here. But 0.540 bits is
+> real and reproducible — it is simply not about concepts, and a cheaper
+> mechanism captures all of it.
+
+**Why 136/137 had the sign backwards:** on a mistrained readout the retrievals
+are noise, so denser addresses make the noise more consistent and the readout
+fits it harder. Corrected, denser addresses carry more usable signal. That is the
+second time the void harness produced a wrong number *with a satisfying
+explanation attached*.
+
+**Reversing a lean, and the reason is the interesting part.** The argument for
+leaving it unmeasured was that a mechanism cannot buy 0.10 bits when the store
+contributes 0.002. That confuses *this* addressing's contribution with a ceiling
+on *all* addressing — 0.002 is what the current scheme gets, not a bound on what
+a different one could. Withdrawing on that reasoning would repeat decision 112's
+error: assuming an axis is flat because a different axis is.
+
+The settled rate survives the correction, so the configuration stands: g18-02
+corrected puts 5e-6 at 9.186 against 9.210 and 9.221 either side, still an
+interior optimum.
 
 ### ⇒ The other open question, and it is no longer addressing
 

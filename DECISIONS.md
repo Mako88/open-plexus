@@ -4085,3 +4085,71 @@ to improve turns out to contribute ~nothing either way.
 **Taken without asking**, under standing authorisation. John's call, when he
 reads this: re-dispatch g18-01's K sweep on the corrected harness, or leave
 concept addressing unmeasured and ask what the store is for on text instead.
+**Decided and run — see 141.**
+
+## 141. Address density is worth 0.540 bits, and it does not need to mean anything
+
+g18-01, the pre-registered sweep, on the corrected harness. 32 jobs, 128 cells,
+**three seeds**, run 30434436216. This replaces the refutation decisions 136 and
+137 made on void numbers.
+
+    bias 0 -- no prior, which is every character-level number's configuration
+      floor         10.700        concept-64    10.159      +0.540
+      shuffled-64   10.143        permuted-64   10.329
+      uniform       10.759
+
+    bias 1 -- a prior available
+      floor          9.186        concept-1024   9.279      -0.093
+      unigram        8.068
+
+### Three parts, and the middle one is the finding
+
+**1. Address density is worth real bits where the store is the only learner.**
+The bias-0 floor is 0.06 below uniform — a model that has learned almost nothing
+— and concept-64 reaches 10.159. **0.540 bits, the largest effect any addressing
+change has produced in this project.**
+
+**2. It does not need to MEAN anything.** `shuffled-64` — grouping built from a
+content index fitted on a *scrambled* corpus — reaches **10.143**, slightly
+better than the learned grouping. The semantic content is worth nothing; the
+collapse of the address space is worth everything.
+
+The two controls disagree with each other, which is why there are two.
+`shuffled` clusters a structureless space and lands on a slightly better size
+distribution; `permuted` forces the real distribution onto random members and
+does worse than both. **Even the shape of the grouping matters more than its
+meaning.**
+
+**3. A prior subsumes all of it.** At bias 1 no grouped arm beats the floor. The
+0.540 bits grouping buys without a prior is less than the 1.514 a prior buys
+alone, and they do not add — decision 139, from the other direction.
+
+### The sign was backwards, and the reason is worth keeping
+
+Decisions 136/137 said grouping *hurts* at every K, monotonically in how much
+resolution it destroys, and had a tidy story for it. **On a mistrained readout
+the retrievals are noise, so denser addresses make the noise more consistent and
+the readout fits it harder — worse. Corrected, denser addresses carry more usable
+signal — better.**
+
+That is the second time tonight the void harness produced not just a wrong number
+but a wrong number with a satisfying explanation attached.
+
+### What stands
+
+**Note 045's proposal is not vindicated.** Its claim is that addresses derived
+from *meaning* pay; the control says meaning contributes nothing here and the
+address count is doing the work. A cheaper mechanism — any grouping, however
+chosen — captures the whole gain.
+
+**And it is not refuted either.** 0.540 bits is real, reproducible across three
+seeds, and larger than anything else this line has moved. It is simply not
+*about* concepts.
+
+**P5 holds across all 128 cells**: the best is 9.186, still 1.12 bits short of a
+unigram.
+
+**Taken without asking.** The lean recorded an hour earlier — leave it unmeasured
+— was wrong, and reversing it is why this exists: 0.002 bits is what the *current*
+addressing contributes, not a ceiling on what a different one could. Assuming an
+axis is flat because a different axis is flat is decision 112's error.

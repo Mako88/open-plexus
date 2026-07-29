@@ -63,17 +63,19 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Can the read gate and the hop mechanism be made to compose?**
+**Is there a task that needs the gate AND the hop at once?**
 
-They are the project's two mechanisms for the two halves of the problem and they
-currently **exclude each other** (decision 152). The gate knows when an address
-holds nothing; the hop follows an address that holds a *step* toward the answer.
-Composition tasks need both and can have neither.
+Not *can they compose* — decision 154 showed the guard that says they cannot
+rests on a false premise. The problem moved: **the choice between the two ways of
+composing them cannot be decided, because no existing task tells them apart.**
+That makes this an instrument question, which GOALS §4 puts first.
+[Note 050](docs/notes/050-the-missing-instrument-composition-over-things-never-stated.md)
+designs the task and is not built.
 
 The previous question — *does the read gate survive contact with anything that is
 not this task* — is answered: **yes, and its scope is now measured rather than
-hoped for.** The evidence is below, and the coverage table at the end of it is
-what raises the question above.
+hoped for.** That evidence is below, and the last two entries in it are what
+raise the question above.
 
 Decision 148 answered the question before that — *can anything tell which of two
 retrievals to trust* — with **yes, once the question is asked exactly.**
@@ -107,78 +109,28 @@ contradicting fact intact when there is a conflict. The sketch is also a second,
 non-superposed memory — justified by membership being one bit against a value's
 `d` floats, and held to that by `tests/test_sketch.py`.
 
-**And it is not a fitted constant — decision 149 swept the thing note 049 named
-in July.** Across `n_values` 4/8/16 and `family_size` 3/4/6, `inherit` beats
-summing on TRANSFER and holds EXCEPTION above plain addressing in **every** cell,
-with the gate at 1.0000 / 0.0000. Nothing was re-tuned, because there is no
-threshold to re-tune. The single dip — the gate at 0.9025 on `family_size=6` —
-was `BRANCHES=3` failing to reach a sibling that HAS a stated fact, and
-`--branches 5` restores it to 1.0000 exactly as predicted.
+**And 149–153 measured its scope rather than assuming it.** Every entry is in
+DECISIONS.md; the reason it is compressed here is that each carried a
+forward-looking claim superseded within a day, which is the drift this file
+exists to stop.
 
-**And it is inert where it should be — decision 150 took it to MQAR**, where
-every queried key was written a few tokens earlier so the correct deferral rate
-is 0.0000 by construction:
-
-    plain      accuracy 0.9950   deferred      -
-    indexed    accuracy 0.8817   deferred      -
-    inherit    accuracy 0.9950   deferred 0.0000
-
-`inherit` matches plain addressing **seed for seed** while summing the same extra
-reads costs 0.113. The gate is what avoids that. And no queried key ever read as
-unwritten, which rules out the failure that would have been invisible on
-families: a false negative there would make an entity silently inherit its
-family's answer over its own.
-
-**And decision 151 bounds what it may be called.** On kinship the gate defers on
-**0.0000** of queries at one hop AND at two — where one hop IS a stated fact and
-two is a composition of them:
-
-    hops 1   plain 0.7767   indexed 0.7067   inherit 0.7767   deferred 0.0000
-    hops 2   plain 0.4433   indexed 0.4067   inherit 0.4433   deferred 0.0000
-
-The question ends `... FACT subject`, and the asked subject is always a stated
-subject, so the address is occupied either way.
-
-> **Occupancy is a property of the ADDRESS, not of the knowledge.** So the gate
-> "knows which addresses it has written" — which is "knows what it knows" only
-> where addresses are per-fact. Families is such a task; kinship is not.
-
-Closure cannot ask this at all: it scores at the object position, where *no*
-address has been written yet, stated or entailed. Checked before building.
-
-**Coverage is closed, and two tasks closed it by being unaskable — decision
-152.**
-
-    MQAR       gate never fires, costs nothing            150
-    families   gate fires selectively, and it works       148, 149
-    kinship    gate never fires, costs nothing, is blind  151
-    closure    unaskable: no address is written at scoring time
-    chains     unaskable: `index_branches` and `hops > 1` exclude each other
-
-**Both unaskable cases are composition tasks**, which is not a coincidence:
-composition is where the answer sits at no single address, and the gate's whole
-vocabulary is single addresses. The chains refusal is a guard that predates this
-work — a hop key is a softmax mixture over many tokens' rows, so it names no
-concept and the index has nothing to look up.
-
-> **The gate and the hop mechanism are currently mutually exclusive**, and they
-> are the project's two mechanisms for the two halves of the problem: the gate
-> knows when an address holds nothing; the hop follows an address that holds a
-> *step* toward the answer.
-
-**Half of it is already done — decision 153.** The gate needs an emptiness test
-AND a source of neighbours; only the second needs a concept name. `AddressSketch`
-hashes any vector, so `track_occupancy` now runs at `hops=2` where
-`index_branches` cannot. **It then has nothing to say on chains:** occupancy at
-chain start / middle / end reads 0.893 / 0.791 / 0.898, zero on 0% of cases.
+    149  not a fitted constant. Across n_values 4/8/16 and family_size 3/4/6 the
+         ordering holds in EVERY cell, gate at 1.0000/0.0000. The one dip was
+         BRANCHES=3 unable to reach a stated sibling; --branches 5 fixed it
+    150  MQAR: inherit matches plain SEED FOR SEED (0.9950) and never defers,
+         while summing the same extra reads costs 0.113. Also rules out sketch
+         false negatives, which would have been invisible on families
+    151  kinship: defers on 0.0000 at one hop AND at two, so the gate is blind
+         where the address is occupied either way
+    152  chains unaskable — index_branches and hops > 1 exclude each other
+    153  half the gate goes there anyway: `track_occupancy` runs at hops=2.
+         It then finds chain start/middle/end at 0.893/0.791/0.898 — nothing
 
 > **Occupancy is informative exactly where an address is READ BEFORE IT IS
 > WRITTEN within the sequence.** Families reads a transfer entity at its query
-> and writes it only afterwards, so it reads 0.0. Chains, kinship and MQAR all
-> write every address before querying it, so it reads positive and says nothing.
-
-That subsumes decision 151's bound and **predicts** where the sketch pays rather
-than hoping: a task that asks about something before anything about it is stored.
+> and writes it only afterwards → 0.0. Chains, kinship and MQAR write every
+> address before querying it → positive, and silent. That subsumes 151's bound
+> and predicts where the sketch pays instead of hoping.
 
 **And the neighbour half is not blocked by what the guard says it is —
 decision 154.** Note 044 refuses `index_branches` above one hop because a hop key
@@ -196,9 +148,30 @@ and `argmax(wk @ hop_key)` is what the index could look up.
 **The guard is not lifted**, because a real design question sits under it that a
 cosine does not settle: `index_branches` runs once per POSITION, not once per
 hop, so combining them means choosing whether the index proposes neighbours of
-the position's concept or of the hop's landing concept. Different mechanisms,
-different costs. **That choice is the live work**, and it is now a design
-decision with a measurement behind it rather than an impossibility.
+the position's concept or of the hop's landing concept.
+
+**And that choice cannot be decided, because nothing measures it —
+[note 050](docs/notes/050-the-missing-instrument-composition-over-things-never-stated.md).**
+
+    families   addresses never written ✓   composition ✗
+    kinship    addresses never written ✗   composition ✓
+    chains     addresses never written ✗   composition ✓
+    MQAR       addresses never written ✗   composition ✗
+
+The gate pays where an address was never written; the hop pays where the answer
+is at no single address. **No task has both**, and decision 153 says why that is
+structural: composition tasks state their facts before querying them, so they
+write every address they later read.
+
+> Building the combined mechanism now would produce a number that means nothing —
+> on chains the gate never fires, so the two design options would be
+> indistinguishable. That is decision 143's circularity one level up.
+
+**So the blocker is the instrument, not the mechanism**, which is where GOALS §4
+says to look first. Note 050 designs the task — entity → family → linked family,
+where step 1 is the gate and step 3 is the hop — with the calibration check that
+decides whether it is fair before any arm is run, and four registered
+predictions. **Not built.**
 
 ### How this line got here, in five lines
 

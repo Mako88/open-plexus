@@ -1165,11 +1165,12 @@ class LocalMemoryConfig:
     #: that is finding what it needs never branches at all; branching happens at
     #: dead ends, which is exactly where it is worth paying for.
     #:
-    #: **A and B are ALTERNATIVES, not additive.** With this on, the
-    #: position-level fan-out does not run at all: similarity is applied where
-    #: the chain has GOT TO rather than to what it was asked about. Running both
-    #: would double the reads and make the cost claim above false -- the test
-    #: that measures it caught exactly that, 56 reads against 28.
+    #: **Ungated summing and this are alternatives; two GATED mechanisms are
+    #: not** -- decision 160, correcting 159. With this on and `index_prefer`
+    #: off, the position-level block is skipped: it would read neighbours at
+    #: every position regardless of need, which measured 56 reads against 28.
+    #: With `index_prefer` set the position-level mechanism is gated too, both
+    #: fire only at dead ends, and they compose.
     #:
     #: Needs `track_occupancy`, because "holds nothing" is the sketch's question
     #: and answering it by norm is what decision 147 refuted.
@@ -2530,7 +2531,22 @@ class LocalAssociativeMemory:
             neighbours = None
             strongest = 0.0
             occupancy_near = 0.0
-            if self.config.index_branches and not self.config.index_at_hops:
+            # SKIP THE POSITION-LEVEL BLOCK ONLY WHEN IT IS THE UNGATED ONE.
+            #
+            # Decision 160: `index_at_hops` used to skip this unconditionally,
+            # which made `inherit` unreachable and blocked the run that would
+            # give either mechanism a task number. The doubling that prompted it
+            # came from decision 146's UNGATED summing, which reads neighbours at
+            # every position whether or not anything is needed.
+            #
+            # `index_prefer` is not that. It is gated -- it defers only where the
+            # token's own address is empty and a neighbour's is not -- so it
+            # composes with the hop-level fan-out at a cost measured in dead
+            # ends rather than positions. `ItComposesWithTheInheritGate` is where
+            # that is measured rather than argued.
+            if self.config.index_branches and (
+                    self.config.index_prefer
+                    or not self.config.index_at_hops):
                 # THE CONTENT INDEX, note 045. Similar concepts are asked as
                 # well, and each is an ORDINARY EXACT READ at a hard token id --
                 # nothing here blurs a key.
@@ -2550,14 +2566,33 @@ class LocalAssociativeMemory:
                         "`model.content`: the index is learned from observed "
                         "co-occurrence and there is nothing to propose "
                         "candidates from until it has seen data")
-                here = self.surfaces.of(self.key_source.concept(tokens, t))
-                # NOT `scored`. `scored` is `run`'s parameter saying which
-                # positions the delta rule applies at, and shadowing it made
-                # `if learn and scored[t]` index a candidate list. Same class as
-                # `store` and `key` above, and it failed loudly only because the
-                # lists happened to be different lengths.
-                proposed = self.content.nearest(here,
-                                                self.config.index_branches)
+                if (self.config.index_prefer == "inherit"
+                        and occupied is not None
+                        and occupied.count(key) > 0.0):
+                    # READ-GATED, not just decision-gated -- and decision 148
+                    # was never either. `inherit` decides by emptiness but read
+                    # every neighbour first and chose afterwards, so it paid the
+                    # full fan-out at EVERY position, including the ones where
+                    # it could not possibly defer.
+                    #
+                    # Skipping is behaviour-preserving rather than an
+                    # approximation: `defer` requires `here <= 0.0`, so a
+                    # position whose own address is occupied never defers no
+                    # matter what the neighbours hold. The reads were pure cost.
+                    #
+                    # Decision 161. Found by a test measuring the composition
+                    # with `index_at_hops`, which came back at exactly double
+                    # and should not have.
+                    proposed = []
+                else:
+                    here = self.surfaces.of(self.key_source.concept(tokens, t))
+                    # NOT `scored`. `scored` is `run`'s parameter saying which
+                    # positions the delta rule applies at, and shadowing it made
+                    # `if learn and scored[t]` index a candidate list. Same class as
+                    # `store` and `key` above, and it failed loudly only because the
+                    # lists happened to be different lengths.
+                    proposed = self.content.nearest(here,
+                                                    self.config.index_branches)
                 if proposed:
                     similarity = np.array([s for _, s in proposed])
                     # SOFTMAX, not the raw similarity, and `spread` is why.

@@ -66,7 +66,8 @@ verified
 | C1 | Detect that it holds no fact at an address | **PASSING** | 148: `AddressSketch`, defers on 1.0000 of transfer and 0.0000 of direct/exception, every seed. Bar is structurally zero, nothing tuned |
 | C2 | Have that detection mean *"I don't know this"* | **PARTIAL** | 151: occupancy is a property of the ADDRESS, not the knowledge. Informative exactly where an address is read before it is written (153). Blind on kinship, chains, MQAR |
 | C4 | **Decline to answer** rather than assert something it does not hold | **UNTESTED** | the gate detects an empty address (C1) and then routes to the neighbours. **Nothing anywhere lets the model say "I do not know"**, and no task scores abstention. John raised this on 2026-07-29: the architecture may be structurally free of LLM overconfidence — the gate is a fact about the store, not a learned probability — but that is a claim with no measurement behind it |
-| C3 | Cost nothing where there is nothing to detect | **PASSING** | 150: matches plain addressing seed for seed on MQAR (0.9950) and never defers, while summing the same reads costs 0.113 |
+| C3 | Cost nothing where there is nothing to detect | **PARTIAL** | 150 measured no ACCURACY cost. **161: the read COST was never measured** — `inherit` read every neighbour and chose afterwards, paying full fan-out at every position. Now read-gated, and 148 reproduces to four decimals. A read-count rail exists in `tests/test_index_at_hops.py` and nowhere else |
+| C5 | Cost no ACCURACY where there is nothing to detect | **PASSING** | 150: matches plain addressing seed for seed on MQAR (0.9950) and never defers, while summing the same reads costs 0.113 |
 
 **Depends on:** A1, A3. **C2 is the row note 051 attacks.**
 
@@ -87,7 +88,7 @@ verified
 | E1 | Follow a chain of the same relation | **CLAIMED** | decision 92 measured the hop generalising to unseen depths zero-shot. Not re-verified here |
 | E2 | Compose relations that combine by rule | **PARTIAL** | kinship 2-hop 0.443 against 1-hop 0.777. Real but weak |
 | E3 | Know when to stop hopping | **CLAIMED** | `halt_gate`, learned. 153 showed occupancy cannot supply this for free |
-| E4 | Combine composition with C1's gate | **PARTIAL** | **159**: `index_at_hops` proposes neighbours at the hop's landing concept, gated on emptiness. `tests/test_index_at_hops.py` shows a chain reaching an answer through a dead end it could not reach without, and the fan-out costing 1 extra read where an ungated one would cost 56. **Mechanism only** — no task result yet, and **160**: it cannot currently be combined with `inherit`, so the run that would give it one is blocked |
+| E4 | Combine composition with C1's gate | **PARTIAL** | **159**: `index_at_hops` proposes neighbours at the hop's landing concept, gated on emptiness. `tests/test_index_at_hops.py` shows a chain reaching an answer through a dead end it could not reach without, and the fan-out costing 1 extra read where an ungated one would cost 56. **Mechanism only** — no task result yet, **161** unblocked combining it with `inherit`, so the LINKED run is now reachable |
 
 **Depends on:** A1, D. **E4 depends on:** C1, D3.
 
@@ -116,7 +117,7 @@ and duplicating it is how two documents start disagreeing.
 
 ## What this ledger says right now
 
-**8 PASSING, 7 PARTIAL, 0 FAILING, 4 UNTESTED, 4 CLAIMED.**
+**8 PASSING, 8 PARTIAL, 0 FAILING, 4 UNTESTED, 4 CLAIMED.**
 
 **D2 and D3 both moved today** — 157 typed the write, 158 typed the read. What
 remains on D3 is that the relation is **fixed rather than chosen**: the mechanism

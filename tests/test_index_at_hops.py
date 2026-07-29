@@ -137,6 +137,56 @@ class ItDoesNotBranchWhereThereIsNoDeadEnd(unittest.TestCase):
         self.assertLess(gated, ungated_bound / 2)
 
 
+class ItComposesWithTheInheritGate(unittest.TestCase):
+    """Decision 160. Two gated mechanisms must both be reachable, and cheap.
+
+    `inherit` fires where a POSITION's address is empty; `index_at_hops` fires
+    where a HOP dead-ends. The linked-families path needs both, and decision 159
+    made them mutually exclusive by skipping the position-level block whenever
+    `index_at_hops` was set. This is the measurement that decision was missing.
+    """
+
+    TOKENS = ItDoesNotBranchWhereThereIsNoDeadEnd.TOKENS
+
+    def reads(self, **overrides) -> int:
+        built = LocalAssociativeMemory(LocalMemoryConfig(
+            vocab_size=VOCAB, d_model=64, lr=0.05, key_scale=0.5, decay=1.0,
+            context_keys=True, derived_keys=True, hops=2, hop_relation=REL,
+            track_occupancy=True, seed=0, **overrides))
+        built.wo[:] = built.wv
+        built.content = fitted()
+        counted = {"n": 0}
+        inner = built.retrieval
+
+        class Counting:
+            def __getattr__(self, name):
+                return getattr(inner, name)
+
+            def read(self, memory, key):
+                counted["n"] += 1
+                return inner.read(memory, key)
+
+        built.retrieval = Counting()
+        built.run(self.TOKENS)
+        return counted["n"]
+
+    def test_both_gates_can_be_on_at_once(self):
+        # The whole point: before decision 160 this configuration ran with the
+        # position-level gate silently disabled.
+        self.assertGreater(
+            self.reads(index_branches=2, index_at_hops=True,
+                       index_prefer="inherit"), 0)
+
+    def test_composing_them_does_not_double_the_reads(self):
+        # Two GATED mechanisms fire only at dead ends, so the pair costs far
+        # less than the ungated summing that prompted decision 159's overreach
+        # -- that measured 56 against 28, a clean doubling.
+        plain = self.reads(index_branches=0)
+        both = self.reads(index_branches=2, index_at_hops=True,
+                          index_prefer="inherit")
+        self.assertLess(both, plain * 2)
+
+
 class ItRefusesWhatCannotWork(unittest.TestCase):
 
     def test_the_fan_out_needs_the_sketch(self):

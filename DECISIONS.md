@@ -5378,3 +5378,47 @@ been wrong about a cost argument once today.
 **Recorded rather than patched**, because a hasty fix to the read path is how
 decision 74 happened, and because the finding — that the day's two mechanisms
 have never been in the same model — is worth more than the patch.
+
+## 161. `inherit` was never read-gated, and nobody had counted its reads
+
+Decision 160 said two gated mechanisms compose without doubling. **A test
+measuring it came back at exactly double, and the reason is that the premise was
+false.**
+
+`inherit` is gated in its DECISION and not in its READS. The position-level block
+reads every neighbour the index proposes and *then* decides whether to defer. So
+it paid the full fan-out at **every position**, including every position whose
+own address was occupied and which therefore could not possibly defer.
+
+**Decision 148 never counted reads.** It measured accuracy, and the mechanism has
+carried an unmeasured C1 cost since the day it was built.
+
+### The fix is the same gate, applied earlier
+
+If the token's own address holds anything, skip the fan-out entirely. This is
+**behaviour-preserving rather than an approximation**: `defer` requires
+`here <= 0.0`, so a position whose address is occupied never defers whatever the
+neighbours hold. The reads were pure cost.
+
+**Reproduced rather than assumed:** decision 148's cells come back at 0.8100 /
+0.4350 / 0.8183 — identical to four decimals across three seeds. That check is
+the reason this is a decision entry and not a revert.
+
+### Twice in one day, on the same kind of claim
+
+Decision 159 concluded A and B were alternatives from a read count and was wrong
+about why. Decision 160 concluded gated mechanisms compose and was wrong about
+whether `inherit` was one. **Both were cost arguments made from reasoning rather
+than measurement, and both were caught by writing the measurement down.**
+
+The standing lesson is narrow and worth keeping: **this project has never had a
+read-count rail.** Accuracy is measured everywhere, and the wire cost that C1 and
+G4 both turn on is measured nowhere. `tests/test_index_at_hops.py` now counts
+reads in three places, which is three more than existed this morning.
+
+### What is now unblocked
+
+`index_prefer="inherit"` and `index_at_hops` can be set on the same model, which
+is what the LINKED run needs. That run is the one that would tell us whether the
+day's mechanisms are individually correct and collectively useless, and it is no
+longer blocked.

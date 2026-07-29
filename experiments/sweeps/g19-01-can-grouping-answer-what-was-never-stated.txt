@@ -1,0 +1,98 @@
+Can grouping answer a question about something never stated?
+============================================================
+
+Script: experiments/g19_01_can_grouping_answer_what_was_never_stated.py
+Task:   openplexus/tasks/families.py, calibrated by g19-00
+Status: THREE SEEDS, all three predictions confirmed. Decision 143.
+
+ANSWER: **Yes, and by 0.91 accuracy.** This is the first measurement in which
+        `concepts.py`'s surface-to-concept indirection pays for itself.
+
+        **AND THE RESULT IS NARROWER THAN THE NUMBER LOOKS. Read the tautology
+        section before quoting it.**
+
+
+MEASURED ON
+------------
+`families.py`: 8 families of 4 entities, 3 attributes each, 8 values, 2 facts
+stated per family, vocabulary 66. Background streams fit `ContentIndex`
+(window 1, no weighting, 200 streams); task sequences carry facts and questions
+only and run ~60 tokens. 400 training sequences, 6 epochs, 200 held out, width
+64, single keys, lr 0.05, decay 0.99, three seeds.
+
+`k = 16` from g19-00, which must cover the token CLASSES rather than just the
+families.
+
+
+PREDICTIONS (registered in note 048, before the task was built)
+----------------------------------------------------------------
+  P1  THE GATE. `concept` beats `ungrouped` on TRANSFER by more than 0.20.
+  P2  THE CONTROL. `permuted` does not beat `ungrouped` on TRANSFER by 0.05.
+  P3  THE RAIL. `nostore` is at chance on both kinds.
+
+SCORED: **P1 CONFIRMED** by +0.9116, against a gate of 0.20.
+        **P2 CONFIRMED** -- permuted is 0.0209 BELOW ungrouped.
+        **P3 CONFIRMED**, and at zero rather than at chance, for the reason
+        decision 142 found on MQAR: a model with nothing to retrieve does not
+        guess, it emits a constant.
+
+
+THE TABLE
+----------
+Mean over three seeds. Chance is 0.125.
+
+    arm           direct  transfer   family recovery
+    ungrouped     0.6583    0.0867         --
+    concept       0.9967    0.9983      1.000
+    permuted      0.2725    0.0658      1.000
+    nostore       0.0000    0.0000         --
+
+**`ungrouped` at 0.087 on TRANSFER is the point.** Nothing was ever said about
+that entity, so today's model can only guess, and it does — structurally, not
+for want of tuning.
+
+**`concept` at 0.998 answers almost every one.** The family shares the store's
+address, so a sibling's write is what a read at this entity returns.
+
+**`permuted` fails, and that is the control that matters.** It has the same
+number of groups and the same group sizes; only the membership is wrong. On text
+(decision 141) the entire measured gain came from having fewer addresses however
+chosen, and only a size-matched control could tell that apart. Here it cannot
+carry the result: **the similarity has to be the real one.**
+
+**And wrong grouping is worse than none** -- permuted DIRECT 0.273 against
+ungrouped 0.658. Accidental siblings share an address and overwrite each other,
+so a bad concept map actively corrupts recall that plain addressing gets right.
+
+
+THE TAUTOLOGY, STATED BEFORE THE RESULT IS QUOTED ANYWHERE
+------------------------------------------------------------
+**The task is built so that every member of a family shares one value.** So
+"group by family" and "know the answer is shared" are close to the same
+statement, and a sceptic is right to say the experiment is partly circular.
+
+What is NOT circular, and is what the 0.91 actually demonstrates:
+
+  - the families are **never labelled**. They are discovered from co-occurrence
+    in a separate stream, by a mechanism that sees nothing else
+  - the value is **redrawn every sequence**, so nothing is memorised across them
+    and no prior can help -- note 047's condition
+  - the model must **store a sibling's fact and retrieve it at the query**, which
+    is the store doing its job through an indirection it was never tested with
+  - `permuted` **fails at matched address count**, so the gain is not the
+    address collapse that explained everything on text
+
+So the honest claim is about the **composition**: discover a grouping, address a
+store by it, and recall through it. All three parts work together, measured, for
+the first time.
+
+**What it does NOT show** is that concept representation solves anything harder
+than *same kind, same answer*. The relation here is identity of value within a
+family, which is the simplest generalisation there is. A task where the answer
+depends on the family AND on something entity-specific would be the next real
+test, and this result says nothing about it.
+
+
+COST
+-----
+12 cells, three seeds, local. About four minutes each.

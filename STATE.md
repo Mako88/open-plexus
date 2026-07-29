@@ -63,16 +63,32 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Does grouping surfaces into concepts let the model answer about something it
-was never told, from what it holds about similar things?**
+**Does concept grouping do anything harder than "same kind, same answer"?**
+
+The previous question — *can grouping answer about something never stated* — is
+**answered yes**, decision 143, and the answer is narrower than its number:
+
+    arm           direct  transfer      chance 0.125
+    ungrouped     0.6583    0.0867
+    concept       0.9967    0.9983
+    permuted      0.2725    0.0658      same sizes, wrong members
+    nostore       0.0000    0.0000
+
+**The composition works** — discover a grouping from co-occurrence, address a
+store by it, recall a sibling's fact through it — and `permuted` failing at
+matched address count means it is the *similarity* paying, not the address
+collapse that explained everything on text (141).
+
+**But `families.py` gives every member of a family one shared value**, so "group
+by family" and "know the answer is shared" are nearly the same statement. The
+result is partly circular and the sweep record says so at length.
+
+**So the next real test is a relation that depends on the family AND on
+something entity-specific**, where knowing the kind is necessary but not
+sufficient. Nothing in decision 143 speaks to it.
 
 Nothing else in this file is a live question. Everything below is either the
 evidence behind that one, a standing agreement, or a refusal.
-
-**Next step:** build [note 048](docs/notes/048-a-task-where-concepts-can-mean-something.md)'s
-task — relational structure *plus designed similarity* — starting with a
-calibration that the families are discoverable at all. g17-01 chose this in July
-and it was never built.
 
 ---
 
@@ -82,6 +98,8 @@ Full records in `experiments/sweeps/`.
 
 **Relational — this is what works:**
 
+    families, TRANSFER, grouped / not         0.998 / 0.087   decision 143
+    families, DIRECT, grouped / not           0.997 / 0.658   decision 143
     MQAR, store on / off                      0.995 / 0.000   decision 142
     2-hop chain, fixed hops=2                 1.000
     3-hop chain, fixed hops=3                 1.000
@@ -129,11 +147,12 @@ beyond that it is extrapolation.
 | `mqar.py` | **the store's control, not history.** The only instrument that isolates the store from a prior — decision 142 |
 | `chains.py` | solved at 1.000, out-degree 1 by construction. A control |
 | `corpus.py` | **PAUSED, not condemned.** Closed by 115/118, reopened by g17-01, and 135–142 measured on it without anyone re-deciding it was the instrument. A text task scored on what the model *holds* is untried |
+| **`families.py`** | **NEW, 2026-07-29.** The only instrument where things RESEMBLE each other, so the only one where a concept can mean something. Calibrated by g19-00, first result decision 143 |
 | `reward_recall.py` | **retired** (decision 126) |
 
-**What none of them have, and it is the gap note 048 exists for:** their entities
-are arbitrary by construction, so nothing resembles anything and a concept has
-nowhere to mean something.
+**The gap note 048 named is now filled by `families.py`** — every other
+instrument's entities are arbitrary by construction, so nothing resembles
+anything and a concept has nowhere to mean something.
 
 **And the standing gap:** everything above is self-designed. **CLUTRR is the only
 external benchmark that would make a number comparable to anyone else's, and it

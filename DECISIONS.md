@@ -4219,3 +4219,71 @@ lower is better, and this one scores accuracy. Corrected in place.
 **Taken without asking**, under standing authorisation. This is the entry that
 says what the text results do and do not mean, and it is the one to read beside
 139 and 141 rather than after them.
+
+## 143. Grouping answers what was never stated — the first result for concepts.py
+
+g19-01 on the `families.py` task, three seeds. **The first measurement in which
+the surface-to-concept indirection pays for itself**, and it is in the frame John
+restated the goal in: understanding rather than prediction.
+
+    arm           direct  transfer   family recovery
+    ungrouped     0.6583    0.0867         --
+    concept       0.9967    0.9983      1.000
+    permuted      0.2725    0.0658      1.000
+    nostore       0.0000    0.0000         --
+    chance                  0.1250
+
+All three of note 048's predictions confirmed. P1 asked for +0.20 on TRANSFER and
+got **+0.9116**.
+
+### What TRANSFER is
+
+An entity whose own fact was **never stated**, whose siblings' were. `ungrouped`
+can only guess and does — 0.087, structurally rather than for want of tuning.
+`concept` shares the store's address across the family, so the sibling's write is
+what a read at this entity returns.
+
+### The control that matters, and it held
+
+`permuted` has the same number of groups and the same group sizes; only the
+membership is wrong. It scores **below** `ungrouped`. On text (decision 141) the
+whole measured gain came from having fewer addresses *however chosen*, and only a
+size-matched control told that apart. **Here it cannot carry the result: the
+similarity has to be the real one.**
+
+And **a wrong concept map is worse than none** — permuted DIRECT 0.273 against
+ungrouped 0.658. Accidental siblings share an address and overwrite each other.
+
+### The tautology, stated before this is quoted anywhere
+
+**The task is built so a family shares one value**, so "group by family" and
+"know the answer is shared" are nearly the same statement. A sceptic is right
+that it is partly circular, and the sweep record says so at length.
+
+What is not circular: the families are **never labelled** (discovered from
+co-occurrence in a separate stream), the value is **redrawn every sequence** so
+no prior can help, the model must **store a sibling's fact and retrieve it**, and
+`permuted` **fails at matched address count**.
+
+So the claim is about the **composition** — discover a grouping, address a store
+by it, recall through it — and all three parts working together is what had never
+been measured.
+
+**It does not show** that concepts solve anything harder than *same kind, same
+answer*. That is the simplest generalisation there is. A task where the answer
+depends on the family **and** on something entity-specific is the next real test,
+and this says nothing about it.
+
+### What it settles about the last two days
+
+Decisions 139–142 found the store contributing nothing on text, and note 047
+explained why: on a next-token objective it can only express an n-gram. **This is
+the same store, the same grouping machinery, and the same `nostore` ablation, on
+a task where the answer is stated rather than distributed — and it goes from
++0.002 bits to +0.91 accuracy.**
+
+The objective was the ceiling. That was an argument on 2026-07-29 morning; it is
+a measurement now.
+
+**Taken without asking**, under standing authorisation and John's *"whatever next
+experiments make sense to continue down that line"*.

@@ -791,11 +791,29 @@ MUTATIONS = [
                "lifted it again ONLY where `hop_relation` builds the pair key "
                "itself. Dropping either clause re-opens it everywhere else",
         path=LOCAL,
-        # RE-POINTED, decision 158. The guard grew a `hop_relation` clause and
-        # this mutation stopped matching -- `--verify` caught it in the same
-        # run, which is the harness doing its job rather than a near miss.
-        old='        if (self.hops > 1 and self.context_keys and self.search_branches < 1\n                and self.hop_relation < 0):',
+        # RE-POINTED TWICE. Decision 158 added the `hop_relation` clause and
+        # decision 162 added `hop_relations`; both times the guard grew and this
+        # mutation stopped matching, and both times `--verify` named it in the
+        # same run. That is the harness doing its job rather than a near miss --
+        # a mutation that cannot be applied is a claim nothing is checking.
+        old='        if (self.hops > 1 and self.context_keys and self.search_branches < 1\n                and self.hop_relation < 0 and not self.hop_relations):',
         new="        if False and self.hops > 1 and self.context_keys:",
+    ),
+    Mutation(
+        name="every-hop-follows-the-FIRST-scheduled-relation",
+        breaks="the entire point of a schedule, and it reverts the model to "
+               "exactly the behaviour decision 162 identified as the blocker: "
+               "one relation per MODEL rather than one per hop. A two-entry "
+               "schedule would walk LINK-then-LINK instead of LINK-then-FACT. "
+               "Nothing about the shape changes -- the same number of reads, the "
+               "same key space, a full set of accuracies -- and the config still "
+               "validates, so the only symptom is that the composition task "
+               "comes back at chance and reads as the mechanism failing rather "
+               "than as the schedule being ignored. That is the wrong "
+               "conclusion decision 162 was written to prevent",
+        path=LOCAL,
+        old="            return self.config.hop_relations[depth]",
+        new="            return self.config.hop_relations[0]",
     ),
     Mutation(
         name="a-hop-decodes-from-the-accumulator",

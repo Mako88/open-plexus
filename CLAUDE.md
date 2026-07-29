@@ -930,6 +930,15 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   python tools/check_duplication.py
   ```
 
+  > *Measured, and correcting a figure this document carried.* The comment in
+  > `checks.yml` said "85 mutations at roughly fifteen seconds each. Sharded it
+  > is about two minutes a job instead of twenty in one." The first full run to
+  > complete — `57d8112`, which finished only because no push superseded it — was
+  > **169 mutations across six shards, 18 to 35 minutes each**, so serial time is
+  > about two and a half hours, not twenty minutes. **All 169 were caught.** The
+  > old figure is the one that would make a local full run look affordable, which
+  > is why it is corrected here rather than annotated.
+
   **`--changed` is NOT in that list any more — mutations run in CI.** John asked
   for this on 2026-07-28: a local `--changed` was costing ten to twenty minutes
   per commit and blocking every experiment while it ran, and `checks.yml`

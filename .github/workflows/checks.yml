@@ -54,8 +54,11 @@ jobs:
         run: python tools/check_architecture.py
 
   # The harness runs one full suite per mutation, so it is serial time and
-  # nothing else — 85 mutations at roughly fifteen seconds each. Sharded it is
-  # about two minutes a job instead of twenty in one.
+  # nothing else. MEASURED on 57d8112, the first full run to complete: 169
+  # mutations, six shards, 18 to 35 minutes each, all caught. Serial that is
+  # about two and a half hours -- the figure here previously said "85 mutations
+  # at fifteen seconds each, two minutes a job", which is what made a local full
+  # run look affordable.
   #
   # It was ALSO being run locally, which was pure duplication and was the thing
   # blocking local work: experiments refuse to run while the source is mutated

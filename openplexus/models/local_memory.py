@@ -1148,6 +1148,34 @@ class LocalMemoryConfig:
     #: Needs a key source that can form a pair (`context_keys`), because a
     #: single key has nowhere to put the relation.
     hop_relation: int = -1
+    #: A relation token **per hop depth**, so hop 1 can follow LINK and hop 2
+    #: FACT. Empty is off and is every number measured before 2026-07-29.
+    #:
+    #: **Decision 162 is what this exists for.** `hop_relation` above is one
+    #: value per MODEL, so a two-hop walk follows LINK-then-LINK or
+    #: FACT-then-FACT and never LINK-then-FACT -- which is exactly the path the
+    #: linked-families task needs:
+    #:
+    #:     key(FACT, entity)   empty -- the gate fires, correctly
+    #:     key(LINK, rep)      -> the linked family's representative   hop 1
+    #:     key(FACT, rep')     -> that family's value                  hop 2
+    #:
+    #: 162 named this as the blocker rather than the relation being *fixed*:
+    #: "even a correct chooser would not help until a hop can carry its own
+    #: relation."
+    #:
+    #: **It is a SCHEDULE, and a schedule the task does not supply is a fitted
+    #: constant wearing a mechanism's clothes** -- 162's own words, and the
+    #: reason this is an instrument for reaching the composition measurement
+    #: rather than a candidate for the final read path. Note 052 §2's
+    #: try-all-and-gate is what replaces it; John's ruling in decision 163 §2 is
+    #: layout first, try-all-and-gate next.
+    #:
+    #: Indexed by hop depth, so entry `i` types the key formed by hop `i`.
+    #: Mutually exclusive with `hop_relation`, needs `context_keys` for the same
+    #: reason, and must be at least `hops` long -- the halting gate reads one
+    #: hop past the last readable one, so `hops - 1 + 1` keys get formed.
+    hop_relations: tuple[int, ...] = ()
     #: Let the content index propose neighbours **at the hop's landing concept**
     #: rather than only at the position's -- ARCHITECTURE row E4, and John's
     #: option B.
@@ -1239,7 +1267,7 @@ class LocalMemoryConfig:
         # `key_source.pair(relation, decoded)` -- so the key space it queries is
         # the one the store writes to, which is the whole objection.
         if (self.hops > 1 and self.context_keys and self.search_branches < 1
-                and self.hop_relation < 0):
+                and self.hop_relation < 0 and not self.hop_relations):
             raise ValueError(
                 "hops re-encode a decoded token through Wk, a SINGLE-TOKEN key "
                 "table, and context_keys makes the store's keys derive from "
@@ -1448,6 +1476,43 @@ class LocalMemoryConfig:
                 "hop_relation needs context_keys: a typed hop reads "
                 "key(relation, concept), and a single key has nowhere to put "
                 "the relation. Decision 157 is the measurement this exists for")
+        if self.hop_relations:
+            if self.hop_relation >= 0:
+                raise ValueError(
+                    "hop_relation and hop_relations are two answers to the same "
+                    "question -- which relation does hop i follow -- and "
+                    "silently preferring one would make the other look "
+                    "connected while doing nothing. Set exactly one: "
+                    "hop_relation for one relation at every depth (decision "
+                    "158), hop_relations for a schedule (decision 162)")
+            if not self.context_keys:
+                raise ValueError(
+                    "hop_relations needs context_keys, for the same reason "
+                    "hop_relation does: a typed hop reads key(relation, "
+                    "concept) and a single key has nowhere to put the relation")
+            if any(relation < 0 for relation in self.hop_relations):
+                raise ValueError(
+                    "every entry in hop_relations must be a relation token. A "
+                    "negative entry would mean one UNTYPED hop inside a typed "
+                    "walk, which queries the single-token key space the store "
+                    "never writes to under context_keys -- measured cosine "
+                    "-0.069 -- and would return noise while still producing a "
+                    "number. That is the refusal above, mid-walk")
+            # A LENGTH CHECK RATHER THAN A FALLBACK, and the reason is that both
+            # available fallbacks are wrong in a way nothing downstream can see.
+            # Reusing the last entry silently turns a 2-entry schedule into
+            # LINK-then-FACT-then-FACT; treating a missing entry as untyped
+            # reintroduces the key-space mismatch above. Either produces a full
+            # set of numbers from a walk nobody specified.
+            if len(self.hop_relations) < self.hops:
+                raise ValueError(
+                    f"hop_relations has {len(self.hop_relations)} entries and "
+                    f"hops is {self.hops}, which needs at least {self.hops}: "
+                    "the walk forms hops - 1 keys, plus one more because the "
+                    "halting gate scores hop k by what hop k + 1 returns. A "
+                    "schedule shorter than the walk has to be extended by a "
+                    "rule, and every such rule changes which relations get "
+                    "followed without saying so")
         if self.memory_cap < 0.0:
             raise ValueError("memory_cap must not be negative")
         if self.capture_slots < 0:
@@ -1880,6 +1945,22 @@ class LocalAssociativeMemory:
         So the reset is explicit and a caller has to mean it.
         """
         self._lasting = None
+
+    def _relation_at(self, depth: int) -> int:
+        """Which relation hop `depth` follows, or -1 for an untyped hop.
+
+        The contract: a caller forming a hop key asks this rather than reading
+        either config field, so the single-relation and scheduled cases cannot
+        drift apart. `depth` is 0-based over the keys the walk forms.
+
+        Decision 162 is why the schedule exists; decision 158 is why the single
+        value does. `__post_init__` refuses both at once and refuses a schedule
+        shorter than the walk, so this needs no fallback -- which is the point,
+        because every available fallback silently changes the walk.
+        """
+        if self.config.hop_relations:
+            return self.config.hop_relations[depth]
+        return self.config.hop_relation
 
     def run(self, tokens: np.ndarray, targets: np.ndarray | None = None,
             scored: np.ndarray | None = None, learn: bool = False,
@@ -2823,7 +2904,12 @@ class LocalAssociativeMemory:
             # One EXTRA retrieval when gating: the gate scores hop k by what hop
             # k+1 returns, so the last readable hop still needs a lookahead.
             extra = 1 if self.halt_w is not None else 0
-            for _ in range(0 if searching else self.config.hops - 1 + extra):
+            # INDEXED, because the relation can now vary with depth -- decision
+            # 162. `depth` counts the keys this loop forms, which is what
+            # `hop_relations` is indexed by and what `__post_init__` sizes
+            # against.
+            for depth in range(0 if searching
+                               else self.config.hops - 1 + extra):
                 # DECODE AND RE-ENCODE, which is how a retrieval becomes a key.
                 #
                 # `retrieved` lives in VALUE space and keys live in KEY space:
@@ -2894,7 +2980,8 @@ class LocalAssociativeMemory:
                 # gradient of confidence, so a wrong first hop is silently
                 # asserted rather than hedged. `hop_sharpness` is the dial
                 # between the two, and high enough approaches argmax.
-                if self.config.hop_relation >= 0:
+                relation = self._relation_at(depth)
+                if relation >= 0:
                     # THE TYPED HOP, ARCHITECTURE row D3.
                     #
                     # The soft mixture is what NAMES the concept -- decision 154
@@ -2911,7 +2998,7 @@ class LocalAssociativeMemory:
                     # rather than hedged, which is exactly what the comment
                     # below warns about for the untyped path.
                     hop_key = self.key_source.pair(
-                        self.config.hop_relation, int(np.argmax(weights)))
+                        relation, int(np.argmax(weights)))
                 else:
                     hop_key = weights @ self.wk
                 fetched = self.retrieval.read(readable, hop_key)
@@ -2935,9 +3022,14 @@ class LocalAssociativeMemory:
                     landed = int(np.argmax(weights))
                     for candidate, _ in self.content.nearest(
                             landed, self.config.index_branches):
-                        if self.config.hop_relation >= 0:
+                        # THE SAME DEPTH'S RELATION. A neighbour is consulted
+                        # because THIS hop's address was empty, so it stands in
+                        # for this hop and must be typed the same way -- reading
+                        # a neighbour under a different relation would answer a
+                        # question nobody asked.
+                        if relation >= 0:
                             near = self.key_source.pair(
-                                self.config.hop_relation, int(candidate))
+                                relation, int(candidate))
                         else:
                             near = self.wk[int(candidate)]
                         if occupied.count(near) > 0.0:

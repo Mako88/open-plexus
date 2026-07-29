@@ -5536,3 +5536,74 @@ principle implies here.** Discrete surfaces is the option under which the
 architecture does *not* change — that was the argument for it. So multimodality
 is additive rather than sweeping, and the decision on this list with real blast
 radius over existing measurements is **§3, not §1.**
+
+## 164. A hop can now carry its own relation, and one seed nearly hid it
+
+Decision 162 named the blocker and declined to build it: `hop_relation` is one
+value per MODEL, so a walk follows LINK-then-LINK or FACT-then-FACT and never
+LINK-then-FACT, which is the path the linked-families task needs. John's ruling
+in decision 163 §2 was layout first, try-all-and-gate next; this is the layout
+version, and it is what the composition task requires rather than an
+optimisation.
+
+**What was built.** `hop_relations` is a tuple indexed by hop depth, mutually
+exclusive with `hop_relation` and off by default, so no earlier number moves. Both
+use sites — the hop key and the dead-end neighbour under `index_at_hops` — go
+through one helper, `_relation_at(depth)`, rather than reading the config twice.
+
+    LINK then FACT      -> LINKED_VALUE   the linked family's value
+    LINK then LINK      -> THIRD          arrives, cannot read the value
+    hop_relation=LINK   -> THIRD          the pre-162 mechanism, its best setting
+
+Stable across seeds 0, 1 and 2. The third row is the claim held as a test rather
+than an argument: the old mechanism reaches the linked family's representative and
+**stops there**, because reading its value needs a different relation.
+
+### The part worth recording, which is how close this came to being an artefact
+
+The first version of the test asserted that the wrong walks do NOT reach
+`LINKED_VALUE`. `hop_relation=FACT` starts at `key(FACT, entity)`, which 162
+describes as empty and the gate firing correctly — so its answer is whatever noise
+decodes to, and **on seed 0 that noise decoded to exactly the right token.** The
+test failed, which is the only reason it was looked at; across seeds 0, 1 and 2 it
+returns OTHER, REP and LINK, so it would have passed or failed by seed.
+
+The fix was not a wider bound. The layout grew a **third family** so that
+`key(LINK, OTHER)` is written too, which gives the LINK-then-LINK walk a
+determinate destination. The discriminating comparison is now positive on both
+sides — same first hop, different second hop, two different named tokens — and
+`hop_relation=FACT` is deliberately **not** asserted on, because asserting on
+noise is what this rewrite removed.
+
+> This is CLAUDE.md rule 10's "bounds so wide they admit the broken case" arriving
+> from the other direction: an assertion narrow enough to be right and resting on
+> a draw. The tell was that the *predicted* outcome and the *guaranteed* outcome
+> were the same sentence.
+
+### What is deliberately NOT claimed
+
+**The relation is still fixed, not chosen.** A schedule is a fitted constant
+wearing a mechanism's clothes unless the task supplies it — 162's own words, and
+they apply to this entry. `hop_relations` is the instrument that makes the
+composition measurement *reachable*; it is not a candidate for the final read
+path. Note 052 §2's try-all-and-gate is, and decision 163 §2 has the ordering.
+
+**No task number.** The LINKED run is now unblocked and has not been run.
+
+### How to undo it
+
+Remove the field, the helper's first branch, and `tests/test_hop_schedule.py`.
+`hop_relation` is untouched and every pre-2026-07-29 number is measured with both
+off. `tools/mutate.py` carries
+`every-hop-follows-the-FIRST-scheduled-relation`, which reverts the depth index
+and is caught.
+
+### And a documented claim that measurement contradicts
+
+CLAUDE.md said the mutation harness is "85 mutations at roughly fifteen seconds
+each. Sharded it is about two minutes a job instead of twenty in one." The full
+run on `57d8112` — the first to complete, because nothing superseded it — was
+**169 mutations across six shards taking 18 to 35 minutes each**, so serial time
+is about two and a half hours rather than twenty minutes. All 169 were caught.
+Rule 5: the document is corrected rather than softened. It matters practically,
+because the old figure is what would make a local full run look affordable.

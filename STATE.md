@@ -85,22 +85,18 @@ Every task, every accuracy number and the whole scoring convention assume one
 answer token. Whatever is chosen, the existing tasks stay valid as capability
 probes and stop being measurements of the goal.
 
-### Parked, with its blocker named: can a hop carry its own relation?
-
-`hop_relation` is one value per MODEL, so a chain follows LINK-then-LINK or
-FACT-then-FACT and never LINK-then-FACT — exactly what the linked-families path
-needs (162). Small in code, large in implication: "which relation at which depth"
-is a **schedule**, and a fixed schedule is a fitted constant unless the task
-supplies it. **This blocks the LINKED run, not the gates.**
-
 ### Where the mechanisms stand
 
 **Every one works in isolation with a unit test. Not one has a task number.**
 That is the state, not a hedge — 148 the gate chooses exactly (1.0000/0.0000),
 157 typed writes stop the collision, 158 a hop follows a named edge, 159 the
 index proposes at a dead end for 1 extra read against an ungated 56, 161
-`inherit` is read-gated and 148 still reproduces to four decimals. **157's LINKED
-column at 0.1275 is the number to move**, and 162 names what is missing.
+`inherit` is read-gated and 148 still reproduces to four decimals, **164 a walk
+follows LINK-then-FACT** where one relation stops at the representative.
+**157's LINKED column at 0.1275 is the number to move, and 164 removed the last
+thing blocking the run.** The relation is still fixed rather than chosen: a
+schedule the task does not supply is a fitted constant (162), which is why 164 is
+an instrument for reaching the measurement and not the final read path.
 
 ### The rail this project does not have
 

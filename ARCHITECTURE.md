@@ -77,7 +77,7 @@ verified
 |---|---|---|---|
 | D1 | Store a typed edge `(subject, relation) → object` | **PARTIAL** | `PairKeys` does exactly this and kinship uses it; decision 100 measured mis-keying at 0.020 vs 0.713. But nothing **chooses** the relation — it is whatever the layout supplies |
 | D2 | Keep two edge types about one subject apart | **PASSING** | **157**: with pair keys every column returns to within 0.05 of its link-free value (0.8333 / 0.4383 / 0.8150), where untyped they collapsed to 0.13 / 0.03 / 0.12. 156 had already ruled out capacity, leaving addressing as the only candidate |
-| D3 | Follow *a specific* relation when reading | **PARTIAL** | **158**: `hop_relation` builds `key(relation, concept)` and `tests/test_typed_hop.py` shows the same sequence at the same position returning THROUGH_IS_A or THROUGH_HAS_A by which relation the hop carries — impossible untyped, where both edges share one address. **The relation is fixed, not chosen**, and 157's LINKED column (0.1275 vs chance 0.125) is still unmoved because the task is not wired to it |
+| D3 | Follow *a specific* relation when reading | **PARTIAL** | **158**: `hop_relation` builds `key(relation, concept)` and `tests/test_typed_hop.py` shows the same sequence at the same position returning THROUGH_IS_A or THROUGH_HAS_A by which relation the hop carries — impossible untyped, where both edges share one address. **164**: `hop_relations` makes it one relation PER HOP, so a walk follows LINK-then-FACT — `tests/test_hop_schedule.py` reaches the linked family's value where the same walk under one relation stops at its representative, stable across three seeds. **The relation is still fixed, not chosen**: a schedule the task does not supply is a fitted constant (162), and 157's LINKED column (0.1275 vs chance 0.125) is unmoved until the task is wired to it |
 
 **Depends on:** A1, A3, A4 (typing multiplies distinct addresses, so D costs A4).
 
@@ -88,7 +88,7 @@ verified
 | E1 | Follow a chain of the same relation | **CLAIMED** | decision 92 measured the hop generalising to unseen depths zero-shot. Not re-verified here |
 | E2 | Compose relations that combine by rule | **PARTIAL** | kinship 2-hop 0.443 against 1-hop 0.777. Real but weak |
 | E3 | Know when to stop hopping | **CLAIMED** | `halt_gate`, learned. 153 showed occupancy cannot supply this for free |
-| E4 | Combine composition with C1's gate | **PARTIAL** | **159**: `index_at_hops` proposes neighbours at the hop's landing concept, gated on emptiness. `tests/test_index_at_hops.py` shows a chain reaching an answer through a dead end it could not reach without, and the fan-out costing 1 extra read where an ungated one would cost 56. **Mechanism only** — no task result yet, **161** unblocked combining it with `inherit`; **162**: the LINKED run still needs a hop to carry its OWN relation (LINK then FACT), and `hop_relation` is one value per model |
+| E4 | Combine composition with C1's gate | **PARTIAL** | **159**: `index_at_hops` proposes neighbours at the hop's landing concept, gated on emptiness. `tests/test_index_at_hops.py` shows a chain reaching an answer through a dead end it could not reach without, and the fan-out costing 1 extra read where an ungated one would cost 56. **Mechanism only** — no task result yet, **161** unblocked combining it with `inherit`; **162**: the LINKED run needed a hop to carry its OWN relation (LINK then FACT), which **164** built as `hop_relations`. The mechanism gap is closed; the task is still not wired to it |
 
 **Depends on:** A1, D. **E4 depends on:** C1, D3.
 

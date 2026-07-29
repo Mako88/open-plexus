@@ -1,0 +1,122 @@
+Can the store contribute a single positive bit at word level?
+=============================================================
+
+Script: experiments/g18_01_does_storing_by_concept_make_words_learnable.py
+        (`--keys`, `--width`, `--lr`, arms `floor` and `nostore`)
+Run:    30430499110, 24 of 24 cells, ~4 min wall.
+
+ANSWER: **NO, ANYWHERE MEASURED.** Three learning rates, two widths and two key
+        schemes. The store never earns a bit; addressed as a bigram it costs
+        0.68.
+
+
+MEASURED ON
+------------
+Tiny Shakespeare, WORD level via `corpus.words`, min_count 10, vocabulary 1733,
+90,000 training words, held-out tail for test. `derived_keys`, readout bias ON,
+cap 5.0, decay 1.0, one epoch, chunk 256, one seed. Bits per word, temperature
+fitted on held-out TRAINING text and the rate chosen the same way.
+
+`nostore` writes nothing at all, so every retrieval is zero, `Wo` receives a
+delta proportional to zero and never moves, and the logits are the learned bias
+alone.
+
+
+PREDICTIONS (registered before the run, in the workflow)
+---------------------------------------------------------
+Three rather than five, which is John's steer of 2026-07-29 applied to the first
+sweep written after it: keep the gate, the rail and the falsifier.
+
+  P1  THE GATE. Some cell beats its matched `nostore` by more than 0.10 bits.
+  P2  THE RAIL. `nostore` is flat in width and key scheme; it has no store.
+  P3  THE FALSIFIER. Single keys at width 512 do NOT reach the bigram at 7.848.
+
+SCORED: P1 REFUTED. P2 CONFIRMED. P3 CONFIRMED.
+
+
+THE TABLE
+----------
+Bits per word on TEST text:
+
+    arm                       5e-05     5e-06     5e-07
+    pair   d128 floor         9.217     9.185     9.218
+    pair   d128 nostore       9.213     9.187     9.221
+    pair   d512 floor         9.214     9.184     9.217
+    pair   d512 nostore       9.213     9.187     9.221
+    single d128 floor        10.290     9.904     9.778
+    single d128 nostore       9.213     9.187     9.221
+    single d512 floor        10.308     9.921     9.869
+    single d512 nostore       9.213     9.187     9.221
+
+    word bigram    7.848        word unigram   8.068      uniform  10.759
+
+Each arm against its OWN matched ablation, at the rate chosen on held-out
+training text:
+
+    pair   d128    store 9.185 against nostore 9.187    +0.002
+    pair   d512    store 9.184 against nostore 9.187    +0.002
+    single d128    store 9.778 against nostore 9.187    -0.591
+    single d512    store 9.869 against nostore 9.187    -0.682
+
+
+WHAT THE THREE AXES EACH KILLED
+--------------------------------
+**The learning rate is not it.** Three rates spanning two orders of magnitude,
+and the best any store-bearing arm manages is +0.002 -- noise.
+
+**The width is not it.** Quadrupling the store from 128 to 512 moves the pair
+arm by 0.001 bits. "The store is too small to hold anything useful" is refuted
+as flatly as the rest: a store four times the size holds four times nothing.
+
+**And the key scheme is not it, in the direction that matters most.** Single
+keys make the store a BIGRAM in vector form -- note 033's ceiling, and here the
+ceiling was the target, because a word bigram at 7.848 beats the bias-only model
+by 1.34 bits. Addressed exactly the way a bigram is addressed, with a brake that
+keeps it stable, **the store is 0.68 bits WORSE than not existing.**
+
+So the problem is not that the store is addressed badly. It is that whatever the
+store retrieves, the readout cannot turn into a better prediction than the prior
+it already has -- and mixing it in costs accuracy.
+
+
+THE RAIL IS WHY THIS IS READABLE
+---------------------------------
+`nostore` returns 9.213 / 9.187 / 9.221 at the three rates and is IDENTICAL to
+three decimals across both widths and both key schemes -- spread 0.000. It has no
+store, so nothing about the store should move it, and nothing does. Every
+comparison above is against a baseline that is demonstrably measuring the bias
+and only the bias.
+
+
+WHAT THIS DOES NOT SAY
+-----------------------
+**Not that the store is useless generally.** MQAR, the kinship line and the
+relational tasks are all solved through it, and those are what it was built for.
+
+**Not that character level is affected.** That is the next question rather than
+an assumption -- see below.
+
+**Not that word-level text is impossible for this architecture.** It says the
+current store contributes nothing to it, which is a statement about the store's
+contribution and not about the ceiling.
+
+
+WHAT IT OPENS, AND IT IS THE SHARPEST QUESTION LEFT
+-----------------------------------------------------
+**Has the store ever contributed anything on TEXT at all?**
+
+At character level the model reaches 5.17 bits against a 6.00 uniform, and that
+looks like the store working. But every character-level run had `readout_bias`
+OFF -- so the store's contribution there was never measured against a model that
+could express a prior, and `Wo` can carry a prior by itself.
+
+If a character-level `nostore` with the bias on lands near 5.17, then the store
+has never contributed on text and the entire text line has been measuring a
+learned prior. That is a bigger claim than anything here and it is one run away.
+
+
+COST
+-----
+24 cells, one per job, ~4 minutes wall. Plus one local cell that predicted the
+single-key result before dispatch (9.904 at d128, lr 5e-6 -- reproduced exactly
+by cell `single d128 5e-06`).

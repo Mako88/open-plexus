@@ -113,7 +113,8 @@ from openplexus.keys import ByConcept  # noqa: E402
 from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
 from openplexus.ngram import NGram  # noqa: E402
-from openplexus.tasks.corpus import build_stream, words  # noqa: E402
+from openplexus.tasks.corpus import (  # noqa: E402
+    build_stream, characters, words)
 
 WIDTH = 128
 CONTENT_WIDTH = 256
@@ -183,10 +184,36 @@ POWER = 0.5
 TEMPERATURES = tuple(np.exp(np.linspace(np.log(1e-4), np.log(20.0), 60)))
 
 
-def corpus():
+def min_count_for(units: str) -> int:
+    """The rarity threshold for a unit, defined ONCE.
+
+    20 for characters -- `corpus.MIN_COUNT`, and what every character-level
+    number in this project used -- and 10 for words. Shared between the corpus
+    and the condition string so a record cannot say `min10` for a run that used
+    20, which it did until this existed.
+    """
+    return MIN_COUNT if units == "words" else 20
+
+
+def corpus(units: str = "words"):
+    """The stream, at whichever unit.
+
+    **Characters are here for one question and it is not this script's.**
+    Decision 137: at character level the model reaches 5.17 against a 6.00
+    uniform and that looks like the store working, but every character-level run
+    had `readout_bias` OFF -- so the store's contribution there was never
+    measured against a model that could express a prior. The same `nostore` arm,
+    at the same unit, is what settles it, and running it through this harness
+    means the calibration procedure and the bars are the ones already in use
+    rather than a second implementation.
+
+    `min_count` follows the unit: 20 for characters, which is `corpus.MIN_COUNT`
+    and what every character-level number used, and 10 for words.
+    """
     text = (Path(__file__).resolve().parent.parent
             / "data" / "tinyshakespeare.txt").read_text(encoding="utf-8")
-    return build_stream(text, test_share=0.1, min_count=MIN_COUNT, units=words)
+    return build_stream(text, test_share=0.1, min_count=min_count_for(units),
+                        units=words if units == "words" else characters)
 
 
 def pieces(documents, chunk: int) -> list:
@@ -365,9 +392,10 @@ def counting_bars(vocab: int, stream: np.ndarray, chunks) -> tuple[float, float]
 
 def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
              decay: float = 1.0, cap: float = 5.0, lr: float = 0.05,
-             keys: str = "pair", width: int = WIDTH) -> dict:
+             keys: str = "pair", width: int = WIDTH,
+             units: str = "words") -> dict:
     started = time.time()
-    built = built or corpus()
+    built = built or corpus(units)
     stream = built.train[0][:TRAIN_WORDS]
     surfaces, index = surfaces_for(kind, k, built.vocab_size, stream, seed)
     model = LocalAssociativeMemory(LocalMemoryConfig(
@@ -436,6 +464,7 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
         arm=f"{kind}-{k}" if kind != "floor" else "floor",
         kind=kind, groups=k, seed=seed, bias=bias,
         decay=decay, cap=cap, lr=lr, coordinates=coordinates, keys=keys,
+        units=units,
         diverged=bool(diverged),
         unstable=unstable,
         error=error,
@@ -464,8 +493,13 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
         seconds=round(time.time() - started, 1),
         condition=f"{kind}{k if kind != 'floor' else ''}"
                   f"|bias{int(bias)}|decay{decay}|cap{cap}|lr{lr}|{keys}"
-                  f"|d{width}|seed{seed}"
-                  f"|power{POWER}|min{MIN_COUNT}|epochs{EPOCHS}")
+                  f"|{units}|d{width}|seed{seed}"
+                  # The ACTUAL threshold, not the module constant. Characters
+                  # use 20 and words 10, and a condition string that says
+                  # `min10` for a run that used 20 is a mislabelled record --
+                  # which is the class of defect decisions 135 and 118 are both
+                  # about.
+                  f"|power{POWER}|min{min_count_for(units)}|epochs{EPOCHS}")
 
 
 def calibrate() -> None:
@@ -528,6 +562,11 @@ def main() -> int:
                              "'the store is too small to hold anything useful' "
                              "are different findings and only one is about the "
                              "architecture")
+    parser.add_argument("--units", choices=("words", "characters"),
+                        default="words",
+                        help="characters is decision 137's open question: the "
+                             "store LOOKS like it works there, and it was never "
+                             "measured against a model with a prior")
     parser.add_argument("--keys", choices=("pair", "single"), default="pair",
                         help="pair keys address (t-1, t); single keys address "
                              "the previous token alone, which makes the store "
@@ -553,7 +592,7 @@ def main() -> int:
     kinds = (args.arm,) if args.arm else ("floor",) + KINDS
     biases = (bool(args.bias),) if args.bias is not None else BIASES
     sizes = (args.groups,) if args.groups is not None else GROUPS
-    built = corpus()
+    built = corpus(args.units)
     records = []
     for seed in seeds:
         for bias in biases:
@@ -567,7 +606,7 @@ def main() -> int:
                     record = one_cell(kind, k, seed, built, bias=bias,
                                       decay=args.decay, cap=args.cap,
                                       lr=args.lr, keys=args.keys,
-                                      width=args.width)
+                                      width=args.width, units=args.units)
                     print(f"  {record['condition']:52s} "
                           f"bits {record['error']:.4f}  "
                           f"addresses {record['addresses']}"

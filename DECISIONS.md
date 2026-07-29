@@ -3808,3 +3808,68 @@ a better address — it is finding out what the store is for.
 **Taken without asking**, under standing authorisation, at 06:0x on 2026-07-29
 with John asleep. Nothing is retracted: g18-00's record carries every figure, and
 the prediction it refuted is scored in place rather than rewritten.
+
+## 137. Three axes, none of them it — and g18-01 is withdrawn before dispatch
+
+g18-02, 24 of 24 cells, run 30430499110. **The gate is refuted and the
+falsifier holds.** Each arm against its own matched ablation, at the rate chosen
+on held-out training text:
+
+    pair   d128    store 9.185 against nostore 9.187    +0.002
+    pair   d512    store 9.184 against nostore 9.187    +0.002
+    single d128    store 9.778 against nostore 9.187    -0.591
+    single d512    store 9.869 against nostore 9.187    -0.682
+
+**The learning rate is not it** — three rates over two orders of magnitude, best
+gain +0.002. **The width is not it** — quadrupling the store moves the pair arm
+0.001 bits, so "too small to hold anything useful" is refuted as flatly as the
+rest. **And the key scheme is not it in the direction that mattered most:**
+single keys make the store a bigram in vector form, a word bigram beats the
+bias-only model by 1.34 bits, and addressed exactly that way the store is **0.68
+bits worse than not existing.**
+
+**The rail is what makes it readable.** `nostore` is identical to three decimals
+across both widths and both key schemes — spread 0.000. It has no store, nothing
+about the store should move it, and nothing does.
+
+### So the problem is not the address
+
+Note 042's account, note 045's index, and the whole concept-addressing line rest
+on the store being addressed badly. Three axes say it is not addressed badly; it
+is that whatever the store retrieves, the readout cannot turn into a better
+prediction than the prior it already has — and mixing it in costs accuracy.
+
+### g18-01 is WITHDRAWN before dispatch, and that is the point of the sequencing
+
+It was written, checked, pre-registered and settled at lr 5e-6 / cap 5.0: 128
+cells over the whole K axis, three seeds and both controls.
+
+**It is not being run.** Its gate asks whether some grouping beats the floor by
+0.10 bits. The floor is an inert store, the groupings were already measured at or
+behind it at K=128 in five ways, and g18-02 says no width, rate or key scheme
+makes the store contribute at all. Spending 128 cells would measure *how much
+each grouping harms a component that does nothing*, which is not a finding
+anybody needs.
+
+This is decision 112's move — a sweep withdrawn after reading, before dispatch —
+and g17-01's, which was calibrated and never sent. The scripts and the workflow
+stay in the tree so the decision is reversible by anyone who thinks the K axis
+still says something.
+
+### The question that replaces it
+
+**Has the store ever contributed anything on TEXT at all?**
+
+At character level the model reaches 5.17 against a 6.00 uniform and that looks
+like the store working. But **every character-level run had `readout_bias` off**,
+so the store's contribution there was never measured against a model that could
+express a prior — and `Wo` can carry a prior by itself.
+
+If a character-level `nostore` with the bias on lands near 5.17, the store has
+never contributed on text and the entire text line has been measuring a learned
+prior. That is a larger claim than anything here, it is one run away, and it is
+g18-03.
+
+**Taken without asking**, under standing authorisation, with John asleep. The
+withdrawal of g18-01 is the decision he would most likely want a say in, so it is
+stated first in STATE and is trivially reversible.

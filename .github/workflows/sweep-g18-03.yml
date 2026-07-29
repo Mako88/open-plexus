@@ -1,0 +1,129 @@
+name: sweep-g18-03-has-the-store-ever-contributed-anything-on-text
+
+# THE QUESTION DECISION 137 LEFT, AND IT IS THE LARGEST ONE THIS LINE HAS ASKED.
+#
+# At WORD level the store contributes nothing: three learning rates, two widths
+# and two key schemes, best gain +0.002 against its own no-store ablation, and
+# -0.68 when addressed as a bigram (g18-02, decision 137).
+#
+# At CHARACTER level the model reaches 5.17 against a 6.00 uniform, and that
+# looks like the store working. **But every character-level run in this project
+# had `readout_bias` OFF.** So the store's contribution there was never measured
+# against a model that can express a prior -- and `Wo`, a vocab x d linear map,
+# can carry a prior by itself.
+#
+#     if character-level `nostore` with the bias ON lands near the floor,
+#     THE STORE HAS NEVER CONTRIBUTED ON TEXT,
+#     and the whole text line has been measuring a learned prior.
+#
+# That is a bigger claim than anything in g18-00 or g18-02, and it is one run
+# away. It is also the claim most likely to be WRONG in an interesting way: at
+# 65 symbols a bigram is a genuinely strong model and the store may well be
+# carrying it.
+#
+# BOTH UNITS IN ONE MATRIX, so the comparison is within one harness, one
+# calibration procedure and one set of bars rather than across two scripts.
+#
+# THE BIAS IS AN AXIS rather than a default, because `bias 0` is the
+# configuration every character-level number in the comparison set was measured
+# with. A `nostore` arm at `bias 0` has no store AND no prior, so it should sit
+# at uniform -- which is the second rail.
+#
+# PREDICTIONS (three: a gate, a rail, a falsifier)
+#
+#   P1  THE GATE. At character level with the bias ON, `floor` beats `nostore`
+#       by more than 0.30 bits. That is the store contributing on text, and it
+#       is what every character-level result has been assumed to show.
+#   P2  THE RAIL. At `bias 0`, `nostore` sits within 0.05 of uniform (6.00 at
+#       this vocabulary). It has no store and no prior, so it has nothing to
+#       predict with; if it scores better than that, something else is learning
+#       and every ablation in this line is misattributed.
+#   P3  THE FALSIFIER. Character-level `floor` with the bias ON does NOT reach
+#       the character bigram. Reaching it would mean the store does at character
+#       level exactly what it refused to do at word level, and the difference
+#       between the two units becomes the whole question.
+#
+# WHAT WOULD BE THE LARGEST RESULT: P1 refuted. The store would have contributed
+# nothing on text at either unit, and every text number this project has is a
+# statement about a linear readout.
+#
+# COST: 24 cells, one per job, ~2-4 min each. Both units, both biases, three
+# rates, floor and nostore.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweep
+  cancel-in-progress: false
+
+jobs:
+  units:
+    strategy:
+      fail-fast: false
+      matrix:
+        units: [characters, words]
+        arm: [floor, nostore]
+        bias: ["0", "1"]
+        # Bracketing the rate settled for words. Characters are a different unit
+        # with a different logit scale, so inheriting one rate would be note
+        # 046's mistake a third time.
+        lr: ["0.005", "0.00005", "0.000005"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - name: ${{ matrix.units }}, ${{ matrix.arm }}, bias ${{ matrix.bias }}, lr ${{ matrix.lr }}
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python experiments/g18_01_does_storing_by_concept_make_words_learnable.py \
+            --seed 0 --arm ${{ matrix.arm }} --groups 128 \
+            --units ${{ matrix.units }} --keys pair --width 128 \
+            --bias ${{ matrix.bias }} --cap 5.0 --decay 1.0 \
+            --lr ${{ matrix.lr }} \
+            --json out/${{ matrix.units }}-${{ matrix.arm }}-b${{ matrix.bias }}-${{ matrix.lr }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g18-03-${{ matrix.units }}-${{ matrix.arm }}-b${{ matrix.bias }}-${{ matrix.lr }}
+          path: out/*.json
+
+  aggregate:
+    needs: [units]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g18-03-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 24" | tee summary.txt
+          python -m tools.summarise_g18_03 | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g18-03-summary
+          path: |
+            summary.txt
+            out/*.json

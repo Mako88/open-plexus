@@ -158,15 +158,77 @@ mistake one more time.
 and reaches 5.17 against a 6.00 uniform, so it is doing something there. This is
 word level, width 128, pair keys, one epoch, one seed.
 
-### What is dispatchable right now
+### g18-02 answered it: three axes, none of them it — decision 137
 
-| run | asks | state |
-|---|---|---|
-| **g18-02** | can the store contribute a positive bit at all — single keys, width, rate | **the one that matters.** A gate, a rail, a falsifier |
-| **g18-01** | the K axis, three seeds, both controls | the pre-registered sweep, now a *verdict* run: its gate already fails at K=128 in five ways |
+24 of 24 cells,
+[run 30430499110](https://github.com/Mako88/open-plexus/actions/runs/30430499110).
+Each arm against its OWN matched ablation, at the rate chosen on held-out
+training text:
 
-Both are written, checked and dispatch-only. g18-01 carries `nostore` as an arm
-so no word-level table can be read without the ablation beside it.
+    pair   d128    store 9.185 against nostore 9.187    +0.002
+    pair   d512    store 9.184 against nostore 9.187    +0.002
+    single d128    store 9.778 against nostore 9.187    -0.591
+    single d512    store 9.869 against nostore 9.187    -0.682
+
+- **The rate is not it** — three rates over two orders of magnitude, best +0.002.
+- **The width is not it** — quadrupling the store moves it 0.001 bits. "Too
+  small to hold anything useful" dies with the rest.
+- **The key scheme is not it, in the direction that mattered most.** Single keys
+  make the store a bigram in vector form, and a word bigram beats the bias-only
+  model by 1.34 bits. Addressed exactly that way, **the store is 0.68 bits worse
+  than not existing.**
+
+**The rail holds:** `nostore` is identical to three decimals across both widths
+and both key schemes — spread 0.000.
+
+> **So the problem is not the address.** Whatever the store retrieves, the
+> readout cannot turn it into a better prediction than the prior it already has,
+> and mixing it in costs accuracy.
+
+### ⇒ g18-01 is WITHDRAWN before dispatch — reverse this if you disagree
+
+Written, checked, pre-registered, settled at lr 5e-6 / cap 5.0: 128 cells over
+the whole K axis, three seeds, both controls. **Not run.** Its gate asks whether
+some grouping beats the floor; the floor is an inert store, the groupings are
+already behind it at K=128 in five ways, and g18-02 says nothing makes the store
+contribute at all. It would measure how much each grouping harms a component
+that does nothing.
+
+Decision 112's move, and g17-01's. **The script and workflow stay in the tree**,
+so this is one `gh workflow run` to reverse.
+
+### ⇒⇒ AND THE FIRST CHARACTER-LEVEL ABLATION SAYS 5.188
+
+**One cell, and it is the most alarming number in this file.**
+
+    the project's best text result ever      5.172   g11-07, eighteen compositions
+    NO STORE AT ALL, bias on, one arm        5.188   measured 2026-07-29
+    character unigram                        4.852   still beaten by neither
+    uniform                                  6.000
+
+A model with **no memory whatsoever** lands within 0.016 bits of the best result
+this project has ever recorded on text.
+
+**It is not yet a like-for-like comparison and must not be quoted as one.**
+5.172 was measured at a different width, over more data, with the bias OFF and
+eighteen arms composed. 5.188 is width 128, 90,000 characters, one epoch, one
+seed, bias ON. The comparison that settles it is `floor` against `nostore` at
+*identical* settings, which is the whole design of g18-03.
+
+> If it holds, **the store has never contributed anything on text at either
+> unit**, and every text number this project holds is a statement about a linear
+> readout rather than about the memory.
+
+**g18-03 is written, checked and dispatch-only**: both units × both bias
+settings × three rates × `{floor, nostore}`, 24 cells. Its gate is that
+character-level `floor` beats `nostore` by more than 0.30 bits with the bias on.
+Its rail is that an unbiased storeless model sits at uniform, because a model
+with neither a store nor a prior has nothing to predict with.
+
+**Why this was not caught earlier:** the ablation was never run. `readout_bias`
+has been off by default since it was added, so no character-level result was ever
+compared against a model that could express a prior — and there was no arm that
+removed the store while keeping everything else.
 
 ### Store by CONCEPT, not by surface — the line this became
 

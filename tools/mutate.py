@@ -802,6 +802,21 @@ MUTATIONS = [
         new="        if False and self.hops > 1 and self.context_keys:",
     ),
     Mutation(
+        name="the-cliff-rule-takes-the-SMALLEST-gap",
+        breaks="the one thing that makes the answer's size unfitted. The rule "
+               "still reads the index, still derives a count from data, still "
+               "returns a plausible set -- it just cuts where the ranking is "
+               "FLATTEST instead of where it falls off, which on families means "
+               "stopping inside the family after one or two siblings. So recall "
+               "collapses while PRECISION STAYS PERFECT, and precision is the "
+               "column decision 167 taught us to watch. Decision 171's whole "
+               "claim is that an argmax over gaps replaces a fitted constant; "
+               "reversing the argmax keeps the shape and loses the content",
+        path=LOCAL,
+        old="        keep = max(range(len(gaps)), key=gaps.__getitem__) + 1",
+        new="        keep = min(range(len(gaps)), key=gaps.__getitem__) + 1",
+    ),
+    Mutation(
         name="the-set-answer-emits-every-candidate",
         breaks="the only thing making a set answer precise. An address that was "
                "never written still returns a vector, and that vector still "

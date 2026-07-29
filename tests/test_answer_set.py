@@ -59,7 +59,7 @@ def fitted(cfg: FamilyConfig, seed: int) -> LocalAssociativeMemory:
     return model
 
 
-def measure(family_size: int, branches: int):
+def measure(family_size: int, branches: int | None, look: int = 8):
     scores = []
     for seed in SEEDS:
         cfg = task(family_size, seed)
@@ -70,7 +70,8 @@ def measure(family_size: int, branches: int):
                                    sequence.answer_sets):
             entity = sequence.tokens[position]
             scores.append(score_one(
-                model.answer_set(families.FACT, entity, branches), truth))
+                model.answer_set(families.FACT, entity, branches=branches,
+                                 look=look), truth))
     return summarise(scores)
 
 
@@ -156,6 +157,57 @@ class TheEnumerationBoundIsFitted(unittest.TestCase):
                 too_many = measure(family_size, family_size + 2)
                 self.assertGreater(matched.exact, too_many.exact)
                 self.assertGreater(matched.mean_f1, too_many.mean_f1)
+
+
+class TheGapRuleChoosesTheCountItself(unittest.TestCase):
+    """Decision 171. The answer's size stops being supplied."""
+
+    def test_it_matches_the_best_fixed_setting_without_being_told_the_size(self):
+        # THE CLAIM. Decision 167's peak required `branches = family_size - 1`,
+        # which the model is not told. The gap rule reaches the same number from
+        # the index's ranked cosines alone.
+        for family_size in (3, 4, 5):
+            with self.subTest(family_size=family_size):
+                gap = measure(family_size, branches=None)
+                best = measure(family_size, branches=family_size - 1)
+                self.assertAlmostEqual(gap.exact, best.exact, places=6)
+                self.assertGreaterEqual(gap.exact, 0.9)
+
+    def test_no_single_fixed_value_can_do_that(self):
+        # THE COMPANION, and without it the test above proves nothing: if some
+        # fixed number happened to work everywhere, the gap rule would be
+        # unnecessary rather than right. `branches=3` is correct at family_size 4
+        # and wrong at 6.
+        self.assertGreaterEqual(measure(4, branches=3).exact, 0.9)
+        self.assertLess(measure(6, branches=3).exact, 0.9)
+
+    def test_look_is_a_CEILING_and_being_generous_is_free(self):
+        # `look` is still a constant, so the honest claim is not "nothing is
+        # fitted" -- it is that the exact value stopped mattering. Doubling it
+        # twice must change nothing, where decision 167's `branches` collapsed
+        # from 1.000 to 0.083 two steps past its peak.
+        wide = [measure(4, branches=None, look=n).exact for n in (6, 12)]
+        self.assertEqual(wide[0], wide[1])
+        self.assertGreaterEqual(wide[0], 0.9)
+
+    def test_and_a_ceiling_BELOW_the_group_still_hurts(self):
+        # THE BOUNDARY, stated rather than glossed. `look` has to exceed the
+        # group: at family_size 6 the answer needs five neighbours, and looking at
+        # four cannot find them. Measured 0.500 against 0.917.
+        tight = measure(6, branches=None, look=4)
+        roomy = measure(6, branches=None, look=8)
+        self.assertLess(tight.exact, roomy.exact)
+
+    def test_the_helper_stops_at_the_cliff(self):
+        # At the seam rather than end to end. Siblings sit at cosine 0.947-0.970
+        # and strangers at 0.438-0.585, so the boundary is where the ranking falls
+        # off and the helper should return exactly the family.
+        cfg = task(4, 0)
+        model = fitted(cfg, 0)
+        for family in cfg.families():
+            for entity in family:
+                chosen = model._cliff_candidates(entity, 8)
+                self.assertEqual(sorted(chosen), sorted(family))
 
 
 class ItRefusesWhatCannotWork(unittest.TestCase):

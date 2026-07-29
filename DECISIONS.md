@@ -313,8 +313,9 @@ lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
   average rather than select and 147 refuted the ways to choose — and **neither
   objection applies to a set answer, because nothing has to be selected.** The
   refutation was about the question.
-- ✅ **Bound the enumeration by the biggest similarity gap** *(uncommitted at time
-  of writing)* — an argmax over gaps, not a threshold, the same move `148` made.
+- ✅ **Bound the enumeration by the biggest similarity gap** — an argmax over gaps,
+  not a threshold, which is the same move `148` made when it replaced a tuned
+  membership bar with a structurally-zero read.
   - matches the best fixed `branches` at family sizes 3/4/5/6 **without being told
     the size**, where no single fixed value works across sizes
   - `look` becomes a **ceiling** rather than a target: flat from 6 to 16, but 0.500

@@ -3355,8 +3355,40 @@ class LocalAssociativeMemory:
         self._final = memory if lasting is None else memory + lasting
         return predictions
 
+    def _cliff_candidates(self, entity: int, look: int) -> list[int]:
+        """The entity and the neighbours before the biggest similarity drop.
+
+        The contract: returns `entity` followed by however many of its nearest
+        neighbours sit above the largest gap in the index's ranked cosines.
+
+        **This replaces a fitted count with an argmax over gaps**, which is the
+        same move decision 148 made when it replaced a tuned membership threshold
+        with a structurally-zero read. Nothing here is compared against a
+        constant: the rule asks where the ranking falls off, not whether a
+        similarity clears a bar.
+
+        `look` is a CEILING, not a target, and that distinction is the whole
+        improvement over `branches`. Being generous costs nothing — extra
+        candidates sit below the cliff and are cut — where `branches` had to be
+        exactly right and destroyed the answer when it was off by one
+        (decision 167). It still has to EXCEED the group, so it is not free.
+
+        Measured on `families.py`: siblings sit at cosine 0.947–0.970 and
+        strangers at 0.438–0.585, so the gap at the boundary is ~0.45 against
+        within-family steps of ~0.01. **That margin is a property of a task
+        calibrated to make families recoverable**, and a noisier grouping narrows
+        it. This is not a claim that the rule survives a bad index.
+        """
+        ranked = self.content.nearest(entity, look)
+        if len(ranked) < 2:
+            return [int(entity)] + [int(token) for token, _ in ranked]
+        sims = [score for _, score in ranked]
+        gaps = [sims[i] - sims[i + 1] for i in range(len(sims) - 1)]
+        keep = max(range(len(gaps)), key=gaps.__getitem__) + 1
+        return [int(entity)] + [int(token) for token, _ in ranked[:keep]]
+
     def answer_set(self, relation: int, entity: int,
-                   branches: int) -> frozenset[int]:
+                   branches: int | None = None, look: int = 8) -> frozenset[int]:
         """Every value the store holds about `entity`'s neighbourhood, as a SET.
 
         The contract: call after `run`. Returns the decoded value at `entity`'s
@@ -3374,10 +3406,18 @@ class LocalAssociativeMemory:
 
         Precision comes from the gate and costs nothing fitted — an address that
         was never written reads exactly 0.0 (decision 148), so an empty neighbour
-        contributes nothing rather than contributing noise. **Enumeration is not
-        free in the same way:** `branches` bounds how many neighbours are
-        considered and is a fitted constant, which is the caveat decision 166
-        records.
+        contributes nothing rather than contributing noise.
+
+        **How many neighbours to consider is the other half, and there are two
+        answers.** `branches` as an integer fixes the count, which is decision
+        167's finding: it has to equal the group size and collapses either side.
+        **`branches=None` derives it from the biggest gap in the index's ranked
+        similarities** — see `_cliff_candidates` — which turns the constant from a
+        target into the ceiling `look`, where being generous costs nothing.
+
+        The fixed form is kept rather than replaced, under rule 14c: it is the
+        measured comparison for the gap rule, and a refutation that cannot be
+        re-run is a refutation nobody can date.
         """
         if self._final is None:
             raise ValueError(
@@ -3397,17 +3437,26 @@ class LocalAssociativeMemory:
                 "answer_set needs a fitted ContentIndex to propose neighbours. "
                 "Without one it can only read the entity's own address, which is "
                 "the single-token measurement")
-        if branches < 1:
+        if branches is not None and branches < 1:
             raise ValueError(
                 "branches must be at least 1, or no neighbour is ever consulted "
                 "and the answer cannot exceed one value -- the singleton case "
-                "decision 166 refuses at the task level")
+                "decision 166 refuses at the task level. Pass None for the gap "
+                "rule, which chooses the count itself")
+        if look < 2:
+            raise ValueError(
+                "look must be at least 2: the gap rule needs two similarities to "
+                "have a gap between them, and with one candidate there is no "
+                "ranking to find a cliff in")
         # THE ENTITY ITSELF FIRST, then its neighbours. Its own address is where a
         # DIRECT fact lives, and a set answer needs it alongside the siblings'
         # rather than instead of them.
-        candidates = [int(entity)]
-        candidates.extend(int(token)
-                          for token, _ in self.content.nearest(entity, branches))
+        if branches is None:
+            candidates = self._cliff_candidates(entity, look)
+        else:
+            candidates = [int(entity)]
+            candidates.extend(
+                int(token) for token, _ in self.content.nearest(entity, branches))
         found: set[int] = set()
         for candidate in candidates:
             key = self.key_source.pair(int(relation), candidate)

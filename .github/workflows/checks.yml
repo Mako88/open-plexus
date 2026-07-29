@@ -54,11 +54,11 @@ jobs:
         run: python tools/check_architecture.py
 
   # The harness runs one full suite per mutation, so it is serial time and
-  # nothing else. MEASURED on 57d8112, the first full run to complete: 169
-  # mutations, six shards, 18 to 35 minutes each, all caught. Serial that is
-  # about two and a half hours -- the figure here previously said "85 mutations
-  # at fifteen seconds each, two minutes a job", which is what made a local full
-  # run look affordable.
+  # nothing else. MEASURED on 57d8112, the first full run to complete: 168
+  # mutations, six shards at 28, 18 to 35 minutes each, all caught. Serial that
+  # is about two and a half hours -- the figure here previously said "85
+  # mutations at fifteen seconds each, two minutes a job", which is what made a
+  # local full run look affordable.
   #
   # It was ALSO being run locally, which was pure duplication and was the thing
   # blocking local work: experiments refuse to run while the source is mutated
@@ -66,7 +66,10 @@ jobs:
   # else. Locally the right command is now `--only <the mutations I just added>`.
   #
   # Shards are by position, not by hash, so the same mutation lands in the same
-  # shard across runs and two logs can be compared line for line.
+  # shard across runs and two logs can be compared line for line -- but ONLY
+  # while the list is unchanged. Inserting a mutation mid-list shifts every one
+  # after it into a different shard, which is how `the-deadline-fires-immediately`
+  # appeared in shard 0 for the first time (note 054).
   mutations:
     runs-on: ubuntu-latest
     strategy:

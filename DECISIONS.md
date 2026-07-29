@@ -5844,3 +5844,65 @@ Delete the method and `tests/test_answer_set.py`. `self._final` is assigned on
 every run and read by nothing else, so removing it changes no result;  it is
 deliberately not `carry_store`, which feeds a store into the next sequence and
 would change what the model learns from.
+
+## 168. A mutation survived in CI, and neither the count nor the cause was what I said
+
+**Decision 164 states "169 mutations … All 169 were caught." The number is wrong
+and the entry is not edited**, because entries here are never rewritten. The
+correct figure is **168**: six shards at 28 each, on `57d8112`.
+
+**How the wrong number got in.** It was read from a `--verify` run taken *after* a
+mutation had already been added to the working tree, and then quoted as a
+description of a CI run that predated the addition. Six times twenty-eight was
+sitting there to check. **A number quoted from the wrong snapshot is rule 11b's
+stale download in a place nobody thought to look, because it was only a count** —
+and it went into `CLAUDE.md`, `checks.yml` and a commit message before anything
+contradicted it.
+
+### And then a mutation genuinely survived
+
+`the-deadline-fires-immediately`, shard 0 of `f6ab220`: **28/29 caught.** Treated as
+blocking per `CLAUDE.md`'s own rule about CI-only mutations. It reproduces as
+**caught** locally, every time.
+
+**Why it appeared in shard 0 for the first time:** shards are by POSITION, and
+164–167 inserted four mutations mid-list, shifting everything after them into
+different shards. `checks.yml` claimed two logs can be compared line for line; that
+holds only while the list is unchanged, and it now says so.
+
+**The cause is in [note 054](docs/notes/054-the-deadline-branch-is-tested-by-a-race.md)**, and the
+short version is that the detection was a race. The receive loop drains every ready
+socket before the overdue check, so when all votes land in one `select` round
+`complete` is already true and the mutation is **semantically inert**. A starved
+2-vCPU runner deschedules the driver and the votes arrive together.
+
+### The fix I tried first was wrong, and it is the entry worth keeping
+
+Asserting `elapsed >= deadline` in `test_an_undeclared_death_completes_WITH_a_deadline`
+**fails on correct code, at 0.002 s.** A node killed outright resets its socket, the
+driver drops it from `expected`, and every step then completes *normally* — so that
+test passes a deadline in and the deadline is **inert**. The obvious home for a
+deadline test is a test where the deadline does nothing.
+
+Walking every way a step could settle short: a killed node resets and is dropped, a
+non-speaking node is never counted (`expected[step] = len(speaking)`), a failed send
+is discarded. **Only a node that ACCEPTS and never replies produces the
+condition, and nothing in the harness can create one.**
+
+    `steps_settled_short` is asserted in exactly ONE place in the repository,
+    and it is asserted to be EMPTY.
+
+That is rule 10's named pattern — a test that something did NOT change needs a
+companion asserting that something DID — with the companion missing, on the branch
+the whole `deadline` parameter exists for.
+
+### What this does and does not invalidate
+
+**The production code is correct**, which rule 11 requires showing rather than
+assuming: the mutation is a real defect the harness is right to inject, and what is
+missing is a test that can reach it. **No measurement moves** — `deadline` is off in
+every result this project has recorded.
+
+**What is left open:** a silent peer in the test harness, test-side only, which
+would make the deadline observable for the first time and turn a race into a
+deterministic catch. Named in note 054 and not built here.

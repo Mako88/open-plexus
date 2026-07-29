@@ -934,10 +934,23 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   > `checks.yml` said "85 mutations at roughly fifteen seconds each. Sharded it
   > is about two minutes a job instead of twenty in one." The first full run to
   > complete — `57d8112`, which finished only because no push superseded it — was
-  > **169 mutations across six shards, 18 to 35 minutes each**, so serial time is
-  > about two and a half hours, not twenty minutes. **All 169 were caught.** The
+  > **168 mutations across six shards, 18 to 35 minutes each**, so serial time is
+  > about two and a half hours, not twenty minutes. All 168 were caught. The
   > old figure is the one that would make a local full run look affordable, which
   > is why it is corrected here rather than annotated.
+  >
+  > *And a correction to the correction, which is the more useful entry.* That
+  > count was first written as **169**, from a `--verify` run taken after a
+  > mutation had already been added — so the figure describing the CI run was read
+  > off the working tree rather than off the run. Six shards at 28 is 168, and the
+  > arithmetic was there to check at the time. **A number quoted from the wrong
+  > snapshot is the same defect as rule 11b's stale download**, in a place nobody
+  > thought to look because it was only a count.
+  >
+  > *Do not compare shard membership across runs after adding a mutation.* Shards
+  > are by POSITION, so inserting one mid-list shifts everything after it into a
+  > different shard. The `checks.yml` comment claims two logs can be compared line
+  > for line; that holds only while the list is unchanged.
 
   **`--changed` is NOT in that list any more — mutations run in CI.** John asked
   for this on 2026-07-28: a local `--changed` was costing ten to twenty minutes

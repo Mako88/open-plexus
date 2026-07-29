@@ -17,6 +17,7 @@ distributed version. It gives identical ones.
 from __future__ import annotations
 
 import os
+import time
 import unittest
 from dataclasses import replace
 
@@ -284,12 +285,15 @@ class ADepartureNOBODYDECLARED(unittest.TestCase):
     def test_an_undeclared_death_completes_WITH_a_deadline(self):
         """A node killed without telling the driver. The run must finish."""
         config, model = configured(4)
+        deadline = 1.0
         with Network(config, 4, model.wv, model.wo) as network:
             healthy = network.run(TOKENS, window=2)
             network._processes[1].terminate()
             network._processes[1].join(timeout=5)
 
-            degraded = network.run(TOKENS, window=2, deadline=1.0)
+            started = time.monotonic()
+            degraded = network.run(TOKENS, window=2, deadline=deadline)
+            elapsed = time.monotonic() - started
 
             self.assertIn(1, network.nodes_suspect,
                           "the dead node was not noticed at all")
@@ -297,6 +301,25 @@ class ADepartureNOBODYDECLARED(unittest.TestCase):
                 np.array_equal(healthy, degraded),
                 "losing a quarter of the store changed nothing, which means "
                 "the node was still being counted")
+            # WHAT THIS TEST DOES NOT COVER, measured rather than assumed.
+            #
+            # `the-deadline-fires-immediately` survived a CI shard while being
+            # caught on every local run, and the first attempt to fix it added a
+            # `elapsed >= deadline` assertion here. **That assertion fails on
+            # CORRECT code**, at 0.002 s, which is the useful finding: a node
+            # killed outright resets its connection, the driver drops it from
+            # `expected`, and every step then completes NORMALLY. So this run
+            # never settles a step short and never consults the overdue branch at
+            # all -- the deadline is passed in and is inert.
+            #
+            # That is not a defect in this test, whose subject is that the run
+            # COMPLETES. It does mean the deadline's timing behaviour is covered
+            # somewhere else or nowhere, and which of those is true is not yet
+            # established.
+            self.assertLess(
+                elapsed, 30.0,
+                "a run with a dead node took the full select timeout, so the "
+                "reset was not noticed and the deadline carried the run")
 
     def test_a_suspect_node_is_RETRIED_rather_than_ejected(self):
         """SWIM's suspicion mechanism, and the behaviour that was wrong first.

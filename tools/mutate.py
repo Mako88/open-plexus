@@ -118,8 +118,11 @@ MUTATIONS = [
                "figure improves for a reason that has nothing to do with the "
                "model",
         path=CORPUS,
-        old="    head, tail = text[:cut], text[cut:]",
-        new="    head, tail = text[:cut + 1], text[cut:]",
+        # Re-pointed when the split moved from characters to UNITS. The line it
+        # targeted no longer exists; the property it guards is unchanged, and at
+        # word level an overlap is a whole shared word rather than one letter.
+        old="    head, tail = stream[:cut], stream[cut:]",
+        new="    head, tail = stream[:cut + 1], stream[cut:]",
     ),
     Mutation(
         name="corrective-writes-forget-to-subtract",

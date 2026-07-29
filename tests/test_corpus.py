@@ -20,7 +20,7 @@ import unittest
 import numpy as np
 
 from openplexus.tasks.corpus import (
-    UNKNOWN, _is_test, build, build_stream, chunks)
+    UNKNOWN, _is_test, build, build_stream, characters, chunks, words)
 
 TEXTS = {f"note-{i}.md": ("the quick brown fox " * 40) + chr(97 + i % 20) * 30
          for i in range(12)}
@@ -148,6 +148,51 @@ class ASingleStreamSplitAtAnOffset(unittest.TestCase):
         """
         with self.assertRaises(ValueError):
             build_stream("a", test_share=0.5, min_count=1)
+
+
+class TheUNITIsAParameter(unittest.TestCase):
+    """Note 045: leaving characters is the prerequisite for meaningful
+    addresses, not the point of them. A concept cannot live in a letter.
+
+    **The character path must stay bit-identical**, because every number in the
+    comparison set was measured on it. Decision 74 invalidated a comparison set
+    by changing one default; the defence here is not changing one.
+    """
+
+    TEXT = "the cat sat on the mat. the cat ate the rat. a dog sat there too."
+
+    def test_the_default_is_unchanged(self):
+        self.assertEqual(
+            build_stream(self.TEXT, min_count=1).symbols,
+            build_stream(self.TEXT, min_count=1, units=characters).symbols)
+
+    def test_words_become_the_symbols(self):
+        built = build_stream(self.TEXT, min_count=1, units=words)
+        self.assertIn("cat", built.symbols)
+        self.assertNotIn("c", built.symbols)
+
+    def test_the_SPLIT_falls_between_units_not_inside_one(self):
+        """**The bug this arrangement avoids.** Cutting the raw string and
+        tokenising each half separately puts a word FRAGMENT on each side of the
+        boundary -- invisible at character level, where a unit is already one
+        character, and a quiet leak at word level.
+
+        Checked by reconstruction: every unit in either half must be a whole
+        word of the original.
+        """
+        built = build_stream(self.TEXT, test_share=0.3, min_count=1,
+                             units=words)
+        original = set(words(self.TEXT))
+        for part in built.train + built.test:
+            for token in part:
+                self.assertIn(built.symbols[token], original | {UNKNOWN})
+
+    def test_the_vocabulary_still_comes_from_TRAINING_only(self):
+        """The leak the module docstring is about, checked at word level too: a
+        symbol appearing solely in the test half must not get an index."""
+        built = build_stream("a b a b a b a b zzz zzz", test_share=0.2,
+                             min_count=1, units=words)
+        self.assertNotIn("zzz", built.symbols)
 
 
 class Chunking(unittest.TestCase):

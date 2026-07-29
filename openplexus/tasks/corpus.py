@@ -48,6 +48,7 @@ much context the store has accumulated when a prediction is made. It is
 from __future__ import annotations
 
 import hashlib
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -128,8 +129,41 @@ def build(texts: dict[str, str], test_share: float = 0.25,
                   tuple(encode(n) for n in test_names))
 
 
+def characters(text: str) -> list[str]:
+    """One symbol per character. **What every number in this project used.**"""
+    return list(text)
+
+
+def words(text: str) -> list[str]:
+    """One symbol per word, lowercased, punctuation dropped.
+
+    ## Why a unit function exists at all
+
+    Note 045: *"words-as-arbitrary-ids have the same defect as characters, with
+    less of it"* -- so leaving characters is not the point, it is the
+    PREREQUISITE. A concept cannot live in a letter; there is no `dog` for the
+    store to attach a fact to, and no address for a content vector to describe.
+    The addressing work needs a unit that can carry meaning before its address
+    can be derived from meaning.
+
+    **Every number in the project's comparison set was measured at character
+    level and none of them survive this.** That is why it is a parameter rather
+    than a replacement: the character path stays the default and stays exactly
+    as it was, and a word-level result is a new series rather than a continuation
+    of the old one. Decision 74 invalidated a comparison set by changing one
+    default; this is the same hazard, handled by not changing one.
+
+    Deliberately crude -- no stemming, no subwords, no apostrophe handling
+    beyond keeping them inside a token. A better tokeniser is a different
+    question from whether meaningful addresses pay, and answering two at once
+    produces a number nobody can attribute.
+    """
+    return re.findall(r"[a-z']+", text.lower())
+
+
 def build_stream(text: str, test_share: float = 0.1,
-                 min_count: int = MIN_COUNT) -> Corpus:
+                 min_count: int = MIN_COUNT,
+                 units=characters) -> Corpus:
     """One continuous text, split at an OFFSET rather than by document.
 
     **This breaks the rule the module docstring gives**, and does so
@@ -147,21 +181,26 @@ def build_stream(text: str, test_share: float = 0.1,
     """
     if not 0.0 < test_share < 1.0:
         raise ValueError(f"test_share must be in (0, 1), got {test_share}")
-    cut = int(len(text) * (1.0 - test_share))
-    head, tail = text[:cut], text[cut:]
+    # SPLIT ON UNITS, NOT ON CHARACTERS. Cutting the raw string and tokenising
+    # each half separately would slice a word in two at the boundary, putting a
+    # fragment in each side -- invisible at character level, where every unit is
+    # already one character, and a small leak at word level.
+    stream = units(text)
+    cut = int(len(stream) * (1.0 - test_share))
+    head, tail = stream[:cut], stream[cut:]
     if not head or not tail:
         raise ValueError(
-            f"a text of {len(text)} characters at share {test_share} leaves "
+            f"a text of {len(stream)} units at share {test_share} leaves "
             f"{len(head)} train and {len(tail)} test; one side is empty")
 
     counts: dict[str, int] = {}
-    for character in head:
-        counts[character] = counts.get(character, 0) + 1
+    for symbol in head:
+        counts[symbol] = counts.get(symbol, 0) + 1
     symbols = (UNKNOWN,) + tuple(sorted(c for c, n in counts.items()
                                         if n >= min_count))
     index = {c: i for i, c in enumerate(symbols)}
 
-    def encode(part: str) -> np.ndarray:
+    def encode(part: list[str]) -> np.ndarray:
         return np.array([index.get(c, 0) for c in part], dtype=np.int64)
 
     return Corpus(symbols, (encode(head),), (encode(tail),))

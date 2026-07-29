@@ -327,6 +327,57 @@ win, and the trade is 0.050 of direct for 0.231 of transfer.
 **N4 did not fire**, so decision 147's conclusion stands: selection was the
 bottleneck, and the read at the chosen address was fine all along.
 
+## THE GENERALISATION SWEEP — note 049's P3, finally answerable
+
+P3 was registered in July and decision 147 could not test it, because there was
+no working rule to test:
+
+> *"The threshold generalises across `n_values` and `family_size` without being
+> re-tuned. If it has to move per configuration, it is a fitted constant wearing
+> a mechanism's clothes."*
+
+`inherit` has no constant to move — an address never written misses the hash
+table and reads exactly 0.0, so the bar is structurally zero. **That makes P3 a
+prediction rather than a hope, and a sharp one: a sweep is exactly where a hidden
+constant shows itself.**
+
+`--n-values` and `--family-size` drive it. Everything else is held at decision
+148's settings so the only thing changing is the one being swept.
+
+**PREDICTIONS, registered before the sweep was run:**
+
+  G1  THE GATE HOLDS ITS SHAPE. `deferred_on_transfer` stays above 0.99 and
+      `deferred_on_direct` below 0.01 at every setting. This is a claim about
+      the hash and the rule, and neither depends on the task's numbers — so a
+      failure here means something is coupled that should not be.
+
+  G2  THE ADVANTAGE SURVIVES. At every setting, `inherit` beats `indexed` on
+      TRANSFER and stays within 0.05 of `ungrouped` on EXCEPTION. Not the same
+      margins -- a larger `n_values` lowers everything by making chance lower --
+      but the same ordering.
+
+  G3  THE FALSIFIER. If the gate holds (G1) and the ordering does not (G2), the
+      advantage measured in 148 came from decision 148's particular numbers
+      rather than from the mechanism, and the honest reading is that it was
+      fitted by choosing a task rather than by choosing a constant.
+
+**SCORED — DECISION 149. G2 CONFIRMED in every cell, G3 did not fire.**
+
+                          TRANSFER              EXCEPTION            gate
+                      inherit  indexed    inherit  ungrouped    defer trn / dir
+        n_values=4     0.4817   0.3025     0.8692     0.8500      1.0000 / 0.0000
+        n_values=16    0.4158   0.2708     0.7600     0.7442      1.0000 / 0.0000
+        family_size=3  0.4075   0.3350     0.8142     0.7942      1.0000 / 0.0000
+        family_size=6  0.2875   0.2000     0.7775     0.7583      0.9025 / 0.0000
+        (148's cell)   0.4350   0.2650     0.8183     0.7833      1.0000 / 0.0000
+
+**G1 dipped in one cell and it is not the gate.** At `family_size=6` a family has
+5 siblings and only 2 stated facts, so on ~10% of transfers no neighbour inside
+`BRANCHES=3` holds anything -- and `inherit` correctly refuses to defer to an
+empty address. `--branches 5` restores the gate to 1.0000 and lifts TRANSFER from
+0.2875 to 0.3317, which names the limit as the index's reach rather than the
+rule's. **No threshold moved, because there is no threshold.**
+
 ## Settings, and why they are not inherited
 
 Single keys (`context_keys` off), because the binding is `entity -> value` and a
@@ -439,9 +490,16 @@ def silent(tokens: np.ndarray) -> np.ndarray:
     return np.zeros(len(tokens), dtype=bool)
 
 
-def one_cell(arm: str, seed: int, exceptions: int = 0) -> dict:
+def one_cell(arm: str, seed: int, exceptions: int = 0,
+             n_values: int | None = None,
+             family_size: int | None = None) -> dict:
     started = time.time()
-    config = FamilyConfig(seed=seed, exceptions_per_family=exceptions)
+    extra = {}
+    if n_values is not None:
+        extra["n_values"] = n_values
+    if family_size is not None:
+        extra["family_size"] = family_size
+    config = FamilyConfig(seed=seed, exceptions_per_family=exceptions, **extra)
     surfaces, index, recovered = surfaces_for(arm, config, seed)
     writes = arm != "nostore"
 
@@ -553,8 +611,13 @@ def one_cell(arm: str, seed: int, exceptions: int = 0) -> dict:
         family_size=config.family_size, n_values=config.n_values,
         scored=asked,
         seconds=round(time.time() - started, 1),
+        # `n_values` and `exceptions_per_family` are in here because the P3
+        # sweep varies them, and without them two cells that differ only in the
+        # answer alphabet write the same condition string -- which reads as a
+        # reproduction rather than a new measurement.
         condition=f"{arm}|k{GROUPS}|d{WIDTH}|seed{seed}"
-                  f"|fam{config.n_families}x{config.family_size}")
+                  f"|fam{config.n_families}x{config.family_size}"
+                  f"|v{config.n_values}|e{exceptions}")
 
 
 def main() -> int:
@@ -572,18 +635,32 @@ def main() -> int:
     # mechanism until the floor has been moved. Every other arm's numbers were
     # measured at 64 and stay comparable only at 64.
     parser.add_argument("--width", type=int, default=None)
+    # NOTE 049'S P3, which asks whether the gate is a mechanism or a constant
+    # that happens to fit decision 148's task. Defaults are None rather than the
+    # task's values so an unswept run is byte-identical to 148's.
+    parser.add_argument("--n-values", type=int, default=None)
+    parser.add_argument("--family-size", type=int, default=None)
+    # BRANCHES was set for family_size 4, where decision 146 measured all three
+    # siblings inside the top 3. A larger family needs more before the index can
+    # reach a sibling that HAS a stated fact, and that is a property of the
+    # index rather than of the gate -- so it is a separate knob and swept
+    # separately.
+    parser.add_argument("--branches", type=int, default=None)
     args = parser.parse_args()
 
     harness.refuse_if_mutating()
     seeds = (args.seed,) if args.seed is not None else SEEDS
     if args.width is not None:
         globals()["WIDTH"] = args.width
+    if args.branches is not None:
+        globals()["BRANCHES"] = args.branches
     arms = (args.arm,) if args.arm else ARMS
 
     records = []
     for seed in seeds:
         for arm in arms:
-            record = one_cell(arm, seed, args.exceptions)
+            record = one_cell(arm, seed, args.exceptions,
+                              args.n_values, args.family_size)
             print(f"  {record['condition']:34s} "
                   f"direct {record['direct']:.4f}  "
                   f"transfer {record['transfer']:.4f}  "

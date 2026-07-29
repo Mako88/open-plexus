@@ -119,8 +119,12 @@ it belongs there rather than in another branch inside `run`.
 
 **P1 HOLDS.** P2 does not — DIRECT costs 0.050 on the no-exception task, which is
 the price of refusing corroboration and the same fact as the win. **P3 is
-answered rather than dodged:** with an exact sketch the bar is structurally zero,
-so there is no constant to re-tune per configuration.
+answered rather than dodged -- and then MEASURED, decision 149.** With an exact
+sketch the bar is structurally zero, so there is no constant to re-tune, and a
+sweep across `n_values` and `family_size` confirms it: the ordering holds in
+every cell and nothing had to move. The one knob that did was `BRANCHES`, the
+number of neighbours the content index proposes, which is the index's reach and
+was never claimed to be family-size-independent.
 
 The paragraph above about two weak reads summing to a confident wrong answer is
 why `inherit` requires BOTH sides — it defers only when this address holds

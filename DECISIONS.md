@@ -4677,3 +4677,59 @@ right, and the missing piece was a way to ask the membership question exactly.**
 **Built under John's greenlight to look up research or invent, staying inside
 concept-based learning.** Nothing here predicts a token; the gate decides which
 concept's address answers a query.
+
+## 149. Note 049's P3, asked in July and answered: no constant moved
+
+P3 was the falsifier that mattered most and the one decision 147 could not reach,
+because there was nothing working to sweep:
+
+> *"The threshold generalises across `n_values` and `family_size` without being
+> re-tuned. If it has to move per configuration, it is a fitted constant wearing
+> a mechanism's clothes."*
+
+Three seeds per cell, exceptions on, everything else at decision 148's settings:
+
+                      TRANSFER              EXCEPTION            gate
+                  inherit  indexed    inherit  ungrouped    defer trn / dir
+    n_values=4     0.4817   0.3025     0.8692     0.8500      1.0000 / 0.0000
+    n_values=16    0.4158   0.2708     0.7600     0.7442      1.0000 / 0.0000
+    family_size=3  0.4075   0.3350     0.8142     0.7942      1.0000 / 0.0000
+    family_size=6  0.2875   0.2000     0.7775     0.7583      0.9025 / 0.0000
+    (148's cell)   0.4350   0.2650     0.8183     0.7833      1.0000 / 0.0000
+
+**G2 CONFIRMED at every setting.** `inherit` beats `indexed` on TRANSFER and
+holds EXCEPTION within 0.05 of plain addressing everywhere -- in fact **above**
+it in all five cells, and above it on DIRECT in all five too. The margins move
+with the task, which they must: a larger answer alphabet lowers chance and lowers
+everything. **The ordering does not move.** G3 did not fire.
+
+**G1 held in four cells and dipped in the fifth**, and the dip is not the gate.
+At `family_size=6` the gate deferred on 0.9025 of TRANSFER queries rather than
+1.0000. `BRANCHES` is 3, set when decision 146 measured that all three siblings
+of a 4-member family sit inside the top 3. A 6-member family has 5 siblings and
+only 2 have stated facts, so on ~10% of transfers **no proposed neighbour holds
+anything** -- and the gate then correctly refuses to defer, because deferring to
+an empty address is decision 69's two-weak-reads failure, which `inherit` was
+built to avoid on both sides.
+
+Re-run at `--branches 5`:
+
+    family_size=6   defer on TRANSFER   TRANSFER
+      branches 3               0.9025     0.2875
+      branches 5               1.0000     0.3317
+
+**Exactly as predicted, and it names the limit as the index's reach rather than
+the gate's rule.** The knob that had to move was `BRANCHES`, which is how many
+neighbours the content index proposes -- a property of the index that was never
+claimed to be family-size-independent. **No threshold moved, because there is no
+threshold: the bar is zero.**
+
+So P3 is answered rather than dodged. The `--n-values`, `--family-size` and
+`--branches` flags default to `None` so an unswept run reproduces decision 148
+byte for byte, and `n_values` and `exceptions_per_family` are now in the
+condition string -- without them two sweep cells differing only in the answer
+alphabet wrote the same label, which reads as a reproduction rather than a new
+measurement.
+
+**Still open, and unchanged by this:** every number is still the families task.
+The gate has not met MQAR, kinship, closure or chains.

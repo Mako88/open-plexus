@@ -97,10 +97,17 @@ contradicting fact intact when there is a conflict. The sketch is also a second,
 non-superposed memory — justified by membership being one bit against a value's
 `d` floats, and held to that by `tests/test_sketch.py`.
 
-**What is open.** Every number here is one task at one width. The gate has not
-met MQAR, kinship, closure, or chains, and `n_values` / `family_size` have not
-been varied since it started working — which is where a mechanism that is really
-a fitted constant would show itself.
+**And it is not a fitted constant — decision 149 swept the thing note 049 named
+in July.** Across `n_values` 4/8/16 and `family_size` 3/4/6, `inherit` beats
+summing on TRANSFER and holds EXCEPTION above plain addressing in **every** cell,
+with the gate at 1.0000 / 0.0000. Nothing was re-tuned, because there is no
+threshold to re-tune. The single dip — the gate at 0.9025 on `family_size=6` —
+was `BRANCHES=3` failing to reach a sibling that HAS a stated fact, and
+`--branches 5` restores it to 1.0000 exactly as predicted.
+
+**What is open.** Every number is still the families task at one width. The gate
+has not met MQAR, kinship, closure or chains, and until it has, "the read gate
+works" means "on the task built to ask this question".
 
 Decision 144 answers the previous question — *does grouping do anything harder
 than same-kind-same-answer* — with **no, and the failure is total**:

@@ -46,6 +46,7 @@ from dataclasses import replace
 
 import numpy as np
 
+from openplexus.concepts import Shared
 from openplexus.models.local_memory import (LocalAssociativeMemory,
                                             LocalMemoryConfig)
 from openplexus.tasks.mqar import IGNORE, MqarConfig, dataset
@@ -198,6 +199,48 @@ class LearningSurvivesRouting(unittest.TestCase):
             "a monolithic store given the SAME number of numbers lost to the "
             "partitioned one -- if that is real it contradicts decision 134's "
             "identical pooled capacity and wants a sweep, not a passing test")
+
+
+class TwoSurfacesOfOneConceptSHAREItsFacts(unittest.TestCase):
+    """The indirection, checked through the model rather than in isolation.
+
+    `openplexus/concepts.py` proves the mapping merges. This proves the model
+    USES it: a fact written under one surface must be readable under another
+    surface of the same concept, which is the whole point of John's picture-of-a-
+    dog framing and is impossible while the surface is the address.
+    """
+
+    def test_a_fact_written_under_one_surface_reads_under_the_other(self):
+        sequence = dataset(TASK, 1)[0]
+        tokens = np.array(sequence.tokens, dtype=np.int64)
+        seen = sorted({int(t) for t in tokens})
+        a, b = seen[1], seen[2]
+
+        model = build(4)
+        model.surfaces = Shared(TASK.vocab_size, [[a, b]])
+        self.assertEqual(model.surfaces.of(a), model.surfaces.of(b),
+                         "the two surfaces did not merge, so this test is not "
+                         "exercising what it claims")
+
+        targets = np.array(sequence.targets, dtype=np.int64)
+        trace: list = []
+        model.run(tokens, targets, targets != IGNORE, learn=True, trace=trace)
+
+        apart = build(4)
+        split: list = []
+        apart.run(tokens, targets, targets != IGNORE, learn=True, trace=split)
+        self.assertNotEqual([e["strength"] for e in trace],
+                            [e["strength"] for e in split],
+                            "merging two surfaces changed nothing, so the "
+                            "model is still addressing by token")
+
+    def test_the_DEFAULT_is_still_one_concept_per_token(self):
+        """The control that protects every existing number. If the seam is not
+        the identity by default it has quietly invalidated the comparison set --
+        decision 74's failure, which is why this is tested and not intended."""
+        model = build(0)
+        for token in range(TASK.vocab_size):
+            self.assertEqual(model.surfaces.of(token), token)
 
 
 class WhatCannotBeCombinedIsREFUSED(unittest.TestCase):

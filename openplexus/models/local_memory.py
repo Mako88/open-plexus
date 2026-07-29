@@ -58,6 +58,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from openplexus.concepts import OneConceptPerToken, Surfaces
 from openplexus.keys import KeySource, PairKeys, TableKeys
 from openplexus.partitioned import ConceptStore
 from openplexus.retrieval import Retrieval, build as build_retrieval
@@ -1449,6 +1450,22 @@ class LocalAssociativeMemory:
         self.key_source: KeySource = (
             PairKeys(config.seed, spread, d, config.vocab_size)
             if config.context_keys else TableKeys(self.wk))
+        # WHICH CONCEPT A SURFACE BELONGS TO, as a replaceable component for the
+        # same reason keys are -- and this one was welded shut until now.
+        #
+        # `key_source.concept` answers "which surface token addresses this
+        # position". This answers "which CONCEPT that surface is of", and the
+        # two are different questions that happened to have the same answer
+        # because every measurement so far had one surface per concept.
+        #
+        # John, 2026-07-29: a picture of a dog, a drawing, and the word are one
+        # concept. That is impossible while the surface IS the address, however
+        # good the content vectors get -- similarity relates DIFFERENT concepts,
+        # where this is one concept with different appearances.
+        #
+        # The default is the identity, so every existing number is untouched.
+        # Assign a different `Surfaces` after construction; `run` reads it.
+        self.surfaces: Surfaces = OneConceptPerToken(config.vocab_size)
         # HOW THE STORE IS READ IS A REPLACEABLE COMPONENT, for the same reason
         # and with more at stake. `openplexus/retrieval.py` holds the seam.
         #
@@ -2268,7 +2285,8 @@ class LocalAssociativeMemory:
                 # token's concept rather than the previous one's. The write
                 # above and the read here are two different machines in the
                 # deployed picture; here they are two views of one array.
-                memory = concepts.matrix(self.key_source.concept(tokens, t))
+                memory = concepts.matrix(
+                    self.surfaces.of(self.key_source.concept(tokens, t)))
             readable = memory if lasting is None else memory + lasting
             retrieved = self.retrieval.read(readable, key)
             # NOT `key`. `key` is the TOKEN's key and it is carried out of this
@@ -2731,7 +2749,8 @@ class LocalAssociativeMemory:
             # `t - 1`, for the same reason `previous_key` is: the pair a key
             # came from is the key source's business, and an index recomputed
             # here would be a second implementation of it.
-            previous_concept = self.key_source.concept(tokens, t)
+            previous_concept = self.surfaces.of(
+                self.key_source.concept(tokens, t))
             previous_retrieval = retrieved
             if self.config.tag_relative:
                 previous_store_size = float(np.linalg.norm(memory))

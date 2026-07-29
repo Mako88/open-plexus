@@ -63,33 +63,39 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Does putting the RELATION in the address pay for itself?**
+**Can the index propose neighbours for a HOP, not just for a position?**
 
-[Note 051](docs/notes/051-typed-edges-a-ground-up-pass.md) — a ground-up pass
-John asked for, organised around the mechanism he proposed: store
-`key(subject, relation) -> object`, and read in three phases (which concept →
-which relation → the exact read, with the gate on the last).
+[ARCHITECTURE.md](ARCHITECTURE.md) row **E4 — the only FAILING row left.**
+`index_branches` is still refused above one hop (note 044). Decision 154 measured
+that guard's premise false: a hop key sits at cosine 0.96 to a single token's
+row, so `argmax(wk @ hop_key)` names a concept the index could look up.
 
-**Most of it is already built and was not recognised as such.** `PairKeys`
-already derives an address from a token PAIR, and kinship already stores
-`key(S, R) -> O` with it — a typed edge. `hop_accumulate="bind"` is a binding
-operator. The hop's decode lands at cosine 0.96 (154). **The one missing piece is
-that the HOP is untyped:** it reads `key(concept)`, never
-`key(concept, relation)`, so the model can follow *an* edge and not *the has-a*
-edge.
+**What blocks it is a design choice rather than a fact.** `index_branches` runs
+once per POSITION, not once per hop, so combining them means deciding whether the
+index proposes neighbours of the position's concept or of the **hop's landing**
+concept. Different mechanisms, different wire costs — and the wire cost makes it
+a G4 question as well as a correctness one. **John's call, flagged rather than
+taken.**
 
-> It explains decision 155's collapse exactly — `LINK here there` and
-> `FACT here value` both write `key(here)`. With typed keys they are different
-> addresses and **cannot** collide. And it attacks 151's bound: `key(entity,
-> has-value)` reading empty is *"I don't know this entity's value"*, where
-> `key(entity)` empty only meant *"nothing at all was written here"*.
+It is also the last thing between the gate and 157's LINKED column, which sits at
+0.1275 against chance 0.125 while the gate correctly defers on 0.9933 of those
+queries: *the model knows it does not know and cannot act on it.*
 
-**The cost is capacity**, and it is the thing to measure first: typing multiplies
-distinct addresses, and note 035's interference is `O(N·ρ)`. A3 tests that on
-MQAR before anything else is built, because if it costs `1/r` nothing else
-matters. Four predictions registered; **nothing built.**
+### The question this replaced, answered
 
----
+**Does putting the RELATION in the address pay for itself?** — **yes.** 156: it
+costs no capacity and below the wall it pays (+0.146 at load 16), because
+interference is `O(N·ρ)` in WRITES and typing adds none while lowering `ρ`. 157:
+the collision is gone, every column within 0.05 of link-free, **D2 FAILING →
+PASSING**. 158: a hop can follow a NAMED edge, **D3 FAILING → PARTIAL** — the
+relation is fixed rather than chosen, which is the honest limit.
+
+[Note 051](docs/notes/051-typed-edges-a-ground-up-pass.md) is the ground-up pass
+John asked for, organised around the mechanism he proposed — store
+`key(subject, relation) -> object`, read in three phases. **Most of it was
+already built and unrecognised:** `PairKeys` already addresses by a token pair,
+kinship already stores `key(S, R) -> O`, and the hop's decode already names a
+concept. What was missing was that the hop never used it, and 158 fixed that.
 
 ### The questions this replaced, both answered
 

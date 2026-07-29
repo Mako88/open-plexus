@@ -47,6 +47,7 @@ NGRAM = ROOT / "openplexus" / "ngram.py"
 REWARD_RECALL = ROOT / "openplexus" / "tasks" / "reward_recall.py"
 KINSHIP = ROOT / "openplexus" / "tasks" / "kinship.py"
 CLOSURE = ROOT / "openplexus" / "tasks" / "closure.py"
+OWNERSHIP = ROOT / "openplexus" / "ownership.py"
 SEARCH = ROOT / "openplexus" / "search.py"
 CORPUS = ROOT / "openplexus" / "tasks" / "corpus.py"
 SLOT_COST = ROOT / "tools" / "slot_cost.py"
@@ -1577,6 +1578,31 @@ MUTATIONS = [
         path=SEARCH,
         old="    walks.sort(key=lambda w: w.score, reverse=True)",
         new="    walks.sort(key=lambda w: w.score, reverse=False)",
+    ),
+    Mutation(
+        name="ownership-falls-back-to-modulo",
+        breaks="the only reason the ring exists. `hash % nodes` remaps NEARLY "
+               "EVERY key when the node count changes, and C3's premise is "
+               "that machines leave without warning constantly -- so one "
+               "machine joining would relocate the whole store. The ring moves "
+               "about 1/n instead. The two are indistinguishable on a static "
+               "network and differ completely the moment membership moves, "
+               "which is the only regime this project cares about",
+        path=OWNERSHIP,
+        old="        index = int(np.searchsorted(self._positions, at, "
+            "side=\"left\"))",
+        new="        index = at % len(self._owners)",
+    ),
+    Mutation(
+        name="every-node-gets-one-position-on-the-ring",
+        breaks="load balance. With a single label per node the ring is lumpy: "
+               "a node landing next to another owns almost nothing while a "
+               "node with a large gap owns far too much -- and a departure "
+               "dumps its whole share on one successor rather than scattering "
+               "it, which is the property C3 wants",
+        path=OWNERSHIP,
+        old="REPLICAS = 64",
+        new="REPLICAS = 1",
     ),
     Mutation(
         name="the-object-comes-after-the-relation",

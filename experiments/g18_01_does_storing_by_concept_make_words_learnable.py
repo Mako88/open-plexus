@@ -421,7 +421,22 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
     writes = kind != "nostore"
     for _ in range(EPOCHS):
         for piece in training:
-            model.run(piece, piece, np.ones(len(piece), bool), learn=True,
+            # THE TARGET IS THE NEXT TOKEN, AND THIS WAS WRONG UNTIL 2026-07-29.
+            #
+            # The model's answer at step t is built from a retrieval keyed on
+            # token t, so it is a prediction of token t+1 -- and `run` records it
+            # in the trace entry for t+1, as `previous_scores`. Scoring is
+            # therefore correct as it stands: entry t against `tokens[t]`.
+            #
+            # Training was not. `run(piece, piece, ...)` teaches the answer at
+            # step t to name token t, which is a mapping its input cannot carry,
+            # so the readout learns noise: |Wo| grows to 0.88 and the bits sit at
+            # uniform. Inherited from g17-01 and carried through every g18 run
+            # before this line existed. g15-01 has it right and always did.
+            targets = np.concatenate([piece[1:], piece[-1:]])
+            scored = np.ones(len(piece), dtype=bool)
+            scored[-1] = False          # nothing follows the last token
+            model.run(piece, targets, scored, learn=True,
                       store=None if writes else silent(piece))
 
     fit_scores, fit_targets = collected(model, calibration, writes)

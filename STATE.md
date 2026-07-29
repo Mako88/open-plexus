@@ -106,6 +106,48 @@ result is this project grading its own homework.
 > `vocab × d` linear map (decision 62) — one fact that explains decision 63, 115
 > and g14-01 at once.
 
+### ⇒ START HERE: store by CONCEPT, not by surface
+
+**The next question, and the three pieces to answer it with are already built.**
+
+g17-01's calibration found word-level text unlearnable, and the reason is
+address sparsity: the store is keyed by word PAIRS, and at word level almost
+every address is seen once. Too many addresses, each too rare.
+
+    uniform                                10.759
+    the model, 90,000 training words       10.721   <- the floor to beat
+    word unigram                            9.323   <- the bar that matters
+
+**But the store is no longer required to be addressed by surfaces.**
+`openplexus/concepts.py` split them: `surface -> content vector -> concept id ->
+store`. If concepts are GROUPS of words rather than individual words, the address
+space collapses and recurrence rises — a few hundred concepts instead of 1,733
+words, each seen many times instead of once. **The readout still predicts
+surfaces**, so nothing is lost on the output side: store by concept, emit by
+word.
+
+The grouping is what `ContentIndex` produces. Cluster its vectors, hand the
+groups to `concepts.Shared`, and the three pieces built on 2026-07-29 compose
+into the fix for the problem the fourth one found.
+
+> **The question:** does storing by concept rather than by surface make
+> word-level text learnable at all?
+>
+> **Floor** 10.721, measured. **Bar** 9.323, the unigram. **Control** the same
+> grouping built from SHUFFLED content must fail — otherwise the gain is the
+> address space shrinking and not the grouping meaning anything, and those are
+> different findings.
+
+Everything needed exists: `ContentIndex` (fitted, tested), `concepts.Shared`
+(tested, agreement property pinned), `corpus.words`, and `index_branches` for
+afterwards. What does not exist is the clustering step and a `Shared` built from
+it.
+
+**Do not start by fixing word-level text directly** (decay, cap, learning rate).
+That is a separate and much longer line, and it would put note 045's question
+behind it indefinitely. g17-01's record lists the options and why this is the
+choice.
+
 ### 0. THE ARCHITECTURE LINE — where the work actually is
 
 **Approved by John: items 1 and 2 of note 042.** They are the same design seen

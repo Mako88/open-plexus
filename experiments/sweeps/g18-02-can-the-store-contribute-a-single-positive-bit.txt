@@ -1,6 +1,16 @@
 Can the store contribute a single positive bit at word level?
 =============================================================
 
+*** VOID -- DECISION 138. Every model number below was measured with the readout
+*** trained on the CURRENT token, where the model's answer at step t predicts
+*** token t+1. The character floor read 5.9965 against a 6.000 uniform where
+*** decision 63 puts it near 5.53; corrected, the same cell returns 5.4227.
+***
+*** The tables are left exactly as they were run. A record that deletes its wrong
+*** numbers cannot be checked, and the shape of this failure -- internally
+*** consistent, rails passing, a monotone ordering with a tidy explanation -- is
+*** the reason to keep it visible.
+
 Script: experiments/g18_01_does_storing_by_concept_make_words_learnable.py
         (`--keys`, `--width`, `--lr`, arms `floor` and `nostore`)
 Run:    30430499110, 24 of 24 cells, ~4 min wall.

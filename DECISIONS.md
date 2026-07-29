@@ -3873,3 +3873,80 @@ g18-03.
 **Taken without asking**, under standing authorisation, with John asleep. The
 withdrawal of g18-01 is the decision he would most likely want a say in, so it is
 stated first in STATE and is trivially reversible.
+
+> ## ⚠ 136 AND 137 ARE RETRACTED — see decision 138. The harness trained on the
+> wrong target, and every model number in both entries is void. The entries are
+> left standing, unedited, because a log that deletes its wrong conclusions
+> cannot be checked.
+
+## 138. RETRACTION: the g18 harness trained on the wrong target
+
+    character floor, as g18 measured it       5.9965    uniform is 6.000
+    character floor, target corrected         5.4227
+    decision 63, the comparison set          ~5.53
+
+One line, and it voids every model number this harness produced.
+
+### The defect
+
+The model's answer at step `t` is built from a retrieval keyed on token `t`, so
+it is a prediction of token **`t+1`** — and `run` records it in the trace entry
+for `t+1`, as `previous_scores`. **Scoring was right all along:** entry `t`
+against `tokens[t]`.
+
+Training was not. `model.run(piece, piece, ...)` teaches the answer at step `t`
+to name token `t`, which is a mapping its input cannot carry. g15-01 has always
+had it right:
+
+    targets = np.concatenate([tokens[1:], tokens[-1:]])
+    scored = np.ones(len(tokens), dtype=bool)
+    scored[-1] = False
+
+### How it hid, and this is the part worth remembering
+
+**The readout still learns.** `|Wo|` reaches 0.88 with a mean of 0.043, and the
+temperature calibration then flattens a signal-free score vector to uniform. So
+the failure presents as *"the store contributes nothing"* rather than as a bug: a
+component asked for something it cannot supply, and a readout dutifully fitting
+noise.
+
+Every arm was mistrained equally, so the results behaved. The table was
+internally consistent. The rails passed. `nostore` sat exactly where a bias-only
+model should. The ordering across five addressing schemes was monotone and
+interpretable, and it had a tidy explanation. **A wrong measurement that behaves
+itself is the expensive kind.**
+
+What caught it was not a rail but a *reproduction*: the character floor came back
+at 5.986 where decision 63 says 5.53, and that number had no innocent reading.
+
+### Void
+
+Everything measured through this harness: g18-00's three passes (the 9.185 floor,
+the learning-rate sweep, "0.98 bits was the rate", the arm ordering, the cap
+being worth 0.20); g18-02 entire; g18-03's first pass at both units; **decisions
+136 and 137 in full**; and the 5.188 character ablation that looked like the
+largest result of the night.
+
+### Survives, because it never went through the model
+
+- **Decision 135.** The unigram at 8.068 and the bigram at 7.848 are counts from
+  `NGram`. No model, no training, no target.
+- **The address-space measurements**: 36,299 surface addresses against 3,438 at
+  K=128, recurrence 2.48 against 26.18. Computed from the stream.
+- The `unstable` and `diverged` rails, `nostore` as an arm, per-unit
+  configuration, and the `--keys` / `--width` / `--key-scale` / `--units` seams.
+- **Note 046's point, strengthened rather than weakened.** Its rule was applied
+  to the learning rate and then a *training convention* was inherited from the
+  same script without being checked. The note says every inherited constant
+  crosses a boundary with the measurement; a convention is one of them.
+
+### And it puts g17-01 in question
+
+`model.run(piece, piece, ...)` is g17-01's line and this harness inherited it. So
+*"the model does not learn word-level text at all"* — the finding that turned the
+architecture line toward addressing — was measured on a mistrained model and has
+to be re-established before anything is built on it.
+
+**Taken without asking**, under standing authorisation. The corrected sweeps are
+dispatched, and the sweep records keep their tables with the defect named at the
+top rather than deleted.

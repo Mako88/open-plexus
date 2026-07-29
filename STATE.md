@@ -106,7 +106,43 @@ result is this project grading its own homework.
 > `vocab × d` linear map (decision 62) — one fact that explains decision 63, 115
 > and g14-01 at once.
 
-### ⇒⇒ START HERE: the store contributes NOTHING at word level
+### ⇒⇒ START HERE: everything below was measured on a mistrained model
+
+**Decision 138, and it is a retraction.** The g18 harness trained the readout on
+the **current** token where the model's answer at step `t` predicts token `t+1`.
+
+    character floor, as g18 measured it       5.9965    uniform is 6.000
+    character floor, target corrected         5.4227
+    decision 63, the comparison set          ~5.53
+
+**How it hid:** the readout still learns — `|Wo|` reaches 0.88 — and the
+temperature fit then flattens a signal-free score vector to uniform. So it
+presents as *"the store contributes nothing"* rather than as a bug. Every arm was
+mistrained equally, so the tables were internally consistent, the rails passed,
+and the ordering across five addressing schemes was monotone and had a tidy
+explanation. **What caught it was a reproduction, not a rail:** the character
+floor came back at 5.986 where decision 63 says 5.53, and that had no innocent
+reading.
+
+**Void:** every model number in the sections below — g18-00's three passes,
+g18-02, g18-03's first pass, and decisions 136 and 137 entire.
+
+**Survives:** decision 135's bar correction (counts from `NGram`, no model) and
+the address-space measurements (computed from the stream). And note 046's point,
+strengthened: its rule was applied to the learning rate, and then a *training
+convention* was inherited from the same script without being checked.
+
+**And it puts g17-01 in question** — `run(piece, piece, ...)` is its line, so
+*"the model does not learn word-level text at all"*, the finding that turned this
+whole line toward addressing, was measured on a mistrained model.
+
+**Corrected sweeps are dispatched.** The sections below are left standing,
+unedited, with this notice at the top: a record that deletes its wrong numbers
+cannot be checked.
+
+---
+
+### ~~The store contributes NOTHING at word level~~ — VOID, decision 138
 
 **Decision 136**, and it displaces the addressing question rather than answering
 it.

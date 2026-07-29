@@ -70,6 +70,17 @@ P1 is the gate. P5 is the rail — if it fails, P1–P4 are unreadable.
 P4 found does not survive contact with the store, and the split-the-address idea
 is dead for the cost of one sweep rather than a rebuild.
 
+## ⚠⚠ AND THE CALIBRATION BELOW IS VOID — DECISION 138
+
+The training call in `one_cell` targets the CURRENT token where the model's
+answer predicts the NEXT one. Corrected, the same harness moves a character-level
+floor from 5.9965 to 5.4227. **So "the model does not learn word-level text at
+all" — the finding that turned the architecture line toward addressing — was
+measured on a mistrained readout and has to be re-established.**
+
+What survives: the unigram bar (decision 135, counts from `NGram`) and the
+address-space arithmetic. The calibration table below does not.
+
 ## ⚠ NOT DISPATCHED — the instrument cannot answer this yet
 
 Calibrated locally before spending a matrix, and the calibration says stop.
@@ -215,6 +226,20 @@ def one_cell(branches: int, power: float, seed: int) -> dict:
     calibration = pieces((stream[cut:],), CHUNK)
     for _ in range(EPOCHS):
         for piece in training:
+            # ⚠ THE TARGET IS WRONG HERE -- DECISION 138, and this line is
+            # where g18 inherited it from. The model's answer at step t is built
+            # from a retrieval keyed on token t, so it predicts token t+1;
+            # training it to name token t is a mapping its input cannot carry.
+            # The readout still learns (|Wo| grows) and the calibration then
+            # flattens a signal-free score vector to uniform, so the failure
+            # presents as "the store contributes nothing".
+            #
+            # NOT FIXED IN PLACE, deliberately: this script was never dispatched
+            # and its record quotes numbers produced by exactly this line. Fixing
+            # the code without re-running would make the two disagree silently.
+            # Anyone re-running it must use g15-01's form first:
+            #     targets = np.concatenate([piece[1:], piece[-1:]])
+            #     scored = np.ones(len(piece), bool); scored[-1] = False
             model.run(piece, piece, np.ones(len(piece), bool), learn=True)
 
     fit_scores, fit_targets = collected(model, calibration)

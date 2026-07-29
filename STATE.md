@@ -135,6 +135,48 @@ pure interference.
 Every text record below carried the sentence *"this does not touch the relational
 line"* as an **inference**. It is now a measurement.
 
+### And the mixture escape hatch is closed — g18-06
+
+142 left an obvious way out: text is a mixture, so if the store does its job on
+the thin *binding* slice, the mean would barely move while the mechanism works
+exactly as designed. It does not.
+
+                        floor      nostore      gap
+    all                 9.1857     9.1873     +0.0016
+    repeat              7.9178     7.9215     +0.0037
+    RARE repeat        11.0963    11.0947     -0.0016      6.3% of positions
+    novel              10.8058    10.8046     -0.0012
+
+**Nothing, anywhere** — including where the token appeared earlier in the same
+chunk *and* is rare enough in training that only binding could predict it.
+
+*(`repeat` alone is confounded and the run showed it: repeats are 56% of
+positions and score 7.92 against novel's 10.81, but `nostore` scores 7.92 too.
+"Occurred earlier" correlates hard with "is common". Hence the rare class.)*
+
+> So the difference between MQAR at 0.995 and text is **not** that text has
+> marginals the prior takes first. **On text the store fails at the very task it
+> aces on MQAR.**
+
+### ⇒ NEXT, and it is mechanical rather than architectural
+
+With `context_keys` the address at position `t` is `hash(t-1, t)`. **To retrieve
+what followed an earlier occurrence of a rare word, the preceding token must
+match too** — the same word in a different context has a different address, and
+the earlier binding is not reachable at all. MQAR does not have this problem: its
+query is a bare key with a marker before it, so the pair repeats exactly.
+
+If that is right, the store is not failing at binding on text — it is being asked
+for an address that in-context recall can almost never produce.
+
+**The test:** g18-06's rare-repeat split under **single** keys, where the address
+is the token alone and the earlier binding is reachable by construction. g18-02
+put single keys behind in aggregate (9.276 against 9.186), but the aggregate is
+exactly the mixture g18-06 exists to look past.
+
+Needs a `--keys` flag on g18-06 and one sweep. **Not built** — naming it beats
+half-running it.
+
 ### the store's contribution on text is substitutable by a prior
 
 **Decision 139**, measured on the corrected harness with its reproduction gate

@@ -211,6 +211,25 @@ class _Guarded:
             raise RuntimeError(f"worker refused: {refusal}") from None
 
 
+def bits(scores, targets, temperature: float) -> float:
+    """Cross-entropy in bits per token, at this temperature.
+
+    Shared rather than copied. **Uncalibrated bits are not comparable across
+    arms** -- a mechanism that sums several retrievals changes the scale of the
+    logits, so raw cross-entropy would measure logit magnitude rather than the
+    quality of the distribution. Every caller must fit `temperature` on held-out
+    text that was not trained on; g10-01 records what happens when it is fitted
+    on text inside the training region (37 bits per character over an 86-symbol
+    vocabulary).
+    """
+    import numpy as np
+    scaled = scores / temperature
+    scaled = scaled - scaled.max(axis=1, keepdims=True)
+    weights = np.exp(scaled)
+    probability = weights[np.arange(len(targets)), targets] / weights.sum(axis=1)
+    return float(-np.log2(np.maximum(probability, 1e-12)).mean())
+
+
 def emit(records: list[dict], path: Path | None) -> None:
     """Write results, or print them as a table."""
     if path is None:

@@ -116,13 +116,7 @@ def scores_and_targets(model, pieces) -> tuple[np.ndarray, np.ndarray]:
     return np.asarray(rows), np.asarray(wanted)
 
 
-def bits(scores: np.ndarray, targets: np.ndarray, temperature: float) -> float:
-    """Cross-entropy in bits per character, at this temperature."""
-    scaled = scores / temperature
-    scaled = scaled - scaled.max(axis=1, keepdims=True)
-    weights = np.exp(scaled)
-    probability = weights[np.arange(len(targets)), targets] / weights.sum(axis=1)
-    return float(-np.log2(np.maximum(probability, 1e-12)).mean())
+from experiments.harness import bits  # noqa: E402,F401
 
 
 def run_one(args) -> list[dict]:

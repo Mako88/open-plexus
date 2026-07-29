@@ -97,7 +97,15 @@ import numpy as np
 FACT = 0
 #: Marks a question: `QUERY entity value`, and the value is what is scored.
 QUERY = 1
-#: How many token ids are spoken for before entities begin.
+#: Marks a family-to-family link, and **only exists when `family_links` is on**
+#: -- note 050's instrument. Adding a marker unconditionally would shift
+#: `entity_base` and stop every number in decisions 143-151 reproducing, which
+#: is decision 74's failure exactly. So the reservation is a property of the
+#: config rather than a constant, and `config.reserved` is what to read.
+LINK = 2
+
+#: How many token ids are spoken for before entities begin, WITHOUT links.
+#: Read `config.reserved`, never this, unless you mean the link-free layout.
 RESERVED = 2
 
 
@@ -131,6 +139,15 @@ class FamilyConfig:
     n_values: int = 8
     stated_per_family: int = 2
     exceptions_per_family: int = 0
+    #: State a LINK between families and ask a third kind of question --
+    #: **note 050's instrument**, and the only task here that needs the read
+    #: gate and the hop mechanism at once.
+    #:
+    #: False reproduces the task decisions 143-151 measured, token for token.
+    #: `tests/test_families.py` asserts that rather than intending it: the link
+    #: permutation is drawn from a SEPARATE rng so the main draw sequence is
+    #: untouched, and the marker is reserved only when this is on.
+    family_links: bool = False
     attribute_mentions: int = 2
     queries_per_kind: int = 2
     seed: int = 0
@@ -159,8 +176,40 @@ class FamilyConfig:
         return self.n_families * self.family_size
 
     @property
+    def reserved(self) -> int:
+        """Token ids spoken for before entities begin.
+
+        One more when links are on, because `LINK` needs an id. Everything
+        downstream is derived from this, so the link-free layout is byte
+        identical to what decisions 143-151 measured.
+        """
+        return RESERVED + (1 if self.family_links else 0)
+
+    @property
+    def linked_family(self) -> tuple[int, ...]:
+        """Which family each family points at, as a derangement.
+
+        Drawn from a SEPARATE generator seeded off `seed`, so switching links on
+        does not disturb the main draw sequence and the link-free task keeps
+        reproducing. A family never links to itself -- a self-link makes the
+        question identical to TRANSFER and would quietly dilute the arm.
+        """
+        if not self.family_links:
+            return ()
+        rng = np.random.default_rng(self.seed + 104729)
+        for _ in range(64):
+            order = rng.permutation(self.n_families)
+            if all(int(order[f]) != f for f in range(self.n_families)):
+                return tuple(int(x) for x in order)
+        # Rotation by one is a derangement for any n >= 2, and `n_families >= 2`
+        # is enforced above. Reached only if 64 draws all fixed a point, which
+        # for n >= 4 is rarer than one in a million -- but a task that sometimes
+        # returns a self-link is worse than one that is occasionally regular.
+        return tuple((f + 1) % self.n_families for f in range(self.n_families))
+
+    @property
     def entity_base(self) -> int:
-        return RESERVED
+        return self.reserved
 
     @property
     def attribute_base(self) -> int:
@@ -208,6 +257,11 @@ class Sequence:
     #: its family's value -- the falsifier for the mechanism that carries
     #: transfer. Never true at the same position as `is_transfer`.
     is_exception: tuple[bool, ...] = ()
+    #: Same order again. True where the answer is the LINKED family's value
+    #: rather than this entity's own or its family's -- note 050's arm. The
+    #: entity's fact was never stated, so answering needs the gate to notice the
+    #: empty address AND the link to be followed. Empty unless `family_links`.
+    is_linked: tuple[bool, ...] = ()
 
 
 def background(config: FamilyConfig, count: int) -> list[np.ndarray]:
@@ -279,6 +333,30 @@ def generate(config: FamilyConfig, seed: int | None = None) -> Sequence:
     for entity, value in facts:
         tokens.extend((FACT, entity, value))
 
+    # THE LINKS, note 050's instrument. Stated as `LINK a b` where a and b are
+    # REPRESENTATIVE ENTITIES of the two families -- there is no family token,
+    # and adding one would hand the model the grouping the task exists to make
+    # it discover.
+    #
+    # Stated AFTER the facts and never in a background stream, so the link
+    # cannot reach `ContentIndex`. That is what the calibration in note 050
+    # checked: the index carries no family-to-family structure, by construction
+    # rather than by luck.
+    linked_value: dict[int, int] = {}
+    if config.family_links:
+        pairs = []
+        for family in range(config.n_families):
+            other = config.linked_family[family]
+            # The representative is the family's FIRST entity, fixed rather than
+            # drawn, so the link is a property of the families and not another
+            # thing to recover per sequence.
+            pairs.append((config.entity_base + family * config.family_size,
+                          config.entity_base + other * config.family_size))
+            linked_value[family] = config.value_base + int(values[other])
+        rng.shuffle(pairs)
+        for here, there in pairs:
+            tokens.extend((LINK, here, there))
+
     # QUESTIONS. DIRECT draws from entities whose fact was stated, TRANSFER from
     # those whose was not -- and both answer with their FAMILY's value, which is
     # what makes the two comparable.
@@ -296,7 +374,35 @@ def generate(config: FamilyConfig, seed: int | None = None) -> Sequence:
     rng.shuffle(odd)
     for entity in odd[:config.queries_per_kind]:
         asked.append((entity, exceptions[entity], False, True))
-    rng.shuffle(asked)
+
+    # THE LINKED ARM. Drawn from entities whose own fact was NOT stated, exactly
+    # like TRANSFER -- so the gate must fire on both and the difference between
+    # them is purely how far the answer is. TRANSFER stops at the family;
+    # LINKED follows the link one step further.
+    #
+    # Taken from the TAIL of `unstated` so a LINKED entity is never also asked
+    # as TRANSFER in the same sequence, which would put two different correct
+    # answers on one address.
+    linked_asked: list[tuple[int, int, bool, bool]] = []
+    if config.family_links:
+        spare = unstated[config.queries_per_kind:]
+        for entity in spare[:config.queries_per_kind]:
+            linked_asked.append(
+                (entity, linked_value[config.family_of(entity)], False, False))
+    if config.family_links:
+        asked_all = ([(a, False) for a in asked]
+                     + [(a, True) for a in linked_asked])
+        rng.shuffle(asked_all)
+        asked = [a for a, _ in asked_all]
+        linked_flags = [flag for _, flag in asked_all]
+    else:
+        # THE BYTE-IDENTITY RAIL. The link-free path must make exactly the draws
+        # decisions 143-151 measured, in exactly this order -- so it shuffles
+        # `asked` itself rather than a list of pairs, because shuffling a
+        # different object consumes the generator differently and every one of
+        # those numbers would stop reproducing. Tested, not intended.
+        rng.shuffle(asked)
+        linked_flags = []
 
     positions: list[int] = []
     transfer: list[bool] = []
@@ -309,7 +415,7 @@ def generate(config: FamilyConfig, seed: int | None = None) -> Sequence:
         exceptional.append(is_exception)
 
     return Sequence(tuple(tokens), tuple(positions), tuple(transfer),
-                    tuple(exceptional))
+                    tuple(exceptional), tuple(linked_flags))
 
 
 def dataset(config: FamilyConfig, count: int) -> list[Sequence]:

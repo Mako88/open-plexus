@@ -19,7 +19,7 @@ import unittest
 import numpy as np
 
 from openplexus.tasks.families import (
-    FACT, QUERY, FamilyConfig, background, dataset, generate)
+    FACT, LINK, QUERY, FamilyConfig, background, dataset, generate)
 
 BASE = FamilyConfig(n_families=4, family_size=3, n_attributes=2, n_values=6,
                     stated_per_family=1, queries_per_kind=1, seed=5)
@@ -248,6 +248,91 @@ class TheAnswerKeyIsSeparateFromTheTask(unittest.TestCase):
         members = [t for group in BASE.families() for t in group]
         self.assertEqual(len(members), BASE.n_entities)
         self.assertEqual(len(set(members)), BASE.n_entities)
+
+
+class LinksAreOffAndInvisible(unittest.TestCase):
+    """Note 050's instrument, and the two things that make it safe.
+
+    **The rail that matters most is the first.** `family_links` edits the file
+    decisions 143-151 are measured on. If switching the field into existence
+    changed one draw, every one of those numbers would stop reproducing while
+    still looking plausible -- decision 74's failure, which is the reason this is
+    asserted rather than intended.
+    """
+
+    def test_the_link_free_path_is_unchanged_by_the_field_existing(self):
+        # Not a comparison against a stored blob: the point is that the DEFAULT
+        # and the explicit `False` take the same draws, and that neither reserves
+        # the LINK id. A regression here shifts `entity_base` or consumes the
+        # generator differently, and both are silent.
+        for seed in range(12):
+            for exceptions in (0, 1):
+                default = generate(FamilyConfig(
+                    seed=seed, exceptions_per_family=exceptions))
+                explicit = generate(FamilyConfig(
+                    seed=seed, exceptions_per_family=exceptions,
+                    family_links=False))
+                self.assertEqual(default.tokens, explicit.tokens)
+                self.assertEqual(default.query_positions,
+                                 explicit.query_positions)
+                self.assertEqual(default.is_transfer, explicit.is_transfer)
+                self.assertEqual(default.is_exception, explicit.is_exception)
+                self.assertEqual(default.is_linked, ())
+
+    def test_links_do_not_move_the_vocabulary_when_off(self):
+        off = FamilyConfig(seed=0)
+        self.assertEqual(off.reserved, 2)
+        self.assertEqual(off.entity_base, 2)
+        # And they DO reserve one more when on, or `LINK` would collide with the
+        # first entity and state a fact about a marker.
+        self.assertEqual(FamilyConfig(seed=0, family_links=True).reserved, 3)
+
+    def test_no_family_links_to_itself(self):
+        # A self-link makes the question identical to TRANSFER, which would
+        # dilute the arm rather than fail it -- the quietest kind of wrong.
+        for seed in range(30):
+            config = FamilyConfig(seed=seed, family_links=True)
+            for family, other in enumerate(config.linked_family):
+                self.assertNotEqual(family, other)
+
+    def test_the_link_is_a_permutation(self):
+        for seed in range(10):
+            config = FamilyConfig(seed=seed, family_links=True)
+            self.assertEqual(sorted(config.linked_family),
+                             list(range(config.n_families)))
+
+    def test_a_linked_query_is_never_also_asked_as_transfer(self):
+        # Two different correct answers on one address would make the arm
+        # unscoreable, and would look like the mechanism failing.
+        for seed in range(20):
+            sequence = generate(FamilyConfig(seed=seed, family_links=True))
+            linked = {sequence.tokens[at] for at, flag
+                      in zip(sequence.query_positions, sequence.is_linked)
+                      if flag}
+            transfer = {sequence.tokens[at] for at, flag
+                        in zip(sequence.query_positions, sequence.is_transfer)
+                        if flag}
+            self.assertEqual(linked & transfer, set())
+
+    def test_a_linked_entity_never_had_its_own_fact_stated(self):
+        # The arm exists to need the gate. An entity whose fact was stated has
+        # an occupied address and would be answerable without it.
+        for seed in range(20):
+            sequence = generate(FamilyConfig(seed=seed, family_links=True))
+            tokens = sequence.tokens
+            stated = {tokens[i + 1] for i in range(len(tokens) - 2)
+                      if tokens[i] == FACT}
+            for at, flag in zip(sequence.query_positions, sequence.is_linked):
+                if flag:
+                    self.assertNotIn(tokens[at], stated)
+
+    def test_the_link_never_reaches_the_background_streams(self):
+        # THE CALIBRATION, as a test rather than a one-off. `ContentIndex` is
+        # fitted on these, so a LINK token appearing here would let the index
+        # answer with no hop -- decision 143's circularity in a new costume.
+        config = FamilyConfig(seed=0, family_links=True)
+        for stream in background(config, 20):
+            self.assertNotIn(LINK, stream.tolist())
 
 
 if __name__ == "__main__":

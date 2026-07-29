@@ -101,12 +101,34 @@ A link permutation drawn blindly could land on a pair the index already sees as
 close, and that cell would then be partly answerable without any hop — decision
 143's trap wearing a different costume.
 
-> **So the calibration must check the DRAWN link, not the average.** For each
-> seed, the cosine between the linked families' entity blocks must sit inside the
-> across-family distribution rather than in its upper tail, and the number must
-> be carried in every record — as `family_recovery` already is in g19-01, and for
-> the same reason: a weak result read without it could be the composition failing
-> or the link being trivially visible, and those are different findings.
+**So the calibration must check the DRAWN link, not the average — and the first
+version of that check was wrong.** It asked whether any single drawn link sat
+above its seed's 90th percentile, and 1 seed in 6 tripped it. That is not
+leakage, it is arithmetic: with 8 links among 56 ordered pairs, chance alone puts
+a link in the top 10% about half the time, so **1 in 6 is below what chance
+produces.** An acceptance test that flags chance is worse than none, because it
+invites explaining away a real failure later.
+
+The right statistic is whether the links are **collectively enriched**. A
+permutation test, six seeds, 20 000 resamples, one-sided:
+
+    seed   drawn mean   other mean   p
+       0      -0.1465      -0.0879   0.847
+       1      -0.1071      -0.1066   0.506
+       2      -0.0930      -0.1055   0.414
+       3      -0.1312      -0.0974   0.791
+       4      -0.1018      -0.0905   0.607
+       5      -0.1195      -0.0908   0.715
+
+**Smallest p is 0.414.** The drawn links are statistically indistinguishable from
+any other family pair, so the index cannot shortcut them. `LINK` never appears in
+a background stream, and `tests/test_families.py` asserts that rather than
+trusting it.
+
+The per-seed number should still ride along in every record — as
+`family_recovery` does in g19-01, and for the same reason: a weak result read
+without it could be the composition failing or the link being visible, and those
+are different findings.
 
 ## The arms this needs
 
@@ -146,9 +168,12 @@ link must therefore be **off by default** and the existing generator byte
 identical without it, or every number in 148–151 stops reproducing — decision
 74's failure, and the reason `--n-values` and `--branches` default to `None`.
 
-**Half the calibration is done and it passed.** The index carries no
-family-to-family structure, by construction rather than by luck. What remains
-before any of the rest is worth writing is the per-seed check on the DRAWN link,
-and that needs the link to exist — so it is the first thing the task file owes.
+**The calibration is done and it passed. The task generator is built; the arms
+are not.** The index carries no
+family-to-family structure, by construction rather than by luck. `family_links` is in `families.py`, off by default, and the link-free path is
+**byte identical to the pre-change generator across 360 configurations** —
+tokens, query positions, both flag vectors, the background streams and the
+vocabulary size. Decisions 143–151 still reproduce.
 
-**The task is not built and not started.**
+**What remains is the four arms and the model-side `inherit-hop` option**, which
+is where the design choice actually gets decided.

@@ -55,6 +55,32 @@ John's statement of it, 2026-07-28:
 > potentially have something like original thoughts — to operate more similarly
 > to the way humans operate, and hopefully be close to AGI.
 
+**Restated by John 2026-07-29**, after a week of work drifted onto next-token
+text and had to be walked back (decisions 135-142, notes 046 and 047). Recorded
+at his request, in his words:
+
+> I want the system to be able to meaningfully store or learn one given idea, one
+> concept, one thing, and how that relates to other things and concepts, and have
+> some ability to learn and be aware of the differences and the interrelations
+> between those concepts.
+>
+> We don't care about figuring out what the most likely next token is. We care
+> about being able to actually process a query — or video input, or a picture,
+> whatever it happens to be — and form a response based on its awareness of all
+> of the concepts in that question.
+>
+> Can it holistically understand a given sentence, or a question, and then form a
+> response based on its awareness of all of the concepts in it? **The goal is
+> understanding, not prediction.**
+
+**And the multi-modal ambition is part of the goal, not a later luxury.** He
+wants as many input and output formats as the design can carry: *"the core of it
+is, the goal is understanding, not prediction... I'd love for this to be
+multi-modal."* Text is the easiest medium to start in and is **not** ruled out —
+the requirement is that the architecture must not be *limited* to it. That is
+what `concepts.py`'s surface-to-concept indirection is for, and it is why one
+concept must be able to have many surfaces.
+
 **The bet, stated so it can fail:** a system whose training objective is
 *relational* rather than *sequential* will reason rather than continue. If a
 model with a good concept map turns out to reason no better than a next-token
@@ -201,6 +227,23 @@ project.
   property this project optimises. Biology is nonetheless a first-class
   *reference* and should be used freely — see §2.1, which is the affirmative
   half of this and matters more than the restriction.
+
+- **NOT NEXT-TOKEN PREDICTION.** John, 2026-07-29, asked for this stated
+  outright: *"text prediction is not the goal... we don't care about figuring
+  out what the most likely next token is."*
+
+  This was implicit in §1 from the start — *"trained to learn how concepts
+  relate rather than to predict what comes next"* — and being implicit was not
+  enough. Decisions 135–142 spent a week measuring this model in bits per token
+  on next-word text, and [note 047](docs/notes/047-what-the-store-can-hold-on-text-is-an-n-gram.md)
+  is the finding that closed it: **on a next-token objective the only relation
+  the store can express is n-gram shaped, and a count table does that exactly.**
+  The objective was the ceiling, not the store.
+
+  **The distinction to keep, so this is not over-corrected:** text as *input* is
+  fine and always was. Text-*prediction* as the score is what is excluded. A
+  model asked what it HOLDS is a different measurement from one asked what comes
+  next, and only the second is bounded by counting.
 
 - **Not efficiency per FLOP.** See §1.1.
 

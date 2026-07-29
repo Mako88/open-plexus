@@ -268,6 +268,39 @@ is enough to show a 0.10 effect, and there is none.
 > At **MQAR's own load** of a handful of bindings, the store still contributes
 > nothing to text. So the difference is not how much it is holding.
 
+### ⇒⇒ THE GOAL, RESTATED BY JOHN 2026-07-29 — and it settles the instrument question
+
+Recorded in full in [GOALS §1](GOALS.md) and as an explicit non-goal in §2. The
+short form:
+
+> **The goal is understanding, not prediction.** Store one concept and how it
+> relates to other concepts; be aware of the differences and interrelations
+> between them; process a query and respond from that awareness. Multi-modal
+> eventually — text is the easiest medium, not the limit.
+
+**`closure.py` and `kinship.py` are the right instruments** — John, asked
+directly. They test relational structure rather than continuation, which is the
+shape the goal names.
+
+**What they lack, and it is the gap that matters now.** g17-01 already recorded
+it, in July, and it was never acted on:
+
+> *"MQAR and the relational tasks are solved by this model, but their entities
+> are arbitrary by construction, so there IS no similarity for an index to find.
+> Running there would measure an index over noise."*
+>
+> *"**Build a task with designed similarity, where the model already works.**
+> Entities that genuinely share attributes... **(3) is the choice**"*
+
+So the relational tasks give **relations between arbitrary symbols**, and the
+goal asks for **relations between things that also resemble each other**. A
+concept that can have many surfaces, or share attributes with a neighbour, has
+nowhere to show that on `kinship.py` as it stands.
+
+**g17-01 chose to build exactly that instrument and the project went to word-level
+text instead.** That is the drift in one sentence, and the pre-drift record
+already contains the answer.
+
 ### ⇒ AND THE CANDIDATE BELOW IS PROBABLY THE WRONG QUESTION — 2026-07-29
 
 Everything from here down measures the store **against a next-token objective**,

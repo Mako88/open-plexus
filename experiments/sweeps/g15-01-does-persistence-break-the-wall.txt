@@ -2,6 +2,37 @@ Does a persistent slow store break decision 63's 16,000-character wall?
 =======================================================================
 
 Script: experiments/g15_01_does_persistence_break_the_wall.py
+Status: RUN THREE TIMES. Final: 15 of 15 jobs, run 30409788113.
+
+FINAL ANSWER: **NO. Persistence does not break the wall -- P3 REFUTED with the
+              store working properly.** But `persist-slow-decay` beats the
+              baseline by ~0.08 bits AT EVERY DATA POINT, and its store norm is
+              CONSTANT at 0.4 whatever the corpus size.
+
+              **A decaying persistent store is a fixed-size cache, not a map.**
+              It reaches equilibrium and holds a moving window. Persistence
+              alone adds no CAPACITY, and capacity is what a growing map needs.
+
+    arm                4,000    8,000   16,000   32,000   62,500  125,000
+    baseline          5.5989   5.5709   5.5353   5.5327   5.5255   5.5261
+    consolidate       5.6349   5.6142   5.5694   5.5749   5.5647   5.5610
+    persist           5.7733   5.7562   5.7838   5.7338   5.8448   5.7101
+    persist-slow      8.2720   9.3943   9.9479  11.1714   7.1027      nan
+    persist-slow-decay 5.5250  5.4823   5.4551   5.4536   5.4393   5.4427
+
+    slow-store norm
+    persist-slow       27.2     40.1     58.5    139.3    131.7     52.2   diverges
+    persist-slow-decay  0.4      0.4      0.4      0.4      0.4      0.4   equilibrium
+
+**Movement past the wall: +0.0124, under the 0.04 seed spread, and not
+monotone.** That is decision 69's finding arriving again on a new mechanism:
+*everything found so far moves the LEVEL, nothing moves the SLOPE.*
+
+Full reading in DECISION 133. The three passes below are kept because the first
+two measured the INSTRUMENT rather than the hypothesis, and finding that out was
+the only way to ask the question properly.
+
+--- FIRST PASS, superseded ---
 Status: RUN, 54 of 54 cells, 9 of 9 jobs, run 30408859908.
 
 ANSWER: **INCONCLUSIVE, and P3's "CONFIRMED" is an artefact — do not quote it.**

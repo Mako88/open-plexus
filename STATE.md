@@ -114,9 +114,25 @@ alone means building it twice.
 
 | | change | status |
 |---|---|---|
-| **0a** | **persistent slow store** | built; **falsifier still not answered** |
-| **0b** | **concept partitioning** | blocked on 0a, deliberately |
+| **0a** | **persistent slow store** | **DONE and REFUTED in its strong form** (decision 133). Worth **0.08 bits at every scale** — keep it — but it does not move the wall |
+| **0b** | **concept partitioning** | **NOW THE LIVE WORK**, and 0a's refutation is the argument for it |
 | 0c | content-derived keys | not started; every key is a random draw, so the store has **no notion of similarity at all** |
+
+**0a's result, and it redirects the whole line.** `persist-slow-decay` beats the
+baseline at every data point, and its store norm is **0.4 at every corpus size** —
+decay balances writes at a fixed point, so it reaches equilibrium immediately.
+
+> **A decaying persistent store is a fixed-size cache, not a map.** Without decay
+> it diverges to NaN instead. Persistence adds *lifetime*, not *capacity*.
+
+**So the wall is a CAPACITY limit, not a lifetime limit**, and decision 63 re-reads
+as: 16,000 characters is where a `d × d` store plus a `vocab × d` readout runs out
+of room. Note 042 said the wall was about having nowhere to accumulate; there is
+now somewhere, and it did not move.
+
+**That is an argument for 0b rather than against it.** Concept partitioning is the
+only proposal on this page that adds capacity as the corpus grows — more concepts
+on more nodes — where persistence extends how long a fixed amount of room is held.
 
 **0a's falsifier is decision 63's 16,000-character wall**, and two runs have
 measured the *instrument* rather than the hypothesis:

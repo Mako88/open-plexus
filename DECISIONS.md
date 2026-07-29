@@ -76,6 +76,8 @@ a report to John, not a gate.
 | 129 | ambiguity is detectable before searching; the expensive signal is below chance |
 | 130 | the gate pays (+0.020 over search-everywhere); the search line closes |
 | 131 | the persistence test tested a SATURATED store; lasting_cap is what binds |
+| 132 | the slow store had no brake, and the write rate was 100x too large |
+| 133 | persistence moves the LEVEL not the SLOPE — the wall is CAPACITY |
 
 ---
 
@@ -3481,3 +3483,80 @@ the store grow with the corpus instead of saturating at the first data point.
 
 **Taken without asking**, under standing authorisation. John approved items 1 and
 2; this reports that item 1's test has to be re-run before item 2 starts.
+
+---
+
+## 133. Persistence moves the LEVEL, not the SLOPE — a decaying store is a cache, not a map
+
+g15-01, third pass, 15 of 15 jobs, run 30409788113. **Note 042's item 1 is
+refuted in its simple form, and what replaces it points straight at item 2.**
+
+    arm                4,000    8,000   16,000   32,000   62,500  125,000
+    baseline          5.5989   5.5709   5.5353   5.5327   5.5255   5.5261
+    persist-slow      8.2720   9.3943   9.9479  11.1714   7.1027      nan
+    persist-slow-decay 5.5250  5.4823   5.4551   5.4536   5.4393   5.4427
+
+    slow-store norm
+    persist-slow       27.2     40.1     58.5    139.3    131.7     52.2   diverges
+    persist-slow-decay  0.4      0.4      0.4      0.4      0.4      0.4   equilibrium
+
+### The good news first, because it is real
+
+**`persist-slow-decay` beats the baseline at every single data point**, by 0.074
+to 0.083 bits. That is a larger and more consistent gain than most mechanisms in
+this project have produced on text, and it is the arm's own control that makes it
+readable: `consolidate` (same consolidation, no persistence) is *worse* than
+baseline everywhere, so **the gain is persistence and not consolidation.**
+
+### And the refutation, which is the finding
+
+**P3 REFUTED.** Movement past the wall is **+0.0124**, under the 0.04 seed
+spread, and not monotone. With the store finally working — accumulating, not
+saturated, gate firing 16,470 to 51,713 times — the wall does not move.
+
+That is decision 69 arriving on a new mechanism: *everything found so far moves
+the LEVEL, nothing moves the SLOPE.* Note 042 predicted persistence would be
+different. It is not.
+
+### Why, and this is the part worth keeping
+
+**The store's norm is 0.4 at every corpus size.** Decay balances writes at a
+fixed point, so the store reaches equilibrium almost immediately and stays there
+whether it has seen 4,000 characters or 125,000.
+
+**A decaying persistent store is a fixed-size cache holding a moving window, not
+a map that grows.** And the alternative is worse: `persist-slow` without decay
+grows to 139 and then diverges into NaN, scoring 8–11 bits throughout.
+
+So the two options are a store that forgets at a fixed size, or one that
+explodes. **Persistence alone adds no CAPACITY**, and a `d × d` matrix has fixed
+capacity whatever its lifetime — decision 109 measured it at ~d².
+
+### What this means for the architecture pass
+
+Note 042 said the wall exists because there is nowhere to accumulate. **Wrong:
+there is now somewhere, and the wall did not move.** The correct statement is
+narrower and more useful:
+
+> The wall is a CAPACITY limit, not a lifetime limit. Giving a fixed-size store
+> a longer life does not give it more room.
+
+**That is an argument for item 2 rather than against it.** Concept partitioning
+is the only proposal on the page that adds capacity as the corpus grows — more
+concepts live on more nodes — where persistence merely extends how long a fixed
+amount of room is held.
+
+It also re-reads decision 63 correctly: 16,000 characters is not where learning
+stops, it is where **a d × d store plus a `vocab × d` readout runs out of
+room.**
+
+### What it does NOT license
+
+Dropping persistence. It is worth 0.08 bits at every scale and it is the
+prerequisite for anything that accumulates — a partition with no memory across
+sequences is the same fixed-size problem spread across machines. `lasting_decay`
+stays, and the settings that work are recorded at the config.
+
+**Taken without asking**, under standing authorisation. John approved items 1 and
+2; this reports that item 1 does what it can and item 2 is where the capacity
+has to come from.

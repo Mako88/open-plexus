@@ -4780,3 +4780,53 @@ is not.
 about whether `inherit` helps anywhere other than families. Kinship, closure and
 chains are still unmet, and that is now the only claim left standing between "the
 read gate works on the task built to ask about it" and "the read gate works".
+
+## 151. The gate knows which addresses it wrote, not what it knows
+
+Kinship, three seeds, and it is a bound rather than a result:
+
+    hops 1   plain 0.7767   indexed 0.7067   inherit 0.7767   deferred 0.0000
+    hops 2   plain 0.4433   indexed 0.4067   inherit 0.4433   deferred 0.0000
+
+At one hop the answer IS a stated fact. At two it is a composition of two. **The
+gate cannot tell the difference** — 0.0000 either way, to four decimals, which is
+K1 confirmed at the limit rather than approximately.
+
+### Why, and it was predicted from the layout rather than discovered
+
+Kinship's question ends `... QUERY target FACT subject`, so the scored position's
+pair key is `(FACT, subject)` — the key a fact wrote for that person **as a
+subject**. The asked subject is the start of the path, so it is the subject of at
+least one stated fact at every hop count. The address is occupied whether the
+answer needs recall or composition.
+
+> **Occupancy is a property of the ADDRESS, not of the knowledge.** Those
+> coincide only when addresses are per-fact, which is what the families task
+> does and what kinship does not.
+
+### What this bounds
+
+Decision 148 is entitled to say **"the gate knows which addresses it has
+written"**. It is NOT entitled to say "the gate knows what it knows", which is
+the same claim only on tasks that address by fact. That distinction was going to
+be made eventually and is cheaper made now than after it had been built on.
+
+**K2 confirmed** — `inherit` matches `plain` to four decimals at both hop counts,
+so decision 150's rail holds under `context_keys` pair keys as well as single
+ones, which is a different key structure and was worth checking separately.
+**K3 confirmed** — `indexed` loses 0.070 and 0.037, so the extra reads cost here
+too and the gate is again what avoids the cost.
+
+### And closure cannot ask this question at all
+
+Worth recording so it is not built twice. Closure looked like the ideal test --
+its docstring says an entailed fact's `key(S, O)` was never written -- but the
+same file says the layout scores at the OBJECT position and *"a stated fact is
+not recallable within its own sequence, which is correct and is why the stated
+half is a floor rather than a second measurement."* **Every address is unwritten
+at scoring time**, stated and entailed alike, so the gate has nothing to separate
+and would defer everywhere. Checked before building, not after.
+
+**So the gate has now met three tasks.** It fires selectively on families, never
+on MQAR, never on kinship, and cannot be asked on closure. Every one of those is
+consistent with a single sentence: it reports whether an address was written.

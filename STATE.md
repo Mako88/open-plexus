@@ -119,9 +119,28 @@ unwritten, which rules out the failure that would have been invisible on
 families: a false negative there would make an entity silently inherit its
 family's answer over its own.
 
-**What is open.** Kinship, closure and chains are still unmet. Until they are,
-"the read gate works" means "on the task built to ask about it, and it costs
-nothing on one that is not".
+**And decision 151 bounds what it may be called.** On kinship the gate defers on
+**0.0000** of queries at one hop AND at two — where one hop IS a stated fact and
+two is a composition of them:
+
+    hops 1   plain 0.7767   indexed 0.7067   inherit 0.7767   deferred 0.0000
+    hops 2   plain 0.4433   indexed 0.4067   inherit 0.4433   deferred 0.0000
+
+The question ends `... FACT subject`, and the asked subject is always a stated
+subject, so the address is occupied either way.
+
+> **Occupancy is a property of the ADDRESS, not of the knowledge.** So the gate
+> "knows which addresses it has written" — which is "knows what it knows" only
+> where addresses are per-fact. Families is such a task; kinship is not.
+
+Closure cannot ask this at all: it scores at the object position, where *no*
+address has been written yet, stated or entailed. Checked before building.
+
+**What is open.** Chains is unmet. But the sharper question is no longer coverage
+— it is that the gate reports address occupancy, and the capability John is
+after wants something that reports **knowledge**. The families task makes those
+the same thing. Finding a mechanism where they stay the same thing on a task that
+does not is the next real problem.
 
 Decision 144 answers the previous question — *does grouping do anything harder
 than same-kind-same-answer* — with **no, and the failure is total**:

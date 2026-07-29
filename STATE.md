@@ -63,9 +63,19 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Does the read gate survive contact with anything that is not this task?**
+**Can the read gate and the hop mechanism be made to compose?**
 
-Decision 148 answered the previous question — *can anything tell which of two
+They are the project's two mechanisms for the two halves of the problem and they
+currently **exclude each other** (decision 152). The gate knows when an address
+holds nothing; the hop follows an address that holds a *step* toward the answer.
+Composition tasks need both and can have neither.
+
+The previous question — *does the read gate survive contact with anything that is
+not this task* — is answered: **yes, and its scope is now measured rather than
+hoped for.** The evidence is below, and the coverage table at the end of it is
+what raises the question above.
+
+Decision 148 answered the question before that — *can anything tell which of two
 retrievals to trust* — with **yes, once the question is asked exactly.**
 
     with exceptions       direct  transfer  exception   wrong = a sibling's
@@ -136,78 +146,54 @@ subject, so the address is occupied either way.
 Closure cannot ask this at all: it scores at the object position, where *no*
 address has been written yet, stated or entailed. Checked before building.
 
-**What is open.** Chains is unmet. But the sharper question is no longer coverage
-— it is that the gate reports address occupancy, and the capability John is
-after wants something that reports **knowledge**. The families task makes those
-the same thing. Finding a mechanism where they stay the same thing on a task that
-does not is the next real problem.
+**Coverage is closed, and two tasks closed it by being unaskable — decision
+152.**
 
-Decision 144 answers the previous question — *does grouping do anything harder
-than same-kind-same-answer* — with **no, and the failure is total**:
+    MQAR       gate never fires, costs nothing            150
+    families   gate fires selectively, and it works       148, 149
+    kinship    gate never fires, costs nothing, is blind  151
+    closure    unaskable: no address is written at scoring time
+    chains     unaskable: `index_branches` and `hops > 1` exclude each other
 
-    arm           direct  transfer  exception   wrong = a sibling's
-    ungrouped     0.7792    0.0608     0.7833        0.0084
-    concept       0.4492    0.4708     0.3708        0.8657
+**Both unaskable cases are composition tasks**, which is not a coincidence:
+composition is where the answer sits at no single address, and the gate's whole
+vocabulary is single addresses. The chains refusal is a guard that predates this
+work — a hop key is a softmax mixture over many tokens' rows, so it names no
+concept and the index has nothing to look up.
 
-An EXCEPTION is an entity whose own stated fact contradicts its family's.
-`concept` is **0.41 worse than having no concepts at all**, and when it errs it
-says a sibling's value 86.6% of the time — the superposition speaking in the
-family's voice.
+> **The gate and the hop mechanism are currently mutually exclusive**, and they
+> are the project's two mechanisms for the two halves of the problem: the gate
+> knows when an address holds nothing; the hop follows an address that holds a
+> *step* toward the answer.
 
-**But "one exception halves everything" was the configuration, not the
-mechanism** — decision 145. 2 stated facts with 1 contradicting is a literal
-50/50. Varying how many siblings agree:
+**What is open, and it is now well-specified.** Making those two compose —
+*give the hop machinery a key that names a concept, or give the index something
+else to look up* (note 044). That is the concrete form of "report knowledge
+rather than occupancy", and it is a better problem than the vague version
+because it names the two things that have to meet.
 
-    stated  agree  exception share   direct  transfer  exception
-         2      1            0.50   0.4650    0.4400     0.3725
-         3      2            0.33   0.9200    0.9250     0.0300
-         5      4            0.20   0.9825    0.9900     0.0000
+### How this line got here, in five lines
 
-> **The default is robust and the exception is ERASED.** The address holds the
-> sum, the majority dominates it, and the dissenting fact goes to 0.000. The
-> system does not fail to answer about an exception — it confidently answers with
-> the category's default, which is the most dangerous shape a wrong answer has
-> and a plain description of a stereotype.
+Everything below is settled and lives in DECISIONS.md. It is kept short here
+because the forward-looking claims each of these made were **superseded within
+days**, and a stale "so the next mechanism is..." reads as current guidance.
 
-**AND THAT WAS OVERSTATED — [note 049](docs/notes/049-specific-beats-general-is-a-read-policy.md).**
-The store is one matrix addressed by keys, so a fact at the SURFACE key and a
-default at the CONCEPT key are different addresses and do not collide. What
-collides is that `ByConcept` maps everything to the concept, so the surface is
-never written or read. **This is a read policy, not a representation redesign.**
+    143  grouping CAN answer what was never stated -- concept 0.998 transfer
+    144  and it ERASES exceptions -- 0.371, saying a sibling's value 86.6%
+    145  "one exception halves everything" was the 50/50 config, not the
+         mechanism. With 4 of 5 agreeing the dissenting fact goes to 0.000
+    146  option B (never share an address, read neighbours through the index)
+         is the right addressing and can only average, not choose
+    147  the two obvious ways to choose are refuted; selection is the problem
 
-Each arm is already good at what the other is bad at — `ungrouped` 0.783 on
-exceptions, `concept` 0.471 on transfer — so a reader that consults both should
-get the better of the two. Note 049 has the design, the threshold question that
-needs deciding rather than typing, and three predictions.
+> **The load-bearing correction was note 049's:** the store is one matrix
+> addressed by keys, so a fact at the surface key and a default at the concept
+> key are *different addresses and never collided*. What collided was `ByConcept`
+> mapping everything to the concept. It was a read policy the whole time, which
+> is why 148 cost a sketch rather than a new representation.
 
-**Which explains decision 141 from the other side** — grouping words hurt on text
-because *text is nothing but exceptions*. Every word has its own continuations.
-
-**So the next mechanism is not a better grouping.** It is a representation that
-can carry a default and an override at once, and that is a different kind of
-question from any this line has asked.
-
-The previous question — *can grouping answer about something never stated* — is
-**answered yes**, decision 143, and the answer is narrower than its number:
-
-    arm           direct  transfer      chance 0.125
-    ungrouped     0.6583    0.0867
-    concept       0.9967    0.9983
-    permuted      0.2725    0.0658      same sizes, wrong members
-    nostore       0.0000    0.0000
-
-**The composition works** — discover a grouping from co-occurrence, address a
-store by it, recall a sibling's fact through it — and `permuted` failing at
-matched address count means it is the *similarity* paying, not the address
-collapse that explained everything on text (141).
-
-**But `families.py` gives every member of a family one shared value**, so "group
-by family" and "know the answer is shared" are nearly the same statement. The
-result is partly circular and the sweep record says so at length.
-
-**So the next real test is a relation that depends on the family AND on
-something entity-specific**, where knowing the kind is necessary but not
-sufficient. Nothing in decision 143 speaks to it.
+Decision 141 reads from the other side too — grouping words hurt on text because
+**text is nothing but exceptions**: every word has its own continuations.
 
 Nothing else in this file is a live question. Everything below is either the
 evidence behind that one, a standing agreement, or a refusal.

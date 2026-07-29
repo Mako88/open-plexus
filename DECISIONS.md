@@ -4830,3 +4830,62 @@ and would defer everywhere. Checked before building, not after.
 **So the gate has now met three tasks.** It fires selectively on families, never
 on MQAR, never on kinship, and cannot be asked on closure. Every one of those is
 consistent with a single sentence: it reports whether an address was written.
+
+## 152. Chains cannot be asked either, and the reason is the interesting part
+
+The gate's coverage sweep ends here, and not with a measurement. Building the
+chains arm produced an immediate refusal from a guard that predates all of this:
+
+    index_branches cannot be combined with hops > 1: the hop key is a softmax
+    mixture of every token's row, so it names no concept and the index has
+    nothing to look up. Note 044
+
+**Chains at `hops=1` is not chains** — the task exists to require two. So the
+experiment was deleted rather than weakened, and the finding is the
+incompatibility itself.
+
+### Why this matters more than the number would have
+
+`inherit` needs `index_branches`, because "answer from the neighbours instead"
+requires neighbours, and the content index is what proposes them. The index needs
+a key that **names a concept**. A hop key is a softmax mixture over many tokens'
+rows and names none.
+
+So the read gate and the hop mechanism are **currently mutually exclusive**, and
+they are the two mechanisms this project has for the two halves of the problem:
+
+    the gate    knows when an address holds nothing, and looks elsewhere
+    the hops    follow an address that holds a STEP toward the answer
+
+Chains is exactly the case where the address is occupied by the first hop rather
+than by the answer — the sharpest statement of decision 151's bound — and it is
+the one case the two mechanisms cannot both be present for.
+
+### What the coverage claim actually is now
+
+    MQAR       gate never fires, costs nothing            decision 150
+    families   gate fires selectively, and it works       decisions 148, 149
+    kinship    gate never fires, costs nothing, is blind  decision 151
+    closure    cannot be asked: no address is written at scoring time
+    chains     cannot be asked: the gate and hops exclude each other
+
+**Three tasks measured, two structurally unaskable, and both unaskable cases are
+composition tasks.** That is not a coincidence and it should not be read as one:
+composition is where the answer is not at any single address, and the gate's
+whole vocabulary is about single addresses.
+
+### What this puts on the table
+
+Decision 151 said occupancy is a property of the address rather than of the
+knowledge. This says the project's one mechanism for *reaching* knowledge that is
+not at an address — the hop — cannot currently be combined with the one mechanism
+that knows an address is empty.
+
+**Making those two compose is now the concrete form of the next real problem**,
+and it is a better-specified problem than "find something that reports
+knowledge": it is *give the hop machinery a key that names a concept, or give the
+index something else to look up.* Note 044 is where that argument already lives.
+
+Nothing was measured here and nothing is claimed. The experiment file was
+deleted rather than committed, because a file that cannot run is worse than no
+file.

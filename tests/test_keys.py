@@ -65,6 +65,20 @@ class FamilyKeys:
             0.0, 1.0, self.width)
         return self.share * family + (1.0 - self.share) * own
 
+    def concept(self, tokens: np.ndarray, t: int) -> int:
+        """The token, not the family -- and the choice is the interesting one.
+
+        Routing by FAMILY would put similar concepts on the same node, which is
+        exactly what note 044 says content-derived keys will want: a query that
+        should reach a related binding has to reach the node holding it. Routing
+        by token spreads them, which is what the hash ring is for.
+
+        **These two pull against each other**, and this outside-the-model source
+        is where that becomes visible. Left as the token so this stays a test of
+        the seam rather than an unmeasured design choice smuggled into a test.
+        """
+        return int(tokens[t])
+
 
 class AKeySourceFromOutsideTheModelJustWorks(unittest.TestCase):
 

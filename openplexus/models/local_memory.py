@@ -59,6 +59,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from openplexus.keys import KeySource, PairKeys, TableKeys
+from openplexus.partitioned import ConceptStore
 from openplexus.retrieval import Retrieval, build as build_retrieval
 from openplexus.search import (candidates as search_candidates,
                                decode_margin as search_margin,
@@ -1059,6 +1060,26 @@ class LocalMemoryConfig:
     readout_bias: bool = False
     derived_keys: bool = False
     context_keys: bool = False
+    #: Split the FAST store by CONCEPT across this many nodes. 0 is the single
+    #: `d x d` matrix every number in this project was measured with.
+    #:
+    #: **This is the falsifier for note 042's item 2, not a tuning knob.**
+    #: Decision 134 measured the case -- pooled capacity identical, lone-node
+    #: capacity 16x at 16 nodes -- but the model had never read or written
+    #: through it, so the arrangement was a data structure with good properties
+    #: rather than a component. This is the seam that asks whether it can still
+    #: learn.
+    #:
+    #: **Each node keeps a FULL `d x d` store**, so `n` nodes hold `n` times the
+    #: state. A comparison against `concept_nodes=0` at equal `d_model` is
+    #: therefore biased TOWARD partitioning, which is deliberate: a LOSS under
+    #: that bias is unambiguous evidence that routing hurts, where a win would
+    #: need the g10-09 equal-state treatment before it meant anything.
+    concept_nodes: int = 0
+    #: How many distinct nodes hold each concept. Only meaningful with
+    #: `concept_nodes`; 1 is right for a per-sequence store, which is rebuilt
+    #: from scratch anyway, and higher values exist so churn can be measured.
+    concept_replicas: int = 1
     seed: int = 0
 
     def __post_init__(self) -> None:
@@ -1310,6 +1331,63 @@ class LocalMemoryConfig:
             raise ValueError(
                 f"d_model {self.d_model} does not divide into "
                 f"{self.partitions} partitions")
+        if self.concept_nodes < 0:
+            raise ValueError("concept_nodes must not be negative")
+        if self.concept_replicas < 1:
+            raise ValueError("a concept held nowhere is a concept lost")
+        if self.concept_nodes:
+            # SCOPE, stated as refusals rather than discovered as wrong numbers.
+            #
+            # Each of these is a mechanism that cannot be routed to one node, so
+            # combining it with partitioning would either quietly broadcast --
+            # the collective amended C1 forbids -- or quietly read the wrong
+            # store. Refusing is what keeps the falsifier's result attributable.
+            if self.hops > 1:
+                raise ValueError(
+                    "concept_nodes cannot be combined with hops > 1: the hop "
+                    "key is a softmax mixture of every token's key row "
+                    "(`hop_key = weights @ wk`), so it names no concept and "
+                    "there is no node to send it to. Note 044. The search walk "
+                    "commits to a hard token at every step and IS routable, "
+                    "which is what a partitioned model should use instead")
+            if self.reward_token >= 0:
+                raise ValueError(
+                    "concept_nodes cannot be combined with reward_token: the "
+                    "un-reward path subtracts pending writes, and `pending` "
+                    "keeps (weight, value, key) without the concept that names "
+                    "which node to subtract from. Storable, and unbuilt")
+            if self.memory_cap:
+                raise ValueError(
+                    "concept_nodes cannot be combined with memory_cap: a cap "
+                    "on the pooled norm is a collective, and a per-node cap is "
+                    "a different mechanism that has never been measured")
+            if self.tag_relative:
+                raise ValueError(
+                    "concept_nodes cannot be combined with tag_relative: it "
+                    "divides by the store's total size, which no single node "
+                    "can know")
+            if self.carry_store:
+                raise ValueError(
+                    "concept_nodes cannot be combined with carry_store: "
+                    "carrying is sound here but untested, and an untested "
+                    "combination inside a falsifier is how a result stops "
+                    "being attributable")
+            if self.consolidation:
+                # THE ONE REFUSAL THAT IS TEMPORARY BY DESIGN. Note 042's items
+                # 1 and 2 are the same design seen from two sides, and the
+                # eventual target is a persistent store that is ITSELF
+                # concept-partitioned. `lasting` is a single `d x d` matrix, so
+                # adding it to a node's own store would give every node the same
+                # slow store -- a collective wearing a local's clothes.
+                #
+                # Refused here because this seam exists to ask ONE question. Two
+                # changes at once produce a number nobody can attribute, which
+                # is the rule `orthogonal_every` is waiting on as well.
+                raise ValueError(
+                    "concept_nodes cannot yet be combined with consolidation: "
+                    "`lasting` is a single matrix shared by every node, so "
+                    "partitioning it is the next piece of work rather than a "
+                    "flag combination")
 
 
 class LocalAssociativeMemory:
@@ -1700,6 +1778,28 @@ class LocalAssociativeMemory:
                     f"{len(tokens)}")
 
         memory = np.zeros((d, d))
+        # THE CONCEPT-PARTITIONED FAST STORE, when one is asked for.
+        #
+        # `memory` stays as the matrix a read is served FROM -- reassigned each
+        # step to whichever node owns the concept being read -- so every
+        # retrieval strategy, the readout, and the trace keep working against a
+        # `d x d` matrix exactly as they did. What changes is which one.
+        #
+        # Assigned by `.matrix()`, which returns a VIEW, so `memory += ...`
+        # writes into the owning node rather than into a copy. That is the whole
+        # of the routing, and it is why this does not need a second inner loop.
+        concepts = None
+        if self.config.concept_nodes:
+            concepts = ConceptStore(nodes=self.config.concept_nodes, width=d,
+                                    seed=self.config.seed,
+                                    replicas=self.config.concept_replicas)
+            if leave is not None:
+                raise ValueError(
+                    "concept_nodes cannot be combined with `leave`: a departure "
+                    "here clears DIMENSION rows, which is the other "
+                    "arrangement's failure mode. A concept-partitioned "
+                    "departure removes whole concepts and `ConceptStore.lose` "
+                    "is what expresses it")
         # CARRYING THE STORE BETWEEN SEQUENCES.
         #
         # The reset above is deliberate and is guarded by
@@ -1773,6 +1873,7 @@ class LocalAssociativeMemory:
         # `self.retrieval` and nothing in this method changes.
         self.retrieval.begin(d)
         previous_key = None
+        previous_concept = -1
         previous_retrieval = None
         # None until the query marker is seen, which is also what turns search
         # on: before the question names its far end there is nothing to check a
@@ -1844,10 +1945,20 @@ class LocalAssociativeMemory:
             # The fade, and whether a masked step gets one. Outside the write
             # guard when `decay_when_masked` is set, so selectivity can be
             # measured without the retention that has been riding along with it.
+            if concepts is not None and previous_key is not None:
+                # POINT THE STORE AT THE NODE THAT OWNS WHAT IS BEING WRITTEN.
+                # The binding about to be made is `previous_key -> value`, and
+                # `previous_key` is token t-1's, so it belongs on t-1's node --
+                # not on the node serving this step's read, which is a different
+                # concept and usually a different machine.
+                memory = concepts.matrix(previous_concept)
             if (self.config.decay_when_masked and self.config.decay < 1.0
                     and previous_key is not None
                     and not (store is None or store[t])):
-                memory *= self.config.decay
+                if concepts is None:
+                    memory *= self.config.decay
+                else:
+                    concepts.decay(self.config.decay)
                 _fade(pending, self.config.decay)
 
             wrote = previous_key is not None and (store is None or store[t])
@@ -1864,7 +1975,15 @@ class LocalAssociativeMemory:
                                        self.config.write_gate)
             if wrote:
                 if self.config.decay < 1.0:
-                    memory *= self.config.decay
+                    if concepts is None:
+                        memory *= self.config.decay
+                    else:
+                        # EVERY node fades, not just the one being written.
+                        # Decay is per-step, and every node already learns that
+                        # a step happened from the token broadcast -- 5 bytes,
+                        # the message the model has always sent. No node has to
+                        # hear from another for this.
+                        concepts.decay(self.config.decay)
                     _fade(pending, self.config.decay)
                 if self.config.corrective_writes:
                     # THE DELTA RULE FOR STORAGE, rather than the Hebbian one.
@@ -2144,6 +2263,12 @@ class LocalAssociativeMemory:
             # g makes from its own dimensions, owing nothing to any other group.
             # NOT named `store` -- that is the write mask parameter, and
             # shadowing it silently turned `if wrote:` into an array test.
+            if concepts is not None:
+                # AND NOW POINT IT AT THE NODE BEING READ, which is this
+                # token's concept rather than the previous one's. The write
+                # above and the read here are two different machines in the
+                # deployed picture; here they are two views of one array.
+                memory = concepts.matrix(self.key_source.concept(tokens, t))
             readable = memory if lasting is None else memory + lasting
             retrieved = self.retrieval.read(readable, key)
             # NOT `key`. `key` is the TOKEN's key and it is carried out of this
@@ -2602,6 +2727,11 @@ class LocalAssociativeMemory:
                     self.bias += self.config.lr * (target - answer)
 
             previous_key = key
+            # Carried alongside `previous_key` rather than recomputed from
+            # `t - 1`, for the same reason `previous_key` is: the pair a key
+            # came from is the key source's business, and an index recomputed
+            # here would be a second implementation of it.
+            previous_concept = self.key_source.concept(tokens, t)
             previous_retrieval = retrieved
             if self.config.tag_relative:
                 previous_store_size = float(np.linalg.norm(memory))

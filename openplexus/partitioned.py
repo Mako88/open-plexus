@@ -139,6 +139,47 @@ class ConceptStore:
                 return self._stores[node] @ key
         return np.zeros(self.width)
 
+    def matrix(self, concept: int) -> np.ndarray:
+        """The store a read of `concept` would come from, as a matrix.
+
+        **The seam that lets the model keep its retrieval strategies.**
+        `Retrieval.read(readable, key)` takes a matrix, and every strategy --
+        `SuperposedRead`, `SettlingRead`, `ExactCache` -- is written against
+        that. Returning the owner's matrix rather than the answer means routing
+        composes with all of them instead of replacing them.
+
+        It is a VIEW, not a copy, so a caller that mutates it writes into the
+        node. That is deliberate: the alternative is copying `width^2` numbers on
+        every read.
+
+        Zeros when every holder is gone, matching `read`.
+        """
+        for node in self.holders(concept):
+            if node not in self._absent:
+                return self._stores[node]
+        return np.zeros((self.width, self.width))
+
+    def decay(self, factor: float) -> None:
+        """Fade every node's store by the same factor.
+
+        **Local despite touching everything.** Each node multiplies its own
+        matrix by a constant it already knows; nothing is exchanged and no node
+        waits for another. The loop here is the simulation running `n` nodes in
+        one process, not a collective.
+        """
+        for store in self._stores:
+            store *= factor
+
+    def norm(self) -> float:
+        """Frobenius norm across all nodes, for probes that reported one before.
+
+        **This one IS a collective** and it is here for measurement only. A
+        deployed node cannot compute it and nothing in the model's decision path
+        may use it -- `tag_relative` divides by the store size and is therefore
+        refused alongside partitioning.
+        """
+        return float(np.sqrt(sum(float(np.sum(s * s)) for s in self._stores)))
+
     def lose(self, node: int) -> None:
         """That node vanishes.
 

@@ -59,6 +59,25 @@ class KeySource(Protocol):
         """
         ...
 
+    def concept(self, tokens: np.ndarray, t: int) -> int:
+        """WHICH concept this position's key belongs to, for routing.
+
+        **`key` says what to retrieve; this says whom to ask.** Under concept
+        partitioning a node holds some concepts and not others, so a read has to
+        name one -- and **a key vector cannot be inverted to a concept**. With
+        random keys there is no inversion at all, and with content-derived keys
+        it would be approximate. The identity has to travel alongside the
+        vector.
+
+        Note 044 walks every read site in the model and finds all of them can
+        supply this except the soft hop, whose key is a softmax mixture of every
+        token's row and therefore names no concept at all.
+
+        Pure, for the same reason `key` is: two nodes disagreeing about who owns
+        a concept is a write and a read going to different machines.
+        """
+        ...
+
 
 class TableKeys:
     """One key per token, read from a table. The original scheme.
@@ -78,6 +97,10 @@ class TableKeys:
 
     def key(self, tokens: np.ndarray, t: int) -> np.ndarray:
         return self.table[tokens[t]]
+
+    def concept(self, tokens: np.ndarray, t: int) -> int:
+        """The token itself. One key per token means one concept per token."""
+        return int(tokens[t])
 
 
 class PairKeys:
@@ -108,6 +131,32 @@ class PairKeys:
     def key(self, tokens: np.ndarray, t: int) -> np.ndarray:
         return self.pair(int(tokens[t - 1]) if t else self.start,
                          int(tokens[t]))
+
+    def concept(self, tokens: np.ndarray, t: int) -> int:
+        """**The CURRENT token, not the pair**, and the choice is load-bearing.
+
+        A pair key is `(t-1, t)`, so there are two defensible answers and they
+        give different systems:
+
+        - **By the pair.** Perfectly balanced, since pairs are numerous and the
+          hash spreads them. But the facts about one entity scatter across every
+          node, so no node owns an entity.
+        - **By the current token.** Every `key(FACT, X)` lands on X's node, so
+          **one node holds an entity and everything said about it.**
+
+        The second is what decision 134's case is actually about. A node's lone
+        capability grows with the network only if what it holds is *coherent* --
+        holding a random sixteenth of every entity's facts is dimension
+        splitting again, in a different coordinate.
+
+        The cost is that balance now depends on how evenly tokens occur, where
+        the pair hash would have spread them regardless. `Ring.balance` measures
+        that and it is the number to check before trusting this.
+
+        Routing by pair is not built. It is one line here, and it should be
+        built the moment there is a measurement that wants it.
+        """
+        return int(tokens[t])
 
     def pair(self, previous: int, token: int) -> np.ndarray:
         """The vector for one pair, exposed so a test can check two nodes agree

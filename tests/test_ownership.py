@@ -17,7 +17,7 @@ import unittest
 
 import numpy as np
 
-from openplexus.ownership import Ring, moved
+from openplexus.ownership import REPLICAS, Ring, moved
 
 CONCEPTS = 4096
 
@@ -53,11 +53,25 @@ class ChurnIsAffordable(unittest.TestCase):
                 naive, 0.5,
                 "modulo is supposed to be catastrophic here; if it is not, "
                 "this test is not making the case it claims to")
+            # `naive / 2` rather than `naive / 3`, and the change is a
+            # CORRECTION rather than a loosening. At 4 nodes modulo moves 0.75,
+            # so a third of it is 0.25 -- **below the 1/n the guarantee actually
+            # promises**, which no correct ring can beat except by luck. It
+            # passed only because the concept-domain collision (see
+            # `test_SMALL_concept_ids_are_spread_like_any_others`) pinned 64
+            # concepts to one node so they never moved.
+            #
+            # A threshold tighter than the property being tested is a test that
+            # fails when the code becomes correct, and this one did.
             self.assertLess(
-                ring, naive / 3,
+                ring, naive / 2,
                 f"at {nodes} nodes the ring moved {ring:.3f} against modulo's "
                 f"{naive:.3f} -- not the improvement the K/n guarantee "
                 f"promises")
+            self.assertLess(
+                ring, 1.5 / nodes,
+                f"at {nodes} nodes the ring moved {ring:.3f}, well past the "
+                f"~{1 / nodes:.3f} the K/n guarantee promises")
 
     def test_losing_a_node_only_moves_what_it_held(self):
         """A departure must not disturb concepts it never owned."""
@@ -119,12 +133,45 @@ class OwnershipIsDerivedNotStored(unittest.TestCase):
         self.assertEqual(len(set(owners.tolist())), 5,
                          "some node owns nothing at all")
 
-    def test_concepts_and_nodes_do_not_share_positions(self):
-        """`CONCEPT_DOMAIN` separates them. Without it, concept `c` and node
-        `c`'s first replica draw the same position and ownership correlates
-        with the node index instead of being spread by the hash."""
-        from openplexus.ownership import CONCEPT_DOMAIN
-        self.assertNotEqual(CONCEPT_DOMAIN, 0)
+    def test_SMALL_concept_ids_are_spread_like_any_others(self):
+        """**The one the model actually depends on, and it was broken.**
+
+        Token ids start at 0 and a vocabulary is small, so every concept the
+        model routes is below `REPLICAS`. The original domain tag put concepts
+        at `(seed, 1, concept)` and node `n`'s replica `r` at `(seed, n, r)` --
+        the same tuple whenever `n == 1` -- so **every concept below 64 landed
+        on node 1** and a partitioned model was a single-node model wearing a
+        ring.
+
+        The old test here asserted `CONCEPT_DOMAIN != 0` and passed throughout.
+        Asserting a constant's value is not asserting the property it was chosen
+        for; this asserts the property.
+
+        `balance()` over 4096 concepts did not catch it either -- 64 of 4096 is
+        1.6% and reads as 1.18. **The regime that matters was measured nowhere**,
+        which is decision 63's lesson again: probe the bottom of the range.
+        """
+        for nodes in (2, 4, 8, 16):
+            with self.subTest(nodes=nodes):
+                owners = Ring(nodes, seed=0).owners(np.arange(REPLICAS))
+                self.assertEqual(
+                    len(set(owners.tolist())), nodes,
+                    f"the first {REPLICAS} concepts reach only "
+                    f"{len(set(owners.tolist()))} of {nodes} nodes")
+
+    def test_a_concept_never_draws_a_NODE_position(self):
+        """The structural version of the above, checked against the ring's own
+        positions rather than against the spread it happens to produce.
+
+        A concept landing exactly on a node's position is not merely unlucky:
+        `searchsorted(side="left")` then returns that node every time, so the
+        collision is systematic rather than a one-in-four-billion coincidence.
+        """
+        ring = Ring(4, seed=0)
+        positions = set(ring._positions.tolist())
+        for concept in range(4 * REPLICAS):
+            self.assertNotIn(ring._concept_position(concept), positions,
+                             f"concept {concept} sits exactly on a node")
 
 
 class ImpossibleRingsAreRefused(unittest.TestCase):

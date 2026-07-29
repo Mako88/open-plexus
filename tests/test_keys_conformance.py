@@ -109,6 +109,52 @@ class EverySourceHonoursTheContract(unittest.TestCase):
                                              source.key(TOKENS, 2)))
 
 
+class EverySourceCanNameWhatItIsAskingFor(unittest.TestCase):
+    """`concept` is what makes a read ROUTABLE, and it has its own contract.
+
+    A key vector says what to retrieve; `concept` says whom to ask. Note 044:
+    a key vector cannot be inverted to a concept, so the identity has to travel
+    beside the vector or a partitioned store cannot serve the read at all.
+    """
+
+    def test_a_concept_is_an_integer(self):
+        """It indexes a hash ring. A numpy scalar would work by accident until
+        it reached `np.random.default_rng((seed, domain, concept))`, which is
+        fussy about types in ways that surface far from here."""
+        for name, source in sources():
+            with self.subTest(name):
+                self.assertIsInstance(source.concept(TOKENS, 4), int)
+
+    def test_the_same_token_always_ROUTES_THE_SAME_WAY(self):
+        """**The property a partitioned store lives on.** `TOKENS` repeats the
+        vocabulary three times, so positions 4, 10 and 16 are the same token in
+        different contexts. If they routed differently, a write and a later read
+        of the same concept would reach different machines and the binding would
+        simply be missing -- with no error anywhere.
+        """
+        for name, source in sources():
+            with self.subTest(name):
+                self.assertEqual(source.concept(TOKENS, 4),
+                                 source.concept(TOKENS, 4 + VOCAB))
+                self.assertEqual(source.concept(TOKENS, 4),
+                                 source.concept(TOKENS, 4 + 2 * VOCAB))
+
+    def test_different_tokens_generally_give_different_concepts(self):
+        """A source routing everything to one concept would satisfy everything
+        above and would also put the whole store on one node."""
+        for name, source in sources():
+            with self.subTest(name):
+                self.assertNotEqual(source.concept(TOKENS, 1),
+                                    source.concept(TOKENS, 2))
+
+    def test_it_does_not_mutate_the_token_sequence(self):
+        for name, source in sources():
+            with self.subTest(name):
+                tokens = TOKENS.copy()
+                source.concept(tokens, 4)
+                np.testing.assert_array_equal(tokens, TOKENS)
+
+
 class TheSuiteBites(unittest.TestCase):
     """Rule 10, applied to the suite rather than to the code it checks."""
 
@@ -119,6 +165,13 @@ class TheSuiteBites(unittest.TestCase):
 
     def test_a_wrong_shape_is_caught(self):
         self.assertNotEqual(np.shape(Drifting().key(TOKENS, 4)), (WIDTH,))
+
+    def test_a_source_that_cannot_ROUTE_fails_the_protocol(self):
+        """`Drifting` has `key` and no `concept`, which is exactly the shape a
+        key source written before note 044 has. It must not satisfy the
+        protocol, or a partitioned store would accept it and then have nowhere
+        to send the read."""
+        self.assertNotIsInstance(Drifting(), KeySource)
 
     def test_a_constant_source_fails_the_distinctness_check(self):
         constant = type("Constant", (), {

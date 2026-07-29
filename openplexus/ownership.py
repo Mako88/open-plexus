@@ -69,10 +69,30 @@ REPLICAS = 64
 #: positions collide only by accident rather than by resolution.
 RING = 1 << 32
 
-#: Separates the two things hashed onto the same ring. Without it, concept `c`
-#: and node `c`'s first replica would draw the SAME position, so ownership would
-#: correlate with the node index rather than being spread by the hash.
+#: Separates the two things hashed onto the same ring, as the SECOND element of
+#: every seed tuple. Nodes draw from `(seed, NODE_DOMAIN, node, replica)` and
+#: concepts from `(seed, CONCEPT_DOMAIN, concept, 0)`, so the two families can
+#: never produce the same tuple whatever the node index or concept id.
+#:
+#: **The first attempt at this was wrong in a way that only bit small concept
+#: ids**, which is the only kind the model has. `CONCEPT_DOMAIN` was 1 and
+#: concepts drew from `(seed, 1, concept)` while node `n`'s replica `r` drew from
+#: `(seed, n, r)` -- identical tuples whenever `n == 1`. So **every concept below
+#: `replicas` landed exactly on one of node 1's own ring positions** and, with
+#: `searchsorted(side="left")` returning that position, node 1 owned all 64 of
+#: them.
+#:
+#: `balance()` over 4096 concepts read 1.18 and looked healthy, because 64 of
+#: 4096 is 1.6% of the range. Token ids 1 to 6 all routed to one node, and a
+#: partitioned model was silently a single-node model.
+#:
+#: The lesson generalises past this bug: **a hash-domain tag has to be in a slot
+#: that the other domain cannot occupy**, not merely a value the other domain is
+#: unlikely to use.
 CONCEPT_DOMAIN = 1
+#: The tag nodes use. Same slot, different value, so no node tuple can equal a
+#: concept tuple.
+NODE_DOMAIN = 0
 
 
 class Ring:
@@ -114,12 +134,17 @@ class Ring:
         on, applied to ownership.
         """
         return int(np.random.default_rng(
-            (self.seed, node, replica)).integers(0, RING))
+            (self.seed, NODE_DOMAIN, node, replica)).integers(0, RING))
+
+    def _concept_position(self, concept: int) -> int:
+        """Where a concept sits. **Tagged, and see `CONCEPT_DOMAIN` for what
+        went wrong when the tag shared a slot with the node index.**"""
+        return int(np.random.default_rng(
+            (self.seed, CONCEPT_DOMAIN, concept, 0)).integers(0, RING))
 
     def owner(self, concept: int) -> int:
         """The node holding `concept` -- first one clockwise of its position."""
-        at = int(np.random.default_rng(
-            (self.seed, CONCEPT_DOMAIN, concept)).integers(0, RING))
+        at = self._concept_position(concept)
         index = int(np.searchsorted(self._positions, at, side="left"))
         # Past the last position wraps to the first, which is what makes it a
         # ring rather than a line.
@@ -141,8 +166,7 @@ class Ring:
         """
         if replicas < 1:
             raise ValueError("a concept held nowhere is a concept lost")
-        at = int(np.random.default_rng(
-            (self.seed, CONCEPT_DOMAIN, concept)).integers(0, RING))
+        at = self._concept_position(concept)
         start = int(np.searchsorted(self._positions, at, side="left"))
         found: list[int] = []
         for step in range(len(self._owners)):

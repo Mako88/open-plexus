@@ -95,6 +95,48 @@ result is this project grading its own homework.
 
 ## Open work, in order
 
+> **PIVOTED TO ARCHITECTURE, 2026-07-28.** John: *"we're gonna have to redo all
+> the tests anyway once some core pieces change, so let's get the core pieces
+> right first."* Component work is paused, not abandoned — items 2 onward below
+> are the queue it resumes into.
+>
+> [Note 042](docs/notes/042-an-architecture-pass-before-more-component-work.md)
+> is the pass. Its finding: **the model has nowhere to keep a concept map.** The
+> store is rebuilt every sequence and the only durable parameter is one
+> `vocab × d` linear map (decision 62) — one fact that explains decision 63, 115
+> and g14-01 at once.
+
+### 0. THE ARCHITECTURE LINE — where the work actually is
+
+**Approved by John: items 1 and 2 of note 042.** They are the same design seen
+from two sides — a persistent store partitioned by concept — so building either
+alone means building it twice.
+
+| | change | status |
+|---|---|---|
+| **0a** | **persistent slow store** | built; **falsifier still not answered** |
+| **0b** | **concept partitioning** | blocked on 0a, deliberately |
+| 0c | content-derived keys | not started; every key is a random draw, so the store has **no notion of similarity at all** |
+
+**0a's falsifier is decision 63's 16,000-character wall**, and two runs have
+measured the *instrument* rather than the hypothesis:
+
+- **g15-01 first pass (decision 131)** — the slow store's norm was pinned at its
+  cap from the smallest data point. It tested a **saturated** store.
+- **cap sweep (decision 132)** — every cap pinned exactly, because `lasting` has
+  only `+=`: the fast store brakes with `memory *= decay` and the slow one had
+  no equivalent. Note 018's defect, mirrored. Fixed with `lasting_decay`, and a
+  brake alone was not enough — **the write rate was ~100× too large**, tuned for
+  a store that gets rebuilt rather than one that persists.
+
+`persist-slow` (consolidation 0.005) and `persist-slow-decay` are the first
+settings where the store tracks the corpus instead of saturating. **That run is
+the first time the question actually gets asked.**
+
+> **If the wall does not move with the store genuinely accumulating and the gate
+> firing tens of thousands of times, that is a real refutation** — note 042's
+> account would be wrong and the proposal needs rethinking rather than retuning.
+
 ### 1. ✅ CLOSED — the search line landed. Decision 130
 
     concat      0.327    what we had -- BELOW the 0.466 shortcut floor

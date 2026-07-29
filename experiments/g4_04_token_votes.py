@@ -33,6 +33,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from experiments import harness  # noqa: E402
 from experiments.harness import parse_args  # noqa: E402
 from openplexus.distributed import Network  # noqa: E402
 from openplexus.models.local_memory import (  # noqa: E402
@@ -60,14 +61,9 @@ TRIVIAL_FLOOR = 1 / TASK.n_pairs + (1 - 1 / TASK.n_pairs) / TASK.n_values
 
 
 def build(count: int, seed: int):
-    built = []
-    for sequence in dataset(replace(TASK, seed=seed), count):
-        tokens = np.asarray(sequence.tokens)
-        targets = np.roll(tokens, -1)
-        scored = np.ones(len(tokens), dtype=bool)
-        scored[-1] = False
-        built.append((tokens, targets, scored, sequence.query_positions))
-    return built
+    """Now `harness.mqar_batch`. Behaviour identical; the body was one of three
+    byte-identical copies."""
+    return harness.mqar_batch(TASK, count, seed)
 
 
 def trained(partitions: int, seed: int = 1) -> LocalAssociativeMemory:

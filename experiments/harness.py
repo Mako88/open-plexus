@@ -275,6 +275,36 @@ def table(records: list[dict]) -> None:
         print(f"    {' '.join(f'{a:.2f}' for a in accs)}")
 
 
+def mqar_batch(task, count: int, seed: int) -> list:
+    """MQAR sequences prepared for `model.run`, as three scripts had them.
+
+    Returns `(tokens, targets, scored, query_positions)` per sequence.
+
+    **Extracted rather than copied a fourth time**, at the duplication checker's
+    insistence and correctly: g10-01, g4-04 and g18-05 each held a byte-identical
+    copy of this, which is exactly the shape the check exists to stop. Rule 12's
+    version of the argument is the one that matters -- a fix applied to one copy
+    and not the others leaves the survivors producing plausible numbers.
+
+    `targets` is the NEXT token, which is only valid for an `autoregressive`
+    task. With that flag off the answer lives in `sequence.targets` and is not
+    the next token at all; g18-05 was built without it and both its arms scored
+    below chance until the trivial floor caught it. See decision 138 for the same
+    defect at text level.
+    """
+    import numpy as np
+    from dataclasses import replace
+    from openplexus.tasks.mqar import dataset
+
+    built = []
+    for sequence in dataset(replace(task, seed=seed), count):
+        tokens = np.asarray(sequence.tokens)
+        targets = np.roll(tokens, -1)
+        scored = np.ones(len(tokens), dtype=bool)
+        scored[-1] = False
+        built.append((tokens, targets, scored, sequence.query_positions))
+    return built
+
 if __name__ == "__main__":
     args = parse_args(__doc__)
     if not args.aggregate:

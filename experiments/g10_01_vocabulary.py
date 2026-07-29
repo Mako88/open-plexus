@@ -39,6 +39,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from experiments import harness  # noqa: E402
 from experiments.harness import emit, parse_args, spread  # noqa: E402
 from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
@@ -59,14 +60,9 @@ BAR = 0.60
 
 
 def build(task: MqarConfig, count: int, seed: int):
-    built = []
-    for sequence in dataset(replace(task, seed=seed), count):
-        tokens = np.asarray(sequence.tokens)
-        targets = np.roll(tokens, -1)
-        scored = np.ones(len(tokens), dtype=bool)
-        scored[-1] = False
-        built.append((tokens, targets, scored, sequence.query_positions))
-    return built
+    """Now `harness.mqar_batch`. Behaviour identical; the body was one of three
+    byte-identical copies."""
+    return harness.mqar_batch(task, count, seed)
 
 
 def score(task: MqarConfig, width: int, lr: float, seed: int,

@@ -70,11 +70,30 @@ class ConceptStore:
             leaving moves about 1/n of concepts rather than nearly all.
     """
 
-    def __init__(self, nodes: int, width: int, seed: int = 0) -> None:
+    def __init__(self, nodes: int, width: int, seed: int = 0,
+                 replicas: int = 3) -> None:
         if nodes < 1:
             raise ValueError("a store needs at least one node")
+        if replicas < 1:
+            raise ValueError("a concept held nowhere is a concept lost")
         self.nodes = nodes
         self.width = width
+        #: How many DISTINCT nodes hold each concept.
+        #:
+        #: **Not 1, and the default is not a detail.** John, 2026-07-29: *"when
+        #: nodes drop you just lose concepts — that doesn't sound like a very
+        #: robust system."* Correct, and it is the arrangement's sharpest cost:
+        #: dimension splitting degrades every concept slightly on a departure,
+        #: while this removes some entirely.
+        #:
+        #: **The arithmetic says the advantage can pay for the fix.** Decision
+        #: 134 measured lone-node capacity 16x better at 16 nodes. Spending 3x
+        #: on replicas leaves ~5x, and the loss probability falls from `f` to
+        #: `f^3` — at 10% of nodes down that is 10% to 0.1%.
+        #:
+        #: Replicas are the next DISTINCT nodes clockwise, so a departure needs
+        #: no data movement at all: the survivors already hold it.
+        self.replicas = replicas
         self.ring = Ring(nodes, seed=seed)
         self._stores = [np.zeros((width, width)) for _ in range(nodes)]
         #: Nodes that have vanished. Their concepts are gone -- not degraded,
@@ -85,32 +104,39 @@ class ConceptStore:
     def owner(self, concept: int) -> int:
         return self.ring.owner(concept)
 
-    def write(self, concept: int, key: np.ndarray, value: np.ndarray) -> None:
-        """Bind `value` to `key`, on whichever node owns `concept`.
+    def holders(self, concept: int) -> list[int]:
+        """Every node holding `concept`, present or not."""
+        return self.ring.holders(concept, self.replicas)
 
-        Writes to ONE node. Under dimension splitting every node writes a slice
-        of every binding; here a binding lives in one place, which is what makes
-        a later read a selection rather than a collective.
+    def write(self, concept: int, key: np.ndarray, value: np.ndarray) -> None:
+        """Bind `value` to `key`, on every node that holds `concept`.
+
+        Writes to `replicas` nodes, not to all of them. Under dimension
+        splitting every node writes a slice of every binding; here a binding
+        lives in a handful of places, which is what makes a later read a
+        selection rather than a collective — and what makes a departure
+        survivable.
         """
-        node = self.owner(concept)
-        if node in self._absent:
-            return
-        self._stores[node] += np.outer(value, key)
+        for node in self.holders(concept):
+            if node not in self._absent:
+                self._stores[node] += np.outer(value, key)
 
     def read(self, concept: int, key: np.ndarray) -> np.ndarray:
-        """Read from the owning node alone.
+        """Read from ONE surviving holder.
 
         **No pooling, no vote, no barrier.** This is the property the whole
         arrangement exists for: note 009 §4's outstanding cross-group sum does
-        not get smaller here, it stops existing.
+        not get smaller here, it stops existing. Replication does not change
+        that — a read still touches one node, it just has a choice of which.
 
-        A concept whose owner has vanished returns zeros — an honest absence
-        rather than a degraded answer, and `lose()` is how that is measured.
+        Zeros only when EVERY holder has vanished, which is an honest absence
+        rather than a degraded answer. `survival()` measures how often that
+        happens.
         """
-        node = self.owner(concept)
-        if node in self._absent:
-            return np.zeros(self.width)
-        return self._stores[node] @ key
+        for node in self.holders(concept):
+            if node not in self._absent:
+                return self._stores[node] @ key
+        return np.zeros(self.width)
 
     def lose(self, node: int) -> None:
         """That node vanishes and takes its concepts with it.
@@ -122,6 +148,22 @@ class ConceptStore:
         """
         self._absent.add(node)
 
+    def survival(self, concepts: int = 4096) -> float:
+        """Share of concepts still reachable with the currently absent nodes.
+
+        **The number John's objection is about**, measured rather than argued:
+        *"when nodes drop you just lose concepts — that doesn't sound like a
+        very robust system."*
+
+        At `replicas = 1` this falls roughly as the fraction of nodes lost. At
+        3 it falls as that fraction CUBED, because a concept is only gone when
+        every holder is.
+        """
+        alive = sum(1 for concept in range(concepts)
+                    if any(node not in self._absent
+                           for node in self.holders(concept)))
+        return alive / concepts
+
     @property
     def numbers_held(self) -> int:
         """Total numbers across all nodes, for equal-state comparisons.
@@ -131,6 +173,16 @@ class ConceptStore:
         this store should quote this beside it.
         """
         return self.nodes * self.width * self.width
+
+    @property
+    def numbers_per_concept(self) -> int:
+        """What replication costs, in the unit a comparison should use.
+
+        Replicas multiply storage. Quoting capacity without this would compare a
+        3x-redundant store against a bare one at equal width, which is exactly
+        the retraction g10-09 earned.
+        """
+        return self.replicas * self.width * self.width
 
     def load(self) -> list[int]:
         """Non-zero-ish store count per node, for checking the ring's balance

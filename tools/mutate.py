@@ -1602,11 +1602,12 @@ MUTATIONS = [
                "degradation reappearing, and the churn trade decision 134 "
                "named would be measured wrong",
         path=PARTITIONED,
-        old="        if node in self._absent:\n"
-            "            return np.zeros(self.width)\n"
+        old="        for node in self.holders(concept):\n"
+            "            if node not in self._absent:\n"
+            "                return self._stores[node] @ key\n"
+            "        return np.zeros(self.width)",
+        new="        node = self.holders(concept)[0]\n"
             "        return self._stores[node] @ key",
-        new="        return self._stores[node] @ key * "
-            "(0.5 if node in self._absent else 1.0)",
     ),
     Mutation(
         name="ownership-falls-back-to-modulo",

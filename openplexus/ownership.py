@@ -125,6 +125,34 @@ class Ring:
         # ring rather than a line.
         return int(self._owners[index % len(self._owners)])
 
+    def holders(self, concept: int, replicas: int) -> list[int]:
+        """The `replicas` DISTINCT nodes that hold `concept`, owner first.
+
+        The next distinct nodes clockwise, which is the standard arrangement and
+        is not arbitrary: a departing node's concepts pass to the successors
+        that already hold them, so **nothing has to move on a failure** — the
+        remaining replicas are already there and already warm.
+
+        **Distinct is the load-bearing word.** Virtual nodes mean the next few
+        positions clockwise are often the SAME node wearing different labels,
+        and replicating a concept three times onto one machine is a backup that
+        dies with its original. This walks the ring until it has `replicas`
+        different nodes, or runs out.
+        """
+        if replicas < 1:
+            raise ValueError("a concept held nowhere is a concept lost")
+        at = int(np.random.default_rng(
+            (self.seed, CONCEPT_DOMAIN, concept)).integers(0, RING))
+        start = int(np.searchsorted(self._positions, at, side="left"))
+        found: list[int] = []
+        for step in range(len(self._owners)):
+            node = int(self._owners[(start + step) % len(self._owners)])
+            if node not in found:
+                found.append(node)
+                if len(found) == min(replicas, self.nodes):
+                    break
+        return found
+
     def owners(self, concepts: np.ndarray) -> np.ndarray:
         """`owner` for many concepts at once."""
         return np.asarray([self.owner(int(c)) for c in concepts])

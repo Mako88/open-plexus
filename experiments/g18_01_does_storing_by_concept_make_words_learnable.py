@@ -393,7 +393,8 @@ def counting_bars(vocab: int, stream: np.ndarray, chunks) -> tuple[float, float]
 def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
              decay: float = 1.0, cap: float = 5.0, lr: float = 0.05,
              keys: str = "pair", width: int = WIDTH,
-             units: str = "words", key_scale: float = 1.0) -> dict:
+             units: str = "words", key_scale: float = 1.0,
+             epochs: int = EPOCHS) -> dict:
     started = time.time()
     built = built or corpus(units)
     stream = built.train[0][:TRAIN_WORDS]
@@ -419,7 +420,7 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
     training = pieces((stream[:cut],), CHUNK)
     calibration = pieces((stream[cut:],), CHUNK)
     writes = kind != "nostore"
-    for _ in range(EPOCHS):
+    for _ in range(epochs):
         for piece in training:
             # THE TARGET IS THE NEXT TOKEN, AND THIS WAS WRONG UNTIL 2026-07-29.
             #
@@ -479,7 +480,7 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
         arm=f"{kind}-{k}" if kind != "floor" else "floor",
         kind=kind, groups=k, seed=seed, bias=bias,
         decay=decay, cap=cap, lr=lr, coordinates=coordinates, keys=keys,
-        units=units, key_scale=key_scale,
+        units=units, key_scale=key_scale, epochs=epochs,
         diverged=bool(diverged),
         unstable=unstable,
         error=error,
@@ -514,7 +515,7 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
                   # `min10` for a run that used 20 is a mislabelled record --
                   # which is the class of defect decisions 135 and 118 are both
                   # about.
-                  f"|power{POWER}|min{min_count_for(units)}|epochs{EPOCHS}")
+                  f"|power{POWER}|min{min_count_for(units)}|epochs{epochs}")
 
 
 def calibrate() -> None:
@@ -577,6 +578,10 @@ def main() -> int:
                              "'the store is too small to hold anything useful' "
                              "are different findings and only one is about the "
                              "architecture")
+    parser.add_argument("--epochs", type=int, default=EPOCHS,
+                        help="training passes. g17-01 used 2 and this script "
+                             "defaults to 1, so reproducing its number needs it "
+                             "stated rather than inherited")
     parser.add_argument("--key-scale", type=float, default=1.0,
                         dest="key_scale",
                         help="spread of the key vectors. The character-level "
@@ -628,7 +633,8 @@ def main() -> int:
                                       decay=args.decay, cap=args.cap,
                                       lr=args.lr, keys=args.keys,
                                       width=args.width, units=args.units,
-                                      key_scale=args.key_scale)
+                                      key_scale=args.key_scale,
+                                      epochs=args.epochs)
                     print(f"  {record['condition']:52s} "
                           f"bits {record['error']:.4f}  "
                           f"addresses {record['addresses']}"

@@ -1,3 +1,21 @@
+# ARCHIVED — the capability ledger
+
+**Merged into [DECISIONS.md](../../DECISIONS.md)** on 2026-07-29, where each
+capability row became a component with options under it.
+
+Its rule was the right one and is carried forward: **a row with no measurement is
+UNTESTED, never "probably fine"**, and `check_decisions.py` now enforces the same
+thing for the tree — every ✅ and ❌ must cite a decision, a sweep or a note, or say
+in words that it rests on no measurement. Its census check is carried forward too;
+it caught its own summary counts drifting the first time a verdict changed.
+
+Final state when archived: **8 PASSING, 9 PARTIAL, 0 FAILING, 3 UNTESTED,
+4 CLAIMED** across 24 rows.
+
+**Read for the reasoning, not for current state.**
+
+---
+
 # Architecture — what each piece must do, and whether it does
 
 **This is a ledger, not an essay.** Every row is a capability the architecture

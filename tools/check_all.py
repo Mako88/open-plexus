@@ -54,9 +54,12 @@ CHECKS: list[tuple[str, list[str], bool]] = [
     ("check_workflows", [sys.executable, "tools/check_workflows.py"], False),
     ("check_rails", [sys.executable, "tools/check_rails.py"], False),
     ("check_duplication", [sys.executable, "tools/check_duplication.py"], False),
-    ("check_state", [sys.executable, "tools/check_state.py"], False),
-    ("check_architecture",
-     [sys.executable, "tools/check_architecture.py"], False),
+    # ONE CHECK WHERE THERE WERE TWO. `check_state` and `check_architecture`
+    # enforced the three-document structure that produced the drift they were
+    # written to catch -- a 6,040-line log nobody could read whole. Their two real
+    # ratchets are kept: a declared census that cannot drift from the body, and
+    # "a state with no measurement is UNTRIED, never probably fine".
+    ("check_decisions", [sys.executable, "tools/check_decisions.py"], False),
     ("unittest", [sys.executable, "-m", "unittest", "discover",
                   "-s", "tests", "-t", "."], True),
 ]

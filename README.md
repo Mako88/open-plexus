@@ -18,18 +18,22 @@ global picture and a machine leaving mid-thought is a normal event.
 
 ## The documents, and which one to read
 
-Three documents carry the project, and they are deliberately kept from doing each
+**Two documents carry the project**, and they are deliberately kept from doing each
 other's jobs — a document that holds intent *and* results *and* a todo list goes
 stale in all three at once, which is how this repository once ended up quoting two
 different answers for the same exponent two paragraphs apart.
 
 | document | what it holds | when |
 |---|---|---|
-| **[STATE.md](STATE.md)** | what is true now, what is open, what is running | **first, and every session** |
+| **[DECISIONS.md](DECISIONS.md)** | every component, its options, and which option each is — with the attempts under each | **first, and every session** |
 | **[GOALS.md](GOALS.md)** | what this is for, the constraints, what would refute it | before deciding whether a mechanism belongs here at all |
-| **[DECISIONS.md](DECISIONS.md)** | a chronological log of what was chosen and why — history, never rewritten | when you need the reasoning behind one past choice |
 
-**STATE.md is the only one kept current.** Where it and the log disagree, it wins.
+**DECISIONS.md is the one kept current, and it is a TREE rather than a log.** It
+was a 6,040-line append-only log until 2026-07-29; nothing could read it whole, so
+it was read selectively, and that produced three wrong recommendations in one day —
+each resting on a claim a later entry had already superseded. **A log records; it
+does not prevent.** The old log is in `docs/archive/` and every attempt in the tree
+cites it, so the reasoning is one lookup away.
 
 - **[docs/explainers/](docs/explainers/)** — plain-language explanations of
   everything here, in reading order, written for someone who does not work in
@@ -46,9 +50,9 @@ different answers for the same exponent two paragraphs apart.
 ## Status
 
 **G0–G3 passed; G4 passes on one seed; G5 is contested.** The live work is
-relational reasoning — composition over chained facts — and the current blocker is
-retrieval fidelity, which decision 112 measured as a width limit. See
-[STATE.md](STATE.md).
+**what an answer is** — the project's stated goal is to respond from awareness of
+how concepts relate, and until 2026-07-29 nothing here had ever scored a
+multi-token answer. See [DECISIONS.md](DECISIONS.md) §6.
 
 ## The three constraints
 

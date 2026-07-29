@@ -149,7 +149,7 @@ thing being *learned*.
 predict it. Fully self-supervised, no marked questions, no labels — so it still
 satisfies the "needs no labels" requirement §5 rests on — but relational rather
 than sequential. That is the live work and it is tracked in
-[STATE.md](STATE.md).
+[DECISIONS.md](DECISIONS.md).
 
 ### 1.2a Directions John wants explored — not requirements, and not idle either
 
@@ -410,7 +410,7 @@ consequences follow immediately and each one has already changed a decision:
 - **Catastrophic forgetting becomes a first-class failure mode**, not a side
   quest. A model that learns forever also forgets forever. This promoted an
   existing negative result on a different question into a load-bearing one — see
-  [STATE.md](STATE.md) for where that stands.
+  [DECISIONS.md](DECISIONS.md) for where that stands.
 - **Evaluation should be PREQUENTIAL** — predict the next item, then learn from
   it, and score the predictions made along the way. A train/test split measures a
   system that stops, which is the thing C4 forbids. Every number in this project
@@ -445,7 +445,7 @@ with training traffic still unmeasured; G5 was refuted, withdrawn, then refined
 three times, and machine *size* rather than machine *count* is what binds. The
 numbers behind every verdict, and the retractions, are in
 [docs/archive/goals-results-log.md](docs/archive/goals-results-log.md); the
-current reading is in [STATE.md](STATE.md).
+current reading is in [DECISIONS.md](DECISIONS.md).
 
 **G0 is first for a reason, and it is the correction of the predecessor's single
 most expensive mistake.** Choosing a benchmark that defeats trivial baselines is
@@ -598,7 +598,7 @@ These were written before anything was built, in the order they needed
 answering. They are recorded here because the design is downstream of them and
 because two of them named the wrong parameter, which is worth a reader knowing.
 **Each is answered in a note; none of them is live work.** What is live is in
-[STATE.md](STATE.md).
+[DECISIONS.md](DECISIONS.md).
 
 | # | the question | where it was answered | the short version |
 |---|---|---|---|
@@ -621,7 +621,7 @@ So the rule is now structural rather than aspirational:
 
 - **Intent and constraints here. Measurements nowhere near here.** Numbers live
   in `experiments/sweeps/`, reasoning in `docs/notes/`, decisions in
-  `DECISIONS.md`, and the current position in `STATE.md`.
+  `DECISIONS.md`, which is the option tree and the current position both.
 - **The only numbers permitted in this document are arithmetic or inherited**,
   and both are labelled as such — §6.1's table is the whole of it.
 - `tests/test_goals_consistency.py` enforces this by refusing measurement-shaped

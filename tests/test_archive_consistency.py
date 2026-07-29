@@ -34,7 +34,10 @@ class ItIsMarkedAsHistory(unittest.TestCase):
         self.assertIn("This is history", LOG)
 
     def test_it_names_where_the_current_state_lives(self):
-        self.assertIn("STATE.md", LOG)
+        # DECISIONS.md, not STATE.md: the three-document structure was replaced by
+        # a single option tree on 2026-07-29. This assertion is why the archive's
+        # pointer got updated with it rather than quietly rotting.
+        self.assertIn("DECISIONS.md", LOG)
 
 
 class TheGatingClaimIsNotStillTheOldOne(unittest.TestCase):

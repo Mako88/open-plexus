@@ -1,7 +1,8 @@
 # Results log — ARCHIVE, lifted out of GOALS.md
 
 > **This is history. Do not read it for the current state of the project.**
-> For what is true now, read [STATE.md](../../STATE.md).
+> For what is true now, read [DECISIONS.md](../../DECISIONS.md) — the option tree.
+> It replaced STATE.md and the append-only log on 2026-07-29.
 
 **What this is.** For most of the project's life this narrative sat at the bottom
 of `GOALS.md` under a heading reading `*Status:*`. It grew to 405 lines of running

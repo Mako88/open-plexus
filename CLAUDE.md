@@ -709,38 +709,64 @@ usually an idea that is not yet understood.
 An explainer that stops making sense is a defect in the explainer. Fix it there
 rather than expecting the reader to work harder.
 
-**14b. Three top-level documents, three jobs, and no document does two.** A
-document that carries intent *and* results *and* a todo list goes stale in all
-three at once, and a reader cannot tell which part is which.
+**14b. Two top-level documents. `DECISIONS.md` is a TREE, not a log.** A document
+that carries intent *and* results *and* a todo list goes stale in all three at
+once, and a reader cannot tell which part is which.
 
 | document | holds | never holds |
 |---|---|---|
+| `DECISIONS.md` | every component, its options, which option each is, and the attempts under each | a chronological entry. **New findings update an option's state and its attempt list** |
 | `GOALS.md` | intent, the constraints, the gate ladder, what would refute the project | any measurement. The only numbers permitted are arithmetic or inherited from the predecessor, and both are labelled |
-| `DECISIONS.md` | a chronological log — what was chosen, what it ruled out, how to undo it | anything presented as current. Entries are **never rewritten** when later work overturns them |
-| `STATE.md` | what is true now, what is open, what is running | reasoning that belongs in a note, or history that belongs in the log |
 
-Two rules keep it from re-collapsing:
+**This replaced a three-document structure on 2026-07-29, and the reason is the
+calibration below.** `DECISIONS.md` was an append-only log of 6,040 lines. Nothing
+could read it whole, so it was read selectively — and that is not a discipline
+failure, it is what happens when a reference outgrows a context window.
 
-- **When something is settled it LEAVES `STATE.md`**, and an entry goes in the
-  log. Settled work accumulating in the current-state document is exactly how the
-  last two grew to 46,000 and 78,000 characters.
-- **`STATE.md` wins over the log.** Say so where a reader will be standing: if
-  the two disagree, the log is the stale one by construction.
+> *Calibration, and it is the most expensive one in this file.* Decision 115 closed
+> saturation explicitly — *"saturation is not an open problem and should stop being
+> treated as one"* — and eliminated store capacity, readout capacity and persistent
+> representation **by name**. Note 042 then built an architecture case on the same
+> wall; decision 133 ran its falsifier, was refuted, and **relabelled the wall a
+> "capacity limit"**; decision 134 superseded 133's follow-on one entry later. On
+> 2026-07-29 all three produced three wrong recommendations in a row.
+>
+> Every entry was individually reasonable. The log's own Index stopped being
+> maintained at entry 134 and entry 132 had an Index row with no body. **A log
+> records; it does not prevent** — and "do not re-propose these" cannot catch a
+> re-label of a null after the fact, which is what 133 did.
+
+Four rules keep the tree from collapsing back into a log:
+
+- **A finding updates an option, it does not append an entry.** If you are writing
+  `## 172.`, stop: the finding belongs on an option's state or in its attempt list.
+  `tests/test_goals_consistency.py` asserts this.
+- **Every ✅ and ❌ cites a decision, a sweep or a note — or says in words that it
+  rests on no measurement.** This is the archived ledger's rule (*a row with no
+  measurement is UNTESTED, never "probably fine"*) and `check_decisions.py`
+  enforces it. A ❌ with no citation is a mechanism refused by opinion, and
+  discarding a good idea on an invalid measurement is the most expensive error
+  available.
+- **Every attempt carries the configuration it was measured in.** A refutation is
+  conditional on a config; decision 74 cost a comparison set by forgetting it.
+- **🔀 is a valid END state.** Two options kept behind a switch and re-tested as
+  the system changes is not indecision — refutations expire, and 107 and 111 both
+  became right later when their inputs moved.
 
 Superseded documents go to `docs/archive/` with a header saying what replaced
 them, rather than being deleted — the retractions in them are usually the useful
-part, and several are cited from elsewhere.
+part, and every attempt in the tree cites the archived log by entry number.
 
 **And prefer MORE documents to LONGER ones.** John's instruction, 2026-07-28:
 keep each note small and add another rather than growing one. A note that grows
 is a note nobody re-reads, and the growth is always the same shape — a result
 table copied out of the sweep record it already lives in.
 
-The concrete rule: **`STATE.md` carries the CLAIM and links the table.** A
+The concrete rule: **the tree carries the CLAIM and links the table.** A
 measurement belongs to exactly one file, which is its sweep record; anywhere else
 quotes the one line that is currently load-bearing and links the rest. Within one
-session `STATE.md` went 21 KB → 36 KB entirely by duplicating tables that already
-existed two directories away.
+session the old `STATE.md` went 21 KB → 36 KB entirely by duplicating tables that
+already existed two directories away.
 
 > *Calibration.* On 2026-07-28 the four top-level documents totalled **503,000
 > characters**, of which `DECISIONS.md` was 318,000. `GOALS.md` opened with

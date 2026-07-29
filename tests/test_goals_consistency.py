@@ -24,8 +24,11 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 GOALS = (ROOT / "GOALS.md").read_text(encoding="utf-8")
-STATE = (ROOT / "STATE.md").read_text(encoding="utf-8")
 DECISIONS = (ROOT / "DECISIONS.md").read_text(encoding="utf-8")
+#: The log DECISIONS.md used to be. Kept as the reference every attempt in the tree
+#: cites, so the reasoning stays one lookup away.
+LOG = (ROOT / "docs" / "archive"
+       / "decisions-log-083-171.md").read_text(encoding="utf-8")
 
 #: A sweep record is where every measurement this project has made actually
 #: lives, so a citation of one is the reliable tell that a document has started
@@ -75,29 +78,42 @@ class TheDocumentsPointAtEachOther(unittest.TestCase):
     """
 
     def test_goals_sends_a_reader_to_the_current_state(self):
-        self.assertIn("STATE.md", GOALS,
-                      "GOALS.md should point at STATE.md for what is live")
+        self.assertIn("DECISIONS.md", GOALS,
+                      "GOALS.md should point at the decision tree for what is "
+                      "live. It pointed at STATE.md until 2026-07-29, when three "
+                      "documents became one")
 
-    def test_the_log_declares_itself_history(self):
+    def test_the_archived_log_declares_itself_history(self):
+        # The sentence used to live in DECISIONS.md, because DECISIONS.md WAS the
+        # log. Now the log is archived and the tree is current, so the disclaimer
+        # has to move with the content rather than staying on the filename.
         self.assertIn(
-            "not the current state", DECISIONS,
-            "DECISIONS.md must say plainly that it is not the current state, "
-            "or its newest entry gets read as one")
+            "ARCHIVED", LOG,
+            "the archived log must say so in its header, or its newest entry "
+            "gets read as the current state -- which is exactly what happened")
 
-    def test_the_log_names_the_document_that_beats_it(self):
+    def test_the_archived_log_names_what_replaced_it(self):
         self.assertIn(
-            "STATE.md wins", DECISIONS,
-            "the log should say which document wins a disagreement, at the "
-            "point where a reader is standing in the log")
+            "DECISIONS.md", LOG,
+            "the log should name the document that supersedes it, at the point "
+            "where a reader is standing in the log")
 
-    def test_state_says_settled_work_leaves(self):
-        """The failure mode is accumulation, not absence. STATE.md has to
-        carry the instruction that keeps it small."""
+    def test_the_tree_says_detail_leaves_for_the_archive(self):
+        """The failure mode is accumulation, not absence — the tree has to carry
+        the instruction that keeps it small, exactly as STATE.md did."""
         self.assertIn(
-            "When something here is settled it leaves",
-            " ".join(STATE.split()),
-            "STATE.md should say that settled items leave it for the log — "
+            "the tree is authoritative; the log is the footnotes",
+            " ".join(DECISIONS.split()).lower(),
+            "DECISIONS.md should say which document wins and where detail goes; "
             "that sentence is the whole reason it stays readable")
+
+    def test_the_tree_is_not_a_log(self):
+        # The specific regression to guard: someone appends entry 172 and the tree
+        # starts growing back into the thing it replaced.
+        self.assertNotIn(
+            "## 172.", DECISIONS,
+            "a numbered entry was appended to the tree. New findings update an "
+            "OPTION's state and its attempt list; the log is archived")
 
 
 class EveryGateHasAVerdict(unittest.TestCase):

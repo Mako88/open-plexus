@@ -1,3 +1,22 @@
+# ARCHIVED — STATE.md, as it stood when the documents were merged
+
+**Replaced by [DECISIONS.md](../../DECISIONS.md)**, the option tree, on 2026-07-29.
+
+This was the only document kept current, and the discipline worked: it was pruned
+from 1,547 lines to under 400 and `tools/check_state.py` failed the build when it
+grew back. What it could not do was stop a SETTLED question being re-opened —
+decision 115 closed saturation and three later entries built on it anyway — because
+a current-state document says what is live, not what is closed.
+
+The tree carries both: a component's verdict, and the refuted options under it with
+the condition that would revive each. `tools/check_decisions.py` inherits this
+file's two real ratchets — a budget that forces detail out, and a declared census
+that cannot drift from the body.
+
+**Read for the reasoning, not for current state.**
+
+---
+
 # State — open questions and work in flight
 
 **This is the only document in this project that is kept current.** Everything in

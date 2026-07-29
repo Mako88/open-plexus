@@ -44,11 +44,12 @@ it is why this is a module rather than another `Retrieval` implementation.
 
 ## What it does not do
 
-**Replication.** Losing a node loses its concepts entirely, which is a sharper
-failure than dimension splitting's uniform degradation. The fix is holding each
-concept on `r` nodes, and that is the DHT literature GOALS §6.2 has listed as
-unread since the project began. `lose()` exists so the cost is measurable
-before anything is built to mitigate it.
+**Repair.** Each concept is held on `replicas` nodes, so a departure is
+survivable — 89.6% of concepts still reachable with HALF the network gone. But
+**nothing restores a lost replica**, so the redundancy depletes under continued
+churn and never recovers. See `lose()` for the measured decay. Under C3, which
+makes churn the normal case rather than an event, that is the difference between
+robust and merely slow to fail.
 """
 
 from __future__ import annotations
@@ -139,14 +140,55 @@ class ConceptStore:
         return np.zeros(self.width)
 
     def lose(self, node: int) -> None:
-        """That node vanishes and takes its concepts with it.
+        """That node vanishes.
 
-        C3's normal case, and this arrangement's sharpest cost. Under dimension
-        splitting a departure degrades every concept slightly; here it removes
-        some entirely and leaves the rest untouched. Which is preferable is a
-        measurement, not a preference, and this is what makes it measurable.
+        ## NOTHING REDISTRIBUTES, and that is a gap rather than a choice
+
+        John asked, 2026-07-29, whether concepts redistribute when a node drops.
+        **They do not.** The ring is unchanged, so `holders` still names the
+        departed node and a read simply falls through to the next survivor.
+        Reads keep working — and the redundancy behind them **depletes**:
+
+            nodes lost     survival     mean live holders per concept
+                     0        1.000                              3.00
+                     6        0.967                              2.03
+                    10        0.873                              1.43
+                    14        0.656                              0.84
+
+        **Replication is a wasting asset without repair.** The 3 replicas are
+        never restored, so under continuous churn — which is C3's premise — the
+        count walks down to zero and survival follows it. The single-departure
+        figures are the best case, not the steady state.
+
+        The fix is standard and unbuilt: when a holder is lost, a survivor
+        copies the concept to the next distinct node clockwise, restoring the
+        count. Consistent hashing already determines WHO that is, so it is a
+        local exchange between neighbours with no coordinator — which is why it
+        fits C1. Its cost is `width^2` numbers per concept moved, and under
+        constant churn that is constant background traffic, so it wants
+        measuring against the `d_max` budget rather than assuming.
+
+        That is anti-entropy and hinted handoff in the DHT literature, which
+        GOALS §6.2 has listed unread since the project began.
+
+        ## What a departure costs, either way
+
+        C3's normal case. Under dimension splitting a departure degrades every
+        concept slightly; here it removes some entirely and leaves the rest
+        untouched. Which is preferable is a measurement, not a preference, and
+        this is what makes it measurable.
         """
         self._absent.add(node)
+
+    def live_holders(self, concept: int) -> int:
+        """How many of this concept's holders are still present.
+
+        **The depletion measure.** `survival` says whether a concept is
+        reachable at all; this says how much redundancy is left behind that
+        answer, which is what falls first and what repair would restore.
+        """
+        return sum(1 for node in self.holders(concept)
+                   if node not in self._absent)
 
     def survival(self, concepts: int = 4096) -> float:
         """Share of concepts still reachable with the currently absent nodes.

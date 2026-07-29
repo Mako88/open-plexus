@@ -218,6 +218,29 @@ class ReplicationMakesChurnSURVIVABLE(unittest.TestCase):
                              f"concept {concept} is replicated onto the same "
                              f"node more than once")
 
+    def test_redundancy_DEPLETES_because_nothing_repairs_it(self):
+        """The gap John's question surfaced, pinned so it is not forgotten.
+
+        Nothing redistributes on a departure, so the replica count walks down
+        and never recovers. Reads keep working until it reaches zero, which
+        makes this the kind of degradation that is invisible right up until it
+        is total.
+
+        **This test asserts the DEFECT.** It should start failing the day
+        repair is built, and that is the point -- the alternative is a silent
+        assumption that three replicas stay three.
+        """
+        store = ConceptStore(nodes=20, width=16, replicas=3)
+        fresh = sum(store.live_holders(c) for c in range(256)) / 256
+        for node in range(10):
+            store.lose(node)
+        depleted = sum(store.live_holders(c) for c in range(256)) / 256
+        self.assertAlmostEqual(fresh, 3.0, places=6)
+        self.assertLess(
+            depleted, 2.0,
+            "redundancy did not deplete -- if something now repairs it, delete "
+            "this test and say so in the commit")
+
     def test_replication_cost_is_reported(self):
         store = ConceptStore(nodes=8, width=16, replicas=3)
         self.assertEqual(store.numbers_per_concept, 3 * 16 * 16)

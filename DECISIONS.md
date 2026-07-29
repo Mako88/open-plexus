@@ -5467,3 +5467,72 @@ each works in isolation, with a unit test, and none has a task number. That was
 true before this entry and it is still true. What has changed is that the reason
 is now named: **not one of them is wrong, and the task needs a fourth thing
 nobody has built.**
+
+## 163. John's rulings on the four cascading decisions
+
+Note 052 laid out four decisions whose blast radius makes them cheaper to settle
+before more is built on the current answer. **John ruled on all four**, and they
+are recorded here rather than left in conversation so the next session inherits
+them as settled.
+
+### 1. Discrete surfaces — ACCEPTED
+
+> *"I agree with you on the exact addressing using a quantizer."*
+
+**Target modalities: video, audio, text and images.** PDFs come in as text.
+
+**Off-the-shelf where it works, our own where it does not** — and John named both
+directions himself: the distributed setting may rule out a stock solution, and
+there may equally be something better for this case than what exists.
+
+Three things that follow, from note 052 §1 and worth keeping with the ruling:
+
+- **the C1 constraint does not bite here.** A quantiser is preprocessing, run
+  once per input at the edge, before anything reaches the store. It is not in the
+  learning loop, so stock encoders are genuinely available
+- **candidates exist for all four.** Residual-VQ audio codecs, the VQ-VAE/VQGAN
+  family for images, frame tokenisers plus temporal handling for video. Text is
+  already discrete
+- **the cost to decide deliberately** is that a stock tokeniser is a large
+  pretrained model in the pipeline. It touches nothing the learner does, but
+  *"our system plus a pretrained encoder"* is a different claim from *"our
+  system"*, and it is better named now than in a write-up
+
+**The risk that matters is the silent one:** a bad quantiser merges two things
+that should stay distinct, and this architecture cannot recover from that,
+because it will then address them identically.
+
+### 2. Where the relation comes from — LAYOUT FIRST, TRY-ALL-AND-GATE NEXT
+
+John: *"I like your try-all-and-gate… as potentially the actual end solution"*,
+and agreed to measure the layout version first.
+
+**Decision 162 has since made this more urgent than note 052 said.** It is not an
+optimisation to schedule — a hop cannot currently carry its own relation, so the
+composition task is unreachable without it. And 162 split the question in two:
+*which* relation, and *whether a hop can carry its own*. **The second blocks
+before the first matters.**
+
+### 3. What an "answer" is — EXPERIMENT, AFTER THE OTHERS
+
+Accepted as a real gap. This is ARCHITECTURE row F3 and it is the one that
+reaches backwards: every task and every accuracy number assumes a single answer
+token.
+
+### 4. Store persistence across sequences — DEFERRED
+
+Deliberately, with the trigger named: nothing currently needs cross-sequence
+memory, and it becomes urgent the moment a task does.
+
+### And the ordering principle behind all four
+
+> *"I would definitely like to shift over to doing these things because they have
+> such a large blast radius first… so that the tweaks that start happening are
+> gonna stick around rather than be completely wasted time because of the
+> architecture changing underneath it."*
+
+**With one correction, which is on the record because it changes what the
+principle implies here.** Discrete surfaces is the option under which the
+architecture does *not* change — that was the argument for it. So multimodality
+is additive rather than sweeping, and the decision on this list with real blast
+radius over existing measurements is **§3, not §1.**

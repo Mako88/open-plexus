@@ -98,7 +98,7 @@ verified
 |---|---|---|---|
 | F1 | Answer from awareness rather than prediction | **PARTIAL** | every relational task is scored on a single answer token. That is not next-token prediction (note 047 rules that out as the objective), but it is also not "form a response from awareness of the concepts in the question" |
 | F2 | Take a query in more than one modality | **UNTESTED** | depends entirely on B4, which is untested |
-| F3 | Produce more than one token of response | **UNTESTED** | **nothing in this project has ever scored a multi-token answer.** Named here because it is in GOALS and has never been on any roadmap. **165** builds the RULER — `openplexus/answers.py`, `exact` and F1 with a standing falsifier for emit-everything (recall 1.000, F1 0.400) and a gate recovering the old single-token accuracy exactly. **166** builds the QUESTION — `families.py set_queries` asks what values a family stated, which is the family's value AND its exceptions, and no single token can answer it. A ruler and a question are not a measurement: **nothing in this project emits a set yet**, so this row does not move |
+| F3 | Produce more than one token of response | **PARTIAL** | **165** the RULER — `openplexus/answers.py`, `exact` and F1, with a standing falsifier for emit-everything (recall 1.000, F1 0.400) and a gate recovering the old single-token accuracy exactly. **166** the QUESTION — `families.py set_queries` asks what values a family stated, which is its value AND its exceptions, and no single token can answer it. **167** the MECHANISM — `answer_set` collects across index-proposed siblings, gated on emptiness, reaching `exact` 1.000 with precision 1.000. **It goes no further than PARTIAL because the peak sits at `branches = family_size - 1` in every row and collapses either side**: the answer's size is handed to the model, and a mechanism told how many things to find has not answered from awareness. The gate filters emptiness, not irrelevance |
 
 **Depends on:** everything above.
 
@@ -117,7 +117,7 @@ and duplicating it is how two documents start disagreeing.
 
 ## What this ledger says right now
 
-**8 PASSING, 8 PARTIAL, 0 FAILING, 4 UNTESTED, 4 CLAIMED.**
+**8 PASSING, 9 PARTIAL, 0 FAILING, 3 UNTESTED, 4 CLAIMED.**
 
 **D2 and D3 both moved today** — 157 typed the write, 158 typed the read. What
 remains on D3 is that the relation is **fixed rather than chosen**: the mechanism
@@ -143,12 +143,20 @@ property of the store rather than a learned confidence. **That may well be true
 and it is currently untested**, and an untested claim about honesty is a poor
 thing to be proud of.
 
-**And the older embarrassment is F3.** The goal is to form a response from
-awareness of the concepts in a question. Nothing here has ever produced more than
-one token of answer. That is not a criticism of any decision — single-token
-scoring is what made everything above measurable — but it has never been written
-down as a gap, and a ledger that omitted it would be flattering rather than
-factual.
+**And the older embarrassment was F3.** The goal is to form a response from
+awareness of the concepts in a question, and for most of this project's life
+nothing here had ever produced more than one token of answer. That was not a
+criticism of any decision — single-token scoring is what made everything above
+measurable — but it had never been written down as a gap, and a ledger that
+omitted it would be flattering rather than factual.
+
+**Decisions 165–167 closed the gap and found the next one in the same move.** A
+ruler, a question no single token can answer, and a mechanism that emits a set at
+`exact` 1.000. What stops it being PASSING is that the answer's SIZE is supplied
+from outside: the peak sits at `branches = family_size - 1` in every row measured
+and collapses on both sides. **A mechanism told how many things to find has not
+answered from awareness**, and the gate cannot supply it, because the gate filters
+emptiness and the surplus candidates are non-empty.
 
 ## Re-check obligations, so rule 3 is mechanical rather than remembered
 

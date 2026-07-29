@@ -5764,3 +5764,83 @@ version is that emitting is unfitted while proposing is not.
 Set the flag off; the stream is byte identical and
 `tests/test_family_set_queries.py` asserts that against decisions 143-151's
 layout rather than intending it.
+
+## 167. The first set answer, and the constant it rests on
+
+`LocalAssociativeMemory.answer_set` reads the entity's own address and its
+content-index neighbours', **skips every address the occupancy sketch says was
+never written**, and returns the decoded values as a set. Row F3 has a mechanism.
+
+**It COLLECTS where decisions 146 and 147 tried to CHOOSE, and that is why it
+works at all.** 146 found that reading neighbours through the index can only
+average rather than select; 147 refuted both obvious rules for picking a winner
+among them. **Neither objection applies to a set answer, because nothing has to be
+selected** — so the mechanism that was refuted for a one-token answer is the right
+shape for this question. That is worth stating plainly: this is not a new
+mechanism, it is a refuted one whose refutation turned out to be about the
+question rather than about it.
+
+### The result, and the headline is the second row not the first
+
+    exact, by family_size against `branches`.  n = 12 per cell, six seeds
+
+                   1       2       3       4       5       6       7       8
+    size 3     0.250   1.000   0.250   0.250   0.167   0.167   0.000   0.000
+    size 4     0.083   0.833   1.000   0.500   0.083   0.000   0.000   0.000
+    size 5     0.667   0.833   0.917   1.000   0.250   0.083   0.000   0.000
+    size 6     0.500   0.500   0.500   0.667   0.917   0.333   0.083   0.000
+
+**The peak sits at `family_size - 1` in every row, and falls off sharply on both
+sides.** So the reportable finding is not 1.000. It is that **the enumeration bound
+must equal the group's size, and the model is not told the group's size and cannot
+currently discover it.** A single number quoted from the diagonal would be a
+measurement of a constant supplied from outside the model.
+
+This is decision 166's caveat, measured rather than argued, and it arrived one
+commit after being written down — which is the only reason the 1.000 was not
+reported as the result.
+
+### Why the gate cannot fix it, stated precisely
+
+The gate filters **emptiness, not irrelevance.** Neighbours beyond the family are
+other families' entities, and their addresses *are* written — they have stated
+facts of their own. So the gate has nothing to object to, and over-enumeration
+costs precision directly:
+
+    gated,   branches 3     exact 1.000   precision 1.000   size 2.00
+    gated,   branches 8     exact 0.000   precision 0.530   size 3.90
+    UNGATED, branches 3     exact 0.200   precision 0.733   size 2.80
+    UNGATED, branches 8     exact 0.000   precision 0.453   size 4.70
+
+**The gate does act** — 0.733 to 1.000 at the matched bound, and it removes 0.8
+spurious values per answer. It is simply the wrong instrument for the other
+failure. `the-set-answer-emits-every-candidate` is the mutation, and note that
+removing the gate raises RECALL, which is precisely why decision 165 refuses to
+report recall alone.
+
+### What is deliberately NOT claimed
+
+**Index purity was 1.000 in every cell**, so the grouping was effectively an
+oracle. This measures the collecting read, not the composition under an imperfect
+grouping — and `families.py` was calibrated to make the grouping recoverable, so
+that is the intended condition rather than a flaw. It does mean the number says
+nothing about what happens when the index is wrong.
+
+**Row F3 moves from UNTESTED to PARTIAL and no further.** A mechanism that needs
+the answer's size handed to it has not answered from awareness.
+
+### The next problem, and no available option makes it free
+
+The enumeration bound is now the blocker. `grouping.cluster` is the obvious
+alternative — a cluster's membership is determined by the data rather than by a
+per-query `k` — but **it takes a `k` of its own**, the number of clusters. So it
+converts a per-query constant into a global one, which is a real improvement in
+kind and **is not the same as unfitted**. Saying otherwise would be the third time
+this line has claimed something was free before checking.
+
+### How to undo it
+
+Delete the method and `tests/test_answer_set.py`. `self._final` is assigned on
+every run and read by nothing else, so removing it changes no result;  it is
+deliberately not `carry_store`, which feeds a store into the next sequence and
+would change what the model learns from.

@@ -1752,6 +1752,10 @@ class LocalAssociativeMemory:
         #: The address sketch from the last `run`, when one was kept. See
         #: `track_occupancy`.
         self.occupied = None
+        #: The store this model ended its last sequence with. `None` until `run`
+        #: has been called once. Read by `answer_set` and by nothing in `run` --
+        #: see the assignment for why that line matters.
+        self._final = None
         #: How many times consolidation has fired, over the model's whole life.
         #: **Observation only**, like `trace` -- nothing reads it back.
         #:
@@ -3335,4 +3339,82 @@ class LocalAssociativeMemory:
             previous_scores = answer
         if self.config.carry_store:
             self._carried = memory
+        # THE FINAL STORE, KEPT FOR READ-ONLY PROBES, and deliberately not the
+        # same thing as `carry_store`.
+        #
+        # `carry_store` feeds a store into the NEXT sequence and changes what the
+        # model learns from. This only records what THIS sequence ended up
+        # holding, and nothing in `run` ever reads it — a set-valued question is
+        # asked once every fact is in, so `answer_set` reads it afterwards rather
+        # than needing a hook inside the loop.
+        #
+        # Decision 62 found a persistence bug by noticing that `learn=False`
+        # predictions were byte-identical whether or not another sequence had run,
+        # so the line between "carried" and "merely visible" is worth keeping
+        # sharp: this is assigned on every run and read by nothing here.
+        self._final = memory if lasting is None else memory + lasting
         return predictions
+
+    def answer_set(self, relation: int, entity: int,
+                   branches: int) -> frozenset[int]:
+        """Every value the store holds about `entity`'s neighbourhood, as a SET.
+
+        The contract: call after `run`. Returns the decoded value at `entity`'s
+        own address and at each of its `branches` nearest neighbours in the
+        content index, **skipping every address the occupancy sketch says was
+        never written.** The result is a set, so order and repetition carry no
+        meaning.
+
+        **This COLLECTS where decisions 146 and 147 tried to CHOOSE, and that is
+        the whole reason it can work.** 146 found that reading neighbours through
+        the index can only average rather than select, and 147 refuted both
+        obvious rules for choosing a winner among them. Neither objection applies
+        to a set answer: nothing has to be selected, so the mechanism that was
+        wrong for a one-token answer is the right shape for this one.
+
+        Precision comes from the gate and costs nothing fitted — an address that
+        was never written reads exactly 0.0 (decision 148), so an empty neighbour
+        contributes nothing rather than contributing noise. **Enumeration is not
+        free in the same way:** `branches` bounds how many neighbours are
+        considered and is a fitted constant, which is the caveat decision 166
+        records.
+        """
+        if self._final is None:
+            raise ValueError(
+                "answer_set reads the store this model ended a sequence with, "
+                "and no sequence has been run. Calling it first would score a "
+                "zero matrix, which decodes to whatever the readout prefers and "
+                "looks exactly like a mechanism that found nothing")
+        if self.occupied is None:
+            raise ValueError(
+                "answer_set needs the occupancy sketch: without it an unwritten "
+                "address returns noise that decodes to a real token, so every "
+                "neighbour would contribute a value and the answer would be as "
+                "large as `branches` regardless of what was stored. Set "
+                "track_occupancy or index_prefer to 'sketch' or 'inherit'")
+        if self.content is None:
+            raise ValueError(
+                "answer_set needs a fitted ContentIndex to propose neighbours. "
+                "Without one it can only read the entity's own address, which is "
+                "the single-token measurement")
+        if branches < 1:
+            raise ValueError(
+                "branches must be at least 1, or no neighbour is ever consulted "
+                "and the answer cannot exceed one value -- the singleton case "
+                "decision 166 refuses at the task level")
+        # THE ENTITY ITSELF FIRST, then its neighbours. Its own address is where a
+        # DIRECT fact lives, and a set answer needs it alongside the siblings'
+        # rather than instead of them.
+        candidates = [int(entity)]
+        candidates.extend(int(token)
+                          for token, _ in self.content.nearest(entity, branches))
+        found: set[int] = set()
+        for candidate in candidates:
+            key = self.key_source.pair(int(relation), candidate)
+            # THE GATE, and it is the only thing standing between this and an
+            # answer of size `branches + 1`.
+            if self.occupied.count(key) <= 0.0:
+                continue
+            retrieved = self.retrieval.read(self._final, key)
+            found.add(int(np.argmax(self.wo @ retrieved)))
+        return frozenset(found)

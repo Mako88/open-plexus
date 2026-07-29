@@ -92,11 +92,21 @@ while F1 is 0.400. `families.py set_queries` asks what values a family stated,
 which is its value AND its exceptions, and **no single token can answer it**: the
 task has held that conjunction since 144 and could never ask for it.
 
-**What is missing is the mechanism.** A gated walk over index-proposed siblings,
-where 148's gate supplies precision and `ContentIndex` supplies candidates. One
-caveat recorded before it is built on: the gate makes *emitting* unfitted, but the
-candidate list is bounded by `index_branches`, which is a fitted constant — so
-"termination is free" is true of precision and not of enumeration.
+**And the mechanism now exists — decision 167.** `answer_set` collects across
+index-proposed siblings, gated on emptiness, and reaches `exact` **1.000** with
+precision **1.000**. F3 is PARTIAL rather than PASSING for one reason: **the peak
+sits at `branches = family_size - 1` in every row measured and collapses on both
+sides** (table in 167). The answer's SIZE is handed to the model, and a mechanism
+told how many things to find has not answered from awareness.
+
+**The gate cannot supply it: it filters emptiness, not irrelevance** — the surplus
+candidates are other families' entities and their addresses ARE written. The gate
+does act (precision 0.733 → 1.000 at the matched bound) and cannot reach the other
+failure.
+
+**⇒ So the enumeration bound is the live sub-question.** `grouping.cluster` takes a
+`k` of its own, converting a per-query constant into a global one — better in kind,
+**not free**.
 
 ### Where the mechanisms stand
 
@@ -124,22 +134,19 @@ chance produces.
 ### Answered and moved to DECISIONS
 
 Decision 148 answered the one before those — *can anything tell which of two
-retrievals to trust* — with **yes, once the question is asked exactly.**
+retrievals to trust* — with **yes, once the question is asked exactly.** `inherit`
+answers from the entity's own address when **anything** was written there and from
+its neighbours' when nothing was: **0.8100 DIRECT / 0.4350 TRANSFER / 0.8183
+EXCEPTION**, the first arm good at all three, where grouping bought transfer by
+destroying exceptions (0.3708, saying a sibling's value 86.6%) and summing landed
+between. The gate is exact — **1.0000** of TRANSFER, **0.0000** of DIRECT and
+EXCEPTION, every seed. Full table in decision 148.
 
-    with exceptions       direct  transfer  exception   wrong = a sibling's
-      ungrouped           0.7792    0.0608     0.7833        0.0084
-      concept (grouped)   0.4492    0.4708     0.3708        0.8657
-      indexed (B, summed) 0.7158    0.2650     0.6875        0.3441
-      inherit             0.8100    0.4350     0.8183        0.0247
-
-`inherit` answers from the entity's own address when **anything** was written
-there and from its neighbours' when nothing was — the first arm good at both,
-where grouping bought transfer by destroying exceptions and summing landed
-between them. The gate is exact: **1.0000** of TRANSFER, **0.0000** of DIRECT and
-EXCEPTION, every seed. What made it work is that membership is *"is there
-anything here"* rather than *"who has more"*, and with a hashed sketch an
-unwritten address reads exactly 0.0 — so note 049's threshold is **structurally
-zero** and nothing is fitted.
+What made it work is that membership is *"is there anything here"* rather than
+*"who has more"*, and with a hashed sketch an unwritten address reads exactly 0.0 —
+so note 049's threshold is **structurally zero** and nothing is fitted. **167 is
+now the limit of that**: emptiness is the only thing the sketch knows, so it cannot
+bound an enumeration over addresses that are all occupied.
 
 **The price is real:** without exceptions DIRECT costs 0.050 against summing
 while TRANSFER gains 0.231. Summing lets agreeing neighbours corroborate;

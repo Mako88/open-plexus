@@ -802,6 +802,21 @@ MUTATIONS = [
         new="        if False and self.hops > 1 and self.context_keys:",
     ),
     Mutation(
+        name="the-set-answer-emits-every-candidate",
+        breaks="the only thing making a set answer precise. An address that was "
+               "never written still returns a vector, and that vector still "
+               "argmaxes to a real token -- so without the gate every neighbour "
+               "the index proposes contributes a value and the answer is as large "
+               "as `branches` regardless of what was stored. Measured at branches "
+               "8: 3.90 values gated against 4.70 ungated, precision 0.530 "
+               "against 0.453. It does not crash, it does not shrink, and RECALL "
+               "goes UP -- which is exactly the metric decision 165 refuses to "
+               "report alone, for this reason",
+        path=LOCAL,
+        old="            if self.occupied.count(key) <= 0.0:\n                continue",
+        new="            if False:\n                continue",
+    ),
+    Mutation(
         name="the-set-answer-is-a-singleton-after-all",
         breaks="ARCHITECTURE row F3 while appearing to satisfy it. The answer set "
                "collapses to one value, so the first multi-token measurement in "

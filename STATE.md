@@ -77,12 +77,20 @@ An EXCEPTION is an entity whose own stated fact contradicts its family's.
 says a sibling's value 86.6% of the time — the superposition speaking in the
 family's voice.
 
-**And one exception per family halves everything else**: transfer 0.998 → 0.471,
-direct 0.997 → 0.449. The family's single address holds two competing values and
-a read is a coin flip.
+**But "one exception halves everything" was the configuration, not the
+mechanism** — decision 145. 2 stated facts with 1 contradicting is a literal
+50/50. Varying how many siblings agree:
 
-> **Concept addressing cannot represent within-family variation at all.** The
-> address holds one thing; a second thing written to it destroys the first.
+    stated  agree  exception share   direct  transfer  exception
+         2      1            0.50   0.4650    0.4400     0.3725
+         3      2            0.33   0.9200    0.9250     0.0300
+         5      4            0.20   0.9825    0.9900     0.0000
+
+> **The default is robust and the exception is ERASED.** The address holds the
+> sum, the majority dominates it, and the dissenting fact goes to 0.000. The
+> system does not fail to answer about an exception — it confidently answers with
+> the category's default, which is the most dangerous shape a wrong answer has
+> and a plain description of a stereotype.
 
 **AND THAT WAS OVERSTATED — [note 049](docs/notes/049-specific-beats-general-is-a-read-policy.md).**
 The store is one matrix addressed by keys, so a fact at the SURFACE key and a

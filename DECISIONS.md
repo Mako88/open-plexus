@@ -4326,6 +4326,15 @@ family's single address holds two competing values and a read is a coin flip.
 > **Concept addressing cannot represent within-family variation at all.** The
 > address holds one thing, and a second thing written to it destroys the first.
 
+> ### ⚠ THE SENTENCE ABOVE IS WRONG — CORRECTED BY DECISION 145
+>
+> "One exception halves everything" is an artefact of the configuration this arm
+> happened to use: 2 facts stated with 1 contradicting is a literal 50/50, so of
+> course a read is a coin flip. **Give the majority any weight and the default
+> survives perfectly** — 0.99 transfer at a 20% exception rate. The address holds
+> the SUM and the majority wins. What is annihilated is the exception, not the
+> default. See 145.
+
 ### It explains decision 141 from the other side
 
 Grouping words hurt on text. **This is why: text is nothing but exceptions.**
@@ -4354,3 +4363,66 @@ at one.
 **Taken without asking**, under standing authorisation. The exception arm was
 added as a falsifier for 143 rather than as a new direction, and its predictions
 were registered before it ran.
+
+## 145. The majority wins and the exception is erased — correcting 144
+
+Decision 144 concluded that *"the address holds one thing, and a second thing
+written to it destroys the first"*, from a single configuration: 2 facts stated
+per family with 1 contradicting. **That is a literal 50/50, so the coin flip it
+measured was the configuration and not the mechanism.**
+
+Varying how many siblings agree, at one exception throughout:
+
+    stated  agree  exception share   direct  transfer  exception
+         2      1            0.50   0.4650    0.4400     0.3725
+         3      2            0.33   0.9200    0.9250     0.0300
+         5      4            0.20   0.9825    0.9900     0.0000
+
+**The default is robust.** At a third and a fifth, `direct` and `transfer` return
+to 0.92 and 0.99 — the concept address holds the superposition and the majority
+dominates it, exactly as a sum should.
+
+**And the exception is not merely wrong. It is erased**: 0.030 at a third, and
+**0.000** at a fifth. Not degraded, not noisy — gone.
+
+### What that changes
+
+**144's mechanism was right and its magnitude was wrong.** Grouping does spend
+specificity, and E3's 86.6% "answers a sibling's value" still holds. What is not
+true is that one dissenting fact breaks the whole family; it takes a dissenter
+worth half the evidence to do that.
+
+**The corrected statement is worse in one way and better in another.** Better:
+the concept map is a robust default store, and tolerates dissent in proportion to
+how outnumbered it is. Worse: **the system does not merely fail to answer about
+an exception, it confidently answers with the category's default** — which is the
+most dangerous shape a wrong answer can have, and a straightforward description
+of a stereotype.
+
+### And it strengthens note 049 rather than weakening it
+
+Note 049 proposes writing at both the surface and concept addresses and reading
+the surface first. 144's numbers left that looking doubtful, because the
+exception's write appeared to poison the concept address.
+
+**At realistic ratios it does not.** 0.99 transfer with a 20% exception rate means
+the concept address survives the extra write comfortably, so a two-level scheme
+can hold the default at the concept and the override at the surface without the
+two destroying each other. **The ceiling probe agrees**: at least one of the two
+arms is right on 0.853 of exceptions and 0.878 of directs.
+
+So the mechanism is licensed, and the remaining question is the selection rule
+rather than whether there is anything to select.
+
+### What was learned about the method, again
+
+**A finding from one configuration is a finding about that configuration.** 144
+swept nothing — it took the task's default shape, measured a dramatic number, and
+generalised from it. The sweep that corrects it cost four minutes.
+
+This is the same failure as the single-seed claim on 2026-07-29 morning, in a
+different dimension: there the axis was seeds, here it was the ratio the effect
+depends on most.
+
+**Taken without asking**, under standing authorisation. 144 is corrected in place
+with the wrong sentence struck and the reason beside it, not rewritten.

@@ -104,6 +104,73 @@ class TheDefaultIsUntouched(unittest.TestCase):
         self.assertEqual(source.concept(np.array([1, 3]), 1), 3)
 
 
+class OnlyONECoordinateCanBeGrouped(unittest.TestCase):
+    """A pair key has two coordinates and the address space is their product.
+
+    Grouping both collapses hardest and costs the most resolution. `context`
+    keeps the token being addressed exact and collapses only its company;
+    `current` does the reverse. The trade is recurrence against resolution and
+    where it pays is a measurement -- these tests only pin that each mode
+    groups the coordinate it says it does, and no other.
+    """
+
+    def source(self, coordinates: str) -> ByConcept:
+        return ByConcept(pairs(), Shared(VOCAB, GROUPS), VOCAB,
+                         coordinates=coordinates)
+
+    def test_context_merges_the_PREVIOUS_token_only(self):
+        source = self.source("context")
+        np.testing.assert_allclose(source.key(np.array([2, 1]), 1),
+                                   source.key(np.array([3, 1]), 1))
+        self.assertFalse(np.allclose(source.key(np.array([1, 2]), 1),
+                                     source.key(np.array([1, 3]), 1)))
+
+    def test_current_merges_THIS_token_only(self):
+        source = self.source("current")
+        np.testing.assert_allclose(source.key(np.array([1, 2]), 1),
+                                   source.key(np.array([1, 3]), 1))
+        self.assertFalse(np.allclose(source.key(np.array([2, 1]), 1),
+                                     source.key(np.array([3, 1]), 1)))
+
+    def test_a_candidate_substitutes_as_ITSELF_under_context(self):
+        """`context` leaves this position exact, so two surfaces of one concept
+        must stay distinguishable as candidates -- otherwise the mode has
+        collapsed the coordinate it exists to preserve."""
+        source, tokens = self.source("context"), np.array([1, 4, 2])
+        self.assertFalse(np.allclose(source.key_as(tokens, 2, 2),
+                                     source.key_as(tokens, 2, 3)))
+        np.testing.assert_allclose(source.key_as(tokens, 2, int(tokens[2])),
+                                   source.key(tokens, 2))
+
+    def test_a_concept_id_cannot_COLLIDE_with_a_surface_id(self):
+        """Under the one-sided modes the inner source is handed a mix of
+        concept ids and token ids on one number line. If they overlapped, a
+        concept and an unrelated word would silently share an address -- so the
+        concept side is shifted clear of the vocabulary, and this is the test
+        that says so rather than the comment.
+        """
+        source = self.source("context")
+        # Concept ids here run 0..4 and so do token ids. Without the shift,
+        # the pair (concept of 5, token 1) and the pair (token 3, token 1)
+        # would collide for some grouping; with it, nothing in the concept
+        # range can equal anything in the surface range.
+        self.assertGreaterEqual(source._shift, VOCAB)
+        mapped = source._as_concepts(np.array([5, 1]), 1)
+        self.assertGreaterEqual(int(mapped[0]), VOCAB)
+        self.assertEqual(int(mapped[1]), 1)
+
+    def test_an_unknown_mode_is_refused(self):
+        with self.assertRaises(ValueError):
+            ByConcept(pairs(), Shared(VOCAB, GROUPS), VOCAB,
+                      coordinates="sideways")
+
+    def test_the_default_is_both_and_is_unchanged(self):
+        """The mode added last must not move what was already measured."""
+        np.testing.assert_allclose(
+            self.source("both").key(np.array([1, 2]), 1),
+            wrapped().key(np.array([1, 2]), 1))
+
+
 class TheSequenceIsNotMutated(unittest.TestCase):
     """This is the only key source that rewrites its input before delegating,
     so the shared conformance check earns its place twice over here."""

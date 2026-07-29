@@ -236,9 +236,28 @@ class ByConcept:
     concept id here would put that mapping in twice — the model would map an
     already-mapped id through the surface table again — so this stays a surface
     and the composition stays exactly where it was.
+
+    ## Which COORDINATE is grouped, and why it is a parameter
+
+    A pair key is `(t-1, t)` — two coordinates, and the address space is their
+    product. Grouping both collapses it hardest and costs the most resolution:
+    at K=128 over 1,733 Shakespeare words the largest group holds 899 of them,
+    so most contexts become indistinguishable *and* most predictions are made
+    from an indistinguishable address.
+
+    **Collapsing one coordinate halves the exponent while leaving the other
+    exact.** `context` groups what came before and keeps the current token
+    itself sharp; `current` does the reverse. Neither is obviously right, which
+    is why this is swept rather than chosen: the trade is recurrence against
+    resolution, and where it pays is a measurement.
+
+    A key source that reads only the current position — `TableKeys` — has one
+    coordinate, so `context` is a no-op there and `both` and `current` agree.
+    That is a property of the inner source and not a special case here.
     """
 
-    def __init__(self, inner: KeySource, surfaces, vocab: int) -> None:
+    def __init__(self, inner: KeySource, surfaces, vocab: int,
+                 coordinates: str = "both") -> None:
         """
         Args:
             inner: The key source to wrap. It sees concept ids where it would
@@ -250,18 +269,31 @@ class ByConcept:
                 `concepts` and nothing about a vocabulary attribute — widening
                 the protocol to save an argument would be paying for this in the
                 wrong place.
+            coordinates: `both`, `context` (everything but this position), or
+                `current` (this position only). See the class docstring.
         """
         if vocab < 1:
             raise ValueError("a vocabulary of nothing has nothing to address")
+        if coordinates not in ("both", "context", "current"):
+            raise ValueError(
+                f"coordinates must be both, context or current, got "
+                f"{coordinates!r}")
         self.inner = inner
         self.surfaces = surfaces
+        self.coordinates = coordinates
         #: The mapping, materialised once. `of` is pure by contract, so this is
         #: a cache and not a snapshot of something that could move.
         self._of = np.asarray([surfaces.of(t) for t in range(vocab)],
                               dtype=np.int64)
+        #: **Concept ids and surface ids share a number line under `context` and
+        #: `current`**, because the inner source is handed a mix of the two. A
+        #: concept id and an unrelated token id colliding would silently merge
+        #: two addresses, so the concept side is shifted clear of the vocabulary.
+        #: Under `both` nothing is mixed and the shift would only waste range.
+        self._shift = 0 if coordinates == "both" else vocab
 
-    def _as_concepts(self, tokens: np.ndarray) -> np.ndarray:
-        """The sequence with every surface replaced by its concept.
+    def _as_concepts(self, tokens: np.ndarray, t: int) -> np.ndarray:
+        """The sequence with the grouped coordinate replaced by its concept.
 
         Rebuilt per call rather than cached against the array it came from.
         Caching on object identity would be correct only while nobody writes
@@ -269,10 +301,23 @@ class ByConcept:
         project makes, and the gather is a few microseconds against a `d x d`
         matrix product per step.
         """
-        return self._of[np.asarray(tokens, dtype=np.int64)]
+        tokens = np.asarray(tokens, dtype=np.int64)
+        if self.coordinates == "both":
+            return self._of[tokens]
+        mapped = self._of[tokens] + self._shift
+        if self.coordinates == "context":
+            # Everything but this position, so the token being addressed keeps
+            # its own identity and only its company is collapsed.
+            out = tokens.copy()
+            out[:t] = mapped[:t]
+            out[t + 1:] = mapped[t + 1:]
+            return out
+        out = tokens.copy()
+        out[t] = mapped[t]
+        return out
 
     def key(self, tokens: np.ndarray, t: int) -> np.ndarray:
-        return self.inner.key(self._as_concepts(tokens), t)
+        return self.inner.key(self._as_concepts(tokens, t), t)
 
     def key_as(self, tokens: np.ndarray, t: int, token: int) -> np.ndarray:
         """A candidate is a SURFACE and is mapped like any other.
@@ -281,9 +326,14 @@ class ByConcept:
         the store about it means asking about the concept it belongs to — which
         also means two candidate surfaces from one concept produce the same read,
         and a caller that wanted them distinguished is asking the wrong layer.
+
+        Under `context` this position is not grouped, so a candidate substitutes
+        as itself and two surfaces of one concept stay distinguishable here —
+        which is the whole point of leaving that coordinate exact.
         """
-        return self.inner.key_as(self._as_concepts(tokens), t,
-                                 int(self._of[int(token)]))
+        substitute = (int(token) if self.coordinates == "context"
+                      else int(self._of[int(token)]) + self._shift)
+        return self.inner.key_as(self._as_concepts(tokens, t), t, substitute)
 
     def concept(self, tokens: np.ndarray, t: int) -> int:
         """The surface `inner` names, unmapped. See the class docstring."""

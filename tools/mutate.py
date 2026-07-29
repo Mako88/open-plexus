@@ -47,6 +47,7 @@ NGRAM = ROOT / "openplexus" / "ngram.py"
 REWARD_RECALL = ROOT / "openplexus" / "tasks" / "reward_recall.py"
 KINSHIP = ROOT / "openplexus" / "tasks" / "kinship.py"
 CLOSURE = ROOT / "openplexus" / "tasks" / "closure.py"
+CONTENT = ROOT / "openplexus" / "content.py"
 OWNERSHIP = ROOT / "openplexus" / "ownership.py"
 PARTITIONED = ROOT / "openplexus" / "partitioned.py"
 SEARCH = ROOT / "openplexus" / "search.py"
@@ -1608,6 +1609,51 @@ MUTATIONS = [
             "        return np.zeros(self.width)",
         new="        node = self.holders(concept)[0]\n"
             "        return self._stores[node] @ key",
+    ),
+    Mutation(
+        name="content-accumulates-in-one-direction-only",
+        breaks="symmetry, and with it the claim that this measures MEANING. "
+               "Crediting a token only with the neighbours that follow it "
+               "makes `a near b` and `b near a` different numbers, so the "
+               "space would encode English word order rather than company "
+               "kept -- and the nearest-neighbour lists that P4 rests on would "
+               "be an artefact of which word happened to come first",
+        path=CONTENT,
+        old="            np.add.at(self._sums, left, "
+            "self._context[right] * weight[right, None])\n"
+            "            np.add.at(self._sums, right, "
+            "self._context[left] * weight[left, None])",
+        new="            np.add.at(self._sums, left, "
+            "self._context[right] * weight[right, None])",
+    ),
+    Mutation(
+        name="content-vectors-are-not-centred",
+        breaks="the only thing separating meaning from frequency here. Every "
+               "token overlaps `the` and `and`, so a shared direction "
+               "dominates every vector and mean off-diagonal cosine sits at "
+               "0.50 against hash keys' 0.0005. Subtracting the common mode is "
+               "what leaves the part that differs per token; without it the "
+               "nearest neighbour of everything drifts toward whatever is "
+               "commonest, which is exactly the shuffled-corpus failure the "
+               "suite uses as its control",
+        path=CONTENT,
+        old="            if seen.any():\n"
+            "                centred[seen] -= centred[seen].mean(axis=0)",
+        new="            if seen.any():\n"
+            "                pass",
+    ),
+    Mutation(
+        name="an-unseen-token-gets-a-confident-vector",
+        breaks="honesty about absence. A token never observed has no evidence "
+               "behind it; zeroing it makes its similarity to everything 0, "
+               "which is correct and useless. Normalising whatever noise the "
+               "sums happen to hold turns it into a unit vector pointing "
+               "somewhere definite -- so it becomes some real token's nearest "
+               "neighbour, and the index would route a read to a concept "
+               "chosen by rounding error",
+        path=CONTENT,
+        old="            centred[~seen] = 0.0",
+        new="            centred[~seen] = 1e-9",
     ),
     Mutation(
         name="ownership-falls-back-to-modulo",

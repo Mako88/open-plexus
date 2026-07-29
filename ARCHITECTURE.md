@@ -65,6 +65,7 @@ verified
 |---|---|---|---|
 | C1 | Detect that it holds no fact at an address | **PASSING** | 148: `AddressSketch`, defers on 1.0000 of transfer and 0.0000 of direct/exception, every seed. Bar is structurally zero, nothing tuned |
 | C2 | Have that detection mean *"I don't know this"* | **PARTIAL** | 151: occupancy is a property of the ADDRESS, not the knowledge. Informative exactly where an address is read before it is written (153). Blind on kinship, chains, MQAR |
+| C4 | **Decline to answer** rather than assert something it does not hold | **UNTESTED** | the gate detects an empty address (C1) and then routes to the neighbours. **Nothing anywhere lets the model say "I do not know"**, and no task scores abstention. John raised this on 2026-07-29: the architecture may be structurally free of LLM overconfidence — the gate is a fact about the store, not a learned probability — but that is a claim with no measurement behind it |
 | C3 | Cost nothing where there is nothing to detect | **PASSING** | 150: matches plain addressing seed for seed on MQAR (0.9950) and never defers, while summing the same reads costs 0.113 |
 
 **Depends on:** A1, A3. **C2 is the row note 051 attacks.**
@@ -115,7 +116,7 @@ and duplicating it is how two documents start disagreeing.
 
 ## What this ledger says right now
 
-**8 PASSING, 6 PARTIAL, 1 FAILING, 3 UNTESTED, 4 CLAIMED.**
+**8 PASSING, 6 PARTIAL, 1 FAILING, 4 UNTESTED, 4 CLAIMED.**
 
 **D2 and D3 both moved today** — 157 typed the write, 158 typed the read. What
 remains on D3 is that the relation is **fixed rather than chosen**: the mechanism
@@ -130,7 +131,14 @@ The PARTIAL that matters most is **C2**. Typing addresses moves it: `key(entity,
 has-value)` reading empty is *"I don't know this entity's value"*, where
 `key(entity)` empty only ever meant *"nothing was written here"*.
 
-**And the honest embarrassment is F3.** The goal is to form a response from
+**C4 and F3 are the two rows nobody had written down.** C4 — declining to
+answer — is the one that matters for a claim the project would want to make:
+that it is structurally free of confident confabulation because its gate is a
+property of the store rather than a learned confidence. **That may well be true
+and it is currently untested**, and an untested claim about honesty is a poor
+thing to be proud of.
+
+**And the older embarrassment is F3.** The goal is to form a response from
 awareness of the concepts in a question. Nothing here has ever produced more than
 one token of answer. That is not a criticism of any decision — single-token
 scoring is what made everything above measurable — but it has never been written

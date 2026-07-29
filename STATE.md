@@ -105,9 +105,33 @@ Six task modules exist and that is two too many to be honest about. The split:
 | **`closure.py`** | **THE PRIMARY INSTRUMENT.** Unmarked stream of facts, some implied by others. Matches the stated goal — relational, no question marker, self-supervised in form. Passes G0 (decision g14-01): entailed headroom 0.277 against a frozen 0.000 |
 | `kinship.py` | **the mechanism testbed.** Marked questions, so it isolates a mechanism cleanly — the whole search line (g13-01…05) is measured on it and those numbers stay comparable. Kept for that, not as the goal |
 | `chains.py` | solved at 1.000, out-degree 1 by construction. A control, not a target |
-| `mqar.py` | G0–G5 were passed on it. History; not a live instrument |
-| `corpus.py` | the text line, closed by decisions 115 and 118 |
+| `mqar.py` | **NO LONGER JUST HISTORY.** Decision 142: the store scores 0.995 here and **zero** with it ablated, and the readout bias that wins on text *costs* 0.279. It is the only instrument that isolates the store from a prior, which makes it the control every other result now needs |
+| `corpus.py` | **the text line, closed by 115 and 118 — REOPENED BY g17-01 AND PAUSED AGAIN 2026-07-29.** See below: the reopening was never re-decided, and what it measured says the *objective* was the limit |
 | `reward_recall.py` | **retired** (John's call, decision 126) |
+
+### The text line: what reopening it cost and what it bought
+
+g17-01 reopened `corpus.py` at word level for one narrow, defensible reason —
+note 045's index needs units that can carry meaning and characters cannot — and
+decisions 135–142 then went a long way down it **without anyone re-deciding that
+text was the instrument.** Note 046's failure one level up: an inherited
+*question* rather than an inherited constant.
+
+**What it bought** is worth keeping, because it is not nothing: a bug that had
+survived four sweeps (138), the corrected bar (135), the ablation habit that now
+protects every result, and note 047's account of why the store cannot win at
+prediction — *the only relation it can express on a next-token objective is
+n-gram shaped, and counting does that exactly.*
+
+**The distinction that matters, and it is John's, 2026-07-29:** the point is not
+to predict what comes next but to be *aware* of enough concepts to respond.
+
+> **Text as INPUT is not the problem. Text-PREDICTION as the score is.** A model
+> asked what it HOLDS is a different measurement from one asked what comes next,
+> and only the second is bounded by counting.
+
+So this is **paused, not condemned**. A text task scored on what the model holds
+rather than what it guesses is untried and is not what 135–142 measured.
 
 **The gap I should name rather than let sit:** *everything above is
 self-designed.* **CLUTRR is the only external benchmark that would make a number
@@ -244,7 +268,27 @@ is enough to show a 0.10 effect, and there is none.
 > At **MQAR's own load** of a handful of bindings, the store still contributes
 > nothing to text. So the difference is not how much it is holding.
 
-### ⇒ ONE CANDIDATE LEFT, and it is not built
+### ⇒ AND THE CANDIDATE BELOW IS PROBABLY THE WRONG QUESTION — 2026-07-29
+
+Everything from here down measures the store **against a next-token objective**,
+and [note 047](docs/notes/047-what-the-store-can-hold-on-text-is-an-n-gram.md)
+argues that objective is the limit: the only relation the store can express there
+is n-gram shaped, and a count table does that exactly and cheaply.
+
+John, reading it: *"the point isn't to predict what comes next, but rather to
+generate something that has meaning because of its awareness of the meaning of a
+bunch of different things."*
+
+So the query-marker candidate below is not refuted — it is **less interesting**.
+If there is no recallable fact at a position, being told to recall does not help,
+and on text most positions have no such fact.
+
+**What replaces it, pending John's word:** the concept-addressing machinery is
+built and tested and has only ever been scored by prediction. The instruments
+where the store demonstrably matters — `closure.py`, `kinship.py`, `mqar.py` —
+have never had it pointed at them.
+
+### The candidate itself, kept for the record — and it is not built
 
 **MQAR has an explicit query marker and text has none.** MQAR says *here comes a
 question* before the key, so the model knows when to retrieve rather than predict

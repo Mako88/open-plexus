@@ -4733,3 +4733,50 @@ measurement.
 
 **Still open, and unchanged by this:** every number is still the families task.
 The gate has not met MQAR, kinship, closure or chains.
+
+## 150. The gate costs exactly nothing where it should do nothing
+
+The first measurement of `inherit` outside the task it was designed for. MQAR:
+every queried key was written a few tokens earlier, so the correct deferral rate
+is 0.0000 **by construction** rather than by argument. Three seeds:
+
+    plain      accuracy 0.9950   deferred      -
+    indexed    accuracy 0.8817   deferred      -
+    inherit    accuracy 0.9950   deferred 0.0000
+
+**M1 CONFIRMED, and not approximately.** `inherit` matches `plain` seed for seed
+— 0.9950/0.9950, 0.9975/0.9975, 0.9925/0.9925 — because the gate never fires and
+a gate that never fires cannot change an answer.
+
+**M2 CONFIRMED at exactly 0.0000.** Not "low". Every queried key was written, and
+not one of them read as unwritten.
+
+**M4 CONFIRMED, and it is what makes M1 a result rather than a tautology.**
+`indexed` — the same extra reads, summed instead of gated — lands **0.113 below
+plain**. Consulting neighbours is not free; here they are arbitrary, because the
+content index was fitted on MQAR where there is no family structure to find, and
+summing arbitrary evidence into a read that was already right can only damage it.
+**`inherit` pays the same reads and loses nothing.** The difference between them
+is the rule and nothing else.
+
+### M3 did not fire, and it reached backwards
+
+`inherit` treats a sketch count of 0.0 as *nothing was ever written here*. A
+**false negative** — an address that was written reading as empty — would be
+invisible on the families task: an entity with its own stated fact would silently
+inherit its family's answer, and the EXCEPTION column would be quietly wrong in a
+way no amount of re-running it would show.
+
+MQAR makes that failure loud, and it did not happen. So decisions 148 and 149 are
+not measuring a gate that sometimes discards a fact the model has.
+
+### What this does and does not establish
+
+**Does:** the gate is safe to leave on. It is inert where there is nothing to
+inherit, it is exactly inert rather than nearly, and the summing arm it replaces
+is not.
+
+**Does not:** MQAR has no structure for the gate to exploit, so this says nothing
+about whether `inherit` helps anywhere other than families. Kinship, closure and
+chains are still unmet, and that is now the only claim left standing between "the
+read gate works on the task built to ask about it" and "the read gate works".

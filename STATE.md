@@ -105,9 +105,23 @@ threshold to re-tune. The single dip — the gate at 0.9025 on `family_size=6` �
 was `BRANCHES=3` failing to reach a sibling that HAS a stated fact, and
 `--branches 5` restores it to 1.0000 exactly as predicted.
 
-**What is open.** Every number is still the families task at one width. The gate
-has not met MQAR, kinship, closure or chains, and until it has, "the read gate
-works" means "on the task built to ask this question".
+**And it is inert where it should be — decision 150 took it to MQAR**, where
+every queried key was written a few tokens earlier so the correct deferral rate
+is 0.0000 by construction:
+
+    plain      accuracy 0.9950   deferred      -
+    indexed    accuracy 0.8817   deferred      -
+    inherit    accuracy 0.9950   deferred 0.0000
+
+`inherit` matches plain addressing **seed for seed** while summing the same extra
+reads costs 0.113. The gate is what avoids that. And no queried key ever read as
+unwritten, which rules out the failure that would have been invisible on
+families: a false negative there would make an entity silently inherit its
+family's answer over its own.
+
+**What is open.** Kinship, closure and chains are still unmet. Until they are,
+"the read gate works" means "on the task built to ask about it, and it costs
+nothing on one that is not".
 
 Decision 144 answers the previous question — *does grouping do anything harder
 than same-kind-same-answer* — with **no, and the failure is total**:

@@ -4889,3 +4889,62 @@ index something else to look up.* Note 044 is where that argument already lives.
 Nothing was measured here and nothing is claimed. The experiment file was
 deleted rather than committed, because a file that cannot run is worse than no
 file.
+
+## 153. Half the gate CAN go where the index cannot — and it has nothing to say there
+
+Decision 152 said the read gate and the hop mechanism exclude each other. That is
+half true, and the half that is false is worth having.
+
+**The gate needs two things and only one of them is blocked.** It needs a test
+for *is this address empty*, and a source of neighbours to read instead. The
+second needs a key that NAMES A CONCEPT, which is exactly what note 044's guard
+refuses above one hop. **The first needs only a vector to hash**, and a hop key
+is a vector. `AddressSketch` never required a concept name.
+
+So `track_occupancy` is now separate from `index_prefer` and exposes the sketch
+as `model.occupied`. It runs at `hops=2`, which `index_branches` cannot, and
+`tests/test_hops.py` and `tests/test_sketch.py` both still pass. **That is a real
+structural gain and it cost a flag.**
+
+### And then it has nothing to say on chains
+
+Measured before building an experiment on it, which is the only reason this is
+three paragraphs instead of a sweep. On 30 chain sequences, occupancy at the
+symbol keys:
+
+    chain START    0.893    zero on 0.0%
+    chain MIDDLE   0.791    zero on 0.0%
+    chain END      0.898    zero on 0.0%
+
+**No separation at all.** The hoped-for signal was that a hop landing past the
+end of a chain would find an empty address, which would give the halt gate an
+exact feature for free instead of a learned one. It does not, and the reason is
+structural rather than incidental: **writes happen at every position**, so
+`key(c)` is written the moment `c` is followed by anything — the next separator,
+in this case. Occupancy says "written". It cannot say "written with something
+that continues the chain", because it is blind to the value **by construction**,
+and that blindness is the whole reason it worked on families.
+
+### The principle, which is what to keep
+
+> **Occupancy is informative exactly where an address is READ BEFORE IT IS
+> WRITTEN within the sequence.** On families a transfer entity is read at its
+> query and written only afterwards, so it reads 0.0. On chains, kinship and
+> MQAR every queried address was written earlier, so it reads positive and says
+> nothing.
+
+That is a sharper statement than decision 151's and it subsumes it. It also
+predicts, rather than hopes, where the sketch will be useful next: **a task where
+the model is asked about something before anything about it has been stored.**
+
+### A probe of my own that was not sound, said plainly
+
+The same script measured occupancy at symbols absent from the sequence and got
+2.227 — higher than the written ones. That would be a false positive and would
+contradict decision 150's M3. It is not reported as a result because the probe
+is wrong: with `derived_keys=True`, `key_as` does not substitute a token the way
+that row assumed. The three rows above use real positions and real keys and
+stand. The fourth was deleted rather than explained away.
+
+**No experiment file was committed**, because the measurement that decided it
+took eight lines and the finding is negative.

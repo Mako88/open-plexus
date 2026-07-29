@@ -1115,6 +1115,20 @@ class LocalMemoryConfig:
     #: rather than buried. What justifies it is that membership is one bit while
     #: a value is `d` floats, and the sketch must never record more than that.
     index_prefer: bool | str = False
+    #: Keep the address sketch even when nothing reads it, and expose it as
+    #: `model.occupied` after a run.
+    #:
+    #: **Decision 152 is why this is separate from `index_prefer`.** The gate
+    #: needs two things: a test for *is this address empty* and a source of
+    #: neighbours to read instead. The second needs a key that NAMES A CONCEPT,
+    #: which is why `index_branches` is refused above one hop. The first needs
+    #: only a vector to hash, and a hop key is a vector.
+    #:
+    #: So this flag is the half of the gate that composition tasks CAN have,
+    #: and it is off by default because it is an instrument rather than a
+    #: mechanism -- nothing in the read path consults it unless `index_prefer`
+    #: does.
+    track_occupancy: bool = False
     readout_bias: bool = False
     derived_keys: bool = False
     context_keys: bool = False
@@ -1607,6 +1621,9 @@ class LocalAssociativeMemory:
         #: rather than mis-selected -- and decision 147 was wrong about where
         #: the problem is. That distinction is not visible in a score.
         self.deferrals: list[tuple[int, bool]] = []
+        #: The address sketch from the last `run`, when one was kept. See
+        #: `track_occupancy`.
+        self.occupied = None
         #: How many times consolidation has fired, over the model's whole life.
         #: **Observation only**, like `trace` -- nothing reads it back.
         #:
@@ -1928,8 +1945,17 @@ class LocalAssociativeMemory:
         occupied = None
         if self.config.index_prefer == "occupancy":
             occupied = SumSketch(d)
-        elif self.config.index_prefer in ("sketch", "inherit"):
+        elif (self.config.index_prefer in ("sketch", "inherit")
+                or self.config.track_occupancy):
             occupied = AddressSketch(d, seed=self.config.seed)
+        # EXPOSED, because the sketch answers a question the gate is only one
+        # consumer of. `index_branches` is refused above `hops == 1` -- a hop key
+        # is a softmax mixture and names no concept, so the content index has
+        # nothing to look up (note 044). **The sketch has no such requirement:**
+        # it hashes whatever vector it is handed, so it can be asked about a hop
+        # key even where the index cannot. Decision 152 is why that separation
+        # is worth having in the open.
+        self.occupied = occupied
         # THE CONCEPT-PARTITIONED FAST STORE, when one is asked for.
         #
         # `memory` stays as the matrix a read is served FROM -- reassigned each

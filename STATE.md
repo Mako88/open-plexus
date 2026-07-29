@@ -166,11 +166,23 @@ concept and the index has nothing to look up.
 > knows when an address holds nothing; the hop follows an address that holds a
 > *step* toward the answer.
 
-**What is open, and it is now well-specified.** Making those two compose —
-*give the hop machinery a key that names a concept, or give the index something
-else to look up* (note 044). That is the concrete form of "report knowledge
-rather than occupancy", and it is a better problem than the vague version
-because it names the two things that have to meet.
+**Half of it is already done — decision 153.** The gate needs an emptiness test
+AND a source of neighbours; only the second needs a concept name. `AddressSketch`
+hashes any vector, so `track_occupancy` now runs at `hops=2` where
+`index_branches` cannot. **It then has nothing to say on chains:** occupancy at
+chain start / middle / end reads 0.893 / 0.791 / 0.898, zero on 0% of cases.
+
+> **Occupancy is informative exactly where an address is READ BEFORE IT IS
+> WRITTEN within the sequence.** Families reads a transfer entity at its query
+> and writes it only afterwards, so it reads 0.0. Chains, kinship and MQAR all
+> write every address before querying it, so it reads positive and says nothing.
+
+That subsumes decision 151's bound and **predicts** where the sketch pays rather
+than hoping: a task that asks about something before anything about it is stored.
+
+**So what is actually open** is the neighbour half — *give the hop machinery a
+key that names a concept, or give the index something else to look up* (note
+044) — and it is now the only half left.
 
 ### How this line got here, in five lines
 

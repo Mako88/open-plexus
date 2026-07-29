@@ -128,20 +128,39 @@ an instrument for reaching the measurement and not the final read path.
 `concept_nodes` 0, keys addressing identity only. **But two of them have been
 measured, and 055's first version claimed otherwise — see its CORRECTION.**
 
-    042 item 1, persistence   RUN 3x (g15-01), decision 133: P3 REFUTED.
-                              norm 0.4 at EVERY corpus size -> a fixed-size
-                              cache, so the WALL IS CAPACITY, NOT LIFETIME.
-                              Still worth 0.074-0.083 bits, still off
+    042 item 1, persistence   RUN 3x (g15-01), decision 133: P3 REFUTED. Store
+                              norm 0.4 at every corpus size. Worth 0.074-0.083
+                              bits at EVERY point with its control worse than
+                              baseline -- a real gain, and off by default
     042 item 2, concept split SEAM BUILT, decision 134: pooled capacity is
                               IDENTICAL to dimension splitting. What it buys is
                               LONE-NODE capacity, 2048 vs 128 at 16 nodes --
                               churn and C1, not the wall
     042 item 3, content keys  never asked; g10-09 was retracted
 
-**133 said item 2 was where capacity comes from; 134 superseded that one entry
-later.** So **nothing measured says what breaks the wall.** Capacity is `~d²` (109)
-— width and total memory, not lifetime and not arrangement. That is the open
-question, and two stale forward-looking claims stacked on each other concealed it.
+### ⚠ And the wall was never architectural — decision 115 closed it
+
+**133 called it a capacity limit and 134 superseded 133's follow-on one entry
+later, but both are downstream of an error.** Decision **115** closed saturation
+with the account that survives: a character bigram table over 66 symbols is
+**intrinsically low-rank**, effective rank **~3 at every width**, so *"the store is
+not failing to use its width — there is nothing there to use"*, and 16,000
+characters is **how long it takes to estimate a bigram table.** 115 eliminated store
+capacity (109) and readout capacity (110) by name.
+
+> **So the 16k wall carries no architectural information, and using it as item 1's
+> falsifier was a category error.** g15-01 measured a real mechanism against a
+> target that cannot show anything — which is note 047's finding on the other axis,
+> *the objective was the ceiling, not the memory.*
+
+**Persistence is therefore UNFALSIFIED on the goal, not refuted.** And the reason is
+the instrument again, not a missing flag. **Every relational task here REDRAWS its
+facts per sequence on purpose** — note 047's condition for the store to be able to
+pay at all — so nothing in the store *should* survive a sequence, and decision 62's
+guard says carrying it would answer from the training set. `carry_store` is
+untouched by any experiment because **there is no task on which persistence could
+pay**, which is note 050's shape one level up: the blocker is a task where something
+is genuinely stable across sequences and something else is not.
 
 ### The rail this project does not have
 
@@ -153,67 +172,31 @@ does. **Build it with measured budgets** — a rail with a guessed threshold is
 worse than none, which decision 155's own p90 calibration proved by flagging what
 chance produces.
 
-### Answered and moved to DECISIONS
+### Settled, and kept here only where the live question rests on it
 
-Decision 148 answered the one before those — *can anything tell which of two
-retrievals to trust* — with **yes, once the question is asked exactly.** `inherit`
-answers from the entity's own address when **anything** was written there and from
-its neighbours' when nothing was: **0.8100 DIRECT / 0.4350 TRANSFER / 0.8183
-EXCEPTION**, the first arm good at all three, where grouping bought transfer by
-destroying exceptions (0.3708, saying a sibling's value 86.6%) and summing landed
-between. The gate is exact — **1.0000** of TRANSFER, **0.0000** of DIRECT and
-EXCEPTION, every seed. Full table in decision 148.
+**Decisions 143–154 are in DECISIONS.md and leave here under rule 14b.** Four
+sentences survive them because the current work stands on those four:
 
-What made it work is that membership is *"is there anything here"* rather than
-*"who has more"*, and with a hashed sketch an unwritten address reads exactly 0.0 —
-so note 049's threshold is **structurally zero** and nothing is fitted. **167 is
-now the limit of that**: emptiness is the only thing the sketch knows, so it cannot
-bound an enumeration over addresses that are all occupied.
-
-**The price is real:** without exceptions DIRECT costs 0.050 against summing while
-TRANSFER gains 0.231 — `inherit` refuses corroboration on principle, which is what
-keeps a contradicting fact intact when there IS a conflict.
-
-**And 149–153 measured its scope rather than assuming it** — not a fitted constant
-across `n_values` and `family_size`, matching plain seed for seed on MQAR, blind on
-kinship where the address is occupied either way. **Full entries in DECISIONS.md,
-which is where they live**; they leave here under rule 14b, having each carried a
-forward-looking claim superseded within a day. What survives them is one sentence:
-
-> **Occupancy is informative exactly where an address is READ BEFORE IT IS
-> WRITTEN within the sequence.** Families reads a transfer entity at its query
-> and writes it only afterwards → 0.0. Chains, kinship and MQAR write every
-> address before querying it → positive, and silent. That subsumes 151's bound
-> and predicts where the sketch pays instead of hoping.
-
-**And the neighbour half is not blocked by what the guard says it is —
-decision 154.** Note 044 refuses `index_branches` above one hop because a hop key
-*"names no concept"*. Measured on chains at the sharpness the task is solved with,
-**a hop key sits at cosine 0.96 to a single token's row** (table in 154). It names a
-concept, and `argmax(wk @ hop_key)` is what the index could look up.
-
-**The guard is not lifted**, because a design question sits under it that a cosine
-does not settle: `index_branches` runs once per POSITION, not per hop, so combining
-them means choosing whether the index proposes neighbours of the position's concept
-or of the hop's landing concept. **And that choice cannot be decided, because
-nothing measures it —
-[note 050](docs/notes/050-the-missing-instrument-composition-over-things-never-stated.md).**
-
-The gate pays where an address was never written; the hop pays where the answer is
-at no single address. **No task has both** — families has the first, kinship and
-chains the second, MQAR neither (table in note 050) — and decision 153 says why that
-is structural: composition tasks state their facts before querying them, so they
-write every address they later read.
-
-> Building the combined mechanism now would produce a number that means nothing —
-> on chains the gate never fires, so the two design options would be
-> indistinguishable. That is decision 143's circularity one level up.
-
-**So the blocker is the instrument, not the mechanism**, which is where GOALS §4
-says to look first. Note 050 designs the task — entity → family → linked family,
-where step 1 is the gate and step 3 is the hop — with the calibration check that
-decides whether it is fair before any arm is run, and four registered
-predictions. **Not built.**
+- **148, the gate.** `inherit` answers from the entity's own address when
+  *anything* was written there and from its neighbours' when nothing was —
+  0.8100 / 0.4350 / 0.8183 across DIRECT, TRANSFER, EXCEPTION. Membership is
+  *"is there anything here"*, not *"who has more"*, so with a hashed sketch an
+  unwritten address reads exactly 0.0: the threshold is **structurally zero** and
+  nothing is fitted. **167 is the limit of that** — emptiness is all the sketch
+  knows, so it cannot bound an enumeration over addresses that are all occupied.
+- **153, where the sketch pays.** Occupancy is informative exactly where an address
+  is **read before it is written** within the sequence. Families qualifies; chains,
+  kinship and MQAR write every address before querying it, so they read positive
+  and silent.
+- **154, the hop names a concept.** A hop key sits at cosine **0.96** to a single
+  token's row, so `argmax(wk @ hop_key)` is a thing the index could look up. The
+  guard is still not lifted, because `index_branches` runs once per POSITION rather
+  than per hop and nothing measures which concept it should propose from.
+- **Note 050, the missing instrument.** The gate pays where an address was never
+  written; the hop pays where the answer is at no single address. **No task has
+  both**, and 153 says why that is structural. Building the combined mechanism now
+  would produce a number that means nothing. Note 050 designs the task, with a
+  fairness calibration and four registered predictions. **Not built.**
 
 ### How this line got here
 

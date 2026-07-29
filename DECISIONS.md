@@ -5959,3 +5959,82 @@ node, and worth knowing before the next one is written.
 
 Delete the file. It adds ~15 s to the suite, touches no production code, and no
 measurement depends on it.
+
+## 170. The 16k wall was closed in decision 115, and three later entries built on it anyway
+
+**Found by going to build note 055's recommendation and reading the record first.**
+Note 055 has the correction; this is the part that outlives it, because it is not
+about my note — it is about a closed question being reopened three times.
+
+### The chain
+
+    113  the wall is because `Wo` is the only durable parameter and one linear
+         map converges. "That is NOT a capacity limit"
+    115  SATURATION IS CLOSED. A character bigram table over 66 symbols is
+         intrinsically low-rank -- effective rank ~3 at EVERY width, so "the
+         store is not failing to use its width, there is nothing there to use".
+         16,000 characters is HOW LONG IT TAKES TO ESTIMATE A BIGRAM TABLE.
+         Store capacity (109) and readout capacity (110) eliminated BY NAME
+    042  builds the architecture case on "the model has nowhere to keep what it
+         learns", with the 16k wall as its falsifier
+    133  runs it, P3 refuted, and relabels the wall "a CAPACITY limit"
+    134  supersedes 133's follow-on one entry later
+
+**115 closed it and said so explicitly:** *"saturation is not an open problem and
+should stop being treated as one. It is a property of the objective, the objective
+was already changed."* Three later entries treated it as one anyway, and each was
+individually reasonable.
+
+### What that makes g15-01
+
+**A real mechanism measured against a target that cannot show anything.** The wall
+is a property of a character bigram objective, so *nothing* moves it — which means
+P3 could not have been confirmed by any mechanism, and its refutation carries no
+information about persistence. This is note 047's finding on the other axis: **the
+objective was the ceiling, not the memory.**
+
+**133's null is therefore not a refutation of persistence.** What survives from
+g15-01 is the part that was never about the wall: `persist-slow-decay` beats
+baseline by **0.074–0.083 bits at every data point**, with its own control
+(consolidation, no persistence) *worse* than baseline everywhere. That attribution
+is clean and it is switched off.
+
+### Why persistence has no relational test, and it is not a missing flag
+
+The obvious next move is to test persistence on a relational task. **It does not
+work, and the reason is worth writing down before someone tries it.**
+
+`carry_store` appears in a mutation and two unit tests and in **no experiment** —
+and that is correct rather than an oversight. Every relational task here **redraws
+its facts per sequence on purpose**, which is note 047's condition for the store to
+be able to pay at all. So nothing in the store *should* survive a sequence, and
+decision 62's guard is explicit: a store that accumulated across them *"would be
+answering from the training set rather than from the sequence in front of it."*
+
+> **There is no task in this repository on which a persistent store could pay.**
+> Persistence is unfalsified on the goal, not refuted — and the blocker is an
+> instrument, which is note 050's shape one level up.
+
+What such a task needs: **something genuinely stable across sequences and something
+genuinely not.** `families.py` is closest and does not have it — its structure is
+stable but lives in `ContentIndex`, which already persists, while the only
+per-sequence content is exactly what must not carry.
+
+### What this does NOT license
+
+**Reopening saturation.** 115 stands and the account is the objective's shape. This
+entry does not dispute it; it records that the entry was ignored.
+
+**Dropping `persistent_lasting`.** 0.08 bits with a clean control, and it is the
+prerequisite for anything that accumulates. Off by default because turning it on
+invalidates the text comparison set — a deliberate choice, and one worth revisiting
+deliberately rather than by inertia.
+
+### The class, not the instance
+
+Three entries built on a closed question. What they share is that **115's closure
+lived in one entry and nothing pointed at it** from the places that would reopen it.
+`STATE.md`'s "do not re-propose these" table has a row for *store or readout capacity
+as the saturation cause* — and 133 did not propose that, it proposed a *lifetime*
+mechanism and then relabelled its own null in the refuted vocabulary. **A ratchet on
+proposals does not catch a re-label after the fact**, which is the gap.

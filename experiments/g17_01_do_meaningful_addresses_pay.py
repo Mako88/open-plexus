@@ -74,13 +74,17 @@ is dead for the cost of one sweep rather than a rebuild.
 
 Calibrated locally before spending a matrix, and the calibration says stop.
 **The model does not learn word-level text at all**: 90,000 words buys 0.038
-bits over uniform, and it sits **1.40 bits WORSE than a word unigram**. There is
+bits over uniform, and it sits **2.65 bits WORSE than a word unigram**. There is
 no headroom for an index to occupy, so every arm would return the same
 non-answer.
 
     uniform                     10.759
     train 90,000 words          10.721
-    word unigram                 9.323   <- not approached
+    word unigram                 8.068   <- not approached
+
+The unigram figure was **9.323 here until decision 135**, hand-rolled beside the
+calibration rather than taken from `openplexus/ngram.py`. The gap is larger than
+this script originally claimed, not smaller.
 
 Single-token keys diverge to NaN instead, so the two obvious repairs pull
 opposite ways: pair keys give context and destroy recurrence (at word level

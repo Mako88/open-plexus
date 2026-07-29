@@ -116,7 +116,16 @@ every address is seen once. Too many addresses, each too rare.
 
     uniform                                10.759
     the model, 90,000 training words       10.721   <- the floor to beat
-    word unigram                            9.323   <- the bar that matters
+    word unigram                            8.068   <- the bar that matters
+    word bigram                             7.848
+
+**The bar was corrected on 2026-07-29 (decision 135).** It stood at 9.323 here
+and in g17-01's record, hand-rolled beside the calibration instead of taken from
+`openplexus/ngram.py`. The real gap is **2.65 bits, not 1.40** — the finding is
+unchanged and bigger than it was written down as. Two further instrument facts
+from the same check: the stock temperature grid **pins at its own edge** at word
+level once the model has a readout bias, and `readout_bias` is worth 0.52 bits
+here against a default of off.
 
 **But the store is no longer required to be addressed by surfaces.**
 `openplexus/concepts.py` split them: `surface -> content vector -> concept id ->
@@ -133,7 +142,7 @@ into the fix for the problem the fourth one found.
 > **The question:** does storing by concept rather than by surface make
 > word-level text learnable at all?
 >
-> **Floor** 10.721, measured. **Bar** 9.323, the unigram. **Control** the same
+> **Floor** 10.721, measured. **Bar** 8.068, the unigram. **Control** the same
 > grouping built from SHUFFLED content must fail — otherwise the gain is the
 > address space shrinking and not the grouping meaning anything, and those are
 > different findings.

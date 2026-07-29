@@ -3645,3 +3645,72 @@ makes a constant event.
 
 **Taken without asking**, under standing authorisation and John's approval of
 item 2.
+
+## 135. The word unigram was never 9.323, and the temperature grid is too narrow at word level
+
+Two defects in the word-level instrument, both found while building g18-01 and
+both affecting numbers already written down. Neither changes a conclusion; one
+makes the standing conclusion **larger** than it was recorded as.
+
+### The bar was 1.26 bits easier than the number every claim was made against
+
+g17-01's record and STATE both quote a word unigram at **9.323** and describe the
+model as *"1.40 bits WORSE than counting how often each word appears"*.
+
+`openplexus/ngram.py` — this project's own counter, the one every character-level
+baseline goes through — scores the same corpus, the same 90,000 training words
+and the same held-out positions at:
+
+    word unigram (NGram order 0)    8.068
+    word bigram  (NGram order 1)    7.848
+    the model, floor                10.711    reproduced, against 10.721 recorded
+    uniform                         10.759
+
+**So the model is 2.65 bits worse than a unigram, not 1.40.** The reproduction of
+the floor to 0.01 bits says the model side of the comparison was measured
+correctly and only the bar was wrong.
+
+Where 9.323 came from is not recoverable — the calibration was local and left no
+script — which is itself the finding: **the bar was hand-rolled beside the
+measurement instead of taken from the instrument that exists for it.** This is
+the same shape as the `prequential 4.540 ... unigram BEATEN` line that stood for
+weeks (decision 118): a number computed once, on the side, and then quoted.
+
+`g18_01`'s `counting_bars` goes through `NGram` for exactly this reason, and it
+scores the bars on `chunk[1:]` so they see the positions the model is scored on
+rather than a set that differs by the first token of every chunk.
+
+### The temperature grid pins at its own edge once the model has a prior
+
+Every word-level number is calibrated over temperatures 0.05 to 20. At word level
+the model's logits have a standard deviation of **0.006**, so the fit wants to
+amplify them far harder than at character level:
+
+    readout_bias off   stock grid  temp 0.0824  interior     10.711
+                       wide grid   temp 0.0750  interior     10.711
+    readout_bias on    stock grid  temp 0.0500  PINNED-LOW   10.252
+                       wide grid   temp 0.0328  interior     10.195
+
+**The arm with a bias chose the smallest temperature on the grid**, which means
+the grid, not the data, decided it — and it understated that arm by 0.057 bits.
+The floor happens not to pin, so the recorded floor stands, but a comparison
+between a pinned arm and an unpinned one is not a comparison at all.
+
+Fixed by widening the grid to 1e-4 and by recording `pinned` per cell, so a
+future run reports the defect instead of absorbing it.
+
+### And a third number, which is not a defect but is worth having
+
+**`readout_bias` is worth 0.52 bits at word level** (10.711 → 10.195), against a
+default of off. The model's own source says why: *"a unigram is exactly a bias
+over tokens"*. It does not rescue anything — 10.195 is still 2.13 bits above the
+unigram — so the account in g17-01 survives: the model's failure at word level is
+not a missing prior.
+
+It does mean the bias belongs in g18-01 as an **axis rather than a default**.
+With it off the model cannot express a prior at all and cannot reach the bar
+however good the addressing becomes; with it on the question "is word-level text
+learnable at all" is a fair one.
+
+**Taken without asking**, under standing authorisation. Nothing is retracted;
+STATE and g17-01's record are corrected in place with the old figures shown.

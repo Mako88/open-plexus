@@ -9,6 +9,17 @@ ANSWER: **THE FLOOR IS AT THE FLOOR.** The model does not learn word-level text
         at all in its current configuration, so there is nothing for an index to
         improve on and every arm would return the same non-answer.
 
+CORRECTION, 2026-07-29 (decision 135): **the unigram bar below is wrong.** Every
+        figure quoted here as 9.323 is 8.068 when measured with this project's
+        own `NGram`, on the same corpus, the same 90,000 training words and the
+        same held-out positions. The bigram is 7.848.
+
+        The floor reproduces to 0.01 bits, so the model side was right and only
+        the bar was hand-rolled. **The gap this record reports as 1.40 bits is
+        2.65 bits**, and the conclusion is unchanged and larger than it was
+        written down as. The old figures are left in place below rather than
+        edited out.
+
         This is decision 63's rule arriving from the usual direction -- probe the
         bottom of a range before spending a matrix on it -- and it saved the
         matrix.

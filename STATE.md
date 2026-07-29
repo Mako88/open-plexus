@@ -158,24 +158,40 @@ positions and score 7.92 against novel's 10.81, but `nostore` scores 7.92 too.
 > marginals the prior takes first. **On text the store fails at the very task it
 > aces on MQAR.**
 
-### ⇒ NEXT, and it is mechanical rather than architectural
+### The mechanical hypothesis — TESTED AND NOT SUPPORTED
 
-With `context_keys` the address at position `t` is `hash(t-1, t)`. **To retrieve
-what followed an earlier occurrence of a rare word, the preceding token must
-match too** — the same word in a different context has a different address, and
-the earlier binding is not reachable at all. MQAR does not have this problem: its
-query is a bare key with a marker before it, so the pair repeats exactly.
+The idea: with `context_keys` the address at position `t` is `hash(t-1, t)`, so
+retrieving what followed an earlier occurrence of a rare word needs the
+*preceding* token to match too. The same word in a different context has a
+different address and the earlier binding is unreachable. MQAR does not have this
+problem — its query is a bare key after a marker, so the pair repeats exactly.
 
-If that is right, the store is not failing at binding on text — it is being asked
-for an address that in-context recall can almost never produce.
+**The test was g18-06's rare-repeat split under SINGLE keys**, where the address
+is the token alone and the earlier binding is reachable by construction. Three
+seeds:
 
-**The test:** g18-06's rare-repeat split under **single** keys, where the address
-is the token alone and the earlier binding is reachable by construction. g18-02
-put single keys behind in aggregate (9.276 against 9.186), but the aggregate is
-exactly the mixture g18-06 exists to look past.
+    single keys, RARE-repeat gap (nostore - floor, positive = store helps)
+      seed 0    +0.0984
+      seed 1    -0.2132
+      seed 2    +0.1125
+      mean      -0.0008
 
-Needs a `--keys` flag on g18-06 and one sweep. **Not built** — naming it beats
-half-running it.
+**Zero, with a ±0.2 swing across seeds.** Single keys do not rescue the store on
+the one slice where binding is the only route.
+
+> ⚠ **I reported this as confirmed from seed 0 alone before the other two
+> landed** — "the first time all night the store has helped on text". That was
+> one cell, and it was wrong. The failure I had spent the night documenting,
+> committed within minutes of writing the memory about it.
+
+So the hypothesis is **unsupported**, not established: the store contributes
+nothing on text under either addressing scheme, and why text differs from MQAR is
+still open.
+
+**What is still worth trying**, and neither is built: the `n_pairs`-style
+question (how many bindings a chunk holds before interference swamps recall — the
+store may simply be over-subscribed at 256 tokens per chunk), and whether the
+*query marker* is what MQAR has and text lacks.
 
 ### the store's contribution on text is substitutable by a prior
 

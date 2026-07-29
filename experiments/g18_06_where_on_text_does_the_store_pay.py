@@ -85,7 +85,32 @@ So the difference between MQAR (0.995) and text is not that text has marginals
 the prior can take. **It is that on text the store fails at the very task it aces
 on MQAR.**
 
-## THE MECHANICAL CANDIDATE, recorded rather than tested
+## THE MECHANICAL CANDIDATE -- TESTED, AND NOT SUPPORTED
+
+    single keys, RARE-repeat gap (nostore - floor; positive = the store helps)
+      seed 0    +0.0984
+      seed 1    -0.2132
+      seed 2    +0.1125
+      mean      -0.0008
+
+**Zero, with a 0.2 swing across seeds.** Single keys do not rescue the store on
+the one slice where binding is the only route, so the address-shape explanation
+below is a hypothesis that did not survive contact with three seeds.
+
+**And it was reported as confirmed off seed 0 alone before the other two
+landed.** One cell, +0.098, called "the first time all night the store has helped
+on text". That is the failure this whole file exists downstream of, committed by
+its author within minutes of writing a memory about it. Left here rather than
+tidied away.
+
+The three-seed means, single keys:
+
+    all              floor  9.3162   nostore  9.1873   gap -0.1289
+    repeat           floor  8.1256   nostore  7.9215   gap -0.2041
+    RARE repeat      floor 11.0955   nostore 11.0947   gap -0.0008
+    novel            floor 10.8375   nostore 10.8046   gap -0.0329
+
+## The candidate itself, for the record
 
 With `context_keys` the address at position `t` is `hash(t-1, t)`. To retrieve
 what followed an earlier occurrence of a rare word, **the preceding token must
@@ -162,14 +187,14 @@ def labelled(model, chunks, counts, store: bool = True):
 
 
 def one_cell(arm: str, seed: int, bias: bool, lr: float, cap: float,
-             built=None) -> dict:
+             built=None, keys: str = "pair") -> dict:
     started = time.time()
     built = built or corpus("words")
     stream = built.train[0][:TRAIN_WORDS]
     writes = arm != "nostore"
     model = LocalAssociativeMemory(LocalMemoryConfig(
         d_model=WIDTH, vocab_size=built.vocab_size, seed=seed,
-        derived_keys=True, context_keys=True, readout_bias=bias,
+        derived_keys=True, context_keys=(keys == "pair"), readout_bias=bias,
         decay=1.0, memory_cap=cap, lr=lr))
 
     cut = int(len(stream) * 0.8)
@@ -194,7 +219,7 @@ def one_cell(arm: str, seed: int, bias: bool, lr: float, cap: float,
                 if mask.any() else float("nan"))
 
     return dict(
-        arm=arm, seed=seed, bias=bias, lr=lr, cap=cap,
+        arm=arm, seed=seed, bias=bias, lr=lr, cap=cap, keys=keys,
         error=on(np.ones(len(targets), bool)),
         repeat_error=on(repeat),
         novel_error=on(~repeat),
@@ -208,8 +233,8 @@ def one_cell(arm: str, seed: int, bias: bool, lr: float, cap: float,
         uniform=round(float(np.log2(built.vocab_size)), 4),
         vocab=built.vocab_size, width=WIDTH, scored=int(len(targets)),
         seconds=round(time.time() - started, 1),
-        condition=f"{arm}|bias{int(bias)}|lr{lr}|cap{cap}|d{WIDTH}|seed{seed}"
-                  f"|min{min_count_for('words')}")
+        condition=f"{arm}|{keys}|bias{int(bias)}|lr{lr}|cap{cap}"
+                  f"|d{WIDTH}|seed{seed}|min{min_count_for('words')}")
 
 
 def main() -> int:
@@ -219,6 +244,13 @@ def main() -> int:
     parser.add_argument("--bias", type=int, choices=(0, 1), default=1)
     parser.add_argument("--lr", type=float, default=0.000005)
     parser.add_argument("--cap", type=float, default=5.0)
+    parser.add_argument("--keys", choices=("pair", "single"), default="pair",
+                        help="THE HYPOTHESIS. With pair keys the address is "
+                             "hash(t-1, t), so recalling what followed an "
+                             "earlier occurrence needs the PRECEDING token to "
+                             "match too. With single keys the address is the "
+                             "token alone and the earlier binding is reachable "
+                             "by construction")
     parser.add_argument("--json", type=str, default=None)
     args = parser.parse_args()
 
@@ -231,7 +263,7 @@ def main() -> int:
     for seed in seeds:
         for arm in arms:
             record = one_cell(arm, seed, bool(args.bias), args.lr, args.cap,
-                              built)
+                              built, args.keys)
             print(f"  {record['condition']:52s} "
                   f"all {record['error']:.4f}  "
                   f"repeat {record['repeat_error']:.4f}  "

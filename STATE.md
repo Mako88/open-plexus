@@ -106,7 +106,63 @@ result is this project grading its own homework.
 > `vocab × d` linear map (decision 62) — one fact that explains decision 63, 115
 > and g14-01 at once.
 
-### ⇒⇒ START HERE: everything below was measured on a mistrained model
+### ⇒⇒ START HERE: the store's contribution on text is substitutable by a prior
+
+**Decision 139**, measured on the corrected harness with its reproduction gate
+passing. This is the first valid measurement in the line and it replaces every
+number in the two sections below it.
+
+    arm                          0.05      0.02     0.005
+    characters bias0 floor      5.423     5.385     5.395
+    characters bias0 nostore    6.000     6.000     6.000
+    characters bias1 floor      5.395     5.377     5.203
+    characters bias1 nostore    5.421     5.280     5.195
+
+    words bias0   floor 10.700   nostore 10.759
+    words bias1   floor  9.186   nostore  9.187
+
+    characters   bigram 3.884   unigram 4.852   uniform  6.000
+    words        bigram 7.848   unigram 8.068   uniform 10.759
+
+**Both halves matter and the second does not cancel the first:**
+
+    with NO prior available    the store is worth +0.615 bits   (characters)
+    with a prior available     the store is worth -0.008 bits   (characters)
+                               and +0.002 bits                  (words)
+
+Every character-level number this project holds was measured at `bias 0`, where
+the store is the only thing that can learn, and there it genuinely carries 0.615
+bits. **But a readout bias does the same job slightly better and the two do not
+add.** Give the model a prior and the store's contribution goes to zero, at both
+units, across four rates and both key schemes.
+
+> So the claim is **not** "the store has never contributed". It is that what it
+> contributes on text is **prior-shaped** — and a prior is a `vocab`-length
+> vector where the store is `d × d` plus a key scheme plus a write rule.
+
+**It explains decision 118**, unexplained for weeks: the unigram has never been
+beaten on text. If the store's contribution is prior-shaped, a unigram is roughly
+the ceiling and the model has been sitting just above it.
+
+**It does not touch the relational line.** MQAR, kinship and the chains are
+solved through this store and no prior solves them — the bindings *are* the
+answer. This is about text, where a prior is most of what there is to know.
+
+**And it re-poses g17-01's premise rather than restoring it.** *"The model does
+not learn word-level text at all"* was measured on a mistrained readout. What is
+true is narrower and duller: the model learns word-level text about as well as a
+prior does, 1.12 bits short of counting.
+
+### ⇒ The open question, and it is no longer addressing
+
+Note 042 turned this line toward *where facts are stored*. Three corrected
+sweeps say the store contributes nothing on text beyond a prior — so the question
+is **what the store is for on this task at all**, or whether text was simply the
+wrong instrument and the relational tasks were the right one from the start.
+
+---
+
+### How that was reached: everything below was measured on a mistrained model
 
 **Decision 138, and it is a retraction.** The g18 harness trained the readout on
 the **current** token where the model's answer at step `t` predicts token `t+1`.

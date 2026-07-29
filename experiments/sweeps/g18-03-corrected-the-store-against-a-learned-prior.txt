@@ -1,0 +1,103 @@
+The store against a learned prior, on both units -- CORRECTED HARNESS
+=====================================================================
+
+Script: experiments/g18_01_does_storing_by_concept_make_words_learnable.py
+Run:    30432893640, 20 of 20 cells, ~4 min wall.
+Status: **THE FIRST VALID MEASUREMENT IN THIS LINE.** Decision 139.
+
+Supersedes g18-03's first pass (run 30431349857) and every number in the g18-00
+and g18-02 records, all of which were measured with the readout trained on the
+wrong target -- decision 138.
+
+ANSWER: **What the store contributes on text is worth no more than a
+        unigram-shaped bias, and is entirely substitutable by one.**
+
+
+MEASURED ON
+------------
+Tiny Shakespeare, both units, one seed, width 128, 90,000 training tokens (72,000
+after the calibration split), one epoch, chunk 256. Bits per token, temperature
+fitted on held-out TRAINING text and the rate chosen the same way.
+
+**Per-unit configuration, not one grid.** Characters run g15-01's settings --
+single keys, decay 0.997, no cap, key_scale 0.5, rates around 0.05. Words run
+g18-00's settled corner -- pair keys, decay 1.0, cap 5.0, lr 5e-6. The two units
+do not share a configuration and the first pass pretended they did.
+
+
+PREDICTIONS
+------------
+  P0  THE REPRODUCTION, before anything else. The character `bias 0` floor lands
+      within 0.15 of decision 63's ~5.53 AND at least 0.4 below uniform.
+  P1  THE GATE. With the bias ON, `floor` beats its matched `nostore` by more
+      than 0.30 bits at character level.
+  P2  THE RAIL. At `bias 0`, `nostore` sits within 0.05 of uniform.
+  P3  THE FALSIFIER. Character `floor` with the bias ON does not reach the
+      character bigram at 3.884.
+
+SCORED: **P0 PASSES** -- 5.385 against ~5.53, and 0.615 below uniform. The
+        instrument reproduces the character model, which the three passes before
+        it did not.
+        **P1 REFUTED.** P2 CONFIRMED exactly. P3 CONFIRMED.
+
+
+THE TABLE
+----------
+Bits per token on TEST text:
+
+    arm                          0.05      0.02     0.005
+    characters bias0 floor      5.423     5.385     5.395
+    characters bias0 nostore    6.000     6.000     6.000
+    characters bias1 floor      5.395     5.377     5.203
+    characters bias1 nostore    5.421     5.280     5.195
+
+    words bias0   floor 10.700   nostore 10.759     (lr 5e-6)
+    words bias1   floor  9.186   nostore  9.187
+
+    characters   bigram 3.884   unigram 4.852   uniform  6.000
+    words        bigram 7.848   unigram 8.068   uniform 10.759
+
+
+THE FINDING, AND BOTH HALVES MATTER
+------------------------------------
+    with NO prior available    the store is worth +0.615 bits   (characters)
+    with a prior available     the store is worth -0.008 bits   (characters)
+                               and +0.002 bits                  (words)
+
+**Every character-level number this project holds was measured at `bias 0`**,
+where the store is the only thing that can learn. There it carries 0.615 bits and
+that work is real.
+
+**A readout bias does the same job slightly better, and the two do not add.**
+Give the model a prior and the store's contribution goes to zero, at both units,
+across four learning rates and both key schemes.
+
+So the claim is NOT "the store has never contributed". It is that what it
+contributes on text is prior-shaped, and a prior is a `vocab`-length vector where
+the store is `d x d` plus a key scheme plus a write rule.
+
+
+WHAT IT EXPLAINS
+-----------------
+**Decision 118**, which has stood unexplained for weeks: the unigram has never
+been beaten by this model on text. If the store's whole contribution is
+prior-shaped then a unigram is roughly the ceiling, and the model has been
+sitting just above it. `bias 1` characters reach 5.195 against a 4.852 unigram --
+still worse than counting, now for a reason rather than as a mystery.
+
+
+WHAT IT DOES NOT TOUCH
+-----------------------
+**The relational line.** MQAR, kinship and the chain tasks are solved through
+this store, and no prior solves them -- the bindings ARE the answer. This is a
+statement about text, where a prior is most of what there is to know.
+
+**And it re-poses g17-01's premise rather than restoring it.** "The model does
+not learn word-level text at all" was measured on a mistrained readout. What is
+true is narrower and duller: the model learns word-level text about as well as a
+prior does, which is 1.12 bits short of counting.
+
+
+COST
+-----
+20 cells, one per job, ~4 min wall.

@@ -3950,3 +3950,77 @@ to be re-established before anything is built on it.
 **Taken without asking**, under standing authorisation. The corrected sweeps are
 dispatched, and the sweep records keep their tables with the defect named at the
 top rather than deleted.
+
+## 139. The store's contribution on text is exactly substitutable by a learned prior
+
+g18-03, 20 of 20 cells, run 30432893640, **on the corrected harness and with its
+reproduction gate passing.** This is the first valid measurement of the question
+and it replaces every void number in decisions 136 and 137.
+
+    arm                          0.05      0.02     0.005
+    characters bias0 floor      5.423     5.385     5.395
+    characters bias0 nostore    6.000     6.000     6.000
+    characters bias1 floor      5.395     5.377     5.203
+    characters bias1 nostore    5.421     5.280     5.195
+
+    words bias0   floor 10.700   nostore 10.759     (lr 5e-6)
+    words bias1   floor  9.186   nostore  9.187
+
+    characters   bigram 3.884   unigram 4.852   uniform  6.000
+    words        bigram 7.848   unigram 8.068   uniform 10.759
+
+### P0 passes, which is what makes the rest readable
+
+The character `bias 0` floor lands at **5.385**, against decision 63's ~5.53 and
+a 6.000 uniform. Within the 0.15 tolerance and 0.6 below uniform. **The
+instrument reproduces the character model**, which the previous three passes did
+not.
+
+### The finding, stated precisely
+
+    with NO prior available    the store is worth +0.615 bits   (characters)
+    with a prior available     the store is worth -0.008 bits   (characters)
+                               and +0.002 bits                  (words)
+
+**Both halves matter and the second does not cancel the first.**
+
+Every character-level number this project holds was measured at `bias 0`, where
+the store is the only thing that can learn, and there it genuinely carries 0.615
+bits. That work was real.
+
+**But a readout bias does the same job slightly better, and the two do not add.**
+Give the model a prior and the store's contribution goes to zero — at both units,
+across four learning rates.
+
+So the honest claim is not "the store has never contributed". It is: **what the
+store contributes on text is worth no more than a unigram-shaped bias, and it is
+entirely substitutable by one.** It is not doing anything a prior cannot.
+
+### What this does and does not license
+
+**Does not touch the relational line.** MQAR, kinship and the chain tasks are
+solved through this store and there is no prior that solves them — the bindings
+are the answer. This is a statement about *text*, where a prior is most of what
+there is to know.
+
+**Does explain decision 118**, which has stood unexplained for weeks: the unigram
+has never been beaten by this model on text. If the store's whole contribution is
+prior-shaped, a unigram is roughly the ceiling and the model has been sitting
+just above it. `bias 1` characters reach 5.195 against a 4.852 unigram — still
+worse than counting, and now for a reason rather than as a mystery.
+
+**And it re-poses g17-01's premise rather than restoring it.** *"The model does
+not learn word-level text at all"* was measured on a mistrained readout. What is
+true is narrower: the model learns word-level text about as well as a prior does,
+which is 1.12 bits short of counting.
+
+### The next question, and it is not addressing
+
+Note 042 turned this line toward *where facts are stored*. Three sweeps say the
+store contributes nothing on text beyond a prior, so **the open question is what
+the store is for on this task at all** — or whether text is simply the wrong
+instrument for measuring it, and the relational tasks were the right one from the
+start.
+
+**Taken without asking**, under standing authorisation, with John asleep. This is
+the entry to read first: 136 and 137 are void, and this replaces them.

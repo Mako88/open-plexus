@@ -48,6 +48,7 @@ REWARD_RECALL = ROOT / "openplexus" / "tasks" / "reward_recall.py"
 KINSHIP = ROOT / "openplexus" / "tasks" / "kinship.py"
 CLOSURE = ROOT / "openplexus" / "tasks" / "closure.py"
 OWNERSHIP = ROOT / "openplexus" / "ownership.py"
+PARTITIONED = ROOT / "openplexus" / "partitioned.py"
 SEARCH = ROOT / "openplexus" / "search.py"
 CORPUS = ROOT / "openplexus" / "tasks" / "corpus.py"
 SLOT_COST = ROOT / "tools" / "slot_cost.py"
@@ -1578,6 +1579,34 @@ MUTATIONS = [
         path=SEARCH,
         old="    walks.sort(key=lambda w: w.score, reverse=True)",
         new="    walks.sort(key=lambda w: w.score, reverse=False)",
+    ),
+    Mutation(
+        name="a-write-goes-to-every-node",
+        breaks="the entire arrangement. Writing a binding to all nodes rather "
+               "than to its owner makes this dimension splitting with extra "
+               "steps: a read would then need every node, which is the barrier "
+               "amended C1 forbids, and decision 134's sixteenfold lone-node "
+               "advantage would vanish. It would still answer correctly, which "
+               "is what makes it dangerous",
+        path=PARTITIONED,
+        old="        self._stores[node] += np.outer(value, key)",
+        new="        for store in self._stores:\n"
+            "            store += np.outer(value, key)",
+    ),
+    Mutation(
+        name="a-departure-degrades-survivors",
+        breaks="the property that makes this arrangement's cost bounded. A "
+               "node vanishing must remove ITS concepts and leave every other "
+               "answer bit-identical; returning a partial answer for concepts "
+               "it never owned would be dimension splitting's uniform "
+               "degradation reappearing, and the churn trade decision 134 "
+               "named would be measured wrong",
+        path=PARTITIONED,
+        old="        if node in self._absent:\n"
+            "            return np.zeros(self.width)\n"
+            "        return self._stores[node] @ key",
+        new="        return self._stores[node] @ key * "
+            "(0.5 if node in self._absent else 1.0)",
     ),
     Mutation(
         name="ownership-falls-back-to-modulo",

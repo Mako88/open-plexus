@@ -44,7 +44,7 @@ verified
 | A1 | Store a binding and recall it exactly | **PASSING** | MQAR 0.995 with the store, 0.000 without. Nothing else in the model does this work |
 | A2 | Rebind a key — replace, not accumulate | **CLAIMED** | `corrective_writes`, g10-11: 0.0x chance of the stale value after 512 rebindings of 8 cues. Not re-verified here |
 | A3 | Keep distinct things distinct | **PASSING** | identity addressing; note 035 measured interference as `O(N·ρ)` in mean key cosine, which is why addresses are exact and similarity lives elsewhere |
-| A4 | Survive more facts than it has dimensions | **PARTIAL** | capacity is the standing wall. 134: splitting by concept leaves pooled capacity identical, lone-node 16× at 16 nodes |
+| A4 | Survive more facts than it has dimensions | **PARTIAL** | capacity is the standing wall. 134: splitting by concept leaves pooled capacity identical, lone-node 16× at 16 nodes. **156: typing an address does not spend it** — interference is `O(N·ρ)` in WRITES, and typing adds none |
 
 **Depends on:** nothing. A1–A4 are the floor everything else stands on.
 
@@ -74,7 +74,7 @@ verified
 | # | must be able to | verdict | evidence |
 |---|---|---|---|
 | D1 | Store a typed edge `(subject, relation) → object` | **PARTIAL** | `PairKeys` does exactly this and kinship uses it; decision 100 measured mis-keying at 0.020 vs 0.713. But nothing **chooses** the relation — it is whatever the layout supplies |
-| D2 | Keep two edge types about one subject apart | **FAILING** | 155: `LINK here there` and `FACT here value` both write `key(here)`. Every column collapsed to chance |
+| D2 | Keep two edge types about one subject apart | **FAILING** | 155: `LINK here there` and `FACT here value` both write `key(here)`. Every column collapsed to chance. **156 rules out capacity as the cause** — re-using one subject across 8 relation types costs nothing — so it is purely an addressing failure |
 | D3 | Follow *a specific* relation when reading | **FAILING** | the hop reads `key(concept)`, never `key(concept, relation)` — note 051. Phase 2 exists in storage with no counterpart in retrieval |
 
 **Depends on:** A1, A3, A4 (typing multiplies distinct addresses, so D costs A4).

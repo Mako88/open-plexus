@@ -5105,3 +5105,61 @@ does not do without saying so first.
 `family_links` stays in the tree, off by default and now documented as refuted,
 because deleting it would also delete the byte-identity rail and the calibration
 that both still hold.
+
+## 156. Typing an address costs nothing, and at low load it pays
+
+Note 051's A3 was the prediction that decided whether typed edges are affordable
+at all, and it was run before the mechanism for that reason. Three seeds:
+
+    axis 1 -- the same facts spread over more relation types, N FIXED
+      load     r=1      r=2      r=4      r=8
+        16   0.8333   0.8333   0.9375   0.9792
+        32   0.6562   0.6771   0.7083   0.7604
+        64   0.4896   0.4844   0.4791   0.4844
+        96   0.3264   0.3507   0.3542   0.3507
+
+**A3a CONFIRMED, in the opposite direction to the fear.** Typing never costs, and
+at low load it PAYS: +0.146 at load 16, +0.104 at load 32, going from one
+relation type to eight.
+
+**The naive `1/r` worry had the mechanism backwards.** Note 035 measured
+interference as `O(N * rho)` — `N` **writes** at mean key cosine `rho`. Typing
+multiplies the address SPACE and adds no writes, so `N` is untouched. What it
+does do is spread keys over more distinct pair-hashes, which LOWERS `rho`. The
+formula that was the reason to fear typing is the reason it helps.
+
+At loads 64 and 96 the effect washes out: capacity is saturated and every column
+degrades together. So the honest summary is **free at the wall, better below it.**
+
+### Axis 2, and it is not what its own docstring claimed
+
+I wrote that axis 2 grows `N` with `r` — each subject stated under every relation.
+**The code does not do that.** `subjects = load // relations` holds the total at
+`load`, so `N` is constant across `r` there too. A3b is therefore **untested**,
+and the docstring is corrected to describe what runs rather than what was meant.
+
+What axis 2 does measure is worth having and is flat: re-using one subject across
+many relation types costs nothing against spreading the same facts over many
+subjects. **That is the D2 collision case**, and it says the collision decision
+155 hit was never a capacity problem — it was purely an addressing one.
+
+### A3d missed, and the reason matters more than the miss
+
+`r = 1` at load 16 came back at 0.8333 against a registered rail of 0.90.
+
+**The rail was a guess rather than a reproduction**, which is the actual defect.
+This harness has never reproduced a known number, so **its absolute values must
+not be quoted** — not here, not in ARCHITECTURE.md, not anywhere. Everything A3a
+rests on is a comparison across `r` at the same seed, load and harness, which is
+internally controlled and unaffected by the absolute level.
+
+The standing lesson is that a harness earns trust by reproducing a number that is
+already known, and this one was built without a candidate to reproduce. That is a
+gap in the experiment, recorded rather than argued away.
+
+### What it unblocks
+
+Note 051's build order put A3 first because a `1/r` cost would have ended the
+line. It does not. **A1 — does the collision disappear on decision 155's task —
+is now the next thing**, and ARCHITECTURE.md rows D2, D3 and E4 are what it would
+move.

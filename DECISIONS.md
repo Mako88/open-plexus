@@ -36,15 +36,19 @@ sparse keys were measured worse, then a readout change reversed them cleanly. So
 search on correct arithmetic; both conditions were measured away later and both
 mechanisms became right. A deleted alternative cannot be re-measured.
 
-**CENSUS: 20 chosen, 17 refuted, 16 untried, 10 both, 1 paused.** Checked against the
+**CENSUS: 23 chosen, 28 refuted, 16 untried, 10 both, 1 paused.** Checked against the
 body by `tools/check_decisions.py`, because a summary that can drift from what it
 summarises is how `check_architecture.py` caught its own counts the first time a
 verdict changed.
 
-> **Back-fill status.** Components 1–7 and 9–11 are populated from the log.
-> Attempt lists marked *(back-fill pending)* are known-incomplete — the option
-> states are correct, the attempt history under them is not yet exhaustive. Said
-> out loud because a tree that looks complete and is not is worse than the log.
+> **Coverage, stated exactly, because a tree that looks complete and is not is
+> worse than the log.** Every ❌ in the archived log is here — the refutations and
+> the retractions are what this document exists to hold, and re-proposing one is the
+> failure it prevents. **Confirmations are NOT exhaustive:** an entry that measured a
+> mechanism working and changed nothing else is cited where it supports an option's
+> state and otherwise left in the log. That is deliberate. If you want the full
+> chronology of what worked, the log is where it is, and every option here names its
+> entry numbers.
 
 ---
 
@@ -258,9 +262,30 @@ path is not chosen.**
   learned chooser is strictly harder.
 - 🔀 **`search.py` beam search** — built, tested, and **deliberately not wired into
   `run`**, labelled as scaffolding so it does not become load-bearing.
-  - `123` built and proved standalone; beam 4 costs 3.2× the traffic
+  - `111` **refused first:** search does not pay, because the verifier is built from
+    the same noisy retrievals it is meant to adjudicate
+  - `121` width does NOT fix retrieval fidelity on the task, and `112` was never a
+    bound on it — **which is what expired 111's condition**
+  - `122` step 2 reproduces at 0.971 and the traversal ceiling is 1.000, so the
+    build is justified. `123` built and proved standalone; beam 4 costs 3.2× the
+    traffic
+  - `129` ambiguity IS detectable before searching, **and the expensive signal is
+    below chance** — the endpoint margin is not the fallback
   - `125` traversal is the win (+0.269); search helps only where ambiguity is
   - `130` the gate pays +0.020 over search-everywhere, and the search line closes
+  - **This is the 🔀 argument in one option:** refused at 111, revived at 121 when
+    its condition was measured away, and it is the reason the switch exists
+- ✅ **A hop REPLACES a retrieval, it does not combine with it** — `101`. `102` built
+  the accumulator and recorded that the stated reason for choosing it was wrong.
+- ❌ **Another mechanism stacked on noisy retrieval** — four tried, all failed
+  against the same 0.915/0.35 ceiling. `102`, `105`, `107`, `111`. **Do not
+  re-propose:** the fix is per-step fidelity, not another layer.
+  - `105` hops and pair keys **do not compose, and the combination produced numbers
+    anyway** — the failure mode this repo's standards are built against
+  - `106` composition degrades under repeated entities *gracefully*, and the 1.000
+    that preceded it was the degenerate case
+  - `107` the traversal mechanism is not worth building; the blocker is per-step
+    fidelity. **Condition expired at `121`/`122`**
 - 🔀 **`hop_accumulate`: `concat` vs `bind`** — concat wins 1.000 to 0.812, **but
   only because 16 rules in a 128-wide space are linearly separable whatever the
   labels do.** That is a property of having few rules. `bind` is kept for exactly
@@ -307,10 +332,34 @@ lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
   structurally zero.
 - ❌ **Structured slots** — not a peer of the others. A fixed frame is a traversal
   with a fixed relation schedule, which `162` already calls a fitted constant.
-- ⬜ **Declining to answer** — ARCHITECTURE row C4. **Nothing anywhere lets the
-  model say "I do not know", and no task scores abstention**, while the gate is a
-  fact about the store rather than a learned probability. An untested claim about
+- ⬜ **Declining to answer** — the archived ledger's row C4. **Nothing anywhere lets
+  the model say "I do not know", and no task scores abstention**, while the gate is
+  a fact about the store rather than a learned probability. An untested claim about
   honesty.
+
+### 6b. Knowing when to stop hopping
+
+**⇒ DECIDED: a learned halting gate. It works and it is not confidence.**
+
+- ✅ **`halt_gate`, learned** — reads the retrieval and decides whether to hop again.
+  - `086` a halting signal exists **and it is not confidence** — what separates is
+    the CONTENT
+  - `087` the gate learns which hop to read, and mixed depths reach **1.000**. Two
+    defects found on the way, each of which looked like a working mechanism, and
+    **the mutation harness caught what the tests did not**
+  - `088` three depths at once, and the gain has an upper edge
+  - `092` **it generalises to a depth it never trained on, zero-shot** (0.992)
+  - `089` it is a token detector, measured: `halt_w` sits **+8.3 sd** on one token's
+    value vector, and the sign was the opposite of what was predicted
+- ❌ **Transferring the gate to new terminator tokens** — impossible *by
+  construction*: two markers have unrelated value vectors. `089`. **Do not
+  re-propose.**
+- ❌ **A token-agnostic terminal signal** — `093` there is none, and that is what
+  points at frozen `Wv`. `094` `value_lr` does not build a terminator class, and
+  making separators targets breaks the gate.
+- ❌ **Occupancy as a free halting signal** — `153`: half the gate can go where the
+  index cannot, and it has **nothing to say** there. Chain start/middle/end at
+  0.893/0.791/0.898 is not a signal.
 
 ## 7. Output → surface
 
@@ -418,6 +467,17 @@ that is the standing weakness.**
 - ❌ **Bits per token as evidence about the store** — the objective is n-gram
   bounded, so it cannot show what the store adds. `142`, `047`. **Do not
   re-propose.**
+- ❌ **Training on every position** — costs composition **1.000 → 0.40**. `095`–`098`
+  is the whole line: `095` the gate is not outvoted, it is CONFLICTED, which is a
+  mechanism problem; `096` letting the gate see WHERE it is triples all-position
+  accuracy **and is still not enough**; `097` density raises the level and does not
+  remove the decay; `098` giving the gate its OWN objective is what removes it.
+  **Do not re-propose all-position training without a separate gate objective.**
+- ❌ **Perpetual learning as a repair for churn** — `091`: it does not heal churn,
+  **because churn costs capacity** rather than knowledge. Treat its +0.008 as a
+  direction, not a number. Also the precedent that matters for anything
+  self-modifying: **C4 is still untested after two attempts, both times because the
+  task was too easy to need it** (`091`, `092`).
 - ❌ **Concept addressing as a fix for text prediction** — 0.540 bits at bias 0, and
   a grouping built from SHUFFLED text does as well. **The address count did the
   work, not the concepts.** `141`
@@ -440,6 +500,39 @@ that is the standing weakness.**
 - ⬜ **CLUTRR or any external benchmark** — **the standing gap. Until one runs, this
   project is grading its own homework.** It has been "next" for several cycles,
   which is itself the finding.
+
+### 10b. Retracted numbers — never quote these
+
+**⇒ SETTLED. Every one of these was internally consistent and wrong.**
+
+- ❌ **`4.540` bits/char, "unigram BEATEN"** — carried as the project's headline text
+  result for weeks. **It is not a measurement of this model.**
+  - `117` the reproduction FAILED: the configuration the record names scores
+    5.665–5.742 against a prequential unigram of 4.776. **1.1 bits away**
+  - `118` the archaeology took ten minutes: `4.540` appears **only in HANDOFF.md** —
+    no sweep, no experiment, no decision entry. Its source is note 037's **4.525**,
+    which that note states plainly is *"trained with ordinary backpropagation,
+    offline, deliberately"* on frozen features. **So it was wrong twice: not the
+    model under its own rule, and not prequential — the opposite of prequential**
+  - Kept because the failure is reusable: **an inherited headline with no
+    provenance outranks every measurement downstream of it**, and nothing
+    downstream can contradict it
+- ❌ **Scoring without a temperature** — `117`'s first attempt read 5.920 against a
+  uniform 5.954, i.e. *the model learning nothing*. The delta rule targets a
+  one-hot, so raw scores sit in about [0, 1] and a softmax over that range is nearly
+  uniform. A calibration artefact that looks exactly like a null result.
+- ❌ **`9.323` as the word-level unigram** — `135` it was never that, and the
+  temperature grid was too narrow at word level.
+- ❌ **Everything measured by the g18 harness before the fix** — `138`
+  **RETRACTION: it trained on the wrong target.** Survived four sweeps and 142
+  cells because every arm was wrong identically: internally consistent, both rails
+  passing, a monotone ordering with a tidy explanation. **What caught it was a
+  figure the project had already measured.** Internal consistency is not evidence.
+- ✅ **g17-01's premise survives its own correction** — `140` the pivot was not an
+  artefact, which is the one thing in this section that held.
+- ❌ **Note 050's linked-families task as first designed** — `155` refuted by its own
+  rail on the first run, and the rail was a p90 calibration that flagged what chance
+  produces. Worth keeping as the example of a fairness check paying immediately.
 
 ## 11. Verification apparatus
 

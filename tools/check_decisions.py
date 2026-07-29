@@ -65,9 +65,19 @@ TREE = ROOT / "DECISIONS.md"
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
-#: Generous against the rebuilt tree (468 lines on 2026-07-29). A forcing function
-#: rather than a measurement: detail belongs in the archived log.
-MAX_LINES = 600
+#: A forcing function rather than a measurement: detail belongs in the archived log.
+#:
+#: **RAISED 600 -> 700 on 2026-07-29, deliberately, which is what this docstring
+#: says to do.** 600 was set against the tree's first draft at 468 lines, BEFORE the
+#: back-fill that put every refutation and retraction from the archived log into it.
+#: That back-fill is the document's whole job — a tree that is selective about what
+#: was settled AGAINST cannot prevent a re-proposal — so the budget was measuring a
+#: draft rather than the artefact.
+#:
+#: The number moved once, with a reason, in a commit that says so. If it needs
+#: raising again, ask first whether confirmations have crept in: those belong in the
+#: log, and the coverage rule at the top of the tree says so.
+MAX_LINES = 700
 
 CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED = "✅", "❌", "⬜", "🔀", "⏸"
 STATES = (CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED)

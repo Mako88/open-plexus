@@ -36,7 +36,7 @@ sparse keys were measured worse, then a readout change reversed them cleanly. So
 search on correct arithmetic; both conditions were measured away later and both
 mechanisms became right. A deleted alternative cannot be re-measured.
 
-**CENSUS: 23 chosen, 28 refuted, 16 untried, 10 both, 1 paused.** Checked against the
+**CENSUS: 22 chosen, 27 refuted, 16 untried, 12 both, 1 paused.** Checked against the
 body by `tools/check_decisions.py`, because a summary that can drift from what it
 summarises is how `check_architecture.py` caught its own counts the first time a
 verdict changed.
@@ -313,19 +313,31 @@ lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
   average rather than select and 147 refuted the ways to choose — and **neither
   objection applies to a set answer, because nothing has to be selected.** The
   refutation was about the question.
-- ✅ **Bound the enumeration by the biggest similarity gap** — an argmax over gaps,
+- 🔀 **Bound the enumeration by the biggest similarity gap** — an argmax over gaps,
   not a threshold, which is the same move `148` made when it replaced a tuned
   membership bar with a structurally-zero read.
   - matches the best fixed `branches` at family sizes 3/4/5/6 **without being told
     the size**, where no single fixed value works across sizes
   - `look` becomes a **ceiling** rather than a target: flat from 6 to 16, but 0.500
-    at look=4 for a family of 6, so it must exceed the group. **The exact value
-    stopped mattering; a bound is still required**
+    at look=4 for a family of 6, so it must exceed the group
   - *measured in:* families, index purity **1.000**, cliff ~0.45 wide against
-    within-family steps of ~0.01. **A property of a task calibrated to make
-    families recoverable** — not a claim it survives a noisy index
-- ❌ **Fixed `branches`** — `167`: the peak sits at `family_size − 1` in every row
-  and collapses either side (1.000 → 0.500 → 0.083). Kept 🔀 as the comparison.
+    within-family steps of ~0.01
+- 🔀 **Fixed `branches`** — the count supplied. `167`: the peak sits at
+  `family_size − 1` in every row and collapses either side (1.000 → 0.500 → 0.083).
+  - **`note 056`: this is a measured CROSSOVER, not a loser.** Degrading the
+    grouping, the gap rule falls **faster**: at purity 0.795 it scores 0.167 against
+    fixed's 0.417, at 0.951 it is 0.750 against 1.000, and they draw level only at
+    purity ≳ 0.99
+  - **Why:** given the count, a noisy ranking can only hand you wrong *candidates*.
+    Deriving the count, it hands you wrong candidates **and** a wrong count — two
+    error sources against one. The tell is over-emission: size 2.58 against a true
+    2.00, precision 0.708
+  - Decision 74's shape again, which is what 🔀 is for: **which one is right is a
+    property of the grouping's quality, not of either mechanism**
+
+> **So F3's remaining gap is sharper than "the size is supplied":** the enumeration
+> bound is **either supplied, or it needs a near-oracle grouping.** Neither is
+> answering from awareness, which is why this row is PARTIAL and not PASSING.
 - ⬜ **Autoregressive output** — *not* ruled out by GOALS §2, which forbids
   next-token prediction as the TRAINING OBJECTIVE, a different thing from
   autoregression as an output MECHANISM. What argues against it is **termination**:

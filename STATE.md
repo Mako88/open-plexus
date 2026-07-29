@@ -63,21 +63,44 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Is there a task that needs the gate AND the hop at once?**
+**Does putting the RELATION in the address pay for itself?**
 
-Not *can they compose* — decision 154 showed the guard that says they cannot
-rests on a false premise. The problem moved: **the choice between the two ways of
-composing them cannot be decided, because no existing task tells them apart.**
-That makes this an instrument question, which GOALS §4 puts first.
-[Note 050](docs/notes/050-the-missing-instrument-composition-over-things-never-stated.md)
-designs the task and is not built.
+[Note 051](docs/notes/051-typed-edges-a-ground-up-pass.md) — a ground-up pass
+John asked for, organised around the mechanism he proposed: store
+`key(subject, relation) -> object`, and read in three phases (which concept →
+which relation → the exact read, with the gate on the last).
 
-The previous question — *does the read gate survive contact with anything that is
-not this task* — is answered: **yes, and its scope is now measured rather than
-hoped for.** That evidence is below, and the last two entries in it are what
-raise the question above.
+**Most of it is already built and was not recognised as such.** `PairKeys`
+already derives an address from a token PAIR, and kinship already stores
+`key(S, R) -> O` with it — a typed edge. `hop_accumulate="bind"` is a binding
+operator. The hop's decode lands at cosine 0.96 (154). **The one missing piece is
+that the HOP is untyped:** it reads `key(concept)`, never
+`key(concept, relation)`, so the model can follow *an* edge and not *the has-a*
+edge.
 
-Decision 148 answered the question before that — *can anything tell which of two
+> It explains decision 155's collapse exactly — `LINK here there` and
+> `FACT here value` both write `key(here)`. With typed keys they are different
+> addresses and **cannot** collide. And it attacks 151's bound: `key(entity,
+> has-value)` reading empty is *"I don't know this entity's value"*, where
+> `key(entity)` empty only meant *"nothing at all was written here"*.
+
+**The cost is capacity**, and it is the thing to measure first: typing multiplies
+distinct addresses, and note 035's interference is `O(N·ρ)`. A3 tests that on
+MQAR before anything else is built, because if it costs `1/r` nothing else
+matters. Four predictions registered; **nothing built.**
+
+---
+
+### The questions this replaced, both answered
+
+*Does the read gate survive contact with anything that is not this task* — **yes,
+and its scope is measured rather than hoped for** (149–153, below).
+
+*Is there a task that needs the gate and the hop at once* — note 050 designed
+one, its first layout was refuted by its own rail (155), and note 051 supersedes
+the question: the collision that killed it is what typed edges make impossible.
+
+Decision 148 answered the one before those — *can anything tell which of two
 retrievals to trust* — with **yes, once the question is asked exactly.**
 
     with exceptions       direct  transfer  exception   wrong = a sibling's

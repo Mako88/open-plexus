@@ -5010,3 +5010,77 @@ design choice with a measurement behind it"*, and stops there deliberately.
 
 **No code changed.** The premise was checked before anything was built on it,
 which is the only reason this cost twenty lines instead of a sweep.
+
+## 155. Note 050's task is refuted by its own rail, on the first run
+
+`--links` was registered with three predictions and T5 was the dullest of them:
+DIRECT, TRANSFER and EXCEPTION stay within 0.05 of their link-free values, because
+otherwise every comparison across `--links` is confounded. It fired immediately:
+
+    inherit, exceptions on    direct  transfer  exception
+      without links           0.8475    0.4600     0.8625
+      with links              0.1125    0.0375     0.1475
+
+**Everything collapses to chance**, and `answers_a_stated_value` falls to 0.1044,
+so the model is not even naming values from the sequence any more.
+
+### The cause is the task design, and it is mine
+
+A link is stated as `LINK here there`, where `here` and `there` are
+**representative entities** of the two families. The store binds the previous
+position's key to the current value, so that writes **`key(here) -> there`**.
+
+`here` is an ordinary entity. Its address is exactly where its own stated fact
+lives. **The link overwrites the fact it was meant to be composed with**, for one
+entity per family, and `corrective_writes` being off means the two superpose
+rather than one replacing the other — so the damage spreads through every read of
+that address.
+
+I chose entity tokens deliberately and wrote the reason into the code: *"there is
+no family token, and adding one would hand the model the grouping the task exists
+to make it discover."* **That reason is wrong.** A family token used ONLY as a
+link endpoint says nothing about which entities belong to which family — the
+model still has to discover that from co-occurrence, exactly as before. I talked
+myself out of the right design with an argument that does not survive being
+stated plainly.
+
+### What survives
+
+Everything except the layout of the link fact:
+
+- **The byte-identity rail holds.** 360 configurations, background streams and
+  vocabulary identical to the pre-change generator. Decisions 143–151 are
+  untouched, which is the property this was most at risk of quietly breaking.
+- **The calibration holds.** The drawn links are statistically invisible to
+  `ContentIndex` (smallest permutation p 0.414), and that is a property of where
+  links are stated rather than of what the endpoints are.
+- **T4 and the arm plumbing hold.** The fourth query kind, its deferral
+  accounting and the `is_linked` flag all work; they were reading a store that
+  had been corrupted upstream.
+
+### What the redesign has to satisfy, stated so the next attempt is cheaper
+
+A link endpoint must be a token **whose address is not also a fact's address**.
+Three candidates, none built:
+
+    family tokens         clean, and the objection above does not hold. Costs
+                          `n_families` ids and a second indirection: reaching
+                          the linked family's VALUE from its family token
+    attribute tokens      already exist, already sit beside entities in the
+                          index, and are never query subjects -- so the index
+                          would propose them for free. Same second-indirection
+                          problem
+    a reserved endpoint   per family, written by nothing else
+
+**The second indirection is the real design problem**, not the collision: whatever
+names the linked family, the model still has to get from that name to a value,
+and only entities have values. That is a third hop, and note 050 predicted the
+task would need two.
+
+**So the task is not just mis-laid-out, it may be harder than the mechanism it
+was built to measure.** That is worth knowing before a fourth attempt, and it is
+what the first run bought.
+
+`family_links` stays in the tree, off by default and now documented as refuted,
+because deleting it would also delete the byte-identity rail and the calibration
+that both still hold.

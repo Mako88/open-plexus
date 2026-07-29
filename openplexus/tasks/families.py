@@ -139,9 +139,16 @@ class FamilyConfig:
     n_values: int = 8
     stated_per_family: int = 2
     exceptions_per_family: int = 0
-    #: State a LINK between families and ask a third kind of question --
-    #: **note 050's instrument**, and the only task here that needs the read
-    #: gate and the hop mechanism at once.
+    #: State a LINK between families and ask a fourth kind of question --
+    #: note 050's instrument.
+    #:
+    #: **REFUTED AS LAID OUT — decision 155, and left in place deliberately.**
+    #: A link is written `LINK here there` with ENTITY endpoints, which binds
+    #: `key(here) -> there` and so overwrites the stated fact living at that
+    #: very address. Every column collapses to chance. The byte-identity rail
+    #: and the index calibration both still hold, which is why this is kept
+    #: rather than deleted -- they are the expensive parts and they are
+    #: independent of the endpoint choice.
     #:
     #: False reproduces the task decisions 143-151 measured, token for token.
     #: `tests/test_families.py` asserts that rather than intending it: the link

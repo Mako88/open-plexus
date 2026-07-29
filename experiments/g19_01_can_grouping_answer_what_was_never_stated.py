@@ -378,6 +378,54 @@ empty address. `--branches 5` restores the gate to 1.0000 and lifts TRANSFER fro
 0.2875 to 0.3317, which names the limit as the index's reach rather than the
 rule's. **No threshold moved, because there is no threshold.**
 
+## THE `--links` ARM — note 050's instrument, and T1 is the reason to run it first
+
+`--links` turns on `families.family_links`: a LINK is stated between families and
+a fourth query kind is asked, whose answer is the LINKED family's value. A LINKED
+entity's own fact was never stated, exactly like TRANSFER, so **the gate must
+fire on both** — the difference is only how far the answer is. TRANSFER stops at
+the family; LINKED follows the link one step further.
+
+**This is run before the `inherit-hop` model change, not after.** Note 050 exists
+because no task can separate the two ways of composing the gate with the hop. If
+this task cannot either — if the existing arms already answer LINKED — then it is
+not the instrument it was designed to be and the model change would be measured
+against nothing. The calibration already cleared the index (the drawn links are
+statistically invisible to it, smallest permutation p 0.414); this clears the
+model.
+
+**PREDICTIONS, registered before the arm was run:**
+
+  T1  THE INSTRUMENT. `inherit` scores near chance on LINKED, and in any case
+      below its own TRANSFER. It notices the empty address and reaches the
+      family, which is one step short — following the link needs a hop it does
+      not have. **A high LINKED score here means the task is answerable without
+      composition and the instrument is wrong.**
+
+  T4  THE GATE. `deferred_on_linked` exceeds 0.9, matching `deferred_on_transfer`.
+      Both kinds have empty addresses, so a gap between them would mean the
+      layout writes one and not the other — decision 153's condition, and it
+      would make the arms incomparable.
+
+  T5  THE RAIL. DIRECT, TRANSFER and EXCEPTION stay within 0.05 of their
+      link-free values. The link facts lengthen the sequence, and if that alone
+      moves the existing columns then every comparison across `--links` is
+      confounded by sequence length rather than by the mechanism.
+
+**SCORED — DECISION 155. T5 REFUTED on the first run, and it is the task's fault
+rather than the mechanism's.**
+
+    inherit, exceptions on    direct  transfer  exception
+      without links           0.8475    0.4600     0.8625
+      with links              0.1125    0.0375     0.1475
+
+A link is written `LINK here there` with ENTITY endpoints, so the store binds
+`key(here) -> there` — **overwriting the stated fact that lives at that very
+address**, one entity per family. T1 and T4 were not scored: they would have been
+read off a store corrupted upstream of anything they measure. The endpoint choice
+is what needs redesigning; the byte-identity rail and the index calibration are
+independent of it and both hold.
+
 ## Settings, and why they are not inherited
 
 Single keys (`context_keys` off), because the binding is `entity -> value` and a
@@ -492,14 +540,16 @@ def silent(tokens: np.ndarray) -> np.ndarray:
 
 def one_cell(arm: str, seed: int, exceptions: int = 0,
              n_values: int | None = None,
-             family_size: int | None = None) -> dict:
+             family_size: int | None = None,
+             links: bool = False) -> dict:
     started = time.time()
     extra = {}
     if n_values is not None:
         extra["n_values"] = n_values
     if family_size is not None:
         extra["family_size"] = family_size
-    config = FamilyConfig(seed=seed, exceptions_per_family=exceptions, **extra)
+    config = FamilyConfig(seed=seed, exceptions_per_family=exceptions,
+                          family_links=links, **extra)
     surfaces, index, recovered = surfaces_for(arm, config, seed)
     writes = arm != "nostore"
 
@@ -539,7 +589,8 @@ def one_cell(arm: str, seed: int, exceptions: int = 0,
             model.run(tokens, targets, scored, learn=True,
                       store=None if writes else silent(tokens))
 
-    tallies = {"direct": [0, 0], "transfer": [0, 0], "exception": [0, 0]}
+    tallies = {"direct": [0, 0], "transfer": [0, 0], "exception": [0, 0],
+               "linked": [0, 0]}
     stated_hits = 0
     # E3: when an EXCEPTION is answered wrongly, how often is the answer
     # specifically a SIBLING's value? A collision speaks with the family's
@@ -550,7 +601,8 @@ def one_cell(arm: str, seed: int, exceptions: int = 0,
     # Accuracy cannot tell "chose the wrong address" from "chose the right
     # address and the read there was corrupted", and those point at different
     # next steps.
-    deferred = {"direct": [0, 0], "transfer": [0, 0], "exception": [0, 0]}
+    deferred = {"direct": [0, 0], "transfer": [0, 0], "exception": [0, 0],
+                "linked": [0, 0]}
     for sequence in test:
         tokens = np.asarray(sequence.tokens)
         model.deferrals.clear()
@@ -558,10 +610,16 @@ def one_cell(arm: str, seed: int, exceptions: int = 0,
                                 store=None if writes else silent(tokens))
         chose = dict(model.deferrals)
         values = {int(t) for t in tokens if t >= config.value_base}
-        for where, transfer, exception in zip(sequence.query_positions,
-                                              sequence.is_transfer,
-                                              sequence.is_exception):
-            kind = ("exception" if exception
+        # `is_linked` is empty without `--links`, so pad rather than zip -- a
+        # bare zip would silently drop every query the moment the arm is off.
+        linked_flags = (sequence.is_linked
+                        or (False,) * len(sequence.query_positions))
+        for where, transfer, exception, linked in zip(sequence.query_positions,
+                                                      sequence.is_transfer,
+                                                      sequence.is_exception,
+                                                      linked_flags):
+            kind = ("linked" if linked
+                    else "exception" if exception
                     else "transfer" if transfer else "direct")
             right = int(predictions[where] == tokens[where + 1])
             tallies[kind][0] += right
@@ -592,6 +650,9 @@ def one_cell(arm: str, seed: int, exceptions: int = 0,
                        / max(tallies["transfer"][1], 1), 4),
         exception=(round(tallies["exception"][0] / tallies["exception"][1],
                          4) if tallies["exception"][1] else None),
+        linked=(round(tallies["linked"][0] / tallies["linked"][1], 4)
+                if tallies["linked"][1] else None),
+        links=links,
         wrong_exception_said_sibling=(
             round(said_a_sibling / wrong_exceptions, 4)
             if wrong_exceptions else None),
@@ -646,6 +707,10 @@ def main() -> int:
     # index rather than of the gate -- so it is a separate knob and swept
     # separately.
     parser.add_argument("--branches", type=int, default=None)
+    parser.add_argument("--links", action="store_true",
+                        help="note 050's instrument: state family links and ask "
+                             "a fourth query kind whose answer is the LINKED "
+                             "family's value")
     args = parser.parse_args()
 
     harness.refuse_if_mutating()
@@ -660,7 +725,7 @@ def main() -> int:
     for seed in seeds:
         for arm in arms:
             record = one_cell(arm, seed, args.exceptions,
-                              args.n_values, args.family_size)
+                              args.n_values, args.family_size, args.links)
             print(f"  {record['condition']:34s} "
                   f"direct {record['direct']:.4f}  "
                   f"transfer {record['transfer']:.4f}  "

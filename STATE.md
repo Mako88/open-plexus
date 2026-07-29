@@ -135,27 +135,75 @@ words, each seen many times instead of once. **The readout still predicts
 surfaces**, so nothing is lost on the output side: store by concept, emit by
 word.
 
-The grouping is what `ContentIndex` produces. Cluster its vectors, hand the
-groups to `concepts.Shared`, and the three pieces built on 2026-07-29 compose
-into the fix for the problem the fourth one found.
-
 > **The question:** does storing by concept rather than by surface make
 > word-level text learnable at all?
 >
-> **Floor** 10.721, measured. **Bar** 8.068, the unigram. **Control** the same
-> grouping built from SHUFFLED content must fail — otherwise the gain is the
-> address space shrinking and not the grouping meaning anything, and those are
-> different findings.
+> **Bar** 8.068, the unigram. **Control** the same grouping built from SHUFFLED
+> content must fail — otherwise the gain is the address space shrinking and not
+> the grouping meaning anything, and those are different findings.
 
-Everything needed exists: `ContentIndex` (fitted, tested), `concepts.Shared`
-(tested, agreement property pinned), `corpus.words`, and `index_branches` for
-afterwards. What does not exist is the clustering step and a `Shared` built from
-it.
+### BUILT, 2026-07-29 — and the floor is no longer 10.721
 
-**Do not start by fixing word-level text directly** (decay, cap, learning rate).
-That is a separate and much longer line, and it would put note 045's question
-behind it indefinitely. g17-01's record lists the options and why this is the
-choice.
+`openplexus/grouping.py` (spherical k-means over content vectors) and
+`keys.ByConcept` (any key source, addressed by concept instead of surface) are
+written, tested, and committed. `experiments/g18_01_...` holds the sweep.
+
+**The address space collapses exactly as the proposal says**, measured on 90,000
+words before dispatch:
+
+    arm              concepts   addresses   recurrence
+    floor                1733      36,299         2.48
+    concept-128           179       3,438        26.18
+    stratified-128        379      19,490         4.62
+    permuted-128          179       3,080        29.22
+    shuffled-128          178       2,596        34.67
+
+**And that is what broke it.** The first concept cell overflowed to NaN, `|Wo|`
+reaching 1.6e63. Pair keys over surfaces never did, because the defect *was* the
+brake: almost every address was written once, so the sparsity that made the model
+useless was the only thing holding the store's norm down.
+
+### ⇒ IN FLIGHT: g18-00, and it may undo g17-01's conclusion
+
+Run [30425355572](https://github.com/Mako88/open-plexus/actions/runs/30425355572),
+dispatched 2026-07-29 05:32Z. 30 cells: `{floor, concept-128, stratified-128} ×
+lr {0.05, 0.01, 0.005, 0.001, 0.0005} × cap {0, 5}`, one seed.
+
+**Because the brake is the LEARNING RATE**, and it moves the floor. At 20,000
+words with a readout bias, no cap:
+
+    lr        floor    concept-128
+    0.05     10.186    DIVERGED
+    0.01      9.851    10.353
+    0.005     9.804    10.349
+    0.001     9.734    10.428     <- floor still improving at the grid edge
+
+> **If that holds at 90,000 words, "the model does not learn word-level text at
+> all" is partly a statement about one hyper-parameter** — `lr=0.05`, the value
+> every character-level sweep used — rather than about the model. g18-01 would
+> then have measured its mechanism against a handicapped baseline, which is what
+> g10-09 was retracted for.
+
+**The rate alone is not enough at scale**: lr 0.005 holds concept-128 at 20,000
+words and blows up at 90,000 — 36.9 bits against a 10.759 uniform, **finite and
+useless**. Hence both axes, at the size the sweep uses.
+
+That 36.9 is why there are now two rails rather than one. `diverged` catches a
+NaN; **`unstable` catches a calibrated model that is worse than uniform**, which
+cannot happen unless the calibration text and the test text disagree about what
+the model does. Without it, that cell would have entered a table as a number.
+
+**Chosen by `fit_error`** — held-out TRAINING text — never by the test set.
+
+**g18-01 is held and cannot be dispatched by accident:** its `lr` and `cap` are
+`SETTINGS_FROM_G18_00`, which parses as a float in nothing, so a job started
+before g18-00 lands fails on its first line rather than returning a number.
+
+**What was true and is now wrong:** the earlier instruction here said *"do not
+start by fixing word-level text directly (decay, cap, learning rate) — that is a
+separate and much longer line."* The mechanism could not be measured without
+touching it: concept addressing does not run at the stock learning rate at all.
+The two questions turned out to be one.
 
 ### 0. THE ARCHITECTURE LINE — where the work actually is
 

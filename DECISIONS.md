@@ -5906,3 +5906,56 @@ every result this project has recorded.
 **What is left open:** a silent peer in the test harness, test-side only, which
 would make the deadline observable for the first time and turn a race into a
 deterministic catch. Named in note 054 and not built here.
+
+## 169. The silent peer, and a timing assertion that passed while measuring nothing
+
+Decision 168 left the deadline branch unreachable. `tests/test_deadline_settles_short.py`
+reaches it: a `SilentPeer` completes the slice handshake, reads every request and
+answers none, so the driver counts a voter that never votes. `spawn=False` already
+existed for containers on an emulated link, and a silent socket is the degenerate
+case — **no production code changed.**
+
+Five tests. Every step settles short by exactly one, the partial answer comes back
+rather than token 0, and the deadline is waited.
+
+**The property that makes it non-flaky, which is the point:** a permanently silent
+voter makes `complete` *impossible*, so the overdue branch is the only path by which
+a step can settle. `the-deadline-fires-immediately` therefore cannot be inert here
+whatever the scheduler does — where the previous detection depended on the driver
+happening to observe a partial vote set.
+
+### The first version of the fix passed and measured nothing
+
+`elapsed >= deadline` was timed around the whole `with` block, which includes both
+peers connecting and their retry sleeps.
+
+    deadline 0.001    elapsed 0.585     <- setup, not the wait
+    deadline 0.5      elapsed ~0.6
+
+**Setup dominated, so the assertion would have passed under the exact mutation it
+was written to catch.** What found it was a sensitivity test — move the input,
+require the output to move — added on the suspicion that a duration bound might be
+measuring a bystander. The fix is to time `run` alone.
+
+That is rule 2 at its smallest scale: *observe the quantity the change claims to
+move.* And it is the second time in this line that the cheap version of a check
+matched something adjacent to the claim rather than the claim — after 164's noise
+draw and 165's docstring match, this is three.
+
+> **Three attempts at one assertion: a race, a vacuous bound, then a real check.
+> The first two both passed when written.** That is the argument for requiring a
+> sensitivity check on anything asserted about a duration, and it is cheap enough
+> to be a habit rather than a rule.
+
+### It also hung before it failed
+
+`run` sends `_RESET` before the first token. The peer counted it as a step, so every
+vote arrived one step ahead and the driver's `if step not in pending: continue`
+discarded each one **in silence** — votes stayed at 0, `votes >= 1` never became
+true, and the run blocked forever. Correct for a real network; merciless for a fake
+node, and worth knowing before the next one is written.
+
+### How to undo it
+
+Delete the file. It adds ~15 s to the suite, touches no production code, and no
+measurement depends on it.

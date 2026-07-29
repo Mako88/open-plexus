@@ -93,6 +93,40 @@ by a race, and the mutation stops being load-dependent.
 **Not done here**, deliberately: it is a harness addition rather than a one-line
 assertion, and the diagnosis is worth landing before the build.
 
+## Outcome — built, and the first version of it was vacuous
+
+`tests/test_deadline_settles_short.py`, five tests. The silent peer works and the
+condition is now reachable: every step settles short by exactly one, the run
+produces the partial answer rather than token 0, and the deadline is waited.
+
+**The property that makes it non-flaky** is that a permanently silent voter makes
+`complete` *impossible*, so the overdue branch is the only way a step can settle.
+The mutation cannot be inert here, whatever the scheduler does — which is the whole
+difference from the race it replaces.
+
+**Two failures on the way, both caught by a check rather than by inspection:**
+
+1. **It hung instead of failing.** `run` sends `_RESET` before the first token; the
+   peer counted it as a step, so every vote was one ahead of the step the driver
+   awaited, and `if step not in pending: continue` discarded each one *in silence*.
+   Votes stayed at 0, `votes >= 1` never became true, and the driver waited
+   forever. Correct behaviour for a real network, merciless for a fake node.
+
+2. **The lower-bound assertion was VACUOUS, and this is the one worth reading.**
+   `elapsed >= deadline` was measured around the whole `with` block, which includes
+   both peers connecting and their retry sleeps. Measured: **0.585 s against a 1 ms
+   deadline.** Setup dominated, so the assertion would have passed under the very
+   mutation it was written to catch.
+
+   What caught it was a sensitivity test — move the input, require the output to
+   move — added on the suspicion that a timing bound might be measuring overhead.
+   The fix is to time `run` alone. **Rule 2, exactly: observe the quantity the
+   change claims to move, not a bystander that correlates with it.**
+
+> So the tally for this note is three attempts: a race, a vacuous bound, and a
+> real check. The first two both *passed* when written. That is the argument for
+> sensitivity checks on anything asserted about a duration.
+
 ## What is NOT wrong
 
 **The production code.** Rule 11 says a failing test is a claim about the

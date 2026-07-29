@@ -4948,3 +4948,65 @@ stand. The fourth was deleted rather than explained away.
 
 **No experiment file was committed**, because the measurement that decided it
 took eight lines and the finding is negative.
+
+## 154. The guard that blocks the other half rests on a premise that is measurably false
+
+Note 044's guard, quoted in full because the whole of this entry is about one
+clause of it:
+
+    index_branches cannot be combined with hops > 1: the hop key is a softmax
+    mixture of every token's row, so it NAMES NO CONCEPT and the index has
+    nothing to look up.
+
+The mechanism is real — `hop_key = weights @ self.wk`, where `weights` is a
+softmax over the vocabulary. **The inference from it is not.** How nearly that
+mixture names one token is an empirical question, and the code beside it already
+half-answers it: *"`hop_sharpness` is the dial between the two, and high enough
+approaches argmax."* Nobody had measured where the dial actually sits.
+
+Chains, 12 sequences, cosine of every read key against every normalised `wk` row:
+
+    sharpness 6.0 (the chains line's own)   top cos   margin to 2nd
+      ordinary read                          1.0000          0.7173
+      HOP 1                                  0.9612          0.6408
+      HOP 2                                  0.9734          0.6605
+
+    sharpness 25.0
+      ordinary read                          1.0000          0.7173
+      HOP 1                                  0.9855          0.6924
+      HOP 2                                  0.9892          0.6982
+
+**A hop key sits at cosine 0.96 to a single token's row, with 0.64 of clear air
+to the runner-up, at the sharpness this task is actually solved with.** That is
+not a mixture that names no concept. It names one, and the nearest-row decode is
+well separated rather than marginal.
+
+**The ordinary read at exactly 1.0000 is the check that makes the rest
+readable.** The reads arrive three per position and the slot assignment was
+inferred rather than known; a first slot that did not come back at exactly 1.0 —
+it is literally a token's own key — would have meant the hop rows were measuring
+something else. It did. That is the reproduce-a-known-number rule, and the first
+version of this probe skipped it and reported a number inflated by the ordinary
+reads it had failed to exclude.
+
+### What this unblocks, and what it does not
+
+**Unblocks:** the index has something to look up after all — `argmax(wk @
+hop_key)`, the token the hop most nearly names. Decision 152 called the gate and
+the hop mechanism mutually exclusive and named the fix as *"give the hop
+machinery a key that names a concept, or give the index something else to look
+up."* It turns out the first was already true and unmeasured.
+
+**Does not:** the guard is not lifted here, because there is a real design
+question underneath it that a measurement does not settle. The `index_branches`
+block runs **once per position**, not once per hop, so combining them requires
+deciding whether the index proposes neighbours of the *position's* concept or of
+the *hop's landing* concept. Those are different mechanisms with different costs,
+and picking one on the strength of a cosine would be the kind of move decisions
+144 and 147 were both retractions of.
+
+So this entry moves the blocker from *"impossible, by construction"* to *"a
+design choice with a measurement behind it"*, and stops there deliberately.
+
+**No code changed.** The premise was checked before anything was built on it,
+which is the only reason this cost twenty lines instead of a sweep.

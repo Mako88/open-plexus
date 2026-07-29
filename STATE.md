@@ -180,9 +180,25 @@ chain start / middle / end reads 0.893 / 0.791 / 0.898, zero on 0% of cases.
 That subsumes decision 151's bound and **predicts** where the sketch pays rather
 than hoping: a task that asks about something before anything about it is stored.
 
-**So what is actually open** is the neighbour half — *give the hop machinery a
-key that names a concept, or give the index something else to look up* (note
-044) — and it is now the only half left.
+**And the neighbour half is not blocked by what the guard says it is —
+decision 154.** Note 044 refuses `index_branches` above one hop because a hop key
+*"names no concept"*. Measured on chains, at the sharpness the task is solved
+with:
+
+    sharpness 6.0        top cos   margin to 2nd
+      ordinary read       1.0000          0.7173     <- the check, not a result
+      HOP 1               0.9612          0.6408
+      HOP 2               0.9734          0.6605
+
+**A hop key sits at cosine 0.96 to a single token's row.** It names a concept,
+and `argmax(wk @ hop_key)` is what the index could look up.
+
+**The guard is not lifted**, because a real design question sits under it that a
+cosine does not settle: `index_branches` runs once per POSITION, not once per
+hop, so combining them means choosing whether the index proposes neighbours of
+the position's concept or of the hop's landing concept. Different mechanisms,
+different costs. **That choice is the live work**, and it is now a design
+decision with a measurement behind it rather than an impossibility.
 
 ### How this line got here, in five lines
 

@@ -5276,3 +5276,53 @@ chooser before the fixed one is shown to pay on a task.
 **And 157's LINKED column is unmoved at 0.1275**, because the families task is
 not wired to this yet. D3 moves FAILING → PARTIAL on the mechanism, not on a task
 result, and the ledger says so.
+
+## 159. The index proposes at the hop's landing concept, and only at dead ends
+
+ARCHITECTURE row E4 -- the last FAILING row -- and John's option B, which he
+chose. `index_at_hops` lets the content index propose neighbours where a HOP
+arrived rather than only at the position it started from. Note 044 refused this
+because a hop key "names no concept"; decision 154 measured that false at cosine
+0.96, so argmax(weights) names where the hop landed and the index can look it up.
+
+JOHN'S CONCERN WAS THE DESIGN CONSTRAINT, NOT AN AFTERTHOUGHT. He asked how this
+is stopped from exploding -- proposing b neighbours at every hop is b ** depth,
+27 reads at three hops with three branches. The answer is the gate we already
+have: FAN OUT ONLY WHERE THE ADDRESS HOLDS NOTHING. A chain that is finding what
+it needs never branches; branching happens at dead ends, which is exactly where
+it is worth paying for. So it is built into the mechanism rather than bolted on,
+and `track_occupancy` is required because "holds nothing" is the sketch's
+question -- answering it by norm is what decision 147 refuted.
+
+tests/test_index_at_hops.py measures both properties:
+  - a chain reaches an answer THROUGH a dead end that it provably cannot reach
+    without the fan-out (the control runs first, so the positive means something)
+  - the fan-out costs 1 extra read on a chain with no real dead end, where an
+    ungated version would cost 56
+
+A AND B ARE ALTERNATIVES, NOT ADDITIVE, and the cost test is what found that. It
+measured 56 reads against 28 -- exactly double -- because turning on
+index_at_hops was also running the position-level fan-out. Option B means
+similarity is applied where the chain HAS GOT TO rather than to what it was
+asked about, so the position-level block is now skipped. The wrong version would
+have doubled the wire cost and made the claim above false.
+
+THREE THINGS THE TESTS CAUGHT, ALL MINE:
+  - with hops=2 the chain takes a SECOND hop after arriving and wanders off the
+    answer. That is E3's question (when to stop) rather than E4's, so the test
+    pins the endpoint to isolate the row being measured
+  - the index returned similarity 0.0 between the two tokens it was supposed to
+    relate. TWO TOKENS THAT ONLY EVER SEE EACH OTHER DO NOT BECOME SIMILAR --
+    they become each other's CONTEXT. families.py documents the same trap and
+    its layout is the fix: both must sit beside a SHARED third token
+  - the cost test asserted EXACTLY zero overhead and measured 29 against 28. The
+    extra read is real and correct -- at the start of a sequence the store is
+    empty, so the earliest position genuinely is a dead end. The assertion was
+    the wrong claim, not a failing mechanism, and it now asserts what matters:
+    cost tracks DEAD ENDS rather than DEPTH
+
+E4 moves FAILING -> PARTIAL. Mechanism only: it has never run on the linked task,
+so 157's LINKED column at 0.1275 is unmoved. NO FAILING ROWS REMAIN -- 8 passing,
+7 partial, 0 failing, 4 untested, 4 claimed -- and what the partials share is
+that each is a mechanism shown to work in isolation whose value on a task is
+still unmeasured.

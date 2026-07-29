@@ -87,7 +87,7 @@ verified
 | E1 | Follow a chain of the same relation | **CLAIMED** | decision 92 measured the hop generalising to unseen depths zero-shot. Not re-verified here |
 | E2 | Compose relations that combine by rule | **PARTIAL** | kinship 2-hop 0.443 against 1-hop 0.777. Real but weak |
 | E3 | Know when to stop hopping | **CLAIMED** | `halt_gate`, learned. 153 showed occupancy cannot supply this for free |
-| E4 | Combine composition with C1's gate | **FAILING** | `index_branches` is refused above one hop (note 044). 154 measured the guard's premise false — a hop key sits at cosine 0.96 to one token's row — so this is a design choice, not an impossibility |
+| E4 | Combine composition with C1's gate | **PARTIAL** | **159**: `index_at_hops` proposes neighbours at the hop's landing concept, gated on emptiness. `tests/test_index_at_hops.py` shows a chain reaching an answer through a dead end it could not reach without, and the fan-out costing 1 extra read where an ungated one would cost 56. **Mechanism only** — no task result yet |
 
 **Depends on:** A1, D. **E4 depends on:** C1, D3.
 
@@ -116,7 +116,7 @@ and duplicating it is how two documents start disagreeing.
 
 ## What this ledger says right now
 
-**8 PASSING, 6 PARTIAL, 1 FAILING, 4 UNTESTED, 4 CLAIMED.**
+**8 PASSING, 7 PARTIAL, 0 FAILING, 4 UNTESTED, 4 CLAIMED.**
 
 **D2 and D3 both moved today** — 157 typed the write, 158 typed the read. What
 remains on D3 is that the relation is **fixed rather than chosen**: the mechanism
@@ -124,8 +124,12 @@ follows a named edge, and nothing decides which name. Note 051 §5 flags choosin
 as unsolved for open queries, and decision 147 is why a learned chooser should
 not be attempted before the fixed one is shown to pay on a task.
 
-**E4 is the one FAILING row left**, and it is now the only thing between the gate
-and composition.
+**No FAILING rows remain.** All three that were failing this morning — D2, D3,
+E4 — are PASSING or PARTIAL, and every one moved on a measurement. What the
+PARTIALs share is that each is a MECHANISM shown to work in isolation whose value
+on a task is unmeasured: D3's relation is fixed rather than chosen, and E4 has
+never run on the linked task. **157's LINKED column at 0.1275 is still the
+number to move**, and it is now reachable rather than blocked.
 
 The PARTIAL that matters most is **C2**. Typing addresses moves it: `key(entity,
 has-value)` reading empty is *"I don't know this entity's value"*, where

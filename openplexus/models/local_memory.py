@@ -1148,6 +1148,32 @@ class LocalMemoryConfig:
     #: Needs a key source that can form a pair (`context_keys`), because a
     #: single key has nowhere to put the relation.
     hop_relation: int = -1
+    #: Let the content index propose neighbours **at the hop's landing concept**
+    #: rather than only at the position's -- ARCHITECTURE row E4, and John's
+    #: option B.
+    #:
+    #: Note 044 refuses `index_branches` above one hop because a hop key "names
+    #: no concept". Decision 154 measured that false: the hop's softmax lands at
+    #: cosine 0.96 on a single row, so `argmax(weights)` names the concept it
+    #: arrived at, and the index can look THAT up.
+    #:
+    #: **The fan-out is gated on emptiness, and that is what stops it
+    #: exploding.** Proposing `b` neighbours at every hop is `b ** depth` reads
+    #: -- 27 at three hops with three branches, which is the wrong shape for C1.
+    #: So neighbours are consulted **only where the hop's own address holds
+    #: nothing**, and the first candidate that holds something is taken. A chain
+    #: that is finding what it needs never branches at all; branching happens at
+    #: dead ends, which is exactly where it is worth paying for.
+    #:
+    #: **A and B are ALTERNATIVES, not additive.** With this on, the
+    #: position-level fan-out does not run at all: similarity is applied where
+    #: the chain has GOT TO rather than to what it was asked about. Running both
+    #: would double the reads and make the cost claim above false -- the test
+    #: that measures it caught exactly that, 56 reads against 28.
+    #:
+    #: Needs `track_occupancy`, because "holds nothing" is the sketch's question
+    #: and answering it by norm is what decision 147 refuted.
+    index_at_hops: bool = False
     readout_bias: bool = False
     derived_keys: bool = False
     context_keys: bool = False
@@ -1476,7 +1502,13 @@ class LocalMemoryConfig:
                 "index_sharpness must be positive: at zero every candidate "
                 "gets an equal share regardless of similarity, which is the "
                 "index proposing nothing")
-        if self.index_branches and self.hops > 1:
+        if self.index_at_hops and not self.track_occupancy:
+            raise ValueError(
+                "index_at_hops needs track_occupancy: the fan-out fires only "
+                "where an address holds nothing, and that is the sketch's "
+                "question. Deciding it by retrieval norm is what decision 147 "
+                "refuted, and an ungated fan-out is b ** depth reads")
+        if self.index_branches and self.hops > 1 and not self.index_at_hops:
             raise ValueError(
                 "index_branches cannot be combined with hops > 1: the hop key "
                 "is a softmax mixture of every token's row, so it names no "
@@ -2498,7 +2530,7 @@ class LocalAssociativeMemory:
             neighbours = None
             strongest = 0.0
             occupancy_near = 0.0
-            if self.config.index_branches:
+            if self.config.index_branches and not self.config.index_at_hops:
                 # THE CONTENT INDEX, note 045. Similar concepts are asked as
                 # well, and each is an ORDINARY EXACT READ at a hard token id --
                 # nothing here blurs a key.
@@ -2848,6 +2880,34 @@ class LocalAssociativeMemory:
                 else:
                     hop_key = weights @ self.wk
                 fetched = self.retrieval.read(readable, hop_key)
+                if (self.config.index_at_hops and occupied is not None
+                        and self.content is not None
+                        and occupied.count(hop_key) <= 0.0):
+                    # A DEAD END, and the only place this fans out.
+                    #
+                    # The hop named a concept and nothing was ever written at
+                    # it. Rather than return noise -- which is what an ungated
+                    # hop does here, and what note 044's refusal was really
+                    # about -- ask the index which concepts are like the one we
+                    # landed on, and take the first that actually holds
+                    # something.
+                    #
+                    # FIRST that holds something, not best: `nearest` is already
+                    # ranked by similarity, so the first hit is the most similar
+                    # non-empty candidate. Reading all of them and choosing
+                    # would be decision 146's averaging again, and 147 refuted
+                    # every rule for choosing among them by magnitude.
+                    landed = int(np.argmax(weights))
+                    for candidate, _ in self.content.nearest(
+                            landed, self.config.index_branches):
+                        if self.config.hop_relation >= 0:
+                            near = self.key_source.pair(
+                                self.config.hop_relation, int(candidate))
+                        else:
+                            near = self.wk[int(candidate)]
+                        if occupied.count(near) > 0.0:
+                            fetched = self.retrieval.read(readable, near)
+                            break
                 if self.config.hop_accumulate == "bind":
                     # HOLD BOTH, by binding them into one vector.
                     #

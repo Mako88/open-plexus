@@ -106,16 +106,84 @@ result is this project grading its own homework.
 > `vocab × d` linear map (decision 62) — one fact that explains decision 63, 115
 > and g14-01 at once.
 
-### ⇒ START HERE: store by CONCEPT, not by surface
+### ⇒⇒ START HERE: the store contributes NOTHING at word level
 
-**The next question, and the three pieces to answer it with are already built.**
+**Decision 136**, and it displaces the addressing question rather than answering
+it.
 
-g17-01's calibration found word-level text unlearnable, and the reason is
+    the model, tuned                          9.185 bits/word
+    the same model, NOTHING ever written
+      to the store -- the readout bias alone  9.187
+    word unigram                              8.068
+    uniform                                  10.759
+
+Those first two are the same model with its memory switched off, agreeing to
+three decimals. **Every word-level bit this model earns is the readout bias**,
+and that bias is 1.12 bits worse than counting how often each word appears.
+
+**The learning rate was not teaching the model to use its memory. It was turning
+the memory off:**
+
+    lr 0.05     floor 10.108    the store is HARMFUL, by 0.92 against nostore
+    lr 5e-6     floor  9.185    the store is INERT, to three decimals
+
+No rate between 5e-4 and 2e-6 makes it positive. So the 0.98 bits that looked
+like a recovered baseline is the model shedding a component that was hurting it.
+
+**Which makes the next question this**, and it is bigger than addressing: *is
+there any rate, width or key scheme at which this store contributes a single
+positive bit at word level?* If not, the architecture line's next move is not a
+better address — it is finding out what the store is for.
+
+**g18-02 asks exactly that**, and its sharpest arm is `single` keys. A single key
+addresses the previous token alone, which makes the store **a bigram in vector
+form** — note 033's ceiling, except that here the ceiling is the target:
+
+    word bigram (NGram)     7.848    what the shape can reach
+    word unigram            8.068
+    the model, tuned        9.185    pair keys
+    the model, NO STORE     9.187    the bias alone
+
+A bigram beats the bias-only model by **1.34 bits**. If the store cannot approach
+that when addressed exactly the way a bigram is addressed, the problem is not the
+address space — it is the store. g17-01 reported single keys diverging at word
+level, at `lr 0.05` with no cap, and both of those are gone.
+
+**Its rate is swept rather than inherited**, because 5e-6 was settled for pair
+keys at width 128, and carrying it into a different key scheme would be
+[note 046](docs/notes/046-the-frozen-learning-rate-may-have-created-a-conclusion.md)'s
+mistake one more time.
+
+**Not a general claim.** At character level the store has no bias to fall back on
+and reaches 5.17 against a 6.00 uniform, so it is doing something there. This is
+word level, width 128, pair keys, one epoch, one seed.
+
+### What is dispatchable right now
+
+| run | asks | state |
+|---|---|---|
+| **g18-02** | can the store contribute a positive bit at all — single keys, width, rate | **the one that matters.** A gate, a rail, a falsifier |
+| **g18-01** | the K axis, three seeds, both controls | the pre-registered sweep, now a *verdict* run: its gate already fails at K=128 in five ways |
+
+Both are written, checked and dispatch-only. g18-01 carries `nostore` as an arm
+so no word-level table can be read without the ablation beside it.
+
+### Store by CONCEPT, not by surface — the line this became
+
+**SUPERSEDED by decision 136, above.** Kept because it is how the question was
+posed and because the pieces it asks for are built and tested. What changed: the
+floor it aims at was measured at the worst corner of an unswept grid, and at the
+tuned corner the store contributes nothing at all — so "make the address space
+denser" answers a question that is not the binding one.
+
+g17-01's calibration found word-level text unlearnable, and the reason it gave is
 address sparsity: the store is keyed by word PAIRS, and at word level almost
 every address is seen once. Too many addresses, each too rare.
 
     uniform                                10.759
-    the model, 90,000 training words       10.721   <- the floor to beat
+    the model, as g17-01 measured it       10.721   <- NOT the floor; see above
+    the model, tuned (decision 136)         9.185
+    the same model with NO STORE            9.187   <- the real floor
     word unigram                            8.068   <- the bar that matters
     word bigram                             7.848
 
@@ -135,14 +203,15 @@ words, each seen many times instead of once. **The readout still predicts
 surfaces**, so nothing is lost on the output side: store by concept, emit by
 word.
 
-> **The question:** does storing by concept rather than by surface make
+> **The question as posed:** does storing by concept rather than by surface make
 > word-level text learnable at all?
 >
-> **Bar** 8.068, the unigram. **Control** the same grouping built from SHUFFLED
-> content must fail — otherwise the gain is the address space shrinking and not
-> the grouping meaning anything, and those are different findings.
+> **Answered at K=128, and the answer is no** — every grouping arm is at or
+> behind a floor that is itself an inert store. The K axis and the controls are
+> still worth running as a verdict (g18-01), but the gate has already failed in
+> five different ways.
 
-### BUILT, 2026-07-29 — and the floor is no longer 10.721
+### BUILT, 2026-07-29 — the pieces, and what they measured
 
 `openplexus/grouping.py` (spherical k-means over content vectors) and
 `keys.ByConcept` (any key source, addressed by concept instead of surface) are
@@ -163,47 +232,46 @@ reaching 1.6e63. Pair keys over surfaces never did, because the defect *was* the
 brake: almost every address was written once, so the sparsity that made the model
 useless was the only thing holding the store's norm down.
 
-### ⇒ IN FLIGHT: g18-00, and it may undo g17-01's conclusion
+### g18-00, three passes — how the headline above was reached
 
-Run [30425355572](https://github.com/Mako88/open-plexus/actions/runs/30425355572),
-dispatched 2026-07-29 05:32Z. 30 cells: `{floor, concept-128, stratified-128} ×
-lr {0.05, 0.01, 0.005, 0.001, 0.0005} × cap {0, 5}`, one seed.
+118 cells over three CI passes — runs
+[30425355572](https://github.com/Mako88/open-plexus/actions/runs/30425355572),
+[30425842494](https://github.com/Mako88/open-plexus/actions/runs/30425842494),
+[30426222929](https://github.com/Mako88/open-plexus/actions/runs/30426222929) —
+plus one local ablation. Full record in
+[the sweep file](experiments/sweeps/g18-00-what-does-each-arm-need-to-run-at-all.txt).
 
-**Because the brake is the LEARNING RATE**, and it moves the floor. At 20,000
-words with a readout bias, no cap:
+The rate was frozen at `lr=0.05` from character level, and **note 028 had audited
+exactly that defect one line earlier**. Sweeping it and the store's cap moved the
+floor from 10.195 to 9.185 — before the ablation showed what that movement was.
 
-    lr        floor    concept-128
-    0.05     10.186    DIVERGED
-    0.01      9.851    10.353
-    0.005     9.804    10.349
-    0.001     9.734    10.428     <- floor still improving at the grid edge
+**Five addressing schemes at K=128**, each at its own best rate:
 
-> **If that holds at 90,000 words, "the model does not learn word-level text at
-> all" is partly a statement about one hyper-parameter** — `lr=0.05`, the value
-> every character-level sweep used — rather than about the model. g18-01 would
-> then have measured its mechanism against a handicapped baseline, which is what
-> g10-09 was retracted for.
+    floor            9.185     no grouping
+    stratified-128   9.185     only the rare tail grouped
+    current-128      9.252     one coordinate of the pair grouped
+    context-128      9.591     the other coordinate
+    concept-128      9.985     both coordinates
+    nostore          9.187     nothing written at all
 
-**The rate alone is not enough at scale**: lr 0.005 holds concept-128 at 20,000
-words and blows up at 90,000 — 36.9 bits against a 10.759 uniform, **finite and
-useless**. Hence both axes, at the size the sweep uses.
+Read with `nostore`, that is not "collapse costs resolution". **The store was not
+using any resolution**, so grouping did not spend any — what the groupings did was
+make an inert component harmful again, in proportion to how much they collapse.
 
-That 36.9 is why there are now two rails rather than one. `diverged` catches a
-NaN; **`unstable` catches a calibrated model that is worse than uniform**, which
-cannot happen unless the calibration text and the test text disagree about what
-the model does. Without it, that cell would have entered a table as a number.
+**Two rails were added on the way and both fired.** `diverged` catches a NaN;
+**`unstable` catches a calibrated model worse than uniform**, which cannot happen
+unless the calibration and test text disagree about what the model does. The
+second exists because concept-128 at lr 0.005 returned 36.9 bits with no NaN
+anywhere — it would have entered a table as a number.
 
-**Chosen by `fit_error`** — held-out TRAINING text — never by the test set.
-
-**g18-01 is held and cannot be dispatched by accident:** its `lr` and `cap` are
-`SETTINGS_FROM_G18_00`, which parses as a float in nothing, so a job started
-before g18-00 lands fails on its first line rather than returning a number.
+**Everything is chosen by `fit_error`** — held-out TRAINING text — never by the
+test set.
 
 **What was true and is now wrong:** the earlier instruction here said *"do not
 start by fixing word-level text directly (decay, cap, learning rate) — that is a
 separate and much longer line."* The mechanism could not be measured without
-touching it: concept addressing does not run at the stock learning rate at all.
-The two questions turned out to be one.
+touching it: concept addressing does not run at the stock learning rate at all,
+and the rate turned out to be the finding. The two questions were one.
 
 ### 0. THE ARCHITECTURE LINE — where the work actually is
 

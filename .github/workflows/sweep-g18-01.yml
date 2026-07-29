@@ -60,12 +60,27 @@ name: sweep-g18-01-does-storing-by-concept-make-words-learnable
 # `concept`: `permuted` and `shuffled` group both coordinates, so scoring a
 # one-sided arm against them would be two changes in one comparison.
 
-# ⚠ NOT DISPATCHABLE UNTIL g18-00 LANDS. The learning rate and the cap below are
-# deliberately unset: g18-00 measures what each arm needs to run at all, and
-# dispatching this at the model's stock lr 0.05 would compare a mechanism against
-# a baseline handicapped by a hyper-parameter -- the confound g10-09 was
-# retracted for. `SETTINGS_FROM_G18_00` parses as a float in nothing, so a job
-# started before then fails on its first line instead of returning a number.
+# WHAT g18-00 ALREADY SAYS, so this run is a verdict rather than a question.
+# At K=128, each arm at its own best rate:
+#
+#     floor            9.185     no grouping
+#     stratified-128   9.185     only the rare tail grouped
+#     current-128      9.252     one coordinate grouped
+#     context-128      9.591     the other coordinate grouped
+#     concept-128      9.985     both coordinates grouped
+#     word unigram     8.068     still 1.12 bits ahead of the best arm
+#
+# The arms are ordered exactly by how much resolution the grouping destroys, and
+# recurrence rises tenfold across that table while buying nothing anywhere. P1's
+# gate is already failing at one K in five ways.
+#
+# THIS RUN EXISTS TO MAKE THAT A VERDICT: the whole K axis, three seeds, and the
+# two controls. A refutation measured at one K and one seed is a signal.
+#
+# `nostore` writes nothing at all, so the readout has only its bias. If it lands
+# where the tuned floor lands, the store is inert at this rate and every arm
+# comparison here is between two inert models -- which would matter more than
+# anything else in the table.
 
 on:
   workflow_dispatch:
@@ -75,8 +90,17 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  LR: SETTINGS_FROM_G18_00
-  CAP: SETTINGS_FROM_G18_00
+  # SETTLED BY g18-00, three passes, runs 30425355572 / 30425842494 /
+  # 30426222929. The floor's choice is interior at last -- 5e-6 by held-out
+  # training text, after two passes in which every arm sat on the grid's edge.
+  #
+  # ONE RATE FOR EVERY ARM, and the objection is answered rather than dodged:
+  # `concept-128`'s own best is 2e-6, worth 0.03 bits over 5e-6. Its deficit
+  # against the floor is 0.80. Running every arm at one rate handicaps the
+  # mechanism by 4% of the gap it has to close, and running each at its own
+  # would make the K axis incomparable across arms.
+  LR: "0.000005"
+  CAP: "5.0"
 
 jobs:
   grid:
@@ -84,7 +108,7 @@ jobs:
       fail-fast: false
       matrix:
         seed: [0, 1, 2]
-        arm: [floor, concept, stratified, context, current, permuted, shuffled]
+        arm: [floor, nostore, concept, stratified, context, current, permuted, shuffled]
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -111,7 +135,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arm: [floor, concept, stratified, context, current, permuted, shuffled]
+        arm: [floor, nostore, concept, stratified, context, current, permuted, shuffled]
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -134,35 +158,8 @@ jobs:
           name: g18-01-${{ matrix.arm }}-0-bias0
           path: out/*.json
 
-  divergence:
-    strategy:
-      fail-fast: false
-      matrix:
-        arm: [floor, concept]
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - name: Install numpy
-        run: pip install numpy
-      - name: no brake, arm ${{ matrix.arm }}
-        run: |
-          set -o pipefail
-          mkdir -p out
-          python experiments/g18_01_does_storing_by_concept_make_words_learnable.py \
-            --seed 0 --arm ${{ matrix.arm }} \
-            --bias 1 --cap 0 --lr ${{ env.LR }} --decay 1.0 \
-            --json out/${{ matrix.arm }}-0-nobrake.json
-      - uses: actions/upload-artifact@v4
-        with:
-          name: g18-01-${{ matrix.arm }}-0-nobrake
-          path: out/*.json
-
   aggregate:
-    needs: [grid, nobias, divergence]
+    needs: [grid, nobias]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -180,7 +177,7 @@ jobs:
       - name: Combine
         run: |
           set -o pipefail
-          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 30" | tee summary.txt
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 32" | tee summary.txt
           python -m tools.summarise_g18_01 | tee -a summary.txt
       - name: Summary
         if: always()

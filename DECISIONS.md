@@ -3714,3 +3714,97 @@ learnable at all" is a fair one.
 
 **Taken without asking**, under standing authorisation. Nothing is retracted;
 STATE and g17-01's record are corrected in place with the old figures shown.
+
+## 136. At word level the store contributes nothing, and the floor is its own ablation
+
+g18-00, three passes, 118 cells, runs 30425355572 / 30425842494 / 30426222929,
+plus one local ablation. **The headline is not about concept addressing.**
+
+    the model, tuned          9.185 bits/word
+    the same model, NOTHING
+      ever written to the
+      store -- bias only      9.187
+    word unigram              8.068
+    uniform                  10.759
+
+**Those first two numbers are the same model with its memory switched off, and
+they agree to three decimals.**
+
+### How this was reached, because the route matters
+
+g17-01 reported the model at 10.721 and concluded it does not learn word-level
+text at all. Two corrections landed on the way here:
+
+- **The bar was wrong** (decision 135): the unigram is 8.068, not 9.323.
+- **The rate was frozen** (note 046): `lr=0.05` came from character level.
+  Sweeping it and the store's cap took the floor from 10.195 to **9.185**, which
+  is 0.98 bits against the 0.038 the original finding rested on.
+
+That second correction looked like good news for the model. **The ablation says
+it is not news about the model at all.**
+
+### The prediction, and it was refuted in the useful direction
+
+Registered in the sweep record before the ablation returned: `nostore` would land
+near the unigram at 8.068, meaning the store is a net *cost*.
+
+**Measured 9.187.** The bias does not learn a unigram — it is 1.12 bits worse
+than counting — so the "actively harmful" half is wrong at this rate. The other
+half is right and larger: the store contributes **nothing**.
+
+### What the learning rate was actually doing
+
+    lr 0.05     floor 10.108    the store is HARMFUL, by 0.92 against nostore
+    lr 5e-6     floor  9.185    the store is INERT, to three decimals
+
+No rate between 5e-4 and 2e-6 makes it positive. **Lowering the learning rate
+does not teach the model to use its memory; it turns the memory off.** The 0.98
+bits "recovered" is the model shedding a component that was hurting it.
+
+### And it explains the result that looked like a mechanism finding
+
+Five addressing schemes at K=128, each at its own best rate:
+
+    floor            9.185     no grouping
+    stratified-128   9.185     only the rare tail grouped
+    current-128      9.252     one coordinate of the pair grouped
+    context-128      9.591     the other coordinate
+    concept-128      9.985     both coordinates
+
+That reads as "every step of address collapse costs accuracy". With the ablation
+it reads more simply: **the store was not using any resolution, so grouping did
+not spend any.** What the groupings did was make an inert component harmful
+again — and the ordering tracks how much collapse each one applies.
+
+`floor` and `stratified-128` agreeing to three decimals at four separate rates
+was the clue, and it is what the ablation was written to chase. Two addressing
+schemes cannot agree that precisely unless what distinguishes them has stopped
+mattering.
+
+### What this does NOT say
+
+**Not that the store is inert generally.** At character level it has no bias term
+to fall back on and it reaches 5.17 against a 6.00 uniform, so it is doing
+something there. This is a word-level result at width 128, one seed, pair keys,
+one epoch.
+
+**Not that g17-01's address-sparsity account is wrong.** It may well be true. It
+is no longer the *binding* constraint: at the tuned rate the store is not
+superposing anything, reusable or not.
+
+**Not that concept addressing is exonerated.** It is behind an inert baseline by
+0.80 bits. Its own P1 gate asks for +0.10 the other way.
+
+### What it licenses, and what it stops
+
+**Stops:** reading any word-level table without `nostore` in it. It is now an arm
+of g18-01 for exactly that reason.
+
+**Opens, and this is the question that matters more than addressing:** is there
+any rate, width or key scheme at which this store contributes a single positive
+bit at word level? If the answer is no, the architecture line's next move is not
+a better address — it is finding out what the store is for.
+
+**Taken without asking**, under standing authorisation, at 06:0x on 2026-07-29
+with John asleep. Nothing is retracted: g18-00's record carries every figure, and
+the prediction it refuted is scored in place rather than rewritten.

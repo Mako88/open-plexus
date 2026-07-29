@@ -95,6 +95,7 @@ range locally before spending CI on it.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import time
 from pathlib import Path
@@ -126,7 +127,8 @@ EPOCHS = 1
 CHUNK = 256
 SEEDS = tuple(range(3))
 GROUPS = (64, 128, 256, 512, 1024)
-KINDS = ("concept", "stratified", "context", "current", "permuted", "shuffled")
+KINDS = ("nostore", "concept", "stratified", "context", "current",
+         "permuted", "shuffled")
 #: Which coordinate of the pair key each arm groups. `context` and `current`
 #: carry the SAME learned grouping as `concept` and differ only in where it is
 #: applied, so a difference between the three is about the coordinate and not
@@ -246,7 +248,7 @@ def surfaces_for(kind: str, k: int, vocab: int, stream: np.ndarray,
     lets the clusterer find whatever survives, which is mostly frequency. Two
     ways of being wrong need two controls.
     """
-    if kind == "floor":
+    if kind in ("floor", "nostore"):
         return OneConceptPerToken(vocab), None
     if kind == "shuffled":
         # The SAME words in a different order, so unigram statistics are
@@ -276,7 +278,8 @@ def surfaces_for(kind: str, k: int, vocab: int, stream: np.ndarray,
 
 
 def addressing(stream: np.ndarray, surfaces, vocab: int,
-               coordinates: str = "both") -> tuple[int, float]:
+               coordinates: str = "both",
+               keys: str = "pair") -> tuple[int, float]:
     """Distinct pair addresses in the training stream, and mean recurrence.
 
     **The rail.** The whole proposal is that grouping collapses the address space
@@ -288,6 +291,13 @@ def addressing(stream: np.ndarray, surfaces, vocab: int,
     pair, so counting both halves would report a collapse it did not make.
     """
     grouped = np.asarray([surfaces.of(int(t)) for t in stream])
+    if keys == "single":
+        # A single key addresses ONE token, so the address space is the
+        # vocabulary rather than the pairs in it. Counting pairs here would
+        # report a collapse the store never sees and make the rail read the
+        # wrong mechanism entirely.
+        addresses = len(set(grouped[:-1].tolist()))
+        return addresses, (len(stream) - 1) / max(addresses, 1)
     # Shifted exactly as `ByConcept` shifts, so a concept and a surface cannot
     # be counted as one address here while being two in the model.
     shifted = grouped + (0 if coordinates == "both" else vocab)
@@ -298,7 +308,27 @@ def addressing(stream: np.ndarray, surfaces, vocab: int,
     return len(pairs), (len(stream) - 1) / max(len(pairs), 1)
 
 
-def collected(model, chunks) -> tuple[np.ndarray, np.ndarray]:
+def silent(tokens: np.ndarray) -> np.ndarray:
+    """A storage mask that writes NOTHING. The `nostore` ablation.
+
+    **The control this run turned out to need.** As the learning rate falls,
+    `floor` and `stratified-128` converge to the same bits per word to three
+    decimals at four different rates — two different addressing schemes cannot
+    agree that precisely unless what distinguishes them has stopped mattering.
+    The suspicion is that the small-rate regime is one where the store barely
+    contributes and the readout's bias is doing the work, which would make "the
+    model learns word-level text better than we thought" a statement about a
+    unigram-shaped prior rather than about the memory.
+
+    Nothing is ever written, so every retrieval is near zero and the readout has
+    only its bias. If that arm lands where the tuned floor lands, the store is
+    inert there and every comparison at that rate is between two inert models.
+    """
+    return np.zeros(len(tokens), dtype=bool)
+
+
+def collected(model, chunks, store: bool = True) -> tuple[np.ndarray,
+                                                          np.ndarray]:
     """Every prediction and the word that actually came.
 
     The trace starts at position 1: position 0 has no previous token, so there
@@ -307,7 +337,8 @@ def collected(model, chunks) -> tuple[np.ndarray, np.ndarray]:
     rows, wanted = [], []
     for tokens in chunks:
         trace: list[dict] = []
-        model.run(tokens, trace=trace)
+        model.run(tokens, trace=trace,
+                  store=None if store else silent(tokens))
         for entry in trace:
             rows.append(entry["scores"])
             wanted.append(int(tokens[entry["t"]]))
@@ -333,17 +364,18 @@ def counting_bars(vocab: int, stream: np.ndarray, chunks) -> tuple[float, float]
 
 
 def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
-             decay: float = 1.0, cap: float = 5.0, lr: float = 0.05) -> dict:
+             decay: float = 1.0, cap: float = 5.0, lr: float = 0.05,
+             keys: str = "pair", width: int = WIDTH) -> dict:
     started = time.time()
     built = built or corpus()
     stream = built.train[0][:TRAIN_WORDS]
     surfaces, index = surfaces_for(kind, k, built.vocab_size, stream, seed)
     model = LocalAssociativeMemory(LocalMemoryConfig(
-        d_model=WIDTH, vocab_size=built.vocab_size, seed=seed,
-        derived_keys=True, context_keys=True, readout_bias=bias,
+        d_model=width, vocab_size=built.vocab_size, seed=seed,
+        derived_keys=True, context_keys=(keys == "pair"), readout_bias=bias,
         decay=decay, memory_cap=cap, lr=lr))
     coordinates = COORDINATES.get(kind, "both")
-    if kind != "floor":
+    if kind not in ("floor", "nostore"):
         # The store is addressed by concept; `model.surfaces` keeps routing
         # consistent with it for the partitioned path, which is off here.
         model.key_source = ByConcept(model.key_source, surfaces,
@@ -358,11 +390,13 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
     cut = int(len(stream) * 0.8)
     training = pieces((stream[:cut],), CHUNK)
     calibration = pieces((stream[cut:],), CHUNK)
+    writes = kind != "nostore"
     for _ in range(EPOCHS):
         for piece in training:
-            model.run(piece, piece, np.ones(len(piece), bool), learn=True)
+            model.run(piece, piece, np.ones(len(piece), bool), learn=True,
+                      store=None if writes else silent(piece))
 
-    fit_scores, fit_targets = collected(model, calibration)
+    fit_scores, fit_targets = collected(model, calibration, writes)
     test_chunks = pieces(built.test, CHUNK)
     # DIVERGENCE IS A RESULT, NOT A CRASH. Without a brake the store's norm runs
     # away once addresses recur, and the readout goes with it. Reported as its
@@ -376,7 +410,7 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
     else:
         temperature = min(TEMPERATURES,
                           key=lambda t: bits(fit_scores, fit_targets, t))
-        test_scores, test_targets = collected(model, test_chunks)
+        test_scores, test_targets = collected(model, test_chunks, writes)
         error = round(bits(test_scores, test_targets, temperature), 4)
     # WHAT A SETTING MAY BE CHOSEN BY. `error` is measured on the test text, so
     # picking a learning rate or a K by it would be selection on the thing being
@@ -396,12 +430,12 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
     uniform = float(np.log2(built.vocab_size))
     unstable = bool(not diverged and error > uniform + 0.05)
     addresses, recurrence = addressing(stream, surfaces, built.vocab_size,
-                                       coordinates)
+                                       coordinates, keys)
     unigram, bigram = counting_bars(built.vocab_size, stream, test_chunks)
     return dict(
         arm=f"{kind}-{k}" if kind != "floor" else "floor",
         kind=kind, groups=k, seed=seed, bias=bias,
-        decay=decay, cap=cap, lr=lr, coordinates=coordinates,
+        decay=decay, cap=cap, lr=lr, coordinates=coordinates, keys=keys,
         diverged=bool(diverged),
         unstable=unstable,
         error=error,
@@ -425,11 +459,12 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
         train_words=int(len(stream)),
         scored=int(len(test_targets)),
         index_numbers=index.numbers_held if index else 0,
-        store_numbers=WIDTH * WIDTH,
+        store_numbers=width * width,
+        width=width,
         seconds=round(time.time() - started, 1),
         condition=f"{kind}{k if kind != 'floor' else ''}"
-                  f"|bias{int(bias)}|decay{decay}|cap{cap}|lr{lr}"
-                  f"|d{WIDTH}|seed{seed}"
+                  f"|bias{int(bias)}|decay{decay}|cap{cap}|lr{lr}|{keys}"
+                  f"|d{width}|seed{seed}"
                   f"|power{POWER}|min{MIN_COUNT}|epochs{EPOCHS}")
 
 
@@ -488,6 +523,20 @@ def main() -> int:
                         help="one K only. For a calibration that is about "
                              "something else -- the learning rate, say -- and "
                              "should not spend the whole K axis on it")
+    parser.add_argument("--width", type=int, default=WIDTH,
+                        help="d_model. 'the store holds nothing useful' and "
+                             "'the store is too small to hold anything useful' "
+                             "are different findings and only one is about the "
+                             "architecture")
+    parser.add_argument("--keys", choices=("pair", "single"), default="pair",
+                        help="pair keys address (t-1, t); single keys address "
+                             "the previous token alone, which makes the store "
+                             "a BIGRAM in vector form. The bigram bar is 7.848 "
+                             "against the bias-only 9.185, so this asks "
+                             "whether the store can reach what it is shaped "
+                             "like. g17-01 found single keys diverge at word "
+                             "level -- at lr 0.05 with no cap, both of which "
+                             "decision 136 replaced")
     parser.add_argument("--calibrate", action="store_true",
                         help="one seed, a few K, locally -- does anything move")
     args = parser.parse_args()
@@ -509,17 +558,43 @@ def main() -> int:
     for seed in seeds:
         for bias in biases:
             for kind in kinds:
-                for k in ((0,) if kind == "floor" else sizes):
+                # `nostore` has no grouping to vary any more than `floor` does,
+                # so it gets ONE cell rather than one per K. Without this it
+                # runs the K axis five times over and returns five identical
+                # rows -- four wasted cells, and a table in which the ablation
+                # looks like it was measured across a sweep it never saw.
+                for k in ((0,) if kind in ("floor", "nostore") else sizes):
                     record = one_cell(kind, k, seed, built, bias=bias,
                                       decay=args.decay, cap=args.cap,
-                                      lr=args.lr)
+                                      lr=args.lr, keys=args.keys,
+                                      width=args.width)
                     print(f"  {record['condition']:52s} "
                           f"bits {record['error']:.4f}  "
                           f"addresses {record['addresses']}"
                           f"{'  DIVERGED' if record['diverged'] else ''}",
                           file=sys.stderr, flush=True)
                     records.append(record)
-    harness.emit(records, Path(args.json) if args.json else None)
+    # NOT `harness.emit`. With no `--json` it falls through to `harness.table`,
+    # which reads an `accuracy` field every cell here reports bits instead of --
+    # so a local run does its four minutes of work and then dies on a KeyError
+    # with the results still in memory. The shared writer is right for
+    # accuracy-shaped experiments and this is not one.
+    if args.json:
+        path = Path(args.json)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(records, indent=1), encoding="utf-8")
+        print(f"wrote {len(records)} records to {path}")
+    else:
+        for record in records:
+            print(f"{record['condition']}  bits {record['error']}  "
+                  f"fit {record['fit_error']}  "
+                  f"addresses {record['addresses']:,}  "
+                  f"recurrence {record['recurrence']}"
+                  f"{'  DIVERGED' if record['diverged'] else ''}"
+                  f"{'  UNSTABLE' if record['unstable'] else ''}")
+        print(f"unigram {records[0]['unigram']}  "
+              f"bigram {records[0]['bigram']}  "
+              f"uniform {records[0]['uniform']}")
     return 0
 
 

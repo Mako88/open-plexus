@@ -117,7 +117,40 @@ alone means building it twice.
 | **0a** | **persistent slow store** | **DONE and REFUTED in its strong form** (decision 133). Worth **0.08 bits at every scale** — keep it — but it does not move the wall |
 | **0b** | **concept partitioning** | **PARTS BUILT, NOT WIRED.** `ownership.Ring` + `partitioned.ConceptStore` + replication exist and are tested. The capacity falsifier ran (g16-01, decision 134). **The falsifier that matters has not: can the model still LEARN through it?** |
 | **0d** | **repair / anti-entropy** | **NEW GAP, surfaced by John's own question.** Replication depletes and never recovers. Nothing is built |
-| 0c | content-derived keys | not started; every key is a random draw, so the store has **no notion of similarity at all** |
+| **0c** | **addresses that mean something** | **NOW THE LIVE WORK** (was "content-derived keys"). [Note 045](docs/notes/045-addresses-that-mean-something.md) scopes it, and **its cheapest gate has passed**. The direct route is REFUSED on our own evidence |
+
+**0c is the deeper limit, and John named it before I did.** *"We need a way to
+represent the same concept"* — a picture of a dog, a drawing, a sound, the word.
+That is the same problem as 0c's one-line description, seen from the other end: a
+concept can only have one address today, because the address IS the token id.
+Note 045 works it through. Two things it settled:
+
+- **Similarity does NOT go in the key vector.** Note 035 already said so —
+  interference is `O(N·ρ)` in mean key cosine — and the refusal is on our own
+  record rather than on taste. Instead: keep hash-derived ids for the store,
+  add a separate **index** from a content vector to concept ids, and read by
+  committing to a hard id. That is the third independent argument for
+  commit-to-a-token (accuracy, decision 123; routability, note 044; now
+  capacity), and it dissolves note 044's ring-versus-similarity tension —
+  only the index needs locality-sensitive placement.
+- **P4 passed.** Co-occurrence vectors built by one local accumulation per
+  observed pair carry real structure (`king → prince, crown`; `father → son,
+  brother`), where the same construction on a **shuffled corpus returns only
+  high-frequency words**. Caveat that changed the plan: mean off-diagonal cosine
+  is 0.50 against hash keys' 0.0005, and the standard fix over-corrects, so
+  **weighting is a swept axis rather than a default**.
+
+**And "sweep everything, then filter" was tested and half-refuted** (John's
+proposal). At equal read budget, one view at top-30 beats the union of three
+weightings at top-10 (recall 0.104 against 0.086) — **depth beats variety**,
+because the views largely return the same candidates. Retrieve-then-filter
+stands; diversifying by weighting does not.
+
+> **None of those numbers are results.** Single corpus, single seed, no
+> pre-registration — they are for deciding what to build. The comparison John
+> asked for is a proper sweep with an **exhaustive-retrieval ceiling arm**, the
+> current model as floor, and **reads per answered position quoted beside every
+> accuracy** so neither can be cited without the other.
 
 **0b's remaining risk is the one nothing has touched.** Everything measured so far
 is a property of the *store* — capacity, balance, survival. The model has never
@@ -815,10 +848,23 @@ again** — this list exists because several of these were proposed twice.
   as its own subprocess and fails if any fails.
 - **Batch commits when a sweep is in flight** — every push queues seven check jobs
   ahead of the matrix, and a second push cancels the first run.
+- **Mutations run in CI, not locally** — John, 2026-07-29, and there was no
+  excuse: `.github/workflows/checks.yml` has sharded them six ways since before
+  this rule existed. `--changed` after touching `local_memory.py` selects **80 of
+  the 165 mutations**, each re-running an 85-second suite, which is roughly two
+  hours during which nothing else can be edited or measured. Run locally only
+  when iterating on **one or two specific mutations**; everything else is a push.
 - **The mutation harness takes the tree exclusively.** Stopping the background
   task does not stop it: that kills the shell wrapper and leaves the Python
   process editing source. Two full check runs once passed against a tree that was
   still being mutated.
+
+  **To actually stop one:** kill the `python tools/mutate.py` processes AND the
+  `unittest discover` child by PID (`taskkill //F //PID ...`), then
+  `git checkout --` the mutated file and confirm with `mutate.py --verify`, which
+  prints `source clean: all N originals present`. A run killed mid-swap leaves a
+  live mutation on disk and `git status` showing one modified file — which looks
+  exactly like ordinary uncommitted work.
 
 ## The standard this project holds itself to
 

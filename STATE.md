@@ -63,58 +63,56 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Can a hop carry its OWN relation?**
+**What is an "answer"?**
+
+ARCHITECTURE row **F3**, and decision 163 §3 is John choosing it as the next
+work. **Nothing in this project has ever scored a multi-token answer.** Every
+task emits one token, so *"form a response from awareness of the concepts in the
+question"* — GOALS §1, the actual goal — has never been tested.
+
+    (a) AUTOREGRESSIVE   emit a token, feed it back, repeat
+    (b) TRAVERSAL        walk the concept graph and emit what is visited
+    (c) SLOTS            fill a fixed frame
+
+**(a) deserves care rather than reflex rejection.** GOALS §2 rules out next-token
+prediction as the TRAINING OBJECTIVE, which is a different thing from
+autoregression as an output MECHANISM. Conflating them would be a rule
+misapplied. [Note 052 §3](docs/notes/052-decisions-that-cascade.md) has the
+options and the blast radius.
+
+**It reaches backwards, which is why it is worth doing before more mechanisms.**
+Every task, every accuracy number and the whole scoring convention assume one
+answer token. Whatever is chosen, the existing tasks stay valid as capability
+probes and stop being measurements of the goal.
+
+### Parked, with its blocker named: can a hop carry its own relation?
 
 `hop_relation` is one value per MODEL, so a chain follows LINK-then-LINK or
-FACT-then-FACT and never LINK-then-FACT. **The linked-families path needs exactly
-that** — decision 162:
+FACT-then-FACT and never LINK-then-FACT — exactly what the linked-families path
+needs (162). Small in code, large in implication: "which relation at which depth"
+is a **schedule**, and a fixed schedule is a fitted constant unless the task
+supplies it. **This blocks the LINKED run, not the gates.**
 
-    key(FACT, entity)   empty; the gate fires, correctly
-    key(LINK, rep)      -> the linked family's representative   hop 1, LINK
-    key(FACT, rep')     -> its value                            hop 2, FACT
-
-Decision 158 called the limit *"the relation is fixed, not chosen"*. The sharper
-statement is **one relation per model, not one per hop**, and it is the second
-that blocks the run. A correct chooser would not help until a hop can carry its
-own relation.
-
-**Small in code, large in implication.** `hop_relation` becomes a sequence
-indexed by depth — but "which relation at which depth" is a **schedule**, and a
-fixed schedule is a fitted constant unless the task supplies it. That makes note
-052 §2's cascading decision more urgent than that note says: it is not an
-optimisation, it is what composition requires.
-
-### Where today's mechanisms actually stand
+### Where the mechanisms stand
 
 **Every one works in isolation with a unit test. Not one has a task number.**
-That is not a hedge, it is the state:
-
-    148  the gate chooses, exactly            1.0000 / 0.0000, three seeds
-    157  typed writes stop the collision      every column within 0.05
-    158  a hop follows a NAMED edge           same position, different answer
-    159  the index proposes at a dead end     1 extra read against an ungated 56
-    161  and `inherit` is now read-gated      148 reproduces to four decimals
-
-**The LINKED column at 0.1275 is still the number to move**, and decision 162
-names the missing piece rather than leaving it as "we should run it".
+That is the state, not a hedge — 148 the gate chooses exactly (1.0000/0.0000),
+157 typed writes stop the collision, 158 a hop follows a named edge, 159 the
+index proposes at a dead end for 1 extra read against an ungated 56, 161
+`inherit` is read-gated and 148 still reproduces to four decimals. **157's LINKED
+column at 0.1275 is the number to move**, and 162 names what is missing.
 
 ### The rail this project does not have
 
 Decision 161: accuracy is measured everywhere, and **the read count that C1 and
-G4 both turn on is measured nowhere**. Two cost claims were made from reasoning
-and both were wrong — 159 about why A and B conflict, 160 about whether
-`inherit` was gated. Both were caught by writing the measurement down.
-`tests/test_index_at_hops.py` counts reads in three places and nothing else in
-the project does.
+G4 both turn on is measured nowhere.** Two cost claims were made from reasoning
+and both were wrong (159, 160); both were caught only by writing the measurement
+down. `tests/test_index_at_hops.py` counts reads in three places and nothing else
+does. **Build it with measured budgets** — a rail with a guessed threshold is
+worse than none, which decision 155's own p90 calibration proved by flagging what
+chance produces.
 
-### The questions this replaced, both answered
-
-*Does the read gate survive contact with anything that is not this task* — **yes,
-and its scope is measured rather than hoped for** (149–153, below).
-
-*Is there a task that needs the gate and the hop at once* — note 050 designed
-one, its first layout was refuted by its own rail (155), and note 051 supersedes
-the question: the collision that killed it is what typed edges make impossible.
+### Answered and moved to DECISIONS
 
 Decision 148 answered the one before those — *can anything tell which of two
 retrievals to trust* — with **yes, once the question is asked exactly.**

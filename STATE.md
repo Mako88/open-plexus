@@ -209,26 +209,55 @@ so this is one `gh workflow run` to reverse.
 A model with **no memory whatsoever** lands within 0.016 bits of the best result
 this project has ever recorded on text.
 
-**It is not yet a like-for-like comparison and must not be quoted as one.**
-5.172 was measured at a different width, over more data, with the bias OFF and
-eighteen arms composed. 5.188 is width 128, 90,000 characters, one epoch, one
-seed, bias ON. The comparison that settles it is `floor` against `nostore` at
-*identical* settings, which is the whole design of g18-03.
+**It is not a like-for-like comparison and must not be quoted as one.** 5.172 was
+measured at a different width, over more data, with the bias OFF and eighteen
+arms composed. 5.188 is width 128, 90,000 characters, one epoch, one seed, bias
+ON. **And the section below is the reason it cannot yet be made like-for-like:**
+this harness does not reproduce the character-level floor at all, so its
+character numbers — including this 5.188 — are measurements of an instrument
+until that is fixed.
 
 > If it holds, **the store has never contributed anything on text at either
 > unit**, and every text number this project holds is a statement about a linear
 > readout rather than about the memory.
 
-**g18-03 is written, checked and dispatch-only**: both units × both bias
-settings × three rates × `{floor, nostore}`, 24 cells. Its gate is that
-character-level `floor` beats `nostore` by more than 0.30 bits with the bias on.
-Its rail is that an unbiased storeless model sits at uniform, because a model
-with neither a store nor a prior has nothing to predict with.
+### ⚠ AND g18-03's FIRST PASS FAILED ITS OWN REPRODUCTION — read before quoting anything above
 
-**Why this was not caught earlier:** the ablation was never run. `readout_bias`
-has been off by default since it was added, so no character-level result was ever
-compared against a model that could express a prior — and there was no arm that
-removed the store while keeping everything else.
+[Run 30431349857](https://github.com/Mako88/open-plexus/actions/runs/30431349857),
+24 of 24 cells. **Its gate reads REFUTED and that verdict is not available**, for
+one reason:
+
+    characters bias0 floor     5.986      this harness
+    decision 63, same model   ~5.53       the comparison set
+
+5.986 against a 6.000 uniform is a model that has learned essentially nothing.
+The character arm is therefore **not the character model**, and a run whose
+control does not reproduce measures the instrument.
+
+**The obvious cause was five inherited constants** — the character line uses
+single keys, `decay 0.997`, no cap, `key_scale 0.5` and `lr 0.05`, and the first
+pass carried the word-level settings across. Note 046's mistake for the third
+time in one night.
+
+**Restoring all five did not fix it.** A local cell at exactly g15-01's settings
+returns **5.9965**. So the difference is something else in this harness, not yet
+identified, and the diagnostic is running.
+
+> **`P0`, added to g18-03: the character `bias 0` floor must land within 0.10 of
+> 5.53 before any other prediction on that unit may be scored.** The run is held
+> until it does. This is decision 131's lesson, which cost a whole matrix the
+> first time.
+
+**What the word half of the pass does say, and it is consistent:** `words bias1`
+reproduces g18-02 exactly (floor 9.185, nostore 9.187), and `words bias0` has the
+store worth **0.054 bits** over knowing nothing — so it is not literally inert,
+it contributes about a twentieth of a bit, and the bias supplies twenty times
+more on its own.
+
+**Why none of this was caught earlier:** the ablation was never run.
+`readout_bias` has been off by default since it was added, so no character-level
+result was ever compared against a model that could express a prior — and there
+was no arm that removed the store while keeping everything else.
 
 ### Store by CONCEPT, not by surface — the line this became
 

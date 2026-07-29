@@ -1,0 +1,105 @@
+Has the store ever contributed anything on TEXT at all?
+=======================================================
+
+Script: experiments/g18_01_does_storing_by_concept_make_words_learnable.py
+        (`--units`, arms `floor` and `nostore`)
+Run:    30431349857, 24 of 24 cells, first pass.
+
+ANSWER: **NOT YET READABLE, AND THE RUN SAYS SO ITSELF.** The character arm does
+        not reproduce this project's own character-level baseline, so its gate
+        cannot be scored. The word half reproduces g18-02 exactly.
+
+
+MEASURED ON
+------------
+Tiny Shakespeare, both units, one seed, width 128, 90,000 training tokens, one
+epoch, chunk 256. Bits per token, temperature fitted on held-out TRAINING text
+and the rate chosen the same way.
+
+
+PREDICTIONS
+------------
+  P1  THE GATE. At character level with the bias ON, `floor` beats `nostore` by
+      more than 0.30 bits.
+  P2  THE RAIL. At `bias 0`, `nostore` sits within 0.05 of uniform.
+  P3  THE FALSIFIER. Character `floor` with the bias ON does not reach the
+      character bigram at 3.884.
+
+SCORED: **P1 NOT SCORED -- the instrument failed its reproduction, see below.**
+        P2 CONFIRMED, exactly: 6.000 against a 6.000 uniform at characters and
+        10.759 against 10.759 at words, both to three decimals. A model with no
+        store and no prior predicts nothing, as it must.
+        P3 CONFIRMED but uninformative while P1 is unreadable.
+
+
+THE TABLE, AND THE ROW THAT INVALIDATES HALF OF IT
+---------------------------------------------------
+Bits per token on TEST text:
+
+    arm                          0.005     5e-05     5e-06
+    characters bias0 floor       5.993     5.986     5.986
+    characters bias0 nostore     6.000     6.000     6.000
+    characters bias1 floor       5.638     5.195     5.189
+    characters bias1 nostore     5.194     5.181     5.188
+    words      bias0 floor      10.707    10.705    10.705
+    words      bias0 nostore    10.759    10.759    10.759
+    words      bias1 floor       9.990     9.217     9.185
+    words      bias1 nostore     9.100     9.213     9.187
+
+    characters   bigram 3.884   unigram 4.852   uniform  6.000
+    words        bigram 7.848   unigram 8.068   uniform 10.759
+
+**`characters bias0 floor` is 5.986 where decision 63 puts the same model at
+about 5.53.** That is not a small discrepancy -- 5.986 is 0.014 below uniform,
+which is a model that has learned essentially nothing, and the comparison set
+says this configuration learns 0.47 bits' worth.
+
+So the character arm is not the character model. **Its gate is unscored rather
+than refuted**, and the tempting headline -- "the store never contributed on
+text" -- is not available from this run.
+
+
+WHY, AND IT IS FIVE INHERITED CONSTANTS
+----------------------------------------
+The character-level comparison set (g15-01's `build`, and decision 63 behind it)
+runs:
+
+    keys          SINGLE (context_keys off)      this run used PAIR
+    decay         0.997                          this run used 1.0
+    memory_cap    0 (none)                       this run used 5.0
+    lr            0.05                           this run swept 0.005 and below
+    key_scale     0.5                            this run used the 1.0 default
+
+Every one of those was settled for WORD level in g18-00 and g18-02 over the
+preceding hours, and carrying them across the unit boundary is **note 046's
+mistake for the third time in one night** -- the note being about exactly this.
+
+The rule the note states was applied to the learning rate and not to the other
+four: when a measurement crosses a boundary that invalidates the comparison set,
+every inherited constant crosses it too.
+
+
+WHAT THE WORD HALF DOES SAY, AND IT IS CONSISTENT
+--------------------------------------------------
+    words bias1   floor 9.185   nostore 9.187   -- reproduces g18-02 exactly
+    words bias0   floor 10.705  nostore 10.759  -- the store is worth 0.054
+
+The second row is the one worth keeping. **With no bias at all, the store buys
+0.054 bits over knowing nothing** -- so it is not literally inert, it is
+contributing about a twentieth of a bit, and the readout bias supplies twenty
+times more than that on its own.
+
+
+NEXT
+-----
+Re-run with per-unit configuration rather than one grid: characters at single
+keys, decay 0.997, no cap, `key_scale` 0.5 and rates around 0.05; words at their
+settled 5e-6 and cap 5.0. **With a REPRODUCTION RAIL** -- the character `bias 0`
+floor must land near decision 63's 5.53 before any gate on that unit is read at
+all. That rail is what this pass lacked, and it is why a wrong answer was one
+sentence away from being written down.
+
+
+COST
+-----
+24 cells, one per job, ~3 min wall. The re-run is the same size.

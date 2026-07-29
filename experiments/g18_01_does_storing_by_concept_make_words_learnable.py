@@ -393,7 +393,7 @@ def counting_bars(vocab: int, stream: np.ndarray, chunks) -> tuple[float, float]
 def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
              decay: float = 1.0, cap: float = 5.0, lr: float = 0.05,
              keys: str = "pair", width: int = WIDTH,
-             units: str = "words") -> dict:
+             units: str = "words", key_scale: float = 1.0) -> dict:
     started = time.time()
     built = built or corpus(units)
     stream = built.train[0][:TRAIN_WORDS]
@@ -401,7 +401,7 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
     model = LocalAssociativeMemory(LocalMemoryConfig(
         d_model=width, vocab_size=built.vocab_size, seed=seed,
         derived_keys=True, context_keys=(keys == "pair"), readout_bias=bias,
-        decay=decay, memory_cap=cap, lr=lr))
+        decay=decay, memory_cap=cap, lr=lr, key_scale=key_scale))
     coordinates = COORDINATES.get(kind, "both")
     if kind not in ("floor", "nostore"):
         # The store is addressed by concept; `model.surfaces` keeps routing
@@ -464,7 +464,7 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
         arm=f"{kind}-{k}" if kind != "floor" else "floor",
         kind=kind, groups=k, seed=seed, bias=bias,
         decay=decay, cap=cap, lr=lr, coordinates=coordinates, keys=keys,
-        units=units,
+        units=units, key_scale=key_scale,
         diverged=bool(diverged),
         unstable=unstable,
         error=error,
@@ -562,6 +562,12 @@ def main() -> int:
                              "'the store is too small to hold anything useful' "
                              "are different findings and only one is about the "
                              "architecture")
+    parser.add_argument("--key-scale", type=float, default=1.0,
+                        dest="key_scale",
+                        help="spread of the key vectors. The character-level "
+                             "comparison set uses 0.5 and the model defaults to "
+                             "1.0, so reproducing a character number needs it "
+                             "stated rather than inherited")
     parser.add_argument("--units", choices=("words", "characters"),
                         default="words",
                         help="characters is decision 137's open question: the "
@@ -606,7 +612,8 @@ def main() -> int:
                     record = one_cell(kind, k, seed, built, bias=bias,
                                       decay=args.decay, cap=args.cap,
                                       lr=args.lr, keys=args.keys,
-                                      width=args.width, units=args.units)
+                                      width=args.width, units=args.units,
+                                      key_scale=args.key_scale)
                     print(f"  {record['condition']:52s} "
                           f"bits {record['error']:.4f}  "
                           f"addresses {record['addresses']}"

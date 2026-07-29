@@ -1972,8 +1972,41 @@ def verify(quiet: bool = False) -> int:
     return 1
 
 
+#: What `--help` prints. **It exists because `--help` used to run the whole
+#: suite**: unrecognised flags were ignored, so the one command every tool in the
+#: world treats as safe took the tree exclusively, mutated `corpus.py`, and left
+#: an experiment that was already running to read mutated source for as long as
+#: it took someone to notice. 2026-07-29, and the experiment's results were void.
+USAGE = """tools/mutate.py -- verify the tests can fail
+
+  --verify          check the source is clean; edits nothing, takes no lock
+  --changed         only mutations touching files changed against origin/master
+  --only NAME[,..]  named mutations
+  --shard N/TOTAL   one shard of the mutation set, for CI
+  --help            this text
+
+**This edits source in place and takes the tree exclusively.** Nothing else may
+read the repository while it runs -- see CLAUDE.md on stopping one safely.
+Mutations belong in CI; run them locally only for one or two named cases."""
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    if "--help" in argv or "-h" in argv:
+        # BEFORE the lock and before anything is written, for the same reason
+        # `--verify` is: the whole point is that it does nothing.
+        print(USAGE)
+        return 0
+    unknown = [a for a in argv if a.startswith("-")
+               and a.split("=")[0] not in ("--verify", "--changed", "--only",
+                                           "--shard", "--help", "-h")]
+    if unknown:
+        # SILENTLY IGNORING A FLAG IS HOW `--help` RAN THE SUITE. A typo in a
+        # flag should cost an error, not a tree-exclusive run.
+        print("unknown option(s): " + " ".join(unknown))
+        print()
+        print(USAGE)
+        return 2
     if "--verify" in argv:
         # Deliberately outside the lock: it edits nothing, and the case it most
         # needs to cover is "is a harness halfway through right now".

@@ -122,6 +122,30 @@ property -- there the store writes recurring addresses, so seed-dependent
 interference actually bites. Under pair keys almost every address is written
 once and there is nothing for a seed to change.
 
+## THE NEXT CANDIDATE: OVER-SUBSCRIPTION -- registered before running
+
+MQAR binds **4 pairs** per sequence and the store carries it at 0.995. Text binds
+**one per position**, so a 256-token chunk asks the same store to hold 255
+bindings at once. The measured retrieval law is `sqrt(d/N)` in the number of
+bindings, so 255 against 4 is a factor of eight in retrieval quality before
+anything else is considered.
+
+    P1  THE GATE. At chunk 16 the store beats `nostore` on RARE REPEAT by more
+        than 0.10 bits, and the gap shrinks monotonically as the chunk grows.
+        Interference is why text differs from MQAR.
+
+    P2  THE CONFOUND, stated because it cuts the other way and would otherwise
+        be an excuse afterwards: a shorter chunk means fewer bindings AND fewer
+        repeats to recall. `rare_repeat_share` is reported per cell so the
+        opportunity is visible beside the gap, and a gate met on twelve
+        positions is not a gate met.
+
+    P3  THE FALSIFIER. If the gap is within 0.02 of zero at EVERY chunk size,
+        over-subscription is dead as an explanation and the difference between
+        text and MQAR is not about how much the store is holding.
+
+**Three seeds before anything is said**, which is this file's own hard-won rule.
+
 ## The candidate itself, for the record
 
 With `context_keys` the address at position `t` is `hash(t-1, t)`. To retrieve
@@ -199,7 +223,7 @@ def labelled(model, chunks, counts, store: bool = True):
 
 
 def one_cell(arm: str, seed: int, bias: bool, lr: float, cap: float,
-             built=None, keys: str = "pair") -> dict:
+             built=None, keys: str = "pair", chunk: int = CHUNK) -> dict:
     started = time.time()
     built = built or corpus("words")
     stream = built.train[0][:TRAIN_WORDS]
@@ -210,7 +234,7 @@ def one_cell(arm: str, seed: int, bias: bool, lr: float, cap: float,
         decay=1.0, memory_cap=cap, lr=lr))
 
     cut = int(len(stream) * 0.8)
-    for piece in pieces((stream[:cut],), CHUNK):
+    for piece in pieces((stream[:cut],), chunk):
         targets = np.concatenate([piece[1:], piece[-1:]])
         scored = np.ones(len(piece), dtype=bool)
         scored[-1] = False
@@ -219,9 +243,9 @@ def one_cell(arm: str, seed: int, bias: bool, lr: float, cap: float,
 
     counts = np.zeros(built.vocab_size)
     np.add.at(counts, stream, 1.0)
-    fit = labelled(model, pieces((stream[cut:],), CHUNK), counts, writes)
+    fit = labelled(model, pieces((stream[cut:],), chunk), counts, writes)
     temperature = min(TEMPERATURES, key=lambda t: bits(fit[0], fit[1], t))
-    test_chunks = pieces(built.test, CHUNK)
+    test_chunks = pieces(built.test, chunk)
     scores, targets, repeat, rare = labelled(model, test_chunks, counts,
                                              writes)
     unigram, bigram = counting_bars(built.vocab_size, stream, test_chunks)
@@ -231,7 +255,7 @@ def one_cell(arm: str, seed: int, bias: bool, lr: float, cap: float,
                 if mask.any() else float("nan"))
 
     return dict(
-        arm=arm, seed=seed, bias=bias, lr=lr, cap=cap, keys=keys,
+        arm=arm, seed=seed, bias=bias, lr=lr, cap=cap, keys=keys, chunk=chunk,
         error=on(np.ones(len(targets), bool)),
         repeat_error=on(repeat),
         novel_error=on(~repeat),
@@ -245,7 +269,7 @@ def one_cell(arm: str, seed: int, bias: bool, lr: float, cap: float,
         uniform=round(float(np.log2(built.vocab_size)), 4),
         vocab=built.vocab_size, width=WIDTH, scored=int(len(targets)),
         seconds=round(time.time() - started, 1),
-        condition=f"{arm}|{keys}|bias{int(bias)}|lr{lr}|cap{cap}"
+        condition=f"{arm}|{keys}|chunk{chunk}|bias{int(bias)}|lr{lr}|cap{cap}"
                   f"|d{WIDTH}|seed{seed}|min{min_count_for('words')}")
 
 
@@ -256,6 +280,13 @@ def main() -> int:
     parser.add_argument("--bias", type=int, choices=(0, 1), default=1)
     parser.add_argument("--lr", type=float, default=0.000005)
     parser.add_argument("--cap", type=float, default=5.0)
+    parser.add_argument("--chunk", type=int, default=CHUNK,
+                        help="THE OVER-SUBSCRIPTION TEST. MQAR binds 4 pairs "
+                             "per sequence and the store carries it at 0.995; "
+                             "text binds one per position, so a 256-token chunk "
+                             "asks the store to hold 255 bindings at once. If "
+                             "interference is why text differs, a short chunk "
+                             "should let the store contribute")
     parser.add_argument("--keys", choices=("pair", "single"), default="pair",
                         help="THE HYPOTHESIS. With pair keys the address is "
                              "hash(t-1, t), so recalling what followed an "
@@ -275,7 +306,7 @@ def main() -> int:
     for seed in seeds:
         for arm in arms:
             record = one_cell(arm, seed, bool(args.bias), args.lr, args.cap,
-                              built, args.keys)
+                              built, args.keys, args.chunk)
             print(f"  {record['condition']:52s} "
                   f"all {record['error']:.4f}  "
                   f"repeat {record['repeat_error']:.4f}  "

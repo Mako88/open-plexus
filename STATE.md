@@ -1496,8 +1496,20 @@ again** — this list exists because several of these were proposed twice.
 - Sweeps are GitHub Actions **dispatch-only** via `gh workflow run`, one matrix at
   a time, cost stated first and estimated **from the most expensive cell**.
   Nothing heavy runs locally.
-- **Never use bash heredocs.** **Never `git commit -m` with backticks** — write
-  the message to a file and use `git commit -F`.
+- **Never use bash heredocs.** **ALWAYS write the commit message to a file and
+  use `git commit -F`. Never `-m`, for any message, ever.**
+
+  **Strengthened 2026-07-29 after breaking it twice in one session.** The rule
+  read *"never `-m` with backticks"*, which requires noticing whether this
+  particular message contains one — and a message describing code is exactly
+  where backticks appear without being thought about. Both times bash ate
+  identifiers out of a commit that was already pushed, and both times the fix
+  was unavailable because rewriting pushed history is not a thing to do
+  unilaterally.
+
+  Rule 18: prefer a rule that makes the mistake structurally impossible over one
+  that asks for more care. An unconditional `-F` needs no judgement; a
+  conditional one needs it every time.
 - **Run `python tools/check_all.py` before every commit**, then `mutate.py
   --changed` separately. **Do not run the checks as one compound shell command** —
   a shell reports only the last statement's exit code, and on 2026-07-28 that

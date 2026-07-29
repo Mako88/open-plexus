@@ -84,6 +84,17 @@ a read is a coin flip.
 > **Concept addressing cannot represent within-family variation at all.** The
 > address holds one thing; a second thing written to it destroys the first.
 
+**AND THAT WAS OVERSTATED — [note 049](docs/notes/049-specific-beats-general-is-a-read-policy.md).**
+The store is one matrix addressed by keys, so a fact at the SURFACE key and a
+default at the CONCEPT key are different addresses and do not collide. What
+collides is that `ByConcept` maps everything to the concept, so the surface is
+never written or read. **This is a read policy, not a representation redesign.**
+
+Each arm is already good at what the other is bad at — `ungrouped` 0.783 on
+exceptions, `concept` 0.471 on transfer — so a reader that consults both should
+get the better of the two. Note 049 has the design, the threshold question that
+needs deciding rather than typing, and three predictions.
+
 **Which explains decision 141 from the other side** — grouping words hurt on text
 because *text is nothing but exceptions*. Every word has its own continuations.
 

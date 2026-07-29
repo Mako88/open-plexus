@@ -75,6 +75,43 @@ unrepresentable.
       specifically the family's is the superposition speaking; generic failure
       is not.
 
+## THE `indexed` ARM — option B, and it needed no model change
+
+Grouping answers TRANSFER by making a family share one address, and decisions
+144/145 measured the price: the shared address is a majority vote, so a
+contradicting fact about one member is **erased**.
+
+**Option B never shares an address.** Every fact is written at the entity's own
+key, so nothing is ever overwritten. Transfer instead reads the *neighbours'*
+addresses, found through the content index — which is note 045's design, stated
+in July as *"similarity picks WHICH exact reads to make, and never what an
+address looks like"*.
+
+**`index_branches` already implements it.** The token's own read stays at full
+weight and the neighbours are added to it, weighted by a softmax over their
+content similarity. So this arm is a configuration, not a mechanism to build.
+
+The cost was measured before the arm was written rather than estimated: on this
+task a true sibling is the **nearest** neighbour 100% of the time, and all three
+siblings are inside the top 3. So option B is one extra read to reach a sibling,
+against option A's two-address read and two-address write.
+
+**PREDICTIONS, registered before the arm was run:**
+
+  I1  THE GATE. `indexed` beats `ungrouped` on TRANSFER by more than 0.20. The
+      neighbours supply what was never stated about this entity.
+
+  I2  THE RAIL, and the whole reason to prefer B. `indexed` stays within 0.05 of
+      `ungrouped` on EXCEPTION. The entity's own read is at full weight and the
+      neighbours are down-weighted, so the specific fact should still win —
+      where `concept` scores 0.371 because it has no specific fact left.
+
+  I3  THE FALSIFIER FOR NOTE 049. If `indexed` reaches `concept`'s TRANSFER and
+      holds `ungrouped`'s EXCEPTION, then option B dominates and the two-level
+      reader in note 049 is unnecessary machinery. If it splits the difference
+      on both, it is averaging rather than choosing and 049's threshold is back
+      on the table.
+
 ## Settings, and why they are not inherited
 
 Single keys (`context_keys` off), because the binding is `entity -> value` and a
@@ -124,13 +161,26 @@ TRAIN = 400
 TEST = 200
 EPOCHS = 6
 SEEDS = (0, 1, 2)
-ARMS = ("ungrouped", "concept", "permuted", "nostore")
+ARMS = ("ungrouped", "concept", "permuted", "nostore", "indexed")
+#: How many neighbours the `indexed` arm reads. 3 covers every sibling on
+#: this task -- measured, not assumed: all three are inside the top 3 at
+#: 100% across seeds.
+BRANCHES = 3
 
 
 def surfaces_for(arm: str, config: FamilyConfig, seed: int):
     """The grouping this arm addresses the store by, and the index behind it."""
     if arm in ("ungrouped", "nostore"):
         return OneConceptPerToken(config.vocab_size), None, float("nan")
+    if arm == "indexed":
+        # OPTION B: the identity mapping, so every fact keeps its own address
+        # and nothing is ever overwritten -- but WITH a fitted index, because
+        # the neighbours are read at query time instead.
+        index = ContentIndex(config.vocab_size, width=CONTENT_WIDTH, seed=seed,
+                             power=INDEX_POWER, window=INDEX_WINDOW)
+        for stream in background(config, BACKGROUND):
+            index.observe(stream)
+        return OneConceptPerToken(config.vocab_size), index, float("nan")
 
     index = ContentIndex(config.vocab_size, width=CONTENT_WIDTH, seed=seed,
                          power=INDEX_POWER, window=INDEX_WINDOW)
@@ -181,8 +231,9 @@ def one_cell(arm: str, seed: int, exceptions: int = 0) -> dict:
 
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=config.vocab_size, d_model=WIDTH, lr=0.05,
-        key_scale=0.5, decay=0.99, seed=seed))
-    if arm not in ("ungrouped", "nostore"):
+        key_scale=0.5, decay=0.99, seed=seed,
+        index_branches=BRANCHES if arm == "indexed" else 0))
+    if arm not in ("ungrouped", "nostore", "indexed"):
         model.key_source = ByConcept(model.key_source, surfaces,
                                      config.vocab_size)
         model.surfaces = surfaces

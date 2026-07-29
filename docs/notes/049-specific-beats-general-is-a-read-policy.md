@@ -27,9 +27,19 @@ So this is a **read policy**, and the fix is small.
 
 ## The mechanism
 
+**SIMPLIFIED BY DECISION 146.** The original proposal wrote at both the surface
+and concept addresses. Option B makes that unnecessary: it never groups at write
+time, so every fact is already at its own address and the concept address is not
+written at all. What remains is one conditional.
+
+    write   at the entity's own address only. Nothing is ever shared, so
+            nothing is ever overwritten
+    read    the entity's own address first. If it holds a real binding, answer
+            and stop. Otherwise read the neighbours the content index proposes
+
+    (the original, superseded)
     write   at BOTH addresses: the surface key and the concept key
-    read    the surface first. If what comes back is strong enough to be a
-            real binding, use it. Otherwise fall back to the concept.
+    read    the surface first, falling back to the concept
 
 That is inheritance with override, and it is the oldest idea in the book — which
 is the point. GOALS' standing rule is to take mechanisms from computer science
@@ -44,6 +54,12 @@ It also matches what the two arms of g19-01 already do *separately*:
 **Each arm is good at exactly what the other is bad at.** A reader that consults
 both should get the better of the two at every position, and the experiment is
 whether it does.
+
+**Decision 146 ran the consulting-both half without the choosing half**, using
+`index_branches`, which adds the neighbours to the entity's own read. It averages:
+`transfer + exception` is flat at ~0.93 across every weighting, monotone in both
+directions. **Consulting both is not enough; the rule has to choose.** That is
+what remains unbuilt here.
 
 ## What has to be decided rather than assumed
 

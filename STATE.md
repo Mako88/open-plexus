@@ -63,7 +63,32 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Can a store hold a family default and a per-entity override at the same time?**
+**Will a preference rule beat the averaging one?** — the only piece of note 049
+still unbuilt, and the only model change this line has ever pointed at.
+
+Decision 146 settled the addressing. John picked option B independently and it is
+note 045's July design: never share an address, read neighbours through the
+content index instead. `index_branches` already implements it, so it cost a
+configuration.
+
+    with exceptions       direct  transfer  exception
+      ungrouped           0.7792    0.0608     0.7833
+      concept (grouped)   0.4492    0.4708     0.3708
+      indexed (option B)  0.7158    0.2650     0.6875
+
+**B is the right addressing** — nothing is overwritten, so the specific fact
+survives in the store. **But it averages rather than chooses:** sweeping how much
+the neighbours count moves transfer and exception monotonically against each
+other with their sum flat at ~0.93. There is no corner that holds both.
+
+    read the entity's own address
+    if it holds a real binding, answer and stop
+    otherwise read the neighbours
+
+One conditional, no double writes. The ceiling exists (at least one arm right on
+0.853 of exceptions), the traffic is measured (a true sibling is the nearest
+neighbour 100% of the time), and the open piece is the threshold for "a real
+binding" — decision 130's precedent applies.
 
 Decision 144 answers the previous question — *does grouping do anything harder
 than same-kind-same-answer* — with **no, and the failure is total**:

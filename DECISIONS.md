@@ -4426,3 +4426,78 @@ depends on most.
 
 **Taken without asking**, under standing authorisation. 144 is corrected in place
 with the wrong sentence struck and the reason beside it, not rewritten.
+
+## 146. Option B is the right addressing and cannot choose on its own
+
+John picked option B independently on 2026-07-29 — never share an address, use
+the content index to read neighbours instead — and it is note 045's design from
+July. **`index_branches` already implements it**, so this cost a configuration
+rather than a mechanism.
+
+Three seeds, against the two extremes:
+
+    with exceptions present     direct  transfer  exception
+      ungrouped                 0.7792    0.0608     0.7833
+      concept (grouped)         0.4492    0.4708     0.3708
+      indexed (option B)        0.7158    0.2650     0.6875
+
+    no exceptions               direct  transfer
+      ungrouped                 0.6583    0.0867
+      concept                   0.9967    0.9983
+      indexed                   0.9733    0.7517
+
+**I1 CONFIRMED** — B beats plain addressing on transfer by +0.665 without
+exceptions and +0.204 with.
+
+**I2 REFUTED** — I predicted B would hold exceptions within 0.05 of plain
+addressing. It loses 0.096.
+
+**I3 FIRED**, which is the finding. B reaches neither extreme; it lands between
+them on both kinds. It is **averaging rather than choosing**.
+
+### And the knobs prove it is a pure exchange rate
+
+`index_weight` sets how much the neighbours count. Sweeping it:
+
+    weight   direct  transfer  exception
+      0.25   0.7700    0.1125     0.7763
+      0.50   0.7612    0.1738     0.7538
+      1.00   0.7012    0.2700     0.6787
+
+**Monotone in both directions at once**, and `transfer + exception` is flat at
+~0.93 across every setting. `index_sharpness` moves nothing. There is no corner
+that holds both.
+
+> **The additive rule cannot choose. It can only set the exchange rate.**
+
+### What that settles
+
+**B is the right addressing.** Nothing is ever overwritten, so the specific fact
+survives *in the store* — which grouping cannot say, and which is why the
+exception column is 0.688 rather than 0.371.
+
+**But surviving in the store is not surviving to the answer.** Reading the
+entity's own address and the neighbours' and *summing* them means the neighbours
+always contaminate, in proportion to their weight.
+
+**So it is B plus A's rule, not B or A** — and the combination is *simpler* than
+note 049 proposed, because B already writes only at the surface:
+
+    read the entity's own address
+    if it holds a real binding, answer from it and stop
+    otherwise read the neighbours the index proposes
+
+No double writes. One conditional. The ceiling probe says both answers are
+recoverable — at least one arm is right on 0.853 of exceptions and 0.878 of
+directs — so the only remaining question is the threshold for "a real binding",
+which is note 049's and has decision 130's precedent.
+
+### The cost, unchanged and now worth quoting
+
+A true sibling is the **nearest** neighbour 100% of the time on this task and all
+three are inside the top 3. So the extra traffic is one read when the entity's
+own address answers, and up to three when it does not — against grouping's one.
+That is the C1 number, measured rather than estimated.
+
+**Taken without asking** for the measurement; the model change it points at is
+still John's call and has not been started.

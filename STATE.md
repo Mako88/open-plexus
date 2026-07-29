@@ -106,7 +106,36 @@ result is this project grading its own homework.
 > `vocab × d` linear map (decision 62) — one fact that explains decision 63, 115
 > and g14-01 at once.
 
-### ⇒⇒ START HERE: the store's contribution on text is substitutable by a prior
+### ⇒⇒ START HERE: two pathways, and the task decides which one pays
+
+**Decision 142**, the control the rest of this section rests on, measured across
+three seeds:
+
+    on TEXT    the prior wins and the store adds nothing   (139, 141)
+    on MQAR    the store wins and the prior COSTS 0.279    (142)
+
+    MQAR   bias0 floor 0.9950   nostore 0.0000
+           bias1 floor 0.7158   nostore 0.0000
+           trivial floor 0.3438 -- what a SMART guesser scores
+
+**The store carries MQAR completely.** `nostore` scores *zero* — not chance,
+zero, because a model with nothing to retrieve does not guess, it emits a
+constant.
+
+**And the readout bias, which is worth 1.5 bits on text, costs 0.279 accuracy
+here.** A prior with nothing to predict does not sit idle; it competes with the
+retrieval for the same readout, and on a task with no exploitable marginals it is
+pure interference.
+
+> So *"the store contributes nothing on text"* is **not** a statement about the
+> store being weak. It is a statement about text having marginals a linear prior
+> can exploit, and the store having no advantage over that — while on a task with
+> no marginals the store is everything and the prior is a liability.
+
+Every text record below carried the sentence *"this does not touch the relational
+line"* as an **inference**. It is now a measurement.
+
+### the store's contribution on text is substitutable by a prior
 
 **Decision 139**, measured on the corrected harness with its reproduction gate
 passing. This is the first valid measurement in the line and it replaces every

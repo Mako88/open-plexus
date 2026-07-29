@@ -1,0 +1,104 @@
+Does the store carry the relational tasks, or is that an inference too?
+=======================================================================
+
+Script: experiments/g18_05_does_the_store_carry_the_relational_tasks.py
+Run:    30436450902, 6 of 6 jobs, 12 cells, three seeds.
+Status: **THE CONTROL THE WHOLE TEXT LINE RESTS ON.** Decision 142.
+
+ANSWER: **The store carries MQAR completely, and the readout bias -- which wins
+        on text -- COSTS 0.279 accuracy here.** The two pathways compete, and
+        which one pays depends entirely on whether the task has exploitable
+        marginals.
+
+
+MEASURED ON
+------------
+MQAR at g10-01's settings: 4 pairs, sequence length 64, 16 keys, 8 values,
+`autoregressive=True`, `filler="random"`, vocabulary 25. Width 64, lr 0.05,
+key_scale 0.5, decay 0.99, 200 training sequences, 6 epochs, 100 held-out
+sequences, three seeds. Accuracy at query positions.
+
+`nostore` writes nothing, so every retrieval is zero.
+
+
+PREDICTIONS
+------------
+  P1  THE GATE. `floor` beats `nostore` by more than 0.30 accuracy.
+  P2  THE RAIL. `nostore` at bias 0 does not exceed the trivial floor, 0.3438.
+  P3  THE FALSIFIER. The readout bias does not move `floor` by more than 0.05.
+
+SCORED: **P1 CONFIRMED** at both bias settings, by 0.995 and 0.716.
+        **P2 CONFIRMED** -- and at ZERO rather than at guessing.
+        **P3 REFUTED**, in the direction the prediction did not anticipate.
+
+
+THE TABLE
+----------
+Accuracy on held-out sequences, mean over three seeds:
+
+    bias0 floor     0.9950
+    bias0 nostore   0.0000
+    bias1 floor     0.7158
+    bias1 nostore   0.0000
+
+    trivial floor   0.3438      what a SMART guesser scores
+
+
+WHAT IT SETTLES
+----------------
+Five sweeps say the store contributes ~nothing on text, and every one of those
+records protects itself with the same sentence: *"this does not touch the
+relational line."* **That sentence was an inference and is now a measurement.**
+The store does on this task exactly what it refuses to do on text, so the text
+results are about TEXT being the wrong instrument for it.
+
+**`nostore` sits at ZERO, not at the trivial floor**, and the distinction is
+worth keeping: a model with nothing to retrieve does not guess uniformly, it
+emits a constant. 0.3438 is what a smart guesser scores; a degenerate model
+scores nothing at all.
+
+
+AND THE HALF THE PREDICTION GOT WRONG
+--------------------------------------
+    bias 0    floor 0.9950
+    bias 1    floor 0.7158        the prior COSTS 0.279
+
+P3 expected the bias to be inert here, and reasoned that if it paid, the
+generator must have a base rate. **It does not pay -- it costs**, and that is the
+more interesting failure.
+
+A prior with nothing to predict does not sit idle. It competes with the
+retrieval for the same readout, and on a task with no exploitable marginals it is
+pure interference.
+
+**Which is the exact mirror of the text result:**
+
+    on TEXT    the prior wins and the store adds nothing  (139, 141)
+    on MQAR    the store wins and the prior costs 0.279   (here)
+
+Two pathways into one readout, and which of them pays is decided by the task
+rather than by the architecture.
+
+
+THE INSTRUMENT FAILURES CAUGHT BUILDING THIS
+---------------------------------------------
+Both were note 046's mistake -- a constant inherited across a boundary -- and
+both were caught by the trivial floor before anything was dispatched.
+
+  decay 1.0             carried from the word-level work; MQAR uses 0.99.
+  autoregressive off    the dataclass default. With it off the answer lives in
+                        `sequence.targets` and is NOT the next token, so the
+                        `np.roll(tokens, -1)` every MQAR script uses scores
+                        against the wrong symbol. Both arms returned 0.055
+                        against a 0.3438 floor -- below chance, which is the
+                        signature of a misalignment rather than undertraining.
+
+A third was caught after the run: the summariser applied the bits convention
+(lower is better) to accuracy and printed P3's two explanations the wrong way
+round. Corrected. **This file is the only accuracy-scored sweep in the g18 line,
+and the exception is where a habit goes wrong.**
+
+
+COST
+-----
+12 cells over 6 jobs, ~3 min each.

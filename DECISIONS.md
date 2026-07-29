@@ -4153,3 +4153,69 @@ unigram.
 — was wrong, and reversing it is why this exists: 0.002 bits is what the *current*
 addressing contributes, not a ceiling on what a different one could. Assuming an
 axis is flat because a different axis is flat is decision 112's error.
+
+## 142. The store carries MQAR completely, and the prior that wins on text costs 0.279 here
+
+g18-05, 12 cells, three seeds, run 30436450902. **The control the whole text
+line rests on, and it had never been run.**
+
+    bias0 floor     0.9950        bias0 nostore   0.0000
+    bias1 floor     0.7158        bias1 nostore   0.0000
+    trivial floor   0.3438        what a SMART guesser scores
+
+### The inference is now a measurement
+
+Decisions 139, 140 and 141 each protect themselves with the same sentence: *"this
+does not touch the relational line — MQAR, kinship and the chains are solved
+through this store and no prior solves them."* It is a good inference. **It was
+still an inference, and the same `nostore` ablation that overturned four sweeps
+of text results had never been pointed at the results the project rests on.**
+
+Pointed at it: the store carries the task completely. **`nostore` scores zero** —
+not chance, zero, because a model with nothing to retrieve does not guess, it
+emits a constant. So the text results are about *text* being the wrong instrument
+for this component.
+
+### And P3 failed in the direction nobody predicted
+
+    bias 0    floor 0.9950
+    bias 1    floor 0.7158        the prior COSTS 0.279
+
+The prediction expected the bias to be inert on MQAR, and reasoned that if it
+*paid* the generator must have a base rate. It does not pay. **It costs**, and
+that is the more interesting failure: a prior with nothing to predict does not
+sit idle — it competes with the retrieval for the same readout, and on a task
+with no exploitable marginals it is pure interference.
+
+> **The exact mirror of the text result.**
+>
+>     on TEXT    the prior wins and the store adds nothing   (139, 141)
+>     on MQAR    the store wins and the prior costs 0.279    (here)
+>
+> Two pathways into one readout, and which of them pays is decided by the task
+> rather than by the architecture.
+
+**That reframes the whole night's text finding.** "The store contributes nothing
+on text" is not a statement about the store being weak. It is a statement about
+text having marginals a linear prior can exploit and the store having no
+advantage over that — while on a task with no marginals, the store is everything
+and the prior is a liability.
+
+### Three instrument failures, and what caught each
+
+    decay 1.0 inherited from word level      caught by the trivial floor
+    autoregressive left at its default       caught by the trivial floor
+    bits convention applied to accuracy      caught after the run, in review
+
+The first two are note 046's mistake — a constant crossing a boundary — for the
+fourth and fifth time in one night. **The trivial floor caught both before
+dispatch**, which is what a rail is for and is the first time tonight one did the
+job a reproduction had to do.
+
+The third is mine after the fact: the summariser printed P3's two explanations
+the wrong way round because every other sweep in this line scores bits, where
+lower is better, and this one scores accuracy. Corrected in place.
+
+**Taken without asking**, under standing authorisation. This is the entry that
+says what the text results do and do not mean, and it is the one to read beside
+139 and 141 rather than after them.

@@ -89,13 +89,32 @@ def main() -> None:
     plain, biased = value(False, "floor"), value(True, "floor")
     if plain is not None and biased is not None:
         moved = abs(biased - plain)
-        print(f"  P3  THE FALSIFIER. the bias does not help: {plain:.4f} "
-              f"against {biased:.4f}, moved {moved:.4f} -> "
+        print(f"  P3  THE FALSIFIER. the bias does not move `floor`: "
+              f"{plain:.4f} against {biased:.4f}, moved {moved:.4f} -> "
               f"{'CONFIRMED' if moved <= NO_HELP else 'REFUTED'}")
-        if moved > NO_HELP:
-            print("      MQAR's values are uniform by construction, so a prior "
-                  "that pays here means the generator has a base rate and every "
-                  "MQAR number in this project is partly a base-rate score.")
+        # THE DIRECTION DECIDES THE MEANING, and the prediction was written
+        # expecting only one of them. A bias that PAYS would mean the generator
+        # has a base rate. A bias that COSTS means something else entirely, and
+        # it is what actually happened.
+        #
+        # **This is ACCURACY, so higher is better** -- the first version of this
+        # branch carried the bits convention over from the text summarisers and
+        # printed the two explanations the wrong way round. Every other number
+        # in the g18 line is bits; this file is the exception, and the exception
+        # is where a habit goes wrong.
+        if biased > plain + NO_HELP:
+            print("      The bias PAYS, which it should not be able to: MQAR's "
+                  "values are uniform by construction, so a base rate here "
+                  "means the generator has one and every MQAR number in this "
+                  "project is partly a base-rate score.")
+        elif biased < plain - NO_HELP:
+            print("      The bias COSTS, which the prediction did not "
+                  "anticipate and which is the more interesting failure. A "
+                  "prior with nothing to predict does not sit idle -- it "
+                  "competes with the retrieval for the same readout, and on a "
+                  "task with no exploitable marginals it is pure interference. "
+                  "The mirror of the text result, where the prior wins and the "
+                  "store adds nothing.")
 
 
 if __name__ == "__main__":

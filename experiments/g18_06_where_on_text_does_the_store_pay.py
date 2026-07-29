@@ -103,12 +103,24 @@ on text". That is the failure this whole file exists downstream of, committed by
 its author within minutes of writing a memory about it. Left here rather than
 tidied away.
 
-The three-seed means, single keys:
+BOTH SCHEMES, THREE SEEDS, and this is the complete answer:
 
-    all              floor  9.3162   nostore  9.1873   gap -0.1289
-    repeat           floor  8.1256   nostore  7.9215   gap -0.2041
-    RARE repeat      floor 11.0955   nostore 11.0947   gap -0.0008
-    novel            floor 10.8375   nostore 10.8046   gap -0.0329
+                       pair keys                    single keys
+                    floor  nostore     gap       floor  nostore     gap
+    all             9.1858   9.1873  +0.0015    9.3162   9.1873  -0.1289
+    repeat          7.9179   7.9215  +0.0036    8.1256   7.9215  -0.2041
+    RARE repeat    11.0962  11.0947  -0.0015   11.0955  11.0947  -0.0008
+    novel          10.8059  10.8046  -0.0013   10.8375  10.8046  -0.0329
+
+**Every slice is within 0.004 of zero**, except where single keys are actively
+harmful on common repeats. The store contributes nothing on text anywhere, under
+either addressing scheme, on any class of position.
+
+One thing the two columns do say: **pair keys are stable across seeds and single
+keys are not.** The 0.2 swing that produced the false positive is a single-key
+property -- there the store writes recurring addresses, so seed-dependent
+interference actually bites. Under pair keys almost every address is written
+once and there is nothing for a seed to change.
 
 ## The candidate itself, for the record
 

@@ -179,6 +179,20 @@ seeds:
 **Zero, with a ±0.2 swing across seeds.** Single keys do not rescue the store on
 the one slice where binding is the only route.
 
+Both schemes, three seeds, which is the complete answer:
+
+                       pair keys                    single keys
+                    floor  nostore     gap       floor  nostore     gap
+    all             9.1858   9.1873  +0.0015    9.3162   9.1873  -0.1289
+    repeat          7.9179   7.9215  +0.0036    8.1256   7.9215  -0.2041
+    RARE repeat    11.0962  11.0947  -0.0015   11.0955  11.0947  -0.0008
+    novel          10.8059  10.8046  -0.0013   10.8375  10.8046  -0.0329
+
+**Every slice within 0.004 of zero**, except where single keys are actively
+harmful on common repeats. And the two columns say one thing worth keeping: pair
+keys are stable across seeds, single keys are not — under pair keys almost every
+address is written once, so there is nothing for a seed to change.
+
 > ⚠ **I reported this as confirmed from seed 0 alone before the other two
 > landed** — "the first time all night the store has helped on text". That was
 > one cell, and it was wrong. The failure I had spent the night documenting,

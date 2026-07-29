@@ -112,10 +112,74 @@ mitigating its bandwidth.
 now rather than after more iteration. That is John's own reasoning and the record
 supports it: decision 74 invalidated a comparison set by changing one default.
 
-**The falsifier is already named and cheap** (042 §1): does a model with a
-persistent slow store keep improving past decision 63's **16,000-character wall**?
-One axis, one arm, and it can be probed locally before a matrix is spent.
-
 **And this note must not become a third pass.** 042's closing caution is that an
-architecture pass should end in a build, not another document. Two design documents
-now describe this change and nothing has been built toward it.
+architecture pass should end in a build, not another document.
+
+---
+
+## CORRECTION, same day, before anything was built on this
+
+**Two claims above were wrong, and both were wrong in the flattering direction —
+they made the next step look unmeasured and available.** Rule 5: the record gets
+fixed, not softened.
+
+**1. The falsifier has been run. It came back NO.** This note said 042 §1's
+falsifier was "cheap and already named" and could "be probed locally before a matrix
+is spent", implying it was open. `experiments/g15_01_does_persistence_break_the_wall.py`
+exists, has a workflow, and **ran three times** — recorded in
+`experiments/sweeps/g15-01-does-persistence-break-the-wall.txt` and read in
+**decision 133**:
+
+    arm                4,000    8,000   16,000   32,000   62,500  125,000
+    baseline          5.5989   5.5709   5.5353   5.5327   5.5255   5.5261
+    persist-slow-decay 5.5250  5.4823   5.4551   5.4536   5.4393   5.4427
+
+    slow-store norm, persist-slow-decay:  0.4 at EVERY corpus size
+
+**P3 REFUTED.** Movement past the wall is +0.0124, under the 0.04 seed spread and
+not monotone, with the gate firing 16,470–51,713 times so the null is about
+persistence and not a shut gate.
+
+> **A decaying persistent store is a fixed-size cache holding a moving window, not
+> a map that grows.** The wall is a **CAPACITY** limit, not a lifetime limit.
+
+The good half is real and also sitting unused: `persist-slow-decay` beats baseline
+by **0.074–0.083 bits at every data point**, its own control (`consolidate`, same
+consolidation without persistence) is *worse* than baseline everywhere, and it is
+**off by default.**
+
+**2. "Nothing has been built toward it" is false.** Item 1 has an experiment run
+three times and a decision. Item 2 has a built seam — `partitioned.py`,
+`ConceptStore`, `concept_nodes` — and decision 134. What is true is narrower:
+**neither is on by default and the combined change does not exist.** The flattened
+version erased two real pieces of work.
+
+### And the sequencing this note recommended is not supported
+
+It pointed at A1 first. Decision 133 pointed at item 2 instead, on the grounds that
+*"concept partitioning is the only proposal on the page that adds capacity as the
+corpus grows."* **Decision 134, the very next entry, measured that claim and it does
+not hold:**
+
+    pooled capacity is IDENTICAL between arrangements -- 128 / 256 / 512 /
+    1024 / 2048 in both, at 1 / 2 / 4 / 8 / 16 nodes
+
+Pooled capacity grows with **total memory**, in either arrangement. What concept
+partitioning uniquely buys is **lone-node capacity and independence** — 2048 against
+128 at sixteen nodes — which is churn resilience and C1, not the wall.
+
+**So 133's forward-looking sentence was superseded one entry later, and this note
+inherited it.** That is precisely the drift `STATE.md`'s header exists to stop,
+reproduced inside a note written to survey the drift.
+
+**What is actually open**, stated without a recommendation attached, because the
+next step should be chosen against the corrected record rather than this one:
+
+- the wall is a capacity limit, and capacity is `~d²` (decision 109) — a property
+  of **width and total memory**, not of lifetime and not of arrangement
+- persistence is worth 0.08 bits, is a prerequisite for anything that accumulates,
+  and adds no capacity
+- concept partitioning buys independence and lone-node capacity, measured, and its
+  case is **not** the wall
+- **no measurement here says what breaks the wall.** That is the open question, and
+  it was hidden by two stale forward-looking claims stacked on each other

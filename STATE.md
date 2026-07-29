@@ -121,21 +121,27 @@ thing blocking the run.** The relation is still fixed rather than chosen: a
 schedule the task does not supply is a fitted constant (162), which is why 164 is
 an instrument for reaching the measurement and not the final read path.
 
-### What is temporary, and it is one change not five
+### What is temporary — and what is already refuted
 
-[Note 055](docs/notes/055-what-is-temporary-an-inventory.md) is the inventory John
-asked for. The finding: **note 042's top three items are all still open and every
-default ships them off** — `carry_store` False, `concept_nodes` 0, keys addressing
-identity only. They are **one change seen from three sides**: a persistent,
-concept-partitioned store addressed by content-derived keys *is* the concept map.
-The dimension-summing readout belongs with it, because a concept-partitioned read is
-a SELECTION rather than the global sum **C1 forbids**.
+[Note 055](docs/notes/055-what-is-temporary-an-inventory.md) is the inventory. Note
+042's three ranked items are all off by default: `carry_store` False,
+`concept_nodes` 0, keys addressing identity only. **But two of them have been
+measured, and 055's first version claimed otherwise — see its CORRECTION.**
 
-**It invalidates essentially every task number**, which is the argument for doing it
-before more iteration rather than after. **The falsifier is cheap and already
-named:** does a persistent slow store break decision 63's 16,000-character wall?
-One axis, one arm, probeable locally. **Two design documents now describe this
-change and nothing is built toward it.**
+    042 item 1, persistence   RUN 3x (g15-01), decision 133: P3 REFUTED.
+                              norm 0.4 at EVERY corpus size -> a fixed-size
+                              cache, so the WALL IS CAPACITY, NOT LIFETIME.
+                              Still worth 0.074-0.083 bits, still off
+    042 item 2, concept split SEAM BUILT, decision 134: pooled capacity is
+                              IDENTICAL to dimension splitting. What it buys is
+                              LONE-NODE capacity, 2048 vs 128 at 16 nodes --
+                              churn and C1, not the wall
+    042 item 3, content keys  never asked; g10-09 was retracted
+
+**133 said item 2 was where capacity comes from; 134 superseded that one entry
+later.** So **nothing measured says what breaks the wall.** Capacity is `~d²` (109)
+— width and total memory, not lifetime and not arrangement. That is the open
+question, and two stale forward-looking claims stacked on each other concealed it.
 
 ### The rail this project does not have
 
@@ -164,10 +170,9 @@ so note 049's threshold is **structurally zero** and nothing is fitted. **167 is
 now the limit of that**: emptiness is the only thing the sketch knows, so it cannot
 bound an enumeration over addresses that are all occupied.
 
-**The price is real:** without exceptions DIRECT costs 0.050 against summing
-while TRANSFER gains 0.231. Summing lets agreeing neighbours corroborate;
-`inherit` refuses that on principle, which is what keeps a contradicting fact
-intact when there IS a conflict.
+**The price is real:** without exceptions DIRECT costs 0.050 against summing while
+TRANSFER gains 0.231 — `inherit` refuses corroboration on principle, which is what
+keeps a contradicting fact intact when there IS a conflict.
 
 **And 149–153 measured its scope rather than assuming it** — not a fitted constant
 across `n_values` and `family_size`, matching plain seed for seed on MQAR, blind on
@@ -187,22 +192,17 @@ decision 154.** Note 044 refuses `index_branches` above one hop because a hop ke
 **a hop key sits at cosine 0.96 to a single token's row** (table in 154). It names a
 concept, and `argmax(wk @ hop_key)` is what the index could look up.
 
-**The guard is not lifted**, because a real design question sits under it that a
-cosine does not settle: `index_branches` runs once per POSITION, not once per
-hop, so combining them means choosing whether the index proposes neighbours of
-the position's concept or of the hop's landing concept.
-
-**And that choice cannot be decided, because nothing measures it —
+**The guard is not lifted**, because a design question sits under it that a cosine
+does not settle: `index_branches` runs once per POSITION, not per hop, so combining
+them means choosing whether the index proposes neighbours of the position's concept
+or of the hop's landing concept. **And that choice cannot be decided, because
+nothing measures it —
 [note 050](docs/notes/050-the-missing-instrument-composition-over-things-never-stated.md).**
 
-    families   addresses never written ✓   composition ✗
-    kinship    addresses never written ✗   composition ✓
-    chains     addresses never written ✗   composition ✓
-    MQAR       addresses never written ✗   composition ✗
-
-The gate pays where an address was never written; the hop pays where the answer
-is at no single address. **No task has both**, and decision 153 says why that is
-structural: composition tasks state their facts before querying them, so they
+The gate pays where an address was never written; the hop pays where the answer is
+at no single address. **No task has both** — families has the first, kinship and
+chains the second, MQAR neither (table in note 050) — and decision 153 says why that
+is structural: composition tasks state their facts before querying them, so they
 write every address they later read.
 
 > Building the combined mechanism now would produce a number that means nothing —

@@ -50,7 +50,13 @@ evidence's.
 
 ---
 
-## THE BLOCKER: retrieval fidelity, and it is a width limit
+## THE BLOCKER: retrieval fidelity — and it is NOT a width limit
+
+*(This heading read "and it is a width limit" until 2026-07-29. Decision 121
+refuted that on the task in July and the warning box below has said so since, so
+the heading spent months asserting what its own section retracts. Same defect as
+`IN PLAIN TERMS` had, found in the same pass: **a heading is the part most people
+read and the part least often revisited.**)*
 
 Every end-to-end relational result is capped by how often a single retrieval is
 right. **Four mechanisms have failed against the same number**, each correct in

@@ -55,6 +55,7 @@ CORPUS = ROOT / "openplexus" / "tasks" / "corpus.py"
 SLOT_COST = ROOT / "tools" / "slot_cost.py"
 RECOVERY = ROOT / "tools" / "recovery.py"
 TESTBED = ROOT / "testbed" / "run.py"
+ANSWERS = ROOT / "openplexus" / "answers.py"
 
 
 @dataclass(frozen=True)
@@ -798,6 +799,21 @@ MUTATIONS = [
         # a mutation that cannot be applied is a claim nothing is checking.
         old='        if (self.hops > 1 and self.context_keys and self.search_branches < 1\n                and self.hop_relation < 0 and not self.hop_relations):',
         new="        if False and self.hops > 1 and self.context_keys:",
+    ),
+    Mutation(
+        name="the-set-score-reports-RECALL-as-F1",
+        breaks="the only defence the set-answer ruler has. A model that emits "
+               "the WHOLE value alphabet scores perfect recall, so a headline "
+               "carrying recall under an F1 heading would report 1.000 for a "
+               "mechanism that does nothing at all -- and it would report it for "
+               "every arm at once, so the ordering between arms would still look "
+               "sensible. ARCHITECTURE row F3 is measured through this number and "
+               "no earlier result constrains it, which is CLAUDE.md rule 7's "
+               "criterion-that-cancels-its-own-input with the sign flipped: not "
+               "blind to the variable, monotone in the wrong direction",
+        path=ANSWERS,
+        old="    f1 = (2.0 * precision * recall / (precision + recall)\n          if precision + recall > 0.0 else 0.0)",
+        new="    f1 = recall",
     ),
     Mutation(
         name="every-hop-follows-the-FIRST-scheduled-relation",

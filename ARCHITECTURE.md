@@ -98,7 +98,7 @@ verified
 |---|---|---|---|
 | F1 | Answer from awareness rather than prediction | **PARTIAL** | every relational task is scored on a single answer token. That is not next-token prediction (note 047 rules that out as the objective), but it is also not "form a response from awareness of the concepts in the question" |
 | F2 | Take a query in more than one modality | **UNTESTED** | depends entirely on B4, which is untested |
-| F3 | Produce more than one token of response | **UNTESTED** | **nothing in this project has ever scored a multi-token answer.** Named here because it is in GOALS and has never been on any roadmap |
+| F3 | Produce more than one token of response | **UNTESTED** | **nothing in this project has ever scored a multi-token answer.** Named here because it is in GOALS and has never been on any roadmap. **165** builds the RULER — `openplexus/answers.py`, `exact` and F1 with a standing falsifier for emit-everything (recall 1.000, F1 0.400) and a gate recovering the old single-token accuracy exactly. A ruler is not a measurement: nothing emits a set answer yet, so this row does not move |
 
 **Depends on:** everything above.
 

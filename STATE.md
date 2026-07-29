@@ -85,6 +85,13 @@ Every task, every accuracy number and the whole scoring convention assume one
 answer token. Whatever is chosen, the existing tasks stay valid as capability
 probes and stop being measurements of the goal.
 
+**The ruler is built and nothing is measured on it yet — decision 165.**
+`openplexus/answers.py` scores `exact` and F1, refuses to report recall alone, and
+recovers the old single-token accuracy exactly. **The falsifier is the load-bearing
+part:** emit the whole alphabet and recall is 1.000 while F1 is 0.400. **Next is
+wiring `families.py` to a set-valued query** — 164 removed the LINKED blocker, so
+both are now open and the answer shape is the one that reaches backwards.
+
 ### Where the mechanisms stand
 
 **Every one works in isolation with a unit test. Not one has a task number.**
@@ -197,28 +204,16 @@ where step 1 is the gate and step 3 is the hop — with the calibration check th
 decides whether it is fair before any arm is run, and four registered
 predictions. **Not built.**
 
-### How this line got here, in five lines
+### How this line got here
 
-Everything below is settled and lives in DECISIONS.md. It is kept short here
-because the forward-looking claims each of these made were **superseded within
-days**, and a stale "so the next mechanism is..." reads as current guidance.
-
-    143  grouping CAN answer what was never stated -- concept 0.998 transfer
-    144  and it ERASES exceptions -- 0.371, saying a sibling's value 86.6%
-    145  "one exception halves everything" was the 50/50 config, not the
-         mechanism. With 4 of 5 agreeing the dissenting fact goes to 0.000
-    146  option B (never share an address, read neighbours through the index)
-         is the right addressing and can only average, not choose
-    147  the two obvious ways to choose are refuted; selection is the problem
-
-> **The load-bearing correction was note 049's:** the store is one matrix
-> addressed by keys, so a fact at the surface key and a default at the concept
-> key are *different addresses and never collided*. What collided was `ByConcept`
-> mapping everything to the concept. It was a read policy the whole time, which
-> is why 148 cost a sketch rather than a new representation.
-
-Decision 141 reads from the other side too — grouping words hurt on text because
-**text is nothing but exceptions**: every word has its own continuations.
+**Decisions 143–147 are settled and live in DECISIONS.md**, and they leave here
+under rule 14b rather than being summarised a third time: grouping can answer what
+was never stated, it erases exceptions, and the two obvious ways to choose between
+two retrievals are both refuted. The one correction worth carrying forward is note
+049's — the store is one matrix addressed by keys, so a fact at the surface key and
+a default at the concept key **never collided**; `ByConcept` mapping everything to
+the concept did, which made it a read policy and is why 148 cost a sketch rather
+than a new representation.
 
 Nothing else in this file is a live question. Everything below is either the
 evidence behind that one, a standing agreement, or a refusal.

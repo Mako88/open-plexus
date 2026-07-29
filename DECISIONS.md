@@ -5607,3 +5607,75 @@ run on `57d8112` — the first to complete, because nothing superseded it — wa
 is about two and a half hours rather than twenty minutes. All 169 were caught.
 Rule 5: the document is corrected rather than softened. It matters practically,
 because the old figure is what would make a local full run look affordable.
+
+## 165. The ruler for a set-valued answer, built before anything produces one
+
+ARCHITECTURE row F3 and the live question in STATE: **nothing in this project has
+ever scored a multi-token answer.** `openplexus/answers.py` is the measurement
+convention for one, and it exists before any mechanism that emits such an answer
+because that ordering is what GOALS §4 asks for and what note 050 established —
+the blocker is the instrument, not the mechanism.
+
+### The trap this is built against
+
+**A model that emits EVERYTHING scores perfect recall.** Recall on a set answer is
+monotone in the wrong direction: it improves as the answer gets less useful, and
+it improves fastest for the laziest possible mechanism. Precision is what decision
+148's emptiness gate is supposed to buy, so precision is exactly what a set score
+must not be allowed to hide.
+
+`SetScore` therefore carries `exact`, precision, recall and F1 together, and the
+reportable numbers are `exact` and `f1`. `SetScoreSummary` carries `mean_size`
+beside `mean_truth_size`, which is the over-emission tell: a mechanism buying F1
+by guessing more is invisible in a headline and obvious there.
+
+**`EmittingEverythingMustNotScoreWell` is a standing falsifier rather than a unit
+test.** Against a 2-of-8 answer it records recall **1.000** and F1 **0.400**. If a
+change ever makes that arm look good, the change is wrong however good the
+headline reads.
+
+### The reproduction gate
+
+Every accuracy in this repository is `predicted == truth` over query positions.
+`exact` on singleton sets is that same comparison, and `single_token_accuracy`
+recovers it and **raises** on anything else — because averaging a set score into a
+column labelled "accuracy" is how a number stops meaning what its heading says.
+On singletons `exact`, precision, recall and F1 are all the same quantity, so a
+task rewritten to this convention cannot report a different figure depending on
+which column it is read from. Decision 138 is why this is a function rather than a
+promise.
+
+### Refusals, chosen over defaults
+
+An empty TRUE set raises: scoring it 1.0 for an empty prediction would let
+questions with no answer raise the mean. An empty PREDICTION scores zero rather
+than raising, because declining to answer is a real behaviour (row C4). An empty
+summary raises, because a zero there is indistinguishable from a mechanism that
+scored zero — rule 8's accumulator reporting its own initial value.
+
+### Dependency-free, and the test for it was wrong first
+
+This is the ruler, so it takes no dependencies (note 007). The test asserting that
+searched the source for the string `import numpy` and **failed on the module's own
+docstring**, which contains the sentence "the ruler does not import numpy". It now
+parses the file with `ast` and inspects import nodes, with a companion asserting
+`dataclasses` IS found — because "this set does not contain numpy" passes
+trivially when the parse found nothing.
+
+> Two tests in two commits now, both written to check a claim and both initially
+> answering a nearby question instead. 164's asserted on a noise draw; this one
+> asserted on prose. The pattern is the same and worth naming: **the cheap version
+> of a check tends to match the claim's WORDS rather than its content.**
+
+### What is deliberately NOT claimed
+
+**Row F3 stays UNTESTED.** A ruler is not a measurement. Nothing in this project
+emits a set answer yet, and the next step is wiring `families.py` to a set-valued
+query — John's ruling, families first and closure after.
+
+### How to undo it
+
+Delete the module and `tests/test_answers.py`. Nothing imports it yet, so no
+result moves. `tools/mutate.py` carries
+`the-set-score-reports-RECALL-as-F1`, which replaces the F1 formula with recall
+and is caught by the falsifier above.

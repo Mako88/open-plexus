@@ -787,11 +787,14 @@ MUTATIONS = [
                "a key space nothing was written to -- and the model still "
                "returns answers, still trains, and still reports accuracies. "
                "Decision 123 lifted the refusal ONLY where search supplies a "
-               "pair-key walk instead of a re-encoding hop; dropping the "
-               "search_branches clause re-opens it everywhere else",
+               "pair-key walk instead of a re-encoding hop; decision 158 "
+               "lifted it again ONLY where `hop_relation` builds the pair key "
+               "itself. Dropping either clause re-opens it everywhere else",
         path=LOCAL,
-        old="        if self.hops > 1 and self.context_keys "
-            "and self.search_branches < 1:",
+        # RE-POINTED, decision 158. The guard grew a `hop_relation` clause and
+        # this mutation stopped matching -- `--verify` caught it in the same
+        # run, which is the harness doing its job rather than a near miss.
+        old='        if (self.hops > 1 and self.context_keys and self.search_branches < 1\n                and self.hop_relation < 0):',
         new="        if False and self.hops > 1 and self.context_keys:",
     ),
     Mutation(

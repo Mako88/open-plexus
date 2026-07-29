@@ -75,7 +75,7 @@ verified
 |---|---|---|---|
 | D1 | Store a typed edge `(subject, relation) → object` | **PARTIAL** | `PairKeys` does exactly this and kinship uses it; decision 100 measured mis-keying at 0.020 vs 0.713. But nothing **chooses** the relation — it is whatever the layout supplies |
 | D2 | Keep two edge types about one subject apart | **PASSING** | **157**: with pair keys every column returns to within 0.05 of its link-free value (0.8333 / 0.4383 / 0.8150), where untyped they collapsed to 0.13 / 0.03 / 0.12. 156 had already ruled out capacity, leaving addressing as the only candidate |
-| D3 | Follow *a specific* relation when reading | **FAILING** | the hop reads `key(concept)`, never `key(concept, relation)` — note 051. **157 measured the consequence**: LINKED queries score 0.1275 against chance 0.125 while the gate correctly defers on 0.9933 of them. The model knows it does not know, and cannot follow the edge |
+| D3 | Follow *a specific* relation when reading | **PARTIAL** | **158**: `hop_relation` builds `key(relation, concept)` and `tests/test_typed_hop.py` shows the same sequence at the same position returning THROUGH_IS_A or THROUGH_HAS_A by which relation the hop carries — impossible untyped, where both edges share one address. **The relation is fixed, not chosen**, and 157's LINKED column (0.1275 vs chance 0.125) is still unmoved because the task is not wired to it |
 
 **Depends on:** A1, A3, A4 (typing multiplies distinct addresses, so D costs A4).
 
@@ -115,16 +115,16 @@ and duplicating it is how two documents start disagreeing.
 
 ## What this ledger says right now
 
-**8 PASSING, 5 PARTIAL, 2 FAILING, 3 UNTESTED, 4 CLAIMED.**
+**8 PASSING, 6 PARTIAL, 1 FAILING, 3 UNTESTED, 4 CLAIMED.**
 
-**D2 was FAILING this morning and is PASSING now** — decision 157, typed
-addresses. The two that remain, **D3 and E4**, are one thing: typing the WRITE
-fixed the collision, and following a NAMED relation needs typing the READ. 157
-measured the consequence directly — LINKED queries sit at chance while the gate
-correctly defers on 0.9933 of them, so the model knows it does not know and
-cannot act on it. **That is the next work**, and
-[note 051](docs/notes/051-typed-edges-a-ground-up-pass.md) is where it is
-specified.
+**D2 and D3 both moved today** — 157 typed the write, 158 typed the read. What
+remains on D3 is that the relation is **fixed rather than chosen**: the mechanism
+follows a named edge, and nothing decides which name. Note 051 §5 flags choosing
+as unsolved for open queries, and decision 147 is why a learned chooser should
+not be attempted before the fixed one is shown to pay on a task.
+
+**E4 is the one FAILING row left**, and it is now the only thing between the gate
+and composition.
 
 The PARTIAL that matters most is **C2**. Typing addresses moves it: `key(entity,
 has-value)` reading empty is *"I don't know this entity's value"*, where

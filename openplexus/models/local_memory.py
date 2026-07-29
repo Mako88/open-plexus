@@ -1129,6 +1129,25 @@ class LocalMemoryConfig:
     #: mechanism -- nothing in the read path consults it unless `index_prefer`
     #: does.
     track_occupancy: bool = False
+    #: Bind this RELATION token into the hop's key, so a hop follows a NAMED
+    #: edge instead of whatever happens to sit at the concept's address.
+    #: `-1` is off and is every number measured before 2026-07-29.
+    #:
+    #: **ARCHITECTURE row D3.** Decision 157 measured the gap it fills: with
+    #: typed WRITES a link no longer overwrites a fact, but LINKED queries still
+    #: score 0.1275 against chance 0.125 while the gate correctly defers on
+    #: 0.9933 of them. The model knows it does not know and cannot act on it,
+    #: because the hop reads `key(concept)` and never `key(relation, concept)`.
+    #:
+    #: **It is a fixed relation, not a chosen one**, and that is the honest
+    #: limit of this version. Which relation to follow is a decision the model
+    #: does not make -- note 051 §5 flags it as unsolved for open queries, and
+    #: decision 147 is why guessing at a learned chooser before the fixed one is
+    #: shown to work would be the wrong order.
+    #:
+    #: Needs a key source that can form a pair (`context_keys`), because a
+    #: single key has nowhere to put the relation.
+    hop_relation: int = -1
     readout_bias: bool = False
     derived_keys: bool = False
     context_keys: bool = False
@@ -1187,7 +1206,13 @@ class LocalMemoryConfig:
             raise ValueError("decay must be in (0, 1]")
         if self.key_scale <= 0.0:
             raise ValueError("key_scale must be positive")
-        if self.hops > 1 and self.context_keys and self.search_branches < 1:
+        # `hop_relation` is the OTHER way to satisfy this guard, and the
+        # guard's own text says so: "a hop that constructs a PAIR key is the
+        # mechanism this needs". A typed hop constructs exactly that --
+        # `key_source.pair(relation, decoded)` -- so the key space it queries is
+        # the one the store writes to, which is the whole objection.
+        if (self.hops > 1 and self.context_keys and self.search_branches < 1
+                and self.hop_relation < 0):
             raise ValueError(
                 "hops re-encode a decoded token through Wk, a SINGLE-TOKEN key "
                 "table, and context_keys makes the store's keys derive from "
@@ -1391,6 +1416,11 @@ class LocalMemoryConfig:
                 "have silently selected the norm rule, which decision 147 "
                 "refuted -- so a typo would have been measured as the one "
                 "setting already known not to work")
+        if self.hop_relation >= 0 and not self.context_keys:
+            raise ValueError(
+                "hop_relation needs context_keys: a typed hop reads "
+                "key(relation, concept), and a single key has nowhere to put "
+                "the relation. Decision 157 is the measurement this exists for")
         if self.memory_cap < 0.0:
             raise ValueError("memory_cap must not be negative")
         if self.capture_slots < 0:
@@ -2797,7 +2827,26 @@ class LocalAssociativeMemory:
                 # gradient of confidence, so a wrong first hop is silently
                 # asserted rather than hedged. `hop_sharpness` is the dial
                 # between the two, and high enough approaches argmax.
-                hop_key = weights @ self.wk
+                if self.config.hop_relation >= 0:
+                    # THE TYPED HOP, ARCHITECTURE row D3.
+                    #
+                    # The soft mixture is what NAMES the concept -- decision 154
+                    # measured it landing at cosine 0.96 on a single row -- so
+                    # decoding it costs an argmax and loses little. The pair key
+                    # then addresses `(relation, that concept)`, which is the
+                    # same address a `RELATION subject object` fact wrote.
+                    #
+                    # This is where the softness is spent rather than kept: a
+                    # pair key is formed from two token IDS, so the relation
+                    # cannot be blended in the way `weights @ wk` blends
+                    # concepts. Naming that as a cost -- the hop is hard here
+                    # where it was soft before, and a wrong decode is asserted
+                    # rather than hedged, which is exactly what the comment
+                    # below warns about for the untyped path.
+                    hop_key = self.key_source.pair(
+                        self.config.hop_relation, int(np.argmax(weights)))
+                else:
+                    hop_key = weights @ self.wk
                 fetched = self.retrieval.read(readable, hop_key)
                 if self.config.hop_accumulate == "bind":
                     # HOLD BOTH, by binding them into one vector.

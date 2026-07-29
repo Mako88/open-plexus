@@ -5222,3 +5222,57 @@ have. **T4 CONFIRMED** at 0.9933 against a predicted 0.9. **T5**, which decision
 The next thing is D3: give the hop a relation. `argmax(wk @ hop_key)` names the
 concept it landed on (154, cosine 0.96), so the missing half is which relation to
 bind with it.
+
+## 158. The hop can follow a named edge, and the guard that blocked it named the fix
+
+ARCHITECTURE row D3. `hop_relation` binds a relation token into the hop's key, so
+a hop reads `key(relation, concept)` rather than `key(concept)`. The concept comes
+from decoding the hop's own softmax, which decision 154 measured landing at cosine
+0.96 on a single row.
+
+**`tests/test_typed_hop.py` is the whole result.** One sequence states two edges
+about one subject — `IS_A SUBJECT THROUGH_IS_A` and `HAS_A SUBJECT
+THROUGH_HAS_A` — and a cue whose ordinary read lands on the subject, so the HOP
+is what has to do the work. The same sequence at the same position returns
+`THROUGH_IS_A` or `THROUGH_HAS_A` **according to which relation the hop carries**.
+
+That test could not have been written before typing. Untyped, both edges live at
+`key(SUBJECT)` and a retrieval is their sum, so no setting of anything returns one
+rather than the other.
+
+### The guard predicted its own fix
+
+`hops > 1` with `context_keys` was refused, and the refusal is worth quoting:
+
+> *"hops re-encode a decoded token through Wk, a SINGLE-TOKEN key table, and
+> context_keys makes the store's keys derive from (previous, token) pairs
+> instead — measured cosine between the two is −0.069 … **A hop that constructs
+> a PAIR key is the mechanism this needs.**"*
+
+A typed hop constructs exactly that. So the guard is relaxed **only** when
+`hop_relation` is set, and the reason cites the guard's own sentence rather than
+overriding it. The `search_branches` route it points at (decision 123) remains the
+other way to satisfy it.
+
+### Two mistakes the tests caught, both mine
+
+**`hops=1` takes no hop**, so the first version of the test had the ordinary read
+answering and `hop_relation` inert — both settings returned the same token. The
+`test_the_two_settings_disagree` case is what exposed it, and it exists precisely
+because two tests passing for the wrong reason looks identical to two passing for
+the right one.
+
+**The addressing tests built a model they did not need**, tripping the guard.
+They use only the key source.
+
+### What this does NOT do, stated plainly
+
+**The relation is fixed, not chosen.** `hop_relation` is a configuration, so the
+mechanism follows a named edge and nothing decides which name. Note 051 §5 flags
+choosing as unsolved for open queries, and decision 147 — where two hand-made
+selection rules were both refuted — is the argument for not attempting a learned
+chooser before the fixed one is shown to pay on a task.
+
+**And 157's LINKED column is unmoved at 0.1275**, because the families task is
+not wired to this yet. D3 moves FAILING → PARTIAL on the mechanism, not on a task
+result, and the ledger says so.

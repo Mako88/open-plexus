@@ -22,7 +22,17 @@ from collections import defaultdict
 
 from tools.recovery import load, require
 
-KIND_ORDER = ("floor", "concept", "stratified", "permuted", "shuffled")
+#: `context` and `current` carry the SAME grouping as `concept` and apply it to
+#: one coordinate of the pair key rather than both, so they sit between it and
+#: the floor by construction: 13,113 and 12,776 addresses at K=128 against the
+#: floor's 36,299 and full grouping's 3,438.
+#:
+#: **P2's controls belong to `concept` alone.** `permuted` and `shuffled` group
+#: both coordinates, so scoring a one-sided arm against them would compare two
+#: changes at once. If a one-sided arm turns out to be the one that pays, its
+#: own matched control is the next run rather than a column of this one.
+KIND_ORDER = ("floor", "concept", "stratified", "context", "current",
+              "permuted", "shuffled")
 #: P1's gate: bits below `floor` that count as the mechanism doing something.
 GATE = 0.10
 #: P2's margin: bits by which a real grouping must beat a structureless one.

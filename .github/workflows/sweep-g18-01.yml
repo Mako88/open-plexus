@@ -47,10 +47,18 @@ name: sweep-g18-01-does-storing-by-concept-make-words-learnable
 # the wall needs the next explanation rather than a bigger sweep.
 #
 # COST, from the dearest cell (any single arm at 90,000 words, one epoch, width
-# 128): 224 s measured locally, so ~5-6 min on a runner. A five-K job is ~30
-# min. 22 jobs, ~13 CPU-hours. The bias-off block runs ONE seed rather than
-# three: it is a robustness check against the configuration every earlier number
-# used, not the measurement.
+# 128): ~2 min on a runner, measured by g18-00's 30 cells finishing in 3m12s
+# wall. A five-K job is ~10 min. 30 jobs. The bias-off block runs ONE seed
+# rather than three: it is a robustness check against the configuration every
+# earlier number used, not the measurement.
+#
+# `context` and `current` group ONE coordinate of the pair key rather than both,
+# and they sit exactly between the floor and full grouping by construction --
+# 13,113 and 12,776 addresses at K=128 against 36,299 and 3,438. They carry the
+# same clustering as `concept`, so a difference between the three is about the
+# coordinate rather than about the grouping. P2's controls stay attached to
+# `concept`: `permuted` and `shuffled` group both coordinates, so scoring a
+# one-sided arm against them would be two changes in one comparison.
 
 # ⚠ NOT DISPATCHABLE UNTIL g18-00 LANDS. The learning rate and the cap below are
 # deliberately unset: g18-00 measures what each arm needs to run at all, and
@@ -76,7 +84,7 @@ jobs:
       fail-fast: false
       matrix:
         seed: [0, 1, 2]
-        arm: [floor, concept, stratified, permuted, shuffled]
+        arm: [floor, concept, stratified, context, current, permuted, shuffled]
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -103,7 +111,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arm: [floor, concept, stratified, permuted, shuffled]
+        arm: [floor, concept, stratified, context, current, permuted, shuffled]
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -172,7 +180,7 @@ jobs:
       - name: Combine
         run: |
           set -o pipefail
-          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 22" | tee summary.txt
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 30" | tee summary.txt
           python -m tools.summarise_g18_01 | tee -a summary.txt
       - name: Summary
         if: always()

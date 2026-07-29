@@ -38,7 +38,7 @@ name: sweep-g18-00-what-does-each-arm-need-to-run-at-all
 # mechanism at a rate tuned for the baseline is the confound g10-09 was
 # retracted for, and it runs in both directions.
 #
-# COST: 48 cells, one per job. Measured rather than estimated on the second
+# COST: 40 cells, one per job. Measured rather than estimated on the second
 # pass: the first 30-cell run took 3m12s wall end to end, because the matrix
 # fans out and a cell is ~2 min on a runner.
 #
@@ -74,14 +74,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # EXTENDED DOWNWARD after the first pass, in which EVERY arm chose the
-        # smallest rate on the grid. A grid whose edge is the answer has not
-        # answered anything, and the summariser says so per arm rather than
-        # leaving it to be noticed.
-        lr: ["0.05", "0.01", "0.005", "0.001", "0.0005", "0.0002", "0.0001",
-             "0.00005"]
-        cap: ["0", "5.0"]
-        arm: [floor, concept, stratified]
+        # EXTENDED DOWNWARD TWICE. Every arm chose the smallest rate on the
+        # first grid, and every arm but one chose the smallest on the second.
+        # A grid whose edge is the answer has not answered anything.
+        #
+        # The rates above 0.0005 are dropped: they are measured, they are in the
+        # sweep record, and re-running them each pass spends a third of the
+        # matrix reproducing the part that is already flat.
+        lr: ["0.0005", "0.0002", "0.0001", "0.00005", "0.00002", "0.00001",
+             "0.000005", "0.000002"]
+        # CAP 5 ONLY. Two passes have it ahead of no cap for every arm at every
+        # rate that runs -- 9.217 against 9.419 for the floor at the best rate --
+        # and the uncapped grouped arms diverge outright above 0.005. Keeping it
+        # as an axis would spend half the matrix reproducing a settled ordering.
+        cap: ["5.0"]
+        # THE ONE-SIDED ARMS JOIN HERE. A pair key is (t-1, t) and the address
+        # space is their product; `context` and `current` group one coordinate
+        # and leave the other exact, landing at 13,113 and 12,776 addresses
+        # against the floor's 36,299 and full grouping's 3,438. They carry the
+        # same clustering as `concept`, so a difference is about the coordinate.
+        arm: [floor, concept, stratified, context, current]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -126,7 +138,7 @@ jobs:
       - name: Combine
         run: |
           set -o pipefail
-          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 48" | tee summary.txt
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 40" | tee summary.txt
           python -m tools.summarise_g18_00 | tee -a summary.txt
       - name: Summary
         if: always()

@@ -126,7 +126,12 @@ EPOCHS = 1
 CHUNK = 256
 SEEDS = tuple(range(3))
 GROUPS = (64, 128, 256, 512, 1024)
-KINDS = ("concept", "stratified", "permuted", "shuffled")
+KINDS = ("concept", "stratified", "context", "current", "permuted", "shuffled")
+#: Which coordinate of the pair key each arm groups. `context` and `current`
+#: carry the SAME learned grouping as `concept` and differ only in where it is
+#: applied, so a difference between the three is about the coordinate and not
+#: about the clustering -- which is what makes them worth running beside it.
+COORDINATES = {"context": "context", "current": "current"}
 #: How many of the commonest words `stratified` leaves ungrouped. Fixed rather
 #: than swept: it is a way of asking whether grouping the tail alone is the
 #: better shape, and sweeping it here would confound that question with tuning.
@@ -254,7 +259,10 @@ def surfaces_for(kind: str, k: int, vocab: int, stream: np.ndarray,
         return (Shared(vocab, stratified_groups(index, stream, vocab, k, seed)),
                 index)
     groups = cluster(index.vectors, k, seed=seed)
-    if kind == "concept":
+    if kind in ("concept", "context", "current"):
+        # The SAME grouping. These three differ only in which coordinate of the
+        # pair key it is applied to, which is what makes a difference between
+        # them readable as being about the coordinate.
         return Shared(vocab, groups), index
     if kind == "permuted":
         order = np.random.default_rng((seed, 92)).permutation(vocab)
@@ -267,17 +275,27 @@ def surfaces_for(kind: str, k: int, vocab: int, stream: np.ndarray,
     raise ValueError(f"unknown arm kind {kind!r}")
 
 
-def addressing(stream: np.ndarray, surfaces) -> tuple[int, float]:
+def addressing(stream: np.ndarray, surfaces, vocab: int,
+               coordinates: str = "both") -> tuple[int, float]:
     """Distinct pair addresses in the training stream, and mean recurrence.
 
     **The rail.** The whole proposal is that grouping collapses the address space
     and raises recurrence; if these two numbers do not move, nothing else in the
     row means anything. Computed from the stream rather than from the model, so
     a bug in the wiring cannot make them agree with the accuracy.
+
+    `coordinates` mirrors `ByConcept`: a one-sided arm groups one half of the
+    pair, so counting both halves would report a collapse it did not make.
     """
-    concepts = np.asarray([surfaces.of(int(t)) for t in stream])
-    pairs = set(zip(concepts[:-1].tolist(), concepts[1:].tolist()))
-    return len(pairs), (len(concepts) - 1) / max(len(pairs), 1)
+    grouped = np.asarray([surfaces.of(int(t)) for t in stream])
+    # Shifted exactly as `ByConcept` shifts, so a concept and a surface cannot
+    # be counted as one address here while being two in the model.
+    shifted = grouped + (0 if coordinates == "both" else vocab)
+    previous = shifted[:-1] if coordinates != "current" else stream[:-1]
+    current = shifted[1:] if coordinates != "context" else stream[1:]
+    pairs = set(zip(np.asarray(previous).tolist(),
+                    np.asarray(current).tolist()))
+    return len(pairs), (len(stream) - 1) / max(len(pairs), 1)
 
 
 def collected(model, chunks) -> tuple[np.ndarray, np.ndarray]:
@@ -324,11 +342,13 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
         d_model=WIDTH, vocab_size=built.vocab_size, seed=seed,
         derived_keys=True, context_keys=True, readout_bias=bias,
         decay=decay, memory_cap=cap, lr=lr))
+    coordinates = COORDINATES.get(kind, "both")
     if kind != "floor":
         # The store is addressed by concept; `model.surfaces` keeps routing
         # consistent with it for the partitioned path, which is off here.
         model.key_source = ByConcept(model.key_source, surfaces,
-                                     built.vocab_size)
+                                     built.vocab_size,
+                                     coordinates=coordinates)
         model.surfaces = surfaces
     model.content = index
 
@@ -375,12 +395,13 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
     # this model does, and the cell is not a measurement.
     uniform = float(np.log2(built.vocab_size))
     unstable = bool(not diverged and error > uniform + 0.05)
-    addresses, recurrence = addressing(stream, surfaces)
+    addresses, recurrence = addressing(stream, surfaces, built.vocab_size,
+                                       coordinates)
     unigram, bigram = counting_bars(built.vocab_size, stream, test_chunks)
     return dict(
         arm=f"{kind}-{k}" if kind != "floor" else "floor",
         kind=kind, groups=k, seed=seed, bias=bias,
-        decay=decay, cap=cap, lr=lr,
+        decay=decay, cap=cap, lr=lr, coordinates=coordinates,
         diverged=bool(diverged),
         unstable=unstable,
         error=error,

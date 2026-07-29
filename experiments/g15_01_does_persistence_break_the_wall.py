@@ -121,12 +121,32 @@ ARMS = {
     # reaching 3452 on a repeating token. It is included BECAUSE it is the
     # limiting case: if it diverges, the cap is not an arbitrary constant and
     # the question becomes what shape it should have rather than how large.
-    "persist-cap50": dict(consolidation=0.5, lasting_cap=50.0,
-                          persistent_lasting=True),
-    "persist-cap500": dict(consolidation=0.5, lasting_cap=500.0,
-                           persistent_lasting=True),
-    "persist-uncapped": dict(consolidation=0.5, lasting_cap=1e9,
-                             persistent_lasting=True),
+    # RAISING THE CAP DID NOTHING, and measuring that is what found the real
+    # defect. Every capped arm pinned at EXACTLY its cap -- 5, 50, 500 and 1e9
+    # -- because `lasting` has only `+=`: `memory *= decay` brakes the fast
+    # store every step and the slow store had no equivalent, so it accumulates
+    # monotonically and saturates whatever ceiling exists. At 1e9 the readout
+    # overflowed to NaN.
+    #
+    # Note 018 recorded this defect in the FAST store; this is its mirror, and
+    # Zenke & Gerstner (2017) -- the paper `lasting_cap` came from -- is titled
+    # *Hebbian plasticity requires compensatory processes on MULTIPLE
+    # timescales*. The project had implemented one.
+    #
+    # A brake alone is not enough: at `consolidation=0.5` the store still
+    # saturates by 50 sequences at every decay tried. Measured, norm after
+    # 10/50/200 sequences at cap 500:
+    #
+    #     consolidation 0.500   189.7   500.0   500.0   saturated
+    #     consolidation 0.050     9.7    26.4   500.0   saturated
+    #     consolidation 0.005     0.5     4.3    17.7   tracks
+    #
+    # **The write rate was about a hundred times too large.** 0.5 was tuned for
+    # a store that is REBUILT every sequence; a persistent one accumulates it.
+    "persist-slow": dict(consolidation=0.005, lasting_cap=500.0,
+                         persistent_lasting=True),
+    "persist-slow-decay": dict(consolidation=0.005, lasting_cap=500.0,
+                               persistent_lasting=True, lasting_decay=0.99),
 }
 
 

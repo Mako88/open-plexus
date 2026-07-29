@@ -815,6 +815,29 @@ class LocalMemoryConfig:
     #: Requires `consolidation` -- there is nothing to persist without a
     #: mechanism that promotes into it.
     persistent_lasting: bool = False
+
+    #: How much of the slow store survives each SEQUENCE. 1.0 is no forgetting,
+    #: which is what every run before g15-01 used.
+    #:
+    #: **The slow store never decayed, and that is why persistence saturated.**
+    #: `memory *= decay` brakes the fast store every step; `lasting` has only
+    #: `+=`. So it accumulates monotonically forever, and g15-01 measured its
+    #: norm pinned at EXACTLY the cap for every cap tried -- 5, 50, 500 and
+    #: 1e9 -- because it grew past each one and was clipped back. At 1e9 the
+    #: readout overflowed to NaN.
+    #:
+    #: A finite cap therefore does not bound a growing store, it *saturates*
+    #: one: the magnitude is constant by construction and only the direction
+    #: moves, dominated by whatever was written most recently and largest.
+    #:
+    #: Zenke & Gerstner (2017) -- the paper `lasting_cap` came from -- is titled
+    #: *Hebbian plasticity requires compensatory processes on MULTIPLE
+    #: timescales*, and this project had implemented one. Note 018 recorded the
+    #: same defect in the FAST store; this is its mirror.
+    #:
+    #: Per SEQUENCE rather than per step, because that is the slow store's
+    #: timescale. At 0.99 a contribution is halved after ~69 sequences.
+    lasting_decay: float = 1.0
     corrective_writes: bool = False
     write_gate: float = 1.0
     retrieval_steps: int = 1
@@ -1248,6 +1271,13 @@ class LocalMemoryConfig:
                 "capture_slots bounds consolidation and does nothing without it")
         if self.lasting_cap < 0.0:
             raise ValueError("lasting_cap must not be negative")
+        if not 0.0 < self.lasting_decay <= 1.0:
+            raise ValueError("lasting_decay must be in (0, 1]")
+        if self.lasting_decay != 1.0 and not self.persistent_lasting:
+            raise ValueError(
+                "lasting_decay is applied once per SEQUENCE, and without "
+                "persistent_lasting the slow store does not survive one -- the "
+                "setting would be silently inert")
         if self.persistent_lasting and not self.consolidation:
             raise ValueError(
                 "persistent_lasting keeps the CONSOLIDATED store across "
@@ -1710,6 +1740,12 @@ class LocalAssociativeMemory:
         if self.config.persistent_lasting:
             if self._lasting is None:
                 self._lasting = np.zeros((d, d))
+            # THE SLOW STORE'S BRAKE, applied once per sequence because that is
+            # its timescale. Without it the store only ever grows and saturates
+            # against whatever cap exists -- g15-01 measured the norm pinned at
+            # exactly 5, 50, 500 and 1e9 in turn.
+            if self.config.lasting_decay != 1.0:
+                self._lasting *= self.config.lasting_decay
             lasting = self._lasting
         else:
             lasting = (np.zeros((d, d)) if self.config.consolidation else None)

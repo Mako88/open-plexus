@@ -17,8 +17,8 @@ from collections import defaultdict
 
 from tools.recovery import load, spread
 
-ARM_ORDER = ("baseline", "consolidate", "persist", "persist-cap50",
-             "persist-cap500", "persist-uncapped")
+ARM_ORDER = ("baseline", "consolidate", "persist", "persist-slow",
+             "persist-slow-decay")
 
 #: Where the wall is. **Movement is split here rather than measured across the
 #: whole range**, because the first pass asked for total movement and counted

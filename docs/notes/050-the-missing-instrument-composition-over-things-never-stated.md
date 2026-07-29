@@ -1,6 +1,7 @@
 # 050 — The missing instrument: composition over something never stated
 
-**Status:** a task design, nothing built. Written because decisions 153 and 154
+**Status:** a task design, nothing built — **except the half of its
+calibration that needed no task change, which has been run.** See below. Written because decisions 153 and 154
 together move the blocker off the mechanism and onto the instrument, and GOALS §4
 puts the instrument first for exactly this reason.
 
@@ -81,8 +82,31 @@ the co-occurrence structure the index is fitted on. If `ContentIndex` can rank
 the linked family above chance from background streams, the task is measuring the
 index and not the composition.
 
-**That check comes first**, as g19-00 came before g19-01 — a task calibration
-that asks whether the structure is discoverable, before any arm is run.
+**That check comes first**, as g19-00 came before g19-01 — and half of it has
+now been run, because it needed no task change. `ContentIndex` fitted on the
+existing background streams, three seeds, mean cosine between entity blocks:
+
+    within-family    0.9989   sd 0.0007
+    across-family   -0.1040   sd 0.1243
+    spread across family pairs 0.6917, largest pair 0.2166
+
+**The good half:** families are recovered essentially perfectly (consistent with
+g19-00's purity 1.000) and there is no family-to-family structure on average. The
+background states attributes and entities only, so a link stated solely in task
+sequences cannot reach the index. **By construction, not by luck.**
+
+**The half that changes the acceptance test:** across-family similarity is not
+uniformly zero. It has an 0.69 spread and the most similar pair reaches 0.2166.
+A link permutation drawn blindly could land on a pair the index already sees as
+close, and that cell would then be partly answerable without any hop — decision
+143's trap wearing a different costume.
+
+> **So the calibration must check the DRAWN link, not the average.** For each
+> seed, the cosine between the linked families' entity blocks must sit inside the
+> across-family distribution rather than in its upper tail, and the number must
+> be carried in every record — as `family_recovery` already is in g19-01, and for
+> the same reason: a weak result read without it could be the composition failing
+> or the link being trivially visible, and those are different findings.
 
 ## The arms this needs
 
@@ -122,5 +146,9 @@ link must therefore be **off by default** and the existing generator byte
 identical without it, or every number in 148–151 stops reproducing — decision
 74's failure, and the reason `--n-values` and `--branches` default to `None`.
 
-**Not built. Not started.** The calibration check above is the part that decides
-whether the rest is worth writing.
+**Half the calibration is done and it passed.** The index carries no
+family-to-family structure, by construction rather than by luck. What remains
+before any of the rest is worth writing is the per-seed check on the DRAWN link,
+and that needs the link to exist — so it is the first thing the task file owes.
+
+**The task is not built and not started.**

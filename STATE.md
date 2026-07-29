@@ -22,14 +22,31 @@ mention something in the log, that thing is closed.
 The project is trying to build a neural network that runs across ordinary
 people's computers over the ordinary internet, instead of inside a data centre.
 
-The current experiment is about **reasoning over facts** — being told "A is B's
-parent" and "B is C's parent" and answering a question about A and C. The model
-can now do this when the facts form a simple chain. It cannot do it reliably when
-a person appears in more than one fact, which is what real facts look like.
+Its central piece is a **memory that stores associations** — told "A is B's
+parent", it can later answer a question about A and B.
 
-**The reason has been found and it is boring in a good way:** the memory is too
-narrow. Made wider, it stops making the mistake. Nobody has yet re-run the real
-task at the wider setting, and that is the next thing to do.
+**On the task that memory was built for, it does everything.** On a recall test
+where the answer was stated earlier in the same passage, the model scores 0.995,
+and switching the memory off drops it to zero. Nothing else in the model is doing
+that work.
+
+**On ordinary text, it contributes nothing at all** — and that took most of
+2026-07-29 to establish, because a bug made it look like something worse. What
+predicts text is a simple frequency prior: which words are common. The memory
+adds no bits on top of it, at any width, any learning rate, any addressing
+scheme, and any amount of text held at once.
+
+Three explanations for the gap have been measured and killed: that text is easy
+for other reasons; that the memory is addressed wrongly; that it is asked to hold
+too much at once. **One is left and it has not been tested.** The recall test
+announces its questions — it says *here comes a question* before asking. Ordinary
+text never does. A memory that cannot tell "recall this" from "guess the next
+word" would be drowned out by the prior at every position where guessing is
+right, which in text is nearly all of them.
+
+Testing that means changing the model or the task rather than measuring what is
+there, so it is the first decision on this line that is John's rather than the
+evidence's.
 
 ---
 

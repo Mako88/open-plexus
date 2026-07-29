@@ -5326,3 +5326,55 @@ so 157's LINKED column at 0.1275 is unmoved. NO FAILING ROWS REMAIN -- 8 passing
 7 partial, 0 failing, 4 untested, 4 claimed -- and what the partials share is
 that each is a mechanism shown to work in isolation whose value on a task is
 still unmeasured.
+
+## 160. "Alternatives, not additive" was too strong, and it blocks the run that matters
+
+Found while wiring the LINKED run — the sweep that would tell us whether today's
+mechanisms are individually correct and collectively useless. **They cannot
+currently be combined**, and the reason is a decision I made an hour earlier.
+
+The LINKED path needs both gates, at different levels:
+
+    position   `key(FACT, entity)` is empty -> ask the entity's SIBLINGS.
+               That is `index_prefer="inherit"`, decision 148
+    hop        the chain dead-ends -> ask neighbours of WHERE IT LANDED.
+               That is `index_at_hops`, decision 159
+
+Decision 159 made `index_at_hops` skip the position-level block entirely, so
+`inherit` has no neighbours to defer to and never fires. **The two mechanisms
+this line spent the day building cannot run in the same model.**
+
+### Why I made that call, and where the reasoning went wrong
+
+The cost test measured 56 reads against 28 and I concluded A and B were
+alternatives. **That was the right fix for the wrong reason.** The doubling came
+from the position-level block running as decision 146's UNGATED summing — it
+reads `index_branches` neighbours at every position regardless of whether
+anything is needed.
+
+`inherit` is not that. It is gated: it defers only where the token's own address
+is empty AND a neighbour's is not. **Two gated mechanisms compose without
+doubling anything**, because each fires only at a dead end and a position is
+rarely both kinds of dead end at once.
+
+So the honest statement is narrower than the one in decision 159's config
+comment: **ungated summing and hop-level fan-out are alternatives. Two gated
+mechanisms are not.**
+
+### What this does not change
+
+The cost claim in decision 159 stands — `tests/test_index_at_hops.py` measures 1
+extra read against an ungated 56, and that test does not involve `inherit`. What
+changes is which configurations are reachable, not what the fan-out costs.
+
+### Not fixed here, deliberately
+
+The fix is to make the skip conditional on the position-level mechanism being the
+ungated one rather than on `index_at_hops` being set. That is a read-path change
+and it wants its own test — specifically one that measures the read count with
+BOTH gates on, since the whole argument above is a cost argument and I have just
+been wrong about a cost argument once today.
+
+**Recorded rather than patched**, because a hasty fix to the read path is how
+decision 74 happened, and because the finding — that the day's two mechanisms
+have never been in the same model — is worth more than the patch.

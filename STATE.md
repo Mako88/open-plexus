@@ -121,6 +121,22 @@ thing blocking the run.** The relation is still fixed rather than chosen: a
 schedule the task does not supply is a fitted constant (162), which is why 164 is
 an instrument for reaching the measurement and not the final read path.
 
+### What is temporary, and it is one change not five
+
+[Note 055](docs/notes/055-what-is-temporary-an-inventory.md) is the inventory John
+asked for. The finding: **note 042's top three items are all still open and every
+default ships them off** — `carry_store` False, `concept_nodes` 0, keys addressing
+identity only. They are **one change seen from three sides**: a persistent,
+concept-partitioned store addressed by content-derived keys *is* the concept map.
+The dimension-summing readout belongs with it, because a concept-partitioned read is
+a SELECTION rather than the global sum **C1 forbids**.
+
+**It invalidates essentially every task number**, which is the argument for doing it
+before more iteration rather than after. **The falsifier is cheap and already
+named:** does a persistent slow store break decision 63's 16,000-character wall?
+One axis, one arm, probeable locally. **Two design documents now describe this
+change and nothing is built toward it.**
+
 ### The rail this project does not have
 
 Decision 161: accuracy is measured everywhere, and **the read count that C1 and
@@ -153,22 +169,11 @@ while TRANSFER gains 0.231. Summing lets agreeing neighbours corroborate;
 `inherit` refuses that on principle, which is what keeps a contradicting fact
 intact when there IS a conflict.
 
-**And 149–153 measured its scope rather than assuming it.** Every entry is in
-DECISIONS.md; the reason it is compressed here is that each carried a
-forward-looking claim superseded within a day, which is the drift this file
-exists to stop.
-
-    149  not a fitted constant. Across n_values 4/8/16 and family_size 3/4/6 the
-         ordering holds in EVERY cell, gate at 1.0000/0.0000. The one dip was
-         BRANCHES=3 unable to reach a stated sibling; --branches 5 fixed it
-    150  MQAR: inherit matches plain SEED FOR SEED (0.9950) and never defers,
-         while summing the same extra reads costs 0.113. Also rules out sketch
-         false negatives, which would have been invisible on families
-    151  kinship: defers on 0.0000 at one hop AND at two, so the gate is blind
-         where the address is occupied either way
-    152  chains unaskable — index_branches and hops > 1 exclude each other
-    153  half the gate goes there anyway: `track_occupancy` runs at hops=2.
-         It then finds chain start/middle/end at 0.893/0.791/0.898 — nothing
+**And 149–153 measured its scope rather than assuming it** — not a fitted constant
+across `n_values` and `family_size`, matching plain seed for seed on MQAR, blind on
+kinship where the address is occupied either way. **Full entries in DECISIONS.md,
+which is where they live**; they leave here under rule 14b, having each carried a
+forward-looking claim superseded within a day. What survives them is one sentence:
 
 > **Occupancy is informative exactly where an address is READ BEFORE IT IS
 > WRITTEN within the sequence.** Families reads a transfer entity at its query
@@ -178,16 +183,9 @@ exists to stop.
 
 **And the neighbour half is not blocked by what the guard says it is —
 decision 154.** Note 044 refuses `index_branches` above one hop because a hop key
-*"names no concept"*. Measured on chains, at the sharpness the task is solved
-with:
-
-    sharpness 6.0        top cos   margin to 2nd
-      ordinary read       1.0000          0.7173     <- the check, not a result
-      HOP 1               0.9612          0.6408
-      HOP 2               0.9734          0.6605
-
-**A hop key sits at cosine 0.96 to a single token's row.** It names a concept,
-and `argmax(wk @ hop_key)` is what the index could look up.
+*"names no concept"*. Measured on chains at the sharpness the task is solved with,
+**a hop key sits at cosine 0.96 to a single token's row** (table in 154). It names a
+concept, and `argmax(wk @ hop_key)` is what the index could look up.
 
 **The guard is not lifted**, because a real design question sits under it that a
 cosine does not settle: `index_branches` runs once per POSITION, not once per

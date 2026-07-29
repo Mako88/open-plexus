@@ -227,3 +227,15 @@ avoid is a design document that cannot reject a mechanism.
 measured gains and architecture work produces designs. The rule that keeps that
 honest is rule 17: *after a block of verification, the next block builds
 something.* An architecture pass should end in a build, not a second pass.
+
+> **Outcome, 2026-07-29.** Checked against the code one day later:
+> **items 1, 2 and 3 are all still open and every default ships them off** —
+> `carry_store` False, `concept_nodes` 0, and `keys.py` addressing identity only.
+> Item 4 (objective/instrument) advanced: `closure.py`, `families.py`, and
+> decisions 165–167 gave row F3 a ruler, a question and a mechanism. Item 5 was
+> re-measured as predicted.
+>
+> [Note 055](055-what-is-temporary-an-inventory.md) is the status pass, written
+> because John asked for exactly this scan again. **The caution above was
+> warranted: there are now two design documents for this change and nothing built
+> toward it.**

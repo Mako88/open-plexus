@@ -202,3 +202,89 @@ class PairKeys:
                     0.0, self.spread, self.width)
             self.cache[(previous, token)] = cached
         return cached
+
+
+class ByConcept:
+    """Any key source, addressed by CONCEPT instead of by surface.
+
+    ## What it is for
+
+    g17-01 found word-level text unlearnable and found the reason: with pair
+    keys, 1,733 words make tens of thousands of distinct addresses over 90,000
+    training words, so nearly every address the store is asked about at test time
+    was written at most once. The store memorises hapaxes rather than superposing
+    anything reusable.
+
+    **Grouping surfaces into concepts collapses that address space.** Three
+    hundred concepts make far fewer pairs than 1,733 words do, and each recurs
+    many times. `concepts.Shared` already expresses the grouping and
+    `grouping.cluster` builds one; this is the piece that makes the store
+    actually *use* it, and it is deliberately a wrapper rather than a fourth key
+    scheme — concept addressing composes with table keys, pair keys, and whatever
+    replaces them.
+
+    **The readout is untouched**, so the model still predicts a surface word from
+    a concept-addressed retrieval: store by concept, emit by word. That asymmetry
+    is the whole proposal, and it is also its risk — two words in one group
+    become indistinguishable *as context*, which is a real loss of resolution
+    traded for recurrence. Which way the trade goes is a measurement.
+
+    ## `concept` returns the SURFACE, on purpose
+
+    Every stock key source answers `concept` with a token id, and the model
+    composes it with `model.surfaces` to get the routing address. Returning a
+    concept id here would put that mapping in twice — the model would map an
+    already-mapped id through the surface table again — so this stays a surface
+    and the composition stays exactly where it was.
+    """
+
+    def __init__(self, inner: KeySource, surfaces, vocab: int) -> None:
+        """
+        Args:
+            inner: The key source to wrap. It sees concept ids where it would
+                have seen token ids, and needs no knowledge that it has been
+                wrapped.
+            surfaces: A `concepts.Surfaces`, consulted once per token here.
+            vocab: How many surface tokens there are. Taken explicitly rather
+                than read off `surfaces`, because `Surfaces` promises `of` and
+                `concepts` and nothing about a vocabulary attribute — widening
+                the protocol to save an argument would be paying for this in the
+                wrong place.
+        """
+        if vocab < 1:
+            raise ValueError("a vocabulary of nothing has nothing to address")
+        self.inner = inner
+        self.surfaces = surfaces
+        #: The mapping, materialised once. `of` is pure by contract, so this is
+        #: a cache and not a snapshot of something that could move.
+        self._of = np.asarray([surfaces.of(t) for t in range(vocab)],
+                              dtype=np.int64)
+
+    def _as_concepts(self, tokens: np.ndarray) -> np.ndarray:
+        """The sequence with every surface replaced by its concept.
+
+        Rebuilt per call rather than cached against the array it came from.
+        Caching on object identity would be correct only while nobody writes
+        through a sequence in place, which is not a promise anything in this
+        project makes, and the gather is a few microseconds against a `d x d`
+        matrix product per step.
+        """
+        return self._of[np.asarray(tokens, dtype=np.int64)]
+
+    def key(self, tokens: np.ndarray, t: int) -> np.ndarray:
+        return self.inner.key(self._as_concepts(tokens), t)
+
+    def key_as(self, tokens: np.ndarray, t: int, token: int) -> np.ndarray:
+        """A candidate is a SURFACE and is mapped like any other.
+
+        The content index proposes words, so what arrives here is a word. Asking
+        the store about it means asking about the concept it belongs to — which
+        also means two candidate surfaces from one concept produce the same read,
+        and a caller that wanted them distinguished is asking the wrong layer.
+        """
+        return self.inner.key_as(self._as_concepts(tokens), t,
+                                 int(self._of[int(token)]))
+
+    def concept(self, tokens: np.ndarray, t: int) -> int:
+        """The surface `inner` names, unmapped. See the class docstring."""
+        return self.inner.concept(tokens, t)

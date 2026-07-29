@@ -1,0 +1,171 @@
+name: sweep-g18-01-does-storing-by-concept-make-words-learnable
+
+# g17-01'S BLOCKER, ATTACKED AT THE ADDRESS SPACE.
+#
+# The model does not learn word-level text at all: 90,000 words buys 0.038 bits
+# over uniform and it sits 2.65 bits worse than a word unigram (8.068 by NGram;
+# the 9.323 in g17-01's record was wrong -- decision 135). The reason g17-01
+# found is address sparsity: with pair keys, 1,733 words make 36,299 distinct
+# addresses over 90,000 words, so almost every address is written once and the
+# store memorises hapaxes.
+#
+# `keys.ByConcept` addresses the store by GROUPS of words instead. Measured
+# before dispatch: K=128 collapses 36,299 addresses to 3,438 and lifts mean
+# recurrence from 2.5 to 26.2. The readout still predicts surfaces -- store by
+# concept, emit by word.
+#
+# TWO CONTROLS, BECAUSE THERE ARE TWO WAYS TO BE WRONG. `permuted` keeps the
+# group SIZES and shuffles the membership, so the address-space statistics are
+# matched and only the meaning is gone. `shuffled` destroys the meaning at the
+# source by fitting the content index on a scrambled stream. An arm beating
+# `floor` but not its controls is a real finding and a smaller one: fewer
+# addresses, however chosen.
+#
+# THE DECAY ARM IS NOT TUNING. The first concept cell overflowed to NaN, and the
+# reason is the defect itself -- surface-level sparsity was the only thing
+# holding the store's norm down, so collapsing the address space restores
+# recurrence AND removes the brake at the same time. `divergence` runs decay 1.0
+# deliberately so that fact is recorded rather than assumed.
+#
+# PREDICTIONS (full text in the script and the sweep file):
+#   P1  THE GATE -- the best concept arm beats floor by more than 0.10 bits
+#   P2  CONTROL -- it beats permuted and shuffled at the same K by 0.05
+#   P3  bits per word is non-monotonic in K, minimum at an intermediate value
+#   P4  RAIL -- addresses fall as the square of the grouping ratio
+#   P5  no arm reaches the word unigram at 8.068
+#
+# WHAT WOULD REFUTE THE PROPOSAL: P1 failing at every K with P4 passing. The
+# address space collapsed exactly as designed and the model still learned
+# nothing, so sparsity was not the binding constraint and note 042's account of
+# the wall needs the next explanation rather than a bigger sweep.
+#
+# COST, from the dearest cell (any single arm at 90,000 words, one epoch, width
+# 128): 224 s measured locally, so ~5-6 min on a runner. A five-K job is ~30
+# min. 22 jobs, ~13 CPU-hours. The bias-off block runs ONE seed rather than
+# three: it is a robustness check against the configuration every earlier number
+# used, not the measurement.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweep
+  cancel-in-progress: false
+
+jobs:
+  grid:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [0, 1, 2]
+        arm: [floor, concept, stratified, permuted, shuffled]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - name: seed ${{ matrix.seed }}, arm ${{ matrix.arm }}
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python experiments/g18_01_does_storing_by_concept_make_words_learnable.py \
+            --seed ${{ matrix.seed }} --arm ${{ matrix.arm }} \
+            --bias 1 --decay 0.997 \
+            --json out/${{ matrix.arm }}-${{ matrix.seed }}-bias1.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g18-01-${{ matrix.arm }}-${{ matrix.seed }}-bias1
+          path: out/*.json
+
+  nobias:
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [floor, concept, stratified, permuted, shuffled]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - name: bias off, arm ${{ matrix.arm }}
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python experiments/g18_01_does_storing_by_concept_make_words_learnable.py \
+            --seed 0 --arm ${{ matrix.arm }} \
+            --bias 0 --decay 0.997 \
+            --json out/${{ matrix.arm }}-0-bias0.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g18-01-${{ matrix.arm }}-0-bias0
+          path: out/*.json
+
+  divergence:
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [floor, concept]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - name: no brake, arm ${{ matrix.arm }}
+        run: |
+          set -o pipefail
+          mkdir -p out
+          python experiments/g18_01_does_storing_by_concept_make_words_learnable.py \
+            --seed 0 --arm ${{ matrix.arm }} \
+            --bias 1 --decay 1.0 \
+            --json out/${{ matrix.arm }}-0-nobrake.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g18-01-${{ matrix.arm }}-0-nobrake
+          path: out/*.json
+
+  aggregate:
+    needs: [grid, nobias, divergence]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install numpy
+        run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g18-01-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 22" | tee summary.txt
+          python -m tools.summarise_g18_01 | tee -a summary.txt
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g18-01-summary
+          path: |
+            summary.txt
+            out/*.json

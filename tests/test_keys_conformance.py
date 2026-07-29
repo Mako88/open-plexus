@@ -25,21 +25,34 @@ import unittest
 
 import numpy as np
 
-from openplexus.keys import KeySource, PairKeys, TableKeys
+from openplexus.concepts import Shared
+from openplexus.keys import ByConcept, KeySource, PairKeys, TableKeys
 
 WIDTH = 8
 VOCAB = 6
 TOKENS = np.tile(np.arange(VOCAB), 3).astype(np.int64)
+#: Tokens 3 and 4 are one concept, and 1 and 2 deliberately are NOT: several
+#: properties below substitute those two and assert the keys differ, which a
+#: grouping that merged them would break for a correct reason. A fixture has to
+#: leave room for the property it is checking.
+GROUPS = [[3, 4]]
 
 
 def sources() -> list[tuple[str, object]]:
     """Every key source the model can be built with."""
     table = np.random.default_rng(0).normal(0.0, 0.3, (VOCAB, WIDTH))
+    pairs = PairKeys(seed=1, spread=0.3, width=WIDTH, start=VOCAB)
     return [
         ("TableKeys", TableKeys(table)),
         # `start` stands in for "no previous token" at position 0, so the
         # first step has a key in the same space as every other step.
-        ("PairKeys", PairKeys(seed=1, spread=0.3, width=WIDTH, start=VOCAB)),
+        ("PairKeys", pairs),
+        # Concept addressing is a WRAPPER, so it has to satisfy every property
+        # its inner source does -- purity, shape, routability. It is the one
+        # source here that rewrites its input before delegating, which is
+        # exactly where a does-not-mutate check earns its place.
+        ("ByConcept(PairKeys)",
+         ByConcept(pairs, Shared(VOCAB, GROUPS), VOCAB)),
     ]
 
 

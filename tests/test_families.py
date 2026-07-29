@@ -92,6 +92,85 @@ class TheTaskIsWellPosed(unittest.TestCase):
         self.assertEqual(sum(sequence.is_transfer), BASE.queries_per_kind)
 
 
+class AnExceptionContradictsItsFamily(unittest.TestCase):
+    """The arm decisions 144 and 145 rest on, added to the task after the first
+    tests were written and therefore uncovered until now.
+
+    Its whole meaning is that the entity's own stated fact **differs** from what
+    its siblings state. If an exception ever coincided with its family's value
+    the arm would score it as a success for the wrong reason, and the failure
+    would look like the mechanism working.
+    """
+
+    ODD = FamilyConfig(n_families=4, family_size=4, n_attributes=2, n_values=6,
+                       stated_per_family=3, exceptions_per_family=1,
+                       queries_per_kind=1, seed=11)
+
+    def test_an_exceptions_answer_differs_from_its_siblings(self):
+        for seed in range(12):
+            sequence = generate(self.ODD, seed=seed)
+            tokens = np.asarray(sequence.tokens)
+            facts = stated_facts(tokens)
+            for position, exception in zip(sequence.query_positions,
+                                           sequence.is_exception):
+                if not exception:
+                    continue
+                entity = int(tokens[position])
+                family = self.ODD.family_of(entity)
+                siblings = [v for e, v in facts.items()
+                            if self.ODD.family_of(e) == family and e != entity]
+                self.assertTrue(siblings)
+                self.assertNotIn(facts[entity], siblings)
+
+    def test_an_exception_is_answered_by_its_OWN_fact(self):
+        """Not its family's. That is the whole distinction."""
+        for seed in range(12):
+            sequence = generate(self.ODD, seed=seed)
+            tokens = np.asarray(sequence.tokens)
+            facts = stated_facts(tokens)
+            for position, exception in zip(sequence.query_positions,
+                                           sequence.is_exception):
+                if exception:
+                    entity = int(tokens[position])
+                    self.assertEqual(int(tokens[position + 1]), facts[entity])
+
+    def test_a_query_is_never_both_transfer_and_exception(self):
+        """One says the fact was not stated, the other that it was and
+        contradicts. Both at once is incoherent."""
+        for seed in range(8):
+            sequence = generate(self.ODD, seed=seed)
+            for transfer, exception in zip(sequence.is_transfer,
+                                           sequence.is_exception):
+                self.assertFalse(transfer and exception)
+
+    def test_the_majority_still_agrees(self):
+        """Decision 145: the default survives because it outnumbers the
+        dissent. If the generator ever let exceptions reach parity, that
+        finding would silently become the 50/50 case 144 mistook for the
+        mechanism."""
+        for seed in range(8):
+            sequence = generate(self.ODD, seed=seed)
+            tokens = np.asarray(sequence.tokens)
+            facts = stated_facts(tokens)
+            for family in range(self.ODD.n_families):
+                values = [v for e, v in facts.items()
+                          if self.ODD.family_of(e) == family]
+                if not values:
+                    continue
+                commonest = max(set(values), key=values.count)
+                self.assertGreater(values.count(commonest), len(values) / 2)
+
+    def test_no_exceptions_reproduces_the_task_143_measured(self):
+        """`exceptions_per_family=0` is the default, and decision 143's numbers
+        depend on this field's existence changing nothing."""
+        plain = FamilyConfig(n_families=4, family_size=3, n_attributes=2,
+                             n_values=6, stated_per_family=1,
+                             queries_per_kind=1, seed=5)
+        for seed in range(6):
+            sequence = generate(plain, seed=seed)
+            self.assertEqual(sum(sequence.is_exception), 0)
+
+
 class TheMappingIsRedrawnEverySequence(unittest.TestCase):
     """Otherwise a prior learns it and transfer becomes counting."""
 

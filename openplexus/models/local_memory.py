@@ -1081,6 +1081,28 @@ class LocalMemoryConfig:
     #: `concept_nodes`; 1 is right for a per-sequence store, which is rebuilt
     #: from scratch anyway, and higher values exist so churn can be measured.
     concept_replicas: int = 1
+    #: How many similar concepts to ALSO read, from the content index. 0 is off
+    #: and reproduces every number measured before note 045.
+    #:
+    #: **Each is an ordinary exact read at a hard token id.** The candidates come
+    #: from meaning-space; the reads do not. That split is the whole design, and
+    #: note 035 is why the other route is closed.
+    #:
+    #: Costs `branches + 1` reads per answered position, in the unit search was
+    #: costed in (decision 123: 3.2x at four branches). Set to `vocab - 1` for
+    #: the exhaustive arm -- John's *"sweep so it gets everything, then filter"*,
+    #: which is the CEILING a cheap variant is measured as a fraction of.
+    index_branches: int = 0
+    #: How much a neighbour's evidence counts against the concept's own read.
+    #: 1.0 gives the whole candidate set the same total weight as the exact read.
+    index_weight: float = 1.0
+    #: Softmax sharpness over candidate similarities. **Not a free constant.**
+    #: Content vectors sit at mean cosine 0.22-0.50 (`ContentIndex.spread`)
+    #: against hash keys' 0.0005, so raw similarities would hand every candidate
+    #: a large share; the softmax is what makes the ranking rather than the floor
+    #: decide. Shares its default with `hop_sharpness`, which solves the same
+    #: problem one level up.
+    index_sharpness: float = 8.0
     seed: int = 0
 
     def __post_init__(self) -> None:
@@ -1332,6 +1354,18 @@ class LocalMemoryConfig:
             raise ValueError(
                 f"d_model {self.d_model} does not divide into "
                 f"{self.partitions} partitions")
+        if self.index_branches < 0:
+            raise ValueError("index_branches must not be negative")
+        if self.index_sharpness <= 0.0:
+            raise ValueError(
+                "index_sharpness must be positive: at zero every candidate "
+                "gets an equal share regardless of similarity, which is the "
+                "index proposing nothing")
+        if self.index_branches and self.hops > 1:
+            raise ValueError(
+                "index_branches cannot be combined with hops > 1: the hop key "
+                "is a softmax mixture of every token's row, so it names no "
+                "concept and the index has nothing to look up. Note 044")
         if self.concept_nodes < 0:
             raise ValueError("concept_nodes must not be negative")
         if self.concept_replicas < 1:
@@ -1466,6 +1500,11 @@ class LocalAssociativeMemory:
         # The default is the identity, so every existing number is untouched.
         # Assign a different `Surfaces` after construction; `run` reads it.
         self.surfaces: Surfaces = OneConceptPerToken(config.vocab_size)
+        #: The content index, when there is one. Assigned after construction
+        #: because it is LEARNED from observed co-occurrence -- unlike keys and
+        #: surfaces, which are pure -- so the model cannot build its own without
+        #: deciding what data it should have seen.
+        self.content = None
         # HOW THE STORE IS READ IS A REPLACEABLE COMPONENT, for the same reason
         # and with more at stake. `openplexus/retrieval.py` holds the seam.
         #
@@ -2289,6 +2328,69 @@ class LocalAssociativeMemory:
                     self.surfaces.of(self.key_source.concept(tokens, t)))
             readable = memory if lasting is None else memory + lasting
             retrieved = self.retrieval.read(readable, key)
+            if self.config.index_branches:
+                # THE CONTENT INDEX, note 045. Similar concepts are asked as
+                # well, and each is an ORDINARY EXACT READ at a hard token id --
+                # nothing here blurs a key.
+                #
+                # That is the whole design: similarity decides WHICH exact reads
+                # to make, and never what an address looks like. Note 035
+                # measured why the other route is closed -- interference is
+                # O(N*rho) in mean key cosine, so overlapping keys spend the
+                # capacity that is already the wall.
+                #
+                # The token's own read stays at full weight and the neighbours
+                # are added to it. A neighbour is evidence about this concept,
+                # not a replacement for it.
+                if self.content is None:
+                    raise ValueError(
+                        "index_branches needs a fitted ContentIndex on "
+                        "`model.content`: the index is learned from observed "
+                        "co-occurrence and there is nothing to propose "
+                        "candidates from until it has seen data")
+                here = self.surfaces.of(self.key_source.concept(tokens, t))
+                # NOT `scored`. `scored` is `run`'s parameter saying which
+                # positions the delta rule applies at, and shadowing it made
+                # `if learn and scored[t]` index a candidate list. Same class as
+                # `store` and `key` above, and it failed loudly only because the
+                # lists happened to be different lengths.
+                proposed = self.content.nearest(here,
+                                                self.config.index_branches)
+                if proposed:
+                    similarity = np.array([s for _, s in proposed])
+                    # SOFTMAX, not the raw similarity, and `spread` is why.
+                    # Content vectors sit at mean cosine 0.22 to 0.50 against
+                    # hash keys' 0.0005, so raw weights would give every
+                    # candidate a large share and swamp the exact read with a
+                    # floor that carries no information.
+                    weights = np.exp(self.config.index_sharpness
+                                     * (similarity - similarity.max()))
+                    weights /= weights.sum()
+                    for (candidate, _), weight in zip(proposed, weights):
+                        if weight < 1e-6:
+                            continue
+                        near = self.key_source.key_as(tokens, t, candidate)
+                        if concepts is not None:
+                            # A candidate lives on ITS OWN node, which is the
+                            # cost note 044 flagged: the ring spreads by hash,
+                            # so similar concepts are deliberately apart. Each
+                            # candidate is one more machine to ask.
+                            readable = concepts.matrix(
+                                self.surfaces.of(candidate))
+                            if lasting is not None:
+                                readable = readable + lasting
+                        retrieved = retrieved + (
+                            self.config.index_weight * weight
+                            * self.retrieval.read(readable, near))
+                    if concepts is not None:
+                        # Point `readable` back at THIS concept's node. The loop
+                        # above walked it across the candidates' machines, and
+                        # everything after this -- the hop, the trace, the
+                        # consolidation -- reads it expecting the position's own
+                        # store.
+                        readable = memory
+                        if lasting is not None:
+                            readable = readable + lasting
             # NOT `key`. `key` is the TOKEN's key and it is carried out of this
             # loop to `previous_key`, which is what the next position WRITES
             # with. Reassigning it here made every binding in the store use a

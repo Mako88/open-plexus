@@ -59,6 +59,25 @@ class KeySource(Protocol):
         """
         ...
 
+    def key_as(self, tokens: np.ndarray, t: int, token: int) -> np.ndarray:
+        """The key at position `t` AS IF the token there were `token`.
+
+        **What a candidate read needs.** The content index proposes concepts,
+        and asking the store about one means building the key it would have
+        had -- which only the key source knows how to do, since a pair key is
+        `(t-1, t)` and a table key is a row.
+
+        `search.walk_from` already does exactly this by calling
+        `PairKeys.pair(fact_token, current)` directly, which works and reaches
+        past the seam. This is that operation, named, so a candidate read
+        composes with ANY key source instead of only with pair keys.
+
+        `key_as(tokens, t, tokens[t])` must equal `key(tokens, t)`, and the
+        conformance suite checks it -- otherwise a candidate read and an
+        ordinary read would disagree about the same token.
+        """
+        ...
+
     def concept(self, tokens: np.ndarray, t: int) -> int:
         """WHICH concept this position's key belongs to, for routing.
 
@@ -98,6 +117,9 @@ class TableKeys:
     def key(self, tokens: np.ndarray, t: int) -> np.ndarray:
         return self.table[tokens[t]]
 
+    def key_as(self, tokens: np.ndarray, t: int, token: int) -> np.ndarray:
+        return self.table[token]
+
     def concept(self, tokens: np.ndarray, t: int) -> int:
         """The token itself. One key per token means one concept per token."""
         return int(tokens[t])
@@ -129,8 +151,20 @@ class PairKeys:
         self.cache: dict[tuple[int, int], np.ndarray] = {}
 
     def key(self, tokens: np.ndarray, t: int) -> np.ndarray:
-        return self.pair(int(tokens[t - 1]) if t else self.start,
-                         int(tokens[t]))
+        # Routed THROUGH `key_as` rather than repeating its body. The two must
+        # agree -- the conformance suite asserts `key_as(t, tokens[t]) == key(t)`
+        # -- and two copies of one rule is how they stop agreeing.
+        return self.key_as(tokens, t, int(tokens[t]))
+
+    def key_as(self, tokens: np.ndarray, t: int, token: int) -> np.ndarray:
+        """The PREVIOUS token is kept and only the current one substituted.
+
+        A pair key is `(t-1, t)` and a candidate stands in for the current
+        token, so the context it is being asked about must not change with it --
+        the question is "what if THIS position held that concept instead", not
+        "what if the whole pair were different".
+        """
+        return self.pair(int(tokens[t - 1]) if t else self.start, int(token))
 
     def concept(self, tokens: np.ndarray, t: int) -> int:
         """**The CURRENT token, not the pair**, and the choice is load-bearing.

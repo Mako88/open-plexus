@@ -59,6 +59,12 @@ class Drifting:
         tokens += 0                                   # touches its input
         return np.full(WIDTH - 1, 1e-3 * self.calls)  # drifts, wrong shape
 
+    def key_as(self, tokens: np.ndarray, t: int, token: int) -> np.ndarray:
+        """Ignores the substitution entirely -- every candidate would read the
+        same address, which is the failure `test_substituting_a_DIFFERENT_token`
+        exists to catch."""
+        return self.key(tokens, t)
+
 
 class EverySourceHonoursTheContract(unittest.TestCase):
 
@@ -107,6 +113,54 @@ class EverySourceHonoursTheContract(unittest.TestCase):
             with self.subTest(name):
                 self.assertFalse(np.allclose(source.key(TOKENS, 1),
                                              source.key(TOKENS, 2)))
+
+
+class ASubstitutedKeyIsStillTHISPositionsKey(unittest.TestCase):
+    """`key_as` is what a candidate read needs, and it has one hard contract.
+
+    The content index proposes concepts and the model asks the store about each,
+    which means building the key that concept WOULD have had at this position.
+    If a substituted key at the position's own token differed from the ordinary
+    key, a candidate read and a normal read would disagree about the same token
+    and the index would look like it was finding things that were not there.
+    """
+
+    def test_substituting_the_actual_token_reproduces_the_key(self):
+        for name, source in sources():
+            with self.subTest(name):
+                for t in (0, 1, 7):
+                    np.testing.assert_allclose(
+                        source.key_as(TOKENS, t, int(TOKENS[t])),
+                        source.key(TOKENS, t))
+
+    def test_substituting_a_DIFFERENT_token_changes_the_key(self):
+        """Otherwise candidates would all read the same address and the index
+        would be an expensive way to retrieve one thing several times."""
+        for name, source in sources():
+            with self.subTest(name):
+                self.assertFalse(np.allclose(source.key_as(TOKENS, 4, 1),
+                                             source.key_as(TOKENS, 4, 2)))
+
+    def test_the_CONTEXT_is_kept_when_the_token_is_substituted(self):
+        """A pair key is `(t-1, t)`. Substituting must change only the current
+        token -- the question is "what if this position held that concept", not
+        "what if the whole pair were different"."""
+        for name, source in sources():
+            with self.subTest(name):
+                # Position 0 has no predecessor and position 6's is token 5, so
+                # substituting the same concept at each must differ for a pair
+                # key and match for a table key.
+                #
+                # The first version compared positions 4 and 10 -- which repeat
+                # the vocabulary, so BOTH have token 3 before them. It varied
+                # nothing and asserted a difference anyway.
+                self.assertEqual(TOKENS[5], 5, "the fixture changed shape")
+                same = np.allclose(source.key_as(TOKENS, 0, 3),
+                                   source.key_as(TOKENS, 6, 3))
+                self.assertEqual(
+                    same, name == "TableKeys",
+                    f"{name} kept the wrong amount of context when a token was "
+                    f"substituted")
 
 
 class EverySourceCanNameWhatItIsAskingFor(unittest.TestCase):

@@ -78,6 +78,7 @@ a report to John, not a gate.
 | 131 | the persistence test tested a SATURATED store; lasting_cap is what binds |
 | 132 | the slow store had no brake, and the write rate was 100x too large |
 | 133 | persistence moves the LEVEL not the SLOPE — the wall is CAPACITY |
+| 134 | pooled capacity is identical; concept partitioning's case is INDEPENDENCE |
 
 ---
 
@@ -3560,3 +3561,87 @@ stays, and the settings that work are recorded at the config.
 **Taken without asking**, under standing authorisation. John approved items 1 and
 2; this reports that item 1 does what it can and item 2 is where the capacity
 has to come from.
+
+---
+
+## 134. Pooled capacity is identical. Concept partitioning's case is INDEPENDENCE, not capacity
+
+g16-01, 5 seeds, 50 cells, per-node memory held equal at ~4,096 numbers.
+
+    arrangement nodes    pooled     ALONE   node sees
+    concept     1           128       128   64 of 64 dims
+    concept     16         2048      2048   64 of 64 dims
+    dimension   1           128       128   64 of 64 dims
+    dimension   2           256       141   45 of 91 dims
+    dimension   4           512       128   32 of 128 dims
+    dimension   8          1024       128   22 of 181 dims
+    dimension   16         2048       128   16 of 256 dims
+
+**Pooled capacity is the same at every node count.** 128, 256, 512, 1024, 2048
+in both arrangements. **Lone-node capacity is not**: concept scales with the
+network, dimension is flat at one node's worth from four nodes onward. At 16
+nodes that is **2048 against 128, a factor of sixteen.**
+
+### The finding, stated as the thing that is actually different
+
+> Under **dimension** splitting, growing the network makes every node's view
+> thinner while the total stays the same, so **a node can never answer alone
+> however large the system gets.** Under **concept** splitting a node owns whole
+> concepts, so its standalone capability grows with the network.
+
+That is a capability difference rather than an engineering one, and it is the
+only capability difference there is — capacity per unit of memory does not
+distinguish them at all.
+
+**And it is exactly what amended C1 cares about.** A read that requires every
+node is the barrier the constraint forbids; "what can one node do" is the
+question. g4-01 is what pointed here, having measured a lone node at 0.949 with
+16 dimensions, 0.681 with 8 and 0.412 with 4.
+
+### Two corrections to my own reasoning, both caught before the result
+
+**Note 043's capacity argument was wrong.** It said concept partitioning is the
+only proposal that adds capacity as the corpus grows. At equal per-node memory
+both scale identically, which the arithmetic showed and this run confirms
+exactly. Corrected in the note before the probe ran.
+
+**And the first version of this probe measured the wrong quantity.** It reported
+pooled capacity only — which is identical — so it would have concluded the two
+arrangements are equivalent and there is nothing to build. The lone-node measure
+was added after reading that output and noticing it could not tell them apart.
+
+Both are the same failure in different places: **a plausible quantity chosen
+before asking what would distinguish the hypotheses.** Decision 133 refuted note
+042 for it, and note 043 and this probe each did it once more.
+
+### Predictions
+
+P1, P2, P4 confirmed. **P3 refuted and the truth is starker** — pooled capacity
+never collapses, and lone-node capacity never *grows*: it is 128 at one node and
+128 at sixteen. The floor is not a cliff at some node count; a lone node under
+dimension splitting is simply stuck at one node's worth forever.
+
+**P5 refuted**: concept capacity is exactly N times one store's with no
+interference penalty, because the stores are independent. The prediction assumed
+superposition across nodes; there is none, which is the point of the
+arrangement.
+
+### What this licenses
+
+Building concept partitioning, on the independence argument rather than the
+capacity one.
+
+### What it does NOT
+
+Any claim the model can LEARN through it. This measures what a data structure
+holds — random keys, no decay, no cap, no task. **Decision 133 is the standing
+reminder**: the last mechanism that looked obviously right moved the level and
+not the slope.
+
+And routing does not exist. Which node owns a key is consistent hashing, listed
+unread in GOALS §6.2 since the project began, and note 043 records that the naive
+`mod nodes` version reshuffles everything when the node count changes — which C3
+makes a constant event.
+
+**Taken without asking**, under standing authorisation and John's approval of
+item 2.

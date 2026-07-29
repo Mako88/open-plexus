@@ -115,7 +115,7 @@ alone means building it twice.
 | | change | status |
 |---|---|---|
 | **0a** | **persistent slow store** | **DONE and REFUTED in its strong form** (decision 133). Worth **0.08 bits at every scale** — keep it — but it does not move the wall |
-| **0b** | **concept partitioning** | **NOW THE LIVE WORK**, and 0a's refutation is the argument for it |
+| **0b** | **concept partitioning** | **NOW THE LIVE WORK.** Its falsifier ran (g16-01, decision 134) and the case is **independence, not capacity** |
 | 0c | content-derived keys | not started; every key is a random draw, so the store has **no notion of similarity at all** |
 
 **0a's result, and it redirects the whole line.** `persist-slow-decay` beats the
@@ -130,9 +130,25 @@ as: 16,000 characters is where a `d × d` store plus a `vocab × d` readout runs
 of room. Note 042 said the wall was about having nowhere to accumulate; there is
 now somewhere, and it did not move.
 
-**That is an argument for 0b rather than against it.** Concept partitioning is the
-only proposal on this page that adds capacity as the corpus grows — more concepts
-on more nodes — where persistence extends how long a fixed amount of room is held.
+**0b's falsifier then ran, and corrected me twice** (g16-01, decision 134):
+
+    arrangement nodes    pooled     ALONE   node sees
+    concept     16         2048      2048   64 of 64 dims
+    dimension   16         2048       128   16 of 256 dims
+
+**Pooled capacity is IDENTICAL** at every node count — so "concept partitioning
+adds capacity" was wrong, and so was the floor version of it. What differs is
+**lone-node** capacity: concept scales with the network, dimension is stuck at one
+node's worth from four nodes onward. Sixteenfold at 16 nodes.
+
+> Under dimension splitting, growing the network makes every node's view thinner
+> while the total stays the same, so **a node can never answer alone however
+> large the system gets.** Under concept splitting a node owns whole concepts, so
+> its standalone capability grows with the network.
+
+**That is what amended C1 cares about** — a read requiring every node is the
+barrier the constraint forbids. It is the only capability difference between the
+two, and it is the reason to build 0b.
 
 **0a's falsifier is decision 63's 16,000-character wall**, and two runs have
 measured the *instrument* rather than the hypothesis:

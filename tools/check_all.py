@@ -55,6 +55,8 @@ CHECKS: list[tuple[str, list[str], bool]] = [
     ("check_rails", [sys.executable, "tools/check_rails.py"], False),
     ("check_duplication", [sys.executable, "tools/check_duplication.py"], False),
     ("check_state", [sys.executable, "tools/check_state.py"], False),
+    ("check_architecture",
+     [sys.executable, "tools/check_architecture.py"], False),
     ("unittest", [sys.executable, "-m", "unittest", "discover",
                   "-s", "tests", "-t", "."], True),
 ]

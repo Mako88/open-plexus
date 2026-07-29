@@ -50,6 +50,9 @@ jobs:
       - name: STATE.md is a statement of state, not an archive
         run: python tools/check_state.py
 
+      - name: Architecture ledger stays factual
+        run: python tools/check_architecture.py
+
   # The harness runs one full suite per mutation, so it is serial time and
   # nothing else — 85 mutations at roughly fifteen seconds each. Sharded it is
   # about two minutes a job instead of twenty in one.

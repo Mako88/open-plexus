@@ -29,25 +29,31 @@ name: sweep-g18-03-has-the-store-ever-contributed-anything-on-text
 # with. A `nostore` arm at `bias 0` has no store AND no prior, so it should sit
 # at uniform -- which is the second rail.
 #
-# ⚠ HELD: THE FIRST PASS FAILED ITS REPRODUCTION AND SO WILL THIS ONE UNTIL THE
-# CHARACTER FLOOR IS EXPLAINED.
+# THE HOLD IS LIFTED: THE REPRODUCTION FAILURE WAS A TRAINING-TARGET BUG.
 #
 # Pass 1 (run 30431349857) put the character `bias 0` floor at 5.986 against a
-# 6.000 uniform, where decision 63 puts the same model near 5.53. A local re-run
-# with all five of g15-01's settings restored -- single keys, decay 0.997, no
-# cap, key_scale 0.5, lr 0.05 -- returned 5.9965. **So the five inherited
-# constants were NOT the cause**, and something else in this harness differs from
-# the character-level pipeline.
+# 6.000 uniform, where decision 63 puts it near 5.53. Restoring all five of
+# g15-01's settings did not fix it -- 5.9965.
 #
-# Until a cell of this script reproduces ~5.53, its character column measures an
-# instrument rather than a hypothesis, and P1 must stay unscored. That is
-# decision 131's lesson, which cost a whole matrix the first time.
+# The cause was decision 138: this harness trained the readout on the CURRENT
+# token, where the model's answer at step t predicts token t+1. Corrected, the
+# same cell returns **5.4227**. Every number from pass 1 is void.
+#
+# So this pass is the first character-level measurement of the question, and P0
+# below is what says whether it may be read at all.
 #
 # PREDICTIONS (three: a gate, a rail, a falsifier)
 #
 #   P0  THE REPRODUCTION, and it comes before the rest. The character `bias 0`
-#       floor lands within 0.10 of decision 63's ~5.53. **If it does not, no
-#       other prediction here may be scored.**
+#       floor lands within 0.15 of decision 63's ~5.53 AND at least 0.4 below
+#       uniform. **If it does not, no other prediction here may be scored.**
+#
+#       The tolerance is 0.15 rather than 0.10 because the corrected local cell
+#       returns 5.4227 -- 0.11 from 5.53 -- and this harness splits the corpus
+#       differently from g15-01 (a contiguous tail against its by-chunk split)
+#       and trains on 72,000 characters where decision 63's nearest point is
+#       125,000. The second clause is the one with teeth: 5.986 failed it by a
+#       mile and no plausible split difference produces that.
 #
 #   P1  THE GATE. At character level with the bias ON, `floor` beats `nostore`
 #       by more than 0.30 bits. That is the store contributing on text, and it

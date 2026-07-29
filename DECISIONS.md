@@ -4287,3 +4287,70 @@ a measurement now.
 
 **Taken without asking**, under standing authorisation and John's *"whatever next
 experiments make sense to continue down that line"*.
+
+## 144. Concept addressing cannot hold an exception, and that is the whole price
+
+g19-01's exception arm, three seeds, run after decision 143 so that its numbers
+are a test of that result rather than part of it. **E1 was registered as a
+prediction I expected to lose, and it lost.**
+
+    arm           direct  transfer  exception   wrong answer = a sibling's
+    ungrouped     0.7792    0.0608     0.7833        0.0084
+    concept       0.4492    0.4708     0.3708        0.8657
+    permuted      0.3417    0.0517     0.3167        0.0300
+    nostore       0.0000    0.0000     0.0000        0.0000
+
+An EXCEPTION is an entity whose **own stated fact contradicts its family's**. For
+`ungrouped` that is ordinary recall and it scores 0.783. For `concept` it is
+0.371 — **0.41 worse than having no concepts at all.**
+
+### The mechanism, named by E3 rather than assumed
+
+When `concept` answers an exception wrongly, **86.6% of the time it says a
+sibling's value**, against 0.8% for `ungrouped`. A wrong answer that is
+specifically the family's is the superposition speaking; generic failure would
+scatter.
+
+### The larger finding, which was not predicted
+
+**One exception per family does not just break the exception. It halves
+everything.**
+
+    concept, no exceptions      direct 0.9967   transfer 0.9983
+    concept, one exception      direct 0.4492   transfer 0.4708
+
+The arithmetic is mechanical: 2 facts stated per family, 1 contradicting, so the
+family's single address holds two competing values and a read is a coin flip.
+0.47 is that coin flip.
+
+> **Concept addressing cannot represent within-family variation at all.** The
+> address holds one thing, and a second thing written to it destroys the first.
+
+### It explains decision 141 from the other side
+
+Grouping words hurt on text. **This is why: text is nothing but exceptions.**
+Every word has its own continuations, so every grouped address holds a dozen
+competing values. The resolution cost that was argued about for a day is now a
+number, measured where it can be isolated.
+
+### What this does to decision 143
+
+**Not a retraction.** 143 measured that the composition works — discover a
+grouping, address a store by it, recall through it — and it does, on a homogeneous
+family. This measures what that costs, and the cost is total: the mechanism holds
+one value per concept and nothing else.
+
+**Together they say the indirection is real and the representation is too poor to
+use as it stands.** A concept that cannot differ from its siblings in any respect
+is not a concept, it is a bucket.
+
+### What it opens
+
+The next mechanism is not a better grouping. It is **a store that can hold a
+family default and a per-entity override at once** — which is a representation
+question, not an addressing one, and it is the first time this line has arrived
+at one.
+
+**Taken without asking**, under standing authorisation. The exception arm was
+added as a falsifier for 143 rather than as a new direction, and its predictions
+were registered before it ran.

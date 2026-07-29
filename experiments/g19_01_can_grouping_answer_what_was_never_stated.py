@@ -45,6 +45,36 @@ store would work, the grouping would be perfect (g19-00: purity 1.000), and
 joining them would still buy nothing — which would say the indirection does not
 do what it was built for, for the cost of one task.
 
+## THE EXCEPTION ARM — `--exceptions 1`, added AFTER decision 143
+
+**The falsifier for the mechanism that answered TRANSFER**, run separately so
+143's numbers are not changed by it: `--exceptions 0` is the default and
+reproduces that result exactly.
+
+Grouping works by giving a family **one store address**. An entity whose own
+stated fact *contradicts* its family's collides with its siblings at that
+address, and the superposition that carries transfer may make the exception
+unrepresentable.
+
+> A system that cannot hold *"birds fly, but not this one"* does not understand
+> birds.
+
+**PREDICTIONS, registered before the arm was run:**
+
+  E1  THE GATE, and I expect to lose it. `concept` scores **worse** than
+      `ungrouped` on EXCEPTION by more than 0.20. Grouping would be buying
+      transfer by spending specificity, and the price would be measured rather
+      than argued.
+
+  E2  THE RAIL. `ungrouped` reaches at least 0.50 on EXCEPTION. The fact was
+      stated about that very entity, so for a model with no grouping this is
+      ordinary recall. If it fails, the arm is broken rather than the mechanism.
+
+  E3  THE DIAGNOSTIC. When `concept` is wrong on EXCEPTION, its answer is **a
+      sibling's value** more often than chance. A wrong answer that is
+      specifically the family's is the superposition speaking; generic failure
+      is not.
+
 ## Settings, and why they are not inherited
 
 Single keys (`context_keys` off), because the binding is `entity -> value` and a
@@ -63,6 +93,7 @@ import argparse
 import json
 import sys
 import time
+from dataclasses import replace
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -77,7 +108,7 @@ from openplexus.keys import ByConcept  # noqa: E402
 from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
 from openplexus.tasks.families import (  # noqa: E402
-    FamilyConfig, background, dataset)
+    FACT, FamilyConfig, background, dataset)
 
 WIDTH = 64
 CONTENT_WIDTH = 128
@@ -142,9 +173,9 @@ def silent(tokens: np.ndarray) -> np.ndarray:
     return np.zeros(len(tokens), dtype=bool)
 
 
-def one_cell(arm: str, seed: int) -> dict:
+def one_cell(arm: str, seed: int, exceptions: int = 0) -> dict:
     started = time.time()
-    config = FamilyConfig(seed=seed)
+    config = FamilyConfig(seed=seed, exceptions_per_family=exceptions)
     surfaces, index, recovered = surfaces_for(arm, config, seed)
     writes = arm != "nostore"
 
@@ -158,7 +189,11 @@ def one_cell(arm: str, seed: int) -> dict:
     model.content = index
 
     train = dataset(config, TRAIN)
-    test = dataset(FamilyConfig(seed=seed + 5000), TEST)
+    # `replace`, not a fresh config: built from scratch it silently dropped
+    # `exceptions_per_family` and the EXCEPTION arm scored zero queries.
+    # The None in the output said so rather than dividing by zero, which is
+    # the only reason it was caught in one run.
+    test = dataset(replace(config, seed=seed + 5000), TEST)
 
     rng = np.random.default_rng(seed)
     order = np.arange(len(train))
@@ -173,26 +208,53 @@ def one_cell(arm: str, seed: int) -> dict:
             model.run(tokens, targets, scored, learn=True,
                       store=None if writes else silent(tokens))
 
-    tallies = {"direct": [0, 0], "transfer": [0, 0]}
+    tallies = {"direct": [0, 0], "transfer": [0, 0], "exception": [0, 0]}
     stated_hits = 0
+    # E3: when an EXCEPTION is answered wrongly, how often is the answer
+    # specifically a SIBLING's value? A collision speaks with the family's
+    # voice; generic failure does not. Read off the sequence rather than the
+    # generator, because nothing here may consult the answer key.
+    said_a_sibling = wrong_exceptions = 0
     for sequence in test:
         tokens = np.asarray(sequence.tokens)
         predictions = model.run(tokens,
                                 store=None if writes else silent(tokens))
         values = {int(t) for t in tokens if t >= config.value_base}
-        for where, transfer in zip(sequence.query_positions,
-                                   sequence.is_transfer):
-            kind = "transfer" if transfer else "direct"
-            tallies[kind][0] += int(predictions[where] == tokens[where + 1])
+        for where, transfer, exception in zip(sequence.query_positions,
+                                              sequence.is_transfer,
+                                              sequence.is_exception):
+            kind = ("exception" if exception
+                    else "transfer" if transfer else "direct")
+            right = int(predictions[where] == tokens[where + 1])
+            tallies[kind][0] += right
             tallies[kind][1] += 1
             stated_hits += int(int(predictions[where]) in values)
+            if kind == "exception" and not right:
+                wrong_exceptions += 1
+                asked_entity = int(tokens[where])
+                family = config.family_of(asked_entity)
+                siblings = [int(tokens[i + 2])
+                            for i in range(len(tokens) - 2)
+                            if tokens[i] == FACT
+                            and int(tokens[i + 1]) != asked_entity
+                            and config.family_of(int(tokens[i + 1])) == family]
+                said_a_sibling += int(int(predictions[where]) in siblings)
 
-    asked = tallies["direct"][1] + tallies["transfer"][1]
+    # ALL THREE KINDS. Omitting exceptions made `answers_a_stated_value`
+    # exceed 1.0, which is the sort of impossible number that is only
+    # obvious when it happens to cross a round threshold.
+    asked = sum(count for _, count in tallies.values())
     return dict(
         arm=arm, seed=seed,
         direct=round(tallies["direct"][0] / max(tallies["direct"][1], 1), 4),
         transfer=round(tallies["transfer"][0]
                        / max(tallies["transfer"][1], 1), 4),
+        exception=(round(tallies["exception"][0] / tallies["exception"][1],
+                         4) if tallies["exception"][1] else None),
+        wrong_exception_said_sibling=(
+            round(said_a_sibling / wrong_exceptions, 4)
+            if wrong_exceptions else None),
+        exceptions_per_family=exceptions,
         chance=round(config.trivial, 4),
         # HOW OFTEN IT NAMES A VALUE STATED IN THIS SEQUENCE. A model that has
         # learned the task's shape without solving it scores above `chance`,
@@ -212,6 +274,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--arm", choices=ARMS, default=None)
+    parser.add_argument("--exceptions", type=int, default=0,
+                        help="members per family whose stated fact "
+                             "CONTRADICTS their family. 0 reproduces "
+                             "decision 143")
     parser.add_argument("--json", type=str, default=None)
     args = parser.parse_args()
 
@@ -222,10 +288,11 @@ def main() -> int:
     records = []
     for seed in seeds:
         for arm in arms:
-            record = one_cell(arm, seed)
+            record = one_cell(arm, seed, args.exceptions)
             print(f"  {record['condition']:34s} "
                   f"direct {record['direct']:.4f}  "
                   f"transfer {record['transfer']:.4f}  "
+                  f"exception {record['exception']}  "
                   f"stated {record['answers_a_stated_value']:.4f}",
                   file=sys.stderr, flush=True)
             records.append(record)

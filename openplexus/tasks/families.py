@@ -28,13 +28,29 @@ it does not.
 
 **Two kinds of question:**
 
-    DIRECT     the entity's own fact was stated in this sequence
-    TRANSFER   it was NOT -- but other members of its family had theirs stated
+    DIRECT      the entity's own fact was stated, and agrees with its family
+    TRANSFER    it was NOT stated -- but siblings' were
+    EXCEPTION   its own fact WAS stated and CONTRADICTS its family's value
 
 **TRANSFER is the whole point.** An entity treated as an arbitrary symbol has had
 nothing said about it and can only be guessed at. An entity grouped with its
 family can be answered from what was stated about its siblings. That is awareness
 of the interrelation between concepts, made scoreable.
+
+**EXCEPTION is the falsifier for the mechanism that answers TRANSFER**, and it
+was added after decision 143 rather than before, so it is a test of that result
+and not part of it. Grouping works by giving a family ONE store address. An
+entity whose own stated fact contradicts its family's therefore collides with its
+siblings at that address, and the same superposition that carries transfer may
+make the exception unrepresentable.
+
+    a system that cannot hold "birds fly, but not this one" does not
+    understand birds
+
+`ungrouped` should find EXCEPTION easy -- the fact was stated about that very
+entity, so for a model with no grouping it is ordinary recall. **If `concept`
+scores worse than `ungrouped` there, grouping buys transfer by spending
+specificity, and the price is now measured rather than argued.**
 
 ## Two streams, and separating them is the whole reason this works
 
@@ -102,6 +118,9 @@ class FamilyConfig:
             attributes. **The discoverability dial.** Too few and no clustering
             is possible; too many and the task measures nothing but the
             clusterer. Calibrated before use — note 048's stated risk.
+        exceptions_per_family: Members whose stated value CONTRADICTS their
+            family's. 0 reproduces the task as decision 143 measured it, so
+            that result is not silently changed by this field existing.
         queries_per_kind: Queries of each kind per sequence.
         seed: Draws everything.
     """
@@ -111,6 +130,7 @@ class FamilyConfig:
     n_attributes: int = 3
     n_values: int = 8
     stated_per_family: int = 2
+    exceptions_per_family: int = 0
     attribute_mentions: int = 2
     queries_per_kind: int = 2
     seed: int = 0
@@ -123,6 +143,12 @@ class FamilyConfig:
                 f"has its fact stated and TRANSFER has no positions to score")
         if self.n_families < 2:
             raise ValueError("one family is not a similarity structure")
+        if self.exceptions_per_family >= self.stated_per_family:
+            raise ValueError(
+                f"{self.exceptions_per_family} exceptions of "
+                f"{self.stated_per_family} stated facts leaves no member "
+                f"agreeing with its family, so the family has no value and "
+                f"TRANSFER has no answer")
         if self.queries_per_kind > self.stated_per_family:
             raise ValueError(
                 f"cannot ask {self.queries_per_kind} DIRECT questions when only "
@@ -178,6 +204,10 @@ class Sequence:
     #: Same order as `query_positions`. True where the entity's own fact was
     #: NOT stated, which is the arm the task exists to measure.
     is_transfer: tuple[bool, ...]
+    #: Same order again. True where the entity's own stated fact CONTRADICTS
+    #: its family's value -- the falsifier for the mechanism that carries
+    #: transfer. Never true at the same position as `is_transfer`.
+    is_exception: tuple[bool, ...] = ()
 
 
 def background(config: FamilyConfig, count: int) -> list[np.ndarray]:
@@ -227,11 +257,19 @@ def generate(config: FamilyConfig, seed: int | None = None) -> Sequence:
 
     stated: dict[int, int] = {}
     unstated: list[int] = []
+    exceptions: dict[int, int] = {}
     for family in range(config.n_families):
         order = rng.permutation(config.family_size)
         for rank, index in enumerate(order):
             entity = config.entity_base + family * config.family_size + int(index)
-            if rank < config.stated_per_family:
+            if rank < config.exceptions_per_family:
+                # A DIFFERENT value, drawn to differ. The exception must
+                # contradict rather than coincide, or the arm measures nothing.
+                other = int(rng.integers(0, config.n_values - 1))
+                other += int(other >= int(values[family]))
+                stated[entity] = config.value_base + other
+                exceptions[entity] = config.value_base + other
+            elif rank < config.stated_per_family:
                 stated[entity] = config.value_base + int(values[family])
             else:
                 unstated.append(entity)
@@ -244,26 +282,34 @@ def generate(config: FamilyConfig, seed: int | None = None) -> Sequence:
     # QUESTIONS. DIRECT draws from entities whose fact was stated, TRANSFER from
     # those whose was not -- and both answer with their FAMILY's value, which is
     # what makes the two comparable.
-    asked: list[tuple[int, int, bool]] = []
-    direct_pool = list(stated)
-    rng.shuffle(direct_pool)
-    for entity in direct_pool[:config.queries_per_kind]:
-        asked.append((entity, stated[entity], False))
+    asked: list[tuple[int, int, bool, bool]] = []
+    agreeing = [e for e in stated if e not in exceptions]
+    rng.shuffle(agreeing)
+    for entity in agreeing[:config.queries_per_kind]:
+        asked.append((entity, stated[entity], False, False))
     rng.shuffle(unstated)
     for entity in unstated[:config.queries_per_kind]:
         family = config.family_of(entity)
-        asked.append((entity, config.value_base + int(values[family]), True))
+        asked.append((entity, config.value_base + int(values[family]),
+                      True, False))
+    odd = list(exceptions)
+    rng.shuffle(odd)
+    for entity in odd[:config.queries_per_kind]:
+        asked.append((entity, exceptions[entity], False, True))
     rng.shuffle(asked)
 
     positions: list[int] = []
     transfer: list[bool] = []
-    for entity, answer, is_transfer in asked:
+    exceptional: list[bool] = []
+    for entity, answer, is_transfer, is_exception in asked:
         tokens.append(QUERY)
         positions.append(len(tokens))
         tokens.extend((entity, answer))
         transfer.append(is_transfer)
+        exceptional.append(is_exception)
 
-    return Sequence(tuple(tokens), tuple(positions), tuple(transfer))
+    return Sequence(tuple(tokens), tuple(positions), tuple(transfer),
+                    tuple(exceptional))
 
 
 def dataset(config: FamilyConfig, count: int) -> list[Sequence]:

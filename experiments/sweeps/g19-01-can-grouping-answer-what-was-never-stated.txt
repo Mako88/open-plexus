@@ -93,6 +93,53 @@ depends on the family AND on something entity-specific would be the next real
 test, and this result says nothing about it.
 
 
+THE EXCEPTION ARM -- run afterwards, and it is the price
+---------------------------------------------------------
+`--exceptions 1`: one member per family whose stated fact CONTRADICTS its
+family's value. Three seeds. Predictions E1-E3 registered in the script before
+the arm was run.
+
+    arm           direct  transfer  exception   wrong answer = a sibling's
+    ungrouped     0.7792    0.0608     0.7833        0.0084
+    concept       0.4492    0.4708     0.3708        0.8657
+    permuted      0.3417    0.0517     0.3167        0.0300
+    nostore       0.0000    0.0000     0.0000        0.0000
+
+**E1 CONFIRMED, and it was predicted as a loss.** `concept` is 0.4125 BELOW
+`ungrouped` on EXCEPTION. Grouping buys transfer by spending specificity.
+
+**E2 CONFIRMED.** `ungrouped` reaches 0.783 -- for a model with no grouping an
+exception is ordinary recall, so the arm is sound.
+
+**E3 CONFIRMED, and it names the mechanism.** When `concept` answers an
+exception wrongly, **86.6% of the time it says a SIBLING's value** -- against
+0.8% for `ungrouped` and 3.0% for `permuted`. That is not generic failure. It is
+the superposition speaking in the family's voice.
+
+AND THE LARGER FINDING, WHICH WAS NOT PREDICTED
+------------------------------------------------
+**One exception per family does not just break the exception. It halves
+everything.**
+
+    concept, no exceptions      direct 0.9967   transfer 0.9983
+    concept, one exception      direct 0.4492   transfer 0.4708
+
+The arithmetic is exact and mechanical. With 2 facts stated per family and 1 of
+them contradicting, the family's single store address holds **two competing
+values**, and a read returns roughly a coin flip between them. 0.47 is that coin
+flip.
+
+> **Concept addressing cannot represent within-family variation at all.** Not
+> "degrades gracefully" -- the address holds one thing, and a second thing
+> written to it destroys the first.
+
+AND IT EXPLAINS DECISION 141 FROM THE OTHER SIDE. Grouping words hurt on text,
+and this is why: **text is nothing but exceptions.** Every word has its own
+continuations, so every grouped address holds a dozen competing values at once.
+The same mechanism, measured cleanly here where it can be isolated, and it is the
+resolution cost that was argued about for a day and is now a number.
+
+
 COST
 -----
-12 cells, three seeds, local. About four minutes each.
+24 cells, three seeds, local. About four minutes each.

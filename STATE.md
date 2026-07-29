@@ -63,7 +63,33 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Does concept grouping do anything harder than "same kind, same answer"?**
+**Can a store hold a family default and a per-entity override at the same time?**
+
+Decision 144 answers the previous question — *does grouping do anything harder
+than same-kind-same-answer* — with **no, and the failure is total**:
+
+    arm           direct  transfer  exception   wrong = a sibling's
+    ungrouped     0.7792    0.0608     0.7833        0.0084
+    concept       0.4492    0.4708     0.3708        0.8657
+
+An EXCEPTION is an entity whose own stated fact contradicts its family's.
+`concept` is **0.41 worse than having no concepts at all**, and when it errs it
+says a sibling's value 86.6% of the time — the superposition speaking in the
+family's voice.
+
+**And one exception per family halves everything else**: transfer 0.998 → 0.471,
+direct 0.997 → 0.449. The family's single address holds two competing values and
+a read is a coin flip.
+
+> **Concept addressing cannot represent within-family variation at all.** The
+> address holds one thing; a second thing written to it destroys the first.
+
+**Which explains decision 141 from the other side** — grouping words hurt on text
+because *text is nothing but exceptions*. Every word has its own continuations.
+
+**So the next mechanism is not a better grouping.** It is a representation that
+can carry a default and an override at once, and that is a different kind of
+question from any this line has asked.
 
 The previous question — *can grouping answer about something never stated* — is
 **answered yes**, decision 143, and the answer is narrower than its number:

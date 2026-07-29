@@ -63,39 +63,49 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Can the index propose neighbours for a HOP, not just for a position?**
+**Can a hop carry its OWN relation?**
 
-[ARCHITECTURE.md](ARCHITECTURE.md) row **E4 — the only FAILING row left.**
-`index_branches` is still refused above one hop (note 044). Decision 154 measured
-that guard's premise false: a hop key sits at cosine 0.96 to a single token's
-row, so `argmax(wk @ hop_key)` names a concept the index could look up.
+`hop_relation` is one value per MODEL, so a chain follows LINK-then-LINK or
+FACT-then-FACT and never LINK-then-FACT. **The linked-families path needs exactly
+that** — decision 162:
 
-**What blocks it is a design choice rather than a fact.** `index_branches` runs
-once per POSITION, not once per hop, so combining them means deciding whether the
-index proposes neighbours of the position's concept or of the **hop's landing**
-concept. Different mechanisms, different wire costs — and the wire cost makes it
-a G4 question as well as a correctness one. **John's call, flagged rather than
-taken.**
+    key(FACT, entity)   empty; the gate fires, correctly
+    key(LINK, rep)      -> the linked family's representative   hop 1, LINK
+    key(FACT, rep')     -> its value                            hop 2, FACT
 
-It is also the last thing between the gate and 157's LINKED column, which sits at
-0.1275 against chance 0.125 while the gate correctly defers on 0.9933 of those
-queries: *the model knows it does not know and cannot act on it.*
+Decision 158 called the limit *"the relation is fixed, not chosen"*. The sharper
+statement is **one relation per model, not one per hop**, and it is the second
+that blocks the run. A correct chooser would not help until a hop can carry its
+own relation.
 
-### The question this replaced, answered
+**Small in code, large in implication.** `hop_relation` becomes a sequence
+indexed by depth — but "which relation at which depth" is a **schedule**, and a
+fixed schedule is a fitted constant unless the task supplies it. That makes note
+052 §2's cascading decision more urgent than that note says: it is not an
+optimisation, it is what composition requires.
 
-**Does putting the RELATION in the address pay for itself?** — **yes.** 156: it
-costs no capacity and below the wall it pays (+0.146 at load 16), because
-interference is `O(N·ρ)` in WRITES and typing adds none while lowering `ρ`. 157:
-the collision is gone, every column within 0.05 of link-free, **D2 FAILING →
-PASSING**. 158: a hop can follow a NAMED edge, **D3 FAILING → PARTIAL** — the
-relation is fixed rather than chosen, which is the honest limit.
+### Where today's mechanisms actually stand
 
-[Note 051](docs/notes/051-typed-edges-a-ground-up-pass.md) is the ground-up pass
-John asked for, organised around the mechanism he proposed — store
-`key(subject, relation) -> object`, read in three phases. **Most of it was
-already built and unrecognised:** `PairKeys` already addresses by a token pair,
-kinship already stores `key(S, R) -> O`, and the hop's decode already names a
-concept. What was missing was that the hop never used it, and 158 fixed that.
+**Every one works in isolation with a unit test. Not one has a task number.**
+That is not a hedge, it is the state:
+
+    148  the gate chooses, exactly            1.0000 / 0.0000, three seeds
+    157  typed writes stop the collision      every column within 0.05
+    158  a hop follows a NAMED edge           same position, different answer
+    159  the index proposes at a dead end     1 extra read against an ungated 56
+    161  and `inherit` is now read-gated      148 reproduces to four decimals
+
+**The LINKED column at 0.1275 is still the number to move**, and decision 162
+names the missing piece rather than leaving it as "we should run it".
+
+### The rail this project does not have
+
+Decision 161: accuracy is measured everywhere, and **the read count that C1 and
+G4 both turn on is measured nowhere**. Two cost claims were made from reasoning
+and both were wrong — 159 about why A and B conflict, 160 about whether
+`inherit` was gated. Both were caught by writing the measurement down.
+`tests/test_index_at_hops.py` counts reads in three places and nothing else in
+the project does.
 
 ### The questions this replaced, both answered
 
@@ -116,27 +126,18 @@ retrievals to trust* — with **yes, once the question is asked exactly.**
       inherit             0.8100    0.4350     0.8183        0.0247
 
 `inherit` answers from the entity's own address when **anything** was written
-there and from its neighbours' when nothing was. It is the **first arm that is
-good at both** — grouping bought transfer by destroying exceptions, plain
-addressing held exceptions and was at chance on transfer, summing landed between
-them on both.
+there and from its neighbours' when nothing was — the first arm good at both,
+where grouping bought transfer by destroying exceptions and summing landed
+between them. The gate is exact: **1.0000** of TRANSFER, **0.0000** of DIRECT and
+EXCEPTION, every seed. What made it work is that membership is *"is there
+anything here"* rather than *"who has more"*, and with a hashed sketch an
+unwritten address reads exactly 0.0 — so note 049's threshold is **structurally
+zero** and nothing is fitted.
 
-The gate is exact: it defers on **1.0000** of TRANSFER and **0.0000** of DIRECT
-and EXCEPTION, every seed.
-
-> Three rules failed first — the retrieval's norm, the decode's margin, and
-> occupancy summed in the store's own space — and each named the next. What
-> works is not a comparison at all. **Membership is "is there anything here",
-> not "who has more"**, and with a hashed sketch an unwritten address reads
-> exactly 0.0. That puts note 049's threshold at **structurally zero**, so
-> nothing is fitted and nothing has to generalise.
-
-**The price, and it is real.** On the no-exception task DIRECT costs 0.050
-against summing while TRANSFER gains 0.231: summing lets agreeing neighbours
-corroborate, and `inherit` refuses that on principle. Refusing it is what keeps a
-contradicting fact intact when there is a conflict. The sketch is also a second,
-non-superposed memory — justified by membership being one bit against a value's
-`d` floats, and held to that by `tests/test_sketch.py`.
+**The price is real:** without exceptions DIRECT costs 0.050 against summing
+while TRANSFER gains 0.231. Summing lets agreeing neighbours corroborate;
+`inherit` refuses that on principle, which is what keeps a contradicting fact
+intact when there IS a conflict.
 
 **And 149–153 measured its scope rather than assuming it.** Every entry is in
 DECISIONS.md; the reason it is compressed here is that each carried a

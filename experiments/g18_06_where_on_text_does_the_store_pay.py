@@ -146,6 +146,30 @@ anything else is considered.
 
 **Three seeds before anything is said**, which is this file's own hard-won rule.
 
+### RESULT: P1 REFUTED, P3 CONFIRMED. Over-subscription is dead.
+
+     chunk   rare-gap   all-gap   rare share   rare n
+        16    +0.0001   +0.0004      0.0112      214
+        64    -0.0008   +0.0010      0.0326      653
+       256    -0.0015   +0.0015      0.0627     1263
+
+**Cutting the store's load from 255 bindings to 15 changes nothing.** Every gap
+is within 0.0015 of zero and there is no trend in either direction. P1 asked for
+0.10 at chunk 16 and got 0.0001.
+
+P2's confound is visible and does not rescue it: the rare-repeat class does
+shrink with the chunk, but 214 positions at chunk 16 is enough to see a 0.10
+effect and there is none.
+
+**So the difference between MQAR and text is not how much the store is holding.**
+At four bindings per chunk -- MQAR's own load -- the store still contributes
+nothing to text.
+
+That leaves the other candidate, and it is now the only one standing: **MQAR has
+an explicit query marker and text has none.** MQAR says *here comes a question*
+before the key, so the model knows when to retrieve rather than predict. Text
+never announces it. Not built.
+
 ## The candidate itself, for the record
 
 With `context_keys` the address at position `t` is `hash(t-1, t)`. To retrieve

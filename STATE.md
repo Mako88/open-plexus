@@ -202,10 +202,39 @@ So the hypothesis is **unsupported**, not established: the store contributes
 nothing on text under either addressing scheme, and why text differs from MQAR is
 still open.
 
-**What is still worth trying**, and neither is built: the `n_pairs`-style
-question (how many bindings a chunk holds before interference swamps recall — the
-store may simply be over-subscribed at 256 tokens per chunk), and whether the
-*query marker* is what MQAR has and text lacks.
+### Over-subscription is dead too — the chunk sweep, three seeds each
+
+MQAR binds 4 pairs per sequence; a 256-token text chunk binds 255. The measured
+retrieval law is `sqrt(d/N)`, so that is a factor of eight before anything else.
+Shrinking the chunk shrinks the load:
+
+     chunk   rare-gap   all-gap   rare share   rare n
+        16    +0.0001   +0.0004      0.0112      214
+        64    -0.0008   +0.0010      0.0326      653
+       256    -0.0015   +0.0015      0.0627     1263
+
+**Cutting the load from 255 bindings to 15 changes nothing.** Every gap within
+0.0015 of zero, no trend. The stated confound — a shorter chunk offers fewer
+repeats to recall — is visible and does not rescue it: 214 positions at chunk 16
+is enough to show a 0.10 effect, and there is none.
+
+> At **MQAR's own load** of a handful of bindings, the store still contributes
+> nothing to text. So the difference is not how much it is holding.
+
+### ⇒ ONE CANDIDATE LEFT, and it is not built
+
+**MQAR has an explicit query marker and text has none.** MQAR says *here comes a
+question* before the key, so the model knows when to retrieve rather than predict
+from the prior. Text never announces it.
+
+If that is the difference, the store is not weak and not over-subscribed — it is
+never told when to answer, and a mechanism that cannot tell recall from
+prediction will be drowned by the prior at every position where prediction is
+right, which on text is nearly all of them.
+
+That is testable — a marker token before a held-out position, or a gate trained
+to decide retrieve-vs-predict — and it is the first thing on this line that would
+be a *build* rather than a measurement.
 
 ### the store's contribution on text is substitutable by a prior
 

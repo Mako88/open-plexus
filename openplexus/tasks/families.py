@@ -108,6 +108,14 @@ LINK = 2
 #: Read `config.reserved`, never this, unless you mean the link-free layout.
 RESERVED = 2
 
+#: Marks a SET-VALUED question: `ASK_ALL entity`, and **no answer token follows
+#: it** -- the true answer is a set and lives in `Sequence.answer_sets` instead.
+#: Only exists when `set_queries` is on, and its id depends on whether `LINK` took
+#: one first, so **read `config.ask_all` and never this constant**. The name is
+#: here for grep-ability and for the same reason `LINK` is: the layout decision
+#: should be visible at the top of the file.
+ASK_ALL_NAME = "ASK_ALL"
+
 
 @dataclass(frozen=True)
 class FamilyConfig:
@@ -157,6 +165,32 @@ class FamilyConfig:
     family_links: bool = False
     attribute_mentions: int = 2
     queries_per_kind: int = 2
+    #: Ask a question whose answer is a SET -- ARCHITECTURE row F3, and the first
+    #: task in this project to do so.
+    #:
+    #: The question is "what values were stated about this entity's family", and
+    #: the answer is every distinct one: the family's own value **and** its
+    #: exceptions. **A single token cannot express that answer.** It has to pick
+    #: one and lose the other, which is why this is not merely a scoring change --
+    #: it makes a fact the task already contained expressible for the first time.
+    #:
+    #:     a system that cannot hold "birds fly, but not this one" does not
+    #:     understand birds
+    #:
+    #: The module docstring above states that as the reason EXCEPTION exists. A
+    #: one-token answer can report the rule or the exception; only a set can
+    #: report that both are true, which is what the sentence actually asks for.
+    #:
+    #: **No answer token is written into the stream.** A set has no single next
+    #: token, so `ASK_ALL entity` is two tokens and the truth lives in
+    #: `Sequence.answer_sets`. That keeps the training convention untouched --
+    #: `targets = roll(tokens, -1)` still scores the stated facts and the
+    #: single-token questions exactly as before -- and makes this a read-only
+    #: probe rather than a change to what the model learns from.
+    #:
+    #: Off by default, and `tests/test_families.py` asserts the off path is byte
+    #: identical to what decisions 143-151 measured.
+    set_queries: bool = False
     seed: int = 0
 
     def __post_init__(self) -> None:
@@ -177,6 +211,19 @@ class FamilyConfig:
             raise ValueError(
                 f"cannot ask {self.queries_per_kind} DIRECT questions when only "
                 f"{self.stated_per_family} facts are stated per family")
+        if self.set_queries and self.exceptions_per_family < 1:
+            # REFUSED RATHER THAN ALLOWED TO BE TRIVIAL. With no exceptions every
+            # stated fact in a family carries the same value, so every answer set
+            # has exactly one element -- and the whole task would report a
+            # set-valued measurement that is the single-token measurement wearing
+            # a different column heading. It would also score WELL, because a
+            # mechanism emitting one token is right.
+            raise ValueError(
+                "set_queries needs exceptions_per_family >= 1. Without an "
+                "exception every member of a family states the same value, so "
+                "every answer set is a singleton and the measurement is the "
+                "single-token one relabelled -- passing for a reason that has "
+                "nothing to do with emitting a set")
 
     @property
     def n_entities(self) -> int:
@@ -186,10 +233,27 @@ class FamilyConfig:
     def reserved(self) -> int:
         """Token ids spoken for before entities begin.
 
-        One more when links are on, because `LINK` needs an id. Everything
-        downstream is derived from this, so the link-free layout is byte
-        identical to what decisions 143-151 measured.
+        One more when links are on, because `LINK` needs an id, and one more
+        again for `ASK_ALL`. Everything downstream is derived from this, so a
+        layout with neither is byte identical to what decisions 143-151 measured.
         """
+        return (RESERVED + (1 if self.family_links else 0)
+                + (1 if self.set_queries else 0))
+
+    @property
+    def ask_all(self) -> int:
+        """Token id marking a set-valued question. Read this, not a constant.
+
+        Its value depends on whether `LINK` claimed an id first, which is exactly
+        the trap `RESERVED` carries a warning about: a module-level constant for a
+        CONDITIONALLY reserved marker is right in one configuration and silently
+        an entity id in another.
+        """
+        if not self.set_queries:
+            raise ValueError(
+                "ask_all has no id when set_queries is off -- that id belongs to "
+                "an entity, and reading it anyway would address a real entity "
+                "while looking like a marker")
         return RESERVED + (1 if self.family_links else 0)
 
     @property
@@ -269,6 +333,16 @@ class Sequence:
     #: entity's fact was never stated, so answering needs the gate to notice the
     #: empty address AND the link to be followed. Empty unless `family_links`.
     is_linked: tuple[bool, ...] = ()
+    #: Positions holding a SET-VALUED question's ENTITY, kept SEPARATE from
+    #: `query_positions` on purpose: nothing follows these in the stream, so a
+    #: script that scored them as `roll(tokens, -1)` would compare the model
+    #: against whatever token happens to come next. Empty unless `set_queries`.
+    set_query_positions: tuple[int, ...] = ()
+    #: Same order as `set_query_positions`. Every distinct value stated about the
+    #: asked entity's family -- the family's own and its exceptions. Score with
+    #: `openplexus.answers`, whose `exact` and `f1` are the reportable numbers and
+    #: whose falsifier is that emitting everything must not look good.
+    answer_sets: tuple[frozenset[int], ...] = ()
 
 
 def background(config: FamilyConfig, count: int) -> list[np.ndarray]:
@@ -439,8 +513,46 @@ def generate(config: FamilyConfig, seed: int | None = None) -> Sequence:
         transfer.append(is_transfer)
         exceptional.append(is_exception)
 
+    # THE SET-VALUED QUESTIONS, ARCHITECTURE row F3. Last, and entirely inside the
+    # conditional, so the off path makes exactly the draws decisions 143-151
+    # measured -- the byte-identity rail above applies to this block too.
+    #
+    # `ASK_ALL entity` and nothing after it. A set has no single next token, so the
+    # truth goes in `answer_sets` and the stream carries no target here. That is
+    # what keeps this a read-only probe: training still learns from the stated
+    # facts, and this asks what the model can be made to say afterwards.
+    set_positions: list[int] = []
+    answer_sets: list[frozenset[int]] = []
+    if config.set_queries:
+        # ONE PER FAMILY AT MOST, and drawn across DISTINCT families, because two
+        # questions about one family have the same answer set -- which would let a
+        # mechanism that memorised one answer score twice for it and would make the
+        # mean a statistic over fewer independent items than `n` claims (rule 8).
+        families_asked = rng.permutation(config.n_families)
+        for family in families_asked[:config.queries_per_kind]:
+            family = int(family)
+            members = [config.entity_base + family * config.family_size + i
+                       for i in range(config.family_size)]
+            # EVERY DISTINCT VALUE STATED ABOUT THE FAMILY. The family's own value
+            # is in here because at least one member agrees -- `__post_init__`
+            # refuses a configuration where none does -- and each exception adds
+            # its own. Unstated members contribute nothing: nothing was said about
+            # them, and their family's value is already present.
+            values_stated = frozenset(
+                stated[entity] for entity in members if entity in stated)
+            # ASKED THROUGH A MEMBER, not through a family token. There is no
+            # family token in this task and adding one would hand over the
+            # grouping the task exists to make discoverable -- the same reason the
+            # links are stated between representative ENTITIES.
+            asked_through = int(rng.choice(members))
+            tokens.append(config.ask_all)
+            set_positions.append(len(tokens))
+            tokens.append(asked_through)
+            answer_sets.append(values_stated)
+
     return Sequence(tuple(tokens), tuple(positions), tuple(transfer),
-                    tuple(exceptional), tuple(linked_flags))
+                    tuple(exceptional), tuple(linked_flags),
+                    tuple(set_positions), tuple(answer_sets))
 
 
 def dataset(config: FamilyConfig, count: int) -> list[Sequence]:

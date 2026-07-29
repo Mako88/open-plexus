@@ -5679,3 +5679,88 @@ Delete the module and `tests/test_answers.py`. Nothing imports it yet, so no
 result moves. `tools/mutate.py` carries
 `the-set-score-reports-RECALL-as-F1`, which replaces the F1 formula with recall
 and is caught by the falsifier above.
+
+## 166. A question a single token cannot answer
+
+`families.py` gains `set_queries`, off by default. The question is **"what values
+were stated about this entity's family"**, and the answer is every distinct one:
+the family's own value and its exceptions.
+
+**This is not only a scoring change, and that is the reason to build it here rather
+than anywhere else.** `families.py`'s docstring already states why EXCEPTION
+exists:
+
+    a system that cannot hold "birds fly, but not this one" does not
+    understand birds
+
+A one-token answer can report *birds fly*, or *not this one*, and never that both
+are true. **The task has contained that conjunction since decision 144 and has
+never been able to ask for it.** So the first set-valued question is not a new
+capability bolted on; it is the existing task finally able to pose the question it
+was designed around.
+
+### The layout, and what it deliberately does not do
+
+`ASK_ALL entity`, two tokens, and **no answer token follows.** A set has no single
+next token, so the truth lives in `Sequence.answer_sets` and
+`set_query_positions` is kept **separate from `query_positions`** — a script
+scoring these through `roll(tokens, -1)` would compare the model against whichever
+token happened to come next, and for the last set query against nothing at all.
+Separate lists make that impossible rather than discouraged.
+
+**It is therefore a read-only probe.** Training still learns from the stated facts
+and the single-token questions exactly as before, so this changes what can be
+*asked* without changing what is *learned* — which is the cheapest possible way to
+reach row F3 and keeps every earlier number comparable.
+
+`ASK_ALL`'s id is **conditional**, like `LINK`'s, so `config.ask_all` is the only
+correct way to read it and reading it while `set_queries` is off raises. A
+module-level constant for a conditionally-reserved marker is a marker in one
+configuration and a real entity in another.
+
+### The refusal that matters
+
+**`set_queries` requires `exceptions_per_family >= 1`.** Without an exception every
+member of a family states the same value, every answer set is a singleton, and the
+measurement is the single-token one under a new column heading — **and it would
+score well**, because a mechanism emitting one token is then exactly right. That is
+a result rising for a reason having nothing to do with the mechanism under test,
+which is the failure this project's standards exist to catch.
+
+`tools/mutate.py` carries `the-set-answer-is-a-singleton-after-all`, which
+reintroduces it past the guard by collapsing the set to its minimum. It moves
+`exact` **up**, which is the direction that invites no checking. Caught.
+
+### Measured, at the ruler rather than at the model
+
+Nothing has run a model on this. What is checked is that the task and decision
+165's ruler fit, including the falsifier:
+
+    the true set                    exact 1.000
+    the family value alone          precision 1.000, recall < 1, exact false
+    every value in the alphabet     recall 1.000, exact 0.000, mean F1 < 0.5
+
+The middle row is the single-token mechanism's *best possible* behaviour scored
+under the set convention: it names the rule and misses the exception. The bottom
+row is the standing falsifier carried out of the ruler's own tests and into the
+task's.
+
+### What is deliberately NOT claimed
+
+**Row F3 stays UNTESTED.** A task that can ask the question and a ruler that can
+score it are not a measurement. **Nothing in this project emits a set yet** — that
+is the mechanism, and it is next: a gated walk over index-proposed siblings, where
+decision 148's gate supplies precision and `ContentIndex` supplies the candidates.
+
+**One caveat on the termination story, corrected before it is built on.** The gate
+gives the answer's *size* without fitting anything — a sibling whose address was
+never written reads exactly 0.0 and is not emitted. But the *candidate list* is
+bounded by `index_branches`, which is a fitted constant. So "the gate terminates
+the walk for free" is true of precision and not of enumeration, and the honest
+version is that emitting is unfitted while proposing is not.
+
+### How to undo it
+
+Set the flag off; the stream is byte identical and
+`tests/test_family_set_queries.py` asserts that against decisions 143-151's
+layout rather than intending it.

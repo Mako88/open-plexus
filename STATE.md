@@ -85,12 +85,18 @@ Every task, every accuracy number and the whole scoring convention assume one
 answer token. Whatever is chosen, the existing tasks stay valid as capability
 probes and stop being measurements of the goal.
 
-**The ruler is built and nothing is measured on it yet — decision 165.**
-`openplexus/answers.py` scores `exact` and F1, refuses to report recall alone, and
-recovers the old single-token accuracy exactly. **The falsifier is the load-bearing
-part:** emit the whole alphabet and recall is 1.000 while F1 is 0.400. **Next is
-wiring `families.py` to a set-valued query** — 164 removed the LINKED blocker, so
-both are now open and the answer shape is the one that reaches backwards.
+**The ruler and the question are built; nothing emits a set yet — 165 and 166.**
+`openplexus/answers.py` scores `exact` and F1 and refuses recall alone; **the
+falsifier is the load-bearing part** — emit the whole alphabet and recall is 1.000
+while F1 is 0.400. `families.py set_queries` asks what values a family stated,
+which is its value AND its exceptions, and **no single token can answer it**: the
+task has held that conjunction since 144 and could never ask for it.
+
+**What is missing is the mechanism.** A gated walk over index-proposed siblings,
+where 148's gate supplies precision and `ContentIndex` supplies candidates. One
+caveat recorded before it is built on: the gate makes *emitting* unfitted, but the
+candidate list is bounded by `index_branches`, which is a fitted constant — so
+"termination is free" is true of precision and not of enumeration.
 
 ### Where the mechanisms stand
 

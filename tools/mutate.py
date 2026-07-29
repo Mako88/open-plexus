@@ -56,6 +56,7 @@ SLOT_COST = ROOT / "tools" / "slot_cost.py"
 RECOVERY = ROOT / "tools" / "recovery.py"
 TESTBED = ROOT / "testbed" / "run.py"
 ANSWERS = ROOT / "openplexus" / "answers.py"
+FAMILIES = ROOT / "openplexus" / "tasks" / "families.py"
 
 
 @dataclass(frozen=True)
@@ -799,6 +800,20 @@ MUTATIONS = [
         # a mutation that cannot be applied is a claim nothing is checking.
         old='        if (self.hops > 1 and self.context_keys and self.search_branches < 1\n                and self.hop_relation < 0 and not self.hop_relations):',
         new="        if False and self.hops > 1 and self.context_keys:",
+    ),
+    Mutation(
+        name="the-set-answer-is-a-singleton-after-all",
+        breaks="ARCHITECTURE row F3 while appearing to satisfy it. The answer set "
+               "collapses to one value, so the first multi-token measurement in "
+               "this project silently becomes the single-token measurement under "
+               "a new column heading -- and it SCORES WELL, because a mechanism "
+               "that emits one token is then exactly right. `exact` goes UP, "
+               "which is the direction that invites no checking. "
+               "`__post_init__` refuses exceptions_per_family=0 for precisely "
+               "this reason, and this reintroduces it past the guard",
+        path=FAMILIES,
+        old="            answer_sets.append(values_stated)",
+        new="            answer_sets.append(frozenset({min(values_stated)}))",
     ),
     Mutation(
         name="the-set-score-reports-RECALL-as-F1",

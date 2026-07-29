@@ -54,6 +54,11 @@ silent**, and it is the real risk of (a) rather than the change itself.
 exists. What it changes is the *roadmap* — B4 becomes "fit `ContentIndex` across
 paired streams", which is additive, rather than "re-key the store".
 
+> **Outcome.** John accepted (a) — decision 163 §1. And the risk named there was
+> half of one: [note 053](053-two-nodes-must-agree-on-what-a-picture-is.md) adds
+> the direction that only exists distributed, where two NODES quantise the same
+> input differently and no node can detect it locally.
+
 ## 2. Where does the relation come from at read time?
 
 Decision 158 built `hop_relation` and named its limit: **the relation is fixed,
@@ -74,6 +79,10 @@ ever worked (148, after 147 refuted two others).
 **Recommendation: (a) now, measure (c) next, and do not attempt (b) yet.**
 Decision 147 is the argument: two hand-made selection rules were refuted before
 membership worked, and a learned chooser is strictly harder than either.
+
+> **Outcome.** John ruled (a) then (c) — decision 163 §2. Decision 162 then found
+> that the prior question was not *which* relation but whether a hop can carry its
+> own at all, and **164 built it** (`hop_relations`). (c) is still unbuilt.
 
 **Blast radius: moderate.** It changes the read path but not the representation.
 Deferring it costs a re-measure of the composition rows, not a rebuild.
@@ -102,6 +111,21 @@ being measurements of the goal.
 **Recommendation: decide before scaling, not before E4.** It is the row where the
 project's actual goal lives, and it is cheap to prototype on the tasks that
 already exist.
+
+> **Outcome.** John's ruling made this the live question (163 §3), and it has
+> narrowed. (c) SLOTS is not a peer of (b) — a fixed frame is a traversal with a
+> fixed relation schedule, which decision 162 already calls a fitted constant. So
+> the choice is (a) against (b), and **what decides it is termination**: under (b)
+> the walk stops where decision 148's gate reads structurally zero, and nothing is
+> fitted; under (a) stopping is a learned end-token. Decision 165 builds the ruler.
+>
+> **And rendering is a separate row, not part of this one.** A concept walk does
+> not emit English. John raised that, and the split — a traversal that decides
+> *what* to say, a realiser that decides *how* — is the field's own two-stage
+> generation shape. The hazard is specific: a fluent renderer can produce the right
+> sentence from a wrong walk, so the concept set stays the scored artifact and the
+> first realiser is templates, which cannot add a fact. Blast radius of rendering
+> is near zero, which is why it does not belong in this note's table.
 
 ## 4. Does the store ever persist across sequences?
 

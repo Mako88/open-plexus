@@ -115,8 +115,42 @@ alone means building it twice.
 | | change | status |
 |---|---|---|
 | **0a** | **persistent slow store** | **DONE and REFUTED in its strong form** (decision 133). Worth **0.08 bits at every scale** — keep it — but it does not move the wall |
-| **0b** | **concept partitioning** | **NOW THE LIVE WORK.** Its falsifier ran (g16-01, decision 134) and the case is **independence, not capacity** |
+| **0b** | **concept partitioning** | **PARTS BUILT, NOT WIRED.** `ownership.Ring` + `partitioned.ConceptStore` + replication exist and are tested. The capacity falsifier ran (g16-01, decision 134). **The falsifier that matters has not: can the model still LEARN through it?** |
+| **0d** | **repair / anti-entropy** | **NEW GAP, surfaced by John's own question.** Replication depletes and never recovers. Nothing is built |
 | 0c | content-derived keys | not started; every key is a random draw, so the store has **no notion of similarity at all** |
+
+**0b's remaining risk is the one nothing has touched.** Everything measured so far
+is a property of the *store* — capacity, balance, survival. The model has never
+read or written through it. Routing needs the token id where `Retrieval.read`
+takes a key vector, so the store cannot sit behind the existing seam unchanged,
+and until a model trains through it the arrangement is a data structure with good
+properties rather than a component.
+
+**0d, in full, because John asked the question that found it.** *Do concepts
+redistribute when a node drops?* **No.** The ring is unchanged, so a read falls
+through to the next surviving holder and keeps working — but the replica count is
+never restored:
+
+    nodes lost (of 20)   survival   mean live holders per concept
+                     0      1.000                            3.00
+                     6      0.967                            2.03
+                    10      0.873                            1.43
+                    14      0.656                            0.84
+
+**So the 0.896-at-half-the-network figure is the single-event best case, not the
+steady state.** C3's premise is that churn is continuous; under continuous churn
+the count walks to zero and survival follows. The degradation is invisible until
+it is total, which is the worst shape a failure can have.
+`test_redundancy_DEPLETES_because_nothing_repairs_it` asserts the defect so it
+cannot be forgotten — it fails the day repair lands.
+
+The fix is standard: on losing a holder, a survivor copies the concept to the next
+distinct node clockwise. Consistent hashing already names who that is, so it is a
+local exchange between ring neighbours with **no coordinator** — which is why it
+fits C1. Cost is `width²` numbers per concept moved, constant background traffic
+under constant churn, and that wants measuring against `d_max` (~640 ms) rather
+than assumed. That is anti-entropy and hinted handoff, in the DHT literature
+GOALS §6.2 has listed unread since the project began.
 
 **0a's result, and it redirects the whole line.** `persist-slow-decay` beats the
 baseline at every data point, and its store norm is **0.4 at every corpus size** —

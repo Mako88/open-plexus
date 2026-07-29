@@ -17,7 +17,6 @@ error -- neither may be compared with anything.
 
 from __future__ import annotations
 
-import math
 import statistics
 from collections import defaultdict
 
@@ -36,7 +35,7 @@ def mean(rows: list[dict], field: str = "error") -> float:
 
 def main() -> None:
     records = require(load(), "kind", "groups", "error", "addresses",
-                      "diverged", "pinned", "bias", "decay")
+                      "diverged", "pinned", "bias", "cap")
     if not records:
         print("NO RECORDS -- the matrix produced nothing, which is a failure "
               "of the run rather than a result")
@@ -45,38 +44,45 @@ def main() -> None:
     seeds = sorted({r["seed"] for r in records})
     print(f"records {len(records)}, seeds {seeds}, "
           f"biases {sorted({r['bias'] for r in records})}, "
-          f"decays {sorted({r['decay'] for r in records})}")
+          f"caps {sorted({r['cap'] for r in records})}")
     if len({r["condition"] for r in records}) != len(records):
         print("!! duplicate condition strings -- two jobs wrote the same cell")
 
     # THE RAILS FIRST. Everything below is unreadable where these fire.
     diverged = [r for r in records if r["diverged"]]
+    unstable = [r for r in records if r.get("unstable")]
     pinned = [r for r in records if r["pinned"]]
     print(f"\nRAILS")
     print(f"  diverged {len(diverged)} of {len(records)}"
-          + (f" -- all at decay "
-             f"{sorted({r['decay'] for r in diverged})}" if diverged else ""))
+          + (f" -- all at cap "
+             f"{sorted({r['cap'] for r in diverged})}" if diverged else ""))
+    print(f"  UNSTABLE (finite, and worse than uniform) {len(unstable)}"
+          + (f" -- {sorted({r['condition'] for r in unstable})}"
+             if unstable else ""))
     print(f"  temperature pinned at a grid edge in {len(pinned)} cell(s)"
           + (" -- those bits are an OVERSTATEMENT of the error by an unknown "
              "amount" if pinned else ""))
 
-    live = [r for r in records if not r["diverged"]]
-    for decay in sorted({r["decay"] for r in live}):
+    # Both rails drop the cell. An unstable cell has a number and it is not a
+    # measurement -- averaging it into an arm would move that arm by tens of
+    # bits and the mean would still look like an ordinary result.
+    live = [r for r in records if not r["diverged"] and not r.get("unstable")]
+    for cap in sorted({r["cap"] for r in live}):
         for bias in sorted({r["bias"] for r in live}):
             block = [r for r in live
-                     if r["decay"] == decay and r["bias"] == bias]
+                     if r["cap"] == cap and r["bias"] == bias]
             if block:
-                report(block, decay, bias)
+                report(block, cap, bias)
 
 
-def report(block: list[dict], decay: float, bias: bool) -> None:
+def report(block: list[dict], cap: float, bias: bool) -> None:
     cells: dict[tuple[str, int], list[dict]] = defaultdict(list)
     for record in block:
         cells[(record["kind"], record["groups"])].append(record)
     groups = sorted({k[1] for k in cells if k[0] != "floor"})
     kinds = [k for k in KIND_ORDER if any(c[0] == k for c in cells)]
 
-    print(f"\n=== decay {decay}, readout bias {int(bias)} "
+    print(f"\n=== store cap {cap}, readout bias {int(bias)} "
           f"{'(the comparison set config)' if not bias else ''}")
     print("bits per WORD, lower is better")
     print(f"  {'arm':<12}" + "".join(f"{g:>10}" for g in groups))
@@ -157,8 +163,12 @@ def predictions(cells, groups, floor: float, reference: dict) -> None:
           f"{'CONFIRMED' if interior else 'REFUTED'}")
 
     floor_addresses = mean(cells[("floor", 0)], "addresses")
-    print(f"  P4  RAIL. addresses fall roughly as the square of the grouping "
-          f"ratio:")
+    print(f"  P4  RAIL. the grouping reaches the store: addresses fall and "
+          f"recurrence rises at every K.")
+    print(f"      Falls LINEARLY in the grouping ratio, not as its square -- "
+          f"the square was predicted and the pre-dispatch measurement had "
+          f"already refuted it. Both columns are printed so the shape is "
+          f"readable rather than asserted.")
     for g in groups:
         if ("concept", g) not in cells:
             continue
@@ -167,7 +177,7 @@ def predictions(cells, groups, floor: float, reference: dict) -> None:
         seen = mean(rows, "addresses") / floor_addresses
         print(f"        K={g:<5} concepts {ratio:.3f} of vocab, "
               f"addresses {seen:.3f} of floor, "
-              f"square of the ratio {ratio ** 2:.3f}  "
+              f"the ratio squared would be {ratio ** 2:.3f}  "
               f"recurrence {mean(rows, 'recurrence'):.1f}")
     collapsed = all(mean(cells[("concept", g)], "addresses") < floor_addresses
                     for g in groups if ("concept", g) in cells)

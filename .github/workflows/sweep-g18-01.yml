@@ -21,17 +21,24 @@ name: sweep-g18-01-does-storing-by-concept-make-words-learnable
 # `floor` but not its controls is a real finding and a smaller one: fewer
 # addresses, however chosen.
 #
-# THE DECAY ARM IS NOT TUNING. The first concept cell overflowed to NaN, and the
-# reason is the defect itself -- surface-level sparsity was the only thing
-# holding the store's norm down, so collapsing the address space restores
-# recurrence AND removes the brake at the same time. `divergence` runs decay 1.0
-# deliberately so that fact is recorded rather than assumed.
+# THE BRAKE IS NOT TUNING. The first concept cell overflowed to NaN (|Wo| reached
+# 1.6e63), and the reason is the defect itself -- surface-level sparsity was the
+# only thing holding the store's norm down, so collapsing the address space
+# restores recurrence AND removes the brake at once. Probed at 20,000 words
+# against a 10.759 uniform, concept-128: no brake 36.2, decay 0.999 36.0, decay
+# 0.997 39.6, decay 0.99 10.78, cap 5.0 10.50, cap+decay 10.50. A cap holds where
+# a fade does not and a fade on top buys nothing -- and a cap keeps the store's
+# window, where a fade throws away the recurrence the grouping just bought. The
+# `divergence` job runs cap 0, the model's own default, so the blow-up is
+# recorded rather than assumed.
 #
 # PREDICTIONS (full text in the script and the sweep file):
 #   P1  THE GATE -- the best concept arm beats floor by more than 0.10 bits
 #   P2  CONTROL -- it beats permuted and shuffled at the same K by 0.05
 #   P3  bits per word is non-monotonic in K, minimum at an intermediate value
-#   P4  RAIL -- addresses fall as the square of the grouping ratio
+#   P4  RAIL -- addresses fall and recurrence rises at every K (the "square of
+#       the grouping ratio" form was predicted and refuted before dispatch; the
+#       fall is linear, and the script records why)
 #   P5  no arm reaches the word unigram at 8.068
 #
 # WHAT WOULD REFUTE THE PROPOSAL: P1 failing at every K with P4 passing. The
@@ -45,12 +52,23 @@ name: sweep-g18-01-does-storing-by-concept-make-words-learnable
 # three: it is a robustness check against the configuration every earlier number
 # used, not the measurement.
 
+# ⚠ NOT DISPATCHABLE UNTIL g18-00 LANDS. The learning rate and the cap below are
+# deliberately unset: g18-00 measures what each arm needs to run at all, and
+# dispatching this at the model's stock lr 0.05 would compare a mechanism against
+# a baseline handicapped by a hyper-parameter -- the confound g10-09 was
+# retracted for. `SETTINGS_FROM_G18_00` parses as a float in nothing, so a job
+# started before then fails on its first line instead of returning a number.
+
 on:
   workflow_dispatch:
 
 concurrency:
   group: open-plexus-sweep
   cancel-in-progress: false
+
+env:
+  LR: SETTINGS_FROM_G18_00
+  CAP: SETTINGS_FROM_G18_00
 
 jobs:
   grid:
@@ -74,7 +92,7 @@ jobs:
           mkdir -p out
           python experiments/g18_01_does_storing_by_concept_make_words_learnable.py \
             --seed ${{ matrix.seed }} --arm ${{ matrix.arm }} \
-            --bias 1 --decay 0.997 \
+            --bias 1 --cap ${{ env.CAP }} --lr ${{ env.LR }} --decay 1.0 \
             --json out/${{ matrix.arm }}-${{ matrix.seed }}-bias1.json
       - uses: actions/upload-artifact@v4
         with:
@@ -101,7 +119,7 @@ jobs:
           mkdir -p out
           python experiments/g18_01_does_storing_by_concept_make_words_learnable.py \
             --seed 0 --arm ${{ matrix.arm }} \
-            --bias 0 --decay 0.997 \
+            --bias 0 --cap ${{ env.CAP }} --lr ${{ env.LR }} --decay 1.0 \
             --json out/${{ matrix.arm }}-0-bias0.json
       - uses: actions/upload-artifact@v4
         with:
@@ -128,7 +146,7 @@ jobs:
           mkdir -p out
           python experiments/g18_01_does_storing_by_concept_make_words_learnable.py \
             --seed 0 --arm ${{ matrix.arm }} \
-            --bias 1 --decay 1.0 \
+            --bias 1 --cap 0 --lr ${{ env.LR }} --decay 1.0 \
             --json out/${{ matrix.arm }}-0-nobrake.json
       - uses: actions/upload-artifact@v4
         with:

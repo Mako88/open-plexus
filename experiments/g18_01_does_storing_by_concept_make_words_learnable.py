@@ -29,8 +29,18 @@ indistinguishable as context.
 
     floor         one concept per word            g17-01's configuration
     concept-K     K groups from content vectors   the proposal
+    stratified-K  the 200 commonest words kept apart, only the tail grouped
     permuted-K    the same group SIZES, members shuffled
     shuffled-K    groups from an index fitted on SHUFFLED text
+
+## The brake is part of the mechanism, not a setting
+
+The first concept cell **overflowed to NaN**, and the reason is the defect
+itself: with one address per word pair almost everything was written once, so the
+sparsity that made the model useless was also the only thing holding the store's
+norm down. Restoring recurrence removes that. `CAP` below records what was probed
+and why a cap rather than a fade — and `cap 0`, the model's own default, is run
+as an arm so the divergence is on the record.
 
 **Two controls, because there are two ways to be wrong.** `permuted` matches the
 address-space statistics exactly and destroys the meaning, so it separates "fewer
@@ -52,10 +62,19 @@ controls is a real finding and a much smaller one.
   P3  Bits per word is non-monotonic in K, with a minimum at an intermediate
       value. Small K destroys the context resolution the store needs; large K
       restores the sparsity that caused the problem.
-  P4  A RAIL, not a finding. Distinct training addresses fall by roughly the
-      square of the grouping ratio and mean recurrence rises to match. If it
-      does not, `ByConcept` is not reaching the store and every arm is measuring
-      the same model.
+  P4  A RAIL, not a finding. Distinct training addresses fall and mean
+      recurrence rises to match, at every K. If they do not, `ByConcept` is not
+      reaching the store and every arm is measuring the same model.
+
+      **The first version of this said "by roughly the SQUARE of the grouping
+      ratio", and the pre-dispatch measurement had already refuted it before
+      anything was run.** Addresses fall almost exactly linearly: 0.103 of the
+      vocabulary gives 0.095 of the addresses, and 0.325 gives 0.320. The
+      square would be right if every pair of words occurred; in a Zipfian
+      corpus the observed pairs are a thin subset of vocab², and merging words
+      mostly merges pairs that already shared a member. Corrected here rather
+      than scored as a confirmation, because it was checked against a number
+      already in hand.
   P5  No arm reaches the word unigram, which `NGram` puts at 8.068 for these
       training words. The mechanism is worth less than the 2.65 bits that would
       take. If it IS reached, that is the headline and every claim about what
@@ -118,19 +137,28 @@ FREQUENT = 200
 #: whatever the addressing does. On is where "learnable at all" is a fair
 #: question. Both are run, and a claim quoted from one says which.
 BIASES = (False, True)
-#: THE BRAKE, and it is an axis because the mechanism REQUIRES one.
+#: THE BRAKE, AND THE MECHANISM REQUIRES ONE. Not a tuning knob.
 #:
-#: The first concept cell overflowed to NaN. Pair keys over surfaces never did,
-#: and the reason is the defect itself: almost every address was written once, so
-#: the sparsity that made the model useless was also what held the store's norm
-#: down. Collapsing the address space restores recurrence -- the point of the
-#: proposal -- and the same key now gets written tens of times with `decay=1.0`
-#: and no cap.
+#: The first concept cell overflowed to NaN, and pair keys over surfaces never
+#: did. The reason is the defect itself: almost every address was written once,
+#: so the sparsity that made the model useless was also the only thing holding
+#: the store's norm down. Collapse the address space -- the point of the
+#: proposal -- and the same key is written tens of times against the model's own
+#: defaults of `decay=1.0` and no cap. `|Wo|` reached 1.6e63.
 #:
-#: 1.0 stays in the grid so the divergence is RECORDED rather than assumed. A
-#: cell that diverges reports NaN, which is a result about what the mechanism
-#: needs and not a failed run.
-DECAYS = (1.0, 0.997)
+#: Probed at 20,000 words before the sweep, concept-128 against a 10.759
+#: uniform:
+#:
+#:     no brake          36.2      decay 0.99    10.781
+#:     decay 0.999       36.0      cap 5.0       10.500   <- the only arm alive
+#:     decay 0.997       39.6      cap 5 + decay 10.501
+#:
+#: **A cap holds where decay does not, and decay on top of it buys nothing.**
+#: That is the right shape as well as the working one: decay shortens the store's
+#: window, which throws away the recurrence the grouping just bought, where a cap
+#: bounds the norm and keeps it. `cap 0` -- the model's own default -- is run as
+#: its own arm so the divergence is RECORDED rather than assumed.
+CAP = 5.0
 #: The index weighting. Fixed rather than swept: K is the axis this experiment
 #: is about, and a result quoted at one weighting says so (g17-01's caveat).
 #: 0.5 is the value that sharpened `king` to `richard, edward, henry`.
@@ -287,7 +315,7 @@ def counting_bars(vocab: int, stream: np.ndarray, chunks) -> tuple[float, float]
 
 
 def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
-             decay: float = 0.997) -> dict:
+             decay: float = 1.0, cap: float = 5.0, lr: float = 0.05) -> dict:
     started = time.time()
     built = built or corpus()
     stream = built.train[0][:TRAIN_WORDS]
@@ -295,7 +323,7 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
     model = LocalAssociativeMemory(LocalMemoryConfig(
         d_model=WIDTH, vocab_size=built.vocab_size, seed=seed,
         derived_keys=True, context_keys=True, readout_bias=bias,
-        decay=decay))
+        decay=decay, memory_cap=cap, lr=lr))
     if kind != "floor":
         # The store is addressed by concept; `model.surfaces` keeps routing
         # consistent with it for the partitioned path, which is off here.
@@ -330,13 +358,33 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
                           key=lambda t: bits(fit_scores, fit_targets, t))
         test_scores, test_targets = collected(model, test_chunks)
         error = round(bits(test_scores, test_targets, temperature), 4)
+    # WHAT A SETTING MAY BE CHOSEN BY. `error` is measured on the test text, so
+    # picking a learning rate or a K by it would be selection on the thing being
+    # reported. This is the same quantity on the held-out TRAINING text the
+    # temperature is already fitted on, and it is the only number a calibration
+    # run is allowed to sort by.
+    fit_error = (float("nan") if diverged
+                 else round(bits(fit_scores, fit_targets, temperature), 4))
+    # FINITE AND USELESS IS THE CASE THAT ALMOST GOT THROUGH.
+    #
+    # concept-128 at lr 0.005 and no cap returned 36.9 bits against a 10.759
+    # uniform: no NaN anywhere, so `diverged` was False and a number went into
+    # the table. A calibrated model cannot be much worse than uniform unless it
+    # is unstable -- the temperature would flatten it -- so being above uniform
+    # at all says the calibration text and the test text disagree about what
+    # this model does, and the cell is not a measurement.
+    uniform = float(np.log2(built.vocab_size))
+    unstable = bool(not diverged and error > uniform + 0.05)
     addresses, recurrence = addressing(stream, surfaces)
     unigram, bigram = counting_bars(built.vocab_size, stream, test_chunks)
     return dict(
         arm=f"{kind}-{k}" if kind != "floor" else "floor",
-        kind=kind, groups=k, seed=seed, bias=bias, decay=decay,
+        kind=kind, groups=k, seed=seed, bias=bias,
+        decay=decay, cap=cap, lr=lr,
         diverged=bool(diverged),
+        unstable=unstable,
         error=error,
+        fit_error=fit_error,
         temperature=round(float(temperature), 6),
         # THE CALIBRATION RAIL. True means the fit wanted a temperature outside
         # the grid, so this cell's bits are an overstatement of its error by an
@@ -352,14 +400,15 @@ def one_cell(kind: str, k: int, seed: int, built=None, bias: bool = False,
         recurrence=round(recurrence, 3),
         unigram=round(unigram, 4),
         bigram=round(bigram, 4),
-        uniform=round(float(np.log2(built.vocab_size)), 4),
+        uniform=round(uniform, 4),
         train_words=int(len(stream)),
         scored=int(len(test_targets)),
         index_numbers=index.numbers_held if index else 0,
         store_numbers=WIDTH * WIDTH,
         seconds=round(time.time() - started, 1),
         condition=f"{kind}{k if kind != 'floor' else ''}"
-                  f"|bias{int(bias)}|decay{decay}|d{WIDTH}|seed{seed}"
+                  f"|bias{int(bias)}|decay{decay}|cap{cap}|lr{lr}"
+                  f"|d{WIDTH}|seed{seed}"
                   f"|power{POWER}|min{MIN_COUNT}|epochs{EPOCHS}")
 
 
@@ -379,7 +428,7 @@ def calibrate() -> None:
     for bias in (False, True):
         for kind, k in [("floor", 0), ("concept", 128), ("concept", 512),
                         ("stratified", 128), ("permuted", 128)]:
-            record = one_cell(kind, k, 0, built, bias=bias)
+            record = one_cell(kind, k, 0, built, bias=bias, cap=CAP)
             print(f"  bias={int(bias)} {record['arm']:14s} "
                   f"bits {record['error']:7.3f}  "
                   f"concepts {record['concepts']:5d}  "
@@ -404,10 +453,20 @@ def main() -> int:
                         help="readout bias: 0 reproduces the comparison set, "
                              "1 gives the model a way to express a prior at "
                              "all; omit to run both")
-    parser.add_argument("--decay", type=float, default=None,
-                        help="the store's brake. 1.0 is no brake, which is the "
-                             "default the model has always had and which "
-                             "DIVERGES once addresses recur; omit to run both")
+    parser.add_argument("--decay", type=float, default=1.0,
+                        help="per-step fade on the store. 1.0 is the model's "
+                             "own default")
+    parser.add_argument("--cap", type=float, default=5.0,
+                        help="largest norm the store may reach; 0 is "
+                             "unbounded, which is the model's own default and "
+                             "which DIVERGES once addresses recur")
+    parser.add_argument("--lr", type=float, default=0.05,
+                        help="readout learning rate; 0.05 is the model's own "
+                             "default")
+    parser.add_argument("--groups", type=int, default=None,
+                        help="one K only. For a calibration that is about "
+                             "something else -- the learning rate, say -- and "
+                             "should not spend the whole K axis on it")
     parser.add_argument("--calibrate", action="store_true",
                         help="one seed, a few K, locally -- does anything move")
     args = parser.parse_args()
@@ -423,22 +482,22 @@ def main() -> int:
     seeds = (args.seed,) if args.seed is not None else SEEDS
     kinds = (args.arm,) if args.arm else ("floor",) + KINDS
     biases = (bool(args.bias),) if args.bias is not None else BIASES
-    decays = (args.decay,) if args.decay is not None else DECAYS
+    sizes = (args.groups,) if args.groups is not None else GROUPS
     built = corpus()
     records = []
     for seed in seeds:
         for bias in biases:
-            for decay in decays:
-                for kind in kinds:
-                    for k in ((0,) if kind == "floor" else GROUPS):
-                        record = one_cell(kind, k, seed, built, bias=bias,
-                                          decay=decay)
-                        print(f"  {record['condition']:44s} "
-                              f"bits {record['error']:.4f}  "
-                              f"addresses {record['addresses']}"
-                              f"{'  DIVERGED' if record['diverged'] else ''}",
-                              file=sys.stderr, flush=True)
-                        records.append(record)
+            for kind in kinds:
+                for k in ((0,) if kind == "floor" else sizes):
+                    record = one_cell(kind, k, seed, built, bias=bias,
+                                      decay=args.decay, cap=args.cap,
+                                      lr=args.lr)
+                    print(f"  {record['condition']:52s} "
+                          f"bits {record['error']:.4f}  "
+                          f"addresses {record['addresses']}"
+                          f"{'  DIVERGED' if record['diverged'] else ''}",
+                          file=sys.stderr, flush=True)
+                    records.append(record)
     harness.emit(records, Path(args.json) if args.json else None)
     return 0
 

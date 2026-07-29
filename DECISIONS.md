@@ -5077,9 +5077,30 @@ names the linked family, the model still has to get from that name to a value,
 and only entities have values. That is a third hop, and note 050 predicted the
 task would need two.
 
-**So the task is not just mis-laid-out, it may be harder than the mechanism it
-was built to measure.** That is worth knowing before a fourth attempt, and it is
-what the first run bought.
+**CORRECTION, same day, before anything was built on it.** The third hop is an
+artefact of the entity-endpoint layout rather than of the task. Put the link on
+ATTRIBUTE tokens and state each family's value at its attribute as well:
+
+    QUERY entity   the gate fires -- the entity's own address is empty
+                   the index proposes attrA, because entities already sit beside
+                   their attributes in the background streams
+    hop 1          attrA -> attrB
+    hop 2          attrB -> the linked family's value
+
+**Two hops after the index proposal, which is exactly what `hops = 2` supports.**
+Attribute tokens are never query subjects and never carry an entity's fact, so
+the collision that refuted the first layout cannot occur.
+
+It also makes the instrument cleaner than the one designed. TRANSFER becomes
+answerable through the attribute in ONE hop while LINKED needs two, so **the arms
+separate by hop depth** rather than by whether a mechanism happens to be present
+— which is a sharper axis than note 050 asked for.
+
+**Still not built, and deliberately.** Stating a family's value at its attribute
+changes what TRANSFER measures, and every TRANSFER number from decision 143
+onward assumes it is answerable only through a sibling. That is a change to the
+meaning of an existing column, which is exactly the class of thing this project
+does not do without saying so first.
 
 `family_links` stays in the tree, off by default and now documented as refuted,
 because deleting it would also delete the byte-identity rail and the calibration

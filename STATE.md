@@ -63,32 +63,38 @@ the score is not.**
 
 ## ⇒ THE QUESTION RIGHT NOW
 
-**Will a preference rule beat the averaging one?** — the only piece of note 049
-still unbuilt, and the only model change this line has ever pointed at.
+**Can anything tell which of two retrievals to trust?**
 
-Decision 146 settled the addressing. John picked option B independently and it is
-note 045's July design: never share an address, read neighbours through the
-content index instead. `index_branches` already implements it, so it cost a
-configuration.
+Decision 147 answered the previous question — *will a preference rule beat the
+averaging one* — with **no, twice.**
 
     with exceptions       direct  transfer  exception
       ungrouped           0.7792    0.0608     0.7833
       concept (grouped)   0.4492    0.4708     0.3708
-      indexed (option B)  0.7158    0.2650     0.6875
+      indexed (B, summed) 0.7158    0.2650     0.6875
+      preferred (by norm) 0.2842    0.3442     0.2467
+      margin (by decode)  0.5833    0.1917     0.5808
 
-**B is the right addressing** — nothing is overwritten, so the specific fact
-survives in the store. **But it averages rather than chooses:** sweeping how much
-the neighbours count moves transfer and exception monotonically against each
-other with their sum flat at ~0.93. There is no corner that holds both.
+**Both hand-made selection rules lose to simply adding the retrievals.** Magnitude
+says how much was written, not whether it is the right address. Decode margin —
+decision 130's actual signal — does better and still loses.
 
-    read the entity's own address
-    if it holds a real binding, answer and stop
-    otherwise read the neighbours
+Decision 146 settled the addressing before this: option B, which John picked
+independently and which is note 045's July design — never share an address, read
+neighbours through the content index. Nothing is overwritten, so the specific fact
+**survives in the store**. It just does not survive to the answer.
 
-One conditional, no double writes. The ceiling exists (at least one arm right on
-0.853 of exceptions), the traffic is measured (a true sibling is the nearest
-neighbour 100% of the time), and the open piece is the threshold for "a real
-binding" — decision 130's precedent applies.
+> The ceiling probe says at least one address holds the right answer on 0.853 of
+> exceptions. **The model holds both reads in the same step and cannot tell
+> which.** Storage was never the problem; selection is — and note 049 named that
+> as its own refutation condition before any of it was built.
+
+**What that leaves.** Summing is the best combination measured and decision 146
+showed it is an exchange rate rather than an answer. A **learned** gate — trained
+to predict which read to trust, rather than a rule read off a quantity that
+happened to be lying around — is the next thing that could work. It is a larger
+change than this line has proposed and needs its own predictions before a
+keyboard.
 
 Decision 144 answers the previous question — *does grouping do anything harder
 than same-kind-same-answer* — with **no, and the failure is total**:

@@ -219,6 +219,19 @@ def _fade(pending: list, factor: float) -> None:
         entry[0] *= factor
 
 
+def _margin(scores: np.ndarray) -> float:
+    """How far the best answer beats the second. Decision 130's signal.
+
+    Not the magnitude of anything: a large retrieval read from the wrong
+    address decodes to a confident-looking vector whose top two are close,
+    where a small one read from the right address separates cleanly.
+    """
+    if scores.size < 2:
+        return 0.0
+    top = np.partition(scores, -2)[-2:]
+    return float(top[1] - top[0])
+
+
 def scale_to(store: np.ndarray, cap: float) -> None:
     """Shrink `store` in place until its norm is at most `cap`. No-op if `cap` is 0.
 
@@ -1058,6 +1071,34 @@ class LocalMemoryConfig:
     cache_only: bool = False
     cache_sharpness: float = 8.0
     cache_weight: float = 1.0
+    #: PREFER the token's own read over the index's neighbours, instead of
+    #: summing them. Off by default, so every number measured before
+    #: 2026-07-29 is untouched -- decision 74's failure was a default that
+    #: moved.
+    #:
+    #: **Decision 146 is why this exists.** `index_branches` adds the
+    #: neighbours to the token's own read, and adding cannot choose: sweeping
+    #: `index_weight` moves TRANSFER and EXCEPTION accuracy monotonically
+    #: against each other with their sum pinned at ~0.93. A model that must
+    #: answer "this bird does not fly" cannot afford to average that with what
+    #: birds usually do.
+    #:
+    #: The rule is a comparison rather than a threshold, so there is no tuned
+    #: constant to generalise: **if the token's own read is the stronger
+    #: evidence, answer from it alone; otherwise answer from the neighbours.**
+    #: A token nothing was written about retrieves near zero, so it defers; a
+    #: token with its own stated fact does not.
+    #: `False` sums, as `index_branches` always has. `"norm"` prefers the
+    #: retrieval with the larger magnitude -- REFUTED, see below. `"margin"`
+    #: prefers the one whose decode is more confident, which is decision 130's
+    #: actual signal.
+    #:
+    #: **`"norm"` is kept because it is a measured negative.** It collapsed to
+    #: 0.247 on exceptions where plain addressing holds 0.783: magnitude says
+    #: how much was written at an address and says nothing about whether it is
+    #: the right address, so a hard choice on it discards the correct answer
+    #: about as often as the wrong one.
+    index_prefer: bool | str = False
     readout_bias: bool = False
     derived_keys: bool = False
     context_keys: bool = False
@@ -2328,6 +2369,8 @@ class LocalAssociativeMemory:
                     self.surfaces.of(self.key_source.concept(tokens, t)))
             readable = memory if lasting is None else memory + lasting
             retrieved = self.retrieval.read(readable, key)
+            neighbours = None
+            strongest = 0.0
             if self.config.index_branches:
                 # THE CONTENT INDEX, note 045. Similar concepts are asked as
                 # well, and each is an ORDINARY EXACT READ at a hard token id --
@@ -2379,9 +2422,26 @@ class LocalAssociativeMemory:
                                 self.surfaces.of(candidate))
                             if lasting is not None:
                                 readable = readable + lasting
-                        retrieved = retrieved + (
-                            self.config.index_weight * weight
-                            * self.retrieval.read(readable, near))
+                        raw = self.retrieval.read(readable, near)
+                        contribution = (self.config.index_weight * weight * raw)
+                        if self.config.index_prefer:
+                            # THE COMPARISON MUST BE SCALE-FAIR, and the first
+                            # version was not: it weighed the token's own RAW
+                            # read against the neighbours' DOWN-WEIGHTED sum,
+                            # so `index_weight` decided the winner before the
+                            # evidence did. The own read won by default and the
+                            # rail caught it -- R2 lost 0.33 of transfer on a
+                            # task with no conflicts to resolve at all.
+                            #
+                            # So the strength of the neighbour evidence is the
+                            # strongest RAW neighbour read, while the value
+                            # answered from is still the weighted mixture.
+                            strongest = max(strongest,
+                                            float(np.linalg.norm(raw)))
+                            neighbours = (contribution if neighbours is None
+                                          else neighbours + contribution)
+                        else:
+                            retrieved = retrieved + contribution
                     if concepts is not None:
                         # Point `readable` back at THIS concept's node. The loop
                         # above walked it across the candidates' machines, and
@@ -2391,6 +2451,38 @@ class LocalAssociativeMemory:
                         readable = memory
                         if lasting is not None:
                             readable = readable + lasting
+                if self.config.index_prefer and neighbours is not None:
+                    # THE CHOICE, and it is a comparison rather than a bar.
+                    #
+                    # Whichever retrieval carries more signal is the one
+                    # answered from -- the other is discarded rather than
+                    # blended, because blending is what decision 146 measured
+                    # and it averages. A token nothing was written about
+                    # retrieves near zero and therefore defers to its
+                    # neighbours; a token with its own stated fact does not,
+                    # and its own fact wins even when every neighbour disagrees.
+                    #
+                    # No threshold, so nothing here has to generalise across
+                    # configurations -- which is what note 049's P3 was worried
+                    # about and the reason this is a comparison at all.
+                    if self.config.index_prefer == "margin":
+                        # DECISION 130'S ACTUAL SIGNAL, and the reason this
+                        # branch exists: the norm version claimed 130's
+                        # precedent and did not implement it. 130 fires on the
+                        # MARGIN OF THE DECODE -- how far the best answer beats
+                        # the second -- not on how large a retrieval is.
+                        #
+                        # Magnitude says how much was written at an address.
+                        # Margin says how sure the readout is about what came
+                        # back, and only the second is evidence about being
+                        # RIGHT. Measured: the norm rule collapsed to 0.247 on
+                        # exceptions where plain addressing holds 0.783.
+                        own_scores = self.wo @ retrieved
+                        near_scores = self.wo @ neighbours
+                        if _margin(near_scores) > _margin(own_scores):
+                            retrieved = neighbours
+                    elif strongest > float(np.linalg.norm(retrieved)):
+                        retrieved = neighbours
             # NOT `key`. `key` is the TOKEN's key and it is carried out of this
             # loop to `previous_key`, which is what the next position WRITES
             # with. Reassigning it here made every binding in the store use a

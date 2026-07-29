@@ -1,6 +1,7 @@
 # 049 — "Specific beats general" is a read policy, not a new representation
 
-**Status:** a design, nothing built. Written to correct something I told John
+**Status:** BUILT AND REFUTED — decision 147. **The falsifier at the bottom of this note is the thing that happened:** both reads were available and the model could not choose between them. Kept as written, because a design whose own refutation condition fires is worth more intact than edited.
+**Was:** a design, nothing built. Written to correct something I told John
 about decision 144 an hour after telling him.
 **Answers:** the question STATE now carries — *can a store hold a family default
 and a per-entity override at the same time?*
@@ -104,5 +105,8 @@ queried position, which matters for C1 and should be quoted rather than
 discovered. And `retrieval.py` already holds the seam for how a store is read, so
 it belongs there rather than in another branch inside `run`.
 
-**Not built. Not started.** The threshold question above is the part that needs a
-decision rather than a keyboard.
+**Built, and it does not work — decision 147.** Two signals were tried for "a
+real binding": the retrieval's norm and the decode's margin. Both lose to summing
+the two reads. P1 fails with both reads available, which is exactly the condition
+named above, so the problem is **selection rather than storage** and this design
+does not reach it.

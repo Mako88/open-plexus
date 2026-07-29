@@ -112,6 +112,52 @@ against option A's two-address read and two-address write.
       on both, it is averaging rather than choosing and 049's threshold is back
       on the table.
 
+## THE `preferred` ARM — B's addressing with a choosing rule
+
+Decision 146 measured that option B consults both and then **adds** them, and
+that adding cannot choose: sweeping `index_weight` moves TRANSFER and EXCEPTION
+against each other with their sum pinned at ~0.93.
+
+`index_prefer` replaces the sum with a comparison. **Whichever retrieval carries
+more signal is answered from, and the other is discarded.** A token nothing was
+written about retrieves near zero and defers to its neighbours; a token with its
+own stated fact does not, and its own fact wins even when every neighbour
+disagrees.
+
+**It is a comparison, not a threshold**, so there is no tuned constant that has
+to generalise — which is what note 049's P3 was worried about.
+
+**PREDICTIONS, registered before the arm was run:**
+
+  R1  THE GATE. `preferred` holds EXCEPTION within 0.05 of `ungrouped` AND
+      beats `indexed` on TRANSFER. Taking the better of the two rather than
+      their average.
+
+  R2  THE RAIL. On the no-exception task `preferred` does not fall below
+      `indexed`. A rule that only ever discards the weaker evidence must not
+      cost anything where there is no conflict.
+
+  R3  THE FALSIFIER. If `preferred` matches `indexed` on both kinds, the two
+      retrievals are not separable by magnitude and the comparison is picking
+      noise. Then a threshold is genuinely needed and note 049's P3 comes back.
+
+**SCORED — DECISION 147. R1 REFUTED, R2 REFUTED, for both rules.** Three seeds:
+
+                           direct  transfer  exception
+      indexed (summed)     0.7158    0.2650     0.6875
+      preferred (by norm)  0.2842    0.3442     0.2467
+      margin (by decode)   0.5833    0.1917     0.5808
+
+Neither rule holds EXCEPTION within 0.05 of `ungrouped`'s 0.7833, and both fall
+below `indexed` on the no-exception task. R3 did not fire in its literal form —
+`preferred` does not *match* `indexed`, it is much worse — but the conclusion R3
+pointed at is the one that stands: **the retrievals are not separable by anything
+hand-made**, and a hard choice on a signal that does not separate them is worse
+than not choosing. `margin` was added after the fact because `preferred` had been
+described as using decision 130's signal and did not; 130 fires on the decode
+margin. Both settings are kept rather than deleted — a measured negative is
+cheaper to read than to rediscover.
+
 ## Settings, and why they are not inherited
 
 Single keys (`context_keys` off), because the binding is `entity -> value` and a
@@ -161,7 +207,8 @@ TRAIN = 400
 TEST = 200
 EPOCHS = 6
 SEEDS = (0, 1, 2)
-ARMS = ("ungrouped", "concept", "permuted", "nostore", "indexed")
+ARMS = ("ungrouped", "concept", "permuted", "nostore", "indexed",
+        "preferred", "margin")
 #: How many neighbours the `indexed` arm reads. 3 covers every sibling on
 #: this task -- measured, not assumed: all three are inside the top 3 at
 #: 100% across seeds.
@@ -172,7 +219,7 @@ def surfaces_for(arm: str, config: FamilyConfig, seed: int):
     """The grouping this arm addresses the store by, and the index behind it."""
     if arm in ("ungrouped", "nostore"):
         return OneConceptPerToken(config.vocab_size), None, float("nan")
-    if arm == "indexed":
+    if arm in ("indexed", "preferred", "margin"):
         # OPTION B: the identity mapping, so every fact keeps its own address
         # and nothing is ever overwritten -- but WITH a fitted index, because
         # the neighbours are read at query time instead.
@@ -232,8 +279,11 @@ def one_cell(arm: str, seed: int, exceptions: int = 0) -> dict:
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=config.vocab_size, d_model=WIDTH, lr=0.05,
         key_scale=0.5, decay=0.99, seed=seed,
-        index_branches=BRANCHES if arm == "indexed" else 0))
-    if arm not in ("ungrouped", "nostore", "indexed"):
+        index_branches=(BRANCHES
+                        if arm in ("indexed", "preferred", "margin") else 0),
+        index_prefer=("norm" if arm == "preferred"
+                      else "margin" if arm == "margin" else False)))
+    if arm not in ("ungrouped", "nostore", "indexed", "preferred", "margin"):
         model.key_source = ByConcept(model.key_source, surfaces,
                                      config.vocab_size)
         model.surfaces = surfaces

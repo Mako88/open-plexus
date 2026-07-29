@@ -4501,3 +4501,75 @@ That is the C1 number, measured rather than estimated.
 
 **Taken without asking** for the measurement; the model change it points at is
 still John's call and has not been started.
+
+## 147. The model has both answers and cannot tell which — note 049 refuted by its own falsifier
+
+Built on John's greenlight, measured, and it does not work. Three seeds, and both
+selection rules lose to simply adding the two retrievals together:
+
+    with exceptions          direct  transfer  exception
+      ungrouped              0.7792    0.0608     0.7833
+      concept (grouped)      0.4492    0.4708     0.3708
+      indexed (B, summed)    0.7158    0.2650     0.6875
+      preferred (by norm)    0.2842    0.3442     0.2467
+      margin (by decode)     0.5833    0.1917     0.5808
+
+    no exceptions            direct  transfer
+      concept                0.9967    0.9983
+      indexed (B, summed)    0.9733    0.7517
+      preferred (by norm)    0.8458    0.8933
+      margin (by decode)     0.8942    0.7850
+
+**R1 REFUTED** — neither rule holds EXCEPTION within 0.05 of `ungrouped`; they
+lose 0.537 and 0.203. **R2 REFUTED** — both fall below `indexed` on the
+no-exception task. **Note 049's P1 fails with both reads available**, which is the
+refutation condition that note wrote down before any of this was built:
+
+> *"The information would be present at two addresses, the model would have both,
+> and it still could not choose — which would say the problem is selection rather
+> than storage, and that is a different and harder question."*
+
+### Two signals tried, both wrong
+
+**Magnitude (`"norm"`).** How much was written at an address says nothing about
+whether it is the right address. It collapsed to 0.247 on exceptions where plain
+addressing holds 0.783 — making a hard choice on a signal that does not separate
+the cases discards the correct answer about as often as the wrong one, and that is
+worse than never choosing at all.
+
+**Decode margin (`"margin"`), which is decision 130's actual signal.** Better —
+0.581 against the norm rule's 0.247 — and still below the summed baseline's 0.688.
+Confidence in *an* answer is not evidence about *which retrieval* produced it.
+
+### A correction to what I claimed while building it
+
+I said the threshold had decision 130's precedent and then implemented a **norm**
+comparison. 130 fires on the margin of the decode. The two are not the same signal
+and I substituted one for the other because it was the quantity to hand. The
+margin version was written afterwards specifically to test the claim I had already
+made. It does better, and still loses.
+
+### What is now known, and it is worth more than the mechanism was
+
+The ceiling probe says at least one of the two addresses holds the right answer on
+0.853 of exceptions and 0.878 of directs. The model holds both reads in the same
+step.
+
+> **Storage was never the problem. Selection is.** Nothing hand-made — neither how
+> much was retrieved nor how confidently it decodes — carries the information
+> needed to choose between two retrievals.
+
+### What that leaves
+
+Summing remains the best combination measured, and decision 146 already showed it
+is an exchange rate rather than an answer. The next thing that could work is a
+**learned** gate — trained to predict which read to trust, rather than a rule
+inferred from a quantity that happened to be lying around. That is a larger change
+than anything this line has proposed and it should not be started on the strength
+of two refuted rules; it needs its own predictions first.
+
+`index_prefer` keeps both refuted settings rather than deleting them, because a
+measured negative is cheaper to read than to rediscover.
+
+**Built and measured under John's explicit greenlight**, including the freedom to
+try novel solutions. This one failed, and the failure is the useful part.

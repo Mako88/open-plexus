@@ -643,6 +643,18 @@ not on. The readout still violates C1.**
   - **So its case is INDEPENDENCE and churn resilience, not capacity.** Under
     dimension splitting a node can never answer alone however large the system
     gets
+  - **BLOCKER, `note 072`: under the `kinship` layout it would cap at TWENTY nodes.**
+    Ownership is `previous_concept = tokens[t-1]`, and kinship puts the relation there, so
+    **100.0% of CLUTRR's 7,132 traversal bindings are owned by a relation** (`sister`
+    alone 20.2%) against 0.0% under `closure`. Both options were chosen alone and the
+    *pair* is the defect — `157` picked kinship for a 4.7× collision reduction without
+    ownership in view. **Worse than the 16-node dimension ceiling it exists to fix.** Four
+    unequal fixes in the note; **routing by the NUMEROUS side of the pair** is the
+    principled one and is untried. `Ring.balance` has been pointed at neither layout
+  - **And `docs/SCALE.md`: bandwidth scales with WIDTH**, so dimension splitting must grow
+    `d` to buy capacity (832 KB per message at Wikidata scale, ~266 MB per query) where
+    concept splitting holds `d` at 512 and adds nodes (~640 KB per query). *arithmetic on
+    measured capacity, no G4 run at these widths*
 - ❌ **The global dimension-summing readout** — this is the globally synchronised
   step **C1 forbids**, the project's own first constraint. Surfaced in a footnote
   to [note 009](docs/notes/009-splitting-the-memory.md) §4 **after four gates were

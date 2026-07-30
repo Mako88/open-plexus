@@ -107,3 +107,40 @@ code"* — so the C4 answer on record describes a fixture without this gate in i
 The measurement that would settle its cost: a stream where some facts become predictable
 and some never do, scored on what reaches the lasting store. `capture_slots` defaults to 0
 and needs `consolidation`, so that arm has to be switched on deliberately.
+
+### `model.consolidations` cannot attribute a firing to a fact — `g25-02`
+
+    CONFIG  when    2026-07-30
+            source  g25-02
+            script  experiments/g25_02_consolidation_gate.py
+            task    synthetic stream, 8 arbitrary facts recurring at a swept gap
+                    in random filler, length held constant across gaps
+            model   LocalAssociativeMemory width 64, consolidation 0.5,
+                    lasting_cap 5.0, decay 0.9 and 0.95
+            knobs   recurrence gap 2 to 64; decay
+            scale   3 seeds
+
+    background firings   about 150 per 6,144 positions
+    fact contribution    order 10 to 25, and it swings NEGATIVE across gaps
+    per_scored           about 3.3 -- 160 firings against 48 fact positions
+
+The counter's comment says it exists *"so a null can be attributed"*, and that is true at
+the granularity it was built for — **did the gate open at all**. It is false at the one
+needed to price the gate — **did the gate open FOR THIS FACT**. Rule 8: a statistic
+collected over one kind of object does not describe an object of another kind.
+
+A difference control built specifically to rescue it — the same stream with fact pairs
+replaced by filler, subtracted — returns noise that swings negative. Signal to background
+is under 1:6.
+
+**One-shot facts consolidate 23.33 times at decay 0.9 against 8 scored positions**, where
+`g25-02` P4 predicted exactly zero and said in advance why it might not be. So on this
+stream the gate is a scoring coincidence rather than a validation signal — *"promotes what
+it already got right"* is really *"promotes what it scored right"*. The stream is
+adversarial by design: arbitrary pairs in random filler give the readout nothing to be
+right about.
+
+**Stopped after three attempts, per rule 17**, with the bound published rather than a
+fourth fixture built. What would measure it is **per-position attribution of consolidation
+firings**, which the model does not expose — `run(trace=...)` may be the hook, and adding
+it is a change to instrumentation rather than an experiment.

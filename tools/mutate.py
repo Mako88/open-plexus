@@ -35,6 +35,7 @@ LOCAL = ROOT / "openplexus" / "models" / "local_memory.py"
 DISTRIBUTED = ROOT / "openplexus" / "distributed.py"
 CONCEPTS = ROOT / "openplexus" / "concepts.py"
 KEYS = ROOT / "openplexus" / "keys.py"
+PEER = ROOT / "openplexus" / "peer.py"
 RETRIEVAL = ROOT / "openplexus" / "retrieval.py"
 SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 # Experiment code is not usually mutated -- experiments are read once and
@@ -1948,6 +1949,20 @@ MUTATIONS = [
         path=CONCEPTS,
         old="        self._parent[max(left, right)] = min(left, right)",
         new="        self._parent[left] = right",
+    ),
+    Mutation(
+        name="a-peer-read-asks-whoever-rather-than-the-owner",
+        breaks="the whole point of removing the driver. Routing every read to peer 0 "
+               "instead of the concept's owner reaches a node that never received "
+               "the write, so the read returns ZEROS -- and a zero vector decodes to "
+               "whichever token the readout happens to prefer, which is an answer "
+               "rather than an error. `test_peer_reads` catches it with a misroute "
+               "control, and that control exists because the FIRST version of the "
+               "measurement passed while `owner` was effectively the identity: the "
+               "test handed it an already-computed owner instead of a concept",
+        path=PEER,
+        old="        return concept % len(self.peers)",
+        new="        return 0",
     ),
     Mutation(
         name="a-node-cannot-see-the-previous-token",

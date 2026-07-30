@@ -122,11 +122,39 @@ which is what a rescaling does and not what a cliff needs.
 > **Enumerating confounds is not the same as reading the component**, and the second
 > is what caught this.
 
-**So the headline is narrower than "real co-occurrence has no cliff" and stronger
-than the first version:** on this slice, with the frequency weighting the module
-provides for this case, real co-occurrence still shows no cliff and carries **17×
-less similarity spread** than the task the rule was built on. Whether the remaining
-gap is language or is the slice is confound 1, and that is now the cheapest one left.
+## Confound 1 settled too, and the picture converges
+
+    slice (all at power 0.75)         n    largest gap    short by
+    top 600, function-heavy         600          0.025         17x
+    rank 200-800                   600          0.057          7x
+    rank 400-1000                  600          0.059          7x
+    rank 1000-2000, rarer         1000          0.059          7x
+    families (synthetic)                        0.424           --
+
+    rank 400-1000, real neighbourhoods
+      'ah'       -> +0.378 +0.351 +0.343 +0.313 +0.299
+      'confess'  -> +0.306 +0.299 +0.285 +0.278 +0.262
+      'look'd'   -> +0.288 +0.274 +0.258 +0.249 +0.239
+
+**The slice was worth about 2.4×** — function words genuinely were suppressing it —
+**and it saturates immediately**: rank 200-800, 400-1000 and 1000-2000 all land at
+0.057–0.059, so the remaining factor of seven is not the slice either.
+
+**Every confound removed bought roughly a factor of two, and the finding held each
+time:** 0.015 → 0.025 with weighting → 0.059 with a content-word slice, against
+0.424. That is a converging sequence, not a collapsing one.
+
+> **And the qualitative point outlives all the factors.** At no setting does the
+> profile become BIMODAL. Real neighbourhoods are smooth decays with steps of
+> 0.02–0.03 all the way down; the synthetic task falls 0.45 in one step. A cliff rule
+> needs a cliff, and what real co-occurrence provides is a slope. The factor of seven
+> is the headline number; the shape is the actual finding.
+
+**So the settled headline:** with the module's own frequency weighting and a
+content-word slice, real co-occurrence carries **~7× less similarity spread** than
+the task the cliff rule was built on, and its profile is a smooth decay rather than
+the two-level structure the rule reads. Three of four confounds are closed and the
+remaining gap is attributable to none of them.
 
 ## What this changes about sequencing
 

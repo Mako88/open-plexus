@@ -364,7 +364,13 @@ lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
     first run measured real text with the mechanism for real text disabled. At
     `power` 0.75 the largest gap goes 0.015 → **0.025**: a 67% improvement and still
     **17× short**, with the profile shape unchanged. Centring is active and is not
-    the cause. Remaining: the slice is function words
+    the cause
+  - **A content-word slice buys another 2.4× and saturates**: rank 200-800,
+    400-1000 and 1000-2000 all land at 0.057–0.059, so **~7× short** is where it
+    settles and no confound accounts for it. **The shape is the real finding** — at
+    no setting does the profile become bimodal. Real neighbourhoods decay smoothly
+    in steps of 0.02–0.03; the task falls 0.45 in one. **A cliff rule needs a cliff
+    and language provides a slope**
 - 🔀 **Fixed `branches`** — the count supplied. `167`: the peak sits at
   `family_size − 1` in every row and collapses either side (1.000 → 0.500 → 0.083).
   - **`note 056`: this is a measured CROSSOVER, not a loser.** Degrading the

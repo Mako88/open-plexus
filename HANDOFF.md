@@ -11,8 +11,12 @@
 > away. Cite `DECISIONS.md` or a numbered note instead.
 >
 > **Where things actually live:** decisions → `DECISIONS.md` (the tree, authoritative).
-> An option's history → `docs/options/<name>.md`. Findings and measurements →
-> `docs/archive/notes/`. Standards → `CLAUDE.md`. Goal and refutation conditions → `GOALS.md`.
+> An option's history → `docs/options/<name>.md`. A prediction, before a run → the sweep
+> record. A finding about the METHOD → a `CLAUDE.md` calibration. The readable version →
+> `docs/explainers/`. Goal and refutation conditions → `GOALS.md`.
+>
+> **Investigation notes are RETIRED** — all 105 are in `docs/archive/notes/`, which has a
+> README saying why. Do not write a new one; the four homes above cover what they did.
 >
 > ## THIS FILE HAS EXISTED BEFORE AND IT FAILED
 >
@@ -31,27 +35,29 @@
 
 ## The doc restructure is FINISHED
 
-All 86 options are migrated. `DECISIONS.md` carries a summary line and a link per option;
-`docs/options/` holds the history. **85 records, 277 entries, 513 measurements**, and the
-tree is 742 lines against its 900 budget, down from 870 with everything expanded rather
-than compressed.
+All 86 options are migrated and the notes are retired. `DECISIONS.md` carries a summary
+line and a link per option; `docs/options/` holds the history. **85 records, 277 entries,
+513 measurements**, tree at 761 lines against its 900 budget.
 
-Three things landed with it, and the second is the one to know about:
+**Read `docs/options/README.md` before writing a record.** It is the format, and its last
+section says what a green check run does NOT mean — which matters more than the format.
 
-**A CONFIG block per entry, seven keys, enforced.** `when source script task model knobs
-scale`, with `unrecorded` written rather than a line dropped. `docs/options/README.md` is
-the format; `tools/check_options.py` enforces it.
+Three checks are new and all three are in CI and the pre-commit list:
 
-**`tools/check_provenance.py` — every measurement must appear in a source its own entry
-cites.** It found seven bad citations during the migration, including `0.9220`, the
-accuracy case for concept partitioning, cited to a note containing no partitioning
-measurement at all. **The number was real** and reproduces to four decimals in seventy
-seconds (`note 105`); the pointer was wrong. Derived figures go in
-`tools/provenance_baseline.json`, where an exemption is visible and can only shrink.
+- **`check_provenance.py`** — every measurement in a record must appear in a source that
+  entry cites. Found seven bad citations during the migration.
+- **`check_explainers.py`** — every explainer in its index, every row resolving.
+- **`check_options.py`** grew a CONFIG-block rule and record-to-record link checking.
 
-**A defect in `check_options.py` itself:** the header exemption was `text[:1400]`, a byte
-count, so every record shorter than that was exempt from the status checks entirely. Fixed
-to the leading blockquote, with a test that feeds it a short record.
+**The thing to know:** `0.9220`, the accuracy case for concept partitioning, was cited to
+a note containing no partitioning measurement at all. **The number was real** and
+reproduces to four decimals in seventy seconds (`note 105`); the pointer was wrong. Six of
+the seven bad citations were correct numbers pointing at the wrong place, which is a class
+no amount of re-reading finds.
+
+**Three of the checks had defects that the checks themselves found**, all the same shape —
+a pattern that could not express the failure it was written for, reporting green. Written
+up in each tool's docstring.
 
 ## The open problems, in the order I would take them
 
@@ -98,3 +104,8 @@ with `check_decisions` and `check_options`, which were in CI but not in that lis
 **John's standing autonomy agreement is recorded** in `DECISIONS.md` standing agreements:
 5-minute heartbeat while a clear next step exists, blocking and harder problems before
 easy ones, and decide rather than wait when he is away.
+
+**The doc work is CLOSED. Do not extend it.** Every remaining item on this page is a
+mechanism question, and the gradient CLAUDE.md rule 17 names points the other way — there
+is always another document to tidy and it always feels productive. If the next session
+opens with a documentation task it has taken the wrong branch.

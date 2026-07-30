@@ -2135,8 +2135,52 @@ MUTATIONS = [
         old="        if route not in self.ROUTES:",
         new="        if False:",
     ),
+    Mutation(
+        name="the-batch-never-narrows-to-what-is-still-missing",
+        breaks="the recompute that makes a batch cost ONE round when every holder "
+               "is alive. Leaving `pending` untouched re-asks the whole batch of "
+               "each replica in turn, so a walk pays `replicas` rounds per hop "
+               "instead of one and note 101's arithmetic is silently 2-3x worse "
+               "-- while every answer is still correct, because the later rounds "
+               "overwrite with a replica's equally valid vector",
+        path=PEER,
+        old="            pending = [index for index in pending if answers[index] is None]",
+        new="            pending = list(pending)",
+    ),
+    Mutation(
+        name="a-wrong-length-reply-is-carved-up-anyway",
+        breaks="the guard on the one failure with no symptom. Answers are paired "
+               "to requests BY POSITION, so a reply of the wrong length hands "
+               "every later answer to the wrong read -- the walk does not fail, "
+               "it goes somewhere else and reports a number, which is the same "
+               "silent-answer class notes 086 and 096 are about",
+        path=PEER,
+        old="            if block.size != len(indices) * self.width:",
+        new="            if False:",
+    ),
+    Mutation(
+        name="every-batched-answer-is-the-first-one",
+        breaks="the positional split of a batched reply. Taking the leading "
+               "vector for every request returns a real, correctly-shaped, "
+               "correctly-decoding answer to the WRONG question -- so a walk "
+               "still runs and still scores, which is why this is asserted "
+               "against one-at-a-time reads rather than against zeros",
+        path=PEER,
+        old="                answers[index] = block[offset * self.width:(offset + 1) * self.width]",
+        new="                answers[index] = block[0:self.width]",
+    ),
+    Mutation(
+        name="the-reader-is-never-asked-whether-it-can-batch",
+        breaks="note 101's fix, entirely, while leaving every answer correct. "
+               "Ignoring a reader's `many` loops one read per round trip, which "
+               "is the 3,850 ms at depth 10 that batching exists to remove. "
+               "Nothing about the walk changes, so only a ROUND count can catch "
+               "it -- the measurement note 100 was written about not having",
+        path=SEARCH,
+        old='    return getattr(read, "many", None) or (',
+        new="    return None or (",
+    ),
 ]
-
 
 def restore_any_leftovers() -> None:
     """Recover from a previous run that was killed mid-mutation."""

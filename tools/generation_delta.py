@@ -131,18 +131,32 @@ def rule_table(root: Path, config: str) -> dict[tuple[str, str], str]:
         table.update(new)
 
 
-def make_fold(table, deltas, mode: str, seed: int = 0):
-    """Fold a chain of relation names, filling gaps according to `mode`."""
+def make_fold(table, deltas, mode: str, seed: int = 0, vectors=None):
+    """Fold a chain of relation names, filling gaps according to `mode`.
+
+    `vectors` is required by `contrastive` and ignored otherwise. **The leak guard
+    for that mode is structural rather than asserted**: `fill` is reached only for
+    a pair ABSENT from `table`, and the vectors are trained only on pairs PRESENT
+    in it, so a rule the fold is asked to supply cannot have trained the
+    representation. Measured cost of getting that wrong, 2026-07-30: 0.4188
+    against 0.2437 on held-out rule prediction.
+    """
     by_delta: dict = collections.defaultdict(list)
     for relation, delta in deltas.items():
         by_delta[delta].append(relation)
     rng = np.random.default_rng(seed)
+    index = {name: i for i, name in enumerate(RELATIONS)}
 
     def fill(left: str, right: str) -> str | None:
         if mode == "gap":
             return None
         if mode == "random":
             return RELATIONS[int(rng.integers(len(RELATIONS)))]
+        if mode == "contrastive":
+            if vectors is None or left not in index or right not in index:
+                return None
+            composed = vectors[index[left]] * vectors[index[right]]
+            return RELATIONS[int(np.argmax(vectors @ composed))]
         if mode == "wrong-delta":
             wanted = deltas[left] + deltas[right]
             other = [r for r in RELATIONS if deltas[r] != wanted]
@@ -164,7 +178,24 @@ def make_fold(table, deltas, mode: str, seed: int = 0):
     return fold
 
 
-MODES = ("gap", "random", "wrong-delta", "delta")
+MODES = ("gap", "random", "wrong-delta", "delta", "contrastive")
+
+
+def contrastive_vectors(root: Path, config: str, table, width: int, seed: int,
+                        epochs: int, lr: float, temperature: float):
+    """Relation vectors from the LOCAL contrastive rule, trained on `table`'s rules.
+
+    Carried constants, named per CLAUDE.md rule 2 because they were chosen
+    elsewhere: `width 32, epochs 8, lr 0.05, temperature 0.1` were selected on
+    held-out RULE prediction in `tools/relation_contrastive.py`, **not on this
+    task**. Tuning them here while the baselines stay untuned is the one-sided
+    sweep the price-of-locality calibration is about, so they are carried
+    unchanged and this comment is the provenance next to the pin.
+    """
+    from tools.relation_contrastive import learn, triangles
+    permitted = {pair for pair in table}
+    tris = triangles(list(rp.rows(root, config, "train")), permitted)
+    return learn(tris, width, seed, epochs, lr, temperature)
 
 
 def main() -> int:
@@ -191,8 +222,11 @@ def main() -> int:
     if not args.end_to_end:
         print(f"\nsymbolic fold over TRUE chains, {len(puzzles)} puzzles")
         print(f"{'arm':>14s} {'end-task':>9s}")
+        vectors = contrastive_vectors(args.root, args.config, table,
+                                      width=32, seed=args.seed, epochs=8,
+                                      lr=0.05, temperature=0.1)
         for mode in MODES:
-            fold = make_fold(table, deltas, mode, args.seed)
+            fold = make_fold(table, deltas, mode, args.seed, vectors)
             right = sum(1 for p in puzzles
                         for chain in [cr.true_chain(p, config)]
                         if chain and fold([names[t] for t in chain])

@@ -3,10 +3,13 @@ Can a locally-learned relation representation beat random filling?
 
 Script: tools/generation_delta.py --fill contrastive  (mode to be added)
         tools/relation_contrastive.py  (the representation)
-Status: NOT RUN. Predictions registered and COMMITTED BEFORE the run, which is
-        the whole point of this file existing before the mode does.
+Status: COMPLETE. Predictions were registered and committed at 57f81e7, BEFORE
+        the fill mode existed. Run 2026-07-30, 10 seeds, locally.
 
-ANSWER: pending.
+ANSWER: YES. Contrastive beats random filling by +0.1179 +/-0.0087, on 10 of 10
+seeds. All four predictions held. This is the FIRST mechanism other than
+generation delta to clear the bar, and the mechanism note 088 refuted scored
+BELOW random on the same question.
 
 
 IN PLAIN TERMS
@@ -148,3 +151,76 @@ MEASURED ON
 CLUTRR-symbolic `gen_train23_test2to10`, layout `kinship`. Relation vectors at
 width 32 from `tools/relation_contrastive.py`, hadamard composition, trained on
 the training rules only.
+
+
+THE RESULT
+----------
+10 seeds, symbolic fold over TRUE chains, 1,146 test puzzles.
+
+               arm      mean      sem       min       max
+               gap    0.5960   0.0000    0.5960    0.5960
+            random    0.6642   0.0018    0.6518    0.6710
+       wrong-delta    0.6329   0.0018    0.6213    0.6396
+             delta    0.9651   0.0000    0.9651    0.9651
+       contrastive    0.7821   0.0077    0.7487    0.8325
+
+    paired contrastive - random   +0.1179 +/-0.0087, wins 10/10
+
+    P1  contrastive beats random          CONFIRMED  +0.1179, 13.5 se
+    P2  contrastive beats wrong-delta     CONFIRMED  +0.1492
+    P3  contrastive does NOT reach delta  CONFIRMED  0.7821 against 0.9651
+    P4  the end-task gap is SMALLER than
+        rule prediction suggested         CONFIRMED  see below
+
+P4 is the one worth reading. Held-out rule prediction improved about **eightfold**
+over untrained (0.2437 against 0.0312). The end task improves by a factor of
+**1.18**. The prediction said that would happen and named the reason in advance:
+end-task accuracy is dominated by steps whose rules the table already has, so a
+better guess only moves the subset where it is consulted.
+
+Contrastive closes **39%** of the distance between random filling and the exact
+symbolic solution -- (0.7821 - 0.6642) / (0.9651 - 0.6642).
+
+
+A DISCREPANCY THAT IS NOT EXPLAINED, AND IS NOT PAPERED OVER
+--------------------------------------------------------------
+P1 was registered against **0.6081**, which is note 088's figure for random
+filling. This harness measures random filling at **0.6642 +/-0.0018**, and the
+two do not overlap.
+
+The comparison that decides P1 is the WITHIN-HARNESS one -- same table, same
+chains, same seeds, paired -- and by that contrastive wins on every seed. But the
+bar quoted in the option record came from somewhere that produced a different
+number for the same arm, and **which of the two is right is unknown.**
+
+Candidates: a different rule table (this uses note 066's 97), a different chain
+source, or a different scoring convention. Not chased here because it does not
+change P1's verdict, and recorded because a figure this project cites as a
+revival condition disagreeing with a re-measurement is exactly the shape of
+note 105.
+
+
+WHAT THIS DOES NOT SHOW
+-------------------------
+**Kinship has an algebraic structure and this is measured on kinship.** Generation
+delta works here precisely because an additive invariant exists, and `note 104`
+established DBpedia EN and DE have none -- not even approximately. A
+representation that learns kinship's structure is not evidence about a domain
+without one, and this is the same scoping that `note 090` carries.
+
+**The fold runs over TRUE chains, not recovered ones.** `note 091` measured delta
+end-to-end at 0.8578 against 0.9668 symbolic, so the model recovering its own
+chains costs about 0.11. Nothing here has been run end to end.
+
+**The knobs are carried, not tuned here.** Width 32, epochs 8, lr 0.05,
+temperature 0.1 were chosen on held-out RULE prediction. The baselines have no
+knobs at all, so tuning these on THIS task while comparing against them is the
+one-sided sweep the price-of-locality calibration is about. They are carried
+unchanged and the provenance sits beside the pin in `contrastive_vectors`.
+
+
+COST
+----
+Local, about 90 seconds for 10 seeds including training the vectors each time. No
+matrix, no dispatch. The pre-dispatch costing said it would be a local run and it
+was.

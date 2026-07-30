@@ -130,3 +130,43 @@ came first and were written down after. An observation, not a tested prediction.
 counted mechanism scored 0.223 here and then fell below random filling on an adversarially
 withheld family. Nothing here has faced that holdout, and until it does this row stays
 untried as a component rather than becoming a choice.
+
+### And it CLEARS the end-task bar the counted version failed — `g23-01`
+
+    CONFIG  when    2026-07-30
+            source  g23-01
+            script  tools/generation_delta.py, contrastive fill mode
+            task    CLUTRR-symbolic gen_train23_test2to10, END TASK, symbolic
+                    fold over true chains, 1,146 test puzzles
+            model   relation vectors width 32, hadamard composition, trained on
+                    the rule table's rules only
+            knobs   fill mode: gap, random, wrong-delta, delta, contrastive
+            scale   10 seeds
+
+                   arm      mean      sem
+                   gap    0.5960   0.0000
+                random    0.6642   0.0018
+           wrong-delta    0.6329   0.0018
+                 delta    0.9651   0.0000
+           contrastive    0.7821   0.0077
+
+    paired contrastive - random   +0.1179 +/-0.0087, wins 10 of 10 seeds
+
+**The first mechanism other than generation delta to beat random filling**, and the
+mechanism `note 088` refuted scored 0.5995 BELOW random on this same question. It closes
+**39%** of the distance between random filling and the exact symbolic solution.
+
+**All four predictions were registered and committed at `57f81e7` before the fill mode
+existed**, which is the discipline the earlier rule-prediction entry above did not follow.
+
+**Scope, and it is the same scope `note 090` carries.** Kinship has an additive invariant;
+`note 104` measured that DBpedia EN and DE have none, not even approximately. A
+representation that learns kinship's structure is not evidence about a domain without one.
+The fold also runs over TRUE chains — `note 091` measured that recovering chains costs
+about 0.11 for the delta arm, and nothing here has been run end to end.
+
+**An unexplained discrepancy, recorded rather than smoothed.** P1 was registered against
+`note 088`'s random-filling figure of 0.6081. This harness measures the same arm at
+**0.6642 ±0.0018** and the two do not overlap. The verdict rests on the within-harness
+paired comparison, which is unaffected, but a figure this project cites as a revival
+condition disagreeing with a re-measurement is note 105's shape.

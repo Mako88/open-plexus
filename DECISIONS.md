@@ -170,12 +170,14 @@ keys, which are still the default and still correct for MQAR.**
   and the store addresses by `(entity, relation)` so the entity supplies the exactness.
   `067` generalising composition is impossible without it (0.056 held out against chance
   0.050); `note 071` such a vector must not enter the address unguarded. **GOALS §1 asks
-  for exactly this.** **First measurement 2026-07-30: a LOCAL CONTRASTIVE rule reaches
-  0.2437 ±0.0419 on held-out rules against 0.0312 untrained** — the first mechanism here
-  with a real objective rather than counting, and its holdout guard is worth 0.1750
-  measured. **Still ⬜ because nothing in the model uses it and it has only faced the
-  RANDOM-quarter holdout — the one `note 088` killed the counted version on.**
-  *measured in:* CLUTRR rule prediction, width 32, 10 seeds.
+  for exactly this.** **`g23-01`: a LOCAL CONTRASTIVE rule CLEARS THE END-TASK BAR** —
+  **0.7821 ±0.0077 against random filling's 0.6642, +0.1179 paired, 10 of 10 seeds**, where
+  `note 088`'s counted version scored *below* random. First mechanism other than generation
+  delta to do so, closing **39%** of the gap to the exact symbolic solution, with all four
+  predictions committed at `57f81e7` before the mode existed. Rule prediction 0.2437 against
+  0.0312 untrained; holdout guard measured at 0.1750. **Still ⬜ because nothing in the model
+  uses it, and scoped like `note 090`: kinship HAS an additive invariant and `note 104` says
+  DBpedia has none.** *measured in:* CLUTRR-symbolic, true chains, width 32, 10 seeds.
   → record: [structured-relations.md](docs/options/structured-relations.md)
 - ⬜ **A better index** — `note 056` made it load-bearing rather than a nicety: the set
   answer works at purity ≳ 0.99 and degrades fast below (0.750 at 0.951, 0.167 at 0.795),
@@ -396,7 +398,12 @@ additive and nothing else has been tried.
   the rules that matter are an adversarially withheld family. `note 084` self-training does
   not lift it; `note 085` associativity **verifies what it cannot generate**. *measured in:*
   CLUTRR, 10 seeds. **Revival: a mechanism that beats 0.6081 end-task**, which is the bar
-  090 clears.
+  090 clears. **REVIVAL CONDITION MET at `g23-01`, by a LEARNED representation** — a local
+  contrastive rule names the missing rule at **0.7821 against random's 0.6642**, so what
+  088 refuted is *naming by a learned readout over COUNTED vectors*, not naming as such.
+  **And `g23-01` re-measures 088's own random arm at 0.6642, not 0.6081** — unexplained,
+  recorded, and it does not move the verdict because the comparison is paired within one
+  harness.
   → record: [naming-the-missing-rule.md](docs/options/naming-the-missing-rule.md)
 - ⬜ **`index_at_hops` combined with the position-level index** — `159`/`160`/`161` built
   the pieces; `154` measured that the guard's premise is false, a hop key sits at cosine

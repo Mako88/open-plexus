@@ -127,6 +127,15 @@ outside the learning loop.** Nothing non-text is built.
   mutations; what drives it is `note 077`/`078`, mutual agreement rather than confidence.
   → record: [merged-concepts.md](docs/options/merged-concepts.md)
 
+**AND DIVERGENCE IS NOT DETECTED ONE LAYER DOWN — `g27-01`.** A peer whose MODEL seed
+differs answers every read, raises nothing, and **a third of its answers are silently
+wrong** (16 of 24 identical). `peer.fingerprint` covers the wire format, the routing and
+the KEY SOURCE; the **VALUE table is not in it**, because `derive` builds values from the
+model seed and `PairKeys` takes a fixed `seed=1`. So two peers agree about where to look
+and disagree about what is there. **The falsifier below cannot be built** — no quantiser
+exists in the tree — so this is the same failure shape at the transport instead.
+*measured in:* 3 in-process peers, width 64, 2 replicas.
+
 **Open sub-question — codebook agreement across nodes.** Two nodes that quantise
 the same input differently write to different addresses and the memory fragments
 **with no node able to detect it locally.** `Merged` answers the MERGE direction; note

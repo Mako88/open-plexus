@@ -198,3 +198,41 @@ Unimpaired on the same bridge: 0.40–1.21 ms/round, which is the identity check
 unmeasured. This is one machine and one bridge: no route changes, no competing traffic, no
 asymmetry, no NAT. And the migrating walk (`note 102`) is the untested answer, whose
 required gain this run raises from about 2x to about 8x.
+
+### A diverged peer is NOT detected, and serves a third of its answers wrong — `g27-01`
+
+    CONFIG  when    2026-07-30
+            source  g27-01
+            script  in-process probe over openplexus/peer.py and node_main
+                    populate/derive; recorded in the sweep
+            task    24 scaffold facts, read every one through RemoteConcepts
+            model   3 peers + asker, width 64, 2 replicas, ring seed 0
+            knobs   one peer's MODEL seed changed from 5 to 99
+            scale   24 reads per arm
+
+    arm                    held per peer   reads ok   raised   mean |v|
+    MATCHED  seeds 5,5,5   [16, 14, 18]          24        0     1.1561
+    DIVERGED seeds 5,5,99  [16, 14, 18]          24        0     1.1408
+
+    identical answers between arms: 16 of 24
+
+**Nothing raised.** The diverged peer held the same number of facts, answered every
+request, and its mean vector norm differs by 0.015 — not a quantity anyone could
+threshold on. **A third of the answers changed, silently.**
+
+**`peer.fingerprint` is honest about its coverage and the gap is beside it.** Its docstring
+lists the wire format, the routing and the KEY SOURCE. The VALUE table is not in it:
+`node_main.derive` builds values from the MODEL seed, which appears nowhere in the
+fingerprint, while `PairKeys` is constructed with a fixed `seed=1` inside `derive` so the
+key source matches regardless.
+
+**So two peers can agree completely about where to look and disagree about what is stored
+there.** Reachable today by getting one environment variable wrong.
+
+**It is a small fix and it is not made here.** Both sides derive from the model seed
+already, so adding it costs a string — a change to `peer.py` that belongs in a commit
+saying so. Replica count is also unfingerprinted and untested.
+
+**Scope:** this is the transport layer, not `DECISIONS.md` component 1's quantiser
+question, whose falsifier **cannot be built** because no quantiser exists in the tree. Same
+failure shape one level down.

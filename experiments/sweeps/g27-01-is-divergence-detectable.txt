@@ -2,9 +2,12 @@ Is a node's divergence detectable, or does it answer plausibly?
 ===============================================================
 
 Script: experiments/g27_01_divergence.py  (to be written)
-Status: NOT RUN. Predictions registered and committed before the script exists.
+Status: COMPLETE. Predictions registered and committed at 24bdd9c, before the
+        probe existed.
 
-ANSWER: pending.
+ANSWER: NO. A diverged peer is NOT detected. It serves vectors of normal
+magnitude, nothing raises, and **a third of the answers are silently wrong**. The
+fingerprint covers the KEY space and not the VALUE space.
 
 
 IN PLAIN TERMS
@@ -115,3 +118,70 @@ MEASURED ON
 -----------
 `openplexus/peer.py` and `openplexus/node_main.py` peer mode, three peers plus an
 asker, width 64, 24 scaffold facts, 2 replicas.
+
+
+THE RESULT
+----------
+Three in-process peers, one asker, 24 facts, 2 replicas.
+
+    arm                    held per peer   reads ok   raised   mean |v|
+    MATCHED  seeds 5,5,5   [16, 14, 18]          24        0     1.1561
+    DIVERGED seeds 5,5,99  [16, 14, 18]          24        0     1.1408
+
+    identical answers between the two arms: 16 of 24
+
+    P1  matched reads succeed              CONFIRMED
+    P2  the fingerprint REJECTS a diverged peer   REFUTED
+    P3  if reads come back they are wrong   CONFIRMED, 8 of 24 differ
+    P4  the fingerprint would miss a diverged REPLICA COUNT   see below
+
+**Nothing raised.** The diverged peer held the same number of facts, answered
+every request, and returned vectors whose mean norm differs by 0.015 -- which is
+not a signal anyone could threshold on. **A third of the answers changed.**
+
+
+WHY, EXACTLY
+------------
+`peer.fingerprint` is honest about what it covers, and its docstring lists it:
+
+    Covers the WIRE FORMAT (PROTOCOL), the ROUTING (peer count, ring seed) and
+    the KEY SOURCE (its seed, spread, width, start token, route and markers).
+
+**The VALUE table is not in it.** `node_main.derive` builds values from
+`np.random.default_rng(seed)` with the MODEL seed, and that seed appears nowhere
+in the fingerprint. `PairKeys` is constructed with a fixed `seed=1` inside
+`derive`, so the key source matches even when the model seed does not.
+
+So two peers can agree completely about **where to look** and disagree about
+**what is stored there**, and every check passes.
+
+**This is P4's shape arriving through a different parameter than predicted.** P4
+guessed the gap would be replica count; it is the value seed. The prediction was
+right about the KIND of failure -- a guard covering the divergence someone
+thought of and not the one beside it -- and wrong about which one, which is worth
+recording as a half-hit rather than a hit.
+
+Replica count remains unfingerprinted too and is untested here.
+
+
+WHAT THIS IS AND IS NOT
+-------------------------
+**It is not the quantiser question.** `DECISIONS.md` component 1's falsifier --
+two nodes given identical input emit identical ids -- **cannot be built**, because
+no quantiser exists anywhere in the tree. That is a blocker of components, not of
+effort, and it is why this sweep measures the layer below.
+
+**It is the same failure shape.** Component 1 says a fragmented memory has *"no
+node able to detect it locally"*. This shows the transport does not detect it
+either, for a divergence that is already reachable today by getting one
+environment variable wrong.
+
+**And it is a small fix.** The model seed is available on both sides by
+construction -- both derive from it -- so adding it to the fingerprint costs a
+string. That is a change to `peer.py` and belongs in a commit that says so, not
+smuggled in here.
+
+
+COST
+----
+Seconds, in process, no containers.

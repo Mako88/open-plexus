@@ -1,34 +1,39 @@
-"""Drive a distributed run whose nodes are separate containers, and check it is exact.
+"""Drive a distributed run whose nodes are containers, and check the split is exact.
 
-## What this measures that nothing has measured
+## What this adds, and what it deliberately does NOT re-implement
 
-Every distributed number in this project came from `Network(spawn=True)` — child
-processes on loopback. Real sockets, real packets, and still one kernel, one clock, no
-container boundary, no emulated latency. `spawn=False` exists to remove those and its
-docstring says so: *"the only way G2, G3 and G4 stop being modelled."*
+`openplexus/node_main.py` is already the launchable node: it reads `OPENPLEXUS_*` from the
+environment, sizes itself with `deployment.plan` against cgroup limits, rebuilds the model
+from the shared seed and joins. **This does not duplicate any of that** — an earlier version
+of this tool reimplemented it as `tools/cluster_node.py`, worse, and had to be deleted.
 
-So this reports three things, in the order they matter:
+So the only thing here is the driver side: the bar, the guard, and the timing.
 
-    EXACTNESS   the distributed prediction must equal the in-process one. If the
-                split is not exact, no timing number means anything
-    LATENCY     per-step wall time, which is what `docs/SCALE.md` says is the
-                binding constraint -- ten sequential hops at ~50 ms is ~500 ms
-                against `d_max`'s 640 ms, about 20% headroom
-    CHURN       with `deadline`, a step settles on what arrived. A node that stops
-                answering must cost a candidate, not the run
+## The guard, which is the part that earned its place
 
-## The window, and why 1 is the wrong default to celebrate
+`Network(spawn=False)` has been exercised only by tests. Run from a container the first
+time, this tool reported `exact=True` for every configuration — **including one where a node
+served a completely different model.** `wo` is learned by the delta rule and starts at zeros,
+so an untrained model predicts token 0 forever and `array_equal` compared all-zeros against
+all-zeros.
 
-`Network.run(window=1)` is lock-step: *"every node must answer before anyone moves,
-which is precisely the global synchronisation C1 forbids."* So a lock-step number is a
-control, not a result, and both are reported.
+`tests/test_connection_order.py` had already hit that and named it. `node_main` already
+exposes the fix as `OPENPLEXUS_DECODER=1`. **So this refuses to report an exactness number
+when the bar is constant**, because a check that cannot fail is worse than no check.
+
+## What the numbers mean
+
+    EXACTNESS   the gate. A timing number from an inexact split measures nothing
+    LATENCY     `docs/SCALE.md` says hop latency binds -- ten sequential hops at
+                ~50 ms is ~500 ms against `d_max`'s 640 ms
+    WINDOW      `run(window=1)` is lock-step, *"precisely the global
+                synchronisation C1 forbids"*, so it is a CONTROL and not a result
 """
 
 from __future__ import annotations
 
 import argparse
 import os
-import statistics
 import sys
 import time
 from pathlib import Path
@@ -37,79 +42,74 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-sys.path.insert(0, str(ROOT / "tools"))
 
-from cluster_node import build, fingerprint, model_for  # noqa: E402
-
+from openplexus import node_main  # noqa: E402
 from openplexus.distributed import Network, slices_for  # noqa: E402
 from openplexus.models.local_memory import LocalAssociativeMemory  # noqa: E402
 
 
+def bar_for(config) -> LocalAssociativeMemory:
+    """The single-process model the split must reproduce.
+
+    Built exactly as `node_main` builds a node's, including the decoder seeding, or
+    the two sides would disagree about the model and every vote would be about the
+    wrong arrays.
+    """
+    model = LocalAssociativeMemory(config)
+    if os.environ.get(node_main.DECODER_VAR) == "1":
+        model.wo[:] = model.wv
+    return model
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--nodes", type=int,
-                        default=int(os.environ.get("NODES", "4")))
-    parser.add_argument("--port", type=int,
-                        default=int(os.environ.get("DRIVER_PORT", "9099")))
-    parser.add_argument("--host", default=os.environ.get("BIND_HOST", "0.0.0.0"))
-    parser.add_argument("--seed", type=int, default=int(os.environ.get("SEED", "0")))
-    parser.add_argument("--d-model", type=int,
-                        default=int(os.environ.get("D_MODEL", "64")))
-    parser.add_argument("--vocab", type=int,
-                        default=int(os.environ.get("VOCAB_SIZE", "64")))
     parser.add_argument("--steps", type=int, default=64)
     parser.add_argument("--windows", type=int, nargs="+", default=[1, 4])
-    parser.add_argument("--deadline", type=float, default=None,
-                        help="settle a step on what arrived, in seconds")
+    parser.add_argument("--deadline", type=float, default=None)
+    parser.add_argument("--bind", default=os.environ.get("BIND_HOST", "0.0.0.0"))
     args = parser.parse_args()
 
-    config = build(args.seed, args.d_model, args.vocab)
-    model = model_for(config)
-    print(f"driver fingerprint {fingerprint(model.wv, model.wo)}   "
-          f"(every node must print the same one)", flush=True)
-    print(f"slices: {[(s.lo, s.hi) for s in slices_for(args.d_model, args.nodes)]}",
-          flush=True)
+    # ONE config function, shared with every node. Two would drift silently.
+    config = node_main.config_from_env()
+    nodes = int(os.environ.get(node_main.NODES_VAR, "1"))
+    port = int(os.environ.get(node_main.DRIVER_PORT_VAR, "0"))
+    if not port:
+        raise SystemExit(f"{node_main.DRIVER_PORT_VAR} is not set")
 
-    rng = np.random.default_rng(args.seed)
-    tokens = rng.integers(0, args.vocab, args.steps)
+    model = bar_for(config)
+    tokens = np.random.default_rng(config.seed).integers(
+        0, config.vocab_size, args.steps)
+    wanted = bar_for(config).run(tokens)
 
-    # THE BAR. One process, one array, no packets -- what the split must reproduce.
-    wanted = model_for(config).run(tokens)
-
-    # THE VACUITY GUARD. An untrained model predicts one token forever, and then
-    # `array_equal` passes no matter what any node sends -- which is what every
-    # earlier run of this tool did while a node served a different model entirely.
     distinct = len(set(wanted.tolist()))
     if distinct < 3:
         raise SystemExit(
             f"the bar predicts only {distinct} distinct token(s) over "
             f"{len(wanted)} steps, so comparing against it would pass whatever "
-            f"the nodes do. Refusing to report an exactness number that cannot "
-            f"fail. See `cluster_node.model_for`.")
-    print(f"bar predicts {distinct} distinct tokens over {len(wanted)} steps "
-          f"-- the exactness check can fail", flush=True)
+            f"the nodes send. Set {node_main.DECODER_VAR}=1 — an untrained `wo` is "
+            f"zeros and predicts one token forever. Refusing to report an "
+            f"exactness number that cannot fail.")
 
-    print(f"\nwaiting for {args.nodes} nodes on {args.host}:{args.port}", flush=True)
-    with Network(config, args.nodes, model.wv, model.wo, host=args.host,
-                 port=args.port, spawn=False) as net:
-        print("all nodes connected\n", flush=True)
-        print(f"{'window':>7s} {'exact':>7s} {'total s':>9s} "
-              f"{'per step ms':>12s} {'p50 ms':>8s} {'short':>6s}")
+    print(f"driver: d={config.d_model} vocab={config.vocab_size} "
+          f"seed={config.seed} nodes={nodes}", flush=True)
+    print(f"slices: {[(s.lo, s.hi) for s in slices_for(config.d_model, nodes)]}",
+          flush=True)
+    print(f"bar predicts {distinct} distinct tokens over {len(wanted)} steps "
+          f"— the exactness check can fail", flush=True)
+    print(f"waiting for {nodes} nodes on {args.bind}:{port}\n", flush=True)
+
+    with Network(config, nodes, model.wv, model.wo, host=args.bind, port=port,
+                 spawn=False) as net:
+        print(f"{'window':>13s} {'exact':>7s} {'total s':>9s} "
+              f"{'per step ms':>12s} {'short':>6s}", flush=True)
         for window in args.windows:
-            marks = []
             start = time.perf_counter()
             got = net.run(tokens, window=window, deadline=args.deadline)
             total = time.perf_counter() - start
-            exact = bool(np.array_equal(got, wanted))
-            per_step = total / len(tokens) * 1000
-            short = sum(net.steps_settled_short.values()) if net.steps_settled_short else 0
-            label = f"{window}" + (" (lock-step)" if window == 1 else "")
-            print(f"{label:>7s} {str(exact):>7s} {total:9.3f} {per_step:12.2f} "
-                  f"{per_step:8.2f} {short:6d}", flush=True)
-            marks.append(per_step)
-    print("\nEXACTNESS is the gate: a timing number from an inexact split measures "
-          "nothing.\nwindow 1 is the lock-step CONTROL -- C1 forbids it as a "
-          "deployment.")
+            label = f"{window} (lock-step)" if window == 1 else str(window)
+            print(f"{label:>13s} {str(bool(np.array_equal(got, wanted))):>7s} "
+                  f"{total:9.3f} {total / len(tokens) * 1000:12.2f} "
+                  f"{sum(net.steps_settled_short.values()):6d}", flush=True)
     return 0
 
 

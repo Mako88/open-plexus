@@ -940,6 +940,42 @@ someone who was not there what to do next time. So:
 
 ---
 
+**19. Search before you build, and leave the tree smaller than you found it.**
+Rule 9 forbids duplicating logic. This is the half that makes rule 9 reachable,
+because **you cannot avoid duplicating what you did not know existed** — and the
+failure mode is not carelessness, it is that a plausible name for a thing is not
+the name it has.
+
+So, before writing a mechanism: grep for what it does, not for what you would
+have called it. Search the tests too — a test named for a behaviour is evidence
+the behaviour is implemented somewhere, and it names the module.
+
+And **every commit carries some consolidation.** Not a separate cleanup pass
+later: the moment to merge two things is while both are in your head, and a
+refactor deferred is a refactor that gets argued about instead. If a commit adds
+code and removes none, that is worth a sentence explaining why — usually it is
+fine, occasionally it is the signal that something was rebuilt rather than found.
+
+Deleting a duplicate is the same commit as noticing it. Extract the shared piece,
+delete the loser, and keep the docstring from whichever explains itself better —
+which is not always the one that survives.
+
+> *Calibration.* — 2026-07-30. `tools/cluster_node.py` was written to run a node
+> as a container. `openplexus/node_main.py` already did that, better: it sizes
+> itself against cgroup limits via `deployment.plan`, and it exposes the decoder
+> seeding as `OPENPLEXUS_DECODER` — the exact fix for a vacuous exactness check
+> that the duplicate then rediscovered from scratch. `tests/test_node_main.py`
+> named the module in its own filename. **Nothing was searched for, because
+> "cluster node" felt like a new thing rather than the thing that exists.**
+> John predicted it before it was found: *"I want to say tests have previously
+> been done cross-container, so I assume there are configs for it somewhere."*
+> He was right, and the duplicate is deleted.
+>
+> Record the next mechanism rebuilt rather than found, and whether a grep would
+> have surfaced it.
+
+---
+
 ## Conventions
 
 **Python 3.14.** The task and measurement layer takes **no dependencies** — see

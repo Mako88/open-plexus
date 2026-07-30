@@ -175,6 +175,75 @@ class ItRefusesWhatWouldMeasureNothing(unittest.TestCase):
             FamilyConfig().ask_all
 
 
+class SharedAttributesMakeFamiliesGENUINELYConfusable(unittest.TestCase):
+    """The axis note 057 needed, and its first version was inert by construction.
+
+    That version had each family borrow its NEIGHBOUR'S attributes, so family f used
+    `{f0, g1, g2, g3}` -- a set no other family used, and therefore still uniquely
+    identifying. Purity stayed at **1.000** sharing three of four attributes. These
+    tests are written against the property that was missing, not against the fix:
+    **two families must actually share tokens.**
+    """
+
+    def evidence(self, cfg, family):
+        """Which attribute tokens co-occur with this family's entities."""
+        stream = families.background(cfg, 1)[0]
+        members = set(cfg.families()[family])
+        seen = set()
+        for i in range(1, len(stream) - 1):
+            if int(stream[i]) in members:
+                seen.add(int(stream[i - 1]))
+                seen.add(int(stream[i + 1]))
+        return seen
+
+    def test_families_share_tokens_when_sharing_is_on(self):
+        cfg = config(n_attributes=4, shared_attributes=3)
+        first, second = self.evidence(cfg, 0), self.evidence(cfg, 1)
+        self.assertTrue(first & second,
+                        "no token is common to two families, so the axis is "
+                        "inert -- which is exactly how the first version failed")
+
+    def test_families_share_NOTHING_when_it_is_off(self):
+        # The companion. Without it the test above passes for a task where every
+        # family always shared everything, which is a different broken.
+        cfg = config(n_attributes=4, shared_attributes=0)
+        self.assertFalse(self.evidence(cfg, 0) & self.evidence(cfg, 1))
+
+    def test_more_sharing_leaves_less_private_evidence(self):
+        # The quantity the axis is supposed to move, moved.
+        wide = config(n_attributes=4, shared_attributes=1)
+        tight = config(n_attributes=4, shared_attributes=3)
+        self.assertGreater(
+            len(self.evidence(wide, 0) - self.evidence(wide, 1)),
+            len(self.evidence(tight, 0) - self.evidence(tight, 1)))
+
+    def test_off_by_default_and_byte_identical(self):
+        base = FamilyConfig(n_families=4, family_size=4, stated_per_family=3,
+                            exceptions_per_family=1, n_values=8, n_attributes=4,
+                            queries_per_kind=2, seed=0)
+        self.assertEqual(base.shared_attributes, 0)
+        off = config(n_attributes=4, shared_attributes=0, set_queries=False)
+        self.assertEqual(families.background(off, 2)[0].tolist(),
+                         families.background(base, 2)[0].tolist())
+        self.assertEqual(off.value_base, base.value_base)
+
+    def test_a_family_with_no_private_attribute_is_refused(self):
+        # Unrecoverable by construction rather than merely hard, which is a task
+        # that measures nothing.
+        with self.assertRaises(ValueError):
+            config(n_attributes=4, shared_attributes=4)
+
+    def test_reading_the_shared_pool_when_off_is_refused(self):
+        with self.assertRaises(ValueError):
+            config(n_attributes=4, shared_attributes=0).shared_base
+
+    def test_the_pool_sits_before_the_values(self):
+        cfg = config(n_attributes=4, shared_attributes=2)
+        self.assertGreaterEqual(cfg.shared_base, cfg.attribute_base)
+        self.assertLess(cfg.shared_base + cfg.shared_attributes - 1,
+                        cfg.value_base)
+
+
 class ScoringItThroughTheRuler(unittest.TestCase):
     """The task and `openplexus.answers` have to fit, including the falsifier."""
 

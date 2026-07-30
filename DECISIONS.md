@@ -141,15 +141,23 @@ keys, which are still the default and still correct for MQAR.**
   - **Revival condition:** a task where similar-things-must-share-an-ADDRESS beats
     exact separation plus a similarity index. Nothing has ever needed that
 - ⬜ **A better index, which is what 042 §2 was actually reaching for** — and
-  `note 056` just made it load-bearing rather than a nicety.
+  `note 056` made it load-bearing rather than a nicety.
   - The set answer's enumeration works at index purity ≳ 0.99 and degrades fast
     below it (0.750 at purity 0.951, 0.167 at 0.795). **So the grouping's quality
-    now bounds the answer**, which is a far more tractable target than re-keying
-    the store — and it is measured rather than argued
+    bounds the answer**, which is a far more tractable target than re-keying the
+    store — and it is measured rather than argued
+  - **`note 057`: purity looks like the SUFFICIENT STATISTIC.** Two very different
+    routes to it — starving the index of data, and making families share their
+    attributes — land answer quality in the same neighbourhood at matched purity
+    (0.417 and 0.333 at purity ~0.70). **A hypothesis, not a result**: one matched
+    pair at n=12, unseparated from noise
+  - **Overlap does not break the index; it makes purity expensive.** With full data
+    ONE private attribute suffices (purity 0.997 sharing three of four). At ten
+    streams, sharing three of four costs 0.28 purity and 0.50 exact
   - `143` is the first result for `concepts.py` and `048` is why `families.py`
-    exists at all: every other instrument's entities are arbitrary, so nothing
-    resembles anything. **Untried:** what makes an index good on a grouping that is
-    not calibrated to be recoverable
+    exists: every other instrument's entities are arbitrary, so nothing resembles
+    anything. **Still untried:** what makes an index good, as opposed to what makes
+    a grouping hard — which is now measured on two axes
 
 ## 3. The store
 

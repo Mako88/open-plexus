@@ -163,6 +163,24 @@ class FamilyConfig:
     #: permutation is drawn from a SEPARATE rng so the main draw sequence is
     #: untouched, and the marker is reserved only when this is on.
     family_links: bool = False
+    #: How many of each family's attribute tokens are SHARED with the next family,
+    #: making the families genuinely confusable rather than merely under-observed.
+    #:
+    #: **This exists because note 056 measured the wrong axis.** It degraded index
+    #: purity by starving the index of background streams, which conflates two
+    #: different situations: an index that has not seen enough, and a concept space
+    #: where the concepts really do overlap. Only the second is what a real grouping
+    #: looks like — a system with plenty of data about categories that genuinely
+    #: share properties. A cliff rule that survives ambiguity but not starvation is
+    #: in much better shape than note 056's table alone can say.
+    #:
+    #: It is also note 053's silent-merge risk in miniature, at the level where it
+    #: can be measured: two things that should stay distinct, described by
+    #: overlapping evidence.
+    #:
+    #: 0 gives every family its own private block, which is what decisions 143-167
+    #: measured. Must stay below `n_attributes` or a family has nothing of its own.
+    shared_attributes: int = 0
     attribute_mentions: int = 2
     queries_per_kind: int = 2
     #: Ask a question whose answer is a SET -- ARCHITECTURE row F3, and the first
@@ -211,6 +229,12 @@ class FamilyConfig:
             raise ValueError(
                 f"cannot ask {self.queries_per_kind} DIRECT questions when only "
                 f"{self.stated_per_family} facts are stated per family")
+        if not 0 <= self.shared_attributes < self.n_attributes:
+            raise ValueError(
+                f"shared_attributes {self.shared_attributes} must be in "
+                f"[0, {self.n_attributes}) -- a family with no private attribute "
+                f"is not a distinguishable family, and the grouping would be "
+                f"unrecoverable by construction rather than merely hard")
         if self.set_queries and self.exceptions_per_family < 1:
             # REFUSED RATHER THAN ALLOWED TO BE TRIVIAL. With no exceptions every
             # stated fact in a family carries the same value, so every answer set
@@ -287,8 +311,25 @@ class FamilyConfig:
         return self.entity_base + self.n_entities
 
     @property
-    def value_base(self) -> int:
+    def shared_base(self) -> int:
+        """First token of the pool every family shares. Read only when on.
+
+        Sits after the private blocks and before the values, so with
+        `shared_attributes` at 0 it claims no ids and `value_base` does not move —
+        which is what keeps the link-free, share-free layout byte identical to what
+        decisions 143-167 measured.
+        """
+        if not self.shared_attributes:
+            raise ValueError(
+                "shared_base has no id when shared_attributes is 0 -- that id "
+                "belongs to a VALUE, and reading it anyway would name a value "
+                "while looking like an attribute")
         return self.attribute_base + self.n_families * self.n_attributes
+
+    @property
+    def value_base(self) -> int:
+        return (self.attribute_base + self.n_families * self.n_attributes
+                + self.shared_attributes)
 
     @property
     def vocab_size(self) -> int:
@@ -367,6 +408,26 @@ def background(config: FamilyConfig, count: int) -> list[np.ndarray]:
             attributes = [
                 config.attribute_base + family * config.n_attributes + a
                 for a in range(config.n_attributes)]
+            if config.shared_attributes:
+                # A POOL EVERY FAMILY DRAWS FROM, replacing that many of this
+                # family's own. So a family is described by a shrinking private
+                # remainder plus evidence common to all of them, which is what
+                # genuine ambiguity looks like.
+                #
+                # THE FIRST VERSION WAS INERT BY CONSTRUCTION and its own P1 caught
+                # it. It had each family borrow its NEIGHBOUR'S attributes, so
+                # family f used {f0, g1, g2, g3} -- a set no other family used, and
+                # therefore still uniquely identifying. Purity stayed at 1.000
+                # sharing three of four attributes. A condition guaranteed absent
+                # by the way it is built is not a condition.
+                #
+                # Entirely inside the conditional and consuming no randomness, so
+                # the layout decisions 143-167 were measured on stays byte
+                # identical -- the rail in `tests/test_families.py` asserts that.
+                keep = config.n_attributes - config.shared_attributes
+                attributes = attributes[:keep] + [
+                    config.shared_base + s
+                    for s in range(config.shared_attributes)]
             for index in range(config.family_size):
                 entity = (config.entity_base + family * config.family_size
                           + index)

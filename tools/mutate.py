@@ -832,6 +832,20 @@ MUTATIONS = [
         new="            if False:\n                continue",
     ),
     Mutation(
+        name="shared-attributes-are-not-actually-shared",
+        breaks="the axis by restoring the defect its first version had. Pointing "
+               "the pool at each family's OWN block gives every family a distinct "
+               "attribute set again, so the families stay perfectly separable and "
+               "purity sits at 1.000 however much 'sharing' is configured. "
+               "Nothing errors, every number is produced, and the conclusion "
+               "would be that concept overlap does not hurt the index -- which is "
+               "the opposite of what note 057 measured once the axis worked. A "
+               "condition guaranteed absent by construction is not a condition",
+        path=FAMILIES,
+        old="                    config.shared_base + s",
+        new="                    config.attribute_base + family * config.n_attributes + s",
+    ),
+    Mutation(
         name="the-set-answer-is-a-singleton-after-all",
         breaks="ARCHITECTURE row F3 while appearing to satisfy it. The answer set "
                "collapses to one value, so the first multi-token measurement in "

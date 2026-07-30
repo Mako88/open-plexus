@@ -7,7 +7,7 @@ Trains the shifted-value attention model on autoregressive MQAR two ways:
                         the whole experiment. If this fails, nothing else counts.
     objective=all       loss on every position. Pure next-token prediction with
                         no indication of which positions matter — the
-                        self-supervised objective docs/notes/002 recommends.
+                        self-supervised objective docs/archive/notes/002 recommends.
 
     python experiments/g1_02_train.py
 
@@ -44,7 +44,7 @@ def prepare(sequence):
 
     The answer to a query at position q is emitted at q+1, so scoring the *query*
     positions is scoring next-token prediction of the answers. That equivalence
-    is the whole point of the autoregressive layout (docs/notes/001 P2).
+    is the whole point of the autoregressive layout (docs/archive/notes/001 P2).
     """
     tokens = np.asarray(sequence.tokens)
     targets = np.roll(tokens, -1)
@@ -118,7 +118,7 @@ def main() -> int:
     conditions = [
         ("answers", "random"),      # ceiling + connection control + G0 step 3
         ("all", "random"),          # the question John asked
-        ("all", "structured"),      # the direct test of docs/notes/008 §4
+        ("all", "structured"),      # the direct test of docs/archive/notes/008 §4
     ]
     results = {}
     for objective, filler in conditions:

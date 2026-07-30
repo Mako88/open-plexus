@@ -1,7 +1,7 @@
 """At a FIXED memory budget, does the store ever beat a cache?
 
 This is the argument for superposition stated as a measurement, and
-[note 030](../docs/notes/030-the-benchmark-does-not-discriminate.md) flagged it
+[note 030](../docs/archive/notes/030-the-benchmark-does-not-discriminate.md) flagged it
 as the thing nobody had checked:
 
 > A cache's cost scales with the number of distinct keys. A superposed store's

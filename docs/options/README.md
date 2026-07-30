@@ -88,7 +88,7 @@ footnote someone skips.
 
 ## Two habits that are not checkable
 
-**Scan `docs/notes/`, `docs/archive/` and the source before writing the first entry.**
+**Scan `docs/archive/notes/`, `docs/archive/` and the source before writing the first entry.**
 Rule 11 of the tree. A record that starts empty invites re-running work that already has an
 answer — which happened on 2026-07-30, when a partitioning result was nearly re-reported as
 new with `note 081` already holding it.

@@ -1,6 +1,6 @@
 """Brakes on the fast store — the half of the paper we did not implement.
 
-[Note 018](../docs/notes/018-the-fast-store-has-no-brakes.md) is the diagnosis.
+[Note 018](../docs/archive/notes/018-the-fast-store-has-no-brakes.md) is the diagnosis.
 `memory = decay * memory + outer(...)` is a geometric series, so repetition drives
 it toward `1 / (1 - decay)` — about 277x a single binding at the half-life these
 sweeps use. Retrieval is linear in that; the delta-rule update is **quadratic**.

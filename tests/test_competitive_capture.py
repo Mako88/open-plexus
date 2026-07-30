@@ -1,6 +1,6 @@
 """A finite pool that tagged candidates have to win.
 
-[Note 015](../docs/notes/015-we-implemented-the-tag-and-not-the-competition.md)
+[Note 015](../docs/archive/notes/015-we-implemented-the-tag-and-not-the-competition.md)
 is the argument. In short: synaptic capture is competitive over a finite protein
 pool, note 010 took the tag and left out the scarcity, and the scarcity is what
 does the selecting.

@@ -24,7 +24,7 @@ swap, and nothing here depends on it. This tree carries what was DECIDED.
 **The contract, not advice.** `tools/check_decisions.py` enforces what can be enforced.
 **The governing constraint, John's:** *"as soon as it's big enough that you have to search
 through it, you're gonna be missing things."* So this stays small enough to read whole, and
-history lives in `docs/notes/` and the archived log.
+history lives in `docs/archive/notes/` and the archived log.
 
 1. **A finding UPDATES AN OPTION; it never appends an entry.** About to add a numbered
    heading? Stop — this is not a log. `tests/test_goals_consistency.py` fails the build.
@@ -53,12 +53,14 @@ history lives in `docs/notes/` and the archived log.
     `unrecorded` written rather than a line dropped — and
     `tools/check_provenance.py` requires every measurement in it to appear in a source
     that entry cites. That check found `0.9220` cited to a note that does not contain it
-    ([note 105](docs/notes/105-the-partitioning-accuracy-figure-has-no-source.md)).
+    ([note 105](docs/archive/notes/105-the-partitioning-accuracy-figure-has-no-source.md)).
 11. **When first creating an option's record, SCAN THE ARCHIVE for it.** John's
-    instruction, 2026-07-30, and the reason is that a record starting empty invites
-    re-running work that `docs/notes/`, `docs/archive/` and the source already answer —
-    which happened on 2026-07-30, when a partitioning result was nearly re-reported as
-    new with `note 081` already holding it. Grep all three before writing the first entry.
+    instruction, 2026-07-30. A record starting empty invites re-running work that
+    `docs/archive/notes/`, `docs/archive/decisions-*.md` and the source already answer —
+    which happened, when a partitioning result was nearly re-reported as new with
+    `note 081` already holding it. **And a reference that does not resolve in the live
+    tree is UNCHECKED, not absent:** the notes and the decision log are archived, not
+    deleted, so look there before concluding a thing was never measured.
 12. **A record holds EVENTS, so it cannot go stale.** *"On this date this configuration
     produced 0.9220"* stays true forever; *"this is what we use"* does not. That is the
     property that makes the split safe where the 6,040-line log was not, and why records
@@ -566,7 +568,7 @@ transport is a parallel path nothing in `run()` uses yet.
   → record: [peer-transport.md](docs/options/peer-transport.md)
 - ❌ **The global dimension-summing readout** — the globally synchronised step **C1
   forbids**, the project's own first constraint. Surfaced in a footnote to
-  [note 009](docs/notes/009-splitting-the-memory.md) §4 **after four gates were passed and
+  [note 009](docs/archive/notes/009-splitting-the-memory.md) §4 **after four gates were passed and
   five sweeps run on top of it.** `combine="vote"` mitigates the BANDWIDTH and not the
   violation; a concept-partitioned read is a **selection**, which is what removes it.
   **Revival:** none while C1 stands, and the arithmetic refuses it independently.
@@ -700,8 +702,8 @@ it has ever been re-litigated, which is the only thing the tree prevents.
 - ✅ **The apparatus** — mutation harness (sharded 6 ways in CI; `--verify` is the authority
   on the count), a dependency-free ruler in `tasks/`/`baselines.py`/`answers.py`
   (`note 007`), the rails (`check_workflows`, `check_rails`, `check_duplication`,
-  `check_decisions`, `check_options`, `check_provenance`), and a sensitivity check on any
-  timing assertion — `169`: three attempts at one assertion and **the first two both passed
+  `check_decisions`, `check_options`, `check_provenance`, `check_explainers`), and a
+  sensitivity check on any timing assertion — `169`: three attempts at one assertion and **the first two both passed
   when written.**
   → record: [verification-apparatus.md](docs/options/verification-apparatus.md) ·
   full account: [archived](docs/archive/verification-apparatus-2026-07-30.md)
@@ -751,5 +753,5 @@ it has ever been re-litigated, which is the only thing the tree prevents.
 - **DECISIONS.md must stay readable in ONE pass — John's primary criterion for it.**
   *"As soon as it's big enough that you have to search through it, you're gonna be
   missing things."* So: no splitting into two files (two files means reading one and
-  missing the other), current state here, history in `docs/notes/`. Trim toward this,
+  missing the other), current state here, history in `docs/archive/notes/`. Trim toward this,
   not toward the line budget.

@@ -4,7 +4,7 @@ The table is **node width x learning rate**, and it exists because `lr 0.05,
 FIXED on every arm` appears in the grid of g9-05 through g9-11 without ever being
 swept. It was chosen for g9-03 at `d_model` 32 and carried through every change
 of width, node count, capacity, fade and reach since
-([note 028](../docs/notes/028-the-learning-rate-has-been-frozen-for-seven-sweeps.md)).
+([note 028](../docs/archive/notes/028-the-learning-rate-has-been-frozen-for-seven-sweeps.md)).
 
 Three questions, reported separately because a single headline merges them:
 

@@ -61,7 +61,7 @@ class TestLookupIsCausal(unittest.TestCase):
 class TestLookupIsConnected(unittest.TestCase):
     def test_the_lookup_depends_on_the_current_token(self):
         """Input-dependence is the whole point. A feature that ignored the
-        current token would be a fixed filter, which docs/notes/006 §7 says is
+        current token would be a fixed filter, which docs/archive/notes/006 §7 says is
         exactly what does not work."""
         a = (1, 4, 2, 1)
         b = (1, 4, 2, 4)

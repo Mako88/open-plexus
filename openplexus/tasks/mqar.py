@@ -7,7 +7,7 @@ consolidate-on-use measurable at all.
 At each query position the correct output is the value that key was paired with.
 All pairs are queried, which is what makes the task discriminating — the
 single-query variant is solved by architectures much weaker than attention, and
-choosing it would produce a benchmark everything passes (see docs/notes/006).
+choosing it would produce a benchmark everything passes (see docs/archive/notes/006).
 
 This module has no dependencies outside the standard library, on purpose. It is
 the reference implementation: obviously correct and slow, and any faster
@@ -34,7 +34,7 @@ class MqarConfig:
 
     Every field is a difficulty dial. G0's output is a curve over these, not a
     single score, because a gap no local rule could close is as uninformative as
-    no gap at all (docs/notes/001, P3).
+    no gap at all (docs/archive/notes/001, P3).
 
     Attributes:
         queries_per_pair: How many times each pair is queried. 1 is the original
@@ -47,7 +47,7 @@ class MqarConfig:
             from a query, can ever pay off. A mechanism that consolidates what
             proved useful has no second occasion to be useful on.
 
-            [Note 010](../../docs/notes/010-tagging-and-capture.md) works through
+            [Note 010](../../docs/archive/notes/010-tagging-and-capture.md) works through
             the biological mechanism this blocks — tag a change now, let a later
             signal decide whether it survives — and concludes that the mechanism
             is right and this benchmark cannot test it. With repeats, the first
@@ -61,7 +61,7 @@ class MqarConfig:
         n_pairs: How many key-value pairs appear, and therefore how many distinct
             bindings. The number of QUERIES is `n_pairs * queries_per_pair`.
             This is the dial that makes the task discriminating at all, rather
-            than one dial among several (docs/notes/006).
+            than one dial among several (docs/archive/notes/006).
         seq_len: Total sequence length. Must leave room for the pairs and their
             queries; the remainder is filler.
         n_keys: Size of the key alphabet. Must be at least `n_pairs`, since keys
@@ -74,7 +74,7 @@ class MqarConfig:
             unpredictable, which starves a predictive learning objective.
             `"structured"` cycles deterministically: still irrelevant and still
             has to be discarded, but predictable. These three exist so that the
-            conflict recorded in docs/notes/002 §7 is a measurable condition
+            conflict recorded in docs/archive/notes/002 §7 is a measurable condition
             rather than an argument.
             `"zipf"` draws filler from a power law over the same alphabet, so a
             few tokens are common and most are rare. **This exists to attack one
@@ -95,7 +95,7 @@ class MqarConfig:
             mechanisms default to off) the answer exists only as a label beside
             the stream and never appears in it.
 
-            This distinction is not cosmetic. docs/notes/001 P2 chose this task
+            This distinction is not cosmetic. docs/archive/notes/001 P2 chose this task
             on the grounds that the self-supervised objective and the task
             metric are one quantity — and that is true only in the
             autoregressive layout. g1-01 found the classification layout does
@@ -329,7 +329,7 @@ def generate(config: MqarConfig) -> MqarSequence:
                 answer_positions.append(len(tokens))
                 # The answer, emitted into the stream. This is what makes
                 # next-token prediction at a query position *be* the task —
-                # docs/notes/001 P2, which the classification layout does not
+                # docs/archive/notes/001 P2, which the classification layout does not
                 # satisfy and was believed to.
                 tokens.append(pairs[key])
                 targets.append(IGNORE)
@@ -372,7 +372,7 @@ def _filler_token(
     if config.filler == "structured":
         # A deterministic cycle: irrelevant to the answer, but perfectly
         # predictable from position, so a predictive objective has signal here
-        # rather than only irreducible noise (docs/notes/002 §7).
+        # rather than only irreducible noise (docs/archive/notes/002 §7).
         return spare_keys[offset % len(spare_keys)]
     return config.pad_token  # "none": distracting as little as possible.
 

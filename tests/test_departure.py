@@ -2,10 +2,10 @@
 
 G3 measured churn with a stored key table, where each node owns columns of `Wk`.
 A departure then removes key dimensions that *every surviving node* needed, which
-is why [note 009](../docs/notes/009-splitting-the-memory.md) had to record that
+is why [note 009](../docs/archive/notes/009-splitting-the-memory.md) had to record that
 churn damage is global rather than local.
 
-[Note 012](../docs/notes/012-broadcast-the-token.md) removed the premise. With
+[Note 012](../docs/archive/notes/012-broadcast-the-token.md) removed the premise. With
 `derived_keys`, no node holds any of `Wk` — each computes the full key from the
 token id — so a departure takes only that node's own values and readout.
 

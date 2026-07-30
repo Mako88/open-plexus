@@ -1,6 +1,6 @@
 """What does putting the relation in the address cost?
 
-[Note 051](../docs/notes/051-typed-edges-a-ground-up-pass.md) proposes storing
+[Note 051](../docs/archive/notes/051-typed-edges-a-ground-up-pass.md) proposes storing
 `key(subject, relation) -> object` so that two kinds of edge about one subject
 stop colliding — decision 155's failure, and rows D2/D3/E4 of
 [ARCHITECTURE.md](../ARCHITECTURE.md). A3 is the prediction that decides whether

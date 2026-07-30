@@ -1,6 +1,6 @@
 """Binding on a token PAIR, and the ceiling it lifts.
 
-[Note 033](../docs/notes/033-the-architecture-pass.md) proved that the model
+[Note 033](../docs/archive/notes/033-the-architecture-pass.md) proved that the model
 binds only adjacent tokens, so a retrieval is the sum of the values of every
 token that has followed this one — a bigram count table in superposition.
 **Nothing in that architecture can represent a trigram, because no trigram is

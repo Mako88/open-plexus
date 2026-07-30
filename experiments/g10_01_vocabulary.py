@@ -1,6 +1,6 @@
 """Does a bigger vocabulary cost width, and does it cost log(vocabulary)?
 
-[Note 020](../docs/notes/020-the-capacity-equation-checked.md) checked this
+[Note 020](../docs/archive/notes/020-the-capacity-equation-checked.md) checked this
 project's central equation against Clarkson, Ubaru & Yang. Theorem 20 covers
 exactly our object — a bundle of key-value pairs, asking whether a binding is in
 it — and gives

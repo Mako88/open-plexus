@@ -1,6 +1,6 @@
 """The first task here where something is at stake, and the traps it has to avoid.
 
-[Note 017](../docs/notes/017-a-task-with-something-at-stake.md) is the design.
+[Note 017](../docs/archive/notes/017-a-task-with-something-at-stake.md) is the design.
 The point of the task is that the signal saying *this mattered* arrives **in the
 stream and late**, so a mechanism using it is reading its own input rather than
 the generator's metadata.
@@ -194,7 +194,7 @@ class TheLayoutLeaksWhichBindingWasRewarded(unittest.TestCase):
     That is not what note 017 built this task to pose. These tests assert the
     leak EXISTS rather than that it is absent, because the numbers in g9-02 to
     g9-10 were measured with it present and a test claiming otherwise would be
-    false. See docs/notes/027-the-task-leaks-the-answer-through-its-layout.md.
+    false. See docs/archive/notes/027-the-task-leaks-the-answer-through-its-layout.md.
 
     **When the generator is fixed, these tests should FAIL** — that is their
     purpose. Replace them then, and re-baseline what depends on them.

@@ -1,6 +1,6 @@
 """Separating what the oracle stores from what it keeps.
 
-[Note 019](../docs/notes/019-the-oracle-also-slows-forgetting.md): `memory *=
+[Note 019](../docs/archive/notes/019-the-oracle-also-slows-forgetting.md): `memory *=
 decay` sits **inside** the `store[t]` guard, so a masked-out position is not
 merely un-written — it is un-faded. On MQAR with 92% filler, an oracle-gated arm
 skips the fade on 92% of steps and runs at an effective half-life roughly an

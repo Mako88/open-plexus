@@ -59,6 +59,8 @@ jobs:
         run: python tools/check_options.py
       - name: Every measurement in a record is in a source that entry cites
         run: python tools/check_provenance.py
+      - name: Every explainer is in its index, and every index row resolves
+        run: python tools/check_explainers.py
       - name: No commit message had a word eaten by a shell
         run: python tools/check_commit_messages.py
 

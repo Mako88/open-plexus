@@ -1,7 +1,7 @@
 """Does a gate work when the relevance signal is real and arrives late?
 
 Six mechanisms have failed to recover the oracle, and every one of them tried to
-infer relevance from the statistics of the stream. [Note 016](../docs/notes/016-who-supplies-relevance.md)
+infer relevance from the statistics of the stream. [Note 016](../docs/archive/notes/016-who-supplies-relevance.md)
 argues that is a harder question than biology solves: neuromodulatory signals are
 not derived by cortex from its inputs, they arrive from elsewhere.
 

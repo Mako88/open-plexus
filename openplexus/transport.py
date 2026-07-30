@@ -5,7 +5,7 @@ it, not graceful degradation: "a design that merely degrades gracefully is weake
 than one with a stated, tested bound, because only the latter can be engineered
 against."
 
-[docs/notes/002](../docs/notes/002-which-credit-assignment-scheme.md) §4 argues the
+[docs/archive/notes/002](../docs/archive/notes/002-which-credit-assignment-scheme.md) §4 argues the
 predictive objective converts latency from a *race* into a *buffer depth*. This
 module is what turns that argument into a measurement.
 

@@ -1,6 +1,6 @@
 """Before building a two-level reader: is there anything for it to pick?
 
-[Note 049](../docs/notes/049-specific-beats-general-is-a-read-policy.md) proposes
+[Note 049](../docs/archive/notes/049-specific-beats-general-is-a-read-policy.md) proposes
 writing at both the surface and concept addresses and reading the surface first.
 That touches `run`, which is the one file where a change invalidates the
 comparison set, so it is worth knowing whether the ceiling exists before paying

@@ -1,6 +1,6 @@
 """How much of the oracle's advantage is selectivity, and how much is retention?
 
-[Note 019](../docs/notes/019-the-oracle-also-slows-forgetting.md): the fade lives
+[Note 019](../docs/archive/notes/019-the-oracle-also-slows-forgetting.md): the fade lives
 inside the `store[t]` guard, so a masked-out position is not merely un-written —
 it is un-faded. On MQAR with 92% filler an oracle-gated arm skips the fade on 92%
 of steps, running at an effective half-life roughly an order of magnitude longer

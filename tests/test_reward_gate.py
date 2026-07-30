@@ -7,7 +7,7 @@ whatever the sequence length — and that is its entire advantage. Every mechani
 tried before this one acted on the lasting store, or on what was promoted out of
 the fast one.
 
-So this gates the fast store. [Note 016](../docs/notes/016-who-supplies-relevance.md)
+So this gates the fast store. [Note 016](../docs/archive/notes/016-who-supplies-relevance.md)
 argues the signal cannot be derived from the statistics of the stream — five
 mechanisms failed trying — and has to arrive from outside them. A reward token is
 in the input, on the same broadcast every node already receives, which

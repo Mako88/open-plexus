@@ -1,6 +1,6 @@
 """Relational chains: answer a question that no single stated fact answers.
 
-[Note 038](../../docs/notes/038-a-relational-task-and-whether-we-can-do-it-at-all.md)
+[Note 038](../../docs/archive/notes/038-a-relational-task-and-whether-we-can-do-it-at-all.md)
 is the design and the reasoning. In short: this project measures bits per
 character, and a character bigram table cannot represent a concept, so the task
 itself is part of the ceiling. CLUTRR (Sinha et al., arXiv:1908.06177) has the

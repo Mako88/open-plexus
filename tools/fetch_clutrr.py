@@ -4,7 +4,7 @@
 
 **The standing gap this closes:** every instrument in this project is self-designed,
 so *"until an external benchmark runs, this project is grading its own homework."*
-[Note 058](../docs/notes/058-real-co-occurrence-has-no-cliff.md) put a number on what
+[Note 058](../docs/archive/notes/058-real-co-occurrence-has-no-cliff.md) put a number on what
 that costs — real word co-occurrence carries ~7x less similarity spread than the
 synthetic task the answer mechanism was built on, and a slope where the task has a
 cliff — which moved an external benchmark from a completeness item to the measurement

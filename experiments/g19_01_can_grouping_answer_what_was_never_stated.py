@@ -1,6 +1,6 @@
 """Can grouping answer a question about something never stated?
 
-[Note 048](../docs/notes/048-a-task-where-concepts-can-mean-something.md)'s
+[Note 048](../docs/archive/notes/048-a-task-where-concepts-can-mean-something.md)'s
 experiment, on the task g19-00 calibrated. **The first measurement in this
 project of whether `concepts.py`'s indirection does what it was built for.**
 

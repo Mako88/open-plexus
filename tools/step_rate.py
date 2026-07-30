@@ -1,6 +1,6 @@
 """Which binds the step rate: the arithmetic, or the network?
 
-[Note 009](../docs/notes/009-splitting-the-memory.md) §3 bounds the affordable
+[Note 009](../docs/archive/notes/009-splitting-the-memory.md) §3 bounds the affordable
 region by `d . rate`, and §5 lists `rate` as never measured -- so the whole
 bandwidth argument rested on a product with one term unknown.
 

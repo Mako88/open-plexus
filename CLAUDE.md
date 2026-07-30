@@ -67,11 +67,11 @@ measurement is conditioned on it being true.
 > *Calibration.* Two verification passes, two catches, both cheap and both
 > upstream of everything. The evidence recommending our credit-assignment scheme
 > turned out to describe a *supervised* variant this project cannot use
-> ([note 005](docs/notes/005-verifying-the-borrowed-claims.md)). The benchmark
+> ([note 005](docs/archive/notes/005-verifying-the-borrowed-claims.md)). The benchmark
 > chosen to have headroom turned out to be *already solved* in the variant
 > specified — one query rather than many — which is the exact failure the note
 > proposing it was written to prevent
-> ([note 006](docs/notes/006-verifying-the-reservoir-claims.md)). Neither would
+> ([note 006](docs/archive/notes/006-verifying-the-reservoir-claims.md)). Neither would
 > have been caught by any experiment downstream of it.
 >
 > *Calibration, and this one is INTERNAL, which is the version the rule did not
@@ -85,7 +85,7 @@ measurement is conditioned on it being true.
 > The tree cited the note, the note cited the tree, and neither held the run.
 >
 > **The number was real.** Re-run it reproduces to four decimal places in seventy
-> seconds ([note 105](docs/notes/105-the-partitioning-accuracy-figure-has-no-source.md)),
+> seconds ([note 105](docs/archive/notes/105-the-partitioning-accuracy-figure-has-no-source.md)),
 > so nothing was fabricated and the conclusion stands. **That is what makes it the
 > instructive case rather than the alarming one:** every figure was correct and only
 > the pointer was wrong, so no amount of re-reading the numbers would have found it.
@@ -95,6 +95,20 @@ measurement is conditioned on it being true.
 > because a check that follows the pointer does not get tired. `script` is now a
 > required field beside `source` for the same reason: **the run that settles a
 > citation dispute is worth more than the citation.**
+
+**A reference that does not resolve is UNCHECKED, not absent — look in
+`docs/archive/` before concluding the thing does not exist.** John's instruction,
+2026-07-30. This project archives rather than deletes, so the failure mode is not
+a missing file, it is a *moved* one: the decision log lives in
+`docs/archive/decisions-*.md` and all 105 investigation notes now live in
+`docs/archive/notes/`. A grep of the live tree that comes back empty has therefore
+not established anything, and the distance between *"I could not find it"* and
+*"it was never measured"* is the whole width of rule 12's most expensive error —
+discarding a good idea on an invalid measurement.
+
+`tools/check_provenance.py` searches the archive itself for exactly this reason, so
+a record whose sources moved keeps resolving. **A person has to remember; the
+checker does not.**
 
 **2. Observe the quantity the change claims to move, not a downstream proxy.**
 A green end-to-end run cannot tell you which of six components is working. When
@@ -164,7 +178,7 @@ individual experiment remains sound.
 > Writing provenance next to the pin also found `fade` carried from `d_model` 32,
 > then `lr` frozen across seven sweeps, then `KEY_SCALE` and `DECAY` arriving by
 > import and appearing in no grid at all
-> ([note 028](docs/notes/028-the-learning-rate-has-been-frozen-for-seven-sweeps.md)).
+> ([note 028](docs/archive/notes/028-the-learning-rate-has-been-frozen-for-seven-sweeps.md)).
 > Two cycles of inventory found what seven sweeps of warnings did not.
 
 **A measurement is conditional on the configuration it was taken in. Name the
@@ -290,9 +304,9 @@ than the one derived at a desk, and because discovering it afterwards costs the
 build twice — once to write and once to reconcile.
 
 > *Calibration.* Three times, each cheaper to catch than the last.
-> [Note 010](docs/notes/010-tagging-and-capture.md): tagging and capture read
+> [Note 010](docs/archive/notes/010-tagging-and-capture.md): tagging and capture read
 > properly only after the mechanism was half-built, and the reading changed it.
-> [Note 020](docs/notes/020-the-capacity-equation-checked.md): `SNR = sqrt(d/N)`
+> [Note 020](docs/archive/notes/020-the-capacity-equation-checked.md): `SNR = sqrt(d/N)`
 > derived empirically and checked against an analytic bound many sweeps later,
 > which agreed *and* named a term never varied. `reward_recall`: built from note
 > 017's five-point requirements list, which turns out to describe **bsuite's
@@ -461,15 +475,34 @@ did not choose to make it pass.
 > *Calibration.* — unfilled. Record the first result that shrank or vanished on
 > repetition: what it measured at first, and what it measured once repeated.
 
-**4. Report negative results as results.** Keep one file per investigation
-recording *question, prediction, outcome* — including the outcomes that refuted
-the prediction. Write the prediction down **before** the run so it cannot be
-retrofitted. A refutation that narrows the search is worth more than an
-unmeasured success, and it is the only thing that stops the same dead end being
-explored twice.
+**4. Report negative results as results, in the OPTION RECORD for the thing that
+was tried.** A refutation that narrows the search is worth more than an unmeasured
+success, and it is the only thing that stops the same dead end being explored
+twice — so it goes where someone about to propose the mechanism will be standing,
+which is `docs/options/<name>.md` and the tree's row above it.
 
-> *Calibration.* — unfilled. Record the first dead end that was entered twice
-> because the first attempt was never written down.
+**And the prediction goes in the artifact that PRODUCES the number, written before
+the run.** A record is an event log written afterwards, so an entry cannot carry a
+commitment — by the time it exists the answer is known. A sweep record can, and
+`tools/check_rails.py` requires every sweep file to carry `PREDICTIONS`. For a
+local probe with no sweep, put a `PREDICTED` line in the option-record entry and
+**commit it before running**, so git ordering is the evidence. That is weaker than
+a separate artifact and should be described as weaker.
+
+> *Calibration, and it retired the note.* **Investigation notes are archived** —
+> `docs/archive/notes/`, all 105 of them, 2026-07-30. They were kept as the home
+> for predictions, and they were not doing that job: **89 of 91 sweep records carry
+> a `PREDICTIONS` section under an enforced rail, against 18 of 105 notes**, several
+> of which are requirements documents rather than experiments. So the rule was
+> describing a discipline that lived somewhere else.
+>
+> What they were was a **chronological log**, which this project has already
+> measured the cost of once at 6,040 lines. The bill arrived the same way:
+> `tools/check_provenance.py` found seven citations that did not resolve, including
+> a real measurement two notes attributed to two different sources, neither holding
+> it ([note 105](docs/archive/notes/105-the-partitioning-accuracy-figure-has-no-source.md)).
+> **A document organised by WHEN cannot be consulted by someone who only knows
+> WHAT.**
 
 **5. Correct the record when an observation refutes a written claim.**
 Falsified claims get fixed, not softened. If the README says the system does X
@@ -685,18 +718,28 @@ one rationale from drifting across five files:
 | Code comment | Why *this line* is this way. Short, and only where it would otherwise read as arbitrary. Local, single-call-site gotchas belong here rather than in a doc. |
 | Doc comment / `<summary>` | The contract the caller can rely on. See rule 15. |
 | Scope-local `ARCHITECTURE.md` | Stable, cross-cutting understanding of this area. See rule 14. |
-| Investigation note | Question, prediction made before the run, result. Never edited afterwards except to record the outcome. |
+| Option record | What was tried, the configuration it was tried in, and what came back. **Events only, no status** — `docs/options/README.md` is the format and `tools/check_options.py` enforces it. |
+| Sweep record | The prediction, written before dispatch, and the cost. `tools/check_rails.py` requires both. |
+| `DECISIONS.md` row | Which option a component IS, with the citation and the revival condition. One or two lines. |
+| Explainer | The same finding for someone who does not work in this field. See rule 14. |
 | Audit file | What a later fix invalidated, and which decisions still rest on it. |
+
+**There is no "investigation note" row any more.** Notes are archived — see rule 4's
+calibration — and their three jobs split cleanly: what was tried goes to the option
+record, the prediction goes to the sweep record, and the readable version goes to an
+explainer. **A finding about the METHOD rather than about an option goes in this file, as
+a calibration.** Nothing needs a fourth home, and a fourth home is how the last one
+started.
 
 When a number appears in more than one, **the test docstring is canonical** — it
 is the one under continuous execution. What breaks if the assertion stops
 holding, with the concrete number from when it did, belongs there; that is where
 the history lives.
 
-**And every investigation note and open item opens in plain language.** One
-short paragraph, headed `IN PLAIN TERMS`, before the technical body: what is
-being asked, why anyone should care, and what a yes or a no would mean. No
-jargon, no numbers that need prior context to parse.
+**And every open item and sweep record opens in plain language.** One short
+paragraph, headed `IN PLAIN TERMS`, before the technical body: what is being
+asked, why anyone should care, and what a yes or a no would mean. No jargon, no
+numbers that need prior context to parse.
 
 This is not a courtesy. Anyone picking this repo up — including you after a
 break, and including an assistant after a context reset — needs to reconstruct
@@ -942,7 +985,7 @@ So, concretely:
 > globally synchronised step C1 forbids. So four gates were passed and five
 > sweeps run on a model that violates this project's first constraint, and it
 > surfaced in a footnote to the bandwidth arithmetic
-> ([note 009](docs/notes/009-splitting-the-memory.md) §4). Rigour on the wrong
+> ([note 009](docs/archive/notes/009-splitting-the-memory.md) §4). Rigour on the wrong
 > question is still the wrong question.
 
 ---
@@ -1008,7 +1051,7 @@ which is not always the one that survives.
 ## Conventions
 
 **Python 3.14.** The task and measurement layer takes **no dependencies** — see
-[note 007](docs/notes/007-the-stack-and-the-first-code.md); a generator with no
+[note 007](docs/archive/notes/007-the-stack-and-the-first-code.md); a generator with no
 library semantics to reason about is auditable line by line, and that layer is
 the reference implementation everything else is asserted against.
 
@@ -1047,6 +1090,7 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   python tools/check_decisions.py
   python tools/check_options.py
   python tools/check_provenance.py
+  python tools/check_explainers.py
   ```
 
   > *Measured, and correcting a figure this document carried.* The comment in

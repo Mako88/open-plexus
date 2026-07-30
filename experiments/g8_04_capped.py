@@ -1,6 +1,6 @@
 """Does bounding the fast store make skewed input measurable?
 
-[Note 018](../docs/notes/018-the-fast-store-has-no-brakes.md): the fast store is
+[Note 018](../docs/archive/notes/018-the-fast-store-has-no-brakes.md): the fast store is
 a geometric series in `decay`, repetition drives it toward `1 / (1 - decay)`, and
 the delta-rule update is quadratic in it, so it diverges.
 

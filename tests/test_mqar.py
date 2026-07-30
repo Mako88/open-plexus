@@ -54,7 +54,7 @@ class TestTaskIsWellPosed(unittest.TestCase):
     def test_all_pairs_are_queried(self):
         """The single-query variant is solved by architectures far weaker than
         attention, so a generator that quietly queried one pair would produce a
-        benchmark everything passes (docs/notes/006)."""
+        benchmark everything passes (docs/archive/notes/006)."""
         seq = generate(BASE)
         self.assertEqual(len(seq.query_positions), BASE.n_pairs)
         self.assertEqual(set(seq.tokens[i] for i in seq.query_positions),
@@ -77,7 +77,7 @@ class TestTaskIsWellPosed(unittest.TestCase):
 
 
 class TestAutoregressiveMode(unittest.TestCase):
-    """The layout that makes docs/notes/001 P2 actually true.
+    """The layout that makes docs/archive/notes/001 P2 actually true.
 
     P2 claimed the self-supervised objective and the task metric are one
     quantity. g1-01 found that false in the classification layout: the answer
@@ -172,7 +172,7 @@ class TestConfigurationIsConnected(unittest.TestCase):
         self.assertEqual(len(generate(replace(BASE, seq_len=80)).tokens), 80)
 
     def test_filler_mode_changes_the_filler_but_not_the_answers(self):
-        """The dial that carries docs/notes/002 §7's unresolved tension. If the
+        """The dial that carries docs/archive/notes/002 §7's unresolved tension. If the
         modes produced identical sequences the sweep would silently compare a
         condition against itself."""
         a = generate(replace(BASE, filler="random"))
@@ -186,7 +186,7 @@ class TestConfigurationIsConnected(unittest.TestCase):
 
     def test_structured_filler_is_predictable_from_position_and_random_is_not(self):
         """The property the whole filler distinction exists for, and the reason
-        docs/notes/002 §7's tension may be resolvable: structured filler must be
+        docs/archive/notes/002 §7's tension may be resolvable: structured filler must be
         a function of *absolute* position, so a predictive objective has signal,
         while remaining irrelevant to the answer.
 

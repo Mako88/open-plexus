@@ -1,6 +1,6 @@
 """One content-addressed lookup, bolted onto a frozen substrate.
 
-docs/notes/006 §7 records a requirement taken from the literature rather than
+docs/archive/notes/006 §7 records a requirement taken from the literature rather than
 from our own reasoning: what separates architectures that solve MQAR from those
 that cannot is **input-dependent sequence mixing** — the model must adapt how it
 combines information according to what it is currently looking at. Width does

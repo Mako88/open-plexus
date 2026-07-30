@@ -1,6 +1,6 @@
 """Is the reward-recall task answerable, and is there room between floor and ceiling?
 
-Run BEFORE anything is measured on this task. [Note 006](../docs/notes/006-verifying-the-reservoir-claims.md)
+Run BEFORE anything is measured on this task. [Note 006](../docs/archive/notes/006-verifying-the-reservoir-claims.md)
 exists because a benchmark was adopted without this check and turned out to be
 already solved in the variant specified.
 

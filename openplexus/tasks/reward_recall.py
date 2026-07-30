@@ -1,11 +1,11 @@
 """Cued recall where only some bindings are worth keeping, marked by reward.
 
-[Note 017](../../docs/notes/017-a-task-with-something-at-stake.md) is the design
+[Note 017](../../docs/archive/notes/017-a-task-with-something-at-stake.md) is the design
 and the reasoning. In short: MQAR is a sequence of random symbols, so **nothing
 in it is good or bad for anything**, and any signal saying which positions matter
 is `position_kinds()` however it is dressed up. That makes the difference between
 "an API told us" and "the agent's own value system told us" untestable — and that
-difference is the whole AGI question ([note 016](../../docs/notes/016-who-supplies-relevance.md)).
+difference is the whole AGI question ([note 016](../../docs/archive/notes/016-who-supplies-relevance.md)).
 
 A sequence presents **cue → item** bindings. Some are followed, after a **delay**,
 by a reward token. Only rewarded cues are ever asked about.

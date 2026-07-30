@@ -1534,7 +1534,7 @@ MUTATIONS = [
     ),
     Mutation(
         name="autoregressive-flag-inert",
-        breaks="the autoregressive layout, so docs/notes/001 P2 is silently unsatisfied again",
+        breaks="the autoregressive layout, so docs/archive/notes/001 P2 is silently unsatisfied again",
         path=MQAR,
         old="    query_width = 2 if config.autoregressive else 1",
         new="    query_width = 1",

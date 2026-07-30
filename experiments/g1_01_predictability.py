@@ -1,7 +1,7 @@
 """Is the substrate predictable at all? — the gate on the credit-assignment scheme.
 
-docs/notes/002 recommends self-supervised temporal prediction: each unit predicts
-its own next input and learns from the difference. docs/notes/005 promoted the
+docs/archive/notes/002 recommends self-supervised temporal prediction: each unit predicts
+its own next input and learns from the difference. docs/archive/notes/005 promoted the
 gate on that recommendation to the most important unmeasured item in the
 project, because the literature that appeared to support the scheme turned out
 to describe a supervised variant we cannot use.
@@ -114,7 +114,7 @@ def main() -> int:
 
     print("AUTOREGRESSIVE layout: each query is followed by its answer, so the")
     print("'answer' column at horizon 1 is the task itself -- predicting the next")
-    print("token at a query position IS answering the query (docs/notes/001 P2).")
+    print("token at a query position IS answering the query (docs/archive/notes/001 P2).")
     print()
     print("horizon 0 is the connection control: decoding the CURRENT token.")
     print("If it is not near 1.000 the probe is broken and no other row means")

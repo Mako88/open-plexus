@@ -9,7 +9,7 @@ tested — have nowhere to show whether they mean anything. g17-01 recorded this
 July and chose to build the fix; the project went to word-level text instead, and
 decisions 135–142 are what that cost.
 
-[Note 048](../../docs/notes/048-a-task-where-concepts-can-mean-something.md) is
+[Note 048](../../docs/archive/notes/048-a-task-where-concepts-can-mean-something.md) is
 the design. This is it.
 
 ## The shape

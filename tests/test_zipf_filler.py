@@ -1,6 +1,6 @@
 """Filler drawn from a power law, and what makes that claim true.
 
-This mode exists to attack one diagnosis. [Note 013](../docs/notes/013-salience-and-the-missing-body.md)
+This mode exists to attack one diagnosis. [Note 013](../docs/archive/notes/013-salience-and-the-missing-body.md)
 found the salience gate genuinely selective -- query positions fire at 7.6x the
 filler rate -- and losing anyway, because uniform filler is 92% of the sequence
 *and* maximally surprising. A 7.6x enrichment cannot survive that base rate.

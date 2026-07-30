@@ -38,7 +38,7 @@ cites it, so the reasoning is one lookup away.
 - **[docs/explainers/](docs/explainers/)** — plain-language explanations of
   everything here, in reading order, written for someone who does not work in
   this field. **Start here if you want the ideas rather than the specification.**
-- **[docs/notes/](docs/notes/)** — the reasoning: question, prediction made before
+- **[docs/archive/notes/](docs/archive/notes/)** — the reasoning: question, prediction made before
   the run, result. Never edited afterwards except to record the outcome.
 - **[experiments/sweeps/](experiments/sweeps/)** — every measurement, with the
   predictions registered before dispatch and scored honestly, including the

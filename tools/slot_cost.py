@@ -31,7 +31,7 @@ regenerates the vector from `(seed, token)` when it is read.
     store                      vocab x slots            (integers)
 
 The third is only possible with `derived_keys`, the standing dependency of the
-entire g9 line ([note 024](../docs/notes/024-what-the-gate-costs-a-tiny-node.md)).
+entire g9 line ([note 024](../docs/archive/notes/024-what-the-gate-costs-a-tiny-node.md)).
 It costs arithmetic at read time instead of memory at rest, and **this file does
 not price that arithmetic** — it counts numbers held, which is what a device with
 a fixed memory budget is limited by. A version that priced compute could reach

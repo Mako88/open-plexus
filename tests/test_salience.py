@@ -10,7 +10,7 @@ as monotonically harmful.
 this node's own running experience by more than a set number of deviations, **in
 either direction**.
 
-[Note 013](../docs/notes/013-salience-and-the-missing-body.md) records what
+[Note 013](../docs/archive/notes/013-salience-and-the-missing-body.md) records what
 happened when it was measured: it works, it needs a compensatory process to avoid
 diverging, and on this benchmark it promotes filler exclusively — 44 promotions,
 44 from filler, none from a pair. These tests fix the mechanism so that finding is

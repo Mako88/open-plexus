@@ -1,6 +1,6 @@
 """Can anything identify WHICH binding, without being told the delay?
 
-[Note 026](../docs/notes/026-the-tags-precision-comes-from-its-fade.md) puts a
+[Note 026](../docs/archive/notes/026-the-tags-precision-comes-from-its-fade.md) puts a
 ceiling on this line. One binding in six is rewarded and nothing local separates
 them at write time, so a PERFECT binding-detector tops out at **16.7% precision**
 — a property of the task. The tag at its best capacity reaches 70% of that and a

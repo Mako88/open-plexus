@@ -5,7 +5,7 @@ with a per-token seed, a node regenerates any row from the token id alone. That 
 what lets a node be sent a **token** rather than a key vector — 32 bytes per step
 at any width, against `8·d·4` for the key.
 
-[Note 012](../docs/notes/012-broadcast-the-token.md) has the arithmetic. The test
+[Note 012](../docs/archive/notes/012-broadcast-the-token.md) has the arithmetic. The test
 that matters here is the one the note said was owed: **statistically equivalent is
 not verified**, so this checks reconstructibility exactly and task accuracy
 empirically rather than trusting the row statistics.

@@ -1,6 +1,6 @@
 """G2 — does the local rule survive a network that is late and out of order?
 
-docs/notes/002 §4 argued the predictive objective converts latency from a *race*
+docs/archive/notes/002 §4 argued the predictive objective converts latency from a *race*
 into a *buffer depth*. `openplexus/transport.py` implements the indexing scheme
 and its own tests pin the reassembly property. This measures the **learning rule
 running through it**, which has never been done.

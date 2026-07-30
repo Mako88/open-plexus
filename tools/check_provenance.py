@@ -55,10 +55,15 @@ from tools.check_rails import compare, read_baseline  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OPTIONS = ROOT / "docs" / "options"
-NOTES = ROOT / "docs" / "notes"
 SWEEPS = ROOT / "experiments" / "sweeps"
 ARCHIVE = ROOT / "docs" / "archive"
 BASELINE = ROOT / "tools" / "provenance_baseline.json"
+
+#: Where a note may live, in order. A note is findable wherever it sits, so archiving
+#: the directory does not break the 85 records that cite one -- which is the property
+#: that made archiving them affordable at all. Live first, so a note that is somehow in
+#: both wins from the live tree rather than from a copy nobody is maintaining.
+NOTE_DIRS = (ROOT / "docs" / "notes", ARCHIVE / "notes")
 
 #: The archived log, split in two, and both are searched for a decision entry.
 LOGS = (ARCHIVE / "decisions-001-082.md", ARCHIVE / "decisions-log-083-171.md")
@@ -106,10 +111,20 @@ def entry_sources(config: str) -> list[Path]:
                    if span else [bare] if re.fullmatch(r"\d{1,3}", bare) else [])
         for number in numbers:
             if kind == "note":
-                found.extend(sorted(NOTES.glob(f"{int(number):03d}-*.md")))
+                found.extend(note_files(int(number)))
             elif kind == "decision":
                 found.extend(p for p in (log_entry(int(number)),) if p is not None)
     return found
+
+
+def note_files(number: int) -> list[Path]:
+    """A note, wherever it lives. Returns from the FIRST directory that has it."""
+    for directory in NOTE_DIRS:
+        if directory.exists():
+            hits = sorted(directory.glob(f"{number:03d}-*.md"))
+            if hits:
+                return hits
+    return []
 
 
 #: Decision entries are regions of one file, not files. They are written to a cache so

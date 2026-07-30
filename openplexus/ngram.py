@@ -14,7 +14,7 @@ between them is most of the result:
 
 **Beating uniform is not evidence of anything.** A model that learns only that
 `e` is common and `q` is rare beats uniform comfortably and has learned no
-structure at all. [Note 013](../docs/notes/013-the-base-rate.md) blamed exactly
+structure at all. [Note 013](../docs/archive/notes/013-the-base-rate.md) blamed exactly
 this class of confusion for the salience gate's apparent success, and g8-02 could
 not move the base rate to check it. Here the base rate is printable, so it gets
 printed.

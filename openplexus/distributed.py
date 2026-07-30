@@ -7,7 +7,7 @@ packet has ever been sent.
 
 This sends packets. Each node is a separate OS process with its own memory,
 connected to a driver over loopback TCP. The driver sends a token id — **four
-bytes**, per [note 012](../docs/notes/012-broadcast-the-token.md) — and each node
+bytes**, per [note 012](../docs/archive/notes/012-broadcast-the-token.md) — and each node
 replies with its own complete vote. Nothing else crosses the wire.
 
 ## What a node holds
@@ -699,7 +699,7 @@ class Network:
         A token id and a flag saying whether an answer is wanted. Independent of
         width, of vocabulary and of how many nodes there are, because it is a
         broadcast of the same message -- which is the whole point of
-        [note 012](../docs/notes/012-broadcast-the-token.md).
+        [note 012](../docs/archive/notes/012-broadcast-the-token.md).
         """
         return _HEADER.size + struct.calcsize("!i?")
 

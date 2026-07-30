@@ -31,7 +31,7 @@ class ReservoirConfig:
     Attributes:
         n_units: State dimension. This is the capacity bound — a reservoir
             cannot hold more independent information than it has units
-            (docs/notes/006 §2), so it is the dial that decides how much of the
+            (docs/archive/notes/006 §2), so it is the dial that decides how much of the
             benchmark is reachable without learning.
         spectral_radius: Target for the recurrent matrix's largest eigenvalue
             magnitude. Below 1.0 the state forgets; the closer to 1.0, the
@@ -40,7 +40,7 @@ class ReservoirConfig:
             dynamics and longer effective memory.
         input_scale: Magnitude of the random input projection. Large values
             drive tanh into saturation, which costs memory — the
-            memory–nonlinearity trade-off (docs/notes/006 §2) is set here and by
+            memory–nonlinearity trade-off (docs/archive/notes/006 §2) is set here and by
             `spectral_radius` together.
         density: Fraction of recurrent connections that are non-zero.
         seed: Determines every weight. The substrate is a deterministic function

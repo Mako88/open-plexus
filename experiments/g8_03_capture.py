@@ -1,6 +1,6 @@
 """Does a finite pool hold N constant, and does that recover anything?
 
-[Note 015](../docs/notes/015-we-implemented-the-tag-and-not-the-competition.md):
+[Note 015](../docs/archive/notes/015-we-implemented-the-tag-and-not-the-competition.md):
 synaptic capture is competitive over a finite pool, note 010 implemented the tag
 and left the pool unbounded, and that omission predicts g8-01's worst number.
 

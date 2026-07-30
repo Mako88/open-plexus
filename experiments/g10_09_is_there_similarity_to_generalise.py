@@ -1,6 +1,6 @@
 """Does this store have similarity generalisation, or nothing to generalise over?
 
-[Note 030](../docs/notes/030-the-benchmark-does-not-discriminate.md) lists four
+[Note 030](../docs/archive/notes/030-the-benchmark-does-not-discriminate.md) lists four
 properties separating a superposed store from a cache. Churn was measured and did
 not favour the store ([g10-08](sweeps/g10-08-which-degrades-better.txt)). This
 asks about the first and most-cited one, and it can be settled by arithmetic

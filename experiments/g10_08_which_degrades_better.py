@@ -1,6 +1,6 @@
 """When a node is lost, which structure degrades better?
 
-[Note 030](../docs/notes/030-the-benchmark-does-not-discriminate.md) argued that
+[Note 030](../docs/archive/notes/030-the-benchmark-does-not-discriminate.md) argued that
 neither `reward_recall` nor character text can tell a superposed store from a
 cache, and named four properties that would. It put **graceful degradation under
 node loss** first, on the grounds that the machinery already exists, and made a

@@ -135,7 +135,7 @@ substrate is worst at.**
 
 §5 carries **self-supervised temporal prediction** — each unit predicts its own
 next input — as the credit-assignment candidate, argued in
-[note 002](docs/notes/002-which-credit-assignment-scheme.md). One of its three
+[note 002](docs/archive/notes/002-which-credit-assignment-scheme.md). One of its three
 stated advantages is *"it is the same objective family as an LLM."*
 
 **That advantage is now a liability under this section**, and the conflict is
@@ -235,7 +235,7 @@ project.
   This was implicit in §1 from the start — *"trained to learn how concepts
   relate rather than to predict what comes next"* — and being implicit was not
   enough. Decisions 135–142 spent a week measuring this model in bits per token
-  on next-word text, and [note 047](docs/notes/047-what-the-store-can-hold-on-text-is-an-n-gram.md)
+  on next-word text, and [note 047](docs/archive/notes/047-what-the-store-can-hold-on-text-is-an-n-gram.md)
   is the finding that closed it: **on a next-token objective the only relation
   the store can express is n-gram shaped, and a count table does that exactly.**
   The objective was the ceiling, not the store.
@@ -614,11 +614,11 @@ because two of them named the wrong parameter, which is worth a reader knowing.
 
 | # | the question | where it was answered | the short version |
 |---|---|---|---|
-| 1 | What task passes G0? | [note 001](docs/notes/001-what-task-passes-g0.md) | Associative recall, as a task *family with a difficulty dial* — a gap no local rule could close is as useless as no gap. G0 has since passed on MQAR and on the chain task. |
-| 2 | Which credit-assignment scheme, and what is the argument that it satisfies C1 and C2? | [note 002](docs/notes/002-which-credit-assignment-scheme.md), [note 008](docs/notes/008-the-task-objective-mismatch.md) | Self-supervised temporal prediction. It converts latency from a *race* into a *buffer depth*: nothing is in transit that can be late, so delay costs memory rather than credit precision. Note 002 §7's proposed structured-filler fix had the sign backwards; note 008 §4 shows irreducible loss contributes no gradient, so random filler is correct. |
-| 3 | What is the churn model? | [note 003](docs/notes/003-the-churn-model.md) | The machine is the failure domain; assume no warning; detection is a separate liveness channel, because on a sparse substrate silence is normal. `d_max` is simultaneously the C2 asynchrony bound and the C3 churn timeout. Session lengths are Weibull with shape below 1, so uptime predicts remaining uptime. |
-| 4 | What fraction of connections crosses the network? | [note 004](docs/notes/004-the-bandwidth-budget.md), [note 009](docs/notes/009-splitting-the-memory.md) | **The question named the wrong parameter.** The fraction is forced to ~1 under uniform placement. The free quantity is `D`, distinct destination *machines* per emitting unit, and it must be single digits to low tens. That forces local-dominant connectivity with sparse long-range links — derived from a bandwidth budget, not from biology. |
-| 5 | Does the distributed-systems literature already answer C3? | [note 003](docs/notes/003-the-churn-model.md) | Partly. The churn measurements transferred directly; federated learning's architecture did not transfer at all, being round-based with a central aggregator — a C1 violation twice over. **CORRECTED 2026-07-29: they are no longer unread.** SWIM and CRDTs were read on 2026-07-28, and SWIM did exactly what this row predicted — it named the false positives note 003 §5 names, and the detector was ejecting nodes permanently where SWIM says suspect-and-retry. A second reading found the retry interval carried in the wrong unit. |
+| 1 | What task passes G0? | [note 001](docs/archive/notes/001-what-task-passes-g0.md) | Associative recall, as a task *family with a difficulty dial* — a gap no local rule could close is as useless as no gap. G0 has since passed on MQAR and on the chain task. |
+| 2 | Which credit-assignment scheme, and what is the argument that it satisfies C1 and C2? | [note 002](docs/archive/notes/002-which-credit-assignment-scheme.md), [note 008](docs/archive/notes/008-the-task-objective-mismatch.md) | Self-supervised temporal prediction. It converts latency from a *race* into a *buffer depth*: nothing is in transit that can be late, so delay costs memory rather than credit precision. Note 002 §7's proposed structured-filler fix had the sign backwards; note 008 §4 shows irreducible loss contributes no gradient, so random filler is correct. |
+| 3 | What is the churn model? | [note 003](docs/archive/notes/003-the-churn-model.md) | The machine is the failure domain; assume no warning; detection is a separate liveness channel, because on a sparse substrate silence is normal. `d_max` is simultaneously the C2 asynchrony bound and the C3 churn timeout. Session lengths are Weibull with shape below 1, so uptime predicts remaining uptime. |
+| 4 | What fraction of connections crosses the network? | [note 004](docs/archive/notes/004-the-bandwidth-budget.md), [note 009](docs/archive/notes/009-splitting-the-memory.md) | **The question named the wrong parameter.** The fraction is forced to ~1 under uniform placement. The free quantity is `D`, distinct destination *machines* per emitting unit, and it must be single digits to low tens. That forces local-dominant connectivity with sparse long-range links — derived from a bandwidth budget, not from biology. |
+| 5 | Does the distributed-systems literature already answer C3? | [note 003](docs/archive/notes/003-the-churn-model.md) | Partly. The churn measurements transferred directly; federated learning's architecture did not transfer at all, being round-based with a central aggregator — a C1 violation twice over. **CORRECTED 2026-07-29: they are no longer unread.** SWIM and CRDTs were read on 2026-07-28, and SWIM did exactly what this row predicted — it named the false positives note 003 §5 names, and the detector was ejecting nodes permanently where SWIM says suspect-and-retry. A second reading found the retry interval carried in the wrong unit. |
 
 ---
 
@@ -632,7 +632,7 @@ carried two different answers for the same exponent two paragraphs apart.
 So the rule is now structural rather than aspirational:
 
 - **Intent and constraints here. Measurements nowhere near here.** Numbers live
-  in `experiments/sweeps/`, reasoning in `docs/notes/`, decisions in
+  in `experiments/sweeps/`, reasoning in `docs/archive/notes/`, decisions in
   `DECISIONS.md`, which is the option tree and the current position both.
 - **The only numbers permitted in this document are arithmetic or inherited**,
   and both are labelled as such — §6.1's table is the whole of it.

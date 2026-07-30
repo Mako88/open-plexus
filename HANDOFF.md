@@ -12,7 +12,7 @@
 >
 > **Where things actually live:** decisions → `DECISIONS.md` (the tree, authoritative).
 > An option's history → `docs/options/<name>.md`. Findings and measurements →
-> `docs/notes/`. Standards → `CLAUDE.md`. Goal and refutation conditions → `GOALS.md`.
+> `docs/archive/notes/`. Standards → `CLAUDE.md`. Goal and refutation conditions → `GOALS.md`.
 >
 > ## THIS FILE HAS EXISTED BEFORE AND IT FAILED
 >

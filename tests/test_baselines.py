@@ -149,7 +149,7 @@ class TestBaselinesAreHonest(unittest.TestCase):
     def test_the_floor_falls_as_more_pairs_are_queried(self):
         """Why n_pairs is the load-bearing dial, now for a second reason.
 
-        docs/notes/006 established that multi-query is what makes the task
+        docs/archive/notes/006 established that multi-query is what makes the task
         discriminating at all. This adds a measured reason: n_pairs also sets
         how far a model must beat a one-line heuristic. At 4 pairs the floor is
         0.344; at 16 it is 0.180.

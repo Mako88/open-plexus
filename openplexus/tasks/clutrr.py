@@ -4,7 +4,7 @@
 
 Every task this project measures on, it wrote itself. That has been the standing
 weakness — *"until an external benchmark runs, this project is grading its own
-homework"* — and [note 058](../../docs/notes/058-real-co-occurrence-has-no-cliff.md)
+homework"* — and [note 058](../../docs/archive/notes/058-real-co-occurrence-has-no-cliff.md)
 put a number on what it costs.
 
 CLUTRR is a benchmark someone else designed. Each puzzle states a chain of family
@@ -46,7 +46,7 @@ Nothing had to be bent to fit.
 mis-read 4% of them, all in the test split.
 
 **2. `max_appearances` is computed and exposed, and it is not decoration.**
-[Note 059](../../docs/notes/059-clutrr-confounds-depth-with-entity-repetition.md):
+[Note 059](../../docs/archive/notes/059-clutrr-confounds-depth-with-entity-repetition.md):
 train and validation contain **zero** puzzles where an entity appears in more than two
 edges; test contains **37.8%**, rising with depth. Repeated entities are this
 project's measured weak point (103: 0.884 → 0.303; 104: 0.628 with pair keys), so a

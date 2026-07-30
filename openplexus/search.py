@@ -365,7 +365,7 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
 
     ## Why this exists, measured
 
-    [Note 064](../docs/notes/064-the-search-branches-at-the-one-step-that-does-not-need-it.md)
+    [Note 064](../docs/archive/notes/064-the-search-branches-at-the-one-step-that-does-not-need-it.md)
     decomposed the walk on CLUTRR and found the two halves have very different error
     rates:
 

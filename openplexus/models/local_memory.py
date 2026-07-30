@@ -37,7 +37,7 @@ At each position `t`, with `e` the embedding of the current token:
 
 A fast-weight associative memory (Hebb; Hopfield; Ba et al. 2016), which is also
 what a linear-attention layer computes. That lineage matters for expectations
-rather than for credit: docs/notes/006 records that linear attention **fails**
+rather than for credit: docs/archive/notes/006 records that linear attention **fails**
 MQAR unless its state is large, while softmax attention does not. So a width
 penalty relative to the attention model is the *expected* outcome, and the size
 of that penalty is the measurement G1 wants (g1-04).
@@ -305,7 +305,7 @@ class LocalMemoryConfig:
             Setting this True gives an oracle its selectivity without its
             retention bonus, which is the only way to find out how much of the
             gap is which. See
-            docs/notes/019-the-oracle-also-slows-forgetting.md.
+            docs/archive/notes/019-the-oracle-also-slows-forgetting.md.
         reward_token: Token id whose arrival means *the recent past mattered*.
             -1 disables the gate, which is how every earlier result was
             measured.
@@ -364,7 +364,7 @@ class LocalMemoryConfig:
             selective about being a binding at all; the reward token supplies the
             value. That split is the one the biology describes and the only one
             available here.
-            docs/notes/022-the-signal-was-there-and-pointing-backwards.md.
+            docs/archive/notes/022-the-signal-was-there-and-pointing-backwards.md.
             **Setting this AND `reward_window` >= 1 runs the combined gate**,
             which protects the union of what each keeps. `reward_window` 0
             alongside a tag is TAG-ONLY, because 0 is also the default and every
@@ -373,7 +373,7 @@ class LocalMemoryConfig:
             plus a one-write window" cannot be expressed. They were mutually exclusive
             while each was being measured apart, which was right then and is
             exactly what a gate reading both signals has to change.
-            [Note 023](../../docs/notes/023-two-signals-and-only-one-of-them-is-about-value.md)
+            [Note 023](../../docs/archive/notes/023-two-signals-and-only-one-of-them-is-about-value.md)
             is the argument: weak retrieval says *this write is a binding* and
             recency says *this binding is the rewarded one*, because the reward
             token sits a fixed distance after the cue. Each mechanism has one
@@ -400,7 +400,7 @@ class LocalMemoryConfig:
             result was measured.
 
             **This exists to measure a defect in the task, not as a proposal.**
-            [Note 027](../../docs/notes/027-the-task-leaks-the-answer-through-its-layout.md)
+            [Note 027](../../docs/archive/notes/027-the-task-leaks-the-answer-through-its-layout.md)
             found that `reward_recall` lays bindings on a lattice of spacing 31
             and places each reward at most 20 steps after its cue, so **the
             nearest binding before a reward is always the rewarded one** --
@@ -481,7 +481,7 @@ class LocalMemoryConfig:
 
             Scales the whole store, never an entry — see `lasting_cap`, where
             the same distinction is pinned by a mutation.
-            docs/notes/018-the-fast-store-has-no-brakes.md.
+            docs/archive/notes/018-the-fast-store-has-no-brakes.md.
         capture_slots: How many promotions the lasting store may hold at once.
             0 keeps the original rule — every step that clears the gate is
             promoted, and nothing is ever displaced.
@@ -506,7 +506,7 @@ class LocalMemoryConfig:
             plus the **token id**. Not the key vector: with `derived_keys` the key
             is regenerated from `(seed, token)`, and without that a width-1 node
             could not afford a single slot. See
-            docs/notes/015-we-implemented-the-tag-and-not-the-competition.md,
+            docs/archive/notes/015-we-implemented-the-tag-and-not-the-competition.md,
             where the first version of the arithmetic was wrong.
         salience: How many standard deviations of surprise a step must carry
             before consolidation fires. 0 keeps the original rule — consolidate
@@ -564,7 +564,7 @@ class LocalMemoryConfig:
             bytes per step at fan-out 8 whatever the width, against `8·d·4` for
             the key — a factor of four thousand at `d = 4096`.
 
-            [Note 012](../../docs/notes/012-broadcast-the-token.md) works through
+            [Note 012](../../docs/archive/notes/012-broadcast-the-token.md) works through
             the trade: it roughly triples a node's compute, which
             `tools/step_rate.py` shows is 21× to 380× under-used, in exchange for
             removing the width term from the bandwidth cost, which is binding.
@@ -712,7 +712,7 @@ class LocalMemoryConfig:
             from token `t` alone. Off by default, which reproduces every earlier
             result exactly. Requires `derived_keys`.
 
-            **This lifts a ceiling that [note 033](../../docs/notes/033-the-architecture-pass.md)
+            **This lifts a ceiling that [note 033](../../docs/archive/notes/033-the-architecture-pass.md)
             proved was there.** With a per-token key the write rule binds
             `value(t)` to `key(t-1)`, so a retrieval is the sum of the values of
             every token that has ever followed this one — a bigram count table in
@@ -753,7 +753,7 @@ class LocalMemoryConfig:
             reads task structure no running system has. The blocker was that
             nothing at storage time separates a useful binding from filler.
 
-            [Note 010](../../docs/notes/010-tagging-and-capture.md) took the
+            [Note 010](../../docs/archive/notes/010-tagging-and-capture.md) took the
             answer from synaptic tagging and capture: **do not decide at storage
             time.** Write everything weakly into a fast, decaying store; when a
             retrieval later turns out to have been right, promote what was
@@ -1104,7 +1104,7 @@ class LocalMemoryConfig:
 
     #: Read from the cache ALONE, dropping the superposed store's contribution.
     #:
-    #: An ablation for [note 030](../docs/notes/030-the-benchmark-does-not-discriminate.md),
+    #: An ablation for [note 030](../docs/archive/notes/030-the-benchmark-does-not-discriminate.md),
     #: which asks for a benchmark that discriminates a superposed store from a
     #: cache and calls it the highest-value open question. It could not be
     #: answered while the cache only ever ADDED to the store: every arm holding

@@ -383,6 +383,15 @@ path is not chosen.**
   only because 16 rules in a 128-wide space are linearly separable whatever the
   labels do.** That is a property of having few rules. `bind` is kept for exactly
   this reason. *measured in:* 16 composition rules, 10 relations, 128-wide
+  - **`note 063`: SCALE.md's trigger for this row — "a rule table in the hundreds" —
+    is MET, by a task it was not written against.** CLUTRR has 1,393 distinct chains
+    and 98 pairs, and **99.8% of test chains are unseen in training** while only 6.6%
+    of adjacent PAIRS are. So a readout over a concatenated chain must generalise to
+    what it never saw; a **fold over pairwise rules** only asks what it was trained on,
+    median 144 times each. **That is the difference between a learnable problem and an
+    unlearnable one**, and it is what `bind` was kept for. **Not licensed:** removing
+    `concat`, or claiming the fold works — the intermediate compositions are
+    **unlabelled**, so a fold must discover them from the endpoint
 - ⬜ **`index_at_hops` combined with the position-level index** — `159`/`160`/`161`
   built the pieces; `154` measured that the guard's premise is false (a hop key
   sits at cosine **0.96** to a single token's row, so it *does* name a concept).
@@ -632,48 +641,33 @@ that is the standing weakness.**
 - ❌ **`reward_recall.py`** — retired, `126`.
 - 🔀 **CLUTRR — FETCHED 2026-07-29 with John's approval, not yet run.** The standing
   gap: until an external instrument runs, this project grades its own homework.
-  - **`note 058` put a number on what that costs.** The set answer's enumeration needs
-    a bimodal similarity profile; the synthetic task has a 0.424 gap and real word
-    co-occurrence has 0.059 after four confounds. That moved this from a completeness
-    item to the measurement that decides whether the answer line means anything
-  - `tools/fetch_clutrr.py` pins URLs and verifies **size and sha256**, so *"did we
-    measure the same bytes"* is answerable — rule 11b. Config
-    `gen_train23_test2to10`: train on 2–3 hops (9,074 rows), test on 2–10 (1,146)
-  - **The GRAPH layer, not the prose.** CLUTRR ships each puzzle twice; the substrate
-    addresses token ids, not sentences, and GOALS §2 does not want a text front-end.
-    **So any result is "CLUTRR-symbolic", never "CLUTRR"**, and the published
-    text-task numbers are not comparable
-  - **`note 059` decides the reporting BEFORE the run: the test split confounds depth
-    with ENTITY REPETITION.** Train and validation have **zero** puzzles where an
-    entity appears in more than two edges; test has **37.8%**, rising with depth.
-    Repeated entities are the measured weak point (`103` 0.884→0.303), so a naive
-    falling curve reads as *"composition degrades with depth"* and is **wrong about
-    which component to fix.** Split on max-appearances. Six target relations also
-    **never appear as an edge**, so the answer space exceeds the input vocabulary
-  - **`openplexus/tasks/clutrr.py` is the loader, dependency-free.** Relation
-    vocabulary **fixed, not read from the file**, so splits share token ids; graphs
-    are general edge lists because **433 are walks that revisit a node**; and
-    `max_appearances` is per puzzle so 059's split is reportable. Mutation
-    `a-revisited-entity-gets-a-fresh-slot` renumbers per edge, making the hard 433
-    quietly easy and the score come out HIGH for no model reason
-  - **`note 060`: the FLOOR is measured and it is not chance.** A `hops=1` model
-    scores **0.0856** (closure) on the plain subset against chance 0.0500 and a
-    majority-class baseline of 0.0421 — *below* chance, since the splits have
-    different answer distributions. **Sequence length leaks the hop count**, so a
-    depth-conditioned prior beats chance without composing. **Report per hop bucket,
-    never against chance, and not the 2-hop cell** — 060's correction withdraws it:
-    at three seeds it reads 0.50/1.00/0.50 on 38 rows. Headroom is at 4–10 hops
-  - **DECIDED without John: the layout is `kinship` (`FACT s r o`), on two independent
-    measurements.** Collisions fall from **411 test rows (35.9%) to 88 (7.7%)** —
-    keying `(entity, relation)` separates a repeated entity's edges, which is `157`'s
-    mechanism on someone else's data. And the `hops=1` floor falls from **0.0856 to
-    0.0365, below chance**, because `closure` writes `key(s, o) → r` and leaks direct
-    recall. **A lower floor is the better instrument.** `closure` stays behind the
-    switch and remains the default (rule 14c; 060's floor used it) — its advantage is
-    a **one-hop** one, and CLUTRR tests two through ten
-  - **No matrix needed yet:** training on all 9,074 puzzles takes **six seconds**, so
-    dispatching would be ceremony. One seed so far — the floor is a bound to
-    re-measure, not a constant
+  - **Why it stopped being optional — `note 058`.** The set answer's enumeration needs
+    a bimodal similarity profile; the synthetic task gives a 0.424 gap and real word
+    co-occurrence 0.059 after four confounds
+  - **The instrument.** `tools/fetch_clutrr.py` pins URLs and verifies size **and
+    sha256** (rule 11b); `openplexus/tasks/clutrr.py` loads the **GRAPH layer, not the
+    prose**, so every result is **"CLUTRR-symbolic", never "CLUTRR"** and the published
+    text numbers are not comparable. Config `gen_train23_test2to10`: train 2–3 hops
+    (9,074), test 2–10 (1,146). Relation vocabulary **fixed** so splits share ids;
+    graphs are general edge lists because **433 revisit a node**
+  - **`note 059`, deciding the reporting BEFORE the run:** the test split confounds
+    depth with **entity repetition** — train and validation have **zero** such
+    puzzles, test **37.8%**, rising with depth. Repeated entities are the measured weak
+    point (`103` 0.884→0.303), so a naive falling curve reads as *"composition degrades
+    with depth"* and is **wrong about which component to fix**
+  - **`note 060`, the floor, and it is not chance:** `hops=1` scores **0.0856**
+    (closure) against chance 0.0500 and a *below-chance* majority baseline of 0.0421,
+    because **sequence length leaks the hop count**. Report per hop bucket, and **not**
+    the 2-hop cell — 060's correction withdrew it at 0.50/1.00/0.50 on 38 rows
+  - **DECIDED without John: the layout is `kinship`, on two independent measurements.**
+    Collisions fall **411 rows (35.9%) → 88 (7.7%)** because keying `(entity,
+    relation)` separates a repeated entity's edges (`157`'s mechanism on someone
+    else's data), and the floor falls **0.0856 → 0.0365, below chance**, because
+    `closure` leaks direct recall via `key(s, o)`. **A lower floor is the better
+    instrument.** `closure` stays behind the switch as the default (rule 14c; 060 used
+    it) — its advantage is a **one-hop** one and CLUTRR tests two through ten
+  - **No matrix needed:** all 9,074 puzzles train in **six seconds**, so dispatching
+    would be ceremony
   - **No composing configuration has been run**, and checking why found a mismatch in
     the loader written an hour earlier. `hops > 1` with `context_keys` needs a typed
     hop; CLUTRR's relations vary along the chain, so `hop_relations` would supply a

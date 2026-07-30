@@ -58,6 +58,7 @@ TESTBED = ROOT / "testbed" / "run.py"
 ANSWERS = ROOT / "openplexus" / "answers.py"
 RENDER = ROOT / "openplexus" / "render.py"
 FAMILIES = ROOT / "openplexus" / "tasks" / "families.py"
+CLUTRR = ROOT / "openplexus" / "tasks" / "clutrr.py"
 
 
 @dataclass(frozen=True)
@@ -831,6 +832,21 @@ MUTATIONS = [
         path=LOCAL,
         old="            if self.occupied.count(key) <= 0.0:\n                continue",
         new="            if False:\n                continue",
+    ),
+    Mutation(
+        name="a-revisited-entity-gets-a-fresh-slot",
+        breaks="note 059's whole finding, silently, and in the direction that makes "
+               "the benchmark look easier than it is. Renumbering per EDGE rather "
+               "than per NODE gives an entity that appears in four edges four "
+               "different slots, so the store never sees the repeat -- and repeated "
+               "entities are this project's measured weak point (103: 0.884 -> "
+               "0.303). The 433 hard test puzzles would quietly become easy ones, "
+               "max_appearances would stay at 2 everywhere, the confound split "
+               "would report nothing, and CLUTRR's scores would come out HIGH for a "
+               "reason having nothing to do with the model",
+        path=CLUTRR,
+        old="        if node not in order:\n            order[node] = config.entity_base + len(order)",
+        new="        order[node] = config.entity_base + len(order)",
     ),
     Mutation(
         name="the-realiser-speaks-only-what-it-can-say-cheapest",

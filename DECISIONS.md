@@ -648,6 +648,19 @@ that is the standing weakness.**
     `max_appearances = 2` subset (713 rows) is the honest primary arm
   - Six target relations — `nephew`, `niece`, and four in-laws — **never appear as an
     edge**, so the answer space is larger than the input vocabulary
+  - **`openplexus/tasks/clutrr.py` is the loader, dependency-free.** CLUTRR turns out
+    to be natively `closure.py`-shaped — `FACT s o r` then `QUERY s o`, the relation
+    as the value and the entity pair as the address, which is the binding `107` said
+    the relational task needed and could not form. Nothing was bent to fit
+  - **The relation vocabulary is FIXED, not read from the file**, so train and test
+    share token ids; deriving them per split is an error that produces numbers and no
+    exception. Graphs are read as general edge lists because **433 are walks that
+    revisit a node**, and `max_appearances` is computed per puzzle so `note 059`'s
+    split can be reported. Mutation `a-revisited-entity-gets-a-fresh-slot` renumbers
+    per edge instead of per node — which would make the hard 433 quietly easy and
+    CLUTRR's score come out HIGH for no reason involving the model
+  - **Not yet run against the model.** The loader reproduces 059's counts through the
+    loader rather than from a probe, which is the gate before any arm
 
 ### 10b. Retracted numbers — never quote these
 

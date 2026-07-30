@@ -33,6 +33,7 @@ INDUCTION = ROOT / "openplexus" / "models" / "induction.py"
 ATTENTION = ROOT / "openplexus" / "models" / "attention.py"
 LOCAL = ROOT / "openplexus" / "models" / "local_memory.py"
 DISTRIBUTED = ROOT / "openplexus" / "distributed.py"
+CONCEPTS = ROOT / "openplexus" / "concepts.py"
 KEYS = ROOT / "openplexus" / "keys.py"
 RETRIEVAL = ROOT / "openplexus" / "retrieval.py"
 SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
@@ -1917,6 +1918,36 @@ MUTATIONS = [
         path=KEYS,
         old="        return token if previous in self.markers else previous",
         new="        return previous",
+    ),
+    Mutation(
+        name="a-merge-remaps-the-surface-and-strands-its-bindings",
+        breaks="the entire reason `Merged` is shaped the way it is. This IS the "
+               "obvious implementation -- follow the forwarding pointer in `of` "
+               "-- and `keys.ByConcept` builds the key from the concept id, so "
+               "remapping a surface moves every key derived from it. The "
+               "bindings already written under the old id are not corrupted, "
+               "they are UNREACHABLE, and nothing raises anywhere. A store that "
+               "silently forgets what it was told still answers questions, just "
+               "worse, which is why this is asserted through the real key source "
+               "rather than reasoned about",
+        path=CONCEPTS,
+        old="        return self.inner.of(token)",
+        new="        return self.representative(self.inner.of(token))",
+    ),
+    Mutation(
+        name="concepts-union-by-arrival-order-instead-of-by-id",
+        breaks="the promise `Surfaces.of` makes -- *the same token maps to the "
+               "same concept on every node forever*. Pointing the first "
+               "representative at the second makes the class representative "
+               "depend on which order merges ARRIVED in, so two nodes learning "
+               "the same merges out of order disagree about the class and send a "
+               "write and a read to different machines. Taking the smallest id "
+               "is what makes the answer a property of the merge SET, and it is "
+               "what lets propagation be lazy instead of needing the coordinator "
+               "amended C1 forbids",
+        path=CONCEPTS,
+        old="        self._parent[max(left, right)] = min(left, right)",
+        new="        self._parent[left] = right",
     ),
     Mutation(
         name="a-traversal-reads-from-the-wrong-node",

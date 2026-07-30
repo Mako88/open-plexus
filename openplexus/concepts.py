@@ -147,3 +147,117 @@ class Shared:
         itself does not contain.
         """
         return [t for t in range(self.vocab) if self._of[t] == concept]
+
+
+class Merged:
+    """Concepts discovered to be one thing, expressed WITHOUT moving any address.
+
+    ## The problem this is shaped by
+
+    Learning that two concepts are the same is the acquisition step nothing in this
+    module performs -- the docstring above says so, and calls it the whole problem.
+    The obvious implementation is a forwarding pointer: remap the loser's surfaces
+    onto the winner and follow the pointer on read.
+
+    **That strands every binding it was meant to preserve.** `keys.ByConcept` hands
+    its inner source CONCEPT ids where token ids would go, so the key is built from
+    the concept id. Change which concept a surface maps to and the key changes with
+    it: the facts stored under the old id are not corrupted, they are unreachable,
+    and nothing anywhere raises.
+
+    ## So `of` does not move, and the merge lives on the READ side
+
+        of(token)          unchanged, forever. A write always lands on the
+                           surface's OWN concept, so no address ever moves and
+                           nothing is ever stranded
+        aliases(concept)   the equivalence class. A reader gathers across it,
+                           rebuilding the key per member because each member's
+                           key is its own
+
+    The cost is honest and it is on the read path: a class of `k` members costs `k`
+    reads at `k` addresses, and no amount of pointer-chasing avoids it, because the
+    bindings genuinely live at `k` different keys on `k` different nodes. Copying a
+    class together is a later, lazy consolidation that shrinks the fan-out without
+    ever breaking a read -- which is precisely what re-keying cannot promise.
+
+    ## Union by MINIMUM ID, not by rank, and this is the distributed requirement
+
+    Union-by-rank picks a representative that depends on the order merges arrived
+    in. Two nodes learning the same merges in different orders would then disagree
+    about the class representative, and `Surfaces.of` promises *"the same token maps
+    to the same concept on every node forever"*.
+
+    Taking the smallest id makes the representative a property of the SET of merges
+    and not of their sequence, so nodes converge without agreeing on an order --
+    no coordinator, which amended C1 requires. The price is deeper trees, and
+    `aliases` returns the whole class anyway so depth costs nothing here.
+
+    ## Why a late merge is a miss and never a corruption
+
+    A node that has not yet learned `merge(a, b)` reads a smaller class, so it
+    misses facts stored under the other member. It does not read the WRONG fact,
+    and once the merge arrives the older bindings are reachable with no migration.
+    **Merges are append-only, so propagation can be lazy** -- the property that made
+    this approach worth choosing over re-keying, which would need a barrier.
+    """
+
+    def __init__(self, inner: Surfaces) -> None:
+        self.inner = inner
+        #: concept -> its class representative. Absent means "its own".
+        self._parent: dict[int, int] = {}
+        #: The merge SET, kept so two nodes can compare what they know rather
+        #: than compare derived state that a different arrival order would shape
+        #: differently.
+        self._merges: set[tuple[int, int]] = set()
+
+    def of(self, token: int) -> int:
+        """**Unchanged, and that is the whole design.** Writes never move."""
+        return self.inner.of(token)
+
+    @property
+    def concepts(self) -> int:
+        """Still the inner count: every concept id remains a live address.
+
+        A merged class occupies as many addresses as it has members, so shrinking
+        this would under-size a store that is still being written to at every one
+        of them.
+        """
+        return self.inner.concepts
+
+    def representative(self, concept: int) -> int:
+        """The class's smallest member, agreed by every node that knows the same
+        merges regardless of the order they arrived in."""
+        seen = concept
+        while seen in self._parent:
+            seen = self._parent[seen]
+        return seen
+
+    def merge(self, one: int, other: int) -> None:
+        """Record that two concepts are the same thing. Idempotent."""
+        if one == other:
+            return
+        self._merges.add((min(one, other), max(one, other)))
+        left, right = self.representative(one), self.representative(other)
+        if left == right:
+            return
+        # The LARGER representative points at the smaller, which is what makes
+        # the outcome independent of arrival order.
+        self._parent[max(left, right)] = min(left, right)
+
+    def aliases(self, concept: int) -> tuple[int, ...]:
+        """Every concept in `concept`'s class, smallest first.
+
+        A reader gathers over these. Sorted so two nodes that know the same merges
+        produce the same order -- a read that combined them in different orders
+        would give different floating-point sums for the same question.
+        """
+        root = self.representative(concept)
+        members = {c for c in self._parent if self.representative(c) == root}
+        members.add(root)
+        members.add(concept)
+        return tuple(sorted(members))
+
+    @property
+    def merges(self) -> frozenset[tuple[int, int]]:
+        """What this node has learned, as the SET that determines the mapping."""
+        return frozenset(self._merges)

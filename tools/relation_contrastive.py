@@ -77,6 +77,30 @@ presented as if the discipline had been followed.
 measured the counted mechanism below random filling once the holdout was an adversarially
 withheld family. Nothing here has faced that, and it is the test that decides whether this
 is a result.
+
+## And on graphs with NO conserved quantity, 2026-07-30
+
+`--graph`, 5 seeds, 75/25 rule split, scored by nearest relation. Dimensions from
+`tools/invariant_dimension.py --graph` on the SAME file:
+
+    graph                        dim   contrastive   majority   untrained
+    EN_DE_15K_V2/rel_triples_1     0   0.3602        0.0942     0.0350
+    D_W_15K_V1/rel_triples_1       2   0.3559        0.0559     0.0492
+
+    determinism 0.778 on both, against kinship's near-1.0
+
+**`dim 0` is where `tools/generation_delta.py` gets nothing at all** -- not weakly, but
+structurally, which is the scope note 104 imposed on the whole composition line. **`dim 2`
+is the case that tool explicitly REFUSES.** The contrastive representation scores the same
+in both and cleared the end-task bar on kinship's `dim 1`, so it does not depend on a
+conserved quantity existing.
+
+**A wrong claim caught one step short.** The first run used `D_W_15K_V1` and was about to
+be reported as a no-invariant graph. Measuring that exact file returned **2, not 0** --
+note 104's dim-0 finding is about `EN_DE`. Both rows name their dimension because of it.
+
+**These were NOT pre-registered**, unlike `g23-01`, and are therefore observations rather
+than tested predictions. Rule 4's distinction, stated rather than blurred.
 """
 
 from __future__ import annotations
@@ -117,7 +141,7 @@ def triangles(puzzles, permitted: set) -> list[tuple[int, int, int]]:
 
 
 def learn(tris, width: int, seed: int, epochs: int, lr: float,
-          temperature: float) -> np.ndarray:
+          temperature: float, n_relations: int | None = None) -> np.ndarray:
     """Relation vectors under a local contrastive rule. Returns `(len(RELATIONS), width)`.
 
     One update per observed triangle. The composition is elementwise product, which is
@@ -129,8 +153,13 @@ def learn(tris, width: int, seed: int, epochs: int, lr: float,
     positive and the denominator is every negative, so no negative sampling schedule
     has to be chosen and none can be got wrong.
     """
+    # `n_relations` defaults to CLUTRR's alphabet so every existing caller is
+    # unchanged, and is a parameter so the SAME learner can run on a graph with
+    # hundreds of relations. Forking it for the second domain would put the one
+    # mechanism under test in two files, which is rule 9's whole argument.
+    count = len(RELATIONS) if n_relations is None else n_relations
     rng = np.random.default_rng(seed)
-    vectors = rng.normal(0.0, 1.0 / np.sqrt(width), (len(RELATIONS), width))
+    vectors = rng.normal(0.0, 1.0 / np.sqrt(width), (count, width))
     if not tris:
         return vectors
     order = np.arange(len(tris))
@@ -161,8 +190,71 @@ def learn(tris, width: int, seed: int, epochs: int, lr: float,
     return vectors
 
 
+def graph_rules(path: Path):
+    """`(items, n_relations)` for a knowledge graph of `(s, r, o)` TSV triples.
+
+    A rule is a closing triangle `a -r1-> b -r2-> c` with `a -r3-> c` present. Real
+    graphs are not functional -- one `(r1, r2)` reaches several `r3` -- so the rule
+    is the COMMONEST `r3`, and the determinism it reports is how often that choice
+    is right. Kinship is near 1.0; these are near 0.78, which is the ceiling this
+    evaluation is measured against and it is well below 1.
+
+    **Reads the same TSV shape `tools/invariant_dimension.py` reads**, deliberately,
+    so the invariant dimension and this can be quoted about the same file without
+    anyone having to check they parsed it the same way.
+    """
+    edges = [tuple(line.split("\t"))
+             for line in path.read_text(encoding="utf-8").splitlines()
+             if len(line.split("\t")) == 3]
+    relations = sorted({r for _, r, _ in edges})
+    index = {r: i for i, r in enumerate(relations)}
+
+    outgoing: dict = {}
+    direct: dict = {}
+    for subject, relation, obj in edges:
+        outgoing.setdefault(subject, []).append((relation, obj))
+        direct.setdefault((subject, obj), set()).add(relation)
+
+    counts: dict = {}
+    for start, first in outgoing.items():
+        for r1, middle in first:
+            for r2, end in outgoing.get(middle, ()):
+                for r3 in direct.get((start, end), ()):
+                    pair = (index[r1], index[r2])
+                    counts.setdefault(pair, {})
+                    counts[pair][index[r3]] = counts[pair].get(index[r3], 0) + 1
+
+    items = sorted((pair, max(answers.items(), key=lambda kv: kv[1])[0])
+                   for pair, answers in counts.items())
+    determinism = float(np.mean([max(a.values()) / sum(a.values())
+                                 for a in counts.values()])) if counts else 0.0
+    return items, len(relations), determinism
+
+
+def score_by_nearest(vectors, test) -> float:
+    """Accuracy of `argmax(vectors @ (v_r1 * v_r2))` over held-out rules.
+
+    **A different scorer from the CLUTRR path above, and the difference is stated
+    rather than hidden.** That one fits a ridge readout over composed vectors
+    (note 070's harness, reused so the comparison to the counted representation is
+    like for like). This one takes the nearest relation directly, which is exactly
+    what `generation_delta.make_fold`'s contrastive mode does -- so a graph number
+    here and a fold number there are the same decision rule.
+    """
+    hits = 0
+    for (r1, r2), r3 in test:
+        composed = vectors[r1] * vectors[r2]
+        hits += int(int(np.argmax(vectors @ composed)) == r3)
+    return hits / len(test) if test else 0.0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--graph", type=Path, default=None,
+                        help="a TSV of (s, r, o) triples instead of CLUTRR. Pair "
+                             "with tools/invariant_dimension.py --graph on the "
+                             "SAME file, so the invariant dimension and this are "
+                             "quoted about one graph")
     parser.add_argument("--root", type=Path, default=ROOT / "data" / "clutrr")
     parser.add_argument("--config", default="gen_train23_test2to10")
     parser.add_argument("--bind", choices=sorted(BINDINGS), default="hadamard")
@@ -174,6 +266,38 @@ def main() -> int:
     parser.add_argument("--random-arm", action="store_true",
                         help="score UNTRAINED vectors. The gate: must land near 0.056")
     args = parser.parse_args()
+
+    if args.graph is not None:
+        items, n_relations, determinism = graph_rules(args.graph)
+        print(f"{args.graph.name}: {n_relations} relations, {len(items)} rules, "
+              f"determinism {determinism:.3f}")
+        scores, majorities = [], []
+        for seed in range(args.seeds):
+            rng = np.random.default_rng(seed)
+            order = rng.permutation(len(items))
+            cut = int(len(items) * 0.75)
+            train = [items[i] for i in order[:cut]]
+            test = [items[i] for i in order[cut:]]
+            tris = [] if args.random_arm else [(a, b, r) for (a, b), r in train]
+            vectors = learn(tris, args.width, seed,
+                            0 if args.random_arm else args.epochs,
+                            args.lr, args.temperature, n_relations)
+            scores.append(score_by_nearest(vectors, test))
+            # The MAJORITY baseline is recomputed per graph, never carried. Two
+            # baselines were got wrong on 2026-07-30 by reusing one measured
+            # somewhere else, and a wrong baseline moves every arm together.
+            counts: dict = {}
+            for _, r3 in train:
+                counts[r3] = counts.get(r3, 0) + 1
+            common = max(counts.items(), key=lambda kv: kv[1])[0]
+            majorities.append(float(np.mean([r3 == common for _, r3 in test])))
+        arm = "RANDOM (untrained)" if args.random_arm else "contrastive"
+        print(f"  {arm:<20} {np.mean(scores):.4f} "
+              f"+/-{np.std(scores) / np.sqrt(len(scores)):.4f}")
+        print(f"  {'majority class':<20} {np.mean(majorities):.4f} "
+              f"+/-{np.std(majorities) / np.sqrt(len(majorities)):.4f}")
+        print(f"  {'chance':<20} {1 / n_relations:.4f}")
+        return 0
 
     puzzles = list(rows(args.root, args.config, "train"))
     rules = base_rules(puzzles)

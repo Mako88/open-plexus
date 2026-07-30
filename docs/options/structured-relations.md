@@ -170,3 +170,51 @@ about 0.11 for the delta arm, and nothing here has been run end to end.
 **0.6642 ±0.0018** and the two do not overlap. The verdict rests on the within-harness
 paired comparison, which is unaffected, but a figure this project cites as a revival
 condition disagreeing with a re-measurement is note 105's shape.
+
+### AND IT DOES NOT NEED AN INVARIANT — three domains, three structures
+
+    CONFIG  when    2026-07-30
+            source  tools/relation_contrastive.py
+            script  tools/relation_contrastive.py --graph <path> --seeds 5
+                    and --random-arm; dimensions from
+                    tools/invariant_dimension.py --graph <same path>
+            task    held-out RULE prediction on knowledge-graph triangles,
+                    scored by nearest relation to compose(r1, r2)
+            model   relation vectors width 32, hadamard, 8 epochs, lr 0.05
+            knobs   graph; random arm on against off
+            scale   5 seeds, 75/25 rule split
+
+    graph                        dim   contrastive   majority   untrained
+    EN_DE_15K_V2/rel_triples_1     0   0.3602        0.0942     0.0350
+    D_W_15K_V1/rel_triples_1       2   0.3559        0.0559     0.0492
+
+**`dim 0` means `generation_delta.py` gets NOTHING in that domain** — the displacement
+mechanism is not weak there, it is structurally impossible, and `note 104` is the
+measurement that scoped the whole composition line to domains that have a conserved
+quantity. **`dim 2` is the case `generation_delta.py` explicitly REFUSES** rather than
+handles.
+
+The contrastive representation scores the same in both, and on kinship (`dim 1`) it
+cleared the end-task bar. **So it is indifferent to whether a conserved quantity exists**,
+which is the constraint the handoff carries as open problem #1.
+
+**Determinism is 0.778 on these graphs against kinship's near-1.0** — one `(r1, r2)`
+genuinely reaches several `r3`, so the ceiling is well below 1.0 and where it sits is
+unmeasured.
+
+**A wrong claim caught one step before it was published.** The first run used `D_W_15K_V1`
+and was about to be reported as *"works on a graph with no invariant"*. Running
+`invariant_dimension.py` on that exact file returned **2, not 0** — note 104's dim-0 result
+is about `EN_DE`, a different dataset. The graph with no invariant had to be measured, not
+assumed, and that is why both rows above name their dimension.
+
+**Baselines are recomputed per graph, never carried.** They differ — 0.0942 and 0.0559 —
+and two baselines were got wrong earlier the same day by reusing one measured elsewhere.
+
+**NOT PRE-REGISTERED, and that is the weakness.** Rule 4 wants the prediction committed
+before the run; `g23-01` did that and this did not. These are observations. A pre-registered
+confirmation is what would make them carry the weight `g23-01`'s numbers carry.
+
+**Held-out RULE prediction, not an end task.** There is no end task defined for these graphs
+in this repository. On kinship the same mechanism cleared the end-task bar, which is the
+only reason to treat this proxy as informative at all.

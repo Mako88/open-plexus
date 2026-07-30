@@ -63,7 +63,8 @@ from openplexus.keys import KeySource, PairKeys, TableKeys
 from openplexus.partitioned import ConceptStore
 from openplexus.retrieval import Retrieval, build as build_retrieval
 from openplexus.sketch import AddressSketch, SumSketch
-from openplexus.search import (candidates as search_candidates,
+from openplexus.search import (beam as run_beam,
+                               candidates as search_candidates,
                                decode_margin as search_margin,
                                search as run_search)
 
@@ -1057,6 +1058,35 @@ class LocalMemoryConfig:
     #: in `docs/SCALE.md`.
     search_gate_margin: float | None = None
 
+    #: Beam width for the walk. **0 means `search`, which branches at the ROOT
+    #: ONLY** and is what every number before note 103 was taken under; `>= 1`
+    #: uses `openplexus.search.beam`, which branches at every step.
+    #:
+    #: Note 064 is why this exists: the walk's two halves have very different
+    #: error rates -- the entity hop is 0.9889 and flat, the relation decode is
+    #: 0.9348 and drops to ~0.91 mid-chain -- and 15% of relation decodes land on
+    #: an entity with two or more outgoing edges, where `key(FACT, e)` holds a
+    #: SUM. `search` hedges at the root, where the decode is already 0.974, and
+    #: commits blindly where it is 0.906. Chain recovery: **0.6588 for `search`,
+    #: 0.8877 for `beam`** (`tools/clutrr_recovery.py`, `tools/prune_period.py`).
+    #:
+    #: **Defaulted OFF rather than switched on**, because `run()`'s subject is
+    #: the end task and chain recovery is not the same measurement -- a better
+    #: chain only helps if the readout consumes it. That is note 103's question.
+    search_beam_width: int = 0
+
+    #: Hops between the beam's rendezvous, when `search_beam_width >= 1`. `1`
+    #: meets every hop and is what note 102 measured as the baseline.
+    #:
+    #: Exposed because the meeting is a DISTRIBUTION cost, not a search
+    #: parameter: ranking all `width` partial walks against each other is the
+    #: round trip that keeps a driver-free walk outside `d_max` past depth 7
+    #: (`note 101`). Note 102 measured the meeting as worth **0.089** chain
+    #: recovery and its period as worth nothing measurable, so `2` fits the
+    #: budget for 2.29x the reads. Left at `1` here so the default is the
+    #: measured one.
+    search_prune_every: int = 1
+
     cache_slots: int = 0
 
     #: Read from the cache ALONE, dropping the superposed store's contribution.
@@ -1280,6 +1310,20 @@ class LocalMemoryConfig:
                 "decision 123). Without it the refusal stands")
         if self.search_branches < 0:
             raise ValueError("search_branches is a count and 0 means off")
+        if self.search_beam_width < 0:
+            raise ValueError("search_beam_width is a count and 0 means `search`")
+        if self.search_beam_width >= 1 and self.search_branches < 1:
+            raise ValueError(
+                "search_beam_width sets the width of the WALK, and there is no "
+                "walk unless search_branches >= 1. Setting a width with search "
+                "off reads as 'the beam is on' and would silently run neither -- "
+                "the class of quiet misconfiguration decision 105 recorded")
+        if self.search_prune_every < 0:
+            raise ValueError(
+                "search_prune_every counts hops between the beam's rendezvous: "
+                "1 meets every hop, 0 never meets. Negative would never prune "
+                "while looking like a period, and an unpruned beam is "
+                "branches**hops walks")
         if self.search_gate_margin is not None and self.search_branches < 2:
             raise ValueError(
                 "a gate on search decides whether to BRANCH, and there is "
@@ -2865,10 +2909,23 @@ class LocalAssociativeMemory:
                         self.config.search_branches)
                     if search_margin(scored) >= self.config.search_gate_margin:
                         branches = 1
-                walks = run_search(
-                    readable, self.retrieval, self.key_source, self.wv,
-                    int(self.config.search_fact_token), int(tokens[t]),
-                    search_target, self.config.hops, branches)
+                # `beam` OR `search`, never both -- they are the same mechanism
+                # branching in different places, and note 064 measured `search`'s
+                # placement as the wrong one: it hedges at the root where the
+                # decode is 0.974 and commits where it is 0.906. `beam` is off by
+                # default so every number taken before note 103 is reproducible.
+                if self.config.search_beam_width >= 1:
+                    walks = run_beam(
+                        readable, self.retrieval, self.key_source, self.wv,
+                        int(self.config.search_fact_token), int(tokens[t]),
+                        search_target, self.config.hops,
+                        width=self.config.search_beam_width, branches=branches,
+                        prune_every=self.config.search_prune_every)
+                else:
+                    walks = run_search(
+                        readable, self.retrieval, self.key_source, self.wv,
+                        int(self.config.search_fact_token), int(tokens[t]),
+                        search_target, self.config.hops, branches)
                 if walks:
                     # The winning walk's per-relation retrievals ARE the hops the
                     # readout consumes, in order, which is why `concat` is

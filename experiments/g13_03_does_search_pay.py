@@ -78,8 +78,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from experiments import harness  # noqa: E402
 from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
-from openplexus.tasks.kinship import (  # noqa: E402
-    IGNORE, KinshipConfig, dataset, shortcut_floors)
+from openplexus.tasks.kinship import KinshipConfig  # noqa: E402
 
 WIDTH = 256
 N_TRAIN, N_TEST, EPOCHS = 400, 200, 4
@@ -98,10 +97,6 @@ ARMS = {
 }
 
 
-def out_degree(sequence, subject: int) -> int:
-    return sum(1 for s, _, _ in sequence.facts if s == subject)
-
-
 def build(arm: str, task: KinshipConfig, seed: int) -> LocalAssociativeMemory:
     settings = dict(ARMS[arm])
     if settings.get("search_branches"):
@@ -111,102 +106,9 @@ def build(arm: str, task: KinshipConfig, seed: int) -> LocalAssociativeMemory:
         d_model=WIDTH, vocab_size=task.vocab_size, seed=seed, **settings))
 
 
-def evaluate(model, data) -> dict:
-    buckets: dict[str, list[int]] = {"1": [], "2+": []}
-    hits = 0
-    for sequence in data:
-        tokens = np.array(sequence.tokens, dtype=np.int64)
-        predicted = model.run(tokens)
-        correct = int(predicted[sequence.answer_position]
-                      == sequence.targets[sequence.answer_position])
-        hits += correct
-        degree = out_degree(sequence, sequence.asked[0])
-        buckets["1" if degree <= 1 else "2+"].append(correct)
-    return {
-        "accuracy": hits / len(data),
-        # Split because search's whole job is the out-degree >= 2 case. If it
-        # gains only at out-degree 1 it is not doing what it was built for.
-        "by_out_degree": {
-            k: {"n": len(v), "accuracy": (sum(v) / len(v)) if v else None}
-            for k, v in buckets.items()},
-    }
-
-
-def one_cell(arm: str, seed: int) -> dict:
-    task = KinshipConfig(hops=2, seed=seed * 100_000)
-    train = dataset(task, N_TRAIN)
-    test = dataset(replace(task, seed=task.seed + 500_000), N_TEST)
-    model = build(arm, task, seed)
-
-    started = time.time()
-    for _ in range(EPOCHS):
-        for sequence in train:
-            tokens = np.array(sequence.tokens, dtype=np.int64)
-            targets = np.array(sequence.targets, dtype=np.int64)
-            model.run(tokens, targets, targets != IGNORE, learn=True)
-    trained = time.time() - started
-
-    result = evaluate(model, test)
-    result.update(
-        arm=arm, width=WIDTH, seed=seed, train_seconds=round(trained, 1),
-        floors=shortcut_floors(task),
-        condition=(f"{arm}|d{WIDTH}|seed{seed}|train{N_TRAIN}x{EPOCHS}"
-                   f"|test{N_TEST}"))
-    return result
-
-
-def cost_probe() -> None:
-    """Time the MOST EXPENSIVE arm. Eight branches each walk two relations and
-    every step of every walk is a retrieval, so this is where the cost is."""
-    arm = "search8"
-    task = KinshipConfig(hops=2, seed=0)
-    sample = dataset(task, 20)
-    model = build(arm, task, 0)
-    started = time.time()
-    for sequence in sample:
-        tokens = np.array(sequence.tokens, dtype=np.int64)
-        targets = np.array(sequence.targets, dtype=np.int64)
-        model.run(tokens, targets, targets != IGNORE, learn=True)
-    per_sequence = (time.time() - started) / len(sample)
-    train_cost = per_sequence * N_TRAIN * EPOCHS
-    print(f"most expensive arm: {arm} at width {WIDTH}")
-    print(f"  {per_sequence * 1000:.1f} ms per training sequence")
-    print(f"  {train_cost / 60:.1f} min to train one cell "
-          f"({N_TRAIN} x {EPOCHS})")
-    print(f"  4 arms per job, worst job "
-          f"~{train_cost * 4 / 60:.0f} min if every arm were this one")
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--seed", type=int, default=None)
-    parser.add_argument("--json", type=str, default=None)
-    parser.add_argument("--cost", action="store_true")
-    args = parser.parse_args()
-
-    harness.refuse_if_mutating()
-
-    if args.cost:
-        cost_probe()
-        return
-
-    seeds = (args.seed,) if args.seed is not None else SEEDS
-    records = [one_cell(arm, seed) for seed in seeds for arm in ARMS]
-
-    for record in records:
-        by = record["by_out_degree"]
-        print(f"{record['condition']}  overall {record['accuracy']:.3f}  "
-              f"[floor first {record['floors']['first']:.3f}]  "
-              + "  ".join(
-                  f"k={k} n={d['n']} "
-                  + ("--" if d["accuracy"] is None else f"{d['accuracy']:.3f}")
-                  for k, d in by.items()))
-
-    if args.json:
-        Path(args.json).parent.mkdir(parents=True, exist_ok=True)
-        Path(args.json).write_text(json.dumps(records, indent=2),
-                                   encoding="utf-8")
-
-
 if __name__ == "__main__":
-    main()
+    harness.kinship_sweep(
+        __doc__, ARMS, build, width=WIDTH, n_train=N_TRAIN, n_test=N_TEST,
+        epochs=EPOCHS, seeds=SEEDS, cost_arm="search8",
+        cost_why=("eight branches each walk two relations and every step of "
+                  "every walk is a retrieval"))

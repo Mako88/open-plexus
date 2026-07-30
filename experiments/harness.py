@@ -310,3 +310,144 @@ if __name__ == "__main__":
     if not args.aggregate:
         raise SystemExit("harness.py is only run directly to --aggregate")
     table(load(args.aggregate))
+
+
+def kinship_out_degree(sequence, subject: int) -> int:
+    """How many facts in `sequence` have `subject` on the left."""
+    return sum(1 for s, _, _ in sequence.facts if s == subject)
+
+
+def kinship_scored(model, data) -> dict:
+    """Accuracy on the readout's answer, SPLIT ON OUT-DEGREE.
+
+    The split is the point. Branching -- root-only in `search`, every step in
+    `beam` -- exists for the case where the queried subject holds two or more
+    relations, because `key(FACT, e)` then holds a SUM. An arm that gains only
+    where the subject holds ONE relation is not resolving ambiguity, it got lucky
+    in the endpoint score, and an overall column cannot tell those apart.
+
+    Lives here rather than in each sweep because g13-03 and g21-01 both need it
+    and `check_duplication` said so -- CLAUDE.md rule 19 arriving from the harness
+    rather than from a review.
+    """
+    import numpy as np
+    buckets: dict[str, list[int]] = {"1": [], "2+": []}
+    hits = 0
+    for sequence in data:
+        predicted = model.run(np.array(sequence.tokens, dtype=np.int64))
+        correct = int(predicted[sequence.answer_position]
+                      == sequence.targets[sequence.answer_position])
+        hits += correct
+        degree = kinship_out_degree(sequence, sequence.asked[0])
+        buckets["1" if degree <= 1 else "2+"].append(correct)
+    return {
+        "accuracy": hits / len(data),
+        "by_out_degree": {
+            k: {"n": len(v), "accuracy": (sum(v) / len(v)) if v else None}
+            for k, v in buckets.items()},
+    }
+
+
+def kinship_cell(arm: str, seed: int, build, *, width: int, n_train: int,
+                 n_test: int, epochs: int, hops: int = 2) -> dict:
+    """Train one arm on kinship at one seed and score it.
+
+    `build(arm, task, seed)` is the caller's, because the arm table is what a
+    sweep is ABOUT and nothing here should know its keys. Everything else --
+    the seed offsets, the train/test split, the condition string -- is shared, so
+    two sweeps' numbers are comparable rather than accidentally alike.
+
+    The test seed is the train seed plus 500,000: a fixed offset, so a sweep
+    cannot silently evaluate on data it trained on.
+    """
+    import time
+    from dataclasses import replace
+
+    import numpy as np
+
+    from openplexus.tasks.kinship import (IGNORE, KinshipConfig, dataset,
+                                          shortcut_floors)
+
+    task = KinshipConfig(hops=hops, seed=seed * 100_000)
+    train = dataset(task, n_train)
+    test = dataset(replace(task, seed=task.seed + 500_000), n_test)
+    model = build(arm, task, seed)
+
+    started = time.time()
+    for _ in range(epochs):
+        for sequence in train:
+            tokens = np.array(sequence.tokens, dtype=np.int64)
+            targets = np.array(sequence.targets, dtype=np.int64)
+            model.run(tokens, targets, targets != IGNORE, learn=True)
+    trained = time.time() - started
+
+    result = kinship_scored(model, test)
+    result.update(
+        arm=arm, width=width, seed=seed, train_seconds=round(trained, 1),
+        floors=shortcut_floors(task),
+        condition=(f"{arm}|d{width}|seed{seed}|train{n_train}x{epochs}"
+                   f"|test{n_test}"))
+    return result
+
+
+def kinship_sweep(description: str, arms, build, *, width: int, n_train: int,
+                  n_test: int, epochs: int, seeds, cost_arm: str,
+                  cost_why: str, hops: int = 2) -> None:
+    """Run a kinship sweep: `--cost` to price it, `--seed` for one cell, `--json`.
+
+    `cost_arm` names the MOST EXPENSIVE arm and `cost_why` says why it is the
+    most expensive, because a cost probe on a cheap arm is worse than none -- it
+    reports a number that will be exceeded and looks like it was checked.
+    """
+    import time
+
+    import numpy as np
+
+    from openplexus.tasks.kinship import IGNORE, KinshipConfig, dataset
+
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--json", type=str, default=None)
+    parser.add_argument("--cost", action="store_true")
+    args = parser.parse_args()
+
+    refuse_if_mutating()
+
+    if args.cost:
+        task = KinshipConfig(hops=hops, seed=0)
+        sample = dataset(task, 20)
+        model = build(cost_arm, task, 0)
+        started = time.time()
+        for sequence in sample:
+            tokens = np.array(sequence.tokens, dtype=np.int64)
+            targets = np.array(sequence.targets, dtype=np.int64)
+            model.run(tokens, targets, targets != IGNORE, learn=True)
+        per_sequence = (time.time() - started) / len(sample)
+        train_cost = per_sequence * n_train * epochs
+        print(f"most expensive arm: {cost_arm} at width {width}")
+        print(f"  {cost_why}")
+        print(f"  {per_sequence * 1000:.1f} ms per training sequence")
+        print(f"  {train_cost / 60:.1f} min to train one cell "
+              f"({n_train} x {epochs})")
+        print(f"  {len(arms)} arms per job, worst job "
+              f"~{train_cost * len(arms) / 60:.0f} min if every arm were this one")
+        return
+
+    chosen = (args.seed,) if args.seed is not None else tuple(seeds)
+    records = [kinship_cell(arm, seed, build, width=width, n_train=n_train,
+                            n_test=n_test, epochs=epochs, hops=hops)
+               for seed in chosen for arm in arms]
+
+    for record in records:
+        by = record["by_out_degree"]
+        print(f"{record['condition']}  overall {record['accuracy']:.3f}  "
+              f"[floor first {record['floors']['first']:.3f}]  "
+              + "  ".join(
+                  f"k={k} n={d['n']} "
+                  + ("--" if d["accuracy"] is None else f"{d['accuracy']:.3f}")
+                  for k, d in by.items()))
+
+    if args.json:
+        Path(args.json).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.json).write_text(json.dumps(records, indent=2),
+                                   encoding="utf-8")

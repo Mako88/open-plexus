@@ -590,105 +590,105 @@ transport is a parallel path nothing in `run()` uses yet.
 **⇒ DECIDED: relational, not next-token. The instruments are all self-designed and
 that is the standing weakness.**
 
-- ✅ **Relational objective** — GOALS §1. Next-token prediction is an explicit
-  non-goal in §2.
-  - `047` **the objective was the ceiling, not the memory.** The only relation the
-    store can express on a next-token objective is *"what followed this"*, which is
-    an n-gram, and a counting table does that exactly and cheaply
-  - `142` the store carries MQAR **completely** (0.995 vs 0.000) and the prior that
-    wins on text costs 0.279 there
-  - `136`,`139` at word level the store contributes nothing (9.185 vs 9.187), and
-    its contribution is exactly substitutable by a learned prior
-- ❌ **Bits per token as evidence about the store** — the objective is n-gram
-  bounded, so it cannot show what the store adds. `142`, `047`. **Do not
-  re-propose.**
-- ❌ **Training on every position** — costs composition **1.000 → 0.40**. `095`–`098`
-  is the whole line: `095` the gate is not outvoted, it is CONFLICTED, which is a
-  mechanism problem; `096` letting the gate see WHERE it is triples all-position
-  accuracy **and is still not enough**; `097` density raises the level and does not
-  remove the decay; `098` giving the gate its OWN objective is what removes it.
-  **Do not re-propose all-position training without a separate gate objective.**
-- ❌ **Perpetual learning as a repair for churn** — `091`: it does not heal churn,
-  **because churn costs capacity** rather than knowledge. Treat its +0.008 as a
-  direction, not a number.
-  - **C4 IS NOW TESTED — `note 081`/`082`, and `091`/`092` failed only because their
-    tasks never saturated.** At 10.6× capacity a single store gives recall **0.07**, and
-    *symmetrically* — oldest beats recent, so it is **interference, not forgetting, and
-    replay cannot fix it.** Decay converts that into a window (0.990 on the last 100,
-    **0.000 older**). **The answer is two multipliers:** consolidation for selectivity
-    (`total ÷ useful`) and partitioning for capacity (`node count`). Neither suffices;
-    forever exceeds any fixed multiple, so **what to shed is still open**
-- ❌ **Concept addressing as a fix for text prediction** — 0.540 bits at bias 0, and
-  a grouping built from SHUFFLED text does as well. **The address count did the
-  work, not the concepts.** `141`
-- ✅ **`families.py`** — the only instrument where things RESEMBLE each other, so the
-  only one where a concept can mean something. `143` is its first result; `166`
-  gave it a set-valued question.
-- ✅ **`closure.py`** — unmarked stream of stated and entailed facts, no question
-  marker, so the stated/entailed split IS the recall/reasoning split.
-  - `g14-01` passes G0: entailed headroom **0.277** against a frozen 0.000.
-    `095` measured the marker as most of the remaining gap, which is what this
-    removes
-- 🔀 **`kinship.py`** the mechanism testbed · **`mqar.py`** the store's control, the
-  only instrument isolating the store from a prior (`142`) · **`chains.py`** solved
-  at 1.000, out-degree 1 by construction, a control.
-- ❌ **A composition sweep on chains as evidence about composition** — a chain is
-  out-degree 1 by construction. `108`. **Do not re-propose.**
-- ⏸ **`corpus.py`** — PAUSED, not condemned. Closed by 115/118, reopened by g17-01,
-  and 135–142 measured on it without anyone re-deciding it was the instrument.
-- ❌ **`reward_recall.py`** — retired, `126`.
-- ✅ **CLUTRR-symbolic — RUN, and it is the first external instrument.** Graph layer,
-  never the prose, so results are *"CLUTRR-symbolic"* and published text numbers are not
-  comparable. `gen_train23_test2to10`, layout **`kinship`** (collisions 35.9% → 7.7%,
-  `157`'s mechanism on someone else's data). Reproduce with
-  `tools/clutrr_recovery.py`.
-  - **Report per hop bucket and split on ENTITY REPETITION** — `note 059`: test is 37.8%
-    repeated where train is 0%, so a falling curve reads as depth and is really `103`'s
-    addressing. `note 060`: the `hops=1` floor is **0.0856**, not chance, because
-    sequence length leaks the hop count
-  - **`note 075`: 065's +0.219 does not reproduce** — stated in full under `search.beam`
-    above. Take differences against `clutrr_recovery.py`'s own baseline
-  - **What it cannot test: concept acquisition.** `note 076` — entities carry 1–2 edges,
-    so two surfaces of one concept share nothing by arithmetic
+- ✅ **Relational objective** — GOALS §1; next-token prediction is an explicit non-goal in
+  §2. `047` **the objective was the ceiling, not the memory** — the only relation the store
+  can express on a next-token objective is an n-gram. `142` the store carries MQAR
+  **completely** (0.995 vs 0.000); `136`/`139` at word level it contributes nothing and is
+  exactly substitutable by a learned prior. *measured in:* corpus and MQAR.
+  → record: [relational-objective.md](docs/options/relational-objective.md)
+- ❌ **Bits per token as evidence about the store** — the objective is n-gram bounded, so it
+  cannot show what the store adds. `142`, `047`. **Do not re-propose.** **Revival:** an
+  objective over text that is not next-token.
+  → record: [bits-per-token.md](docs/options/bits-per-token.md)
+- ❌ **Training on every position** — costs composition **1.000 → 0.40**. `095`–`098` is the
+  whole line, ending at `098`: giving the gate its OWN objective is what removes the decay.
+  *measured in:* composition over chains. **Do not re-propose without a separate gate
+  objective** — which is also the **revival condition, and `098` says it is met** with
+  `gate_objective` set.
+  → record: [training-every-position.md](docs/options/training-every-position.md)
+- ❌ **Perpetual learning as a repair for churn** — `091` it does not heal churn, **because
+  churn costs capacity** rather than knowledge; treat +0.008 as a direction. **C4 IS NOW
+  TESTED (`note 081`/`082`), and `091`/`092` failed only because their tasks never
+  saturated**: at 10.6× capacity recall is **0.07** and *symmetric*, so it is interference
+  and replay cannot fix it. **The answer is two multipliers**, consolidation and
+  partitioning, and neither suffices. **Revival:** none as a churn repair.
+  → record: [perpetual-learning-for-churn.md](docs/options/perpetual-learning-for-churn.md)
+- ❌ **Concept addressing as a fix for text prediction** — 0.540 bits at bias 0, and **a
+  grouping built from SHUFFLED text does as well.** The address count did the work, not the
+  concepts. `141`. *measured in:* corpus, character level. **Revival:** a text objective
+  that is not next-token.
+  → record: [concept-addressing-for-text.md](docs/options/concept-addressing-for-text.md)
+- ✅ **`families.py`** — the only instrument where things RESEMBLE each other, so the only
+  one where a concept can mean something. `143` is its first result; `166` gave it a
+  set-valued question, the first in the repository a single token cannot answer.
+  → record: [families-instrument.md](docs/options/families-instrument.md)
+- ✅ **`closure.py`** — unmarked stream of stated and entailed facts, no question marker, so
+  the stated/entailed split IS the recall/reasoning split. `g14-01` passes G0 with entailed
+  headroom **0.277** against a frozen 0.000.
+  → record: [closure-instrument.md](docs/options/closure-instrument.md)
+- 🔀 **`kinship.py`** the mechanism testbed and `run()`'s own task · **`mqar.py`** the
+  store's control, the only instrument isolating it from a prior (`142`) · **`chains.py`**
+  solved at 1.000, out-degree 1 by construction, a control.
+  → record: [kinship-mqar-chains.md](docs/options/kinship-mqar-chains.md)
+- ❌ **A composition sweep on chains as evidence about composition** — a chain is out-degree
+  1 by construction, so nothing chooses. `108`, and `note 103` measures it from the other
+  side. **Do not re-propose.** **Revival:** none for chains; the instrument for the question
+  is one with genuine out-degree.
+  → record: [composition-sweep-on-chains.md](docs/options/composition-sweep-on-chains.md)
+- ⏸ **`corpus.py`** — PAUSED, not condemned. Closed by 115/118, reopened by g17-01, and
+  135–142 measured on it without anyone re-deciding it was the instrument.
+  → record: [corpus-instrument.md](docs/options/corpus-instrument.md)
+- ❌ **`reward_recall.py`** — retired, `126`. Its requirements list turns out to describe
+  **bsuite's Memory Length test**: the list was a search query and was not used as one.
+  **Revival:** the literature's version, if a memory-length instrument is wanted.
+  → record: [reward-recall.md](docs/options/reward-recall.md)
+- ✅ **CLUTRR-symbolic — the first external instrument.** Graph layer, never the prose, so
+  results are *"CLUTRR-symbolic"* and published text numbers are not comparable.
+  `gen_train23_test2to10`, layout **`kinship`** (collisions 35.9% → 7.7%). **Report per hop
+  bucket and split on ENTITY REPETITION** — `note 059`, test is 37.8% repeated where train
+  is 0%, so a falling curve reads as depth and is really addressing. `note 060` the `hops=1`
+  floor is **0.0856**, not chance. **What it cannot test: concept acquisition** (`note 076`).
+  → record: [clutrr-symbolic.md](docs/options/clutrr-symbolic.md)
 - ✅ **OpenEA `EN_DE_15K_V2` — the acquisition instrument, FETCHED with John's approval.**
   Two DBpedia graphs, 15,000 gold links, URIs **encoded** so string matching cannot cheat.
-  Chosen on measurement: 74% shared relation vocabulary, and every entity has ≥4 edges
-  where CLUTRR has 5.9%. `tools/fetch_openea.py` verifies size and sha256; GPL data,
-  evaluation use.
-  - **`note 077`** zero supervision, bag of (relation, direction): hits@1 **0.0389** at
-    **583× chance**, and monotone in evidence — 0.0024 at one edge to 0.1502 at sixteen,
-    which is why CLUTRR could not see it
-  - **`note 078`** bootstrapping on mutual nearest neighbours reaches **0.3098, 8×**, not
-    plateaued. **A confidence gate makes it WORSE** (0.2334 at ≥0.9, 0.0855 at ≥0.98) and
-    does not buy precision, so **mutuality is the merge gate and magnitude is not**. Seed
-    precision self-corrects 0.263 → 0.676 untuned
-  - **Not the hard setting:** `D_W`/`D_Y` share **0%** of their relations, so round 0 has
-    nothing to compare. A vocabulary-free seed is untried and is the case a real network
-    faces
-- ❌ **`4.540` bits/char, "unigram BEATEN"** — the project's headline text result for
-  weeks, and **not a measurement of this model.** `117`: the named configuration scores
-  5.665–5.742 against a prequential unigram of 4.776, **1.1 bits away**. `118`: the figure
-  appears **only in HANDOFF.md** — no sweep, no entry — and traces to note 037's 4.525,
-  which that note says is *"trained with ordinary backpropagation, offline"* on frozen
-  features. **Wrong twice: not the model under its own rule, and the opposite of
-  prequential.** Kept because the failure is reusable — **an inherited headline with no
-  provenance outranks every measurement downstream of it**
-- ❌ **Scoring without a temperature** — `117`'s first attempt read 5.920 against a
-  uniform 5.954, i.e. *the model learning nothing*. The delta rule targets a
-  one-hot, so raw scores sit in about [0, 1] and a softmax over that range is nearly
-  uniform. A calibration artefact that looks exactly like a null result.
-- ❌ **`9.323` as the word-level unigram** — `135` it was never that, and the
-  temperature grid was too narrow at word level.
-- ❌ **Everything measured by the g18 harness before the fix** — `138`
-  **RETRACTION: it trained on the wrong target.** Survived four sweeps and 142
-  cells because every arm was wrong identically: internally consistent, both rails
-  passing, a monotone ordering with a tidy explanation. **What caught it was a
-  figure the project had already measured.** Internal consistency is not evidence.
-- ✅ **g17-01's premise survives its own correction** — `140` the pivot was not an
-  artefact, which is the one thing in this section that held.
-- ❌ **Note 050's linked-families task as first designed** — `155` refuted by its own
-  rail on the first run, and the rail was a p90 calibration that flagged what chance
-  produces. Worth keeping as the example of a fairness check paying immediately.
+  Chosen on two measurements: **74.0%** shared relation vocabulary, and a degree floor CLUTRR
+  cannot reach. `note 077` zero supervision reaches hits@1 **0.0389** at 583× chance and is
+  monotone in evidence; `note 078` bootstrapping reaches **0.3098**, and **a confidence gate
+  makes it WORSE**, so mutuality is the merge gate and magnitude is not. **Not the hard
+  setting:** `D_W`/`D_Y` share **0.0%** of their relations, and a vocabulary-free seed is
+  untried.
+  → record: [openea.md](docs/options/openea.md)
+- ❌ **`4.540` bits/char, "unigram BEATEN"** — the project's headline text result for weeks,
+  and **not a measurement of this model.** `117` the named configuration scores 5.665–5.742
+  against a prequential unigram of 4.776. `118` the figure appears in no sweep and no entry,
+  and traces to an offline backprop probe on frozen features. **Wrong twice.** Kept because
+  the failure is reusable — **an inherited headline with no provenance outranks every
+  measurement downstream of it.** **Revival:** none.
+  → record: [the-4540-headline.md](docs/options/the-4540-headline.md)
+- ❌ **Scoring without a temperature** — `117`'s first attempt read 5.920 against a uniform
+  5.954. The delta rule targets a one-hot, so raw scores sit in about [0, 1] and a softmax
+  over that range is nearly uniform. **A calibration artefact that looks exactly like a null
+  result.** **Revival:** none — it is a defect, not a setting.
+  → record: [scoring-without-temperature.md](docs/options/scoring-without-temperature.md)
+- ❌ **`9.323` as the word-level unigram** — `135` it was never that, and the temperature
+  grid was too narrow at word level. **A wrong baseline moves every arm together.**
+  **Revival:** none; baselines are computed by the dependency-free ruler.
+  → record: [word-level-unigram.md](docs/options/word-level-unigram.md)
+- ❌ **Everything measured by the g18 harness before the fix** — `138` **RETRACTION: it
+  trained on the wrong target.** Survived four sweeps and 142 cells because every arm was
+  wrong identically. **What caught it was a figure the project had already measured.
+  Internal consistency is not evidence.** **Revival:** none for those numbers; the corrected
+  harness is a different instrument.
+  → record: [g18-harness.md](docs/options/g18-harness.md)
+- ✅ **g17-01's premise survives its own correction** — `140` the pivot was not an artefact,
+  which is the one thing in this line that held, and it was sorted deliberately rather than
+  retracted with its neighbours.
+  → record: [g17-01-premise.md](docs/options/g17-01-premise.md)
+- ❌ **Note 050's linked-families task as first designed** — `155` refuted by its own rail on
+  the first run, a p90 calibration that flagged what chance produces. The example of a
+  fairness check paying immediately. **Revival condition MET at `164`:** the blocker was that
+  a hop could not carry its own relation.
+  → record: [linked-families-task.md](docs/options/linked-families-task.md)
 
 ## 11. Verification apparatus
 
@@ -697,12 +697,14 @@ itself in its own docstring and CLAUDE.md rules 6, 10, 11 and 14 carry the polic
 was spending lines in a document whose criterion is being readable in one pass. Nothing in
 it has ever been re-litigated, which is the only thing the tree prevents.
 
-- ✅ **The apparatus** — mutation harness (sharded 6 ways in CI; `--verify` is the
-  authority on the count), a dependency-free ruler in `tasks/`/`baselines.py`/`answers.py`
+- ✅ **The apparatus** — mutation harness (sharded 6 ways in CI; `--verify` is the authority
+  on the count), a dependency-free ruler in `tasks/`/`baselines.py`/`answers.py`
   (`note 007`), the rails (`check_workflows`, `check_rails`, `check_duplication`,
-  `check_decisions`), and a sensitivity check on any timing assertion — `169`: three
-  attempts at one assertion and **the first two both passed when written.**
-  - Full account: [archived](docs/archive/verification-apparatus-2026-07-30.md)
+  `check_decisions`, `check_options`, `check_provenance`), and a sensitivity check on any
+  timing assertion — `169`: three attempts at one assertion and **the first two both passed
+  when written.**
+  → record: [verification-apparatus.md](docs/options/verification-apparatus.md) ·
+  full account: [archived](docs/archive/verification-apparatus-2026-07-30.md)
 
 ---
 
@@ -718,6 +720,20 @@ it has ever been re-litigated, which is the only thing the tree prevents.
   science where the problem is well understood.
 - **Scheduled wake-ups DO NOT FIRE.** A persistent `Monitor` emitting a heartbeat
   is what works.
+- **RUN UNATTENDED, AND KEEP RUNNING — John, 2026-07-30.** Three parts, and they are one
+  instruction: *"keep a 5 minute monitor wakeup going as long as there is still a clear next
+  step forward toward the goal, always focus on blocking/harder problems before simpler
+  stuff, and make any decision necessary to move forward if I'm not around."*
+  - **The heartbeat is 5 minutes, and its stopping condition is the absence of a clear next
+    step** — not the absence of an answer, not the end of a task, and not the arrival of a
+    convenient pause. While one exists, the loop stays armed.
+  - **Blocking and harder first.** This is the counter to the gradient CLAUDE.md rule 17
+    names: every audit yields a satisfying provable result and every new mechanism most
+    likely yields a null, so the easy work is always the work that feels productive. Order
+    by what is blocking, then by what is hard — never by what is ready.
+  - **Decide, do not wait.** The existing blanket permission covered architectural calls;
+    this widens it to **any** decision needed to keep moving, with one boundary: it may not
+    countermand a goal or constraint already agreed. Record which calls were made alone.
 - **Input and output is John's call** — his framing is that if the AGI goal wins,
   inputs should look like a body: a loop with consequences, not a passive feed.
 - **The endgame is undecided** — commercial, open source, or both — and John holds

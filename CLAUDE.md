@@ -906,6 +906,13 @@ So, concretely:
   background and something else gets built while they run. `tools/mutate.py` is
   seven minutes of nothing; a sweep is hours of it.
 - **Retire a condition in the same change that adds it.**
+- **Order by BLOCKING, then by HARD — never by what is ready.** John's instruction,
+  2026-07-30. This is the same gradient as the bullet above, seen from the queue
+  rather than from the day: at any moment the easiest available task is the one
+  that feels most productive, and it is almost never the one the goal is waiting
+  on. Take the thing that unblocks something else first; among the rest, take the
+  hardest. A session that ends having cleared five easy items and left the blocker
+  untouched has gone backwards.
 - **When in doubt, ask what would move the goal**, not what would make the
   record more accurate.
 - **A measurement revised twice is no longer the bottleneck.** Stop measuring it

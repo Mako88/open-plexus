@@ -1,21 +1,9 @@
 # Option record — partition the store by CONCEPT
 
-> **RECORD ONLY. This file carries no status.** Whether this option is chosen, refused,
-> untried or live-both lives in `DECISIONS.md` and nowhere else. If you are about to write
-> "we use this" or "this is blocked", it belongs there.
->
-> **Only events are recorded here, and events do not un-happen.** Every entry says what
-> was tried, what the model looked like when it was tried, and what came back. That is why
-> this file cannot go stale: a conclusion can be superseded, but "on 2026-07-14 this
-> configuration produced 0.9220" stays true forever. The append-only log that preceded
-> this project's tree went wrong by holding conclusions, not by holding history.
->
-> **Absence means untried.** There is deliberately no "gaps" or "next steps" section —
-> those are status, they rot, and `DECISIONS.md` owns them.
->
-> **The model state matters and is recorded per entry.** A result taken at `hops=2` with
-> single-token keys is not evidence about the same option at `hops=10` with pair keys, and
-> this project has twice drawn a wrong conclusion by quoting a number across regimes.
+> **RECORD ONLY. This file carries no status.** Chosen, refused, untried or live-both lives
+> in [DECISIONS.md](../../DECISIONS.md) alone. Here there are only events, and events do not
+> un-happen, so nothing here can go stale. **Absence means untried.**
+> Format and the CONFIG block: [README.md](README.md).
 
 ---
 
@@ -37,7 +25,13 @@
 
 ### The capacity argument, first stated and then corrected — `note 043`
 
-**Model state:** design pass, nothing built.
+    CONFIG  when    2026-07-28
+            source  note 043
+            script  none -- design pass
+            task    design pass, nothing built
+            model   n/a
+            knobs   n/a
+            scale   n/a
 
 Claimed that concept partitioning multiplies total capacity where dimension splitting does
 not. **The arithmetic does not support that** and it was written anyway: per unit of
@@ -50,7 +44,13 @@ that shrinks as nodes are added.
 
 ### The lone-node floor — `g4-01`
 
-**Model state:** dimension splitting, the then-default.
+    CONFIG  when    2026-07-28
+            source  g4-01
+            script  experiments/g4_01_partitions.py
+            task    kinship
+            model   dimension splitting, the then-default
+            knobs   slice width 4, 8 and 16 dimensions
+            scale   unrecorded
 
 A single node's answer holds at 16 dimensions and degrades fast below:
 
@@ -62,14 +62,26 @@ So under dimension splitting node count is bounded by `width ÷ 16`.
 
 ### Pooled capacity is identical; lone-node capacity is not — `134`
 
-**Model state:** per-node memory held equal at ~4,096 numbers, 5 seeds, 50 cells.
+    CONFIG  when    2026-07-28
+            source  decision 134
+            script  unrecorded
+            task    synthetic capacity probe
+            model   per-node memory held equal at ~4,096 numbers
+            knobs   1, 2, 4, 8 and 16 nodes, both arrangements
+            scale   5 seeds, 50 cells
 
     pooled capacity      IDENTICAL to dimension splitting at every node count
     lone-node capacity   2048 against 128 at 16 nodes -- a factor of sixteen
 
 ### C4 cannot be met without it — `note 081`
 
-**Model state:** single store, capacity `~0.023·d²`, arranged at 10.6× overload.
+    CONFIG  when    2026-07-30
+            source  note 081
+            script  unrecorded
+            task    a stream arranged at 10.6x the store's capacity
+            model   single store, capacity ~0.023*d^2
+            knobs   decay on and off
+            scale   unrecorded
 
 Both alternatives to growing capacity fail. No decay saturates — recall **0.07 at 10.6×**,
 and *symmetric*, oldest beating recent, so it is interference rather than forgetting and
@@ -81,23 +93,63 @@ Since each concept node holds a full-width store for its own concepts, total cap
 read is 1.26 at half capacity and **1.03 at 10.6×** — so gate health tracks live load
 rather than total writes.
 
-### Accuracy, measured twice at different node counts
+### Accuracy at four nodes, measured — `note 105`
 
-**Model state:** CLUTRR `gen_train23_test2to10`, kinship layout, beam search, width 64.
+    CONFIG  when    2026-07-30
+            source  note 105, and note 075 for the monolithic baseline
+            script  tools/clutrr_recovery.py --concept-nodes 4 --seeds 0 1 2
+            task    CLUTRR gen_train23_test2to10, kinship layout, chain recovery
+            model   width 64, decay 1.0, route current
+            knobs   concept_nodes 4 against 0, beam width 4, branches 4
+            scale   1146 puzzles, 3 seeds
 
-    nodes   beam    source
-        0   0.8877  `note 081` companion, monolithic
-        4   0.9220  `note 081` companion -- 713/713 on the plain subset
-        8   0.9058  `note 103`, seed 0 only
-        0   0.8770  `note 103`, seed 0 only, monolithic
+     seed   search     beam      plain
+        0   0.7880   0.9049    713/713
+        1   0.8290   0.9389    713/713
+        2   0.8098   0.9223    712/713
 
-The stated mechanism is that a node carries interference only from what it owns. The
-two monolithic figures differ because they are different seed counts, which is the kind of
-difference the model-state line exists to make visible.
+    mean   search 0.8089   beam 0.9220
+    note 075, monolithic, same script and seeds:  search 0.7810   beam 0.8877
+
+**+0.0343 on the beam and +0.028 on search.** The stated mechanism is that a node carries
+interference only from what it owns.
+
+This entry exists because `0.9220` was carried in the tree for a day citing `note 081`,
+which contains no partitioning measurement at all — no `0.9220`, no `0.8877`, no mention
+of a companion. Note 090 quoted it against a different baseline (`0.8805`, note 065's
+unrecoverable-configuration mean) and note 103 quoted it as *"note 081's companion
+measurement"*. **The run was real and had simply never been written down**, which the
+re-run settles: it reproduces to four decimal places.
+
+### A second node count, seed 0 only — `note 103`
+
+    CONFIG  when    2026-07-30
+            source  note 103
+            script  tools/clutrr_recovery.py --concept-nodes 8
+            task    CLUTRR, chain recovery
+            model   width 64
+            knobs   concept_nodes 0 and 8, route current and first-concept
+            scale   seed 0 only, recorded in note 103 as a lead and not a result
+
+    concept_nodes   route            search    beam
+    0               either           0.7914    0.8770
+    8               current          0.7845    0.9058
+    8               first-concept    0.8141    0.9040
+
+`route` is accuracy-neutral for the beam (0.9058 against 0.9040). At `concept_nodes=0` the
+two routes are **bit-identical**, which is not a measurement: `owner()` is consulted only
+when the store is partitioned, so an unpartitioned comparison of routes cannot say
+anything.
 
 ### Ownership under the kinship layout capped it at twenty nodes — `note 072`
 
-**Model state:** ownership was `previous_concept = tokens[t-1]`, CLUTRR kinship layout.
+    CONFIG  when    2026-07-30
+            source  note 072
+            script  unrecorded
+            task    CLUTRR, kinship layout against closure layout
+            model   ownership as `previous_concept = tokens[t-1]`
+            knobs   layout kinship against closure
+            scale   7,132 traversal bindings
 
 Kinship puts the RELATION in that position, so **100.0% of CLUTRR's 7,132 traversal
 bindings were owned by a relation** (`sister` alone 20.2%) against 0.0% under the
@@ -106,7 +158,13 @@ picked kinship for a 4.7× collision reduction with ownership not in view.
 
 ### `PairKeys(route="first-concept")` moved ownership to entities — `note 073`
 
-**Model state:** as above, with the new route built and not defaulted.
+    CONFIG  when    2026-07-30
+            source  note 073
+            script  unrecorded
+            task    CLUTRR, kinship layout
+            model   the new route built and not defaulted
+            knobs   PairKeys route first-concept against the previous route
+            scale   7,132 traversal bindings
 
 Traversal bindings move from relation-owned to **entity**-owned, markers stop owning
 content (31.6% → **0.0%**), and the busiest peer drops 26.6% → **11.8%**.
@@ -115,17 +173,15 @@ content (31.6% → **0.0%**), and the busiest peer drops 26.6% → **11.8%**.
 `pair(relation, entity)` remains relation-owned at 22.3% of all keys — though its value is
 a separator the traversal never reads.
 
-### The two routes are bit-identical when nothing is partitioned — `note 103`
-
-**Model state:** `concept_nodes=0`, CLUTRR, seed 0.
-
-Both routes returned 0.7914 search / 0.8770 beam, to four decimals. `owner()` is consulted
-only when the store is partitioned, so an unpartitioned comparison of routes is not a
-measurement of anything.
-
 ### Over the wire, with no driver — `notes 093`–`101`
 
-**Model state:** `openplexus/peer.py`, `PROTOCOL` 2 then 3, loopback only.
+    CONFIG  when    2026-07-30
+            source  notes 093-101
+            script  openplexus/peer.py, tools/walk_rounds.py
+            task    reads, writes and a beam walk across peers
+            model   openplexus/peer.py, PROTOCOL 2 then 3, loopback only
+            knobs   concept_replicas, ring seed, read_many batching
+            scale   width 256; up to 64 peers; latency priced at an assumed 50 ms RTT
 
     messages per read      2 against 2N for broadcast, at width 256
     consistent hashing     a peer joining moves 1.4% of concepts at 64 peers,
@@ -138,9 +194,15 @@ measurement of anything.
 No measurement over a real link: `SCALE.md`'s 50 ms is an assumption, and the `tc netem`
 container harness has never been pointed at the peer path.
 
-### The `hops > 1` refusal was checked against the code — 2026-07-30
+### The `hops > 1` refusal was checked against the code
 
-**Model state:** `search_beam_width=4` defaulted that day (`note 103`).
+    CONFIG  when    2026-07-30
+            source  read of openplexus/models/local_memory.py, no run
+            script  none -- source reading
+            task    none
+            model   search_beam_width defaulted to 4 that day (note 103)
+            knobs   concept_nodes > 0 with hops > 1
+            scale   n/a
 
 The refusal's stated reason is that the soft hop key is *"a softmax mixture of every
 token's key row, so it names no concept"*. The hop loop is

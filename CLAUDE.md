@@ -73,6 +73,28 @@ measurement is conditioned on it being true.
 > proposing it was written to prevent
 > ([note 006](docs/notes/006-verifying-the-reservoir-claims.md)). Neither would
 > have been caught by any experiment downstream of it.
+>
+> *Calibration, and this one is INTERNAL, which is the version the rule did not
+> anticipate.* The rule is written about the literature. The same gap opened between
+> two of this project's own documents in a single day. `DECISIONS.md` carried
+> `0.9220` — concept partitioning improving accuracy — citing `note 081`, **which
+> contains no partitioning measurement at all.** Note 090 quoted the figure against
+> one baseline crediting note 065, note 103 quoted it against a different baseline
+> crediting *"note 081's companion measurement"*, and note 103 says in its own text
+> that it found the claim **in the tree** rather than in the note it went on to cite.
+> The tree cited the note, the note cited the tree, and neither held the run.
+>
+> **The number was real.** Re-run it reproduces to four decimal places in seventy
+> seconds ([note 105](docs/notes/105-the-partitioning-accuracy-figure-has-no-source.md)),
+> so nothing was fabricated and the conclusion stands. **That is what makes it the
+> instructive case rather than the alarming one:** every figure was correct and only
+> the pointer was wrong, so no amount of re-reading the numbers would have found it.
+> Eight notes were written after it and none did.
+>
+> It was found by `tools/check_provenance.py` on its first run, over two records,
+> because a check that follows the pointer does not get tired. `script` is now a
+> required field beside `source` for the same reason: **the run that settles a
+> citation dispute is worth more than the citation.**
 
 **2. Observe the quantity the change claims to move, not a downstream proxy.**
 A green end-to-end run cannot tell you which of six components is working. When
@@ -1015,6 +1037,9 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   python tools/check_workflows.py
   python tools/check_rails.py
   python tools/check_duplication.py
+  python tools/check_decisions.py
+  python tools/check_options.py
+  python tools/check_provenance.py
   ```
 
   > *Measured, and correcting a figure this document carried.* The comment in

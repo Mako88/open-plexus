@@ -1,16 +1,9 @@
 # Option record — `search.beam`, branch at every step
 
-> **RECORD ONLY. This file carries no status.** Whether this option is chosen, refused,
-> untried or live-both lives in `DECISIONS.md` and nowhere else.
->
-> **Only events are recorded here, and events do not un-happen.** Every entry says what
-> was tried, what the model looked like when it was tried, and what came back — which is
-> why this file cannot go stale. **Absence means untried**; there is no "gaps" section,
-> because that is status and it rots.
->
-> **The model state is recorded per entry** because a number taken at one task, depth and
-> width is not evidence about another. This option is the reason that rule exists: its
-> headline figure was quoted across regimes twice.
+> **RECORD ONLY. This file carries no status.** Chosen, refused, untried or live-both lives
+> in [DECISIONS.md](../../DECISIONS.md) alone. Here there are only events, and events do not
+> un-happen, so nothing here can go stale. **Absence means untried.**
+> Format and the CONFIG block: [README.md](README.md).
 
 ---
 
@@ -27,9 +20,15 @@
 
 ## What was tried, and what came back
 
-### Search was refused twice, on the arithmetic of its day — `111`, `107`
+### Search was refused twice, on the arithmetic of its day — `107`, `111`
 
-**Model state:** steps 1 and 3 of the traversal at 0.710 and 0.677.
+    CONFIG  when    2026-07-28
+            source  decisions 107 and 111
+            script  unrecorded
+            task    kinship traversal
+            model   single-token keys, steps 1 and 3 at 0.710 and 0.677
+            knobs   search_branches 0
+            scale   unrecorded
 
 `111`: *"you cannot search your way out of noisy primitives, because the verifier is built
 from the primitives."* `107` had already declined the pair-key traversal beneath it — *"a
@@ -37,16 +36,27 @@ perfect traversal buys 0.05"* — because compounding those step accuracies left
 
 ### The condition expired — `g13-01`, `g13-02`
 
-**Model state:** pair keys built, `derived_keys` and `context_keys` on.
+    CONFIG  when    2026-07-28
+            source  decision 122, g13-01, g13-02
+            script  experiments/g13_02_what_the_traversal_step_costs.py
+            task    kinship
+            model   pair keys built
+            knobs   derived_keys on, context_keys on
+            scale   8 seeds
 
-    step 1 at out-degree 1      1.000 +/-0.000, 8 seeds
+    step 1 at out-degree 1      1.000 +/-0.000
     step 2 at a unique pair     1.000, and 0.971 overall
     the two together, ceiling   1.000 against the 0.87 that would justify building it
 
 ### Root-only branching was measured at the wrong place — `note 064`
 
-**Model state:** `search` only; `walk_from` commits to `first_relation` and takes argmax
-after. CLUTRR.
+    CONFIG  when    2026-07-29
+            source  note 064
+            script  tools/clutrr_recovery.py
+            task    CLUTRR gen_train23_test2to10, kinship layout
+            model   `search` only; `walk_from` commits to `first_relation`, argmax after
+            knobs   search_branches 1 to 8
+            scale   unrecorded
 
     entity hop        0.9889   flat in position and in chain length
     relation decode   0.9348   0.974 at the root, ~0.91 mid-chain
@@ -58,30 +68,60 @@ only 0.650 → 0.659. Measured at the wrong place by its own construction.
 
 ### Per-step branching, and the figure that has been quoted across regimes — `note 065`
 
-**Model state:** CLUTRR `gen_train23_test2to10`, kinship layout, width 64.
+    CONFIG  when    2026-07-29
+            source  note 065
+            script  unrecorded -- note 074 established no committed script reproduces it
+            task    CLUTRR gen_train23_test2to10, kinship layout, chain recovery
+            model   width 64
+            knobs   unrecorded
+            scale   unrecorded
 
 Reported **+0.2190** chain recovery over `search`, and 713/713 on the plain subset.
 
 ### That gain does not reproduce — `note 074`, `note 075`
 
-**Model state:** as above, re-run from a committed script.
+    CONFIG  when    2026-07-30
+            source  notes 074-075
+            script  tools/clutrr_recovery.py
+            task    CLUTRR gen_train23_test2to10, kinship layout, chain recovery
+            model   width 64, re-run from a committed script
+            knobs   width, `allowed` mask and `branches` each varied in turn
+            scale   3 seeds
 
 No committed script produced 065's numbers, so the configuration behind them is
 unrecovered. On re-measurement `beam` lands within **0.007** of 065's mean while `search`
 is high by **0.12**, so the gain comes out at **+0.107**. Not width, not the `allowed`
 mask, not `branches` — all tested. Differences are to be taken against
-`tools/clutrr_recovery.py`'s own baseline.
+`tools/clutrr_recovery.py`'s own baseline, whose three-seed means are search **0.7810**
+and beam **0.8877**.
 
-### 713/713 is reached under partitioning — `note 081` companion
+### 713/713 is reached under partitioning, and the figure now has a run behind it — `note 105`
 
-**Model state:** 4 concept nodes, CLUTRR.
+    CONFIG  when    2026-07-30
+            source  note 105, and note 075 for the monolithic baseline
+            script  tools/clutrr_recovery.py --concept-nodes 4 --seeds 0 1 2
+            task    CLUTRR gen_train23_test2to10, kinship layout, chain recovery
+            model   width 64, decay 1.0, route current
+            knobs   concept_nodes 4 against 0, beam width 4, branches 4
+            scale   1146 puzzles, 3 seeds
 
-    4 concept nodes   0.9220
-    monolithic        0.8877
+    4 concept nodes   0.9220   713/713 at two seeds, 712/713 at the third
+    monolithic        0.8877   note 075's three-seed mean, same script
+
+`0.9220` was carried in the tree for a day citing `note 081`, **which contains no
+partitioning measurement at all** — the run existed and had never been written down. Re-run
+here it reproduces to four decimal places. Search gains too: **0.8089** against note 075's
+monolithic **0.7810**.
 
 ### The rendezvous, and its period — `note 102`
 
-**Model state:** CLUTRR, width 64, beam 4, branches 4, 3 seeds, 1,146 puzzles.
+    CONFIG  when    2026-07-30
+            source  note 102
+            script  tools/prune_period.py
+            task    CLUTRR, chain recovery
+            model   width 64
+            knobs   search_beam_width 4, branches 4, search_prune_every 1 to 5 and never
+            scale   1,146 puzzles, 3 seeds
 
     prune_every   recovery      sd     reads vs k=1
               1     0.8877  0.0305            1.00x
@@ -96,7 +136,13 @@ population uncapped between them, which is where the reads go.
 
 ### Round trips, batched — `note 100`, `note 101`
 
-**Model state:** `peer.py` `PROTOCOL` 3, loopback, priced at a 50 ms RTT.
+    CONFIG  when    2026-07-30
+            source  notes 100-101
+            script  tools/walk_rounds.py
+            task    a depth-10 beam walk
+            model   openplexus/peer.py at PROTOCOL 3, loopback
+            knobs   read_many batching on against off
+            scale   priced at an assumed 50 ms RTT
 
 A hop is **two dependent rounds** — follow, then look up what the follow decoded to — so a
 depth-10 beam is 20 rounds. Batching a hop's independent reads took depth 10 from
@@ -106,8 +152,13 @@ asked a peer the round before had already used.
 
 ### On `run()`'s own task — `note 103`, `g21-01`
 
-**Model state:** kinship, `hops=2`, width 256, 8 seeds, 32 cells. **Not CLUTRR, and not
-chain recovery** — the readout's answer.
+    CONFIG  when    2026-07-30
+            source  note 103, g21-01
+            script  experiments/g21_01_does_the_beam_pay_in_run.py
+            task    kinship, hops 2 -- NOT CLUTRR and NOT chain recovery
+            model   width 256, the readout's answer
+            knobs   search_beam_width 0 and 4, search_branches 4, search_prune_every 1 and 2
+            scale   32 cells, 8 seeds
 
     arm         overall            out-degree 1       out-degree >= 2
     walk        0.596 +/-0.018     0.702 +/-0.025     0.446 +/-0.010
@@ -123,7 +174,15 @@ reproducing g13-03's −0.054; `beam` recovers 0.692 there and gains +0.038 at o
 ≥ 2. Period 2 costs **−0.016 ±0.006** on this task — inside the 0.02 predicted, and 2.7 SE
 from zero.
 
-### Cost
+### What it costs
+
+    CONFIG  when    2026-07-28
+            source  decision 123
+            script  unrecorded
+            task    kinship
+            model   width unrecorded
+            knobs   search_beam_width 4
+            scale   unrecorded
 
 `width × branches × depth` reads, roughly 4× `search`. Unpruned it is `branches^depth` —
 a million walks at ten hops — so pruning is what makes the option exist at all. `123`

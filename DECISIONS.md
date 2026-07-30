@@ -352,25 +352,16 @@ lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
     at look=4 for a family of 6, so it must exceed the group
   - *measured in:* families, index purity **1.000**, cliff ~0.45 wide against
     within-family steps of ~0.01
-  - **`note 058`: real word co-occurrence has NO such cliff.** Largest gap **0.015**
-    against the synthetic task's **0.424** — 28× smaller — with every token's top
-    eight neighbours inside 0.02 of each other at ~0.96. A shuffled-text control
-    gives 0.002, so real text carries ~7× chance structure and ~1/28th of what the
-    task supplies. **So the crossover has a second clause: this needs purity ≳ 0.99
-    AND a bimodal profile, and one real dataset supplies neither**
-  - **The confound that mattered was tested and the finding held.** `ContentIndex`
-    has a `power` argument that down-weights common context and **defaults to off**,
-    with a docstring saying it is *"the one that moved `king` to `richard`"* — so the
-    first run measured real text with the mechanism for real text disabled. At
-    `power` 0.75 the largest gap goes 0.015 → **0.025**: a 67% improvement and still
-    **17× short**, with the profile shape unchanged. Centring is active and is not
-    the cause
-  - **A content-word slice buys another 2.4× and saturates**: rank 200-800,
-    400-1000 and 1000-2000 all land at 0.057–0.059, so **~7× short** is where it
-    settles and no confound accounts for it. **The shape is the real finding** — at
-    no setting does the profile become bimodal. Real neighbourhoods decay smoothly
-    in steps of 0.02–0.03; the task falls 0.45 in one. **A cliff rule needs a cliff
-    and language provides a slope**
+  - **`note 058`: REAL word co-occurrence has no such cliff, and the shape is the
+    finding.** Largest gap **0.059** against the task's **0.424** after four
+    confounds were closed — weighting on (`power` defaults to OFF and its docstring
+    calls it *"the one that moved `king` to `richard`"*), a content-word slice,
+    centring confirmed active, a shuffled control at 0.002. **At no setting does the
+    profile become bimodal:** real neighbourhoods decay in steps of 0.02–0.03 where
+    the task falls 0.45 in one. **A cliff rule needs a cliff and language provides a
+    slope**
+  - **So the crossover has a second clause:** this needs purity ≳ 0.99 **and** a
+    bimodal profile, and one real dataset supplies neither
 - 🔀 **Fixed `branches`** — the count supplied. `167`: the peak sits at
   `family_size − 1` in every row and collapses either side (1.000 → 0.500 → 0.083).
   - **`note 056`: this is a measured CROSSOVER, not a loser.** Degrading the
@@ -430,47 +421,28 @@ not gate anything above.**
 
 - ✅ **Template realiser** — `openplexus/render.py`, deterministic, dependency-free,
   **structurally incapable of adding a fact.** John's ruling: templates first.
-  - *no measurement* — it is not a mechanism with a number, it is the floor of the
-    ladder. What it contributes is a **bar**: `unfaithful()` returns the words in a
-    rendered sentence that came from neither the caller nor `FRAME`, and `FRAME` is
-    a fixed 25-word list a reader can check
-  - **The bar is written here first, where it is trivially true**, so a retrieval
-    realiser or a learned renderer has something to fail against later rather than
-    being graded on how well it reads. `content_words(render(...)) - FRAME` must
-    EQUAL the answer set — an equality, so dropping a value fails as well as
-    inventing one
-  - Two failure shapes are tested, not just a nonsense word: a hedge
-    (*"probably three"*) and a plausible completion (*"of the Arden household"*).
-    The second is the realistic one and reads perfectly
-  - An empty set **declines** rather than rendering a hole, which is the surface for
-    row C4 if anything ever earns it
-  - Mutation `the-faithfulness-check-forgives-everything` adds the rendered text's
-    own words to the allowed set, certifying any sentence as faithful. Every
-    invention test still reads through that function, so it would fail **only when
-    the check is finally load-bearing**
-- ✅ **Retrieval realiser** — `render.speak`. The words come from the CONCEPT MAP
-  rather than from the caller, so the model supplies its own vocabulary and `render`
-  arranges it. No new model, no next-token prediction, real words out.
-  - *no measurement* — like the template realiser it is a floor, not a mechanism
-    with a number. `Shared.surfaces` already existed and already stated the design
-    problem: *"which surface to use is a choice the concept itself does not
-    contain."* This is where that choice gets made rather than dodged
-  - **Two policies, and the default is arbitrary and says so.** Lowest token id is
-    deterministic and agrees across nodes, which is all a placeholder owes; most
-    frequent wins when counts are supplied. A connection test asserts supplying
-    counts MOVES the choice, or the second policy would be inert
-  - **Neither is the eventual answer:** once a concept has surfaces in more than one
-    modality the choice belongs to the QUERY — a question asked in pictures should be
-    answered in pictures — and nothing is multimodal, so that policy cannot yet be
-    written against anything
-  - `spoken_faithfully` is the bar one level down from `unfaithful`: that one asks
-    whether a WORD was invented, this asks whether a CONCEPT was. **Checked in both
-    directions**, because a realiser that dropped a concept passes any
-    invents-nothing test trivially. Mutation
-    `the-realiser-speaks-only-what-it-can-say-cheapest` removes the set equality,
-    certifying a realiser that speaks one concept of five — **under-reporting reads
-    as caution and scores as precision**, which is decision 165's asymmetry from the
-    other side
+  - *no measurement* — a floor, not a mechanism with a number. What it contributes
+    is a **bar**: `content_words(render(...)) - FRAME` must EQUAL the answer set, so
+    dropping a value fails as well as inventing one, and `FRAME` is a fixed 25-word
+    list a reader can check in full
+  - **Written where it is trivially true, so the rungs above have something to fail
+    against** rather than being graded on how well they read
+  - Empty set **declines** rather than rendering a hole — the surface for row C4 if
+    anything earns it
+- ✅ **Retrieval realiser** — `render.speak`. **The words come from the CONCEPT MAP,
+  not the caller**, so the model supplies its own vocabulary and `render` arranges
+  it. No new model, no next-token prediction.
+  - *no measurement*, same reason. `Shared.surfaces` already stated the design
+    problem — *"which surface to use is a choice the concept itself does not
+    contain"* — and this is where it gets made rather than dodged
+  - **The default policy is arbitrary and says so** (lowest token id: deterministic,
+    agrees across nodes); most frequent wins when counts are given, with a
+    connection test asserting counts MOVE the choice
+  - **Neither is the eventual answer:** with surfaces in several modalities the
+    choice belongs to the QUERY, and nothing is multimodal yet
+  - `spoken_faithfully` is the same bar one level down — whether a CONCEPT was
+    invented rather than a word — **checked in both directions**, because a realiser
+    that dropped a concept passes any invents-nothing test trivially
 - ⬜ **Small learned renderer trained on our own concept sets** — with a
   **faithfulness** test rather than an accuracy one: perturb the set and the text
   must move; hold the set and the text must contain nothing the set does not.

@@ -77,6 +77,14 @@ if hasattr(sys.stdout, "reconfigure"):
 #: The number moved once, with a reason, in a commit that says so. If it needs
 #: raising again, ask first whether confirmations have crept in: those belong in the
 #: log, and the coverage rule at the top of the tree says so.
+#:
+#: **That question was asked at 688 lines and the answer was yes**, so the budget was
+#: NOT raised a second time. What had crept in was process narration on the newest
+#: ✅ entries — which mutation guards which claim, how a check was made to fail, what
+#: was learned while building. All of it true, all of it already in the commit
+#: messages and the notes, none of it what a reader consults the tree for. Trimming
+#: three entries returned 28 lines. **The pressure worked as designed: it forced a
+#: read of the newest writing rather than the oldest.**
 MAX_LINES = 700
 
 CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED = "✅", "❌", "⬜", "🔀", "⏸"

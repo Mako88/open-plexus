@@ -136,6 +136,11 @@ and disagree about what is there. **The falsifier below cannot be built** — no
 exists in the tree — so this is the same failure shape at the transport instead.
 *measured in:* 3 in-process peers, width 64, 2 replicas.
 
+**FIXED same day:** the fingerprint now hashes the value table, `node_main` passes it, and
+the eight wrong answers are rejected while the sixteen right ones still succeed. Omitting it
+is distinct from supplying it, so the guard is not silently opt-in. **Replica count is still
+unfingerprinted.**
+
 **Open sub-question — codebook agreement across nodes.** Two nodes that quantise
 the same input differently write to different addresses and the memory fragments
 **with no node able to detect it locally.** `Merged` answers the MERGE direction; note
@@ -832,6 +837,12 @@ it has ever been re-litigated, which is the only thing the tree prevents.
   - **So `d_max` stays as the churn timeout and stops being quoted as a deadline on
     answers.** Depth results are reported in seconds against a stated budget, and until
     John states one, no depth is called a failure. **Revisit if interactive use returns.**
+- **STANDING PERMISSION TO FETCH BENCHMARK DATASETS — John, 2026-07-30.** Replaces
+  per-dataset approval, which cost real work: `g23-03` ran on already-approved graphs
+  rather than the benchmark that would have answered kill-list #3. **Scope: evaluation
+  data from its canonical public distribution — not code, models or weights.** Fetchers
+  pin the URL and verify size and sha256 (`fetch_clutrr.py`, `fetch_openea.py`); `data/`
+  stays gitignored, so CI needs a fetch step. Name the dataset and why in the commit.
 - **Explain plainly, keep the numbers, do not hide bad news.**
 - **Goal ordering:** AGI is primary; being an LLM replacement on consumer machines
   is secondary and must not compete with it.
@@ -843,9 +854,8 @@ it has ever been re-litigated, which is the only thing the tree prevents.
   instruction: *"keep a 5 minute monitor wakeup going as long as there is still a clear next
   step forward toward the goal, always focus on blocking/harder problems before simpler
   stuff, and make any decision necessary to move forward if I'm not around."*
-  - **The heartbeat is 5 minutes, and its stopping condition is the absence of a clear next
-    step** — not the absence of an answer, not the end of a task, and not the arrival of a
-    convenient pause. While one exists, the loop stays armed.
+  - **The heartbeat is 5 minutes and stops only when no clear next step exists** — not at
+    the end of a task and not at a convenient pause.
   - **MOST LIKELY TO DISPROVE THE PROJECT, FIRST — John's restatement, 2026-07-30.** This
     previously read *"blocking and harder first"*, and hard was a proxy for what he
     actually meant. **The ordering quantity is how likely a question is to show the whole
@@ -861,9 +871,8 @@ it has ever been re-litigated, which is the only thing the tree prevents.
     - It remains the counter to the gradient CLAUDE.md rule 17 names: every audit yields a
       satisfying provable result and every new mechanism most likely yields a null, so the
       easy work is always the work that feels productive. **Never order by what is ready.**
-  - **Decide, do not wait.** The existing blanket permission covered architectural calls;
-    this widens it to **any** decision needed to keep moving, with one boundary: it may not
-    countermand a goal or constraint already agreed. Record which calls were made alone.
+  - **Decide, do not wait** — any call needed to keep moving, short of countermanding an
+    agreed goal or constraint. Record which were made alone.
 - **Input and output is John's call** — his framing is that if the AGI goal wins,
   inputs should look like a body: a loop with consequences, not a passive feed.
 - **The endgame is undecided** — commercial, open source, or both — and John holds

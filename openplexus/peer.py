@@ -86,17 +86,31 @@ _ACK = b""
 _HELLO = struct.Struct("!16s")
 
 
-def fingerprint(keys, peers: int, seed: int) -> bytes:
+def fingerprint(keys, peers: int, seed: int, values=None) -> bytes:
     """What both sides must agree on, as sixteen bytes.
 
-    Covers the WIRE FORMAT (`PROTOCOL`), the ROUTING (peer count, ring seed) and the KEY
-    SOURCE (its seed, spread, width, start token, route and markers). A difference in any
-    of them sends a read somewhere the write never went, rebuilds a different key at the
-    same address, or misparses the request entirely.
+    Covers the WIRE FORMAT (`PROTOCOL`), the ROUTING (peer count, ring seed), the KEY
+    SOURCE (its seed, spread, width, start token, route and markers) and — when it is
+    given — the VALUE TABLE. A difference in any of them sends a read somewhere the write
+    never went, rebuilds a different key at the same address, misparses the request, or
+    returns a vector that decodes to the wrong token.
 
     Derived on each side from its own configuration rather than exchanged as data, so
     agreement means the configurations match rather than that one side was told what to
     claim.
+
+    **`values` exists because everything above it was not enough.** `g27-01` ran three
+    peers with one on a different MODEL seed: every read succeeded, nothing raised, mean
+    vector norm differed by 0.015, and **8 of 24 answers were silently wrong.** The key
+    source matched throughout — `node_main.derive` builds `PairKeys` with a fixed
+    `seed=1` and the value table from the model seed — so two peers agreed exactly about
+    WHERE to look and disagreed about WHAT IS THERE.
+
+    **Passing `values` is what checks that, and omitting it leaves the value space
+    unchecked.** It is optional only because callers that do not hold a value table
+    cannot supply one; `openplexus/node_main.py` holds one and passes it. The array's
+    bytes are hashed rather than a seed label, so divergence is caught however it arose
+    rather than only when someone mislabels it.
     """
     parts = [f"protocol={PROTOCOL}", f"peers={peers}", f"ring={seed}",
              f"keyseed={getattr(keys, 'seed', None)}",
@@ -106,6 +120,11 @@ def fingerprint(keys, peers: int, seed: int) -> bytes:
              f"start={getattr(keys, 'start', None)}",
              f"route={getattr(keys, 'route', 'current')}",
              f"markers={sorted(getattr(keys, 'markers', ()))}"]
+    if values is not None:
+        parts.append("values=" + hashlib.sha256(
+            np.ascontiguousarray(values, dtype=np.float64).tobytes()).hexdigest())
+    else:
+        parts.append("values=UNCHECKED")
     return hashlib.sha256("|".join(parts).encode()).digest()[:16]
 
 
@@ -118,13 +137,13 @@ class ConceptPeer:
     """
 
     def __init__(self, store, keys, host: str = "127.0.0.1", port: int = 0,
-                 peers: int = 1, seed: int = 0) -> None:
+                 peers: int = 1, seed: int = 0, values=None) -> None:
         self.store = store
         self.keys = keys
         #: What a caller must match. `peers` and `seed` are the RING's, which this peer
         #: does not use itself -- it serves whatever it is asked for -- but must agree
         #: about, or callers will ask the wrong peer and get zeros.
-        self.fingerprint = fingerprint(keys, peers, seed)
+        self.fingerprint = fingerprint(keys, peers, seed, values)
         #: Served counts, so a measurement reports what happened rather than what was
         #: intended.
         self.writes = 0
@@ -260,7 +279,7 @@ class RemoteConcepts:
     """
 
     def __init__(self, peers: dict[int, tuple[str, int]], width: int,
-                 keys, seed: int = 0, replicas: int = 3) -> None:
+                 keys, seed: int = 0, replicas: int = 3, values=None) -> None:
         """`peers` maps a NODE index to its address. Ownership is the ring's business.
 
         **`Ring`, not `concept % len(peers)`.** The modulo was a placeholder and it is
@@ -277,7 +296,7 @@ class RemoteConcepts:
         #: for the same reason it has one: John, 2026-07-29 -- *"when nodes drop you
         #: just lose concepts -- that doesn't sound like a very robust system."*
         self.replicas = replicas
-        self.fingerprint = fingerprint(keys, len(peers), seed)
+        self.fingerprint = fingerprint(keys, len(peers), seed, values)
         #: Reads that found no living holder, so an absence is COUNTED rather than
         #: quietly returned. Zeros decode to whatever the readout prefers, which is
         #: the silent-answer failure notes 086 and 096 are both about.

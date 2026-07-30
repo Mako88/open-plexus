@@ -221,8 +221,13 @@ def serve_peer(config: LocalMemoryConfig) -> int:
     facts = scaffold_facts(int(os.environ.get("OPENPLEXUS_FACTS", "24")), vocab)
     store, keys, held = populate(index, nodes, width, vocab, config.seed,
                                  ring_seed, replicas, facts)
+    # The VALUE table goes into the fingerprint, because `g27-01` measured that
+    # everything else agreeing is not enough: a peer on a different model seed
+    # answered every read, raised nothing, and 8 of 24 answers were silently
+    # wrong. Both sides derive this from the same seed, so it costs a hash.
+    values, _ = derive(width, vocab, config.seed)
 
-    peer = ConceptPeer(store, keys, host=os.environ.get("BIND_HOST", "0.0.0.0"),
+    peer = ConceptPeer(store, keys, values=values, host=os.environ.get("BIND_HOST", "0.0.0.0"),
                        port=port, peers=nodes, seed=ring_seed).start()
     print(f"peer {index}/{nodes} on port {peer.port}, "
           f"holding {held} of {len(facts)} facts at {replicas} replicas",

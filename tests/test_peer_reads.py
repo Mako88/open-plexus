@@ -640,3 +640,48 @@ class ThePeerIsListeningBeforeItIsStarted(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TheFingerprintCoversTheVALUETable(unittest.TestCase):
+    """`g27-01`: everything else agreeing was not enough.
+
+    Three peers with one on a different MODEL seed answered every read, raised
+    nothing, and **8 of 24 answers were silently wrong** — the key source matched
+    throughout, because `node_main.derive` builds `PairKeys` with a fixed seed and
+    the value table from the model seed. Two peers agreed about WHERE to look and
+    disagreed about WHAT IS THERE.
+    """
+
+    def _table(self, seed):
+        rng = np.random.default_rng(seed)
+        values = rng.normal(0.0, 1.0, (VOCAB, WIDTH))
+        return values / np.linalg.norm(values, axis=1, keepdims=True)
+
+    def test_the_same_value_table_agrees(self):
+        """The companion. Without it the mismatch test passes when nothing works."""
+        keys = PairKeys(seed=1, spread=1.0 / np.sqrt(WIDTH), width=WIDTH,
+                        start=VOCAB, route="first-concept", markers=frozenset({FACT}))
+        self.assertEqual(
+            peer_module.fingerprint(keys, NODES, RING_SEED, self._table(5)),
+            peer_module.fingerprint(keys, NODES, RING_SEED, self._table(5)))
+
+    def test_a_DIFFERENT_value_table_disagrees(self):
+        """The assertion that catches it. Identical keys, identical routing."""
+        keys = PairKeys(seed=1, spread=1.0 / np.sqrt(WIDTH), width=WIDTH,
+                        start=VOCAB, route="first-concept", markers=frozenset({FACT}))
+        self.assertNotEqual(
+            peer_module.fingerprint(keys, NODES, RING_SEED, self._table(5)),
+            peer_module.fingerprint(keys, NODES, RING_SEED, self._table(99)))
+
+    def test_omitting_the_table_is_DISTINCT_from_supplying_one(self):
+        """A caller that checks the value space must not match one that does not.
+
+        Otherwise the guard is opt-in in the worst way: an old peer and a new one
+        would agree, and the old one's value space would go unchecked while both
+        believed they had verified each other.
+        """
+        keys = PairKeys(seed=1, spread=1.0 / np.sqrt(WIDTH), width=WIDTH,
+                        start=VOCAB, route="first-concept", markers=frozenset({FACT}))
+        self.assertNotEqual(
+            peer_module.fingerprint(keys, NODES, RING_SEED, None),
+            peer_module.fingerprint(keys, NODES, RING_SEED, self._table(5)))

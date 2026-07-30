@@ -236,3 +236,34 @@ saying so. Replica count is also unfingerprinted and untested.
 **Scope:** this is the transport layer, not `DECISIONS.md` component 1's quantiser
 question, whose falsifier **cannot be built** because no quantiser exists in the tree. Same
 failure shape one level down.
+
+### The gap is closed: the fingerprint now covers the VALUE table
+
+    CONFIG  when    2026-07-30
+            source  g27-01, and openplexus/peer.py fingerprint
+            script  tests/test_peer_reads.py
+                    TheFingerprintCoversTheVALUETable
+            task    same 24-fact probe, one peer on model seed 99
+            model   3 peers + asker, width 64, 2 replicas
+            knobs   values passed to fingerprint against omitted
+            scale   24 reads per arm
+
+    arm                    reads ok   REJECTED
+    MATCHED  seeds 5,5,5         24          0
+    DIVERGED seeds 5,5,99        16          8
+
+**Exactly the eight answers that were silently wrong are now rejected**, and the sixteen
+that route to matched peers still succeed — the guard fires on the diverged peer and
+nowhere else.
+
+**The array's bytes are hashed rather than a seed label**, so divergence is caught however
+it arose rather than only when someone mislabels it. `node_main.serve_peer` passes the
+table it already derives, so the deployed path is covered.
+
+**Omitting `values` is DISTINCT from supplying it**, asserted by test. Otherwise the guard
+would be opt-in in the worst way: a caller that checks the value space and one that does
+not would agree, and both would believe they had verified each other.
+
+Mutation `the-fingerprint-ignores-the-VALUE-table`, caught. **Replica count is still not
+fingerprinted** and remains untested — `g27-01` P4 guessed that gap and found this one
+instead.

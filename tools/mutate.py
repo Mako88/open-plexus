@@ -2221,6 +2221,18 @@ MUTATIONS = [
         new="        if index == ring.owner(concept):",
     ),
     Mutation(
+        name="the-fingerprint-ignores-the-VALUE-table",
+        breaks="the guard g27-01 exists for. Everything else agreeing was not "
+               "enough: three peers with one on a different MODEL seed answered "
+               "every read, raised nothing, and 8 of 24 answers were SILENTLY "
+               "wrong, because the key source matched throughout while the value "
+               "table did not. With this applied, two peers agree about where to "
+               "look and disagree about what is there, and nothing objects",
+        path=PEER,
+        old='        parts.append("values=" + hashlib.sha256(',
+        new='        parts.append("values=IGNORED" + "" * len(hashlib.sha256(',
+    ),
+    Mutation(
         name="the-held-out-rule-trains-the-representation",
         breaks="the only thing separating a result from an artefact here. Note "
                "070 reported 0.223 on a random-quarter holdout and note 088 then "

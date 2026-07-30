@@ -165,6 +165,26 @@ def record_problems(relative: str, text: str) -> list[str]:
                 f'{relative} header does not say "{expected}", so a reader who '
                 f"opens it cold cannot tell it from a status document.")
 
+    # Records cross-link each other -- a refutation points at what replaced it, a
+    # ceiling points at what closed it. `check_options` already checks the tree's links
+    # into this directory; nothing checked the links WITHIN it, and during the migration
+    # three records referenced a sibling that did not exist yet. All three were written
+    # before their target and all three happened to get written -- which is luck, and the
+    # failure mode is a reader following a link to nothing and concluding the history is
+    # elsewhere when it is nowhere.
+    # `docs/options/x.md` written from INSIDE docs/options resolves to
+    # docs/options/docs/options/x.md, so a repo-root path is broken here even though it
+    # looks right. The first version of this check used a slash-free pattern and skipped
+    # exactly that case, which is the one instance of it in the directory -- a check
+    # whose pattern excludes the broken form finds nothing and reports success.
+    for target in re.findall(r"\]\((?!https?:|\.\./)([A-Za-z0-9._/-]+\.md)\)", body):
+        if not (OPTIONS / target).exists():
+            problems.append(
+                f"{relative} links {target}, which is not a record in this directory. "
+                f"A dangling cross-link reads as 'the rest of the story is over there' "
+                f"when there is no there. Sibling records are linked by BARE FILENAME: "
+                f"a `docs/options/` prefix is relative to this directory, not the repo.")
+
     for heading, entry in config_blocks(text):
         if not re.search(r"^\s+CONFIG\s", entry, re.MULTILINE):
             problems.append(

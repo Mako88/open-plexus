@@ -111,3 +111,29 @@ figure `0.9220`, carried in `DECISIONS.md` as the accuracy case for concept part
 appears in no note, sweep or script output anywhere in the repository — and the two notes
 that quote it credit two different sources and pair it with two different baselines.
 `note 105` is what came of that.
+
+---
+
+## WHAT A GREEN RUN DOES NOT MEAN
+
+Stated here because the checks are convincing enough to be over-read, and an over-read
+check is worse than none — it converts an open question into a settled one for free.
+
+**Every number present is sourced. Nothing verifies a number that should be here is not
+MISSING.** The asymmetry is total: a false claim is caught, an omission is invisible.
+These 85 records were compressed out of 105 archived notes in a single pass on
+2026-07-30, and **the compression judgement — what was carried forward against what was
+left in the archive — has been reviewed by nobody.** It is recoverable, because nothing
+was deleted and every citation resolves, but recoverable is not the same as checked.
+
+**A number can also be attached to the wrong claim and still pass**, since the checker
+asks whether a figure exists in the source, not whether it means what the sentence says.
+A figure transposed between two rows of one table is invisible to it.
+
+**And nothing checks the `What exists` section against the code.** If a config field or a
+class is renamed, the record goes stale silently. The `script` field's paths *are*
+checked — that caught three wrong filenames during the migration — but the file list is
+prose.
+
+The honest summary: these checks catch **citation** failures, which is one class, and it
+is the class that had cost this project the most. They are a net, not a wall.

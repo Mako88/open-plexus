@@ -115,6 +115,26 @@ class TheConfigCheckBites(unittest.TestCase):
             "a status marker in a short record passed, which means the header exemption "
             "is swallowing the whole file again")
 
+    def test_a_dangling_cross_link_is_caught(self):
+        """Records point at each other — a refutation names what replaced it. Nothing
+        checked those until 2026-07-30, and three were written before their target
+        existed. All three happened to get written, which is luck rather than a system.
+
+        The pattern matters as much as the check. Its first version excluded links
+        containing a slash, and the ONE broken link in the directory was
+        `](docs/options/x.md)` written from inside `docs/options` — a repo-root path
+        that resolves to `docs/options/docs/options/x.md`. A pattern that cannot express
+        the broken form reports success over it."""
+        for target, why in [("no-such-record.md", "a target that does not exist"),
+                            ("docs/options/by-concept.md", "a repo-root path")]:
+            with self.subTest(link=target):
+                broken = GOOD.replace("It came back 0.500.",
+                                      f"It came back 0.500. See [x]({target}).")
+                self.assertTrue(
+                    any("dangling cross-link" in p or "not a record" in p
+                        for p in record_problems("broken.md", broken)),
+                    f"{why} passed as a working link")
+
     def test_a_status_in_prose_is_caught(self):
         broken = GOOD.replace("It came back 0.500.", "It came back 0.500 and this is "
                                                      "what we use.")

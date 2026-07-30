@@ -45,7 +45,7 @@ So what was measured was address density, which is a capacity knob, not concept 
 **Text is nothing but exceptions.** Every word has its own continuations, so every grouped
 address holds a dozen competing values, and the majority-wins behaviour that makes concept
 addressing work on families is exactly what destroys it on text. Record:
-[by-concept.md](docs/options/by-concept.md).
+[by-concept.md](by-concept.md).
 
 **Revival:** a text objective that is not next-token, since the exception density is a
 property of the target rather than of the medium. Record:

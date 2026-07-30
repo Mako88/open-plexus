@@ -1963,6 +1963,30 @@ MUTATIONS = [
         new="    return _reader(readable, retrieval, keys)",
     ),
     Mutation(
+        name="a-read-gives-up-on-the-owner",
+        breaks="C3. `Ring.holders` walks clockwise for distinct peers precisely so "
+               "*nothing has to move on a failure -- the remaining replicas are "
+               "already there and already warm*. Asking only the owner throws that "
+               "away: every departure becomes a lost concept even though the data is "
+               "sitting on the next peer, and the read returns ZEROS, which decode to "
+               "whatever the readout prefers",
+        path=PEER,
+        old="        for node in self.holders(concept):",
+        new="        for node in self.holders(concept)[:1]:",
+    ),
+    Mutation(
+        name="an-absent-read-is-not-counted",
+        breaks="the only thing that stops zeros being an answer. `ConceptStore.read` "
+               "calls them *an honest absence rather than a degraded answer*, and a "
+               "zero vector still decodes to whichever token the readout prefers -- so "
+               "the COUNT is what separates absence from a confident wrong answer. "
+               "Same class as note 086's vacuous exactness check, which passed while a "
+               "node served a different model entirely",
+        path=PEER,
+        old="        self.absent += 1",
+        new="        pass",
+    ),
+    Mutation(
         name="a-config-mismatch-is-served-anyway",
         breaks="the handshake that stops note 086's failure class recurring. A caller "
                "routing by a different ring, or building keys from a different seed, "

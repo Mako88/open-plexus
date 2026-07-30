@@ -168,7 +168,7 @@ class RemoteConcepts:
     """
 
     def __init__(self, peers: dict[int, tuple[str, int]], width: int,
-                 keys, seed: int = 0) -> None:
+                 keys, seed: int = 0, replicas: int = 3) -> None:
         """`peers` maps a NODE index to its address. Ownership is the ring's business.
 
         **`Ring`, not `concept % len(peers)`.** The modulo was a placeholder and it is
@@ -181,7 +181,15 @@ class RemoteConcepts:
         self.width = width
         self.keys = keys
         self.ring = Ring(len(peers), seed=seed)
+        #: How many distinct peers hold each concept. Matches `ConceptStore`'s default
+        #: for the same reason it has one: John, 2026-07-29 -- *"when nodes drop you
+        #: just lose concepts -- that doesn't sound like a very robust system."*
+        self.replicas = replicas
         self.fingerprint = fingerprint(keys, len(peers), seed)
+        #: Reads that found no living holder, so an absence is COUNTED rather than
+        #: quietly returned. Zeros decode to whatever the readout prefers, which is
+        #: the silent-answer failure notes 086 and 096 are both about.
+        self.absent = 0
         self._connections: dict[int, socket.socket] = {}
         #: Reads served, so a measurement can count messages rather than assume them.
         self.reads = 0
@@ -211,12 +219,49 @@ class RemoteConcepts:
         makes the routing need no coordinator."""
         return self.ring.owner(concept)
 
+    def holders(self, concept: int) -> list[int]:
+        """Every peer holding `concept`, owner first.
+
+        `Ring.holders` walks clockwise for DISTINCT peers, so a departure needs no
+        data movement: *"the remaining replicas are already there and already warm."*
+        """
+        return self.ring.holders(concept, self.replicas)
+
     def read(self, concept: int, previous: int, token: int) -> np.ndarray:
-        connection = self._connection(self.owner(concept))
-        send(connection, _REQUEST.pack(concept, previous, token))
-        payload = receive(connection)
-        self.reads += 1
-        return np.frombuffer(payload, dtype=">f8").astype(float)
+        """Ask the owner; on a dead peer, ask the next holder.
+
+        **A departure costs a round trip, not the answer.** C3 says peers come and go,
+        and asking only the owner makes every departure a lost concept even though the
+        replicas already hold it.
+
+        Returns zeros when no holder answers, matching `ConceptStore.read` -- *"an
+        honest absence rather than a degraded answer"* -- and increments `absent`, so
+        the absence is counted. An uncounted zero vector decodes to whatever the readout
+        prefers and reads as an answer.
+        """
+        for node in self.holders(concept):
+            try:
+                connection = self._connection(node)
+                send(connection, _REQUEST.pack(concept, previous, token))
+                payload = receive(connection)
+            except (ConnectionError, OSError, ValueError) as failure:
+                if isinstance(failure, ValueError):
+                    raise      # a fingerprint mismatch is a config fault, not churn
+                self._drop(node)
+                continue
+            self.reads += 1
+            return np.frombuffer(payload, dtype=">f8").astype(float)
+        self.absent += 1
+        return np.zeros(self.width)
+
+    def _drop(self, node: int) -> None:
+        """Forget a peer's socket so a later read reconnects rather than reusing it."""
+        stale = self._connections.pop(node, None)
+        if stale is not None:
+            try:
+                stale.close()
+            except OSError:
+                pass
 
     def close(self) -> None:
         for connection in self._connections.values():

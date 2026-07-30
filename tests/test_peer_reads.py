@@ -31,7 +31,11 @@ from openplexus.ownership import Ring
 from openplexus.partitioned import ConceptStore
 from openplexus.peer import ConceptPeer, RemoteConcepts
 
-WIDTH, VOCAB, NODES = 64, 40, 4
+WIDTH, VOCAB, NODES = 64, 40, 5
+#: Fewer replicas than peers, so a misroute has somewhere to go that genuinely lacks
+#: the data. At `replicas == NODES` every peer holds everything and no misroute is
+#: possible, which would make the control below vacuous rather than strict.
+REPLICAS = 2
 FACT = 0
 #: Writer and reader must agree on who owns what, and they agree by using the SAME
 #: ring parameters rather than by coordinating. `RemoteConcepts` builds `Ring(len(peers),
@@ -56,8 +60,12 @@ def fixture():
     ring = Ring(NODES, seed=RING_SEED)
     for entity, relation, obj in FACTS:
         concept = keys.owner(entity, relation)
-        stores[ring.owner(concept)].write(concept, keys.pair(entity, relation),
-                                          values[obj])
+        # EVERY holder, not just the owner. `ConceptStore.write` fans out for the same
+        # reason: *"a departure needs no data movement at all -- the survivors already
+        # hold it"*. Writing to the owner alone makes every departure a lost concept
+        # and leaves the replica fallback nothing to find.
+        for node in ring.holders(concept, REPLICAS):
+            stores[node].write(concept, keys.pair(entity, relation), values[obj])
     return values, keys, stores
 
 
@@ -70,7 +78,7 @@ class APeerServesTheConceptsItOwns(unittest.TestCase):
                       for i in range(NODES)]
         self.remote = RemoteConcepts(
             {i: ("127.0.0.1", self.peers[i].port) for i in range(NODES)},
-            WIDTH, self.keys, seed=RING_SEED)
+            WIDTH, self.keys, seed=RING_SEED, replicas=REPLICAS)
 
     def tearDown(self):
         self.remote.close()
@@ -104,20 +112,27 @@ class APeerServesTheConceptsItOwns(unittest.TestCase):
             self.assertEqual(int(np.argmax(self.values @ got)), obj)
 
     def _elsewhere(self, concept: int) -> int:
-        """A concept the ring sends to a DIFFERENT peer.
+        """A concept whose HOLDERS are disjoint from this one's.
 
-        `concept + 1` was the first version and it stopped being a misroute the moment
-        the modulo placeholder became a ring: consistent hashing puts adjacent concepts
-        on the same peer most of the time, so three of twenty-four "misrouted" reads
-        went to the right peer and matched. **A control has to be expressed in the
-        quantity it is controlling** — the peer — not in an arithmetic that happened to
-        change it.
+        Twice weakened and twice strengthened, which is worth recording in the fixture
+        rather than only in a note:
+
+        1. `concept + 1` while routing was `concept % peers`. Fine then.
+        2. Consistent hashing puts adjacent concepts on the same peer most of the time,
+           so `+1` stopped being a misroute and three of twenty-four reads matched.
+           Fixed by requiring a different OWNER.
+        3. A read now tries every HOLDER, so a different owner is not enough — the
+           holder sets overlap, and a misrouted read reaches the right peer anyway.
+
+        **A control has to exclude every route to the answer, not just the first one.**
         """
-        mine = self.remote.owner(concept)
-        for offset in range(1, 1000):
-            if self.remote.owner(concept + offset) != mine:
+        mine = set(self.remote.holders(concept))
+        for offset in range(1, 5000):
+            if not (mine & set(self.remote.holders(concept + offset))):
                 return concept + offset
-        raise AssertionError("the ring sends every concept to one peer")
+        raise AssertionError(
+            "no concept has holders disjoint from this one, so no misroute exists "
+            "and the control cannot be written -- lower REPLICAS or raise NODES")
 
     def test_MISROUTING_breaks_it(self):
         """The control. Without this, `owner()` could be the identity and every
@@ -181,7 +196,7 @@ class ABeamTraversalRunsWithoutADriver(unittest.TestCase):
                       for i in range(NODES)]
         self.remote = RemoteConcepts(
             {i: ("127.0.0.1", self.peers[i].port) for i in range(NODES)},
-            WIDTH, self.keys, seed=RING_SEED)
+            WIDTH, self.keys, seed=RING_SEED, replicas=REPLICAS)
 
     def tearDown(self):
         self.remote.close()
@@ -209,14 +224,76 @@ class ABeamTraversalRunsWithoutADriver(unittest.TestCase):
     def test_MISROUTING_changes_the_walk(self):
         """So the routing is what produces it, not the fixture."""
         def misrouted(previous, token):
-            # A DIFFERENT PEER, not a different concept: with a ring, adjacent
-            # concepts usually share an owner, so `+1` is often not a misroute.
+            # Disjoint HOLDERS, not merely a different owner: a read tries every
+            # holder, so overlapping sets let a "misroute" reach the answer.
             concept = self.keys.owner(previous, token)
-            mine = self.remote.owner(concept)
-            other = next(concept + k for k in range(1, 1000)
-                         if self.remote.owner(concept + k) != mine)
+            mine = set(self.remote.holders(concept))
+            other = next(concept + k for k in range(1, 5000)
+                         if not (mine & set(self.remote.holders(concept + k))))
             return self.remote.read(other, previous, token)
         self.assertNotEqual(self._walk(misrouted), self._walk(None))
+
+
+class ADepartureCostsARoundTripNotTheAnswer(unittest.TestCase):
+    """C3: peers come and go. A vanished owner must not be a lost concept.
+
+    `Ring.holders` walks clockwise for distinct peers precisely so *"nothing has to move
+    on a failure -- the remaining replicas are already there and already warm"*. Asking
+    only the owner throws that away.
+    """
+
+    def setUp(self):
+        self.values, self.keys, self.stores = fixture()
+        self.peers = [ConceptPeer(self.stores[i], self.keys, peers=NODES,
+                                  seed=RING_SEED).start()
+                      for i in range(NODES)]
+        self.remote = RemoteConcepts(
+            {i: ("127.0.0.1", self.peers[i].port) for i in range(NODES)},
+            WIDTH, self.keys, seed=RING_SEED, replicas=REPLICAS)
+
+    def tearDown(self):
+        self.remote.close()
+        for peer in self.peers:
+            peer.close()
+
+    def _one_fact_with_two_holders(self):
+        for entity, relation, obj in FACTS:
+            concept = self.keys.owner(entity, relation)
+            if len(self.remote.holders(concept)) >= 2:
+                return entity, relation, obj, concept
+        raise AssertionError("no fact has a replica, so there is nothing to fail over to")
+
+    def test_the_answer_survives_the_owner_vanishing(self):
+        entity, relation, obj, concept = self._one_fact_with_two_holders()
+        self.assertEqual(
+            int(np.argmax(self.values @ self.remote.read(concept, entity, relation))),
+            obj, "the fact must be readable before anything is killed")
+
+        owner = self.remote.holders(concept)[0]
+        self.peers[owner].close()
+        self.remote._drop(owner)
+
+        got = self.remote.read(concept, entity, relation)
+        self.assertEqual(int(np.argmax(self.values @ got)), obj,
+                         "the owner vanished and the replica did not answer, so a "
+                         "departure cost the concept rather than a round trip")
+
+    def test_losing_EVERY_holder_is_a_counted_absence(self):
+        """Zeros are honest only if something counts them.
+
+        `ConceptStore.read` returns zeros when every holder has gone — *"an honest
+        absence rather than a degraded answer"* — and a zero vector still decodes to
+        whichever token the readout prefers. So the count is what stops it being an
+        answer.
+        """
+        entity, relation, _, concept = self._one_fact_with_two_holders()
+        for node in self.remote.holders(concept):
+            self.peers[node].close()
+            self.remote._drop(node)
+        before = self.remote.absent
+        got = self.remote.read(concept, entity, relation)
+        np.testing.assert_allclose(got, np.zeros(WIDTH))
+        self.assertEqual(self.remote.absent, before + 1)
 
 
 class AConfigMismatchIsRefusedRatherThanServed(unittest.TestCase):
@@ -240,7 +317,7 @@ class AConfigMismatchIsRefusedRatherThanServed(unittest.TestCase):
             peer.close()
 
     def test_a_matching_caller_is_served(self):
-        remote = RemoteConcepts(self.where, WIDTH, self.keys, seed=RING_SEED)
+        remote = RemoteConcepts(self.where, WIDTH, self.keys, seed=RING_SEED, replicas=REPLICAS)
         try:
             entity, relation, obj = FACTS[0]
             got = remote.read(self.keys.owner(entity, relation), entity, relation)
@@ -262,7 +339,8 @@ class AConfigMismatchIsRefusedRatherThanServed(unittest.TestCase):
         other = PairKeys(seed=self.keys.seed + 1, spread=self.keys.spread,
                          width=WIDTH, start=VOCAB, route="first-concept",
                          markers=frozenset({FACT}))
-        remote = RemoteConcepts(self.where, WIDTH, other, seed=RING_SEED)
+        remote = RemoteConcepts(self.where, WIDTH, other, seed=RING_SEED,
+                                replicas=REPLICAS)
         try:
             entity, relation, _ = FACTS[0]
             with self.assertRaises(ValueError):
@@ -276,7 +354,8 @@ class AConfigMismatchIsRefusedRatherThanServed(unittest.TestCase):
         other = PairKeys(seed=self.keys.seed, spread=self.keys.spread,
                          width=WIDTH, start=VOCAB, route="current",
                          markers=frozenset({FACT}))
-        remote = RemoteConcepts(self.where, WIDTH, other, seed=RING_SEED)
+        remote = RemoteConcepts(self.where, WIDTH, other, seed=RING_SEED,
+                                replicas=REPLICAS)
         try:
             with self.assertRaises(ValueError):
                 remote.read(0, FACTS[0][0], FACTS[0][1])

@@ -88,3 +88,37 @@ mechanism question is open and this note deliberately does not touch it.**
 **And one seed.** Rule 3 says reproduce before believing, so the floor is a bound to
 re-measure rather than a constant. The 0.500 at n=38 in particular is one cell of
 thirty-eight rows on one seed.
+
+---
+
+## CORRECTION, same day: reproduced at three seeds, and point 2 above is wrong
+
+    hops=1 floor, test-plain, 3 seeds
+
+    layout    mean      per-hop 2..10
+    closure   0.0856    0.50 0.14 0.01 0.05 0.08 0.21 0.00 0.07 0.03
+                        1.00 0.00 0.05 0.01 0.05 0.05 0.05 0.04 0.16
+                        0.50 0.14 0.02 0.04 0.03 0.07 0.03 0.07 0.06
+    kinship   0.0365    0.50 0.00 0.05 0.03 0.00 0.05 0.07 0.07 0.00
+                        0.50 0.00 0.00 0.02 0.06 0.02 0.00 0.02 0.00
+                        0.00 0.00 0.00 0.00 0.03 0.02 0.02 0.11 0.00
+
+**The two-hop cell is not a bar; it is noise.** Point 2 said a composing mechanism
+"has to beat 0.500" there. Across three seeds the cell reads 0.50, 1.00, 0.50 under
+`closure` and 0.50, 0.50, 0.00 under `kinship` — 38 rows, so each is 19 or 38 items and
+one extra hit moves it 0.026. **The 1.00 is 38 of 38, which is exactly the flattering
+accident the same point warned about**, and it arrived in the very next run.
+
+Rule 3 caught this at the cost of two extra seeds. Point 2 is withdrawn: **report the
+2- and 3-hop cells, do not gate anything on them.** Points 1, 3 and 4 stand.
+
+**And the floor depends on the LAYOUT, which point 4's cost estimate did not
+anticipate.** `closure` writes `key(s, o) -> r`, so a query pair that *was* stated
+reads its answer directly — the floor is partly leaked recall. `kinship` never writes
+that address, so its floor is **0.0365, below chance**, and a non-composing model gets
+essentially nothing.
+
+> **A lower floor is the better instrument.** More headroom, and no depth-conditioned
+> prior to mistake for reasoning. That is a second, independent reason to prefer
+> `kinship` alongside the 4.7x collision reduction — and it was not the reason the
+> layout was chosen, which is worth saying so it is not read as post-hoc support.

@@ -84,6 +84,69 @@ class TheLayoutIsTheOneThatAlreadyWorks(unittest.TestCase):
                              cfg.relation_base + RELATIONS.index("aunt"))
 
 
+class TheLayoutDecidesWhichAddressesCollide(unittest.TestCase):
+    """`kinship` exists because it collides on 7.7% of test where `closure` hits 35.9%.
+
+    Decision 157's mechanism on someone else's data: keying `(entity, relation)`
+    separates a repeated entity's edges when their relations differ. Note 059 found
+    the repeated-entity case is 38% of test and **absent from training**, so it is the
+    confound most likely to be mistaken for depth.
+    """
+
+    #: One entity as the subject of two edges with DIFFERENT relations. Under
+    #: `closure` both write to `key(FACT, e0)`; under `kinship` they write to
+    #: `key(e0, father)` and `key(e0, sister)`.
+    SHARED = ([(0, 1), (0, 2)], ["father", "sister"], (1, 2), "sister")
+
+    def rows(self, layout, directory):
+        cfg = write([self.SHARED], pathlib.Path(directory))
+        cfg = ClutrrConfig(root=cfg.root, config="cfg", split="test",
+                           layout=layout)
+        return load(cfg)[0], cfg
+
+    def test_kinship_puts_the_relation_before_the_object(self):
+        with tempfile.TemporaryDirectory() as directory:
+            p, cfg = self.rows("kinship", directory)
+            e0 = cfg.entity_base
+            father = cfg.relation_base + RELATIONS.index("father")
+            self.assertEqual(p.tokens[:4], (FACT, e0, father, e0 + 1))
+
+    def test_closure_puts_the_object_before_the_relation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            p, cfg = self.rows("closure", directory)
+            e0 = cfg.entity_base
+            father = cfg.relation_base + RELATIONS.index("father")
+            self.assertEqual(p.tokens[:4], (FACT, e0, e0 + 1, father))
+
+    def test_the_two_layouts_disagree(self):
+        # Stated separately: if both produced the same stream the option would be
+        # inert and every claim about the collision rate would be about nothing.
+        with tempfile.TemporaryDirectory() as directory:
+            k, _ = self.rows("kinship", directory)
+            c, _ = self.rows("closure", directory)
+            self.assertNotEqual(k.tokens, c.tokens)
+            self.assertEqual(len(k.tokens), len(c.tokens))
+
+    def test_both_carry_the_same_answer_and_query(self):
+        # The layout changes addressing, not the question. If it changed the target
+        # the two arms would not be comparable.
+        with tempfile.TemporaryDirectory() as directory:
+            k, _ = self.rows("kinship", directory)
+            c, _ = self.rows("closure", directory)
+            self.assertEqual(k.target, c.target)
+            self.assertEqual(k.tokens[k.query_position],
+                             c.tokens[c.query_position])
+
+    def test_an_unknown_layout_is_refused(self):
+        with self.assertRaises(ValueError):
+            ClutrrConfig(root=REAL, split="test", layout="clsoure")
+
+    def test_closure_is_still_the_default(self):
+        # Note 060's floor was measured with `closure`, and a default that moved
+        # under a recorded number is decision 74's failure.
+        self.assertEqual(ClutrrConfig(root=REAL).layout, "closure")
+
+
 class TheGraphsAreNotPaths(unittest.TestCase):
     """433 of 10,220 revisit a node. An `(i, i+1)` assumption mis-reads them."""
 

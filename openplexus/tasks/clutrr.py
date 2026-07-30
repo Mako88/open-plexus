@@ -114,11 +114,43 @@ class ClutrrConfig:
     config: str = "gen_train23_test2to10"
     split: str = "test"
     max_entities: int = 11
+    #: Which token ordering, and it decides which traversal is possible at all.
+    #:
+    #:     "closure"  FACT s o r  ->  key(FACT, s) -> o  and  key(s, o) -> r
+    #:     "kinship"  FACT s r o  ->  key(FACT, s) -> r  and  key(s, r) -> o
+    #:
+    #: **Measured on this test split, and the reason `kinship` exists:**
+    #:
+    #:     closure collides -- an entity is SUBJECT of >1 edge      411 rows (35.9%)
+    #:     kinship collides -- the same (entity, relation) twice     88 rows ( 7.7%)
+    #:
+    #: A 4.7x reduction, and it is decision 157's mechanism confirmed on someone
+    #: else's data: typing the address separates a repeated entity's edges. 311 rows
+    #: collide under `closure` and not at all under `kinship`. That matters because
+    #: note 059 found the repeated-entity case is 38% of test and **absent from
+    #: training**, so it is the confound most likely to be mistaken for depth.
+    #:
+    #: `kinship` also makes `openplexus/search.py` applicable — `walk_from` reads
+    #: `key(entity, relation)` and `key(FACT, entity)`, which is this ordering — so
+    #: the traversal becomes reuse of a proved mechanism (123, 125, 130) rather than
+    #: new work.
+    #:
+    #: **What `closure` was for, and why it lost.** It puts the answer at
+    #: `key(s, o)`, so a query reads it directly. That is right at ONE hop and CLUTRR
+    #: tests two through ten, so the advantage was for the case the benchmark does not
+    #: test. Kept under rule 14c: it is the measured comparison, and note 060's floor
+    #: was taken with it.
+    layout: str = "closure"
 
     def __post_init__(self) -> None:
         if self.split not in ("train", "validation", "test"):
             raise ValueError(
                 f"split must be train, validation or test, got {self.split!r}")
+        if self.layout not in ("closure", "kinship"):
+            raise ValueError(
+                f"layout must be 'closure' or 'kinship', got {self.layout!r}. An "
+                f"unknown string would have to fall through to one of them, and a "
+                f"typo would then be measured as the ordering nobody chose")
         if self.max_entities < 3:
             raise ValueError(
                 "a two-hop chain needs three entities, so fewer than three "
@@ -222,8 +254,15 @@ def load(config: ClutrrConfig) -> list[Puzzle]:
                     f"{config.max_entities}")
             tokens: list[int] = []
             for (left, right), name in zip(edges, types):
-                tokens.extend((FACT, ids[left], ids[right],
-                               config.relation_base + _RELATION_ID[name]))
+                relation = config.relation_base + _RELATION_ID[name]
+                if config.layout == "kinship":
+                    # FACT s r o. key(FACT, s) -> r and key(s, r) -> o, so a repeated
+                    # entity's edges land at DIFFERENT addresses when their relations
+                    # differ -- 35.9% of test rows collide under `closure` and 7.7%
+                    # here.
+                    tokens.extend((FACT, ids[left], relation, ids[right]))
+                else:
+                    tokens.extend((FACT, ids[left], ids[right], relation))
             tokens.append(QUERY)
             tokens.append(ids[query[0]])
             position = len(tokens)

@@ -648,27 +648,35 @@ that is the standing weakness.**
     `max_appearances = 2` subset (713 rows) is the honest primary arm
   - Six target relations — `nephew`, `niece`, and four in-laws — **never appear as an
     edge**, so the answer space is larger than the input vocabulary
-  - **`openplexus/tasks/clutrr.py` is the loader, dependency-free.** CLUTRR turns out
-    to be natively `closure.py`-shaped — `FACT s o r` then `QUERY s o`, the relation
-    as the value and the entity pair as the address, which is the binding `107` said
-    the relational task needed and could not form. Nothing was bent to fit
-  - **The relation vocabulary is FIXED, not read from the file**, so train and test
-    share token ids; deriving them per split is an error that produces numbers and no
-    exception. Graphs are read as general edge lists because **433 are walks that
-    revisit a node**, and `max_appearances` is computed per puzzle so `note 059`'s
-    split can be reported. Mutation `a-revisited-entity-gets-a-fresh-slot` renumbers
-    per edge instead of per node — which would make the hard 433 quietly easy and
-    CLUTRR's score come out HIGH for no reason involving the model
+  - **`openplexus/tasks/clutrr.py` is the loader, dependency-free.** The relation
+    vocabulary is **fixed, not read from the file**, so train and test share token
+    ids — deriving per split produces numbers and no exception. Graphs are general
+    edge lists because **433 are walks that revisit a node**, and `max_appearances`
+    is computed per puzzle so 059's split is reportable. Mutation
+    `a-revisited-entity-gets-a-fresh-slot` renumbers per edge, which would make the
+    hard 433 quietly easy and CLUTRR's score come out HIGH for no model reason
   - **`note 060`: the FLOOR is measured and it is not chance.** A `hops=1` model —
-    composition off, so prior plus direct recall only — scores **0.0898** overall on
-    the plain subset and **0.500 at two hops**, against chance 0.0500 and a
-    majority-class baseline of 0.0421 (*below* chance: the splits have different
-    answer distributions). **Sequence length leaks the hop count** — 11 tokens at two
-    hops against 43 at ten — and the answer distribution varies with depth, so a
-    depth-conditioned prior beats chance without composing
-  - **So report against the `hops=1` floor PER HOP BUCKET, never against chance.** A
-    composing mechanism must beat **0.500** at two hops and 0.011 at four. The
-    headroom is at 4–10 hops, which is what CLUTRR was built to test
+    composition off — scores **0.0856** on the plain subset against chance 0.0500 and
+    a majority-class baseline of 0.0421 (*below* chance; the splits have different
+    answer distributions). **Sequence length leaks the hop count**, 11 tokens at two
+    hops against 43 at ten, so a depth-conditioned prior beats chance without composing
+  - **So report against the `hops=1` floor PER HOP BUCKET, never against chance** —
+    but **not the 2-hop cell**, which 060's correction withdraws: at three seeds it
+    reads 0.50/1.00/0.50, and 38 rows means one hit moves it 0.026. **The headroom is
+    at 4–10 hops**, which is what CLUTRR was built to test
+  - **DECIDED without John, under the standing agreement: the layout is `kinship`
+    (`FACT s r o`), and it was decided on two independent measurements.** Collisions
+    fall from **411 test rows (35.9%) to 88 (7.7%)** because keying `(entity,
+    relation)` separates a repeated entity's edges — decision 157's mechanism on
+    someone else's data. And the `hops=1` floor falls from **0.0856 to 0.0365, below
+    chance**, because `closure` writes `key(s, o) → r` and so leaks direct recall
+    while `kinship` never writes that address. **A lower floor is the better
+    instrument.** `kinship` also makes `search.py` applicable, turning the traversal
+    into reuse of a proved mechanism rather than new work
+  - **`closure` stays behind the switch and is still the default**, under rule 14c and
+    because 060's floor was measured with it. Its advantage — the answer at
+    `key(s, o)`, readable directly — is a **one-hop** advantage, and CLUTRR tests two
+    through ten
   - **No matrix needed yet:** training on all 9,074 puzzles takes **six seconds**, so
     dispatching would be ceremony. One seed so far — the floor is a bound to
     re-measure, not a constant

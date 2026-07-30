@@ -235,6 +235,81 @@ class ABeamTraversalRunsWithoutADriver(unittest.TestCase):
         self.assertNotEqual(self._walk(misrouted), self._walk(None))
 
 
+class AWriteReachesEveryHolder(unittest.TestCase):
+    """The write path, which is what makes this a network rather than a cache.
+
+    Nothing is pre-loaded here: every fact arrives over a socket. `ConceptStore.write`
+    fans out locally for a reason — *"a departure needs no data movement at all: the
+    survivors already hold it"* — and a peer-to-peer write has to do the same or the
+    replica fallback has nothing to fall back to.
+    """
+
+    def setUp(self):
+        rng = np.random.default_rng(0)
+        self.values = rng.normal(0.0, 1.0, (VOCAB, WIDTH))
+        self.values /= np.linalg.norm(self.values, axis=1, keepdims=True)
+        self.keys = PairKeys(seed=1, spread=1.0 / np.sqrt(WIDTH), width=WIDTH,
+                             start=VOCAB, route="first-concept",
+                             markers=frozenset({FACT}))
+        # EMPTY stores. A write that did nothing would show up as a failed read.
+        self.stores = [ConceptStore(nodes=1, width=WIDTH, seed=0, replicas=1)
+                       for _ in range(NODES)]
+        self.peers = [ConceptPeer(self.stores[i], self.keys, peers=NODES,
+                                  seed=RING_SEED).start() for i in range(NODES)]
+        self.remote = RemoteConcepts(
+            {i: ("127.0.0.1", self.peers[i].port) for i in range(NODES)},
+            WIDTH, self.keys, seed=RING_SEED, replicas=REPLICAS)
+
+    def tearDown(self):
+        self.remote.close()
+        for peer in self.peers:
+            peer.close()
+
+    def _write_all(self):
+        for entity, relation, obj in FACTS:
+            self.remote.write(self.keys.owner(entity, relation), entity, relation,
+                              self.values[obj])
+
+    def test_every_holder_acknowledges(self):
+        for entity, relation, obj in FACTS:
+            landed = self.remote.write(self.keys.owner(entity, relation),
+                                       entity, relation, self.values[obj])
+            self.assertEqual(landed, REPLICAS)
+
+    def test_a_written_fact_reads_back(self):
+        self._write_all()
+        for entity, relation, obj in FACTS:
+            got = self.remote.read(self.keys.owner(entity, relation),
+                                   entity, relation)
+            self.assertEqual(int(np.argmax(self.values @ got)), obj)
+
+    def test_a_written_fact_survives_its_owner_leaving(self):
+        """The whole point of fanning the write out."""
+        self._write_all()
+        entity, relation, obj = FACTS[0]
+        concept = self.keys.owner(entity, relation)
+        owner = self.remote.holders(concept)[0]
+        self.peers[owner].close()
+        self.remote._drop(owner)
+        got = self.remote.read(concept, entity, relation)
+        self.assertEqual(int(np.argmax(self.values @ got)), obj,
+                         "the write did not reach a replica, so the departure cost "
+                         "the fact")
+
+    def test_a_write_reaching_nobody_is_counted(self):
+        """A write that lands nowhere and says nothing is a fact the network believes
+        it holds."""
+        entity, relation, obj = FACTS[0]
+        concept = self.keys.owner(entity, relation)
+        for node in self.remote.holders(concept):
+            self.peers[node].close()
+            self.remote._drop(node)
+        before = self.remote.lost
+        self.assertEqual(
+            self.remote.write(concept, entity, relation, self.values[obj]), 0)
+        self.assertEqual(self.remote.lost, before + 1)
+
+
 class ADepartureCostsARoundTripNotTheAnswer(unittest.TestCase):
     """C3: peers come and go. A vanished owner must not be a lost concept.
 
@@ -453,7 +528,13 @@ class ThePeerRefusesAMismatchItself(unittest.TestCase):
             send(raw, struct.pack("!16s", claimed))
             try:
                 receive(raw)                      # the peer's own fingerprint
-                send(raw, struct.pack("!iii", 0, FACTS[0][0], FACTS[0][1]))
+                # The wire format, hardcoded on purpose: this test is about the
+                # handshake rather than the client, so it cannot go through
+                # `RemoteConcepts`. It broke when a write kind was added to the
+                # header — which is note 096's *"a protocol change is invisible to
+                # the fingerprint"* arriving as a test failure rather than as two
+                # peers silently misparsing each other.
+                send(raw, struct.pack("!Biii", 0, 0, FACTS[0][0], FACTS[0][1]))
                 payload = receive(raw)
             except (ConnectionError, OSError):
                 return None

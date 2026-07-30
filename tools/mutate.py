@@ -1963,6 +1963,31 @@ MUTATIONS = [
         new="    return _reader(readable, retrieval, keys)",
     ),
     Mutation(
+        name="a-write-goes-only-to-the-owner",
+        breaks="the replica fallback, from the other end. Reads walk every holder "
+               "precisely because writes fanned out -- `ConceptStore.write` says *a "
+               "departure needs no data movement at all: the survivors already hold "
+               "it*. Writing only to the owner leaves nothing for a read to fall back "
+               "to, so the read path still looks correct and every departure silently "
+               "costs a concept. Two mechanisms that only work as a pair, and this "
+               "breaks the half that is easier to forget",
+        path=PEER,
+        old="        targets = self.holders(concept)",
+        new="        targets = self.holders(concept)[:1]",
+    ),
+    Mutation(
+        name="a-lost-write-is-not-counted",
+        breaks="the only signal that a write went nowhere. A write reaching no holder "
+               "and reporting nothing is a fact the network believes it holds and does "
+               "not, and the next read of it returns zeros -- which decode to whatever "
+               "the readout prefers. The same silence as an uncounted absent read, and "
+               "the same reason note 086's exactness check was worthless until it could "
+               "fail",
+        path=PEER,
+        old="            self.lost += 1",
+        new="            pass",
+    ),
+    Mutation(
         name="closing-a-peer-does-not-wait-for-it",
         breaks="the property that makes a simulated departure a FACT rather than a "
                "race. Closing a socket that another thread is blocked in `accept` on "

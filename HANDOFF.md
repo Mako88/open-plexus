@@ -57,9 +57,24 @@ identically at 96, 192, 288 and 384 steps. **The record says outright this is a 
 a result**, and note 010 argues MQAR cannot test a real replacement because the only event
 separating a pair from filler is the query, which arrives too late and never recurs.
 
-**So #10's live question is not "does scale work" — it is "can a real gate replace g7-02's
-oracle".** That is the thing to build, and it is a different question from the one I put on
-the list.
+**And the escape route is ALSO measured, and it also failed.** `g8-01` — literally titled
+*"can any real mechanism replace the oracle gate"* — ran 36/36 cells with `on-use` and
+`salience` arms against the oracle ceiling and the ungated floor. Its verdict: **"No
+mechanism tried recovers the oracle. The largest recovery anywhere in the grid is 0.05 and
+most cells are at or below zero. Every result that rests on the gate is a CEILING."**
+
+**So #10 is a COMPOUNDED negative and should be read that way:** scale fails, the one thing
+that rescues it is an oracle, and nothing real has been able to build that oracle.
+
+**No new candidate, and I checked rather than assuming one.** The occupancy gate (`148`,
+exact per `g26-01`) is the obvious thing to reach for and it is the WRONG SHAPE: the oracle
+decides *is this arriving position a real binding or filler*, occupancy answers *was this
+address written before*, and a first-time binding is unwritten by definition — so it cannot
+separate a new pair from new filler. Proposing it would be forcing a fit.
+
+**What would actually move #10** is a mechanism that separates a binding from filler at
+WRITE time, from local evidence, which is note 010's problem and is unsolved. Anyone picking
+this up should read `g8-01` and `note 010` before writing code, not after.
 
 **10 to 12 were MISSED from the original nine and John caught it**, and then **#10 was
 labelled ⬜ when the archive already had it as failed** — the same too-narrow-a-search

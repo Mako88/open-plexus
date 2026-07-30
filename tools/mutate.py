@@ -1905,6 +1905,31 @@ MUTATIONS = [
             "                    suspect[index] = now",
         new="                    suspect[index] = now",
     ),
+    Mutation(
+        name="a-marker-owns-the-bindings-it-heads",
+        breaks="the ONLY difference between `first-concept` and a plain `first` "
+               "rule, and `note 073` measured what plain `first` costs: `FACT` "
+               "appears in every fact block, so filing under it unconditionally "
+               "puts 50.0% of all bindings on one owner. That is worse than the "
+               "relation-ownership defect the route exists to fix, and it would "
+               "still pass every correctness test -- a node holding half the "
+               "network answers the same questions, just from one machine",
+        path=KEYS,
+        old="        return int(tokens[t]) if previous in self.markers else previous",
+        new="        return previous",
+    ),
+    Mutation(
+        name="the-route-falls-through-instead-of-raising",
+        breaks="the guard that stops a typo being measured as a routing nobody "
+               "chose. `PairKeys` has two routes and every number to date was "
+               "taken under `current`, so a misspelled route silently selecting "
+               "it would report the OLD ownership under a new name -- the same "
+               "class of error `ClutrrConfig.layout` raises on, and the reason "
+               "that validation exists",
+        path=KEYS,
+        old="        if route not in self.ROUTES:",
+        new="        if False:",
+    ),
 ]
 
 

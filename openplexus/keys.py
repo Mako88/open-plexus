@@ -139,8 +139,18 @@ class PairKeys:
     on: a node is handed two token ids and rebuilds the vector itself.
     """
 
+    #: Which element of the pair `concept` names, i.e. which node owns the
+    #: binding. `"current"` is the original and `note 073` measured the cost.
+    ROUTES = ("current", "first-concept")
+
     def __init__(self, seed: int, spread: float, width: int,
-                 start: int) -> None:
+                 start: int, route: str = "current",
+                 markers: frozenset[int] | set[int] = frozenset()) -> None:
+        if route not in self.ROUTES:
+            raise ValueError(
+                f"route must be one of {self.ROUTES}, got {route!r}. An unknown "
+                f"string would have to fall through to one of them, and a typo "
+                f"would then be measured as the routing nobody chose")
         self.seed = seed
         self.spread = spread
         self.width = width
@@ -148,6 +158,11 @@ class PairKeys:
         #: has a key in the same space as every other step rather than a special
         #: case the store would have to exclude.
         self.start = start
+        self.route = route
+        #: Tokens that name no concept — a task's `FACT`/`QUERY` and the like.
+        #: **`start` is one by definition**, standing in for "no previous token",
+        #: so it is added rather than left to the caller to remember.
+        self.markers = frozenset(markers) | {start}
         self.cache: dict[tuple[int, int], np.ndarray] = {}
 
     def key(self, tokens: np.ndarray, t: int) -> np.ndarray:
@@ -189,8 +204,49 @@ class PairKeys:
 
         Routing by pair is not built. It is one line here, and it should be
         built the moment there is a measurement that wants it.
+
+        ## `note 073` measured this and the paragraph above is half right
+
+        *"Every `key(FACT, X)` lands on X's node"* is true; *"so one node holds an
+        entity and everything said about it"* does not follow. `key(FACT, X)`
+        lands on X and `key(X, r)` lands on **r**, so X owns one of the two
+        bindings it heads — **coherence 0.0% under BOTH layouts**, measured.
+
+        And under a `FACT s r o` ordering the second binding is the one a
+        traversal reads, so **100.0% of them land on a relation.** There are
+        twenty relations and always will be, which caps the network below the
+        ceiling concept splitting exists to lift.
+
+        `route="first-concept"` names the first element of the pair instead,
+        skipping markers so `key(FACT, X)` still lands on X rather than piling
+        every fact onto `FACT` (which `route="first"` would, at 50.0% — measured
+        and rejected).
+
+        **What it fixes, stated at the scope it was measured at**, because 073's
+        first table overstated this and was corrected:
+
+            key(entity, relation) -> entity, not -> relation    the traversal
+                                                                binding, 072's
+                                                                actual defect
+            markers own no content binding    31.6% -> 0.0%
+            busiest owner                     26.6% -> 11.8%
+
+        **It does NOT make relations own nothing.** `pair(relation, entity)` is
+        still a key, still filed under the relation, and there is one per fact —
+        22.3% of all keys. Its value is the next block's marker, so the traversal
+        never reads it, but it does occupy the node. Ownership therefore stops
+        depending on the token ORDER for the bindings that carry facts, which is
+        less than "the conflict disappears".
+
+        `"current"` remains the default and the measured comparison: it is what
+        every number to date was taken under, decision 134's included.
         """
-        return int(tokens[t])
+        if self.route == "current":
+            return int(tokens[t])
+        previous = int(tokens[t - 1]) if t else self.start
+        # A marker names no concept, so fall through to the current token --
+        # which is what keeps `key(FACT, X)` on X instead of on FACT.
+        return int(tokens[t]) if previous in self.markers else previous
 
     def pair(self, previous: int, token: int) -> np.ndarray:
         """The vector for one pair, exposed so a test can check two nodes agree

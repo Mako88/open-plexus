@@ -649,12 +649,12 @@ not on. The readout still violates C1.**
     alone 20.2%) against 0.0% under `closure`. Both options were chosen alone and the
     *pair* is the defect — `157` picked kinship for a 4.7× collision reduction without
     ownership in view. **Worse than the 16-node dimension ceiling it exists to fix**
-  - **FIXED by `note 073`, one line, NOT YET IMPLEMENTED: route by the first CONCEPT of
-    the pair**, skipping markers. **0.0% relation-owned and 100% coherent under BOTH
-    layouts**, so ownership stops depending on the ordering and `157` stops trading
-    against distribution. It refutes three of 072's four candidates and finds that
-    **`current` is 0.0% coherent under `closure` too**, which `PairKeys.concept`'s
-    docstring claims it is not. Held for its own commit: it moves `134`'s baseline
+  - **PARTLY fixed by `note 073`, BUILT as `PairKeys(route="first-concept")`**, default
+    unchanged. The traversal binding moves relation-owned → **entity**-owned, markers stop
+    owning content (31.6% → **0.0%**), busiest drops 26.6% → **11.8%**. **073's "0.0%
+    relation-owned" is CORRECTED** — it scored 2 of 4 keys per block; `pair(relation,
+    entity)` is still relation-owned at 22.3% of all keys, though its value is a separator
+    the traversal never reads. `concept_nodes` still 0
   - **And `docs/SCALE.md`: bandwidth scales with WIDTH**, so dimension splitting must grow
     `d` to buy capacity (832 KB per message at Wikidata scale, ~266 MB per query) where
     concept splitting holds `d` at 512 and adds nodes (~640 KB per query). *arithmetic on

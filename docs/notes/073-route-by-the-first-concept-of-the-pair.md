@@ -83,6 +83,46 @@ agreeing. `TableKeys` is unaffected — its key *is* the current token.
 partitioned run, and decision 134's numbers were taken under the current rule, so it needs
 its own commit with the baseline re-measured rather than riding along with a note.
 
+## CORRECTION — the headline number was over a subset I did not name
+
+**Found by writing the test for the implementation**, which asserted "no marker owns a
+binding" and failed. The table above scored **two hand-picked positions per fact block**.
+A key exists at *every* position, so `FACT s r o` has four:
+
+    pair(prev, FACT)   value is the opening entity
+    pair(FACT, s)      content -- scored above
+    pair(s, r)         content, the traversal binding -- scored above
+    pair(r, o)         value is the NEXT block's marker. NOT scored above
+
+Re-measured over every key, both layouts, identical numbers:
+
+    route            scope     rel-owned   marker-owned   busiest
+    current          content       31.6%          31.6%     26.6%
+    current          ALL           22.3%          25.9%     22.3%
+    first-concept    content       31.6%           0.0%     11.8%
+    first-concept    ALL           22.3%           3.6%     15.2%
+
+**"0.0% relation-owned" is not supported at any full scope**, and neither is "the conflict
+disappears." `pair(relation, entity)` is a real key, one per fact, still filed under the
+relation — 22.3% of all keys. Its value is a separator so the traversal never reads it, but
+it still occupies the node.
+
+**What survives, and it is narrower than the section above claims:**
+
+    key(entity, relation) -> entity rather than -> relation      072's actual defect, fixed
+    markers own no content binding          31.6% -> 0.0%
+    busiest owner                           26.6% -> 11.8%
+
+So ownership stops depending on the token ORDER **for the bindings that carry facts**. That
+is worth having and it is not what this note first said.
+
+> **Fourth correction of the session, same shape as the other three: a subset measured and
+> reported as the whole.** 067 reasoned over twenty relations when the population was three
+> addresses; 069's baseline had the marginals removed; 071 used the raw read for the gate;
+> here two positions per block stood in for four. **The pattern is worth naming as a
+> standing hazard rather than four separate slips** — every one of them was a number that
+> was correct about something narrower than the sentence it was put in.
+
 ## What is NOT claimed
 
 **The balance figures do not generalise.** 18.7% busiest and 10 owners are artifacts of

@@ -468,9 +468,14 @@ lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
   fixed relation schedule, which `162` already calls a fitted constant. *no measurement* — a
   scope ruling. **Revival:** a domain where the frame genuinely is supplied by the task.
   → record: [structured-slots.md](docs/options/structured-slots.md)
-- ⬜ **Declining to answer** — the archived ledger's row C4. **Nothing anywhere lets the
-  model say "I do not know", and no task scores abstention**, while the gate is a fact about
-  the store rather than a learned probability. An untested claim about honesty.
+- ⬜ **Declining to answer** — the archived ledger's row C4. **`g26-01` is the first
+  abstention measurement here and the gate CAN decline, exactly:** correct abstention
+  **1.0000**, false abstention **0.000** once an artefact of the question set is removed,
+  on a known entity with a known relation whose PAIR was never written. *measured in:*
+  kinship, width 256, 3 seeds, 105 unanswerable questions. **Still ⬜ because nothing in
+  `run()` consults occupancy to decline** — the sketch was asked from outside — and because
+  the gate remains blind to a question whose addresses ARE occupied, so a written-but-wrong
+  answer is invisible.
   → record: [declining-to-answer.md](docs/options/declining-to-answer.md)
 
 ### 6b. Knowing when to stop hopping

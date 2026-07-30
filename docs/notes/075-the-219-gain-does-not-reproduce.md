@@ -54,12 +54,29 @@ collapses to 0.60, and at width 128 `beam` reaches **0.9363 — above 065's best
 `plain` reaches 712/713. A harness that is *better* than the one being reproduced is not a
 broken harness; it is a different configuration.
 
-## What is most likely, and it is stated as a hypothesis
+## The obvious hypothesis, tested and REFUTED
 
-The discrepancy sits entirely in `search`, so the candidates are about how `search` was
-invoked rather than about the store: a different `branches`, a different depth convention,
-or a `search` arm that was not given the `allowed` mask the beam arm had. **Untested** —
-each is one run, and they are the obvious next step.
+The discrepancy sits entirely in `search`, so the first candidates were about how it was
+invoked. None of them reaches 0.6588:
+
+    seed 0, width 64                 search
+    masked, branches=4               0.7914
+    UNMASKED, branches=4             0.7897
+    masked, branches=2               0.7932
+    masked, branches=1               0.7688
+
+**Neither the `allowed` mask nor `branches` explains it.** So the difference is in the store
+or in the scoring, not in the search call — which is a narrower space and a harder one:
+`decay`, `spread`, the retrieval strategy, or a chain-recovery criterion stricter than
+"the walk's relations equal the true chain". Still open.
+
+### And an incidental finding that confirms note 064
+
+**`search` is nearly insensitive to `branches`** — 0.7688 at one against 0.7914 at four, a
+spread of 0.02 across a four-fold change. Note 064's diagnosis was that the old search
+*"branches at the one step that doesn't need it"*, and this is that claim measured from the
+other side: turning the branching almost off costs almost nothing. Independent of anything
+065 did, and it is the clearest support 064 has.
 
 ## The gate, and my own first version of it failed the rule it enforces
 

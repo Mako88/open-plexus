@@ -51,6 +51,13 @@ and now has the stronger form: the fold has NO error of its own.
 **Every one is NEVER STATED, in any split** — checked against train, validation and test.
 So they are not withheld, they are absent, and no amount of reading the data supplies them.
 
+> **⚠ CORRECTED BY `note 088`, one hour later. The table below is about COMPLETION, and
+> every filling arm completes 1.0000 — so it describes a quantity that saturates the moment
+> anything is filled and must NOT be read as an end-task projection.** Measured end-task
+> correctness: 0.5201 gapped, **0.6081 ± 0.0055 filling at random**, and note 070's readout
+> at 0.5995 — below random. What survives here is that the fold is perfect given coverage
+> and which 31 rules are missing; the leverage arithmetic does not.
+
 ## What accuracy is worth, and this is the target
 
     guesser accuracy p    per-step coverage    completion at 9 hops

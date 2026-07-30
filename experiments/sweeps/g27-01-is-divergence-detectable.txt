@@ -1,0 +1,117 @@
+Is a node's divergence detectable, or does it answer plausibly?
+===============================================================
+
+Script: experiments/g27_01_divergence.py  (to be written)
+Status: NOT RUN. Predictions registered and committed before the script exists.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+Machines in this system agree about where things are stored without ever talking
+about it -- each works it out from a shared starting number. If one of them has a
+different starting number, it puts things in different places.
+
+The dangerous part is not that it disagrees. It is that **asking the wrong
+machine does not produce an error.** It produces a vector, and a vector always
+decodes to some answer. So a machine that has drifted looks exactly like a
+machine that is working.
+
+This asks whether anything notices.
+
+
+WHY THIS EXISTS AND WHAT IT IS A PROXY FOR
+---------------------------------------------
+`DECISIONS.md` component 1 carries this as the open sub-question:
+
+    Two nodes that quantise the same input differently write to different
+    addresses and the memory fragments **with no node able to detect it
+    locally.**
+
+and names the falsifier to build first: *two nodes given identical input must
+emit identical ids.*
+
+**That falsifier CANNOT be built, and finding that out is part of this.** There is
+no quantiser anywhere in the tree -- nothing turns non-symbolic input into ids --
+so "identical input gives identical ids" is trivially true for text tokens and
+untestable for anything else. Component 1's ⬜ on the learned codebook is the
+blocker, not effort.
+
+**What IS testable today is the same failure one layer down.** Peers derive their
+keys, values and ring from seeds rather than being told them, which is what lets
+two containers agree without exchanging anything (`openplexus/node_main.py`,
+`derive`). A peer whose seed differs has diverged in exactly the way a peer whose
+codebook differs would, and `peer.fingerprint` exists to catch it.
+
+So this measures **detection**, not quantisation. Stated because the two are not
+the same claim and the result must not be quoted as if they were.
+
+
+THE MEASUREMENT
+---------------
+Three peers serving a store, and one asker.
+
+    MATCHED     every peer on the same seed. The control
+    DIVERGED    one peer on a different seed, so its keys and values differ
+
+For each: does the read RAISE, or return a vector? And if it returns one, is the
+answer wrong?
+
+**A wrong answer that raises is a good failure. A wrong answer that returns is the
+one this project keeps finding**, and `peer.py` says so in its own words: a
+caller asking the wrong owner gets zeros, and a zero vector decodes to whatever
+the readout prefers -- an answer, not an error.
+
+
+PREDICTIONS
+-----------
+  P1  THE CONTROL. With every peer matched, reads succeed and the walk is exact.
+
+      If this fails the harness is broken and nothing below is readable.
+
+  P2  THE TEST. With one peer diverged, the fingerprint REJECTS it -- the asker
+      raises or refuses rather than reading.
+
+      Refuted if reads come back anyway. That would mean divergence is silent at
+      the transport layer too, and the tree's *"no node able to detect it
+      locally"* extends further than component 1.
+
+  P3  If reads DO come back from a diverged peer, they are wrong -- the answer
+      differs from the matched case.
+
+      A diverged peer returning the RIGHT answer would mean the seed does not
+      reach the stored value, which is a connection failure in `derive` and a
+      more serious finding than either outcome above.
+
+  P4  THE ONE I AM LEAST SURE OF. The fingerprint catches a diverged SEED but
+      would not catch a diverged REPLICA COUNT.
+
+      `peer.fingerprint` is built from `(keys, peers, seed)`. Replica count is
+      not in it, and two peers that disagree about how many holders a concept has
+      will write to overlapping-but-different sets -- a partial fragmentation
+      that every fingerprint check passes. If that is right, the guard covers the
+      divergence someone thought of and not the one beside it.
+
+
+WHAT WOULD MAKE THIS NOT COUNT
+--------------------------------
+**A diverged peer that holds nothing.** If the seed change also empties its
+store, a failed read is about emptiness rather than about divergence. Held facts
+are counted per peer and reported, as `g24-01` did from the container logs.
+
+**Reading a concept the diverged peer does not own.** The ring must route to the
+diverged peer for the test to touch it, so the queried concepts are chosen from
+the ones it owns and that is asserted rather than hoped.
+
+
+COST
+----
+In-process peers on loopback. Seconds. No containers, no dispatch -- this is about
+agreement, not latency, and `g24-01` already owns the latency question.
+
+
+MEASURED ON
+-----------
+`openplexus/peer.py` and `openplexus/node_main.py` peer mode, three peers plus an
+asker, width 64, 24 scaffold facts, 2 replicas.

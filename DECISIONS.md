@@ -672,9 +672,21 @@ that is the standing weakness.**
   - **No matrix needed yet:** training on all 9,074 puzzles takes **six seconds**, so
     dispatching would be ceremony. One seed so far — the floor is a bound to
     re-measure, not a constant
-  - **No composing configuration has been run.** `hops > 1` with `context_keys` needs
-    a typed hop, and CLUTRR's relations vary along the chain, so `hop_relations` would
-    supply a schedule the task does not — decision 162's problem, unsolved here
+  - **No composing configuration has been run**, and checking why found a mismatch in
+    the loader written an hour earlier. `hops > 1` with `context_keys` needs a typed
+    hop; CLUTRR's relations vary along the chain, so `hop_relations` would supply a
+    schedule the task does not — 162's problem. **And `search.py` cannot be used
+    as-is:** `walk_from` walks `key(entity, relation) → next entity` plus
+    `key(FACT, entity) → relation`, which is **kinship's** `FACT S R O` layout. The
+    loader emits **closure's** `FACT S O R`, giving `key(FACT, s) → o` and
+    `key(s, o) → r`. Both are walkable and they are **different walks**, and no
+    existing mechanism walks the second
+  - **So the open question is sharper than "which relation at which hop":** the
+    layout choice determines which traversal is even possible, and closure's — chosen
+    because CLUTRR's question is natively relation-as-value — makes the entity chain
+    directly walkable via `key(FACT, e)` while making `search.py` inapplicable.
+    **`key(FACT, e)` is also exactly where a repeated entity collides**, which is
+    note 059's 38%, so the two problems are the same problem
 
 ### 10b. Retracted numbers — never quote these
 

@@ -39,6 +39,7 @@ coordinator.
 
 from __future__ import annotations
 
+import hashlib
 import socket
 import struct
 import threading
@@ -54,6 +55,34 @@ from openplexus.ownership import Ring
 _REQUEST = struct.Struct("!iii")
 #: Asks the peer to shut down. Not a concept id any task uses.
 _STOP = -1
+#: The handshake. A peer and a caller must agree about the ring AND the key source, and
+#: every way of disagreeing is silent: a read routed by a different ring reaches a peer
+#: that never received the write and returns zeros, and a zero vector decodes to whatever
+#: the readout prefers -- an answer, not an error. Note 086 is the entry about a config
+#: mismatch producing a full set of confident numbers about the wrong model.
+_HELLO = struct.Struct("!16s")
+
+
+def fingerprint(keys, peers: int, seed: int) -> bytes:
+    """What both sides must agree on, as sixteen bytes.
+
+    Covers the ROUTING (peer count, ring seed) and the KEY SOURCE (its seed, spread,
+    width, start token, route and markers). A difference in any of them sends a read
+    somewhere the write never went, or rebuilds a different key at the same address.
+
+    Derived on each side from its own configuration rather than exchanged as data, so
+    agreement means the configurations match rather than that one side was told what to
+    claim.
+    """
+    parts = [f"peers={peers}", f"ring={seed}",
+             f"keyseed={getattr(keys, 'seed', None)}",
+             f"spread={getattr(keys, 'spread', None):.12g}"
+             if hasattr(keys, "spread") else "spread=None",
+             f"width={getattr(keys, 'width', None)}",
+             f"start={getattr(keys, 'start', None)}",
+             f"route={getattr(keys, 'route', 'current')}",
+             f"markers={sorted(getattr(keys, 'markers', ()))}"]
+    return hashlib.sha256("|".join(parts).encode()).digest()[:16]
 
 
 class ConceptPeer:
@@ -64,9 +93,14 @@ class ConceptPeer:
     arithmetic.
     """
 
-    def __init__(self, store, keys, host: str = "127.0.0.1", port: int = 0) -> None:
+    def __init__(self, store, keys, host: str = "127.0.0.1", port: int = 0,
+                 peers: int = 1, seed: int = 0) -> None:
         self.store = store
         self.keys = keys
+        #: What a caller must match. `peers` and `seed` are the RING's, which this peer
+        #: does not use itself -- it serves whatever it is asked for -- but must agree
+        #: about, or callers will ask the wrong peer and get zeros.
+        self.fingerprint = fingerprint(keys, peers, seed)
         self._listener = socket.socket()
         self._listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._listener.bind((host, port))
@@ -92,6 +126,16 @@ class ConceptPeer:
                 return
             with connection:
                 connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+                # The handshake first, and REFUSE on mismatch rather than serving.
+                # Serving a caller that routes differently is the failure mode this
+                # exists to make loud.
+                try:
+                    theirs, = _HELLO.unpack(receive(connection))
+                except (ConnectionError, OSError, struct.error):
+                    continue
+                send(connection, _HELLO.pack(self.fingerprint))
+                if theirs != self.fingerprint:
+                    continue
                 while True:
                     try:
                         message = receive(connection)
@@ -137,6 +181,7 @@ class RemoteConcepts:
         self.width = width
         self.keys = keys
         self.ring = Ring(len(peers), seed=seed)
+        self.fingerprint = fingerprint(keys, len(peers), seed)
         self._connections: dict[int, socket.socket] = {}
         #: Reads served, so a measurement can count messages rather than assume them.
         self.reads = 0
@@ -148,6 +193,16 @@ class RemoteConcepts:
         host, port = self.peers[node]
         opened = socket.create_connection((host, port))
         opened.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        send(opened, _HELLO.pack(self.fingerprint))
+        theirs, = _HELLO.unpack(receive(opened))
+        if theirs != self.fingerprint:
+            opened.close()
+            raise ValueError(
+                f"peer {node} at {host}:{port} disagrees about the ring or the key "
+                f"source: it reports {theirs.hex()[:12]} and this caller computes "
+                f"{self.fingerprint.hex()[:12]}. Reads would be routed to peers that "
+                f"never received the write and would come back as ZEROS, which decode "
+                f"to whatever the readout prefers. Refusing rather than serving.")
         self._connections[node] = opened
         return opened
 

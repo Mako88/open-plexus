@@ -1963,6 +1963,19 @@ MUTATIONS = [
         new="    return _reader(readable, retrieval, keys)",
     ),
     Mutation(
+        name="a-config-mismatch-is-served-anyway",
+        breaks="the handshake that stops note 086's failure class recurring. A caller "
+               "routing by a different ring, or building keys from a different seed, "
+               "asks peers that never received the write: the read returns ZEROS and a "
+               "zero vector decodes to whatever the readout prefers, so the run "
+               "produces a full set of confident numbers about nothing. Serving the "
+               "mismatch instead of refusing it is exactly the silence the fingerprint "
+               "exists to break",
+        path=PEER,
+        old="                if theirs != self.fingerprint:",
+        new="                if False:",
+    ),
+    Mutation(
         name="a-peer-read-asks-whoever-rather-than-the-owner",
         breaks="the whole point of removing the driver. Routing every read to peer 0 "
                "instead of the concept's owner reaches a node that never received "

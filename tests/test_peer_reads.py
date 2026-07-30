@@ -65,7 +65,8 @@ class APeerServesTheConceptsItOwns(unittest.TestCase):
 
     def setUp(self):
         self.values, self.keys, self.stores = fixture()
-        self.peers = [ConceptPeer(self.stores[i], self.keys).start()
+        self.peers = [ConceptPeer(self.stores[i], self.keys, peers=NODES,
+                                  seed=RING_SEED).start()
                       for i in range(NODES)]
         self.remote = RemoteConcepts(
             {i: ("127.0.0.1", self.peers[i].port) for i in range(NODES)},
@@ -175,7 +176,8 @@ class ABeamTraversalRunsWithoutADriver(unittest.TestCase):
                 concept = self.keys.owner(previous, token)
                 self.stores[Ring(NODES, seed=RING_SEED).owner(concept)].write(
                     concept, key, self.values[value])
-        self.peers = [ConceptPeer(self.stores[i], self.keys).start()
+        self.peers = [ConceptPeer(self.stores[i], self.keys, peers=NODES,
+                                  seed=RING_SEED).start()
                       for i in range(NODES)]
         self.remote = RemoteConcepts(
             {i: ("127.0.0.1", self.peers[i].port) for i in range(NODES)},
@@ -215,6 +217,119 @@ class ABeamTraversalRunsWithoutADriver(unittest.TestCase):
                          if self.remote.owner(concept + k) != mine)
             return self.remote.read(other, previous, token)
         self.assertNotEqual(self._walk(misrouted), self._walk(None))
+
+
+class AConfigMismatchIsRefusedRatherThanServed(unittest.TestCase):
+    """Note 086's failure class, guarded this time.
+
+    A caller routing by a different ring, or building keys from a different seed, asks
+    peers that never received the write. The read returns ZEROS and a zero vector decodes
+    to whatever the readout prefers — an answer, not an error. Nothing downstream can
+    tell, which is exactly what note 086 recorded happening.
+    """
+
+    def setUp(self):
+        self.values, self.keys, self.stores = fixture()
+        self.peers = [ConceptPeer(self.stores[i], self.keys, peers=NODES,
+                                  seed=RING_SEED).start()
+                      for i in range(NODES)]
+        self.where = {i: ("127.0.0.1", self.peers[i].port) for i in range(NODES)}
+
+    def tearDown(self):
+        for peer in self.peers:
+            peer.close()
+
+    def test_a_matching_caller_is_served(self):
+        remote = RemoteConcepts(self.where, WIDTH, self.keys, seed=RING_SEED)
+        try:
+            entity, relation, obj = FACTS[0]
+            got = remote.read(self.keys.owner(entity, relation), entity, relation)
+            self.assertEqual(int(np.argmax(self.values @ got)), obj)
+        finally:
+            remote.close()
+
+    def test_a_DIFFERENT_RING_SEED_is_refused(self):
+        remote = RemoteConcepts(self.where, WIDTH, self.keys,
+                                seed=RING_SEED + 1)
+        try:
+            entity, relation, _ = FACTS[0]
+            with self.assertRaises(ValueError):
+                remote.read(self.keys.owner(entity, relation), entity, relation)
+        finally:
+            remote.close()
+
+    def test_a_DIFFERENT_KEY_SEED_is_refused(self):
+        other = PairKeys(seed=self.keys.seed + 1, spread=self.keys.spread,
+                         width=WIDTH, start=VOCAB, route="first-concept",
+                         markers=frozenset({FACT}))
+        remote = RemoteConcepts(self.where, WIDTH, other, seed=RING_SEED)
+        try:
+            entity, relation, _ = FACTS[0]
+            with self.assertRaises(ValueError):
+                remote.read(other.owner(entity, relation), entity, relation)
+        finally:
+            remote.close()
+
+    def test_a_DIFFERENT_ROUTE_is_refused(self):
+        """`current` against `first-concept` puts every binding at a different
+        address, and note 073 is the entry about which one this project chose."""
+        other = PairKeys(seed=self.keys.seed, spread=self.keys.spread,
+                         width=WIDTH, start=VOCAB, route="current",
+                         markers=frozenset({FACT}))
+        remote = RemoteConcepts(self.where, WIDTH, other, seed=RING_SEED)
+        try:
+            with self.assertRaises(ValueError):
+                remote.read(0, FACTS[0][0], FACTS[0][1])
+        finally:
+            remote.close()
+
+
+class ThePeerRefusesAMismatchItself(unittest.TestCase):
+    """The peer's own check, tested with a raw socket rather than through the client.
+
+    `RemoteConcepts` refuses a mismatch before sending anything, so going through it
+    never exercises the peer's side — a mutation disabling the peer's check survived
+    every test in this file. **A peer must not depend on callers being well behaved**:
+    it is the thing that owns the data, and a caller with a stale ring is exactly what
+    churn produces.
+    """
+
+    def setUp(self):
+        self.values, self.keys, self.stores = fixture()
+        self.peer = ConceptPeer(self.stores[0], self.keys, peers=NODES,
+                                seed=RING_SEED).start()
+
+    def tearDown(self):
+        self.peer.close()
+
+    def _handshake_then_read(self, claimed: bytes):
+        """Send `claimed` as the fingerprint, then ask for a read. Returns the
+        answer, or None if the peer hung up."""
+        import socket as sockets
+        import struct
+
+        from openplexus.distributed import receive, send
+        with sockets.create_connection(("127.0.0.1", self.peer.port),
+                                       timeout=5) as raw:
+            send(raw, struct.pack("!16s", claimed))
+            try:
+                receive(raw)                      # the peer's own fingerprint
+                send(raw, struct.pack("!iii", 0, FACTS[0][0], FACTS[0][1]))
+                payload = receive(raw)
+            except (ConnectionError, OSError):
+                return None
+            return payload or None
+
+    def test_the_right_fingerprint_is_served(self):
+        self.assertIsNotNone(self._handshake_then_read(self.peer.fingerprint))
+
+    def test_a_WRONG_fingerprint_gets_no_answer(self):
+        wrong = bytes(16)
+        self.assertNotEqual(wrong, self.peer.fingerprint)
+        self.assertIsNone(
+            self._handshake_then_read(wrong),
+            "the peer served a caller that disagrees about the ring or the keys, "
+            "so a stale caller would receive zeros and call them an answer")
 
 
 class ThePeerIsListeningBeforeItIsStarted(unittest.TestCase):

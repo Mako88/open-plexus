@@ -1969,11 +1969,13 @@ MUTATIONS = [
                "the write, so the read returns ZEROS -- and a zero vector decodes to "
                "whichever token the readout happens to prefer, which is an answer "
                "rather than an error. `test_peer_reads` catches it with a misroute "
-               "control, and that control exists because the FIRST version of the "
-               "measurement passed while `owner` was effectively the identity: the "
-               "test handed it an already-computed owner instead of a concept",
+               "control, and that control has been strengthened twice: once because "
+               "the test handed `owner` an already-computed owner instead of a "
+               "concept, and again because `concept + 1` stopped being a misroute "
+               "when the modulo placeholder became a RING -- consistent hashing puts "
+               "adjacent concepts on the same peer most of the time",
         path=PEER,
-        old="        return concept % len(self.peers)",
+        old="        return self.ring.owner(concept)",
         new="        return 0",
     ),
     Mutation(

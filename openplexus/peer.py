@@ -46,6 +46,7 @@ import threading
 import numpy as np
 
 from openplexus.distributed import receive, send
+from openplexus.ownership import Ring
 
 #: `(concept, previous, token)` — three ints. The key is REBUILT by the owner from
 #: `(previous, token)` rather than sent: that is `derived_keys`' whole argument, and it
@@ -123,11 +124,19 @@ class RemoteConcepts:
     """
 
     def __init__(self, peers: dict[int, tuple[str, int]], width: int,
-                 keys) -> None:
-        """`peers` maps a NODE index to its address. Ownership is the ring's business."""
+                 keys, seed: int = 0) -> None:
+        """`peers` maps a NODE index to its address. Ownership is the ring's business.
+
+        **`Ring`, not `concept % len(peers)`.** The modulo was a placeholder and it is
+        wrong for a network: changing the peer count reshuffles nearly every concept,
+        so every binding written before the change is at an address nobody asks about.
+        Consistent hashing moves about `1/n` instead, which is the property `Ring`
+        exists for and `ConceptStore` already relies on.
+        """
         self.peers = peers
         self.width = width
         self.keys = keys
+        self.ring = Ring(len(peers), seed=seed)
         self._connections: dict[int, socket.socket] = {}
         #: Reads served, so a measurement can count messages rather than assume them.
         self.reads = 0
@@ -145,7 +154,7 @@ class RemoteConcepts:
     def owner(self, concept: int) -> int:
         """Which peer holds it. Every peer answers this identically, which is what
         makes the routing need no coordinator."""
-        return concept % len(self.peers)
+        return self.ring.owner(concept)
 
     def read(self, concept: int, previous: int, token: int) -> np.ndarray:
         connection = self._connection(self.owner(concept))

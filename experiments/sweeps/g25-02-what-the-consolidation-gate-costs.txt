@@ -1,0 +1,129 @@
+What does the consolidation gate cost?
+=======================================
+
+Script: experiments/g25_02_consolidation_gate.py  (to be written)
+Status: NOT RUN. Predictions registered and committed before the script exists.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+The system has a short-term memory that fades and a long-term one that does not.
+Things get copied from the short one to the long one, and there is a rule for
+when: **only when the system already predicted the thing correctly.**
+
+That sounds sensible -- keep what has proved right -- and it has a consequence
+nobody has measured. To predict something correctly, the system has to already
+have it in short-term memory. So a fact only becomes permanent if it comes round
+AGAIN while the first time is still remembered.
+
+**A fact that is only ever seen once, or that comes round too slowly, never
+becomes permanent** -- no matter how useful it is.
+
+If that is right, the long-term store keeps what repeats and loses what does not.
+For something meant to be a map of concepts, that matters: most facts about the
+world are arbitrary and are not seen twice in quick succession.
+
+
+WHY THIS EXISTS
+----------------
+`docs/options/use-based-eviction.md` records C4's answer as an EVICTION story --
+discard what has gone longest unused, so a persistently-used fact survives.
+`g25-01` was built to test that and was VOID, because it modelled eviction with no
+promotion gate in front of it.
+
+`openplexus/models/local_memory.py` has the gate, and its own comment states it:
+
+    consolidation fires on `predictions[t-1] == token` -- it promotes what the
+    model ALREADY GOT RIGHT -- so a persistent store cannot bootstrap a model
+    that predicts badly
+
+**And "already got it right" on an arbitrary fact means "already in the fast
+store and still retrievable".** The fast store decays -- `consolidation` requires
+`decay < 1.0`, enforced in the config -- so retrievability has a horizon. The gate
+is therefore not about a fact being PREDICTABLE from a pattern. It is about the
+fact RECURRING inside a window.
+
+**Read `g8-03` and `g8-04` before building here.** `capture_slots` is already
+measured and the verdict is a null: *"bounding the lasting store cannot reproduce
+a mechanism that gates the FAST one"*, every pool recovering approximately zero.
+This sweep is about the CONSOLIDATION gate, which is the `elif fires:` branch as
+much as the pooled one, so it is a different question -- but a null here would be
+the second on this mechanism and should be read that way.
+
+
+THE MEASUREMENT
+---------------
+`model.consolidations` is already counted, and the comment says why: *"COUNTED so
+a null can be attributed ... without this counter, 'the persistent store did not
+help' and 'the gate never opened' are the same number."* That is exactly the
+quantity here.
+
+One stream per condition. Facts recur at a fixed GAP; the gap is the swept axis.
+Everything else is held, and the fast store's half-life is stated beside every
+row so the horizon is visible rather than inferred.
+
+    gap << horizon    the fact is still retrievable when it recurs
+    gap >> horizon    it is not, so the prediction misses and nothing consolidates
+
+
+PREDICTIONS
+-----------
+  P1  THE TEST. Consolidations per fact FALL as the gap grows, and the fall is
+      large -- at the widest gap it is below a fifth of the narrowest.
+
+      Refuted if consolidation is flat in gap. That would mean the gate does not
+      depend on the fast store's horizon at all, and my reading of the mechanism
+      is wrong rather than the mechanism being limited.
+
+  P2  THE GATE. At the narrowest gap, consolidations are greater than zero.
+
+      If nothing consolidates anywhere, the arm is misconfigured and P1 is
+      unreadable -- a flat line at zero is not a decline. `consolidation`
+      requires `decay < 1.0` and defaults to off, so this is a real risk and not
+      a formality.
+
+  P3  The decline tracks the DECAY HALF-LIFE rather than a fixed step count:
+      halving the decay roughly halves the gap at which consolidation collapses.
+
+      This is what separates "the horizon is the cause" from "wide gaps are
+      harder for some other reason". Refuted if the collapse point does not move
+      with decay.
+
+  P4  THE ONE I EXPECT TO BE WRONG. A fact seen ONCE and never repeated
+      consolidates zero times, exactly.
+
+      I expect exactly zero, and expect to be wrong because the readout can be
+      right by luck -- with a small vocabulary a guess lands sometimes, and the
+      gate cannot tell luck from retrieval. **If it is non-zero, the gate is
+      leakier than the comment claims**, and "promotes what it already got right"
+      is really "promotes what it scored right", which is a weaker property and
+      one worth knowing before anything is built on it.
+
+
+WHAT WOULD MAKE THIS NOT COUNT
+--------------------------------
+**Sequence length confounding gap.** A wider gap in a fixed-length sequence means
+fewer recurrences, so fewer chances to consolidate regardless of the horizon.
+Recurrence COUNT is therefore held constant across gaps and the sequence grows
+instead, and the count is reported per row.
+
+**A null that is really g8-03's null.** If consolidation is at zero everywhere,
+that is P2 failing, not P1 confirming, and it must be reported as a
+misconfiguration rather than as a finding about horizons.
+
+**Knobs carried, not tuned.** Width, learning rate and decay come from the
+existing kinship configuration. Tuning them to make the gate fire would be
+choosing the arm that gives the answer.
+
+
+COST
+----
+One model per condition on short sequences. Minutes, local, no dispatch.
+
+
+MEASURED ON
+-----------
+`openplexus/models/local_memory.py` with `consolidation` on, over a synthetic
+recurring-fact stream. Decay swept at two values to test P3.

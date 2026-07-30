@@ -1963,6 +1963,19 @@ MUTATIONS = [
         new="    return _reader(readable, retrieval, keys)",
     ),
     Mutation(
+        name="the-protocol-version-leaves-the-fingerprint",
+        breaks="the only thing that makes two peers on different wire formats refuse "
+               "each other. Note 096 named this gap -- *a protocol change is invisible "
+               "to the fingerprint* -- and note 098 walked into it one commit later by "
+               "adding a write kind to the header. Without the version in the digest, "
+               "two peers with matching config and different layouts agree they agree, "
+               "then misparse every request: a read is interpreted as some other kind, "
+               "against some other concept, and answers confidently",
+        path=PEER,
+        old='    parts = [f"protocol={PROTOCOL}", f"peers={peers}", f"ring={seed}",',
+        new='    parts = [f"peers={peers}", f"ring={seed}",',
+    ),
+    Mutation(
         name="a-write-goes-only-to-the-owner",
         breaks="the replica fallback, from the other end. Reads walk every holder "
                "precisely because writes fanned out -- `ConceptStore.write` says *a "

@@ -56,6 +56,18 @@ from openplexus.ownership import Ring
 #: this direction.
 _REQUEST = struct.Struct("!Biii")
 READ, WRITE, STOP = 0, 1, 2
+#: The WIRE FORMAT's version, carried in the fingerprint so two peers speaking different
+#: dialects refuse each other instead of misparsing.
+#:
+#: **1** was reads only: `(concept, previous, token)`.
+#: **2** added a kind byte and the write payload.
+#:
+#: Note 096 recorded the gap this fills — *"two peers on different code with the same
+#: config produce the same fingerprint, so a protocol change is invisible to it"* — and
+#: note 098 hit it one commit later, when adding the write kind silently changed the
+#: format. **`tests/test_peer_reads.py` pins this against `_REQUEST.format`**, so changing
+#: the layout without bumping the number fails rather than shipping.
+PROTOCOL = 2
 #: A write is acknowledged so the caller knows it landed. One byte.
 _ACK = b""
 #: The handshake. A peer and a caller must agree about the ring AND the key source, and
@@ -69,15 +81,16 @@ _HELLO = struct.Struct("!16s")
 def fingerprint(keys, peers: int, seed: int) -> bytes:
     """What both sides must agree on, as sixteen bytes.
 
-    Covers the ROUTING (peer count, ring seed) and the KEY SOURCE (its seed, spread,
-    width, start token, route and markers). A difference in any of them sends a read
-    somewhere the write never went, or rebuilds a different key at the same address.
+    Covers the WIRE FORMAT (`PROTOCOL`), the ROUTING (peer count, ring seed) and the KEY
+    SOURCE (its seed, spread, width, start token, route and markers). A difference in any
+    of them sends a read somewhere the write never went, rebuilds a different key at the
+    same address, or misparses the request entirely.
 
     Derived on each side from its own configuration rather than exchanged as data, so
     agreement means the configurations match rather than that one side was told what to
     claim.
     """
-    parts = [f"peers={peers}", f"ring={seed}",
+    parts = [f"protocol={PROTOCOL}", f"peers={peers}", f"ring={seed}",
              f"keyseed={getattr(keys, 'seed', None)}",
              f"spread={getattr(keys, 'spread', None):.12g}"
              if hasattr(keys, "spread") else "spread=None",

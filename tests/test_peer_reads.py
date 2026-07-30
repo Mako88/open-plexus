@@ -30,6 +30,7 @@ import numpy as np
 from openplexus.keys import PairKeys
 from openplexus.ownership import Ring
 from openplexus.partitioned import ConceptStore
+from openplexus import peer as peer_module
 from openplexus.peer import ConceptPeer, RemoteConcepts
 
 WIDTH, VOCAB, NODES = 64, 40, 5
@@ -550,6 +551,43 @@ class ThePeerRefusesAMismatchItself(unittest.TestCase):
             self._handshake_then_read(wrong),
             "the peer served a caller that disagrees about the ring or the keys, "
             "so a stale caller would receive zeros and call them an answer")
+
+
+class TheWireFormatIsPinnedToItsVersion(unittest.TestCase):
+    """Changing the layout without bumping `PROTOCOL` must FAIL, not ship.
+
+    Note 096 named this gap — *"a protocol change is invisible to the fingerprint"* — and
+    note 098 walked straight into it one commit later by adding a write kind to the
+    header. A rule saying "remember to bump the version" is the kind of rule CLAUDE.md
+    rule 18 says to prefer a check over.
+    """
+
+    #: The layout `PROTOCOL = 2` describes. If this assertion fails, the wire format
+    #: changed: bump `peer.PROTOCOL` and update this pair together.
+    EXPECTED = {2: "!Biii"}
+
+    def test_the_struct_layout_matches_the_declared_version(self):
+        self.assertIn(
+            peer_module.PROTOCOL, self.EXPECTED,
+            f"PROTOCOL is {peer_module.PROTOCOL} and this test does not know that "
+            f"version. Add its layout to EXPECTED in the same commit that bumps it.")
+        self.assertEqual(
+            peer_module._REQUEST.format, self.EXPECTED[peer_module.PROTOCOL],
+            "the request layout changed without PROTOCOL changing, so two peers on "
+            "different code would agree on the fingerprint and misparse each other")
+
+    def test_the_version_is_in_the_fingerprint(self):
+        """Otherwise pinning it achieves nothing at runtime."""
+        _, keys, _ = fixture()
+        mine = peer_module.fingerprint(keys, NODES, RING_SEED)
+        original = peer_module.PROTOCOL
+        try:
+            peer_module.PROTOCOL = original + 1
+            self.assertNotEqual(
+                peer_module.fingerprint(keys, NODES, RING_SEED), mine,
+                "the fingerprint ignores PROTOCOL, so a dialect mismatch is silent")
+        finally:
+            peer_module.PROTOCOL = original
 
 
 class ThePeerIsListeningBeforeItIsStarted(unittest.TestCase):

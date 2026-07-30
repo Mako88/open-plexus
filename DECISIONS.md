@@ -78,7 +78,7 @@ sparse keys were measured worse, then a readout change reversed them cleanly. So
 search on correct arithmetic; both conditions were measured away later and both
 mechanisms became right. A deleted alternative cannot be re-measured.
 
-**CENSUS: 24 chosen, 28 refuted, 14 untried, 12 both, 1 paused.** Checked against the
+**CENSUS: 24 chosen, 28 refuted, 13 untried, 13 both, 1 paused.** Checked against the
 body by `tools/check_decisions.py`, because a summary that can drift from what it
 summarises is how `check_architecture.py` caught its own counts the first time a
 verdict changed.
@@ -625,14 +625,29 @@ that is the standing weakness.**
 - ⏸ **`corpus.py`** — PAUSED, not condemned. Closed by 115/118, reopened by g17-01,
   and 135–142 measured on it without anyone re-deciding it was the instrument.
 - ❌ **`reward_recall.py`** — retired, `126`.
-- ⬜ **CLUTRR or any external benchmark** — **the standing gap. Until one runs, this
-  project is grading its own homework.** It has been "next" for several cycles,
-  which is itself the finding.
-  - **`note 058` put a number on what that costs, and it is large.** The set
-    answer's enumeration depends on a bimodal similarity profile; the synthetic task
-    has one with a 0.424 gap and real word co-occurrence has 0.015. **So this stops
-    being a completeness item and becomes the measurement that decides whether the
-    answer line means anything.** Needs a data fetch, which is John's call
+- 🔀 **CLUTRR — FETCHED 2026-07-29 with John's approval, not yet run.** The standing
+  gap: until an external instrument runs, this project grades its own homework.
+  - **`note 058` put a number on what that costs.** The set answer's enumeration needs
+    a bimodal similarity profile; the synthetic task has a 0.424 gap and real word
+    co-occurrence has 0.059 after four confounds. That moved this from a completeness
+    item to the measurement that decides whether the answer line means anything
+  - `tools/fetch_clutrr.py` pins URLs and verifies **size and sha256**, so *"did we
+    measure the same bytes"* is answerable — rule 11b. Config
+    `gen_train23_test2to10`: train on 2–3 hops (9,074 rows), test on 2–10 (1,146)
+  - **The GRAPH layer, not the prose.** CLUTRR ships each puzzle twice; the substrate
+    addresses token ids, not sentences, and GOALS §2 does not want a text front-end.
+    **So any result is "CLUTRR-symbolic", never "CLUTRR"**, and the published
+    text-task numbers are not comparable
+  - **`note 059`, and it decides the reporting BEFORE the run: the test split
+    confounds depth with ENTITY REPETITION.** Train and validation have **zero**
+    puzzles where an entity appears in more than two edges; test has **37.8%**, rising
+    from 13 cases at four hops to 87 at ten. Repeated entities are this project's
+    measured weak point — `103` 0.884→0.303 single-token, `104` 0.628 with pair keys —
+    so a naive falling curve would read as *"composition degrades with depth"* and be
+    **wrong about which component to fix.** Report split by max-appearances; the
+    `max_appearances = 2` subset (713 rows) is the honest primary arm
+  - Six target relations — `nephew`, `niece`, and four in-laws — **never appear as an
+    edge**, so the answer space is larger than the input vocabulary
 
 ### 10b. Retracted numbers — never quote these
 

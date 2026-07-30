@@ -1,0 +1,17 @@
+# A node or driver of a distributed run, as a container.
+#
+# `distributed.py`'s Network(spawn=False) docstring says a container on the other end
+# of an emulated link "is the only way G2, G3 and G4 stop being modelled". This is that
+# container. Loopback measured 0.28 ms/step; SCALE.md says a real hop is ~50 ms, so the
+# point of the boundary is `tc netem`, which needs NET_ADMIN in compose.
+FROM python:3.12-slim
+
+# iproute2 for `tc`, which is the whole reason a container beats a subprocess here.
+RUN apt-get update && apt-get install -y --no-install-recommends iproute2 \
+    && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir numpy
+
+WORKDIR /app
+COPY openplexus /app/openplexus
+COPY tools /app/tools
+ENV PYTHONUNBUFFERED=1

@@ -137,3 +137,36 @@ Not read from data. It is arithmetic rather than domain knowledge, and the ablat
 the actual domain knowledge supplied was harmful — but **a system that discovered the
 additivity itself would be a stronger claim than this makes**, and the note says so in its
 own text.
+
+### `dim` is a property of the EXTRACT, not the domain — `g23-03`
+
+    CONFIG  when    2026-07-30
+            source  g23-03
+            script  tools/invariant_dimension.py --graph <path>, over all 16
+                    OpenEA rel_triples files
+            task    none -- linear algebra over cycle constraints
+            model   n/a
+            knobs   graph
+            scale   16 graphs, 8 V1/V2 pairs
+
+    pair            side 1          side 2
+    D_W       V1 = 2, V2 = 0    V1 = 0, V2 = 0
+    D_Y       V1 = 0, V2 = 0    V1 = 0, V2 = 0
+    EN_DE     V1 = 1, V2 = 0    V1 = 0, V2 = 0
+    EN_FR     V1 = 1, V2 = 0    V1 = 0, V2 = 0
+
+**Three of eight pairs disagree**, all on the DBpedia side, all `dim >= 1` in V1 and
+`dim 0` in V2.
+
+`note 104` measured `EN_DE` **V2** and concluded *"DBpedia EN and DE have no additive
+invariant, and not approximately"* — which scoped this whole option to *"solved wherever a
+conserved quantity exists"* and put *"invariants per sub-domain"* at the top of the
+handoff. **The V1 extract of that same source graph has dimension 1.**
+
+V1 and V2 are different samples of one source at different densities, and the dimension is
+a property of the cycle structure that density changes. So the honest statement is that a
+particular 15,000-entity sample has no invariant, not that DBpedia has none — and the
+with/without framing this option's scope rests on is partly an artefact of sampling.
+
+**Predicted before the run and expected to fail** (`g23-03` P4), with this consequence
+written out in advance rather than after.

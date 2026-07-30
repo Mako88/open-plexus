@@ -113,6 +113,27 @@ note 104's dim-0 finding is about `EN_DE`. Both rows name their dimension becaus
 
 **These were NOT pre-registered**, unlike `g23-01`, and are therefore observations rather
 than tested predictions. Rule 4's distinction, stated rather than blurred.
+
+## Sixteen graphs, and the margin does not track the invariant -- `g23-03`
+
+    dim 0    n=13   mean margin over counting  +0.0974
+    dim >=1  n=3    mean margin over counting  +0.0507
+    difference 0.0467, against a bar of 0.05 registered before the run
+
+**The sign is the reassuring part.** A mechanism exploiting conserved quantities would
+score HIGHER where they exist; this scores higher where they do not. Fragile at `dim >= 1`
+-- three graphs, one of them a near-tie -- so it supports *"the margin does not increase
+with an invariant"*, not *"the margin is independent of it"*.
+
+**It loses on two of sixteen**, and the informative one is `D_Y_V1_s2` at **-0.0834 with
+48 rules** -- the smallest graph here, twelve rules held out. Counting wins where there is
+almost nothing to learn from, so *"beats counting"* carries a data requirement somewhere
+between 48 and 175 rules.
+
+**And invariant dimension is a property of the EXTRACT, not the domain.** Three of eight
+V1/V2 pairs disagree, all on the DBpedia side, all `dim >= 1` in V1 and `dim 0` in V2. So
+`note 104`'s *"DBpedia EN and DE have no additive invariant"* is a statement about one
+15,000-entity sample.
 """
 
 from __future__ import annotations

@@ -396,7 +396,11 @@ additive and nothing else has been tried.
   **SCOPED by `note 104`:** DBpedia EN and DE have **no additive invariant**, and not
   approximately, so it is *"solved wherever a conserved quantity exists"*. **Revival of the
   general case:** invariants per SUB-DOMAIN, a different computation, unbuilt. *measured in:*
-  CLUTRR kinship.
+  CLUTRR kinship. **`g23-03` NARROWS THAT SCOPING: `dim` is a property of the EXTRACT, not
+  the domain** — three of eight OpenEA V1/V2 pairs disagree, all `dim ≥ 1` in V1 and 0 in V2,
+  including the `EN_DE` graph note 104 measured. So *"DBpedia has none"* is really *"this
+  15,000-entity sample has none"*, and the with/without framing is partly a sampling
+  artefact.
   → record: [generation-delta.md](docs/options/generation-delta.md)
 - ❌ **Naming the missing rule, by any learned readout — `note 088`.** Scores **0.5995 end
   task, BELOW random filling's 0.6081 ± 0.0055**, and `majority` is worse still, so

@@ -585,7 +585,14 @@ transport is a parallel path nothing in `run()` uses yet.
   3,850 ms to **1,000 ms**, which is **necessary and not sufficient against `d_max` 640 ms**.
   **A MIGRATING walk is where the remaining 2× is, and it is NOT BUILT** — `note 102` prices
   the rendezvous at 0.089 with its period unmeasurable, so a walk must meet, not meet every
-  hop. *measured in:* loopback only, priced at an assumed 50 ms RTT.
+  hop. **`g24-01` RAN IT OVER A REAL IMPAIRED LINK AT LAST, and note 101's estimate was 3.2×
+  optimistic:** a round costs **161 ms** on an 80 ms link, not the assumed 50, so the walk
+  misses `d_max` at **depth 2** rather than depth 8, and depth 5 costs **1,614 ms**. Rounds
+  are `2 × depth` in every row, so the structure holds and only the constant was wrong.
+  **New term nothing here models: with 2% loss, `ms/round` GROWS with depth** — 164, 271,
+  302 — because a retransmit costs a timeout, so cost is superlinear exactly when the
+  network is worst. The migrating walk now has to find ~8× rather than 2×. *measured in:*
+  4 peer containers + asker, `tc netem` on all, Docker bridge.
   → record: [peer-transport.md](docs/options/peer-transport.md)
 - ❌ **The global dimension-summing readout** — the globally synchronised step **C1
   forbids**, the project's own first constraint. Surfaced in a footnote to

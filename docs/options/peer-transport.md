@@ -157,3 +157,44 @@ Batching trades round trips for bytes.
 **Untried:** write ordering (they race, and the store is additive), re-replication,
 negotiation rather than refusal, and any real link — every latency figure here is priced
 from an assumed 50 ms RTT on loopback.
+
+### The walk over a REAL impaired link: it misses `d_max` at depth 2 — `g24-01`
+
+    CONFIG  when    2026-07-30
+            source  g24-01
+            script  testbed/run.py --mode peer --nodes 4 --width 64
+                    --delay 80ms [--jitter 20ms --loss 2%]
+            task    search.beam through RemoteConcepts, beam width 2, branches 2
+            model   node_main peer mode, width 64, vocab 40, 24 facts, 2 replicas
+            knobs   tc netem delay/jitter/loss, applied to the ASKER as well as
+                    the peers
+            scale   4 peers + 1 asker in containers, Docker 29.6.1
+
+    clean 80 ms delay          80 ms + 20 ms jitter + 2% loss
+    depth  wall ms  ms/round   depth  wall ms  ms/round
+        1    322.3    161.15       1    328.5    164.25
+        2    645.3    161.33       2   1083.3    270.83
+        3    967.8    161.30       3   1814.7    302.45
+        5   1614.4    161.44
+
+**Note 101's table is the prediction and it was committed long before this run**: it
+priced a round at an assumed 50 ms and put the breaking point at depth 8. Measured, a
+round costs **161 ms** and the walk goes over `d_max` at **depth 2**. Depth 5, which that
+table records as fitting at 78% of budget, costs **1,614 ms**.
+
+Rounds equal `2 * depth` in every row of every run, so the STRUCTURE note 101 established
+is confirmed exactly; only its constant was wrong, by 3.2x.
+
+**And a term no model here has: with loss, cost is SUPERLINEAR in depth.** Clean,
+`ms/round` is flat to two decimals. With 2% loss it grows — 164, 271, 302 — because each
+additional round is another chance at a retransmit and a retransmit costs a timeout, not a
+round trip. `tools/walk_rounds.py` and note 101 both treat a walk as `rounds x RTT`, which
+is linear. **Depth is dearest exactly when the network is worst.**
+
+Unimpaired on the same bridge: 0.40–1.21 ms/round, which is the identity check.
+
+**What it does not settle.** `d_max` 640 ms is itself a floor from six simulated links
+(`128`), and a real WAN raises it — that would move the bar the walk's way and is
+unmeasured. This is one machine and one bridge: no route changes, no competing traffic, no
+asymmetry, no NAT. And the migrating walk (`note 102`) is the untested answer, whose
+required gain this run raises from about 2x to about 8x.

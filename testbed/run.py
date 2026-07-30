@@ -27,6 +27,10 @@ IMAGE = "openplexus-testbed"
 NETWORK = "openplexus-testbed"
 DRIVER = "openplexus-driver"
 PORT = 9999
+#: Peer mode only. A different port from the driver's so a stray container
+#: from the other mode cannot be answered by mistake.
+ASKER = "openplexus-asker"
+PEER_PORT = 9500
 
 
 def run(command: list[str], **kwargs) -> subprocess.CompletedProcess:
@@ -51,6 +55,73 @@ def impairment(delay: str | None, jitter: str | None, loss: str | None) -> str:
     return " ".join(parts) + " || exit 3; "
 
 
+def peer_mode(args) -> int:
+    """Time a driver-free walk across peer containers under `tc netem`.
+
+    **This is the measurement notes 094 and 101 both say has never been taken.**
+    Their words: `tools/cluster_compose.py` *"can put peers in containers with
+    `tc netem`, and has not been pointed at this"*, and the `tc netem` container
+    harness *"has still never been pointed at the peer path"*. Every peer number
+    in the project is loopback priced at an assumed 50 ms RTT.
+
+    **Impairment is applied to the ASKER as well as the peers**, and that is not
+    incidental. `netem delay` shapes egress, so delaying only the peers makes the
+    request leg free and the reply leg slow -- half a link. Both sides get it, so
+    a stated `--delay 80ms` is about 160 ms of round trip, and the tool reports
+    milliseconds per ROUND rather than wall clock for that reason.
+
+    **What this does not duplicate:** the walk, the reader and the round counter
+    all already exist -- `openplexus/peer.py`, `search.beam`, and
+    `RemoteConcepts.rounds`. `tools/peer_walk_timing.py` is the timing loop and
+    already runs in process. This is the container and impairment wiring, which
+    is the one part that was missing, and it reuses this file's own image, network
+    and `impairment()` rather than standing up a second harness.
+    """
+    print(f"building {IMAGE} ...", flush=True, file=sys.stderr)
+    built = run(["docker", "build", "-q", "-f", "testbed/Dockerfile",
+                 "-t", IMAGE, "."])
+    if built.returncode:
+        print(built.stderr, file=sys.stderr)
+        return 1
+
+    run(["docker", "network", "create", NETWORK])
+    names = [f"openplexus-peer-{i}" for i in range(args.nodes)]
+    run(["docker", "rm", "-f", ASKER, *names])
+
+    tc = impairment(args.delay, args.jitter, args.loss)
+    shared = ["-e", "OPENPLEXUS_MODE=peer",
+              "-e", f"OPENPLEXUS_PEER_PORT={PEER_PORT}",
+              "-e", f"OPENPLEXUS_D_MODEL={args.width}",
+              "-e", f"OPENPLEXUS_NODES={args.nodes}",
+              "-e", "OPENPLEXUS_VOCAB_SIZE=40",
+              "-e", "OPENPLEXUS_CONTEXT_KEYS=1"]
+    for index, name in enumerate(names):
+        launched = run(["docker", "run", "-d", "--name", name,
+                        "--network", NETWORK, "--cap-add=NET_ADMIN", *shared,
+                        "-e", f"OPENPLEXUS_NODE_INDEX={index}",
+                        IMAGE, "sh", "-c",
+                        f"{tc}python -m openplexus.node_main"])
+        if launched.returncode:
+            print(launched.stderr, file=sys.stderr)
+            return 1
+
+    time.sleep(3)          # peers bind before serving; give them the bind
+    peers = ",".join(f"{name}:{PEER_PORT}" for name in names)
+    depths = " ".join(str(d) for d in args.depths)
+    asked = run(["docker", "run", "--name", ASKER, "--network", NETWORK,
+                 "--cap-add=NET_ADMIN", IMAGE, "sh", "-c",
+                 f"{tc}python tools/peer_walk_timing.py --peers {peers} "
+                 f"--depths {depths} --width {args.width} --nodes {args.nodes}"])
+    print(asked.stdout or asked.stderr, file=sys.stderr)
+    for name in names:
+        logs = run(["docker", "logs", name]).stdout.strip().splitlines()
+        if logs:
+            print(f"  {name}: {logs[0]}", file=sys.stderr)
+    if not args.keep:
+        run(["docker", "rm", "-f", ASKER, *names])
+    return asked.returncode
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--nodes", type=int, default=2)
@@ -66,7 +137,17 @@ def main() -> int:
                         help="step at which those nodes go silent")
     parser.add_argument("--keep", action="store_true",
                         help="leave containers behind for inspection")
+    parser.add_argument("--mode", choices=("slice", "peer"), default="slice",
+                        help="slice: the driver-based DIMENSION path, which every "
+                             "netem result to date used. peer: point-to-point "
+                             "concept reads with no driver, which notes 094 and "
+                             "101 both record as never having been run here")
+    parser.add_argument("--depths", type=int, nargs="+", default=[1, 2, 3, 5],
+                        help="peer mode only: walk depths to time")
     args = parser.parse_args()
+
+    if args.mode == "peer":
+        return peer_mode(args)
 
     if args.width % args.nodes:
         # slices_for refuses uneven splits; say so here rather than letting the

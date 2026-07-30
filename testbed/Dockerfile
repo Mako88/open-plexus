@@ -15,5 +15,9 @@ RUN pip install --no-cache-dir numpy
 WORKDIR /app
 COPY openplexus /app/openplexus
 COPY testbed /app/testbed
+# `tools/` is here for peer mode's asker, which runs tools/peer_walk_timing.py
+# inside a container on the impaired network. The slice path does not need it and
+# the layer is small, so one image still serves every role.
+COPY tools /app/tools
 
 ENV PYTHONUNBUFFERED=1

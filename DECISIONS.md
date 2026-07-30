@@ -278,28 +278,29 @@ saturation.**
 **⇒ DECIDED: `inherit`. The project's cleanest mechanism and nothing in it is
 fitted.**
 
-- ✅ **`inherit` / occupancy sketch** — answer from your own address if **anything**
-  was written there, else from your neighbours'.
-  - `148` 0.8100 DIRECT / 0.4350 TRANSFER / 0.8183 EXCEPTION — the first arm good
-    at all three. The gate is **exact: 1.0000 of TRANSFER, 0.0000 of DIRECT and
-    EXCEPTION, every seed**. *measured in:* families with exceptions, 3 seeds
-  - **Why it works:** membership is *"is there anything here"*, not *"who has
-    more"*, and with a hashed sketch an unwritten address reads **exactly 0.0** —
-    so the threshold is structurally zero and nothing is tuned
-  - `149` not a fitted constant: ordering holds in every cell across `n_values`
-    4/8/16 and `family_size` 3/4/6
-  - `150` MQAR: matches plain **seed for seed** (0.9950) and never defers; summing
-    the same extra reads costs 0.113. Also rules out sketch false negatives
-  - `153` **where it pays:** occupancy is informative exactly where an address is
-    READ BEFORE IT IS WRITTEN within the sequence. Families qualifies; chains,
-    kinship and MQAR write every address before querying it
-  - `161` it was never read-gated and nobody had counted its reads
-- ❌ **Select by norm** — magnitude at an address says nothing about whether it is
-  the right address. Collapsed to 0.247 on exceptions where plain addressing holds
-  0.783. `147`
-- ❌ **Select by decode margin** — confidence in *an* answer is not evidence about
-  *which retrieval* produced it. 0.581, below the summed baseline's 0.688. `147`
-- ❌ **Sum the two retrievals** — averaging, so it cannot choose. `146`
+- ✅ **`inherit` / occupancy sketch** — answer from your own address if **anything** was
+  written there, else from your neighbours'. `148` 0.8100 / 0.4350 / 0.8183, the first arm
+  good at all three, and the gate is **exact** — 1.0000 of TRANSFER, 0.0000 of DIRECT and
+  EXCEPTION, every seed. **Why it works:** membership is *"is there anything here"*, so an
+  unwritten address reads **exactly 0.0** and the threshold is structural, not tuned.
+  `149` not a fitted constant; `150` costs nothing on MQAR; `153` it pays exactly where an
+  address is read before it is written. *measured in:* families with exceptions, 3 seeds.
+  → record: [inherit-gate.md](docs/options/inherit-gate.md)
+- ❌ **Select by norm** — magnitude at an address says nothing about whether it is the
+  right address, and it moves with the concept's popularity rather than the query. `147`
+  0.247 on exceptions where plain addressing holds 0.783. *measured in:* families with
+  exceptions. **Revival:** none foreseen — it is rule 7's shape, a criterion that cancels
+  its own input.
+  → record: [select-by-norm.md](docs/options/select-by-norm.md)
+- ❌ **Select by decode margin** — confidence in *an* answer is not evidence about *which
+  retrieval* produced it. `147` 0.581, below the summed baseline's 0.688. *measured in:*
+  families with exceptions. **Revival:** the same quantity DOES work on a different
+  question — `129`/`130` gate the search on it for +0.020.
+  → record: [select-by-decode-margin.md](docs/options/select-by-decode-margin.md)
+- ❌ **Sum the two retrievals** — averaging, so it cannot choose. `146`. *measured in:*
+  families with exceptions. **Revival condition MET at `167`:** nothing has to be selected
+  when the answer is a set, and the mechanism returns unchanged.
+  → record: [sum-the-retrievals.md](docs/options/sum-the-retrievals.md)
 - **The limit, and it is what `167` ran into:** the sketch knows **emptiness, not
   relevance.** It cannot bound an enumeration over addresses that are all
   occupied.
@@ -313,31 +314,28 @@ quantity learned exactly from loop constraints. End task 0.5201 → 0.9668 symbo
 compose but whether an arbitrary domain has an invariant of this kind; kinship's is
 additive and nothing else has been tried.
 
-- ✅ **`hop_relation`** — bind a relation token into the hop's key, so a hop follows
-  a NAMED edge. `158`
-- ✅ **`hop_relations`** — one relation PER HOP, so a walk follows LINK-then-FACT.
-  - `164` LINK→FACT reaches the linked family's value; LINK→LINK stops at its
-    representative; `hop_relation=LINK` (the pre-164 mechanism at its best setting)
-    also stops there. Stable across 3 seeds
-  - **Labelled an instrument, not the answer.** A schedule the task does not supply
-    is a fitted constant (`162`)
+- ✅ **`hop_relation`** — bind a relation token into the hop's key, so a hop follows a
+  NAMED edge. `158`, and `162` is why it blocks before the choosing question matters.
+  *measured in:* kinship, where the query states the relation.
+  → record: [hop-relation.md](docs/options/hop-relation.md)
+- ✅ **`hop_relations`** — one relation PER HOP, so a walk follows LINK-then-FACT. `164`
+  LINK→FACT reaches the linked family's value where both LINK→LINK and the pre-164
+  mechanism stop at its representative. **Labelled an instrument, not the answer:** a
+  schedule the task does not supply is a fitted constant (`162`). *measured in:* families
+  with links, 3 seeds.
+  → record: [hop-relations.md](docs/options/hop-relations.md)
 - ⬜ **Try-all-and-gate** — follow every relation type, keep the one whose address is not
-  empty: `r` reads, no new mechanism, and **the gate doing selection**, which is the one
-  selection rule here that has ever worked. `163 §2` John: *"potentially the actual end
-  solution."*
-  - **Its viability is a property of RELATION DENSITY and the dense case is refuted.** The
-    gate selects only where exactly one candidate address is occupied, and `search.py`
-    records the split: `(subject, relation)` names one person **94.9%** of the time while
-    `(FACT, subject)` *"names one of several relations about half the time"* — so on ten
-    relations it is undecided about half the time, which is why `search.py` exists (`108`)
-  - **Where it works is where it is unnecessary** (few sparse relations, i.e. `families.py`,
-    where `hop_relations` suffices) and where it is needed it is refuted. **Revival:** a task
-    with several individually-sparse relations, which nothing here has
-  - **And `note 090` took a different route entirely** — supplying the DISPLACEMENT rather
-    than choosing the relation — so this and the learned chooser below are alternatives to
-    a problem now solved another way. Kept as ⬜ rather than ❌ because neither was measured
-- ⬜ **Learned relation chooser** — `147`: two hand-made selection rules were refuted before
-  membership worked, and a learned chooser is strictly harder. See 090's route above.
+  empty: `r` reads, no new mechanism, and **the gate doing selection**. `163 §2` John:
+  *"potentially the actual end solution."* **Its viability is a property of RELATION
+  DENSITY and the dense case is refuted** — `108`, `(subject, relation)` names one person
+  94.9% of the time while `(FACT, subject)` is undecided about half the time. **Where it
+  works is where it is unnecessary.** Kept ⬜ because it was never measured, and `note 090`
+  solved the problem another way.
+  → record: [try-all-and-gate.md](docs/options/try-all-and-gate.md)
+- ⬜ **Learned relation chooser** — `147`: two hand-made selection rules were refuted
+  before membership worked, and a learned chooser is strictly harder. Also superseded by
+  090's route.
+  → record: [learned-relation-chooser.md](docs/options/learned-relation-chooser.md)
 - ✅ **`search.py` beam search — `run()` CALLS IT, `search_beam_width=4` by default.**
   Branches at EVERY step, where `search` hedges only at the root — which `note 064`
   measured as the wrong place, since the relation decode is 0.974 there and ~0.91
@@ -346,183 +344,127 @@ additive and nothing else has been tried.
   and depth — do not quote one for the other**. `search_prune_every` stays 1: period 2
   costs −0.016 ±0.006 and is a knob for meeting `d_max`, not a default.
   → record: [docs/options/beam-search.md](docs/options/beam-search.md)
-- ✅ **`search.beam` — branch at EVERY step, pruned.** Beats single-step branching on
-  every seed of both harnesses, which is the qualitative claim and it holds.
-  - **`note 075`: `note 065`'s +0.2190 does NOT reproduce.** `beam` lands within 0.007 of
-    065's mean; `search` is high by 0.12, so the gain is **+0.107**. Not width, not the
-    `allowed` mask, not `branches` — all tested. 065's config is unrecovered, so take
-    differences against `tools/clutrr_recovery.py`'s own baseline
-  - **713/713 on the plain subset is reached — under PARTITIONING** (`note 081`): 4
-    concept nodes give beam **0.9220** against 0.8877 monolithic (`note 105`), because a node carries
-    interference only from what it owns. `note 103` corroborates at 8 nodes (0.9058)
-  - **A MECHANISM, not a margin** (`note 103`): `search` is worse than not branching at
-    out-degree 1 (0.649 vs walk's 0.702); `beam` recovers 0.692 AND gains +0.038 at ≥ 2
-  - 🔀 **`search_prune_every` — a DEPLOYMENT knob, left at 1.** `note 103` prices period
-    2 at **−0.016 ±0.006**, real at 2.7 SE. Pay it to meet `d_max`, not by default
-  - **Cost 4× the reads** (`width × branches × depth`); unpruned is `branches^h`, a
-    million walks at ten hops, so pruning is what makes it exist. **G4 unanswered** —
-    `123` had beam 4 at 3.2× on kinship. `search` is untouched as the comparison (14c)
-  - **⇒ It corrects `note 063`**, which put the ceiling on route-finding rather than
-    naming: right at 0.659, wrong once the route is solved, so the fold is the next work
-- ✅ **A hop REPLACES a retrieval, it does not combine with it** — `101`. `102` built
-  the accumulator and recorded that the stated reason for choosing it was wrong.
-- ❌ **Another mechanism stacked on noisy retrieval** — four tried, all failed
-  against the same 0.915/0.35 ceiling. `102`, `105`, `107`, `111`. **Do not
-  re-propose:** the fix is per-step fidelity, not another layer.
-  - `105` hops and pair keys **do not compose, and the combination produced numbers
-    anyway** — the failure mode this repo's standards are built against
-  - `106` composition degrades under repeated entities *gracefully*, and the 1.000
-    that preceded it was the degenerate case
-  - `107` the traversal mechanism is not worth building; the blocker is per-step
-    fidelity. **Condition expired at `121`/`122`**
+- ✅ **`search.beam` — branch at EVERY step, pruned.** Beats single-step branching on every
+  seed of both harnesses. **`note 075`: `note 065`'s +0.2190 does NOT reproduce** — the gain
+  is **+0.107**, and 065's config is unrecovered. **713/713 on the plain subset is reached
+  under PARTITIONING**, beam **0.9220** at 4 nodes against 0.8877 monolithic (`note 105`).
+  **A MECHANISM, not a margin** (`note 103`). Cost 4× the reads; unpruned is
+  `branches^h`. **⇒ It corrects `note 063`**, which put the ceiling on route-finding rather
+  than naming. *measured in:* CLUTRR chain recovery, width 64, 3 seeds.
+  → record: [beam-search.md](docs/options/beam-search.md)
+- ✅ **A hop REPLACES a retrieval, it does not combine with it** — `101`. `102` built the
+  accumulator and recorded that the stated reason for choosing it was wrong. `103`'s oracle
+  is what showed the readout was getting nothing from hop 1. *measured in:* kinship.
+  → record: [hop-replaces-retrieval.md](docs/options/hop-replaces-retrieval.md)
+- ❌ **Another mechanism stacked on noisy retrieval** — four tried, all failed against the
+  same 0.915/0.35 ceiling: `102`, `105`, `107`, `111`. **Do not re-propose:** the fix is
+  per-step fidelity, not another layer. `105` is the one where the combination **produced
+  numbers anyway**. *measured in:* kinship. **Two conditions EXPIRED at `121`/`122`**, which
+  is why the traversal was eventually built.
+  → record: [stacked-on-noisy-retrieval.md](docs/options/stacked-on-noisy-retrieval.md)
 - 🔀 **`hop_accumulate`: `concat` vs `bind`** — concat wins 1.000 to 0.812, **but only
-  because 16 rules in a 128-wide space are linearly separable whatever the labels do**, which
-  is a property of having few rules. `bind` is kept for that reason. *measured in:* 16 rules,
-  10 relations, 128-wide
-  - **`note 063`: SCALE.md's trigger — "a rule table in the hundreds" — is MET.** CLUTRR has
-    1,393 distinct chains, and **99.8% of test chains are unseen** while only 6.6% of adjacent
-    PAIRS are. A readout over a whole chain must generalise to what it never saw; a **fold
-    over pairwise rules** only asks what it was trained on, median 144 times each
-  - **`note 066` corrects 063 both ways.** Intermediates are NOT unlabelled — a 2-hop answer
-    IS a labelled pairwise rule (4,076 of them, 62 unambiguous), and 3-hop puzzles label
-    `(derived, base)`, so the task supplies its own curriculum. But 063's "6.6% unseen"
-    counted *stated* pairs where the fold needs `(accumulated, next)` with the accumulated
-    side **derived**: **120 asked for, 97 derivable**, converged in two rounds
-  - **The fold is right 98.8% where it can act** (596/603) but **completes only 52.6%** —
-    tabulation's ceiling, not the fold's error. **The bottleneck moved twice:** 063
-    route-finding → 065 naming → 066 the rules to name with. Unexplained: the **3-hop cell
-    (0.524) is below 4-hop (0.732)**
+  because 16 rules in a 128-wide space are linearly separable whatever the labels do.**
+  `bind` is kept for that reason. **`note 063`: SCALE.md's trigger is MET** — CLUTRR has
+  1,393 chains, 99.8% of test chains unseen, so a **fold over pairwise rules** is what
+  generalises. **`note 066` corrects 063 both ways**, and the fold is right **98.8% where it
+  can act** while completing only **52.6%** — tabulation's ceiling. *measured in:* 16 rules,
+  10 relations, 128-wide; then CLUTRR.
+  → record: [hop-accumulate.md](docs/options/hop-accumulate.md)
 - ✅ **GENERATION DELTA, learned from cycles — `note 090`, and it CLOSES the ceiling.**
-  A chain plus its query is a loop, so the chain's deltas must sum to the answer's: one
-  equation per puzzle, 9,074 of them, 20 unknowns, null space **1** (the gauge), and
-  **20/20 deltas recovered exactly**. Fill a gap with any relation of the right delta and
-  the chain stays arithmetically correct.
-  - **End task 0.5201 → 0.9668** symbolically, against 1.0000 for an oracle handed the
-    true rules. **CONTROL: a deliberately WRONG delta scores 0.5681, below random's
-    0.6081** — so the displacement is the mechanism, not the filling. Fills also FALL,
-    720 against random's 1,152, because a delta-preserving fill lands where the table
-    already knows
-  - **`note 091` end to end, the model recovering its own chains: 0.8578**, with chain
-    recovery 0.8770. Roughly the product, slightly better because a mis-recovered chain
-    can still compose right. `tools/generation_delta.py` reproduces both
-  - **`note 087`: the fold is PERFECT given coverage** — supply every missing rule and
-    puzzles complete 1.0000. The gap was **31 rules**, all spouse/in-law, never stated
-  - **`note 089`'s hand-coded features were mostly NOISE** (oracle 0.7382; marry cost
-    0.125, gender+affinity 0.058). **The one measured as LEAST learnable — generation,
-    0.350 from profiles — is the only one that mattered**: profiles are ADJACENCY and
-    generation is GLOBAL, so it needed a different kind of signal, not a better regressor
-  - ❌ **SCOPED by `note 104` — the limit of the headline result.** Null-space DIMENSION
-    counts a domain's invariants from data alone. **DBpedia EN and DE both return 0**
-    (167/96 relations, 82k/90k loops, full rank), and not approximately: CLUTRR's null
-    direction is 1.3e-15 with a **14-order gap**, DBpedia's cluster at ~3e-3 with none. So
-    it is *"solved wherever a conserved quantity exists"*. **Revival:** invariants per
-    SUB-DOMAIN — a consistent SUBSET of relations — a different computation, unbuilt
-- ❌ **Naming the missing rule, by any learned readout — `note 088`.** Extensional
-  relations reach 0.223 held-out (`note 070`, +0.099 paired, t=11.6) and score **0.5995 end
-  task, BELOW random filling's 0.6081 ± 0.0055.** 070's holdout was a random quarter; the
-  rules that matter are an adversarially withheld family, and this is the measurement that
-  separates them. `majority` is worse still (0.5620), so systematic error costs more than
-  noise. **Revival: only if a mechanism beats 0.6081 end-task, which is the bar 090 clears.**
-  - `note 067` `bind` over RANDOM relations: 0.056 held out against chance 0.050. Kept
-    under 14c as the measured comparison
-  - `note 084` self-training does not lift it, frozen from round 1: **bootstrapping needs
-    new FEATURES, not new labels** — 078's rounds added graph columns, this adds only
-    pseudo-labels over the same space
-  - `note 085` **associativity VERIFIES what it cannot generate.** Holds on the known table
-    (0.933), determines held-out rules at 0.059 (chance — 15% density), and as a filter
-    separates **0.5645 from 0.0162** with 98.4% of rejections genuinely wrong. Propagating
-    it iteratively fills **zero cells in zero rounds** (`note 090`), so deduction is settled
-    as unable to supply the rules
-  - `note 071` structured vectors in the ADDRESS need the gate: raw reads return another of
-    that entity's facts 0.592–0.775, `AddressSketch` recovers 1.0000/0.0005 at 24 bits
-- ⬜ **`index_at_hops` combined with the position-level index** — `159`/`160`/`161`
-  built the pieces; `154` measured that the guard's premise is false (a hop key
-  sits at cosine **0.96** to a single token's row, so it *does* name a concept).
-  Blocked on an instrument, not a mechanism: **no task has both** an
-  address-never-written and a composition
-  ([note 050](docs/notes/050-the-missing-instrument-composition-over-things-never-stated.md)).
+  9,074 loop equations, 20 unknowns, null space **1**, and **20/20 deltas recovered
+  exactly**. End task **0.5201 → 0.9668** symbolically, and **0.8578 end to end** with the
+  model recovering its own chains (`note 091`). **CONTROL: a deliberately WRONG delta scores
+  0.5681, below random's 0.6081** — so the displacement is the mechanism, not the filling.
+  **SCOPED by `note 104`:** DBpedia EN and DE have **no additive invariant**, and not
+  approximately, so it is *"solved wherever a conserved quantity exists"*. **Revival of the
+  general case:** invariants per SUB-DOMAIN, a different computation, unbuilt. *measured in:*
+  CLUTRR kinship.
+  → record: [generation-delta.md](docs/options/generation-delta.md)
+- ❌ **Naming the missing rule, by any learned readout — `note 088`.** Scores **0.5995 end
+  task, BELOW random filling's 0.6081 ± 0.0055**, and `majority` is worse still, so
+  systematic error costs more than noise. Note 070's 0.223 held-out was a random quarter;
+  the rules that matter are an adversarially withheld family. `note 084` self-training does
+  not lift it; `note 085` associativity **verifies what it cannot generate**. *measured in:*
+  CLUTRR, 10 seeds. **Revival: a mechanism that beats 0.6081 end-task**, which is the bar
+  090 clears.
+  → record: [naming-the-missing-rule.md](docs/options/naming-the-missing-rule.md)
+- ⬜ **`index_at_hops` combined with the position-level index** — `159`/`160`/`161` built
+  the pieces; `154` measured that the guard's premise is false, a hop key sits at cosine
+  **0.96** to a single token's row. Blocked on an instrument, not a mechanism: **no task has
+  both** an address-never-written and a composition (`note 050`).
+  → record: [index-at-hops.md](docs/options/index-at-hops.md)
 
 ## 6. The answer — what a response IS
 
 **⇒ OPEN, and this is the live question. It is where the project's stated goal
 lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
 
-- ✅ **Set of tokens, scored by `exact` and F1** — the measurement convention.
-  - `165` `openplexus/answers.py`. **Recall alone is never reported:** emitting the
-    whole alphabet scores recall **1.000** and F1 0.400. That trap fired within one
-    commit — removing the gate in `167` *raised* recall while precision fell
-  - `165` degenerates exactly: on singletons `exact` IS the old accuracy, and
-    `single_token_accuracy` recovers it and raises on anything else
-- ✅ **Emit by gated collection over index-proposed neighbours** — `167`.
-  **This is decision 146's refuted mechanism, unchanged.** 146 found it can only
-  average rather than select and 147 refuted the ways to choose — and **neither
-  objection applies to a set answer, because nothing has to be selected.** The
-  refutation was about the question.
+- ✅ **Set of tokens, scored by `exact` and F1** — the measurement convention, `165`, built
+  BEFORE anything produced a set. **Recall alone is never reported:** emitting the whole
+  alphabet scores recall 1.000 and F1 0.400, and that trap fired within one commit. It
+  degenerates exactly, so every earlier singleton number stays comparable. *measured in:*
+  `openplexus/answers.py`, dependency-free.
+  → record: [set-of-tokens.md](docs/options/set-of-tokens.md)
+- ✅ **Emit by gated collection over index-proposed neighbours** — `167`. **This is decision
+  146's refuted mechanism, unchanged**: 146 found it can only average and 147 refuted the
+  ways to choose, and **neither objection applies to a set answer, because nothing has to be
+  selected.** The refutation was about the question. *measured in:* families, set-valued.
+  → record: [gated-collection.md](docs/options/gated-collection.md)
 - 🔀 **Bound the enumeration by the biggest similarity gap** — an argmax over gaps, not a
-  threshold, the same move `148` made replacing a tuned bar with a structurally-zero read.
-  - Matches the best fixed `branches` at family sizes 3–6 **without being told the size**,
-    where no single fixed value works across all of them. `look` is a **ceiling** not a
-    target: flat 6→16, but 0.500 at look=4 for a family of 6, so it must exceed the group.
-    *measured in:* families, index purity **1.000**, cliff ~0.45 wide against within-family
-    steps of ~0.01
-  - **`note 058`: real word co-occurrence has NO cliff, and the shape is the finding.**
-    Largest gap **0.059** against the task's **0.424**, after four confounds were closed
-    (weighting off, content-word slice, centring confirmed, shuffled control at 0.002).
-    **At no setting is the profile bimodal** — language decays in steps of 0.02–0.03 where
-    the task falls 0.45 at once. **A cliff rule needs a cliff and language provides a
-    slope**, so the crossover needs purity ≳0.99 *and* bimodality, and one real dataset
-    supplies neither
-- 🔀 **Fixed `branches`** — the count supplied. `167`: the peak sits at
-  `family_size − 1` in every row and collapses either side (1.000 → 0.500 → 0.083).
-  - **`note 056`: this is a measured CROSSOVER, not a loser.** Degrading the
-    grouping, the gap rule falls **faster**: at purity 0.795 it scores 0.167 against
-    fixed's 0.417, at 0.951 it is 0.750 against 1.000, and they draw level only at
-    purity ≳ 0.99
-  - **Why:** given the count, a noisy ranking can only hand you wrong *candidates*.
-    Deriving the count, it hands you wrong candidates **and** a wrong count — two
-    error sources against one. The tell is over-emission: size 2.58 against a true
-    2.00, precision 0.708
-  - Decision 74's shape again, which is what 🔀 is for: **which one is right is a
-    property of the grouping's quality, not of either mechanism**
+  threshold, the same move `148` made. Matches the best fixed `branches` at family sizes 3–6
+  **without being told the size**, with `look` a ceiling rather than a target. **`note 058`:
+  real word co-occurrence has NO cliff** — largest gap 0.059 against the task's 0.424, and
+  **at no setting is the profile bimodal**. *measured in:* families at index purity 1.000.
+  → record: [biggest-similarity-gap.md](docs/options/biggest-similarity-gap.md)
+- 🔀 **Fixed `branches`** — the count supplied. `167`: the peak sits at `family_size − 1` in
+  every row and collapses either side. **`note 056`: a measured CROSSOVER, not a loser** —
+  degrade the grouping and the gap rule falls faster, because deriving the count adds a
+  second error source. Decision 74's shape again, which is what 🔀 is for: **which is right
+  is a property of the grouping's quality, not of either mechanism.**
+  → record: [fixed-branches.md](docs/options/fixed-branches.md)
 
 > **So F3's remaining gap is sharper than "the size is supplied":** the enumeration
 > bound is **either supplied, or it needs a near-oracle grouping.** Neither is
 > answering from awareness, which is why this row is PARTIAL and not PASSING.
-- ⬜ **Autoregressive output** — *not* ruled out by GOALS §2, which forbids
-  next-token prediction as the TRAINING OBJECTIVE, a different thing from
-  autoregression as an output MECHANISM. What argues against it is **termination**:
-  it needs a learned end-token, where a gated walk stops where `148` reads
-  structurally zero.
-- ❌ **Structured slots** — not a peer of the others. A fixed frame is a traversal
-  with a fixed relation schedule, which `162` already calls a fitted constant.
-- ⬜ **Declining to answer** — the archived ledger's row C4. **Nothing anywhere lets
-  the model say "I do not know", and no task scores abstention**, while the gate is
-  a fact about the store rather than a learned probability. An untested claim about
-  honesty.
+- ⬜ **Autoregressive output** — *not* ruled out by GOALS §2, which forbids next-token
+  prediction as the TRAINING OBJECTIVE, a different thing from autoregression as an output
+  MECHANISM. What argues against it is **termination**: it needs a learned end-token, where
+  a gated walk stops where `148` reads structurally zero.
+  → record: [autoregressive-output.md](docs/options/autoregressive-output.md)
+- ❌ **Structured slots** — not a peer of the others. A fixed frame is a traversal with a
+  fixed relation schedule, which `162` already calls a fitted constant. *no measurement* — a
+  scope ruling. **Revival:** a domain where the frame genuinely is supplied by the task.
+  → record: [structured-slots.md](docs/options/structured-slots.md)
+- ⬜ **Declining to answer** — the archived ledger's row C4. **Nothing anywhere lets the
+  model say "I do not know", and no task scores abstention**, while the gate is a fact about
+  the store rather than a learned probability. An untested claim about honesty.
+  → record: [declining-to-answer.md](docs/options/declining-to-answer.md)
 
 ### 6b. Knowing when to stop hopping
 
 **⇒ DECIDED: a learned halting gate. It works and it is not confidence.**
 
-- ✅ **`halt_gate`, learned** — reads the retrieval and decides whether to hop again.
-  - `086` a halting signal exists **and it is not confidence** — what separates is
-    the CONTENT
-  - `087` the gate learns which hop to read, and mixed depths reach **1.000**. Two
-    defects found on the way, each of which looked like a working mechanism, and
-    **the mutation harness caught what the tests did not**
-  - `088` three depths at once, and the gain has an upper edge
-  - `092` **it generalises to a depth it never trained on, zero-shot** (0.992)
-  - `089` it is a token detector, measured: `halt_w` sits **+8.3 sd** on one token's
-    value vector, and the sign was the opposite of what was predicted
-- ❌ **Transferring the gate to new terminator tokens** — impossible *by
-  construction*: two markers have unrelated value vectors. `089`. **Do not
-  re-propose.**
-- ❌ **A token-agnostic terminal signal** — `093` there is none, and that is what
-  points at frozen `Wv`. `094` `value_lr` does not build a terminator class, and
-  making separators targets breaks the gate.
-- ❌ **Occupancy as a free halting signal** — `153`: half the gate can go where the
-  index cannot, and it has **nothing to say** there. Chain start/middle/end at
-  0.893/0.791/0.898 is not a signal.
+- ✅ **`halt_gate`, learned** — reads the retrieval and decides whether to hop again. `086`
+  a halting signal exists **and it is not confidence** — what separates is the CONTENT.
+  `087` mixed depths reach **1.000**, and **the mutation harness caught two defects the
+  tests did not**. `092` **it generalises to a depth it never trained on, zero-shot**
+  (0.992). `089` it is a token detector, measured, and the sign was the opposite of what was
+  predicted. *measured in:* chains and kinship at mixed depths.
+  → record: [halt-gate.md](docs/options/halt-gate.md)
+- ❌ **Transferring the gate to new terminator tokens** — impossible *by construction*: two
+  markers have unrelated value vectors under a frozen random `Wv`. `089`. **Do not
+  re-propose.** **Revival:** a `Wv` in which terminators share structure.
+  → record: [gate-transfer.md](docs/options/gate-transfer.md)
+- ❌ **A token-agnostic terminal signal** — `093` there is none, and that is what points at
+  frozen `Wv`. `094` `value_lr` does not build a terminator class, and making separators
+  targets breaks the gate. *measured in:* chains with several terminator markers.
+  **Revival:** a representation where a terminator class exists to be found.
+  → record: [token-agnostic-terminal.md](docs/options/token-agnostic-terminal.md)
+- ❌ **Occupancy as a free halting signal** — `153`: half the gate can go where the index
+  cannot, and it has **nothing to say** there. Chain start/middle/end at 0.893/0.791/0.898
+  is not a signal, because a traversal writes every address before querying it. **Revival:**
+  a task where a walk can run off the end of what was written.
+  → record: [occupancy-as-halting.md](docs/options/occupancy-as-halting.md)
 
 ## 7. Output → surface
 

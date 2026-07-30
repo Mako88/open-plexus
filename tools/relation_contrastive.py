@@ -83,11 +83,23 @@ is a result.
 `--graph`, 5 seeds, 75/25 rule split, scored by nearest relation. Dimensions from
 `tools/invariant_dimension.py --graph` on the SAME file:
 
-    graph                        dim   contrastive   majority   untrained
-    EN_DE_15K_V2/rel_triples_1     0   0.3602        0.0942     0.0350
-    D_W_15K_V1/rel_triples_1       2   0.3559        0.0559     0.0492
+    graph                     dim  contrastive  counted  majority  untrained
+    EN_DE_15K_V2/rel_triples_1  0   0.3680       0.2505   0.1000    0.0359
+    D_W_15K_V1/rel_triples_1    2   0.3398       0.2602   0.0797    0.0441
 
-    determinism 0.778 on both, against kinship's near-1.0
+    determinism 0.778 and 0.754, against kinship's near-1.0
+
+**`counted` is the arm that matters and it is strong.** No learning, no vectors, no
+gradient -- just "the commonest r3 among training rules sharing r1". It closes most of
+the distance from `majority` on its own, and the objective adds ~0.12 on top of it
+(`g23-02`). Quoting the contrastive score against `majority` quotes the weak opponent.
+
+**Earlier figures here were NONDETERMINISTIC and are superseded.** They read 0.3602 /
+0.3559 with majorities 0.0942 / 0.0559. `graph_rules` iterated a set of relation
+strings and Python randomises string hashing per process, so tie breaks -- and
+therefore the rules, and therefore the split -- moved between runs of the same seed.
+**The counted arm exposed it by varying when it has no randomness of its own.** Now
+deterministic across three consecutive runs.
 
 **`dim 0` is where `tools/generation_delta.py` gets nothing at all** -- not weakly, but
 structurally, which is the scope note 104 imposed on the whole composition line. **`dim 2`
@@ -219,16 +231,63 @@ def graph_rules(path: Path):
     for start, first in outgoing.items():
         for r1, middle in first:
             for r2, end in outgoing.get(middle, ()):
-                for r3 in direct.get((start, end), ()):
+                # `sorted`, because `direct`'s values are SETS of strings and
+                # Python randomises string hashing per process -- so unsorted
+                # iteration made the accumulation order, and therefore the tie
+                # breaks below, differ between runs of the same seed.
+                for r3 in sorted(direct.get((start, end), ())):
                     pair = (index[r1], index[r2])
                     counts.setdefault(pair, {})
                     counts[pair][index[r3]] = counts[pair].get(index[r3], 0) + 1
 
-    items = sorted((pair, max(answers.items(), key=lambda kv: kv[1])[0])
+    # Ties broken by LOWEST relation index, not by insertion order. Three runs at
+    # identical seeds gave 0.3641, 0.3680 and 0.3583 before this -- the split
+    # itself was moving, which the counted arm exposed because it has no
+    # randomness of its own and varied anyway.
+    items = sorted((pair, max(answers.items(), key=lambda kv: (kv[1], -kv[0]))[0])
                    for pair, answers in counts.items())
     determinism = float(np.mean([max(a.values()) / sum(a.values())
                                  for a in counts.values()])) if counts else 0.0
     return items, len(relations), determinism
+
+
+def counted_predictor(train):
+    """The cheap opponent: no learning, no vectors, no gradient. Counting.
+
+    For a held-out `(r1, r2)`, answer in this order — **specified in `g23-02`
+    before the arm was built**, because a counting baseline has many reasonable
+    definitions and choosing the one that loses is the easiest unconscious cheat
+    available:
+
+        1. commonest r3 among training rules whose FIRST element is r1
+        2. failing that, commonest among those whose SECOND is r2
+        3. failing that, the global commonest
+
+    It sees exactly the training rules the contrastive arm sees, so a difference
+    between them is the objective rather than the split.
+    """
+    by_first: dict = {}
+    by_second: dict = {}
+    overall: dict = {}
+    for (r1, r2), r3 in train:
+        for table, key in ((by_first, r1), (by_second, r2), (overall, None)):
+            table.setdefault(key, {})
+            table[key][r3] = table[key].get(r3, 0) + 1
+
+    def commonest(counts):
+        return max(counts.items(), key=lambda kv: kv[1])[0] if counts else None
+
+    fallback = commonest(overall.get(None, {}))
+
+    def predict(pair):
+        r1, r2 = pair
+        if r1 in by_first:
+            return commonest(by_first[r1])
+        if r2 in by_second:
+            return commonest(by_second[r2])
+        return fallback
+
+    return predict
 
 
 def score_by_nearest(vectors, test) -> float:
@@ -271,7 +330,7 @@ def main() -> int:
         items, n_relations, determinism = graph_rules(args.graph)
         print(f"{args.graph.name}: {n_relations} relations, {len(items)} rules, "
               f"determinism {determinism:.3f}")
-        scores, majorities = [], []
+        scores, majorities, counted = [], [], []
         for seed in range(args.seeds):
             rng = np.random.default_rng(seed)
             order = rng.permutation(len(items))
@@ -291,9 +350,15 @@ def main() -> int:
                 counts[r3] = counts.get(r3, 0) + 1
             common = max(counts.items(), key=lambda kv: kv[1])[0]
             majorities.append(float(np.mean([r3 == common for _, r3 in test])))
+            # The STRONG cheap opponent, on the identical split. g23-02.
+            predict = counted_predictor(train)
+            counted.append(float(np.mean([predict(pair) == r3
+                                          for pair, r3 in test])))
         arm = "RANDOM (untrained)" if args.random_arm else "contrastive"
         print(f"  {arm:<20} {np.mean(scores):.4f} "
               f"+/-{np.std(scores) / np.sqrt(len(scores)):.4f}")
+        print(f"  {'counted (no learning)':<20} {np.mean(counted):.4f} "
+              f"+/-{np.std(counted) / np.sqrt(len(counted)):.4f}")
         print(f"  {'majority class':<20} {np.mean(majorities):.4f} "
               f"+/-{np.std(majorities) / np.sqrt(len(majorities)):.4f}")
         print(f"  {'chance':<20} {1 / n_relations:.4f}")

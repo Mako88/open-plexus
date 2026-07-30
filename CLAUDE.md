@@ -472,8 +472,23 @@ successful manual click is an anecdote. Anything that will be acted on gets
 repeated — enough times to separate the effect from the noise, and on input you
 did not choose to make it pass.
 
-> *Calibration.* — unfilled. Record the first result that shrank or vanished on
-> repetition: what it measured at first, and what it measured once repeated.
+> *Calibration, and the useful part is WHAT made it visible.* Three runs of
+> `g23-02` at identical seeds returned **0.3641, 0.3680 and 0.3583**. A stochastic
+> mechanism drifting by 0.01 between runs reads as seed noise, and the reported
+> `±0.0065` absorbed it completely.
+>
+> **The deterministic arm is what exposed it.** A counting baseline was added to
+> answer a different question — does the objective beat plain counting — and it
+> moved too: 0.2544 / 0.2485 / 0.2534. Counting has no randomness beyond the split,
+> so a varying counted arm meant **the split itself was moving**. `graph_rules`
+> iterated a `set` of relation strings under Python's per-process hash
+> randomisation, so tie-breaks in *"the commonest r3 for this pair"* resolved
+> differently, changing the rules and therefore the holdout.
+>
+> **So the habit is not "sort your sets".** It is that **a deterministic opponent
+> is a reproducibility check on the whole harness**, and it costs nothing. Two
+> published figures had to be superseded because it was added late rather than
+> first.
 
 **4. Report negative results as results, in the OPTION RECORD for the thing that
 was tried.** A refutation that narrows the search is worth more than an unmeasured

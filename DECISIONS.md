@@ -176,12 +176,14 @@ keys, which are still the default and still correct for MQAR.**
   delta to do so, closing **39%** of the gap to the exact symbolic solution, with all four
   predictions committed at `57f81e7` before the mode existed. Rule prediction 0.2437 against
   0.0312 untrained; holdout guard measured at 0.1750. **AND IT DOES NOT NEED AN INVARIANT:
-  0.3602 against a 0.0942 majority on `EN_DE_15K_V2` at invariant dimension 0 — where
-  `generation_delta` is structurally impossible — and 0.3559 at dimension 2, which that tool
-  REFUSES.** So `note 104`'s scoping of the composition line does not bind this mechanism,
-  which is the handoff's open problem #1 answered from the other side. Graph rows are
-  observations, **not pre-registered**, unlike g23-01. **Still ⬜ because nothing in the model
-  uses it.** *measured in:* CLUTRR-symbolic true chains and two OpenEA graphs, width 32.
+  0.3680 on `EN_DE_15K_V2` at invariant dimension 0** — where `generation_delta` is
+  structurally impossible — **and 0.3398 at dimension 2**, which that tool REFUSES. So
+  `note 104`'s scoping of the composition line does not bind this mechanism, which is the
+  handoff's open problem #1 answered from the other side. **`g23-02`: the opponent that
+  matters is COUNTING, not the majority arm — counting reaches 0.2505/0.2602 with no
+  learning at all, and the objective adds ~0.12 on top.** Quoting against `majority`
+  (0.1000) quotes the weak opponent. **Still ⬜ because nothing in the model uses it.**
+  *measured in:* CLUTRR-symbolic true chains and two OpenEA graphs, width 32, 5 seeds.
   → record: [structured-relations.md](docs/options/structured-relations.md)
 - ⬜ **A better index** — `note 056` made it load-bearing rather than a nicety: the set
   answer works at purity ≳ 0.99 and degrades fast below (0.750 at 0.951, 0.167 at 0.795),

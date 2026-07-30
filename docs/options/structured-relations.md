@@ -184,9 +184,21 @@ condition disagreeing with a re-measurement is note 105's shape.
             knobs   graph; random arm on against off
             scale   5 seeds, 75/25 rule split
 
-    graph                        dim   contrastive   majority   untrained
-    EN_DE_15K_V2/rel_triples_1     0   0.3602        0.0942     0.0350
-    D_W_15K_V1/rel_triples_1       2   0.3559        0.0559     0.0492
+    graph                     dim  contrastive  counted  majority  untrained
+    EN_DE_15K_V2/rel_triples_1  0   0.3680       0.2505   0.1000    0.0359
+    D_W_15K_V1/rel_triples_1    2   0.3398       0.2602   0.0797    0.0441
+
+**`counted` is the opponent that matters, and `g23-02` registered its definition before
+building it.** No learning, no vectors, no gradient. It closes most of the distance from
+`majority` on its own and the objective adds ~0.12 on top. **Quoting the contrastive
+score against `majority` quotes the weak opponent** — and the majority arm was the only
+one present when these rows were first written.
+
+**The figures first recorded here were NONDETERMINISTIC and are superseded** (0.3602 /
+0.3559, majorities 0.0942 / 0.0559). A set of relation strings was iterated under Python's
+per-process hash randomisation, so tie breaks moved the rules and therefore the split.
+**The counted arm found it by varying when it has no randomness of its own** — a stochastic
+arm drifting between runs reads as seed noise and the reported error bar absorbed it.
 
 **`dim 0` means `generation_delta.py` gets NOTHING in that domain** — the displacement
 mechanism is not weak there, it is structurally impossible, and `note 104` is the

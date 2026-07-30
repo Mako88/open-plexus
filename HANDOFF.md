@@ -24,15 +24,25 @@ is ready. **Tuning is deferred until the core is proven.** Three companions in
 harder; every option offered to John carries a plain explanation, pros and cons, and a
 recommendation; never offer an option already known to fail the goals.
 
-    1  relational objective buys reasoning   BLOCKED, and that is a finding
-    2  representations learned LOCALLY       YES, and it does not need an invariant
-    3  conventional system already wins      PARTLY -- counting gets 0.25 of 0.37
-    4  multi-hop walk over real internet     NO at depth 2, and d_max was the wrong bar
-    5  learn forever without wrecking it     the QUESTION was wrong; see below
-    6  independent nodes agree what a thing IS
-    7  decide what to say, and decline
-    8  adjudicate contradictions
-    9  survive hostile participants
+     1  relational objective buys reasoning  BLOCKED -- no decisive instrument here
+     2  representations learned LOCALLY      YES -- 3 domains, beats counting, no invariant
+     3  conventional system already wins     PARTLY -- counting gets 0.25 of 0.37
+     4  multi-hop walk over real internet    NO at depth 2; d_max was the wrong bar
+     5  learn forever                        BLOCKED on instrumentation, bound published
+     6  independent nodes agree              NO and silent -- transport FIXED same day
+     7  decide what to say, and decline      YES on the case the gate can see
+     8  adjudicate contradictions            untouched
+     9  survive hostile participants         untouched
+    10  margin survives scale                G5 CONTESTED
+    11  training traffic fits broadband      G4 passes on ONE SEED
+    12  survives a second modality           no evidence either way
+
+**10 to 12 were MISSED from the original nine and John caught it.** The list was built
+from an outside review plus my reading and **never cross-checked against `GOALS.md`'s own
+gate ladder** -- where G4 is `⚠️ PASSES ON ONE SEED` and G5 is `⚠️ CONTESTED`. Same
+too-narrow-a-search failure as the netem one, in a different place. **#10 is a strong
+disprove-candidate**: "the margin shrinks with scale" is a gate in the project's own
+falsification ladder and would make this a small-model curiosity.
 
 ## #2 — the live thread, and the session's result
 
@@ -71,9 +81,11 @@ so "beats counting" carries a data requirement.
 dispatchable and would likely return "below the resolution of this instrument".
 
 **Outward-looking options exist and were not checked before I concluded otherwise:** SCAN,
-COGS, CFQ for compositional generalisation; **FB15k-237 / WN18RR** for relation composition,
-which would answer **#3 at the same time** because they ship published baselines. **A fetch
-needs John's approval and he has not given it.**
+COGS, CFQ for compositional generalisation; **FB15k-237 / WN18RR** for relation composition.
+**FB15k-237 is FETCHED** (`tools/fetch_fb15k237.py`, pinned and checksummed) under John's
+standing permission for benchmark data. **But it does not hand us a published number:** the
+literature measures LINK PREDICTION on it and this project measures RULE PREDICTION, so
+reaching a real baseline still needs one of them reformulating.
 
 ## #4 answered, and `d_max` was the wrong bar
 

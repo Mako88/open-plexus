@@ -118,3 +118,47 @@ instrument is half-built and the vocabulary-free seed is untried.
 So the honest position is not that (c) is available. It is that **(c) stopped being
 refused-by-argument and became an open measurement with a named dataset**, which is a
 different state and the tree should be able to say so.
+
+### Deriving from a shared seed is the architecture, and it stops exactly here
+
+    CONFIG  when    2026-07-30
+            source  John in conversation; openplexus/node_main.py derive,
+                    openplexus/ownership.py Ring, openplexus/peer.py fingerprint
+            script  none -- a scope statement about existing mechanisms
+            task    none
+            model   n/a
+            knobs   none
+            scale   n/a
+
+John's question: can a single shared value let every node generate the same information
+deterministically, instead of coordinating? **It already does, and it is load-bearing.**
+
+    derive(width, vocab, seed)   value table and keys from seeds alone -- two
+                                 containers agree without exchanging a message
+    Ring(nodes, seed)            who owns which concept is COMPUTED, not told
+    derived_keys                 a key is regenerated from (seed, token) rather than
+                                 stored, which is what makes a slot affordable at all
+    peer.fingerprint             each side derives it from its OWN config, so agreement
+                                 means the configs match rather than one side being
+                                 told what to claim
+
+**`g27-01` is what happens where it is applied incompletely.** The fingerprint covered
+everything derived from the KEY seed and nothing derived from the VALUE seed, so two peers
+agreed about where to look and disagreed about what was there — silently, on a third of
+answers.
+
+**And the wall is structural, which is why it belongs in THIS record.** A seed generates
+the same random TABLE everywhere. It cannot generate the same CODEBOOK, because a codebook
+is fitted to data and two nodes seeing different data derive different ones from the
+identical seed. **Everything that does not depend on what was seen can be synchronised for
+free; concept identity is the one thing that does.** That is the SPLIT problem restated
+from the other side, and it is why note 053's refusal is about ordering rather than effort.
+
+**Two smaller notes.** Time is not a usable shared source — clocks skew, so a value derived
+from it is not the same value everywhere. And discovery is a real gap: the ring gives
+deterministic ownership GIVEN the node set, and nothing here finds the set.
+
+**Named rather than assumed harmless:** a shared seed IS a coordination point — one value
+everyone must agree on. It is static and tiny, the same class as agreeing a protocol
+version, so it does not stall when a participant is slow. That is what C1 forbids, and this
+is not it — but the exception is written down rather than left implicit.

@@ -1,0 +1,96 @@
+Does the contrastive rule hold on a standard benchmark?
+========================================================
+
+Script: tools/relation_contrastive.py --graph data/fb15k237/train.txt
+        tools/invariant_dimension.py --graph (same file)
+Status: NOT RUN. Predictions registered and committed before the run.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+Everything this project has beaten so far is something it built itself or a
+trivial opponent -- always-guess-the-commonest, plain counting, an untrained copy
+of itself.
+
+FB15k-237 is the standard benchmark for this kind of graph. It was not designed
+here, it is three times bigger than anything tried so far, and a decade of
+published work uses it. This runs the same measurement on it.
+
+**It will not produce a published number to compare against**, and that limit is
+worth stating before the run rather than after: the literature measures a
+different task on this data. What it gives is a graph nobody here chose.
+
+
+WHAT IS ALREADY KNOWN ABOUT IT
+--------------------------------
+    272,115 edges, 237 relations, invariant dimension 0 -- NO conserved quantity
+
+Measured with `tools/invariant_dimension.py`, the same tool `g23-03` used on the
+sixteen OpenEA graphs, so it joins that comparison directly. **`dim 0` puts it in
+the group where `generation_delta.py` gets nothing at all.**
+
+For scale: the largest OpenEA graph was 84,867 edges with 169 relations and 821
+rules.
+
+
+PREDICTIONS
+-----------
+  P1  THE TEST. `contrastive` beats `counted`.
+
+      15 of 16 OpenEA graphs did. Refuted here would mean the result does not
+      survive a graph this project did not choose, which is the single most
+      likely way it turns out to be an artefact of the corpora tried so far.
+
+  P2  The margin sits inside the range OpenEA's `dim 0` graphs produced,
+      +0.02 to +0.29.
+
+      Outside it in either direction means graph size or provenance matters in a
+      way the sixteen could not show.
+
+  P3  `counted` scores HIGHER here than its OpenEA average of about 0.25.
+
+      More edges and more rules give first-order counting more to work with, so
+      the cheap opponent should get stronger. If counting does NOT improve with
+      an order of magnitude more data, that is a fact about counting worth
+      having on its own.
+
+  P4  THE ONE I AM LEAST SURE OF. Determinism is BELOW OpenEA's 0.754-0.778.
+
+      Freebase relations are fine-grained -- `/award/award_winner/awards_won./...`
+      -- so one `(r1, r2)` pair should compose to more different `r3` than a
+      DBpedia pair does. If determinism drops a long way, the ceiling drops with
+      it and BOTH arms fall, which would make a small margin uninformative rather
+      than negative. **Determinism is therefore reported beside every number and
+      read before the margin is.**
+
+
+WHAT WOULD MAKE THIS NOT COUNT
+--------------------------------
+**Knobs carried, not tuned.** Width 32, epochs 8, lr 0.05, temperature 0.1, all
+chosen on CLUTRR rule prediction. The counted arm has no knobs. Tuning here while
+the opponent cannot be tuned is the one-sided sweep the price-of-locality
+calibration is about.
+
+**The bytes.** `tools/fetch_fb15k237.py` pins size and sha256 and refuses to
+proceed on a mismatch, verified by corrupting a file deliberately. A benchmark
+someone re-downloaded a different version of is rule 11b's stale artifact with a
+longer fuse.
+
+**And it is NOT the published comparison.** The literature reports LINK
+PREDICTION on FB15k-237 -- given a head and a relation, rank the tail. This is
+RULE PREDICTION -- given two composed relations, name the third. Same data,
+different tasks. **No number from here may be set beside a published one.**
+
+
+COST
+----
+One graph, two arms, 5 seeds. Larger than the OpenEA runs by about 3x on edges;
+minutes rather than an hour. Local, no dispatch -- `data/` is gitignored.
+
+
+MEASURED ON
+-----------
+`data/fb15k237/train.txt`, sha256 61099230e4439f90..., 272,115 edges after
+parsing, 237 relations, invariant dimension 0.

@@ -78,7 +78,7 @@ sparse keys were measured worse, then a readout change reversed them cleanly. So
 search on correct arithmetic; both conditions were measured away later and both
 mechanisms became right. A deleted alternative cannot be re-measured.
 
-**CENSUS: 25 chosen, 28 refuted, 13 untried, 13 both, 1 paused.** Checked against the
+**CENSUS: 25 chosen, 29 refuted, 14 untried, 13 both, 1 paused.** Checked against the
 body by `tools/check_decisions.py`, because a summary that can drift from what it
 summarises is how `check_architecture.py` caught its own counts the first time a
 verdict changed.
@@ -163,25 +163,27 @@ keys, which are still the default and still correct for MQAR.**
     surface key and a default at the concept key are *different addresses*.
     `ByConcept` was a READ POLICY, which is why 148 cost a sketch and not a
     representation
-- ❌ **Content-derived keys, i.e. similar concepts on NEARBY addresses** — and this
-  entry exists because reading the tree as a tree found it contradicting §1.
-  - `042 §2` ranked it third by blast radius and framed it as *"the store has no
-    notion of similarity at all — `dog` and `wolf` are as unrelated as `dog` and
-    `7`"*. `g10-09` tried it and was **RETRACTED**: the cache was indexed by token
-    id, so the question was never asked
-  - **But §1 already refuses this mechanism under a different name.** "Address the
-    store by continuous vector" is ❌ *because* similar things landing near each
-    other raises `ρ`, and interference is `O(N·ρ)` — which also turns the gate's
-    structurally-zero bar into a tuned threshold and stops `AddressSketch`
-    colliding. **Nearby addresses is the thing being refused, whether the
-    nearness comes from a raw vector or from learned content statistics**
-  - **The resolution is note 045's and it is already the architecture:**
-    similarity lives in a SEPARATE INDEX, and the store stays exactly addressed.
-    `ContentIndex` proposes candidates by similarity; nothing addresses by it. So
-    042 §2's complaint is answered rather than open — **the store does not need a
-    notion of similarity, because the index has one**
-  - **Revival condition:** a task where similar-things-must-share-an-ADDRESS beats
-    exact separation plus a similarity index. Nothing has ever needed that
+- ❌ **Content-derived keys for ENTITIES, i.e. similar entities on NEARBY addresses** —
+  this entry exists because reading the tree as a tree found it contradicting §1, and
+  **`note 067` then split it: the refusal is right for entities and does not transfer to
+  relations.**
+  - `042 §2` ranked it third by blast radius — *"the store has no notion of similarity
+    at all"* — and `g10-09` was **RETRACTED**, its cache indexed by token id so the
+    question was never asked
+  - **§1 already refuses this under another name.** "Address the store by continuous
+    vector" is ❌ *because* nearby addresses raise `ρ` and interference is `O(N·ρ)`,
+    which also turns the gate's structurally-zero bar into a tuned threshold. **Nearby
+    addresses is what is refused, however the nearness arises** — and with thousands of
+    entities that is fatal
+  - **Resolution is note 045's and already the architecture:** similarity lives in a
+    SEPARATE INDEX; `ContentIndex` proposes, nothing addresses by it. **Revival:** a task
+    where similar-things-must-share-an-ADDRESS beats exact separation plus an index
+- ⬜ **Structured representations for RELATIONS — the half `067` split off, and it is
+  the live requirement.** Twenty relations, which must be **comparable** rather than
+  exactly separated, and the store addresses by `(entity, relation)` where the entity
+  supplies the exactness — so `O(N·ρ)` does not bite. `067` measured that generalising
+  composition is impossible without it (0.056 held out), and **GOALS §1 asks for exactly
+  this**: *"be aware of the differences and interrelations between them"*
 - ⬜ **A better index, which is what 042 §2 was actually reaching for** — and
   `note 056` made it load-bearing rather than a nicety.
   - The set answer's enumeration works at index purity ≳ 0.99 and degrades fast
@@ -354,19 +356,14 @@ path is not chosen.**
     BOTH endpoints, so 108's missing disambiguator is handed over by the task; `depth`
     is **observable, not fitted** (the story *is* the chain); and `Walk.retrieved` is
     *"what a readout consumes"*
-  - **`note 062`, MEASURED.** Chain recovery **0.659**, 1.000 at 2–3 hops and 0.361 at
-    10, monotone. Endpoint scoring does select (0.659 against 0.149 random) **but beam
-    width bought +0.009 for 8× the walks** — its conclusion *"the search does not pay"*
-    was **narrowed by 064 and overturned by 065**; what stands is the numbers, the
-    **drift-not-capacity** finding, and 059's collision split at **0.114 vs 0.704**
-  - **`note 064` REVISED 062's reading.** Decomposed per step: the **entity hop is
-    0.9889 and FLAT** in position and chain length, so the store is not degrading as it
-    fills; the **relation decode is 0.9348**, six times the error rate, and 15% of those
-    reads land on an entity with two or more outgoing edges where `key(FACT, e)` is a
-    superposition. **And `walk_from` branches ONLY AT THE ROOT** — greedy `argmax`
-    after — so it hedged at the 0.974 step and committed blindly at the 0.906 ones.
-    That is the whole +0.009: **measured at the wrong place by its own construction**,
-    not refuted. The narrow claim is *root-only branching buys nothing*
+  - **`notes 062` and `064`, superseded by 065 and kept for their durable facts.** 062
+    measured root-only search at **0.659** and concluded *"the search does not pay"* —
+    **overturned**. 064 found why: the **entity hop is 0.9889 and FLAT** (so the store
+    does not degrade as it fills) while the **relation decode is 0.9348**, six times the
+    error rate, with 15% of those reads on an entity holding two or more outgoing edges.
+    **`walk_from` branches only at the ROOT**, hedging at the 0.974 step and committing
+    blindly at the 0.906 ones — the whole +0.009, **measured at the wrong place by its
+    own construction**
 - ✅ **`search.beam` — branch at EVERY step, pruned. `note 065`, and it is the largest
   single mechanism gain in this project's record.**
   - **0.6614 → 0.8805 chain recovery, +0.2190 against a seed spread of 0.0113** — 20×
@@ -407,27 +404,30 @@ path is not chosen.**
     what it never saw; a **fold over pairwise rules** only asks what it was trained on,
     median 144 times each. **That is the difference between a learnable problem and an
     unlearnable one**, and it is what `bind` was kept for
-  - **`note 066` CORRECTS 063 in BOTH directions, measured symbolically.** 063 feared
-    the intermediates were unlabelled — **they are not**: a 2-hop puzzle's answer *is* a
-    labelled pairwise rule (4,076 of them, 62 unambiguous), and 3-hop puzzles then label
-    `(derived, base)` from those, so the task supplies its own curriculum. But 063 also
-    read 6.6% unseen *stated* pairs as near-full coverage, and the fold asks for
-    `(accumulated, next)` where the accumulated side is **derived** — a different
-    population: **120 asked for, 97 derivable**, converging after two bootstrap rounds
-  - **The fold is right 98.8% of the time it can act** (596 of 603), against 0.42%
-    irreducible ambiguity — the mechanism is sound. **It completes only 52.6%**, and
-    that is tabulation's ceiling rather than the fold's error: longer chains compose
-    more times and hit a missing rule (1.000 at two hops, 0.218 at ten)
-  - **⇒ THE BOTTLENECK MOVED TWICE IN ONE EVENING** — 063 put it on route-finding, 065
-    solved the route and moved it to naming, 066 puts it on **the rules available to
-    name with**: not a mechanism, but the training data's coverage of a space CLUTRR
-    deliberately does not cover
-  - **⇒ AND IT IS THE FIRST MEASURED ARGUMENT FOR A LEARNED REPRESENTATION OVER A
-    LOOKUP.** 97 rules is everything derivable, so beating 52% needs composition that
-    generalises its own structure — knowing `aunt` behaves like `parent's sister`
-    without having seen `aunt-then-X`. **That is where `bind` was headed:** one rule
-    composing any two vectors, which a table cannot do. Unexplained and recorded rather
-    than smoothed: the **3-hop cell (0.524) is below the 4-hop cell (0.732)**
+  - **`note 066` CORRECTS 063 both ways, measured symbolically.** The intermediates are
+    **not** unlabelled — a 2-hop puzzle's answer IS a labelled pairwise rule (4,076 of
+    them, 62 unambiguous) and 3-hop puzzles then label `(derived, base)`, so the task
+    supplies its own curriculum. But 063's "6.6% unseen" counted *stated* pairs, and the
+    fold asks for `(accumulated, next)` where the accumulated side is **derived**:
+    **120 asked for, 97 derivable**, converged after two rounds
+  - **The fold is right 98.8% where it can act** (596/603) against 0.42% irreducible
+    ambiguity, and **completes only 52.6%** — tabulation's ceiling, not the fold's
+    error. **So the bottleneck moved twice in one evening**: 063 route-finding → 065
+    route solved, naming → 066 **the rules available to name with**. Unexplained and not
+    smoothed: the **3-hop cell (0.524) is below the 4-hop cell (0.732)**
+- ❌ **`bind` as a route to GENERALISING composition — `note 067`, and it refutes 066's
+  own closing sentence.** Over the 97 rules, holding out a quarter: **0.844 on trained
+  rules, 0.056 held out**, against chance 0.050 and majority 0.082. Five seeds. **Not
+  weak generalisation — none.**
+  - **Why: a binding is built to be UNBINDABLE, not PREDICTABLE.** `a ⊙ b` retains
+    enough of each to recover the other, which is what VSA binding is for; it carries no
+    claim that similar inputs give similar outputs, and with **random** relation vectors
+    they demonstrably do not. 066's *"composes any two vectors by one rule"* is true and
+    the conclusion does not follow — **I measured tabulation's ceiling and claimed
+    binding's reach**
+  - **Revival: STRUCTURED relation vectors.** The operation is not the problem, so
+    `bind` stays (14c) as the measured comparison for anything claiming to generalise.
+    **It also splits component 2's refusal** — see the relations row there
 - ⬜ **`index_at_hops` combined with the position-level index** — `159`/`160`/`161`
   built the pieces; `154` measured that the guard's premise is false (a hop key
   sits at cosine **0.96** to a single token's row, so it *does* name a concept).

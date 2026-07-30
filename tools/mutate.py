@@ -833,6 +833,19 @@ MUTATIONS = [
         new="            if False:\n                continue",
     ),
     Mutation(
+        name="the-realiser-speaks-only-what-it-can-say-cheapest",
+        breaks="the direction of the faithfulness check that catches the flattering "
+               "failure. Dropping the set equality leaves only the all() clause, so "
+               "a realiser that spoke ONE concept out of five would be certified "
+               "faithful -- everything it said was genuine, it just said almost "
+               "nothing. Under-reporting reads as caution and scores as precision, "
+               "which is the same asymmetry decision 165 built the emit-everything "
+               "falsifier against, arriving from the opposite side",
+        path=RENDER,
+        old="    return (all(surfaces.of(t) in wanted for t in said)\n            and {surfaces.of(t) for t in said} == wanted)",
+        new="    return all(surfaces.of(t) in wanted for t in said)",
+    ),
+    Mutation(
         name="the-faithfulness-check-forgives-everything",
         breaks="the only thing that makes a renderer safe, and it breaks it in the "
                "direction that reads as working. Adding the rendered text's own "

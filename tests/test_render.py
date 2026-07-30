@@ -17,7 +17,9 @@ from __future__ import annotations
 
 import unittest
 
-from openplexus.render import FRAME, content_words, render, unfaithful
+from openplexus import concepts
+from openplexus.render import (
+    FRAME, content_words, render, speak, spoken_faithfully, unfaithful)
 
 
 class TheFaithfulnessBar(unittest.TestCase):
@@ -103,6 +105,78 @@ class ItRefusesWhatWouldReadAsAFact(unittest.TestCase):
         # did not have rather than as one it could not name.
         with self.assertRaises(ValueError):
             render("Rosalind", ["seven", ""])
+
+
+class TheRetrievalRealiserSpeaksFromTheCONCEPTMAP(unittest.TestCase):
+    """The words come from the model's own map, not from the caller.
+
+    `Shared.surfaces` says it plainly: *"a concept has to be spoken, drawn or
+    otherwise emitted, and which surface to use is a choice the concept itself does
+    not contain."* `speak` is where that choice gets made rather than dodged.
+    """
+
+    #: Three concepts. The first has two surfaces, so there is something to choose
+    #: between -- without that this tests nothing about the choice.
+    GROUPS = [[1, 4], [2], [3, 5, 6]]
+
+    def surfaces(self):
+        return concepts.Shared(vocab=8, groups=self.GROUPS)
+
+    def test_one_surface_per_concept_and_all_of_them(self):
+        surf = self.surfaces()
+        answer = {surf.of(1), surf.of(3)}
+        spoken = speak(answer, surf)
+        self.assertEqual(len(spoken), 2)
+        self.assertTrue(spoken_faithfully(answer, spoken, surf))
+
+    def test_it_invents_no_concept(self):
+        surf = self.surfaces()
+        answer = {surf.of(1)}
+        spoken = speak(answer, surf)
+        self.assertEqual({surf.of(t) for t in spoken}, answer)
+
+    def test_the_check_catches_a_dropped_concept(self):
+        # RULE 10, and the direction that looks better. A realiser that said less
+        # than it knew would pass any "invents nothing" assertion.
+        surf = self.surfaces()
+        answer = {surf.of(1), surf.of(3)}
+        self.assertFalse(spoken_faithfully(answer, [min(surf.surfaces(surf.of(1)))],
+                                           surf))
+
+    def test_the_check_catches_a_smuggled_concept(self):
+        surf = self.surfaces()
+        answer = {surf.of(1)}
+        smuggled = speak({surf.of(1), surf.of(2)}, surf)
+        self.assertFalse(spoken_faithfully(answer, smuggled, surf))
+
+    def test_frequency_changes_which_surface_is_chosen(self):
+        # THE CONNECTION TEST. The default is the lowest token id and is arbitrary;
+        # if supplying counts did not move the choice, the policy would be inert and
+        # the docstring describing two policies would be describing one.
+        surf = self.surfaces()
+        answer = {surf.of(1)}
+        common = [0.0] * 8
+        common[4] = 10.0                      # token 4 is the other surface of it
+        self.assertEqual(speak(answer, surf), [1])
+        self.assertEqual(speak(answer, surf, frequency=common), [4])
+
+    def test_a_concept_with_no_surface_is_refused(self):
+        # Silence would read as the model declining rather than as a broken map.
+        surf = self.surfaces()
+        with self.assertRaises(ValueError):
+            speak([surf.concepts + 5], surf)
+
+    def test_it_composes_with_the_template_renderer(self):
+        # End to end at the output layer: concepts -> surfaces -> words -> sentence,
+        # and the sentence must still invent nothing.
+        surf = self.surfaces()
+        answer = {surf.of(1), surf.of(3)}
+        words = {1: "red", 2: "blue", 3: "tall", 4: "crimson", 5: "high", 6: "big"}
+        spoken = [words[t] for t in speak(answer, surf)]
+        text = render("Rosalind", spoken, relation="value")
+        self.assertEqual(unfaithful("Rosalind", spoken, text), set())
+        self.assertIn("red", text)
+        self.assertIn("tall", text)
 
 
 class TheRulerTakesNoDependencies(unittest.TestCase):

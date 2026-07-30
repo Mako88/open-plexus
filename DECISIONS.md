@@ -36,7 +36,7 @@ sparse keys were measured worse, then a readout change reversed them cleanly. So
 search on correct arithmetic; both conditions were measured away later and both
 mechanisms became right. A deleted alternative cannot be re-measured.
 
-**CENSUS: 23 chosen, 28 refuted, 15 untried, 12 both, 1 paused.** Checked against the
+**CENSUS: 24 chosen, 28 refuted, 14 untried, 12 both, 1 paused.** Checked against the
 body by `tools/check_decisions.py`, because a summary that can drift from what it
 summarises is how `check_architecture.py` caught its own counts the first time a
 verdict changed.
@@ -448,10 +448,29 @@ not gate anything above.**
     own words to the allowed set, certifying any sentence as faithful. Every
     invention test still reads through that function, so it would fail **only when
     the check is finally load-bearing**
-- ⬜ **Retrieval realiser** — emit the surfaces each visited concept already
-  carries. `concepts.Surfaces` exists precisely because one concept has many
-  surfaces, so a concept can carry its own words. No new model, no next-token
-  prediction, real words out.
+- ✅ **Retrieval realiser** — `render.speak`. The words come from the CONCEPT MAP
+  rather than from the caller, so the model supplies its own vocabulary and `render`
+  arranges it. No new model, no next-token prediction, real words out.
+  - *no measurement* — like the template realiser it is a floor, not a mechanism
+    with a number. `Shared.surfaces` already existed and already stated the design
+    problem: *"which surface to use is a choice the concept itself does not
+    contain."* This is where that choice gets made rather than dodged
+  - **Two policies, and the default is arbitrary and says so.** Lowest token id is
+    deterministic and agrees across nodes, which is all a placeholder owes; most
+    frequent wins when counts are supplied. A connection test asserts supplying
+    counts MOVES the choice, or the second policy would be inert
+  - **Neither is the eventual answer:** once a concept has surfaces in more than one
+    modality the choice belongs to the QUERY — a question asked in pictures should be
+    answered in pictures — and nothing is multimodal, so that policy cannot yet be
+    written against anything
+  - `spoken_faithfully` is the bar one level down from `unfaithful`: that one asks
+    whether a WORD was invented, this asks whether a CONCEPT was. **Checked in both
+    directions**, because a realiser that dropped a concept passes any
+    invents-nothing test trivially. Mutation
+    `the-realiser-speaks-only-what-it-can-say-cheapest` removes the set equality,
+    certifying a realiser that speaks one concept of five — **under-reporting reads
+    as caution and scores as precision**, which is decision 165's asymmetry from the
+    other side
 - ⬜ **Small learned renderer trained on our own concept sets** — with a
   **faithfulness** test rather than an accuracy one: perturb the set and the text
   must move; hold the set and the text must contain nothing the set does not.

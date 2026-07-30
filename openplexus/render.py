@@ -113,6 +113,77 @@ def render(subject: str, values: Sequence[str],
     return (f"{subject} holds these recorded {noun}s: {joined}.")
 
 
+def speak(answer: Iterable[int], surfaces, frequency: Sequence[float] | None = None
+          ) -> list[int]:
+    """Choose one surface token for each concept in a set answer.
+
+    The retrieval realiser's half of the job: the words come from the CONCEPT MAP
+    rather than from the caller, so the model supplies its own vocabulary. `render`
+    then arranges them.
+
+    Args:
+        answer: Concept ids, as `answer_set` would produce after mapping through
+            `surfaces.of`. Order carries no meaning and is not relied on.
+        surfaces: Anything with `surfaces(concept) -> list[int]`, i.e.
+            `concepts.Shared`. `OneConceptPerToken` has no such method because it
+            has nothing to choose between, which is the honest reason this needs
+            the richer one.
+        frequency: Optional per-token counts. When given, the most frequent surface
+            of each concept wins.
+
+    Returns:
+        One surface token per concept, concepts in sorted order so the result is
+        reproducible.
+
+    **WHICH SURFACE TO USE IS A CHOICE THE CONCEPT DOES NOT CONTAIN**, which is
+    `Shared.surfaces`' own wording, and this function is where that choice has to be
+    made rather than dodged. Two policies:
+
+    - **lowest token id**, the default, and it is **arbitrary — named rather than
+      defended.** It is deterministic and it agrees across nodes, which is all a
+      placeholder owes.
+    - **most frequent**, when `frequency` is supplied. Defensible for text, where the
+      common surface is the one a reader expects.
+
+    Neither is the eventual answer. **When a concept has surfaces in more than one
+    modality the choice belongs to the QUERY** — a question asked in pictures should
+    be answered in pictures — and nothing here is multimodal yet, so that policy
+    cannot be written against anything. Recorded so this is not mistaken for solved.
+    """
+    chosen: list[int] = []
+    for concept in sorted({int(c) for c in answer}):
+        options = surfaces.surfaces(concept)
+        if not options:
+            raise ValueError(
+                f"concept {concept} has no surface, so it cannot be spoken. A "
+                f"concept with nothing to emit is either outside the vocabulary "
+                f"or the grouping lost it, and returning silence would read as "
+                f"the model declining rather than as a broken map")
+        if frequency is None:
+            chosen.append(min(options))
+        else:
+            chosen.append(max(options, key=lambda t: (frequency[t], -t)))
+    return chosen
+
+
+def spoken_faithfully(answer: Iterable[int], spoken: Iterable[int],
+                      surfaces) -> bool:
+    """Every spoken token is a surface of a concept that was in the answer.
+
+    The contract: the faithfulness bar for `speak`, and the analogue of
+    `unfaithful` one level down — where that one asks whether a WORD was invented,
+    this asks whether a CONCEPT was.
+
+    Checked in both directions on purpose. A realiser that dropped a concept passes
+    any "invents nothing" test trivially, and under-reporting is the failure that
+    looks better.
+    """
+    wanted = {int(c) for c in answer}
+    said = list(spoken)
+    return (all(surfaces.of(t) in wanted for t in said)
+            and {surfaces.of(t) for t in said} == wanted)
+
+
 def unfaithful(subject: str, values: Iterable[str], text: str) -> set[str]:
     """Words in `text` that came from neither the caller nor `FRAME`.
 

@@ -24,25 +24,47 @@ is ready. **Tuning is deferred until the core is proven.** Three companions in
 harder; every option offered to John carries a plain explanation, pros and cons, and a
 recommendation; never offer an option already known to fail the goals.
 
-     1  relational objective buys reasoning  BLOCKED -- no decisive instrument here
-     2  representations learned LOCALLY      YES -- 3 domains, beats counting, no invariant
-     3  conventional system already wins     PARTLY -- counting gets 0.25 of 0.37
-     4  multi-hop walk over real internet    NO at depth 2; d_max was the wrong bar
-     5  learn forever                        BLOCKED on instrumentation, bound published
-     6  independent nodes agree              NO and silent -- transport FIXED same day
-     7  decide what to say, and decline      YES on the case the gate can see
-     8  adjudicate contradictions            untouched
-     9  survive hostile participants         untouched
-    10  margin survives scale                G5 CONTESTED
-    11  training traffic fits broadband      G4 passes on ONE SEED
-    12  survives a second modality           no evidence either way
+     ✅  2  representations learned LOCALLY   18 graphs, beats counting, no invariant
+     ✅  6  independent nodes agree           real bug found AND FIXED (transport half)
+     ✅  7  decide what to say, and decline   exact, on the case the gate can see
 
-**10 to 12 were MISSED from the original nine and John caught it.** The list was built
-from an outside review plus my reading and **never cross-checked against `GOALS.md`'s own
-gate ladder** -- where G4 is `⚠️ PASSES ON ONE SEED` and G5 is `⚠️ CONTESTED`. Same
-too-narrow-a-search failure as the netem one, in a different place. **#10 is a strong
-disprove-candidate**: "the margin shrinks with scale" is a gate in the project's own
-falsification ladder and would make this a small-model curiosity.
+     ❌ 10  margin survives scale             G5 MET ITS REFUTATION CONDITION
+
+     ⏸  4  multi-hop walk over real internet MEASURED; verdict needs a latency budget
+
+     ⬜  1  relational objective buys reasoning  blocked: no instrument with a wide band
+     ⬜  3  conventional system already wins     no real baseline yet
+     ⬜  5  learn forever                        blocked: needs per-position attribution
+     ⬜  8  adjudicate contradictions            untouched
+     ⬜  9  survive hostile participants         untouched
+     ⬜ 11  training traffic fits broadband      G4 passes on ONE SEED
+     ⬜ 12  survives a second modality           no evidence either way
+
+**#6's ✅ is the TRANSPORT half only.** The quantiser half — do two nodes turn the same
+input into the same id — is untestable because no quantiser exists. That half is ⬜.
+
+**#10 IS NOT UNTOUCHED AND I LABELLED IT WRONG.**
+`docs/archive/goals-results-log.md` records G5 as **resolved and failing**: usable machine
+count goes as `T^-0.45`, so a ten-times-longer problem needs machines **6.6x wider** while
+the machine count you can split across falls to **a third**. In its own words — *"for a goal
+whose whole premise is that machine COUNT is the elastic quantity and machine SIZE is fixed
+by what people already own, the elastic quantity is the one that stops helping."* Pooling
+(`g5-04`) postpones the wall and does not remove it, degrading at exponent 1.94 against 0.82.
+
+**The one escape is an ORACLE.** `g7-02`: with an oracle gate deciding what to store,
+sequence length stops being a difficulty dial at all — devices holding ONE NUMBER each score
+identically at 96, 192, 288 and 384 steps. **The record says outright this is a ceiling, not
+a result**, and note 010 argues MQAR cannot test a real replacement because the only event
+separating a pair from filler is the query, which arrives too late and never recurs.
+
+**So #10's live question is not "does scale work" — it is "can a real gate replace g7-02's
+oracle".** That is the thing to build, and it is a different question from the one I put on
+the list.
+
+**10 to 12 were MISSED from the original nine and John caught it**, and then **#10 was
+labelled ⬜ when the archive already had it as failed** — the same too-narrow-a-search
+failure twice on one item. The list was built from an outside review plus my reading and
+never cross-checked against `GOALS.md`'s gate ladder or the archived results log.
 
 ## #2 — the live thread, and the session's result
 

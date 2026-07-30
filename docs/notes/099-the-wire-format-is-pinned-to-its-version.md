@@ -54,3 +54,28 @@ limitation, unchanged.
 **And the pin is a single expected layout.** It knows one format per version and refuses an
 unknown `PROTOCOL`, which is right while there is one, and would need a table if peers ever
 had to support several at once.
+
+---
+
+## A process failure while writing this, recorded because the outcome was luck
+
+Verifying the pin meant deliberately breaking it: rewrite `_REQUEST` as `!Bqii`, run the
+test, restore the file. The test failed as intended and the restore reported success.
+
+**The restore wrote back byte-identical content, and Windows' timestamp granularity meant
+Python did not notice.** So `__pycache__` kept the *broken* bytecode: the source read
+`!Biii` and the imported module reported `!Bqii`. Two tests then failed for a reason
+invisible in the source.
+
+**The mutation harness caught it and I overrode it.** It said *"The suite is red before any
+mutation. Fix that first."* — precisely the right refusal — and I committed and pushed
+anyway, reading it as noise from a tool rather than as the tool doing its job.
+
+**The commit turned out to be correct**, because the source was always right and CI compiles
+fresh. That is luck, not process: had the source been wrong, the same sequence would have
+shipped it.
+
+> **Two lessons, and the second is the general one.** A verification that rewrites a source
+> file and restores it must clear `__pycache__`, because identical content plus coarse
+> timestamps defeats mtime invalidation. And *"the suite is red"* from any tool is a stop
+> condition — the whole value of a check is that it is believed when it is inconvenient.

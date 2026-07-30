@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import socket
 import threading
+import time
 import unittest
 
 import numpy as np
@@ -89,17 +90,42 @@ def drive(context_keys: bool) -> tuple[np.ndarray, np.ndarray]:
     # `Network.__enter__` blocks until every node connects, so the nodes cannot be
     # started from inside its own `with`.
     from openplexus.distributed import serve
+
+    def join(own) -> None:
+        """Retry until the driver is listening.
+
+        `Network` binds in `__enter__`, which runs in the driver thread, so the port
+        is chosen before anything accepts on it. **CI failed here with
+        `ConnectionRefusedError` where this machine won the race** — so the window is
+        real and its width is not something a test may depend on.
+
+        Retrying `serve` rather than probing the port first: a probe connection is
+        indistinguishable from a node joining, so the driver accepts it, waits for a
+        slice announcement, and reports *"peer closed after 0 of 4 bytes"*. That was
+        a real bug in an earlier version of `tools/cluster_node.py`.
+        """
+        deadline = time.monotonic() + 30
+        while True:
+            try:
+                serve(settings, own, "127.0.0.1", port,
+                      model.wv[:, own.lo:own.hi].copy(),
+                      model.wo[:, own.lo:own.hi].copy())
+                return
+            except OSError:
+                if time.monotonic() > deadline:
+                    raise
+                time.sleep(0.02)
+
     workers = []
     for own in slices_for(WIDTH, NODES):
-        worker = threading.Thread(
-            target=serve,
-            args=(settings, own, "127.0.0.1", port,
-                  model.wv[:, own.lo:own.hi].copy(),
-                  model.wo[:, own.lo:own.hi].copy()),
-            daemon=True)
+        worker = threading.Thread(target=join, args=(own,), daemon=True)
         worker.start()
         workers.append(worker)
     thread.join(timeout=60)
+    if "got" not in box:
+        raise AssertionError(
+            "the driver produced no result: the nodes never all joined. That is a "
+            "FIXTURE failure and says nothing about whether the split is exact")
     return box["got"], wanted
 
 

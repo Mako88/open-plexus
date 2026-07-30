@@ -330,39 +330,38 @@ path is not chosen.**
   - `163 §2` John: *"potentially the actual end solution."* **The intended final
     form**, and still the right target.
   - **BUT ITS VIABILITY IS A PROPERTY OF RELATION DENSITY, and the dense case is
-    already measured against it.** The gate can select only where **exactly one**
-    candidate address is occupied; zero is a dead end and several is the case `147`
-    refuted every rule for. `openplexus/search.py` records the split: a
-    `(subject, relation)` pair names one person **94.9%** of the time, while
-    `(FACT, subject)` *"names one of several relations about half the time"*
-  - **So on `kinship.py` — ten relations, an entity holding several at once — the
-    gate would be undecided about half the time**, and `search.py` exists because
-    that is where the question needed *"which of S's relations leads to T"* rather
-    than *"what relation does S hold"* (`108`)
-  - **Deliberately not built, and this is the reason:** the case where it would work
-    is few sparse relations, which is `families.py`, where `hop_relations` already
-    suffices — and the case that needs it is the dense one where it is refuted. **A
-    mechanism scoped to where it is unnecessary is not worth its reads.** What would
-    change this is a task with several relations that are individually sparse, which
-    nothing here has
+    already measured against it.** The gate selects only where **exactly one**
+    candidate address is occupied; zero is a dead end and several is what `147`
+    refuted every rule for. `search.py` records the split: `(subject, relation)` names
+    one person **94.9%** of the time while `(FACT, subject)` *"names one of several
+    relations about half the time"* — so on ten relations the gate is undecided about
+    half the time, which is why `search.py` exists (`108`)
+  - **Deliberately not built:** where it would work is few sparse relations, which is
+    `families.py`, where `hop_relations` already suffices; where it is NEEDED is the
+    dense case where it is refuted. **A mechanism scoped to where it is unnecessary is
+    not worth its reads.** Revival: a task with several individually-sparse relations,
+    which nothing here has
 - ⬜ **Learned relation chooser** — `147` is the argument for not attempting it yet:
   two hand-made selection rules were refuted before membership worked, and a
   learned chooser is strictly harder.
 - 🔀 **`search.py` beam search** — built, tested, and **deliberately not wired into
   `run`**, labelled as scaffolding so it does not become load-bearing.
-  - `111` **refused first:** search does not pay, because the verifier is built from
-    the same noisy retrievals it is meant to adjudicate
-  - `121` width does NOT fix retrieval fidelity on the task, and `112` was never a
-    bound on it — **which is what expired 111's condition**
-  - `122` step 2 reproduces at 0.971 and the traversal ceiling is 1.000, so the
-    build is justified. `123` built and proved standalone; beam 4 costs 3.2× the
-    traffic
-  - `129` ambiguity IS detectable before searching, **and the expensive signal is
-    below chance** — the endpoint margin is not the fallback
-  - `125` traversal is the win (+0.269); search helps only where ambiguity is
+  - `111` **refused first:** the verifier is built from the same noisy retrievals it
+    must adjudicate. `121` width does NOT fix retrieval fidelity and `112` was never a
+    bound on it — **which expired 111's condition**
+  - `122` step 2 reproduces at 0.971, traversal ceiling 1.000. `123` built and proved
+    standalone; beam 4 costs 3.2× the traffic. `129` ambiguity IS detectable before
+    searching and the expensive signal is below chance. `125` traversal is the win
+    (+0.269); search helps only where ambiguity is
   - `130` the gate pays +0.020 over search-everywhere, and the search line closes
   - **This is the 🔀 argument in one option:** refused at 111, revived at 121 when
     its condition was measured away, and it is the reason the switch exists
+  - **`note 061`: it is what CLUTRR needs, verified against the code and not built.**
+    CLUTRR names BOTH endpoints, so the disambiguator 108 said was missing is handed
+    over by the task. `depth` is **observable, not fitted** — the story *is* the chain,
+    so the fact count is the path length. And `Walk.retrieved` is *"what a readout
+    consumes"*, so the composed relation is predictable where kinship's endpoint was
+    itself the answer. **Wiring it into `run` is the next build**
 - ✅ **A hop REPLACES a retrieval, it does not combine with it** — `101`. `102` built
   the accumulator and recorded that the stated reason for choosing it was wrong.
 - ❌ **Another mechanism stacked on noisy retrieval** — four tried, all failed

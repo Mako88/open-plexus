@@ -194,5 +194,41 @@ class OwnershipIsCoherentUnderBothOrderings(unittest.TestCase):
         self.assertEqual(counted[ALICE], 2)
 
 
+class ConceptAndOwnerAgree(unittest.TestCase):
+    """The conformance property, and it is the one nothing else would catch.
+
+    `concept(tokens, t)` decides which node a WRITE goes to; `owner(a, b)` decides
+    which node a traversal READS from, because `search` reads by pair with no
+    surrounding sequence. If the two disagree the model writes a binding on one
+    machine and looks for it on another — and both answer confidently, so every
+    test would pass and every number would be wrong.
+
+    `key`/`key_as` have the same hazard and the same guard.
+    """
+
+    STREAMS = (
+        np.array([FACT, ALICE, FATHER, BOB]),
+        np.array([FACT, ALICE, BOB, FATHER]),
+        np.array([FACT, ALICE, FATHER, BOB, FACT, BOB, SISTER, CAROL]),
+        np.array([QUERY, ALICE, CAROL]),
+    )
+
+    def test_they_agree_at_every_position_under_every_route(self):
+        for route in PairKeys.ROUTES:
+            keys = source(route)
+            for tokens in self.STREAMS:
+                for t in range(len(tokens)):
+                    previous = int(tokens[t - 1]) if t else VOCAB
+                    with self.subTest(route=route, tokens=list(tokens), t=t):
+                        self.assertEqual(
+                            keys.concept(tokens, t),
+                            keys.owner(previous, int(tokens[t])))
+
+    def test_owner_needs_no_sequence(self):
+        """The reason `owner` exists: a traversal has a pair and nothing else."""
+        self.assertEqual(source("first-concept").owner(ALICE, FATHER), ALICE)
+        self.assertEqual(source("current").owner(ALICE, FATHER), FATHER)
+
+
 if __name__ == "__main__":
     unittest.main()

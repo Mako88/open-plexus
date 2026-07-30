@@ -1915,8 +1915,23 @@ MUTATIONS = [
                "still pass every correctness test -- a node holding half the "
                "network answers the same questions, just from one machine",
         path=KEYS,
-        old="        return int(tokens[t]) if previous in self.markers else previous",
+        old="        return token if previous in self.markers else previous",
         new="        return previous",
+    ),
+    Mutation(
+        name="the-write-owner-stops-agreeing-with-the-read-owner",
+        breaks="the agreement between where a binding is WRITTEN and where a "
+               "traversal LOOKS for it. `concept` decides the first and `owner` "
+               "the second, and inlining the old rule in `concept` makes writes "
+               "route by the current token while reads route by the first "
+               "concept. Nothing crashes: the model files a fact on one machine "
+               "and searches another, and both answer confidently, so every "
+               "number would come out and every one would be wrong. Same hazard "
+               "`key`/`key_as` has, and the reason `concept` delegates",
+        path=KEYS,
+        old="        return self.owner(int(tokens[t - 1]) if t else self.start,\n"
+            "                          int(tokens[t]))",
+        new="        return int(tokens[t])",
     ),
     Mutation(
         name="the-route-falls-through-instead-of-raising",

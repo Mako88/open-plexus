@@ -241,12 +241,26 @@ class PairKeys:
         `"current"` remains the default and the measured comparison: it is what
         every number to date was taken under, decision 134's included.
         """
+        # Routed THROUGH `owner` for the same reason `key` routes through
+        # `key_as`: a traversal reads by PAIR and has no token array, so the rule
+        # has to exist at pair level anyway. Two copies of it is how the node
+        # that WROTE a binding and the node a search READS from stop agreeing --
+        # which no test would catch, because both would answer confidently.
+        return self.owner(int(tokens[t - 1]) if t else self.start,
+                          int(tokens[t]))
+
+    def owner(self, previous: int, token: int) -> int:
+        """Which concept owns the binding at `pair(previous, token)`.
+
+        The pair-level form of `concept`, and the one a traversal needs: `search`
+        reads `pair(current, relation)` with no surrounding sequence, so there is
+        no position to ask about.
+        """
         if self.route == "current":
-            return int(tokens[t])
-        previous = int(tokens[t - 1]) if t else self.start
+            return token
         # A marker names no concept, so fall through to the current token --
         # which is what keeps `key(FACT, X)` on X instead of on FACT.
-        return int(tokens[t]) if previous in self.markers else previous
+        return token if previous in self.markers else previous
 
     def pair(self, previous: int, token: int) -> np.ndarray:
         """The vector for one pair, exposed so a test can check two nodes agree

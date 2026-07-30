@@ -53,7 +53,7 @@ history lives in `docs/notes/` and the archived log.
     🔀 LIVE BOTH   two or more kept behind a switch and re-tested as the system
                    changes. A valid END state, not indecision
 
-**CENSUS: 30 chosen, 29 refuted, 15 untried, 12 both, 1 paused.** Checked against the body,
+**CENSUS: 29 chosen, 29 refuted, 15 untried, 12 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -220,6 +220,18 @@ read.**
     3 seeds, ~1.5 sd). An inversion in a control arm, recorded not smoothed
   - **The cost:** a useful fact nobody asks about inside its window is gone before it can
     be promoted. Every fixture here is built not to pay it
+- ✅ **The two-timescale loop RUNS — `note 092`, and it cannot adjudicate.** Contradiction,
+  blame, promotion and eviction assembled: 30% of facts corrupted, recall back to **1.000**
+  after six passes, with blame falling 115 → 20 so it converges rather than oscillating. It
+  damages nothing when nothing is wrong.
+  - **But repair moves the damage to whichever side it does not trust.** Corrupt the direct
+    fact and repair takes 0.697 → 1.000; corrupt the DERIVATION and it takes 1.000 → 0.697.
+    Identical corruption, relocated. **`note 068` predicted exactly this** — *"a wrong
+    derived fact becomes a premise"* — before anything was built
+  - **What is missing is REDUNDANCY:** a derivation against a read is a two-way disagreement
+    with no majority; two independent derivations against a read is a three-way vote.
+    Untried. Trusting the direct fact always is just "detect only", which trades one failure
+    for the other
 - ⬜ **An EXTERNAL persistent store — John, 2026-07-30, and it is sound.** Eviction becomes
   *archival* rather than deletion. **The key already exists:** `derived_keys` means
   `keys.pair(entity, relation)` is rebuilt from two token ids, so `(entity, relation) →
@@ -328,8 +340,12 @@ fitted.**
 
 ## 5. Composition — reaching what was never stated
 
-**⇒ DECIDED: typed hops with a per-hop schedule, as an INSTRUMENT. The final read
-path is not chosen.**
+**⇒ LARGELY SOLVED, `note 090`/`091`: a chain is walked by `search.beam` and named by a
+fold over pairwise rules, with missing rules supplied by GENERATION DELTA — a conserved
+quantity learned exactly from loop constraints. End task 0.5201 → 0.9668 symbolically and
+0.8578 with the model recovering its own chains.** The open question is no longer how to
+compose but whether an arbitrary domain has an invariant of this kind; kinship's is
+additive and nothing else has been tried.
 
 - ✅ **`hop_relation`** — bind a relation token into the hop's key, so a hop follows
   a NAMED edge. `158`
@@ -339,44 +355,37 @@ path is not chosen.**
     also stops there. Stable across 3 seeds
   - **Labelled an instrument, not the answer.** A schedule the task does not supply
     is a fitted constant (`162`)
-- ⬜ **Try-all-and-gate** — follow every relation type, keep the one whose address is
-  not empty. Costs `r` reads, needs no new mechanism, and is **the gate doing
-  selection again** — the one selection rule here that has ever worked.
-  - `163 §2` John: *"potentially the actual end solution."* **The intended final
-    form**, and still the right target.
-  - **BUT ITS VIABILITY IS A PROPERTY OF RELATION DENSITY, and the dense case is
-    already measured against it.** The gate selects only where **exactly one**
-    candidate address is occupied; zero is a dead end and several is what `147`
-    refuted every rule for. `search.py` records the split: `(subject, relation)` names
-    one person **94.9%** of the time while `(FACT, subject)` *"names one of several
-    relations about half the time"* — so on ten relations the gate is undecided about
-    half the time, which is why `search.py` exists (`108`)
-  - **Deliberately not built:** where it would work is few sparse relations, which is
-    `families.py`, where `hop_relations` already suffices; where it is NEEDED is the
-    dense case where it is refuted. **A mechanism scoped to where it is unnecessary is
-    not worth its reads.** Revival: a task with several individually-sparse relations,
-    which nothing here has
-- ⬜ **Learned relation chooser** — `147` is the argument for not attempting it yet:
-  two hand-made selection rules were refuted before membership worked, and a
-  learned chooser is strictly harder.
-- 🔀 **`search.py` beam search** — built, tested, and **deliberately not wired into
-  `run`**, labelled as scaffolding so it does not become load-bearing.
+- ⬜ **Try-all-and-gate** — follow every relation type, keep the one whose address is not
+  empty: `r` reads, no new mechanism, and **the gate doing selection**, which is the one
+  selection rule here that has ever worked. `163 §2` John: *"potentially the actual end
+  solution."*
+  - **Its viability is a property of RELATION DENSITY and the dense case is refuted.** The
+    gate selects only where exactly one candidate address is occupied, and `search.py`
+    records the split: `(subject, relation)` names one person **94.9%** of the time while
+    `(FACT, subject)` *"names one of several relations about half the time"* — so on ten
+    relations it is undecided about half the time, which is why `search.py` exists (`108`)
+  - **Where it works is where it is unnecessary** (few sparse relations, i.e. `families.py`,
+    where `hop_relations` suffices) and where it is needed it is refuted. **Revival:** a task
+    with several individually-sparse relations, which nothing here has
+  - **And `note 090` took a different route entirely** — supplying the DISPLACEMENT rather
+    than choosing the relation — so this and the learned chooser below are alternatives to
+    a problem now solved another way. Kept as ⬜ rather than ❌ because neither was measured
+- ⬜ **Learned relation chooser** — `147`: two hand-made selection rules were refuted before
+  membership worked, and a learned chooser is strictly harder. See 090's route above.
+- 🔀 **`search.py` beam search** — built and tested; `run` still does not call it, but
+  `note 091` drives it end to end from `tools/`, so it is no longer only scaffolding.
   - **The 🔀 argument in one option:** refused at `111` (the verifier is built from the
-    same noisy retrievals it must adjudicate), **revived at `121` when width was
-    measured NOT to fix fidelity**, built at `123`, closed at `130` (+0.020 over
-    search-everywhere) with `125`'s +0.269 traversal win. A refutation that expired
-  - **`note 061`: it is what CLUTRR needs, verified against the code.** CLUTRR names
-    BOTH endpoints, so 108's missing disambiguator is handed over by the task; `depth`
-    is **observable, not fitted** (the story *is* the chain); and `Walk.retrieved` is
-    *"what a readout consumes"*
-  - **`notes 062` and `064`, superseded by 065 and kept for their durable facts.** 062
-    measured root-only search at **0.659** and concluded *"the search does not pay"* —
-    **overturned**. 064 found why: the **entity hop is 0.9889 and FLAT** (so the store
-    does not degrade as it fills) while the **relation decode is 0.9348**, six times the
-    error rate, with 15% of those reads on an entity holding two or more outgoing edges.
-    **`walk_from` branches only at the ROOT**, hedging at the 0.974 step and committing
-    blindly at the 0.906 ones — the whole +0.009, **measured at the wrong place by its
-    own construction**
+    same noisy retrievals it must adjudicate), **revived at `121` when width was measured
+    NOT to fix fidelity**, built at `123`, closed at `130` (+0.020) with `125`'s +0.269
+    traversal win. A refutation that expired
+  - **`note 061`: it is what CLUTRR needs**, verified against the code — the task names
+    BOTH endpoints, so `108`'s missing disambiguator is handed over, and `depth` is
+    observable rather than fitted
+  - **`note 064`'s durable fact, kept though 065 superseded its conclusion:** the entity
+    hop is **0.9889 and FLAT** (the store does not degrade as it fills) while the relation
+    decode is **0.9348** — six times the error rate. `walk_from` branched only at the ROOT,
+    hedging at the 0.974 step and committing blindly at the 0.906 ones, so its +0.009 was
+    **measured at the wrong place by its own construction**
 - ✅ **`search.beam` — branch at EVERY step, pruned.** Beats single-step branching on
   every seed of both harnesses, which is the qualitative claim and it holds.
   - **`note 075`: `note 065`'s +0.2190 does NOT reproduce.** `beam` lands within 0.007 of
@@ -420,49 +429,48 @@ path is not chosen.**
     **The bottleneck moved twice:** 063 route-finding → 065 route solved, naming → 066 the
     rules available to name with. Unexplained: the **3-hop cell (0.524) is below 4-hop
     (0.732)**
-- ❌ **`bind` as a route to GENERALISING composition — `note 067`, and it refutes 066's
-  own closing sentence.** Over the 97 rules, holding out a quarter: **0.844 on trained
-  rules, 0.056 held out**, against chance 0.050 and majority 0.082. Five seeds. **Not
-  weak generalisation — none.**
-  - **Why: a binding is built to be UNBINDABLE, not PREDICTABLE.** `a ⊙ b` retains
-    enough of each to recover the other, which is what VSA binding is for; it carries no
-    claim that similar inputs give similar outputs, and with **random** relation vectors
-    they demonstrably do not. 066's *"composes any two vectors by one rule"* is true and
-    the conclusion does not follow — **I measured tabulation's ceiling and claimed
-    binding's reach**
-  - **Revival: STRUCTURED relation vectors — and it is MET, see the next row.** The
-    operation is not the problem, so `bind` stays (14c) as the measured comparison for
-    anything claiming to generalise. **It also splits component 2's refusal** — see the
-    relations row there
-- ✅ **EXTENSIONAL relation vectors — `note 070`, answering 067's "whole question".** Profile
-  each relation by how others attach to the entities it links (relation × {HH,HT,TH,TT}),
-  compose with `concat` + circular convolution. Held-out rule prediction **0.223 against
-  random's 0.124** — paired **+0.099**, se 0.009, **t = 11.6**, 120 seeds. `father` comes out
-  `grandfather`'s nearest neighbour, which is 067's own statement of the requirement.
-  `tools/relation_profiles.py` reproduces it and carries its P0.
-  - **`note 069` moved the baseline: marginals alone are worth 0.242**, so composition claims
-    beat 0.24 not 0.05. **Void without per-seed profiles**, or a 2-hop puzzle writes its own
-    rule into its target's profile
-  - **`note 084`: self-training does NOT lift it** — 0.2062 → 0.1984, frozen from round 1.
-    078's loop compounded by adding new FEATURES; pseudo-labels over the same features
-    re-learn the same function. **Bootstrapping needs new features, not new labels**
-  - **`note 085`: ASSOCIATIVITY verifies what it cannot generate.** Holds on the known table
-    (**0.933**), determines held-out rules at **0.059** (chance — the table is 15% dense).
-    As a filter: satisfying every constraint → **0.5645**, contradicting them → **0.0162**,
-    and **98.4% of rejections are genuinely wrong.** Second label-free correctness signal
-    after `080`, which `082` says the memory design reduces to. **9.7% recall**
-  - **`note 071`: in the ADDRESS it needs the gate, and then costs little.**
-    `key(e,r) = hash(e) ⊛ profile(r)` reads back at 0.992–1.000, but under the RAW
-    `memory @ key` an unwritten address returns one of that entity's own facts
-    **0.592–0.775, flat across load** (hashed: 0.036, tracking chance) — one entity's
-    addresses share a subspace. **`AddressSketch` recovers it** as an LSH *threshold* rather
-    than a blend: **1.0000/0.0005 at 24 bits**, ~1% at the default 16. **So it rules out the
-    UNGATED read, not the representation** — 071's title, written before the gate was tested,
-    overstates it
-  - **Refutation: it does not transfer off kinship**, which has unusually strong positional
-    structure (`note 058` measured a domain with none). **NOT built**, and `keys.py` is not
-    the place: structure in the VALUE, or an exact address plus a separate structured
-    channel, are the untried homes
+- ✅ **GENERATION DELTA, learned from cycles — `note 090`, and it CLOSES the ceiling.**
+  A chain plus its query is a loop, so the chain's deltas must sum to the answer's: one
+  equation per puzzle, 9,074 of them, 20 unknowns, null space **1** (the gauge), and
+  **20/20 deltas recovered exactly**. Fill a gap with any relation of the right delta and
+  the chain stays arithmetically correct.
+  - **End task 0.5201 → 0.9668** symbolically, against 1.0000 for an oracle handed the
+    true rules. **CONTROL: a deliberately WRONG delta scores 0.5681, below random's
+    0.6081** — so the displacement is the mechanism, not the filling. Fills also FALL,
+    720 against random's 1,152, because a delta-preserving fill lands where the table
+    already knows
+  - **`note 091` end to end, the model recovering its own chains: 0.8578**, with chain
+    recovery 0.8770. Roughly the product, slightly better because a mis-recovered chain
+    can still compose right. `tools/generation_delta.py` reproduces both
+  - **`note 087`: the fold is PERFECT given coverage** — supply every missing rule and
+    puzzles complete 1.0000, so 066's *"tabulation's ceiling"* understates it. The gap was
+    **31 rules**, all spouse/in-law, **never stated in any split**
+  - **`note 089`'s hand-coded features were mostly NOISE.** Its oracle scored 0.7382; the
+    marry clause cost 0.125 and gender+affinity a further 0.058. **The feature it measured
+    as least learnable (generation, 0.350 from profiles) is the only one that mattered** —
+    profiles are ADJACENCY and generation is GLOBAL, so the answer was a different kind of
+    signal, not a better regressor
+  - **Refutation, and it is the live question: kinship has an ADDITIVE INVARIANT.** Whether
+    an arbitrary relational domain has a conserved quantity is untested, and a domain
+    without one gets nothing from this
+- ❌ **Naming the missing rule, by any learned readout — `note 088`.** Extensional
+  relations reach 0.223 held-out (`note 070`, +0.099 paired, t=11.6) and score **0.5995 end
+  task, BELOW random filling's 0.6081 ± 0.0055.** 070's holdout was a random quarter; the
+  rules that matter are an adversarially withheld family, and this is the measurement that
+  separates them. `majority` is worse still (0.5620), so systematic error costs more than
+  noise. **Revival: only if a mechanism beats 0.6081 end-task, which is the bar 090 clears.**
+  - `note 067` `bind` over RANDOM relations: 0.056 held out against chance 0.050. Kept
+    under 14c as the measured comparison
+  - `note 084` self-training does not lift it, frozen from round 1: **bootstrapping needs
+    new FEATURES, not new labels** — 078's rounds added graph columns, this adds only
+    pseudo-labels over the same space
+  - `note 085` **associativity VERIFIES what it cannot generate.** Holds on the known table
+    (0.933), determines held-out rules at 0.059 (chance — 15% density), and as a filter
+    separates **0.5645 from 0.0162** with 98.4% of rejections genuinely wrong. Propagating
+    it iteratively fills **zero cells in zero rounds** (`note 090`), so deduction is settled
+    as unable to supply the rules
+  - `note 071` structured vectors in the ADDRESS need the gate: raw reads return another of
+    that entity's facts 0.592–0.775, `AddressSketch` recovers 1.0000/0.0005 at 24 bits
 - ⬜ **`index_at_hops` combined with the position-level index** — `159`/`160`/`161`
   built the pieces; `154` measured that the guard's premise is false (a hop key
   sits at cosine **0.96** to a single token's row, so it *does* name a concept).
@@ -618,8 +626,13 @@ not gate anything above.**
 
 ## 9. Distribution
 
-**⇒ DECIDED: split by dimension today. Concept splitting is built as a seam and is
-not on. The readout still violates C1.**
+**⇒ THE DRIVER IS GONE FROM THE READ PATH, `note 093`/`094`.** A read goes to the one
+peer holding the fact — 2 messages rather than 2N, and no sum, so C1's collective is off
+the read path. Writes reach every holder (`note 098`), a departure costs a round trip
+rather than the answer (`note 097`), routing is consistent hashing (`note 095`), and the
+wire format plus the ring are fingerprinted so a mismatch is refused rather than served
+(`note 096`/`099`). **Dimension splitting remains the default and `concept_nodes` is still
+0**; the peer transport is a parallel path nothing in `run()` uses yet.
 
 - ✅ **Partition by dimension** — every node computes `M_slice @ key_slice` and
   inherits the sum. Current default.
@@ -677,6 +690,29 @@ not on. The readout still violates C1.**
     `d` to buy capacity (832 KB per message at Wikidata scale, ~266 MB per query) where
     concept splitting holds `d` at 512 and adds nodes (~640 KB per query). *arithmetic on
     measured capacity, no G4 run at these widths*
+- ✅ **`openplexus/peer.py` — point-to-point reads and writes, no driver.**
+  `notes 093`–`099`. Every read goes to the peer owning the concept; every write reaches
+  every holder. **2 messages per read against 2N for broadcast** — 256x at 256 peers — and
+  the serialisation point goes with it.
+  - **A driver-free `beam` traversal is exact** (`note 094`): identical walk to one
+    process, and a misrouted control changes it, so the routing produces the answer.
+    `search` takes `reader=` so a caller injects routing and `search` never imports a
+    transport
+  - **Consistent hashing** (`note 095`): a peer joining moves **1.4%** of concepts at 64
+    peers where `concept % peers` moved 98.4%, landing on the ideal `1/n` to a tenth of a
+    point
+  - **A departure costs a round trip, not the answer** (`note 097`): reads walk
+    `Ring.holders`, and writes fan out so there is something to fall back to. **Both halves
+    are needed and either alone looks fine.** Losing every holder returns zeros and
+    **counts** them, because an uncounted zero decodes to whatever the readout prefers
+  - **Fingerprinted** (`note 096`/`099`): peer count, ring seed, key seed/spread/width/
+    start/route/markers, and the **wire-format version** — pinned to `_REQUEST.format` by a
+    test, so changing the layout without bumping it fails rather than shipping
+  - **Costs, stated:** the retrieval strategy moves to the owning node, because a remote
+    store cannot return a `d×d` matrix (512 KB against 2 KB). A write waits for `R` holders,
+    which is not `N` but is not free. **Untried:** ordering (writes race and the store is
+    additive), re-replication after a departure, negotiation rather than refusal, and
+    anything at scale or over real latency
 - ❌ **The global dimension-summing readout** — this is the globally synchronised
   step **C1 forbids**, the project's own first constraint. Surfaced in a footnote
   to [note 009](docs/notes/009-splitting-the-memory.md) §4 **after four gates were
@@ -809,32 +845,17 @@ that is the standing weakness.**
 
 ## 11. Verification apparatus
 
-**⇒ DECIDED and deliberately permanent. Listed so effort does not go here hunting
-for stopgaps.**
+**⇒ DECIDED and deliberately permanent. Moved out of the tree** — every item documents
+itself in its own docstring and CLAUDE.md rules 6, 10, 11 and 14 carry the policy, so it
+was spending lines in a document whose criterion is being readable in one pass. Nothing in
+it has ever been re-litigated, which is the only thing the tree prevents.
 
-- ✅ **Mutation harness** — 172 mutations, sharded 6 ways in CI. **Measured on
-  `57d8112`: 168 mutations, 28 per shard, 18–35 minutes each, all caught** — so
-  serial is ~2.5 hours, not the twenty minutes the comment claimed.
-  - `168` shards are by POSITION, so inserting a mutation mid-list shifts
-    everything after it. Two logs compare line-for-line only while the list is
-    unchanged
-- ✅ **Dependency-free ruler** — `tasks/`, `baselines.py`, `answers.py` take no
-  dependencies, because they are what everything else is asserted against.
-  - `note 007` the stack decision. *no measurement* — a convention, and the
-    argument is that a generator with no library semantics is auditable line by
-    line
-- ✅ **The rails** — `check_workflows` (flags vs `--help`, one second, turns a spent
-  matrix into an error), `check_rails`, `check_duplication`, `check_decisions`.
-  - *no measurement* for the rails as a policy — they are conventions, and each
-    encodes a specific failure that already cost a result rather than generic lint
-  - `check_duplication`'s stated justification was **wrong and its own tool
-    measured that**: run over the pre-port tree it finds none of the five
-    hand-copied recovery refusals it was requested for, because those copies had
-    already diverged. So it is PREVENTION, not detection, and the thing that
-    catches a drifted copy is still a mutation
-- ✅ **Sensitivity checks on any timing assertion** — `169`: three attempts at one
-  assertion (a race, a vacuous bound, then a real check) and **the first two both
-  passed when written.**
+- ✅ **The apparatus** — mutation harness (sharded 6 ways in CI; `--verify` is the
+  authority on the count), a dependency-free ruler in `tasks/`/`baselines.py`/`answers.py`
+  (`note 007`), the rails (`check_workflows`, `check_rails`, `check_duplication`,
+  `check_decisions`), and a sensitivity check on any timing assertion — `169`: three
+  attempts at one assertion and **the first two both passed when written.**
+  - Full account: [archived](docs/archive/verification-apparatus-2026-07-30.md)
 
 ---
 

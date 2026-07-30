@@ -133,6 +133,13 @@ def _reader(readable, retrieval, keys):
     `isinstance` rather than `hasattr`: the two cases are a matrix and a store,
     both named outright, so a third kind of argument raises instead of being
     guessed at.
+
+    **A third case is supplied rather than detected.** A REMOTE store cannot answer
+    `matrix(concept)` -- at width 256 that is 512 KB per read against 2 KB for the
+    answer, so the owning node must do the retrieval itself (note 093). Teaching this
+    function about transports would put the network in `search`'s imports; instead every
+    public function takes `reader=`, and a caller holding a socket passes one in. So
+    `search` never learns what a peer is.
     """
     if isinstance(readable, np.ndarray):
         return lambda previous, token: retrieval.read(
@@ -140,6 +147,17 @@ def _reader(readable, retrieval, keys):
     return lambda previous, token: retrieval.read(
         readable.matrix(keys.owner(previous, token)),
         keys.pair(previous, token))
+
+
+def _resolve(reader, readable, retrieval, keys):
+    """Honour an injected reader, or build one from `readable`.
+
+    One function so there is ONE place the injection is honoured. Three call sites each
+    writing `reader or _reader(...)` is three chances for one of them to stop honouring
+    it, and a traversal that silently reads the local store instead of the network
+    produces numbers about a single process while claiming to be distributed.
+    """
+    return reader or _reader(readable, retrieval, keys)
 
 
 def _top(scores: np.ndarray, count: int,
@@ -164,7 +182,7 @@ def _top(scores: np.ndarray, count: int,
 
 def walk_from(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
               fact_token: int, start: int, first_relation: int,
-              depth: int) -> Walk:
+              depth: int, reader=None) -> Walk:
     """Follow one committed branch `depth` relations deep.
 
     The walk alternates the two operations decision 107 measured separately:
@@ -182,7 +200,7 @@ def walk_from(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     if depth < 1:
         raise ValueError("a walk of depth 0 has nothing to follow")
 
-    read = _reader(readable, retrieval, keys)
+    read = _resolve(reader, readable, retrieval, keys)
 
     relations = [first_relation]
     entities: list[int] = []
@@ -213,7 +231,8 @@ def walk_from(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
 
 def candidates(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
                fact_token: int, start: int, branches: int,
-               allowed: np.ndarray | None = None) -> list[tuple[int, float]]:
+               allowed: np.ndarray | None = None,
+               reader=None) -> list[tuple[int, float]]:
     """The branches worth trying from `start`, with their decode scores.
 
     Split out of `search` so **the decision to search can be taken without
@@ -230,7 +249,7 @@ def candidates(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     confidence signal reaching 0.628 against 0.500 for guessing, so a signal
     that merely sounds plausible has a poor record here.
     """
-    read = _reader(readable, retrieval, keys)
+    read = _resolve(reader, readable, retrieval, keys)
     first = read(fact_token, start)
     scores = _decode(wv, first)
     return [(token, float(scores[token]))
@@ -255,7 +274,7 @@ def decode_margin(scored: list[tuple[int, float]]) -> float:
 def search(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
            fact_token: int, start: int, target: np.ndarray, depth: int,
            branches: int = 4,
-           allowed: np.ndarray | None = None) -> list[Walk]:
+           allowed: np.ndarray | None = None, reader=None) -> list[Walk]:
     """Every candidate branch from `start`, scored by whether it reaches `target`.
 
     Returns the walks sorted best first. The caller decides what to do with them
@@ -299,12 +318,12 @@ def search(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
         raise ValueError("branches must be at least 1")
 
     scored = candidates(readable, retrieval, keys, wv, fact_token, start,
-                        branches, allowed)
+                        branches, allowed, reader=reader)
 
     walks = []
     for candidate, _ in scored:
         walk = walk_from(readable, retrieval, keys, wv, fact_token, start,
-                         candidate, depth)
+                         candidate, depth, reader=reader)
         # SCORED BY THE ENDPOINT, not by confidence anywhere along the way.
         # Decision 93 measured every identity-free confidence signal -- norm,
         # entropy, peak, gap, kurtosis -- and the best linear separator over all
@@ -321,7 +340,7 @@ def search(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
 
 def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
          fact_token: int, start: int, target: np.ndarray, depth: int,
-         width: int = 4, branches: int = 4,
+         width: int = 4, branches: int = 4, reader=None,
          allowed: np.ndarray | None = None) -> list[Walk]:
     """Search branching at EVERY step, not only the root.
 
@@ -385,7 +404,7 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     if width < 1 or branches < 1:
         raise ValueError("width and branches must both be at least 1")
 
-    read = _reader(readable, retrieval, keys)
+    read = _resolve(reader, readable, retrieval, keys)
 
     # A partial walk: entity now, relations committed, values read, entities passed,
     # and the cumulative decode score that pruning ranks on.

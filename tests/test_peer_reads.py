@@ -107,6 +107,75 @@ class APeerServesTheConceptsItOwns(unittest.TestCase):
         self.assertEqual(self.remote.reads - before, len(FACTS))
 
 
+class ABeamTraversalRunsWithoutADriver(unittest.TestCase):
+    """The integration note 093 named as missing: a WALK with no reduction anywhere.
+
+    `search` takes `reader=` so a caller holding sockets can inject routing without
+    `search` importing a transport. Every read in the walk goes to the one peer owning
+    the concept.
+    """
+
+    #: A chain 2-20->3-21->4-22->5 with a branch off 2, so the beam has a choice to
+    #: get wrong. Out-degree 1 would hide a routing fault, which is how decision 108's
+    #: missing-search capability stayed hidden.
+    WALK_FACTS = ((2, 20, 3), (3, 21, 4), (4, 22, 5), (2, 23, 6), (6, 21, 7))
+    RELS = (20, 21, 22, 23)
+
+    def setUp(self):
+        rng = np.random.default_rng(3)
+        self.values = rng.normal(0.0, 1.0, (VOCAB, WIDTH))
+        self.values /= np.linalg.norm(self.values, axis=1, keepdims=True)
+        self.keys = PairKeys(seed=1, spread=1.0 / np.sqrt(WIDTH), width=WIDTH,
+                             start=VOCAB, route="first-concept",
+                             markers=frozenset({FACT}))
+        self.whole = np.zeros((WIDTH, WIDTH))
+        self.stores = [ConceptStore(nodes=1, width=WIDTH, seed=0, replicas=1)
+                       for _ in range(NODES)]
+        for entity, relation, obj in self.WALK_FACTS:
+            for previous, token, value in (
+                    (FACT, entity, relation), (entity, relation, obj)):
+                key = self.keys.pair(previous, token)
+                self.whole += np.outer(self.values[value], key)
+                concept = self.keys.owner(previous, token)
+                self.stores[concept % NODES].write(concept, key,
+                                                  self.values[value])
+        self.peers = [ConceptPeer(self.stores[i], self.keys).start()
+                      for i in range(NODES)]
+        self.remote = RemoteConcepts(
+            {i: ("127.0.0.1", self.peers[i].port) for i in range(NODES)},
+            WIDTH, self.keys)
+
+    def tearDown(self):
+        self.remote.close()
+        for peer in self.peers:
+            peer.close()
+
+    def _walk(self, reader):
+        from openplexus.retrieval import SuperposedRead
+        from openplexus.search import beam
+        walks = beam(None if reader else self.whole, SuperposedRead(), self.keys,
+                     self.values, FACT, 2, self.values[5], 3, width=2, branches=2,
+                     allowed=np.array(self.RELS), reader=reader)
+        return walks[0].relations if walks else None
+
+    def test_the_driver_free_walk_equals_the_in_process_one(self):
+        def routed(previous, token):
+            return self.remote.read(self.keys.owner(previous, token),
+                                    previous, token)
+        self.assertEqual(self._walk(routed), self._walk(None))
+
+    def test_the_walk_is_the_true_chain(self):
+        """Equality against a wrong walk would also be equality."""
+        self.assertEqual(self._walk(None), (20, 21, 22))
+
+    def test_MISROUTING_changes_the_walk(self):
+        """So the routing is what produces it, not the fixture."""
+        def misrouted(previous, token):
+            return self.remote.read(self.keys.owner(previous, token) + 1,
+                                    previous, token)
+        self.assertNotEqual(self._walk(misrouted), self._walk(None))
+
+
 class ThePeerIsListeningBeforeItIsStarted(unittest.TestCase):
     """Binding in `__init__` is the fix for the race that failed CI once already."""
 

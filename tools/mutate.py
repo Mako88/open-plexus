@@ -1951,6 +1951,18 @@ MUTATIONS = [
         new="        self._parent[left] = right",
     ),
     Mutation(
+        name="an-injected-reader-is-ignored",
+        breaks="the seam that lets a traversal run without a driver. `search` takes "
+               "`reader=` so a caller holding sockets can route each read, and "
+               "ignoring it silently falls back to the local matrix -- which for a "
+               "driver-free walk means `readable` is None and the walk raises, but "
+               "for any caller that passes BOTH a store and a reader it means the "
+               "network is quietly bypassed and the numbers describe a single process",
+        path=SEARCH,
+        old="    return reader or _reader(readable, retrieval, keys)",
+        new="    return _reader(readable, retrieval, keys)",
+    ),
+    Mutation(
         name="a-peer-read-asks-whoever-rather-than-the-owner",
         breaks="the whole point of removing the driver. Routing every read to peer 0 "
                "instead of the concept's owner reaches a node that never received "

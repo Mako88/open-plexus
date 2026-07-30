@@ -105,6 +105,13 @@ class ConceptPeer:
         self._listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._listener.bind((host, port))
         self._listener.listen(8)
+        # A TIMEOUT so `accept` returns periodically and the loop can notice `_stop`.
+        # Closing a listener from another thread while one is blocked in `accept` is
+        # not portable: on Windows the accept fails and the peer stops, on Linux the
+        # peer kept serving and a test asserting a departure read zeros got a real
+        # answer instead -- in CI only, because this machine happened to behave the
+        # other way.
+        self._listener.settimeout(0.1)
         #: Bound before `serve` starts, so a caller may connect immediately. Binding
         #: in a background thread is what made a test race its own driver -- the
         #: window between choosing a port and accepting on it is not something a
@@ -122,10 +129,16 @@ class ConceptPeer:
         while not self._stop:
             try:
                 connection, _ = self._listener.accept()
+            except socket.timeout:
+                continue          # the point of the timeout: re-check `_stop`
             except OSError:
                 return
             with connection:
                 connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+                # Same reason as the listener's timeout: without it a peer blocked in
+                # `receive` on a live connection never re-checks `_stop`, so `close`
+                # waits out its whole join and the peer keeps answering meanwhile.
+                connection.settimeout(0.1)
                 # The handshake first, and REFUSE on mismatch rather than serving.
                 # Serving a caller that routes differently is the failure mode this
                 # exists to make loud.
@@ -136,9 +149,11 @@ class ConceptPeer:
                 send(connection, _HELLO.pack(self.fingerprint))
                 if theirs != self.fingerprint:
                     continue
-                while True:
+                while not self._stop:
                     try:
                         message = receive(connection)
+                    except socket.timeout:
+                        continue
                     except (ConnectionError, OSError):
                         break
                     if not message:
@@ -152,7 +167,18 @@ class ConceptPeer:
                     send(connection, np.asarray(value, dtype=">f8").tobytes())
 
     def close(self) -> None:
+        """Stop serving, and do not return until the peer has actually stopped.
+
+        **Synchronous on purpose.** A caller simulating a departure needs the peer to be
+        gone by the time the next read happens, and an asynchronous close makes that a
+        race whose outcome depends on the platform's `accept` semantics -- which is
+        exactly how a churn test passed here and failed in CI.
+        """
         self._stop = True
+        thread, self._thread = self._thread, None
+        if thread is not None and thread.is_alive():
+            # At most one accept timeout plus the work in flight.
+            thread.join(timeout=2.0)
         try:
             self._listener.close()
         except OSError:

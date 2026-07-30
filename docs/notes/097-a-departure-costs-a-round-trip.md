@@ -71,3 +71,35 @@ them, and nothing re-replicates to restore the count. After two departures a con
 
 **And `survival()` is unused.** `ConceptStore.survival` estimates how often every holder is
 gone; the real quantity here is `absent / reads` and nothing sweeps it against a churn rate.
+
+---
+
+## CI FAILURE, and it was in this note's own mechanism
+
+**`test_losing_EVERY_holder_is_a_counted_absence` failed in CI and passed here**, taking the
+suite and all six mutation shards with it. The read returned a real value where zeros were
+expected: **the peer kept serving after `close()`.**
+
+`close()` closed the listener and returned. **Closing a socket that another thread is blocked
+in `accept` on is not portable** — Windows failed the accept and the peer stopped; Linux kept
+it alive. So a simulated departure was a race whose outcome depended on which machine ran it.
+
+**The fix is in the production code, not the test.** The listener and each accepted connection
+carry a 0.1 s timeout so both loops re-check `_stop`, and `close()` joins the thread. Measured:
+**0.106 s with a live connection open**, thread confirmed dead, and the next read returns
+counted zeros.
+
+> **A departure has to be a fact by the time the next read happens.** An asynchronous close
+> makes every churn test a race, and a race that this machine wins is a test that only reports
+> on this machine.
+
+### Two of my own mistakes on the way, both caught by the tools
+
+**The fingerprint refused my new tests, twice** — I built peers with `peers=NODES` while giving
+the client a one-peer dict, and the peer count is in the fingerprint. Note 096's handshake
+working on its author.
+
+**And the first version of the close test was vacuous.** `close` sets `_thread = None`, so
+`assertFalse(peer._thread.is_alive())` passes trivially — and it passed with the join deleted
+entirely, which the mutation caught. The test now holds the thread reference before closing.
+**192 mutations.**

@@ -1963,6 +1963,19 @@ MUTATIONS = [
         new="    return _reader(readable, retrieval, keys)",
     ),
     Mutation(
+        name="closing-a-peer-does-not-wait-for-it",
+        breaks="the property that makes a simulated departure a FACT rather than a "
+               "race. Closing a socket that another thread is blocked in `accept` on "
+               "is not portable: without the join, Windows stopped the peer and Linux "
+               "kept it serving, so a churn test asserting a departure reads zeros got "
+               "a real answer -- in CI only, because this machine behaved the other "
+               "way. A test whose result depends on which platform ran it is not a "
+               "test",
+        path=PEER,
+        old="            thread.join(timeout=2.0)",
+        new="            pass",
+    ),
+    Mutation(
         name="a-read-gives-up-on-the-owner",
         breaks="C3. `Ring.holders` walks clockwise for distinct peers precisely so "
                "*nothing has to move on a failure -- the remaining replicas are "

@@ -22,6 +22,7 @@ pooling, no vote, no barrier"* — and `openplexus/peer.py` is that over a socke
 
 from __future__ import annotations
 
+import time
 import unittest
 
 import numpy as np
@@ -294,6 +295,65 @@ class ADepartureCostsARoundTripNotTheAnswer(unittest.TestCase):
         got = self.remote.read(concept, entity, relation)
         np.testing.assert_allclose(got, np.zeros(WIDTH))
         self.assertEqual(self.remote.absent, before + 1)
+
+
+class ClosingAPeerIsSynchronous(unittest.TestCase):
+    """A departure must have HAPPENED by the time the next read runs.
+
+    This is the fix for a CI-only failure. `close` used to close the listener and
+    return, leaving the serving thread to notice whenever it happened to. On Windows
+    the blocked `accept` failed and the peer stopped; **on Linux it kept serving**, so a
+    test that killed every holder and expected zeros got a real answer instead.
+
+    Closing a socket that another thread is blocked in `accept` on is not portable, so
+    both the listener and each accepted connection carry a short timeout and the loops
+    re-check `_stop`. `close` then joins, which makes a simulated departure a fact
+    rather than a race.
+    """
+
+    def test_close_stops_the_thread_even_with_a_live_connection(self):
+        values, keys, stores = fixture()
+        peer = ConceptPeer(stores[0], keys, peers=1, seed=RING_SEED).start()
+        remote = RemoteConcepts({0: ("127.0.0.1", peer.port)}, WIDTH, keys,
+                                seed=RING_SEED, replicas=1)
+        try:
+            # Force a live connection, so the serving thread is inside `receive`
+            # rather than waiting in `accept`.
+            remote.read(0, FACTS[0][0], FACTS[0][1])
+            # HOLD THE THREAD before closing. `close` sets `_thread = None`, so
+            # asserting on `peer._thread` afterwards is vacuous — it passed while the
+            # join was removed entirely, which a mutation caught.
+            serving = peer._thread
+            self.assertIsNotNone(serving)
+            started = time.perf_counter()
+            peer.close()
+            took = time.perf_counter() - started
+            self.assertLess(took, 1.5,
+                            f"close took {took:.2f}s, so it waited out its join "
+                            f"instead of the loop noticing `_stop`")
+            self.assertFalse(serving.is_alive(),
+                             "the serving thread outlived close, so a departure is "
+                             "not a fact by the time the next read happens")
+        finally:
+            remote.close()
+            peer.close()
+
+    def test_a_read_after_close_is_a_counted_absence(self):
+        """The property the CI failure was actually about."""
+        values, keys, stores = fixture()
+        peer = ConceptPeer(stores[0], keys, peers=1, seed=RING_SEED).start()
+        remote = RemoteConcepts({0: ("127.0.0.1", peer.port)}, WIDTH, keys,
+                                seed=RING_SEED, replicas=1)
+        try:
+            remote.read(0, FACTS[0][0], FACTS[0][1])
+            peer.close()
+            remote._drop(0)
+            before = remote.absent
+            got = remote.read(0, FACTS[0][0], FACTS[0][1])
+            np.testing.assert_allclose(got, np.zeros(WIDTH))
+            self.assertEqual(remote.absent, before + 1)
+        finally:
+            remote.close()
 
 
 class AConfigMismatchIsRefusedRatherThanServed(unittest.TestCase):

@@ -345,24 +345,20 @@ path is not chosen.**
     **`walk_from` branches only at the ROOT**, hedging at the 0.974 step and committing
     blindly at the 0.906 ones — the whole +0.009, **measured at the wrong place by its
     own construction**
-- ✅ **`search.beam` — branch at EVERY step, pruned. `note 065`, and it is the largest
-  single mechanism gain in this project's record.**
-  - **0.6614 → 0.8805 chain recovery, +0.2190 against a seed spread of 0.0113** — 20×
-    the noise, same sign on all three seeds. 064's refutation condition (*fails to beat
-    0.659 by more than seed spread*) is not met by a wide margin
-  - **On note 059's plain subset it is 713/713 = 1.000, every seed.** The mechanism is
-    not merely better, it is **exhausted** where the addressing is sound. The residue
-    is the 433 collided rows at ~0.68, consistent with `103`/`104`'s repeated-entity
-    line and the part `157`'s layout could not reach
-  - Gain **concentrated at depth** as 064 predicted: nothing at 2–3 hops, +0.34 at
-    eight and nine. **Cost 4× the reads** (`width × branches × depth`); unpruned is
-    `branches^h`, a million walks at ten hops, so pruning is what makes it exist.
-    Whether 4× is acceptable is a **G4 question, unanswered** — `123` had beam 4 at
-    3.2× on kinship. **`search` is untouched** as the comparison (rule 14c); mutation
-    `the-beam-branches-at-the-root-like-the-old-search` reverts the defect
-  - **⇒ AND IT CORRECTS `note 063`:** that note put the ceiling on route-finding rather
-    than naming, which was right at 0.659 and is **wrong now** — the route is solved on
-    the plain subset, so **the fold over pairwise rules is the next work after all**
+- ✅ **`search.beam` — branch at EVERY step, pruned.** Beats single-step branching on
+  every seed of both harnesses, which is the qualitative claim and it holds.
+  - **`note 075`: `note 065`'s +0.2190 does NOT reproduce.** `beam` lands within 0.007 of
+    065's mean; `search` is high by 0.12, so the gain is **+0.107**. Not width, not the
+    `allowed` mask, not `branches` — all tested. 065's config is unrecovered, so take
+    differences against `tools/clutrr_recovery.py`'s own baseline
+  - **713/713 on the plain subset is reached — under PARTITIONING**, `note 081`'s
+    companion measurement: 4 concept nodes give beam 0.9220 against 0.8877 monolithic,
+    because a node carries interference only from what it owns
+  - **Cost 4× the reads** (`width × branches × depth`); unpruned is `branches^h`, a
+    million walks at ten hops, so pruning is what makes it exist. **G4 unanswered** —
+    `123` had beam 4 at 3.2× on kinship. `search` is untouched as the comparison (14c)
+  - **⇒ It corrects `note 063`**, which put the ceiling on route-finding rather than
+    naming: right at 0.659, wrong once the route is solved, so the fold is the next work
 - ✅ **A hop REPLACES a retrieval, it does not combine with it** — `101`. `102` built
   the accumulator and recorded that the stated reason for choosing it was wrong.
 - ❌ **Another mechanism stacked on noisy retrieval** — four tried, all failed
@@ -621,9 +617,21 @@ not on. The readout still violates C1.**
     collective every participant must join, which is the barrier C1 forbids. The fix
     exists: `distributed.py`'s deadline settles a step on what arrived, so a slow node
     costs a candidate rather than stalling — the path `169`'s silent peer made testable
-  - **So its case is INDEPENDENCE and churn resilience, not capacity.** Under
-    dimension splitting a node can never answer alone however large the system
-    gets
+  - **`note 081` MAKES IT MANDATORY, and this is the strongest argument for it.**
+    Capacity is fixed at `~0.023·d²` per store, and both knobs fail: no decay saturates
+    (recall **0.07 at 10.6×**, and *symmetric* — oldest beats recent, so it is
+    interference, not forgetting, and **replay cannot fix it**), while decay windows
+    (0.990 on the last 100, **0.000 on anything older**). **C4 needs capacity that GROWS
+    and this is the only mechanism that provides it** — `nodes × per-node`, since each
+    node holds a FULL-WIDTH store. Distribution was framed as how to use spare machines;
+    it is how the project satisfies its own fourth constraint
+  - **And `note 081` costs the GATE at load.** `148`'s structurally-zero read is 1.26 at
+    half capacity and **1.03 at 10.6×** — gone. `note 080`'s contradiction signal is the
+    same quantity, so **the credit loop closes only inside the window.** Gate health is a
+    function of LIVE load, not total writes
+  - **So its case was INDEPENDENCE and churn resilience, not capacity** — that framing
+    is now superseded by 081. Under dimension splitting a node can never answer alone
+    however large the system gets
   - **BLOCKER, `note 072`: under the `kinship` layout it would cap at TWENTY nodes.**
     Ownership is `previous_concept = tokens[t-1]`, and kinship puts the relation there, so
     **100.0% of CLUTRR's 7,132 traversal bindings are owned by a relation** (`sister`

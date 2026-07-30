@@ -13,6 +13,8 @@ Thumbs.db
 # the URLs and verifies size and sha256, so "did we measure the same bytes" is
 # answerable without carrying 10 MB of CSV in every clone forever.
 data/clutrr/
+# OpenEA is 237 MB zipped and 280 MB extracted for the 15K sets alone.
+data/openea/
 
 # Python bytecode
 __pycache__/

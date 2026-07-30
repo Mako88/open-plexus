@@ -330,6 +330,22 @@ record and the only symptom is an error about something you never ran.
 > one. `DECISIONS.md` carried the correct text, which is the only reason this
 > cost nothing.
 
+> **AND THE RULE IS NOW A CHECK, because four calibrations of one rule is evidence
+> that more care is not available.** `tools/check_commit_messages.py` scans recent
+> messages for the *symptom* rather than the process, so it does not care how the
+> message was produced: **a word vanishing leaves its spaces behind.** Run over 400
+> commits it found nine hits — four genuine mangled messages, of which **two were not
+> in the list below**, and five later commits that quote the damage.
+>
+> The rule was believed to have failed four times. It had failed **six**. Rule 18's
+> instruction — prefer a rule that makes the mistake structurally impossible — with
+> the evidence that the warnings were not working being the warnings themselves.
+>
+> **It is a net, not a wall, and `-F` stays.** A word eaten at the end of a line
+> leaves no double space, and a `printf` truncation removes everything after the `%`
+> and leaves no signature at all — which is how commit `6d72e11` lost 2,000 of 2,500
+> bytes.
+
 > *Calibration.* Commit `18388e5`. The line "PREDICTION 3 REFUTED BACKWARDS.
 > `none` was predicted to rise" was committed as "PREDICTION 3 REFUTED BACKWARDS.
 >  was predicted to rise". Every other commit that day used `-F` and was fine;

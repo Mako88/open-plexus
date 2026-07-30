@@ -60,6 +60,8 @@ CHECKS: list[tuple[str, list[str], bool]] = [
     # ratchets are kept: a declared census that cannot drift from the body, and
     # "a state with no measurement is UNTRIED, never probably fine".
     ("check_decisions", [sys.executable, "tools/check_decisions.py"], False),
+    ("check_commit_messages",
+     [sys.executable, "tools/check_commit_messages.py"], False),
     ("unittest", [sys.executable, "-m", "unittest", "discover",
                   "-s", "tests", "-t", "."], True),
 ]

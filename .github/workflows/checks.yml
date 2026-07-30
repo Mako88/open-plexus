@@ -55,6 +55,8 @@ jobs:
         run: python tools/check_duplication.py
       - name: The decision tree stays a tree, and every state cites evidence
         run: python tools/check_decisions.py
+      - name: Option records hold history, the tree holds status
+        run: python tools/check_options.py
       - name: No commit message had a word eaten by a shell
         run: python tools/check_commit_messages.py
 

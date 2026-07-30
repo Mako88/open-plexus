@@ -43,8 +43,20 @@ history lives in `docs/notes/` and the archived log.
    that worked and changed nothing else is cited where it supports a state.
 9. **At the line budget, trim the NEWEST writing first.** Process narration is true,
    already in commits and notes, and not what anyone consults this for.
-10. **Detail lives in notes and the log; this carries the claim and links them.** A
-    measurement belongs to exactly one file.
+10. **Detail lives in an OPTION RECORD; this carries the claim and links it.** A
+    measurement belongs to exactly one file. An option's history goes in
+    `docs/options/<name>.md`: what was tried, **the state of the model when it was
+    tried**, and what came back — and **no status**, which lives only here.
+    `tools/check_options.py` enforces the split.
+11. **When first creating an option's record, SCAN THE ARCHIVE for it.** John's
+    instruction, 2026-07-30, and the reason is that a record starting empty invites
+    re-running work that `docs/notes/`, `docs/archive/` and the source already answer —
+    which happened on 2026-07-30, when a partitioning result was nearly re-reported as
+    new with `note 081` already holding it. Grep all three before writing the first entry.
+12. **A record holds EVENTS, so it cannot go stale.** *"On this date this configuration
+    produced 0.9220"* stays true forever; *"this is what we use"* does not. That is the
+    property that makes the split safe where the 6,040-line log was not, and why records
+    have no "gaps" or "next steps" section. Absence means untried.
 
 ---
 
@@ -375,19 +387,14 @@ additive and nothing else has been tried.
     a problem now solved another way. Kept as ⬜ rather than ❌ because neither was measured
 - ⬜ **Learned relation chooser** — `147`: two hand-made selection rules were refuted before
   membership worked, and a learned chooser is strictly harder. See 090's route above.
-- ✅ **`search.py` beam search — `run()` CALLS IT, `search_beam_width=4` by default**
-  (`note 103`): **+0.041 ±0.013 over `search4`**, kinship hops 2, 8 seeds, above 2 SE.
-  Measured on `run()`'s task, not inherited from CLUTRR's different task/depth/score.
-  - **The 🔀 argument in one option:** refused at `111` (the verifier is built from the
-    same noisy retrievals it must adjudicate), **revived at `121` when width was measured
-    NOT to fix fidelity**, built at `123`, closed at `130` (+0.020) with `125`'s +0.269
-    traversal win. A refutation that expired
-  - **`note 061`: it is what CLUTRR needs** — the task names BOTH endpoints, so `108`'s
-    missing disambiguator is handed over, and `depth` is observable rather than fitted
-  - **`note 064`'s durable fact:** the entity hop is **0.9889 and FLAT** while the relation
-    decode is **0.9348** — six times the error rate — and `walk_from` hedged at the 0.974
-    step while committing blindly at the 0.906 ones, so its +0.009 was **measured at the
-    wrong place by its own construction**
+- ✅ **`search.py` beam search — `run()` CALLS IT, `search_beam_width=4` by default.**
+  Branches at EVERY step, where `search` hedges only at the root — which `note 064`
+  measured as the wrong place, since the relation decode is 0.974 there and ~0.91
+  mid-chain. **+0.041 ±0.013 over `search4`** on `run()`'s own task (kinship, hops 2,
+  8 seeds, `note 103`); on CLUTRR chain recovery the gain is +0.107, **a different task
+  and depth — do not quote one for the other**. `search_prune_every` stays 1: period 2
+  costs −0.016 ±0.006 and is a knob for meeting `d_max`, not a default.
+  → record: [docs/options/beam-search.md](docs/options/beam-search.md)
 - ✅ **`search.beam` — branch at EVERY step, pruned.** Beats single-step branching on
   every seed of both harnesses, which is the qualitative claim and it holds.
   - **`note 075`: `note 065`'s +0.2190 does NOT reproduce.** `beam` lands within 0.007 of
@@ -646,51 +653,14 @@ transport is a parallel path nothing in `run()` uses yet.
   inherits the sum. Current default.
   - `g4-01` a lone node's answer holds at 16 dims (0.949) and degrades fast below:
     8 → 0.681, 4 → 0.412. **So node count ≈ width ÷ 16**, not anything softer
-- 🔀 **Partition by concept** — `concept_nodes`, `partitioned.py`, `ConceptStore`.
-  Built, off by default, and **refuses to combine with `consolidation` or
-  `carry_store`** — both refusals labelled temporary in the source.
-  - `134` **pooled capacity is IDENTICAL** to dimension splitting at every node
-    count. **Lone-node capacity is not:** 2048 against 128 at 16 nodes, a factor of
-    sixteen. *measured in:* 5 seeds, 50 cells, per-node memory held equal at ~4,096
-    numbers
-  - **A SECOND thing it buys, which `134` did not have: PARALLEL SEARCH.** John asked
-    2026-07-30 whether the beam could be distributed. It is **serial in depth and
-    parallel in width** — step *k+1* needs step *k*'s landing entity, but the 16
-    expansions within a step are independent. Under CONCEPT splitting each read goes to
-    one owner, so `ownership.Ring` (*"which node owns a concept, without a directory or
-    a coordinator"*) makes it **16 point-to-point messages to named neighbours** — which
-    amended C1 explicitly permits. **So the beam's 4× cost becomes 4× the NODES and 1×
-    the TIME.** Under dimension splitting every read needs every node and it really is
-    4× the traffic. *no measurement* — reasoned from the mechanism's own structure, and
-    it is a stronger argument for this option than 134's independence case
-  - **`note 081` MAKES IT MANDATORY, and this is the strongest argument for it.**
-    Capacity is fixed at `~0.023·d²` per store, and both knobs fail: no decay saturates
-    (recall **0.07 at 10.6×**, and *symmetric* — oldest beats recent, so it is
-    interference, not forgetting, and **replay cannot fix it**), while decay windows
-    (0.990 on the last 100, **0.000 on anything older**). **C4 needs capacity that GROWS
-    and this is the only mechanism that provides it** — `nodes × per-node`, since each
-    node holds a FULL-WIDTH store. Distribution was framed as how to use spare machines;
-    it is how the project satisfies its own fourth constraint
-  - **And `note 081` costs the GATE at load.** `148`'s structurally-zero read is 1.26 at
-    half capacity and **1.03 at 10.6×** — gone. `note 080`'s contradiction signal is the
-    same quantity, so **the credit loop closes only inside the window.** Gate health is a
-    function of LIVE load, not total writes
-  - Its case used to be independence and churn resilience; **081 supersedes that**. Under
-    dimension splitting a node can never answer alone however large the system gets
-  - **BLOCKER, `note 072`: under `kinship` it would cap at TWENTY nodes.** Ownership was
-    `tokens[t-1]` and kinship puts the RELATION there, so **100.0% of CLUTRR's 7,132
-    traversal bindings are relation-owned** (`sister` alone 20.2%) against 0.0% under
-    `closure`. Both options were chosen alone and the *pair* is the defect — `157` picked
-    kinship for a 4.7× collision reduction without ownership in view
-  - **PARTLY fixed by `note 073`, BUILT as `PairKeys(route="first-concept")`**, default
-    unchanged. Traversal bindings move to **entity**-owned, markers stop owning content
-    (31.6% → **0.0%**), busiest drops 26.6% → **11.8%**. **073's "0.0%" is CORRECTED** —
-    it scored 2 of 4 keys per block, and `pair(relation, entity)` is still relation-owned
-    at 22.3%, though its value is a separator the traversal never reads
-  - **And `docs/SCALE.md`: bandwidth scales with WIDTH**, so dimension splitting must grow
-    `d` to buy capacity (832 KB per message at Wikidata scale, ~266 MB per query) where
-    concept splitting holds `d` at 512 and adds nodes (~640 KB per query). *arithmetic on
-    measured capacity, no G4 run at these widths*
+- 🔀 **Partition by concept** — `concept_nodes`, `partitioned.py`, `ConceptStore`, and
+  `peer.py` over sockets. **`note 081` makes it MANDATORY, not merely better:** C4 needs
+  capacity that GROWS and this is the only mechanism that supplies it (`nodes × per-node`,
+  each node holding a full-width store), since no-decay saturates and decay windows forget.
+  Accuracy improves too — beam **0.9220 at 4 nodes against 0.8877** monolithic. **Blocked
+  from being the default by six combination refusals** in `LocalMemoryConfig`, and off by
+  default (`concept_nodes = 0`).
+  → record: [docs/options/concept-partitioning.md](docs/options/concept-partitioning.md)
 - ✅ **`openplexus/peer.py` — point-to-point reads and writes, no driver.**
   `notes 093`–`099`. Every read goes to the peer owning the concept; every write reaches
   every holder. **2 messages per read against 2N for broadcast** — 256x at 256 peers — and

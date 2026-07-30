@@ -83,6 +83,22 @@ estimates; `tools/walk_rounds.py` measures the path that exists.
 
 John asked to **talk problems 1–4 through before more solo building.**
 
+## The option-record restructure is STARTED, not finished
+
+John's design, 2026-07-30: `DECISIONS.md` carries a summary line and a link per option;
+`docs/options/<name>.md` carries the history — what was tried, **the model state when it
+was tried**, the results, and **no status**. Rules 10–12 of the tree state the contract,
+`tools/check_options.py` enforces it, and it runs in CI.
+
+**Two of 86 options are migrated** (`concept-partitioning`, `beam-search`). That is
+deliberate: migrating all of them at once means moving 13,545 lines of measurement text in
+one pass, which is where transcription errors enter numbers nobody re-derives. **Migrate
+an option when you next touch it**, and rule 11 says to grep `docs/notes/`,
+`docs/archive/` and the source first so the record starts complete.
+
+Collapsing those two freed **29 lines** in the tree (899 → 870), so the budget pressure
+eases as migration proceeds rather than needing to be fought each time.
+
 ## Two process facts
 
 **CI mutation shards have not completed in a long stretch.** Every `checks` run back to
@@ -94,8 +110,10 @@ exists — **not** that every mutation is still caught. Either batch commits or 
 land. The unbuilt speedups (git-worktree parallelism ~8×, two-phase targeted running 2.8×
 measured) are the real fix.
 
-**`DECISIONS.md` sits at exactly 900/900 lines.** Anything added displaces something, and
-rule 9 says trim the newest writing first.
+**`DECISIONS.md` has a 900-line budget** and was pressed against it all session; option
+migration is what buys headroom back. Rule 9 says trim the newest writing first. Run
+`tools/check_decisions.py` for the current count rather than trusting a number written
+here — this paragraph said "exactly 900/900" until migrating two options made it false.
 
 ## Standing correction worth carrying forward
 

@@ -671,18 +671,16 @@ transport is a parallel path nothing in `run()` uses yet.
     function of LIVE load, not total writes
   - Its case used to be independence and churn resilience; **081 supersedes that**. Under
     dimension splitting a node can never answer alone however large the system gets
-  - **BLOCKER, `note 072`: under the `kinship` layout it would cap at TWENTY nodes.**
-    Ownership is `previous_concept = tokens[t-1]`, and kinship puts the relation there, so
-    **100.0% of CLUTRR's 7,132 traversal bindings are owned by a relation** (`sister`
-    alone 20.2%) against 0.0% under `closure`. Both options were chosen alone and the
-    *pair* is the defect — `157` picked kinship for a 4.7× collision reduction without
-    ownership in view. **Worse than the 16-node dimension ceiling it exists to fix**
+  - **BLOCKER, `note 072`: under `kinship` it would cap at TWENTY nodes.** Ownership was
+    `tokens[t-1]` and kinship puts the RELATION there, so **100.0% of CLUTRR's 7,132
+    traversal bindings are relation-owned** (`sister` alone 20.2%) against 0.0% under
+    `closure`. Both options were chosen alone and the *pair* is the defect — `157` picked
+    kinship for a 4.7× collision reduction without ownership in view
   - **PARTLY fixed by `note 073`, BUILT as `PairKeys(route="first-concept")`**, default
-    unchanged. The traversal binding moves relation-owned → **entity**-owned, markers stop
-    owning content (31.6% → **0.0%**), busiest drops 26.6% → **11.8%**. **073's "0.0%
-    relation-owned" is CORRECTED** — it scored 2 of 4 keys per block; `pair(relation,
-    entity)` is still relation-owned at 22.3% of all keys, though its value is a separator
-    the traversal never reads. `concept_nodes` still 0
+    unchanged. Traversal bindings move to **entity**-owned, markers stop owning content
+    (31.6% → **0.0%**), busiest drops 26.6% → **11.8%**. **073's "0.0%" is CORRECTED** —
+    it scored 2 of 4 keys per block, and `pair(relation, entity)` is still relation-owned
+    at 22.3%, though its value is a separator the traversal never reads
   - **And `docs/SCALE.md`: bandwidth scales with WIDTH**, so dimension splitting must grow
     `d` to buy capacity (832 KB per message at Wikidata scale, ~266 MB per query) where
     concept splitting holds `d` at 512 and adds nodes (~640 KB per query). *arithmetic on
@@ -711,10 +709,12 @@ transport is a parallel path nothing in `run()` uses yet.
   - 🔀 **A MIGRATING walk** is where the remaining 2× is (`note 101`): `owner` routes a
     hop's look-up and the next hop's follow to the **same concept**, so 12 of 19 rounds
     ask a peer the round before already used. One peer visit per hop is ~`depth × RTT/2`.
-    **Blocked on PRUNING**, which ranks all `width` walks together, so the caller is a
-    rendezvous every hop — and that is the second round trip. `distributed.py`'s deadline
-    is the shape of the fix: settle a step on what arrived, so a slow node costs a
-    candidate rather than stalling. `width`-way is bounded, so not C1's collective
+    **`note 102` CLEARS the pruning blocker.** The rendezvous is worth **0.089** chain
+    recovery; its PERIOD is worth nothing measurable (0.8860 at `prune_every=2` against
+    0.8877 at 1, sd **0.0305** over 3 seeds). So a migrating walk must meet, not meet
+    *every hop* — `k=2` fits `d_max` at depth 10 for **2.29×** the reads, where `k=5` is
+    **38×** for a third of a standard deviation. **NOT BUILT:** the latency column is an
+    estimate and `tests/test_prune_period.py` pins the real path at `2 × depth` rounds
   - **Costs, stated:** the retrieval strategy moves to the owning node, because a remote
     store cannot return a `d×d` matrix (512 KB against 2 KB). A write waits for `R` holders,
     which is not `N` but is not free. Batching trades round trips for bytes, right only

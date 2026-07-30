@@ -360,7 +360,7 @@ def search(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
 def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
          fact_token: int, start: int, target: np.ndarray, depth: int,
          width: int = 4, branches: int = 4, reader=None,
-         allowed: np.ndarray | None = None) -> list[Walk]:
+         allowed: np.ndarray | None = None, prune_every: int = 1) -> list[Walk]:
     """Search branching at EVERY step, not only the root.
 
     ## Why this exists, measured
@@ -422,6 +422,11 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
         raise ValueError("a beam of depth 0 has nothing to follow")
     if width < 1 or branches < 1:
         raise ValueError("width and branches must both be at least 1")
+    if prune_every < 0:
+        raise ValueError(
+            "prune_every counts hops between rendezvous: 1 meets every hop, 0 never "
+            "meets. A negative period would silently never prune while looking like "
+            "a period, and an unpruned beam is branches**depth walks")
 
     many = _many(_resolve(reader, readable, retrieval, keys))
 
@@ -434,7 +439,7 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     partial = [(start, (r,), (root,), (), float(_decode(wv, root)[r]))
                for r in opening]
 
-    for _ in range(depth - 1):
+    for hop in range(depth - 1):
         # FOLLOW every surviving walk in ONE round. The pairs are all known before
         # any is issued -- a hop's walks do not depend on each other, only on the
         # hop before -- so `width` reads share a round trip instead of taking one
@@ -446,11 +451,15 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
         # entity to look up is what the follow's value decoded to, so a hop costs two
         # round trips and not one. Note 101 is the arithmetic that falls out of that.
         values = many([(fact_token, landed) for landed in landings])
+        # How many children each walk keeps ON ITS OWN. Between prunes it is capped
+        # per parent rather than across the beam, because a cap across the beam IS
+        # the rendezvous -- so the population grows by `branches` per unpruned hop
+        # and that growth is the price of not meeting.
         grown: list[tuple] = []
         for (_, relations, retrieved, entities, cumulative), landed, value in zip(
                 partial, landings, values):
             scores = _decode(wv, value)
-            for candidate in _top(scores, branches, allowed):
+            for candidate in _top(scores, branches if prune_every else 1, allowed):
                 grown.append((landed, relations + (candidate,),
                               retrieved + (value,), entities + (landed,),
                               cumulative + float(scores[candidate])))
@@ -459,8 +468,17 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
         # PRUNE. Sorting by cumulative decode rather than by anything involving the
         # target, because using the target here would let the answer choose the
         # route -- which is the circularity decision 143 records one level up.
-        grown.sort(key=lambda item: item[4], reverse=True)
-        partial = grown[:width]
+        #
+        # **Every `prune_every` hops, not necessarily every hop.** Ranking the beam
+        # against itself is a rendezvous, and note 101 measured that meeting as the
+        # second of a hop's two round trips -- the one that keeps a driver-free walk
+        # outside `d_max` past depth 7. Skipping it costs bytes (the population grows
+        # by `branches`) and buys round trips. `prune_every=0` never meets at all,
+        # which is `width` independent greedy walks.
+        if prune_every and (hop + 1) % prune_every == 0:
+            grown.sort(key=lambda item: item[4], reverse=True)
+            grown = grown[:width]
+        partial = grown
 
     # The endpoints are independent too, so they are one round rather than `width`.
     endpoints = many([(current, relations[-1])

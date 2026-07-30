@@ -2180,8 +2180,28 @@ MUTATIONS = [
         old='    return getattr(read, "many", None) or (',
         new="    return None or (",
     ),
+    Mutation(
+        name="the-beam-meets-every-hop-whatever-the-period",
+        breaks="the period itself. Pruning unconditionally makes `prune_every` inert "
+               "while every answer stays correct at the default -- so the knob that "
+               "note 102 measures as the way a migrating walk meets d_max would "
+               "silently do nothing, and only a READ count notices",
+        path=SEARCH,
+        old="        if prune_every and (hop + 1) % prune_every == 0:",
+        new="        if True:",
+    ),
+    Mutation(
+        name="never-pruning-still-expands-by-branches",
+        breaks="the one-child-per-parent rule that makes `prune_every=0` mean "
+               "`width` independent greedy walks. Expanding by `branches` with no "
+               "truncation is `branches**depth` partial walks -- a million at ten "
+               "hops -- so this does not fail, it hangs, which is why the population "
+               "is asserted and not only the answer",
+        path=SEARCH,
+        old="            for candidate in _top(scores, branches if prune_every else 1, allowed):",
+        new="            for candidate in _top(scores, branches, allowed):",
+    ),
 ]
-
 def restore_any_leftovers() -> None:
     """Recover from a previous run that was killed mid-mutation."""
     for bak in ROOT.rglob("*.py.bak"):

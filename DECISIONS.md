@@ -36,7 +36,7 @@ sparse keys were measured worse, then a readout change reversed them cleanly. So
 search on correct arithmetic; both conditions were measured away later and both
 mechanisms became right. A deleted alternative cannot be re-measured.
 
-**CENSUS: 22 chosen, 28 refuted, 16 untried, 12 both, 1 paused.** Checked against the
+**CENSUS: 23 chosen, 28 refuted, 15 untried, 12 both, 1 paused.** Checked against the
 body by `tools/check_decisions.py`, because a summary that can drift from what it
 summarises is how `check_architecture.py` caught its own counts the first time a
 verdict changed.
@@ -428,9 +428,26 @@ lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
 **⇒ OPEN and off the critical path. Blast radius near zero, which is why it does
 not gate anything above.**
 
-- ⬜ **Template realiser** — deterministic, ~50 lines, **structurally incapable of
-  adding a fact.** Recommended first: if templates read sensibly, the concept set
-  genuinely carries the answer.
+- ✅ **Template realiser** — `openplexus/render.py`, deterministic, dependency-free,
+  **structurally incapable of adding a fact.** John's ruling: templates first.
+  - *no measurement* — it is not a mechanism with a number, it is the floor of the
+    ladder. What it contributes is a **bar**: `unfaithful()` returns the words in a
+    rendered sentence that came from neither the caller nor `FRAME`, and `FRAME` is
+    a fixed 25-word list a reader can check
+  - **The bar is written here first, where it is trivially true**, so a retrieval
+    realiser or a learned renderer has something to fail against later rather than
+    being graded on how well it reads. `content_words(render(...)) - FRAME` must
+    EQUAL the answer set — an equality, so dropping a value fails as well as
+    inventing one
+  - Two failure shapes are tested, not just a nonsense word: a hedge
+    (*"probably three"*) and a plausible completion (*"of the Arden household"*).
+    The second is the realistic one and reads perfectly
+  - An empty set **declines** rather than rendering a hole, which is the surface for
+    row C4 if anything ever earns it
+  - Mutation `the-faithfulness-check-forgives-everything` adds the rendered text's
+    own words to the allowed set, certifying any sentence as faithful. Every
+    invention test still reads through that function, so it would fail **only when
+    the check is finally load-bearing**
 - ⬜ **Retrieval realiser** — emit the surfaces each visited concept already
   carries. `concepts.Surfaces` exists precisely because one concept has many
   surfaces, so a concept can carry its own words. No new model, no next-token

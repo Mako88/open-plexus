@@ -56,6 +56,7 @@ SLOT_COST = ROOT / "tools" / "slot_cost.py"
 RECOVERY = ROOT / "tools" / "recovery.py"
 TESTBED = ROOT / "testbed" / "run.py"
 ANSWERS = ROOT / "openplexus" / "answers.py"
+RENDER = ROOT / "openplexus" / "render.py"
 FAMILIES = ROOT / "openplexus" / "tasks" / "families.py"
 
 
@@ -830,6 +831,21 @@ MUTATIONS = [
         path=LOCAL,
         old="            if self.occupied.count(key) <= 0.0:\n                continue",
         new="            if False:\n                continue",
+    ),
+    Mutation(
+        name="the-faithfulness-check-forgives-everything",
+        breaks="the only thing that makes a renderer safe, and it breaks it in the "
+               "direction that reads as working. Adding the rendered text's own "
+               "words to the allowed set makes `unfaithful` return the empty set "
+               "for ANY sentence, so a renderer that invented a household name, a "
+               "hedge, or an entire extra fact would be certified faithful. Every "
+               "test in tests/test_render.py that asserts nothing was invented "
+               "would still pass, because they all read this function. It is the "
+               "bar a learned renderer has to clear later, so a forgiving version "
+               "does not fail now -- it fails when it is finally load-bearing",
+        path=RENDER,
+        old="    allowed = FRAME | content_words(subject)",
+        new="    allowed = FRAME | content_words(subject) | content_words(text)",
     ),
     Mutation(
         name="shared-attributes-are-not-actually-shared",

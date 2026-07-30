@@ -773,6 +773,15 @@ Superseded documents go to `docs/archive/` with a header saying what replaced
 them, rather than being deleted — the retractions in them are usually the useful
 part, and every attempt in the tree cites the archived log by entry number.
 
+**The capability ledger stays archived, decided 2026-07-29.** Folding
+`ARCHITECTURE.md`'s 24 rows back in was considered and declined: the tree already
+carries what they asserted, distributed across the components they belonged to, and
+**two documents describing components is the drift this restructure exists to end.**
+What was worth keeping was its RULE, and `check_decisions.py` enforces it — a state
+with no measurement is UNTRIED, never "probably fine" — along with its census check,
+which caught its own summary counts the first time a verdict changed. The gate ladder
+in `GOALS.md §4` is untouched and remains the only place a gate verdict is written.
+
 **And prefer MORE documents to LONGER ones.** John's instruction, 2026-07-28:
 keep each note small and add another rather than growing one. A note that grows
 is a note nobody re-reads, and the growth is always the same shape — a result

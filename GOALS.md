@@ -485,6 +485,12 @@ the substrate is chosen to serve it.**
 4. **Distribution** — the transport and the churn model, against a substrate
    that has already passed G1.
 
+> **REVIEWED AND KEPT, 2026-07-29.** Archiving this section was considered and
+> declined: the banner names what survives and what does not, and a reader reaches it
+> before the prose, so the risk of acting on a rejected candidate is already handled.
+> Removing it would also lose the reasoning that makes §1.2 legible as a *change of
+> mind* rather than as a position held from the start.
+>
 > **⚠ SUPERSEDED IN PART, 2026-07-28. Read §1.2 first.** The candidate below is
 > next-INPUT prediction, and §1.2 records John's ruling that predicting the next
 > thing is precisely what this project is not for. What survives is the argument

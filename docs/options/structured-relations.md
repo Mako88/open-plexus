@@ -296,3 +296,37 @@ relations compose *more* deterministically, not less.
 **Not the published comparison, and it was written down before the run:** the literature
 measures LINK PREDICTION on this data and here it is RULE PREDICTION. Kill-list item 3 still
 needs one of them reformulated.
+
+### POST-HOC: the margin grows with corpus size — a hypothesis, not a result
+
+    CONFIG  when    2026-07-30
+            source  g23-03, g23-04
+            script  none -- analysis over numbers those two already produced
+            task    17 graphs, held-out rule prediction
+            model   as those sweeps
+            knobs   none -- nothing re-run
+            scale   17 graphs, 29 to 3,332 rules
+
+    Pearson r, margin against log10(rules)   +0.507
+    rules < 300    n=5    mean margin  +0.0451
+    rules >= 300   n=12   mean margin  +0.1167
+    both losses    at 48 and 594 rules
+
+**This is POST-HOC and is labelled so rather than presented as a finding.** The numbers were
+collected to answer whether the margin tracks *invariant dimension*, and this asks a
+different question of them. Rule 4's distinction: a prediction written after the data is a
+summary, not a commitment. It generates a hypothesis for a pre-registered test and settles
+nothing.
+
+**Two confounds, both visible in the table.** Size is entangled with SOURCE — the largest
+graph is also the only one from Freebase — so "bigger" and "different corpus" cannot be
+separated across these 17. And `r = +0.507` over 17 points is a weak correlation with a wide
+interval.
+
+**And it is NOT `GOALS.md`'s G5.** G5 asks whether the margin survives as the NETWORK grows
+— more machines, smaller slices. This is corpus size at one machine. Different axis, and a
+result here says nothing about that one.
+
+What it does support, weakly: the earlier margins are **not** a small-data artefact, since
+the direction is the wrong way round for that. The right test is a size sweep WITHIN one
+corpus, subsampling FB15k-237 so source is held fixed — registered before it runs.

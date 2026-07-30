@@ -1022,6 +1022,57 @@ So, before writing a mechanism: grep for what it does, not for what you would
 have called it. Search the tests too — a test named for a behaviour is evidence
 the behaviour is implemented somewhere, and it names the module.
 
+**A NEGATIVE SEARCH RESULT IS NOT A FINDING UNTIL IT WAS A WIDE ONE.** This is
+rule 1's *"a reference that does not resolve is UNCHECKED, not absent"* applied
+to code, and it is the half that keeps failing. Searching one plausible
+directory and concluding is the same error as searching the live tree and
+concluding a note was never written. **Search every place work lives** —
+`openplexus/`, `tools/`, `tests/`, `testbed/`, `experiments/` and
+`docs/archive/` — and search by capability, not by the directory you expect it
+in.
+
+> *Calibration, 2026-07-30, and it is a near-miss rather than a cost.* Before
+> building a peer-path latency measurement I searched `.github/workflows/` for
+> `cluster|container|netem`, got nothing, and told John *"no workflow runs the
+> container harness at all."* True, and useless: `tc netem` has been run
+> **repeatedly** — sweeps `g12-01`, `g12-03`, `g12-04`, notes 014 and 086,
+> `tests/test_impairment.py` — from `testbed/run.py`, which is a directory I
+> never looked in and which says in its own docstring that it is verified on
+> Docker Desktop *and* on Actions runners.
+>
+> **John caught it, not the search.** Nothing was duplicated, and only because
+> notes 094 and 101 each say in their own words that the harness *"has never
+> been pointed at the peer path"* — so the gap was documented twice by someone
+> who had done the wide search already. **The rule held by inheritance, not by
+> being followed**, and the correction is cheap: the right target turned out to
+> be `testbed/run.py`, which already runs on CI, rather than the generator I was
+> about to extend.
+
+**AND EVERY NEW MODULE SAYS WHAT IT DOES NOT DUPLICATE**, in its own docstring,
+naming what was searched. John's instruction, 2026-07-30: unchecked duplication
+is a known failure mode of assistant-written code, and he asked for something
+structural rather than another rule asking for care.
+
+`tools/check_rails.py` R6 enforces it on `openplexus/` and `tools/`. It cannot
+tell whether a search happened — what it can do is refuse a module that never
+asked the question, and *"this does not duplicate X because Y"* cannot be written
+without going to look at X.
+
+> *Calibration.* **65 of 66 modules violated it the day it was written**, which is
+> the honest measure of how much this was being done. They are baselined and the
+> list can only shrink. The one that already complied is `tools/cluster_driver.py`,
+> whose *"What this adds, and what it deliberately does NOT re-implement"* section
+> is exactly why it did not repeat the `cluster_node.py` mistake its own
+> predecessor made — so the practice was already here, in the one file that had
+> been burned.
+>
+> **The first probe of the ratchet passed for the wrong reason** and is worth
+> recording: a throwaway module written to prove the check bites was given the
+> docstring *"a module that never says what it does not duplicate"*, which
+> contains the marker phrase. It passed legitimately. A check verified with a
+> test that cannot fail is rule 10's shape, arriving inside the tool built to
+> enforce rule 19.
+
 And **every commit carries some consolidation.** Not a separate cleanup pass
 later: the moment to merge two things is while both are in your head, and a
 refactor deferred is a refactor that gets argued about instead. If a commit adds

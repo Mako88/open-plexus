@@ -91,15 +91,16 @@ def entry_sources(config: str) -> list[Path]:
     found: list[Path] = []
     kind = None
     for token in re.split(r"[\s,;]+", line.group(1)):
-        bare = token.strip("`'\"()[[]].").lower()
+        raw = token.strip("`'\"()[[]].")
+        bare = raw.lower()
         if bare in KEYWORDS:
             kind = KEYWORDS[bare]
             continue
         if re.fullmatch(r"g\d+-\d+", bare):
             found.extend(sorted(SWEEPS.glob(f"{bare}-*.txt")))
             continue
-        if "/" in bare and (ROOT / bare).exists():
-            found.append(ROOT / bare)
+        if "/" in raw and path_exists_exactly(ROOT / raw):
+            found.append(ROOT / raw)
             continue
         # `notes 093-101` is a range and means nine notes. Written with an en dash as
         # often as a hyphen, and the first version of this resolver silently matched
@@ -115,6 +116,35 @@ def entry_sources(config: str) -> list[Path]:
             elif kind == "decision":
                 found.extend(p for p in (log_entry(int(number)),) if p is not None)
     return found
+
+
+def path_exists_exactly(candidate: Path) -> bool:
+    """`candidate.exists()`, but case-exact on Windows as well as on Linux.
+
+    **This is the bug that made the checker weaker on the machine it is run on
+    than in the machine that gates the commit**, which is the worst direction for
+    a check to be wrong in.
+
+    The resolver lowercased every citation token before testing it, so
+    `source docs/SCALE.md` was looked up as `docs/scale.md`. NTFS resolves that
+    and ext4 does not: the check passed locally, went green, and CI failed on
+    `external-persistent-store.md` and `hop-accumulate.md` with *"a number is not
+    in the source its entry cites"* — for two entries whose citations were
+    correct all along.
+
+    `Path.exists()` alone cannot fix it, because it is the case-insensitive call.
+    Comparing against the parent's real directory listing can, because a listing
+    reports the name as stored on both platforms.
+
+    The lowercasing itself is still wanted for keywords and `g\\d+-\\d+` sweep
+    ids, so the fix is to keep the raw token for paths rather than to stop
+    lowercasing.
+    """
+    try:
+        return (candidate.exists()
+                and candidate.name in {p.name for p in candidate.parent.iterdir()})
+    except OSError:
+        return False
 
 
 def note_files(number: int) -> list[Path]:

@@ -79,7 +79,7 @@ history lives in `docs/archive/notes/` and the archived log.
                    went against it, so it carries no revival condition — what it
                    needs is a reason to pick it back up
 
-**CENSUS: 30 chosen, 29 refuted, 15 untried, 11 both, 1 paused.** Checked against the body,
+**CENSUS: 30 chosen, 30 refuted, 15 untried, 11 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -628,8 +628,21 @@ that is the standing weakness.**
   set-valued question, the first in the repository a single token cannot answer.
   → record: [families-instrument.md](docs/options/families-instrument.md)
 - ✅ **`closure.py`** — unmarked stream of stated and entailed facts, no question marker, so
-  the stated/entailed split IS the recall/reasoning split. `g14-01` passes G0 with entailed
-  headroom **0.277** against a frozen 0.000.
+  the stated/entailed split IS the recall/reasoning split. **`g14-01` matrix returned, 8 of
+  8 seeds:** G0 passes by the gate as written — attention **0.282 ±0.011** against a frozen
+  **0.000**. **But P2 is REFUTED and it is the more meaningful prediction:** the margin over
+  the real floor, `majority` at **0.190 ±0.009**, is **+0.092** against a predicted >0.15.
+  `frozen` scores exactly nothing, so **anything quoting 0.28 as this task's headroom is
+  quoting the distance to a degenerate control.** *measured in:* 10 people, 24 stated, 6
+  entailed, width 256.
+  → record: [closure-instrument.md](docs/options/closure-instrument.md)
+- ❌ **The delta rule as a composer on `closure`** — **`local` reaches 0.108 ±0.005 against
+  the 0.190 majority floor, on every one of eight seeds.** Below the base rate is not weak
+  composition, it is active misprediction: the arm would score better discarding what it
+  learned. `g14-01`. **This is the first task this project built for itself and the local
+  rule is negative on it**, which points at component 8 — `Wo` alone learns, `Wk`/`Wv`
+  frozen. *measured in:* closure, width 256, 8 seeds. **Revival:** a learning rule that
+  reaches anything durable beyond the readout.
   → record: [closure-instrument.md](docs/options/closure-instrument.md)
 - 🔀 **`kinship.py`** the mechanism testbed and `run()`'s own task · **`mqar.py`** the
   store's control, the only instrument isolating it from a prior (`142`) · **`chains.py`**
@@ -718,6 +731,29 @@ it has ever been re-litigated, which is the only thing the tree prevents.
 - **Blanket permission for architectural decisions.** The pending-decisions list is
   a REPORT, not a gate. Decide, proceed, record which calls were made alone.
 - **List pending decisions at the end of every response.** John reads from a phone.
+- **PREFER THE OPTION THAT SETTLES THE QUESTION — John, 2026-07-30.** Where one option
+  gives a decisive signal and another leaves the question open, take the decisive one
+  **even when it is harder, slower and more likely to fail.** The only exception is an
+  absolutely massive lift, and that bar is high. In his words: *"we've done a lot of
+  close enough or nearly there or almost there things, and at the end of the day we
+  still have these nine things we have to prove out."*
+  - It is the ordering rule's twin. That one says take the question most likely to
+    disprove the project; this says take the FORM of it that could actually disprove it.
+  - **It applies to instrument design, not only to mechanism choice.** A test whose band
+    is too narrow to separate its arms is a "nearly there" wearing an experiment's
+    clothes — it consumes the cost of settling the question and does not settle it.
+- **EVERY OPTION OFFERED TO JOHN CARRIES THREE THINGS — his instruction, 2026-07-30.**
+  He switches between this and other work, so context is not assumed:
+  1. **What it IS, explained plainly** — which piece of the mechanism it handles and
+     where it sits in the system. No jargon that needs another document.
+  2. **Pros and cons**, so the trade-off being made is visible rather than implied.
+  3. **A recommendation**, and what happens if he does not reply.
+- **NEVER OFFER AN OPTION THAT FAILS THE GOALS — John, 2026-07-30.** If something is
+  known not to scale, or not to survive where the project is going, it is not a choice
+  and must not be presented as one, however well it would work today. Put it in the
+  tree as a ❌ with the reason if it is worth recording that it was considered; do not
+  put it in a list he is asked to pick from. **An invalid option in a menu costs him
+  the time to evaluate it and risks him picking it.**
 - **Explain plainly, keep the numbers, do not hide bad news.**
 - **Goal ordering:** AGI is primary; being an LLM replacement on consumer machines
   is secondary and must not compete with it.

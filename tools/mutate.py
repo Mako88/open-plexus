@@ -36,6 +36,7 @@ DISTRIBUTED = ROOT / "openplexus" / "distributed.py"
 CONCEPTS = ROOT / "openplexus" / "concepts.py"
 KEYS = ROOT / "openplexus" / "keys.py"
 PEER = ROOT / "openplexus" / "peer.py"
+NODE_MAIN = ROOT / "openplexus" / "node_main.py"
 RETRIEVAL = ROOT / "openplexus" / "retrieval.py"
 SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 # Experiment code is not usually mutated -- experiments are read once and
@@ -2206,6 +2207,18 @@ MUTATIONS = [
         path=SEARCH,
         old="            for candidate in _top(scores, branches if prune_every else 1, allowed):",
         new="            for candidate in _top(scores, branches, allowed):",
+    ),
+    Mutation(
+        name="a-peer-holds-only-what-it-OWNS",
+        breaks="the replica fan-out in peer mode. Writing to the owner alone "
+               "leaves the replica fallback nothing to find, so a departure "
+               "costs the concept rather than a round trip -- and it fails "
+               "SILENTLY, because a caller asking a peer that lacks a concept "
+               "reads zeros and a zero vector decodes to whatever the readout "
+               "prefers. A latency measurement would still produce timings",
+        path=NODE_MAIN,
+        old="        if index in ring.holders(concept, replicas):",
+        new="        if index == ring.owner(concept):",
     ),
 ]
 def restore_any_leftovers() -> None:

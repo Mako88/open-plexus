@@ -211,6 +211,58 @@ def experiments_bypassing_the_harness() -> list[str]:
     return offenders
 
 
+#: Phrases that count as answering "what does this not duplicate". Two rather
+#: than one because the repo already says it both ways, and both are specific to
+#: the duplication question -- unlike "what this is not", which appears in
+#: several modules for entirely different reasons and would pass them for free.
+DUPLICATION_MARKERS = ("does not duplicate", "not re-implement",
+                       "does not reimplement")
+
+
+def modules_not_saying_what_they_do_not_duplicate() -> list[str]:
+    """R6. A module in `openplexus/` or `tools/` whose docstring never says it.
+
+    **Why a rail rather than a rule.** Rules 9 and 19 already require searching
+    before building and extracting rather than parallelising, and rule 19's
+    calibration is `tools/cluster_node.py` — written to run a node as a container
+    when `openplexus/node_main.py` already did it better, and deleted. The rule
+    did not prevent it. John's instruction, 2026-07-30: put something structural
+    in place, because unchecked duplication is a known failure mode of
+    assistant-written code and no amount of care has stopped it here.
+
+    **What it actually enforces is a sentence, and that is the point.** It cannot
+    tell whether a search happened. What it can do is refuse a new module that
+    never asked the question — and writing "this does not duplicate X because Y"
+    is impossible without going to look at X. `tools/cluster_driver.py` is the
+    precedent and is the one module that already complies: its
+    *"What this adds, and what it deliberately does NOT re-implement"* section is
+    why it did not repeat the mistake its predecessor made.
+
+    **Summarisers are exempt structurally, not by baseline.** There is one per
+    sweep by construction, they are near-copies by nature, and
+    `check_duplication.py` already compares their bodies — which is where it
+    caught its first real hit. A name in a baseline stops being read; a
+    structural exemption keeps applying and says why.
+
+    65 of 66 modules violated this the day it was written. They are exempt and
+    the list can only shrink, which is the ratchet: this is a bar for what gets
+    added, not an accusation about what is here.
+    """
+    offenders = []
+    for directory in ("openplexus", "tools"):
+        for path in sorted((ROOT / directory).glob("**/*.py")):
+            if path.name.startswith("summarise_") or path.name == "__init__.py":
+                continue
+            try:
+                docstring = ast.get_docstring(
+                    ast.parse(path.read_text(encoding="utf-8"))) or ""
+            except SyntaxError:
+                continue          # R5 owns this, and reporting it twice is noise
+            if not any(m in docstring.lower() for m in DUPLICATION_MARKERS):
+                offenders.append(path.relative_to(ROOT).as_posix())
+    return offenders
+
+
 def runs_anything(source: str) -> bool:
     """Whether a module's top level executes, rather than only defining."""
     inert = (ast.Import, ast.ImportFrom, ast.FunctionDef, ast.AsyncFunctionDef,
@@ -271,6 +323,8 @@ def current() -> dict[str, list[str]]:
             experiments_bypassing_the_harness(),
         "R4-test-asserts-something": tests_that_assert_nothing(),
         "R5-tools-and-experiments-parse": files_that_do_not_parse(),
+        "R6-module-says-what-it-does-not-duplicate":
+            modules_not_saying_what_they_do_not_duplicate(),
     }
 
 

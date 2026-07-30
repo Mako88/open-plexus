@@ -2,9 +2,12 @@ Does the closure task pass G0?
 ==============================
 
 Script: experiments/g14_01_does_closure_pass_g0.py
-Status: DISPATCHED. Predictions registered before the matrix ran.
+Status: COMPLETE. Predictions registered before the matrix ran. Matrix returned
+2026-07-30, run 30573507385, 8 of 8 seeds.
 
-ANSWER: pending. A single seed is recorded below and it passes.
+ANSWER: YES BY THE GATE AS WRITTEN, AND THE MARGIN OVER THE BASE RATE IS HALF
+WHAT WAS PREDICTED. P3 confirmed at 0.282; P2 refuted at +0.092 against a
+predicted >0.15. Full table and the reading under THE MATRIX, below.
 
 
 IN PLAIN TERMS
@@ -142,3 +145,85 @@ edges, 6 entailed, ~4.5 implied per sequence.
 Width 256 for the local arms deliberately: the task writes ~119 bindings per
 sequence, above decision 109's ~96 capacity for width 64, so a narrower arm would
 measure capacity rather than composition.
+
+
+THE MATRIX
+----------
+Run 30573507385, dispatched 2026-07-30. 8 of 8 seeds returned, 32 cells.
+Condition read from the data, not from the directory name: `d256|seedN|
+train300x4|test150` on every cell, all four arms present in every seed.
+
+    arm                      stated            entailed
+      majority       0.100 +/-0.002      0.190 +/-0.009
+      frozen         0.000 +/-0.000      0.000 +/-0.000
+      local          0.098 +/-0.002      0.108 +/-0.005
+      attention      0.097 +/-0.002      0.282 +/-0.011
+
+    P1  frozen at or below majority on ENTAILED     CONFIRMED  0.000 vs 0.190
+    P2  attention beats majority by >0.15           REFUTED    +0.092
+    P3  THE GATE, attention - frozen > 0.15         CONFIRMED  0.282
+    P4  every arm within 0.05 of majority, STATED   REFUTED    frozen at 0.000
+    P5  local between frozen and attention          CONFIRMED  0.000<0.108<0.282
+
+The single pre-dispatch seed reproduces: it read 0.198 / 0.000 / 0.097 / 0.277
+against the matrix's 0.190 / 0.000 / 0.108 / 0.282. Nothing moved by more than
+0.011. **That is the one thing here that went better than expected**, and it is
+worth saying because rule 3 exists for the cases where it does not.
+
+
+WHAT THE GATE ACTUALLY MEASURED, AND WHY P2 MATTERS MORE THAN P3
+-----------------------------------------------------------------
+P3 passes against `frozen`, which scores **exactly 0.000** -- not the base rate,
+not near it, but nothing at all. A random `Wo` emits a token that is essentially
+never the right relation, so it is a floor in the sense that a wall is a floor.
+
+**The honest floor is `majority` at 0.190**, and against that the strong
+reference has **0.092**, not the 0.15 the experiment committed to in advance.
+
+GOALS section 4 is satisfied by the letter -- headroom against a frozen substrate,
+multi-seed, base rate reported alongside -- and the spirit is thinner than the
+verdict sounds. Both readings are recorded rather than one being chosen, because
+the difference between them is the whole question of what this instrument can be
+used for.
+
+**So the G0 verdict stands and its margin is restated: 0.092 over the base
+rate, not 0.28.** Anything quoting 0.277 or 0.282 as this task's headroom is
+quoting the distance to a degenerate control.
+
+
+THE FINDING NOBODY PREDICTED: THE LOCAL RULE IS BELOW THE FLOOR
+----------------------------------------------------------------
+`local` reaches **0.108 on entailed against a majority floor of 0.190**, on every
+one of eight seeds, spread +/-0.005.
+
+P5 predicted it would land between frozen and attention and it does. What P5 did
+not say, because nobody thought to ask, is which side of the BASE RATE it would
+land on. A model scoring below "always answer the commonest relation" is not
+composing weakly. It is actively mispredicting, and it would score better by
+throwing away everything it learned.
+
+The delta rule takes 0.108 of the 0.282 available against frozen -- 38% -- and
+**-0.082 of the 0.092 available against the base rate.** The second ratio is the
+one that describes what this project has achieved on the first task it built for
+itself, and it is negative.
+
+This is not a defect in the experiment. It is the measurement the experiment was
+built to take, and it points at what learns: `Wo` alone, with `Wk` and `Wv`
+frozen random. See DECISIONS.md component 8.
+
+
+WHAT THIS COST, AND THE PROCESS FINDING
+-----------------------------------------
+Matrix: 8 jobs, all green, under the estimate.
+
+**The record sat at `ANSWER: pending` while two documents cited it as a pass.**
+`DECISIONS.md` and `docs/options/closure-instrument.md` both carried "passes G0
+with entailed headroom 0.277" -- the single pre-dispatch seed -- with the option
+record's `scale` field reading `unrecorded` where "one seed" would have caught
+it. Found while choosing an instrument, not by any check.
+
+**Nothing verifies that a sweep record whose status is `pending` is not being
+quoted as settled.** That is a checkable property: `check_provenance.py` already
+resolves every measurement to a cited source, so it can also read that source's
+status line. Recorded here rather than built, because the class matters more than
+this instance -- see CLAUDE.md rule 12 on fixing the class.

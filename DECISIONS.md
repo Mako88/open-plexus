@@ -9,6 +9,9 @@ read selectively, which on 2026-07-29 produced three wrong recommendations in a 
 off claims later entries had already superseded. **A log records; it does not
 prevent.** Full account in `CLAUDE.md` rule 14b.
 
+**Mid-swap?** [HANDOFF.md](HANDOFF.md) carries what is OPEN — scratch, overwritten each
+swap, and nothing here depends on it. This tree carries what was DECIDED.
+
 **The old log is not deleted:**
 [entries 83–171](docs/archive/decisions-log-083-171.md) and
 [1–82](docs/archive/decisions-001-082.md). Every attempt below cites its entry number.
@@ -394,12 +397,10 @@ additive and nothing else has been tried.
   - **713/713 on the plain subset is reached — under PARTITIONING** (`note 081`): 4
     concept nodes give beam **0.9220** against 0.8877 monolithic, because a node carries
     interference only from what it owns. `note 103` corroborates at 8 nodes (0.9058)
-  - **The out-degree split is why it is a MECHANISM, not a margin** (`note 103`):
-    `search` is worse than not branching at out-degree 1 (0.649 vs walk's 0.702, g13-03's
-    −0.054 again); `beam` recovers 0.692 AND gains +0.038 at out-degree ≥ 2
-  - 🔀 **`search_prune_every` — a DEPLOYMENT knob, left at 1.** `note 102`: the beam's
-    rendezvous is worth 0.089 and its PERIOD nothing measurable. `note 103` prices period
-    2 at **−0.016 ±0.006** — real at 2.7 SE. Pay it to meet `d_max`, not by default
+  - **A MECHANISM, not a margin** (`note 103`): `search` is worse than not branching at
+    out-degree 1 (0.649 vs walk's 0.702); `beam` recovers 0.692 AND gains +0.038 at ≥ 2
+  - 🔀 **`search_prune_every` — a DEPLOYMENT knob, left at 1.** `note 103` prices period
+    2 at **−0.016 ±0.006**, real at 2.7 SE. Pay it to meet `d_max`, not by default
   - **Cost 4× the reads** (`width × branches × depth`); unpruned is `branches^h`, a
     million walks at ten hops, so pruning is what makes it exist. **G4 unanswered** —
     `123` had beam 4 at 3.2× on kinship. `search` is untouched as the comparison (14c)
@@ -713,11 +714,10 @@ transport is a parallel path nothing in `run()` uses yet.
   - 🔀 **A MIGRATING walk** is where the remaining 2× is (`note 101`): `owner` routes a
     hop's look-up and the next hop's follow to the **same concept**, so 12 of 19 rounds
     ask a peer the round before already used. One peer visit per hop is ~`depth × RTT/2`.
-    **`note 102` CLEARS the pruning blocker:** the rendezvous is worth **0.089** and its
-    PERIOD nothing measurable (sd 0.0305, 3 seeds), so a migrating walk must meet but not
-    *every hop*. `k=2` fits `d_max` for **2.29×** the reads; `k=5` is 38× for nothing.
-    **NOT BUILT** — the latency is an estimate and `test_prune_period.py` pins the real
-    path at `2 × depth` rounds
+    **`note 102` CLEARS the pruning blocker:** the rendezvous is worth **0.089**, its
+    PERIOD nothing measurable (sd 0.0305, 3 seeds) — so a migrating walk must meet, not
+    meet *every hop*. `k=2` fits `d_max` for **2.29×** the reads. **NOT BUILT:** latency
+    is an estimate; `test_prune_period.py` pins the real path at `2 × depth` rounds
   - **Costs, stated:** retrieval moves to the owning node (a remote store cannot return a
     `d×d` matrix — 512 KB against 2 KB); a write waits for `R` holders, not `N` but not
     free; batching trades round trips for bytes. **Untried:** write ordering (they race and

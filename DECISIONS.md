@@ -357,9 +357,14 @@ lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
     eight neighbours inside 0.02 of each other at ~0.96. A shuffled-text control
     gives 0.002, so real text carries ~7× chance structure and ~1/28th of what the
     task supplies. **So the crossover has a second clause: this needs purity ≳ 0.99
-    AND a bimodal profile, and one real dataset supplies neither.** Three confounds
-    named there and not resolved — the slice is function words, centring was not
-    checked, and the chunk size was chosen rather than measured
+    AND a bimodal profile, and one real dataset supplies neither**
+  - **The confound that mattered was tested and the finding held.** `ContentIndex`
+    has a `power` argument that down-weights common context and **defaults to off**,
+    with a docstring saying it is *"the one that moved `king` to `richard`"* — so the
+    first run measured real text with the mechanism for real text disabled. At
+    `power` 0.75 the largest gap goes 0.015 → **0.025**: a 67% improvement and still
+    **17× short**, with the profile shape unchanged. Centring is active and is not
+    the cause. Remaining: the slice is function words
 - 🔀 **Fixed `branches`** — the count supplied. `167`: the peak sits at
   `family_size − 1` in every row and collapses either side (1.000 → 0.500 → 0.083).
   - **`note 056`: this is a measured CROSSOVER, not a loser.** Degrading the

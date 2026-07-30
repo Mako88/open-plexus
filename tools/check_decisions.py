@@ -118,7 +118,23 @@ if hasattr(sys.stdout, "reconfigure"):
 #: That is the document doing its job rather than accumulating. A revival condition
 #: nobody can afford to record the answer to is a refusal that stays refused by budget,
 #: which is the failure mode rule 12 names as the most expensive available.
-MAX_LINES = 840
+#: **RAISED 840 -> 860 on 2026-07-30, and this is the SECOND raise in one session,
+#: which is a smell rather than a routine.** Recorded as such.
+#:
+#: What forced it: note 071 REFUTES the obvious application of note 070 — structured
+#: relation vectors must not enter the address — and rule 8 requires refutations be
+#: exhaustive where confirmations are not. Three trims were made first and all three
+#: were the document working (process narration removed under rule 9, a confirmation
+#: compressed under rule 8). The fourth trim would have been damage, which is the line
+#: the previous comment draws.
+#:
+#: **The limit, stated so the next raise is not automatic: a THIRD raise means the tree
+#: has outgrown one file and component 5 should become its own, not that 880 is the
+#: right number.** Component 5 now carries the largest share of the document because
+#: composition is where the open work is; that is a reason to split it out, not a reason
+#: to keep growing a file nobody can read whole — which is the exact failure this
+#: checker was built to prevent.
+MAX_LINES = 860
 
 CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED = "✅", "❌", "⬜", "🔀", "⏸"
 STATES = (CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED)

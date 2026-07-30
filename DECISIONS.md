@@ -435,19 +435,22 @@ path is not chosen.**
   prediction **0.223 against random relations' 0.124** — paired **+0.099**, se 0.009,
   **t = 11.6**, 120 seeds, wins 76% / loses 6%. **Nearly double.** `father` comes out
   `grandfather`'s nearest neighbour, which is 067's own statement of the requirement
-  - **`note 069` first, and it moved the baseline.** `concat` lets a readout learn
-    MARGINALS worth **0.242** without using the vectors at all, so 067's 0.056 was taken
-    with the useful signal already removed. **Composition claims beat 0.24, not 0.05**
-  - **Five harness iterations, four caught by stated controls.** `lstsq` memorised
-    (trained 0.917 for all three representations, identical to 3dp); the random arm gave
-    0.125 where 067 says 0.056; **target leakage** — a 2-hop puzzle wrote its own rule
-    into its target's profile, and it was the *entire* first effect; and `story-edges-only`
-    was the WRONG control, since it also left six relations with zero profile. Per-seed
-    profiles are the fix. **What made it reportable: random + hadamard = 0.056 exactly**
-    on 067's own 97-rule set (0.050, i.e. chance, on the final 62-rule protocol)
+  - **`note 069` moved the baseline: marginals alone are worth 0.242**, so composition
+    claims beat 0.24 and not 0.05. **Void without per-seed profiles** — a 2-hop puzzle
+    otherwise writes its own rule into its target's profile. `tools/relation_profiles.py`
+    reproduces it and carries the P0 in its output
+  - **`note 071` bounds WHERE it may be applied: the composition path, never the
+    address.** `key(e,r) = hash(e) ⊛ profile(r)` reads facts back fine (0.992–1.000) but
+    an address never written returns one of that entity's OTHER facts **0.592–0.775, flat
+    across load**, against hashed's 0.036 tracking chance 0.023. **067's counter-argument
+    used the wrong population** — interference is not global over twenty relations, it is
+    local to one entity's handful of addresses in a shared subspace. So **component 2's
+    refusal holds for relations too**, by a different mechanism. 070 is untouched: it
+    never used the store
   - **Refutation: it does not transfer off kinship**, which has unusually strong
-    positional structure — `note 058` measured a domain with none. **And it is NOT built**:
-    `keys.py` still hashes token ids, and wiring it in faces the split in component 2
+    positional structure — `note 058` measured a domain with none. **And it is NOT built**,
+    nor should `keys.py` be the place: structure in the VALUE, and an exact address with a
+    separate structured channel, are the two untried homes left
 - ⬜ **`index_at_hops` combined with the position-level index** — `159`/`160`/`161`
   built the pieces; `154` measured that the guard's premise is false (a hop key
   sits at cosine **0.96** to a single token's row, so it *does* name a concept).

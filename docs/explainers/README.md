@@ -48,6 +48,31 @@ explainer, and saying so is the most useful thing you can do.
 | [29](29-the-signal-was-pointing-backwards.md) | The signal was there, pointing backwards |
 | [30](30-two-ways-to-pick-what-to-keep.md) | Two ways to pick what to keep |
 | [31](31-what-the-filter-turned-out-to-be.md) | What the filter turned out to be |
+| [028](028-four-corrections-and-a-detour.md) | Four corrections in a row, and the detour they caused |
+| [029](029-giving-every-machine-its-own-scorer.md) | Giving every machine its own scorer |
+| [030](030-the-middle-person-was-not-needed.md) | The middle person wasn't needed |
+| [031](031-losing-machines-tidily.md) | Losing machines tidily |
+| [032](032-where-adding-machines-stops-helping.md) | Where adding machines stops helping |
+| [033](033-the-wall-that-was-not-there.md) | The wall that wasn't there |
+| [034](034-how-many-machines-can-you-actually-use.md) | How many machines can you actually use? |
+| [035](035-the-crowded-room.md) | The crowded room |
+| [036](036-how-small-can-a-machine-be.md) | How small can a machine be? |
+| [037](037-when-length-stops-mattering.md) | When length stops mattering |
+| [038](038-how-to-spend-a-machine.md) | How should a machine spend what it has? |
+| [039](039-tiny-devices-and-forgetting.md) | Do tiny devices forget? |
+| [040](040-when-forgetting-starts-to-pay.md) | When forgetting starts to pay |
+| [041](041-can-anyone-join.md) | Can anyone join? |
+| [042](042-the-cheat-we-could-not-replace.md) | The cheat we could not replace |
+| [043](043-we-made-the-test-realistic-and-it-broke.md) | We made the test more realistic and the model stopped working |
+| [044](044-the-number-was-right-and-the-pointer-was-wrong.md) | Every number was right. The pointer was wrong. |
+
+> **Two numbering series, and both are real.** `01`–`31` came first; `028` onward
+> started when the explainers were renumbered to track the notes and the two were
+> never reconciled. **Sixteen of the second series had never been listed here at
+> all** — found on 2026-07-30 while adding `044`, which is the same defect the
+> option records now have a check for: a document nobody links is a document nobody
+> reads. Listed now rather than renamed, because renaming breaks every link that
+> already points at one.
 
 More get added as the project introduces new ideas. Anything here that turns out
 to be wrong gets corrected, not softened — same rule as everywhere else.

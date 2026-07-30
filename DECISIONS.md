@@ -347,12 +347,10 @@ path is not chosen.**
 - 🔀 **`search.py` beam search** — built, tested, and **deliberately not wired into
   `run`**, labelled as scaffolding so it does not become load-bearing.
   - `111` **refused first:** the verifier is built from the same noisy retrievals it
-    must adjudicate. `121` width does NOT fix retrieval fidelity and `112` was never a
-    bound on it — **which expired 111's condition**
-  - `122` step 2 reproduces at 0.971, traversal ceiling 1.000. `123` built and proved
-    standalone; beam 4 costs 3.2× the traffic. `129` ambiguity IS detectable before
-    searching and the expensive signal is below chance. `125` traversal is the win
-    (+0.269); search helps only where ambiguity is
+    must adjudicate. `121`/`112`: width does NOT fix retrieval fidelity, **which
+    expired 111's condition**. `122` step 2 at 0.971, ceiling 1.000. `123` proved
+    standalone, beam 4 costs 3.2× the traffic. `129` ambiguity is detectable before
+    searching. `125` traversal is the win (+0.269); search helps only where ambiguity is
   - `130` the gate pays +0.020 over search-everywhere, and the search line closes
   - **This is the 🔀 argument in one option:** refused at 111, revived at 121 when
     its condition was measured away, and it is the reason the switch exists
@@ -364,10 +362,24 @@ path is not chosen.**
     not.** Chain recovery **0.659 overall**, 1.000 at 2–3 hops and 0.361 at 10,
     monotone. Endpoint scoring does select (0.659 against 0.149 random) **but beam
     width buys +0.009 for 8× the walks**, because on CLUTRR the story IS a chain so
-    `key(FACT, s)` names ONE relation **0.974** of the time. **Decision 130 transfers:
-    search helps only where ambiguity is.** The failure is **drift, not capacity**, and
-    the collision rows confirm 059 at **0.114 against 0.704**. **Not an end-task
-    number** — a route is not an answer, the readout step is unrun, one seed
+    `key(FACT, s)` names ONE relation **0.974** of the time. The failure is **drift,
+    not capacity**, and the collision rows confirm 059 at **0.114 against 0.704**.
+    **Not an end-task number** — a route is not an answer, the readout step is unrun
+  - **`note 064` REVISES 062's reading, and this is the actionable end of the line.**
+    Decomposed per step: the **entity hop is 0.9889 and FLAT** in position and chain
+    length, so the store is not degrading as it fills; the **relation decode is
+    0.9348**, six times the error rate, and it is the only part that varies with
+    position (0.974 at the root, ~0.91 mid-chain). **15% of those reads are on an
+    entity with two or more outgoing edges**, where `key(FACT, e)` is a superposition
+  - **And `walk_from` branches ONLY AT THE ROOT** — every later step is
+    `argmax(_decode(...))`, greedy. So `branches` hedges at the step whose decode is
+    already 0.974 and commits blindly at the steps running 0.906–0.942. **That is the
+    complete explanation of the +0.009**, and it means the search was **measured at the
+    wrong place by its own construction** rather than refuted. The narrow claim is
+    *root-only branching buys nothing* — about the implementation, not about searching
+  - **⇒ ONE CHANGE FOLLOWS: branch at every step, pruned.** Refuted if it fails to beat
+    0.659 by more than seed spread, which would point at `112`'s width limit. A pruned
+    beam is **a different mechanism** — `branches^h` is unaffordable at ten hops
 - ✅ **A hop REPLACES a retrieval, it does not combine with it** — `101`. `102` built
   the accumulator and recorded that the stated reason for choosing it was wrong.
 - ❌ **Another mechanism stacked on noisy retrieval** — four tried, all failed

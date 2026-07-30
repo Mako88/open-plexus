@@ -583,6 +583,20 @@ not on. The readout still violates C1.**
     count. **Lone-node capacity is not:** 2048 against 128 at 16 nodes, a factor of
     sixteen. *measured in:* 5 seeds, 50 cells, per-node memory held equal at ~4,096
     numbers
+  - **A SECOND thing it buys, which `134` did not have: PARALLEL SEARCH.** John asked
+    2026-07-30 whether the beam could be distributed. It is **serial in depth and
+    parallel in width** — step *k+1* needs step *k*'s landing entity, but the 16
+    expansions within a step are independent. Under CONCEPT splitting each read goes to
+    one owner, so `ownership.Ring` (*"which node owns a concept, without a directory or
+    a coordinator"*) makes it **16 point-to-point messages to named neighbours** — which
+    amended C1 explicitly permits. **So the beam's 4× cost becomes 4× the NODES and 1×
+    the TIME.** Under dimension splitting every read needs every node and it really is
+    4× the traffic. *no measurement* — reasoned from the mechanism's own structure, and
+    it is a stronger argument for this option than 134's independence case
+  - **The obstacle is PRUNING, not the reads.** Top-`width` over the beam is a
+    collective every participant must join, which is the barrier C1 forbids. The fix
+    exists: `distributed.py`'s deadline settles a step on what arrived, so a slow node
+    costs a candidate rather than stalling — the path `169`'s silent peer made testable
   - **So its case is INDEPENDENCE and churn resilience, not capacity.** Under
     dimension splitting a node can never answer alone however large the system
     gets

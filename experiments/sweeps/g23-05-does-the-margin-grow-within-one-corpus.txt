@@ -1,0 +1,110 @@
+Does the margin grow with size WITHIN one corpus?
+==================================================
+
+Script: tools/relation_contrastive.py --graph <subsample of FB15k-237>
+Status: NOT RUN. Predictions registered and committed before the run.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+Across eighteen graphs, the learned representation beat plain counting by more on
+the big ones than the small ones. That is encouraging -- it says the result is not
+an artefact of small test sets -- but it was noticed AFTER the fact, and the big
+graphs also came from different sources than the small ones.
+
+So this holds the source fixed. Take one graph, throw away most of it, and see
+whether the advantage shrinks.
+
+If it does, the size story survives. If the advantage is flat, the earlier pattern
+was about which corpus a graph came from rather than how big it was.
+
+
+WHY THIS EXISTS
+----------------
+`docs/options/structured-relations.md` carries a POST-HOC observation: Pearson
+`r = +0.507` between margin and `log10(rules)` over 17 graphs, mean margin
+`+0.0451` below 300 rules against `+0.1167` above, both losses at the small end.
+
+**It is labelled post-hoc there and it settles nothing.** Two confounds were named
+with it: size is entangled with SOURCE -- the largest graph is the only Freebase
+one -- and `r = +0.507` over 17 points is weak.
+
+This removes the first confound by construction: every point comes from
+FB15k-237.
+
+**It is still not `GOALS.md`'s G5.** G5 asks whether the margin survives as the
+NETWORK grows -- more machines, smaller slices. This is corpus size at one
+machine. A result here says nothing about that axis and must not be quoted at it.
+
+
+THE MEASUREMENT
+---------------
+Subsample FB15k-237's 272,115 edges at several fractions, then run the same two
+arms on each. Everything else held: width 32, epochs 8, lr 0.05, temperature 0.1,
+5 seeds, 75/25 rule split.
+
+**Edges are sampled, not rules**, because a corpus arrives as edges and the rule
+set is what falls out. Rule count is reported per row rather than controlled, and
+P4 is about the relationship between the two.
+
+
+PREDICTIONS
+-----------
+  P1  THE TEST. The margin grows with subsample size, and the largest subsample
+      beats the smallest by more than 0.05.
+
+      Refuted by a flat margin, which would mean the post-hoc pattern was about
+      corpus IDENTITY and not size -- and would take the small-graph losses back
+      to being unexplained.
+
+  P2  At the smallest subsample the margin is at or below +0.03, approaching the
+      losses seen at 48 and 594 rules.
+
+      This is P1's other end. If small subsamples of a big corpus keep a healthy
+      margin while genuinely small corpora do not, size is not the variable and
+      something about those corpora is.
+
+  P3  `counted` is FLAT across sizes -- its best and worst differ by less than
+      0.05.
+
+      `g23-04` already refuted the prediction that counting improves with data:
+      four times the rules bought it nothing. If it is flat here too, the margin's
+      shape is entirely the learned arm's.
+
+  P4  THE ONE I EXPECT TO BE WRONG. Rule count falls roughly LINEARLY with edge
+      count.
+
+      I expect it does not. A rule needs a closing triangle -- three specific
+      edges all present -- so removing half the edges should remove far more than
+      half the triangles. If rules fall super-linearly, then "corpus size" in
+      EDGES and in RULES are different axes, the post-hoc correlation was computed
+      on rules, and this sweep's x-axis has to be stated carefully wherever it is
+      quoted.
+
+
+WHAT WOULD MAKE THIS NOT COUNT
+--------------------------------
+**Subsampling that is not uniform.** Taking the first N lines would follow
+whatever order the file is in, which for a knowledge graph is not random. Edges
+are sampled with a seeded shuffle and the seed is part of the condition.
+
+**Too few rules to split.** Below a few dozen rules a 75/25 split leaves single
+digits held out and the score is noise. Rule count is reported per row and any row
+under 40 held-out rules is called out rather than averaged in.
+
+**Knobs carried, not tuned per size.** Tuning the learned arm at each size while
+counting has no knobs is the one-sided sweep the price-of-locality calibration is
+about.
+
+
+COST
+----
+Five subsample sizes, two arms, 5 seeds, on a corpus that takes about four minutes
+at full size. Under half an hour local, no dispatch.
+
+
+MEASURED ON
+-----------
+`data/fb15k237/train.txt`, sha256 61099230e4439f90..., subsampled by edge count.

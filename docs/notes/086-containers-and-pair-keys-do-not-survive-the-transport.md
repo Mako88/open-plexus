@@ -49,6 +49,28 @@ broadcast eight bytes instead of four, or have the node keep the previous token 
 the node already tracks `step`, so carrying one integer is not a new mechanism. Neither is
 tried, and until one is, **no relational result has ever crossed a wire.**
 
+## CLOSED, same day
+
+`Node.key` now builds a pair key when `context_keys` is set, by **remembering the previous
+token** rather than being sent it. A node already processes tokens in order and already keeps
+`_previous_key`; holding the id beside it costs one integer, where widening the broadcast
+would have spent note 012's four-byte finding on every configuration including those that
+never needed it.
+
+    containers, 4 nodes, netem 5 ms, bar predicting 17 distinct tokens
+
+    single-token keys (control)     exact TRUE   (unchanged)
+    context_keys=True              exact TRUE   (was FALSE)
+
+`reset()` clears the remembered token too — a survivor would make the next sequence's first
+pair key depend on the last sequence's final token, which is the same leak `reset` was added
+for after a departure test's answers changed *before* the departure step.
+
+**Guarded by `tests/test_pair_keys_distributed.py`** (5 tests) and two mutations. One test
+asserts the node's key equals `keys.PairKeys.pair` byte for byte, because the network
+comparison alone would pass if **both** sides were wrong in the same way — and they share a
+seed, so that is a real possibility rather than a hypothetical.
+
 ## What DOES work, and the numbers
 
     exactness       TRUE at 4, 8 and 16 nodes, d=64 and d=256, with single-token

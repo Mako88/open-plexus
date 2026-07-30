@@ -58,6 +58,7 @@ D_MODEL_VAR = "OPENPLEXUS_D_MODEL"
 VOCAB_VAR = "OPENPLEXUS_VOCAB_SIZE"
 SEED_VAR = "OPENPLEXUS_SEED"
 DECODER_VAR = "OPENPLEXUS_DECODER"
+CONTEXT_KEYS_VAR = "OPENPLEXUS_CONTEXT_KEYS"
 
 
 def config_from_env() -> LocalMemoryConfig:
@@ -66,12 +67,19 @@ def config_from_env() -> LocalMemoryConfig:
     Any disagreement here is silent: the nodes still run, still vote, and still
     produce a number. Only the driver's slice check would notice, and only if the
     width disagreed.
+
+    `OPENPLEXUS_CONTEXT_KEYS=1` selects PAIR keys, which every relational result in
+    this project uses. Off by default because every distributed measurement to date
+    was taken with single-token keys, and note 086 is the entry about a default that
+    moved quietly. `Node.key` reconstructs the pair by remembering the previous
+    token; before that existed, this configuration was silently INEXACT.
     """
     return LocalMemoryConfig(
         vocab_size=int(os.environ.get(VOCAB_VAR, "41")),
         d_model=int(os.environ.get(D_MODEL_VAR, "16")),
         lr=0.05, key_scale=0.5, decay=0.9,
         derived_keys=True,
+        context_keys=os.environ.get(CONTEXT_KEYS_VAR) == "1",
         seed=int(os.environ.get(SEED_VAR, "5")))
 
 

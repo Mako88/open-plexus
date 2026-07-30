@@ -1950,6 +1950,34 @@ MUTATIONS = [
         new="        self._parent[left] = right",
     ),
     Mutation(
+        name="a-node-cannot-see-the-previous-token",
+        breaks="the fix for note 086, the defect that let a pair-keyed network be "
+               "silently INEXACT. A pair key is (seed, previous, token); ignoring "
+               "`context_keys` derives it from (seed, token) alone, so the node "
+               "builds a different address than the driver assumed. **Nothing "
+               "raises** -- the nodes still run, still vote, and still produce a "
+               "number about the wrong arrays, which is how this survived until "
+               "containers made it visible. Every relational result in this "
+               "project uses pair keys, so this is the mutation standing between "
+               "them and the wire",
+        path=DISTRIBUTED,
+        old="        if not self.config.context_keys:",
+        new="        if True:",
+    ),
+    Mutation(
+        name="reset-keeps-the-previous-token",
+        breaks="sequence isolation for pair keys. `reset` exists because a node "
+               "process outlives the sequence, and a surviving previous TOKEN "
+               "makes the next sequence's FIRST pair key depend on the last "
+               "sequence's final token -- the same leak `reset` was added for, "
+               "after a departure test's answers changed BEFORE the departure "
+               "step. Silent, and small: it shifts one key per sequence, so only "
+               "a comparison against the single-process model notices",
+        path=DISTRIBUTED,
+        old="        self._previous_token = None",
+        new="        self._previous_token = self._previous_token",
+    ),
+    Mutation(
         name="a-traversal-reads-from-the-wrong-node",
         breaks="the agreement between where a binding was written and where the "
                "search looks. Hardcoding the current token is the `current` "

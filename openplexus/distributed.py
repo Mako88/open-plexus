@@ -147,16 +147,50 @@ class Node:
         self.readout = np.array(readout)    # vocab x own.width
         self.memory = np.zeros((own.width, config.d_model))
         self._previous_key: np.ndarray | None = None
+        #: The previous TOKEN, which a pair key needs and a single-token key does
+        #: not. Kept here rather than sent, because a node already processes
+        #: tokens in order and already remembers `_previous_key` -- so one more
+        #: integer is not a new mechanism, where widening the broadcast would
+        #: undo note 012's four-byte finding for every configuration including
+        #: the ones that do not need it.
+        self._previous_token: int | None = None
         self._spread = config.key_scale / np.sqrt(config.d_model)
 
     def key(self, token: int) -> np.ndarray:
         """Derived, not stored -- the whole reason a token id is enough.
 
-        Row `t` depends on `(seed, t)` and on nothing drawn before it, so this
-        node can produce any row without ever having seen the others.
+        With single-token keys, row `t` depends on `(seed, t)` and on nothing
+        drawn before it, so this node can produce any row without ever having
+        seen the others.
+
+        ## `context_keys`, and the defect this closes
+
+        A pair key is `(previous, token)`, and note 086 measured what happens when
+        a node cannot see `previous`: it builds a different address than the
+        driver assumed and **the split silently stops being exact** -- exact went
+        FALSE with `context_keys=True` and TRUE without, on containers with a
+        check that could fail.
+
+        **Every relational result in this project uses pair keys**, so until this
+        existed none of them had ever crossed a wire.
+
+        The previous token is REMEMBERED rather than sent. A node processes tokens
+        in order and already keeps `_previous_key`, so holding the id alongside it
+        costs one integer; widening the broadcast would spend note 012's four-byte
+        finding on every configuration, including those that do not need it.
+
+        Must agree with `keys.PairKeys.pair` exactly: same `(seed, previous,
+        token)` triple, same spread, same width, and `vocab_size` standing in for
+        "no previous token" -- which is what `local_memory` passes as `start`.
         """
-        return np.random.default_rng((self.config.seed, int(token))).normal(
-            0.0, self._spread, self.config.d_model)
+        if not self.config.context_keys:
+            return np.random.default_rng((self.config.seed, int(token))).normal(
+                0.0, self._spread, self.config.d_model)
+        previous = (self.config.vocab_size if self._previous_token is None
+                    else self._previous_token)
+        return np.random.default_rng(
+            (self.config.seed, int(previous), int(token))).normal(
+                0.0, self._spread, self.config.d_model)
 
     def reset(self) -> None:
         """Forget the sequence, keep the model.
@@ -171,6 +205,10 @@ class Node:
         """
         self.memory[:] = 0.0
         self._previous_key = None
+        # Cleared with the key it belongs to. A surviving previous token would
+        # make the next sequence's first pair key depend on the last sequence's
+        # final token, which is the same class of leak `reset` exists for.
+        self._previous_token = None
 
     def step(self, token: int) -> np.ndarray:
         """Take one token, return this node's complete vote over the vocabulary."""
@@ -184,6 +222,7 @@ class Node:
 
         retrieved = self.memory @ key
         self._previous_key = key
+        self._previous_token = int(token)
         return self.readout @ retrieved
 
 

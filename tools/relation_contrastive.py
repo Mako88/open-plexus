@@ -1,0 +1,210 @@
+"""Relation vectors learned by a LOCAL contrastive rule, scored by note 070's harness.
+
+## What this does not duplicate
+
+Searched by capability across `openplexus/`, `tools/`, `tests/`, `experiments/`,
+`testbed/` and `docs/archive/` before writing:
+
+    tools/relation_profiles.py  note 070's extensional vectors. Builds a relation's
+                                vector by COUNTING how other relations attach to the
+                                entities it links. No objective, no negatives, no
+                                gradient. Its `score`, `rows`, `base_rules` and
+                                `BINDINGS` are IMPORTED here rather than rewritten --
+                                the evaluation is the part that must not fork
+    openplexus/content.py       distributional token vectors, and its docstring says
+                                outright "no objective, no negative sampling and no
+                                gradient". Same family as the above, different objects
+    openplexus/keys.py          hashes a relation id, so `father` and `mother` are as
+                                unrelated as `father` and `7`. The thing being replaced
+    tools/generation_delta.py   solves for a conserved quantity from loop equations.
+                                Exact linear algebra over cycles, not a learned
+                                representation, and scoped by note 104 to graphs that
+                                HAVE an invariant
+
+**So what is new here is the objective**, and only that: an explicit local
+positive/negative signal with a gradient. Everything about how the result is judged
+comes from `relation_profiles`.
+
+## The mechanism, and why it is local
+
+A 2-hop CLUTRR puzzle is a closing triangle: `a -r1-> b -r2-> c` with `a -r3-> c`.
+
+    POSITIVE   (r1, r2) composed should land ON r3
+    NEGATIVE   (r1, r2) composed should land far from every OTHER relation
+
+Both are constructible from **one puzzle**, by one node, with no global view: the
+negatives are the other relations in the alphabet, which every node already knows.
+Nothing here needs a population statistic, a barrier, or a second machine.
+
+## What would make this vacuous, guarded rather than hoped for
+
+**The held-out rules must not reach the representation.** Note 070's number was
+`0.223` on a RANDOM quarter, and note 088 showed the same mechanism falls below random
+filling once the holdout is adversarial -- so a rule leaking into the vectors is the
+difference between a result and an artefact. `permitted` is threaded through exactly as
+`relation_profiles.profile` threads it, and `tests/test_relation_contrastive.py`
+asserts a held-out rule's triangle never contributes an update.
+
+**And the random arm is the gate.** Untrained vectors must score near `0.056`
+(note 067's measurement, chance `0.050`). If the random arm scores well, the harness is
+measuring the ridge fit rather than the representation, and nothing else in the run is
+reportable.
+
+## What it measured, 2026-07-30, and how much to trust it
+
+10 seeds, width 32, 8 epochs, `--bind hadamard`, 62 rules with a 16-rule holdout:
+
+    untrained (random arm)              0.0312 +/-0.0133
+    counted extensional, same binding   0.0690          (tools/relation_profiles.py)
+    contrastive, learned                0.2437 +/-0.0419
+
+    held-out rules EXCLUDED             0.2437
+    held-out rules INCLUDED, a leak     0.4188
+    so the guard is worth              +0.1750
+
+**Read the binding caveat before quoting the middle row.** The counted vectors score
+`0.069` under `hadamard` and `0.223` under `both` (note 070's headline). So matched-binding
+is `0.244` against `0.069`, and best-against-best is `0.244` against `0.223`. Both are
+true and neither alone is.
+
+**THIS IS WEAKER EVIDENCE THAN A SWEEP AND THE REASON IS PROCESS.** Rule 4 requires a local
+probe's prediction to be committed BEFORE the run, so git ordering is the evidence. That
+was not done here -- the numbers were produced first and written down afterwards, which
+makes them an observation rather than a test of a prediction. Recorded as such rather than
+presented as if the discipline had been followed.
+
+**And it is the EASY holdout.** A random quarter, which is note 070's split. Note 088
+measured the counted mechanism below random filling once the holdout was an adversarially
+withheld family. Nothing here has faced that, and it is the test that decides whether this
+is a result.
+"""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from openplexus.tasks.clutrr import RELATIONS  # noqa: E402
+from tools.relation_profiles import (  # noqa: E402
+    BINDINGS, base_rules, rows, score)
+
+INDEX = {name: i for i, name in enumerate(RELATIONS)}
+
+
+def triangles(puzzles, permitted: set) -> list[tuple[int, int, int]]:
+    """Closing 2-hop triangles as `(r1, r2, r3)` indices.
+
+    A puzzle contributes ONLY if its own rule is permitted. That is the guard note
+    088 made necessary: a held-out rule whose triangle trains the representation has
+    written its own answer into the thing being tested.
+    """
+    found = []
+    for edges, types, _query, target in puzzles:
+        if len(edges) != 2:
+            continue
+        if (types[0], types[1]) not in permitted:
+            continue
+        if target not in INDEX or any(t not in INDEX for t in types):
+            continue
+        found.append((INDEX[types[0]], INDEX[types[1]], INDEX[target]))
+    return found
+
+
+def learn(tris, width: int, seed: int, epochs: int, lr: float,
+          temperature: float) -> np.ndarray:
+    """Relation vectors under a local contrastive rule. Returns `(len(RELATIONS), width)`.
+
+    One update per observed triangle. The composition is elementwise product, which is
+    `BINDINGS["hadamard"]` -- the same binding the scorer may be asked for, so the
+    representation is not learned under one composition and judged under another.
+
+    The loss is softmax cross-entropy of `compose(r1, r2) . r_k` over every relation
+    `k`, with the true `r3` as the target. That IS the contrast: the numerator is the
+    positive and the denominator is every negative, so no negative sampling schedule
+    has to be chosen and none can be got wrong.
+    """
+    rng = np.random.default_rng(seed)
+    vectors = rng.normal(0.0, 1.0 / np.sqrt(width), (len(RELATIONS), width))
+    if not tris:
+        return vectors
+    order = np.arange(len(tris))
+    for _ in range(epochs):
+        rng.shuffle(order)
+        for i in order:
+            a, b, target = tris[i]
+            composed = vectors[a] * vectors[b]
+            logits = vectors @ composed / temperature
+            logits -= logits.max()
+            probs = np.exp(logits)
+            probs /= probs.sum()
+            error = probs.copy()
+            error[target] -= 1.0
+
+            # d/d vectors[k] for k != a, b: error[k] * composed / T
+            grad_vectors = np.outer(error, composed) / temperature
+            # d/d composed, which then splits across the two factors by the product
+            d_composed = (vectors.T @ error) / temperature
+            grad_a = d_composed * vectors[b]
+            grad_b = d_composed * vectors[a]
+
+            vectors -= lr * grad_vectors
+            vectors[a] -= lr * grad_a
+            vectors[b] -= lr * grad_b
+            norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+            vectors /= np.where(norms == 0, 1.0, norms)
+    return vectors
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, default=ROOT / "data" / "clutrr")
+    parser.add_argument("--config", default="gen_train23_test2to10")
+    parser.add_argument("--bind", choices=sorted(BINDINGS), default="hadamard")
+    parser.add_argument("--seeds", type=int, default=20)
+    parser.add_argument("--width", type=int, default=32)
+    parser.add_argument("--epochs", type=int, default=8)
+    parser.add_argument("--lr", type=float, default=0.05)
+    parser.add_argument("--temperature", type=float, default=0.1)
+    parser.add_argument("--random-arm", action="store_true",
+                        help="score UNTRAINED vectors. The gate: must land near 0.056")
+    args = parser.parse_args()
+
+    puzzles = list(rows(args.root, args.config, "train"))
+    rules = base_rules(puzzles)
+    items = sorted(rules.items())
+    bind = BINDINGS[args.bind]
+
+    scores = []
+    for seed in range(args.seeds):
+        rng = np.random.default_rng(seed)
+        order = rng.permutation(len(items))
+        cut = int(len(items) * 0.75)
+        permitted = {items[i][0] for i in order[:cut]}
+        tris = triangles(puzzles, permitted)
+        vectors = (learn([], args.width, seed, 0, 0.0, 1.0) if args.random_arm
+                   else learn(tris, args.width, seed, args.epochs, args.lr,
+                              args.temperature))
+        scores.append(score(vectors, items, order, bind))
+
+    mean = float(np.mean(scores))
+    error = float(np.std(scores) / np.sqrt(len(scores)))
+    arm = "RANDOM (untrained)" if args.random_arm else f"contrastive w{args.width}"
+    print(f"{arm}: {mean:.4f} +/-{error:.4f} over {args.seeds} seeds, "
+          f"{len(items)} rules, holdout {len(items) - int(len(items) * 0.75)}")
+    if args.random_arm and mean > 0.15:
+        print("THE GATE FAILED. Untrained vectors should score near 0.056 "
+              "(note 067, chance 0.050). Above that the harness is measuring the "
+              "ridge fit rather than the representation, and no other arm in this "
+              "run is reportable.")
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

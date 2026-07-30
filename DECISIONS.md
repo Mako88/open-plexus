@@ -170,7 +170,12 @@ keys, which are still the default and still correct for MQAR.**
   and the store addresses by `(entity, relation)` so the entity supplies the exactness.
   `067` generalising composition is impossible without it (0.056 held out against chance
   0.050); `note 071` such a vector must not enter the address unguarded. **GOALS §1 asks
-  for exactly this.**
+  for exactly this.** **First measurement 2026-07-30: a LOCAL CONTRASTIVE rule reaches
+  0.2437 ±0.0419 on held-out rules against 0.0312 untrained** — the first mechanism here
+  with a real objective rather than counting, and its holdout guard is worth 0.1750
+  measured. **Still ⬜ because nothing in the model uses it and it has only faced the
+  RANDOM-quarter holdout — the one `note 088` killed the counted version on.**
+  *measured in:* CLUTRR rule prediction, width 32, 10 seeds.
   → record: [structured-relations.md](docs/options/structured-relations.md)
 - ⬜ **A better index** — `note 056` made it load-bearing rather than a nicety: the set
   answer works at purity ≳ 0.99 and degrades fast below (0.750 at 0.951, 0.167 at 0.795),

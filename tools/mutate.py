@@ -36,7 +36,6 @@ DISTRIBUTED = ROOT / "openplexus" / "distributed.py"
 CONCEPTS = ROOT / "openplexus" / "concepts.py"
 KEYS = ROOT / "openplexus" / "keys.py"
 PEER = ROOT / "openplexus" / "peer.py"
-NODE_MAIN = ROOT / "openplexus" / "node_main.py"
 RETRIEVAL = ROOT / "openplexus" / "retrieval.py"
 SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 # Experiment code is not usually mutated -- experiments are read once and
@@ -46,6 +45,7 @@ CHURN = ROOT / "experiments" / "g4_02_machine_churn.py"
 TRANSPORT = ROOT / "openplexus" / "transport.py"
 DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 NODE_MAIN = ROOT / "openplexus" / "node_main.py"
+RELATION_CONTRASTIVE = ROOT / "tools" / "relation_contrastive.py"
 NGRAM = ROOT / "openplexus" / "ngram.py"
 REWARD_RECALL = ROOT / "openplexus" / "tasks" / "reward_recall.py"
 KINSHIP = ROOT / "openplexus" / "tasks" / "kinship.py"
@@ -2219,6 +2219,31 @@ MUTATIONS = [
         path=NODE_MAIN,
         old="        if index in ring.holders(concept, replicas):",
         new="        if index == ring.owner(concept):",
+    ),
+    Mutation(
+        name="the-held-out-rule-trains-the-representation",
+        breaks="the only thing separating a result from an artefact here. Note "
+               "070 reported 0.223 on a random-quarter holdout and note 088 then "
+               "found the same mechanism BELOW random filling once the holdout "
+               "was adversarial -- the difference being whether a held-out rule "
+               "reached the vectors. MEASURED on the corpus: excluding them "
+               "scores 0.2437, including them scores 0.4188, so this mutation is "
+               "worth +0.175 and would look like a breakthrough",
+        path=RELATION_CONTRASTIVE,
+        old="        if (types[0], types[1]) not in permitted:",
+        new="        if False:",
+    ),
+    Mutation(
+        name="the-contrast-has-no-NEGATIVES",
+        breaks="the contrastive half of the rule. Subtracting one from the "
+               "target's probability is what makes the objective push the "
+               "composition TOWARD its target and away from every other "
+               "relation; without it every relation is pushed the same way and "
+               "the softmax has nothing to separate. The vectors still move, so "
+               "a test asserting only that they changed would not notice",
+        path=RELATION_CONTRASTIVE,
+        old="            error[target] -= 1.0",
+        new="            error[target] -= 0.0",
     ),
 ]
 def restore_any_leftovers() -> None:

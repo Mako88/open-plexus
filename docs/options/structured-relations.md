@@ -89,3 +89,44 @@ them"* — and note 067 measured that it cannot be had from random vectors. What
 built is a relation representation that is learned, comparable, and safe in an address at
 the same time. Note 088's refutation is of one route to it (naming the missing rule by a
 learned readout), not of the requirement.
+
+### A LOCAL CONTRASTIVE rule reaches 0.2437 on held-out rules — the easy holdout
+
+    CONFIG  when    2026-07-30
+            source  tools/relation_contrastive.py
+            script  tools/relation_contrastive.py --seeds 10
+                    and --random-arm for the gate
+            task    CLUTRR gen_train23_test2to10, held-out RULE prediction
+            model   relation vectors, width 32, hadamard composition, softmax
+                    cross-entropy over all relations, 8 epochs, lr 0.05
+            knobs   bind hadamard; random arm on against off
+            scale   10 seeds, 62 rules, 16-rule holdout
+
+    untrained (random arm)              0.0312 +/-0.0133
+    counted extensional, same binding   0.0690
+    contrastive, learned                0.2437 +/-0.0419
+
+**The first mechanism in this project with an ACTUAL OBJECTIVE on relation
+representations.** `relation_profiles.py` counts co-occurrence and `content.py` says in its
+own docstring *"no objective, no negative sampling and no gradient"*. This has positives,
+negatives and a gradient, and every one of them is built from a single 2-hop puzzle on a
+single node — no population statistic, no barrier, no second machine.
+
+**The guard was measured rather than asserted.** Letting held-out rules train the
+representation scores **0.4188** against **0.2437** with them excluded, so the guard is
+worth **0.1750** and without it the number would nearly double and look like a
+breakthrough. `the-held-out-rule-trains-the-representation` in `tools/mutate.py` is that
+control as a mutation, and it is caught.
+
+**Binding caveat, so neither framing is quoted alone.** The counted vectors score 0.069
+under `hadamard` and 0.223 under `both`. Matched-binding is 0.244 against 0.069;
+best-against-best is 0.244 against 0.223.
+
+**Weaker than a sweep, on process grounds.** Rule 4 requires a local probe's prediction to
+be committed before the run so git ordering is the evidence. That was not done: the numbers
+came first and were written down after. An observation, not a tested prediction.
+
+**And this is note 070's RANDOM-QUARTER holdout, which is the one note 088 killed.** The
+counted mechanism scored 0.223 here and then fell below random filling on an adversarially
+withheld family. Nothing here has faced that holdout, and until it does this row stays
+untried as a component rather than becoming a choice.

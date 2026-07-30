@@ -1070,10 +1070,18 @@ class LocalMemoryConfig:
     #: commits blindly where it is 0.906. Chain recovery: **0.6588 for `search`,
     #: 0.8877 for `beam`** (`tools/clutrr_recovery.py`, `tools/prune_period.py`).
     #:
-    #: **Defaulted OFF rather than switched on**, because `run()`'s subject is
-    #: the end task and chain recovery is not the same measurement -- a better
-    #: chain only helps if the readout consumes it. That is note 103's question.
-    search_beam_width: int = 0
+    #: **DEFAULT 4 as of note 103**, which measured it on `run()`'s own task
+    #: rather than inheriting CLUTRR's number: `beam4` beats `search4` by
+    #: **+0.041 +/-0.013** on kinship at hops 2, 8 seeds -- above 2 SE, so the
+    #: mechanism reaches this regime even though only one mid-chain decode exists
+    #: here for it to fix. The split says it is doing its job: **+0.039 at
+    #: out-degree >= 2**, where `key(FACT, e)` holds a sum, and **+0.043 at
+    #: out-degree 1**, where it repairs damage `search` does by committing at the
+    #: root (walk 0.702, search4 0.649, beam4 0.692).
+    #:
+    #: `0` still selects `search`, and every pre-note-103 number is reproducible
+    #: by setting it.
+    search_beam_width: int = 4
 
     #: Hops between the beam's rendezvous, when `search_beam_width >= 1`. `1`
     #: meets every hop and is what note 102 measured as the baseline.
@@ -1083,8 +1091,13 @@ class LocalMemoryConfig:
     #: round trip that keeps a driver-free walk outside `d_max` past depth 7
     #: (`note 101`). Note 102 measured the meeting as worth **0.089** chain
     #: recovery and its period as worth nothing measurable, so `2` fits the
-    #: budget for 2.29x the reads. Left at `1` here so the default is the
-    #: measured one.
+    #: budget for 2.29x the reads.
+    #:
+    #: **Left at 1, and note 103 is why it is not 2.** On the end task `2` costs
+    #: **-0.016 +/-0.006** -- inside the 0.02 tolerance predicted, so note 102's
+    #: finding transfers, but it is about 2.7 SE from zero and therefore a real
+    #: small loss rather than free. So this is a knob a DEPLOYMENT turns up when
+    #: latency binds, not a default: pay 0.016 to meet `d_max`, and only then.
     search_prune_every: int = 1
 
     cache_slots: int = 0
@@ -1312,12 +1325,12 @@ class LocalMemoryConfig:
             raise ValueError("search_branches is a count and 0 means off")
         if self.search_beam_width < 0:
             raise ValueError("search_beam_width is a count and 0 means `search`")
-        if self.search_beam_width >= 1 and self.search_branches < 1:
-            raise ValueError(
-                "search_beam_width sets the width of the WALK, and there is no "
-                "walk unless search_branches >= 1. Setting a width with search "
-                "off reads as 'the beam is on' and would silently run neither -- "
-                "the class of quiet misconfiguration decision 105 recorded")
+        # NO CROSS-CHECK against `search_branches`. There was one -- "a width set
+        # while search is off reads as 'the beam is on'" -- and note 103 making 4
+        # the default inverted its logic: the width now describes HOW to walk and
+        # is simply unread when nothing walks. Left as a comment because the
+        # check was correct when written and its removal is a consequence of the
+        # default moving, not a decision that the risk went away.
         if self.search_prune_every < 0:
             raise ValueError(
                 "search_prune_every counts hops between the beam's rendezvous: "

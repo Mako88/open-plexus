@@ -53,7 +53,7 @@ history lives in `docs/notes/` and the archived log.
     🔀 LIVE BOTH   two or more kept behind a switch and re-tested as the system
                    changes. A valid END state, not indecision
 
-**CENSUS: 29 chosen, 29 refuted, 15 untried, 12 both, 1 paused.** Checked against the body,
+**CENSUS: 30 chosen, 29 refuted, 15 untried, 11 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -372,29 +372,34 @@ additive and nothing else has been tried.
     a problem now solved another way. Kept as ⬜ rather than ❌ because neither was measured
 - ⬜ **Learned relation chooser** — `147`: two hand-made selection rules were refuted before
   membership worked, and a learned chooser is strictly harder. See 090's route above.
-- 🔀 **`search.py` beam search** — built and tested; `run` still does not call it, but
-  `note 091` drives it end to end from `tools/`, so it is no longer only scaffolding.
+- ✅ **`search.py` beam search — `run()` CALLS IT, `search_beam_width=4` by default**
+  (`note 103`): **+0.041 ±0.013 over `search4`**, kinship hops 2, 8 seeds, above 2 SE.
+  Measured on `run()`'s task, not inherited from CLUTRR's different task/depth/score.
   - **The 🔀 argument in one option:** refused at `111` (the verifier is built from the
     same noisy retrievals it must adjudicate), **revived at `121` when width was measured
     NOT to fix fidelity**, built at `123`, closed at `130` (+0.020) with `125`'s +0.269
     traversal win. A refutation that expired
-  - **`note 061`: it is what CLUTRR needs**, verified against the code — the task names
-    BOTH endpoints, so `108`'s missing disambiguator is handed over, and `depth` is
-    observable rather than fitted
-  - **`note 064`'s durable fact, kept though 065 superseded its conclusion:** the entity
-    hop is **0.9889 and FLAT** (the store does not degrade as it fills) while the relation
-    decode is **0.9348** — six times the error rate. `walk_from` branched only at the ROOT,
-    hedging at the 0.974 step and committing blindly at the 0.906 ones, so its +0.009 was
-    **measured at the wrong place by its own construction**
+  - **`note 061`: it is what CLUTRR needs** — the task names BOTH endpoints, so `108`'s
+    missing disambiguator is handed over, and `depth` is observable rather than fitted
+  - **`note 064`'s durable fact:** the entity hop is **0.9889 and FLAT** while the relation
+    decode is **0.9348** — six times the error rate — and `walk_from` hedged at the 0.974
+    step while committing blindly at the 0.906 ones, so its +0.009 was **measured at the
+    wrong place by its own construction**
 - ✅ **`search.beam` — branch at EVERY step, pruned.** Beats single-step branching on
   every seed of both harnesses, which is the qualitative claim and it holds.
   - **`note 075`: `note 065`'s +0.2190 does NOT reproduce.** `beam` lands within 0.007 of
     065's mean; `search` is high by 0.12, so the gain is **+0.107**. Not width, not the
     `allowed` mask, not `branches` — all tested. 065's config is unrecovered, so take
     differences against `tools/clutrr_recovery.py`'s own baseline
-  - **713/713 on the plain subset is reached — under PARTITIONING**, `note 081`'s
-    companion measurement: 4 concept nodes give beam 0.9220 against 0.8877 monolithic,
-    because a node carries interference only from what it owns
+  - **713/713 on the plain subset is reached — under PARTITIONING** (`note 081`): 4
+    concept nodes give beam **0.9220** against 0.8877 monolithic, because a node carries
+    interference only from what it owns. `note 103` corroborates at 8 nodes (0.9058)
+  - **The out-degree split is why it is a MECHANISM, not a margin** (`note 103`):
+    `search` is worse than not branching at out-degree 1 (0.649 vs walk's 0.702, g13-03's
+    −0.054 again); `beam` recovers 0.692 AND gains +0.038 at out-degree ≥ 2
+  - 🔀 **`search_prune_every` — a DEPLOYMENT knob, left at 1.** `note 102`: the beam's
+    rendezvous is worth 0.089 and its PERIOD nothing measurable. `note 103` prices period
+    2 at **−0.016 ±0.006** — real at 2.7 SE. Pay it to meet `d_max`, not by default
   - **Cost 4× the reads** (`width × branches × depth`); unpruned is `branches^h`, a
     million walks at ten hops, so pruning is what makes it exist. **G4 unanswered** —
     `123` had beam 4 at 3.2× on kinship. `search` is untouched as the comparison (14c)
@@ -694,32 +699,29 @@ transport is a parallel path nothing in `run()` uses yet.
     `search` takes `reader=` so a caller injects routing and `search` never imports a
     transport
   - **Consistent hashing** (`note 095`): a peer joining moves **1.4%** of concepts at 64
-    peers where `concept % peers` moved 98.4%, landing on the ideal `1/n` to a tenth of a
-    point
+    peers where `concept % peers` moved 98.4% — the ideal `1/n` to a tenth of a point
   - **A departure costs a round trip, not the answer** (`note 097`): reads walk
-    `Ring.holders`, and writes fan out so there is something to fall back to. **Both halves
-    are needed and either alone looks fine.** Losing every holder returns zeros and
-    **counts** them, because an uncounted zero decodes to whatever the readout prefers
-  - **Fingerprinted** (`note 096`/`099`): peer count, ring seed, key seed/spread/width/
-    start/route/markers, and the **wire-format version**, pinned to every struct on the
-    wire by a test. **It caught `PROTOCOL` 3 the day after it was written**
-  - ❌ **One read per round trip** (`note 100`/`101`): a walk's 77 reads at depth 10 cost
-    `77 × RTT` = 3,850 ms. `read_many` batches a hop's independent reads into one round,
-    giving 1,000 ms — **necessary and not sufficient, since `d_max` is 640 ms**
+    `Ring.holders` and writes fan out. **Both halves are needed; either alone looks fine.**
+    Losing every holder returns zeros and **counts** them — an uncounted zero decodes to
+    whatever the readout prefers
+  - **Fingerprinted** (`note 096`/`099`): peer count, ring seed, key params and the
+    **wire-format version**, pinned to every struct by a test. **It caught `PROTOCOL` 3
+    the day after it was written**
+  - ❌ **One read per round trip** (`note 100`/`101`): 77 reads at depth 10 cost 3,850 ms.
+    `read_many` batches a hop's independent reads into one round → 1,000 ms. **Necessary
+    and not sufficient: `d_max` is 640 ms**
   - 🔀 **A MIGRATING walk** is where the remaining 2× is (`note 101`): `owner` routes a
     hop's look-up and the next hop's follow to the **same concept**, so 12 of 19 rounds
     ask a peer the round before already used. One peer visit per hop is ~`depth × RTT/2`.
-    **`note 102` CLEARS the pruning blocker.** The rendezvous is worth **0.089** chain
-    recovery; its PERIOD is worth nothing measurable (0.8860 at `prune_every=2` against
-    0.8877 at 1, sd **0.0305** over 3 seeds). So a migrating walk must meet, not meet
-    *every hop* — `k=2` fits `d_max` at depth 10 for **2.29×** the reads, where `k=5` is
-    **38×** for a third of a standard deviation. **NOT BUILT:** the latency column is an
-    estimate and `tests/test_prune_period.py` pins the real path at `2 × depth` rounds
-  - **Costs, stated:** the retrieval strategy moves to the owning node, because a remote
-    store cannot return a `d×d` matrix (512 KB against 2 KB). A write waits for `R` holders,
-    which is not `N` but is not free. Batching trades round trips for bytes, right only
-    while latency dominates. **Untried:** ordering (writes race, store is additive),
-    re-replication after departure, negotiation rather than refusal, real latency
+    **`note 102` CLEARS the pruning blocker:** the rendezvous is worth **0.089** and its
+    PERIOD nothing measurable (sd 0.0305, 3 seeds), so a migrating walk must meet but not
+    *every hop*. `k=2` fits `d_max` for **2.29×** the reads; `k=5` is 38× for nothing.
+    **NOT BUILT** — the latency is an estimate and `test_prune_period.py` pins the real
+    path at `2 × depth` rounds
+  - **Costs, stated:** retrieval moves to the owning node (a remote store cannot return a
+    `d×d` matrix — 512 KB against 2 KB); a write waits for `R` holders, not `N` but not
+    free; batching trades round trips for bytes. **Untried:** write ordering (they race and
+    the store is additive), re-replication, negotiation rather than refusal, real latency
 - ❌ **The global dimension-summing readout** — this is the globally synchronised
   step **C1 forbids**, the project's own first constraint. Surfaced in a footnote
   to [note 009](docs/notes/009-splitting-the-memory.md) §4 **after four gates were
@@ -804,10 +806,8 @@ that is the standing weakness.**
     repeated where train is 0%, so a falling curve reads as depth and is really `103`'s
     addressing. `note 060`: the `hops=1` floor is **0.0856**, not chance, because
     sequence length leaks the hop count
-  - **`note 075`: note 065's +0.219 does NOT reproduce.** `beam` lands within 0.007;
-    `search` is high by 0.12, so the gain is **+0.107**. Not a width effect and not the
-    `allowed` mask or `branches` — both tested. **065's config is still unrecovered**, so
-    take differences against `clutrr_recovery.py`'s own baseline
+  - **`note 075`: 065's +0.219 does not reproduce** — stated in full under `search.beam`
+    above. Take differences against `clutrr_recovery.py`'s own baseline
   - **What it cannot test: concept acquisition.** `note 076` — entities carry 1–2 edges,
     so two surfaces of one concept share nothing by arithmetic
 - ✅ **OpenEA `EN_DE_15K_V2` — the acquisition instrument, FETCHED with John's approval.**

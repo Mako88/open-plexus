@@ -53,7 +53,7 @@ history lives in `docs/notes/` and the archived log.
     🔀 LIVE BOTH   two or more kept behind a switch and re-tested as the system
                    changes. A valid END state, not indecision
 
-**CENSUS: 26 chosen, 29 refuted, 14 untried, 13 both, 1 paused.** Checked against the body,
+**CENSUS: 29 chosen, 29 refuted, 14 untried, 12 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -98,14 +98,26 @@ outside the learning loop.** Nothing non-text is built.
   is the unsupervised-translation problem, strictly harder than the project's goal.
   Solving it as a *precondition* is the wrong order.
   - [note 053](docs/notes/053-two-nodes-must-agree-on-what-a-picture-is.md)
+- ✅ **`concepts.Merged` — the MERGE direction, built, and it does NOT move `of`.** The
+  obvious design (remap the loser's surfaces) strands every binding it means to preserve,
+  because `ByConcept` builds the key from the concept id. So writes always land on a
+  surface's own concept and the merge is a **read-side** gather over `aliases()`. Cost is
+  `k` reads at `k` addresses for a class of `k`; a later lazy consolidation shrinks it
+  without breaking a read, which re-keying cannot promise.
+  - **Union by MINIMUM id, not by rank** — rank makes the representative depend on arrival
+    order, and `Surfaces.of` promises the same answer on every node forever. Minimum makes
+    it a property of the merge SET, so **propagation is lazy and needs no coordinator**
+  - **A late merge is a MISS, never a corruption**, and un-merging is free: `of` never
+    moved, so dropping an alias strands nothing. 19 tests, 2 mutations
+  - **What drives it:** `note 077`/`078` — mutual agreement, not a confidence threshold
 
 **Open sub-question — codebook agreement across nodes.** Two nodes that quantise
 the same input differently write to different addresses and the memory fragments
-**with no node able to detect it locally.** 163 §1 named the MERGE direction (two
-things → one id); note 053 adds SPLIT (one thing → two ids), which only exists
-distributed. Recommended: quantise once at ingest, codebook versioned as part of
-network identity. Falsifier to build first: two nodes given identical input must
-emit identical ids, with the companion that different input must differ.
+**with no node able to detect it locally.** `Merged` answers the MERGE direction; note
+053's SPLIT (one thing → two ids), which only exists distributed, is still open.
+Recommended: quantise once at ingest, codebook versioned as part of network identity.
+Falsifier to build first: two nodes given identical input must emit identical ids, with
+the companion that different input must differ.
 
 ## 2. Addressing — how a concept becomes a store address
 
@@ -698,55 +710,36 @@ that is the standing weakness.**
 - ⏸ **`corpus.py`** — PAUSED, not condemned. Closed by 115/118, reopened by g17-01,
   and 135–142 measured on it without anyone re-deciding it was the instrument.
 - ❌ **`reward_recall.py`** — retired, `126`.
-- 🔀 **CLUTRR — FETCHED 2026-07-29 with John's approval, not yet run.** The standing
-  gap: until an external instrument runs, this project grades its own homework.
-  - **Why it stopped being optional — `note 058`.** The set answer's enumeration needs
-    a bimodal similarity profile; the synthetic task gives a 0.424 gap and real word
-    co-occurrence 0.059 after four confounds
-  - **The instrument.** `tools/fetch_clutrr.py` pins URLs and verifies size **and
-    sha256** (rule 11b); `openplexus/tasks/clutrr.py` loads the **GRAPH layer, not the
-    prose**, so every result is **"CLUTRR-symbolic", never "CLUTRR"** and the published
-    text numbers are not comparable. Config `gen_train23_test2to10`: train 2–3 hops
-    (9,074), test 2–10 (1,146). Relation vocabulary **fixed** so splits share ids;
-    graphs are general edge lists because **433 revisit a node**
-  - **`note 059`, deciding the reporting BEFORE the run:** the test split confounds
-    depth with **entity repetition** — train and validation have **zero** such
-    puzzles, test **37.8%**, rising with depth. Repeated entities are the measured weak
-    point (`103` 0.884→0.303), so a naive falling curve reads as *"composition degrades
-    with depth"* and is **wrong about which component to fix**
-  - **`note 060`, the floor, and it is not chance:** `hops=1` scores **0.0856**
-    (closure) against chance 0.0500 and a *below-chance* majority baseline of 0.0421,
-    because **sequence length leaks the hop count**. Report per hop bucket, and **not**
-    the 2-hop cell — 060's correction withdrew it at 0.50/1.00/0.50 on 38 rows
-  - **DECIDED without John: the layout is `kinship`, on two independent measurements.**
-    Collisions fall **411 rows (35.9%) → 88 (7.7%)** because keying `(entity,
-    relation)` separates a repeated entity's edges (`157`'s mechanism on someone
-    else's data), and the floor falls **0.0856 → 0.0365, below chance**, because
-    `closure` leaks direct recall via `key(s, o)`. **A lower floor is the better
-    instrument.** `closure` stays behind the switch as the default (rule 14c; 060 used
-    it) — its advantage is a **one-hop** one and CLUTRR tests two through ten
-  - **No matrix needed:** all 9,074 puzzles train in **six seconds**, so dispatching
-    would be ceremony
-  - **No composing configuration has been run**, and checking why found a mismatch in
-    the loader written an hour earlier. `hops > 1` with `context_keys` needs a typed
-    hop; CLUTRR's relations vary along the chain, so `hop_relations` would supply a
-    schedule the task does not — 162's problem. **And `search.py` cannot be used
-    as-is:** `walk_from` walks `key(entity, relation) → next entity` plus
-    `key(FACT, entity) → relation`, which is **kinship's** `FACT S R O` layout. The
-    loader emits **closure's** `FACT S O R`, giving `key(FACT, s) → o` and
-    `key(s, o) → r`. Both are walkable and they are **different walks**, and no
-    existing mechanism walks the second
-  - **So the open question is sharper than "which relation at which hop":** the
-    layout choice determines which traversal is even possible, and closure's — chosen
-    because CLUTRR's question is natively relation-as-value — makes the entity chain
-    directly walkable via `key(FACT, e)` while making `search.py` inapplicable.
-    **`key(FACT, e)` is also exactly where a repeated entity collides**, which is
-    note 059's 38%, so the two problems are the same problem
-
-### 10b. Retracted numbers — never quote these
-
-**⇒ SETTLED. Every one of these was internally consistent and wrong.**
-
+- ✅ **CLUTRR-symbolic — RUN, and it is the first external instrument.** Graph layer,
+  never the prose, so results are *"CLUTRR-symbolic"* and published text numbers are not
+  comparable. `gen_train23_test2to10`, layout **`kinship`** (collisions 35.9% → 7.7%,
+  `157`'s mechanism on someone else's data). Reproduce with
+  `tools/clutrr_recovery.py`.
+  - **Report per hop bucket and split on ENTITY REPETITION** — `note 059`: test is 37.8%
+    repeated where train is 0%, so a falling curve reads as depth and is really `103`'s
+    addressing. `note 060`: the `hops=1` floor is **0.0856**, not chance, because
+    sequence length leaks the hop count
+  - **`note 075`: note 065's +0.219 does NOT reproduce.** `beam` lands within 0.007;
+    `search` is high by 0.12, so the gain is **+0.107**. Not a width effect and not the
+    `allowed` mask or `branches` — both tested. **065's config is still unrecovered**, so
+    take differences against `clutrr_recovery.py`'s own baseline
+  - **What it cannot test: concept acquisition.** `note 076` — entities carry 1–2 edges,
+    so two surfaces of one concept share nothing by arithmetic
+- ✅ **OpenEA `EN_DE_15K_V2` — the acquisition instrument, FETCHED with John's approval.**
+  Two DBpedia graphs, 15,000 gold links, URIs **encoded** so string matching cannot cheat.
+  Chosen on measurement: 74% shared relation vocabulary, and every entity has ≥4 edges
+  where CLUTRR has 5.9%. `tools/fetch_openea.py` verifies size and sha256; GPL data,
+  evaluation use.
+  - **`note 077`** zero supervision, bag of (relation, direction): hits@1 **0.0389** at
+    **583× chance**, and monotone in evidence — 0.0024 at one edge to 0.1502 at sixteen,
+    which is why CLUTRR could not see it
+  - **`note 078`** bootstrapping on mutual nearest neighbours reaches **0.3098, 8×**, not
+    plateaued. **A confidence gate makes it WORSE** (0.2334 at ≥0.9, 0.0855 at ≥0.98) and
+    does not buy precision, so **mutuality is the merge gate and magnitude is not**. Seed
+    precision self-corrects 0.263 → 0.676 untuned
+  - **Not the hard setting:** `D_W`/`D_Y` share **0%** of their relations, so round 0 has
+    nothing to compare. A vocabulary-free seed is untried and is the case a real network
+    faces
 - ❌ **`4.540` bits/char, "unigram BEATEN"** — carried as the project's headline text
   result for weeks. **It is not a measurement of this model.**
   - `117` the reproduction FAILED: the configuration the record names scores

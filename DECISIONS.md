@@ -18,46 +18,30 @@ prevent.** Full account in `CLAUDE.md` rule 14b.
 
 ## THE RULES FOR MAINTAINING THIS DOCUMENT
 
-**Read these before editing it.** They are the contract, not advice, and
-`tools/check_decisions.py` enforces the ones that can be enforced. John asked for them
-spelled out here rather than left implicit, because a convention nobody can point at
-is a convention that drifts.
+**The contract, not advice.** `tools/check_decisions.py` enforces what can be enforced.
+**The governing constraint, John's:** *"as soon as it's big enough that you have to search
+through it, you're gonna be missing things."* So this stays small enough to read whole, and
+history lives in `docs/notes/` and the archived log.
 
-1. **A finding UPDATES AN OPTION. It never appends an entry.** If you are about to add
-   a numbered heading — `## <next number>` — stop: this is not a log. The finding
-   belongs on an option's state, or in the attempt list under it.
-   `tests/test_goals_consistency.py` fails the build if one appears. *(It caught this
-   very rule when the rule quoted the forbidden heading literally, which is the
-   check working rather than a false alarm.)*
-2. **Every option carries exactly one state marker: ✅ ❌ ⬜ 🔀.** Not two, not none.
-   An option whose status is a matter of interpretation is the thing this document
-   exists to prevent.
-3. **Every ✅ and ❌ cites a decision, a sweep or a note — or says in words that it
-   rests on NO MEASUREMENT.** This is the archived capability ledger's rule carried
-   forward: *a state with no measurement is UNTRIED, never "probably fine."* A ❌ with
-   no citation is a mechanism refused by opinion, and discarding a good idea on an
-   invalid measurement is the most expensive error available.
-4. **Every attempt names the configuration it was measured in.** A refutation is
-   conditional on a config. Decision 74 cost a whole comparison set by forgetting it.
-5. **Every ❌ states its REVIVAL CONDITION** — what would have to be true for it to be
-   worth trying again. Refutations expire; one nobody can date is one nobody can
-   retire.
-6. **Every component section carries a `⇒` verdict line** saying DECIDED or OPEN, with
-   the one-line answer if decided. That line is what makes the document scannable,
-   which is its whole job.
-7. **Update the CENSUS when a state changes.** The checker compares it against the
-   body and fails on a mismatch — that check exists because its predecessor caught its
-   own summary drifting the first time a verdict changed.
-8. **Refutations are exhaustive; confirmations are not.** Every ❌ from the archived
-   log belongs here. An entry that measured something working and changed nothing else
-   is cited where it supports a state and otherwise left in the log.
-9. **When it hits its line budget, trim the NEWEST writing first.** Process narration
-   — which mutation guards which claim, what was learned while building — is true,
-   already in the commit messages and notes, and not what a reader consults this for.
-   A budget that only ever prunes old material protects whoever is writing today.
-10. **Detail lives in the archived log and in `docs/notes/`; this carries the claim
-    and links them.** A measurement belongs to exactly one file, which is its sweep
-    record.
+1. **A finding UPDATES AN OPTION; it never appends an entry.** About to add a numbered
+   heading? Stop — this is not a log. `tests/test_goals_consistency.py` fails the build.
+2. **Exactly one state marker per option: ✅ ❌ ⬜ 🔀.** Not two, not none.
+3. **Every ✅ and ❌ cites a decision, sweep or note, or says it rests on NO MEASUREMENT.**
+   A state with no measurement is UNTRIED, never "probably fine." A ❌ refused by opinion
+   discards a good idea on an invalid measurement — the most expensive error available.
+4. **Every claim names the configuration it was measured in.** Refutations are conditional
+   on a config; `74` cost a whole comparison set by forgetting that.
+5. **Every ❌ states its REVIVAL CONDITION.** Refutations expire, and one nobody can date
+   is one nobody can retire — `107` and `111` both became right later.
+6. **Every component carries a `⇒` verdict line**, DECIDED or OPEN, with the answer if
+   decided. That line is what makes this scannable, which is the job.
+7. **Update the CENSUS when a state changes.** The checker fails on a mismatch.
+8. **Refutations are exhaustive; confirmations are not.** Every ❌ belongs here. Something
+   that worked and changed nothing else is cited where it supports a state.
+9. **At the line budget, trim the NEWEST writing first.** Process narration is true,
+   already in commits and notes, and not what anyone consults this for.
+10. **Detail lives in notes and the log; this carries the claim and links them.** A
+    measurement belongs to exactly one file.
 
 ---
 
@@ -66,31 +50,16 @@ is a convention that drifts.
     ✅ CHOSEN      decided, built, and this is what we use
     ❌ REFUTED     measured and it lost. The revival condition is stated
     ⬜ UNTRIED     no measurement. Not "probably fine"
-    🔀 LIVE BOTH   two or more kept behind a switch, deliberately, and re-tested
-                   as the system changes. A valid END state, not indecision
+    🔀 LIVE BOTH   two or more kept behind a switch and re-tested as the system
+                   changes. A valid END state, not indecision
 
-**Every attempt carries the configuration it was measured in.** A refutation is
-conditional on a config, and decision 74 cost a comparison set by forgetting that:
-sparse keys were measured worse, then a readout change reversed them cleanly. So
-`measured in:` is part of the record, not decoration.
+**CENSUS: 26 chosen, 29 refuted, 14 untried, 13 both, 1 paused.** Checked against the body,
+because a summary that can drift is how its predecessor caught its own counts.
 
-**🔀 exists because refutations expire.** 107 declined a traversal and 111 declined
-search on correct arithmetic; both conditions were measured away later and both
-mechanisms became right. A deleted alternative cannot be re-measured.
-
-**CENSUS: 26 chosen, 29 refuted, 14 untried, 13 both, 1 paused.** Checked against the
-body by `tools/check_decisions.py`, because a summary that can drift from what it
-summarises is how `check_architecture.py` caught its own counts the first time a
-verdict changed.
-
-> **Coverage, stated exactly, because a tree that looks complete and is not is
-> worse than the log.** Every ❌ in the archived log is here — the refutations and
-> the retractions are what this document exists to hold, and re-proposing one is the
-> failure it prevents. **Confirmations are NOT exhaustive:** an entry that measured a
-> mechanism working and changed nothing else is cited where it supports an option's
-> state and otherwise left in the log. That is deliberate. If you want the full
-> chronology of what worked, the log is where it is, and every option here names its
-> entry numbers.
+> **Coverage, stated exactly, because a tree that looks complete and is not is worse than
+> the log.** Every ❌ from the log is here; re-proposing a refuted mechanism is the failure
+> this prevents. **Confirmations are NOT exhaustive** — for the full chronology of what
+> worked, the log is where it is, and every option names its entries.
 
 ---
 
@@ -855,3 +824,17 @@ for stopgaps.**
 - **The endgame is undecided** — commercial, open source, or both — and John holds
   that an AGI used the way current chat agents are used would be immoral.
   Recommendations must not quietly assume an answer.
+- **LEGIBILITY MAY BE SPENT TO REACH THE GOAL — decided by John, 2026-07-30.** This
+  architecture has a property LLMs lack: the route IS the reason, since `beam` returns
+  the walk it actually took, so the explanation and the computation are one object
+  rather than a post-hoc story. A learned similarity geometry is *less* legible than a
+  rule table, so `note 070`'s direction spends some of it. **John's call, in his
+  words:** it is necessary for the goals, he cannot inspect anyone else's brain either,
+  and *"if we don't meet the goals, then it doesn't matter anyway."* Recorded as a
+  decision rather than allowed to happen by default — and the property is worth
+  protecting where it costs nothing, which is most places.
+- **DECISIONS.md must stay readable in ONE pass — John's primary criterion for it.**
+  *"As soon as it's big enough that you have to search through it, you're gonna be
+  missing things."* So: no splitting into two files (two files means reading one and
+  missing the other), current state here, history in `docs/notes/`. Trim toward this,
+  not toward the line budget.

@@ -48,8 +48,9 @@ sys.path.insert(0, str(ROOT))
 from openplexus.models.local_memory import (  # noqa: E402
     LocalAssociativeMemory, LocalMemoryConfig)
 from openplexus.search import beam, search  # noqa: E402
+from openplexus.keys import PairKeys  # noqa: E402
 from openplexus.tasks.clutrr import (  # noqa: E402
-    FACT, RELATIONS, ClutrrConfig, load)
+    FACT, RELATIONS, RESERVED, ClutrrConfig, load)
 
 #: What note 065 reported, per seed. The gate.
 EXPECTED = {
@@ -101,12 +102,26 @@ def true_chain(puzzle, config: ClutrrConfig) -> tuple[int, ...] | None:
 
 
 def recovery(config: ClutrrConfig, seed: int, width: int, branches: int,
-             beam_width: int, decay: float):
-    """Chain recovery for `search` and `beam` over one split."""
+             beam_width: int, decay: float, concept_nodes: int = 0,
+             route: str = "current"):
+    """Chain recovery for `search` and `beam` over one split.
+
+    With `concept_nodes` the traversal reads the ConceptStore the run built, not
+    `_final` — that is one node's view and would report a partitioned model as
+    catastrophically worse while measuring the wrong object.
+    """
     puzzles = load(config)
     model = LocalAssociativeMemory(LocalMemoryConfig(
         vocab_size=config.vocab_size, d_model=width, seed=seed,
-        context_keys=True, derived_keys=True, decay=decay))
+        context_keys=True, derived_keys=True, decay=decay,
+        concept_nodes=concept_nodes))
+    if route != "current":
+        # Assigned after construction rather than through a config flag, which is
+        # the seam `keys.py` argues for in as many words.
+        model.key_source = PairKeys(
+            config.seed if hasattr(config, "seed") else seed,
+            1.0 / np.sqrt(width), width, config.vocab_size,
+            route=route, markers=frozenset(range(RESERVED)))
     allowed = np.arange(config.relation_base,
                         config.relation_base + len(RELATIONS))
 
@@ -121,7 +136,7 @@ def recovery(config: ClutrrConfig, seed: int, width: int, branches: int,
             continue
         scored += 1
         model.run(np.asarray(puzzle.tokens))
-        store = model._final
+        store = model._concepts if model._concepts is not None else model._final
         subject = int(puzzle.tokens[puzzle.query_position - 1])
         target = model.wv[int(puzzle.tokens[puzzle.query_position])]
         args = (store, model.retrieval, model.key_source, model.wv,
@@ -151,18 +166,23 @@ def main() -> int:
     parser.add_argument("--branches", type=int, default=4)
     parser.add_argument("--beam-width", type=int, default=4)
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2])
+    parser.add_argument("--concept-nodes", type=int, default=0,
+                        help="0 is the monolithic baseline this must be read against")
+    parser.add_argument("--route", default="current",
+                        help="PairKeys routing; first-concept is note 073's")
     args = parser.parse_args()
 
     config = ClutrrConfig(root=args.root, split=args.split, layout="kinship")
     print(f"width {args.width}, decay {args.decay}, branches {args.branches}, "
-          f"beam width {args.beam_width}, layout kinship")
+          f"beam width {args.beam_width}, layout kinship, "
+          f"concept_nodes {args.concept_nodes}, route {args.route}")
     print(f"{'seed':>5} {'search':>8} {'beam':>8}   "
           f"{'065 search':>11} {'065 beam':>9}   {'plain':>10}")
     searches, beams = [], []
     for seed in args.seeds:
         got_search, got_beam, plain, plain_n, scored, skipped = recovery(
             config, seed, args.width, args.branches, args.beam_width,
-            args.decay)
+            args.decay, args.concept_nodes, args.route)
         searches.append(got_search)
         beams.append(got_beam)
         want = EXPECTED.get(seed, (float("nan"), float("nan")))

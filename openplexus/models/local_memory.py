@@ -1756,6 +1756,7 @@ class LocalAssociativeMemory:
         #: has been called once. Read by `answer_set` and by nothing in `run` --
         #: see the assignment for why that line matters.
         self._final = None
+        self._concepts = None
         #: How many times consolidation has fired, over the model's whole life.
         #: **Observation only**, like `trace` -- nothing reads it back.
         #:
@@ -3353,6 +3354,20 @@ class LocalAssociativeMemory:
         # so the line between "carried" and "merely visible" is worth keeping
         # sharp: this is assigned on every run and read by nothing here.
         self._final = memory if lasting is None else memory + lasting
+        #: THE PARTITIONED STORE, on the same terms as `_final` above, and it is
+        #: not the same object.
+        #:
+        #: `_final` is whichever node's matrix the last write happened to point
+        #: at — a VIEW, per the routing comment above — so under
+        #: `concept_nodes` it holds one node's bindings and looks exactly like a
+        #: whole store that lost most of its facts. A probe reading it would
+        #: report a partitioned model as catastrophically worse and be measuring
+        #: the wrong object.
+        #:
+        #: `search.py` accepts either a matrix or something with `.matrix()`, so
+        #: a traversal over the real thing needs the store itself. None when
+        #: partitioning is off, which is what a caller should branch on.
+        self._concepts = concepts
         return predictions
 
     def _cliff_candidates(self, entity: int, look: int) -> list[int]:

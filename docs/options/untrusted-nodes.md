@@ -52,3 +52,38 @@ endgame is deliberately open — recommendations must not quietly assume an answ
 
 That is why it is untried rather than deferred: the work is not blocked on effort, it is
 blocked on a decision nobody has made.
+
+### The merge gate is a SYBIL TARGET, and that puts this inside the learning rule
+
+    CONFIG  when    2026-07-30
+            source  note 078, and docs/options/openea.md
+            script  tools/openea_alignment.py
+            task    OpenEA EN_DE_15K_V2, zero supervision
+            model   concepts.Merged driven by mutual nearest neighbours
+            knobs   mutual agreement as the merge gate; confidence gate off
+            scale   15,000 gold links
+
+The two attacks named above are attacks on *storage*. This is an attack on *acquisition*,
+and it is the one that matters more, because it was surfaced by the mechanism the project
+chose on measurement rather than by a hypothetical.
+
+`note 078` established that **mutuality is the merge gate and magnitude is not**: mutual
+nearest neighbours reach **0.3098**, and adding a confidence gate makes it strictly worse —
+**0.2334** at `sim >= 0.9` and **0.0855** at `sim >= 0.98`. The reason it works is that
+mutual best match means *"neither has a better candidate"*, which is a statement about the
+structure of the neighbourhood rather than about any one node's certainty.
+
+**A statement about the structure of a neighbourhood is precisely what a population of
+colluding nodes rewrites.** Enough sybils asserting each other as best candidates
+manufacture mutuality for a pair that has none, and the gate has no second quantity to
+fall back on — the project deliberately removed the one it had, because on honest data the
+confidence gate was *harmful*. So the hardening that would seem obvious is the thing
+already measured to cost accuracy.
+
+That connection is recorded here rather than acted on. It is not a refutation of mutuality,
+which is measured and is the right gate on honest data. It is the statement that
+**component 9's threat model reaches into component 1's acquisition rule**, so a decision
+about the endgame is not only an operational decision — it changes which merge gate is
+admissible.
+
+Nothing is measured against an adversary. No sybil experiment exists.

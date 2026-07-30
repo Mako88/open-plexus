@@ -732,10 +732,21 @@ it has ever been re-litigated, which is the only thing the tree prevents.
   - **The heartbeat is 5 minutes, and its stopping condition is the absence of a clear next
     step** — not the absence of an answer, not the end of a task, and not the arrival of a
     convenient pause. While one exists, the loop stays armed.
-  - **Blocking and harder first.** This is the counter to the gradient CLAUDE.md rule 17
-    names: every audit yields a satisfying provable result and every new mechanism most
-    likely yields a null, so the easy work is always the work that feels productive. Order
-    by what is blocking, then by what is hard — never by what is ready.
+  - **MOST LIKELY TO DISPROVE THE PROJECT, FIRST — John's restatement, 2026-07-30.** This
+    previously read *"blocking and harder first"*, and hard was a proxy for what he
+    actually meant. **The ordering quantity is how likely a question is to show the whole
+    thing cannot work**, not how difficult it is and not what it unblocks. In his words:
+    *"until we've validated the core principles and core ideas of it, that's my top
+    priority... knock out as efficiently as we can the things we need to get to a point
+    where we'll know for sure one way or the other."*
+    - **Tuning is explicitly DEFERRED until the core is proven.** Making a working
+      mechanism better is not a validation step, however much headroom it has.
+    - **Order by kill probability, then by dependency, then by cost.** A cheap question
+      whose answer invalidates an expensive one comes first — the expensive work is
+      wasted if the cheap answer is no.
+    - It remains the counter to the gradient CLAUDE.md rule 17 names: every audit yields a
+      satisfying provable result and every new mechanism most likely yields a null, so the
+      easy work is always the work that feels productive. **Never order by what is ready.**
   - **Decide, do not wait.** The existing blanket permission covered architectural calls;
     this widens it to **any** decision needed to keep moving, with one boundary: it may not
     countermand a goal or constraint already agreed. Record which calls were made alone.

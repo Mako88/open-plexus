@@ -1919,6 +1919,20 @@ MUTATIONS = [
         new="        return previous",
     ),
     Mutation(
+        name="a-traversal-reads-from-the-wrong-node",
+        breaks="the agreement between where a binding was written and where the "
+               "search looks. Hardcoding the current token is the `current` "
+               "route, so under `first-concept` every read goes to a node that "
+               "never received the write. **It does not raise** -- that node "
+               "returns its own superposition, so the walk completes, decodes "
+               "something, and is merely worse. The equivalence test against a "
+               "whole store is the only thing that notices, which is why it "
+               "exists",
+        path=SEARCH,
+        old="        readable.matrix(keys.owner(previous, token)),",
+        new="        readable.matrix(token),",
+    ),
+    Mutation(
         name="the-write-owner-stops-agreeing-with-the-read-owner",
         breaks="the agreement between where a binding is WRITTEN and where a "
                "traversal LOOKS for it. `concept` decides the first and `owner` "

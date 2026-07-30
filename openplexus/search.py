@@ -116,6 +116,32 @@ def _decode(wv: np.ndarray, value: np.ndarray) -> np.ndarray:
     return wv @ value
 
 
+def _reader(readable, retrieval, keys):
+    """One pair read, routed to the node that owns it when the store is split.
+
+    ## Why this exists and why it is ONE function
+
+    Every read in this module goes through here -- ten of them. A partitioned
+    store has no single matrix, so each one has to reach the node that owns the
+    pair it is reading, and `keys.owner` is what says which node that is.
+
+    **The branch is taken once, here, rather than ten times at the read sites.**
+    Ten copies of a routing decision is how nine of them stay right and one
+    quietly reads the wrong store -- and a search that reads the wrong store does
+    not fail, it returns a worse answer, so no test would say so.
+
+    `isinstance` rather than `hasattr`: the two cases are a matrix and a store,
+    both named outright, so a third kind of argument raises instead of being
+    guessed at.
+    """
+    if isinstance(readable, np.ndarray):
+        return lambda previous, token: retrieval.read(
+            readable, keys.pair(previous, token))
+    return lambda previous, token: retrieval.read(
+        readable.matrix(keys.owner(previous, token)),
+        keys.pair(previous, token))
+
+
 def _top(scores: np.ndarray, count: int,
          allowed: np.ndarray | None) -> list[int]:
     """The `count` highest-scoring token ids, best first.
@@ -156,6 +182,8 @@ def walk_from(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     if depth < 1:
         raise ValueError("a walk of depth 0 has nothing to follow")
 
+    read = _reader(readable, retrieval, keys)
+
     relations = [first_relation]
     entities: list[int] = []
     retrieved: list[np.ndarray] = []
@@ -164,21 +192,21 @@ def walk_from(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     # The first relation was handed in, so its retrieval is the one that
     # produced the candidates. Re-read it here rather than threading it through,
     # so a Walk is reproducible from its own inputs.
-    retrieved.append(retrieval.read(readable, keys.pair(fact_token, current)))
+    retrieved.append(read(fact_token, current))
 
     for _ in range(depth - 1):
         # FOLLOW: commit to the relation and find who it reaches.
-        nxt = retrieval.read(readable, keys.pair(current, relations[-1]))
+        nxt = read(current, relations[-1])
         current = int(np.argmax(_decode(wv, nxt)))
         entities.append(current)
         # LOOK UP: that entity's own relation.
-        value = retrieval.read(readable, keys.pair(fact_token, current))
+        value = read(fact_token, current)
         relations.append(int(np.argmax(_decode(wv, value))))
         retrieved.append(value)
 
     # The endpoint is where the LAST relation lands, and it is what the target
     # is compared against.
-    endpoint = retrieval.read(readable, keys.pair(current, relations[-1]))
+    endpoint = read(current, relations[-1])
     return Walk(tuple(relations), tuple(entities), tuple(retrieved),
                 endpoint, 0.0)
 
@@ -202,7 +230,8 @@ def candidates(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     confidence signal reaching 0.628 against 0.500 for guessing, so a signal
     that merely sounds plausible has a poor record here.
     """
-    first = retrieval.read(readable, keys.pair(fact_token, start))
+    read = _reader(readable, retrieval, keys)
+    first = read(fact_token, start)
     scores = _decode(wv, first)
     return [(token, float(scores[token]))
             for token in _top(scores, branches, allowed)]
@@ -356,9 +385,11 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     if width < 1 or branches < 1:
         raise ValueError("width and branches must both be at least 1")
 
+    read = _reader(readable, retrieval, keys)
+
     # A partial walk: entity now, relations committed, values read, entities passed,
     # and the cumulative decode score that pruning ranks on.
-    root = retrieval.read(readable, keys.pair(fact_token, start))
+    root = read(fact_token, start)
     opening = _top(_decode(wv, root), branches, allowed)
     if not opening:
         return []
@@ -369,9 +400,9 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
         grown: list[tuple] = []
         for current, relations, retrieved, entities, cumulative in partial:
             # FOLLOW, exactly as `walk_from` does, so the two are comparable.
-            nxt = retrieval.read(readable, keys.pair(current, relations[-1]))
+            nxt = read(current, relations[-1])
             landed = int(np.argmax(_decode(wv, nxt)))
-            value = retrieval.read(readable, keys.pair(fact_token, landed))
+            value = read(fact_token, landed)
             scores = _decode(wv, value)
             for candidate in _top(scores, branches, allowed):
                 grown.append((landed, relations + (candidate,),
@@ -387,7 +418,7 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
 
     walks = []
     for current, relations, retrieved, entities, _ in partial:
-        endpoint = retrieval.read(readable, keys.pair(current, relations[-1]))
+        endpoint = read(current, relations[-1])
         walks.append(Walk(relations, entities, retrieved, endpoint,
                           float(endpoint @ target)))
     walks.sort(key=lambda w: w.score, reverse=True)

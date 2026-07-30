@@ -8,104 +8,105 @@
 >
 > **Nothing else in the tree may cite this file.** A note, a docstring or a commit that
 > points here makes it load-bearing, and a load-bearing scratch file cannot be thrown
-> away. Cite `DECISIONS.md` or a numbered note instead.
+> away. Cite `DECISIONS.md` or a sweep record instead.
 >
 > **Where things actually live:** decisions → `DECISIONS.md` (the tree, authoritative).
 > An option's history → `docs/options/<name>.md`. A prediction, before a run → the sweep
 > record. A finding about the METHOD → a `CLAUDE.md` calibration. The readable version →
 > `docs/explainers/`. Goal and refutation conditions → `GOALS.md`.
 >
-> **Investigation notes are RETIRED** — all 105 are in `docs/archive/notes/`, which has a
-> README saying why. Do not write a new one; the four homes above cover what they did.
->
-> ## THIS FILE HAS EXISTED BEFORE AND IT FAILED
->
-> `CLAUDE.md` rule 14b's calibration records what happened: a previous file here carried a
-> headline text result for weeks that decision 118 established was an offline backprop
-> probe on frozen features — not prequential, and not the model. A sibling `STATE.md` grew
-> 21 KB → 36 KB in a single session purely by duplicating tables that existed elsewhere.
->
-> **So the rule that matters is not brevity, it is this: NO CLAIM LIVES HERE.** Every
-> number below is a pointer to the file that owns it, and if the two disagree that file
-> wins.
+> **Investigation notes are RETIRED** — all 105 are in `docs/archive/notes/`. Do not write
+> a new one. **NO CLAIM LIVES HERE:** every number below points at the file that owns it,
+> and if the two disagree that file wins.
 
-**Written:** 2026-07-30, end of the session that completed the option-record migration.
+**Written:** 2026-07-30, end of the session that built the first learned relation
+representation.
 
 ---
 
-## The doc restructure is FINISHED
+## THE ORDERING CHANGED, AND IT IS THE MOST IMPORTANT THING ON THIS PAGE
 
-All 86 options are migrated and the notes are retired. `DECISIONS.md` carries a summary
-line and a link per option; `docs/options/` holds the history. **85 records, 277 entries,
-513 measurements**, tree at 761 lines against its 900 budget.
+John restated the standing agreement: **order by what is most likely to DISPROVE the
+project**, not by what is hard and not by what is ready. Tuning a working mechanism is
+explicitly deferred until the core is proven. His words: *"we've done a lot of close
+enough or nearly there or almost there things, and at the end of the day we still have
+these nine things we have to prove out."*
 
-**Read `docs/options/README.md` before writing a record.** It is the format, and its last
-section says what a green check run does NOT mean — which matters more than the format.
+Two companions, both in `DECISIONS.md` standing agreements:
 
-Three checks are new and all three are in CI and the pre-commit list:
+- **Prefer the option that SETTLES the question**, even when harder and slower. A test
+  whose band is too narrow to separate its arms is a "nearly there" wearing an
+  experiment's clothes.
+- **Every option offered to John carries three things:** a plain explanation of what it is
+  and where it sits, pros and cons, and a recommendation with a default. **And never offer
+  an option already known to fail the goals** — put it in the tree as ❌ if it is worth
+  recording, never in a menu.
 
-- **`check_provenance.py`** — every measurement in a record must appear in a source that
-  entry cites. Found seven bad citations during the migration.
-- **`check_explainers.py`** — every explainer in its index, every row resolving.
-- **`check_options.py`** grew a CONFIG-block rule and record-to-record link checking.
+## The kill list, in order
 
-**The thing to know:** `0.9220`, the accuracy case for concept partitioning, was cited to
-a note containing no partitioning measurement at all. **The number was real** and
-reproduces to four decimals in seventy seconds (`note 105`); the pointer was wrong. Six of
-the seven bad citations were correct numbers pointing at the wrong place, which is a class
-no amount of re-reading finds.
+    1  does a relational objective actually buy reasoning      BLOCKED, see below
+    2  can representations be learned by LOCAL rules           FIRST YES TODAY
+    3  does a graph DB / symbolic system already do this       not started
+    4  does a multi-hop walk fit real internet latency         instrument built
+    5  can it learn forever without wrecking itself
+    6  do independent nodes agree what a thing IS
+    7  can it decide what to say, and decline
+    8  can it adjudicate contradictions
+    9  does it survive hostile participants
 
-**Three of the checks had defects that the checks themselves found**, all the same shape —
-a pattern that could not express the failure it was written for, reporting green. Written
-up in each tool's docstring.
+## What happened to #2, which is the live thread
 
-## The open problems, in the order I would take them
+**A local contrastive rule learns relation structure, and it does not need a conserved
+quantity.** Full numbers in `docs/options/structured-relations.md` and
+`experiments/sweeps/g23-01-*.txt`.
 
-**1. Find invariants per SUB-DOMAIN.** The consequence of `note 104`. The displacement
-mechanism needs a conserved quantity and DBpedia has none globally — dimension 0 on both
-graphs, no approximate one either. The replacement question: does some *subset* of a
-graph's relations close consistently? A largest-consistent-subset search rather than a null
-space over all relations — a different computation, unbuilt.
-`tools/invariant_dimension.py` is the instrument to extend.
+- **End task, kinship:** 0.7821 against random filling's 0.6642, +0.1179 paired, **10 of
+  10 seeds**. First mechanism other than generation delta to clear that bar; the one
+  `note 088` refuted scored *below* random. **Predictions were committed at `57f81e7`
+  before the fill mode existed.**
+- **Held-out rules on graphs with no invariant:** 0.3602 at invariant dimension **0**,
+  where `generation_delta` is structurally impossible, and 0.3559 at dimension 2, which
+  that tool refuses. **So `note 104`'s scoping does not bind this mechanism** — which is
+  the old open problem #1, answered from the other side.
 
-**2. Adjudication.** The memory loop still cannot decide which side of a contradiction is
-wrong. Contradiction supplies *wrong* and blame supplies *where* (`note 080`, `note 092`);
-nothing votes. Idea worth testing: concept partitioning means the same binding is reachable
-through differently-interfered stores, so a second opinion need not be a second derivation
-from the same primitives — which is what killed the earlier attempt.
+**Where it is NOT yet:** nothing in the model uses it, so the tree row is still ⬜. The
+graph numbers are **not pre-registered** and are observations. The fold runs over TRUE
+chains — `note 091` says recovering chains costs about 0.11. Determinism on the graphs is
+0.778, so the ceiling is well below 1.0 and unmeasured.
 
-**3. The six `concept_nodes` refusals, which are really four problems.** The `hops > 1`
-refusal in `openplexus/models/local_memory.py` is over-broad, verified by reading the code:
-the hop loop is `for depth in range(0 if searching else ...)`, so with search on the soft
-key it objects to is never built. **The guard should be `hops > 1 and search_branches < 1`**,
-and since `note 103` that condition is the default. Unblocks partitioning *plus* multi-hop,
-which is the configuration C4 needs. Wants a sweep, not just a narrowing.
-The rest: `reward_token` is mechanical, `carry_store` needs a test, `memory_cap` and
-`tag_relative` are **one** design question, `consolidation` needs `lasting` partitioned.
+## Why #1 is blocked, and it is a real finding
 
-**4. Non-logical thought.** Nothing built, no plan, and the one most likely to produce
-something plausible and useless without a steer on what is wanted.
+**This project has no instrument on which the premise test can be run decisively.**
+Closure's usable band is 0.092 (`g14-01`, 8 seeds). CLUTRR's is ~0.285 in one bucket with
+five possible answers and heavy label skew, with the reference below a trivial baseline at
+8 of 9 depths. `g22-01` is built, costed and dispatchable against closure, and would
+probably return "below the resolution of this instrument".
 
-**5. The migrating walk.** Designed and priced, not built. Needs the decode on the peer,
-walk state on the wire, and a rendezvous protocol. `note 102`'s latency figures are
-estimates; `tools/walk_rounds.py` measures the path that exists.
+The band was revised **three times** in one session; `CLAUDE.md` rule 17 says stop
+measuring at that point, publish the bound, and go build. That is why #2 was taken instead.
 
-John asked to **talk problems 1–4 through before more solo building.**
+**The two-layer reference is PARKED.** It was approved on the diagnosis that a one-layer
+model cannot compose — and measurement refuted that: it reaches 0.714 at trained depth. Do
+not build it without a better reason.
+
+## Also new, and both are checks rather than rules
+
+- **`check_rails.py` R6** — every module in `openplexus/` and `tools/` must say in its
+  docstring what it does not duplicate. 65 of 66 violated it on day one and are baselined;
+  it caught its author's own two new files first. `CLAUDE.md` rule 19 gained the clause
+  that was missing: **a negative search result is not a finding until it was a wide one.**
+- **`check_provenance.py` was case-blind** and therefore *weaker locally than in CI*, which
+  is the worst direction. `tests/test_check_provenance.py` asserts the wrong case does not
+  resolve.
 
 ## Process facts
 
-**CI is healthy again.** The `checks` run on `34e9ae9` completed green in 1h4m — the first
-full run including the mutation shards in a long stretch, after every run back to `ac2f4cf`
-was cancelled by the next push. Keep batching commits so a run can land.
-
-**`tools/check_provenance.py` runs in CI** and is in `CLAUDE.md`'s pre-commit list, along
-with `check_decisions` and `check_options`, which were in CI but not in that list.
-
-**John's standing autonomy agreement is recorded** in `DECISIONS.md` standing agreements:
-5-minute heartbeat while a clear next step exists, blocking and harder problems before
-easy ones, and decide rather than wait when he is away.
-
-**The doc work is CLOSED. Do not extend it.** Every remaining item on this page is a
-mechanism question, and the gradient CLAUDE.md rule 17 names points the other way — there
-is always another document to tidy and it always feels productive. If the next session
-opens with a documentation task it has taken the wrong branch.
+- **`peer.py` has never run over an impaired link.** `testbed/run.py` is the verified netem
+  runner and drives the DIMENSION path; notes 094 and 101 both say the harness has never
+  been pointed at the peer path. `openplexus/node_main.py` now has a peer mode and
+  `tools/peer_walk_timing.py` times a walk and refuses a per-round number when rounds do
+  not equal `2*depth`. Neither has run in a container.
+- **No workflow runs docker or netem.** The container work has only ever been driven by
+  hand.
+- **`generation_delta.py` refusing `dim > 1` is a live gap**, not a footnote — the
+  contrastive representation handles that case and it does not.

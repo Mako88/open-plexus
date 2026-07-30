@@ -23,12 +23,74 @@ LOG = (pathlib.Path(__file__).resolve().parent.parent
        / "docs" / "archive" / "goals-results-log.md").read_text(encoding="utf-8")
 
 
-class ItIsMarkedAsHistory(unittest.TestCase):
-    """An archive that does not say it is an archive is just a stale document.
+ARCHIVE = pathlib.Path(__file__).resolve().parent.parent / "docs" / "archive"
 
-    This is the whole point of the 2026-07-28 split: the failure mode was never
-    size, it was a stale claim wearing a current document's authority.
+#: Any of these in the opening of an archived file says "do not read this as current".
+HISTORY = ("ARCHIVED", "This is history", "superseded", "Replaced by")
+
+#: And it has to say where to go instead. A file that says "this is old" and stops
+#: leaves the reader with nothing, which is worse than the stale claim.
+REPLACEMENT = ("DECISIONS.md", "docs/options", "CLAUDE.md", "GOALS.md")
+
+#: How much of the file counts as its opening. Generous: the point is that a reader who
+#: lands here sees it before the content, not that it is in the first sentence.
+HEAD = 900
+
+
+class EveryArchivedFileSaysItIsArchived(unittest.TestCase):
+    """Written over the ENUMERATION rather than over one file, which is rule 12.
+
+    The single-file version of this guard existed for `goals-results-log.md` and passed
+    for weeks. Run over the whole directory on 2026-07-30 it found two failures
+    immediately:
+
+    - `backlog-2026-07-28.md` sent the reader to `STATE.md`, which had not existed since
+      the option tree replaced it. **A dangling pointer at the top of an archive.**
+    - `state-2026-07-29-before-pruning.md` had no header at all and opened with *"This is
+      the only document in this project that is kept current"* — a stale claim wearing a
+      current document's authority, in the archive of the very restructure that fixed
+      that failure.
+
+    Neither would have been found by reading, because nobody reads an archive header;
+    they read past it. Both are fixed in place with the reason beside them rather than
+    quietly, per rule 11's split-do-not-loosen.
+
+    The 105 archived notes are covered by their directory's README rather than
+    individually — a per-file header on each would be 105 copies of one sentence, which
+    rule 9 refuses.
     """
+
+    def files(self):
+        return sorted(ARCHIVE.glob("*.md")) + sorted(ARCHIVE.glob("*/README.md"))
+
+    def test_there_is_something_to_check(self):
+        """A glob that matches nothing passes every assertion below vacuously."""
+        self.assertGreater(len(self.files()), 5)
+
+    def test_each_declares_itself_history(self):
+        for path in self.files():
+            with self.subTest(path=path.name):
+                head = path.read_text(encoding="utf-8")[:HEAD]
+                self.assertTrue(
+                    any(mark.lower() in head.lower() for mark in HISTORY),
+                    f"{path.name} does not say it is archived in its first {HEAD} "
+                    f"characters, so a reader who lands there reads it as current. "
+                    f"That is the failure the split exists to prevent.")
+
+    def test_each_names_where_the_current_state_lives(self):
+        for path in self.files():
+            with self.subTest(path=path.name):
+                head = path.read_text(encoding="utf-8")[:HEAD]
+                self.assertTrue(
+                    any(name in head for name in REPLACEMENT),
+                    f"{path.name} says it is old and does not say what replaced it. "
+                    f"A pointer that rots is why `backlog-2026-07-28.md` sent readers "
+                    f"to STATE.md for a year after it stopped existing.")
+
+
+class ItIsMarkedAsHistory(unittest.TestCase):
+    """The original single-file guard, kept because it names the specific pointer that
+    had to be updated when the three-document structure became one tree."""
 
     def test_the_header_says_not_to_read_it_for_current_state(self):
         self.assertIn("This is history", LOG)

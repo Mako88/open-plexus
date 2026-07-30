@@ -75,6 +75,9 @@ history lives in `docs/archive/notes/` and the archived log.
     ⬜ UNTRIED     no measurement. Not "probably fine"
     🔀 LIVE BOTH   two or more kept behind a switch and re-tested as the system
                    changes. A valid END state, not indecision
+    ⏸ PAUSED      set down without being refuted. Distinct from ❌: no measurement
+                   went against it, so it carries no revival condition — what it
+                   needs is a reason to pick it back up
 
 **CENSUS: 30 chosen, 29 refuted, 15 untried, 11 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.

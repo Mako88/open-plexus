@@ -1,4 +1,18 @@
-# State — open questions and work in flight
+# State — ARCHIVED, superseded 2026-07-29
+
+> **This is history. Do not read it for current state.** `STATE.md` was replaced by the
+> option tree in [DECISIONS.md](../../DECISIONS.md), with an option's history in
+> [docs/options/](../options/). This is the copy taken before that pruning.
+>
+> *The sentence below — "the only document in this project that is kept current" — was
+> true when written and is false now. It is left in place rather than edited, because the
+> point of keeping an archive is to keep what it said. **It is also exactly the failure
+> the archive headers exist to prevent**: a stale claim wearing a current document's
+> authority, sitting at the top of the archive of the restructure that fixed it. It had no
+> header at all until 2026-07-30, when a check written over every file in this directory
+> found it.*
+
+---
 
 **This is the only document in this project that is kept current.** Everything in
 it is either live work, an open question, or a standing agreement. When something

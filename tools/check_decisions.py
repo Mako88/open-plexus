@@ -94,7 +94,22 @@ if hasattr(sys.stdout, "reconfigure"):
 #: The distinction to hold if this comes up again: **trim narration, keep contract.**
 #: A raise for prose about what was learned while building is the thing rule 9 refuses;
 #: a raise for the rules that keep the document usable is the document working.
-MAX_LINES = 780
+#: **RAISED 780 -> 820 on 2026-07-30, deliberately, and this is the third raise so the
+#: reasoning matters more than the number.** The rule is *trim narration, keep contract*
+#: — and what pushed past 780 was neither. It was an external benchmark arriving: notes
+#: 059-065 in one session, a measured floor, a layout decision on two independent
+#: measurements, a per-step decomposition, and a mechanism gain of +0.219. Every line of
+#: it is a citation, a figure, or a refutation condition.
+#:
+#: Five shaving passes were made first, which is the failure this comment exists to
+#: prevent next time: **shaving a line at a time to stay under a budget is how a
+#: document gets worse without anyone deciding to make it worse.** If a raise is
+#: warranted, take it once and say why.
+#:
+#: What would say the budget is wrong rather than tight: confirmations creeping back in
+#: (rule 8 puts those in the log), or process narration about what was learned while
+#: building (rule 9). Neither is what is here.
+MAX_LINES = 820
 
 CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED = "✅", "❌", "⬜", "🔀", "⏸"
 STATES = (CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED)

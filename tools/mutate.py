@@ -849,6 +849,21 @@ MUTATIONS = [
         new="        order[node] = config.entity_base + len(order)",
     ),
     Mutation(
+        name="the-beam-branches-at-the-root-like-the-old-search",
+        breaks="the entire gain, and it reverts the mechanism to the defect note 064 "
+               "diagnosed. Taking one candidate per step instead of `branches` makes "
+               "every step after the root greedy again -- which is exactly what "
+               "`walk_from` does, and what took CLUTRR chain recovery to 0.659 "
+               "instead of 0.873. The beam still runs, still prunes, still returns "
+               "walks sorted by endpoint, and every shape assertion still passes: "
+               "only the per-step alternatives are gone. It would read as `beam` "
+               "being no better than `search`, which is the conclusion note 062 drew "
+               "and note 064 had to withdraw",
+        path=SEARCH,
+        old="            for candidate in _top(scores, branches, allowed):",
+        new="            for candidate in _top(scores, 1, allowed):",
+    ),
+    Mutation(
         name="the-realiser-speaks-only-what-it-can-say-cheapest",
         breaks="the direction of the faithfulness check that catches the flattering "
                "failure. Dropping the set equality leaves only the all() clause, so "
@@ -1722,8 +1737,16 @@ MUTATIONS = [
                "a gate whose sign was wrong and beating the baseline anyway, "
                "which is why the direction gets its own mutation",
         path=SEARCH,
-        old="    walks.sort(key=lambda w: w.score, reverse=True)",
-        new="    walks.sort(key=lambda w: w.score, reverse=False)",
+        # RE-POINTED. `beam` added a second `walks.sort(...)` line identical to this
+        # one, so the target stopped being unique and `--verify` refused -- the same
+        # guard that catches a mutation gone stale, arriving as AMBIGUITY rather than
+        # absence. Anchored to the preceding line, which only `search` has.
+        old="        walks.append(Walk(walk.relations, walk.entities, walk.retrieved,\n"
+            "                          walk.endpoint, score))\n\n"
+            "    walks.sort(key=lambda w: w.score, reverse=True)",
+        new="        walks.append(Walk(walk.relations, walk.entities, walk.retrieved,\n"
+            "                          walk.endpoint, score))\n\n"
+            "    walks.sort(key=lambda w: w.score, reverse=False)",
     ),
     Mutation(
         name="a-write-goes-to-every-node",

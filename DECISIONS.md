@@ -78,7 +78,7 @@ sparse keys were measured worse, then a readout change reversed them cleanly. So
 search on correct arithmetic; both conditions were measured away later and both
 mechanisms became right. A deleted alternative cannot be re-measured.
 
-**CENSUS: 24 chosen, 28 refuted, 13 untried, 13 both, 1 paused.** Checked against the
+**CENSUS: 25 chosen, 28 refuted, 13 untried, 13 both, 1 paused.** Checked against the
 body by `tools/check_decisions.py`, because a summary that can drift from what it
 summarises is how `check_architecture.py` caught its own counts the first time a
 verdict changed.
@@ -346,40 +346,45 @@ path is not chosen.**
   learned chooser is strictly harder.
 - 🔀 **`search.py` beam search** — built, tested, and **deliberately not wired into
   `run`**, labelled as scaffolding so it does not become load-bearing.
-  - `111` **refused first:** the verifier is built from the same noisy retrievals it
-    must adjudicate. `121`/`112`: width does NOT fix retrieval fidelity, **which
-    expired 111's condition**. `122` step 2 at 0.971, ceiling 1.000. `123` proved
-    standalone, beam 4 costs 3.2× the traffic. `129` ambiguity is detectable before
-    searching. `125` traversal is the win (+0.269); search helps only where ambiguity is
-  - `130` the gate pays +0.020 over search-everywhere, and the search line closes
-  - **This is the 🔀 argument in one option:** refused at 111, revived at 121 when
-    its condition was measured away, and it is the reason the switch exists
+  - **The 🔀 argument in one option:** refused at `111` (the verifier is built from the
+    same noisy retrievals it must adjudicate), **revived at `121` when width was
+    measured NOT to fix fidelity**, built at `123`, closed at `130` (+0.020 over
+    search-everywhere) with `125`'s +0.269 traversal win. A refutation that expired
   - **`note 061`: it is what CLUTRR needs, verified against the code.** CLUTRR names
     BOTH endpoints, so 108's missing disambiguator is handed over by the task; `depth`
     is **observable, not fitted** (the story *is* the chain); and `Walk.retrieved` is
     *"what a readout consumes"*
-  - **`note 062`, MEASURED — the traversal pays and the search on top of it does
-    not.** Chain recovery **0.659 overall**, 1.000 at 2–3 hops and 0.361 at 10,
-    monotone. Endpoint scoring does select (0.659 against 0.149 random) **but beam
-    width buys +0.009 for 8× the walks**, because on CLUTRR the story IS a chain so
-    `key(FACT, s)` names ONE relation **0.974** of the time. The failure is **drift,
-    not capacity**, and the collision rows confirm 059 at **0.114 against 0.704**.
-    **Not an end-task number** — a route is not an answer, the readout step is unrun
-  - **`note 064` REVISES 062's reading, and this is the actionable end of the line.**
-    Decomposed per step: the **entity hop is 0.9889 and FLAT** in position and chain
-    length, so the store is not degrading as it fills; the **relation decode is
-    0.9348**, six times the error rate, and it is the only part that varies with
-    position (0.974 at the root, ~0.91 mid-chain). **15% of those reads are on an
-    entity with two or more outgoing edges**, where `key(FACT, e)` is a superposition
-  - **And `walk_from` branches ONLY AT THE ROOT** — every later step is
-    `argmax(_decode(...))`, greedy. So `branches` hedges at the step whose decode is
-    already 0.974 and commits blindly at the steps running 0.906–0.942. **That is the
-    complete explanation of the +0.009**, and it means the search was **measured at the
-    wrong place by its own construction** rather than refuted. The narrow claim is
-    *root-only branching buys nothing* — about the implementation, not about searching
-  - **⇒ ONE CHANGE FOLLOWS: branch at every step, pruned.** Refuted if it fails to beat
-    0.659 by more than seed spread, which would point at `112`'s width limit. A pruned
-    beam is **a different mechanism** — `branches^h` is unaffordable at ten hops
+  - **`note 062`, MEASURED.** Chain recovery **0.659**, 1.000 at 2–3 hops and 0.361 at
+    10, monotone. Endpoint scoring does select (0.659 against 0.149 random) **but beam
+    width bought +0.009 for 8× the walks** — its conclusion *"the search does not pay"*
+    was **narrowed by 064 and overturned by 065**; what stands is the numbers, the
+    **drift-not-capacity** finding, and 059's collision split at **0.114 vs 0.704**
+  - **`note 064` REVISED 062's reading.** Decomposed per step: the **entity hop is
+    0.9889 and FLAT** in position and chain length, so the store is not degrading as it
+    fills; the **relation decode is 0.9348**, six times the error rate, and 15% of those
+    reads land on an entity with two or more outgoing edges where `key(FACT, e)` is a
+    superposition. **And `walk_from` branches ONLY AT THE ROOT** — greedy `argmax`
+    after — so it hedged at the 0.974 step and committed blindly at the 0.906 ones.
+    That is the whole +0.009: **measured at the wrong place by its own construction**,
+    not refuted. The narrow claim is *root-only branching buys nothing*
+- ✅ **`search.beam` — branch at EVERY step, pruned. `note 065`, and it is the largest
+  single mechanism gain in this project's record.**
+  - **0.6614 → 0.8805 chain recovery, +0.2190 against a seed spread of 0.0113** — 20×
+    the noise, same sign on all three seeds. 064's refutation condition (*fails to beat
+    0.659 by more than seed spread*) is not met by a wide margin
+  - **On note 059's plain subset it is 713/713 = 1.000, every seed.** The mechanism is
+    not merely better, it is **exhausted** where the addressing is sound. The residue
+    is the 433 collided rows at ~0.68, consistent with `103`/`104`'s repeated-entity
+    line and the part `157`'s layout could not reach
+  - Gain **concentrated at depth** as 064 predicted: nothing at 2–3 hops, +0.34 at
+    eight and nine. **Cost 4× the reads** (`width × branches × depth`); unpruned is
+    `branches^h`, a million walks at ten hops, so pruning is what makes it exist.
+    Whether 4× is acceptable is a **G4 question, unanswered** — `123` had beam 4 at
+    3.2× on kinship. **`search` is untouched** as the comparison (rule 14c); mutation
+    `the-beam-branches-at-the-root-like-the-old-search` reverts the defect
+  - **⇒ AND IT CORRECTS `note 063`:** that note put the ceiling on route-finding rather
+    than naming, which was right at 0.659 and is **wrong now** — the route is solved on
+    the plain subset, so **the fold over pairwise rules is the next work after all**
 - ✅ **A hop REPLACES a retrieval, it does not combine with it** — `101`. `102` built
   the accumulator and recorded that the stated reason for choosing it was wrong.
 - ❌ **Another mechanism stacked on noisy retrieval** — four tried, all failed

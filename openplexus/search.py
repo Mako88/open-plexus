@@ -290,6 +290,110 @@ def search(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     return walks
 
 
+def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
+         fact_token: int, start: int, target: np.ndarray, depth: int,
+         width: int = 4, branches: int = 4,
+         allowed: np.ndarray | None = None) -> list[Walk]:
+    """Search branching at EVERY step, not only the root.
+
+    ## Why this exists, measured
+
+    [Note 064](../docs/notes/064-the-search-branches-at-the-one-step-that-does-not-need-it.md)
+    decomposed the walk on CLUTRR and found the two halves have very different error
+    rates:
+
+        entity hop        0.9889   flat in position and in chain length
+        relation decode   0.9348   0.974 at the root, ~0.91 mid-chain
+
+    and that 15% of the relation-decode reads land on an entity with two or more
+    outgoing edges, where `key(FACT, e)` holds a **sum** of relations.
+
+    **`search` hedges only at the root**, because `walk_from` commits to
+    `first_relation` and then takes `argmax` at every later step. So it widens the
+    search where the decode is already 0.974 and commits blindly where it is 0.906.
+    That is the whole of why beam width 1 to 8 moved chain recovery 0.650 to 0.659:
+    **the mechanism was measured at the wrong place by its own construction**, not
+    refuted.
+
+    ## What it does
+
+    Standard beam, with the two scores kept apart because they answer different
+    questions:
+
+        expand    each surviving partial walk by the top `branches` relations
+        prune     to `width` survivors by CUMULATIVE DECODE score
+        select    finally by the ENDPOINT, against `target`
+
+    **Pruning cannot use the endpoint**, which is only available once a walk is
+    finished — so mid-walk it uses the local decode, which decision 93 measured as a
+    poor *confidence* signal. That is tolerable here and not a contradiction: the
+    decode is being used to decide **which partial walks are worth continuing**, not
+    to decide which answer is right. The endpoint still makes the final call, exactly
+    as in `search`.
+
+    ## Cost, stated because it is the reason this is not simply better
+
+    `branches ** depth` walks unpruned, which at ten hops and four branches is a
+    million. `width` is what makes it affordable: cost is
+    `width * branches * depth` reads, so 160 at width 4, branches 4, depth 10 —
+    against `search`'s 4 walks of 10 steps. **Roughly four times the reads**, and
+    whether that buys anything is the measurement, not an assumption.
+
+    Args:
+        width: Partial walks kept after each prune. `1` is greedy-with-lookahead and
+            is the control that isolates pruning from branching.
+        branches: Relation candidates tried per step.
+
+    Returns:
+        Walks sorted best first by endpoint score, same contract as `search`.
+    """
+    if not hasattr(keys, "pair"):
+        raise ValueError(
+            "beam needs PairKeys, for the same reason search does: a walk keys on "
+            "(entity, relation) and a single-token table has no such key")
+    if depth < 1:
+        raise ValueError("a beam of depth 0 has nothing to follow")
+    if width < 1 or branches < 1:
+        raise ValueError("width and branches must both be at least 1")
+
+    # A partial walk: entity now, relations committed, values read, entities passed,
+    # and the cumulative decode score that pruning ranks on.
+    root = retrieval.read(readable, keys.pair(fact_token, start))
+    opening = _top(_decode(wv, root), branches, allowed)
+    if not opening:
+        return []
+    partial = [(start, (r,), (root,), (), float(_decode(wv, root)[r]))
+               for r in opening]
+
+    for _ in range(depth - 1):
+        grown: list[tuple] = []
+        for current, relations, retrieved, entities, cumulative in partial:
+            # FOLLOW, exactly as `walk_from` does, so the two are comparable.
+            nxt = retrieval.read(readable, keys.pair(current, relations[-1]))
+            landed = int(np.argmax(_decode(wv, nxt)))
+            value = retrieval.read(readable, keys.pair(fact_token, landed))
+            scores = _decode(wv, value)
+            for candidate in _top(scores, branches, allowed):
+                grown.append((landed, relations + (candidate,),
+                              retrieved + (value,), entities + (landed,),
+                              cumulative + float(scores[candidate])))
+        if not grown:
+            break
+        # PRUNE. Sorting by cumulative decode rather than by anything involving the
+        # target, because using the target here would let the answer choose the
+        # route -- which is the circularity decision 143 records one level up.
+        grown.sort(key=lambda item: item[4], reverse=True)
+        partial = grown[:width]
+
+    walks = []
+    for current, relations, retrieved, entities, _ in partial:
+        endpoint = retrieval.read(readable, keys.pair(current, relations[-1]))
+        walks.append(Walk(relations, entities, retrieved, endpoint,
+                          float(endpoint @ target)))
+    walks.sort(key=lambda w: w.score, reverse=True)
+    return walks
+
+
 def margin(walks: list[Walk]) -> float:
     """How decisively the best walk beat the runner-up.
 

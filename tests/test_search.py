@@ -32,7 +32,7 @@ import numpy as np
 
 from openplexus.keys import PairKeys, TableKeys
 from openplexus.retrieval import SuperposedRead
-from openplexus.search import margin, search, walk_from
+from openplexus.search import beam, margin, search, walk_from
 
 WIDTH = 256
 VOCAB = 40
@@ -163,6 +163,93 @@ class TheAmbiguousCaseIsWhereSearchEarnsItsPlace(unittest.TestCase):
         question."""
         walks = self.fixture.find(ALICE, DAVE, depth=2, branches=3)
         self.assertEqual(walks[0].relations[0], FRIEND)
+
+
+class BranchingAtEVERYStepNotOnlyTheRoot(unittest.TestCase):
+    """`beam`, and note 064 is why it exists.
+
+    `search` commits to a first relation and then takes `argmax` at every later step,
+    so it hedges only at the root. On CLUTRR that root decode is 0.974 while the later
+    ones run 0.906–0.942 — the hedging was spent where it was not needed. Branching per
+    step took chain recovery **0.659 → 0.873**, entirely at depth.
+
+    The load-bearing test here is `test_the_degenerate_beam_IS_the_greedy_walk`. If a
+    one-wide one-branch beam were not the same walk as greedy, every comparison between
+    the two mechanisms would be measuring an unrelated difference.
+    """
+
+    #: Two facts about the same subject, the wrong one written louder, so a greedy
+    #: decode takes the loud branch and only branching can recover. Placed at the
+    #: SECOND step, which is exactly where `search` cannot hedge.
+    START, MID, GOOD, BAD, END = 1, 2, 3, 4, 5
+    LOUD, QUIET, FIRST = 11, 12, 13
+
+    def setUp(self):
+        self.f = Fixture()
+        # step 1: START --FIRST--> MID, unambiguous.
+        self.f.state_fact(self.START, self.FIRST, self.MID)
+        # step 2: MID has two relations and the WRONG one is louder.
+        self.f.bind(FACT, self.MID, self.LOUD, weight=1.6)
+        self.f.bind(FACT, self.MID, self.QUIET, weight=1.0)
+        self.f.bind(self.MID, self.LOUD, self.BAD)
+        self.f.bind(self.MID, self.QUIET, self.GOOD)
+
+    def run_beam(self, width, branches, target):
+        return beam(self.f.store, self.f.retrieval, self.f.keys, self.f.wv,
+                    FACT, self.START, self.f.wv[target], 2,
+                    width=width, branches=branches)
+
+    def test_the_degenerate_beam_IS_the_greedy_walk(self):
+        # THE GATE. width 1, branches 1 must reproduce `search(branches=1)` exactly,
+        # or the two mechanisms are not comparable and every number is suspect.
+        greedy = self.f.find(self.START, self.GOOD, 2, 1)
+        degenerate = self.run_beam(1, 1, self.GOOD)
+        self.assertEqual(degenerate[0].relations, greedy[0].relations)
+        self.assertEqual(degenerate[0].entities, greedy[0].entities)
+
+    def test_root_only_branching_cannot_reach_the_quiet_second_step(self):
+        # `search` with four branches still fails, because its branching is at the
+        # root and the ambiguity is at step two. This is note 064's finding as a test.
+        walks = self.f.find(self.START, self.GOOD, 2, 4)
+        self.assertEqual(walks[0].relations[1], self.LOUD)
+
+    def test_per_step_branching_reaches_it(self):
+        walks = self.run_beam(4, 4, self.GOOD)
+        self.assertEqual(walks[0].relations[1], self.QUIET)
+
+    def test_and_still_prefers_the_loud_branch_when_THAT_is_the_target(self):
+        # The companion. If the beam always returned the quiet branch it would be
+        # broken in a way the test above cannot see.
+        walks = self.run_beam(4, 4, self.BAD)
+        self.assertEqual(walks[0].relations[1], self.LOUD)
+
+    def test_pruning_alone_buys_nothing(self):
+        # THE FALSIFIER, and it fired on CLUTRR too: width 4 with one branch has
+        # nothing to choose between, so it must not beat greedy. Without this the
+        # gain could be attributed to keeping partials rather than to branching.
+        wide = self.run_beam(4, 1, self.GOOD)
+        greedy = self.run_beam(1, 1, self.GOOD)
+        self.assertEqual(wide[0].relations, greedy[0].relations)
+
+    def test_the_walk_shape_matches_search(self):
+        walks = self.run_beam(4, 4, self.GOOD)
+        self.assertEqual(len(walks[0].relations), 2)
+        self.assertEqual(len(walks[0].retrieved), 2)
+        self.assertEqual(len(walks[0].entities), 1)
+
+    def test_it_refuses_what_search_refuses(self):
+        for kwargs in (dict(width=0, branches=1), dict(width=1, branches=0)):
+            with self.subTest(**kwargs):
+                with self.assertRaises(ValueError):
+                    beam(self.f.store, self.f.retrieval, self.f.keys, self.f.wv,
+                         FACT, self.START, self.f.wv[self.GOOD], 2, **kwargs)
+        with self.assertRaises(ValueError):
+            beam(self.f.store, self.f.retrieval, self.f.keys, self.f.wv, FACT,
+                 self.START, self.f.wv[self.GOOD], 0)
+        with self.assertRaises(ValueError):
+            beam(self.f.store, self.f.retrieval,
+                 TableKeys(np.zeros((VOCAB, WIDTH))), self.f.wv, FACT,
+                 self.START, self.f.wv[self.GOOD], 2)
 
 
 class ItRefusesWhatItCannotDo(unittest.TestCase):

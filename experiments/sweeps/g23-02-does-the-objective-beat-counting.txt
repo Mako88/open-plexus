@@ -1,0 +1,118 @@
+Does the contrastive OBJECTIVE beat plain counting, on graphs?
+===============================================================
+
+Script: tools/relation_contrastive.py --graph <path> --counted-arm  (to be added)
+Status: NOT RUN. Prediction registered and COMMITTED before the arm exists.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+Yesterday's result: a learned representation guesses missing relationship rules
+much better than chance, on two big real-world knowledge graphs.
+
+The obvious question, and the one that would deflate it: **would simply counting
+do just as well?** No learning, no objective, no gradient -- just "when this
+relationship appears, what usually follows it?"
+
+If counting matches the learned version, the learning is decoration and the
+result is about the data having easy statistics, not about a representation being
+learned.
+
+This project has been here before and the counting version won that time.
+
+
+WHY THIS EXISTS
+----------------
+`DECISIONS.md` kill-list item 3 is *"does a graph database or symbolic system
+already do this"*, and John's instruction is to be **delighted** when a
+conventional system wins cheaply, because that says which parts do not need
+learning.
+
+The contrastive result on graphs (`docs/options/structured-relations.md`,
+2026-07-30) is:
+
+    EN_DE_15K_V2/rel_triples_1   dim 0   contrastive 0.3602   majority 0.0942
+    D_W_15K_V1/rel_triples_1     dim 2   contrastive 0.3559   majority 0.0559
+
+**The majority arm is a weak opponent** -- it ignores the question entirely and
+answers the same relation every time. Counting is the strong cheap opponent and
+it has not been run.
+
+**And on CLUTRR, counting was the incumbent.** `tools/relation_profiles.py` builds
+relation vectors by counting attachments and reaches 0.223 on note 070's split,
+against the contrastive rule's 0.244 -- close enough that on THAT task the
+objective bought little. Whether the gap is bigger on a real graph is the
+question.
+
+
+THE COUNTED ARM, DEFINED BEFORE IT IS RUN
+-------------------------------------------
+For a held-out pair `(r1, r2)`, predict, in order:
+
+    1. the commonest r3 among TRAINING rules whose first element is r1
+    2. failing that, the commonest r3 among training rules whose second is r2
+    3. failing that, the global commonest r3
+
+No learning, no vectors, no gradient. It sees exactly the same training rules the
+contrastive arm sees, so a difference is the objective and not the data.
+
+**Specified here rather than after the numbers**, because a counting baseline has
+many reasonable definitions and picking the one that loses is the easiest
+unconscious cheat available.
+
+
+PREDICTIONS
+-----------
+  P1  THE TEST. `counted` scores BELOW `contrastive` on both graphs.
+
+      Refuted if it matches or beats it. **A refutation means the objective is
+      decoration** and the graph result is about easy statistics rather than a
+      learned representation -- which would take the row back to where note 088
+      left it.
+
+  P2  `counted` beats the `majority` arm on both graphs.
+
+      If it does not, the counted arm is broken rather than weak, and P1 is
+      unreadable. This is the gate.
+
+  P3  The gap between `counted` and `contrastive` is LARGER on the graphs than
+      the 0.223-against-0.244 seen on CLUTRR.
+
+      The reason to expect it: CLUTRR has 20 relations and a near-deterministic
+      rule table, so counting has little room to be wrong. These graphs have 169
+      and 248 relations at determinism 0.778, where a first-order count should
+      degrade faster than a representation that composes.
+
+  P4  THE ONE I AM LEAST SURE OF. `counted` lands above 0.20 -- i.e. it is a
+      genuinely strong baseline rather than a formality.
+
+      Registered because if counting reaches 0.30 against contrastive's 0.36,
+      the honest headline is "a bit better than counting", not "learned
+      representation works". I would rather have committed to that in advance
+      than choose the framing afterwards.
+
+
+WHAT WOULD MAKE THIS NOT COUNT
+--------------------------------
+**The two arms must see identical training rules.** Same seed, same permutation,
+same 75/25 split, same items. Anything else compares a split rather than a
+mechanism.
+
+**No tuning of either.** The contrastive knobs are already carried from the
+rule-prediction task and stay carried; the counted arm has no knobs by
+construction, which is part of why it is the fair opponent.
+
+
+COST
+----
+Seconds. The counted arm is two dictionaries and the contrastive numbers already
+exist. Local, no dispatch.
+
+
+MEASURED ON
+-----------
+`EN_DE_15K_V2/rel_triples_1` (invariant dimension 0) and
+`D_W_15K_V1/rel_triples_1` (dimension 2), 5 seeds, 75/25 rule split, scored by
+exact match on the held-out pair's modal relation.

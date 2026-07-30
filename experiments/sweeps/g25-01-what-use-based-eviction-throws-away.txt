@@ -2,9 +2,11 @@ What does use-based eviction throw away?
 =========================================
 
 Script: experiments/g25_01_dormant_facts.py  (to be written)
-Status: NOT RUN. Predictions registered and committed before the script exists.
+Status: FIRST RUN VOID -- P1, the control, failed. Predictions were registered
+        and committed at 51b3b00 before the script existed and are unchanged.
 
-ANSWER: pending.
+ANSWER: pending. The dormant column is NOT reported, because the control that
+makes it readable did not hold.
 
 
 IN PLAIN TERMS
@@ -130,3 +132,53 @@ MEASURED ON
 -----------
 A stream of 4,000 facts through 150 slots, 3 seeds, matching note 083's
 parameters exactly so the control arms are comparable.
+
+
+THE FIRST RUN, AND WHY ITS NUMBERS ARE NOT REPORTED
+------------------------------------------------------
+              policy   persistent   abandoned   dormant
+              random        0.000       0.000     0.000
+        least-recent        0.000       0.000     0.000
+      least-frequent        0.660       0.423     0.000
+
+**P1 is refuted, so nothing else here is readable** -- note 083 measures random at
+0.717 / 0.783 and least-recent at 1.000 / 0.500, and this reproduces neither.
+Recorded because a void run is a result about the harness and deleting it would
+lose the reason.
+
+Instrumented, the persistent class decays monotonically: 100 held at index 149,
+19 at 299, 1 at 999, 0 at 2000. **Once a fact is evicted, a query that misses does
+not restore it**, so the population can only fall.
+
+## And note 083's design cannot be reconstructed from note 083
+
+Reading it properly is what settled this, and the note says two things that
+matter:
+
+    the fast store   a sharp recent window
+    promotion        what proved right gets copied OUT of the window
+
+**The 150 slots are a PROMOTED store, not the stream.** Only queried facts are
+ever promoted, which is why filler never competes for a slot and why abandoned
+settles at exactly 50 of 100 -- 150 slots minus the 100 persistent. This harness
+wrote every streaming fact straight into the bounded store, which is a different
+mechanism wearing the same name.
+
+**So the DORMANT question has a structural answer rather than an empirical one,
+and it is sharper than the horse race this file was designed around:** a fact
+that is never queried is never promoted, so it never enters the durable store at
+all. Not evicted from it -- never in it. That is note 082's cost, which note 083
+names as *"unchanged and unpaid here"*, and it is a property of promotion gating
+rather than of any eviction policy.
+
+**P2 and P3 are therefore mis-specified**, not merely unmeasured: they compare
+eviction policies on a class that eviction never sees. P4 was closer than it
+deserved to be -- it predicted "near zero", and the reason is that the class is
+absent rather than discarded.
+
+**What the redesign has to be.** Two stores, promotion gated on use, and the
+question becomes what a promotion gate costs rather than what an eviction policy
+throws away. `LocalMemoryConfig.capture_slots` is the real mechanism and note 083
+explicitly did NOT exercise it -- *"this reimplements the idea rather than
+exercising that code"* -- so a rebuild should use it rather than write a third
+fixture.

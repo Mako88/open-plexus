@@ -779,6 +779,35 @@ it has ever been re-litigated, which is the only thing the tree prevents.
   tree as a ❌ with the reason if it is worth recording that it was considered; do not
   put it in a list he is asked to pick from. **An invalid option in a menu costs him
   the time to evaluate it and risks him picking it.**
+- **CHECKPOINT ONTO A BRANCH SO A CI RUN CAN FINISH — John, 2026-07-30, and it is a
+  recurring failure rather than a one-off.** `checks.yml` uses
+  `concurrency: checks-${{ github.ref }}`, which is **per ref**, so a push to a branch
+  cannot cancel master's run and vice versa. The mechanism was already there; the fault
+  was pushing the same ref repeatedly.
+  - **At a checkpoint, push a `checkpoint/<date>-<n>` branch and leave it alone.** That
+    run completes uninterrupted while work continues on master.
+  - **Measured, and it is why this is a rule:** on 2026-07-30 **eight consecutive `checks`
+    runs were cancelled**, so the six mutation shards — which run ONLY in CI — did not
+    execute once across a session that changed four modules. `--verify` passing is not the
+    same check: it asserts the original text is present, not that the suite would notice a
+    mechanism breaking.
+  - The existing "batch related work into one commit" rule was written about a **sweep**
+    being starved. It did not fire here because no sweep was in flight, so each push looked
+    free. **`checks` is the thing being starved, and it is starved by ordinary commits.**
+- **LATENCY: `d_max` IS A CHURN TIMEOUT, NOT A LATENCY BUDGET — my call, 2026-07-30,
+  recorded because it corrects how I had been reporting.** Decision 128 derived 640 ms as
+  3× a measured p99, following SWIM's rule for declaring a node dead rather than slow.
+  **It was never derived from a user requirement**, and `g24-01` reported "OVER" against it
+  as though exceeding it were failure. It is not: it is the point at which a peer is
+  treated as gone.
+  - **The two requirements are separate.** A walk must survive a machine leaving
+    mid-walk — that is what a timeout is for. And an answer must arrive within whatever
+    the use case tolerates, **which has never been stated**.
+  - John's framing: the endgame is not chat-shaped, so interactive latency may not be the
+    requirement at all. At 161 ms a round, depth 10 is ~3.2 s.
+  - **So `d_max` stays as the churn timeout and stops being quoted as a deadline on
+    answers.** Depth results are reported in seconds against a stated budget, and until
+    John states one, no depth is called a failure. **Revisit if interactive use returns.**
 - **Explain plainly, keep the numbers, do not hide bad news.**
 - **Goal ordering:** AGI is primary; being an LLM replacement on consumer machines
   is secondary and must not compete with it.

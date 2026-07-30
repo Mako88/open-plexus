@@ -648,9 +648,13 @@ not on. The readout still violates C1.**
     **100.0% of CLUTRR's 7,132 traversal bindings are owned by a relation** (`sister`
     alone 20.2%) against 0.0% under `closure`. Both options were chosen alone and the
     *pair* is the defect — `157` picked kinship for a 4.7× collision reduction without
-    ownership in view. **Worse than the 16-node dimension ceiling it exists to fix.** Four
-    unequal fixes in the note; **routing by the NUMEROUS side of the pair** is the
-    principled one and is untried. `Ring.balance` has been pointed at neither layout
+    ownership in view. **Worse than the 16-node dimension ceiling it exists to fix**
+  - **FIXED by `note 073`, one line, NOT YET IMPLEMENTED: route by the first CONCEPT of
+    the pair**, skipping markers. **0.0% relation-owned and 100% coherent under BOTH
+    layouts**, so ownership stops depending on the ordering and `157` stops trading
+    against distribution. It refutes three of 072's four candidates and finds that
+    **`current` is 0.0% coherent under `closure` too**, which `PairKeys.concept`'s
+    docstring claims it is not. Held for its own commit: it moves `134`'s baseline
   - **And `docs/SCALE.md`: bandwidth scales with WIDTH**, so dimension splitting must grow
     `d` to buy capacity (832 KB per message at Wikidata scale, ~266 MB per query) where
     concept splitting holds `d` at 512 and adds nodes (~640 KB per query). *arithmetic on

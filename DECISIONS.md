@@ -406,9 +406,28 @@ path is not chosen.**
     of adjacent PAIRS are. So a readout over a concatenated chain must generalise to
     what it never saw; a **fold over pairwise rules** only asks what it was trained on,
     median 144 times each. **That is the difference between a learnable problem and an
-    unlearnable one**, and it is what `bind` was kept for. **Not licensed:** removing
-    `concat`, or claiming the fold works — the intermediate compositions are
-    **unlabelled**, so a fold must discover them from the endpoint
+    unlearnable one**, and it is what `bind` was kept for
+  - **`note 066` CORRECTS 063 in BOTH directions, measured symbolically.** 063 feared
+    the intermediates were unlabelled — **they are not**: a 2-hop puzzle's answer *is* a
+    labelled pairwise rule (4,076 of them, 62 unambiguous), and 3-hop puzzles then label
+    `(derived, base)` from those, so the task supplies its own curriculum. But 063 also
+    read 6.6% unseen *stated* pairs as near-full coverage, and the fold asks for
+    `(accumulated, next)` where the accumulated side is **derived** — a different
+    population: **120 asked for, 97 derivable**, converging after two bootstrap rounds
+  - **The fold is right 98.8% of the time it can act** (596 of 603), against 0.42%
+    irreducible ambiguity — the mechanism is sound. **It completes only 52.6%**, and
+    that is tabulation's ceiling rather than the fold's error: longer chains compose
+    more times and hit a missing rule (1.000 at two hops, 0.218 at ten)
+  - **⇒ THE BOTTLENECK MOVED TWICE IN ONE EVENING** — 063 put it on route-finding, 065
+    solved the route and moved it to naming, 066 puts it on **the rules available to
+    name with**: not a mechanism, but the training data's coverage of a space CLUTRR
+    deliberately does not cover
+  - **⇒ AND IT IS THE FIRST MEASURED ARGUMENT FOR A LEARNED REPRESENTATION OVER A
+    LOOKUP.** 97 rules is everything derivable, so beating 52% needs composition that
+    generalises its own structure — knowing `aunt` behaves like `parent's sister`
+    without having seen `aunt-then-X`. **That is where `bind` was headed:** one rule
+    composing any two vectors, which a table cannot do. Unexplained and recorded rather
+    than smoothed: the **3-hop cell (0.524) is below the 4-hop cell (0.732)**
 - ⬜ **`index_at_hops` combined with the position-level index** — `159`/`160`/`161`
   built the pieces; `154` measured that the guard's premise is false (a hop key
   sits at cosine **0.96** to a single token's row, so it *does* name a concept).

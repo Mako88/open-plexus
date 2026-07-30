@@ -1,0 +1,17 @@
+{
+  "docs/options/a-better-index.md": [],
+  "docs/options/beam-search.md": [],
+  "docs/options/by-concept.md": [],
+  "docs/options/concept-partitioning.md": [],
+  "docs/options/content-derived-entity-keys.md": [],
+  "docs/options/continuous-vector-addressing.md": [],
+  "docs/options/discrete-surface-ids.md": [],
+  "docs/options/learned-codebook.md": [],
+  "docs/options/merged-concepts.md": [],
+  "docs/options/pair-keys.md": [],
+  "docs/options/per-node-codebooks.md": [],
+  "docs/options/structured-relations.md": [
+    "A structured vector in the ADDRESS needs the gate — `note 071` :: 0.0005"
+  ],
+  "docs/options/table-keys.md": []
+}

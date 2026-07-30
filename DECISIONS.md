@@ -47,7 +47,13 @@ history lives in `docs/notes/` and the archived log.
     measurement belongs to exactly one file. An option's history goes in
     `docs/options/<name>.md`: what was tried, **the state of the model when it was
     tried**, and what came back — and **no status**, which lives only here.
-    `tools/check_options.py` enforces the split.
+    `tools/check_options.py` enforces the split, and
+    [docs/options/README.md](docs/options/README.md) is the format. Every entry carries a
+    seven-key **CONFIG block** — `when source script task model knobs scale`, with
+    `unrecorded` written rather than a line dropped — and
+    `tools/check_provenance.py` requires every measurement in it to appear in a source
+    that entry cites. That check found `0.9220` cited to a note that does not contain it
+    ([note 105](docs/notes/105-the-partitioning-accuracy-figure-has-no-source.md)).
 11. **When first creating an option's record, SCAN THE ARCHIVE for it.** John's
     instruction, 2026-07-30, and the reason is that a record starting empty invites
     re-running work that `docs/notes/`, `docs/archive/` and the source already answer —
@@ -87,44 +93,34 @@ not the category.
 **⇒ DECIDED at the category level (163 §1): discrete ids, produced at the edge,
 outside the learning loop.** Nothing non-text is built.
 
-- ✅ **Discrete surface ids** — every input becomes a concept id. Keeps exact
-  addressing, the structurally-zero gate, and the sketch, all of which rest on
-  identity. Field precedent: VQ-VAE, discrete audio codecs.
-  - `163 §1` John accepted. Targets: video, audio, text, images; PDFs enter as
-    text. *measured in:* no measurement — a design ruling on 052 §1's analysis
-  - Cost named at the time: a stock encoder is a large pretrained model in the
-    pipeline, so *"our system plus a pretrained encoder"* is a different claim
+- ✅ **Discrete surface ids** — every input becomes a concept id, quantised at the edge.
+  Keeps exact addressing, the structurally-zero gate and the sketch, all of which rest on
+  identity. Targets video, audio, text and images; PDFs enter as text. `163 §1` John's
+  ruling on note 052 §1's blast-radius argument, *no measurement*. Cost named at the time:
+  *"our system plus a pretrained encoder"* is a different claim from *"our system"*.
+  → record: [discrete-surface-ids.md](docs/options/discrete-surface-ids.md)
 - ❌ **Address the store by continuous vector** — refuted on blast radius, not on a
-  number. Destroys exact addressing (interference is `O(N·ρ)` and similar images
-  raise ρ by construction), the gate's structurally-zero bar becomes a tuned
-  threshold, and `AddressSketch` needs exact repeats to collide.
-  - `052 §1` reasoned, not measured. **Revival condition:** a task where
-    similar-things-must-share-an-address beats exact separation.
-- ⬜ **Codebook learned by us, append-only** — new distinctions get NEW ids;
-  existing ids never move, so nothing is re-addressed. The occupancy gate already
-  answers *"was anything ever written here"* with a structural zero, which is a
-  novelty detector — so minting a concept on novelty is reachable with parts that
-  exist and are measured (148).
-  - John raised this 2026-07-29. **Split it honestly:** the codebook (which
-    concepts exist) is ours; the FEATURE SPACE (what makes two images similar at
-    all) is where off-the-shelf earns its place.
-- ⬜ **Per-node codebooks plus translation between them** — refused rather than
-  untried: aligning two independently-learned discrete spaces with no paired data
-  is the unsupervised-translation problem, strictly harder than the project's goal.
-  Solving it as a *precondition* is the wrong order.
-  - [note 053](docs/notes/053-two-nodes-must-agree-on-what-a-picture-is.md)
-- ✅ **`concepts.Merged` — the MERGE direction, built, and it does NOT move `of`.** The
-  obvious design (remap the loser's surfaces) strands every binding it means to preserve,
-  because `ByConcept` builds the key from the concept id. So writes always land on a
-  surface's own concept and the merge is a **read-side** gather over `aliases()`. Cost is
-  `k` reads at `k` addresses for a class of `k`; a later lazy consolidation shrinks it
-  without breaking a read, which re-keying cannot promise.
-  - **Union by MINIMUM id, not by rank** — rank makes the representative depend on arrival
-    order, and `Surfaces.of` promises the same answer on every node forever. Minimum makes
-    it a property of the merge SET, so **propagation is lazy and needs no coordinator**
-  - **A late merge is a MISS, never a corruption**, and un-merging is free: `of` never
-    moved, so dropping an alias strands nothing. 19 tests, 2 mutations
-  - **What drives it:** `note 077`/`078` — mutual agreement, not a confidence threshold
+  number. Destroys exact addressing (`O(N·ρ)`, and similar images raise ρ by
+  construction), the gate's structurally-zero bar, and the sketch's need for exact
+  repeats. `052 §1` reasoned, not measured. **Revival:** a task where
+  similar-things-must-share-an-address beats exact separation.
+  → record: [continuous-vector-addressing.md](docs/options/continuous-vector-addressing.md)
+- ⬜ **Codebook learned by us, append-only** — new distinctions get NEW ids; existing ids
+  never move. The occupancy gate is already a novelty detector, so minting a concept on
+  novelty is reachable with measured parts (148). **Split it honestly:** the codebook is
+  ours, the FEATURE SPACE is where off-the-shelf earns its place.
+  → record: [learned-codebook.md](docs/options/learned-codebook.md)
+- ⬜ **Per-node codebooks plus translation between them** — refused rather than untried:
+  aligning two independently-learned discrete spaces with no paired data is the
+  unsupervised-translation problem, strictly harder than the project's goal.
+  → record: [per-node-codebooks.md](docs/options/per-node-codebooks.md)
+- ✅ **`concepts.Merged` — the MERGE direction, and it does NOT move `of`.** Remapping the
+  loser's surfaces strands every binding it means to preserve, so a merge is a **read-side
+  gather** over `aliases()`. Union by MINIMUM id, not rank, which makes the class a
+  property of the merge SET and propagation lazy with no coordinator. A late merge is a
+  MISS, never a corruption. *no measurement* on the mechanism itself — 19 tests, 2
+  mutations; what drives it is `note 077`/`078`, mutual agreement rather than confidence.
+  → record: [merged-concepts.md](docs/options/merged-concepts.md)
 
 **Open sub-question — codebook agreement across nodes.** Two nodes that quantise
 the same input differently write to different addresses and the memory fragments
@@ -139,65 +135,45 @@ the companion that different input must differ.
 **⇒ DECIDED: pair keys for relational work, identity-derived. 🔀 with single-token
 keys, which are still the default and still correct for MQAR.**
 
-- 🔀 **`PairKeys`** — hashed `(previous, token)`, so an entity's ROLES separate.
-  - `103` single-token keys collapse when an entity appears in two facts: 0.884 at
-    one appearance → 0.303 at two. *measured in:* 14 people, 10 facts
-  - `104` pair keys largely fix it: 0.918 / 0.628. Residual at 2+ appearances is
-    the same entity in the same ROLE, which pair keys cannot separate
-  - `156` typing an address costs nothing and pays at low load
-  - `157` typed writes stop link/fact collision: every column within 0.05 of its
-    link-free value (0.8333 / 0.4383 / 0.8150) where untyped collapsed to
-    0.13 / 0.03 / 0.12. *measured in:* families with `family_links`
-- 🔀 **`TableKeys`** — one key per token. Default, and right where each entity
-  appears once.
-- ❌ **`ByConcept`** — map every surface to its concept's address. Destroys
-  exceptions.
-  - `144`,`145` the majority wins and the dissenting fact goes to 0.000. `143`
-    bought transfer (0.998) and `144` measured the price: exception 0.371, and it
-    says a sibling's value 86.6% of the time
-  - `049` **the load-bearing correction:** the store never collided. A fact at the
-    surface key and a default at the concept key are *different addresses*.
-    `ByConcept` was a READ POLICY, which is why 148 cost a sketch and not a
-    representation
+- 🔀 **`PairKeys`** — hashed `(previous, token)`, so an entity's ROLES separate. `103`
+  single-token keys collapse when an entity appears in two facts, 0.884 → 0.303; `104`
+  pair keys largely fix it, 0.918 / 0.628, and the residual is the same entity in the
+  same ROLE, which they cannot separate. `156`/`157` typed writes stop link/fact
+  collision. *measured in:* 14 people 10 facts, and families with `family_links`.
+  → record: [pair-keys.md](docs/options/pair-keys.md)
+- 🔀 **`TableKeys`** — one key per token. Right where each entity appears once: `103`
+  hop 1 is 0.959 at one appearance, and `142` the store carries MQAR completely under it.
+  → record: [table-keys.md](docs/options/table-keys.md)
+- ❌ **`ByConcept`** — map every surface to its concept's address. **Destroys exceptions,
+  and confidently answers with the category's default**, which is the most dangerous shape
+  a wrong answer has. `144`/`145` the majority wins and the dissenter goes to 0.000; `143`
+  bought transfer at 0.9983. `049` **the load-bearing correction:** the store never
+  collided — surface and concept are *different addresses*, so this was a READ POLICY, and
+  that is why 148 cost a sketch rather than a representation. *measured in:* families,
+  3 seeds. **Revival:** a task with no within-category variation to lose.
+  → record: [by-concept.md](docs/options/by-concept.md)
 - ❌ **Content-derived keys for ENTITIES, i.e. similar entities on NEARBY addresses** —
-  this entry exists because reading the tree as a tree found it contradicting §1, and
-  **`note 067` then split it: the refusal is right for entities and does not transfer to
-  relations.**
-  - `042 §2` ranked it third by blast radius — *"the store has no notion of similarity
-    at all"* — and `g10-09` was **RETRACTED**, its cache indexed by token id so the
-    question was never asked
-  - **§1 already refuses this under another name.** "Address the store by continuous
-    vector" is ❌ *because* nearby addresses raise `ρ` and interference is `O(N·ρ)`,
-    which also turns the gate's structurally-zero bar into a tuned threshold. **Nearby
-    addresses is what is refused, however the nearness arises** — and with thousands of
-    entities that is fatal
-  - **Resolution is note 045's and already the architecture:** similarity lives in a
-    SEPARATE INDEX; `ContentIndex` proposes, nothing addresses by it. **Revival:** a task
-    where similar-things-must-share-an-ADDRESS beats exact separation plus an index
-- ⬜ **Structured representations for RELATIONS — the half `067` split off, and it is
-  the live requirement.** Twenty relations, which must be **comparable** rather than
-  exactly separated, and the store addresses by `(entity, relation)` where the entity
-  supplies the exactness — so `O(N·ρ)` does not bite. `067` measured that generalising
-  composition is impossible without it (0.056 held out), and **GOALS §1 asks for exactly
-  this**: *"be aware of the differences and interrelations between them"*
-- ⬜ **A better index, which is what 042 §2 was actually reaching for** — and
-  `note 056` made it load-bearing rather than a nicety.
-  - The set answer's enumeration works at index purity ≳ 0.99 and degrades fast
-    below it (0.750 at purity 0.951, 0.167 at 0.795). **So the grouping's quality
-    bounds the answer**, which is a far more tractable target than re-keying the
-    store — and it is measured rather than argued
-  - **`note 057`: purity looks like the SUFFICIENT STATISTIC.** Two very different
-    routes to it — starving the index of data, and making families share their
-    attributes — land answer quality in the same neighbourhood at matched purity
-    (0.417 and 0.333 at purity ~0.70). **A hypothesis, not a result**: one matched
-    pair at n=12, unseparated from noise
-  - **Overlap does not break the index; it makes purity expensive.** With full data
-    ONE private attribute suffices (purity 0.997 sharing three of four). At ten
-    streams, sharing three of four costs 0.28 purity and 0.50 exact
-  - `143` is the first result for `concepts.py` and `048` is why `families.py`
-    exists: every other instrument's entities are arbitrary, so nothing resembles
-    anything. **Still untried:** what makes an index good, as opposed to what makes
-    a grouping hard — which is now measured on two axes
+  §1 already refuses this under another name: **nearby addresses is what is refused,
+  however the nearness arises.** `042 §2` ranked it third by blast radius and `g10-09`
+  was **RETRACTED**, its cache indexed by token id so the question was never asked.
+  Resolution is note 045's and already the architecture — similarity lives in a separate
+  index. **Revival:** a task where similar-things-must-share-an-ADDRESS beats exact
+  separation plus an index.
+  → record: [content-derived-entity-keys.md](docs/options/content-derived-entity-keys.md)
+- ⬜ **Structured representations for RELATIONS — the half `067` split off, and the live
+  requirement.** Twenty relations must be **comparable** rather than exactly separated,
+  and the store addresses by `(entity, relation)` so the entity supplies the exactness.
+  `067` generalising composition is impossible without it (0.056 held out against chance
+  0.050); `note 071` such a vector must not enter the address unguarded. **GOALS §1 asks
+  for exactly this.**
+  → record: [structured-relations.md](docs/options/structured-relations.md)
+- ⬜ **A better index** — `note 056` made it load-bearing rather than a nicety: the set
+  answer works at purity ≳ 0.99 and degrades fast below (0.750 at 0.951, 0.167 at 0.795),
+  **so the grouping's quality bounds the answer.** `note 057` purity looks like the
+  sufficient statistic, recorded as a hypothesis at n=12. `note 058` real language has no
+  cliff. **Still untried:** what makes an index GOOD, as opposed to what makes a grouping
+  hard.
+  → record: [a-better-index.md](docs/options/a-better-index.md)
 
 ## 3. The store
 
@@ -206,115 +182,90 @@ keys, which are still the default and still correct for MQAR.**
 **⇒ DECIDED: one superposed `d × d` matrix. 🔀 with an exact cache and a settling
 read.**
 
-- 🔀 **`SuperposedRead`** — summed outer products. Earns its place.
-  - `119` beats a bounded exact cache **8×** once bindings exceed slots
-  - `109` capacity ~**d²**: width 32 → 16 bindings, 64 → 96, 128 → 384, at 90%
-    recovery. *measured in:* direct outer products, **no decay, no cap** — the
-    model's own write path reduces it
-- 🔀 **`ExactCache`**, 🔀 **`SettlingRead`** — kept per 14c. The cache was the
-  project's first controlled corpus improvement.
-- ❌ **Anything recovering per-item information AFTER the sum** — `r = M @ key` is
-  a sum. Readout bias, competitive retrieval, orthogonal updates and pair-keys-for-
-  recovery all failed for this one reason.
-  - `69` and the whole g11 line. **Do not re-propose.**
+- 🔀 **`SuperposedRead`** — summed outer products, and it earns its place: `119` beats a
+  bounded exact cache **8×** once bindings exceed slots. `109` capacity ~**d²**, at 90%
+  recovery. *measured in:* direct outer products, **no decay, no cap** — the model's own
+  write path reduces it.
+  → record: [superposed-read.md](docs/options/superposed-read.md)
+- 🔀 **`ExactCache`** and 🔀 **`SettlingRead`** — kept per 14c. The cache is the project's
+  first controlled corpus gain, `69` **+0.19 bits** at 128 slots in `g11-06` — and `76`
+  found it was mostly compensation for a weak readout. `SettlingRead` has unit tests and
+  no experiment.
+  → record: [exact-cache-and-settling-read.md](docs/options/exact-cache-and-settling-read.md)
+- ❌ **Anything recovering per-item information AFTER the sum** — `r = M @ key` is a sum.
+  Readout bias, competitive retrieval, orthogonal updates and pair-keys-for-recovery all
+  failed for this one reason: `69` six mechanisms move the LEVEL and none the SLOPE.
+  *measured in:* corpus, 4k–250k characters. **Do not re-propose.** **Revival:** a read
+  that is not a sum.
+  → record: [after-the-sum.md](docs/options/after-the-sum.md)
 
 ### 3b. Lifetime
 
 **⇒ OPEN, and the question that has been asked wrong twice.**
 
-- ✅ **Per-sequence, rebuilt every sequence** — current default.
-  - `62` confirmed empirically: with `learn=False`, predictions are byte-identical
-    whether or not another sequence ran first
+- ✅ **Per-sequence, rebuilt every sequence** — current default. `62` confirmed
+  empirically: with `learn=False`, predictions are byte-identical whether or not another
+  sequence ran first, which is the guard that makes any cross-sequence claim falsifiable.
+  → record: [per-sequence-store.md](docs/options/per-sequence-store.md)
 - ✅ **Use-based eviction — `note 083`, and it is what makes C4's *forever* meaningful.**
-  Discard whatever has gone longest unused and a persistently-queried fact survives
-  **1.000 with zero variance** after 4,000 facts through 150 slots; random eviction gets
-  0.717. Recency and frequency are indistinguishable here (both are true of the same facts
-  by construction). **Bounded in content, unbounded in TIME** — fixed storage cannot hold
-  everything, which is arithmetic, so this is the reachable form of the constraint.
-  - **Unexplained:** random is *worse* on persistent than abandoned (0.717 vs 0.783,
-    3 seeds, ~1.5 sd). An inversion in a control arm, recorded not smoothed
-  - **The cost:** a useful fact nobody asks about inside its window is gone before it can
-    be promoted. Every fixture here is built not to pay it
+  Discard whatever has gone longest unused: a persistently-queried fact survives **1.000
+  with zero variance** where random eviction gets 0.717. **Bounded in content, unbounded
+  in TIME** — fixed storage cannot hold everything, which is arithmetic. *measured in:*
+  4,000 facts through 150 slots, 3 seeds. **Unexplained:** random is *worse* on persistent
+  than abandoned.
+  → record: [use-based-eviction.md](docs/options/use-based-eviction.md)
 - ✅ **The two-timescale loop RUNS — `note 092`, and it cannot adjudicate.** Contradiction,
-  blame, promotion and eviction assembled: 30% of facts corrupted, recall back to **1.000**
-  after six passes, with blame falling 115 → 20 so it converges rather than oscillating. It
-  damages nothing when nothing is wrong.
-  - **But repair moves the damage to whichever side it does not trust.** Corrupt the direct
-    fact and repair takes 0.697 → 1.000; corrupt the DERIVATION and it takes 1.000 → 0.697.
-    Identical corruption, relocated. **`note 068` predicted exactly this** — *"a wrong
-    derived fact becomes a premise"* — before anything was built
-  - **What is missing is REDUNDANCY:** a derivation against a read is a two-way disagreement
-    with no majority; two independent derivations against a read is a three-way vote.
-    Untried. Trusting the direct fact always is just "detect only", which trades one failure
-    for the other
+  blame, promotion and eviction assembled: recall back to **1.000** after six passes, blame
+  falling 115 → 20. **But repair moves the damage to whichever side it does not trust** —
+  identical corruption, relocated, exactly as `note 068` predicted before anything was
+  built. What is missing is REDUNDANCY, and it is untried. *measured in:* 30% of facts
+  corrupted.
+  → record: [two-timescale-loop.md](docs/options/two-timescale-loop.md)
 - ⬜ **An EXTERNAL persistent store — John, 2026-07-30, and it is sound.** Eviction becomes
-  *archival* rather than deletion. **The key already exists:** `derived_keys` means
-  `keys.pair(entity, relation)` is rebuilt from two token ids, so `(entity, relation) →
-  value` is an ordinary key-value pair needing no translation. `ownership.Ring` is already
-  consistent hashing, which **is** the DHT addressing layer.
-  - **It cannot be in the traversal loop.** `docs/SCALE.md`: ten sequential hops at ~50 ms
-    is ~500 ms against `d_max`'s 640 ms, ~20% headroom, and a DHT lookup is several hops of
-    its own. **So it is a PREFETCH source, not a read path** — `lasting` becomes a cache
-    over it rather than the bottom of the stack
-  - **It cannot replace the vectors.** `note 070`/`077`/`078` need similarity over the whole
-    space; a key-value store cannot answer *"which entity relates most like this one"*
-  - **It moves the hard question rather than removing it:** 083's *"what will be used"*
-    becomes *"what to prefetch"*. Better failure mode though — a wrong prefetch is a slow
-    answer where a wrong eviction was a lost one
-- 🔀 **`persistent_lasting`** — a consolidated slow store surviving sequences.
-  **A real gain, switched off.**
-  - `133` beats baseline by **0.074–0.083 bits at EVERY data point**, and its own
-    control (consolidation without persistence) is *worse* than baseline
-    everywhere, so the attribution is clean. *measured in:* Tiny Shakespeare,
-    character level, 4k–125k chars, 3 seeds
-  - `133` **and it does not move the data wall**: +0.0124 past 16k, under the 0.04
-    seed spread, not monotone. Store norm **0.4 at every corpus size** → a
-    fixed-size cache holding a moving window, not a map that grows
-  - **`note 082` explains 133's window mechanically, and rehabilitates the mechanism.**
-    On a stream at 10× capacity it takes recall of the asked-about facts from **0.020 to
-    1.000**, and **recall tracks the correctness signal one-to-one** (0.9→0.915,
-    0.7→0.705, 0.5→0.540) — so the whole thing reduces to that signal, which `note 080`
-    measures at six sd, label-free. **Bounded, not unbounded:** the slow store saturates
-    in turn (1.1× → 0.965, 4.2× → 0.419), so it buys `total ÷ useful` and not infinity.
-    **And a fact never asked about inside its window is unrecoverable** — the cost the
-    fixture is built not to pay
-  - `131`,`132` the first two passes measured the INSTRUMENT: a store saturated at
-    `lasting_cap` before the run started, then a write rate 100× too large
-  - **Off by default** because turning it on invalidates the text comparison set.
-    Since `115` says character-level bits is the wrong target, that set may not be
-    worth protecting — a cheap decision currently made by inertia
-- ⬜ **`carry_store`** — carry the raw fast store between sequences. In a mutation
-  and two unit tests, and **no experiment.** Correctly so: every relational task
-  here **redraws its facts per sequence on purpose** (`047`'s condition), so
-  nothing should survive, and `62`'s guard says carrying would answer from the
-  training set.
-  - **`170`: there is no task in this repository on which persistence could pay.**
-    Persistence is *unfalsified on the goal*, not refuted. The blocker is an
-    instrument needing something genuinely stable across sequences and something
-    genuinely not
+  *archival*. The key and the routing already exist (`derived_keys`, `ownership.Ring`).
+  **It cannot be in the traversal loop** — `docs/SCALE.md` leaves ~20% headroom and a DHT
+  lookup is several hops — so it is a PREFETCH source and `lasting` becomes a cache over
+  it. It moves the hard question rather than removing it, to a better failure mode.
+  → record: [external-persistent-store.md](docs/options/external-persistent-store.md)
+- 🔀 **`persistent_lasting`** — a consolidated slow store surviving sequences. **A real
+  gain, switched off.** `133` beats baseline by **0.074–0.083 bits at EVERY data point**
+  with a clean control, **and does not move the data wall** (+0.0124, under the seed
+  spread). `note 082` rehabilitates it on a saturating stream — 0.020 → 1.000 — and shows
+  it reduces to `note 080`'s correctness signal, bounded rather than unbounded. *measured
+  in:* Tiny Shakespeare 4k–125k chars, 3 seeds. Off by default because turning it on
+  invalidates the text comparison set, which `115` says may not be worth protecting.
+  → record: [persistent-lasting.md](docs/options/persistent-lasting.md)
+- ⬜ **`carry_store`** — carry the raw fast store between sequences. In a mutation and two
+  unit tests, and **no experiment.** Correctly so: every relational task here redraws its
+  facts per sequence on purpose (`047`), and `62`'s guard says carrying would answer from
+  the training set. **`170`: there is no task in this repository on which persistence could
+  pay** — unfalsified on the goal, not refuted.
+  → record: [carry-store.md](docs/options/carry-store.md)
 
 ### 3c. Capacity, and the wall that is not one
 
 **⇒ SETTLED and repeatedly re-opened. Read this before proposing anything about
 saturation.**
 
-- ✅ **The 16k-character wall is a property of the OBJECTIVE, not the
-  architecture.**
-  - `115` **SATURATION IS CLOSED.** A character bigram table over 66 symbols is
-    intrinsically low-rank — effective rank **~3 at every width** (32/64/128/256),
-    so *"the store is not failing to use its width. There is nothing there to
-    use."* 16,000 characters is how long it takes to estimate a bigram table
-  - `115` eliminated the competitors **by name**: store capacity (`109`), readout
-    capacity (`110`), persistent representation (`114`)
-  - `110` at widths 64–128 store and readout both **exceed task demand**, so
-    decision 63 is not a capacity limit
-  - `113` width is NOT flat — our arms improve with it (5.730 at d=16 → 5.494 at
-    d=128, R² 0.92). A width sweep tests a claim nobody makes
-- ❌ **"The wall is a capacity limit"** — `133`'s relabel of its own null.
-  Contradicts `110` and `115`.
-- ❌ **"Concept partitioning is where the capacity comes from"** — `133`'s
-  follow-on, superseded by `134` one entry later: pooled capacity is **identical**
-  between arrangements (128/256/512/1024/2048 at 1/2/4/8/16 nodes).
+- ✅ **The 16k-character wall is a property of the OBJECTIVE, not the architecture.**
+  `115` **SATURATION IS CLOSED**: a character bigram table over 66 symbols is
+  intrinsically low-rank, effective rank **~3 at every width**, so *"the store is not
+  failing to use its width. There is nothing there to use."* It eliminated the competitors
+  **by name** — store capacity (`109`), readout capacity (`110`), persistent
+  representation (`114`) — and `113` shows width is not flat, so a width sweep tests a
+  claim nobody makes. *measured in:* corpus, character level, widths 32–256.
+  → record: [saturation-closed.md](docs/options/saturation-closed.md)
+- ❌ **"The wall is a capacity limit"** — `133`'s relabel of its own null, contradicting
+  `110` and `115`. *measured in:* Tiny Shakespeare, 3 seeds. **Revival:** a direct probe
+  showing store or readout below task demand, which is what 109 and 110 measured the
+  other way.
+  → record: [wall-as-capacity-limit.md](docs/options/wall-as-capacity-limit.md)
+- ❌ **"Concept partitioning is where the capacity comes from"** — `133`'s follow-on,
+  superseded by `134` one entry later: pooled capacity is **identical** between
+  arrangements. What differs is LONE-NODE capacity, which is a different claim and is the
+  one that survives. *measured in:* per-node memory held equal, 5 seeds, 50 cells.
+  **Revival:** a measurement where pooled capacity differs.
+  → record: [partitioning-as-capacity-source.md](docs/options/partitioning-as-capacity-source.md)
 - **`170` is the entry about this pattern:** 115's closure lived in one place and
   nothing pointed at it. **A ratchet on proposals does not catch a re-label after
   the fact.** This tree is the fix.
@@ -402,7 +353,7 @@ additive and nothing else has been tried.
     `allowed` mask, not `branches` — all tested. 065's config is unrecovered, so take
     differences against `tools/clutrr_recovery.py`'s own baseline
   - **713/713 on the plain subset is reached — under PARTITIONING** (`note 081`): 4
-    concept nodes give beam **0.9220** against 0.8877 monolithic, because a node carries
+    concept nodes give beam **0.9220** against 0.8877 monolithic (`note 105`), because a node carries
     interference only from what it owns. `note 103` corroborates at 8 nodes (0.9058)
   - **A MECHANISM, not a margin** (`note 103`): `search` is worse than not branching at
     out-degree 1 (0.649 vs walk's 0.702); `beam` recovers 0.692 AND gains +0.038 at ≥ 2
@@ -657,7 +608,9 @@ transport is a parallel path nothing in `run()` uses yet.
   `peer.py` over sockets. **`note 081` makes it MANDATORY, not merely better:** C4 needs
   capacity that GROWS and this is the only mechanism that supplies it (`nodes × per-node`,
   each node holding a full-width store), since no-decay saturates and decay windows forget.
-  Accuracy improves too — beam **0.9220 at 4 nodes against 0.8877** monolithic. **Blocked
+  Accuracy improves too — beam **0.9220 at 4 nodes against 0.8877** monolithic
+  (`note 105`, re-measured after the tree was found citing this to a note that does not
+  contain it). **Blocked
   from being the default by six combination refusals** in `LocalMemoryConfig`, and off by
   default (`concept_nodes = 0`).
   → record: [docs/options/concept-partitioning.md](docs/options/concept-partitioning.md)

@@ -352,6 +352,14 @@ lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
     at look=4 for a family of 6, so it must exceed the group
   - *measured in:* families, index purity **1.000**, cliff ~0.45 wide against
     within-family steps of ~0.01
+  - **`note 058`: real word co-occurrence has NO such cliff.** Largest gap **0.015**
+    against the synthetic task's **0.424** — 28× smaller — with every token's top
+    eight neighbours inside 0.02 of each other at ~0.96. A shuffled-text control
+    gives 0.002, so real text carries ~7× chance structure and ~1/28th of what the
+    task supplies. **So the crossover has a second clause: this needs purity ≳ 0.99
+    AND a bimodal profile, and one real dataset supplies neither.** Three confounds
+    named there and not resolved — the slice is function words, centring was not
+    checked, and the chunk size was chosen rather than measured
 - 🔀 **Fixed `branches`** — the count supplied. `167`: the peak sits at
   `family_size − 1` in every row and collapses either side (1.000 → 0.500 → 0.083).
   - **`note 056`: this is a measured CROSSOVER, not a loser.** Degrading the
@@ -543,6 +551,11 @@ that is the standing weakness.**
 - ⬜ **CLUTRR or any external benchmark** — **the standing gap. Until one runs, this
   project is grading its own homework.** It has been "next" for several cycles,
   which is itself the finding.
+  - **`note 058` put a number on what that costs, and it is large.** The set
+    answer's enumeration depends on a bimodal similarity profile; the synthetic task
+    has one with a 0.424 gap and real word co-occurrence has 0.015. **So this stops
+    being a completeness item and becomes the measurement that decides whether the
+    answer line means anything.** Needs a data fetch, which is John's call
 
 ### 10b. Retracted numbers — never quote these
 

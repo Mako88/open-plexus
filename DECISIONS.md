@@ -473,62 +473,57 @@ not gate anything above.**
 
 - ✅ **Template realiser** — `openplexus/render.py`, deterministic, dependency-free,
   **structurally incapable of adding a fact.** John's ruling: templates first.
-  - *no measurement* — a floor, not a mechanism with a number. What it contributes
-    is a **bar**: `content_words(render(...)) - FRAME` must EQUAL the answer set, so
-    dropping a value fails as well as inventing one, and `FRAME` is a fixed 25-word
-    list a reader can check in full
-  - **Written where it is trivially true, so the rungs above have something to fail
-    against** rather than being graded on how well they read
-  - Empty set **declines** rather than rendering a hole — the surface for row C4 if
-    anything earns it
-- ✅ **Retrieval realiser** — `render.speak`. **The words come from the CONCEPT MAP,
-  not the caller**, so the model supplies its own vocabulary and `render` arranges
-  it. No new model, no next-token prediction.
-  - *no measurement*, same reason. `Shared.surfaces` already stated the design
-    problem — *"which surface to use is a choice the concept itself does not
-    contain"* — and this is where it gets made rather than dodged
-  - **The default policy is arbitrary and says so** (lowest token id: deterministic,
-    agrees across nodes); most frequent wins when counts are given, with a
-    connection test asserting counts MOVE the choice
-  - **Neither is the eventual answer:** with surfaces in several modalities the
-    choice belongs to the QUERY, and nothing is multimodal yet
-  - `spoken_faithfully` is the same bar one level down — whether a CONCEPT was
-    invented rather than a word — **checked in both directions**, because a realiser
-    that dropped a concept passes any invents-nothing test trivially
-- ⬜ **Small learned renderer trained on our own concept sets** — with a
-  **faithfulness** test rather than an accuracy one: perturb the set and the text
-  must move; hold the set and the text must contain nothing the set does not.
-- ❌ **Off-the-shelf LLM as renderer** — cheapest demo, worst for the claim. A
-  fluent renderer **can produce the right sentence from a wrong walk**, so the
-  end-to-end number would measure its world knowledge. Rule 2 exactly.
-  - *no measurement* — refused on the same grounds rule 2 is written on, that a
-    green end-to-end run cannot say which component worked. **Revival condition:** a
-    faithfulness test showing it cannot add or drop a fact
-- ✅ **No renderer, for programmatic use** — for a query API or an agent tool, a set
-  of typed bindings is *better* than a sentence, so rendering is optional for a
-  whole class of uses rather than merely deferrable.
-  - *no measurement* — a scope position, not a result. It is here because it is
-    what makes component 7 non-blocking for everything above it
+  *no measurement* — a floor, not a mechanism with a number. It contributes a **bar**:
+  `content_words(render(...)) - FRAME` must EQUAL the answer set, so dropping a value fails
+  as well as inventing one. Empty set **declines** rather than rendering a hole.
+  → record: [template-realiser.md](docs/options/template-realiser.md)
+- ✅ **Retrieval realiser** — `render.speak`. **The words come from the CONCEPT MAP, not the
+  caller**, so the model supplies its own vocabulary and `render` arranges it.
+  *no measurement*. The default policy is arbitrary and says so, with a connection test
+  asserting counts MOVE the choice; `spoken_faithfully` is the same bar one level down,
+  **checked in both directions**. Neither is the eventual answer — with several modalities
+  the choice belongs to the QUERY.
+  → record: [retrieval-realiser.md](docs/options/retrieval-realiser.md)
+- ⬜ **Small learned renderer trained on our own concept sets** — with a **faithfulness**
+  test rather than an accuracy one: perturb the set and the text must move; hold the set and
+  the text must contain nothing the set does not.
+  → record: [learned-renderer.md](docs/options/learned-renderer.md)
+- ❌ **Off-the-shelf LLM as renderer** — cheapest demo, worst for the claim. A fluent
+  renderer **can produce the right sentence from a wrong walk**, so the end-to-end number
+  would measure its world knowledge. Rule 2 exactly. *no measurement* — refused on the
+  grounds rule 2 is written on. **Revival condition:** a faithfulness test showing it cannot
+  add or drop a fact.
+  → record: [llm-renderer.md](docs/options/llm-renderer.md)
+- ✅ **No renderer, for programmatic use** — for a query API or an agent tool, a set of typed
+  bindings is *better* than a sentence. *no measurement* — a scope position, and it is what
+  makes component 7 non-blocking for everything above it.
+  → record: [no-renderer.md](docs/options/no-renderer.md)
 
 ## 8. What learns
 
 **⇒ OPEN. The narrowest description of the whole architectural problem.**
 
-- ✅ **`Wo` only, delta rule at scored positions** — the exact gradient for a single
-  linear readout, so it is not an approximation of backprop; there is nothing to
-  backpropagate through.
-  - `042 §4` **the rule is not the limitation; the absence of anything for it to
-    write to is.** `Wk` and `Wv` are frozen random, the store is rebuilt per
-    sequence, so **everything durable is one linear map**
-- ❌ **`value_lr` / `value_centre` to unfreeze the values** — the values move a long
-  way, stay spread, and the plateau does not budge. `114` it works and it does not
-  help; `94` it does not build a terminator class. **Do not re-propose as a fix for
-  collapse.**
-- 🔀 **`hidden` readout** — the largest single factor on text (`83`), and the answer
-  when the readout/store crossover binds above width ~100 (`110`).
-- ⬜ **Self-modifying structure** — nothing to modify: the store is `d × d`, fixed
-  at construction. `042` is right that 3b and 10 are prerequisites, not
-  alternatives. Reserve the seam, build when a task can tell whether it helped.
+- ✅ **`Wo` only, delta rule at scored positions** — the exact gradient for a single linear
+  readout, so it is not an approximation of backprop; there is nothing to backpropagate
+  through. `042 §4` **the rule is not the limitation; the absence of anything for it to
+  write to is** — `Wk` and `Wv` frozen random and the store rebuilt per sequence, so
+  **everything durable is one linear map**.
+  → record: [wo-only-delta-rule.md](docs/options/wo-only-delta-rule.md)
+- ❌ **`value_lr` / `value_centre` to unfreeze the values** — the values move a long way,
+  stay spread, and the plateau does not budge. `114` it works and it does not help; `94` it
+  does not build a terminator class; `69` it costs −0.45 on text. *measured in:* corpus, and
+  chains with terminator markers. **Do not re-propose as a fix for collapse.** **Revival:**
+  a task where the value space itself is the bottleneck.
+  → record: [value-lr.md](docs/options/value-lr.md)
+- 🔀 **`hidden` readout** — the largest single factor on text (`70`, overstated there and
+  corrected by `71`), and the answer when the readout/store crossover binds above width ~100
+  (`110`). **Two "refuted" mechanisms partially recover under it** (`74`, `76`, `77`), which
+  is the calibration behind measurements being conditional on their configuration.
+  → record: [hidden-readout.md](docs/options/hidden-readout.md)
+- ⬜ **Self-modifying structure** — nothing to modify: the store is `d × d`, fixed at
+  construction. `042` is right that 3b and 10 are prerequisites, not alternatives. Reserve
+  the seam, build when a task can tell whether it helped.
+  → record: [self-modifying-structure.md](docs/options/self-modifying-structure.md)
 
 ## 9. Distribution
 
@@ -542,10 +537,11 @@ trips, so depth 10 costs 1,000 ms against 640 ms even with a hop's reads batched
 **Dimension splitting remains the default and `concept_nodes` is still 0**; the peer
 transport is a parallel path nothing in `run()` uses yet.
 
-- ✅ **Partition by dimension** — every node computes `M_slice @ key_slice` and
-  inherits the sum. Current default.
-  - `g4-01` a lone node's answer holds at 16 dims (0.949) and degrades fast below:
-    8 → 0.681, 4 → 0.412. **So node count ≈ width ÷ 16**, not anything softer
+- ✅ **Partition by dimension** — every node computes `M_slice @ key_slice` and inherits the
+  sum. Current default. `g4-01` a lone node's answer holds at 16 dims (0.949) and degrades
+  fast below: 8 → 0.681, 4 → 0.412. **So node count ≈ width ÷ 16**, not anything softer.
+  *measured in:* kinship.
+  → record: [partition-by-dimension.md](docs/options/partition-by-dimension.md)
 - 🔀 **Partition by concept** — `concept_nodes`, `partitioned.py`, `ConceptStore`, and
   `peer.py` over sockets. **`note 081` makes it MANDATORY, not merely better:** C4 needs
   capacity that GROWS and this is the only mechanism that supplies it (`nodes × per-node`,
@@ -556,59 +552,38 @@ transport is a parallel path nothing in `run()` uses yet.
   from being the default by six combination refusals** in `LocalMemoryConfig`, and off by
   default (`concept_nodes = 0`).
   → record: [docs/options/concept-partitioning.md](docs/options/concept-partitioning.md)
-- ✅ **`openplexus/peer.py` — point-to-point reads and writes, no driver.**
-  `notes 093`–`099`. Every read goes to the peer owning the concept; every write reaches
-  every holder. **2 messages per read against 2N for broadcast** — 256x at 256 peers — and
-  the serialisation point goes with it.
-  - **A driver-free `beam` traversal is exact** (`note 094`): identical walk to one
-    process, and a misrouted control changes it, so the routing produces the answer.
-    `search` takes `reader=` so a caller injects routing and `search` never imports a
-    transport
-  - **Consistent hashing** (`note 095`): a peer joining moves **1.4%** of concepts at 64
-    peers where `concept % peers` moved 98.4% — the ideal `1/n` to a tenth of a point
-  - **A departure costs a round trip, not the answer** (`note 097`): reads walk
-    `Ring.holders` and writes fan out. **Both halves are needed; either alone looks fine.**
-    Losing every holder returns zeros and **counts** them — an uncounted zero decodes to
-    whatever the readout prefers
-  - **Fingerprinted** (`note 096`/`099`): peer count, ring seed, key params and the
-    **wire-format version**, pinned to every struct by a test. **It caught `PROTOCOL` 3
-    the day after it was written**
-  - ❌ **One read per round trip** (`note 100`/`101`): 77 reads at depth 10 cost 3,850 ms.
-    `read_many` batches a hop's independent reads into one round → 1,000 ms. **Necessary
-    and not sufficient: `d_max` is 640 ms**
-  - 🔀 **A MIGRATING walk** is where the remaining 2× is (`note 101`): `owner` routes a
-    hop's look-up and the next hop's follow to the **same concept**, so 12 of 19 rounds
-    ask a peer the round before already used. One peer visit per hop is ~`depth × RTT/2`.
-    **`note 102` CLEARS the pruning blocker:** the rendezvous is worth **0.089**, its
-    PERIOD nothing measurable (sd 0.0305, 3 seeds) — so a migrating walk must meet, not
-    meet *every hop*. `k=2` fits `d_max` for **2.29×** the reads. **NOT BUILT:** latency
-    is an estimate; `test_prune_period.py` pins the real path at `2 × depth` rounds
-  - **Costs, stated:** retrieval moves to the owning node (a remote store cannot return a
-    `d×d` matrix — 512 KB against 2 KB); a write waits for `R` holders, not `N` but not
-    free; batching trades round trips for bytes. **Untried:** write ordering (they race and
-    the store is additive), re-replication, negotiation rather than refusal, real latency
-- ❌ **The global dimension-summing readout** — this is the globally synchronised
-  step **C1 forbids**, the project's own first constraint. Surfaced in a footnote
-  to [note 009](docs/notes/009-splitting-the-memory.md) §4 **after four gates were
-  passed and five sweeps run on top of it.**
-  - `combine="vote"` mitigates the BANDWIDTH (4 bytes per node, ~8 KB at 1024
-    nodes) and not the violation. A concept-partitioned read is a **selection**,
-    which is what removes it
-- ✅ **Transport: vote-based, with suspicion and a deadline** — sound and ahead of
-  the rest.
-  - `128` `d_max` ~**640 ms** = 3× a measured p99. *measured in:* 4 nodes, width
-    16, Docker bridge with `tc netem`, delay to 80 ms + 20 ms jitter + 2% loss.
-    **A floor, not a constant** — a real WAN raises it
-  - `126`,`127` the detector ejected nodes permanently; SWIM says suspect and
-    retry. Fixed
-  - `169` the deadline's actual branch — settle short on what arrived — had **no
-    test until a silent peer existed**. `steps_settled_short` was asserted in one
-    place, to be empty
-- ⬜ **Untrusted nodes** — no threat model at all. A node that lies about occupancy
-  or writes to addresses it does not own. **Forks on the project's endgame:**
+- ✅ **`openplexus/peer.py` — point-to-point reads and writes, no driver.** `notes 093`–`099`.
+  **2 messages per read against 2N for broadcast** — 256× at 256 peers — and the
+  serialisation point goes with it. A driver-free `beam` traversal is **exact** and a
+  misrouted control changes it; consistent hashing moves **1.4%** of concepts on a join
+  where modulo moved 98.4%; a departure costs a round trip, not the answer, and **both
+  halves are needed — either alone looks fine**; the wire format is fingerprinted and
+  **caught `PROTOCOL` 3 the day after it was written**. Batching takes depth 10 from
+  3,850 ms to **1,000 ms**, which is **necessary and not sufficient against `d_max` 640 ms**.
+  **A MIGRATING walk is where the remaining 2× is, and it is NOT BUILT** — `note 102` prices
+  the rendezvous at 0.089 with its period unmeasurable, so a walk must meet, not meet every
+  hop. *measured in:* loopback only, priced at an assumed 50 ms RTT.
+  → record: [peer-transport.md](docs/options/peer-transport.md)
+- ❌ **The global dimension-summing readout** — the globally synchronised step **C1
+  forbids**, the project's own first constraint. Surfaced in a footnote to
+  [note 009](docs/notes/009-splitting-the-memory.md) §4 **after four gates were passed and
+  five sweeps run on top of it.** `combine="vote"` mitigates the BANDWIDTH and not the
+  violation; a concept-partitioned read is a **selection**, which is what removes it.
+  **Revival:** none while C1 stands, and the arithmetic refuses it independently.
+  → record: [global-summing-readout.md](docs/options/global-summing-readout.md)
+- ✅ **Transport: vote-based, with suspicion and a deadline** — sound and ahead of the rest.
+  `128` `d_max` ~**640 ms** = 3× a measured p99, **a floor and not a constant**. `126`/`127`
+  the detector ejected nodes permanently where SWIM says suspect and retry. `169` the
+  deadline's actual branch had **no test until a silent peer existed**. *measured in:* 4
+  nodes, width 16, Docker bridge with `tc netem` at 80 ms + 20 ms jitter + 2% loss.
+  → record: [transport-vote-deadline.md](docs/options/transport-vote-deadline.md)
+- ⬜ **Untrusted nodes** — no threat model at all. A node that lies about occupancy or writes
+  to addresses it does not own. **Forks on the project's endgame:**
   open-source-and-runs-everywhere implies it; a controlled network does not.
-- ⬜ **Slice negotiation** — static by John's explicit choice; a node that
-  negotiates its own slice is a coordination protocol and nothing needs one yet.
+  → record: [untrusted-nodes.md](docs/options/untrusted-nodes.md)
+- ⬜ **Slice negotiation** — static by John's explicit choice; a node that negotiates its own
+  slice is a coordination protocol and nothing needs one yet.
+  → record: [slice-negotiation.md](docs/options/slice-negotiation.md)
 
 ## 10. The objective and the instruments
 

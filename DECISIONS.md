@@ -53,7 +53,7 @@ history lives in `docs/notes/` and the archived log.
     🔀 LIVE BOTH   two or more kept behind a switch and re-tested as the system
                    changes. A valid END state, not indecision
 
-**CENSUS: 29 chosen, 29 refuted, 14 untried, 12 both, 1 paused.** Checked against the body,
+**CENSUS: 30 chosen, 29 refuted, 15 untried, 12 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -210,6 +210,30 @@ read.**
 - ✅ **Per-sequence, rebuilt every sequence** — current default.
   - `62` confirmed empirically: with `learn=False`, predictions are byte-identical
     whether or not another sequence ran first
+- ✅ **Use-based eviction — `note 083`, and it is what makes C4's *forever* meaningful.**
+  Discard whatever has gone longest unused and a persistently-queried fact survives
+  **1.000 with zero variance** after 4,000 facts through 150 slots; random eviction gets
+  0.717. Recency and frequency are indistinguishable here (both are true of the same facts
+  by construction). **Bounded in content, unbounded in TIME** — fixed storage cannot hold
+  everything, which is arithmetic, so this is the reachable form of the constraint.
+  - **Unexplained:** random is *worse* on persistent than abandoned (0.717 vs 0.783,
+    3 seeds, ~1.5 sd). An inversion in a control arm, recorded not smoothed
+  - **The cost:** a useful fact nobody asks about inside its window is gone before it can
+    be promoted. Every fixture here is built not to pay it
+- ⬜ **An EXTERNAL persistent store — John, 2026-07-30, and it is sound.** Eviction becomes
+  *archival* rather than deletion. **The key already exists:** `derived_keys` means
+  `keys.pair(entity, relation)` is rebuilt from two token ids, so `(entity, relation) →
+  value` is an ordinary key-value pair needing no translation. `ownership.Ring` is already
+  consistent hashing, which **is** the DHT addressing layer.
+  - **It cannot be in the traversal loop.** `docs/SCALE.md`: ten sequential hops at ~50 ms
+    is ~500 ms against `d_max`'s 640 ms, ~20% headroom, and a DHT lookup is several hops of
+    its own. **So it is a PREFETCH source, not a read path** — `lasting` becomes a cache
+    over it rather than the bottom of the stack
+  - **It cannot replace the vectors.** `note 070`/`077`/`078` need similarity over the whole
+    space; a key-value store cannot answer *"which entity relates most like this one"*
+  - **It moves the hard question rather than removing it:** 083's *"what will be used"*
+    becomes *"what to prefetch"*. Better failure mode though — a wrong prefetch is a slow
+    answer where a wrong eviction was a lost one
 - 🔀 **`persistent_lasting`** — a consolidated slow store surviving sequences.
   **A real gain, switched off.**
   - `133` beats baseline by **0.074–0.083 bits at EVERY data point**, and its own
@@ -378,28 +402,24 @@ path is not chosen.**
     that preceded it was the degenerate case
   - `107` the traversal mechanism is not worth building; the blocker is per-step
     fidelity. **Condition expired at `121`/`122`**
-- 🔀 **`hop_accumulate`: `concat` vs `bind`** — concat wins 1.000 to 0.812, **but
-  only because 16 rules in a 128-wide space are linearly separable whatever the
-  labels do.** That is a property of having few rules. `bind` is kept for exactly
-  this reason. *measured in:* 16 composition rules, 10 relations, 128-wide
-  - **`note 063`: SCALE.md's trigger for this row — "a rule table in the hundreds" —
-    is MET, by a task it was not written against.** CLUTRR has 1,393 distinct chains
-    and 98 pairs, and **99.8% of test chains are unseen in training** while only 6.6%
-    of adjacent PAIRS are. So a readout over a concatenated chain must generalise to
-    what it never saw; a **fold over pairwise rules** only asks what it was trained on,
-    median 144 times each. **That is the difference between a learnable problem and an
-    unlearnable one**, and it is what `bind` was kept for
-  - **`note 066` CORRECTS 063 both ways, measured symbolically.** The intermediates are
-    **not** unlabelled — a 2-hop puzzle's answer IS a labelled pairwise rule (4,076 of
-    them, 62 unambiguous) and 3-hop puzzles then label `(derived, base)`, so the task
-    supplies its own curriculum. But 063's "6.6% unseen" counted *stated* pairs, and the
-    fold asks for `(accumulated, next)` where the accumulated side is **derived**:
-    **120 asked for, 97 derivable**, converged after two rounds
+- 🔀 **`hop_accumulate`: `concat` vs `bind`** — concat wins 1.000 to 0.812, **but only
+  because 16 rules in a 128-wide space are linearly separable whatever the labels do**, which
+  is a property of having few rules. `bind` is kept for that reason. *measured in:* 16 rules,
+  10 relations, 128-wide
+  - **`note 063`: SCALE.md's trigger — "a rule table in the hundreds" — is MET.** CLUTRR has
+    1,393 distinct chains, and **99.8% of test chains are unseen** while only 6.6% of adjacent
+    PAIRS are. A readout over a whole chain must generalise to what it never saw; a **fold
+    over pairwise rules** only asks what it was trained on, median 144 times each
+  - **`note 066` corrects 063 both ways.** Intermediates are NOT unlabelled — a 2-hop answer
+    IS a labelled pairwise rule (4,076 of them, 62 unambiguous), and 3-hop puzzles label
+    `(derived, base)`, so the task supplies its own curriculum. But 063's "6.6% unseen"
+    counted *stated* pairs where the fold needs `(accumulated, next)` with the accumulated
+    side **derived**: **120 asked for, 97 derivable**, converged in two rounds
   - **The fold is right 98.8% where it can act** (596/603) against 0.42% irreducible
-    ambiguity, and **completes only 52.6%** — tabulation's ceiling, not the fold's
-    error. **So the bottleneck moved twice in one evening**: 063 route-finding → 065
-    route solved, naming → 066 **the rules available to name with**. Unexplained and not
-    smoothed: the **3-hop cell (0.524) is below the 4-hop cell (0.732)**
+    ambiguity, and **completes only 52.6%** — tabulation's ceiling, not the fold's error.
+    **The bottleneck moved twice:** 063 route-finding → 065 route solved, naming → 066 the
+    rules available to name with. Unexplained: the **3-hop cell (0.524) is below 4-hop
+    (0.732)**
 - ❌ **`bind` as a route to GENERALISING composition — `note 067`, and it refutes 066's
   own closing sentence.** Over the 97 rules, holding out a quarter: **0.844 on trained
   rules, 0.056 held out**, against chance 0.050 and majority 0.082. Five seeds. **Not
@@ -414,29 +434,35 @@ path is not chosen.**
     operation is not the problem, so `bind` stays (14c) as the measured comparison for
     anything claiming to generalise. **It also splits component 2's refusal** — see the
     relations row there
-- ✅ **EXTENSIONAL relation vectors — `note 070`, and it answers 067's "whole question".**
-  Profile each relation by how other relations attach to the entities it links (relation
-  × {HH, HT, TH, TT}), compose with `concat` + circular convolution. Held-out rule
-  prediction **0.223 against random relations' 0.124** — paired **+0.099**, se 0.009,
-  **t = 11.6**, 120 seeds, wins 76% / loses 6%. **Nearly double.** `father` comes out
-  `grandfather`'s nearest neighbour, which is 067's own statement of the requirement
-  - **`note 069` moved the baseline: marginals alone are worth 0.242**, so composition
-    claims beat 0.24 and not 0.05. **Void without per-seed profiles** — a 2-hop puzzle
-    otherwise writes its own rule into its target's profile. `tools/relation_profiles.py`
-    reproduces it and carries the P0 in its output
-  - **`note 071`: in the ADDRESS it needs the gate, and with it the cost is small.**
-    `key(e,r) = hash(e) ⊛ profile(r)` reads back fine (0.992–1.000), but under the RAW
-    `memory @ key` an unwritten address returns one of that entity's other facts
-    **0.592–0.775, flat across load**, against hashed's 0.036 tracking chance 0.023 —
-    because all of one entity's addresses share a subspace. **`AddressSketch` recovers
-    it**, being an LSH *threshold* rather than a blend: **1.0000 written / 0.0005
-    unwritten at 24 bits**, ~1% at the default 16 against hashed's 0.6%. **So this rules
-    out the UNGATED read, not the representation** — and 071's own title, written before
-    the gate was tested, overstates it
-  - **Refutation: it does not transfer off kinship**, which has unusually strong
-    positional structure — `note 058` measured a domain with none. **And it is NOT built**,
-    nor should `keys.py` be the place: structure in the VALUE, and an exact address with a
-    separate structured channel, are the two untried homes left
+- ✅ **EXTENSIONAL relation vectors — `note 070`, answering 067's "whole question".** Profile
+  each relation by how others attach to the entities it links (relation × {HH,HT,TH,TT}),
+  compose with `concat` + circular convolution. Held-out rule prediction **0.223 against
+  random's 0.124** — paired **+0.099**, se 0.009, **t = 11.6**, 120 seeds. `father` comes out
+  `grandfather`'s nearest neighbour, which is 067's own statement of the requirement.
+  `tools/relation_profiles.py` reproduces it and carries its P0.
+  - **`note 069` moved the baseline: marginals alone are worth 0.242**, so composition claims
+    beat 0.24 not 0.05. **Void without per-seed profiles**, or a 2-hop puzzle writes its own
+    rule into its target's profile
+  - **`note 084`: self-training does NOT lift it** — 0.2062 → 0.1984, frozen from round 1.
+    078's loop compounded by adding new FEATURES; pseudo-labels over the same features
+    re-learn the same function. **Bootstrapping needs new features, not new labels**
+  - **`note 085`: ASSOCIATIVITY verifies what it cannot generate.** Holds on the known table
+    (**0.933**), determines held-out rules at **0.059** (chance — the table is 15% dense).
+    As a filter: satisfying every constraint → **0.5645**, contradicting them → **0.0162**,
+    and **98.4% of rejections are genuinely wrong.** Second label-free correctness signal
+    after `080`, which `082` says the memory design reduces to. **9.7% recall**
+  - **`note 071`: in the ADDRESS it needs the gate, and then costs little.**
+    `key(e,r) = hash(e) ⊛ profile(r)` reads back at 0.992–1.000, but under the RAW
+    `memory @ key` an unwritten address returns one of that entity's own facts
+    **0.592–0.775, flat across load** (hashed: 0.036, tracking chance) — one entity's
+    addresses share a subspace. **`AddressSketch` recovers it** as an LSH *threshold* rather
+    than a blend: **1.0000/0.0005 at 24 bits**, ~1% at the default 16. **So it rules out the
+    UNGATED read, not the representation** — 071's title, written before the gate was tested,
+    overstates it
+  - **Refutation: it does not transfer off kinship**, which has unusually strong positional
+    structure (`note 058` measured a domain with none). **NOT built**, and `keys.py` is not
+    the place: structure in the VALUE, or an exact address plus a separate structured
+    channel, are the untried homes
 - ⬜ **`index_at_hops` combined with the position-level index** — `159`/`160`/`161`
   built the pieces; `154` measured that the guard's premise is false (a hop key
   sits at cosine **0.96** to a single token's row, so it *does* name a concept).
@@ -756,18 +782,14 @@ that is the standing weakness.**
   - **Not the hard setting:** `D_W`/`D_Y` share **0%** of their relations, so round 0 has
     nothing to compare. A vocabulary-free seed is untried and is the case a real network
     faces
-- ❌ **`4.540` bits/char, "unigram BEATEN"** — carried as the project's headline text
-  result for weeks. **It is not a measurement of this model.**
-  - `117` the reproduction FAILED: the configuration the record names scores
-    5.665–5.742 against a prequential unigram of 4.776. **1.1 bits away**
-  - `118` the archaeology took ten minutes: `4.540` appears **only in HANDOFF.md** —
-    no sweep, no experiment, no decision entry. Its source is note 037's **4.525**,
-    which that note states plainly is *"trained with ordinary backpropagation,
-    offline, deliberately"* on frozen features. **So it was wrong twice: not the
-    model under its own rule, and not prequential — the opposite of prequential**
-  - Kept because the failure is reusable: **an inherited headline with no
-    provenance outranks every measurement downstream of it**, and nothing
-    downstream can contradict it
+- ❌ **`4.540` bits/char, "unigram BEATEN"** — the project's headline text result for
+  weeks, and **not a measurement of this model.** `117`: the named configuration scores
+  5.665–5.742 against a prequential unigram of 4.776, **1.1 bits away**. `118`: the figure
+  appears **only in HANDOFF.md** — no sweep, no entry — and traces to note 037's 4.525,
+  which that note says is *"trained with ordinary backpropagation, offline"* on frozen
+  features. **Wrong twice: not the model under its own rule, and the opposite of
+  prequential.** Kept because the failure is reusable — **an inherited headline with no
+  provenance outranks every measurement downstream of it**
 - ❌ **Scoring without a temperature** — `117`'s first attempt read 5.920 against a
   uniform 5.954, i.e. *the model learning nothing*. The delta rule targets a
   one-hot, so raw scores sit in about [0, 1] and a softmax over that range is nearly

@@ -134,7 +134,26 @@ if hasattr(sys.stdout, "reconfigure"):
 #: composition is where the open work is; that is a reason to split it out, not a reason
 #: to keep growing a file nobody can read whole — which is the exact failure this
 #: checker was built to prevent.
-MAX_LINES = 860
+#: **RAISED 860 -> 900 on 2026-07-30, the THIRD raise, and the escalation the previous
+#: comment prescribed is CLOSED.** That comment said a third raise means the tree has
+#: outgrown one file and component 5 should become its own. **John ruled that out**, and
+#: his reason is better than mine was: *"as soon as it's big enough that you have to search
+#: through it, you're gonna be missing things"* — and two files means reading one and
+#: missing the other, which is the same failure wearing a different hat.
+#:
+#: So splitting is unavailable and shaving is worse than deciding. What grew the file is
+#: nine notes in one session (070-085): C4 tested end to end, concept acquisition validated
+#: on an external benchmark, credit assignment closed, and two label-free correctness
+#: signals. Every line of it is a citation, a figure or a refutation condition.
+#:
+#: **Four shaving passes were made first and all four were real compression** — the meta
+#: sections 76 -> 45, the beam block 18 -> 13 while carrying a correction, the cliff block
+#: 19 -> 14, the newest extensional block 34 -> 27 under rule 9. A fifth would be damage.
+#:
+#: **And the number is now explicitly a proxy.** The real test is John's: can this be read
+#: in one pass. 900 lines is about 11k tokens, which is one pass. If that stops being true
+#: the answer is to archive settled components wholesale, not to shave and not to split.
+MAX_LINES = 900
 
 CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED = "✅", "❌", "⬜", "🔀", "⏸"
 STATES = (CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED)

@@ -429,11 +429,10 @@ additive and nothing else has been tried.
     `(derived, base)`, so the task supplies its own curriculum. But 063's "6.6% unseen"
     counted *stated* pairs where the fold needs `(accumulated, next)` with the accumulated
     side **derived**: **120 asked for, 97 derivable**, converged in two rounds
-  - **The fold is right 98.8% where it can act** (596/603) against 0.42% irreducible
-    ambiguity, and **completes only 52.6%** — tabulation's ceiling, not the fold's error.
-    **The bottleneck moved twice:** 063 route-finding → 065 route solved, naming → 066 the
-    rules available to name with. Unexplained: the **3-hop cell (0.524) is below 4-hop
-    (0.732)**
+  - **The fold is right 98.8% where it can act** (596/603) but **completes only 52.6%** —
+    tabulation's ceiling, not the fold's error. **The bottleneck moved twice:** 063
+    route-finding → 065 naming → 066 the rules to name with. Unexplained: the **3-hop cell
+    (0.524) is below 4-hop (0.732)**
 - ✅ **GENERATION DELTA, learned from cycles — `note 090`, and it CLOSES the ceiling.**
   A chain plus its query is a loop, so the chain's deltas must sum to the answer's: one
   equation per puzzle, 9,074 of them, 20 unknowns, null space **1** (the gauge), and
@@ -448,16 +447,17 @@ additive and nothing else has been tried.
     recovery 0.8770. Roughly the product, slightly better because a mis-recovered chain
     can still compose right. `tools/generation_delta.py` reproduces both
   - **`note 087`: the fold is PERFECT given coverage** — supply every missing rule and
-    puzzles complete 1.0000, so 066's *"tabulation's ceiling"* understates it. The gap was
-    **31 rules**, all spouse/in-law, **never stated in any split**
-  - **`note 089`'s hand-coded features were mostly NOISE.** Its oracle scored 0.7382; the
-    marry clause cost 0.125 and gender+affinity a further 0.058. **The feature it measured
-    as least learnable (generation, 0.350 from profiles) is the only one that mattered** —
-    profiles are ADJACENCY and generation is GLOBAL, so the answer was a different kind of
-    signal, not a better regressor
-  - **Refutation, and it is the live question: kinship has an ADDITIVE INVARIANT.** Whether
-    an arbitrary relational domain has a conserved quantity is untested, and a domain
-    without one gets nothing from this
+    puzzles complete 1.0000. The gap was **31 rules**, all spouse/in-law, never stated
+  - **`note 089`'s hand-coded features were mostly NOISE** (oracle 0.7382; marry cost
+    0.125, gender+affinity 0.058). **The one measured as LEAST learnable — generation,
+    0.350 from profiles — is the only one that mattered**: profiles are ADJACENCY and
+    generation is GLOBAL, so it needed a different kind of signal, not a better regressor
+  - ❌ **SCOPED by `note 104` — the limit of the headline result.** Null-space DIMENSION
+    counts a domain's invariants from data alone. **DBpedia EN and DE both return 0**
+    (167/96 relations, 82k/90k loops, full rank), and not approximately: CLUTRR's null
+    direction is 1.3e-15 with a **14-order gap**, DBpedia's cluster at ~3e-3 with none. So
+    it is *"solved wherever a conserved quantity exists"*. **Revival:** invariants per
+    SUB-DOMAIN — a consistent SUBSET of relations — a different computation, unbuilt
 - ❌ **Naming the missing rule, by any learned readout — `note 088`.** Extensional
   relations reach 0.223 held-out (`note 070`, +0.099 paired, t=11.6) and score **0.5995 end
   task, BELOW random filling's 0.6081 ± 0.0055.** 070's holdout was a random quarter; the

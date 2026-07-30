@@ -282,11 +282,27 @@ path is not chosen.**
     also stops there. Stable across 3 seeds
   - **Labelled an instrument, not the answer.** A schedule the task does not supply
     is a fitted constant (`162`)
-- ⬜ **Try-all-and-gate** — follow every relation type, keep the one whose address
-  is not empty. Costs `r` reads, needs no new mechanism, and is **the gate doing
+- ⬜ **Try-all-and-gate** — follow every relation type, keep the one whose address is
+  not empty. Costs `r` reads, needs no new mechanism, and is **the gate doing
   selection again** — the one selection rule here that has ever worked.
-  - `163 §2` John: *"potentially the actual end solution."* **This is the intended
-    final form.**
+  - `163 §2` John: *"potentially the actual end solution."* **The intended final
+    form**, and still the right target.
+  - **BUT ITS VIABILITY IS A PROPERTY OF RELATION DENSITY, and the dense case is
+    already measured against it.** The gate can select only where **exactly one**
+    candidate address is occupied; zero is a dead end and several is the case `147`
+    refuted every rule for. `openplexus/search.py` records the split: a
+    `(subject, relation)` pair names one person **94.9%** of the time, while
+    `(FACT, subject)` *"names one of several relations about half the time"*
+  - **So on `kinship.py` — ten relations, an entity holding several at once — the
+    gate would be undecided about half the time**, and `search.py` exists because
+    that is where the question needed *"which of S's relations leads to T"* rather
+    than *"what relation does S hold"* (`108`)
+  - **Deliberately not built, and this is the reason:** the case where it would work
+    is few sparse relations, which is `families.py`, where `hop_relations` already
+    suffices — and the case that needs it is the dense one where it is refuted. **A
+    mechanism scoped to where it is unnecessary is not worth its reads.** What would
+    change this is a task with several relations that are individually sparse, which
+    nothing here has
 - ⬜ **Learned relation chooser** — `147` is the argument for not attempting it yet:
   two hand-made selection rules were refuted before membership worked, and a
   learned chooser is strictly harder.

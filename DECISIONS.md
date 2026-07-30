@@ -819,14 +819,10 @@ it has ever been re-litigated, which is the only thing the tree prevents.
   was pushing the same ref repeatedly.
   - **At a checkpoint, push a `checkpoint/<date>-<n>` branch and leave it alone.** That
     run completes uninterrupted while work continues on master.
-  - **Measured, and it is why this is a rule:** on 2026-07-30 **eight consecutive `checks`
-    runs were cancelled**, so the six mutation shards — which run ONLY in CI — did not
-    execute once across a session that changed four modules. `--verify` passing is not the
-    same check: it asserts the original text is present, not that the suite would notice a
-    mechanism breaking.
-  - The existing "batch related work into one commit" rule was written about a **sweep**
-    being starved. It did not fire here because no sweep was in flight, so each push looked
-    free. **`checks` is the thing being starved, and it is starved by ordinary commits.**
+  - **Measured:** eight consecutive `checks` runs cancelled on 2026-07-30, so the six
+    mutation shards — CI-only — did not execute once across a session that changed four
+    modules. The older "batch when a sweep is in flight" rule did not fire because no sweep
+    was in flight: **`checks` is starved by ordinary commits.**
 - **LATENCY: `d_max` IS A CHURN TIMEOUT, NOT A LATENCY BUDGET — my call, 2026-07-30,
   recorded because it corrects how I had been reporting.** Decision 128 derived 640 ms as
   3× a measured p99, following SWIM's rule for declaring a node dead rather than slow.
@@ -841,12 +837,15 @@ it has ever been re-litigated, which is the only thing the tree prevents.
   - **So `d_max` stays as the churn timeout and stops being quoted as a deadline on
     answers.** Depth results are reported in seconds against a stated budget, and until
     John states one, no depth is called a failure. **Revisit if interactive use returns.**
-- **STANDING PERMISSION TO FETCH BENCHMARK DATASETS — John, 2026-07-30.** Replaces
-  per-dataset approval, which cost real work: `g23-03` ran on already-approved graphs
-  rather than the benchmark that would have answered kill-list #3. **Scope: evaluation
-  data from its canonical public distribution — not code, models or weights.** Fetchers
-  pin the URL and verify size and sha256 (`fetch_clutrr.py`, `fetch_openea.py`); `data/`
-  stays gitignored, so CI needs a fetch step. Name the dataset and why in the commit.
+- **STANDING PERMISSION TO FIND AND FETCH DATASETS — John, 2026-07-30, widened same day.**
+  *"If a new dataset would help prove or disprove something you need proven, always feel
+  free to go look for it, and if you find one, download it and use it without requesting
+  specific permission."* **So SEARCHING for one is part of it, not just fetching a named
+  one.** Scope: evaluation data from its canonical public distribution — not code, models
+  or weights. Fetchers pin URL, size and sha256; `data/*/` is gitignored so CI needs a
+  fetch step. Name the dataset and why in the commit. Measured cost of the old
+  per-dataset rule: `g23-03` ran on already-approved graphs rather than the benchmark
+  that answered more.
 - **Explain plainly, keep the numbers, do not hide bad news.**
 - **Goal ordering:** AGI is primary; being an LLM replacement on consumer machines
   is secondary and must not compete with it.

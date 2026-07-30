@@ -439,14 +439,15 @@ path is not chosen.**
     claims beat 0.24 and not 0.05. **Void without per-seed profiles** — a 2-hop puzzle
     otherwise writes its own rule into its target's profile. `tools/relation_profiles.py`
     reproduces it and carries the P0 in its output
-  - **`note 071` bounds WHERE it may be applied: the composition path, never the
-    address.** `key(e,r) = hash(e) ⊛ profile(r)` reads facts back fine (0.992–1.000) but
-    an address never written returns one of that entity's OTHER facts **0.592–0.775, flat
-    across load**, against hashed's 0.036 tracking chance 0.023. **067's counter-argument
-    used the wrong population** — interference is not global over twenty relations, it is
-    local to one entity's handful of addresses in a shared subspace. So **component 2's
-    refusal holds for relations too**, by a different mechanism. 070 is untouched: it
-    never used the store
+  - **`note 071`: in the ADDRESS it needs the gate, and with it the cost is small.**
+    `key(e,r) = hash(e) ⊛ profile(r)` reads back fine (0.992–1.000), but under the RAW
+    `memory @ key` an unwritten address returns one of that entity's other facts
+    **0.592–0.775, flat across load**, against hashed's 0.036 tracking chance 0.023 —
+    because all of one entity's addresses share a subspace. **`AddressSketch` recovers
+    it**, being an LSH *threshold* rather than a blend: **1.0000 written / 0.0005
+    unwritten at 24 bits**, ~1% at the default 16 against hashed's 0.6%. **So this rules
+    out the UNGATED read, not the representation** — and 071's own title, written before
+    the gate was tested, overstates it
   - **Refutation: it does not transfer off kinship**, which has unusually strong
     positional structure — `note 058` measured a domain with none. **And it is NOT built**,
     nor should `keys.py` be the place: structure in the VALUE, and an exact address with a

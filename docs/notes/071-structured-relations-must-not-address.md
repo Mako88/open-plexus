@@ -82,14 +82,46 @@ than reducing it.
                                   does -- AddressSketch is a mechanism apart
                                   from the store read
 
+## CORRECTION — the gate DOES recover it, so the refusal above is too strong
+
+**Written twenty minutes after the rest of this note, by testing the thing it listed as
+untested.** The refusal was reached on the raw `memory @ key` read; decision 148's
+exactness comes from `AddressSketch`, which is **random-hyperplane LSH — a THRESHOLD on
+similarity, not a linear blend.** They fail differently, and measuring the wrong one is
+what produced the refusal.
+
+    AddressSketch, 3 facts per entity, 5 seeds, written / unwritten admitted
+
+    bits=16     hashed  1.0000 / 0.0007-0.0063     structured  1.0000 / 0.0044-0.0100
+    bits=24     hashed  1.0000 / 0.0000            structured  1.0000 / 0.0004-0.0007
+
+**At 24 bits structured keys are essentially exact**, and at the default 16 they cost about
+1% false admits against hashed's 0.6%. **That is a price with a number on it, not a
+refusal.** Since the gate decides membership before the read runs, the blending measured
+above never reaches an unwritten address in the assembled pipeline.
+
+**So structured relation vectors in the address are VIABLE, conditional on the gate being
+in the path with enough bits** — which is the opposite of this note's title, and the title
+is left as written because a note whose conclusion was reversed should say so where it can
+be seen rather than be quietly renamed.
+
+> **This is the third correction in one session and the pattern is one thing:
+> measuring a mechanism adjacent to the one the claim is about.** 067 reasoned about
+> twenty relations when the population was one entity's three addresses; 069's baseline
+> was taken with the marginals removed; here the raw read stood in for the gate. Rule 12
+> names discarding a good idea on an invalid measurement as the most expensive error
+> available, and it was avoided here only because the note had written down what it had
+> not tested.
+
 ## What is NOT claimed
 
-**Not that the gate was tested.** Decision 148's 1.0000/0.0000 comes from
-`AddressSketch` with `index_prefer="inherit"`, and this measures the raw `memory @ key`
-read, whose own docstring calls it *"the one under suspicion."* **The gate may well recover
-what the raw read loses, and that is untested.** What is established is that the raw read
-degrades in a way it does not with hashed keys, which is enough to refuse the wiring
-without further work.
+**Not that 16 bits is sufficient.** 1% false admits at 128 entities is small and its cost
+downstream is unmeasured; `bits` is a config value and raising it has its own price that
+`tools/gate_cost.py` would have to answer.
+
+**Not that the raw-read finding is void.** Structured keys DO blend under
+`SuperposedRead`, exactly as measured — that is now a statement about which retrieval this
+representation requires, and it rules out the ungated read rather than the representation.
 
 **Not a claim about three facts per entity being the right load.** Real use holds more, and
 a denser subspace should make this worse rather than better — but that direction is

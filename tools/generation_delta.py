@@ -39,6 +39,24 @@ part of this file.
     gaps unfilled                            0.5279
     delta-filled                             0.8578
 
+    CONTRASTIVE fill, added 2026-07-30 (g23-01, g23-02)
+    symbolic fold, TRUE chains, 10 seeds
+    random                                   0.6642 +/-0.0018
+    contrastive                              0.7821 +/-0.0077   +0.1179 paired
+
+    END TO END, model recovers the chain, 3 seeds
+    seed  recovery  random  contrastive  delta
+       0    0.8770  0.6003       0.6658  0.8578
+       1    0.9293  0.6248       0.7260  0.9040
+       2    0.8569  0.6012       0.6911  0.8377
+    contrastive - random                     +0.0855 +/-0.0086, 3 of 3
+
+**The margin more than HALVES end to end**, +0.1179 against +0.0855, and survives on every
+seed. Every arm drops together -- random 0.664 to 0.609, delta 0.965 to 0.867, contrastive
+0.782 to 0.694 -- so chain recovery costs about 0.10, which reproduces note 091's 0.11 for
+the delta arm. Contrastive closes 33% of the distance to the exact solution here against
+39% on true chains.
+
 **The wrong-delta control is what makes the result readable.** Without it, "filling helps"
 would be the finding, and note 088 measured that filling at random helps a little on its own.
 
@@ -239,7 +257,16 @@ def main() -> int:
         context_keys=True, derived_keys=True, decay=1.0))
     allowed = np.arange(config.relation_base,
                         config.relation_base + len(RELATIONS))
-    folds = {mode: make_fold(table, deltas, mode, args.seed) for mode in MODES}
+    # The end-to-end path built its folds WITHOUT vectors, so `contrastive` fell
+    # through to None on every fill and the arm would have reported the `gap`
+    # policy's number under a different name. Caught by adding the arm, not by
+    # the arm failing -- a fill that returns None looks like an unanswerable
+    # chain rather than like a broken mode.
+    vectors = contrastive_vectors(args.root, args.config, table,
+                                  width=32, seed=args.seed, epochs=8,
+                                  lr=0.05, temperature=0.1)
+    folds = {mode: make_fold(table, deltas, mode, args.seed, vectors)
+             for mode in MODES}
     scored = recovered = 0
     right = dict.fromkeys(MODES, 0)
     for puzzle in puzzles:

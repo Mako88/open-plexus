@@ -230,3 +230,38 @@ confirmation is what would make them carry the weight `g23-01`'s numbers carry.
 **Held-out RULE prediction, not an end task.** There is no end task defined for these graphs
 in this repository. On kinship the same mechanism cleared the end-task bar, which is the
 only reason to treat this proxy as informative at all.
+
+### END TO END, with the model recovering its own chains — the margin halves and survives
+
+    CONFIG  when    2026-07-30
+            source  tools/generation_delta.py
+            script  tools/generation_delta.py --end-to-end --seed {0,1,2}
+            task    CLUTRR-symbolic, END TASK, model recovers the chain
+            model   LocalAssociativeMemory width 64, context+derived keys, beam
+            knobs   fill mode; contrastive vectors width 32 from the rule table
+            scale   3 seeds, 1,146 puzzles
+
+    seed  recovery  random  contrastive  delta
+       0    0.8770  0.6003       0.6658  0.8578
+       1    0.9293  0.6248       0.7260  0.9040
+       2    0.8569  0.6012       0.6911  0.8377
+
+    contrastive - random   +0.0855 +/-0.0086, 3 of 3 seeds
+
+**The caveat on the true-chain result is now measured rather than quoted.** `g23-01` ran the
+fold over TRUE chains and its margin was **+0.1179**. With the model recovering its own
+chains the margin is **+0.0855** — it more than halves at the low end and survives on every
+seed. Contrastive closes **33%** of the distance to the exact symbolic solution here against
+39% on true chains.
+
+Every arm drops together: random 0.664 → 0.609, delta 0.965 → 0.867, contrastive 0.782 →
+0.694. `note 091` measured the delta arm's cost of chain recovery at about 0.11 and this
+reproduces it at 0.10.
+
+**A bug I introduced and caught by reading rather than by running.** The `--end-to-end` path
+built its folds without passing `vectors`, so `contrastive` would have fallen through to
+`None` on every fill — and a fill returning `None` reads as *"this chain is unanswerable"*
+rather than as *"this mode is broken"*, so the arm would have silently reported the `gap`
+policy's number under a different name. Nothing would have failed. Found by checking the
+second code path before trusting its output, which is the only reason there is a number here
+rather than a plausible one.

@@ -659,8 +659,22 @@ that is the standing weakness.**
     split can be reported. Mutation `a-revisited-entity-gets-a-fresh-slot` renumbers
     per edge instead of per node — which would make the hard 433 quietly easy and
     CLUTRR's score come out HIGH for no reason involving the model
-  - **Not yet run against the model.** The loader reproduces 059's counts through the
-    loader rather than from a probe, which is the gate before any arm
+  - **`note 060`: the FLOOR is measured and it is not chance.** A `hops=1` model —
+    composition off, so prior plus direct recall only — scores **0.0898** overall on
+    the plain subset and **0.500 at two hops**, against chance 0.0500 and a
+    majority-class baseline of 0.0421 (*below* chance: the splits have different
+    answer distributions). **Sequence length leaks the hop count** — 11 tokens at two
+    hops against 43 at ten — and the answer distribution varies with depth, so a
+    depth-conditioned prior beats chance without composing
+  - **So report against the `hops=1` floor PER HOP BUCKET, never against chance.** A
+    composing mechanism must beat **0.500** at two hops and 0.011 at four. The
+    headroom is at 4–10 hops, which is what CLUTRR was built to test
+  - **No matrix needed yet:** training on all 9,074 puzzles takes **six seconds**, so
+    dispatching would be ceremony. One seed so far — the floor is a bound to
+    re-measure, not a constant
+  - **No composing configuration has been run.** `hops > 1` with `context_keys` needs
+    a typed hop, and CLUTRR's relations vary along the chain, so `hop_relations` would
+    supply a schedule the task does not — decision 162's problem, unsolved here
 
 ### 10b. Retracted numbers — never quote these
 

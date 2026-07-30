@@ -330,3 +330,43 @@ result here says nothing about that one.
 What it does support, weakly: the earlier margins are **not** a small-data artefact, since
 the direction is the wrong way round for that. The right test is a size sweep WITHIN one
 corpus, subsampling FB15k-237 so source is held fixed — registered before it runs.
+
+**CORRECTED BY `g23-05`, which ran that test: SIZE IS NOT THE VARIABLE.** A small subsample
+of FB15k-237 keeps most of the margin where genuinely small corpora lose it — the numbers
+are in the `g23-05` entry below, which is where they were measured. **The post-hoc reading
+of the small-graph losses as a size effect is wrong**: whatever makes those corpora hard is
+a property of the corpus, not of how much of it there is. The source-entanglement confound
+named above was the whole story.
+
+### Within one corpus: both arms grow, and `g23-04`'s saturation claim was cross-corpus
+
+    CONFIG  when    2026-07-30
+            source  g23-05
+            script  tools/relation_contrastive.py --graph
+                    data/fb15k237/sub{005,010,025,050,100}.txt --seeds 5
+            task    FB15k-237 subsampled by edge count, held-out rule prediction
+            model   width 32, hadamard, 8 epochs, lr 0.05, carried unchanged
+            knobs   subsample fraction
+            scale   5 sizes, 5 seeds, 13,605 to 272,115 edges
+
+    subsample     edges   rules   det    contr   count   margin
+    sub005       13,605     149  0.906   0.2368  0.1263  +0.1105
+    sub010       27,211     386  0.899   0.3505  0.2124  +0.1381
+    sub025       68,028   1,283  0.870   0.4486  0.2050  +0.2436
+    sub050      136,057   2,271  0.836   0.4863  0.2335  +0.2528
+    sub100      272,115   3,332  0.803   0.4547  0.2475  +0.2072
+
+**`g23-04`'s "first-order counting saturates" is CORRECTED.** Within one corpus counting
+roughly doubles, 0.1263 to 0.2475. What g23-04 compared was FB15k-237 against a *different
+set of corpora*, so the flatness was cross-corpus rather than a property of counting. **Both
+arms grow with data; the margin grows because the learned arm grows faster.**
+
+**Rules fall SUB-linearly with edges** — 50% of edges keeps 68.2% of rules — because a rule
+needs only one surviving instance of its triangle and common pairs have many. The opposite
+of what `g23-05` P4 predicted.
+
+**A confound not anticipated, and it cuts against the headline:** determinism RISES as the
+corpus shrinks (0.803 → 0.906), so small subsamples are an easier task. The small end is
+easier *and still scores lower*, which strengthens the direction — but the magnitude is not
+clean and should not be quoted as one. **And the margin is not monotonic**: it peaks at
+`sub050` and falls at full size, unexplained.

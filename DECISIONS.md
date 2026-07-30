@@ -113,7 +113,14 @@ outside the learning loop.** Nothing non-text is built.
 - ⬜ **Codebook learned by us, append-only** — new distinctions get NEW ids; existing ids
   never move. The occupancy gate is already a novelty detector, so minting a concept on
   novelty is reachable with measured parts (148). **Split it honestly:** the codebook is
-  ours, the FEATURE SPACE is where off-the-shelf earns its place.
+  ours, the FEATURE SPACE is where off-the-shelf earns its place. **JOHN'S RULING,
+  2026-07-30: an OFF-THE-SHELF quantiser is acceptable and may be preferred** — *"worst
+  case scenario we can use an off-the-shelf quantiser, and in fact maybe that is the
+  preferred solution ... off-the-shelf when you can."* So SPLIT is no longer a blocker on
+  a component nobody has built: a shared frozen encoder makes two nodes derive the same
+  ids by construction. **The cost is the one `163 §1` already named** — *"our system plus a
+  pretrained encoder"* is a different claim from *"our system"* — and it is now a cost
+  accepted rather than a reason to wait.
   → record: [learned-codebook.md](docs/options/learned-codebook.md)
 - ⬜ **Per-node codebooks plus translation between them** — refused rather than untried:
   aligning two independently-learned discrete spaces with no paired data is the
@@ -127,19 +134,14 @@ outside the learning loop.** Nothing non-text is built.
   mutations; what drives it is `note 077`/`078`, mutual agreement rather than confidence.
   → record: [merged-concepts.md](docs/options/merged-concepts.md)
 
-**AND DIVERGENCE IS NOT DETECTED ONE LAYER DOWN — `g27-01`.** A peer whose MODEL seed
-differs answers every read, raises nothing, and **a third of its answers are silently
-wrong** (16 of 24 identical). `peer.fingerprint` covers the wire format, the routing and
-the KEY SOURCE; the **VALUE table is not in it**, because `derive` builds values from the
-model seed and `PairKeys` takes a fixed `seed=1`. So two peers agree about where to look
-and disagree about what is there. **The falsifier below cannot be built** — no quantiser
-exists in the tree — so this is the same failure shape at the transport instead.
+**AND DIVERGENCE IS NOT DETECTED ONE LAYER DOWN — `g27-01`, FIXED same day.** A peer whose
+MODEL seed differs answered every read, raised nothing, and **a third of its answers were
+silently wrong**: `fingerprint` covered the routing and the KEY SOURCE but not the VALUE
+table. It now hashes the value table and the eight wrong answers are rejected while the
+sixteen right ones still succeed; omitting it is distinct from supplying it, so the guard is
+not silently opt-in. **Replica count is still unfingerprinted.** The falsifier below cannot
+be built — no quantiser exists — so this is the same failure shape at the transport.
 *measured in:* 3 in-process peers, width 64, 2 replicas.
-
-**FIXED same day:** the fingerprint now hashes the value table, `node_main` passes it, and
-the eight wrong answers are rejected while the sixteen right ones still succeed. Omitting it
-is distinct from supplying it, so the guard is not silently opt-in. **Replica count is still
-unfingerprinted.**
 
 **Open sub-question — codebook agreement across nodes.** Two nodes that quantise
 the same input differently write to different addresses and the memory fragments
@@ -795,23 +797,18 @@ it has ever been re-litigated, which is the only thing the tree prevents.
   absolutely massive lift, and that bar is high. In his words: *"we've done a lot of
   close enough or nearly there or almost there things, and at the end of the day we
   still have these nine things we have to prove out."*
-  - It is the ordering rule's twin. That one says take the question most likely to
-    disprove the project; this says take the FORM of it that could actually disprove it.
-  - **It applies to instrument design, not only to mechanism choice.** A test whose band
-    is too narrow to separate its arms is a "nearly there" wearing an experiment's
-    clothes — it consumes the cost of settling the question and does not settle it.
+  - **The ordering rule's twin**: that one picks the question most likely to disprove the
+    project, this picks the FORM of it that could. **It applies to instrument design too** —
+    a test whose band cannot separate its arms is a "nearly there" wearing an experiment's
+    clothes.
 - **EVERY OPTION OFFERED TO JOHN CARRIES THREE THINGS — his instruction, 2026-07-30.**
-  He switches between this and other work, so context is not assumed:
-  1. **What it IS, explained plainly** — which piece of the mechanism it handles and
-     where it sits in the system. No jargon that needs another document.
-  2. **Pros and cons**, so the trade-off being made is visible rather than implied.
-  3. **A recommendation**, and what happens if he does not reply.
-- **NEVER OFFER AN OPTION THAT FAILS THE GOALS — John, 2026-07-30.** If something is
-  known not to scale, or not to survive where the project is going, it is not a choice
-  and must not be presented as one, however well it would work today. Put it in the
-  tree as a ❌ with the reason if it is worth recording that it was considered; do not
-  put it in a list he is asked to pick from. **An invalid option in a menu costs him
-  the time to evaluate it and risks him picking it.**
+  He switches between this and other work, so assume no context: **what it IS in plain
+  terms** and where it sits, **pros and cons**, and **a recommendation** with what happens
+  if he does not reply.
+- **NEVER OFFER AN OPTION THAT FAILS THE GOALS — John, 2026-07-30.** Something known not
+  to scale or not to survive where the project is going is not a choice, however well it
+  works today. Record it as a ❌ with the reason; keep it out of any menu. **An invalid
+  option costs him the time to evaluate it and risks him picking it.**
 - **CHECKPOINT ONTO A BRANCH SO A CI RUN CAN FINISH — John, 2026-07-30, and it is a
   recurring failure rather than a one-off.** `checks.yml` uses
   `concurrency: checks-${{ github.ref }}`, which is **per ref**, so a push to a branch
@@ -835,8 +832,13 @@ it has ever been re-litigated, which is the only thing the tree prevents.
   - John's framing: the endgame is not chat-shaped, so interactive latency may not be the
     requirement at all. At 161 ms a round, depth 10 is ~3.2 s.
   - **So `d_max` stays as the churn timeout and stops being quoted as a deadline on
-    answers.** Depth results are reported in seconds against a stated budget, and until
-    John states one, no depth is called a failure. **Revisit if interactive use returns.**
+    answers.** **JOHN'S RULING, 2026-07-30: the measured latency is ACCEPTED.** In his
+    words — *"inherently, it's the internet, it's gonna be relatively slow ... that's a
+    thing we eat for right now."* At 161 ms a round and 2 rounds a hop, the project's own
+    task depths cost: **depth 2 ≈ 0.6 s, depth 3 ≈ 1.0 s, depth 5 ≈ 1.6 s, depth 10 ≈
+    3.2 s.** CLUTRR tests 2–10 hops and `run()` works at 2, so the common case is about a
+    second. **Accepted, not solved** — the migrating walk stays the known ~2× if interactive
+    use ever returns.
 - **STANDING PERMISSION TO FIND AND FETCH DATASETS — John, 2026-07-30, widened same day.**
   *"If a new dataset would help prove or disprove something you need proven, always feel
   free to go look for it, and if you find one, download it and use it without requesting

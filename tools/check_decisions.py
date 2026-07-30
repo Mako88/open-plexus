@@ -109,7 +109,16 @@ if hasattr(sys.stdout, "reconfigure"):
 #: What would say the budget is wrong rather than tight: confirmations creeping back in
 #: (rule 8 puts those in the log), or process narration about what was learned while
 #: building (rule 9). Neither is what is here.
-MAX_LINES = 820
+#: **RAISED 820 -> 840 on 2026-07-30, deliberately, and taken in ONE step because the
+#: last raise's comment says shaving is how a document gets worse without anyone
+#: deciding to.** What needed the room: component 5's `bind` row carried a *stated
+#: revival condition* — structured relation vectors — and note 070 met it, so the tree
+#: gained a ✅ where it previously had a refusal and a promise.
+#:
+#: That is the document doing its job rather than accumulating. A revival condition
+#: nobody can afford to record the answer to is a refusal that stays refused by budget,
+#: which is the failure mode rule 12 names as the most expensive available.
+MAX_LINES = 840
 
 CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED = "✅", "❌", "⬜", "🔀", "⏸"
 STATES = (CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED)

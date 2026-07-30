@@ -78,7 +78,7 @@ sparse keys were measured worse, then a readout change reversed them cleanly. So
 search on correct arithmetic; both conditions were measured away later and both
 mechanisms became right. A deleted alternative cannot be re-measured.
 
-**CENSUS: 25 chosen, 29 refuted, 14 untried, 13 both, 1 paused.** Checked against the
+**CENSUS: 26 chosen, 29 refuted, 14 untried, 13 both, 1 paused.** Checked against the
 body by `tools/check_decisions.py`, because a summary that can drift from what it
 summarises is how `check_architecture.py` caught its own counts the first time a
 verdict changed.
@@ -425,9 +425,29 @@ path is not chosen.**
     they demonstrably do not. 066's *"composes any two vectors by one rule"* is true and
     the conclusion does not follow — **I measured tabulation's ceiling and claimed
     binding's reach**
-  - **Revival: STRUCTURED relation vectors.** The operation is not the problem, so
-    `bind` stays (14c) as the measured comparison for anything claiming to generalise.
-    **It also splits component 2's refusal** — see the relations row there
+  - **Revival: STRUCTURED relation vectors — and it is MET, see the next row.** The
+    operation is not the problem, so `bind` stays (14c) as the measured comparison for
+    anything claiming to generalise. **It also splits component 2's refusal** — see the
+    relations row there
+- ✅ **EXTENSIONAL relation vectors — `note 070`, and it answers 067's "whole question".**
+  Profile each relation by how other relations attach to the entities it links (relation
+  × {HH, HT, TH, TT}), compose with `concat` + circular convolution. Held-out rule
+  prediction **0.223 against random relations' 0.124** — paired **+0.099**, se 0.009,
+  **t = 11.6**, 120 seeds, wins 76% / loses 6%. **Nearly double.** `father` comes out
+  `grandfather`'s nearest neighbour, which is 067's own statement of the requirement
+  - **`note 069` first, and it moved the baseline.** `concat` lets a readout learn
+    MARGINALS worth **0.242** without using the vectors at all, so 067's 0.056 was taken
+    with the useful signal already removed. **Composition claims beat 0.24, not 0.05**
+  - **Five harness iterations, four caught by stated controls.** `lstsq` memorised
+    (trained 0.917 for all three representations, identical to 3dp); the random arm gave
+    0.125 where 067 says 0.056; **target leakage** — a 2-hop puzzle wrote its own rule
+    into its target's profile, and it was the *entire* first effect; and `story-edges-only`
+    was the WRONG control, since it also left six relations with zero profile. Per-seed
+    profiles are the fix. **What made it reportable: random + hadamard = 0.056 exactly**
+    on 067's own 97-rule set (0.050, i.e. chance, on the final 62-rule protocol)
+  - **Refutation: it does not transfer off kinship**, which has unusually strong
+    positional structure — `note 058` measured a domain with none. **And it is NOT built**:
+    `keys.py` still hashes token ids, and wiring it in faces the split in component 2
 - ⬜ **`index_at_hops` combined with the position-level index** — `159`/`160`/`161`
   built the pieces; `154` measured that the guard's premise is false (a hop key
   sits at cosine **0.96** to a single token's row, so it *does* name a concept).

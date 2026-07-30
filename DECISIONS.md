@@ -219,6 +219,14 @@ read.**
   - `133` **and it does not move the data wall**: +0.0124 past 16k, under the 0.04
     seed spread, not monotone. Store norm **0.4 at every corpus size** → a
     fixed-size cache holding a moving window, not a map that grows
+  - **`note 082` explains 133's window mechanically, and rehabilitates the mechanism.**
+    On a stream at 10× capacity it takes recall of the asked-about facts from **0.020 to
+    1.000**, and **recall tracks the correctness signal one-to-one** (0.9→0.915,
+    0.7→0.705, 0.5→0.540) — so the whole thing reduces to that signal, which `note 080`
+    measures at six sd, label-free. **Bounded, not unbounded:** the slow store saturates
+    in turn (1.1× → 0.965, 4.2× → 0.419), so it buys `total ÷ useful` and not infinity.
+    **And a fact never asked about inside its window is unrecoverable** — the cost the
+    fixture is built not to pay
   - `131`,`132` the first two passes measured the INSTRUMENT: a store saturated at
     `lasting_cap` before the run started, then a write rate 100× too large
   - **Off by default** because turning it on invalidates the text comparison set.
@@ -452,25 +460,20 @@ lives, and until 2026-07-29 nothing here had ever scored a multi-token answer.**
   average rather than select and 147 refuted the ways to choose — and **neither
   objection applies to a set answer, because nothing has to be selected.** The
   refutation was about the question.
-- 🔀 **Bound the enumeration by the biggest similarity gap** — an argmax over gaps,
-  not a threshold, which is the same move `148` made when it replaced a tuned
-  membership bar with a structurally-zero read.
-  - matches the best fixed `branches` at family sizes 3/4/5/6 **without being told
-    the size**, where no single fixed value works across sizes
-  - `look` becomes a **ceiling** rather than a target: flat from 6 to 16, but 0.500
-    at look=4 for a family of 6, so it must exceed the group
-  - *measured in:* families, index purity **1.000**, cliff ~0.45 wide against
-    within-family steps of ~0.01
-  - **`note 058`: REAL word co-occurrence has no such cliff, and the shape is the
-    finding.** Largest gap **0.059** against the task's **0.424** after four
-    confounds were closed — weighting on (`power` defaults to OFF and its docstring
-    calls it *"the one that moved `king` to `richard`"*), a content-word slice,
-    centring confirmed active, a shuffled control at 0.002. **At no setting does the
-    profile become bimodal:** real neighbourhoods decay in steps of 0.02–0.03 where
-    the task falls 0.45 in one. **A cliff rule needs a cliff and language provides a
-    slope**
-  - **So the crossover has a second clause:** this needs purity ≳ 0.99 **and** a
-    bimodal profile, and one real dataset supplies neither
+- 🔀 **Bound the enumeration by the biggest similarity gap** — an argmax over gaps, not a
+  threshold, the same move `148` made replacing a tuned bar with a structurally-zero read.
+  - Matches the best fixed `branches` at family sizes 3–6 **without being told the size**,
+    where no single fixed value works across all of them. `look` is a **ceiling** not a
+    target: flat 6→16, but 0.500 at look=4 for a family of 6, so it must exceed the group.
+    *measured in:* families, index purity **1.000**, cliff ~0.45 wide against within-family
+    steps of ~0.01
+  - **`note 058`: real word co-occurrence has NO cliff, and the shape is the finding.**
+    Largest gap **0.059** against the task's **0.424**, after four confounds were closed
+    (weighting off, content-word slice, centring confirmed, shuffled control at 0.002).
+    **At no setting is the profile bimodal** — language decays in steps of 0.02–0.03 where
+    the task falls 0.45 at once. **A cliff rule needs a cliff and language provides a
+    slope**, so the crossover needs purity ≳0.99 *and* bimodality, and one real dataset
+    supplies neither
 - 🔀 **Fixed `branches`** — the count supplied. `167`: the peak sits at
   `family_size − 1` in every row and collapses either side (1.000 → 0.500 → 0.083).
   - **`note 056`: this is a measured CROSSOVER, not a loser.** Degrading the
@@ -696,9 +699,14 @@ that is the standing weakness.**
   **Do not re-propose all-position training without a separate gate objective.**
 - ❌ **Perpetual learning as a repair for churn** — `091`: it does not heal churn,
   **because churn costs capacity** rather than knowledge. Treat its +0.008 as a
-  direction, not a number. Also the precedent that matters for anything
-  self-modifying: **C4 is still untested after two attempts, both times because the
-  task was too easy to need it** (`091`, `092`).
+  direction, not a number.
+  - **C4 IS NOW TESTED — `note 081`/`082`, and `091`/`092` failed only because their
+    tasks never saturated.** At 10.6× capacity a single store gives recall **0.07**, and
+    *symmetrically* — oldest beats recent, so it is **interference, not forgetting, and
+    replay cannot fix it.** Decay converts that into a window (0.990 on the last 100,
+    **0.000 older**). **The answer is two multipliers:** consolidation for selectivity
+    (`total ÷ useful`) and partitioning for capacity (`node count`). Neither suffices;
+    forever exceeds any fixed multiple, so **what to shed is still open**
 - ❌ **Concept addressing as a fix for text prediction** — 0.540 bits at bias 0, and
   a grouping built from SHUFFLED text does as well. **The address count did the
   work, not the concepts.** `141`

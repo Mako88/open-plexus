@@ -1,0 +1,132 @@
+What does use-based eviction throw away?
+=========================================
+
+Script: experiments/g25_01_dormant_facts.py  (to be written)
+Status: NOT RUN. Predictions registered and committed before the script exists.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+The system cannot keep everything, so it throws things away. The rule it uses is
+"discard whatever has gone longest without being asked about", and that rule
+scored perfectly: every fact that keeps being queried survives, 100 out of 100.
+
+But look at what that rule does to a fact **nobody has asked about yet**. It
+throws it away first, by design.
+
+For a system meant to learn things it will need LATER, that is the obvious way
+for a good rule to be a bad one. And the existing measurement cannot see it,
+because every fact in it gets queried at some point.
+
+This adds the missing case: facts that are never asked about while the stream
+runs, and asked about at the end.
+
+
+WHY THIS EXISTS
+----------------
+`note 083` is C4's answer -- learning forever is reachable in fixed storage,
+bounded in content and unbounded in time -- and it measured:
+
+    policy                   persistent            abandoned
+    random             0.717 (sd 0.045)     0.783 (sd 0.045)
+    least-recent       1.000 (sd 0.000)     0.500 (sd 0.000)
+    least-frequent     1.000 (sd 0.000)     0.500 (sd 0.000)
+
+PERSISTENT is queried throughout; ABANDONED is queried during the first quarter.
+**Both are queried.** `docs/options/use-based-eviction.md` names the gap in its
+own words:
+
+    A useful fact nobody asks about inside its window is gone before it can be
+    promoted. Every fixture measuring this policy queries the facts it cares
+    about, so none of them pays that cost.
+
+**And the record names a second gap:** *"Recency and frequency are
+indistinguishable here, because both are true of the same facts by
+construction."* Two policies scoring 1.000 and 0.500 identically is not two
+results, it is one result the instrument cannot split.
+
+**There is also no script.** The option record's CONFIG says `script unrecorded`,
+and nothing in `experiments/` or `tools/` reproduces it. A headline C4 result that
+cannot be re-run is note 105's shape, and re-deriving it is half of what this
+does.
+
+
+THE ARMS
+--------
+    PERSISTENT   queried throughout                  note 083's arm
+    ABANDONED    queried during the first quarter    note 083's arm
+    DORMANT      NEVER queried during the stream,    NEW
+                 asked about only at the end
+
+    random           evict a uniformly random slot
+    least-recent     evict the longest-unqueried
+    least-frequent   evict the least-queried
+
+Reproducing note 083's two arms is the control. **If PERSISTENT and ABANDONED do
+not come back at 1.000 / 0.500 and 0.717 / 0.783, this harness is not that
+harness** and the DORMANT column says nothing.
+
+Splitting recency from frequency needs a case where they disagree, and DORMANT is
+one: every dormant fact has been touched exactly once, at write, so recency
+orders them by WRITE TIME while frequency ties them all at one.
+
+
+PREDICTIONS
+-----------
+  P1  THE CONTROL. PERSISTENT and ABANDONED reproduce note 083 within 0.05:
+      random 0.717 / 0.783, both content-aware policies 1.000 / 0.500.
+
+      Refuted means the harness differs from the one that produced C4's answer,
+      and nothing else here is readable. **This is the first time those numbers
+      will have been re-run at all.**
+
+  P2  THE TEST. On DORMANT, both content-aware policies score BELOW random.
+
+      This is the cost the option record names and no fixture has paid. Refuted
+      if they match or beat random, which would mean the policy's advantage is
+      not bought at the expense of the unqueried.
+
+  P3  On DORMANT, least-recent and least-frequent SEPARATE -- they differ by
+      more than 0.05, where on the other two arms they are identical.
+
+      Because a dormant fact is touched once at write: recency orders them by
+      write time, frequency ties them all. **If they still do not separate, the
+      instrument cannot tell the two policies apart at all and note 083's
+      "indistinguishable" is a property of the measurement rather than of the
+      policies.**
+
+  P4  THE ONE I EXPECT TO BE UNCOMFORTABLE. DORMANT under least-frequent lands
+      near ZERO, not merely below random.
+
+      Every dormant fact has count 1 and every persistent fact has many, so the
+      policy evicts the whole dormant class before touching a persistent one. If
+      that is right, the rule this project calls C4's answer discards
+      **everything it has not yet been asked about**, and "bounded in content,
+      unbounded in time" needs the word USED in it.
+
+
+WHAT WOULD MAKE THIS NOT COUNT
+--------------------------------
+**Slot arithmetic doing the work.** Note 083's 0.500 on abandoned is exactly
+150 slots minus 100 persistent, over 100 abandoned. With three classes the
+arithmetic changes, so the slot count and class sizes are reported beside every
+number and the expected-by-arithmetic value is printed next to the measured one.
+
+**Ties.** With frequency, the whole dormant class ties at one. How ties break is
+then the entire result, so it is chosen explicitly -- oldest first -- and stated,
+rather than falling out of dict order. `g23-02` is the calibration: an unsorted
+set made a number move between runs of the same seed.
+
+
+COST
+----
+Pure Python over a bounded dict, 4,000 facts, no model and no training. Seconds.
+Local, no dispatch.
+
+
+MEASURED ON
+-----------
+A stream of 4,000 facts through 150 slots, 3 seeds, matching note 083's
+parameters exactly so the control arms are comparable.

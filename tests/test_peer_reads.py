@@ -31,7 +31,7 @@ from openplexus.keys import PairKeys
 from openplexus.ownership import Ring
 from openplexus.partitioned import ConceptStore
 from openplexus import peer as peer_module
-from openplexus.peer import ConceptPeer, RemoteConcepts
+from openplexus.peer import ConceptPeer, RemoteConcepts, reader_for
 
 WIDTH, VOCAB, NODES = 64, 40, 5
 #: Fewer replicas than peers, so a misroute has somewhere to go that genuinely lacks
@@ -205,19 +205,44 @@ class ABeamTraversalRunsWithoutADriver(unittest.TestCase):
         for peer in self.peers:
             peer.close()
 
+    #: Pinned so the round count below is about a stated depth rather than a literal.
+    DEPTH = 3
+
     def _walk(self, reader):
         from openplexus.retrieval import SuperposedRead
         from openplexus.search import beam
         walks = beam(None if reader else self.whole, SuperposedRead(), self.keys,
-                     self.values, FACT, 2, self.values[5], 3, width=2, branches=2,
-                     allowed=np.array(self.RELS), reader=reader)
+                     self.values, FACT, 2, self.values[5], self.DEPTH, width=2,
+                     branches=2, allowed=np.array(self.RELS), reader=reader)
         return walks[0].relations if walks else None
 
     def test_the_driver_free_walk_equals_the_in_process_one(self):
-        def routed(previous, token):
+        self.assertEqual(self._walk(reader_for(self.remote, self.keys)),
+                         self._walk(None))
+
+    def test_a_reader_WITHOUT_batching_finds_the_same_walk(self):
+        """`many` is optional, so a plain callable must keep working unchanged."""
+        def one_at_a_time(previous, token):
             return self.remote.read(self.keys.owner(previous, token),
                                     previous, token)
-        self.assertEqual(self._walk(routed), self._walk(None))
+        self.assertEqual(self._walk(one_at_a_time), self._walk(None))
+
+    def test_the_walk_costs_TWO_rounds_per_hop(self):
+        """A hop is two DEPENDENT rounds, and batching cannot make it one.
+
+        Follow, then look up what the follow decoded to. Pinned here because
+        `tools/walk_rounds.py` shows this leaves depth 10 at 1,000 ms against a 640 ms
+        `d_max` -- the shape of that arithmetic is a property worth failing on rather
+        than a sentence in a note nobody rereads.
+        """
+        before = self.remote.rounds
+        self._walk(reader_for(self.remote, self.keys))
+        self.assertEqual(
+            self.remote.rounds - before, 2 * self.DEPTH,
+            f"a depth-{self.DEPTH} walk took a different number of rounds than "
+            f"2*depth. DOWN would mean the follow and the look-up stopped depending "
+            f"on each other, which is a real result and the one d_max needs; UP means "
+            f"a hop's reads are no longer sharing a request.")
 
     def test_the_walk_is_the_true_chain(self):
         """Equality against a wrong walk would also be equality."""
@@ -535,7 +560,8 @@ class ThePeerRefusesAMismatchItself(unittest.TestCase):
                 # header — which is note 096's *"a protocol change is invisible to
                 # the fingerprint"* arriving as a test failure rather than as two
                 # peers silently misparsing each other.
-                send(raw, struct.pack("!Biii", 0, 0, FACTS[0][0], FACTS[0][1]))
+                send(raw, struct.pack("!Bi", 0, 1)
+                     + struct.pack("!iii", 0, FACTS[0][0], FACTS[0][1]))
                 payload = receive(raw)
             except (ConnectionError, OSError):
                 return None
@@ -562,9 +588,11 @@ class TheWireFormatIsPinnedToItsVersion(unittest.TestCase):
     rule 18 says to prefer a check over.
     """
 
-    #: The layout `PROTOCOL = 2` describes. If this assertion fails, the wire format
-    #: changed: bump `peer.PROTOCOL` and update this pair together.
-    EXPECTED = {2: "!Biii"}
+    #: EVERY struct on the wire, per version. Pinning only the header would have
+    #: missed version 3, which moved the pair into a struct of its own -- so the
+    #: header shrank, the format changed, and one assertion about `_REQUEST` alone
+    #: could have been satisfied by editing the expected string.
+    EXPECTED = {2: ("!Biii",), 3: ("!Bi", "!iii")}
 
     def test_the_struct_layout_matches_the_declared_version(self):
         self.assertIn(
@@ -572,7 +600,9 @@ class TheWireFormatIsPinnedToItsVersion(unittest.TestCase):
             f"PROTOCOL is {peer_module.PROTOCOL} and this test does not know that "
             f"version. Add its layout to EXPECTED in the same commit that bumps it.")
         self.assertEqual(
-            peer_module._REQUEST.format, self.EXPECTED[peer_module.PROTOCOL],
+            (peer_module._REQUEST.format, peer_module._PAIR.format)[
+                :len(self.EXPECTED[peer_module.PROTOCOL])],
+            self.EXPECTED[peer_module.PROTOCOL],
             "the request layout changed without PROTOCOL changing, so two peers on "
             "different code would agree on the fingerprint and misparse each other")
 

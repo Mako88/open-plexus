@@ -39,6 +39,7 @@ coordinator.
 
 from __future__ import annotations
 
+import collections
 import hashlib
 import socket
 import struct
@@ -49,25 +50,32 @@ import numpy as np
 from openplexus.distributed import receive, send
 from openplexus.ownership import Ring
 
-#: `(kind, concept, previous, token)`. The key is REBUILT by the peer from
-#: `(previous, token)` rather than sent: that is `derived_keys`' whole argument, and it
-#: keeps a read request at thirteen bytes instead of a width-vector. A WRITE carries the
-#: value after the header, which is the only place a width-vector crosses the wire in
-#: this direction.
-_REQUEST = struct.Struct("!Biii")
+#: `(kind, count)`, then `count` pairs. **Every request carries a count, and a single
+#: read is `count == 1`** -- one code path rather than a batch format bolted beside a
+#: scalar one, which is where the two would drift.
+_REQUEST = struct.Struct("!Bi")
+#: `(concept, previous, token)`. The key is REBUILT by the peer from `(previous, token)`
+#: rather than sent: that is `derived_keys`' whole argument, and it keeps a read at
+#: twelve bytes instead of a width-vector. A WRITE carries the value after the pairs,
+#: which is the only place a width-vector crosses the wire in this direction.
+_PAIR = struct.Struct("!iii")
 READ, WRITE, STOP = 0, 1, 2
 #: The WIRE FORMAT's version, carried in the fingerprint so two peers speaking different
 #: dialects refuse each other instead of misparsing.
 #:
 #: **1** was reads only: `(concept, previous, token)`.
 #: **2** added a kind byte and the write payload.
+#: **3** moved the pair out of the header and put a COUNT in it, so one request may
+#: carry a whole hop's reads. Note 100 is why: `d_max` is a deadline on a walk, so the
+#: binding quantity is sequential ROUND TRIPS, and a hop's reads are independent of
+#: each other.
 #:
 #: Note 096 recorded the gap this fills — *"two peers on different code with the same
 #: config produce the same fingerprint, so a protocol change is invisible to it"* — and
 #: note 098 hit it one commit later, when adding the write kind silently changed the
-#: format. **`tests/test_peer_reads.py` pins this against `_REQUEST.format`**, so changing
-#: the layout without bumping the number fails rather than shipping.
-PROTOCOL = 2
+#: format. **`tests/test_peer_reads.py` pins this against both struct layouts**, so
+#: changing either without bumping the number fails rather than shipping.
+PROTOCOL = 3
 #: A write is acknowledged so the caller knows it landed. One byte.
 _ACK = b""
 #: The handshake. A peer and a caller must agree about the ring AND the key source, and
@@ -177,24 +185,31 @@ class ConceptPeer:
                         break
                     if not message:
                         break
-                    header = message[:_REQUEST.size]
-                    kind, concept, previous, token = _REQUEST.unpack(header)
+                    kind, count = _REQUEST.unpack(message[:_REQUEST.size])
                     if kind == STOP:
                         self._stop = True
                         return
-                    key = self.keys.pair(previous, token)
+                    end = _REQUEST.size + count * _PAIR.size
+                    pairs = [_PAIR.unpack_from(message, offset) for offset in
+                             range(_REQUEST.size, end, _PAIR.size)]
                     if kind == WRITE:
-                        # The value rides after the header in the SAME message, so a
+                        concept, previous, token = pairs[0]
+                        # The value rides after the pairs in the SAME message, so a
                         # write is one round trip rather than two.
-                        value = np.frombuffer(message[_REQUEST.size:],
+                        value = np.frombuffer(message[end:],
                                               dtype=">f8").astype(float)
-                        self.store.write(concept, key, value)
+                        self.store.write(concept, self.keys.pair(previous, token),
+                                         value)
                         self.writes += 1
                         send(connection, _ACK)
                         continue
-                    send(connection,
-                         np.asarray(self.store.read(concept, key),
-                                    dtype=">f8").tobytes())
+                    # One reply for the whole batch, vectors concatenated in the
+                    # order asked. The caller pairs them up by position, so nothing
+                    # about which concept an answer belongs to crosses the wire.
+                    answers = [np.asarray(
+                        self.store.read(concept, self.keys.pair(previous, token)),
+                        dtype=">f8") for concept, previous, token in pairs]
+                    send(connection, b"".join(a.tobytes() for a in answers))
 
     def close(self) -> None:
         """Stop serving, and do not return until the peer has actually stopped.
@@ -213,6 +228,27 @@ class ConceptPeer:
             self._listener.close()
         except OSError:
             pass
+
+
+def reader_for(remote, keys):
+    """A `search`-shaped reader that routes through `remote` and batches a hop.
+
+    `search` takes `reader=` precisely so it never learns what a peer is, which leaves
+    somebody to write the two-line closure that turns `(previous, token)` into a routed
+    read. It was written twice already -- once in a test, once in a measurement -- and
+    the second copy is where the batching would have been forgotten.
+
+    The `many` attribute is what `search.beam` looks for. **A reader without one still
+    works**, one read per round trip, so the batching is an optimisation a transport may
+    offer rather than a contract every reader must meet.
+    """
+    def read(previous: int, token: int) -> np.ndarray:
+        return remote.read(keys.owner(previous, token), previous, token)
+
+    read.many = lambda pairs: remote.read_many(
+        [(keys.owner(previous, token), previous, token)
+         for previous, token in pairs])
+    return read
 
 
 class RemoteConcepts:
@@ -252,6 +288,10 @@ class RemoteConcepts:
         self._connections: dict[int, socket.socket] = {}
         #: Reads served, so a measurement can count messages rather than assume them.
         self.reads = 0
+        #: ROUND TRIPS, which is the quantity `d_max` is a deadline on. Kept apart from
+        #: `reads` because note 100's whole finding is that the two are different and
+        #: the message count is the one that does not bind.
+        self.rounds = 0
 
     def _connection(self, node: int) -> socket.socket:
         existing = self._connections.get(node)
@@ -302,8 +342,8 @@ class RemoteConcepts:
         That trades a wait for a window in which a read can miss a recent write, and
         which is right depends on a measurement nobody has taken.
         """
-        payload = _REQUEST.pack(WRITE, concept, previous, token) + np.asarray(
-            value, dtype=">f8").tobytes()
+        payload = (_REQUEST.pack(WRITE, 1) + _PAIR.pack(concept, previous, token)
+                   + np.asarray(value, dtype=">f8").tobytes())
         #: Named so the fan-out has one anchor a mutation can target. `for node in
         #: self.holders(concept)` appears on the read path too, and a mutation cannot
         #: point at a line that occurs twice -- which is the duplication check arriving
@@ -325,31 +365,93 @@ class RemoteConcepts:
         return landed
 
     def read(self, concept: int, previous: int, token: int) -> np.ndarray:
-        """Ask the owner; on a dead peer, ask the next holder.
+        """One read. A batch of one, so there is a single read path to be right about."""
+        return self.read_many([(concept, previous, token)])[0]
 
-        **A departure costs a round trip, not the answer.** C3 says peers come and go,
-        and asking only the owner makes every departure a lost concept even though the
-        replicas already hold it.
+    def read_many(self, requests) -> list[np.ndarray]:
+        """Read many pairs in ONE round trip per peer, sends before receives.
 
-        Returns zeros when no holder answers, matching `ConceptStore.read` -- *"an
-        honest absence rather than a degraded answer"* -- and increments `absent`, so
-        the absence is counted. An uncounted zero vector decodes to whatever the readout
-        prefers and reads as an answer.
+        ## Why the batch is the primitive
+
+        `d_max` is a deadline on a WALK, so what binds is how many round trips are
+        strung end to end -- not how many messages are sent. A beam hop's reads are
+        independent of each other: the pairs are all known before any is issued. Note
+        100 measured the difference at ten hops and width four, 50 ms RTT:
+
+            one read per round trip     77 x 50 ms = 3,850 ms     six times over
+            one round trip per hop      batched, see `rounds`
+
+        **Every request is sent before any reply is read**, which is what makes this
+        one round rather than `k`. One socket per peer is what allows it: replies
+        arrive on separate connections, so nothing has to be matched up by an id.
+
+        ## Failover, and why it costs a whole round
+
+        A dead holder sends its group back through the loop, so a departure costs one
+        more ROUND for the whole batch rather than one round trip for the pair that
+        missed. That is the wrong trade if departures are common and the right one if
+        they are rare, and C3 does not say which. **Stated rather than tuned**, since
+        `rounds` now measures it.
+
+        Returns zeros for pairs no holder answered, matching `ConceptStore.read` --
+        *"an honest absence rather than a degraded answer"* -- and counts each in
+        `absent`. An uncounted zero vector decodes to whatever the readout prefers and
+        reads as an answer.
         """
-        for node in self.holders(concept):
+        answers: list[np.ndarray | None] = [None] * len(requests)
+        pending = list(range(len(requests)))
+        for attempt in range(self.replicas):
+            if not pending:
+                break
+            groups: dict[int, list[int]] = collections.defaultdict(list)
+            for index in pending:
+                holders = self.holders(requests[index][0])
+                if attempt < len(holders):
+                    groups[holders[attempt]].append(index)
+            if not groups:
+                break
+            self._round(groups, requests, answers)
+            # RECOMPUTED, not assumed: an attempt that answered nothing would
+            # otherwise loop asking the same dead peers, and one that answered
+            # everything would keep asking replicas for answers already in hand.
+            pending = [index for index in pending if answers[index] is None]
+        for index in pending:
+            self.absent += 1
+            answers[index] = np.zeros(self.width)
+        return [np.zeros(self.width) if a is None else a for a in answers]
+
+    def _round(self, groups, requests, answers) -> None:
+        """Send every group, then collect every reply. One round trip of wall time."""
+        self.rounds += 1
+        sent = {}
+        for node, indices in groups.items():
+            payload = _REQUEST.pack(READ, len(indices)) + b"".join(
+                _PAIR.pack(*requests[index]) for index in indices)
             try:
-                connection = self._connection(node)
-                send(connection, _REQUEST.pack(READ, concept, previous, token))
-                payload = receive(connection)
-            except (ConnectionError, OSError, ValueError) as failure:
-                if isinstance(failure, ValueError):
-                    raise      # a fingerprint mismatch is a config fault, not churn
+                send(self._connection(node), payload)
+            except (ConnectionError, OSError):
                 self._drop(node)
                 continue
-            self.reads += 1
-            return np.frombuffer(payload, dtype=">f8").astype(float)
-        self.absent += 1
-        return np.zeros(self.width)
+            sent[node] = indices
+        for node, indices in sent.items():
+            try:
+                payload = receive(self._connections[node])
+            except (ConnectionError, OSError, KeyError):
+                self._drop(node)
+                continue
+            block = np.frombuffer(payload, dtype=">f8").astype(float)
+            if block.size != len(indices) * self.width:
+                # A short reply is not an absence: it means the peer answered a
+                # different question than the one asked, and positional pairing
+                # would then hand every later answer to the wrong read.
+                raise ValueError(
+                    f"peer {node} returned {block.size} floats for "
+                    f"{len(indices)} reads at width {self.width}. Answers are "
+                    f"paired to requests BY POSITION, so a wrong-length reply "
+                    f"misassigns every answer after it rather than losing one.")
+            for offset, index in enumerate(indices):
+                answers[index] = block[offset * self.width:(offset + 1) * self.width]
+            self.reads += len(indices)
 
     def _drop(self, node: int) -> None:
         """Forget a peer's socket so a later read reconnects rather than reusing it."""

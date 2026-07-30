@@ -160,6 +160,25 @@ def _resolve(reader, readable, retrieval, keys):
     return reader or _reader(readable, retrieval, keys)
 
 
+def _many(read):
+    """Read several pairs at once when the reader can, one at a time when it cannot.
+
+    ## The quantity this is about
+
+    `d_max` is a deadline on a WALK, so what binds is how many round trips are strung
+    end to end -- not how many reads happen. Note 100 measured the difference: at ten
+    hops and width four a walk makes 77 reads, and issuing them one at a time costs
+    `77 x RTT` where the reads WITHIN a hop are independent and could share a trip.
+
+    **Optional, not required.** A local matrix has no round trips to save, and a reader
+    that offers no `many` is looped over -- so the batching is a property a transport
+    may have rather than a contract every reader must meet. The fallback is what keeps
+    `beam` one function instead of a batched copy beside a scalar one.
+    """
+    return getattr(read, "many", None) or (
+        lambda pairs: [read(previous, token) for previous, token in pairs])
+
+
 def _top(scores: np.ndarray, count: int,
          allowed: np.ndarray | None) -> list[int]:
     """The `count` highest-scoring token ids, best first.
@@ -404,11 +423,11 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     if width < 1 or branches < 1:
         raise ValueError("width and branches must both be at least 1")
 
-    read = _resolve(reader, readable, retrieval, keys)
+    many = _many(_resolve(reader, readable, retrieval, keys))
 
     # A partial walk: entity now, relations committed, values read, entities passed,
     # and the cumulative decode score that pruning ranks on.
-    root = read(fact_token, start)
+    root, = many([(fact_token, start)])
     opening = _top(_decode(wv, root), branches, allowed)
     if not opening:
         return []
@@ -416,12 +435,20 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
                for r in opening]
 
     for _ in range(depth - 1):
+        # FOLLOW every surviving walk in ONE round. The pairs are all known before
+        # any is issued -- a hop's walks do not depend on each other, only on the
+        # hop before -- so `width` reads share a round trip instead of taking one
+        # each. That is note 100's fix and the whole reason `many` exists.
+        followed = many([(current, relations[-1])
+                         for current, relations, *_ in partial])
+        landings = [int(np.argmax(_decode(wv, nxt))) for nxt in followed]
+        # LOOK UP, in a SECOND round. **This cannot join the follow above**: the
+        # entity to look up is what the follow's value decoded to, so a hop costs two
+        # round trips and not one. Note 101 is the arithmetic that falls out of that.
+        values = many([(fact_token, landed) for landed in landings])
         grown: list[tuple] = []
-        for current, relations, retrieved, entities, cumulative in partial:
-            # FOLLOW, exactly as `walk_from` does, so the two are comparable.
-            nxt = read(current, relations[-1])
-            landed = int(np.argmax(_decode(wv, nxt)))
-            value = read(fact_token, landed)
+        for (_, relations, retrieved, entities, cumulative), landed, value in zip(
+                partial, landings, values):
             scores = _decode(wv, value)
             for candidate in _top(scores, branches, allowed):
                 grown.append((landed, relations + (candidate,),
@@ -435,11 +462,13 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
         grown.sort(key=lambda item: item[4], reverse=True)
         partial = grown[:width]
 
-    walks = []
-    for current, relations, retrieved, entities, _ in partial:
-        endpoint = read(current, relations[-1])
-        walks.append(Walk(relations, entities, retrieved, endpoint,
-                          float(endpoint @ target)))
+    # The endpoints are independent too, so they are one round rather than `width`.
+    endpoints = many([(current, relations[-1])
+                      for current, relations, *_ in partial])
+    walks = [Walk(relations, entities, retrieved, endpoint,
+                  float(endpoint @ target))
+             for (_, relations, retrieved, entities, _), endpoint
+             in zip(partial, endpoints)]
     walks.sort(key=lambda w: w.score, reverse=True)
     return walks
 

@@ -626,13 +626,15 @@ not gate anything above.**
 
 ## 9. Distribution
 
-**⇒ THE DRIVER IS GONE FROM THE READ PATH, `note 093`/`094`.** A read goes to the one
-peer holding the fact — 2 messages rather than 2N, and no sum, so C1's collective is off
-the read path. Writes reach every holder (`note 098`), a departure costs a round trip
-rather than the answer (`note 097`), routing is consistent hashing (`note 095`), and the
-wire format plus the ring are fingerprinted so a mismatch is refused rather than served
-(`note 096`/`099`). **Dimension splitting remains the default and `concept_nodes` is still
-0**; the peer transport is a parallel path nothing in `run()` uses yet.
+**⇒ THE DRIVER IS GONE FROM THE READ PATH, `note 093`/`094` — AND THE PATH MISSES `d_max`
+BEYOND DEPTH 7, `note 101`.** A read goes to the one peer holding the fact: 2 messages
+rather than 2N, no sum, so C1's collective is off the read path. Writes reach every
+holder (`note 098`), a departure costs a round trip rather than the answer (`note 097`),
+routing is consistent hashing (`note 095`), and the wire plus the ring are fingerprinted
+(`note 096`/`099`). **But C2 is a deadline on a WALK**, and a hop is two dependent round
+trips, so depth 10 costs 1,000 ms against 640 ms even with a hop's reads batched.
+**Dimension splitting remains the default and `concept_nodes` is still 0**; the peer
+transport is a parallel path nothing in `run()` uses yet.
 
 - ✅ **Partition by dimension** — every node computes `M_slice @ key_slice` and
   inherits the sum. Current default.
@@ -655,10 +657,6 @@ wire format plus the ring are fingerprinted so a mismatch is refused rather than
     the TIME.** Under dimension splitting every read needs every node and it really is
     4× the traffic. *no measurement* — reasoned from the mechanism's own structure, and
     it is a stronger argument for this option than 134's independence case
-  - **The obstacle is PRUNING, not the reads.** Top-`width` over the beam is a
-    collective every participant must join, which is the barrier C1 forbids. The fix
-    exists: `distributed.py`'s deadline settles a step on what arrived, so a slow node
-    costs a candidate rather than stalling — the path `169`'s silent peer made testable
   - **`note 081` MAKES IT MANDATORY, and this is the strongest argument for it.**
     Capacity is fixed at `~0.023·d²` per store, and both knobs fail: no decay saturates
     (recall **0.07 at 10.6×**, and *symmetric* — oldest beats recent, so it is
@@ -671,9 +669,8 @@ wire format plus the ring are fingerprinted so a mismatch is refused rather than
     half capacity and **1.03 at 10.6×** — gone. `note 080`'s contradiction signal is the
     same quantity, so **the credit loop closes only inside the window.** Gate health is a
     function of LIVE load, not total writes
-  - **So its case was INDEPENDENCE and churn resilience, not capacity** — that framing
-    is now superseded by 081. Under dimension splitting a node can never answer alone
-    however large the system gets
+  - Its case used to be independence and churn resilience; **081 supersedes that**. Under
+    dimension splitting a node can never answer alone however large the system gets
   - **BLOCKER, `note 072`: under the `kinship` layout it would cap at TWENTY nodes.**
     Ownership is `previous_concept = tokens[t-1]`, and kinship puts the relation there, so
     **100.0% of CLUTRR's 7,132 traversal bindings are owned by a relation** (`sister`
@@ -706,13 +703,23 @@ wire format plus the ring are fingerprinted so a mismatch is refused rather than
     are needed and either alone looks fine.** Losing every holder returns zeros and
     **counts** them, because an uncounted zero decodes to whatever the readout prefers
   - **Fingerprinted** (`note 096`/`099`): peer count, ring seed, key seed/spread/width/
-    start/route/markers, and the **wire-format version** — pinned to `_REQUEST.format` by a
-    test, so changing the layout without bumping it fails rather than shipping
+    start/route/markers, and the **wire-format version**, pinned to every struct on the
+    wire by a test. **It caught `PROTOCOL` 3 the day after it was written**
+  - ❌ **One read per round trip** (`note 100`/`101`): a walk's 77 reads at depth 10 cost
+    `77 × RTT` = 3,850 ms. `read_many` batches a hop's independent reads into one round,
+    giving 1,000 ms — **necessary and not sufficient, since `d_max` is 640 ms**
+  - 🔀 **A MIGRATING walk** is where the remaining 2× is (`note 101`): `owner` routes a
+    hop's look-up and the next hop's follow to the **same concept**, so 12 of 19 rounds
+    ask a peer the round before already used. One peer visit per hop is ~`depth × RTT/2`.
+    **Blocked on PRUNING**, which ranks all `width` walks together, so the caller is a
+    rendezvous every hop — and that is the second round trip. `distributed.py`'s deadline
+    is the shape of the fix: settle a step on what arrived, so a slow node costs a
+    candidate rather than stalling. `width`-way is bounded, so not C1's collective
   - **Costs, stated:** the retrieval strategy moves to the owning node, because a remote
     store cannot return a `d×d` matrix (512 KB against 2 KB). A write waits for `R` holders,
-    which is not `N` but is not free. **Untried:** ordering (writes race and the store is
-    additive), re-replication after a departure, negotiation rather than refusal, and
-    anything at scale or over real latency
+    which is not `N` but is not free. Batching trades round trips for bytes, right only
+    while latency dominates. **Untried:** ordering (writes race, store is additive),
+    re-replication after departure, negotiation rather than refusal, real latency
 - ❌ **The global dimension-summing readout** — this is the globally synchronised
   step **C1 forbids**, the project's own first constraint. Surfaced in a footnote
   to [note 009](docs/notes/009-splitting-the-memory.md) §4 **after four gates were

@@ -413,8 +413,14 @@ consequences follow immediately and each one has already changed a decision:
   [DECISIONS.md](DECISIONS.md) for where that stands.
 - **Evaluation should be PREQUENTIAL** — predict the next item, then learn from
   it, and score the predictions made along the way. A train/test split measures a
-  system that stops, which is the thing C4 forbids. Every number in this project
-  so far comes from a split.
+  system that stops, which is the thing C4 forbids.
+
+  **CORRECTED 2026-07-29.** This read *"Every number in this project so far comes
+  from a split"*, which stopped being true and then stayed on the page. Decision
+  117 scored prequentially — with the n-gram baselines scored prequentially too,
+  because a bigram fitted on the whole corpus is not a fair opponent for a model
+  given one online pass. **What holds is the weaker claim:** prequential
+  evaluation is what C4 demands and is still the exception rather than the norm.
 
 C4 does not conflict with C1–C3 and sharpens them: a node that must keep learning
 forever cannot rely on ever having seen the whole corpus, which is the same
@@ -560,7 +566,7 @@ from them may be quoted until it has been.
 | Feedback alignment / DFA | Lillicrap et al. (2016); Nøkland (2016) | Removes weight transport. |
 | Reservoir computing | Maass (LSM); Jaeger (ESN) | **The G0 control.** Any result must be reported against a random frozen substrate, because that is what a reservoir already gives for free. |
 | Federated / decentralised learning | (survey needed) | **Gap in the predecessor's reading.** This is the field that actually studies unreliable heterogeneous nodes, and it was never consulted. Read before designing distribution. |
-| Gossip / epidemic protocols, CRDTs | (survey needed) | **Gap.** C1 and C3 are distributed-systems problems with a distributed-systems literature. |
+| Gossip / epidemic protocols, CRDTs | **READ 2026-07-28** | C1 and C3 are distributed-systems problems with a distributed-systems literature. **No longer a gap:** SWIM and CRDTs were read, the detector was found to eject nodes permanently where SWIM says suspect-and-retry, and it was fixed. A second pass corrected a misreading of SWIM's retry interval — it was in the wrong unit, steps rather than seconds, and a step has no fixed duration. |
 
 The last two rows are additions. The predecessor read neuroscience and machine
 learning and did not read distributed systems, which — given that the goal is a
@@ -606,7 +612,7 @@ because two of them named the wrong parameter, which is worth a reader knowing.
 | 2 | Which credit-assignment scheme, and what is the argument that it satisfies C1 and C2? | [note 002](docs/notes/002-which-credit-assignment-scheme.md), [note 008](docs/notes/008-the-task-objective-mismatch.md) | Self-supervised temporal prediction. It converts latency from a *race* into a *buffer depth*: nothing is in transit that can be late, so delay costs memory rather than credit precision. Note 002 §7's proposed structured-filler fix had the sign backwards; note 008 §4 shows irreducible loss contributes no gradient, so random filler is correct. |
 | 3 | What is the churn model? | [note 003](docs/notes/003-the-churn-model.md) | The machine is the failure domain; assume no warning; detection is a separate liveness channel, because on a sparse substrate silence is normal. `d_max` is simultaneously the C2 asynchrony bound and the C3 churn timeout. Session lengths are Weibull with shape below 1, so uptime predicts remaining uptime. |
 | 4 | What fraction of connections crosses the network? | [note 004](docs/notes/004-the-bandwidth-budget.md), [note 009](docs/notes/009-splitting-the-memory.md) | **The question named the wrong parameter.** The fraction is forced to ~1 under uniform placement. The free quantity is `D`, distinct destination *machines* per emitting unit, and it must be single digits to low tens. That forces local-dominant connectivity with sparse long-range links — derived from a bandwidth budget, not from biology. |
-| 5 | Does the distributed-systems literature already answer C3? | [note 003](docs/notes/003-the-churn-model.md) | Partly. The churn measurements transferred directly; federated learning's architecture did not transfer at all, being round-based with a central aggregator — a C1 violation twice over. **Gossip protocols, SWIM-style failure detectors and CRDTs are still unread**, and SWIM in particular exists to avoid exactly the false positives note 003 §5 names. |
+| 5 | Does the distributed-systems literature already answer C3? | [note 003](docs/notes/003-the-churn-model.md) | Partly. The churn measurements transferred directly; federated learning's architecture did not transfer at all, being round-based with a central aggregator — a C1 violation twice over. **CORRECTED 2026-07-29: they are no longer unread.** SWIM and CRDTs were read on 2026-07-28, and SWIM did exactly what this row predicted — it named the false positives note 003 §5 names, and the detector was ejecting nodes permanently where SWIM says suspect-and-retry. A second reading found the retry interval carried in the wrong unit. |
 
 ---
 

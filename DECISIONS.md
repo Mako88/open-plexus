@@ -36,7 +36,7 @@ sparse keys were measured worse, then a readout change reversed them cleanly. So
 search on correct arithmetic; both conditions were measured away later and both
 mechanisms became right. A deleted alternative cannot be re-measured.
 
-**CENSUS: 22 chosen, 27 refuted, 16 untried, 12 both, 1 paused.** Checked against the
+**CENSUS: 22 chosen, 28 refuted, 16 untried, 12 both, 1 paused.** Checked against the
 body by `tools/check_decisions.py`, because a summary that can drift from what it
 summarises is how `check_architecture.py` caught its own counts the first time a
 verdict changed.
@@ -121,13 +121,35 @@ keys, which are still the default and still correct for MQAR.**
     surface key and a default at the concept key are *different addresses*.
     `ByConcept` was a READ POLICY, which is why 148 cost a sketch and not a
     representation
-- ⬜ **Content-derived keys** — similar concepts land on nearby addresses. **The
-  store currently has no notion of similarity at all:** `dog` and `wolf` are as
-  unrelated as `dog` and `7`. Similarity lives in `ContentIndex`, a side channel
-  consulted by hand.
-  - `042 §2` ranked this third by blast radius. `g10-09` tried it and was
-    **RETRACTED** — the cache was indexed by token id, so the question was never
-    asked. **Still open, and it is the third face of the concept-map change.**
+- ❌ **Content-derived keys, i.e. similar concepts on NEARBY addresses** — and this
+  entry exists because reading the tree as a tree found it contradicting §1.
+  - `042 §2` ranked it third by blast radius and framed it as *"the store has no
+    notion of similarity at all — `dog` and `wolf` are as unrelated as `dog` and
+    `7`"*. `g10-09` tried it and was **RETRACTED**: the cache was indexed by token
+    id, so the question was never asked
+  - **But §1 already refuses this mechanism under a different name.** "Address the
+    store by continuous vector" is ❌ *because* similar things landing near each
+    other raises `ρ`, and interference is `O(N·ρ)` — which also turns the gate's
+    structurally-zero bar into a tuned threshold and stops `AddressSketch`
+    colliding. **Nearby addresses is the thing being refused, whether the
+    nearness comes from a raw vector or from learned content statistics**
+  - **The resolution is note 045's and it is already the architecture:**
+    similarity lives in a SEPARATE INDEX, and the store stays exactly addressed.
+    `ContentIndex` proposes candidates by similarity; nothing addresses by it. So
+    042 §2's complaint is answered rather than open — **the store does not need a
+    notion of similarity, because the index has one**
+  - **Revival condition:** a task where similar-things-must-share-an-ADDRESS beats
+    exact separation plus a similarity index. Nothing has ever needed that
+- ⬜ **A better index, which is what 042 §2 was actually reaching for** — and
+  `note 056` just made it load-bearing rather than a nicety.
+  - The set answer's enumeration works at index purity ≳ 0.99 and degrades fast
+    below it (0.750 at purity 0.951, 0.167 at 0.795). **So the grouping's quality
+    now bounds the answer**, which is a far more tractable target than re-keying
+    the store — and it is measured rather than argued
+  - `143` is the first result for `concepts.py` and `048` is why `families.py`
+    exists at all: every other instrument's entities are arbitrary, so nothing
+    resembles anything. **Untried:** what makes an index good on a grouping that is
+    not calibrated to be recoverable
 
 ## 3. The store
 

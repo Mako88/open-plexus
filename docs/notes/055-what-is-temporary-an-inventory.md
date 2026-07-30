@@ -183,3 +183,22 @@ next step should be chosen against the corrected record rather than this one:
   case is **not** the wall
 - **no measurement here says what breaks the wall.** That is the open question, and
   it was hidden by two stale forward-looking claims stacked on each other
+
+### And A3 was mis-specified — found later the same day
+
+A3 above calls content-derived keys open. **The tree, read as a tree, found it
+contradicting the input-encoding component**: "address the store by continuous
+vector" is refused there *because* similar things landing on nearby addresses raises
+`ρ`, and interference is `O(N·ρ)`. **Nearby addresses is the thing being refused,
+whether the nearness comes from a raw vector or from learned content statistics.**
+
+The resolution is note 045's and is already the architecture: similarity lives in a
+separate index and the store stays exactly addressed. So 042 §2's complaint — *"the
+store has no notion of similarity at all"* — is **answered rather than open**. The
+store does not need one; the index has it.
+
+**What is actually open is the INDEX'S QUALITY**, and note 056 made that
+load-bearing: the set answer's enumeration works at purity ≳ 0.99 and collapses
+below. That is a far more tractable target than re-keying the store, and it is
+measured. **So A1–A3 are not "one change seen from three sides" after all — A3 was a
+different question wearing that description.**

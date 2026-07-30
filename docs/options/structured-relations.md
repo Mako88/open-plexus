@@ -265,3 +265,34 @@ rather than as *"this mode is broken"*, so the arm would have silently reported 
 policy's number under a different name. Nothing would have failed. Found by checking the
 second code path before trusting its output, which is the only reason there is a number here
 rather than a plausible one.
+
+### The first EXTERNAL graph, and the largest margin yet — `g23-04`
+
+    CONFIG  when    2026-07-30
+            source  g23-04
+            script  tools/relation_contrastive.py --graph
+                    data/fb15k237/train.txt --seeds 5
+            task    FB15k-237, held-out RULE prediction, 75/25 split
+            model   relation vectors width 32, hadamard, 8 epochs, lr 0.05
+            knobs   carried unchanged from CLUTRR rule prediction
+            scale   5 seeds, 272,115 edges, 237 relations, 3,332 rules
+
+    contrastive            0.4547 +/-0.0090
+    counted (no learning)  0.2475 +/-0.0060
+    majority class         0.0447 +/-0.0025
+    margin                 +0.2072
+
+**The largest margin across eighteen graphs, on the biggest one, externally designed, at
+invariant dimension 0** — the combination least explainable by the corpora having been
+chosen here.
+
+**Counting had four times the rules and did not improve** (0.2475 against an OpenEA average
+near 0.25), so first-order counting saturates and the margin widened rather than narrowing.
+That refutes `g23-04` P3 in the direction that strengthens the result.
+
+**Determinism is 0.803**, above DBpedia's 0.754–0.778, refuting P4 — Freebase's fine-grained
+relations compose *more* deterministically, not less.
+
+**Not the published comparison, and it was written down before the run:** the literature
+measures LINK PREDICTION on this data and here it is RULE PREDICTION. Kill-list item 3 still
+needs one of them reformulated.

@@ -196,7 +196,11 @@ keys, which are still the default and still correct for MQAR.**
   handoff's open problem #1 answered from the other side. **`g23-02`: the opponent that
   matters is COUNTING, not the majority arm — counting reaches 0.2505/0.2602 with no
   learning at all, and the objective adds ~0.12 on top.** Quoting against `majority`
-  (0.1000) quotes the weak opponent. **Still ⬜ because nothing in the model uses it.**
+  (0.1000) quotes the weak opponent. **`g23-04`: on FB15k-237 — the first EXTERNAL graph,
+  272k edges, `dim 0` — the margin is the LARGEST of eighteen at +0.2072 (0.4547 against
+  counting's 0.2475). Counting had 4× the rules and did NOT improve, so it saturates and
+  the gap is not an artefact of small corpora.** Not the published comparison: the
+  literature measures LINK prediction there and this is RULE prediction. **Still ⬜ because nothing in the model uses it.**
   *measured in:* CLUTRR-symbolic true chains and two OpenEA graphs, width 32, 5 seeds.
   → record: [structured-relations.md](docs/options/structured-relations.md)
 - ⬜ **A better index** — `note 056` made it load-bearing rather than a nicety: the set

@@ -230,7 +230,13 @@ read.**
   with zero variance** where random eviction gets 0.717. **Bounded in content, unbounded
   in TIME** — fixed storage cannot hold everything, which is arithmetic. *measured in:*
   4,000 facts through 150 slots, 3 seeds. **Unexplained:** random is *worse* on persistent
-  than abandoned.
+  than abandoned. **AND THERE IS A PRIOR GATE NO RECORD MENTIONED until 2026-07-30:**
+  `local_memory.py` promotes only when the previous prediction was **correct** — *"it
+  promotes what the model ALREADY GOT RIGHT, so a persistent store cannot bootstrap a model
+  that predicts badly"*. So the durable store receives what is already predicted, not what
+  is used, and the honest form is *"bounded to content the model already gets right"*.
+  **Unmeasured** — note 083 explicitly did not exercise `capture_slots`, and `g25-01`'s
+  first attempt was void for modelling eviction without the promotion gate.
   → record: [use-based-eviction.md](docs/options/use-based-eviction.md)
 - ✅ **The two-timescale loop RUNS — `note 092`, and it cannot adjudicate.** Contradiction,
   blame, promotion and eviction assembled: recall back to **1.000** after six passes, blame

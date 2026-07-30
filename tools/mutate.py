@@ -862,7 +862,10 @@ MUTATIONS = [
                "being no better than `search`, which is the conclusion note 062 drew "
                "and note 064 had to withdraw",
         path=SEARCH,
-        old="            for candidate in _top(scores, branches, allowed):",
+        # RE-POINTED when `prune_every` arrived (note 102). The line grew a
+        # conditional; the mutation is unchanged in what it does -- one candidate
+        # per step, so every step after the root is greedy again.
+        old="            for candidate in _top(scores, branches if prune_every else 1, allowed):",
         new="            for candidate in _top(scores, 1, allowed):",
     ),
     Mutation(
@@ -2022,8 +2025,11 @@ MUTATIONS = [
                "sitting on the next peer, and the read returns ZEROS, which decode to "
                "whatever the readout prefers",
         path=PEER,
-        old="        for node in self.holders(concept):",
-        new="        for node in self.holders(concept)[:1]:",
+        # RE-POINTED when `read` became `read_many` (note 101). The holder walk is
+        # now the attempt loop, so capping the attempts at one is the same defect:
+        # ask the owner and give up.
+        old="        for attempt in range(self.replicas):",
+        new="        for attempt in range(1):",
     ),
     Mutation(
         name="an-absent-read-is-not-counted",

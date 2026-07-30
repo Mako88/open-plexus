@@ -356,12 +356,18 @@ path is not chosen.**
   - `130` the gate pays +0.020 over search-everywhere, and the search line closes
   - **This is the 🔀 argument in one option:** refused at 111, revived at 121 when
     its condition was measured away, and it is the reason the switch exists
-  - **`note 061`: it is what CLUTRR needs, verified against the code and not built.**
-    CLUTRR names BOTH endpoints, so the disambiguator 108 said was missing is handed
-    over by the task. `depth` is **observable, not fitted** — the story *is* the chain,
-    so the fact count is the path length. And `Walk.retrieved` is *"what a readout
-    consumes"*, so the composed relation is predictable where kinship's endpoint was
-    itself the answer. **Wiring it into `run` is the next build**
+  - **`note 061`: it is what CLUTRR needs, verified against the code.** CLUTRR names
+    BOTH endpoints, so 108's missing disambiguator is handed over by the task; `depth`
+    is **observable, not fitted** (the story *is* the chain); and `Walk.retrieved` is
+    *"what a readout consumes"*
+  - **`note 062`, MEASURED — the traversal pays and the search on top of it does
+    not.** Chain recovery **0.659 overall**, 1.000 at 2–3 hops and 0.361 at 10,
+    monotone. Endpoint scoring does select (0.659 against 0.149 random) **but beam
+    width buys +0.009 for 8× the walks**, because on CLUTRR the story IS a chain so
+    `key(FACT, s)` names ONE relation **0.974** of the time. **Decision 130 transfers:
+    search helps only where ambiguity is.** The failure is **drift, not capacity**, and
+    the collision rows confirm 059 at **0.114 against 0.704**. **Not an end-task
+    number** — a route is not an answer, the readout step is unrun, one seed
 - ✅ **A hop REPLACES a retrieval, it does not combine with it** — `101`. `102` built
   the accumulator and recorded that the stated reason for choosing it was wrong.
 - ❌ **Another mechanism stacked on noisy retrieval** — four tried, all failed
@@ -637,45 +643,34 @@ that is the standing weakness.**
     addresses token ids, not sentences, and GOALS §2 does not want a text front-end.
     **So any result is "CLUTRR-symbolic", never "CLUTRR"**, and the published
     text-task numbers are not comparable
-  - **`note 059`, and it decides the reporting BEFORE the run: the test split
-    confounds depth with ENTITY REPETITION.** Train and validation have **zero**
-    puzzles where an entity appears in more than two edges; test has **37.8%**, rising
-    from 13 cases at four hops to 87 at ten. Repeated entities are this project's
-    measured weak point — `103` 0.884→0.303 single-token, `104` 0.628 with pair keys —
-    so a naive falling curve would read as *"composition degrades with depth"* and be
-    **wrong about which component to fix.** Report split by max-appearances; the
-    `max_appearances = 2` subset (713 rows) is the honest primary arm
-  - Six target relations — `nephew`, `niece`, and four in-laws — **never appear as an
-    edge**, so the answer space is larger than the input vocabulary
-  - **`openplexus/tasks/clutrr.py` is the loader, dependency-free.** The relation
-    vocabulary is **fixed, not read from the file**, so train and test share token
-    ids — deriving per split produces numbers and no exception. Graphs are general
-    edge lists because **433 are walks that revisit a node**, and `max_appearances`
-    is computed per puzzle so 059's split is reportable. Mutation
-    `a-revisited-entity-gets-a-fresh-slot` renumbers per edge, which would make the
-    hard 433 quietly easy and CLUTRR's score come out HIGH for no model reason
-  - **`note 060`: the FLOOR is measured and it is not chance.** A `hops=1` model —
-    composition off — scores **0.0856** on the plain subset against chance 0.0500 and
-    a majority-class baseline of 0.0421 (*below* chance; the splits have different
-    answer distributions). **Sequence length leaks the hop count**, 11 tokens at two
-    hops against 43 at ten, so a depth-conditioned prior beats chance without composing
-  - **So report against the `hops=1` floor PER HOP BUCKET, never against chance** —
-    but **not the 2-hop cell**, which 060's correction withdraws: at three seeds it
-    reads 0.50/1.00/0.50, and 38 rows means one hit moves it 0.026. **The headroom is
-    at 4–10 hops**, which is what CLUTRR was built to test
-  - **DECIDED without John, under the standing agreement: the layout is `kinship`
-    (`FACT s r o`), and it was decided on two independent measurements.** Collisions
-    fall from **411 test rows (35.9%) to 88 (7.7%)** because keying `(entity,
-    relation)` separates a repeated entity's edges — decision 157's mechanism on
-    someone else's data. And the `hops=1` floor falls from **0.0856 to 0.0365, below
-    chance**, because `closure` writes `key(s, o) → r` and so leaks direct recall
-    while `kinship` never writes that address. **A lower floor is the better
-    instrument.** `kinship` also makes `search.py` applicable, turning the traversal
-    into reuse of a proved mechanism rather than new work
-  - **`closure` stays behind the switch and is still the default**, under rule 14c and
-    because 060's floor was measured with it. Its advantage — the answer at
-    `key(s, o)`, readable directly — is a **one-hop** advantage, and CLUTRR tests two
-    through ten
+  - **`note 059` decides the reporting BEFORE the run: the test split confounds depth
+    with ENTITY REPETITION.** Train and validation have **zero** puzzles where an
+    entity appears in more than two edges; test has **37.8%**, rising with depth.
+    Repeated entities are the measured weak point (`103` 0.884→0.303), so a naive
+    falling curve reads as *"composition degrades with depth"* and is **wrong about
+    which component to fix.** Split on max-appearances. Six target relations also
+    **never appear as an edge**, so the answer space exceeds the input vocabulary
+  - **`openplexus/tasks/clutrr.py` is the loader, dependency-free.** Relation
+    vocabulary **fixed, not read from the file**, so splits share token ids; graphs
+    are general edge lists because **433 are walks that revisit a node**; and
+    `max_appearances` is per puzzle so 059's split is reportable. Mutation
+    `a-revisited-entity-gets-a-fresh-slot` renumbers per edge, making the hard 433
+    quietly easy and the score come out HIGH for no model reason
+  - **`note 060`: the FLOOR is measured and it is not chance.** A `hops=1` model
+    scores **0.0856** (closure) on the plain subset against chance 0.0500 and a
+    majority-class baseline of 0.0421 — *below* chance, since the splits have
+    different answer distributions. **Sequence length leaks the hop count**, so a
+    depth-conditioned prior beats chance without composing. **Report per hop bucket,
+    never against chance, and not the 2-hop cell** — 060's correction withdraws it:
+    at three seeds it reads 0.50/1.00/0.50 on 38 rows. Headroom is at 4–10 hops
+  - **DECIDED without John: the layout is `kinship` (`FACT s r o`), on two independent
+    measurements.** Collisions fall from **411 test rows (35.9%) to 88 (7.7%)** —
+    keying `(entity, relation)` separates a repeated entity's edges, which is `157`'s
+    mechanism on someone else's data. And the `hops=1` floor falls from **0.0856 to
+    0.0365, below chance**, because `closure` writes `key(s, o) → r` and leaks direct
+    recall. **A lower floor is the better instrument.** `closure` stays behind the
+    switch and remains the default (rule 14c; 060's floor used it) — its advantage is
+    a **one-hop** one, and CLUTRR tests two through ten
   - **No matrix needed yet:** training on all 9,074 puzzles takes **six seconds**, so
     dispatching would be ceremony. One seed so far — the floor is a bound to
     re-measure, not a constant

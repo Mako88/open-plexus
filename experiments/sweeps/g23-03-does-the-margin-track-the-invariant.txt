@@ -1,0 +1,117 @@
+Does the contrastive margin track a graph's invariant dimension?
+=================================================================
+
+Script: tools/relation_contrastive.py --graph <path>
+        tools/invariant_dimension.py --graph <same path>
+Status: NOT RUN. Predictions registered and committed before the sweep.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+We found that a learned representation guesses missing relationship rules better
+than counting, on two big knowledge graphs. One of those graphs has a tidy
+mathematical structure underneath it and the other does not, and the learned
+representation did about equally well on both.
+
+Two graphs is not many. There are sixteen already downloaded.
+
+The sharp question: **does the method do better on the graphs that have the tidy
+structure?** If it does, then it is quietly exploiting that structure and the
+claim "it does not need one" is wrong. If the margin is flat across graphs with
+and without it, the claim holds much more strongly than two data points can show.
+
+
+WHY THIS EXISTS
+----------------
+`docs/options/structured-relations.md` carries:
+
+    graph                     dim  contrastive  counted  majority
+    EN_DE_15K_V2/rel_triples_1  0   0.3680       0.2505   0.1000
+    D_W_15K_V1/rel_triples_1    2   0.3398       0.2602   0.0797
+
+and the claim that the mechanism is **indifferent to whether a conserved quantity
+exists** -- which matters because `note 104` scoped this project's whole
+composition line to domains that have one, and `generation_delta.py` gets nothing
+at `dim 0` and refuses `dim > 1`.
+
+**Two graphs cannot separate "indifferent" from "we happened to pick two similar
+ones".** Sixteen can: OpenEA ships `D_W`, `D_Y`, `EN_DE` and `EN_FR` at V1 and V2,
+each with two sides.
+
+**No new download.** These were fetched with John's approval already.
+
+
+THE MEASUREMENT
+---------------
+For every graph: `invariant_dimension.py --graph` for `dim`, and
+`relation_contrastive.py --graph` for contrastive, counted, majority and chance
+on held-out rules, 5 seeds, 75/25 split.
+
+The quantity of interest is the **margin**, `contrastive - counted`, because
+counted is the strong cheap opponent (`g23-02`) and majority is the weak one.
+
+
+PREDICTIONS
+-----------
+  P1  THE TEST. The margin does NOT correlate with `dim`. Specifically: the mean
+      margin on `dim 0` graphs is within 0.05 of the mean margin on `dim >= 1`
+      graphs.
+
+      Refuted if the margin is systematically larger where an invariant exists.
+      **That refutation would say the mechanism has been exploiting the
+      invariant all along**, and the claim it does not need one -- which is the
+      strongest thing this project has said about #2 -- would have to be
+      withdrawn.
+
+  P2  Contrastive beats counted on EVERY graph.
+
+      Refuted by a single graph where counting wins. One loss would not sink the
+      mechanism but it would end "beats counting" as an unqualified statement,
+      and the losing graph's properties become the next question.
+
+  P3  At least THREE of the sixteen graphs have `dim 0`.
+
+      A gate rather than a finding: if almost every graph has an invariant, this
+      sweep has no `dim 0` group to compare against and P1 is unanswerable. If
+      that happens, say so and stop rather than reporting a comparison between
+      one graph and fifteen.
+
+  P4  THE ONE I EXPECT TO BE WRONG. The V1 and V2 versions of the same pair
+      agree on `dim` -- e.g. `D_W_15K_V1` and `D_W_15K_V2` are both dimension 2.
+
+      Registered because I assumed it while writing this and want the assumption
+      visible. V1 and V2 differ in density by construction, and the invariant
+      dimension is a property of the CYCLE structure, which density changes. If
+      they disagree, `dim` is a property of the sample rather than of the domain,
+      and every statement in this project that names a domain's dimension --
+      including `note 104`'s about DBpedia -- is really about one extract of it.
+
+
+WHAT WOULD MAKE THIS NOT COUNT
+--------------------------------
+**Graph size confounding dimension.** If `dim 0` graphs are systematically bigger
+or denser, a margin difference is about size and not about invariants. Edge
+count, relation count and rule count are reported beside every row so the
+confound is visible rather than assumed away.
+
+**Determinism confounding it too.** These graphs are ~0.78 deterministic and
+kinship is ~1.0. If that varies across the sixteen it bounds the achievable score
+per graph, so it is reported per row as well.
+
+**The knobs stay carried.** Width 32, epochs 8, lr 0.05, temperature 0.1, chosen
+on CLUTRR rule prediction. Tuning per graph while the counted arm has no knobs is
+the one-sided sweep the price-of-locality calibration is about.
+
+
+COST
+----
+Sixteen graphs, two tools each, 5 seeds. Measured on EN_DE at a few minutes per
+graph, so under an hour locally. Run in the background rather than dispatched --
+it needs `data/openea`, which is gitignored and absent in CI.
+
+
+MEASURED ON
+-----------
+`data/openea/OpenEA_dataset_v2.0/{D_W,D_Y,EN_DE,EN_FR}_15K_{V1,V2}/rel_triples_{1,2}`

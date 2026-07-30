@@ -148,24 +148,45 @@ partitioning.
 | **The fix, already built** | Concept splitting. Lone-node capacity 2048 against 128 at sixteen nodes, and it **grows with the network** where dimension splitting is flat forever. It also makes the beam's reads point-to-point rather than collective, and makes the global readout a selection instead of the sum C1 forbids |
 
 **And the arithmetic for the target scale**, from `0.023·d²` bindings (the row above:
-width 32 → 16, 64 → 96, 128 → 384):
+width 32 → 16, 64 → 96, 128 → 384). **Total store is invariant at ~170 GB; the SCHEME
+decides how it is sliced, and the first version of this section mixed the two** — it did
+dimension-partitioning arithmetic while recommending concept partitioning, which do not
+compose:
 
-    relations held        width      nodes   per node
-    1.5e3  (today)          256         16      16 KB
-    1e7    (personal KB)  21,000      1,300    1.3 MB
-    1e9    (Wikidata)    208,000     13,000     13 MB
+    scheme        relations held      width     nodes   per node    msg size
+    dimension     1e9 (Wikidata)    208,000    13,000      13 MB      832 KB
+    CONCEPT       1e9 (Wikidata)         512   167,000       1 MB        2 KB
 
-**Thousands of machines, not millions**, which is the encouraging half.
+**And this is a third argument for concept splitting, stronger than the two above.** A
+message carries a `d`-wide vector, so **bandwidth scales with width** — and dimension
+splitting has to *grow* `d` to buy capacity while concept splitting keeps it fixed and adds
+nodes:
+
+    beam at ~160 reads per query (width 4 x branches 4 x depth 10)
+
+    d = 208,000   832 KB per vector   ~266 MB per query   INFEASIBLE
+    d = 512         2 KB per vector    ~640 KB per query   ~50 Mbit/s at 10 q/s
+
+**The binding constraint is hop LATENCY, not throughput or memory.** The beam's hops are
+sequential — hop 4 cannot start before hop 3 returns — so ten hops at ~50 ms round trip is
+**~500 ms against C2's `d_max` of 640 ms**, about 20% headroom. That is very likely where
+640 ms came from, and it means **anything reducing the number of SEQUENTIAL hops is worth
+more than anything parallelising within a hop.**
+
+**Node count is not device count.** A node is a process; 170 GB fits one used dual-Xeon
+server with 256 GB, so the cheapest full-scale run is one machine, not 167,000. Physical
+devices are for the properties that only exist over a real network — churn, `d_max`, the
+ring settling without a coordinator — and 20-50 suffice for that.
 
 > **⚠ This extrapolates `d²` three orders of magnitude past the measured range (d ≤ 128),
 > which is further than any other row here reaches.** It is also the UNCAPPED, no-decay
 > ceiling — `decay` and `memory_cap` both reduce it and nobody has measured by how much.
 > **Capacity is not capability:** holding 1e9 bindings says nothing about reasoning over
-> them. And bandwidth is a separate gate (G4) this does not touch. Treat the table as an
-> order-of-magnitude sanity check on whether the goal is reachable at all, never as a
-> specification.
+> them. The message-size arithmetic is a floor that assumes one `d`-wide vector each way
+> and no compression, and **G4 has not been run at any of these widths.** Treat all of it
+> as an order-of-magnitude check on whether the goal is reachable, never as a specification.
 
 **On comparing to an LLM:** not well-posed for the primary goal, since GOALS §2 makes
 next-token prediction a non-goal and there is no shared axis. The storage comparison
-(174 GB against a frontier model's ~2 TB) is apples to oranges. **The answerable question
-is how many machines**, and it is the table above.
+(170 GB against a frontier model's ~2 TB) is apples to oranges. **The answerable questions
+are how much memory and how many hops**, and they are above.

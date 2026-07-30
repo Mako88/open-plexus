@@ -4,18 +4,60 @@
 option each is. **One page, scannable, so a settled question stops being
 re-opened.** That is the only job it has.
 
-**Why it was rebuilt.** This was a 6,040-line append-only log. Nothing could read
-it whole, so it was read selectively — and on 2026-07-29 that produced three wrong
-recommendations in a row, each built on a claim a later entry had already
-superseded. Decision 115 closed saturation and three later entries reopened it. A
-log records; it does not prevent.
+**Why it was rebuilt.** It was a 6,040-line append-only log — unreadable whole, so
+read selectively, which on 2026-07-29 produced three wrong recommendations in a row
+off claims later entries had already superseded. **A log records; it does not
+prevent.** Full account in `CLAUDE.md` rule 14b.
 
-**The old log is not deleted.** It is
-[docs/archive/decisions-log-083-171.md](docs/archive/decisions-log-083-171.md),
-and entries 1–82 are
-[docs/archive/decisions-001-082.md](docs/archive/decisions-001-082.md). Every
-attempt below cites its entry number, so the reasoning is one lookup away. **The
-tree is authoritative; the log is the footnotes.**
+**The old log is not deleted:**
+[entries 83–171](docs/archive/decisions-log-083-171.md) and
+[1–82](docs/archive/decisions-001-082.md). Every attempt below cites its entry number.
+**The tree is authoritative; the log is the footnotes.**
+
+---
+
+## THE RULES FOR MAINTAINING THIS DOCUMENT
+
+**Read these before editing it.** They are the contract, not advice, and
+`tools/check_decisions.py` enforces the ones that can be enforced. John asked for them
+spelled out here rather than left implicit, because a convention nobody can point at
+is a convention that drifts.
+
+1. **A finding UPDATES AN OPTION. It never appends an entry.** If you are about to add
+   a numbered heading — `## <next number>` — stop: this is not a log. The finding
+   belongs on an option's state, or in the attempt list under it.
+   `tests/test_goals_consistency.py` fails the build if one appears. *(It caught this
+   very rule when the rule quoted the forbidden heading literally, which is the
+   check working rather than a false alarm.)*
+2. **Every option carries exactly one state marker: ✅ ❌ ⬜ 🔀.** Not two, not none.
+   An option whose status is a matter of interpretation is the thing this document
+   exists to prevent.
+3. **Every ✅ and ❌ cites a decision, a sweep or a note — or says in words that it
+   rests on NO MEASUREMENT.** This is the archived capability ledger's rule carried
+   forward: *a state with no measurement is UNTRIED, never "probably fine."* A ❌ with
+   no citation is a mechanism refused by opinion, and discarding a good idea on an
+   invalid measurement is the most expensive error available.
+4. **Every attempt names the configuration it was measured in.** A refutation is
+   conditional on a config. Decision 74 cost a whole comparison set by forgetting it.
+5. **Every ❌ states its REVIVAL CONDITION** — what would have to be true for it to be
+   worth trying again. Refutations expire; one nobody can date is one nobody can
+   retire.
+6. **Every component section carries a `⇒` verdict line** saying DECIDED or OPEN, with
+   the one-line answer if decided. That line is what makes the document scannable,
+   which is its whole job.
+7. **Update the CENSUS when a state changes.** The checker compares it against the
+   body and fails on a mismatch — that check exists because its predecessor caught its
+   own summary drifting the first time a verdict changed.
+8. **Refutations are exhaustive; confirmations are not.** Every ❌ from the archived
+   log belongs here. An entry that measured something working and changed nothing else
+   is cited where it supports a state and otherwise left in the log.
+9. **When it hits its line budget, trim the NEWEST writing first.** Process narration
+   — which mutation guards which claim, what was learned while building — is true,
+   already in the commit messages and notes, and not what a reader consults this for.
+   A budget that only ever prunes old material protects whoever is writing today.
+10. **Detail lives in the archived log and in `docs/notes/`; this carries the claim
+    and links them.** A measurement belongs to exactly one file, which is its sweep
+    record.
 
 ---
 

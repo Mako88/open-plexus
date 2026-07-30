@@ -85,7 +85,16 @@ if hasattr(sys.stdout, "reconfigure"):
 #: messages and the notes, none of it what a reader consults the tree for. Trimming
 #: three entries returned 28 lines. **The pressure worked as designed: it forced a
 #: read of the newest writing rather than the oldest.**
-MAX_LINES = 700
+#: **RAISED 700 -> 780 on 2026-07-29, deliberately, and for a different reason than
+#: the first raise.** John asked for the maintenance contract to be spelled out at the
+#: top of the tree rather than left implicit — ten numbered rules, about forty lines.
+#: That is not narration and rule 9 does not apply to it: it is the document's own
+#: operating instructions, and the budget was set before they existed.
+#:
+#: The distinction to hold if this comes up again: **trim narration, keep contract.**
+#: A raise for prose about what was learned while building is the thing rule 9 refuses;
+#: a raise for the rules that keep the document usable is the document working.
+MAX_LINES = 780
 
 CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED = "✅", "❌", "⬜", "🔀", "⏸"
 STATES = (CHOSEN, REFUTED, UNTRIED, BOTH, PAUSED)

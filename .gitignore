@@ -9,6 +9,11 @@ CLAUDE.local.md
 Thumbs.db
 
 
+# Third-party benchmark data. FETCHED, not vendored: `tools/fetch_clutrr.py` pins
+# the URLs and verifies size and sha256, so "did we measure the same bytes" is
+# answerable without carrying 10 MB of CSV in every clone forever.
+data/clutrr/
+
 # Python bytecode
 __pycache__/
 *.py[cod]

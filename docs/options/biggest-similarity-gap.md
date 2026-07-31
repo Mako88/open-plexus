@@ -325,3 +325,41 @@ backward direction being exactly 1.0, which no combiner can weigh away because i
 is TRUE. It is a property of the surface, so a rule reading a surface's own
 BREADTH — how many different things it is present with — would refuse it without
 consulting any edge. Untried, and not a knob.
+
+### Depth 1 is enough, and a wide beam there is FREE — `g38-03`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g38-03-how-deep-may-a-query-walk.txt
+            script  experiments/g38_03_how_deep_may_a_query_walk.py
+            task    MNIST + FSDD + 10 words, arm `together`, 1 distractor
+            model   `grounding.reach`, conditional, combiner `mean`
+            knobs   beam 2/4/8/16/32 x depth 1/2/3; 50 codes pinned; 3 seeds
+            scale   link@k with a coverage companion; messages counted
+
+**John's question — how deep may a query walk before it costs too much — and the
+axis `g38-01` pinned without sweeping.**
+
+**Depth 1, beam 16: link@k 0.9665 at 0.9933 coverage for 109 messages.** Depth 2
+at the same beam costs **809** messages for a lower **0.9200**; depth 3 costs
+**3117** for the same. Deeper is worse AND dearer.
+
+**And at depth 1 the cost is FLAT in beam** — 109 messages whether the beam is 2
+or 32 — because scoring a surface's partners is the cost and expanding them is
+not, and at depth 1 nothing is expanded. So the best setting is also the cheapest
+available. For comparison, `g33-03` measured 439 messages per walk at 192
+surfaces on the bounded mechanism.
+
+**It also converts `g38-01`'s comparison into a starker one.** The incumbent
+partition on the same cell and seeds is **0.6667 at 0.0533 coverage** — it finds
+one image code in twenty and is right about two thirds of that one. The walk
+finds essentially all of them.
+
+**`distractor` is 1.0000 in all fifteen cells**, so the search budget is a fourth
+axis that cannot separate the link from the distractor. Three scalar dials and a
+budget, all failing the same way.
+
+**Two things this does NOT settle.** The two-hop query — an image code reaching
+an audio code through a shared word, which is what motivated depth 2 — was not
+run; only word-to-image, which co-occurs directly and needs one hop by
+construction. And **predictions were not committed before this run**, which every
+other sweep this session did; the record says so at the top.

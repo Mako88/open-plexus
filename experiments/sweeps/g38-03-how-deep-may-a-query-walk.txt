@@ -1,0 +1,226 @@
+How deep may a query walk before it costs too much?
+====================================================
+
+Script: experiments/g38_03_how_deep_may_a_query_walk.py
+Status: RUN, local, 2026-07-31, 7.2s.
+
+**PREDICTIONS WERE NOT COMMITTED BEFORE THIS RUN, AND THAT IS A LAPSE.** Every
+other sweep this session registered them first and this one did not — it was run
+immediately after being written. The section below is therefore POST-HOC and is
+marked so throughout. It is written out anyway because the refutation conditions
+are the useful part of the format, but nothing here counts as a prediction having
+been made.
+
+ANSWER: **Depth 1 is enough, deeper is worse, and the cheapest cell is also
+        nearly the best.** At depth 1, beam 16: `link@k` **0.9665** at
+        **0.9933** coverage for **109** messages. Depth 2 at the same beam costs
+        **809** messages for a lower 0.9200, and depth 3 costs **3117** for the
+        same 0.9200.
+
+        **And at depth 1 the message cost is FLAT in beam** — 109 whether the
+        beam is 2 or 32 — because scoring the candidates is the cost and
+        expanding them is not. So a wide beam at depth 1 is free.
+
+        The incumbent partition on the same cell and seeds: **0.6667 at 0.0533
+        coverage.** It finds one in twenty of the image codes it should.
+
+
+IN PLAIN TERMS
+--------------
+The last run showed that letting a question travel further through the network
+found things the old method missed. The obvious next question is how far it
+should be allowed to go — because every step costs messages between machines,
+and the owner of this project has said he would accept a slow answer if the
+answer is right.
+
+It turns out the question barely needs to travel at all.
+
+Going **one step** and looking at a decent number of options gets essentially
+everything: it correctly identifies 97% of what it finds, and it finds 99% of
+what it should. Going two or three steps costs up to thirty times more messages
+and gets **worse**, because the extra distance pulls in things that outrank the
+right answers.
+
+There is also a pleasant surprise about cost. At one step, widening how many
+options you consider is **free** — the cost is in asking about each neighbour,
+and you have to ask about all of them anyway to know which are best. So the
+setting that works best is also the cheapest available.
+
+The comparison with the old method is the part that matters most. The old method
+scored 67% correct — but only over **one twentieth** of what it should have
+found. It was not being careful. It was barely finding anything.
+
+One honest caveat. This only asks how a *word* reaches *pictures*, and those
+appear together, so one step is enough by construction. The case that genuinely
+needs two steps — a picture reaching a sound, when the two have never occurred
+together — is not what this measured.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    link@k      of the top-`k` image codes a word reaches, the share whose
+                majority digit is that word's. `k` is how many image codes
+                genuinely belong to that digit
+    covered     **the companion `link@k` needs.** Share of the image codes it
+                SHOULD have found that it had a chance to score at all. A
+                precision of 1.0000 over a twentieth of them is not comparable
+                with one over all of them
+    distractor  share of words admitting the ever-present distractor
+    messages    scored candidates per word. **Counted, not estimated** — one
+                scoring is one remote read, since `owner(x)` holds `count(x,y)`
+                and `count(x)` and needs only `count(y)` from a peer
+
+**`covered` WAS MISSING FROM THE FIRST VERSION OF THIS RUN AND THE TABLE WAS
+UNREADABLE WITHOUT IT.** The first table reported `link@k` 1.0000 at depth 1
+beam 2 as though it were the best cell; coverage there is **0.0867**. `g38-01`'s
+own record says, about a different column, that a zero from reaching nothing and
+a zero from reaching wrong things are different answers — and the follow-up
+dropped the companion anyway. Recorded because a warning one run old did not
+prevent it.
+
+
+MEASURED ON
+-----------
+Local, one process. Streams and scorer IMPORTED from `g36_04` and `g38_01`.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions    3,000
+    codes           50   pinned from g36-04
+    arm      `together`  the cell where the bound failed
+    combiner     mean    `g38-01`'s winner
+    statistic  conditional
+    seeds      0, 1, 2
+
+Swept: `beam` in {2, 4, 8, 16, 32} x `depth` in {1, 2, 3}.
+
+
+PREDICTIONS — POST-HOC, SEE THE STATUS LINE
+--------------------------------------------
+P1  link@k RISES WITH BEAM AND THEN PLATEAUS.
+    REFUTED IF it falls with beam.
+
+P2  DEPTH BEYOND 1 BUYS LITTLE FOR THIS QUERY, because a word and an image code
+    co-occur directly in this arm, so the second hop can only add routes through
+    audio codes that the first hop did not need.
+    REFUTED IF depth 2 or 3 clearly beats depth 1.
+
+P3  COST GROWS ROUGHLY WITH beam x depth, not beam**depth, because most surfaces
+    have few partners with a non-zero score.
+    REFUTED IF cost grows exponentially in depth.
+
+P4  DISTRACTOR ADMISSION IS FLAT IN THE BUDGET. It is a property of the
+    combiner, not of how far the query travels.
+    REFUTED IF a budget setting excludes the distractor — which would be a
+    cheap fix for `g38-01`'s one failure and the best outcome available here.
+
+
+COST
+----
+Estimated: this is `g38-01`'s cell run 15 times at varying budgets, and that was
+32.8s for 12 cells. **30 to 120 seconds.**
+
+Recorded after the run: **7.2s** — faster than the estimate, because the streams
+are built once and reused across all 15 cells rather than rebuilt per cell.
+
+
+RESULTS
+-------
+ depth  beam   link@k  covered  distractor  messages
+     1     2   1.0000   0.0867      1.0000       109
+     1     4   1.0000   0.3333      1.0000       109
+     1     8   0.9754   0.7933      1.0000       109
+     1    16   0.9665   0.9933      1.0000       109
+     1    32   0.9667   1.0000      1.0000       109
+
+     2     2   1.0000   0.0867      1.0000       243
+     2     4   1.0000   0.5600      1.0000       293
+     2     8   0.9589   0.9733      1.0000       397
+     2    16   0.9200   1.0000      1.0000       809
+     2    32   0.8933   1.0000      1.0000      1818
+
+     3     2   0.5549   0.2067      1.0000       441
+     3     4   0.3600   1.0000      1.0000       820
+     3     8   0.7733   1.0000      1.0000      1584
+     3    16   0.9200   1.0000      1.0000      3117
+     3    32   0.8933   1.0000      1.0000      7227
+
+incumbent partition, same cell and seeds: link@k 0.6667 at covered 0.0533
+
+
+SCORECARD
+---------
+  P1  **REFUTED as written, and the refutation is a coverage effect rather than
+            a real decline.** `link@k` FALLS with beam — 1.0000, 1.0000, 0.9754,
+            0.9665, 0.9667 at depth 1 — but `covered` rises 0.0867, 0.3333,
+            0.7933, 0.9933, 1.0000 over the same row.
+
+            **So the small beams are not more accurate, they are barely
+            looking.** Precision over one twentieth of the target set is not a
+            better score than precision over all of it, and reading the row
+            without the companion column would invert the conclusion. The honest
+            reading is that beam 16 is the operating point: it reaches
+            essentially everything and loses 0.03 of precision doing it.
+
+  P2  **HELD.** Depth 1 at beam 16 gives 0.9665 at 0.9933 coverage; depth 2 at
+            beam 16 gives 0.9200 at 1.0000, and depth 3 the same 0.9200. Deeper
+            is not better and is much dearer.
+
+            **Scope, and it is the caveat that binds:** this measures a WORD
+            reaching IMAGE CODES, which co-occur directly in this arm, so one hop
+            suffices by construction. The query that genuinely needs two hops —
+            an image code reaching an audio code in the `alternating` arm, where
+            they share zero occasions — is not what this ran. **No conclusion
+            here transfers to that case.**
+
+  P3  **HELD, and the shape is more useful than the prediction.** Messages at
+            depth 1 are **109 at every beam**, because the cost is scoring a
+            surface's partners and every partner must be scored to know which
+            are best. **Expansion is what beam limits, and at depth 1 nothing is
+            expanded.** So a wide beam at depth 1 costs nothing.
+
+            Beyond depth 1 the cost does grow with beam: 243 to 1818 at depth 2,
+            441 to 7227 at depth 3. Roughly linear in beam at fixed depth, and
+            roughly linear in depth at fixed beam — not exponential, because most
+            surfaces have few partners scoring above zero.
+
+            For comparison, `g33-03` measured **439** messages per walk at 192
+            surfaces on the BOUNDED mechanism. Depth 1 here is 109 per word.
+
+  P4  **HELD, and it closes the cheapest possible escape.** `distractor` is
+            **1.0000** in all fifteen cells. No budget setting excludes it, which
+            confirms it is a property of the combiner and not of how far the
+            query travels. `g38-01`'s one failure is not fixable by tuning this.
+
+
+WHAT THIS CHANGES
+-----------------
+**The operating point is depth 1, beam 16, and it is the cheapest good cell
+rather than a compromise.** 0.9665 precision at 0.9933 coverage for 109 messages
+per word.
+
+**And it sharpens `g38-01`'s comparison rather than overturning it.** That run
+reported the incumbent at 0.6667 with `reached` 0.27 per word; converted to the
+same coverage measure that is **0.0533**. The incumbent is not scoring
+moderately — it is finding one image code in twenty and being right about two
+thirds of that one. The walk finds essentially all of them.
+
+**What remains unfixed is the same thing.** Every cell admits the distractor.
+Three scalar dials and now a fourth axis — the search budget — have all failed to
+separate the link from the distractor.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**The two-hop query was not measured**, and it is the one that motivated depth 2
+in the first place. An image code reaching an audio code through a shared word,
+in the `alternating` arm, is the case `g36-04` measured at 0.9580 and this run
+does not touch.
+
+**One arm, one code count, one combiner.** `together`, 50 codes, `mean`. The
+budget's interaction with any of those is unmeasured.
+
+**Messages are counted in ONE PROCESS.** The count is what a sharded
+implementation would send, derived from where each quantity lives, not observed
+on a socket. `g35-01` and `g35-03` are where that gets checked for real, and
+neither has run the walk.

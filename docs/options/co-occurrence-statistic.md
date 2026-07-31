@@ -383,3 +383,46 @@ surface FREQUENCIES uneven; nothing makes *which surfaces co-occur* uneven. Ever
 statistic measured on this generator is therefore answering a slightly wrong
 question. Registered, not fixed — changing the generator invalidates the
 comparison set, so it is a decision rather than a cleanup.
+
+### THE CURVE HAS NOT FLATTENED — every absolute figure is a lower bound — `g39-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g39-01-what-does-the-learning-curve-look-like.txt
+            script  experiments/g39_01_what_does_the_learning_curve_look_like.py
+            task    MNIST + FSDD + 10 words, ONE pass, scored at 8 checkpoints,
+                    no split and nothing replayed
+            model   grounding.reach, conditional, beam 16, depth 1, mean
+            knobs   occasions 25..3000; arms together/alternating; 3 seeds
+            scale   link precision with a coverage companion; chance 0.1000
+
+**The first prequential measurement in the grounding line**, which `GOALS.md` §3
+has required since it was written and recorded as *"still the exception rather
+than the norm"*.
+
+**`link` goes 0.5643 at 1,500 occasions to 0.9665 at 3,000 — a rise of 0.4022
+over the last doubling**, against a registered refutation threshold of 0.05. The
+curve is steepest where the data ends.
+
+**So stream length is `CLAUDE.md`'s constant-that-looks-like-background**, held at
+3,000 across g32 through g38 without ever being varied. Arm-vs-arm comparisons at
+equal length survive. **Absolute figures become lower bounds**, and every *"X does
+not help"* becomes a claim that might only be true at this length — which is the
+most expensive error class this project names.
+
+**And the shape inverts a prediction usefully.** Coverage arrives almost at once
+— **0.6733** at 25 occasions, **0.8867** at 100 — while precision sits at chance
+until about 400. **The mechanism finds nearly everything immediately and spends
+the whole stream sorting it**, so the work is discrimination rather than
+discovery, and a recall-shaped metric would have looked good from occasion 25.
+
+**`g38-01`'s advantage is a large-data effect.** Both mechanisms sit within 0.05
+of chance until 400 occasions and the partition is briefly ahead at two
+checkpoints. The walk's lead arrives late and is then decisive.
+
+**`distractor` is 1.0000 at every checkpoint from 25 onward.** Experience does
+not fix it either — five axes now, none of which separates the link from the
+distractor.
+
+**The cheap follow-up is not done:** 3,000 occasions is one pass over FSDD, and
+cycling the stream is both trivially available and what a system that learns
+forever would do. **Nothing establishes where the curve flattens.**

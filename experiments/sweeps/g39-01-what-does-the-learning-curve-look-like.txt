@@ -2,7 +2,21 @@ Is the grounding result a plateau, or a snapshot of a curve still moving?
 =========================================================================
 
 Script: experiments/g39_01_what_does_the_learning_curve_look_like.py
-Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+Status: RUN, local, 2026-07-31, 8.6s. Predictions committed at `f1145ae`
+        before the script was executed.
+
+ANSWER: **NOT A PLATEAU. IT IS STILL CLIMBING STEEPLY WHEN THE DATA RUNS OUT.**
+        `link` goes **0.5643 at 1,500 occasions to 0.9665 at 3,000** — a rise of
+        **0.40 over the last doubling**, against a refutation threshold of 0.05.
+        The curve is steepest at the very end of the stream.
+
+        **So every absolute grounding figure in `g32` through `g38` is a LOWER
+        BOUND that was reported as a value.** Comparisons between arms at equal
+        stream length survive; absolute claims and "X does not help" claims do
+        not. See WHAT THIS INVALIDATES below, enumerated before anything is
+        built on top of it.
+
+        Four of five predictions refuted. The one that held is the rail.
 
 
 IN PLAIN TERMS
@@ -129,14 +143,143 @@ Estimated from `g38-03`'s measured 7.2s for 15 scoring cells: this scores 8
 checkpoints x 2 arms x 3 seeds = 48 cells, plus `equivalence_classes` at each,
 which is the dearer of the two. **30 to 120 seconds**, local.
 
-Recorded after the run: TO BE FILLED.
+Recorded after the run: **8.6s**, below a 30-120s estimate. The streams are
+built once per seed and scored in place, so the checkpoints cost almost nothing
+beyond the single pass they interrupt.
 
 
 RESULTS
 -------
-TO BE FILLED.
+=== together ===
+ occasions  per digit    link  covered  partition  distractor  surfaces
+        25          2  0.1290   0.6733     0.0000      1.0000        18
+        50          5  0.1082   0.8000     0.0256      1.0000        22
+       100         10  0.1050   0.8867     0.1222      1.0000        27
+       200         20  0.1090   0.9133     0.0630      1.0000        39
+       400         40  0.2238   0.9533     0.0531      1.0000        53
+       800         80  0.3710   0.9733     0.2991      1.0000        72
+      1500        150  0.5643   0.9333     0.5417      1.0000        98
+      3000        300  0.9665   0.9933     0.6667      1.0000       111
+
+=== alternating ===
+        25          2  0.1467   0.5000     0.0000      1.0000        17
+        50          5  0.1166   0.6867     0.0417      1.0000        21
+       100         10  0.1063   0.7533     0.0000      1.0000        23
+       200         20  0.0958   0.7600     0.0778      1.0000        33
+       400         40  0.2169   0.8600     0.3141      1.0000        44
+       800         80  0.3635   0.8667     0.2462      1.0000        60
+      1500        150  0.5170   0.9800     0.2635      1.0000        93
+      3000        300  0.9457   0.9867     0.8476      1.0000       111
+
+    chance for `link` and `partition`: 0.1000
 
 
 SCORECARD
 ---------
-TO BE FILLED.
+  P1  **REFUTED, BY EIGHT TIMES THE THRESHOLD, AND IT IS THE FINDING.** The
+            prediction was 90% of final by 800 occasions and under 0.05 of
+            movement over the last doubling.
+
+            Actual: **0.3710 at 800**, which is 38% of final, and the last
+            doubling moves **0.5643 to 0.9665** — a rise of **0.4022**.
+
+            **The curve is not merely unfinished, it is steepest at the end.**
+            Every earlier row is near chance until 400 occasions, then it climbs
+            without slowing.
+
+            This file's own prediction says what that means: *"every grounding
+            figure in this project is a lower bound reported as a value, and the
+            stream length becomes a variable that has been silently held
+            constant across g32 through g38."* That is now the case, and stream
+            length is exactly `CLAUDE.md`'s *"a variable that never changes does
+            not look like a variable — it looks like the background."*
+
+  P2  **REFUTED, BACKWARDS, and the inversion is informative.** Coverage was
+            predicted to arrive after precision. It arrives **first and almost
+            immediately**: 0.6733 at 25 occasions and 0.8867 at 100, while
+            `link` is still at 0.1050.
+
+            **So the mechanism finds nearly everything at once and spends the
+            entire stream sorting it.** That is a different system from the one
+            assumed — the work is discrimination, not discovery — and it says a
+            recall-shaped metric would have looked good from occasion 25 while
+            the thing knew nothing.
+
+  P3  **REFUTED.** The walk does not lead at every point. At 100 occasions in
+            `together` the partition is ahead (0.1222 against 0.1050), and in
+            `alternating` at 400 it is well ahead (0.3141 against 0.2169).
+
+            **The honest reading is that both are at chance until about 400
+            occasions and the early ordering is noise.** Chance is 0.1000 and
+            every row before 400 sits within 0.05 of it for both mechanisms. The
+            walk's advantage is real and arrives late: 0.9665 against 0.6667 at
+            the end of `together`.
+
+            So `g38-01`'s result is a large-data effect, which was the refutation
+            clause's own wording, and it changes WHEN to use which rather than
+            which to use.
+
+  P4  **HELD.** `distractor` is **1.0000** at all eight checkpoints in both
+            arms, from 25 occasions onward. It does not start low and rise, and
+            it does not fall with experience.
+
+            **So experience cannot fix it either.** That is now five axes —
+            three scalar dials, the search budget, and stream length — none of
+            which separates the link from the distractor.
+
+  P5  **HELD, and it is the rail that makes the early rows readable.**
+            `surfaces` is **18** of a final 111 at 25 occasions and only **98**
+            at 1,500. The world is still arriving for half the stream, so the
+            early checkpoints are not measuring a mechanism performing badly on
+            a complete world — they are measuring an incomplete world.
+
+            **That partly explains the shape but does not explain it away.**
+            Between 1,500 and 3,000 the surface count goes 98 to 111, a 13%
+            change, while `link` rises 71%. So the late climb is mostly evidence
+            accumulating on surfaces already present.
+
+
+WHAT THIS INVALIDATES, ENUMERATED BEFORE ANYTHING IS BUILT ON TOP
+------------------------------------------------------------------
+`CLAUDE.md` requires this list to exist as a list, in order of blast radius,
+rather than being discovered one surprised result at a time.
+
+**SURVIVES — comparisons between arms at equal stream length.** Every sweep in
+g32-g38 ran its arms on the same number of occasions, so which arm is better is
+unaffected. That includes `g36-04`'s interleaved-beats-simultaneous, `g38-01`'s
+walk-beats-partition, and `g32-01`'s refutation of raw counting.
+
+**BECOMES A LOWER BOUND — every absolute figure.** `0.9665`, `0.9580`, `0.9902`,
+`0.9599` and the rest are what the mechanism reached *at 3,000 occasions while
+still improving rapidly*. None is what it achieves.
+
+**AT RISK, AND THIS IS THE EXPENSIVE CLASS — every "X does not help".** A
+mechanism refuted at 3,000 occasions may be a mechanism whose benefit had not
+arrived. `CLAUDE.md`: *"discarding a good idea on an invalid measurement is the
+most expensive error available."* The specific entries to re-check are
+`g36-06`'s damping exponent and `g35-02`'s churn redundancy.
+
+**NOT AT RISK — `g38-02`'s breadth refutation**, which measures a property of the
+data rather than a performance, and `g37-01`/`g37-03`, which are about CLUTRR.
+
+**THE CHEAP FIX IS OBVIOUS AND IS NOT DONE.** FSDD has 3,000 recordings, so 3,000
+occasions is one pass over the data. Cycling the stream for several passes is
+both trivially available and exactly what a system that learns forever would do.
+**Nothing here establishes where the curve actually flattens**, and that is the
+next run rather than a caveat.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**THE QUANTISER IS STILL BATCH**, and the record says so before the results
+rather than after. It is fitted on all 4,000 images before the stream begins, so
+this is prequential in the LINKING and batch in the PERCEPTION. A genuinely
+online system needs an online quantiser, which does not exist.
+
+**One code count and one operating point.** 50 codes, beam 16, depth 1. The
+curve's shape almost certainly depends on occasions per CODE rather than per
+concept — 50 codes over 3,000 occasions is about 60 each — and that ratio is
+held constant here.
+
+**Nothing is distributed.** One process.
+

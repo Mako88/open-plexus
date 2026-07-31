@@ -405,3 +405,49 @@ no cell of `g38-01` could have shown.**
 either. Five axes now — three scalar dials, the search budget, and stream length
 — and none separates the link from the distractor. That is enough to stop looking
 for a sixth knob and call it structural.
+
+### SOLVED, by removing things: `forward` at alpha 1.0 — `g39-04`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g39-04-does-the-forward-score-refuse-the-distractor.txt
+            script  experiments/g39_04_does_the_forward_score_refuse_the_distractor.py
+            task    MNIST + FSDD + 10 words, 1 distractor present every
+                    occasion, stream extended by re-pairing to 24,000
+            model   grounding.reach, damped(alpha), combiner `forward`, beam 16
+            knobs   arms together/alternating x occasions 3,000/24,000 x alpha
+                    0.5/0.75/1.0 x depth 1/2; 50 codes; 3 seeds
+            scale   link, coverage, distractor admission; chance 0.1000
+
+**The week's open problem, closed.** **8 of 24** settings keep the link and refuse
+the distractor, against `g39-03`'s **0 of 24** for every symmetrising combiner —
+and the eight are exactly the eight at `alpha = 1.0`, in both arms, at both
+stream lengths, at both depths.
+
+At 24,000 occasions on `together`: link **0.9867**, coverage **1.0000**,
+distractor **0.0000**. The incumbent partition on the same cell is **0.9216**.
+
+**`forward` at alpha 1.0 is plain `conditional` read from the query's own side.**
+So the working rule is: keep every edge, drop the cut, drop mutuality, drop
+symmetrisation — rank and read. **A simplification, not a mechanism.**
+
+**Symmetrising was what admitted the distractor.** From a word's side its own
+codes score ~1.00 and the distractor ~0.28; from the distractor's side everything
+scores 1.00, because it genuinely is always present. Every combining rule mixes
+that true-but-useless number in. `forward` never sees it.
+
+**The one-sided-rule objection was tested, not argued.** `grounding.py`'s header
+warns a one-sided rule lets a hub attach to everything. At depth 2 `distractor`
+is **0.0000** in every cell — the objection is about the DISTRACTOR'S list, and a
+query starting at the word never reads it.
+
+**And alpha is the deciding variable**, which `g39-03` had found it was not under
+the symmetric combiners: at 0.5 the distractor is admitted at 1.0000, because a
+square root under-corrects for a surface fifty times more common.
+
+**`strength`'s original justification is retired.** It was introduced as soft
+mutuality with a doubt attached; the doubt was right about `min` and the answer
+lay off the min-to-max axis entirely. `SYMMETRIC` now names the four that
+combine.
+
+**Not settled:** depth 3 and beyond, where the one-sided objection gets stronger
+with distance; one code count and one beam.

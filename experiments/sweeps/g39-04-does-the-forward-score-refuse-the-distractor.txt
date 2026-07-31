@@ -2,7 +2,23 @@ Does the forward score keep the link and refuse the distractor?
 ================================================================
 
 Script: experiments/g39_04_does_the_forward_score_refuse_the_distractor.py
-Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+Status: RUN, local, 2026-07-31, 12.6s. Predictions committed at `9d997c4`
+        before the script was executed.
+
+ANSWER: **YES, AND THE ANSWER IS A SIMPLIFICATION RATHER THAN A MECHANISM.**
+        8 of 24 settings meet the bar against `g39-03`'s **0 of 24**, and the
+        eight are exactly the eight where `alpha = 1.0` — both arms, both stream
+        lengths, both depths. At 24,000 occasions, `together`: link **0.9867**,
+        coverage **1.0000**, distractor **0.0000**.
+
+        `forward` at `alpha = 1.0` is plain `conditional` read from the query's
+        own side. **So the working rule is: keep every edge, drop the cut, drop
+        mutuality, drop symmetrisation — rank and read.** Against
+        `equivalence_classes`'s 0.9216 at the same length.
+
+        Four of five predictions refuted, including P2 in the better direction:
+        depth 2 was predicted to readmit the distractor and it does not, in any
+        cell.
 
 
 IN PLAIN TERMS
@@ -121,14 +137,137 @@ stream for 3 seeds and scored 24 settings. This is 2 arms rather than 1 and 12
 settings per arm rather than 24, so roughly the same scoring work over twice the
 stream building. **20 to 60 seconds**, local.
 
-Recorded after the run: TO BE FILLED.
+Recorded after the run: **12.6s**, inside a 20-60s estimate.
 
 
 RESULTS
 -------
-TO BE FILLED.
+arm           occasions  alpha depth    link  covered  distractor  BOTH?
+together           3000   0.50     1  0.9915   0.7467      1.0000      -
+together           3000   0.50     2  0.0200   1.0000      0.0000      -
+together           3000   0.75     1  0.9664   0.9933      0.2000      -
+together           3000   0.75     2  0.1867   1.0000      0.0000      -
+together           3000   1.00     1  0.9800   1.0000      0.0000    YES
+together           3000   1.00     2  0.9800   1.0000      0.0000    YES
+together          24000   0.50     1  0.9912   0.7467      1.0000      -
+together          24000   0.50     2  0.0200   1.0000      0.0000      -
+together          24000   0.75     1  0.9733   1.0000      0.1667      -
+together          24000   0.75     2  0.1200   1.0000      0.0000      -
+together          24000   1.00     1  0.9867   1.0000      0.0000    YES
+together          24000   1.00     2  0.9867   1.0000      0.0000    YES
+
+alternating        3000   0.50     1  1.0000   0.6933      1.0000      -
+alternating        3000   0.50     2  0.0267   1.0000      0.0000      -
+alternating        3000   0.75     1  0.9725   0.9733      0.5333      -
+alternating        3000   0.75     2  0.0800   1.0000      0.0000      -
+alternating        3000   1.00     1  0.9395   0.9933      0.0000    YES
+alternating        3000   1.00     2  0.9395   0.9933      0.0000    YES
+alternating       24000   0.50     1  0.9912   0.7133      1.0000      -
+alternating       24000   0.50     2  0.0200   1.0000      0.0000      -
+alternating       24000   0.75     1  0.9724   0.9600      0.4667      -
+alternating       24000   0.75     2  0.0267   1.0000      0.0000      -
+alternating       24000   1.00     1  0.9800   1.0000      0.0000    YES
+alternating       24000   1.00     2  0.9800   1.0000      0.0000    YES
+
+    settings meeting BOTH: 8 of 24
+    g39-03, every symmetrising combiner: 0 of 24
+
+
+THE ARITHMETIC EXPLAINS EVERY ROW, WHICH IS WHY IT IS BELIEVABLE
+-----------------------------------------------------------------
+`damped(alpha)` scores `c_xy / c_y**alpha`, read forward from the word `w`. For
+its own image code `c` (about 60 occasions) against the distractor `d` (3,000):
+
+    alpha = 1.0    own code  60/60    = 1.00     distractor  845/3000  = 0.28
+    alpha = 0.5    own code  60/7.75  = 7.75     distractor  845/54.8  = 15.4
+
+**At full damping the word's own codes win; at half damping the distractor wins**,
+because a square root under-corrects for a surface fifty times more common. That
+is the whole of the alpha column, and it was predictable from the definition.
 
 
 SCORECARD
 ---------
-TO BE FILLED.
+  P1  **REFUTED.** Not every depth-1 cell works — only the `alpha = 1.0` ones.
+            At alpha 0.5 the distractor is admitted at **1.0000** in both arms,
+            and at 0.75 at **0.1667** to **0.5333**.
+
+            The probe that made this prediction weak had run at alpha 1.0, so it
+            had measured the one value that works and generalised from it. **The
+            marking was right and the prediction was still wrong**, which is the
+            useful reminder: labelling a prediction weak does not make it safer,
+            it makes the failure interpretable.
+
+  P2  **REFUTED, IN THE BETTER DIRECTION — the outcome this file called the
+            stronger result.** Depth 2 was predicted to readmit the distractor,
+            because the second hop starts from an image code rather than the
+            word, and from a code's side an ever-present surface is a strong
+            partner.
+
+            `distractor` is **0.0000 in every depth-2 cell**, at every alpha and
+            both arms. The one-sided rule is safe at two hops, not merely safe
+            where the query happens to start.
+
+            **But depth 2 destroys the LINK below alpha 1.0** — 0.0200, 0.1867,
+            0.0267, 0.0800 — because an under-corrected second hop drags in
+            everything. At alpha 1.0, depth 2 reproduces depth 1 to four
+            decimals in all four cells, so the second hop adds exactly nothing,
+            which is `g38-03`'s finding arriving again by another route.
+
+  P3  **REFUTED, and it is the deciding variable rather than a minor one.**
+            `link` ranges **0.0200 to 1.0000** across alpha at fixed arm and
+            depth. `g39-03` found alpha moving coverage rather than precision
+            under the symmetric combiners; under `forward` it decides
+            everything.
+
+  P4  **REFUTED.** Failures are not confined to coverage. The alpha-0.5 depth-1
+            cells fail on `distractor` at 1.0000 while `link` is 0.9912, and
+            every depth-2 cell below alpha 1.0 fails on `link` at 0.02 to 0.19.
+            All three columns are load-bearing and no single one predicts the
+            verdict.
+
+  P5  **HELD.** `alternating` meets the bar at alpha 1.0 at both lengths —
+            0.9395 and 0.9800 — so this is not a fix for the simultaneous case
+            only. `g36-04` established the interleaved case is the realistic
+            one, and a fix that missed it would have been close to useless.
+
+
+WHAT THIS CHANGES
+-----------------
+**The week's open problem is closed, and by removing things rather than adding
+them.** The working rule is: score `conditional` from the query's own side, keep
+every edge, take the strongest, walk. No cut, no mutuality, no symmetrisation.
+
+Against the incumbent at the same length and arm: **0.9867 with the distractor
+refused, against 0.9216**. The incumbent's refusal came from the cut, and the cut
+cost it the word; this refuses without the cut.
+
+**And `strength`'s original justification is fully retired.** It was introduced
+as soft mutuality, on the argument that an edge should be as strong as its weaker
+direction. That argument was recorded with a doubt attached, the doubt was right
+about `min`, and the answer turned out to lie off the min-to-max axis entirely.
+`SYMMETRIC` now names the four that combine and `forward` is documented as
+deliberately not one of them.
+
+**The one-sided-rule objection is answered by measurement rather than argument.**
+`grounding.py`'s header warns that a one-sided rule lets a hub attach itself to
+everything. P2 tested exactly that at two hops and it did not happen — because
+the objection is about the DISTRACTOR'S list, and a query that starts at the word
+never reads it.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**Depth 3 and beyond.** P2 is clean at two hops and the objection it answers gets
+stronger with distance. `g38-03` found depth 3 worse and dearer under `mean`, and
+`forward` has not been run there.
+
+**One code count, one beam.** 50 and 16.
+
+**`equivalence_classes` is not retired.** It stays as the measured alternative per
+rule 14c, and every earlier result scored through it remains reproducible.
+
+**Nothing is distributed.** `forward` costs ONE remote read per candidate — the
+same as `conditional` and half of what a symmetric combiner would need if the
+pair count were not already symmetric. That is arithmetic from where each
+quantity lives, not an observation on a socket.

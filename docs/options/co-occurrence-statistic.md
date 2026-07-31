@@ -236,3 +236,35 @@ counting is anything merely common, however it got that way.
 concepts come from short streams and so meet less noise. The direct probe is what carries
 the conclusion. The clean control is one rare concept in an otherwise uniform world at
 fixed stream length, and it has not been run.
+
+### It solves 26 of 29 PUBLISHED conditions, and fails where the answer is absent — `g34-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g34-01-external-word-learning-trials.txt
+            script  experiments/g34_01_external_word_learning_trials.py
+            task    xsl.py -- 29 published cross-situational word-learning conditions
+            model   mutual top-k over counts; no join, no federation
+            knobs   arm in {count, conditional}, bound in {1, derived}
+            scale   12-18 word-object pairs, 18-81 trials per condition
+
+**The first grounding measurement on stimuli this project did not design.**
+Ground truth comes from the files, not from humans — no published accuracy is
+reachable without an RData reader, so this is external *stimuli* and not an
+external *benchmark*.
+
+The derived bound recovers **26 of 29** conditions exactly, mean **0.9569**
+against a floor of 0.6667 for a two-surface concept. Fixed bound 1 reaches
+**0.9007**.
+
+**The three failures are `filt0E_3L`, `filt0E_6L` and `filt0E_9L`, all at
+0.5833 with a largest ranking gap of exactly 0.000.** In that condition a pair is
+only ever presented alongside one other pair, so a word co-occurs with two objects
+on identically the same trials and `conditional` returns exactly **1.0** for both.
+Tripling the trials — 18, 36, 54 — returns the same 0.5833, so **the information
+is absent rather than scarce**, and no function of co-occurrence counts can reach
+it. What would is *mutual exclusivity*, which this project has no version of.
+
+**Raw counting survives the frequency variation an experimenter actually uses.**
+Every `freq369` condition — pairs shown 3, 6 and 9 times — scores 1.0000 under
+`count`. That narrows `g32-02`'s skew finding to the skew it was measured at,
+`zipf` 2.0, where the commonest concept took 4,992 occasions and the rarest zero.

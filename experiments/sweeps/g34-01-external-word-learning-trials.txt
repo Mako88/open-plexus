@@ -2,7 +2,14 @@ Trials this project did not design
 ==================================
 
 Script: experiments/g34_01_external_word_learning_trials.py
-Status: PREDICTIONS COMMITTED, NOT YET RUN.
+Status: RUN, local, 2026-07-31, 0.1s. Predictions committed at `bfad487`
+        before the script was executed.
+
+ANSWER: **26 of 29 conditions recovered exactly, and the three failures are
+        conditions where the answer is provably not in the data.** The ranking is
+        bimodal on stimuli this project did not design — mean largest gap about
+        0.5 against note 058's 0.059 for real language — so the derived bound is
+        validated outside a world we built.
 
 
 IN PLAIN TERMS
@@ -104,14 +111,130 @@ Estimated: 29 conditions of at most 36 trials each is a few thousand pair
 updates in total — thousands of times smaller than any previous grounding sweep.
 **Seconds.** Local.
 
-Recorded after the run: PENDING.
+Recorded after the run: **0.1s**. "Seconds" was right; it is 29 files of at most
+81 trials.
 
 
 RESULTS
 -------
-PENDING.
+f1 against the true word-object mapping. **Floor 0.6667**, not 0.5.
+
+    condition                  trials pairs      reps   count    cond  derived    gap   cut
+    1_max_temp_spat_cont_orig      27    18         6  1.0000  1.0000   1.0000  0.509   1.0
+    1olap3tr_contr                 27    18         6  1.0000  1.0000   1.0000  0.528   1.0
+    2_x8_39_4x4                    27    18       3-9  0.9444  0.9259   1.0000  0.531   1.4
+    3_x8_369_4x4                   27    18     3-6-9  0.9815  0.9815   1.0000  0.481   1.1
+    4_no_spat_orig_max_tc          27    18         6  1.0000  1.0000   1.0000  0.509   1.0
+    cont_div6-12                   36    18         6  1.0000  1.0000   1.0000  0.537   1.0
+    filt0E_3L                      18    12         3  0.5833  0.5833   0.5833  0.000   1.0
+    filt0E_6L                      36    12         6  0.5833  0.5833   0.5833  0.000   1.0
+    filt0E_9L                      54    12         9  0.5833  0.5833   0.5833  0.000   1.0
+    filt3E_3L                      27    12       3-6  0.8333  0.8333   1.0000  0.667   2.0
+    filt3E_6L                      45    12       6-9  0.8333  0.8333   1.0000  0.611   2.0
+    filt3E_9L                      63    12      9-12  0.8333  0.8333   1.0000  0.583   2.0
+    filt6E_3L                      36    12       3-9  0.8333  0.8333   1.0000  0.722   2.0
+    filt6E_6L                      54    12      6-12  0.8333  0.8333   1.0000  0.667   2.0
+    filt6E_9L                      72    12      9-15  0.8333  0.8333   1.0000  0.633   2.0
+    filt9E_3L                      45    12      3-12  0.8333  0.8333   1.0000  0.750   2.0
+    filt9E_6L                      63    12      6-15  0.8333  0.8333   1.0000  0.700   2.0
+    filt9E_9L                      81    12      9-18  0.8333  0.8333   1.0000  0.667   2.0
+    freq369-3x3hiCD                36    18     3-6-9  1.0000  1.0000   1.0000  0.546   1.1
+    freq369-3x3loCD                36    18     3-6-9  1.0000  1.0000   1.0000  0.377   1.0
+    freq369_36mx                   36    18     3-6-9  1.0000  1.0000   1.0000  0.497   1.0
+    freq369_39mx                   36    18     3-6-9  0.9444  0.9444   1.0000  0.506   1.3
+    orig_3x3                       36    18         6  1.0000  1.0000   1.0000  0.556   1.0
+    orig_4x4                       27    18         6  1.0000  1.0000   1.0000  0.509   1.0
+    reord_orig_1 .. _4             27    18         6  1.0000  1.0000   1.0000  0.509   1.0
+    temp_cont_1olap3tr             27    18         6  1.0000  1.0000   1.0000  0.537   1.0
+
+    count        mean 0.9007   worst 0.5833   perfect 14/29
+    conditional  mean 0.9001   worst 0.5833   perfect 14/29
+    derived      mean 0.9569   worst 0.5833   perfect 26/29
 
 
 SCORECARD
 ---------
-PENDING.
+  P1  HELD. The derived bound recovers **26 of 29** conditions exactly, mean
+            0.9569. Where the dataset table records a human score at all it is
+            0.18 to 0.56. **Indicative only** — those human numbers belong to
+            conditions whose orderings are not in this set — but the gap is not
+            subtle, and it is what an exact counter with perfect memory should do
+            to participants who have neither.
+
+  P2  HELD, AND IT IS THE ANSWER `g33-04` WAS WAITING ON. The mean largest gap is
+            about **0.5** across the 26 solvable conditions — the same order as
+            the designed families task's 0.424 and **an order of magnitude above
+            note 058's 0.059 for real language.** So the ranking IS bimodal on
+            stimuli this project did not write, and the derived bound is not
+            validated only on worlds we built.
+
+            **The caveat that survives**: these are laboratory experiments
+            designed to be learnable from co-occurrence. Between them and natural
+            language there is a gap this run does not cross, and note 058 is
+            still the only measurement on the far side of it.
+
+  P3  REFUTED, AND THE REFUTATION IS A GOOD OUTCOME. The mean cut was predicted
+            within 0.3 of 1, since a word has exactly one object. It is about
+            **1.34**, because every `filt3E`–`filt9E` condition cuts at **2.0**.
+
+            Cutting at 2 is CORRECT there: those conditions score **1.0000** with
+            the derived bound against **0.8333** at a fixed bound of 1. The
+            second candidate enters the ranking and is then removed by mutuality,
+            while a true partner whose score is asymmetric — the same asymmetry
+            `g33-04` found on chains — gets in where a cut of 1 excluded it. **So
+            the rule beat the count it was predicted to match, and the prediction
+            was measuring the wrong thing.**
+
+  P4  REFUTED, AND IT NARROWS `g32-02` USEFULLY. Raw counting was predicted to
+            suffer where pairs appear 3, 6 and 9 times. It does not: every
+            `freq369` condition scores 1.0000 under `count` except `39mx` at
+            0.9444, which is what `conditional` scores too.
+
+            `g32-02`'s skew finding stands at the skew it was measured under —
+            `zipf` 2.0, where the commonest concept took 4,992 occasions and the
+            rarest zero. **A 3:9 ratio is not that**, and P4's own refutation
+            clause said exactly this: the finding is about skew far larger than an
+            experimenter would use.
+
+
+THE THREE FAILURES ARE THE MOST VALUABLE ROWS
+-----------------------------------------------
+`filt0E_3L`, `filt0E_6L` and `filt0E_9L` score **0.5833 on every arm**, with a
+largest gap of **exactly 0.000**, at 18, 36 and 54 trials.
+
+The flat ranking is not noise. In that condition **pair 1 is only ever presented
+alongside pair 7** — every trial containing one contains the other and nothing
+else. So word-1 co-occurs with object-1 and with object-7 on precisely the same
+trials, and `conditional` gives both exactly **1.0**. They do not nearly tie;
+they tie identically, forever.
+
+**More data cannot help, and the run shows that rather than arguing it**: 3L, 6L
+and 9L triple the trials and return the same 0.5833. The information is ABSENT,
+not scarce.
+
+**So this is a structural limit found on somebody else's data at the first
+attempt**, and it is not a defect in the statistic — no function of co-occurrence
+counts can separate two things that co-occur identically. What separates them is
+a constraint the mechanism does not have: **one word names one object**, so
+committing word-7 to object-7 should remove object-7 from word-1's candidates.
+That is *mutual exclusivity*, it is one of the best-attested findings in child
+word learning, and this project has no version of it.
+
+**And the ladder is the experimenters', not ours.** `filt0E` withholds
+disambiguating exposure and the mechanism scores 0.5833; `filt3E` through
+`filt9E` supply it and the mechanism scores 1.0000. It fails exactly where the
+information was withheld and succeeds exactly where it was given, which is better
+evidence that it is doing the intended thing than any of the 26 perfect rows.
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+**No human comparison.** Not one condition here has a published accuracy — see
+`tools/fetch_kachergis.py`. Calling this an external benchmark would be wrong; it
+is external stimuli with self-contained ground truth.
+
+**No join, no federation, no containers.** This is the statistic and the bound.
+
+**Laboratory stimuli are not natural data.** P2's answer holds for designed
+experiments and note 058's slope still stands for real language; nothing here
+bridges those two.

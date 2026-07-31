@@ -93,7 +93,7 @@ history lives in `docs/archive/notes/` and the archived log.
                    went against it, so it carries no revival condition — what it
                    needs is a reason to pick it back up
 
-**CENSUS: 32 chosen, 30 refuted, 15 untried, 12 both, 1 paused.** Checked against the body,
+**CENSUS: 33 chosen, 30 refuted, 15 untried, 12 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -269,6 +269,7 @@ is the standing weakness** — though `CLUTRR`, `OpenEA` and now `FB15k-237` are
 - ❌ **A composition sweep on chains as evidence about composition** — out-degree 1 by construction, so nothing chooses. `108`, `note 103`. **Revival:** none for chains. → [record](docs/options/composition-sweep-on-chains.md)
 - ⏸ **`corpus.py`** — PAUSED, not condemned. Closed by `115`/`118`, reopened by `g17-01`. → [record](docs/options/corpus-instrument.md)
 - ❌ **`reward_recall.py`** — retired; its requirements list turns out to describe bsuite's Memory Length test, and the list was a search query nobody used as one. `126`. **Revival:** the literature's version. → [record](docs/options/reward-recall.md)
+- ✅ **`xsl.py` — 29 published word-learning conditions** — the first EXTERNAL grounding instrument; 26 of 29 recovered exactly, and the 3 failures present two pairs only ever together, so co-occurrence provably cannot separate them. `g34-01`. **Stimuli, not a benchmark: no human accuracy is reachable without an RData reader.** → [record](docs/options/co-occurrence-statistic.md)
 - ✅ **CLUTRR-symbolic** — the first external instrument; graph layer, never the prose. Report per hop bucket and split on ENTITY REPETITION. `note 059`, `note 060`. → [record](docs/options/clutrr-symbolic.md)
 - ✅ **OpenEA `EN_DE_15K_V2`** — the acquisition instrument. Zero supervision reaches 583× chance; **mutuality is the merge gate and a confidence gate makes it WORSE**. `note 077`/`078`. → [record](docs/options/openea.md)
 - ❌ **`4.540` bits/char, "unigram BEATEN"** — the headline for weeks, and not a measurement of this model; an inherited figure with no provenance outranks every measurement downstream of it. `117`, `118`. **Revival:** none. → [record](docs/options/the-4540-headline.md)

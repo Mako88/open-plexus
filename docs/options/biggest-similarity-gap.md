@@ -129,3 +129,31 @@ data this rule does not merely degrade: its output is determined by representati
 noise**, and a result taken from it there would be unreproducible for a reason no
 seed controls. Asserted rather than commented so the caution cannot be read as
 theoretical.
+
+### The ranking IS bimodal on stimuli we did not design — `g34-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g34-01-external-word-learning-trials.txt
+            script  experiments/g34_01_external_word_learning_trials.py
+            task    xsl.py -- 29 published cross-situational word-learning conditions
+            model   grounding.cliff over conditional scores; look 16
+            knobs   bound in {1, derived}
+            scale   12-18 pairs, 18-81 trials per condition
+
+**The question `g33-04` left open.** Mean largest gap across the 26 solvable
+conditions is about **0.5** — the same order as the designed families task's
+0.424, and an order of magnitude above note 058's **0.059** for real language.
+
+So the cliff this rule needs exists outside a world this project built, and the
+derived bound beats a fixed one there: **0.9569** mean f1 against **0.9007**, and
+26 of 29 conditions exact against 14.
+
+**The `filt3E`–`filt9E` family is where it earns that**, and the mechanism is the
+one `g33-04` named on chains. Those conditions cut at **2.0** rather than the
+true 1, and score **1.0000** where a fixed bound of 1 scores **0.8333** — the
+second candidate enters the ranking and is then removed by mutuality, while a
+true partner whose score is asymmetric gets in where a cut of 1 excluded it.
+
+**And the caveat that survives.** These are laboratory experiments designed to be
+learnable from co-occurrence. Note 058's slope remains the only measurement on
+natural language, and nothing here bridges the two.

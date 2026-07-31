@@ -74,8 +74,11 @@ def main() -> None:
     for width in WIDTHS:
         ranks = task.evaluate(store_scorer(task, width, seed=0))
         print(lp.row(f"store, width {width}", ranks["filtered"]))
-        print(lp.row(f"  same, UNFILTERED", ranks["unfiltered"]))
+        print(lp.row("  same, UNFILTERED", ranks["unfiltered"]))
+        print(lp.row("  same, TIES AS LOSSES",
+                     ranks["filtered_pessimistic"]))
     print(lp.row("frequency", frequency["filtered"]))
+    print(lp.row("  same, TIES AS LOSSES", frequency["filtered_pessimistic"]))
     print(f"\n  chance MRR {1 / task.n_entities:.6f}; capacity 0.023*d^2 is "
           f"{0.023 * 256 ** 2:,.0f} bindings at width 256 against "
           f"{len(task.train):,} triples")

@@ -102,30 +102,61 @@ class Task:
         return lambda heads, rels: counts[rels]
 
     def evaluate(self, scorer) -> dict:
-        """`{filtered: ranks, unfiltered: ranks}` for one scorer over the test set.
+        """Ranks for one scorer: `filtered` / `unfiltered`, each OPTIMISTIC and TIED.
 
-        The rank is `1 + how many candidates outscore the true tail`, which puts ties
-        in the true tail's favour. **That is optimistic and is stated rather than
-        hidden**: a scorer returning a constant would rank everything 1. The untrained
-        arm is the gate against exactly that, and it is the reason `g30-02` requires one.
+        **Ties are not a detail here, they decide the comparison.** A rank of
+        `1 + how many candidates strictly outscore the true tail` puts every tie in
+        the true tail's favour, so a scorer returning a constant ranks everything 1st
+        and reads as perfect. `frequency` is exactly the shape that exploits this:
+        it ignores the head, and most entities are never a tail of a given relation,
+        so thousands of candidates sit at score 0 together.
+
+        So both ends are returned for every arm and neither is chosen here:
+
+            optimistic   1 + (strictly greater)   ties count as wins
+            pessimistic  count of (>= true)       ties count as losses
+
+        A scorer whose two numbers differ is a scorer whose result depends on the tie
+        convention, and that has to be visible in the table rather than settled by
+        whoever wrote the ranking loop.
         """
-        filtered, unfiltered = [], []
+        out: dict = {k: [] for k in ("filtered", "unfiltered",
+                                     "filtered_pessimistic", "unfiltered_pessimistic")}
         for start in range(0, len(self.heads), CHUNK):
             stop = start + CHUNK
             heads = self.heads[start:stop]
             rels = self.rels[start:stop]
             tails = self.tails[start:stop]
             scores = np.asarray(scorer(heads, rels), dtype=float)
-            true = scores[np.arange(len(tails)), tails]
-            unfiltered.extend((scores > true[:, None]).sum(axis=1) + 1)
+            best, tied = ranks(scores, tails)
+            out["unfiltered"].extend(best)
+            out["unfiltered_pessimistic"].extend(tied)
             for row, (h, r, t) in enumerate(zip(heads, rels, tails)):
                 others = self.known[(int(h), int(r))] - {int(t)}
                 if others:
-                    scores[row, np.fromiter(others, dtype=int, count=len(others))] = -np.inf
-                scores[row, t] = true[row]
-            filtered.extend((scores > true[:, None]).sum(axis=1) + 1)
-        return {"filtered": np.array(filtered, dtype=float),
-                "unfiltered": np.array(unfiltered, dtype=float)}
+                    scores[row, np.fromiter(others, dtype=int,
+                                            count=len(others))] = -np.inf
+            best, tied = ranks(scores, tails)
+            out["filtered"].extend(best)
+            out["filtered_pessimistic"].extend(tied)
+        return {k: np.array(v, dtype=float) for k, v in out.items()}
+
+
+def ranks(scores: np.ndarray, targets) -> tuple[np.ndarray, np.ndarray]:
+    """`(optimistic, pessimistic)` rank of each target within its row of `scores`.
+
+    Split out of `Task.evaluate` so it can be tested without `data/`, which is
+    gitignored and therefore absent in CI -- the same reason
+    `tests/test_relation_contrastive.py` works on synthetic triangles.
+
+    **Optimistic counts ties as wins and pessimistic counts them as losses.** For a
+    scorer that separates candidates cleanly the two agree; for one that produces
+    large tied blocks they diverge enormously, and which one is quoted then decides
+    the comparison rather than reporting it.
+    """
+    rows = np.arange(len(targets))
+    true = scores[rows, np.asarray(targets)][:, None]
+    return ((scores > true).sum(axis=1) + 1, (scores >= true).sum(axis=1))
 
 
 def metrics(ranks: np.ndarray) -> tuple[float, float, float, float]:

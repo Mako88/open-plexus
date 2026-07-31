@@ -74,7 +74,10 @@ def main() -> None:
     print("\n" + lp.header())
     print(lp.row(arm, ranks["filtered"]))
     print(lp.row("  same, UNFILTERED", ranks["unfiltered"]))
-    print(lp.row("frequency", task.evaluate(task.frequency_scorer())["filtered"]))
+    print(lp.row("  same, TIES AS LOSSES", ranks["filtered_pessimistic"]))
+    freq = task.evaluate(task.frequency_scorer())
+    print(lp.row("frequency", freq["filtered"]))
+    print(lp.row("  same, TIES AS LOSSES", freq["filtered_pessimistic"]))
     print(f"\n  chance MRR {1 / task.n_entities:.6f}")
     print("  g30-01's raw store on this protocol: 0.0122 at width 256, "
           "0.0232 at width 512")

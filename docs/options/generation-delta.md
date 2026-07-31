@@ -229,3 +229,51 @@ with/without framing this option's scope rests on is partly an artefact of sampl
 
 **Predicted before the run and expected to fail** (`g23-03` P4), with this consequence
 written out in advance rather than after.
+
+### FB15k-237 HAS NO INVARIANT, and not approximately one — 2026-07-31
+
+    CONFIG  when    2026-07-31
+            source  docs/options/generation-delta.md -- this entry holds the run
+            script  tools/invariant_dimension.py --graph data/fb15k237/train.txt
+            task    none -- linear algebra over cycle constraints
+            model   n/a. No model, no training, no walk
+            knobs   none
+            scale   272,115 edges, 267,089 loops, 237 relations
+
+    domain                    rels    loops   rank   dim
+    CLUTRR kinship (CONTROL)    20     9,074     19     1
+    FB15k-237 train            237   267,089    234     0
+
+Three relations appear in no loop and are excluded; an all-zero column would join
+the null space for free.
+
+**And the zero is HARD, which is the claim `note 104` established the standard
+for.** The singular spectra:
+
+    domain            largest   smallest   smallest/largest   gap at the bottom
+    CLUTRR             70.6216    9.09e-14           1.29e-15          1.02e+14x
+    FB15k-237         446.69        9.936             0.02224             1.006x
+
+CLUTRR's null direction sits fourteen orders below its largest and the two
+smallest values are separated by a factor of 10^14. **FB15k-237's bottom six
+cluster between 9.94 and 10.39 with no separation at all** — 1.006x between the
+two smallest. An invariant holding with exceptions would show as a tail. There is
+none.
+
+**So the displacement mechanism gets NOTHING on FB15k-237**, and that mechanism is
+worth the difference between 0.6061 and 0.9076 on CLUTRR's deepest bucket.
+
+**The CLUTRR control reproduces `note 104`'s 1.29e-15 exactly**, which is what
+makes the FB15k-237 column readable rather than a number from an unvalidated
+probe.
+
+**Scope, carried from `g23-03` because it still applies:** `dim` is a property of
+the EXTRACT. FB15k-237 is itself a curated selection of Freebase with inverse
+relations removed, so this is a statement about that extract. What it is NOT is a
+statement that no subset of those 237 relations closes — a largest-consistent-
+subset search is a different computation and `g23-03` named it as unbuilt.
+
+**No prediction was registered before this run and none is claimed.** It is a
+deterministic property of a fixed file with no arm, no tuning and nothing to
+choose after the fact, so there was no result to steer; the rail exists for runs
+where there is.

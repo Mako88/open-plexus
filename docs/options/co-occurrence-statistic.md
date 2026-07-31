@@ -277,3 +277,68 @@ co-occurrence has a ceiling, and **it motivates building nothing.**
 Every `freq369` condition — pairs shown 3, 6 and 9 times — scores 1.0000 under
 `count`. That narrows `g32-02`'s skew finding to the skew it was measured at,
 `zipf` 2.0, where the commonest concept took 4,992 occasions and the rarest zero.
+
+### The damping exponent has no useful interior — `g36-06`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g36-06-can-a-softer-denominator-save-the-word.txt
+            script  experiments/g36_06_can_a_softer_denominator_save_the_word.py
+            task    MNIST 4,000 images + FSDD 3,000 recordings + 10 words,
+                    3,000 occasions, noise 2, 1 distractor present EVERY occasion
+            model   `grounding.damped(alpha)`, new and off by default
+            knobs   alpha 0/0.25/0.5/0.75/1.0 x arms together/alternating;
+                    50 codes pinned from g36-04; 3 seeds
+            scale   word survival, distractor admission, link purity, class size
+
+**John asked whether the denominator could be softened so connections matter more
+than frequency.** The diagnosis behind the question is right and measured: a word
+is present **845.4** times against **60.0** for any single code, so `conditional`
+handicaps it fourteen-fold for being shared across fewer types.
+
+`damped(alpha)` exposes `c_xy / c_y**alpha` as one axis; alpha 0, 0.5 and 1
+reproduce `count`, `weighted` and `conditional` exactly.
+
+**The fix does not work.** Softening restores the word's presence in a neighbour
+list — 0.0200 to 0.9400 — while end-to-end linking goes to **0.0000**. Alpha 1.0
+is the best value in both arms (0.6667 and 0.8476).
+
+**The low end fails by FRAGMENTING, not by merging**, which is the opposite of
+the registered prediction. Mean class size at alpha 0.0 is **1.99** against 4.26
+and 8.89 at alpha 1.0. Every surface ranks the ever-present distractor first, the
+bound is spent on it, and almost no pair is mutual.
+
+**So `word` and `link_img` are not two views of one quantity.** A word can be in
+an image code's list while no image code is in any word's list, because a hub can
+be mutual with only as many spokes as its OWN bound admits.
+
+**And the volume asymmetry is necessary but not sufficient.** In `alternating`
+the word survives at every alpha including 1.0 — 0.8389 to 0.9865 — and a word is
+just as common there. What `together` adds is a rival that is well-correlated
+AND rare.
+
+**Kept as a switched-off alternative** per rule 14c, with the revival condition
+named: a stream with no ever-present distractor, where the trade might have an
+interior. Every number here is measured with one, because that is `g32-01`'s
+falsifier condition.
+
+### `count` and `local_conditional` are ONE arm — 2026-07-31
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g36-06-can-a-softer-denominator-save-the-word.txt
+            script  experiments/g36_06_can_a_softer_denominator_save_the_word.py
+            task    as above
+            model   the five named statistics
+            knobs   none -- arithmetic, confirmed on the three-modality stream
+            scale   full neighbour ranking, 20 surfaces
+
+For a fixed surface `x`, `local_conditional` divides every candidate's score by
+`count(x)`, which is a **constant**. Dividing a list by a constant preserves its
+order exactly, so it induces the identical ranking to `raw_count`. Confirmed
+directly: identical full orderings on every surface checked.
+
+**With `g32-01`'s finding that `ppmi` and `conditional` agree above chance, the
+five named statistics are THREE distinct rankings**, not five. Any grid sweeping
+all five is reporting two of them twice.
+
+This is the third instance of the identical-arms failure in this line, and the
+check remains arithmetic on the arms before dispatch rather than a run.

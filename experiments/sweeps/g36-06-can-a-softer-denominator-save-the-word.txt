@@ -2,7 +2,16 @@ Can a softer denominator save the word without letting the distractor back in?
 ===============================================================================
 
 Script: experiments/g36_06_can_a_softer_denominator_save_the_word.py
-Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+Status: RUN, local, 2026-07-31, 25.5s. Predictions committed at `05d4dd4`
+        before the script was executed.
+
+ANSWER: **The diagnosis is right and the fix does not work.** Softening the
+        denominator restores the word's PRESENCE in a neighbour list — 0.0200 to
+        0.9400 — and destroys the MUTUAL structure the walk runs on, so
+        end-to-end linking goes to **0.0000**. `alpha = 1` remains the best value
+        in both arms. Three of five predictions refuted, and the most useful
+        refutation is that the low end fails by FRAGMENTING rather than by
+        merging, which is the opposite of what was predicted.
 
 
 IN PLAIN TERMS
@@ -31,6 +40,29 @@ anywhere in between keeps the word *and* keeps the background noise out.
 **It is entirely possible the answer is no.** The two failures may sit at
 opposite ends with no gap between them, and if so that is worth knowing plainly,
 because it says the fix has to be something other than tuning this number.
+
+
+THE ASYMMETRY THAT PROMPTED THIS, MEASURED
+-------------------------------------------
+Mean times present, on this stream, arm `together`, 50 codes, seed 0:
+
+    image code    50 of them    present   60.0 times on average
+    audio code    50 of them    present   60.0
+    word          10 of them    present  845.4
+
+Ten words carry the occasions that fifty codes split between them, so a word is
+present about **fourteen times** as often as any single code. `conditional`
+divides by the candidate's own count, which turns that into a fourteen-fold
+handicap applied to the word for being shared across fewer TYPES rather than for
+being less informative.
+
+**Provenance:** measured by a probe on this same stream before this sweep was
+written, not by this script. It is the motivating observation rather than a
+result, and it is recorded here so anything quoting it has one place to point at.
+
+For one image code the concrete case is: the word co-occurs with it in **50** of
+its **65** appearances — 77% — and still scores below an audio code that shares
+far fewer.
 
 
 WHAT IS BEING MEASURED
@@ -128,14 +160,140 @@ arms) with 3 seeds and 2 k-means per seed. This runs 10 cells (2 arms x 5 alphas
 at ONE code count, so the k-means work is a third and the walk work is similar.
 **15 to 40 seconds.** Local, no runner.
 
-Recorded after the run: TO BE FILLED.
+Recorded after the run: **25.5s**, against an estimate of 15 to 40 seconds.
+Inside the range. Second time in a row, and both estimates were scaled from a
+measured run of the same code rather than from an intuition about cost.
 
 
 RESULTS
 -------
-TO BE FILLED.
+arm            alpha    word  distractor  link_img   cross  crossed  classes
+together        0.00  0.8200      1.0000    0.0000  0.0000   0.0000     1.99
+together        0.25  0.9467      0.9333    0.0000  1.0000   0.0333     2.02
+together        0.50  0.9400      0.1867    0.0000  0.9315   0.6867     2.96
+together        0.75  0.3600      0.0000    0.2715  0.2991   6.8533    16.98
+together        1.00  0.0200      0.0000    0.6667  0.8853   2.1000     4.26
+
+alternating     0.00  0.8389      0.9932    0.0000  0.0000   0.0000     1.99
+alternating     0.25  0.9664      0.9932    0.0000  0.0000   0.0000     1.99
+alternating     0.50  0.9865      0.1340    0.0000  0.0000   0.0000     1.99
+alternating     0.75  0.9865      0.0135    0.1385  0.1468  13.9200    35.69
+alternating     1.00  0.9797      0.0067    0.8476  0.8011   3.6200     8.89
+
+**READ `link_img = 0.0000` AS "NO IMAGE CODE IS IN ANY WORD'S CLASS", NOT AS
+"the ones that are, are wrong".** The denominator is empty. `classes` at 1.99
+against 111 surfaces confirms it: almost every surface is alone.
+
+**And the alpha 0.25 `together` row is the trap this file was built to catch.**
+`cross` reads **1.0000**, which is the best number in the table, on `crossed` =
+0.0333 — one audio code reached across fifty image codes, and it happened to be
+right. A run reporting `cross` without `crossed` would have published a perfect
+cross-sensory score for a graph that had linked essentially nothing.
 
 
 SCORECARD
 ---------
-TO BE FILLED.
+  P1  **REFUTED on `word`, held on `distractor`.** `distractor` falls
+            monotonically with alpha in both arms — 1.0000, 0.9333, 0.1867,
+            0.0000, 0.0000 — exactly as the arithmetic says.
+
+            `word` in `together` does NOT: **0.8200, 0.9467, 0.9400, 0.3600,
+            0.0200.** It RISES from alpha 0 to 0.25 and then falls off a cliff
+            between 0.5 and 0.75. So the dial is not a trade with two clean ends;
+            the low end has its own failure and it is not the one predicted.
+
+  P2  **REFUTED AS WRITTEN, AND THE REFUTATION IS WHY THE CRITERION WAS WRONG.**
+            The stated condition was `word` above 0.80 with `distractor` below
+            0.05. **`alternating` at alpha 0.75 meets it exactly** — 0.9865 and
+            0.0135 — and so, nearly, does alpha 1.00.
+
+            **And at that cell `link_img` is 0.1385 with `classes` at 35.69**,
+            which is a collapsed graph. The two-metric criterion is satisfied
+            while the task fails.
+
+            That is `g32-01`'s calibration arriving in this file's own
+            predictions: `captured` would have called a distractor a rounding
+            error while it destroyed a third of the recovery, and here a
+            word-survival criterion calls a collapse a success. **The criterion
+            should have carried `classes` in it, and it was written without.**
+
+            **On the question John actually asked, the answer is NO.** No alpha
+            beats 1.0 end to end in either arm. `together` peaks at alpha 1.00
+            (0.6667) and `alternating` peaks at alpha 1.00 (0.8476). Softening
+            the denominator does not recover the word; it recovers the word's
+            presence in a list while removing what made the list useful.
+
+  P3  **REFUTED, BACKWARDS, and this is the most informative line in the run.**
+            `classes` at alpha 0.0 is **1.99**, against **4.26** at alpha 1.0 in
+            `together` and **8.89** in `alternating`. It was predicted to be at
+            least twice as large; it is less than half.
+
+            **The low end fails by FRAGMENTING, not by merging.** The reason is
+            mutuality. At alpha 0 every surface ranks the ever-present distractor
+            first, so the bound is spent on it and almost no pair is mutual — the
+            graph is singletons. Over-merging was the intuitive failure mode of a
+            weak correction and it is not what happens.
+
+            **So `word` and `link_img` are not two views of one thing.** A word
+            can be in an image code's list (0.9400) while no image code is in any
+            word's list, because a hub can be mutual with only as many spokes as
+            its own bound admits. That is the hub problem again, from the third
+            direction this week.
+
+  P4  **HELD, and it settles John's account precisely.** In `alternating` the
+            word survives at **every** alpha: 0.8389, 0.9664, 0.9865, 0.9865,
+            0.9797 — including 1.00, where `together` reads 0.0200.
+
+            A word is just as common in `alternating` as in `together`. So volume
+            asymmetry alone does NOT evict it. **His diagnosis of the mechanism
+            is correct and is necessary; it is not sufficient.** What `together`
+            adds is a rival that is both well-correlated with the code and RARE,
+            and the denominator only punishes the word when there is such a rival
+            to be punished in favour of.
+
+  P5  HELD as a wiring check. The alpha column is not flat — every quantity moves
+            across it — so the exponent reaches the score. This was worth keeping
+            because a mutation making every alpha compute `conditional` survived
+            the first version of `tests/test_damped.py`, where two orderings
+            coincided on the fixture.
+
+
+WHAT THIS CHANGES
+-----------------
+**`conditional` stays, and the reason for keeping it is now stronger than the
+reason it was chosen.** It was adopted because it kills a persistent distractor
+at no cost (`g32-01`) and is C1-safe. It now also has the only end-to-end
+numbers in this table.
+
+**`damped` stays as a switched-off alternative**, per `CLAUDE.md` 14c: it carries
+why it lost, with this record's number, and it costs a config field. Refutations
+expire, and the one condition that would revive it is named below.
+
+**The thing to stop doing is looking for a scalar fix to the hub problem.** Three
+runs now have found the same wall from three directions — `g33-02`'s global `k`,
+`g36-05`'s eviction, and this run's fragmentation. All three are the same fact:
+**a bound is a budget, and a hub's budget is what limits how many spokes it can
+be MUTUAL with.** No choice of statistic changes the size of the budget.
+
+**What that points at instead** is the bound itself being per-DIRECTION or
+per-KIND rather than one number per surface — a word keeping more partners than a
+picture does, because it is a word. That is untried, it is not a scalar, and it
+is the first mechanism proposal in this line that the measurements actually
+motivate rather than merely permit.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**One code count, pinned at 50 from `g36-04`.** The bound's budget and the number
+of codes per digit are related, and this sweep holds the second fixed. `g33-04`'s
+lesson about carried constants applies: 50 was the middle of `g36-04`'s
+{20, 50, 100} and is not known to be right for this question.
+
+**Alpha above 1.0 was not tried.** The family permits it and nothing here
+explores it. The arithmetic suggests it would punish the word harder, so it is
+predicted to be worse rather than shown to be — say so if it is ever quoted.
+
+**The revival condition for `damped`:** a stream where no distractor is present
+on every occasion. Every number above is measured with one, because that is
+`g32-01`'s falsifier condition, and it is what makes the low end of the axis fail
+immediately. On a clean stream the trade might have an interior. Untested.

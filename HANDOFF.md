@@ -137,7 +137,12 @@ quantity that is not there.
 
 ## STATE
 
-Clean tree, preflight 11/11 three times, **everything pushed.**
+Clean tree, preflight 11/11 four times. **Six commits on `master`, NOT PUSHED** —
+John was not asked this session and nothing here pushes without being asked. So
+`checks.yml` has not run on any of it, and the full mutation harness — six shards,
+45–80 minutes, the thing that catches a vacuous test region — **has not been run
+against this work at all.** That is the one gap in the verification, and it is
+stated here rather than discovered.
 
 `data/` holds clutrr, fb15k237, fsdd, kachergis, mnist, openea and tinyshakespeare, all
 gitignored. Re-fetch on a fresh clone with `tools/fetch_*.py`.

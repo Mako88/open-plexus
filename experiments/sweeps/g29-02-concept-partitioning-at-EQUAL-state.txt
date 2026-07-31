@@ -2,9 +2,102 @@ Concept partitioning at equal state, because g29-01 was not
 ============================================================
 
 Script: experiments/g5_01_scaling.py --mode concept, at reduced width
-Status: NOT RUN. Predictions registered and committed before the run.
+Status: RUN, 10 of 10 cells. Predictions committed at `cfbbdb3` before dispatch.
 
-ANSWER: pending.
+ANSWER: **P1 and P2 HELD, at a QUARTER of the state rather than the 0.60x this
+        file predicted. P3 REFUTED -- the cell is still a ceiling.**
+
+    concept     1.0000  in 30 cells of 30, spread over learning rates 0.0000
+    dimension   0.7549  mean, range 0.685-0.808, spread 0.1229
+
+So concept partitioning solves `g5-01`'s cell using **a quarter of the numbers and
+a quarter of the machines**, where dimension partitioning reaches 0.755. That
+cannot be bought with state, which is what `g29-01` could not say.
+
+
+THE STATE FIGURES IN THIS FILE WERE WRONG, AND THE CORRECTION FAVOURS US
+--------------------------------------------------------------------------
+This file predicted the concept arm would hold **88,128** numbers at 16 nodes,
+0.60x the dimension arm. It actually held **37,440** at **4** nodes, 0.25x.
+
+`g5_01_scaling.py` derives the machine count from the width -- `groups = width //
+MACHINE_WIDTH`, `MACHINE_WIDTH = 16` -- so asking for width 64 also asked for four
+machines rather than sixteen. **That line was not read before the number was
+written down.** Verified from the artifacts' own `partitions` field, which reports
+4 for the concept arm and 16 for the dimension arm.
+
+    arrangement                         width  machines     numbers   vs dimension
+    dimension, as g5-01 runs it           256        16     147,520          1.00x
+    concept,   AS ACTUALLY RUN             64         4      37,440          0.25x
+    concept,   as this file predicted      64        16      88,128          0.60x
+    concept,   g29-01's confounded arm    256        16   1,132,608          7.68x
+
+**Third time in one session that a number reached a record without being read off
+the run.** The pattern each time is a figure derived by reasoning about a
+parameter rather than by looking at what the parameter did, and each time rule
+11b's *"only the data says what happened"* is what caught it.
+
+
+AND g5-01's GRID TIES MACHINE COUNT TO WIDTH, WHICH IS WORTH RECORDING SEPARATELY
+-----------------------------------------------------------------------------------
+`WIDTHS = (16, 32, 64, 128, 256)` with `P = width // 16` gives `P = (1, 2, 4, 8,
+16)`. So the sweep whose exponent is `#10`'s headline **never varies width at a
+fixed machine count** -- it moves along a diagonal where both grow together, and
+its width-16 cell is not partitioned at all.
+
+That is not a defect in `g29-02`, which inherits the design deliberately so the
+arms stay comparable. It is a fact about what `g5-01`'s 0.69 exponent is an
+exponent OF, and it has not been written down before.
+
+    width   machines   dimension state   concept state
+       16          1            5,440           5,568
+       32          2           11,328          12,608
+       64          4           24,640          37,440
+      128          8           57,408         173,120
+      256         16          147,520       1,132,608
+
+At EQUAL width the concept arrangement costs more, from 1.02x at width 16 to 7.68x
+at width 256, because each node carries a full-width store. That is the price of
+the arrangement and it is why `g29-02` had to drop the width to make the
+comparison fair.
+
+
+SCORECARD
+---------
+  P1  HELD. Concept solves the cell, 1.0000 against the 0.95 bar, at 0.25x state
+      rather than the 0.60x predicted -- a harder test than the one registered.
+
+  P2  HELD. 1.0000 against dimension's 0.755, at lower state and fewer machines.
+
+  P3  REFUTED, and this is the one that matters for what comes next. The concept
+      arm's spread across five learning rates is **0.0000** -- identical to
+      `g29-01`. Dropping the width from 256 to 64 did not move it off the ceiling.
+
+      A grid where every cell is perfect cannot rank anything and cannot fit a
+      slope. **So `#10` is not answered.** What is established is that the wall
+      `g5-01` measured is a property of DIMENSION splitting; concept partitioning's
+      own wall is further out and has never been looked for.
+
+  P4  HELD, and by more than expected. Concept cells took **8-22 minutes** against
+      `g29-01`'s 47-53 at width 256; dimension cells took 24-31. So the
+      arrangement is not intrinsically 1.7x more expensive -- that was width 256
+      carrying sixteen full stores. At four nodes and width 64 it is CHEAPER than
+      the dimension arm it beats.
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+**The exponent.** One sequence length cannot fit a slope, and both arms would need
+to be swept over length before `0.69` has a counterpart.
+
+**Whether concept scales.** Its state grows as `machines x width^2` where dimension
+grows as `width^2`, so the arrangement that wins here is the one that gets more
+expensive faster. At width 256 it is already 7.68x. **Whichever wall concept has,
+the cost table above says it will be paid for in memory per machine** -- which is
+exactly the quantity `#10` is about.
+
+**Anything about longer sequences.** `g29-03` pushes `seq_len` until the concept arm
+stops solving, which is the only way to find the number this line of work needs.
 
 
 IN PLAIN TERMS

@@ -1,0 +1,118 @@
+Link prediction on FB15k-237: our system on their task
+=======================================================
+
+Script: experiments/g30_01_link_prediction.py  (to be written)
+Status: NOT RUN. Predictions registered and committed before the script exists.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+Everything this project has beaten is either something it built itself or a
+trivial opponent. Kill-list item 3 asks whether a conventional system already does
+this, and it has never been answered because nothing here has been run on a task
+the outside world has numbers for.
+
+FB15k-237 is that task. Given a thing and a relationship -- *"Tokyo, located-in"*
+-- rank every candidate answer and see how highly the true one places. Our store
+is addressed by exactly that pair, so this is not a redesign: it is reading the
+store the way it is already read, scored the way everyone else scores it.
+
+**The likely answer is that it does badly, and the reason is arithmetic that is
+already on record.** The store holds roughly `0.023 x width squared` bindings.
+At width 256 that is about 1,500. FB15k-237 has **272,115**. So the store can
+hold well under one percent of the graph, and this measures what that costs.
+
+
+WHY THIS EXISTS
+----------------
+`g23-04` put our contrastive rule on FB15k-237 and found the largest margin of
+eighteen graphs -- but on RULE prediction, which is our question. The literature
+measures LINK prediction on this data, which is theirs. That difference was
+written into the fetcher and the sweep record before either ran, precisely so it
+could not drift into a claim.
+
+**This runs their question.** John, 2026-07-30: *"evaluate what we have on their
+task."*
+
+
+THE MEASUREMENT
+---------------
+Standard link prediction, tail side. For each test triple `(h, r, t)`: read the
+store at `key(h, r)`, score every candidate entity by its value vector, rank.
+
+    MRR          mean reciprocal rank of the true tail
+    Hits@1/3/10  how often it lands in the top 1, 3, 10
+    FILTERED     other known true tails for `(h, r)` are removed from the
+                 ranking, which is the convention; unfiltered is also reported
+                 because a number that does not say which it is, is not a number
+
+    chance MRR   about 1/14,505
+
+**Two opponents, both computable here.** `frequency` ranks entities by how often
+they appear as a tail of that relation -- no learning, the same cheap-and-strong
+shape that has been informative all night. `chance` is the floor.
+
+**No published number is quoted.** Comparing to the literature requires reading
+the source, and rule 1 forbids letting a recalled figure gate anything. What this
+produces is our number on their metric; setting it beside a published one is a
+separate job that starts with reading.
+
+
+PREDICTIONS
+-----------
+  P1  THE GATE. Filtered MRR beats chance (~0.00007).
+
+      If it does not, the store is returning noise and nothing else is readable.
+      **This is a real risk rather than a formality**: at width 256 the store
+      holds ~1,500 bindings against 272,115 triples, and retrieval goes as
+      `sqrt(width / stored)`, which is about 0.03 here.
+
+  P2  THE TEST. Our filtered MRR LOSES to the `frequency` baseline.
+
+      **I expect this REFUTED in the bad direction** -- that is, I expect us to
+      lose. A store at 180x its capacity is superposing everything into noise,
+      and frequency needs no capacity at all. If we somehow win, that is a
+      surprise worth checking for a leak before celebrating.
+
+  P3  Hits@10 is below 0.10.
+
+      Well short of what a competent system reaches. Registered so the result is
+      not later described as "competitive" without a number attached.
+
+  P4  THE ONE I AM LEAST SURE OF. Widening the store helps SUBLINEARLY -- going
+      from width 256 to 512 improves MRR by less than 2x.
+
+      Capacity goes as width squared, so 4x the capacity for 2x the width. If MRR
+      scales with capacity this should be a big jump; if it is bounded by
+      something else -- the readout, the value geometry -- it will barely move.
+      **This is the same question g5-01 asked about width and length**, and it is
+      cheap to ask here because no training is involved.
+
+
+WHAT WOULD MAKE THIS NOT COUNT
+--------------------------------
+**Unfiltered numbers passed off as filtered.** They differ a lot and the
+convention is filtered. Both are printed, always, side by side.
+
+**Test triples leaking into the store.** The store is built from TRAIN only. The
+filter uses train, valid and test to remove known-true alternatives from the
+ranking, which is the standard convention and is NOT the same as training on
+them.
+
+**Reading the entity set from test.** Candidates come from the train entity set,
+so a test triple whose tail was never seen in training is unanswerable by
+construction -- counted and reported rather than dropped silently.
+
+
+COST
+----
+272,115 outer products to build the store, then 20,466 rankings against 14,505
+entities. Matrix work, no training. Minutes, local.
+
+
+MEASURED ON
+-----------
+`data/fb15k237/`, sha256 pinned in `tools/fetch_fb15k237.py`. Store width 256
+unless swept, values drawn as `node_main.derive` draws them.

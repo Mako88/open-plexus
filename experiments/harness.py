@@ -486,15 +486,25 @@ def occasions_cell(config, statistic, k, *, look: int = 16) -> tuple[dict, float
         question as a perfect answer.
     """
     from openplexus.grounding import (CoOccurrence, equivalence_classes,
-                                      reached_together, score_classes)
+                                      partner_rate, reached_together,
+                                      score_classes)
     from openplexus.tasks.occasions import generate
 
     index = CoOccurrence()
     for occasion in generate(config):
         index.observe(occasion.surfaces)
     recovered = equivalence_classes(index, statistic, k, look)
-    scored = score_classes(recovered, config.classes(),
+    truth = config.classes()
+    scored = score_classes(recovered, truth,
                            distractors=[config.concept_surfaces])
+    # ADDED as a key rather than a second return value, so every existing caller
+    # is untouched. `connected` is floor-free where `f1` is not: a concept
+    # recovered alone scores 0.6667, 0.5000 or 0.3333 depending on how many
+    # surfaces it has, so an f1 column read across a surface-count axis is
+    # several scales printed as one -- which is what `g35-02` had to correct.
+    scored["connected"] = partner_rate(
+        recovered, truth,
+        among=[s for s in range(config.concept_surfaces)])
 
     apart = config.apart()
     if not apart:

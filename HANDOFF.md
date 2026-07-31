@@ -28,13 +28,14 @@ recommendation; never offer an option already known to fail the goals.
      ✅  6  independent nodes agree           real bug found AND FIXED (transport half)
      ✅  7  decide what to say, and decline   exact, on the case the gate can see
 
-     ❌ 10  margin survives scale             G5 MET ITS REFUTATION CONDITION
+     🔀 10  margin survives scale             REFUTATION WAS ON THE WRONG ARRANGEMENT
 
      ⏸  4  multi-hop walk over real internet MEASURED; verdict needs a latency budget
 
      ⬜  1  relational objective buys reasoning  blocked: no instrument with a wide band
-     ⬜  3  conventional system already wins     no real baseline yet
-     ⬜  5  learn forever                        blocked: needs per-position attribution
+     ⬜  3  conventional system already wins     FIRST REAL BASELINE RUN, and we lose
+     ⬜  5  learn forever                        the cheap route is refuted; needs
+                                                per-position attribution
      ⬜  8  adjudicate contradictions            untouched
      ⬜  9  survive hostile participants         untouched
      ⬜ 11  training traffic fits broadband      G4 passes on ONE SEED
@@ -43,7 +44,32 @@ recommendation; never offer an option already known to fail the goals.
 **#6's ✅ is the TRANSPORT half only.** The quantiser half — do two nodes turn the same
 input into the same id — is untestable because no quantiser exists. That half is ⬜.
 
-**#10 IS NOT UNTOUCHED AND I LABELLED IT WRONG.**
+**#10 MOVED FROM ❌ TO 🔀 ON 2026-07-30, AND THE REASON IS THE ARRANGEMENT.**
+Everything below this paragraph was measured on **dimension** partitioning — every machine
+holds a slice of the width and every read is a fragment summed across machines.
+[`g29-02`](experiments/sweeps/g29-02-concept-partitioning-at-EQUAL-state.txt) ran `g5-01`'s
+own cell with **concept** partitioning instead, where a read is served whole by the one
+machine holding the fact:
+
+    dimension   16 machines, width 256, 147,520 numbers  ->  0.7549
+    concept      4 machines, width  64,  37,440 numbers  ->  1.0000
+
+**A quarter of the memory, a quarter of the machines, and it solves what the other stalls
+on.** That cannot be bought with state, which is exactly what killed the first attempt —
+[`g29-01`](experiments/sweeps/g29-01-does-concept-partitioning-escape-g5s-wall.txt) ran the
+concept arm at 7.7× the state and is confounded beyond use.
+
+**🔀 and not ✅, because the concept arm is SATURATED.** Thirty cells of thirty return
+1.0000 with zero spread across learning rates, so the grid cannot rank anything or fit a
+slope. What is established is that G5's wall belongs to dimension splitting. **Concept
+partitioning's own wall has never been looked for**, and the numbers below stand as
+statements about the arrangement the project does not intend to use.
+
+The cost table is the standing caution: concept state grows as `machines × width²` against
+dimension's `width²`, reaching **7.68×** at width 256. Whatever wall it has will be paid for
+in memory per machine, which is the quantity #10 is about.
+
+**#10's ORIGINAL REFUTATION, on dimension splitting, unchanged below.**
 `docs/archive/goals-results-log.md` records G5 as **resolved and failing**: usable machine
 count goes as `T^-0.45`, so a ten-times-longer problem needs machines **6.6x wider** while
 the machine count you can split across falls to **a third**. In its own words — *"for a goal
@@ -168,6 +194,53 @@ today; it is now on `docs/options/use-based-eviction.md`.
 **Before building here, read `g8-03` and `g8-04`:** `capture_slots` is already measured, and
 *"bounding the lasting store cannot reproduce a mechanism that gates the FAST one"* — every
 pool recovered approximately zero.
+
+**And the cheap route to unblocking it is REFUTED, 2026-07-30.**
+[`g31-01`](experiments/sweeps/g31-01-is-the-filler-share-ours-or-the-worlds.txt) proposed a
+label-free stand-in for *"is this write worth making"* — count whether the address recurs
+later — so the 92× bar could finally be measured on data this project did not generate. Its
+gate failed: the oracle control reproduces at **92.0×** against `g28-01`'s 91.9×, and the
+same stream counted label-free reads **0.0×–0.1×** at every granularity.
+
+**Recurrence is not demand.** MQAR's filler is drawn from a small key range, so it recurs
+constantly; the proxy calls 99.9% of the stream worth writing where the oracle says 1.1%.
+No granularity closes it, so the conclusion is structural: worth-writing is a fact about
+FUTURE DEMAND, no count of the symbols can reach it, and the only routes left are a task
+that declares its queries — which is MQAR, where we started — or an intervention that
+removes the write and sees what breaks. **That is the per-position attribution route, and
+this strengthens the case for it rather than replacing it.**
+
+One thing survives independently, and it is structure rather than measurement: **only
+`openplexus/tasks/mqar.py` and `openplexus/tasks/reward_recall.py` have a `filler` position
+kind, and this project wrote both.** That does not show the bar is unrepresentative — a
+stream with no explicit junk can still be mostly not-worth-storing — only that it has never
+been measured off a task we authored.
+
+## #3 — the first real outside baseline, and we lose to counting
+
+[`g30-01`](experiments/sweeps/g30-01-link-prediction-on-their-task.txt) ran the raw store on
+FB15k-237's own metric: filtered tail-side link prediction, 20,438 test triples.
+
+    store, width 256    MRR 0.0122        frequency  MRR 0.3378
+    store, width 512    MRR 0.0232        chance     MRR 0.000069
+
+**177× chance and one twenty-eighth of counting.** The opponent ranks entities by how often
+each is a tail of that relation — no learning, no capacity — and it is computed here on the
+same test set rather than quoted from a paper. All four predictions held, including the one
+whose refutation would have been the good news.
+
+**It does not close #3.** Link prediction is offline, global and non-local; none of this
+project's constraints are exercised by it. It bounds one reading of the store on one outside
+task, and it did not include the learning rule at all —
+[`g30-02`](experiments/sweeps/g30-02-the-local-rule-on-their-task.txt) is that run and is in
+progress.
+
+**The informative line was the width one.** Doubling width moved the raw store 1.90×,
+against 1.41× from the superposition law and 4× from capacity, so at 181× over capacity
+neither model describes the read. The LEARNED arm goes the other way — width **hurts**,
+0.1633 at 64 against 0.1385 at 256 — which says it is optimisation-limited rather than
+capacity-limited, and that any width or K comparison before convergence is measuring
+learning speed instead of capability.
 
 ## Process, and one thing that must not regress
 

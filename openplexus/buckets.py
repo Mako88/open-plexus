@@ -258,7 +258,18 @@ class Join:
         self._advance(None)
 
     def _advance(self, now: int | None) -> None:
-        """Flush every bucket whose window has closed by `now`."""
+        """Flush every bucket whose window has closed by `now`.
+
+        **This does NOT enforce the deadline; `_offer` does.** Reading the code
+        the other way round is easy and wrong, so it is worth saying: `now` here
+        is the current observation's emission time, and an observation arrives
+        later than that. What makes it safe is that observations are fed in
+        emission order, so any observation still to come has an arrival strictly
+        after any bucket this flushes — a bucket can therefore never be closed
+        out from under something that would have made it. This reclaims memory
+        and fixes the order buckets are written in; the lateness test lives in
+        `_offer` and is checked per observation.
+        """
         due = [b for b, closes in self._closes.items()
                if now is None or closes < now]
         for bucket in sorted(due):
@@ -353,9 +364,16 @@ class Join:
 
     @property
     def messages_per_observation(self) -> float:
-        """What `spread` costs. 1.0 is plain rounding."""
-        total = self.delivered + self.lost_late + self.lost_dropped
-        return self.messages / total if total else 0.0
+        """What `spread` costs. **Exactly 1.0 for plain rounding, at any drop.**
+
+        Counted over observations that were actually SENT, so a dropped one — it
+        never left its observer — is out of the denominator rather than dragging
+        the figure below 1.0 and making plain rounding look cheaper than free.
+        A message that arrives after its bucket has gone still counts: the sender
+        had no way to know, and the byte crossed the network either way.
+        """
+        sent = self.delivered + self.lost_late
+        return self.messages / sent if sent else 0.0
 
     def busiest_share(self) -> float:
         """Largest share of buckets any one node owned.

@@ -246,6 +246,29 @@ class ArrivingTooLate(unittest.TestCase):
         self.assertGreater(late, 0)
         self.assertEqual(delivered + late, 60)
 
+    def test_plain_rounding_costs_exactly_one_message_even_when_things_drop(self):
+        """A dropped observation never left its observer, so it is not a saving.
+
+        Counting it in the denominator made plain rounding report BELOW 1.0 —
+        cheaper than sending one message per observation, which is not a thing
+        that can happen. The figure has to describe what crossed the network.
+        """
+        config = BucketConfig(width=10, drop=0.5, nodes=8, observers=3, seed=2)
+        join = Join(config)
+        join.run([Observation(surface=s, when=s, observer=s % 3)
+                  for s in range(200)])
+        self.assertGreater(join.lost_dropped, 0, "the fixture dropped nothing")
+        self.assertAlmostEqual(join.messages_per_observation, 1.0)
+
+    def test_and_overlapping_windows_still_cost_their_multiple_when_things_drop(self):
+        """The companion, so the fix is not just 'always report 1.0'."""
+        config = BucketConfig(width=10, spread=2, drop=0.5, nodes=8,
+                              observers=3, seed=2)
+        join = Join(config)
+        join.run([Observation(surface=s, when=s, observer=s % 3)
+                  for s in range(200)])
+        self.assertAlmostEqual(join.messages_per_observation, 5.0)
+
     def test_a_dropped_observation_is_counted_separately_from_a_late_one(self):
         """C3 loss and C2 lateness are different failures and must not merge."""
         config = BucketConfig(width=10, drop=0.5, nodes=8, observers=3, seed=2)

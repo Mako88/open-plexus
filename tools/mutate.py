@@ -2425,6 +2425,17 @@ MUTATIONS = [
             "                if held[observation.surface] // config.width == bucket:\n"
             "                    continue",
     ),
+    Mutation(
+        name="dropped-observations-count-against-the-message-bill",
+        breaks="what the bandwidth figure is a statistic OF. An observation lost "
+               "before it left its observer sent nothing, so counting it in the "
+               "denominator reports plain rounding as costing LESS than one "
+               "message each -- a saving that did not happen, on a number that "
+               "exists to price the network",
+        path=BUCKETS,
+        old="        sent = self.delivered + self.lost_late",
+        new="        sent = self.delivered + self.lost_late + self.lost_dropped",
+    ),
 ]
 def restore_any_leftovers() -> None:
     """Recover from a previous run that was killed mid-mutation."""

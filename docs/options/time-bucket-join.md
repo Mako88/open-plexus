@@ -9,10 +9,19 @@
 
 ## What exists
 
-- Nothing. No bucket, no join, no accumulator. This record exists because the design was
-  chosen before it was built, and the reasoning is worth more than a later reconstruction.
-- The pieces it would be built from do exist: `openplexus/ownership.py` (`Ring`, consistent
-  hashing) is what would own a bucket, and `openplexus/partitioned.py` is the store shape.
+- `openplexus/buckets.py`: `BucketConfig`, `Observation`, `observations()` and `Join`.
+  A node rounds **its own** clock, sends to `owner(bucket)` via `ownership.Ring`, and the
+  owner writes pairs into a `grounding.CoOccurrence` and discards the bucket. Knobs for
+  width, overlapping windows, clock skew, delivery lateness, flush grace and drop.
+- `tests/test_buckets.py` and six mutations in `tools/mutate.py`.
+- `experiments/g33_01_does_the_bucket_join_keep_the_signal.py`.
+
+**What does NOT exist, stated because the file's own docstring is the only other place it
+is said:** the accumulator is **not sharded**. `Join` holds one `CoOccurrence` for every
+surface in the world, so *"the link is written to `owner(surface)`, where it accumulates
+over that percept's lifetime"* is addressed for the **bucket** half only. One object
+holding every row cannot demonstrate that the rows are separable. There are also no
+sockets, no processes and no containers.
 
 ---
 
@@ -198,3 +207,71 @@ whose class contains the distractor — moved by **0.0174** where f1 moved by **
 because mutuality caps a distractor's degree and its harm is *displacement* rather than
 joining. Recorded in [co-occurrence-statistic.md](co-occurrence-statistic.md), which holds
 every figure from both runs.
+
+### The join was BUILT, and it costs nothing across a wide envelope — `g33-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g33-01-does-the-bucket-join-keep-the-signal.txt
+            script  experiments/g33_01_does_the_bucket_join_keep_the_signal.py
+            task    occasions, 64 concepts, 8,000 occasions, tempo 100
+            model   openplexus/buckets.py -- ONE PROCESS, no sockets, no containers
+            knobs   width, moment duration, skew, spread, lateness, grace; k 2
+            scale   3 observers, 8 nodes, 3 seeds
+
+With clocks agreed and no lateness, the join reproduces the single-process ceiling
+**exactly** — `1.0000` at every swept width from 5 to 500, at every moment duration.
+
+**Two of this record's four stated objections do not survive measurement.**
+
+*"Boundaries hurt more than skew"* and the overlapping-window answer to them: overlapping
+windows work, but **widening the bucket does the same job at one fifth of the messages**.
+At skew 50, `spread` 2 lifts width 50 from `0.6420` to `1.0000` at **5.0** messages per
+observation, while width 200 reaches `1.0000` at **1.0**. The proposed fix is dominated by
+the simpler knob.
+
+*"The asynchrony bound fights the bucket size"*: it does not, in the direction feared. Skew
+is free once the bucket is roughly four times it — at skew 50, width 200 loses nothing.
+
+**And moments do not have to be separated in time**, which this record assumed. At a moment
+duration equal to the gap between moments, every width from 20 up still reaches `1.0000`.
+
+*"One episode is nearly worthless"* stands and is the reason it works: `g32-02` measured
+the accumulation needed at about 16 occasions per concept.
+
+### What the wide-window tolerance actually is — `g33-01` probe A
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g33-01-does-the-bucket-join-keep-the-signal.txt
+            script  experiments/g33_01_does_the_bucket_join_keep_the_signal.py
+            task    occasions, as above, instantaneous moments
+            model   openplexus/buckets.py
+            knobs   width from 500 to 50,000 at tempo 100
+            scale   1 seed
+
+`1.0000` at five and ten moments merged per bucket, `0.9836` at twenty, `0.5124` at fifty
+and `0.3389` at a hundred — below the 0.5 floor, which is the shuffled control's regime.
+
+**The sweep's own grid stopped at five and did not contain this failure.** It was found by
+probing past the grid afterwards.
+
+### Lateness is a deadline, and the join survives losing most of its traffic — `g33-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g33-01-does-the-bucket-join-keep-the-signal.txt
+            script  experiments/g33_01_does_the_bucket_join_keep_the_signal.py
+            task    occasions, as above
+            model   openplexus/buckets.py, width 50, spread 0, skew 0
+            knobs   lateness, grace, drop
+            scale   3 seeds
+
+Grace at least as large as the worst delay loses nothing and scores `1.0000`. The same
+delay with no grace loses a **0.7463** share of observations at lateness 200 and still
+scores `0.8647`.
+
+Dropping observations outright: `1.0000` at drop `0.50`, `0.9149` at `0.75`, `0.4496` at
+`0.90`.
+
+**Loss is NOT equivalent to a shorter stream**, which was tested because it looked like it
+should be. It removes individual observations rather than whole occasions, so a pair needs
+both members and the damage is quadratic — at 25 surviving occasions per concept this
+scores `0.5692` where `g32-02`'s clean stream at the same count scores `0.9503`.

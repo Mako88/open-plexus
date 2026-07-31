@@ -2,7 +2,13 @@ Does the bucket join keep the signal?
 =====================================
 
 Script: experiments/g33_01_does_the_bucket_join_keep_the_signal.py
-Status: PREDICTIONS COMMITTED, NOT YET RUN.
+Status: RUN, local, 2026-07-31. Predictions committed at `2c136c6` before the
+        script was executed; the join was corrected at `5fd54b0` and the grid
+        re-run clean, which is recorded in RESULTS rather than quietly redone.
+
+ANSWER: four predictions held, three refuted, and the two biggest refutations
+        both went the FAVOURABLE way — the join needs no segmentation of a
+        continuous stream, and the C1-safe statistic costs nothing.
 
 
 IN PLAIN TERMS
@@ -107,6 +113,19 @@ grid that does not contain both failures cannot show an interior optimum, and
 CLAUDE.md's calibration is three sweeps lost to grids that started past the
 phenomenon.
 
+> **AND IT DID NOT BRACKET IT. Written after the run, against myself.** 500 is
+> five times `tempo` and the upper failure does not begin until about **twenty**
+> times, so the grid contains the narrow-window failure and NOT the wide-window
+> one. Every conclusion about width being free is therefore a conclusion about
+> the range that was swept, and the range was chosen by a factor of five that
+> nothing justified.
+>
+> The limit was found by probing past the grid afterwards, which is the same
+> defect CLAUDE.md records for grids that start above saturation, arriving from
+> the other end. The probe is in RESULTS and cost seconds; doing it BEFORE
+> dispatch would have cost the same seconds and made the sweep's own range
+> defensible.
+
 
 PREDICTIONS
 -----------
@@ -169,12 +188,204 @@ Estimated before the run: 288 join cells plus the lateness block, each over a
 stream of 8,000 occasions and about 49,000 observations. g32-01 ran 36 such
 streams in 12.7s, so about **three to five minutes**. Local.
 
-Recorded after the run: PENDING.
+Recorded after the run: **482.9s wall**, one process, against an estimate of
+three to five minutes. **1.9x OVER, where g32-01 and g32-02 were both about 8x
+UNDER.** The estimator is unreliable in both directions and should be quoted as a
+bound to check rather than a figure to plan against.
+
+At eight minutes this sits right on CLAUDE.md's line — `g8_05_which_advantage`
+ran ten minutes locally while being called "a quick control". This was costed
+before dispatch and called an experiment, which is the difference, but a third
+run of it belongs in Actions.
 
 
 RESULTS
 -------
-PENDING.
+Status: RUN, local, 2026-07-31, 482.9s. Predictions committed at `2c136c6`
+before the script was executed.
+
+ANSWER: **the join is free across a wide operating envelope, the C1-safe
+statistic costs nothing against the undeployable one, the statistic that needs no
+remote read fails everywhere — and WIDENING THE BUCKET dominates overlapping
+windows, buying the same recovery at one fifth of the messages.**
+
+  `conditional`, single-process ceiling 1.0000. Floor is 0.5.
+
+    spread 0, skew 0        w=5      20      50     100     200     500
+    moment lasts   0     1.0000  1.0000  1.0000  1.0000  1.0000  1.0000
+    moment lasts  20     1.0000  1.0000  1.0000  1.0000  1.0000  1.0000
+    moment lasts  60     0.8984  1.0000  1.0000  1.0000  1.0000  1.0000
+    moment lasts 100     0.7821  1.0000  1.0000  1.0000  1.0000  1.0000
+                                                     1.0 messages per observation
+
+    spread 0, skew 50      w=5      20      50     100     200     500
+    moment lasts   0     0.3777  0.3777  0.6420  0.6276  1.0000  1.0000
+    moment lasts  20     0.4453  0.4739  0.4819  0.6410  1.0000  1.0000
+    moment lasts  60     0.5129  0.5679  0.7959  0.9795  1.0000  1.0000
+    moment lasts 100     0.5147  0.6713  0.8249  1.0000  1.0000  1.0000
+                                                     1.0 messages per observation
+
+    spread 2, skew 50      w=5      20      50     100     200     500
+    moment lasts   0     0.4460  0.6700  1.0000  1.0000  1.0000  1.0000
+    moment lasts  20     0.5054  0.6944  0.7948  0.7113  1.0000  1.0000
+    moment lasts  60     0.6806  0.6974  0.9276  1.0000  1.0000  1.0000
+    moment lasts 100     0.6612  0.6966  0.8818  1.0000  1.0000  1.0000
+                                                     5.0 messages per observation
+
+  `spread 2, skew 0` is 1.0000 in every cell except width 5 at duration 100
+  (0.9857), so overlapping windows cost nothing when the clocks agree.
+
+  `local` — the only statistic needing no remote read — has a single-process
+  ceiling of **0.6956**, which is exactly raw counting's score with a distractor
+  present, and it never exceeds **0.6991** in any of the 96 cells.
+
+    LATENESS, width 50, spread 0, skew 0
+
+      lateness   grace     lost       f1
+             0       0   0.0000   1.0000
+            50       0   0.0000   1.0000
+           200       0   0.7463   0.8647
+           200     200   0.0000   1.0000
+           500       0   0.8982   0.4931
+           500     500   0.0000   1.0000
+         2,000     500   0.7235   0.9179
+
+
+SCORECARD
+---------
+  P1  HELD. Instantaneous moments, no skew, no lateness: 1.0000 at every width.
+            The join is exactly equivalent to the single-process path, so every
+            other cell is readable. Already asserted by `test_buckets`, so this
+            is a control and not a finding.
+
+  P2  REFUTED WITHIN THE GRID, and the grid is what was wrong. f1 is monotone
+            non-decreasing in width everywhere the sweep looked — there is no
+            interior optimum in [5, 500], only a lower bound. The predicted
+            shape DOES exist; it starts at about twenty merged moments, and the
+            sweep stopped at five. See the note under MEASURED ON, written
+            against myself, and PROBE A for the numbers.
+
+  P3  REFUTED, AND IT IS THE MOST VALUABLE RESULT IN THIS FILE. Moments as long
+            as the gaps between them were predicted to defeat every width. Every
+            width from 20 up reaches the ceiling — 1.0000 at duration 100.
+
+            **So the mechanism does not need moments to be separated in time**,
+            and a continuously-arriving world needs no segmentation step before
+            it. `GOALS.md` 1.2a asks for exactly that world and I had assumed it
+            was a problem to be solved later. It is not a problem.
+
+  P4  HELD IN DIRECTION, and the ratio is the useful part. At skew 50 and width
+            5, f1 falls 1.0000 -> 0.3777, far past the predicted 0.20. But at
+            width 200 — four times the skew — it falls by **nothing at all**.
+
+            The second clause is where it gets interesting. `spread` 2 was
+            predicted to recover the skew damage, and it does at width 50
+            (0.6420 -> 1.0000) but NOT below (0.3777 -> 0.4460 at width 5).
+            **Widening does the same job at 1.0 messages per observation where
+            overlapping windows cost 5.0**, so the option record's proposed
+            answer to boundaries is dominated by the simpler knob.
+
+  P5  HELD, and mechanically checked rather than eyeballed. `conditional` and
+            `ppmi` differ by at most **0.0007** across all 96 cells. **The
+            statistic that cannot be deployed under C1 buys nothing over the one
+            that can**, which is the outcome the design needed.
+
+  P6  HELD. Grace at least as large as the worst delay loses nothing and scores
+            1.0000; the same delay with no grace loses 75-90% of observations.
+            Lateness is a deadline, not a delay.
+
+            And the robustness underneath it is worth naming: at 72.4% of
+            observations lost the score is still **0.9179**. PROBE B has the
+            clean version of that.
+
+  P7  HELD. `local` reaches 1.0000 in **0 of 96** cells where `conditional`
+            reaches it in 66, and its ceiling is 0.6956 — raw counting's score
+            with a distractor, arrived at from a different direction, exactly as
+            its own docstring predicted.
+
+            **So the remote read is necessary.** The refutation would have been
+            the more valuable outcome and it did not happen.
+
+
+PROBE A — where the wide-window tolerance actually ends
+--------------------------------------------------------
+Run after the grid, because the grid did not contain this failure. `conditional`,
+skew 0, spread 0, instantaneous moments, tempo 100, so `width / 100` is how many
+moments merge into one bucket.
+
+**THE FIRST RUN OF THIS GRID IS SUPERSEDED AND MUST NOT BE QUOTED.** Its
+`spread` rows measured a defect in `buckets.py` — a recurring surface's marginal
+was counted nowhere once windows overlapped, reading `c(distractor) = 1` against
+8,000 — and it was nearly written up as a design finding about overlapping
+windows. Fixed at `5fd54b0`; the grid below is a clean re-run. The `spread 0`
+rows were provably untouched by it, and are unchanged between the two runs, which
+is the only reason the defect was legible at all.
+
+
+PROBE A — where the wide-window tolerance actually ends
+--------------------------------------------------------
+Run after the grid, because the grid did not contain this failure. `conditional`,
+skew 0, spread 0, instantaneous moments, tempo 100, so `width / 100` is how many
+moments merge into one bucket.
+
+    width    moments merged    buckets    f1
+      500                 5      1,600    1.0000
+    1,000                10        800    1.0000
+    2,000                20        400    0.9836
+    5,000                50        160    0.5124
+   10,000               100         80    0.3389
+   20,000               200         40    0.4906
+   50,000               500         16    0.5078
+
+**So the envelope is [one moment, about ten moments] and it is wide but not
+open.** At fifty merged the score is at the 0.5 floor and at a hundred it is
+below it, which is the shuffled control's regime — grouping wrongly rather than
+not grouping. Roughly: once a bucket holds enough moments that most surfaces are
+in most buckets, co-occurrence carries nothing.
+
+
+PROBE B — how much loss the join survives
+------------------------------------------
+Observations dropped at random before they are ever sent. `conditional`, width
+50, no skew, 8,000 occasions, 125 per concept.
+
+    drop    observations kept    f1
+    0.00               49,281    1.0000
+    0.25               36,913    1.0000
+    0.50               24,637    1.0000
+    0.75               12,241    0.9149
+    0.90                4,915    0.4496
+    0.95                2,442    0.3788
+
+**Half of everything can be lost for free**, and three quarters costs 0.085.
+
+
+PROBE C — a hypothesis of mine, tested and REFUTED
+---------------------------------------------------
+The obvious reading of Probe B is that loss is just a shorter stream: 125
+occasions per concept at 90% loss leaves about 12, which is under `g32-02`'s
+measured threshold of 16, and at 75% leaves 31, which is over it. That would have
+unified the two results neatly.
+
+**It is wrong, and lengthening the stream does not move the cliff
+proportionally.** At 25 surviving occasions per concept this scores 0.5692 where
+`g32-02`'s clean stream at 16-31 occasions scores 0.9503.
+
+The reason is that loss removes individual OBSERVATIONS, not whole occasions, so
+a pair needs BOTH members to survive and the damage is quadratic. Scoring against
+`per_concept x presence^2 x (1-drop)^2`:
+
+    occasions    drop    effective pairs    f1
+        8,000    0.95               0.15    0.3788
+       16,000    0.95               0.31    0.4175
+        8,000    0.90               0.61    0.4496
+       32,000    0.95               0.61    0.4961
+       16,000    0.90               1.22    0.5692
+       32,000    0.90               2.45    0.7161
+
+Monotone in the effective count, and the two cells at a MATCHED effective value
+agree within 0.05. **Stated as approximate**: six points, one matched pair, and
+no attempt to fit anything.
 
 
 SCORECARD

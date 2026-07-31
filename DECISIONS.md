@@ -115,7 +115,7 @@ outside the learning loop.** Nothing non-text is built.
   novelty is reachable with measured parts (148). **Split it honestly:** the codebook is
   ours, the FEATURE SPACE is where off-the-shelf earns its place. **JOHN'S RULING,
   2026-07-30: an OFF-THE-SHELF quantiser is acceptable and may be preferred.**
-  **RECOMMENDED SHAPE: borrowed FEATURES, our own DETERMINISTIC id rule** — a fixed
+  **CHOSEN BY JOHN, 2026-07-30: borrowed FEATURES, our own DETERMINISTIC id rule** — a fixed
   function from feature vector to id, not a learned codebook. Two nodes then derive the
   same id by construction (John's shared-derivation principle one level up), new
   distinctions still get new ids because the rule is total, and versioning the encoder into
@@ -802,7 +802,9 @@ it has ever been re-litigated, which is the only thing the tree prevents.
 - **EVERY OPTION OFFERED TO JOHN CARRIES THREE THINGS — his instruction, 2026-07-30.**
   He switches between this and other work, so assume no context: **what it IS in plain
   terms** and where it sits, **pros and cons**, and **a recommendation** with what happens
-  if he does not reply.
+  if he does not reply. **AND INCLUDE UNTRIED NOVEL OPTIONS** — *"always feel free to throw
+  in untried novel solutions that could work."* A menu of only the already-attempted cannot
+  escape a dead end.
 - **NEVER OFFER AN OPTION THAT FAILS THE GOALS — John, 2026-07-30.** Something known not
   to scale or not to survive where the project is going is not a choice, however well it
   works today. Record it as a ❌ with the reason; keep it out of any menu. **An invalid
@@ -851,8 +853,7 @@ it has ever been re-litigated, which is the only thing the tree prevents.
 - **Explain plainly, keep the numbers, do not hide bad news.**
 - **Goal ordering:** AGI is primary; being an LLM replacement on consumer machines
   is secondary and must not compete with it.
-- **Biology gives policies, not representations.** Take mechanisms from computer
-  science where the problem is well understood.
+- **Biology gives policies, not representations**; take mechanisms from computer science.
 - **Scheduled wake-ups DO NOT FIRE.** A persistent `Monitor` emitting a heartbeat
   is what works.
 - **RUN UNATTENDED, AND KEEP RUNNING — John, 2026-07-30.** Three parts, and they are one
@@ -880,9 +881,8 @@ it has ever been re-litigated, which is the only thing the tree prevents.
     agreed goal or constraint. Record which were made alone.
 - **Input and output is John's call** — his framing is that if the AGI goal wins,
   inputs should look like a body: a loop with consequences, not a passive feed.
-- **The endgame is undecided** — commercial, open source, or both — and John holds
-  that an AGI used the way current chat agents are used would be immoral.
-  Recommendations must not quietly assume an answer.
+- **The endgame is undecided** — commercial, open source, or both — and John holds that an
+  AGI used the way current chat agents are used would be immoral. Do not assume an answer.
 - **LEGIBILITY MAY BE SPENT TO REACH THE GOAL — decided by John, 2026-07-30.** This
   architecture has a property LLMs lack: the route IS the reason, since `beam` returns
   the walk it actually took, so the explanation and the computation are one object

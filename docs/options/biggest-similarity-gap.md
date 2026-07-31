@@ -363,3 +363,45 @@ an audio code through a shared word, which is what motivated depth 2 — was not
 run; only word-to-image, which co-occurs directly and needs one hop by
 construction. And **predictions were not committed before this run**, which every
 other sweep this session did; the record says so at the top.
+
+### The curve flattens at 12,000, and the walk's lead is a QUARTER of the reported one — `g39-02`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g39-02-where-does-the-curve-flatten.txt
+            script  experiments/g39_02_where_does_the_curve_flatten.py
+            task    MNIST + FSDD + 10 words, arm `together`, stream extended by
+                    RE-PAIRING to 24,000 occasions, 1 distractor
+            model   grounding.reach, conditional, beam 16, depth 1, mean
+            knobs   occasions 3,000/6,000/12,000/24,000; 50 codes; 3 seeds
+            scale   link precision with coverage companion; chance 0.1000
+
+**The follow-up `g39-01` demanded, and it corrects `g38-01` rather than
+confirming it.**
+
+    occasions      walk    partition     gap
+         3,000   0.9665       0.6667   0.2998
+        24,000   0.9867       0.9216   0.0651
+
+**The walk gains 0.0202 from eight times the data; the partition gains 0.2549.**
+So the incumbent was far more penalised by the short stream, and `g38-01`'s
+headline gap is about a quarter of what it reported. The walk still wins; it wins
+by 0.065 rather than 0.30.
+
+**The curve is flat from 12,000** — `link` moves 0.0000 over the final doubling —
+so 1,200 occasions per digit is the plateau and absolute figures at 3,000
+understate the walk by only 0.02.
+
+**Repeating the stream would have been a no-op and the design says why.**
+`conditional` is a ratio, so an exact repeat multiplies both terms and changes
+nothing. The extension re-pairs each recording with a different image and redraws
+the noise, which is genuinely new co-occurrence from the same underlying data.
+
+**The partition improves NON-MONOTONICALLY** — 0.6667, 0.5185, 0.8833, 0.9216 —
+because a hard partition is discrete and a small score change flips whole
+components. The walk's ranking rises smoothly. **That is an argument for the walk
+no cell of `g38-01` could have shown.**
+
+**And `distractor` is 1.0000 at 24,000 occasions.** Experience does not repair it
+either. Five axes now — three scalar dials, the search budget, and stream length
+— and none separates the link from the distractor. That is enough to stop looking
+for a sixth knob and call it structural.

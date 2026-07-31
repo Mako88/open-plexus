@@ -19,6 +19,29 @@ ANSWER: **Bounding the search beats bounding the representation, by the largest
         Three of five predictions refuted, and `max` was refuted in the
         direction that looked like good news until it was checked.
 
+> **CORRECTED 2026-07-31, the same day: the 0.29 gap is largely a SMALL-DATA
+> EFFECT.** Every number here was taken at 3,000 occasions, and `g39-01` found
+> the curve still climbing steeply there. `g39-02` extends it to 24,000, where
+> it flattens:
+>
+>     occasions      walk    partition     gap
+>          3,000   0.9665       0.6667   0.2998
+>         24,000   0.9867       0.9216   0.0651
+>
+> **The walk gains 0.0202 from eight times the data; the partition gains
+> 0.2549.** So the incumbent was far more penalised by the short stream, and the
+> gap at convergence is about **a quarter** of what is reported below.
+>
+> **The direction is unchanged and the magnitude is not.** The walk still wins,
+> and every arm-versus-arm comparison in this file was run at equal stream length
+> so their ORDERING stands. What does not stand is reading 0.6667 as what the
+> partition achieves.
+>
+> `g39-02` also found the partition improves **non-monotonically** — 0.6667,
+> 0.5185, 0.8833, 0.9216 — because a hard partition is a discrete structure and a
+> small score change flips whole components. The walk's ranking rises smoothly.
+> That is an argument for the walk which no cell in this file could have shown.
+
 
 IN PLAIN TERMS
 --------------

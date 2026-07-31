@@ -65,15 +65,15 @@ def _cell(surfaces: int, pairings: str, k: int, seed: int):
     for occasion in generate(config):
         index.observe(occasion.surfaces)
     recovered = equivalence_classes(index, STATISTICS[ARM], k)
-    f1 = score_classes(recovered, config.classes(),
-                       distractors=[config.concept_surfaces])["f1"]
+    scored = score_classes(recovered, config.classes(),
+                           distractors=[config.concept_surfaces])
 
     apart = config.apart()
     if not apart:
-        return f1, None
+        return scored, None
     pairs = [(concept * surfaces + one, concept * surfaces + other)
              for concept in range(CONCEPTS) for one, other in apart]
-    return f1, reached_together(recovered, pairs)
+    return scored, reached_together(recovered, pairs)
 
 
 def main() -> None:
@@ -86,17 +86,18 @@ def main() -> None:
           "whose modalities never shared an occasion\n")
 
     header = (f"{'pairing':<10}{'surfaces':>9}{'k':>4}{'never met':>11}"
-              f"{'f1':>9}{'bridged':>10}")
+              f"{'f1':>9}{'bridged':>10}{'largest':>10}")
     print(header)
     print("-" * len(header))
 
     for pairings in PAIRINGS:
         for surfaces in SURFACES:
             for k in KS:
-                f1s, bridges = [], []
+                f1s, bridges, largest = [], [], []
                 for seed in SEEDS:
-                    f1, bridged = _cell(surfaces, pairings, k, seed)
-                    f1s.append(f1)
+                    scored, bridged = _cell(surfaces, pairings, k, seed)
+                    f1s.append(scored["f1"])
+                    largest.append(scored["largest"])
                     if bridged is not None:
                         bridges.append(bridged)
                 apart = OccasionConfig(surfaces=surfaces,
@@ -104,7 +105,8 @@ def main() -> None:
                 shown = (f"{sum(bridges) / len(bridges):>10.4f}" if bridges
                          else f"{'n/a':>10}")
                 print(f"{pairings:<10}{surfaces:>9}{k:>4}{len(apart):>11}"
-                      f"{sum(f1s) / len(f1s):>9.4f}{shown}")
+                      f"{sum(f1s) / len(f1s):>9.4f}{shown}"
+                      f"{sum(largest) / len(largest):>10.4f}")
         print()
 
     print(f"COST: {time.time() - started:.1f}s wall, one process")

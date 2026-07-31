@@ -147,3 +147,36 @@ arrives without anyone building one.** At zipf 2.0 the commonest concept is the 
 most occasions, so its surfaces become the best raw-count partner of **60 of 60** surfaces
 of the twenty rarest concepts. The busiest-peer pressure this record names is therefore not
 hypothetical, and it is the same object as the distractor.
+
+### The walk BRIDGES a chain and cannot express a STAR — `g33-02`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g33-02-can-the-walk-bridge-two-modalities-that-never-meet.txt
+            script  experiments/g33_02_bridging_modalities.py
+            task    occasions, 64 concepts, 8,000 occasions, pairings chain/star/complete
+            model   none -- mutual top-k over counts, conditional, no join
+            knobs   surfaces 3-5, k 2-4, pairings; 3 seeds
+            scale   uniform frequency, 1 distractor
+
+**The first actual test of this record's central claim**, because every earlier
+run showed all of a concept's surfaces together — so the walk had only ever
+closed a gap of zero.
+
+A three-modality **chain**, whose ends are never once seen together, is bridged at
+**1.0000** with a largest recovered class of **0.0777** of all surfaces, so it is
+a real bridge rather than a collapse. It stays at **1.0000** at four and five
+modalities. **The claim survives.**
+
+**A star does not work at all, and that is the finding.** With `k` 2 the hub keeps
+two partners, so bridging falls to **0.3333** at four surfaces and **0.1667** at
+five — exactly one spoke-pair joined out of three, and one out of six. Raising `k`
+to fit the hub makes every unrelated surface admit noise partners and the graph
+becomes one class of **0.98** of everything.
+
+So a single global `k` must be at least the hub's degree and cannot be, and
+`DECISIONS.md` §6's *bound the enumeration by the biggest similarity gap* is now
+the thing that has to solve it rather than an alternative kept for interest.
+
+**A word that names a concept IS a hub** — it meets the picture and the sound
+while those two may never meet each other — so the star is the shape this
+record's own motivating example has, not a corner case chosen to be hard.

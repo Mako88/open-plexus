@@ -24,7 +24,7 @@ import unittest
 from openplexus.grounding import (STATISTICS, CoOccurrence, conditional,
                                   equivalence_classes, frequency_weighted,
                                   local_conditional, neighbours, ppmi,
-                                  raw_count, score_classes)
+                                  raw_count, reached_together, score_classes)
 
 
 def _index(occasions: list[tuple[int, ...]]) -> CoOccurrence:
@@ -343,6 +343,36 @@ class Scoring(unittest.TestCase):
         without = score_classes(recovered, self.TRUTH, distractors=[9])
         self.assertAlmostEqual(with_it["f1"], without["f1"])
         self.assertEqual(len(self.TRUTH), 5)
+
+    def test_reaching_together_scores_a_TOTAL_COLLAPSE_as_perfect(self):
+        """Documented rather than fixed, because it cannot be fixed here.
+
+        `reached_together` asks whether nominated pairs share a class, so a
+        recovery that puts everything in one class satisfies every pair. It is
+        recall and it has recall's failure. `g33-02` hit it for real: one class
+        of 256 surfaces out of 257, reported as a perfect bridge, while
+        `score_classes` read 0.0308 in the same cell.
+
+        The assertion exists so that anyone changing this function sees the trap
+        before removing the warning from its docstring.
+        """
+        everything = frozenset({0, 1, 2, 3, 9})
+        collapsed = {s: everything for s in everything}
+        self.assertEqual(reached_together(collapsed, [(0, 3), (1, 9)]), 1.0)
+
+    def test_and_the_companion_metric_sees_the_collapse(self):
+        """Which is why they are reported together and never apart."""
+        everything = frozenset({0, 1, 2, 3, 9})
+        collapsed = {s: everything for s in everything}
+        result = score_classes(collapsed, self.TRUTH, distractors=[9])
+        self.assertAlmostEqual(result["largest"], 1.0)
+        self.assertLess(result["f1"], 0.6)
+
+    def test_scoring_no_pairs_at_all_is_refused(self):
+        """`complete` has nothing to bridge, and 1.0 for the absence of the
+        question is the way this reads as a pass while testing nothing."""
+        with self.assertRaises(ValueError):
+            reached_together({0: frozenset({0})}, [])
 
     def test_a_world_of_nothing_but_distractors_is_refused(self):
         with self.assertRaises(ValueError):

@@ -403,6 +403,17 @@ def reached_together(recovered: dict[int, frozenset[int]],
     starting at any member and walking. Walking is only doing work when the
     answer was not directly observed.
 
+    **THIS IS RECALL-SHAPED AND HAS RECALL'S FAILURE. It must never be read
+    alone.** A recovery that puts every surface in the world into one class
+    scores **1.0000** here, because every nominated pair is trivially together.
+    That is not a hypothetical: `g33-02` produced exactly it — one class holding
+    256 of 257 surfaces, reported as a perfect bridge — and the only thing that
+    revealed it was `score_classes`, which fell to 0.0308 in the same cell.
+
+    So report `largest` or `f1` beside it, always. `score_classes` uses F1 rather
+    than recall for precisely this reason and this function could not, because
+    the whole point is to score a nominated subset of pairs rather than a class.
+
     Returns:
         0.0 to 1.0. Raises if no pairs are given, because a rate over nothing
         reads as a score and is not one.

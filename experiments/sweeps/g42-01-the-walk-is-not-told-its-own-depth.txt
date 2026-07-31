@@ -154,14 +154,130 @@ settings and `free-15` walks deeper, so a cell is dearer.
 Estimated **10 to 20 minutes** local for 8 seeds at one width. Local, not
 Actions: it is minutes and not a matrix.
 
-Recorded after the run: (pending)
+Recorded after the run: **279.2s**, well under the 10-20 minute estimate.
 
 
 RESULTS
 -------
-(pending)
+`delta` fold, subset `all`, width 256, beam 8, 8 seeds. `len` is how often the
+depth-free arm committed to a walk of the TRUE length.
+
+    hops    floor      told   wrong-1   free-10   free-15   len free-10
+       2   0.0000    1.0000    0.1875    0.1250    0.5000        0.1250
+       3   0.0000    0.9524    0.1786    0.3452    0.2917        0.1964
+       4   0.0684    0.9118    0.1289    0.2276    0.1822        0.0684
+       5   0.0805    0.9504    0.1624    0.2909    0.3534        0.1272
+       6   0.0374    0.9439    0.1787    0.4416    0.3528        0.0654
+       7   0.0903    0.9358    0.1771    0.4236    0.4740        0.1398
+       8   0.0667    0.9533    0.1850    0.5067    0.4167        0.1642
+       9   0.1092    0.9338    0.2069    0.4181    0.5578        0.1817
+      10   0.0588    0.9076    0.1649    0.8666    0.4254        0.3508
+
+**THE HARNESS VALIDATES ITSELF.** `told` reproduces `g41-01` to four decimals in
+every bucket — 0.9076 at 10 hops, 0.9533 at 8 — from a separate script through a
+separate code path. Two independent implementations agreeing exactly is the
+cheapest evidence available that neither is mis-wired, and it is why the rest of
+this table can be read at all.
 
 
 SCORECARD
 ---------
-(pending)
+  P1  **HELD, and far more strongly than written.** The prediction was that
+            `wrong-1` falls below the `random` bar at 6 hops and deeper. It falls
+            below it at EVERY depth, and lands near the achievable floor
+            throughout: **0.1649 at 10 hops against `told`'s 0.9076.**
+
+            **One extra hop takes the mechanism from 0.91 to 0.16.** The walk is
+            not mildly assisted by being told its depth; it is almost entirely
+            dependent on it. This reproduces decision 85's *"overshoot scores
+            0.000 in every direction"* for the model's own `hops` on a different
+            object, which the record said could not be inherited and had to be
+            measured. It has now been measured.
+
+  P2  **HELD ON THE ARITHMETIC AND VOIDED BY P4.** `free-10` at 10 hops is
+            0.8666, which does land strictly between the bar (0.4643) and `told`
+            (0.9076), exactly as predicted.
+
+            **It holds for a reason that makes it worthless.** At 10 hops the
+            budget IS the answer — `free-10` cannot walk further than 10 and the
+            true chain is 10 — so the arm is not finding its own end there, it is
+            being handed it by the grid. `free-15`, which has no such coincidence,
+            gives **0.4254** in the same bucket.
+
+            Recorded as held because that is what the prediction said, and
+            recorded as uninformative because that is what it is.
+
+  P3  **REFUTED.** The clean/all gap is larger for `free-10` than for `told` in
+            **1 of 3** buckets from 8 hops up, not 3 of 3, and the two do not
+            agree within 0.03 either. So entity repetition is not what costs the
+            depth-free arm, and the reasoning behind the prediction — that a
+            repeated entity offers a short spurious path only a length-free arm
+            can take — is not supported.
+
+  P4  **REFUTED, and it is the finding.** `free-15` differs from `free-10` by
+            more than 0.03 in **9 of 9** buckets, by as much as **0.4412** at 10
+            hops and 0.375 at 2. The two budgets do not agree anywhere.
+
+            **So the budget is doing the work, and the arm is not depth-free in
+            any useful sense.** The residual aid this record named in advance
+            turned out to be the whole mechanism.
+
+  P5  **REFUTED, and in the direction that says the diagnostic is sound.**
+            `free-10` names the true chain length far LESS often than it answers
+            correctly — 0.3508 against 0.8666 at 10 hops, 0.0654 against 0.4416
+            at 6. Walks of the wrong length routinely fold to the right answer.
+
+            That is the additive invariant absorbing the error: a wrong route
+            with the right total displacement still names the right relation. It
+            also means end-task accuracy on the `free` arms cannot be read as
+            evidence that the walk found the chain, which is why the length
+            column was collected.
+
+
+A HYPOTHESIS RAISED AND REFUTED IN THE SAME HOUR
+------------------------------------------------
+The obvious explanation for `free-10` preferring long walks is that `beam` ranks
+by `endpoint @ target`, **unnormalised**, so a larger-norm endpoint wins on
+magnitude rather than direction. Same-length walks share a scale and it cancels;
+across lengths it need not.
+
+Measured, 40 puzzles at 3 hops, budget 10:
+
+    walk length   1      2      3      5     10
+    mean |endpoint|   0.4086  0.4263  0.5369  0.6079  0.6602
+
+The norm does grow with length, and the beam picked length 10 in **28 of 40**
+puzzles whose true chain is 3. So the hypothesis looked right.
+
+**Ranking by COSINE instead changes nothing.** True-length accuracy, raw against
+normalised:
+
+    hops       3       6      10
+    raw     0.1500  0.0500  0.4750
+    cosine  0.1500  0.0500  0.4250
+
+**So the norm correlates with length without deciding the choice**, and
+normalising is not the repair. `CLAUDE.md` calls a diagnosis a claim about
+behaviour needing the same evidence as any other; this one cost two minutes to
+refute and would have become the next thing built.
+
+
+WHAT THIS MEANS FOR KILL-LIST #1
+--------------------------------
+**`g41-01`'s 0.9076 depends on being told the answer's shape, and this project
+currently has no way to remove that aid.** The end-task figure and the aid are
+not separable by anything measured here.
+
+That is the expensive outcome and it was the one P1 was written expecting.
+
+**What survives.** The mechanism composes a chain and names it, at 0.9076 on the
+deepest bucket of a published split, GIVEN the chain's length. That is a real
+capability and it is not nothing — but it is a statement about a system with an
+oracle attached, and the comparison systems in `g37-01`'s borrowed table do not
+have one.
+
+**What is now open, and it is a better question than the one this run asked.**
+Not *"can the walk find its own end by scoring endpoints"* — measured, no — but
+*"is there any signal available at a hop that says this is the end"*. The endpoint
+score is one candidate and it has been refuted. `halt_gate` is a second, learned
+rather than computed, and it has never been pointed at a traversal.

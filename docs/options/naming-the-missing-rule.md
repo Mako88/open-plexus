@@ -109,3 +109,29 @@ comparison the structured version is a difference from.
 Raw reads return another of that entity's facts **0.592–0.775** of the time. At 24 bits the
 sketch takes structured keys to 1.0000 recall against 0.0004–0.0007 false hits. Record:
 [structured-relations.md](structured-relations.md).
+
+### End to end at a swept width, and it is the only filler a domain WITHOUT an invariant gets — `g41-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g41-01-the-pipeline-on-the-published-protocol.txt
+            script  experiments/g41_01_the_pipeline_on_the_published_protocol.py
+            task    CLUTRR gen_train23_test2to10, TEST split, 1,146 puzzles
+            model   LocalAssociativeMemory + search.beam + the contrastive fold
+            knobs   d_model {32, 64, 128, 256, 512} x beam width {4, 8}
+            scale   8 seeds, per hop bucket, achievable floor as an arm
+
+At width 256, beam 8, 10 hops, subset `all`: **0.6061**, against an achievable
+floor of **0.0588**, a random fill of **0.4632** and the hand-supplied invariant's
+**0.9076**.
+
+**This is the row that matters for scope.** `note 104` and `g23-03` measure
+whether a graph has an additive invariant at all; a graph without one cannot have
+the `delta` fold, and this is what it gets instead. Record:
+[generation-delta.md](generation-delta.md).
+
+**It does NOT transfer as a target to another graph, and saying so is the point.**
+0.6061 is CLUTRR's number, where 97 rules are learned over a 20-relation domain.
+A graph with 237 relations has a far sparser table, and the filler is only as good
+as what the table already holds — so the figure to beat on a new instrument has to
+be measured there, not carried from here. That is the mistake this record's own
+`note 088` entry was caught by once already: a real effect on the wrong question.

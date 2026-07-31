@@ -93,7 +93,7 @@ history lives in `docs/archive/notes/` and the archived log.
                    went against it, so it carries no revival condition — what it
                    needs is a reason to pick it back up
 
-**CENSUS: 34 chosen, 30 refuted, 16 untried, 12 both, 1 paused.** Checked against the body,
+**CENSUS: 34 chosen, 31 refuted, 17 untried, 12 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -189,6 +189,8 @@ question is whether an arbitrary domain has an invariant of that kind.
 - ⬜ **Learned relation chooser** — strictly harder than two hand-made rules that were already refuted. `147`. → [record](docs/options/learned-relation-chooser.md)
 - ✅ **`search.beam` — branch at EVERY step, pruned** — `run()` calls it, `search_beam_width=4`. **A MECHANISM, not a margin** (`note 103`); `note 065`'s +0.2190 does NOT reproduce, the gain is +0.107. **The default 4 is UNDERTUNED at depth** — 0.8015 against 0.8676 at beam 8, CLUTRR 10 hops (`g41-01`). → [record](docs/options/beam-search.md)
 - ✅ **A hop REPLACES a retrieval, it does not combine with it** — `101`, `102`, `103`. → [record](docs/options/hop-replaces-retrieval.md)
+- ❌ **Let the walk choose its own length, by endpoint score** — the aid is worth almost everything (`told` 0.9076 against `wrong-1` 0.1649, CLUTRR 10 hops) and removing it does not work: two budgets disagree in 9 of 9 buckets and normalising the score changes nothing. `g42-01`. **Revival:** a per-hop signal that says *this is the end* — `halt_gate` is the untried candidate. → [record](docs/options/depth-free-walking.md)
+- ⬜ **`halt_gate` pointed at a TRAVERSAL rather than at one read** — it generalises zero-shot to an untrained depth at 0.992 (`092`) and has never been given a walk. The only named candidate left after `g42-01` refuted the endpoint score. → [record](docs/options/halt-gate.md)
 - ❌ **Another mechanism stacked on noisy retrieval** — four tried, all against the same ceiling; the fix is per-step fidelity. `102`, `105`, `107`, `111`. **Two conditions EXPIRED at `121`/`122`.** → [record](docs/options/stacked-on-noisy-retrieval.md)
 - 🔀 **`hop_accumulate`: `concat` vs `bind`** — concat wins only because 16 rules in a 128-wide space are linearly separable whatever the labels do; `note 063`/`066` make the fold what generalises. → [record](docs/options/hop-accumulate.md)
 - ✅ **GENERATION DELTA, learned from cycles** — 20/20 deltas recovered exactly; end task 0.5201 → 0.9668, and a deliberately WRONG delta scores below random. `note 090`/`091`. **SCOPED by `note 104`**, narrowed by `g23-03`: `dim` is a property of the EXTRACT, not the domain. **Every figure was taken at an UNSWEPT `d_model` and at the best of eight seeds** — 0.1943 at width 32 against 0.9076 at 256, CLUTRR 10 hops (`g41-01`). → [record](docs/options/generation-delta.md)

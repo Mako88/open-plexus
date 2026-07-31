@@ -42,6 +42,21 @@ ANSWER: **Bounding the search beats bounding the representation, by the largest
 > small score change flips whole components. The walk's ranking rises smoothly.
 > That is an argument for the walk which no cell in this file could have shown.
 
+> **SECOND CORRECTION, same day: `min` reaching NOTHING is a BEAM-8 ARTEFACT.**
+> This file reports `min` at `reached` 0.00 and link 0.0000 and calls it a
+> property of the combiner. At beam 16 — `g38-03`'s operating point — `g39-03`
+> measures `min` at link **0.9677** over coverage **0.5933**.
+>
+> `g38-03` measured coverage rising from 0.0867 at beam 2 to 0.9933 at beam 16,
+> so a strict combiner needs a wider window before image codes enter it at all.
+>
+> **The account below is still right and its consequence is milder than
+> stated:** `min` takes the weaker direction, which on a hub edge is the small
+> one, and that costs **coverage** rather than everything.
+>
+> Both corrections to this file came from measuring at settings it had pinned —
+> stream length and beam. Two constants, two overstatements.
+
 
 IN PLAIN TERMS
 --------------

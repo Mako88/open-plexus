@@ -2,7 +2,25 @@ Is the distractor failure structural, or was it measured too early?
 ====================================================================
 
 Script: experiments/g39_03_is_the_distractor_failure_structural.py
-Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+Status: RUN, local, 2026-07-31, 8.4s. Predictions committed at `181c273`
+        before the script was executed.
+
+ANSWER: **STRUCTURAL. 0 of 24 settings meet the bar, and `distractor` is
+        1.0000 in every single cell** — three exponents, four combiners, both
+        stream lengths. The re-check at convergence did not rescue it.
+
+        **And it identifies WHAT was doing the refusing all along.** `g36-06`
+        measured the distractor falling to 0.0000 as the exponent rose — but
+        that was under `equivalence_classes`. Under `reach` the exponent moves
+        it **not at all**. So the thing excluding the distractor was never the
+        statistic: it was the HARD CUT plus mutuality, which is exactly what a
+        ranked walk removes.
+
+        The trade is now nameable in one line: **a hard cut refuses the
+        distractor and evicts the word; a ranked walk keeps the word and admits
+        the distractor.** Five axes failed because none of them was the axis.
+
+        Two predictions refuted, two held, and the rail held exactly.
 
 
 IN PLAIN TERMS
@@ -111,14 +129,144 @@ stream for 3 seeds and scored 4 checkpoints. This scores 12 settings at each of
 2 checkpoints, so about six times the scoring on the same stream build.
 **30 to 120 seconds**, local.
 
-Recorded after the run: TO BE FILLED.
+Recorded after the run: **8.4s**, below a 30-120s estimate, because the stream
+is built once per seed and the 24 settings are scored in place.
 
 
 RESULTS
 -------
-TO BE FILLED.
+ occasions  alpha  combiner       link  covered  distractor  BOTH?
+      3000   0.50  min          0.9677   0.6000      1.0000      -
+      3000   0.50  geometric    0.9788   0.6400      1.0000      -
+      3000   0.50  mean         0.9798   0.6600      1.0000      -
+      3000   0.50  max          0.9910   0.7333      1.0000      -
+      3000   0.75  min          0.9677   0.6000      1.0000      -
+      3000   0.75  geometric    0.9798   0.6600      1.0000      -
+      3000   0.75  mean         0.9841   0.8467      1.0000      -
+      3000   0.75  max          0.9664   0.9933      1.0000      -
+      3000   1.00  min          0.9677   0.6000      1.0000      -
+      3000   1.00  geometric    0.9915   0.7467      1.0000      -
+      3000   1.00  mean         0.9665   0.9933      1.0000      -
+      3000   1.00  max          0.9800   0.9933      1.0000      -
+
+     24000   0.50  min          0.9677   0.5933      1.0000      -
+     24000   0.50  geometric    1.0000   0.6333      1.0000      -
+     24000   0.50  mean         0.9899   0.6467      1.0000      -
+     24000   0.50  max          0.9912   0.7400      1.0000      -
+     24000   0.75  min          0.9677   0.5933      1.0000      -
+     24000   0.75  geometric    0.9899   0.6467      1.0000      -
+     24000   0.75  mean         0.9922   0.8200      1.0000      -
+     24000   0.75  max          0.9733   1.0000      1.0000      -
+     24000   1.00  min          0.9677   0.5933      1.0000      -
+     24000   1.00  geometric    0.9912   0.7467      1.0000      -
+     24000   1.00  mean         0.9867   1.0000      1.0000      -
+     24000   1.00  max          0.9867   1.0000      1.0000      -
+
+    settings meeting BOTH: 0 of 24
 
 
 SCORECARD
 ---------
-TO BE FILLED.
+  P1  **HELD, and it was written to fail.** `solved` is **0 of 24**. No exponent,
+            no combiner, at neither stream length, keeps the link and refuses the
+            distractor.
+
+            Crossing the two axes was the last cheap thing available and it found
+            nothing. **"Structural" now has a converged measurement behind it
+            rather than being a summary of five disappointments.**
+
+  P2  **HELD EXACTLY, and it is the rail.** `mean` at alpha 1.00 and 3,000
+            occasions gives link **0.9665** at coverage **0.9933** — identical to
+            `g38-03`'s reported cell to four decimals.
+
+            So the stream construction has not drifted from the runs being
+            re-checked, and every other row is comparable with them.
+
+  P3  **REFUTED, AND THE REFUTATION IS THE MOST USEFUL LINE HERE.** The exponent
+            was predicted to trade the distractor against the link. It moves the
+            distractor **not at all** — 1.0000 at every alpha.
+
+            `g36-06` measured the opposite: 1.0000, 0.9333, 0.1867, 0.0000,
+            0.0000 as alpha rose. **The difference is the mechanism, not the
+            data.** That run scored admission through `equivalence_classes`,
+            which applies a derived cut and then requires mutuality. This one
+            scores it through `reach`, which applies neither.
+
+            **So the exponent never refused the distractor. The hard cut did.**
+            An ever-present surface scores low under `conditional` and falls
+            below the cliff; it also fails mutuality, since it is in everyone's
+            list and nobody is in its. Remove the cut and the ranking still
+            contains it — just further down, and `reach` reads the whole ranking.
+
+            That reframes five axes at once: they were all statistics or budgets,
+            and the mechanism doing the work was a structural constraint that the
+            walk deliberately removed.
+
+  P4  **REFUTED.** `min` was predicted to gain most from convergence, being
+            furthest from its plateau. It gains **nothing**: link 0.9677 at both
+            lengths and coverage 0.6000 to 0.5933, a slight fall.
+
+            `geometric` gains most (0.9788 to 1.0000 at alpha 0.5), and `mean`
+            gains its coverage (0.9933 to 1.0000). So `g39-02`'s
+            *"furthest-from-plateau gains most"* does not generalise from the
+            partition to the combiners.
+
+  P5  **HELD.** `distractor` is 1.0000 at every setting at both lengths. Stream
+            length changes it by exactly zero, which confirms `g39-02`'s finding
+            was about the mechanism rather than about one setting.
+
+
+AND A SECOND CORRECTION TO `g38-01`
+------------------------------------
+That run reported `min` reaching **nothing** — `reached` 0.00, link 0.0000 — and
+this run has `min` at link **0.9677** over coverage **0.5933**.
+
+**The difference is the beam.** `g38-01` ran beam 8; this runs beam 16. `g38-03`
+measured coverage rising from 0.0867 at beam 2 to 0.9933 at beam 16, so a strict
+combiner simply needs a wider window before image codes enter it at all.
+
+So *"`min` reaches nothing"* is a beam-8 artefact and not a property of `min`.
+The account attached to it — that `min` takes the weaker direction, which on a
+hub edge is the small one — is still correct, and its consequence is milder than
+reported: `min` costs **coverage**, not everything.
+
+`g38-01`'s record is corrected in place. **That is the second correction to that
+file today**, both from measuring at a setting it had pinned.
+
+
+WHAT THIS CHANGES
+-----------------
+**Stop looking for a statistic that refuses the distractor.** Three exponents by
+four combiners by two stream lengths says the ranking always contains it. The
+refusal has to come from a structural constraint — a cut, mutuality, or something
+not yet built — and not from how an edge is scored.
+
+**And that is a genuine tension in John's proposal rather than a bug in it.** The
+ranked walk exists to stop discarding edges, and discarding edges is what was
+refusing the distractor. Those cannot both be had by tuning; something has to
+supply the refusal that the cut used to.
+
+**What the numbers say to do meanwhile.** Alpha 1.0 with `mean` or `max` gives
+0.9867 link at 1.0000 coverage — the best cells in the table — so the operating
+point is unchanged and the open problem is orthogonal to it.
+
+**The alpha and combiner axes mostly move COVERAGE, not precision.** Link is
+between 0.9664 and 1.0000 in all 24 cells while coverage ranges 0.5933 to 1.0000.
+That was not visible in either earlier sweep and it means those axes are about
+how much gets found, not how right it is.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**One arm, one code count, one beam and depth.** `together`, 50 codes, beam 16,
+depth 1.
+
+**Alpha 0 and 0.25 were excluded on `g36-06`'s evidence** rather than re-measured
+here, and that evidence was taken under the other mechanism. Given P3 found the
+two mechanisms disagree about exactly this column, **that exclusion is now
+weaker than it was when written** and should be re-checked before the low end is
+called closed.
+
+**Nothing here proposes the structural constraint it argues for.** Naming what a
+mechanism needs is not building it, and `CLAUDE.md` is explicit that a diagnosis
+is a claim about behaviour like any other.

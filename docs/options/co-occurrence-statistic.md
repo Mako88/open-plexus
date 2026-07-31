@@ -426,3 +426,48 @@ distractor.
 **The cheap follow-up is not done:** 3,000 occasions is one pass over FSDD, and
 cycling the stream is both trivially available and what a system that learns
 forever would do. **Nothing establishes where the curve flattens.**
+
+### The HARD CUT refused the distractor, not the statistic — `g39-03`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g39-03-is-the-distractor-failure-structural.txt
+            script  experiments/g39_03_is_the_distractor_failure_structural.py
+            task    MNIST + FSDD + 10 words, arm together, 1 distractor present
+                    every occasion, stream extended by re-pairing
+            model   grounding.reach, damped(alpha), beam 16, depth 1
+            knobs   alpha 0.5/0.75/1.0 x combiner min/geometric/mean/max, at
+                    3,000 and 24,000 occasions; 50 codes; 3 seeds
+            scale   link, coverage, distractor admission; chance 0.1000
+
+**The re-check `g39-01` obliged, at the length `g39-02` showed is converged, on
+the one failure nothing had fixed. 0 of 24 settings keep the link and refuse the
+distractor; `distractor` is 1.0000 in every cell.**
+
+**And it names what was doing the refusing.** `g36-06` measured the distractor
+falling to 0.0000 as the exponent rose. Under `reach` the exponent moves it **not
+at all**. The difference is the mechanism: that run scored admission through
+`equivalence_classes`, which applies a derived cut and then requires mutuality;
+this one applies neither.
+
+**So the exponent never refused the distractor — the hard cut did.** An
+ever-present surface scores low under `conditional` and falls below the cliff,
+and it fails mutuality because it is in everyone's list and nobody is in its.
+Remove the cut and the ranking still contains it, further down, where a walk
+reading the whole ranking finds it.
+
+**One line for the whole trade: a hard cut refuses the distractor and evicts the
+word; a ranked walk keeps the word and admits the distractor.** Five axes failed
+because none of them was the axis. **Stop looking for a statistic that refuses
+it** — the refusal has to come from a structural constraint.
+
+**The rail held exactly**: `mean` at alpha 1.0 and 3,000 occasions reproduces
+`g38-03`'s cell to four decimals, 0.9665 at 0.9933.
+
+**Alpha and combiner move COVERAGE, not precision.** Link is 0.9664 to 1.0000 in
+all 24 cells while coverage ranges 0.5933 to 1.0000 — invisible in either earlier
+sweep, and it means those axes decide how much is found rather than how right it
+is. The best cells are alpha 1.0 with `mean` or `max`: **0.9867 at 1.0000**.
+
+**Alpha 0 and 0.25 were excluded on `g36-06`'s evidence**, which was taken under
+the other mechanism — and since the two mechanisms disagree about exactly this
+column, that exclusion is now weaker than when written.

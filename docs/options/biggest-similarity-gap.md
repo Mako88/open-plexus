@@ -186,4 +186,4 @@ requires — compatible with the mechanism at all.
 
 **And the two bounds do NOT cross on this axis**: derived is equal or better in
 all 24 cells. `g33-04`'s measured crossover is on the PAIRING STRUCTURE axis
-(chains), which is why the 🔀 stands for that reason and not this one.
+(chains), so the reason both arms are kept is that one and not this one.

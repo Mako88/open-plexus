@@ -36,7 +36,15 @@ FLAG = re.compile(r"(--[\w-]+)")
 def accepted_flags(script: Path) -> set[str]:
     """Flags the script's own --help reports."""
     result = subprocess.run([sys.executable, str(script), "--help"],
-                            cwd=ROOT, capture_output=True, text=True)
+                            cwd=ROOT, capture_output=True, text=True,
+                            # ENCODING STATED, not inherited. Without it the
+                            # ambient locale decodes the subprocess output, and
+                            # a docstring containing an em-dash crashes this on
+                            # any machine whose default is not UTF-8 -- turning
+                            # the check that guards a twenty-minute job into the
+                            # thing that fails before it. `errors` keeps a stray
+                            # byte from doing the same.
+                            encoding="utf-8", errors="replace")
     if result.returncode != 0:
         raise RuntimeError(f"{script.name} --help failed:\n{result.stderr[-500:]}")
     return set(FLAG.findall(result.stdout))

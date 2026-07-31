@@ -2547,6 +2547,20 @@ MUTATIONS = [
         new="        for surface, partner in ((one, other), (one, other)):",
     ),
     Mutation(
+        name="a-departed-owner-reports-a-marginal-of-zero",
+        breaks="the difference between a node that LEFT and a surface nobody "
+               "ever saw. Zero is an ordinary count, so it drives every "
+               "chance-corrected score to zero and the candidate is silently "
+               "ranked last instead of being dropped as unscoreable -- and the "
+               "unreachable counter never moves, so a degraded run is "
+               "indistinguishable from a healthy one",
+        path=FEDERATED,
+        old='            raise KeyError(\n'
+            '                f"node {target} owns surface {surface} and has departed. "',
+        new='            return 0 or KeyError(\n'
+            '                f"node {target} owns surface {surface} and has departed. "',
+    ),
+    Mutation(
         name="a-node-reads-a-peers-marginal-from-its-own-table",
         breaks="the boundary between what a node holds and what it must ask "
                "for. `count(y)` lives at `owner(y)`; served locally it comes "

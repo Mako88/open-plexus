@@ -138,6 +138,57 @@ class AskingAcrossTheSplitCosts(unittest.TestCase):
         self.assertGreater(self.federated.hops, before)
 
 
+class WhenANodeLeaves(unittest.TestCase):
+    """Nothing is replicated, so a departure is a permanent loss."""
+
+    def setUp(self) -> None:
+        self.config, self.single, self.federated = _both()
+
+    def test_its_surfaces_stop_being_present(self):
+        gone = [s for s in self.single.rows()
+                if self.federated.owner(s) == 0]
+        self.assertTrue(gone, "node 0 owned nothing, so this tests nothing")
+        self.federated.lose(0)
+        for surface in gone:
+            self.assertFalse(self.federated.present(surface))
+
+    def test_everything_else_is_untouched(self):
+        """The companion. A `lose` that emptied the world passes the test above."""
+        self.federated.lose(0)
+        for surface in self.single.rows():
+            if self.federated.owner(surface) != 0:
+                self.assertTrue(self.federated.present(surface))
+
+    def test_asking_a_departed_owner_RAISES_rather_than_returning_zero(self):
+        """A marginal of zero is an ordinary count. A departed peer is not."""
+        gone = next(s for s in self.single.rows()
+                    if self.federated.owner(s) == 0)
+        self.federated.lose(0)
+        with self.assertRaises(KeyError):
+            self.federated.seen(gone)
+
+    def test_a_walk_still_returns_a_SMALLER_answer_rather_than_failing(self):
+        """Dropping an unscoreable candidate is local and graceful. Scoring it
+        as zero would make a departed peer look like a surface nobody saw."""
+        alive = next(s for s in sorted(self.single.rows())
+                     if self.federated.owner(s) != 0)
+        before = self.federated.walk(alive, conditional, 2)
+        self.federated.lose(0)
+        after = self.federated.walk(alive, conditional, 2)
+        self.assertIn(alive, after)
+        self.assertLessEqual(len(after), len(before))
+
+    def test_the_unreachable_reads_are_COUNTED(self):
+        """A departure that left no trace in the accounting would make a
+        degraded run indistinguishable from a healthy one."""
+        self.federated.lose(0)
+        before = self.federated.unreachable
+        for surface in sorted(self.single.rows())[:20]:
+            if self.federated.present(surface):
+                self.federated.walk(surface, conditional, 2)
+        self.assertGreater(self.federated.unreachable, before)
+
+
 class WhatNoNodeCanKnow(unittest.TestCase):
     """PPMI is refused rather than approximated, and that is deliberate."""
 

@@ -136,10 +136,40 @@ class Federation:
         self.remote_writes = 0
         self.remote_reads = 0
         self.hops = 0
+        self.unreachable = 0
+        self._absent: set[int] = set()
 
     def owner(self, surface: int) -> int:
         """Which node holds this surface's row. No directory, no message."""
         return self._ring.owner(surface)
+
+    def lose(self, node: int) -> None:
+        """That node vanishes, and **its rows vanish with it.**
+
+        `partitioned.ConceptStore.lose` keeps a concept reachable because it is
+        held on `replicas` nodes and a read falls through to a survivor. **The
+        grounding store has no replicas at all**, so this is the harsher case:
+        every surface that node owned is gone outright, and no survivor holds a
+        copy to fall through to.
+
+        Two costs follow and only the first is obvious:
+
+        - **the rows it held are lost.** Everything ever learned about those
+          surfaces, permanently, because nothing is replicated and nothing is
+          repaired;
+        - **every SURVIVING surface loses those as candidates.** Ranking needs
+          `count(y)` from `owner(y)`, so a partner on a departed node cannot be
+          scored by anyone. A concept with one surface here is damaged even
+          though its other surfaces are untouched.
+
+        The second is why a departure costs more than its share of the ring, and
+        measuring how much more is what `g35-02` is for.
+        """
+        self._absent.add(node)
+
+    def present(self, surface: int) -> bool:
+        """Whether this surface's owner is still here."""
+        return self.owner(surface) not in self._absent
 
     def note(self, surface: int, *, sender: int | None = None) -> None:
         """Record that a surface was present, at its own owner."""
@@ -168,8 +198,22 @@ class Federation:
 
         Counts a remote read when the asker is elsewhere, which is what makes
         the cost of `conditional` visible instead of implied.
+
+        Raises:
+            KeyError: if the owner has departed. **Not a zero** — a marginal of
+                zero is an ordinary count that drives every chance-corrected
+                score to zero, so a departed peer would read as a surface that
+                simply never appeared. `rank` catches this and drops the
+                candidate, which is the local and graceful thing to do; nothing
+                else may treat it as data.
         """
         target = self.owner(surface)
+        if target in self._absent:
+            self.unreachable += 1
+            raise KeyError(
+                f"node {target} owns surface {surface} and has departed. "
+                f"Returning 0 would make it look like a surface nobody ever "
+                f"saw, which is a count rather than an absence")
         if asker is not None and asker != target:
             self.remote_reads += 1
         return self._tables[target].seen(surface)
@@ -207,7 +251,14 @@ class Federation:
             # surface itself, which its owner already holds, so it pays nothing
             # -- which is the whole reason it is worth measuring and the reason
             # this cost must not be charged unconditionally.
-            score = statistic(view, surface, other)
+            try:
+                score = statistic(view, surface, other)
+            except KeyError:
+                # The candidate's owner has left. DROPPING it is local and
+                # graceful: this node cannot score it and cannot know what it
+                # would have scored, so pretending otherwise is the only way to
+                # get a wrong answer rather than a smaller one.
+                continue
             if score > 0.0:
                 scored.append((score, other))
         scored.sort(key=lambda pair: (-pair[0], pair[1]))

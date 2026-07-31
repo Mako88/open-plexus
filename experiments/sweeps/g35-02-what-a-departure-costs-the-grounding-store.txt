@@ -1,0 +1,120 @@
+What does a departure cost, when nothing is replicated?
+=======================================================
+
+Script: experiments/g35_02_what_a_departure_costs_the_grounding_store.py
+Status: PREDICTIONS COMMITTED, NOT YET RUN.
+
+
+IN PLAIN TERMS
+--------------
+This project's premise is that machines leaving is **normal**, not an accident.
+So the question is not whether the system survives a departure but what one
+costs.
+
+The older store kept three copies of everything, so losing a machine mostly cost
+redundancy. The grounding store keeps **one**. When a machine goes, everything it
+knew about its share of things is gone for good, and nothing anywhere has a copy.
+
+There is a second cost that is easy to miss. To judge whether two things belong
+together, a machine has to ask how common the *other* thing is — and if the
+machine holding that answer has left, nobody can score it. So a departure damages
+things it never held, by making them unjudgeable.
+
+That means a concept is in trouble if **any** of its appearances lived on the
+departed machine. A dog known by a picture, a sound and a word has three chances
+to be hit rather than one.
+
+**Which raises the uncomfortable question this run is really about.** The whole
+point of multiple modalities is that a concept can be reached several ways. Does
+that make it more robust to a machine leaving, or less? More ways to reach it, or
+more ways to lose part of it? The answer is not obvious and it matters, because
+multimodality is a requirement here rather than a feature.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    ring share      the departed nodes' share of the network, `lost / nodes`
+    surfaces gone   share of surfaces whose owner has left
+    concepts hit    share of concepts with AT LEAST ONE surface gone
+    f1              recovery, scoring a lost surface as **zero** rather than
+                    skipping it. Skipping would average over the survivors,
+                    which is a different question and a flattering one
+    largest         biggest recovered class, to catch a collapse
+
+An unreachable candidate is **dropped** from a ranking rather than scored zero. A
+zero marginal is an ordinary count and would make a departed peer look like a
+surface nobody ever saw; dropping is local, graceful, and the only option that
+gives a smaller answer rather than a wrong one.
+
+
+MEASURED ON
+-----------
+Local, single process, Python 3.14, no numpy. `Federation`, so ownership and the
+crossings are real; no sockets, because this is a question about what
+INFORMATION is lost and transport cannot change that.
+
+    concepts       32
+    nodes           8      carried from g33-03
+    occasions   4,000      125 per concept, above g32-02's ~16 threshold
+    presence      0.7      carried
+    noise           3      carried
+    distractors     1      carried
+    bound     derived      `g33-04`'s winner, so this measures the arrangement
+                           actually in use rather than a superseded one
+    statistic conditional  the C1-safe one
+    seeds     0, 1, 2
+
+Swept: `surfaces` per concept in {2, 3, 5}, nodes lost in {0, 1, 2, 4}.
+
+
+PREDICTIONS
+-----------
+P1  CONTROL, near-arithmetic. `surfaces gone` tracks `ring share` to within
+    about 0.06 — consistent hashing spreads keys evenly but a ring is lumpy, and
+    `Ring.balance` already exists because of it.
+    REFUTED IF the two diverge widely, which would mean ownership is not
+    spreading and every other row is about a different arrangement.
+
+P2  A DEPARTURE COSTS MORE THAN ITS SHARE. `concepts hit` is far above
+    `surfaces gone`, because a concept is damaged if ANY of its surfaces is
+    lost: about `1 - (1 - share)^surfaces`. At 3 surfaces and one node of eight
+    that is roughly **0.33 against 0.125**.
+    REFUTED IF the two are close, which would mean surfaces of one concept land
+    on the same node — and that would be worth knowing, because it would make
+    the ring's placement correlated in a way nothing has checked.
+
+P3  IT DEGRADES RATHER THAN COLLAPSING. `f1` falls roughly in step with
+    `concepts hit`, and `largest` stays small at every loss level.
+    REFUTED IF `largest` rises or `f1` falls off a cliff — either would mean
+    dropping unreachable candidates destabilises the walk rather than shrinking
+    its answer, and the graceful-degradation claim would be wrong.
+
+P4  MORE MODALITIES MAKES CHURN WORSE, NOT BETTER. At a fixed loss, `concepts
+    hit` RISES with `surfaces` — 2, 3, then 5 — because more surfaces is more
+    chances one of them was on the departed node. At one node of eight:
+    roughly 0.23, 0.33, 0.49.
+    REFUTED IF more surfaces helps. **That refutation would be the good news
+    and it is worth wanting**: it would mean the redundancy intuition holds and
+    multimodality buys fault tolerance for free. If it does not, then
+    `GOALS.md`'s multimodal requirement and C3 pull against each other, and
+    replication stops being an optimisation and becomes a prerequisite.
+
+
+COST
+----
+Estimated: 3 surface counts x 4 loss levels x 3 seeds is 36 fills of 4,000
+occasions, plus a walk from every surface in each. `g33-03` did 6 fills of the
+same size with walks in 63s, so this is **five to ten minutes**. Local, and near
+the line where it would belong in Actions.
+
+Recorded after the run: PENDING.
+
+
+RESULTS
+-------
+PENDING.
+
+
+SCORECARD
+---------
+PENDING.

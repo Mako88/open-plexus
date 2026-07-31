@@ -630,6 +630,18 @@ zero.
 > reading `0.6120` would have been reported as a moderate result when it is a
 > fifth of the way from nothing to everything. **The floor is one line of
 > arithmetic and it was available before the run.**
+>
+> *And the same day, the same rule, missed a second way: THE FLOOR MOVED WHEN A
+> NEW AXIS WAS ADDED.* `g35-02` swept surfaces per concept in {2, 3, 5} and read
+> `f1` across them as flat — 0.8639, 0.8708, 0.8534 — which invites *"more
+> modalities costs nothing under churn"*. But a concept recovered alone scores
+> **0.6667, 0.5000 and 0.3333** at those three sizes, so the column is three
+> different scales printed as one and the flat row is not evidence of equality.
+>
+> **The floor was computed once, for a fixed shape, and nothing prompted a
+> re-check when the shape became a variable.** So the standard is not *compute the
+> floor* — it is **compute it for every cell of the grid**, because an axis that
+> moves the degenerate case moves the meaning of every number above it.
 
 **And check that two arms of a comparison are not the same function.** Two
 statistics that induce the same ordering are one arm wearing two names, and the

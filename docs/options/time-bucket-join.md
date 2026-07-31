@@ -323,3 +323,33 @@ straight after a flush read one that had not arrived.
 Forwarding now precedes the reply, so a reply means the work has landed. The regression
 test stalls a forward deliberately rather than relying on a race, because a loopback race
 is not a test of an ordering.
+
+### A departure is AMPLIFIED by the modality count — `g35-02`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g35-02-what-a-departure-costs-the-grounding-store.txt
+            script  experiments/g35_02_what_a_departure_costs_the_grounding_store.py
+            task    occasions, 32 concepts, 4,000 occasions, no distractor loss modelling
+            model   Federation, 8 nodes, conditional, derived bound, NOTHING replicated
+            knobs   surfaces per concept 2/3/5, nodes lost 0/1/2/4; 3 seeds
+            scale   in-process; ownership real, transport not
+
+**The grounding store has no replicas**, unlike `partitioned.ConceptStore`, so a
+departed node's rows are gone permanently and nothing falls through to a survivor.
+
+Losing one node of eight removes about **0.094** of surfaces and damages **0.260** of
+concepts at 3 surfaces each — a concept is hit if ANY of its surfaces was there, and the
+measured share matches `1 - (1 - gone)^surfaces` closely. At 5 surfaces it is **0.479**.
+So the surfaces of one concept spread across the ring rather than landing together, which
+is what makes the exponent apply.
+
+**Nothing collapses.** `largest` never exceeds **0.0462**, and losing half the network
+still returns f1 near **0.40** rather than failing.
+
+**Whether that amplification COSTS anything is unsettled**, and the sweep record says so:
+`f1` looks flat across surface counts, but the metric's floor moves with the surface count
+— 0.6667, 0.5000, 0.3333 for a concept recovered alone — so the comparison is three scales
+in one column. A floor-free metric is the next run.
+
+Replication is therefore a named, unbuilt requirement rather than an optimisation, and the
+repair is the anti-entropy `ConceptStore.lose` already describes.

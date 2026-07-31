@@ -2,7 +2,15 @@ What does a departure cost, when nothing is replicated?
 =======================================================
 
 Script: experiments/g35_02_what_a_departure_costs_the_grounding_store.py
-Status: PREDICTIONS COMMITTED, NOT YET RUN.
+Status: RUN, local, 2026-07-31, 310.5s. Predictions committed at `f2e1bd3`
+        before the script was executed.
+
+ANSWER: **all four predictions held, and the fourth must not be read the way it
+        invites.** `concepts hit` does rise with modality count — 0.198, 0.260,
+        0.479 at one node of eight — but `f1` is flat across the same range, and
+        THAT COMPARISON IS CONFOUNDED because the metric's floor differs by
+        surface count. So whether multimodality costs anything under churn is
+        **still open**, and this run cannot close it.
 
 
 IN PLAIN TERMS
@@ -107,14 +115,106 @@ occasions, plus a walk from every surface in each. `g33-03` did 6 fills of the
 same size with walks in 63s, so this is **five to ten minutes**. Local, and near
 the line where it would belong in Actions.
 
-Recorded after the run: PENDING.
+Recorded after the run: **310.5s**, one process, against an estimate of five
+to ten minutes. In range, and near enough the ten-minute line that a wider
+grid belongs in Actions.
 
 
 RESULTS
 -------
-PENDING.
+     surfaces  lost  ring share  surfaces gone  concepts hit       f1   largest
+            2     0       0.000          0.000         0.000   1.0000    0.0308
+            2     1       0.125          0.099         0.198   0.8639    0.0359
+            2     2       0.250          0.245         0.438   0.6747    0.0462
+            2     4       0.500          0.505         0.729   0.3958    0.0410
+
+            3     0       0.000          0.000         0.000   1.0000    0.0309
+            3     1       0.125          0.094         0.260   0.8708    0.0309
+            3     2       0.250          0.226         0.521   0.7038    0.0309
+            3     4       0.500          0.486         0.844   0.4135    0.0309
+
+            5     0       0.000          0.000         0.000   1.0000    0.0311
+            5     1       0.125          0.102         0.479   0.8534    0.0311
+            5     2       0.250          0.229         0.771   0.6819    0.0311
+            5     4       0.500          0.494         0.969   0.3701    0.0290
 
 
 SCORECARD
 ---------
-PENDING.
+  P1  HELD. `surfaces gone` tracks `ring share` within 0.031 at every level —
+            0.094 to 0.102 against 0.125 for one node of eight. Ownership
+            spreads, so every other row is about the arrangement it claims.
+
+  P2  HELD, AND THE ARITHMETIC IS ALMOST EXACT. A departure costs far more than
+            its share: at 3 surfaces and one node lost, **0.260** of concepts are
+            damaged against **0.094** of surfaces. The predicted form
+            `1 - (1 - gone)^surfaces` gives 0.256 for that cell, 0.188 against a
+            measured 0.198 at 2 surfaces, and 0.415 against 0.479 at 5.
+
+            So a concept is damaged if ANY of its surfaces was on the departed
+            node, and the surfaces of one concept are spread across the ring
+            rather than landing together — which is what makes the exponent
+            apply and is worth knowing on its own.
+
+  P3  HELD. `largest` never exceeds **0.0462** at any loss level, and `f1` falls
+            smoothly — 1.0000, 0.8639, 0.6747, 0.3958 at 2 surfaces. Dropping an
+            unscoreable candidate shrinks the answer rather than destabilising
+            the walk, which is what the graceful-degradation claim needed.
+
+            **Losing half the network leaves f1 near 0.40 with no collapse.**
+
+  P4  HELD ON `concepts hit`: 0.198, 0.260, 0.479 at 2, 3 and 5 surfaces with
+            one node of eight gone. More modalities IS more exposure.
+
+
+THE READING P4 INVITES IS WRONG, AND THE CONFOUND IS MINE
+-----------------------------------------------------------
+The obvious next sentence is *"so multimodality and C3 pull against each other"*.
+**The table does not support it, and the reason is a defect in this run's design
+rather than a finding.**
+
+Look at `f1` across surface counts at a fixed loss:
+
+    one node lost      2 surfaces 0.8639     3 surfaces 0.8708     5 surfaces 0.8534
+    four nodes lost    2 surfaces 0.3958     3 surfaces 0.4135     5 surfaces 0.3701
+
+Flat. Which would say the extra exposure costs nothing — more concepts are
+touched, but each keeps more surviving surfaces, and the two effects cancel.
+
+**That comparison is not admissible, because the metric's floor moves with the
+surface count.** A concept recovered entirely alone scores:
+
+    2 surfaces   0.6667
+    3 surfaces   0.5000
+    5 surfaces   0.3333
+
+and a surface whose owner departed is scored **0.0**, below all of them. So the
+same `f1` means *less* degradation at 5 surfaces than at 2, and the flat row is
+not evidence of equality — it is three different scales printed in one column.
+
+**This is CLAUDE.md's own standard, applied to me a second time today.** The rule
+is to compute what a metric returns for the degenerate case before reading a
+number off it; `g32-01`'s 0.5 floor was that lesson and the floor was fixed
+there, so nothing prompted a re-check when `surfaces` became an axis.
+
+**So P4's consequence is UNSETTLED.** What would settle it is a quantity
+comparable across surface counts — the share of concepts whose recovered class
+still contains at least one true partner, which has no size-dependent floor.
+That is a small change and it is the next run rather than a reinterpretation of
+this one.
+
+
+WHAT THIS DOES SETTLE
+----------------------
+**A departure is amplified by the modality count and the exponent is measured**,
+which is a fact about `concepts hit` and needs no metric comparison: at 5
+surfaces, losing one node of eight touches **48%** of concepts.
+
+**Nothing collapses at any loss level**, including half the network gone.
+
+**And replication is now a named, unbuilt requirement rather than an
+optimisation.** `partitioned.ConceptStore` has `replicas` and its own docstring
+says repair is *"standard and unbuilt"*; the grounding store has no replicas at
+all, so this amplification applies at full strength. The fix is the same
+anti-entropy `ConceptStore.lose` already describes, and it is the obvious next
+mechanism.

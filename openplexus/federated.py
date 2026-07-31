@@ -227,7 +227,8 @@ class Federation:
         """
         return self._tables[self.owner(surface)].partners(surface)
 
-    def rank(self, surface: int, statistic: Statistic, k: int) -> list[int]:
+    def rank(self, surface: int, statistic: Statistic, k: int | None,
+             look: int = 16) -> list[int]:
         """The `k` strongest partners of a surface, computed AT ITS OWNER.
 
         The owner has `count(surface, y)` for every `y` it has ever seen beside
@@ -239,9 +240,17 @@ class Federation:
         Zero scores are dropped rather than padding the list, exactly as
         `grounding.neighbours` does, so a statistic refusing a partner is not
         overruled by a quota.
+
+        `k=None` derives the bound per surface from its own ranking, which is
+        `g33-04`'s winner and the arrangement actually in use. **It was missing
+        here until `g35-02` tried to use it**, so every federated number before
+        that was taken at a fixed bound — which is stated where those numbers
+        are, and is why `g33-03`'s read cost says `k 2` in its config block.
         """
-        if k < 1:
+        if k is not None and k < 1:
             raise ValueError("k must be at least 1")
+        if look < 1:
+            raise ValueError("look must be at least 1")
         home = self.owner(surface)
         view = _AtOwner(self, home)
         scored: list[tuple[float, int]] = []
@@ -262,9 +271,15 @@ class Federation:
             if score > 0.0:
                 scored.append((score, other))
         scored.sort(key=lambda pair: (-pair[0], pair[1]))
+        if k is None:
+            from openplexus.grounding import cliff
+            window = scored[:look]
+            keep = cliff([score for score, _ in window])
+            return [other for _, other in window[:keep]]
         return [other for _, other in scored[:k]]
 
-    def walk(self, start: int, statistic: Statistic, k: int) -> frozenset[int]:
+    def walk(self, start: int, statistic: Statistic, k: int | None,
+             look: int = 16) -> frozenset[int]:
         """The equivalence class reached from one surface, by actual hops.
 
         `grounding.equivalence_classes` computes every class at once over a
@@ -293,7 +308,7 @@ class Federation:
 
         def rank_once(surface: int) -> list[int]:
             if surface not in ranked:
-                ranked[surface] = self.rank(surface, statistic, k)
+                ranked[surface] = self.rank(surface, statistic, k, look)
             return ranked[surface]
 
         reached = {start}

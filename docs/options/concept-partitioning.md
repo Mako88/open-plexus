@@ -247,3 +247,44 @@ dimension slices, reporting the fitted exponent against g5-01's 0.69 and g1-10's
 unpartitioned 0.37. Predictions registered first, and the exponent's confidence interval
 reported rather than a point estimate — `g5-02` and `g5-03` are the calibration for fitting
 through crossings that were bounds.
+
+### It wins g5-01's cell outright — at 7.7× the state, so it settles nothing — `g29-01`
+
+    CONFIG  when    2026-07-30
+            source  experiments/sweeps/g29-01-does-concept-partitioning-escape-g5s-wall.txt
+            script  experiments/g5_01_scaling.py --mode concept
+            task    MQAR at g5-01's parameters
+            model   concept_nodes=16 against partitions=16, both at d_model 256
+            knobs   lr {0.01, 0.02, 0.05, 0.1, 0.2}, seeds 1-3, 16 epochs
+            scale   seq_len 384, the cell g5-01 measured at 0.769
+
+    concept     1.0000  in 30 cells of 30, zero spread across seeds and rates
+    dimension   0.7549  mean, range 0.685-0.808 (g5-01 recorded 0.769)
+
+**The state is not equal and the gap is 7.7×.** Each concept node keeps a full `d × d`
+store, so sixteen nodes hold sixteen of them. Measured on a model that has actually run a
+384-token sequence — `ConceptStore` allocates lazily, and a freshly constructed model
+reports 81,984 numbers for every arrangement, so a count taken at construction would have
+shown no difference:
+
+    dimension, 16 groups at width 256      147,520
+    concept,   16 nodes  at width 256    1,132,608
+
+`local_memory.py` states this at the knob's own definition: the comparison at equal
+`d_model` is *"biased TOWARD partitioning"*, a LOSS would be unambiguous, and a win
+*"would need the g10-09 equal-state treatment before it meant anything."*
+
+**Two further defects, recorded so the entry is not read as merely confounded.** Thirty
+identical `1.0000`s is a grid at its ceiling, which cannot rank a learning rate and so
+could not have detected an effect had one existed. And it is ONE sequence length: `#10` is
+about how required width GROWS with length, and one cell cannot fit a slope.
+
+**What it does establish**, and it is the same thing `tests/test_concept_routing.py`
+already had at one seed: routing does not break learning.
+[`g29-02`](../../experiments/sweeps/g29-02-concept-partitioning-at-EQUAL-state.txt) re-runs
+the cell with the concept arm at width 64, where it holds **less** state than the dimension
+arm and a win therefore cannot be bought. Its state figures live there, not here.
+
+*Cost, which is a property of the arrangement and had not been written down:* concept cells
+took 47–53 minutes against the dimension cells' 26–30 at equal width, so about **1.7×** per
+cell.

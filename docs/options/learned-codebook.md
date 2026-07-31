@@ -104,3 +104,78 @@ frozen is fine; a codebook that must stay in sync across edges as it learns is
 the collective amended C1 forbids. **That is the question to ask of any learned
 variant**, and it is the reason this is recorded beside the request above rather
 than in a design file.
+
+### THE QUANTISER IS DOING IDENTITY WORK IT IS NOT SUPPOSED TO DO — John, 2026-07-31
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g36-04-a-picture-a-sound-and-a-word.txt
+            script  experiments/g36_04_a_picture_a_sound_and_a_word.py
+            task    MNIST images + FSDD spoken digits + 10 words
+            model   spherical k-means over borrowed features, `grouping.cluster`
+            knobs   codes 20/50/100; 3 seeds
+            scale   quantiser purity, link purity; chance 0.100
+
+**John's discomfort, and it lands on a real inconsistency rather than a
+preference.** `DECISIONS.md` §1 records the split: *the quantiser answers
+ADDRESSING, not IDENTITY; identity is LEARNED.* But `grouping.cluster` is
+**k-means**, and clustering by similarity IS an identity assignment — it decides
+that these two pictures are the same thing, which is precisely the decision the
+mechanism is supposed to reach by itself from co-occurrence.
+
+So the current front end violates the project's own stated division of labour.
+Nothing measured has caught it, because a good clusterer makes the downstream
+look better rather than worse.
+
+**Two things are being conflated and only one of them is required.**
+
+  - **Discretisation** is required, and unavoidably. `CoOccurrence` counts
+    recurrence of an id; if every input got a unique id every count would be 1
+    and no statistic could form. Two recordings of *six* share almost no raw
+    bytes, so SOMETHING must place perceptually near things near each other.
+  - **A trained, global, semantic quantiser** is NOT required, and it is the
+    part that carries the objection.
+
+**RANDOM-HYPERPLANE LSH SEPARATES THEM, AND IT IS ALREADY IN THIS REPOSITORY.**
+`openplexus/sketch.py` — `AddressSketch` — hashes by the sign pattern of `b`
+random hyperplanes, so two inputs collide with probability set by the ANGLE
+between them. It was built to record *that* an address was written, never what
+went there, which is the same refusal being asked for here.
+
+Its properties against k-means, for this use:
+
+  - **No training and no data.** A shared seed is the only thing two nodes need,
+    and a constant distributed once and frozen is C1-legal in a way a codebook
+    that must stay in sync as it learns is not.
+  - **It decides no identities.** A bucket is not a claim that two things are the
+    same; it is a bin fine enough for counting to work. Identity stays with the
+    walk, which is where this project says it belongs.
+  - **It answers kill-list #6's untested half by construction.** Two nodes
+    running k-means on different samples produce different centroids and
+    therefore different code meanings. **That has never been tested and probably
+    fails.** Two nodes running the same hyperplanes cannot disagree.
+
+**The granularity argument, which is why a dumb hash may be sufficient.**
+Over-segmentation is REPAIRABLE by the mechanism — the walk already merges
+surfaces that co-occur with the same things, which is what `equivalence_classes`
+does. Under-segmentation is NOT: if sixes and fives land in one bucket, nothing
+downstream can separate them. So the front end does not need to be smart, it
+needs to be **fine and stable**, which is a hash rather than a classifier.
+
+**And John's specificity problem falls out of the same mechanism.** Fewer bits is
+a coarser bucket and more bits is a finer one, so a multi-resolution hash gives
+*dog* and *Labrador* from one device rather than needing a hierarchy bolted on.
+Untried and not obviously correct, but it is the first proposal in this line that
+addresses the granularity gap at all.
+
+**WHAT THIS IS NOT.** It is not a fix for the shelf problems. `g36-04` measured
+that the linking is not limited by front-end quality over the range tested — the
+audio quantiser is 0.185 worse at its own job and produced the table's best link,
+**0.9902** — and `g36-05` traced the eviction to the bound being a budget, which
+is downstream of the quantiser entirely.
+
+**THE EXPERIMENT, and what would refute it.** Swap `grouping.cluster` for an LSH
+front end in `g36-04`'s pipeline, sweep the bit count, and add the agreement test
+the current quantiser has never had: two nodes, different data samples, same
+seed — do the codes mean the same thing? **Refuted if LSH is clearly worse than
+k-means at a matched code count**, which would say the borrowed feature space was
+doing real work and that John's *"no artificial identification"* costs accuracy.

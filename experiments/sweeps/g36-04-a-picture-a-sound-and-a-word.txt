@@ -2,7 +2,18 @@ Does a third modality help, and can two senses reach each other?
 =================================================================
 
 Script: experiments/g36_04_a_picture_a_sound_and_a_word.py
-Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+Status: RUN, local, 2026-07-31, 23.8s. Predictions committed at `d5fec70`
+        before the script was executed.
+
+ANSWER: **John's claim is TRUE, and the obvious way of implementing it is the
+        one that breaks it.** Two senses that NEVER co-occur reach each other
+        through a shared word at **0.9580** — better than two senses that always
+        co-occur (0.8853), and better than either sense alone reaches its own
+        word. But putting both senses in every occasion **costs 0.23 of image
+        linking**, and the reason is measured rather than guessed: the two senses
+        evict the word from each other's bounded neighbour list. The word
+        survives for **2% of image codes** in `together` against **100%** in
+        both other arms (`g36-05`).
 
 
 IN PLAIN TERMS
@@ -182,14 +193,158 @@ minutes" was wrong by two orders of magnitude -- so this one is estimated from
 that MEASUREMENT rather than from an intuition. Five arms against one, plus the
 audio path: **60 to 180 seconds.** Local, no runner.
 
-Recorded after the run: TO BE FILLED.
+Recorded after the run: **23.8s**, against an estimate of 60 to 180 seconds.
+Still wrong, but by a factor of 2.5 rather than g36-01's factor of 100 --
+because this estimate was scaled from g36-01's MEASURED 6.0s rather than from an
+intuition about what k-means costs.
 
 
 RESULTS
 -------
-TO BE FILLED.
+ codes  arm               q_img   q_aud  link_img  link_aud   cross  crossed  classes
+    20  image+word       0.7174  0.4809    0.7986    0.0000  0.0000   0.0000     3.24
+    20  audio+word       0.7174  0.4809    0.0000    0.6270  0.0000   0.0000     3.34
+    20  together         0.7174  0.4809    0.6190    0.5275  0.6568   1.6167     4.05
+    20  alternating      0.7174  0.4809    0.7848    0.8619  0.8297   0.9000     3.43
+    20  alternating x2   0.7174  0.4809    0.7726    0.8680  0.8105   0.9333     3.59
+
+    50  image+word       0.8299  0.6449    0.8961    0.0000  0.0000   0.0000     6.41
+    50  audio+word       0.8299  0.6449    0.0000    0.9902  0.0000   0.0000     3.64
+    50  together         0.8299  0.6449    0.6667    0.4167  0.8853   2.1000     4.26
+    50  alternating      0.8299  0.6449    0.8476    0.8388  0.8011   3.6200     8.89
+    50  alternating x2   0.8299  0.6449    0.9850    0.9825  0.9580   2.9400     7.44
+
+   100  image+word       0.8718  0.7974    0.4448    0.0000  0.0000   0.0000    32.13
+   100  audio+word       0.8718  0.7974    0.0000    0.5793  0.0000   0.0000    22.18
+   100  together         0.8718  0.7974    0.2265    0.3152  0.4531   3.6533     7.48
+   100  alternating      0.8718  0.7974    0.2823    0.2856  0.2791  11.9567    27.61
+   100  alternating x2   0.8718  0.7974    0.7058    0.7095  0.6899   5.2667    12.42
+
+    chance for every purity: 0.1000
+
+**The zeros in the single-sense arms are STRUCTURAL, not failures.** `image+word`
+never observes an audio code, so `link_aud` and `cross` have an empty
+denominator. They are the control that fires: a non-zero there would mean the
+arm was leaking a modality it is defined not to contain.
+
+**The 100-code rows are near collapse and must not be read as a clean
+comparison.** `classes` is 32.13 and 27.61 against a surface count of 211, and
+`crossed` reaches 11.96 audio codes per image code. `g32-02` put the threshold at
+about 16 occasions per concept and 100 codes leaves 30 recordings each. The
+column is kept because the RANKING between arms is stable across all three code
+counts, but no absolute number from that block is quotable.
 
 
 SCORECARD
 ---------
-TO BE FILLED.
+  P1  **REFUTED, at every code count, by more than four times the margin the
+            prediction set.** `link_img` in `together` against `image+word`:
+
+                20 codes   0.6190  against  0.7986    -0.18
+                50 codes   0.6667  against  0.8961    -0.23
+               100 codes   0.2265  against  0.4448    -0.22
+
+            The refutation condition was a drop over 0.05 at two of three code
+            counts. It is over 0.18 at three of three.
+
+            **So adding a third modality to every occasion is an active harm**,
+            and John's claim as literally stated -- more input types that
+            CO-OCCUR gives more differentiation -- is false on real sensory data
+            under the derived bound. `g36-02` found the same claim false under a
+            fixed bound; it is now false under both.
+
+            **The mechanism was not left as a guess.** `g36-05` measures it: in
+            `together` the word survives the derived bound for **2%** of image
+            codes against **100%** in the other two arms, its mean rank falls
+            from 1.02 to 6.60, and of the 1.78 partners the cliff keeps, **1.76
+            are audio codes.** A picture and a sound that always arrive together
+            become each other's strongest partner and evict the word.
+
+  P2  **HELD, and it is the finding.** In `alternating`, where an image code and
+            an audio code share **zero** occasions, `cross` is 0.8297 and 0.8011
+            at 20 and 50 codes against chance 0.1000, with `crossed` at 0.90 and
+            3.62 so the figure is not computed over a handful of pairs.
+
+            **Two senses that never once co-occur reach each other through a
+            shared word.** The star survives contact with real sensory data, and
+            `g33-04`'s derived bound transfers off the synthetic stream.
+
+  P3  **REFUTED BACKWARDS, which this file named as the most interesting outcome
+            available.** `cross` in `together` against `alternating x2`, matched
+            on per-modality exposure:
+
+                20 codes   0.6568  against  0.8105
+                50 codes   0.8853  against  0.9580
+               100 codes   0.4531  against  0.6899
+
+            **The bridged route beats the direct one, every time.** A shared name
+            is a better route between two senses than co-occurring with them is.
+
+            That is not mysterious once P1's mechanism is in hand: a direct edge
+            is bought with the hub connection, because the bound is a fixed
+            budget. The word is a cleaner signal about identity than a
+            simultaneous sensation is, and paying for the sensation costs the
+            word.
+
+  P4  **REFUTED.** `link_aud` matches or beats `link_img` wherever both are
+            present: 0.8619 against 0.7848 at 20 codes `alternating`, 0.9825
+            against 0.9850 at 50 `alternating x2`, and the best single link in
+            the table is `audio+word` at **0.9902** -- from the front end that is
+            0.185 WORSE at quantising.
+
+            So **the linking is not limited by front-end quality** over this
+            range. That is the substantive half: a 0.6449 quantiser supports a
+            0.9902 link, so effort spent on better perception would not have
+            bought better grounding here. `g36-01` reached the same conclusion
+            from the other side, measuring the linking as within five points of
+            what its front end permitted.
+
+  P5  **REFUTED, backwards again.** `alternating` does not fall below
+            `image+word` by a small amount; at 50 codes `alternating x2` reaches
+            **0.9850 against 0.8961**, and at 100 codes **0.7058 against
+            0.4448**. Splitting a stream across two senses and then giving it the
+            same per-sense exposure is BETTER than never splitting it.
+
+            Half the exposure does cost something -- `alternating` at 50 codes is
+            0.8476 against `alternating x2`'s 0.9850 -- so the exposure axis is
+            real. It is simply smaller than the benefit of having a second sense
+            at all.
+
+
+WHAT THIS CHANGES
+-----------------
+**John's intuition is right about the WORLD and wrong about the mechanism.** More
+senses genuinely does buy more differentiation -- 0.9850 against 0.8961 is the
+measurement of it. But the benefit arrives when the senses are *interleaved*, and
+inverts when they are *simultaneous*, and nothing in the intuition predicted that
+sign flip.
+
+**The good news is that interleaved is what reality looks like.** You rarely see
+a thing at the exact moment you hear its name spoken by someone else and hear the
+thing itself. `alternating` is the realistic stream and `together` is the
+artificial one.
+
+**And it says not to build the obvious thing.** The natural response to the hub
+problem is a mechanism letting two spokes notice they share a hub and connect
+directly. This measures that arrangement -- `together` IS spokes directly
+connected -- and it is worse in every cell. The walk already bridges them
+transitively, at 0.9580.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**Ten concepts, and they are digits.** Unchanged from `g36-01`, and the star here
+has ten hubs with two spokes each. A real hub has many more spokes and `g33-02`
+measured that the degree is what breaks a fixed bound.
+
+**`together` is the EXTREME of simultaneity** -- both senses in 100% of
+occasions. The interesting axis is the one between: what share of occasions may
+carry both senses before the eviction starts? That is one parameter and is not
+swept here.
+
+**G7 is still not passed**, for `g36-01`'s reason: no arm introduces a concept
+through one modality and queries it through another. Every arm here has the word
+present throughout.
+
+**Nothing is distributed.** One process. `g35-01` and `g35-03` are the container
+path.

@@ -150,3 +150,36 @@ id that is **stable for one percept**, and it is no longer being asked to make a
 a word agree. The failure mode this record warned about — a bad quantiser silently merging
 two things by addressing them identically — is unchanged in kind but now applies only
 within a modality, where it is far easier to check.
+
+### THREE modalities, two of them real sensory data — `g36-04`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g36-04-a-picture-a-sound-and-a-word.txt
+            script  experiments/g36_04_a_picture_a_sound_and_a_word.py
+            task    MNIST 4,000 images + FSDD 3,000 spoken digits (6 speakers)
+                    + 10 words. 3,000 occasions, noise 2, 1 distractor
+            model   conditional; bound derived; no join
+            knobs   codes 20/50/100; five arms; 3 seeds
+            scale   link purity per modality, cross-sensory purity; chance 0.100
+
+**Adding a third modality cost almost nothing to BUILD, which is the load-bearing
+observation about this option.** The mechanism does not know how many modalities
+exist. `openplexus/tasks/spoken.py` is a stdlib `wave` reader, the features are a
+crude 8x16 spectrogram, and the quantiser is the SAME `grouping.cluster` the
+images use — `harness.quantise` takes pixels and spectra through one call. The
+counting, the walk, the bound, the sharding and the containers were untouched.
+
+Two senses that share **zero** occasions reach each other through a shared word
+at **0.9580** (50 codes, matched exposure), against chance 0.100. **The star
+survives contact with real sensory data.**
+
+And the linking is **not limited by front-end quality** over this range: the
+audio quantiser is 0.185 worse than the image one and produces the table's best
+link, **0.9902**. `g36-01` reached the same conclusion from the other side.
+
+**Two senses in EVERY occasion is an active harm** — image linking drops 0.18 to
+0.23 at all three code counts — and the cause is the bound evicting the word
+(`g36-05`). See [biggest-similarity-gap](biggest-similarity-gap.md).
+
+Still no test where a concept is introduced through one modality and queried
+through another; the word is present throughout every arm, so G7 is not passed.

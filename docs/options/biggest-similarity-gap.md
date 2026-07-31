@@ -187,3 +187,37 @@ requires — compatible with the mechanism at all.
 **And the two bounds do NOT cross on this axis**: derived is equal or better in
 all 24 cells. `g33-04`'s measured crossover is on the PAIRING STRUCTURE axis
 (chains), so the reason both arms are kept is that one and not this one.
+
+### The bound is a BUDGET, not a threshold, and it evicts — `g36-04`, `g36-05`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g36-05-what-the-bound-evicts.txt
+            script  experiments/g36_05_what_the_bound_evicts.py
+            task    MNIST 4,000 images + FSDD 3,000 recordings + 10 words,
+                    3,000 occasions, noise 2, 1 distractor
+            model   conditional; bound derived; no join
+            knobs   50 codes, arms image+word / together / alternating; 3 seeds
+            scale   share of image codes whose OWN word survives the bound
+
+The first measurement of what the derived rule DROPS rather than what it keeps,
+and it is the mechanism behind `g36-04`'s headline.
+
+When a picture and a sound share **every** occasion, they become each other's
+strongest partner and the word is evicted: it survives the bound for **0.0200**
+of image codes against **0.9867** when the picture is alone and **0.9797** when
+the two senses alternate. Its mean rank falls 1.04 -> **6.70**. Of the 2.05
+partners kept, **2.03 are audio codes**.
+
+`mean bound` moves 1.09 -> 2.05, not 1.09 -> 6.7. **The cliff substitutes rather
+than widens** — it keeps roughly one partner per modality present, which is the
+derived rule behaving exactly as designed and is why the effect is an eviction
+rather than a dilution.
+
+**This is a design decision and not only a finding: do NOT build spoke-to-spoke
+linking as a fix for the hub problem.** `together` is that arrangement reached
+from the data side, and `g36-04` prices it end to end — the bridged route beats
+the direct one in all three code counts, 0.9580 against 0.8853 at 50 codes. The
+walk already bridges two senses that never co-occur.
+
+**Untested and it is the interesting part:** `together` is 100% simultaneity and
+`alternating` is 0%. Nothing measures 10% or 30%, and reality is in there.

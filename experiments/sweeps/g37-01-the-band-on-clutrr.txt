@@ -1,0 +1,249 @@
+How wide is CLUTRR-symbolic's measurement band?
+================================================
+
+Script: experiments/g37_01_the_band_on_clutrr.py
+Status: RUN, local, 2026-07-31, 1.7s. **The floor table was computed in scratch
+        before this artifact existed**, so the prediction below is WEAK and
+        marked -- see the section on it.
+
+ANSWER: **Wide enough, and kill-list item #1 is not blocked for the reason
+        recorded.** The honest floor on the test split is **0.1370** overall and
+        0.16 to 0.27 in the usable hop buckets, against published graph-only
+        references from 0.39 (the weakest, GCN at 10 hops) to about 0.97 (R5).
+        So the band is between **0.20 and 0.79**, against `closure`'s **0.092**.
+        Even the most pessimistic reading is more than twice as wide.
+
+
+IN PLAIN TERMS
+--------------
+The project has a list of things that could kill it. Item one is *"does training
+on relationships actually buy reasoning?"*, and it has been sitting marked
+**blocked** — not because the idea failed, but because there was supposedly no
+test sensitive enough to tell a good answer from a bad one.
+
+A test is only useful if there is room between *"a machine that learned nothing"*
+and *"the best anyone has managed"*. If that gap is narrow, every result lands
+inside the noise and nothing is learned from running it. The gap on the test we
+built ourselves is small — about nine points.
+
+This checks a test we did **not** build: CLUTRR, a published benchmark about
+family relationships, whose data has been sitting fetched in this repository the
+whole time. Work out who someone is to someone else, given a chain of other
+relationships, and never being told the answer directly.
+
+**The gap there is between twenty and seventy-nine points.** So the instrument
+exists, other people have already published scores on the exact version we have,
+and the thing that was blocking item one was a misreading of our own notes rather
+than a missing test.
+
+That last part is the uncomfortable half and it is written down deliberately.
+
+
+WHAT WAS ACTUALLY BLOCKING IT, AND IT WAS OURS
+------------------------------------------------
+`docs/options/clutrr-symbolic.md` said, correctly:
+
+    Results are "CLUTRR-symbolic" and published text numbers are not comparable.
+
+**That sentence is true.** The NLU baselines in the literature read prose, and
+this project does not generate prose, so their numbers say nothing about it.
+
+**It was read as a different sentence** — *no published CLUTRR number is
+comparable* — and that reading is false. The standard evaluation in the
+literature is the **noiseless graph-based** version, trained on k=2,3 and tested
+on k in [2,10]. That is `gen_train23_test2to10`, which is the split already on
+disk here.
+
+This is `CLAUDE.md` rule 1's borrowed-claim failure with the borrowing happening
+**inside this repository**: a claim filed under *established*, sitting upstream of
+a decision, that no downstream measurement could ever reach — because everything
+downstream was conditioned on it.
+
+The tell was grammatical and available at any time: the record says *text*
+numbers, and the conclusion drawn was about *published* numbers.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    majority       the share the commonest answer takes. **The floor.** A
+                   constant predictor is free, so this is what any mechanism
+                   must be read against
+    rep<=2         share of the bucket whose most-repeated entity appears in at
+                   most two edges -- note 059's axis
+    maj|rep<=2     the floor ON that arm, reported separately because it MOVES
+    n|rep<=2       how many puzzles that leaves, because a floor over 32
+                   puzzles is not a floor
+
+**Chance is 0.0500 and is NOT the floor.** Reporting it as one would overstate
+every result by about nine points at 10 hops. `g32-01` cost this project a
+published figure by reading a metric against zero when its floor was 0.5.
+
+
+MEASURED ON
+-----------
+Local, one process, no model, no seed, no training. A property of the data.
+
+    data        CLUTRR gen_train23_test2to10, fetched, gitignored
+    layout      kinship -- chosen on measurement, collisions 35.9% -> 7.7%
+    relations   20 in the loader's fixed vocabulary; 18 used as answers
+    splits      train 9,074, validation 2,020, test 1,146
+
+**No seeds, and that is correct rather than a shortcut.** A constant predictor's
+score on a fixed file has no variance. Rule 3's seed-count calibration is about
+stochastic mechanisms; there is nothing stochastic here.
+
+
+HOW WEAK THE PREDICTION IS
+---------------------------
+The floor table was computed in a scratch probe before this script existed, so P1
+is a summary rather than a commitment. It is written out anyway because the
+refutation condition is the useful part of it, and because promoting the probe
+into an artifact is worth doing regardless — `g36-01`'s headline was a lucky draw
+that survived in the record precisely because its diagnostic lived in scratch.
+
+P2 was NOT known and is a real commitment.
+
+
+PREDICTIONS
+-----------
+P1  THE FLOOR IS WELL BELOW THE PUBLISHED REFERENCES, leaving a band several
+    times `closure`'s 0.092.
+    REFUTED IF the majority floor is above about 0.5 in the usable buckets, which
+    would mean the instrument is nearly solved by a constant and item #1 stays
+    blocked for the reason recorded.
+    **WEAK: computed in scratch before being written.**
+
+P2  THE FLOOR MOVES WITH THE ENTITY-REPETITION ARM, and in the unhelpful
+    direction: `maj|rep<=2` is HIGHER than the unconditional majority at the
+    deeper hops, because removing repeated entities removes the harder puzzles.
+    REFUTED IF the two floors track each other. Then the primary arm can be read
+    across hops directly and `g35-02`'s floor confound does not apply here.
+    **This was not known when written.**
+
+
+COST
+----
+Estimated: reading three CSV files and counting. **Under five seconds**, local.
+
+Recorded after the run: **1.7s**.
+
+
+RESULTS
+-------
+train: 9,074 puzzles, 18 of 20 relations used as answers
+ hops  puzzles  majority   rep<=2  maj|rep<=2  n|rep<=2
+    2     4076    0.0969   1.0000      0.0969      4076
+    3     4998    0.1184   1.0000      0.1184      4998
+  all     9074    0.1087
+
+validation: 2,020 puzzles, 18 of 20 relations used as answers
+    2     1020    0.1029   1.0000      0.1029      1020
+    3     1000    0.1180   1.0000      0.1180      1000
+  all     2020    0.1099
+
+test: 1,146 puzzles, 18 of 20 relations used as answers
+    2       38    0.5000   1.0000      0.5000        38
+    3      105    0.4286   1.0000      0.4286       105
+    4      190    0.1895   0.9316      0.2034       177
+    5      174    0.1609   0.7529      0.2061       131
+    6      107    0.2336   0.5888      0.3810        63
+    7      144    0.1806   0.4236      0.2951        61
+    8      150    0.2667   0.4067      0.3115        61
+    9      119    0.1681   0.3782      0.3111        45
+   10      119    0.1849   0.2689      0.2812        32
+  all     1146    0.1370
+
+    chance for a uniform guess: 0.0500
+
+
+SCORECARD
+---------
+  P1  HELD. The usable buckets floor at 0.1609 to 0.2667. Against the weakest
+            published graph reference the band is about **0.20**; against the
+            strongest, about **0.79**. `closure`'s is **0.092**.
+
+  P2  **HELD, and it is the finding that changes how this instrument must be
+            read.** `maj|rep<=2` is higher than the unconditional majority
+            everywhere past 4 hops, and by a lot:
+
+                 6 hops   0.3810  against  0.2336
+                 7 hops   0.2951  against  0.1806
+                 9 hops   0.3111  against  0.1681
+
+            **The clean arm is easier by base rate**, because removing repeated
+            entities removes the harder puzzles rather than an unrelated
+            nuisance. So the primary arm's floor is a different number at every
+            hop, and a `rep<=2` column read across hops is several scales printed
+            as one -- `g35-02`'s confound, waiting on a new instrument.
+
+            The practical consequence: **report the floor beside every cell**, or
+            report a floor-relative quantity. Not the raw accuracy.
+
+
+THE BORROWED REFERENCE NUMBERS, AND EXACTLY HOW FAR TO TRUST THEM
+------------------------------------------------------------------
+Recorded here so anything quoting them can point at one place, and so the
+verification status travels with them rather than being re-established.
+
+Trained on k=2,3, tested on longer chains, noiseless graph-based CLUTRR --
+the same configuration as `gen_train23_test2to10`:
+
+    model        4 hops   5      6      7      8      9      10
+    R5             0.98   0.99   0.98   0.96   0.97   0.98   0.97
+    CTP_A          0.99   0.99   0.99   0.96   0.94   0.89   0.90
+    GNTP           0.49   0.45   0.38   0.37   0.32   0.31   0.31
+    GAT_s          0.91   0.76   0.54   0.56   0.54   0.55   0.45
+    GCN_s          0.84   0.68   0.53   0.47   0.42   0.45   0.39
+
+    our majority   0.1895 0.1609 0.2336 0.1806 0.2667 0.1681 0.1849
+
+**PROVENANCE, and it is not clean.** Read from an ar5iv HTML rendering of R5
+(arXiv 2205.06454) Table 2, via a summarising fetch. **The PDF was not read
+directly** — extraction failed on every PDF attempted, which is the honest reason
+rather than a choice. A second source (arXiv 2407.17396) was consulted and agrees
+on model ordering and magnitude in the easier k=2,3,4 training setting, where it
+reports GAT at 0.99 falling to 0.68 and GCN at 0.94 falling to 0.41.
+
+`CLAUDE.md` rule 1: this is a SUMMARISED claim and must not gate a design choice
+on its own. **What makes it usable is that the conclusion does not depend on it
+being right.** The band is wide whether the reference is 0.39 or 0.98, and the
+two sources' disagreement is smaller than the distance to the floor.
+
+**What would settle it properly**, in order of cost: read one PDF locally, or run
+a strong reference here. The second is better and is the obvious next step, since
+`GOALS.md` G0 asks for a reference *measured*, not cited.
+
+
+THE THREE CAVEATS, AND THEY BIND
+---------------------------------
+**The 2-hop test bucket is 38 puzzles with a floor of 0.5000.** Nothing from it
+is quotable. 3 hops is 105 at 0.4286 and is nearly as bad. **The usable range
+starts at 4 hops**, which is also where the published references start reporting.
+
+**The clean arm shrinks to 32 puzzles at 10 hops.** Depth and entity repetition
+are confounded in the data itself and no choice of arm removes both. A result at
+10 hops on the clean arm has a standard error around 0.08 from sample size alone.
+
+**Train has ZERO repeated-entity puzzles and test has up to 73%.** That is note
+059's finding and it is a property of CLUTRR, not of anything here. It means the
+generalisation being tested is partly *to repeated entities*, which is this
+project's measured weak point (decision 103: 0.884 -> 0.303).
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**The reference numbers are BORROWED and only partly verified.** They were read
+from ar5iv HTML renderings of two papers via a summarising fetch, not from the
+PDFs. Two independent sources agree on ordering and magnitude. `CLAUDE.md` rule 1
+says a summarised claim must be marked and must not gate a design choice on its
+own -- **the conclusion here survives the full disagreement between the two
+sources**, which is the only reason it is allowed to carry one.
+
+**No frozen-substrate control has been run.** G0 wants a random frozen substrate
+measured, and that is a model this script does not build. The floor is the
+constant predictor, which is the stricter of the two.
+
+**Nothing says our mechanism can score anything here.** A wide band means the
+instrument can SEE a difference. It says nothing about which direction one will
+be found in, and `g14-01` is the reminder: on `closure` the local rule came in
+**below** the base rate.

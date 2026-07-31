@@ -1,0 +1,172 @@
+Does breadth separate the word from the distractor?
+====================================================
+
+Script: experiments/g38_02_does_breadth_separate_the_distractor.py
+Status: RUN, local, 2026-07-31, 8.3s.
+
+ANSWER: **NO, and the proposal is dead before anything was built.** Breadth
+        separates the word from the distractor by **1.24x**. Plain frequency —
+        which the deployed statistic already uses — separates them by
+        **3.56x**. So the quantity proposed as *better than frequency* is
+        roughly three times WORSE at the one job it was proposed for.
+
+        Cost: one probe and about eight seconds, against a mechanism, its
+        tests, its mutations and a sweep.
+
+
+IN PLAIN TERMS
+--------------
+After the last run, the picture was this. There is one thing that is present in
+every single moment — call it the hum of the room. It ruins the machine's
+judgement, because it turns up alongside everything and so appears to be about
+everything.
+
+The current fix is to divide by how often something occurs. The hum occurs
+constantly, so it gets divided down to nothing. That works. **But the word "dog"
+also occurs quite often**, and it gets divided down too, which is the problem we
+have been chasing all week.
+
+So the idea was: surely the hum and the word are different in a way that has
+nothing to do with how *often* they occur. The word is common but **fussy** — it
+mostly turns up around dogs. The hum is common and **indiscriminate** — it turns
+up around everything, evenly. If we measured fussiness instead of frequency, we
+could keep the word and drop the hum.
+
+It is a nice idea. **It is wrong, and one measurement was enough to show it.**
+
+The word turns out to be nearly as indiscriminate as the hum. Not because words
+are indiscriminate in general, but because of how this test data is built:
+alongside the right word, two random other words are spoken in every moment. So
+over three thousand moments, every word ends up having been present alongside
+almost every picture at least once.
+
+Measured properly — not "how many things has it ever met" but "how evenly is its
+attention spread" — the hum is only about **a quarter** more spread out than a
+word. Frequency, the thing we already use, tells them apart more than **three
+times** better.
+
+So the proposal is not a small improvement or a promising direction. It is worse
+than what it was meant to replace, at the exact job it was meant to do.
+
+**Writing this down is the point.** The idea was mine, it sounded principled, and
+it would have cost a day. It cost eight seconds instead because a claim about
+behaviour was checked before a mechanism was built on it.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    frequency    how many occasions a surface was present on
+    partners     how many DISTINCT surfaces it has ever met
+    effective    `exp(entropy)` of its partner counts — how many partners it
+                 BEHAVES as though it has. Mass spread evenly over a hundred
+                 scores about a hundred; mass sitting on three scores about
+                 three, however many it has touched once
+    SEPARATION   distractor divided by word, for each column. **The only number
+                 that decides anything**, since the proposal is precisely that
+                 one column separates them better than another
+
+`effective` rather than `partners` because the raw count cannot express the
+difference the proposal rests on. Both are reported so the failure is attributed
+to the right one.
+
+
+MEASURED ON
+-----------
+Local, one process. Streams IMPORTED from `g36_04`, so the distributions
+measured are the ones the failure was measured on.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions    3,000
+    codes           50   pinned from g36-04
+    noise            2   OTHER WORDS per occasion, drawn UNIFORMLY at random.
+                         **This is the mechanism that kills the proposal** and
+                         it is a property of the generator, not of language
+    distractors      1   present EVERY occasion
+    seeds      0, 1, 2
+
+Arms: `together` and `alternating`.
+
+
+PREDICTIONS
+-----------
+P1  BREADTH SEPARATES THEM BETTER THAN FREQUENCY. The distractor's `effective`
+    partner count is more than 3.56x the word's — beating what frequency already
+    achieves.
+    REFUTED IF the separation is smaller. **Then the proposal is worse than the
+    thing it was meant to replace and nothing should be built.**
+
+P2  RAW PARTNER COUNT DOES NOT SEPARATE THEM. `partners` is close for both,
+    because a surface meeting something once is not the same as depending on it.
+    REFUTED IF raw count separates them well, which would make the entropy
+    unnecessary and the mechanism cheaper still.
+
+
+COST
+----
+Estimated from `g36-06`'s 25.5s: this builds the same streams and does no walk at
+all, so it is strictly cheaper. **Under 30 seconds.**
+
+Recorded after the run: **8.3s**.
+
+
+RESULTS
+-------
+arm          kind            n  frequency  partners  effective
+together     image code     50       60.0      27.0       14.7
+together     audio code     50       60.0      27.0       14.8
+together     word           10      842.6     109.2       39.0
+together     DISTRACTOR      1     3000.0     110.0       48.5
+             SEPARATION             3.56x     1.01x      1.24x
+
+alternating  image code     49       30.2      10.9        8.2
+alternating  audio code     50       30.0      10.7        8.2
+alternating  word           10      842.6     107.7       24.8
+alternating  DISTRACTOR      1     3000.0     109.7       31.3
+             SEPARATION             3.56x     1.02x      1.26x
+
+
+SCORECARD
+---------
+  P1  **REFUTED, and not narrowly.** Breadth separates by **1.24x** and
+            **1.26x**; frequency separates by **3.56x** in both arms. The
+            proposed quantity is about three times worse at the job it was
+            proposed for.
+
+            **The mechanism of the failure is identified rather than guessed.**
+            A word's `partners` count is **109.2** of a possible 110 — it has met
+            essentially every surface. That is the uniform noise draw: two random
+            other words in every occasion means each word appears alongside every
+            digit's codes many times over three thousand occasions.
+
+            So the word is not fussy in this data. It is nearly as indiscriminate
+            as the distractor, and the only thing separating them is how much
+            more often the distractor turns up — which is frequency, which we
+            already use.
+
+  P2  **HELD, and it is the one useful thing here.** `partners` separates by
+            **1.01x** and **1.02x**, which is nothing at all. Raw partner count
+            is completely blind to the difference, so the entropy was the right
+            refinement of the idea — it just was not enough of one.
+
+
+WHAT THIS DOES NOT SETTLE, AND IT IS THE HONEST CAVEAT
+--------------------------------------------------------
+**The refutation is conditional on THIS noise model, and the noise model may be
+unrealistic.** `NOISE = 2` draws other words uniformly at random, so a word is
+equally likely to be uttered in any scene. Real speech is not like that: *dog* is
+not said uniformly across every situation, and in a realistic stream a word's
+partner distribution would be far more concentrated.
+
+**So what is refuted is: breadth cannot rescue the distractor problem ON THE DATA
+THE FAILURE WAS MEASURED ON.** That is the correct scope, and it is sufficient to
+stop the build — a mechanism cannot be justified by a stream nobody has run.
+
+**It also identifies a real defect in the instrument**, which is worth more than
+the refuted proposal. If a word meeting 109 of 110 surfaces is an artefact of
+uniform noise, then every co-occurrence statistic measured on this generator is
+being asked a slightly wrong question, and `g32-02`'s `zipf` knob exists to make
+frequencies uneven but nothing makes *which* words appear together uneven.
+
+**That is registered and not fixed here.** Changing the generator would
+invalidate the comparison set, so it is a decision rather than a cleanup.

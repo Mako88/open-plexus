@@ -342,3 +342,44 @@ all five is reporting two of them twice.
 
 This is the third instance of the identical-arms failure in this line, and the
 check remains arithmetic on the arms before dispatch rather than a run.
+
+### Breadth is WORSE than frequency at spotting the distractor — `g38-02`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g38-02-does-breadth-separate-the-distractor.txt
+            script  experiments/g38_02_does_breadth_separate_the_distractor.py
+            task    MNIST + FSDD + 10 words, 3,000 occasions, noise 2 drawn
+                    UNIFORMLY, 1 distractor present every occasion
+            model   none -- a property of the co-occurrence table
+            knobs   arms together/alternating; 50 codes pinned; 3 seeds
+            scale   distractor / word ratio per column
+
+**A proposal refuted before it was built, which is the entry's whole value.**
+`g38-01` found three scalar dials all failing at opposite ends, so the next idea
+was deliberately not a fourth: a distractor should be distinguishable from a word
+**without consulting any edge**, from a surface's own row and therefore free of
+any remote read. A word is common but focused; a distractor is common and
+indiscriminate.
+
+**Measured, the separation is 1.24x by breadth against 3.56x by plain
+frequency** — the proposed quantity is about three times worse at the one job it
+was proposed for. `exp(entropy)` of the partner counts was the right refinement
+of the idea; raw partner count separates by **1.01x**, which is nothing.
+
+**The cause is identified rather than guessed.** A word's partner count is
+**109.2** of a possible 110 — it has met essentially every surface — because
+`NOISE` draws two other words UNIFORMLY per occasion. Over 3,000 occasions every
+word appears beside every digit's codes many times, so the word is not focused in
+this data.
+
+**Scope, stated precisely: refuted ON THE DATA THE FAILURE WAS MEASURED ON.**
+Real speech is not uniform over scenes, and a realistic stream would concentrate
+a word's partners far more. That is enough to stop the build — a mechanism cannot
+be justified by a stream nobody has run — and not enough to call the idea wrong
+in general.
+
+**And it found an instrument defect worth more than the proposal.** `zipf` makes
+surface FREQUENCIES uneven; nothing makes *which surfaces co-occur* uneven. Every
+statistic measured on this generator is therefore answering a slightly wrong
+question. Registered, not fixed — changing the generator invalidates the
+comparison set, so it is a decision rather than a cleanup.

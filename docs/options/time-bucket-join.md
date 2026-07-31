@@ -18,6 +18,47 @@
 
 ## What was tried, and what came back
 
+### WHAT A TIME BUCKET IS NOT, because the first write-up of this read as circular
+
+    CONFIG  when    2026-07-31
+            source  GOALS.md, the grounding section
+            script  none -- a clarification, no measurement
+            task    n/a
+            model   n/a
+            knobs   none
+            scale   n/a
+
+**A time bucket is not a concept, and nothing durable is stored in one.** The first
+version of this record was read as saying a concept IS a time window, which would make
+the mechanism circular — define a concept by a window, then look concepts up by window.
+It is not what the design says, and a record that reads that way is a defect in the
+record.
+
+Three objects, three lifetimes, and only one of them is permanent:
+
+    PERCEPT       one image code, one word, one sound       forever, stable id
+    TIME BUCKET   what showed up at 10:23:15                seconds, then discarded
+    CONCEPT       never stored anywhere at all              a pattern, not an object
+
+**The bucket is a rendezvous, not a container.** Two nodes observing different things at
+one instant compute the same bucket address independently, send what they saw, and the
+bucket's owner notices the coincidence. It immediately writes the pairwise links out to
+`owner(percept)` for each percept involved — **and then the bucket is thrown away.**
+
+**Nothing is ever looked up by time.** Lookups are by percept id, which is stable. Time is
+used once, at the moment of observation, and never consulted again.
+
+**And why a bucket is needed at all: the two observations are on DIFFERENT MACHINES.** One
+machine that saw the image and heard the sound would simply notice, with no mechanism
+required. The bucket exists so two machines can discover their observations coincided
+without either asking the other, which is the collective C1 forbids. It is a
+distributed-systems device, not a theory of meaning.
+
+**One bucket is nearly worthless and that is expected.** Everything present in one second
+gets linked — the dog, the sofa and the face alike. The signal is not in any bucket; it is
+in the counts accumulated across thousands of them at the percept's owner, where the thing
+that co-occurs every time separates from the thing that co-occurred once.
+
 ### The problem it answers, and why nothing else here answers it — John, 2026-07-30
 
     CONFIG  when    2026-07-30

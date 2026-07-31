@@ -12,249 +12,139 @@
 > **NO CLAIM LIVES HERE.** Every number points at the file that owns it, and if the two
 > disagree that file wins.
 
-**Written:** 2026-07-31, after the session that changed what the project is aiming at.
+**Written:** 2026-07-31, after the session that built the grounding mechanism end to end.
 
 ---
 
-## THE NEXT THING, and John has already chosen it
+## WHAT HAPPENED: the grounding line is BUILT and MEASURED
 
-**Build the grounding mechanism and test it.** John, 2026-07-31: *"I think this is the
-absolutely next thing to pursue — getting this all built and then a test."* His preference
-is an existing test over a home-made one, and **one exists** (below).
+The previous handoff said *"build the grounding mechanism and test it"*. That is done, from
+the statistic through to containers under `tc netem`. Eight sweep records, in order:
 
-Read these three, in this order, before anything else:
+    g32-01  can counting separate "always there" from "is the thing"
+    g32-02  how many occasions does a concept need
+    g33-01  does the bucket join keep the signal
+    g33-02  can the walk bridge modalities that never meet
+    g33-03  what does one query cost in peer messages
+    g33-04  does a per-surface bound fix the star
+    g34-01  trials this project did not design
+    g35-01  the grounding store in real containers
+    g35-02  what a departure costs when nothing is replicated
 
-1. [`GOALS.md`](GOALS.md) — the grounding section. What understanding MEANS here, why
-   multimodality is a requirement rather than a phase, and gates **G6** and **G7**.
-2. [`identity-without-a-global-id.md`](docs/options/identity-without-a-global-id.md) — a
-   concept gets no id; it is an equivalence class reached by walking.
-3. [`time-bucket-join.md`](docs/options/time-bucket-join.md) — the rounded timestamp as the
-   transient cross-node join. **Its first section says what a time bucket is NOT**, because
-   the first write-up read as circular.
+**Read `docs/explainers/34` and `35` first** — they are the plain-language version and the
+fastest way back in.
 
-[Explainer 33](docs/explainers/33-how-two-machines-notice-the-same-moment.md) is the same
-thing in plain language and is the fastest way in.
+### The five things that would change what you build next
 
-### The design in four lines
+**1. Raw counting is refuted; a chance-corrected statistic repairs it.** A distractor
+present every occasion costs `count` 0.3044 of f1 and costs `conditional` 0.0000
+(`g32-01`). And the same failure arrives without anyone building a distractor: at `zipf`
+2.0 the commonest concept becomes one, and **60 of 60** surfaces of the rarest concepts
+have a different concept's surface as their best raw-count partner (`g32-02`).
 
-    owner(surface id)   everything ever learned about one percept    DURABLE, hashable
-    owner(time bucket)  that two percepts occurred together          TRANSIENT, discarded
-    a concept           never stored anywhere                        a shape in the links
-    identity            learned by counting co-occurrence            not computed
+**2. PPMI IS NOT DEPLOYABLE.** It divides by how many occasions the whole system has seen,
+which no node can know without a collective. `conditional` gives identical rankings above
+chance (`g32-01`, max difference **0.0007** over 96 cells) and needs only a peer read.
+`federated._AtOwner` and `bucket_service._Borrowed` both REFUSE to supply the total rather
+than approximating it.
 
-Time is the **join**; the percept's owner is the **accumulator**. Cross-situational
-learning becomes local counting at a fixed address, so nothing gathers and no barrier
-appears.
+**3. The read costs one peer message PER PARTNER**, not per `k` — 439 for one walk at 192
+surfaces, flat at 2.6x fan-out (`g33-03`). The write path is cheap by comparison at 38.4
+row updates per occasion. **The expensive half of this design is reading.**
 
----
+**4. A single global `k` cannot express a hub with spokes**, which is the shape a word
+naming a concept has. The derived per-surface bound (`grounding.cliff`) is the best arm in
+8 of 9 cells and collapses in none (`g33-04`). **It needs a cliff**, and note 058 measured
+real language as a slope where the rule's output is decided by floating point — but
+`g34-01` found published experimental stimuli ARE bimodal, mean largest gap ~0.5.
 
-## THE EXISTING TEST — found 2026-07-31, NOT yet verified beyond its README
-
-**Cross-situational word learning is an established field and it has a model-comparison
-dataset.** [Kachergis et al., *A large-scale comparison of cross-situational word learning
-models*](https://www.kachergis.com/publication/bakeoff/) — **44 experimental conditions,
-1,696 human participants**, with code and data at
-[github.com/kachergis/word_learning_models](https://github.com/kachergis/word_learning_models).
-
-Why it is a strong fit, and this is the assessment rather than a measurement:
-
-- **The stimuli are already symbolic.** Per the repository README, a condition gives
-  per-trial matrices of words and objects. **Each trial IS a time bucket** — a set of
-  things that co-occurred, with the correct pairing unknown. That is our mechanism's input
-  shape with no perception layer required.
-- **It has HUMAN baselines**, so the opponent is people rather than a counting baseline we
-  wrote. This project has never had that.
-- **It has published models to compare against**, associative and hypothesis-testing.
-- **Referential ambiguity is the whole point of it**, which is exactly G6's falsifier.
-
-**VERIFIED 2026-07-31, AND THE REPOSITORY ABOVE IS THE WRONG ONE.** Read from the files
-via the GitHub API, not from a README.
-
-- **`kachergis/word_learning_models` is a 2013 personal collection, not the bakeoff.**
-  About 20 conditions, **no LICENCE file** (only a request to cite the author's
-  dissertation), and **no human-accuracy data** — a handful of figures quoted in prose in
-  the README and nothing else.
-- **The bakeoff data is in [`kachergis/XSLmodels`](https://github.com/kachergis/XSLmodels),
-  which IS licensed** — GPL — and holds `data-raw/XSL-dataset-fields.csv` and
-  `data-raw/orders/`.
-
-> **CORRECTED 2026-07-31, SECOND PASS, AND THE FIRST CORRECTION WAS ALSO WRONG.**
-> The first pass reported *"63 conditions as a plain CSV with per-condition accuracy"*
-> from reading the header row and the first few data rows. Counting the whole file:
->
->     64 rows        8 with `accuracy`       4 with `sd_accuracy`
->     52 with `order_filename`      37 with `nsubj`      0 with `train` or `test`
->
-> And the intersection is the part that matters: **ZERO conditions have both a
-> plain-text ordering AND a human accuracy.** The 8 with human numbers
-> (Suanda2014 ×3, KoehneTrueswellGleitman2013 ×4, VlachDeBrock) name orderings
-> that are not in `orders/`; the 29 orderings that ARE there carry no human
-> figure.
-
-- **So `.RData` is still the blocker for the human comparison**, and only for that.
-  What is reachable with no dependency: **29 trial orderings as plain text**, one line
-  per trial, each number a word-object pair — real experimental stimuli this project did
-  not design, which is enough to answer the standing *"is the ranking bimodal on data we
-  did not generate"* question that `g33-04` names as its largest caveat.
-- **The human baselines need a pure-Python `.RData` reader** — gzipped XDR, a real but
-  bounded piece of work, and the thing that would turn external *stimuli* into an
-  external *benchmark*. Registered, not built.
-- `kachergis/XSL-datasets` is an **unmodified Quarto template** — still Palmer Penguins,
-  no XSL data in it. Do not go there.
-- GPL matters for vendoring, not for use: `data/*/` is gitignored, so this needs a fetcher
-  like `tools/fetch_clutrr.py`, not a commit of the data.
-- Still unverified: whether the CSV's conditions line up with the paper's 44, and whether
-  the orderings' numbering scheme matches the CSV's `order_filename`.
-- It is words-and-objects, **not literally image and audio**, so it tests the mechanism's
-  shape rather than G7's cross-modality. G6 first, G7 later.
-
-**If it does not pan out**, the fallback is registered in both option records: a symbol
-stream with a **distractor present on every single occasion**. Does it ever get pruned, and
-can the walk tell it from the target? Minutes to write, no perception layer.
+**5. Multimodality is the redundancy.** With nothing replicated, losing half the network
+still leaves **0.9596** of surviving surfaces connected to a true partner at 5 surfaces per
+concept, against 0.5522 at 2 (`g35-02`). Replication is an improvement, not a prerequisite.
 
 ---
 
-## WHO ELSE IS DOING THIS — searched 2026-07-31, and the search was NOT wide
+## WHAT IS BUILT, and where the boundaries are
 
-**Read as search summaries and abstracts, not papers.** Rule 19 says a negative result is
-not a finding until the search was a wide one, and four web searches is not that. Treated
-as leads.
+    openplexus/tasks/occasions.py   the instrument: a stream with known ground truth
+    openplexus/tasks/xsl.py         29 PUBLISHED conditions, external stimuli
+    openplexus/grounding.py         counts, five statistics, cliff, the walk, scoring
+    openplexus/buckets.py           the time-bucket join, one process
+    openplexus/federated.py         the table split by owner, every crossing counted
+    openplexus/bucket_service.py    ONE node's share, refusing every key it does not own
+    openplexus/bucket_peer.py       that over TCP
+    openplexus/node_main.py         OPENPLEXUS_MODE=bucket
+    testbed/run.py --mode bucket    containers under tc netem
+    tools/bucket_drive.py           the driver, which owns nothing
 
-**Three established fields, each doing one piece of it:**
-
-- **Cross-situational word learning** — cognitive science, decades old, human baselines.
-  Exactly our co-occurrence-to-identity mechanism, but single-machine, batch, and much of
-  it explicitly works on simplified symbolic inputs rather than raw sensory ones.
-- **Hyperdimensional computing / Vector Symbolic Architectures** — two ACM Computing
-  Surveys, applied to edge devices and federated learning. **Our superposed store IS a
-  VSA associative memory.** The SNR law and the capacity constant this project derived and
-  checked against an analytic bound are results in that field. Worth knowing we are inside
-  a literature rather than beside one.
-- **Decentralised training on volunteer hardware** — Learning@home / Hivemind, Petals,
-  Nous Psyche, Pluralis Agora. These already run large models across unreliable volunteer
-  machines over the ordinary internet, at electricity costs reported far below cloud spot
-  pricing.
-
-**THE UNCOMFORTABLE PART, and it is a premise-level challenge rather than a detail.** Those
-projects keep backpropagation and engineer AROUND the synchronisation — pipeline
-parallelism, expert routing, scheduling. They work. So *"distributed AI on consumer
-hardware"* is **not** this project's differentiator: it exists and it ships.
-
-The bet that is unclaimed is the narrower one — **that a local rule removes the need for
-the global step**, rather than tolerating it. Which means the payoff has to be something
-the synchronised systems cannot do: learn continuously without stopping, survive arbitrary
-churn, keep reorganising concepts as new things arrive.
-
-**`GOALS.md` currently argues from cost and access. The stronger argument is capability
-under conditions the alternatives cannot meet, and it is not written that way.** Raised as
-an open question for John rather than edited in, because it is a change to the project's
-stated premise and that is his call.
+**Container identity runs in CI** — `.github/workflows/testbed-bucket-identity.yml`, at 2
+and 4 nodes, green. `testbed-identity.yml`'s header records why that matters: the harness
+was built, proved once, and left un-run for months.
 
 ---
 
-## WHAT CHANGED ABOUT THE PROJECT'S DIRECTION
+## THE THREE THINGS NOT DONE, in the order I would take them
 
-**`GOALS.md` §2 already refused next-token prediction. It was not enough** — a
-sequence-prediction benchmark was proposed anyway, for good reasons (it solved recurrence,
-filler and perpetual learning at once), and nothing in the document objected. **A refusal
-without a positive statement only catches bad-faith proposals.**
+**1. THE READ PATH ACROSS CONTAINERS.** `g35-01` drives writes and reads marginals back; it
+does not run the WALK over sockets. So `g33-03`'s cost is still an in-process count, and
+the one quantity a user would feel — how long a grounded question takes — is unmeasured on
+a real link. `g24-01`'s 161 ms a round is the figure to compare against.
 
-So `GOALS.md` now states the positive half, and the gate ladder has two new rungs:
+**2. CONNECTION REUSE.** `bucket_peer` opens a socket per message, which is named as a
+deliberate simplification at its own definition and measured at **96x** under 40 ms delay
+(2.66s clean against 255.68s impaired, `g35-01`). P1 is registered there. **Do not quote
+that 96x as a latency for the architecture** — it prices the simplification, not the design.
 
-    G6  composition   answer about a relation it was never given, that follows from
-                      ones it was. Refuted if it can only return what it was told
-    G7  grounding     a concept introduced through one modality, queried through another
-
-**The ladder previously stopped at scale**, which meant every gate could be passed by a
-system that had understood nothing.
-
-**MQAR should stop being the scoreboard.** It has no concepts and no relations in it, its
-memory is rebuilt per sequence so it structurally cannot test C4, and its shape already
-forced a C1 violation once. Keep it as the capacity ruler — its scaling exponent is real
-and useful — and stop judging progress by it.
+**3. REPLICATION AND REPAIR.** Anti-entropy as `partitioned.ConceptStore.lose` describes.
+Now a ranked option rather than urgent, because of finding 5 above. The unmeasured
+comparison: deliberate replica placement against simply having more modalities.
 
 ---
 
-## THE KILL LIST
+## WHAT I GOT WRONG, so it is not re-derived
 
-     ✅  2  representations learned LOCALLY   18 graphs, beats counting, no invariant
-     ✅  6  independent nodes agree           TRANSPORT half only; quantiser half ⬜
-     ✅  7  decide what to say, and decline   exact, on the case the gate can see
+**`HANDOFF.md` named the wrong repository, and my correction was also wrong.** The bakeoff
+data is in `kachergis/XSLmodels`, not `word_learning_models`. But **zero conditions have
+both a plain-text ordering and a human accuracy** — 8 of 64 rows carry one and none of
+those name a `.txt` file. So `g34-01` is external STIMULI, not an external BENCHMARK, and
+every file that could be quoted from says so. Human baselines need a pure-Python RData
+reader, unbuilt.
 
-     🔀 10  margin survives scale             REFUTATION WAS ON THE WRONG ARRANGEMENT
+**Mutual exclusivity would not fix `g34-01`'s three failures.** I said it would, in the
+sweep record and to John. The four surfaces are a closed fully symmetric clique — two
+assignments fit every observation and a one-word-one-object constraint keeps both. Nothing
+recovers it. **It motivates building nothing.**
 
-     ⏸  4  multi-hop walk over real internet MEASURED; accepted, tweak later
-
-     ⬜  1  relational objective buys reasoning  blocked: no instrument with a wide band
-     ⬜  3  conventional system already wins     first outside number run, and we lose
-     ⬜  5  learn forever                        the cheap route is refuted
-     ⬜  8  adjudicate contradictions            untouched
-     ⬜  9  survive hostile participants         untouched
-     ⬜ 11  training traffic fits broadband      G4 passes on ONE SEED
-     ⬜ 12  survives a second modality           now G7, and it has a design
-
-**#10 moved from ❌ to 🔀.** Everything recorded about it was measured on DIMENSION
-partitioning. Concept partitioning solves the same cell on a quarter of the memory and a
-quarter of the machines — figures in
-[`g29-02`](experiments/sweeps/g29-02-concept-partitioning-at-EQUAL-state.txt). **Not a
-checkmark: the concept arm is saturated at 1.0000 in every cell with zero spread**, so the
-grid cannot rank anything or fit a slope.
-
-**A local probe DID find concept's wall and it is a cliff.** Width 32, 2 machines: solid at
-sequence 384, collapsed at 768, all three seeds. **The 1536 cell was killed for the session
-swap and never ran.** Numbers are in the terminal history only — **re-run before quoting**,
-they are not in any record.
-
-**#3's first outside number**: raw store on FB15k-237's own metric loses to a counting
-baseline by a wide margin —
-[`g30-01`](experiments/sweeps/g30-01-link-prediction-on-their-task.txt). The learned arm is
-better but still loses, and **width HURTS it**, which says it is optimisation-limited
-rather than capacity-limited. It does not close #3: link prediction is offline, global and
-non-local.
-
----
-
-## IN FLIGHT AND UNFINISHED
-
-**`g30-02` has no write-up.** The predictions are committed; the grid ran; the record still
-says pending. P4 (best K interior) and P5 (widening helps) both need scoring, and **P5 is
-refuted in the opposite direction to the prediction**. Convergence was probed and the arm
-peaks around 8 epochs then turns down. **Everything is in terminal history only — the
-numbers must be re-run, not recalled.**
-
-**`g29-03` was never written.** The sequence-length grid that would fit concept
-partitioning's exponent. The cheap probe located the cliff; the grid is the next step and
-belongs in Actions.
-
-**`concept_replicas` defaults to 1 in the model config and 3 in `ConceptStore`.** Every
-measurement ever run had zero fault tolerance. **Replication is free in RAM** — verified,
-identical state at 1, 2 and 3 replicas — so this is a default worth fixing before anything
-distributed is measured. It costs superposition capacity, not memory.
-
-**`g22-01` is built and dispatchable and has never been dispatched.**
+**Four metrics in this line read 1.0 under total collapse** — `reached_together`,
+`partner_rate`, and `bridged` in two sweeps. Each is recall-shaped and each says so in its
+own docstring now. Always report `largest` beside them.
 
 ---
 
 ## PROCESS, and what must not regress
 
-- **CHECKPOINT ONTO A BRANCH** when a sweep is in flight. `checks.yml` cancels superseded
-  runs per ref, so pushing to master repeatedly starves a queued matrix.
-- **`gh run view --jq` with a literal `"/"` breaks under Git Bash** — MSYS expands it into
-  a Windows path and the poll silently returns garbage rather than erroring. Build status
-  strings without slashes.
-- **Verify a run's identity FROM THE DATA.** It caught three wrong numbers this session,
-  including one where the machine count was derived from the width by the script and the
-  prediction assumed otherwise.
-- **`check_provenance.py` earned its keep four times in one session**, every time the same
-  shape: a figure written into a record under a citation that does not contain it.
-- **Read a knob's own definition and its test's docstring before sweeping it.** `g29-01`
-  was dispatched into a confound that `local_memory.py` and `tests/test_concept_routing.py`
-  had both already written down.
+- **CI IS BLOCKING AND IT CAUGHT A REAL BUG.** A peer could not be shut down on Linux:
+  closing a socket another thread is blocked on inside `accept` wakes it on Windows and
+  does not on Linux, so a "departed" node kept serving. **Any churn measurement over that
+  harness would have been measuring nodes that had not gone.** Watch the run, treat red as
+  blocking.
+- **`checks` takes 45-80 minutes** (six mutation shards). Batch commits; hold a push while
+  one is in flight rather than starving it.
+- **A heredoc containing `\n` inside a Python string breaks `mutate.py`.** Three times this
+  session. Use the Edit tool for mutation entries, not `sed`/heredoc rewriting.
+- **`check_provenance` earned its keep three more times**, every time the same shape: a
+  figure written under a citation that does not contain it. Once it was a new record entry
+  inserted INSIDE an existing one, which orphaned a paragraph from its CONFIG block.
+- **`check_duplication` caught a copied `_cell` between two experiment scripts** within
+  minutes of the second being written. Extracted to `harness.occasions_cell`.
 
 ---
 
 ## STATE
 
-Clean tree, 207 mutations verified, 1,370 tests green, all seven checks passing. **Seven
-commits unpushed at the time of writing** — push them and watch `checks.yml`. No background
-processes, no `.mutate.lock`, no sweep in flight.
+Clean tree, 230 mutations verified, 1,526 tests green, all seven checks passing.
+**Nine commits unpushed at the time of writing** — push them and watch both `checks` and
+`testbed-bucket-identity`. No background processes, no `.mutate.lock`, no sweep in flight.
+
+`data/kachergis/` is fetched and gitignored; re-run `python tools/fetch_kachergis.py` on a
+fresh clone before `g34-01`.

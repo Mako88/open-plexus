@@ -73,8 +73,23 @@ address written before*, and a first-time binding is unwritten by definition —
 separate a new pair from new filler. Proposing it would be forcing a fit.
 
 **What would actually move #10** is a mechanism that separates a binding from filler at
-WRITE time, from local evidence, which is note 010's problem and is unsolved. Anyone picking
-this up should read `g8-01` and `note 010` before writing code, not after.
+WRITE time, from local evidence, which is note 010's problem and is unsolved.
+
+**`g28-01` put a NUMBER on how good it has to be, and screening is now seconds.** A gate
+must fire on real content `target * filler / ((1-target) * real)` times more often than on
+filler. **That is not a constant** — at MQAR's measured 98.92% filler share a merely
+half-real stored set needs **91.9x**. Best structural signal screened: `token-novel` at
+**25.2x**, `addr-novel` at **18.9x**. Both a factor of four short.
+
+**Screen before building.** Four gates were built and measured after; this costs seconds
+and killed two novel candidates plus a bug in the screener itself. `g28-01` also has no
+working control yet — P1 compared `pair:filler` against note 013's `query:filler` number —
+so the candidate figures are recorded rather than relied on, and reproducing 7.6x on the
+right class is the first job for anyone continuing.
+
+**And the filler share is most of the problem.** At 98.9% filler the bar is brutal
+regardless of mechanism, which is an argument about the INSTRUMENT rather than about any
+gate. Note 010 already says MQAR cannot separate pair from filler at write time.
 
 **10 to 12 were MISSED from the original nine and John caught it**, and then **#10 was
 labelled ⬜ when the archive already had it as failed** — the same too-narrow-a-search

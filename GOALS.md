@@ -678,8 +678,10 @@ and no gate is passed on a single run** (rule 3).
 > **G7's verdict, 2026-07-31, and the scope is part of the verdict.** The
 > falsifier did not fire: from an image code the walk reaches audio codes of the
 > same digit while the two share **zero** occasions, with a word as the only
-> route. The numbers are in `experiments/sweeps/g40-01-...`; per rule 14b this
-> row carries the verdict and not the measurement.
+> route. **The numbers and the run that produced them are in
+> [DECISIONS.md](DECISIONS.md)**, which is where this file points for every
+> result — per rule 14b, a gate row carries the verdict and never the
+> measurement, and `test_goals_consistency` enforces it.
 >
 > **Three limits, stated here because a gate row is where someone will read the
 > claim.** The ORDER half of the gate is free for this mechanism — a

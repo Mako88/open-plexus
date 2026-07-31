@@ -451,3 +451,33 @@ combine.
 
 **Not settled:** depth 3 and beyond, where the one-sided objection gets stronger
 with distance; one code count and one beam.
+
+### The margin is real and does not degrade with clutter — `g39-05`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g39-05-how-wide-is-the-margin.txt
+            script  experiments/g39_05_how_wide_is_the_margin.py
+            task    MNIST + FSDD + 10 words, 24,000 occasions, distractors
+                    present on EVERY occasion
+            model   conditional read FORWARD from the word; no cut, no mutuality
+            knobs   distractors 1/2/4/8; 50 codes; 3 seeds
+            scale   rank and score gap, not the pass/fail verdict
+
+**The suspicion check `g39-04`'s clean result deserved.** That run's metric asks
+whether the distractor enters a word's top-`want`, and `want` is about 5 — so a
+distractor at rank 6 would pass while being a coin on edge.
+
+**It sits at rank 19.1 against a want of 5.0.** The weakest TRUE partner scores
+**0.7266** against the distractor's **0.2802**, a margin of **0.4464** — larger
+than the distractor's entire score. Fourteen positions clear, not one.
+
+**And it is identical at 1, 2, 4 and 8 distractors, to four decimals.** That is
+mechanism rather than luck: a surface present on every occasion has the same
+count as every other such surface, so `conditional` scores them all the same.
+They accumulate at the same depth instead of any one climbing. **The refusal does
+not weaken as clutter accumulates**, which is the property a real stream needs.
+
+**The untested case is the realistic one:** every distractor here is at 100%
+presence, which is `g32-01`'s falsifier condition and the EASIEST case to reject.
+A surface present on 90% of occasions scores higher and sits closer to the true
+partners. A lamp is in most rooms, not all of them.

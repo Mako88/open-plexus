@@ -1,0 +1,149 @@
+How wide is the margin, and does it survive more distractors?
+==============================================================
+
+Script: experiments/g39_05_how_wide_is_the_margin.py
+Status: RUN, local, 2026-07-31, 23.8s.
+
+**POST-HOC, and marked.** A scratch probe of these same columns ran before this
+artifact existed, so the predictions below are summaries rather than
+commitments. It is promoted out of scratch because `g39-04`'s conclusion rests
+on it, and `g36-01`'s headline survived as a wrong sentence for exactly as long
+as its diagnostic lived in scratch.
+
+ANSWER: **A real margin, not a coin on edge.** The best-placed distractor sits
+        at rank **19.1** against a `want` of **5.0**, and the weakest TRUE
+        partner scores **0.7266** against the distractor's **0.2802** — a gap of
+        **0.4464**, which is larger than the distractor's entire score.
+
+        **And it is completely insensitive to how many distractors there are.**
+        1, 2, 4 and 8 give identical numbers to four decimals, because every
+        ever-present surface has the same count and therefore the same score.
+        They pile up at the same rank rather than climbing.
+
+
+IN PLAIN TERMS
+--------------
+The previous run closed a problem that had resisted five attempts, and it did so
+with a perfect score. That is exactly when to be suspicious.
+
+Here is the specific way it could have been luck. The test asks whether the
+ever-present hum sneaks into a word's top five. The hum scores about 0.28. If the
+weakest genuine partner scored, say, 0.30, then the hum would be sitting at
+number six with almost nothing separating it — and any small change would tip it
+in. A pass in that situation is not a result, it is a coin balanced on its edge.
+
+So this measures the distance rather than the verdict.
+
+The hum is not at number six. It is at **number nineteen**, and the weakest
+genuine partner outscores it by more than the hum's entire score. That is a wide
+gap, not a near miss.
+
+The second question is whether it holds up when there is more than one such
+thing, since a real room has a hum *and* a lamp *and* the word "the". It does,
+and for a reason that is pleasing rather than lucky: everything that is always
+present has the same count, so it gets the same low score. They stack up together
+at the bottom instead of one of them climbing.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    rank           where the best-placed distractor sits in a word's FULL
+                   ranking. The pass/fail column in `g39-04` cannot show this
+    want           how many image codes genuinely belong to that word. The
+                   threshold `rank` has to clear
+    weakest true   the lowest-scoring genuine partner
+    best distr     the highest-scoring distractor
+    margin         weakest true minus best distr. **The quantity that decides
+                   whether `g39-04` is robust**
+    admitted       `g39-04`'s own column, reproduced as a rail
+
+`admitted` reproducing 0.0000 is what makes the other columns comparable with
+that run rather than describing some other configuration.
+
+
+MEASURED ON
+-----------
+Local, one process. Stream construction reproduced from `g39-04`.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions   24,000   eight passes, re-paired
+    codes           50
+    statistic  conditional, read FORWARD from the word -- `g39-04`'s winner
+    seeds      0, 1, 2
+
+Swept: `distractors` in {1, 2, 4, 8}, each present on EVERY occasion.
+
+
+PREDICTIONS — POST-HOC, SEE THE STATUS LINE
+--------------------------------------------
+P1  THE MARGIN IS WIDE. `rank` is well beyond `want`, not one past it.
+    REFUTED IF `rank` is `want + 1`. **Then `g39-04` is a coin on edge** and its
+    conclusion should be withdrawn to a much weaker one.
+
+P2  MORE DISTRACTORS DO NOT DEGRADE IT. `admitted` stays 0.0000 at 8.
+    REFUTED IF it rises with the count, which would mean the refusal holds only
+    for the single-distractor condition `g32-01` happens to use.
+
+
+COST
+----
+Estimated from `g39-04`'s measured 12.6s: four distractor counts, each building
+a 24,000-occasion stream for 3 seeds, against that run's two arms. **20 to 40
+seconds.**
+
+Recorded after the run: **23.8s**.
+
+
+RESULTS
+-------
+ distractors   rank  want  weakest true  best distr   margin  admitted
+           1   19.1   5.0        0.7266      0.2802   0.4464    0.0000
+           2   19.1   5.0        0.7266      0.2802   0.4464    0.0000
+           4   19.1   5.0        0.7266      0.2802   0.4464    0.0000
+           8   19.1   5.0        0.7266      0.2802   0.4464    0.0000
+
+
+SCORECARD
+---------
+  P1  **HELD, with room to spare.** `rank` is **19.1** against `want` **5.0** —
+            fourteen positions clear, not one. The margin is **0.4464**, which
+            exceeds the distractor's own score of 0.2802.
+
+            So `g39-04` is not a near miss. A word's ranking would have to change
+            substantially before the distractor entered its top five.
+
+            **What sits between rank 5 and rank 19 is not scored here** and is
+            worth knowing: it will be the word's own audio codes and foreign
+            image codes. Neither affects `link`, which counts image codes only,
+            but it means the top of a word's list is not purely its own pictures.
+
+  P2  **HELD, and the mechanism is better than the prediction.** Every count from
+            1 to 8 gives identical numbers to four decimals.
+
+            **That is not a coincidence and it should generalise.** A surface
+            present on every occasion has, by definition, the same count as every
+            other such surface, so `conditional` gives them all the same score.
+            Adding more of them adds more surfaces at 0.2802 — they accumulate at
+            the same depth rather than any of them climbing.
+
+            So the refusal does not weaken as clutter accumulates, which is the
+            property a real stream would need.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**Distractors that are present ALMOST always.** Every one here is at 100%
+presence, which is `g32-01`'s falsifier condition and the easiest case for
+`conditional` to reject. A surface present on 90% of occasions scores higher and
+sits closer to the true partners. **That is the untested case and it is the
+realistic one** — a lamp is in most rooms, not all of them.
+
+**One code count.** `want` is 5.0 because 50 codes over 10 digits gives 5 each.
+At 100 codes `want` would be 10 and the distractor's rank would have to clear a
+higher bar. Unswept.
+
+**The `weakest true` figure is a mean over words and seeds.** A single bad word
+could sit far lower without moving it, and nothing here reports the worst case.
+`CLAUDE.md` rule 3's calibration is precisely that: a mean of 1.0000 hid a
+0.7015.

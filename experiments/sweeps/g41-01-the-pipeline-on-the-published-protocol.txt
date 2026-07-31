@@ -1,0 +1,161 @@
+Does 0.8578 survive being reported properly?
+============================================
+
+Script: experiments/g41_01_the_pipeline_on_the_published_protocol.py
+Status: PREDICTIONS REGISTERED, run pending.
+
+**A TIMING PROBE RAN FIRST AND ITS NUMBERS ARE VISIBLE TO ME.** One seed, width
+64, both beam widths, about 12 seconds. It was run to cost the sweep and it
+smoke-tested the script, and then it showed the whole result at that cell.
+
+`CLAUDE.md` is explicit that a prediction written after a control has run is a
+weaker test than it looks, and the honest response is to say which came first
+rather than to write four confident predictions and collect a clean scorecard.
+So every prediction below is labelled **SEEN** or **GENUINE**, and only the
+GENUINE ones are evidence that anything was understood in advance.
+
+
+IN PLAIN TERMS
+--------------
+We have a number for this system on somebody else's reasoning benchmark: 0.8578.
+It is a good number — the published systems on the same benchmark run from about
+0.39 to 0.97.
+
+But it is a single average over 1,146 puzzles of wildly different difficulty, and
+this project has already written down, twice, why that is not allowed here. The
+easy puzzles and the hard puzzles are mixed together. It was measured once, at
+settings copied from an older experiment that nobody has since varied. And it was
+never compared against the score you would get by ignoring the puzzle entirely and
+always giving the same answer.
+
+This run changes nothing about how the system works. It reports the same
+machinery honestly: broken out by how hard each puzzle is, with the do-nothing
+score printed beside it, at eight different random starts instead of one, and
+with the two copied settings actually varied.
+
+A good number that survives this is worth quoting. One that does not was never
+real, and it is much cheaper to find that out now than after it has been built on.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    accuracy    per hop bucket, 2 to 10, NEVER pooled. Hops 2-3 are the only
+                depths present in TRAIN, so they are recall and 4-10 are
+                generalisation
+    recovery    whether the walk commits to the true chain of relations. The
+                diagnostic that separates "the walk lost the chain" from "the
+                fold named it wrong"
+    subsets     `all`, and `clean` = note 059's max_appearances <= 2. Reported
+                BESIDE each other, never instead, because the floor differs
+                between them and g35-02's confound is a column of several scales
+                printed as one
+
+The arms, all scored on the same puzzles:
+
+    majority    the ACHIEVABLE floor -- always answer the commonest TRAIN
+                relation. NOT the test bucket's own majority, which g37-03
+                established is an ORACLE floor no model can reach
+    gap         fold with no fill for a missing rule
+    random      fill a gap with a random relation. Note 088's bar
+    wrong-delta THE CONTROL. A deliberately wrong displacement. It must land at
+                or below `random`, and if it does not, "filling helps" is the
+                finding rather than "this displacement helps"
+    delta       the mechanism
+    contrastive the learned-vector fill from g23-01/02
+
+Swept: `width` over {32, 64, 128} and `beam width` over {4, 8}, at 8 seeds.
+Both are constants carried from note 065's configuration and neither has been
+varied since. `CLAUDE.md` names sweeping one arm and not the other by name, and
+g37-03 swept the reference while leaving exactly these untouched.
+
+**Eight seeds rather than three, on purpose.** The probe returned 1.0000 in
+several cells. A failure occurring in one draw of eight is missed by three seeds
+about 67% of the time, so a clean sweep of three is the EXPECTED outcome even
+when a one-in-eight failure exists (`CLAUDE.md`, the g36-01 calibration). The
+report prints the WORST seed beside the mean for the `delta` arm and for
+recovery.
+
+
+WHAT IS NOT CHANGED, AND WHY IT IS NOT
+--------------------------------------
+**Both aids stay in.** The walk is handed `len(chain)`, so it is told its own
+depth; and *"deltas add"* is arithmetic supplied by hand rather than discovered
+(note 090 says so in its own text).
+
+Keeping them is what makes this comparable to note 091's 0.8578. Removing them is
+a separate run, because a fall would otherwise be unattributable between "the
+protocol was generous" and "the aid was doing the work" — which is `g37-02`'s
+mistake one level up.
+
+
+MEASURED ON
+-----------
+Local, one process.
+
+    data        CLUTRR gen_train23_test2to10, TEST split, 1,146 puzzles
+    rules       97, learned from TRAIN (note 066's bootstrap)
+    deltas      20, from TRAIN loop constraints, null space dimension 1
+    search      beam, branches 4 fixed, width swept
+    layout      kinship
+
+The data does not move with the seed. CLUTRR is a fixed file, so a seed varies
+model initialisation, the contrastive vectors and the fill draws only. Variance
+here is a statement about the model, not about the task.
+
+
+PREDICTIONS
+-----------
+P1  **GENUINE.** WIDTH DOES NOT MATTER AND THE CARRIED 64 IS NOT THE ISSUE. The
+    `delta` arm at 10 hops moves by less than 0.05 across {32, 64, 128} at fixed
+    beam.
+    REFUTED IF the spread exceeds 0.05. Then a second carried constant was
+    load-bearing and every earlier CLUTRR figure is at an untuned width.
+
+P2  **GENUINE, and it is the one this run exists for.** THE CELLS AT 1.0000 DO
+    NOT ALL SURVIVE EIGHT SEEDS. At least one cell reporting 1.0000 at seed 0
+    has a worst seed below 1.0000.
+    REFUTED IF every 1.0000 cell is 1.0000 on all eight. Then the perfection is
+    real and may be written as "every" — which is the word the g36-01
+    calibration exists to stop being written on three seeds.
+
+P3  **SEEN, so this is a summary and not a commitment.** BEAM WIDTH 4 IS
+    UNDERTUNED AT DEPTH. The probe gave `delta` at 10 hops 0.7059 at beam 4
+    against 0.7815 at beam 8, subset `all`. This says only whether that holds at
+    8 seeds and 3 widths.
+
+P4  **SEEN in part.** THE WRONG-DELTA CONTROL DOES NOT FIRE AT 2 HOPS. Every arm
+    scored 1.0000 there in the probe, so the bucket cannot separate the
+    mechanism from filling anything at all. GENUINE half: it fires at every
+    bucket from 4 hops up, at every width and beam, on all 8 seeds — meaning
+    `delta` exceeds `wrong-delta` in all of them.
+    REFUTED IF any bucket from 4 up has `wrong-delta` at or above `delta`. Then
+    the mechanism is not separated from filling at that depth.
+
+P5  **GENUINE.** THE POOLED 0.8578 IS NOT REPRESENTATIVE OF THE DEEP BUCKETS.
+    The `delta` arm at 10 hops, subset `all`, is below 0.8578 at every width and
+    beam.
+    REFUTED IF any cell at 10 hops meets or beats the pooled figure. Then
+    pooling did not flatter the result and the protocol complaint costs nothing.
+
+
+COST
+----
+Measured, not estimated: **11.8s** for one seed at one width, covering both beam
+widths and including the shared setup (floor, 97 rules, 20 deltas) and the
+per-seed contrastive vectors.
+
+Full grid is 8 seeds x 3 widths. Estimated **4 to 8 minutes**, local, one
+process. **This does not go to Actions** — it is minutes, not a matrix, and
+`CLAUDE.md`'s line is how long it holds the machine.
+
+Recorded after the run: (pending)
+
+
+RESULTS
+-------
+(pending)
+
+
+SCORECARD
+---------
+(pending)

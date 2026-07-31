@@ -1,0 +1,161 @@
+What is the chain length worth, and can the walk do without it?
+===============================================================
+
+Script: experiments/g42_01_the_walk_is_not_told_its_own_depth.py
+Status: PREDICTIONS REGISTERED BEFORE THE MECHANISM EXISTS. Nothing has been run.
+
+**This is the strong form of the pre-registration and it is deliberate.** g41-01's
+predictions were written after a timing probe had shown that cell, and its record
+says so. Here the depth-free mechanism has not been written yet, so nothing about
+its behaviour has been observed by anyone.
+
+
+IN PLAIN TERMS
+--------------
+When this system answers a CLUTRR puzzle it walks along a chain of relationships:
+*A is B's father, B is C's sister, so A is C's ...*. To do that it has to know
+when to stop walking.
+
+At the moment we tell it. The puzzle is read ahead of time, the true chain is
+counted, and the walk is handed that number. Published systems on this benchmark
+are not given it.
+
+That is a real advantage and nobody has measured how large it is. It might be
+worth almost nothing — the walk might be finding the right answer for the right
+reasons and the number is just a convenience. Or it might be doing most of the
+work, in which case our headline figure is a measurement of a hint rather than of
+the system.
+
+So this run does two things. It measures **what the hint is worth**, by handing
+the walk a deliberately wrong length and watching what happens. And it tries to
+**do without it**, by letting the walk decide for itself when it has arrived.
+
+The rule for deciding is not new information: a CLUTRR question names both people
+it is asking about, so the walk already knows where it is trying to get to. It can
+simply stop when it gets there. Whether that works is the measurement.
+
+A large fall here would be the most useful bad news available, because it would
+mean the number this project is about to quote was propped up by something the
+comparison systems do not get.
+
+
+WHAT IS BEING MEASURED
+----------------------
+Every quantity from g41-01, unchanged, so the two are directly comparable:
+per hop bucket 2-10, never pooled; subsets `all` and `clean` (note 059's
+max_appearances <= 2); the ACHIEVABLE floor as an arm; 8 seeds.
+
+Added here:
+
+    chosen length   how long a walk the depth-free arm actually commits to, and
+                    how often that equals the true chain length. **The
+                    diagnostic**, because end-task accuracy alone cannot say
+                    whether a fall is the walk stopping early or the fold
+                    naming it wrong
+    fold arm        `delta` throughout, with `random` and `wrong-delta` carried
+                    as the bar and the control
+
+THE DEPTH ARMS
+
+    told            depth = len(chain). The incumbent. Reproduces g41-01
+    wrong-1         depth = len(chain) + 1. **The instrument that prices the
+                    aid.** Not a mechanism anyone would ship -- it exists to
+                    turn "the walk is told its depth" into a number
+    free-10         depth is a MAXIMUM of 10, the deepest chain in the data.
+                    The walk scores its own endpoint against the query's object
+                    at every hop and selects across lengths
+    free-15         the same at a maximum of 15, so the budget overshoots the
+                    data. Separates "it works" from "it works because the
+                    budget happened to be the answer"
+
+**`free-*` still receives a budget, and that is a residual aid, named.** A
+maximum is much weaker than an exact length, and `free-15` is what says whether
+the maximum is load-bearing at all. It is not claimed to be aid-free.
+
+**The stopping rule uses nothing the task does not supply.** A CLUTRR query names
+its object, and `openplexus/search.py` already selects the final walk by scoring
+its endpoint against that object -- its own docstring calls the object "the
+disambiguator". What changes is only that the score is consulted at every hop
+instead of at one.
+
+
+PREDICTIONS
+-----------
+P1  **THE AID IS WORTH A LOT.** `wrong-1` end task falls below the `random` fill
+    bar at 6 hops and deeper, subset `all`.
+    REFUTED IF `wrong-1` stays within 0.05 of `told` everywhere. Then depth was
+    never load-bearing, removing it is cheap by construction, and g41-01's number
+    was not flattered by it -- which is the cheap outcome and the one that would
+    let the incumbent figure stand as it is.
+
+P2  **THE DEPTH-FREE ARM RECOVERS MOST OF IT AND NOT ALL.** `free-10`'s `delta`
+    accuracy at 10 hops, subset `all`, lands strictly between the `random` bar
+    and `told`.
+    REFUTED IF it meets or beats `told`. Then the exact length was never adding
+    anything and the honest report is that the aid was cosmetic.
+    ALSO REFUTED IF it falls at or below `random`. Then the walk cannot find its
+    own end and the composition result depends on being told the answer's shape.
+
+P3  **ENTITY REPETITION IS WHAT COSTS THE DEPTH-FREE ARM.** The gap between
+    subset `clean` and subset `all` is LARGER for `free-10` than for `told`, at
+    8 hops and deeper. The reasoning: a repeated entity is what creates a short
+    path that lands on the target without being the true chain, and only an arm
+    free to stop early can take one.
+    REFUTED IF the two gaps agree within 0.03. Then short spurious paths are not
+    the failure mode and whatever `free-10` loses is lost for another reason.
+
+P4  **THE BUDGET IS NOT THE ANSWER.** `free-15` agrees with `free-10` within
+    0.03 at every bucket.
+    REFUTED IF `free-15` is markedly worse. Then the maximum is doing real work,
+    the arm is not depth-free in any useful sense, and the residual aid named
+    above is the whole mechanism.
+
+P5  **THE CHOSEN LENGTH IS RIGHT MORE OFTEN THAN THE END TASK IS.** `free-10`
+    picks the true chain length more often than it answers correctly, at every
+    bucket from 4 hops up.
+    REFUTED IF the end task is more often right than the length is. That would
+    mean walks of the wrong length are still folding to the right answer, which
+    would make the length a poor diagnostic and P3's reasoning unreadable.
+
+P1 is written expecting the EXPENSIVE outcome, which is the opposite of g37-03's
+P1 and is deliberate: the cheap reading here is that the aid is worthless, and
+nothing about a walk that scores 1.0000 recovery at 2-5 hops when handed its
+depth suggests that.
+
+
+MEASURED ON
+-----------
+Local, one process. Identical data, rules and deltas to g41-01.
+
+    data        CLUTRR gen_train23_test2to10, TEST split, 1,146 puzzles
+    search      beam, branches 4; width and model width at g41-01's chosen cell
+    layout      kinship
+
+**The width and beam width are taken from g41-01's result, and the cell they came
+from is written here rather than left implicit** -- `CLAUDE.md`'s calibration on
+g9-11 cost 0.58 of recovery to a constant carried from another configuration with
+no note of where it came from.
+
+    width, beam:  (pending g41-01)
+
+
+COST
+----
+g41-01 measures 11.8s per (seed, width) covering two beam settings on the full
+1,146-puzzle test split. This run has four depth arms rather than two beam
+settings and `free-15` walks deeper, so a cell is dearer.
+
+Estimated **10 to 20 minutes** local for 8 seeds at one width. Local, not
+Actions: it is minutes and not a matrix.
+
+Recorded after the run: (pending)
+
+
+RESULTS
+-------
+(pending)
+
+
+SCORECARD
+---------
+(pending)

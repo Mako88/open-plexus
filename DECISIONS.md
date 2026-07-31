@@ -370,7 +370,10 @@ it has ever been re-litigated, which is the only thing the tree prevents.
   is secondary and must not compete with it.
 - **Biology gives policies, not representations**; take mechanisms from computer science.
 - **Scheduled wake-ups DO NOT FIRE.** A persistent `Monitor` emitting a heartbeat
-  is what works.
+  is what works. **Arm it at the START of a session, not when a job is dispatched —
+  John, 2026-07-31**, and point it at `scratchpad/STATUS.txt` (gitignored) rather than
+  at a job: the heartbeat carries no state, so the file is where the next action lives
+  and it can be rewritten at any moment without restarting the monitor.
 - **RUN UNATTENDED, AND KEEP RUNNING — John, 2026-07-30.** Three parts, and they are one
   instruction: *"keep a 5 minute monitor wakeup going as long as there is still a clear next
   step forward toward the goal, always focus on blocking/harder problems before simpler

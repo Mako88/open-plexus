@@ -5,12 +5,16 @@ Script: experiments/g35_02_what_a_departure_costs_the_grounding_store.py
 Status: RUN, local, 2026-07-31, 310.5s. Predictions committed at `f2e1bd3`
         before the script was executed.
 
-ANSWER: **all four predictions held, and the fourth must not be read the way it
-        invites.** `concepts hit` does rise with modality count — 0.198, 0.260,
-        0.479 at one node of eight — but `f1` is flat across the same range, and
-        THAT COMPARISON IS CONFOUNDED because the metric's floor differs by
-        surface count. So whether multimodality costs anything under churn is
-        **still open**, and this run cannot close it.
+ANSWER: **all five predictions held, and the answer reverses the alarming
+        reading of the fourth.** More modalities means more concepts are TOUCHED
+        by a departure — 0.198, 0.260, 0.479 at one node of eight — and almost
+        none are LOST: `connected` goes 0.8901, 0.9923, **1.0000** over the same
+        range. At HALF the network gone it is 0.5522, 0.8160, **0.9596**.
+
+        **So multimodality buys fault tolerance rather than costing it**, and
+        `GOALS.md`'s multimodal requirement and C3 reinforce each other instead
+        of pulling apart. A surviving surface needs only ONE partner left, and
+        five surfaces give it four chances where two give it one.
 
 
 IN PLAIN TERMS
@@ -142,21 +146,26 @@ grid belongs in Actions.
 
 RESULTS
 -------
-     surfaces  lost  ring share  surfaces gone  concepts hit       f1   largest
-            2     0       0.000          0.000         0.000   1.0000    0.0308
-            2     1       0.125          0.099         0.198   0.8639    0.0359
-            2     2       0.250          0.245         0.438   0.6747    0.0462
-            2     4       0.500          0.505         0.729   0.3958    0.0410
+     surfaces  lost  ring share  surfaces gone  concepts hit       f1  connected   largest
+            2     0       0.000          0.000         0.000   1.0000     1.0000    0.0308
+            2     1       0.125          0.099         0.198   0.8639     0.8901    0.0359
+            2     2       0.250          0.245         0.438   0.6747     0.7396    0.0462
+            2     4       0.500          0.505         0.729   0.3958     0.5522    0.0410
 
-            3     0       0.000          0.000         0.000   1.0000    0.0309
-            3     1       0.125          0.094         0.260   0.8708    0.0309
-            3     2       0.250          0.226         0.521   0.7038    0.0309
-            3     4       0.500          0.486         0.844   0.4135    0.0309
+            3     0       0.000          0.000         0.000   1.0000     1.0000    0.0309
+            3     1       0.125          0.094         0.260   0.8708     0.9923    0.0309
+            3     2       0.250          0.226         0.521   0.7038     0.9499    0.0309
+            3     4       0.500          0.486         0.844   0.4135     0.8160    0.0309
 
-            5     0       0.000          0.000         0.000   1.0000    0.0311
-            5     1       0.125          0.102         0.479   0.8534    0.0311
-            5     2       0.250          0.229         0.771   0.6819    0.0311
-            5     4       0.500          0.494         0.969   0.3701    0.0290
+            5     0       0.000          0.000         0.000   1.0000     1.0000    0.0311
+            5     1       0.125          0.102         0.479   0.8534     1.0000    0.0311
+            5     2       0.250          0.229         0.771   0.6819     1.0000    0.0311
+            5     4       0.500          0.494         0.969   0.3701     0.9596    0.0290
+
+`connected` is `partner_rate` over the SURVIVORS: did a surface end up with any
+of its own? It is recall-shaped and reads 1.0000 under collapse, so it is read
+beside `largest` — which never exceeds **0.0462**, so none of these are
+collapses.
 
 
 SCORECARD
@@ -187,11 +196,22 @@ SCORECARD
             one node of eight gone. More modalities IS more exposure.
 
 
-THE READING P4 INVITES IS WRONG, AND THE CONFOUND IS MINE
------------------------------------------------------------
-The obvious next sentence is *"so multimodality and C3 pull against each other"*.
-**The table does not support it, and the reason is a defect in this run's design
-rather than a finding.**
+  P5  HELD, AND IT IS THE ANSWER. `connected` rises with the surface count at
+            every loss level: **0.8901, 0.9923, 1.0000** at one node of eight,
+            and **0.5522, 0.8160, 0.9596** at four. The predicted form
+            `1 - gone^(surfaces-1)` gives 0.901 against a measured 0.8901 at two
+            surfaces and 0.9999 against 1.0000 at five.
+
+            Registered AFTER the first run and before the second, which is
+            weaker than a prediction made in advance of everything and is said
+            so where the prediction sits.
+
+
+THE READING P4 INVITED WAS WRONG, AND A FLOOR-FREE METRIC SETTLED IT
+----------------------------------------------------------------------
+The obvious next sentence after P4 is *"so multimodality and C3 pull against each
+other"*. **It is wrong**, and the first run could not say so because of a defect
+in its own design.
 
 Look at `f1` across surface counts at a fixed loss:
 
@@ -217,24 +237,43 @@ is to compute what a metric returns for the degenerate case before reading a
 number off it; `g32-01`'s 0.5 floor was that lesson and the floor was fixed
 there, so nothing prompted a re-check when `surfaces` became an axis.
 
-**So P4's consequence is UNSETTLED.** What would settle it is a quantity
-comparable across surface counts — the share of concepts whose recovered class
-still contains at least one true partner, which has no size-dependent floor.
-That is a small change and it is the next run rather than a reinterpretation of
-this one.
+**So a floor-free quantity was added and the grid re-run.** `connected` asks a
+yes-or-no question of each surviving surface — *did you end up with any of your
+own?* — which means the same thing at every class size.
+
+**It rises with the surface count, steeply.** At half the network gone, two
+surfaces leaves 0.5522 of survivors still connected and five leaves **0.9596**.
+The reason is simple once stated: a surface needs only ONE partner to remain
+reachable, and five surfaces give it four chances where two give it one.
+
+**So the two metrics say different true things.** More concepts are TOUCHED by a
+departure and far fewer are LOST — and `concepts hit`, which counts a concept as
+damaged if a single surface went, was the wrong quantity to worry about. The
+redundancy intuition holds after all, for a reason the arithmetic predicts.
 
 
 WHAT THIS DOES SETTLE
 ----------------------
-**A departure is amplified by the modality count and the exponent is measured**,
-which is a fact about `concepts hit` and needs no metric comparison: at 5
-surfaces, losing one node of eight touches **48%** of concepts.
+**A departure is amplified by the modality count and the exponent is measured**:
+at 5 surfaces, losing one node of eight TOUCHES **48%** of concepts.
+
+**And almost none of them are lost.** `connected` at that cell is **1.0000**, so
+every touched concept still reaches at least one of its own surfaces.
+
+**MULTIMODALITY IS THE REDUNDANCY.** With nothing replicated, the surfaces
+themselves are the copies — which answers, for this store, the question
+`partitioned.ConceptStore.lose` leaves open in its own docstring: *"which is
+preferable is a measurement, not a preference."*
 
 **Nothing collapses at any loss level**, including half the network gone.
 
-**And replication is now a named, unbuilt requirement rather than an
-optimisation.** `partitioned.ConceptStore` has `replicas` and its own docstring
-says repair is *"standard and unbuilt"*; the grounding store has no replicas at
-all, so this amplification applies at full strength. The fix is the same
-anti-entropy `ConceptStore.lose` already describes, and it is the obvious next
-mechanism.
+**Replication is therefore an improvement rather than a prerequisite**, which is
+a weaker claim than this file made before the second run and is the right one.
+The two-surface row is where it would pay: **0.5522** connected at half the
+network gone, against **0.9596** at five surfaces. The repair is the anti-entropy
+`ConceptStore.lose` already describes, and it is a ranked option rather than an
+urgent gap.
+
+**What is still not measured**: a concept's surfaces are placed independently by
+the ring here. Replication would place copies deliberately, and whether that
+beats simply having more modalities is a comparison nobody has run.

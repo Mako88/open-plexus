@@ -346,10 +346,20 @@ is what makes the exponent apply.
 **Nothing collapses.** `largest` never exceeds **0.0462**, and losing half the network
 still returns f1 near **0.40** rather than failing.
 
-**Whether that amplification COSTS anything is unsettled**, and the sweep record says so:
-`f1` looks flat across surface counts, but the metric's floor moves with the surface count
-— 0.6667, 0.5000, 0.3333 for a concept recovered alone — so the comparison is three scales
-in one column. A floor-free metric is the next run.
+**But almost none of them are LOST, and multimodality is why.** A floor-free metric —
+the share of surviving surfaces whose class still holds at least one true partner — goes
+**0.8901, 0.9923, 1.0000** at 2, 3 and 5 surfaces with one node of eight gone, and
+**0.5522, 0.8160, 0.9596** with HALF the network gone. `largest` never exceeds 0.0462, so
+none of those are collapses.
 
-Replication is therefore a named, unbuilt requirement rather than an optimisation, and the
-repair is the anti-entropy `ConceptStore.lose` already describes.
+A surface needs only ONE partner to stay reachable, so five surfaces give it four chances
+where two give it one. **With nothing replicated, the surfaces themselves are the copies** —
+which answers, for this store, the question `partitioned.ConceptStore.lose` leaves open:
+*"which is preferable is a measurement, not a preference."*
+
+Replication is therefore an improvement rather than a prerequisite, and the two-surface row
+is where it would pay.
+
+**The f1 column cannot be compared across that axis**, because the metric's floor moves
+with the class size — 0.6667, 0.5000, 0.3333 for a concept recovered alone. The first run
+read it as flat and could not settle anything; the floor-free metric is what settled it.

@@ -148,14 +148,202 @@ Full grid is 8 seeds x 3 widths. Estimated **4 to 8 minutes**, local, one
 process. **This does not go to Actions** — it is minutes, not a matrix, and
 `CLAUDE.md`'s line is how long it holds the machine.
 
-Recorded after the run: (pending)
+Recorded after the run: **240.4s** for the full grid, 8 seeds x 3 widths x 2
+beams, one process. Well inside the estimate, and the estimate itself was made
+from a measured cell rather than a guessed multiple.
 
 
 RESULTS
 -------
-(pending)
+The full tables are in the run's own output. What follows is the load-bearing
+part, and the file is the authority for anything not quoted here.
+
+WIDTH DOMINATES EVERYTHING, and it was never varied.
+`delta`, subset `all`, beam 8, mean of 8 seeds:
+
+    hops    width 32   width 64   width 128
+       4      0.7789     0.9092      0.9125
+       5      0.7543     0.9375      0.9476
+       6      0.6098     0.8937      0.9381
+       7      0.4922     0.8646      0.9262
+       8      0.3850     0.8458      0.9425
+       9      0.2489     0.7962      0.9160
+      10      0.1943     0.7185      0.8676
+
+At width 32 the mechanism is gone: 0.1943 at 10 hops against the `random` bar's
+0.1807 and `wrong-delta`'s 0.1702.
+
+THE SEED SPREAD IS A SYMPTOM OF THE WIDTH. At 10 hops, subset `all`, beam 8:
+
+    width    mean    worst   seed 0
+       32  0.1943   0.1092   0.1943
+       64  0.7185   0.6050   0.7815
+      128  0.8676   0.8319   0.8676
+
+**Seed 0 is the best of eight at width 64**, and it is the seed every published
+CLUTRR figure in this repository was taken at. At width 128 the spread closes to
+0.036, because the model is no longer near its capacity cliff.
+
+BEAM WIDTH IS REAL AND SMALL. `delta` at 10 hops, subset `all`:
+
+    width    beam 4   beam 8   difference
+       64    0.6796   0.7185      +0.0389
+      128    0.8015   0.8676      +0.0661
+
+So the carried `beam 4` was undertuned, and it is worth about a fifth of what the
+carried `width 64` was worth. **Sweeping only the beam would have found a real
+effect and missed the one that mattered** -- which is the argument for the
+inventory habit rather than for chasing the knob that looks most likely.
+
+WHAT EACH PART CONTRIBUTES, and this is the most consequential row in the run.
+At width 256, beam 8, 10 hops, subset `all`, 8 seeds:
+
+    achievable floor (commonest TRAIN answer)          0.0588
+    walk + learned rule table, gaps UNFILLED           0.3613
+    + fill a gap with a random relation                0.4632
+    + fill it with a LEARNED relation vector           0.6061
+    + fill it by the hand-supplied additive invariant  0.9076
+
+    chain recovery, for reference                      0.8960
+
+**The invariant is the largest single term, and it is the one supplied by hand.**
+`note 090` says so in its own text — *"the rule 'deltas add' is a design choice,
+not read from data"* — and this puts a number on what that choice is worth on the
+deepest bucket: the difference between 0.3613 and 0.9076.
+
+**Against the best LEARNED filler it is worth the difference between 0.6061 and
+0.9076**, which is the fairer comparison and still large. `contrastive` is the
+g23-01/02 mechanism and is the only arm here that could exist in a domain with no
+conserved quantity.
+
+**This bears directly on the scope question** (`note 104`, `g23-03`: general
+knowledge graphs mostly have no additive invariant). A domain without one does not
+get the `delta` row. It gets the `contrastive` row, and on this instrument that is
+0.6061 against a floor of 0.0588 — a real result, and not the headline one.
+
+THE 2-HOP BUCKET SEPARATES NOTHING, at any width or beam or seed. `gap`,
+`random`, `wrong-delta`, `delta` and `contrastive` are all **1.0000** there, and
+the achievable floor is **0.0000**. The 3-hop bucket is flat between `delta` and
+`contrastive` (both 0.9524) at every width above 32. `g37-01` predicted the first
+of these from the data alone and it is confirmed by measurement.
+
+THE FLOOR MOVES WITH THE SUBSET, as note 059 and g35-02 both say it must, and it
+is printed per cell rather than once.
 
 
 SCORECARD
 ---------
-(pending)
+  P1  **REFUTED, and it is the expensive outcome.** Predicted spread across
+            widths below 0.05 at 10 hops; measured **0.67**. Width is not a
+            detail, it is the dominant term, and `width 64` was carried from
+            note 065's configuration into every CLUTRR number this project has
+            published. It costs **0.149** at 10 hops against width 128.
+
+            This is `CLAUDE.md`'s g9-11 calibration recurring exactly: a
+            constant carried from another configuration dominating every
+            mechanism being compared. That calibration is now three instances
+            old and each was found by inventory rather than by suspicion.
+
+  P2  **HELD, and it is why the run used eight seeds.** Cells reading 1.0000 at
+            seed 0 have worst seeds well below it -- width 64, beam 8, subset
+            `clean`, 6 hops: recovery **1.0000** at seed 0 against a worst of
+            **0.8095**. Three seeds would have missed a one-in-eight failure
+            about 67% of the time, and this run had many more than one.
+
+  P3  **HELD, and it was labelled SEEN, so it is a summary.** Beam 4 is
+            undertuned at depth at both usable widths. Recorded as a summary
+            rather than counted as evidence of foresight.
+
+  P4  **THE SEEN HALF CONFIRMED; THE GENUINE HALF REFUTED BY ONE CELL OF 84.**
+
+            The seen half: every arm is 1.0000 at 2 hops, control included, so
+            that bucket cannot separate the mechanism from filling anything at
+            all.
+
+            The genuine half predicted `delta` above `wrong-delta` in every cell
+            from 4 hops up. It holds in **83 of 84** and fails at **width 32,
+            beam 4, subset `clean`, 10 hops: delta 0.1328 against wrong-delta
+            0.1367.**
+
+            **It was found by checking all 84 mechanically and would have been
+            missed by reading the tables**, which is what the six printed
+            tables invite. The failing cell is the most capacity-starved corner
+            of the grid, so it is consistent with P1 rather than separate from
+            it -- at width 32 the mechanism has collapsed far enough that its
+            own control is indistinguishable from it.
+
+  P5  **REFUTED, in the direction that flatters the project, which is the one
+            to be careful about.** Predicted that no 10-hop cell would reach the
+            pooled 0.8578. Width 128 at beam 8 gives **0.8676**.
+
+            So reporting the figure honestly made it BETTER rather than worse,
+            once the width was allowed to move. The pooled number was not
+            flattering the deep buckets; it was being dragged down by an
+            undertuned width that the shallow buckets could absorb and the deep
+            ones could not.
+
+
+WHAT THIS DOES NOT SETTLE, AND ONE OF THEM IS DISQUALIFYING FOR NOW
+-------------------------------------------------------------------
+**THE GRID DOES NOT CONTAIN ITS OWN ANSWER.** Width 128 is the best cell at every
+hop bucket, both subsets and both beams -- it is the TOP of the grid, so the
+optimum lies outside it and **0.8676 is a lower bound rather than a measurement
+of the mechanism's reach.** `CLAUDE.md`'s g4-01 calibration is explicit that this
+is a sweep that has not swept, and `tools/grid.py` exists to catch it.
+
+An edge probe at width 256 was dispatched immediately. **It returned 218.7s
+later and the edge did not close, but it is decelerating.** `delta` at 10 hops,
+subset `all`, beam 8, 8 seeds:
+
+    width      mean     worst    gain over the width below
+       32    0.1943    0.1092
+       64    0.7185    0.6050                       +0.5242
+      128    0.8676    0.8319                       +0.1491
+      256    0.9076    0.8739                       +0.0400
+
+Each doubling buys roughly a quarter of the last one.
+
+**THE 512 PROBE CLOSES IT, and not by being better.** 887.2s, 8 seeds:
+
+    width      mean     worst    gain over the width below
+      256    0.9076    0.8739                       +0.0400
+      512    0.9233    0.8655                       +0.0157
+
+The mean rises by 0.0157 and **the worst seed FALLS**, 0.8739 to 0.8655. The two
+widths are inside each other's seed spread.
+
+**And 512 is no longer uniformly best, which is the part that settles it.** At 5
+hops it gives 0.9468 against 256's 0.9504, and at 6 hops 0.9322 against 0.9439.
+The optimum is INTERIOR in several buckets, so the grid now contains its own
+answer and `CLAUDE.md`'s g4-01 objection is discharged: these are measurements
+rather than floors.
+
+**The reach of this mechanism at 10 hops is about 0.91-0.92**, and width 256 is
+the operating point — 512 costs four times as much for a difference the seeds
+cannot resolve. `g42-01` takes 256 from here, with the cell written next to the
+pin.
+
+**The 4x cost scaling held exactly**: 218.7s at 256 predicts 875s at 512 and it
+came in at 887.2s. Worth recording, because `CLAUDE.md`'s standing calibration is
+that local-to-runner timing multipliers are guessed badly — this one is a
+local-to-local width multiplier and it is clean.
+
+**A THIRD CARRIED CONSTANT WAS PINNED IN THIS RUN AND NOT SWEPT.** `branches = 4`
+comes from `note 065`'s configuration exactly as `width` and `beam width` did.
+Three axes was as much as one grid could hold, and the honest statement is that
+this sweep corrected two of three.
+
+It was found by `tools/check_constants.py`, written LATER THE SAME SESSION and
+pointed at this file, which flagged it immediately. **So the experiment built to
+correct carried constants was itself carrying one, with the rule fresh in mind** —
+which is the strongest available argument that the rule needed to become a check
+rather than a fifth calibration.
+
+**BOTH AIDS ARE STILL IN.** The walk is handed `len(chain)` and *"deltas add"* is
+supplied by hand. Nothing here is a claim about a system that finds its own
+answer's shape. `g42-01` is that question and its predictions are already
+committed.
+
+**The 2-hop and 3-hop buckets are recall, not generalisation**, being the only
+depths present in TRAIN. Nothing in the 4-10 range is undermined by their
+flatness, and nothing about the mechanism should be argued from them.

@@ -136,7 +136,13 @@ from is written here rather than left implicit** -- `CLAUDE.md`'s calibration on
 g9-11 cost 0.58 of recovery to a constant carried from another configuration with
 no note of where it came from.
 
-    width, beam:  (pending g41-01)
+    width  256, from g41-01 at 10 hops, subset `all`, beam 8, 8 seeds --
+           where the width curve flattens. 512 buys 0.0157 of mean, loses on
+           its worst seed, and loses outright at 5 and 6 hops
+    beam     8, from g41-01, best at every width it tried
+    branches 4, CARRIED from note 065 and NOT swept by g41-01 either. Named
+           because it is the one pin of the three that is still unexamined --
+           `tools/check_constants.py` flagged it in g41-01's own source
 
 
 COST

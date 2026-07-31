@@ -63,6 +63,8 @@ jobs:
         run: python tools/check_explainers.py
       - name: No commit message had a word eaten by a shell
         run: python tools/check_commit_messages.py
+      - name: Every pinned number says where it came from
+        run: python tools/check_constants.py
 
   # The harness runs one full suite per mutation, so it is serial time and
   # nothing else. MEASURED on 57d8112, the first full run to complete: 168

@@ -67,6 +67,65 @@ already knows.
 
 Roughly the product, slightly better because a mis-recovered chain can still compose right.
 
+### 0.8578 WAS TAKEN AT AN UNTUNED WIDTH AND THE BEST OF EIGHT SEEDS — `g41-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g41-01-the-pipeline-on-the-published-protocol.txt
+            script  experiments/g41_01_the_pipeline_on_the_published_protocol.py
+            task    CLUTRR gen_train23_test2to10, TEST split, 1,146 puzzles
+            model   LocalAssociativeMemory + search.beam + the delta fold
+            knobs   d_model {32, 64, 128, 256} x beam width {4, 8}
+            scale   8 seeds, per hop bucket, both max_appearances subsets
+
+The pooled figure is reported per hop bucket against the ACHIEVABLE floor, and
+the carried constants are swept. **`d_model` was never varied before this** — it
+arrives from `note 065`'s configuration — and it dominates every mechanism in the
+comparison. At 10 hops, subset `all`, beam 8, the arm runs **0.1943 at width 32
+against 0.9076 at width 256**, a spread of 0.71 where the sweep predicted under
+0.05. Full table in the record; it is quoted nowhere else.
+
+**Seed 0 is the best of eight at the carried width** — 0.7815 against a mean of
+0.7185 and a worst of 0.6050 — and seed 0 is where `note 090`/`091` were taken.
+At width 256 the same bucket reads **0.9076 mean against 0.8739 worst**, so the
+variance was a symptom of running near a capacity cliff rather than a property of
+the mechanism.
+
+**Reporting it honestly made it BETTER, not worse.** The deepest bucket beats the
+pooled 0.8578 once the width may move.
+
+**The grid pinned at its top edge until 512, which closed it.** 512 raises the
+10-hop mean to **0.9233** while its worst seed FALLS to **0.8655**, and it loses
+to 256 at 5 hops (0.9468 against 0.9504) and at 6 (0.9322 against 0.9439) — so
+the optimum is interior and these are measurements rather than lower bounds. The
+reach at 10 hops is about 0.91-0.92 and **256 is the operating point**; 512 costs
+four times as much for a difference the seeds cannot resolve.
+
+**`branches` was NOT swept** and is carried from `note 065` like the other two.
+`tools/check_constants.py` flagged it in `g41-01`'s own source, after the fact.
+
+**AND THE RUN PRICES THE INVARIANT ITSELF**, which is what it bears on hardest.
+At width 256, beam 8, 10 hops, subset `all`, the arms decompose:
+
+    achievable floor (commonest TRAIN answer)          0.0588
+    walk + learned rule table, gaps UNFILLED           0.3613
+    + a random relation in the gap                     0.4632
+    + a LEARNED relation vector (`g23-01`/`g23-02`)    0.6061
+    + the hand-supplied additive invariant             0.9076
+
+**The largest single term is the one supplied by hand.** `note 090` states in its
+own text that *"deltas add"* is a design choice rather than read from data; this
+is what that choice is worth on the deepest bucket, against nothing and against
+the best learned alternative.
+
+**This is the scope question with a number on it.** A domain with no conserved
+quantity does not get the `delta` row — it gets `contrastive`, which is 0.6061
+here against a floor of 0.0588. Real, and not the headline. `note 104` and
+`g23-03` are where the presence of an invariant is measured per graph.
+
+**Both aids remain**: the walk is handed `len(chain)`, and *"deltas add"* is still
+supplied. Nothing here bears on the first. Record:
+[beam-search.md](beam-search.md) for the search half.
+
 ### The hand-coded features were mostly noise, and the one that mattered was the least learnable — `note 089`
 
     CONFIG  when    2026-07-30

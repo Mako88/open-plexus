@@ -1783,6 +1783,21 @@ MUTATIONS = [
         new="    obj = base.facts[0][2]",
     ),
     Mutation(
+        name="the-shorter-walks-never-join-the-ranking",
+        breaks="`any_length` entirely, and it breaks it the way this project's "
+               "worst failures break things -- silently and plausibly. The "
+               "shorter walks are still collected, still scored, still cost "
+               "nothing extra; they simply never reach the ranking, so the "
+               "function returns exactly what the exact-depth version returns "
+               "while reporting itself as depth-free. Every shape assertion "
+               "passes, the read count is unchanged, and g42-01 would read as "
+               "'the walk finds its own end at no cost' when what it measured "
+               "was the walk being told its depth after all",
+        path=SEARCH,
+        old="    walks.extend(finished)",
+        new="    walks.extend([])",
+    ),
+    Mutation(
         name="search-scores-by-confidence-not-by-the-target",
         breaks="the one thing search adds. Scoring a branch by how STRONG its "
                "endpoint is, rather than by whether that endpoint is the "

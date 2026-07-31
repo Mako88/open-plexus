@@ -187,3 +187,23 @@ from zero.
 `width × branches × depth` reads, roughly 4× `search`. Unpruned it is `branches^depth` —
 a million walks at ten hops — so pruning is what makes the option exist at all. `123`
 measured beam 4 at 3.2× on kinship. G4 unanswered.
+
+### BEAM WIDTH 4 IS UNDERTUNED AT DEPTH, and it is a fifth of what `d_model` was worth — `g41-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g41-01-the-pipeline-on-the-published-protocol.txt
+            script  experiments/g41_01_the_pipeline_on_the_published_protocol.py
+            task    CLUTRR gen_train23_test2to10, TEST split, 1,146 puzzles
+            model   LocalAssociativeMemory + search.beam + the delta fold
+            knobs   beam width {4, 8} x d_model {32, 64, 128, 256}
+            scale   8 seeds, per hop bucket, both max_appearances subsets
+
+`search_beam_width=4` arrives from `note 065` and had never been varied. At 10 hops,
+subset `all`, the end task reads **0.8015 at beam 4 against 0.8676 at beam 8**, width
+128 — so the carried value costs real accuracy at depth and nothing at all in the
+shallow buckets.
+
+**It is the smaller of the two carried constants, by about fivefold**, and that is the
+transferable part: `d_model` was swept in the same run and moved the same cell far
+further. Sweeping the knob that looks most likely would have found a real effect and
+missed the one that mattered. Record: [generation-delta.md](generation-delta.md).

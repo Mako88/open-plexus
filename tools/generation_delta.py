@@ -220,6 +220,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT / "data" / "clutrr")
     parser.add_argument("--config", default="gen_train23_test2to10")
+    # note 065's width, carried into every figure this script reproduces.
+    # `g41-01` measured it undertuned: 0.7185 at 10 hops against 0.9076 at
+    # width 256, and seed 0 is the best of eight here.
     parser.add_argument("--width", type=int, default=64)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--end-to-end", action="store_true",

@@ -176,6 +176,53 @@ CENSUS = re.compile(
     r"(\d+) paused", re.IGNORECASE)
 
 
+def rows(text: str) -> list[tuple[str, str, list[str]]]:
+    """`(section, option line, the option's OWN continuation)`, in file order.
+
+    Split out of `main` so the extent rule below can be asserted directly. A
+    whole-tree run cannot check it: it goes green whenever no row happens to
+    need the text it is wrongly reading, which was true on the day the rule was
+    written and is exactly why the defect survived.
+
+    **A row's block is its own bullet and nothing below it** — indented
+    continuation lines up to the first blank or unindented line, which is what
+    markdown means by a bullet. It previously ran on to the next option or
+    section, swallowing blank lines and whole following paragraphs, and the
+    `Shard the count table` row passed on a citation belonging to text
+    underneath it. That row was fixed by hand; this is the class.
+
+    Measured over the tree the day the bound landed: **15 rows had blocks
+    reaching past their own bullet and 0 needed the extra text to pass.** So it
+    changes no verdict today, which is the point — what it prevents is the
+    uncited row added tomorrow directly above a cited one.
+    """
+    out: list[tuple[str, str, list[str]]] = []
+    section: str | None = None
+    current: tuple[str, str, list[str]] | None = None
+    for line in text.split("\n"):
+        component = COMPONENT.match(line) or SUBCOMPONENT.match(line)
+        if component:
+            current = None
+            section = f"{component.group(1)}. {component.group(2)}"
+            continue
+        if line.startswith("## "):
+            current, section = None, None
+            continue
+        if OPTION.match(line):
+            if any(line.startswith(f"- {s}") for s in STATES):
+                current = (section or "(no section)", line.strip(), [])
+                out.append(current)
+            else:
+                current = None
+            continue
+        if current is not None:
+            if line.strip() and line.startswith("  "):
+                current[2].append(line)
+            else:
+                current = None
+    return out
+
+
 def main() -> int:
     text = TREE.read_text(encoding="utf-8")
     lines = text.split("\n")
@@ -188,25 +235,23 @@ def main() -> int:
             f"what it is for. Raising the budget is a decision; make it "
             f"deliberately.")
 
-    # Walk the file once, tracking which section each option belongs to and
-    # collecting the block of lines beneath it. Evidence lives in the sub-bullets,
-    # not on the option line, so an option is judged on its whole block.
+    # `rows` is the ONE parser and owns the extent rule; this pass adds only what
+    # is about a LINE rather than about a row -- the verdict lines and the
+    # unmarked bullets. Two parsers is how one of them stops honouring the bound.
+    option_blocks = rows(text)
     section: str | None = None
     sections_seen: list[str] = []
     verdict_in: set[str] = set()
     counts = {state: 0 for state in STATES}
-    option_blocks: list[tuple[str, str, list[str]]] = []
-    current: tuple[str, str, list[str]] | None = None
 
     for line in lines:
         component = COMPONENT.match(line) or SUBCOMPONENT.match(line)
         if component:
-            current = None
             section = f"{component.group(1)}. {component.group(2)}"
             sections_seen.append(section)
             continue
         if line.startswith("## "):
-            current, section = None, None
+            section = None
             continue
         if "⇒" in line and section is not None:
             verdict_in.add(section)
@@ -219,8 +264,6 @@ def main() -> int:
                     f"{line[:70]}")
             else:
                 counts[marks[0]] += 1
-            current = (section or "(no section)", line.strip(), [])
-            option_blocks.append(current)
             continue
         if option:
             # A top-level bullet with no marker inside a component is an option
@@ -229,10 +272,6 @@ def main() -> int:
                 problems.append(
                     f"bullet in section {section} carries no state marker: "
                     f"{line[:70]}")
-            current = None
-            continue
-        if current is not None:
-            current[2].append(line)
 
     for name, title, body in option_blocks:
         if not (title.startswith(f"- {CHOSEN}") or title.startswith(f"- {REFUTED}")):

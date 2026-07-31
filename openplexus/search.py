@@ -360,7 +360,8 @@ def search(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
 def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
          fact_token: int, start: int, target: np.ndarray, depth: int,
          width: int = 4, branches: int = 4, reader=None,
-         allowed: np.ndarray | None = None, prune_every: int = 1) -> list[Walk]:
+         allowed: np.ndarray | None = None, prune_every: int = 1,
+         any_length: bool = False) -> list[Walk]:
     """Search branching at EVERY step, not only the root.
 
     ## Why this exists, measured
@@ -406,10 +407,32 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     against `search`'s 4 walks of 10 steps. **Roughly four times the reads**, and
     whether that buys anything is the measurement, not an assumption.
 
+    ## `any_length` — treating `depth` as a MAXIMUM, and why it is free
+
+    Off by default, so every result taken before it exists is unchanged.
+
+    With it on, `depth` stops being an exact length and becomes a budget: a walk of
+    ANY length up to it is a candidate, and the final ranking is over all of them by
+    the same endpoint score. **This adds no reads.** The endpoint of a length-k walk
+    is the value at `(current, relations[-1])`, which is exactly what hop k+1 already
+    fetches in order to follow — so the scores come out of a round trip that was
+    happening anyway.
+
+    **It is not a halting signal and does not compete with one.**
+    `LocalMemoryConfig.halt_gate` learns which hop's RETRIEVAL to read inside one
+    read, mixing retrievals. This ranks whole ROUTES against each other and mixes
+    nothing. See `docs/options/halt-gate.md`.
+
+    **What it uses is what the question already gave.** `target` names where the walk
+    is trying to arrive, and the exact-depth version already selects on it — at one
+    hop rather than at every hop. Nothing withheld from the task is consulted.
+
     Args:
         width: Partial walks kept after each prune. `1` is greedy-with-lookahead and
             is the control that isolates pruning from branching.
         branches: Relation candidates tried per step.
+        any_length: Treat `depth` as a maximum rather than an exact length, and rank
+            walks of every length against each other.
 
     Returns:
         Walks sorted best first by endpoint score, same contract as `search`.
@@ -439,6 +462,10 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
     partial = [(start, (r,), (root,), (), float(_decode(wv, root)[r]))
                for r in opening]
 
+    # Walks that ENDED before `depth`, kept only when `depth` is a maximum. Filled
+    # from the follow below rather than by a read of its own.
+    finished: list[Walk] = []
+
     for hop in range(depth - 1):
         # FOLLOW every surviving walk in ONE round. The pairs are all known before
         # any is issued -- a hop's walks do not depend on each other, only on the
@@ -446,6 +473,17 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
         # each. That is note 100's fix and the whole reason `many` exists.
         followed = many([(current, relations[-1])
                          for current, relations, *_ in partial])
+        # THE SAME VALUE IS THIS WALK'S ENDPOINT. `followed[i]` is read at
+        # `(current, relations[-1])`, which is precisely what the tail of this
+        # function reads to score a finished walk -- so a shorter walk is scored out
+        # of a round trip that was already being paid for. Zero extra reads is the
+        # reason `any_length` is not a bandwidth question.
+        if any_length:
+            finished.extend(
+                Walk(relations, entities, retrieved, endpoint,
+                     float(endpoint @ target))
+                for (_, relations, retrieved, entities, _), endpoint
+                in zip(partial, followed))
         landings = [int(np.argmax(_decode(wv, nxt))) for nxt in followed]
         # LOOK UP, in a SECOND round. **This cannot join the follow above**: the
         # entity to look up is what the follow's value decoded to, so a hop costs two
@@ -487,6 +525,10 @@ def beam(readable: np.ndarray, retrieval, keys, wv: np.ndarray,
                   float(endpoint @ target))
              for (_, relations, retrieved, entities, _), endpoint
              in zip(partial, endpoints)]
+    # Shorter walks join the SAME ranking rather than a separate one. Ranking them
+    # apart and preferring one pool would be a length prior, and no measurement here
+    # supports having one.
+    walks.extend(finished)
     walks.sort(key=lambda w: w.score, reverse=True)
     return walks
 

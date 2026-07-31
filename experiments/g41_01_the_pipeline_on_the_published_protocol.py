@@ -89,7 +89,15 @@ CONFIG = "gen_train23_test2to10"
 #: Swept, because `note 065` chose them at one configuration and nothing since
 #: has varied them. `width 64` and `(4, 4)` are the carried values.
 WIDTHS = (32, 64, 128)
+
+#: Swept. `note 065` chose 4 and `tools/clutrr_recovery.py` has carried it since.
 BEAMS = (4, 8)
+
+#: NOT SWEPT, and carried from `note 065`'s configuration exactly as `width` and
+#: `beam width` were. **This is a third pin of the same kind as the two this run
+#: exists to correct**, and saying so is the honest version -- three axes was as
+#: much as one grid could hold. `tools/check_constants.py` is what made it
+#: visible; it was written after this file and flagged it immediately.
 BRANCHES = 4
 
 #: EIGHT, not the usual three. A timing probe at width 64 returned **1.0000**

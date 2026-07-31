@@ -252,6 +252,99 @@ class BranchingAtEVERYStepNotOnlyTheRoot(unittest.TestCase):
                  self.START, self.f.wv[self.GOOD], 2)
 
 
+class TreatingDepthAsAMaximum(unittest.TestCase):
+    """`beam(any_length=True)`, and the two claims it has to earn.
+
+    The mechanism exists because every CLUTRR figure this project has published --
+    note 091's 0.8578 and g41-01's per-bucket version -- hands the walk `len(chain)`,
+    parsed out of the puzzle. Published systems on that benchmark are not given it.
+
+    Two claims, and each has a test that fails when it stops holding:
+
+      - **A shorter walk can WIN.** If the length-1 route is the one that reaches the
+        target, `any_length=True` must return it, and `any_length=False` must not.
+        Without the second half the first passes whenever the flag is disconnected.
+      - **It costs no extra reads.** The docstring says the endpoint of a length-k
+        walk is the value hop k+1 already fetches. If that were wrong, `any_length`
+        would be a bandwidth change wearing the clothes of a free one, and kill-list
+        #11 is measured in reads.
+
+    The store: `START --FIRST--> MID --QUIET--> GOOD`. Asking for MID at depth 2 makes
+    the correct answer a walk SHORTER than the depth, which is the case the exact-depth
+    version cannot express at all.
+    """
+
+    START, MID, GOOD = 1, 2, 3
+    FIRST, QUIET = 11, 12
+
+    def setUp(self):
+        self.f = Fixture()
+        self.f.state_fact(self.START, self.FIRST, self.MID)
+        self.f.state_fact(self.MID, self.QUIET, self.GOOD)
+
+    def run_beam(self, target, depth=2, **kwargs):
+        return beam(self.f.store, self.f.retrieval, self.f.keys, self.f.wv,
+                    FACT, self.START, self.f.wv[target], depth,
+                    width=4, branches=4, **kwargs)
+
+    def test_the_short_walk_wins_when_it_is_the_one_that_arrives(self):
+        walks = self.run_beam(self.MID, any_length=True)
+        self.assertEqual(len(walks[0].relations), 1)
+        self.assertEqual(walks[0].relations, (self.FIRST,))
+
+    def test_and_the_exact_depth_version_cannot_return_it(self):
+        # THE COMPANION. Perturb the input, assert the output moves: with the flag
+        # off, every walk is exactly `depth` long, so the length-1 answer is not
+        # merely unranked -- it does not exist. Without this, the test above passes
+        # whenever `any_length` is disconnected and the short walk wins anyway.
+        walks = self.run_beam(self.MID, any_length=False)
+        self.assertTrue(walks, "the exact-depth beam still returns something")
+        self.assertTrue(all(len(w.relations) == 2 for w in walks),
+                        "no walk shorter than `depth` may appear with the flag off")
+
+    def test_it_is_not_a_preference_for_SHORT_walks(self):
+        # The other companion. A mechanism that always returned the shortest walk
+        # would pass the first test and be worthless, so the case where the LONG
+        # walk is right has to keep working with the flag on.
+        walks = self.run_beam(self.GOOD, any_length=True)
+        self.assertEqual(walks[0].relations, (self.FIRST, self.QUIET))
+
+    def test_it_costs_no_extra_reads(self):
+        """The docstring's bandwidth claim, asserted rather than asserted-in-prose.
+
+        A length-k walk's endpoint is read at `(current, relations[-1])`, which is
+        exactly the pair hop k+1 issues to follow. So turning the flag on must not
+        change the number of reads -- if it ever does, the free-ness claim is wrong
+        and every message-count taken with it is wrong too.
+        """
+        counts = []
+        for flag in (False, True):
+            tally = [0]
+            plain = self.f.retrieval, self.f.keys
+
+            def counting(previous, token, tally=tally, plain=plain):
+                tally[0] += 1
+                retrieval, keys = plain
+                return retrieval.read(self.f.store, keys.pair(previous, token))
+
+            beam(self.f.store, self.f.retrieval, self.f.keys, self.f.wv, FACT,
+                 self.START, self.f.wv[self.MID], 4, width=4, branches=4,
+                 reader=counting, any_length=flag)
+            counts.append(tally[0])
+        self.assertEqual(counts[0], counts[1],
+                         f"any_length changed the read count {counts[0]} -> "
+                         f"{counts[1]}; the endpoint is supposed to come out of "
+                         f"the follow that was happening anyway")
+
+    def test_the_default_is_OFF(self):
+        # New mechanisms default to off, so every result taken before this existed
+        # reproduces without being re-run.
+        default = self.run_beam(self.MID)
+        explicit = self.run_beam(self.MID, any_length=False)
+        self.assertEqual([w.relations for w in default],
+                         [w.relations for w in explicit])
+
+
 class ItRefusesWhatItCannotDo(unittest.TestCase):
 
     def test_single_token_keys_are_refused_rather_than_searched_badly(self):

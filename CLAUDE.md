@@ -228,6 +228,43 @@ individual experiment remains sound.
 > ([note 028](docs/archive/notes/028-the-learning-rate-has-been-frozen-for-seven-sweeps.md)).
 > Two cycles of inventory found what seven sweeps of warnings did not.
 
+> **AND THE RULE IS NOW A CHECK, at John's instruction, 2026-07-31: *"since we've
+> had to learn to look up constants 4 separate times, can you put it somewhere
+> durable and/or testable so it doesn't have to be learned again?"*** This is rule
+> 18's own prescription, and the precedent is `check_commit_messages.py` — four
+> calibrations of one rule is evidence that more care is not available.
+>
+> The fourth calibration is the largest. `d_model` was carried from `note 065` into
+> **every CLUTRR figure this project has published**, and `g41-01` measured the
+> deepest bucket at **0.1943 at width 32 against 0.9076 at 256**. The published
+> 0.8578 also sat on the best of eight seeds — 0.7815 against a worst of 0.6050 —
+> and the seed variance turned out to be a *symptom* of the carried width, because
+> at 256 the spread closes.
+>
+> `tools/check_constants.py` refuses a pinned number that says nothing about where
+> it came from, in `experiments/` and `tools/`, in **both** shapes the failures
+> took: `WIDTH = 256` at module level, and `default=4` inside `add_argument` —
+> which is how `tools/clutrr_recovery.py` carried `note 065`'s beam width, and a
+> checker looking only for `NAME = value` would have missed every one of those.
+>
+> **It cannot tell whether a value is stale**, and says so in its own output. What
+> it can do is refuse a pin nobody asked the question of, and *"slots 4, from g9-10
+> at NODE 32"* cannot be written without going to look. A green run means every pin
+> was asked, not that none is carried.
+>
+> *Calibration on the check itself, which is the part worth keeping.* **502 pins
+> had no provenance the day it was written, and two of them were in files written
+> that same session, with this rule fresh in mind** — `BRANCHES = 4` in `g41-01`,
+> carried from `note 065` exactly like the two constants that sweep existed to
+> correct. So the check found a third carried constant in the experiment built to
+> find carried constants. Six were fixed rather than baselined and 495 are exempt
+> in `tools/constants_baseline.json`, which can only shrink.
+>
+> The negative case is the load-bearing one and has its own test: a help string
+> reading *"how many partial walks the beam keeps"* explains the parameter, says
+> nothing about where `4` came from, and **must still fail**. A check that accepted
+> prose would go green on nearly every argument in the repository.
+
 **A measurement is conditional on the configuration it was taken in. Name the
 condition, and re-validate the comparison set when the condition moves.**
 
@@ -1303,7 +1340,29 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   > not of concatenation being right, and nothing in the result says so. John
   > asked for these to be swappable and documented rather than discovered later.
 
-- **Run all these checks before every commit:**
+- **Run all these checks before every commit — as ONE command:**
+  ```
+  python tools/preflight.py
+  ```
+
+  > *Why an entry point rather than a list.* The list below is nine commands, and
+  > typing them means composing them, which is where an exit code gets lost. A
+  > suite piped through `tail` reports **`tail`'s** status — always 0 — so a red
+  > suite reads exactly like a green one and the `&&` chain after it runs anyway.
+  > That happened on 2026-07-31, one command before a commit, and it is the
+  > **second** instance: the note further down records `mutate.py --verify`
+  > exiting 1 on a lock refusal and looking like 0 for the same reason, also
+  > ending in `| tail`.
+  >
+  > `set -o pipefail` fixes it and must be remembered every time. `preflight.py`
+  > pipes nothing, checks every code, and keeps going after a failure so one run
+  > reports everything wrong. It reimplements no checker — each is a subprocess,
+  > so there is still one implementation of every rule.
+  >
+  > **CI is still the authority** and runs the full mutation harness sharded six
+  > ways, which is 45-80 minutes and deliberately not local.
+
+  It runs these, in this order:
   ```
   python tools/mutate.py --verify
   python -m unittest discover -s tests -t . -q
@@ -1314,6 +1373,8 @@ ruler stays dependency-free. The consumer-device runtime remains undecided.
   python tools/check_options.py
   python tools/check_provenance.py
   python tools/check_explainers.py
+  python tools/check_commit_messages.py
+  python tools/check_constants.py
   ```
 
   > *Measured, and correcting a figure this document carried.* The comment in

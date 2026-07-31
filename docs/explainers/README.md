@@ -72,6 +72,7 @@ explainer, and saying so is the most useful thing you can do.
 | [044](044-the-number-was-right-and-the-pointer-was-wrong.md) | Every number was right. The pointer was wrong. |
 | [045](045-worse-than-guessing.md) | Our own learning rule scored below guessing. |
 | [046](046-guessing-better-than-chance.md) | It learned to guess, and the guess beat chance. |
+| [047](047-the-setting-nobody-had-ever-changed.md) | A value copied from an old experiment was worth more than every mechanism it was comparing. |
 
 > **Two numbering series, and both are real.** `01`–`31` came first; `028` onward
 > started when the explainers were renumbered to track the notes and the two were

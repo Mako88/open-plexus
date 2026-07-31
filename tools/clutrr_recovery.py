@@ -161,9 +161,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT / "data" / "clutrr")
     parser.add_argument("--split", default="test")
+    # note 065's width, carried. `g41-01` measured it UNDERTUNED at depth on
+    # CLUTRR -- 0.7185 at 10 hops against 0.9076 at width 256.
     parser.add_argument("--width", type=int, default=64)
     parser.add_argument("--decay", type=float, default=1.0)
+    # note 065's branches, carried, and never swept by anything since.
     parser.add_argument("--branches", type=int, default=4)
+    # note 065's beam width, carried. `g41-01`: 0.8015 against 0.8676 at
+    # beam 8, CLUTRR 10 hops, so this default costs accuracy at depth.
     parser.add_argument("--beam-width", type=int, default=4)
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2])
     parser.add_argument("--concept-nodes", type=int, default=0,

@@ -1,0 +1,127 @@
+How many occasions does a concept need?
+=======================================
+
+Script: experiments/g32_02_how_many_occasions_does_a_concept_need.py
+Status: PREDICTIONS COMMITTED, NOT YET RUN.
+
+
+IN PLAIN TERMS
+--------------
+g32-01 asked whether a machine can learn that a picture and a word mean the same
+thing by noticing they turn up together. It can — as long as it asks "did these
+two meet MORE OFTEN than you would expect by chance" rather than just "how often
+did these two meet".
+
+But it also found something nobody was looking for. When some things in the
+world are far commoner than others — which is true of every real world; a few
+words are used constantly and most are rare — the whole thing got much worse, for
+every method, whether or not the distractor was there.
+
+There are two completely different reasons that could happen, and g32-01 cannot
+tell them apart:
+
+  1. The rare things simply were not seen enough times. Nothing can learn a thing
+     it met once. That is dull, and it converts to a number: how many times is
+     enough.
+
+  2. The common things are actively drowning out the rare ones — crowding into
+     everyone's list of likely partners. That is a real problem with the design
+     and it would not go away by running longer.
+
+This tells them apart by scoring each concept separately and asking how many
+times that particular concept came up. If a rare concept in a lopsided world does
+just as well as an equally-rare concept in an even world, it is reason 1 and we
+learn a threshold. If it does worse, it is reason 2.
+
+Reason 2 would be the more serious finding, because the world this system is
+meant to run on is lopsided and cannot be made even.
+
+
+WHAT IS BEING MEASURED
+----------------------
+f1 per CONCEPT, against the number of occasions that concept was the subject of.
+
+Two arms only — `count` and `ppmi` — because g32-01 established that `ppmi` and
+`conditional` impose the same order on every above-chance pair and differ only in
+what they refuse, so running both again would re-measure one thing twice.
+
+**The floor is 0.5, not 0.** A three-surface concept recovered entirely alone
+scores precision 1.0 and recall 1/3, which is f1 0.5. Every number below is read
+against that, which is the correction g32-01's P5 forced.
+
+No distractor in any cell. g32-01 settled that normalisation removes it entirely,
+so carrying it here would only add a term already understood.
+
+
+MEASURED ON
+-----------
+Local, single process, Python 3.14, no numpy.
+
+    concepts       64      CARRIED FROM g32-01, and at g32-01's own concept
+                           count, so the pin sits in the configuration it was
+                           chosen for rather than transplanted into a new one
+    surfaces        3      carried from g32-01
+    presence      0.7      carried from g32-01
+    noise           3      carried from g32-01
+    k               2      carried from g32-01, = surfaces - 1
+    distractors     0      removed deliberately; see above
+    seeds     0, 1, 2
+
+Swept: stream length in {256, 512, 1024, 2000, 4000, 8000, 16000} at zipf 0.0 —
+about 4 to 250 occasions per concept — and zipf in {1.0, 2.0} at 8,000.
+
+**The bottom of the range is deliberate.** CLAUDE.md requires probing the bottom
+and confirming the arm is still moving there, because a grid that starts above
+saturation guarantees a flat line; g11-05 lost fifteen jobs to exactly that. Four
+occasions per concept is far below anything that can work, so if the curve is
+flat at the bottom the grid is wrong rather than the answer.
+
+
+PREDICTIONS
+-----------
+P1  The uniform curve RISES with occasions per concept and is still rising
+    somewhere inside the grid — it is neither flat nor saturated at both ends.
+    REFUTED IF f1 is flat across all seven lengths, which would mean the grid
+    does not contain the phenomenon and no threshold can be read from it.
+
+P2  THE ONE THE PROBE EXISTS FOR. Concepts from the SKEWED streams score within
+    0.10 of uniform concepts seen a comparable number of times, at every bucket
+    where both have concepts.
+    REFUTED IF skewed concepts score materially below matched uniform ones. That
+    refutation is the serious outcome: it would mean a common concept degrades a
+    rare one directly, running longer does not fix it, and a Zipfian world — the
+    only kind there is — is a standing problem for this mechanism rather than a
+    sampling inconvenience.
+
+P3  `ppmi` needs FEWER occasions than `count` to reach any given f1. Chance
+    correction is a variance reduction as well as a bias correction, so it should
+    buy sample efficiency and not only distractor resistance.
+    REFUTED IF the two curves coincide, which would say normalisation helps only
+    against a persistent distractor and nothing else.
+
+P4  Concepts seen fewer than about 8 times sit at or near the 0.5 floor for both
+    arms. A concept met a handful of times cannot be distinguished from noise by
+    any statistic over counts.
+    REFUTED IF recovery is appreciable below 8 occasions, which would mean the
+    mechanism is far more sample-efficient than expected and the Zipfian tail is
+    reachable after all.
+
+
+COST
+----
+Estimated before the run: g32-01 was 12.7s for 36 streams of up to 8,000
+occasions. This is 2 arms x (7 lengths + 2 skews) x 3 seeds = 54 streams, plus a
+pooled re-run of the uniform set per arm, so about 96 streams, and the longest is
+16,000 occasions. Estimate **under two minutes**, same order as g32-01. Local.
+
+Recorded after the run: PENDING.
+
+
+RESULTS
+-------
+PENDING.
+
+
+SCORECARD
+---------
+PENDING.

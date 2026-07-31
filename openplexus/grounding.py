@@ -264,6 +264,29 @@ def equivalence_classes(index: CoOccurrence, statistic: Statistic,
     return classes
 
 
+def class_f1(found: frozenset[int], correct: frozenset[int]) -> float:
+    """How well one recovered class matches the true one.
+
+    F1 rather than recall, so a class that is right but too large is penalised
+    as heavily as one that is too small — otherwise a mechanism wins by
+    answering *everything*.
+
+    **The floor this implies is 0.5, not 0, and it is not obvious.** A surface
+    recovered entirely alone is perfectly precise and a third recalled against a
+    three-surface concept, which scores exactly 0.5. So *recovered nothing* and
+    *recovered half of everything* are not far apart on this scale, and a score
+    is only interpretable against the singleton floor for the concept size in
+    play. `g32-01` predicted a shuffled control near zero and it came in at 0.32
+    to 0.51, which is that floor plus the harm of grouping wrongly.
+    """
+    overlap = len(found & correct)
+    if not overlap:
+        return 0.0
+    precision = overlap / len(found)
+    recall = overlap / len(correct)
+    return 2 * precision * recall / (precision + recall)
+
+
 def score_classes(recovered: dict[int, frozenset[int]],
                   truth: dict[int, frozenset[int]],
                   distractors: Iterable[int] = ()) -> dict[str, float]:
@@ -305,12 +328,7 @@ def score_classes(recovered: dict[int, frozenset[int]],
     total, captured = 0.0, 0
     for surface in scored:
         found = recovered.get(surface, frozenset({surface}))
-        correct = truth[surface]
-        overlap = len(found & correct)
-        if overlap:
-            precision = overlap / len(found)
-            recall = overlap / len(correct)
-            total += 2 * precision * recall / (precision + recall)
+        total += class_f1(found, truth[surface])
         if found & marked:
             captured += 1
 

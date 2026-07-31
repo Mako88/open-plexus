@@ -125,7 +125,8 @@ Estimated before the run: under two minutes, single process. 36 streams of 8,000
 occasions, each occasion about six surfaces, so roughly 5 million pair updates
 in total plus four rankings over 193 surfaces per stream.
 
-Recorded after the run: PENDING.
+Recorded after the run: **12.7s wall**, one process, 36 streams. The estimate of
+"under two minutes" was right in kind and 9x conservative. Local was correct.
 
 **Costed rather than assumed, because "it is only counting" is how a control ends
 up holding the machine for ten minutes** — CLAUDE.md's calibration on
@@ -135,9 +136,131 @@ belongs in Actions and the estimate is the thing that was wrong.
 
 RESULTS
 -------
-PENDING.
+Status: RUN, local, 2026-07-31, 12.7s. Predictions committed at `9f0abd8` before
+the script was executed.
+
+ANSWER: **raw counting is refuted and normalising fixes it completely — but the
+distractor was never the hard part. Frequency skew is, it costs every arm about
+four times what the distractor costs counting, and it was registered nowhere.**
+
+  f1, mean of 3 seeds. READ AGAINST 0.5, NOT AGAINST 0 -- see P5.
+
+    real stream          count   weighted   conditional   ppmi
+    zipf 0.0, no distr  1.0000     1.0000        1.0000  1.0000
+    zipf 0.0, 1 distr   0.6956     1.0000        1.0000  1.0000
+    zipf 1.0, no distr  0.8073     0.9969        1.0000  1.0000
+    zipf 1.0, 1 distr   0.6163     0.8969        1.0000  1.0000
+    zipf 2.0, no distr  0.5437     0.6208        0.6120  0.6120
+    zipf 2.0, 1 distr   0.5212     0.5948        0.6120  0.6120
+
+    shuffled control    0.3668 to 0.5078 for count, 0.3189 to 0.3655 for ppmi
+
+  captured, the registered falsifier's own metric, real stream with 1 distractor
+
+    zipf 0.0            0.0174     0.0000        0.0000  0.0000
+    zipf 1.0            0.0104     0.0000        0.0000  0.0000
+    zipf 2.0            0.0156     0.0000        0.0000  0.0000
 
 
 SCORECARD
 ---------
-PENDING.
+  P1  HELD. Easy world, all four arms at 1.0000. The instrument is solvable and
+            every other number is readable.
+
+  P2  HELD, and it is the falsifier answered. One distractor costs `count`
+            0.3044 of f1 at zipf 0.0 (1.0000 -> 0.6956), just over the predicted
+            0.30, and costs `ppmi` exactly 0.0000, under the predicted 0.05.
+            **Mutuality alone is NOT a sufficient defence. Normalisation is, and
+            all three normalised arms are perfect.**
+
+  P3  REFUTED, and the refutation is arithmetic I should have done first.
+            `ppmi` and `conditional` are IDENTICAL to four decimals in every one
+            of the twelve real cells, so the prediction that one falls faster
+            than the other could not have been true.
+
+            For a fixed surface, `c_x` and `N` are constants, so PPMI's
+            `log(c_xy*N/(c_x*c_y))` is monotone in `c_xy/c_y` -- which is
+            `conditional`. **The two impose the same order on every pair that
+            occurs more often than chance and differ only in that PPMI REFUSES
+            the rest.** Verified directly: 0 of 40 above-chance rankings differ
+            on a random index, 40 of 40 full rankings do.
+
+            With k=2 and true partners far above chance, the difference never
+            reaches the top of any list, so the arms produced the same classes
+            everywhere. **Two of the four arms were one experiment**, which is
+            rule 10's shape arriving inside a grid rather than inside a test: an
+            outcome guaranteed by construction is not evidence however it comes
+            out. A grid that probed BELOW chance -- small k, weak partners --
+            would separate them, and nothing here does.
+
+  P4  SPLIT, and honestly it is mostly refuted. `weighted` was predicted to sit
+            between `count` and `ppmi` at zipf 0.0: it does not, it EQUALS `ppmi`
+            at 1.0000, because that cell is saturated and cannot separate
+            anything. The over-correction clause held: at zipf 1.0 it is between
+            (0.8969 against 0.6163 and 1.0000) and at zipf 2.0 it falls BELOW
+            `ppmi` (0.5948 against 0.6120) while staying above `count`. So note
+            045's Shakespeare observation reproduces in direction on a designed
+            stream, at a much smaller magnitude than the anecdote suggested.
+
+  P5  REFUTED, AND IT IS THE MOST IMPORTANT LINE IN THIS FILE. The shuffled
+            control does not score near zero. It scores 0.3189 to 0.5078.
+
+            **The metric has a floor of exactly 0.5 and it is not a floor of
+            zero.** A recovery that groups NOTHING -- every surface alone --
+            scores precision 1.0 and recall 1/3 against a three-surface concept,
+            which is f1 0.5. Confirmed directly rather than derived.
+
+            So the reference points are:
+
+                1.0000   perfect
+                0.5000   recovered nothing at all, every surface alone
+                ~0.35    the shuffled control, which is WORSE than nothing
+                         because it groups surfaces that do not belong together
+
+            **Every f1 in this file must be read against 0.5.** The zipf 2.0 row
+            at 0.6120 is not "a moderate score", it is a fifth of the way from
+            recovering nothing to recovering everything. Anything published off
+            this metric without the floor stated would be badly overread, and
+            the prediction was wrong about the instrument rather than the data.
+
+  P6  HELD at every cell, and by one to two orders of magnitude. Where `count`
+            loses to `ppmi`, the f1 gap is 0.3044 / 0.3837 / 0.0908 against
+            `captured` gaps of 0.0174 / 0.0104 / 0.0156 -- a factor of 17x, 37x
+            and 6x. **The registered falsifier's own metric would have reported
+            the distractor as a rounding error while it was destroying a third
+            of the recovery.** Mutuality caps the distractor's degree at k, so it
+            almost never JOINS a class; what it does is DISPLACE, taking the top
+            slot a true partner needed. Counting the joins measures the wrong
+            thing.
+
+
+WHAT THIS ACTUALLY SETTLES, AND WHAT IT MOVES TO
+-------------------------------------------------
+**The registered falsifier is answered and the answer is not the interesting
+one.** Counting fails -- as both option records predicted -- and the failure is
+completely repaired by dividing by the neighbour's own frequency. That repair is
+reachable under amended C1: `c_xy` and `c_x` are already at `owner(x)`, and
+`c_y` is one bounded message to one named peer, which the constraint permits
+where a collective does not. So the design survives its own falsifier at the
+cost of one hop, and **intervention is not required to separate a persistent
+distractor.** The hypothesis that it might be is not supported by this run and is
+not refuted either -- it was never tested here.
+
+**What the run found instead was not registered anywhere.** At zipf 2.0 every
+arm collapses to ~0.61 against a 0.5 floor, distractor or no distractor. Skew
+costs about 0.39 where the distractor costs counting 0.30 and costs the
+normalised arms nothing at all. That is the larger effect and the one nobody
+predicted.
+
+**And it has an obvious candidate explanation that this grid cannot separate.**
+At zipf 2.0 over 64 concepts the weights are `1/i^2`, so the commonest concept
+takes about 61% of 8,000 occasions and the rarest takes about one. A concept
+seen once cannot be recovered by any statistic. **So the zipf axis may be
+measuring stream length per concept rather than skew at all**, and the two are
+confounded in every cell here.
+
+That is the next question and it is a better one: **how many occasions does a
+concept need before it can be recovered?** It replaces a confounded axis with a
+number, it is minutes to run, and it bears directly on whether this mechanism
+can work on a Zipfian world -- which every real one is, and where the tail never
+gets its occasions.

@@ -262,7 +262,16 @@ only ever presented alongside one other pair, so a word co-occurs with two objec
 on identically the same trials and `conditional` returns exactly **1.0** for both.
 Tripling the trials — 18, 36, 54 — returns the same 0.5833, so **the information
 is absent rather than scarce**, and no function of co-occurrence counts can reach
-it. What would is *mutual exclusivity*, which this project has no version of.
+it.
+
+**And nothing else does either**, which corrects this entry's first version. The
+four surfaces are a closed, fully symmetric clique — every pairwise `conditional`
+inside it is exactly **1.000** and nothing outside it ever appears with any of
+them — so two assignments are consistent with every observation and a
+one-word-one-object constraint keeps both. *Mutual exclusivity* was named here as
+the missing ingredient and it is not one: it halves a hypothesis space of two to
+a hypothesis space of two. The condition is a designed control proving
+co-occurrence has a ceiling, and **it motivates building nothing.**
 
 **Raw counting survives the frequency variation an experimenter actually uses.**
 Every `freq369` condition — pairs shown 3, 6 and 9 times — scores 1.0000 under

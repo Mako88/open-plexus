@@ -110,6 +110,34 @@ discarding a good idea on an invalid measurement.
 a record whose sources moved keeps resolving. **A person has to remember; the
 checker does not.**
 
+**A DIAGNOSIS IS A CLAIM ABOUT BEHAVIOUR AND NEEDS THE SAME EVIDENCE.** *"It
+failed because X, so build Y"* is two unobserved claims wearing the clothes of an
+explanation, and it does not feel like a claim — which is why it gets past. Before
+proposing a mechanism to repair a measured failure, **check the failure is
+repairable at all.**
+
+> *Calibration, and it is the THIRD instance in one day, which is what promotes
+> it from an entry to a rule.* `g34-01` found three published conditions the
+> mechanism cannot solve, and the write-up said the missing ingredient was
+> *mutual exclusivity* — one word names one object — naming it a well-attested
+> result this project lacks. It was reported to John in those terms.
+>
+> **One probe refuted it.** The four surfaces are a closed, fully symmetric
+> clique: every pairwise score inside is exactly 1.000 and nothing outside ever
+> appears with any of them. Two assignments fit every observation, and a
+> one-word-one-object constraint **keeps both** — it halves a hypothesis space of
+> two into a hypothesis space of two. Nothing recovers it, because the
+> distinguishing information was never presented.
+>
+> The other two that day were the same shape at shorter range: a repository named
+> from its README rather than its files, and a CSV's coverage reported from its
+> header and first three rows. **All three were assertions standing where a
+> cheap check was available**, and in each the check cost under a minute.
+>
+> The tell is grammatical: *"what would fix it is ..."*, written before anything
+> was run. **It is the most expensive thing on this list**, because a false
+> diagnosis does not merely go in the record — it becomes the next thing built.
+
 **2. Observe the quantity the change claims to move, not a downstream proxy.**
 A green end-to-end run cannot tell you which of six components is working. When
 you change a specific thing, measure that thing directly — then treat the

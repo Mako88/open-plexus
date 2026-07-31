@@ -214,11 +214,28 @@ not scarce.
 
 **So this is a structural limit found on somebody else's data at the first
 attempt**, and it is not a defect in the statistic — no function of co-occurrence
-counts can separate two things that co-occur identically. What separates them is
-a constraint the mechanism does not have: **one word names one object**, so
-committing word-7 to object-7 should remove object-7 from word-1's candidates.
-That is *mutual exclusivity*, it is one of the best-attested findings in child
-word learning, and this project has no version of it.
+counts can separate two things that co-occur identically.
+
+> **CORRECTED, an hour after this section was first written.** It said the
+> missing ingredient was *mutual exclusivity* — one word names one object, so
+> committing word-7 to object-7 should remove object-7 from word-1's candidates.
+> **That is wrong, and checking it took one probe.**
+>
+> The four surfaces `{word1, obj1, word7, obj7}` are a **closed, fully symmetric
+> clique**: every pairwise `conditional` inside it is exactly 1.000, and nothing
+> outside it ever appears with any of them. There are two assignments consistent
+> with every observation ever made — `w1→o1, w7→o7` and `w1→o7, w7→o1` — and a
+> one-word-one-object constraint **keeps both**. It halves the hypothesis space
+> from two to two.
+>
+> **Nothing recovers this.** Not this mechanism, not mutual exclusivity, not a
+> perfect Bayesian learner: the information distinguishing the two assignments
+> was never presented. The condition is a designed control that proves
+> co-occurrence has a ceiling, and the humans who score near chance on this
+> family are up against the same wall rather than a different one.
+>
+> **So it does not motivate building anything**, which is the part that matters:
+> the first version of this paragraph made it read as a to-do list.
 
 **And the ladder is the experimenters', not ours.** `filt0E` withholds
 disambiguating exposure and the mechanism scores 0.5833; `filt3E` through

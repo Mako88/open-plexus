@@ -1,0 +1,142 @@
+Is the grounding result a plateau, or a snapshot of a curve still moving?
+=========================================================================
+
+Script: experiments/g39_01_what_does_the_learning_curve_look_like.py
+Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+
+
+IN PLAIN TERMS
+--------------
+Everything this project has measured about grounding was scored **once, at the
+end**. Pour in three thousand moments, then ask how well it did.
+
+That is the wrong shape for what this is supposed to be, and the project's own
+goals document says so plainly: there is no training phase and no operating
+phase. There is one stream of experience and the thing learns from it forever.
+Splitting it into "learn" and then "test" measures a system that stops, which is
+exactly what this design forbids.
+
+So this changes the measurement rather than the mechanism. **The mechanism was
+already continuous** — it updates as each moment arrives and nothing about it
+ever stops. What was batch-shaped was us, asking only at the end.
+
+Now it gets asked all the way along. Every result becomes a curve instead of a
+dot.
+
+**And that answers a question nobody has asked out loud.** We report that it
+identifies the right pictures 97% of the time. Is that where it *settles*, or
+just where it happened to be when we ran out of data? Those mean very different
+things. If the curve is still climbing at the end, then every number we have is a
+floor being quoted as a result — and this project has made close to that mistake
+before, running an entire sweep in a range where nothing was moving any more.
+
+The other thing it shows is how *fast* it learns. If a concept is solid after
+twenty examples, that is a completely different kind of system from one that
+needs three thousand. Nobody here knows which it is.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    link         of the top-`k` image codes a word reaches, the share whose
+                 majority digit is that word's, computed from the table AS IT
+                 STANDS at that point in the stream
+    covered      how many of the codes it SHOULD find it had a chance to score.
+                 **`link` is not readable without it** -- `g38-03` reported
+                 1.0000 over 8% coverage as though it were the best cell
+    partition    the incumbent `equivalence_classes`, scored at the same points,
+                 so the two mechanisms have the same curve and not just the
+                 same endpoint
+    distractor   share of words admitting the ever-present distractor
+    surfaces     how many surfaces exist at all yet. **The rail**: early rows
+                 score a world that has not finished arriving
+
+**There is no held-out set and nothing is replayed.** The ground truth is the
+quantiser's own majority label, which is not part of the mechanism at any point.
+That is what makes this prequential rather than a train/test curve renamed.
+
+**Checkpoints are geometric, not even** — 25, 50, 100, 200, 400, 800, 1500,
+3000. A learning curve should move most at the start, and an even grid spends its
+resolution where nothing is happening. That is `g11-05`'s failure seen from the
+other end: five points, fifteen jobs, every one past saturation.
+
+
+MEASURED ON
+-----------
+Local, one process. Streams built INLINE rather than by `g36_04._stream`, because
+that function observes the whole stream before returning — which is exactly the
+batch shape this run exists to stop doing. The occasion CONTENTS are identical.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions    3,000   one pass, scored at 8 points
+    codes           50   pinned from g36-04
+    noise            2   imported from g36_04, so it cannot drift
+    distractors      1   present EVERY occasion
+    beam            16   `g38-03`'s operating point
+    depth            1   `g38-03` found deeper is worse and dearer
+    combiner      mean   `g38-01`'s winner
+    seeds      0, 1, 2
+
+Arms: `together` and `alternating`.
+
+**The quantiser is fitted on all 4,000 images before the stream starts**, and
+that is a real inconsistency with the prequential claim. It is left in and named
+rather than fixed, because fixing it means an online quantiser, which does not
+exist. **So this is prequential in the LINKING and batch in the PERCEPTION**, and
+no row should be read as though the whole system were online.
+
+
+PREDICTIONS
+-----------
+P1  IT LEARNS FAST AND THEN STOPS. `link` reaches 90% of its final value by 800
+    occasions — 80 per digit — and moves by less than 0.05 between 1500 and 3000.
+    REFUTED IF it is still climbing by more than 0.05 over the last doubling.
+    **That is the outcome that matters most**: it would mean every grounding
+    figure in this project is a lower bound reported as a value, and the stream
+    length becomes a variable that has been silently held constant across g32
+    through g38.
+
+P2  COVERAGE ARRIVES LATER THAN PRECISION. `covered` reaches its plateau after
+    `link` does, because being right about the few codes seen early is easier
+    than having seen all of them.
+    REFUTED IF coverage saturates first, which would mean the mechanism finds
+    everything immediately and spends the rest of the stream sorting it.
+
+P3  THE WALK BEATS THE PARTITION AT EVERY POINT, not just at the end. `link`
+    exceeds `partition` at all eight checkpoints in `together`.
+    REFUTED IF the partition leads early and loses later. That would mean the
+    hard cut is the better rule when evidence is thin and the advantage measured
+    in `g38-01` is a large-data effect — which would change when to use which,
+    rather than which to use.
+
+P4  THE DISTRACTOR IS ADMITTED FROM THE VERY FIRST CHECKPOINT. `distractor` is
+    1.0000 at 25 occasions and never falls.
+    REFUTED IF it starts low and rises, or starts high and falls. Either would
+    mean the failure is a function of how much has been seen, and therefore
+    something experience could fix — which four axes have so far failed to.
+
+P5  **THE RAIL.** `surfaces` is well below its final value at 25 occasions, so
+    the earliest rows describe a world still arriving and must not be read as
+    performance.
+    REFUTED IF `surfaces` is already complete at 25, which would mean the early
+    checkpoints are measuring a fully-populated world and the curve is purely
+    about evidence rather than about coverage of the world.
+
+
+COST
+----
+Estimated from `g38-03`'s measured 7.2s for 15 scoring cells: this scores 8
+checkpoints x 2 arms x 3 seeds = 48 cells, plus `equivalence_classes` at each,
+which is the dearer of the two. **30 to 120 seconds**, local.
+
+Recorded after the run: TO BE FILLED.
+
+
+RESULTS
+-------
+TO BE FILLED.
+
+
+SCORECARD
+---------
+TO BE FILLED.

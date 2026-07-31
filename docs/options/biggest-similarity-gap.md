@@ -278,3 +278,50 @@ partition has mean class size as a collapse alarm. A ranking cannot collapse,
 which sounds like an improvement and means a recall-shaped metric will read well
 here for reasons unrelated to the mechanism working. New scorers need their own
 floor.
+
+### The walk WINS the link and LOSES the distractor — `g38-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g38-01-does-the-weighted-walk-beat-the-partition.txt
+            script  experiments/g38_01_does_the_weighted_walk_beat_the_partition.py
+            task    MNIST + FSDD + 10 words, 3,000 occasions, 1 distractor
+                    present every occasion
+            model   `grounding.reach`, conditional, beam 8, depth 2
+            knobs   combiner min/geometric/mean/max; arms together/alternating;
+                    50 codes pinned from g36-04; 3 seeds
+            scale   link@k against a shuffled floor at chance 0.1000
+
+**The first measurement of bounding the SEARCH instead of the REPRESENTATION.**
+
+`mean` scores **0.9589** on the cell where the bound failed, against the
+incumbent's **0.6667** — and **0.9829** against **0.9220** on the cell where it
+had not. It wins both, and no stored count changed: the word was never missing,
+only past a bound that keeps two partners while it sat at rank 6.70.
+
+**It is not adoptable, because `mean` admits the ever-present distractor for
+every word — 1.0000 against the incumbent's 0.0000.** That is `g32-01`'s
+falsifier firing on the new mechanism, and trading it back would undo a measured
+result to buy an unmeasured one.
+
+**`min` reaches nothing at all** (`reached` 0.00). Its weaker direction for a
+true partner is about 0.07 while the distractor's is about 0.28, so the top of
+every list is distractor and noise. The doubt registered at `strength`'s
+definition was right; the magnitude attached to it was a guess and was wrong by
+an order of magnitude.
+
+**`max`'s clean distractor column is an ARTEFACT of tie-breaking**, not a
+property: everything saturates near 1.0 and ties break by ascending surface id,
+which image codes win by holding lower numbers. The tell is `link@k` at
+**0.1000**, exactly chance and exactly the shuffled floor.
+
+**THIRD DIAL OF THIS SHAPE.** `damped`'s exponent had the word at one end and the
+distractor at the other with nothing between (`g36-06`); the combiner repeats it
+exactly. Three scalar knobs, three two-ended failures — **evidence the conflict
+is structural rather than untuned, and the next proposal should not be a fourth
+knob.**
+
+**Where the arithmetic points.** The distractor's damage enters through its
+backward direction being exactly 1.0, which no combiner can weigh away because it
+is TRUE. It is a property of the surface, so a rule reading a surface's own
+BREADTH — how many different things it is present with — would refuse it without
+consulting any edge. Untried, and not a knob.

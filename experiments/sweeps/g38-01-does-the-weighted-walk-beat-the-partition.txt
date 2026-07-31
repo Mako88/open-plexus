@@ -2,7 +2,22 @@ Does bounding the SEARCH beat bounding the REPRESENTATION?
 ===========================================================
 
 Script: experiments/g38_01_does_the_weighted_walk_beat_the_partition.py
-Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+Status: RUN, local, 2026-07-31, 32.8s. Predictions committed at `da9d8c9`
+        before the script was executed.
+
+ANSWER: **Bounding the search beats bounding the representation, by the largest
+        margin measured on this line — and it costs the distractor.** On the
+        cell where the bound failed, `mean` scores **0.9589** against the
+        incumbent's **0.6667**, and on the good cell **0.9829** against
+        **0.9220**. So it is not a trade between cells; it wins both.
+
+        **But `mean` admits the ever-present distractor for every word —
+        `distractor` 1.0000 against the incumbent's 0.0000.** That is `g32-01`'s
+        falsifier firing on the new mechanism. **No arm does both**, which is
+        the third dial in this line with its two failures at opposite ends.
+
+        Three of five predictions refuted, and `max` was refuted in the
+        direction that looked like good news until it was checked.
 
 
 IN PLAIN TERMS
@@ -142,14 +157,154 @@ Estimated from `g36-06`'s measured 25.5s for 10 cells at this code count. This i
 scores every partner of each — heavier per cell than a single walk. `classes`
 and `shuffled` are cheap. **60 to 240 seconds**, local.
 
-Recorded after the run: TO BE FILLED.
+Recorded after the run: **32.8s**, against an estimate of 60 to 240 seconds.
+Below the range this time — the beam expands far fewer nodes than `beam**depth`
+in practice, because most surfaces have few partners with a non-zero score.
 
 
 RESULTS
 -------
-TO BE FILLED.
+arm          method        link@k    link  reached  distractor
+together     classes       0.6667  0.6667     0.27      0.0000
+together     min           0.0000  0.0000     0.00      1.0000
+together     geometric     0.6667  0.3691     5.00      1.0000
+together     mean          0.9589  0.9046     4.87      1.0000
+together     max           0.1000  0.3790     5.00      0.0000
+together     shuffled      0.1000  0.1000     5.00      0.0333
+
+alternating  classes       0.9220  0.8476     4.17      0.0000
+alternating  min           0.0000  0.0000     0.00      1.0000
+alternating  geometric     0.1737  0.1478     4.17      1.0000
+alternating  mean          0.9829  0.9754     3.90      1.0000
+alternating  max           0.1000  0.3509     5.00      0.0000
+alternating  shuffled      0.1067  0.1000     5.00      0.0333
+
+    chance for both link columns: 0.1000
+
+**`min`'s 0.0000 means NOTHING WAS REACHED, not that everything reached was
+wrong.** `reached` is 0.00 — the denominator is empty. The two are different
+answers and the companion column is the only thing separating them.
+
+**And `classes` on `together` has `reached` = 0.27**, so its 0.6667 is computed
+over about one image code per four words. That is `g36-05`'s eviction visible
+from the other side: the incumbent is not scoring badly, it is scoring almost
+nothing.
 
 
 SCORECARD
 ---------
-TO BE FILLED.
+  P1  **HELD, and it is the largest improvement measured on this line.** On
+            `together`, `mean` scores **0.9589** on `link@k` against `classes`'s
+            **0.6667** — a gain of 0.29, against a predicted bar of 0.05.
+
+            **The word was never missing, only out of reach.** `g36-05` put it at
+            rank 6.70 under a bound that keeps two partners. A search allowed to
+            look eight deep finds it, and the stored table did not change by one
+            count.
+
+  P2  **REFUTED AS WRITTEN, AND THE DOUBT IT ENCODED WAS RIGHT.** The prediction
+            was that `min` would land within 0.05 of `classes`. It lands
+            **0.6667 below it**, reaching nothing at all.
+
+            The arithmetic is the entry. For a word `w` and image code `c`,
+            `min` takes `conditional(c, w)` — small, because `w` is common — at
+            roughly 0.07. For the distractor `d`, it takes `conditional(w, d)` at
+            roughly 0.28, because `d`'s own count is spread across every
+            occasion rather than concentrated. **So the distractor's weaker
+            direction is still stronger than a true partner's**, and the top of
+            every word's list is distractor and noise words.
+
+            The registered refutation clause — *"REFUTED IF `min` clearly beats
+            `classes`"* — did not fire. So the direction was right and the
+            magnitude was wrong by an order of magnitude, and the honest reading
+            is that the doubt recorded at `strength`'s definition was correct
+            while the number attached to it was a guess.
+
+  P3  **REFUTED, and it looked like good news until it was checked.** `max` was
+            predicted to readmit the distractor above 0.5. Its `distractor`
+            column is **0.0000** in both arms.
+
+            **That is an artefact of tie-breaking and not a property.** `max`
+            takes the stronger direction, and for an image code that is
+            `conditional(w, c)` at near 1.0 — while the distractor's backward
+            direction is exactly 1.0. Everything saturates at the top, ties are
+            broken by ascending surface id, and image codes hold ids 0-49 while
+            the distractor holds 110. **It is excluded by its number, not by its
+            score.**
+
+            The tell is `link@k` = **0.1000**, exactly chance and exactly
+            `shuffled`. A clean distractor column beside a chance-level link is a
+            mechanism that has stopped discriminating, not one that has learned
+            to refuse.
+
+            So the axis does NOT have a usable interior in the way P3's
+            refutation clause hoped: `max` does not keep the lopsided hub edge
+            while paying nothing, it destroys the ranking.
+
+  P4  **HELD, and better than held.** On `alternating`, where `classes` already
+            scores 0.9220, `mean` gives **0.9829**. The prediction was that the
+            best combiner would be within 0.05 rather than clearly worse; it is
+            0.06 BETTER.
+
+            So the walk is not a hub-only alternative that trades a good case for
+            a bad one. It wins in both.
+
+  P5  **HELD, and it is the rail that makes the rest readable.** `shuffled`
+            scores **0.1000** and **0.1067** on `link@k`, which is chance and not
+            zero. Every number above is read against that.
+
+            It also caught something: `shuffled`'s `distractor` is **0.0333**,
+            not 0. A random ranking admits the distractor about a thirtieth of
+            the time by luck, so 0.0000 is genuinely below chance and 1.0000 is
+            genuinely total.
+
+
+WHAT THIS CHANGES
+-----------------
+**John's proposal is right about the mechanism and the numbers are on its side.**
+Keeping every edge and bounding the search instead recovers a result the bounded
+representation could not reach, without changing one stored count. `link@k` goes
+0.6667 to 0.9589 where the bound had failed, and 0.9220 to 0.9829 where it had
+not.
+
+**And it is not adoptable as it stands.** `mean` fails `g32-01`'s falsifier
+completely — every word admits the ever-present distractor. That refutation cost
+this project its original design once and the correction is the reason
+`conditional` is the deployed statistic. Trading it back for a better link would
+be undoing a measured result to buy an unmeasured one.
+
+**THE THIRD DIAL OF THIS SHAPE, and that is now a pattern rather than an
+incident.** `damped`'s exponent had the word at one end and the distractor at the
+other with nothing in between (`g36-06`). The combiner has the same shape:
+`min` protects nothing, `max` discriminates nothing, `mean` wins the link and
+loses the distractor. **Three scalar knobs, three times the same two-ended
+failure.** That is evidence the conflict is structural rather than untuned, and
+the next proposal should not be a fourth knob.
+
+**What the arithmetic points at instead.** The distractor's damage enters through
+its BACKWARD direction being exactly 1.0 — it is present whenever anything is.
+That is not a property a combiner can weigh away, because it is true. It is a
+property of the surface, and a rule that looked at a surface's own breadth —
+*how many different things is this present with* — would refuse it without
+consulting any edge. Untried, not a knob, and the second proposal in this line
+the measurements point at rather than merely permit.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**One code count, pinned at 50 from `g36-04`**, named as this run's standing risk
+before it ran. The beam and depth interact with how many codes a digit has, and
+that is not swept.
+
+**`beam` and `depth` were not swept either.** 8 and 2 were chosen so a word could
+reach an image code directly or through an audio code. Whether the win grows or
+shrinks with a larger budget is exactly John's *"how deep may a query walk"*
+question and is unmeasured.
+
+**Nothing here is distributed.** `reach` costs one remote read per candidate, the
+same as `conditional`, but the TRAVERSAL cost is new and `g33-03`'s 439 messages
+per walk was measured on the bounded version. The unbounded figure is unknown.
+
+**`geometric` is unexplained.** It scores 0.6667 on `together` and 0.1737 on
+`alternating` — better than `min`, far worse than `mean`, and inconsistent
+between arms. No account is offered because none was checked.

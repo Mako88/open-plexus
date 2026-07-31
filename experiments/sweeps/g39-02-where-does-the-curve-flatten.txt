@@ -1,0 +1,122 @@
+Where does the grounding curve actually flatten?
+=================================================
+
+Script: experiments/g39_02_where_does_the_curve_flatten.py
+Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+
+
+IN PLAIN TERMS
+--------------
+The previous run found that the machine was still learning fast when it ran out
+of data. Everything we have reported is therefore a floor rather than a result --
+we stopped watching while it was still improving.
+
+So this gives it eight times as much experience and watches where it settles.
+
+There is a trap in doing that, and it is worth stating because the obvious
+version does nothing at all. You cannot simply play the same three thousand
+moments over again. The machine judges connections by proportion -- how often
+these two appear together, relative to how often that one appears at all -- and
+playing the same tape twice doubles both numbers and changes no proportion.
+Every score would come out identical and the flat line would be an artefact of
+the arithmetic rather than a finding about learning.
+
+So instead the same underlying material is recombined. The same three thousand
+recordings and the same pictures, but each pass pairs them up differently and the
+background chatter is redrawn. That is genuinely new experience, and it is also
+the honest model of a real learner: you do not meet new dogs forever, you meet
+the same dogs in new situations.
+
+The thing being watched hardest is the one failure nothing has fixed. There is an
+ever-present hum that the machine wrongly treats as meaningful, and it has done
+so at every setting of every dial we have tried, and at every point in the
+stream. More experience is the last cheap thing left to try on it.
+
+
+WHAT IS BEING MEASURED
+----------------------
+The same four quantities as `g39-01`, scored by the SAME imported function, at
+3,000 / 6,000 / 12,000 / 24,000 occasions.
+
+    link         precision over the top-`k` image codes a word reaches
+    covered      how many of the codes it SHOULD find it had a chance to score.
+                 `link` is not readable without it
+    partition    the incumbent `equivalence_classes`, on the same curve
+    distractor   share of words admitting the ever-present distractor
+    surfaces     the rail -- how much of the world exists yet
+
+**The 3,000 column must reproduce `g39-01`'s `together` row**, which is what
+makes the rest of the table trustworthy. It will not match to four decimals,
+because the pairing cursor and the noise draw advance differently once passes are
+possible, and that is stated in advance rather than explained afterwards.
+
+
+MEASURED ON
+-----------
+Local, one process. Scorer IMPORTED from `g39_01`.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions   24,000   eight passes, each RE-PAIRED and with fresh noise
+    codes           50   pinned, as everywhere in this line
+    arm      together    where the walk beats the partition most
+    beam/depth   16, 1   g38-03's operating point
+    combiner      mean
+    seeds      0, 1, 2
+
+**One arm only.** `together` is where `g38-01` measured the largest gap, so it is
+where a change in the gap will show. `alternating` is not run and nothing here
+transfers to it.
+
+
+PREDICTIONS
+-----------
+P1  IT FLATTENS BY 12,000. `link` moves less than 0.03 between 12,000 and 24,000.
+    REFUTED IF it is still climbing by more than 0.03 over that doubling. Then
+    the plateau is further out than eight passes reaches, and stream length has
+    to become a swept axis in this line rather than a constant -- which is a
+    larger change to how everything here is measured.
+
+P2  IT LANDS ABOVE 0.98. With eight times the evidence, `link` exceeds the
+    0.9665 reported at 3,000.
+    REFUTED IF it falls. A DECLINE would mean extra pairings are adding
+    confusion rather than evidence -- each pass pairs a recording with a
+    different image, so more passes make the audio-to-image association broader,
+    and that could dilute rather than sharpen.
+
+P3  THE PARTITION CLOSES SOME OF THE GAP. `partition` improves more than `link`
+    does over the extension, because it starts further from its ceiling --
+    0.6667 against 0.9665.
+    REFUTED IF the gap widens. That would strengthen `g38-01`'s conclusion
+    rather than qualify it.
+
+P4  **THE ONE WORTH RUNNING FOR.** `distractor` stays at 1.0000 at every
+    checkpoint.
+    REFUTED IF it falls at any point. **That would be the best outcome available
+    in this whole line**: it would mean the distractor failure is a
+    small-evidence effect that experience repairs, and five axes of mechanism
+    work would turn out to have been chasing something the data fixes by itself.
+
+P5  **THE RAIL.** `surfaces` is 111 -- complete -- at every checkpoint, since
+    `g39-01` reached 111 by 3,000.
+    REFUTED IF it is not, which would mean the world is still arriving and the
+    curve is confounded with coverage rather than being about evidence.
+
+
+COST
+----
+Estimated from `g39-01`'s measured 8.6s for 3,000 occasions x 2 arms x 3 seeds.
+This is 24,000 occasions x 1 arm x 3 seeds, so four times the observation work,
+and the scoring happens at 4 checkpoints rather than 8. **30 to 90 seconds.**
+
+Recorded after the run: TO BE FILLED.
+
+
+RESULTS
+-------
+TO BE FILLED.
+
+
+SCORECARD
+---------
+TO BE FILLED.

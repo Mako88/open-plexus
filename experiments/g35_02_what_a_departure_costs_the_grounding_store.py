@@ -33,7 +33,7 @@ if str(ROOT) not in sys.path:
 from experiments import harness  # noqa: E402
 from openplexus.federated import Federation  # noqa: E402
 from openplexus.grounding import (STATISTICS, class_f1,  # noqa: E402
-                                  score_classes)
+                                  partner_rate)
 from openplexus.tasks.occasions import OccasionConfig, generate  # noqa: E402
 
 CONCEPTS = 32
@@ -64,24 +64,35 @@ def _fill(surfaces: int, seed: int):
 
 
 def _score(config, federation) -> dict[str, float]:
-    """Recover every class by walking, and score against the truth."""
+    """Recover every class by walking, and score it two ways.
+
+    `f1` scores a lost surface as ZERO rather than skipping it, because skipping
+    averages over the survivors and flatters the result.
+
+    `connected` is `partner_rate` over the SURVIVORS only, and the two answer
+    different questions on purpose. **`f1`'s floor moves with the class size** —
+    0.6667, 0.5000, 0.3333 at two, three and five surfaces — so an f1 column read
+    across the `surfaces` axis is three scales printed as one, which is the
+    confound `g35-02`'s first run could not resolve. `connected` asks a
+    yes-or-no question of each survivor and means the same thing at every size.
+    """
     truth = config.classes()
     statistic = STATISTICS[ARM]
     total, biggest = 0.0, 0
-    scored = 0
+    recovered: dict[int, frozenset[int]] = {}
+    survivors = []
     for surface in range(config.concept_surfaces):
         if not federation.present(surface):
-            # Its owner is gone, so nothing can be recovered for it. Scored as
-            # zero rather than skipped: skipping would report the average over
-            # the surfaces that SURVIVED, which is a different question and a
-            # flattering one.
-            scored += 1
             continue
         found = federation.walk(surface, statistic, K)
+        recovered[surface] = found
+        survivors.append(surface)
         total += class_f1(found, truth[surface])
         biggest = max(biggest, len(found))
-        scored += 1
+    scored = config.concept_surfaces
     return {"f1": total / max(scored, 1),
+            "connected": (partner_rate(recovered, truth, among=survivors)
+                          if survivors else 0.0),
             "largest": biggest / config.vocabulary}
 
 
@@ -93,13 +104,14 @@ def main() -> None:
     print("        NOTHING IS REPLICATED: a departed node's rows are gone\n")
 
     header = (f"{'surfaces':>9}{'lost':>6}{'ring share':>12}"
-              f"{'surfaces gone':>15}{'concepts hit':>14}{'f1':>9}{'largest':>9}")
+              f"{'surfaces gone':>15}{'concepts hit':>14}{'f1':>9}"
+              f"{'connected':>11}{'largest':>9}")
     print(header)
     print("-" * len(header))
 
     for surfaces in SURFACES:
         for lost in LOST:
-            shares, gone, hit, f1s, larges = [], [], [], [], []
+            shares, gone, hit, f1s, conns, larges = [], [], [], [], [], []
             for seed in SEEDS:
                 config, federation = _fill(surfaces, seed)
                 for node in range(lost):
@@ -112,11 +124,13 @@ def main() -> None:
                 hit.append(len(damaged) / CONCEPTS)
                 result = _score(config, federation)
                 f1s.append(result["f1"])
+                conns.append(result["connected"])
                 larges.append(result["largest"])
             mean = lambda v: sum(v) / len(v)          # noqa: E731 - local
             print(f"{surfaces:>9}{lost:>6}{mean(shares):>12.3f}"
                   f"{mean(gone):>15.3f}{mean(hit):>14.3f}"
-                  f"{mean(f1s):>9.4f}{mean(larges):>9.4f}")
+                  f"{mean(f1s):>9.4f}{mean(conns):>11.4f}"
+                  f"{mean(larges):>9.4f}")
         print()
 
     print(f"COST: {time.time() - started:.1f}s wall, one process")

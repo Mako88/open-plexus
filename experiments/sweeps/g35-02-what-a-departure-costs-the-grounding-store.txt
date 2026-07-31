@@ -97,6 +97,26 @@ P3  IT DEGRADES RATHER THAN COLLAPSING. `f1` falls roughly in step with
     dropping unreachable candidates destabilises the walk rather than shrinking
     its answer, and the graceful-degradation claim would be wrong.
 
+P5  REGISTERED AFTER THE FIRST RUN AND BEFORE THE SECOND, which is stated so it
+    is not counted as a prediction made in advance of everything. The first run
+    could not resolve P4's consequence because `f1`'s floor moves with the class
+    size. `connected` — the share of SURVIVING surfaces whose recovered class
+    still holds at least one true partner — has no size-dependent floor.
+
+    **`connected` RISES with the surface count at a fixed loss.** A surviving
+    surface needs only ONE partner to remain reachable, and at five surfaces it
+    has four chances where at two it has one: roughly `1 - gone^(surfaces-1)`,
+    so about 0.90 at two surfaces and near 1.00 at five with one node of eight
+    gone.
+    REFUTED IF `connected` is flat or falls with surfaces. **That would settle
+    P4's alarming reading**: more modalities would be pure exposure with no
+    compensating redundancy, and replication would be a prerequisite for the
+    multimodal goal rather than an improvement to it.
+
+    If it holds, the two metrics say different true things — more concepts are
+    TOUCHED and fewer concepts are LOST — and the alarming reading of P4 is
+    simply the wrong quantity.
+
 P4  MORE MODALITIES MAKES CHURN WORSE, NOT BETTER. At a fixed loss, `concepts
     hit` RISES with `surfaces` — 2, 3, then 5 — because more surfaces is more
     chances one of them was on the departed node. At one node of eight:

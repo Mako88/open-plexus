@@ -487,6 +487,44 @@ def reached_together(recovered: dict[int, frozenset[int]],
     return hit / len(wanted)
 
 
+def partner_rate(recovered: dict[int, frozenset[int]],
+                 truth: dict[int, frozenset[int]],
+                 among: Iterable[int] | None = None) -> float:
+    """Share of surfaces whose class still holds at least one TRUE partner.
+
+    **Floor-free, which is the entire reason it exists.** `class_f1`'s floor
+    moves with the class size — a concept recovered alone scores 0.6667 at two
+    surfaces, 0.5000 at three and 0.3333 at five — so an f1 column compared
+    across a surface-count axis is three scales printed as one. `g35-02` read
+    exactly that column as flat and could not say whether the flatness meant
+    anything.
+
+    This asks a yes-or-no question of every surface: *did you end up with any of
+    your own?* Alone is 0 and connected is 1 at every size, so the number means
+    the same thing in every cell.
+
+    **It is recall-shaped and must not be read alone.** A recovery that puts
+    everything in one class scores 1.0, exactly as `reached_together` does.
+    Report `largest` beside it — that lesson cost `g33-02` a headline.
+
+    Args:
+        among: Which surfaces to score, defaulting to every key in `truth`. A
+            caller measuring churn passes the SURVIVORS, because a surface whose
+            owner departed has no class to judge and scoring it zero would fold
+            two different failures into one number.
+    """
+    scored = list(truth if among is None else among)
+    if not scored:
+        raise ValueError(
+            "no surfaces to score. A rate over nothing reads as a score")
+    connected = 0
+    for surface in scored:
+        found = recovered.get(surface, frozenset({surface}))
+        if (found & truth[surface]) - {surface}:
+            connected += 1
+    return connected / len(scored)
+
+
 def score_classes(recovered: dict[int, frozenset[int]],
                   truth: dict[int, frozenset[int]],
                   distractors: Iterable[int] = ()) -> dict[str, float]:

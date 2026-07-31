@@ -24,7 +24,8 @@ import unittest
 from openplexus.grounding import (STATISTICS, CoOccurrence, cliff, conditional,
                                   equivalence_classes, frequency_weighted,
                                   local_conditional, neighbours, ppmi,
-                                  raw_count, reached_together, score_classes)
+                                  partner_rate, raw_count,
+                                  reached_together, score_classes)
 
 
 def _index(occasions: list[tuple[int, ...]]) -> CoOccurrence:
@@ -457,6 +458,39 @@ class Scoring(unittest.TestCase):
         question is the way this reads as a pass while testing nothing."""
         with self.assertRaises(ValueError):
             reached_together({0: frozenset({0})}, [])
+
+    def test_the_partner_rate_means_the_same_thing_at_every_class_size(self):
+        """Why it exists: `class_f1`'s floor moves with the class size.
+
+        A concept recovered ALONE scores 0.6667, 0.5000 and 0.3333 at two,
+        three and five surfaces — so an f1 column read across a surface-count
+        axis is three scales in one. This scores 0.0 for alone at every size.
+        """
+        for size in (2, 3, 5):
+            truth = {s: frozenset(range(size)) for s in range(size)}
+            alone = {s: frozenset({s}) for s in range(size)}
+            self.assertEqual(partner_rate(alone, truth), 0.0, f"size {size}")
+            self.assertEqual(partner_rate(truth, truth), 1.0, f"size {size}")
+
+    def test_ONE_surviving_partner_is_enough(self):
+        """The property that separates it from f1: it asks whether the concept
+        is still REACHABLE, not how completely it was recovered."""
+        truth = {s: frozenset(range(5)) for s in range(5)}
+        partial = {s: frozenset({s, 0}) for s in range(5)}
+        partial[0] = frozenset({0, 1})
+        self.assertEqual(partner_rate(partial, truth), 1.0)
+
+    def test_it_reads_1_0_under_TOTAL_COLLAPSE_and_must_not_be_read_alone(self):
+        """Recall's failure again, documented rather than fixed — it cannot be
+        fixed here without turning it back into a size-dependent score."""
+        everything = frozenset(range(5))
+        collapsed = {s: everything for s in range(5)}
+        truth = {s: frozenset({s, (s + 1) % 5}) for s in range(5)}
+        self.assertEqual(partner_rate(collapsed, truth), 1.0)
+
+    def test_scoring_no_surfaces_is_refused(self):
+        with self.assertRaises(ValueError):
+            partner_rate({}, {0: frozenset({0})}, among=[])
 
     def test_a_world_of_nothing_but_distractors_is_refused(self):
         with self.assertRaises(ValueError):

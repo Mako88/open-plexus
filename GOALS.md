@@ -151,6 +151,92 @@ satisfies the "needs no labels" requirement §5 rests on — but relational rath
 than sequential. That is the live work and it is tracked in
 [DECISIONS.md](DECISIONS.md).
 
+### 1.2b What UNDERSTANDING means here, and why grounding is load-bearing
+
+**Stated by John, 2026-07-30, and this is the positive half of §2's refusal.**
+Saying what the project is not aiming at was not enough: a benchmark was proposed
+that quietly reintroduced sequence prediction because it was convenient to
+measure, and the refusal in §2 did not catch it. This section exists so the next
+such proposal is caught by the goal rather than by a conversation.
+
+**The operational definition.** In his words: understanding a thing is *"knowing
+what it is in relation to everything else."* Not a definition by properties, and
+not a definition by what typically follows it — a concept's meaning is its
+**position in the structure of relations to every other concept.**
+
+That is a claim with teeth, because position in a relational structure is
+measurable, and it separates cleanly from prediction. A system asked *"what
+follows this?"* can succeed by memorising frequencies. A system asked *"what
+relation holds between these two, given ones you were told about others?"* cannot.
+
+**The distinction §2 needs and did not state: a training SIGNAL is not an
+OBJECTIVE.** Prediction as a mechanism for generating error is unobjectionable
+and biology uses it constantly. Prediction as the quantity being optimised
+produces a predictor. §2 forbids the second; nothing here forbids the first, and
+conflating them is how the wrong benchmark gets adopted for the right reasons.
+
+#### Multimodal grounding is a REQUIREMENT, not a later phase
+
+John, 2026-07-30: an image of a dog, a video of a dog, a sound of a dog and the
+word *dog* should all trigger the same concept — *"not as a predictive thing, but
+as a recognition of, oh, that's what it is."*
+
+**This is not scope creep, it is the answer to the standard objection against
+§1.2's own thesis.** A purely relational system knows how its symbols relate to
+one another and nothing about what any of them refers to. Grounding the same
+concept in several modalities is what dissolves that, which makes multimodality
+load-bearing for the thesis rather than an application of it. A design that
+forecloses it has broken §1.2, not deferred a feature.
+
+**And it is TWO problems, which must not be budgeted as one:**
+
+- **Agreement within a modality** — two nodes given the same input produce the
+  same concept id. This is the quantiser question already on the gate ladder, and
+  John has ruled that a borrowed quantiser is acceptable and possibly preferred.
+- **Alignment across modalities** — an image and a word produce the same id. This
+  does **not** fall out of quantisation. Two independently quantised modalities
+  will never agree by accident; it needs a representation built from paired data.
+  Borrowing it is consistent with §2's rule on prior art, and assuming it comes
+  free is the failure to avoid.
+
+#### What it will look like from outside, and why that is not the goal
+
+The first interface is expected to be **text chat — slower than a language model,
+and that is accepted.** John is explicit that this is a surface rather than the
+system: he expects an internal stream of thought running whether or not anyone is
+asking, and eventually something simulating a body. §1.2a's *"constant input and
+output"* is the same commitment seen from the architecture side.
+
+**So a chat transcript is not evidence about §1.2b**, and fluency is not the
+quantity. What is being built is a thing that can be *asked* about relations,
+where the asking is an interface onto a structure that exists whether or not
+anyone asks.
+
+#### The falsifier
+
+> **If it can only answer what it was told, or only in the modality it was told
+> in, it has INDEXED rather than understood.**
+
+So the test is a relation it was never given, that follows from ones it was, with
+the concepts introduced through one modality and queried through another. Both
+halves are required: composition without cross-modality is a knowledge graph, and
+cross-modality without composition is a lookup table.
+
+#### The open hypothesis, labelled as one
+
+Learning a concept's position from its relations is what knowledge-graph embedding
+methods already do, and their results are respectable rather than transformative.
+**If this project expects to differ, the reason has to be stated in advance rather
+than discovered afterwards**, or it will rediscover their ceiling with extra
+steps.
+
+The current candidate, and it is a hypothesis with no measurement behind it: those
+methods learn one global embedding by centralised optimisation over a graph fixed
+at training time, where C4 requires a structure that keeps reorganising as new
+things arrive and never freezes. **Whether continual local reorganisation buys
+anything over a frozen global fit is untested**, and it is exactly the kind of
+claim §1's own standards say to label rather than assume.
+
 ### 1.2a Directions John wants explored — not requirements, and not idle either
 
 **Stated 2026-07-28.** None of these is a constraint. Each is a direction he
@@ -445,6 +531,19 @@ and no gate is passed on a single run** (rule 3).
 | **G3 — churn** ✅ **PASSED** | Does the margin survive nodes leaving mid-run and rejoining? | Losing a node degrades the whole rather than a part, or recovery costs more than the node was worth. |
 | **G4 — bandwidth** ⚠️ **PASSES ON ONE SEED** | Does the required cross-machine traffic fit consumer broadband? | The traffic needed for the margin exceeds what a home connection carries. |
 | **G5 — scale** ⚠️ **CONTESTED** | Does the margin hold or grow as the network grows? | The margin shrinks with scale. Then it is a small-model curiosity, not a route to either goal. |
+| **G6 — composition** ⬜ **NOT REACHED** | Can it answer about a relation it was never given, that follows from ones it was? | It can only return what it was told. Then it has INDEXED rather than understood, and §1.2b's definition is not being met however good the recall is. |
+| **G7 — grounding** ⬜ **NOT REACHED** | Does a concept introduced through one modality answer when queried through another? | The same concept cannot be reached from two modalities under these constraints. Then §1.2b's answer to symbol grounding fails, and the relational structure is a closed symbol system. |
+
+**G6 and G7 were added 2026-07-30 and they are the operational form of §1.2b.**
+The ladder previously stopped at scale, so every gate could be passed by a system
+that had understood nothing — which is how a sequence-prediction benchmark came to
+be proposed without any gate objecting. They sit in this order because G6 is cheap
+(the relational tasks already in `openplexus/tasks/` ask exactly this question) and
+G7 is expensive (it needs a representation built from paired data, per §1.2b).
+
+**Both are required and neither substitutes for the other.** Composition without
+cross-modality is a knowledge graph; cross-modality without composition is a
+lookup table.
 
 **This table is the only place a gate verdict is written.** G4 passes on one seed
 with training traffic still unmeasured; G5 was refuted, withdrawn, then refined

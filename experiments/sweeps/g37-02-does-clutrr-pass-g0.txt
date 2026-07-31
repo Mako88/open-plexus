@@ -1,0 +1,161 @@
+Does CLUTRR-symbolic pass G0, and where does our rule land on it?
+==================================================================
+
+Script: experiments/g37_02_does_clutrr_pass_g0.py
+Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+
+
+IN PLAIN TERMS
+--------------
+The project keeps a short list of things that could kill it. Item one asks
+whether training a system on *relationships between things* actually buys it the
+ability to reason, rather than just to remember.
+
+That question has been unanswerable because there was no test sensitive enough.
+The previous run found one — CLUTRR, somebody else's published benchmark, whose
+data has been sitting in this repository the whole time — and established that
+the gap between "learned nothing" and "best published result" is wide.
+
+**A wide gap means the test can SEE a difference. It does not mean we will like
+the direction.** This run is the check that has to come before any of that.
+
+It asks two things.
+
+**First, is the test actually hard?** If a system with random, untrained
+internals already scores well, then the task can be done without learning
+anything, and every result measured on it afterwards is meaningless. That is
+exactly the mistake the predecessor project made, and it cost about a year.
+
+**Second, is the test actually possible?** A model given every advantage — real
+gradient training, the whole sequence to look at — is run on it. If even that
+cannot do it, the task is not learnable in this framing and nothing built on top
+is worth running.
+
+Only if the first fails and the second succeeds is there room in between for a
+learning rule to be judged. Our own rule is run too, so we find out where it
+lands — and there is a live possibility, already seen once on the test we built
+ourselves, that it lands **below** the score you would get by always guessing the
+same answer.
+
+The puzzles get harder in a specific way: the system is trained only on short
+chains and tested on chains up to five times longer. So the numbers are reported
+per chain length and never averaged, because the short ones are memory and the
+long ones are the actual question.
+
+
+WHAT IS BEING MEASURED
+----------------------
+Accuracy at the query slot: the relation the puzzle asks for, which is never in
+the stream. Reported **per hop bucket, never pooled**, with each bucket's own
+floor beside it.
+
+    majority    always answer the commonest relation IN TRAIN. The base rate.
+                Taken from train and not test, because a constant fitted to the
+                answers is not a floor, it is a one-parameter model
+    frozen      our model, random `Wo`, NO LEARNING. The substrate
+    local       our model under the delta rule. The candidate
+    attention   backprop, softmax over positions, Adam. The strong reference
+
+**Two axes must not be averaged over and the script refuses to.** Hops 2-3 are
+the ONLY depths in train, so they are recall and 4-10 are generalisation.
+And `g37-01` measured the floor MOVING with entity repetition in the unhelpful
+direction — 0.3810 against 0.2336 at 6 hops — so `clean_accuracy` is recorded
+per bucket rather than pooled into a second headline.
+
+
+MEASURED ON
+-----------
+Local, one process.
+
+    data          CLUTRR gen_train23_test2to10, fetched, gitignored
+    layout        kinship -- chosen on measurement, collisions 35.9% -> 7.7%
+    train         9,074 puzzles, hops 2-3 ONLY
+    test          1,146 puzzles, hops 2-10
+    relations     20 in the fixed vocabulary; 18 used as answers
+    local         d256, pair keys, one hop, NO search, 4 epochs
+    attention     d128, Adam lr 3e-3, 16 epochs
+    seeds         0, 1, 2
+
+**Search is OFF in the local arm deliberately.** This measures the OBJECTIVE, and
+mixing in the search mechanism would make a result unattributable to either.
+
+**THE FULL TRAIN SPLIT IS USED, and that was a measurement rather than a
+choice.** The cost probe put the expensive arm at **1.68 ms** per training
+sequence, so all 9,074 puzzles cost 12.2 minutes across three seeds. `g14-01` had
+to cap `closure` at 300 because its sequences are 120 tokens; CLUTRR's are 11 to
+43. A subsample would have needed its size defended and buys nothing.
+
+**THE ATTENTION SETTINGS ARE CARRIED FROM `g14-01`, WHERE THEY WERE CHOSEN FOR A
+DIFFERENT TASK.** d128 and 16 epochs were tuned on `closure` at 120 tokens.
+`CLAUDE.md`'s calibration is explicit that naming a carried constant as a risk
+does **not** prevent it — g9-11 did exactly that and lost 0.58 anyway. So this is
+recorded as the standing risk of this run, and P2's refutation clause below says
+what to do if it fires, rather than leaving it to be discovered.
+
+**The data does not move with the seed.** CLUTRR is a fixed file; seeds vary
+model initialisation and training order only. Spread here is a statement about
+the model and not about the task, and it will be narrower than `g14-01`'s.
+
+
+PREDICTIONS
+-----------
+P1  THE TASK IS NOT ANSWERABLE WITHOUT LEARNING. `frozen` sits at or below the
+    floor in every bucket, and does not exceed it by more than 0.05 anywhere.
+    REFUTED IF `frozen` clearly beats the floor. **That is the predecessor's
+    failure exactly** — a random substrate that already composes means the
+    instrument cannot attribute anything to learning, and CLUTRR would have to be
+    discarded despite its band.
+
+P2  THE TASK IS LEARNABLE AT ALL. `attention` beats the floor by more than 0.15
+    in the IN-DISTRIBUTION buckets, hops 2 and 3.
+    REFUTED IF it does not. **Then the first thing to check is the carried
+    constants, not the task**: d128 and 16 epochs came from `closure`, and
+    `g14-01` reported that task failing G0 at an undersized reference before the
+    reference was fixed. The response to a refutation here is a width/epoch probe
+    on THIS task, and only a second failure would say anything about CLUTRR.
+
+P3  **THE GATE.** Headroom at 4+ hops — `attention` minus `frozen` — exceeds 0.15
+    in at least three of the seven out-of-distribution buckets.
+    REFUTED IF it does not. Then the band `g37-01` computed is real but
+    unreachable by anything this project can run, and item #1 goes back to
+    blocked with a *different and better* reason than the one it had.
+
+P4  SYSTEMATIC GENERALISATION IS HARD, WHICH IS WHAT CLUTRR IS FOR. Every
+    learning arm declines from hops 2-3 to hops 9-10, and `attention` at 10 hops
+    is below its own score at 3 hops by more than 0.20.
+    REFUTED IF accuracy is flat across depth. That would mean either the model
+    generalises perfectly — implausible against the published references, which
+    all decline — or the query is answerable without following the chain, which
+    would be a defect in how this script frames the task and would invalidate
+    every other row.
+
+P5  `local` LANDS BETWEEN `frozen` AND `attention`.
+    REFUTED IF it is below `frozen`, or above `attention`. **The first is a live
+    possibility and is not a formality**: on `closure`, `local` scored 0.108
+    against a majority floor of 0.190 on every one of eight seeds — actively
+    mispredicting, worse than having learned nothing. If that repeats here on
+    somebody else's benchmark, it is the strongest negative result this project
+    has produced and it belongs in the record as one.
+
+P4 is the rail. If it fails, the task is not being posed as intended and P1-P3
+are unreadable whatever they say.
+
+
+COST
+----
+Measured, not estimated. The cost probe reports **1.68 ms** per training sequence
+for the expensive arm, giving **4.1 min** per attention cell and **12.2 min**
+for three seeds. `majority` and `frozen` are nearly free; `local` trains without
+a backward pass. **Total expected: 15 to 25 minutes**, local, no runner.
+
+Recorded after the run: TO BE FILLED.
+
+
+RESULTS
+-------
+TO BE FILLED.
+
+
+SCORECARD
+---------
+TO BE FILLED.

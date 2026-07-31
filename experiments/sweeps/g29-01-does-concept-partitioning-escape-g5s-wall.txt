@@ -107,10 +107,22 @@ Neither predicts this exponent, and neither may be quoted as if it did.
 so the arms differ only in how the store is split.
 
 
-COST
-----
-g5-01's grid was 5 widths x 4 lengths. Dispatched, not local. Costed with `--cost`
-before dispatch, per the 8x local-to-runner factor.
+COST, MEASURED RATHER THAN ESTIMATED
+--------------------------------------
+**One cell -- width 256, seq 384, one seed, one learning rate -- exceeded TEN
+MINUTES locally and was killed.** That is `CLAUDE.md`'s own line for what belongs
+in Actions rather than on the machine, and it is the calibration `g8_05` earned:
+a thing described as "a quick control before the full run" that held the machine
+for over ten minutes was an experiment.
+
+So the full grid -- 5 widths x 4 lengths x seeds x learning rates, TWICE for the
+two arms -- is CI work and is not being run locally. At the measured 8x
+local-to-runner factor a single cell is over an hour on a 2-vCPU runner, so the
+grid needs sharding by seed as g5-01's own workflow does.
+
+The decisive single cell is running in the background instead, because
+`g5-01`'s sharpest number is one comparison rather than a curve: sixteen-way
+dimension splitting reached **0.769** at exactly this cell.
 
 
 MEASURED ON

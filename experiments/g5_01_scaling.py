@@ -51,16 +51,34 @@ def score(model, sequences, partition) -> float:
     return correct / total
 
 
-def run(width: int, seq_len: int, lr: float, seed: int) -> list[dict]:
+def run(width: int, seq_len: int, lr: float, seed: int,
+        split: str = "dimension") -> list[dict]:
     groups = width // MACHINE_WIDTH
     task = replace(BASE, seq_len=seq_len)
     rng = np.random.default_rng(seed)
     train_set = dataset(task, N_TRAIN)
     test_set = dataset(replace(task, seed=task.seed + 99_991), N_TEST)
 
+    # `split="concept"` swaps DIMENSION partitioning for CONCEPT partitioning and
+    # changes nothing else, so the two arms differ only in how the store is cut.
+    # **Default unchanged**, so g5-01's published grid still reproduces exactly.
+    #
+    # Why it is worth an arm (`g29-01`): this sweep's own conclusion is that *"the
+    # wall is caused by the partitioning, not by the underlying rule"* -- and that
+    # wall was measured on dimension splitting, where every read is a fragment
+    # summed across machines. A concept-partitioned read is served whole by the one
+    # node holding the fact. No sweep had ever varied a scale axis under it.
+    #
+    # **`alone` MEANS SOMETHING DIFFERENT under `concept` and must not be compared
+    # across arms**: a lone dimension node holds a slice of the WIDTH, a lone
+    # concept node holds a subset of the FACTS. The exponent is fitted on `pooled`
+    # (`tools/summarise_g5_01.py` crosses on `best_pooled`), which is the whole
+    # system either way and is the comparable quantity.
+    partitioning = ({"concept_nodes": groups} if split == "concept"
+                    else {"partitions": groups})
     model = LocalAssociativeMemory(LocalMemoryConfig(
-        vocab_size=task.vocab_size, d_model=width, partitions=groups,
-        lr=lr, key_scale=KEY_SCALE, seed=seed))
+        vocab_size=task.vocab_size, d_model=width,
+        lr=lr, key_scale=KEY_SCALE, seed=seed, **partitioning))
     order = np.arange(len(train_set))
     records = []
     for epoch in range(1, CHECKPOINTS[-1] + 1):
@@ -76,10 +94,19 @@ def run(width: int, seq_len: int, lr: float, seed: int) -> list[dict]:
         pooled = score(model, test_set, None)
         # One machine picked at random rather than group 0, and reported per
         # seed: a deployment gets whichever machine it gets.
-        alone = score(model, test_set, int(rng.integers(groups)))
+        # **NOT AVAILABLE under concept partitioning, and not faked.** `score`'s
+        # third argument is a DIMENSION group index passed to `run(partition=)`,
+        # and a concept-partitioned model has one dimension group -- asking for
+        # group 1 raises, which is the model telling the truth. A lone concept
+        # node holds a subset of the FACTS and there is no API exposing that
+        # score, so it is `nan` rather than a number that would be compared to
+        # g5-01's `alone` by someone reading a column.
+        alone = (float("nan") if split == "concept"
+                 else score(model, test_set, int(rng.integers(groups))))
         records.append(dict(
-            condition=f"P={groups} seq={seq_len} lr={lr} e={epoch}",
-            seed=seed, d_model=width, partitions=groups, seq_len=seq_len,
+            condition=f"{split} P={groups} seq={seq_len} lr={lr} e={epoch}",
+            seed=seed, d_model=width, partitions=groups, split=split,
+            seq_len=seq_len,
             lr=lr, epoch=epoch, accuracy=pooled, pooled=pooled, alone=alone))
         print(f"  P={groups:<3} d={width:<4} seq={seq_len:<4} lr={lr:<5} "
               f"seed={seed} e={epoch:<3} pooled {pooled:.3f}  alone {alone:.3f}",
@@ -93,13 +120,19 @@ def main() -> int:
     seq_lens = (args.seqlen,) if args.seqlen else SEQ_LENS
     seeds = (args.seed,) if args.seed is not None else SEEDS
     rates = (args.lr,) if args.lr else LEARNING_RATES
+    # `--mode concept` selects CONCEPT partitioning (g29-01). Anything else keeps
+    # the dimension splitting this sweep was published on.
+    split = "concept" if getattr(args, "mode", None) == "concept" else "dimension"
+    if split == "concept":
+        print("SPLIT = CONCEPT. `alone` is one node's FACTS, not one width slice, "
+              "and is not comparable to g5-01's `alone`.", flush=True)
 
     records = []
     for width in widths:
         for seq_len in seq_lens:
             for lr in rates:
                 for seed in seeds:
-                    records.extend(run(width, seq_len, lr, seed))
+                    records.extend(run(width, seq_len, lr, seed, split))
     emit(records, args.json)
     return 0
 

@@ -1,0 +1,135 @@
+GATE G7 — a concept introduced in one modality, queried in another
+===================================================================
+
+Script: experiments/g40_01_introduced_in_one_modality_queried_in_another.py
+Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+
+
+IN PLAIN TERMS
+--------------
+This is the gate the whole grounding line was built for, and it has never been
+run.
+
+The question: can the machine learn what something is from one sense, and then
+recognise it through a different sense it barely encountered?
+
+Everything measured so far has stopped short of that in one specific way. The
+word has been present in every single moment, alongside both the picture and the
+sound. So what was really tested was whether three things that always arrive
+together can be recognised as one thing. That is a fair question and it was
+answered, but it is not this one.
+
+Here the picture and the sound **never once occur together**, in any arm. The
+only thing joining them is the word — and in most arms the sound turns up only at
+the very end, and only briefly.
+
+**One thing has to be said plainly, because it makes the gate easier than it
+sounds.** This machine counts what turns up with what, and a count does not care
+what order things arrived in. Showing all the pictures first and all the sounds
+afterwards produces exactly the same tally as mixing them. So the *order* part of
+this gate cannot fail — not because the machine is clever, but because the
+question does not bite on a tally.
+
+Claiming a pass on that basis would be passing a test by construction. So the
+real question is the one underneath: **how little of the second sense is enough?**
+
+That is a genuine threshold, it is not free, and it is what gets swept. If it
+takes as much of the sound as of the picture, the answer is unimpressive. If a
+handful of examples is enough, that is a real result about learning from very
+little.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    cross      **the gate.** From an IMAGE code, does the walk reach an AUDIO
+               code of the same digit? They share zero occasions in every arm
+    crossed    how many audio codes an image code reaches at all. The companion
+               `cross` needs -- reaching nothing and reaching wrong things are
+               different answers, and this line has been caught by that twice
+    word_aud   from the WORD, does it reach the right audio codes? The half of
+               the route that has to work first
+    heard      how many audio codes were scored at all
+
+**Chance is 0.10.** A concept has about 5 image codes and 5 audio codes.
+
+
+MEASURED ON
+-----------
+Local, one process.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions   12,000   four passes, re-paired
+    codes           50
+    statistic  conditional read FORWARD -- `g39-04`'s winner
+    beam            16   `g38-03`'s operating point
+    depth            2   **required here**: an image code reaches a sound only
+                         through the word, which is two hops. `g38-03` found
+                         depth 2 unnecessary for a one-hop query and this is not
+                         one
+    seeds      0, 1, 2
+
+Arms: `phased` at sound-shares {0.01, 0.02, 0.05, 0.10, 0.25, 0.50}, plus
+`interleaved` at 0.50 as the control.
+
+**In `phased` the sound occasions are all at the END of the stream.** In
+`interleaved` they are mixed throughout. The tally cannot tell them apart, which
+is exactly what P1 exists to demonstrate rather than assume.
+
+
+PREDICTIONS
+-----------
+P1  **ORDER IS FREE, AND THIS DEMONSTRATES IT RATHER THAN ASSUMING IT.**
+    `phased` at 0.50 matches `interleaved` at 0.50 on every column, within 0.02.
+    REFUTED IF they differ. **That would mean something in the pipeline is
+    order-sensitive when the tally is not** -- most likely the quantiser or the
+    re-pairing cursor -- and every result in this line that assumed order does
+    not matter would need re-checking.
+
+P2  **THE GATE PASSES AT FAIR EXPOSURE.** `cross` at share 0.50 is far above
+    chance 0.10 -- above 0.70 -- with `crossed` above 1.0 so it is not computed
+    over a handful.
+    REFUTED IF it is near chance. **That is G7's falsifier firing**, and
+    `GOALS.md` §1.2b's answer to symbol grounding fails on the first run that
+    actually asks it.
+
+P3  **THE THRESHOLD IS LOW, AND THIS IS THE REAL CONTENT.** `cross` stays above
+    0.70 down to a share of 0.05 -- 600 sound occasions, 60 per digit.
+    REFUTED IF it collapses above that. Then the second modality needs
+    comparable exposure to the first, and *"introduced in one, queried in
+    another"* is true only in a weak sense.
+
+P4  IT BREAKS SOMEWHERE. At share 0.01 -- 120 occasions, 12 per digit -- `cross`
+    is below 0.70, because `g32-02` put the concept threshold at about 16
+    occasions and 12 is under it.
+    REFUTED IF 0.01 still works, which would be a stronger result than predicted
+    and would say the threshold is below anything this grid resolves.
+
+P5  `word_aud` LEADS `cross`. The word reaches the sounds before an image code
+    can, because that is one hop and the cross-modal route is two.
+    REFUTED IF `cross` exceeds `word_aud` anywhere -- the route cannot be better
+    than its own first leg, so that would indicate a scoring defect rather than
+    a finding.
+
+P5 is the rail. If it fails, the two-hop path is not doing what the columns say
+and P2-P4 are unreadable.
+
+
+COST
+----
+Estimated from `g39-06`'s measured 23.1s for seven arms at 12,000 occasions.
+This is seven arms at the same length, but scores a walk from every IMAGE CODE
+rather than from ten words -- fifty starts instead of ten. **60 to 180
+seconds.**
+
+Recorded after the run: TO BE FILLED.
+
+
+RESULTS
+-------
+TO BE FILLED.
+
+
+SCORECARD
+---------
+TO BE FILLED.

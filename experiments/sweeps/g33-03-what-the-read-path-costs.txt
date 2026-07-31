@@ -1,0 +1,149 @@
+What does one query cost in peer messages?
+==========================================
+
+Script: experiments/g33_03_what_the_read_path_costs.py
+Status: RUN, local, 2026-07-31, 63.1s.
+
+**NOT PRE-REGISTERED, and that is stated first because it is the weakness of this
+file.** See PREDICTIONS.
+
+ANSWER: **the read scales with FAN-OUT, not with `k`.** A query costs about 2.6
+peer messages per distinct partner the surface has ever been seen beside — 439
+messages for one walk in a 192-surface world — and fan-out grows toward the whole
+vocabulary in any stream with noise in it.
+
+
+IN PLAIN TERMS
+--------------
+The design says a concept is not stored anywhere: you start at one thing you know
+— a word, say — and follow the strongest links until you arrive at the picture.
+Each step means asking the machine that holds that thing what its strongest links
+are.
+
+Answering that question turns out to need a second kind of question. To judge
+whether two things belong together you have to know **how common each of them is
+on its own**, and that number lives on whichever machine owns the other thing. So
+before the owner can rank anything it has to ask around.
+
+The worry is how many things it has to ask about. Not the handful it eventually
+keeps — **all of them**, every single thing that has ever appeared beside it, and
+in a busy world that is nearly everything. This measures whether that is what
+happens. It is.
+
+That does not stop the design working, and everything measured so far still
+stands. It says the expensive part is the ASKING rather than the storing, and
+that a query in a large world would be a lot of small messages rather than a few.
+Making that cheaper is a real open problem and there is an obvious candidate,
+registered below so it can be tested rather than assumed.
+
+
+WHAT IS BEING MEASURED
+----------------------
+One WALK is one query: from a surface, to the equivalence class it reaches.
+
+    reads/walk       `count(y)` lookups a node had to ask a PEER for
+    hops/walk        node-to-node steps
+    fan-out          distinct partners a surface has been seen beside
+    reads/fan-out    the ratio, which is the shape of the answer
+
+
+MEASURED ON
+-----------
+Local, single process, Python 3.14, no numpy. `openplexus/federated.py` at
+`5fd54b0`+, with rankings memoised per walk.
+
+    surfaces        3      carried from g33-01
+    presence      0.7      carried from g33-01
+    noise           3      carried from g33-01
+    distractors     1      carried from g33-01
+    occasions   4,000      62 per concept at 64 concepts, above g32-02's ~16
+    k               2      carried from g33-01
+    nodes           8      carried from g33-01
+    seed            0      ONE SEED. See PREDICTIONS
+
+Swept: `concepts` in {16, 32, 64}, statistic in {`conditional`, `local`}.
+
+
+PREDICTIONS
+-----------
+**NONE WERE REGISTERED, and the honest thing is to say what that costs.** These
+numbers were taken at a terminal while `federated.py` was being written, and this
+file exists because `tools/check_provenance.py` refused to let a record cite
+figures that lived nowhere. So the script is a REPRODUCTION of a measurement, not
+the execution of a plan, and it is weaker evidence than `g32-01` or `g33-01` for
+exactly the reason CLAUDE.md gives: a prediction written after the numbers are in
+is a summary rather than a commitment.
+
+Two things a prediction would have forced and their absence is visible here:
+**one seed**, and **no probe of where the ratio stops being 2.6**.
+
+REGISTERED NOW, before it is built, for the follow-up:
+
+P1  A LOCAL PREFILTER PRESERVES THE ANSWER AT UNIFORM FREQUENCY AND FAILS UNDER
+    SKEW. Ranking by raw count needs no peer at all, so an owner could keep its
+    top `m` by raw count and pay the remote read only for those — turning the
+    cost from fan-out into `m`. At `zipf` 0 this recovers the same classes for
+    `m` around 20; at `zipf` 2 it does not.
+    REFUTED IF it holds under skew. The reason to doubt it is measured rather
+    than guessed: `g32-02` found **60 of 60** surfaces of the rarest concepts
+    had a DIFFERENT concept's surface as their best raw-count partner, so the
+    filter would discard the true partner before the exact statistic ever saw
+    it. If that turns out not to matter, the read path gets cheap and the
+    objection in this file's ANSWER largely dissolves.
+
+
+COST
+----
+Estimated before the run: seconds to a minute, being counting with no training.
+Recorded after: **63.1s**, one process. Local was correct.
+
+
+RESULTS
+-------
+    arm           concepts  surfaces  fan-out  reads/walk  hops/walk  reads/fan-out
+    conditional         16        48     48.0       124.8        6.0            2.6
+    conditional         32        96     96.0       249.6        6.0            2.6
+    conditional         64       192    168.4       439.2        6.0            2.6
+
+    local               16        48     48.0         0.0        1.8            0.0
+    local               32        96     96.0         0.0        1.6            0.0
+    local               64       192    168.4         0.0        1.5            0.0
+
+    WRITE PATH: 153516 row updates over 4000 occasions = 38.4 per occasion
+
+Three things follow.
+
+**The read scales with fan-out and the ratio is flat at 2.6** across a four-fold
+change in world size, so the constant is a property of the walk (how many
+surfaces one query ranks) and the growth is entirely fan-out's.
+
+**`local` costs exactly nothing** — 0.0 peer messages at every size — which is
+the other half of `g33-01`'s P7. The free statistic is free and it does not work;
+the working statistic works and is not free. There is no third option measured.
+
+**The write path is cheap by comparison**: 38.4 row updates per occasion, fixed,
+because an occasion has a bounded number of surfaces in it. **The expensive half
+of this design is reading, not writing**, which is the opposite of what the
+bandwidth arithmetic in `note 004` was worried about and is worth saying plainly.
+
+Memoising each surface's ranking within a walk was worth **3x** and changed no
+answer — the naive version re-ranked a surface once per edge touching it, about
+eight times fan-out against 2.6. That is in `Federation.walk` with the reason at
+the line.
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+**One seed, three sizes, and no error bars.** The ratio being identical to one
+decimal at all three sizes is suggestive and is not three seeds.
+
+**Nothing here is bytes.** A "message" is a `count(y)` lookup; how large it is on
+a wire and whether many can be batched into one packet is unmeasured, and G4 is
+about bytes on a home connection rather than about message counts.
+
+**Fan-out here is a property of THIS generator.** Noise draws uniformly from every
+other concept, so everything meets everything eventually. A stream with clustered
+noise would have smaller fan-out and this file says nothing about it.
+
+**And no node in this run is a separate process.** Same caveat as everything else
+in g32 and g33: the crossings are counted, not sent.

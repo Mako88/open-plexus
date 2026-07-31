@@ -54,6 +54,7 @@ CONTENT = ROOT / "openplexus" / "content.py"
 OCCASIONS = ROOT / "openplexus" / "tasks" / "occasions.py"
 GROUNDING = ROOT / "openplexus" / "grounding.py"
 BUCKETS = ROOT / "openplexus" / "buckets.py"
+FEDERATED = ROOT / "openplexus" / "federated.py"
 OWNERSHIP = ROOT / "openplexus" / "ownership.py"
 PARTITIONED = ROOT / "openplexus" / "partitioned.py"
 SEARCH = ROOT / "openplexus" / "search.py"
@@ -2435,6 +2436,53 @@ MUTATIONS = [
         path=BUCKETS,
         old="        sent = self.delivered + self.lost_late",
         new="        sent = self.delivered + self.lost_late + self.lost_dropped",
+    ),
+    Mutation(
+        name="one-node-writes-BOTH-halves-of-a-pair",
+        breaks="the locality this module exists to demonstrate. A pair is two "
+               "rows on two machines and each owner writes only its own "
+               "direction; writing both puts `owner(x)` in possession of a row "
+               "it does not own, which is the shared state amended C1 forbids. "
+               "Every number would be identical, because the arithmetic is the "
+               "same -- only the ownership is wrong",
+        path=FEDERATED,
+        old="        for surface, partner in ((one, other), (other, one)):",
+        new="        for surface, partner in ((one, other), (one, other)):",
+    ),
+    Mutation(
+        name="a-node-reads-a-peers-marginal-from-its-own-table",
+        breaks="the boundary between what a node holds and what it must ask "
+               "for. `count(y)` lives at `owner(y)`; served locally it comes "
+               "back 0 for anything this node does not hold, so every "
+               "chance-corrected score collapses and the walk returns each "
+               "surface alone. It also makes the read look FREE, which is the "
+               "one number this module was built to produce",
+        path=FEDERATED,
+        old="        return self._federation.seen(surface, asker=self._home)",
+        new="        return self._table.seen(surface)",
+    ),
+    Mutation(
+        name="crossing-a-node-boundary-is-not-counted",
+        breaks="the price of the only statistic that works. `conditional` needs "
+               "one peer read per candidate partner and the whole point of a "
+               "counted federation is that the figure is measured rather than "
+               "argued; a silent counter reports the design as free",
+        path=FEDERATED,
+        old="        if asker is not None and asker != target:\n"
+            "            self.remote_reads += 1",
+        new="        if False:\n"
+            "            self.remote_reads += 1",
+    ),
+    Mutation(
+        name="a-node-passes-off-its-own-share-as-the-worlds-total",
+        breaks="the refusal that keeps PPMI honest. A node knows how many "
+               "occasions IT saw and nothing about the rest; returning that as "
+               "`occasions` makes `ppmi` run and produce a plausible number "
+               "computed against the wrong denominator on every node, which is "
+               "worse than the statistic being unavailable",
+        path=FEDERATED,
+        old="        raise NotImplementedError(",
+        new="        return self._table.occasions or NotImplementedError(",
     ),
 ]
 def restore_any_leftovers() -> None:

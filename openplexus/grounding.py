@@ -159,16 +159,41 @@ class CoOccurrence:
         Does NOT touch either marginal — see `note`. A caller that counts a
         marginal here as well would count it once per partner.
         """
-        if one == other:
+        self.observed_with(one, other)
+        self.observed_with(other, one)
+
+    def observed_with(self, surface: int, other: int) -> None:
+        """Record ONE direction: this surface's row gains this partner.
+
+        `pair` is this twice, and the split exists because **a sharded
+        accumulator cannot do both halves.** When rows live at `owner(surface)`,
+        the node holding `x` may write `x`'s row and must not write `y`'s — that
+        row is another machine's, and touching it is the shared state C1
+        forbids. A node that quietly kept both would look identical from outside
+        and would be holding data it does not own.
+        """
+        if surface == other:
             raise ValueError(
                 "a surface cannot be its own partner; counting one would make "
                 "every statistic read its own presence as evidence")
-        self._pairs.setdefault(one, {})[other] = self.together(one, other) + 1
-        self._pairs.setdefault(other, {})[one] = self.together(other, one) + 1
+        row = self._pairs.setdefault(surface, {})
+        row[other] = row.get(other, 0) + 1
 
     def surfaces(self) -> list[int]:
         """Every surface seen at least once, in ascending order."""
         return sorted(self._seen)
+
+    def rows(self) -> list[int]:
+        """Every surface this table holds ANYTHING about, in ascending order.
+
+        Wider than `surfaces`, and the difference matters exactly once: a
+        sharded owner may be told about a pair before it is ever told the
+        surface was present, so it holds a row with no marginal yet. **A
+        locality check written over `surfaces` would not see that row**, and a
+        row invisible to the check is the one place a node could hold data it
+        does not own without anything noticing.
+        """
+        return sorted(set(self._seen) | set(self._pairs))
 
     def seen(self, surface: int) -> int:
         """How many occasions a surface was present on."""

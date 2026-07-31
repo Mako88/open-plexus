@@ -15,10 +15,14 @@
   connected components; `class_f1` and `score_classes` score a recovery.
 - `openplexus/tasks/occasions.py`: the instrument. A stream of moments with known ground
   truth, a `presence` knob, a `zipf` knob and a persistent-distractor knob.
-- `tests/test_grounding.py`, `tests/test_occasions.py`, and five mutations in
-  `tools/mutate.py`.
-- **No distribution.** No bucket, no join, no ownership. `grounding.py` says so in its own
-  docstring and says why.
+- `openplexus/federated.py`: `Federation` splits those tables by `owner(surface)` using the
+  same `Ring` the join uses, counts every crossing, and **refuses `occasions`** so `ppmi`
+  cannot be computed by a node rather than being quietly approximated.
+- `tests/test_grounding.py`, `tests/test_occasions.py`, `tests/test_federated.py`, and nine
+  mutations in `tools/mutate.py`.
+- **`grounding.py` itself still has no distribution in it** and says so in its own
+  docstring — the split lives in `federated.py`, so the single-table path stays available
+  as the reference every federated answer is checked against.
 - [`content.py`](../../openplexus/content.py)'s `ContentIndex` predates all of it and
   accumulates co-occurrence into a superposed *vector*, which cannot hold a per-neighbour
   count and so cannot compute any of these statistics.
@@ -64,6 +68,44 @@ list. That is `peer.py`'s profile rather than a barrier's and it is not one mess
 
 **Nothing has measured either version.** It is a reading of the constraint against the
 arithmetic, and the container run is what would test it.
+
+### The read path costs one peer message PER PARTNER, and that is the bill — `openplexus/federated.py`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g33-03-what-the-read-path-costs.txt
+            script  experiments/g33_03_what_the_read_path_costs.py
+            task    occasions, 3 surfaces, presence 0.7, noise 3, 1 distractor
+            model   Federation, 8 nodes, conditional, k 2, 4,000 occasions
+            knobs   concepts 16 / 32 / 64
+            scale   48, 96 and 192 surfaces
+
+**Labelled as unpredicted, and the sweep record says so first.** These were taken
+at a terminal while `federated.py` was being written; `g33-03` is a REPRODUCTION
+of them, written because `check_provenance` refused a record citing figures that
+lived nowhere. Weaker evidence than `g32-01` or `g33-01`, one seed, no error bars.
+
+Remote reads for one walk, after memoising each surface's ranking within a walk:
+
+    surfaces    mean fan-out    remote reads per walk    ratio
+          48            48.0                    124.8      2.6
+          96            96.0                    249.6      2.6
+         192           168.4                    439.2      2.6
+
+**The cost is a constant times the FAN-OUT** — how many distinct partners a
+surface has ever been seen beside — and in a stream with noise and a distractor
+that is close to the whole vocabulary. It is not a constant times `k`.
+
+Memoising is worth **3x** and changes no answer: the naive walk re-ranks a
+surface once per edge touching it, which measured at about eight times fan-out
+before and 2.6 after. A node ranking one surface twice inside a single query has
+asked its peers the same question twice.
+
+**What this does not settle.** Whether a cheap local prefilter — rank by raw
+count, which needs no peer, then pay for the top `m` only — preserves the answer.
+`g32-02` is the reason to doubt it: under frequency skew, **60 of 60** surfaces
+of the rarest concepts had a different concept's surface as their best raw-count
+partner, so the filter would discard the true partner before the exact statistic
+ever saw it. Untried.
 
 ### PPMI is not deployable at all, and only building it showed that — `g33-01`
 

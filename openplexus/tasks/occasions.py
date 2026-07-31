@@ -106,6 +106,23 @@ class OccasionConfig:
             belong to no concept, so each one's true class is itself alone.
         zipf: Exponent on the concept-frequency distribution. 0.0 is uniform;
             larger is more skewed, so a few concepts dominate the stream.
+        pairings: Which of a concept's modalities may appear TOGETHER.
+
+            `"complete"` is every run before 2026-07-31: all surfaces of the
+            subject may show up at once, so learning that they belong together
+            never requires more than one direct co-occurrence. **That is easier
+            than the world and easier than the design claims to handle.**
+
+            `"chain"` lets modality `m` appear only with `m±1`, so the ends of
+            the chain are NEVER seen together and can only be linked through
+            what sits between them. `"star"` lets modality 0 appear with any
+            other and the others never with each other.
+
+            This is `GOALS.md` gate G7's shape — a concept met through one
+            modality and queried through another — and it is what
+            `identity-without-a-global-id.md` means by *"reached by starting at
+            any member and WALKING"*. Walking only does work when some members
+            are not directly connected.
         occasions: How many moments the stream runs for.
         seed: Stream seed.
     """
@@ -116,6 +133,7 @@ class OccasionConfig:
     noise: int = 3
     distractors: int = 1
     zipf: float = 0.0
+    pairings: str = "complete"
     occasions: int = 4000
     seed: int = 0
 
@@ -140,6 +158,10 @@ class OccasionConfig:
                 "ones, which is the same skew relabelled and reads as a bug")
         if self.occasions < 1:
             raise ValueError("a stream needs at least one occasion")
+        if self.pairings not in ("complete", "chain", "star"):
+            raise ValueError(
+                f"pairings must be complete, chain or star, not "
+                f"{self.pairings!r}")
         # The noise draw is without replacement from surfaces outside the
         # subject concept and outside the distractors, so it cannot ask for more
         # than exist. Caught here rather than at the first unlucky draw, because
@@ -196,6 +218,38 @@ class OccasionConfig:
         for surface in range(self.concept_surfaces, self.vocabulary):
             answer[surface] = frozenset({surface})
         return answer
+
+    def groups(self) -> tuple[tuple[int, ...], ...]:
+        """Which sets of modalities may co-occur on one occasion.
+
+        `complete` returns exactly ONE group, and that is load-bearing rather
+        than tidy: `generate` takes an untouched code path when there is one
+        group, so every stream produced before `pairings` existed is reproduced
+        byte for byte and no earlier measurement is invalidated by this knob.
+        """
+        every = tuple(range(self.surfaces))
+        if self.pairings == "complete":
+            return (every,)
+        if self.pairings == "chain":
+            return tuple((m, m + 1) for m in range(self.surfaces - 1))
+        return tuple((0, m) for m in range(1, self.surfaces))
+
+    def apart(self) -> tuple[tuple[int, int], ...]:
+        """Modality pairs that NEVER share an occasion — what a walk must bridge.
+
+        Empty for `complete`, which is why every run before this knob existed
+        was measuring direct association rather than reach.
+        """
+        together = set()
+        for group in self.groups():
+            for one in group:
+                for other in group:
+                    together.add((one, other))
+        return tuple(
+            (one, other)
+            for one in range(self.surfaces)
+            for other in range(one + 1, self.surfaces)
+            if (one, other) not in together)
 
     def weights(self) -> list[float]:
         """How often each concept is the subject, before normalisation."""
@@ -254,8 +308,14 @@ def generate(config: OccasionConfig, count: int | None = None) -> list[Occasion]
         # would stop describing the stream it names. Redrawing keeps the
         # marginals exactly `presence` conditioned on non-empty, which is a
         # statement `test_occasions.py` checks rather than this comment asserting.
+        groups = config.groups()
         while True:
-            present = [s for s in own if rng.random() < config.presence]
+            if len(groups) == 1:
+                present = [s for s in own if rng.random() < config.presence]
+            else:
+                chosen = groups[rng.randrange(len(groups))]
+                present = [own[m] for m in chosen
+                           if rng.random() < config.presence]
             if present:
                 break
 

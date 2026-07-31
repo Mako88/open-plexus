@@ -191,6 +191,49 @@ class Skew(unittest.TestCase):
         self.assertLess(max(counts.values()) / min(counts.values()), 1.5)
 
 
+class Pairings(unittest.TestCase):
+    """Which modalities may share an occasion — G7's shape, and it must BITE."""
+
+    def test_complete_is_byte_identical_to_a_stream_built_before_the_knob(self):
+        """The knob must not invalidate g32-01, g32-02 or g33-01.
+
+        Those ran before `pairings` existed, and a knob that shifted the random
+        sequence — even with the same default — would make every one of them
+        unreproducible. `groups()` returning a single group is what keeps the
+        old code path untouched, and this is the assertion that says so.
+        """
+        plain = OccasionConfig(concepts=16, occasions=500, seed=0)
+        named = OccasionConfig(concepts=16, occasions=500, seed=0,
+                               pairings="complete")
+        self.assertEqual(generate(plain), generate(named))
+
+    def test_a_chain_never_shows_the_two_ends_together(self):
+        config = OccasionConfig(concepts=16, surfaces=4, occasions=2000,
+                                seed=0, pairings="chain")
+        self.assertIn((0, 3), config.apart())
+        for occasion in generate(config):
+            own = [s for s in occasion.surfaces
+                   if config.concept_of(s) == occasion.subject]
+            modalities = {config.modality(s) for s in own}
+            for one, other in config.apart():
+                self.assertFalse(
+                    {one, other} <= modalities,
+                    f"modalities {one} and {other} shared occasion "
+                    f"{occasion.when} and must never")
+
+    def test_complete_leaves_NOTHING_for_a_walk_to_bridge(self):
+        """The companion, and it is why every earlier run was the easy case."""
+        self.assertEqual(OccasionConfig(surfaces=4).apart(), ())
+
+    def test_a_star_isolates_every_spoke_from_every_other(self):
+        config = OccasionConfig(surfaces=4, pairings="star")
+        self.assertEqual(config.apart(), ((1, 2), (1, 3), (2, 3)))
+
+    def test_an_unknown_pairing_is_refused(self):
+        with self.assertRaises(ValueError):
+            OccasionConfig(pairings="sometimes")
+
+
 class GroundTruth(unittest.TestCase):
     """`classes()` is the answer everything is scored against."""
 

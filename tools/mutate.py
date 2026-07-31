@@ -2307,8 +2307,22 @@ MUTATIONS = [
                "every arm's result follows from arithmetic. The run would still "
                "produce a scorecard, and it would be measuring construction",
         path=OCCASIONS,
-        old="            present = [s for s in own if rng.random() < config.presence]",
-        new="            present = list(own)",
+        old="                present = [s for s in own if rng.random() < config.presence]",
+        new="                present = list(own)",
+    ),
+    Mutation(
+        name="a-chain-links-every-modality-to-every-other",
+        breaks="the only thing that makes G7's question a question. `chain` and "
+               "`star` exist so some of a concept's surfaces are NEVER seen "
+               "together and can only be reached through what sits between "
+               "them; returning the complete group instead means every pair was "
+               "directly observed, `apart()` is empty, and the walk is scored on "
+               "links it never had to infer",
+        path=OCCASIONS,
+        old='        if self.pairings == "complete":\n'
+            "            return (every,)",
+        new="        if True:\n"
+            "            return (every,)",
     ),
     Mutation(
         name="noise-can-be-drawn-from-the-subject-itself",

@@ -1,8 +1,8 @@
 Can the walk bridge two modalities that never meet?
 ====================================================
 
-Script: experiments/g33_02_bridging_modalities.py   (NOT YET WRITTEN)
-Status: PREDICTIONS DRAFTED. Not committed and not run.
+Script: experiments/g33_02_bridging_modalities.py
+Status: PREDICTIONS COMMITTED, NOT YET RUN.
 
 
 IN PLAIN TERMS
@@ -70,12 +70,12 @@ Nothing yet. The intended configuration, carried from `g33-01` at its own concep
 count so no pin is transplanted:
 
     concepts       64      carried from g32-01 / g33-01
-    surfaces        3-5    the axis. 3 reproduces every previous run
+    surfaces        3-5    an axis. 3 reproduces every previous run
     presence      0.7      carried
     noise           3      carried
     distractors     1      carried
     occasions   8,000      125 per concept, well above g32-02's ~16 threshold
-    k               2      carried, and P3 is about whether it has to grow
+    k             2-4      an axis, because P3 is about whether it has to grow
     statistic  conditional the C1-safe one; `ppmi` as the reference
     seeds     0, 1, 2
 
@@ -125,11 +125,27 @@ P4  On `star`, the hub surface is pruned by the chance correction for the same
     distinguishes them by frequency alone.
 
 
-WHY THIS IS DRAFTED RATHER THAN RUN
-------------------------------------
-`g33-01` is still in flight and rule 17 forbids opening a new investigation while
-an existing one has work in it. This is the design written down so it is not
-reconstructed later, and its predictions are drafted where they can be read
-before anything produces a number.
+HOW IT IS SCORED, AND WHY NOT WITH f1
+--------------------------------------
+`reached_together` over `config.apart()`, which is the set of modality pairs the
+stream never shows together. `f1` averages over every surface, so a class that is
+mostly right scores well even when the ONE link that had to be inferred was
+missed — and that link is the entire question. Both are reported; `bridged` is
+the one that answers it.
+
+`apart()` is empty for `complete`, and `reached_together` RAISES on an empty pair
+list rather than returning 1.0. Reporting a perfect score for the absence of the
+question is the specific way this measurement could look like a pass while
+testing nothing.
 
 **Nothing here has been run and no number below this line exists.**
+
+
+RESULTS
+-------
+PENDING.
+
+
+SCORECARD
+---------
+PENDING.

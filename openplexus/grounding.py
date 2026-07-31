@@ -387,6 +387,38 @@ def class_f1(found: frozenset[int], correct: frozenset[int]) -> float:
     return 2 * precision * recall / (precision + recall)
 
 
+def reached_together(recovered: dict[int, frozenset[int]],
+                     pairs: Iterable[tuple[int, int]]) -> float:
+    """Share of the given surface pairs that ended up in one recovered class.
+
+    **Scored over pairs chosen by the caller, and that is the whole point.**
+    `score_classes` averages over every surface, so a class that is mostly right
+    scores well even if the one link that had to be *inferred* was missed. This
+    asks only about pairs the caller nominates — in practice, ones whose
+    modalities never shared an occasion, so the only route between them is
+    through something else.
+
+    That is `GOALS.md` gate G7's question and
+    `identity-without-a-global-id.md`'s central claim: a concept is reached by
+    starting at any member and walking. Walking is only doing work when the
+    answer was not directly observed.
+
+    Returns:
+        0.0 to 1.0. Raises if no pairs are given, because a rate over nothing
+        reads as a score and is not one.
+    """
+    wanted = list(pairs)
+    if not wanted:
+        raise ValueError(
+            "no pairs to score. A `complete` pairing has no modality pair that "
+            "never co-occurs, so there is nothing here that a walk had to "
+            "bridge -- and reporting 1.0 for that would be reporting the "
+            "absence of the question as a perfect answer")
+    hit = sum(1 for one, other in wanted
+              if other in recovered.get(one, frozenset({one})))
+    return hit / len(wanted)
+
+
 def score_classes(recovered: dict[int, frozenset[int]],
                   truth: dict[int, frozenset[int]],
                   distractors: Iterable[int] = ()) -> dict[str, float]:

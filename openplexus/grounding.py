@@ -1,0 +1,322 @@
+"""Learning that two surfaces are one thing, by counting what turns up together.
+
+The mechanism [`GOALS.md`](../GOALS.md) §1.2b commits to: identity between
+modalities is **not computed, it is learned from co-occurrence.** A picture, a
+bark and the word *dog* become one concept because they keep arriving together
+while the sofa and the face do not.
+
+This is the arithmetic half of that, and it is deliberately the whole of what is
+built so far.
+
+## What this contains, and what it does NOT contain yet
+
+**It contains no distribution at all**, and that is a decision rather than an
+omission. [`time-bucket-join.md`](../docs/options/time-bucket-join.md) designs a
+transient join at `owner(time bucket)` writing links out to `owner(surface id)`;
+none of it is here. The reason is that the two halves answer different questions:
+
+    the statistic   can counting separate "always there" from "is the thing"
+    the join        can two machines discover a coincidence without asking
+
+**Only the first can refute the design cheaply**, and it refutes it completely if
+it fails: distribution cannot add information to a count, so every difference the
+join introduces — a boundary splitting one moment in two, a late arrival landing
+in the wrong bucket, a departed node taking counts with it — can only *lose*
+signal. A statistic that cannot separate the distractor here cannot separate it
+spread across machines. **The converse does not hold**, so a pass here is
+necessary and not sufficient, and the join is what has to be built and run in
+containers before anything is claimed about C1.
+
+## What this does NOT duplicate, and what was searched
+
+Searched by capability — co-occurrence, counting, pair statistics, grouping,
+walk, equivalence — across `openplexus/`, `tools/`, `tests/` and `experiments/`.
+
+- **`openplexus/content.py` (`ContentIndex`) already accumulates co-occurrence,
+  and the difference is the reason this file exists.** That one sums neighbour
+  vectors into one superposed vector per token. A superposition **cannot hold a
+  per-neighbour count** — it holds their sum — so no statistic that needs
+  `count(x, y)` separately from `count(x)` is reachable from it. That is exactly
+  the shape every escape from a persistent distractor takes, and
+  [note 045](../docs/archive/notes/045-addresses-that-mean-something.md) named
+  PPMI and subsampling as untried for that reason. **A table can hold what a
+  superposition cannot**, and this file is that table. `ContentIndex` is not
+  replaced and stays the representation used for similarity.
+- **`openplexus/grouping.py`** turns content *vectors* into groups by spherical
+  k-means. It needs vectors, needs `k`, and produces a partition of everything.
+  This walks an explicit count graph and produces classes that may overlap
+  nothing and leave surfaces alone — which is what *"the distractor was pruned"*
+  has to look like.
+- **`openplexus/search.py`** already walks, but it walks a *store* by keyed
+  retrieval, committing to a token per step. There is no store here and nothing
+  is retrieved; the graph is the counts themselves.
+- **`openplexus/ownership.py` and `openplexus/partitioned.py`** are what the join
+  would be built from and are deliberately not imported. See above.
+- **`openplexus/sketch.py`** answers occupancy — whether an address was ever
+  written — not how often two things met.
+
+## Why mutual top-k rather than a threshold
+
+An edge is kept only if each surface is in the other's top `k`. Mutuality is not
+a new idea here: it is the merge gate measured on OpenEA, where **a confidence
+gate made alignment worse and mutuality was what worked** (`DECISIONS.md` §10).
+A one-sided rule lets a hub — which is precisely what a distractor present every
+time is — attach itself to every surface in the world, since it is in everyone's
+top list and nobody is in its.
+
+**`k` is SUPPLIED, and that is generous to the mechanism on purpose.** Telling it
+how large a class is hands it something the real problem does not, so a failure
+under this rule is a strong refutation and a pass is a weak confirmation.
+Discovering the size instead is already an open option — *bound the enumeration
+by the biggest similarity gap* in `DECISIONS.md` §6 — and it is the follow-up,
+not a gap in this file.
+
+## Determinism
+
+Neighbours are ordered by `(-score, surface)`, never by set iteration. Ties are
+everywhere in raw counts, and CLAUDE.md rule 3's calibration is a published
+figure that moved between runs because a `set` of strings iterated in hash order.
+Same failure, one layer down, so it is closed by construction here.
+"""
+
+from __future__ import annotations
+
+import math
+from itertools import combinations
+from typing import Callable, Iterable
+
+
+class CoOccurrence:
+    """Counts of what turned up with what, and how often each thing turned up.
+
+    This is the durable accumulator the design puts at `owner(surface id)`, with
+    the ownership left out — every surface's row is independent of every other's,
+    which is the property that makes sharding it later a routing change rather
+    than a redesign.
+
+    Attributes:
+        occasions: How many moments have been observed.
+    """
+
+    def __init__(self) -> None:
+        self.occasions = 0
+        self._seen: dict[int, int] = {}
+        self._pairs: dict[int, dict[int, int]] = {}
+
+    def observe(self, surfaces: Iterable[int]) -> None:
+        """Record one moment: everything present met everything else present.
+
+        A surface appearing twice in one moment is counted once — an occasion is
+        a *set*, and double-counting would make a repeated surface look like a
+        stronger partner to everything.
+        """
+        present = sorted(set(surfaces))
+        self.occasions += 1
+        for surface in present:
+            self._seen[surface] = self._seen.get(surface, 0) + 1
+            self._pairs.setdefault(surface, {})
+        for one, other in combinations(present, 2):
+            self._pairs[one][other] = self._pairs[one].get(other, 0) + 1
+            self._pairs[other][one] = self._pairs[other].get(one, 0) + 1
+
+    def surfaces(self) -> list[int]:
+        """Every surface seen at least once, in ascending order."""
+        return sorted(self._seen)
+
+    def seen(self, surface: int) -> int:
+        """How many occasions a surface was present on."""
+        return self._seen.get(surface, 0)
+
+    def together(self, one: int, other: int) -> int:
+        """How many occasions two surfaces were both present on."""
+        return self._pairs.get(one, {}).get(other, 0)
+
+    def partners(self, surface: int) -> list[int]:
+        """Every surface ever seen alongside this one, in ascending order."""
+        return sorted(self._pairs.get(surface, {}))
+
+
+#: A statistic scores a candidate neighbour `other` of `surface`. Higher is a
+#: stronger claim that the two are the same thing.
+Statistic = Callable[[CoOccurrence, int, int], float]
+
+
+def raw_count(index: CoOccurrence, surface: int, other: int) -> float:
+    """How often they met. The mechanism exactly as the option records design it.
+
+    **This is the arm the falsifier is aimed at.** A surface present on every
+    occasion meets everything more often than any real partner that is present
+    only sometimes, so this ranks the distractor first by construction whenever
+    `presence` is below 1.
+    """
+    return float(index.together(surface, other))
+
+
+def frequency_weighted(index: CoOccurrence, surface: int, other: int) -> float:
+    """Meetings, discounted by how common the neighbour is: `c_xy / sqrt(c_y)`.
+
+    Note 045's fix, which sharpened some queries on Shakespeare and destroyed
+    others. It is here to be measured rather than to be believed, and the
+    prediction attached to it is that it over-corrects once concept frequencies
+    are uneven.
+    """
+    common = index.seen(other)
+    if common <= 0:
+        return 0.0
+    return index.together(surface, other) / math.sqrt(common)
+
+
+def conditional(index: CoOccurrence, surface: int, other: int) -> float:
+    """`P(surface | other)` — of the times the neighbour showed up, how often did this.
+
+    A thing present every time has this at the base rate of `surface` for every
+    partner, so it cannot be anyone's best neighbour unless nothing else is.
+    """
+    common = index.seen(other)
+    if common <= 0:
+        return 0.0
+    return index.together(surface, other) / common
+
+
+def ppmi(index: CoOccurrence, surface: int, other: int) -> float:
+    """Positive pointwise mutual information — how much likelier than chance.
+
+    Named as untried in note 045 and untried since. A surface present on **every**
+    occasion has `P(other) = 1`, so its PMI with anything is exactly zero and it
+    is pruned analytically. That is why the interesting question is not whether
+    this beats the distractor — it must — but whether it survives uneven concept
+    frequencies, where PMI is known to over-reward rare events.
+    """
+    both = index.together(surface, other)
+    if both <= 0:
+        return 0.0
+    mine, theirs = index.seen(surface), index.seen(other)
+    if mine <= 0 or theirs <= 0:
+        return 0.0
+    lift = (both * index.occasions) / (mine * theirs)
+    if lift <= 1.0:
+        return 0.0
+    return math.log(lift)
+
+
+#: Every statistic, by the name a sweep reports it under.
+STATISTICS: dict[str, Statistic] = {
+    "count": raw_count,
+    "weighted": frequency_weighted,
+    "conditional": conditional,
+    "ppmi": ppmi,
+}
+
+
+def neighbours(index: CoOccurrence, surface: int, statistic: Statistic,
+               k: int) -> list[int]:
+    """The `k` strongest partners of a surface, best first.
+
+    Scores of zero are dropped rather than ranked: a statistic returning zero is
+    saying *no evidence*, and padding a list out to `k` with things it refused
+    would manufacture edges the statistic did not claim.
+    """
+    if k < 1:
+        raise ValueError("k must be at least 1")
+    scored = [(statistic(index, surface, other), other)
+              for other in index.partners(surface)]
+    scored = [(score, other) for score, other in scored if score > 0.0]
+    scored.sort(key=lambda pair: (-pair[0], pair[1]))
+    return [other for _, other in scored[:k]]
+
+
+def equivalence_classes(index: CoOccurrence, statistic: Statistic,
+                        k: int) -> dict[int, frozenset[int]]:
+    """Walk the mutual-top-`k` graph; each surface's class is what it reaches.
+
+    A concept is never stored, so this is the whole of what *"reaching a
+    concept"* means: start at any surface, follow links, and the set you arrive
+    at is the class. Connected components are that walk run to exhaustion.
+
+    Returns:
+        Every surface seen, mapped to the class containing it. A surface with no
+        surviving edge maps to itself alone.
+    """
+    top = {surface: set(neighbours(index, surface, statistic, k))
+           for surface in index.surfaces()}
+    adjacency: dict[int, set[int]] = {surface: set() for surface in top}
+    for surface, chosen in top.items():
+        for other in chosen:
+            if surface in top.get(other, ()):        # mutual, or no edge
+                adjacency[surface].add(other)
+                adjacency[other].add(surface)
+
+    classes: dict[int, frozenset[int]] = {}
+    for start in sorted(adjacency):
+        if start in classes:
+            continue
+        component: set[int] = set()
+        frontier = [start]
+        while frontier:
+            here = frontier.pop()
+            if here in component:
+                continue
+            component.add(here)
+            frontier.extend(sorted(adjacency[here] - component))
+        frozen = frozenset(component)
+        for member in component:
+            classes[member] = frozen
+    return classes
+
+
+def score_classes(recovered: dict[int, frozenset[int]],
+                  truth: dict[int, frozenset[int]],
+                  distractors: Iterable[int] = ()) -> dict[str, float]:
+    """How well the walk recovered the concepts.
+
+    Args:
+        recovered: What the mechanism found, per surface.
+        truth: The generator's answer, per surface.
+        distractors: Surfaces that were present on every occasion.
+
+    Returns:
+        `f1` — mean over non-distractor surfaces of the F1 between the recovered
+        class and the true one, so a class that is right but too large is
+        penalised as well as one that is too small.
+
+        `captured` — the share of non-distractor surfaces whose recovered class
+        contains a distractor. **This is the registered falsifier, scored
+        directly**: 0.0 means the distractor was pruned everywhere.
+
+        **It cannot reach 1.0, and reading it as though it could understates the
+        harm.** Mutuality caps a distractor's degree at `k` — every surface that
+        points at it is one it did not point back at — so a surviving distractor
+        poisons a few classes rather than all of them. What it does to the rest
+        is *displacement*: it takes the top slot a true partner needed, so
+        couples break without the distractor ever joining them. **`f1` is the
+        quantity that sees that**, and it is the one to read first.
+        `test_grounding.TheWalk` holds the worked case and the number.
+
+        `largest` — the biggest recovered class as a share of all surfaces. It
+        catches the other failure, where a statistic links so freely that
+        everything chains into one component through ordinary-looking edges.
+    """
+    marked = frozenset(distractors)
+    scored = [s for s in sorted(truth) if s not in marked]
+    if not scored:
+        raise ValueError(
+            "every surface is a distractor, so there is no concept to recover")
+
+    total, captured = 0.0, 0
+    for surface in scored:
+        found = recovered.get(surface, frozenset({surface}))
+        correct = truth[surface]
+        overlap = len(found & correct)
+        if overlap:
+            precision = overlap / len(found)
+            recall = overlap / len(correct)
+            total += 2 * precision * recall / (precision + recall)
+        if found & marked:
+            captured += 1
+
+    sizes = {frozen for frozen in recovered.values()}
+    biggest = max((len(frozen) for frozen in sizes), default=0)
+    population = len(truth) or 1
+    return {"f1": total / len(scored),
+            "captured": captured / len(scored),
+            "largest": biggest / population}

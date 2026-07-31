@@ -30,12 +30,28 @@ machines instead.** Not a faster network: a differently-shaped one, where no par
 ever has to wait for a global picture, and where a machine leaving in the middle
 of a thought is a normal event rather than a failure.
 
-If it works, the payoff is a path to large-scale AI whose limit is how many
-people want to join rather than how much money one company has.
+**And the obvious version of this already exists, which is where the argument has
+to start.** Several projects already run large AI models across volunteer
+machines over the ordinary internet, and they work. They manage it by keeping the
+conventional training method and engineering around its need for lockstep —
+splitting the model into stages, routing work to whoever is free, scheduling
+around the slow. So *"AI on people's own computers"* is not the thing that would
+make this project worth doing. It is done.
+
+What is unclaimed is the narrower thing: **removing the need for the lockstep
+rather than tolerating it.** A system built that way could do things the others
+structurally cannot — keep learning while it runs, rather than in training runs
+that finish; carry on when a machine vanishes mid-thought; rearrange what it
+knows as new things arrive, instead of being fitted once and frozen. **That is
+the payoff to aim at, and it is a claim about capability rather than about
+price.**
+
+Cheapness and openness follow if it works, and they are worth having. They are
+not the reason to try, because a system that merely made distributed training
+cheaper would be competing with things that already do it.
 
 If it does not work, the useful outcome is a clear, measured statement of
-*which specific constraint kills it*. That is worth having on its own, because
-nobody appears to have written it down.
+*which specific constraint kills it*. That is worth having on its own.
 
 ---
 
@@ -106,6 +122,57 @@ goals. "Would a single GPU beat this" is a footnote, not a blocker.
 
 What matters instead is whether the thing works on **consumer devices that are
 unreliable, heterogeneous, and constantly leaving.**
+
+### 1.1a The differentiator is CAPABILITY, not cost — and the reason is that the cost version is taken
+
+**Approved by John, 2026-07-31.** This document previously argued from cost and
+access: data centres are expensive, idle consumer machines are free, so a system
+that used them would widen who can build. That argument is not wrong and it is
+not sufficient, because **there is an established field already doing it.**
+
+**Decentralised training on volunteer hardware exists and ships.** Learning@home
+and Hivemind, Petals, Nous Psyche, Pluralis Agora — large models trained and
+served across unreliable volunteer machines over the ordinary internet.
+
+> **Rule 1 applies and the label matters more than the list.** These were read as
+> search results and abstracts, not as papers, in a search that was not wide. They
+> are **leads**, and no property of any of them may be quoted as established here
+> until one is actually read. What is being taken from them is not a number; it is
+> the fact that the category is occupied, which a search result is sufficient to
+> establish.
+
+**They keep backpropagation and engineer around the synchronisation** — pipeline
+stages, expert routing, scheduling around stragglers. That is a real and
+successful strategy, and it means *"distributed AI on consumer hardware"* is a
+**solved problem statement**, not this project's contribution.
+
+**So the bet has to be the narrower one, and it is this:** that a local rule
+**removes the need for the global step**, rather than tolerating it. Everything
+in §3 is downstream of that sentence.
+
+**Which forces the payoff to be something the synchronised systems cannot do at
+all.** Being cheaper is not it — they are already cheap. What a system with no
+global step can be that a scheduled-around one cannot:
+
+- **It never stops learning.** C4 is not a preference; it is the differentiator.
+  A system whose training is a run that ends can be distributed with enough
+  engineering. A system with no run and no end is a different object.
+- **It survives arbitrary churn mid-computation**, rather than treating a
+  departure as an exception to recover from. C3.
+- **It keeps reorganising what it knows** as new things arrive, instead of
+  fitting a structure once over a graph fixed at training time.
+
+**The practical consequence for what gets measured.** A result showing this
+architecture can be spread across machines is **not evidence for the project** —
+that capability is not in dispute and is not ours. The evidence that counts comes
+from the gates the alternatives structurally cannot reach, which is why G6 and G7
+were added and why C4 is a constraint rather than an aspiration.
+
+**And the risk this creates, stated rather than discovered later.** If continual
+local reorganisation turns out to buy nothing over a frozen global fit, the
+project has no differentiator at all — not a weaker one. That is exactly the open
+hypothesis §1.2b already records under *"the open hypothesis, labelled as one"*,
+and it is now the central one rather than a caveat at the end of a section.
 
 ### 1.2 What the model is trained to DO — relationships, not text
 

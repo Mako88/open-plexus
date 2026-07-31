@@ -51,6 +51,8 @@ REWARD_RECALL = ROOT / "openplexus" / "tasks" / "reward_recall.py"
 KINSHIP = ROOT / "openplexus" / "tasks" / "kinship.py"
 CLOSURE = ROOT / "openplexus" / "tasks" / "closure.py"
 CONTENT = ROOT / "openplexus" / "content.py"
+OCCASIONS = ROOT / "openplexus" / "tasks" / "occasions.py"
+GROUNDING = ROOT / "openplexus" / "grounding.py"
 OWNERSHIP = ROOT / "openplexus" / "ownership.py"
 PARTITIONED = ROOT / "openplexus" / "partitioned.py"
 SEARCH = ROOT / "openplexus" / "search.py"
@@ -2293,6 +2295,63 @@ MUTATIONS = [
             "                grad_a = d_composed * right[b]\n"
             "                grad_b = d_composed * left[a]\n"
             "            else:",
+    ),
+    Mutation(
+        name="every-surface-of-the-subject-is-always-present",
+        breaks="the only thing that makes the grounding falsifier an experiment. "
+               "With every surface of a concept present whenever it is the "
+               "subject, the true partner and the ever-present distractor have "
+               "IDENTICAL counts, so raw counting ties rather than failing and "
+               "every arm's result follows from arithmetic. The run would still "
+               "produce a scorecard, and it would be measuring construction",
+        path=OCCASIONS,
+        old="            present = [s for s in own if rng.random() < config.presence]",
+        new="            present = list(own)",
+    ),
+    Mutation(
+        name="noise-can-be-drawn-from-the-subject-itself",
+        breaks="the separation between signal and distraction. Noise is the "
+               "sofa -- a thing that happened to be in the room -- and drawing "
+               "it from the subject's own surfaces hands the mechanism extra "
+               "co-occurrence for free, so `presence` stops describing the "
+               "stream and every recovery score is inflated by an amount nobody "
+               "controls",
+        path=OCCASIONS,
+        old="                if s // config.surfaces != subject]",
+        new="                if True]",
+    ),
+    Mutation(
+        name="a-link-does-not-have-to-be-returned",
+        breaks="mutuality, which is the only thing stopping a surface present on "
+               "every occasion from attaching itself to the entire world. It is "
+               "in everyone's top list and nobody is in its; a one-sided rule "
+               "gives it an edge to every surface there is, and the walk returns "
+               "one class containing everything. Measured on OpenEA as the merge "
+               "gate that works where a confidence gate does not",
+        path=GROUNDING,
+        old="            if surface in top.get(other, ()):        # mutual, or no edge",
+        new="            if True:",
+    ),
+    Mutation(
+        name="the-neighbour-list-is-padded-out-to-k",
+        breaks="the difference between a cap and a quota. A statistic returning "
+               "zero is refusing to claim a link, and keeping those entries "
+               "manufactures edges out of no evidence -- so a surface with one "
+               "real partner acquires k-1 invented ones, and the invented ones "
+               "are whichever happened to sort first",
+        path=GROUNDING,
+        old="    scored = [(score, other) for score, other in scored if score > 0.0]",
+        new="    scored = list(scored)",
+    ),
+    Mutation(
+        name="a-moment-is-a-list-rather-than-a-set",
+        breaks="what an occasion IS. A surface appearing twice in one moment "
+               "would count as its own partner and as a doubly-strong partner "
+               "to everything else present, so a duplicate anywhere upstream "
+               "silently reweights the whole table",
+        path=GROUNDING,
+        old="        present = sorted(set(surfaces))",
+        new="        present = sorted(surfaces)",
     ),
 ]
 def restore_any_leftovers() -> None:

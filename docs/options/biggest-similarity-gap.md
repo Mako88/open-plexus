@@ -78,3 +78,54 @@ task falls 0.45 at once. So the crossover needs purity ≳0.99 **and** bimodalit
 real dataset supplies neither.
 
 **The shape is the finding, not the number** — a cliff rule needs a cliff.
+
+### It resolves a hub-and-spoke tension a fixed count CANNOT express — `g33-04`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g33-04-does-a-derived-bound-fix-the-star.txt
+            script  experiments/g33_04_does_a_derived_bound_fix_the_star.py
+            task    occasions, 64 concepts, 8,000 occasions, pairings complete/chain/star
+            model   grounding.cliff over conditional scores; look 16; no join
+            knobs   bound in {2, 3, derived}, surfaces 3-5; 3 seeds
+            scale   uniform frequency, 1 distractor
+
+**A second, independent argument for this option from a different direction.**
+`g33-02` found a single global bound cannot express a star: the hub needs a bound
+at least its own degree while a spoke needs one, and no value is both.
+
+Derived, on `star` at five surfaces: bridged **0.8429** and f1 **0.9202**, against
+a fixed 2's **0.1667** and **0.4847**, and a fixed 3's collapse to a largest class
+of **0.8962** of all surfaces. Largest for the derived arm never exceeds
+**0.0208** in any of nine cells, so **the rule is self-limiting** where a fixed
+bound large enough for the hub is not.
+
+On `complete` it matches the best fixed bound at 3 and 4 surfaces and reaches
+**1.0000** at 5 where the best fixed value in that grid reaches 0.9236 — the
+decision-167 property reproducing on a different world and a different statistic.
+
+**It loses on chains and the cause is stated:** a mid-chain surface's two true
+neighbours score asymmetrically, because the rarer one scores higher, so the
+biggest gap falls between them rather than after them. Bridged degrades
+**0.9792, 0.7344, 0.6215** with length against a fixed 2's flat 1.0000 — while f1
+is HIGHER at every length, because the fixed bound over-links a leaf. A trade,
+not a loss.
+
+### The rule's answer on an even slope is decided by FLOATING POINT — `test_grounding`
+
+    CONFIG  when    2026-07-31
+            source  tests/test_grounding.py, TheCliff
+            script  none -- a property of the arithmetic, asserted in a test
+            task    n/a
+            model   grounding.cliff
+            knobs   none
+            scale   n/a
+
+`[0.5, 0.4, 0.3, 0.2, 0.1]` returns 2 and `[5.0, 4.0, 3.0, 2.0, 1.0]` returns 1 —
+the same ranking with the same gaps, because `0.5 - 0.4` and `0.4 - 0.3` differ in
+binary and an argmax over gaps has nothing else to separate them.
+
+Note 058 measured real co-occurrence as exactly that shape. **So on slope-shaped
+data this rule does not merely degrade: its output is determined by representation
+noise**, and a result taken from it there would be unreproducible for a reason no
+seed controls. Asserted rather than commented so the caution cannot be read as
+theoretical.

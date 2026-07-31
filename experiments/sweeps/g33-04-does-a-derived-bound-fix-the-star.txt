@@ -2,7 +2,14 @@ Does a per-surface bound fix the star?
 ======================================
 
 Script: experiments/g33_04_does_a_derived_bound_fix_the_star.py
-Status: PREDICTIONS COMMITTED, NOT YET RUN.
+Status: RUN, local, 2026-07-31, 29.0s. Predictions committed at `5a214a4`
+        before the script was executed.
+
+ANSWER: **the derived bound is the best arm in eight of nine cells and collapses
+        in none.** It turns the star from unusable into workable — 0.1667 to
+        0.8429 bridged at five surfaces, with f1 0.4847 to 0.9202 — and matches
+        or beats the best fixed bound on `complete` without being told which it
+        is. Its one weakness is chains, exactly where and why P2 said.
 
 
 IN PLAIN TERMS
@@ -108,14 +115,109 @@ Estimated: `g33-02` ran the same grid shape in 28.4s. This is 27 cells against
 that one's 27, with the derived arm doing slightly more work per ranking, so
 **under a minute**. Local.
 
-Recorded after the run: PENDING.
+Recorded after the run: **29.0s**, one process. The estimate held.
 
 
 RESULTS
 -------
-PENDING.
+    pairing    surfaces   bound       f1   bridged   largest
+    complete          3       2   1.0000       n/a    0.0155
+    complete          3       3   0.4049       n/a    0.2487
+    complete          3 derived   1.0000       n/a    0.0155
+    complete          4       2   0.8446       n/a    0.0156
+    complete          4       3   1.0000       n/a    0.0156
+    complete          4 derived   1.0000       n/a    0.0156
+    complete          5       2   0.7137       n/a    0.0156
+    complete          5       3   0.9236       n/a    0.0156
+    complete          5 derived   1.0000       n/a    0.0156
+
+    chain             3       2   0.6864    1.0000    0.0777
+    chain             3       3   0.0464    1.0000    0.9793
+    chain             3 derived   0.9938    0.9792    0.0155
+    chain             4       2   0.7233    1.0000    0.0726
+    chain             4       3   0.0464    1.0000    0.9805
+    chain             4 derived   0.9109    0.7344    0.0156
+    chain             5       2   0.7835    1.0000    0.0623
+    chain             5       3   0.0360    1.0000    0.9917
+    chain             5 derived   0.8470    0.6215    0.0156
+
+    star              3       2   0.7043    1.0000    0.0881
+    star              3       3   0.0429    1.0000    0.9793
+    star              3 derived   0.9891    0.9635    0.0155
+    star              4       2   0.5662    0.3333    0.0493
+    star              4       3   0.0360    1.0000    0.9909
+    star              4 derived   0.9594    0.9115    0.0208
+    star              5       2   0.4847    0.1667    0.0363
+    star              5       3   0.0693    0.8177    0.8962
+    star              5 derived   0.9202    0.8429    0.0166
+
+Every `bridged` of 1.0000 at a fixed bound of 3 sits beside a `largest` of 0.98:
+those are one class holding everything and they measure nothing. The derived
+arm's `largest` never exceeds **0.0208**.
 
 
 SCORECARD
 ---------
-PENDING.
+  P1  REFUTED ON THE LETTER, CONFIRMED IN DIRECTION, and the letter is what a
+            prediction is for. Bridging above 0.90 with no collapse was
+            predicted at four AND five surfaces. At four: **0.9115**, largest
+            0.0208 — held. At five: **0.8429**, which is below the bar.
+
+            The substantive claim is not close. Fixed 2 bridges **0.1667** at
+            five surfaces and fixed 3 collapses to largest 0.8962; the derived
+            bound reaches 0.8429 with largest 0.0166 and lifts f1 from 0.4847 to
+            **0.9202**. So the per-surface bound does resolve the tension
+            `g33-02` found, and 0.90 was a number I chose without evidence.
+
+  P2  SPLIT, and the split is the useful part. The derived bound was predicted
+            WORSE than fixed 2 on chains. On `bridged` it is, and it degrades
+            with length exactly as the pre-run probe said: **0.9792, 0.7344,
+            0.6215** against fixed 2's flat 1.0000.
+
+            **On f1 it is BETTER at every chain length** — 0.9938, 0.9109, 0.8470
+            against 0.6864, 0.7233, 0.7835 — because fixed 2 over-links a leaf
+            that needs only one partner, and the contamination costs more than
+            the missed bridge does.
+
+            So it is a genuine trade rather than a loss, and which side wins is
+            a property of what is being asked: reach the far end of a chain, or
+            recover clean classes. That is `DECISIONS.md` 14c's shape and both
+            arms stay.
+
+  P3  HELD, AND MORE STRONGLY THAN PREDICTED. On `complete` the derived bound
+            matches the best fixed bound at 3 and 4 surfaces and **beats every
+            fixed value in this grid** at 5 (1.0000 against 0.9236), without
+            being told which is best. `g33-02` shows a fixed 4 also reaches
+            1.0000 there — so the derived rule found the right answer at each
+            size where no single fixed number does.
+
+            This re-tests decision 167's families result on a different world
+            and a different statistic, and it reproduces.
+
+  P4  HELD, DECISIVELY, and it is the property that makes the rule usable.
+            `largest` for the derived arm is between **0.0155 and 0.0208** in
+            every one of the nine cells. The rule is self-limiting: a noise
+            surface's ranking falls off after very few partners, so it admits
+            few, and no amount of world-shape makes it chain everything
+            together. Fixed 3 collapses in six cells out of nine.
+
+
+WHAT THIS DOES NOT SETTLE, AND IT IS THE LARGEST CAVEAT IN THE g33 LINE
+------------------------------------------------------------------------
+**This world was designed to have a cliff and the rule needs one.** Note 058
+measured real language co-occurrence decaying in steps of 0.02–0.03 where a
+designed task falls 0.45 at once, bimodal at no setting. And `cliff` on an even
+slope returns an answer decided by floating point — `[0.5, 0.4, 0.3, 0.2, 0.1]`
+gives 2 while `[5, 4, 3, 2, 1]` gives 1, asserted in `test_grounding`.
+
+So the honest statement is: **a per-surface bound resolves the hub-and-spoke
+tension WHERE THE RANKING IS BIMODAL.** Whether the ranking is bimodal on data
+this project did not generate is unmeasured here and measured negatively
+elsewhere. The `conditional` profile being bimodal in this world was checked
+before the grid ran rather than assumed, and that check is the thing to repeat on
+any new stream before trusting a number from this arm.
+
+**And the chain weakness has a stated cause that suggests a fix.** A mid-chain
+surface's two true neighbours score asymmetrically because one is rarer, so the
+biggest gap falls between them. A symmetric statistic, or taking the union of
+each end's derived set rather than the intersection, would address it. Untried.

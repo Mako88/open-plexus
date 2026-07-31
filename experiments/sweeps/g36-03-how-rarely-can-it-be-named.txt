@@ -1,0 +1,127 @@
+How rarely can a thing be named and still be grounded?
+======================================================
+
+Script: experiments/g36_03_how_rarely_can_it_be_named.py
+Status: PREDICTIONS COMMITTED, NOT YET RUN.
+
+
+IN PLAIN TERMS
+--------------
+`g36-01` had the word present every single time a picture was shown. That is not
+how naming works. A child sees dogs constantly and hears the word *dog*
+occasionally — most sightings are silent.
+
+So: show the pictures as before, and speak the word only some fraction of the
+time. How rare can the naming get before the link breaks?
+
+**This is also as close to gate G7 as this setup can honestly get**, and the
+reason is worth stating because it locates something.
+
+The strict reading of G7 would be: can the word reach a picture-code it has
+*never* been spoken alongside? **In this stream that is impossible for a
+structural reason** — each moment shows one picture, so picture-codes never
+appear together, and there is no chain from an unnamed code to a named one. A
+test of it would fail for bookkeeping reasons and tell us nothing.
+
+Which makes clear where generalisation actually lives in this design:
+
+  - **Seeing a new three as a three** is the quantiser's job. A fresh picture
+    lands on the code the existing threes already occupy — that is why the code
+    exists.
+  - **Knowing that code is called "three"** is co-occurrence's job.
+
+So the honest question is whether naming a *fraction* of a code's pictures is
+enough to name the whole code. And there is already a number that predicts the
+answer: `g32-02` measured about **16 occasions** as what a concept needs. A code
+here holds about 80 pictures, so naming should break somewhere near a rate of
+**0.20**.
+
+
+WHAT IS BEING MEASURED
+----------------------
+Identical to `g36-01` except for the naming rate, so the two are directly
+comparable and the rate is the only thing that moved.
+
+    quantiser   agreement WITHIN a modality. **Unaffected by naming** and
+                reported as the control it is: if it moves, something other than
+                the intended axis changed
+    link        of the image codes a word reaches, the share whose majority is
+                that word's digit. Per CODE
+    grounded    share of ALL images both reachable from their word and in a
+                majority-correct code. Per IMAGE, so it is comparable with
+                `quantiser` where `link` is not — the confound `g36-01` had to
+                correct
+    reach       share of the ten words reaching any image code
+    classes     mean recovered class size, the collapse companion
+
+Chance for the purities is the largest class share, about 0.11.
+
+
+MEASURED ON
+-----------
+Local, single process, Python 3.14, numpy for the quantiser only.
+
+    images       4,000    MNIST prefix, ~80 per code
+    codes           50    `g36-01`'s operating point: perfect link purity there
+    words           10
+    noise            2    other words, carried from g36-01
+    distractors      1    carried
+    quantiser  spherical k-means over unit pixel rows
+    bound      derived
+    seeds      0, 1, 2
+
+Swept: naming rate in {0.02, 0.05, 0.10, 0.20, 0.50, 1.00} — about 1.6, 4, 8,
+16, 40 and 80 namings per code.
+
+**The grid brackets the predicted breaking point on both sides**, which
+`g33-01` did not do for bucket width and had to say so afterwards.
+
+
+PREDICTIONS
+-----------
+P1  CONTROL. `quantiser` is flat across every naming rate, because the clustering
+    never sees a word.
+    REFUTED IF it moves, which would mean the naming rate is reaching something
+    it should not and no other row is interpretable.
+
+P2  NAMING IS CHEAP. At a rate of **0.20** — about 16 namings per code, which is
+    `g32-02`'s measured threshold — `link` is still above 0.90.
+    REFUTED IF it has already collapsed there, which would mean grounding needs
+    far more naming than a concept needs occasions, and the two thresholds are
+    not the same quantity.
+
+P3  IT BREAKS BELOW THAT, AND SHARPLY. At 0.05 — about 4 namings per code —
+    `link` falls below 0.50 and `reach` falls below 1.0, because some words never
+    accumulate enough evidence to rank their own code first.
+    REFUTED IF it survives at 0.05, which would be the better outcome: naming
+    would be cheaper than the occasion threshold implies, and the word would be
+    getting help from somewhere this file has not accounted for.
+
+P4  `grounded` FALLS FASTER THAN `link`. `link` asks whether the codes a word
+    reaches are the right ones; `grounded` asks how many images that covers. A
+    word that reaches one correct code out of its digit's three scores perfectly
+    on the first and poorly on the second.
+    REFUTED IF they fall together, which would mean a digit's images are
+    concentrated in a single code and the quantiser is doing more than
+    `g36-01`'s 0.83 purity suggests.
+
+
+COST
+----
+Estimated: 6 naming rates x 3 seeds is 18 k-means runs over 4,000 x 784 plus
+4,000 occasions each. `g36-01` did 9 such runs in 5.9s, so **about 15 seconds**.
+The last two estimates in this line were wrong by two orders of magnitude in the
+same direction, so this one is scaled from a MEASURED run of the same shape
+rather than from a guess.
+
+Recorded after the run: PENDING.
+
+
+RESULTS
+-------
+PENDING.
+
+
+SCORECARD
+---------
+PENDING.

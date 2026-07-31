@@ -2,7 +2,24 @@ Does the refusal survive a thing present ALMOST always?
 ========================================================
 
 Script: experiments/g39_06_what_about_a_thing_present_almost_always.py
-Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+Status: RUN, local, 2026-07-31, 23.1s. Predictions committed at `253418c`
+        before the script was executed.
+
+ANSWER: **Partial presence does nothing at all, exactly as the arithmetic said
+        — and the CONFOUND arm is a coin on edge that a pooled mean hid.**
+
+        Independent presence from 1.0 down to 0.5 leaves the distractor's score
+        at 0.2805-0.2808 and the margin at 0.4488-0.4491. The `p` cancels, so
+        `g39-05`'s caveat dissolves rather than being answered.
+
+        **The correlated arm pooled over ten words reads margin 0.4494 and looks
+        fine. Scored on the digit it actually favours it reads 0.0096** —
+        weakest true partner 0.6307 against the confound's 0.6211. A 47-fold
+        collapse, invisible in the pooled row.
+
+        It is still not admitted, at rank 7.7 against a want of 4.7. **But it is
+        refused by a hair rather than by a margin**, and that is the honest
+        boundary of everything `g39-04` and `g39-05` established.
 
 
 IN PLAIN TERMS
@@ -99,14 +116,106 @@ Estimated from `g39-05`'s measured 23.8s for four arms at 24,000 occasions. This
 is six arms at 12,000, so about three quarters of that work. **15 to 40
 seconds.**
 
-Recorded after the run: TO BE FILLED.
+Recorded after the run: **23.1s**, inside a 15-40s estimate.
 
 
 RESULTS
 -------
-TO BE FILLED.
+    presence   rank  want  weakest true  distractor   margin  admitted
+        0.50   19.7   5.0        0.7296      0.2808   0.4488    0.0000
+        0.70   19.6   5.0        0.7296      0.2806   0.4489    0.0000
+        0.90   19.5   5.0        0.7296      0.2805   0.4491    0.0000
+        0.95   19.5   5.0        0.7296      0.2805   0.4491    0.0000
+        1.00   19.5   5.0        0.7296      0.2806   0.4490    0.0000
+  correlated   27.8   5.0        0.7296      0.2802   0.4494    0.0000
+  -> digit 3    7.7   4.7        0.6307      0.6211   0.0096    0.0000
+
+
+AND THE PROBE HAD THE DEFECT ITS OWN PREDECESSOR WARNED ABOUT
+---------------------------------------------------------------
+The `correlated` row was FIRST reported pooled over all ten words, where it reads
+margin **0.4494** and looks indistinguishable from the independent arms. The
+correlation touches one digit, so nine irrelevant words diluted it away.
+
+**`g39-05`'s own "what this does not settle" says exactly this**, one run
+earlier: *"a single bad word could sit far lower without moving it."* The probe
+testing that caveat was built with the caveat in it.
+
+It was caught by re-reading that section rather than by any check, and the
+`-> digit 3` row exists because of it. **A warning one run old did not prevent
+the repeat** — the same shape as `g38-03` dropping a companion column the day
+after `g38-01` explained why it mattered.
 
 
 SCORECARD
 ---------
-TO BE FILLED.
+  P1  **HELD, and it confirms the published account rather than just the
+            mechanism.** The distractor's score is 0.2808, 0.2806, 0.2805,
+            0.2805, 0.2806 across presences from 0.5 to 1.0 — flat to three
+            decimals, against a predicted tolerance of 0.05.
+
+            `p` appears in both the numerator and the denominator and cancels.
+            **Since `g39-04`'s explanation of why `forward` works is the same
+            cancellation read from the other side, this is evidence for the
+            account and not only for the result.**
+
+  P2  **HELD.** `margin` is 0.4488 to 0.4491 across independent presences,
+            against `g39-05`'s 0.4464 at a different stream length. Partial
+            presence is not a threat.
+
+  P3  **REFUTED AS WRITTEN, AND THE SPIRIT IS WHAT MATTERS.** The correlated arm
+            was predicted to be admitted. It is not — `admitted` 0.0000, rank
+            **7.7** against want **4.7**.
+
+            **But the margin collapses from 0.4490 to 0.0096**, a factor of 47.
+            The weakest true partner scores 0.6307 and the confound 0.6211.
+            **It is outside the top-`want` by a hair, not by a margin.**
+
+            The arithmetic says why it survives at all: this confound is present
+            on 100% of digit 3's occasions and 10% elsewhere, so it is about 63%
+            specific to that concept, while an image code of digit 3 is
+            essentially 100% specific. **A confound has to be MORE concentrated
+            on a concept than the concept's own surfaces are before it displaces
+            them** — a high bar, and the reason the refusal holds here.
+
+            **A stronger confound would cross it**, and nothing here establishes
+            where. That is the untested boundary.
+
+  P4  **REFUTED, and unreadable as originally computed.** The pooled `admitted`
+            was predicted near 0.1 and is 0.0000, because the confound is not
+            admitted even for the digit it favours. The prediction assumed it
+            would be, which P3 already covers.
+
+
+WHAT THIS CHANGES
+-----------------
+**`g39-05`'s caveat is answered and dissolved.** A thing present almost always is
+no harder than a thing present always, because the statistic is a ratio and
+partial presence cancels out of it. A lamp in most rooms is refused exactly as a
+lamp in all rooms is.
+
+**The real boundary is CORRELATION, not partial presence**, and it is much
+closer than any previous number suggested. At 63% concept-specificity the margin
+is 0.0096. **Every headline in this line — 0.9867, the 0.4464 margin, "the
+distractor is refused" — is measured against distractors that are uncorrelated
+with the concept.**
+
+**And no statistic over co-occurrence can fix that**, which is not a defect of
+`forward`: a surface genuinely more common around one concept IS evidence about
+that concept, and the data contains no signal distinguishing "spuriously
+correlated" from "actually part of it". `g32-01` names intervention as the only
+escape and this project has not tested it.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**Where the confound boundary actually is.** One correlation strength was tried,
+100%/10%. The margin at that point is 0.0096, so the crossing is very close and
+nothing locates it.
+
+**One code count.** `want` is about 5 because 50 codes over 10 digits gives 5
+each. A confound competes against however many true partners there are, so the
+bar moves with the code count.
+
+**Intervention is untested and is the only named escape.** Nothing in this
+project has run it.

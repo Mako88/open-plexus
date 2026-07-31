@@ -102,16 +102,22 @@ def main() -> None:
           f"{PASSES * len(heard)} occasions, seeds {SEEDS}")
     print(f"        `correlated` is present on EVERY occasion of digit "
           f"{FAVOURED} and {CORRELATED_ELSEWHERE:.0%} elsewhere\n")
-    header = (f"{'presence':>10}{'rank':>7}{'want':>6}{'weakest true':>14}"
+    header = (f"{'presence':>12}{'rank':>7}{'want':>6}{'weakest true':>14}"
               f"{'distractor':>12}{'margin':>9}{'admitted':>10}")
     print(header)
     print("-" * len(header))
 
-    arms = [(f"{p:.2f}", p, False) for p in PRESENCES]
-    arms.append(("correlated", None, True))
+    arms = [(f"{p:.2f}", p, False, None) for p in PRESENCES]
+    arms.append(("correlated", None, True, None))
+    # **THE FAVOURED DIGIT, SCORED ALONE.** A mean over ten words dilutes the
+    # correlated arm by the nine it does not touch, which is exactly the defect
+    # `g39-05`'s own caveats named one run earlier -- "a single bad word could
+    # sit far lower without moving it". Reported apart rather than averaged in.
+    arms.append((f"  -> digit {FAVOURED}", None, True, FAVOURED))
 
-    for label, presence, correlated in arms:
-        cells = len(SEEDS) * words
+    for label, presence, correlated, only in arms:
+        watching = [only] if only is not None else list(range(words))
+        cells = len(SEEDS) * len(watching)
         ranks = wants = weakest = worst = admitted = 0.0
         for seed in SEEDS:
             image_code = harness.quantise(pixels, CODES, seed)
@@ -142,7 +148,7 @@ def main() -> None:
                         present.add(spare)
                     index.observe(present)
 
-            for digit in range(words):
+            for digit in watching:
                 token = 2 * CODES + digit
                 scored = sorted(((STATISTIC(index, token, other), other)
                                  for other in index.partners(token)),
@@ -158,7 +164,7 @@ def main() -> None:
                 worst += by_id.get(spare, 0.0) / cells
                 admitted += (1 if placed <= len(true) else 0) / cells
 
-        print(f"{label:>10}{ranks:>7.1f}{wants:>6.1f}{weakest:>14.4f}"
+        print(f"{label:>12}{ranks:>7.1f}{wants:>6.1f}{weakest:>14.4f}"
               f"{worst:>12.4f}{weakest - worst:>9.4f}{admitted:>10.4f}")
 
     print(f"\nCOST: {time.time() - started:.1f}s wall, one process")

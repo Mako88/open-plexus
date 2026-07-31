@@ -471,3 +471,46 @@ is. The best cells are alpha 1.0 with `mean` or `max`: **0.9867 at 1.0000**.
 **Alpha 0 and 0.25 were excluded on `g36-06`'s evidence**, which was taken under
 the other mechanism — and since the two mechanisms disagree about exactly this
 column, that exclusion is now weaker than when written.
+
+### Partial presence CANCELS; correlation is the real boundary — `g39-06`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g39-06-what-about-a-thing-present-almost-always.txt
+            script  experiments/g39_06_what_about_a_thing_present_almost_always.py
+            task    MNIST + FSDD + 10 words, 12,000 occasions, one distractor at
+                    varying presence, plus a correlated confound arm
+            model   conditional read FORWARD from the word; no cut, no mutuality
+            knobs   presence 0.5/0.7/0.9/0.95/1.0; correlated 100% on digit 3
+                    and 10% elsewhere; 50 codes; 3 seeds
+            scale   rank, score gap and admission; g39-05's columns
+
+**`g39-05`'s caveat is answered and dissolves.** A distractor present
+independently with probability `p` contributes `p` to BOTH terms of
+`count(x,y)/count(y)`, so it cancels. Measured: the score is **0.2805 to
+0.2808** across presences from 1.0 down to 0.5, and the margin **0.4488 to
+0.4491**. A lamp in most rooms is refused exactly as a lamp in all rooms is.
+
+**Since `g39-04`'s account of why `forward` works is the same cancellation read
+from the other side, this is evidence for the ACCOUNT and not only the result.**
+
+**The real boundary is CORRELATION and it is far closer than any earlier number
+suggested.** A confound present on every occasion of one digit and 10% elsewhere
+is still refused — rank 7.7 against a want of 4.7 — but the margin collapses
+from **0.4490 to 0.0096**, a factor of 47. **Refused by a hair, not by a
+margin.**
+
+The arithmetic says why it survives: that confound is about 63% specific to its
+concept while a true image code is essentially 100% specific. **A confound must
+be MORE concentrated on a concept than the concept's own surfaces before it
+displaces them.** A stronger one would cross, and nothing locates where.
+
+**No statistic over co-occurrence can fix that**, and it is not a defect of
+`forward`: a surface genuinely more common around one concept IS evidence about
+it, and the data contains nothing distinguishing spurious correlation from real
+membership. `g32-01` names intervention as the only escape; it remains untested.
+
+**A PROCESS NOTE THAT COST A WRONG ROW.** The correlated arm was first reported
+pooled over ten words, where it reads margin **0.4494** and looks fine — the
+correlation touches one digit and nine irrelevant words diluted it. `g39-05`'s
+own caveats say exactly this one run earlier: *"a single bad word could sit far
+lower without moving it."* Caught by re-reading that section, not by any check.

@@ -1466,6 +1466,15 @@ MUTATIONS = [
         new="        self.grouped_wo = self.wo.reshape(v, config.partitions, -1).copy()",
     ),
     Mutation(
+        name="forward-secretly-symmetrises",
+        breaks="the one combiner that refuses an ever-present distractor "
+               "starts mixing in the backward direction, where the distractor "
+               "scores 1.0 because it genuinely is always there",
+        path=GROUNDING,
+        old='    "forward": lambda a, b: a,',
+        new='    "forward": lambda a, b: (a + b) / 2.0,',
+    ),
+    Mutation(
         name="the-edge-weight-is-one-directional",
         breaks="strength stops being symmetric, so an edge means something "
                "different depending on which end asks -- and the soft "

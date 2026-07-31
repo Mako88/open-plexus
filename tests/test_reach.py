@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import unittest
 
-from openplexus.grounding import (STATISTICS, CoOccurrence, equivalence_classes,
-                                  reach, strength)
+from openplexus.grounding import (STATISTICS, SYMMETRIC, CoOccurrence,
+                                  equivalence_classes, reach, strength)
 
 CONDITIONAL = STATISTICS["conditional"]
 
@@ -44,13 +44,81 @@ def _with_distractor() -> CoOccurrence:
     return index
 
 
+def _hub_with_distractor() -> CoOccurrence:
+    """The asymmetry `g36-04` actually has, which `_with_distractor` does NOT.
+
+    A word `w` is COMMON (845 occasions) and each of its image codes is RARE (60,
+    all of them with `w`). A distractor `d` is present on every one of the 3,000
+    occasions.
+
+    **The distinction matters and a test caught it.** On `_with_distractor` the
+    subject is not especially common, so `min` ranks the true partner above the
+    distractor and a companion assertion claiming otherwise failed on its first
+    run. The inversion needs a HUB — a surface common enough that
+    `conditional(code, word)` is small — which is the case the real data has and
+    that fixture does not.
+    """
+    index = CoOccurrence()
+    for _ in range(60):
+        index.observe({0, 1, 99})          # word, its own code, distractor
+    for _ in range(785):
+        index.observe({0, 2, 99})          # word, filler, distractor
+    for _ in range(2155):
+        index.observe({3, 99})             # elsewhere, distractor still there
+    return index
+
+
 class TheEdgeWeightIsSymmetricAndRefusesTheEverPresent(unittest.TestCase):
 
-    def test_strength_does_not_depend_on_argument_order(self):
+    def test_the_symmetric_combiners_do_not_depend_on_argument_order(self):
         index = _with_distractor()
-        for other in (1, 99):
-            self.assertAlmostEqual(strength(index, CONDITIONAL, 0, other),
-                                   strength(index, CONDITIONAL, other, 0))
+        for name in SYMMETRIC:
+            for other in (1, 99):
+                self.assertAlmostEqual(
+                    strength(index, CONDITIONAL, 0, other, name),
+                    strength(index, CONDITIONAL, other, 0, name),
+                    msg=f"{name} is listed as symmetric and is not")
+
+    def test_forward_is_DELIBERATELY_asymmetric(self):
+        """The companion the test above needs.
+
+        `forward` discards the backward direction, so it must NOT be symmetric —
+        and asserting only that the others are would leave the one that matters
+        untested. `SYMMETRIC` exists so a caller can tell them apart rather than
+        assume.
+        """
+        index = _with_distractor()
+        self.assertNotIn("forward", SYMMETRIC)
+        self.assertNotAlmostEqual(
+            strength(index, CONDITIONAL, 0, 99, "forward"),
+            strength(index, CONDITIONAL, 99, 0, "forward"))
+        # And it IS the plain directional score, which is the whole claim.
+        self.assertAlmostEqual(strength(index, CONDITIONAL, 0, 99, "forward"),
+                               CONDITIONAL(index, 0, 99))
+
+    def test_forward_ranks_a_true_partner_ABOVE_the_distractor(self):
+        """`g39-04`'s mechanism, asserted where it will be read.
+
+        Every symmetrising rule mixes in the backward direction, where an
+        ever-present surface scores 1.0 because it genuinely is always there.
+        `forward` never sees that number. If this inverts, the account of why
+        five sweeps failed is wrong.
+        """
+        index = _hub_with_distractor()
+        partner = strength(index, CONDITIONAL, 0, 1, "forward")
+        distractor = strength(index, CONDITIONAL, 0, 99, "forward")
+        self.assertGreater(partner, distractor)
+
+        # THE COMPANION, and it is what makes the choice load-bearing rather
+        # than cosmetic: every symmetrising rule gets this BACKWARDS on the same
+        # table. Without it, `forward` being correct would be untested against
+        # the alternatives actually being wrong.
+        for name in SYMMETRIC:
+            self.assertLessEqual(
+                strength(index, CONDITIONAL, 0, 1, name),
+                strength(index, CONDITIONAL, 0, 99, name),
+                msg=f"{name} ranks them correctly here, so the account of why "
+                    f"five sweeps failed does not hold for it")
 
     def test_the_distractor_scores_BELOW_the_real_partner(self):
         """`g32-01`'s falsifier, asked of the symmetric weight.

@@ -1,0 +1,134 @@
+Does the forward score keep the link and refuse the distractor?
+================================================================
+
+Script: experiments/g39_04_does_the_forward_score_refuse_the_distractor.py
+Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+
+
+IN PLAIN TERMS
+--------------
+One failure has survived everything tried against it this week. Something present
+in every single moment -- a hum in the room, the word "the" -- gets treated as
+meaningful, because it turns up alongside everything.
+
+Five things were tried. None worked, and the last run explained why: **we were
+looking on the wrong axis entirely.** The thing that used to keep the hum out was
+never the scoring rule. It was a hard cut that threw away weak connections -- and
+throwing away connections is precisely what we removed, on purpose, because it
+was also throwing away the word.
+
+But the arithmetic pointed somewhere the grid never went.
+
+Every connection has two ends, and they disagree. From the word's side, its own
+pictures are its strongest partners and the hum is much weaker. From the hum's
+side, everything looks maximally connected -- because the hum genuinely is
+present with everything, always. That is not an error; it is true.
+
+Everything tried so far **averaged the two ends together** in one way or another.
+And averaging is what lets the hum's true-but-useless "I am always here" leak in
+and outrank a real partner.
+
+So the fix might be to stop averaging. Ask only from the asking side.
+
+A quick check suggested that works: the link stays high and the hum is refused
+completely, for the first time. **But that was one setting.** This asks whether
+it survives the axes that killed everything else -- both arrangements of the
+senses, three settings of the correction dial, one hop and two.
+
+The place it is most likely to break is named in advance. Discarding half of
+every connection is exactly what this project's own notes warn against, because a
+one-sided rule normally lets an always-present thing attach itself to everything.
+The reason it may be safe here is that the question always starts from the word,
+so the hum never gets to nominate itself -- and that reason stops applying the
+moment the search takes a second step.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    link         precision over the top-`k` image codes a word reaches
+    covered      how many of the codes it SHOULD find it had a chance to score
+    distractor   share of words admitting the ever-present distractor
+    BOTH?        link >= 0.80 AND covered >= 0.80 AND distractor <= 0.05
+
+Identical columns and identical thresholds to `g39-03`, so the two tables can be
+read side by side. That run's answer was **0 of 24**.
+
+
+MEASURED ON
+-----------
+Local, one process.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions   24,000   extended by RE-PAIRING; an exact repeat is a no-op for
+                         a ratio statistic
+    codes           50   pinned, as everywhere in this line
+    beam            16   g38-03's operating point
+    seeds      0, 1, 2
+
+Swept: arm {together, alternating} x occasions {3,000, 24,000} x alpha
+{0.5, 0.75, 1.0} x depth {1, 2}. Combiner is `forward` throughout.
+
+
+HOW WEAK P1 IS, STATED PRECISELY
+---------------------------------
+A scratch probe measured `forward` at link 0.9800, coverage 1.0000, distractor
+0.0000 before these predictions were written -- **at one arm, one alpha, one
+depth, one stream length.** So P1 is a summary for that cell and a commitment
+nowhere else. P2 through P5 are genuine: nothing has measured `forward` at any
+other setting.
+
+`CLAUDE.md` requires this said out loud, because a prediction written after a
+control has run is not evidence that the mechanism was understood in advance.
+
+
+PREDICTIONS
+-----------
+P1  IT WORKS AT DEPTH 1. `BOTH?` is YES for every depth-1 cell -- both arms,
+    all three alphas, both stream lengths.
+    REFUTED IF any depth-1 cell fails. **WEAK: one such cell was measured
+    before this was written.**
+
+P2  IT BREAKS AT DEPTH 2, AND THIS IS THE REAL TEST. `distractor` rises above
+    0.05 in at least one depth-2 cell, because the second hop starts from a
+    surface that is NOT the word -- and from an image code's side the
+    ever-present distractor is a strong partner.
+    REFUTED IF depth 2 is clean everywhere. **That would be the stronger
+    result**: it would mean the one-sided rule is safe generally rather than
+    safe only because the query happens to start somewhere favourable.
+
+P3  ALPHA BARELY MATTERS. `link` varies by less than 0.05 across the three
+    exponents at fixed arm and depth, because `g39-03` found alpha moves
+    coverage rather than precision.
+    REFUTED IF alpha changes the answer, which would mean `forward` has
+    reintroduced a dependence the symmetric combiners did not have.
+
+P4  COVERAGE IS THE COST, IF THERE IS ONE. Where a cell fails, it fails on
+    `covered` rather than on `link` -- a one-sided view sees fewer partners, not
+    wrong ones.
+    REFUTED IF a cell fails on `link` instead.
+
+P5  THE `alternating` ARM IS NOT WORSE. `BOTH?` holds there too at depth 1.
+    REFUTED IF it fails there, which would make `forward` a fix for the
+    simultaneous case only -- and `g36-04` established that the interleaved case
+    is the realistic one, so a fix that misses it is close to useless.
+
+
+COST
+----
+Estimated from `g39-03`'s measured 8.4s, which built the same 24,000-occasion
+stream for 3 seeds and scored 24 settings. This is 2 arms rather than 1 and 12
+settings per arm rather than 24, so roughly the same scoring work over twice the
+stream building. **20 to 60 seconds**, local.
+
+Recorded after the run: TO BE FILLED.
+
+
+RESULTS
+-------
+TO BE FILLED.
+
+
+SCORECARD
+---------
+TO BE FILLED.

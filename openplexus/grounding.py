@@ -482,18 +482,43 @@ def equivalence_classes(index: CoOccurrence, statistic: Statistic,
 
 
 #: How the two directional scores of an edge are combined into one weight.
-#: **Which of these is right is UNMEASURED** — see `strength`.
+#:
+#: **`forward` is the odd one and it is the one that works.** It discards the
+#: backward direction entirely, so it is NOT symmetric — `strength(x, y)` and
+#: `strength(y, x)` differ — and it is the only entry that keeps the link while
+#: refusing an ever-present distractor (`g39-04`).
+#:
+#: The reason is arithmetic. For a word `w`, its own image code `c`, and a
+#: distractor `d` present on every occasion:
+#:
+#:     conditional(w, c) ~ 1.00     conditional(c, w) ~ 0.07
+#:     conditional(w, d) ~ 0.28     conditional(d, w) ~ 1.00
+#:
+#: The FORWARD view separates them cleanly — 1.00 against 0.28. Every
+#: symmetrising rule mixes in the backward direction, where the distractor's
+#: 1.00 is genuinely true, and inverts the order: `min` gives 0.07 against 0.28,
+#: `mean` gives 0.53 against 0.64, `max` ties them at 1.00.
+#:
+#: **So symmetrising is what admitted the distractor**, and five sweeps looking
+#: for a statistic that refuses it were looking on the wrong axis.
 COMBINERS: dict[str, Callable[[float, float], float]] = {
     "min": min,
     "max": max,
     "mean": lambda a, b: (a + b) / 2.0,
     "geometric": lambda a, b: math.sqrt(a * b),
+    "forward": lambda a, b: a,
 }
+
+#: The combiners that genuinely produce a symmetric weight. `forward` does not,
+#: deliberately, and separating the two here means a caller relying on symmetry
+#: can assert it rather than assume it.
+SYMMETRIC = ("min", "max", "mean", "geometric")
 
 
 def strength(index: CoOccurrence, statistic: Statistic,
              one: int, other: int, combine: str = "min") -> float:
-    """A SYMMETRIC edge weight, from the two directional scores.
+    """An edge weight from the two directional scores. **Symmetric unless
+    `combine` is `forward`.**
 
     **This generalises the rule `equivalence_classes` uses, without the hard
     cut.** There, an edge survives only if each surface is in the other's
@@ -518,6 +543,17 @@ def strength(index: CoOccurrence, statistic: Statistic,
     rank a distractor above a real partner. **That was an unchecked assertion and
     a test refuted it on the first run** — on the natural fixture the mean ranks
     them correctly too. The claim is removed rather than softened.
+
+    **AND THE ANSWER TURNED OUT TO BE NEITHER: it is `forward`, which does not
+    combine at all.** `g39-03` measured every symmetrising rule admitting the
+    distractor for every word, at three exponents and two stream lengths — 0 of
+    24 — and `g39-04` measured `forward` refusing it at 0.0000 while keeping the
+    link at 0.9800 and full coverage. See `COMBINERS`.
+
+    **So the doubt recorded here about hub edges was right about `min` and wrong
+    about the remedy.** It predicted the answer lay somewhere along the
+    min-to-max axis. It lies off that axis entirely, at the point where the
+    backward direction is discarded rather than weighed.
 
     Args:
         statistic: Any `Statistic`. Both directions are evaluated, so a

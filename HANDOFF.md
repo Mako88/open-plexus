@@ -12,187 +12,169 @@
 > **NO CLAIM LIVES HERE.** Every number points at the file that owns it, and if the two
 > disagree that file wins.
 
-**Written:** 2026-07-31, after the session that built the grounding mechanism end to end.
+**Written:** 2026-07-31, after the session that added a third modality and unblocked
+kill-list item #1.
 
 ---
 
-## WHAT HAPPENED: the grounding line is BUILT and MEASURED
+## WHERE TO START READING
 
-The previous handoff said *"build the grounding mechanism and test it"*. That is done, from
-the statistic through to containers under `tc netem`. Eight sweep records, in order:
-
-    g32-01  can counting separate "always there" from "is the thing"
-    g32-02  how many occasions does a concept need
-    g33-01  does the bucket join keep the signal
-    g33-02  can the walk bridge modalities that never meet
-    g33-03  what does one query cost in peer messages
-    g33-04  does a per-surface bound fix the star
-    g34-01  trials this project did not design
-    g35-01  the grounding store in real containers
-    g35-02  what a departure costs when nothing is replicated
-
-**Read `docs/explainers/34` and `35` first** — they are the plain-language version and the
-fastest way back in.
-
-### The five things that would change what you build next
-
-**1. Raw counting is refuted; a chance-corrected statistic repairs it.** A distractor
-present every occasion costs `count` 0.3044 of f1 and costs `conditional` 0.0000
-(`g32-01`). And the same failure arrives without anyone building a distractor: at `zipf`
-2.0 the commonest concept becomes one, and **60 of 60** surfaces of the rarest concepts
-have a different concept's surface as their best raw-count partner (`g32-02`).
-
-**2. PPMI IS NOT DEPLOYABLE.** It divides by how many occasions the whole system has seen,
-which no node can know without a collective. `conditional` gives identical rankings above
-chance (`g32-01`, max difference **0.0007** over 96 cells) and needs only a peer read.
-`federated._AtOwner` and `bucket_service._Borrowed` both REFUSE to supply the total rather
-than approximating it.
-
-**3. The read costs one peer message PER PARTNER**, not per `k` — 439 for one walk at 192
-surfaces, flat at 2.6x fan-out (`g33-03`). The write path is cheap by comparison at 38.4
-row updates per occasion. **The expensive half of this design is reading.**
-
-**4. A single global `k` cannot express a hub with spokes**, which is the shape a word
-naming a concept has. The derived per-surface bound (`grounding.cliff`) is the best arm in
-8 of 9 cells and collapses in none (`g33-04`). **It needs a cliff**, and note 058 measured
-real language as a slope where the rule's output is decided by floating point — but
-`g34-01` found published experimental stimuli ARE bimodal, mean largest gap ~0.5.
-
-**5. Multimodality is the redundancy.** With nothing replicated, losing half the network
-still leaves **0.9596** of surviving surfaces connected to a true partner at 5 surfaces per
-concept, against 0.5522 at 2 (`g35-02`). Replication is an improvement, not a prerequisite.
+**`docs/explainers/36-a-shelf-with-only-two-slots.md`.** It is the plain-language version
+of the single idea that three of this session's runs converged on, and it is the fastest
+way back in. Then `g36-04` and `g37-01`.
 
 ---
 
-## THE KILL LIST — what could still stop this
+## THE ONE IDEA THAT CAME OUT OF THIS SESSION
 
-> **Restored after being dropped.** The rewrite of this file for the grounding work left it
-> out, which was a mistake: it is the only standing summary of what would kill the project,
-> and a handoff without it hands over the work and not the risk.
+**A bound is a BUDGET, and a hub's budget limits how many spokes it can be MUTUAL with.**
+Three runs found the same wall from three directions and none of them recognised it alone:
+
+    g33-02   a single global `k` cannot express a hub with spokes
+    g36-05   two senses that always co-occur EVICT the word from each other's list
+    g36-06   softening the denominator does not repair it -- it FRAGMENTS instead
+
+**No choice of statistic changes the size of the budget**, which is why `damped(alpha)`
+failed. The untried thing the measurements motivate is a bound that is per-KIND rather
+than one number per surface — a word keeping more partners than a picture because it is a
+word. **Registered, not built**, and deliberately: it is the first proposal in this line
+the data pushes toward rather than merely permits.
+
+---
+
+## WHAT HAPPENED
+
+### A third modality, on real audio — `g36-04`, `g36-05`, `g36-06`
+
+`openplexus/tasks/spoken.py` reads the Free Spoken Digit Dataset with stdlib `wave`, so
+the ruler stays dependency-free. 3,000 recordings, six speakers, CC BY-SA 4.0, gitignored.
+
+**Adding a whole sense cost a reader and a feature function.** The quantiser is the SAME
+`grouping.cluster` the images use — `harness.quantise` takes pixels and spectra through one
+call. Counting, walk, bound, sharding and containers were untouched, because the mechanism
+does not know how many modalities exist. That is the load-bearing observation about the
+architecture, more than any single number.
+
+**The headline is a sign flip nobody predicted.** Two senses that share ZERO occasions
+reach each other through a shared word better than two senses that share every occasion,
+and better than one sense alone. **Interleaved helps; simultaneous harms.**
+
+**And the linking is not limited by front-end quality** over the range tested: the audio
+quantiser is measurably worse at its own job and produced the table's best link. `g36-01`
+reached the same conclusion from the other side. **This changes what a learned quantiser
+would be FOR** — see `docs/options/learned-codebook.md`.
+
+### Kill-list #1 is UNBLOCKED, and it was our own record blocking it — `g37-01`
+
+`docs/options/clutrr-symbolic.md` said *"published TEXT numbers are not comparable"*. True.
+It was read as *"no published CLUTRR number is comparable"*, which is false: the standard
+evaluation is the noiseless GRAPH-based version on exactly the split already fetched here.
+
+**Rule 1's borrowed-claim failure, with the borrowing happening inside the repository.**
+Filed under *established*, upstream of a decision, unreachable by anything downstream.
+
+`g37-01` computes the honest floor from the data. Against published graph-only references
+the band is several times `closure`'s. **`g37-02` is the G0 control that follows** —
+frozen substrate and a measured strong reference, because a CITED reference is not a
+measured one.
+
+### Two of John's design notes are recorded — `docs/options/learned-codebook.md`
+
+The request to try a learned quantiser, and the **edge-machine architecture**: a request
+routes through an edge machine holding the quantiser, which converts the input, sends it to
+the network, and returns the response. That makes the quantiser an EDGE concern rather than
+a per-node one, which is a smaller and better-posed problem. The C1 question it leaves open
+is recorded beside it.
+
+---
+
+## THE KILL LIST
 
      ✅  2  representations learned LOCALLY   18 graphs, beats counting, no invariant
-     ✅  6  independent nodes agree           TRANSPORT half; grounding store now agrees
-                                              EXACTLY across containers. Quantiser half ⬜
+     ✅  6  independent nodes agree           TRANSPORT half exact across containers.
+                                              Quantiser half UNTESTED
      ✅  7  decide what to say, and decline   exact, on the case the gate can see
 
      🔀 10  margin survives scale             refutation was on the wrong arrangement
 
-     ⏸  4  multi-hop walk over real internet MEASURED again, and it got WORSE: a
-                                              grounded question is 5.09 s impaired
+     ⏸  4  multi-hop walk over real internet  got WORSE: 5.09 s per grounded question
 
-     ⬜  1  relational objective buys reasoning  blocked: no instrument with a wide band
-     ⬜  3  conventional system already wins     external STIMULI now run; no human opponent
-     ⬜  5  learn forever                        the cheap route is refuted
-     ⬜  8  adjudicate contradictions            untouched
-     ⬜  9  survive hostile participants         untouched
-     ⬜ 11  training traffic fits broadband      writes cheap; READS scale with fan-out
-     ⬜ 12  survives a second modality           the WALK bridges; no second modality yet
+     ⬜  1  relational objective buys reasoning UNBLOCKED. Instrument found, floor
+                                               measured, G0 control in flight
+     ⬜  3  conventional system already wins    external stimuli run; no human opponent
+     ⬜  5  learn forever                       the cheap route is refuted
+     ⬜  8  adjudicate contradictions           untouched
+     ⬜  9  survive hostile participants        untouched
+     ⬜ 11  training traffic fits broadband     writes cheap; READS scale with fan-out
+     ⬜ 12  survives a second modality          THREE modalities now run on real
+                                               sensory data. G7 still NOT passed
 
-**What moved today, and none of it is a new checkmark.**
-
-**#6** gained its hardest evidence: the grounding store agrees with one process **exactly**
-in real containers, clean and at 40 ms with jitter, on both the write and read paths
-(`g35-01`, `g35-03`), and it runs in CI. The quantiser half is untouched.
-
-**#4 got worse, not better.** `g24-01` measured 161 ms a round and John accepted it. A
-grounded question over containers costs **5.09 s** with held connections (`g35-04`), which
-is outside that ruling. The two dominant terms are named and one is now fixed.
-
-**#11 has real numbers for the first time on this path.** Writes are cheap and flat — 38.4
-row updates per occasion. **Reads are the problem**: one peer message per candidate
-partner, scaling with FAN-OUT rather than with `k` (`g33-03`).
-
-**#12 is closer than it was and is not passed.** `g33-02` showed the walk bridges surfaces
-that never co-occur, and `g35-02` found multimodality is the redundancy under churn. But
-there is still no second modality — those are symbol streams, and G7 needs a real one.
-
-**#3 got its first external instrument for grounding** (`g34-01`, 26 of 29 published
-conditions recovered exactly) — but it is external STIMULI, not a benchmark. **No
-conventional system has been run against this.**
+**#12 is much closer and is not passed.** Every arm has the word present throughout, so
+nothing yet introduces a concept through one modality and queries it through another. That
+run is the obvious one and is not done.
 
 ---
 
-## WHAT IS BUILT, and where the boundaries are
+## WHAT IS BUILT
 
     openplexus/tasks/occasions.py   the instrument: a stream with known ground truth
     openplexus/tasks/xsl.py         29 PUBLISHED conditions, external stimuli
-    openplexus/grounding.py         counts, five statistics, cliff, the walk, scoring
+    openplexus/tasks/mnist.py       images, IDX, dependency-free
+    openplexus/tasks/spoken.py      audio, WAV, dependency-free
+    openplexus/tasks/clutrr.py      someone else's relational benchmark
+    openplexus/grounding.py         counts, statistics, `damped`, cliff, walk, scoring
     openplexus/buckets.py           the time-bucket join, one process
     openplexus/federated.py         the table split by owner, every crossing counted
     openplexus/bucket_service.py    ONE node's share, refusing every key it does not own
     openplexus/bucket_peer.py       that over TCP
-    openplexus/node_main.py         OPENPLEXUS_MODE=bucket
     testbed/run.py --mode bucket    containers under tc netem
-    tools/bucket_drive.py           the driver, which owns nothing
-
-**Container identity runs in CI** — `.github/workflows/testbed-bucket-identity.yml`, at 2
-and 4 nodes, green. `testbed-identity.yml`'s header records why that matters: the harness
-was built, proved once, and left un-run for months.
-
----
-
-## THE THREE THINGS NOT DONE, in the order I would take them
-
-**1. THE READ PATH ACROSS CONTAINERS.** `g35-01` drives writes and reads marginals back; it
-does not run the WALK over sockets. So `g33-03`'s cost is still an in-process count, and
-the one quantity a user would feel — how long a grounded question takes — is unmeasured on
-a real link. `g24-01`'s 161 ms a round is the figure to compare against.
-
-**2. CONNECTION REUSE.** `bucket_peer` opens a socket per message, which is named as a
-deliberate simplification at its own definition and measured at **96x** under 40 ms delay
-(2.66s clean against 255.68s impaired, `g35-01`). P1 is registered there. **Do not quote
-that 96x as a latency for the architecture** — it prices the simplification, not the design.
-
-**3. REPLICATION AND REPAIR.** Anti-entropy as `partitioned.ConceptStore.lose` describes.
-Now a ranked option rather than urgent, because of finding 5 above. The unmeasured
-comparison: deliberate replica placement against simply having more modalities.
 
 ---
 
 ## WHAT I GOT WRONG, so it is not re-derived
 
-**`HANDOFF.md` named the wrong repository, and my correction was also wrong.** The bakeoff
-data is in `kachergis/XSLmodels`, not `word_learning_models`. But **zero conditions have
-both a plain-text ordering and a human accuracy** — 8 of 64 rows carry one and none of
-those name a `.txt` file. So `g34-01` is external STIMULI, not an external BENCHMARK, and
-every file that could be quoted from says so. Human baselines need a pure-Python RData
-reader, unbuilt.
+**A prefix of `spoken.available` is one digit, not a sample.** FSDD filenames begin with
+the digit, so the first half of the files are digits 0-4. A probe reported purity 0.7093,
+which looks fine. **The tell was the CHANCE level printing at 0.20 instead of 0.10**, not
+the purity. `sample` exists for this and `mnist.read` says why a prefix is safe there.
 
-**Mutual exclusivity would not fix `g34-01`'s three failures.** I said it would, in the
-sweep record and to John. The four surfaces are a closed fully symmetric clique — two
-assignments fit every observation and a one-word-one-object constraint keeps both. Nothing
-recovers it. **It motivates building nothing.**
+**`count` and `local_conditional` are ONE arm.** For a fixed surface, dividing every
+candidate by that surface's own count divides by a constant. With `g32-01`'s
+`ppmi == conditional`, the five named statistics are **three** distinct rankings. Third
+instance of this failure in this line; the check is arithmetic before dispatch.
 
-**Four metrics in this line read 1.0 under total collapse** — `reached_together`,
-`partner_rate`, and `bridged` in two sweeps. Each is recall-shaped and each says so in its
-own docstring now. Always report `largest` beside them.
+**A prediction criterion can be satisfied by a collapse.** `g36-06`'s P2 asked for word
+survival above 0.80 with distractor admission below 0.05. A cell met it exactly — at a
+collapsed graph. **The criterion should have carried the class-size guard and did not.**
+
+**A `cross` of 1.0000 on `crossed` 0.0333 is one lucky pair, not a perfect score.** The
+companion column is what caught it.
 
 ---
 
-## PROCESS, and what must not regress
+## PROCESS
 
-- **CI IS BLOCKING AND IT CAUGHT A REAL BUG.** A peer could not be shut down on Linux:
-  closing a socket another thread is blocked on inside `accept` wakes it on Windows and
-  does not on Linux, so a "departed" node kept serving. **Any churn measurement over that
-  harness would have been measuring nodes that had not gone.** Watch the run, treat red as
-  blocking.
-- **`checks` takes 45-80 minutes** (six mutation shards). Batch commits; hold a push while
-  one is in flight rather than starving it.
-- **A heredoc containing `\n` inside a Python string breaks `mutate.py`.** Three times this
-  session. Use the Edit tool for mutation entries, not `sed`/heredoc rewriting.
-- **`check_provenance` earned its keep three more times**, every time the same shape: a
-  figure written under a citation that does not contain it. Once it was a new record entry
-  inserted INSIDE an existing one, which orphaned a paragraph from its CONFIG block.
-- **`check_duplication` caught a copied `_cell` between two experiment scripts** within
-  minutes of the second being written. Extracted to `harness.occasions_cell`.
+- **CI is blocking and has caught real bugs.** Watch it; treat red as blocking.
+- **`checks` takes 45-80 minutes** (six mutation shards). Batch commits.
+- **A heredoc containing `\n` inside a Python string breaks `mutate.py`.** Use the Edit
+  tool. And a `cat > file <<'EOF'` heredoc in the Bash tool failed outright on a long
+  Python file this session — the Write tool is the reliable route.
+- **`check_provenance` earned its keep again**, refusing an option-record entry that cited
+  a script which did not exist yet. The fix was to build the script.
+- **`check_rails` R3 caught a new experiment parsing its own arguments.** The guard
+  `refuse_if_mutating()` is now called explicitly in it.
 
 ---
 
 ## STATE
 
-Clean tree, 230 mutations verified, 1,526 tests green, all seven checks passing.
-**Nine commits unpushed at the time of writing** — push them and watch both `checks` and
-`testbed-bucket-identity`. No background processes, no `.mutate.lock`, no sweep in flight.
+`g37-02` was RUNNING at the time of writing — the G0 control on CLUTRR, four arms, three
+seeds, about 15-25 minutes local. Its predictions are committed at `0ce95a4`, before
+execution. **Check `experiments/sweeps/g37-02-does-clutrr-pass-g0.txt` for whether the
+results were ever filled in**; if its status still says `run pending`, the run did not
+report and it should be re-run rather than assumed.
 
-`data/kachergis/` is fetched and gitignored; re-run `python tools/fetch_kachergis.py` on a
-fresh clone before `g34-01`.
+1,560 tests green, 233 mutations verified, all seven checks passing.
+
+`data/` holds clutrr, fb15k237, fsdd, kachergis, mnist, openea and tinyshakespeare, all
+gitignored. Re-fetch on a fresh clone with the `tools/fetch_*.py` scripts.

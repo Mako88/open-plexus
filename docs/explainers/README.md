@@ -52,6 +52,7 @@ explainer, and saying so is the most useful thing you can do.
 | [33](33-how-two-machines-notice-the-same-moment.md) | How two machines notice the same moment |
 | [34](34-the-word-the-ruins-everything.md) | The word "the" ruins everything |
 | [35](35-the-machine-that-forgets-in-the-right-way.md) | The machine that forgets in the right way |
+| [36](36-a-shelf-with-only-two-slots.md) | Three failures that turned out to be one thing |
 | [028](028-four-corrections-and-a-detour.md) | Four corrections in a row, and the detour they caused |
 | [029](029-giving-every-machine-its-own-scorer.md) | Giving every machine its own scorer |
 | [030](030-the-middle-person-was-not-needed.md) | The middle person wasn't needed |

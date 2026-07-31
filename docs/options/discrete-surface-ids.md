@@ -58,6 +58,47 @@ where it works, our own where it does not — John named both directions himself
 distributed setting may rule out a stock solution, and there may equally be something
 better for this case than what exists.
 
+### The quantiser answers ADDRESSING, not IDENTITY — John, 2026-07-30
+
+    CONFIG  when    2026-07-30
+            source  GOALS.md §1.2b
+            script  none -- a ruling that narrows an earlier one
+            task    n/a
+            model   n/a
+            knobs   none
+            scale   n/a
+
+> *"I think fundamentally that's what needs to happen rather than using an external
+> quantizer"* — on learning that a picture, a sound and a word name one thing by
+> **experiencing them together over time**, the way a child does.
+
+**Read against `163 §1` this looks like a reversal and is not one**, and separating the
+two questions is what keeps this record from drifting:
+
+- **ADDRESSING** — how does a non-text input become a discrete id at all, so the store
+  can be keyed by it? `163 §1` stands. A quantiser, borrowed where it works.
+- **IDENTITY** — how does the system come to hold that *this* image id and *that* word id
+  name the same concept? **Not the quantiser's job, and it cannot do it**: two
+  independently quantised modalities never agree by accident. Learned from temporal
+  co-occurrence, varied across contexts.
+
+**And this record already contains the argument for the change.** The entry above states
+the quantiser's cost: *"a bad one merges two things that should stay distinct, and this
+architecture cannot recover from that because it will then address them identically. That
+failure is silent."*
+
+**Learned identity removes exactly that failure mode.** A merge becomes an association the
+system can weaken on later evidence, rather than an address collision it can never see. So
+the objection this record raised against quantised identity is answered by not asking the
+quantiser to supply identity — which is a narrowing of `163`, not a contradiction of it.
+
+**The open tension, recorded because it is not resolved.** Concept partitioning needs a
+DETERMINISTIC owner per concept — consistent hashing over a stable id, computable by any
+node without asking. Learned identity is negotiated and therefore not stable, so it cannot
+be hashed. Two directions exist and neither is chosen: a cheap deterministic id for routing
+with learned structure for meaning, or convergence between nodes by gossip. See
+[concept-partitioning.md](concept-partitioning.md).
+
 Three things recorded with the ruling:
 
 - **C1 does not bite here.** A quantiser is preprocessing, run once per input at the edge,

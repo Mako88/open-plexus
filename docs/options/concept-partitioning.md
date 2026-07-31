@@ -288,3 +288,38 @@ arm and a win therefore cannot be bought. Its state figures live there, not here
 *Cost, which is a property of the arrangement and had not been written down:* concept cells
 took 47–53 minutes against the dimension cells' 26–30 at equal width, so about **1.7×** per
 cell.
+
+### Learned identity and deterministic ownership are in tension — John, 2026-07-30
+
+    CONFIG  when    2026-07-30
+            source  GOALS.md, the grounding section
+            script  none -- a conflict between two commitments, recorded unresolved
+            task    n/a
+            model   n/a
+            knobs   none
+            scale   n/a
+
+This arrangement rests on `Ring` — consistent hashing over a concept id, so **any node can
+compute who owns a concept without asking anyone.** That is what makes a read one hop
+instead of a broadcast, and it is why the cross-machine sum stops existing rather than
+merely shrinking.
+
+**It requires the id to be STABLE.** [`GOALS.md`](../../GOALS.md) now commits the project
+to identity *learned from temporal co-occurrence* rather than computed at the edge — which is
+negotiated, changes as evidence arrives, and differs between nodes with different
+experience. **A concept whose identity is still being negotiated cannot be consistent
+hashed.**
+
+Two directions, **neither chosen and neither measured**:
+
+- **Split routing from meaning.** A cheap deterministic id decides *where a thing lives*;
+  learned structure decides *what it means*. Keeps every property this record depends on,
+  at the cost of putting a quantiser back in the addressing path —
+  [discrete-surface-ids.md](discrete-surface-ids.md) is where that half lives.
+- **Converge by gossip.** Nodes negotiate concept identity between themselves over time.
+  Honest to the goal and much harder: distributed agreement on a moving target, under the
+  churn C3 requires.
+
+**Recorded rather than resolved.** The failure this project has paid for repeatedly is a
+conflict noticed piecemeal, one surprised result at a time, months after both commitments
+were made. Both were made deliberately and both are current.

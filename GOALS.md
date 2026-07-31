@@ -193,11 +193,61 @@ forecloses it has broken §1.2, not deferred a feature.
 - **Agreement within a modality** — two nodes given the same input produce the
   same concept id. This is the quantiser question already on the gate ladder, and
   John has ruled that a borrowed quantiser is acceptable and possibly preferred.
-- **Alignment across modalities** — an image and a word produce the same id. This
-  does **not** fall out of quantisation. Two independently quantised modalities
-  will never agree by accident; it needs a representation built from paired data.
-  Borrowing it is consistent with §2's rule on prior art, and assuming it comes
-  free is the failure to avoid.
+- **Alignment across modalities** — an image and a word name the same concept.
+  This does **not** fall out of quantisation. Two independently quantised
+  modalities never agree by accident.
+
+  **REFINED by John, 2026-07-30, and the refinement is the design.** Identity is
+  not computed, it is **learned from temporal co-occurrence** — the way a child
+  learns that a picture, a bark and the word *dog* are one thing, by meeting them
+  together, repeatedly, in varying contexts.
+
+  This narrows the quantiser's job rather than removing it: **the quantiser
+  answers ADDRESSING — how a non-text input becomes an id at all — and identity is
+  learned on top.** Both halves are recorded in
+  [discrete-surface-ids.md](docs/options/discrete-surface-ids.md), including why
+  this answers an objection that record had already raised against itself.
+
+  Three consequences follow and are stated so they are not rediscovered:
+
+  - **It is the SAME mechanism as the rest of the system.** Binding co-occurring
+    things into an associative store is what the model already does, so grounding
+    is that mechanism applied to a stream carrying more than one kind of input —
+    not a new component.
+  - **Co-occurrence alone binds everything present.** A dog, a sofa and a face all
+    co-occur with the word. What disambiguates is **variation across situations**:
+    the constant across every occasion is the concept. That is a contrastive
+    signal, which this project already has a rule for.
+  - **It does not remove the perceptual front-end**, only the requirement that it
+    be *aligned*. Something must still map pixels to a representation where
+    similar things land near each other. That borrow is far smaller and less
+    contentious than an aligned multimodal space, and it is consistent with §2's
+    rule on prior art.
+
+  **THE OPEN TENSION, recorded unresolved.** C1's concept partitioning needs a
+  DETERMINISTIC owner per concept — hashable, computable by any node without
+  asking. Learned identity is negotiated and therefore not stable, so it cannot be
+  hashed. Two directions exist, neither chosen: split routing from meaning, or let
+  nodes converge by gossip. **This is a genuine conflict between two commitments
+  the project has made, and naming it is not the same as resolving it.**
+
+#### Intervention may be load-bearing, and the evidence is that it turned up twice
+
+**Hypothesis, labelled as one, 2026-07-30.** Watching things co-occur cannot
+separate *"these appear together"* from *"these are the same thing."* Acting on
+one and seeing what follows can — move the dog and see what moves with it.
+
+The reason to take it seriously rather than file it as speculation: **the same
+distinction blocked a completely unrelated part of this project on the same day.**
+The search for a label-free way to tell which memories are worth keeping failed on
+exactly this — counting how often something recurs cannot distinguish recurrence
+from demand, and the conclusion there was also that only intervention reaches it.
+
+Two independent routes to *"correlation is not enough, and the missing ingredient
+is acting rather than observing"* is worth recording. **It is not evidence that
+either conclusion is right**, and it is explicitly not a requirement: it is a
+reason to expect a passive stream to be insufficient, and to design so that adding
+action later does not require a rewrite.
 
 #### What it will look like from outside, and why that is not the goal
 

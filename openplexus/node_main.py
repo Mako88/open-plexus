@@ -39,11 +39,21 @@ at zeros, and its vacuity guard caught it — two different nodes departing gave
 identical answers. A testbed that measured latency against that model would have
 reported beautiful, meaningless numbers.
 
-## The two modes, and why they live in one file
+## The three modes, and why they live in one file
 
 `OPENPLEXUS_MODE=slice` — the default and everything measured to date — joins a
 driver and serves a **dimension** slice. `OPENPLEXUS_MODE=peer` serves the
 **concepts** it owns over `peer.py`, with no driver anywhere.
+`OPENPLEXUS_MODE=bucket` serves the **grounding store** it owns over
+`bucket_peer.py`: a slice of the time buckets and a slice of the surface rows,
+with no driver and no model at all.
+
+Bucket mode builds no `LocalAssociativeMemory`, which is worth saying because
+every other mode does. There is no `d_model`, no readout and no key table — the
+grounding store is a sparse count table, so the sizing plan and the decoder
+switch that matter to the other two are irrelevant to it, and pretending
+otherwise would report a node that could afford dimensions it will never
+allocate.
 
 **What this does not duplicate.** `tools/cluster_driver.py` is the driver side
 and stays there; `openplexus/peer.py` owns the wire and the ring lookup;
@@ -78,6 +88,9 @@ import os
 import sys
 import time
 
+from openplexus.bucket_peer import BucketPeer
+from openplexus.bucket_service import BucketService
+from openplexus.buckets import BucketConfig
 from openplexus.deployment import plan
 from openplexus.distributed import serve, slices_for
 from openplexus.models.local_memory import (
@@ -99,6 +112,12 @@ VOCAB_VAR = "OPENPLEXUS_VOCAB_SIZE"
 SEED_VAR = "OPENPLEXUS_SEED"
 DECODER_VAR = "OPENPLEXUS_DECODER"
 CONTEXT_KEYS_VAR = "OPENPLEXUS_CONTEXT_KEYS"
+#: Bucket mode only. The join's width, and the addresses of every peer as
+#: `node=host:port` pairs -- supplied rather than discovered, because service
+#: discovery is a coordination protocol and John's static-slice ruling applies
+#: to it for the same reason.
+BUCKET_WIDTH_VAR = "OPENPLEXUS_BUCKET_WIDTH"
+BUCKET_PEERS_VAR = "OPENPLEXUS_BUCKET_PEERS"
 
 
 def config_from_env() -> LocalMemoryConfig:
@@ -245,8 +264,66 @@ def serve_peer(config: LocalMemoryConfig) -> int:
     return 0
 
 
+def serve_bucket() -> int:
+    """Serve the buckets and surface rows this node owns, over `bucket_peer`.
+
+    No driver, no model, and nothing derived from a seed except the ring — which
+    every node computes from `(nodes, seed)` exactly as `peer` mode does, so two
+    containers agree on who owns what without exchanging anything.
+
+    **The peer table is supplied, not discovered.** `OPENPLEXUS_BUCKET_PEERS` is
+    `0=host:port,1=host:port,...`. Discovery is a coordination protocol and
+    John's ruling on static slices applies for the same reason: nothing measured
+    yet needs one, and adding it would be a second thing to debug when a count
+    comes out wrong.
+    """
+    port = int(os.environ.get(PEER_PORT_VAR, "0"))
+    if not port:
+        print(f"{PEER_PORT_VAR} is not set; a peer must be reachable",
+              file=sys.stderr)
+        return 2
+
+    nodes = int(os.environ.get(NODES_VAR, "1"))
+    index = int(os.environ.get(NODE_INDEX_VAR, "0"))
+    ring_seed = int(os.environ.get(RING_SEED_VAR, "0"))
+    width = int(os.environ.get(BUCKET_WIDTH_VAR, "50"))
+
+    addresses: dict[int, tuple[str, int]] = {}
+    for entry in os.environ.get(BUCKET_PEERS_VAR, "").split(","):
+        if not entry.strip():
+            continue
+        node, where = entry.split("=", 1)
+        host, peer_port = where.rsplit(":", 1)
+        addresses[int(node)] = (host, int(peer_port))
+
+    config = BucketConfig(width=width, nodes=nodes, seed=ring_seed)
+    service = BucketService(index, config)
+    peer = BucketPeer(service, addresses,
+                      host=os.environ.get("BIND_HOST", "0.0.0.0"),
+                      port=port).start()
+    print(f"bucket node {index}/{nodes} on port {peer.port}, "
+          f"bucket width {width}, {len(addresses)} peer address(es) known",
+          flush=True)
+    print(f"  a node that owns no bucket and no surface still serves; "
+          f"ownership is decided per key by the ring", flush=True)
+    try:
+        while True:
+            time.sleep(3600)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        if peer.failures:
+            # Printed on the way out because a lost write is invisible in the
+            # counts -- it reads as a weaker signal rather than as a fault.
+            print(f"  {len(peer.failures)} forward(s) FAILED", flush=True)
+        peer.close()
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     del argv
+    if os.environ.get(MODE_VAR) == "bucket":
+        return serve_bucket()
     config = config_from_env()
     if os.environ.get(MODE_VAR) == "peer":
         return serve_peer(config)

@@ -148,9 +148,22 @@ class BucketPeer:
                 except ValueError as refused:
                     reply = {"refused": str(refused)}
                 outbox = self.service.take()
+            # FORWARD BEFORE REPLYING, so the reply means the work has LANDED.
+            #
+            # The first version replied first and forwarded after. In one
+            # process that raced fast enough to pass every test; across three
+            # OS processes it does not, and a `FLUSH` returned while its `NOTE`
+            # and `LINK` messages were still in flight -- so a caller reading a
+            # count straight afterwards read one that had not arrived yet.
+            #
+            # There is no deadlock in forwarding under a peer's own handler:
+            # the listener thread only accepts and spawns, so a peer can serve
+            # an incoming forward while one of its own handlers is blocked
+            # sending one. Two peers flushing into each other is therefore two
+            # handler threads waiting on two other handler threads, not a cycle.
+            for destination, forward in outbox:
+                self._forward(destination, forward)
             send(connection, json.dumps(reply).encode("utf-8"))
-        for destination, forward in outbox:
-            self._forward(destination, forward)
 
     def _forward(self, destination: int, message: tuple) -> None:
         """Push one emitted message to the node that owns its key.

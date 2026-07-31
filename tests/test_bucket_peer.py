@@ -12,6 +12,8 @@ being free.
 
 from __future__ import annotations
 
+import socket
+import threading
 import unittest
 
 from openplexus.bucket_peer import BucketPeer, ask
@@ -84,14 +86,22 @@ class ItCrossesAWire(unittest.TestCase):
 class ItForwardsWhatItEmits(unittest.TestCase):
     """A bucket owner's flush has to reach the surface owners over the wire."""
 
-    def setUp(self) -> None:
-        self.network = _Network()
-        self.addCleanup(self.network.close)
-        self.occasions = OccasionConfig(concepts=8, surfaces=3, presence=0.7,
-                                        noise=2, distractors=1, occasions=90,
-                                        seed=0)
-        self.stream = generate(self.occasions)
-        self._drive()
+    # DRIVEN ONCE FOR THE WHOLE CLASS, not once per test. `setUp` re-ran the
+    # entire stream for each of the four assertions -- four times 19 seconds --
+    # because every message here opens its own connection. The drive is
+    # read-only afterwards, so sharing it changes nothing except the bill.
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.network = _Network()
+        cls.occasions = OccasionConfig(concepts=8, surfaces=3, presence=0.7,
+                                       noise=2, distractors=1, occasions=60,
+                                       seed=0)
+        cls.stream = generate(cls.occasions)
+        cls._drive(cls)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.network.close()
 
     def _drive(self) -> None:
         closes: dict[int, int] = {}
@@ -135,6 +145,69 @@ class ItForwardsWhatItEmits(unittest.TestCase):
         pushes would still report a positive count."""
         for peer in self.network.peers:
             self.assertEqual(peer.failures, [], f"peer {peer.service.node}")
+
+
+class TheReplyMeansTheWorkLanded(unittest.TestCase):
+    """A `FLUSH` must not return while its writes are still in flight.
+
+    The first version replied first and forwarded after. In ONE PROCESS that
+    raced fast enough to pass every test here; across three OS processes it did
+    not, and a caller reading a count straight after a flush read one that had
+    not arrived. **A loopback race is not a reliable test of an ordering**, so
+    this asserts the ordering directly: forwarding is pointed at a destination
+    that accepts and then stalls, and the flush must not return until it moves.
+    """
+
+    def setUp(self) -> None:
+        self.released = threading.Event()
+        self.accepted = threading.Event()
+        self.blocker = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.blocker.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.blocker.bind(("127.0.0.1", 0))
+        self.blocker.listen(8)
+        self.blocked_port = self.blocker.getsockname()[1]
+        threading.Thread(target=self._stall, daemon=True).start()
+        self.addCleanup(self.released.set)
+        self.addCleanup(self.blocker.close)
+
+    def _stall(self) -> None:
+        while True:
+            try:
+                connection, _ = self.blocker.accept()
+            except OSError:
+                return
+            self.accepted.set()
+            self.released.wait(timeout=5.0)
+            connection.close()
+
+    def test_a_flush_waits_for_its_forwards(self):
+        config = BucketConfig(width=50, nodes=2, observers=1, seed=0)
+        service = BucketService(0, config)
+        # Route every forward at the stalling socket, whichever node owns what.
+        peer = BucketPeer(service, {0: ("127.0.0.1", self.blocked_port),
+                                    1: ("127.0.0.1", self.blocked_port)},
+                          host="127.0.0.1").start()
+        self.addCleanup(peer.close)
+
+        # ONE surface in the bucket, so the flush emits exactly one forward:
+        # a single `NOTE` and no pairs. One is all the ordering needs, and more
+        # would only make the test slower by stalling each in turn.
+        bucket = next(b for b in range(500) if service.owns(b))
+        service.handle(("OBSERVE", bucket, 41, bucket * config.width))
+
+        done = threading.Event()
+        threading.Thread(
+            target=lambda: (ask("127.0.0.1", peer.port, ("FLUSH", bucket),
+                                timeout=10.0), done.set()),
+            daemon=True).start()
+
+        self.assertTrue(self.accepted.wait(timeout=5.0),
+                        "the flush never attempted a forward")
+        self.assertFalse(done.wait(timeout=0.5),
+                         "the flush replied while a forward was still stalled")
+        self.released.set()
+        self.assertTrue(done.wait(timeout=5.0),
+                        "the flush never returned after the forward moved")
 
 
 class WhenThePeerIsGone(unittest.TestCase):

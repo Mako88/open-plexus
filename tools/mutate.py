@@ -2468,6 +2468,22 @@ MUTATIONS = [
         new="        sent = self.delivered + self.lost_late + self.lost_dropped",
     ),
     Mutation(
+        name="the-reply-goes-out-before-the-writes-land",
+        breaks="what a reply MEANS. Forwarding after replying lets a FLUSH "
+               "return while its NOTE and LINK messages are still in flight, so "
+               "a caller reading a count straight afterwards reads one that has "
+               "not arrived. In ONE PROCESS this races fast enough to pass "
+               "every test; across three OS processes it did not, which is how "
+               "it was found",
+        path=BUCKET_PEER,
+        old="            for destination, forward in outbox:\n"
+            "                self._forward(destination, forward)\n"
+            '            send(connection, json.dumps(reply).encode("utf-8"))',
+        new='            send(connection, json.dumps(reply).encode("utf-8"))\n'
+            "        for destination, forward in outbox:\n"
+            "            self._forward(destination, forward)",
+    ),
+    Mutation(
         name="an-undeliverable-write-leaves-no-evidence",
         breaks="the only thing a server thread can do about a lost message. "
                "Forwarding has no caller to catch anything, so a swallowed "

@@ -309,6 +309,14 @@ This sweep's diagnosis is that `salience` is genuinely selective -- query
 positions fire at **7.6x the filler rate** -- and still loses **because filler is
 92% of the sequence and a 7.6x enrichment does not survive that base rate**.
 
+**WARNING, 2026-07-30: 7.6x IS NOT REPRODUCIBLE FROM THIS REPOSITORY.** Both
+`experiments/g8_02_control.py` at its committed parameters and `g28-01`'s screen
+report **zero filler positions clearing the bar**, which makes the ratio infinite
+rather than 7.6x. The configuration that produced it is unrecorded. The diagnosis
+below may still be right -- it is about a base rate, which is robust -- but the
+figure it names cannot currently be re-derived, and note 105 is what happens when
+that goes unnoticed.
+
 What that enrichment actually buys, and what would be needed:
 
     stored set is % real     enrichment required AT 92% FILLER

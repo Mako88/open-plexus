@@ -201,3 +201,48 @@ instrument's own filler share is most of the problem.
 COST
 ----
 Seconds per run. Local, no dispatch, no training.
+
+
+THE CONTROL WAS ADDED, AND IT SHOWS 7.6x IS NOT REPRODUCIBLE HERE
+====================================================================
+The screen now reports `surprise` on QUERY:filler beside the pair:filler arms, so
+note 013's number has something comparable to land against.
+
+    query positions 480, fires 0.0000; filler fires 0.0000   ->  DOES NOT REPRODUCE
+
+**And the existing tool does the same.** `experiments/g8_02_control.py`, run at its
+own committed parameters, prints *"no filler cleared the bar at all"* on every arm:
+
+    kind             n   self-info  over bar     rate
+    answer         480       5.938       480   1.0000
+    filler       29440       3.485         0   0.0000
+    pair           320       4.723       160   0.5000
+    query          480       3.507         0   0.0000
+
+**So this screen is not wrong -- it agrees exactly with the tool it was modelled
+on. The REFERENCE is unreachable.** 7.6x came from a configuration neither tool
+reproduces, and nothing committed records which one. That is `note 105`'s shape,
+under a number `g8-01`'s whole diagnosis rests on: *"salience is genuinely
+selective and still loses"* is an argument built on a figure that cannot be
+re-derived here.
+
+
+AND THE SCREENING IDEA IS WEAKER THAN I SOLD IT
+-------------------------------------------------
+The proxy says `surprise` has INFINITE enrichment at these parameters -- zero
+filler fires. `g8-01` measured the salience arm recovering nothing.
+
+Both can be true, and the reason matters: **this screen measures a UNIGRAM
+self-information proxy, not the model's salience mechanism.** `g8_02_control`'s
+own docstring says so -- it *"understates how predictable the task content is"*
+because the model is associative and the proxy is not.
+
+**So a candidate clearing this screen is not thereby a candidate that works**, and
+the claim made when this file was registered -- that screening lets a gate be
+rejected on paper -- holds only in ONE direction. A signal that cannot separate
+the classes in the data certainly cannot separate them in a model. A signal that
+CAN may still fail, exactly as salience did.
+
+That asymmetry is worth keeping, because it is still cheaper than four built
+gates. But "screen first" was overstated and is corrected here rather than left
+to be discovered by whoever screens something, builds it, and watches it fail.

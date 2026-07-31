@@ -110,6 +110,12 @@ def main() -> None:
     names = ("surprise", "addr-novel", "addr-seen", "token-novel", "token-seen")
     fired = {n: [0, 0] for n in names}      # [on should-store, on filler]
     seen = [0, 0]
+    # THE CONTROL, added after the first run had none. note 013 measured surprise at
+    # 7.6x on QUERY:filler; this file measures PAIR:filler, and the first version
+    # predicted one would reproduce the other. Different classes. Both are now
+    # reported so the known number is actually comparable to something.
+    query_fired = 0
+    query_seen = 0
 
     for sequence in sequences:
         tokens = list(sequence.tokens)
@@ -126,6 +132,9 @@ def main() -> None:
                 seen[1] += 1
                 for n in names:
                     fired[n][1] += int(sig[n])
+            if kinds[t] == "query":
+                query_seen += 1
+                query_fired += int(sig["surprise"])
 
     print(f"\n{len(sequences)} sequences, seq_len {BASE.seq_len}, "
           f"n_keys {BASE.n_keys}")
@@ -145,6 +154,16 @@ def main() -> None:
           f"{seen[1] / positions * 100:.2f}%, so the bar is {bar / 11.5:.1f}x higher")
     print("  A signal below it stores more filler than content, whatever the "
           "threshold.")
+
+    # The control, printed last so it is read as a calibration and not an arm.
+    filler_rate = fired["surprise"][1] / seen[1]
+    query_rate = query_fired / query_seen if query_seen else 0.0
+    ratio = query_rate / filler_rate if filler_rate else float("inf")
+    print("\n  CONTROL, surprise on QUERY:filler -- note 013 measured 7.6x")
+    print(f"    query positions {query_seen:,}, fires {query_rate:.4f}; "
+          f"filler fires {filler_rate:.4f}")
+    print(f"    enrichment {ratio:.2f}x  "
+          f"{'reproduces' if 2.5 <= ratio <= 23 else 'DOES NOT REPRODUCE'}")
 
 
 if __name__ == "__main__":

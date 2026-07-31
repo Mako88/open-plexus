@@ -1,10 +1,96 @@
 Is the filler share a fact about the world, or about MQAR?
 ===========================================================
 
-Script: tools/write_worthiness.py  (to be written)
-Status: NOT RUN. Predictions registered and committed before the script exists.
+Script: tools/write_worthiness.py
+Status: RUN, local. Predictions committed at `92b8a0f` before the script existed.
 
-ANSWER: pending.
+ANSWER: **P1 FAILED, so P2 through P5 ARE NOT REPORTABLE AND ARE NOT REPORTED.**
+        The label-free definition is not the same quantity as the oracle one, and
+        the gate existed to catch exactly that.
+
+    CONTROL, MQAR by oracle label      92.0x     (g28-01 measured 91.9x)
+    SAME STREAM, counted label-free    0.0x to 0.1x at every granularity
+
+Three orders of magnitude apart. The control reproduces to within 0.1%, so the
+failure is in the new definition and not in the comparison.
+
+The cross-source table the run printed is therefore **not quoted here, in any
+form**, and the numbers in it are not evidence about Shakespeare, FB15k-237 or
+OpenEA. Quoting them would be reporting a measurement whose own control says it
+measures something else.
+
+
+WHY IT FAILED, WHICH IS WORTH MORE THAN THE TABLE WOULD HAVE BEEN
+-------------------------------------------------------------------
+The definition was *"a write is worth making if its ADDRESS is queried again later"*,
+and it was implemented as *"if its address RECURS later"*. Those are not the same
+sentence and the gap is the whole failure.
+
+MQAR's filler is drawn from a small key range, so filler addresses recur constantly.
+**Recurrence is true of almost every position in almost any stream.** Under this
+count MQAR is 99.9% worth writing, when the oracle says 1.1%.
+
+**Recurrence is not demand.** What makes a write worth making is a fact about the
+future demand on it, and no count of the symbols can see that. This is not a
+granularity problem and sweeping the dial finer does not fix it -- MQAR's finest
+setting still reads 0.1x against the oracle's 92x.
+
+**So P3 is unresolved rather than refuted.** The question of whether the bar tracks
+address granularity is a real one and this run did not answer it; it answered a
+different question, badly, and the gate caught it.
+
+
+WHAT THIS MEANS FOR KILL-LIST 5, AND IT IS A DIRECTION
+--------------------------------------------------------
+The attractive thing about a label-free count was that it would be cheap and would
+cross to any data. **The result is that the cheap route does not exist**: worth-writing
+is defined by what is later asked, so recovering it requires either a task that
+declares its queries -- which is MQAR, and is where we started -- or an INTERVENTION:
+remove the write and see what breaks.
+
+That is the per-position attribution route, and this run is an argument for it rather
+than an alternative to it. It also lowers the value of hunting for a better write
+signal by counting, which is what `g28-01` did.
+
+
+WHAT SURVIVES INDEPENDENTLY, AND IT IS STRUCTURE NOT MEASUREMENT
+-------------------------------------------------------------------
+One thing needs no definition at all and is stated as structure, LABELLED as such:
+
+**Only two things in this repository have a `filler` position kind, and this project
+wrote both of them** -- `openplexus/tasks/mqar.py` and
+`openplexus/tasks/reward_recall.py`. FB15k-237, OpenEA and CLUTRR have no filler,
+because every triple in a knowledge graph is a fact.
+
+That is a fact about the file tree, not a measurement, and it does NOT establish that
+the 92x bar is unrepresentative -- a stream with no explicit junk can still be mostly
+not-worth-storing. It establishes only that the bar has never been measured off a task
+we authored, which is what prompted this run and is still true after it.
+
+
+A CORRECTION MADE MID-RUN
+--------------------------
+The first version of the control read **23.0x**, and it was mis-specified in exactly
+the way `g28-01`'s own P1 was: it counted every non-filler position as should-store,
+where `g28-01` counts only what `harness.oracle_mask` marks -- a position whose
+PREDECESSOR was a pair -- against filler alone, with queries excluded from both sides.
+Two classes, one name, one sweep apart.
+
+**It was caught because the control had a number to reproduce.** A control with
+nothing to hit would have read 23.0x and been believed, and then the label-free rows
+would have been compared against a wrong bar. This is the third time in this repo that
+a known figure to reproduce has caught a mis-specified comparison class.
+
+
+COST
+----
+About 90 seconds local, plus the re-run after the control was corrected.
+
+
+MEASURED ON
+-----------
+`tools/write_worthiness.py`, whose docstring now opens by saying its definition is
+refuted, so nobody imports it expecting the quantity its name suggests.
 
 
 IN PLAIN TERMS

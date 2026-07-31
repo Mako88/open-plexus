@@ -115,8 +115,27 @@ A green end-to-end run cannot tell you which of six components is working. When
 you change a specific thing, measure that thing directly — then treat the
 end-to-end result as a summary, not a diagnosis.
 
-> *Calibration.* — unfilled. Record the first time a proxy metric hid a broken
-> component: how many runs went by before a direct probe found it.
+> *Calibration, and it is the good version: ZERO runs went by.* `g31-01` proposed a
+> label-free proxy for *"is this write worth making"* — count whether the address
+> recurs later — so the quantity could travel to data this project did not generate.
+> The proxy is wrong: **recurrence is not demand.** MQAR's filler is drawn from a
+> small key range, so a filler address recurs constantly, and the proxy reads the
+> stream as 99.9% worth writing where the oracle says 1.1%. Bars of `0.1x` against
+> `92.0x`, three orders of magnitude, at every granularity.
+>
+> **It cost one run because the proxy was required to reproduce the direct quantity
+> before being used**, and that requirement was registered as the gate rather than
+> noticed afterwards. The proxy was not refined; it was abandoned, and the conclusion
+> — that worth-writing is a fact about future demand and is therefore reachable only
+> by intervention, not by counting — is worth more than the cross-source table would
+> have been.
+>
+> *And a second catch inside the first.* The control's own first version read `23.0x`
+> instead of `92.0x`: it counted every non-filler position as should-store, where
+> `g28-01` counts only what `harness.oracle_mask` marks, against filler alone. Two
+> classes, one name — **the same mis-specification `g28-01`'s P1 made, one sweep
+> earlier.** It was caught only because the control had a published number to hit.
+> A control with nothing to reproduce would have read `23.0x` and been believed.
 
 **A variable that never changes does not look like a variable — it looks like
 the background.** Before concluding that a mechanism is refuted, list what was

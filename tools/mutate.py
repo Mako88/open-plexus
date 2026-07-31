@@ -53,6 +53,7 @@ CLOSURE = ROOT / "openplexus" / "tasks" / "closure.py"
 CONTENT = ROOT / "openplexus" / "content.py"
 OCCASIONS = ROOT / "openplexus" / "tasks" / "occasions.py"
 XSL = ROOT / "openplexus" / "tasks" / "xsl.py"
+MNIST = ROOT / "openplexus" / "tasks" / "mnist.py"
 GROUNDING = ROOT / "openplexus" / "grounding.py"
 BUCKETS = ROOT / "openplexus" / "buckets.py"
 FEDERATED = ROOT / "openplexus" / "federated.py"
@@ -2312,6 +2313,17 @@ MUTATIONS = [
         path=OCCASIONS,
         old="                present = [s for s in own if rng.random() < config.presence]",
         new="                present = list(own)",
+    ),
+    Mutation(
+        name="the-images-drift-out-of-step-with-their-labels",
+        breaks="the only thing that makes gate G7's first real test scorable. "
+               "An off-by-one stride pairs every image with the NEXT one's "
+               "label, so a perfectly good grouping is scored against the wrong "
+               "answer and reads as a mechanism that learned nothing -- a null "
+               "result manufactured by the ruler",
+        path=MNIST,
+        old="    images = [pixels[i * stride:(i + 1) * stride] for i in range(take)]",
+        new="    images = [pixels[i * stride:(i + 2) * stride] for i in range(take)]",
     ),
     Mutation(
         name="a-trial-presents-only-the-CORRECT-word-object-pairing",

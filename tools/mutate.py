@@ -2468,6 +2468,21 @@ MUTATIONS = [
         new="        sent = self.delivered + self.lost_late + self.lost_dropped",
     ),
     Mutation(
+        name="a-closed-peer-goes-on-serving",
+        breaks="what it means for a node to LEAVE. Without the accept timeout "
+               "the serve loop never reads `_running` again, and closing a "
+               "socket another thread is blocked on inside `accept` wakes it on "
+               "Windows but NOT on Linux -- so a shut-down peer keeps answering "
+               "and keeps taking forwards. Any churn measurement over this "
+               "harness would be measuring nodes that had not actually gone. "
+               "NOTE: this bites on LINUX, which is where the harness runs. It "
+               "may survive a local Windows run, and that platform gap is the "
+               "bug itself rather than a weakness in the mutation",
+        path=BUCKET_PEER,
+        old="        self._listener.settimeout(0.25)",
+        new="        self._listener.settimeout(None)",
+    ),
+    Mutation(
         name="the-reply-goes-out-before-the-writes-land",
         breaks="what a reply MEANS. Forwarding after replying lets a FLUSH "
                "return while its NOTE and LINK messages are still in flight, so "

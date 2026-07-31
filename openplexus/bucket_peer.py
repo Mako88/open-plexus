@@ -103,6 +103,17 @@ class BucketPeer:
         self._listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._listener.bind((host, port))
         self._listener.listen(64)
+        # A TIMEOUT SO `close` CAN ACTUALLY STOP IT, and this is a portability
+        # bug Windows hid. Closing a socket another thread is blocked on inside
+        # `accept` wakes that thread on Windows and does NOT on Linux, so a
+        # "closed" peer went on accepting connections there: CI failed two
+        # tests that pass locally -- a connection to a shut-down peer succeeded,
+        # and a forward to a "dead" node was delivered.
+        #
+        # **A peer that cannot be shut down is not a test problem.** It is a node
+        # that keeps serving after it departs, which is exactly what C3 is about,
+        # and it would have made any churn measurement here meaningless.
+        self._listener.settimeout(0.25)
         self.port = self._listener.getsockname()[1]
         self._running = False
         self._thread: threading.Thread | None = None
@@ -114,18 +125,27 @@ class BucketPeer:
         return self
 
     def close(self) -> None:
+        """Stop serving, and do not return until the port is actually free.
+
+        The join is not tidiness: a caller that closes a peer and immediately
+        asserts it is unreachable is asserting against a listener that may still
+        be inside `accept`. Waiting is what makes *"this node has left"* true
+        rather than requested.
+        """
         self._running = False
+        if self._thread is not None:
+            self._thread.join(timeout=3.0)
         try:
             self._listener.close()
         except OSError:
             pass
-        if self._thread is not None:
-            self._thread.join(timeout=2.0)
 
     def _serve(self) -> None:
         while self._running:
             try:
                 connection, _ = self._listener.accept()
+            except TimeoutError:
+                continue          # the timeout exists so `_running` gets read
             except OSError:
                 return
             threading.Thread(target=self._one, args=(connection,),

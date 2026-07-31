@@ -48,6 +48,7 @@ explainer, and saying so is the most useful thing you can do.
 | [29](29-the-signal-was-pointing-backwards.md) | The signal was there, pointing backwards |
 | [30](30-two-ways-to-pick-what-to-keep.md) | Two ways to pick what to keep |
 | [31](31-what-the-filter-turned-out-to-be.md) | What the filter turned out to be |
+| [32](32-the-difference-between-seen-again-and-wanted-again.md) | The difference between "seen again" and "wanted again" |
 | [028](028-four-corrections-and-a-detour.md) | Four corrections in a row, and the detour they caused |
 | [029](029-giving-every-machine-its-own-scorer.md) | Giving every machine its own scorer |
 | [030](030-the-middle-person-was-not-needed.md) | The middle person wasn't needed |

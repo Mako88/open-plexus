@@ -2254,8 +2254,45 @@ MUTATIONS = [
                "the softmax has nothing to separate. The vectors still move, so "
                "a test asserting only that they changed would not notice",
         path=RELATION_CONTRASTIVE,
-        old="            error[target] -= 1.0",
-        new="            error[target] -= 0.0",
+        # RE-POINTED, same commit as the rename that moved it. `learn_pairs` calls the
+        # target's row `hit` because with sampled negatives it is index 0 of the drawn
+        # set rather than the target's own id. `--verify` reported `original text
+        # appears 0 times` -- which is the whole reason it runs first.
+        old="            error[hit] -= 1.0",
+        new="            error[hit] -= 0.0",
+    ),
+    Mutation(
+        name="the-sampled-negatives-OVERWRITE-instead-of-accumulating",
+        breaks="the sampled-negative update whenever a negative is drawn twice. "
+               "Fancy-index assignment keeps only the LAST write for a repeated "
+               "index, so every duplicate's gradient is silently discarded -- and "
+               "sampling with replacement produces duplicates constantly once the "
+               "negative count approaches the alphabet size. The rule still runs "
+               "and still learns, just from a fraction of the signal it computed.",
+        path=RELATION_CONTRASTIVE,
+        old="                np.add.at(left, rows, -bulk)",
+        new="                left[rows] -= bulk",
+    ),
+    Mutation(
+        name="the-gradients-are-taken-AFTER-the-bulk-update",
+        breaks="the shared-table case, which is CLUTRR and every graph result. "
+               "`right[b]` and `left[a]` are rows of the array the bulk step "
+               "writes, so computing the bulk step first feeds already-updated "
+               "values into the two factor gradients. A different rule from the "
+               "one the recorded numbers were measured under, and silent.",
+        path=RELATION_CONTRASTIVE,
+        # Targets the smallest block that still expresses the bug: recompute the two
+        # factor gradients AFTER the bulk step, in the shared-table path. A larger
+        # `old` block went stale the moment an adjacent line gained a comment, which
+        # is the staleness `--verify` exists to surface and did.
+        old="            if rows is None:\n"
+            "                left -= bulk\n"
+            "            else:",
+        new="            if rows is None:\n"
+            "                left -= bulk\n"
+            "                grad_a = d_composed * right[b]\n"
+            "                grad_b = d_composed * left[a]\n"
+            "            else:",
     ),
 ]
 def restore_any_leftovers() -> None:

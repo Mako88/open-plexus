@@ -185,42 +185,119 @@ def learn(tris, width: int, seed: int, epochs: int, lr: float,
     `k`, with the true `r3` as the target. That IS the contrast: the numerator is the
     positive and the denominator is every negative, so no negative sampling schedule
     has to be chosen and none can be got wrong.
+
+    **This is the single-alphabet case of `learn_pairs`** -- one table, every negative.
+    Kept as the name every existing caller uses, and delegating rather than repeating
+    the update, so there is one implementation of the rule.
     """
     # `n_relations` defaults to CLUTRR's alphabet so every existing caller is
     # unchanged, and is a parameter so the SAME learner can run on a graph with
     # hundreds of relations. Forking it for the second domain would put the one
     # mechanism under test in two files, which is rule 9's whole argument.
     count = len(RELATIONS) if n_relations is None else n_relations
+    return learn_pairs(tris, width, seed, epochs, lr, temperature,
+                       n_left=count, n_right=None)[0]
+
+
+def learn_pairs(items, width: int, seed: int, epochs: int, lr: float,
+                temperature: float, n_left: int, n_right: int | None = None,
+                negatives: int | None = None):
+    """The contrastive rule over `(a, b, target)`, with `a`/`target` in one table.
+
+    Returns `(left, right)`. **`n_right=None` means ONE SHARED TABLE** -- `right` is the
+    same array as `left`, which is the CLUTRR and graph case where relations compose
+    with relations. Give `n_right` when `b` is drawn from a different alphabet, as
+    entities and relations are on a knowledge graph.
+
+    `negatives=None` contrasts against EVERY row of `left`, which is the original rule
+    and the default, so no existing result moves. **An integer samples that many
+    negatives instead, and it is a real weakening rather than an optimisation:**
+
+      - a sampled contrast is a schedule, `K` is a knob, and it can be chosen wrongly,
+        which the full contrast could not be
+      - the row normalisation becomes PARTIAL. Renormalising all `n_left` rows per
+        update is the cost the sampling exists to avoid, so only touched rows are
+        renormalised, and an untouched row keeps whatever norm it had
+
+    Both are stated here rather than in a caller because this is where someone reading
+    the update will be. `g30-02` is where the `K` grid and its results live.
+    """
     rng = np.random.default_rng(seed)
-    vectors = rng.normal(0.0, 1.0 / np.sqrt(width), (count, width))
-    if not tris:
-        return vectors
-    order = np.arange(len(tris))
+    left = rng.normal(0.0, 1.0 / np.sqrt(width), (n_left, width))
+    right = left if n_right is None else rng.normal(
+        0.0, 1.0 / np.sqrt(width), (n_right, width))
+    if len(items) == 0:
+        return left, right
+
+    order = np.arange(len(items))
     for _ in range(epochs):
         rng.shuffle(order)
         for i in order:
-            a, b, target = tris[i]
-            composed = vectors[a] * vectors[b]
-            logits = vectors @ composed / temperature
+            a, b, target = items[i]
+            composed = left[a] * right[b]
+
+            if negatives is None:
+                rows = None
+                logits = left @ composed / temperature
+                hit = target
+            else:
+                # The target sits at index 0 so `hit` needs no search, and duplicate
+                # draws are harmless because the scatter below accumulates.
+                rows = np.concatenate(
+                    ([target], rng.integers(0, n_left, negatives)))
+                logits = left[rows] @ composed / temperature
+                hit = 0
+
             logits -= logits.max()
             probs = np.exp(logits)
             probs /= probs.sum()
-            error = probs.copy()
-            error[target] -= 1.0
+            error = probs
+            error[hit] -= 1.0
 
-            # d/d vectors[k] for k != a, b: error[k] * composed / T
-            grad_vectors = np.outer(error, composed) / temperature
-            # d/d composed, which then splits across the two factors by the product
-            d_composed = (vectors.T @ error) / temperature
-            grad_a = d_composed * vectors[b]
-            grad_b = d_composed * vectors[a]
+            # EVERY gradient is computed before ANY table update. With one shared
+            # table `right[b]` and `left[a]` are rows of the array being written, so
+            # applying the bulk step first would feed updated values into `grad_a`
+            # and `grad_b` -- a different rule from the one CLUTRR's numbers were
+            # measured under, and silent.
+            source = left if rows is None else left[rows]
+            d_composed = (source.T @ error) / temperature
+            grad_a = d_composed * right[b]
+            grad_b = d_composed * left[a]
+            # Parenthesised to divide BEFORE multiplying by `lr`, matching the
+            # pre-refactor `grad = outer / T` then `-= lr * grad`. Without it the
+            # rounding differs in the last bits and `learn` stops being identical
+            # to the code every recorded CLUTRR and graph number came from.
+            bulk = lr * (np.outer(error, composed) / temperature)
 
-            vectors -= lr * grad_vectors
-            vectors[a] -= lr * grad_a
-            vectors[b] -= lr * grad_b
-            norms = np.linalg.norm(vectors, axis=1, keepdims=True)
-            vectors /= np.where(norms == 0, 1.0, norms)
-    return vectors
+            if rows is None:
+                left -= bulk
+            else:
+                # `np.add.at` and not `left[rows] -=`, because fancy-index assignment
+                # keeps only the LAST write when an index repeats, and a repeat is
+                # exactly what sampling with replacement produces.
+                np.add.at(left, rows, -bulk)
+            left[a] -= lr * grad_a
+            right[b] -= lr * grad_b
+
+            if rows is None:
+                _renormalise(left)
+                if right is not left:
+                    _renormalise(right)
+            else:
+                _renormalise(left, np.append(rows, a))
+                _renormalise(right if right is not left else left, np.array([b]))
+    return left, right
+
+
+def _renormalise(table: np.ndarray, rows: np.ndarray | None = None) -> None:
+    """Unit-normalise every row, or only `rows`. In place."""
+    view = table if rows is None else table[rows]
+    norms = np.linalg.norm(view, axis=-1, keepdims=True)
+    scaled = view / np.where(norms == 0, 1.0, norms)
+    if rows is None:
+        table[:] = scaled
+    else:
+        table[rows] = scaled
 
 
 def graph_rules(path: Path):

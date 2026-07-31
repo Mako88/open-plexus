@@ -81,6 +81,10 @@ ALLOWED = (
     # **The reasoning survived**: g5_01_scaling.py carries it at lines 72 and
     # 103-128, which is the durable home and is why this cost nothing.
     "g29-01: concept-partitioning arm built",
+    # QUOTES the line above rather than being damaged by it. Five of the nine hits in
+    # the original calibration run were this same shape, which is the cost of a check
+    # that matches the symptom: writing about the damage reproduces the damage.
+    "The commit-message checker caught one",
 )
 
 

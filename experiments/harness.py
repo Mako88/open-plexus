@@ -143,6 +143,17 @@ def parse_args(description: str) -> argparse.Namespace:
                              "baseline was data-limited, not width-limited, so "
                              "the reference could not scale and the sweep "
                              "resolved nothing")
+    parser.add_argument("--negatives", type=int, default=None,
+                        help="how many negatives a contrastive update contrasts "
+                             "against; omitted contrasts against EVERY symbol, "
+                             "which is the original rule and is unaffordable "
+                             "once the alphabet is 14,505 entities (g30-02)")
+    parser.add_argument("--temperature", type=float, default=None,
+                        help="softmax temperature for a contrastive update")
+    parser.add_argument("--untrained", action="store_true",
+                        help="THE GATE for any learned arm: run the identical "
+                             "call with zero epochs, so a bug in the learner "
+                             "cannot make the gate pass by accident")
     parser.add_argument("--fade", type=float, default=None,
                         help="per-step multiplier ageing a tag's marks toward "
                              "eviction; 1.0 never ages them")

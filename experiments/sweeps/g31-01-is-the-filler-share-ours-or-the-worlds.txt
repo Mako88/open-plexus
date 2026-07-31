@@ -1,0 +1,136 @@
+Is the filler share a fact about the world, or about MQAR?
+===========================================================
+
+Script: tools/write_worthiness.py  (to be written)
+Status: NOT RUN. Predictions registered and committed before the script exists.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+Kill-list item 5 -- can a machine learn forever from an endless stream -- is blocked
+on one number. For the things a node keeps to be even half worth keeping, its
+write signal has to fire on useful material about **92 times** more often than on
+junk. The best signal anyone here has measured fires at **7.6x**. That is not a
+tuning gap, and it has stopped the item dead.
+
+**But the 92x comes from MQAR, which this project wrote.** We chose how much junk is
+in that stream. Nobody has ever measured the equivalent number on data we did not
+make up, so the wall blocking item 5 may be a wall we poured.
+
+This measures it on real data.
+
+**And it may find something worse than good news**, which is why it is worth running
+rather than assuming: the bar might be set by how FINELY addresses are cut rather
+than by whether the data is real. If so, MQAR is not unrepresentative -- it is just
+sitting at one point on a dial nobody knew was there, and the same 92x will appear
+in real data at the same setting.
+
+
+THE DEFINITION, AND IT IS THE WHOLE EXPERIMENT
+-----------------------------------------------
+Every previous number here used an ORACLE -- `position_kinds()` -- which only exists
+because we generated the data and labelled it. Real data has no such labels, so a
+definition that needs one cannot cross over. This one does not:
+
+    A WRITE OPPORTUNITY is a position where a node could bind an address to a value.
+    It is WORTH WRITING if that same ADDRESS is queried again later in the stream.
+
+That is checkable by counting on any stream, needs no labels, and is what a write
+gate is actually for -- a write nothing ever reads is waste whatever it contained.
+
+The bar follows from it with no new arithmetic. With `w` the worthy share, the
+enrichment needed for a half-real stored set is
+
+    bar = (1 - w) / w
+
+which is `bar_for(w, 1-w)` in `experiments/g28_01_gate_screen.py`, unchanged.
+
+
+WHY THIS IS A DIAL AND NOT A DICHOTOMY
+---------------------------------------
+**Recurrence depends on how finely the address is cut, and that is a knob, not a
+property of the data.** Character bigrams in English recur constantly -- there are
+only so many. Widen the address to four characters and most of them never repeat.
+
+MQAR's filler is drawn from a wide key range, so its addresses almost never recur.
+**That is a granularity choice, and it was made when the task was written.**
+
+So reporting one number per source would compare Shakespeare at one granularity to
+MQAR at another and call the difference "real versus synthetic". The granularity is
+swept on every source instead, and the sources are compared at MATCHED settings.
+
+    sources    MQAR (the control), tinyshakespeare, FB15k-237, an OpenEA graph
+    dial       address width: how much context the address includes
+
+
+PREDICTIONS
+-----------
+  P1  THE CONTROL, and nothing else is readable if it fails. MQAR at its own
+      configuration reproduces a bar near 91.9x -- within 15% -- under this
+      label-free definition.
+
+      `g28-01` measured 91.9x using `position_kinds()`. If counting address
+      recurrence lands somewhere else entirely, the two are different quantities and
+      no cross-source comparison in this file means anything.
+
+  P2  THE TEST. At its NATURAL granularity, at least one real source has a bar below
+      **7.6x** -- the best signal already measured.
+
+      If any real source does, item 5's blocker is not a fact about streams, and the
+      signal we already have is enough there.
+
+  P3  THE ONE I THINK IS ACTUALLY TRUE, and it is the unwelcome one. The bar tracks
+      ADDRESS GRANULARITY far more strongly than it tracks real-versus-synthetic:
+      at matched granularity, the real sources and MQAR land within 3x of each other.
+
+      Refuted if a real source stays far below MQAR at every granularity, which
+      would mean real data genuinely has less waste in it. **I expect P2 and P3 to
+      BOTH hold**, which sounds contradictory and is not: it would mean the bar is
+      cheap at coarse addressing and expensive at fine, and the question becomes
+      which granularity the model actually needs.
+
+  P4  FB15k-237 has the LOWEST bar of any source, under 2x.
+
+      A knowledge graph is all content -- there is no junk in it by construction --
+      and many `(head, relation)` addresses have several tails, so they recur.
+      **If even a pure-content graph shows a high bar, the definition is measuring
+      something other than waste and P1 was not a sufficient control.**
+
+  P5  THE ONE I AM LEAST SURE OF. Shakespeare's bar at bigram addressing is under
+      0.1x -- that is, the great majority of writes are worth making.
+
+      Registered because it is the cheapest way to be wrong in public about whether
+      the whole framing survives contact with a small alphabet.
+
+
+WHAT WOULD MAKE THIS NOT COUNT
+--------------------------------
+**A definition that flatters real data.** "Queried again later" is fixed before any
+source is read and is identical across sources. It is not tuned per source, and the
+same function computes every row.
+
+**Comparing across granularities by accident.** Every table cell names its
+granularity. The cross-source claim is only made at matched settings -- which is the
+`g9-11` calibration, where a constant carried from another configuration was worth
+0.58 of recovery.
+
+**Reading a bar as an answer for item 5.** A low bar says a gate is EASY on that
+source; it does not say this project's gate works, and it does not say the source is
+one the project should be running on. Those are separate and are not conflated here.
+
+**MQAR's number quoted rather than recomputed.** It is re-measured in this run with
+this definition, and the oracle figure is printed beside it as the control.
+
+
+COST
+----
+Counting over four sources at several granularities. No training, no model. Seconds
+to a couple of minutes, local.
+
+
+MEASURED ON
+-----------
+`openplexus/tasks/mqar.py` at `g28-01`'s BASE config, `data/tinyshakespeare.txt`,
+`data/fb15k237/train.txt`, one `data/openea/` graph.

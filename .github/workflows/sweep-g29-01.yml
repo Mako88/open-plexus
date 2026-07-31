@@ -1,0 +1,119 @@
+name: sweep-g29-01-does-concept-partitioning-escape-g5s-wall
+
+# G5's wall was measured on DIMENSION splitting, and `g5-01` says so itself:
+#
+#   256 dimensions in one piece solve seq 384. The same 256 dimensions split
+#   sixteen ways reach 0.769. The wall is caused by the partitioning, not by
+#   the underlying rule.
+#
+# A concept-partitioned read is served WHOLE by the one node holding the fact, so
+# the mechanism g5-01 blames is absent. No sweep has ever varied a scale axis
+# under `concept_nodes` -- grep experiments/sweeps for it and nothing matches.
+#
+# THIS IS THE NARROW GRID AND THAT IS DELIBERATE. g5-01's full matrix is 5 widths
+# x 4 lengths x 5 learning rates = 100 jobs, and a second arm doubles it. `g29-01`
+# P3 is the GATE and it is ONE CELL: does the concept arm solve seq 384 at width
+# 256, where the sixteen-way dimension split reached 0.769? If both arrangements
+# land in the same place the difference does not exist where g5-01 found the wall,
+# and the exponent is decoration -- P3 says that in advance. Spend the 100 jobs
+# only if this says there is something to measure.
+#
+# BOTH ARMS RUN HERE. The dimension arm is not quoted from g5-01: it is re-run on
+# the same runner, same seeds, same learning rates, so the comparison is paired
+# rather than cross-sweep. `g23-04`'s saturation claim was wrong for exactly that
+# reason -- it compared across corpora and called the result a property.
+#
+# COST, MEASURED: one cell exceeded TEN MINUTES locally and was killed, which is
+# CLAUDE.md's own line for what belongs in Actions. At the measured 8x
+# local-to-runner factor a cell is well over an hour, hence timeout-minutes 180.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: open-plexus-sweep
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    strategy:
+      fail-fast: false
+      matrix:
+        split: [dimension, concept]
+        lr: ["0.01", "0.02", "0.05", "0.1", "0.2"]
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - name: ${{ matrix.split }} lr ${{ matrix.lr }} at width 256 seq 384
+        run: |
+          set -o pipefail
+          mkdir -p out
+          if [ "${{ matrix.split }}" = "concept" ]; then MODE="--mode concept"; else MODE=""; fi
+          python experiments/g5_01_scaling.py $MODE \
+            --width 256 --seqlen 384 --lr ${{ matrix.lr }} \
+            --json out/G-${{ matrix.split }}-${{ matrix.lr }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g29-01-${{ matrix.split }}-${{ matrix.lr }}
+          path: out/*.json
+
+  aggregate:
+    needs: [gate]
+    # A matrix that loses cells still reports, and says how many it lost.
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install numpy
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: g29-01-*
+          path: out
+          merge-multiple: true
+      - name: Combine
+        run: |
+          set -o pipefail
+          echo "cells returned: $(ls out/*.json 2>/dev/null | wc -l) of 10" \
+            | tee summary.txt
+          python - <<'EOF' | tee -a summary.txt
+          import glob, json
+          rows = [r for p in sorted(glob.glob("out/*.json"))
+                  for r in json.load(open(p))]
+          best = {}
+          for r in rows:
+              # BEST over learning rates, per arm, at the final checkpoint --
+              # g5-01's own convention, so the 0.769 it reports is comparable.
+              if r["epoch"] != max(x["epoch"] for x in rows):
+                  continue
+              key = r.get("split", "dimension")
+              if key not in best or r["pooled"] > best[key][0]:
+                  best[key] = (r["pooled"], r["lr"])
+          print(f"\n{'arm':<12}{'best pooled':>13}{'at lr':>8}")
+          for k in sorted(best):
+              print(f"{k:<12}{best[k][0]:>13.4f}{best[k][1]:>8}")
+          print("\n  g5-01 measured the DIMENSION arm at 0.769 here.")
+          print("  P3: concept SOLVES this cell where dimension reached 0.769.")
+          print("  If both land together, the wall is not about splitting the")
+          print("  WIDTH and #10's verdict stands.")
+          EOF
+      - name: Summary
+        if: always()
+        run: |
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat summary.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: g29-01-summary
+          path: |
+            summary.txt
+            out/*.json

@@ -56,6 +56,7 @@ XSL = ROOT / "openplexus" / "tasks" / "xsl.py"
 GROUNDING = ROOT / "openplexus" / "grounding.py"
 BUCKETS = ROOT / "openplexus" / "buckets.py"
 FEDERATED = ROOT / "openplexus" / "federated.py"
+BUCKET_SERVICE = ROOT / "openplexus" / "bucket_service.py"
 OWNERSHIP = ROOT / "openplexus" / "ownership.py"
 PARTITIONED = ROOT / "openplexus" / "partitioned.py"
 SEARCH = ROOT / "openplexus" / "search.py"
@@ -2464,6 +2465,30 @@ MUTATIONS = [
         path=BUCKETS,
         old="        sent = self.delivered + self.lost_late",
         new="        sent = self.delivered + self.lost_late + self.lost_dropped",
+    ),
+    Mutation(
+        name="a-node-serves-a-key-it-does-not-own",
+        breaks="the only thing that makes a SEPARATED store different from a "
+               "separable one. A service answering for another node's surface "
+               "returns the right number from the wrong arrangement -- every "
+               "count still matches the single-process reference, every test "
+               "about totals still passes, and the claim that a row lives at "
+               "its owner is silently false",
+        path=BUCKET_SERVICE,
+        old="        if not self.owns(key):",
+        new="        if False:",
+    ),
+    Mutation(
+        name="a-missing-marginal-is-treated-as-zero",
+        breaks="the loudness that catches a broken fetch. A candidate whose "
+               "marginal never arrived scores zero under every "
+               "chance-corrected statistic, so the walk returns each surface "
+               "alone and the result reads as a null rather than as a message "
+               "that was not sent. That exact failure happened once already, in "
+               "the first federated walk",
+        path=BUCKET_SERVICE,
+        old="        raise KeyError(",
+        new="        return 0 or KeyError(",
     ),
     Mutation(
         name="one-node-writes-BOTH-halves-of-a-pair",

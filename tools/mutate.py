@@ -57,6 +57,7 @@ GROUNDING = ROOT / "openplexus" / "grounding.py"
 BUCKETS = ROOT / "openplexus" / "buckets.py"
 FEDERATED = ROOT / "openplexus" / "federated.py"
 BUCKET_SERVICE = ROOT / "openplexus" / "bucket_service.py"
+BUCKET_PEER = ROOT / "openplexus" / "bucket_peer.py"
 OWNERSHIP = ROOT / "openplexus" / "ownership.py"
 PARTITIONED = ROOT / "openplexus" / "partitioned.py"
 SEARCH = ROOT / "openplexus" / "search.py"
@@ -2465,6 +2466,18 @@ MUTATIONS = [
         path=BUCKETS,
         old="        sent = self.delivered + self.lost_late",
         new="        sent = self.delivered + self.lost_late + self.lost_dropped",
+    ),
+    Mutation(
+        name="an-undeliverable-write-leaves-no-evidence",
+        breaks="the only thing a server thread can do about a lost message. "
+               "Forwarding has no caller to catch anything, so a swallowed "
+               "failure loses the write AND the record of it -- and g33-01 "
+               "measured what missing writes do to a recovery: they read as a "
+               "weaker signal rather than as a fault, on a run that reports "
+               "itself healthy",
+        path=BUCKET_PEER,
+        old="            self.failures.append((destination, message, str(unreachable)))",
+        new="            pass",
     ),
     Mutation(
         name="a-node-serves-a-key-it-does-not-own",

@@ -2,7 +2,23 @@ Does CLUTRR-symbolic pass G0, and where does our rule land on it?
 ==================================================================
 
 Script: experiments/g37_02_does_clutrr_pass_g0.py
-Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+Status: RUN, local, 2026-07-31. Predictions committed at `0ce95a4` before the
+        script was executed.
+
+ANSWER: **G0 is NOT ANSWERED, and that is different from FAILED.** Every learning
+        arm lands below the floor at every depth past 3 hops. The registered
+        response to that was a width/epoch probe on the reference, and it ran
+        (`g37-03`): **train accuracy is 0.4185 at d128x16 and 0.4215 at
+        d256x48** — twice the width and three times the epochs buy **0.003**.
+        The reference cannot fit data it has seen forty-eight times, so it is not
+        undertrained, it is structurally unable to compose. **These numbers are a
+        statement about `ShiftedAttention`, not about CLUTRR.**
+
+        And a second correction, upstream: `g37-01` called the test bucket's
+        majority share "the honest floor". **It is an ORACLE floor.** A constant
+        predictor fitted on TRAIN answers `brother`, which appears **0 times** in
+        the 2-hop and 3-hop test buckets. See below — the record is corrected
+        there too.
 
 
 IN PLAIN TERMS
@@ -148,14 +164,145 @@ for the expensive arm, giving **4.1 min** per attention cell and **12.2 min**
 for three seeds. `majority` and `frozen` are nearly free; `local` trains without
 a backward pass. **Total expected: 15 to 25 minutes**, local, no runner.
 
-Recorded after the run: TO BE FILLED.
+Recorded after the run: about **20 minutes** for the matrix, inside the 15-25
+estimate, plus **17 minutes** for the follow-up probe that was not budgeted for
+because it was contingent.
 
 
 RESULTS
 -------
-TO BE FILLED.
+Accuracy at the query slot, per hop bucket, mean of 3 seeds.
+
+arm              2       3       4       5       6       7       8       9      10
+majority    0.0000  0.0000  0.0684  0.0805  0.0374  0.0903  0.0667  0.1092  0.0588
+frozen      0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
+local       0.5000  0.3492  0.0982  0.1245  0.0685  0.0856  0.0622  0.0812  0.0868
+attention   0.1667  0.3651  0.1018  0.0690  0.0654  0.0718  0.0733  0.0532  0.0644
+--
+oracle      0.5000  0.4286  0.1895  0.1609  0.2336  0.1806  0.2667  0.1681  0.1849
+n               38     105     190     174     107     144     150     119     119
+
+**TWO FLOORS, AND THE DIFFERENCE IS THE MOST IMPORTANT LINE IN THIS FILE.**
+
+  `majority`   what a constant predictor fitted on TRAIN actually scores. It
+               answers `brother`, the commonest train target at 0.1087.
+               **ACHIEVABLE.** 0.0000 to 0.1092
+  `oracle`     the commonest answer in each TEST bucket. **NOT achievable** — a
+               model would have to know the test labels to choose it. 0.1370
+               overall, up to 0.5000
+
+`g37-01` computed the second and called it the honest floor. That was wrong and
+is corrected in its own record. **The gap between them is a property of CLUTRR
+and it is large**: `brother` appears **0 of 38** times at 2 hops and **0 of 105**
+at 3 hops, while those buckets are 50.00% `grandson` and 42.86% `father`. At 4
+and 10 hops the commonest test answer is `niece` — **one of the six relations
+that never appear as a stated edge**, only as a target.
+
+So the train and test answer distributions are not merely different, they are
+close to disjoint at the shallow end.
 
 
 SCORECARD
 ---------
-TO BE FILLED.
+  P1  **HELD, and more strongly than intended.** `frozen` scores **0.0000** in
+            every bucket across three seeds. The task is certainly not answerable
+            without learning.
+
+            **But it is a floor the way a wall is a floor**, which is `g14-01`'s
+            phrase for the identical observation on `closure`. A random `Wo`
+            emits a token that is essentially never a relation at all — the
+            vocabulary is 33 tokens of which 20 are relations — so this measures
+            "an untrained readout emits noise", not "the task resists a
+            non-learner". **`majority` is the floor that means something.**
+
+  P2  **REFUTED.** `attention` scores 0.1667 and 0.3651 at hops 2 and 3, against
+            an oracle floor of 0.5000 and 0.4286. It is below the oracle floor
+            in-distribution, on the depths it trained on.
+
+            **The registered response was to check the carried constants before
+            saying anything about the task, and that is what happened.** `g37-03`
+            swept width and epochs:
+
+                d128 x16   train 0.4185
+                d128 x48   train 0.4205
+                d256 x16   train 0.4185
+                d256 x48   train 0.4215
+
+            **Twice the width and three times the epochs move training accuracy
+            by 0.003.** A model that cannot fit 2,000 examples it has seen
+            forty-eight times is not undertrained.
+
+            So the refutation is real and its cause is identified: **a
+            single-layer shifted-attention model cannot compose a chain of
+            relations.** It was built for MQAR-style single-hop recall and that
+            is what it does. Composing two hops needs a second pass and the
+            architecture has none.
+
+            **This is a negative result about our own tooling, not about
+            CLUTRR.** Every published reference on this benchmark — R5, CTP, GAT
+            — is a multi-hop architecture.
+
+  P3  **REFUTED, and UNREADABLE, which is the honest verdict.** Headroom at 4+
+            hops is 0.10, 0.07, 0.065, 0.07, 0.073, 0.053, 0.064 — under 0.15 in
+            all seven. But P3 measures `attention` minus `frozen`, and P2
+            established that `attention` is not a strong reference on this task.
+            **A gate computed from a broken reference is not a verdict.**
+
+            `GOALS.md` G0 requires a strong non-local reference **measured**. This
+            project does not currently have one that can compose. That is the
+            finding.
+
+  P4  **HELD, and it is the rail, so the rest is readable.** Every learning arm
+            declines with depth. `attention` goes 0.3651 at 3 hops to 0.0644 at
+            10, a fall of 0.3007 against a predicted floor of 0.20. `local` goes
+            0.3492 to 0.0868.
+
+            So the task IS being posed as a composition problem — depth costs
+            accuracy, which is what CLUTRR exists to show and what every
+            published reference also shows. Had this been flat, everything above
+            would have been unreadable.
+
+  P5  **HELD, narrowly and unimpressively.** `local` sits above `frozen`
+            everywhere and above `attention` in six of nine buckets — 0.5000
+            against 0.1667 at 2 hops, 0.0868 against 0.0644 at 10.
+
+            **Beating the reference is not a good sign here.** It means the two
+            are close together near the bottom rather than that the local rule is
+            strong, and P2 established the reference is not measuring what it was
+            meant to. The one thing worth keeping: `local` is at the oracle floor
+            at 2 hops (0.5000) and above `majority` everywhere, so unlike
+            `closure` it is not actively mispredicting.
+
+
+WHAT THIS CHANGES
+-----------------
+**Item #1 is not re-blocked, and the blocker has moved to a more tractable
+place.** Before today it was *"no instrument with a wide enough band"*. After
+`g37-01` the instrument exists and the band is real. After this run the missing
+piece is **a reference model capable of multi-hop composition**, which is a thing
+to build rather than a thing to find.
+
+**Three ways forward, and they are not equal.** Building a composing reference is
+the one `GOALS.md` asks for and is the only one that yields a measured band.
+Quoting the published numbers is cheaper and leaves G0 formally unmet. Declaring
+CLUTRR too hard is not supported by anything measured here.
+
+**And the achievable floor is LOWER than reported**, which makes the band wider
+rather than narrower: against `majority` at 0.0588 to 0.1092, published
+references at 0.39 to 0.97 leave 0.28 to 0.91.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**Nothing about whether a relational objective buys reasoning**, which is what
+item #1 asks. That comparison needs a reference first.
+
+**The local arm's settings were never tuned on this task either.** d256 and 4
+epochs are carried from `g14-01`. `CLAUDE.md` requires a hyperparameter swept on
+one arm to be swept on all, and `g37-03` swept only the reference. **So `local`'s
+numbers here are provisional in exactly the way the reference's were**, and it
+would be inconsistent to treat them as settled while correcting the other.
+
+**The train/test answer shift is unexplained.** `brother` appearing 0 times in
+two test buckets is recorded, not diagnosed. It may be intrinsic to how CLUTRR
+generates longer chains, or it may interact with the `kinship` layout choice.

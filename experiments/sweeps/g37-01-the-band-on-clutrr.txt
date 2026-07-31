@@ -7,11 +7,36 @@ Status: RUN, local, 2026-07-31, 1.7s. **The floor table was computed in scratch
         marked -- see the section on it.
 
 ANSWER: **Wide enough, and kill-list item #1 is not blocked for the reason
-        recorded.** The honest floor on the test split is **0.1370** overall and
-        0.16 to 0.27 in the usable hop buckets, against published graph-only
-        references from 0.39 (the weakest, GCN at 10 hops) to about 0.97 (R5).
-        So the band is between **0.20 and 0.79**, against `closure`'s **0.092**.
-        Even the most pessimistic reading is more than twice as wide.
+        recorded.** The floor computed here is **0.1370** overall and 0.16 to
+        0.27 in the usable hop buckets, against published graph-only references
+        from 0.39 (the weakest, GCN at 10 hops) to about 0.97 (R5). So the band
+        is between **0.20 and 0.79**, against `closure`'s **0.092**. Even the
+        most pessimistic reading is more than twice as wide.
+
+> **CORRECTED 2026-07-31, THE SAME DAY: the number below is an ORACLE floor and
+> this file called it the honest one.**
+>
+> The table is the commonest answer share within each TEST bucket. **No model can
+> achieve it**, because choosing that answer requires knowing the test labels.
+> The achievable floor is a constant fitted on TRAIN, and `g37-02` measured it:
+> the commonest training answer is `brother` at 0.1087, and it appears **0 of 38**
+> times in the 2-hop test bucket and **0 of 105** at 3 hops. As a predictor it
+> scores **0.0000 to 0.1092** across the nine buckets.
+>
+> The two floors are far apart because the train and test answer distributions
+> are close to disjoint at the shallow end — 2 hops is 50.00% `grandson`, 3 hops
+> is 42.86% `father`, and 4 and 10 hops are `niece`, which is one of the six
+> relations that never appear as a stated edge.
+>
+> **The conclusion is unchanged and the band is WIDER, not narrower** — against
+> an achievable floor near 0.06 to 0.11 the references leave 0.28 to 0.91.
+> What was wrong is the characterisation, not the direction, and correcting it
+> matters because the oracle floor is the *stricter* of the two: a result read
+> against 0.2667 at 8 hops would be judged against a bar no model can reach.
+>
+> **Both are worth reporting and the run now does.** `g37-02` prints them as
+> separate rows named `majority` and `oracle` so neither can be mistaken for the
+> other.
 
 
 IN PLAIN TERMS

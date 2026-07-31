@@ -158,3 +158,42 @@ THREE CAVEATS THAT ARE NOT DECORATION:
 - **The clean arm shrinks to 0.2689 of the 10-hop bucket**, which is 32 puzzles.
   Depth and entity repetition are confounded in the data itself (note 059) and no
   choice of arm removes both.
+
+### G0 IS NOT ANSWERED: we have no reference that can compose — `g37-02`, `g37-03`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g37-03-can-the-reference-compose.txt
+            script  experiments/g37_03_can_the_reference_compose.py
+            task    CLUTRR gen_train23_test2to10, train hops 2-3, test 2-10
+            model   ShiftedAttention, Adam lr 3e-3
+            knobs   width 128/256 x epochs 16/48; 2,000 training puzzles; seed 0
+            scale   accuracy on the TRAINING set, base rate 0.1087
+
+`g37-02` ran the four G0 arms and every learning arm landed below the floor past
+3 hops. **That is not a verdict on CLUTRR**, and the reason was established by a
+probe registered *before* the failing run, in `g37-02`'s own P2.
+
+**Train accuracy: 0.4185, 0.4205, 0.4185, 0.4215.** Twice the width and three
+times the epochs move it by **0.0030**. A model that cannot fit 2,000 examples
+seen forty-eight times is not undertrained — `ShiftedAttention` is single-layer
+and single-pass, and composing a relation chain needs a second pass over an
+intermediate result.
+
+**So the blocker on kill-list #1 has moved again, and this time it is something
+to BUILD.** The instrument exists (`g37-01`), the band is real, and nothing in
+this repository can currently measure it.
+
+**And the floor reported in `g37-01` was an ORACLE floor.** The commonest
+training answer is `brother`; it appears **0 of 38** times in the 2-hop test
+bucket and **0 of 105** at 3 hops, because those buckets are `grandson` and
+`father` and the deep ones are `niece` — one of the six relations that never
+appear as a stated edge. A constant fitted on train scores **0.0000** in the
+shallow buckets and never exceeds its own **0.1087** base rate, against an oracle
+floor running to **0.5000**. That record is corrected; the band is WIDER as a
+result, and the oracle version is the *stricter* bar — a result read against it
+would be judged against something no model can reach.
+
+**The `local` arm's settings were not swept and its numbers are provisional in
+the same way the reference's were.** Sweeping one arm and not the other is the
+failure `CLAUDE.md` names explicitly, and correcting one while leaving the other
+would repeat it.

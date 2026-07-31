@@ -1,0 +1,205 @@
+Can the reference fit CLUTRR's training set at all?
+====================================================
+
+Script: experiments/g37_03_can_the_reference_compose.py
+Status: RUN, local, 2026-07-31, about 17 minutes.
+
+**REGISTERED BEFORE THE RESULT THAT TRIGGERED IT.** `g37-02`'s P2 says, in a file
+committed at `0ce95a4` before that script was executed, that if the reference
+fails the first thing to check is the carried constants and only a second failure
+says anything about CLUTRR. P2 was refuted; this is that check. **So this is not
+a post-hoc rescue of a bad result — the response was written down first.**
+
+ANSWER: **The reference cannot fit its own training data, and width and epochs
+        are not why.** Train accuracy is **0.4185** at d128x16 and **0.4215** at
+        d256x48 — twice the width and three times the epochs buy **0.003**. A
+        model that cannot fit 2,000 examples it has seen forty-eight times is
+        not undertrained. `ShiftedAttention` is a single-layer, single-pass
+        model and CLUTRR needs composition, so **`g37-02`'s numbers are a
+        statement about our reference, not about the benchmark.**
+
+        And `g37-02`'s `majority` arm scoring 0.0000 is REAL. The commonest
+        training answer is `brother`; it appears **0 of 38** times in the 2-hop
+        test bucket and **0 of 105** at 3 hops.
+
+
+IN PLAIN TERMS
+--------------
+The previous run looked like a disaster. A model given every advantage — real
+gradient training, the whole puzzle to look at — scored worse than just guessing
+the same answer every time.
+
+There are two very different reasons that could happen, and they look identical
+from the results table.
+
+**Either the puzzle is too hard**, or **our model was too small for it.** The
+second is not a hypothetical: this project has made exactly that mistake once
+before, on a different task, and reported it as unsolvable when the real problem
+was that the reference model had been given too little to work with.
+
+So before saying anything about the benchmark, we wrote down in advance — before
+running anything — that this check would have to come first.
+
+The check is simple. Instead of asking how well the model does on puzzles it has
+never seen, ask how well it does on **the ones it was trained on**. If it cannot
+even get those right after seeing them dozens of times, the problem is the model.
+If it aces those and fails the new ones, the problem is the puzzle.
+
+It got 42% on puzzles it had seen 48 times. Doubling its size and tripling its
+training changed that by **three tenths of one percent**.
+
+So it is the model. Our reference reads a puzzle once, in one pass, and these
+puzzles need you to work out one link, then use that answer to work out the next.
+One pass cannot do two steps. Every published system that does well here has
+several.
+
+**That is a useful answer, not a wasted run.** It means the benchmark is still
+good, and the thing we are missing is a model of our own that can take more than
+one step — which is something to build, not something to go looking for.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    train acc   accuracy on the SAME puzzles the model was trained on. **The
+                quantity that separates "our model is too small" from "the task
+                is too hard", which test accuracy alone cannot do**
+    test 2-3    accuracy on unseen puzzles at the depths it trained on
+    plus the train and test answer distributions, because `g37-02`'s majority
+    arm scoring 0.0000 needed to be shown real rather than assumed
+
+`CLAUDE.md` rule 2: observe the quantity the claim is about. `g37-02` measured
+only test accuracy, and a green-or-red end-to-end number cannot say which of two
+components is at fault.
+
+
+MEASURED ON
+-----------
+Local, one process.
+
+    data          CLUTRR gen_train23_test2to10
+    train         2,000 puzzles, a PREFIX of the 9,074, hops 2-3
+    test          143 puzzles at hops 2-3, in-distribution
+    optimiser     Adam, lr 3e-3, unchanged from g37-02
+    seed          0
+
+Swept: `(width, epochs)` over d128/d256 x 16/48.
+
+**The subsample is the right choice here rather than a shortcut.** The question
+is whether the model can fit examples it has SEEN, and fewer examples make that
+strictly easier. A failure to fit 2,000 is a stronger result than a failure to
+fit 9,074, so the cheaper run is also the more conservative one.
+
+**One seed, and that is defensible for this question only.** The claim is that
+four settings agree to 0.003 on training accuracy — a spread that narrow across
+four independent models is itself the multi-seed evidence. It would NOT be
+defensible for the test column, which is why nothing is concluded from it.
+
+
+PREDICTIONS
+-----------
+P1  MORE WIDTH AND MORE EPOCHS REPAIR IT. Train accuracy at d256x48 exceeds
+    d128x16 by more than 0.15, and the largest setting fits the training data
+    well — above 0.80.
+    REFUTED IF the four settings agree closely. **Then the reference is not
+    undersized, it is structurally unable**, and `g37-02` says nothing about
+    CLUTRR. That is the outcome that costs the most work, because it means a new
+    reference has to be built before item #1 can be measured at all.
+
+P2  THE MAJORITY ARM'S ZERO IS A REAL DISTRIBUTION SHIFT, not a defect. The
+    commonest training answer appears rarely or never in the shallow test
+    buckets.
+    REFUTED IF the commonest training answer is well represented there. Then
+    `g37-02`'s majority arm is miscomputed and its floor row cannot be trusted.
+
+P1 is written expecting the cheap outcome. It is the one that would let the
+existing reference stand.
+
+
+COST
+----
+Estimated from `g37-02`'s measured 1.68 ms per training sequence: 2,000 puzzles
+across 16+48+16+48 = 128 epoch-passes is about 7 minutes at d128, more at d256
+since cost grows with width. **10 to 25 minutes**, local.
+
+Recorded after the run: **about 17 minutes** — 54s, 158s, 216s and 591s for the
+four cells. d256x48 is 11x d128x16, so cost grows faster than the product of the
+two factors.
+
+
+RESULTS
+-------
+train majority relation: brother (986/9074 = 0.1087)
+
+WHERE THE TRAIN MAJORITY LANDS IN TEST
+   2 hops: `brother` appears   0/38    bucket's own top = grandson  19/38  = 0.5000
+   3 hops: `brother` appears   0/105   bucket's own top = father    45/105 = 0.4286
+   4 hops: `brother` appears  13/190   bucket's own top = niece     36/190 = 0.1895
+  10 hops: `brother` appears   7/119   bucket's own top = niece     22/119 = 0.1849
+
+FITTING on 2000 training puzzles; in-distribution test = 143 puzzles at hops 2-3
+  width  epochs  train acc  test 2-3     sec
+    128      16     0.4185    0.4476      54
+    128      48     0.4205    0.1049     158
+    256      16     0.4185    0.3427     216
+    256      48     0.4215    0.4755     591
+
+
+SCORECARD
+---------
+  P1  **REFUTED, and it is the expensive outcome.** The four settings give
+            **0.4185, 0.4205, 0.4185, 0.4215** — a spread of **0.0030** across
+            twice the width and three times the epochs.
+
+            The model learns something: 0.42 is well above the 0.1087 train base
+            rate. It then stops, and neither capacity nor training time moves it.
+
+            **A single-layer, single-pass attention model cannot compose a chain
+            of relations.** Working out `A is B's X` and then using that to work
+            out `A is C's Y` needs a second pass over the intermediate result,
+            and the architecture has none. It was built for MQAR-style single-hop
+            recall, which is what it does.
+
+            **So `g37-02` measured our reference, not CLUTRR**, and its P2 and P3
+            are unreadable as statements about the benchmark.
+
+  P2  **HELD, and the shift is larger than "real" suggests.** `brother` is
+            **0 of 38** at 2 hops and **0 of 105** at 3 hops. The shallow test
+            buckets are `grandson` and `father`; the deep ones are `niece`,
+            which is **one of the six relations that never appear as a stated
+            edge** and exist only as targets.
+
+            So `g37-02`'s majority row is correct, and the more useful
+            consequence is upstream: **`g37-01` reported the test bucket's
+            majority as "the honest floor" and it is an ORACLE floor**, one no
+            model can reach without knowing the test labels. That record is
+            corrected.
+
+
+WHAT THIS CHANGES
+-----------------
+**A composing reference is now the blocking item for kill-list #1**, and it is
+the first time that blocker has been something to BUILD rather than something to
+find. `g37-01` established the instrument and the band; this establishes that
+nothing in this repository can currently measure it.
+
+**The `local` arm needs the same treatment before its numbers are quoted.**
+`CLAUDE.md` requires a hyperparameter swept on one arm to be swept on all, and
+this swept only the reference. `local`'s d256 and 4 epochs are carried from
+`g14-01` exactly as the reference's were, so they are provisional in the same
+way — and it would be inconsistent to correct one and not the other.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**Whether a bigger change would fix it.** Only width and epochs were swept. A
+different learning rate, a second attention layer, or an iterated pass are all
+untried, and the second of those is the one the diagnosis points at.
+
+**The test column is not a result.** 0.4476, 0.1049, 0.3427, 0.4755 across
+settings whose train accuracy agrees to 0.003 is instability, on one seed, on 143
+puzzles. Nothing is concluded from it and it is printed only because hiding a
+column that was computed would be worse.
+
+**The train/test answer shift is recorded, not explained.** Whether it is
+intrinsic to how CLUTRR generates longer chains, or interacts with the `kinship`
+layout this project chose, is unknown.

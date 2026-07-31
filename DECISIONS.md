@@ -114,13 +114,16 @@ outside the learning loop.** Nothing non-text is built.
   never move. The occupancy gate is already a novelty detector, so minting a concept on
   novelty is reachable with measured parts (148). **Split it honestly:** the codebook is
   ours, the FEATURE SPACE is where off-the-shelf earns its place. **JOHN'S RULING,
-  2026-07-30: an OFF-THE-SHELF quantiser is acceptable and may be preferred** — *"worst
-  case scenario we can use an off-the-shelf quantiser, and in fact maybe that is the
-  preferred solution ... off-the-shelf when you can."* So SPLIT is no longer a blocker on
-  a component nobody has built: a shared frozen encoder makes two nodes derive the same
-  ids by construction. **The cost is the one `163 §1` already named** — *"our system plus a
-  pretrained encoder"* is a different claim from *"our system"* — and it is now a cost
-  accepted rather than a reason to wait.
+  2026-07-30: an OFF-THE-SHELF quantiser is acceptable and may be preferred.**
+  **RECOMMENDED SHAPE: borrowed FEATURES, our own DETERMINISTIC id rule** — a fixed
+  function from feature vector to id, not a learned codebook. Two nodes then derive the
+  same id by construction (John's shared-derivation principle one level up), new
+  distinctions still get new ids because the rule is total, and versioning the encoder into
+  the id avoids note 053's re-addressing cost. **A dumb quantiser is bad at putting similar
+  things nearby and §1 already refuses that**, so the weakness fits. **The real cost is not
+  hardware** — the encoder runs once per input at the edge, outside the learning loop — **it
+  is OPEN-ENDEDNESS: a frozen feature space caps the system's concepts at the distinctions
+  someone else's model already makes.** That is a ceiling and is recorded as one.
   → record: [learned-codebook.md](docs/options/learned-codebook.md)
 - ⬜ **Per-node codebooks plus translation between them** — refused rather than untried:
   aligning two independently-learned discrete spaces with no paired data is the
@@ -192,17 +195,16 @@ keys, which are still the default and still correct for MQAR.**
   delta to do so, closing **39%** of the gap to the exact symbolic solution, with all four
   predictions committed at `57f81e7` before the mode existed. Rule prediction 0.2437 against
   0.0312 untrained; holdout guard measured at 0.1750. **AND IT DOES NOT NEED AN INVARIANT:
-  0.3680 on `EN_DE_15K_V2` at invariant dimension 0** — where `generation_delta` is
-  structurally impossible — **and 0.3398 at dimension 2**, which that tool REFUSES. So
-  `note 104`'s scoping of the composition line does not bind this mechanism, which is the
-  handoff's open problem #1 answered from the other side. **`g23-02`: the opponent that
+  0.3680 at dimension 0** — where `generation_delta` is structurally impossible — **and
+  0.3398 at dimension 2**, which that tool REFUSES, so `note 104`'s scoping does not bind
+  this mechanism. **`g23-02`: the opponent that
   matters is COUNTING, not the majority arm — counting reaches 0.2505/0.2602 with no
   learning at all, and the objective adds ~0.12 on top.** Quoting against `majority`
-  (0.1000) quotes the weak opponent. **`g23-04`: on FB15k-237 — the first EXTERNAL graph,
-  272k edges, `dim 0` — the margin is the LARGEST of eighteen at +0.2072 (0.4547 against
-  counting's 0.2475). Counting had 4× the rules and did NOT improve, so it saturates and
-  the gap is not an artefact of small corpora.** Not the published comparison: the
-  literature measures LINK prediction there and this is RULE prediction. **Still ⬜ because nothing in the model uses it.**
+  (0.1000) quotes the weak opponent. **`g23-04`/`g23-05`: on FB15k-237 — first EXTERNAL graph, 272k
+  edges, `dim 0` — the margin is the LARGEST of eighteen at +0.2072. Within one corpus BOTH
+  arms grow and SIZE IS NOT THE VARIABLE** — a 5% subsample keeps most of the margin where
+  genuinely small corpora lose it. Not the published comparison: the literature measures
+  LINK prediction there and this is RULE prediction. **Still ⬜ because nothing in the model uses it.**
   *measured in:* CLUTRR-symbolic true chains and two OpenEA graphs, width 32, 5 seeds.
   → record: [structured-relations.md](docs/options/structured-relations.md)
 - ⬜ **A better index** — `note 056` made it load-bearing rather than a nicety: the set
@@ -620,14 +622,10 @@ transport is a parallel path nothing in `run()` uses yet.
   3,850 ms to **1,000 ms**, which is **necessary and not sufficient against `d_max` 640 ms**.
   **A MIGRATING walk is where the remaining 2× is, and it is NOT BUILT** — `note 102` prices
   the rendezvous at 0.089 with its period unmeasurable, so a walk must meet, not meet every
-  hop. **`g24-01` RAN IT OVER A REAL IMPAIRED LINK AT LAST, and note 101's estimate was 3.2×
-  optimistic:** a round costs **161 ms** on an 80 ms link, not the assumed 50, so the walk
-  misses `d_max` at **depth 2** rather than depth 8, and depth 5 costs **1,614 ms**. Rounds
-  are `2 × depth` in every row, so the structure holds and only the constant was wrong.
-  **New term nothing here models: with 2% loss, `ms/round` GROWS with depth** — 164, 271,
-  302 — because a retransmit costs a timeout, so cost is superlinear exactly when the
-  network is worst. The migrating walk now has to find ~8× rather than 2×. *measured in:*
-  4 peer containers + asker, `tc netem` on all, Docker bridge.
+  hop. **`g24-01` RAN IT OVER A REAL IMPAIRED LINK AT LAST:** a round costs **161 ms** on an
+  80 ms link against note 101's assumed 50, so the structure (`2 × depth` rounds) holds and
+  only the constant was wrong, by 3.2×. **With 2% loss the cost is SUPERLINEAR in depth** —
+  a term nothing here models. *measured in:* 4 peer containers + asker under `tc netem`.
   → record: [peer-transport.md](docs/options/peer-transport.md)
 - ❌ **The global dimension-summing readout** — the globally synchronised step **C1
   forbids**, the project's own first constraint. Surfaced in a footnote to
@@ -837,8 +835,10 @@ it has ever been re-litigated, which is the only thing the tree prevents.
     thing we eat for right now."* At 161 ms a round and 2 rounds a hop, the project's own
     task depths cost: **depth 2 ≈ 0.6 s, depth 3 ≈ 1.0 s, depth 5 ≈ 1.6 s, depth 10 ≈
     3.2 s.** CLUTRR tests 2–10 hops and `run()` works at 2, so the common case is about a
-    second. **Accepted, not solved** — the migrating walk stays the known ~2× if interactive
-    use ever returns.
+    second. **ACCEPTED, NOT CLOSED — John, 2026-07-30:** *"accepted as far as does the
+    project meet its goals, but still something I want to tweak in the future... it drops
+    way down the list because it works."* So performance work stays on the list at low
+    priority rather than being struck off; the migrating walk is the known ~2×.
 - **STANDING PERMISSION TO FIND AND FETCH DATASETS — John, 2026-07-30, widened same day.**
   *"If a new dataset would help prove or disprove something you need proven, always feel
   free to go look for it, and if you find one, download it and use it without requesting

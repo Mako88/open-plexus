@@ -308,25 +308,82 @@ STATISTICS: dict[str, Statistic] = {
 }
 
 
+def cliff(scores: list[float]) -> int:
+    """How many of a DESCENDING score list sit above its biggest drop.
+
+    An argmax over consecutive gaps, so nothing is compared against a constant:
+    the rule asks where a ranking falls off rather than whether a score clears a
+    bar. Decision 171's mechanism, extracted here from
+    `local_memory._cliff_candidates` so one implementation serves both — a fix in
+    a duplicated copy is a fix that did not land, wearing the appearance of one
+    that did.
+
+    **A cliff rule needs a cliff, and note 058 measured a real one that has
+    none**: language co-occurrence decays in steps of 0.02–0.03 where the
+    families task falls 0.45 at once, and at no setting was that profile
+    bimodal. So this is well-posed only where the ranking is genuinely bimodal,
+    and *"it worked on our task"* is not evidence that it will elsewhere.
+
+    **On an even slope the answer is decided by FLOATING POINT, which is worse
+    than ill-posed.** `[0.5, 0.4, 0.3, 0.2, 0.1]` returns 2 and
+    `[5.0, 4.0, 3.0, 2.0, 1.0]` returns 1 — the same ranking with the same gaps,
+    because `0.5 - 0.4` and `0.4 - 0.3` differ in binary and an argmax has
+    nothing else to separate them. A result taken from this rule on slope-shaped
+    data would be unreproducible for a reason no seed controls.
+    `test_grounding.TheCliff` asserts both, so this cannot be read as
+    theoretical.
+
+    Returns:
+        At least 1, at most `len(scores)`. An empty or single-element list
+        returns `len(scores)`, because there is no gap to take an argmax over
+        and inventing one would be a rule about nothing.
+    """
+    if len(scores) < 2:
+        return len(scores)
+    gaps = [scores[i] - scores[i + 1] for i in range(len(scores) - 1)]
+    return max(range(len(gaps)), key=gaps.__getitem__) + 1
+
+
 def neighbours(index: CoOccurrence, surface: int, statistic: Statistic,
-               k: int) -> list[int]:
-    """The `k` strongest partners of a surface, best first.
+               k: int | None, look: int = 16) -> list[int]:
+    """The strongest partners of a surface, best first.
+
+    Args:
+        k: How many to keep, or **`None` to derive it from the ranking itself**
+            via `cliff`. A fixed `k` is one number applied to every surface, and
+            `g33-02` measured what that costs: a hub needs `k` at least its own
+            degree while a leaf needs 1, so on a star no single value works —
+            too small and the hub cannot reach its spokes, large enough and every
+            unrelated surface admits noise until the graph is one component
+            holding 0.98 of everything.
+        look: Ceiling on how many candidates the derived rule may consider.
+            Ignored when `k` is given. **A ceiling and not a target** — being
+            generous costs nothing because extra candidates fall below the cliff
+            — but it must EXCEED the group, which is the one way to break it
+            (decision 167 measured 0.500 at a look of 4 for a group of 6).
 
     Scores of zero are dropped rather than ranked: a statistic returning zero is
     saying *no evidence*, and padding a list out to `k` with things it refused
     would manufacture edges the statistic did not claim.
     """
-    if k < 1:
+    if k is not None and k < 1:
         raise ValueError("k must be at least 1")
+    if look < 1:
+        raise ValueError("look must be at least 1")
     scored = [(statistic(index, surface, other), other)
               for other in index.partners(surface)]
     scored = [(score, other) for score, other in scored if score > 0.0]
     scored.sort(key=lambda pair: (-pair[0], pair[1]))
+    if k is None:
+        window = scored[:look]
+        keep = cliff([score for score, _ in window])
+        return [other for _, other in window[:keep]]
     return [other for _, other in scored[:k]]
 
 
 def equivalence_classes(index: CoOccurrence, statistic: Statistic,
-                        k: int) -> dict[int, frozenset[int]]:
+                        k: int | None,
+                        look: int = 16) -> dict[int, frozenset[int]]:
     """Walk the mutual-top-`k` graph; each surface's class is what it reaches.
 
     A concept is never stored, so this is the whole of what *"reaching a
@@ -337,7 +394,7 @@ def equivalence_classes(index: CoOccurrence, statistic: Statistic,
         Every surface seen, mapped to the class containing it. A surface with no
         surviving edge maps to itself alone.
     """
-    top = {surface: set(neighbours(index, surface, statistic, k))
+    top = {surface: set(neighbours(index, surface, statistic, k, look))
            for surface in index.surfaces()}
     adjacency: dict[int, set[int]] = {surface: set() for surface in top}
     for surface, chosen in top.items():

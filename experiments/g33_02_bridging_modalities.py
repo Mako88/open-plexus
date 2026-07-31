@@ -35,10 +35,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from experiments import harness  # noqa: E402
-from openplexus.grounding import (STATISTICS, CoOccurrence,  # noqa: E402
-                                  equivalence_classes, reached_together,
-                                  score_classes)
-from openplexus.tasks.occasions import OccasionConfig, generate  # noqa: E402
+from openplexus.grounding import STATISTICS  # noqa: E402
+from openplexus.tasks.occasions import OccasionConfig  # noqa: E402
 
 #: Carried from g33-01 at its own concept count.
 CONCEPTS = 64
@@ -54,26 +52,6 @@ PAIRINGS = ("complete", "chain", "star")
 #: its slots on the right partners, so the question is whether `k` has to grow.
 KS = (2, 3, 4)
 ARM = "conditional"
-
-
-def _cell(surfaces: int, pairings: str, k: int, seed: int):
-    config = OccasionConfig(concepts=CONCEPTS, surfaces=surfaces,
-                            presence=PRESENCE, noise=NOISE,
-                            distractors=DISTRACTORS, pairings=pairings,
-                            occasions=OCCASIONS, seed=seed)
-    index = CoOccurrence()
-    for occasion in generate(config):
-        index.observe(occasion.surfaces)
-    recovered = equivalence_classes(index, STATISTICS[ARM], k)
-    scored = score_classes(recovered, config.classes(),
-                           distractors=[config.concept_surfaces])
-
-    apart = config.apart()
-    if not apart:
-        return scored, None
-    pairs = [(concept * surfaces + one, concept * surfaces + other)
-             for concept in range(CONCEPTS) for one, other in apart]
-    return scored, reached_together(recovered, pairs)
 
 
 def main() -> None:
@@ -95,7 +73,13 @@ def main() -> None:
             for k in KS:
                 f1s, bridges, largest = [], [], []
                 for seed in SEEDS:
-                    scored, bridged = _cell(surfaces, pairings, k, seed)
+                    config = OccasionConfig(
+                        concepts=CONCEPTS, surfaces=surfaces,
+                        presence=PRESENCE, noise=NOISE,
+                        distractors=DISTRACTORS, pairings=pairings,
+                        occasions=OCCASIONS, seed=seed)
+                    scored, bridged = harness.occasions_cell(
+                        config, STATISTICS[ARM], k)
                     f1s.append(scored["f1"])
                     largest.append(scored["largest"])
                     if bridged is not None:

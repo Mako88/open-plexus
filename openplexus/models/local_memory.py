@@ -59,6 +59,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from openplexus.concepts import OneConceptPerToken, Surfaces
+from openplexus.grounding import cliff
 from openplexus.keys import KeySource, PairKeys, TableKeys
 from openplexus.partitioned import ConceptStore
 from openplexus.retrieval import Retrieval, build as build_retrieval
@@ -3467,9 +3468,7 @@ class LocalAssociativeMemory:
         ranked = self.content.nearest(entity, look)
         if len(ranked) < 2:
             return [int(entity)] + [int(token) for token, _ in ranked]
-        sims = [score for _, score in ranked]
-        gaps = [sims[i] - sims[i + 1] for i in range(len(sims) - 1)]
-        keep = max(range(len(gaps)), key=gaps.__getitem__) + 1
+        keep = cliff([score for _, score in ranked])
         return [int(entity)] + [int(token) for token, _ in ranked[:keep]]
 
     def answer_set(self, relation: int, entity: int,

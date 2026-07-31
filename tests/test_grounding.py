@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import unittest
 
-from openplexus.grounding import (STATISTICS, CoOccurrence, conditional,
+from openplexus.grounding import (STATISTICS, CoOccurrence, cliff, conditional,
                                   equivalence_classes, frequency_weighted,
                                   local_conditional, neighbours, ppmi,
                                   raw_count, reached_together, score_classes)
@@ -222,6 +222,90 @@ class Mutuality(unittest.TestCase):
         """`k` is a cap, not a quota. Padding would invent evidence."""
         index = _index([(0, 1)] * 10 + [(2, 3)] * 10)
         self.assertEqual(neighbours(index, 0, raw_count, k=5), [1])
+
+
+#: A hub with three spokes, plus one very common surface that brushes against
+#: all of them. Without that weak partner the hub's three scores are the WHOLE
+#: ranking, there is no drop after them, and the rule has nothing to find — which
+#: is how the first version of this fixture failed and is worth keeping visible:
+#: a cliff rule needs something on the far side of the cliff.
+_STAR = ([(0, 1)] * 300 + [(0, 2)] * 300 + [(0, 3)] * 300
+         + [(0, 50)] * 20 + [(1, 50)] * 20 + [(2, 50)] * 20 + [(3, 50)] * 20
+         + [(50, 60)] * 2000)
+
+
+class TheCliff(unittest.TestCase):
+    """Deriving the count from the ranking instead of being handed it."""
+
+    def test_it_cuts_where_the_ranking_falls_off(self):
+        self.assertEqual(cliff([0.9, 0.88, 0.87, 0.1, 0.09]), 3)
+
+    def test_one_score_or_none_has_no_gap_to_argmax_over(self):
+        self.assertEqual(cliff([]), 0)
+        self.assertEqual(cliff([0.5]), 1)
+
+    def test_on_an_EVEN_SLOPE_the_answer_is_decided_by_FLOATING_POINT(self):
+        """A cliff rule needs a cliff, and on a slope it is worse than useless.
+
+        These two lists are the same ranking with the same gaps, written
+        differently. They give DIFFERENT answers — 2 and 1 — because
+        `0.5 - 0.4` and `0.4 - 0.3` are not equal in binary, and an argmax over
+        gaps has nothing else to go on.
+
+        Note 058 measured real language co-occurrence decaying in steps of
+        0.02–0.03 where the families task falls 0.45 at once, and found the
+        profile bimodal at no setting. **So on that data this rule does not
+        merely degrade — its output is determined by representation noise**, and
+        any result taken from it there would be unreproducible for a reason no
+        seed controls.
+
+        Asserted rather than commented so nobody reads the docstring's caution as
+        theoretical.
+        """
+        self.assertEqual(cliff([0.5, 0.4, 0.3, 0.2, 0.1]), 2)
+        self.assertEqual(cliff([5.0, 4.0, 3.0, 2.0, 1.0]), 1)
+
+    def test_and_on_a_REAL_cliff_it_is_stable_under_the_same_rescaling(self):
+        """The companion. The instability is a property of the FLAT case, not of
+        the rule everywhere — otherwise it could not be used at all."""
+        self.assertEqual(cliff([0.9, 0.88, 0.87, 0.1, 0.09]), 3)
+        self.assertEqual(cliff([90.0, 88.0, 87.0, 10.0, 9.0]), 3)
+
+    def test_a_hub_and_a_spoke_get_DIFFERENT_counts_from_the_same_rule(self):
+        """The property a fixed `k` cannot have, and the reason this exists.
+
+        `g33-02` measured a single global `k` failing on a star: the hub needs
+        `k` at least its own degree while a spoke needs 1, and no one value is
+        both. Asserted here as a fact about the derived rule rather than about
+        any particular world.
+        """
+        index = _index(_STAR)
+        hub = neighbours(index, 0, conditional, k=None)
+        spoke = neighbours(index, 1, conditional, k=None)
+        self.assertEqual(sorted(hub), [1, 2, 3])
+        self.assertEqual(spoke, [0])
+
+    def test_a_fixed_k_cannot_do_that(self):
+        """The companion. Whatever single `k` is chosen, one of the two is wrong."""
+        index = _index(_STAR)
+        for k in (1, 2, 3):
+            hub = neighbours(index, 0, conditional, k=k)
+            spoke = neighbours(index, 1, conditional, k=k)
+            self.assertFalse(len(hub) == 3 and len(spoke) == 1,
+                             f"k={k} gave the hub 3 and the spoke 1, which is "
+                             f"what the derived rule is for")
+
+    def test_look_is_a_ceiling_and_must_exceed_the_group(self):
+        """Decision 167 measured 0.500 at a look of 4 for a group of 6, so being
+        generous is free and being stingy is the one way to break it."""
+        index = _index(_STAR)
+        self.assertEqual(len(neighbours(index, 0, conditional, None, look=2)), 1)
+        self.assertEqual(len(neighbours(index, 0, conditional, None, look=16)), 3)
+
+    def test_a_look_of_zero_is_refused(self):
+        index, _ = _world()
+        with self.assertRaises(ValueError):
+            neighbours(index, 0, conditional, None, look=0)
 
 
 class TheWalk(unittest.TestCase):

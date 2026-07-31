@@ -1,0 +1,121 @@
+Does a per-surface bound fix the star?
+======================================
+
+Script: experiments/g33_04_does_a_derived_bound_fix_the_star.py
+Status: PREDICTIONS COMMITTED, NOT YET RUN.
+
+
+IN PLAIN TERMS
+--------------
+When the machine decides which things belong with which, it keeps a fixed number
+of best matches for each thing — the same number for everything.
+
+`g33-02` showed why that cannot work. Picture a word that names a thing: the word
+turns up with the picture and with the sound, but the picture and the sound may
+never turn up together. The word is a hub with several spokes; each spoke has
+exactly one link, back to the word. Allow two links each and the word cannot hold
+all its spokes. Allow four and every unrelated thing in the world also grabs four
+links, everything joins to everything, and the answer is one enormous blob.
+
+The fix is obvious once stated: **stop using one number for everything.** Let each
+thing look at its own list of matches and cut where the scores fall off a cliff.
+A hub's list has a cliff after its spokes; a spoke's has one after its single
+partner. Same rule, different answers, no number chosen by hand.
+
+**The reason to doubt it is not a hunch, it is a measurement this project already
+has.** A cliff rule needs a cliff, and note 058 looked at real language and found
+a gentle slope instead — the biggest drop was 0.059 where the designed task drops
+0.424, and the profile was never split in two. Worse, on a perfectly even slope
+the rule's answer is decided by floating-point rounding, which a test now asserts.
+
+So this world is designed to have a cliff, and a pass here means the rule works
+**where there is a cliff** and means nothing about anywhere else. That caveat is
+the whole reason this file says it twice.
+
+
+WHAT IS BEING MEASURED
+----------------------
+The same three quantities as `g33-02`, so the two are directly comparable:
+
+    f1         mean per-surface F1 against the true class. FLOOR IS 0.5
+    bridged    share of same-concept pairs whose modalities NEVER co-occurred
+               that ended in one class. **RECALL — reads 1.0000 under total
+               collapse, so it is never read without `largest`**
+    largest    biggest recovered class as a share of all surfaces
+
+Arms: bound in {2, 3, derived}. The two fixed values are `g33-02`'s own, re-run
+rather than quoted, so the comparison is like for like and not against a
+remembered number.
+
+
+MEASURED ON
+-----------
+Local, single process, Python 3.14, no numpy.
+
+    concepts       64      carried from g33-02
+    surfaces       3-5     carried from g33-02
+    presence      0.7      carried
+    noise           3      carried
+    distractors     1      carried
+    occasions   8,000      carried; 125 per concept
+    statistic  conditional the C1-safe one
+    look           16      the derived rule's CEILING. Must exceed the group;
+                           decision 167 measured 0.500 at a look of 4 for a
+                           group of 6, so generosity is free and stinginess is
+                           the one way to break it
+    seeds     0, 1, 2
+
+The join is not in the loop. This is a question about the bound.
+
+
+PREDICTIONS
+-----------
+P1  THE ONE IT EXISTS FOR. On `star` at 4 and 5 surfaces, the derived bound
+    reaches `bridged` above 0.90 **with `largest` below 0.15** — a real bridge
+    and not a collapse. No fixed bound does both in `g33-02`: 2 bridges 0.3333
+    and 0.1667, 3 collapses to `largest` 0.99.
+    REFUTED IF it cannot, which would mean the per-surface bound does not
+    resolve the tension either and `DECISIONS.md` §6's option is not the answer
+    to this after all — leaving the star, and therefore a named concept, with no
+    mechanism that handles it.
+
+P2  ON `chain` THE DERIVED BOUND IS WORSE THAN FIXED `k` 2, and the reason is
+    already visible in the scores. A mid-chain surface has two true neighbours
+    whose conditional scores are ASYMMETRIC — a leaf neighbour is rarer, so it
+    scores higher — and the biggest gap falls between the two rather than after
+    them. Probed directly before this ran: surface 1 of a 5-chain scores 0.224
+    for surface 0 and 0.103 for surface 2, then 0.042 for noise, so the argmax
+    cuts after one.
+    REFUTED IF it matches or beats fixed 2 on chains. That would be the better
+    outcome and would mean the derived rule dominates rather than trading.
+
+P3  ON `complete` the derived bound matches the BEST fixed bound at every
+    surface count, without being told which that is — which is the property
+    decision 167 measured on families and this re-tests on a different world.
+    REFUTED IF it falls short of the best fixed value anywhere.
+
+P4  NO CELL COLLAPSES. `largest` stays below 0.15 for the derived bound
+    everywhere, because a noise surface's ranking has its cliff after very few
+    partners and it therefore admits few.
+    REFUTED IF any derived cell collapses, which would say the rule is not
+    self-limiting and the collapse `g33-02` found at fixed `k` 3 is not about
+    the bound being fixed at all.
+
+
+COST
+----
+Estimated: `g33-02` ran the same grid shape in 28.4s. This is 27 cells against
+that one's 27, with the derived arm doing slightly more work per ranking, so
+**under a minute**. Local.
+
+Recorded after the run: PENDING.
+
+
+RESULTS
+-------
+PENDING.
+
+
+SCORECARD
+---------
+PENDING.

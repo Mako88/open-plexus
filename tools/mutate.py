@@ -821,9 +821,9 @@ MUTATIONS = [
                "column decision 167 taught us to watch. Decision 171's whole "
                "claim is that an argmax over gaps replaces a fitted constant; "
                "reversing the argmax keeps the shape and loses the content",
-        path=LOCAL,
-        old="        keep = max(range(len(gaps)), key=gaps.__getitem__) + 1",
-        new="        keep = min(range(len(gaps)), key=gaps.__getitem__) + 1",
+        path=GROUNDING,
+        old="    return max(range(len(gaps)), key=gaps.__getitem__) + 1",
+        new="    return min(range(len(gaps)), key=gaps.__getitem__) + 1",
     ),
     Mutation(
         name="the-set-answer-emits-every-candidate",

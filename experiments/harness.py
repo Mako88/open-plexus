@@ -462,3 +462,43 @@ def kinship_sweep(description: str, arms, build, *, width: int, n_train: int,
         Path(args.json).parent.mkdir(parents=True, exist_ok=True)
         Path(args.json).write_text(json.dumps(records, indent=2),
                                    encoding="utf-8")
+
+
+def occasions_cell(config, statistic, k, *, look: int = 16) -> tuple[dict, float | None]:
+    """Build one occasion stream, recover its classes, and score them.
+
+    Shared by every `g33` script that asks a question about the WALK rather than
+    about the join, because `tools/check_duplication.py` caught the second copy
+    of it the moment it was written — which is the rule working: a fix applied to
+    one copy and not the other keeps producing plausible numbers.
+
+    Args:
+        config: An `occasions.OccasionConfig`.
+        statistic: A `grounding.Statistic`.
+        k: Fixed bound, or `None` to derive it per surface from the ranking.
+        look: Ceiling for the derived bound. Ignored when `k` is given.
+
+    Returns:
+        `(scored, bridged)` where `scored` is `grounding.score_classes` output
+        and `bridged` is `reached_together` over the modality pairs that never
+        shared an occasion — or `None` when the pairing leaves nothing to bridge,
+        because scoring an empty pair set would report the ABSENCE of the
+        question as a perfect answer.
+    """
+    from openplexus.grounding import (CoOccurrence, equivalence_classes,
+                                      reached_together, score_classes)
+    from openplexus.tasks.occasions import generate
+
+    index = CoOccurrence()
+    for occasion in generate(config):
+        index.observe(occasion.surfaces)
+    recovered = equivalence_classes(index, statistic, k, look)
+    scored = score_classes(recovered, config.classes(),
+                           distractors=[config.concept_surfaces])
+
+    apart = config.apart()
+    if not apart:
+        return scored, None
+    pairs = [(concept * config.surfaces + one, concept * config.surfaces + other)
+             for concept in range(config.concepts) for one, other in apart]
+    return scored, reached_together(recovered, pairs)

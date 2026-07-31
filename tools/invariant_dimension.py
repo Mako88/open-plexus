@@ -129,6 +129,21 @@ def _triples(path: Path):
             yield parts[0], parts[1], parts[2]
 
 
+def relation_names(path: Path, limit: int | None = None) -> list[str]:
+    """The relation names, in the SAME order `graph_rows` indexes its columns by.
+
+    Extracted so a caller that needs to know what column `i` means -- `g43-01`
+    groups FB15k-237's relations by the leading segment of their path names --
+    reads the order from here instead of re-deriving `sorted(set(...))` and
+    hoping the two stay in step. `graph_rows` calls it, so there is one ordering
+    and not two that agree today.
+    """
+    edges = list(_triples(path))
+    if limit:
+        edges = edges[:limit]
+    return sorted({relation for _, relation, _ in edges})
+
+
 def graph_rows(path: Path, limit: int | None = None):
     """Fundamental-cycle constraints for a knowledge graph of `(s, r, o)` triples.
 
@@ -139,7 +154,7 @@ def graph_rows(path: Path, limit: int | None = None):
     edges = list(_triples(path))
     if limit:
         edges = edges[:limit]
-    relations = sorted({r for _, r, _ in edges})
+    relations = relation_names(path, limit)
     index = {r: i for i, r in enumerate(relations)}
 
     adjacent: dict[str, list[tuple[str, str, int]]] = collections.defaultdict(list)

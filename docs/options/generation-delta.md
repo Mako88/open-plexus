@@ -277,3 +277,46 @@ subset search is a different computation and `g23-03` named it as unbuilt.
 deterministic property of a fixed file with no arm, no tuning and nothing to
 choose after the fact, so there was no result to steer; the rail exists for runs
 where there is.
+
+### NO SUB-DOMAIN OF FB15k-237 CLOSES EITHER — `g43-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g43-01-does-any-sub-domain-close.txt
+            script  experiments/g43_01_does_any_sub_domain_close.py
+            task    none -- linear algebra over cycle constraints
+            model   n/a. No model, no training, no walk
+            knobs   30 name-derived sub-domains; a ladder of best-evidenced
+                    subset sizes; a shuffled control on both
+            scale   272,115 edges, 267,089 loops, 237 relations, 51.1s
+
+`g23-03` named this computation and left it unbuilt. **Nothing closes anywhere.**
+All 30 by-domain subsets, all eight rungs of the size ladder, and the shuffled
+control: **dim 0** in every cell.
+
+    |S| 234  loops 267,089  ratio 1141.4  dim 0
+    |S|  16  loops  79,841  ratio 4990.1  dim 0
+    |S|   2  loops   2,574  ratio 1287.0  dim 0
+
+**Two relations with 2,574 loops between them do not compose additively.** The
+best-evidenced domains fail too — `award` at 947.6 loops per relation, `people` at
+814.1.
+
+**So the additive invariant is a property of kinship.** It is worth the difference
+between 0.6061 and 0.9076 on CLUTRR's deepest bucket and it gets nothing on
+FB15k-237, at any granularity tried.
+
+**A GATE, not decoration:** the run refuses to report unless the same restriction
+recovers CLUTRR's own dim 1 first. A search that cannot find a known invariant
+would produce this exact null.
+
+**What it does NOT settle, stated because a complete-looking null is the dangerous
+kind.** The partition is by relation NAME — honest, because the data supplies it,
+but one partition among very many, and a search that is not name-derived is still
+unbuilt. And every cell here asks whether displacements SUM to zero; a
+multiplicative, modular or vector-valued conserved quantity would read as dim 0
+throughout. `note 090` already records that *"deltas add"* is a design choice, and
+this establishes that the choice does not transfer — not that no choice would.
+
+**The first version of this run reported four closing domains and it was an
+artefact**, corroborated rather than caught by its own shuffled control. The
+account is in the sweep record and the method lesson is a `CLAUDE.md` calibration.

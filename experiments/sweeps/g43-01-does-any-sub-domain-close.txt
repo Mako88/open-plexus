@@ -129,14 +129,121 @@ tens of groups; greedy is one SVD per removal step and is the expensive arm.
 Estimated **5 to 20 minutes** local. Local rather than Actions: minutes, not a
 matrix.
 
-Recorded after the run: (pending)
+Recorded after the run: **51.1s**, well under the estimate. The first design cost
+more than the run did — see below.
 
 
 RESULTS
 -------
-(pending)
+    GATE: CLUTRR kinship under the same restriction -> dim 1   (note 104: 1)
+
+    WHOLE GRAPH   267,089 loops   |S| 234   ratio 1141.4   dim 0
+                  agrees with tools/invariant_dimension.py --graph
+
+**NOTHING CLOSES. ANYWHERE.** All 30 by-domain subsets: dim 0. All eight rungs of
+the size ladder: dim 0. The shuffled control: dim 0. Both arms, every cell.
+
+The largest well-evidenced domains, real arm:
+
+    domain        |S|   no-loop     loops   loops/|S|   dim
+    film           36         2    14,901       413.9     0
+    location       21         1     7,881       375.3     0
+    people         20         0    16,283       814.1     0
+    award          17         0    16,109       947.6     0
+    education      11         4     2,167       197.0     0
+    government      7         1     1,655       236.4     0
+
+And the ladder goes all the way down without closing:
+
+    |S| 234  loops 267,089  ratio 1141.4  dim 0
+    |S|  16  loops  79,841  ratio 4990.1  dim 0
+    |S|   2  loops   2,574  ratio 1287.0  dim 0
+
+**Two relations, 2,574 loops between them, and no consistent displacement.**
+FB15k-237's relations do not compose additively even in pairs.
 
 
 SCORECARD
 ---------
-(pending)
+  P1  **HELD, and more completely than written.** Predicted no `by-domain`
+            subset with loops/|S| >= 10 would close. **None closes at any
+            ratio**, including `award` at 947.6 and `people` at 814.1.
+
+  P2  **VACUOUS.** It predicted that the subsets which DO close are the
+            poorly-evidenced ones. Nothing closes, so there is no population to
+            range over. Recorded as vacuous rather than held: a prediction with
+            an empty subject is not evidence about anything.
+
+  P3  **VACUOUS for the same reason.** The ladder never reaches dim >= 1, so
+            there is no size at which closure "first happens" and nothing to say
+            about the evidence ratio there.
+
+  P4  **VACUOUS, and this is the one that hurts.** The control was supposed to
+            be the falsifier — real closing at larger subsets than shuffled would
+            have meant structure. Neither closes anywhere, so the comparison has
+            no content.
+
+            **In the FIRST version of this script it had content, and it pointed
+            the wrong way.** See below.
+
+
+THE NEAR-MISS, AND IT IS THE FINDING
+------------------------------------
+**The first version of this script reported a result.** Whole graph dim **3**.
+Four domains closing: `film` 2, `location` 1, `education` 4, `government` 1, every
+one of them flagged `closes, INFORMATIVE` at ratios in the hundreds.
+
+All of it was an artefact. `restricted()` called `inv.dimension`, **took only the
+rank, and recomputed the dimension itself** as `len(columns) - rank` — which puts
+back the all-zero columns `dimension` deliberately excludes. A relation appearing
+in no within-subset loop has an all-zero column and joins the null space for free.
+
+The tell, once looked for, is exact: **each spurious dim equals that domain's
+no-loop count.** film 2 and 2, location 1 and 1, education 4 and 4, government 1
+and 1.
+
+**`dimension`'s own docstring names this failure and the graph it first appeared
+on** — DBpedia read as *"two conserved quantities"* and both were relations that
+never close a loop. It was reproduced here by discarding that function's answer
+and recomputing it worse.
+
+**AND THE CONTROL MADE IT MORE CONVINCING, NOT LESS.** This is the part worth
+carrying away. Shuffling spreads each loop's coefficients across all 237 columns,
+so no column is all-zero and the artefact **cannot occur in the shuffled arm**.
+The first table therefore read:
+
+    real       four domains close
+    shuffled   nothing closes
+
+which is precisely the signature of a genuine effect that a control has confirmed.
+A shuffle control tests whether a result survives destroying the *meaning* of the
+data; it does not test whether the result survives a bug in the measurement, and
+here it actively concealed one by removing the bug's precondition.
+
+**What caught it was neither the control nor the tests.** It was that the
+whole-graph row said dim 3 where `tools/invariant_dimension.py --graph` had said
+dim 0 on the same file an hour earlier. Two answers to one question, from two
+pieces of code that should agree.
+
+
+WHAT THIS SETTLES, AND WHAT IT DOES NOT
+---------------------------------------
+**Settled: the additive invariant is a property of kinship, not a general
+mechanism.** FB15k-237 has none over all 237 relations, none over any of its 30
+name-derived sub-domains, and none over its best-evidenced 2, 4, 8, 16, 32, 64 or
+128 relations. `note 104` found the same for two DBpedia extracts. The mechanism
+worth the difference between 0.6061 and 0.9076 on CLUTRR's deepest bucket gets
+nothing on any of them.
+
+**Not settled: whether SOME partition closes.** The partition here is by relation
+NAME, which the data supplies and which is therefore honest, but it is one
+partition out of very many. A subset search that is not name-derived remains
+unbuilt, and this run says nothing about it — only that the obvious grouping, the
+best-evidenced prefixes, and the whole all fail.
+
+**Not settled: whether additivity is the right invariant.** Every measurement
+here asks whether displacements SUM to zero around a loop. A domain could have a
+conserved quantity that is multiplicative, or modular, or vector-valued, and this
+computation would report dim 0 for all of them. `note 090` already says *"deltas
+add"* is a design choice; this establishes that the choice does not transfer, not
+that no choice would.

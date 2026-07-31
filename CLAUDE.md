@@ -829,6 +829,44 @@ it, ask what outcome would *refute* the prediction attached to it. If the
 predicted outcome is guaranteed by how the condition is built, it is not
 evidence however it comes out — and it will read as confirmation.
 
+**A CONTROL TESTS THE DATA, NOT THE CODE — AND IT CAN MAKE A BUG LOOK
+CONFIRMED.** A shuffle, a permutation or a randomised arm asks whether a result
+survives destroying the *meaning* of the input. It says nothing about whether the
+result survives a defect in the measurement, and when the shuffle happens to
+remove that defect's precondition, the control does not merely fail to catch
+it — **it supplies the corroboration.**
+
+> *Calibration, `g43-01`, 2026-07-31.* The question was whether any sub-domain of
+> FB15k-237 has an additive invariant when the whole graph has none. The first
+> run said yes: whole graph **dim 3**, and four domains closing — `film` 2,
+> `location` 1, `education` 4, `government` 1 — at evidence ratios in the
+> hundreds.
+>
+> All artefact. `restricted()` called the existing `dimension()`, **took only its
+> rank, and recomputed the dimension itself**, putting back the all-zero columns
+> that function deliberately excludes: a relation in no within-subset loop joins
+> the null space for free. `dimension`'s own docstring names this failure and the
+> graph it first appeared on. The tell is exact — **each spurious dim equals that
+> domain's no-loop count**, 2 and 2, 1 and 1, 4 and 4, 1 and 1.
+>
+> **The shuffled control read `dim 0` everywhere, and that is WHY the table looked
+> real.** Shuffling spreads each loop's coefficients across all 237 columns, so no
+> column is all-zero and **the bug cannot occur in that arm.** So the output was
+> *"four domains close, and the control says it is not chance"* — the exact
+> signature of a genuine effect. A better-designed control would have made it
+> worse, not better.
+>
+> **What caught it was neither the control nor the tests.** It was that the
+> whole-graph row said `dim 3` where `tools/invariant_dimension.py --graph` had
+> printed `dim 0` on the same file an hour earlier. Two pieces of code that must
+> agree, disagreeing.
+>
+> The habit that generalises: **when a new script re-derives a quantity an
+> existing tool already computes, make it print both and compare.** That is rule
+> 2's *"a proxy must reproduce the direct quantity before being used"* applied to
+> a reimplementation rather than to a proxy — and here the reimplementation was
+> three lines long, which is exactly the size at which nobody thinks to check.
+
 **A test that something did NOT change needs a companion asserting that
 something DID.** An unchanged-assertion passes whenever the mechanism is
 disconnected, which is precisely the case it exists to catch.

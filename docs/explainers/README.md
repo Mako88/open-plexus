@@ -74,6 +74,7 @@ explainer, and saying so is the most useful thing you can do.
 | [046](046-guessing-better-than-chance.md) | It learned to guess, and the guess beat chance. |
 | [047](047-the-setting-nobody-had-ever-changed.md) | A value copied from an old experiment was worth more than every mechanism it was comparing. |
 | [048](048-it-was-being-told-where-to-stop.md) | The walk was handed the answer's shape; taking it away is unsolved. |
+| [049](049-the-check-that-agreed-with-the-mistake.md) | Our safety check confirmed a bug instead of catching it. |
 
 > **Two numbering series, and both are real.** `01`–`31` came first; `028` onward
 > started when the explainers were renumbered to track the notes and the two were

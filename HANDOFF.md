@@ -85,6 +85,44 @@ can the walk tell it from the target? Minutes to write, no perception layer.
 
 ---
 
+## WHO ELSE IS DOING THIS — searched 2026-07-31, and the search was NOT wide
+
+**Read as search summaries and abstracts, not papers.** Rule 19 says a negative result is
+not a finding until the search was a wide one, and four web searches is not that. Treated
+as leads.
+
+**Three established fields, each doing one piece of it:**
+
+- **Cross-situational word learning** — cognitive science, decades old, human baselines.
+  Exactly our co-occurrence-to-identity mechanism, but single-machine, batch, and much of
+  it explicitly works on simplified symbolic inputs rather than raw sensory ones.
+- **Hyperdimensional computing / Vector Symbolic Architectures** — two ACM Computing
+  Surveys, applied to edge devices and federated learning. **Our superposed store IS a
+  VSA associative memory.** The SNR law and the capacity constant this project derived and
+  checked against an analytic bound are results in that field. Worth knowing we are inside
+  a literature rather than beside one.
+- **Decentralised training on volunteer hardware** — Learning@home / Hivemind, Petals,
+  Nous Psyche, Pluralis Agora. These already run large models across unreliable volunteer
+  machines over the ordinary internet, at electricity costs reported far below cloud spot
+  pricing.
+
+**THE UNCOMFORTABLE PART, and it is a premise-level challenge rather than a detail.** Those
+projects keep backpropagation and engineer AROUND the synchronisation — pipeline
+parallelism, expert routing, scheduling. They work. So *"distributed AI on consumer
+hardware"* is **not** this project's differentiator: it exists and it ships.
+
+The bet that is unclaimed is the narrower one — **that a local rule removes the need for
+the global step**, rather than tolerating it. Which means the payoff has to be something
+the synchronised systems cannot do: learn continuously without stopping, survive arbitrary
+churn, keep reorganising concepts as new things arrive.
+
+**`GOALS.md` currently argues from cost and access. The stronger argument is capability
+under conditions the alternatives cannot meet, and it is not written that way.** Raised as
+an open question for John rather than edited in, because it is a change to the project's
+stated premise and that is his call.
+
+---
+
 ## WHAT CHANGED ABOUT THE PROJECT'S DIRECTION
 
 **`GOALS.md` §2 already refused next-token prediction. It was not enough** — a

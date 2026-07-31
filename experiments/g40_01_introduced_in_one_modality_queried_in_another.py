@@ -161,7 +161,14 @@ def main() -> None:
             # difference -- which is the point of having both.
             sound_from = int(total * (1.0 - share))
 
-            index = CoOccurrence()
+            # **BUILD THE OCCASIONS FIRST, THEN CHOOSE THE ORDER.** The two arms
+            # must observe the IDENTICAL multiset or they are not testing order,
+            # they are testing two different datasets. A first version decided
+            # `carries_sound` inline -- deterministically in one arm and by a
+            # coin in the other -- so the arms saw different image/audio
+            # pairings AND different noise draws, and the 0.04 gap between them
+            # was uninterpretable rather than a finding.
+            occasions = []
             position = 0
             for _ in range(PASSES):
                 for audio_row, digit in enumerate(heard):
@@ -172,10 +179,7 @@ def main() -> None:
                     sound = audio_code[audio_row]
                     if picture < 0 or sound < 0:
                         continue
-                    if arm == "phased":
-                        carries_sound = position >= sound_from
-                    else:
-                        carries_sound = rng.random() < share
+                    carries_sound = position >= sound_from
                     position += 1
                     present = {word[digit]}
                     present.add(CODES + sound if carries_sound else picture)
@@ -183,7 +187,14 @@ def main() -> None:
                         present.add(word[int(other)])
                     for extra in range(DISTRACTORS):
                         present.add(spare + extra)
-                    index.observe(present)
+                    occasions.append(present)
+
+            if arm == "interleaved":
+                rng.shuffle(occasions)
+
+            index = CoOccurrence()
+            for present in occasions:
+                index.observe(present)
 
             got = _score(index, image_major, audio_major)
             for key, value in got.items():

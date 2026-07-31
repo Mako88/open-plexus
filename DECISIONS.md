@@ -93,7 +93,7 @@ history lives in `docs/archive/notes/` and the archived log.
                    went against it, so it carries no revival condition — what it
                    needs is a reason to pick it back up
 
-**CENSUS: 34 chosen, 30 refuted, 15 untried, 12 both, 1 paused.** Checked against the body,
+**CENSUS: 34 chosen, 30 refuted, 16 untried, 12 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -117,7 +117,8 @@ Nothing non-text is built.
 - ✅ **A concept has no global id — it is an equivalence class reached by walking** — John, 2026-07-31; dissolves the learned-identity vs deterministic-ownership conflict. *no measurement*. → [record](docs/options/identity-without-a-global-id.md)
 - ✅ **Rounded timestamp as the cross-node co-occurrence key** — built; reproduces the single-process ceiling exactly, and WIDENING beats overlapping windows at a fifth of the messages. `g33-01`. **Runs in REAL CONTAINERS and agrees with one process exactly, clean and at 40ms/10ms** (`g35-01`), and the READ path too (`g35-03`) — though a question costs 10.2s on a 40ms link with one connection per message. → [record](docs/options/time-bucket-join.md)
 - 🔀 **The co-occurrence statistic: raw count vs chance-corrected** — counting is beaten by anything merely COMMON, designed or Zipfian; correcting costs sample efficiency where neither applies. `g32-01`, `g32-02`. **Its read costs one peer message PER PARTNER**, not per `k`. → [record](docs/options/co-occurrence-statistic.md)
-- ✅ **Shard the count table by `owner(surface)`** — `federated.py`: no node holds a row it does not own, the walk agrees with the single-table answer, and `ppmi` is REFUSED rather than approximated because no node knows the world's total. *no sweep — measured while building*. → [record](docs/options/co-occurrence-statistic.md)
+- ✅ **Shard the count table by `owner(surface)`** — `federated.py`: no node holds a row it does not own, the walk agrees with the single-table answer, and `ppmi` is REFUSED rather than approximated because no node knows the world's total. *Rests on no measurement beyond the build-time assertions — no sweep was run.* → [record](docs/options/co-occurrence-statistic.md)
+- ⬜ **INTERVENTION — act to disambiguate, rather than only observing** — the only named escape from a CONFOUND, and untried since `g32-01` named it. A merely-common surface is refused by a margin of 0.4490; a surface *correlated* with a concept by **0.0096**, a 47× collapse, and a stronger one crosses. `g39-06`. **No statistic over co-occurrence can fix it** — an observational stream contains nothing separating *spuriously correlated* from *actually part of it*. John, 2026-07-31, placed it after kill-list #1 and named the reason: interacting with the world is necessary, not incidental. **The instrument does not exist**: every task here is a reader or a generator and none can be ASKED for a specific occasion. → [record](docs/options/intervention.md)
 
 **Open — codebook agreement across nodes.** SPLIT (one thing → two ids) only exists
 distributed and is unsolved; `g27-01` showed divergence is silent one layer down and the

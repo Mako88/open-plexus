@@ -2,7 +2,23 @@ GATE G7 — a concept introduced in one modality, queried in another
 ===================================================================
 
 Script: experiments/g40_01_introduced_in_one_modality_queried_in_another.py
-Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+Status: RUN, local, 2026-07-31, 22.5s. Predictions committed at `3bb5005`
+        before the script was executed.
+
+ANSWER: **G7 PASSES, and its falsifier did not fire.** From an image code, the
+        walk reaches audio codes of the same digit at **0.8464** against chance
+        **0.10** — with the two modalities sharing ZERO occasions and the word
+        as the only route.
+
+        **Order is free and is now demonstrated rather than assumed**: the same
+        occasions shuffled produce a bit-identical result, 0.8464 and 0.9000 to
+        four decimals.
+
+        **The exposure threshold is HIGH and that is the honest limitation.**
+        `cross` collapses from 0.8437 at a 25% sound share to **0.2623** at 10%
+        and to chance below that. So the second modality needs roughly a
+        QUARTER of the stream — 300 occasions per digit — not the handful
+        predicted. P3 refuted.
 
 
 IN PLAIN TERMS
@@ -122,14 +138,125 @@ This is seven arms at the same length, but scores a walk from every IMAGE CODE
 rather than from ten words -- fifty starts instead of ten. **60 to 180
 seconds.**
 
-Recorded after the run: TO BE FILLED.
+Recorded after the run: **22.5s**, below a 60-180s estimate.
 
 
 RESULTS
 -------
-TO BE FILLED.
+arm           share  sound occ  per digit   cross  crossed  word_aud   heard
+phased         0.01        120         12  0.1154     5.03    0.1164    0.69
+phased         0.02        240         24  0.0902     5.03    0.0847    0.85
+phased         0.05        600         60  0.1260     5.03    0.1248    0.97
+phased         0.10       1200        120  0.2623     5.03    0.2729    0.95
+phased         0.25       3000        300  0.8437     5.03    0.8933    1.00
+phased         0.50       6000        600  0.8464     5.03    0.9000    1.00
+interleaved    0.50       6000        600  0.8464     5.03    0.9000    1.00
+
+    chance: 0.10
+
+
+A DESIGN DEFECT CAUGHT AND FIXED BEFORE ANYTHING WAS CONCLUDED
+----------------------------------------------------------------
+The first version of this run reported `interleaved` at cross **0.8029** against
+`phased`'s 0.8464 — a gap of 0.0435 that would have REFUTED P1 and implied
+something in the pipeline was order-sensitive.
+
+**It was not a finding. The two arms were observing different data.** The arm
+decided whether an occasion carried the sound inline — deterministically in
+`phased` and by a coin in `interleaved` — so they got different image/audio
+pairings and, because the coin consumed randomness, different noise draws too.
+
+The fix is to build the occasion list ONCE and then either observe it in order or
+shuffle it, so the multiset is identical and only the order differs. With that,
+the two arms agree to four decimals.
+
+**A comparison between two orderings has to hold the data fixed**, and deciding
+the split inline does not. Recorded because the wrong version produced a
+plausible number and a plausible story.
 
 
 SCORECARD
 ---------
-TO BE FILLED.
+  P1  **HELD, after the fix above, and it is now a demonstration rather than an
+            assumption.** The same occasions shuffled give cross **0.8464** and
+            word_aud **0.9000** — bit-identical to the phased order.
+
+            So a co-occurrence tally genuinely does not care when things
+            arrived, and the ORDER half of G7 is free for this mechanism. Saying
+            that out loud is what stops this run being a gate passed by
+            construction.
+
+  P2  **HELD, AND IT IS THE GATE.** `cross` is **0.8464** at fair exposure
+            against chance 0.10, with `crossed` at **5.03** audio codes per
+            image code, so it is not computed over a handful.
+
+            **An image code and an audio code share zero occasions in every arm.**
+            The machine gets from a picture to a sound it has never encountered
+            alongside it, through a word that co-occurred with both at different
+            times.
+
+            **G7's falsifier — *"the same concept cannot be reached from two
+            modalities under these constraints"* — did not fire.**
+
+  P3  **REFUTED, and this is the honest limitation of the pass.** `cross` was
+            predicted above 0.70 down to a 5% share. It reads **0.1260** there,
+            which is chance.
+
+            The collapse is between 25% and 10%:
+
+                share 0.25   300 per digit   cross 0.8437
+                share 0.10   120 per digit   cross 0.2623
+                share 0.05    60 per digit   cross 0.1260
+
+            **So the second modality needs roughly a quarter of the stream**,
+            not a handful of examples. *"Introduced in one modality, queried in
+            another"* is true in the sense the gate asks, and it is NOT true in
+            the stronger sense of learning a new sense from brief exposure.
+
+            The threshold is also far above `g32-02`'s ~16 occasions per
+            concept, which was measured for a single modality. **A cross-modal
+            link costs an order of magnitude more exposure than a within-modal
+            one**, and that comparison is new.
+
+  P4  **HELD.** At a 1% share — 12 occasions per digit — `cross` is **0.1154**,
+            which is chance. The mechanism does break, and where predicted.
+
+  P5  **HELD where it is readable.** `word_aud` leads `cross` at every share
+            from 0.10 upward: 0.2729/0.2623, 0.8933/0.8437, 0.9000/0.8464. The
+            two-hop route is never better than its own first leg.
+
+            At shares 0.02 and 0.05 `cross` marginally exceeds `word_aud`
+            (0.0902/0.0847 and 0.1260/0.1248), **but both sit at chance there**,
+            so the ordering is noise rather than the defect P5 was written to
+            catch. The rail holds in the interpretable region and says nothing
+            outside it.
+
+
+WHAT THIS CHANGES
+-----------------
+**G7 is passed and `GOALS.md` §4 is updated**, which is the only place a gate
+verdict is written.
+
+**And the pass is narrower than the gate's wording suggests**, which the record
+says here so nothing downstream over-reads it. What is demonstrated is that a
+concept's two senses need never co-occur. What is NOT demonstrated is learning a
+modality from brief exposure — that needs a quarter of the stream.
+
+**A cross-modal link is about an order of magnitude dearer than a within-modal
+one** — 300 occasions per digit against `g32-02`'s ~16. That is a new quantity
+and it is the number to design against.
+
+
+WHAT THIS DOES NOT SETTLE
+-------------------------
+**The threshold is bracketed, not located.** It falls between a 10% and a 25%
+share and this grid has no point between them.
+
+**One code count, one beam, one depth.** 50, 16, 2. `want` is about 5 audio
+codes per digit because 50 codes over 10 digits gives 5 each, so the threshold
+may be a statement about occasions per CODE rather than per digit.
+
+**The quantiser is still batch**, fitted on all the data before the stream
+begins. So the sound's CODES existed before the sound was ever heard, and a
+genuinely online system would have to form them from the brief exposure too.
+**That is the part of "learning a new sense late" this does not test at all.**

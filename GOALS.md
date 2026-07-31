@@ -673,7 +673,23 @@ and no gate is passed on a single run** (rule 3).
 | **G4 — bandwidth** ⚠️ **PASSES ON ONE SEED** | Does the required cross-machine traffic fit consumer broadband? | The traffic needed for the margin exceeds what a home connection carries. |
 | **G5 — scale** ⚠️ **CONTESTED** | Does the margin hold or grow as the network grows? | The margin shrinks with scale. Then it is a small-model curiosity, not a route to either goal. |
 | **G6 — composition** ⬜ **NOT REACHED** | Can it answer about a relation it was never given, that follows from ones it was? | It can only return what it was told. Then it has INDEXED rather than understood, and §1.2b's definition is not being met however good the recall is. |
-| **G7 — grounding** ⬜ **NOT REACHED** | Does a concept introduced through one modality answer when queried through another? | The same concept cannot be reached from two modalities under these constraints. Then §1.2b's answer to symbol grounding fails, and the relational structure is a closed symbol system. |
+| **G7 — grounding** ✅ **PASSED, NARROWLY IN SCOPE** | Does a concept introduced through one modality answer when queried through another? | The same concept cannot be reached from two modalities under these constraints. Then §1.2b's answer to symbol grounding fails, and the relational structure is a closed symbol system. |
+
+> **G7's verdict, 2026-07-31, and the scope is part of the verdict.** The
+> falsifier did not fire: from an image code the walk reaches audio codes of the
+> same digit while the two share **zero** occasions, with a word as the only
+> route. The numbers are in `experiments/sweeps/g40-01-...`; per rule 14b this
+> row carries the verdict and not the measurement.
+>
+> **Three limits, stated here because a gate row is where someone will read the
+> claim.** The ORDER half of the gate is free for this mechanism — a
+> co-occurrence tally is order-insensitive, and the run demonstrates that rather
+> than assuming it, so no credit is claimed for it. The second modality needs
+> roughly a QUARTER of the stream, about an order of magnitude more exposure
+> than a within-modality link, so this is not learning a sense from brief
+> acquaintance. And the **quantiser is still batch** — the sound's codes existed
+> before any sound was heard, so forming a new modality's codes late is
+> untested.
 
 **G6 and G7 were added 2026-07-30 and they are the operational form of §1.2b.**
 The ladder previously stopped at scale, so every gate could be passed by a system

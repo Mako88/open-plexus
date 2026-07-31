@@ -197,3 +197,52 @@ would be judged against something no model can reach.
 the same way the reference's were.** Sweeping one arm and not the other is the
 failure `CLAUDE.md` names explicitly, and correcting one while leaving the other
 would repeat it.
+
+### WHAT THE NEXT SESSION NEEDS: a reference that can compose — 2026-07-31
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g37-03-can-the-reference-compose.txt
+            script  experiments/g37_03_can_the_reference_compose.py
+            task    CLUTRR gen_train23_test2to10, train hops 2-3
+            model   ShiftedAttention, Adam lr 3e-3
+            knobs   width 128/256 x epochs 16/48; 2,000 training puzzles
+            scale   accuracy on the TRAINING set, base rate 0.1087
+
+**Written as a handoff entry, because John is taking kill-list #1 into a new
+session.** Everything needed is measured and in place; what is missing is one
+model.
+
+**THE STATE, in three facts.** The instrument exists and its data is fetched
+(`data/clutrr/gen_train23_test2to10`). The band is real — the achievable floor is
+a constant fitted on train, which scores **0.0000** in the shallow test buckets
+and never exceeds its own **0.1087** base rate, against published graph-only
+references whose table and provenance live in `g37-01`'s record, one
+place. And **nothing in this repository can measure it**:
+`ShiftedAttention` fits its own training data to **0.4185** at d128x16 and
+**0.4215** at d256x48, so twice the width and three times the epochs buy 0.003.
+
+**WHY IT FAILS, and it is not a tuning problem.** The model is single-layer and
+single-pass. CLUTRR asks you to work out `A is B's X`, then USE that answer to
+work out the next link. One pass cannot do two steps. Every published system that
+does well here — R5, CTP, GAT — is multi-hop.
+
+**THE FOUR THINGS THAT WOULD SAVE TIME**, each of them a trap this project has
+already stepped in:
+
+- **Sweep the LOCAL arm too.** Its d256 and 4 epochs are carried from `g14-01`
+  exactly as the reference's were, and `g37-03` swept only the reference.
+  `CLAUDE.md` names sweeping one arm and not the other by name.
+- **Use `majority`, not the bucket majority, as the floor.** The commonest
+  TRAINING answer is `brother` and it appears **0 of 38** times in the 2-hop
+  test bucket. The per-bucket majority is an ORACLE floor no model can reach.
+- **Report per hop bucket and never pool.** Hops 2-3 are the only depths in
+  train, so they are recall and 4-10 are generalisation. The 2-hop test bucket
+  is 38 puzzles.
+- **Split on `max_appearances`, and remember its floor MOVES** — it is markedly
+  HIGHER on the clean arm at every depth past 4, because removing repeated
+  entities removes the harder
+  puzzles.
+
+**The reference numbers are BORROWED and only partly verified** — read from ar5iv
+renderings via a summarising fetch, not from the PDFs. The table and its
+provenance are in `g37-01`'s record, in one place.

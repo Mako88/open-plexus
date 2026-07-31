@@ -12,169 +12,158 @@
 > **NO CLAIM LIVES HERE.** Every number points at the file that owns it, and if the two
 > disagree that file wins.
 
-**Written:** 2026-07-31, after the session that added a third modality and unblocked
-kill-list item #1.
+**Written:** 2026-07-31, at the end of the session that passed G7 and rebuilt the walk.
 
 ---
 
-## WHERE TO START READING
+## THE NEXT SESSION IS KILL-LIST #1, AND EVERYTHING IT NEEDS IS READY
 
-**`docs/explainers/36-a-shelf-with-only-two-slots.md`.** It is the plain-language version
-of the single idea that three of this session's runs converged on, and it is the fastest
-way back in. Then `g36-04` and `g37-01`.
+John, 2026-07-31: he is taking **#1 — does a relational objective buy reasoning** — into a
+new session. **Read `docs/options/clutrr-symbolic.md`, the last entry**, which is written
+as the handoff for exactly that and names the four traps this project has already stepped
+in.
 
----
+The short version: the instrument exists and its data is fetched, the band is real, and
+**nothing in this repository can measure it** — `ShiftedAttention` fits its own training
+data to 0.4185 at d128x16 and 0.4215 at d256x48, because it is single-pass and CLUTRR needs
+composition. **The missing piece is one model.**
 
-## THE ONE IDEA THAT CAME OUT OF THIS SESSION
-
-**A bound is a BUDGET, and a hub's budget limits how many spokes it can be MUTUAL with.**
-Three runs found the same wall from three directions and none of them recognised it alone:
-
-    g33-02   a single global `k` cannot express a hub with spokes
-    g36-05   two senses that always co-occur EVICT the word from each other's list
-    g36-06   softening the denominator does not repair it -- it FRAGMENTS instead
-
-**No choice of statistic changes the size of the budget**, which is why `damped(alpha)`
-failed. The untried thing the measurements motivate is a bound that is per-KIND rather
-than one number per surface — a word keeping more partners than a picture because it is a
-word. **Registered, not built**, and deliberately: it is the first proposal in this line
-the data pushes toward rather than merely permits.
+**After #1, John named INTERVENTION** — `docs/options/intervention.md`, written this
+session. His reason, recorded there: interacting with the world is necessary for where this
+is going, not incidental.
 
 ---
 
-## WHAT HAPPENED
+## WHAT HAPPENED: the walk was rebuilt and G7 passed
 
-### A third modality, on real audio — `g36-04`, `g36-05`, `g36-06`
+**G7 is PASSED** — `GOALS.md` §4 carries the verdict and its three limits. From an image
+code the walk reaches audio codes of the same digit while the two share **zero** occasions,
+with a word as the only route.
 
-`openplexus/tasks/spoken.py` reads the Free Spoken Digit Dataset with stdlib `wave`, so
-the ruler stays dependency-free. 3,000 recordings, six speakers, CC BY-SA 4.0, gitignored.
+**The mechanism changed underneath it, and this is the load-bearing part.** John's
+proposal, 2026-07-31: *"I don't think we want a ceiling at all."* Keep every edge, bound the
+SEARCH instead of the representation. `grounding.reach` is that, and after four sweeps the
+working rule turned out to be a **simplification**:
 
-**Adding a whole sense cost a reader and a feature function.** The quantiser is the SAME
-`grouping.cluster` the images use — `harness.quantise` takes pixels and spectra through one
-call. Counting, walk, bound, sharding and containers were untouched, because the mechanism
-does not know how many modalities exist. That is the load-bearing observation about the
-architecture, more than any single number.
+    score `conditional` from the query's own side, keep every edge,
+    take the strongest, walk. No cut, no mutuality, no symmetrisation.
 
-**The headline is a sign flip nobody predicted.** Two senses that share ZERO occasions
-reach each other through a shared word better than two senses that share every occasion,
-and better than one sense alone. **Interleaved helps; simultaneous harms.**
+At convergence that is **0.9867** link at full coverage with the distractor refused
+completely, against the incumbent partition's 0.9216.
 
-**And the linking is not limited by front-end quality** over the range tested: the audio
-quantiser is measurably worse at its own job and produced the table's best link. `g36-01`
-reached the same conclusion from the other side. **This changes what a learned quantiser
-would be FOR** — see `docs/options/learned-codebook.md`.
+### The five things that would change what you build next
 
-### Kill-list #1 is UNBLOCKED, and it was our own record blocking it — `g37-01`
+**1. Symmetrising the edge is what admitted the distractor.** Five axes failed — three
+scalar dials, the search budget, stream length — because none was the axis. From a word's
+side its own codes score ~1.0 and an ever-present distractor ~0.28; from the distractor's
+side everything scores 1.0, **because that is true**. Every combining rule mixed it in.
+`forward` never sees it (`g39-03`, `g39-04`).
 
-`docs/options/clutrr-symbolic.md` said *"published TEXT numbers are not comparable"*. True.
-It was read as *"no published CLUTRR number is comparable"*, which is false: the standard
-evaluation is the noiseless GRAPH-based version on exactly the split already fetched here.
+**2. Depth 1 is enough and a wide beam there is FREE.** 109 messages per query, flat in
+beam, because scoring the candidates is the cost and expanding them is not. Depth 2+ is
+worse AND dearer for a one-hop query (`g38-03`). **Depth 2 IS needed for cross-modal**,
+which is two hops by construction (`g40-01`).
 
-**Rule 1's borrowed-claim failure, with the borrowing happening inside the repository.**
-Filed under *established*, upstream of a decision, unreachable by anything downstream.
+**3. The curve does not flatten until 12,000 occasions.** Every absolute figure taken at
+3,000 is a lower bound. Arm-vs-arm comparisons at equal length survive; **"X does not help"
+claims do not**, and that is the expensive class (`g39-01`, `g39-02`).
 
-`g37-01` computes the honest floor from the data. Against published graph-only references
-the band is several times `closure`'s. **`g37-02` is the G0 control that follows** —
-frozen substrate and a measured strong reference, because a CITED reference is not a
-measured one.
+**4. Partial presence CANCELS; correlation is the real boundary.** A thing present 50% of
+the time is refused exactly as one present 100% of the time, because `p` appears in both
+terms of the ratio. A thing *correlated* with a concept is refused by **0.0096** — a 47-fold
+collapse — and a stronger one crosses (`g39-06`). **No co-occurrence statistic can fix
+that**, which is why intervention is registered.
 
-### Two of John's design notes are recorded — `docs/options/learned-codebook.md`
-
-The request to try a learned quantiser, and the **edge-machine architecture**: a request
-routes through an edge machine holding the quantiser, which converts the input, sends it to
-the network, and returns the response. That makes the quantiser an EDGE concern rather than
-a per-node one, which is a smaller and better-posed problem. The C1 question it leaves open
-is recorded beside it.
+**5. A cross-modal link costs an order of magnitude more exposure than a within-modal one.**
+About 300 occasions per digit against `g32-02`'s ~16 (`g40-01`).
 
 ---
 
 ## THE KILL LIST
 
-     ✅  2  representations learned LOCALLY   18 graphs, beats counting, no invariant
-     ✅  6  independent nodes agree           TRANSPORT half exact across containers.
-                                              Quantiser half UNTESTED
-     ✅  7  decide what to say, and decline   exact, on the case the gate can see
+     ✅  2  representations learned LOCALLY   18 graphs, beats counting
+     ✅  6  independent nodes agree           transport half exact in containers.
+                                              QUANTISER half still untested
+     ✅  7  decide what to say, and decline   exact, on the case the gate sees
 
      🔀 10  margin survives scale             refutation was on the wrong arrangement
 
-     ⏸  4  multi-hop walk over real internet  got WORSE: 5.09 s per grounded question
+     ⏸  4  multi-hop walk over real internet  5.09 s per grounded question
 
-     ⬜  1  relational objective buys reasoning UNBLOCKED. Instrument found, floor
-                                               measured, G0 control in flight
-     ⬜  3  conventional system already wins    external stimuli run; no human opponent
-     ⬜  5  learn forever                       the cheap route is refuted
-     ⬜  8  adjudicate contradictions           untouched
-     ⬜  9  survive hostile participants        untouched
-     ⬜ 11  training traffic fits broadband     writes cheap; READS scale with fan-out
-     ⬜ 12  survives a second modality          THREE modalities now run on real
-                                               sensory data. G7 still NOT passed
-
-**#12 is much closer and is not passed.** Every arm has the word present throughout, so
-nothing yet introduces a concept through one modality and queries it through another. That
-run is the obvious one and is not done.
+     ⬜  1  relational objective buys reasoning  blocker is now a MODEL to build
+     ⬜  3  conventional system already wins     external stimuli; no human opponent
+     ⬜  5  learn forever                        first prequential evidence, g39-01/02
+     ⬜  8  adjudicate contradictions            untouched
+     ⬜  9  survive hostile participants         untouched
+     ⬜ 11  training traffic fits broadband      109 messages per query at depth 1
+     ⬜ 12  survives a second modality           G7 PASSED. Three modalities, real data
 
 ---
 
 ## WHAT IS BUILT
 
-    openplexus/tasks/occasions.py   the instrument: a stream with known ground truth
-    openplexus/tasks/xsl.py         29 PUBLISHED conditions, external stimuli
-    openplexus/tasks/mnist.py       images, IDX, dependency-free
+    openplexus/grounding.py         counts, statistics, `damped`, `strength`,
+                                    `reach`, cliff, the walk, scoring
     openplexus/tasks/spoken.py      audio, WAV, dependency-free
+    openplexus/tasks/mnist.py       images, IDX, dependency-free
     openplexus/tasks/clutrr.py      someone else's relational benchmark
-    openplexus/grounding.py         counts, statistics, `damped`, cliff, walk, scoring
+    openplexus/tasks/occasions.py   the synthetic instrument
     openplexus/buckets.py           the time-bucket join, one process
-    openplexus/federated.py         the table split by owner, every crossing counted
-    openplexus/bucket_service.py    ONE node's share, refusing every key it does not own
+    openplexus/federated.py         the table split by owner
+    openplexus/bucket_service.py    ONE node's share, refusing unowned keys
     openplexus/bucket_peer.py       that over TCP
     testbed/run.py --mode bucket    containers under tc netem
+
+**`equivalence_classes` is NOT retired.** It stays as the measured alternative per rule
+14c, so every earlier result remains reproducible.
 
 ---
 
 ## WHAT I GOT WRONG, so it is not re-derived
 
-**A prefix of `spoken.available` is one digit, not a sample.** FSDD filenames begin with
-the digit, so the first half of the files are digits 0-4. A probe reported purity 0.7093,
-which looks fine. **The tell was the CHANCE level printing at 0.20 instead of 0.10**, not
-the purity. `sample` exists for this and `mnist.read` says why a prefix is safe there.
+**Two corrections to `g38-01` in one day, both from measuring at a constant it had pinned.**
+Its 0.30 advantage is 0.065 at convergence, and its *"`min` reaches nothing"* is a beam-8
+artefact — at beam 16 `min` gives 0.9677 at 0.5933 coverage.
 
-**`count` and `local_conditional` are ONE arm.** For a fixed surface, dividing every
-candidate by that surface's own count divides by a constant. With `g32-01`'s
-`ppmi == conditional`, the five named statistics are **three** distinct rankings. Third
-instance of this failure in this line; the check is arithmetic before dispatch.
+**A warning one run old did not prevent its own repeat, TWICE.** `g38-03` dropped the
+companion coverage column the day after `g38-01` explained why it mattered. `g39-06` pooled
+a confound over ten words the day after `g39-05` warned that a mean hides a single bad case
+— it hid a 47-fold collapse. **Both were caught by re-reading my own notes, not by any
+check.**
 
-**A prediction criterion can be satisfied by a collapse.** `g36-06`'s P2 asked for word
-survival above 0.80 with distractor admission below 0.05. A cell met it exactly — at a
-collapsed graph. **The criterion should have carried the class-size guard and did not.**
+**A comparison between two ORDERINGS has to hold the data fixed.** `g40-01`'s first version
+decided the phase split inline, so the two arms saw different pairings AND different noise,
+and the 0.0435 gap looked like order-sensitivity. Building the occasion list once and
+shuffling it makes them agree to four decimals.
 
-**A `cross` of 1.0000 on `crossed` 0.0333 is one lucky pair, not a perfect score.** The
-companion column is what caught it.
+**`strength`'s original justification was wrong and a test caught it on the first run.** It
+was introduced as soft mutuality with a doubt attached; the doubt was right about `min` and
+the answer lay off that axis entirely.
+
+**`check_decisions` has a latent gap, found by accident.** The `Shard the count table` row
+was passing because its evidence block swallowed text from BELOW it; inserting a new option
+after it made the row fail. The row is fixed. **Whether other rows pass the same way is
+unchecked** and is worth a look.
 
 ---
 
 ## PROCESS
 
-- **CI is blocking and has caught real bugs.** Watch it; treat red as blocking.
 - **`checks` takes 45-80 minutes** (six mutation shards). Batch commits.
-- **A heredoc containing `\n` inside a Python string breaks `mutate.py`.** Use the Edit
-  tool. And a `cat > file <<'EOF'` heredoc in the Bash tool failed outright on a long
-  Python file this session — the Write tool is the reliable route.
-- **`check_provenance` earned its keep again**, refusing an option-record entry that cited
-  a script which did not exist yet. The fix was to build the script.
-- **`check_rails` R3 caught a new experiment parsing its own arguments.** The guard
-  `refuse_if_mutating()` is now called explicitly in it.
+- **The Bash tool's heredocs fail on long Python files.** Use the Write tool. This cost
+  three retries this session and `CLAUDE.md` already warns about it for `mutate.py`.
+- **`check_provenance` earned its keep four more times**, every time refusing a number
+  quoted under a source that does not contain it — including a script that did not exist
+  yet, which was the right complaint and the fix was to build it.
+- **A status file plus a persistent monitor works well.** The monitor tails
+  `scratchpad/STATUS.txt` and emits on change, so it never needs restarting.
 
 ---
 
 ## STATE
 
-`g37-02` was RUNNING at the time of writing — the G0 control on CLUTRR, four arms, three
-seeds, about 15-25 minutes local. Its predictions are committed at `0ce95a4`, before
-execution. **Check `experiments/sweeps/g37-02-does-clutrr-pass-g0.txt` for whether the
-results were ever filled in**; if its status still says `run pending`, the run did not
-report and it should be re-run rather than assumed.
-
-1,560 tests green, 233 mutations verified, all seven checks passing.
+Clean tree, all seven checks passing, **1,579 tests green, 237 mutations verified.**
+Everything pushed.
 
 `data/` holds clutrr, fb15k237, fsdd, kachergis, mnist, openea and tinyshakespeare, all
-gitignored. Re-fetch on a fresh clone with the `tools/fetch_*.py` scripts.
+gitignored. Re-fetch on a fresh clone with `tools/fetch_*.py`.

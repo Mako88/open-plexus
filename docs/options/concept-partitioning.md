@@ -323,3 +323,27 @@ Two directions, **neither chosen and neither measured**:
 **Recorded rather than resolved.** The failure this project has paid for repeatedly is a
 conflict noticed piecemeal, one surprised result at a time, months after both commitments
 were made. Both were made deliberately and both are current.
+
+### The tension is dissolved: the concept was never the address — John, 2026-07-31
+
+    CONFIG  when    2026-07-31
+            source  GOALS.md, the grounding section
+            script  none -- design pass
+            task    n/a
+            model   n/a
+            knobs   none
+            scale   n/a
+
+Neither exit above was taken. **A concept gets no id at all** — it is the equivalence class
+that falls out of co-occurrence links, reached by walking from any member. What needs a
+stable hashable address is a *percept*, and percepts already have one.
+
+So `Ring` keeps every property this record depends on, over `owner(surface id)` rather than
+over a negotiated concept id, and identity stays learned on top. The full mechanism and its
+costs are in [identity-without-a-global-id.md](identity-without-a-global-id.md); the
+cross-node join that makes co-occurrence observable without a collective is in
+[time-bucket-join.md](time-bucket-join.md).
+
+**What this record must now carry as an open cost**: a percept that co-occurs with
+everything accumulates an enormous neighbour list at one owner, which is new pressure on
+the busiest-peer share measured above, and nothing has measured it.

@@ -93,7 +93,7 @@ history lives in `docs/archive/notes/` and the archived log.
                    went against it, so it carries no revival condition — what it
                    needs is a reason to pick it back up
 
-**CENSUS: 29 chosen, 30 refuted, 15 untried, 11 both, 1 paused.** Checked against the body,
+**CENSUS: 30 chosen, 30 refuted, 16 untried, 11 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -113,6 +113,9 @@ Nothing non-text is built.
 - ⬜ **Codebook: borrowed FEATURES, our own DETERMINISTIC id rule** — John's choice, 2026-07-30. Ceiling: a frozen feature space caps concepts at another model's distinctions. → [record](docs/options/learned-codebook.md)
 - ⬜ **Per-node codebooks plus translation** — unsupervised translation, strictly harder than the goal. → [record](docs/options/per-node-codebooks.md)
 - ✅ **`concepts.Merged`** — merge is a read-side gather over `aliases()`, union by minimum id; a late merge is a MISS, never a corruption. *no measurement*. → [record](docs/options/merged-concepts.md)
+
+- ✅ **A concept has no global id — it is an equivalence class reached by walking** — John, 2026-07-31; dissolves the learned-identity vs deterministic-ownership conflict. *no measurement*. → [record](docs/options/identity-without-a-global-id.md)
+- ⬜ **Rounded timestamp as the cross-node co-occurrence key** — transient join; the durable accumulator is `owner(surface id)`. John, 2026-07-31. → [record](docs/options/time-bucket-join.md)
 
 **Open — codebook agreement across nodes.** SPLIT (one thing → two ids) only exists
 distributed and is unsolved; `g27-01` showed divergence is silent one layer down and the

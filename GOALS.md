@@ -224,12 +224,36 @@ forecloses it has broken §1.2, not deferred a feature.
     contentious than an aligned multimodal space, and it is consistent with §2's
     rule on prior art.
 
-  **THE OPEN TENSION, recorded unresolved.** C1's concept partitioning needs a
-  DETERMINISTIC owner per concept — hashable, computable by any node without
-  asking. Learned identity is negotiated and therefore not stable, so it cannot be
-  hashed. Two directions exist, neither chosen: split routing from meaning, or let
-  nodes converge by gossip. **This is a genuine conflict between two commitments
-  the project has made, and naming it is not the same as resolving it.**
+  **THE TENSION AND ITS RESOLUTION — John, 2026-07-31.** C1's concept partitioning
+  needs a DETERMINISTIC owner per concept, hashable and computable by any node
+  without asking; learned identity is negotiated and therefore unhashable. That
+  read as a conflict between two commitments the project had made deliberately.
+
+  **The exit is that the concept was never the address.** A concept gets no id: it
+  is the **equivalence class** that falls out of the co-occurrence links, reached by
+  starting at any member and walking. What needs a stable address is a *percept* —
+  an image code, a word — and those already have one. Nothing addresses *dog*.
+
+  Two keys carry the mechanism, and both are hashable:
+
+      owner(surface id)   everything ever learned about one percept, DURABLE
+      owner(time bucket)  that two percepts occurred together, TRANSIENT
+
+  **Time is the join; the percept's owner is the accumulator.** A rounded arrival
+  timestamp lets two nodes agree that what one saw and another heard happened
+  together, computed locally with no message sent — the same property `Ring` gives
+  concepts. The link is then written to the percept's owner, where it accumulates
+  over that percept's lifetime, so cross-situational learning becomes local counting
+  at a fixed address: the sofa fades because it appeared once, the word persists
+  because it appears every time. **No gather, and the hot spot is transient because
+  nothing durable lives at the time key.**
+
+  It is the fast-store-and-durable-store shape the project already has, with time
+  addressing the fast tier and percept id the slow one. The quantiser ruling is
+  untouched and identity stays learned. Records:
+  [identity-without-a-global-id.md](docs/options/identity-without-a-global-id.md)
+  and [time-bucket-join.md](docs/options/time-bucket-join.md), both carrying what it
+  costs and what would refute it.
 
 #### Intervention may be load-bearing, and the evidence is that it turned up twice
 

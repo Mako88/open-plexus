@@ -129,3 +129,24 @@ The correction recorded beside it: discrete surfaces is the option under which t
 architecture does *not* change, so multimodality becomes additive. **The decision on that
 list with real blast radius over existing measurements is §3 — what an answer is — and not
 §1.**
+
+### The addressing half is now the WHOLE job — John, 2026-07-31
+
+    CONFIG  when    2026-07-31
+            source  GOALS.md, the grounding section
+            script  none -- design pass
+            task    n/a
+            model   n/a
+            knobs   none
+            scale   n/a
+
+The entry above split addressing from identity and left the routing question open. It is
+now answered: **a surface id is the only thing that gets a durable address**, because a
+concept gets none — it is an equivalence class reached by walking, per
+[identity-without-a-global-id.md](identity-without-a-global-id.md).
+
+That makes this record's scope narrower and firmer than it was. A quantiser must produce an
+id that is **stable for one percept**, and it is no longer being asked to make an image and
+a word agree. The failure mode this record warned about — a bad quantiser silently merging
+two things by addressing them identically — is unchanged in kind but now applies only
+within a modality, where it is far easier to check.

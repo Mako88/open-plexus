@@ -1,0 +1,112 @@
+Does the refusal survive a thing present ALMOST always?
+========================================================
+
+Script: experiments/g39_06_what_about_a_thing_present_almost_always.py
+Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+
+
+IN PLAIN TERMS
+--------------
+The last run showed the machine reliably ignoring a hum that is present in every
+single moment. But it named its own weak spot: something present in EVERY moment
+is the easiest case to dismiss. A lamp is in most rooms, not all of them, and
+something present ninety percent of the time is a harder problem.
+
+So this turns the dial down and watches.
+
+There is a reason to think nothing will happen, and it is worth stating before
+the run because it is a real prediction rather than a hope. The machine judges a
+connection by a proportion -- how often these two appear together, divided by how
+often that one appears at all. If the lamp is switched on at random for nine
+tenths of moments, then BOTH of those numbers drop by a tenth, and the proportion
+is unchanged. The dial should do nothing.
+
+If that turns out to be wrong, then the explanation we just published for why any
+of this works is also wrong, because it is the same piece of arithmetic read from
+the other side. So this is a test of the account, not just of the mechanism.
+
+**And there is a case the arithmetic explicitly does not cover**, included here
+so the boundary is on the record rather than discovered later.
+
+The cancellation assumes the lamp is switched on without regard to what is being
+shown. Something that turns up more often around ONE thing is not background at
+all -- it genuinely is associated with that thing, and no amount of counting can
+say otherwise, because from the data there is no difference between "associated
+with" and "genuinely part of". That arm is here to show where the wall is. **It
+is expected to fail, and failing is the correct behaviour.**
+
+
+WHAT IS BEING MEASURED
+----------------------
+    rank           where the distractor sits in a word's full ranking
+    want           how many image codes genuinely belong to that word
+    weakest true   the lowest-scoring genuine partner
+    distractor     the distractor's own score
+    margin         weakest true minus distractor
+    admitted       whether it entered the top-`want`. `g32-01`'s falsifier
+
+Same columns as `g39-05` so the two tables read side by side.
+
+
+MEASURED ON
+-----------
+Local, one process. Stream reproduced from `g39-05` at half the passes.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions   12,000   four passes. `g39-02` put the plateau at 12,000
+    codes           50
+    statistic  conditional, read FORWARD from the word
+    seeds      0, 1, 2
+
+Swept: distractor `presence` in {0.5, 0.7, 0.9, 0.95, 1.0}, drawn independently
+per occasion, plus one `correlated` arm present on every occasion of digit 3 and
+10% elsewhere.
+
+
+PREDICTIONS
+-----------
+P1  **PRESENCE DOES NOTHING, AND THE ARITHMETIC SAYS WHY.** `admitted` is 0.0000
+    at every independent presence from 1.0 down to 0.5, and the distractor's own
+    score varies by less than 0.05 across them, because `p` cancels between the
+    numerator and the denominator.
+    REFUTED IF the score moves with presence. **Then the published account of
+    why `forward` works is wrong**, since it rests on the same cancellation, and
+    `g39-04` would need re-examining rather than extending.
+
+P2  THE MARGIN IS THEREFORE ALSO FLAT. `margin` stays near `g39-05`'s 0.4464 at
+    every independent presence.
+    REFUTED IF it narrows as presence falls, which would mean partial presence
+    is a real threat and `g39-05`'s caveat was correct.
+
+P3  **THE CORRELATED ARM IS ADMITTED, and that is the RIGHT answer rather than a
+    failure.** `admitted` is above 0.05 for it.
+    REFUTED IF it is refused. That would be surprising and would need explaining
+    -- a surface genuinely more common around one concept SHOULD score highly
+    for that concept, and a mechanism refusing it would be refusing real
+    evidence.
+
+P4  THE CORRELATED ARM HURTS ONLY THE DIGIT IT FAVOURS. Since `admitted` is
+    averaged over ten words and only digit 3 is favoured, it lands near 0.1
+    rather than near 1.0.
+    REFUTED IF it is admitted for most words, which would mean the correlation
+    leaks across concepts and the arm is not testing what it claims.
+
+
+COST
+----
+Estimated from `g39-05`'s measured 23.8s for four arms at 24,000 occasions. This
+is six arms at 12,000, so about three quarters of that work. **15 to 40
+seconds.**
+
+Recorded after the run: TO BE FILLED.
+
+
+RESULTS
+-------
+TO BE FILLED.
+
+
+SCORECARD
+---------
+TO BE FILLED.

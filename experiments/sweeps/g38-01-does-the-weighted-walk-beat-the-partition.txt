@@ -1,0 +1,155 @@
+Does bounding the SEARCH beat bounding the REPRESENTATION?
+===========================================================
+
+Script: experiments/g38_01_does_the_weighted_walk_beat_the_partition.py
+Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+
+
+IN PLAIN TERMS
+--------------
+Until now, each thing in this system kept only a handful of connections — the few
+that stood out clearly — and everything else was ignored when questions were
+asked. Three separate experiments this week failed for the same reason: something
+important got pushed off that short list.
+
+The worst case was clear. When a picture and a sound always arrived together,
+they became each other's obvious partner and the **word** got pushed out. It
+scored badly not because it was wrong but because it came seventh, and the
+machine only ever looked at the first two.
+
+So this tries the other arrangement. **Keep every connection, and limit how far a
+question is allowed to travel instead.** Nothing is thrown away; a question just
+has a budget. That is the owner of this project's suggestion, on the reasoning
+that a concept genuinely IS a web of connections, and that if answering takes
+longer, that is a problem to solve later rather than a reason not to try.
+
+There is a specific reason it might not work, and it is written down so the run
+can settle it rather than the argument.
+
+A connection has two ends and they often disagree. The word *dog* is only
+sometimes about any one picture, but a picture of a dog is almost always about
+the word. So which end do you believe? Believe the weaker end and you are back to
+pushing the word out. Believe the stronger end and you also start believing the
+thing that is simply always present — the failure the whole design was corrected
+for once already.
+
+Those are opposite ends of one dial. The last time this project found a dial like
+that, there was nothing useful in the middle. **This asks whether this one is
+different**, and it watches both failures at once so a win on one cannot hide a
+loss on the other.
+
+One thing had to be replaced. The old arrangement could fail by lumping
+everything into one blob, and we watched for that. The new one **cannot** blob —
+which sounds better and is actually a hazard, because it means a careless score
+would look good for reasons that have nothing to do with it working. So there is
+a deliberately scrambled arm, and every number is read against that rather than
+against zero.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    link@k       of the top-`k` IMAGE codes a word reaches, the share whose
+                 majority digit is that word's. `k` is the number of image codes
+                 that genuinely belong to that digit, so the bar is identical
+                 for every arm and a longer list earns nothing
+    link         the same over EVERYTHING reached, ignoring order. Reported
+                 because ranking a set is a handicap the incumbent did not sign
+                 up for, and `link@k` alone would understate it
+    reached      how many image codes were available to score, per word. The
+                 companion `link@k` needs: a perfect score over two codes and one
+                 over twenty are different answers
+    distractor   share of words admitting the ever-present distractor inside
+                 their top `k`. `g32-01`'s falsifier, watched in the same run
+
+**Chance for both link columns is about 0.10** and is printed by the run.
+
+**`shuffled` is the floor and it is not zero.** A ranking cannot collapse, so the
+alarm the partition had — mean class size — does not exist here. Reading any
+number against zero would be `g32-01`'s mistake repeated on a new mechanism.
+
+
+MEASURED ON
+-----------
+Local, one process. Streams IMPORTED from `g36_04` rather than restated.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions    3,000
+    codes           50   **PINNED from g36-04**, where it was the middle of
+                         {20, 50, 100} and the only count that neither collapsed
+                         nor was coarse. Not swept here, and that is the standing
+                         risk of this run: `CLAUDE.md`'s calibration is explicit
+                         that naming a carried constant does not prevent it
+    noise            2   other words per occasion
+    distractors      1   present EVERY occasion
+    statistic  conditional, the C1-safe one
+    beam             8   search budget, not a representation budget
+    depth            2   so a word may reach an image code directly, or through
+                         an audio code. Depth 1 could not test the bridge at all
+    seeds      0, 1, 2
+
+Arms: `together` and `alternating`, crossed with six methods — `classes` (the
+incumbent), the four combiners, and `shuffled`.
+
+**Why `together` is the cell that matters.** It is where the bound demonstrably
+failed: the word survives it for **0.0200** of image codes and link purity is
+**0.6667** against 0.8476 in `alternating`. If the walk cannot beat the partition
+there, it will not beat it anywhere.
+
+
+PREDICTIONS
+-----------
+P1  **THE HEADLINE.** On `together`, at least one combiner beats `classes` on
+    `link@k` by more than 0.05.
+    REFUTED IF none does. Then bounding the search buys nothing over bounding the
+    representation on the exact cell chosen because the representation bound
+    failed, and the ceiling should stay — which would be a clean negative on
+    John's proposal and would save building the rest of it.
+
+P2  **`min` DOES NOT HELP, and this is the doubt registered at `strength`'s own
+    definition before any of this ran.** On `together`, `min` scores within 0.05
+    of `classes` on `link@k`, because it takes the weaker direction and on a hub
+    edge that is the small one — reproducing the eviction rather than repairing
+    it.
+    REFUTED IF `min` clearly beats `classes`. Then the eviction was about the
+    hard CUT rather than about which direction is believed, and the combiner axis
+    matters less than expected.
+
+P3  `max` READMITS THE DISTRACTOR. Its `distractor` column is above 0.5 in at
+    least one arm, because an ever-present thing has a backward direction of 1.0
+    and `max` takes it.
+    REFUTED IF `max` keeps the distractor out. **That is the best available
+    outcome**: it would mean the axis HAS an interior — unlike `damped`'s — and
+    the lopsided hub edge can be kept without paying `g32-01`'s price.
+
+P4  NO REGRESSION ON THE GOOD CELL. On `alternating`, where `classes` already
+    scores well, the best combiner is within 0.05 of it.
+    REFUTED IF every combiner is clearly worse there. Then the walk trades a good
+    case for a bad one and is not a replacement, only an alternative for hubs.
+
+P5  THE FLOOR IS REAL AND NOT ZERO. `shuffled` scores near chance 0.10 on
+    `link@k`, not 0.00.
+    REFUTED IF it scores near zero, which would mean the metric has no positive
+    floor and the other rows can be read directly. **This is the rail**: if
+    `shuffled` scores well, the metric is broken and nothing else here is
+    readable.
+
+
+COST
+----
+Estimated from `g36-06`'s measured 25.5s for 10 cells at this code count. This is
+12 cells, but each `reach` expands up to `beam**depth` = 64 nodes per word and
+scores every partner of each — heavier per cell than a single walk. `classes`
+and `shuffled` are cheap. **60 to 240 seconds**, local.
+
+Recorded after the run: TO BE FILLED.
+
+
+RESULTS
+-------
+TO BE FILLED.
+
+
+SCORECARD
+---------
+TO BE FILLED.

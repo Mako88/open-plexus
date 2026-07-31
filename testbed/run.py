@@ -2,6 +2,7 @@
 
     python testbed/run.py --nodes 4
     python testbed/run.py --nodes 4 --delay 80ms --jitter 20ms --loss 2%
+    python testbed/run.py --mode bucket --nodes 4 --delay 80ms
 
 **This is what turns G2, G3 and G4 from modelled into measured.** Every latency,
 jitter and churn result in this project so far comes from a model of a network.
@@ -31,6 +32,9 @@ PORT = 9999
 #: from the other mode cannot be answered by mistake.
 ASKER = "openplexus-asker"
 PEER_PORT = 9500
+#: Bucket mode only. Another distinct port, for the same reason as `ASKER`'s:
+#: a stray container from another mode must not be able to answer by mistake.
+BUCKET_PORT = 9600
 
 
 def run(command: list[str], **kwargs) -> subprocess.CompletedProcess:
@@ -122,6 +126,80 @@ def peer_mode(args) -> int:
     return asked.returncode
 
 
+def bucket_mode(args) -> int:
+    """Run the GROUNDING store across containers under `tc netem`.
+
+    **The last untested half of the grounding line.** `g32` and `g33` measured
+    the statistic, the join, the bound and the sharding; every one of them
+    counted crossings rather than sending them, and `openplexus/buckets.py` says
+    so in its own docstring. This sends them, between containers, over a link
+    with whatever `netem` was asked for.
+
+    The property asserted is note 014's, unchanged: **a network of containers
+    must agree with the single-process model EXACTLY.** Not approximately, and
+    not on average — a count is an integer and a wrong one is a bug.
+
+    Impairment goes on the peers AND the driver, for the reason `peer_mode`
+    gives: `netem delay` shapes egress, so delaying one side makes half a link.
+
+    **What this does not duplicate.** The image, the network and `impairment()`
+    are this file's own and are shared with the other two modes;
+    `openplexus/node_main.py` is the launcher; `tools/bucket_drive.py` is the
+    driver. This is the container wiring and nothing else.
+    """
+    print(f"building {IMAGE} ...", flush=True, file=sys.stderr)
+    built = run(["docker", "build", "-q", "-f", "testbed/Dockerfile",
+                 "-t", IMAGE, "."])
+    if built.returncode:
+        print(built.stderr, file=sys.stderr)
+        return 1
+
+    run(["docker", "network", "create", NETWORK])
+    names = [f"openplexus-bucket-{i}" for i in range(args.nodes)]
+    run(["docker", "rm", "-f", ASKER, *names])
+
+    tc = impairment(args.delay, args.jitter, args.loss)
+    table = ",".join(f"{i}={name}:{BUCKET_PORT}"
+                     for i, name in enumerate(names))
+    shared = ["-e", "OPENPLEXUS_MODE=bucket",
+              "-e", f"OPENPLEXUS_PEER_PORT={BUCKET_PORT}",
+              "-e", f"OPENPLEXUS_NODES={args.nodes}",
+              "-e", f"OPENPLEXUS_BUCKET_WIDTH={args.bucket_width}",
+              "-e", f"OPENPLEXUS_BUCKET_PEERS={table}"]
+    for index, name in enumerate(names):
+        launched = run(["docker", "run", "-d", "--name", name,
+                        "--network", NETWORK, "--cap-add=NET_ADMIN", *shared,
+                        "-e", f"OPENPLEXUS_NODE_INDEX={index}",
+                        IMAGE, "sh", "-c",
+                        f"{tc}python -m openplexus.node_main"])
+        if launched.returncode:
+            print(launched.stderr, file=sys.stderr)
+            return 1
+
+    time.sleep(3)          # peers bind before serving; give them the bind
+    peers = ",".join(f"{name}:{BUCKET_PORT}" for name in names)
+    asked = run(["docker", "run", "--name", ASKER, "--network", NETWORK,
+                 "--cap-add=NET_ADMIN", IMAGE, "sh", "-c",
+                 f"{tc}python tools/bucket_drive.py --peers {peers} "
+                 f"--width {args.bucket_width} --concepts {args.concepts} "
+                 f"--occasions {args.occasions}"])
+    print(asked.stdout, flush=True)
+    print(asked.stderr, file=sys.stderr)
+    for name in names:
+        logs = run(["docker", "logs", name]).stdout.strip().splitlines()
+        if logs:
+            print(f"  {name}: {logs[0]}", file=sys.stderr)
+        # A node prints its failed forwards on the way out. A count that is
+        # short because a write never landed reads as a weaker signal, so the
+        # log is checked rather than the number being trusted alone.
+        for line in logs:
+            if "FAILED" in line:
+                print(f"  {name}: {line}", file=sys.stderr)
+    if not args.keep:
+        run(["docker", "rm", "-f", ASKER, *names])
+    return asked.returncode
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--nodes", type=int, default=2)
@@ -137,7 +215,14 @@ def main() -> int:
                         help="step at which those nodes go silent")
     parser.add_argument("--keep", action="store_true",
                         help="leave containers behind for inspection")
-    parser.add_argument("--mode", choices=("slice", "peer"), default="slice",
+    parser.add_argument("--bucket-width", type=int, default=50,
+                        help="bucket mode only: the join's window")
+    parser.add_argument("--concepts", type=int, default=6,
+                        help="bucket mode only: how many concepts the stream has")
+    parser.add_argument("--occasions", type=int, default=60,
+                        help="bucket mode only: how many moments to drive")
+    parser.add_argument("--mode", choices=("slice", "peer", "bucket"),
+                        default="slice",
                         help="slice: the driver-based DIMENSION path, which every "
                              "netem result to date used. peer: point-to-point "
                              "concept reads with no driver, which notes 094 and "
@@ -148,6 +233,8 @@ def main() -> int:
 
     if args.mode == "peer":
         return peer_mode(args)
+    if args.mode == "bucket":
+        return bucket_mode(args)
 
     if args.width % args.nodes:
         # slices_for refuses uneven splits; say so here rather than letting the

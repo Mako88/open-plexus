@@ -1,0 +1,139 @@
+The grounding store in real containers
+======================================
+
+Script: testbed/run.py --mode bucket   (driver: tools/bucket_drive.py)
+Status: RUN, local, 2026-07-31, Docker 29.6.1.
+
+**THIS IS AN IDENTITY CHECK, NOT A HYPOTHESIS TEST, and the distinction is
+stated first so nothing here is read as a scored prediction.** The property is a
+CONTRACT — a network of containers must agree with the single-process model
+exactly — which is note 014's rule for the slice path applied unchanged. There
+were no predictions to register because there is nothing to be uncertain about:
+a count is an integer and a wrong one is a bug.
+
+The timing below **was** unexpected and is labelled as an incidental
+measurement.
+
+
+IN PLAIN TERMS
+--------------
+Everything measured about the grounding mechanism so far ran inside one program.
+When two "machines" needed to tell each other something, that was a function
+call — the message was counted, not sent. Every write-up said so, because a
+program pretending to be a network is exactly the kind of thing that looks like
+it works and is doing nothing.
+
+This is the real version. Four containers on a real Docker network, each holding
+only its own share, sending actual packets. Then the same stream is run the old
+way in one program and the two are compared.
+
+They match exactly. Then the link was made bad on purpose — 40 milliseconds of
+delay each way, with jitter — and they still match exactly.
+
+The surprise is what it cost. The same work took **2.66 seconds** on a clean link
+and **255.68 seconds** over the slow one: ninety-six times longer. That is not
+the network being slow; it is this implementation opening a fresh connection for
+every single message, which was a deliberate simplification and is now a measured
+bill rather than a footnote.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    agrees_with_one_process   every surface's marginal, at its owner, against
+                              the same stream run in one process
+    mismatches                how many disagreed. Must be 0
+    seconds                   driver wall clock, observation to last read
+
+The driver **owns nothing and stores nothing**. It observes, it flushes, and it
+reads each count back from the peer that holds it. A driver that accumulated
+counts itself would be the gather amended C1 forbids, and it would agree with one
+process for the wrong reason.
+
+
+MEASURED ON
+-----------
+Docker 29.6.1 on Windows 10, `testbed/Dockerfile`, one container per node plus a
+driver container. `tc netem` applied inside **every** container including the
+driver, because `netem delay` shapes egress and impairing one side is half a
+link.
+
+    nodes            4
+    bucket width    50
+    tempo          100
+    concepts         6      19 surfaces including the distractor
+    occasions       60
+    seed             0
+
+Node containers run `python -m openplexus.node_main` with
+`OPENPLEXUS_MODE=bucket`. They build **no model** — no `d_model`, no readout, no
+key table — because the grounding store is a sparse count table.
+
+
+PREDICTIONS
+-----------
+**NONE, and the reason is that this asserts a contract rather than testing a
+belief.** `testbed-identity.yml` is the precedent: it asserts bit-identity for
+the slice path and registers no predictions either, because *"a network of
+containers must agree with the single-process model"* is not a hypothesis about
+the world, it is the definition of the harness being trustworthy.
+
+Registered now, for the follow-up the timing makes necessary:
+
+P1  CONNECTION REUSE REMOVES MOST OF THE 96x. Every message currently opens a
+    socket, sends, reads and closes, so it pays a connection setup **and** a
+    request round trip — two RTTs where one would do. Holding connections, as
+    `peer.py` does, should bring the impaired run to within about 2x of half its
+    current time.
+    REFUTED IF it does not, which would mean the cost is in the message COUNT
+    rather than the per-message overhead — and then the read path's one message
+    per candidate partner (`g33-03`) is the thing to attack instead, which is a
+    much larger change.
+
+
+COST
+----
+Clean run **2.66s**; impaired run **255.68s**; image build a few seconds more
+each time, excluded from both.
+
+
+RESULTS
+-------
+    link                        nodes  observations  flushes  surfaces  mismatches  seconds
+    clean                           4           305       60        19           0     2.66
+    delay 40ms, jitter 10ms         4           305       60        19           0   255.68
+
+**`agrees_with_one_process: true` on both.** Four containers, no shared memory,
+no driver holding any part of the answer, and every one of the 19 marginals
+matches the single-process reference exactly — under impairment as well as
+without it.
+
+**The 96x is the incidental finding and it is a real bill.** 305 observations, 60
+flushes and 19 reads is 384 driver messages, plus every `NOTE` and `LINK` a flush
+forwards between peers. Each of those opens its own connection, so each costs a
+setup round trip **and** a request round trip: roughly 200 ms at this delay
+against roughly 2 ms clean.
+
+**What that does NOT settle**: whether the driver's messages or the peers'
+forwards dominate. Both were impaired and neither was counted separately, so the
+split is unmeasured and P1 is written to find out.
+
+**And the number must not be quoted as a latency for this architecture.** It is a
+property of one-connection-per-message, which `bucket_peer.py` names as a
+deliberate simplification at its own definition. `g24-01`'s 161 ms a round
+remains the figure for a walk over held connections.
+
+
+WHAT THIS SETTLES, AND WHAT IT DOES NOT
+-----------------------------------------
+**Settles:** the join, the sharded accumulator and the ownership rule work across
+real process and container boundaries, over a real network, with impairment, and
+produce the same counts as one process. Every `g32` and `g33` number was taken
+with crossings counted rather than sent; this is the first time they were sent,
+and nothing changed.
+
+**Does not settle:** the READ path. This drives writes and reads marginals back;
+it does not run the walk across containers, so `g33-03`'s one-message-per-partner
+cost is still an in-process count. Nor does it test churn — no container is
+killed mid-run — which is C3 and is the obvious next thing this harness can do
+cheaply, since `testbed/run.py` already has `--absent` and `--leave-at` for the
+slice path.

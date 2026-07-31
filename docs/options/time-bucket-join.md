@@ -16,12 +16,17 @@
 - `tests/test_buckets.py` and six mutations in `tools/mutate.py`.
 - `experiments/g33_01_does_the_bucket_join_keep_the_signal.py`.
 
-**What does NOT exist, stated because the file's own docstring is the only other place it
-is said:** the accumulator is **not sharded**. `Join` holds one `CoOccurrence` for every
-surface in the world, so *"the link is written to `owner(surface)`, where it accumulates
-over that percept's lifetime"* is addressed for the **bucket** half only. One object
-holding every row cannot demonstrate that the rows are separable. There are also no
-sockets, no processes and no containers.
+- `openplexus/federated.py` splits the accumulator by `owner(surface)` and counts every
+  crossing; `openplexus/bucket_service.py` is ONE node's share and refuses any key it does
+  not own; `openplexus/bucket_peer.py` puts a socket around that;
+  `openplexus/node_main.py` gains `OPENPLEXUS_MODE=bucket`; `testbed/run.py --mode bucket`
+  runs it in containers under `tc netem`, with `tools/bucket_drive.py` driving and
+  `.github/workflows/testbed-bucket-identity.yml` re-running it.
+
+**What does NOT exist:** the READ path across containers. The container run drives writes
+and reads marginals back; it does not walk. So `g33-03`'s cost of one message per
+candidate partner is still an in-process count. Churn is untested here too — no container
+is killed mid-run.
 
 ---
 
@@ -275,3 +280,46 @@ Dropping observations outright: `1.0000` at drop `0.50`, `0.9149` at `0.75`, `0.
 should be. It removes individual observations rather than whole occasions, so a pair needs
 both members and the damage is quadratic — at 25 surviving occasions per concept this
 scores `0.5692` where `g32-02`'s clean stream at the same count scores `0.9503`.
+
+### It runs in real containers and agrees exactly, impaired and clean — `g35-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g35-01-the-grounding-store-in-real-containers.txt
+            script  testbed/run.py --mode bucket, driver tools/bucket_drive.py
+            task    occasions, 6 concepts, 60 occasions, 19 surfaces
+            model   bucket_service + bucket_peer, one container per node, no model layer
+            knobs   nodes 4; tc netem delay 40ms jitter 10ms, or clean
+            scale   Docker 29.6.1, 305 observations, 60 flushes
+
+**Every `g32` and `g33` number was taken with crossings COUNTED rather than sent.** This
+sends them. Four containers, a real Docker network, a driver that owns nothing and reads
+each count back from the peer holding it.
+
+`agrees_with_one_process: true`, **0 mismatches** across all 19 surfaces, on a clean link
+and again at 40 ms delay with 10 ms jitter. So the join, the sharded accumulator and the
+ownership rule survive a real process and container boundary unchanged.
+
+**The incidental finding is a 96x bill**: **2.66s** clean against **255.68s** impaired.
+That is one-connection-per-message, which `bucket_peer.py` names as a deliberate
+simplification — each message pays a setup round trip and a request round trip. It **must
+not be quoted as a latency for this architecture**; `g24-01`'s 161 ms a round remains the
+figure for a walk over held connections.
+
+### The reply had to precede the writes, and only containers showed it — `g35-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g35-01-the-grounding-store-in-real-containers.txt
+            script  none -- found while wiring OPENPLEXUS_MODE=bucket
+            task    n/a
+            model   bucket_peer
+            knobs   none
+            scale   3 OS processes
+
+`BucketPeer` replied to a message and forwarded its outbox afterwards, so a `FLUSH`
+returned while its `NOTE` and `LINK` messages were still in flight. **In one process that
+raced fast enough to pass every test**; across three OS processes a caller reading a count
+straight after a flush read one that had not arrived.
+
+Forwarding now precedes the reply, so a reply means the work has landed. The regression
+test stalls a forward deliberately rather than relying on a race, because a loopback race
+is not a test of an ordering.

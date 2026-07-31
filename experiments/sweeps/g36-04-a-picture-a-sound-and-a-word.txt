@@ -1,0 +1,195 @@
+Does a third modality help, and can two senses reach each other?
+=================================================================
+
+Script: experiments/g36_04_a_picture_a_sound_and_a_word.py
+Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+
+
+IN PLAIN TERMS
+--------------
+The machine has already learned to connect a written word to pictures of the
+thing it names, from nothing but seeing them at the same time. This adds a third
+kind of input: **the word said out loud**, three thousand real recordings of
+people speaking the digits, six different voices.
+
+Two questions become askable that could not be asked with only two inputs.
+
+**First, John's question.** He suggested that the more different kinds of input
+there are, the better this should work — because each extra kind gives another
+way to tell two things apart. That sounds obviously right, and there is a reason
+to doubt it: the machine keeps only a limited number of connections per thing, so
+a third input is also a third competitor for that space. It could help, and it
+could crowd out.
+
+**Second, and this is the one that matters more.** You do not usually see a
+picture of something at the same moment you hear it said. You see it, or you hear
+it. So there is a version of this where the picture and the sound **never once
+occur together**, and the only thing joining them is the word that turns up
+alongside both.
+
+Can the machine still work out that the picture and the sound are the same thing?
+It has never seen them together. If it can, that is the beginning of the answer
+to how a concept holds together across senses that never meet. If it cannot, the
+thing that has to be added is known and named — but it is not built.
+
+There is also a plain fairness problem being controlled for. Splitting attention
+between a picture and a sound means seeing each half as often. So one arm runs at
+double the length, to separate *"joining two senses through a word is hard"* from
+*"half as much practice is less practice"*.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    q_img, q_aud   quantiser purity per modality: share of items sitting in a
+                   code whose MAJORITY digit is their own. The seeing and
+                   hearing halves, and they are the same for every arm at a
+                   given (codes, seed) because the quantisers are computed once
+                   and shared -- no arm is scored against a different front end
+    link_img       of the IMAGE codes a word's recovered class holds, the share
+                   whose majority digit is that word's
+    link_aud       the same for AUDIO codes
+    cross          THE BRIDGE. Of the audio codes an image code's class holds,
+                   the share whose majority digit matches the image code's own
+    crossed        how many audio codes an image code reaches at all, per image
+                   code. **The companion `cross` needs**: a `cross` of 0.0
+                   because everything reached is wrong and one because nothing
+                   was reached are different answers, and this line separates
+                   them
+    classes        mean recovered class size, the collapse guard
+
+**Chance for every purity is the largest class share, about 0.109**, printed by
+the run rather than assumed.
+
+`link_*` and `cross` are recall-shaped in the way every metric in this line has
+been -- a total collapse puts every surface in every class and scores well.
+`classes` is the companion and a collapse shows up there as a number near the
+surface count, which is `2*codes + 11`.
+
+
+MEASURED ON
+-----------
+Local, single process, Python 3.14. numpy for the quantiser and the FFT only;
+both task readers are dependency-free.
+
+    images         4,000   MNIST training prefix, tools/fetch_mnist.py
+    recordings     3,000   FSDD, six speakers, 8 kHz mono, tools/fetch_fsdd.py
+                           CC BY-SA 4.0, Zohar Jackson et al. Gitignored, not
+                           redistributed
+    occasions      3,000   one per recording, paired with an image of the same
+                           digit taken ROUND-ROBIN from that digit's pool, so
+                           every image is used about equally and no pairing is
+                           a random draw
+    words             10   one token per digit, shared between modalities
+    noise              2   OTHER WORDS per occasion, matching g36-01
+    distractors        1   present every occasion, carried from g32-01
+    image features raw 28x28 greyscale, unit length
+    audio features 8 time segments x 16 frequency bands, log energy, unit
+                           length. Segments are PROPORTIONAL to recording
+                           length, so speaking rate is discarded and spectral
+                           shape is kept
+    statistic  conditional, the C1-safe one
+    bound      derived, `g33-04`'s winner
+    seeds      0, 1, 2
+
+Swept: `codes` in {20, 50, 100} -- matching g36-01 so the `image+word` arm is
+directly comparable against it -- crossed with five arms.
+
+**BOTH front ends are deliberately weak and BORROWED.** `DECISIONS.md` §1
+records John's ruling that a borrowed feature space is acceptable and possibly
+preferred. Raw pixels and a crude spectrogram are the cheapest honest choices,
+and the point is to measure the LINKING against front ends whose quality is known
+and reported.
+
+
+A NOTE ON WHICH NUMBERS WERE ALREADY KNOWN
+-------------------------------------------
+`CLAUDE.md` requires this, because a prediction written after a control has run
+is a summary rather than a commitment.
+
+**The audio quantiser purity was probed before these predictions were written**,
+to check the front end could fire at all -- a run where it sat at chance would
+make every downstream number unreadable. Over a 1,500-recording sample at
+seed 0: **0.4880 at 20 codes, 0.6640 at 50, 0.8067 at 100**, against chance
+0.1087. So P4 below is largely a restatement of something measured, and it is
+marked WEAK for that reason.
+
+**The probe also caught a trap that would have invalidated the run.** A first
+pass took a PREFIX of the sorted recordings and reported chance 0.20 -- because
+FSDD filenames begin with the digit, so the first half of the files are digits 0
+to 4 and nothing else. The tell was the chance level, not the purity. `spoken.py`
+now says this at `available` and offers `sample`; `mnist.read` takes a prefix
+deliberately and says why it is safe there.
+
+Nothing about the LINKING, the bridge, or any arm comparison has been run.
+
+
+PREDICTIONS
+-----------
+P1  MORE MODALITIES HELP, WHICH IS JOHN'S CLAIM, AND IT IS TESTED AGAINST THE
+    ARM THAT COULD REFUTE IT. `link_img` in `together` is at or above
+    `link_img` in `image+word`, at every code count -- the sound adds evidence
+    about which pictures belong with which word.
+    REFUTED IF `together` is clearly BELOW `image+word` (call it a drop of more
+    than 0.05 at two of three code counts). That would mean the third modality
+    COMPETES for the derived bound rather than adding to it, extending
+    `g36-02`'s finding -- true under a fixed bound -- to the derived one, and it
+    would make "add more senses" an active harm rather than a free improvement.
+
+P2  THE STAR SURVIVES CONTACT WITH REAL DATA. In `alternating`, where an image
+    code and an audio code share **zero** occasions, `cross` is far above chance
+    0.109 -- above **0.50** -- and `crossed` is above 0.5 so the figure is not
+    computed over a handful of pairs.
+    REFUTED IF `cross` is near chance, or if `crossed` is near zero so there is
+    no bridge to score. **That is the hub problem biting on sensory data**:
+    `g33-04`'s derived bound would have repaired the star only on symbols this
+    project generated, and two senses that never co-occur would need a mechanism
+    that does not exist yet.
+
+P3  A DIRECT EDGE BEATS A BRIDGED ONE. `cross` in `together` exceeds `cross` in
+    `alternating x2`, which is matched on per-modality exposure, at every code
+    count.
+    REFUTED IF the bridged version equals or beats the direct one. **That would
+    be the most interesting outcome available here**: it would say a word is a
+    BETTER route between two senses than co-occurring with them is -- that the
+    shared name denoises what direct co-occurrence does not -- and it would
+    change what the architecture should reach for first.
+
+P4  **WEAK, and marked so.** Audio is the poorer front end and the linking
+    inherits it: `link_aud` is below `link_img` at every code count.
+    REFUTED IF `link_aud` matches or beats `link_img`. That is not the trivial
+    outcome it looks like: it would mean the linking is limited by something
+    other than front-end quality, since the audio quantiser is 0.24 worse at 20
+    codes. The quantiser purities are already known -- see above -- so only the
+    claim about the LINK is a commitment.
+
+P5  SPLITTING COSTS SOMETHING, AND LESS THAN HALF. `link_img` in `alternating`
+    is below `link_img` in `image+word` -- half the exposure -- but by less than
+    the gap between `image+word` at 20 codes and at 50, because `g32-02` put the
+    threshold at about 16 occasions per concept and even the split arm gives 150
+    per digit.
+    REFUTED IF `alternating` collapses, which would mean the occasion threshold
+    binds far higher on real sensory data than on the synthetic stream.
+
+
+COST
+----
+Estimated: 3 code counts x 3 seeds x 2 k-means runs, plus 5 arms x 9 cells of
+3,000-6,000 occasions and a walk over about 210 surfaces. One-off: 3,000 WAV
+reads and 3,000 FFTs.
+
+`g36-01` did the image third of this in 6.0s, and its own estimate of "two to ten
+minutes" was wrong by two orders of magnitude -- so this one is estimated from
+that MEASUREMENT rather than from an intuition. Five arms against one, plus the
+audio path: **60 to 180 seconds.** Local, no runner.
+
+Recorded after the run: TO BE FILLED.
+
+
+RESULTS
+-------
+TO BE FILLED.
+
+
+SCORECARD
+---------
+TO BE FILLED.

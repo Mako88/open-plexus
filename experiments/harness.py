@@ -512,3 +512,63 @@ def occasions_cell(config, statistic, k, *, look: int = 16) -> tuple[dict, float
     pairs = [(concept * config.surfaces + one, concept * config.surfaces + other)
              for concept in range(config.concepts) for one, other in apart]
     return scored, reached_together(recovered, pairs)
+
+
+def quantise(vectors, codes: int, seed: int) -> list[int]:
+    """Unit-normalise rows and assign each to a spherical k-means code.
+
+    **The quantiser is BORROWED, not invented** — `grouping.cluster` already does
+    this and `DECISIONS.md` §1 records John's ruling that a borrowed feature
+    space is acceptable and possibly preferred. What is deliberately crude is the
+    FEATURES each caller hands in: the point is to measure the linking against a
+    front end whose quality is known and reported, not to build a good one.
+
+    Extracted when `g36-04` needed the identical body for a second modality —
+    which is exactly the copy `tools/check_duplication.py` exists to refuse, and
+    is the reason it is here rather than in each script. **It is modality-blind:
+    pixels and spectra go through the same call, and that is the substantive
+    point rather than a convenience.**
+
+    Args:
+        vectors: A 2-D numpy array, one row per item. Not normalised.
+        codes: How many codes to cluster into.
+        seed: Passed through to `grouping.cluster`.
+
+    Returns:
+        One code per row, in row order. `-1` marks a row no code claimed.
+    """
+    import numpy as np
+
+    from openplexus.grouping import cluster
+
+    norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+    norms[norms == 0.0] = 1.0
+    assigned = [-1] * len(vectors)
+    for code, members in enumerate(cluster(vectors / norms, k=codes, seed=seed)):
+        for row in members:
+            assigned[row] = code
+    return assigned
+
+
+def purity(assigned: list[int], labels: list[int]) -> tuple[float, dict[int, int]]:
+    """Share of items sitting in a code whose MAJORITY label is their own.
+
+    The `agreement WITHIN a modality` half of `GOALS.md` §1.2b, which insists it
+    is a separate problem from alignment ACROSS modalities and must not be
+    budgeted with it.
+
+    Returns:
+        `(share, majority)` — the share, and each code's majority label, which
+        callers need to score the linking against.
+    """
+    from collections import Counter
+
+    holders: dict[int, Counter] = {}
+    for code, label in zip(assigned, labels):
+        if code >= 0:
+            holders.setdefault(code, Counter())[label] += 1
+    majority = {code: counts.most_common(1)[0][0]
+                for code, counts in holders.items()}
+    agreed = sum(counts[majority[code]] for code, counts in holders.items())
+    total = sum(sum(counts.values()) for counts in holders.values())
+    return (agreed / total if total else 0.0), majority

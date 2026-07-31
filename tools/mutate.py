@@ -54,6 +54,7 @@ CONTENT = ROOT / "openplexus" / "content.py"
 OCCASIONS = ROOT / "openplexus" / "tasks" / "occasions.py"
 XSL = ROOT / "openplexus" / "tasks" / "xsl.py"
 MNIST = ROOT / "openplexus" / "tasks" / "mnist.py"
+SPOKEN = ROOT / "openplexus" / "tasks" / "spoken.py"
 GROUNDING = ROOT / "openplexus" / "grounding.py"
 BUCKETS = ROOT / "openplexus" / "buckets.py"
 FEDERATED = ROOT / "openplexus" / "federated.py"
@@ -1463,6 +1464,14 @@ MUTATIONS = [
         path=LOCAL,
         old="        self.grouped_wo = self.wo.reshape(v, config.partitions, -1)",
         new="        self.grouped_wo = self.wo.reshape(v, config.partitions, -1).copy()",
+    ),
+    Mutation(
+        name="the-audio-sample-is-a-prefix",
+        breaks="a draw becomes a prefix, and FSDD filenames start with the "
+               "digit, so a sample silently becomes one digit's recordings",
+        path=SPOKEN,
+        old="    return sorted(random.Random(seed).sample(paths, count))",
+        new="    return paths[:count]",
     ),
     Mutation(
         name="filler-collides-with-keys",

@@ -50,39 +50,16 @@ ARM = "conditional"
 
 
 def _quantise(digits: mnist.Digits, codes: int, seed: int) -> list[int]:
-    """Pixels to a discrete code, by spherical k-means over unit rows.
+    """Pixels to a discrete code, via the shared quantiser.
 
-    **The quantiser is BORROWED, not invented** — `grouping.cluster` already does
-    this and `DECISIONS.md` §1 records John's ruling that a borrowed feature
-    space is acceptable and possibly preferred. Raw normalised pixels are a
-    deliberately weak feature space: the point is to measure the linking against
-    a quantiser whose quality is known, not to build a good one.
+    The body moved to `harness.quantise` when `g36-04` needed the identical one
+    for spectra. **The numbers here are unchanged** — the extraction was verified
+    by re-running this script and comparing every cell against the table already
+    in the record.
     """
     flat = np.frombuffer(b"".join(digits.images), dtype=np.uint8)
     vectors = flat.reshape(len(digits), digits.pixels).astype(np.float64)
-    norms = np.linalg.norm(vectors, axis=1, keepdims=True)
-    norms[norms == 0.0] = 1.0
-    groups = cluster(vectors / norms, k=codes, seed=seed)
-
-    assigned = [-1] * len(digits)
-    for code, members in enumerate(groups):
-        for row in members:
-            assigned[row] = code
-    return assigned
-
-
-def _purity(assigned: list[int], labels: list[int]) -> tuple[float, dict[int, int]]:
-    """Share of images sitting in a code whose MAJORITY digit is their own."""
-    holders: dict[int, Counter] = {}
-    for code, label in zip(assigned, labels):
-        if code < 0:
-            continue
-        holders.setdefault(code, Counter())[label] += 1
-    majority = {code: counts.most_common(1)[0][0]
-                for code, counts in holders.items()}
-    agreed = sum(counts[majority[code]] for code, counts in holders.items())
-    total = sum(sum(counts.values()) for counts in holders.values())
-    return (agreed / total if total else 0.0), majority
+    return harness.quantise(vectors, codes, seed)
 
 
 def main() -> None:
@@ -107,7 +84,7 @@ def main() -> None:
         quant, links, reaches, sizes, grounded = [], [], [], [], []
         for seed in SEEDS:
             assigned = _quantise(digits, codes, seed)
-            purity, majority = _purity(assigned, digits.labels)
+            purity, majority = harness.purity(assigned, digits.labels)
             quant.append(purity)
 
             words = {d: codes + d for d in range(len(mnist.WORDS))}

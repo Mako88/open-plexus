@@ -545,6 +545,31 @@ did not choose to make it pass.
 > published figures had to be superseded because it was added late rather than
 > first.
 
+**AND THREE SEEDS CANNOT SEE AN OCCASIONAL FAILURE. Match the seed count to how
+RARE the failure would be, not to convention.** Three agreeing seeds is evidence
+about the typical case and almost none about the tail — which is exactly where a
+result that will be quoted needs to be sound.
+
+> *Calibration, and it caught a headline that had already been reported.*
+> `g36-01` ran the project's usual three seeds and every one returned **1.0000**,
+> so it was written up as *"every image code in a word's class has that word's
+> digit as its majority"* and reported in those words. Eight seeds of the same
+> cell:
+>
+>     1.0000  1.0000  1.0000  0.7015  1.0000  0.9773  1.0000  1.0000
+>
+> **Mean 0.9599, worst 0.7015.** The finding survived — 0.96 against chance 0.111
+> is still decisive — and the claim of *perfection* did not.
+>
+> The arithmetic is the point: a failure occurring in one draw of eight is missed
+> by three seeds **(7/8)³ ≈ 67%** of the time. So three seeds passing cleanly is
+> the EXPECTED outcome even when a one-in-eight failure exists, and a clean sweep
+> of three is not evidence against one.
+>
+> **The cheap habit: whenever a cell returns a perfect score, run more seeds
+> before writing the word "every".** It cost eleven seconds here and it was found
+> only by accident, while checking an unrelated discrepancy in `g36-03`.
+
 **4. Report negative results as results, in the OPTION RECORD for the thing that
 was tried.** A refutation that narrows the search is worth more than an unmeasured
 success, and it is the only thing that stops the same dead end being explored

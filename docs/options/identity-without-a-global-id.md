@@ -195,9 +195,12 @@ record's own motivating example has, not a corner case chosen to be hard.
 symbol streams this project generated, where a modality is an integer and the hard half —
 recognising two different pictures of one thing as one thing — never arises.
 
-At 50 codes, **every image code in a word's recovered class has that word's digit as its
-majority**: link purity **1.0000** against chance **0.1110**, with all ten words reaching
-image codes and a mean class size of **5.00**, so it is not a collapse.
+At 50 codes link purity is **1.0000** on seeds 0-2 against chance **0.1110**, with all ten
+words reaching image codes and a mean class size of **5.00**, so it is not a collapse.
+
+**That 1.0000 is a lucky draw and the record says so.** Over eight seeds the same cell
+gives **0.9599** mean with a worst of **0.7015**, so the claim is *far above chance* and
+not *perfect*. Three seeds miss a one-in-eight failure about two thirds of the time.
 
 **Linking does not beat seeing**, on the metric where the two are comparable: per-image
 recovery is **0.6604, 0.7688, 0.8266** against quantiser purities of **0.7174, 0.8299,

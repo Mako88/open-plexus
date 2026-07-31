@@ -2,7 +2,15 @@ How rarely can a thing be named and still be grounded?
 ======================================================
 
 Script: experiments/g36_03_how_rarely_can_it_be_named.py
-Status: PREDICTIONS COMMITTED, NOT YET RUN.
+Status: RUN, local, 2026-08-01, 11.2s. Predictions committed at `3e8901a`
+        before the script was executed.
+
+ANSWER: **naming is NOT as cheap as the occasion threshold implies, and P2 is
+        refuted.** At 16 namings per code — `g32-02`'s measured threshold — link
+        purity is **0.7847**, not the predicted 0.90. Below that it falls off a
+        cliff: **0.3596** at 8 namings and **0.0664** at 1.6, which is BELOW
+        chance. Grounding a name costs more evidence than learning a concept
+        does.
 
 
 IN PLAIN TERMS
@@ -114,14 +122,92 @@ The last two estimates in this line were wrong by two orders of magnitude in the
 same direction, so this one is scaled from a MEASURED run of the same shape
 rather than from a guess.
 
-Recorded after the run: PENDING.
+Recorded after the run: **11.2s** against an estimate of about 15 seconds.
+Right for once, because it was scaled from a MEASURED run of the same shape
+rather than from a guess — which is what the two previous misses were.
 
 
 RESULTS
 -------
-PENDING.
+  naming  namings/code  quantiser    link  grounded   reach  classes
+    0.02           1.6     0.8299  0.0664    0.0224  0.9667     2.45
+    0.05           4.0     0.8299  0.1272    0.0874  0.9667     4.61
+    0.10           8.0     0.8299  0.3596    0.1303  1.0000     2.80
+    0.20          16.0     0.8299  0.7847    0.3307  1.0000     2.56
+    0.50          40.0     0.8299  0.8929    0.6346  1.0000     4.69
+    1.00          80.0     0.8299  0.8084    0.7877  1.0000     6.90
+
+  chance for the purities: 0.1110
 
 
 SCORECARD
 ---------
-PENDING.
+  P1  HELD, exactly. `quantiser` is **0.8299** at every naming rate, to four
+            decimals, because the clustering never sees a word. The naming rate
+            reaches nothing it should not.
+
+  P2  REFUTED. At 0.20 — 16 namings per code, which is `g32-02`'s measured
+            threshold for a concept — `link` is **0.7847**, not above 0.90.
+
+            **So the two thresholds are not the same quantity**, which is what
+            the refutation clause said it would mean. Learning that a set of
+            pictures belong together takes about 16 sightings; learning what that
+            set is CALLED takes more. The naming has to out-compete the noise
+            words, which are present at two per occasion regardless, so a rare
+            name is fighting a constant distractor rather than merely being
+            scarce.
+
+  P3  HELD. At 0.05 — 4 namings per code — `link` is **0.1272**, far below the
+            predicted 0.50, and `reach` falls to **0.9667**: a word that is
+            almost never spoken fails to reach any picture at all.
+
+            At 0.02 it is **0.0664**, which is BELOW chance 0.1110. A word spoken
+            1.6 times per code does not merely fail to ground — it grounds to the
+            WRONG codes, which is the raw-counting failure of `g32-01` arriving
+            through scarcity instead of through frequency.
+
+  P4  HELD, and the gap is large. `grounded` falls much faster than `link` —
+            0.7877, 0.6346, **0.3307**, 0.1303 against 0.8084, 0.8929, 0.7847,
+            0.3596. At 0.20 a word reaches mostly-correct codes (0.78) covering
+            only a third of its images (0.33).
+
+            So a digit's pictures ARE spread across several codes, as the 0.8299
+            quantiser purity implies, and a rarely-named word reaches some of
+            them and not the rest.
+
+
+THE ROW THAT DID NOT MATCH, AND WHAT IT COST
+----------------------------------------------
+`naming` 1.00 is `g36-01`'s configuration and should reproduce its **1.0000**.
+It gives **0.8084**.
+
+The streams are not byte-identical — testing `rng.random() < naming` consumes a
+draw that `g36-01` does not, so the noise words differ — but a seed difference
+producing 1.0000 against 0.8084 is too large to accept without checking.
+
+**Checked, and `g36-01`'s headline was a lucky draw.** Eight seeds of that cell:
+
+    1.0000  1.0000  1.0000  0.7015  1.0000  0.9773  1.0000  1.0000
+
+Mean **0.9599**, worst **0.7015**. `g36-01` used seeds 0, 1 and 2 — the project's
+convention — and all three are clean. **A failure in one draw of eight is missed
+by three seeds about two thirds of the time**, so a clean sweep of three is the
+expected outcome even when the failure exists.
+
+`g36-01`'s record is corrected and the claim of perfection withdrawn; the finding
+itself is untouched, because 0.96 against chance 0.111 was never resting on the
+last four decimals. The standard is now in `CLAUDE.md` rule 3: **whenever a cell
+returns a perfect score, run more seeds before writing the word "every".**
+
+
+WHAT THIS DOES NOT SETTLE
+--------------------------
+**Why naming is dearer than occurrence.** The account above — a rare name
+competing against constant noise words — is an explanation offered, not measured.
+Sweeping `noise` at a fixed naming rate would test it and is not run.
+
+**Whether a better quantiser moves the cliff.** `grounded` is capped by
+quantiser purity, and at 0.8299 a third of the shortfall at high naming rates is
+the front end rather than the linking.
+
+**And nothing here is distributed.** One process, no join.

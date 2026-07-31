@@ -5,12 +5,28 @@ Script: experiments/g36_01_a_picture_and_a_word.py
 Status: RUN, local, 2026-07-31, 5.9s. Predictions committed at `9d9703d`
         before the script was executed.
 
-ANSWER: **G7's falsifier did NOT fire.** At 50 codes every image code in a
-        word's recovered class is that word's digit — link purity **1.0000**
-        against chance **0.1110** — and 76.9% of all images are reachable from
-        their own word. **But G7 is not PASSED**, for a reason stated in full
-        below: both modalities are present in every occasion, so this measures
-        ALIGNMENT rather than introduce-in-one-and-query-in-another.
+ANSWER: **G7's falsifier did NOT fire.** At 50 codes link purity is far above
+        chance **0.1110**, and 76.9% of all images are reachable from their own
+        word. **But G7 is not PASSED**, for a reason stated in full below: both
+        modalities are present in every occasion, so this measures ALIGNMENT
+        rather than introduce-in-one-and-query-in-another.
+
+> **CORRECTED 2026-08-01: the headline was 1.0000 and that figure is a LUCKY
+> DRAW.** This run used seeds 0, 1 and 2 — the project's convention — and all
+> three give exactly 1.0000. Run over eight seeds while checking something else
+> in `g36-03`:
+>
+>     1.0000  1.0000  1.0000  0.7015  1.0000  0.9773  1.0000  1.0000
+>
+> **Mean 0.9599, worst 0.7015.** So *"every image code in a word's class has that
+> word's digit as its majority"* is true of most draws and NOT true in general,
+> and it was reported as though it were.
+>
+> **The finding survives and the sentence did not.** 0.96 against chance 0.1110
+> is still decisive, and every conclusion below about the gate holds. What fails
+> is the claim of perfection, which three seeds could not have caught: a failure
+> occurring in one draw of eight is missed by three seeds about **two thirds** of
+> the time.
 
 
 IN PLAIN TERMS

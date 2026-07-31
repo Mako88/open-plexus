@@ -1466,6 +1466,32 @@ MUTATIONS = [
         new="        self.grouped_wo = self.wo.reshape(v, config.partitions, -1).copy()",
     ),
     Mutation(
+        name="the-edge-weight-is-one-directional",
+        breaks="strength stops being symmetric, so an edge means something "
+               "different depending on which end asks -- and the soft "
+               "mutuality that refuses an ever-present distractor is gone",
+        path=GROUNDING,
+        old="    return COMBINERS[combine](statistic(index, one, other),\n"
+            "                              statistic(index, other, one))",
+        new="    return statistic(index, other, one)",
+    ),
+    Mutation(
+        name="the-walk-ignores-its-beam",
+        breaks="reach expands every partner, so the SEARCH budget stops "
+               "bounding anything and a query costs O(N**depth)",
+        path=GROUNDING,
+        old="            for score, other in scored[:beam]:",
+        new="            for score, other in scored:",
+    ),
+    Mutation(
+        name="the-path-strength-does-not-decay",
+        breaks="a long weak route scores the same as a short strong one, so "
+               "the ranking stops meaning distance at all",
+        path=GROUNDING,
+        old="                travelled = carried * score",
+        new="                travelled = score",
+    ),
+    Mutation(
         name="the-damping-exponent-is-ignored",
         breaks="every alpha collapses to conditional, so the sweep's axis is "
                "flat and reports one statistic under five names",

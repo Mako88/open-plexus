@@ -221,3 +221,60 @@ walk already bridges two senses that never co-occur.
 
 **Untested and it is the interesting part:** `together` is 100% simultaneity and
 `alternating` is 0%. Nothing measures 10% or 30%, and reality is in there.
+
+### The alternative that removes the ceiling entirely — John, 2026-07-31
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g36-05-what-the-bound-evicts.txt
+            script  experiments/g36_05_what_the_bound_evicts.py
+            task    MNIST images + FSDD spoken digits + 10 words
+            model   conditional; bound derived, `look` ceiling 16
+            knobs   50 codes, arms image+word / together / alternating; 3 seeds
+            scale   share of image codes whose OWN word survives the bound
+
+**John's instruction, 2026-07-31: *"I don't think we want a ceiling at all."***
+His reasoning is that a concept IS a web of connections, so traversal is
+intrinsic rather than a cost to be minimised away — and that latency is an
+optimisation problem to be solved after the capability is proved, not before.
+
+**`grounding.reach` is that, and the distinction it turns on is WHERE THE BUDGET
+SITS.** `neighbours` and `equivalence_classes` bound the REPRESENTATION: each
+surface keeps a few partners and the rest are discarded before any question is
+asked. `reach` bounds the SEARCH: every edge stays and `beam`/`depth` limit how
+far one question travels. An unbounded representation with a bounded search is
+affordable; an unbounded search over it is `O(N**depth)` and is not.
+
+**Soft mutuality costs NOTHING extra in messages, which was not obvious.**
+`strength` evaluates both directions, and both need only `count(x,y)`,
+`count(x)` and `count(y)`. `owner(x)` holds the first two, so it is still **one
+remote read**, exactly as `conditional` alone.
+
+**THE COMBINER IS A SWEPT PARAMETER AND NOT A CHOICE MADE BY ARGUMENT.** A first
+version justified `min` by claiming a mean would rank an ever-present distractor
+above a real partner; **a test refuted that on its first run** — the mean puts
+them in the correct order. The figures live in
+`tests/test_reach.py::test_a_MEAN_also_ranks_them_correctly_here`, which is the
+canonical home for them because it is the copy under continuous execution.
+And thinking it through the other way, `min`
+takes the WEAKER direction, which on a hub edge is the small one: a word's edge
+to an image code is near 1.0 from the word's side and small from the code's. So
+`min` weakens exactly the edges `g36-05` found being evicted at **0.0200**.
+`COMBINERS` holds min/geometric/mean/max and the doubt is recorded at the
+definition rather than left to be discovered.
+
+**WHAT SWITCHING WOULD INVALIDATE, enumerated before anything is built on top.**
+Not at risk: C1 itself — a deep traversal is many bounded one-hop messages, and
+what John relaxed is latency, not the constraint. Also safe: the statistic
+findings and the container/join results. **Conditional:** every number scored
+through `equivalence_classes`, which is g32-02's threshold, g34-01, g35-02 and
+all of g36. **Superseded if the bound goes:** `g33-02` and `g33-04`, which are
+about the bounded representation. **Actively worse:** `g33-03`'s read cost.
+
+**Both mechanisms are kept**, per rule 14c, so the default is unchanged and no
+earlier number moves.
+
+**And a tripwire is LOST, which is the risk least likely to be noticed.** A
+partition has mean class size as a collapse alarm. A ranking cannot collapse,
+which sounds like an improvement and means a recall-shaped metric will read well
+here for reasons unrelated to the mechanism working. New scorers need their own
+floor.

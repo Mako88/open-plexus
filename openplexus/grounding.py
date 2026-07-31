@@ -481,6 +481,131 @@ def equivalence_classes(index: CoOccurrence, statistic: Statistic,
     return classes
 
 
+#: How the two directional scores of an edge are combined into one weight.
+#: **Which of these is right is UNMEASURED** — see `strength`.
+COMBINERS: dict[str, Callable[[float, float], float]] = {
+    "min": min,
+    "max": max,
+    "mean": lambda a, b: (a + b) / 2.0,
+    "geometric": lambda a, b: math.sqrt(a * b),
+}
+
+
+def strength(index: CoOccurrence, statistic: Statistic,
+             one: int, other: int, combine: str = "min") -> float:
+    """A SYMMETRIC edge weight, from the two directional scores.
+
+    **This generalises the rule `equivalence_classes` uses, without the hard
+    cut.** There, an edge survives only if each surface is in the other's
+    top-`k`; here every edge survives and carries how strongly both ends agree.
+
+    **WHICH COMBINER IS RIGHT IS AN OPEN QUESTION AND THE DEFAULT IS NOT A
+    FINDING.** `min` is the conservative choice — an edge is only as strong as
+    its weaker direction, which is the soft analogue of mutuality, since a
+    mutual rule also refuses an edge one side does not want.
+
+    **And there is a specific reason to doubt it**, recorded here rather than
+    discovered later. The directional scores of a HUB edge are lopsided: for a
+    word `w` naming an image code `c`, `conditional(w, c)` is near 1.0 because
+    `c` appears almost only with `w`, while `conditional(c, w)` is small because
+    `w` is common. **`min` takes the small one**, so it weakens exactly the
+    hub-to-spoke edges that `g36-05` found being evicted. `max` keeps them — and
+    also keeps an ever-present distractor, whose backward direction is likewise
+    1.0. So the two failure modes sit at opposite ends of this choice, which is
+    the same shape as `damped`'s exponent and was resolved there by measuring.
+
+    A first version of this docstring justified `min` by claiming a mean would
+    rank a distractor above a real partner. **That was an unchecked assertion and
+    a test refuted it on the first run** — on the natural fixture the mean ranks
+    them correctly too. The claim is removed rather than softened.
+
+    Args:
+        statistic: Any `Statistic`. Both directions are evaluated, so a
+            statistic costing one remote read costs two here.
+        combine: A key of `COMBINERS`. Unknown keys are refused rather than
+            defaulted, because silently falling back would make a sweep arm that
+            looks distinct and is not.
+    """
+    if combine not in COMBINERS:
+        raise ValueError(
+            f"unknown combiner {combine!r}; expected one of "
+            f"{sorted(COMBINERS)}. Defaulting here would give a sweep an arm "
+            f"that looks distinct and is not")
+    return COMBINERS[combine](statistic(index, one, other),
+                              statistic(index, other, one))
+
+
+def reach(index: CoOccurrence, statistic: Statistic, start: int, *,
+          beam: int = 8, depth: int = 3, floor: float = 0.0,
+          combine: str = "min") -> dict[int, float]:
+    """Best-first weighted walk from one surface. Everything reached, ranked.
+
+    **The alternative to `equivalence_classes`, and the difference is where the
+    budget sits.** That function bounds the REPRESENTATION — each surface keeps
+    a few partners and the rest are discarded before anything is asked. This
+    bounds the SEARCH instead: every edge in the table stays, and `beam` and
+    `depth` limit how far one question may travel.
+
+    John's instruction, 2026-07-31: *"I don't think we want a ceiling at all"*,
+    with the reasoning that a concept IS a web of connections and traversal is
+    therefore intrinsic rather than a cost to be minimised away. This is that,
+    made concrete — and the distinction it turns on is that an unbounded
+    representation with a bounded search is affordable, while an unbounded
+    search over an unbounded representation is `O(N**depth)` and is not.
+
+    **Why this is not simply better and must be measured.** `equivalence_classes`
+    returns a partition, so two surfaces are in one concept or they are not.
+    This returns a RANKING, which answers a different question and needs a
+    different scorer. It also cannot collapse — there is no component to merge —
+    so a metric that reads well under collapse will read well here for a reason
+    having nothing to do with the mechanism working.
+
+    Path strength MULTIPLIES along the path, so a long weak route loses to a
+    short strong one without any explicit depth penalty. Scores above 1 would
+    invert that; `conditional` and `damped(1.0)` are bounded by 1, `raw_count`
+    is not, and passing an unbounded statistic here is a caller error the
+    docstring names rather than the code guessing at a normalisation.
+
+    Args:
+        beam: How many of a surface's strongest partners to expand at each step.
+            **A search budget, not a representation budget** — raising it costs
+            time and changes no stored value.
+        depth: How many hops from `start`.
+        floor: Paths weaker than this are not expanded. `0.0` expands
+            everything the beam admits.
+
+    Returns:
+        Every surface reached, mapped to its BEST path strength, excluding
+        `start` itself. Empty when nothing clears the floor.
+    """
+    if beam < 1:
+        raise ValueError("beam must be at least 1")
+    if depth < 1:
+        raise ValueError("depth must be at least 1")
+
+    best: dict[int, float] = {}
+    frontier = [(start, 1.0)]
+    for _ in range(depth):
+        following: list[tuple[int, float]] = []
+        for here, carried in frontier:
+            scored = sorted(
+                ((strength(index, statistic, here, other, combine), other)
+                 for other in index.partners(here)),
+                key=lambda pair: (-pair[0], pair[1]))
+            for score, other in scored[:beam]:
+                if score <= 0.0 or other == start:
+                    continue
+                travelled = carried * score
+                if travelled <= floor or travelled <= best.get(other, 0.0):
+                    continue
+                best[other] = travelled
+                following.append((other, travelled))
+        if not following:
+            break
+        frontier = following
+    return best
+
+
 def class_f1(found: frozenset[int], correct: frozenset[int]) -> float:
     """How well one recovered class matches the true one.
 

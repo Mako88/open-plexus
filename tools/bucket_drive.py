@@ -42,7 +42,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from openplexus.bucket_peer import ask  # noqa: E402
+from openplexus.bucket_peer import Link  # noqa: E402
 from openplexus.buckets import BucketConfig, observations  # noqa: E402
 from openplexus.grounding import (STATISTICS,  # noqa: E402
                                   CoOccurrence, equivalence_classes)
@@ -71,6 +71,10 @@ def main(argv: list[str] | None = None) -> int:
         addresses.append((host, int(port)))
     nodes = len(addresses)
     ring = Ring(nodes=nodes, seed=args.seed)
+    # HELD connections. One per message cost 96x on the write path and 142x on
+    # the read path under a 40 ms link (`g35-01`, `g35-03`), because every
+    # message paid a setup round trip before it said anything.
+    link = Link({node: where for node, where in enumerate(addresses)})
 
     occasions = OccasionConfig(concepts=args.concepts, surfaces=3,
                                presence=0.7, noise=2, distractors=1,
@@ -89,15 +93,15 @@ def main(argv: list[str] | None = None) -> int:
     closes: dict[int, int] = {}
     sent = 0
 
-    def at(key: int) -> tuple[str, int]:
-        return addresses[ring.owner(key)]
+    def at(key: int) -> int:
+        return ring.owner(key)
 
     def advance(now: int | None) -> int:
         flushed = 0
         due = [b for b, shut in closes.items() if now is None or shut < now]
         for bucket in sorted(due):
             closes.pop(bucket)
-            ask(*at(bucket), ("FLUSH", bucket))
+            link.ask(at(bucket), ("FLUSH", bucket))
             flushed += 1
         return flushed
 
@@ -106,8 +110,8 @@ def main(argv: list[str] | None = None) -> int:
         flushes += advance(observation.when)
         bucket = observation.when // args.width
         closes[bucket] = (bucket + 1) * args.width
-        ask(*at(bucket), ("OBSERVE", bucket, observation.surface,
-                          observation.when))
+        link.ask(at(bucket), ("OBSERVE", bucket, observation.surface,
+                              observation.when))
         sent += 1
     flushes += advance(None)
 
@@ -117,7 +121,7 @@ def main(argv: list[str] | None = None) -> int:
 
     mismatches = []
     for surface in single.surfaces():
-        held = ask(*at(surface), ("SEEN", surface))
+        held = link.ask(at(surface), ("SEEN", surface))
         if held != single.seen(surface):
             mismatches.append({"surface": surface, "held": held,
                                "expected": single.seen(surface)})
@@ -138,7 +142,7 @@ def main(argv: list[str] | None = None) -> int:
                 nonlocal asked
                 if node not in ranked:
                     asked += 1
-                    got = ask(*at(node), ("RANK", node, None))
+                    got = link.ask(at(node), ("RANK", node, None))
                     ranked[node] = got if isinstance(got, list) else []
                 return ranked[node]
 
@@ -188,9 +192,12 @@ def main(argv: list[str] | None = None) -> int:
         "detail": mismatches[:10],
         "agrees_with_one_process": not mismatches,
         "seconds": round(time.time() - started, 2),
+        "driver_messages": link.sent,
+        "driver_reconnects": link.reconnects,
         "walk": walk,
     }
     print(json.dumps(result, indent=1))
+    link.close()
     return 0 if not mismatches else 1
 
 

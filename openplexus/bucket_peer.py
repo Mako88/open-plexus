@@ -31,17 +31,25 @@ A caller therefore asks `RANK` and gets **a short list of surface ids**, never a
 row. The peer pays one `SEEN` per candidate on the caller's behalf, which is
 `g33-03`'s measured cost arriving on a real link.
 
-## One connection per message, stated as a cost rather than hidden
+## Connections are HELD, and the failure mode that bought is handled
 
-Every message opens a socket, sends, reads a reply and closes. That is one extra
-round trip per message and it is **not** how a real deployment would do it.
+`Link` opens one connection per destination and reuses it. The first version
+opened one per message, which `g35-01` and `g35-03` measured at **96x** and
+**142x** under a 40 ms link — every message paying a connection setup on top of
+its request.
 
-It is chosen because the quantity this exists to establish is *correctness across
-a real process boundary*, and connection reuse is a pool with its own failure
-modes — a stale socket after a peer restarts, a half-open connection that reads
-as a hang. **Timings from this are therefore not comparable to `peer.py`'s**,
-which holds its connections, and `g24-01`'s 161 ms a round is the number to quote
-for a walk rather than anything measured here.
+**The reason it was one-per-message first was honest and is now paid for**: a
+pool has its own failure mode, a socket left stale by a restarted peer, and a
+stale socket does not announce itself — it fails on the next write, or worse
+reads as a hang. So `Link.ask` **retries exactly once on a fresh connection** and
+raises on the second failure. Once distinguishes *"the socket went stale"* from
+*"the peer is gone"*; retrying further would turn a departure into a hang, which
+is the thing C3 says must not happen.
+
+`peer.py` holds connections the same way and is the precedent rather than a thing
+to extend: its cache carries a fingerprint handshake, because a diverged peer
+there answers with zeros that decode to a real token. The equivalent guard here
+is `bucket_service`'s ownership refusal, which travels in the reply.
 
 ## What this does NOT duplicate, and what was searched
 
@@ -75,15 +83,98 @@ from openplexus.distributed import receive, send
 
 
 def ask(host: str, port: int, message: tuple, timeout: float = 10.0):
-    """Send one message to a peer and return its reply.
+    """Send one message on a FRESH connection and return its reply.
+
+    Kept for callers that make one request and stop — a test, a probe. Anything
+    sending more than a handful should use `Link`, which holds its connections.
 
     Raises rather than returning a default on any failure. **A message that did
     not arrive must not look like a zero** — that is the missing-marginal failure
     `bucket_service.rank` refuses, one layer down.
     """
     with socket.create_connection((host, port), timeout=timeout) as sock:
+        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         send(sock, json.dumps(list(message)).encode("utf-8"))
         return json.loads(receive(sock).decode("utf-8"))
+
+
+class Link:
+    """Held connections to a set of peers, one socket per destination.
+
+    Attributes:
+        sent: Messages sent successfully.
+        reconnects: Times a cached socket failed and a fresh one then worked.
+            **Not noise — read it.** A number climbing during a run means peers
+            are restarting or the link is dropping connections, and every message
+            it counts is one that would have been LOST without the retry.
+    """
+
+    def __init__(self, addresses: dict[int, tuple[str, int]],
+                 timeout: float = 10.0) -> None:
+        self.addresses = dict(addresses)
+        self.timeout = timeout
+        self.sent = 0
+        self.reconnects = 0
+        self._open: dict[int, socket.socket] = {}
+        self._locks: dict[int, threading.Lock] = {}
+        self._locks_guard = threading.Lock()
+
+    def _connect(self, node: int) -> socket.socket:
+        host, port = self.addresses[node]
+        opened = socket.create_connection((host, port), timeout=self.timeout)
+        opened.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self._open[node] = opened
+        return opened
+
+    def ask(self, node: int, message: tuple):
+        """Send on the held connection, reopening ONCE if it has gone stale.
+
+        **Locked PER DESTINATION, not globally.** A shared socket used by two
+        threads at once interleaves two length-prefixed frames and both replies
+        come back to the wrong caller — a corruption that reads as data. One
+        global lock would fix that and serialise every outbound message in the
+        node, including ones to different peers that have nothing to do with each
+        other, which on an impaired link is the cost this class exists to remove.
+        """
+        payload = json.dumps(list(message)).encode("utf-8")
+        with self._lock_for(node):
+            return self._ask_locked(node, payload)
+
+    def _lock_for(self, node: int) -> threading.Lock:
+        with self._locks_guard:
+            return self._locks.setdefault(node, threading.Lock())
+
+    def _ask_locked(self, node: int, payload: bytes):
+        for attempt in (0, 1):
+            cached = self._open.get(node)
+            sock = cached if cached is not None else self._connect(node)
+            try:
+                send(sock, payload)
+                reply = json.loads(receive(sock).decode("utf-8"))
+            except (OSError, ValueError):
+                self._drop(node)
+                if attempt or cached is None:
+                    # Already retried, or this WAS a fresh connection. A second
+                    # failure is the peer being gone rather than the socket
+                    # being stale, and retrying past here turns a departure into
+                    # a hang.
+                    raise
+                self.reconnects += 1
+                continue
+            self.sent += 1
+            return reply
+
+    def _drop(self, node: int) -> None:
+        sock = self._open.pop(node, None)
+        if sock is not None:
+            try:
+                sock.close()
+            except OSError:
+                pass
+
+    def close(self) -> None:
+        for node in list(self._open):
+            self._drop(node)
 
 
 class BucketPeer:
@@ -110,6 +201,13 @@ class BucketPeer:
                  host: str = "127.0.0.1", port: int = 0) -> None:
         self.service = service
         self.addresses = dict(addresses)
+        # SHARES the dict rather than copying it. Every peer has to exist before
+        # any of their ports are known, so callers fill this in AFTER
+        # construction -- and a Link holding a snapshot taken at construction
+        # would raise KeyError on the first message to a peer added later, which
+        # is what happened.
+        self.link = Link({})
+        self.link.addresses = self.addresses
         self.forwarded = 0
         self.fetched = 0
         self.failures: list[tuple[int, tuple, str]] = []
@@ -148,6 +246,7 @@ class BucketPeer:
         rather than requested.
         """
         self._running = False
+        self.link.close()
         if self._thread is not None:
             self._thread.join(timeout=3.0)
         try:
@@ -167,11 +266,24 @@ class BucketPeer:
                              daemon=True).start()
 
     def _one(self, connection: socket.socket) -> None:
+        """Serve every message on one connection until the caller closes it.
+
+        **The loop is what makes `Link` worth having.** A held connection that
+        answered once would still pay a setup round trip per message, and the
+        client-side cache would buy nothing.
+        """
         with connection:
+            connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            while self._running and self._exchange(connection):
+                pass
+
+    def _exchange(self, connection: socket.socket) -> bool:
+        """One request and one reply. False when the caller has gone away."""
+        if True:
             try:
                 message = tuple(json.loads(receive(connection).decode("utf-8")))
-            except (ConnectionError, ValueError):
-                return
+            except (ConnectionError, ValueError, OSError):
+                return False
             # The service is not thread-safe and does not need to be: one lock
             # around the whole handling keeps a flush's outbox from interleaving
             # with another connection's. Contention is irrelevant at the message
@@ -184,7 +296,7 @@ class BucketPeer:
                 # ranking into each other would deadlock.
                 reply = self._rank(message)
                 send(connection, json.dumps(reply).encode("utf-8"))
-                return
+                return True
             with self._lock:
                 try:
                     reply = self.service.handle(message)
@@ -207,6 +319,7 @@ class BucketPeer:
             for destination, forward in outbox:
                 self._forward(destination, forward)
             send(connection, json.dumps(reply).encode("utf-8"))
+            return True
 
     def _rank(self, message: tuple):
         """`("RANK", surface, k)` — rank at the owner, fetching what it lacks.
@@ -234,9 +347,8 @@ class BucketPeer:
                 with self._lock:
                     seen[other] = self.service.handle(("SEEN", other))
                 continue
-            host, port = self.addresses[owner]
             try:
-                seen[other] = ask(host, port, ("SEEN", other))
+                seen[other] = self.link.ask(owner, ("SEEN", other))
             except OSError as unreachable:
                 # A departed peer. Leaving the marginal ABSENT makes
                 # `_Borrowed.seen` raise and the candidate is dropped, which is
@@ -266,9 +378,8 @@ class BucketPeer:
         signal rather than as a fault. So the only useful thing a thread can do
         is leave evidence, and `failures` is that evidence.
         """
-        host, port = self.addresses[destination]
         try:
-            ask(host, port, message)
+            self.link.ask(destination, message)
         except OSError as unreachable:
             self.failures.append((destination, message, str(unreachable)))
             return

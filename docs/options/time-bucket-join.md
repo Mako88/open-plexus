@@ -388,3 +388,25 @@ terms are known: one connection per message, and one `SEEN` per candidate partne
 `g33-03` measured as scaling with fan-out. **That is worse than the 161 ms a round John
 accepted in `g24-01`**, so the grounding read path is not yet inside that ruling, and the
 record names the two changes that would bring it there.
+
+### Holding the connections is worth 2x on an impaired link — `g35-04`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g35-04-what-holding-the-connections-is-worth.txt
+            script  testbed/run.py --mode bucket --walk, driver tools/bucket_drive.py
+            task    occasions, 6 concepts, 60 occasions, 19 surfaces
+            model   bucket_peer.Link, one held socket per destination
+            knobs   clean or tc netem delay 40ms jitter 10ms; 4 nodes
+            scale   Docker 29.6.1
+
+A grounded question falls from **10.19 s** to **5.09 s** impaired, and the load phase from
+**449.79 s** to **226.21 s** — a ratio of 2.00 and 1.99, which is what removing one of two
+round trips per message should give. Clean runs improve by more, 3.5x and 3.0x, because
+setup is a larger share of a cheap message.
+
+Every identity check still passes, before and after. `driver_reconnects` is 0, so the
+stale-socket retry that reuse made necessary has unit tests and no field evidence.
+
+**5.09 s is still outside the latency John accepted** in `g24-01`, and the remaining cost
+is the message COUNT rather than per-message overhead — which `g35-03`'s P1 refutation
+clause explicitly did NOT fire on, so attacking the count is still available and untried.

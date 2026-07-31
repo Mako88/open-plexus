@@ -64,6 +64,54 @@ concept, against 0.5522 at 2 (`g35-02`). Replication is an improvement, not a pr
 
 ---
 
+## THE KILL LIST — what could still stop this
+
+> **Restored after being dropped.** The rewrite of this file for the grounding work left it
+> out, which was a mistake: it is the only standing summary of what would kill the project,
+> and a handoff without it hands over the work and not the risk.
+
+     ✅  2  representations learned LOCALLY   18 graphs, beats counting, no invariant
+     ✅  6  independent nodes agree           TRANSPORT half; grounding store now agrees
+                                              EXACTLY across containers. Quantiser half ⬜
+     ✅  7  decide what to say, and decline   exact, on the case the gate can see
+
+     🔀 10  margin survives scale             refutation was on the wrong arrangement
+
+     ⏸  4  multi-hop walk over real internet MEASURED again, and it got WORSE: a
+                                              grounded question is 5.09 s impaired
+
+     ⬜  1  relational objective buys reasoning  blocked: no instrument with a wide band
+     ⬜  3  conventional system already wins     external STIMULI now run; no human opponent
+     ⬜  5  learn forever                        the cheap route is refuted
+     ⬜  8  adjudicate contradictions            untouched
+     ⬜  9  survive hostile participants         untouched
+     ⬜ 11  training traffic fits broadband      writes cheap; READS scale with fan-out
+     ⬜ 12  survives a second modality           the WALK bridges; no second modality yet
+
+**What moved today, and none of it is a new checkmark.**
+
+**#6** gained its hardest evidence: the grounding store agrees with one process **exactly**
+in real containers, clean and at 40 ms with jitter, on both the write and read paths
+(`g35-01`, `g35-03`), and it runs in CI. The quantiser half is untouched.
+
+**#4 got worse, not better.** `g24-01` measured 161 ms a round and John accepted it. A
+grounded question over containers costs **5.09 s** with held connections (`g35-04`), which
+is outside that ruling. The two dominant terms are named and one is now fixed.
+
+**#11 has real numbers for the first time on this path.** Writes are cheap and flat — 38.4
+row updates per occasion. **Reads are the problem**: one peer message per candidate
+partner, scaling with FAN-OUT rather than with `k` (`g33-03`).
+
+**#12 is closer than it was and is not passed.** `g33-02` showed the walk bridges surfaces
+that never co-occur, and `g35-02` found multimodality is the redundancy under churn. But
+there is still no second modality — those are symbol streams, and G7 needs a real one.
+
+**#3 got its first external instrument for grounding** (`g34-01`, 26 of 29 published
+conditions recovered exactly) — but it is external STIMULI, not a benchmark. **No
+conventional system has been run against this.**
+
+---
+
 ## WHAT IS BUILT, and where the boundaries are
 
     openplexus/tasks/occasions.py   the instrument: a stream with known ground truth

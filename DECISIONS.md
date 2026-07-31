@@ -93,7 +93,7 @@ history lives in `docs/archive/notes/` and the archived log.
                    went against it, so it carries no revival condition — what it
                    needs is a reason to pick it back up
 
-**CENSUS: 30 chosen, 30 refuted, 16 untried, 11 both, 1 paused.** Checked against the body,
+**CENSUS: 30 chosen, 30 refuted, 16 untried, 12 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -116,6 +116,7 @@ Nothing non-text is built.
 
 - ✅ **A concept has no global id — it is an equivalence class reached by walking** — John, 2026-07-31; dissolves the learned-identity vs deterministic-ownership conflict. *no measurement*. → [record](docs/options/identity-without-a-global-id.md)
 - ⬜ **Rounded timestamp as the cross-node co-occurrence key** — transient join; the durable accumulator is `owner(surface id)`. John, 2026-07-31. → [record](docs/options/time-bucket-join.md)
+- 🔀 **The co-occurrence statistic: raw count vs chance-corrected** — counting is beaten by anything merely COMMON, designed or Zipfian; correcting costs sample efficiency where neither applies. `g32-01`, `g32-02`. → [record](docs/options/co-occurrence-statistic.md)
 
 **Open — codebook agreement across nodes.** SPLIT (one thing → two ids) only exists
 distributed and is unsolved; `g27-01` showed divergence is silent one layer down and the

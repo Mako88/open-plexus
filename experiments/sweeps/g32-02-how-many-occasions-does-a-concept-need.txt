@@ -114,14 +114,153 @@ occasions. This is 2 arms x (7 lengths + 2 skews) x 3 seeds = 54 streams, plus a
 pooled re-run of the uniform set per arm, so about 96 streams, and the longest is
 16,000 occasions. Estimate **under two minutes**, same order as g32-01. Local.
 
-Recorded after the run: PENDING.
+Recorded after the run: **14.0s wall**, one process. Estimate of under two
+minutes was right in kind and 8x conservative, the same ratio as g32-01.
 
 
 RESULTS
 -------
-PENDING.
+Status: RUN, local, 2026-07-31, 14.0s. Predictions committed at `139de0a` before
+the script was executed.
+
+ANSWER: **a concept needs about 16 occasions, which is far fewer than predicted.
+Skew is NOT only starvation. And the reason is that a common enough concept IS a
+persistent distractor for every rare one — so g32-01's finding and this one are
+the same failure, which is why one fix handles both.**
+
+  UNIFORM, no distractor, whole-stream f1. Floor is 0.5.
+
+    occasions   each     count     ppmi
+          256    4.0    0.7468   0.6136
+          512    8.0    0.8863   0.8678
+         1024   16.0    0.9950   0.9965
+         2000   31.2    1.0000   1.0000
+         4000+  62.5+   1.0000   1.0000
+
+  PER CONCEPT, by that concept's own subject count. Uniform is pooled over all
+  seven lengths and is the curve the skewed rows are read against.
+
+    subject count      uniform  zipf 1.0  zipf 2.0        (count)
+    under 2             0.4877         -    0.5000
+    under 4             0.6248         -    0.5000
+    under 8             0.8322         -    0.5000
+    under 16            0.9714         -    0.5000
+    under 32            0.9984    0.5056    0.5000
+    under 64            1.0000    0.7577    0.5000
+    under 128           1.0000    0.9925    0.5444
+    under 256           1.0000    1.0000    1.0000
+
+    subject count      uniform  zipf 1.0  zipf 2.0        (ppmi)
+    under 2             0.3991         -    0.3831
+    under 4             0.5439         -    0.3760
+    under 8             0.7332         -    0.4762
+    under 16            0.9503         -    0.7651
+    under 32            0.9984    1.0000    0.9434
+    under 64            1.0000    1.0000    1.0000
+    under 128+          1.0000    1.0000    1.0000
+
+  THE MECHANISM, probed directly at zipf 2.0, seed 0:
+
+    60 of 60 surfaces of the twenty rarest concepts have a surface of a
+    DIFFERENT concept as their best raw-count partner.
+
+    concept 45 was the subject 0 times in 8,000 occasions. Its surface 135 was
+    nonetheless present on 129 of them, entirely as noise in other concepts'
+    occasions. Its strongest partners:
+
+        surface   2  (concept 0, subject 4,992x)   met 62x
+        surface   0  (concept 0, subject 4,992x)   met 57x
+        surface   1  (concept 0, subject 4,992x)   met 57x
+        its OWN two partners                       met  1x each
 
 
 SCORECARD
 ---------
-PENDING.
+  P1  HELD. The uniform curve rises 0.7468 -> 1.0000 across 4 to 31 occasions
+            per concept and saturates inside the grid. The bottom of the range
+            was probed and the arm is moving there, so a threshold can be read.
+
+  P2  REFUTED, and this was the probe's reason for existing. Skew is NOT only
+            starvation. At MATCHED subject count, skewed concepts score far
+            below uniform ones: under `count` at zipf 1.0, concepts seen 16-31
+            times score 0.5056 against uniform's 0.9984 — a gap of 0.49, at
+            identical rarity. At zipf 2.0 `count` sits at the 0.5 floor out to
+            127 occasions where uniform is perfect from 32.
+
+            **But the magnitude is completely different between arms, and that
+            is the useful half.** `ppmi` is untouched by zipf 1.0 — 1.0000 in
+            every bucket including the rarest. At zipf 2.0 it carries a
+            mid-range penalty of 0.17 to 0.26 that closes by 32-64 occasions.
+            So normalisation does not merely resist a designed distractor, it
+            resists frequency skew as well.
+
+  P3  REFUTED, AND BACKWARDS, which is the more interesting direction. `ppmi`
+            was predicted to need FEWER occasions than `count`. On uniform
+            streams it needs MORE: 0.5439 against 0.6248 at 2-3 occasions,
+            0.7332 against 0.8322 at 4-7, 0.9503 against 0.9714 at 8-15. PMI is
+            a ratio of two estimates, so it is higher-variance where counts are
+            small, and chance correction costs sample efficiency rather than
+            buying it.
+
+            **So there is a crossover and neither statistic dominates.** Raw
+            counting wins in the uniform, data-poor, distractor-free regime;
+            normalisation wins the moment there is a distractor or any skew.
+            That is `DECISIONS.md` 14c's shape — two options kept behind a
+            switch — and not a winner to be chosen.
+
+  P4  REFUTED, and the mechanism is far more sample-efficient than predicted.
+            Concepts seen only 4-7 times reach 0.8322 under counting, well above
+            the 0.5 floor rather than at it. The threshold for near-perfect
+            recovery is about **16 occasions**, and useful recovery starts
+            around 8.
+
+            One line worth keeping: at a single occasion `ppmi` scores 0.3991,
+            BELOW the 0.5 floor. With one observation it does not merely fail to
+            group, it groups wrongly.
+
+
+THE UNIFICATION, WHICH IS THE FINDING
+--------------------------------------
+g32-01 built a distractor by hand — a surface present on every occasion — and
+found counting ranked it above every true partner. This probe did not build one,
+and counting failed anyway at zipf 2.0.
+
+The direct probe says why: **at high skew the commonest concept is present often
+enough to BE that distractor.** Concept 0 is the subject of 62% of occasions, so
+its surfaces turn up beside everything, and for a concept seen a handful of times
+they turn up beside it far more often than its own partners do. It is not a hub
+anyone designed. It is what a Zipfian world produces on its own.
+
+So the two findings are one: **raw co-occurrence counting is defeated by anything
+that is simply common, whether it was put there deliberately or arose from the
+frequency distribution.** Dividing by the neighbour's own frequency is the fix in
+both cases and it is the same fix — which is why one hop repairs both, and why
+this is a property of the statistic rather than two separate problems.
+
+**And the consequence for the project is a real constraint, not a tuning note.**
+Every world this mechanism will actually meet is Zipfian. The tail is not an edge
+case, it is most of the concepts. Two things follow and only the first is
+comfortable:
+
+  - Normalisation is MANDATORY, not an optimisation. Raw counting at zipf 2.0
+    recovers nothing at all below 128 occasions.
+  - Normalisation is not sufficient at zipf 2.0 either. `ppmi` still loses 0.17
+    to 0.26 in the mid range, so the tail costs something even with the fix.
+
+
+WHAT THIS DOES NOT SETTLE, STATED SO IT IS NOT OVERREAD
+--------------------------------------------------------
+**The bucket comparison confounds subject count with stream length.** Uniform
+concepts with few subject occasions come from SHORT streams (256, 512), so they
+have little exposure to noise. Skewed concepts with the same subject count come
+from an 8,000-occasion stream, so they have a great deal. The two are not matched
+on that axis and the comparison alone cannot separate skew from exposure.
+
+**The direct probe is what carries the conclusion**, and it is not subject to
+that: it shows the specific partners a rare concept acquires, and they are the
+commonest concept's surfaces. In a uniform stream of any length no concept can be
+met 57 times by a stranger, because no concept is present that often. The clean
+version would be one rare concept in an otherwise uniform world at fixed stream
+length, and that is the control to run if this conclusion is ever load-bearing.
+
+**Nothing here is distributed**, and none of it says anything about C1.

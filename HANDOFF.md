@@ -67,15 +67,28 @@ Why it is a strong fit, and this is the assessment rather than a measurement:
 - **It has published models to compare against**, associative and hypothesis-testing.
 - **Referential ambiguity is the whole point of it**, which is exactly G6's falsifier.
 
-**What is NOT verified and must be before it is trusted** (rule 1 — this was read as a
-summary and a README, not run):
+**VERIFIED 2026-07-31, AND THE REPOSITORY ABOVE IS THE WRONG ONE.** Read from the files
+via the GitHub API, not from a README.
 
-- The data format has not been opened. `.RData` needs converting; the task layer takes no
-  dependencies, so the conversion is a one-off, not an import.
-- **There is no licence file.** Downloading and using locally is inside John's standing
-  permission; committing the data into this repo is not obviously safe. Check before
-  vendoring — `.gitignore` already covers `data/*/`.
-- Whether the 44 conditions are all word-object, or include variants that do not fit.
+- **`kachergis/word_learning_models` is a 2013 personal collection, not the bakeoff.**
+  About 20 conditions, **no LICENCE file** (only a request to cite the author's
+  dissertation), and **no human-accuracy data** — a handful of figures quoted in prose in
+  the README and nothing else.
+- **The bakeoff data is in [`kachergis/XSLmodels`](https://github.com/kachergis/XSLmodels),
+  which IS licensed** — GPL — and holds `data-raw/XSL-dataset-fields.csv`: **63 conditions
+  as a PLAIN CSV**, with per-condition `accuracy`, `sd_accuracy`, `nsubj`, `citation`,
+  `age_years` and `adult_data`. Beside it, `data-raw/orders/` has **66 plain-text trial
+  orderings**, one line per trial. Datasets from SmithYu2008, Suanda2014, Medina2013,
+  Benitez2020, VlachDeBrock, YuZhongFricker and KoehneTrueswellGleitman.
+- **So the `.RData` problem is largely gone.** Human results are CSV and orderings are
+  `.txt`; both are readable by the dependency-free task layer. Two `.RData` files remain
+  and hold the asymmetric conditions only.
+- `kachergis/XSL-datasets` is an **unmodified Quarto template** — still Palmer Penguins,
+  no XSL data in it. Do not go there.
+- GPL matters for vendoring, not for use: `data/*/` is gitignored, so this needs a fetcher
+  like `tools/fetch_clutrr.py`, not a commit of the data.
+- Still unverified: whether the CSV's conditions line up with the paper's 44, and whether
+  the orderings' numbering scheme matches the CSV's `order_filename`.
 - It is words-and-objects, **not literally image and audio**, so it tests the mechanism's
   shape rather than G7's cross-modality. G6 first, G7 later.
 

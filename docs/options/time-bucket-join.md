@@ -172,3 +172,29 @@ the memory side of the project on the same day.
 
 **This needs no perception layer.** It is a symbol stream with a designed co-occurrence
 structure, which makes it the cheapest available test of the whole mechanism.
+
+### The falsifier was run, and the distractor IS pruned — but not by counting — `g32-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g32-01-can-counting-tell-the-distractor.txt
+            script  experiments/g32_01_can_counting_tell_the_distractor.py
+            task    occasions, 64 concepts, 3 surfaces, presence 0.7, noise 3
+            model   none -- counting only; NO bucket and NO join were built
+            knobs   statistic, zipf, distractors, shuffled control; k 2; 3 seeds
+            scale   8,000 occasions per stream
+
+A distractor present on every occasion costs raw counting **0.3044** of f1 and costs a
+chance-corrected statistic **0.0000**. So the distractor is pruned, the answer is not
+*"counting is insufficient and the missing ingredient is intervention"*, and the
+intervention hypothesis is neither supported nor refuted — it was not tested.
+
+**What was tested is the accumulator, not the join.** No bucket exists; the whole stream
+was observed in one process. That is deliberate: distribution cannot add information to a
+count, so a failure here would have settled the design, while a pass settles nothing about
+C1. Details and the asymmetry are in `openplexus/grounding.py`'s docstring.
+
+**And the falsifier's own metric was the wrong one.** `captured` — the share of surfaces
+whose class contains the distractor — moved by **0.0174** where f1 moved by **0.3044**,
+because mutuality caps a distractor's degree and its harm is *displacement* rather than
+joining. Recorded in [co-occurrence-statistic.md](co-occurrence-statistic.md), which holds
+every figure from both runs.

@@ -116,3 +116,34 @@ This is the same falsifier [time-bucket-join.md](time-bucket-join.md) registers,
 other end: that record asks whether the distractor is ever *pruned*, this one asks whether
 the walk can *tell them apart*. Both are answerable on a symbol stream with no perception
 layer, which is what makes them the cheap first test.
+
+### The walk was built and it recovers the classes — `g32-01`, `g32-02`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g32-01-can-counting-tell-the-distractor.txt
+            script  experiments/g32_01_can_counting_tell_the_distractor.py
+            task    occasions, 64 concepts, 3 surfaces, presence 0.7, noise 3
+            model   none -- a mutual top-k graph over counts; no store, no vectors
+            knobs   statistic, zipf, distractors, shuffled control; k 2; 3 seeds
+            scale   8,000 occasions per stream
+
+`equivalence_classes` is the walk this record describes: start anywhere, follow links,
+and the connected component you arrive at is the class. It reaches **1.0000** f1 — every
+concept recovered exactly — under three of four statistics with a distractor present, and
+under all four with none.
+
+**`k` was SUPPLIED**, so the walk was told how large a class is. That is generous, and it
+makes the pass a weak confirmation while a failure would have been strong. Finding the size
+instead is *bound the enumeration by the biggest similarity gap* in `DECISIONS.md` §6 and
+is untried here.
+
+**The cost this record predicted is real and now has a number.** A concept needs about
+**16** occasions before the walk recovers it, and a concept the stream shows a handful of
+times is not reachable by any statistic over counts —
+[co-occurrence-statistic.md](co-occurrence-statistic.md) holds the curve.
+
+**And the load this record warned about — a percept that co-occurs with everything —
+arrives without anyone building one.** At zipf 2.0 the commonest concept is the subject of
+most occasions, so its surfaces become the best raw-count partner of **60 of 60** surfaces
+of the twenty rarest concepts. The busiest-peer pressure this record names is therefore not
+hypothetical, and it is the same object as the distractor.

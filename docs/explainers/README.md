@@ -50,6 +50,7 @@ explainer, and saying so is the most useful thing you can do.
 | [31](31-what-the-filter-turned-out-to-be.md) | What the filter turned out to be |
 | [32](32-the-difference-between-seen-again-and-wanted-again.md) | The difference between "seen again" and "wanted again" |
 | [33](33-how-two-machines-notice-the-same-moment.md) | How two machines notice the same moment |
+| [34](34-the-word-the-ruins-everything.md) | The word "the" ruins everything |
 | [028](028-four-corrections-and-a-detour.md) | Four corrections in a row, and the detour they caused |
 | [029](029-giving-every-machine-its-own-scorer.md) | Giving every machine its own scorer |
 | [030](030-the-middle-person-was-not-needed.md) | The middle person wasn't needed |

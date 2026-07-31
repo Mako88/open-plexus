@@ -74,6 +74,13 @@ ALLOWED = (
     "Catch a commit message the shell ate",
     "trim the newest entries",
     "the retrieval realiser",
+    # DAMAGED, and this one the checker found LIVE rather than in the calibration
+    # sweep. `6a50139f` reads "The  metric does NOT transfer" -- `` `alone` `` was
+    # eaten by a double-quoted `-m`, four commits after this file was written to
+    # stop exactly that. It is already pushed, so it is recorded rather than fixed.
+    # **The reasoning survived**: g5_01_scaling.py carries it at lines 72 and
+    # 103-128, which is the durable home and is why this cost nothing.
+    "g29-01: concept-partitioning arm built",
 )
 
 

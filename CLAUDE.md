@@ -377,6 +377,14 @@ record and the only symptom is an error about something you never ran.
 > instruction — prefer a rule that makes the mistake structurally impossible — with
 > the evidence that the warnings were not working being the warnings themselves.
 >
+> **And it caught a SEVENTH four commits after it was written.** `6a50139f` reads
+> "The  metric does NOT transfer" — `` `alone` `` eaten by a double-quoted `-m`, on
+> master, in the same session that added the checker. So the check is doing the job
+> the five warnings above it could not, and the drift back to `-m` happens even with
+> the rule freshly in mind. **The reasoning survived** because it also lives in
+> `experiments/g5_01_scaling.py`, which is the general mitigation: a commit message
+> is the only home for nothing.
+
 > **It is a net, not a wall, and `-F` stays.** A word eaten at the end of a line
 > leaves no double space, and a `printf` truncation removes everything after the `%`
 > and leaves no signature at all — which is how commit `6d72e11` lost 2,000 of 2,500

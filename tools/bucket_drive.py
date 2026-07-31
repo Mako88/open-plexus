@@ -44,7 +44,8 @@ if str(ROOT) not in sys.path:
 
 from openplexus.bucket_peer import ask  # noqa: E402
 from openplexus.buckets import BucketConfig, observations  # noqa: E402
-from openplexus.grounding import CoOccurrence  # noqa: E402
+from openplexus.grounding import (STATISTICS,  # noqa: E402
+                                  CoOccurrence, equivalence_classes)
 from openplexus.ownership import Ring  # noqa: E402
 from openplexus.tasks.occasions import OccasionConfig, generate  # noqa: E402
 
@@ -58,6 +59,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--concepts", type=int, default=6)
     parser.add_argument("--occasions", type=int, default=60)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--walk", action="store_true",
+                        help="after loading, WALK from every surface and time "
+                             "it. The read path, which the write path does not "
+                             "exercise")
     args = parser.parse_args(argv)
 
     addresses = []
@@ -117,6 +122,57 @@ def main(argv: list[str] | None = None) -> int:
             mismatches.append({"surface": surface, "held": held,
                                "expected": single.seen(surface)})
 
+    walk = None
+    if args.walk:
+        # THE READ PATH. Every `RANK` is answered AT the owner, which fetches
+        # `count(y)` from each candidate's owner itself -- so the row never
+        # travels and the driver never gathers. Mutuality needs the other end's
+        # ranking too, which is a second `RANK` and a second set of fetches.
+        began = time.time()
+        asked, reached = 0, []
+        recovered: dict[int, frozenset[int]] = {}
+        for surface in single.surfaces():
+            ranked = {}
+
+            def rank_once(node: int):
+                nonlocal asked
+                if node not in ranked:
+                    asked += 1
+                    got = ask(*at(node), ("RANK", node, None))
+                    ranked[node] = got if isinstance(got, list) else []
+                return ranked[node]
+
+            found, frontier = {surface}, [surface]
+            while frontier:
+                here = frontier.pop()
+                for other in rank_once(here):
+                    if here not in rank_once(other):
+                        continue
+                    if other not in found:
+                        found.add(other)
+                        frontier.append(other)
+            reached.append(len(found))
+            recovered[surface] = frozenset(found)
+
+        # THE READ PATH GETS THE SAME IDENTITY CHECK AS THE WRITE PATH. Timing a
+        # walk that returns the wrong classes would be timing the harness. The
+        # single-process comparison uses the same statistic and the same derived
+        # bound, so a difference is the network and nothing else.
+        expected = equivalence_classes(single, STATISTICS["conditional"], None)
+        differing = [s for s in single.surfaces()
+                     if recovered.get(s) != expected.get(s)]
+        walk = {
+            "walks": len(reached),
+            "rank_messages": asked,
+            "rank_messages_per_walk": round(asked / max(len(reached), 1), 1),
+            "mean_class_size": round(sum(reached) / max(len(reached), 1), 2),
+            "classes_differing_from_one_process": len(differing),
+            "walk_agrees_with_one_process": not differing,
+            "seconds": round(time.time() - began, 2),
+        }
+        print(f"walked from {len(reached)} surfaces", file=sys.stderr,
+              flush=True)
+
     result = {
         # WRITTEN FROM WHAT ACTUALLY RAN, not from what was asked for. Rule 11b:
         # only the data says what happened, and a run identified by its
@@ -132,6 +188,7 @@ def main(argv: list[str] | None = None) -> int:
         "detail": mismatches[:10],
         "agrees_with_one_process": not mismatches,
         "seconds": round(time.time() - started, 2),
+        "walk": walk,
     }
     print(json.dumps(result, indent=1))
     return 0 if not mismatches else 1

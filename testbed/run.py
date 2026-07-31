@@ -182,7 +182,8 @@ def bucket_mode(args) -> int:
                  "--cap-add=NET_ADMIN", IMAGE, "sh", "-c",
                  f"{tc}python tools/bucket_drive.py --peers {peers} "
                  f"--width {args.bucket_width} --concepts {args.concepts} "
-                 f"--occasions {args.occasions}"])
+                 f"--occasions {args.occasions}"
+                 + (" --walk" if args.walk else "")])
     print(asked.stdout, flush=True)
     print(asked.stderr, file=sys.stderr)
     for name in names:
@@ -221,6 +222,8 @@ def main() -> int:
                         help="bucket mode only: how many concepts the stream has")
     parser.add_argument("--occasions", type=int, default=60,
                         help="bucket mode only: how many moments to drive")
+    parser.add_argument("--walk", action="store_true",
+                        help="bucket mode only: also time the READ path")
     parser.add_argument("--mode", choices=("slice", "peer", "bucket"),
                         default="slice",
                         help="slice: the driver-based DIMENSION path, which every "

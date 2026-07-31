@@ -20,6 +20,17 @@ bandwidth-bound.
 returns a table, for the reason `bucket_service` gives: moving the ranking to the
 asker is the gather amended C1 forbids, and it would be the easier design.
 
+**`RANK` is handled HERE rather than in the service, and that placement is the
+point.** Ranking needs `count(y)` from every candidate's owner, so it needs a
+network — and `bucket_service` is deliberately transport-free, taking those
+marginals as an argument. So this peer collects them with `SEEN` messages and
+hands the service a dict. The decision stays in the service; only the fetching
+lives here.
+
+A caller therefore asks `RANK` and gets **a short list of surface ids**, never a
+row. The peer pays one `SEEN` per candidate on the caller's behalf, which is
+`g33-03`'s measured cost arriving on a real link.
+
 ## One connection per message, stated as a cost rather than hidden
 
 Every message opens a socket, sends, reads a reply and closes. That is one extra
@@ -85,6 +96,9 @@ class BucketPeer:
         forwarded: Messages this peer has pushed to other peers, successfully.
             The write-side traffic count, where `bucket_service` counts the read
             side.
+        fetched: `SEEN` messages this peer sent to OTHERS while ranking, on a
+            caller's behalf. The read-side traffic, where `forwarded` counts the
+            write side.
         failures: `(destination, message, reason)` for every push that could not
             be delivered. **Read this before trusting any count taken from a
             run** — a non-empty list means writes were lost, and lost writes look
@@ -97,6 +111,7 @@ class BucketPeer:
         self.service = service
         self.addresses = dict(addresses)
         self.forwarded = 0
+        self.fetched = 0
         self.failures: list[tuple[int, tuple, str]] = []
         self._lock = threading.Lock()
         self._listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -162,6 +177,14 @@ class BucketPeer:
             # with another connection's. Contention is irrelevant at the message
             # rates this is for, and a lock-free version would be a second
             # concurrency design nobody asked for.
+            if message and message[0] == "RANK":
+                # Not a service message: it needs the network, and the service
+                # has none. Handled outside the lock because it BLOCKS on peers,
+                # and holding the lock across a remote call is how two peers
+                # ranking into each other would deadlock.
+                reply = self._rank(message)
+                send(connection, json.dumps(reply).encode("utf-8"))
+                return
             with self._lock:
                 try:
                     reply = self.service.handle(message)
@@ -184,6 +207,49 @@ class BucketPeer:
             for destination, forward in outbox:
                 self._forward(destination, forward)
             send(connection, json.dumps(reply).encode("utf-8"))
+
+    def _rank(self, message: tuple):
+        """`("RANK", surface, k)` — rank at the owner, fetching what it lacks.
+
+        Returns the chosen partner ids, or a `refused` object if this node does
+        not own the surface. `k` may be `null`, which selects the derived
+        per-surface bound `g33-04` measured as the best arm.
+
+        **Every `SEEN` this sends is charged to `fetched`.** That is the read
+        cost `g33-03` counted in one process, arriving on a real link, and a
+        version that cached marginals across queries would report a smaller
+        number for a different mechanism — so it does not.
+        """
+        _, surface, k = message
+        try:
+            with self._lock:
+                candidates = self.service.candidates(surface)
+        except ValueError as refused:
+            return {"refused": str(refused)}
+
+        seen: dict[int, int] = {}
+        for other in candidates:
+            owner = self.service.owner(other)
+            if owner == self.service.node:
+                with self._lock:
+                    seen[other] = self.service.handle(("SEEN", other))
+                continue
+            host, port = self.addresses[owner]
+            try:
+                seen[other] = ask(host, port, ("SEEN", other))
+            except OSError as unreachable:
+                # A departed peer. Leaving the marginal ABSENT makes
+                # `_Borrowed.seen` raise and the candidate is dropped, which is
+                # `Federation`'s graceful-degradation rule arriving over a wire.
+                self.failures.append((owner, ("SEEN", other), str(unreachable)))
+                continue
+            self.fetched += 1
+
+        from openplexus.grounding import STATISTICS
+        with self._lock:
+            chosen = self.service.rank(surface, STATISTICS["conditional"], k,
+                                       seen)
+        return chosen
 
     def _forward(self, destination: int, message: tuple) -> None:
         """Push one emitted message to the node that owns its key.

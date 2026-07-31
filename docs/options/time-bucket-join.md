@@ -23,10 +23,9 @@
   runs it in containers under `tc netem`, with `tools/bucket_drive.py` driving and
   `.github/workflows/testbed-bucket-identity.yml` re-running it.
 
-**What does NOT exist:** the READ path across containers. The container run drives writes
-and reads marginals back; it does not walk. So `g33-03`'s cost of one message per
-candidate partner is still an in-process count. Churn is untested here too — no container
-is killed mid-run.
+**What does NOT exist:** container churn — no container is killed mid-run, though
+`g35-02` measures what a departure costs in process. Connection reuse: every message opens
+its own socket, which `bucket_peer.py` names as a deliberate simplification.
 
 ---
 
@@ -363,3 +362,29 @@ is where it would pay.
 **The f1 column cannot be compared across that axis**, because the metric's floor moves
 with the class size — 0.6667, 0.5000, 0.3333 for a concept recovered alone. The first run
 read it as flat and could not settle anything; the floor-free metric is what settled it.
+
+### The READ path across containers agrees exactly, and costs 10.2s a question — `g35-03`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g35-03-what-a-grounded-question-costs-on-a-real-link.txt
+            script  testbed/run.py --mode bucket --walk, driver tools/bucket_drive.py
+            task    occasions, 6 or 24 concepts, 19 or 73 surfaces
+            model   bucket_service + bucket_peer, RANK answered at the owner, derived bound
+            knobs   clean or tc netem delay 40ms jitter 10ms; 4 nodes
+            scale   Docker 29.6.1
+
+`g35-01` sent the WRITES across containers and never asked a question. This walks.
+
+**`walk_agrees_with_one_process: true` in all three cells** — 73 surfaces clean, 19 clean,
+19 at 40 ms with 10 ms jitter — so ranking at the owner, fetching marginals across the
+network and checking mutuality from both ends returns exactly what one process returns.
+
+A `RANK` is answered AT the owner, which fetches `count(y)` from each candidate's owner
+itself and returns a short list of ids. **The row never travels and the driver never
+gathers**, which is why there is no verb that returns a table.
+
+**A grounded question costs 0.072s clean and 10.19s impaired**, about 142x. Both dominant
+terms are known: one connection per message, and one `SEEN` per candidate partner which
+`g33-03` measured as scaling with fan-out. **That is worse than the 161 ms a round John
+accepted in `g24-01`**, so the grounding read path is not yet inside that ruling, and the
+record names the two changes that would bring it there.

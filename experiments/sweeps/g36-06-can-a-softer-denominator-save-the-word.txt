@@ -1,0 +1,141 @@
+Can a softer denominator save the word without letting the distractor back in?
+===============================================================================
+
+Script: experiments/g36_06_can_a_softer_denominator_save_the_word.py
+Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+
+
+IN PLAIN TERMS
+--------------
+When the machine decides which things belong together, it does not just count how
+often two things turn up at the same time. It divides that count by how common
+the second thing is on its own — otherwise something that is *always* around wins
+every comparison by being always around.
+
+That correction was necessary and it was measured: without it, a permanent piece
+of background noise beats every real connection.
+
+But it has a cost that only showed up once there were three kinds of input.
+There are ten words and a hundred codes for pictures and sounds, so **each word
+turns up about fourteen times as often as any single picture code** — not because
+it matters less, but because ten things are sharing the work of a hundred. The
+correction reads that commonness as unimportance and pushes the word out.
+
+John spotted this and asked the obvious question: **can we turn the correction
+down a bit?**
+
+So this turns it into a dial. All the way up is what we have now. All the way
+down is plain counting, which we already know fails. The question is whether
+anywhere in between keeps the word *and* keeps the background noise out.
+
+**It is entirely possible the answer is no.** The two failures may sit at
+opposite ends with no gap between them, and if so that is worth knowing plainly,
+because it says the fix has to be something other than tuning this number.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    word          share of image codes whose OWN word survives the derived
+                  bound. `g36-05`'s quantity, and the thing the dial must move
+    distractor    share of image codes admitting the ever-present distractor.
+                  `g32-01`'s falsifier, and the thing it must not break
+    link_img      the end-to-end consequence, comparable with `g36-04`
+    cross         the cross-sensory bridge, comparable with `g36-04`
+    crossed       audio codes reached per image code -- the companion `cross`
+                  needs, since 0.0 from reaching nothing and 0.0 from reaching
+                  only wrong things are different answers
+    classes       mean recovered class size. The collapse guard, and it matters
+                  MORE here than usual: a low alpha is expected to merge things,
+                  and a merged graph scores well on every recall-shaped column
+
+**Both failure modes are watched in the same run**, which is the design point. A
+sweep that only watched `word` would report alpha 0 as a triumph while the
+distractor walked back in, and `g32-01`'s calibration is exactly that shape --
+`captured` would have called a distractor a rounding error while it destroyed a
+third of the recovery.
+
+
+MEASURED ON
+-----------
+Local, one process. Identical construction to `g36-04` -- the stream builder is
+IMPORTED from it, so the arms cannot drift from the run this is explaining.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions    3,000
+    codes           50   g36-04's operating point. **Pinned from g36-04, where
+                         it was the middle of {20, 50, 100} and the one count
+                         that neither collapsed nor was coarse.** Not swept here
+    words           10
+    noise            2   other words per occasion
+    distractors      1   present EVERY occasion -- the falsifier's own condition
+    statistic  `grounding.damped(alpha)`, new, off by default
+    bound      derived
+    seeds      0, 1, 2
+
+Swept: `alpha` in {0.0, 0.25, 0.5, 0.75, 1.0}, crossed with the `together` and
+`alternating` arms.
+
+**Why `alternating` is in the grid and not assumed.** It is the arm where the
+word already survives at 0.9797, so it is the CONTROL for John's diagnosis: if
+volume asymmetry alone caused the eviction, the word should be at risk there too,
+because a word is just as common in that arm. P4 turns that into a commitment.
+
+
+PREDICTIONS
+-----------
+P1  THE TWO FAILURES ARE MONOTONE AND OPPOSITE. In `together`, `word` falls as
+    alpha rises and `distractor` falls as alpha rises -- both moving the same way
+    with the dial, which is what makes it a trade rather than a tuning problem.
+    REFUTED IF either is non-monotone, which would mean the exponent is not
+    acting the way the arithmetic says and something else is moving.
+
+P2  **THE HEADLINE, AND IT IS WRITTEN TO FAIL.** No alpha achieves both. There is
+    no value with `word` above 0.80 and `distractor` below 0.05.
+    REFUTED IF some alpha does both -- **which would make John's fix correct as
+    stated and would be the best available outcome here.** It would mean the
+    eviction is a tuning error rather than a structural conflict, and the
+    `together` arrangement stops being one to avoid.
+
+P3  A LOW ALPHA MERGES THINGS. `classes` at alpha 0.0 is at least twice its value
+    at alpha 1.0, so any improvement in `link_img` or `cross` at the low end has
+    to be read against a graph that is collapsing.
+    REFUTED IF `classes` is flat across alpha. Then a low alpha is not buying its
+    numbers with over-merging and the recall-shaped columns can be read directly.
+
+P4  **JOHN'S DIAGNOSIS IS NECESSARY BUT NOT SUFFICIENT, and this is the arm that
+    tests it.** In `alternating`, `word` stays above 0.80 at EVERY alpha
+    including 1.0 -- because the word is just as common there, so if volume
+    asymmetry alone caused the eviction it would happen there too. It does not:
+    what `together` adds is a rival that is both well-correlated and rare.
+    REFUTED IF `alternating` also loses the word at high alpha. Then the
+    asymmetry alone is the whole cause, John's account is complete as stated, and
+    the rival plays no part.
+
+P5  THE 0.5 ROW REPRODUCES `weighted`. `link_img` at alpha 0.5 in `together`
+    matches what `frequency_weighted` would give, because the family reproduces
+    it exactly -- asserted in `tests/test_damped.py` against that implementation.
+    This is a WIRING check rather than a scientific claim, and it is here because
+    a mutation that made every alpha compute `conditional` **survived the first
+    version of those tests**: two orderings coincided on the fixture. A flat row
+    across alpha is the symptom to watch for.
+
+
+COST
+----
+Estimated from `g36-04`'s measured 23.8s: that ran 15 cells (3 code counts x 5
+arms) with 3 seeds and 2 k-means per seed. This runs 10 cells (2 arms x 5 alphas)
+at ONE code count, so the k-means work is a third and the walk work is similar.
+**15 to 40 seconds.** Local, no runner.
+
+Recorded after the run: TO BE FILLED.
+
+
+RESULTS
+-------
+TO BE FILLED.
+
+
+SCORECARD
+---------
+TO BE FILLED.

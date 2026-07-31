@@ -298,6 +298,66 @@ def ppmi(index: CoOccurrence, surface: int, other: int) -> float:
     return math.log(lift)
 
 
+def damped(alpha: float) -> Statistic:
+    """`c_xy / c_y**alpha` — the family the other statistics are points on.
+
+    **John's question, 2026-07-31**, in his words: *"I suspect the reason the
+    words are disappearing from the connection is the difference in volume —
+    LOTS of images and LOTS of audio, but only 10 words. I'm wondering if we need
+    some kind of scaling so connections matter more than frequency of a thing."*
+
+    His diagnosis is right and is measured: in `g36-04`'s three-modality stream a
+    word is present **845.4** times on average against **60.0** for any single
+    image or audio code, because ten words carry the occasions that fifty codes
+    split. `conditional` divides by the candidate's own count, so a word takes a
+    fourteen-fold handicap for being shared across fewer types.
+
+    This exposes the exponent so the question can be asked as one axis instead of
+    as a choice between named statistics:
+
+        alpha = 0.0    identical ranking to `raw_count`
+        alpha = 0.5    identical to `frequency_weighted`
+        alpha = 1.0    identical to `conditional`
+
+    **The tension it exists to resolve is real and may have no solution.**
+    `g32-01` measured that `alpha = 1` is what kills a distractor present on
+    every occasion — raw counting loses 0.3044 of f1 to one and `conditional`
+    loses 0.0000. `g36-05` measured that `alpha = 1` is also what evicts the
+    word, which survives the bound for 0.0200 of image codes. Those pull in
+    opposite directions, so an intermediate value either does both or neither,
+    and nothing here assumes which.
+
+    **This is a NEW MECHANISM and defaults to off**: it is not in `STATISTICS`,
+    so no existing result changes and the comparison against not having it is
+    free. Callers construct it explicitly.
+
+    Args:
+        alpha: The exponent on the neighbour's own count. Must not be negative —
+            a negative exponent would REWARD a common neighbour, which is the
+            failure every statistic here exists to avoid, and admitting it
+            silently would produce a plausible number for an incoherent rule.
+
+    Returns:
+        A `Statistic`. It costs the same one remote read per candidate that
+        `conditional` does for any `alpha > 0`, and none at `alpha == 0`.
+    """
+    if alpha < 0.0:
+        raise ValueError(
+            f"alpha must not be negative; {alpha} would score a MORE common "
+            f"neighbour higher, which inverts the correction this family exists "
+            f"to apply")
+
+    def score(index: CoOccurrence, surface: int, other: int) -> float:
+        if alpha == 0.0:
+            return float(index.together(surface, other))
+        common = index.seen(other)
+        if common <= 0:
+            return 0.0
+        return index.together(surface, other) / (common ** alpha)
+
+    return score
+
+
 #: Every statistic, by the name a sweep reports it under.
 STATISTICS: dict[str, Statistic] = {
     "count": raw_count,

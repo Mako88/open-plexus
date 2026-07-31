@@ -1466,6 +1466,14 @@ MUTATIONS = [
         new="        self.grouped_wo = self.wo.reshape(v, config.partitions, -1).copy()",
     ),
     Mutation(
+        name="the-damping-exponent-is-ignored",
+        breaks="every alpha collapses to conditional, so the sweep's axis is "
+               "flat and reports one statistic under five names",
+        path=GROUNDING,
+        old="        return index.together(surface, other) / (common ** alpha)",
+        new="        return index.together(surface, other) / common",
+    ),
+    Mutation(
         name="the-audio-sample-is-a-prefix",
         breaks="a draw becomes a prefix, and FSDD filenames start with the "
                "digit, so a sample silently becomes one digit's recordings",

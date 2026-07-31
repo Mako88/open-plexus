@@ -1,0 +1,135 @@
+Can the walk bridge two modalities that never meet?
+====================================================
+
+Script: experiments/g33_02_bridging_modalities.py   (NOT YET WRITTEN)
+Status: PREDICTIONS DRAFTED. Not committed and not run.
+
+
+IN PLAIN TERMS
+--------------
+Everything measured so far has been easy in one specific way that nobody has
+said out loud: **every occasion showed all three surfaces of a concept at once.**
+The picture, the sound and the word all turned up together, so learning that they
+belong together only ever required noticing one direct co-occurrence.
+
+The real world is not like that. You see a dog and hear someone say "dog", often.
+You hear a bark and hear someone say "dog", often. But you may **never** see the
+picture and hear the bark in the same moment with nobody speaking. The link
+between two of the three has to be inferred through the third.
+
+That is exactly what `GOALS.md` gate **G7** asks — a concept introduced through
+one modality and queried through another — and it is what
+`identity-without-a-global-id.md` claims when it says a concept is *"the
+equivalence class reached by starting at any member and WALKING"*. Walking is
+only doing work if some members are not directly connected.
+
+**If the walk cannot bridge them, the design has been passing an easier test than
+the one it was written for**, and every number in g32 and g33 is about direct
+association rather than about concepts.
+
+
+WHY IT MIGHT FAIL, WHICH IS THE POINT
+--------------------------------------
+The recovery keeps an edge only where the ranking is MUTUAL and each surface
+keeps at most `k`. With three surfaces and `k = 2` the arithmetic is comfortable:
+the word's two best partners are the picture and the sound, and each of those has
+the word among its own two, so all three land in one component.
+
+**That comfort is an artefact of the sizes.** Make the chain longer — four or
+five modalities where each only ever meets its neighbour — and the middle links
+have to spend their `k` on the right partners while every noise surface competes
+for the same slots. Nothing measured says how far a chain can stretch.
+
+And there is a second failure available: if the bridge surface is the one that is
+COMMON, it behaves like g32-02's frequency hub and may be pruned by the very
+correction that makes the rest work.
+
+
+WHAT WOULD BE MEASURED
+----------------------
+`occasions.py` already tags every surface with a modality and deliberately never
+hands that tag to the mechanism. What it does NOT yet have is a way to stop two
+modalities co-occurring, so it needs one knob — a pairing structure saying which
+modalities may appear together on one occasion.
+
+    chain      m0-m1, m1-m2, m2-m3 ...   neighbours only; the ends never meet
+    star       m0-m1, m0-m2, m0-m3       everything meets the hub and nothing else
+    complete   every pair                what every run so far has used
+
+Scored the same way, plus one new quantity that is the gate itself:
+
+    reachable   share of surface pairs from the SAME concept that end in one
+                recovered class, counted ONLY over pairs whose modalities never
+                co-occurred. Direct pairs are excluded because they are what
+                the previous runs already measured
+
+
+MEASURED ON
+-----------
+Nothing yet. The intended configuration, carried from `g33-01` at its own concept
+count so no pin is transplanted:
+
+    concepts       64      carried from g32-01 / g33-01
+    surfaces        3-5    the axis. 3 reproduces every previous run
+    presence      0.7      carried
+    noise           3      carried
+    distractors     1      carried
+    occasions   8,000      125 per concept, well above g32-02's ~16 threshold
+    k               2      carried, and P3 is about whether it has to grow
+    statistic  conditional the C1-safe one; `ppmi` as the reference
+    seeds     0, 1, 2
+
+The join is NOT in the loop. This is a question about the walk, and putting the
+bucket layer underneath it would confound a recovery failure with a delivery one.
+
+
+COST
+----
+Estimated: `g32-01` ran 36 streams of 8,000 occasions in 12.7s and `g33-01` ran
+about 300 join cells in 571s. This has no join, so it is g32-01's profile — three
+structures times three surface counts times three seeds is 27 streams, **well
+under a minute**. Local.
+
+**And `g33-01`'s estimate was wrong by 2x in the OPTIMISTIC direction** — three
+to five minutes predicted against 9.5 actual — where g32-01 and g32-02 were both
+8x conservative. So the estimator is unreliable in both directions and this
+figure is a bound to check rather than to trust.
+
+Recorded after the run: NOT RUN.
+
+
+PREDICTIONS, DRAFTED BEFORE THE SCRIPT EXISTS
+----------------------------------------------
+P1  CONTROL. On `complete` the score reproduces g33-01's, since that is the
+    structure every previous run used.
+    REFUTED IF it does not, which would mean the new knob changed something it
+    should not have.
+
+P2  On `chain` with three modalities, `reachable` is above 0.90 — the walk
+    bridges a single missing link.
+    REFUTED IF it is not, which would refute
+    `identity-without-a-global-id.md`'s central claim outright and would mean
+    every result so far measured direct association rather than a concept.
+
+P3  `reachable` FALLS as the chain lengthens to four and five modalities, and it
+    falls faster than `k` grows.
+    REFUTED IF it is flat, which would be the strong result: the equivalence
+    class would be reachable at any chain length and the walk would be doing
+    real work rather than closing one gap.
+
+P4  On `star`, the hub surface is pruned by the chance correction for the same
+    reason g32-02's commonest concept was — it is present in every occasion of
+    that concept — and `reachable` collapses.
+    REFUTED IF the hub survives. This is the interesting tension: the correction
+    that defeats a distractor may also defeat a genuine BRIDGE, and nothing
+    distinguishes them by frequency alone.
+
+
+WHY THIS IS DRAFTED RATHER THAN RUN
+------------------------------------
+`g33-01` is still in flight and rule 17 forbids opening a new investigation while
+an existing one has work in it. This is the design written down so it is not
+reconstructed later, and its predictions are drafted where they can be read
+before anything produces a number.
+
+**Nothing here has been run and no number below this line exists.**

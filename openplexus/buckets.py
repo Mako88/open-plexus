@@ -62,12 +62,26 @@ across `openplexus/`, `tools/`, `tests/`, `testbed/` and `experiments/`.
   it has no notion of time beyond an index, and putting a clock model into the
   ruler would make the instrument depend on the mechanism it measures.
 
-## What is NOT here
+## What is NOT here, and the second item is the honest one
 
 **No sockets, no processes, no containers.** Everything below runs in one
 process, and a pass here says nothing about C1 — for the same reason
 `grounding.py` gives: distribution can only lose information, so a failure here
 is conclusive and a success is not. The container run is `testbed/run.py`.
+
+**And the accumulator is NOT actually sharded.** `Join` holds one `CoOccurrence`
+for the whole world. `Ring` decides which node owns each *bucket*, so the join
+half is addressed for real — but *"the link is written to `owner(surface)`, where
+it accumulates over that percept's lifetime"* is a claim this file asserts and
+does not demonstrate. One object holding every surface's row cannot show that the
+rows are separable, however true it is that they are.
+
+That is a gap rather than a caveat, and it is the next thing to close: splitting
+the accumulator by `owner(surface)` and counting the messages between the two
+halves makes the locality structural instead of asserted, and produces a
+bytes-per-observation figure G4 has never had for this path. Containers are the
+step *after* that, because a socket around an unsharded object proves nothing
+either.
 """
 
 from __future__ import annotations
@@ -310,7 +324,25 @@ class Join:
             closes = (bucket + 1) * config.width + config.grace
             if arrives > closes:
                 continue
-            self._open.setdefault(bucket, {})[observation.surface] = reading
+            held = self._open.setdefault(bucket, {})
+            # WHICH READING SURVIVES WHEN ONE SURFACE ARRIVES TWICE.
+            #
+            # A bucket holds each surface once -- it cannot tell two moments
+            # apart and must not pretend to. But WHICH of the two readings it
+            # keeps decides whether the marginal is ever counted, because
+            # `_flush` counts a marginal only at the bucket the reading centres
+            # on. Keeping the last arrival silently loses it: with `spread` on,
+            # a surface present every occasion is written into each bucket by
+            # several neighbouring moments, the final writer centres elsewhere,
+            # and the marginal is counted NOWHERE. Measured at c(distractor)=1
+            # against 8,000.
+            #
+            # So a reading that belongs to this bucket outranks one that does
+            # not. Ties keep the earlier, which is arbitrary and stated so.
+            if observation.surface in held:
+                if held[observation.surface] // config.width == bucket:
+                    continue
+            held[observation.surface] = reading
             self._closes[bucket] = closes
             self._touched.add(bucket)
             landed = True

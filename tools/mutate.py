@@ -2407,6 +2407,24 @@ MUTATIONS = [
         new="            if False:\n"
             "                continue",
     ),
+    Mutation(
+        name="the-LAST-reading-into-a-bucket-wins",
+        breaks="the marginal of anything that recurs, once windows overlap. A "
+               "bucket holds each surface once and counts its marginal only at "
+               "the bucket the reading centres on; with `spread` on, several "
+               "neighbouring moments write the same surface into one bucket, so "
+               "keeping the last writer leaves a reading centred elsewhere and "
+               "the marginal is counted NOWHERE. Measured at c(distractor)=1 "
+               "against 8,000, which read as a flaw in overlapping windows "
+               "rather than as a bug",
+        path=BUCKETS,
+        old="            if observation.surface in held:\n"
+            "                if held[observation.surface] // config.width == bucket:\n"
+            "                    continue",
+        new="            if False:\n"
+            "                if held[observation.surface] // config.width == bucket:\n"
+            "                    continue",
+    ),
 ]
 def restore_any_leftovers() -> None:
     """Recover from a previous run that was killed mid-mutation."""

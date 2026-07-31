@@ -44,7 +44,7 @@ all three staying at 1.0000.
 Mutuality alone is not a sufficient defence, which the unit-test world had been too small
 to settle. Normalising by the neighbour's own frequency is.
 
-### The repair costs ONE HOP under amended C1 — `g32-01`, and it is an argument not a measurement
+### The repair costs a remote read PER CANDIDATE — `g32-01`, an argument not a measurement
 
     CONFIG  when    2026-07-31
             source  experiments/sweeps/g32-01-can-counting-tell-the-distractor.txt
@@ -57,8 +57,30 @@ to settle. Normalising by the neighbour's own frequency is.
 `count(x, y)` and `count(x)` already sit at `owner(x)`. `count(y)` is a bounded message to
 one named peer, which amended C1 permits where a collective everyone must join does not.
 
-**Nothing has measured this.** It is a reading of the constraint against the arithmetic,
-and the container run is what would test it.
+**This entry first said the repair costs ONE HOP, and that was wrong** — corrected the same
+day, from building the distributed version. One hop is right for a single *pair*; ranking a
+surface's partners needs `count(y)` for every candidate, so the cost grows with the partner
+list. That is `peer.py`'s profile rather than a barrier's and it is not one message.
+
+**Nothing has measured either version.** It is a reading of the constraint against the
+arithmetic, and the container run is what would test it.
+
+### PPMI is not deployable at all, and only building it showed that — `g33-01`
+
+    CONFIG  when    2026-07-31
+            source  openplexus/grounding.py, CoOccurrence.moment
+            script  none -- found while writing openplexus/buckets.py
+            task    n/a
+            model   n/a
+            knobs   none
+            scale   n/a
+
+PPMI divides by the number of occasions the **whole system** has seen. No node can know
+that without a collective, and amended C1 forbids collectives — so the statistic that won
+`g32-01` is a reference rather than a design.
+
+It surfaced only when the join was built: the single-process accumulator maintains that
+total for free, and nothing in `g32-01` had any reason to ask where it comes from.
 
 ### PPMI and the conditional are ONE arm above chance — `g32-01`
 

@@ -551,8 +551,61 @@ Falsified claims get fixed, not softened. If the README says the system does X
 and it does not do X, the README changes — it does not become "the system aims
 to do X".
 
-> *Calibration.* — unfilled. Record the first documented claim that measurement
-> contradicted, and what the document says now.
+> *Calibration, and BOTH were mine, written the same day they were corrected.*
+>
+> `HANDOFF.md` named `kachergis/word_learning_models` as the home of a
+> model-comparison dataset with *"44 experimental conditions, 1,696 human
+> participants"* and *"code and data"*. Reading the files rather than the README
+> found a 2013 personal collection: about 20 conditions, **no licence file**, and
+> **no human-accuracy data at all** — a handful of figures quoted in prose. The
+> bakeoff data is in a different repository, `kachergis/XSLmodels`, which is
+> GPL-licensed and carries per-condition accuracy, standard deviation and sample
+> size **as a plain CSV**. The document now says that, and says which repository
+> is an unmodified template still containing Palmer Penguins.
+>
+> **The claim was not softened, and the correction went the useful direction** —
+> the obstacle the handoff worried about (`.RData` conversion in a
+> dependency-free layer) largely evaporated once the right repository was open.
+>
+> Then the same day, one level down: `co-occurrence-statistic.md` recorded that a
+> chance-corrected statistic *"costs ONE HOP"*. True for a single pair, false for
+> the operation — ranking a surface's partners needs `count(y)` for **every
+> candidate**. Found by building the distributed version, which is the only thing
+> that would have found it, and fixed at the definition as well as in the record.
+
+**And compute what a metric returns for the NULL recovery before reading any
+number off it.** A score is only interpretable against what *doing nothing*
+scores, and that value is a property of the metric and the data shape rather than
+of the mechanism — so it can be computed once, in advance, and it is not always
+zero.
+
+> *Calibration.* `g32-01` predicted its shuffled control near zero and it came in
+> at **0.3189 to 0.5078**. The metric was mean per-surface F1 against a
+> three-surface class, so a recovery that groups **nothing at all** — every
+> surface alone — is perfectly precise and a third recalled, which is exactly
+> **0.5**. The control scored *below* that, because grouping wrongly is worse than
+> not grouping.
+>
+> Nothing was wrong with the data or the code. What was wrong is that a later row
+> reading `0.6120` would have been reported as a moderate result when it is a
+> fifth of the way from nothing to everything. **The floor is one line of
+> arithmetic and it was available before the run.**
+
+**And check that two arms of a comparison are not the same function.** Two
+statistics that induce the same ordering are one arm wearing two names, and the
+grid will report them agreeing to four decimals as though that were a finding.
+
+> *Calibration.* `g32-01` swept four statistics and **two of them were one
+> experiment.** For a fixed surface, PPMI's `log(c_xy·N / (c_x·c_y))` is monotone
+> in `c_xy/c_y`, which *is* the conditional probability — so they order every
+> above-chance pair identically and differ only in that PPMI refuses the rest.
+> Verified after the fact: **0 of 40** above-chance rankings differ, against
+> **40 of 40** full rankings.
+>
+> The prediction attached to them — that one would degrade faster than the other —
+> could not have been true, and no run was needed to know it. This is rule 10's
+> *"guaranteed by how the condition is built"* arriving in a **grid** rather than
+> in a test, and the check is arithmetic on the arms before dispatch.
 
 ---
 

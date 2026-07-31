@@ -115,6 +115,39 @@ class TwoNodesAgreeWithoutAsking(unittest.TestCase):
         self.assertEqual(join.index.seen(1), 1)
         self.assertEqual(_seen(join, 0, 1), 0)
 
+    def test_a_recurring_surface_keeps_its_marginal_when_windows_overlap(self):
+        """The defect that made overlapping windows look like a design flaw.
+
+        A bucket holds each surface once, and with `spread` on, several
+        neighbouring moments write the same ever-present surface into the same
+        bucket. If the last writer wins, the surviving reading centres on some
+        OTHER bucket, so the marginal is counted at neither — and a surface
+        present at every moment ends up with a marginal of one.
+
+        Measured at `c(distractor) = 1` against 8,000 in `g33-01`, where it
+        dropped f1 from 1.0000 to 0.6953 and read as *"overlapping windows
+        manufacture spurious pairs"*. They do not. The reading that belongs to a
+        bucket has to outrank the one that does not.
+
+        Asserted as the property: a thing present at every moment has a marginal
+        equal to the number of moments, whatever `spread` is.
+        """
+        moments = 40
+        for spread in (0, 1, 2, 4):
+            with self.subTest(spread=spread):
+                config = BucketConfig(width=10, spread=spread, nodes=8,
+                                      observers=3, seed=0)
+                stream = []
+                for step in range(moments):
+                    stream.append(Observation(surface=99, when=step * 10,
+                                              observer=0))
+                    stream.append(Observation(surface=step % 7, when=step * 10,
+                                              observer=1))
+                join = Join(config)
+                join.run(stream)
+                self.assertEqual(join.index.seen(99), moments)
+                self.assertEqual(join.index.occasions, moments)
+
     def test_a_surface_is_counted_ONCE_however_many_buckets_it_reaches(self):
         """The defect `spread` introduced, asserted so it cannot come back.
 
@@ -241,7 +274,11 @@ class Ownership(unittest.TestCase):
         join = Join(config)
         join.run([Observation(surface=s % 20, when=s, observer=s % 3)
                   for s in range(4000)])
-        self.assertLess(join.busiest_share(), 0.30,
+        # 0.125 is even across eight nodes and a real ring is lumpier than that.
+        # The bound is 0.25 rather than something looser because the measured
+        # value at this seed is 0.145, and a bound wide enough to admit a
+        # badly-skewed ring would admit the broken case it exists to catch.
+        self.assertLess(join.busiest_share(), 0.25,
                         "one node owns far more than its eighth of the buckets")
 
 

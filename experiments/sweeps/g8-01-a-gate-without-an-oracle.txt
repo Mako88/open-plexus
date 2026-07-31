@@ -354,3 +354,42 @@ already exist, does this token recur) rather than at better-tuned magnitudes.
 Note 010's objection stands against the obvious version of that: in MQAR the only
 event separating a pair from filler is the query, which arrives too late and never
 recurs. **So the instrument may have to change before the mechanism can.**
+
+
+
+IDEAS NOT YET TRIED, RECORDED 2026-07-31
+==========================================
+Four gates have been built and failed and the bar is ~92x at MQAR's real base
+rate. These are the candidates that have NOT been tried, written down so the next
+person starts from a list rather than from scratch. **None is measured.**
+
+**1. DEDUP, not a gate.** Do not write an address already written. `g28-01`
+measured **94.7% of filler positions sit at an address already seen**, against
+**100% of real bindings at a fresh one**. So dedup skips ~95% of filler writes and
+zero real writes -- exact, no threshold, nothing to tune, and the occupancy sketch
+already answers it. **~19x, not 92x**, so it helps and does not finish. It was not
+among this sweep's arms.
+
+**2. LAZY MATERIALISATION.** Record something cheap per position; materialise the
+full binding only when something READS it. Converts *predict what will be needed*
+into *find out*, and makes `N` exactly the used bindings, which IS the oracle's
+`N`. The query arrives too late to gate a write and is perfectly timed to gate a
+COMMIT. Costs a slow first read per binding -- latency John accepted on
+2026-07-30.
+
+**3. THE SCALE WALL MAY NOT APPLY TO CONCEPT PARTITIONING.** This sweep's sibling
+`g5-01` attributes the wall to DIMENSION splitting in its own words, and no sweep
+has ever varied a scale axis under `concept_nodes`. See
+`docs/options/concept-partitioning.md`.
+
+**4. IS DECAY ALREADY THE GATE?** Forgetting bounds `N` at roughly `1/(1-decay)`,
+independent of stream length. If so the oracle's advantage is about ACCURACY and
+not SCALE, and #10 measures the wrong axis. Note 011 names the oracle-versus-decay
+gap as the honest size of what is unsolved, so this has been thought about -- but
+not against the scale axis specifically, as far as a grep shows.
+
+**5. THE BASE RATE MAY BE THE BENCHMARK'S FAULT.** The 92x bar comes from MQAR
+being 99% filler and real streams are not. Note 010 already argues MQAR cannot
+separate pair from filler at write time. **Changing an instrument to improve a
+result is the move this project is most suspicious of**, so this needs a stated
+argument before it needs a run.

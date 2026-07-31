@@ -209,3 +209,41 @@ token's key row, so it names no concept"*. The hop loop is
 `for depth in range(0 if searching else ...)`, so when search is on it runs zero times and
 that key is never built; the walk commits to a hard token at every step. Read, not run —
 no sweep has been taken with `concept_nodes` and `hops > 1` together.
+
+### G5's WALL WAS MEASURED ON DIMENSION SPLITTING, AND THIS HAS NEVER BEEN SCALED
+
+    CONFIG  when    2026-07-31
+            source  g5-01, and DECISIONS.md component 9
+            script  none -- a scope finding from reading g5-01 and grepping
+                    experiments/sweeps for concept_nodes
+            task    none
+            model   n/a
+            knobs   none
+            scale   n/a
+
+`g5-01`'s own conclusion, in its own words:
+
+    256 dimensions in one piece solve seq 384. The same 256 dimensions split
+    sixteen ways reach 0.769. **The wall is caused by the partitioning, not by
+    the underlying rule.**
+
+**That wall is DIMENSION splitting**, where each node holds `d/n` of the width and every
+read is a degraded partial read summed across nodes. **Concept partitioning does not do
+that**: a read goes to the one node holding the fact, and that node has a FULL-WIDTH store
+(`peer.py`: *"2 messages per read against 2N"*, no sum).
+
+**Grepped `experiments/sweeps/` for `concept_nodes`: no file mentions it.** No sweep has
+ever varied sequence length, node count or any scale axis under concept partitioning. The
+measurement that produced `GOALS.md`'s G5 verdict does not cover the arrangement
+`note 081` calls mandatory.
+
+**Stated as an OPEN QUESTION, not a rescue.** Reasons for caution, both on record: `134`
+measured pooled capacity as IDENTICAL between the two arrangements at equal per-node
+memory, and it is lone-node capacity that differs by 16×. So a full-width read does not
+obviously translate into a better scaling exponent, and the arithmetic has not been done.
+
+**What would settle it:** `g5-01`'s grid re-run with `concept_nodes` set instead of
+dimension slices, reporting the fitted exponent against g5-01's 0.69 and g1-10's
+unpartitioned 0.37. Predictions registered first, and the exponent's confidence interval
+reported rather than a point estimate — `g5-02` and `g5-03` are the calibration for fitting
+through crossings that were bounds.

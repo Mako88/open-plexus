@@ -1,0 +1,124 @@
+Is the distractor failure structural, or was it measured too early?
+====================================================================
+
+Script: experiments/g39_03_is_the_distractor_failure_structural.py
+Status: PREDICTIONS WRITTEN, run pending. Committed before execution.
+
+
+IN PLAIN TERMS
+--------------
+There is one stubborn failure in this whole line of work. Something that is
+present in every single moment -- a hum in the room, the word "the" -- gets
+treated as though it were meaningful, because it turns up alongside everything.
+
+Five different things have been tried against it and none worked. So the working
+conclusion has been that it is a deep problem rather than a tuning problem.
+
+**But there is a reason to doubt that conclusion, and it appeared only
+yesterday.** All five of those attempts were measured after three thousand
+moments -- and we have since found the machine was still learning fast at that
+point. One of the two mechanisms being compared turned out to be much further
+from its final state than the other. So an idea that looked refuted might simply
+have been measured before its benefit arrived.
+
+That is the most expensive mistake this project has a name for: throwing away a
+good idea because the measurement was wrong.
+
+So this re-runs the two most important of those attempts at the length where the
+machine has actually stopped improving, and crosses them together, which nothing
+has done. If nothing works there either, "it is a deep problem" stops being a
+summary of five disappointments and becomes a claim with real evidence behind it.
+If something does work, five conclusions need revisiting.
+
+Either answer is worth having. The one that would be embarrassing is not asking.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    link         precision over the top-`k` image codes a word reaches
+    covered      how many of the codes it SHOULD find it had a chance to score
+    distractor   share of words admitting the ever-present distractor
+    BOTH?        the whole question, as one column: link >= 0.80 AND
+                 covered >= 0.80 AND distractor <= 0.05
+
+**The coverage clause in `BOTH?` is not decoration.** `g38-03` reported a cell at
+1.0000 precision over 0.0867 coverage as though it were the best in the table --
+a mechanism that is right about a twentieth of the answer is not solving
+anything. A criterion without that clause is the one `g36-06` wrote and then had
+to retract, where a cell met the bar at a collapsed graph.
+
+
+MEASURED ON
+-----------
+Local, one process. Scorer and stream construction match `g39-01` and `g39-02`.
+
+    images       4,000   MNIST prefix
+    recordings   3,000   FSDD, six speakers
+    occasions   24,000   extended by RE-PAIRING, since an exact repeat is a
+                         no-op for a ratio statistic
+    codes           50   pinned, as everywhere in this line
+    arm      together    where the failure is sharpest
+    beam/depth   16, 1   g38-03's operating point
+    seeds      0, 1, 2
+
+Swept: `alpha` in {0.5, 0.75, 1.0} x `combiner` in {min, geometric, mean, max},
+at 3,000 and 24,000 occasions. **The two axes have never been crossed.**
+
+**Alpha 0 and 0.25 are excluded on evidence, not cost:** `g36-06` measured them
+admitting the distractor at 1.0000 and 0.9333, which is the failing end of the
+axis being probed.
+
+
+PREDICTIONS
+-----------
+P1  **THE HEADLINE, WRITTEN TO FAIL.** No setting meets `BOTH?` at either
+    length. `solved` is 0 of 24.
+    REFUTED IF any does. **That would be the best outcome available in this
+    entire line** -- it would revise `g36-06` and `g38-01`, and it would mean
+    five axes of mechanism work were chasing something a longer stream and a
+    crossed grid fix by themselves.
+
+P2  THE 3,000 ROWS REPRODUCE WHAT WAS ALREADY REPORTED. `mean` at alpha 1.0 and
+    3,000 occasions gives link near 0.9665 and distractor 1.0000, matching
+    `g38-01` and `g38-03`.
+    REFUTED IF it does not. **That is the rail** -- a mismatch means the stream
+    construction has drifted from the runs being re-checked and nothing else
+    here is comparable.
+
+P3  MORE DAMPING SUPPRESSES THE DISTRACTOR AND COSTS THE LINK, at both lengths,
+    for every combiner. The two columns move in opposite directions along alpha.
+    REFUTED IF they move together anywhere -- which is exactly the interior the
+    first two sweeps failed to find, and would locate it.
+
+P4  CONVERGENCE HELPS THE STRICT COMBINERS MOST. `min` and `geometric` improve
+    more between 3,000 and 24,000 than `mean` does, because `g39-02` found the
+    arm furthest from its plateau gains most, and those two scored worst at
+    3,000.
+    REFUTED IF `mean` gains most, which would mean the permissive end was the
+    under-measured one and the ordering at 3,000 was already fair.
+
+P5  DISTRACTOR ADMISSION IS UNCHANGED BY LENGTH for every setting -- whatever it
+    is at 3,000 it is at 24,000, within 0.05.
+    REFUTED IF it moves. That would mean the failure is partly an evidence
+    effect after all, and `g39-02`'s conclusion that experience does not repair
+    it was drawn from one setting rather than from the mechanism.
+
+
+COST
+----
+Estimated from `g39-02`'s measured 8.7s, which built the same 24,000-occasion
+stream for 3 seeds and scored 4 checkpoints. This scores 12 settings at each of
+2 checkpoints, so about six times the scoring on the same stream build.
+**30 to 120 seconds**, local.
+
+Recorded after the run: TO BE FILLED.
+
+
+RESULTS
+-------
+TO BE FILLED.
+
+
+SCORECARD
+---------
+TO BE FILLED.

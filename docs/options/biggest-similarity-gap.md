@@ -157,3 +157,33 @@ true partner whose score is asymmetric gets in where a cut of 1 excluded it.
 **And the caveat that survives.** These are laboratory experiments designed to be
 learnable from co-occurrence. Note 058's slope remains the only measurement on
 natural language, and nothing here bridges the two.
+
+### It is what makes MORE MODALITIES safe rather than harmful — `g36-02`
+
+    CONFIG  when    2026-08-01
+            source  experiments/sweeps/g36-02-do-more-modalities-learn-faster.txt
+            script  experiments/g36_02_do_more_modalities_learn_faster.py
+            task    occasions, 64 concepts, presence 0.7, noise 3, 1 distractor
+            model   conditional; bound fixed 2 or derived; no join
+            knobs   surfaces 2/3/5/8, occasions per concept 2..64; 3 seeds
+            scale   floor-free `connected`, bar 0.95
+
+**A third independent argument for this option**, after `g33-02`'s hub and
+`g33-04`'s grid.
+
+Under a FIXED bound of 2, adding modalities **caps** what can ever be learned: 5
+surfaces plateaus at **0.7531** and 8 at **0.5781**, and neither improves from 16
+occasions per concept to 64 — thirty-two times the data buys nothing. 2 and 3
+surfaces reach **1.0000** on the same axis.
+
+Under the derived bound every surface count reaches 1.0000, and more modalities
+is better at every stream length: **0.3542, 0.4201, 0.4969, 0.5677** at the
+sparsest column.
+
+**So the failure is a ceiling rather than a delay**, and experience does not
+repair it. The derived bound is what makes multimodality — which `GOALS.md`
+requires — compatible with the mechanism at all.
+
+**And the two bounds do NOT cross on this axis**: derived is equal or better in
+all 24 cells. `g33-04`'s measured crossover is on the PAIRING STRUCTURE axis
+(chains), which is why the 🔀 stands for that reason and not this one.

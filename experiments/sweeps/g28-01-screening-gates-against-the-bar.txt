@@ -1,0 +1,117 @@
+Screening write-time gate signals against the 11.5x bar
+========================================================
+
+Script: experiments/g28_01_gate_screen.py  (to be written)
+Status: NOT RUN. Predictions registered and committed before the script exists.
+
+ANSWER: pending.
+
+
+IN PLAIN TERMS
+---------------
+The system cannot store everything it sees, and the thing that decides what to
+keep is the single biggest unsolved piece: with a perfect decider, tiny devices
+work at any problem size; without one, they do not.
+
+Four deciders have been built and all four failed. What nobody worked out until
+today is **how good a decider would have to be** -- and the answer is that it must
+fire on real content about **11.5 times** more often than on filler just to make
+half of what it stores worth storing. The best ever measured is **7.6 times**.
+
+That number lets a candidate be checked in seconds instead of built in days. This
+checks several at once, including ones nobody has tried.
+
+
+WHY THIS EXISTS
+----------------
+`g8-01`: *"No mechanism tried recovers the oracle ... every result that rests on
+the gate is a CEILING."* `g8-03` and `g8-04` add two more failures.
+
+The bar, derived on 2026-07-30 and appended to `g8-01`:
+
+    stored set is % real     enrichment required
+                     50%                   11.5x
+                     75%                   34.5x
+    measured best (salience)               7.6x
+    what 7.6x actually buys               39.8% real
+
+**None of the four failed mechanisms was screened before being built.** This
+screens first.
+
+**It measures the DATA, not a model** -- the pattern `g8_02_control.py` already
+uses, and its reasoning applies unchanged: what a model can exploit is bounded by
+what is there to exploit, and counting is seconds where a sweep is hours.
+
+**The class is PAIR positions, not query positions.** `g8_02_control` reports
+query:filler because it was asking about surprise; the write gate has to keep the
+BINDING, which is `harness.oracle_mask` -- a position whose predecessor was a
+pair.
+
+
+THE CANDIDATES
+--------------
+    surprise         self-information in the tails      the 7.6x control
+    addr-novel       this (prev, token) pair has NOT occurred before   NOVEL
+    addr-seen        the inverse: it HAS occurred before               NOVEL
+    token-novel      this token has not occurred before               NOVEL
+    token-seen       this token has occurred before                   NOVEL
+
+**The novel four are STRUCTURAL rather than thresholds on a magnitude**, and that
+is deliberate: a 100x gap is not a tuning gap, so a signal that could close it is
+unlikely to be a better-tuned scalar. They are also free -- the occupancy sketch
+already answers "has this address been written" exactly (`148`, `g26-01`).
+
+
+PREDICTIONS
+-----------
+  P1  THE CONTROL. `surprise` lands within 3x of the known 7.6x.
+
+      Different task parameters, so exactness is not expected -- but an order of
+      magnitude away means this harness is not measuring what note 013 measured
+      and nothing below is readable.
+
+  P2  THE TEST. At least one candidate clears 11.5x.
+
+      **I expect this REFUTED.** Note 010 argues MQAR cannot separate pair from
+      filler at write time, because the only event that distinguishes them is the
+      query, which arrives too late and never recurs. If every candidate lands
+      near 1x, that is strong evidence the INSTRUMENT has to change before any
+      mechanism can -- which is a cheap and useful finding, not a wasted run.
+
+  P3  `addr-seen` beats `addr-novel`.
+
+      Filler is drawn repeatedly from a small alphabet over a long sequence, so
+      filler pairs should recur while a real binding occurs once. That makes
+      "seen before" a FILLER detector, and its inverse the useful direction --
+      which is the opposite polarity to the one I first reached for and rejected.
+
+  P4  THE ONE I AM LEAST SURE OF. `addr-novel` clears 2x but not 11.5x.
+
+      It depends entirely on how often filler pairs actually repeat at
+      `seq_len 768` with `n_keys 32`, which I have not computed. If filler
+      repeats a lot this could be strongly enriched; if the pair alphabet is
+      effectively large it will be near 1x. **Genuinely uncertain, and cheap to
+      settle, which is the whole argument for screening.**
+
+
+WHAT WOULD MAKE THIS NOT COUNT
+--------------------------------
+**Reading the answer key.** A candidate may only use what a node has at write
+time: the tokens so far and its own store. `position_kinds()` is used ONLY to
+score, never as an input.
+
+**A bar met on the wrong class.** Enrichment is pair-versus-filler, not
+query-versus-filler. Reporting the second and comparing it to 11.5x would be the
+category error this file exists to avoid.
+
+
+COST
+----
+Counting over generated sequences. Seconds. Local, no dispatch, no training.
+
+
+MEASURED ON
+-----------
+`openplexus/tasks/mqar.py` at `g8_02_control`'s parameters -- `n_pairs 4,
+seq_len 768, n_keys 32, n_values 8, queries_per_pair 3` -- so the control arm is
+comparable to the number it is reproducing.

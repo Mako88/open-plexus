@@ -1,10 +1,105 @@
 Link prediction on FB15k-237: our system on their task
 =======================================================
 
-Script: experiments/g30_01_link_prediction.py  (to be written)
-Status: NOT RUN. Predictions registered and committed before the script exists.
+Script: experiments/g30_01_link_prediction.py
+Status: RUN, local, seed 0, widths 256 and 512. Predictions committed at `2ec4f7e`
+        before the script existed.
 
-ANSWER: pending.
+ANSWER: **the store beats chance by 177x and loses to a counting baseline by 28x.**
+        All four predictions held, including the one whose refutation would have
+        been good news.
+
+    width 256, 20,438 test triples scored, 28 unanswerable
+
+        arm                 MRR   Hits@1   Hits@3  Hits@10
+        store            0.0122   0.0089   0.0122   0.0173
+        frequency        0.3378   0.2603   0.3651   0.4894
+        store, UNFIL     0.0121   0.0089   0.0121   0.0173
+
+    width 512, same test set
+
+        store            0.0232   0.0181   0.0242   0.0316
+        frequency        0.3378   0.2603   0.3651   0.4894
+        store, UNFIL     0.0228   0.0176   0.0235   0.0313
+
+    chance MRR 0.000069. Capacity 0.023*d^2: 1,507 bindings at 256 against
+    272,115 triples (181x over), 6,029 at 512 (45x over).
+
+
+SCORECARD
+---------
+  P1  HELD.     0.0122 against chance 0.000069 -- 177x. The store is returning
+                signal at 181x its capacity, which is the one mildly encouraging
+                line in this file.
+  P2  HELD, and this was the test. We LOSE to `frequency`, 0.0122 against 0.3378.
+                A baseline that counts how often each entity appears as a tail of
+                each relation, with no learning and no capacity, is **28x better**.
+  P3  HELD.     Hits@10 0.0173, well under 0.10.
+  P4  HELD.     256 -> 512 moved MRR 0.0122 -> 0.0232, a factor of **1.90**, under
+                the 2x line. Capacity quadrupled and quality did not double.
+
+**A clean scorecard is not the achievement it looks like** -- `g7-04`'s calibration.
+P1 through P3 were arithmetic before they were predictions: 181x over capacity has
+one outcome. P4 is the only one that carried information.
+
+
+WHAT P4 ACTUALLY SAYS, AND IT IS THE USEFUL LINE
+--------------------------------------------------
+Capacity goes as `d^2` and retrieval as `sqrt(d/N)`, so doubling the width should
+buy `sqrt(2)` = 1.41x. It bought **1.90x**. So quality is rising FASTER than the
+superposition bound predicts and SLOWER than capacity -- roughly linear in width.
+
+Two readings, and this run does not separate them:
+
+  - the SNR law is the wrong model this far past capacity, or
+  - something else is bounding the read, and width is relieving it incidentally
+
+Naive extrapolation at 1.90x per doubling puts MRR level with `frequency` at about
+width 4,100 -- a 16.8-million-cell store per node, holding one graph. **That is an
+extrapolation across five doublings from two points and is quoted as a scale, not
+as a prediction.** The honest version: nothing in this measurement suggests the
+gap closes at any width a consumer device has.
+
+
+WHAT THIS DOES AND DOES NOT SETTLE
+-----------------------------------
+**It settles that the raw store is not a link predictor.** No published number was
+needed for that -- the opponent that beat it is four lines of counting, computed
+here, on the same test set, on the same machine.
+
+**It does NOT settle kill-list #3.** #3 asks whether a conventional system already
+does what this project is for, and link prediction is not what this project is for:
+it asks for a rank over a fixed entity set from a store that saw the whole graph
+offline. Nothing here is local, asynchronous, or perpetual. The result bounds ONE
+reading of the store on ONE outside task.
+
+**It does NOT test the contrastive rule.** `g23-04`'s +0.2072 was RULE prediction
+with `tools/relation_contrastive.py`; this reads raw outer-product bindings with
+random value vectors. They are different mechanisms and the numbers do not compare.
+A contrastive arm on this metric is a separate run and is not being quoted from
+this one.
+
+
+THE GUARDS, AND THEY HELD
+--------------------------
+Filtered and unfiltered are both printed and differ by 0.0001 to 0.0004, which is
+small because the store is near the floor -- at a competent MRR they diverge a lot,
+so the guard matters more the better the result gets.
+
+The store was built from TRAIN only; the filter reads all three splits, which is
+the convention and is not training on them. 28 test triples were unanswerable
+(entity or relation unseen in train) and are reported rather than dropped.
+
+
+COST
+----
+About four minutes local for both widths, one seed. No training.
+
+
+MEASURED ON
+-----------
+`data/fb15k237/`, sha256 pinned in `tools/fetch_fb15k237.py`.
+`experiments/g30_01_link_prediction.py`, seed 0.
 
 
 IN PLAIN TERMS

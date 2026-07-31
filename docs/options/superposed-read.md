@@ -66,6 +66,35 @@ At widths 64–128 store and readout **both exceed task demand**, so the 16k-cha
 not a store limit. The full account is in [saturation-closed.md](saturation-closed.md);
 this entry exists so that a reader of the store's record does not have to find it elsewhere.
 
+### On the literature's own task it loses to counting — `g30-01`
+
+    CONFIG  when    2026-07-30
+            source  experiments/sweeps/g30-01-link-prediction-on-their-task.txt
+            script  experiments/g30_01_link_prediction.py
+            task    FB15k-237 tail-side link prediction, filtered, 20,438 test triples
+            model   raw summed outer products, random unit value vectors, key = ent*rel
+            knobs   width 256 and 512, seed 0
+            scale   272,115 train triples against 1,507 bindings of capacity at 256
+
+    arm                width 256   width 512
+    store MRR             0.0122      0.0232
+    frequency MRR         0.3378      0.3378
+    chance MRR          0.000069    0.000069
+
+**177× chance and 1/28th of a counting baseline.** `frequency` ranks entities by how often
+they are a tail of that relation — no learning, no capacity — and beats the store by a
+factor of 28 at both widths.
+
+**The width result is the informative one.** Doubling the width moved MRR by **1.90×**,
+against `sqrt(2)` = 1.41× from the SNR law and 4× from capacity. So quality rises roughly
+linearly in width, faster than superposition predicts and far slower than capacity — at
+181× over capacity, neither model describes the read.
+
+This bounds ONE reading of the store on ONE outside task; it is offline, global and
+non-local, so it says nothing about the project's constraints. It also does not touch the
+contrastive relation vectors, which are a different mechanism measured on a different
+question ([relational-objective.md](relational-objective.md)).
+
 ### The crossover that is still live — `110`
 
     CONFIG  when    2026-07-28

@@ -2,9 +2,11 @@ Screening write-time gate signals against the 11.5x bar
 ========================================================
 
 Script: experiments/g28_01_gate_screen.py  (to be written)
-Status: NOT RUN. Predictions registered and committed before the script exists.
+Status: RUN, AND ALL FOUR PREDICTIONS REFUTED -- two of them by MY OWN errors,
+        which is the useful part. Registered and committed at d4fcc87 first.
 
-ANSWER: pending.
+ANSWER: NO candidate clears the bar. And the bar itself was wrong: 11.5x is
+CONFIGURATION-SPECIFIC and at this task's base rate it is 91.9x.
 
 
 IN PLAIN TERMS
@@ -115,3 +117,87 @@ MEASURED ON
 `openplexus/tasks/mqar.py` at `g8_02_control`'s parameters -- `n_pairs 4,
 seq_len 768, n_keys 32, n_values 8, queries_per_pair 3` -- so the control arm is
 comparable to the number it is reproducing.
+
+
+THE RESULT
+----------
+40 sequences, seq_len 768, n_keys 32.
+320 should-store positions against 29,401 filler -- **filler share 0.989.**
+
+    signal         fires|store  fires|filler   enrichment   vs bar
+    surprise            0.5000        0.0000          inf   degenerate
+    addr-novel          1.0000        0.0529        18.90       --
+    addr-seen           0.0000        0.9471         0.00       --
+    token-novel         0.9250        0.0368        25.16       --
+    token-seen          0.0750        0.9632         0.08       --
+
+    bar for a HALF-real stored set AT THIS BASE RATE:  91.9x
+
+
+ERROR ONE: THE BAR IS NOT A CONSTANT, AND I HARDCODED IT
+-----------------------------------------------------------
+The first run printed **CLEARS** against `addr-novel` and `token-novel`.
+
+`BAR = 11.5` was derived at `g8-01`'s **92%** filler share. This configuration
+measures **98.92%**, where a half-real stored set needs **91.9x** -- eight times
+higher. Both "clearing" candidates are a factor of four SHORT.
+
+**A constant carried from another configuration**, which `CLAUDE.md` rule 2 has
+three calibrations for, arriving inside the tool built to stop a fifth gate being
+built on a bad screen. The bar is now computed from the measured base rate every
+run and printed with the filler share beside it.
+
+**And it reaches backwards.** The bar appended to `g8-01` on 2026-07-30 is stated
+as `11.5x` with no base rate attached. That figure is only correct at 92% filler
+and has been corrected there.
+
+
+ERROR TWO: P1 WAS MIS-SPECIFIED, SO THERE IS NO CONTROL
+----------------------------------------------------------
+P1 predicted `surprise` would land within 3x of note 013's **7.6x**. It measured
+**infinite** -- no filler position cleared the bar at all.
+
+**That is my specification error, not a harness failure.** Note 013's 7.6x is
+QUERY:filler. This file measures PAIR:filler, and says so deliberately two
+sections above. I predicted a control would reproduce a number from a different
+class.
+
+The mechanism is worth keeping: at 98.9% filler, filler tokens ARE the common
+ones, so their self-information sits at the mean and none clears a 2.5-sigma bar.
+Zero filler fires gives infinite enrichment while firing on only HALF the real
+positions -- **degenerate, not selective.** A gate storing on that would store
+almost nothing.
+
+**So there is no working control and by this file's own rule nothing below P1 is
+readable.** The candidates' numbers are recorded, not relied on.
+
+
+P3 CONTRADICTED ITSELF, WHICH IS WORTH MORE THAN ITS VERDICT
+---------------------------------------------------------------
+P3's statement: *"`addr-seen` beats `addr-novel`."* P3's rationale, in the same
+paragraph: *"that makes 'seen before' a FILLER detector, and its inverse the
+useful direction."*
+
+Those are opposite claims. Measured: `addr-novel` **18.90x**, `addr-seen`
+**0.00x** -- the RATIONALE was right and the STATEMENT was backwards.
+
+A registered prediction whose sentence disagrees with its own reasoning is worse
+than a wrong prediction, because it cannot be scored. Both halves are kept here
+rather than the convenient one being quoted.
+
+
+WHAT THIS BOUGHT, WHICH IS STILL MORE THAN A SWEEP WOULD HAVE
+----------------------------------------------------------------
+Minutes, and it killed two novel candidates, one tool bug and one mis-specified
+control **before** anything was built on them. Four previous gates were built
+first and measured after.
+
+**The real target is now visible and it is worse than yesterday's number
+suggested.** At MQAR's actual base rate a gate needs ~92x enrichment, not 11.5x,
+and the best structural signal found is 25x. The gap is not a tuning gap and the
+instrument's own filler share is most of the problem.
+
+
+COST
+----
+Seconds per run. Local, no dispatch, no training.

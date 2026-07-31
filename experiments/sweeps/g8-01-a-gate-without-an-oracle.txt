@@ -311,11 +311,19 @@ positions fire at **7.6x the filler rate** -- and still loses **because filler i
 
 What that enrichment actually buys, and what would be needed:
 
-    stored set is % real     enrichment required
+    stored set is % real     enrichment required AT 92% FILLER
                      50%                   11.5x
                      75%                   34.5x
                      90%                  103.5x
                      95%                  218.5x
+
+**THE BAR MOVES WITH THE FILLER SHARE AND THESE NUMBERS ARE ONLY FOR 92%.**
+`g28-01` hardcoded `11.5` and applied it to a configuration whose filler share is
+**98.92%**, where the same half-real target needs **91.9x** -- eight times higher --
+and printed CLEARS against two candidates that were a factor of four short. It is
+`target * filler / ((1 - target) * real)`, it travels with the measurement, and
+`experiments/g28_01_gate_screen.py` now computes it per run rather than quoting
+this table.
 
     measured best (salience)               7.6x
     the stored set 7.6x buys              39.8% real

@@ -212,6 +212,45 @@ class TheReplyMeansTheWorkLanded(unittest.TestCase):
 
 class WhenThePeerIsGone(unittest.TestCase):
 
+    def test_the_serve_loop_notices_it_was_STOPPED_without_the_socket_closing(self):
+        """The accept timeout's own contract, isolated from the second defence.
+
+        `close()` does two independent things that each free the port: it sets
+        `_running` false so the serve loop can exit, AND it closes the listener
+        after joining. **Either one alone makes the other two tests in this
+        class pass**, which is why the mutation `a-closed-peer-goes-on-serving`
+        survived CI at 38/39 while both of them were green — the region was not
+        weak, the mechanism had become redundant.
+
+        Redundancy is not the same as being checked. Without the timeout the
+        serve thread never reads `_running` again; it is abandoned inside
+        `accept`, `close()` pays the full three-second join, and a thread leaks
+        per departed node. On Linux, closing a socket another thread is blocked
+        on does not wake it, so the abandoned listener is what the original bug
+        was: **a node that keeps answering after it has left**, which is exactly
+        what C3 forbids and what would make any churn measurement here
+        meaningless.
+
+        So this stops the loop the way `close()` does and **never touches the
+        socket**, leaving the timeout as the only thing that can end it. That
+        also makes the test platform-independent: the Windows behaviour that
+        hid the original bug is `close()` waking `accept`, and nothing here
+        closes anything.
+        """
+        network = _Network()
+        self.addCleanup(network.close)
+        peer = network.peers[0]
+
+        peer._running = False                      # noqa: SLF001 - the unit
+        peer._thread.join(timeout=2.0)             # noqa: SLF001 - the unit
+
+        self.assertFalse(
+            peer._thread.is_alive(),               # noqa: SLF001 - the unit
+            "the serve loop must return once `_running` goes false, with the "
+            "listener still open. A loop that only exits when the socket is "
+            "closed is a node that leaves when its port is taken away rather "
+            "than when it decides to")
+
     def test_asking_a_closed_peer_RAISES(self):
         """A message that did not arrive must not read as a zero — the same
         rule `bucket_service.rank` enforces for a missing marginal."""

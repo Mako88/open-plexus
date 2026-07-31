@@ -12,245 +12,182 @@
 > **NO CLAIM LIVES HERE.** Every number points at the file that owns it, and if the two
 > disagree that file wins.
 
-**Written:** 2026-07-30, after the session that got #2 its first yes and answered #4.
+**Written:** 2026-07-31, after the session that changed what the project is aiming at.
 
 ---
 
-## THE ORDERING, WHICH IS THE MOST IMPORTANT THING ON THIS PAGE
+## THE NEXT THING, and John has already chosen it
 
-**Order by what is most likely to DISPROVE the project.** Not by what is hard, not by what
-is ready. **Tuning is deferred until the core is proven.** Three companions in
-`DECISIONS.md` standing agreements: prefer the option that SETTLES a question even when
-harder; every option offered to John carries a plain explanation, pros and cons, and a
-recommendation; never offer an option already known to fail the goals.
+**Build the grounding mechanism and test it.** John, 2026-07-31: *"I think this is the
+absolutely next thing to pursue — getting this all built and then a test."* His preference
+is an existing test over a home-made one, and **one exists** (below).
+
+Read these three, in this order, before anything else:
+
+1. [`GOALS.md`](GOALS.md) — the grounding section. What understanding MEANS here, why
+   multimodality is a requirement rather than a phase, and gates **G6** and **G7**.
+2. [`identity-without-a-global-id.md`](docs/options/identity-without-a-global-id.md) — a
+   concept gets no id; it is an equivalence class reached by walking.
+3. [`time-bucket-join.md`](docs/options/time-bucket-join.md) — the rounded timestamp as the
+   transient cross-node join. **Its first section says what a time bucket is NOT**, because
+   the first write-up read as circular.
+
+[Explainer 33](docs/explainers/33-how-two-machines-notice-the-same-moment.md) is the same
+thing in plain language and is the fastest way in.
+
+### The design in four lines
+
+    owner(surface id)   everything ever learned about one percept    DURABLE, hashable
+    owner(time bucket)  that two percepts occurred together          TRANSIENT, discarded
+    a concept           never stored anywhere                        a shape in the links
+    identity            learned by counting co-occurrence            not computed
+
+Time is the **join**; the percept's owner is the **accumulator**. Cross-situational
+learning becomes local counting at a fixed address, so nothing gathers and no barrier
+appears.
+
+---
+
+## THE EXISTING TEST — found 2026-07-31, NOT yet verified beyond its README
+
+**Cross-situational word learning is an established field and it has a model-comparison
+dataset.** [Kachergis et al., *A large-scale comparison of cross-situational word learning
+models*](https://www.kachergis.com/publication/bakeoff/) — **44 experimental conditions,
+1,696 human participants**, with code and data at
+[github.com/kachergis/word_learning_models](https://github.com/kachergis/word_learning_models).
+
+Why it is a strong fit, and this is the assessment rather than a measurement:
+
+- **The stimuli are already symbolic.** Per the repository README, a condition gives
+  per-trial matrices of words and objects. **Each trial IS a time bucket** — a set of
+  things that co-occurred, with the correct pairing unknown. That is our mechanism's input
+  shape with no perception layer required.
+- **It has HUMAN baselines**, so the opponent is people rather than a counting baseline we
+  wrote. This project has never had that.
+- **It has published models to compare against**, associative and hypothesis-testing.
+- **Referential ambiguity is the whole point of it**, which is exactly G6's falsifier.
+
+**What is NOT verified and must be before it is trusted** (rule 1 — this was read as a
+summary and a README, not run):
+
+- The data format has not been opened. `.RData` needs converting; the task layer takes no
+  dependencies, so the conversion is a one-off, not an import.
+- **There is no licence file.** Downloading and using locally is inside John's standing
+  permission; committing the data into this repo is not obviously safe. Check before
+  vendoring — `.gitignore` already covers `data/*/`.
+- Whether the 44 conditions are all word-object, or include variants that do not fit.
+- It is words-and-objects, **not literally image and audio**, so it tests the mechanism's
+  shape rather than G7's cross-modality. G6 first, G7 later.
+
+**If it does not pan out**, the fallback is registered in both option records: a symbol
+stream with a **distractor present on every single occasion**. Does it ever get pruned, and
+can the walk tell it from the target? Minutes to write, no perception layer.
+
+---
+
+## WHAT CHANGED ABOUT THE PROJECT'S DIRECTION
+
+**`GOALS.md` §2 already refused next-token prediction. It was not enough** — a
+sequence-prediction benchmark was proposed anyway, for good reasons (it solved recurrence,
+filler and perpetual learning at once), and nothing in the document objected. **A refusal
+without a positive statement only catches bad-faith proposals.**
+
+So `GOALS.md` now states the positive half, and the gate ladder has two new rungs:
+
+    G6  composition   answer about a relation it was never given, that follows from
+                      ones it was. Refuted if it can only return what it was told
+    G7  grounding     a concept introduced through one modality, queried through another
+
+**The ladder previously stopped at scale**, which meant every gate could be passed by a
+system that had understood nothing.
+
+**MQAR should stop being the scoreboard.** It has no concepts and no relations in it, its
+memory is rebuilt per sequence so it structurally cannot test C4, and its shape already
+forced a C1 violation once. Keep it as the capacity ruler — its scaling exponent is real
+and useful — and stop judging progress by it.
+
+---
+
+## THE KILL LIST
 
      ✅  2  representations learned LOCALLY   18 graphs, beats counting, no invariant
-     ✅  6  independent nodes agree           real bug found AND FIXED (transport half)
+     ✅  6  independent nodes agree           TRANSPORT half only; quantiser half ⬜
      ✅  7  decide what to say, and decline   exact, on the case the gate can see
 
      🔀 10  margin survives scale             REFUTATION WAS ON THE WRONG ARRANGEMENT
 
-     ⏸  4  multi-hop walk over real internet MEASURED; verdict needs a latency budget
+     ⏸  4  multi-hop walk over real internet MEASURED; accepted, tweak later
 
      ⬜  1  relational objective buys reasoning  blocked: no instrument with a wide band
-     ⬜  3  conventional system already wins     FIRST REAL BASELINE RUN, and we lose
-     ⬜  5  learn forever                        the cheap route is refuted; needs
-                                                per-position attribution
+     ⬜  3  conventional system already wins     first outside number run, and we lose
+     ⬜  5  learn forever                        the cheap route is refuted
      ⬜  8  adjudicate contradictions            untouched
      ⬜  9  survive hostile participants         untouched
      ⬜ 11  training traffic fits broadband      G4 passes on ONE SEED
-     ⬜ 12  survives a second modality           no evidence either way
+     ⬜ 12  survives a second modality           now G7, and it has a design
 
-**#6's ✅ is the TRANSPORT half only.** The quantiser half — do two nodes turn the same
-input into the same id — is untestable because no quantiser exists. That half is ⬜.
+**#10 moved from ❌ to 🔀.** Everything recorded about it was measured on DIMENSION
+partitioning. Concept partitioning solves the same cell on a quarter of the memory and a
+quarter of the machines — figures in
+[`g29-02`](experiments/sweeps/g29-02-concept-partitioning-at-EQUAL-state.txt). **Not a
+checkmark: the concept arm is saturated at 1.0000 in every cell with zero spread**, so the
+grid cannot rank anything or fit a slope.
 
-**#10 MOVED FROM ❌ TO 🔀 ON 2026-07-30, AND THE REASON IS THE ARRANGEMENT.**
-Everything below this paragraph was measured on **dimension** partitioning — every machine
-holds a slice of the width and every read is a fragment summed across machines.
-[`g29-02`](experiments/sweeps/g29-02-concept-partitioning-at-EQUAL-state.txt) ran `g5-01`'s
-own cell with **concept** partitioning instead, where a read is served whole by the one
-machine holding the fact:
+**A local probe DID find concept's wall and it is a cliff.** Width 32, 2 machines: solid at
+sequence 384, collapsed at 768, all three seeds. **The 1536 cell was killed for the session
+swap and never ran.** Numbers are in the terminal history only — **re-run before quoting**,
+they are not in any record.
 
-    dimension   16 machines, width 256, 147,520 numbers  ->  0.7549
-    concept      4 machines, width  64,  37,440 numbers  ->  1.0000
+**#3's first outside number**: raw store on FB15k-237's own metric loses to a counting
+baseline by a wide margin —
+[`g30-01`](experiments/sweeps/g30-01-link-prediction-on-their-task.txt). The learned arm is
+better but still loses, and **width HURTS it**, which says it is optimisation-limited
+rather than capacity-limited. It does not close #3: link prediction is offline, global and
+non-local.
 
-**A quarter of the memory, a quarter of the machines, and it solves what the other stalls
-on.** That cannot be bought with state, which is exactly what killed the first attempt —
-[`g29-01`](experiments/sweeps/g29-01-does-concept-partitioning-escape-g5s-wall.txt) ran the
-concept arm at 7.7× the state and is confounded beyond use.
+---
 
-**🔀 and not ✅, because the concept arm is SATURATED.** Thirty cells of thirty return
-1.0000 with zero spread across learning rates, so the grid cannot rank anything or fit a
-slope. What is established is that G5's wall belongs to dimension splitting. **Concept
-partitioning's own wall has never been looked for**, and the numbers below stand as
-statements about the arrangement the project does not intend to use.
+## IN FLIGHT AND UNFINISHED
 
-The cost table is the standing caution: concept state grows as `machines × width²` against
-dimension's `width²`, reaching **7.68×** at width 256. Whatever wall it has will be paid for
-in memory per machine, which is the quantity #10 is about.
+**`g30-02` has no write-up.** The predictions are committed; the grid ran; the record still
+says pending. P4 (best K interior) and P5 (widening helps) both need scoring, and **P5 is
+refuted in the opposite direction to the prediction**. Convergence was probed and the arm
+peaks around 8 epochs then turns down. **Everything is in terminal history only — the
+numbers must be re-run, not recalled.**
 
-**#10's ORIGINAL REFUTATION, on dimension splitting, unchanged below.**
-`docs/archive/goals-results-log.md` records G5 as **resolved and failing**: usable machine
-count goes as `T^-0.45`, so a ten-times-longer problem needs machines **6.6x wider** while
-the machine count you can split across falls to **a third**. In its own words — *"for a goal
-whose whole premise is that machine COUNT is the elastic quantity and machine SIZE is fixed
-by what people already own, the elastic quantity is the one that stops helping."* Pooling
-(`g5-04`) postpones the wall and does not remove it, degrading at exponent 1.94 against 0.82.
+**`g29-03` was never written.** The sequence-length grid that would fit concept
+partitioning's exponent. The cheap probe located the cliff; the grid is the next step and
+belongs in Actions.
 
-**The one escape is an ORACLE.** `g7-02`: with an oracle gate deciding what to store,
-sequence length stops being a difficulty dial at all — devices holding ONE NUMBER each score
-identically at 96, 192, 288 and 384 steps. **The record says outright this is a ceiling, not
-a result**, and note 010 argues MQAR cannot test a real replacement because the only event
-separating a pair from filler is the query, which arrives too late and never recurs.
+**`concept_replicas` defaults to 1 in the model config and 3 in `ConceptStore`.** Every
+measurement ever run had zero fault tolerance. **Replication is free in RAM** — verified,
+identical state at 1, 2 and 3 replicas — so this is a default worth fixing before anything
+distributed is measured. It costs superposition capacity, not memory.
 
-**And the escape route is ALSO measured, and it also failed.** `g8-01` — literally titled
-*"can any real mechanism replace the oracle gate"* — ran 36/36 cells with `on-use` and
-`salience` arms against the oracle ceiling and the ungated floor. Its verdict: **"No
-mechanism tried recovers the oracle. The largest recovery anywhere in the grid is 0.05 and
-most cells are at or below zero. Every result that rests on the gate is a CEILING."**
+**`g22-01` is built and dispatchable and has never been dispatched.**
 
-**So #10 is a COMPOUNDED negative and should be read that way:** scale fails, the one thing
-that rescues it is an oracle, and nothing real has been able to build that oracle.
+---
 
-**No new candidate, and I checked rather than assuming one.** The occupancy gate (`148`,
-exact per `g26-01`) is the obvious thing to reach for and it is the WRONG SHAPE: the oracle
-decides *is this arriving position a real binding or filler*, occupancy answers *was this
-address written before*, and a first-time binding is unwritten by definition — so it cannot
-separate a new pair from new filler. Proposing it would be forcing a fit.
+## PROCESS, and what must not regress
 
-**What would actually move #10** is a mechanism that separates a binding from filler at
-WRITE time, from local evidence, which is note 010's problem and is unsolved.
+- **CHECKPOINT ONTO A BRANCH** when a sweep is in flight. `checks.yml` cancels superseded
+  runs per ref, so pushing to master repeatedly starves a queued matrix.
+- **`gh run view --jq` with a literal `"/"` breaks under Git Bash** — MSYS expands it into
+  a Windows path and the poll silently returns garbage rather than erroring. Build status
+  strings without slashes.
+- **Verify a run's identity FROM THE DATA.** It caught three wrong numbers this session,
+  including one where the machine count was derived from the width by the script and the
+  prediction assumed otherwise.
+- **`check_provenance.py` earned its keep four times in one session**, every time the same
+  shape: a figure written into a record under a citation that does not contain it.
+- **Read a knob's own definition and its test's docstring before sweeping it.** `g29-01`
+  was dispatched into a confound that `local_memory.py` and `tests/test_concept_routing.py`
+  had both already written down.
 
-**`g28-01` put a NUMBER on how good it has to be, and screening is now seconds.** A gate
-must fire on real content `target * filler / ((1-target) * real)` times more often than on
-filler. **That is not a constant** — at MQAR's measured 98.92% filler share a merely
-half-real stored set needs **91.9x**. Best structural signal screened: `token-novel` at
-**25.2x**, `addr-novel` at **18.9x**. Both a factor of four short.
+---
 
-**Screen before building.** Four gates were built and measured after; this costs seconds
-and killed two novel candidates plus a bug in the screener itself. `g28-01` also has no
-working control yet — P1 compared `pair:filler` against note 013's `query:filler` number —
-so the candidate figures are recorded rather than relied on, and reproducing 7.6x on the
-right class is the first job for anyone continuing.
+## STATE
 
-**And the filler share is most of the problem.** At 98.9% filler the bar is brutal
-regardless of mechanism, which is an argument about the INSTRUMENT rather than about any
-gate. Note 010 already says MQAR cannot separate pair from filler at write time.
-
-**10 to 12 were MISSED from the original nine and John caught it**, and then **#10 was
-labelled ⬜ when the archive already had it as failed** — the same too-narrow-a-search
-failure twice on one item. The list was built from an outside review plus my reading and
-never cross-checked against `GOALS.md`'s gate ladder or the archived results log.
-
-## #2 — the live thread, and the session's result
-
-A **local contrastive rule** over relation vectors. Positives from closing triangles,
-negatives from every other relation, one update per puzzle, no population statistic and no
-barrier. `tools/relation_contrastive.py`, evaluated through note 070's harness.
-
-    kinship end task, true chains     0.7821 vs random 0.6642   +0.1179, 10/10 seeds
-    kinship end task, END TO END      0.6943 vs random 0.6088   +0.0855,  3/3 seeds
-    16 OpenEA graphs, vs COUNTING     +0.0974 at dim 0, +0.0507 at dim >= 1
-
-Every one pre-registered. Records: `docs/options/structured-relations.md`, sweeps
-`g23-01`, `g23-02`, `g23-03`.
-
-**It does not need a conserved quantity**, which is what `note 104` scoped the whole
-composition line on. It loses on 2 of 16 graphs and the informative loss has **48 rules** —
-so "beats counting" carries a data requirement.
-
-**Still ⬜: nothing in the model uses it.** A measurement is not an adoption.
-
-## Three claims corrected, all of them mine
-
-- **"The one-layer reference cannot compose"** — refuted, it reaches 0.714 at trained depth.
-  **The two-layer reference is PARKED**; do not build it without a better reason.
-- **"CLUTRR has ~4x closure's band"** — wrong twice, once from a borrowed number and once
-  from a mismatched baseline.
-- **"DBpedia has no additive invariant"** — narrowed to *one 15,000-entity extract has
-  none*. Three of eight V1/V2 pairs disagree on dimension (`g23-03` P4). **`dim` is a
-  property of the extract**, so note 104's scoping is partly a sampling artefact.
-
-## #1 is blocked, and the block is the finding
-
-**No instrument here can test the premise decisively.** Closure's usable band is 0.092
-(`g14-01`, 8 seeds, and its `local` arm sits at 0.108 BELOW a 0.190 base rate). CLUTRR's is
-~0.285 in one bucket with five answers and heavy label skew. `g22-01` is built, costed and
-dispatchable and would likely return "below the resolution of this instrument".
-
-**Outward-looking options exist and were not checked before I concluded otherwise:** SCAN,
-COGS, CFQ for compositional generalisation; **FB15k-237 / WN18RR** for relation composition.
-**FB15k-237 is FETCHED** (`tools/fetch_fb15k237.py`, pinned and checksummed) under John's
-standing permission for benchmark data. **But it does not hand us a published number:** the
-literature measures LINK PREDICTION on it and this project measures RULE PREDICTION, so
-reaching a real baseline still needs one of them reformulating.
-
-## #4 answered, and `d_max` was the wrong bar
-
-`g24-01` pointed `tc netem` at the peer path at last — the gap notes 094 and 101 each named.
-**161 ms per round on an 80 ms link against note 101's assumed 50**, so the walk exceeds
-`d_max` at **depth 2**, not depth 8. Rounds are `2 * depth` in every row, so the structure
-was right and only the constant was wrong.
-
-**New term nothing here models: with 2% loss, cost is SUPERLINEAR in depth** — 164, 271,
-302 ms/round — because a retransmit costs a timeout. Depth is dearest when the network is
-worst.
-
-**And `d_max` is a CHURN TIMEOUT, not a latency budget** (my call, recorded). It was derived
-as 3x a p99 for declaring a node dead. No depth is called a failure until John states a real
-budget.
-
-## #5 — the question was wrong
-
-`g25-01`'s first run was VOID: its control failed because it modelled eviction with no
-promotion gate in front of it.
-
-**Reading `local_memory.py` is what settled it.** Consolidation fires on
-`predictions[t-1] == token` — *"it promotes what the model ALREADY GOT RIGHT, so a
-persistent store cannot bootstrap a model that predicts badly"*. **The durable store
-receives what is already predicted, not what is used.** No record mentioned this before
-today; it is now on `docs/options/use-based-eviction.md`.
-
-**Before building here, read `g8-03` and `g8-04`:** `capture_slots` is already measured, and
-*"bounding the lasting store cannot reproduce a mechanism that gates the FAST one"* — every
-pool recovered approximately zero.
-
-**And the cheap route to unblocking it is REFUTED, 2026-07-30.**
-[`g31-01`](experiments/sweeps/g31-01-is-the-filler-share-ours-or-the-worlds.txt) proposed a
-label-free stand-in for *"is this write worth making"* — count whether the address recurs
-later — so the 92× bar could finally be measured on data this project did not generate. Its
-gate failed: the oracle control reproduces at **92.0×** against `g28-01`'s 91.9×, and the
-same stream counted label-free reads **0.0×–0.1×** at every granularity.
-
-**Recurrence is not demand.** MQAR's filler is drawn from a small key range, so it recurs
-constantly; the proxy calls 99.9% of the stream worth writing where the oracle says 1.1%.
-No granularity closes it, so the conclusion is structural: worth-writing is a fact about
-FUTURE DEMAND, no count of the symbols can reach it, and the only routes left are a task
-that declares its queries — which is MQAR, where we started — or an intervention that
-removes the write and sees what breaks. **That is the per-position attribution route, and
-this strengthens the case for it rather than replacing it.**
-
-One thing survives independently, and it is structure rather than measurement: **only
-`openplexus/tasks/mqar.py` and `openplexus/tasks/reward_recall.py` have a `filler` position
-kind, and this project wrote both.** That does not show the bar is unrepresentative — a
-stream with no explicit junk can still be mostly not-worth-storing — only that it has never
-been measured off a task we authored.
-
-## #3 — the first real outside baseline, and we lose to counting
-
-[`g30-01`](experiments/sweeps/g30-01-link-prediction-on-their-task.txt) ran the raw store on
-FB15k-237's own metric: filtered tail-side link prediction, 20,438 test triples.
-
-    store, width 256    MRR 0.0122        frequency  MRR 0.3378
-    store, width 512    MRR 0.0232        chance     MRR 0.000069
-
-**177× chance and one twenty-eighth of counting.** The opponent ranks entities by how often
-each is a tail of that relation — no learning, no capacity — and it is computed here on the
-same test set rather than quoted from a paper. All four predictions held, including the one
-whose refutation would have been the good news.
-
-**It does not close #3.** Link prediction is offline, global and non-local; none of this
-project's constraints are exercised by it. It bounds one reading of the store on one outside
-task, and it did not include the learning rule at all —
-[`g30-02`](experiments/sweeps/g30-02-the-local-rule-on-their-task.txt) is that run and is in
-progress.
-
-**The informative line was the width one.** Doubling width moved the raw store 1.90×,
-against 1.41× from the superposition law and 4× from capacity, so at 181× over capacity
-neither model describes the read. The LEARNED arm goes the other way — width **hurts**,
-0.1633 at 64 against 0.1385 at 256 — which says it is optimisation-limited rather than
-capacity-limited, and that any width or K comparison before convergence is measuring
-learning speed instead of capability.
-
-## Process, and one thing that must not regress
-
-- **CHECKPOINT ONTO A BRANCH.** `checks.yml` uses a PER-REF concurrency group, so a branch
-  push cannot cancel master's run. **Eight consecutive runs were cancelled on 2026-07-30**,
-  so the six mutation shards — CI-only — did not execute once. Cancel superseded checkpoint
-  branches so they do not compete for runners.
-- **`check_rails.py` R6**: every module in `openplexus/` and `tools/` says what it does not
-  duplicate. 65 of 66 baselined; it caught its author's own new files first.
-- **`check_provenance.py` was case-blind** and therefore weaker locally than in CI.
-- Four near-misses this session were caught by machinery, not by care, and a fifth — that
-  `tc netem` had in fact been run many times, just never on the peer path — was caught by
-  John. **Search wide before concluding a negative.**
+Clean tree, 207 mutations verified, 1,370 tests green, all seven checks passing. **Seven
+commits unpushed at the time of writing** — push them and watch `checks.yml`. No background
+processes, no `.mutate.lock`, no sweep in flight.

@@ -1,0 +1,117 @@
+Trials this project did not design
+==================================
+
+Script: experiments/g34_01_external_word_learning_trials.py
+Status: PREDICTIONS COMMITTED, NOT YET RUN.
+
+
+IN PLAIN TERMS
+--------------
+Every test of the grounding mechanism so far used a stream this project wrote,
+with knobs this project chose. That is a real weakness and the project already
+names it: **we have been grading our own homework.**
+
+These trials come from psychology experiments published between 2008 and 2013.
+Each trial shows a participant several words and several objects at once and does
+not say which goes with which. Nobody can tell from one trial. Across many
+trials, the word that keeps appearing whenever a particular object does is
+presumably its name — which is the same reasoning the mechanism does, posed by
+someone else, more than a decade earlier.
+
+The correct answer is in the file, so no human data is needed to score it. That
+matters, because the human scores turn out not to be reachable without decoding
+an R binary format. **So this is external STIMULI, not an external BENCHMARK**, and
+that difference is stated wherever a number from it is quoted.
+
+The second question is the one that is really outstanding. The mechanism's newest
+piece — deciding for itself how many partners to keep — works by looking for a
+**cliff** in the ranking. This project has only ever seen a cliff in worlds it
+built. When it looked at real language it found a gentle slope instead, where the
+rule is not just weaker but decided by rounding error. So: do real experimental
+trials have a cliff or a slope? These files can answer that, and nothing else
+here can.
+
+
+WHAT IS BEING MEASURED
+----------------------
+    f1        mean per-surface F1 against the true word-object mapping.
+              **The floor here is 0.6667, NOT 0.5** — a concept has two surfaces,
+              not three, so one recovered alone scores precision 1.0 and recall
+              0.5. Every previous grounding sweep had a 0.5 floor and quoting
+              this table against that one would overstate every row
+    gap       mean size of the largest drop in a surface's ranking — the
+              quantity note 058 reported as 0.059 for real language against
+              0.424 for the designed families task
+    cut       mean number of partners the derived bound keeps. The true answer
+              is 1, because a word has exactly one object
+
+Arms: `count` and `conditional` at a fixed bound of 1, and `conditional` with the
+derived bound. `local` and `ppmi` are omitted: `g33-01` measured the first
+failing everywhere and the second undeployable under C1.
+
+
+MEASURED ON
+-----------
+Local, single process, Python 3.14, no numpy.
+
+29 conditions from `kachergis/XSLmodels`, fetched by `tools/fetch_kachergis.py`
+and pinned by sha256. Between 12 and 18 word-object pairs each, 2 to 4 pairs per
+trial, 18 to 36 trials. Nothing is swept: **the trials are fixed, which is the
+entire point** — a knob is how a designed instrument gets made solvable.
+
+The join is not in the loop and neither is the federation. This asks whether the
+STATISTIC and the BOUND survive contact with stimuli this project did not write.
+
+
+PREDICTIONS
+-----------
+P1  THE MECHANISM BEATS THE PEOPLE, and by a lot. Where the dataset table records
+    a human score at all it is 0.18 to 0.56, and those conditions are considered
+    hard. An exact counter with perfect memory should recover most conditions at
+    f1 above 0.90.
+    REFUTED IF it does not. **That refutation would be the interesting one**: it
+    would mean these trials contain a difficulty the mechanism shares with people
+    rather than one it sidesteps, and the mechanism would have found a real limit
+    on somebody else's data at the first attempt. Note the comparison is
+    indicative only — the human numbers are for conditions whose orderings are
+    not in this set, so this is a claim about the family, not a paired contrast.
+
+P2  THE RANKING IS BIMODAL HERE, with a mean largest gap above 0.20 — far above
+    note 058's 0.059 for real language, and below the designed task's 0.424.
+    REFUTED IF the mean gap is under 0.10, which would put these trials on the
+    slope side with natural language and would mean `g33-04`'s derived bound is
+    validated only on worlds this project designed. That is the outcome that
+    would matter most, because it would make the per-surface bound —
+    `g33-02`'s only working answer to a hub — unsafe on anything real.
+
+P3  THE DERIVED BOUND CUTS AT 1, on average, within 0.3. The true class has two
+    surfaces so exactly one partner is right, and the rule is not told that.
+    REFUTED IF the mean cut is far from 1, which would say the cliff is in the
+    wrong place even where one exists.
+
+P4  THE `freq369` CONDITIONS SCORE WORSE THAN `orig_*`. Those deliberately show
+    some pairs 3 times, some 6 and some 9, and `g32-02` measured frequency skew
+    as the failure mode of raw counting — so `count` should suffer there and
+    `conditional` should not.
+    REFUTED IF `count` holds up under varied frequency, which would narrow
+    `g32-02`'s finding to streams where the skew is much larger than an
+    experimenter would use.
+
+
+COST
+----
+Estimated: 29 conditions of at most 36 trials each is a few thousand pair
+updates in total — thousands of times smaller than any previous grounding sweep.
+**Seconds.** Local.
+
+Recorded after the run: PENDING.
+
+
+RESULTS
+-------
+PENDING.
+
+
+SCORECARD
+---------
+PENDING.

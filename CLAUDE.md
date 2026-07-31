@@ -563,9 +563,21 @@ to do X".
 > size **as a plain CSV**. The document now says that, and says which repository
 > is an unmodified template still containing Palmer Penguins.
 >
-> **The claim was not softened, and the correction went the useful direction** —
-> the obstacle the handoff worried about (`.RData` conversion in a
-> dependency-free layer) largely evaporated once the right repository was open.
+> **AND THE CORRECTION WAS ITSELF WRONG, the same day, which is the entry that
+> earns its place.** The fix said the replacement repository held *"63 conditions
+> as a plain CSV with per-condition accuracy"* and that the `.RData` obstacle had
+> largely evaporated. Counting the whole file rather than reading its header and
+> first rows: **8 of 64 rows carry an accuracy**, `train` and `test` are entirely
+> empty, and — the part that decides it — **ZERO conditions have both a
+> plain-text ordering and a human number.** The human baselines are exactly as
+> blocked as the original claim said.
+>
+> **Reading a file is not the same as checking it, and a header plus three rows
+> is a sample.** This is rule 1's borrowed-claim failure at the shortest possible
+> range: not a summary of someone else's paper, but a summary of a file that was
+> already open. The tell was available for the cost of one `sum(1 for ...)`, and
+> the confident version had already been reported and written into `HANDOFF.md`
+> before anyone counted.
 >
 > Then the same day, one level down: `co-occurrence-statistic.md` recorded that a
 > chance-corrected statistic *"costs ONE HOP"*. True for a single pair, false for

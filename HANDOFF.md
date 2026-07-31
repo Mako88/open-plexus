@@ -75,14 +75,30 @@ via the GitHub API, not from a README.
   dissertation), and **no human-accuracy data** — a handful of figures quoted in prose in
   the README and nothing else.
 - **The bakeoff data is in [`kachergis/XSLmodels`](https://github.com/kachergis/XSLmodels),
-  which IS licensed** — GPL — and holds `data-raw/XSL-dataset-fields.csv`: **63 conditions
-  as a PLAIN CSV**, with per-condition `accuracy`, `sd_accuracy`, `nsubj`, `citation`,
-  `age_years` and `adult_data`. Beside it, `data-raw/orders/` has **66 plain-text trial
-  orderings**, one line per trial. Datasets from SmithYu2008, Suanda2014, Medina2013,
-  Benitez2020, VlachDeBrock, YuZhongFricker and KoehneTrueswellGleitman.
-- **So the `.RData` problem is largely gone.** Human results are CSV and orderings are
-  `.txt`; both are readable by the dependency-free task layer. Two `.RData` files remain
-  and hold the asymmetric conditions only.
+  which IS licensed** — GPL — and holds `data-raw/XSL-dataset-fields.csv` and
+  `data-raw/orders/`.
+
+> **CORRECTED 2026-07-31, SECOND PASS, AND THE FIRST CORRECTION WAS ALSO WRONG.**
+> The first pass reported *"63 conditions as a plain CSV with per-condition accuracy"*
+> from reading the header row and the first few data rows. Counting the whole file:
+>
+>     64 rows        8 with `accuracy`       4 with `sd_accuracy`
+>     52 with `order_filename`      37 with `nsubj`      0 with `train` or `test`
+>
+> And the intersection is the part that matters: **ZERO conditions have both a
+> plain-text ordering AND a human accuracy.** The 8 with human numbers
+> (Suanda2014 ×3, KoehneTrueswellGleitman2013 ×4, VlachDeBrock) name orderings
+> that are not in `orders/`; the 29 orderings that ARE there carry no human
+> figure.
+
+- **So `.RData` is still the blocker for the human comparison**, and only for that.
+  What is reachable with no dependency: **29 trial orderings as plain text**, one line
+  per trial, each number a word-object pair — real experimental stimuli this project did
+  not design, which is enough to answer the standing *"is the ranking bimodal on data we
+  did not generate"* question that `g33-04` names as its largest caveat.
+- **The human baselines need a pure-Python `.RData` reader** — gzipped XDR, a real but
+  bounded piece of work, and the thing that would turn external *stimuli* into an
+  external *benchmark*. Registered, not built.
 - `kachergis/XSL-datasets` is an **unmodified Quarto template** — still Palmer Penguins,
   no XSL data in it. Do not go there.
 - GPL matters for vendoring, not for use: `data/*/` is gitignored, so this needs a fetcher

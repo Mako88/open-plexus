@@ -52,6 +52,7 @@ KINSHIP = ROOT / "openplexus" / "tasks" / "kinship.py"
 CLOSURE = ROOT / "openplexus" / "tasks" / "closure.py"
 CONTENT = ROOT / "openplexus" / "content.py"
 OCCASIONS = ROOT / "openplexus" / "tasks" / "occasions.py"
+XSL = ROOT / "openplexus" / "tasks" / "xsl.py"
 GROUNDING = ROOT / "openplexus" / "grounding.py"
 BUCKETS = ROOT / "openplexus" / "buckets.py"
 FEDERATED = ROOT / "openplexus" / "federated.py"
@@ -2309,6 +2310,19 @@ MUTATIONS = [
         path=OCCASIONS,
         old="                present = [s for s in own if rng.random() < config.presence]",
         new="                present = list(own)",
+    ),
+    Mutation(
+        name="a-trial-presents-only-the-CORRECT-word-object-pairing",
+        breaks="the whole difficulty the experiments were built to pose. A "
+               "trial shows several words and several objects UNPAIRED, so on "
+               "any one trial a word is equally consistent with every object "
+               "present; emitting each word beside only its own object hands "
+               "the answer over, and the mechanism would score perfectly on a "
+               "task nobody ran",
+        path=XSL,
+        old="            tuple(sorted([self.word(v) for v in line]\n"
+            "                         + [self.object(v) for v in line]))",
+        new="            tuple(sorted([self.word(line[0]), self.object(line[0])]))",
     ),
     Mutation(
         name="a-chain-links-every-modality-to-every-other",

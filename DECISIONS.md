@@ -93,7 +93,7 @@ history lives in `docs/archive/notes/` and the archived log.
                    went against it, so it carries no revival condition — what it
                    needs is a reason to pick it back up
 
-**CENSUS: 33 chosen, 30 refuted, 15 untried, 12 both, 1 paused.** Checked against the body,
+**CENSUS: 34 chosen, 30 refuted, 15 untried, 12 both, 1 paused.** Checked against the body,
 because a summary that can drift is how its predecessor caught its own counts.
 
 > **Coverage, stated exactly, because a tree that looks complete and is not is worse than
@@ -269,6 +269,7 @@ is the standing weakness** — though `CLUTRR`, `OpenEA` and now `FB15k-237` are
 - ❌ **A composition sweep on chains as evidence about composition** — out-degree 1 by construction, so nothing chooses. `108`, `note 103`. **Revival:** none for chains. → [record](docs/options/composition-sweep-on-chains.md)
 - ⏸ **`corpus.py`** — PAUSED, not condemned. Closed by `115`/`118`, reopened by `g17-01`. → [record](docs/options/corpus-instrument.md)
 - ❌ **`reward_recall.py`** — retired; its requirements list turns out to describe bsuite's Memory Length test, and the list was a search query nobody used as one. `126`. **Revival:** the literature's version. → [record](docs/options/reward-recall.md)
+- ✅ **`mnist.py` — real sensory input, digits and their names** — the first grounding instrument that is not symbolic; a word's class holds only its own digit's image codes at 50 codes. `g36-01`. **ALIGNMENT, not G7: both modalities are in every occasion.** → [record](docs/options/identity-without-a-global-id.md)
 - ✅ **`xsl.py` — 29 published word-learning conditions** — the first EXTERNAL grounding instrument; 26 of 29 recovered exactly, and the 3 failures present two pairs only ever together, so co-occurrence provably cannot separate them. `g34-01`. **Stimuli, not a benchmark: no human accuracy is reachable without an RData reader.** → [record](docs/options/co-occurrence-statistic.md)
 - ✅ **CLUTRR-symbolic** — the first external instrument; graph layer, never the prose. Report per hop bucket and split on ENTITY REPETITION. `note 059`, `note 060`. → [record](docs/options/clutrr-symbolic.md)
 - ✅ **OpenEA `EN_DE_15K_V2`** — the acquisition instrument. Zero supervision reaches 583× chance; **mutuality is the merge gate and a confidence gate makes it WORSE**. `note 077`/`078`. → [record](docs/options/openea.md)

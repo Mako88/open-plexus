@@ -180,3 +180,30 @@ the thing that has to solve it rather than an alternative kept for interest.
 **A word that names a concept IS a hub** — it meets the picture and the sound
 while those two may never meet each other — so the star is the shape this
 record's own motivating example has, not a corner case chosen to be hard.
+
+### A word and a PICTURE reach the same concept — `g36-01`
+
+    CONFIG  when    2026-07-31
+            source  experiments/sweeps/g36-01-a-picture-and-a-word.txt
+            script  experiments/g36_01_a_picture_and_a_word.py
+            task    MNIST, 4,000 images, 10 word tokens, noise 2, 1 distractor
+            model   grouping.cluster quantiser; conditional; derived bound
+            knobs   codes 20 / 50 / 100; 3 seeds
+            scale   one process, no join
+
+**The first grounding measurement on real sensory input.** Every earlier one ran on
+symbol streams this project generated, where a modality is an integer and the hard half —
+recognising two different pictures of one thing as one thing — never arises.
+
+At 50 codes, **every image code in a word's recovered class has that word's digit as its
+majority**: link purity **1.0000** against chance **0.1110**, with all ten words reaching
+image codes and a mean class size of **5.00**, so it is not a collapse.
+
+**Linking does not beat seeing**, on the metric where the two are comparable: per-image
+recovery is **0.6604, 0.7688, 0.8266** against quantiser purities of **0.7174, 0.8299,
+0.8718**. The gap is about five points, so **the bottleneck is the perceptual front end
+rather than the grounding**.
+
+**This is ALIGNMENT and not G7.** Both modalities are present in every occasion, where
+`GOALS.md` states G7 as a concept *introduced* through one modality and *queried* through
+another. The record says so at length rather than claiming a gate.

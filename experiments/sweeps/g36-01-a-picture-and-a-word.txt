@@ -2,7 +2,15 @@ Can a word and a picture reach the same concept?
 ================================================
 
 Script: experiments/g36_01_a_picture_and_a_word.py
-Status: PREDICTIONS COMMITTED, NOT YET RUN.
+Status: RUN, local, 2026-07-31, 5.9s. Predictions committed at `9d9703d`
+        before the script was executed.
+
+ANSWER: **G7's falsifier did NOT fire.** At 50 codes every image code in a
+        word's recovered class is that word's digit — link purity **1.0000**
+        against chance **0.1110** — and 76.9% of all images are reachable from
+        their own word. **But G7 is not PASSED**, for a reason stated in full
+        below: both modalities are present in every occasion, so this measures
+        ALIGNMENT rather than introduce-in-one-and-query-in-another.
 
 
 IN PLAIN TERMS
@@ -121,14 +129,106 @@ Estimated: 3 code counts x 3 seeds is 9 k-means runs over 4,000 x 784, 25
 iterations each, plus 4,000 occasions of about 5 surfaces per run. k-means
 dominates. **Two to ten minutes.** Local.
 
-Recorded after the run: PENDING.
+Recorded after the run: **5.9s**, against an estimate of two to ten minutes.
+Wrong by two orders of magnitude — k-means on 4,000 unit rows is far cheaper
+than assumed, and the estimate was made without measuring one iteration.
 
 
 RESULTS
 -------
-PENDING.
+      codes  per code  quantiser    link  grounded   reach  classes
+         20       200     0.7174  0.8036    0.6604  1.0000     3.34
+         50        80     0.8299  1.0000    0.7688  1.0000     5.00
+        100        40     0.8718  0.6494    0.8266  1.0000    15.31
+
+    chance for quantiser, link and grounded: 0.1110
+
+`grounded` was ADDED AFTER THE FIRST RUN and before anything was concluded — see
+P3. It is the share of all images that are BOTH in a code their own word reaches
+AND in a code whose majority is their digit, so it is per-image and comparable
+with quantiser purity, which `link` is not.
 
 
 SCORECARD
 ---------
-PENDING.
+  P1  HELD, just. Quantiser purity is 0.7174, 0.8299 and 0.8718 against a
+            predicted 0.40 to 0.85 — the 100-code cell is 0.0218 over the top of
+            the range. Far above chance 0.1110 and far below 1.0, which is what
+            raw pixels should give: they group by ink position rather than by
+            shape.
+
+  P2  **HELD, AND IT IS THE GATE.** Link purity is 0.8036, **1.0000** and 0.6494
+            against chance 0.1110 and a predicted floor of 0.50. At 50 codes
+            **every image code in a word's class has that word's digit as its
+            majority**, and every one of the ten words reaches image codes at
+            all.
+
+            **So a word and a picture do reach the same concept, from
+            co-occurrence alone, on real sensory data.** G7's falsifier —
+            *"the same concept cannot be reached from two modalities under these
+            constraints"* — did not fire.
+
+  P3  REFUTED AS WRITTEN, THEN HELD ON THE RIGHT METRIC, and the difference is
+            the whole entry. `link` (0.8036, 1.0000, 0.6494) exceeds quantiser
+            purity in two cells, which reads as *the word REPAIRING the
+            quantiser* — the outcome this file called the most interesting
+            available.
+
+            **It is not supported, because the two are not comparable.**
+            Quantiser purity counts IMAGES; `link` counts CODES. A code that is
+            60% threes is one correct code for `link` while its 40% wrong images
+            drag the quantiser figure down. That is `g35-02`'s floor confound in
+            a new costume, three days running.
+
+            On `grounded`, which is per-image: **0.6604, 0.7688, 0.8266 against
+            0.7174, 0.8299, 0.8718.** Below the quantiser in every cell, by
+            0.057, 0.061 and 0.045. **P3's actual claim holds: linking cannot
+            beat seeing.**
+
+            And the gap being SMALL is the useful part — the linking loses about
+            five points relative to what the front end permits, so **the
+            bottleneck is perception rather than grounding.**
+
+  P4  HELD on `link`, which peaks at 50 codes and falls to 0.6494 at 100, exactly
+            as predicted from `g32-02`'s occasion threshold: 100 codes leaves 40
+            images each and `classes` triples to 15.31.
+
+            **REFUTED on `grounded`, which rises monotonically** — and that is
+            over-merging rather than improvement. `grounded` is recall-shaped
+            like every other metric in this line: a class holding more codes
+            catches more of a digit's images, and at full collapse it would equal
+            quantiser purity. `link` is the precision side and it is what falls.
+
+            So 50 codes is the operating point: perfect precision, 0.7688 recall,
+            no collapse.
+
+
+WHY G7 IS NOT PASSED, WHICH IS THE MOST IMPORTANT LINE HERE
+------------------------------------------------------------
+`GOALS.md` states G7 as *"a concept introduced through one modality, queried
+through another"*. **In this run both modalities are present in every single
+occasion** — the picture and the word always arrive together.
+
+So what is measured is **alignment across modalities**, which §1.2b names as the
+harder of the two halves and which nothing here had tested. It is not
+introduce-in-one-and-query-in-another, and calling this a pass would be exactly
+the overclaim the gate ladder exists to prevent.
+
+The run G7 needs is the obvious one and is not done: show a concept only through
+pictures for a while, then ask with the word. That requires the word to be absent
+during learning for at least part of the stream, which `occasions.py` can express
+and this script does not.
+
+
+WHAT ELSE THIS DOES NOT SETTLE
+-------------------------------
+**Ten concepts, and they are digits.** A world with ten things in it is not a
+test of anything's capacity, and `g32-02`'s own caution about small worlds
+applies.
+
+**The quantiser is raw pixels and deliberately weak.** A better front end would
+raise every number here and would not tell us more about the linking, which is
+already within five points of what the front end permits.
+
+**Nothing is distributed.** This is the statistic and the walk in one process;
+`g35-01` and `g35-03` are where the container path lives.

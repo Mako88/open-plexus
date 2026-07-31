@@ -99,12 +99,12 @@ def main() -> None:
           f"{chance:.4f}\n")
 
     header = (f"{'codes':>7}{'per code':>10}{'quantiser':>11}{'link':>8}"
-              f"{'reach':>8}{'classes':>9}")
+              f"{'grounded':>10}{'reach':>8}{'classes':>9}")
     print(header)
     print("-" * len(header))
 
     for codes in CODES:
-        quant, links, reaches, sizes = [], [], [], []
+        quant, links, reaches, sizes, grounded = [], [], [], [], []
         for seed in SEEDS:
             assigned = _quantise(digits, codes, seed)
             purity, majority = _purity(assigned, digits.labels)
@@ -139,13 +139,27 @@ def main() -> None:
                     if majority.get(picture) == digit:
                         hit += 1
             links.append(hit / seen if seen else 0.0)
+
+            # PER IMAGE, so it is comparable with quantiser purity. `link` is
+            # per CODE and the two have different denominators -- a code that is
+            # 60% threes counts as one correct code while its 40% wrong images
+            # drag the quantiser figure down. Comparing them directly would be
+            # g35-02's floor confound in a new costume.
+            wanted = {digit: recovered.get(token, frozenset({token}))
+                      for digit, token in words.items()}
+            correct = sum(
+                1 for code, label in zip(assigned, digits.labels)
+                if code >= 0 and code in wanted[label]
+                and majority.get(code) == label)
+            grounded.append(correct / len(digits))
             reaches.append(reached / len(words))
             sizes.append(sum(len(v) for v in recovered.values())
                          / max(len(recovered), 1))
 
         mean = lambda v: sum(v) / len(v)          # noqa: E731 - local
         print(f"{codes:>7}{len(digits) / codes:>10.0f}{mean(quant):>11.4f}"
-              f"{mean(links):>8.4f}{mean(reaches):>8.4f}{mean(sizes):>9.2f}")
+              f"{mean(links):>8.4f}{mean(grounded):>10.4f}"
+              f"{mean(reaches):>8.4f}{mean(sizes):>9.2f}")
 
     print(f"\nCOST: {time.time() - started:.1f}s wall, one process")
 

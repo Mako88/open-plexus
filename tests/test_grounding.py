@@ -23,7 +23,8 @@ import unittest
 
 from openplexus.grounding import (STATISTICS, CoOccurrence, conditional,
                                   equivalence_classes, frequency_weighted,
-                                  neighbours, ppmi, raw_count, score_classes)
+                                  local_conditional, neighbours, ppmi,
+                                  raw_count, score_classes)
 
 
 def _index(occasions: list[tuple[int, ...]]) -> CoOccurrence:
@@ -155,6 +156,35 @@ class WhatTheStatisticsMean(unittest.TestCase):
         index = _index([(0, 1)] * 30 + [(1,)] * 70 + [(0, 2)] * 30)
         self.assertAlmostEqual(conditional(index, 0, 1), 0.30)
         self.assertAlmostEqual(conditional(index, 0, 2), 1.00)
+
+    def test_the_only_statistic_needing_no_remote_read_prefers_the_distractor(self):
+        """The C1 cost, stated as a property rather than as an argument.
+
+        `owner(x)` holds `count(x,y)` and `count(x)`. The one normalisation it
+        can compute alone is `P(other | x)`, and a thing present on every
+        occasion has that at 1.0 for every surface while a true partner present
+        only sometimes cannot. **So the free version fails for the same reason
+        raw counting does**, and the working statistic is the one that has to ask
+        another machine.
+        """
+        index, hub = _world()
+        for surface in index.surfaces():
+            if surface == hub:
+                continue
+            self.assertEqual(
+                neighbours(index, surface, local_conditional, k=1), [hub],
+                "the purely-local statistic did not prefer the distractor, so "
+                "the remote read may not be necessary after all")
+
+    def test_and_it_is_correct_when_nothing_is_always_there(self):
+        """The companion. It is a working statistic, not a broken one — which is
+        what makes its failure above a statement about the distractor rather
+        than about the arithmetic."""
+        index, _ = _world(hub=False)
+        for surface in index.surfaces():
+            partner = surface + 1 if surface % 2 == 0 else surface - 1
+            self.assertEqual(
+                neighbours(index, surface, local_conditional, k=1), [partner])
 
     def test_every_statistic_refuses_a_pair_that_never_met(self):
         index, _ = _world()

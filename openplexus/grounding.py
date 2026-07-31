@@ -111,13 +111,60 @@ class CoOccurrence:
         stronger partner to everything.
         """
         present = sorted(set(surfaces))
-        self.occasions += 1
+        self.moment()
         for surface in present:
-            self._seen[surface] = self._seen.get(surface, 0) + 1
-            self._pairs.setdefault(surface, {})
+            self.note(surface)
         for one, other in combinations(present, 2):
-            self._pairs[one][other] = self._pairs[one].get(other, 0) + 1
-            self._pairs[other][one] = self._pairs[other].get(one, 0) + 1
+            self.pair(one, other)
+
+    def moment(self) -> None:
+        """Record that one occasion happened, whatever was in it.
+
+        **This is the one GLOBAL quantity in the whole mechanism, and naming it
+        is the point of separating it.** `ppmi` divides by it, so a node
+        computing PPMI needs to know how many occasions the entire system has
+        seen — which no node can know without a collective, and amended C1
+        forbids collectives.
+
+        `conditional` needs none of it: `count(x,y) / count(y)` is `owner(x)`'s
+        own row plus a bounded message to `owner(y)`. Since `g32-01` measured
+        the two as giving identical rankings above chance, **the C1-safe
+        statistic is the one to deploy and PPMI is the one to compare against.**
+
+        **And "one hop" is the wrong count, corrected here rather than left to
+        propagate.** It is one hop *per candidate partner*, because ranking needs
+        `count(y)` for every `y` under consideration — bounded per message and
+        growing with a surface's partner list, which is `peer.py`'s profile
+        rather than a collective's. The version needing no remote read at all is
+        `local_conditional`, and it is an arm precisely so that *"the free one
+        cannot work"* is a measurement rather than an argument.
+        """
+        self.occasions += 1
+
+    def note(self, surface: int) -> None:
+        """Record that a surface was present, without any partner.
+
+        Split out of `observe` because a distributed join cannot hand over a
+        whole moment at once — it discovers pairs one bucket at a time, and has
+        to count a surface's own appearances exactly once somewhere else. Both
+        halves must stay in ONE implementation or the two paths drift and every
+        chance-corrected statistic silently uses a different denominator on each.
+        """
+        self._seen[surface] = self._seen.get(surface, 0) + 1
+        self._pairs.setdefault(surface, {})
+
+    def pair(self, one: int, other: int) -> None:
+        """Record that two surfaces met, symmetrically.
+
+        Does NOT touch either marginal — see `note`. A caller that counts a
+        marginal here as well would count it once per partner.
+        """
+        if one == other:
+            raise ValueError(
+                "a surface cannot be its own partner; counting one would make "
+                "every statistic read its own presence as evidence")
+        self._pairs.setdefault(one, {})[other] = self.together(one, other) + 1
+        self._pairs.setdefault(other, {})[one] = self.together(other, one) + 1
 
     def surfaces(self) -> list[int]:
         """Every surface seen at least once, in ascending order."""
@@ -178,6 +225,33 @@ def conditional(index: CoOccurrence, surface: int, other: int) -> float:
     return index.together(surface, other) / common
 
 
+def local_conditional(index: CoOccurrence, surface: int, other: int) -> float:
+    """`P(other | surface)` — the only normalisation needing NO remote read.
+
+    **This exists to be refuted, and it is the C1 question stated as an arm.**
+
+    `owner(x)` holds `count(x,y)` and `count(x)` and nothing else. `conditional`
+    divides by `count(y)`, which lives at `owner(y)` — so ranking a surface's
+    partners costs one remote read *per candidate*, not one in total. This is
+    the statistic that avoids all of them.
+
+    It should not work, and the arithmetic says why: a distractor present on
+    every occasion has `P(distractor | x) = 1.0` for every `x`, while a true
+    partner present only sometimes has `P(partner | x) = presence`. **So the
+    purely-local direction ranks the distractor first by construction**, which is
+    the failure `raw_count` has, arriving through a different door.
+
+    Kept as a measured arm rather than an argument, because *"the local version
+    cannot work"* is exactly the kind of claim this project requires a number
+    for — and because if it ever does work on some stream, the remote read goes
+    away and the design gets cheaper.
+    """
+    mine = index.seen(surface)
+    if mine <= 0:
+        return 0.0
+    return index.together(surface, other) / mine
+
+
 def ppmi(index: CoOccurrence, surface: int, other: int) -> float:
     """Positive pointwise mutual information — how much likelier than chance.
 
@@ -204,6 +278,7 @@ STATISTICS: dict[str, Statistic] = {
     "count": raw_count,
     "weighted": frequency_weighted,
     "conditional": conditional,
+    "local": local_conditional,
     "ppmi": ppmi,
 }
 

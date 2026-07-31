@@ -1,0 +1,182 @@
+Does the bucket join keep the signal?
+=====================================
+
+Script: experiments/g33_01_does_the_bucket_join_keep_the_signal.py
+Status: PREDICTIONS COMMITTED, NOT YET RUN.
+
+
+IN PLAIN TERMS
+--------------
+The last two runs showed a machine CAN learn that a picture and a word are the
+same thing by noticing they keep turning up together — as long as it asks "more
+often than by luck" rather than "how often".
+
+Both of those runs cheated in one specific way, on purpose. They were handed a
+tidy list of what happened together. In the real design nobody hands that over,
+because the picture arrives at one machine and the sound at another and neither
+is allowed to ask the other anything. Instead each machine looks at the clock,
+rounds it off, and posts what it saw to whoever is responsible for that slice of
+time. Two machines that round to the same number have found each other without
+speaking.
+
+The obvious worry is that rounding is crude, and it is. Three ways it goes wrong:
+
+  - **Slice too narrow.** One moment gets cut in half by a boundary, and the two
+    halves never meet.
+  - **Slice too wide.** Two unrelated moments land in the same slice, and get
+    filed as though they happened together.
+  - **Clocks that disagree.** Two machines think it is a different time, so one
+    instant becomes two slices.
+
+The first two pull opposite ways. Make the slice bigger to stop cutting moments
+in half, and you start gluing moments together. **So there has to be a workable
+size in between, or the whole approach has no setting that works at all.** That
+is what this run is for.
+
+There is also a limit we expect to find. If moments last as long as the gaps
+between them — things happening more or less continuously — then no slice size
+can separate one from the next, and the method should fail. Finding out where
+that line sits matters, because the world this is meant to run in does not pause
+politely between events.
+
+
+WHAT IS BEING MEASURED
+----------------------
+The same recovery score as g32-01, so the numbers are directly comparable, and
+each cell is read against **the single-process score on the same stream** rather
+than against 1.0. That ceiling is computed per arm and printed.
+
+    f1         mean over surfaces of F1 between recovered class and true one.
+               FLOOR IS 0.5, not 0 -- a concept recovered alone scores that
+    messages   observation-to-bucket messages per observation. 1.0 is plain
+               rounding; overlapping windows cost `2*spread+1`
+    lost       share of observations that reached their bucket after it was
+               flushed and discarded
+
+ARMS. `conditional`, `local` and `ppmi`. g32-01 established `weighted` loses and
+that `conditional` and `ppmi` rank identically above chance, so running the full
+four would re-measure one thing twice.
+
+**The choice between them stopped being cosmetic while this was being built, and
+that is a finding from building rather than from running.** Sorting the three by
+what a node has to ask anyone else for:
+
+    local         count(x,y) / count(x)      NOTHING. owner(x) holds both
+    conditional   count(x,y) / count(y)      count(y), from owner(y)
+    ppmi          adds the total occasions   a number NO node can know
+
+`ppmi` divides by how many occasions the whole system has seen. That is a
+collective, and amended C1 forbids collectives — so **the project's best
+statistic so far is not deployable as written.**
+
+`conditional` is, and the cost is one bounded message per CANDIDATE partner,
+which is `peer.py`'s profile rather than a barrier's. **An earlier version of
+this claim said "one hop" and that was wrong** — ranking needs `count(y)` for
+every `y` under consideration, not once. Corrected at `CoOccurrence.moment`.
+
+`local` is the free one, and P7 exists because *"the free one cannot work"* has
+to be a measurement here rather than an argument.
+
+
+MEASURED ON
+-----------
+Local, single process, Python 3.14, no numpy.
+
+    concepts       64      CARRIED FROM g32-01 at its own concept count
+    surfaces        3      carried from g32-01
+    presence      0.7      carried from g32-01
+    noise           3      carried from g32-01
+    distractors     1      carried from g32-01
+    occasions   8,000      125 per concept, far above g32-02's measured
+                           threshold of ~16 -- so anything lost here is the JOIN
+                           losing it, not the concept being starved
+    k               2      carried from g32-01
+    tempo         100      true time between occasions. Every width is read
+                           against this and against the moment duration
+    nodes           8
+    observers       3      one machine per modality, which is the case the join
+                           exists for
+    seeds     0, 1, 2
+
+Swept: `width` in {5, 20, 50, 100, 200, 500}; moment duration in {0, 20, 60,
+100}; `skew` in {0, 50}; `spread` in {0, 2}. Separately, lateness against grace.
+
+**The width range brackets `tempo` on both sides deliberately** — 5 is far below
+any moment duration and 500 is five times the gap between occasions — because a
+grid that does not contain both failures cannot show an interior optimum, and
+CLAUDE.md's calibration is three sweeps lost to grids that started past the
+phenomenon.
+
+
+PREDICTIONS
+-----------
+P1  CONTROL, and it is already asserted by `test_buckets`, so it is not a
+    finding. With an instantaneous moment, no skew and no lateness, any width
+    below `tempo` reproduces the single-process ceiling EXACTLY.
+    REFUTED IF it does not, in which case the join is not equivalent to the
+    thing it is meant to be equivalent to and nothing else here is readable.
+
+P2  THE FALSIFIER. Along `width`, at a moment duration of 20 or 60, f1 is
+    non-monotone: it is low at width 5 (moments cut in half), high in the
+    middle, and falls again by width 500 (moments glued together). An interior
+    optimum exists.
+    REFUTED IF f1 is monotone in width, or flat. Flat would mean the axis is
+    inert and the mechanism is not doing what its docstring says. Monotone
+    increasing would mean gluing moments together costs nothing — which would be
+    good news and would say the co-occurrence statistic is robust enough that
+    the window barely matters.
+
+P3  THE OPERATING ENVELOPE. At a moment duration of 100 — moments as long as the
+    gaps between them — NO width reaches within 0.10 of the ceiling.
+    REFUTED IF some width does. That would be the strongest possible result
+    here: it would mean the statistic tolerates a window that cannot separate
+    consecutive moments, and the continuous-input world `GOALS.md` 1.2a asks for
+    is reachable without any segmentation step.
+
+P4  SKEW. At skew 50 with `spread` 0, f1 falls by more than 0.20 against skew 0
+    at the same width. `spread` 2 recovers most of that — within 0.05 of the
+    unskewed score — at 5.0 messages per observation.
+    REFUTED IF skew is free, which would mean the nodes are not really reading
+    their own clocks; a mutation exists for exactly that failure.
+
+P5  THE C1-SAFE STATISTIC COSTS NOTHING. `conditional` stays within 0.02 of
+    `ppmi` in every cell.
+    REFUTED IF `ppmi` is materially better, which would be an awkward result:
+    the better statistic would be the one that needs a global count, and the
+    design would owe an answer for how a node estimates it.
+
+P6  LATENESS IS A DEADLINE, NOT A DELAY. At a fixed lateness, raising `grace`
+    recovers the lost observations and the f1 with them.
+    REFUTED IF grace does not help, which would mean something other than the
+    deadline is discarding them.
+
+P7  THE REMOTE READ IS NECESSARY. `local` — the only statistic a node can
+    compute without asking anyone anything — sits at or below the 0.5 floor in
+    every cell that has a distractor in it, because a thing present on every
+    occasion has `P(it | x) = 1.0` for every `x`.
+    REFUTED IF `local` performs comparably to `conditional`. **That would be the
+    most valuable refutation available in this file**: the remote read would go
+    away, ranking would cost nothing beyond a node's own memory, and the C1
+    argument for the whole grounding design would get materially stronger.
+    Predicted to fail, registered because it should be measured rather than
+    asserted, and the arithmetic that says it fails is in `local_conditional`'s
+    own docstring so the prediction is not a guess.
+
+
+COST
+----
+Estimated before the run: 288 join cells plus the lateness block, each over a
+stream of 8,000 occasions and about 49,000 observations. g32-01 ran 36 such
+streams in 12.7s, so about **three to five minutes**. Local.
+
+Recorded after the run: PENDING.
+
+
+RESULTS
+-------
+PENDING.
+
+
+SCORECARD
+---------
+PENDING.

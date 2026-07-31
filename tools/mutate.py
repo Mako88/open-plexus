@@ -53,6 +53,7 @@ CLOSURE = ROOT / "openplexus" / "tasks" / "closure.py"
 CONTENT = ROOT / "openplexus" / "content.py"
 OCCASIONS = ROOT / "openplexus" / "tasks" / "occasions.py"
 GROUNDING = ROOT / "openplexus" / "grounding.py"
+BUCKETS = ROOT / "openplexus" / "buckets.py"
 OWNERSHIP = ROOT / "openplexus" / "ownership.py"
 PARTITIONED = ROOT / "openplexus" / "partitioned.py"
 SEARCH = ROOT / "openplexus" / "search.py"
@@ -2352,6 +2353,59 @@ MUTATIONS = [
         path=GROUNDING,
         old="        present = sorted(set(surfaces))",
         new="        present = sorted(surfaces)",
+    ),
+    Mutation(
+        name="the-node-rounds-the-TRUE-time-not-its-own-clock",
+        breaks="the entire reason a bucket exists. Two machines agree because "
+               "each does the same arithmetic on ITS OWN clock, and they "
+               "disagree by exactly as much as their clocks do. Reading the "
+               "true time makes every node perfectly synchronised for free, so "
+               "the skew axis becomes inert and every impaired cell reports the "
+               "clean number -- a mechanism that runs, produces plausible "
+               "output, and is measuring a world that does not exist",
+        path=BUCKETS,
+        old="        reading = observation.when + self._offset[observation.observer]",
+        new="        reading = observation.when",
+    ),
+    Mutation(
+        name="a-pair-is-counted-in-every-bucket-that-saw-it",
+        breaks="the one-bucket-decides rule that makes overlapping windows "
+               "safe. Without it a pair is counted once per SHARED bucket, so "
+               "the multiplier is how well the two observers' clocks agree "
+               "rather than how often the two things co-occurred. Measured at "
+               "5x before it was fixed, and invisible downstream because the "
+               "counts still look like counts",
+        path=BUCKETS,
+        old="            if ((one[1] + other[1]) // 2) // width == bucket:",
+        new="            if True:",
+    ),
+    Mutation(
+        name="a-marginal-is-counted-in-every-bucket-it-reaches",
+        breaks="the denominator every chance-corrected statistic divides by. "
+               "With `spread` on, a surface reaches 2*spread+1 buckets, so its "
+               "`seen` is inflated by that factor while its pair counts are "
+               "not -- which drives conditional and PPMI down for every surface "
+               "uniformly and looks like a weaker signal rather than a bug",
+        path=BUCKETS,
+        old="            if reading // width == bucket:\n"
+            "                self.index.note(surface)\n"
+            "                noted = True",
+        new="            if True:\n"
+            "                self.index.note(surface)\n"
+            "                noted = True",
+    ),
+    Mutation(
+        name="an-observation-that-missed-its-bucket-is-taken-anyway",
+        breaks="the deadline, which is the only thing making a time key "
+               "transient. A bucket is discarded once its grace expires and "
+               "there is nothing durable to add a late observation to; "
+               "accepting one regardless makes lateness free, so the C2 axis "
+               "reports the clean number at every delay",
+        path=BUCKETS,
+        old="            if arrives > closes:\n"
+            "                continue",
+        new="            if False:\n"
+            "                continue",
     ),
 ]
 def restore_any_leftovers() -> None:

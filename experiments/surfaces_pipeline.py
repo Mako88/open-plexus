@@ -221,6 +221,9 @@ def main() -> int:
     parser.add_argument("--json", type=pathlib.Path, default=None)
     parser.add_argument("--quick", action="store_true",
                         help="one seed and one bit count, for a smoke run")
+    parser.add_argument("--repeats", type=int, default=1,
+                        help="passes over the recordings; 2 doubles "
+                             "the occasions without new audio")
     parser.add_argument("--images", type=int, default=IMAGES)
     args = parser.parse_args()
 
@@ -249,10 +252,18 @@ def main() -> int:
         pool[label].append(row)
     used: Counter = Counter()
     pairs = []
-    for audio_row, digit in enumerate(said):
-        rows = pool[digit]
-        pairs.append((rows[used[digit] % len(rows)], audio_row, digit))
-        used[digit] += 1
+    # REPEATS EXIST TO ASK WHETHER THE ~300-PER-DIGIT PRICE IS COUNT OR VARIETY.
+    # `alternating` gives each sense half the stream, so audio sees 150 per
+    # digit against g40-01's measured 300, and the audio set caps at 3,000
+    # recordings. A second pass reuses every recording -- so the AUDIO codes
+    # repeat while the images do not, since `used` keeps advancing. If that
+    # buys the link, the price is evidence; if not, it is distinct recordings,
+    # and the arm cannot be afforded from this corpus at all.
+    for _ in range(args.repeats):
+        for audio_row, digit in enumerate(said):
+            rows = pool[digit]
+            pairs.append((rows[used[digit] % len(rows)], audio_row, digit))
+            used[digit] += 1
 
     chance = max(Counter(said).values()) / len(said)
     print(f"{len(digits)} images, {len(heard)} recordings, "

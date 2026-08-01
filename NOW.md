@@ -63,26 +63,25 @@ break the bound rather than trade along it. Untested.
 more than one KIND of thing** — images+audio+words in one, intervention moments
 in another, knowledge-graph facts in a third, none ever meeting.
 
-**Counting instances does not find it.** One arm builds one graph and
-`expect(graph=1)` passes; a sweep builds many and that is correct, since arms
-are independent experiments. So `wiring.expect(holding={...})` counts the KINDS
-entering a graph and fails when a declared one never arrives. Built, tested,
-mutation caught.
+**Counting instances does not find it.** One arm builds one graph and a sweep
+builds many, both correctly. So `wiring` gained three checks, each catching what
+the others cannot, each mutation-caught: `graph=N` (an accumulator split by
+accident), `holding={...}` (a declared kind that never arrived), and
+`disjoint=True` (two kinds sharing node numbers).
 
-**THE MERGE NEEDS A NAMESPACE, AND THE KIND CHECK IS BLIND TO IT.** All three
-sources number from zero: image codes `[0, codes)` then audio then words;
-concept surfaces then distractors then shadows; `{entity: i for i, entity in
-enumerate(entities)}`. Merged naively, image code 0 and concept surface 0 and
-entity 0 are ONE integer accumulating into one row — no error, just wrong
-counts. And `expect(holding=...)` passes it: all four kinds arrive, lying on
-top of each other.
+**The third exists because the second is blind to the merge's real risk.** Every
+source numbers from zero, so a naive merge puts image code 0, concept surface 0
+and entity 0 in ONE row — every kind arrives, `holding` passes, counts are
+silently summed. `Namespace` hands out the blocks that keep them apart.
 
-**Next, and it goes in before any merging:** a companion asserting ids from
-different kinds are DISJOINT. Then the merge itself.
+**Next: the merge**, one `CoOccurrence` fed pictures, sounds, words and facts
+through one namespace, declared under all three checks. `namespace` is in the
+orphan baseline with that reason so it cannot go quiet.
 
-**Also:** traversal (beam walk, `flood`, route-typing) MOVES through a graph;
-intervention EDITS it. Different operations on one structure, discussed as
-alternatives.
+**Reserving is deliberately NOT declaring** — `wiring.kind` is called when data
+arrives, not when room is made, or a reservation would satisfy the check.
+
+**Also:** traversal MOVES through a graph; intervention EDITS it.
 
 ## Known debts
 

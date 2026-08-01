@@ -44,6 +44,7 @@ SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 CHURN = ROOT / "experiments" / "g4_02_machine_churn.py"
 G44_ASKING = ROOT / "experiments" / "g44_01_asking.py"
 WIRING = ROOT / "openplexus" / "wiring.py"
+NAMESPACE = ROOT / "openplexus" / "namespace.py"
 TRANSPORT = ROOT / "openplexus" / "transport.py"
 DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 NODE_MAIN = ROOT / "openplexus" / "node_main.py"
@@ -99,6 +100,17 @@ class Mutation:
 
 
 MUTATIONS = [
+    Mutation(
+        name="every-kind-starts-its-block-at-zero",
+        breaks="the only thing a shared graph needs from this module. Blocks "
+               "that all begin at 0 put image code 0, concept surface 0 and "
+               "entity 0 in one row whose counts are the sum of three "
+               "unrelated things -- and nothing raises, which is why the merge "
+               "could not simply be inspected",
+        path=NAMESPACE,
+        old="        block = range(self.size, self.size + count)",
+        new="        block = range(0, count)",
+    ),
     Mutation(
         name="a-single-shared-node-number-is-tolerated",
         breaks="the check guarding the merge, at exactly the boundary a real "

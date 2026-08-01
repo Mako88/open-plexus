@@ -218,6 +218,15 @@ class Federation:
             self.remote_reads += 1
         return self._tables[target].seen(surface)
 
+    def at(self, node: int) -> "_AtOwner":
+        """The federation as ONE node sees it, which is the only honest read.
+
+        `rank` already goes through this; exposing it lets a comparison harness
+        read the split graph by the same path the system does, rather than by
+        reaching past the routing it is trying to check.
+        """
+        return _AtOwner(self, node)
+
     def partners_of(self, surface: int) -> list[int]:
         """Every surface ever seen beside this one, from its owner's row.
 

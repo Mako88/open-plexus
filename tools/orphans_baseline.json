@@ -1,4 +1,5 @@
 {
+  "agreement": "does a graph split across owners answer like one held whole -- the question testbed/driver.py left behind, asked of the count graph. Its caller is the container driver, which is a later phase: two processes on a socket is a different question (latency, departure, partition) and this one has to hold first. Exercised in-process by tests/test_agreement.py, which is where the C1 result currently lives.",
   "bucket_peer": "the peer that answers reads over a socket. Nothing runs a node -- node_main.py was deliberately not carried over in the restructure -- so the whole distributed half has tests and no caller.",
   "deployment": "decides how many slices a machine can hold. Reads a cgroup and plans for a node nobody starts.",
   "federated": "the count graph split across owners, with the remote reads counted. Same missing entry point.",

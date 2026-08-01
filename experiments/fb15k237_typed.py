@@ -261,7 +261,14 @@ def main() -> int:
         return vector / top if top > 0 else vector
 
     def sweep(triples, accumulate):
-        """MRR at every alpha over one split, from one pass of the vectors."""
+        """Every alpha's per-query ranks over one split, from one pass.
+
+        The ranks are kept rather than reduced to an MRR immediately, because
+        **the margin is a difference between two arms scored on the SAME
+        queries** and its error bar is the paired one. Reducing first throws
+        away the pairing and leaves the difference to be eyeballed against a
+        sample size.
+        """
         totals = {alpha: [] for alpha in ALPHAS}
         for head, relation, tail in triples:
             asked = relation_at[relation]
@@ -275,20 +282,39 @@ def main() -> int:
                         alpha * structure + (1.0 - alpha) * other,
                         given, relation, answer, direction)
                     totals[alpha].append(middle)
-        return {alpha: metrics(ranks)["mrr"] for alpha, ranks in totals.items()}
+        return totals
+
+    def paired(ranks, floor_ranks):
+        """`(mean gain, standard error, better, worse)` per query.
+
+        A margin of 0.0124 over 5,000 queries is either a result or it is the
+        noise of a difference nobody bounded, and only this can say which.
+        """
+        gains = np.array([1.0 / a - 1.0 / b
+                          for a, b in zip(ranks, floor_ranks)])
+        error = float(gains.std(ddof=1) / np.sqrt(len(gains))) if len(
+            gains) > 1 else float("inf")
+        return (float(gains.mean()), error,
+                int((gains > 0).sum()), int((gains < 0).sum()))
 
     held = random.Random(args.seed).sample(
         valid, min(args.queries // 2, len(valid)))
     print(f"\nBLEND SWEEP. alpha 0 is the floor exactly. Chosen on "
           f"{len(held)} validation triples, read on test.")
     for accumulate in ACCUMULATORS:
-        on_valid = sweep(held, accumulate)
+        valid_ranks = sweep(held, accumulate)
+        on_valid = {a: metrics(r)["mrr"] for a, r in valid_ranks.items()}
         chosen = max(on_valid, key=lambda alpha: on_valid[alpha])
-        on_test = sweep(queries, accumulate)
+        test_ranks = sweep(queries, accumulate)
+        on_test = {a: metrics(r)["mrr"] for a, r in test_ranks.items()}
+        gain, error, better, worse = paired(test_ranks[chosen],
+                                            test_ranks[0.0])
         rows.append({"arm": "blend", "accumulate": accumulate,
                      "chosen_alpha": chosen, "validation": on_valid,
                      "test": on_test,
-                     "margin": on_test[chosen] - on_test[0.0]})
+                     "margin": on_test[chosen] - on_test[0.0],
+                     "paired_gain": gain, "standard_error": error,
+                     "better": better, "worse": worse})
         # THE MARGIN IS A DIFFERENCE OF TWO MEANS OVER THE SAME QUERIES, so its
         # error bar is not the MRR's. Reported as a spread across the queries
         # rather than left to be eyeballed against a sample size in the header.
@@ -298,6 +324,9 @@ def main() -> int:
               f"  over {2 * len(queries)} scored queries")
         print("       test by alpha: "
               + "  ".join(f"{a}:{on_test[a]:.4f}" for a in ALPHAS))
+        print(f"       PAIRED against the floor on the same queries: "
+              f"{gain:+.4f} +/- {error:.4f} (one standard error), "
+              f"{better} better and {worse} worse")
 
     best = max((row for row in rows
                 if row["arm"] not in ("relation only", "blend")),

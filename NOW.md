@@ -16,15 +16,20 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
 
 - **`fb15k237_walk.py` at 4,000 queries** → `out/fb15k237-walk.txt`. Partial
   rows so far agree with the smoke run (depth 2 beam 16 mean, −0.0418).
-- **`fb15k237_typed.py` at 2,500 queries** → `out/fb15k237-typed.txt`. **This is
-  the one to read first in the morning.** At 150 queries it produced the only
-  positive margin of the night — `sum over paths`, blend weight 0.05 chosen on
-  validation, test 0.2277 against the floor's 0.2170, **+0.0107**. That is 300
-  scored queries and the margin is inside the noise at that size, and 0.05 was
-  the smallest non-zero weight on the grid, so **it is not a result yet.** This
-  run extends the grid down to 0.01 and raises n by 16x. If the margin holds at
-  0.01-0.05 it is the first thing the project's own mechanism has done on
-  external data; if it collapses, the night's answer is a clean four-way null.
+- **`fb15k237_typed.py` on the FULL test set** → `out/fb15k237-typed-full.txt`.
+  **Read this first.** The 2,500-query run held the margin and sharpened it:
+  `sum over paths`, alpha 0.02 chosen on validation, test **0.2409** against the
+  floor's 0.2286, **margin +0.0124** over 5,000 scored queries. The alpha curve
+  now has an interior maximum rather than an edge winner — 0.0:0.2286,
+  0.01:0.2410, 0.02:0.2409, 0.05:0.2383, 0.1:0.2267, 1.0:0.1328.
+
+  **Two things this full run fixes, and until it lands the margin is not
+  quotable.** The 2,500-query floor is 0.2286 where the full-set floor is
+  0.2334, so a margin measured against the small floor and compared with a
+  published full-set number flatters us by about 0.005. And a difference of two
+  means needs a paired error bar rather than an eyeball; the run now reports the
+  per-query gain, its standard error, and how many queries got better against
+  how many got worse.
 
 ## Next, in the order I would take them
 
@@ -45,6 +50,16 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
    separate open questions.
 
 ## What tonight established
+
+- **A typed ranked walk blended with the marginal is the first thing this
+  project's own mechanism has done above a floor on external data**, and the
+  size of it is +0.0124 MRR at 2,500 queries. For scale, DistMult's margin over
+  the full-set floor is +0.0076 and ComplEx's is +0.0136. **That is the whole
+  claim** — not that the count graph is competitive, but that it clears a
+  no-structure baseline by an amount in the same range as two published models
+  clear it by, having been given no training and no embedding.
+- **`sum` over paths beats `max` at every alpha**, which is the ranked walk
+  earning its keep over a thresholded lookup.
 
 - **The structural signal is real and it is small.** Ranked on its own, with no
   marginal mixed in: untyped walk 0.0082, the audit's thresholded rule miner

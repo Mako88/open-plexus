@@ -49,7 +49,8 @@ it back — refutations expire, and two have already become right later.
 - ❌ ~~Take the weaker direction~~ — *penalises exactly the hub edges worth keeping.*
 - ❌ ~~Take the stronger direction~~ — *stops discriminating; it scored at the floor.*
 - ❌ ~~Tune a damping exponent~~ — *five dials were tried and none was the axis.*
-- 🚧 Walk further than one step — *was ❌ at worse and up to thirty times dearer, and its stated revival condition has now been measured: on FB15k-237 the two endpoints of a test triple are **0.0000 one hop apart in training and 0.7373 two hops apart**, so a one-step mechanism cannot reach the answer whatever statistic it uses. `grounding.reach` exists and has never been run on external data.*
+- ❌ ~~Walk further than one step~~ — *its revival condition was met and the walk was then run and did not pay. On FB15k-237 the endpoints of a test triple are 0.0000 one hop apart in training and 0.7373 two hops apart, so a one-step mechanism provably cannot reach the answer — and a two-step one reaches it and still cannot rank it. Best arm 0.2025 against a marginal floor of 0.2290, at every depth to 3 and every beam to 256, with an interior maximum at beam 16 so it is not under-searched.* **Revives if** a walk is given the relation types along the path, which this one deliberately was not.
+- ⬜ Being reachable is not being findable — *the gap this opened. 0.7373 of answers lie two steps away and the ranked walk puts them nowhere near the top, because two steps from an entity of average degree 37 is about 1,300 candidates and nothing yet says which of them the question was about.*
 - ⬜ Act on the world to disambiguate — *the only named escape from a confound that counting provably cannot separate.*
 
 **5. The answer.** What a response actually is.

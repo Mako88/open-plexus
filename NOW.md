@@ -14,32 +14,24 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
 
 ## In flight
 
-- **The full `fb15k237_audit.py` re-run is going, in the background.** It adds
-  the tie-policy bound and nothing else; the arms it has already printed match
-  what is committed (floor 0.2334, and the bound is 0.2305 to 0.2597). When it
-  lands, check nothing moved and refresh `out/`.
-- **The mutation harness has not been run since `composition.py` was
-  generalised.** Two mutations were re-pointed — `the-role-is-dropped-from-the-
-  surface` and `a-candidate-needs-only-ONE-half-behind-it`, the second caught by
-  `--verify` rather than by anyone remembering — and both need a run to confirm
-  they still go red. **It could not run tonight because the audit was touching
-  the tree**, which is `CLAUDE.md`'s rule and not an oversight.
+- **`fb15k237_walk.py` is running the full grid at 4,000 queries**, in the
+  background, writing `out/fb15k237-walk.txt`. The 120-query smoke run is what
+  the numbers below come from; when the big run lands, check the sign of the
+  margin has not changed and update README §4 if it has.
 
 ## Next, in the order I would take them
 
-1. **The walk on FB15k-237**, and it is now the obvious next thing rather than a
-   preference. Tonight's counted arm scored **below** the marginal — margin
-   −0.0480 — and the reason is measured: the two endpoints of a test triple are
-   **0.0000 one hop apart in training and 0.7373 two hops apart**. A one-step
-   mechanism cannot reach the answer whatever statistic it uses. `grounding.reach`
-   is built, has a beam and a depth, multiplies path strength along the route,
-   and **has never been run on external data**. Report the margin over the
-   0.2334 floor, never the MRR.
+1. **A walk that is told the relation types along the path.** Tonight's walk was
+   deliberately untyped, and the ❌ it earned in README §4 names exactly this as
+   its revival condition. The audit's rule miner already does typed two-hop
+   paths — `r1(h, x) & r2(x, t) => r(h, t)` at 0.0460 — but it is a
+   confidence-thresholded lookup rather than a ranked walk, so the combination
+   of the two is untried and is the obvious next mechanism.
 2. **Keep the route, not just the endpoint.** `reach` returns each surface it
    reached and the best path strength to it, and throws the path away. If a
    concept is a traversal then the route is the object — and for a
-   link-prediction answer the route is also the explanation. Small change,
-   directly on the project's own claim.
+   link-prediction answer the route is also the explanation. It is also what
+   item 1 needs in order to know which relation types a path used.
 3. **An error signal** (README §7). Nothing is currently ever wrong, because
    counts only go up. Predicting *relations* rather than tokens gives a signal
    that can be wrong without being next-token prediction.
@@ -48,6 +40,22 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
    separate open questions.
 
 ## What tonight established
+
+- **The walk does not clear the marginal either, and it is not under-searched.**
+  Best arm 0.2025 against a floor of 0.2290, over depths 1 to 3 and beams 4 to
+  256. Walk-only peaks at **beam 16** and falls at 64 and 256 — an interior
+  maximum, so a wider search finds more paths and ranks them worse rather than
+  the grid stopping too early. Depth 1 walk-only returns 0.0001, reproducing the
+  counted run's empty entity signal exactly, which is the check that the two
+  runs measure the same quantity.
+- **So being reachable is not being findable**, and that is the gap now open.
+  0.7373 of answers are two steps away and the ranked walk puts them nowhere
+  near the top, because two steps from an entity of average degree 37 is about
+  1,300 candidates and nothing in an untyped walk says which of them the
+  question was about.
+- **Both re-pointed mutations go red.** `a-candidate-needs-only-ONE-half-behind-
+  it` and `the-role-is-dropped-from-the-surface`, run once the audit had let go
+  of the tree.
 
 - **The count graph does not clear the marginal on FB15k-237, and the reason is
   structural rather than statistical.** Best combined arm 0.1707 against a floor

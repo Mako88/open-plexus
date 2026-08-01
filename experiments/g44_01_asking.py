@@ -813,6 +813,35 @@ whichever of its partners happen to be real parts. That would be the two
 findings interfering rather than compounding, which is worth knowing and is not
 what I expect.
 
+## THE NEXT STEP IS NOT ANOTHER ARM: an ask returns more than one bit
+
+**Nine arms are built and the bound has appeared in three disguises** — pairs ×
+asks-per-pair, aim × coverage, and the budget stopping binding when asks cost
+draws. Every arm that helped moved one factor by taking it out of another. **The
+next thing has to change the TOTAL, and combining existing arms cannot.**
+
+**Here is one that can, and it is sitting unused in the return value.**
+`world.ask` returns an `Answer` carrying `occasion.surfaces` — the FULL set of
+what was present when the world complied. Every arm here reads one bit of it,
+`refused`, and discards the rest. `learn_from_asks` pours it into the index as
+an observation, which is a different use and was measured worth nothing (P18).
+
+**What a complying occasion actually says.** Asked for the lamp without the dog
+and got one: that is one bit about the lamp. But the occasion ALSO shows
+everything else present in a world without the dog — so every surface in it is a
+surface that does not need the dog either, and every surface absent from it is a
+candidate that might. **One ask carries evidence about the whole occasion, not
+about the pair it named.**
+
+That is the shape that breaks a product rather than trading along it: not more
+asks, not better-chosen asks, but more facts per ask — and unlike `ask-set`,
+which asked for many things at once and got one answer, this reads many answers
+out of one question already being asked.
+
+**Registered as the direction and NOT as a prediction**, because the quantity it
+would move is not yet identified. The next commit should name what it measures
+before building it, which is the thing that has protected every result here.
+
 ## WHAT AN ASK COSTS, and a leak that has to be closed before it is used
 
 The arms are coverage-limited and the reason is priced, not chosen:

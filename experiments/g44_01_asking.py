@@ -364,6 +364,14 @@ def adjusted(index: CoOccurrence, statistic, candidate: int, query: int,
     if not asked:
         return score
     rate = refused / asked
+    if rule == 'per-query':
+        # THE CUT, FITTED WHERE IT IS APPLIED. A global split learns from pairs
+        # the demotion never touches -- the arm's cut is 0.6278 against an
+        # oracle boundary of 0.2870 because unscored pairs refuse at 0.6667.
+        # This one can only see candidates for this query.
+        local = {k: v for k, v in refusals.items() if k[1] == query}
+        here = learned_threshold(local)
+        return score * rate if here and rate < here else score
     if rule == 'threshold':
         # A SPLIT, NOT A GRADIENT. Below the learned cut the candidate
         # detaches more easily than the rest and is demoted; above it,
@@ -532,6 +540,8 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
                                              refusals, 'comparative'),
         "separation_threshold": separation(index, config, statistic,
                                            refusals, 'threshold'),
+        "separation_per_query": separation(index, config, statistic,
+                                           refusals, 'per-query'),
         "refusal_rate": (sum(r for _, r in tallies) / sum(a for a, _ in tallies)
                          if tallies else 0.0),
         "pairs_tested": len(refusals),
@@ -650,6 +660,8 @@ def ceiling(config: OccasionConfig, statistic, rng: random.Random,
                                              refusals, 'comparative'),
         "separation_threshold": separation(index, config, statistic,
                                            refusals, 'threshold'),
+        "separation_per_query": separation(index, config, statistic,
+                                           refusals, 'per-query'),
         "refusal_rate": (sum(r for _, r in tallies) / sum(a for a, _ in tallies)
                          if tallies else 0.0),
         "pairs_tested": len(refusals),

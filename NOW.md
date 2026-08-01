@@ -23,38 +23,37 @@ John's point, and it stands. **Unfinished:** `flood` has a floor and no beam,
 and EXPANSIONS IS THE WRONG COST COLUMN where nodes expand in parallel — what
 transfers is messages sent and work per node, neither measured.
 
-## g44-01: an autonomous arm beats watching, and the reason is measured
+## g44-01: CLOSED. An arm beats watching, and the bound survived everything
 
 **`ask-set` beats watching**, paired over 20 seeds: **+0.0085, sd of the mean
-0.0025, winning on 16/20**. The first arm here to do it. Against the oracle's
-swing from −0.2967 to +0.2256 that is **1.6% of what the mechanism can do** — a
-mechanism identified, not a problem solved.
+0.0025, 16/20**. The first and only arm to do it — **1.6% of the oracle's swing**
+from −0.2967 to +0.2256. A mechanism identified, not a problem solved.
 
-**WHY, and it explains six earlier failures at once.** Of the scored pairs each
-arm demotes, how many are confounds:
-
-    arm          on target   shadow   true
-    ask-mutual          51      0.2   51.0
-    ask-set             12      4.0    8.2
-
-`ask-mutual` demotes real parts and almost nothing else. Its 48% shadow ASK rate
-never becomes a shadow SCORED pair, because it asks a shadow against whichever
-query made it notice the shadow — usually not one of that shadow's own concept's
-surfaces. **It pays for the right suspects and files them under the wrong
-questions**, which is why the arm with the best coverage was the worst arm.
+**WHY, and it explains six failures at once.** Of the scored pairs each arm
+demotes, `ask-mutual` gets 0.2 confounds to 51 real parts; `ask-set` gets 4 to 8.
+`ask-mutual` pays for the right suspects and files them under the wrong
+questions — it asks a shadow against whichever query made it notice the shadow,
+usually not that shadow's own concept's surface, so `separation` never reads the
+pair. **The arm with the best coverage was the worst arm.**
 
 **The principle: ask about a candidate relative to what IT predicts, not
 relative to the query that made you notice it.** Nomination and interrogation
-had been one step in every arm; separating them is what put demotions where they
-help. **Coverage of the METRIC is not coverage of the CONFOUNDS.**
+were one step in every arm. **Coverage of the METRIC is not coverage of the
+CONFOUNDS.**
 
-**Two of my explanations died on the way.** "It changed the price of a fact" —
-refuted by `SET_SIZE=1`, which is an ordinary single ask and delivers +0.0075 of
-the +0.0102. And a recorded 53 that had silently drifted to 46 under an earlier
-refactor, caught only because I checked an unrelated claim.
+**The line is closed, not abandoned.** Ten ideas; the bound survived every
+attempt to move either factor or the total, each refutation saying what revives
+it: combining what worked (aim and concentration spend one budget — 77%
+confounds at 7 candidates instead of 44); set-asking (no denominator, so no
+rate); harvesting (enrichment separates wider, 0.2354 against 0.16, and resolves
+**3–5× worse** on a 4× wider spread — revived by a harvested quantity whose
+spread falls with asks like a Bernoulli's).
 
-**Not claimed:** the `SET_SIZE=2` peak (+0.0164, 12/12). Best cell of a sweep of
-my own arm's hyperparameter with no matching sweep elsewhere.
+**The refusal rate is the best quantity measured, not merely the incumbent.**
+
+**Three of my explanations died here**, each within a commit or two of being
+written: "it changes the price of a fact" (refuted by `SET_SIZE=1`), a recorded
+53 that had drifted to 46 unnoticed, and enrichment's wider gap meaning anything.
 
 ## THE ASKING POLICY BUILDS A GRAPH AND NEVER WALKS IT
 

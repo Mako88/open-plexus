@@ -59,9 +59,14 @@ marginal, which watching counts for free and which is exactly what cannot
 separate a confound. The timing channel is redundant with counting, not ahead of
 it. The wrong claim came from comparing two ratios over different quantities.
 
-**Two defects on the record.** P12 refuted at 100%: two means always return two
-groups, so where the shadow genuinely is a part the rule demotes true partners
-on every query — it has no way to report *nothing here*. The per-query filter now has three
+**P12 refuted at 100%, and now measured rather than argued.** Where there is a
+confound the split is nearly perfect (36 of 36 shadows, 2 false positives);
+where there is not, it demotes all 72 true partners, which at `alone` 0.0 are
+genuinely the more detachable group. The two cases ARE distinguishable — by the
+low group's absolute level, 0.2105 against 0.3779. The scale-free candidate, the
+ratio between groups, is useless: 0.55 against 0.52. **What is missing is an
+absolute anchor the arm can compute**, which is smaller than "no nothing-to-find
+state" made it sound. The per-query filter now has three
 tests and a caught mutation; its first test was vacuous and is noted in the
 commit.
 

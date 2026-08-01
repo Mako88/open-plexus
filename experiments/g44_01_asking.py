@@ -253,6 +253,31 @@ per query, over the candidates for that query alone, uses no privileged
 knowledge and cannot be polluted by pairs the demotion never touches. Nothing
 here has run it.
 
+## WHAT P12 WOULD TAKE, measured rather than argued
+
+P12 is refuted at 100% and the useful question is what a NOTHING-TO-FIND state
+would need. Splitting the scored pairs at 96 asks each, with and without a real
+confound:
+
+    alone    cut     low mean   high mean   low group is
+     0.30  0.2969     0.2105      0.3833    36/38 shadows
+     0.00  0.5540     0.3779      0.7300    0/72 shadows
+
+**The split itself is nearly perfect where there is something to find** -- every
+one of the 36 shadows, and 2 false positives. Where there is not, it demotes all
+72 true partners, because at 0.0 the true partners genuinely ARE the more
+detachable group and the rule is reporting that correctly.
+
+**So the two cases are distinguishable, and not in the obvious way.** The signal
+is the low group's ABSOLUTE level, 0.2105 against 0.3779. The scale-free
+candidate -- the ratio between the groups -- does not work at all: 0.55 against
+0.52, which is nothing.
+
+An absolute cutoff would be a tuned constant unless it is anchored to something
+the arm can compute, and no such anchor is known here. **That is the whole of
+what is missing**, and it is smaller than "the rule has no nothing-to-find
+state" made it sound.
+
 ## WHAT AN ASK COSTS, and a leak that has to be closed before it is used
 
 The arms are coverage-limited and the reason is priced, not chosen:

@@ -69,6 +69,28 @@ P14 is unmeasurable — budget stops binding above 0.25.
 5. **Compression** (README §7). One principle for forgetting, hierarchy and a
    reason to reorganise.
 
+## CROSS-MODAL DOES NOT CURRENTLY REACH, and John remembers it working
+
+**John's report, 2026-08-01:** before the restructure, audio reached a word with
+no direct connection. The experiment survived — `surfaces_pipeline.py`'s
+`alternating` arm is exactly that test, an image code and an audio code sharing
+ZERO occasions so the only route is through the word. Run today:
+
+    front     arm          link_img  link_aud   cross  crossed
+    kmeans    together       0.0000    0.0000  0.7339   1.7563
+    kmeans    alternating    0.9000    0.0000  0.0000   0.0000
+
+**`crossed` is 0.0000: no image code reaches any audio code at all**, and that
+column exists precisely so a collapse and an empty reach are not read alike. In
+that arm `link_aud` is also 0.0000 — the audio codes do not link to their own
+word, so there is nothing for a route to pass through. `together` works, but
+that is the arm where both senses share a moment, which is not the claim.
+
+**Not yet established: regression or never-held-here.** Saying which needs the
+pre-restructure run, not a guess. **This outranks further g44-01 work** — a
+headline result that stopped reproducing is worth more than another decimal on
+one that did not.
+
 ## Known debts
 
 - **THE DISTRIBUTED TESTBED DOES NOT RUN.** `testbed/driver.py` imports

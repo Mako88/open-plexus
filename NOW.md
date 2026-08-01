@@ -155,6 +155,21 @@ cited anywhere.
   is what the audit does. Its Table 5 gives DistMult Hits@1 0.155 and ComplEx
   0.158 against our floor's 0.1700, so the marginal beats both there and loses
   at Hits@10.
+- **And the floor's tie policy does not decide the comparison, only its size.**
+  Published models have continuous scores and almost no ties; ours puts
+  thousands of entities on exactly zero, so the floor runs 0.2305 to 0.2597.
+  Each published margin over it:
+
+        model      pessimistic    average   optimistic
+        DistMult      +0.0105     +0.0076      -0.0187
+        ComplEx       +0.0165     +0.0136      -0.0127
+        TransE        +0.0635     +0.0606      +0.0343
+        RotatE        +0.1075     +0.1046      +0.0783
+
+  The only sign change is DistMult and ComplEx going NEGATIVE under the reading
+  most generous to the floor, which makes the finding stronger rather than
+  weaker. The average is what is quoted, because it is the neutral choice and
+  reportedly the one Sun et al. propose — that last part is still unread.
 - **There is no node entry point.** `node_main.py` started the old store and was
   deliberately not carried over.
 - **`asking.py`'s two new mutations have not been RUN.** `tests/test_asking.py`

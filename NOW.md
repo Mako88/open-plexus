@@ -15,18 +15,17 @@ Delete a line when it is done. Nothing may cite this file.
 
 ## The flood: what is left of it
 
-Settled and in the commit record: meaning-gating beats strength-gating by about
-two to one, and the flood does NOT beat the flat enumeration (+0.0081 against
-+0.0136 at 300 queries). A +0.0164 reported at sixty queries was withdrawn.
+Settled and in the commits: meaning-gating beats strength-gating about two to
+one, and the flood does NOT beat the flat enumeration (+0.0081 against +0.0136
+at 300 queries). A +0.0164 at sixty queries was withdrawn.
 
-**What is unfinished.** A route that composes confidently barely decays, so the
-floor kills what means nothing and does not bound what means something. The
-floor and a beam do different jobs and `flood` has only the floor.
+**Unfinished:** a route that composes confidently barely decays, so the floor
+kills what means nothing and does not bound what means something. `flood` has a
+floor and no beam, and they do different jobs.
 
-**And EXPANSIONS IS THE WRONG COST COLUMN here.** John's point: where every node
-expands its own edges in parallel, wall clock is the longest path, not the sum
-of all work. The costs that transfer are MESSAGES SENT and WORK PER NODE and
-neither is measured.
+**EXPANSIONS IS THE WRONG COST COLUMN.** Where every node expands its own edges
+in parallel, wall clock is the longest path, not the sum of all work. What
+transfers is MESSAGES SENT and WORK PER NODE, and neither is measured.
 
 ## g44-01: asking separates a confound watching cannot
 
@@ -129,32 +128,21 @@ to make `crossed` non-zero; unrun.
 
 ## Reading leads, none of them read
 
-Each may replace work otherwise done by hand, and each must be read before it is
-cited anywhere. A remembered number about someone else's work is the borrowed
-claim `CLAUDE.md` puts first.
+Each must be read before it is cited. A remembered number about someone else's
+work is the borrowed claim `CLAUDE.md` puts first.
 
-- **Rule mining over paths, e.g. AnyBURL** (Meilicke et al. 2019). **Partly
-  checked, and the check corrected the claim.** A search summary supports the
-  direction — rule learning over paths is competitive with embedding models on
-  this benchmark family — but says FB15k-237 is *specifically hard* for
-  rule-based methods and puts AnyBURL slightly BELOW ConvE there, where I had
-  said "reaches the RotatE range". No table has been read: the paper's PDF and
-  SAFRAN's OpenReview page both returned unparseable content.
-
-  What survives is enough to matter: **a rule-over-paths system lands near 0.31
-  where ours lands at 0.247**, so the ceiling on this family is well above us and
-  our implementation is the limit — length-2 only, one confidence per route
-  shape, evidence summed rather than combined as probabilities, no filtering of
-  unreliable rules. Those are the levers, in that order.
+- **AnyBURL / rule mining over paths** (Meilicke 2019). Partly checked, and the
+  check corrected the claim: FB15k-237 is specifically hard for rule-based
+  methods and AnyBURL sits slightly BELOW ConvE there. What survives: **a
+  rule-over-paths system lands near 0.31 where ours lands at 0.247**, so our
+  implementation is the limit — length-2 only, one confidence per route shape,
+  evidence summed rather than combined, no filtering of unreliable rules.
+- **Interventional causal discovery under a budget** — not yet searched. The
+  sharper question after today: not how to spend a budget of interventions, but
+  **when structure says what you do not need to test**.
 - **PROBE** (`arXiv 2606.08921`) — reweights the metric by inverse popularity.
   Fetched, not read; its smoothing constants were not in the summary, so the
   popularity stratification in `fb15k237_typed.py` takes the idea and not the
   metric.
-- **Sun et al., ACL 2020** (`arXiv 1911.03903`) — reportedly the tie problem and
-  an average-rank fix, which is the policy `fb15k237_audit.py` chose
-  independently. **Two fetches returned the abstract only**; the substance is in
-  the PDF and WebFetch returns it as binary.
-- **Akrami et al.** — reportedly finds redundancy and leakage inflating accuracy
-  19–175% across standard benchmarks. May name which datasets leak.
 - **SCAN, COGS, CFQ** — splits made by structure rather than sampling, which is
   the property CLUTRR lacked. Audit any with the table attack before adopting.

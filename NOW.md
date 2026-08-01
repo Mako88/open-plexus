@@ -69,6 +69,28 @@ P14 is unmeasurable — budget stops binding above 0.25.
 5. **Compression** (README §7). One principle for forgetting, hierarchy and a
    reason to reorganise.
 
+## THE ASKING POLICY BUILDS A GRAPH AND NEVER WALKS IT
+
+**John's observation, 2026-08-01**, and it is correct. He expected the graph to
+be built from the moments. It is: `index.observe(occasion.surfaces)` turns every
+moment into edges. What he spotted is that nothing then uses it as a graph —
+`grep -c "pathways|flood|reach|routed"` in `g44_01_asking.py` returns **0**, and
+every use is `statistic(index, a, b)`, a single direct edge.
+
+**I had described these as two separate worlds. That was wrong** and it hid the
+gap rather than naming it.
+
+**Why it matters for the wall.** The policy nominates by DIRECT association —
+`conditional`, then mutual predictability — both one-hop. A confound is a
+two-hop fact: two things tied together only through a third. The policy cannot
+express that, so it must TEST candidates it might have ruled out structurally.
+
+Today's conclusion was that the constraint is a product, pairs × asks-per-pair,
+bounded by budget. That holds as measured, and it assumes every candidate has to
+be tested. **A policy that reads the neighbourhood's shape might not need to
+test most of them** — which would break the bound rather than trade along it.
+Untested, and it is the first idea here that is not another face of that number.
+
 ## CROSS-MODAL DOES NOT CURRENTLY REACH, and John remembers it working
 
 **John's report, 2026-08-01:** before the restructure, audio reached a word with

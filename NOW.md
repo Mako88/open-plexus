@@ -46,9 +46,17 @@ along the way: concentrating asks beats spreading them, and fitting the cut per
 query beats fitting it globally (the arm's global cut was 0.6278 against an
 oracle boundary of 0.2870, because unscored pairs refuse at a median 0.6667).
 
-**The open question.** An ask consumes a draw, so under the equal-exposure
-invariant an arm cannot resolve 108 pairs out of a stream it must also watch.
-Whether that is a fact about intervention or about this harness is next.
+**The coverage cap is a fact about THIS HARNESS, and it is priced.** An ask
+costs 8.63 draws for a true partner, 2.91 for a shadow, 1.00 for background,
+against 1.00 for a watch — `World.ask` rejection-samples until the world yields
+the configuration. Equal exposure therefore charges asking up to 8.63× watching,
+and that is what starves every arm. A real intervening agent acts once.
+
+**And the cost LEAKS THE ANSWER — this has to be closed before anything is built
+on it.** True part 8.63 draws against confound 2.91 is a ratio of 2.97, wider
+than the refusal rates' 1.73. An arm that timed its asks and read no refusal at
+all would separate the confound better than the mechanism under test. Nothing
+does this and nothing should until the sampler is replaced.
 
 **Two defects on the record.** P12 refuted at 100%: two means always return two
 groups, so where the shadow genuinely is a part the rule demotes true partners

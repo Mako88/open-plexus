@@ -253,6 +253,28 @@ per query, over the candidates for that query alone, uses no privileged
 knowledge and cannot be polluted by pairs the demotion never touches. Nothing
 here has run it.
 
+## WHAT AN ASK COSTS, and a leak that has to be closed before it is used
+
+The arms are coverage-limited and the reason is priced, not chosen:
+
+    asking about a true partner   8.63 draws
+    asking about a shadow         2.91 draws
+    asking about background       1.00 draws
+    watching                      1.00 draws
+
+`World.ask` rejection-samples until the world yields the requested
+configuration, so an ask costs 3 to 9 draws. Under the equal-exposure invariant
+that charges asking up to 8.63x watching, and THAT is what starves every arm --
+not a policy, not a budget, and not anything about intervention. **A real
+intervening agent acts once.** So the coverage cap is a fact about this harness.
+
+**And the cost LEAKS THE ANSWER.** A true part costs 8.63 draws and a confound
+2.91, a ratio of 2.97, which is wider than the refusal rates' 1.73. An arm that
+timed its asks and never read a single refusal would separate the confound
+better than the mechanism this run is about. Nothing here does that, and nothing
+should until the sampler is replaced -- a result obtained that way would be a
+result about rejection sampling wearing the clothes of one about asking.
+
     python experiments/g44_01_asking.py --json out/g44-01.json
 """
 

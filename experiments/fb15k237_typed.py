@@ -249,6 +249,18 @@ def main() -> int:
     # THE BLEND SWEEP. Chosen on validation, read on test, and alpha 0 is the
     # floor by construction rather than by a second implementation of it.
     def structure_vector(given, asked, accumulate):
+        """The path evidence, normalised, and how CONCENTRATED it was.
+
+        The concentration is the largest candidate's share of the total, which
+        is high when the paths agree on one answer and low when they spray over
+        hundreds. It is a property of the query rather than a fitted constant,
+        and it is what a per-query blend weight needs: the global blend mixes
+        structure in at the same strength whether or not it has anything to say,
+        and the mechanism wins 7,375 queries while losing 11,302.
+
+        Returned alongside rather than folded in, so the global arm and the
+        per-query arm read the same vector and differ only in the weight.
+        """
         vector = np.zeros(len(entities))
         for first, second, end in routes(out_of, given, FANOUT):
             weight = path_weight(first, second, asked)
@@ -257,8 +269,10 @@ def main() -> int:
             at = entity_at[end]
             vector[at] = (max(vector[at], weight) if accumulate == "max"
                           else vector[at] + weight)
-        top = vector.max()
-        return vector / top if top > 0 else vector
+        top, total = vector.max(), vector.sum()
+        if top <= 0.0:
+            return vector, 0.0
+        return vector / top, float(top / total)
 
     def sweep(triples, accumulate):
         """Every alpha's per-query ranks over one split, from one pass.
@@ -270,18 +284,23 @@ def main() -> int:
         sample size.
         """
         totals = {alpha: [] for alpha in ALPHAS}
+        totals.update({("per query", alpha): [] for alpha in ALPHAS})
         for head, relation, tail in triples:
             asked = relation_at[relation]
             for direction in ("tail", "head"):
                 given, answer = ((head, tail) if direction == "tail"
                                  else (tail, head))
-                structure = structure_vector(given, asked, accumulate)
+                structure, concentration = structure_vector(given, asked,
+                                                            accumulate)
                 other = floor_of.vector(relation, direction)
                 for alpha in ALPHAS:
-                    _, middle, _ = ranker.rank(
-                        alpha * structure + (1.0 - alpha) * other,
-                        given, relation, answer, direction)
-                    totals[alpha].append(middle)
+                    for weight, key in ((alpha, alpha),
+                                        (alpha * concentration,
+                                         ("per query", alpha))):
+                        _, middle, _ = ranker.rank(
+                            weight * structure + (1.0 - weight) * other,
+                            given, relation, answer, direction)
+                        totals[key].append(middle)
         return totals
 
     def paired(ranks, floor_ranks):
@@ -304,33 +323,40 @@ def main() -> int:
     for accumulate in ACCUMULATORS:
         valid_ranks = sweep(held, accumulate)
         on_valid = {a: metrics(r)["mrr"] for a, r in valid_ranks.items()}
-        chosen = max(on_valid, key=lambda alpha: on_valid[alpha])
         test_ranks = sweep(queries, accumulate)
         on_test = {a: metrics(r)["mrr"] for a, r in test_ranks.items()}
-        gain, error, better, worse = paired(test_ranks[chosen],
-                                            test_ranks[0.0])
-        rows.append({"arm": "blend", "accumulate": accumulate,
-                     "chosen_alpha": chosen, "validation": on_valid,
-                     "test": on_test,
-                     "margin": on_test[chosen] - on_test[0.0],
-                     "paired_gain": gain, "standard_error": error,
-                     "better": better, "worse": worse,
-                     # Kept only until the stratification below has read them,
-                     # then deleted -- 40,000 ranks per alpha is not a record,
-                     # it is a working value.
-                     "_test_ranks": test_ranks})
-        # THE MARGIN IS A DIFFERENCE OF TWO MEANS OVER THE SAME QUERIES, so its
-        # error bar is not the MRR's. Reported as a spread across the queries
-        # rather than left to be eyeballed against a sample size in the header.
-        print(f"  {accumulate:>4} over paths: validation picks alpha "
-              f"{chosen}, test MRR {on_test[chosen]:.4f} against the floor's "
-              f"{on_test[0.0]:.4f}  margin {on_test[chosen] - on_test[0.0]:+.4f}"
-              f"  over {2 * len(queries)} scored queries")
-        print("       test by alpha: "
+        # THE TWO WEIGHTINGS ARE CHOSEN SEPARATELY on validation and reported
+        # side by side. Sharing one alpha would compare them at a setting picked
+        # for the other, which is the untuned-baseline mistake in miniature.
+        for label, keys in (("global", list(ALPHAS)),
+                            ("per query", [("per query", a) for a in ALPHAS])):
+            chosen = max(keys, key=lambda key: on_valid[key])
+            gain, error, better, worse = paired(test_ranks[chosen],
+                                                test_ranks[0.0])
+            alpha = chosen[1] if isinstance(chosen, tuple) else chosen
+            rows.append({"arm": "blend", "weighting": label,
+                         "accumulate": accumulate, "chosen_alpha": alpha,
+                         "test": {str(k): v for k, v in on_test.items()},
+                         "margin": on_test[chosen] - on_test[0.0],
+                         "paired_gain": gain, "standard_error": error,
+                         "better": better, "worse": worse,
+                         # Kept only until the stratification below has read
+                         # them, then deleted -- 40,000 ranks per alpha is a
+                         # working value and not a record.
+                         "_test_ranks": test_ranks, "_chosen": chosen})
+            print(f"  {accumulate:>4} over paths, {label:<9} weight: "
+                  f"validation picks alpha {alpha}, test MRR "
+                  f"{on_test[chosen]:.4f} against the floor's "
+                  f"{on_test[0.0]:.4f}  margin "
+                  f"{on_test[chosen] - on_test[0.0]:+.4f}")
+            print(f"       PAIRED on the same queries: {gain:+.4f} +/- "
+                  f"{error:.4f} (one standard error), {better} better and "
+                  f"{worse} worse")
+        print("       test by alpha, global:    "
               + "  ".join(f"{a}:{on_test[a]:.4f}" for a in ALPHAS))
-        print(f"       PAIRED against the floor on the same queries: "
-              f"{gain:+.4f} +/- {error:.4f} (one standard error), "
-              f"{better} better and {worse} worse")
+        print("       test by alpha, per query: "
+              + "  ".join(f"{a}:{on_test[('per query', a)]:.4f}"
+                          for a in ALPHAS))
 
     # IS THE MARGIN JUST POPULARITY? The floor is a popularity ranking, so a
     # gain concentrated on the answers that are already common would be the
@@ -348,8 +374,9 @@ def main() -> int:
         degree[tail] += 1
     for accumulate in ACCUMULATORS:
         row = next(r for r in rows
-                   if r["arm"] == "blend" and r["accumulate"] == accumulate)
-        chosen = row["chosen_alpha"]
+                   if r["arm"] == "blend" and r["accumulate"] == accumulate
+                   and r["weighting"] == "per query")
+        chosen = row["_chosen"]
         bands: dict = {}
         for index, (head, relation, tail) in enumerate(queries):
             asked = relation_at[relation]
@@ -376,20 +403,25 @@ def main() -> int:
                          "n": len(at), "floor": base["mrr"],
                          "blend": blended["mrr"],
                          "margin": blended["mrr"] - base["mrr"]})
-        del row["_test_ranks"]
+    # CLEARED ONCE, AFTER EVERY ACCUMULATOR HAS READ THEM. Clearing inside the
+    # loop emptied the second accumulator's ranks before its own bands ran, and
+    # the run died on the last line of a fifty-minute job.
+    for other in rows:
+        other.pop("_test_ranks", None)
+        other.pop("_chosen", None)
 
     # THE BLEND ROWS ARE THE ARM. Reporting the best FIXED combiner as "best"
     # printed a negative margin directly under a positive one and invited the
     # wrong line to be quoted; the fixed combiners are a swept axis that lost.
     blends = [row for row in rows if row["arm"] == "blend"]
-    best = max(blends, key=lambda row: row["test"][row["chosen_alpha"]])
+    best = max(blends, key=lambda row: row["margin"])
     fixed = max((row for row in rows
                  if row["arm"] not in ("relation only", "blend", "band")),
                 key=lambda row: row["mrr"])
-    print(f"\nBest arm: {best['test'][best['chosen_alpha']]:.4f} "
-          f"({best['accumulate']} over paths, blended at alpha "
-          f"{best['chosen_alpha']}) - margin {best['margin']:+.4f} "
-          f"+/- {best['standard_error']:.4f}")
+    print(f"\nBest arm: {best['accumulate']} over paths, "
+          f"{best['weighting']} weight at alpha {best['chosen_alpha']} - "
+          f"margin {best['margin']:+.4f} +/- {best['standard_error']:.4f}, "
+          f"{best['better']} better and {best['worse']} worse")
     print(f"Best FIXED combiner, which is the axis that lost: {fixed['mrr']:.4f} "
           f"({fixed['accumulate']} over paths, {fixed['arm']}) - margin "
           f"{fixed['margin']:+.4f}")

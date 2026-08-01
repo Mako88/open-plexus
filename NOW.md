@@ -16,8 +16,11 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
 
 - **`fb15k237_walk.py` at 4,000 queries** → `out/fb15k237-walk.txt`. Partial
   rows so far agree with the smoke run (depth 2 beam 16 mean, −0.0418).
-- **`fb15k237_typed.py` on the FULL test set** → `out/fb15k237-typed-full.txt`.
-  **Read this first.** The 2,500-query run held the margin and sharpened it:
+- **`fb15k237_typed.py` on the FULL test set, with the popularity bands**
+  → `out/fb15k237-typed-full.txt`. **Read this first.** An earlier full run was
+  stopped and relaunched rather than left to finish: it predated the
+  stratification, and the bands are now the question that decides the result, so
+  it would have had to be run again regardless. The 2,500-query run held the margin and sharpened it:
   `sum over paths`, alpha 0.02 chosen on validation, test **0.2409** against the
   floor's 0.2286, **margin +0.0124** over 5,000 scored queries. The alpha curve
   now has an interior maximum rather than an edge winner — 0.0:0.2286,

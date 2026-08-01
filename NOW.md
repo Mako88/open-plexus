@@ -2,353 +2,84 @@
 
 What is being worked on, and what has been agreed but not started.
 
-**The invariant that makes this worth having:** every 🚧 in
-[README.md](README.md) appears here, and nothing appears here that is not in the
-README. An approved piece of work cannot go quiet, which is how the LSH front end
-was agreed and then dropped for two sessions — it sat as ⬜ in the tree, identical
-to options nobody had ever considered, and the next planning pass never saw it.
+**The invariant:** every 🚧 in [README.md](README.md) appears here, and nothing
+appears here that is not in the README. An approved piece of work cannot go
+quiet, which is how the LSH front end was agreed and then dropped for two
+sessions.
 
-Delete a line when it is done. This file is disposable and nothing may cite it.
+**A finding updates a line; it never appends one.** Settled results belong in the
+README, which carries the claim; this file carries only what is unfinished.
+Delete a line when it is done. Nothing may cite this file.
 
 ---
 
-## The result, and it is the first one
-
-**A typed ranked walk clears the floor by the same margin ComplEx does, with no
-training and no embedding.** `sum over paths`, blend weight 0.01 chosen on
-10,233 validation triples, read on all 20,466 test triples in both directions:
-
-    floor (relation only)   0.2334
-    the arm                 0.2470
-    margin                 +0.0136  +/- 0.0005, so about 27 standard errors
-
-    published, same floor:  ComplEx +0.0136   DistMult +0.0076
-                            TransE  +0.0606   RotatE   +0.1046
-
-**So it matches the weaker half of the published field and is nowhere near the
-stronger half.** "Matched ComplEx" and "lost to RotatE by a factor of eight" are
-the same sentence and both belong in it.
-
-**And the +0.0136 is a dilution, which is the more useful reading.** Split by
-whether any path reached the true answer:
-
-    sum over paths, global weight
-      answer reached   n=14,281   0.3412 -> 0.3886   +0.0474
-      never reached    n=26,651   0.1757 -> 0.1711   -0.0046
-
-Where the mechanism can see the answer it is worth **+0.0474**, three and a half
-times the headline; the whole-set figure is that gain spread over the two thirds
-of queries it structurally cannot answer, where it can only push other candidates
-above an answer it never scored. The weighted average reproduces the headline
-exactly, which is the check that the split is of the same thing.
-
-**This is NOT "we would beat TransE with more reach."** The reachable third is
-selected by the mechanism's own ability, so it is an easier subset by
-construction — its floor is 0.3412 against 0.1757 for the rest. Whether the gain
-survives as reach expands is untested, and the queries reach expands INTO are
-the ones it is currently failing to arrive at.
-
-**And it is not the marginal being reinforced**, which was the live worry. Split
-by how many training triples the answer entity has:
-
-    rare (<10)         n= 1,703   0.0166 -> 0.0469   +0.0303
-    middling (10-49)   n=17,330   0.0548 -> 0.0684   +0.0137
-    common (50+)       n=21,899   0.3917 -> 0.4039   +0.0122
-
-The gain is LARGEST where the answer is rare, nearly tripling the floor there,
-and smallest where it is common. The 120-query preview said the opposite and had
-seven queries in that band.
-
-**What is still true and must travel with the number:** 7,375 queries improved
-and 11,302 got worse. The mechanism wins a minority of queries by a lot and
-loses the majority by a little, at every sample size from 120 to 40,932, so that
-is a property of it rather than noise. Most of the 0.2470 is the marginal; the
-structure contributes the 0.0136.
-
-**Reproduced on seed 1, and the reproduction is narrower than the word usually
-means.** Every figure came back bit-identical: alpha 0.01, 0.2470 against 0.2334,
-+0.0136 +/- 0.0005, 7,375 better and 11,302 worse.
-
-Identical rather than merely close, because **the test measurement is
-deterministic given alpha** — the whole test set is scored, the fan-out cap takes
-a fixed prefix, and nothing samples. The only thing a seed can move is which
-10,233 of 17,535 validation triples choose alpha, and both halves chose 0.01. So
-what is established is that **the alpha choice is stable to resampling the
-validation set**, and that is all a seed can establish here.
-
-**The uncertainty that remains is therefore not seed variance.** It is the
-+/-0.0005 paired error, and the systematic choices: the fan-out cap of 200, the
-two-step limit, `conditional` as the statistic, and the linear form of the blend
-itself. Those are swept or named, none is reproduced by running the same thing
-twice, and a second seed was never going to touch them.
-The only seed-dependent step is which 10,233 validation triples choose the blend
-weight — the test set is scored whole and the fan-out cap is deterministic — and
-the alpha curve is broad enough that the choice should barely matter (0.01 gives
-0.2470, 0.02 gives 0.2459, 0.05 still gives 0.2406). **If seed 1 disagrees, the
-README line goes back to ⬜ and the disagreement is the finding.**
-
 ## In flight
 
-- **Fan-out 600 with the sampling fix, 2,000 queries** →
-  `out/fb15k237-fanout600.txt`. The number to read is **the `n` on the
-  reached/never-reached lines**, not the margin: at fan-out 200 with a biased
-  prefix it was 14,281 of 40,932, about 35%, against 0.7373 of test pairs being
-  two hops apart in the graph. If sampling three times as many edges does not
-  move that share much, the ceiling is the two-step limit rather than the cap,
-  and the next move is three steps rather than a wider fan.
+- **`fb15k237_flood.py`, 150 queries, depth 2** → `out/fb15k237-flood.txt`. Two
+  gates: `strength` weighs an edge `1/degree(neighbour)` and prunes by how well
+  connected things are; `meaning` weighs every edge 1.0 so the only decay is the
+  confidence of what a route composes into, which is what the design asks for
+  and has no defence against a hub. Blend weight swept on both arms — and taken
+  on TEST, which flatters the flood, because this run has no validation split.
 
-- **`fb15k237_walk.py` at 4,000 queries was STOPPED before its last two cells**,
-  and the hole is named rather than left to be discovered: `depth 3 beam 64` ran
-  `walk only` (0.0065) and never ran `min` or `mean`. It was stopped because its
-  conclusion was already established — every arm below the floor, and walk-only
-  peaking at beam 16 then declining at 64 and 256 at every depth, which is the
-  interior maximum that rules out the grid being too small — and because those
-  two cells are about fifty minutes of a machine the decisive run needs.
-  `out/fb15k237-walk.txt` has everything up to that point. **If the depth-3
-  beam-64 combined cells ever matter, they have not been run.**
-- **`fb15k237_typed.py` on the FULL test set, with the popularity bands**
-  → `out/fb15k237-typed-full.txt`. **Read this first.** An earlier full run was
-  stopped and relaunched rather than left to finish: it predated the
-  stratification, and the bands are now the question that decides the result, so
-  it would have had to be run again regardless. The 2,500-query run held the margin and sharpened it:
-  `sum over paths`, alpha 0.02 chosen on validation, test **0.2409** against the
-  floor's 0.2286, **margin +0.0124** over 5,000 scored queries. The alpha curve
-  now has an interior maximum rather than an edge winner — 0.0:0.2286,
-  0.01:0.2410, 0.02:0.2409, 0.05:0.2383, 0.1:0.2267, 1.0:0.1328.
-
-  **First full-scale arm is in, and it holds.** `max over paths`, alpha 0.01
-  chosen on 10,233 validation triples: test 0.2381 against the floor's 0.2334,
-  **margin +0.0047 with a standard error of 0.0004** over 40,932 scored
-  queries — about twelve standard errors, so the margin is real and it is
-  small. **7,246 queries better against 11,114 worse**, so it remains a
-  minority of large wins funding a majority of small losses. `sum over paths`,
-  which was the stronger arm at 2,500 queries, and the popularity bands are
-  still running.
-
-  **Two things this full run fixes, and until it lands the margin is not
-  quotable.** The 2,500-query floor is 0.2286 where the full-set floor is
-  0.2334, so a margin measured against the small floor and compared with a
-  published full-set number flatters us by about 0.005. And a difference of two
-  means needs a paired error bar rather than an eyeball; the run now reports the
-  per-query gain, its standard error, and how many queries got better against
-  how many got worse.
+  **Early reading is poor**: the strength gate reaches 0.208 of answers for
+  ~36,000 expansions per query, against the capped enumeration's 0.35 for a
+  fraction of that. If the meaning gate does not beat it, the honest conclusion
+  is that flooding costs a great deal and buys less than flat enumeration.
 
 ## Next, in the order I would take them
 
-1. **THE CAP IS NOT THE BINDING CONSTRAINT, and saying it was is a correction
-   this file owes.** Tripling the fan-out from 200 to 600 moved the reached
-   share from 34.9% to **37.9%** — three points, against a hoped-for doubling.
-   Reach stays about half of the 0.7373 of test pairs that are two hops apart.
-
-   **The diagnosis that survives is hubs.** The 0.7373 was measured with no cap
-   at all. A two-step path through an entity carrying 7,614 edges needs that
-   entity's list to contain the target inside the cap, and 600 of 7,614 samples
-   8% of it — so paths through hubs are missed at both settings, which is why
-   raising the cap barely moves anything. **A uniform cap cannot fix this**: the
-   fix would have to skip hub edges by how uninformative they are rather than by
-   how many there are, which is an idea and not yet a mechanism.
-
-   **Confound resolved by the control**, and it went against the change I was
-   most confident in:
-
-        fan-out 200, prefix     34.9%
-        fan-out 200, sampled    35.2%     <- the sampling fix, worth ~nothing
-        fan-out 600, sampled    37.9%     <- the cap, worth the whole 2.7
-
-   The prefix bias was real in principle and immaterial in effect. It was
-   committed with a confident rationale about hubs being systematically
-   mis-sampled, and the rationale was right about the mechanism and wrong about
-   the size. **Keep the fix** — an unbiased sample is still the honest thing to
-   take — but it buys nothing and must not be cited as if it did.
-
-   The margin on reachable queries is flat across all three, +0.0280, +0.0265,
-   +0.0267, so nothing here changes what the mechanism is worth where it works.
-2. **Run the reached/never-reached split at full scale.** The decomposition
-   above is from forty queries. It is the sharpest diagnostic the run has and it
-   has never been read at a size that settles anything. A run is in flight —
-   **and it measures the OLD prefix behaviour**, because the sampling fix landed
-   after it started and its process holds the previous code. That is the right
-   comparison point rather than a mistake: it says where the mechanism stood
-   before the cap was unbiased. Re-running it after will not reproduce it, and
-   should not.
-2. **Three-step typed paths.** 0.2597 of answers lie further than two steps and
-   nothing has been run there. Costs a fan-out cubed, so it needs the cap
-   thinking through rather than raising.
-2. ~~Keep the route~~ — **done**. `grounding.routed` returns
-   `(strength, route)` and `reach` is that with the routes dropped. Item 1 can
-   now ask which edges a path used.
-3. **An error signal** (README §7). Nothing is currently ever wrong, because
-   counts only go up. Predicting *relations* rather than tokens gives a signal
-   that can be wrong without being next-token prediction.
-4. **Compression** (README §7). One principle that supplies forgetting,
-   hierarchy, and a reason to reorganise — three holes that are currently three
-   separate open questions.
-
-## What tonight established
-
-- **A typed ranked walk blended with the marginal is the first thing this
-  project's own mechanism has done above a floor on external data**, and the
-  size of it is +0.0124 MRR at 2,500 queries. For scale, DistMult's margin over
-  the full-set floor is +0.0076 and ComplEx's is +0.0136. **That is the whole
-  claim** — not that the count graph is competitive, but that it clears a
-  no-structure baseline by an amount in the same range as two published models
-  clear it by, having been given no training and no embedding.
-- **AND THE CLAIM IS ALREADY IN TROUBLE, from its own diagnostics.** At 120
-  queries the paired gain is +0.0068 with a standard error of 0.0062, and
-  **40 queries improved against 69 that got worse** — so the positive mean is a
-  few large wins paid for by many small losses, which an MRR difference hides
-  completely. Worse, the gain is concentrated where the answer is ALREADY
-  COMMON: −0.0081 on answers with fewer than ten training triples, +0.0096 on
-  answers with fifty or more. The floor is a popularity ranking, so a gain that
-  lives on popular answers may be the marginal being reinforced rather than
-  structure being added. **The full run decides it, and if that pattern holds at
-  scale the honest reading is that the margin is a popularity artefact.**
-- **`sum` over paths beats `max` at every alpha**, which is the ranked walk
-  earning its keep over a thresholded lookup.
-
-- **The structural signal is real and it is small.** Ranked on its own, with no
-  marginal mixed in: untyped walk 0.0082, the audit's thresholded rule miner
-  0.0460, typed ranked paths **0.1234**. Each mechanism roughly doubles the one
-  before it, and all three sit below the 0.2334 a marginal reaches by ignoring
-  the question entirely.
-- **`sum` over paths beats `max` over paths** — 0.1234 against 0.0834 — which is
-  the claim that separates a ranked walk from a thresholded lookup: many weak
-  agreeing paths outrank one strong path. That is the first thing measured this
-  week that came out the way the architecture says it should.
-- **Fixed combiners were the wrong question.** `min` and `mean` both land below
-  the floor, so they say more about the mix than the signal; the swept blend is
-  what asks properly, and alpha 0 is the floor by construction.
-
-- **The walk does not clear the marginal either, and it is not under-searched.**
-  Best arm 0.2025 against a floor of 0.2290, over depths 1 to 3 and beams 4 to
-  256. Walk-only peaks at **beam 16** and falls at 64 and 256 — an interior
-  maximum, so a wider search finds more paths and ranks them worse rather than
-  the grid stopping too early. Depth 1 walk-only returns 0.0001, reproducing the
-  counted run's empty entity signal exactly, which is the check that the two
-  runs measure the same quantity.
-- **So being reachable is not being findable**, and that is the gap now open.
-  0.7373 of answers are two steps away and the ranked walk puts them nowhere
-  near the top, because two steps from an entity of average degree 37 is about
-  1,300 candidates and nothing in an untyped walk says which of them the
-  question was about.
-- **Both re-pointed mutations go red.** `a-candidate-needs-only-ONE-half-behind-
-  it` and `the-role-is-dropped-from-the-surface`, run once the audit had let go
-  of the tree.
-
-- **The count graph does not clear the marginal on FB15k-237, and the reason is
-  structural rather than statistical.** Best combined arm 0.1707 against a floor
-  of 0.2186 by the same mechanism with a half switched off. The entity half
-  scores 0.0001 alone, because a link-prediction query asks for an edge that is
-  not in training, so the answer never co-occurred with the question. Adding a
-  near-empty signal to a working one makes it worse, which is what the negative
-  margin is.
-- **That is README §4's revival condition, met and measured.** *Walk further
-  than one step* was ❌ with *"revives if a question needs two hops by
-  construction"*. It does, here, by construction. The line is now 🚧.
-- **The floor and the mechanism are one implementation.** `Composition.given`
-  ranks any role from whichever roles the query supplies, so *relation only* is
-  the marginal, *both* is the arm, and neither can drift from the other.
-
-## Reading leads, none of them read
-
-- **Rule-mining systems on this benchmark, e.g. AnyBURL.** Recalled from memory
-  and **not checked**: that learned rules over paths reach the RotatE range on
-  FB15k-237 with no embeddings at all. If it holds, it says our +0.0136 is far
-  below what this FAMILY achieves and the ceiling is our implementation rather
-  than the approach — length-2 paths only, one confidence per route shape,
-  evidence summed rather than combined as probabilities, no filtering of
-  unreliable rules. **Check it before it is repeated anywhere**; a remembered
-  number about someone else's work is the borrowed claim CLAUDE.md puts first,
-  and it has already been stated once in conversation.
-
-Found by search on 2026-08-01, recorded as leads and **not as findings**. Each
-may replace work otherwise done by hand, and each has to be read before it is
-cited anywhere.
-
-- **PROBE** (`arXiv 2606.08921`, 2026) — *fetched, not read.* It reweights the
-  metric by inverse popularity rather than comparing against a baseline:
-  per-triple weights from entity degree and entity-conditioned relation
-  frequency, with a `beta` setting how hard low-popularity triples are
-  upweighted, and a separate `alpha` setting rank sharpness. **Its smoothing
-  constants were not in what was fetched**, so it is deliberately NOT
-  reimplemented — a metric named after a paper nobody opened is the borrowed
-  claim `CLAUDE.md` puts first. The popularity stratification in
-  `fb15k237_typed.py` takes the idea and needs no constants. Reading the paper
-  properly would let the weighted version be reported as PROBE.
-- **A Re-evaluation of Knowledge Graph Completion Methods**, Sun et al. ACL 2020
-  (`aclanthology.org/2020.acl-main.489`, `arXiv 1911.03903`). Reportedly the tie
-  problem and the average-rank fix, which is the policy `fb15k237_audit.py`
-  chose independently. **Two fetches got the abstract only** — the anthology
-  landing page and the arXiv abstract page — and the abstract says just
-  *"inappropriate evaluation protocol"* and *"a simple evaluation protocol...
-  robust to handle bias in the model"* without naming ties at all. **The PDF is
-  what has to be read**, and WebFetch returns it as unparsed binary, so this
-  needs a human or a different tool. Until then the tie policy stays our own
-  documented choice rather than a cited convention — which is fine, because the
-  tie bound shows the comparison's direction does not depend on it.
-- **Akrami et al., realistic re-evaluation of KGC.** Reportedly finds redundancy
-  and test leakage inflating accuracy by 19-175% across standard benchmarks —
-  this week's CLUTRR result at family scale, possibly naming which datasets leak.
-- **SCAN, COGS, CFQ** for kill-list #1's instrument problem: splits made by
-  STRUCTURE rather than by sampling. Audit any of them with the table attack
-  before adopting one; the filter is whether the ceiling is computable.
+1. **Structured logging.** Agreed with John. Experiments emit JSON rows already;
+   what is not checked is that they ALL do, that prose never carries a number,
+   and that a run's parameters travel with its rows. That is the thing that went
+   wrong before the restructure, so it wants a check and not a convention.
+2. **Contradiction, which is nearly free.** `flood` returns every route to an
+   endpoint and throws all but the strongest away. Two routes composing to
+   incompatible kinds is README §5's ⬜ *a contradiction the map contains* — an
+   output that was never an input, computable from what is already being
+   discarded.
+3. **Three steps, and it needs the flood to work first.** 0.2597 of answers lie
+   further than two. `PathTypes.best` reduces a pair to one kind so the table
+   stays pair-sized at any depth; nothing has been run there.
+4. **An error signal** (README §7). Counts only go up, so nothing is ever wrong.
+5. **Compression** (README §7). One principle for forgetting, hierarchy and a
+   reason to reorganise.
 
 ## Known debts
 
-- **Kill-list #1 has an instrument with a floor rather than a ceiling.** CLUTRR
-  is dead twice over (`clutrr_ceiling.py`, `clutrr_headroom.py`). FB15k-237
-  passed its audit: the inverse leak is gone — 0.45 applied to train against
-  0.0001 applied to test — but relation-tail frequency alone scores MRR 0.2334,
-  against published DistMult 0.241 and ComplEx 0.247. **Report the margin.**
-- **The protocol question is closed.** RotatE (ICLR 2019) evaluates filtered
-  against train, validation and test, corrupting subjects *or* objects — which
-  is what the audit does. Its Table 5 gives DistMult Hits@1 0.155 and ComplEx
-  0.158 against our floor's 0.1700, so the marginal beats both there and loses
-  at Hits@10.
-- **And the floor's tie policy does not decide the comparison, only its size.**
-  Published models have continuous scores and almost no ties; ours puts
-  thousands of entities on exactly zero, so the floor runs 0.2305 to 0.2597.
-  Each published margin over it:
-
-        model      pessimistic    average   optimistic
-        DistMult      +0.0105     +0.0076      -0.0187
-        ComplEx       +0.0165     +0.0136      -0.0127
-        TransE        +0.0635     +0.0606      +0.0343
-        RotatE        +0.1075     +0.1046      +0.0783
-
-  The only sign change is DistMult and ComplEx going NEGATIVE under the reading
-  most generous to the floor, which makes the finding stronger rather than
-  weaker. The average is what is quoted because it is the neutral choice; the
-  claim that it is also the published convention is unread and is not relied on.
-- **And the two floors agree.** `fb15k237_audit.py` builds it as a raw count
-  vector and `Composition.given` builds it as a relation-only ranking, written
-  separately — both return **0.2334** over all 40,932 scored queries.
-- **There is no node entry point.** `node_main.py` started the old store and was
-  deliberately not carried over.
-- ~~`asking.py`'s mutations and the route mutation are unrun~~ — **all three ran
-  and all three were caught**, and `--verify` reports the source clean at 50/50.
-  Run alongside the typed sweep after all: the rule's stated hazard is a commit
-  landing mid-run, which is controllable, and the sweep holds its modules in
-  memory and writes nothing to the tree. No commit was made until the harness
-  had finished and verified.
-
-  *(Superseded, kept one turn so the change of mind is visible:)* **the two new
-  mutations have not been RUN.** `tests/test_asking.py`
-  now covers it — the refusal being one draw, the budget being charged, a
-  refusal not being a miss, and watching reproducing `occasions.generate`
-  occasion for occasion — and `the-ask-retries-until-the-world-says-yes` and
-  `an-ask-is-not-charged-for-what-it-drew` are registered. **Neither has been
-  seen to go red**, because the FB15k runs were touching the tree all night and
-  the harness may not run alongside them. **`the-route-reported-is-not-the-
-  route-walked` is in the same state.** First thing to clear in the morning,
-  once the sweeps have stopped:
-
-      python tools/mutate.py --only the-ask-retries-until-the-world-says-yes,an-ask-is-not-charged-for-what-it-drew,the-route-reported-is-not-the-route-walked
-- **`experiments/` has eight scripts and no harness.** They share `Ranker`,
-  `Marginal` and `load` through `experiments/__init__.py`, but argument parsing
-  and JSON writing are still duplicated eight ways. `tools/check_experiments.py`
-  now at least starts each of them, in preflight and in CI.
-- **The link columns in `surfaces_pipeline.py` step in tenths.** Shares over ten
+- **Nothing runs as a node.** `bucket_peer`, `federated`, `deployment` are in
+  `tools/orphans_baseline.json` because no entry point starts one. **The
+  distributed half — the project's actual claim — is untested end to end**, and
+  FB15k measures knowledge-graph completion instead, which the README names as
+  the failure case.
+- **`tasks/asking.py` has a falsifier registered as g44-01 and never run.**
+- **`tasks/xsl.py` has no caller.** Use it or drop it.
+- **The link columns in `surfaces_pipeline.py` step in tenths** — shares over ten
   words, so nothing smaller than 0.1 can be read.
-- **The front end is not wired to anything that runs as a node**, because there
-  is no node entry point. It is used by the sweeps and nowhere else.
+- **`experiments/` has nine scripts and no harness.** They share `Ranker`,
+  `Marginal` and `load`; argument parsing and JSON writing are still copied.
+
+## Reading leads, none of them read
+
+Each may replace work otherwise done by hand, and each must be read before it is
+cited anywhere. A remembered number about someone else's work is the borrowed
+claim `CLAUDE.md` puts first.
+
+- **Rule mining over paths, e.g. AnyBURL.** Recalled, not checked: that learned
+  path rules reach the RotatE range on FB15k-237 with no embeddings. If true our
+  +0.0136 is far below what this family achieves and the ceiling is our
+  implementation — length-2 only, one confidence per shape, evidence summed
+  rather than combined as probabilities, no filtering. **Stated once in
+  conversation already; check before repeating.**
+- **PROBE** (`arXiv 2606.08921`) — reweights the metric by inverse popularity.
+  Fetched, not read; its smoothing constants were not in the summary, so the
+  popularity stratification in `fb15k237_typed.py` takes the idea and not the
+  metric.
+- **Sun et al., ACL 2020** (`arXiv 1911.03903`) — reportedly the tie problem and
+  an average-rank fix, which is the policy `fb15k237_audit.py` chose
+  independently. **Two fetches returned the abstract only**; the substance is in
+  the PDF and WebFetch returns it as binary.
+- **Akrami et al.** — reportedly finds redundancy and leakage inflating accuracy
+  19–175% across standard benchmarks. May name which datasets leak.
+- **SCAN, COGS, CFQ** — splits made by structure rather than sampling, which is
+  the property CLUTRR lacked. Audit any with the table attack before adopting.

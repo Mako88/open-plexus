@@ -186,6 +186,30 @@ whole win, and `separation` takes a MIN over true partners, so one wrongly
 demoted part costs the entire query. **What is missing is a legitimate rule that
 approximates the oracle**, and nothing here has found one.
 
+## The price of asking, registered before it is measured
+
+P10 failed on allocation: about 7 asks per pair where the rule needs 48. The
+obvious repair is an arm that REVISITS -- nominate as `ask-mutual` does, then
+stay on that pair until it has a resolved rate.
+
+The arithmetic is uncomfortable before anything is run. 108 pairs at 48 asks is
+5,184 asks against a stream of 4,000 occasions, so a rule that works may still
+cost more than watching the world at all.
+
+    ask-repeat    nominates by mutual predictability, then re-asks the same
+                  pair REVISITS times before moving on
+
+    P13  ask-repeat beats watching by >0.05 at some budget at or under 2.0
+    P14  and the smallest budget that does it is ABOVE 0.5, so asking is not
+         cheap and the earlier grid could not have found it
+    P15  at equal budget ask-repeat beats ask-mutual, since the only difference
+         is how the same number of asks is spread
+
+P14 is the one worth being wrong about. If a budget under 0.5 does it, the
+grid was simply too coarse and nothing about cost follows; if none under 2.0
+does, intervention works and does not pay for itself here, which is a result
+about the mechanism and not about this implementation.
+
     python experiments/g44_01_asking.py --json out/g44-01.json
 """
 

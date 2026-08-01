@@ -68,12 +68,22 @@ from openplexus.pathways import PathTypes, flood  # noqa: E402
 #: about 7e-4 -- the whole of that grid sat ABOVE the strength of every route it
 #: was meant to admit. Multiplicative decay against small weights means the
 #: useful floor is orders of magnitude below where a reader would guess, which
-#: is the argument for sweeping it rather than picking one.
+#: is the argument for sweeping it rather than picking one. Swept, never
+#: pinned.
 FLOORS = (0.001, 0.0005, 0.0002, 0.0001, 0.00005)
 
 #: The statistic, for the path types and for the marginal. `conditional` is the
 #: one measured to refuse an ever-present distractor (g39-04).
 STATISTIC = "conditional"
+
+#: Floors for the MEANING gate, which decays only by composition
+#: confidence and so lives on a completely different scale from the
+#: strength gate. Swept over the range a confidence can take.
+MEANING_FLOORS = (0.5, 0.3, 0.2, 0.1, 0.05)
+
+#: Blend weights, swept on every arm. Alpha 0 is the floor exactly, so a
+#: flood that adds nothing scores the floor rather than below it.
+BLENDS = (0.0, 0.005, 0.01, 0.05, 0.1, 0.3)
 
 #: Expansions per query after which the walk gives up. **A safety, and every
 #: cell reports how often it fired.** Chosen here as roughly the cost of the
@@ -93,7 +103,11 @@ def main() -> int:
     # Chosen here: a flood is dearer per query than an enumeration, so this
     # defaults low and the floor sweep is what the run is for.
     parser.add_argument("--queries", type=int, default=300)
+    # Chosen here; it picks the query subsample only.
     parser.add_argument("--seed", type=int, default=0)
+    # Chosen here as the shallowest depth that can compose past a pair;
+    # two is the flat mechanism this is trying to beat, so three is the
+    # first setting where the design does anything new.
     parser.add_argument("--depth", type=int, default=3)
     args = parser.parse_args()
 
@@ -116,15 +130,25 @@ def main() -> int:
           f"mean degree {sum(degree.values()) / len(degree):.1f}, "
           f"largest {max(degree.values())}")
 
-    # THE EDGE WEIGHT. `P(here | neighbour)` is `1 / degree(neighbour)` on a
-    # graph where every pair co-occurs once, so an edge into a hub is weak.
-    weighted: dict = {}
-    for node, edges in out_of.items():
-        weighted[node] = [(kind, other, 1.0 / degree[other])
+    # TWO WAYS TO SPEND THE BUDGET, and they are the whole comparison.
+    #
+    # `strength` weighs an edge `P(here | neighbour)`, which is
+    # `1 / degree(neighbour)` where every pair co-occurs once -- an edge into a
+    # hub is weak. It prunes by how well CONNECTED things are.
+    #
+    # `meaning` weighs every edge 1.0, so the only thing that decays along a
+    # route is the confidence of what it composes into. It prunes by how much
+    # the route MEANS, which is what the design asks for -- and it has no
+    # defence against a hub at all, so the ceiling is expected to fire.
+    #
+    # Neither needs a change to `flood`: the walk takes its weights from the
+    # adjacency it is handed, so the gating rule is a property of the caller.
+    by_strength = {node: [(kind, other, 1.0 / degree[other])
                           for kind, other in edges]
-
-    def adjacency(node):
-        return weighted.get(node, ())
+                   for node, edges in out_of.items()}
+    by_meaning = {node: [(kind, other, 1.0) for kind, other in edges]
+                  for node, edges in out_of.items()}
+    GATES = {"strength": by_strength, "meaning": by_meaning}
 
     types = PathTypes(kinds=kinds, spans=len(relations))
     counted = 0
@@ -168,51 +192,65 @@ def main() -> int:
                                        given, relation, answer, direction)
             base.append(middle)
     floor_score = metrics(base)
-    print(f"{'floor':>8}{'MRR':>9}{'margin':>9}{'arrived':>9}"
+    print(f"{'gate':>9}{'floor':>9}{'MRR':>9}{'margin':>9}{'arrived':>9}"
           f"{'expansions':>12}{'gave up':>9}{'sec':>8}")
-    print(f"{'(none)':>8}{floor_score['mrr']:>9.4f}{0.0:>+9.4f}"
+    print(f"{'(none)':>9}{'-':>9}{floor_score['mrr']:>9.4f}{0.0:>+9.4f}"
           f"{'-':>9}{'-':>12}{'-':>9}{time.time() - started:>8.1f}")
 
     rows: list[dict] = [floor_score | {"arm": "relation only"}]
-    for floor in FLOORS:
-        began = time.time()
-        ranks, arrived, spent, quit_early = [], 0, 0, 0
-        for head, relation, tail in queries:
-            asked = relation_at[relation]
-            for direction in ("tail", "head"):
-                given, answer = ((head, tail) if direction == "tail"
-                                 else (tail, head))
-                found, expansions, gave_up = flood(
-                    adjacency, entity_at[given], asked, types, statistic,
-                    floor=floor, depth=args.depth, ceiling=CEILING)
-                spent += expansions
-                quit_early += gave_up
-                arrived += entity_at[answer] in found
-                vector = np.zeros(len(entities))
-                for endpoint, (score, _) in found.items():
-                    vector[endpoint] = score
-                top = vector.max()
-                if top > 0:
-                    vector /= top
-                # The blend weight that won the capped run, so the flood is
-                # read at the setting its predecessor was tuned to rather than
-                # at one chosen for it.
-                mixed = 0.01 * vector + 0.99 * floor_of.vector(relation,
-                                                               direction)
-                _, middle, _ = ranker.rank(mixed, given, relation, answer,
-                                           direction)
-                ranks.append(middle)
-        got = metrics(ranks)
-        scored = 2 * len(queries)
-        row = got | {"arm": "flood", "floor": floor, "depth": args.depth,
-                     "margin": got["mrr"] - floor_score["mrr"],
-                     "arrived": arrived / scored,
-                     "expansions": spent / scored,
-                     "gave_up": quit_early / scored}
-        rows.append(row)
-        print(f"{floor:>8}{got['mrr']:>9.4f}{row['margin']:>+9.4f}"
-              f"{row['arrived']:>9.4f}{row['expansions']:>12.0f}"
-              f"{row['gave_up']:>9.4f}{time.time() - began:>8.1f}")
+    for gate, table in GATES.items():
+      def adjacency(node, table=table):
+        return table.get(node, ())
+      # A meaning gate does not decay by degree, so the floors that suit it are
+      # orders of magnitude higher. Sweeping one grid over both would report
+      # every cell of one arm as empty.
+      for floor in (FLOORS if gate == "strength" else MEANING_FLOORS):
+          began = time.time()
+          ranks, arrived, spent, quit_early = {}, 0, 0, 0
+          for head, relation, tail in queries:
+              asked = relation_at[relation]
+              for direction in ("tail", "head"):
+                  given, answer = ((head, tail) if direction == "tail"
+                                   else (tail, head))
+                  found, expansions, gave_up = flood(
+                      adjacency, entity_at[given], asked, types, statistic,
+                      floor=floor, depth=args.depth, ceiling=CEILING)
+                  spent += expansions
+                  quit_early += gave_up
+                  arrived += entity_at[answer] in found
+                  vector = np.zeros(len(entities))
+                  for endpoint, (score, _) in found.items():
+                      vector[endpoint] = score
+                  top = vector.max()
+                  if top > 0:
+                      vector /= top
+                  # SWEPT ON THIS ARM TOO. Carrying the weight that won the
+                  # capped enumeration would tune one arm and not the other,
+                  # which is the untuned-baseline mistake this project refuses.
+                  # There is no validation split here, so the best is taken on
+                  # TEST and that FLATTERS the flood -- it is an upper bound on
+                  # what the arm could do, not a score it earned.
+                  other = floor_of.vector(relation, direction)
+                  for alpha in BLENDS:
+                      _, middle, _ = ranker.rank(
+                          alpha * vector + (1.0 - alpha) * other,
+                          given, relation, answer, direction)
+                      ranks.setdefault(alpha, []).append(middle)
+          scored = 2 * len(queries)
+          by_alpha = {a: metrics(r)["mrr"] for a, r in ranks.items()}
+          best_alpha = max(by_alpha, key=lambda a: by_alpha[a])
+          got = metrics(ranks[best_alpha]) | {"best_alpha": best_alpha,
+                                              "by_alpha": by_alpha}
+          row = got | {"arm": "flood", "floor": floor, "depth": args.depth,
+                       "margin": got["mrr"] - floor_score["mrr"],
+                       "arrived": arrived / scored,
+                       "expansions": spent / scored,
+                       "gave_up": quit_early / scored}
+          row["gate"] = gate
+          rows.append(row)
+          print(f"{gate:>9}{floor:>9}{got['mrr']:>9.4f}{row['margin']:>+9.4f}"
+                f"{row['arrived']:>9.4f}{row['expansions']:>12.0f}"
+                f"{row['gave_up']:>9.4f}{time.time() - began:>8.1f}")
 
     print("\nThe capped two-step enumeration this is measured against: "
           "+0.0136 margin, 0.35 arrived.")

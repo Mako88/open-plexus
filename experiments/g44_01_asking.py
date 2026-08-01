@@ -896,6 +896,30 @@ measurement, not a conclusion, and it has not been made.**
 **P29 was the one that mattered**, and it mattered by being unanswerable: naming
 the quantity before building is what exposed that there was no quantity.
 
+### The open measurement, made: enrichment separates WIDER than refusal rate
+
+    ENRICHMENT = harvested / (compliances x marginal)
+      true partners  mean 0.6897   n=32
+      shadows        mean 0.9251   n=16
+      gap            +0.2354       (the refusal-rate gap is 0.16)
+
+**A gap about 1.5x wider than the quantity it would replace, computed from asks
+the arm is ALREADY making.** Normalising by marginal frequency is what makes it
+a signal rather than a restatement of how common a surface is — the raw counts
+tracked the marginal and said nothing.
+
+**And it does NOT yet follow that fewer asks are needed.** The binding factor is
+asks-per-pair, and that depends on gap AND SPREAD together: a refusal rate is
+Bernoulli with a variance one can write down, while an enrichment is a ratio of
+counts whose spread has not been measured here. **A wider gap with a wider
+spread buys nothing**, and this run has 16 shadows across 4 seeds, which is thin.
+
+So what is established is that enrichment separates, and by more than refusal
+rate does. What is NOT established is the thing that would matter: how many asks
+it takes to resolve, which is the only number that touches the bound. That
+measurement is the next one and it is specified — spread per pair at a fixed
+number of asks, exactly as the 12-to-384 sweep did for the threshold rule.
+
 **P28 is not scored.** It was to hold "almost by construction", and building an
 arm to confirm a construction is the tuning this file has refused twice. P28 will hold almost by construction: harvesting
 cannot help but touch more pairs. If P29 fails, more coverage of a WRONG number

@@ -278,6 +278,27 @@ the arm can compute, and no such anchor is known here. **That is the whole of
 what is missing**, and it is smaller than "the rule has no nothing-to-find
 state" made it sound.
 
+## DOES ASKING CORRUPT THE COUNTS? P16 AND P17, REGISTERED FIRST
+
+An arm covering 25 pairs scores -0.3067 where the coverage curve says 27 pairs
+is -0.1846, and the curve builds its index from unconditioned watches while an
+arm feeds every ask-occasion into the same index. An ask-occasion is drawn
+CONDITIONED on the candidate being present, so it is not a sample of the world:
+every candidate an arm asks about is over-represented in the counts that arm
+then scores.
+
+`learn_from_asks=False` keeps the intervention and throws away the occasion it
+produced. Refusals are still recorded and draws are still charged, so the arm
+pays exactly what it paid before and only stops LEARNING from a biased sample.
+
+    P16  an arm that does not learn from its own asks beats one that does,
+         by >0.05 at matched budget
+    P17  and it beats watching, which no arm has done
+
+P16 without P17 would mean the bias is real and something else is also wrong.
+Neither holding would refute the hypothesis outright and send the 0.12 back to
+being unexplained, which is where it is now.
+
 ## THE COVERAGE CURVE REFUTES "IT NEEDS NEAR-TOTAL COVERAGE"
 
 That claim was inferred from three points -- 6, 25 and 108 -- and never
@@ -602,7 +623,7 @@ def wrongly_demoted(config: OccasionConfig, statistic,
 
 
 def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
-            rng: random.Random) -> dict:
+            rng: random.Random, learn_from_asks: bool = True) -> dict:
     """One arm on one world. Every arm spends `config.occasions` draws."""
     world = World(config)
     index = CoOccurrence()
@@ -627,8 +648,13 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             answer = world.ask(present=candidate, absent=query)
             asks -= 1
             if answer.occasion is not None:
-                index.observe(answer.occasion.surfaces)
-                seen.extend(answer.occasion.surfaces)
+                # AN ASK-OCCASION IS NOT A SAMPLE OF THE WORLD. It was
+                # drawn conditioned on the candidate being present, so
+                # learning from it over-represents exactly the surfaces
+                # this arm chose to ask about.
+                if learn_from_asks:
+                    index.observe(answer.occasion.surfaces)
+                    seen.extend(answer.occasion.surfaces)
                 was, refused = refusals.get((candidate, query), (0, 0))
                 refusals[(candidate, query)] = (was + 1,
                                                 refused + answer.refused)
@@ -662,8 +688,9 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
         answer = world.ask(present=candidate, absent=query)
         asks -= 1
         if answer.occasion is not None:
-            index.observe(answer.occasion.surfaces)
-            seen.extend(answer.occasion.surfaces)
+            if learn_from_asks:
+                index.observe(answer.occasion.surfaces)
+                seen.extend(answer.occasion.surfaces)
             was, refused = refusals.get((candidate, query), (0, 0))
             refusals[(candidate, query)] = (was + 1, refused + answer.refused)
             shadow_asks += config.is_shadow(candidate)

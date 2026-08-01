@@ -30,44 +30,26 @@ neither is measured.
 
 ## g44-01: asking separates a confound watching cannot
 
-**A legitimate rule matches the oracle.** `learned_threshold` splits observed
-refusal rates by two means and demotes only the low group, reading nothing but
-rates the arm paid for. At 384 asks per pair it reaches **+0.2256**, where an
-oracle calling `is_shadow` reaches **+0.2256** and watching reaches **−0.2967**.
-Tested; its mutation is caught.
+**Settled.** `learned_threshold` splits observed refusal rates and demotes only
+the low group, using nothing but rates the arm paid for. At 384 asks per pair it
+reaches **+0.2256**, matching an oracle that calls `is_shadow`, against
+watching's **−0.2967**. Tested; both mutations caught.
 
-**The poisoning hypothesis is dead, and the whole thing is ONE number.** P18
-refuted, P19 held (indexes 3600 against 4000, so nothing was starved). Not
-learning from its own asks is worth −0.002 to `ask-repeat`.
+**No arm reaches it, and the constraint is one number: pairs × asks-per-pair,
+bounded by the budget.** A real part is detachable 62% of the time (refused
+0.3837 against a shadow's 0.2222), so the signal is a 0.16 gap needing ~48 asks
+per pair to resolve, and a misclassified pair demotes a real part rather than
+merely failing to help. Reaching +0.19 took 108 × 96 = 10,368 asks against a
+4,000 stream. Policy, budget, noise, sampler pricing, metric strictness,
+coverage and self-poisoning have each turned out to be a face of that.
 
-**What is left is the product: pairs × asks-per-pair.** `ask-mutual` lands 52
-pairs and scores −0.4099 where the curve puts 54 pairs at −0.0844, because the
-curve resolves each at 96 asks and the arm affords about seven. The rule is
-unusable below ~12 asks per pair and exact at 384; a misclassified pair does not
-merely fail to help, it demotes a real part. Reaching +0.19 took 108 pairs × 96
-asks = 10,368 against a stream of 4,000. **Policy, budget, noise, pricing,
-metric, coverage and poisoning have each turned out to be a face of that.**
+**P12 refuted at 100%:** where there is no confound the rule demotes all 72 true
+partners. The two cases differ by the low group's absolute level (0.2105 against
+0.3779); the scale-free ratio is useless (0.55 against 0.52). **Missing: an
+absolute anchor the arm can compute.**
 
-**Scored:** P5, P7, P9, P11, P15 held. P1–P3, P6, P8, P10, P12, P13 refuted.
-P16 withdrawn, P19 held, P18 refuted.
-P14 is unmeasurable — budget stops binding above 0.25.
-
-## Next, in the order I would take them
-
-1. **A flood with a beam as well as a floor.** The floor removes routes that
-   mean nothing; nothing currently bounds how many meaningful ones survive, and
-   that is what makes depth 3 unaffordable. `reach`'s beam is the missing half.
-2. **Contradiction, which is nearly free.** `flood` returns every route to an
-   endpoint and throws all but the strongest away. Two routes composing to
-   incompatible kinds is README §5's ⬜ *a contradiction the map contains* — an
-   output that was never an input, computable from what is already being
-   discarded.
-3. **Three steps, and it needs the flood to work first.** 0.2597 of answers lie
-   further than two. `PathTypes.best` reduces a pair to one kind so the table
-   stays pair-sized at any depth; nothing has been run there.
-4. **An error signal** (README §7). Counts only go up, so nothing is ever wrong.
-5. **Compression** (README §7). One principle for forgetting, hierarchy and a
-   reason to reorganise.
+**Scored:** P5, P7, P9, P11, P15, P19 held. P1–P3, P6, P8, P10, P12, P13, P18
+refuted. P14 unmeasurable, P16 withdrawn as an artefact.
 
 ## THE ASKING POLICY BUILDS A GRAPH AND NEVER WALKS IT
 

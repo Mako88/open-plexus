@@ -91,5 +91,51 @@ class ItStaysOutOfTheWay(unittest.TestCase):
             CoOccurrence()
 
 
+class AGraphHoldsWhatTheRunDeclared(unittest.TestCase):
+    """The check counting instances cannot make. `expect(graph=1)` passes on
+    every arm in this project and always did; what was never true is that any
+    one graph held pictures AND sounds AND words AND facts."""
+
+    def setUp(self):
+        wiring.reset()
+
+    def test_all_the_declared_kinds_arriving_passes(self):
+        with wiring.expect(holding={"image", "audio", "word"}):
+            for name in ("image", "audio", "word"):
+                wiring.kind(name)
+
+    def test_A_KIND_THAT_NEVER_ARRIVES_FAILS(self):
+        """The real case, and the one this module exists for."""
+        with self.assertRaises(wiring.WiringError) as caught:
+            with wiring.expect(holding={"image", "audio", "word", "fact"}):
+                wiring.kind("image")
+                wiring.kind("word")
+        said = str(caught.exception)
+        self.assertIn("audio", said)
+        self.assertIn("fact", said)
+
+    def test_AN_UNDECLARED_KIND_FAILS_TOO(self):
+        """The companion. A merge that quietly gains a kind nobody declared is
+        doing something its author did not describe."""
+        with self.assertRaises(wiring.WiringError) as caught:
+            with wiring.expect(holding={"image"}):
+                wiring.kind("image")
+                wiring.kind("audio")
+        self.assertIn("audio", str(caught.exception))
+
+    def test_repeats_do_not_change_the_verdict(self):
+        """Kinds are a SET. A graph fed a thousand pictures and one sound holds
+        both, and how lopsided that is belongs to a different measurement."""
+        with wiring.expect(holding={"image", "audio"}):
+            for _ in range(50):
+                wiring.kind("image")
+            wiring.kind("audio")
+
+    def test_declaring_no_kinds_checks_none(self):
+        with wiring.expect(graph=1):
+            CoOccurrence()
+            wiring.kind("anything-at-all")
+
+
 if __name__ == "__main__":
     unittest.main()

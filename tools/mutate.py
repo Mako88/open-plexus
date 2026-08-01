@@ -100,6 +100,17 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="a-kind-that-never-arrived-is-tolerated",
+        breaks="the only check that can find this project's actual fault. "
+               "Requiring the declared kinds to be a SUBSET of what arrived "
+               "passes a run that declared pictures, sounds, words and facts "
+               "and received pictures alone -- which is the state every graph "
+               "here has been in, each one individually wired and tested",
+        path=WIRING,
+        old="            if had != self.holding:",
+        new="            if not had >= self.holding:",
+    ),
+    Mutation(
         name="the-wiring-check-tolerates-extra-instances",
         breaks="the exact case this module was written for. Flagging only a "
                "SHORTFALL passes a run that declared one graph and built three, "

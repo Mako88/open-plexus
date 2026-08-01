@@ -44,6 +44,27 @@ def touch(part: str) -> None:
         _seen[part] = _seen.get(part, 0) + 1
 
 
+def kind(name: str) -> None:
+    """Record that a KIND of thing entered a graph.
+
+    **The check that finds the fault counting instances cannot.** One arm
+    building one graph is right, and a sweep building many is right, so
+    `expect(graph=1)` passes everywhere and says nothing. What was never true is
+    that any single graph held pictures AND sounds AND words AND facts — three
+    populations, each in its own accumulator, none ever meeting.
+
+    The caller declares the kind because a `CoOccurrence` cannot know one: it
+    holds integers, and what those integers MEAN lives with whoever fed them in.
+    That is also why this cannot be inferred later from the data.
+    """
+    touch(f"kind:{name}")
+
+
+def kinds() -> set[str]:
+    """Which kinds have entered a graph since the last reset."""
+    return {part.split(":", 1)[1] for part in trace() if part.startswith("kind:")}
+
+
 def trace() -> dict[str, int]:
     """What has been built since the last reset."""
     with _lock:
@@ -66,7 +87,12 @@ class expect:
     rather than having to enumerate everything the process touches.
     """
 
-    def __init__(self, **counts: int) -> None:
+    def __init__(self, holding: set[str] | None = None, **counts: int) -> None:
+        #: The kinds this run says its graph holds. **Exact, like the counts**:
+        #: a run declaring pictures and sounds and getting only pictures has
+        #: not half-passed, and one that quietly gains a kind nobody declared
+        #: is the merge doing something its author did not describe.
+        self.holding = None if holding is None else set(holding)
         self.counts = counts
 
     def __enter__(self) -> "expect":
@@ -79,6 +105,15 @@ class expect:
         if kind is not None:
             return False
         got = trace()
+        if self.holding is not None:
+            had = kinds()
+            if had != self.holding:
+                missing = sorted(self.holding - had)
+                extra = sorted(had - self.holding)
+                raise WiringError(
+                    "this run's graph did not hold what it declared -- "
+                    f"never arrived: {missing or 'none'}; "
+                    f"undeclared: {extra or 'none'}")
         wrong = {part: (want, got.get(part, 0))
                  for part, want in self.counts.items()
                  if got.get(part, 0) != want}

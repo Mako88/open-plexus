@@ -58,7 +58,7 @@ it back — refutations expire, and two have already become right later.
 - ⬜ A set, scored on exactness and completeness — *forces a commitment to a boundary rather than a hedge.*
 - ⬜ Refuse when nothing was written there — *the only honest answer for a thing never seen, and the machinery exists.*
 - ⬜ Generated one piece at a time — *the only way to produce a novel SEQUENCE, and nothing yet says when it stops.*
-- ⬜ A relation that was never stated but follows — *composition is novel output from a single query, no generation involved.*
+- ⬜ A relation that was never stated but follows — *composition is novel output from a single query, no generation involved. Counting role-marked relations returned the marginal on CLUTRR's 62 facts — 0.00 under the demanding combiner and 0.15 under the permissive, against 0.05 — which is three observations per relation-role and so bounds the data volume rather than the idea.*
 - ⬜ The answer to an analogy — *find where two parts of the map have the same shape, and read off the missing corner.*
 - ⬜ A contradiction the map contains — *an output that was never an input, and nobody asked the question.*
 - ⬜ A bridge between two regions that never co-occurred — *the thing that connects distant fields, aimed at deliberately rather than stumbled into.*
@@ -102,7 +102,7 @@ necessarily words** — an action is an output, and so is a structure.
 - ⬜ Learn from live sensors, test on labelled data never trained on — *the only named way to tell whether a microphone-and-camera system learned anything.*
 - ⬜ Beat a conventional system on the same input — *nobody has run it, and it is the first thing an outsider would ask for.*
 - ⬜ Noise that is sticky rather than uniform — *real irrelevant co-occurrence recurs together; ours is white noise, and ideas refuted against it are untested rather than dead.*
-- ❌ ~~CLUTRR-symbolic as evidence of composition~~ — *62 facts counted from its two-hop training rows, plus a search over bracketings, answer 100% of the test split at every hop count and reach 1.01 relations per puzzle; a shuffled table scores 0.12. It measures whether a system can find the ORDER to apply knowledge in — left to right, the same facts score 0.28.* **Revives if** a configuration is found whose relation algebra is not confluent, or when the question being asked is about search.
+- ❌ ~~CLUTRR-symbolic as evidence of composition~~ — *62 facts counted from its two-hop training rows, plus a search over bracketings, answer 100% of the test split at every hop count and reach 1.01 relations per puzzle; a shuffled table scores 0.12. It measures whether a system can find the ORDER to apply knowledge in — left to right, the same facts score 0.28. **Withholding facts does not repair it**: the 4,998 three-hop training rows determine every held-out pair by deduction alone, returning the ceiling to 0.98 with 40 of the 62 withheld.* **Revives if** a configuration is found whose relation algebra is not confluent, or when the question being asked is about search.
 - ❌ ~~Train, then test~~ — *measures a system that stops, which is the one thing C4 forbids.*
 - ❌ ~~Bits per token on text~~ — *bounded by what an n-gram table does, so it cannot show what structure adds.*
 

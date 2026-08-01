@@ -33,13 +33,16 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
 
 ## Known debts from the restructure
 
-- **Kill-list #1 has lost its instrument and needs a new one.** CLUTRR composition
-  was to be re-established on the count graph; `experiments/clutrr_ceiling.py`
-  then measured that 62 counted facts and a bracketing search answer 100% of the
-  split, so no score on it is evidence about understanding. What CLUTRR can still
-  measure is whether a mechanism finds the bracketing — the same facts folded
-  left to right score 0.28. **The question that decides the project is unchanged
-  and now has nothing pointed at it.**
+- **Kill-list #1 has lost its instrument and needs a new one.** 62 facts counted
+  from CLUTRR's two-hop rows plus a bracketing search answer 100% of the split
+  (`clutrr_ceiling.py`), and withholding facts does not repair it — the three-hop
+  rows determine every held-out pair by deduction, ceiling back to 0.98
+  (`clutrr_headroom.py`). Both were cheap and both were run before building on
+  the benchmark, which is the only reason two dead ends cost hours rather than
+  weeks. **The question that decides the project now has nothing pointed at it.**
+  The next candidate is FB15k-237, which exists because its predecessor leaked
+  the same way; **run the leakage audit on it before anything else**, since that
+  is exactly what these two runs would have saved.
 - **There is no node entry point.** `node_main.py` started the old store and was
   deliberately not carried over.
 - **`openplexus/tasks/asking.py` has no tests and no mutation**, so by this

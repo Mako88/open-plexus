@@ -72,6 +72,7 @@ RENDER = ROOT / "openplexus" / "render.py"
 FAMILIES = ROOT / "openplexus" / "tasks" / "families.py"
 CLUTRR = ROOT / "openplexus" / "tasks" / "clutrr.py"
 SURFACES = ROOT / "openplexus" / "surfaces.py"
+COMPOSITION = ROOT / "openplexus" / "composition.py"
 
 
 @dataclass(frozen=True)
@@ -548,6 +549,32 @@ MUTATIONS = [
         path=FEDERATED,
         old="        raise NotImplementedError(",
         new="        return self._table.occasions or NotImplementedError(",
+    ),
+    Mutation(
+        name="a-candidate-needs-only-ONE-half-behind-it",
+        breaks="the entire claim of the role-marked layout. Scoring a candidate "
+               "from the left half alone makes the answer a property of the "
+               "first relation, so `father . X` returns the same thing whatever "
+               "X is -- and on a table where each left appears in three facts "
+               "that still produces a plausible ranking and a plausible score, "
+               "which would be reported as counting having composed something",
+        path=COMPOSITION,
+        old="            score = rule(statistic(self.index, answer, from_left),\n"
+            "                         statistic(self.index, answer, from_right))",
+        new="            score = rule(statistic(self.index, answer, from_left),\n"
+            "                         statistic(self.index, answer, from_left))",
+    ),
+    Mutation(
+        name="the-role-is-dropped-from-the-surface",
+        breaks="the separation that makes a never-stated pair answerable at "
+               "all. With one surface per relation regardless of role, "
+               "`left(father)`, `right(father)` and `target(father)` are one "
+               "row, so every count is a mixture of what father composes WITH "
+               "and what it composes INTO -- and the mechanism still runs, "
+               "still ranks, and still commits to answers",
+        path=COMPOSITION,
+        old="        return ROLES.index(role) * self.relations + relation",
+        new="        return relation",
     ),
     Mutation(
         name="the-composition-search-only-brackets-from-the-left",

@@ -556,7 +556,31 @@ most. `informative` overlap is containment with that weighting:
          0.10, which containment managed 9 of
     P23  and nominates a shadow on >20% of its asks, against containment's 0.5%
 
-**P23 is the diagnostic and P22 the claim.** P23 failing means the weighting did
+### What happened: BOTH REFUTED, and the registered reading applies
+
+    arm              per query   on target   shadow
+    ask-mutual         -0.4099          52    48.2%
+    ask-structural     -0.3106           9      0.5%
+    ask-informed       -0.3056           5      0.1%
+
+**P22 refuted at 5 of 108, P23 at 0.1%.** Discounting the background did not
+change who gets asked about; it narrowed the choice further. The weighting was
+the repair that rescued `ask-mutual`, and here it made the measure worse.
+
+**The registered reading stands: containment does not find confounds in this
+world, weighted or not.** Both variants go to a candidate with a small, tidy
+neighbourhood, and a shadow's neighbourhood is neither small nor tidy — it meets
+its concept's surfaces AND the background, exactly as a true partner does. The
+asymmetry that distinguishes them is DIRECTIONAL, which is why reading
+`P(query | candidate)` works and why measuring overlap does not.
+
+**Scoping this precisely, because the registration was broad.** What is refuted
+is the CONTAINMENT FAMILY: shared-neighbourhood measures, with and without a
+frequency discount. A two-hop quantity that is directional the way `ask-mutual`
+is directional has not been built, and nothing here says one cannot exist. What
+is refuted is the version anyone would write first, twice.
+
+**P23 was the diagnostic and P22 the claim.** P23 failing means the weighting did
 not change WHO gets asked about, and the two-hop direction is then out of ideas
 in this world rather than merely unimplemented. Neither says anything yet about
 beating watching -- the product bound is untouched by which pairs are chosen.
@@ -804,6 +828,28 @@ def wrongly_demoted(config: OccasionConfig, statistic,
     return harmed / queries if queries else 0.0
 
 
+def informative(index: CoOccurrence, candidate: int, here: set) -> float:
+    """Containment, with each shared partner weighted by what it says.
+
+    **The repair containment needed, and the same one `ask-mutual` needed.** A
+    surface present in every occasion is inside every neighbourhood, so counting
+    it as shared makes containment a measure of how FEW partners a thing has.
+    Weighting by `1 - seen/occasions` sends it to zero and leaves the rare
+    partners -- the ones whose co-occurrence was a fact about the world rather
+    than about the room -- carrying the comparison.
+    """
+    theirs = index.partners(candidate)
+    if not theirs:
+        return 0.0
+    total = shared = 0.0
+    for partner in theirs:
+        weight = 1.0 - index.seen(partner) / max(index.occasions, 1)
+        total += weight
+        if partner in here:
+            shared += weight
+    return shared / total if total else 0.0
+
+
 def containment(index: CoOccurrence, candidate: int, here: set) -> float:
     """How much of `candidate`'s neighbourhood lies inside `here`.
 
@@ -883,6 +929,15 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             partners = index.partners(query)
             if not partners:
                 candidate = rng.randrange(config.vocabulary)
+            elif arm == "ask-informed":
+                # THE SAME TWO-HOP IDEA, WITH THE BACKGROUND DISCOUNTED. A
+                # surface in every occasion says nothing about who it meets, so
+                # it weighs zero here; a rare one weighs most. Containment
+                # counted it like any other partner, which is why the argmax
+                # went to whatever had the fewest.
+                here = set(index.partners(query))
+                candidate = max(partners, key=lambda p: informative(
+                    index, p, here))
             elif arm == "ask-structural":
                 # WALK THE GRAPH INSTEAD OF READING ONE EDGE. A shadow is tied
                 # to this query only THROUGH the concept, so it co-occurs with
@@ -1081,7 +1136,7 @@ def main() -> int:
     summary: dict = {}
     for budget in BUDGETS:
         for arm in ("watch", "ask-random", "ask-targeted", "ask-mutual",
-                    "ask-structural"):
+                    "ask-structural", "ask-informed"):
             if arm == "watch" and budget != BUDGETS[0]:
                 continue
             got = []

@@ -79,6 +79,29 @@ P5 is the one that matters. P6 without P5 would mean it helped for a reason this
 explanation does not name, and P5 without P6 kills the direction properly: the
 right questions asked, and the confound still ahead.
 
+## A comparative demotion, registered before it is written
+
+P5 and P7 held and P6 did not, and the ceiling split says the fault is in
+`adjusted` rather than in any policy: allowed to demote shadows alone it reaches
++0.2042 against watching's -0.2967, and allowed to demote true partners alone,
+-0.5509. A raw refusal rate is being read as an absolute when a true surface at
+`presence` 0.7 is genuinely detachable most of the time.
+
+So compare a candidate against the OTHER candidates asked about for the same
+query -- which is legitimate, since nothing tells the arm which surfaces are
+concepts -- and demote only what is detached more easily than its neighbours:
+
+    factor = min(1.0, refusal_rate / mean refusal_rate for that query)
+
+    P8  ask-mutual with this demotion beats watching by >0.05 at budget 0.10,
+        which no arm has done
+    P9  and at shadow_alone 0.0 it does NOT beat its own watch by >0.02, since
+        there the shadow is a part and there is nothing to find
+
+P9 is the one that can embarrass this. A rule that always improves separation
+improves it in the world where the confound is constitutive too, and that would
+make P8 a property of the arithmetic rather than a finding about asking.
+
     python experiments/g44_01_asking.py --json out/g44-01.json
 """
 

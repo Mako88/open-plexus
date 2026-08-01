@@ -13,76 +13,73 @@ Delete a line when it is done. Nothing may cite this file.
 
 ---
 
-## The flood: what is left of it
+## The flood, and why its numbers are now suspect
 
-Settled and in the commits: meaning-gating beats strength-gating about two to
-one, and the flood does NOT beat the flat enumeration (+0.0081 against +0.0136
-at 300 queries). A +0.0164 at sixty queries was withdrawn.
+Measured: meaning-gating beats strength-gating about two to one, and `flood`
+does NOT beat flat enumeration (+0.0081 against +0.0136). **But it was tested on
+knowledge-graph triples — published facts, not anything this system observed —
+so it says nothing about traversing the graph the architecture is meant to
+build.** John's point, and it stands.
 
-**Unfinished:** a route that composes confidently barely decays, so the floor
-kills what means nothing and does not bound what means something. `flood` has a
-floor and no beam, and they do different jobs.
-
-**EXPANSIONS IS THE WRONG COST COLUMN.** Where every node expands its own edges
-in parallel, wall clock is the longest path, not the sum of all work. What
-transfers is MESSAGES SENT and WORK PER NODE, and neither is measured.
+**Unfinished:** a confidently-composing route barely decays, so the floor kills
+what means nothing and does not bound what means something. `flood` has a floor
+and no beam. And EXPANSIONS IS THE WRONG COST COLUMN where nodes expand in
+parallel — what transfers is messages sent and work per node, neither measured.
 
 ## g44-01: asking separates a confound watching cannot
 
-**Settled.** `learned_threshold` splits observed refusal rates and demotes only
-the low group, using nothing but rates the arm paid for. At 384 asks per pair it
-reaches **+0.2256**, matching an oracle that calls `is_shadow`, against
-watching's **−0.2967**. Tested; both mutations caught.
+**Settled and paused behind the architecture work.** `learned_threshold` demotes
+only the low group of observed refusal rates, using nothing but rates the arm
+paid for, and at 384 asks per pair reaches **+0.2256** — matching an oracle that
+calls `is_shadow`, against watching's **−0.2967**. Tested, mutations caught.
 
-**No arm reaches it, and the constraint is one number: pairs × asks-per-pair,
-bounded by the budget.** A real part is detachable 62% of the time (refused
-0.3837 against a shadow's 0.2222), so the signal is a 0.16 gap needing ~48 asks
-per pair to resolve, and a misclassified pair demotes a real part rather than
-merely failing to help. Reaching +0.19 took 108 × 96 = 10,368 asks against a
-4,000 stream. Policy, budget, noise, sampler pricing, metric strictness,
-coverage and self-poisoning have each turned out to be a face of that.
+**No arm reaches it, and the constraint is one number: pairs × asks-per-pair.** A
+real part is detachable 62% of the time (refused 0.3837 against a shadow's
+0.2222), so the signal is a 0.16 gap needing ~48 asks per pair, and a
+misclassified pair demotes a real part rather than merely failing to help.
+Policy, budget, noise, sampler pricing, metric strictness, coverage and
+self-poisoning were each measured and each turned out to be a face of that.
 
-**P12 refuted at 100%:** where there is no confound the rule demotes all 72 true
-partners. The cases differ by the low group's absolute level (0.2105 against
-0.3779); the scale-free ratio is useless. **Missing: an absolute anchor.**
+**P12 refuted at 100%:** with no confound present the rule demotes all 72 true
+partners. Missing is an absolute anchor the arm can compute; the scale-free
+ratio is useless (0.55 against 0.52).
 
 ## THE ASKING POLICY BUILDS A GRAPH AND NEVER WALKS IT
 
-**John's observation, 2026-08-01**, and it is correct. He expected the graph to
-be built from the moments. It is: `index.observe(occasion.surfaces)` turns every
-moment into edges. What he spotted is that nothing then uses it as a graph —
-`grep -c "pathways|flood|reach|routed"` in `g44_01_asking.py` returns **0**, and
-every use is `statistic(index, a, b)`, a single direct edge.
+**John's catch, 2026-08-01.** `index.observe` turns every moment into edges, and
+then `grep -c "pathways|flood|reach|routed"` in `g44_01_asking.py` returns **0** —
+every use is `statistic(index, a, b)`, one direct edge.
 
-**I had described these as two separate worlds. That was wrong** and it hid the
-gap rather than naming it.
+**Why it bears on the wall.** The policy nominates by direct association, which
+is one-hop. A confound is a TWO-hop fact: two things tied together only through
+a third. A one-hop policy cannot express that, so it must TEST candidates that
+structure might have ruled out for free — and the product bound assumes exactly
+that every candidate needs testing. Reading the neighbourhood's shape would
+break the bound rather than trade along it. Untested.
 
-**Why it matters for the wall.** The policy nominates by DIRECT association —
-`conditional`, then mutual predictability — both one-hop. A confound is a
-two-hop fact: two things tied together only through a third. The policy cannot
-express that, so it must TEST candidates it might have ruled out structurally.
+## ONE GRAPH: THE PROBLEM IS KINDS, NOT INSTANCES
 
-Today's conclusion was that the constraint is a product, pairs × asks-per-pair,
-bounded by budget. That holds as measured, and it assumes every candidate has to
-be tested. **A policy that reads the neighbourhood's shape might not need to
-test most of them** — which would break the bound rather than trade along it.
-Untested, and it is the first idea here that is not another face of that number.
+`CoOccurrence` is the whole representation — things are nodes, anything observed
+together gets a weighted edge — and **no single graph has ever held more than one
+KIND of thing**: images+audio+words in one, intervention moments in another,
+knowledge-graph facts in a third, and none of them ever met.
 
-## CROSS-MODAL: UNDER-RESOURCED, NOT REGRESSED
+**"Three graphs" was the wrong diagnosis of the right problem, and pointing the
+new `wiring` check at real code before building on the phrasing is what caught
+it.** One arm of g44-01 builds exactly one graph and `expect(graph=1)` passes. A
+full sweep builds many, and that is CORRECT — arms are independent experiments
+and must not share an accumulator. Counting instances does not find this.
 
-**John reported it working before the restructure and he is right.** `g40-01`
-(readable at `f0a8a72^`) passed gate G7 and priced it: **a cross-modal link
-costs ~300 occasions per digit**, against ~16 within-modal.
+**So the check that catches it counts the KINDS entering a graph.** A run
+declares *this graph holds pictures and sounds and words and facts* and fails if
+one never arrives. The merge then has an instrument that can fail it, rather
+than my inspection. `wiring.touch("graph")` stays: an accumulator split by
+accident is a different fault and a real one.
 
-`surfaces_pipeline.py` runs 3,000 occasions over ten digits — exactly 300 each —
-but `alternating` puts sound on odd occasions and pictures on even ones, so
-**audio gets 150 per digit.** The arm that tests the claim is the one arm that
-cannot afford it, and its `crossed` 0.0000 looks exactly like a broken mechanism.
-The run now prints which arms can afford their own test.
-
-**Unrun:** reuse recordings so `alternating` carries 6,000 occasions. No
-`--occasions` flag and the audio set caps at 3,000, so the occasion builder must
-repeat them. Predicted to make `crossed` non-zero.
+**Also worth stating:** traversal (beam walk, `flood`, route-typing) MOVES
+through a graph; intervention EDITS it, asking the world whether one thing can
+be had without another. Different operations on one structure, and they were
+being discussed as alternatives.
 
 ## Known debts
 

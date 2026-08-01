@@ -1,86 +1,132 @@
 # Open Plexus
 
-Can a neural network learn using only **local information** and **bounded
-asynchrony** — so that it runs on consumer devices that are unreliable,
-heterogeneous, and constantly leaving?
+An attempt to build AGI that runs on distributed compute over the internet.
 
-Today's AI runs in data centres because training requires every part of the
-network to exchange information with every other part, in lockstep, many times a
-second. That is only affordable when the machines sit in one building on a
-dedicated network, and it means the scale of an AI system is set by how much
-capital one organisation can raise.
+---
 
-Meanwhile there are billions of computers, phones and consoles sitting idle in
-people's homes — already bought, already paid for, connected by the ordinary
-internet. This project asks whether a network can be built for *those* machines:
-not a faster network, a differently-shaped one, where no part ever waits for a
-global picture and a machine leaving mid-thought is a normal event.
+## Decisions
 
-## The documents, and which one to read
+Every part the data flows through, and every option for it — including the dead
+ones, because this is the file that gets read and an option that is not here will
+be proposed again.
 
-**Two documents carry the project**, and they are deliberately kept from doing each
-other's jobs — a document that holds intent *and* results *and* a todo list goes
-stale in all three at once, which is how this repository once ended up quoting two
-different answers for the same exponent two paragraphs apart.
+**✅ in use ⬜ untried ❌ ruled out 🚧 approved, not built 🔀 both kept**
 
-| document | what it holds | when |
-|---|---|---|
-| **[DECISIONS.md](DECISIONS.md)** | every component, its options, and which option each is — with the attempts under each | **first, and every session** |
-| **[GOALS.md](GOALS.md)** | what this is for, the constraints, what would refute it | before deciding whether a mechanism belongs here at all |
+One line each. A ❌ says what killed it and, where it is known, what would bring
+it back — refutations expire, and two have already become right later.
 
-**DECISIONS.md is the one kept current, and it is a TREE rather than a log.** It
-was a 6,040-line append-only log until 2026-07-29; nothing could read it whole, so
-it was read selectively, and that produced three wrong recommendations in one day —
-each resting on a claim a later entry had already superseded. **A log records; it
-does not prevent.** The old log is in `docs/archive/` and every attempt in the tree
-cites it, so the reasoning is one lookup away.
+---
 
-- **[docs/explainers/](docs/explainers/)** — plain-language explanations of
-  everything here, in reading order, written for someone who does not work in
-  this field. **Start here if you want the ideas rather than the specification.**
-- **[docs/archive/notes/](docs/archive/notes/)** — the reasoning: question, prediction made before
-  the run, result. Never edited afterwards except to record the outcome.
-- **[experiments/sweeps/](experiments/sweeps/)** — every measurement, with the
-  predictions registered before dispatch and scored honestly, including the
-  refuted ones.
-- **[docs/archive/](docs/archive/)** — superseded records, kept for their
-  reasoning and clearly marked as history.
-- **[CLAUDE.md](CLAUDE.md)** — the engineering standards the project runs under.
+**1. Input → surfaces.** How raw data becomes an id that can be counted.
 
-## Status
+- ✅ Trained k-means quantiser — *in use, and it is the thing being replaced.*
+- 🚧 Random-hyperplane LSH — *no training and no data, a shared seed is all two nodes need, and the bit count gives dog-vs-Labrador for free.*
+- ⬜ A codebook learned from co-occurrence — *removes the last borrowed component, but it must stay in sync as it learns, which C1 forbids.*
+- ⬜ Per-node codebooks plus translation — *avoids agreement entirely, at the cost of unsupervised translation, which is harder than the goal.*
+- ❌ ~~No discretisation — count raw similarity~~ — *every count stays 1, so no statistic can form.* **Revives if** counting is replaced by something that does not need recurrence.
+- ❌ ~~k-means as the permanent answer~~ — *clustering by similarity is an identity assignment, which is the walk's job.* **Revives if** identity stops being something the walk decides.
 
-**G0–G3 passed; G4 passes on one seed; G5 is contested.** The live work is
-**what an answer is** — the project's stated goal is to respond from awareness of
-how concepts relate, and until 2026-07-29 nothing here had ever scored a
-multi-token answer. See [DECISIONS.md](DECISIONS.md) §6.
+**2. What gets stored.** Which co-occurrences are kept.
 
-## The three constraints
+- ✅ Every count, nothing ever cut.
+- ❌ ~~Cut each surface's partners at the biggest score gap~~ — *refuses the ever-present distractor and evicts the word that names the concept.* **Revives if** something else supplies the refusal.
+- ❌ ~~Cap how many partners are even considered~~ — *a constant nobody set on purpose, and it turned out to be the thing doing the cutting.*
+- ⬜ Forget by age or disuse — *unbounded growth is not survivable on a phone, and nothing currently decides what to drop.*
 
-| | |
-|---|---|
-| **Locality** | No operation may require globally synchronised state — even when violating it improves the numbers. |
-| **Bounded asynchrony** | Information arrives late, out of order, at varying delay. The design states a bound and is correct below it. |
-| **Churn** | Machines leaving is the normal case, not an edge case. |
+**3. Identity.** What makes several surfaces one thing.
 
-## What refutes it
+- ✅ No id at all — a concept is what you reach by walking.
+- ❌ ~~Freeze partners into groups by mutual agreement~~ — *a hard partition flips whole groups on a small score change, so it gets worse with more data at some point.* **Revives if** a task needs a yes/no answer to "are these the same".
+- ❌ ~~Give every concept a global id~~ — *nobody can assign one without a coordinator.*
+- ⬜ Identity at more than one grain — *dog and Labrador are the same walk at different resolutions, and nothing currently expresses "narrower than".*
 
-Six gates, ordered by cost of finding out, each with the outcome that kills the
-project at that stage. `G0` is first and is the correction of the predecessor's
-most expensive mistake: **prove the benchmark leaves a learning rule something to
-do, before writing a learning rule.** See [GOALS.md §4](GOALS.md).
+**4. Retrieval.** How a question gets answered.
 
-## Relationship to plexus
+- ✅ Ranked walk, scored one-way from the asking side.
+- ❌ ~~Average the two directions of an edge~~ — *a thing present everywhere scores 1.0 from its own side because that is true, and averaging lets it outrank real partners.*
+- ❌ ~~Take the weaker direction~~ — *penalises exactly the hub edges worth keeping.*
+- ❌ ~~Take the stronger direction~~ — *stops discriminating; it scored at the floor.*
+- ❌ ~~Tune a damping exponent~~ — *five dials were tried and none was the axis.*
+- ❌ ~~Walk further than one step~~ — *worse and up to thirty times dearer.* **Revives if** a question needs two hops by construction, as cross-modal ones do.
+- ⬜ Act on the world to disambiguate — *the only named escape from a confound that counting provably cannot separate.*
 
-Open Plexus replaces `plexus` (`Mako88/submenu`, branch
-`claude/bio-inspired-neural-model-ohhrp6`). It is a restart rather than a fork,
-for two reasons: that architecture was built without a plan first, and it was
-framed as "biology, but better" rather than "the machines and the network
-already exist — build for those."
+**5. The answer.** What a response actually is.
 
-No code is inherited. What is inherited is its record of what did not work,
-which is the most useful thing it produced. [GOALS.md §6](GOALS.md) states what
-transfers and at what confidence; most of it transfers at *none*, and says so.
+- ⬜ The ranked list itself, cut where the caller wants — *the walk already produces it; nothing extra is decided.*
+- ⬜ A set, scored on exactness and completeness — *forces a commitment to a boundary rather than a hedge.*
+- ⬜ Refuse when nothing was written there — *the only honest answer for a thing never seen, and the machinery exists.*
+- ⬜ Generated one piece at a time — *the only way to produce a novel SEQUENCE, and nothing yet says when it stops.*
+- ⬜ A relation that was never stated but follows — *composition is novel output from a single query, no generation involved.*
+- ⬜ The answer to an analogy — *find where two parts of the map have the same shape, and read off the missing corner.*
+- ⬜ A contradiction the map contains — *an output that was never an input, and nobody asked the question.*
+- ⬜ A bridge between two regions that never co-occurred — *the thing that connects distant fields, aimed at deliberately rather than stumbled into.*
+- ❌ ~~A fixed frame with slots to fill~~ — *a frame is a traversal with a schedule nobody supplied.* **Revives if** a domain genuinely supplies the frame.
 
-## Licence
+**6. Output.** Turning an answer into something that leaves the system. **Not
+necessarily words** — an action is an output, and so is a structure.
 
-MIT.
+- ⬜ Words, fetched from the concept map — *they come from what was learned, so it cannot name what it does not have.*
+- ⬜ Words, composed by the system itself — *if it understands, it should be able to work out how to say things; nothing hands it grammar.*
+- ⬜ An action on the world — *the same channel intervention needs, which makes acting and answering one mechanism instead of two.*
+- ⬜ A structure — a map, a plan, a set of bindings — *the honest output for a system whose knowledge is a shape, and it needs no language at all.*
+- ⬜ Template — *structurally incapable of adding a fact, which makes it a floor rather than a goal.*
+- ❌ ~~An off-the-shelf LLM~~ — *a fluent renderer writes the right sentence from a wrong walk, so the score measures its world knowledge.* **Revives if** a test exists showing it cannot add or drop a fact.
+
+**7. What changes over time.** The thing that makes it learn.
+
+- ✅ The counts — *and this is currently the whole of what learns.*
+- ⬜ Learned representations for relations — *lets a relation never seen sit near ones that were, which counting cannot do.*
+- ⬜ Structure that reorganises, not just weights — *C4 claims the system keeps rearranging what it knows, and nothing implements that.*
+- ⬜ Predict what comes with what, and learn from being wrong — *counts only go up, so nothing is ever wrong and nothing is ever corrected; predicting RELATIONS is an error signal that is not next-token prediction.*
+- ⬜ Compress — keep the boundaries that describe the stream in the fewest bits — *one principle that would supply forgetting, hierarchy and a reason to reorganise, all of which are currently missing.*
+- ❌ ~~A trained readout on frozen random projections~~ — *everything durable ends up in one matrix, and the rule was never the limitation.*
+- ❌ ~~Replay as a repair for churn~~ — *churn costs capacity, not knowledge.*
+
+**8. Ownership.** Which machine holds which part.
+
+- ✅ Consistent hashing, no directory and no coordinator.
+- 🔀 Split by dimension, or split by concept — *dimension is the default; concept is required once capacity has to grow.*
+- ❌ ~~Any readout that sums across every machine~~ — *the step C1 forbids, and four gates were passed on top of one before anyone noticed.*
+
+**9. Talking between machines.** How a question crosses the network.
+
+- ✅ Point-to-point reads straight to the holder, no driver in between.
+- ✅ Departure by suspicion and a deadline, not by one missed reply.
+- ⬜ Surviving hostile participants — *no threat model exists, and the step where two things are judged the same is the obvious target.*
+
+**10. How we know it works.** The measurement, which is a design choice like any other.
+
+- ✅ Prequential — score as the stream arrives.
+- ⬜ Learn from live sensors, test on labelled data never trained on — *the only named way to tell whether a microphone-and-camera system learned anything.*
+- ⬜ Beat a conventional system on the same input — *nobody has run it, and it is the first thing an outsider would ask for.*
+- ⬜ Noise that is sticky rather than uniform — *real irrelevant co-occurrence recurs together; ours is white noise, and ideas refuted against it are untested rather than dead.*
+- ❌ ~~Train, then test~~ — *measures a system that stops, which is the one thing C4 forbids.*
+- ❌ ~~Bits per token on text~~ — *bounded by what an n-gram table does, so it cannot show what structure adds.*
+
+---
+
+## The constraints
+
+An option that breaks one of these is not a candidate, however well it performs.
+
+- **C1 — Nothing waits for the whole.** No update needs every part to have
+  exchanged with every other part, and no answer needs a step every machine joins.
+  A constant handed out once and frozen is fine — nobody waits for it. An
+  agreement that has to be maintained as things change is not.
+- **C2 — Messages are late, jittered and out of order.** Nothing may assume otherwise.
+- **C3 — A machine vanishing mid-thought is normal**, not an error to recover from.
+- **C4 — No training run that ends.** It never stops learning.
+
+Latency is **not** a constraint. Ten minutes for an answer is an optimisation
+problem if everything else works.
+
+---
+
+## The one that decides the project
+
+**Does a relational objective buy reasoning?**
+
+A graph database also stores and retrieves relations. What separates this from
+one is whether it can produce something it was never told. If it cannot, what
+remains is a distributed graph database with a learned front end — which is
+useful, and is not this.

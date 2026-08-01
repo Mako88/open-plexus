@@ -56,7 +56,7 @@ is `bucket_service`'s ownership refusal, which travels in the reply.
 Searched by capability — socket, serve, peer, wire, frame, protocol — across
 `openplexus/`, `tools/`, `tests/` and `testbed/`.
 
-- **`openplexus/distributed.py` owns the FRAMING** and `send`/`receive` are
+- **`openplexus/framing.py` owns the FRAMING** and `send`/`receive` are
   imported rather than re-written. A second length-prefix implementation is two
   chances to disagree about a header.
 - **`openplexus/peer.py` serves the SUPERPOSED STORE** — `read(concept, key)`
@@ -79,7 +79,7 @@ import socket
 import threading
 
 from openplexus.bucket_service import BucketService
-from openplexus.distributed import receive, send
+from openplexus.framing import receive, send
 
 
 def ask(host: str, port: int, message: tuple, timeout: float = 10.0):

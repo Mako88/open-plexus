@@ -70,7 +70,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # checks the first way.
 sys.path.insert(0, str(ROOT))
 
-from tools.check_rails import compare, read_baseline  # noqa: E402
+# `compare` and `read_baseline` live below -- see their docstrings.
 BASELINE = ROOT / "tools" / "duplication_baseline.json"
 SCOPE = ("tools", "experiments")
 #: Below this a shared shape is a coincidence of the language, not a copy.
@@ -99,6 +99,38 @@ class Shape(ast.NodeTransformer):
 
     def visit_arg(self, node):
         return ast.copy_location(ast.arg(arg="_", annotation=None), node)
+
+
+
+def read_baseline(path, rails) -> dict:
+    """The exemptions for these rails, or empty ones if the file is absent.
+
+    **Inlined from the retired `check_rails.py`.** That tool policed document
+    conventions -- sweep-record sections, option-record format -- for a document
+    set that no longer exists, and it was the only other caller. A shared helper
+    with one user is a helper in the wrong file.
+    """
+    import json
+    if not path.exists():
+        return {rail: [] for rail in rails}
+    stored = json.loads(path.read_text(encoding="utf-8"))
+    return {rail: list(stored.get(rail, [])) for rail in rails}
+
+
+def compare(found: dict, baseline: dict) -> tuple:
+    """(new violations, stale exemptions), given what is found and what is excused.
+
+    Pure, so the ratchet can be tested without a repository in a particular
+    state. A stale exemption is an error rather than a warning: a list nobody
+    prunes eventually covers whatever is added to that path later, and the point
+    of a ratchet is that it can only tighten.
+    """
+    new, stale = {}, {}
+    for rail, offenders in found.items():
+        exempt = set(baseline.get(rail, ()))
+        new[rail] = [name for name in offenders if name not in exempt]
+        stale[rail] = [name for name in exempt if name not in set(offenders)]
+    return new, stale
 
 
 def _statements(node: ast.AST) -> int:

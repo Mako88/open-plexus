@@ -108,20 +108,24 @@ class AnArgparseDefaultIsAPinToo(unittest.TestCase):
         self.assertEqual(unprovenanced(ARGPARSE_CITED), [])
 
 
-class TheRealTreeIsCoveredBothWays(unittest.TestCase):
+class TheRealTreeHasSomethingToFind(unittest.TestCase):
 
-    def test_it_finds_pins_of_both_kinds_in_the_repo(self):
+    def test_it_finds_a_real_module_level_pin(self):
         """A fixture-only test would pass against a scanner pointed at nothing.
 
-        Naming two real files rather than globbing, so a rename fails loudly
+        Naming a real file rather than globbing, so a rename fails loudly
         instead of going vacuous.
+
+        **The argparse shape is fixture-covered only**, and that is stated
+        rather than hidden: no tool in this tree currently has a numeric
+        `add_argument` default. It did in the tree this was written against —
+        `tools/clutrr_recovery.py` carried three, and they were the instances
+        that cost real accuracy — so the scanner keeps reading that shape and
+        this assertion will be extended the moment one reappears.
         """
         from tools.check_constants import ROOT
-        module = pins(ROOT / "experiments"
-                      / "g41_01_the_pipeline_on_the_published_protocol.py")
-        argument = pins(ROOT / "tools" / "clutrr_recovery.py")
-        self.assertIn("BRANCHES", [n for n, _, _ in module])
-        self.assertIn("--beam-width", [n for n, _, _ in argument])
+        found = [n for n, _, _ in pins(ROOT / "tools" / "check_duplication.py")]
+        self.assertIn("MIN_STATEMENTS", found)
 
 
 if __name__ == "__main__":

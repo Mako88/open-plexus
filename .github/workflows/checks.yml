@@ -49,18 +49,10 @@ jobs:
         run: python -m unittest discover -s tests -t . -q
       - name: Verify every workflow flag is one its script accepts
         run: python tools/check_workflows.py
-      - name: Repo-specific rails (ratchet -- new violations only)
-        run: python tools/check_rails.py
       - name: Duplicated function bodies (ratchet -- new copies only)
         run: python tools/check_duplication.py
-      - name: The decision tree stays a tree, and every state cites evidence
-        run: python tools/check_decisions.py
-      - name: Option records hold history, the tree holds status
-        run: python tools/check_options.py
-      - name: Every measurement in a record is in a source that entry cites
-        run: python tools/check_provenance.py
-      - name: Every explainer is in its index, and every index row resolves
-        run: python tools/check_explainers.py
+      - name: Every module imports
+        run: python tools/check_imports.py
       - name: No commit message had a word eaten by a shell
         run: python tools/check_commit_messages.py
       - name: Every pinned number says where it came from

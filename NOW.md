@@ -71,10 +71,26 @@ anything)` is 1.0, the largest the statistic can take, and a policy that asks
 about its highest-scoring partner is pulled to the background on every draw. It
 is the confound failure happening to the confound detector.
 
-**The open question, and it is the whole of g44-01 now:** whether a policy that
-may not be told which surfaces are concepts can find those 108 pairs at all.
-Asking about the argmax cannot. A candidate worth trying is to nominate by
-*instability* — pairs whose statistic is still moving — rather than by strength.
+**A policy CAN find them, and the metric still gets worse.** `ask-mutual`
+nominates by `min(P(c|q), P(q|c))`, which the background cannot fake because it
+predicts nothing in reverse. It lands 53 of 108 against targeting's 1, 47.8% of
+its asks are shadow pairs — P5 and P7 held — and separation falls to −0.5130.
+
+**Splitting the ceiling by what it may demote says why, and it is good news:**
+
+    shadows only        +0.2042      beats the confound outright
+    true partners only  −0.5509
+    both                −0.0500      watching −0.2967
+
+**`adjusted` is the bug.** It multiplies by the raw refusal rate, but a true
+surface at `presence` 0.7 is genuinely detachable — refused 0.3837 against a
+shadow's 0.2222. Being detachable is not being no part of it; only the
+comparison between candidates carries signal. Control holds: at
+`shadow_alone` 0.0 the same shadows-only demotion gives −0.0135, not +0.2042.
+
+**Next here:** demote by a candidate's refusal rate against the *other
+candidates for the same query* rather than against 1.0. Nothing tells the arm
+which surfaces are concepts, so it stays legitimate.
 
 ## Next, in the order I would take them
 

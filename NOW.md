@@ -65,12 +65,19 @@ Each may replace work otherwise done by hand, and each must be read before it is
 cited anywhere. A remembered number about someone else's work is the borrowed
 claim `CLAUDE.md` puts first.
 
-- **Rule mining over paths, e.g. AnyBURL.** Recalled, not checked: that learned
-  path rules reach the RotatE range on FB15k-237 with no embeddings. If true our
-  +0.0136 is far below what this family achieves and the ceiling is our
-  implementation — length-2 only, one confidence per shape, evidence summed
-  rather than combined as probabilities, no filtering. **Stated once in
-  conversation already; check before repeating.**
+- **Rule mining over paths, e.g. AnyBURL** (Meilicke et al. 2019). **Partly
+  checked, and the check corrected the claim.** A search summary supports the
+  direction — rule learning over paths is competitive with embedding models on
+  this benchmark family — but says FB15k-237 is *specifically hard* for
+  rule-based methods and puts AnyBURL slightly BELOW ConvE there, where I had
+  said "reaches the RotatE range". No table has been read: the paper's PDF and
+  SAFRAN's OpenReview page both returned unparseable content.
+
+  What survives is enough to matter: **a rule-over-paths system lands near 0.31
+  where ours lands at 0.247**, so the ceiling on this family is well above us and
+  our implementation is the limit — length-2 only, one confidence per route
+  shape, evidence summed rather than combined as probabilities, no filtering of
+  unreliable rules. Those are the levers, in that order.
 - **PROBE** (`arXiv 2606.08921`) — reweights the metric by inverse popularity.
   Fetched, not read; its smoothing constants were not in the summary, so the
   popularity stratification in `fb15k237_typed.py` takes the idea and not the

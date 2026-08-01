@@ -92,20 +92,14 @@ may be a statement about occasions per CODE rather than per digit.*
 
 ## A RULE BROKEN TWICE, AND THIS PROJECT'S ANSWER IS A CHECK
 
-**I committed on a red preflight**, by chaining `git commit` off a `grep` of
-preflight's output so `&&` read grep's exit status. `CLAUDE.md` names this
-exactly — *a suite piped through `tail` reports `tail`'s status, which is always
-0* — and I hit it anyway by piping to `grep` instead of `tail`.
+**I committed on a red preflight**, chaining `git commit` off a `grep` of its
+output so `&&` read grep's status. `CLAUDE.md` names this for `tail`; I hit it
+with `grep`. **And `tools/mutate.py` was broken mid-edit four times** by patch
+scripts writing before `ast.parse` validated.
 
-**Separately, `tools/mutate.py` was broken mid-edit four times today** by shell
-heredocs eating `
-`, each time because a patch script wrote the file before
-`ast.parse` validated it. Fixed each time by `git checkout` and the Write tool.
-
-The standing policy is that a rule which keeps being broken becomes a check.
-**Two candidates, and both are John's call because both cost something:** a git
-pre-commit hook running preflight (adds ~70s to every commit), and having patch
-scripts parse before writing (free, but it is a habit rather than a mechanism).
+Two candidate checks, both John's call because both cost something: a pre-commit
+hook running preflight (~70s per commit), and parse-before-write (free, but a
+habit rather than a mechanism — which the doctrine says fails).
 
 ## Known debts
 
@@ -114,15 +108,21 @@ scripts parse before writing (free, but it is a habit rather than a mechanism).
   answering a real socket request and refusing an unknown message. C1's discrete
   unit runs again.
 
-  **`testbed/driver.py` is a REPLACEMENT, not a rewrite**, and checking that
-  first stopped a wasted port: it measures a distributed `Network` of
-  `LocalAssociativeMemory` against a single-process one, and that architecture
-  was deleted. Only its SHAPE survives, and the shape is right — compare a
-  distributed result against a single-process reference and report WHERE they
-  diverge, *the only measurement that distinguishes a network which is slow from
-  one which is wrong*. The replacement asks that of the count graph: **does a
-  `CoOccurrence` split across `federated` owners answer reads identically to one
-  held whole?**
+  **AND ITS QUESTION IS ANSWERED IN-PROCESS.** `agreement.disagreements` reports
+  WHERE a split graph differs from a whole one, and a `Federation` across 4
+  owners agrees with a whole `CoOccurrence` on every `seen`, every `partners`
+  and every pairwise `together` over 200 occasions — still at 32 owners, where
+  most nodes are empty and a routing bug has somewhere to hide. Reads go through
+  `federation.at(owner)`, the path `rank` uses, so this checks the routing
+  rather than stepping past it.
+
+  **What is left is the CONTAINER run**, which is a different question —
+  latency, departure, partition — and a later phase's work. This one had to hold
+  first: a federation that disagrees in one process will disagree in twelve.
+
+  **`testbed/driver.py` stays dead and is a REPLACEMENT, not a rewrite** — it
+  measures a `LocalAssociativeMemory` network that the restructure deleted. Only
+  its reason survives, and `agreement.py` now carries it.
 
 - **`tasks/xsl.py` has no caller.** Use it or drop it.
 - **The link columns in `surfaces_pipeline.py` step in tenths** — shares over ten

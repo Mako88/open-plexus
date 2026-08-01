@@ -52,11 +52,12 @@ against 1.00 for a watch — `World.ask` rejection-samples until the world yield
 the configuration. Equal exposure therefore charges asking up to 8.63× watching,
 and that is what starves every arm. A real intervening agent acts once.
 
-**And the cost LEAKS THE ANSWER — this has to be closed before anything is built
-on it.** True part 8.63 draws against confound 2.91 is a ratio of 2.97, wider
-than the refusal rates' 1.73. An arm that timed its asks and read no refusal at
-all would separate the confound better than the mechanism under test. Nothing
-does this and nothing should until the sampler is replaced.
+**I called that a leak and it is not one — withdrawn.** `ask` rejects on
+`present` and never on `absent`, so the cost is 1/P(present): 0.1223 → 8.17
+against 8.63 measured, 0.3597 → 2.78 against 2.91. That is the candidate's
+marginal, which watching counts for free and which is exactly what cannot
+separate a confound. The timing channel is redundant with counting, not ahead of
+it. The wrong claim came from comparing two ratios over different quantities.
 
 **Two defects on the record.** P12 refuted at 100%: two means always return two
 groups, so where the shadow genuinely is a part the rule demotes true partners

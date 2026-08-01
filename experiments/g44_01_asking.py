@@ -268,12 +268,24 @@ that charges asking up to 8.63x watching, and THAT is what starves every arm --
 not a policy, not a budget, and not anything about intervention. **A real
 intervening agent acts once.** So the coverage cap is a fact about this harness.
 
-**And the cost LEAKS THE ANSWER.** A true part costs 8.63 draws and a confound
-2.91, a ratio of 2.97, which is wider than the refusal rates' 1.73. An arm that
-timed its asks and never read a single refusal would separate the confound
-better than the mechanism this run is about. Nothing here does that, and nothing
-should until the sampler is replaced -- a result obtained that way would be a
-result about rejection sampling wearing the clothes of one about asking.
+**I called that a LEAK and it is not one.** The claim was that an arm timing its
+asks would separate the confound without reading a refusal, on the grounds that
+8.63 against 2.91 is a wider ratio than the refusal rates' 1.73. Checking what
+the cost actually reports:
+
+    candidate       P(present)    1/P   measured cost
+    true partner        0.1223   8.17            8.63
+    shadow              0.3597   2.78            2.91
+    background          1.0000   1.00            1.00
+
+`ask` rejects on `present` and never on `absent` -- the refusal is decided by
+the first qualifying occasion -- so the cost is 1/P(present) and nothing else.
+That is the candidate's MARGINAL, which watching counts for free and which is
+precisely the quantity that cannot separate a confound: it is why watching sits
+at -0.2967. The timing channel is redundant with counting, not ahead of it.
+
+Two ratios over different quantities are not comparable, and comparing them is
+how the wrong claim was reached.
 
     python experiments/g44_01_asking.py --json out/g44-01.json
 """

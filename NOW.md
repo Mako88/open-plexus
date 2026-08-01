@@ -14,8 +14,15 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
 
 ## In flight
 
-- **`fb15k237_walk.py` at 4,000 queries** → `out/fb15k237-walk.txt`. Partial
-  rows so far agree with the smoke run (depth 2 beam 16 mean, −0.0418).
+- **`fb15k237_walk.py` at 4,000 queries was STOPPED before its last two cells**,
+  and the hole is named rather than left to be discovered: `depth 3 beam 64` ran
+  `walk only` (0.0065) and never ran `min` or `mean`. It was stopped because its
+  conclusion was already established — every arm below the floor, and walk-only
+  peaking at beam 16 then declining at 64 and 256 at every depth, which is the
+  interior maximum that rules out the grid being too small — and because those
+  two cells are about fifty minutes of a machine the decisive run needs.
+  `out/fb15k237-walk.txt` has everything up to that point. **If the depth-3
+  beam-64 combined cells ever matter, they have not been run.**
 - **`fb15k237_typed.py` on the FULL test set, with the popularity bands**
   → `out/fb15k237-typed-full.txt`. **Read this first.** An earlier full run was
   stopped and relaunched rather than left to finish: it predated the

@@ -782,7 +782,32 @@ asks before moving on.
          ask-set only samples
     P27  and its demoted scored pairs are >50% confounds, against ask-set's 33%
 
-**P27 is the mechanism and P26 the payoff.** P27 failing means concentration
+### What happened: P27 HELD, P26 REFUTED, and they explain each other
+
+    arm          margin   sd/mean   wins      on target  shadow  true  cands
+    ask-set     +0.0085    0.0025  16/20             12     4.0   8.2     44
+    ask-aimed   +0.0023    0.0018   7/20              1     1.0   0.3      7
+
+**P27 held and then some: 77% of what `ask-aimed` demotes are confounds**,
+against `ask-set`'s 33%. Concentration did not blunt the aim, it SHARPENED it.
+
+**P26 refuted at +0.0023 on 7 wins of 20**, which is not distinguishable from
+nothing. The reason is in the last column: staying on a candidate for `REVISITS`
+asks reaches **7 candidates where `ask-set` reaches 44**, so it lands ONE scored
+pair. Perfect aim at one pair cannot move an average over 36 queries.
+
+**The two findings interfere, and the shape is the product bound again.** P15's
+concentration and the aiming principle both work, and they compete for the same
+budget: asks spent resolving one candidate are asks not spent finding another.
+`aim × coverage` is bounded exactly as `pairs × asks-per-pair` was, and I
+combined two things that each move one factor by taking it out of the other.
+
+**That was registered as the possibility I did not expect**, which is the only
+reason it is a result rather than a surprise. It also says the next combination
+should not be tried blind: any pairing of these arms trades along the same
+bound unless something changes the total.
+
+**P27 was the mechanism and P26 the payoff.** P27 failing means concentration
 does not preserve the aim — that staying on one candidate spends the budget on
 whichever of its partners happen to be real parts. That would be the two
 findings interfering rather than compounding, which is worth knowing and is not
@@ -1092,6 +1117,7 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
     made = 0
     observed = 0
     staying: tuple | None = None
+    aiming: tuple | None = None
 
     while world.drawn < config.occasions:
         spend_on_ask = arm != "watch" and asks > 0 and len(seen) > 4
@@ -1129,6 +1155,42 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
                 shadow_asks += config.is_shadow(candidate)
                 if was + 1 >= REVISITS:
                     staying = None
+            continue
+
+        if arm == "ask-aimed":
+            # BOTH THINGS THAT HELPED, TOGETHER. Nominate by mutual
+            # predictability, which finds confounds; interrogate against the
+            # candidate's OWN partners, which is where a confound's scored
+            # pairs live; and STAY on it, because resolving a 0.16 gap takes
+            # about 48 asks and sampling it settles nothing.
+            if aiming is None:
+                query = rng.choice(seen)
+                partners = index.partners(query)
+                if not partners:
+                    continue
+                chosen = max(partners, key=lambda p: min(
+                    statistic(index, p, query), statistic(index, query, p)))
+                if chosen == query:
+                    continue
+                own = [t for t in index.partners(chosen) if t != chosen]
+                if not own:
+                    continue
+                aiming = (chosen, own[:SET_SIZE], 0)
+            candidate, targets, spent = aiming
+            target = targets[spent % len(targets)]
+            answer = world.ask(present=candidate, absent=target)
+            asks -= 1
+            made += 1
+            if answer.occasion is not None:
+                if learn_from_asks:
+                    index.observe(answer.occasion.surfaces)
+                    seen.extend(answer.occasion.surfaces)
+                shadow_asks += config.is_shadow(candidate)
+                was, refused = refusals.get((candidate, target), (0, 0))
+                refusals[(candidate, target)] = (was + 1,
+                                                 refused + answer.refused)
+            spent += 1
+            aiming = None if spent >= REVISITS else (candidate, targets, spent)
             continue
 
         if arm == "ask-set":
@@ -1384,7 +1446,7 @@ def main() -> int:
     for budget in BUDGETS:
         for arm in ("watch", "ask-random", "ask-targeted", "ask-mutual",
                     "ask-structural", "ask-informed",
-                    "ask-set"):
+                    "ask-set", "ask-aimed"):
             if arm == "watch" and budget != BUDGETS[0]:
                 continue
             got = []

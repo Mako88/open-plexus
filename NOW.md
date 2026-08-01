@@ -23,86 +23,87 @@ John's point, and it stands. **Unfinished:** `flood` has a floor and no beam,
 and EXPANSIONS IS THE WRONG COST COLUMN where nodes expand in parallel — what
 transfers is messages sent and work per node, neither measured.
 
-## g44-01: asking separates a confound watching cannot
+## g44-01: an autonomous arm beats watching, and the reason is measured
 
-**Settled, and paused behind the architecture work.** `learned_threshold`
-demotes only the low group of observed refusal rates, using nothing but rates
-the arm paid for, and at 384 asks per pair reaches **+0.2256** — matching an
-oracle that calls `is_shadow`, against watching's **−0.2967**.
+**`ask-set` beats watching**, paired over 20 seeds: **+0.0085, sd of the mean
+0.0025, winning on 16/20**. The first arm here to do it. Against the oracle's
+swing from −0.2967 to +0.2256 that is **1.6% of what the mechanism can do** — a
+mechanism identified, not a problem solved.
 
-**No arm reaches it, and the constraint is one number: pairs × asks-per-pair.** A
-real part is detachable 62% of the time (0.3837 refused against a shadow's
-0.2222), so the signal is a 0.16 gap needing ~48 asks per pair, and a
-misclassified pair demotes a real part. Policy, budget, noise, sampler pricing,
-metric strictness, coverage and self-poisoning were each measured and each was a
-face of that number.
+**WHY, and it explains six earlier failures at once.** Of the scored pairs each
+arm demotes, how many are confounds:
 
-**P12 refuted at 100%:** with no confound present it demotes all 72 true
-partners. Missing is an absolute anchor the arm can compute — the scale-free
-ratio is useless (0.55 against 0.52).
+    arm          on target   shadow   true
+    ask-mutual          51      0.2   51.0
+    ask-set             12      4.0    8.2
+
+`ask-mutual` demotes real parts and almost nothing else. Its 48% shadow ASK rate
+never becomes a shadow SCORED pair, because it asks a shadow against whichever
+query made it notice the shadow — usually not one of that shadow's own concept's
+surfaces. **It pays for the right suspects and files them under the wrong
+questions**, which is why the arm with the best coverage was the worst arm.
+
+**The principle: ask about a candidate relative to what IT predicts, not
+relative to the query that made you notice it.** Nomination and interrogation
+had been one step in every arm; separating them is what put demotions where they
+help. **Coverage of the METRIC is not coverage of the CONFOUNDS.**
+
+**Two of my explanations died on the way.** "It changed the price of a fact" —
+refuted by `SET_SIZE=1`, which is an ordinary single ask and delivers +0.0075 of
+the +0.0102. And a recorded 53 that had silently drifted to 46 under an earlier
+refactor, caught only because I checked an unrelated claim.
+
+**Not claimed:** the `SET_SIZE=2` peak (+0.0164, 12/12). Best cell of a sweep of
+my own arm's hyperparameter with no matching sweep elsewhere.
 
 ## THE ASKING POLICY BUILDS A GRAPH AND NEVER WALKS IT
 
-**John's catch.** `index.observe` turns every moment into edges, then
-`grep -c "pathways|flood|reach|routed"` in `g44_01_asking.py` returns **0** —
-every use is one direct edge. The policy nominates by direct association, which
-is one-hop; a confound is a TWO-hop fact, two things tied together only through
-a third. So it must TEST candidates structure might have ruled out for free, and
-the product bound assumes exactly that. Reading the neighbourhood's shape would
-break the bound rather than trade along it. Untested.
+**John's catch**, and still true: `grep -c "pathways|flood|reach|routed"` in
+`g44_01_asking.py` returns **0**. Two attempts to use structure were refuted —
+containment and containment with the background discounted — both because a
+shadow's neighbourhood is not distinctive; it meets the background and its
+concept's surfaces exactly as a true partner does. **The asymmetry is
+DIRECTIONAL**, which is why reading `P(query | candidate)` works and measuring
+overlap does not. A directional two-hop measure has not been built.
 
 ## ONE GRAPH: BUILT, AND FOUR CHECKS GUARD IT
 
-`CoOccurrence` is the whole representation, and **no single graph had ever held
-more than one KIND of thing** — images+audio+words in one, intervention moments
-in another, knowledge-graph facts in a third.
+`CoOccurrence` is the whole representation, and no single graph had ever held
+more than one KIND of thing. **The merge landed:** `stream()` was already a
+hand-rolled namespace with the same layout, so `Namespace` gives byte-identical
+node numbers and the whole results table was the regression check. The senses
+now share one declared graph.
 
 **Four checks, each catching what the others cannot, each mutation-caught:**
 `graph=N` (an accumulator split by accident), `holding={...}` (a declared kind
-that never arrived), `disjoint=True` (two kinds sharing node numbers, which
-`holding` is blind to), and `shared.linked(a, b)` (two kinds co-resident but
-disconnected, which all three others pass).
+that never arrived), `disjoint=True` (two kinds sharing node numbers), and
+`shared.linked(a, b)` (co-resident but disconnected — which all three others
+pass). Each of the last three exists because checking showed the previous one
+blind.
 
-**THE MERGE LANDED.** `stream()` was already a hand-rolled namespace with the
-same layout, so `Namespace` gives byte-identical node numbers and the whole
-results table was the regression check — every figure unchanged. The senses now
-share one declared graph.
+**And the declaration caught a bug in `SharedGraph` on its first run:** `holds()`
+read process-global `wiring.kinds()`, so one-graph-per-arm runs reported earlier
+arms' kinds. Every test passed with it — they build one graph per test.
 
-**The declaration caught a bug in `SharedGraph` on its first run:** `holds()`
-read process-global `wiring.kinds()`, so one-graph-per-arm runs had every graph
-reporting earlier arms' kinds. Every test passed with it — the tests build one
-graph per test, exactly the case it did not break. Fixed, regression test added.
+**CROSS-MODAL REACHES AGAIN**, the first measurement on the merged architecture:
+at `--repeats 2` the `alternating` arm reaches **cross 1.0000** where it was
+0.0000. Under-resourced, not regressed. The repeat reuses recordings, so
+`g40-01`'s ~300 per digit is a price in EVIDENCE, not distinct recordings.
 
 **Facts stay a separate island.** DEFAULT APPLIED, John to override: nothing in
-the data bridges a fact to a picture, and inventing that corpus is a bigger
-decision than a default should make.
+the data bridges a fact to a picture.
 
-**CROSS-MODAL REACHES AGAIN**, and it is the first measurement on the merged
-architecture. At `--repeats 2` the `alternating` arm — image and audio sharing
-ZERO occasions, so the only route is through the word — reaches **cross 1.0000,
-crossed 3.0984** where it was 0.0000. Under-resourced, not regressed, now
-measured rather than predicted.
-
-**And the repeat says WHICH price g40-01 measured.** A second pass reuses every
-recording, so audio codes repeat while images do not. The link comes back, so
-the ~300 per digit is about EVIDENCE and not about distinct recordings. The
-8-bit cell stays at 0.0000 — more codes, fewer occasions each — which is
-evidence for the reading `g40-01` itself flagged as unsettled: *the threshold
-may be a statement about occasions per CODE rather than per digit.*
-
-## ONE UNGUARDED RULE, AND ONE THAT WAS ALREADY GUARDED
+## ONE UNGUARDED RULE, AND TWO ALREADY GUARDED
 
 **I committed on a red preflight**, chaining `git commit` off a `grep` of its
-output so `&&` read grep's status. `CLAUDE.md` names this for `tail`; I hit it
-with `grep`. **Nothing stopped it and nothing would have noticed** — I found it
-re-reading my own output. Candidate: a pre-commit hook running preflight, cost
-~70s per commit. John's call, since he bears it.
+output so `&&` read grep's status. Nothing stopped it; I found it re-reading my
+own output. Candidate: a pre-commit hook running preflight, ~70s per commit.
+John's call, since he bears it.
 
-**`tools/mutate.py` was broken mid-edit four times** by patch scripts writing
-before `ast.parse` validated — and that one needs no new check. It fails
-preflight's import step, which caught it 4/4. The guard exists and worked; the
-cost was my time, not a wrong result. I first offered both as candidates, which
-would have added a rule where a mechanism already does the job.
+**Two others need no new check.** A corrupted `mutate.py` fails preflight's
+import step (caught 4/4), and a mutation whose target moves fails `--verify`
+(caught 2/2, both times because `ask` changed shape). The guards exist and work;
+what they cost was my time, not a wrong result.
 
 ## Known debts
 

@@ -100,6 +100,18 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="a-single-shared-node-number-is-tolerated",
+        breaks="the check guarding the merge, at exactly the boundary a real "
+               "mistake lands on. Firing only on wholesale collision passes an "
+               "off-by-one in a namespace offset, which puts one kind's first "
+               "node on another kind's last and adds their counts together "
+               "silently -- every declared kind still arrives, so nothing else "
+               "here notices",
+        path=WIRING,
+        old="            if shared:",
+        new="            if shared and max(shared.values()) > 1:",
+    ),
+    Mutation(
         name="a-kind-that-never-arrived-is-tolerated",
         breaks="the only check that can find this project's actual fault. "
                "Requiring the declared kinds to be a SUBSET of what arrived "

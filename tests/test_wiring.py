@@ -137,5 +137,49 @@ class AGraphHoldsWhatTheRunDeclared(unittest.TestCase):
             wiring.kind("anything-at-all")
 
 
+class KindsMustNotSHARE_NodeNumbers(unittest.TestCase):
+    """The fault the kind check is blind to, and the merge's real risk.
+
+    Every source in this project numbers from zero. Merged naively, image code
+    0 and concept surface 0 and entity 0 are ONE node: every declared kind
+    arrives, `holding` passes, and the counts are silently added together.
+    """
+
+    def setUp(self):
+        wiring.reset()
+
+    def test_a_namespaced_merge_passes(self):
+        with wiring.expect(holding={"image", "fact"}, disjoint=True):
+            wiring.kind("image", range(0, 100))
+            wiring.kind("fact", range(100, 200))
+
+    def test_COLLIDING_IDS_FAIL(self):
+        with self.assertRaises(wiring.WiringError) as caught:
+            with wiring.expect(holding={"image", "fact"}, disjoint=True):
+                wiring.kind("image", range(0, 100))
+                wiring.kind("fact", range(0, 100))
+        self.assertIn("share 100", str(caught.exception))
+
+    def test_ONE_shared_id_is_enough_to_fail(self):
+        """A boundary that only fires on wholesale collision would pass the
+        off-by-one that is the likeliest real mistake."""
+        with self.assertRaises(wiring.WiringError):
+            with wiring.expect(disjoint=True):
+                wiring.kind("image", range(0, 100))
+                wiring.kind("fact", range(99, 200))
+
+    def test_the_kind_check_ALONE_would_pass_a_collision(self):
+        """States the blind spot as a test, so nobody re-derives it. Without
+        `disjoint`, a fully collided merge is declared healthy."""
+        with wiring.expect(holding={"image", "fact"}):
+            wiring.kind("image", range(0, 100))
+            wiring.kind("fact", range(0, 100))
+
+    def test_overlaps_reports_nothing_when_namespaced(self):
+        wiring.kind("image", range(0, 10))
+        wiring.kind("fact", range(10, 20))
+        self.assertEqual(wiring.overlaps(), {})
+
+
 if __name__ == "__main__":
     unittest.main()

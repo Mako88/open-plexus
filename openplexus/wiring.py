@@ -32,6 +32,8 @@ import threading
 
 _lock = threading.Lock()
 _seen: dict[str, int] = {}
+#: kind -> the node numbers it occupies, for the disjointness check.
+_ids: dict[str, set[int]] = {}
 
 
 class WiringError(AssertionError):
@@ -44,7 +46,7 @@ def touch(part: str) -> None:
         _seen[part] = _seen.get(part, 0) + 1
 
 
-def kind(name: str) -> None:
+def kind(name: str, ids=()) -> None:
     """Record that a KIND of thing entered a graph.
 
     **The check that finds the fault counting instances cannot.** One arm
@@ -56,8 +58,18 @@ def kind(name: str) -> None:
     The caller declares the kind because a `CoOccurrence` cannot know one: it
     holds integers, and what those integers MEAN lives with whoever fed them in.
     That is also why this cannot be inferred later from the data.
+
+    Pass `ids` — the node numbers this kind occupies — and `expect(disjoint=
+    True)` will refuse a merge in which two kinds share one. **That check is
+    needed because the kind check cannot see the fault it matters most for.**
+    All three sources here number from zero, so a naive merge puts image code 0,
+    concept surface 0 and entity 0 in ONE row: every declared kind arrives, the
+    declaration passes, and the counts are silently wrong.
     """
     touch(f"kind:{name}")
+    if ids:
+        with _lock:
+            _ids.setdefault(name, set()).update(int(i) for i in ids)
 
 
 def kinds() -> set[str]:
@@ -74,6 +86,19 @@ def trace() -> dict[str, int]:
 def reset() -> None:
     with _lock:
         _seen.clear()
+        _ids.clear()
+
+
+def overlaps() -> dict[tuple[str, str], int]:
+    """Which pairs of kinds share node numbers, and how many.
+
+    Empty is the only healthy answer once more than one kind is in a graph.
+    """
+    with _lock:
+        named = sorted(_ids)
+        return {(a, b): len(_ids[a] & _ids[b])
+                for i, a in enumerate(named) for b in named[i + 1:]
+                if _ids[a] & _ids[b]}
 
 
 class expect:
@@ -87,12 +112,16 @@ class expect:
     rather than having to enumerate everything the process touches.
     """
 
-    def __init__(self, holding: set[str] | None = None, **counts: int) -> None:
+    def __init__(self, holding: set[str] | None = None,
+                 disjoint: bool = False, **counts: int) -> None:
         #: The kinds this run says its graph holds. **Exact, like the counts**:
         #: a run declaring pictures and sounds and getting only pictures has
         #: not half-passed, and one that quietly gains a kind nobody declared
         #: is the merge doing something its author did not describe.
         self.holding = None if holding is None else set(holding)
+        #: Refuse a graph in which two kinds share a node number. Off by
+        #: default so a run that declares nothing is unaffected.
+        self.disjoint = disjoint
         self.counts = counts
 
     def __enter__(self) -> "expect":
@@ -114,6 +143,15 @@ class expect:
                     "this run's graph did not hold what it declared -- "
                     f"never arrived: {missing or 'none'}; "
                     f"undeclared: {extra or 'none'}")
+        if self.disjoint:
+            shared = overlaps()
+            if shared:
+                detail = ", ".join(f"{a} and {b} share {n} node number(s)"
+                                   for (a, b), n in sorted(shared.items()))
+                raise WiringError(
+                    "two kinds are occupying the same nodes, so their counts "
+                    f"are being added together -- {detail}. Every source here "
+                    "numbers from zero; a merge needs a namespace.")
         wrong = {part: (want, got.get(part, 0))
                  for part, want in self.counts.items()
                  if got.get(part, 0) != want}

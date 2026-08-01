@@ -43,12 +43,8 @@ merely failing to help. Reaching +0.19 took 108 × 96 = 10,368 asks against a
 coverage and self-poisoning have each turned out to be a face of that.
 
 **P12 refuted at 100%:** where there is no confound the rule demotes all 72 true
-partners. The two cases differ by the low group's absolute level (0.2105 against
-0.3779); the scale-free ratio is useless (0.55 against 0.52). **Missing: an
-absolute anchor the arm can compute.**
-
-**Scored:** P5, P7, P9, P11, P15, P19 held. P1–P3, P6, P8, P10, P12, P13, P18
-refuted. P14 unmeasurable, P16 withdrawn as an artefact.
+partners. The cases differ by the low group's absolute level (0.2105 against
+0.3779); the scale-free ratio is useless. **Missing: an absolute anchor.**
 
 ## THE ASKING POLICY BUILDS A GRAPH AND NEVER WALKS IT
 
@@ -72,54 +68,40 @@ be tested. **A policy that reads the neighbourhood's shape might not need to
 test most of them** — which would break the bound rather than trade along it.
 Untested, and it is the first idea here that is not another face of that number.
 
-## CROSS-MODAL DOES NOT CURRENTLY REACH, and John remembers it working
+## CROSS-MODAL: UNDER-RESOURCED, NOT REGRESSED
 
-**John's report, 2026-08-01:** before the restructure, audio reached a word with
-no direct connection. The experiment survived — `surfaces_pipeline.py`'s
-`alternating` arm is exactly that test, an image code and an audio code sharing
-ZERO occasions so the only route is through the word. Run today:
+**John reported it working before the restructure and he is right.** `g40-01`
+(readable at `f0a8a72^`) passed gate G7 and priced it: **a cross-modal link
+costs ~300 occasions per digit**, against ~16 within-modal.
 
-    front     arm          link_img  link_aud   cross  crossed
-    kmeans    together       0.0000    0.0000  0.7339   1.7563
-    kmeans    alternating    0.9000    0.0000  0.0000   0.0000
+`surfaces_pipeline.py` runs 3,000 occasions over ten digits — exactly 300 each —
+but `alternating` puts sound on odd occasions and pictures on even ones, so
+**audio gets 150 per digit.** The arm that tests the claim is the one arm that
+cannot afford it, and its `crossed` 0.0000 looks exactly like a broken mechanism.
+The run now prints which arms can afford their own test.
 
-**`crossed` is 0.0000: no image code reaches any audio code at all**, and that
-column exists precisely so a collapse and an empty reach are not read alike. In
-that arm `link_aud` is also 0.0000 — the audio codes do not link to their own
-word, so there is nothing for a route to pass through. `together` works, but
-that is the arm where both senses share a moment, which is not the claim.
-
-**Established from the pre-restructure record, and it is NOT a regression.**
-`g40-01`'s sweep (readable at `f0a8a72^`) passed gate G7 and recorded the price:
-**a cross-modal link costs about 300 occasions per digit, an order of magnitude
-dearer than a within-modal one at ~16.**
-
-The pipeline runs 3,000 occasions over ten digits — exactly 300 each — but the
-`alternating` arm puts sound on odd occasions and pictures on even ones, so
-**audio gets 150 per digit, half of what the link is known to need.** The arm
-that tests the claim is the one arm that cannot afford it, by construction.
-
-**The test:** reuse recordings so alternating carries 6,000 occasions and audio
-reaches 300 per digit. There is no `--occasions` flag and the audio set caps at
-3,000 recordings, so this needs the occasion builder to repeat them. Predicted
-to make `crossed` non-zero; unrun.
+**Unrun:** reuse recordings so `alternating` carries 6,000 occasions. No
+`--occasions` flag and the audio set caps at 3,000, so the occasion builder must
+repeat them. Predicted to make `crossed` non-zero.
 
 ## Known debts
 
-- **THE DISTRIBUTED TESTBED DOES NOT RUN.** `testbed/driver.py` imports
-  `openplexus.distributed` and `openplexus.models.local_memory`, both deleted in
-  the restructure, so it parses and cannot load. `run.py` also documents a
-  `--mode bucket` the driver has no code for. Its docstring says the container
-  runs were verified on Docker Desktop and on CI, and two workflows exist, so
-  those runs did happen — **against code that is gone.**
+- **THE DISTRIBUTED HALF IS ONE MISSING ENTRY POINT, not a hole.** The
+  inventory says it precisely: `bucket_peer` (answers reads over a socket),
+  `federated` (the count graph split across owners, remote reads counted) and
+  `deployment` (how many slices a machine holds) all exist and are tested, and
+  **all three have no caller because `node_main.py` was deliberately not carried
+  over in the restructure.** `testbed/driver.py` then imports two modules the
+  restructure deleted, so it cannot load; its docstring's container runs did
+  happen, against code that is gone.
 
-  Nothing caught it: `check_imports` skips `testbed/` because it "expects a
-  container runtime", and `check_orphans` counts `testbed/` as a CALLER, so
-  `bucket_peer` and `federated` look wired by a thing that cannot start. That is
-  the `experiments/` hole one directory over, and the same fix applies.
+  Nothing caught it: `check_imports` skips `testbed/`, and `check_orphans`
+  counts it as a CALLER, so the modules looked wired by a thing that cannot run.
 
-  **This is the project's actual claim and it is unrunnable**, which is worse
-  than the "untested" this file said before.
+  **This is C1 and John asked about it directly, 2026-08-01.** The discrete
+  units exist; nothing launches one. The job is an entry point plus rewriting
+  the driver against `bucket_peer`, and it is bounded.
+
 - **`tasks/xsl.py` has no caller.** Use it or drop it.
 - **The link columns in `surfaces_pipeline.py` step in tenths** — shares over ten
   words, so nothing smaller than 0.1 can be read.

@@ -99,6 +99,17 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="the-per-query-cut-reads-every-query",
+        breaks="the whole point of fitting a cut where it is applied. The arm's "
+               "global cut is 0.6278 against an oracle boundary of 0.2870, "
+               "because pairs the metric never scores refuse at a median 0.6667 "
+               "and set the boundary above everything it does score. This "
+               "restores that, and improved every cell when it was removed",
+        path=G44_ASKING,
+        old="        local = {k: v for k, v in refusals.items() if k[1] == query}",
+        new="        local = dict(refusals)",
+    ),
+    Mutation(
         name="an-unasked-pair-votes-on-the-boundary",
         breaks="the learned threshold, in exactly the way the arm's own does. A "
                "pair nobody asked about has no rate; counting it as 0.0 drags "

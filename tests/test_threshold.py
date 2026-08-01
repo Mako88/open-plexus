@@ -26,7 +26,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from experiments.g44_01_asking import learned_threshold  # noqa: E402
+from experiments.g44_01_asking import (adjusted,  # noqa: E402
+                                       learned_threshold)
+from openplexus.grounding import STATISTICS, CoOccurrence  # noqa: E402
 
 
 def rates(*groups) -> dict:
@@ -86,6 +88,54 @@ class ItRefusesToInventABoundary(unittest.TestCase):
                                learned_threshold(with_empties), places=9)
         self.assertGreater(learned_threshold(asked), 0.0)
 
+
+
+class TheCutIsFittedWhereItIsApplied(unittest.TestCase):
+    """`per-query` filters to one query's own candidates before splitting.
+
+    The global rule learns from pairs the demotion never touches: the arm's cut
+    came out at 0.6278 against an oracle boundary of 0.2870, because unscored
+    pairs refuse at a median 0.6667. These fix that the filter is the mechanism
+    and not decoration.
+    """
+
+    def setUp(self):
+        self.index = CoOccurrence()
+        for _ in range(40):
+            self.index.observe([0, 1, 2])
+        self.statistic = STATISTICS["conditional"]
+        #: Two candidates for query 0, CLOSE together: locally they split, and
+        #: 2 is the one that detaches more easily. **The values matter**: far
+        #: apart, a global cut lands between them too and the filter would be
+        #: undetectable -- which is how the first version of this passed while
+        #: its mutation survived.
+        self.here = {(1, 0): (100, 90), (2, 0): (100, 80)}
+
+    def score(self, candidate, refusals):
+        return adjusted(self.index, self.statistic, candidate, 0, refusals,
+                        "per-query")
+
+    def test_the_easily_detached_candidate_is_demoted(self):
+        plain = self.statistic(self.index, 2, 0)
+        self.assertLess(self.score(2, self.here), plain)
+
+    def test_and_the_one_that_holds_is_NOT(self):
+        """The companion. A rule that demoted both would pass the test above."""
+        plain = self.statistic(self.index, 1, 0)
+        self.assertAlmostEqual(self.score(1, self.here), plain, places=9)
+
+    def test_another_query_cannot_move_this_one(self):
+        """The mechanism itself. Pairs belonging to query 9 are pairs this
+        demotion is never applied to, and under the global rule they set the
+        boundary anyway."""
+        # Query 9's candidates detach far more easily than either of query 0's.
+        # Split globally they form the low group on their own, pulling the
+        # boundary BELOW both of query 0's and demoting neither.
+        elsewhere = {**self.here, (5, 9): (100, 10), (6, 9): (100, 12),
+                     (7, 9): (100, 8)}
+        for candidate in (1, 2):
+            self.assertAlmostEqual(self.score(candidate, self.here),
+                                   self.score(candidate, elsewhere), places=9)
 
 if __name__ == "__main__":
     unittest.main()

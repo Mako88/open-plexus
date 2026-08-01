@@ -28,37 +28,38 @@ expands its own edges in parallel, wall clock is the longest path, not the sum
 of all work. The costs that transfer are MESSAGES SENT and WORK PER NODE and
 neither is measured.
 
-## g44-01: intervention works, and no legitimate rule reaches it yet
+## g44-01 is answered: asking separates a confound watching cannot
 
-**Asking retrieves the information watching cannot.** Allowed to demote only the
-confound, separation reaches **+0.2042** against watching's **−0.2967** — it
-crosses zero and beats it outright. The control holds: at `shadow_alone` 0.0,
-where the shadow genuinely is a part, the same demotion gives −0.0135.
+**A legitimate rule matches the oracle exactly.** `learned_threshold` splits the
+observed refusal rates by two means and demotes only the low group, reading
+nothing but rates the arm paid for. At 384 asks per pair it reaches **+0.2256**
+where an oracle calling `is_shadow` reaches **+0.2256**, against watching's
+**−0.2967**. Tested, and its mutation is caught.
 
-**P1–P3 refuted on coverage, P5 and P7 held, P6 and P8 refuted.** `ask-targeted`
-lands 1 of the 108 scored pairs at every budget, because the background surfaces
-are in every occasion so `conditional(background | anything)` is 1.0 and argmax
-goes there — the confound failure happening to the confound detector.
-`ask-mutual` nominates by `min(P(c|q), P(q|c))`, which the background cannot
-fake, and lands 53. Separation then falls to −0.5130.
+**Why a threshold and not a gradient.** Per-pair rates at 192 asks: true
+partners 0.292–0.474, shadows 0.135–0.292, and zero of 216 true partners below
+the highest shadow. Every earlier rule multiplied a score by a rate, which is
+the wrong shape for a clean split.
 
-**`adjusted` is the bug.** It reads a refusal rate as an absolute, but a true
-surface at `presence` 0.7 is genuinely detachable — refused 0.3837 against a
-shadow's 0.2222. Being detachable is not being no part of it.
+**Scored:** P5, P7, P9, P11 held. P1–P3, P6, P8, P10, P12 refuted. P10 failed on
+**allocation** — at budget 0.10 the arm spends ~400 asks over 53 pairs, about 7
+each, and the rule needs 48 before it beats doing nothing.
 
-**The comparative demotion was tried and is not the fix.** P8 refuted at
-−0.1264, P9 held. Comparing against the other candidates for the same query
-helps where the arm is starved (−0.5130 → −0.4231) and *hurts* at full coverage
-(−0.1425 against raw's −0.0500). Estimation noise was the natural suspect and
-is refuted too: 12 → 192 asks per pair moves nothing across zero.
+**Next here, and it is scheduling rather than mechanism:** every arm nominates a
+fresh pair each draw, which is the worst spend for a rule needing a resolved
+rate per pair. An arm that revisits fewer pairs is the change.
 
-**What is left is exact, and it is not budget, policy or noise — all three are
-now measured and none is the constraint.** `shadows only` is an ORACLE; it calls
-`is_shadow`, which no arm may do, and it sits near +0.22 while watching sits at
-−0.2967. The information is there and asking retrieves it. Every legitimate rule
-tried demotes true partners often enough to pay back the whole win, and
-`separation` takes a MIN over them, so one wrongly demoted part costs the query.
-**The missing piece is a legitimate rule that approximates the oracle.**
+**P12 stands refuted at 100%, and it is a real defect.** Two means always return
+two groups, so where the shadow genuinely is a part the rule demotes true
+partners on every query. It has no way to report *nothing here*. P11 held, so it
+does not manufacture an advantage — but a confound detector that cannot find
+nothing is half a detector.
+
+**One correction on the record.** "The shortfall is structural and not sampling"
+was concluded from sweeping the raw and comparative rules. It does not
+generalise: a multiplier takes a noisy rate as an unbiased factor, a classifier
+asks which side of a boundary a value is on and noise flips it. The sweep has to
+be re-run per rule.
 
 ## Next, in the order I would take them
 

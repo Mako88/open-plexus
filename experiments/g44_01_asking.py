@@ -538,6 +538,29 @@ targets no better or worse than mutual predictability and the bound is
 untouched. If both hold, the bound was an artefact of asking about the wrong
 things.
 
+## P22: THE SAME TWO-HOP IDEA, WITH THE BACKGROUND DISCOUNTED
+
+Containment failed because a surface in every occasion is inside everyone's
+neighbourhood, so the argmax went to whatever had the fewest partners. **That is
+the third policy here defeated by the ever-present background** -- `conditional`
+scores it 1.0, containment counts it as shared, and only `ask-mutual` survived
+it, by reading the direction the background cannot fake.
+
+So weight each shared partner by how much its presence says. A surface present
+in every occasion has `P = 1` and contributes NOTHING; a rare one contributes
+most. `informative` overlap is containment with that weighting:
+
+    weight(partner) = 1 - seen(partner) / occasions
+
+    P22  ask-informed lands >30 of the 108 scored pairs on target at budget
+         0.10, which containment managed 9 of
+    P23  and nominates a shadow on >20% of its asks, against containment's 0.5%
+
+**P23 is the diagnostic and P22 the claim.** P23 failing means the weighting did
+not change WHO gets asked about, and the two-hop direction is then out of ideas
+in this world rather than merely unimplemented. Neither says anything yet about
+beating watching -- the product bound is untouched by which pairs are chosen.
+
 ## WHAT AN ASK COSTS, and a leak that has to be closed before it is used
 
 The arms are coverage-limited and the reason is priced, not chosen:

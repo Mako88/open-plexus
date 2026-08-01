@@ -52,6 +52,33 @@ test, and no arm gets credit for a question it did not ask.
 Every arm spends the same number of occasions, watched or asked, so **no arm
 sees more of the world than another** -- otherwise this measures sample size.
 
+## A fourth arm, and its predictions are registered here BEFORE it is written
+
+`ask-targeted` failed for a reason worth building on: the background surfaces are
+present in EVERY occasion, so `conditional(background | anything)` is 1.0, the
+largest the statistic can take, and asking about the best-scoring partner asks
+about the background on every draw. It lands 1 of the 108 pairs the metric
+reads. That is argmax-on-association finding the most ubiquitous thing -- the
+confound failure, happening to the confound detector.
+
+The asymmetry it missed: the background predicts nothing in REVERSE. It is
+present whenever the concept is AND whenever it is not, so `P(query|background)`
+is small, while a shadow appears with its own concept and rarely otherwise, so it
+predicts that concept well. **Mutual predictability separates them, and it uses
+nothing the arm is not allowed to know** -- no arm may be told which surfaces are
+concepts.
+
+    ask-mutual    asks about the partner maximising min(P(c|q), P(q|c))
+
+    P5  it lands >30 of the 108 scored pairs on target at budget 0.10,
+        against ask-targeted's 1
+    P6  and beats watching by >0.05, which no arm has done
+    P7  and >40% of its asks are shadow pairs, which is the reason if it works
+
+P5 is the one that matters. P6 without P5 would mean it helped for a reason this
+explanation does not name, and P5 without P6 kills the direction properly: the
+right questions asked, and the confound still ahead.
+
     python experiments/g44_01_asking.py --json out/g44-01.json
 """
 

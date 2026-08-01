@@ -294,42 +294,61 @@ def generate(config: OccasionConfig, count: int | None = None) -> list[Occasion]
     subjects = range(config.concepts)
     always = tuple(range(config.concept_surfaces, config.vocabulary))
 
-    stream: list[Occasion] = []
-    for when in range(total):
-        subject = rng.choices(subjects, weights=weights, k=1)[0]
-        own = [subject * config.surfaces + m for m in range(config.surfaces)]
+    return [draw_occasion(config, rng, when, weights, subjects, always)
+            for when in range(total)]
 
-        # REJECTION, NOT A FORCED MEMBER.
-        #
-        # An occasion showing none of its subject's surfaces carries no signal
-        # about that subject and would silently dilute every count. The obvious
-        # fix -- pick one surface as mandatory, then draw the rest -- changes the
-        # marginal presence rate of whichever surface was forced, so `presence`
-        # would stop describing the stream it names. Redrawing keeps the
-        # marginals exactly `presence` conditioned on non-empty, which is a
-        # statement `test_occasions.py` checks rather than this comment asserting.
-        groups = config.groups()
-        while True:
-            if len(groups) == 1:
-                present = [s for s in own if rng.random() < config.presence]
-            else:
-                chosen = groups[rng.randrange(len(groups))]
-                present = [own[m] for m in chosen
-                           if rng.random() < config.presence]
-            if present:
-                break
 
-        if config.noise:
-            elsewhere = [
-                s for s in range(config.concept_surfaces)
-                if s // config.surfaces != subject]
-            present.extend(rng.sample(elsewhere, config.noise))
+def draw_occasion(config: OccasionConfig, rng: random.Random, when: int,
+                  weights=None, subjects=None, always=None) -> Occasion:
+    """ONE occasion, drawn exactly as `generate` draws each of its own.
 
-        present.extend(always)
-        stream.append(Occasion(when=when,
-                               surfaces=tuple(sorted(present)),
-                               subject=subject))
-    return stream
+    Split out so a world that can be ASKED (`openplexus/tasks/asking.py`) draws
+    from the identical distribution rather than from a second implementation that
+    agrees today. **Every earlier result is a stream of these**, so the two paths
+    have to be the same code and not merely the same intention — `CLAUDE.md`
+    rule 9: a duplicated path is a fix that did not land, wearing the appearance
+    of one that did.
+
+    The three derived arguments are optional and recomputed when absent, so a
+    single-occasion caller needs only the config; `generate` passes them once
+    rather than per occasion.
+    """
+    weights = config.weights() if weights is None else weights
+    subjects = range(config.concepts) if subjects is None else subjects
+    if always is None:
+        always = tuple(range(config.concept_surfaces, config.vocabulary))
+
+    subject = rng.choices(subjects, weights=weights, k=1)[0]
+    own = [subject * config.surfaces + m for m in range(config.surfaces)]
+
+    # REJECTION, NOT A FORCED MEMBER.
+    #
+    # An occasion showing none of its subject's surfaces carries no signal
+    # about that subject and would silently dilute every count. The obvious
+    # fix -- pick one surface as mandatory, then draw the rest -- changes the
+    # marginal presence rate of whichever surface was forced, so `presence`
+    # would stop describing the stream it names. Redrawing keeps the
+    # marginals exactly `presence` conditioned on non-empty, which is a
+    # statement `test_occasions.py` checks rather than this comment asserting.
+    groups = config.groups()
+    while True:
+        if len(groups) == 1:
+            present = [s for s in own if rng.random() < config.presence]
+        else:
+            chosen = groups[rng.randrange(len(groups))]
+            present = [own[m] for m in chosen
+                       if rng.random() < config.presence]
+        if present:
+            break
+
+    if config.noise:
+        elsewhere = [
+            s for s in range(config.concept_surfaces)
+            if s // config.surfaces != subject]
+        present.extend(rng.sample(elsewhere, config.noise))
+
+    present.extend(always)
+    return Occasion(when=when, surfaces=tuple(sorted(present)), subject=subject)
 
 
 def shuffled(stream: list[Occasion], seed: int = 0) -> list[Occasion]:

@@ -52,6 +52,7 @@ ROOT = Path(__file__).resolve().parent.parent
 #: means -- commit `3634a23` shipped a live mutation because nothing ran it.
 STEPS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("source is not mid-mutation", ("tools/mutate.py", "--verify")),
+    ("every module imports", ("tools/check_imports.py",)),
     ("the test suite", ("-m", "unittest", "discover", "-s", "tests",
                         "-t", ".", "-q")),
     ("workflow flags match the scripts", ("tools/check_workflows.py",)),

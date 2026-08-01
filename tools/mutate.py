@@ -2378,8 +2378,11 @@ MUTATIONS = [
                "every arm's result follows from arithmetic. The run would still "
                "produce a scorecard, and it would be measuring construction",
         path=OCCASIONS,
-        old="                present = [s for s in own if rng.random() < config.presence]",
-        new="                present = list(own)",
+        # RE-POINTED with `noise-can-be-drawn-from-the-subject-itself`, same
+        # cause: `draw_occasion` was extracted from `generate`, so the body
+        # lost one level of indentation. Nothing else changed.
+        old="            present = [s for s in own if rng.random() < config.presence]",
+        new="            present = list(own)",
     ),
     Mutation(
         name="the-images-drift-out-of-step-with-their-labels",
@@ -2428,8 +2431,13 @@ MUTATIONS = [
                "stream and every recovery score is inflated by an amount nobody "
                "controls",
         path=OCCASIONS,
-        old="                if s // config.surfaces != subject]",
-        new="                if True]",
+        # RE-POINTED when `draw_occasion` was extracted from `generate` so an
+        # askable world could draw from the identical distribution. The body
+        # moved out of a `for` loop into a module-level function, so it lost one
+        # level of indentation and nothing else. `--verify` caught it, which is
+        # the whole reason that check runs first.
+        old="            if s // config.surfaces != subject]",
+        new="            if True]",
     ),
     Mutation(
         name="a-link-does-not-have-to-be-returned",

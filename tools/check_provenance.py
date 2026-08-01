@@ -216,6 +216,17 @@ def missing_scripts(entry: str) -> list[str]:
     A `script` field is what makes an entry re-runnable, so a path that has been renamed
     turns the field into decoration. Only tokens that LOOK like repo paths are checked --
     the field also carries arguments, and `--seeds 0 1 2` is not a file.
+
+    **A path under a fetched dataset directory is EXEMPT, and that is not a loophole.**
+    `data/*/` is gitignored on purpose -- `tools/fetch_*.py` pins each URL, size and
+    sha256 rather than carrying the bytes forever -- so `data/fb15k237/train.txt` exists
+    on a machine that has fetched it and nowhere else. Resolving it made this check
+    **pass locally and fail in CI**, which `tests/test_check_provenance.py` already names
+    as the worst direction for a check to be wrong in, about a different bug in this same
+    function. It cost a red run on 2026-07-31.
+
+    Naming the real data file is CORRECT documentation of what was run, so the fix is to
+    stop checking a path that cannot be checked rather than to make records vaguer.
     """
     line = re.search(r"^\s+script\s+(.+)$", entry, re.MULTILINE)
     if not line:
@@ -223,6 +234,8 @@ def missing_scripts(entry: str) -> list[str]:
     gone = []
     for token in re.split(r"[\s,;]+", line.group(1)):
         bare = token.strip("`'\"()[],.")
+        if bare.startswith("data/") and bare.count("/") > 1:
+            continue
         if "/" in bare and re.search(r"\.(py|txt|md|yml|json)$", bare):
             if not (ROOT / bare).exists():
                 gone.append(bare)

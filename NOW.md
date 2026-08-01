@@ -41,12 +41,22 @@ loses the majority by a little, at every sample size from 120 to 40,932, so that
 is a property of it rather than noise. Most of the 0.2470 is the marginal; the
 structure contributes the 0.0136.
 
-**Not yet reproduced.** A second seed is running (`out/fb15k237-typed-seed1.txt`),
-**against the script as it stood at `b9679f0`**, before the per-query arm was
-added — which is the right version to reproduce a result committed there, and the
-global blend's arithmetic is untouched by that addition. Its fixed-combiner arms
-are already coming back identical to seed 0 (0.1944, 0.1278), confirming the seed
-reaches only the validation subsample that picks alpha.
+**Reproduced on seed 1, and the reproduction is narrower than the word usually
+means.** Every figure came back bit-identical: alpha 0.01, 0.2470 against 0.2334,
++0.0136 +/- 0.0005, 7,375 better and 11,302 worse.
+
+Identical rather than merely close, because **the test measurement is
+deterministic given alpha** — the whole test set is scored, the fan-out cap takes
+a fixed prefix, and nothing samples. The only thing a seed can move is which
+10,233 of 17,535 validation triples choose alpha, and both halves chose 0.01. So
+what is established is that **the alpha choice is stable to resampling the
+validation set**, and that is all a seed can establish here.
+
+**The uncertainty that remains is therefore not seed variance.** It is the
++/-0.0005 paired error, and the systematic choices: the fan-out cap of 200, the
+two-step limit, `conditional` as the statistic, and the linear form of the blend
+itself. Those are swept or named, none is reproduced by running the same thing
+twice, and a second seed was never going to touch them.
 The only seed-dependent step is which 10,233 validation triples choose the blend
 weight — the test set is scored whole and the fan-out cap is deterministic — and
 the alpha curve is broad enough that the choice should barely matter (0.01 gives

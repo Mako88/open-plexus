@@ -285,6 +285,14 @@ def main() -> int:
         """
         totals = {alpha: [] for alpha in ALPHAS}
         totals.update({("per query", alpha): [] for alpha in ALPHAS})
+        #: Per scored query: did ANY path reach the true answer? This splits the
+        #: losses into two different failures. Where the answer was never
+        #: reached the structure can only push other candidates above it, so the
+        #: blend is pure harm and no weighting can rescue it -- a convex blend
+        #: and an additive bonus rank identically, so "do not penalise what was
+        #: not reached" is not available as a repair. Where it WAS reached and
+        #: still lost, the ranking is wrong and that is a different problem.
+        totals["reached"] = []
         for head, relation, tail in triples:
             asked = relation_at[relation]
             for direction in ("tail", "head"):
@@ -293,6 +301,8 @@ def main() -> int:
                 structure, concentration = structure_vector(given, asked,
                                                             accumulate)
                 other = floor_of.vector(relation, direction)
+                totals["reached"].append(
+                    bool(structure[ranker.at[answer]] > 0.0))
                 for alpha in ALPHAS:
                     for weight, key in ((alpha, alpha),
                                         (alpha * concentration,
@@ -322,8 +332,10 @@ def main() -> int:
           f"{len(held)} validation triples, read on test.")
     for accumulate in ACCUMULATORS:
         valid_ranks = sweep(held, accumulate)
+        reached = valid_ranks.pop("reached")
         on_valid = {a: metrics(r)["mrr"] for a, r in valid_ranks.items()}
         test_ranks = sweep(queries, accumulate)
+        reached = test_ranks.pop("reached")
         on_test = {a: metrics(r)["mrr"] for a, r in test_ranks.items()}
         # THE TWO WEIGHTINGS ARE CHOSEN SEPARATELY on validation and reported
         # side by side. Sharing one alpha would compare them at a setting picked
@@ -352,6 +364,22 @@ def main() -> int:
             print(f"       PAIRED on the same queries: {gain:+.4f} +/- "
                   f"{error:.4f} (one standard error), {better} better and "
                   f"{worse} worse")
+            # SPLIT BY WHETHER ANY PATH REACHED THE TRUE ANSWER. Two different
+            # failures hide inside one loss count.
+            for label, want in (("answer reached", True),
+                                ("never reached", False)):
+                at = [i for i, got in enumerate(reached) if got is want]
+                if not at:
+                    continue
+                blended = metrics([test_ranks[chosen][i] for i in at])
+                base = metrics([test_ranks[0.0][i] for i in at])
+                rows.append({"arm": "reached", "weighting": label,
+                             "accumulate": accumulate, "n": len(at),
+                             "floor": base["mrr"], "blend": blended["mrr"],
+                             "margin": blended["mrr"] - base["mrr"]})
+                print(f"         {label:<15} n={len(at):>6}  floor "
+                      f"{base['mrr']:.4f}  blend {blended['mrr']:.4f}  margin "
+                      f"{blended['mrr'] - base['mrr']:+.4f}")
         print("       test by alpha, global:    "
               + "  ".join(f"{a}:{on_test[a]:.4f}" for a in ALPHAS))
         print("       test by alpha, per query: "

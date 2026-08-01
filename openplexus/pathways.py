@@ -82,10 +82,23 @@ class PathTypes:
         self.kinds = kinds
         self.spans = spans
         self.counts = Composition(kinds, right=kinds, target=spans)
+        #: `best` memoised per pair, and it is the difference between a walk
+        #: that runs and one that does not. It scans every span, so it is
+        #: `spans` weight lookups per call -- 237 on FB15k-237 -- and a flood
+        #: gated by MEANING has to call it at every expansion, where a flood
+        #: gated by degree calls it never. A first attempt did not return in
+        #: twenty-five minutes on one cell.
+        #:
+        #: Cleared by `observe`, because a cached answer from before a count
+        #: arrived is a stale answer, and a table that is still being built
+        #: would otherwise freeze at whatever it knew first.
+        self._best: dict[tuple[int, int], tuple[int, float]] = {}
 
     def observe(self, first: int, second: int, spanned: int) -> None:
         """One route: `first` then `second` got where `spanned` gets directly."""
         self.counts.observe(first, second, spanned)
+        if self._best:
+            self._best.clear()
 
     def weight(self, first: int, second: int, asked: int,
                statistic: Statistic) -> float:
@@ -142,11 +155,15 @@ class PathTypes:
         Returns `(-1, 0.0)` when the pair means nothing. A caller must stop
         there rather than carry a kind it invented.
         """
+        held = self._best.get((first, second))
+        if held is not None:
+            return held
         found = (-1, 0.0)
         for span in range(self.spans):
             score = self.weight(first, second, span, statistic)
             if score > found[1]:
                 found = (span, score)
+        self._best[(first, second)] = found
         return found
 
 

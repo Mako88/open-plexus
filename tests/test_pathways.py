@@ -267,5 +267,36 @@ class ConcentrationIsAConfidence(unittest.TestCase):
         self.assertEqual(concentration({1: 0.0}), 0.0)
 
 
+class TheCacheMustNotOutLiveWhatItSummarised(unittest.TestCase):
+    """`best` scans every span, so a meaning-gated flood cannot afford it live.
+
+    Caching it is what makes that walk run at all — a first attempt did not
+    return in twenty-five minutes on one cell. But a cached answer from before a
+    count arrived is a stale answer, and a table still being built would freeze
+    at whatever it knew first.
+    """
+
+    def test_a_later_count_changes_what_a_pair_amounts_to(self):
+        types = PathTypes(kinds=4, spans=4)
+        for _ in range(5):
+            types.observe(0, 1, 2)
+        self.assertEqual(types.best(0, 1, CONDITIONAL)[0], 2)
+        # Now teach it that the pair means 3 far more often.
+        for _ in range(50):
+            types.observe(0, 1, 3)
+        self.assertEqual(types.best(0, 1, CONDITIONAL)[0], 3)
+
+    def test_the_cached_answer_is_the_computed_one(self):
+        types = PathTypes(kinds=4, spans=4)
+        for _ in range(5):
+            types.observe(0, 1, 2)
+            types.observe(0, 3, 1)
+        first = types.best(0, 1, CONDITIONAL)
+        again = types.best(0, 1, CONDITIONAL)
+        self.assertEqual(first, again)
+        # And a different pair is not served the first one's answer.
+        self.assertNotEqual(types.best(0, 3, CONDITIONAL)[0], first[0])
+
+
 if __name__ == "__main__":
     unittest.main()

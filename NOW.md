@@ -13,15 +13,26 @@ Delete a line when it is done. Nothing may cite this file.
 
 ---
 
-## The flood, and why its numbers are now suspect
+## The flood: numbers void, and it cannot simply be re-pointed
 
 Measured: meaning-gating beats strength-gating about two to one, and `flood`
-does NOT beat flat enumeration (+0.0081 against +0.0136). **But it was tested on
+does NOT beat flat enumeration (+0.0081 against +0.0136). **But it ran on
 published knowledge-graph triples, not on anything this system observed**, so it
-says nothing about traversing the graph the architecture is meant to build.
-John's point, and it stands. **Unfinished:** `flood` has a floor and no beam,
-and EXPANSIONS IS THE WRONG COST COLUMN where nodes expand in parallel — what
-transfers is messages sent and work per node, neither measured.
+says nothing about traversing the graph the architecture builds — John's point,
+and it stands.
+
+**It cannot simply be re-run there, which I proposed before checking.** `flood`
+takes `types: PathTypes` — route KINDS built for FB15k's typed relations — and
+the senses graph has untyped co-occurrence edges. A design question, not a
+re-run.
+
+**And the merged graph IS walked**, by `equivalence_classes` at
+`surfaces_pipeline.py:182`: the cross-modal `cross 1.0000` is already a walk on
+a graph this system built. I said it had never been walked; wrong.
+
+**Unfinished:** `flood` has a floor and no beam, and EXPANSIONS IS THE WRONG
+COST COLUMN where nodes expand in parallel — what transfers is messages sent and
+work per node, neither measured.
 
 ## g44-01: CLOSED. An arm beats watching, and the bound survived everything
 
@@ -57,40 +68,36 @@ written: "it changes the price of a fact" (refuted by `SET_SIZE=1`), a recorded
 
 ## THE ASKING POLICY BUILDS A GRAPH AND NEVER WALKS IT
 
-**John's catch**, and still true: `grep -c "pathways|flood|reach|routed"` in
-`g44_01_asking.py` returns **0**. Two attempts to use structure were refuted —
-containment and containment with the background discounted — both because a
-shadow's neighbourhood is not distinctive; it meets the background and its
-concept's surfaces exactly as a true partner does. **The asymmetry is
-DIRECTIONAL**, which is why reading `P(query | candidate)` works and measuring
-overlap does not. A directional two-hop measure has not been built.
+**John's catch**, still true: `grep -c "pathways|flood|reach|routed"` in
+`g44_01_asking.py` returns **0**. Two structural attempts refuted — containment,
+and containment with the background discounted — both because a shadow's
+neighbourhood is not distinctive: it meets the background and its concept's
+surfaces exactly as a true partner does. **The asymmetry is DIRECTIONAL**, which
+is why reading `P(query | candidate)` works and overlap does not. A directional
+two-hop measure is unbuilt.
 
 ## ONE GRAPH: BUILT, AND FOUR CHECKS GUARD IT
 
-`CoOccurrence` is the whole representation, and no single graph had ever held
+`CoOccurrence` is the whole representation and no single graph had ever held
 more than one KIND of thing. **The merge landed:** `stream()` was already a
 hand-rolled namespace with the same layout, so `Namespace` gives byte-identical
-node numbers and the whole results table was the regression check. The senses
-now share one declared graph.
+node numbers and the results table was the regression check.
 
 **Four checks, each catching what the others cannot, each mutation-caught:**
-`graph=N` (an accumulator split by accident), `holding={...}` (a declared kind
-that never arrived), `disjoint=True` (two kinds sharing node numbers), and
-`shared.linked(a, b)` (co-resident but disconnected — which all three others
-pass). Each of the last three exists because checking showed the previous one
-blind.
+`graph=N`, `holding={...}`, `disjoint=True`, and `shared.linked(a, b)` —
+co-resident but disconnected, which all three others pass. Each of the last
+three exists because checking showed the previous one blind.
 
-**And the declaration caught a bug in `SharedGraph` on its first run:** `holds()`
-read process-global `wiring.kinds()`, so one-graph-per-arm runs reported earlier
-arms' kinds. Every test passed with it — they build one graph per test.
+**The declaration caught a bug in `SharedGraph` on its first run:** `holds()`
+read process-global state, so one-graph-per-arm runs reported earlier arms'
+kinds. Every test passed with it — they build one graph per test.
 
 **CROSS-MODAL REACHES AGAIN**, the first measurement on the merged architecture:
-at `--repeats 2` the `alternating` arm reaches **cross 1.0000** where it was
-0.0000. Under-resourced, not regressed. The repeat reuses recordings, so
-`g40-01`'s ~300 per digit is a price in EVIDENCE, not distinct recordings.
+at `--repeats 2` the `alternating` arm — senses sharing ZERO occasions — reaches
+**cross 1.0000** where it was 0.0000. Under-resourced, not regressed. The repeat
+reuses recordings, so `g40-01`'s ~300 per digit is a price in EVIDENCE.
 
-**Facts stay a separate island.** DEFAULT APPLIED, John to override: nothing in
-the data bridges a fact to a picture.
+**Facts stay a separate island.** DEFAULT APPLIED, John to override.
 
 ## ONE UNGUARDED RULE, AND TWO ALREADY GUARDED
 
@@ -106,26 +113,17 @@ what they cost was my time, not a wrong result.
 
 ## Known debts
 
-- **THE DISTRIBUTED HALF: entry point DONE, driver still dead.**
-  `node_main.py` is built and smoke-tested — a separate process on TCP,
-  answering a real socket request and refusing an unknown message. C1's discrete
-  unit runs again.
+- **DISTRIBUTED: entry point done, in-process agreement done, container left.**
+  `node_main.py` runs a node as a process on TCP. `agreement.disagreements`
+  reports WHERE a split graph differs from a whole one, and a `Federation`
+  across 4 owners agrees with a whole `CoOccurrence` on every read — still at 32
+  owners, where most nodes are empty. Reads go through `federation.at(owner)`,
+  the path `rank` uses, so it checks the routing rather than stepping past it.
 
-  **AND ITS QUESTION IS ANSWERED IN-PROCESS.** `agreement.disagreements` reports
-  WHERE a split graph differs from a whole one, and a `Federation` across 4
-  owners agrees with a whole `CoOccurrence` on every `seen`, every `partners`
-  and every pairwise `together` over 200 occasions — still at 32 owners, where
-  most nodes are empty and a routing bug has somewhere to hide. Reads go through
-  `federation.at(owner)`, the path `rank` uses, so this checks the routing
-  rather than stepping past it.
-
-  **What is left is the CONTAINER run**, which is a different question —
-  latency, departure, partition — and a later phase's work. This one had to hold
-  first: a federation that disagrees in one process will disagree in twelve.
-
-  **`testbed/driver.py` stays dead and is a REPLACEMENT, not a rewrite** — it
-  measures a `LocalAssociativeMemory` network that the restructure deleted. Only
-  its reason survives, and `agreement.py` now carries it.
+  **Left: the container run** — latency, departure, partition — a different
+  question and a later phase's. `testbed/driver.py` stays dead and is a
+  REPLACEMENT not a rewrite: it measures a `LocalAssociativeMemory` network the
+  restructure deleted. Only its reason survives, and `agreement.py` carries it.
 
 - **`tasks/xsl.py` has no caller.** Use it or drop it.
 - **The link columns in `surfaces_pipeline.py` step in tenths** — shares over ten

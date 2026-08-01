@@ -90,10 +90,20 @@ that arm `link_aud` is also 0.0000 — the audio codes do not link to their own
 word, so there is nothing for a route to pass through. `together` works, but
 that is the arm where both senses share a moment, which is not the claim.
 
-**Not yet established: regression or never-held-here.** Saying which needs the
-pre-restructure run, not a guess. **This outranks further g44-01 work** — a
-headline result that stopped reproducing is worth more than another decimal on
-one that did not.
+**Established from the pre-restructure record, and it is NOT a regression.**
+`g40-01`'s sweep (readable at `f0a8a72^`) passed gate G7 and recorded the price:
+**a cross-modal link costs about 300 occasions per digit, an order of magnitude
+dearer than a within-modal one at ~16.**
+
+The pipeline runs 3,000 occasions over ten digits — exactly 300 each — but the
+`alternating` arm puts sound on odd occasions and pictures on even ones, so
+**audio gets 150 per digit, half of what the link is known to need.** The arm
+that tests the claim is the one arm that cannot afford it, by construction.
+
+**The test:** reuse recordings so alternating carries 6,000 occasions and audio
+reaches 300 per digit. There is no `--occasions` flag and the audio set caps at
+3,000 recordings, so this needs the occasion builder to repeat them. Predicted
+to make `crossed` non-zero; unrun.
 
 ## Known debts
 

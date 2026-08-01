@@ -14,11 +14,7 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
 
 ## Agreed, not started
 
-- **The LSH front end** (README §1). Replace `grouping.cluster` with
-  random-hyperplane hashing from `openplexus/sketch.py`. Sweep the bit count, and
-  add the agreement test the front end has never had: two nodes, different data
-  samples, same seed — do the codes mean the same thing? That last part closes a
-  falsifier that has been specified and unwritten since before this restructure.
+- Nothing.
 
 ## In flight
 
@@ -26,9 +22,8 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
 
 ## Next, in the order I would take them
 
-1. **The LSH front end**, above. It is the only agreed-and-unstarted item, it is
-   the one part of the architecture the README states and the code contradicts,
-   and it settles the untested half of "independent nodes agree".
+1. **CLUTRR composition on the count graph**, below. Agreed with John after the
+   LSH front end, and it is kill-list #1.
 2. **An error signal** (README §7). Nothing is currently ever wrong, because
    counts only go up. Predicting *relations* rather than tokens gives a signal
    that can be wrong without being next-token prediction.
@@ -45,6 +40,12 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
   deliberately not carried over.
 - **`openplexus/tasks/asking.py` has no tests and no mutation**, so by this
   project's own rules it is not finished.
-- **`experiments/` does not exist.** The harness that ran sweeps went with the old
-  tree; whatever replaces it should emit structured rows rather than prose, so
-  records are generated rather than written.
+- **`experiments/` has two scripts and no harness.** `surfaces_bits.py` and
+  `surfaces_pipeline.py` each carry their own argument parsing and their own JSON
+  writing. That is fine for two and is a copy at four.
+- **The link columns in `surfaces_pipeline.py` step in tenths.** They are shares
+  over ten words, so a single code moving changes a column by 0.1 and no
+  difference smaller than that can be read. Whatever compares front ends
+  downstream next needs a finer denominator than the vocabulary.
+- **The front end is not wired to anything that runs as a node**, because there is
+  no node entry point (above). It is used by the two sweeps and nowhere else.

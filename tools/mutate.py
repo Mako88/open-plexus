@@ -71,6 +71,7 @@ ANSWERS = ROOT / "openplexus" / "answers.py"
 RENDER = ROOT / "openplexus" / "render.py"
 FAMILIES = ROOT / "openplexus" / "tasks" / "families.py"
 CLUTRR = ROOT / "openplexus" / "tasks" / "clutrr.py"
+SURFACES = ROOT / "openplexus" / "surfaces.py"
 
 
 @dataclass(frozen=True)
@@ -547,6 +548,45 @@ MUTATIONS = [
         path=FEDERATED,
         old="        raise NotImplementedError(",
         new="        return self._table.occasions or NotImplementedError(",
+    ),
+    Mutation(
+        name="the-front-end-draws-its-planes-without-the-seed",
+        breaks="the only reason the hash replaced a trained quantiser. The "
+               "planes are the shared constant, and drawn afresh they are "
+               "per-process: two nodes send the same input to different "
+               "surfaces, so a write and a read go to different machines and "
+               "the count that should have accumulated never does. NOTHING "
+               "ELSE MOVES -- one node's own scores are identical, purity is "
+               "identical, and every single-process measurement in this "
+               "repository still passes",
+        path=SURFACES,
+        old="        self._planes = np.random.default_rng(seed).normal(",
+        new="        self._planes = np.random.default_rng().normal(",
+    ),
+    Mutation(
+        name="an-input-with-no-content-gets-a-code-anyway",
+        breaks="the refusal that keeps a surface from being made out of "
+               "silence. A zero vector sits on every plane at once, so its "
+               "sign pattern is the tie-break rather than the input -- and "
+               "every empty input in the stream lands on ONE code together, "
+               "which then co-occurs with everything and reads as the hub the "
+               "walk is built to refuse",
+        path=SURFACES,
+        old="        if not np.any(vector):\n            return -1",
+        new="        if False:\n            return -1",
+    ),
+    Mutation(
+        name="the-batch-packs-its-bits-the-other-way-round",
+        breaks="the agreement between one matrix product and one call per row. "
+               "The partition is IDENTICAL either way and every purity, every "
+               "distinct-code count and every collision rate comes out the "
+               "same, so nothing measured on codes alone can see it -- but a "
+               "node quantising in batches and a node quantising one arrival "
+               "at a time would name the same input differently, which is the "
+               "exact failure the hash exists to make impossible",
+        path=SURFACES,
+        old="        weights = 1 << np.arange(self.bits - 1, -1, -1)",
+        new="        weights = 1 << np.arange(self.bits)",
     ),
 ]
 def restore_any_leftovers() -> None:

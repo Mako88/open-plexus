@@ -119,6 +119,29 @@ def cluster(vectors: np.ndarray, k: int, seed: int = 0,
     return sorted((group for group in groups if group), key=lambda g: g[0])
 
 
+def codes(vectors: np.ndarray, k: int, seed: int = 0) -> list[int]:
+    """`cluster` as a FRONT END: one code per row, `-1` for a row no code claimed.
+
+    The adapter `surfaces.Hyperplanes.codes` is measured against, kept here so
+    the comparison runs against this module rather than against a
+    reimplementation of it. It was the body of the deleted
+    `experiments/harness.quantise`, and it had already been copied into a second
+    sweep once — which is the copy `tools/check_duplication.py` exists to refuse.
+
+    Rows are unit-normalised first because `cluster` scores by dot product and
+    expects that; a caller handing in raw pixels would otherwise be clustering
+    by brightness.
+    """
+    vectors = np.asarray(vectors, dtype=float)
+    norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+    norms[norms == 0.0] = 1.0
+    assigned = [-1] * len(vectors)
+    for code, members in enumerate(cluster(vectors / norms, k=k, seed=seed)):
+        for row in members:
+            assigned[row] = code
+    return assigned
+
+
 def _seeded(points: np.ndarray, k: int, seed: int) -> np.ndarray:
     """k-means++ initialisation, on cosine distance.
 

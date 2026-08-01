@@ -43,6 +43,8 @@ from __future__ import annotations
 
 import numpy as np
 
+from openplexus.surfaces import Hyperplanes
+
 
 class SumSketch:
     """The obvious version: add the written keys up in the store's own space.
@@ -90,17 +92,13 @@ class AddressSketch:
     """
 
     def __init__(self, width: int, bits: int = 16, seed: int = 0) -> None:
-        if bits < 1:
-            raise ValueError("bits must be at least 1")
-        if bits > 62:
-            # The signature is packed into a Python int via shifts; past this
-            # the arithmetic is still correct but the buckets outnumber any
-            # plausible number of writes, which means every address is unique
-            # and the sketch has stopped compressing anything.
-            raise ValueError("bits above 62 buys nothing: the table would be "
-                             "sparser than the writes it records")
-        self._planes = np.random.default_rng(seed).normal(
-            size=(bits, width)) / np.sqrt(width)
+        # THE PLANES COME FROM `surfaces.Hyperplanes`, and the packing with
+        # them. It was duplicated here first and the front end second; one
+        # implementation means a fix to the hash cannot land in one and not the
+        # other. The two callers want different things from a signature -- this
+        # one addresses a table, that one names a surface -- and that difference
+        # lives in `code` rather than in a second copy of the arithmetic.
+        self._hash = Hyperplanes(width, bits=bits, seed=seed)
         self._counts: dict[int, float] = {}
         # Everything is stored in units of `self._scale`, which shrinks as the
         # store decays. A write divides by it and a read multiplies by it, so
@@ -108,11 +106,7 @@ class AddressSketch:
         self._scale = 1.0
 
     def signature(self, key: np.ndarray) -> int:
-        bits = self._planes @ key > 0.0
-        value = 0
-        for bit in bits:
-            value = (value << 1) | int(bit)
-        return value
+        return self._hash.signature(key)
 
     def add(self, key: np.ndarray, amount: float = 1.0) -> None:
         if self._scale <= 0.0:

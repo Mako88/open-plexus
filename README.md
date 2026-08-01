@@ -19,12 +19,12 @@ it back — refutations expire, and two have already become right later.
 
 **1. Input → surfaces.** How raw data becomes an id that can be counted.
 
-- ✅ Trained k-means quantiser — *in use, and it is the thing being replaced.*
-- 🚧 Random-hyperplane LSH — *no training and no data, a shared seed is all two nodes need, and the bit count gives dog-vs-Labrador for free.*
+- ✅ Random-hyperplane LSH, over features centred per item — *no training and no data: two nodes send an identical input to the same surface every time, where k-means on different samples of the same stream manages under 0.12, and the bit count is the grain dial.*
+- ⬜ Features in which an angle means something — *the hash cuts by angle, so it is only as good as the input: on raw waveforms every front end including a random assignment scores the same. This is where the front end's remaining cost lives, and nothing yet builds one locally.*
 - ⬜ A codebook learned from co-occurrence — *removes the last borrowed component, but it must stay in sync as it learns, which C1 forbids.*
 - ⬜ Per-node codebooks plus translation — *avoids agreement entirely, at the cost of unsupervised translation, which is harder than the goal.*
 - ❌ ~~No discretisation — count raw similarity~~ — *every count stays 1, so no statistic can form.* **Revives if** counting is replaced by something that does not need recurrence.
-- ❌ ~~k-means as the permanent answer~~ — *clustering by similarity is an identity assignment, which is the walk's job.* **Revives if** identity stops being something the walk decides.
+- ❌ ~~Trained k-means quantiser~~ — *clustering by similarity is an identity assignment, which is the walk's job, and two nodes fitted on different samples of one stream agree about almost no item with nothing anywhere reporting it. It is still the better grouping — about twice the purity at a matched code count — and that gap is the price paid.* **Revives if** a per-node front end becomes acceptable, or identity stops being something the walk decides.
 
 **2. What gets stored.** Which co-occurrences are kept.
 

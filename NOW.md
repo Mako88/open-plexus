@@ -40,7 +40,11 @@ Tested; its mutation is caught.
 shadows 0.135–0.292, zero of 216 true partners below the highest shadow. Every
 earlier rule multiplied a score by a rate, which is the wrong shape.
 
-**No ARM has beaten watching yet, and the gap is coverage.** Best is
+**No ARM has beaten watching, and the gap is NOT coverage** — re-pricing an ask
+as one action (`charge_per_ask=1`, default off) lifts on-target pairs 6 → 25 and
+leaves separation at −0.3067, still short. `separation` takes a min over true
+partners, so one wrongly demoted part costs a whole query: partial coverage is
+not partial credit at any size, and the ceiling only pays at 108 of 108.** Best is
 `ask-repeat` with a per-query cut at −0.3054, 0.009 short, from −0.5130. Fixed
 along the way: concentrating asks beats spreading them, and fitting the cut per
 query beats fitting it globally (the arm's global cut was 0.6278 against an
@@ -72,11 +76,6 @@ commit.
 
 **Scored:** P5, P7, P9, P11, P15 held. P1–P3, P6, P8, P10, P12, P13 refuted.
 P14 is unmeasurable — budget stops binding above 0.25.
-
-**One correction.** "The shortfall is structural and not sampling" came from
-sweeping the raw and comparative rules and does not generalise: a multiplier
-takes a noisy rate as an unbiased factor, a classifier asks which side of a
-boundary a value is on and noise flips it. Sweep per rule.
 
 ## Next, in the order I would take them
 

@@ -278,6 +278,30 @@ the arm can compute, and no such anchor is known here. **That is the whole of
 what is missing**, and it is smaller than "the rule has no nothing-to-find
 state" made it sound.
 
+## RE-PRICING THE ASK BUYS COVERAGE AND NOT SEPARATION
+
+`World(config, charge_per_ask=1)` charges an ask one action instead of every
+occasion the rejection search looked at. **Default is off**, so every earlier
+number stands.
+
+                          per query   on target
+    watching                -0.2967           0
+    ask-repeat, rejection   -0.3189           6
+    ask-repeat, one draw    -0.3067          25
+
+**Four times the coverage and still below watching.** I had written that the gap
+between the arms and the ceiling was "bookkeeping in the simulator, not a limit
+on asking". That was a prediction stated as a conclusion and it is refuted:
+the accounting WAS capping coverage, and coverage was not what was missing.
+
+The reason is one already measured here and it governs throughout: `separation`
+takes a MIN over true partners, so a single wrongly demoted part costs the whole
+query while a correctly demoted confound helps one term. **Partial coverage is
+not partial credit**, at 6 pairs or at 25. The ceiling reaches +0.1444 at 108.
+
+So the arms need near-total coverage rather than more of it, and nothing here
+has shown a way to buy that under any accounting.
+
 ## WHAT AN ASK COSTS, and a leak that has to be closed before it is used
 
 The arms are coverage-limited and the reason is priced, not chosen:

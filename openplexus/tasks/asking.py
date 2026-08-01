@@ -98,8 +98,19 @@ class World:
     still strictly increasing and a bucket join can round it exactly as before.
     """
 
-    def __init__(self, config: OccasionConfig) -> None:
+    def __init__(self, config: OccasionConfig,
+                 charge_per_ask: int | None = None) -> None:
         self.config = config
+        #: What ONE ask costs the budget, or None to charge every occasion the
+        #: sampler looked at. **Defaults to None, which is what every earlier
+        #: result consumed.** Measured: a rejection search costs 8.63 draws for
+        #: a true partner, 2.91 for a shadow and 1.00 for a background surface,
+        #: because the loop hunts for `present` and the cost is 1/P(present).
+        #: Equal exposure therefore charges asking up to 8.63x watching, which
+        #: is what caps every arm's coverage. A real intervening agent acts
+        #: once, so `charge_per_ask=1` is the accounting that asks what
+        #: intervention costs rather than what simulating it costs.
+        self.charge_per_ask = charge_per_ask
         self._rng = random.Random(config.seed)
         self._when = 0
         #: Occasions drawn, however they were requested. **The budget both arms
@@ -133,7 +144,9 @@ class World:
             raise ValueError(
                 "asking for a surface without itself is unanswerable by "
                 "construction, and would report a refusal every time")
+        before = self.drawn
         drawn = 0
+        answer = None
         for _ in range(patience):
             occasion = draw_occasion(self.config, self._rng, self._when)
             self._when += 1
@@ -141,7 +154,13 @@ class World:
             drawn += 1
             if present not in occasion.surfaces:
                 continue
-            if absent in occasion.surfaces:
-                return Answer(occasion=occasion, refused=True, drawn=drawn)
-            return Answer(occasion=occasion, refused=False, drawn=drawn)
-        return Answer(occasion=None, refused=False, drawn=drawn)
+            answer = Answer(occasion=occasion,
+                            refused=absent in occasion.surfaces, drawn=drawn)
+            break
+        if answer is None:
+            answer = Answer(occasion=None, refused=False, drawn=drawn)
+        # `drawn` on the Answer always reports what the sampler really did. Only
+        # the BUDGET is re-priced, and only when asked to be.
+        if self.charge_per_ask is not None:
+            self.drawn = before + self.charge_per_ask
+        return answer

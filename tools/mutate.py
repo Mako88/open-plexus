@@ -713,9 +713,17 @@ MUTATIONS = [
                "toward zero, which reads as *nothing is constitutive* rather "
                "than as a broken world, and every other column stays healthy",
         path=ASKING,
-        old="                return Answer(occasion=occasion, refused=True, "
-            "drawn=drawn)",
-        new="                continue",
+        # RE-POINTED when `ask` was restructured to price the budget
+        # separately from the sampling. Same break: retry after a refusal,
+        # so the rate becomes a function of `patience` and not a
+        # measurement.
+        old="            answer = Answer(occasion=occasion,\n"
+            "                            refused=absent in "
+            "occasion.surfaces, drawn=drawn)\n            break",
+        new="            if absent in occasion.surfaces:\n"
+            "                continue\n"
+            "            answer = Answer(occasion=occasion, refused=False, "
+            "drawn=drawn)\n            break",
     ),
     Mutation(
         name="an-ask-is-not-charged-for-what-it-drew",

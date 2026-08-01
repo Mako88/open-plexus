@@ -40,7 +40,8 @@ import numpy as np  # noqa: E402
 
 from openplexus.grouping import codes as kmeans_codes  # noqa: E402
 from openplexus.surfaces import (Hyperplanes, agreement,  # noqa: E402
-                                 centred, purity, spectra, waveform)
+                                 centred, cepstrum, cochlea, purity, spectra,
+                                 waveform)
 from openplexus.tasks import mnist, spoken  # noqa: E402
 
 MNIST_DATA = ROOT / "data" / "mnist"
@@ -181,6 +182,12 @@ def main() -> int:
         # whether it needs that either. Read against `audio` row for row: same
         # items, same labels, same hash, different input.
         ("audio-wave", waveform(heard), [u.digit for u in heard]),
+        # AND THE SAME RECORDINGS THROUGH AN EAR-SHAPED BANK. Log-spaced bands
+        # on fixed overlapping windows, then the same with the level removed
+        # per frame. Both are fixed transforms of one item, so neither brings
+        # back the thing k-means was dropped for.
+        ("audio-ear", cochlea(heard), [u.digit for u in heard]),
+        ("audio-cepstrum", cepstrum(cochlea(heard)), [u.digit for u in heard]),
     )
     bits = BITS[1::2] if args.quick else BITS
     seeds = SEEDS[:1] if args.quick else SEEDS

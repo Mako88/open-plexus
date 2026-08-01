@@ -20,7 +20,8 @@ it back — refutations expire, and two have already become right later.
 **1. Input → surfaces.** How raw data becomes an id that can be counted.
 
 - ✅ Random-hyperplane LSH, over features centred per item — *no training and no data: two nodes send an identical input to the same surface every time, where k-means on different samples of the same stream manages under 0.12, and the bit count is the grain dial.*
-- ⬜ Features in which an angle means something — *the hash cuts by angle, so it is only as good as the input: on raw waveforms every front end including a random assignment scores the same. This is where the front end's remaining cost lives, and nothing yet builds one locally.*
+- 🔀 Fixed transforms of one item — an ear-shaped filterbank, a cepstrum, per-item centring — *legal because a constant is not a codebook, and they are what makes an angle mean anything: on raw waveforms every front end including a random assignment scores the same. They improve the SPACE and not the allocation — k-means gains 0.05 from them and the hash gains 0.01.*
+- ⬜ Spending the codes where the data is, without fitting a codebook — *the hash's whole remaining deficit, about 0.44 of purity in every feature space with structure in it. A data-free front end cannot know where the data is; whether the walk can repair the over-segmentation instead is the untested half.*
 - ⬜ A codebook learned from co-occurrence — *removes the last borrowed component, but it must stay in sync as it learns, which C1 forbids.*
 - ⬜ Per-node codebooks plus translation — *avoids agreement entirely, at the cost of unsupervised translation, which is harder than the goal.*
 - ❌ ~~No discretisation — count raw similarity~~ — *every count stays 1, so no statistic can form.* **Revives if** counting is replaced by something that does not need recurrence.

@@ -257,6 +257,92 @@ def waveform(utterances, width: int = 2048) -> np.ndarray:
     return np.asarray(rows)
 
 
+def _mel(hertz: np.ndarray) -> np.ndarray:
+    return 2595.0 * np.log10(1.0 + hertz / 700.0)
+
+
+def _hertz(mel: np.ndarray) -> np.ndarray:
+    return 700.0 * (10.0 ** (mel / 2595.0) - 1.0)
+
+
+def cochlea(utterances, frames: int = 16, bands: int = 24,
+            lowest: float = 50.0) -> np.ndarray:
+    """Log-spaced bands on fixed overlapping windows. **What an ear roughly does.**
+
+    John's question, 2026-07-31: is there an equivalent to how ears hear that
+    could be emulated? There is, and this is it — the basilar membrane resolves
+    frequency roughly logarithmically, so the bands are spaced on the mel scale
+    rather than evenly, and the energy is log-compressed.
+
+    **It is a fixed physical model and not a fitted one**, which is the whole
+    reason it is allowed here: like the planes, it is a constant handed out once
+    and never updated, so two nodes computing it cannot disagree. Borrowing a
+    *shape of ear* is not borrowing a *codebook*.
+
+    **What it bought, measured on 3,000 FSDD recordings at about 8 per code.**
+    Against `spectra`'s evenly spaced bands it moves k-means from 0.921 to 0.948
+    and the hash from 0.534 to 0.496 — that is, it improves the front end that
+    can spend its resolution where the data is, and does nothing for the one that
+    cannot. `cepstrum` on top reaches 0.974 and 0.539.
+
+    **So the hash's deficit is not the feature space.** In every representation
+    with any structure in it, the trained quantiser is about 0.44 ahead; on raw
+    waveform, where there is none, both fall to the floor. What separates them is
+    where the codes are SPENT, and that is the one thing a data-free front end
+    cannot decide.
+    """
+    rows = []
+    for utterance in utterances:
+        signal = np.asarray(utterance.samples, dtype=np.float64)
+        edges = _hertz(np.linspace(_mel(np.array(lowest)),
+                                   _mel(np.array(utterance.rate / 2.0)),
+                                   bands + 1))
+        # Windows overlap and are a fixed fraction of the recording, so a slow
+        # speaker and a fast one are compared frame for frame -- the same
+        # proportional choice `spectra` makes, and for the same reason.
+        window = max(int(len(signal) / frames * 2), 8)
+        row = []
+        for start in np.linspace(0, max(len(signal) - window, 0),
+                                 frames).astype(int):
+            segment = signal[start:start + window]
+            if len(segment) < window:
+                segment = np.pad(segment, (0, window - len(segment)))
+            power = np.abs(np.fft.rfft(segment * np.hanning(len(segment)))) ** 2
+            hertz = np.fft.rfftfreq(len(segment), 1.0 / utterance.rate)
+            for low, high in zip(edges[:-1], edges[1:]):
+                inside = (hertz >= low) & (hertz < high)
+                row.append(float(np.log1p(power[inside].sum()))
+                           if inside.any() else 0.0)
+        rows.append(row)
+    return np.asarray(rows)
+
+
+def cepstrum(rows: np.ndarray, bands: int = 24, keep: int = 13) -> np.ndarray:
+    """A DCT across each frame's bands, with the first coefficient DROPPED.
+
+    The standard speech front end, and it earns its place here for one specific
+    reason rather than for being standard: **coefficient zero IS the frame's mean
+    level**, so dropping it removes the common offset per frame — a finer version
+    of what `centred` does per item, and the offset is exactly what stops a
+    hyperplane through the origin from cutting anything.
+
+    Both steps are fixed transforms of a single item. Nothing is estimated from a
+    corpus, so nothing has to be kept in sync.
+
+    Args:
+        rows: `cochlea` output, one row per item, frames concatenated.
+    """
+    rows = np.asarray(rows, dtype=float)
+    if rows.shape[1] % bands:
+        raise ValueError(f"a row of {rows.shape[1]} does not divide into "
+                         f"{bands} bands per frame")
+    frames = rows.shape[1] // bands
+    grid = rows.reshape(len(rows), frames, bands)
+    index = np.arange(bands)
+    basis = np.cos(np.pi * (index[None, :] + 0.5) * index[:, None] / bands)
+    return (grid @ basis.T)[:, :, 1:keep + 1].reshape(len(rows), -1)
+
+
 def purity(assigned: list[int], labels: list[int]) -> tuple[float, dict[int, int]]:
     """Share of items sitting in a code whose MAJORITY label is their own.
 

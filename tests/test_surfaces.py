@@ -21,8 +21,9 @@ import unittest
 import numpy as np
 
 from openplexus.grouping import codes as kmeans
-from openplexus.surfaces import (Hyperplanes, agreement, centred, purity,
-                                 spectra, waveform)
+from openplexus.surfaces import (Hyperplanes, _hertz, _mel, agreement,
+                                 centred, cepstrum, cochlea, purity, spectra,
+                                 waveform)
 
 WIDTH, CLASSES = 32, 10
 
@@ -256,8 +257,9 @@ class CentringIsPerITEMOrItIsNotAllowED(unittest.TestCase):
 class TheAudioFeaturesAreShapedAsPromised(unittest.TestCase):
 
     class Recording:
-        def __init__(self, samples):
+        def __init__(self, samples, rate: int = 8000):
             self.samples = samples
+            self.rate = rate
 
     def test_one_row_per_recording_of_segments_by_bands(self):
         rng = np.random.default_rng(0)
@@ -271,6 +273,63 @@ class TheAudioFeaturesAreShapedAsPromised(unittest.TestCase):
         # change which digits are in the stream.
         self.assertEqual(spectra([self.Recording([1, -1, 1])],
                                  segments=8, bands=4).shape, (1, 32))
+
+    def test_the_cochlea_spends_more_bands_low_down_than_even_spacing_does(self):
+        """The one property that makes it an ear rather than a filter bank.
+
+        Not *most* bands below a kilohertz — mel spacing over 50 Hz to Nyquist
+        puts 11 of 25 edges there, which is fewer than half. The claim is
+        comparative and the even-spaced bank is the companion: 6 edges, so the
+        ear-shaped bank spends nearly twice as many where speech is.
+        """
+        edges = _hertz(np.linspace(_mel(np.array(50.0)),
+                                   _mel(np.array(4000.0)), 25))
+        even = np.linspace(50.0, 4000.0, 25)
+        self.assertGreater(sum(1 for e in edges if e < 1000.0),
+                           sum(1 for e in even if e < 1000.0))
+
+    def test_the_two_scales_agree_at_the_ends_and_nowhere_between(self):
+        # Otherwise the mapping could be the identity and the test above would
+        # be comparing a bank against itself.
+        self.assertAlmostEqual(float(_hertz(_mel(np.array(1234.0)))), 1234.0,
+                               places=6)
+        self.assertGreater(float(_mel(np.array(1000.0))) / 1000.0,
+                           float(_mel(np.array(4000.0))) / 4000.0)
+
+    def test_four_octaves_land_in_four_different_bands(self):
+        """The spacing, tested through the OUTPUT rather than through `_mel`.
+
+        Doubling the frequency is one octave whether it is 100 Hz or 800 Hz, and
+        an ear resolves all four. Evenly spaced bands over 50 Hz to 4 kHz are
+        165 Hz wide, so the first three octaves fall inside the first two bands
+        and cannot be told apart — which is what this would catch.
+        """
+        rate = 8000
+        peaks = []
+        for hertz in (100, 200, 400, 800):
+            tone = np.sin(2 * np.pi * hertz * np.arange(4000) / rate) * 4000
+            row = cochlea([self.Recording(list(tone.astype(int)), rate)],
+                          frames=1, bands=24)
+            peaks.append(int(np.argmax(row[0])))
+        self.assertEqual(len(set(peaks)), 4, f"bands {peaks}")
+
+    def test_the_cochlea_is_one_row_per_recording_of_frames_by_bands(self):
+        rng = np.random.default_rng(0)
+        heard = [self.Recording(list(rng.integers(-2000, 2000, size=n)), 8000)
+                 for n in (4000, 9000)]
+        self.assertEqual(cochlea(heard, frames=4, bands=6).shape, (2, 24))
+
+    def test_the_cepstrum_drops_the_level_and_keeps_the_shape(self):
+        # Two frames identical in shape but 10x apart in level must come back
+        # near-identical, because the level is coefficient zero and it is gone.
+        quiet = np.array([[1.0, 2.0, 3.0, 2.0, 1.0, 0.5]])
+        loud = quiet + 5.0
+        self.assertTrue(np.allclose(cepstrum(quiet, bands=6, keep=3),
+                                    cepstrum(loud, bands=6, keep=3)))
+
+    def test_the_cepstrum_refuses_a_row_that_does_not_divide_into_frames(self):
+        with self.assertRaises(ValueError):
+            cepstrum(np.zeros((2, 25)), bands=6)
 
     def test_the_waveform_is_one_fixed_width_whatever_the_length(self):
         rng = np.random.default_rng(0)

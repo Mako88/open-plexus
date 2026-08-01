@@ -588,6 +588,31 @@ MUTATIONS = [
         new="        self._planes = np.random.default_rng().normal(",
     ),
     Mutation(
+        name="the-ear-shaped-bank-is-evenly-spaced-after-all",
+        breaks="the only thing that makes it an ear rather than a filter bank. "
+               "Evenly spaced bands over 50 Hz to Nyquist are 165 Hz wide, so "
+               "the first three octaves of speech fall inside the first two "
+               "bands and cannot be told apart -- and the row still comes back "
+               "the right shape, still varies with the input, and still "
+               "produces codes, so every column downstream looks healthy",
+        path=SURFACES,
+        old="        edges = _hertz(np.linspace(_mel(np.array(lowest)),\n"
+            "                                   _mel(np.array(utterance.rate / 2.0)),\n"
+            "                                   bands + 1))",
+        new="        edges = np.linspace(lowest, utterance.rate / 2.0, bands + 1)",
+    ),
+    Mutation(
+        name="the-cepstrum-keeps-the-level-it-exists-to-drop",
+        breaks="the reason this transform is here rather than any other. "
+               "Coefficient zero is the frame's mean level, and keeping it puts "
+               "back exactly the common offset that stops a hyperplane through "
+               "the origin from cutting anything -- the failure measured at 6 "
+               "codes over 3,000 recordings",
+        path=SURFACES,
+        old="    return (grid @ basis.T)[:, :, 1:keep + 1].reshape(len(rows), -1)",
+        new="    return (grid @ basis.T)[:, :, 0:keep].reshape(len(rows), -1)",
+    ),
+    Mutation(
         name="an-input-with-no-content-gets-a-code-anyway",
         breaks="the refusal that keeps a surface from being made out of "
                "silence. A zero vector sits on every plane at once, so its "

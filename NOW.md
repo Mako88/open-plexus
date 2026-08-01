@@ -135,17 +135,23 @@ README line goes back to ⬜ and the disagreement is the finding.**
 
 ## Next, in the order I would take them
 
-1. **RAISE THE FAN-OUT, and the margin is a floor rather than a ceiling.** The
-   losses are now explained: splitting by whether any path reached the true
-   answer shows the blend helping where it did (+0.0117) and strictly hurting
-   where it did not (−0.0191), which it must, since the structure can only push
-   other candidates above an answer it never scored. And only about a third of
-   queries reach the answer at all, on a benchmark where **0.7373 of test pairs
-   are two hops apart**. The gap is `FANOUT = 200`, which takes an entity's
-   first 200 edges **in insertion order** — an arbitrary slice on entities
-   carrying up to 7,614. Raise it, or make it take the strongest edges rather
-   than the first ones, and re-measure. Cost grows as the square, so this needs
-   a sweep with a budget rather than one big number.
+1. **THE CAP IS NOT THE BINDING CONSTRAINT, and saying it was is a correction
+   this file owes.** Tripling the fan-out from 200 to 600 moved the reached
+   share from 34.9% to **37.9%** — three points, against a hoped-for doubling.
+   Reach stays about half of the 0.7373 of test pairs that are two hops apart.
+
+   **The diagnosis that survives is hubs.** The 0.7373 was measured with no cap
+   at all. A two-step path through an entity carrying 7,614 edges needs that
+   entity's list to contain the target inside the cap, and 600 of 7,614 samples
+   8% of it — so paths through hubs are missed at both settings, which is why
+   raising the cap barely moves anything. **A uniform cap cannot fix this**: the
+   fix would have to skip hub edges by how uninformative they are rather than by
+   how many there are, which is an idea and not yet a mechanism.
+
+   *(Confound, named: the 600 run also carries the sampling fix, so two things
+   changed together. A fan-out 200 run WITH sampling is in flight to separate
+   them. The conclusion above is robust to it either way — 35% and 38% are both
+   about half of 74%.)*
 2. **Run the reached/never-reached split at full scale.** The decomposition
    above is from forty queries. It is the sharpest diagnostic the run has and it
    has never been read at a size that settles anything. A run is in flight —

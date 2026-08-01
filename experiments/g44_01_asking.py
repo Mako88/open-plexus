@@ -762,6 +762,32 @@ the constraint is deeper than accounting.
 extension must keep the current behaviour exactly, since every number in this
 file was measured through it.
 
+## P26 AND P27: the two things that helped, combined. Registered first
+
+Two findings here point the same way and have never been used together.
+
+**P15 held:** concentrating asks on fewer pairs beats spreading them, because
+the threshold rule needs ~48 asks to resolve a 0.16 gap.
+
+**And the new one:** asking a candidate against ITS OWN top partners lands on
+scored CONFOUND pairs, where asking it against the query that nominated it lands
+on real parts — `ask-set` demotes 4 confounds to 8 parts, `ask-mutual` 0.2 to 51.
+
+`ask-aimed` does both: nominate by mutual predictability, interrogate against
+the candidate's own neighbourhood, and STAY on that candidate for `REVISITS`
+asks before moving on.
+
+    P26  paired against watching over 20 seeds, ask-aimed beats it by >0.02 —
+         more than double ask-set's +0.0085, since it should resolve the pairs
+         ask-set only samples
+    P27  and its demoted scored pairs are >50% confounds, against ask-set's 33%
+
+**P27 is the mechanism and P26 the payoff.** P27 failing means concentration
+does not preserve the aim — that staying on one candidate spends the budget on
+whichever of its partners happen to be real parts. That would be the two
+findings interfering rather than compounding, which is worth knowing and is not
+what I expect.
+
 ## WHAT AN ASK COSTS, and a leak that has to be closed before it is used
 
 The arms are coverage-limited and the reason is priced, not chosen:

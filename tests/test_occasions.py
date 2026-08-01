@@ -361,5 +361,79 @@ class Validation(unittest.TestCase):
             OccasionConfig(concepts=3, surfaces=2, noise=5)
 
 
+class AShadowFollowsOneConceptAndCountingCannotRefuseIt(unittest.TestCase):
+    """The case a distractor is not, and the reason `g44-01` needs a world.
+
+    A distractor is present on every occasion, so it is no commoner around the
+    dog than around anything else and counting refuses it — measured at 0.4490.
+    A SHADOW is present exactly when one concept is, so it co-occurs with that
+    concept's surfaces as strongly as they co-occur with each other. **No
+    statistic reading this stream can separate it**, which is what makes
+    intervention the only named escape.
+    """
+
+    def world(self, **over):
+        return OccasionConfig(concepts=4, surfaces=3, presence=0.7, noise=1,
+                              distractors=1, shadows=4, occasions=400, seed=5,
+                              **over)
+
+    def test_a_shadow_is_present_exactly_when_its_concept_is(self):
+        config = self.world()
+        for occasion in generate(config, count=200):
+            for concept in range(config.concepts):
+                shadow = config.shadow_of(concept)
+                own = {concept * config.surfaces + m
+                       for m in range(config.surfaces)}
+                if occasion.subject == concept:
+                    self.assertIn(shadow, occasion.surfaces)
+                else:
+                    self.assertNotIn(shadow, occasion.surfaces)
+                    # And it is not smuggled in as noise from elsewhere.
+                    self.assertFalse(own & set(occasion.surfaces) and
+                                     shadow in occasion.surfaces)
+
+    def test_it_is_not_present_on_every_occasion_which_a_distractor_is(self):
+        config = self.world()
+        stream = generate(config, count=300)
+        shadow = config.shadow_of(0)
+        seen = sum(shadow in o.surfaces for o in stream)
+        self.assertGreater(seen, 0)
+        self.assertLess(seen, len(stream))
+        # The distractor, for contrast, is on every one of them.
+        distractor = config.concept_surfaces
+        self.assertEqual(sum(distractor in o.surfaces for o in stream),
+                         len(stream))
+
+    def test_it_co_occurs_with_its_concept_at_least_as_strongly_as_its_own_surfaces(self):
+        """The claim that makes counting helpless, as a number rather than prose."""
+        config = self.world()
+        stream = generate(config, count=1500)
+        shadow = config.shadow_of(0)
+        own = [0 * config.surfaces + m for m in range(config.surfaces)]
+        with_shadow = sum(shadow in o.surfaces and own[0] in o.surfaces
+                          for o in stream)
+        with_sibling = sum(own[1] in o.surfaces and own[0] in o.surfaces
+                           for o in stream)
+        self.assertGreaterEqual(with_shadow, with_sibling)
+
+    def test_a_world_with_no_shadows_is_byte_identical_to_before(self):
+        # The guarantee that turning this on changed nothing already measured.
+        plain = OccasionConfig(concepts=4, surfaces=3, presence=0.7, noise=1,
+                               distractors=1, occasions=200, seed=5)
+        self.assertEqual(plain.shadows, 0)
+        self.assertEqual(plain.vocabulary, plain.concept_surfaces + 1)
+        self.assertIsNone(plain.shadow_of(0))
+        surfaces = [o.surfaces for o in generate(plain, count=100)]
+        again = [o.surfaces for o in generate(plain, count=100)]
+        self.assertEqual(surfaces, again)
+
+    def test_the_shadow_ids_sit_past_the_distractors(self):
+        config = self.world()
+        self.assertEqual(config.shadow_base,
+                         config.concept_surfaces + config.distractors)
+        self.assertTrue(config.is_shadow(config.shadow_of(0)))
+        self.assertFalse(config.is_shadow(config.concept_surfaces))
+
+
 if __name__ == "__main__":
     unittest.main()

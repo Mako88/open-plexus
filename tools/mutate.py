@@ -240,6 +240,23 @@ MUTATIONS = [
         new="REPLICAS = 1",
     ),
     Mutation(
+        name="a-shadow-is-present-on-every-occasion",
+        breaks="the distinction the whole intervention falsifier rests "
+               "on. A distractor is present every time and counting "
+               "REFUSES it, measured at 0.4490; a shadow is present "
+               "exactly when one concept is, and counting cannot, "
+               "measured at 0.0096. Making the shadow global turns the "
+               "hard case into the easy one -- so g44-01 would run, "
+               "produce numbers, and be measuring the confound that was "
+               "already solved",
+        path=OCCASIONS,
+        old="    shadow = config.shadow_of(subject)" + chr(10) +
+            "    if shadow is not None:" + chr(10) +
+            "        present.append(shadow)",
+        new="    for concept in range(config.shadows):" + chr(10) +
+            "        present.append(config.shadow_of(concept))",
+    ),
+    Mutation(
         name="every-surface-of-the-subject-is-always-present",
         breaks="the only thing that makes the grounding falsifier an experiment. "
                "With every surface of a concept present whenever it is the "

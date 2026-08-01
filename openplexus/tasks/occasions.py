@@ -132,6 +132,24 @@ class OccasionConfig:
     presence: float = 0.7
     noise: int = 3
     distractors: int = 1
+    #: How many concepts get a SHADOW — a surface present whenever that concept
+    #: is the subject, and never otherwise. **Defaults to none, so every earlier
+    #: result is reproduced exactly.**
+    #:
+    #: A `distractor` is present on every occasion, and counting refuses it: it
+    #: is common around everything, so it is no more common around the dog than
+    #: around anything else. A SHADOW is the case counting provably cannot
+    #: crack — the lamp switched on whenever THIS dog is in the room. It is
+    #: exactly as correlated with the concept as the concept's own surfaces are,
+    #: so no statistic reading the stream can separate *"always there when"*
+    #: from *"part of"*, and g39-06 measured that collapse at 0.4490 against
+    #: 0.0096.
+    #:
+    #: It exists so `g44-01` can ask whether INTERVENING separates what
+    #: watching cannot. Nothing else should turn it on: a stream with shadows is
+    #: a harder world and a result measured in it is not comparable with one
+    #: measured without.
+    shadows: int = 0
     zipf: float = 0.0
     pairings: str = "complete"
     occasions: int = 4000
@@ -180,8 +198,23 @@ class OccasionConfig:
 
     @property
     def vocabulary(self) -> int:
-        """Every surface id in the stream, distractors included."""
+        """Every surface id in the stream, distractors and shadows included."""
+        return self.concept_surfaces + self.distractors + self.shadows
+
+    @property
+    def shadow_base(self) -> int:
+        """Where the shadow surfaces start. One per concept, in concept order."""
         return self.concept_surfaces + self.distractors
+
+    def shadow_of(self, concept: int) -> int | None:
+        """The surface that follows `concept` around, if this world has them."""
+        if not self.shadows or concept >= self.shadows:
+            return None
+        return self.shadow_base + concept
+
+    def is_shadow(self, surface: int) -> bool:
+        """Whether a surface is one that follows a single concept."""
+        return surface >= self.shadow_base
 
     def concept_of(self, surface: int) -> int | None:
         """Which concept a surface belongs to, or `None` for a distractor."""
@@ -292,7 +325,7 @@ def generate(config: OccasionConfig, count: int | None = None) -> list[Occasion]
     rng = random.Random(config.seed)
     weights = config.weights()
     subjects = range(config.concepts)
-    always = tuple(range(config.concept_surfaces, config.vocabulary))
+    always = tuple(range(config.concept_surfaces, config.shadow_base))
 
     return [draw_occasion(config, rng, when, weights, subjects, always)
             for when in range(total)]
@@ -316,7 +349,7 @@ def draw_occasion(config: OccasionConfig, rng: random.Random, when: int,
     weights = config.weights() if weights is None else weights
     subjects = range(config.concepts) if subjects is None else subjects
     if always is None:
-        always = tuple(range(config.concept_surfaces, config.vocabulary))
+        always = tuple(range(config.concept_surfaces, config.shadow_base))
 
     subject = rng.choices(subjects, weights=weights, k=1)[0]
     own = [subject * config.surfaces + m for m in range(config.surfaces)]
@@ -346,6 +379,15 @@ def draw_occasion(config: OccasionConfig, rng: random.Random, when: int,
             s for s in range(config.concept_surfaces)
             if s // config.surfaces != subject]
         present.extend(rng.sample(elsewhere, config.noise))
+
+    # THE SHADOW, added before the always-present ones so its id ordering does
+    # not depend on which came first. It is tied to the SUBJECT rather than
+    # drawn, which is the whole point: it is present exactly when the concept
+    # is, so it co-occurs with that concept's surfaces as strongly as they do
+    # with each other, and no count over this stream can tell them apart.
+    shadow = config.shadow_of(subject)
+    if shadow is not None:
+        present.append(shadow)
 
     present.extend(always)
     return Occasion(when=when, surfaces=tuple(sorted(present)), subject=subject)

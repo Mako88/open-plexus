@@ -59,40 +59,30 @@ break the bound rather than trade along it. Untested.
 
 ## ONE GRAPH: THE PROBLEM IS KINDS, NOT INSTANCES
 
-`CoOccurrence` is the whole representation — things are nodes, anything observed
-together gets a weighted edge — and **no single graph has ever held more than one
-KIND of thing**: images+audio+words in one, intervention moments in another,
-knowledge-graph facts in a third, and none of them ever met.
+`CoOccurrence` is the whole representation, and **no single graph has ever held
+more than one KIND of thing** — images+audio+words in one, intervention moments
+in another, knowledge-graph facts in a third, none ever meeting.
 
-**"Three graphs" was the wrong diagnosis of the right problem, and pointing the
-new `wiring` check at real code before building on the phrasing is what caught
-it.** One arm of g44-01 builds exactly one graph and `expect(graph=1)` passes. A
-full sweep builds many, and that is CORRECT — arms are independent experiments
-and must not share an accumulator. Counting instances does not find this.
+**Counting instances does not find it.** One arm builds one graph and
+`expect(graph=1)` passes; a sweep builds many and that is correct, since arms
+are independent experiments. So `wiring.expect(holding={...})` counts the KINDS
+entering a graph and fails when a declared one never arrives. Built, tested,
+mutation caught.
 
-**THE MERGE NEEDS A NAMESPACE, AND THE KIND CHECK HAS A BLIND SPOT THERE.**
-Checked before building, and all three sources number from zero: image codes
-`[0, codes)` then audio then words; concept surfaces from 0 then distractors
-then shadows; `{entity: i for i, entity in enumerate(entities)}`. Merged
-naively, image code 0 and concept surface 0 and entity 0 are ONE integer and
-accumulate into one row — no error, just nonsense counts.
+**THE MERGE NEEDS A NAMESPACE, AND THE KIND CHECK IS BLIND TO IT.** All three
+sources number from zero: image codes `[0, codes)` then audio then words;
+concept surfaces then distractors then shadows; `{entity: i for i, entity in
+enumerate(entities)}`. Merged naively, image code 0 and concept surface 0 and
+entity 0 are ONE integer accumulating into one row — no error, just wrong
+counts. And `expect(holding=...)` passes it: all four kinds arrive, lying on
+top of each other.
 
-**And `expect(holding=...)` would pass that merge**: all four kinds arrive, they
-are simply lying on top of each other. So the kind check needs a companion that
-asserts ids from different kinds are DISJOINT, and building the merge without
-it would be trusting the instrument exactly where it cannot see.
+**Next, and it goes in before any merging:** a companion asserting ids from
+different kinds are DISJOINT. Then the merge itself.
 
-**So the check that catches the original fault counts the KINDS entering a
-graph.** A run
-declares *this graph holds pictures and sounds and words and facts* and fails if
-one never arrives. The merge then has an instrument that can fail it, rather
-than my inspection. `wiring.touch("graph")` stays: an accumulator split by
-accident is a different fault and a real one.
-
-**Also worth stating:** traversal (beam walk, `flood`, route-typing) MOVES
-through a graph; intervention EDITS it, asking the world whether one thing can
-be had without another. Different operations on one structure, and they were
-being discussed as alternatives.
+**Also:** traversal (beam walk, `flood`, route-typing) MOVES through a graph;
+intervention EDITS it. Different operations on one structure, discussed as
+alternatives.
 
 ## Known debts
 

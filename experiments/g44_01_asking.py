@@ -649,7 +649,30 @@ N facts is the outcome a confound produces most.
          against ask-mutual's 46, because one ask now settles several
     P25  and it beats watching by >0.05, which no arm has done
 
-**P25 is the real one.** Every previous failure traced back to a pair needing
+### What happened: BOTH REFUTED, and a small positive margin that is NOT a win
+
+    arm          per query   on target   pairs   shadow
+    watch          -0.2967           0       0     0.0%
+    ask-mutual     -0.4099          52     100    48.2%
+    ask-set        -0.2881          13     180    35.0%
+
+**P24 refuted at 13 of 108** — one ask naming four queries settles four pairs
+only when it complies, and compliance concentrates the coverage on candidates
+that detach easily rather than spreading it. **P25 refuted at +0.0086 against a
+threshold of 0.05.**
+
+**And ask-set is nonetheless the first arm here to score above watching at all.**
+At 12 seeds the margin is **+0.0102**, so it survived four times the seeds — more
+than the withdrawn +0.0164 managed. But the per-seed ranges overlap
+([-0.3019, -0.2857] against [-0.3057, -0.2640]), so **this is not established
+and must not be reported as a result.** This project has withdrawn two claims of
+exactly this size and shape, both mine, both on the day they were made.
+
+**What would settle it:** a PAIRED comparison, same seed against same seed,
+rather than two means. A margin one fifth of its registered threshold, with
+overlapping ranges, is a direction and not a finding.
+
+**P25 was the real one.** Every previous failure traced back to a pair needing
 ~48 asks to resolve a 0.16 gap. If a set-ask buys N pairs per ask, the effective
 budget multiplies and that is the first mechanism here that touches the binding
 factor. If P24 holds and P25 fails, the bound survives even a cheaper fact, and
@@ -737,6 +760,12 @@ ALONE = 0.30
 #: doing nothing (+0.1314 against watching's -0.2967, where 12 asks gives
 #: -0.0802). Not tuned on any arm -- the ceiling picked it before an arm used it.
 REVISITS = 48
+
+#: How many queries one set-ask covers. **4 is chosen here**, as the largest set
+#: that still complies often enough to be worth it: a shadow complies 0.7778 per
+#: pair, so four independent ones comply about 0.37 of the time, and a set that
+#: almost never complies buys nothing however many pairs it names.
+SET_SIZE = 4
 
 #: Budgets for the price sweep, **chosen here** to bracket 1.0, where an arm asks
 #: as much as it watches. P13 and P14 are about that region and the main grid
@@ -996,6 +1025,44 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
                     staying = None
             continue
 
+        if arm == "ask-set":
+            # ONE ASK, MANY FACTS. Ask a candidate without ANY of several
+            # queries: COMPLIANCE means it was had without all of them, so
+            # every pair is settled at once. A refusal says only that at least
+            # one held and cannot be attributed, so it buys a single ordinary
+            # ask instead -- which is what makes this a cheaper fact rather
+            # than a vaguer one.
+            query = rng.choice(seen)
+            partners = index.partners(query)
+            if not partners:
+                continue
+            candidate = max(partners, key=lambda p: min(
+                statistic(index, p, query), statistic(index, query, p)))
+            if candidate == query:
+                continue
+            targets = [t for t in index.partners(candidate)
+                       if t != candidate][:SET_SIZE] or [query]
+            answer = world.ask(present=candidate, absent=targets)
+            asks -= 1
+            made += 1
+            if answer.occasion is not None:
+                if learn_from_asks:
+                    index.observe(answer.occasion.surfaces)
+                    seen.extend(answer.occasion.surfaces)
+                shadow_asks += config.is_shadow(candidate)
+                if not answer.refused:
+                    for target in targets:
+                        was, refused = refusals.get((candidate, target), (0, 0))
+                        refusals[(candidate, target)] = (was + 1, refused)
+                else:
+                    single = world.ask(present=candidate, absent=targets[0])
+                    asks -= 1
+                    made += 1
+                    was, refused = refusals.get((candidate, targets[0]), (0, 0))
+                    refusals[(candidate, targets[0])] = (
+                        was + 1, refused + single.refused)
+            continue
+
         query = rng.choice(seen)
         if arm == "ask-random":
             candidate = rng.randrange(config.vocabulary)
@@ -1210,7 +1277,8 @@ def main() -> int:
     summary: dict = {}
     for budget in BUDGETS:
         for arm in ("watch", "ask-random", "ask-targeted", "ask-mutual",
-                    "ask-structural", "ask-informed"):
+                    "ask-structural", "ask-informed",
+                    "ask-set"):
             if arm == "watch" and budget != BUDGETS[0]:
                 continue
             got = []

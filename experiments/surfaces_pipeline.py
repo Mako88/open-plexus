@@ -222,8 +222,11 @@ def main() -> int:
     parser.add_argument("--quick", action="store_true",
                         help="one seed and one bit count, for a smoke run")
     parser.add_argument("--repeats", type=int, default=1,
-                        help="passes over the recordings; 2 doubles "
-                             "the occasions without new audio")
+                        help="passes over the recordings. **1 is chosen here** "
+                             "so every earlier number stays reproducible; 2 is "
+                             "the cell that makes `alternating` afford "
+                             "g40-01's measured ~300 occasions per digit, and "
+                             "is where cross reaches 1.0000")
     parser.add_argument("--images", type=int, default=IMAGES)
     args = parser.parse_args()
 

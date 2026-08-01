@@ -842,6 +842,36 @@ out of one question already being asked.
 would move is not yet identified. The next commit should name what it measures
 before building it, which is the thing that has protected every result here.
 
+## P28 AND P29: harvesting the occasion. The quantity, then the risk
+
+**The quantity.** `ask(present=c, absent=q)` that COMPLIES returns an occasion
+containing `c` and not `q`. For every other surface `s` in it, `s` was present
+while `q` was absent — so `(s, q)` complied as well, observed for free. One ask
+yields as many pair-facts as the occasion is wide, and unlike `ask-set` it needs
+no set named in advance and costs nothing extra.
+
+A REFUSAL yields nothing for anyone else: the occasion contains `q`, and one
+co-occurrence is not a refusal — a refusal is a failed SEARCH.
+
+**The risk, and it is why this can fail.** Harvested facts are drawn CONDITIONED
+on `c` being present. A direct ask about `(s, q)` samples occasions containing
+`s`; a harvested one samples occasions containing `c` that happen to contain `s`.
+**Those are different populations, and the rate estimated from one need not be
+the rate of the other.** If the bias is large the harvest is worse than useless,
+because it arrives in volume and drowns the honest asks.
+
+    P28  ask-harvest lands >60 of the 108 scored pairs on target at budget
+         0.10, against ask-set's 12, since every compliance settles a whole
+         occasion
+    P29  and the harvested refusal rate for a pair is within 0.05 of the rate a
+         direct ask measures for that same pair — the bias check, and the
+         thing that decides whether the volume is worth having
+
+**P29 is the one that matters.** P28 will hold almost by construction: harvesting
+cannot help but touch more pairs. If P29 fails, more coverage of a WRONG number
+is exactly the failure this file has already recorded three times, and the
+honest outcome is to discard the harvest rather than tune it.
+
 ## WHAT AN ASK COSTS, and a leak that has to be closed before it is used
 
 The arms are coverage-limited and the reason is priced, not chosen:

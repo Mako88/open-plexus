@@ -102,6 +102,17 @@ class Mutation:
 
 MUTATIONS = [
     Mutation(
+        name="a-kind-counts-as-reachable-from-itself",
+        breaks="the only check that separates one graph from several sharing a "
+               "dictionary. Seeding the frontier as already-arrived reports "
+               "every kind reachable from every other, including two islands "
+               "that never touch -- and the three wiring checks all pass that "
+               "graph, so nothing else here would notice",
+        path=SHARED,
+        old="        starts = {self.space.node(one, i) for i in range(len(self.space.ids(one)))}",
+        new="        starts = set()",
+    ),
+    Mutation(
         name="the-shared-graph-ignores-its-namespace",
         breaks="the only thing that makes one graph possible. Observing local "
                "ids puts image 2 and word 2 and fact 2 on ONE node, which is "

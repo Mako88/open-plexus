@@ -17,44 +17,38 @@ Delete a line when it is done. Nothing may cite this file.
 
 Measured: meaning-gating beats strength-gating about two to one, and `flood`
 does NOT beat flat enumeration (+0.0081 against +0.0136). **But it was tested on
-knowledge-graph triples — published facts, not anything this system observed —
-so it says nothing about traversing the graph the architecture is meant to
-build.** John's point, and it stands.
-
-**Unfinished:** a confidently-composing route barely decays, so the floor kills
-what means nothing and does not bound what means something. `flood` has a floor
-and no beam. And EXPANSIONS IS THE WRONG COST COLUMN where nodes expand in
-parallel — what transfers is messages sent and work per node, neither measured.
+published knowledge-graph triples, not on anything this system observed**, so it
+says nothing about traversing the graph the architecture is meant to build.
+John's point, and it stands. **Unfinished:** `flood` has a floor and no beam,
+and EXPANSIONS IS THE WRONG COST COLUMN where nodes expand in parallel — what
+transfers is messages sent and work per node, neither measured.
 
 ## g44-01: asking separates a confound watching cannot
 
-**Settled and paused behind the architecture work.** `learned_threshold` demotes
-only the low group of observed refusal rates, using nothing but rates the arm
-paid for, and at 384 asks per pair reaches **+0.2256** — matching an oracle that
-calls `is_shadow`, against watching's **−0.2967**. Tested, mutations caught.
+**Settled, and paused behind the architecture work.** `learned_threshold`
+demotes only the low group of observed refusal rates, using nothing but rates
+the arm paid for, and at 384 asks per pair reaches **+0.2256** — matching an
+oracle that calls `is_shadow`, against watching's **−0.2967**.
 
 **No arm reaches it, and the constraint is one number: pairs × asks-per-pair.** A
-real part is detachable 62% of the time (refused 0.3837 against a shadow's
+real part is detachable 62% of the time (0.3837 refused against a shadow's
 0.2222), so the signal is a 0.16 gap needing ~48 asks per pair, and a
-misclassified pair demotes a real part rather than merely failing to help.
-Policy, budget, noise, sampler pricing, metric strictness, coverage and
-self-poisoning were each measured and each turned out to be a face of that.
+misclassified pair demotes a real part. Policy, budget, noise, sampler pricing,
+metric strictness, coverage and self-poisoning were each measured and each was a
+face of that number.
 
-**P12 refuted at 100%:** with no confound present the rule demotes all 72 true
-partners. Missing is an absolute anchor the arm can compute; the scale-free
+**P12 refuted at 100%:** with no confound present it demotes all 72 true
+partners. Missing is an absolute anchor the arm can compute — the scale-free
 ratio is useless (0.55 against 0.52).
 
 ## THE ASKING POLICY BUILDS A GRAPH AND NEVER WALKS IT
 
-**John's catch, 2026-08-01.** `index.observe` turns every moment into edges, and
-then `grep -c "pathways|flood|reach|routed"` in `g44_01_asking.py` returns **0** —
-every use is `statistic(index, a, b)`, one direct edge.
-
-**Why it bears on the wall.** The policy nominates by direct association, which
-is one-hop. A confound is a TWO-hop fact: two things tied together only through
-a third. A one-hop policy cannot express that, so it must TEST candidates that
-structure might have ruled out for free — and the product bound assumes exactly
-that every candidate needs testing. Reading the neighbourhood's shape would
+**John's catch.** `index.observe` turns every moment into edges, then
+`grep -c "pathways|flood|reach|routed"` in `g44_01_asking.py` returns **0** —
+every use is one direct edge. The policy nominates by direct association, which
+is one-hop; a confound is a TWO-hop fact, two things tied together only through
+a third. So it must TEST candidates structure might have ruled out for free, and
+the product bound assumes exactly that. Reading the neighbourhood's shape would
 break the bound rather than trade along it. Untested.
 
 ## ONE GRAPH: THE PROBLEM IS KINDS, NOT INSTANCES
@@ -74,9 +68,23 @@ source numbers from zero, so a naive merge puts image code 0, concept surface 0
 and entity 0 in ONE row — every kind arrives, `holding` passes, counts are
 silently summed. `Namespace` hands out the blocks that keep them apart.
 
-**Next: the merge**, one `CoOccurrence` fed pictures, sounds, words and facts
-through one namespace, declared under all three checks. `namespace` is in the
-orphan baseline with that reason so it cannot go quiet.
+**`SharedGraph` is built and does the thing three graphs made impossible:** a
+route crosses from a picture to a fact, two hops through a word, between kinds
+that never co-occurred.
+
+**AND CO-RESIDENCE IS NOT CONNECTION — a fourth check was needed.** All three
+wiring checks PASS a graph that is two disconnected islands sharing a
+dictionary. Kinds do not automatically meet: pictures, sounds and words arrive
+in the same moment, but **a knowledge-graph fact shares no occasion with a
+picture of a digit at all.** `shared.linked(a, b)` is what says whether anything
+bridges them, and without it the real merge would report success on three
+unrelated components in one dict.
+
+**Next: the merged pipeline** — real pictures, sounds, words and facts through
+one namespace, declared under all four checks. **The open design question it
+raises: what bridges facts to senses?** Nothing in the data does, so either a
+source that mentions both is needed, or facts stay a separate island and "one
+graph" means one graph of the senses. Unanswered.
 
 **Reserving is deliberately NOT declaring** — `wiring.kind` is called when data
 arrives, not when room is made, or a reservation would satisfy the check.

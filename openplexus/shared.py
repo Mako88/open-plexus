@@ -70,6 +70,37 @@ class SharedGraph:
         self.index.observe(nodes)
         return nodes
 
+    def linked(self, one: str, other: str, depth: int = 4) -> bool:
+        """Can any node of `one` reach any node of `other`?
+
+        **The check the wiring instruments cannot make, and the one the real
+        merge needs most.** `graph=1`, `holding={...}` and `disjoint=True` all
+        pass a graph that is two disconnected islands sharing a dictionary:
+        every kind arrived, nothing collided, and nothing connects. That is
+        "one graph" in name only.
+
+        It matters because kinds do not automatically meet. Pictures, sounds and
+        words co-occur — they arrive in the same moment. Knowledge-graph facts
+        share no occasion with a picture of a digit at all, so pouring both in
+        produces two components and no route can ever cross between them.
+
+        A merged graph is only one graph if something bridges its kinds, and
+        this is what says whether anything does.
+        """
+        starts = {self.space.node(one, i) for i in range(len(self.space.ids(one)))}
+        targets = {self.space.node(other, i)
+                   for i in range(len(self.space.ids(other)))}
+        seen, edge = set(starts), set(starts)
+        for _ in range(depth):
+            nxt = {p for node in edge for p in self.index.partners(node)}
+            if nxt & targets:
+                return True
+            edge = nxt - seen
+            if not edge:
+                return False
+            seen |= edge
+        return False
+
     def holds(self) -> set[str]:
         """Which kinds have actually been observed, not merely reserved."""
         return wiring.kinds() & set(self.space.kinds())

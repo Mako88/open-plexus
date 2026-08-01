@@ -110,5 +110,53 @@ class TheGuaranteesHold(unittest.TestCase):
             shared.observe([("fact", 0)])
 
 
+class ONE_GRAPH_MEANS_CONNECTED(unittest.TestCase):
+    """Co-residence is not connection, and no wiring check can tell.
+
+    `graph=1`, `holding={...}` and `disjoint=True` all pass a graph that is two
+    disconnected islands sharing a dictionary. Kinds do not automatically meet:
+    pictures, sounds and words arrive in the same moment, but a knowledge-graph
+    fact shares no occasion with a picture of a digit at all.
+    """
+
+    def setUp(self):
+        wiring.reset()
+
+    def islands(self) -> SharedGraph:
+        shared = SharedGraph()
+        shared.reserve("image", 4)
+        shared.reserve("fact", 4)
+        for _ in range(10):
+            shared.observe([("image", 0), ("image", 1)])
+            shared.observe([("fact", 0), ("fact", 1)])
+        return shared
+
+    def test_every_wiring_check_passes_two_islands(self):
+        """Stated as a test so the blind spot is not re-derived."""
+        with wiring.expect(holding={"image", "fact"}, disjoint=True, graph=1):
+            self.islands()
+
+    def test_but_linked_says_NO(self):
+        self.assertFalse(self.islands().linked("image", "fact"))
+
+    def test_and_YES_once_something_bridges_them(self):
+        """The companion. A `linked` that always said no would pass above."""
+        shared = self.islands()
+        for _ in range(10):
+            shared.observe([("image", 1), ("fact", 0)])
+        self.assertTrue(shared.linked("image", "fact"))
+
+    def test_it_finds_a_bridge_more_than_one_hop_away(self):
+        shared = SharedGraph()
+        shared.reserve("image", 4)
+        shared.reserve("word", 4)
+        shared.reserve("fact", 4)
+        for _ in range(10):
+            shared.observe([("image", 1), ("word", 1)])
+            shared.observe([("word", 1), ("fact", 0)])
+        self.assertFalse(shared.linked("image", "fact", depth=1))
+        self.assertTrue(shared.linked("image", "fact", depth=2))
+
+
 if __name__ == "__main__":
     unittest.main()

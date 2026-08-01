@@ -920,6 +920,32 @@ it takes to resolve, which is the only number that touches the bound. That
 measurement is the next one and it is specified — spread per pair at a fixed
 number of asks, exactly as the 12-to-384 sweep did for the threshold rule.
 
+### And the deciding measurement REFUTES it. The harvest direction is dead
+
+     48 asks  refusal rate  gap 0.1725  spread 0.0587  gap/spread 2.94
+     48 asks  enrichment    gap 0.1348  spread 0.2560  gap/spread 0.53
+    192 asks  refusal rate  gap 0.1510  spread 0.0293  gap/spread 5.16
+    192 asks  enrichment    gap 0.2403  spread 0.1555  gap/spread 1.54
+
+**The wider gap is more than cancelled by a spread four times wider.** Refusal
+rate resolves three to five times better per ask, at both budgets. Enrichment
+does not merely fail to beat it — it is far worse, and an arm built on it would
+have needed MORE asks per pair, not fewer.
+
+**This is exactly the risk named one commit earlier** — *a wider gap with a wider
+spread buys nothing* — and writing it down as the deciding test is why the
+separation was never reported as a win. The +0.2354 gap was real and irrelevant.
+
+**What it settles.** The refusal rate is not merely the quantity this file
+happens to use; it is the best of the two measured, by a wide margin, and the
+"more facts per ask" direction is refuted through both of its forms — the set
+(no rate at all) and the harvest (a rate too noisy to use).
+
+**What would revive it**, since a ruled-out option must say so: a harvested
+quantity whose spread falls with asks the way a Bernoulli rate's does. Both
+figures here IMPROVE with more asks (0.53 to 1.54) but from too far behind, so
+the objection is the constant and not the trend.
+
 **P28 is not scored.** It was to hold "almost by construction", and building an
 arm to confirm a construction is the tuning this file has refused twice. P28 will hold almost by construction: harvesting
 cannot help but touch more pairs. If P29 fails, more coverage of a WRONG number

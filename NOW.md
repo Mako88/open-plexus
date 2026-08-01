@@ -13,40 +13,48 @@ Delete a line when it is done. Nothing may cite this file.
 
 ---
 
-## In flight
+## What the flood established, and one claim it withdrew
 
-- **`fb15k237_flood.py`, 150 queries, depth 2** → `out/fb15k237-flood.txt`. Two
-  gates: `strength` weighs an edge `1/degree(neighbour)` and prunes by how well
-  connected things are; `meaning` weighs every edge 1.0 so the only decay is the
-  confidence of what a route composes into, which is what the design asks for
-  and has no defence against a hub. Blend weight swept on both arms — and taken
-  on TEST, which flatters the flood, because this run has no validation split.
+**Meaning-gating beats strength-gating. The flood does not beat the flat
+enumeration**, and I reported that it did on sixty queries before the matched
+run existed:
 
-  **The strength gate is measured and it is poor.** Three cells at 150 queries,
-  then stopped rather than finished, because the pattern was set and each cell
-  was costing more than the last:
+    arm                            margin   arrived   expansions
+    flood, depth 2, floor 0.05    +0.0081    0.3417       31,316
+    flood, depth 3, floor 0.05    +0.0052    0.3833      167,852
+    flood, strength gate, best    +0.0034
+    capped two-step enumeration   +0.0136    0.35         ~1,400
 
-        floor     margin   arrived   expansions   sec
-        0.001    +0.0000    0.0133        19486   153
-        0.0005   +0.0034    0.0267        20649   337
-        0.0002   +0.0019    0.0667        25716   700
+All at 300 queries except the enumeration, which is the full 40,932. The
+withdrawn number was **+0.0164 at sixty queries** — the same small-sample
+mistake the popularity bands made earlier the same day, made again within hours
+of writing that one up.
 
-  Against the capped enumeration's +0.0136 and 0.35 arrived, for a fraction of
-  the cost. **The two cells not run are named here rather than left to be
-  discovered**: floors 1e-4 and 5e-5, which an earlier 25-query probe put at
-  0.208 arrived and a margin still inside noise.
+**What survives.** Gating on what a route MEANS is worth roughly twice gating on
+how well connected things are, which was the real question about the design's
+shape. And depth 3 costs five times depth 2, abandons 74% of its walks at the
+ceiling, and scores worse — reaching more (0.38 against 0.34) while ranking
+worse, which is *being reachable is not being findable* arriving again.
 
-  Weighting by `1/degree` makes everything decay at the same rate, so the floor
-  cuts by DEPTH rather than by quality — nothing dies for being a bad idea, only
-  for being far away. That cannot produce the handful of surviving paths the
-  design wants, and the meaning gate is the arm that can.
+**The diagnosis is structural.** A route that composes confidently barely
+decays, so a meaning floor kills what means nothing and does nothing to bound
+what means something, and those multiply. The floor and a beam do different
+jobs: the floor removes the meaningless, a beam bounds how many meaningful
+routes are carried. `flood` deliberately has no beam because the design asked
+for the weight to be the whole budget. It needs both.
+
+**And EXPANSIONS IS THE WRONG COST COLUMN for this project.** John's point,
+2026-08-02: on a machine where every node expands its own edges in parallel,
+wall clock is the longest path rather than the sum of all work, so 167,852
+expansions across a network is not 167,852 anything. The costs that transfer are
+MESSAGES SENT and WORK PER NODE, and neither is measured. The ceiling firing on
+74% of queries is a bandwidth statement, not a latency one.
 
 ## Next, in the order I would take them
 
-1. **Structured logging.** Agreed with John. Experiments emit JSON rows already;
-   what is not checked is that they ALL do, that prose never carries a number,
-   and that a run's parameters travel with its rows. That is the thing that went
-   wrong before the restructure, so it wants a check and not a convention.
+1. **A flood with a beam as well as a floor.** The floor removes routes that
+   mean nothing; nothing currently bounds how many meaningful ones survive, and
+   that is what makes depth 3 unaffordable. `reach`'s beam is the missing half.
 2. **Contradiction, which is nearly free.** `flood` returns every route to an
    endpoint and throws all but the strongest away. Two routes composing to
    incompatible kinds is README §5's ⬜ *a contradiction the map contains* — an

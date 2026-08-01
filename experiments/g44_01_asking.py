@@ -74,7 +74,9 @@ from openplexus.tasks.occasions import OccasionConfig  # noqa: E402
 
 #: Budgets to sweep, as a fraction of the stream spent on asks. **The axis P3 is
 #: about**: at a budget where refusals are near zero the advantage should be near
-#: zero, and if it is not, whatever helps is not the refusal.
+#: zero, and if it is not, whatever helps is not the refusal. Swept, and 0.10 is
+#: the cell P1 and P2 name, so it is in the grid because the registered
+#: prediction put it there rather than because it was chosen here.
 BUDGETS = (0.0, 0.05, 0.10, 0.25)
 
 #: Seeds. Three is this project's floor and is chosen here as that floor.

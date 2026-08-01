@@ -88,12 +88,16 @@ README line goes back to ⬜ and the disagreement is the finding.**
 
 ## Next, in the order I would take them
 
-1. **A walk that is told the relation types along the path.** Tonight's walk was
-   deliberately untyped, and the ❌ it earned in README §4 names exactly this as
-   its revival condition. The audit's rule miner already does typed two-hop
-   paths — `r1(h, x) & r2(x, t) => r(h, t)` at 0.0460 — but it is a
-   confidence-thresholded lookup rather than a ranked walk, so the combination
-   of the two is untried and is the obvious next mechanism.
+1. **A per-query blend weight.** The single strongest lead the result leaves.
+   Alpha is one global number, and the mechanism wins 7,375 queries and loses
+   11,302 — so it is being mixed in at the same strength whether or not it has
+   anything to say. Weighting by how much path evidence actually reached the
+   candidates would keep the wins and drop the losses, and needs no fitted
+   parameter beyond the scale alpha already has. **If the losses are where the
+   structure is silent, this is most of the remaining headroom.**
+2. **Three-step typed paths.** 0.2597 of answers lie further than two steps and
+   nothing has been run there. Costs a fan-out cubed, so it needs the cap
+   thinking through rather than raising.
 2. ~~Keep the route~~ — **done**. `grounding.routed` returns
    `(strength, route)` and `reach` is that with the routes dropped. Item 1 can
    now ask which edges a path used.

@@ -45,6 +45,7 @@ it back — refutations expire, and two have already become right later.
 **4. Retrieval.** How a question gets answered.
 
 - ✅ Ranked walk, scored one-way from the asking side.
+- ⬜ Walk toward SURPRISE rather than strength — *every walk here expands the strongest edge, so it can only surface what the counts already favour, and nothing it returns can be unexpected by construction. A path that is unlikely a priori and composes confidently is where a new idea would live; `grounding.ppmi` computes exactly that and has never been used to walk.*
 - ❌ ~~Average the two directions of an edge~~ — *a thing present everywhere scores 1.0 from its own side because that is true, and averaging lets it outrank real partners.*
 - ❌ ~~Take the weaker direction~~ — *penalises exactly the hub edges worth keeping.*
 - ❌ ~~Take the stronger direction~~ — *stops discriminating; it scored at the floor.*
@@ -62,8 +63,8 @@ it back — refutations expire, and two have already become right later.
 - ⬜ Refuse when nothing was written there — *the only honest answer for a thing never seen, and the machinery exists.*
 - ⬜ Generated one piece at a time — *the only way to produce a novel SEQUENCE, and nothing yet says when it stops.*
 - ✅ A relation that was never stated but follows — *composition is novel output from a single query, no generation involved. On FB15k-237 a ranked walk over typed two-step paths, counted and blended with the marginal at a weight chosen on validation, scores **0.2470 against a structureless floor of 0.2334 — a margin of +0.0136 ± 0.0005** over 40,932 queries, where published ComplEx holds +0.0136 and DistMult +0.0076 over that same floor. **The gain is largest where the answer is RARE** (+0.0303, nearly tripling the floor) and smallest where it is common, so it is not the marginal being reinforced. It returned the marginal on CLUTRR's 62 facts, and 272,115 triples is what the difference was. A second seed reproduces every figure exactly — which establishes only that the blend weight is stable to resampling the validation set, because the test measurement has no randomness left in it to vary. **The margin is a dilution**: split by whether any path reached the answer, it is +0.0474 on the 35% where one did and −0.0046 on the 65% where none did, and the weighted average is the headline. The reachable subset is selected by the mechanism's own ability and its floor is twice as high, so this is not a claim about what more reach would buy.*
-- ⬜ The answer to an analogy — *find where two parts of the map have the same shape, and read off the missing corner.*
-- ⬜ A contradiction the map contains — *an output that was never an input, and nobody asked the question.*
+- ⬜ The answer to an analogy — *find where two parts of the map have the same shape, and read off the missing corner. A route SHAPE is now a first-class thing — `PathTypes` counts them — so two regions spanned by the same shapes is the same question one level up.*
+- ⬜ A contradiction the map contains — *an output that was never an input, and nobody asked the question. **`pathways.flood` already produces the raw material**: it returns every route to an endpoint, so two routes composing to incompatible kinds is a contradiction, computable and currently discarded.*
 - ⬜ A bridge between two regions that never co-occurred — *the thing that connects distant fields, aimed at deliberately rather than stumbled into.*
 - ❌ ~~A fixed frame with slots to fill~~ — *a frame is a traversal with a schedule nobody supplied.* **Revives if** a domain genuinely supplies the frame.
 

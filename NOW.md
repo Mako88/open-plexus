@@ -251,6 +251,16 @@ README line goes back to ⬜ and the disagreement is the finding.**
 
 ## Reading leads, none of them read
 
+- **Rule-mining systems on this benchmark, e.g. AnyBURL.** Recalled from memory
+  and **not checked**: that learned rules over paths reach the RotatE range on
+  FB15k-237 with no embeddings at all. If it holds, it says our +0.0136 is far
+  below what this FAMILY achieves and the ceiling is our implementation rather
+  than the approach — length-2 paths only, one confidence per route shape,
+  evidence summed rather than combined as probabilities, no filtering of
+  unreliable rules. **Check it before it is repeated anywhere**; a remembered
+  number about someone else's work is the borrowed claim CLAUDE.md puts first,
+  and it has already been stated once in conversation.
+
 Found by search on 2026-08-01, recorded as leads and **not as findings**. Each
 may replace work otherwise done by hand, and each has to be read before it is
 cited anywhere.

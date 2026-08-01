@@ -65,6 +65,11 @@ jobs:
       # check here that guards the RECORD rather than the code.
       - name: Nothing is built and left unwired
         run: python tools/check_orphans.py
+      # The README held at 140 lines through a week of heavy work and
+      # still grew: one option line reached 1,263 characters. Line count
+      # was the wrong dimension to watch.
+      - name: The record stays readable
+        run: python tools/check_record.py
       - name: No commit message had a word eaten by a shell
         run: python tools/check_commit_messages.py
       - name: Every pinned number says where it came from

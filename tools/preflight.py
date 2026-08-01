@@ -55,6 +55,7 @@ STEPS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("every module imports", ("tools/check_imports.py",)),
     ("every experiment starts", ("tools/check_experiments.py",)),
     ("nothing is built and unwired", ("tools/check_orphans.py",)),
+    ("the record stays readable", ("tools/check_record.py",)),
     ("the test suite", ("-m", "unittest", "discover", "-s", "tests",
                         "-t", ".", "-q")),
     ("workflow flags match the scripts", ("tools/check_workflows.py",)),

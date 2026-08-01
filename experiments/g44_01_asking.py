@@ -154,6 +154,23 @@ def adjusted(index: CoOccurrence, statistic, candidate: int, query: int,
     """The counted score, demoted by how easily the candidate came alone.
 
     An unasked pair is unchanged: an arm may only demote what it paid to test.
+
+    **THIS RULE IS THE THING THAT IS WRONG, and the ceiling split says so.**
+    Allowed to demote only shadows it reaches +0.2042, beating the confound
+    outright from watching's -0.2967; allowed to demote only true partners,
+    -0.5509. Both together is -0.0500, which is the win and the damage very
+    nearly cancelling and which is why the full ceiling looked mediocre.
+
+    The reason is that a refusal RATE is read here as an absolute. A true
+    surface at `presence` 0.7 is genuinely detachable most of the time -- it is
+    refused 0.3837 against a shadow's 0.2222 -- so being detachable is not the
+    same as not being a part, and only the COMPARISON between candidates
+    carries the signal. Multiplying by the raw rate spends that signal on a
+    quantity it does not measure.
+
+    The control holds the reading: at `shadow_alone` 0.0 the same shadows-only
+    demotion reaches -0.0135, not +0.2042, so this fires when there is a
+    detachable confound and not otherwise.
     """
     score = statistic(index, candidate, query)
     asked, refused = refusals.get((candidate, query), (0, 0))
@@ -170,6 +187,7 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
     refusals: dict = {}
     asks = int(config.occasions * budget) if arm != "watch" else 0
     seen: list[int] = []
+    shadow_asks = 0
 
     while world.drawn < config.occasions:
         spend_on_ask = arm != "watch" and asks > 0 and len(seen) > 4
@@ -183,12 +201,20 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
         if arm == "ask-random":
             candidate = rng.randrange(config.vocabulary)
         else:
-            # THE POLICY: ask about the partner that currently looks most like
-            # part of this, which is exactly where a confound hides.
             partners = index.partners(query)
             if not partners:
                 candidate = rng.randrange(config.vocabulary)
+            elif arm == "ask-mutual":
+                # ASK ABOUT WHAT PREDICTS THIS AND IS PREDICTED BY IT. A surface
+                # present in every occasion scores 1.0 one way and nearly
+                # nothing the other, so the minimum of the two directions is
+                # what the background cannot fake.
+                candidate = max(partners, key=lambda p: min(
+                    statistic(index, p, query), statistic(index, query, p)))
             else:
+                # THE POLICY: ask about the partner that currently looks most
+                # like part of this, which is where a confound hides. It is also
+                # where the BACKGROUND is, and that is why it lands 1 of 108.
                 candidate = max(partners,
                                 key=lambda p: statistic(index, p, query))
         if candidate == query:
@@ -200,6 +226,7 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             seen.extend(answer.occasion.surfaces)
             was, refused = refusals.get((candidate, query), (0, 0))
             refusals[(candidate, query)] = (was + 1, refused + answer.refused)
+            shadow_asks += config.is_shadow(candidate)
 
     tallies = list(refusals.values())
     wanted = scored_pairs(config)
@@ -214,6 +241,10 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
         # pairs while one of them tests 60 pairs nobody scores.
         "on_target": len(set(refusals) & wanted),
         "scored": len(wanted),
+        # P7: is it asking about SHADOWS? If an arm wins without this, it won
+        # for a reason the explanation does not name.
+        "shadow_share": (shadow_asks / (config.occasions * budget)
+                         if budget and arm != "watch" else 0.0),
         "drawn": world.drawn,
     }
 
@@ -273,7 +304,7 @@ def discrimination(config: OccasionConfig, per_pair: int = 40) -> dict:
 
 
 def ceiling(config: OccasionConfig, statistic, rng: random.Random,
-            per_pair: int = 12) -> dict:
+            per_pair: int = 12, restrict: str = "") -> dict:
     """What asking could do if it asked about EVERY pair the metric scores.
 
     **Not an arm.** It spends whatever it needs and no policy could afford it.
@@ -307,9 +338,14 @@ def ceiling(config: OccasionConfig, statistic, rng: random.Random,
                     was, refused = refusals.get((candidate, query), (0, 0))
                     refusals[(candidate, query)] = (was + 1,
                                                     refused + answer.refused)
+    if restrict == "shadows":
+        refusals = {k: v for k, v in refusals.items() if config.is_shadow(k[0])}
+    elif restrict == "true":
+        refusals = {k: v for k, v in refusals.items()
+                    if not config.is_shadow(k[0])}
     tallies = list(refusals.values())
     return {
-        "arm": "ceiling (not an arm)",
+        "arm": f"ceiling ({restrict})" if restrict else "ceiling (not an arm)",
         "separation": separation(index, config, statistic, refusals),
         "refusal_rate": (sum(r for _, r in tallies) / sum(a for a, _ in tallies)
                          if tallies else 0.0),
@@ -331,13 +367,13 @@ def main() -> int:
     print(f"g44-01  shadow_alone {args.alone}, statistic {STATISTIC}, "
           f"{len(SEEDS)} seeds")
     print(f"{'arm':<14}{'budget':>8}{'separation':>13}{'refusals':>11}"
-          f"{'pairs':>8}{'on target':>11}{'drawn':>8}")
+          f"{'pairs':>8}{'on target':>11}{'shadow':>8}{'drawn':>8}")
     print("-" * 62)
 
     rows: list[dict] = []
     summary: dict = {}
     for budget in BUDGETS:
-        for arm in ("watch", "ask-random", "ask-targeted"):
+        for arm in ("watch", "ask-random", "ask-targeted", "ask-mutual"):
             if arm == "watch" and budget != BUDGETS[0]:
                 continue
             got = []
@@ -352,13 +388,15 @@ def main() -> int:
                    "pairs_tested": mean("pairs_tested"),
                    "on_target": mean("on_target"),
                    "scored": mean("scored"),
+                   "shadow_share": mean("shadow_share"),
                    "drawn": mean("drawn")}
             rows.append(row)
             summary[(arm, budget)] = row["separation"]
             hit = f"{row['on_target']:.0f}/{row['scored']:.0f}"
             print(f"{arm:<14}{budget:>8}{row['separation']:>13.4f}"
                   f"{row['refusal_rate']:>11.4f}{row['pairs_tested']:>8.0f}"
-                  f"{hit:>11}{row['drawn']:>8.0f}")
+                  f"{hit:>11}{row['shadow_share']:>8.1%}"
+                  f"{row['drawn']:>8.0f}")
 
     # THE CEILING, before any prediction is read. A refuted prediction has two
     # causes and this is what tells them apart.
@@ -390,6 +428,30 @@ def main() -> int:
           "partner. The control must be NEGATIVE: a shadow that cannot be had "
           "alone IS constitutive, and asking should say so.")
 
+    # WHICH HALF OF THE DEMOTION DOES THE WORK? Asking everything reaches
+    # -0.0500 and asking 53 of 108 well-chosen pairs reaches -0.5130, so a
+    # SUBSET is worse than none. This splits the ceiling to say why.
+    print("\nThe ceiling, split by what it is allowed to demote:")
+    for restrict, label in (("shadows", "shadows only"), ("true", "true only")):
+        halves = [ceiling(world_config(seed, args.alone), statistic,
+                          random.Random(seed), restrict=restrict)
+                  for seed in SEEDS]
+        got = sum(h["separation"] for h in halves) / len(halves)
+        rows.append({"arm": f"ceiling ({restrict})", "separation": got})
+        print(f"  {label:<16}{got:>10.4f}")
+    print("  Demoting a true partner lowers a MIN and demoting the shadow "
+          "lowers one term, so partial coverage is not partial credit.")
+    # THE CONTROL, and without it "demote the shadow" is true by construction.
+    # At alone=0.0 the shadow IS constitutive, so demoting shadows must NOT
+    # rescue separation -- if it does, this is arithmetic and not evidence.
+    guard = [ceiling(world_config(seed, 0.0), statistic, random.Random(seed),
+                     restrict="shadows") for seed in SEEDS]
+    held = sum(g["separation"] for g in guard) / len(guard)
+    rows.append({"arm": "ceiling (shadows, alone=0.0)", "separation": held})
+    print(f"  control, alone=0.0, shadows only  {held:>10.4f}  <- must stay "
+          f"low: a shadow that cannot be had alone is a PART, and demoting it "
+          f"is the error this whole run is trying not to make")
+
     floor = summary[("watch", BUDGETS[0])]
     print(f"\nPREDICTIONS, registered before this file existed:")
     verdicts = []
@@ -408,6 +470,20 @@ def main() -> int:
     p3 = (at_ten - floor) >= low
     verdicts.append(("P3", "the advantage grows with the budget that buys "
                      "refusals", p3, f"{low:+.4f} -> {at_ten - floor:+.4f}"))
+
+    coverage = {(r["arm"], r["budget"]): r for r in rows if "on_target" in r}
+    mutual = coverage.get(("ask-mutual", 0.10), {})
+    landed = mutual.get("on_target", 0.0)
+    verdicts.append(("P5", "ask-mutual lands >30 of 108 scored pairs on target",
+                     landed > 30, f"{landed:.0f}/108"))
+
+    mutual_ten = summary.get(("ask-mutual", 0.10), 0.0)
+    verdicts.append(("P6", "and beats watching by >0.05",
+                     mutual_ten - floor > 0.05, f"{mutual_ten - floor:+.4f}"))
+
+    share = mutual.get("shadow_share", 0.0)
+    verdicts.append(("P7", "and >40% of its asks are shadow pairs",
+                     share > 0.40, f"{share:.1%}"))
 
     for name, claim, held, detail in verdicts:
         print(f"  {name} {'HELD ' if held else 'REFUTED'}  {claim}  [{detail}]")

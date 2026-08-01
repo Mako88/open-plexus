@@ -134,8 +134,16 @@ cited anywhere.
   `fb15k237_typed.py` takes the idea and needs no constants. Reading the paper
   properly would let the weighted version be reported as PROBE.
 - **A Re-evaluation of Knowledge Graph Completion Methods**, Sun et al. ACL 2020
-  (`aclanthology.org/2020.acl-main.489`). Reportedly the tie problem and the
-  average-rank fix, which is the policy `fb15k237_audit.py` chose independently.
+  (`aclanthology.org/2020.acl-main.489`, `arXiv 1911.03903`). Reportedly the tie
+  problem and the average-rank fix, which is the policy `fb15k237_audit.py`
+  chose independently. **Two fetches got the abstract only** — the anthology
+  landing page and the arXiv abstract page — and the abstract says just
+  *"inappropriate evaluation protocol"* and *"a simple evaluation protocol...
+  robust to handle bias in the model"* without naming ties at all. **The PDF is
+  what has to be read**, and WebFetch returns it as unparsed binary, so this
+  needs a human or a different tool. Until then the tie policy stays our own
+  documented choice rather than a cited convention — which is fine, because the
+  tie bound shows the comparison's direction does not depend on it.
 - **Akrami et al., realistic re-evaluation of KGC.** Reportedly finds redundancy
   and test leakage inflating accuracy by 19-175% across standard benchmarks —
   this week's CLUTRR result at family scale, possibly naming which datasets leak.
@@ -168,8 +176,11 @@ cited anywhere.
 
   The only sign change is DistMult and ComplEx going NEGATIVE under the reading
   most generous to the floor, which makes the finding stronger rather than
-  weaker. The average is what is quoted, because it is the neutral choice and
-  reportedly the one Sun et al. propose — that last part is still unread.
+  weaker. The average is what is quoted because it is the neutral choice; the
+  claim that it is also the published convention is unread and is not relied on.
+- **And the two floors agree.** `fb15k237_audit.py` builds it as a raw count
+  vector and `Composition.given` builds it as a relation-only ranking, written
+  separately — both return **0.2334** over all 40,932 scored queries.
 - **There is no node entry point.** `node_main.py` started the old store and was
   deliberately not carried over.
 - **`asking.py`'s two new mutations have not been RUN.** `tests/test_asking.py`

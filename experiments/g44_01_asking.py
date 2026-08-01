@@ -278,6 +278,29 @@ the arm can compute, and no such anchor is known here. **That is the whole of
 what is missing**, and it is smaller than "the rule has no nothing-to-find
 state" made it sound.
 
+## IS THE MIN UNFAIR TO THE ARMS? A NULL
+
+`separation` takes a MIN over true partners, inherited from g39-06, and a min
+makes one wrongly demoted part cost a whole query. That is a metric choice
+rather than a fact about the mechanism, so it is worth knowing whether the arms
+fail on strictness or on substance. Both forms, same runs:
+
+    arm            budget      min      mean
+    watch             0.0  -0.2967  -0.2864
+    ask-repeat       0.25  -0.3189  -0.2906
+    ask-mutual       0.10  -0.3297  -0.2865
+
+**The min exaggerates the damage and does not cause it.** Under the mean the
+arms stop being actively harmed -- ask-repeat goes from 0.022 below watching to
+0.004 below -- and NEITHER FORM SHOWS AN ARM BEATING IT. Reported both ways and
+neither is swapped in: the min asks whether EVERY real surface outranks the
+confound, which is the stricter and the registered question.
+
+So "partial coverage is not partial credit" is too strong and is corrected here:
+under the mean, partial coverage does earn partial credit, and at 25 pairs of
+108 the credit is simply too small to move a 36-query average. The obstacle is
+the amount of coverage and not the shape of the metric.
+
 ## RE-PRICING THE ASK BUYS COVERAGE AND NOT SEPARATION
 
 `World(config, charge_per_ask=1)` charges an ask one action instead of every

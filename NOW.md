@@ -40,11 +40,12 @@ Tested; its mutation is caught.
 shadows 0.135–0.292, zero of 216 true partners below the highest shadow. Every
 earlier rule multiplied a score by a rate, which is the wrong shape.
 
-**No ARM has beaten watching, and the gap is NOT coverage** — re-pricing an ask
-as one action (`charge_per_ask=1`, default off) lifts on-target pairs 6 → 25 and
-leaves separation at −0.3067, still short. `separation` takes a min over true
-partners, so one wrongly demoted part costs a whole query: partial coverage is
-not partial credit at any size, and the ceiling only pays at 108 of 108.** Best is
+**No ARM has beaten watching, and it needs NEAR-TOTAL coverage rather than more
+of it.** Re-pricing an ask as one action (`charge_per_ask=1`, default off) lifts
+on-target pairs 6 → 25 and leaves separation at −0.3067; the ceiling only pays at
+108 of 108. Scored with a MEAN over true partners instead of the registered min,
+the arms stop being harmed (−0.2906 against watching's −0.2864) and still do not
+beat it, so the metric's strictness is not the obstacle. Best is
 `ask-repeat` with a per-query cut at −0.3054, 0.009 short, from −0.5130. Fixed
 along the way: concentrating asks beats spreading them, and fitting the cut per
 query beats fitting it globally (the arm's global cut was 0.6278 against an

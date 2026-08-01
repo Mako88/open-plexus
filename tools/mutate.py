@@ -585,6 +585,18 @@ MUTATIONS = [
         new="        return relation",
     ),
     Mutation(
+        name="the-route-reported-is-not-the-route-walked",
+        breaks="the explanation, while leaving the ranking untouched. Recording "
+               "the route the frontier ARRIVED with rather than the one it "
+               "leaves on drops the last step, so every route ends one surface "
+               "short of the thing it explains -- and the strength, the "
+               "ordering and every score in every sweep are identical, because "
+               "nothing but the explanation reads it",
+        path=GROUNDING,
+        old="                best[other] = (travelled, route + (other,))",
+        new="                best[other] = (travelled, route)",
+    ),
+    Mutation(
         name="the-ask-retries-until-the-world-says-yes",
         breaks="the one quantity the intervention idea rests on. A refusal is "
                "the world saying a part is constitutive, and redrawing after "

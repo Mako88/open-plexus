@@ -614,16 +614,45 @@ def reach(index: CoOccurrence, statistic: Statistic, start: int, *,
         Every surface reached, mapped to its BEST path strength, excluding
         `start` itself. Empty when nothing clears the floor.
     """
+    return {surface: strength_reached
+            for surface, (strength_reached, _) in routed(
+                index, statistic, start, beam=beam, depth=depth, floor=floor,
+                combine=combine).items()}
+
+
+def routed(index: CoOccurrence, statistic: Statistic, start: int, *,
+           beam: int = 8, depth: int = 3, floor: float = 0.0,
+           combine: str = "min") -> dict[int, tuple[float, tuple[int, ...]]]:
+    """`reach`, keeping the ROUTE that got there as well as how strong it was.
+
+    **`reach` computed this and threw it away**, which is a strange thing for a
+    project whose position is that a concept is not stored but is what you reach
+    by walking. If identity is a traversal then the traversal is the object, and
+    a caller that has only the endpoint has the summary rather than the thing.
+
+    Two callers need it concretely rather than philosophically. An answer's route
+    is its explanation — *why* these two entities are related, not merely that
+    the walk got from one to the other. And a walk that is to be told which
+    relation types it passed through has to know which edges it used.
+
+    `reach` delegates here and drops the second half, so there is one walk and
+    the ranking cannot drift between them.
+
+    Returns:
+        Every surface reached, mapped to `(best path strength, route)`. The
+        route lists the surfaces AFTER `start` in the order they were traversed,
+        so its length is the number of hops and `start` is not repeated in it.
+    """
     if beam < 1:
         raise ValueError("beam must be at least 1")
     if depth < 1:
         raise ValueError("depth must be at least 1")
 
-    best: dict[int, float] = {}
-    frontier = [(start, 1.0)]
+    best: dict[int, tuple[float, tuple[int, ...]]] = {}
+    frontier: list[tuple[int, float, tuple[int, ...]]] = [(start, 1.0, ())]
     for _ in range(depth):
-        following: list[tuple[int, float]] = []
-        for here, carried in frontier:
+        following: list[tuple[int, float, tuple[int, ...]]] = []
+        for here, carried, route in frontier:
             scored = sorted(
                 ((strength(index, statistic, here, other, combine), other)
                  for other in index.partners(here)),
@@ -632,10 +661,11 @@ def reach(index: CoOccurrence, statistic: Statistic, start: int, *,
                 if score <= 0.0 or other == start:
                     continue
                 travelled = carried * score
-                if travelled <= floor or travelled <= best.get(other, 0.0):
+                if travelled <= floor or travelled <= best.get(
+                        other, (0.0, ()))[0]:
                     continue
-                best[other] = travelled
-                following.append((other, travelled))
+                best[other] = (travelled, route + (other,))
+                following.append((other, travelled, route + (other,)))
         if not following:
             break
         frontier = following

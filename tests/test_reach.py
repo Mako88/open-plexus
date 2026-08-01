@@ -12,7 +12,7 @@ from __future__ import annotations
 import unittest
 
 from openplexus.grounding import (STATISTICS, SYMMETRIC, CoOccurrence,
-                                  equivalence_classes, reach, strength)
+                                  equivalence_classes, reach, routed, strength)
 
 CONDITIONAL = STATISTICS["conditional"]
 
@@ -211,6 +211,68 @@ class TheWalkReachesThroughAHub(unittest.TestCase):
 
     def test_the_start_is_never_its_own_result(self):
         self.assertNotIn(0, reach(_chain(), CONDITIONAL, 0, beam=8, depth=3))
+
+
+class TheROUTEIsKeptAndIsTheOneThatWasWalked(unittest.TestCase):
+    """If a concept is what you reach by walking, the walk is the object.
+
+    `reach` computed the route and discarded it. These fix what `routed`
+    returns, because a route that is merely plausible — right length, right
+    endpoint, wrong middle — would explain an answer incorrectly and nothing
+    downstream could tell.
+    """
+
+    def test_reach_is_routed_with_the_routes_dropped(self):
+        # The two must not become two walks. Whatever `reach` reports, `routed`
+        # has to report the same strengths for the same surfaces.
+        index = _chain()
+        strengths = reach(index, CONDITIONAL, 0, beam=8, depth=3)
+        with_routes = routed(index, CONDITIONAL, 0, beam=8, depth=3)
+        self.assertEqual(set(strengths), set(with_routes))
+        for surface, value in strengths.items():
+            self.assertEqual(value, with_routes[surface][0])
+
+    def test_every_step_of_a_route_is_a_real_edge(self):
+        index = _chain()
+        for surface, (_, route) in routed(index, CONDITIONAL, 0, beam=8,
+                                          depth=3).items():
+            here = 0
+            for step in route:
+                self.assertGreater(index.together(here, step), 0,
+                                   f"route to {surface} steps {here}->{step}, "
+                                   f"which is not an edge")
+                here = step
+            self.assertEqual(here, surface, "the route ends somewhere else")
+
+    def test_the_route_is_as_long_as_the_walk_was_deep(self):
+        index = _chain()
+        near = routed(index, CONDITIONAL, 0, beam=8, depth=3)
+        self.assertEqual(len(near[1][1]), 1, "a neighbour is one hop away")
+        self.assertEqual(len(near[2][1]), 2, "the bridged end is two")
+
+    def test_no_route_is_longer_than_the_depth_allows(self):
+        for depth in (1, 2, 3):
+            for _, route in routed(_chain(), CONDITIONAL, 0, beam=8,
+                                   depth=depth).values():
+                self.assertLessEqual(len(route), depth)
+
+    def test_the_strength_is_the_product_along_the_route(self):
+        """Path strength multiplies, and the route has to be the one it
+        multiplied along — otherwise the number and the explanation describe
+        two different walks."""
+        index = _chain()
+        for _, (value, route) in routed(index, CONDITIONAL, 0, beam=8,
+                                        depth=3).items():
+            product, here = 1.0, 0
+            for step in route:
+                product *= strength(index, CONDITIONAL, here, step, "min")
+                here = step
+            self.assertAlmostEqual(value, product)
+
+    def test_the_start_is_not_repeated_inside_its_own_routes(self):
+        for _, route in routed(_chain(), CONDITIONAL, 0, beam=8,
+                               depth=3).values():
+            self.assertNotIn(0, route)
 
 
 class TheBUDGETIsOnSearchAndNotOnStorage(unittest.TestCase):

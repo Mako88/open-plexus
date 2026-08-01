@@ -198,6 +198,38 @@ def main() -> int:
         print(f"  {distance} hop{'s' if distance > 1 else ' '}  "
               f"{hops[distance] / len(sample):.4f}")
     print(f"  further or not at all  {hops[0] / len(sample):.4f}")
+
+    # AND HOW MUCH OF THAT TWO-HOP CONNECTIVITY IS ONLY HUBS. The figure above
+    # is measured with no cap, and a typed walk caps its fan-out -- so a pair
+    # joined only through an entity carrying thousands of edges is counted as
+    # reachable here and is missed in practice. If most two-hop connections are
+    # hub-mediated then the gap between 0.7373 and the walk's 35% is not
+    # headroom, it is an artefact of measuring connectivity without the budget
+    # that any real walk has to spend.
+    degree = {entity: len(near) for entity, near in adjacent.items()}
+    bands = ((10, "under 10"), (100, "10 to 99"), (1000, "100 to 999"),
+             (10 ** 9, "1000 or more"))
+    smallest: dict = {label: 0 for _, label in bands}
+    joined = 0
+    for head, _, tail in sample:
+        via = [x for x in adjacent.get(head, ()) if tail in adjacent.get(x, ())]
+        if not via:
+            continue
+        joined += 1
+        least = min(degree[x] for x in via)
+        for limit, label in bands:
+            if least < limit:
+                smallest[label] += 1
+                break
+    print(f"\nOf the {joined} pairs joined in two hops, the degree of the "
+          f"SMALLEST intermediate that joins them:")
+    for _, label in bands:
+        print(f"  {label:<14} {smallest[label] / max(joined, 1):.4f}")
+    print("  A pair whose only intermediates are hubs is reachable on paper "
+          "and not by any walk with a budget.")
+    rows.append({"arm": "intermediates", "joined": joined,
+                 **{label: smallest[label] / max(joined, 1)
+                    for _, label in bands}})
     print("  A one-step mechanism cannot reach an answer that is two steps "
           "away, whatever statistic it uses.")
     rows.append({"arm": "reachability",

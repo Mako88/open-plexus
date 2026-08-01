@@ -28,43 +28,23 @@ expands its own edges in parallel, wall clock is the longest path, not the sum
 of all work. The costs that transfer are MESSAGES SENT and WORK PER NODE and
 neither is measured.
 
-## g44-01 ran: the mechanism works, both policies were starved
+## g44-01: intervention works, and no legitimate rule reaches it yet
 
-**Intervention separates a confound, in both directions.** True partners are
-refused 0.3837 of the time against the shadow's 0.2222, so the confound is
-demoted harder; and the control inverts it, refusing the shadow 0.7326 against
-0.3917 when the shadow genuinely cannot be had alone. That check exists because
-separation is a DIFFERENCE and the demotion MULTIPLIES, so uniform shrinkage
-would have moved the number for free — it nearly made "recovers 83% of the gap"
-a statement about arithmetic.
+**Asking retrieves the information watching cannot.** Allowed to demote only the
+confound, separation reaches **+0.2042** against watching's **−0.2967** — it
+crosses zero and beats it outright. The control holds: at `shadow_alone` 0.0,
+where the shadow genuinely is a part, the same demotion gives −0.0135.
 
-**P1–P3 stay refuted, and the reason is coverage.** Neither policy asked the
-questions the metric reads: `ask-random` buys 504 pairs to land 18 of 108 on
-target, `ask-targeted` is pinned at 1 at every budget, and the ceiling with
-108/108 reaches −0.0500 against watching's −0.2967.
+**P1–P3 refuted on coverage, P5 and P7 held, P6 and P8 refuted.** `ask-targeted`
+lands 1 of the 108 scored pairs at every budget, because the background surfaces
+are in every occasion so `conditional(background | anything)` is 1.0 and argmax
+goes there — the confound failure happening to the confound detector.
+`ask-mutual` nominates by `min(P(c|q), P(q|c))`, which the background cannot
+fake, and lands 53. Separation then falls to −0.5130.
 
-**Why targeting fails is the interesting part.** `occasions.py` holds the noise
-and distractor surfaces present in EVERY occasion, so `conditional(background |
-anything)` is 1.0, the largest the statistic can take, and a policy that asks
-about its highest-scoring partner is pulled to the background on every draw. It
-is the confound failure happening to the confound detector.
-
-**A policy CAN find them, and the metric still gets worse.** `ask-mutual`
-nominates by `min(P(c|q), P(q|c))`, which the background cannot fake because it
-predicts nothing in reverse. It lands 53 of 108 against targeting's 1, 47.8% of
-its asks are shadow pairs — P5 and P7 held — and separation falls to −0.5130.
-
-**Splitting the ceiling by what it may demote says why, and it is good news:**
-
-    shadows only        +0.2042      beats the confound outright
-    true partners only  −0.5509
-    both                −0.0500      watching −0.2967
-
-**`adjusted` is the bug.** It multiplies by the raw refusal rate, but a true
+**`adjusted` is the bug.** It reads a refusal rate as an absolute, but a true
 surface at `presence` 0.7 is genuinely detachable — refused 0.3837 against a
-shadow's 0.2222. Being detachable is not being no part of it; only the
-comparison between candidates carries signal. Control holds: at
-`shadow_alone` 0.0 the same shadows-only demotion gives −0.0135, not +0.2042.
+shadow's 0.2222. Being detachable is not being no part of it.
 
 **The comparative demotion was tried and is not the fix.** P8 refuted at
 −0.1264, P9 held. Comparing against the other candidates for the same query

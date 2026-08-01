@@ -34,11 +34,9 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
    paths — `r1(h, x) & r2(x, t) => r(h, t)` at 0.0460 — but it is a
    confidence-thresholded lookup rather than a ranked walk, so the combination
    of the two is untried and is the obvious next mechanism.
-2. **Keep the route, not just the endpoint.** `reach` returns each surface it
-   reached and the best path strength to it, and throws the path away. If a
-   concept is a traversal then the route is the object — and for a
-   link-prediction answer the route is also the explanation. It is also what
-   item 1 needs in order to know which relation types a path used.
+2. ~~Keep the route~~ — **done**. `grounding.routed` returns
+   `(strength, route)` and `reach` is that with the routes dropped. Item 1 can
+   now ask which edges a path used.
 3. **An error signal** (README §7). Nothing is currently ever wrong, because
    counts only go up. Predicting *relations* rather than tokens gives a signal
    that can be wrong without being next-token prediction.
@@ -131,8 +129,11 @@ cited anywhere.
   occasion for occasion — and `the-ask-retries-until-the-world-says-yes` and
   `an-ask-is-not-charged-for-what-it-drew` are registered. **Neither has been
   seen to go red**, because the FB15k runs were touching the tree all night and
-  the harness may not run alongside them. First thing to clear in the morning:
-  `python tools/mutate.py --only the-ask-retries-until-the-world-says-yes,an-ask-is-not-charged-for-what-it-drew`
+  the harness may not run alongside them. **`the-route-reported-is-not-the-
+  route-walked` is in the same state.** First thing to clear in the morning,
+  once the sweeps have stopped:
+
+      python tools/mutate.py --only the-ask-retries-until-the-world-says-yes,an-ask-is-not-charged-for-what-it-drew,the-route-reported-is-not-the-route-walked
 - **`experiments/` has six scripts and no harness.** They now share `Ranker` and
   `load` through `experiments/__init__.py`, which is the first step away from
   each script carrying its own copy, but argument parsing and JSON writing are

@@ -44,6 +44,11 @@ class SharedGraph:
     def __init__(self) -> None:
         self.index = CoOccurrence()
         self.space = Namespace()
+        #: Kinds THIS graph has been fed. Deliberately not read back from
+        #: `wiring`, which is process-global: several graphs in one run would
+        #: each report the others' kinds, and the first thing this check was
+        #: pointed at did exactly that.
+        self._held: set[str] = set()
 
     def reserve(self, kind: str, count: int) -> range:
         """Claim node numbers for a kind. **Does not declare that it arrived.**"""
@@ -67,6 +72,7 @@ class SharedGraph:
             seen.setdefault(kind, []).append(node)
         for kind, used in seen.items():
             wiring.kind(kind, used)
+            self._held.add(kind)
         self.index.observe(nodes)
         return nodes
 
@@ -102,5 +108,5 @@ class SharedGraph:
         return False
 
     def holds(self) -> set[str]:
-        """Which kinds have actually been observed, not merely reserved."""
-        return wiring.kinds() & set(self.space.kinds())
+        """Which kinds THIS graph has been fed, not merely reserved."""
+        return set(self._held)

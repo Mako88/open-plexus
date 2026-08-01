@@ -50,6 +50,8 @@ if str(ROOT) not in sys.path:
 
 import numpy as np  # noqa: E402
 
+from openplexus import wiring  # noqa: E402
+from openplexus.shared import SharedGraph  # noqa: E402
 from openplexus.grounding import (STATISTICS, CoOccurrence,  # noqa: E402
                                   equivalence_classes)
 from openplexus.grouping import codes as kmeans_codes  # noqa: E402
@@ -122,32 +124,56 @@ def stream(arm: str, pairs, codes: int, image_code, audio_code, rng):
     then the distractors. Carried from g36-04 so the stream is the one that
     table measured and only the front end differs.
     """
-    word = {digit: 2 * codes + digit for digit in range(len(mnist.WORDS))}
-    spare = 2 * codes + len(mnist.WORDS)
+    # ONE SHARED GRAPH, AND THE LAYOUT IS THE ONE THIS FUNCTION ALREADY HAD.
+    # The manual arithmetic below was a hand-rolled namespace -- image [0,
+    # codes), audio [codes, 2*codes), words above -- so `Namespace` produces
+    # byte-identical node numbers and the whole table is a regression check on
+    # the refactor. What changes is that the layout is now DECLARED, and
+    # `wiring` can be asked whether this graph really holds every sense.
+    shared = SharedGraph()
+    shared.reserve("image", codes)
+    shared.reserve("audio", codes)
+    shared.reserve("word", len(mnist.WORDS))
+    shared.reserve("distractor", DISTRACTORS)
 
-    index = CoOccurrence()
+    index = shared.index
     for position, (image_row, audio_row, digit) in enumerate(pairs):
         picture, sound = image_code[image_row], audio_code[audio_row]
         if picture < 0 or sound < 0:
             continue
-        present = {word[digit]}
+        present = [("word", digit)]
         if arm == "image+word":
-            present.add(picture)
+            present.append(("image", picture))
         elif arm == "audio+word":
-            present.add(codes + sound)
+            present.append(("audio", sound))
         elif arm == "together":
-            present.update({picture, codes + sound})
+            present += [("image", picture), ("audio", sound)]
         else:
             # THE STAR. Odd occasions carry the sound and even ones the picture,
             # so an image code and an audio code never once share an occasion.
-            present.add(picture if position % 2 == 0 else codes + sound)
+            present.append(("image", picture) if position % 2 == 0
+                           else ("audio", sound))
         # Noise is OTHER WORDS: things said in the room that are not about what
         # is being shown.
         for other in rng.choice(len(mnist.WORDS), NOISE, replace=False):
-            present.add(word[int(other)])
+            present.append(("word", int(other)))
         for extra in range(DISTRACTORS):
-            present.add(spare + extra)
-        index.observe(present)
+            present.append(("distractor", extra))
+        # De-duplicated, because `present` was a SET and a repeated word must
+        # not become two observations of the same node.
+        shared.observe(sorted(set(present)))
+
+    # WHAT THIS ARM'S GRAPH ACTUALLY HOLDS, checked against what the arm is.
+    # `image+word` holding audio would mean the arms are not what they say, and
+    # `alternating` missing one sense is the under-resourced case reporting
+    # itself instead of looking like a refuted mechanism.
+    wanted = {"word", "distractor"} | ({"image"} if arm == "image+word"
+                                       else {"audio"} if arm == "audio+word"
+                                       else {"image", "audio"})
+    if shared.holds() != wanted:
+        raise wiring.WiringError(
+            f"arm {arm!r} built a graph holding {sorted(shared.holds())}, "
+            f"not {sorted(wanted)}")
     return index
 
 

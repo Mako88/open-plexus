@@ -158,5 +158,31 @@ class ONE_GRAPH_MEANS_CONNECTED(unittest.TestCase):
         self.assertTrue(shared.linked("image", "fact", depth=2))
 
 
+class ONE_GRAPH_DOES_NOT_SEE_ANOTHERS_KINDS(unittest.TestCase):
+    """`wiring` is process-global; a graph is not.
+
+    Found by pointing the new declaration at `surfaces_pipeline`, which builds
+    one graph per arm in one process: the `audio+word` arm reported holding
+    IMAGE, because `holds()` read the previous arm's kinds out of global state.
+    """
+
+    def setUp(self):
+        wiring.reset()
+
+    def test_a_second_graph_does_not_inherit_the_first(self):
+        first = SharedGraph()
+        first.reserve("image", 4)
+        first.reserve("audio", 4)
+        first.observe([("image", 0)])
+
+        second = SharedGraph()
+        second.reserve("image", 4)
+        second.reserve("audio", 4)
+        second.observe([("audio", 0)])
+
+        self.assertEqual(first.holds(), {"image"})
+        self.assertEqual(second.holds(), {"audio"})
+
+
 if __name__ == "__main__":
     unittest.main()

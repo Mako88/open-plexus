@@ -320,7 +320,39 @@ than run end to end. **Default off**, so every earlier number stands.
 vacuity for the same reason the last one was, and a run that cannot show P19 is
 not evidence about P18 whichever way it comes out.
 
-### What happened: P16 is an ARTEFACT and is withdrawn
+### What happened: P19 HELD, P18 REFUTED, and the poisoning idea is dead
+
+    arm          budget  learns  per query  observed  on target
+    watch           0.0    True    -0.2967      4000          0
+    ask-repeat     0.10    True    -0.2954      4000          3
+    ask-repeat     0.10   False    -0.2975      3600          4
+    ask-mutual     0.10    True    -0.4099      4000         52
+    ask-mutual     0.10   False    -0.4253      3600         54
+
+P19 held: 3600 against 4000, so no index was starved and the numbers mean
+something this time. **P18 refuted.** Not learning from its own asks is worth
+-0.0021 to ask-repeat and -0.0154 to ask-mutual, which is to say nothing and
+slightly negative. **Asking does not poison the counts.**
+
+### And the 0.33 discrepancy is RESOLUTION, not coverage
+
+`ask-mutual` lands 52 scored pairs and reaches -0.4099 where the coverage curve
+puts 54 pairs at -0.0844. With poisoning dead, what is left is that the curve
+resolves every covered pair at 96 asks and the arm at budget 0.10 spreads about
+400 asks over 52 pairs -- roughly SEVEN each.
+
+That is consistent with the asks-per-pair sweep already here: the threshold rule
+is unusable at 12 asks per pair (-0.0802 at full coverage) and exact at 384. At
+seven it is worse than unusable, and a misclassified pair does not merely fail
+to help, it demotes a true partner.
+
+**So the constraint is the PRODUCT, pairs times asks-per-pair, and the budget
+bounds it.** An arm can have 52 pairs at 7 asks or 8 pairs at 48, and the curve
+that reaches +0.19 needed 108 at 96, which is 10,368 asks against a stream of
+4,000. Every separate explanation tried here -- policy, budget, noise, pricing,
+metric, coverage, poisoning -- has been a face of that one number.
+
+### P16 is an ARTEFACT and is withdrawn
 
     arm          budget   learns   per query   on target
     watch           0.0     True     -0.2967           0
@@ -694,7 +726,8 @@ def wrongly_demoted(config: OccasionConfig, statistic,
 
 
 def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
-            rng: random.Random, learn_from_asks: bool = True) -> dict:
+            rng: random.Random, learn_from_asks: bool = True,
+            interleave: bool = False) -> dict:
     """One arm on one world. Every arm spends `config.occasions` draws."""
     world = World(config)
     index = CoOccurrence()
@@ -702,13 +735,21 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
     asks = int(config.occasions * budget) if arm != "watch" else 0
     seen: list[int] = []
     shadow_asks = 0
+    made = 0
+    observed = 0
     staying: tuple | None = None
 
     while world.drawn < config.occasions:
         spend_on_ask = arm != "watch" and asks > 0 and len(seen) > 4
+        if interleave and spend_on_ask:
+            # MIX THEM THROUGH THE RUN. Without this an arm asks the moment
+            # it can and never watches again, which froze one index at a
+            # single observation and made -0.0741 look like a result.
+            spend_on_ask = made / max(world.drawn, 1) < budget
         if not spend_on_ask:
             occasion = world.watch()
             index.observe(occasion.surfaces)
+            observed += 1
             seen.extend(occasion.surfaces)
             continue
 
@@ -718,6 +759,7 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             candidate, query = staying
             answer = world.ask(present=candidate, absent=query)
             asks -= 1
+            made += 1
             if answer.occasion is not None:
                 # AN ASK-OCCASION IS NOT A SAMPLE OF THE WORLD. It was
                 # drawn conditioned on the candidate being present, so
@@ -725,6 +767,7 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
                 # this arm chose to ask about.
                 if learn_from_asks:
                     index.observe(answer.occasion.surfaces)
+                    observed += 1
                     seen.extend(answer.occasion.surfaces)
                 was, refused = refusals.get((candidate, query), (0, 0))
                 refusals[(candidate, query)] = (was + 1,
@@ -758,9 +801,11 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             continue
         answer = world.ask(present=candidate, absent=query)
         asks -= 1
+        made += 1
         if answer.occasion is not None:
             if learn_from_asks:
                 index.observe(answer.occasion.surfaces)
+                observed += 1
                 seen.extend(answer.occasion.surfaces)
             was, refused = refusals.get((candidate, query), (0, 0))
             refusals[(candidate, query)] = (was + 1, refused + answer.refused)
@@ -792,6 +837,7 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
         "shadow_share": (shadow_asks / (config.occasions * budget)
                          if budget and arm != "watch" else 0.0),
         "drawn": world.drawn,
+        "observed": observed,
     }
 
 

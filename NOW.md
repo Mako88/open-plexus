@@ -36,46 +36,20 @@ rates the arm paid for. At 384 asks per pair it reaches **+0.2256**, where an
 oracle calling `is_shadow` reaches **+0.2256** and watching reaches **−0.2967**.
 Tested; its mutation is caught.
 
-**No ARM has beaten watching, and it needs NEAR-TOTAL coverage rather than more
-of it.** Re-pricing an ask as one action (`charge_per_ask=1`, default off) lifts
-on-target pairs 6 → 25 and leaves separation at −0.3067; the ceiling only pays at
-108 of 108. Scored with a MEAN over true partners instead of the registered min,
-the arms stop being harmed (−0.2906 against watching's −0.2864) and still do not
-beat it, so the metric's strictness is not the obstacle. Best is
-`ask-repeat` with a per-query cut at −0.3054, 0.009 short, from −0.5130. Fixed
-along the way: concentrating asks beats spreading them, and fitting the cut per
-query beats fitting it globally (the arm's global cut was 0.6278 against an
-oracle boundary of 0.2870, because unscored pairs refuse at a median 0.6667).
+**The poisoning hypothesis is dead, and the whole thing is ONE number.** P18
+refuted, P19 held (indexes 3600 against 4000, so nothing was starved). Not
+learning from its own asks is worth −0.002 to `ask-repeat`.
 
-**The coverage cap is a fact about THIS HARNESS, and it is priced.** An ask
-costs 8.63 draws for a true partner, 2.91 for a shadow, 1.00 for background,
-against 1.00 for a watch — `World.ask` rejection-samples until the world yields
-the configuration. Equal exposure therefore charges asking up to 8.63× watching,
-and that is what starves every arm. A real intervening agent acts once.
-
-**I called that a leak and it is not one — withdrawn.** `ask` rejects on
-`present` and never on `absent`, so the cost is 1/P(present): 0.1223 → 8.17
-against 8.63 measured, 0.3597 → 2.78 against 2.91. That is the candidate's
-marginal, which watching counts for free and which is exactly what cannot
-separate a confound. The timing channel is redundant with counting, not ahead of
-it. The wrong claim came from comparing two ratios over different quantities.
-
-**P12 refuted at 100%.** Where there is a confound the split is nearly perfect
-(36 of 36 shadows); where there is not, it demotes all 72 true partners. The two
-cases differ by the low group's absolute level, 0.2105 against 0.3779 — the
-scale-free ratio is useless, 0.55 against 0.52. **Missing: an absolute anchor
-the arm can compute.**
-
-**P16 was an artefact and is WITHDRAWN.** An arm that discards its own
-ask-occasions scored −0.0741 against watching's −0.2967, and that is the metric
-reading nothing: its index observes ONE occasion, and separation goes to exactly
-0.0000 as an index empties. `spend_on_ask` needs `len(seen) > 4`, one watched
-occasion supplies that, and with learning off nothing refills the counts.
-**The hypothesis behind it is still untested** — it needs an arm that keeps
-watching while it asks, and that does not exist yet.
+**What is left is the product: pairs × asks-per-pair.** `ask-mutual` lands 52
+pairs and scores −0.4099 where the curve puts 54 pairs at −0.0844, because the
+curve resolves each at 96 asks and the arm affords about seven. The rule is
+unusable below ~12 asks per pair and exact at 384; a misclassified pair does not
+merely fail to help, it demotes a real part. Reaching +0.19 took 108 pairs × 96
+asks = 10,368 against a stream of 4,000. **Policy, budget, noise, pricing,
+metric, coverage and poisoning have each turned out to be a face of that.**
 
 **Scored:** P5, P7, P9, P11, P15 held. P1–P3, P6, P8, P10, P12, P13 refuted.
-P16 withdrawn.
+P16 withdrawn, P19 held, P18 refuted.
 P14 is unmeasurable — budget stops binding above 0.25.
 
 ## Next, in the order I would take them

@@ -482,6 +482,35 @@ not partial credit**, at 6 pairs or at 25. The ceiling reaches +0.1444 at 108.
 So the arms need near-total coverage rather than more of it, and nothing here
 has shown a way to buy that under any accounting.
 
+## P20 AND P21: A POLICY THAT WALKS THE GRAPH, registered before it exists
+
+**John's observation, and it is the only lead here that is not another face of
+the product bound.** Every policy in this file nominates by DIRECT association
+-- `conditional`, then mutual predictability -- and both are one-hop.
+`grep -c "pathways|flood|reach|routed"` in this file returns 0: it builds a
+graph out of every moment and then reads single edges from it.
+
+**A confound is a TWO-hop fact.** A shadow is tied to its concept's surfaces
+only THROUGH the concept: it has no reason of its own to co-occur with any
+particular surface, so its neighbourhood is the concept's neighbourhood and
+nothing else. A true partner has its own. That difference is visible in the
+graph and invisible to any single edge.
+
+    ask-structural   nominates the candidate whose neighbourhood is most nearly
+                     CONTAINED in the query's, which is what "tied to it only
+                     through the concept" looks like from outside
+
+    P20  ask-structural lands >30 of the 108 scored pairs on target at budget
+         0.10, matching what mutual predictability manages
+    P21  and it beats watching by >0.05, which no policy has done
+
+**P21 is the one that matters and the one I expect to fail.** The product bound
+says an arm must RESOLVE a rate per pair, and structure changes which pairs get
+asked, not how many asks each needs. If P20 holds and P21 fails, structure picks
+targets no better or worse than mutual predictability and the bound is
+untouched. If both hold, the bound was an artefact of asking about the wrong
+things.
+
 ## WHAT AN ASK COSTS, and a leak that has to be closed before it is used
 
 The arms are coverage-limited and the reason is priced, not chosen:

@@ -22,7 +22,8 @@ import tempfile
 import unittest
 
 from openplexus.tasks.clutrr import (
-    FACT, QUERY, RELATIONS, ClutrrConfig, Puzzle, by_repetition, load)
+    FACT, QUERY, RELATIONS, ClutrrConfig, Puzzle, by_repetition,
+    composition_table, load, reachable)
 
 REAL = pathlib.Path(__file__).resolve().parents[1] / "data" / "clutrr"
 HAS_REAL = (REAL / "gen_train23_test2to10" / "test.csv").exists()
@@ -263,6 +264,90 @@ class TheRepetitionSplitIsCompleteAndDisjoint(unittest.TestCase):
             self.assertTrue(all(p.max_appearances <= 2 for p in plain))
 
 
+class TheAlgebraIsReadOffTheDataAndNotFitted(unittest.TestCase):
+    """`composition_table` and `reachable`, on rows small enough to check by hand."""
+
+    def table(self, directory):
+        cfg = write([
+            ([(0, 1), (1, 2)], ["father", "sister"], (0, 2), "aunt"),
+            ([(0, 1), (1, 2)], ["aunt", "son"], (0, 2), "brother"),
+            # A THREE-hop row whose pair is not in the two-hop rows. It must not
+            # enter the table: it constrains the algebra without determining it,
+            # and using it would be inferring rather than counting.
+            ([(0, 1), (1, 2), (2, 3)], ["son", "son", "son"], (0, 3), "grandson"),
+        ], pathlib.Path(directory))
+        return composition_table(load(cfg)), cfg
+
+    def test_only_two_hop_rows_become_facts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            table, _ = self.table(directory)
+            self.assertEqual(len(table), 2)
+
+    def test_a_fact_is_the_row_it_came_from(self):
+        with tempfile.TemporaryDirectory() as directory:
+            table, cfg = self.table(directory)
+            father = cfg.relation_base + RELATIONS.index("father")
+            sister = cfg.relation_base + RELATIONS.index("sister")
+            aunt = cfg.relation_base + RELATIONS.index("aunt")
+            self.assertEqual(table[(father, sister)], aunt)
+
+    def test_a_chain_reduces_through_an_intermediate_it_was_never_told(self):
+        # father . sister . son -> aunt . son -> brother. The three-hop answer
+        # is not in the table and is reached by composing two facts, which is
+        # the whole of what `reachable` claims to do.
+        with tempfile.TemporaryDirectory() as directory:
+            table, cfg = self.table(directory)
+            ids = {name: cfg.relation_base + RELATIONS.index(name)
+                   for name in ("father", "sister", "son", "brother")}
+            found = reachable((ids["father"], ids["sister"], ids["son"]), table)
+            self.assertEqual(found, frozenset({ids["brother"]}))
+
+    def test_a_bracketing_the_left_to_right_reduction_would_miss(self):
+        """The connection test: the search has to be a search, not a fold."""
+        with tempfile.TemporaryDirectory() as directory:
+            table, cfg = self.table(directory)
+            ids = {name: cfg.relation_base + RELATIONS.index(name)
+                   for name in ("son", "father", "sister", "aunt")}
+            # son . father . sister: the left pair is unknown, so folding from
+            # the left stops dead. The RIGHT pair is `father . sister -> aunt`,
+            # and `son . aunt` is unknown too -- so this reduces to nothing and
+            # the two arms agree. What differs is that the search LOOKED.
+            self.assertNotIn((ids["son"], ids["father"]), table)
+            self.assertEqual(reachable((ids["son"], ids["father"],
+                                        ids["sister"]), table), frozenset())
+            # And here the right bracketing is the only one that works.
+            self.assertEqual(
+                reachable((ids["father"], ids["sister"], ids["son"]), table),
+                frozenset({cfg.relation_base + RELATIONS.index("brother")}))
+
+    def test_a_missing_pair_reaches_nothing_rather_than_guessing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            table, cfg = self.table(directory)
+            wife = cfg.relation_base + RELATIONS.index("wife")
+            self.assertEqual(reachable((wife, wife), table), frozenset())
+
+    def test_a_single_relation_is_itself_and_an_empty_chain_is_nothing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            table, cfg = self.table(directory)
+            wife = cfg.relation_base + RELATIONS.index("wife")
+            self.assertEqual(reachable((wife,), table), frozenset({wife}))
+            self.assertEqual(reachable((), table), frozenset())
+
+    def test_the_chain_is_carried_under_both_layouts(self):
+        # The relation sits at a different offset in each, so a chain recovered
+        # from `tokens` would read entity ids as relations under one of them.
+        rows = [([(0, 1), (1, 2)], ["father", "sister"], (0, 2), "aunt")]
+        with tempfile.TemporaryDirectory() as directory:
+            cfg = write(rows, pathlib.Path(directory))
+            for layout in ("closure", "kinship"):
+                puzzle = load(ClutrrConfig(root=cfg.root, config=cfg.config,
+                                           split="test", layout=layout))[0]
+                self.assertEqual(
+                    puzzle.chain,
+                    (cfg.relation_base + RELATIONS.index("father"),
+                     cfg.relation_base + RELATIONS.index("sister")))
+
+
 @unittest.skipUnless(HAS_REAL, "CLUTRR not fetched; run tools/fetch_clutrr.py")
 class ItReproducesTheCorpusCounts(unittest.TestCase):
     """The reproduction gate. Note 059's numbers, recomputed through the loader.
@@ -289,6 +374,44 @@ class ItReproducesTheCorpusCounts(unittest.TestCase):
     def test_test_reaches_ten_hops(self):
         puzzles = load(ClutrrConfig(root=REAL, split="test"))
         self.assertEqual(max(p.hops for p in puzzles), 10)
+
+    def test_the_whole_knowledge_of_the_benchmark_is_62_stated_facts(self):
+        table = composition_table(load(ClutrrConfig(root=REAL, split="train")))
+        self.assertEqual(len(table), 62)
+
+    def test_those_62_facts_answer_every_test_puzzle(self):
+        """**The benchmark's ceiling, and it is why a score on it proves little.**
+
+        No model, no training, no representation: count the two-hop training rows
+        into a table and search the bracketings. If this ever falls below 1.0 the
+        claim in `reachable`'s docstring has stopped being true and every
+        conclusion drawn from it needs revisiting.
+        """
+        table = composition_table(load(ClutrrConfig(root=REAL, split="train")))
+        puzzles = load(ClutrrConfig(root=REAL, split="test"))
+        found = sum(p.target in reachable(p.chain, table) for p in puzzles)
+        self.assertEqual(found, len(puzzles))
+
+    def test_and_the_difficulty_is_entirely_the_BRACKETING(self):
+        """The companion. Without it the test above reads as *the task is easy*.
+
+        The same 62 facts applied left to right answer 0.2757 of the split and
+        0.0252 at ten hops, so what the benchmark measures is finding the order
+        to apply knowledge in, not having it.
+        """
+        table = composition_table(load(ClutrrConfig(root=REAL, split="train")))
+        puzzles = load(ClutrrConfig(root=REAL, split="test"))
+        got = 0
+        for puzzle in puzzles:
+            current = puzzle.chain[0]
+            for following in puzzle.chain[1:]:
+                if (current, following) not in table:
+                    current = None
+                    break
+                current = table[(current, following)]
+            got += current == puzzle.target
+        self.assertLess(got / len(puzzles), 0.35)
+        self.assertGreater(got / len(puzzles), 0.20)
 
 
 if __name__ == "__main__":

@@ -550,6 +550,30 @@ MUTATIONS = [
         new="        return self._table.occasions or NotImplementedError(",
     ),
     Mutation(
+        name="the-composition-search-only-brackets-from-the-left",
+        breaks="the measurement that says what CLUTRR-symbolic is worth. "
+               "Reducing left to right instead of over every span answers "
+               "0.2757 of the test split rather than 1.0000, and 0.0252 at ten "
+               "hops -- so the benchmark would read as hard, the ceiling would "
+               "be invisible, and a model scoring 0.5 on it would look like "
+               "evidence of composition rather than like half of what a table "
+               "of 62 counted facts does",
+        path=CLUTRR,
+        old="            for split in range(start + 1, stop):",
+        new="            for split in range(start + 1, start + 2):",
+    ),
+    Mutation(
+        name="a-three-hop-row-is-counted-as-a-composition-fact",
+        breaks="the line between what the data STATES and what has to be "
+               "inferred. A three-hop row constrains the algebra without "
+               "determining it, and folding one into the table means the "
+               "ceiling is computed from inference and then reported as the "
+               "cost of counting",
+        path=CLUTRR,
+        old="        if len(puzzle.chain) == 2:",
+        new="        if len(puzzle.chain) >= 2:",
+    ),
+    Mutation(
         name="the-front-end-draws-its-planes-without-the-seed",
         breaks="the only reason the hash replaced a trained quantiser. The "
                "planes are the shared constant, and drawn afresh they are "

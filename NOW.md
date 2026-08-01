@@ -33,9 +33,13 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
 
 ## Known debts from the restructure
 
-- **CLUTRR composition has to be re-established on the count graph.** The result
-  that exists was measured on the store, which is gone. This is kill-list #1 and
-  it is the question that decides the project.
+- **Kill-list #1 has lost its instrument and needs a new one.** CLUTRR composition
+  was to be re-established on the count graph; `experiments/clutrr_ceiling.py`
+  then measured that 62 counted facts and a bracketing search answer 100% of the
+  split, so no score on it is evidence about understanding. What CLUTRR can still
+  measure is whether a mechanism finds the bracketing — the same facts folded
+  left to right score 0.28. **The question that decides the project is unchanged
+  and now has nothing pointed at it.**
 - **There is no node entry point.** `node_main.py` started the old store and was
   deliberately not carried over.
 - **`openplexus/tasks/asking.py` has no tests and no mutation**, so by this

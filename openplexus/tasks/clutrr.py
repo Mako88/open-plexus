@@ -192,6 +192,10 @@ class Puzzle:
         hops: Stated edges. The axis CLUTRR advertises.
         max_appearances: How often the most-repeated entity appears across the
             stated edges. **The axis CLUTRR does not advertise** — note 059.
+        chain: The stated relations in walk order, as relation ids. Carried
+            straight from `edge_types` rather than recovered from `tokens`,
+            because the two layouts put the relation at different offsets and a
+            reader that guessed would silently read entity ids as relations.
     """
 
     tokens: tuple[int, ...]
@@ -199,6 +203,7 @@ class Puzzle:
     target: int
     hops: int
     max_appearances: int
+    chain: tuple[int, ...] = ()
 
 
 def _entity_ids(edges, query, config: ClutrrConfig) -> dict[int, int]:
@@ -274,8 +279,78 @@ def load(config: ClutrrConfig) -> list[Puzzle]:
                 target=config.relation_base + _RELATION_ID[target],
                 hops=len(edges),
                 max_appearances=max(appearances.values()),
+                chain=tuple(config.relation_base + _RELATION_ID[name]
+                            for name in types),
             ))
     return puzzles
+
+
+def composition_table(puzzles: list[Puzzle]) -> dict[tuple[int, int], int]:
+    """`(first, second) -> the relation that spans both`, from 2-hop puzzles only.
+
+    A two-hop puzzle states exactly this and nothing else: walk `first` then
+    `second`, and the question is what relates the two ends. Reading it off is
+    not a model — it is what the row says.
+
+    **Measured on `gen_train23_test2to10`: 62 pairs, every one with a single
+    answer, all 4,076 two-hop training rows explained.** The relation algebra is
+    a function, not a distribution, so a later entry never contradicts an earlier
+    one and the first is kept.
+
+    Longer puzzles are ignored deliberately. A three-hop row constrains the
+    table without determining it, and using one would mean inferring — which is
+    the thing being measured rather than part of the measurement.
+    """
+    table: dict[tuple[int, int], int] = {}
+    for puzzle in puzzles:
+        if len(puzzle.chain) == 2:
+            table.setdefault((puzzle.chain[0], puzzle.chain[1]), puzzle.target)
+    return table
+
+
+def reachable(chain: tuple[int, ...],
+              table: dict[tuple[int, int], int]) -> frozenset[int]:
+    """Every relation `chain` reduces to under ANY bracketing. **The ceiling.**
+
+    A chain of relations is an expression in an algebra whose only rule is the
+    table, and this is that expression evaluated every way it can be bracketed —
+    the standard CYK recurrence over spans.
+
+    **Why this exists, and it is the most important thing in this file.** The
+    difference between reducing left to right and searching the bracketings is
+    the difference between 0.2757 and 1.0000 on the test split. That is the whole
+    of what `gen_train23_test2to10` asks: the knowledge needed is 62 facts
+    countable from the two-hop training rows, and everything else is finding the
+    order to apply them in.
+
+    So **a score on this benchmark is not evidence that anything was understood**,
+    and the shuffled control says the ceiling is not an artefact of a permissive
+    search: with the table's answers shuffled the same search finds the target for
+    0.12 of puzzles and its reachable set balloons from 1.01 relations to 2.4.
+
+    Returns:
+        The reachable relations. A singleton for 99% of the test split, which is
+        why *contains the answer* and *answers correctly* barely differ here — but
+        they are different claims, and a caller reporting the first as the second
+        is overstating by however often the set is larger.
+    """
+    size = len(chain)
+    if size == 0:
+        return frozenset()
+    spans = [[frozenset() for _ in range(size + 1)] for _ in range(size + 1)]
+    for start, relation in enumerate(chain):
+        spans[start][start + 1] = frozenset({relation})
+    for width in range(2, size + 1):
+        for start in range(0, size - width + 1):
+            stop = start + width
+            found: set[int] = set()
+            for split in range(start + 1, stop):
+                for left in spans[start][split]:
+                    for right in spans[split][stop]:
+                        if (left, right) in table:
+                            found.add(table[(left, right)])
+            spans[start][stop] = frozenset(found)
+    return spans[0][size]
 
 
 def by_repetition(puzzles: list[Puzzle], repeated: bool) -> list[Puzzle]:

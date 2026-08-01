@@ -101,6 +101,7 @@ necessarily words** — an action is an output, and so is a structure.
 - ⬜ Learn from live sensors, test on labelled data never trained on — *the only named way to tell whether a microphone-and-camera system learned anything.*
 - ⬜ Beat a conventional system on the same input — *nobody has run it, and it is the first thing an outsider would ask for.*
 - ⬜ Noise that is sticky rather than uniform — *real irrelevant co-occurrence recurs together; ours is white noise, and ideas refuted against it are untested rather than dead.*
+- ❌ ~~CLUTRR-symbolic as evidence of composition~~ — *62 facts counted from its two-hop training rows, plus a search over bracketings, answer 100% of the test split at every hop count and reach 1.01 relations per puzzle; a shuffled table scores 0.12. It measures whether a system can find the ORDER to apply knowledge in — left to right, the same facts score 0.28.* **Revives if** a configuration is found whose relation algebra is not confluent, or when the question being asked is about search.
 - ❌ ~~Train, then test~~ — *measures a system that stops, which is the one thing C4 forbids.*
 - ❌ ~~Bits per token on text~~ — *bounded by what an n-gram table does, so it cannot show what structure adds.*
 

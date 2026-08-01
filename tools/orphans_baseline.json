@@ -1,0 +1,8 @@
+{
+  "bucket_peer": "the peer that answers reads over a socket. Nothing runs a node -- node_main.py was deliberately not carried over in the restructure -- so the whole distributed half has tests and no caller.",
+  "deployment": "decides how many slices a machine can hold. Reads a cgroup and plans for a node nobody starts.",
+  "federated": "the count graph split across owners, with the remote reads counted. Same missing entry point.",
+  "sketch": "records THAT an address was written. Built for the superposed store the restructure deleted; surfaces.Hyperplanes now owns the hash it contributed, so the useful half survived and the sketch itself has no consumer.",
+  "tasks.asking": "a world that can be ASKED rather than only watched. Its falsifier was registered as g44-01 and never run, so the task exists and the experiment that would use it does not.",
+  "tasks.xsl": "cross-situational word learning, read from external trials. No sweep currently reads it."
+}

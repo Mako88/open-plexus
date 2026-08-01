@@ -60,6 +60,7 @@ import numpy as np  # noqa: E402
 from experiments.fb15k237_audit import (PUBLISHED, Marginal,  # noqa: E402
                                         Ranker, load, metrics)
 from openplexus.composition import Composition  # noqa: E402
+from openplexus.pathways import PathTypes  # noqa: E402
 from openplexus.grounding import COMBINERS, STATISTICS  # noqa: E402
 
 #: The statistic, for the path-type counts and for the relation marginal alike.
@@ -160,8 +161,9 @@ def main() -> int:
           f"{sum(len(v) for v in out_of.values()) / max(len(out_of), 1):.1f}, "
           f"largest {max(len(v) for v in out_of.values())}")
 
-    # THE PATH-TYPE COUNTS. Composition again, over relation pairs.
-    paths = Composition(width, right=width, target=len(relations))
+    # THE PATH-TYPE COUNTS. `pathways.PathTypes`, which is where this
+    # mechanism lives now -- the sweep discovered it and the library owns it.
+    paths = PathTypes(kinds=width, spans=len(relations))
     counted = 0
     for head, relation, tail in train:
         target = relation_at[relation]
@@ -198,14 +200,10 @@ def main() -> int:
     predicts: dict = {}
 
     def path_weight(first, second, asked):
+        """`PathTypes.weight`, cached -- the same pair recurs constantly."""
         key = (first, second, asked)
         if key not in predicts:
-            answer = paths.surface("target", asked)
-            score = min(statistic(paths.index, answer,
-                                  paths.surface("left", first)),
-                        statistic(paths.index, answer,
-                                  paths.surface("right", second)))
-            predicts[key] = float(score)
+            predicts[key] = paths.weight(first, second, asked, statistic)
         return predicts[key]
 
     rows: list[dict] = []

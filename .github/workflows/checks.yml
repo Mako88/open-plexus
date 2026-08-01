@@ -60,6 +60,11 @@ jobs:
       # cp1252 console the day it was written.
       - name: Every experiment script starts
         run: python tools/check_experiments.py
+      # A module nothing calls gets rediscovered and rebuilt. That is the
+      # failure that forced this project's restructure, and it is the one
+      # check here that guards the RECORD rather than the code.
+      - name: Nothing is built and left unwired
+        run: python tools/check_orphans.py
       - name: No commit message had a word eaten by a shell
         run: python tools/check_commit_messages.py
       - name: Every pinned number says where it came from

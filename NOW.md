@@ -61,11 +61,20 @@ Delete a line when it is done. Nothing may cite this file.
 
 ## Known debts
 
-- **Nothing runs as a node.** `bucket_peer`, `federated`, `deployment` are in
-  `tools/orphans_baseline.json` because no entry point starts one. **The
-  distributed half — the project's actual claim — is untested end to end**, and
-  FB15k measures knowledge-graph completion instead, which the README names as
-  the failure case.
+- **THE DISTRIBUTED TESTBED DOES NOT RUN.** `testbed/driver.py` imports
+  `openplexus.distributed` and `openplexus.models.local_memory`, both deleted in
+  the restructure, so it parses and cannot load. `run.py` also documents a
+  `--mode bucket` the driver has no code for. Its docstring says the container
+  runs were verified on Docker Desktop and on CI, and two workflows exist, so
+  those runs did happen — **against code that is gone.**
+
+  Nothing caught it: `check_imports` skips `testbed/` because it "expects a
+  container runtime", and `check_orphans` counts `testbed/` as a CALLER, so
+  `bucket_peer` and `federated` look wired by a thing that cannot start. That is
+  the `experiments/` hole one directory over, and the same fix applies.
+
+  **This is the project's actual claim and it is unrunnable**, which is worse
+  than the "untested" this file said before.
 - **`tasks/asking.py` has a falsifier registered as g44-01 and never run.**
 - **`tasks/xsl.py` has no caller.** Use it or drop it.
 - **The link columns in `surfaces_pipeline.py` step in tenths** — shares over ten

@@ -55,12 +55,25 @@ if str(ROOT) not in sys.path:
 
 #: Packages whose every module must load. `experiments/` is out by design -- see
 #: the docstring; `testbed/` is out because it expects a container runtime.
-SCANNED = ("openplexus", "tools", "tests")
+SCANNED = ("openplexus", "tools", "tests", "testbed")
 
 #: Modules that are entry points with side effects at import, or that this file
 #: would recurse into. Kept explicit rather than pattern-matched so an addition
 #: is a visible decision.
 SKIP = {"tools.check_imports"}
+
+#: Modules that are KNOWN BROKEN, with why. **Not the same list as SKIP and
+#: deliberately so**: a skipped module is one there is no point loading, and a
+#: carried one is one that ought to load and does not. Every run prints these,
+#: because a debt nobody sees is the thing this project keeps rediscovering.
+CARRIED = {
+    "testbed.driver":
+        "imports openplexus.distributed and openplexus.models.local_memory, "
+        "both deleted in the restructure. The container runs its docstring "
+        "claims did happen, against code that is gone -- so the DISTRIBUTED "
+        "half, which is the project's actual claim, cannot start. Rewriting it "
+        "against bucket_peer is the job.",
+}
 
 
 def modules() -> list[str]:
@@ -77,7 +90,7 @@ def modules() -> list[str]:
             if not parts:
                 continue
             name = ".".join(parts)
-            if name not in SKIP:
+            if name not in SKIP and name not in CARRIED:
                 found.append(name)
     return found
 
@@ -100,7 +113,10 @@ def main() -> int:
               "broken module reached\na green pre-commit run on 2026-07-31.")
         return 1
 
-    print(f"imports ok - {len(names)} module(s) across {len(SCANNED)} packages")
+    print(f"imports ok - {len(names)} module(s) across {len(SCANNED)} packages"
+          + (f", {len(CARRIED)} known broken" if CARRIED else ""))
+    for name, why in sorted(CARRIED.items()):
+        print(f"        CARRIED {name}: {why}")
     return 0
 
 

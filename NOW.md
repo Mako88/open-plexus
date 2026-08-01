@@ -13,42 +13,20 @@ Delete a line when it is done. Nothing may cite this file.
 
 ---
 
-## What the flood established, and one claim it withdrew
+## The flood: what is left of it
 
-**Meaning-gating beats strength-gating. The flood does not beat the flat
-enumeration**, and I reported that it did on sixty queries before the matched
-run existed:
+Settled and in the commit record: meaning-gating beats strength-gating by about
+two to one, and the flood does NOT beat the flat enumeration (+0.0081 against
++0.0136 at 300 queries). A +0.0164 reported at sixty queries was withdrawn.
 
-    arm                            margin   arrived   expansions
-    flood, depth 2, floor 0.05    +0.0081    0.3417       31,316
-    flood, depth 3, floor 0.05    +0.0052    0.3833      167,852
-    flood, strength gate, best    +0.0034
-    capped two-step enumeration   +0.0136    0.35         ~1,400
+**What is unfinished.** A route that composes confidently barely decays, so the
+floor kills what means nothing and does not bound what means something. The
+floor and a beam do different jobs and `flood` has only the floor.
 
-All at 300 queries except the enumeration, which is the full 40,932. The
-withdrawn number was **+0.0164 at sixty queries** — the same small-sample
-mistake the popularity bands made earlier the same day, made again within hours
-of writing that one up.
-
-**What survives.** Gating on what a route MEANS is worth roughly twice gating on
-how well connected things are, which was the real question about the design's
-shape. And depth 3 costs five times depth 2, abandons 74% of its walks at the
-ceiling, and scores worse — reaching more (0.38 against 0.34) while ranking
-worse, which is *being reachable is not being findable* arriving again.
-
-**The diagnosis is structural.** A route that composes confidently barely
-decays, so a meaning floor kills what means nothing and does nothing to bound
-what means something, and those multiply. The floor and a beam do different
-jobs: the floor removes the meaningless, a beam bounds how many meaningful
-routes are carried. `flood` deliberately has no beam because the design asked
-for the weight to be the whole budget. It needs both.
-
-**And EXPANSIONS IS THE WRONG COST COLUMN for this project.** John's point,
-2026-08-02: on a machine where every node expands its own edges in parallel,
-wall clock is the longest path rather than the sum of all work, so 167,852
-expansions across a network is not 167,852 anything. The costs that transfer are
-MESSAGES SENT and WORK PER NODE, and neither is measured. The ceiling firing on
-74% of queries is a bandwidth statement, not a latency one.
+**And EXPANSIONS IS THE WRONG COST COLUMN here.** John's point: where every node
+expands its own edges in parallel, wall clock is the longest path, not the sum
+of all work. The costs that transfer are MESSAGES SENT and WORK PER NODE and
+neither is measured.
 
 ## g44-01 ran: the mechanism works, both policies were starved
 

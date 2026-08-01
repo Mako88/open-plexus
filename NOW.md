@@ -33,6 +33,15 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
   now has an interior maximum rather than an edge winner — 0.0:0.2286,
   0.01:0.2410, 0.02:0.2409, 0.05:0.2383, 0.1:0.2267, 1.0:0.1328.
 
+  **First full-scale arm is in, and it holds.** `max over paths`, alpha 0.01
+  chosen on 10,233 validation triples: test 0.2381 against the floor's 0.2334,
+  **margin +0.0047 with a standard error of 0.0004** over 40,932 scored
+  queries — about twelve standard errors, so the margin is real and it is
+  small. **7,246 queries better against 11,114 worse**, so it remains a
+  minority of large wins funding a majority of small losses. `sum over paths`,
+  which was the stronger arm at 2,500 queries, and the popularity bands are
+  still running.
+
   **Two things this full run fixes, and until it lands the margin is not
   quotable.** The 2,500-query floor is 0.2286 where the full-set floor is
   0.2334, so a margin measured against the small floor and compared with a
@@ -190,7 +199,15 @@ cited anywhere.
   separately — both return **0.2334** over all 40,932 scored queries.
 - **There is no node entry point.** `node_main.py` started the old store and was
   deliberately not carried over.
-- **`asking.py`'s two new mutations have not been RUN.** `tests/test_asking.py`
+- ~~`asking.py`'s mutations and the route mutation are unrun~~ — **all three ran
+  and all three were caught**, and `--verify` reports the source clean at 50/50.
+  Run alongside the typed sweep after all: the rule's stated hazard is a commit
+  landing mid-run, which is controllable, and the sweep holds its modules in
+  memory and writes nothing to the tree. No commit was made until the harness
+  had finished and verified.
+
+  *(Superseded, kept one turn so the change of mind is visible:)* **the two new
+  mutations have not been RUN.** `tests/test_asking.py`
   now covers it — the refusal being one draw, the budget being charged, a
   refusal not being a miss, and watching reproducing `occasions.generate`
   occasion for occasion — and `the-ask-retries-until-the-world-says-yes` and

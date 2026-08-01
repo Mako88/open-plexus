@@ -92,10 +92,18 @@ COMBINERS_SWEPT = ("min", "mean")
 ALPHAS = (0.0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.0)
 
 #: Cap on the branching factor when enumerating two-step routes, and it is
-#: PRINTED. The mean out-degree is about 37 and the largest is 1,325, so a
+#: PRINTED. The mean out-degree is about 37 and the largest is 7,614, so a
 #: handful of hub entities would otherwise dominate the cost of every query they
 #: appear in. Chosen here; a cap that is not reported lets a partial enumeration
 #: read as a complete one.
+#:
+#: **What it takes is now a random subset rather than the first N.** The edges
+#: were in insertion order, so a hub's slice was whichever triples happened to
+#: be read first -- an arbitrary and systematically biased sample, and the
+#: reached/never-reached split traced most of the mechanism's losses to answers
+#: no path arrived at. Each entity's list is shuffled ONCE at build time with a
+#: seeded generator, so the prefix is a uniform sample, the cost per query is
+#: unchanged, and two runs at one seed still agree exactly.
 FANOUT = 200
 
 
@@ -117,6 +125,10 @@ def main() -> int:
     # Chosen here; it picks the query subsample and the training sample for the
     # path counts, and both are reported.
     parser.add_argument("--seed", type=int, default=0)
+    # Swept from the command line rather than pinned in the file, because the
+    # reached/never-reached split says this is the binding constraint and cost
+    # grows as its square -- so it is a budget to be spent deliberately.
+    parser.add_argument("--fanout", type=int, default=FANOUT)
     args = parser.parse_args()
 
     started = time.time()
@@ -136,9 +148,15 @@ def main() -> int:
     for head, relation, tail in train:
         out_of[head].append((relation_at[relation], tail))
         out_of[tail].append((relation_at[relation] + len(relations), head))
+    # SHUFFLED ONCE, so the cap below samples rather than taking whichever
+    # triples were read first. Seeded, so the run stays reproducible.
+    shuffler = random.Random(args.seed)
+    for edges in out_of.values():
+        shuffler.shuffle(edges)
     print(f"{len(train)} triples, {len(relations)} relations, "
           f"{width} directed relation ids")
-    print(f"fan-out capped at {FANOUT}; mean out-degree "
+    print(f"fan-out capped at {args.fanout}, sampled not prefixed; "
+          f"mean out-degree "
           f"{sum(len(v) for v in out_of.values()) / max(len(out_of), 1):.1f}, "
           f"largest {max(len(v) for v in out_of.values())}")
 
@@ -147,7 +165,7 @@ def main() -> int:
     counted = 0
     for head, relation, tail in train:
         target = relation_at[relation]
-        for first, second, end in routes(out_of, head, FANOUT):
+        for first, second, end in routes(out_of, head, args.fanout):
             if end == tail:
                 paths.observe(first, second, target)
                 counted += 1
@@ -220,7 +238,7 @@ def main() -> int:
                     given, answer = ((head, tail) if direction == "tail"
                                      else (tail, head))
                     vector = np.zeros(len(entities))
-                    for first, second, end in routes(out_of, given, FANOUT):
+                    for first, second, end in routes(out_of, given, args.fanout):
                         weight = path_weight(first, second, asked)
                         if weight <= 0.0:
                             continue
@@ -238,7 +256,7 @@ def main() -> int:
                                                direction)
                     ranks.append(middle)
             got = metrics(ranks) | {"arm": combine, "accumulate": accumulate,
-                                    "statistic": STATISTIC, "fanout": FANOUT}
+                                    "statistic": STATISTIC, "fanout": args.fanout}
             got["margin"] = got["mrr"] - floor["mrr"]
             rows.append(got)
             label = f"{accumulate} over paths / {combine}"
@@ -262,7 +280,7 @@ def main() -> int:
         per-query arm read the same vector and differ only in the weight.
         """
         vector = np.zeros(len(entities))
-        for first, second, end in routes(out_of, given, FANOUT):
+        for first, second, end in routes(out_of, given, args.fanout):
             weight = path_weight(first, second, asked)
             if weight <= 0.0:
                 continue

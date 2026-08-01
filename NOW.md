@@ -14,10 +14,17 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
 
 ## In flight
 
-- **`fb15k237_walk.py` is running the full grid at 4,000 queries**, in the
-  background, writing `out/fb15k237-walk.txt`. The 120-query smoke run is what
-  the numbers below come from; when the big run lands, check the sign of the
-  margin has not changed and update README §4 if it has.
+- **`fb15k237_walk.py` at 4,000 queries** → `out/fb15k237-walk.txt`. Partial
+  rows so far agree with the smoke run (depth 2 beam 16 mean, −0.0418).
+- **`fb15k237_typed.py` at 2,500 queries** → `out/fb15k237-typed.txt`. **This is
+  the one to read first in the morning.** At 150 queries it produced the only
+  positive margin of the night — `sum over paths`, blend weight 0.05 chosen on
+  validation, test 0.2277 against the floor's 0.2170, **+0.0107**. That is 300
+  scored queries and the margin is inside the noise at that size, and 0.05 was
+  the smallest non-zero weight on the grid, so **it is not a result yet.** This
+  run extends the grid down to 0.01 and raises n by 16x. If the margin holds at
+  0.01-0.05 it is the first thing the project's own mechanism has done on
+  external data; if it collapses, the night's answer is a clean four-way null.
 
 ## Next, in the order I would take them
 
@@ -40,6 +47,19 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
    separate open questions.
 
 ## What tonight established
+
+- **The structural signal is real and it is small.** Ranked on its own, with no
+  marginal mixed in: untyped walk 0.0082, the audit's thresholded rule miner
+  0.0460, typed ranked paths **0.1234**. Each mechanism roughly doubles the one
+  before it, and all three sit below the 0.2334 a marginal reaches by ignoring
+  the question entirely.
+- **`sum` over paths beats `max` over paths** — 0.1234 against 0.0834 — which is
+  the claim that separates a ranked walk from a thresholded lookup: many weak
+  agreeing paths outrank one strong path. That is the first thing measured this
+  week that came out the way the architecture says it should.
+- **Fixed combiners were the wrong question.** `min` and `mean` both land below
+  the floor, so they say more about the mix than the signal; the swept blend is
+  what asks properly, and alpha 0 is the floor by construction.
 
 - **The walk does not clear the marginal either, and it is not under-searched.**
   Best arm 0.2025 against a floor of 0.2290, over depths 1 to 3 and beams 4 to

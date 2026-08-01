@@ -53,8 +53,8 @@ if str(ROOT) not in sys.path:
 
 import numpy as np  # noqa: E402
 
-from experiments.fb15k237_audit import (PUBLISHED, Ranker,  # noqa: E402
-                                        load, metrics)
+from experiments.fb15k237_audit import (PUBLISHED, Marginal,  # noqa: E402
+                                        Ranker, load, metrics)
 from openplexus.composition import Composition  # noqa: E402
 from openplexus.grounding import COMBINERS, CoOccurrence, STATISTICS, reach  # noqa: E402
 
@@ -132,19 +132,8 @@ def main() -> int:
     print(f"scoring {len(queries)} triples in both directions\n")
 
     statistic = STATISTICS[STATISTIC]
-    marginal_cache: dict = {}
-
-    def relation_vector(relation: str, direction: str) -> np.ndarray:
-        """`P(candidate | relation)` as a dense vector. The floor, cached."""
-        key = (relation, direction)
-        if key not in marginal_cache:
-            want = "target" if direction == "tail" else "left"
-            vector = np.zeros(len(entities))
-            for score, candidate in counts.given(
-                    {"right": relation_at[relation]}, want, statistic):
-                vector[candidate] = score
-            marginal_cache[key] = vector
-        return marginal_cache[key]
+    # The floor, shared with every other FB15k run rather than written again.
+    floor_of = Marginal(counts, entities, relation_at, statistic)
 
     rows: list[dict] = []
     header = (f"{'arm':<30}{'MRR':>9}{'hits@1':>9}{'hits@10':>9}"
@@ -157,7 +146,7 @@ def main() -> int:
         for direction in ("tail", "head"):
             given, answer = ((head, tail) if direction == "tail"
                              else (tail, head))
-            _, middle, _ = ranker.rank(relation_vector(relation, direction),
+            _, middle, _ = ranker.rank(floor_of.vector(relation, direction),
                                        given, relation, answer, direction)
             floor_ranks.append(middle)
     floor = metrics(floor_ranks)
@@ -185,7 +174,7 @@ def main() -> int:
                                 beam=beam, depth=depth).items():
                             vector[surface] = strength
                         if combine != "walk only":
-                            other = relation_vector(relation, direction)
+                            other = floor_of.vector(relation, direction)
                             rule = COMBINERS[combine]
                             vector = np.array([rule(a, b) for a, b
                                                in zip(vector, other)])

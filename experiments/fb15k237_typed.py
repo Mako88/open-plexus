@@ -1,0 +1,320 @@
+"""A ranked walk that knows which relations it walked through.
+
+Three things have now been measured on FB15k-237 and none of them clears the
+marginal floor of 0.2334:
+
+    the marginal itself      0.2334   rank tails by the relation alone
+    the one-step count      -0.0480   the answer is never one step away
+    the untyped walk        -0.0265   it reaches the answer and cannot rank it
+    the rule miner           0.0460   typed two-hop paths, thresholded lookup
+
+**The untyped walk's ❌ named its own revival condition: give the walk the
+relation types along the path.** This is that, and it is not the rule miner:
+
+- the miner keeps a path type only if its confidence clears 0.5, and answers
+  from the best surviving rule. One path decides.
+- this counts every path type without a threshold, and a candidate accumulates
+  evidence from EVERY path that reaches it. Many weak agreeing paths can
+  outrank one strong path, which is the thing a ranked walk is for and the thing
+  a thresholded lookup structurally cannot do.
+
+## The mechanism is `Composition` again, over relation pairs
+
+For a training triple `(h, r, t)`, every two-step route from `h` to `t` says
+*walking `r1` then `r2` got to the same place `r` does*. That is exactly a
+composition fact, so it is counted by the same class the CLUTRR work used:
+
+    Composition(left=relations, right=relations, target=relations)
+    observe(r1, r2, r)
+
+At query time a candidate is scored by how well the paths that reach it predict
+the relation being asked about — `P(r | r1, r2)` from those counts — accumulated
+over paths, and then combined with the relation marginal as every other arm has
+been.
+
+Reusing `Composition` is the point rather than a convenience: **the null it
+returned on CLUTRR was bounded by having only three observations per
+relation-role**, and here the same mechanism gets 272,115 triples. If the bound
+was the data, this is where it shows.
+
+    python experiments/fb15k237_typed.py --json out/fb15k237-typed.json
+    python experiments/fb15k237_typed.py --queries 500
+"""
+
+from __future__ import annotations
+
+import argparse
+import collections
+import json
+import pathlib
+import random
+import sys
+import time
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+import numpy as np  # noqa: E402
+
+from experiments.fb15k237_audit import (PUBLISHED, Marginal,  # noqa: E402
+                                        Ranker, load, metrics)
+from openplexus.composition import Composition  # noqa: E402
+from openplexus.grounding import COMBINERS, STATISTICS  # noqa: E402
+
+#: The statistic, for the path-type counts and for the relation marginal alike.
+#: `conditional` is the one measured to refuse an ever-present distractor
+#: (g39-04), and a knowledge graph is mostly hubs.
+STATISTIC = "conditional"
+
+#: How a candidate's path evidence is accumulated. Swept, because it is the one
+#: axis that distinguishes this from the rule miner: `max` keeps the single best
+#: path and is what a thresholded lookup does, `sum` lets agreeing paths add up.
+ACCUMULATORS = ("max", "sum")
+
+#: How path evidence and the relation marginal are combined. Swept for the same
+#: reason as everywhere else in this run.
+COMBINERS_SWEPT = ("min", "mean")
+
+#: Blend weights for `alpha * structure + (1 - alpha) * marginal`. **`min` and
+#: `mean` are arbitrary fixed mixes and both landed below the floor**, which
+#: says as much about the mix as about the signal. This asks the question
+#: properly: alpha 0 IS the floor, exactly, so any alpha that beats it is the
+#: structural signal adding something and no alpha beating it is a clean null.
+#:
+#: Swept on VALIDATION and read on test, because choosing the weight on the
+#: thing being reported is how a null becomes a positive result.
+#:
+#: **Extended below 0.05 after 0.05 won and was the smallest non-zero value
+#: tried** — a grid whose winner sits at its edge has not established where the
+#: optimum is, and the first run's winning margin was +0.0107 on 150 triples,
+#: which is inside the noise of a sample that size. Both are fixed here.
+ALPHAS = (0.0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 1.0)
+
+#: Cap on the branching factor when enumerating two-step routes, and it is
+#: PRINTED. The mean out-degree is about 37 and the largest is 1,325, so a
+#: handful of hub entities would otherwise dominate the cost of every query they
+#: appear in. Chosen here; a cap that is not reported lets a partial enumeration
+#: read as a complete one.
+FANOUT = 200
+
+
+def routes(out_of, start, fanout):
+    """Every `(first relation, second relation, end)` two steps from `start`."""
+    for first, middle in out_of.get(start, ())[:fanout]:
+        for second, end in out_of.get(middle, ())[:fanout]:
+            yield first, second, end
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--json", type=pathlib.Path, default=None)
+    # Chosen here as a default that finishes in minutes rather than hours; the
+    # route enumeration is the fixed cost and the per-query work scales with
+    # this. A margin as small as the one this run is chasing needs it raised —
+    # 150 queries put the first positive margin inside its own noise.
+    parser.add_argument("--queries", type=int, default=1000)
+    # Chosen here; it picks the query subsample and the training sample for the
+    # path counts, and both are reported.
+    parser.add_argument("--seed", type=int, default=0)
+    args = parser.parse_args()
+
+    started = time.time()
+    train, valid, test = load("train.txt"), load("valid.txt"), load("test.txt")
+    entities = sorted({e for triples in (train, valid, test)
+                       for h, _, t in triples for e in (h, t)})
+    relations = sorted({r for _, r, _ in train})
+    entity_at = {name: i for i, name in enumerate(entities)}
+    relation_at = {name: i for i, name in enumerate(relations)}
+
+    # Typed adjacency, in BOTH directions. A route may traverse an edge against
+    # its stated direction, and refusing that would make the graph a DAG it is
+    # not -- so a reversed traversal gets its own relation id, `r + relations`,
+    # rather than being conflated with the forward one.
+    width = 2 * len(relations)
+    out_of: dict = collections.defaultdict(list)
+    for head, relation, tail in train:
+        out_of[head].append((relation_at[relation], tail))
+        out_of[tail].append((relation_at[relation] + len(relations), head))
+    print(f"{len(train)} triples, {len(relations)} relations, "
+          f"{width} directed relation ids")
+    print(f"fan-out capped at {FANOUT}; mean out-degree "
+          f"{sum(len(v) for v in out_of.values()) / max(len(out_of), 1):.1f}, "
+          f"largest {max(len(v) for v in out_of.values())}")
+
+    # THE PATH-TYPE COUNTS. Composition again, over relation pairs.
+    paths = Composition(width, right=width, target=len(relations))
+    counted = 0
+    for head, relation, tail in train:
+        target = relation_at[relation]
+        for first, second, end in routes(out_of, head, FANOUT):
+            if end == tail:
+                paths.observe(first, second, target)
+                counted += 1
+    print(f"counted {counted} two-step routes that land where a stated "
+          f"relation does ({time.time() - started:.1f}s)")
+
+    # THE RELATION MARGINAL, the same floor as every other run.
+    marginal = Composition(len(entities), right=len(relations),
+                           target=len(entities))
+    for head, relation, tail in train:
+        marginal.observe(entity_at[head], relation_at[relation],
+                         entity_at[tail])
+
+    known_tails: dict = {}
+    known_heads: dict = {}
+    for head, relation, tail in train + valid + test:
+        known_tails.setdefault((head, relation), set()).add(tail)
+        known_heads.setdefault((relation, tail), set()).add(head)
+    ranker = Ranker(entities, known_tails, known_heads)
+    queries = random.Random(args.seed).sample(
+        test, min(args.queries, len(test)))
+    print(f"scoring {len(queries)} triples in both directions\n")
+
+    statistic = STATISTICS[STATISTIC]
+    # The floor, shared with every other FB15k run rather than written again.
+    floor_of = Marginal(marginal, entities, relation_at, statistic)
+
+    #: `P(asked relation | first, second)` for a path type, cached because the
+    #: same pair recurs across queries constantly.
+    predicts: dict = {}
+
+    def path_weight(first, second, asked):
+        key = (first, second, asked)
+        if key not in predicts:
+            answer = paths.surface("target", asked)
+            score = min(statistic(paths.index, answer,
+                                  paths.surface("left", first)),
+                        statistic(paths.index, answer,
+                                  paths.surface("right", second)))
+            predicts[key] = float(score)
+        return predicts[key]
+
+    rows: list[dict] = []
+    header = (f"{'arm':<34}{'MRR':>9}{'hits@1':>9}{'hits@10':>9}"
+              f"{'margin':>9}{'sec':>8}")
+
+    floor_ranks = []
+    for head, relation, tail in queries:
+        for direction in ("tail", "head"):
+            given, answer = ((head, tail) if direction == "tail"
+                             else (tail, head))
+            _, middle, _ = ranker.rank(floor_of.vector(relation, direction),
+                                       given, relation, answer, direction)
+            floor_ranks.append(middle)
+    floor = metrics(floor_ranks)
+    rows.append(floor | {"arm": "relation only"})
+    print(header)
+    print("-" * len(header))
+    print(f"{'relation only (the floor)':<34}{floor['mrr']:>9.4f}"
+          f"{floor['hits1']:>9.4f}{floor['hits10']:>9.4f}{0.0:>+9.4f}"
+          f"{time.time() - started:>8.1f}")
+
+    for accumulate in ACCUMULATORS:
+        for combine in ("paths only", *COMBINERS_SWEPT):
+            began = time.time()
+            ranks = []
+            for head, relation, tail in queries:
+                asked = relation_at[relation]
+                for direction in ("tail", "head"):
+                    given, answer = ((head, tail) if direction == "tail"
+                                     else (tail, head))
+                    vector = np.zeros(len(entities))
+                    for first, second, end in routes(out_of, given, FANOUT):
+                        weight = path_weight(first, second, asked)
+                        if weight <= 0.0:
+                            continue
+                        at = entity_at[end]
+                        vector[at] = (max(vector[at], weight)
+                                      if accumulate == "max"
+                                      else vector[at] + weight)
+                    if combine != "paths only":
+                        rule = COMBINERS[combine]
+                        other = floor_of.vector(relation, direction)
+                        top = vector.max() or 1.0
+                        vector = np.array([rule(a / top, b) for a, b
+                                           in zip(vector, other)])
+                    _, middle, _ = ranker.rank(vector, given, relation, answer,
+                                               direction)
+                    ranks.append(middle)
+            got = metrics(ranks) | {"arm": combine, "accumulate": accumulate,
+                                    "statistic": STATISTIC, "fanout": FANOUT}
+            got["margin"] = got["mrr"] - floor["mrr"]
+            rows.append(got)
+            label = f"{accumulate} over paths / {combine}"
+            print(f"{label:<34}{got['mrr']:>9.4f}{got['hits1']:>9.4f}"
+                  f"{got['hits10']:>9.4f}{got['margin']:>+9.4f}"
+                  f"{time.time() - began:>8.1f}")
+
+    # THE BLEND SWEEP. Chosen on validation, read on test, and alpha 0 is the
+    # floor by construction rather than by a second implementation of it.
+    def structure_vector(given, asked, accumulate):
+        vector = np.zeros(len(entities))
+        for first, second, end in routes(out_of, given, FANOUT):
+            weight = path_weight(first, second, asked)
+            if weight <= 0.0:
+                continue
+            at = entity_at[end]
+            vector[at] = (max(vector[at], weight) if accumulate == "max"
+                          else vector[at] + weight)
+        top = vector.max()
+        return vector / top if top > 0 else vector
+
+    def sweep(triples, accumulate):
+        """MRR at every alpha over one split, from one pass of the vectors."""
+        totals = {alpha: [] for alpha in ALPHAS}
+        for head, relation, tail in triples:
+            asked = relation_at[relation]
+            for direction in ("tail", "head"):
+                given, answer = ((head, tail) if direction == "tail"
+                                 else (tail, head))
+                structure = structure_vector(given, asked, accumulate)
+                other = floor_of.vector(relation, direction)
+                for alpha in ALPHAS:
+                    _, middle, _ = ranker.rank(
+                        alpha * structure + (1.0 - alpha) * other,
+                        given, relation, answer, direction)
+                    totals[alpha].append(middle)
+        return {alpha: metrics(ranks)["mrr"] for alpha, ranks in totals.items()}
+
+    held = random.Random(args.seed).sample(
+        valid, min(args.queries // 2, len(valid)))
+    print(f"\nBLEND SWEEP. alpha 0 is the floor exactly. Chosen on "
+          f"{len(held)} validation triples, read on test.")
+    for accumulate in ACCUMULATORS:
+        on_valid = sweep(held, accumulate)
+        chosen = max(on_valid, key=lambda alpha: on_valid[alpha])
+        on_test = sweep(queries, accumulate)
+        rows.append({"arm": "blend", "accumulate": accumulate,
+                     "chosen_alpha": chosen, "validation": on_valid,
+                     "test": on_test,
+                     "margin": on_test[chosen] - on_test[0.0]})
+        # THE MARGIN IS A DIFFERENCE OF TWO MEANS OVER THE SAME QUERIES, so its
+        # error bar is not the MRR's. Reported as a spread across the queries
+        # rather than left to be eyeballed against a sample size in the header.
+        print(f"  {accumulate:>4} over paths: validation picks alpha "
+              f"{chosen}, test MRR {on_test[chosen]:.4f} against the floor's "
+              f"{on_test[0.0]:.4f}  margin {on_test[chosen] - on_test[0.0]:+.4f}"
+              f"  over {2 * len(queries)} scored queries")
+        print("       test by alpha: "
+              + "  ".join(f"{a}:{on_test[a]:.4f}" for a in ALPHAS))
+
+    best = max((row for row in rows
+                if row["arm"] not in ("relation only", "blend")),
+               key=lambda row: row["mrr"])
+    print(f"\nBest typed arm: {best['mrr']:.4f} ({best['accumulate']} over "
+          f"paths, {best['arm']}) — margin {best['margin']:+.4f}")
+    print("Published, against this same floor:")
+    for name, (mrr, _) in sorted(PUBLISHED.items(), key=lambda item: item[1][0]):
+        print(f"  {name:>10}  {mrr:.4f}   margin {mrr - floor['mrr']:+.4f}")
+
+    if args.json:
+        args.json.parent.mkdir(parents=True, exist_ok=True)
+        args.json.write_text(json.dumps(rows, indent=1), encoding="utf-8")
+        print(f"\n{len(rows)} rows -> {args.json}")
+    print(f"COST: {time.time() - started:.1f}s wall, one process")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

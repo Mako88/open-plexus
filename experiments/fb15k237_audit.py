@@ -204,6 +204,38 @@ def plain_rank(scores, at, given, relation, answer, known_tails, known_heads,
     return above + 1.0, above + 1 + tied / 2.0, above + 1.0 + tied
 
 
+class Marginal:
+    """The floor, as a dense score vector per `(relation, direction)`, cached.
+
+    **Shared because three runs need the same floor, and a floor written three
+    times is three floors** — `tools/check_duplication.py` refused the second
+    copy, which is exactly what it is for.
+
+    It is `Composition` with one role supplied: rank candidates by the relation
+    alone, with no reference to the entity the question is about. So the arm and
+    its baseline stay one program here too.
+    """
+
+    def __init__(self, counts, entities, relation_at, statistic) -> None:
+        self.counts = counts
+        self.width = len(entities)
+        self.relation_at = relation_at
+        self.statistic = statistic
+        self._cache: dict = {}
+
+    def vector(self, relation: str, direction: str) -> np.ndarray:
+        key = (relation, direction)
+        if key not in self._cache:
+            want = "target" if direction == "tail" else "left"
+            vector = np.zeros(self.width)
+            for score, candidate in self.counts.given(
+                    {"right": self.relation_at[relation]}, want,
+                    self.statistic):
+                vector[candidate] = score
+            self._cache[key] = vector
+        return self._cache[key]
+
+
 def metrics(ranks: list[float]) -> dict:
     array = np.asarray(ranks, dtype=float)
     return {"n": len(ranks), "mrr": float(np.mean(1.0 / array)),

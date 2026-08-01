@@ -51,54 +51,34 @@ a third. So it must TEST candidates structure might have ruled out for free, and
 the product bound assumes exactly that. Reading the neighbourhood's shape would
 break the bound rather than trade along it. Untested.
 
-## ONE GRAPH: THE PROBLEM IS KINDS, NOT INSTANCES
+## ONE GRAPH: BUILT, AND FOUR CHECKS GUARD IT
 
-`CoOccurrence` is the whole representation, and **no single graph has ever held
+`CoOccurrence` is the whole representation, and **no single graph had ever held
 more than one KIND of thing** — images+audio+words in one, intervention moments
-in another, knowledge-graph facts in a third, none ever meeting.
+in another, knowledge-graph facts in a third.
 
-**Counting instances does not find it.** One arm builds one graph and a sweep
-builds many, both correctly. So `wiring` gained three checks, each catching what
-the others cannot, each mutation-caught: `graph=N` (an accumulator split by
-accident), `holding={...}` (a declared kind that never arrived), and
-`disjoint=True` (two kinds sharing node numbers).
+**Four checks, each catching what the others cannot, each mutation-caught:**
+`graph=N` (an accumulator split by accident), `holding={...}` (a declared kind
+that never arrived), `disjoint=True` (two kinds sharing node numbers, which
+`holding` is blind to), and `shared.linked(a, b)` (two kinds co-resident but
+disconnected, which all three others pass).
 
-**The third exists because the second is blind to the merge's real risk.** Every
-source numbers from zero, so a naive merge puts image code 0, concept surface 0
-and entity 0 in ONE row — every kind arrives, `holding` passes, counts are
-silently summed. `Namespace` hands out the blocks that keep them apart.
+**THE MERGE LANDED.** `stream()` was already a hand-rolled namespace with the
+same layout, so `Namespace` gives byte-identical node numbers and the whole
+results table was the regression check — every figure unchanged. The senses now
+share one declared graph.
 
-**`SharedGraph` is built and does the thing three graphs made impossible:** a
-route crosses from a picture to a fact, two hops through a word, between kinds
-that never co-occurred.
+**The declaration caught a bug in `SharedGraph` on its first run:** `holds()`
+read process-global `wiring.kinds()`, so one-graph-per-arm runs had every graph
+reporting earlier arms' kinds. Every test passed with it — the tests build one
+graph per test, exactly the case it did not break. Fixed, regression test added.
 
-**AND CO-RESIDENCE IS NOT CONNECTION — a fourth check was needed.** All three
-wiring checks PASS a graph that is two disconnected islands sharing a
-dictionary. Kinds do not automatically meet: pictures, sounds and words arrive
-in the same moment, but **a knowledge-graph fact shares no occasion with a
-picture of a digit at all.** `shared.linked(a, b)` is what says whether anything
-bridges them, and without it the real merge would report success on three
-unrelated components in one dict.
-
-**THE MERGE LANDED.** `surfaces_pipeline`'s `stream()` was already a hand-rolled
-namespace with the same layout, so `Namespace` gives byte-identical node numbers
-and the whole results table was the regression check — every figure unchanged to
-four decimals. The senses now share one declared graph.
-
-**And the declaration caught a bug in `SharedGraph` on its first run.**
-`holds()` read `wiring.kinds()`, which is process-global, so a run building one
-graph per arm had every graph reporting earlier arms' kinds. Three hours old,
-and every test passed with it, because the tests build one graph per test —
-exactly the case it did not break. Fixed to track per-graph; regression test
-added.
+**Facts stay a separate island.** DEFAULT APPLIED, John to override: nothing in
+the data bridges a fact to a picture, and inventing that corpus is a bigger
+decision than a default should make.
 
 **Next:** the 6,000-occasion cross-modal run, now that the architecture it would
 be measured on is the intended one.
-
-**Reserving is deliberately NOT declaring** — `wiring.kind` is called when data
-arrives, not when room is made, or a reservation would satisfy the check.
-
-**Also:** traversal MOVES through a graph; intervention EDITS it.
 
 ## Known debts
 

@@ -45,6 +45,7 @@ CHURN = ROOT / "experiments" / "g4_02_machine_churn.py"
 G44_ASKING = ROOT / "experiments" / "g44_01_asking.py"
 WIRING = ROOT / "openplexus" / "wiring.py"
 NAMESPACE = ROOT / "openplexus" / "namespace.py"
+SHARED = ROOT / "openplexus" / "shared.py"
 TRANSPORT = ROOT / "openplexus" / "transport.py"
 DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 NODE_MAIN = ROOT / "openplexus" / "node_main.py"
@@ -100,6 +101,17 @@ class Mutation:
 
 
 MUTATIONS = [
+    Mutation(
+        name="the-shared-graph-ignores-its-namespace",
+        breaks="the only thing that makes one graph possible. Observing local "
+               "ids puts image 2 and word 2 and fact 2 on ONE node, which is "
+               "the silent collision the whole namespace exists to prevent: "
+               "nothing raises, the occasion counts, and two unrelated things "
+               "accumulate into the same row",
+        path=SHARED,
+        old="        nodes = [self.space.node(kind, local) for kind, local in pairs]",
+        new="        nodes = [local for kind, local in pairs]",
+    ),
     Mutation(
         name="every-kind-starts-its-block-at-zero",
         breaks="the only thing a shared graph needs from this module. Blocks "

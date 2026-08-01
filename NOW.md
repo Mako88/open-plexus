@@ -45,9 +45,24 @@ the wrong shape for a clean split.
 **allocation** — at budget 0.10 the arm spends ~400 asks over 53 pairs, about 7
 each, and the rule needs 48 before it beats doing nothing.
 
-**Next here, and it is scheduling rather than mechanism:** every arm nominates a
-fresh pair each draw, which is the worst spend for a rule needing a resolved
-rate per pair. An arm that revisits fewer pairs is the change.
+**Revisiting helps and does not close it.** `ask-repeat` stays on a pair for 48
+asks: P15 held (−0.3356 against ask-mutual's −0.4708 at equal budget), P13
+refuted, P14 unmeasurable because budget stops binding above 0.25 — an ask
+consumes a draw and the run ends at `occasions` draws.
+
+**And a longer stream makes it worse:** −0.3283 at 4,000 occasions, −0.5138 at
+30,000, with coverage rising 5 → 52 pairs. Both arms get the same stream, so
+more coverage scoring worse is a demotion landing on true partners.
+
+**The cause is WHERE the cut is learned.** The arm's cut is 0.6278; the oracle
+boundary is 0.2870. Eight of its fourteen pairs are ones the metric never
+scores, refusing at a median 0.6667 — *higher* than any scored pair, since a
+background surface asked about the wrong query is hard to detach. So the split
+separates scored from unscored and demotes everything the metric reads.
+
+**Next here:** fit the threshold per query, over that query's own candidates.
+No privileged knowledge, and it cannot be polluted by pairs the demotion never
+touches. Not yet run.
 
 **P12 stands refuted at 100%, and it is a real defect.** Two means always return
 two groups, so where the shadow genuinely is a part the rule demotes true

@@ -132,21 +132,15 @@ arrives, not when room is made, or a reservation would satisfy the check.
 
 ## Reading leads, none of them read
 
-Each must be read before it is cited. A remembered number about someone else's
-work is the borrowed claim `CLAUDE.md` puts first.
+A remembered number about someone else's work is the borrowed claim `CLAUDE.md`
+puts first.
 
 - **AnyBURL / rule mining over paths** (Meilicke 2019). Partly checked, and the
-  check corrected the claim: FB15k-237 is specifically hard for rule-based
-  methods and AnyBURL sits slightly BELOW ConvE there. What survives: **a
-  rule-over-paths system lands near 0.31 where ours lands at 0.247**, so our
-  implementation is the limit — length-2 only, one confidence per route shape,
-  evidence summed rather than combined, no filtering of unreliable rules.
-- **Interventional causal discovery under a budget** — not yet searched. The
-  sharper question after today: not how to spend a budget of interventions, but
-  **when structure says what you do not need to test**.
-- **PROBE** (`arXiv 2606.08921`) — reweights the metric by inverse popularity.
-  Fetched, not read; its smoothing constants were not in the summary, so the
-  popularity stratification in `fb15k237_typed.py` takes the idea and not the
-  metric.
+  check corrected me: FB15k-237 is specifically hard for rule-based methods.
+  What survives — **a rule-over-paths system lands near 0.31 where ours lands at
+  0.247**, so our implementation is the limit: length-2 only, one confidence per
+  route shape, evidence summed rather than combined, no filtering.
+- **Interventional causal discovery under a budget** — not searched. The sharper
+  question after today: **when does structure say what you need not test?**
 - **SCAN, COGS, CFQ** — splits made by structure rather than sampling, which is
   the property CLUTRR lacked. Audit any with the table attack before adopting.

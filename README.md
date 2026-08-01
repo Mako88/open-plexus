@@ -32,6 +32,7 @@ it back — refutations expire, and two have already become right later.
 - ❌ ~~Cut each surface's partners at the biggest score gap~~ — *refuses the ever-present distractor and evicts the word that names the concept.* **Revives if** something else supplies the refusal.
 - ❌ ~~Cap how many partners are even considered~~ — *a constant nobody set on purpose, and it turned out to be the thing doing the cutting.*
 - ⬜ Forget by age or disuse — *unbounded growth is not survivable on a phone, and nothing currently decides what to drop.*
+- ⬜ Archive rather than delete — evict to a store on that node, never in the walk — *a machine that never forgets is fine; one that never compresses cannot form concepts, and an archive nothing waits on is C1-legal where a shared database is not.*
 
 **3. Identity.** What makes several surfaces one thing.
 

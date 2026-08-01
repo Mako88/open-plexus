@@ -867,7 +867,37 @@ because it arrives in volume and drowns the honest asks.
          direct ask measures for that same pair — the bias check, and the
          thing that decides whether the volume is worth having
 
-**P29 is the one that matters.** P28 will hold almost by construction: harvesting
+### What happened: P29 CANNOT BE SCORED AS WRITTEN, and that is the finding
+
+Measured before building anything, 400 asks against one query:
+
+                     harvested   direct refusal rate
+    true partner  1         33                0.3400
+    true partner  2         42                0.3850
+    shadow       37        131                0.2500
+
+**Harvesting observes only COMPLIANCES. There is no denominator, so there is no
+harvested rate**, and P29 — written to compare one against the direct rate —
+asks about a quantity that does not exist. A surface absent from a complying
+occasion is not a refusal for that surface; it may simply be rare.
+
+**And the counts that DO exist largely track marginal frequency.** The shadow
+appears about four times as often and is about three times as common to begin
+with. That is the same redundancy that killed the ask-cost "leak" earlier: a
+signal watching already has, and marginal frequency is precisely what cannot
+separate a confound.
+
+**What is left is one open question, recorded unresolved.** Normalising the
+harvest by what marginal frequency predicts gives an ENRICHMENT rather than a
+count, and the two figures above do not settle whether that separates — the
+arithmetic is close and this run has one query and one seed. **It is a
+measurement, not a conclusion, and it has not been made.**
+
+**P29 was the one that mattered**, and it mattered by being unanswerable: naming
+the quantity before building is what exposed that there was no quantity.
+
+**P28 is not scored.** It was to hold "almost by construction", and building an
+arm to confirm a construction is the tuning this file has refused twice. P28 will hold almost by construction: harvesting
 cannot help but touch more pairs. If P29 fails, more coverage of a WRONG number
 is exactly the failure this file has already recorded three times, and the
 honest outcome is to discard the harvest rather than tune it.

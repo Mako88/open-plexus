@@ -23,6 +23,11 @@ training and no embedding.** `sum over paths`, blend weight 0.01 chosen on
     margin                 +0.0136  +/- 0.0005, so about 27 standard errors
 
     published, same floor:  ComplEx +0.0136   DistMult +0.0076
+                            TransE  +0.0606   RotatE   +0.1046
+
+**So it matches the weaker half of the published field and is nowhere near the
+stronger half.** "Matched ComplEx" and "lost to RotatE by a factor of eight" are
+the same sentence and both belong in it.
 
 **And it is not the marginal being reinforced**, which was the live worry. Split
 by how many training triples the answer entity has:

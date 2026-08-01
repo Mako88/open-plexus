@@ -314,7 +314,11 @@ def main() -> int:
                      "test": on_test,
                      "margin": on_test[chosen] - on_test[0.0],
                      "paired_gain": gain, "standard_error": error,
-                     "better": better, "worse": worse})
+                     "better": better, "worse": worse,
+                     # Kept only until the stratification below has read them,
+                     # then deleted -- 40,000 ranks per alpha is not a record,
+                     # it is a working value.
+                     "_test_ranks": test_ranks})
         # THE MARGIN IS A DIFFERENCE OF TWO MEANS OVER THE SAME QUERIES, so its
         # error bar is not the MRR's. Reported as a spread across the queries
         # rather than left to be eyeballed against a sample size in the header.
@@ -328,8 +332,54 @@ def main() -> int:
               f"{gain:+.4f} +/- {error:.4f} (one standard error), "
               f"{better} better and {worse} worse")
 
+    # IS THE MARGIN JUST POPULARITY? The floor is a popularity ranking, so a
+    # gain concentrated on the answers that are already common would be the
+    # marginal being reinforced rather than structure being added. Split by how
+    # many training triples the ANSWER appears in and read the margin per band.
+    #
+    # The idea is PROBE's (arXiv 2606.08921), which evaluates knowledge-graph
+    # completion in a popularity-aware way. Its own weighting is not
+    # reimplemented here: the paper has smoothing constants this run has not
+    # read, and a metric named after a paper nobody opened is the borrowed claim
+    # CLAUDE.md puts first. A stratification needs no constants.
+    degree: dict = collections.Counter()
+    for head, _, tail in train:
+        degree[head] += 1
+        degree[tail] += 1
+    for accumulate in ACCUMULATORS:
+        row = next(r for r in rows
+                   if r["arm"] == "blend" and r["accumulate"] == accumulate)
+        chosen = row["chosen_alpha"]
+        bands: dict = {}
+        for index, (head, relation, tail) in enumerate(queries):
+            asked = relation_at[relation]
+            for offset, direction in enumerate(("tail", "head")):
+                given, answer = ((head, tail) if direction == "tail"
+                                 else (tail, head))
+                at = 2 * index + offset
+                popularity = degree[answer]
+                band = ("rare (<10)" if popularity < 10 else
+                        "middling (10-49)" if popularity < 50 else
+                        "common (50+)")
+                bands.setdefault(band, []).append(at)
+        print(f"\n  {accumulate} over paths, margin by how common the ANSWER is:")
+        for band in ("rare (<10)", "middling (10-49)", "common (50+)"):
+            at = bands.get(band, [])
+            if not at:
+                continue
+            blended = metrics([row["_test_ranks"][chosen][i] for i in at])
+            base = metrics([row["_test_ranks"][0.0][i] for i in at])
+            print(f"    {band:<18} n={len(at):>6}  floor {base['mrr']:.4f}  "
+                  f"blend {blended['mrr']:.4f}  margin "
+                  f"{blended['mrr'] - base['mrr']:+.4f}")
+            rows.append({"arm": "band", "accumulate": accumulate, "band": band,
+                         "n": len(at), "floor": base["mrr"],
+                         "blend": blended["mrr"],
+                         "margin": blended["mrr"] - base["mrr"]})
+        del row["_test_ranks"]
+
     best = max((row for row in rows
-                if row["arm"] not in ("relation only", "blend")),
+                if row["arm"] not in ("relation only", "blend", "band")),
                key=lambda row: row["mrr"])
     print(f"\nBest typed arm: {best['mrr']:.4f} ({best['accumulate']} over "
           f"paths, {best['arm']}) — margin {best['margin']:+.4f}")

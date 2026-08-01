@@ -58,6 +58,16 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
   claim** — not that the count graph is competitive, but that it clears a
   no-structure baseline by an amount in the same range as two published models
   clear it by, having been given no training and no embedding.
+- **AND THE CLAIM IS ALREADY IN TROUBLE, from its own diagnostics.** At 120
+  queries the paired gain is +0.0068 with a standard error of 0.0062, and
+  **40 queries improved against 69 that got worse** — so the positive mean is a
+  few large wins paid for by many small losses, which an MRR difference hides
+  completely. Worse, the gain is concentrated where the answer is ALREADY
+  COMMON: −0.0081 on answers with fewer than ten training triples, +0.0096 on
+  answers with fifty or more. The floor is a popularity ranking, so a gain that
+  lives on popular answers may be the marginal being reinforced rather than
+  structure being added. **The full run decides it, and if that pattern holds at
+  scale the honest reading is that the margin is a popularity artefact.**
 - **`sum` over paths beats `max` at every alpha**, which is the ranked walk
   earning its keep over a thresholded lookup.
 
@@ -110,10 +120,16 @@ Found by search on 2026-08-01, recorded as leads and **not as findings**. Each
 may replace work otherwise done by hand, and each has to be read before it is
 cited anywhere.
 
-- **Generalized Rank-based Evaluation for KGC** (`arXiv 2606.08921`, 2026).
-  Reportedly proposes *popularity-bias robustness* as an evaluation axis, which
-  is what the 0.2334 marginal floor measures. **Read this first** — if the metric
-  exists, use theirs rather than inventing margin-over-marginal.
+- **PROBE** (`arXiv 2606.08921`, 2026) — *fetched, not read.* It reweights the
+  metric by inverse popularity rather than comparing against a baseline:
+  per-triple weights from entity degree and entity-conditioned relation
+  frequency, with a `beta` setting how hard low-popularity triples are
+  upweighted, and a separate `alpha` setting rank sharpness. **Its smoothing
+  constants were not in what was fetched**, so it is deliberately NOT
+  reimplemented — a metric named after a paper nobody opened is the borrowed
+  claim `CLAUDE.md` puts first. The popularity stratification in
+  `fb15k237_typed.py` takes the idea and needs no constants. Reading the paper
+  properly would let the weighted version be reported as PROBE.
 - **A Re-evaluation of Knowledge Graph Completion Methods**, Sun et al. ACL 2020
   (`aclanthology.org/2020.acl-main.489`). Reportedly the tie problem and the
   average-rank fix, which is the policy `fb15k237_audit.py` chose independently.

@@ -66,7 +66,16 @@ cases differ by the low group's absolute level, 0.2105 against 0.3779 — the
 scale-free ratio is useless, 0.55 against 0.52. **Missing: an absolute anchor
 the arm can compute.**
 
-**Scored:** P5, P7, P9, P11, P15, P16 held. P1–P3, P6, P8, P10, P12, P13 refuted.
+**P16 was an artefact and is WITHDRAWN.** An arm that discards its own
+ask-occasions scored −0.0741 against watching's −0.2967, and that is the metric
+reading nothing: its index observes ONE occasion, and separation goes to exactly
+0.0000 as an index empties. `spend_on_ask` needs `len(seen) > 4`, one watched
+occasion supplies that, and with learning off nothing refills the counts.
+**The hypothesis behind it is still untested** — it needs an arm that keeps
+watching while it asks, and that does not exist yet.
+
+**Scored:** P5, P7, P9, P11, P15 held. P1–P3, P6, P8, P10, P12, P13 refuted.
+P16 withdrawn.
 P14 is unmeasurable — budget stops binding above 0.25.
 
 ## Next, in the order I would take them

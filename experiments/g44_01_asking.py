@@ -299,7 +299,7 @@ P16 without P17 would mean the bias is real and something else is also wrong.
 Neither holding would refute the hypothesis outright and send the 0.12 back to
 being unexplained, which is where it is now.
 
-### What happened: P16 held hugely, and I do not understand the result
+### What happened: P16 is an ARTEFACT and is withdrawn
 
     arm          budget   learns   per query   on target
     watch           0.0     True     -0.2967           0
@@ -318,17 +318,36 @@ Watching on a truncated stream says otherwise: 4000 observations -0.2967, 400
 -0.3124, 100 -0.3496, 50 -0.3562. A sparser index scores WORSE, so the gain is
 not sparsity.
 
-**AND IT IS STILL NOT EXPLAINED, WHICH IS WHY THIS SAYS SO.** The blind arm
-lands ONE scored pair. One demoted pair cannot move an average over 36 queries
-by 0.245, so whatever produced this is not the demotion, and the conditioned-
-sample story that P16 was registered for does not obviously produce it either.
-Something changes in the index or in the arm's own trajectory that has not been
-identified.
+**The blind arm lands ONE scored pair, and one demoted pair cannot move an
+average over 36 queries by 0.245.** That is what made it worth chasing rather
+than reporting, and the chase found it:
 
-The number is real and reproduced across three seeds. What it means is not
-established, and it must not be read as "the bias explanation confirmed" until
-the mechanism is found -- a +0.245 nobody can account for is exactly the shape
-of a result that turns out to be measuring something else.
+    observations   separation
+             400     -0.3124
+              50     -0.3562
+               8     -0.2315
+               2     -0.1019
+               0     +0.0000
+
+**Separation goes to ZERO as the index empties**, because an empty index scores
+everything at zero and the difference of two zeros is zero. The blind arm's
+index observes exactly ONE occasion, on every seed.
+
+The cause is a pre-existing property of the arm that the flag exposed:
+`spend_on_ask` requires `len(seen) > 4`, and one watched occasion already
+contains more than four surfaces. With learning ON, ask-occasions kept feeding
+the index, so it never mattered. With learning OFF, the arm watches once, crosses
+the threshold, and asks for the rest of the stream while its counts stay frozen
+at one observation.
+
+So -0.0741 is not the confound being separated. It is the metric reading nothing
+at all, and it happens to look like a large win because vacuity sits at zero and
+every real score here is negative. **P16 is withdrawn.**
+
+**The hypothesis it was meant to test is still untested.** Testing it needs an
+arm that keeps watching while it asks -- the flag as written cannot separate
+"does not learn from asks" from "does not learn". That is a change to the arm's
+schedule and nothing here has made it.
 
 ## THE COVERAGE CURVE REFUTES "IT NEEDS NEAR-TOTAL COVERAGE"
 

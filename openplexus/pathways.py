@@ -152,7 +152,7 @@ class PathTypes:
 
 def flood(adjacency, start: int, asked: int, types: PathTypes,
           statistic: Statistic, *, floor: float, depth: int = 3,
-          accumulate: str = "sum"):
+          accumulate: str = "sum", ceiling: int | None = None):
     """Expand EVERY edge strong enough, compose as you go, keep the route.
 
     John's design, 2026-08-02: *"in parallel at the same time, traverse all
@@ -188,10 +188,19 @@ def flood(adjacency, start: int, asked: int, types: PathTypes,
         depth: How many edges a route may use. A bound on the worst case, not a
             schedule — most branches die on `floor` long before it.
 
+    Args (continued):
+        ceiling: Expansions after which the walk gives up, and **a safety rather
+            than part of the design**. The weight is meant to be the whole
+            budget; this exists because a floor that fails to prune does not
+            merely score badly, it does not return. A caller that sets it MUST
+            report how often it fired, or a run that gave up looks exactly like
+            a run that finished.
+
     Returns:
-        `endpoint -> (score, route)` for every endpoint reached by a route whose
-        composed kind is `asked`. The route is the edge kinds walked, in order,
-        which is the chain of reasoning for that answer.
+        `(endpoints, expansions, gave_up)`. `endpoints` maps each endpoint
+        reached by a route whose composed kind is `asked` to `(score, route)`,
+        where the route is the edge kinds walked in order -- the chain of
+        reasoning for that answer. `expansions` is what the walk cost.
     """
     if accumulate not in ACCUMULATORS:
         raise ValueError(f"accumulate must be one of {ACCUMULATORS}")
@@ -203,6 +212,7 @@ def flood(adjacency, start: int, asked: int, types: PathTypes,
             "the depth limit, which on a real graph does not return")
 
     found: dict[int, tuple[float, tuple[int, ...]]] = {}
+    expansions = 0
     # Each frontier entry carries where it is, what the route so far AMOUNTS to
     # as a single kind, how strong it is, and the kinds it walked.
     frontier = [(start, -1, 1.0, ())]
@@ -210,6 +220,9 @@ def flood(adjacency, start: int, asked: int, types: PathTypes,
         following = []
         for here, carried, strength, route in frontier:
             for kind, neighbour, weight in adjacency(here):
+                expansions += 1
+                if ceiling is not None and expansions > ceiling:
+                    return found, expansions, True
                 travelled = strength * weight
                 # A COST GUARD, not a correctness one: strength
                 # only decreases, so every branch this drops the
@@ -247,7 +260,7 @@ def flood(adjacency, start: int, asked: int, types: PathTypes,
         if not following:
             break
         frontier = following
-    return found
+    return found, expansions, False
 
 
 def concentration(scores: dict[int, float]) -> float:

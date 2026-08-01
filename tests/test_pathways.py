@@ -128,20 +128,20 @@ class TheFloodExpandsByWeightAndComposesAsItGoes(unittest.TestCase):
 
     def test_two_steps_arrive_with_their_route(self):
         types, adjacency = self.world()
-        found = flood(adjacency, 0, 2, types, CONDITIONAL, floor=0.01, depth=3)
+        found = flood(adjacency, 0, 2, types, CONDITIONAL, floor=0.01, depth=3)[0]
         self.assertIn(2, found)
         self.assertEqual(found[2][1], (0, 1))
 
     def test_three_steps_need_the_composed_kind_carried_forward(self):
         """The thing a pair-shaped table cannot do without reducing first."""
         types, adjacency = self.world()
-        found = flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.01, depth=3)
+        found = flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.01, depth=3)[0]
         self.assertIn(3, found)
         self.assertEqual(found[3][1], (0, 1, 4))
 
     def test_depth_two_cannot_reach_the_three_step_answer(self):
         types, adjacency = self.world()
-        found = flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.01, depth=2)
+        found = flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.01, depth=2)[0]
         self.assertNotIn(3, found)
 
     def test_the_floor_is_the_budget_and_it_prunes(self):
@@ -149,9 +149,9 @@ class TheFloodExpandsByWeightAndComposesAsItGoes(unittest.TestCase):
         # composition confidences are applied. A floor above that stops it.
         types, adjacency = self.world()
         self.assertEqual(
-            flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.95, depth=3), {})
+            flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.95, depth=3)[0], {})
         self.assertIn(
-            3, flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.01, depth=3))
+            3, flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.01, depth=3)[0])
 
     def test_a_strong_walk_that_composes_weakly_is_pruned(self):
         """The floor that actually binds, and it binds AFTER composing.
@@ -169,26 +169,44 @@ class TheFloodExpandsByWeightAndComposesAsItGoes(unittest.TestCase):
         edges = {0: [(0, 1, 1.0)], 1: [(1, 9, 1.0)]}
         adjacency = lambda node: edges.get(node, ())     # noqa: E731 - local
         self.assertIn(9, flood(adjacency, 0, 2, types, CONDITIONAL,
-                               floor=0.3, depth=2))
+                               floor=0.3, depth=2)[0])
         self.assertEqual(flood(adjacency, 0, 2, types, CONDITIONAL,
-                               floor=0.7, depth=2), {})
+                               floor=0.7, depth=2)[0], {})
 
     def test_a_route_that_composes_to_something_else_is_not_an_answer(self):
         types, adjacency = self.world()
-        found = flood(adjacency, 0, 5, types, CONDITIONAL, floor=0.01, depth=3)
+        found = flood(adjacency, 0, 5, types, CONDITIONAL, floor=0.01, depth=3)[0]
         self.assertEqual(found, {})
+
+    def test_the_ceiling_reports_that_it_gave_up(self):
+        """A safety, and a run that gave up must not look like one that finished.
+
+        The weight is meant to be the whole budget. This exists because a floor
+        that fails to prune does not merely score badly — it does not return —
+        and the caller has to be able to say how often that happened.
+        """
+        types, adjacency = self.world()
+        found, expansions, gave_up = flood(adjacency, 0, 3, types, CONDITIONAL,
+                                           floor=0.01, depth=3, ceiling=1)
+        self.assertTrue(gave_up)
+        self.assertEqual(found, {})
+        whole, cost, finished = flood(adjacency, 0, 3, types, CONDITIONAL,
+                                      floor=0.01, depth=3)
+        self.assertFalse(finished)
+        self.assertIn(3, whole)
+        self.assertGreater(cost, expansions)
 
     def test_a_floor_of_zero_is_refused_rather_than_run(self):
         # It would expand every edge to the depth limit, which on a real graph
         # does not return -- a budget of nothing is not a budget.
         types, adjacency = self.world()
         with self.assertRaises(ValueError):
-            flood(adjacency, 0, 2, types, CONDITIONAL, floor=0.0)
+            flood(adjacency, 0, 2, types, CONDITIONAL, floor=0.0)[0]
 
     def test_one_step_is_refused_because_nothing_has_composed(self):
         types, adjacency = self.world()
         with self.assertRaises(ValueError):
-            flood(adjacency, 0, 2, types, CONDITIONAL, floor=0.01, depth=1)
+            flood(adjacency, 0, 2, types, CONDITIONAL, floor=0.01, depth=1)[0]
 
     def test_agreeing_routes_add_up_and_the_kept_route_is_the_strongest(self):
         types = PathTypes(kinds=6, spans=6)
@@ -197,10 +215,11 @@ class TheFloodExpandsByWeightAndComposesAsItGoes(unittest.TestCase):
             types.observe(3, 1, 2)
         edges = {0: [(0, 1, 0.9), (3, 5, 0.4)],
                  1: [(1, 9, 0.9)], 5: [(1, 9, 0.9)]}
-        found = flood(lambda n: edges.get(n, ()), 0, 2, types, CONDITIONAL,
-                      floor=0.01, depth=2)
-        strongest = flood(lambda n: edges.get(n, ()), 0, 2, types, CONDITIONAL,
-                          floor=0.01, depth=2, accumulate="max")
+        found, _, _ = flood(lambda n: edges.get(n, ()), 0, 2, types,
+                            CONDITIONAL, floor=0.01, depth=2)
+        strongest, _, _ = flood(lambda n: edges.get(n, ()), 0, 2, types,
+                                CONDITIONAL, floor=0.01, depth=2,
+                                accumulate="max")
         self.assertGreater(found[9][0], strongest[9][0])
         self.assertEqual(found[9][1], (0, 1))
 

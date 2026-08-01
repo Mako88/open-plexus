@@ -210,6 +210,49 @@ grid was simply too coarse and nothing about cost follows; if none under 2.0
 does, intervention works and does not pay for itself here, which is a result
 about the mechanism and not about this implementation.
 
+### What happened: P15 HELD, P13 REFUTED, P14 NOT MEASURABLE
+
+**P15 held.** At equal budget, concentrating asks beats spreading them:
+ask-repeat -0.3356 against ask-mutual's -0.4708. The only difference is how the
+same asks are spread, so that is the allocation effect on its own.
+
+**P14 cannot be measured and saying so is the finding.** Budget stops binding
+above about 0.25: an ask consumes a draw, the run stops at `occasions` draws,
+and at budgets 0.25, 1.0 and 2.0 the arm reaches 14 pairs and 4,001 draws every
+time. The equal-exposure invariant caps asking with the same ceiling it caps
+watching, so a budget axis cannot price this. Recorded rather than reported as
+a refutation, which is what the identical rows would have looked like.
+
+**P13 refuted, and lengthening the stream makes it worse, not better:**
+
+    occasions   ask-repeat    watch   on target
+         4000      -0.3283  -0.2947           5
+        12000      -0.4061  -0.2918          22
+        30000      -0.5138  -0.2888          52
+
+Both arms get the same stream, so this is not exposure. **More coverage scores
+worse**, which is the signature of a demotion landing on true partners.
+
+### Why, and it is the mutation's failure mode in mirror image
+
+The arm's learned cut is **0.6278**. The oracle boundary is **0.2870**.
+
+8 of the 14 pairs it learns from are pairs the metric never scores, and their
+median refusal rate is **0.6667** -- far HIGHER than any scored pair, because a
+background surface asked about the wrong query is hard to detach rather than
+easy. So the two-means split separates scored from UNSCORED, lands above
+everything the metric reads, and demotes every scored pair including all true
+partners.
+
+`an-unasked-pair-votes-on-the-boundary` guards the same failure with the sign
+reversed: it drags the cut down until nothing is demoted. Both are the threshold
+being learned from a population it will not be applied to.
+
+**So the next change is where the cut is learned, not how.** A threshold fitted
+per query, over the candidates for that query alone, uses no privileged
+knowledge and cannot be polluted by pairs the demotion never touches. Nothing
+here has run it.
+
     python experiments/g44_01_asking.py --json out/g44-01.json
 """
 
@@ -249,6 +292,17 @@ STATISTIC = "conditional"
 #: still cannot see it. 0.0 is run as the control: a shadow that can never be
 #: had alone is constitutive by construction and NO arm should separate it.
 ALONE = 0.30
+
+#: How many times `ask-repeat` stays on a pair. **48 was swept, not chosen here**: it is the smallest value tested at which the learned threshold beats
+#: doing nothing (+0.1314 against watching's -0.2967, where 12 asks gives
+#: -0.0802). Not tuned on any arm -- the ceiling picked it before an arm used it.
+REVISITS = 48
+
+#: Budgets for the price sweep, **chosen here** to bracket 1.0, where an arm asks
+#: as much as it watches. P13 and P14 are about that region and the main grid
+#: cannot reach it. Measured afterwards to stop binding above 0.25, since an ask
+#: consumes a draw and the run ends at `occasions` draws.
+PRICES = (0.25, 0.5, 1.0, 2.0)
 
 
 def world_config(seed: int, alone: float) -> OccasionConfig:
@@ -409,6 +463,7 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
     asks = int(config.occasions * budget) if arm != "watch" else 0
     seen: list[int] = []
     shadow_asks = 0
+    staying: tuple | None = None
 
     while world.drawn < config.occasions:
         spend_on_ask = arm != "watch" and asks > 0 and len(seen) > 4
@@ -418,6 +473,23 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             seen.extend(occasion.surfaces)
             continue
 
+        if arm == "ask-repeat" and staying is not None:
+            # STAY ON THE PAIR. Nominating a fresh pair every draw is the worst
+            # available spend for a rule that needs a resolved rate per pair.
+            candidate, query = staying
+            answer = world.ask(present=candidate, absent=query)
+            asks -= 1
+            if answer.occasion is not None:
+                index.observe(answer.occasion.surfaces)
+                seen.extend(answer.occasion.surfaces)
+                was, refused = refusals.get((candidate, query), (0, 0))
+                refusals[(candidate, query)] = (was + 1,
+                                                refused + answer.refused)
+                shadow_asks += config.is_shadow(candidate)
+                if was + 1 >= REVISITS:
+                    staying = None
+            continue
+
         query = rng.choice(seen)
         if arm == "ask-random":
             candidate = rng.randrange(config.vocabulary)
@@ -425,7 +497,7 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             partners = index.partners(query)
             if not partners:
                 candidate = rng.randrange(config.vocabulary)
-            elif arm == "ask-mutual":
+            elif arm in ("ask-mutual", "ask-repeat"):
                 # ASK ABOUT WHAT PREDICTS THIS AND IS PREDICTED BY IT. A surface
                 # present in every occasion scores 1.0 one way and nearly
                 # nothing the other, so the minimum of the two directions is
@@ -448,6 +520,8 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             was, refused = refusals.get((candidate, query), (0, 0))
             refusals[(candidate, query)] = (was + 1, refused + answer.refused)
             shadow_asks += config.is_shadow(candidate)
+            if arm == "ask-repeat" and was + 1 < REVISITS:
+                staying = (candidate, query)
 
     tallies = list(refusals.values())
     wanted = scored_pairs(config)

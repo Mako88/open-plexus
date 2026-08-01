@@ -77,39 +77,52 @@ graph per test, exactly the case it did not break. Fixed, regression test added.
 the data bridges a fact to a picture, and inventing that corpus is a bigger
 decision than a default should make.
 
-**Next:** the 6,000-occasion cross-modal run, now that the architecture it would
-be measured on is the intended one.
+**CROSS-MODAL REACHES AGAIN**, and it is the first measurement on the merged
+architecture. At `--repeats 2` the `alternating` arm — image and audio sharing
+ZERO occasions, so the only route is through the word — reaches **cross 1.0000,
+crossed 3.0984** where it was 0.0000. Under-resourced, not regressed, now
+measured rather than predicted.
+
+**And the repeat says WHICH price g40-01 measured.** A second pass reuses every
+recording, so audio codes repeat while images do not. The link comes back, so
+the ~300 per digit is about EVIDENCE and not about distinct recordings. The
+8-bit cell stays at 0.0000 — more codes, fewer occasions each — which is
+evidence for the reading `g40-01` itself flagged as unsettled: *the threshold
+may be a statement about occasions per CODE rather than per digit.*
+
+## A RULE BROKEN TWICE, AND THIS PROJECT'S ANSWER IS A CHECK
+
+**I committed on a red preflight**, by chaining `git commit` off a `grep` of
+preflight's output so `&&` read grep's exit status. `CLAUDE.md` names this
+exactly — *a suite piped through `tail` reports `tail`'s status, which is always
+0* — and I hit it anyway by piping to `grep` instead of `tail`.
+
+**Separately, `tools/mutate.py` was broken mid-edit four times today** by shell
+heredocs eating `
+`, each time because a patch script wrote the file before
+`ast.parse` validated it. Fixed each time by `git checkout` and the Write tool.
+
+The standing policy is that a rule which keeps being broken becomes a check.
+**Two candidates, and both are John's call because both cost something:** a git
+pre-commit hook running preflight (adds ~70s to every commit), and having patch
+scripts parse before writing (free, but it is a habit rather than a mechanism).
 
 ## Known debts
 
-- **THE DISTRIBUTED HALF IS ONE MISSING ENTRY POINT, not a hole.** The
-  inventory says it precisely: `bucket_peer` (answers reads over a socket),
-  `federated` (the count graph split across owners, remote reads counted) and
-  `deployment` (how many slices a machine holds) all exist and are tested, and
-  **all three have no caller because `node_main.py` was deliberately not carried
-  over in the restructure.** `testbed/driver.py` then imports two modules the
-  restructure deleted, so it cannot load; its docstring's container runs did
-  happen, against code that is gone.
+- **THE DISTRIBUTED HALF: entry point DONE, driver still dead.**
+  `node_main.py` is built and smoke-tested — a separate process on TCP,
+  answering a real socket request and refusing an unknown message. C1's discrete
+  unit runs again.
 
-  Nothing caught it: `check_imports` skips `testbed/`, and `check_orphans`
-  counts it as a CALLER, so the modules looked wired by a thing that cannot run.
-
-  **`node_main.py` is now built**, smoke-tested end to end: a separate process
-  listening on TCP, answering a real socket request and refusing an unknown
-  message. C1's discrete unit runs again.
-
-  **The driver is NOT a rewrite, it is a replacement, and checking that first
-  is what stopped a wasted port.** `testbed/driver.py` measures whether a
-  distributed `Network` of `LocalAssociativeMemory` agrees with a single-process
-  one — weights `wv`/`wo`, `d_model`, a vocabulary. **That architecture was
-  deleted in the restructure**, so there is nothing in it to point at
-  `bucket_peer`; only its SHAPE survives, and that shape is the right one.
-
-  What it did was compare a distributed result against a single-process
-  reference and report where they diverge — *"the only measurement that
-  distinguishes a network which is slow from one which is wrong"*. The
-  replacement asks the same question of the count graph: does a `CoOccurrence`
-  split across `federated` owners answer reads identically to one held whole?
+  **`testbed/driver.py` is a REPLACEMENT, not a rewrite**, and checking that
+  first stopped a wasted port: it measures a distributed `Network` of
+  `LocalAssociativeMemory` against a single-process one, and that architecture
+  was deleted. Only its SHAPE survives, and the shape is right — compare a
+  distributed result against a single-process reference and report WHERE they
+  diverge, *the only measurement that distinguishes a network which is slow from
+  one which is wrong*. The replacement asks that of the count graph: **does a
+  `CoOccurrence` split across `federated` owners answer reads identically to one
+  held whole?**
 
 - **`tasks/xsl.py` has no caller.** Use it or drop it.
 - **The link columns in `surfaces_pipeline.py` step in tenths** — shares over ten

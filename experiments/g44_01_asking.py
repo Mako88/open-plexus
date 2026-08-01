@@ -684,6 +684,37 @@ oracle's swing from -0.2967 to +0.2256 it recovers about **1.6%** of what the
 mechanism can do. The product bound is DENTED, not broken: a cheaper fact buys a
 real improvement and nowhere near the one available.
 
+### WHAT ACTUALLY WORKS: asking a candidate against ITS OWN neighbourhood
+
+Of the scored pairs each arm demotes, how many are confounds — measured, not
+reasoned, because the last explanation here lasted one commit:
+
+    arm          on target   shadow   true
+    ask-mutual          51      0.2   51.0
+    ask-set             12      4.0    8.2
+
+**`ask-mutual` demotes real parts and essentially nothing else.** 51 of 51
+scored pairs are true partners. Its 48% shadow ASK rate never becomes a shadow
+SCORED pair, because it asks a shadow against whichever query made it notice the
+shadow — and that query is usually not one of that shadow's own concept's
+surfaces, so `separation` never reads the pair. It pays for the right suspects
+and files them under the wrong questions.
+
+**`ask-set` asks a candidate against ITS OWN top partners**, so when the
+candidate is a shadow, those partners ARE its concept's surfaces and the pair is
+one the metric reads. A third of its hits are confounds against `ask-mutual`'s
+0.4%.
+
+**The design principle, and it is the useful part:** ask about a candidate
+relative to what IT predicts, not relative to the query that made you notice it.
+Nomination and interrogation had been the same step in every arm here, and
+separating them is what put demotions where they help.
+
+**The margin is still +0.0085 and the oracle's swing is +0.52**, so this is a
+mechanism identified rather than a problem solved. What it explains is why five
+arms with better coverage did worse: coverage of the metric is not the same as
+coverage of the CONFOUNDS, and every earlier arm optimised the first.
+
 ### THE SET MECHANISM IS NOT WHAT WORKS. The control says so
 
 Sweeping `SET_SIZE`, every cell shown, paired against watching on 12 seeds:

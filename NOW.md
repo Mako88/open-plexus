@@ -97,9 +97,16 @@ output so `&&` read grep's status. `CLAUDE.md` names this for `tail`; I hit it
 with `grep`. **And `tools/mutate.py` was broken mid-edit four times** by patch
 scripts writing before `ast.parse` validated.
 
-Two candidate checks, both John's call because both cost something: a pre-commit
-hook running preflight (~70s per commit), and parse-before-write (free, but a
-habit rather than a mechanism — which the doctrine says fails).
+**Only ONE of those is unguarded, and I offered both as if they were.** A broken
+`mutate.py` fails preflight's import check, which caught it 4 times out of 4 —
+the guard exists and worked, and the cost was my time rather than a wrong
+result. Proposing a new check for it would have been adding a rule where a
+mechanism already does the job.
+
+**Committing on a red preflight IS unguarded.** Nothing stopped it and nothing
+would have noticed; I found it by re-reading my own output. The candidate is a
+pre-commit hook running preflight, and its cost is ~70s on every commit —
+John's call, since he bears it.
 
 ## Known debts
 

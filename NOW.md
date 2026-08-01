@@ -121,7 +121,12 @@ README line goes back to ⬜ and the disagreement is the finding.**
    a sweep with a budget rather than one big number.
 2. **Run the reached/never-reached split at full scale.** The decomposition
    above is from forty queries. It is the sharpest diagnostic the run has and it
-   has never been read at a size that settles anything.
+   has never been read at a size that settles anything. A run is in flight —
+   **and it measures the OLD prefix behaviour**, because the sampling fix landed
+   after it started and its process holds the previous code. That is the right
+   comparison point rather than a mistake: it says where the mechanism stood
+   before the cap was unbiased. Re-running it after will not reproduce it, and
+   should not.
 2. **Three-step typed paths.** 0.2597 of answers lie further than two steps and
    nothing has been run there. Costs a fan-out cubed, so it needs the cap
    thinking through rather than raising.

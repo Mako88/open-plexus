@@ -278,6 +278,39 @@ the arm can compute, and no such anchor is known here. **That is the whole of
 what is missing**, and it is smaller than "the rule has no nothing-to-find
 state" made it sound.
 
+## THE COVERAGE CURVE REFUTES "IT NEEDS NEAR-TOTAL COVERAGE"
+
+That claim was inferred from three points -- 6, 25 and 108 -- and never
+measured. Measured, with each covered pair resolved at 96 asks so this is
+coverage and not noise:
+
+    covered   per query   threshold
+          0     -0.2967     -0.2967
+         12     -0.2850     -0.2473
+         27     -0.2358     -0.1846
+         54     -0.0844     -0.0142
+         81     +0.0533     +0.0899
+        108     +0.1889     +0.1940
+
+**Smooth and monotonic, with no cliff.** Twelve pairs of 108 already beat
+watching by 0.05, and it crosses zero near 60. Coverage buys separation in
+proportion, which is the opposite of what "near-total" claimed.
+
+### And that opens the real question
+
+**An arm covering 25 pairs scores -0.3067 where this curve says 27 pairs is
+-0.1846.** Same rule, same world, similar coverage, and 0.12 apart. The arms are
+losing something that is not coverage, not budget, not the metric and not the
+sampler, because each of those is now measured.
+
+One candidate, and it is a HYPOTHESIS with no measurement behind it yet: this
+curve builds its index from `occasions` unconditioned watches, while an arm
+feeds every ask-occasion into the same index -- and an ask-occasion is drawn
+conditioned on the candidate being present, so it is not a sample from the
+world. If that is it, ASKING CORRUPTS THE COUNTS IT IS TRYING TO CORRECT, and
+the fix is to intervene without learning from the intervention. Nothing here has
+tested that, and it should be tested before it is believed.
+
 ## IS THE MIN UNFAIR TO THE ARMS? A NULL
 
 `separation` takes a MIN over true partners, inherited from g39-06, and a min

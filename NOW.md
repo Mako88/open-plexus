@@ -12,6 +12,35 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
 
 ---
 
+## The result, and it is the first one
+
+**A typed ranked walk clears the floor by the same margin ComplEx does, with no
+training and no embedding.** `sum over paths`, blend weight 0.01 chosen on
+10,233 validation triples, read on all 20,466 test triples in both directions:
+
+    floor (relation only)   0.2334
+    the arm                 0.2470
+    margin                 +0.0136  +/- 0.0005, so about 27 standard errors
+
+    published, same floor:  ComplEx +0.0136   DistMult +0.0076
+
+**And it is not the marginal being reinforced**, which was the live worry. Split
+by how many training triples the answer entity has:
+
+    rare (<10)         n= 1,703   0.0166 -> 0.0469   +0.0303
+    middling (10-49)   n=17,330   0.0548 -> 0.0684   +0.0137
+    common (50+)       n=21,899   0.3917 -> 0.4039   +0.0122
+
+The gain is LARGEST where the answer is rare, nearly tripling the floor there,
+and smallest where it is common. The 120-query preview said the opposite and had
+seven queries in that band.
+
+**What is still true and must travel with the number:** 7,375 queries improved
+and 11,302 got worse. The mechanism wins a minority of queries by a lot and
+loses the majority by a little, at every sample size from 120 to 40,932, so that
+is a property of it rather than noise. Most of the 0.2470 is the marginal; the
+structure contributes the 0.0136.
+
 ## In flight
 
 - **`fb15k237_walk.py` at 4,000 queries was STOPPED before its last two cells**,

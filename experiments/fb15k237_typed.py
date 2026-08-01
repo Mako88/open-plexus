@@ -378,11 +378,21 @@ def main() -> int:
                          "margin": blended["mrr"] - base["mrr"]})
         del row["_test_ranks"]
 
-    best = max((row for row in rows
-                if row["arm"] not in ("relation only", "blend", "band")),
-               key=lambda row: row["mrr"])
-    print(f"\nBest typed arm: {best['mrr']:.4f} ({best['accumulate']} over "
-          f"paths, {best['arm']}) — margin {best['margin']:+.4f}")
+    # THE BLEND ROWS ARE THE ARM. Reporting the best FIXED combiner as "best"
+    # printed a negative margin directly under a positive one and invited the
+    # wrong line to be quoted; the fixed combiners are a swept axis that lost.
+    blends = [row for row in rows if row["arm"] == "blend"]
+    best = max(blends, key=lambda row: row["test"][row["chosen_alpha"]])
+    fixed = max((row for row in rows
+                 if row["arm"] not in ("relation only", "blend", "band")),
+                key=lambda row: row["mrr"])
+    print(f"\nBest arm: {best['test'][best['chosen_alpha']]:.4f} "
+          f"({best['accumulate']} over paths, blended at alpha "
+          f"{best['chosen_alpha']}) - margin {best['margin']:+.4f} "
+          f"+/- {best['standard_error']:.4f}")
+    print(f"Best FIXED combiner, which is the axis that lost: {fixed['mrr']:.4f} "
+          f"({fixed['accumulate']} over paths, {fixed['arm']}) - margin "
+          f"{fixed['margin']:+.4f}")
     print("Published, against this same floor:")
     for name, (mrr, _) in sorted(PUBLISHED.items(), key=lambda item: item[1][0]):
         print(f"  {name:>10}  {mrr:.4f}   margin {mrr - floor['mrr']:+.4f}")

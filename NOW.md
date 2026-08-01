@@ -108,16 +108,15 @@ README line goes back to ⬜ and the disagreement is the finding.**
 
 ## Next, in the order I would take them
 
-1. **Measure the per-query blend weight, which is BUILT and unmeasured at
-   scale.** It weights the structure by how concentrated its path evidence is —
-   the largest candidate's share of the total — so a query whose paths agree on
-   one answer gets it at full strength and one whose paths spray over hundreds
-   barely gets it. No fitted constant, alpha 0 is still exactly the floor, and
-   both weightings are chosen separately on validation so neither is compared at
-   a setting picked for the other. **The question it answers is whether the
-   11,302 losses are the queries where the structure was silent.** At sixty
-   queries it says nothing either way; run it at full scale once the seed-1
-   reproduction has the machine.
+1. **Why the mechanism loses 11,302 queries, which is still open.** The first
+   answer was wrong: weighting the structure per query by how concentrated its
+   evidence is does NOT convert the losses — +0.0131 against the global
+   weight's +0.0136, and 11,359 losses against 11,302. So the losing queries are
+   not simply the ones where the structure was silent, and what they ARE is
+   unmeasured. A breakdown by relation, or by whether the true answer was
+   reached by any path at all, is the next place to look — the second of those
+   splits the losses into *never reached* and *reached and mis-ranked*, which
+   are different failures needing different repairs.
 2. **Three-step typed paths.** 0.2597 of answers lie further than two steps and
    nothing has been run there. Costs a fan-out cubed, so it needs the cap
    thinking through rather than raising.

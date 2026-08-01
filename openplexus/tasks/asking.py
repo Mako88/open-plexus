@@ -125,7 +125,7 @@ class World:
         self.drawn += 1
         return occasion
 
-    def ask(self, present: int, absent: int, patience: int = 64) -> Answer:
+    def ask(self, present: int, absent, patience: int = 64) -> Answer:
         """One occasion featuring `present`, and whether `absent` came with it.
 
         Args:
@@ -140,7 +140,16 @@ class World:
         Returns:
             An `Answer`. `refused` is only meaningful when an occasion was found.
         """
-        if present == absent:
+        # ONE SURFACE OR SEVERAL. A set asks for `present` without ANY of them,
+        # so a REFUSAL means at least one could not be shed and a COMPLIANCE
+        # means all of them could -- one ask carrying as many facts as the set
+        # is large. An int behaves exactly as it always has, because every
+        # number measured through this was measured that way.
+        wanted = {absent} if isinstance(absent, int) else set(absent)
+        if not wanted:
+            raise ValueError("asking for a surface without nothing is not a "
+                             "question; it would comply every time")
+        if present in wanted:
             raise ValueError(
                 "asking for a surface without itself is unanswerable by "
                 "construction, and would report a refusal every time")
@@ -155,7 +164,8 @@ class World:
             if present not in occasion.surfaces:
                 continue
             answer = Answer(occasion=occasion,
-                            refused=absent in occasion.surfaces, drawn=drawn)
+                            refused=bool(wanted & set(occasion.surfaces)),
+                            drawn=drawn)
             break
         if answer is None:
             answer = Answer(occasion=None, refused=False, drawn=drawn)

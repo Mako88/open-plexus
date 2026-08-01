@@ -585,6 +585,21 @@ not change WHO gets asked about, and the two-hop direction is then out of ideas
 in this world rather than merely unimplemented. Neither says anything yet about
 beating watching -- the product bound is untouched by which pairs are chosen.
 
+## A RECORDED NUMBER DRIFTED AND NOTHING NOTICED
+
+**`ask-mutual` lands 46 of 108, not the 53 recorded when P5 was scored.** Found
+by accident: a set-ask extension to `World.ask` produced 46, I treated that as a
+claim about my own code, and reverting it gave 46 as well. The extension was
+innocent; the figure had drifted earlier, under the `charge_per_ask` restructure
+of `ask`, and every run since has quoted a number that no longer reproduced.
+
+**P5's verdict is unaffected** — its threshold was 30 and 46 clears it — which is
+exactly why nothing caught it. A mechanically scored prediction protects the
+VERDICT and says nothing about a figure quoted in prose beside it.
+
+Corrected throughout. Recorded because *"a finding updates a line, it never
+appends an entry"* assumes the line still holds, and this one had stopped.
+
 ## STOP BUILDING NOMINATORS. THE ARITHMETIC SAYS THEY CANNOT WIN
 
 Five policies have been built here: `ask-random`, `ask-targeted`, `ask-mutual`,
@@ -631,7 +646,7 @@ COMPLIES 78% of the time; a true partner complies 62%. The outcome that carries
 N facts is the outcome a confound produces most.
 
     P24  ask-set at budget 0.10 lands >60 of the 108 scored pairs on target,
-         against ask-mutual's 52, because one ask now settles several
+         against ask-mutual's 46, because one ask now settles several
     P25  and it beats watching by >0.05, which no arm has done
 
 **P25 is the real one.** Every previous failure traced back to a pair needing
@@ -1253,7 +1268,7 @@ def main() -> int:
           "alone IS constitutive, and asking should say so.")
 
     # WHICH HALF OF THE DEMOTION DOES THE WORK? Asking everything reaches
-    # -0.0500 and asking 53 of 108 well-chosen pairs reaches -0.5130, so a
+    # -0.0500 and asking 46 of 108 well-chosen pairs reaches -0.5130, so a
     # SUBSET is worse than none. This splits the ceiling to say why.
     print("\nThe ceiling, split by what it is allowed to demote:")
     for restrict, label in (("shadows", "shadows only"), ("true", "true only")):
@@ -1265,7 +1280,7 @@ def main() -> int:
         print(f"  {label:<16}{got:>10.4f}")
     print("  Demoting a true partner lowers a MIN and demoting the shadow "
           "lowers one term, so partial coverage is not partial credit.")
-    # IS THE COMPARATIVE RULE WRONG, OR STARVED? At 53 of 108 pairs many
+    # IS THE COMPARATIVE RULE WRONG, OR STARVED? At 46 of 108 pairs many
     # queries have ONE asked candidate, and a candidate compared only against
     # itself is never demoted. This runs the same rule at full coverage.
     full = sum(t["separation_comparative"] for t in tops) / len(tops)

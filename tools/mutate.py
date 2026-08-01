@@ -788,9 +788,10 @@ MUTATIONS = [
         # so the rate becomes a function of `patience` and not a
         # measurement.
         old="            answer = Answer(occasion=occasion,\n"
-            "                            refused=absent in "
-            "occasion.surfaces, drawn=drawn)\n            break",
-        new="            if absent in occasion.surfaces:\n"
+            "                            refused=bool(wanted & "
+            "set(occasion.surfaces)),\n"
+            "                            drawn=drawn)\n            break",
+        new="            if wanted & set(occasion.surfaces):\n"
             "                continue\n"
             "            answer = Answer(occasion=occasion, refused=False, "
             "drawn=drawn)\n            break",

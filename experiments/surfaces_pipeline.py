@@ -82,6 +82,39 @@ ARMS = ("image+word", "audio+word", "together", "alternating")
 FRONTS = ("lsh", "kmeans")
 
 
+#: What a CROSS-MODAL link costs, from `g40-01`'s sweep, readable at
+#: `f0a8a72^`. **Not chosen here**: that run passed gate G7 and measured the
+#: price at about 300 occasions per digit, an order of magnitude dearer than a
+#: within-modal link at about 16.
+CROSS_MODAL_OCCASIONS_PER_DIGIT = 300
+
+
+def affordable(occasions: int, digits: int) -> None:
+    """Say, before any arm runs, which arms can afford the link they test.
+
+    **The check this file needed and did not have.** `alternating` puts sound on
+    odd occasions and pictures on even ones, so each sense gets HALF the stream
+    -- and at 3,000 occasions over ten digits that is 150 per digit against a
+    measured requirement of 300. The arm that tests the cross-modal claim was
+    the one arm that could not afford it, and it reported `crossed` 0.0000
+    looking exactly like a broken mechanism.
+
+    A precondition that fails loudly beats a log nobody reads. This one prints
+    on every run, above the table, so an under-resourced arm cannot be mistaken
+    for a refuted one.
+    """
+    print("\nCAN EACH ARM AFFORD THE LINK IT TESTS? "
+          f"a cross-modal link needs ~{CROSS_MODAL_OCCASIONS_PER_DIGIT} "
+          "occasions per digit (g40-01)")
+    for arm, share in (("image+word", 1.0), ("audio+word", 1.0),
+                       ("together", 1.0), ("alternating", 0.5)):
+        per_digit = occasions * share / digits
+        verdict = ("ok" if per_digit >= CROSS_MODAL_OCCASIONS_PER_DIGIT
+                   else "UNDER-RESOURCED, a null here is not a refutation")
+        print(f"  {arm:<14}{per_digit:>7.0f} per digit per sense   {verdict}")
+    print()
+
+
 def stream(arm: str, pairs, codes: int, image_code, audio_code, rng):
     """One arm's occasions, laid out so a range test identifies the modality.
 
@@ -199,7 +232,9 @@ def main() -> int:
     print(f"{len(digits)} images, {len(heard)} recordings, "
           f"{len(spoken.speakers(paths))} speakers, {len(pairs)} occasions")
     print(f"noise {NOISE}, distractors {DISTRACTORS}, statistic {ARM}, "
-          f"chance for every purity is {chance:.4f}\n")
+          f"chance for every purity is {chance:.4f}")
+    affordable(len(pairs), len(mnist.WORDS))
+
 
     header = (f"{'bits':>5}{'front':>8}{'arm':>15}{'codes':>7}{'q_img':>8}"
               f"{'q_aud':>8}{'link_img':>10}{'link_aud':>10}{'cross':>8}"

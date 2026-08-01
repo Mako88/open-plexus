@@ -299,6 +299,37 @@ P16 without P17 would mean the bias is real and something else is also wrong.
 Neither holding would refute the hypothesis outright and send the 0.12 back to
 being unexplained, which is where it is now.
 
+### What happened: P16 held hugely, and I do not understand the result
+
+    arm          budget   learns   per query   on target
+    watch           0.0     True     -0.2967           0
+    ask-repeat     0.25     True     -0.3189           6
+    ask-repeat     0.25    False     -0.0741           1
+    ask-mutual     0.10     True     -0.3297          46
+    ask-mutual     0.10    False     -0.3171           1
+
+Not learning from its own asks is worth +0.245 to ask-repeat. P17 still fails --
+-0.0741 does not beat watching -- but the size of that is far past anything
+registered.
+
+**The obvious artefact is refuted.** Discarding ask-occasions leaves the index
+with less data, and less data could shrink a difference toward zero for free.
+Watching on a truncated stream says otherwise: 4000 observations -0.2967, 400
+-0.3124, 100 -0.3496, 50 -0.3562. A sparser index scores WORSE, so the gain is
+not sparsity.
+
+**AND IT IS STILL NOT EXPLAINED, WHICH IS WHY THIS SAYS SO.** The blind arm
+lands ONE scored pair. One demoted pair cannot move an average over 36 queries
+by 0.245, so whatever produced this is not the demotion, and the conditioned-
+sample story that P16 was registered for does not obviously produce it either.
+Something changes in the index or in the arm's own trajectory that has not been
+identified.
+
+The number is real and reproduced across three seeds. What it means is not
+established, and it must not be read as "the bias explanation confirmed" until
+the mechanism is found -- a +0.245 nobody can account for is exactly the shape
+of a result that turns out to be measuring something else.
+
 ## THE COVERAGE CURVE REFUTES "IT NEEDS NEAR-TOTAL COVERAGE"
 
 That claim was inferred from three points -- 6, 25 and 108 -- and never

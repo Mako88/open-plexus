@@ -36,10 +36,6 @@ rates the arm paid for. At 384 asks per pair it reaches **+0.2256**, where an
 oracle calling `is_shadow` reaches **+0.2256** and watching reaches **−0.2967**.
 Tested; its mutation is caught.
 
-**Why a split and not a gradient.** At 192 asks: true partners 0.292–0.474,
-shadows 0.135–0.292, zero of 216 true partners below the highest shadow. Every
-earlier rule multiplied a score by a rate, which is the wrong shape.
-
 **No ARM has beaten watching, and it needs NEAR-TOTAL coverage rather than more
 of it.** Re-pricing an ask as one action (`charge_per_ask=1`, default off) lifts
 on-target pairs 6 → 25 and leaves separation at −0.3067; the ceiling only pays at
@@ -64,18 +60,13 @@ marginal, which watching counts for free and which is exactly what cannot
 separate a confound. The timing channel is redundant with counting, not ahead of
 it. The wrong claim came from comparing two ratios over different quantities.
 
-**P12 refuted at 100%, and now measured rather than argued.** Where there is a
-confound the split is nearly perfect (36 of 36 shadows, 2 false positives);
-where there is not, it demotes all 72 true partners, which at `alone` 0.0 are
-genuinely the more detachable group. The two cases ARE distinguishable — by the
-low group's absolute level, 0.2105 against 0.3779. The scale-free candidate, the
-ratio between groups, is useless: 0.55 against 0.52. **What is missing is an
-absolute anchor the arm can compute**, which is smaller than "no nothing-to-find
-state" made it sound. The per-query filter now has three
-tests and a caught mutation; its first test was vacuous and is noted in the
-commit.
+**P12 refuted at 100%.** Where there is a confound the split is nearly perfect
+(36 of 36 shadows); where there is not, it demotes all 72 true partners. The two
+cases differ by the low group's absolute level, 0.2105 against 0.3779 — the
+scale-free ratio is useless, 0.55 against 0.52. **Missing: an absolute anchor
+the arm can compute.**
 
-**Scored:** P5, P7, P9, P11, P15 held. P1–P3, P6, P8, P10, P12, P13 refuted.
+**Scored:** P5, P7, P9, P11, P15, P16 held. P1–P3, P6, P8, P10, P12, P13 refuted.
 P14 is unmeasurable — budget stops binding above 0.25.
 
 ## Next, in the order I would take them

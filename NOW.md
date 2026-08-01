@@ -148,10 +148,21 @@ README line goes back to ⬜ and the disagreement is the finding.**
    fix would have to skip hub edges by how uninformative they are rather than by
    how many there are, which is an idea and not yet a mechanism.
 
-   *(Confound, named: the 600 run also carries the sampling fix, so two things
-   changed together. A fan-out 200 run WITH sampling is in flight to separate
-   them. The conclusion above is robust to it either way — 35% and 38% are both
-   about half of 74%.)*
+   **Confound resolved by the control**, and it went against the change I was
+   most confident in:
+
+        fan-out 200, prefix     34.9%
+        fan-out 200, sampled    35.2%     <- the sampling fix, worth ~nothing
+        fan-out 600, sampled    37.9%     <- the cap, worth the whole 2.7
+
+   The prefix bias was real in principle and immaterial in effect. It was
+   committed with a confident rationale about hubs being systematically
+   mis-sampled, and the rationale was right about the mechanism and wrong about
+   the size. **Keep the fix** — an unbiased sample is still the honest thing to
+   take — but it buys nothing and must not be cited as if it did.
+
+   The margin on reachable queries is flat across all three, +0.0280, +0.0265,
+   +0.0267, so nothing here changes what the mechanism is worth where it works.
 2. **Run the reached/never-reached split at full scale.** The decomposition
    above is from forty queries. It is the sharpest diagnostic the run has and it
    has never been read at a size that settles anything. A run is in flight —

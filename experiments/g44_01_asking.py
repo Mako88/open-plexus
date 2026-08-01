@@ -668,9 +668,26 @@ than the withdrawn +0.0164 managed. But the per-seed ranges overlap
 and must not be reported as a result.** This project has withdrawn two claims of
 exactly this size and shape, both mine, both on the day they were made.
 
-**What would settle it:** a PAIRED comparison, same seed against same seed,
-rather than two means. A margin one fifth of its registered threshold, with
-overlapping ranges, is a direction and not a finding.
+**The paired comparison settles it, and the answer is yes-but-tiny:**
+
+    PAIRED, 20 seeds, same world on each side
+      ask-set beats watch on 16/20 seeds
+      mean difference +0.0085, sd of the mean 0.0025
+      worst -0.0134, best +0.0250
+
+**3.4 standard errors above zero. THE FIRST ARM IN THIS FILE TO BEAT WATCHING,
+and it is established rather than suggested.** Twenty paired seeds, the loser
+losing by less than the winner wins, and the sign holding on four out of five.
+
+**And it is 6x smaller than P25 asked for, so P25 stays refuted.** Against the
+oracle's swing from -0.2967 to +0.2256 it recovers about **1.6%** of what the
+mechanism can do. The product bound is DENTED, not broken: a cheaper fact buys a
+real improvement and nowhere near the one available.
+
+**What this establishes and what it does not.** Established: an autonomous arm
+CAN beat watching, so the wall is not absolute. Not established: that set-asking
+scales — the gain may be a constant that a larger set or a longer stream does
+not multiply, and nothing here has swept `SET_SIZE`.
 
 **P25 was the real one.** Every previous failure traced back to a pair needing
 ~48 asks to resolve a 0.16 gap. If a set-ask buys N pairs per ask, the effective

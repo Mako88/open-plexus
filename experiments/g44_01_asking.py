@@ -116,8 +116,16 @@ about +-0.13 against a 0.16 signal -- and sweeping it refutes that too:
             48      -0.0070      -0.0580       +0.2343
            192      -0.0104      -0.0784       +0.2246
 
-Sixteen times the asks moves nothing across zero. **The shortfall is structural
-and not sampling**, and `shadows only` sits near +0.22 throughout.
+Sixteen times the asks moves nothing across zero for EITHER OF THOSE TWO RULES,
+and `shadows only` sits near +0.22 throughout.
+
+**"The shortfall is structural and not sampling" is how I first wrote that, and
+it was too general.** It holds for a rule that multiplies a score by a rate,
+where a noisier rate is still an unbiased multiplier. A CLASSIFIER has a
+completely different sensitivity -- it is asking which side of a boundary a
+value falls, and noise flips that. The threshold rule below is unusable at 12
+asks per pair and exact at 384, so the sweep had to be re-run per rule rather
+than concluded once.
 
 ## A threshold, registered before it is written
 
@@ -141,6 +149,26 @@ the arm actually observed, which needs no privileged knowledge.
     P11  and at shadow_alone 0.0 it does NOT beat its own watch by >0.02
     P12  the rule has a NOTHING-TO-FIND state: at shadow_alone 0.0 it demotes
          true partners on under 20% of queries
+
+### What happened: P10 refuted, P11 held, P12 refuted at 100%
+
+**And the rule is nonetheless right.** Swept against asks per pair, against an
+oracle that calls `is_shadow` and reaches +0.2042:
+
+    asks per pair   threshold      raw   oracle
+               12     -0.0802  -0.0500  +0.2042
+               48     +0.1314  -0.0070  +0.2343
+              192     +0.2170  -0.0104  +0.2246
+              384     +0.2256  -0.0050  +0.2256
+
+**At 384 the learned threshold MATCHES THE ORACLE to four decimals**, using
+nothing but rates the arm paid for. So a legitimate rule does exist, and P10
+failed on allocation: at budget 0.10 the arm spends about 400 asks over 53-odd
+pairs, roughly 7 each, where the rule needs 48 before it beats doing nothing.
+
+**The constraint has moved from "what to ask" to "how often to ask it."** Every
+arm here nominates a fresh pair each draw, which is the worst possible spend for
+a rule that needs a resolved rate per pair.
 
 **P12 is the one I expect to fail, and it is registered because of that.** A
 two-means split always returns two groups, so at 0.0 -- where the shadow is a
@@ -206,13 +234,14 @@ def world_config(seed: int, alone: float) -> OccasionConfig:
 
 
 def separation(index: CoOccurrence, config: OccasionConfig, statistic,
-               refusals: dict, comparative: bool = False) -> float:
+               refusals: dict, rule: str = '') -> float:
     """`g39-06`'s quantity: weakest TRUE partner minus the confound.
 
     Positive means every real surface of the concept outranks the thing that
     merely follows it around. Averaged over concepts, so one lucky concept
     cannot carry the arm.
     """
+    cut = learned_threshold(refusals) if rule == 'threshold' else 0.0
     scores = []
     for concept in range(config.concepts):
         own = [concept * config.surfaces + m for m in range(config.surfaces)]
@@ -222,15 +251,15 @@ def separation(index: CoOccurrence, config: OccasionConfig, statistic,
             if not partners:
                 continue
             weakest = min(adjusted(index, statistic, p, query, refusals,
-                                   comparative) for p in partners)
+                                   rule, cut) for p in partners)
             confound = adjusted(index, statistic, shadow, query, refusals,
-                                comparative)
+                                rule, cut)
             scores.append(weakest - confound)
     return sum(scores) / len(scores) if scores else 0.0
 
 
 def adjusted(index: CoOccurrence, statistic, candidate: int, query: int,
-             refusals: dict, comparative: bool = False) -> float:
+             refusals: dict, rule: str = '', cut: float = 0.0) -> float:
     """The counted score, demoted by how easily the candidate came alone.
 
     An unasked pair is unchanged: an arm may only demote what it paid to test.
@@ -257,7 +286,13 @@ def adjusted(index: CoOccurrence, statistic, candidate: int, query: int,
     if not asked:
         return score
     rate = refused / asked
-    if not comparative:
+    if rule == 'threshold':
+        # A SPLIT, NOT A GRADIENT. Below the learned cut the candidate
+        # detaches more easily than the rest and is demoted; above it,
+        # nothing happens, because being hard to detach is what a part
+        # looks like and there is no credit to give for it.
+        return score * rate if rate < cut else score
+    if rule != 'comparative':
         return score * rate
     # AGAINST THE OTHER CANDIDATES FOR THIS QUERY, not against 1.0. Only a
     # candidate detached more easily than its neighbours is demoted, and the
@@ -268,6 +303,77 @@ def adjusted(index: CoOccurrence, statistic, candidate: int, query: int,
     if typical <= 0.0:
         return score * rate
     return score * min(1.0, rate / typical)
+
+
+def learned_threshold(refusals: dict, rounds: int = 40) -> float:
+    """Split the observed refusal rates in two, and return the boundary.
+
+    **Nothing here may look at what a surface IS.** It reads only rates the arm
+    paid for, so the arm could run this itself.
+
+    Two means, seeded at the extremes and iterated to a fixed point. The measured
+    structure it is built for: true partners run 0.292 to 0.474 and shadows 0.135
+    to 0.292 at 192 asks, with zero of 216 true partners below the highest
+    shadow, so a boundary exists and the only question is finding it unaided.
+    """
+    rates = sorted(r / a for a, r in refusals.values() if a)
+    if len(rates) < 2:
+        return 0.0
+    low, high = rates[0], rates[-1]
+    if high - low < 1e-9:
+        return 0.0
+    for _ in range(rounds):
+        boundary = (low + high) / 2
+        under = [r for r in rates if r < boundary]
+        over = [r for r in rates if r >= boundary]
+        if not under or not over:
+            return 0.0
+        moved_low = sum(under) / len(under)
+        moved_high = sum(over) / len(over)
+        if abs(moved_low - low) < 1e-9 and abs(moved_high - high) < 1e-9:
+            break
+        low, high = moved_low, moved_high
+    return (low + high) / 2
+
+
+def wrongly_demoted(config: OccasionConfig, statistic,
+                    per_pair: int = 48) -> float:
+    """At `shadow_alone` 0.0, how often does the threshold demote a real part?
+
+    **The question P12 asks, and the one a confound detector has to answer.**
+    Here the shadow genuinely cannot be had without its concept, so there is no
+    confound to find and the correct behaviour is to demote nothing. A two-means
+    split always returns two groups, so it will demote whichever group detaches
+    more easily -- and at 0.0 that is the TRUE PARTNERS, refused 0.3917 against
+    the shadow's 0.7326.
+
+    Returns the share of queries where at least one true partner falls below the
+    learned cut.
+    """
+    world = World(config)
+    refusals: dict = {}
+    for concept in range(config.concepts):
+        own = [concept * config.surfaces + m for m in range(config.surfaces)]
+        for query in own:
+            for cand in [s for s in own if s != query] + [
+                    config.shadow_of(concept)]:
+                asked = refused = 0
+                for _ in range(per_pair):
+                    refused += world.ask(present=cand, absent=query).refused
+                    asked += 1
+                refusals[(cand, query)] = (asked, refused)
+    cut = learned_threshold(refusals)
+    queries = harmed = 0
+    for concept in range(config.concepts):
+        own = [concept * config.surfaces + m for m in range(config.surfaces)]
+        for query in own:
+            queries += 1
+            for cand in [s for s in own if s != query]:
+                asked, refused = refusals[(cand, query)]
+                if refused / asked < cut:
+                    harmed += 1
+                    break
+    return harmed / queries if queries else 0.0
 
 
 def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
@@ -325,7 +431,9 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
         "arm": arm, "budget": budget,
         "separation": separation(index, config, statistic, refusals),
         "separation_comparative": separation(index, config, statistic,
-                                             refusals, comparative=True),
+                                             refusals, 'comparative'),
+        "separation_threshold": separation(index, config, statistic,
+                                           refusals, 'threshold'),
         "refusal_rate": (sum(r for _, r in tallies) / sum(a for a, _ in tallies)
                          if tallies else 0.0),
         "pairs_tested": len(refusals),
@@ -441,7 +549,9 @@ def ceiling(config: OccasionConfig, statistic, rng: random.Random,
         "arm": f"ceiling ({restrict})" if restrict else "ceiling (not an arm)",
         "separation": separation(index, config, statistic, refusals),
         "separation_comparative": separation(index, config, statistic,
-                                             refusals, comparative=True),
+                                             refusals, 'comparative'),
+        "separation_threshold": separation(index, config, statistic,
+                                           refusals, 'threshold'),
         "refusal_rate": (sum(r for _, r in tallies) / sum(a for a, _ in tallies)
                          if tallies else 0.0),
         "pairs_tested": len(refusals),
@@ -480,6 +590,7 @@ def main() -> int:
             row = {"arm": arm, "budget": budget, "alone": args.alone,
                    "separation": mean("separation"),
                    "separation_comparative": mean("separation_comparative"),
+                   "separation_threshold": mean("separation_threshold"),
                    "refusal_rate": mean("refusal_rate"),
                    "pairs_tested": mean("pairs_tested"),
                    "on_target": mean("on_target"),
@@ -544,6 +655,14 @@ def main() -> int:
     rows.append({"arm": "ceiling (comparative)", "separation": full})
     print(f"  comparative, full coverage      {full:>10.4f}  <- the same rule "
           f"the arm could not afford")
+    # THE THRESHOLD, ON SCORED PAIRS ONLY. The arm learns its cut from every
+    # ask it made, and most of those are background pairs that detach for
+    # free, so its split lands between background and everything else rather
+    # than between confounds and parts. This is the rule without that.
+    cut = sum(t["separation_threshold"] for t in tops) / len(tops)
+    rows.append({"arm": "ceiling (threshold)", "separation": cut})
+    print(f"  threshold, full coverage        {cut:>10.4f}  <- learned from "
+          f"scored pairs alone, which is what the arm cannot arrange")
     # THE CONTROL, and without it "demote the shadow" is true by construction.
     # At alone=0.0 the shadow IS constitutive, so demoting shadows must NOT
     # rescue separation -- if it does, this is arithmetic and not evidence.
@@ -600,13 +719,33 @@ def main() -> int:
                                     statistic, random.Random(seed)))
         control_rows.append(run_arm("watch", world_config(seed, 0.0), 0.0,
                                     statistic, random.Random(seed)))
-    def control_mean(arm):
+    def comparative_mean(arm):
         got = [r["separation_comparative"] for r in control_rows
                if r["arm"] == arm]
         return sum(got) / len(got)
-    p9 = control_mean("ask-mutual") - control_mean("watch")
+    p9 = comparative_mean("ask-mutual") - comparative_mean("watch")
     verdicts.append(("P9", "and at shadow_alone 0.0 it does NOT beat watch "
                      "by >0.02", not p9 > 0.02, f"{p9:+.4f}"))
+
+    thresh = {(r["arm"], r["budget"]): r["separation_threshold"]
+              for r in rows if "separation_threshold" in r}
+    p10 = thresh.get(("ask-mutual", 0.10), 0.0) - thresh.get(("watch", 0.0), 0.0)
+    verdicts.append(("P10", "learned threshold: ask-mutual beats watch by "
+                     ">0.05", p10 > 0.05, f"{p10:+.4f}"))
+
+    def control_mean(arm, key):
+        got = [r[key] for r in control_rows if r["arm"] == arm]
+        return sum(got) / len(got)
+    p11 = control_mean("ask-mutual", "separation_threshold") - \
+        control_mean("watch", "separation_threshold")
+    verdicts.append(("P11", "and at shadow_alone 0.0 it does NOT beat watch "
+                     "by >0.02", not p11 > 0.02, f"{p11:+.4f}"))
+
+    # P12: DOES IT KNOW HOW TO FIND NOTHING? Registered expecting a failure.
+    wrong = wrongly_demoted(world_config(SEEDS[0], 0.0), statistic)
+    verdicts.append(("P12", "a NOTHING-TO-FIND state: at alone 0.0 it demotes "
+                     "true partners on <20% of queries", wrong < 0.20,
+                     f"{wrong:.1%} of queries"))
 
     for name, claim, held, detail in verdicts:
         print(f"  {name} {'HELD ' if held else 'REFUTED'}  {claim}  [{detail}]")

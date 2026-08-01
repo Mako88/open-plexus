@@ -40,9 +40,21 @@ Delete a line when it is done. This file is disposable and nothing may cite it.
   (`clutrr_headroom.py`). Both were cheap and both were run before building on
   the benchmark, which is the only reason two dead ends cost hours rather than
   weeks. **The question that decides the project now has nothing pointed at it.**
-  The next candidate is FB15k-237, which exists because its predecessor leaked
-  the same way; **run the leakage audit on it before anything else**, since that
-  is exactly what these two runs would have saved.
+  The next candidate is FB15k-237, and its audit ran first
+  (`experiments/fb15k237_audit.py`): **the leak is genuinely gone** — mined
+  inverse rules score 0.45 on train and 0.0001 on test — but the marginal is
+  strong, MRR 0.2334 from relation-tail frequency alone. So it is usable, with
+  that as the line to clear rather than zero.
+
+- **The published comparison is now cited rather than remembered**, and it says
+  the marginal is most of the score: DistMult 0.241 and ComplEx 0.247 against a
+  no-structure floor of 0.2334 (TransERR arXiv 2306.14580 Table 3). RotatE 0.338
+  and TransERR 0.360 are clear of it. **One caveat travels with those numbers:**
+  that table does not itself say the metrics are filtered and averaged over both
+  directions. It is the convention and it is what this audit does, but nobody
+  has confirmed it for that specific table — and a head-only or tail-only
+  published figure would not be comparable, since our own two halves are 0.1363
+  and 0.3305.
 - **There is no node entry point.** `node_main.py` started the old store and was
   deliberately not carried over.
 - **`openplexus/tasks/asking.py` has no tests and no mutation**, so by this

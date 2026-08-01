@@ -80,13 +80,20 @@ picture of a digit at all.** `shared.linked(a, b)` is what says whether anything
 bridges them, and without it the real merge would report success on three
 unrelated components in one dict.
 
-**Next: the merged pipeline** — real pictures, sounds, words and facts through
-one namespace, declared under all four checks. **What bridges facts to senses? Nothing in the data does.** DEFAULT APPLIED
-2026-08-01, John to override: facts stay a separate island and the merge is
-**one graph of the SENSES** — pictures, sounds and words, which genuinely
-co-occur because that is what an occasion is. Bridging facts means inventing a
-corpus where a fact and a picture share a referent, which is a bigger decision
-than a default should make.
+**THE MERGE LANDED.** `surfaces_pipeline`'s `stream()` was already a hand-rolled
+namespace with the same layout, so `Namespace` gives byte-identical node numbers
+and the whole results table was the regression check — every figure unchanged to
+four decimals. The senses now share one declared graph.
+
+**And the declaration caught a bug in `SharedGraph` on its first run.**
+`holds()` read `wiring.kinds()`, which is process-global, so a run building one
+graph per arm had every graph reporting earlier arms' kinds. Three hours old,
+and every test passed with it, because the tests build one graph per test —
+exactly the case it did not break. Fixed to track per-graph; regression test
+added.
+
+**Next:** the 6,000-occasion cross-modal run, now that the architecture it would
+be measured on is the intended one.
 
 **Reserving is deliberately NOT declaring** — `wiring.kind` is called when data
 arrives, not when room is made, or a reservation would satisfy the check.

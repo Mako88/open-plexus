@@ -102,6 +102,30 @@ P9 is the one that can embarrass this. A rule that always improves separation
 improves it in the world where the confound is constitutive too, and that would
 make P8 a property of the arithmetic rather than a finding about asking.
 
+## What happened, and what is actually left
+
+P8 REFUTED at -0.1264 and P9 HELD. Comparing locally is better than reading a
+rate as an absolute (-0.5130 to -0.4231 for the arm) and it is WORSE than the
+raw rule at full coverage, -0.1425 against -0.0500, so it is not the fix.
+
+The obvious explanation was estimation noise -- twelve asks resolve a rate to
+about +-0.13 against a 0.16 signal -- and sweeping it refutes that too:
+
+    asks per pair       raw   comparative   shadows only
+            12      -0.0500      -0.1425       +0.2042
+            48      -0.0070      -0.0580       +0.2343
+           192      -0.0104      -0.0784       +0.2246
+
+Sixteen times the asks moves nothing across zero. **The shortfall is structural
+and not sampling**, and `shadows only` sits near +0.22 throughout.
+
+So the open problem is exact, and it is not about budget, policy, or noise:
+`shadows only` is an ORACLE -- it calls `is_shadow`, which no arm may do. Every
+legitimate rule tried so far demotes true partners often enough to pay back the
+whole win, and `separation` takes a MIN over true partners, so one wrongly
+demoted part costs the entire query. **What is missing is a legitimate rule that
+approximates the oracle**, and nothing here has found one.
+
     python experiments/g44_01_asking.py --json out/g44-01.json
 """
 
@@ -150,7 +174,7 @@ def world_config(seed: int, alone: float) -> OccasionConfig:
 
 
 def separation(index: CoOccurrence, config: OccasionConfig, statistic,
-               refusals: dict) -> float:
+               refusals: dict, comparative: bool = False) -> float:
     """`g39-06`'s quantity: weakest TRUE partner minus the confound.
 
     Positive means every real surface of the concept outranks the thing that
@@ -165,15 +189,16 @@ def separation(index: CoOccurrence, config: OccasionConfig, statistic,
             partners = [s for s in own if s != query]
             if not partners:
                 continue
-            weakest = min(adjusted(index, statistic, p, query, refusals)
-                          for p in partners)
-            confound = adjusted(index, statistic, shadow, query, refusals)
+            weakest = min(adjusted(index, statistic, p, query, refusals,
+                                   comparative) for p in partners)
+            confound = adjusted(index, statistic, shadow, query, refusals,
+                                comparative)
             scores.append(weakest - confound)
     return sum(scores) / len(scores) if scores else 0.0
 
 
 def adjusted(index: CoOccurrence, statistic, candidate: int, query: int,
-             refusals: dict) -> float:
+             refusals: dict, comparative: bool = False) -> float:
     """The counted score, demoted by how easily the candidate came alone.
 
     An unasked pair is unchanged: an arm may only demote what it paid to test.
@@ -199,7 +224,18 @@ def adjusted(index: CoOccurrence, statistic, candidate: int, query: int,
     asked, refused = refusals.get((candidate, query), (0, 0))
     if not asked:
         return score
-    return score * (refused / asked)
+    rate = refused / asked
+    if not comparative:
+        return score * rate
+    # AGAINST THE OTHER CANDIDATES FOR THIS QUERY, not against 1.0. Only a
+    # candidate detached more easily than its neighbours is demoted, and the
+    # cap means being HARDER to detach than average is never a bonus.
+    peers = [r / a for (c, q), (a, r) in refusals.items()
+             if q == query and a]
+    typical = sum(peers) / len(peers) if peers else 0.0
+    if typical <= 0.0:
+        return score * rate
+    return score * min(1.0, rate / typical)
 
 
 def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
@@ -256,6 +292,8 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
     return {
         "arm": arm, "budget": budget,
         "separation": separation(index, config, statistic, refusals),
+        "separation_comparative": separation(index, config, statistic,
+                                             refusals, comparative=True),
         "refusal_rate": (sum(r for _, r in tallies) / sum(a for a, _ in tallies)
                          if tallies else 0.0),
         "pairs_tested": len(refusals),
@@ -370,6 +408,8 @@ def ceiling(config: OccasionConfig, statistic, rng: random.Random,
     return {
         "arm": f"ceiling ({restrict})" if restrict else "ceiling (not an arm)",
         "separation": separation(index, config, statistic, refusals),
+        "separation_comparative": separation(index, config, statistic,
+                                             refusals, comparative=True),
         "refusal_rate": (sum(r for _, r in tallies) / sum(a for a, _ in tallies)
                          if tallies else 0.0),
         "pairs_tested": len(refusals),
@@ -407,6 +447,7 @@ def main() -> int:
             mean = lambda key: sum(g[key] for g in got) / len(got)  # noqa: E731
             row = {"arm": arm, "budget": budget, "alone": args.alone,
                    "separation": mean("separation"),
+                   "separation_comparative": mean("separation_comparative"),
                    "refusal_rate": mean("refusal_rate"),
                    "pairs_tested": mean("pairs_tested"),
                    "on_target": mean("on_target"),
@@ -464,6 +505,13 @@ def main() -> int:
         print(f"  {label:<16}{got:>10.4f}")
     print("  Demoting a true partner lowers a MIN and demoting the shadow "
           "lowers one term, so partial coverage is not partial credit.")
+    # IS THE COMPARATIVE RULE WRONG, OR STARVED? At 53 of 108 pairs many
+    # queries have ONE asked candidate, and a candidate compared only against
+    # itself is never demoted. This runs the same rule at full coverage.
+    full = sum(t["separation_comparative"] for t in tops) / len(tops)
+    rows.append({"arm": "ceiling (comparative)", "separation": full})
+    print(f"  comparative, full coverage      {full:>10.4f}  <- the same rule "
+          f"the arm could not afford")
     # THE CONTROL, and without it "demote the shadow" is true by construction.
     # At alone=0.0 the shadow IS constitutive, so demoting shadows must NOT
     # rescue separation -- if it does, this is arithmetic and not evidence.
@@ -507,6 +555,26 @@ def main() -> int:
     share = mutual.get("shadow_share", 0.0)
     verdicts.append(("P7", "and >40% of its asks are shadow pairs",
                      share > 0.40, f"{share:.1%}"))
+
+    comp = {(r["arm"], r["budget"]): r["separation_comparative"]
+            for r in rows if "separation_comparative" in r}
+    p8 = comp.get(("ask-mutual", 0.10), 0.0) - comp.get(("watch", 0.0), 0.0)
+    verdicts.append(("P8", "comparative demotion: ask-mutual beats watch "
+                     "by >0.05", p8 > 0.05, f"{p8:+.4f}"))
+
+    control_rows = []
+    for seed in SEEDS:
+        control_rows.append(run_arm("ask-mutual", world_config(seed, 0.0), 0.10,
+                                    statistic, random.Random(seed)))
+        control_rows.append(run_arm("watch", world_config(seed, 0.0), 0.0,
+                                    statistic, random.Random(seed)))
+    def control_mean(arm):
+        got = [r["separation_comparative"] for r in control_rows
+               if r["arm"] == arm]
+        return sum(got) / len(got)
+    p9 = control_mean("ask-mutual") - control_mean("watch")
+    verdicts.append(("P9", "and at shadow_alone 0.0 it does NOT beat watch "
+                     "by >0.02", not p9 > 0.02, f"{p9:+.4f}"))
 
     for name, claim, held, detail in verdicts:
         print(f"  {name} {'HELD ' if held else 'REFUTED'}  {claim}  [{detail}]")

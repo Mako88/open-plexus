@@ -50,6 +50,32 @@ expansions across a network is not 167,852 anything. The costs that transfer are
 MESSAGES SENT and WORK PER NODE, and neither is measured. The ceiling firing on
 74% of queries is a bandwidth statement, not a latency one.
 
+## g44-01 ran: the mechanism works, both policies were starved
+
+**Intervention separates a confound, in both directions.** True partners are
+refused 0.3837 of the time against the shadow's 0.2222, so the confound is
+demoted harder; and the control inverts it, refusing the shadow 0.7326 against
+0.3917 when the shadow genuinely cannot be had alone. That check exists because
+separation is a DIFFERENCE and the demotion MULTIPLIES, so uniform shrinkage
+would have moved the number for free — it nearly made "recovers 83% of the gap"
+a statement about arithmetic.
+
+**P1–P3 stay refuted, and the reason is coverage.** Neither policy asked the
+questions the metric reads: `ask-random` buys 504 pairs to land 18 of 108 on
+target, `ask-targeted` is pinned at 1 at every budget, and the ceiling with
+108/108 reaches −0.0500 against watching's −0.2967.
+
+**Why targeting fails is the interesting part.** `occasions.py` holds the noise
+and distractor surfaces present in EVERY occasion, so `conditional(background |
+anything)` is 1.0, the largest the statistic can take, and a policy that asks
+about its highest-scoring partner is pulled to the background on every draw. It
+is the confound failure happening to the confound detector.
+
+**The open question, and it is the whole of g44-01 now:** whether a policy that
+may not be told which surfaces are concepts can find those 108 pairs at all.
+Asking about the argmax cannot. A candidate worth trying is to nominate by
+*instability* — pairs whose statistic is still moving — rather than by strength.
+
 ## Next, in the order I would take them
 
 1. **A flood with a beam as well as a floor.** The floor removes routes that
@@ -83,7 +109,6 @@ MESSAGES SENT and WORK PER NODE, and neither is measured. The ceiling firing on
 
   **This is the project's actual claim and it is unrunnable**, which is worse
   than the "untested" this file said before.
-- **`tasks/asking.py` has a falsifier registered as g44-01 and never run.**
 - **`tasks/xsl.py` has no caller.** Use it or drop it.
 - **The link columns in `surfaces_pipeline.py` step in tenths** — shares over ten
   words, so nothing smaller than 0.1 can be read.

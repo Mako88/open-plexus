@@ -299,6 +299,27 @@ P16 without P17 would mean the bias is real and something else is also wrong.
 Neither holding would refute the hypothesis outright and send the 0.12 back to
 being unexplained, which is where it is now.
 
+### P18 and P19, registered before the arm that can test this exists
+
+Every arm here asks CONTINUOUSLY once it can: `spend_on_ask` needs only that the
+ask allowance is unspent, so the arm stops watching the moment it starts asking.
+That is why the budget axis stopped binding above 0.25, and it is why turning
+learning off froze the index at one observation.
+
+`interleave=True` asks only while the share of draws spent asking is under
+`budget`, and watches otherwise, so the two are mixed through the run rather
+than run end to end. **Default off**, so every earlier number stands.
+
+    P18  interleaved, an arm that does NOT learn from its asks beats one that
+         does, by >0.05 at matched budget -- the poisoning hypothesis, finally
+         asked in a form that can answer it
+    P19  and both interleaved arms keep an index within 20% of what pure
+         watching accumulates, which is what makes P18 readable at all
+
+**P19 is the guard P16 lacked.** If the index is starved again, P18's number is
+vacuity for the same reason the last one was, and a run that cannot show P19 is
+not evidence about P18 whichever way it comes out.
+
 ### What happened: P16 is an ARTEFACT and is withdrawn
 
     arm          budget   learns   per query   on target

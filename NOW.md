@@ -70,7 +70,20 @@ it.** One arm of g44-01 builds exactly one graph and `expect(graph=1)` passes. A
 full sweep builds many, and that is CORRECT — arms are independent experiments
 and must not share an accumulator. Counting instances does not find this.
 
-**So the check that catches it counts the KINDS entering a graph.** A run
+**THE MERGE NEEDS A NAMESPACE, AND THE KIND CHECK HAS A BLIND SPOT THERE.**
+Checked before building, and all three sources number from zero: image codes
+`[0, codes)` then audio then words; concept surfaces from 0 then distractors
+then shadows; `{entity: i for i, entity in enumerate(entities)}`. Merged
+naively, image code 0 and concept surface 0 and entity 0 are ONE integer and
+accumulate into one row — no error, just nonsense counts.
+
+**And `expect(holding=...)` would pass that merge**: all four kinds arrive, they
+are simply lying on top of each other. So the kind check needs a companion that
+asserts ids from different kinds are DISJOINT, and building the merge without
+it would be trusting the instrument exactly where it cannot see.
+
+**So the check that catches the original fault counts the KINDS entering a
+graph.** A run
 declares *this graph holds pictures and sounds and words and facts* and fails if
 one never arrives. The merge then has an instrument that can fail it, rather
 than my inspection. `wiring.touch("graph")` stays: an accumulator split by

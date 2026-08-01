@@ -111,6 +111,11 @@ def main() -> int:
     # two is the flat mechanism this is trying to beat, so three is the
     # first setting where the design does anything new.
     parser.add_argument("--depth", type=int, default=3)
+    # Which gate to run. The two are not alternatives to be averaged --
+    # they prune on different quantities and cost differently -- and a
+    # run of one is often what the question needs.
+    parser.add_argument("--gate", choices=("strength", "meaning", "both"),
+                        default="both")
     args = parser.parse_args()
 
     started = time.time()
@@ -201,6 +206,8 @@ def main() -> int:
 
     rows: list[dict] = [floor_score | {"arm": "relation only"}]
     for gate, table in GATES.items():
+      if args.gate not in (gate, "both"):
+          continue
       def adjacency(node, table=table):
         return table.get(node, ())
       # A meaning gate does not decay by degree, so the floors that suit it are

@@ -22,10 +22,24 @@ Delete a line when it is done. Nothing may cite this file.
   and has no defence against a hub. Blend weight swept on both arms — and taken
   on TEST, which flatters the flood, because this run has no validation split.
 
-  **Early reading is poor**: the strength gate reaches 0.208 of answers for
-  ~36,000 expansions per query, against the capped enumeration's 0.35 for a
-  fraction of that. If the meaning gate does not beat it, the honest conclusion
-  is that flooding costs a great deal and buys less than flat enumeration.
+  **The strength gate is measured and it is poor.** Three cells at 150 queries,
+  then stopped rather than finished, because the pattern was set and each cell
+  was costing more than the last:
+
+        floor     margin   arrived   expansions   sec
+        0.001    +0.0000    0.0133        19486   153
+        0.0005   +0.0034    0.0267        20649   337
+        0.0002   +0.0019    0.0667        25716   700
+
+  Against the capped enumeration's +0.0136 and 0.35 arrived, for a fraction of
+  the cost. **The two cells not run are named here rather than left to be
+  discovered**: floors 1e-4 and 5e-5, which an earlier 25-query probe put at
+  0.208 arrived and a margin still inside noise.
+
+  Weighting by `1/degree` makes everything decay at the same rate, so the floor
+  cuts by DEPTH rather than by quality — nothing dies for being a bad idea, only
+  for being far away. That cannot produce the handful of surviving paths the
+  design wants, and the meaning gate is the arm that can.
 
 ## Next, in the order I would take them
 

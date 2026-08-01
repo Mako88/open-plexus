@@ -74,6 +74,7 @@ CLUTRR = ROOT / "openplexus" / "tasks" / "clutrr.py"
 SURFACES = ROOT / "openplexus" / "surfaces.py"
 COMPOSITION = ROOT / "openplexus" / "composition.py"
 ASKING = ROOT / "openplexus" / "tasks" / "asking.py"
+PATHWAYS = ROOT / "openplexus" / "pathways.py"
 
 
 @dataclass(frozen=True)
@@ -550,6 +551,43 @@ MUTATIONS = [
         path=FEDERATED,
         old="        raise NotImplementedError(",
         new="        return self._table.occasions or NotImplementedError(",
+    ),
+    Mutation(
+        name="an-unreached-candidate-is-scored-as-zero",
+        breaks="the difference between *no route arrived* and *a route arrived "
+               "and said nothing*, which is this mechanism's main failure mode "
+               "and the one measured at -0.0046 across two thirds of queries. "
+               "With every endpoint present at zero, a caller blending against "
+               "a baseline cannot tell the two apart, and the arrived/never "
+               "split that decomposed the whole result becomes unmeasurable",
+        path=PATHWAYS,
+        old="            if weight <= 0.0:\n                continue",
+        new="            if weight <= 0.0:\n                found[end] = 0.0\n"
+            "                continue",
+    ),
+    Mutation(
+        name="routes-stop-accumulating-and-keep-their-best",
+        breaks="the one claim that separates a ranked walk from a rule lookup: "
+               "many weak agreeing routes outranking one strong route. Summing "
+               "is worth 0.1234 against 0.0834 for the best-route rule on "
+               "FB15k-237, and with this the `sum` arm silently becomes the "
+               "`max` arm while both still appear in every table",
+        path=PATHWAYS,
+        old="                found[end] = found.get(end, 0.0) + weight",
+        new="                found[end] = max(found.get(end, 0.0), weight)",
+    ),
+    Mutation(
+        name="a-route-kind-forgets-which-edge-came-first",
+        breaks="what a route KIND is. With both halves scored against the same "
+               "end of the pair, walking `born in` then `located in` and the "
+               "reverse become one row, so two different meanings are averaged "
+               "into it -- and the mechanism still runs, still ranks, and still "
+               "produces a plausible margin",
+        path=PATHWAYS,
+        old="                   statistic(self.counts.index, answer,\n"
+            "                             self.counts.surface(\"right\", second)))",
+        new="                   statistic(self.counts.index, answer,\n"
+            "                             self.counts.surface(\"left\", second)))",
     ),
     Mutation(
         name="a-candidate-needs-only-ONE-half-behind-it",

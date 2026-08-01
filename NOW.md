@@ -41,7 +41,12 @@ loses the majority by a little, at every sample size from 120 to 40,932, so that
 is a property of it rather than noise. Most of the 0.2470 is the marginal; the
 structure contributes the 0.0136.
 
-**Not yet reproduced.** A second seed is running (`out/fb15k237-typed-seed1.txt`).
+**Not yet reproduced.** A second seed is running (`out/fb15k237-typed-seed1.txt`),
+**against the script as it stood at `b9679f0`**, before the per-query arm was
+added — which is the right version to reproduce a result committed there, and the
+global blend's arithmetic is untouched by that addition. Its fixed-combiner arms
+are already coming back identical to seed 0 (0.1944, 0.1278), confirming the seed
+reaches only the validation subsample that picks alpha.
 The only seed-dependent step is which 10,233 validation triples choose the blend
 weight — the test set is scored whole and the fan-out cap is deterministic — and
 the alpha curve is broad enough that the choice should barely matter (0.01 gives
@@ -88,13 +93,16 @@ README line goes back to ⬜ and the disagreement is the finding.**
 
 ## Next, in the order I would take them
 
-1. **A per-query blend weight.** The single strongest lead the result leaves.
-   Alpha is one global number, and the mechanism wins 7,375 queries and loses
-   11,302 — so it is being mixed in at the same strength whether or not it has
-   anything to say. Weighting by how much path evidence actually reached the
-   candidates would keep the wins and drop the losses, and needs no fitted
-   parameter beyond the scale alpha already has. **If the losses are where the
-   structure is silent, this is most of the remaining headroom.**
+1. **Measure the per-query blend weight, which is BUILT and unmeasured at
+   scale.** It weights the structure by how concentrated its path evidence is —
+   the largest candidate's share of the total — so a query whose paths agree on
+   one answer gets it at full strength and one whose paths spray over hundreds
+   barely gets it. No fitted constant, alpha 0 is still exactly the floor, and
+   both weightings are chosen separately on validation so neither is compared at
+   a setting picked for the other. **The question it answers is whether the
+   11,302 losses are the queries where the structure was silent.** At sixty
+   queries it says nothing either way; run it at full scale once the seed-1
+   reproduction has the machine.
 2. **Three-step typed paths.** 0.2597 of answers lie further than two steps and
    nothing has been run there. Costs a fan-out cubed, so it needs the cap
    thinking through rather than raising.

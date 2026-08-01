@@ -79,6 +79,8 @@ Same failure, one layer down, so it is closed by construction here.
 
 from __future__ import annotations
 
+from openplexus import wiring
+
 import math
 from itertools import combinations
 from typing import Callable, Iterable
@@ -97,6 +99,10 @@ class CoOccurrence:
     """
 
     def __init__(self) -> None:
+        # ONE INSTANCE, COUNTED. `wiring.expect(graph=1)` is how a run states
+        # that it uses a single shared graph, and three separate ones existed
+        # here for as long as anyone can tell because nobody counted.
+        wiring.touch("graph")
         self.occasions = 0
         self._seen: dict[int, int] = {}
         self._pairs: dict[int, dict[int, int]] = {}

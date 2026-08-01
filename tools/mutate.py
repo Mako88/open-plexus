@@ -43,6 +43,7 @@ SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 # than crashing, which is how a sweep becomes a confident wrong answer.
 CHURN = ROOT / "experiments" / "g4_02_machine_churn.py"
 G44_ASKING = ROOT / "experiments" / "g44_01_asking.py"
+WIRING = ROOT / "openplexus" / "wiring.py"
 TRANSPORT = ROOT / "openplexus" / "transport.py"
 DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 NODE_MAIN = ROOT / "openplexus" / "node_main.py"
@@ -98,6 +99,17 @@ class Mutation:
 
 
 MUTATIONS = [
+    Mutation(
+        name="the-wiring-check-tolerates-extra-instances",
+        breaks="the exact case this module was written for. Flagging only a "
+               "SHORTFALL passes a run that declared one graph and built three, "
+               "which is the state this project was in for as long as anyone "
+               "can tell: every part wired, every part tested, and nobody "
+               "counting",
+        path=WIRING,
+        old="                 if got.get(part, 0) != want}",
+        new="                 if got.get(part, 0) < want}",
+    ),
     Mutation(
         name="the-per-query-cut-reads-every-query",
         breaks="the whole point of fitting a cut where it is applied. The arm's "

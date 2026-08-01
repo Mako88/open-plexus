@@ -613,6 +613,37 @@ and nothing here has tried changing the QUESTION rather than the target:
 Neither is built. Both are about the price of a fact, which is the factor five
 policies could not touch.
 
+## P24 AND P25: ONE ASK, MANY FACTS. Registered before the extension exists
+
+The product bound is pairs times asks-per-pair, and five policies moved only the
+first factor. **A set-ask moves neither factor — it changes how many facts one
+ask buys**, which is the only shape of change that breaks a product rather than
+trading along it.
+
+Ask for a candidate without ANY of several queries. **Compliance is the
+informative outcome**: if it came back without all of them, it is detached from
+all of them, and one ask has settled N pairs. Refusal says only that at least
+one held, which is weak — so the value depends entirely on how often compliance
+happens.
+
+**And it happens most where it is wanted.** A shadow refuses at 0.2222, so it
+COMPLIES 78% of the time; a true partner complies 62%. The outcome that carries
+N facts is the outcome a confound produces most.
+
+    P24  ask-set at budget 0.10 lands >60 of the 108 scored pairs on target,
+         against ask-mutual's 52, because one ask now settles several
+    P25  and it beats watching by >0.05, which no arm has done
+
+**P25 is the real one.** Every previous failure traced back to a pair needing
+~48 asks to resolve a 0.16 gap. If a set-ask buys N pairs per ask, the effective
+budget multiplies and that is the first mechanism here that touches the binding
+factor. If P24 holds and P25 fails, the bound survives even a cheaper fact, and
+the constraint is deeper than accounting.
+
+**Requires extending `World.ask`, whose `absent` is a single surface.** The
+extension must keep the current behaviour exactly, since every number in this
+file was measured through it.
+
 ## WHAT AN ASK COSTS, and a leak that has to be closed before it is used
 
 The arms are coverage-limited and the reason is priced, not chosen:

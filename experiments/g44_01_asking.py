@@ -175,14 +175,74 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             refusals[(candidate, query)] = (was + 1, refused + answer.refused)
 
     tallies = list(refusals.values())
+    wanted = scored_pairs(config)
     return {
         "arm": arm, "budget": budget,
         "separation": separation(index, config, statistic, refusals),
         "refusal_rate": (sum(r for _, r in tallies) / sum(a for a, _ in tallies)
                          if tallies else 0.0),
         "pairs_tested": len(refusals),
+        # OF THE PAIRS IT PAID TO TEST, HOW MANY DOES THE METRIC READ? A count
+        # of pairs asked says nothing without this: two arms can both test 60
+        # pairs while one of them tests 60 pairs nobody scores.
+        "on_target": len(set(refusals) & wanted),
+        "scored": len(wanted),
         "drawn": world.drawn,
     }
+
+
+def scored_pairs(config: OccasionConfig) -> set:
+    """Exactly the (candidate, query) pairs `separation` reads.
+
+    Every other pair an arm asks about is spend that cannot move the number,
+    however sensible the question was.
+    """
+    pairs = set()
+    for concept in range(config.concepts):
+        own = [concept * config.surfaces + m for m in range(config.surfaces)]
+        for query in own:
+            for candidate in [s for s in own if s != query]:
+                pairs.add((candidate, query))
+            pairs.add((config.shadow_of(concept), query))
+    return pairs
+
+
+def discrimination(config: OccasionConfig, per_pair: int = 40) -> dict:
+    """Do shadows and true partners get DIFFERENT refusal rates, or the same?
+
+    **The check that says whether the ceiling means anything.** Separation is a
+    DIFFERENCE of scores and the demotion MULTIPLIES them, so if everything is
+    scaled by the same factor the difference shrinks toward zero while
+    discriminating nothing at all -- and a ceiling that improved for that reason
+    would be an artefact of arithmetic.
+
+    It is not. Measured at `shadow_alone` 0.30: true partners are refused 0.3837
+    of the time and shadows 0.2222, so the confound is demoted harder. And the
+    control inverts it: at 0.0 the shadow cannot be had without its concept at
+    all, is refused 0.7326 against a true partner's 0.3917, and is correctly
+    treated as the most constitutive thing present.
+
+    That is the causal claim behaving as stated in both directions, which is the
+    strongest evidence in this run and is separate from any policy finding one.
+    """
+    world = World(config)
+    tallies = {"true": [0, 0], "shadow": [0, 0]}
+    for concept in range(config.concepts):
+        own = [concept * config.surfaces + m for m in range(config.surfaces)]
+        shadow = config.shadow_of(concept)
+        for query in own:
+            for kind, candidates in (("true", [s for s in own if s != query]),
+                                     ("shadow", [shadow])):
+                for candidate in candidates:
+                    for _ in range(per_pair):
+                        answer = world.ask(present=candidate, absent=query)
+                        tallies[kind][0] += 1
+                        tallies[kind][1] += answer.refused
+    rates = {k: (r / a if a else 0.0) for k, (a, r) in tallies.items()}
+    return {"arm": "discrimination", "true_refusal": rates["true"],
+            "shadow_refusal": rates["shadow"],
+            "discrimination": rates["true"] - rates["shadow"],
+            "alone": config.shadow_alone}
 
 
 def ceiling(config: OccasionConfig, statistic, rng: random.Random,
@@ -192,9 +252,13 @@ def ceiling(config: OccasionConfig, statistic, rng: random.Random,
     **Not an arm.** It spends whatever it needs and no policy could afford it.
     It exists because a refuted prediction has two possible causes and they need
     telling apart: the mechanism cannot separate the confound, or the POLICY
-    never asked about the pairs the metric reads. `ask-targeted` tested about 60
-    distinct pairs where separation scores 108, so most of what was measured had
-    never been asked about.
+    never asked about the pairs the metric reads.
+
+    It is the second, and by a margin no guess would have reached. `ask-targeted`
+    tests 60 distinct pairs against the 108 that separation scores, and the two
+    counts being the same size is a coincidence: the OVERLAP is 1. The
+    `on target` column carries that number now, because a count of pairs tested
+    is unreadable without it.
 
     If this is positive, intervention works and the policy is the problem. If it
     is negative, the direction is refuted and no policy saves it -- which is
@@ -240,7 +304,7 @@ def main() -> int:
     print(f"g44-01  shadow_alone {args.alone}, statistic {STATISTIC}, "
           f"{len(SEEDS)} seeds")
     print(f"{'arm':<14}{'budget':>8}{'separation':>13}{'refusals':>11}"
-          f"{'pairs':>8}{'drawn':>8}")
+          f"{'pairs':>8}{'on target':>11}{'drawn':>8}")
     print("-" * 62)
 
     rows: list[dict] = []
@@ -259,12 +323,15 @@ def main() -> int:
                    "separation": mean("separation"),
                    "refusal_rate": mean("refusal_rate"),
                    "pairs_tested": mean("pairs_tested"),
+                   "on_target": mean("on_target"),
+                   "scored": mean("scored"),
                    "drawn": mean("drawn")}
             rows.append(row)
             summary[(arm, budget)] = row["separation"]
+            hit = f"{row['on_target']:.0f}/{row['scored']:.0f}"
             print(f"{arm:<14}{budget:>8}{row['separation']:>13.4f}"
                   f"{row['refusal_rate']:>11.4f}{row['pairs_tested']:>8.0f}"
-                  f"{row['drawn']:>8.0f}")
+                  f"{hit:>11}{row['drawn']:>8.0f}")
 
     # THE CEILING, before any prediction is read. A refuted prediction has two
     # causes and this is what tells them apart.
@@ -280,6 +347,21 @@ def main() -> int:
     print("  * not an arm: asks about every pair the metric scores, at any "
           "cost. It says whether the MECHANISM can separate the confound, "
           "separately from whether a POLICY found it.")
+
+    # DOES REFUSAL DISCRIMINATE, or does it shrink everything equally? A
+    # difference of scores under a multiplicative demotion moves toward zero
+    # for free, so the ceiling means nothing until this is read.
+    split = discrimination(world_config(SEEDS[0], args.alone))
+    control = discrimination(world_config(SEEDS[0], 0.0))
+    rows.extend([split, control | {"arm": "discrimination (control)"}])
+    print(f"\nDoes refusal DISCRIMINATE, or just shrink everything?")
+    for label, got in (("confound", split), ("control, alone=0.0", control)):
+        print(f"  {label:<20} true {got['true_refusal']:.4f}  shadow "
+              f"{got['shadow_refusal']:.4f}  difference "
+              f"{got['discrimination']:+.4f}")
+    print("  A positive difference demotes the confound harder than a real "
+          "partner. The control must be NEGATIVE: a shadow that cannot be had "
+          "alone IS constitutive, and asking should say so.")
 
     floor = summary[("watch", BUDGETS[0])]
     print(f"\nPREDICTIONS, registered before this file existed:")

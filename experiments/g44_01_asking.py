@@ -585,6 +585,34 @@ not change WHO gets asked about, and the two-hop direction is then out of ideas
 in this world rather than merely unimplemented. Neither says anything yet about
 beating watching -- the product bound is untouched by which pairs are chosen.
 
+## STOP BUILDING NOMINATORS. THE ARITHMETIC SAYS THEY CANNOT WIN
+
+Five policies have been built here: `ask-random`, `ask-targeted`, `ask-mutual`,
+`ask-structural`, `ask-informed`. The obvious sixth is a DIRECTIONAL two-hop
+measure, since direction is what separates the one that works from the four that
+do not. **It should not be built, and the reason is already measured.**
+
+`ask-mutual` lands **52 of the 108 scored pairs** — half of everything the
+metric reads, at 48% shadows — and still scores -0.4099 against watching's
+-0.2967. **A better nominator is not the constraint**, because the constraint is
+the PRODUCT: pairs times asks-per-pair. Choosing better pairs moves one factor
+and the budget then takes it back out of the other.
+
+**The lever that is left is the OTHER factor: asks per pair.** A true partner
+refuses at 0.3837 and a shadow at 0.2222, so the signal is a 0.16 gap and
+resolving it takes ~48 asks. **A question with a wider gap would need fewer**,
+and nothing here has tried changing the QUESTION rather than the target:
+
+- ask both directions of the same pair and compare, which is two facts per pair
+  rather than one and is the same asymmetry `ask-mutual` exploits, spent on
+  resolution instead of on selection;
+- ask about a SET rather than a pair, so one refusal constrains many candidates
+  at once -- the thing that would actually break a product bound rather than
+  trade along it.
+
+Neither is built. Both are about the price of a fact, which is the factor five
+policies could not touch.
+
 ## WHAT AN ASK COSTS, and a leak that has to be closed before it is used
 
 The arms are coverage-limited and the reason is priced, not chosen:

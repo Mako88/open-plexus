@@ -52,8 +52,11 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 EXPERIMENTS = ROOT / "experiments"
 
 #: Files that are not entry points. `__init__.py` makes the directory a package
-#: so one sweep can import another's ranking machinery rather than copy it.
-SKIP = {"__init__.py"}
+#: so one sweep can import another's ranking machinery rather than copy it, and
+#: `harness.py` is what they share. **Kept as a list of names rather than a
+#: pattern**: a sweep that fails this check by being renamed to look like a
+#: helper is exactly what a pattern would let through.
+SKIP = {"__init__.py", "harness.py"}
 
 
 def scripts() -> list[pathlib.Path]:
@@ -62,12 +65,21 @@ def scripts() -> list[pathlib.Path]:
 
 
 def starts(path: pathlib.Path) -> tuple[bool, str]:
-    """Run one script's `--help`. True when it exits 0."""
+    """Run one script's `--help`. True when it exits 0 and it offers `--json`.
+
+    **A sweep that cannot be asked for structured output is a sweep whose result
+    exists only as prose in a terminal.** That is the shape of the record this
+    project threw away in its restructure, so it is checked rather than left to
+    convention -- and `--help` already has to be run, so it costs nothing.
+    """
     finished = subprocess.run(
         [sys.executable, str(path.relative_to(ROOT)), "--help"], cwd=ROOT,
         capture_output=True, text=True, encoding="utf-8", errors="replace",
         timeout=120)
     output = (finished.stdout or "") + (finished.stderr or "")
+    if finished.returncode == 0 and "--json" not in output:
+        return False, ("it starts, and it offers no --json, so its results "
+                       "would exist only as prose in a terminal")
     return finished.returncode == 0, output
 
 

@@ -54,6 +54,8 @@ if str(ROOT) not in sys.path:
 
 import numpy as np  # noqa: E402
 
+from experiments import harness  # noqa: E402
+
 from experiments.fb15k237_audit import (PUBLISHED, Marginal,  # noqa: E402
                                         Ranker, load, metrics)
 from openplexus.composition import Composition  # noqa: E402
@@ -259,10 +261,10 @@ def main() -> int:
                       for name, (mrr, _) in sorted(PUBLISHED.items(),
                                                    key=lambda i: i[1][0])))
 
-    if args.json:
-        args.json.parent.mkdir(parents=True, exist_ok=True)
-        args.json.write_text(json.dumps(rows, indent=1), encoding="utf-8")
-        print(f"\n{len(rows)} rows -> {args.json}")
+    harness.emit(args.json, rows, started=started,
+                 floors=list(FLOORS), meaning_floors=list(MEANING_FLOORS),
+                 blends=list(BLENDS), statistic=STATISTIC, ceiling=CEILING,
+                 depth=args.depth, queries=len(queries), seed=args.seed)
     print(f"COST: {time.time() - started:.1f}s wall, one process")
     return 0
 

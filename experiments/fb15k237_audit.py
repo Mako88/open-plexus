@@ -45,6 +45,8 @@ if str(ROOT) not in sys.path:
 
 import numpy as np  # noqa: E402
 
+from experiments import harness  # noqa: E402
+
 DATA = ROOT / "data" / "fb15k237"
 
 #: A rule needs this many supporting facts and this share of its body to be
@@ -438,10 +440,10 @@ def main() -> int:
     print(f"  test triples reversed in train under the same relation: {flipped}")
     rows.append({"arm": "overlap", "verbatim": verbatim, "flipped": flipped})
 
-    if args.json:
-        args.json.parent.mkdir(parents=True, exist_ok=True)
-        args.json.write_text(json.dumps(rows, indent=1), encoding="utf-8")
-        print(f"\n{len(rows)} rows -> {args.json}")
+    harness.emit(args.json, rows, started=started,
+                 support=SUPPORT, confidence=CONFIDENCE,
+                 facts_per_relation=FACTS_PER_RELATION, degree=DEGREE,
+                 queries=len(queries), seed=args.seed)
     print(f"COST: {time.time() - started:.1f}s wall, one process")
     return 0
 

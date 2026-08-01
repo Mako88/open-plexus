@@ -40,6 +40,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from experiments import harness  # noqa: E402
+
 from openplexus.composition import Composition  # noqa: E402
 from openplexus.grounding import STATISTICS  # noqa: E402
 from openplexus.tasks.clutrr import (ClutrrConfig, RELATIONS,  # noqa: E402
@@ -173,10 +175,9 @@ def main() -> int:
             line.append(f"{combine} {share:.4f}")
         print(f"  {name:>12}: " + "   ".join(line))
 
-    if args.json:
-        args.json.parent.mkdir(parents=True, exist_ok=True)
-        args.json.write_text(json.dumps(rows, indent=1), encoding="utf-8")
-        print(f"\n{len(rows)} rows -> {args.json}")
+    harness.emit(args.json, rows, started=started,
+                 hold=list(HOLD), seeds=list(SEEDS), statistic=STATISTIC,
+                 combine=COMBINE)
     print(f"COST: {time.time() - started:.1f}s wall, one process")
     return 0
 

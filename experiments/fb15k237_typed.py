@@ -404,6 +404,58 @@ def main() -> int:
               + "  ".join(f"{a}:{on_test[('per query', a)]:.4f}"
                           for a in ALPHAS))
 
+    # WHERE THE REACH GOES, and it leaks in two different places.
+    #
+    # 0.7373 of test pairs are two steps apart in the graph with no budget at
+    # all. This mechanism lands on the answer far less often than that, and the
+    # shortfall is TWO failures that were being read as one number all night:
+    #
+    #   arrived      any two-step route reaches the answer under the fan-out cap
+    #   with evidence   ...and at least one of those routes has a path type that
+    #                   says anything about the relation being asked
+    #
+    # The first is a budget problem and the second is a knowledge problem, and
+    # they need different repairs. Split by the degree of the QUERY entity
+    # because that is where the cap bites -- an entity with thousands of edges
+    # has 200 of them sampled, and the route that would have arrived is usually
+    # not among them.
+    degrees = ((10, "under 10"), (50, "10 to 49"), (200, "50 to 199"),
+               (1000, "200 to 999"), (10 ** 9, "1000 or more"))
+    seen: dict = {label: [0, 0, 0] for _, label in degrees}
+    for head, relation, tail in queries:
+        asked = relation_at[relation]
+        for direction in ("tail", "head"):
+            given, answer = ((head, tail) if direction == "tail"
+                             else (tail, head))
+            band = next(label for limit, label in degrees
+                        if len(out_of.get(given, ())) < limit)
+            arrived = evidenced = False
+            for first, second, end in routes(out_of, given, args.fanout):
+                if end != answer:
+                    continue
+                arrived = True
+                if path_weight(first, second, asked) > 0.0:
+                    evidenced = True
+                    break
+            seen[band][0] += arrived
+            seen[band][1] += evidenced
+            seen[band][2] += 1
+    print(f"\nWhere the reach goes, by the degree of the QUERY entity, at "
+          f"fan-out {args.fanout}:")
+    print(f"  {'query degree':<15}{'n':>7}{'arrived':>10}{'with evidence':>15}")
+    for _, label in degrees:
+        arrived, evidenced, total = seen[label]
+        if not total:
+            continue
+        print(f"  {label:<15}{total:>7}{arrived / total:>10.4f}"
+              f"{evidenced / total:>15.4f}")
+        rows.append({"arm": "reach", "band": label, "n": total,
+                     "arrived": arrived / total,
+                     "evidenced": evidenced / total,
+                     "fanout": args.fanout})
+    print("  Reach peaks just under the cap and falls above it, which is the "
+          "budget leak; the gap between the two columns is the knowledge one.")
+
     # IS THE MARGIN JUST POPULARITY? The floor is a popularity ranking, so a
     # gain concentrated on the answers that are already common would be the
     # marginal being reinforced rather than structure being added. Split by how

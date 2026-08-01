@@ -98,9 +98,22 @@ repeat them. Predicted to make `crossed` non-zero.
   Nothing caught it: `check_imports` skips `testbed/`, and `check_orphans`
   counts it as a CALLER, so the modules looked wired by a thing that cannot run.
 
-  **This is C1 and John asked about it directly, 2026-08-01.** The discrete
-  units exist; nothing launches one. The job is an entry point plus rewriting
-  the driver against `bucket_peer`, and it is bounded.
+  **`node_main.py` is now built**, smoke-tested end to end: a separate process
+  listening on TCP, answering a real socket request and refusing an unknown
+  message. C1's discrete unit runs again.
+
+  **The driver is NOT a rewrite, it is a replacement, and checking that first
+  is what stopped a wasted port.** `testbed/driver.py` measures whether a
+  distributed `Network` of `LocalAssociativeMemory` agrees with a single-process
+  one — weights `wv`/`wo`, `d_model`, a vocabulary. **That architecture was
+  deleted in the restructure**, so there is nothing in it to point at
+  `bucket_peer`; only its SHAPE survives, and that shape is the right one.
+
+  What it did was compare a distributed result against a single-process
+  reference and report where they diverge — *"the only measurement that
+  distinguishes a network which is slow from one which is wrong"*. The
+  replacement asks the same question of the count graph: does a `CoOccurrence`
+  split across `federated` owners answer reads identically to one held whole?
 
 - **`tasks/xsl.py` has no caller.** Use it or drop it.
 - **The link columns in `surfaces_pipeline.py` step in tenths** — shares over ten

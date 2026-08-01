@@ -435,5 +435,61 @@ class AShadowFollowsOneConceptAndCountingCannotRefuseIt(unittest.TestCase):
         self.assertFalse(config.is_shadow(config.concept_surfaces))
 
 
+class AConfoundMustBeAbleToAppearAlone(unittest.TestCase):
+    """The axis that decides whether intervention can say anything at all.
+
+    A shadow that never appears without its concept is CONSTITUTIVE by
+    construction: nothing can ever produce the lamp without the dog, so by every
+    observable test the lamp is part of the dog. An arm that claims to separate
+    a confound must not separate that one — it is a control, not a failure.
+
+    Above zero the lamp is a thing in its own right that usually accompanies the
+    dog. Counting still cannot tell it from a part. Asking can.
+    """
+
+    def world(self, alone):
+        return OccasionConfig(concepts=4, surfaces=3, presence=0.7, noise=0,
+                              distractors=0, shadows=4, shadow_alone=alone,
+                              occasions=600, seed=11)
+
+    def test_at_zero_a_shadow_never_appears_without_its_concept(self):
+        config = self.world(0.0)
+        for occasion in generate(config, count=400):
+            for concept in range(config.concepts):
+                if config.shadow_of(concept) in occasion.surfaces:
+                    self.assertEqual(occasion.subject, concept)
+
+    def test_above_zero_it_does(self):
+        config = self.world(0.3)
+        alone = 0
+        for occasion in generate(config, count=400):
+            for concept in range(config.concepts):
+                if (config.shadow_of(concept) in occasion.surfaces
+                        and occasion.subject != concept):
+                    alone += 1
+        self.assertGreater(alone, 0)
+
+    def test_it_is_still_present_every_time_its_own_concept_is(self):
+        # Otherwise it stops being the hard case and becomes ordinary noise.
+        config = self.world(0.3)
+        for occasion in generate(config, count=400):
+            self.assertIn(config.shadow_of(occasion.subject), occasion.surfaces)
+
+    def test_the_rate_is_about_what_was_asked_for(self):
+        config = self.world(0.5)
+        stream = generate(config, count=1200)
+        others = [o for o in stream if o.subject != 0]
+        seen = sum(config.shadow_of(0) in o.surfaces for o in others)
+        self.assertAlmostEqual(seen / len(others), 0.5, delta=0.08)
+
+    def test_a_rate_without_shadows_is_refused_rather_than_ignored(self):
+        with self.assertRaises(ValueError):
+            OccasionConfig(shadows=0, shadow_alone=0.3)
+
+    def test_a_rate_outside_zero_to_one_is_refused(self):
+        with self.assertRaises(ValueError):
+            OccasionConfig(shadows=2, shadow_alone=1.5)
+
+
 if __name__ == "__main__":
     unittest.main()

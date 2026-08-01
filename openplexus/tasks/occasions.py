@@ -150,6 +150,22 @@ class OccasionConfig:
     #: a harder world and a result measured in it is not comparable with one
     #: measured without.
     shadows: int = 0
+    #: How often a shadow turns up WITHOUT its concept. **The axis that decides
+    #: whether intervention can say anything at all**, and it was missing from
+    #: the first version of this world.
+    #:
+    #: At 0.0 the lamp is on if and only if the dog is there. Nothing can ever
+    #: produce the lamp without the dog, so by every observable test the lamp IS
+    #: part of the dog — and intervention agrees, correctly. That is a control
+    #: rather than a failure: an arm that claims to separate a confound must NOT
+    #: separate this one.
+    #:
+    #: Above 0.0 the lamp is a thing in its own right that usually accompanies
+    #: the dog. Counting still cannot tell it from a part, because it is present
+    #: on nearly every occasion the dog is. Asking can: request the lamp WITHOUT
+    #: the dog and the world sometimes complies, which a constitutive part never
+    #: does. **That gap is the whole of what g44-01 measures.**
+    shadow_alone: float = 0.0
     zipf: float = 0.0
     pairings: str = "complete"
     occasions: int = 4000
@@ -170,6 +186,13 @@ class OccasionConfig:
             raise ValueError("noise cannot be negative")
         if self.distractors < 0:
             raise ValueError("distractors cannot be negative")
+        if not 0.0 <= self.shadow_alone <= 1.0:
+            raise ValueError("shadow_alone is a probability")
+        if self.shadow_alone and not self.shadows:
+            raise ValueError(
+                "shadow_alone without shadows describes how often a surface "
+                "that does not exist turns up, which is a configuration nobody "
+                "meant to write")
         if self.zipf < 0.0:
             raise ValueError(
                 "a negative zipf exponent would make RARE concepts the common "
@@ -388,6 +411,14 @@ def draw_occasion(config: OccasionConfig, rng: random.Random, when: int,
     shadow = config.shadow_of(subject)
     if shadow is not None:
         present.append(shadow)
+    if config.shadow_alone:
+        # AND EVERY OTHER SHADOW, SOMETIMES. A confound that can never appear
+        # without its concept is constitutive by construction and no
+        # intervention should separate it; this is what makes the world able to
+        # contain one that is not.
+        for other in range(config.shadows):
+            if other != subject and rng.random() < config.shadow_alone:
+                present.append(config.shadow_base + other)
 
     present.extend(always)
     return Occasion(when=when, surfaces=tuple(sorted(present)), subject=subject)

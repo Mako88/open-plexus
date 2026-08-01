@@ -81,10 +81,12 @@ bridges them, and without it the real merge would report success on three
 unrelated components in one dict.
 
 **Next: the merged pipeline** — real pictures, sounds, words and facts through
-one namespace, declared under all four checks. **The open design question it
-raises: what bridges facts to senses?** Nothing in the data does, so either a
-source that mentions both is needed, or facts stay a separate island and "one
-graph" means one graph of the senses. Unanswered.
+one namespace, declared under all four checks. **What bridges facts to senses? Nothing in the data does.** DEFAULT APPLIED
+2026-08-01, John to override: facts stay a separate island and the merge is
+**one graph of the SENSES** — pictures, sounds and words, which genuinely
+co-occur because that is what an occasion is. Bridging facts means inventing a
+corpus where a fact and a picture share a referent, which is a bigger decision
+than a default should make.
 
 **Reserving is deliberately NOT declaring** — `wiring.kind` is called when data
 arrives, not when room is made, or a reservation would satisfy the check.

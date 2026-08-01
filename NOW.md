@@ -108,15 +108,20 @@ README line goes back to ⬜ and the disagreement is the finding.**
 
 ## Next, in the order I would take them
 
-1. **Why the mechanism loses 11,302 queries, which is still open.** The first
-   answer was wrong: weighting the structure per query by how concentrated its
-   evidence is does NOT convert the losses — +0.0131 against the global
-   weight's +0.0136, and 11,359 losses against 11,302. So the losing queries are
-   not simply the ones where the structure was silent, and what they ARE is
-   unmeasured. A breakdown by relation, or by whether the true answer was
-   reached by any path at all, is the next place to look — the second of those
-   splits the losses into *never reached* and *reached and mis-ranked*, which
-   are different failures needing different repairs.
+1. **RAISE THE FAN-OUT, and the margin is a floor rather than a ceiling.** The
+   losses are now explained: splitting by whether any path reached the true
+   answer shows the blend helping where it did (+0.0117) and strictly hurting
+   where it did not (−0.0191), which it must, since the structure can only push
+   other candidates above an answer it never scored. And only about a third of
+   queries reach the answer at all, on a benchmark where **0.7373 of test pairs
+   are two hops apart**. The gap is `FANOUT = 200`, which takes an entity's
+   first 200 edges **in insertion order** — an arbitrary slice on entities
+   carrying up to 7,614. Raise it, or make it take the strongest edges rather
+   than the first ones, and re-measure. Cost grows as the square, so this needs
+   a sweep with a budget rather than one big number.
+2. **Run the reached/never-reached split at full scale.** The decomposition
+   above is from forty queries. It is the sharpest diagnostic the run has and it
+   has never been read at a size that settles anything.
 2. **Three-step typed paths.** 0.2597 of answers lie further than two steps and
    nothing has been run there. Costs a fan-out cubed, so it needs the cap
    thinking through rather than raising.

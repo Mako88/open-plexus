@@ -42,6 +42,7 @@ SPLIT = ROOT / "experiments" / "g6_01_forgetting.py"
 # discarded. This one is, because its generator returned a wrong SET rather
 # than crashing, which is how a sweep becomes a confident wrong answer.
 CHURN = ROOT / "experiments" / "g4_02_machine_churn.py"
+G44_ASKING = ROOT / "experiments" / "g44_01_asking.py"
 TRANSPORT = ROOT / "openplexus" / "transport.py"
 DEPLOYMENT = ROOT / "openplexus" / "deployment.py"
 NODE_MAIN = ROOT / "openplexus" / "node_main.py"
@@ -97,6 +98,17 @@ class Mutation:
 
 
 MUTATIONS = [
+    Mutation(
+        name="an-unasked-pair-votes-on-the-boundary",
+        breaks="the learned threshold, in exactly the way the arm's own does. A "
+               "pair nobody asked about has no rate; counting it as 0.0 drags "
+               "the cut below every real rate and nothing is ever demoted. This "
+               "is the measured failure of ask-targeted, which learns its cut "
+               "from background pairs that detach for free and lands 1 of 108",
+        path=G44_ASKING,
+        old="    rates = sorted(r / a for a, r in refusals.values() if a)",
+        new="    rates = sorted(r / a if a else 0.0 for a, r in refusals.values())",
+    ),
     Mutation(
         name="a-failed-tc-lets-the-node-join-anyway",
         breaks="the guarantee that an impaired run was impaired. The node would "

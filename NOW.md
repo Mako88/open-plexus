@@ -183,10 +183,10 @@ cited anywhere.
   once the sweeps have stopped:
 
       python tools/mutate.py --only the-ask-retries-until-the-world-says-yes,an-ask-is-not-charged-for-what-it-drew,the-route-reported-is-not-the-route-walked
-- **`experiments/` has six scripts and no harness.** They now share `Ranker` and
-  `load` through `experiments/__init__.py`, which is the first step away from
-  each script carrying its own copy, but argument parsing and JSON writing are
-  still duplicated six ways.
+- **`experiments/` has eight scripts and no harness.** They share `Ranker`,
+  `Marginal` and `load` through `experiments/__init__.py`, but argument parsing
+  and JSON writing are still duplicated eight ways. `tools/check_experiments.py`
+  now at least starts each of them, in preflight and in CI.
 - **The link columns in `surfaces_pipeline.py` step in tenths.** Shares over ten
   words, so nothing smaller than 0.1 can be read.
 - **The front end is not wired to anything that runs as a node**, because there

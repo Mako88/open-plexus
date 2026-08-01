@@ -53,6 +53,13 @@ jobs:
         run: python tools/check_duplication.py
       - name: Every module imports
         run: python tools/check_imports.py
+      # `check_imports.py` skips experiments/ on purpose. This closes that gap
+      # by starting each sweep with --help, which argparse answers before the
+      # script does any work -- so a sweep that cannot run stops being invisible
+      # to every gate at once. It found three scripts whose --help crashed on a
+      # cp1252 console the day it was written.
+      - name: Every experiment script starts
+        run: python tools/check_experiments.py
       - name: No commit message had a word eaten by a shell
         run: python tools/check_commit_messages.py
       - name: Every pinned number says where it came from

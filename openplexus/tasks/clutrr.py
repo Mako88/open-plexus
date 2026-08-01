@@ -49,7 +49,7 @@ mis-read 4% of them, all in the test split.
 [Note 059](../../docs/archive/notes/059-clutrr-confounds-depth-with-entity-repetition.md):
 train and validation contain **zero** puzzles where an entity appears in more than two
 edges; test contains **37.8%**, rising with depth. Repeated entities are this
-project's measured weak point (103: 0.884 → 0.303; 104: 0.628 with pair keys), so a
+project's measured weak point (103: 0.884 -> 0.303; 104: 0.628 with pair keys), so a
 single average across that split would credit *depth* for an *addressing* failure.
 **The primary arm is `max_appearances == 2`.**
 

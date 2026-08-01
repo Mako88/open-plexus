@@ -8,8 +8,8 @@ marginal floor of 0.2334:
     the untyped walk        -0.0265   it reaches the answer and cannot rank it
     the rule miner           0.0460   typed two-hop paths, thresholded lookup
 
-**The untyped walk's ❌ named its own revival condition: give the walk the
-relation types along the path.** This is that, and it is not the rule miner:
+**The untyped walk's refutation named its own revival condition: give the walk
+the relation types along the path.** This is that, and it is not the rule miner:
 
 - the miner keeps a path type only if its confidence clears 0.5, and answers
   from the best surviving rule. One path decides.

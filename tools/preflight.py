@@ -53,6 +53,7 @@ ROOT = Path(__file__).resolve().parent.parent
 STEPS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("source is not mid-mutation", ("tools/mutate.py", "--verify")),
     ("every module imports", ("tools/check_imports.py",)),
+    ("every experiment starts", ("tools/check_experiments.py",)),
     ("the test suite", ("-m", "unittest", "discover", "-s", "tests",
                         "-t", ".", "-q")),
     ("workflow flags match the scripts", ("tools/check_workflows.py",)),

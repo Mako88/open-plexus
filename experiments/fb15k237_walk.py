@@ -1,7 +1,7 @@
 """Can a two-step walk reach what a one-step count cannot?
 
 `fb15k237_counted.py` measured the count graph below the marginal — margin
-−0.0480 — and measured why: over 3,000 test triples the two endpoints are
+-0.0480 — and measured why: over 3,000 test triples the two endpoints are
 **0.0000 one hop apart in training and 0.7373 two hops apart**. The entity half
 of a one-step query is not a weak signal, it is an empty one.
 

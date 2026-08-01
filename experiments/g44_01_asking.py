@@ -119,7 +119,39 @@ about +-0.13 against a 0.16 signal -- and sweeping it refutes that too:
 Sixteen times the asks moves nothing across zero. **The shortfall is structural
 and not sampling**, and `shadows only` sits near +0.22 throughout.
 
-So the open problem is exact, and it is not about budget, policy, or noise:
+## A threshold, registered before it is written
+
+Every rule tried so far is CONTINUOUS -- it multiplies a score by a rate, so
+every asked candidate is demoted by something. Measuring the per-pair rates at
+192 asks says the structure is not continuous at all:
+
+    refusal rate per pair, shadow_alone 0.30
+    true partner   n=216  min 0.292  median 0.375  max 0.474
+    shadow         n=108  min 0.135  median 0.214  max 0.292
+
+**Zero of 216 true partners fall below the highest shadow rate.** A threshold at
+0.287 classifies 323 of 324 pairs, against 66.7% for calling everything a part.
+So the oracle is reachable and a continuous rule was the wrong shape.
+
+The threshold must be LEARNED, not passed in -- a two-means split over the rates
+the arm actually observed, which needs no privileged knowledge.
+
+    P10  a learned threshold, demoting only the low group, makes ask-mutual
+         beat watching by >0.05 at budget 0.10
+    P11  and at shadow_alone 0.0 it does NOT beat its own watch by >0.02
+    P12  the rule has a NOTHING-TO-FIND state: at shadow_alone 0.0 it demotes
+         true partners on under 20% of queries
+
+**P12 is the one I expect to fail, and it is registered because of that.** A
+two-means split always returns two groups, so at 0.0 -- where the shadow is a
+part and refuses 0.7326 against a true partner's 0.3917 -- the more detachable
+group is the TRUE PARTNERS, and a rule that must always demote somebody will
+demote them. A confound detector with no way to report "nothing here" is a
+different kind of broken from one that reports the wrong thing.
+
+## The open problem before the threshold was tried
+
+It is not about budget, policy, or noise:
 `shadows only` is an ORACLE -- it calls `is_shadow`, which no arm may do. Every
 legitimate rule tried so far demotes true partners often enough to pay back the
 whole win, and `separation` takes a MIN over true partners, so one wrongly

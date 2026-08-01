@@ -125,8 +125,14 @@ cited anywhere.
   at Hits@10.
 - **There is no node entry point.** `node_main.py` started the old store and was
   deliberately not carried over.
-- **`openplexus/tasks/asking.py` has no tests and no mutation**, so by this
-  project's own rules it is not finished.
+- **`asking.py`'s two new mutations have not been RUN.** `tests/test_asking.py`
+  now covers it — the refusal being one draw, the budget being charged, a
+  refusal not being a miss, and watching reproducing `occasions.generate`
+  occasion for occasion — and `the-ask-retries-until-the-world-says-yes` and
+  `an-ask-is-not-charged-for-what-it-drew` are registered. **Neither has been
+  seen to go red**, because the FB15k runs were touching the tree all night and
+  the harness may not run alongside them. First thing to clear in the morning:
+  `python tools/mutate.py --only the-ask-retries-until-the-world-says-yes,an-ask-is-not-charged-for-what-it-drew`
 - **`experiments/` has six scripts and no harness.** They now share `Ranker` and
   `load` through `experiments/__init__.py`, which is the first step away from
   each script carrying its own copy, but argument parsing and JSON writing are

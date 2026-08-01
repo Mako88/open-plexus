@@ -73,6 +73,7 @@ FAMILIES = ROOT / "openplexus" / "tasks" / "families.py"
 CLUTRR = ROOT / "openplexus" / "tasks" / "clutrr.py"
 SURFACES = ROOT / "openplexus" / "surfaces.py"
 COMPOSITION = ROOT / "openplexus" / "composition.py"
+ASKING = ROOT / "openplexus" / "tasks" / "asking.py"
 
 
 @dataclass(frozen=True)
@@ -582,6 +583,30 @@ MUTATIONS = [
         # line, same defect, one expression later.
         old="        return self.offsets[role] + relation",
         new="        return relation",
+    ),
+    Mutation(
+        name="the-ask-retries-until-the-world-says-yes",
+        breaks="the one quantity the intervention idea rests on. A refusal is "
+               "the world saying a part is constitutive, and redrawing after "
+               "one makes the refusal rate a function of `patience` -- a dial "
+               "on the result rather than a measurement. It drives refusals "
+               "toward zero, which reads as *nothing is constitutive* rather "
+               "than as a broken world, and every other column stays healthy",
+        path=ASKING,
+        old="                return Answer(occasion=occasion, refused=True, "
+            "drawn=drawn)",
+        new="                continue",
+    ),
+    Mutation(
+        name="an-ask-is-not-charged-for-what-it-drew",
+        breaks="the only thing keeping asking and watching comparable. An "
+               "asking system that pays for one occasion per answer while "
+               "drawing sixty sees far more of the world than a watching one, "
+               "so any advantage it shows is sample size -- which is the "
+               "confound g41-01 found dominating a different question entirely",
+        path=ASKING,
+        old="            self.drawn += 1\n            drawn += 1",
+        new="            drawn += 1",
     ),
     Mutation(
         name="the-composition-search-only-brackets-from-the-left",

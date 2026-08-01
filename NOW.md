@@ -61,8 +61,9 @@ it. The wrong claim came from comparing two ratios over different quantities.
 
 **Two defects on the record.** P12 refuted at 100%: two means always return two
 groups, so where the shadow genuinely is a part the rule demotes true partners
-on every query — it has no way to report *nothing here*. And per-query reuses
-`learned_threshold` on a filtered dict with no mutation; the filter is untested.
+on every query — it has no way to report *nothing here*. The per-query filter now has three
+tests and a caught mutation; its first test was vacuous and is noted in the
+commit.
 
 **Scored:** P5, P7, P9, P11, P15 held. P1–P3, P6, P8, P10, P12, P13 refuted.
 P14 is unmeasurable — budget stops binding above 0.25.

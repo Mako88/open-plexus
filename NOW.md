@@ -89,6 +89,14 @@ README line goes back to ⬜ and the disagreement is the finding.**
 
 ## In flight
 
+- **Fan-out 600 with the sampling fix, 2,000 queries** →
+  `out/fb15k237-fanout600.txt`. The number to read is **the `n` on the
+  reached/never-reached lines**, not the margin: at fan-out 200 with a biased
+  prefix it was 14,281 of 40,932, about 35%, against 0.7373 of test pairs being
+  two hops apart in the graph. If sampling three times as many edges does not
+  move that share much, the ceiling is the two-step limit rather than the cap,
+  and the next move is three steps rather than a wider fan.
+
 - **`fb15k237_walk.py` at 4,000 queries was STOPPED before its last two cells**,
   and the hole is named rather than left to be discovered: `depth 3 beam 64` ran
   `walk only` (0.0065) and never ran `min` or `mean`. It was stopped because its

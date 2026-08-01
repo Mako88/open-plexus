@@ -29,6 +29,25 @@ training and no embedding.** `sum over paths`, blend weight 0.01 chosen on
 stronger half.** "Matched ComplEx" and "lost to RotatE by a factor of eight" are
 the same sentence and both belong in it.
 
+**And the +0.0136 is a dilution, which is the more useful reading.** Split by
+whether any path reached the true answer:
+
+    sum over paths, global weight
+      answer reached   n=14,281   0.3412 -> 0.3886   +0.0474
+      never reached    n=26,651   0.1757 -> 0.1711   -0.0046
+
+Where the mechanism can see the answer it is worth **+0.0474**, three and a half
+times the headline; the whole-set figure is that gain spread over the two thirds
+of queries it structurally cannot answer, where it can only push other candidates
+above an answer it never scored. The weighted average reproduces the headline
+exactly, which is the check that the split is of the same thing.
+
+**This is NOT "we would beat TransE with more reach."** The reachable third is
+selected by the mechanism's own ability, so it is an easier subset by
+construction — its floor is 0.3412 against 0.1757 for the rest. Whether the gain
+survives as reach expands is untested, and the queries reach expands INTO are
+the ones it is currently failing to arrive at.
+
 **And it is not the marginal being reinforced**, which was the live worry. Split
 by how many training triples the answer entity has:
 

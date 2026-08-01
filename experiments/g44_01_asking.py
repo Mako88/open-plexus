@@ -684,10 +684,42 @@ oracle's swing from -0.2967 to +0.2256 it recovers about **1.6%** of what the
 mechanism can do. The product bound is DENTED, not broken: a cheaper fact buys a
 real improvement and nowhere near the one available.
 
+### THE SET MECHANISM IS NOT WHAT WORKS. The control says so
+
+Sweeping `SET_SIZE`, every cell shown, paired against watching on 12 seeds:
+
+    SET_SIZE    margin   sd/mean   wins
+           1   +0.0075    0.0020   10/12
+           2   +0.0164    0.0032   12/12
+           4   +0.0102    0.0031   10/12
+           8   +0.0077    0.0033    9/12
+          16   +0.0078    0.0037    9/12
+
+**`SET_SIZE = 1` names one query, so it IS an ordinary single ask — and it
+already delivers +0.0075 of the +0.0102.** One ask buying many facts is not what
+beats watching. The gain survives when the set is removed.
+
+**So my explanation was wrong.** I wrote that this "changed the price of a fact
+rather than the choice of which fact to buy". The control says the opposite: the
+price is incidental, and what changed is WHICH PAIRS get asked about. `ask-set`
+nominates a candidate and then asks it against ITS OWN top partners rather than
+against the query it was nominated for — a different pair population entirely,
+not a better-targeted version of the same one.
+
+**Which also qualifies "stop building nominators".** That argument was that
+better targeting cannot help, because `ask-mutual` lands half the scored pairs
+and still loses. It holds for choosing better among the SAME pairs. It does not
+cover choosing a different population, which is what this does, and the effect
+is small but real.
+
+**The peak at 2 is not being claimed.** +0.0164 at 12/12 is the best cell of a
+sweep of my own arm's hyperparameter, with no matching sweep on any other arm,
+which is exactly the tuning this project's rules forbid reporting. The whole
+sweep is here so the best cell cannot be read as the result.
+
 **What this establishes and what it does not.** Established: an autonomous arm
-CAN beat watching, so the wall is not absolute. Not established: that set-asking
-scales — the gain may be a constant that a larger set or a longer stream does
-not multiply, and nothing here has swept `SET_SIZE`.
+CAN beat watching, so the wall is not absolute. Not established, and now REFUTED: that
+set-asking is the mechanism. It is not; the gain is there at set size one.
 
 **P25 was the real one.** Every previous failure traced back to a pair needing
 ~48 asks to resolve a 0.16 gap. If a set-ask buys N pairs per ask, the effective

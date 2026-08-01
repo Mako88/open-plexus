@@ -242,8 +242,20 @@ def flood(adjacency, start: int, asked: int, types: PathTypes,
                         continue
                 walked = route + (kind,)
                 following.append((neighbour, became, travelled, walked))
-                if became != asked or len(walked) < 2:
+                if len(walked) < 2:
                     continue
+                # TWO DIFFERENT QUESTIONS, and conflating them was worth
+                # everything. `best` says what the route AMOUNTS to, which is
+                # what has to be carried forward to compose again. Scoring an
+                # arrival asks how much the route says about the kind ASKED --
+                # a route that usually means something else can still be real
+                # evidence, and keeping only routes whose argmax matched the
+                # question made the walk arrive at nothing at all: 0.0000 of
+                # answers reached, at every floor.
+                says = types.weight(carried, kind, asked, statistic)
+                if says <= 0.0:
+                    continue
+                travelled = strength * weight * says
                 held = found.get(neighbour)
                 if held is None:
                     found[neighbour] = (travelled, walked)

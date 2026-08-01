@@ -139,6 +139,36 @@ class TheFloodExpandsByWeightAndComposesAsItGoes(unittest.TestCase):
         self.assertIn(3, found)
         self.assertEqual(found[3][1], (0, 1, 4))
 
+    def test_a_route_that_usually_means_something_else_still_counts(self):
+        """The bug that made the flood arrive at NOTHING on real data.
+
+        Scoring an arrival by what the route AMOUNTS to keeps only routes whose
+        argmax happens to be the question, and throws away every route that
+        carries real evidence while usually meaning something else. On
+        FB15k-237 that was 0.0000 of answers reached, at every floor, while the
+        tests here passed — because their worlds were built so the argmax and
+        the question agreed.
+
+        Here the pair means 2 twice as often as 5, so `best` says 2. A question
+        about 5 must still find the endpoint.
+        """
+        types = PathTypes(kinds=6, spans=6)
+        for _ in range(6):
+            types.observe(0, 1, 2)
+        for _ in range(3):
+            types.observe(0, 1, 5)
+        edges = {0: [(0, 1, 1.0)], 1: [(1, 9, 1.0)]}
+        adjacency = lambda node: edges.get(node, ())     # noqa: E731 - local
+        self.assertEqual(types.best(0, 1, CONDITIONAL)[0], 2)
+        found, _, _ = flood(adjacency, 0, 5, types, CONDITIONAL, floor=0.01,
+                            depth=2)
+        self.assertIn(9, found)
+        # And it scores below the same endpoint asked about the kind the route
+        # DOES usually mean, or the evidence is not being read at all.
+        stronger, _, _ = flood(adjacency, 0, 2, types, CONDITIONAL, floor=0.01,
+                               depth=2)
+        self.assertGreater(stronger[9][0], found[9][0])
+
     def test_depth_two_cannot_reach_the_three_step_answer(self):
         types, adjacency = self.world()
         found = flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.01, depth=2)[0]

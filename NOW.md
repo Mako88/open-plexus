@@ -41,6 +41,13 @@ loses the majority by a little, at every sample size from 120 to 40,932, so that
 is a property of it rather than noise. Most of the 0.2470 is the marginal; the
 structure contributes the 0.0136.
 
+**Not yet reproduced.** A second seed is running (`out/fb15k237-typed-seed1.txt`).
+The only seed-dependent step is which 10,233 validation triples choose the blend
+weight — the test set is scored whole and the fan-out cap is deterministic — and
+the alpha curve is broad enough that the choice should barely matter (0.01 gives
+0.2470, 0.02 gives 0.2459, 0.05 still gives 0.2406). **If seed 1 disagrees, the
+README line goes back to ⬜ and the disagreement is the finding.**
+
 ## In flight
 
 - **`fb15k237_walk.py` at 4,000 queries was STOPPED before its last two cells**,

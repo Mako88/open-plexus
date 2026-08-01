@@ -145,12 +145,23 @@ class Ranker:
         self.known_heads = known_heads
 
     def rank(self, scores: np.ndarray, given: str, relation: str, answer: str,
-             direction: str) -> float:
-        """The answer's filtered rank. Ties take the middle of their block.
+             direction: str) -> tuple[float, float, float]:
+        """The answer's filtered rank, under all three tie policies at once.
 
-        A pessimistic tie-break would report the frequency arm as far worse than
-        it is, and an optimistic one would report a constant score as perfect;
-        the average is the only choice that does not encode a preference.
+        **This is the caveat that matters for a counting baseline and not for
+        the models it is compared against.** A frequency score puts thousands of
+        entities on exactly zero, so the answer lands inside a huge tied block
+        and the policy decides the number: optimistic puts it at the top of the
+        block, pessimistic at the bottom, average in the middle. A trained
+        embedding produces continuous scores and has almost no ties, so its
+        published figure is insensitive to a choice that moves ours a long way.
+
+        All three come from one pass — `above` and `tied` determine each — so
+        reporting the range costs nothing and quoting only the middle would be
+        choosing the flattering half of a bound.
+
+        Returns:
+            `(optimistic, average, pessimistic)`.
         """
         target = self.at[answer]
         mask = np.zeros(len(self.entities), dtype=bool)
@@ -163,7 +174,7 @@ class Ranker:
         value = scores[target]
         above = int(np.sum((scores > value) & ~mask))
         tied = int(np.sum((scores == value) & ~mask)) - 1
-        return above + 1 + tied / 2.0
+        return above + 1.0, above + 1 + tied / 2.0, above + 1.0 + tied
 
 
 def plain_rank(scores, at, given, relation, answer, known_tails, known_heads,
@@ -190,7 +201,7 @@ def plain_rank(scores, at, given, relation, answer, known_tails, known_heads,
             above += 1
         elif scores[index] == value and entity != answer:
             tied += 1
-    return above + 1 + tied / 2.0
+    return above + 1.0, above + 1 + tied / 2.0, above + 1.0 + tied
 
 
 def metrics(ranks: list[float]) -> dict:
@@ -327,6 +338,7 @@ def main() -> int:
     for arm in ("random", "frequency", "inverse", "two hop",
                 "two hop + frequency"):
         per_direction: dict[str, list[float]] = {"tail": [], "head": []}
+        bounds: dict[str, list[float]] = {"optimistic": [], "pessimistic": []}
         fired = 0
         rng = np.random.default_rng(args.seed)
         for head, relation, tail in queries:
@@ -347,12 +359,20 @@ def main() -> int:
                         # The rules first, the frequency floor underneath, so a
                         # query no rule fires on is not scored as a refusal.
                         scores = scores + marginal / (marginal.max() + 1.0)
-                per_direction[direction].append(
-                    ranker.rank(scores, given, relation, answer, direction))
+                best, middle, worst = ranker.rank(scores, given, relation,
+                                                  answer, direction)
+                per_direction[direction].append(middle)
+                bounds["optimistic"].append(best)
+                bounds["pessimistic"].append(worst)
         both = per_direction["tail"] + per_direction["head"]
-        got = metrics(both) | {"arm": arm,
-                               "mrr_tail": metrics(per_direction["tail"])["mrr"],
-                               "mrr_head": metrics(per_direction["head"])["mrr"]}
+        got = metrics(both) | {
+            "arm": arm,
+            "mrr_tail": metrics(per_direction["tail"])["mrr"],
+            "mrr_head": metrics(per_direction["head"])["mrr"],
+            "mrr_optimistic": metrics(bounds["optimistic"])["mrr"],
+            "mrr_pessimistic": metrics(bounds["pessimistic"])["mrr"],
+            "hits1_optimistic": metrics(bounds["optimistic"])["hits1"],
+            "hits1_pessimistic": metrics(bounds["pessimistic"])["hits1"]}
         if arm in ("inverse", "two hop", "two hop + frequency"):
             got["fired"] = fired / (2 * len(queries))
         rows.append(got)
@@ -360,6 +380,11 @@ def main() -> int:
         print(f"{arm:>22}  MRR {got['mrr']:.4f}  hits@1 {got['hits1']:.4f}  "
               f"hits@10 {got['hits10']:.4f}  tail {got['mrr_tail']:.4f}  "
               f"head {got['mrr_head']:.4f}{extra}")
+        print(f"{'':>22}  MRR under ties: optimistic "
+              f"{got['mrr_optimistic']:.4f}, pessimistic "
+              f"{got['mrr_pessimistic']:.4f}; hits@1 "
+              f"{got['hits1_optimistic']:.4f} to "
+              f"{got['hits1_pessimistic']:.4f}")
 
     floor = next(row for row in rows if row["arm"] == "frequency")
     print("\nAgainst published models, filtered MRR and hits@10 "

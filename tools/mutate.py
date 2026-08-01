@@ -559,10 +559,12 @@ MUTATIONS = [
                "that still produces a plausible ranking and a plausible score, "
                "which would be reported as counting having composed something",
         path=COMPOSITION,
-        old="            score = rule(statistic(self.index, answer, from_left),\n"
-            "                         statistic(self.index, answer, from_right))",
-        new="            score = rule(statistic(self.index, answer, from_left),\n"
-            "                         statistic(self.index, answer, from_left))",
+        # RE-POINTED when `ranked` became `given`, which folds over however many
+        # roles the query supplies rather than combining exactly two. The defect
+        # is the same one -- score from the first source and ignore the rest --
+        # and it is now an empty slice instead of a repeated argument.
+        old="            for other in values[1:]:",
+        new="            for other in values[:0]:",
     ),
     Mutation(
         name="the-role-is-dropped-from-the-surface",
@@ -573,7 +575,12 @@ MUTATIONS = [
                "and what it composes INTO -- and the mechanism still runs, "
                "still ranks, and still commits to answers",
         path=COMPOSITION,
-        old="        return ROLES.index(role) * self.relations + relation",
+        # RE-POINTED when the three roles stopped sharing one alphabet. The
+        # surface was `role index * relations + relation` and is now an offset
+        # per role, because a knowledge graph's left and right are 14,541 and
+        # 237 wide and multiplying by one size would overlap the blocks. Same
+        # line, same defect, one expression later.
+        old="        return self.offsets[role] + relation",
         new="        return relation",
     ),
     Mutation(

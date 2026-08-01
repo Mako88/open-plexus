@@ -57,6 +57,45 @@ class ARoleIsPartOfTheSurfaceAndNotAConvention(unittest.TestCase):
     def test_a_composition_over_no_relations_is_refused(self):
         with self.assertRaises(ValueError):
             Composition(0)
+        with self.assertRaises(ValueError):
+            Composition(4, right=0)
+
+
+class TheThreeRolesNeedNotShareAnAlphabet(unittest.TestCase):
+    """`(entity, relation) -> entity` is the shape link prediction asks for.
+
+    Composing family relations, all three roles are relations and one size does.
+    A knowledge graph's left is 14,541 wide and its right is 237, and a surface
+    computed as `role * size` would overlap the blocks silently — every count on
+    an entity mixed with a count on a relation, and no error anywhere.
+    """
+
+    def test_the_blocks_do_not_overlap_at_different_widths(self):
+        counts = Composition(5, right=2, target=3)
+        seen = {counts.surface(role, i)
+                for role in ROLES for i in range(counts.sizes[role])}
+        self.assertEqual(len(seen), 10)
+        self.assertEqual(counts.width, 10)
+
+    def test_each_role_is_bounded_by_its_own_size(self):
+        counts = Composition(5, right=2, target=3)
+        counts.surface("left", 4)
+        with self.assertRaises(ValueError):
+            counts.surface("right", 2)
+        with self.assertRaises(ValueError):
+            counts.surface("target", 3)
+
+    def test_the_candidates_come_from_the_TARGET_alphabet(self):
+        # Ranging over the left alphabet would score entities that cannot be
+        # answers, and on a knowledge graph that is 14,000 candidates too many.
+        counts = Composition(5, right=2, target=3)
+        counts.observe(4, 1, 2)
+        self.assertEqual(counts.answer(4, 1, CONDITIONAL), 2)
+        self.assertLessEqual(len(counts.ranked(4, 1, CONDITIONAL)), 3)
+
+    def test_one_size_still_sizes_every_role(self):
+        counts = Composition(6)
+        self.assertEqual(counts.sizes, {"left": 6, "right": 6, "target": 6})
 
 
 class WhatWasStatedComesBack(unittest.TestCase):
@@ -134,6 +173,53 @@ class APairNeverStatedIsAnsweredFromItsHalves(unittest.TestCase):
     def test_an_unknown_combiner_is_refused(self):
         with self.assertRaises(ValueError):
             self.counts().ranked(0, 2, CONDITIONAL, "average")
+
+
+class TheFloorIsTheMECHANISMWithAHalfSwitchedOff(unittest.TestCase):
+    """`given` has to make the baseline and the arm one implementation.
+
+    If the marginal were written separately it could drift from the thing it is
+    the floor for, and the margin between them would stop meaning anything.
+    """
+
+    def counts(self) -> Composition:
+        counts = Composition(4)
+        for _ in range(4):
+            counts.observe(0, 1, 2)      # relation 1 usually leads to 2
+        counts.observe(3, 1, 0)
+        return counts
+
+    def test_the_right_role_alone_is_the_marginal(self):
+        # No reference to the left at all, so both queries give one answer.
+        counts = self.counts()
+        from_relation = counts.given({"right": 1}, "target", CONDITIONAL)
+        self.assertEqual(from_relation[0][1], 2)
+        self.assertEqual(counts.given({"right": 1}, "target", CONDITIONAL),
+                         from_relation)
+
+    def test_adding_the_other_half_can_move_the_answer_off_the_marginal(self):
+        """Which is the whole question: does the entity half add anything?"""
+        counts = self.counts()
+        marginal = counts.given({"right": 1}, "target", CONDITIONAL)[0][1]
+        both = counts.answer(3, 1, CONDITIONAL, "mean")
+        self.assertEqual(marginal, 2)
+        self.assertEqual(both, 0)
+
+    def test_the_other_direction_reads_the_same_counts(self):
+        counts = self.counts()
+        self.assertEqual(
+            counts.given({"right": 1, "target": 2}, "left", CONDITIONAL)[0][1],
+            0)
+
+    def test_asking_for_a_role_that_was_given_is_refused(self):
+        with self.assertRaises(ValueError):
+            self.counts().given({"left": 0}, "left", CONDITIONAL)
+
+    def test_ranking_from_nothing_is_refused(self):
+        # It would return the candidates in id order, which looks like a
+        # prediction and is the numbering.
+        with self.assertRaises(ValueError):
+            self.counts().given({}, "target", CONDITIONAL)
 
 
 class TheRankingIsTotalAndTheTableIsReadableByTheSearch(unittest.TestCase):

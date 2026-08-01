@@ -49,7 +49,7 @@ it back — refutations expire, and two have already become right later.
 - ❌ ~~Take the weaker direction~~ — *penalises exactly the hub edges worth keeping.*
 - ❌ ~~Take the stronger direction~~ — *stops discriminating; it scored at the floor.*
 - ❌ ~~Tune a damping exponent~~ — *five dials were tried and none was the axis.*
-- ❌ ~~Walk further than one step~~ — *worse and up to thirty times dearer.* **Revives if** a question needs two hops by construction, as cross-modal ones do.
+- 🚧 Walk further than one step — *was ❌ at worse and up to thirty times dearer, and its stated revival condition has now been measured: on FB15k-237 the two endpoints of a test triple are **0.0000 one hop apart in training and 0.7373 two hops apart**, so a one-step mechanism cannot reach the answer whatever statistic it uses. `grounding.reach` exists and has never been run on external data.*
 - ⬜ Act on the world to disambiguate — *the only named escape from a confound that counting provably cannot separate.*
 
 **5. The answer.** What a response actually is.

@@ -66,9 +66,19 @@ shadow's 0.2222. Being detachable is not being no part of it; only the
 comparison between candidates carries signal. Control holds: at
 `shadow_alone` 0.0 the same shadows-only demotion gives −0.0135, not +0.2042.
 
-**Next here:** demote by a candidate's refusal rate against the *other
-candidates for the same query* rather than against 1.0. Nothing tells the arm
-which surfaces are concepts, so it stays legitimate.
+**The comparative demotion was tried and is not the fix.** P8 refuted at
+−0.1264, P9 held. Comparing against the other candidates for the same query
+helps where the arm is starved (−0.5130 → −0.4231) and *hurts* at full coverage
+(−0.1425 against raw's −0.0500). Estimation noise was the natural suspect and
+is refuted too: 12 → 192 asks per pair moves nothing across zero.
+
+**What is left is exact, and it is not budget, policy or noise — all three are
+now measured and none is the constraint.** `shadows only` is an ORACLE; it calls
+`is_shadow`, which no arm may do, and it sits near +0.22 while watching sits at
+−0.2967. The information is there and asking retrieves it. Every legitimate rule
+tried demotes true partners often enough to pay back the whole win, and
+`separation` takes a MIN over them, so one wrongly demoted part costs the query.
+**The missing piece is a legitimate rule that approximates the oracle.**
 
 ## Next, in the order I would take them
 

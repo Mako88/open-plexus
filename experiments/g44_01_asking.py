@@ -504,7 +504,34 @@ graph and invisible to any single edge.
          0.10, matching what mutual predictability manages
     P21  and it beats watching by >0.05, which no policy has done
 
-**P21 is the one that matters and the one I expect to fail.** The product bound
+### What happened: BOTH REFUTED, and not in the way that was expected
+
+    arm              per query   on target   shadow
+    watch              -0.2967           0     0.0%
+    ask-mutual         -0.4099          52    48.2%
+    ask-structural     -0.3106           9      0.5%
+
+**P20 refuted at 9 of 108, and P21 with it.** The interesting number is the last
+column: containment nominates a shadow 0.5% of the time against mutual
+predictability's 48%. It does not fail to EXPLOIT the structure, it fails to
+FIND the confound at all.
+
+**Why, and it is the background again.** Containment rewards a small
+neighbourhood entirely inside the query's, and the surfaces present in every
+occasion are inside everyone's. So the argmax goes to whatever has the fewest
+partners — a rare noise surface — and a shadow, which meets the background and
+its concept's surfaces like everything else, is not distinctively contained.
+This is `ask-targeted`'s failure with the sign reversed: that one was pulled to
+the most ubiquitous thing, this one to the least.
+
+**What is NOT refuted is John's lead.** The claim was that a confound is a
+two-hop fact a one-hop policy cannot express, and that stands — what is refuted
+is that CONTAINMENT is the two-hop quantity that shows it. A measure that
+discounted the ever-present background before comparing neighbourhoods has not
+been tried, and the same fix worked for `ask-mutual`, where reading the reverse
+direction was what the background could not fake.
+
+**P21 was the one I expected to fail and the one that matters.** The product bound
 says an arm must RESOLVE a rate per pair, and structure changes which pairs get
 asked, not how many asks each needs. If P20 holds and P21 fails, structure picks
 targets no better or worse than mutual predictability and the bound is
@@ -754,6 +781,26 @@ def wrongly_demoted(config: OccasionConfig, statistic,
     return harmed / queries if queries else 0.0
 
 
+def containment(index: CoOccurrence, candidate: int, here: set) -> float:
+    """How much of `candidate`'s neighbourhood lies inside `here`.
+
+    **The two-hop quantity a one-hop policy cannot express.** A shadow appears
+    with its concept and for no reason of its own, so everything it meets is
+    something the concept's surfaces also meet: its neighbourhood is a subset of
+    theirs. A true surface has partners of its own -- noise it happened to
+    co-occur with, other concepts it turns up beside -- so its neighbourhood
+    leaks outside.
+
+    Ties broken toward the smaller neighbourhood, since a candidate met once is
+    trivially contained and says nothing.
+    """
+    theirs = set(index.partners(candidate))
+    if not theirs:
+        return 0.0
+    inside = len(theirs & here) / len(theirs)
+    return inside * (1.0 - 1.0 / (1.0 + len(theirs)))
+
+
 def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             rng: random.Random, learn_from_asks: bool = True,
             interleave: bool = False) -> dict:
@@ -813,6 +860,16 @@ def run_arm(arm: str, config: OccasionConfig, budget: float, statistic,
             partners = index.partners(query)
             if not partners:
                 candidate = rng.randrange(config.vocabulary)
+            elif arm == "ask-structural":
+                # WALK THE GRAPH INSTEAD OF READING ONE EDGE. A shadow is tied
+                # to this query only THROUGH the concept, so it co-occurs with
+                # what the query co-occurs with and nothing else -- its
+                # neighbourhood is CONTAINED in the query's. A true partner
+                # brings its own. Containment is a two-hop fact and no single
+                # edge shows it.
+                here = set(index.partners(query))
+                candidate = max(partners, key=lambda p: containment(
+                    index, p, here))
             elif arm in ("ask-mutual", "ask-repeat"):
                 # ASK ABOUT WHAT PREDICTS THIS AND IS PREDICTED BY IT. A surface
                 # present in every occasion scores 1.0 one way and nearly
@@ -1000,7 +1057,8 @@ def main() -> int:
     rows: list[dict] = []
     summary: dict = {}
     for budget in BUDGETS:
-        for arm in ("watch", "ask-random", "ask-targeted", "ask-mutual"):
+        for arm in ("watch", "ask-random", "ask-targeted", "ask-mutual",
+                    "ask-structural"):
             if arm == "watch" and budget != BUDGETS[0]:
                 continue
             got = []

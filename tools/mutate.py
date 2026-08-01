@@ -553,6 +553,36 @@ MUTATIONS = [
         new="        return self._table.occasions or NotImplementedError(",
     ),
     Mutation(
+        name="the-flood-does-not-carry-what-it-composed",
+        breaks="the only thing that lets a walk go past two steps. Carrying the "
+               "LAST edge's kind rather than what the route so far amounts to "
+               "turns every step into an independent pair, so a three-step "
+               "answer can never be composed and the walk silently becomes the "
+               "flat two-step mechanism wearing a depth parameter",
+        path=PATHWAYS,
+        old="                    became, confidence = types.best(carried, kind, statistic)",
+        new="                    became, confidence = kind, 1.0",
+    ),
+    Mutation(
+        name="the-floor-stops-pruning-the-flood",
+        breaks="the only budget this walk has. The design deliberately has no "
+               "cap on how many edges are expanded -- the weight is the budget "
+               "-- so a floor that admits everything makes the frontier the "
+               "whole reachable graph, and on an entity with 7,614 edges the "
+               "walk does not return",
+        path=PATHWAYS,
+        # RE-POINTED. It first targeted the floor check BEFORE composition,
+        # which survived -- and the survival was the mutation's fault rather
+        # than the test's. Strength only decreases, so anything that check
+        # prunes the post-composition check prunes too: it is a cost guard whose
+        # removal is unobservable. This targets the one that binds, where a
+        # route strong enough to walk composes into something too weak to trust.
+        old="                    travelled *= confidence" + chr(10) +
+            "                    if travelled <= floor:" + chr(10) +
+            "                        continue",
+        new="                    travelled *= confidence",
+    ),
+    Mutation(
         name="an-unreached-candidate-is-scored-as-zero",
         breaks="the difference between *no route arrived* and *a route arrived "
                "and said nothing*, which is this mechanism's main failure mode "

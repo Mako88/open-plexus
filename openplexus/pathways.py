@@ -128,6 +128,128 @@ class PathTypes:
         return found
 
 
+    def best(self, first: int, second: int,
+             statistic: Statistic) -> tuple[int, float]:
+        """The single kind this pair most amounts to, and how strongly.
+
+        `weight` asks *does this pair mean the kind I was asked about*. This asks
+        *what does this pair mean at all*, and it is what makes a walk longer
+        than two steps possible: the pair reduces to ONE kind, which can then be
+        composed with the next edge. The table stays pair-sized however deep the
+        walk goes, where a table over triples would need 106 million rows against
+        272,115 facts and could never recur.
+
+        Returns `(-1, 0.0)` when the pair means nothing. A caller must stop
+        there rather than carry a kind it invented.
+        """
+        found = (-1, 0.0)
+        for span in range(self.spans):
+            score = self.weight(first, second, span, statistic)
+            if score > found[1]:
+                found = (span, score)
+        return found
+
+
+def flood(adjacency, start: int, asked: int, types: PathTypes,
+          statistic: Statistic, *, floor: float, depth: int = 3,
+          accumulate: str = "sum"):
+    """Expand EVERY edge strong enough, compose as you go, keep the route.
+
+    John's design, 2026-08-02: *"in parallel at the same time, traverse all
+    possibilities gated by the weight, and the thing that is traversing composes
+    as it goes so that when we get to the end state, each thing that gets there
+    has a whole string of reasoning."*
+
+    It is the join of three halves that existed separately and were never
+    connected:
+
+    - `grounding.reach` spreads and multiplies strength along the path, so
+      distance costs without a penalty being written anywhere — and is blind to
+      what its edges mean.
+    - `PathTypes` knows exactly what a pair of edges means — and is flat, with no
+      propagation and no decay, fixed at two steps by the shape of its table.
+    - `tasks.clutrr.reachable` composes a chain of any length by reducing pairs —
+      on symbols, with no weights and no graph.
+
+    **The budget is the weight and not a count.** Every edge above `floor` is
+    expanded; nothing is sampled and nothing is capped at N. That is the whole
+    point of the design and it is also the risk: an entity with 7,614 edges whose
+    weights do not discriminate will not be pruned by any floor, and the flood
+    does not die. Whether weights discriminate at hubs is unmeasured, so `floor`
+    is swept rather than pinned.
+
+    Args:
+        adjacency: `entity -> iterable of (edge kind, neighbour, weight)`.
+        start: Where the question begins.
+        asked: The kind of connection the question is about.
+        floor: Path strength below which a branch is abandoned. **The only
+            budget.** At 0.0 this enumerates the reachable graph and will not
+            return on a real one.
+        depth: How many edges a route may use. A bound on the worst case, not a
+            schedule — most branches die on `floor` long before it.
+
+    Returns:
+        `endpoint -> (score, route)` for every endpoint reached by a route whose
+        composed kind is `asked`. The route is the edge kinds walked, in order,
+        which is the chain of reasoning for that answer.
+    """
+    if accumulate not in ACCUMULATORS:
+        raise ValueError(f"accumulate must be one of {ACCUMULATORS}")
+    if depth < 2:
+        raise ValueError("a composed route needs at least two edges")
+    if floor <= 0.0:
+        raise ValueError(
+            "a floor of zero is not a budget: every edge would be expanded to "
+            "the depth limit, which on a real graph does not return")
+
+    found: dict[int, tuple[float, tuple[int, ...]]] = {}
+    # Each frontier entry carries where it is, what the route so far AMOUNTS to
+    # as a single kind, how strong it is, and the kinds it walked.
+    frontier = [(start, -1, 1.0, ())]
+    for _ in range(depth):
+        following = []
+        for here, carried, strength, route in frontier:
+            for kind, neighbour, weight in adjacency(here):
+                travelled = strength * weight
+                # A COST GUARD, not a correctness one: strength
+                # only decreases, so every branch this drops the
+                # post-composition floor would drop as well. It
+                # saves the composition lookup, nothing more.
+                if travelled <= floor or neighbour == start:
+                    continue
+                if carried < 0:
+                    # First edge: the route so far is just that edge.
+                    became, confidence = kind, 1.0
+                else:
+                    became, confidence = types.best(carried, kind, statistic)
+                    if became < 0:
+                        continue
+                    travelled *= confidence
+                    if travelled <= floor:
+                        continue
+                walked = route + (kind,)
+                following.append((neighbour, became, travelled, walked))
+                if became != asked or len(walked) < 2:
+                    continue
+                held = found.get(neighbour)
+                if held is None:
+                    found[neighbour] = (travelled, walked)
+                elif accumulate == "max":
+                    if travelled > held[0]:
+                        found[neighbour] = (travelled, walked)
+                else:
+                    # Agreeing routes add up, and the route KEPT is the
+                    # strongest single one -- a sum has no route of its own and
+                    # reporting the last-seen would make the explanation
+                    # whichever branch happened to be visited last.
+                    best_route = held[1] if held[0] >= travelled else walked
+                    found[neighbour] = (held[0] + travelled, best_route)
+        if not following:
+            break
+        frontier = following
+    return found
+
+
 def concentration(scores: dict[int, float]) -> float:
     """The largest candidate's share of the total. **A confidence, not a fix.**
 

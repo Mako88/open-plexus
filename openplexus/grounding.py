@@ -52,8 +52,6 @@ walk, equivalence — across `openplexus/`, `tools/`, `tests/` and `experiments/
   is retrieved; the graph is the counts themselves.
 - **`openplexus/ownership.py` and `openplexus/partitioned.py`** are what the join
   would be built from and are deliberately not imported. See above.
-- **`openplexus/sketch.py`** answers occupancy — whether an address was ever
-  written — not how often two things met.
 
 ## Why mutual top-k rather than a threshold
 

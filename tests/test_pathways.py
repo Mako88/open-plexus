@@ -21,7 +21,7 @@ from __future__ import annotations
 import unittest
 
 from openplexus.grounding import STATISTICS
-from openplexus.pathways import PathTypes, concentration
+from openplexus.pathways import PathTypes, concentration, flood
 
 CONDITIONAL = STATISTICS["conditional"]
 
@@ -107,6 +107,102 @@ class AnUnreachedCandidateIsAbsent(unittest.TestCase):
     def test_only_the_endpoints_a_route_reached_are_present(self):
         found = taught().score([(0, 1, 77), (2, 3, 88)], 0, CONDITIONAL)
         self.assertEqual(set(found), {77})
+
+
+class TheFloodExpandsByWeightAndComposesAsItGoes(unittest.TestCase):
+    """The join: propagation, edge meanings and composition in one walk.
+
+    The world is a straight line, 0 -> 1 -> 2 -> 3, walked by edge kinds 0, 1
+    and 4. Kind 0 then kind 1 amounts to kind 2; kind 2 then kind 4 amounts to
+    kind 3. So the two-step answer is 2 and the three-step answer is 3, and the
+    three-step one is only reachable by carrying the derived kind forward.
+    """
+
+    def world(self):
+        types = PathTypes(kinds=6, spans=6)
+        for _ in range(5):
+            types.observe(0, 1, 2)       # kind 0 then 1 amounts to 2
+            types.observe(2, 4, 3)       # kind 2 then 4 amounts to 3
+        edges = {0: [(0, 1, 0.9)], 1: [(1, 2, 0.9)], 2: [(4, 3, 0.9)]}
+        return types, (lambda node: edges.get(node, ()))
+
+    def test_two_steps_arrive_with_their_route(self):
+        types, adjacency = self.world()
+        found = flood(adjacency, 0, 2, types, CONDITIONAL, floor=0.01, depth=3)
+        self.assertIn(2, found)
+        self.assertEqual(found[2][1], (0, 1))
+
+    def test_three_steps_need_the_composed_kind_carried_forward(self):
+        """The thing a pair-shaped table cannot do without reducing first."""
+        types, adjacency = self.world()
+        found = flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.01, depth=3)
+        self.assertIn(3, found)
+        self.assertEqual(found[3][1], (0, 1, 4))
+
+    def test_depth_two_cannot_reach_the_three_step_answer(self):
+        types, adjacency = self.world()
+        found = flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.01, depth=2)
+        self.assertNotIn(3, found)
+
+    def test_the_floor_is_the_budget_and_it_prunes(self):
+        # Strength multiplies, so three 0.9 edges land near 0.7 before the
+        # composition confidences are applied. A floor above that stops it.
+        types, adjacency = self.world()
+        self.assertEqual(
+            flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.95, depth=3), {})
+        self.assertIn(
+            3, flood(adjacency, 0, 3, types, CONDITIONAL, floor=0.01, depth=3))
+
+    def test_a_strong_walk_that_composes_weakly_is_pruned(self):
+        """The floor that actually binds, and it binds AFTER composing.
+
+        Both edges are certain, so the route is strong enough to walk. But the
+        pair means its span only half the time, so what the route AMOUNTS to is
+        weak — and a floor above that has to stop it. The check before
+        composing cannot: strength only decreases, so it prunes nothing the
+        later one would not.
+        """
+        types = PathTypes(kinds=6, spans=6)
+        for _ in range(5):
+            types.observe(0, 1, 2)      # the pair means 2 half the time
+            types.observe(0, 1, 3)      # and 3 the other half
+        edges = {0: [(0, 1, 1.0)], 1: [(1, 9, 1.0)]}
+        adjacency = lambda node: edges.get(node, ())     # noqa: E731 - local
+        self.assertIn(9, flood(adjacency, 0, 2, types, CONDITIONAL,
+                               floor=0.3, depth=2))
+        self.assertEqual(flood(adjacency, 0, 2, types, CONDITIONAL,
+                               floor=0.7, depth=2), {})
+
+    def test_a_route_that_composes_to_something_else_is_not_an_answer(self):
+        types, adjacency = self.world()
+        found = flood(adjacency, 0, 5, types, CONDITIONAL, floor=0.01, depth=3)
+        self.assertEqual(found, {})
+
+    def test_a_floor_of_zero_is_refused_rather_than_run(self):
+        # It would expand every edge to the depth limit, which on a real graph
+        # does not return -- a budget of nothing is not a budget.
+        types, adjacency = self.world()
+        with self.assertRaises(ValueError):
+            flood(adjacency, 0, 2, types, CONDITIONAL, floor=0.0)
+
+    def test_one_step_is_refused_because_nothing_has_composed(self):
+        types, adjacency = self.world()
+        with self.assertRaises(ValueError):
+            flood(adjacency, 0, 2, types, CONDITIONAL, floor=0.01, depth=1)
+
+    def test_agreeing_routes_add_up_and_the_kept_route_is_the_strongest(self):
+        types = PathTypes(kinds=6, spans=6)
+        for _ in range(5):
+            types.observe(0, 1, 2)
+            types.observe(3, 1, 2)
+        edges = {0: [(0, 1, 0.9), (3, 5, 0.4)],
+                 1: [(1, 9, 0.9)], 5: [(1, 9, 0.9)]}
+        found = flood(lambda n: edges.get(n, ()), 0, 2, types, CONDITIONAL,
+                      floor=0.01, depth=2)
+        strongest = flood(lambda n: edges.get(n, ()), 0, 2, types, CONDITIONAL,
+                          floor=0.01, depth=2, accumulate="max")
+        self.assertGreater(found[9][0], strongest[9][0])
+        self.assertEqual(found[9][1], (0, 1))
 
 
 class ConcentrationIsAConfidence(unittest.TestCase):

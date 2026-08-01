@@ -60,9 +60,19 @@ scores, refusing at a median 0.6667 — *higher* than any scored pair, since a
 background surface asked about the wrong query is hard to detach. So the split
 separates scored from unscored and demotes everything the metric reads.
 
-**Next here:** fit the threshold per query, over that query's own candidates.
-No privileged knowledge, and it cannot be polluted by pairs the demotion never
-touches. Not yet run.
+**Fitting the cut per query was run and improves every cell**, including the
+ceiling (+0.1314 → +0.1444) and `ask-repeat` (−0.3123 → −0.3054, now 0.009
+short of watching, from −0.5130 this morning). So the pollution was real and it
+was not the only thing wrong.
+
+**What is left between the arms and the ceiling is coverage**, and that is
+capped by the equal-exposure invariant rather than by any policy — an ask
+consumes a draw, so an arm cannot resolve 108 pairs out of a stream it must also
+watch. Whether that is a fact about intervention or about this harness is the
+open question, and it is the one worth answering next.
+
+**Debt:** per-query reuses `learned_threshold` on a filtered dict and has no
+mutation. The filter is the mechanism and it is untested.
 
 **P12 stands refuted at 100%, and it is a real defect.** Two means always return
 two groups, so where the shadow genuinely is a part the rule demotes true

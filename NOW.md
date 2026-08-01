@@ -90,23 +90,19 @@ the ~300 per digit is about EVIDENCE and not about distinct recordings. The
 evidence for the reading `g40-01` itself flagged as unsettled: *the threshold
 may be a statement about occasions per CODE rather than per digit.*
 
-## A RULE BROKEN TWICE, AND THIS PROJECT'S ANSWER IS A CHECK
+## ONE UNGUARDED RULE, AND ONE THAT WAS ALREADY GUARDED
 
 **I committed on a red preflight**, chaining `git commit` off a `grep` of its
 output so `&&` read grep's status. `CLAUDE.md` names this for `tail`; I hit it
-with `grep`. **And `tools/mutate.py` was broken mid-edit four times** by patch
-scripts writing before `ast.parse` validated.
+with `grep`. **Nothing stopped it and nothing would have noticed** — I found it
+re-reading my own output. Candidate: a pre-commit hook running preflight, cost
+~70s per commit. John's call, since he bears it.
 
-**Only ONE of those is unguarded, and I offered both as if they were.** A broken
-`mutate.py` fails preflight's import check, which caught it 4 times out of 4 —
-the guard exists and worked, and the cost was my time rather than a wrong
-result. Proposing a new check for it would have been adding a rule where a
-mechanism already does the job.
-
-**Committing on a red preflight IS unguarded.** Nothing stopped it and nothing
-would have noticed; I found it by re-reading my own output. The candidate is a
-pre-commit hook running preflight, and its cost is ~70s on every commit —
-John's call, since he bears it.
+**`tools/mutate.py` was broken mid-edit four times** by patch scripts writing
+before `ast.parse` validated — and that one needs no new check. It fails
+preflight's import step, which caught it 4/4. The guard exists and worked; the
+cost was my time, not a wrong result. I first offered both as candidates, which
+would have added a rule where a mechanism already does the job.
 
 ## Known debts
 

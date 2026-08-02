@@ -20,9 +20,8 @@ when it is done. Nothing may cite it. Rewritten at the end of every turn — see
 **UNDERPOWERED**: senses runs used n=150 where +0.03 needs 840. Only the flood
 and many-origins have been re-run; surprise/rarity refuelling has not.
 
-**Report `busiest`, not `messages`.** Nothing runs in parallel; serial seconds
-are TOTAL work. `Flood.busiest()` is what a distributed run would cost —
-9.5× to 22.4× less. Every cost reported this session led with the wrong column.
+**Report `busiest`, not `messages`** — serial seconds are TOTAL work, and
+`Flood.busiest()` is what a distributed run costs: 9.5× to 22.4× less.
 
 ## THE FLOOD IS THE DIRECTION — John's call, 2026-08-02
 
@@ -51,10 +50,11 @@ death report never arrives. That is what decision 9's deadline is for.
 2. **Turn death on in snake and re-run everything policy-related.** The old
    numbers are meaningless with nothing to lose.
 
-3. **k-means: a reference ceiling, not a candidate.** A seeded codebook does
-   not work. Random centres from a shared seed are legal but probably no better
-   than the hash. The ensemble front end is the better bet AND keeps both of
-   the walk's jobs.
+3. **k-means, experimented with rather than parked** — see action 5.
+
+**THE FOUR 🚧, checked 2026-08-02** so none goes quiet: *any node is an input
+or an output, machines carrying the addresses*; and *which chain to render* with
+its two live steps, *arrival narrows* and *prediction ranks*.
 
 ## AGREED 2026-08-02, NOT BUILT
 
@@ -90,33 +90,35 @@ death report never arrives. That is what decision 9's deadline is for.
    the walk: **relative claims are safe under any quantiser, absolute ones are
    not.**
 
-**Waiting on John**: which chain to render (agreed in principle, nothing
-built); whether ARC-AGI-3 is next (counting needs recurrence, ARC withholds it).
+**Waiting on John**: whether ARC-AGI-3 is next — counting needs recurrence and
+ARC withholds it by design.
 
 **Preference**: three honest sources exist; reward is rejected and curiosity
 loses to random, so homeostasis is the one left. Action 1 builds it.
 
 **Ensemble front end**: built; budget pins at the TOP of its grid. Sweep
-higher, then three seeds at whatever interior maximum appears.
+higher, then three seeds at the interior maximum.
 
-**`--repeats` may do nothing**: it replays the same recordings, and repeated
-identical evidence does not sharpen a ratio. Unmeasured.
+**`--repeats` may do nothing**: it replays the same recordings, so the evidence
+is not fresh. Unmeasured.
 
-**Columns**: neighbour-conditioned works. Left: conditioning on a SUMMARY of
-the neighbours rather than the single one in the direction of travel.
+**Columns**: neighbour-conditioned works. Left: a SUMMARY of the neighbours
+rather than the single one in the direction of travel.
 
 **Snake**: no multimodality yet — vision, plus hearing in `snake_hearing.py`;
-action and interoception designed, not built. Nothing beats random play.
+action and interoception designed, not built. Nothing beats random play, and
+**no experiment turns the energy on**, so those numbers are the meaningless
+ones priority 2 exists to replace.
 
 ## Prediction and forgetting: four holes
 
-- **Prediction error does not drive the asking**; **nothing has swept the
-  half-life**, now known to change answers; **eviction has no policy** because
-  nothing measures memory pressure.
-- **Automatic dial tuning** is designed, not built: a node scoring candidates
-  for its own dial against its own prediction error, local and never-ending.
-  **Risk**: minimising surprise is won by never looking at anything surprising,
-  so score error per observation MADE.
+- **Prediction error does not drive the asking**; **the half-life is unswept**,
+  now known to change answers; **eviction has no policy**, nothing measuring
+  memory pressure.
+- **Automatic dial tuning** designed, not built: a node scoring candidates for
+  its own dial against its own prediction error. **Risk**: minimising surprise
+  is won by never looking at anything surprising, so score error per
+  observation MADE.
 
 ## Forgetting: built, one half untested
 
@@ -135,16 +137,12 @@ action and interoception designed, not built. Nothing beats random play.
 
 ## Known debts
 
-- **`deployment.py`, `agreement.py`, `tasks/xsl.py` are dead** — tests only.
-  **`experiments/` has fifteen scripts and no harness.**
-- **DISTRIBUTED: entry point and in-process agreement done, container left.**
-  Left: latency, departure, partition — which is priority 1.
-- **§5's "refuse when nothing was written" is unverified**; every refusal in
+- **`deployment.py`, `agreement.py`, `tasks/xsl.py` are dead** — tests only;
+  **`experiments/` has fifteen scripts and no harness**; **the written
+  channel's dials were chosen, not measured**.
+- **§5's "refuse when nothing was written" is unverified** — every refusal in
   the package is an ownership refusal instead.
-- **The written channel's dials were chosen, not measured.**
 
-## Reading leads, unread
-
-**Predictive coding** (the dark room is its named risk, measured);
-**interventional causal discovery under a budget**; **AnyBURL**, near 0.31
+**Reading leads, unread**: predictive coding (the dark room is its named risk,
+measured); interventional causal discovery under a budget; AnyBURL, near 0.31
 where ours lands at 0.247.

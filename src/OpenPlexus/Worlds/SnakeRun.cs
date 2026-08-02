@@ -49,11 +49,54 @@ public sealed record RunResult
     public required int Deaths { get; init; }
 
     /// <summary>
+    /// Of the steps a chain chose, how many chose the action just taken.
+    /// </summary>
+    /// <remarks>
+    /// <b>The check that decides whether <see cref="ChosenByChain"/> means
+    /// anything.</b> The action joins the occasion it was taken in, so the last
+    /// action is tightly bound to the current view — a walk that only ever
+    /// returns what the body just did would make "a chain caused a move" true
+    /// and empty. If this equals <see cref="ChosenByChain"/>, the chain is a
+    /// mirror.
+    /// </remarks>
+    public required int EchoedLast { get; init; }
+
+    /// <summary>
     /// Routes killed by the horizon rather than by economics, summed over the
     /// run. <b>A walk that hit the horizon looks exactly like one that
     /// finished unless this is reported.</b>
     /// </summary>
     public required long Halted { get; init; }
+}
+
+/// <summary>
+/// What decides the move.
+/// </summary>
+/// <remarks>
+/// <b>Controls that change ONE thing.</b> <see cref="SnakeRun.PlayAsync"/>'s
+/// <c>blind</c> flag changes two — it stops the action joining the occasion,
+/// which alters the graph <i>and</i> forces every move to be random — so it
+/// cannot say whether the chain helps. These can: the graph learns identically
+/// under all three and only the choice differs.
+/// </remarks>
+public enum Policy
+{
+    /// <summary>Take the action a chain reached, and fall back to random.</summary>
+    Chain,
+
+    /// <summary>Ignore the chain entirely. <b>The floor.</b></summary>
+    Random,
+
+    /// <summary>
+    /// Ignore the chain and repeat the last action.
+    /// </summary>
+    /// <remarks>
+    /// <b>The control for momentum.</b> Reversing into the neck is instantly
+    /// fatal, so anything that repeats the last action more often than chance
+    /// survives longer for a reason that has nothing to do with reasoning. If
+    /// this matches <see cref="Chain"/>, that is the whole explanation.
+    /// </remarks>
+    Repeat,
 }
 
 /// <summary>
@@ -153,12 +196,15 @@ public sealed class SnakeRun : IDisposable
     /// </param>
     /// <param name="ct">Cancellation.</param>
     public async Task<RunResult> PlayAsync(
-        int steps, bool blind = false, CancellationToken ct = default)
+        int steps,
+        bool blind = false,
+        Policy policy = Policy.Chain,
+        CancellationToken ct = default)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(steps);
 
         SnakeAction? did = null;
-        int taken = 0, byChain = 0, reachedNothing = 0, silent = 0, ate = 0;
+        int taken = 0, byChain = 0, reachedNothing = 0, silent = 0, ate = 0, echoed = 0;
         long halted = 0;
 
         for (; taken < steps && _snake.Alive; taken++)
@@ -177,9 +223,21 @@ public sealed class SnakeRun : IDisposable
             if (thought is null) silent++;
             else { halted += thought.Halted; if (chosen is null) reachedNothing++; }
 
-            var action = chosen is { } code && SnakeSense.Decode(code) is { } meant
-                ? Bump(ref byChain, meant)
-                : (SnakeAction)_fallback.Next(4);
+            if (policy != Policy.Chain) chosen = null;
+
+            SnakeAction action;
+            if (chosen is { } code && SnakeSense.Decode(code) is { } meant)
+            {
+                byChain++;
+                if (did == meant) echoed++;
+                action = meant;
+            }
+            else
+            {
+                action = policy == Policy.Repeat && did is { } last
+                    ? last
+                    : (SnakeAction)_fallback.Next(4);
+            }
 
             _snake.Step(action);
             did = blind ? null : action;
@@ -202,13 +260,8 @@ public sealed class SnakeRun : IDisposable
             Nodes = _clusters.Sum(cluster => cluster.Count),
             Deaths = _eye.DeathsSeen,
             Halted = halted,
+            EchoedLast = echoed,
         };
-    }
-
-    private static SnakeAction Bump(ref int counter, SnakeAction action)
-    {
-        counter++;
-        return action;
     }
 
     private void Failures()

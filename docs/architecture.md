@@ -325,6 +325,39 @@ Recorded here so a decision does not go quiet.
    NOT a candidate** — capping how many partners are considered is already ❌
    on `master` as "a constant nobody set on purpose, doing the cutting".
 
+10. **DOES THE CHAIN DO ANYTHING? Measured 2026-08-02, and the answer is
+    "less than the dumbest possible policy".** 30 seeds, 300-step budget,
+    `includeEmpty: false`, `Horizon = 4`. The graph learns identically under
+    all three arms; only the choice differs.
+
+    | policy | mean steps | max | fruit |
+    |---|---|---|---|
+    | chain | 4.77 | **17** | 0 |
+    | random | 2.70 | 9 | 0 |
+    | repeat the last action | **5.90** | 8 | 0 |
+
+    **The chain beats random and loses to repeat-last-action.** So there is no
+    evidence it contributes anything a trivial momentum rule does not, and some
+    evidence it contributes less.
+
+    **It is not merely echoing, though.** Of 77 chain-chosen moves over ten
+    seeds, 28 repeated the last action — 36% against a chance rate of 25%. So
+    the chain carries *some* momentum and nothing like all of it, which is what
+    makes the comparison above meaningful rather than tautological.
+
+    **Two things cut the other way and are not conclusions.** `repeat` is
+    capped at 8 by geometry — walking straight from the centre of a 15-wide
+    board hits the wall — so its mean is flattered by a task that is over
+    before a straight line stops working. And the chain's best run reached 17,
+    which no repeat run can. **Nothing ate a fruit under any policy**, so none
+    of this is evidence about competence; it is evidence about survival in runs
+    that end almost immediately.
+
+    **The confound this replaced.** The `blind` arm changes two things — it
+    stops the action joining the occasion, altering the graph, *and* forces
+    every move to be random — so it can never say whether the chain helps.
+    `Policy` exists to change one thing.
+
 9. **Random play dies in about five steps**, because the four actions are
    absolute directions and reversing into the neck is instantly fatal. That is
    the floor everything gets compared against, so it needs to be understood

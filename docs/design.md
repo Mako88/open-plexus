@@ -10,7 +10,7 @@ exactly. If they ever disagree, this file is wrong and gets fixed.
 tested.** The `CS0169` progress bar is at **0**, down from 27 — every field has
 a body behind it. What remains is the end-to-end snake run.
 
-**129 tests pass, and fifty-four mutations have been run to confirm they bite.**
+**133 tests pass, and fifty-eight mutations have been run to confirm they bite.**
 
 **A CHAIN HAS CAUSED A MOVE.** On a 200-step budget with seed 1 the snake took
 5 steps before dying, and **2 of them were chosen by a chain that reached an
@@ -20,6 +20,10 @@ including `master` — that a chain of reasoning has caused anything.
 
 **And the flood does not scale.** Those 5 steps halted 275,280 routes at the
 horizon on a graph of 13 nodes. See open fork 8.
+
+**And the chain loses to repeating the last action.** Over 30 seeds: chain
+4.77 mean steps, random 2.70, repeat-last-action 5.90. See open fork 10 — this
+is the number that says whether any of the rest was worth building.
 A test has proved nothing until it has been seen to fail for the right reason.
 
 **Five mutations have SURVIVED across the project, and all five are recorded

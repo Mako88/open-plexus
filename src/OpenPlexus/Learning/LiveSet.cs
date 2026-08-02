@@ -8,6 +8,9 @@ public readonly record struct Changes
 {
     public required ImmutableArray<Code> Started { get; init; }
     public required ImmutableArray<Code> Stopped { get; init; }
+
+    /// <summary>Whether this frame said anything at all. A stable scene is silent.</summary>
+    public bool Quiet => Started.IsEmpty && Stopped.IsEmpty;
 }
 
 /// <summary>
@@ -37,12 +40,44 @@ public sealed class LiveSet
     /// stopped, by diffing against what was live. <b>Everything that persists
     /// produces nothing at all.</b>
     /// </summary>
-    public Changes Update(IReadOnlyCollection<Code> present, long now) =>
-        throw new NotImplementedException();
+    public Changes Update(IReadOnlyCollection<Code> present, long now)
+    {
+        ArgumentNullException.ThrowIfNull(present);
+
+        var here = present as HashSet<Code> ?? [.. present];
+        var started = ImmutableArray.CreateBuilder<Code>();
+        var stopped = ImmutableArray.CreateBuilder<Code>();
+
+        foreach (var code in here)
+        {
+            // A PERSISTING CODE KEEPS ITS ORIGINAL START TIME. Refreshing it
+            // here would silently make every duration zero, and duration is the
+            // one thing this representation gains over a set of moments.
+            if (_live.TryAdd(code, now)) started.Add(code);
+        }
+
+        foreach (var code in _live.Keys)
+        {
+            if (!here.Contains(code)) stopped.Add(code);
+        }
+
+        foreach (var code in stopped) _live.Remove(code);
+
+        return new Changes
+        {
+            Started = started.ToImmutable(),
+            Stopped = stopped.ToImmutable(),
+        };
+    }
 
     /// <summary>The codes currently on.</summary>
-    public IReadOnlyCollection<Code> Live => throw new NotImplementedException();
+    public IReadOnlyCollection<Code> Live => _live.Keys;
 
-    /// <summary>When a live code started. Feeds duration, which nothing represents yet.</summary>
-    public long StartedAt(Code code) => throw new NotImplementedException();
+    /// <summary>
+    /// When a live code started. Feeds duration, which nothing represents yet.
+    /// </summary>
+    public long StartedAt(Code code) =>
+        _live.TryGetValue(code, out var at)
+            ? at
+            : throw new KeyNotFoundException($"{code} is not live");
 }

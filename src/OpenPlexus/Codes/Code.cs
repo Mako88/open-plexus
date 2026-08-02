@@ -16,8 +16,22 @@ namespace OpenPlexus.Codes;
 /// quantiser is built from the shared seed and never fitted to data.
 /// </para>
 /// </remarks>
-public readonly record struct Code(byte Modality, ulong Value)
+public readonly record struct Code(byte Modality, ulong Value) : IComparable<Code>
 {
+    /// <summary>
+    /// Modality first, then value.
+    /// </summary>
+    /// <remarks>
+    /// Ordering exists so that anything iterating codes can do so
+    /// deterministically. A dictionary's order is not stable across runs, and a
+    /// result that moves with it would be a difference nobody chose.
+    /// </remarks>
+    public int CompareTo(Code other)
+    {
+        var modality = Modality.CompareTo(other.Modality);
+        return modality != 0 ? modality : Value.CompareTo(other.Value);
+    }
+
     /// <summary>
     /// The top <paramref name="bits"/> bits of <see cref="Value"/>.
     /// </summary>
@@ -28,5 +42,10 @@ public readonly record struct Code(byte Modality, ulong Value)
     /// addressing rather than being built. Limit: within-modality only, since
     /// two front ends never share a prefix.
     /// </remarks>
-    public ulong Prefix(int bits) => throw new NotImplementedException();
+    public ulong Prefix(int bits)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(bits);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(bits, 64);
+        return bits == 0 ? 0UL : Value >> (64 - bits);
+    }
 }

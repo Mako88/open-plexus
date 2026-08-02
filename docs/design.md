@@ -4,9 +4,16 @@ What every piece is and what every method does, in words. No bodies, no
 implementations — this is the mental model, and the code is meant to match it
 exactly. If they ever disagree, this file is wrong and gets fixed.
 
-**Status: every type below exists as a stub and the solution builds. No method
-has a body.** Each unimplemented field shows up as a `CS0169` build warning, so
-the warning count is a rough progress bar — 27 at the point the stubs landed.
+**Status: every type exists. `Code`, `Node` and `LiveSet` are implemented and
+tested; everything else is a stub.** Each unimplemented field shows up as a
+`CS0169` build warning, so the count is a rough progress bar — 27 when the
+stubs landed, 23 now.
+
+**25 tests pass, and four mutations were run to confirm they bite**: dropping
+the partner marginal from the edge weight, charging nothing under `Best`
+pricing, removing the cycle check, and letting persistence reset a start time.
+Each turned exactly the test that claims to cover it red. A test has proved
+nothing until it has been seen to fail for the right reason.
 
 Scope: **snake**, running on one machine, with every boundary shaped so the
 same code runs across many. Static background is out of scope for now — see

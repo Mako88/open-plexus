@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using OpenPlexus.Codes;
 using OpenPlexus.Thinking;
 
@@ -37,21 +38,47 @@ public sealed class Node
     /// <summary>How many occasions this node fired on at all. Its own marginal.</summary>
     private double _seen;
 
-    public Node(Code code, WalkSettings settings) => throw new NotImplementedException();
+    /// <param name="code">This node's identity.</param>
+    /// <param name="settings">
+    /// The dials. Validated here so a node cannot exist holding a contradictory
+    /// pair — an argument that silently does nothing is a sweep arm that looks
+    /// distinct and is not.
+    /// </param>
+    public Node(Code code, WalkSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+
+        if (settings.Stamina <= 0.0)
+            throw new ArgumentOutOfRangeException(nameof(settings),
+                "a route with no stamina cannot take its first step");
+
+        if (settings.Cost == StepCost.Constant && settings.Charge <= 0.0)
+            throw new ArgumentOutOfRangeException(nameof(settings),
+                "StepCost.Constant needs a Charge above zero");
+
+        if (settings.Cost != StepCost.Constant && settings.Charge != 0.0)
+            throw new ArgumentException(
+                "Charge is the price for StepCost.Constant and does nothing " +
+                "otherwise; setting both would give a sweep an arm that is not one",
+                nameof(settings));
+
+        _code = code;
+        _settings = settings;
+    }
 
     /// <inheritdoc cref="_code"/>
-    public Code Code => throw new NotImplementedException();
+    public Code Code => _code;
 
     /// <summary>
     /// How many occasions this node fired on. <b>Public because a neighbour
     /// needs it</b> to weigh an edge pointing here — see <see cref="IMarginals"/>.
     /// </summary>
-    public double Seen => throw new NotImplementedException();
+    public double Seen => _seen;
 
     // ---- learning: these two are the entirety of what changes over time ----
 
     /// <summary>"I fired on this occasion." Adds one to the marginal.</summary>
-    public void Note() => throw new NotImplementedException();
+    public void Note() => _seen += 1.0;
 
     /// <summary>
     /// "That code fired on the same occasion I did." Adds one to that partner's
@@ -63,15 +90,23 @@ public sealed class Node
     /// would be holding data it does not own, which is the shared state C1
     /// forbids.
     /// </remarks>
-    public void Observe(Code other) => throw new NotImplementedException();
+    public void Observe(Code other)
+    {
+        if (other == _code)
+            throw new ArgumentException(
+                "a code cannot be its own partner; counting one would make " +
+                "every statistic read its own presence as evidence", nameof(other));
+
+        _together[other] = _together.GetValueOrDefault(other) + 1.0;
+    }
 
     /// <summary>Reads back one cell of the row.</summary>
-    public double Together(Code other) => throw new NotImplementedException();
+    public double Together(Code other) => _together.GetValueOrDefault(other);
 
     /// <summary>
     /// Every code this node has ever co-occurred with. The fan-out of one hop.
     /// </summary>
-    public IReadOnlyCollection<Code> Partners() => throw new NotImplementedException();
+    public IReadOnlyCollection<Code> Partners() => _together.Keys;
 
     // ---- thinking ----------------------------------------------------------
 
@@ -84,16 +119,104 @@ public sealed class Node
     /// partners with zero weight and partners <b>already in the arriving
     /// chain</b>; for each survivor work out <c>held - price + fuel</c> and
     /// drop it if that is not positive; build one outgoing message per survivor
-    /// with this node appended to the chain and its strength multiplied by the
-    /// edge weight; report <c>k-1</c> splits if <c>k</c> survived, or one death
-    /// if none did.
+    /// with the partner appended to the chain and the strength multiplied by
+    /// the edge weight; report <c>k-1</c> splits if <c>k</c> survived, or one
+    /// death if none did.
     /// </para>
     /// <para>
     /// <b>Returns rather than sends.</b> See <see cref="Fired"/>.
     /// </para>
+    /// <para>
+    /// <b>A chain ends with the node the message is addressed to</b>, so the
+    /// receiver is already in it when this runs. That is what makes the cycle
+    /// check free — the partner is refused if it appears anywhere in the chain
+    /// already being carried.
+    /// </para>
     /// </remarks>
-    public Fired Fire(Message message, IMarginals marginals) =>
-        throw new NotImplementedException();
+    public Fired Fire(Message message, IMarginals marginals)
+    {
+        ArgumentNullException.ThrowIfNull(marginals);
+
+        if (message.To != _code)
+            throw new ArgumentException(
+                $"message addressed to {message.To} reached the node for {_code}",
+                nameof(message));
+
+        // An origin message has not travelled, so nothing arrived here and
+        // there is no edge to value. Its strength is the starting 1.0.
+        var isOrigin = message.Chain.Length <= 1;
+
+        // LIFT DIVIDES BY THIS NODE'S OWN MARGINAL, which is the receiver's to
+        // read. PPMI's global occasion total is identical for every candidate
+        // so it cancels in a ranking and never has to be known — which is what
+        // makes rarity-weighting C1-legal where PPMI is not.
+        var carried = !isOrigin && _settings.Value == ArrivalValue.Lift
+            ? message.Carried / Math.Max(_seen, 1.0)
+            : message.Carried;
+
+        var reached = isOrigin
+            ? null
+            : new Arrival
+            {
+                Endpoint = _code,
+                Score = carried,
+                Chain = message.Chain,
+                Best = carried,
+                Routes = 1,
+            };
+
+        var weights = new Dictionary<Code, double>(_together.Count);
+        var fuels = new Dictionary<Code, double>(_together.Count);
+        var affordable = new List<double>(_together.Count);
+
+        foreach (var partner in _together.Keys)
+        {
+            var weight = WeightOf(partner, marginals);
+            weights[partner] = weight;
+
+            // THE FUEL AND THE SCORE ARE TWO QUANTITIES. The weight scores an
+            // arrival; the fuel decides whether the route can keep going. Under
+            // Refuel.Strength they are the same number, which is why they
+            // looked like one thing until surprise needed them apart.
+            var fuel = Fuel(weight);
+            fuels[partner] = fuel;
+            if (fuel > 0.0) affordable.Add(fuel);
+        }
+
+        var price = PriceOfAStep(affordable);
+        var outgoing = ImmutableArray.CreateBuilder<Message>(weights.Count);
+
+        foreach (var (partner, weight) in weights)
+        {
+            if (weight <= 0.0 || message.Chain.Contains(partner)) continue;
+
+            var left = message.Held - price + fuels[partner];
+            if (left <= 0.0) continue;
+
+            outgoing.Add(message with
+            {
+                To = partner,
+                Held = left,
+                Chain = message.Chain.Add(partner),
+                Carried = carried * weight,
+            });
+        }
+
+        var children = outgoing.Count;
+
+        return new Fired
+        {
+            Outgoing = outgoing.ToImmutable(),
+            Reached = reached,
+
+            // One route became `children` routes, so the live count moves by
+            // the difference — a split is not the birth of `children` new ones.
+            Accounting = new Accounting(
+                message.Broadcast,
+                Splits: children > 0 ? children - 1 : 0,
+                Deaths: children == 0 ? 1 : 0),
+        };
+    }
 
     /// <summary>
     /// How strong the edge to a partner is: the shared count divided by
@@ -111,8 +234,11 @@ public sealed class Node
     /// and <see cref="IMarginals"/> is the seam where that shows.
     /// </para>
     /// </remarks>
-    private double WeightOf(Code partner, IMarginals marginals) =>
-        throw new NotImplementedException();
+    private double WeightOf(Code partner, IMarginals marginals)
+    {
+        var common = marginals.SeenOf(partner);
+        return common <= 0.0 ? 0.0 : _together[partner] / common;
+    }
 
     /// <summary>
     /// What a route is paid for taking an edge of this weight.
@@ -122,11 +248,36 @@ public sealed class Node
     /// under <see cref="Refuel.Strength"/>, which is why they looked like one
     /// thing until surprise needed them apart.
     /// </remarks>
-    private double Fuel(double weight) => throw new NotImplementedException();
+    private double Fuel(double weight) => _settings.Refuel switch
+    {
+        Refuel.Strength => weight,
+
+        // A route survives by walking edges that were unlikely. Local, because
+        // it needs one node's own row and one marginal, where PPMI needs the
+        // global total C1 forbids.
+        Refuel.Surprise => weight > 0.0 && weight < 1.0 ? -Math.Log2(weight) : 0.0,
+
+        _ => throw new UnreachableException(),
+    };
 
     /// <summary>
-    /// What leaving this node costs, computed once from every partner weight.
+    /// What leaving this node costs, computed once from every partner's fuel.
     /// </summary>
-    private double PriceOfAStep(IReadOnlyCollection<double> weights) =>
-        throw new NotImplementedException();
+    private double PriceOfAStep(IReadOnlyCollection<double> affordable) => _settings.Cost switch
+    {
+        StepCost.Constant => _settings.Charge,
+
+        // REFUTED and kept so the refutation can be re-run: about half a node's
+        // edges are above its own mean, so a route taking above-mean steps
+        // gains budget forever.
+        StepCost.Local => affordable.Count == 0 ? 0.0 : affordable.Sum() / affordable.Count,
+
+        // Opportunity cost: the step is charged what the best step here would
+        // have cost. Budget is therefore non-increasing, and strictly
+        // decreasing for anything but the strongest edge, so the walk is
+        // bounded without a constant.
+        StepCost.Best => affordable.Count == 0 ? 0.0 : affordable.Max(),
+
+        _ => throw new UnreachableException(),
+    };
 }

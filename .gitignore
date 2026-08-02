@@ -1,31 +1,21 @@
-# Local, non-shared context. Personal working notes and environment specifics.
-CLAUDE.local.md
-
-# Editors / OS
-.vs/
-.vscode/
-.idea/
-*.user
-*.swp
-.DS_Store
-Thumbs.db
-
-# .NET build output
+# Build output
 bin/
 obj/
+[Dd]ebug/
+[Rr]elease/
 artifacts/
 
-# Working scratch. Overwritten freely; nothing durable may cite it.
-scratchpad/
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
 
-# MASTER'S WORKING ARTEFACTS, WHICH SHARE THIS DIRECTORY. A branch switch does
-# not remove untracked files, so master's 640 MB of fetched benchmark data and
-# its sweep results sit here whenever it has been checked out. Both are ignored
-# on master too, and both must stay ignored here: `git add -A` on this branch
-# was already caught starting to swallow the datasets once.
-data/
-out/
+# Local settings
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
 
-# Python bytecode, for the same reason. Nothing here runs Python, but running
-# master's suite and switching back leaves these behind.
+# Python (master branch)
 __pycache__/
+*.pyc
+out/

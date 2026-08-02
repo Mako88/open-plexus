@@ -4,7 +4,9 @@ What every piece is and what every method does, in words. No bodies, no
 implementations — this is the mental model, and the code is meant to match it
 exactly. If they ever disagree, this file is wrong and gets fixed.
 
-**Status: nothing here is written. This is the thing to argue with before it is.**
+**Status: every type below exists as a stub and the solution builds. No method
+has a body.** Each unimplemented field shows up as a `CS0169` build warning, so
+the warning count is a rough progress bar — 27 at the point the stubs landed.
 
 Scope: **snake**, running on one machine, with every boundary shaped so the
 same code runs across many. Static background is out of scope for now — see
@@ -63,14 +65,6 @@ fitted to data. Two quantizers fitted on different samples agree about under
 - **`Modality`** — what this quantizer is a front end for.
 - **`Codify(observation)`** — the codes present. Not "the code" — several.
 
-### `SnakeQuantizer`
-
-- **`Codify(view)`** — one code per visible cell, carrying the cell's offset
-  from the head and its contents. **One-hot over contents, not a hyperplane**:
-  `EMPTY WALL BODY FOOD` are 0 1 2 3 and a hyperplane over those numbers would
-  make wall-and-body near and empty-and-food far, which is arithmetic nobody
-  meant.
-
 ---
 
 ## `Graph/`
@@ -118,12 +112,21 @@ nothing about the network.
   assert the outgoing set moves. That is the whole of the wiring problem made
   assertable.
 
-- **`WeightOf(partner)`** — how strong the edge is: shared count divided by
-  *the partner's* marginal — **how well the partner predicts me**. That is what
-  refuses a thing present everywhere: it co-occurs with you constantly and
-  predicts nothing in particular. Measured at 0.0000 for a distractor against
-  0.9800 for a real link. **This is the method that cannot work as written
-  across machines** — that marginal lives on the partner's machine. Open fork 2.
+- **`WeightOf(partner, marginals)`** — how strong the edge is: shared count
+  divided by *the partner's* marginal — **how well the partner predicts me**.
+  That is what refuses a thing present everywhere: it co-occurs with you
+  constantly and predicts nothing in particular. Measured at 0.0000 for a
+  distractor against 0.9800 for a real link. **This is the method that cannot
+  work as written across machines** — that marginal lives on the partner's
+  machine. Open fork 2.
+
+### `IMarginals`
+
+**Fork 2, made visible on purpose.** One method, `SeenOf(code)`, and its whole
+job is to be the seam where this design collides with C1 — so it is an
+interface you can see rather than a dictionary lookup buried in a loop.
+**When fork 2 is resolved this interface should disappear. If it is still here
+later, the fork went quiet.**
 - **`Fuel(weight)`** — what a route is *paid* for taking the edge. Either the
   weight (survive by walking strong edges) or how surprising the edge was
   (survive by walking unlikely ones). Deliberately separate from the score;
@@ -332,6 +335,21 @@ why an arbitrary sensor can be attached without the graph knowing what it is.
   eat gets fewer steps of experience — selection without a reward, and the
   first source of preference this design has.
 - **`Alive`** — whether the run is over.
+
+### `SnakeQuantizer`
+
+Lives here rather than in `Codes/` so that folder stays free of any world.
+
+- **`Codify(view)`** — one code per visible cell, carrying the cell's offset
+  from the head and its contents. **One-hot over contents, not a hyperplane**:
+  `EMPTY WALL BODY FOOD` are 0 1 2 3 and a hyperplane over those numbers would
+  make wall-and-body near and empty-and-food far, which is arithmetic nobody
+  meant. No seed needed — a fixed transform is legal precisely because a
+  constant is not a codebook.
+- **Open question, left open in the code:** whether an `EMPTY` cell emits a
+  code at all. Emitting them makes empty space a first-class observation and
+  costs a code per cell; withholding them makes "nothing there" mean nothing
+  rather than something. Under onsets the cost is small either way.
 
 ---
 

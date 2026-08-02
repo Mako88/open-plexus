@@ -76,11 +76,10 @@ render* with its two live steps, *arrival narrows* and *prediction ranks*.
    **Tangent worth its own experiment**: several buses segment the graph, and
    one bus per modality is a way to implement columns that costs nothing.
 
-8. **C# for the parallel node.** Discussed, not decided, and not otherwise
-   recorded. Python's GIL is why priority 1 cannot be done in-process. The
-   suggestion was a C# node speaking the existing socket protocol rather than a
-   port: `node_main.py` and `bucket_peer.py` already define that boundary, and
-   numpy has no comfortable equivalent for the front end.
+8. **C# is a NEW ATTEMPT, not a port — John, 2026-08-02.** Branch `csharp`:
+   same goal, tighter scope, C# so he is comfortable in his own project and
+   involved from the start. **`master` is untouched and IS the fallback.**
+   Nothing migrates; what crosses is the lessons, not the code.
 
 ## AGREED 2026-08-02, NOT BUILT
 
@@ -105,8 +104,9 @@ render* with its two live steps, *arrival narrows* and *prediction ranks*.
    within-modality identity. With one front end on both arms, **relative
    claims are safe and absolute ones are not.**
 
-**Waiting on John**: whether ARC-AGI-3 is next — counting needs recurrence and
-ARC withholds it by design.
+**ARC-AGI-3 answered**: branch `csharp`'s target, not this one's, and it starts
+on SNAKE so a bad result cannot be the environment. **The recurrence objection
+is untested, not refuted** — it was written about ARC's few-shot grids.
 
 **Preference**: three honest sources exist; reward is rejected and curiosity
 loses to random, so homeostasis is the one left. Action 1 builds it.

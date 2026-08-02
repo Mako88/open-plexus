@@ -43,6 +43,17 @@ curiosity loses to random in every form tried.
 correlates with time-since-food and that is predictable structure. **Not a
 score.**
 
+## THE ENSEMBLE FRONT END: built, budget not swept
+
+`experiments/ensemble_front.py`. Several coarse hashes per item instead of one
+fine one — the first legal repair for the hash's deficit, since it fits nothing.
+
+**Not a result yet.** The budget pins at the TOP of its grid: families=4 at
+stamina 0.2 gives 0.2200 against a chance of 0.100, seeds 0.038/0.292/0.330. A
+sweep at its edge has not swept and a spread containing chance is not a finding.
+**Next: a grid that goes higher**, then three seeds at whatever interior maximum
+it finds.
+
 ## THE FRONT END IS THE BOTTLENECK — settled, in the README
 
 The hash tops out at `q_img` 0.42 and no walk clears chance on the graph it
@@ -77,16 +88,12 @@ triple again, which `Predictor` already holds.
 **Named risk**: binding on neighbours multiplies the state space by the
 neighbour alphabet. The cheap version conditions on a SUMMARY of them.
 
-## Snake: built, and what it cannot show
+## Snake: built, two gaps
 
-`tasks/snake.py`, `experiments/snake_prediction.py`, `snake_surfaces.py`.
-
-- **No multimodality yet.** The occasion carries vision, and hearing only in
-  `snake_hearing.py`. Action and interoception — ate, died, length — are
-  designed as their own kinds in one `SharedGraph` and are not built. That is
-  what would make the stream time-synced by construction, not by alignment.
-- **Nothing beats random play.** Five policies tried; the reason an interactive
-  world was wanted is still unanswered.
+- **No multimodality yet.** Vision, plus hearing in `snake_hearing.py`. Action
+  and interoception are designed as their own kinds in one `SharedGraph` and
+  are not built.
+- **Nothing beats random play.** Five policies tried.
 
 ## Prediction: built, two holes open
 
@@ -108,7 +115,7 @@ neighbour alphabet. The cheap version conditions on a SUMMARY of them.
 - **Nothing has swept the half-life**, which is now known to change answers
   and not only memory, so it needs sweeping like any other dial.
 - **Eviction has no policy.** `weakest` ranks by what is left; nothing decides
-  when to call it, because that is memory pressure and nothing measures memory.
+  when to call it, because nothing measures memory pressure.
 
 ## Decided
 
@@ -125,9 +132,8 @@ neighbour alphabet. The cheap version conditions on a SUMMARY of them.
   their own tests, and `deployment.py` budgets predecessor-era `w × d`
   associative memory. **`tasks/xsl.py` has no caller.**
 - **DISTRIBUTED: entry point and in-process agreement done, container left.**
-  `node_main.py` runs a node on TCP; a `Federation` across 4 owners agrees with
-  a whole `CoOccurrence` on every read, still at 32 owners. Left: latency,
-  departure, partition. `testbed/driver.py` measures a deleted network.
+  `node_main.py` runs a node on TCP; a `Federation` agrees with a whole
+  `CoOccurrence` on every read. Left: latency, departure, partition.
 - **`experiments/` has thirteen scripts and no harness**, and the link columns
   in `surfaces_pipeline.py` still step in tenths.
 - **§5's ⬜ "refuse when nothing was written — the machinery exists" is
@@ -138,9 +144,7 @@ neighbour alphabet. The cheap version conditions on a SUMMARY of them.
 
 ## Reading leads, none of them read
 
-- **Predictive coding** — now the most relevant, since prediction exists and the
-  dark-room failure is the named risk against tuning on it.
+- **Predictive coding**, and the dark room measured today as the named risk.
 - **Interventional causal discovery under a budget** — when does structure say
   what you need not test?
-- **AnyBURL / rule mining over paths** — lands near 0.31 where ours lands at
-  0.247, so our implementation is the limit.
+- **AnyBURL** — lands near 0.31 where ours lands at 0.247.

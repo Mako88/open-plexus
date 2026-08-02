@@ -3,6 +3,12 @@
 The living map. Updated as pieces land, so the shape is visible without
 reading the code.
 
+**Method-level detail lives in [design.md](design.md)** — what every piece is
+and what every method does, in words.
+
+**Current scope: snake, on one machine, every boundary shaped so the same code
+runs across many.** Static background is out of scope — fork 1b.
+
 **Status marks: ✅ built ⬜ proposed, not written 🔬 experiment we want to run**
 
 Nothing is built yet. Everything below is ⬜.

@@ -60,7 +60,8 @@ from openplexus.tasks.snake import ACTIONS, Snake  # noqa: E402
 
 FSDD_DATA = ROOT / "data" / "fsdd"
 
-POLICIES = ("random", "least-seen", "learning-progress")
+POLICIES = ("random", "committed", "least-seen",
+            "learning-progress", "epsilon-greedy")
 ARMS = ("silent", "hearing")
 
 #: Seeds, chosen here as this project's floor of three.
@@ -97,8 +98,32 @@ def tilted(row: np.ndarray, distance: float, tilt: float) -> np.ndarray:
     return row - tilt * distance * slope / BANDS
 
 
-def choose(policy, predictor, recent, state, rng):
+#: How long `committed` holds a direction. Chosen here. A random walk covers
+#: ground like the square root of its length and a committed one like its
+#: length, so this is the cheapest thing that is not one-step-greedy.
+COMMIT = 6
+
+#: How often `epsilon-greedy` ignores its own rule. Chosen here at the
+#: textbook tenth. It exists to separate "directed is bad" from "directed
+#: ALONE is bad" -- the four policies before it could never leave a place
+#: their own rule had no reason to leave.
+EPSILON = 0.1
+
+
+def choose(policy, predictor, recent, state, rng, plan):
     if policy == "random":
+        return rng.randrange(len(ACTIONS))
+    if policy == "committed":
+        # Hold a direction rather than re-deciding every step. Nothing here
+        # looks at the model at all, which is the point: if this beats the
+        # directed policies then what they lacked was persistence, not a
+        # better score.
+        if plan["left"] <= 0:
+            plan["action"] = rng.randrange(len(ACTIONS))
+            plan["left"] = COMMIT
+        plan["left"] -= 1
+        return plan["action"]
+    if policy == "epsilon-greedy" and rng.random() < EPSILON:
         return rng.randrange(len(ACTIONS))
     if policy == "least-seen":
         scores = [-predictor.seen(state, action)
@@ -143,10 +168,11 @@ def play(arm, policy, seed, steps, tilt, calls) -> dict:
         return hash((view, int(heard))), view
 
     recent: dict = {}
+    plan = {"action": 0, "left": 0}
     state, _ = observe(world)
     hits, places, deaths, food = [], {world.body[0]}, 0, 0
     for _ in range(steps):
-        action = choose(policy, predictor, recent, state, rng)
+        action = choose(policy, predictor, recent, state, rng, plan)
         step = world.step(action)
         deaths += step.died
         food += step.ate

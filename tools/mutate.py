@@ -973,8 +973,12 @@ MUTATIONS = [
                "differs only in cost, so a test asserting what was REACHED "
                "cannot see it",
         path=BROADCAST,
-        old="                left = held - price + weight",
-        new="                left = held + weight",
+        # RE-POINTED when `refuel` split the fuel from the score: a route is
+        # paid `paid[other]` and an arrival is scored `weight`, and under
+        # `strength` those are the same number, which is why they read as one
+        # quantity until surprise needed them apart.
+        old="                left = held - price + paid[other]",
+        new="                left = held + paid[other]",
     ),
     Mutation(
         name="the-broadcast-gate-ignores-its-combiner",

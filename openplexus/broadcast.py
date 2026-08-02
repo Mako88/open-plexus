@@ -77,6 +77,7 @@ budget, terminate — across `openplexus/`, `experiments/`, `tests/`, `tools/`.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 
 from openplexus.grounding import CoOccurrence, Statistic, strength
@@ -105,6 +106,27 @@ from openplexus.grounding import CoOccurrence, Statistic, strength
 #: the single step in front of it. That is a real difference and it is a
 #: different claim.
 COSTS = ("constant", "local", "best")
+
+#: What a route is paid for taking an edge — **the budget, not the score.** The
+#: score is always the path strength; this decides only which routes survive.
+#:
+#: - `strength` pays the edge weight, so a route survives by walking edges the
+#:   counts already favour. It can therefore only ever surface what is already
+#:   expected, which is decision 4's standing objection to every walk here.
+#: - `surprise` pays `-log2(weight)`, so a route survives by walking edges that
+#:   were unlikely. This is "walk toward surprise rather than strength" in the
+#:   only form a broadcast can express it: **preference as economics rather than
+#:   as selection.** A sequential walk ranks its frontier and picks; a broadcast
+#:   cannot rank anything globally, but it can make the unexpected cheaper to
+#:   keep walking.
+#:
+#: Both are local: `-log2(conditional(other, here))` needs one node's own row
+#: and one marginal, where `ppmi` needs the global occasion total that C1
+#: forbids. That is why the surprise measure here is not `grounding.ppmi`.
+#:
+#: **Named risk**: the rarest edges are also the noisiest, so this may fund
+#: routes through coincidence. That is the thing to measure, not to assume away.
+REFUELS = ("strength", "surprise")
 
 #: How a candidate accumulates evidence from the routes reaching it. `sum` is
 #: what pays on the typed walk, 0.1234 against `max`'s 0.0834, and the reason is
@@ -173,6 +195,7 @@ class Flood:
 def flood(index: CoOccurrence, statistic: Statistic, origins,
           *, stamina: float = 1.0, cost: str = "local",
           charge: float = 0.0, combine: str = "forward",
+          refuel: str = "strength",
           accumulate: str = "sum", ceiling: int = 1_000_000) -> Flood:
     """Broadcast `origins` and return everything the graph carried them to.
 
@@ -212,6 +235,8 @@ def flood(index: CoOccurrence, statistic: Statistic, origins,
     """
     if cost not in COSTS:
         raise ValueError(f"cost must be one of {COSTS}")
+    if refuel not in REFUELS:
+        raise ValueError(f"refuel must be one of {REFUELS}")
     if accumulate not in ACCUMULATORS:
         raise ValueError(f"accumulate must be one of {ACCUMULATORS}")
     if cost == "local" and charge:
@@ -242,7 +267,15 @@ def flood(index: CoOccurrence, statistic: Statistic, origins,
 
             weights = [(other, strength(index, statistic, here, other, combine))
                        for other in partners]
-            live_weights = [weight for _, weight in weights if weight > 0.0]
+            # THE FUEL AND THE SCORE ARE TWO QUANTITIES. `weight` scores an
+            # arrival; `paid` decides whether the route can keep going. Under
+            # `strength` they are the same number, which is why they looked
+            # like one thing until surprise needed them apart.
+            paid = {other: (weight if refuel == "strength"
+                            else -math.log2(weight) if 0.0 < weight < 1.0
+                            else 0.0)
+                    for other, weight in weights}
+            live_weights = [fuel for fuel in paid.values() if fuel > 0.0]
             if cost == "local":
                 price = (sum(live_weights) / len(live_weights)
                          if live_weights else 0.0)
@@ -260,7 +293,7 @@ def flood(index: CoOccurrence, statistic: Statistic, origins,
             for other, weight in weights:
                 if weight <= 0.0 or other in chain:
                     continue
-                left = held - price + weight
+                left = held - price + paid[other]
                 if left <= 0.0:
                     continue
                 onward = chain + (other,)

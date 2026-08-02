@@ -60,7 +60,7 @@ import numpy as np  # noqa: E402
 from experiments.surfaces_pipeline import (ARM, NOISE, Words,  # noqa: E402
                                            quantise, read_corpus, renderings,
                                            stream)
-from openplexus.broadcast import COSTS, flood  # noqa: E402
+from openplexus.broadcast import COSTS, REFUELS, flood  # noqa: E402
 from openplexus.grounding import STATISTICS, equivalence_classes  # noqa: E402
 from openplexus.surfaces import purity  # noqa: E402
 from openplexus.tasks import written  # noqa: E402
@@ -105,6 +105,11 @@ def main() -> int:
     # `broadcast.COSTS` for the sweep that refuted `local`. Selectable so the
     # refutation can be re-run rather than believed.
     parser.add_argument("--cost", choices=COSTS, default="best")
+    # What a route is PAID for a step. `strength` funds the expected and can
+    # therefore only surface what the counts already favour; `surprise` funds
+    # the unlikely, which is decision 4's "walk toward surprise" in the only
+    # form a broadcast can express it.
+    parser.add_argument("--refuel", choices=REFUELS, default="strength")
     # A SAFETY, not part of the design, and chosen here as what returns in
     # about a minute per arm. `gave_up` reports how often it fired, because a
     # walk that gave up looks exactly like one that finished.
@@ -178,7 +183,8 @@ def main() -> int:
                                 for local in words.per_occasion[position]]
                 result = flood(index, statistic, origins,
                                stamina=args.stamina, cost=args.cost,
-                               combine="forward", ceiling=args.ceiling)
+                               refuel=args.refuel, combine="forward",
+                               ceiling=args.ceiling)
                 messages += result.messages
                 busiest = max(busiest, result.busiest())
                 quit_early += result.gave_up

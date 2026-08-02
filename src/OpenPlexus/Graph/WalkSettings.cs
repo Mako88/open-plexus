@@ -19,9 +19,42 @@ public enum StepCost
     /// <summary>
     /// The strongest edge available here — an opportunity cost. Budget can
     /// then never rise, so only a route taking near-best edges keeps it.
-    /// <b>The one measured to bound the walk.</b>
+    /// <b>Bounds the walk only where weights DIFFER</b>: the best edge pays
+    /// exactly zero net, so in a near-deterministic world where almost every
+    /// weight is near 1.0 nothing decays at all. See <see cref="Inverse"/>.
     /// </summary>
     Best,
+
+    /// <summary>
+    /// <c>1 / weight</c> of the edge actually taken, and nothing is paid back.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's design, 2026-08-02.</b> The stronger the connection the
+    /// cheaper the step, so a route runs further down strong edges than weak
+    /// ones — and the cost is a property of <i>that connection alone</i>, where
+    /// <see cref="Best"/> makes the cost of an edge depend on what other edges
+    /// the node happens to have.
+    /// </para>
+    /// <para>
+    /// <b>THIS IS WHAT BOUNDS THE WALK.</b> Every hop costs at least 1, because
+    /// a weight cannot exceed 1.0, so a route with budget B takes at most B
+    /// steps however perfect its path. `Best` has no such floor and that is the
+    /// measured factorial.
+    /// </para>
+    /// <para>
+    /// <b>The near misses matter and are recorded so they are not re-proposed.</b>
+    /// <c>1 - weight</c> and <c>-log(weight)</c> both cost <b>zero</b> at a
+    /// weight of 1.0 and reproduce the exact failure they would be meant to
+    /// fix. Only a form strictly positive at perfect strength terminates.
+    /// </para>
+    /// <para>
+    /// <see cref="WalkSettings.Refuel"/> does nothing here — there is no
+    /// payment — so pairing this with <see cref="Refuel.Surprise"/> is refused
+    /// rather than silently ignored.
+    /// </para>
+    /// </remarks>
+    Inverse,
 }
 
 /// <summary>What a route is paid for taking an edge. The budget, not the score.</summary>
@@ -101,6 +134,12 @@ public sealed record WalkSettings
     /// <summary>
     /// The longest chain a route may carry. A route that reaches it dies.
     /// </summary>
+    /// <remarks>
+    /// <b>Under <see cref="StepCost.Inverse"/> this should not be the thing
+    /// that stops a walk</b> — the budget bounds it, and a horizon that fires
+    /// first would hide whether the economics work. Set it well above the
+    /// stamina and watch <see cref="Thinking.Accounting.Halted"/>.
+    /// </remarks>
     /// <remarks>
     /// <para>
     /// <b>A SAFETY, NOT PART OF THE DESIGN — and it had to exist, because the

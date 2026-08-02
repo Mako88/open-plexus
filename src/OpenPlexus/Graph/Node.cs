@@ -68,6 +68,12 @@ public sealed class Node
             throw new ArgumentOutOfRangeException(nameof(settings),
                 "StepCost.Constant needs a Charge above zero");
 
+        if (settings.Cost == StepCost.Inverse && settings.Refuel != Refuel.Strength)
+            throw new ArgumentException(
+                "StepCost.Inverse pays nothing back, so Refuel does nothing under it; " +
+                "an argument that silently does nothing is a sweep arm that is not one",
+                nameof(settings));
+
         if (settings.Cost != StepCost.Constant && settings.Charge != 0.0)
             throw new ArgumentException(
                 "Charge is the price for StepCost.Constant and does nothing " +
@@ -230,14 +236,22 @@ public sealed class Node
             if (fuel > 0.0) affordable.Add(fuel);
         }
 
-        var price = PriceOfAStep(affordable);
+        // Under Inverse the cost belongs to the edge, not to the node, so
+        // there is no single price for leaving here.
+        var price = _settings.Cost == StepCost.Inverse ? 0.0 : PriceOfAStep(affordable);
         var outgoing = ImmutableArray.CreateBuilder<Message>(weights.Count);
 
         foreach (var (partner, weight) in weights)
         {
             if (weight <= 0.0 || message.Chain.Contains(partner)) continue;
 
-            var left = message.Held - price + fuels[partner];
+            // EVERY HOP COSTS AT LEAST 1 under Inverse, because a weight
+            // cannot exceed 1.0 — which is what bounds the walk without a
+            // horizon. `Best` has no such floor.
+            var left = _settings.Cost == StepCost.Inverse
+                ? message.Held - (1.0 / weight)
+                : message.Held - price + fuels[partner];
+
             if (left <= 0.0) continue;
 
             outgoing.Add(message with

@@ -217,9 +217,9 @@ by status rather than by scrolling.
 
 | | | |
 |---|---|---|
-| **14** | What a step costs, once the sender cannot weigh | **blocks 2** |
+| **14** | ✅ **BUILT** — inverse cost, `1/weight`. Answered fork 8 as a side effect. Unblocks 2 |
 | **2** | Who computes the edge weight | decided (receiver weighs) — blocked on 14 |
-| **8** | How the flood is bounded | still factorial; the cheap half is done |
+| **8** | ✅ **Answered by fork 14's inverse cost** — factorial became polynomial in the budget, and the horizon stopped firing |
 | **11** | The output machine is not addressed | needed before a second machine |
 | **12** | `Halted` is approximate, and the ordering that causes it | both orderings cost something |
 
@@ -545,6 +545,24 @@ Recorded here so a decision does not go quiet.
     Only a form strictly positive at perfect strength terminates. With
     `1 / weight`, stamina reads as *how many perfect hops can I afford* — still
     a scale to sweep, but a meaningful one rather than a magic number.
+
+    **✅ BUILT AND MEASURED, 2026-08-02.** Messages from one origin on a clique
+    where every weight is exactly 1.0, budget 4, horizon 50 so the horizon
+    cannot be what stops it:
+
+    | clique | 4 | 6 | 8 | 10 | 12 |
+    |---|---|---|---|---|---|
+    | `Best` | 15 | 325 | 13,699 | 986,409 | **5,000,003 — capped** |
+    | `Inverse` | 15 | 85 | 259 | 585 | **1,111** |
+
+    `Best` runs to depth *n*; `Inverse` stops at depth **4**, exactly the
+    budget. Factorial becomes polynomial in the budget.
+
+    **On snake, 200 seeds: the horizon never fires.** `Inverse` halted **0**
+    routes against `Best`'s 105,189, and behaviour is indistinguishable —
+    6.590 mean steps against 6.655, either side of a standard error of about
+    0.42. **So fork 8 is answered and the `Horizon` constant is no longer what
+    bounds anything.**
     **His intuition is already what `Best` does, by a route he did not expect.**
     The price is flat — the strongest partner's fuel — but the *payment* is the
     taken edge's fuel, so the NET is edge-specific: a route down the best edge

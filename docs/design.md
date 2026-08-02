@@ -10,7 +10,7 @@ exactly. If they ever disagree, this file is wrong and gets fixed.
 tested.** The `CS0169` progress bar is at **0**, down from 27 — every field has
 a body behind it. What remains is the end-to-end snake run.
 
-**149 tests pass, and seventy-four mutations have been run to confirm they bite.**
+**156 tests pass, and seventy-nine mutations have been run to confirm they bite.**
 
 **A CHAIN HAS CAUSED A MOVE.** On a 200-step budget with seed 1 the snake took
 5 steps before dying, and **2 of them were chosen by a chain that reached an

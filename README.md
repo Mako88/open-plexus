@@ -27,9 +27,9 @@ later.
 - ✅ One-hot for a categorical cell — *`EMPTY WALL BODY FOOD` are 0 1 2 3 and a hyperplane over those numbers would make wall-and-body near and empty-and-food far, which is arithmetic nobody meant.*
 - ⬜ SEVERAL coarse hashes per item instead of one fine one — *the first LEGAL repair for the hash's 0.44 purity deficit, which is decisive: at the hash's purity no walk clears chance on the senses graph and at k-means' both do. Four families of 6 bits, each alone 62 codes with 63 items behind every one, conjunction **0.9845** — never built, so nothing is starved. Data-free, so two nodes agree exactly.*
 - ⬜ A codebook learned from co-occurrence — *removes the last borrowed component, but it must stay in sync as it learns, which C1 forbids.*
-- ⬜ Per-node codebooks plus translation — *avoids agreement entirely, at the cost of unsupervised translation, which is harder than the goal.*
 - ❌ ~~No discretisation — count raw similarity~~ — *every count stays 1, so no statistic can form.* **Revives if** counting is replaced by something that does not need recurrence.
-- ❌ ~~Trained k-means quantiser~~ — *clustering by similarity is an identity assignment, which is the walk's job, and two nodes fitted on different samples agree about almost no item with nothing reporting it. It is still the better grouping, about twice the purity at a matched code count, and that gap is the price.* **Revives if** a per-node front end becomes acceptable.
+- ⬜ Trained k-means quantiser — *was ❌ because two nodes fitted on different samples agree about almost no item — **a fact about code assignment whose cost to the WALK was never measured.** Two codebooks on disjoint halves, the arrangement C1 forces, score **0.9404** against one shared codebook's 0.8820. Disagreement did not break it.*
+- ✅ A shared anchor lets disagreeing codebooks connect — *decision 3 doing real work: a concept is what you reach by walking, so two nodes naming an input differently still meet wherever both link — which is **per-node codebooks without the unsupervised translation** that option assumed. Caveat: the anchor is one clean word per digit.*
 
 **2. What gets stored.** Which co-occurrences are kept.
 

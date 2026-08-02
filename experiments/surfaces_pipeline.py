@@ -135,6 +135,61 @@ def affordable(occasions: int, digits: int) -> None:
 
 
 @dataclass
+class Corpus:
+    """The stream every arm shares, before any front end has touched it.
+
+    Extracted so a second experiment can build the identical stream rather than
+    restate it — a restated corpus is two corpora that agree until one is
+    edited, which is the duplication `tools/check_duplication.py` refuses.
+    """
+
+    digits: object
+    pixels: object
+    paths: list
+    heard: list
+    sounds: object
+    said: list[int]
+    pairs: list
+    chance: float
+
+
+def read_corpus(images: int, repeats: int) -> Corpus:
+    """Load the images and recordings and pair them into occasions."""
+    digits = mnist.read(MNIST_DATA, limit=images)
+    pixels = (np.frombuffer(b"".join(digits.images), dtype=np.uint8)
+              .reshape(len(digits), digits.pixels).astype(np.float64))
+    paths = spoken.available(FSDD_DATA)
+    heard = [spoken.read(path) for path in paths]
+    sounds = spectra(heard)
+    said = [u.digit for u in heard]
+
+    # One occasion per recording, paired with an image of the SAME digit taken
+    # round-robin from that digit's pool -- every image is used about equally
+    # and no draw is random, so the arms stay comparable seed for seed.
+    pool = defaultdict(list)
+    for row, label in enumerate(digits.labels):
+        pool[label].append(row)
+    used: Counter = Counter()
+    pairs = []
+    # REPEATS EXIST TO ASK WHETHER THE ~300-PER-DIGIT PRICE IS COUNT OR VARIETY.
+    # `alternating` gives each sense half the stream, so audio sees 150 per
+    # digit against g40-01's measured 300, and the audio set caps at 3,000
+    # recordings. A second pass reuses every recording -- so the AUDIO codes
+    # repeat while the images do not, since `used` keeps advancing. If that
+    # buys the link, the price is evidence; if not, it is distinct recordings,
+    # and the arm cannot be afforded from this corpus at all.
+    for _ in range(repeats):
+        for audio_row, digit in enumerate(said):
+            rows = pool[digit]
+            pairs.append((rows[used[digit] % len(rows)], audio_row, digit))
+            used[digit] += 1
+
+    return Corpus(digits=digits, pixels=pixels, paths=paths, heard=heard,
+                  sounds=sounds, said=said, pairs=pairs,
+                  chance=max(Counter(said).values()) / len(said))
+
+
+@dataclass
 class Words:
     """The word channel, as the stream sees it: a width and what is said when.
 
@@ -338,36 +393,11 @@ def main() -> int:
         raise SystemExit(f"no data in {MNIST_DATA}: python tools/fetch_mnist.py")
 
     started = time.time()
-    digits = mnist.read(MNIST_DATA, limit=args.images)
-    pixels = (np.frombuffer(b"".join(digits.images), dtype=np.uint8)
-              .reshape(len(digits), digits.pixels).astype(np.float64))
-    paths = spoken.available(FSDD_DATA)
-    heard = [spoken.read(path) for path in paths]
-    sounds = spectra(heard)
-    said = [u.digit for u in heard]
-
-    # One occasion per recording, paired with an image of the SAME digit taken
-    # round-robin from that digit's pool -- every image is used about equally
-    # and no draw is random, so the arms stay comparable seed for seed.
-    pool = defaultdict(list)
-    for row, label in enumerate(digits.labels):
-        pool[label].append(row)
-    used: Counter = Counter()
-    pairs = []
-    # REPEATS EXIST TO ASK WHETHER THE ~300-PER-DIGIT PRICE IS COUNT OR VARIETY.
-    # `alternating` gives each sense half the stream, so audio sees 150 per
-    # digit against g40-01's measured 300, and the audio set caps at 3,000
-    # recordings. A second pass reuses every recording -- so the AUDIO codes
-    # repeat while the images do not, since `used` keeps advancing. If that
-    # buys the link, the price is evidence; if not, it is distinct recordings,
-    # and the arm cannot be afforded from this corpus at all.
-    for _ in range(args.repeats):
-        for audio_row, digit in enumerate(said):
-            rows = pool[digit]
-            pairs.append((rows[used[digit] % len(rows)], audio_row, digit))
-            used[digit] += 1
-
-    chance = max(Counter(said).values()) / len(said)
+    corpus = read_corpus(args.images, args.repeats)
+    digits, pixels = corpus.digits, corpus.pixels
+    paths, heard, sounds, said = (corpus.paths, corpus.heard, corpus.sounds,
+                                  corpus.said)
+    pairs, chance = corpus.pairs, corpus.chance
     print(f"{len(digits)} images, {len(heard)} recordings, "
           f"{len(spoken.speakers(paths))} speakers, {len(pairs)} occasions")
     print(f"noise {NOISE}, distractors {DISTRACTORS}, statistic {ARM}, "

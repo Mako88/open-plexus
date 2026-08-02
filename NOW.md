@@ -38,33 +38,31 @@ not be informative**, because the action channel does not exist yet and the
 induction is hard, so a failure could not be attributed. Recommended
 intermediate: any environment where an action changes what is observed.
 
-## The broadcast flood: BUILT, not measured
+## The broadcast flood: built, and the many-origins claim is refuted
 
-`openplexus/broadcast.py`. Many seeds, stamina in place of a floor, termination
-by accounting, and the per-node work columns `pathways.flood` never produced.
-15 tests, 4 mutations, all caught. Callerless for one step and recorded in
-`tools/orphans_baseline.json` with the reason.
+`openplexus/broadcast.py`, called by `experiments/senses_broadcast.py`. The gate
+and the pricing are settled and in the README. `experiments/senses_broadcast.py`, `alternating` graph
+so a picture reaches a sound only through a word. 8 bits, 150 broadcasts,
+`best` pricing, chance about 0.108. `cross` by stamina —
+`out/senses-stamina-sweep.txt`:
 
-**The gate is `forward`, and the design said mutual.** Measured on the real
-proportions — a word on 845 occasions, its codes on 60, a distractor on 3,845:
+    stamina      0.002   0.005    0.01    0.02    0.05
+    flood-one   0.1081  0.1213  0.1209  0.1132  0.1082
+    flood-many  0.0959  0.1012  0.1013  0.1012  0.1017
 
-    seeded at a rare code   min  0.2298 vs 0.1231   correct
-    seeded at the hub word  min  0.0766 vs 0.3592   INVERTED
+**`flood-many` is below chance at every budget** and costs 3–10× more,
+saturating from 0.005 up. **More origins made it worse, monotonically.**
+`flood-one` peaks at 0.1213 against 0.108 — an interior maximum, so the grid
+did sweep, but +0.013 on ONE rng seed is not a result.
 
-Mutuality is not wrong everywhere. **It is wrong from the common end**, and a
-flood stands on both ends during one walk — a route seeded at an image code
-arrives at the word and expands from the word, and that hop is scored from the
-hub's side. `forward` is the only combiner correct at both. A first version of
-this claim said symmetrising is always wrong; a test refuted it.
+**Why more origins hurt, and it is diagnosable**: the extra origins are the
+word nodes, which are hubs. The `forward` gate decides which EDGES a route
+walks; it does nothing about where a route STARTS. A hub origin is ungated,
+and it floods.
 
-**Mutuality survives elsewhere and the distinction is worth keeping:** as a
-top-k membership gate in `equivalence_classes` it is load-bearing and has its
-own mutation. It fails as a weight, not as a filter.
-
-**Not measured: whether many seeds replace edge kinds.** The typed walk
-discriminated by route kind. This has no kinds and its questions have none
-either, so the claim is that hundreds of surfaces firing at once converge. That
-is the first measurement and it needs the word channel repaired first.
+**Left**: three rng seeds, and origin stamina scaled by how much the origin
+predicts — a specific surface funding a long thought and a generic one not.
+That is the named repair and it is not built.
 
 ## The word channel: repaired and measured. What is LEFT
 
@@ -75,8 +73,7 @@ earlier number is reproducible.
 **Unfinished:**
 
 - **The dials are chosen, not measured.** `silence 0.15 mistake 0.05
-  corrupt 0.30`. `--silence/--mistake/--corrupt` exist so they can be swept and
-  nothing has swept them.
+  corrupt 0.30`, swept by `--silence/--mistake/--corrupt`, and nothing has.
 - **Nobody has asked what the byte channel is worth on its own terms.** Every
   column here was built to score a channel of multiplicity 1. `link_img` counts
   surfaces per word NODE, so a channel with 72 nodes per digit is measured on a
@@ -85,10 +82,6 @@ earlier number is reproducible.
 - **Order is discarded.** `features` is a bare byte histogram, so `three` and
   `there` are one surface. The obvious extension, and it changes the SPACE
   rather than the allocation, which is where §1 says such changes land.
-
-**Dials are dials.** `silence 0.15 mistake 0.05 corrupt 0.30` were chosen, not
-measured, and `--silence/--mistake/--corrupt` exist so a result that moves with
-them is visible as a result about them.
 
 ## Prediction, agreed and not started
 
@@ -113,15 +106,8 @@ ask where error is high **and falling**, not high and flat.
 
 ## Known debts
 
-- **FIXED, and the fix changed the answer.** `fb15k237_flood.py` printed
-  `+0.0136 margin, 0.35 arrived` as a string literal from a full-test-set run,
-  while its own margins came from whatever subsample it drew. The capped
-  enumeration is now an arm in the same table, on the same queries, through the
-  same scoring loop. Published margins are no longer computed at all — the
-  subtraction across query sets is refused and both numbers are printed.
-  **A 25-query smoke run has the flood ABOVE the flat arm** (+0.0188 against
-  +0.0088) where the literal said it lost. 25 queries decides nothing; the real
-  run has not been done and no flood number should be cited until it is.
+- **FIXED, verdict survived, and it is in the README now.** Both depths run
+  matched; the flood loses at both and deeper is worse.
 - **Nine files reference `openplexus/distributed.py`, `openplexus/peer.py` or
   `DECISIONS.md`**, none of which exist. A search for "is there a dimension
   split" finds prose saying yes.

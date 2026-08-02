@@ -81,12 +81,30 @@ from dataclasses import dataclass, field
 
 from openplexus.grounding import CoOccurrence, Statistic, strength
 
-#: How a route pays for a step. `constant` charges the same everywhere and is
-#: one tuned number, which is what the stamina design set out to remove.
-#: `local` charges the mean weight of the edges leaving the node it is standing
-#: on, so an edge only funds a route by being strong *for that node* — no
-#: constant is set by hand and the comparison is local, which C1 requires.
-COSTS = ("constant", "local")
+#: How a route pays for a step.
+#:
+#: - `constant` charges the same everywhere. One tuned number, which is what
+#:   the stamina design set out to remove.
+#: - `local` charges the MEAN weight of the edges leaving the node. **Refuted.**
+#:   About half a node's edges are above its own mean, so a route taking
+#:   above-mean steps gains stamina forever. On the senses graph at 6 bits it
+#:   was unbounded at every budget tried from 0.002 to 0.25 — all 44 audio codes
+#:   reached, `gave_up` 1.00, agreement 0.1082 against a chance of about 0.108.
+#:   A walk that reaches everything has answered nothing. It is kept as an arm
+#:   because a refutation that cannot be re-run is a claim.
+#: - `best` charges the STRONGEST edge available at the node — an opportunity
+#:   cost. Stamina can then never rise, so only a route taking near-best edges
+#:   keeps its budget. **The one measured to bound the walk**: 0.3 audio codes
+#:   reached at a budget of 0.002, 2.1 at 0.01, 19.4 at 0.05, everything at
+#:   0.25.
+#:
+#: **The design's claim that stamina removes a tuned constant is false**, and
+#: the numbers above are why: the starting budget has a scale, and the scale has
+#: to be swept exactly as a floor does. What stamina genuinely buys is history —
+#: a route that walked strong edges can afford a weak one, where a floor cuts on
+#: the single step in front of it. That is a real difference and it is a
+#: different claim.
+COSTS = ("constant", "local", "best")
 
 #: How a candidate accumulates evidence from the routes reaching it. `sum` is
 #: what pays on the typed walk, 0.1234 against `max`'s 0.0834, and the reason is
@@ -129,7 +147,7 @@ class Flood:
         live: Routes still alive when the walk stopped. Zero means the thought
             ended by its own accounting; anything else means `ceiling` fired.
         splits, deaths: The accounting itself, kept so the invariant
-            `len(seeds) + splits - deaths == live` can be asserted rather than
+            `len(origins) + splits - deaths == live` can be asserted rather than
             trusted.
         gave_up: Whether `ceiling` stopped it. A run that gave up looks exactly
             like a run that finished unless this is reported.
@@ -143,22 +161,22 @@ class Flood:
     deaths: int = 0
     gave_up: bool = False
 
-    def balanced(self, seeds: int) -> bool:
+    def balanced(self, origins: int) -> bool:
         """Whether the accounting adds up. One route in, k out, one death out."""
-        return seeds + self.splits - self.deaths == self.live
+        return origins + self.splits - self.deaths == self.live
 
     def busiest(self) -> int:
         """Work done by the single hardest-hit node. The column a mean hides."""
         return max(self.work.values(), default=0)
 
 
-def flood(index: CoOccurrence, statistic: Statistic, seeds,
+def flood(index: CoOccurrence, statistic: Statistic, origins,
           *, stamina: float = 1.0, cost: str = "local",
           charge: float = 0.0, combine: str = "forward",
           accumulate: str = "sum", ceiling: int = 1_000_000) -> Flood:
-    """Broadcast `seeds` and return everything the graph carried them to.
+    """Broadcast `origins` and return everything the graph carried them to.
 
-    Every seed starts one route holding `stamina`. A route standing on a node
+    Every origin starts one route holding `stamina`. A route standing on a node
     considers each of that node's partners; the edge weight both funds the route
     and multiplies its strength. A route that cannot pay dies. When no route is
     alive the thought is over — there is no depth limit, because the budget is
@@ -169,14 +187,18 @@ def flood(index: CoOccurrence, statistic: Statistic, seeds,
     what makes an unbounded walk terminate on a cyclic graph.
 
     Args:
-        seeds: The broadcast. Many at once is the point — the discrimination
+        origins: The broadcast — the surfaces that fired. **Not a random
+            seed**; the collision with `SEEDS` in the sweeps is why this is not
+            called one. Many at once is the point — the discrimination
             that edge kinds supplied on a typed graph is supposed to come from
             routes converging, which cannot happen from a single seed.
-        stamina: What each route starts with. Not a floor: it is spent and
-            refilled, so a route that walks strong edges can afford a weak one
-            later where a floor would have cut it at the first.
-        cost: A key of `COSTS`. `local` sets the price from the node itself and
-            needs no constant.
+        stamina: What each route starts with. **A swept budget, not a freed
+            knob** — see `COSTS` for the measurement that killed that claim. It
+            differs from a floor in carrying history rather than in having no
+            scale: a route that walked strong edges can afford a weak one where
+            a floor cuts on the single step in front of it.
+        cost: A key of `COSTS`. `best` is the only one measured to bound the
+            walk; `local` is refuted and kept so the refutation can be re-run.
         charge: The price per step when `cost` is `constant`. Ignored otherwise,
             and refused if set without it, because an argument that silently
             does nothing is a sweep arm that looks distinct and is not.
@@ -201,12 +223,12 @@ def flood(index: CoOccurrence, statistic: Statistic, seeds,
     if stamina <= 0.0:
         raise ValueError("a route with no stamina cannot take its first step")
 
-    seeds = list(dict.fromkeys(seeds))
-    if not seeds:
+    origins = list(dict.fromkeys(origins))
+    if not origins:
         raise ValueError("a broadcast of nothing reaches nothing")
 
-    result = Flood(live=len(seeds))
-    frontier = [(seed, stamina, (seed,), 1.0) for seed in seeds]
+    result = Flood(live=len(origins))
+    frontier = [(origin, stamina, (origin,), 1.0) for origin in origins]
 
     while frontier:
         following = []
@@ -220,14 +242,17 @@ def flood(index: CoOccurrence, statistic: Statistic, seeds,
 
             weights = [(other, strength(index, statistic, here, other, combine))
                        for other in partners]
+            live_weights = [weight for _, weight in weights if weight > 0.0]
             if cost == "local":
-                # The price is what this node's edges are worth on average, so
-                # "strong" means strong here rather than strong against a number
-                # somebody chose. A node with one edge charges exactly what that
-                # edge pays, and a route through it neither gains nor starves.
-                live_weights = [weight for _, weight in weights if weight > 0.0]
                 price = (sum(live_weights) / len(live_weights)
                          if live_weights else 0.0)
+            elif cost == "best":
+                # Opportunity cost: the step is charged what the best step here
+                # would have cost. Stamina is therefore non-increasing, and
+                # strictly decreasing for anything but the strongest edge, so
+                # the walk is bounded without a constant. See COSTS for the
+                # measurement that ruled `local` out.
+                price = max(live_weights, default=0.0)
             else:
                 price = charge
 

@@ -1,4 +1,4 @@
-"""The broadcast flood — many seeds, stamina, and the accounting that ends it.
+"""The broadcast flood — many origins, stamina, and the accounting that ends it.
 
 The load-bearing tests here are the connection tests and the accounting
 invariant. Everything else this module reports — messages, work, chains — is
@@ -52,7 +52,7 @@ class BroadcastReachesAndReports(unittest.TestCase):
         got = flood(_two_concepts(), CONDITIONAL, [10, 11, 12])
         self.assertIn(0, got.reached)
         self.assertGreater(got.reached[0].routes, 1,
-                           "several seeds should reach the word they share")
+                           "several origins should reach the word they share")
 
     def test_a_chain_never_repeats_a_node(self):
         """What makes an unbounded walk terminate on a cyclic graph."""
@@ -78,7 +78,7 @@ class TheAccountingEndsIt(unittest.TestCase):
         self.assertEqual(got.live, 0)
         self.assertTrue(got.balanced(3),
                         f"splits {got.splits} deaths {got.deaths} "
-                        f"live {got.live} do not account for 3 seeds")
+                        f"live {got.live} do not account for 3 origins")
 
     def test_giving_up_does_not_look_like_finishing(self):
         """A run stopped by the safety must be distinguishable from one that ended.
@@ -137,12 +137,12 @@ class PerturbingTheInputMovesTheOutput(unittest.TestCase):
         after = flood(index, CONDITIONAL, [10, 11, 12]).reached[0].score
         self.assertNotAlmostEqual(before, after)
 
-    def test_the_seed_set_changes_what_is_reached(self):
-        """The design's whole claim is that many seeds do something one cannot.
+    def test_the_origin_set_changes_what_is_reached(self):
+        """The design's whole claim is that many origins do something one cannot.
 
-        This asserts only that the seed set is connected to the outcome. Whether
-        more seeds DISCRIMINATE better is the open measurement and is not
-        asserted here.
+        This asserts only that the origin set is connected to the outcome.
+        Whether more origins DISCRIMINATE better is the open measurement and
+        is not asserted here.
         """
         index = _two_concepts()
         one = flood(index, CONDITIONAL, [10])

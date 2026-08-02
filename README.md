@@ -91,7 +91,9 @@ later.
 necessarily words — an action is an output, and so is a structure.
 
 - 🚧 Any node is an input or an output; the MACHINES carry the addresses — *John's design, 2026-08-01. A machine broadcasts an input carrying the id of the output machine it wants, so completed chains and death reports come back addressed. Machines are not nodes, hold no edges and are in no walk — which is why an arbitrary sensor or actuator can be attached without the graph knowing what it is.*
-- 🚧 Which chain to render: arrival narrows, prediction ranks, brevity breaks ties — *agreed 2026-08-01. The input names an output machine, so the candidates are the chains that REACH it; among those, keep the one whose consequences best predict what arrives next; tie-break on the chain explaining the most input in the fewest steps. **No step needs a new mechanism or a new constant** — the three are the addressing design, the prediction error signal, and §7's compression principle, each doing a second job.*
+- 🚧 Which chain to render: arrival narrows, prediction ranks, brevity breaks ties — *agreed 2026-08-01. **No step needs a new mechanism or a new constant**: the three are the addressing design, the prediction error signal and §7's compression principle, each doing a second job.*
+- 🚧 Arrival narrows the field — *the input names an output machine, so the candidates are exactly the chains that REACH it. Selection is routing.*
+- 🚧 Prediction ranks what is left — *keep the chain whose consequences best predict what arrives next, which moves the choice from an invented internal score to something the world can settle.*
 - ⬜ Words, fetched from the concept map — *they come from what was learned, so it cannot name what it does not have.*
 - ⬜ Words, composed by the system itself — *if it understands, it should be able to work out how to say things; nothing hands it grammar.*
 - ⬜ An action on the world — *the same channel intervention needs, which makes acting and answering one mechanism instead of two.*

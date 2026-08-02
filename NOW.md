@@ -24,37 +24,49 @@ arithmetic. The seed spreads reported all session, 0.038 to 0.330, are its
 signature, and every senses measurement is null where every snake measurement
 works. **Nothing has been re-run.**
 
-## THE POWERED RE-RUN IS IN FLIGHT — `out/powered-rerun.txt`
+## THE POWERED RE-RUN — in flight, `out/powered-rerun.txt`
 
-Six runs at 1,000 questions, `lsh` and `kmeans`, three seeds each. First cell
-in: under `lsh`, `flood-one` 0.0871 and `flood-many` 0.1066 against a chance of
-0.108, with `classes` reaching 0.03 audio surfaces per question. Still null
-under the hash, which is what the front-end finding predicts. **The `kmeans`
-half is where the question is actually answered** and has not run yet.
+Six runs at 1,000 questions, `lsh` and `kmeans`, three seeds. It exists because
+an audit of the README's 33 ruled-out entries found **three refutations resting
+on 120-150-question senses runs** where detecting +0.03 needs 840: the flood as
+a cross-modal walk, surprise/rarity refuelling, and many-origins. All three are
+the broadcast line and none has had a powered test.
 
-`flood-many` costs 411s per seed at this size and gives up on 0.999 of
-questions, so its budget is wrong for a graph this dense and that is a separate
-thing to fix.
+First cell: under `lsh`, flood-one 0.0871 and flood-many 0.1066 against chance
+0.108. Still null under the hash, as the front-end finding predicts. **The
+`kmeans` half is where the question is answered** and has not run. `flood-many`
+costs 411s a seed and gives up on 0.999 of questions, so its budget is wrong
+for a graph this dense.
 
-## THREE REFUTATIONS TO RE-RUN, and they are all the broadcast
+## AGREED 2026-08-02, NOT BUILT — start here
 
-John's question: what did we abandon on a failed test that may now be
-hindering us? Audited against the README's 33 ruled-out entries. Seven rest on
-senses-graph numbers; three of those are small effects measured at 120-150
-questions where +0.03 needs 840, under the hash, before the rank-blind metric
-was fixed:
+1. **Snake gets an energy bar.** It depletes, fruit restores it, and running
+   out ENDS the run rather than resetting. John's call, and his reasoning is
+   the mechanism: what survives longer learns more, so a policy that does not
+   eat generates less experience. **That is selection without a reward** — no
+   external judge, nothing declaring food good. It is the smallest thing that
+   gives the system something to lose, and without something to lose no
+   preference is possible at all.
 
-- **the broadcast flood as a cross-modal walk**
-- **refuelling on surprise, and valuing arrivals by rarity**
-- **many origins in place of edge kinds** — and the ensemble front end now
-  supplies far more origins than the four that were tested
+2. **Re-run the three broadcast refutations at 1,000 questions.** In flight;
+   see below. `flood-many` needs its budget re-swept for a graph this dense
+   before its cell means anything.
 
-**All three are John's design, and none has had a properly powered test.**
-Re-run at ~1,000 questions before anything is built on their being dead.
+3. **Split the anchor as well as the codebooks.** The disagreement result had
+   one clean word surface per digit shared by both codebooks by construction.
+   A real federation has no such thing. This is the test that decides whether
+   k-means is genuinely legal.
 
-The other four survive for reasons that are not about power: the k-means ❌ is
-a C1 argument rather than a score, `MEAN` pricing was unbounded rather than
-weak, and the stamina-scale and `cross 1.0000` entries are facts about spread.
+4. **THE FRONT END SHOULD BE AS WEAK AS POSSIBLE.** John's observation,
+   2026-08-02, and it is already the project's own argument in `surfaces.py`:
+   *clustering by similarity is an identity assignment, and identity is the
+   walk's job.* So "k-means walks better than the hash" may mean **the walk is
+   not doing its job**, not that the hash is bad — a good clusterer answers the
+   question upstream where nothing can audit it. The front end's only mandate
+   is decision 1's ❌ for no-discretisation: make recurrence possible so a
+   statistic can form. **The ensemble front end is the right shape for exactly
+   this reason** — many coarse codes, each meaning little, combination left to
+   the counts. Reread today's "the front end is the bottleneck" against this.
 
 ## Waiting on John
 
@@ -67,34 +79,20 @@ recurrence and ARC withholds it by design.
 
 ## Nothing in this design wants anything
 
-John's finding: there is no reason to pursue the fruit, so `food` measures an
-accident. A score is external and an energy is a sensation, so only the first
-is foreign — but **energy alone supplies no preference** either. Three honest
-sources exist and this design has none: reward is rejected, homeostasis needs
-running out to END the stream and death here resets, and curiosity loses to
-random in every form tried.
+John's finding. Three honest sources of preference exist and this design has
+none: reward is rejected, homeostasis needs running out to END the stream and
+death here resets, and curiosity loses to random in every form. **Action 1
+above is the fix.**
 
-**Recommended, not built**: energy as an INPUT-ONLY channel. Not a score.
+**Ensemble front end**: built, budget pins at the TOP of its grid (0.2200
+against chance 0.100, seeds 0.038/0.292/0.330). A grid that goes higher, then
+three seeds at whatever interior maximum it finds.
 
-## THE ENSEMBLE FRONT END: built, budget not swept
+**`--repeats` may do nothing**, unmeasured: it replays the same recordings and
+repeated identical evidence does not sharpen a ratio.
 
-`experiments/ensemble_front.py`. Several coarse hashes per item instead of one
-fine one — the first legal repair for the hash's deficit, since it fits nothing.
-
-**Not a result yet.** The budget pins at the TOP of its grid: families=4 at
-stamina 0.2 gives 0.2200 against a chance of 0.100, seeds 0.038/0.292/0.330. A
-sweep at its edge has not swept and a spread containing chance is not a finding.
-**Next: a grid that goes higher**, then three seeds at whatever interior maximum
-it finds.
-
-**`--repeats` may do nothing**, unmeasured: it replays the same recordings, and
-repeated identical evidence does not sharpen a ratio. It has been used
-throughout as though it added evidence.
-
-## Columns: neighbour-conditioned works, settled in the README
-
-Left: conditioning on a SUMMARY of the neighbours rather than one, which is
-what would let a column read more than the direction it is heading.
+**Columns**: neighbour-conditioned works. Left: conditioning on a SUMMARY of
+the neighbours rather than the single one in the direction of travel.
 
 ## Snake: no multimodality yet (vision, plus hearing in `snake_hearing.py`;
 action and interoception designed, not built), and nothing beats random play.

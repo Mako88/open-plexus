@@ -110,6 +110,10 @@ and saved builds, repeatedly.
   session, on the path that decides whether a departed node stops answering.
 - **Long jobs go to the background and something else gets built meanwhile.**
   Never end a turn with neither more work nor an armed wake-up.
+- **Rewrite `NOW.md` at the end of every turn.** It is the state a tick or a
+  compaction reads back; anything only in the conversation is gone. Rewrite, do
+  not append — a finding updates a line. The five-minute working monitor that
+  reads it is `.claude/skills/monitor`.
 
 ---
 

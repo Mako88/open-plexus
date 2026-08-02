@@ -9,139 +9,128 @@ sessions.
 
 **A finding updates a line; it never appends one.** Settled results belong in the
 README, which carries the claim; this file carries only what is unfinished.
-Delete a line when it is done. Nothing may cite this file.
+Delete a line when it is done. Nothing may cite this file. Rewritten at the end
+of every turn — see `.claude/skills/monitor`.
 
 ---
 
-## The flood: void numbers, superseded by the broadcast design
+## Waiting on John
 
-`flood` does NOT beat flat enumeration (+0.0081 against +0.0136) — **but it ran
-on published knowledge-graph triples, not on anything this system observed**, so
-the numbers say nothing about the graph the architecture builds. Nor can it be
-re-pointed at the senses graph: it takes `types: PathTypes`, route KINDS from
-FB15k's typed relations, and co-occurrence edges have no kind. **The merged
-graph IS walked** by `equivalence_classes` — I claimed otherwise; wrong.
+**Decay, eviction to disk, and reinstatement.** His design, 2026-08-01: edges
+weaken over time; a node fired adds to its own lifespan; a node whose edges have
+worn away is written to disk on its own machine and loaded back if it ever fires
+again. It is C1-legal without trying, and it is the same primitive as the
+flood's stamina. Two amendments proposed and not yet answered:
 
-## g44-01: CLOSED — see `experiments/g44_01_asking.py` and its commits
+- **Archive the edges with the node, not just the node.** A node reinstated
+  empty has been forgotten in the only sense that matters.
+- **Reinstate with a boost, not the default weight**, or a node hovering at the
+  threshold pages in and out forever.
 
-**Settled and out of this file**, which carries only unfinished work. One line:
-`ask-set` beats watching by **+0.0085** (paired, 20 seeds, 16/20) — the only arm
-that does, at 1.6% of the oracle's swing. The bound survived every attempt to
-move either factor or the total, and each ruled-out branch records what revives
-it. **The principle worth keeping: ask about a candidate relative to what IT
-predicts, not relative to the query that made you notice it.**
+Also unanswered: whether uniform decay is free. It should be — every statistic
+here is a ratio, so a common factor cancels — but lazy decay-on-read is not
+uniform unless each edge carries a stamp and is aged forward to now. Unmeasured.
 
-## THE ASKING POLICY BUILDS A GRAPH AND NEVER WALKS IT
+Not in the README until he answers, because it is proposed rather than approved.
 
-**John's catch**, still true: `grep -c "pathways|flood|reach|routed"` in
-`g44_01_asking.py` returns **0**. Two structural attempts refuted — containment,
-and containment with the background discounted — because a shadow's
-neighbourhood is not distinctive. **The asymmetry is DIRECTIONAL**, which is why
-mutual prediction works and overlap does not, and why the broadcast design
-refuels on mutual strength.
+## The broadcast flood: BUILT, not measured
 
-## ONE GRAPH: BUILT, AND FOUR CHECKS GUARD IT
+`openplexus/broadcast.py`. Many seeds, stamina in place of a floor, termination
+by accounting, and the per-node work columns `pathways.flood` never produced.
+15 tests, 4 mutations, all caught. Callerless for one step and recorded in
+`tools/orphans_baseline.json` with the reason.
 
-The senses share one declared graph. `stream()` was already a hand-rolled
-namespace with the same layout, so `Namespace` gave byte-identical node numbers
-and the results table was the regression check.
+**The gate is `forward`, and the design said mutual.** Measured on the real
+proportions — a word on 845 occasions, its codes on 60, a distractor on 3,845:
 
-**Four checks, each catching what the others cannot, each mutation-caught:**
-`graph=N`, `holding={...}`, `disjoint=True`, and `shared.linked(a, b)` —
-co-resident but disconnected, which the other three pass. Each of the last three
-exists because checking showed the previous one blind, and the fourth caught a
-real bug in `SharedGraph` one commit after being written.
+    seeded at a rare code   min  0.2298 vs 0.1231   correct
+    seeded at the hub word  min  0.0766 vs 0.3592   INVERTED
 
-**CROSS-MODAL REACHES AGAIN**, the first measurement on the merged architecture:
-at `--repeats 2` the `alternating` arm — senses sharing ZERO occasions — reaches
-**cross 1.0000** where it was 0.0000. Under-resourced, not regressed; and the
-repeat reuses recordings, so `g40-01`'s ~300 per digit is a price in EVIDENCE.
+Mutuality is not wrong everywhere. **It is wrong from the common end**, and a
+flood stands on both ends during one walk — a route seeded at an image code
+arrives at the word and expands from the word, and that hop is scored from the
+hub's side. `forward` is the only combiner correct at both. A first version of
+this claim said symmetrising is always wrong; a test refuted it.
 
-## THE DESIGN, AGREED WITH JOHN 2026-08-01. Not started
+**Mutuality survives elsewhere and the distinction is worth keeping:** as a
+top-k membership gate in `equivalence_classes` it is load-bearing and has its
+own mutation. It fails as a weight, not as a filter.
 
-**A correction that makes the rest work.** There is not one node per concept per
-modality — there are MANY. About a hundred image codes per digit at 1024 codes,
-which is what `q_img 0.90` measures. **The multiplicity is the point:** the
-system has to discover that those hundred codes are one thing, and does, by them
-all reaching the same word. One node per digit would mean somebody decided which
-images count as a three, which is the label the design exists to avoid.
+**Not measured: whether many seeds replace edge kinds.** The typed walk
+discriminated by route kind. This has no kinds and its questions have none
+either, so the claim is that hundreds of surfaces firing at once converge. That
+is the first measurement and it needs the word channel repaired first.
 
-**A concept is never stored** — it is what the walk recovers, so it is already
-distributed: its image and audio nodes can live on different machines, because
-they were never together.
+## The word channel is a label, and the repair is to make it a modality
 
-### The broadcast flood
+John's position is right — text is a legitimate input for a digital system, one
+of several that co-occur. The code does not implement it. In
+`surfaces_pipeline.py`:
 
-John's design, made concrete. Input is broadcast to every node. A node holding a
-MUTUAL link to something in the broadcast re-broadcasts, appending itself, so a
-route carries its whole chain of reasoning — the thing `flood` was built for.
+- `shared.reserve("word", len(mnist.WORDS))` — **one node per class**, ten in
+  total, where image has about a hundred codes per digit at 1024.
+- `present = [("word", digit)]`, from `said = [u.digit for u in heard]` — the
+  scoring label, never wrong, never absent. The correct word is on 100% of
+  occasions; each of the `NOISE = 2` wrong words on about 20%.
 
-- **Stamina replaces the floor.** A route carries a budget refuelled by the
-  strength of what it walks, so strong reasoning funds itself and weak reasoning
-  runs out. **One fewer tuned constant**, which is the objection to the floor.
-- **Refuel on MUTUAL strength, never raw.** The ever-present background has the
-  strongest raw edges to everything and destroyed four separate policies today.
-  Raw-fuelled stamina would fund routes straight through it and starve the rest,
-  and they would arrive looking like the best reasoning in the system.
-- **Termination is accounting, not a threshold.** A route splitting into k
-  children reports k; a dying route reports one death; the origin knows the live
-  count and the thought is over at zero. No cutoff to tune, and the origin ends
-  holding every complete chain that survived.
-- **It produces the honest cost columns**: MESSAGES SENT and WORK PER NODE,
-  which `expansions` never measured.
+**The repair follows from the position rather than retreating from it:** emit
+the word as bytes and LSH them, so one word becomes many surfaces the system
+must discover are one thing; let it be absent sometimes and wrong sometimes;
+include several written forms. **It is a precondition for the flood's headline
+measurement** — the many-seeds claim cannot be tested on a channel of
+multiplicity 1.
 
-### Prediction, and it closes TWO gaps at once
+## Prediction, agreed and not started
 
-**Counts only go up, so nothing in this system can ever be wrong** — there is no
-error signal anywhere. Predicting the next input and learning from the miss
-supplies one.
+Counts only go up, so nothing here can ever be wrong; predicting the next input
+supplies the missing error signal. **John's connection: prediction error is what
+should drive the asking**, which currently runs on a fixed budget fraction. One
+mechanism, two holes, no new knob.
 
-**And John's connection, which is the strongest idea in the session: prediction
-error is what should DRIVE the asking.** Nothing currently decides when to ask
-rather than watch — it is a fixed budget fraction, a knob. A surface that keeps
-being predicted wrong is exactly a surface worth spending a question on. One
-mechanism fills both holes, and it needs no new knob.
+Named risk, from active learning: uncertainty sampling chases irreducible noise.
+A surface unpredictable because it is random attracts every question and teaches
+nothing — structurally the ever-present distractor, one level up. Cheap proxy:
+ask where error is high **and falling**, not high and flat.
 
-### Decided
+## Decided
 
-- **No tokenizer.** A tokenizer's vocabulary is LEARNED from a corpus we never
-  saw, which is the imported artefact this design exists to avoid. LSH the text
-  bytes like everything else; cross-language then follows only where writing
-  systems share bytes, and that is the honest version.
-- **Facts are dropped**, not islanded. They are a separate corpus sharing no
-  referent with anything sensory.
-- **No pre-commit hook.** John's call: every red preflight so far was caught and
-  fixed immediately, so the check has not been needed.
-
-### The label that is still load-bearing
-
-**The word surface is ground truth** — `said = [u.digit for u in heard]`. So
-*audio reaches image through the word* is real routing through a SUPERVISED
-anchor. The front end is genuinely untrained; the anchor is not.
+- **No tokenizer.** Its vocabulary is learned from a corpus we never saw.
+- **Facts are dropped**, not islanded — a separate corpus sharing no referent.
+- **No pre-commit hook.** Every red preflight so far was caught immediately.
+- **Video after the flood and the word channel.** It hands over prediction
+  targets for free, which is what the error signal needs, and continuity across
+  frames is an unsupervised answer to the multiplicity problem.
 
 ## Known debts
 
-- **DISTRIBUTED: entry point and in-process agreement DONE, container left.**
-  `node_main.py` runs a node as a process on TCP. A `Federation` across 4 owners
-  agrees with a whole `CoOccurrence` on every read, still at 32 owners where
-  most nodes are empty, read through `federation.at(owner)` so it checks the
-  routing rather than stepping past it. **Left: the container run** — latency,
-  departure, partition. `testbed/driver.py` stays dead: it measures a network
-  the restructure deleted, and only its question survives, in `agreement.py`.
-
-- **`tasks/xsl.py` has no caller.** Use it or drop it.
-- **The link columns in `surfaces_pipeline.py` step in tenths** — shares over ten
-  words, so nothing smaller than 0.1 can be read.
-- **`experiments/` has nine scripts and no harness.** They share `Ranker`,
-  `Marginal` and `load`; argument parsing and JSON writing are still copied.
+- **From the README audit, 2026-08-01.** `experiments/fb15k237_flood.py:264`
+  prints `+0.0136 margin, 0.35 arrived` as a **string literal**, not recomputed
+  on the queries the run sampled, so the comparison spans two query sets and two
+  floors. Two lines down, published full-test-set MRRs are compared against the
+  subsample floor and labelled "the same kind of floor" — that is where
+  `DistMult +0.0224` comes from against the README's correct `+0.0076`. Fix both
+  before the flood numbers are cited again.
+- **Nine files reference `openplexus/distributed.py`, `openplexus/peer.py` or
+  `DECISIONS.md`**, none of which exist. A search for "is there a dimension
+  split" finds prose saying yes.
+- **`deployment.py` and `agreement.py` are dead** — imported by nothing but
+  their own tests, and `deployment.py` budgets predecessor-era `w × d`
+  associative memory. **`tasks/xsl.py` has no caller.**
+- **DISTRIBUTED: entry point and in-process agreement done, container left.**
+  `node_main.py` runs a node on TCP; a `Federation` across 4 owners agrees with
+  a whole `CoOccurrence` on every read, still at 32 owners. Left: latency,
+  departure, partition. `testbed/driver.py` measures a deleted network.
+- **The link columns in `surfaces_pipeline.py` step in tenths.**
+- **`experiments/` has nine scripts and no harness.**
+- **§5's ⬜ "refuse when nothing was written — the machinery exists" is
+  unverified.** Every refusal in the package is an ownership refusal or the
+  asking experiment's detachability rate. Neither is that.
 
 ## Reading leads, none of them read
 
-- **AnyBURL / rule mining over paths** — partly checked, and the check corrected
-  me. What survives: **a rule-over-paths system lands near 0.31 where ours lands
-  at 0.247**, so our implementation is the limit — length-2 only, one confidence
-  per route shape, evidence summed rather than combined, no filtering.
-- **Interventional causal discovery under a budget** — unsearched. The sharper
-  question: **when does structure say what you need not test?**
-- **Predictive coding** — new, and the one to read first: prediction now has two
-  jobs here, the missing error signal and the trigger for asking.
+- **Predictive coding** — read first; prediction now has two jobs here.
+- **AnyBURL / rule mining over paths** — a rule-over-paths system lands near
+  0.31 where ours lands at 0.247, so our implementation is the limit: length-2
+  only, one confidence per route shape, evidence summed rather than combined.
+- **Interventional causal discovery under a budget.** The sharper question:
+  when does structure say what you need not test?

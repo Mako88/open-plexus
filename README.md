@@ -10,18 +10,20 @@ Every part the data flows through, and every option for it — including the dea
 ones, because this is the file that gets read and an option that is not here will
 be proposed again.
 
-**✅ in use ⬜ untried ❌ ruled out 🚧 approved, not built 🔀 both kept**
+**✅ in use ⬜ untried ❌ ruled out 🚧 approved, not built**
 
-One line each. A ❌ says what killed it and, where it is known, what would bring
-it back — refutations expire, and two have already become right later.
+Several options can be in use at once; ✅ is not exclusive. One line each. A ❌
+says what killed it and, where it is known, what would bring it back —
+refutations are conditional on their configuration, and two have become right
+later.
 
 ---
 
 **1. Input → surfaces.** How raw data becomes an id that can be counted.
 
-- ✅ Random-hyperplane LSH, over features centred per item — *no training and no data: two nodes send an identical input to the same surface every time, where k-means on different samples of the same stream manages under 0.12, and the bit count is the grain dial.*
-- 🔀 Fixed transforms of one item — an ear-shaped filterbank, a cepstrum, per-item centring — *legal because a constant is not a codebook, and they are what makes an angle mean anything: on raw waveforms every front end including a random assignment scores the same. They improve the SPACE and not the allocation — k-means gains 0.05 from them and the hash gains 0.01.*
-- ⬜ Spending the codes where the data is, without fitting a codebook — *the hash's whole remaining deficit, about 0.44 of purity in every feature space with structure in it. A data-free front end cannot know where the data is; whether the walk can repair the over-segmentation instead is the untested half.*
+- ✅ Random-hyperplane LSH, over features centred per item — *no training and no data. Two nodes send an identical input to the same surface every time, where k-means fitted on different samples of one stream agrees on under 0.12. The bit count is the grain dial.*
+- ✅ Fixed transforms of one item — an ear-shaped filterbank, a cepstrum, per-item centring — *legal because a constant is not a codebook. They are what makes an angle mean anything: on raw waveforms every front end including random assignment scores the same. They improve the space rather than the allocation — k-means gains 0.05 from them and the hash gains 0.01.*
+- ⬜ Spending the codes where the data is, without fitting a codebook — *the hash's remaining deficit, about 0.44 of purity in every feature space with structure in it. A data-free front end cannot know where the data is; whether the walk repairs the over-segmentation instead is untested.*
 - ⬜ A codebook learned from co-occurrence — *removes the last borrowed component, but it must stay in sync as it learns, which C1 forbids.*
 - ⬜ Per-node codebooks plus translation — *avoids agreement entirely, at the cost of unsupervised translation, which is harder than the goal.*
 - ❌ ~~No discretisation — count raw similarity~~ — *every count stays 1, so no statistic can form.* **Revives if** counting is replaced by something that does not need recurrence.
@@ -31,46 +33,51 @@ it back — refutations expire, and two have already become right later.
 
 - ✅ Every count, nothing ever cut.
 - ❌ ~~Cut each surface's partners at the biggest score gap~~ — *refuses the ever-present distractor and evicts the word that names the concept.* **Revives if** something else supplies the refusal.
-- ❌ ~~Cap how many partners are even considered~~ — *a constant nobody set on purpose, and it turned out to be the thing doing the cutting.*
+- ❌ ~~Cap how many partners are even considered~~ — *a constant nobody set on purpose, and it turned out to be doing the cutting.*
 - ⬜ Forget by age or disuse — *unbounded growth is not survivable on a phone, and nothing currently decides what to drop.*
-- ⬜ Archive rather than delete — evict to a store on that node, never in the walk — *a machine that never forgets is fine; one that never compresses cannot form concepts, and an archive nothing waits on is C1-legal where a shared database is not.*
+- ⬜ Archive rather than delete — evict to a store on that node, never in the walk — *a machine that never forgets is fine; one that never compresses cannot form concepts. An archive nothing waits on is C1-legal where a shared database is not.*
 
 **3. Identity.** What makes several surfaces one thing.
 
 - ✅ No id at all — a concept is what you reach by walking.
-- ❌ ~~Freeze partners into groups by mutual agreement~~ — *a hard partition flips whole groups on a small score change, so it gets worse with more data at some point.* **Revives if** a task needs a yes/no answer to "are these the same".
+- ❌ ~~Freeze partners into groups by mutual agreement~~ — *a hard partition flips whole groups on a small score change, so past some point it gets worse with more data.* **Revives if** a task needs a yes/no answer to "are these the same".
 - ❌ ~~Give every concept a global id~~ — *nobody can assign one without a coordinator.*
-- ⬜ Identity at more than one grain — *dog and Labrador are the same walk at different resolutions, and nothing currently expresses "narrower than".*
+- ⬜ Identity at more than one grain — *dog and Labrador are the same walk at different resolutions, and nothing expresses "narrower than".*
 
 **4. Retrieval.** How a question gets answered.
 
 - ✅ Ranked walk, scored one-way from the asking side.
-- ⬜ Walk toward SURPRISE rather than strength — *every walk here expands the strongest edge, so it can only surface what the counts already favour, and nothing it returns can be unexpected by construction. A path that is unlikely a priori and composes confidently is where a new idea would live; `grounding.ppmi` computes exactly that and has never been used to walk.*
+- ✅ Walk two steps, carrying the relation types along the path — *the only version that pays. Test endpoints are 0.0000 one hop apart in training and 0.7373 two hops apart, so one step cannot reach the answer. Evidence accumulates over every route reaching a candidate, which a thresholded rule lookup cannot do: `sum` beats `max` at every blend weight.*
+- ✅ A blend weight that is per query rather than global — *built to test whether the losses were the queries where structure had nothing to say. They are not: +0.0131 against a global +0.0136, with slightly more losses. Kept because it cannot blow up — at full weight it holds 0.2379 where a global blend collapses to 0.1278, which is the form to use where there is no validation set, meaning every node.*
+- 🚧 Broadcast flood — *input goes to every node; a node linked to something in the broadcast re-broadcasts and appends itself, so a route arrives carrying its whole chain of reasoning. Built as `openplexus/broadcast.py`. Not measured.*
+- 🚧 Stamina in place of a floor — *a route carries a budget the edges it walks refuel, so strong reasoning funds itself and weak reasoning runs out. Pricing a step at the node's own mean edge weight removes the constant a floor needs.*
+- ⬜ Many seeds in place of edge kinds — *the typed walk discriminated by route kind, which a senses graph has not got and whose questions have not got either. The broadcast's answer is that hundreds of surfaces fire at once and their routes converge. Untested, and the first thing to measure.*
+- ⬜ Walk toward surprise rather than strength — *every walk here expands the strongest edge, so nothing it returns can be unexpected. A path unlikely a priori that composes confidently is where a new idea would live.*
+- ⬜ A surprise statistic one node can compute alone — *`grounding.ppmi` is that measure, and `federated` and `bucket_service` both refuse to serve it because it divides by a global occasion total. Walking on surprise needs a local one first.*
+- ❌ ~~Walk three steps~~ — *run 2026-08-01 as a typed flood, `out/fb15k237-flood-depth3.json`: best +0.0052 against the two-step enumeration's +0.0136, arriving on 0.31–0.38 of queries against 0.35. Deeper reached no further and ranked worse.* **Revives if** the reach at depth 3 is spent differently — the arrival rate says the routes exist and the scoring, not the search, is what failed.
+- ⬜ Walk four steps or more — *0.2597 of answers lie further than two, and nothing has been run past three. Cost is a fan-out to the fourth.*
+- ⬜ Act on the world to disambiguate — *the only named escape from a confound that counting cannot separate.*
 - ❌ ~~Average the two directions of an edge~~ — *a thing present everywhere scores 1.0 from its own side because that is true, and averaging lets it outrank real partners.*
 - ❌ ~~Take the weaker direction~~ — *penalises exactly the hub edges worth keeping.*
 - ❌ ~~Take the stronger direction~~ — *stops discriminating; it scored at the floor.*
 - ❌ ~~Tune a damping exponent~~ — *five dials were tried and none was the axis.*
-- ✅ Walk two steps, carrying the relation TYPES along the path — *the only version that pays. Test endpoints are 0.0000 one hop apart in training and 0.7373 two hops apart, so one step provably cannot reach the answer. Evidence accumulates over every route reaching a candidate, which a thresholded rule lookup cannot do: `sum` beats `max` at every blend weight.*
-- ❌ ~~Walk further than one step WITHOUT the types~~ — *reaches the answer and cannot rank it: 0.0082 at depth 3, every combination below the floor at every beam to 256, with an interior maximum at 16 so it is not under-searched. Two steps from a degree-37 entity is about 1,300 candidates and nothing says which one the question was about.* **Revives if** something other than types supplies that discrimination.
-- 🔀 A blend weight that is per query rather than global — *built to test whether the losses were the queries where structure had nothing to say. **They are not**: +0.0131 against a global +0.0136, with slightly more losses. It survives because it cannot blow up — at full weight it holds 0.2379 where a global blend collapses to 0.1278, which is the form to use where there is no validation set, meaning every node.*
-- ⬜ Walk three steps or more — *0.2597 of answers lie further than two, and nothing has been run there. Typed three-step paths are the obvious extension and cost a fan-out cubed.*
-- ⬜ Act on the world to disambiguate — *the only named escape from a confound that counting provably cannot separate.*
+- ❌ ~~Walk further than one step without the types~~ — *reaches the answer and cannot rank it: 0.0082 at depth 3, every combination below the floor at every beam to 256, with an interior maximum at 16, so it is not under-searched. Two steps from a degree-37 entity is about 1,300 candidates and nothing says which one the question was about.* **Revives if** something other than types supplies that discrimination.
 
 **5. The answer.** What a response actually is.
 
+- ✅ A relation that was never stated but follows — *composition is novel output from a single query, no generation involved. Typed two-step paths on FB15k-237 clear a structureless floor by +0.0136 ± 0.0005, the margin published ComplEx holds over that same floor.*
+- ✅ Report that margin as a dilution, both halves — *+0.0474 where a route reaches the answer, −0.0046 where none does, at 35% reached. The reached third is selected by the mechanism's own ability, so it says nothing about what more reach would buy.*
 - ⬜ The ranked list itself, cut where the caller wants — *the walk already produces it; nothing extra is decided.*
 - ⬜ A set, scored on exactness and completeness — *forces a commitment to a boundary rather than a hedge.*
 - ⬜ Refuse when nothing was written there — *the only honest answer for a thing never seen, and the machinery exists.*
-- ⬜ Generated one piece at a time — *the only way to produce a novel SEQUENCE, and nothing yet says when it stops.*
-- ✅ A relation that was never stated but follows — *composition is novel output from a single query, no generation involved. Typed two-step paths on FB15k-237 clear a structureless floor by **+0.0136 ± 0.0005**, the margin published ComplEx holds over that same floor.*
-- 🔀 That margin is a DILUTION, and both halves are the finding — *+0.0474 where a route reaches the answer, −0.0046 where none does, at 35% reached. The reachable third is selected by the mechanism's own ability, so it is not a claim about what more reach would buy.*
-- ⬜ The answer to an analogy — *find where two parts of the map have the same shape, and read off the missing corner. A route SHAPE is now a first-class thing — `PathTypes` counts them — so two regions spanned by the same shapes is the same question one level up.*
-- ⬜ A contradiction the map contains — *an output that was never an input, and nobody asked the question. **`pathways.flood` already produces the raw material**: it returns every route to an endpoint, so two routes composing to incompatible kinds is a contradiction, computable and currently discarded.*
+- ⬜ Generated one piece at a time — *the only way to produce a novel sequence, and nothing yet says when it stops.*
+- ⬜ The answer to an analogy — *find where two parts of the map have the same shape, and read off the missing corner. A route shape is a first-class thing — `PathTypes` counts them — so two regions spanned by the same shapes is the same question one level up.*
+- ⬜ A contradiction the map contains — *an output that was never an input, and nobody asked the question. `pathways.flood` already produces the raw material: it returns every route to an endpoint, so two routes composing to incompatible kinds is a contradiction, computable and currently discarded.*
 - ⬜ A bridge between two regions that never co-occurred — *the thing that connects distant fields, aimed at deliberately rather than stumbled into.*
 - ❌ ~~A fixed frame with slots to fill~~ — *a frame is a traversal with a schedule nobody supplied.* **Revives if** a domain genuinely supplies the frame.
 
-**6. Output.** Turning an answer into something that leaves the system. **Not
-necessarily words** — an action is an output, and so is a structure.
+**6. Output.** Turning an answer into something that leaves the system. Not
+necessarily words — an action is an output, and so is a structure.
 
 - ⬜ Words, fetched from the concept map — *they come from what was learned, so it cannot name what it does not have.*
 - ⬜ Words, composed by the system itself — *if it understands, it should be able to work out how to say things; nothing hands it grammar.*
@@ -81,18 +88,19 @@ necessarily words** — an action is an output, and so is a structure.
 
 **7. What changes over time.** The thing that makes it learn.
 
-- ✅ The counts — *and this is currently the whole of what learns.*
+- ✅ The counts — *currently the whole of what learns.*
+- 🚧 Predict what comes with what, and learn from being wrong — *counts only go up, so nothing is ever wrong and nothing is ever corrected. Predicting relations is an error signal that is not next-token prediction. Agreed 2026-08-01, to build after the broadcast flood. It closes a second hole: prediction error decides when to ask rather than watch, which is currently a knob.*
 - ⬜ Learned representations for relations — *lets a relation never seen sit near ones that were, which counting cannot do.*
 - ⬜ Structure that reorganises, not just weights — *C4 claims the system keeps rearranging what it knows, and nothing implements that.*
-- ⬜ Predict what comes with what, and learn from being wrong — *counts only go up, so nothing is ever wrong and nothing is ever corrected; predicting RELATIONS is an error signal that is not next-token prediction.*
-- ⬜ Compress — keep the boundaries that describe the stream in the fewest bits — *one principle that would supply forgetting, hierarchy and a reason to reorganise, all of which are currently missing.*
+- ⬜ Compress — keep the boundaries that describe the stream in the fewest bits — *one principle that would supply forgetting, hierarchy and a reason to reorganise, all of which are missing.*
 - ❌ ~~A trained readout on frozen random projections~~ — *everything durable ends up in one matrix, and the rule was never the limitation.*
 - ❌ ~~Replay as a repair for churn~~ — *churn costs capacity, not knowledge.*
 
 **8. Ownership.** Which machine holds which part.
 
 - ✅ Consistent hashing, no directory and no coordinator.
-- 🔀 Split by dimension, or split by concept — *dimension is the default; concept is required once capacity has to grow.*
+- ✅ Split by concept — *`ownership.Ring` maps a concept to its owner, and `federated` and `buckets.Join` both use that one ring rather than two rules that could drift. Pooled capacity matches dimension splitting, but lone-node capacity is sixteen times larger at sixteen nodes and grows with the network.*
+- ❌ ~~Split by dimension~~ — *the driver-based arrangement in the deleted `openplexus/distributed.py`, and the C1 violation the ring exists to avoid: it leaves a node stuck at one node's worth of capacity forever.* **Revives if** a driver becomes acceptable, which C1 currently forbids.
 - ❌ ~~Any readout that sums across every machine~~ — *the step C1 forbids, and four gates were passed on top of one before anyone noticed.*
 
 **9. Talking between machines.** How a question crosses the network.
@@ -104,11 +112,11 @@ necessarily words** — an action is an output, and so is a structure.
 **10. How we know it works.** The measurement, which is a design choice like any other.
 
 - ✅ Prequential — score as the stream arrives.
+- ✅ FB15k-237, floor established before anything was built on it — *its predecessor's leak is gone: rules mined from train score 0.45 on train and 0.0001 on test. What it hands over instead is the marginal, MRR 0.2334, and published DistMult and ComplEx sit at 0.241 and 0.247 — within 0.014 of a baseline with no structure in it. Report the margin, never the MRR.*
+- ✅ Beat a conventional system on the same input — *run, and the answer is "matched, on the part that is not the baseline". Against one floor: ours +0.0136, ComplEx +0.0136, DistMult +0.0076, but TransE +0.0606 and RotatE +0.1046. It matches the weaker half of the field and is nowhere near the stronger. Absolute MRR is the wrong column; most of everyone's is the marginal.*
 - ⬜ Learn from live sensors, test on labelled data never trained on — *the only named way to tell whether a microphone-and-camera system learned anything.*
-- 🔀 Beat a conventional system on the same input — *run, and the answer is "matched, on the part that is not the baseline". Against one floor: ours +0.0136, ComplEx +0.0136, DistMult +0.0076 — but TransE +0.0606 and RotatE +0.1046. It matches the weaker half of the field and is nowhere near the stronger. **Absolute MRR is the wrong column**: most of everyone's is the marginal.*
-- ✅ FB15k-237, floor established before anything was built on it — *its predecessor's leak is genuinely gone: rules mined from train score 0.45 on train and 0.0001 on test. What it hands over instead is the marginal, MRR 0.2334 — and published DistMult and ComplEx sit at 0.241 and 0.247, **within 0.014 of a baseline with no structure in it**. Report the margin, never the MRR.*
-- ⬜ Noise that is sticky rather than uniform — *real irrelevant co-occurrence recurs together; ours is white noise, and ideas refuted against it are untested rather than dead.*
-- ❌ ~~CLUTRR-symbolic as evidence of composition~~ — *62 facts counted from its two-hop rows plus a bracketing search answer 100% of the test split at every hop count; a shuffled table scores 0.12. What it measures is finding the ORDER to apply knowledge in — the same facts folded left to right score 0.28.* **Revives if** a configuration is found whose relation algebra is not confluent.
+- ⬜ Noise that is sticky rather than uniform — *real irrelevant co-occurrence recurs together; ours is white noise, so ideas refuted against it are untested rather than dead.*
+- ❌ ~~CLUTRR-symbolic as evidence of composition~~ — *62 facts counted from its two-hop rows, plus a bracketing search, answer 100% of the test split at every hop count; a shuffled table scores 0.12. What it measures is finding the order to apply knowledge in — the same facts folded left to right score 0.28.* **Revives if** a configuration is found whose relation algebra is not confluent.
 - ❌ ~~Withholding CLUTRR's facts to make it an instrument~~ — *the 4,998 three-hop rows determine every held-out pair by deduction alone, returning the ceiling to 0.98 with 40 of the 62 withheld. The facts were never withheld, only restated.*
 - ❌ ~~Train, then test~~ — *measures a system that stops, which is the one thing C4 forbids.*
 - ❌ ~~Bits per token on text~~ — *bounded by what an n-gram table does, so it cannot show what structure adds.*
@@ -120,14 +128,14 @@ necessarily words** — an action is an output, and so is a structure.
 An option that breaks one of these is not a candidate, however well it performs.
 
 - **C1 — Nothing waits for the whole.** No update needs every part to have
-  exchanged with every other part, and no answer needs a step every machine joins.
-  A constant handed out once and frozen is fine — nobody waits for it. An
+  exchanged with every other part, and no answer needs a step every machine
+  joins. A constant handed out once and frozen is fine — nobody waits for it. An
   agreement that has to be maintained as things change is not.
 - **C2 — Messages are late, jittered and out of order.** Nothing may assume otherwise.
 - **C3 — A machine vanishing mid-thought is normal**, not an error to recover from.
 - **C4 — No training run that ends.** It never stops learning.
 
-Latency is **not** a constraint. Ten minutes for an answer is an optimisation
+Latency is not a constraint. Ten minutes for an answer is an optimisation
 problem if everything else works.
 
 ---

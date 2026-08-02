@@ -79,6 +79,7 @@ SURFACES = ROOT / "openplexus" / "surfaces.py"
 COMPOSITION = ROOT / "openplexus" / "composition.py"
 ASKING = ROOT / "openplexus" / "tasks" / "asking.py"
 PATHWAYS = ROOT / "openplexus" / "pathways.py"
+BROADCAST = ROOT / "openplexus" / "broadcast.py"
 
 
 @dataclass(frozen=True)
@@ -894,6 +895,50 @@ MUTATIONS = [
         path=SURFACES,
         old="        weights = 1 << np.arange(self.bits - 1, -1, -1)",
         new="        weights = 1 << np.arange(self.bits)",
+    ),
+    Mutation(
+        name="the-broadcast-never-buries-a-dead-route",
+        breaks="the accounting that ends the thought. Termination here is "
+               "bookkeeping rather than a threshold, so a death that goes "
+               "unreported leaves the origin believing routes are still "
+               "walking -- while every endpoint, chain and score comes back "
+               "correct, so nothing but the ledger notices",
+        path=BROADCAST,
+        old="                result.live -= 1",
+        new="                result.live -= 0",
+    ),
+    Mutation(
+        name="a-broadcast-route-may-revisit-its-own-chain",
+        breaks="the only thing that makes an unbounded walk terminate on a "
+               "cyclic graph. With the budget refuelled by every edge it "
+               "walks, a route round a strong cycle never runs out, so the "
+               "walk ends only when the safety ceiling fires -- which looks "
+               "exactly like a finished flood unless `gave_up` is read",
+        path=BROADCAST,
+        old="                if weight <= 0.0 or other in chain:",
+        new="                if weight <= 0.0:",
+    ),
+    Mutation(
+        name="stamina-is-refuelled-but-never-spent",
+        breaks="the budget itself. A route that only ever gains turns the "
+               "flood into an exhaustive enumeration of everything reachable. "
+               "It still returns the right endpoints with the right chains and "
+               "differs only in cost, so a test asserting what was REACHED "
+               "cannot see it",
+        path=BROADCAST,
+        old="                left = held - price + weight",
+        new="                left = held + weight",
+    ),
+    Mutation(
+        name="the-broadcast-gate-ignores-its-combiner",
+        breaks="the measurement that redirected this module. Pinning `min` "
+               "restores the design's original MUTUAL gate, which is correct "
+               "seeded at a rare code and inverts at a hub -- so it funds the "
+               "ever-present background from the second hop onward while the "
+               "first hop still looks right",
+        path=BROADCAST,
+        old="            weights = [(other, strength(index, statistic, here, other, combine))",
+        new="            weights = [(other, strength(index, statistic, here, other, 'min'))",
     ),
 ]
 def restore_any_leftovers() -> None:

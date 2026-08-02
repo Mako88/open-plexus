@@ -49,9 +49,9 @@ if str(ROOT) not in sys.path:
 from openplexus.prediction import BINDINGS, Predictor  # noqa: E402
 from openplexus.tasks.snake import ACTIONS, Snake  # noqa: E402
 
-#: Seeds. Three is this project's floor, and it is here rather than at one
-#: because a one-seed peak regressed three times in a single session before this
-#: was written.
+#: Seeds, chosen here as this project's floor of three. It is three rather than
+#: one because a one-seed peak regressed on confirmation three times in the
+#: session before this was written.
 SEEDS = (0, 1, 2)
 
 #: Chosen here as what finishes in seconds and still lets the hit rate settle;

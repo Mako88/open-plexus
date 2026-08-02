@@ -75,7 +75,14 @@ and saved builds, repeatedly.
   land, wearing the appearance of one that did.
 - **Search before you build, and by capability rather than by the name you would
   have used.** A negative search result is not a finding until it was a wide one.
-- **New mechanisms default to off**, so earlier results stay reproducible.
+- **New mechanisms default to off**, so earlier results stay reproducible —
+  **and ship with a run that turns them on.** Off-by-default protects the
+  baseline; a committed run with it ON is the only thing that stops the
+  mechanism being lost. This is how the project keeps producing code that is
+  built, correct, and never used: a flaw is noticed, a fix is built, the fix is
+  left off so the numbers do not move, and nobody ever moves them.
+  `tools/check_orphans.py` catches a module with no caller. It cannot catch a
+  flag with no run.
 
 ---
 

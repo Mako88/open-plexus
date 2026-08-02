@@ -21,34 +21,32 @@ when it is done. Nothing may cite it. Rewritten at the end of every turn — see
 seed spreads reported all session, 0.038 to 0.330, are the signature. Nothing
 has been re-run.
 
-## THE POWERED RE-RUN — `out/powered-rerun.txt`
+**Powered re-run: DONE**, `out/powered-rerun.txt`, and two of the three
+refutations did not survive — see the README. Surprise/rarity refuelling was
+not re-run and is still on 150-question evidence.
 
-Six runs at 1,000 questions across both front ends and three seeds, because an
-audit found **three refutations resting on 120-150-question runs** where +0.03
-needs 840: the flood as a cross-modal walk, surprise/rarity refuelling, and
-many-origins. All three are the broadcast line.
+**Report `busiest`, not `messages`.** Nothing runs in parallel; serial seconds
+are TOTAL work. `Flood.busiest()` is what a distributed run would cost —
+9.5× to 22.4× less. Every cost reported this session led with the wrong column.
 
-`lsh` seeds 0 and 1 are in and null, as the front-end finding predicts. **The
-`kmeans` half is where the question is answered and has not run.** Fix
-`flood-many`'s budget first — it gives up on 0.999 of questions.
+## PRIORITY, REORDERED BY JOHN 2026-08-02
 
-## REPORT `busiest`, NOT `messages` — the design's own column
+1. **Make `broadcast.flood` actually parallel.** It is the architecture and a
+   serial simulation is not testing it. **Honest scope**: `busiest()` already
+   measures what a parallel run would COST — 9.5x to 22.4x less than serial.
+   What a real implementation adds is **C2 and C3**: late messages, lost
+   messages, nodes vanishing mid-thought. That is untested and is the part that
+   could break the design. `bucket_peer.py` and `node_main.py` exist for it.
 
-Nothing here runs in parallel: `broadcast.flood` is a single-threaded loop and
-every node is a dict entry. So the seconds a run takes are TOTAL work, and the
-number the design is about is `Flood.busiest()`. Measured in the run in flight:
-199,062 expansions per question against a busiest node's 13,920 — **14.3× —
-so 411s of total work is about 29s of distributed wall clock.** Every cost
-reported this session led with the wrong column.
+2. **Turn death on in snake and re-run everything policy-related.** The old
+   numbers are meaningless with nothing to lose.
 
-## AGREED 2026-08-02, NOT BUILT — start here
+3. **k-means: a reference ceiling, not a candidate.** A seeded codebook does
+   not work. Random centres from a shared seed are legal but probably no better
+   than the hash. The ensemble front end is the better bet AND keeps both of
+   the walk's jobs.
 
-1. **BUILT — snake's energy bar.** See the README; `SELECTING_ENERGY = 200` is
-   measured, not chosen. What is left is USING it: no experiment runs with
-   energy on, so no policy has yet been selected against.
-
-2. **Re-run the three broadcast refutations at 1,000 questions.** In flight;
-   see below.
+## AGREED 2026-08-02, NOT BUILT
 
 3. **Split the anchor as well as the codebooks.** The disagreement result had
    one clean word per digit shared by both codebooks by construction; a real

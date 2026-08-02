@@ -946,6 +946,18 @@ MUTATIONS = [
         new="        alphabet = max(len(self._targets), 1)",
     ),
     Mutation(
+        name="a-death-refunds-the-energy",
+        breaks="the only thing stopping a policy from stalling the clock. A "
+               "step that killed the snake costing no energy makes running "
+               "into walls free, so a policy that never eats survives as long "
+               "as one that does -- which removes the selection this mechanism "
+               "exists to create, while every board, view and score stays "
+               "exactly the same",
+        path=SNAKE,
+        old="            self.energy -= 1",
+        new="            self.energy -= 0 if died else 1",
+    ),
+    Mutation(
         name="the-snake-view-is-not-centred",
         breaks="the only thing that makes a situation RECUR. Indexing the view "
                "from the board's origin instead of the head makes an identical "

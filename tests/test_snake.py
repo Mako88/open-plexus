@@ -12,7 +12,8 @@ import random
 import unittest
 
 from openplexus.tasks.snake import (ACTIONS, BODY, EMPTY, FOOD, WALL,
-                                    Snake, patches)
+                                    SELECTING_ENERGY, Snake,
+                                    patches)
 
 
 class TheViewIsCentredSoSituationsRecur(unittest.TestCase):
@@ -190,3 +191,63 @@ class PatchesCutTheViewIntoOverlappingWindows(unittest.TestCase):
     def test_a_window_larger_than_the_view_is_refused(self):
         with self.assertRaises(ValueError):
             patches(tuple(range(9)), 4)
+
+
+class EnergyGivesItSomethingToLose(unittest.TestCase):
+    """John's design. Not a reward: nothing declares food good. A policy that
+    does not eat simply gets fewer steps of experience, which is selection."""
+
+    def test_off_by_default(self):
+        world = Snake(width=8, height=8, sight=2, seed=0)
+        self.assertIsNone(world.energy)
+        self.assertFalse(world.step(0).starved)
+
+    def test_it_starves_when_the_energy_runs_out(self):
+        world = Snake(width=8, height=8, sight=2, seed=0, energy=5)
+        starved = [world.step(0).starved for _ in range(5)]
+        self.assertEqual(starved, [False, False, False, False, True])
+
+    def test_eating_extends_the_life(self):
+        """The connection test, and the mechanism itself: without this the
+        energy is a clock rather than a reason to eat."""
+        fed = Snake(width=6, height=6, sight=2, seed=0, energy=4)
+        fed.body, fed.food = [(3, 3)], (3, 2)
+        self.assertTrue(fed.step(0).ate)
+        self.assertEqual(fed.energy, 4)          # spent one, refilled to full
+
+        hungry = Snake(width=6, height=6, sight=2, seed=0, energy=4)
+        hungry.body, hungry.food = [(3, 3)], (0, 0)
+        hungry.step(0)
+        self.assertEqual(hungry.energy, 3)
+
+    def test_dying_does_not_refund_the_step(self):
+        """Otherwise a policy could stall the clock by running into walls."""
+        world = Snake(width=3, height=3, sight=1, seed=0, energy=10)
+        world.body, world.food = [(0, 1)], (2, 2)
+        step = world.step(2)
+        self.assertTrue(step.died)
+        self.assertEqual(world.energy, 9)
+
+    def test_a_snake_with_no_energy_is_refused(self):
+        with self.assertRaises(ValueError):
+            Snake(energy=0)
+
+    def test_the_selecting_energy_is_not_a_uniform_timer(self):
+        """SELECTING_ENERGY is measured, not chosen: at a value too small every
+        policy starves at the same step and nothing is selected."""
+        import random as _random
+        lives = []
+        for seed in range(4):
+            world = Snake(width=8, height=8, sight=2, seed=seed,
+                          energy=SELECTING_ENERGY)
+            rng = _random.Random(seed)
+            steps = 0
+            while steps < 20000:
+                steps += 1
+                if world.step(rng.randrange(len(ACTIONS))).starved:
+                    break
+            lives.append(steps)
+        self.assertGreater(max(lives), min(lives),
+                           "if every seed starves at the same step this is a "
+                           "clock and not a selection pressure")
+        self.assertGreater(max(lives), SELECTING_ENERGY)

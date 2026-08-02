@@ -103,8 +103,8 @@ necessarily words — an action is an output, and so is a structure.
 - 🚧 Which chain to render: arrival narrows, prediction ranks, brevity breaks ties — *agreed 2026-08-01. **No step needs a new mechanism or a new constant**: the three are the addressing design, the prediction error signal and §7's compression principle, each doing a second job.*
 - 🚧 Arrival narrows the field — *the input names an output machine, so the candidates are exactly the chains that REACH it. Selection is routing.*
 - 🚧 Prediction ranks what is left — *keep the chain whose consequences best predict what arrives next, which moves the choice from an invented internal score to something the world can settle.*
-- ⬜ Words, fetched from the concept map — *they come from what was learned, so it cannot name what it does not have.*
-- ⬜ Words, composed by the system itself — *if it understands, it should be able to work out how to say things; nothing hands it grammar.*
+- ⬜ Words — fetched from the concept map, or composed by the system itself — *fetched, they come from what was learned, so it cannot name what it does not have. Composed, it has to work out how to say things, and nothing hands it grammar.*
+- ✅ Something to lose — *`tasks/snake.py` energy, John's design: it depletes, fruit restores it, running out ENDS the run rather than resetting. **Nothing declares food good.** A policy that does not eat gets fewer steps of experience — selection without a reward, and the first source of preference this design has had.*
 - ⬜ An action on the world — *the same channel intervention needs, which makes acting and answering one mechanism instead of two.*
 - ⬜ A structure — a map, a plan, a set of bindings — *the honest output for a system whose knowledge is a shape, and it needs no language at all.*
 - ⬜ Template — *structurally incapable of adding a fact, which makes it a floor rather than a goal.*

@@ -63,6 +63,21 @@ ACTIONS = ((0, -1), (0, 1), (-1, 0), (1, 0))
 EMPTY, WALL, BODY, FOOD = 0, 1, 2, 3
 
 
+#: A starting energy that SELECTS rather than times out, measured on 8x8 with
+#: sight 2 under random play over eight seeds:
+#:
+#:      20 ->  20 steps, spread 20-20,       0.0 fruit   a uniform timer
+#:      60 ->  70 steps, spread 60-110,      0.4 fruit
+#:     200 -> 479 steps, spread 200-814,     3.1 fruit
+#:     400 -> 4797 steps, spread 1014-10310, 43.4 fruit  effectively survives
+#:
+#: At 20 nothing ever reaches fruit, so every policy starves identically and
+#: there is no selection at all — only a clock. At 400 the spread is tenfold
+#: and random play survives indefinitely. **200 is where eating visibly extends
+#: a life and not eating visibly ends one**, which is the whole mechanism.
+SELECTING_ENERGY = 200
+
+
 def patches(view: tuple[int, ...], side: int = 3) -> list[tuple[int, ...]]:
     """Cut a square view into every overlapping `side` x `side` window.
 
@@ -97,12 +112,20 @@ class Step:
             here optimises it; it is reported so an experiment can say whether
             a policy that never sees a reward nonetheless eats more.
         died: Whether the snake ran into a wall or itself.
+        starved: Whether the energy ran out. **This is not another death.** A
+            death resets the board and play continues, which costs a policy
+            nothing; starving is meant to END the run, so a policy that does
+            not eat gets fewer steps of experience than one that does. The
+            world does not act on it — the caller decides — because whether
+            the stream stops is the experiment's business and C4 is about the
+            system, not one episode.
     """
 
     view: tuple[int, ...]
     action: int
     ate: bool
     died: bool
+    starved: bool = False
 
 
 class Snake:
@@ -112,16 +135,34 @@ class Snake:
         width, height: Board size.
         sight: Half-width of the visible window, or `None` for the whole board.
             A window of `sight=2` shows a 5x5 patch centred on the head.
+        energy: Steps the snake can take before starving, or `None` for no
+            energy at all — **the default, so every earlier result stands.**
+
+            John's design, 2026-08-02, and his reasoning is the mechanism:
+            what survives longer learns more, so a policy that does not eat
+            generates less experience and is selected against. **Nothing
+            declares food good.** There is no reward here and no external
+            judge; there is only something to lose, which is what every
+            preference this project has looked for needs and has never had.
     """
 
     def __init__(self, width: int = 12, height: int = 12,
-                 sight: int | None = 2, seed: int = 0) -> None:
+                 sight: int | None = 2, seed: int = 0,
+                 energy: int | None = None, refill: int | None = None) -> None:
         if width < 3 or height < 3:
             raise ValueError("a board smaller than 3x3 has no room to turn")
         if sight is not None and sight < 1:
             raise ValueError("a sight of zero sees only the head, which never "
                              "changes, so no action could ever be informative")
+        if energy is not None and energy < 1:
+            raise ValueError("a snake with no energy starves before it moves")
         self.width, self.height, self.sight = width, height, sight
+        self.full = energy
+        #: What one fruit is worth. Defaults to a full tank, so the question a
+        #: run asks is *can it reach the next fruit in time* rather than *how
+        #: many dials did somebody set*.
+        self.refill = energy if refill is None else refill
+        self.energy = energy
         self._rng = random.Random(seed)
         self.reset()
 
@@ -198,4 +239,14 @@ class Snake:
             else:
                 self.body.pop()
             self.heading = action
-        return Step(view=self.view(), action=action, ate=ate, died=died)
+        starved = False
+        if self.full is not None:
+            # SPENT ON EVERY STEP, INCLUDING THE ONE THAT KILLED IT. A death
+            # already costs the board; it must not also refund the step, or a
+            # policy could stall the clock by running into walls.
+            self.energy -= 1
+            if ate:
+                self.energy = min(self.energy + self.refill, self.full)
+            starved = self.energy <= 0
+        return Step(view=self.view(), action=action, ate=ate, died=died,
+                    starved=starved)

@@ -5,12 +5,17 @@ implementations — this is the mental model, and the code is meant to match it
 exactly. If they ever disagree, this file is wrong and gets fixed.
 
 **Status: every type exists. `Code`, `Node`, `LiveSet`, `Snake`,
-`SnakeQuantizer` and `Thought` are implemented and tested; everything else is a
-stub.** Each unimplemented field shows up as a `CS0169` build warning, so the
-count is a rough progress bar — 27 when the stubs landed, **14** now.
+`SnakeQuantizer`, `Thought` and `Ring` are implemented and tested; everything
+else is a stub.** Each unimplemented field shows up as a `CS0169` build
+warning, so the count is a rough progress bar — 27 when the stubs landed,
+**13** now.
 
-**56 tests pass, and fifteen mutations have been run to confirm they bite.** A
-test has proved nothing until it has been seen to fail for the right reason.
+**66 tests pass, and twenty-two mutations have been run to confirm they bite.**
+A test has proved nothing until it has been seen to fail for the right reason.
+
+**Three mutations SURVIVED on `Ring`, and all three are recorded rather than
+hidden** — a surviving mutation marks a vacuous region of the test set, and
+pretending otherwise is worse than the gap.
 
 | Mutation | Caught by |
 |---|---|
@@ -29,6 +34,18 @@ test has proved nothing until it has been seen to fail for the right reason.
 | another broadcast's accounting is accepted | broadcast-refused |
 | release keeps the state | releasing-drops-state |
 | ties ignore chain length | tie-breaks-on-shorter |
+| the ring becomes a modulo | only-its-own-codes-move |
+| the splitmix finaliser is removed | adjacent-codes-do-not-land-together |
+| `Leave` does nothing | departed-codes-do-move |
+| the seed is dropped from cluster placement | a-different-seed-places-codes |
+
+**Survived, on `Ring`:**
+
+| Mutation | Why it survives |
+|---|---|
+| the seed is dropped from the code hash | **Fixed.** The seed was folded into *both* the code hash and cluster placement, and each covered for the other — removing either alone changed no answer. One implementation per behaviour, so it now lives on cluster placement alone, where a mutation does bite. |
+| the address tie-break is removed | Only reachable on a 64-bit collision between two cluster points, which no test produces. Kept because `List.Sort` is unstable, so a collision would otherwise let insertion order reach the answer. **A claim about improbability, not about tested behaviour.** |
+| the `Join` idempotence guard is removed | Joining twice re-adds the same points at the same positions, so no lookup changes its answer. The guard saves memory, not correctness, and no test can see it. |
 
 Scope: **snake**, running on one machine, with every boundary shaped so the
 same code runs across many. Static background is out of scope for now — see
@@ -203,6 +220,14 @@ directory and nobody to ask.**
 - **`Join(address)`**, **`Leave(address)`** — membership changes as machines
   arrive and vanish.
 - **`Clusters`** — the current membership view.
+- **`replicas`** is a constructor argument with no default: how many points
+  each cluster occupies on the ring, and **the dial that decides how evenly
+  load falls**. Measured over 8 clusters and 20,000 codes against an even
+  2,500 — `16`: 2035–3448, `64`: 1837–3152, `256`: 2230–2883, `1024`:
+  2449–2617. So the dial is real, and 64 is not a good value for it.
+- **Only the departed cluster's codes move** when one leaves, and everything
+  that moves when one arrives moves *to* it — both asserted, and they are the
+  whole reason for a ring rather than a modulo.
 
 **Views differ between machines while membership is changing, and that is
 allowed.** A misrouted message is a lost count, not a corruption — the

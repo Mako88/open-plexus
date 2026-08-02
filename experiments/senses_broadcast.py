@@ -60,7 +60,8 @@ import numpy as np  # noqa: E402
 from experiments.surfaces_pipeline import (ARM, NOISE, Words,  # noqa: E402
                                            quantise, read_corpus, renderings,
                                            stream)
-from openplexus.broadcast import COSTS, REFUELS, flood  # noqa: E402
+from openplexus.broadcast import (COSTS, REFUELS, VALUES,  # noqa: E402
+                                  flood)
 from openplexus.grounding import STATISTICS, equivalence_classes  # noqa: E402
 from openplexus.surfaces import purity  # noqa: E402
 from openplexus.tasks import written  # noqa: E402
@@ -72,14 +73,26 @@ ARMS = ("classes", "flood-one", "flood-many")
 OCCASIONS = 200
 
 
-def reached_audio(reached, codes: int, audio_major, digit: int):
-    """Of the audio codes in `reached`, how many arrived and how many agree."""
-    arrived = agreed = 0
-    for surface in reached:
-        if codes <= surface < 2 * codes:
-            arrived += 1
-            agreed += audio_major.get(surface - codes) == digit
-    return arrived, agreed
+def reached_audio(reached, codes: int, audio_major, digit: int,
+                  top: int | None = None):
+    """Of the audio codes reached, how many arrived and how many agree.
+
+    **`top` is what makes this able to see a RANKING.** Without it this is a
+    set statistic: it counts membership and is completely blind to what any
+    arrival scored. A valuation rule that reorders every candidate without
+    changing which ones are reachable would move it by exactly nothing — which
+    is what happened when `lift` was first measured against `strength` and the
+    numbers barely moved.
+
+    With `top`, only the best `top` audio codes by score are counted, so a rule
+    that puts the right ones first is visible and one that does not is too.
+    """
+    audio = [s for s in reached if codes <= s < 2 * codes]
+    if top is not None and isinstance(reached, dict):
+        audio.sort(key=lambda s: (-reached[s].score, s))
+        audio = audio[:top]
+    agreed = sum(audio_major.get(s - codes) == digit for s in audio)
+    return len(audio), agreed
 
 
 def main() -> int:
@@ -110,6 +123,15 @@ def main() -> int:
     # the unlikely, which is decision 4's "walk toward surprise" in the only
     # form a broadcast can express it.
     parser.add_argument("--refuel", choices=REFUELS, default="strength")
+    # How an ARRIVAL is valued, which is not how a route is funded. `lift`
+    # funds on strength and values on rarity -- grounded routes, unexpected
+    # destinations.
+    parser.add_argument("--value", choices=VALUES, default="strength")
+    # How many of the best-scoring arrivals are counted. **Without this the
+    # score is not measured at all** -- agreement over the whole reached SET is
+    # blind to any reordering. Chosen here as a handful, which is what an
+    # answer would be.
+    parser.add_argument("--top", type=int, default=5)
     # A SAFETY, not part of the design, and chosen here as what returns in
     # about a minute per arm. `gave_up` reports how often it fired, because a
     # walk that gave up looks exactly like one that finished.
@@ -183,13 +205,15 @@ def main() -> int:
                                 for local in words.per_occasion[position]]
                 result = flood(index, statistic, origins,
                                stamina=args.stamina, cost=args.cost,
-                               refuel=args.refuel, combine="forward",
+                               refuel=args.refuel, value=args.value,
+                               combine="forward",
                                ceiling=args.ceiling)
                 messages += result.messages
                 busiest = max(busiest, result.busiest())
                 quit_early += result.gave_up
                 got = result.reached
-            here, same = reached_audio(got, codes, audio_major, digit)
+            here, same = reached_audio(got, codes, audio_major, digit,
+                                       args.top)
             arrived += here
             agreed += same
         row = {"arm": arm,

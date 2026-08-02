@@ -128,6 +128,29 @@ COSTS = ("constant", "local", "best")
 #: routes through coincidence. That is the thing to measure, not to assume away.
 REFUELS = ("strength", "surprise")
 
+#: How an arrival is VALUED, which is a different question from how a route is
+#: funded. John's design, 2026-08-02: *"we need to find some balance of
+#: following surprise and reasoning ... 'Aha!' moments, but those moments need
+#: to be grounded in logical connections."*
+#:
+#: - `strength` values an arrival by the accumulated path strength, so the best
+#:   answer is the best-supported one and can only ever be the expected one.
+#: - `lift` divides that by how prevalent the endpoint is on its own. A route
+#:   that is confident AND lands somewhere rare scores high; one that lands on
+#:   the ever-present background scores low however strong it was.
+#:
+#: **This is what refuelling on surprise got backwards.** Paying a route for
+#: walking unlikely edges lets noise stay solvent. Funding on STRENGTH and
+#: valuing on RARITY keeps every surviving route grounded and then asks which
+#: of them arrived somewhere unexpected — which is the shape John described.
+#:
+#: **And it is C1-legal where `ppmi` is not.** PPMI divides by the global
+#: occasion total, which no node can know. That total is the same for every
+#: candidate, so it CANCELS IN A RANKING — `seen(endpoint)` alone is one node's
+#: own marginal, and ordering by `strength / seen(endpoint)` orders identically
+#: to ordering by lift over the true prior.
+VALUES = ("strength", "lift")
+
 #: How a candidate accumulates evidence from the routes reaching it. `sum` is
 #: what pays on the typed walk, 0.1234 against `max`'s 0.0834, and the reason is
 #: the claim being made here: many weak agreeing routes should outrank one
@@ -195,7 +218,7 @@ class Flood:
 def flood(index: CoOccurrence, statistic: Statistic, origins,
           *, stamina: float = 1.0, cost: str = "local",
           charge: float = 0.0, combine: str = "forward",
-          refuel: str = "strength",
+          refuel: str = "strength", value: str = "strength",
           accumulate: str = "sum", ceiling: int = 1_000_000) -> Flood:
     """Broadcast `origins` and return everything the graph carried them to.
 
@@ -237,6 +260,8 @@ def flood(index: CoOccurrence, statistic: Statistic, origins,
         raise ValueError(f"cost must be one of {COSTS}")
     if refuel not in REFUELS:
         raise ValueError(f"refuel must be one of {REFUELS}")
+    if value not in VALUES:
+        raise ValueError(f"value must be one of {VALUES}")
     if accumulate not in ACCUMULATORS:
         raise ValueError(f"accumulate must be one of {ACCUMULATORS}")
     if cost == "local" and charge:
@@ -298,6 +323,11 @@ def flood(index: CoOccurrence, statistic: Statistic, origins,
                     continue
                 onward = chain + (other,)
                 travelled = carried * weight
+                if value == "lift":
+                    # Rare endpoints are worth more. The global occasion total
+                    # PPMI needs is a constant across candidates, so it cancels
+                    # and never has to be known.
+                    travelled /= max(index.seen(other), 1.0)
                 arrived = result.reached.get(other)
                 if arrived is None:
                     result.reached[other] = Arrival(

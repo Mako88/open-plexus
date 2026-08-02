@@ -98,14 +98,46 @@ class CoOccurrence:
         occasions: How many moments have been observed.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, half_life: float | None = None) -> None:
+        """
+        Args:
+            half_life: Occasions after which an untouched count is worth half.
+                **`None` is no decay and is the default**, so every result
+                measured before this existed is reproducible unchanged.
+
+                The clock is `tick`, which counts occasions observed **at this
+                node** — not wall time and not a global total. A node nobody
+                talks to should not forget what it knows because the rest of the
+                world got busy, and a global clock is the collective C1 forbids.
+        """
         # ONE INSTANCE, COUNTED. `wiring.expect(graph=1)` is how a run states
         # that it uses a single shared graph, and three separate ones existed
         # here for as long as anyone can tell because nobody counted.
         wiring.touch("graph")
+        if half_life is not None and half_life <= 0:
+            raise ValueError("a half-life must be positive; zero would erase "
+                             "every count at the moment it was written")
         self.occasions = 0
-        self._seen: dict[int, int] = {}
-        self._pairs: dict[int, dict[int, int]] = {}
+        self.tick = 0
+        self.half_life = half_life
+        self._retain = None if half_life is None else 0.5 ** (1.0 / half_life)
+        # Each cell is `[value, tick it was last brought forward to]`. A list
+        # rather than a tuple so ageing is in place: this is the hot path.
+        self._seen: dict[int, list] = {}
+        self._pairs: dict[int, dict[int, list]] = {}
+
+    def _age(self, cell: list) -> float:
+        """Bring one count forward to now. **The only place decay happens.**
+
+        A count is the sum over its observations of `retain ** (now - then)`, and
+        ageing on touch computes exactly that incrementally: age to the current
+        tick, then add. Sweeping every cell would give the same numbers and is
+        not affordable on billions of edges.
+        """
+        if self._retain is not None and cell[1] != self.tick:
+            cell[0] *= self._retain ** (self.tick - cell[1])
+            cell[1] = self.tick
+        return cell[0]
 
     def observe(self, surfaces: Iterable[int]) -> None:
         """Record one moment: everything present met everything else present.
@@ -144,6 +176,7 @@ class CoOccurrence:
         cannot work"* is a measurement rather than an argument.
         """
         self.occasions += 1
+        self.tick += 1
 
     def note(self, surface: int) -> None:
         """Record that a surface was present, without any partner.
@@ -154,7 +187,12 @@ class CoOccurrence:
         halves must stay in ONE implementation or the two paths drift and every
         chance-corrected statistic silently uses a different denominator on each.
         """
-        self._seen[surface] = self._seen.get(surface, 0) + 1
+        cell = self._seen.get(surface)
+        if cell is None:
+            self._seen[surface] = [1.0, self.tick]
+        else:
+            self._age(cell)
+            cell[0] += 1.0
         self._pairs.setdefault(surface, {})
 
     def pair(self, one: int, other: int) -> None:
@@ -181,7 +219,12 @@ class CoOccurrence:
                 "a surface cannot be its own partner; counting one would make "
                 "every statistic read its own presence as evidence")
         row = self._pairs.setdefault(surface, {})
-        row[other] = row.get(other, 0) + 1
+        cell = row.get(other)
+        if cell is None:
+            row[other] = [1.0, self.tick]
+        else:
+            self._age(cell)
+            cell[0] += 1.0
 
     def surfaces(self) -> list[int]:
         """Every surface seen at least once, in ascending order."""
@@ -199,17 +242,78 @@ class CoOccurrence:
         """
         return sorted(set(self._seen) | set(self._pairs))
 
-    def seen(self, surface: int) -> int:
-        """How many occasions a surface was present on."""
-        return self._seen.get(surface, 0)
+    def seen(self, surface: int) -> float:
+        """How many occasions a surface was present on, decayed to now.
 
-    def together(self, one: int, other: int) -> int:
-        """How many occasions two surfaces were both present on."""
-        return self._pairs.get(one, {}).get(other, 0)
+        A float because decay makes it one. With `half_life=None` every value
+        is a whole number and every earlier comparison holds exactly.
+        """
+        cell = self._seen.get(surface)
+        return self._age(cell) if cell is not None else 0
+
+    def together(self, one: int, other: int) -> float:
+        """How many occasions two surfaces were both present on, decayed to now."""
+        cell = self._pairs.get(one, {}).get(other)
+        return self._age(cell) if cell is not None else 0
 
     def partners(self, surface: int) -> list[int]:
         """Every surface ever seen alongside this one, in ascending order."""
         return sorted(self._pairs.get(surface, {}))
+
+    def weakest(self, count: int) -> list[int]:
+        """The `count` surfaces holding the least decayed evidence.
+
+        **The eviction order is memory pressure, not importance.** A surface
+        seen twice and both times decisive is worth keeping; what this ranks is
+        how little is left of it, so a machine under pressure sheds what has
+        already faded rather than what looks unimportant. That distinction is
+        what keeps this out of decision 2's ruled-out cutting rules, which
+        evicted the word that named the concept.
+
+        Ties break on the surface id so two runs agree exactly.
+        """
+        if count < 0:
+            raise ValueError("cannot evict a negative number of surfaces")
+        return sorted(self.rows(),
+                      key=lambda surface: (self.seen(surface), surface))[:count]
+
+    def evict(self, surface: int) -> dict:
+        """Remove one surface's row and hand back everything held about it.
+
+        **This is a move to another store, not a deletion**, and the caller is
+        expected to write the return value somewhere. What is returned is enough
+        to restore the surface exactly: its own marginal and every partner count
+        in its row, all decayed to now so the archive holds settled numbers
+        rather than numbers that keep needing a clock.
+
+        Only THIS surface's row goes. Other surfaces' rows may still name it as
+        a partner, and that is correct rather than a leak: in the sharded
+        arrangement those rows belong to other owners and writing them is the
+        step C1 forbids.
+        """
+        held = {"seen": self.seen(surface),
+                "row": {other: self.together(surface, other)
+                        for other in self.partners(surface)}}
+        self._seen.pop(surface, None)
+        self._pairs.pop(surface, None)
+        return held
+
+    def reinstate(self, surface: int, held: dict, boost: float = 1.0) -> None:
+        """Load an archived surface back, with its edges and a boost.
+
+        Args:
+            boost: What the restored counts are multiplied by. **The default is
+                1.0, which is exact restoration and which thrashes**: a surface
+                evicted for being faint comes back just as faint and is the
+                weakest thing again immediately. A boost above 1 is hysteresis,
+                and it is also what makes something recently needed easier to
+                reach again.
+        """
+        if boost <= 0:
+            raise ValueError("a boost of zero reinstates nothing")
+        self._seen[surface] = [held["seen"] * boost, self.tick]
+        self._pairs[surface] = {other: [value * boost, self.tick]
+                                for other, value in held["row"].items()}
 
 
 #: A statistic scores a candidate neighbour `other` of `surface`. Higher is a

@@ -24,6 +24,36 @@ exists, so the ranking step has a mechanism for the first time.
 produced results. The objection stands: counting needs recurrence and ARC
 withholds it by design.
 
+## THE GAP JOHN FOUND: nothing in this design wants anything
+
+His question, 2026-08-02: is there any reason to pursue the fruit? **There is
+not.** `food` is a column measuring an accident — `committed` eats the most (52)
+because it blunders furthest, not because it is trying.
+
+**A score and an energy are different things and only one is foreign here.** A
+score is external: something outside decides what is good and tells the system.
+An energy depletes and food restores it, and nothing says being full is good —
+it is a SENSATION, an interoceptive channel like `ate` and `died`.
+
+**But energy alone still supplies no preference.** A system that feels hunger
+and predicts it perfectly is indifferent to being hungry; a perfect predictor is
+content in any state it can foresee. Only three honest sources exist:
+
+- **External reward** — rejected by the design.
+- **Homeostasis with real consequences** — if running out ENDS the stream, then
+  policies that do not eat generate less experience. That is selection, not
+  preference. **It does not exist here**: death resets and the run continues, so
+  there is no pressure at all. It would need a run that can genuinely end, or a
+  population.
+- **Curiosity** — an intrinsic preference for learning. Built, measured, and it
+  loses to random in every form tried.
+
+**Recommended, and not built**: energy as an input-only channel, because
+hunger correlates with time-since-food and that is predictable structure, which
+is what this system eats. **Not a score.** And "does it pursue the fruit" stays
+the wrong question until something supplies preference — the right one is "does
+it learn the world", which held-out prediction already measures.
+
 ## The live thread: columns that can read each other
 
 **What was refuted is INDEPENDENT columns.** Nine overlapping 3×3 windows on

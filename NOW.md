@@ -24,6 +24,18 @@ arithmetic. The seed spreads reported all session, 0.038 to 0.330, are its
 signature, and every senses measurement is null where every snake measurement
 works. **Nothing has been re-run.**
 
+## THE POWERED RE-RUN IS IN FLIGHT — `out/powered-rerun.txt`
+
+Six runs at 1,000 questions, `lsh` and `kmeans`, three seeds each. First cell
+in: under `lsh`, `flood-one` 0.0871 and `flood-many` 0.1066 against a chance of
+0.108, with `classes` reaching 0.03 audio surfaces per question. Still null
+under the hash, which is what the front-end finding predicts. **The `kmeans`
+half is where the question is actually answered** and has not run yet.
+
+`flood-many` costs 411s per seed at this size and gives up on 0.999 of
+questions, so its budget is wrong for a graph this dense and that is a separate
+thing to fix.
+
 ## THREE REFUTATIONS TO RE-RUN, and they are all the broadcast
 
 John's question: what did we abandon on a failed test that may now be
@@ -84,25 +96,16 @@ throughout as though it added evidence.
 Left: conditioning on a SUMMARY of the neighbours rather than one, which is
 what would let a column read more than the direction it is heading.
 
-## Snake: built, two gaps
+## Snake: no multimodality yet (vision, plus hearing in `snake_hearing.py`;
+action and interoception designed, not built), and nothing beats random play.
 
-- **No multimodality yet.** Vision, plus hearing in `snake_hearing.py`. Action
-  and interoception are designed as their own kinds in one `SharedGraph` and
-  are not built.
-- **Nothing beats random play.** Five policies tried.
+## Prediction: two holes open
 
-## Prediction: built, two holes open
-
-`openplexus/prediction.py`, prequential. Results in the README and
-`out/snake-prediction.json`.
-
-- **Prediction error does not drive the asking yet.** The asking budget is
-  still a fixed fraction.
-- **Automatic dial tuning is designed and not built.** A node scoring a small
-  set of candidate values for its own dial, prequentially, against its own
-  prediction error — C1-legal because local, C4-legal because it never ends.
-  **Named risk**: a system minimising surprise can win by never looking at
-  anything surprising, so error must be scored per observation MADE.
+- **Prediction error does not drive the asking yet.** Still a fixed fraction.
+- **Automatic dial tuning is designed and not built.** A node scoring candidate
+  values for its own dial against its own prediction error — local, so C1-legal;
+  never ending, so C4-legal. **Named risk**: minimising surprise can be won by
+  never looking at anything surprising, so score error per observation MADE.
 
 ## Forgetting: built, one half untested
 

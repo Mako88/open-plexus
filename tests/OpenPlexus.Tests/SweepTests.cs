@@ -9,8 +9,11 @@ namespace OpenPlexus.Tests;
 /// </summary>
 public sealed class SweepTests
 {
+    // PINNED TO THE ABSOLUTE ARM. Every number recorded against these tests was
+    // measured before the view rotated, and re-measuring on the relative arm is
+    // its own step rather than something these should drift into.
     private static Task<SweepRow> Run(int horizon, bool includeEmpty, int seed = 1) =>
-        Sweep.OnceAsync(horizon, includeEmpty, StepCost.Best, seed, steps: 40);
+        Sweep.OnceAsync(horizon, includeEmpty, StepCost.Best, seed, steps: 40, relative: false);
 
     [Fact]
     public async Task The_horizon_is_what_bounds_the_flood()
@@ -55,17 +58,19 @@ public sealed class SweepTests
     }
 
     [Fact]
-    public async Task Nothing_has_eaten_anything_yet()
+    public async Task The_absolute_arm_runs_are_far_too_short_to_say_anything()
     {
-        // Recorded as a fact rather than left to be discovered later. Across the
-        // whole grid — four horizons, both front ends, three seeds — the fruit
-        // count was zero every time. There is no evidence of competent play
-        // here and this test exists so that claim cannot quietly be made.
-        var rows = await Sweep.GridAsync([2], [true, false], [StepCost.Best], [1, 2, 3], steps: 40);
+        // THIS USED TO ASSERT NOBODY EVER ATE, which was a sample-size artefact
+        // dressed as a property — see the same correction in PolicyTests.
+        // What is honest and stable about this arm is that its runs end almost
+        // immediately, because one move in four reverses into the neck and
+        // kills the snake outright.
+        var rows = await Sweep.GridAsync(
+            [2], [true, false], [StepCost.Best], [1, 2, 3], steps: 40, relative: false);
 
-        Assert.All(rows, row => Assert.Equal(0, row.Result.Ate));
-
-        // And the runs are far too short for that to be surprising.
         Assert.All(rows, row => Assert.True(row.Result.Steps < 20));
+
+        // The companion: they did run, so the bound above is not vacuous.
+        Assert.Contains(rows, row => row.Result.Steps > 1);
     }
 }

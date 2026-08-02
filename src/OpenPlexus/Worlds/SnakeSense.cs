@@ -16,8 +16,15 @@ public sealed record SnakeFrame
 {
     public required SnakeView View { get; init; }
 
-    /// <summary>What was done to get here. Null on the very first frame.</summary>
-    public required SnakeAction? Did { get; init; }
+    /// <summary>
+    /// The code for what was done to get here. Null on the very first frame.
+    /// </summary>
+    /// <remarks>
+    /// A <see cref="Code"/> rather than an action, so the same front end serves
+    /// both action vocabularies — absolute directions and relative turns —
+    /// without knowing which is in use.
+    /// </remarks>
+    public required Code? Did { get; init; }
 }
 
 /// <summary>
@@ -38,17 +45,38 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
 
     public SnakeSense(bool includeEmpty) => _vision = new SnakeQuantizer(includeEmpty);
 
-    /// <summary>The four codes an action can be. What an output machine offers.</summary>
+    /// <summary>Where the turn codes start, clear of the four direction codes.</summary>
+    private const ulong Turning = 16;
+
+    /// <summary>The four codes an absolute action can be.</summary>
     public static IReadOnlyList<Code> Actions { get; } =
         [.. Enum.GetValues<SnakeAction>().Select(Encode)];
 
+    /// <summary>
+    /// The three codes a turn can be. <b>Three, not four</b> — Back does not
+    /// exist, so an output machine cannot offer it.
+    /// </summary>
+    public static IReadOnlyList<Code> Turns { get; } =
+        [.. Enum.GetValues<Turn>().Select(Encode)];
+
     /// <summary>The code for one action. A fixed transform, so every machine agrees.</summary>
     public static Code Encode(SnakeAction action) => new(Proprioception, (ulong)action);
+
+    /// <summary>The code for one turn. Kept clear of the direction codes.</summary>
+    public static Code Encode(Turn turn) => new(Proprioception, Turning + (ulong)turn);
 
     /// <summary>The action a code means, if it means one at all.</summary>
     public static SnakeAction? Decode(Code code) =>
         code.Modality == Proprioception && code.Value <= (ulong)SnakeAction.West
             ? (SnakeAction)code.Value
+            : null;
+
+    /// <summary>The turn a code means, if it means one at all.</summary>
+    public static Turn? Turned(Code code) =>
+        code.Modality == Proprioception
+        && code.Value >= Turning
+        && code.Value <= Turning + (ulong)Turn.Right
+            ? (Turn)(code.Value - Turning)
             : null;
 
     /// <inheritdoc/>
@@ -60,7 +88,7 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
         ArgumentNullException.ThrowIfNull(frame);
 
         var codes = new List<Code>(_vision.Codify(frame.View));
-        if (frame.Did is { } did) codes.Add(Encode(did));
+        if (frame.Did is { } did) codes.Add(did);
         return codes;
     }
 }

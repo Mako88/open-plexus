@@ -171,7 +171,7 @@ public sealed class SnakeRunTests
         var sense = new SnakeSense(includeEmpty: true);
 
         var without = sense.Codify(new SnakeFrame { View = view, Did = null });
-        var with = sense.Codify(new SnakeFrame { View = view, Did = SnakeAction.East });
+        var with = sense.Codify(new SnakeFrame { View = view, Did = SnakeSense.Encode(SnakeAction.East) });
 
         // An action code only gets edges if it is present alongside what was
         // seen; without that no walk can ever reach one.

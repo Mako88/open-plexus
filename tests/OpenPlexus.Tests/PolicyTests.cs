@@ -13,6 +13,12 @@ public sealed class PolicyTests
     private static SnakeSettings World() => new()
     {
         Width = 15, Height = 15, Sight = 1,
+
+        // PINNED TO THE ABSOLUTE ARM. Every number recorded against these tests
+        // was measured before the view rotated, and fork 10 gets re-measured on
+        // the relative arm as its own step rather than by these drifting under
+        // it.
+        Relative = false,
         StartingEnergy = 60.0, EnergyPerStep = 1.0, EnergyPerFood = 30.0,
     };
 

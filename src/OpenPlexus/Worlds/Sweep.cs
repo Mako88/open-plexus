@@ -49,6 +49,7 @@ public static class Sweep
         StepCost cost,
         int seed,
         int steps,
+        bool relative = true,
         CancellationToken ct = default)
     {
         var world = new SnakeSettings
@@ -56,6 +57,7 @@ public static class Sweep
             Width = 15,
             Height = 15,
             Sight = 1,
+            Relative = relative,
             StartingEnergy = 60.0,
             EnergyPerStep = 1.0,
             EnergyPerFood = 30.0,
@@ -96,6 +98,7 @@ public static class Sweep
         IReadOnlyCollection<StepCost> costs,
         IReadOnlyCollection<int> seeds,
         int steps,
+        bool relative = true,
         CancellationToken ct = default)
     {
         var rows = new List<SweepRow>();
@@ -104,7 +107,7 @@ public static class Sweep
             foreach (var empty in includeEmpty)
                 foreach (var horizon in horizons)
                     foreach (var seed in seeds)
-                        rows.Add(await OnceAsync(horizon, empty, cost, seed, steps, ct)
+                        rows.Add(await OnceAsync(horizon, empty, cost, seed, steps, relative, ct)
                             .ConfigureAwait(false));
 
         return rows;

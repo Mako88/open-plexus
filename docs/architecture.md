@@ -443,11 +443,32 @@ Recorded here so a decision does not go quiet.
     every move to be random — so it can never say whether the chain helps.
     `Policy` exists to change one thing.
 
-9. **Random play dies in about five steps**, because the four actions are
-   absolute directions and reversing into the neck is instantly fatal. That is
-   the floor everything gets compared against, so it needs to be understood
-   before any number is read: a run that ends at step 5 has almost no
-   experience in it.
+9. **✅ ANSWERED BY RELATIVE INPUTS, 2026-08-02.** Random play died in about
+   five steps because the four actions were absolute directions and reversing
+   into the neck is instantly fatal — one move in four killed the snake at
+   once. **The view now rotates with the snake's heading and actions become
+   Ahead / Left / Right, so Back is not an action that exists.** It falls out
+   of the coordinate system rather than being a rule bolted on.
+
+   **Measured, 200 seeds, inverse cost, horizon 50:**
+
+   | arm | policy | mean steps | se | past 20 steps | fruit |
+   |---|---|---|---|---|---|
+   | absolute | chain | 6.530 | 0.416 | 2 / 200 | 9 |
+   | absolute | random | 3.990 | 0.272 | 3 / 200 | 0 |
+   | **relative** | **chain** | **51.260** | 1.009 | **189 / 200** | 18 |
+   | **relative** | random | 33.705 | 1.153 | 145 / 200 | 22 |
+
+   **Runs are about eight times longer**, and the recurrence the rotation was
+   supposed to buy shows up too: new nodes per step fall from **0.98 to 0.19**,
+   so a code is seen about five times as often before a run ends.
+
+   **Two cautions before anyone reads the chain column as a result.** The chain
+   arm's maximum is 60, which is exactly the starting energy — those runs are
+   **censored by the energy cap**, not by dying, so 51.260 is a lower bound.
+   And random ate *more* fruit than the chain did (22 against 18), so surviving
+   longer and eating are not the same thing here. Fork 10 gets re-measured on
+   this arm as its own step.
 
 11. **THE OUTPUT MACHINE IS NOT ADDRESSED — design and code diverge here.**
     The design says *a machine broadcasts an input carrying the id of the

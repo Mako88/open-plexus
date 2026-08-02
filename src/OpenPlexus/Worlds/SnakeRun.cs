@@ -152,6 +152,7 @@ public sealed class SnakeRun : IDisposable
     private readonly Snake _snake;
     private readonly Random _fallback;
     private readonly List<Exception> _faults = [];
+    private readonly bool _relative;
 
     /// <param name="includeEmpty">
     /// Whether an empty cell emits a code. <b>Defaults to false — John's call,
@@ -201,7 +202,10 @@ public sealed class SnakeRun : IDisposable
             dials);
 
         _handles.Add(_bus.Subscribe(_eye));
-        _hand = new OutputMachine(new MachineAddress("hand"), SnakeSense.Actions);
+        _relative = world.Relative;
+        _hand = new OutputMachine(
+            new MachineAddress("hand"),
+            _relative ? SnakeSense.Turns : SnakeSense.Actions);
     }
 
     /// <summary>Plays until the run ends or the step budget runs out.</summary>
@@ -223,7 +227,7 @@ public sealed class SnakeRun : IDisposable
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(steps);
 
-        SnakeAction? did = null;
+        Code? did = null;
         int taken = 0, byChain = 0, reachedNothing = 0, silent = 0, ate = 0, echoed = 0;
         long halted = 0;
         var unbalanced = 0;
@@ -251,22 +255,22 @@ public sealed class SnakeRun : IDisposable
 
             if (policy != Policy.Chain) chosen = null;
 
-            SnakeAction action;
-            if (chosen is { } code && SnakeSense.Decode(code) is { } meant)
+            Code? meant = chosen is { } code && Understood(code) ? code : null;
+
+            Code doing;
+            if (meant is { } picked)
             {
                 byChain++;
-                if (did == meant) echoed++;
-                action = meant;
+                if (did == picked) echoed++;
+                doing = picked;
             }
             else
             {
-                action = policy == Policy.Repeat && did is { } last
-                    ? last
-                    : (SnakeAction)_fallback.Next(4);
+                doing = policy == Policy.Repeat && did is { } last ? last : Anything();
             }
 
-            _snake.Step(action);
-            did = blind ? null : action;
+            Perform(doing);
+            did = blind ? null : doing;
 
             if (_snake.Alive && _snake.Energy > before) ate++;
         }
@@ -289,6 +293,21 @@ public sealed class SnakeRun : IDisposable
             EchoedLast = echoed,
             Unbalanced = unbalanced,
         };
+    }
+
+    /// <summary>Whether a code names something this world can actually do.</summary>
+    private bool Understood(Code code) =>
+        _relative ? SnakeSense.Turned(code) is not null : SnakeSense.Decode(code) is not null;
+
+    /// <summary>A move nobody reasoned about. The floor everything is measured against.</summary>
+    private Code Anything() => _relative
+        ? SnakeSense.Encode((Turn)_fallback.Next(3))
+        : SnakeSense.Encode((SnakeAction)_fallback.Next(4));
+
+    private void Perform(Code code)
+    {
+        if (_relative) _snake.Steer(SnakeSense.Turned(code)!.Value);
+        else _snake.Step(SnakeSense.Decode(code)!.Value);
     }
 
     private void Failures()

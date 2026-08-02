@@ -13,6 +13,10 @@ public sealed class SnakeTests
         Width = 21,
         Height = 21,
         Sight = sight,
+
+        // These tests are about absolute movement and an unrotated view, so
+        // they say so rather than riding on whatever the default happens to be.
+        Relative = false,
         StartingEnergy = energy,
         EnergyPerStep = 1.0,
         EnergyPerFood = perFood,

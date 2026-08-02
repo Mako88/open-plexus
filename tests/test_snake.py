@@ -12,7 +12,7 @@ import random
 import unittest
 
 from openplexus.tasks.snake import (ACTIONS, BODY, EMPTY, FOOD, WALL,
-                                    Snake)
+                                    Snake, patches)
 
 
 class TheViewIsCentredSoSituationsRecur(unittest.TestCase):
@@ -159,3 +159,34 @@ class ArgumentsAreRefused(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PatchesCutTheViewIntoOverlappingWindows(unittest.TestCase):
+    """Many surfaces per input rather than one, which a grid supplies free."""
+
+    def test_a_five_wide_view_gives_nine_three_wide_windows(self):
+        world = Snake(width=12, height=12, sight=2, seed=0)
+        self.assertEqual(len(patches(world.view(), 3)), 9)
+
+    def test_each_window_holds_its_own_cells(self):
+        view = tuple(range(25))
+        got = patches(view, 3)
+        self.assertEqual(got[0], (0, 1, 2, 5, 6, 7, 10, 11, 12))
+        self.assertEqual(got[-1], (12, 13, 14, 17, 18, 19, 22, 23, 24))
+
+    def test_the_windows_overlap(self):
+        """Which is what stops a moving feature vanishing between them."""
+        got = patches(tuple(range(25)), 3)
+        self.assertTrue(set(got[0]) & set(got[1]))
+
+    def test_a_window_the_size_of_the_view_is_the_view(self):
+        view = tuple(range(9))
+        self.assertEqual(patches(view, 3), [view])
+
+    def test_a_view_that_is_not_square_is_refused(self):
+        with self.assertRaises(ValueError):
+            patches((1, 2, 3, 4, 5), 2)
+
+    def test_a_window_larger_than_the_view_is_refused(self):
+        with self.assertRaises(ValueError):
+            patches(tuple(range(9)), 4)

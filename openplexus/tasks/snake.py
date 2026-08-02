@@ -63,6 +63,29 @@ ACTIONS = ((0, -1), (0, 1), (-1, 0), (1, 0))
 EMPTY, WALL, BODY, FOOD = 0, 1, 2, 3
 
 
+def patches(view: tuple[int, ...], side: int = 3) -> list[tuple[int, ...]]:
+    """Cut a square view into every overlapping `side` x `side` window.
+
+    **Many surfaces per input rather than one**, which decision 1 records as
+    open and which a grid supplies for free where a spectrogram does not. It is
+    also the shape the cortical-column story describes — small units each seeing
+    a slice — and that is the reason this arm exists, not evidence that it works.
+
+    A patch sees less than the whole view, so its own next state can depend on
+    something outside it. That is real partial observability INSIDE the system
+    and it is the reason this can lose rather than only win.
+    """
+    width = int(len(view) ** 0.5)
+    if width * width != len(view):
+        raise ValueError(f"a view of {len(view)} cells is not square")
+    if not 1 <= side <= width:
+        raise ValueError(f"a {side}x{side} patch does not fit a {width}-wide view")
+    return [tuple(view[(top + dy) * width + left + dx]
+                  for dy in range(side) for dx in range(side))
+            for top in range(width - side + 1)
+            for left in range(width - side + 1)]
+
+
 @dataclass
 class Step:
     """One transition, and everything needed to score a prediction of it.

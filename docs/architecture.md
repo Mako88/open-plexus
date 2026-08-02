@@ -381,9 +381,44 @@ Recorded here so a decision does not go quiet.
    NOT a candidate** — capping how many partners are considered is already ❌
    on `master` as "a constant nobody set on purpose, doing the cutting".
 
-10. **DOES THE CHAIN DO ANYTHING? Re-measured 2026-08-02 after the origin
-    became a broadcast**, because every earlier number described code that no
-    longer exists. 200 seeds, 300-step budget, `Horizon = 4`, empty cells
+10. **DOES THE CHAIN DO ANYTHING? Re-measured 2026-08-02 on the relative arm,
+    where runs are long enough to ask.** 200 seeds, inverse cost, horizon 50,
+    1,000-step budget. `starved` means the energy ran out; `collided` means it
+    hit something.
+
+    | energy | policy | mean | se | max | starved | collided | fruit |
+    |---|---|---|---|---|---|---|---|
+    | 60 | chain | 51.05 | 1.01 | **60** | 124 | 76 | 15 |
+    | 60 | random | 33.70 | 1.15 | 77 | 25 | 175 | 22 |
+    | 60 | repeat | 42.01 | 1.76 | **60** | 131 | 69 | 2 |
+    | 200 | chain | 92.85 | 4.06 | 209 | 18 | 182 | **40** |
+    | 200 | random | 37.41 | 1.76 | 142 | 0 | 200 | 25 |
+    | 200 | **repeat** | **133.71** | 6.47 | 200 | 131 | 69 | **2** |
+
+    **At 60 energy the chain and repeat arms were censored** — their maxima are
+    exactly the starting energy, so those runs ended at the cap rather than in
+    the world and no mean taken there measured anything. Everything below is
+    read off the 200-energy rows.
+
+    **SURVIVAL IS THE WRONG METRIC, and this is the finding.** Repeating a turn
+    under relative actions is a tight circle the snake can hold forever, so it
+    outlives every other arm — 133.71 against the chain's 92.85, about five
+    standard errors — and eats **two** fruit in 200 runs against the chain's
+    forty. The arm that survives longest is the one that achieves least.
+
+    **What the chain does have:** it outlives random by about twelve standard
+    errors, and it eats more than either other arm in absolute terms.
+
+    **What it does not:** per step alive, random eats MORE — 0.0033 fruit per
+    step against the chain's 0.0022. So the chain buys survival, not appetite.
+
+    **And its behaviour is mostly momentum.** 5,865 of 7,692 chain-chosen moves
+    repeated the last action — **76%**, against 33% by chance over three turns.
+    Under absolute actions that figure was 36%. So on this arm the chain is
+    behaving like a noisy version of the arm that beats it.
+
+    **No arm dominates**, and the honest next question is what to score. Fruit
+    per step alive is the only column so far that is not won by standing still. 200 seeds, 300-step budget, `Horizon = 4`, empty cells
     withheld. The graph learns identically under all three arms; only the
     choice differs.
 

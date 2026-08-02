@@ -253,6 +253,8 @@ Recorded here so a decision does not go quiet.
    **His locality observation is right and is available either way**: see fork
    3, where codes that live together are cheap to walk between without paying
    the broadcast cost.
+   **John, 2026-08-02: "broadcast the origin, that's the initial input — yes."**
+   Read as agreement with the origin/hop split; hops stay routed. Not built.
 
 7. **How clusters are grouped — John's follow-up, 2026-08-02.**
    - **By modality: rejected by John, and he is right.** It puts a picture and
@@ -380,7 +382,28 @@ Recorded here so a decision does not go quiet.
    before any number is read: a run that ends at step 5 has almost no
    experience in it.
 
-5. **What a thought does with a death event.** The bus fires one when a cluster
+11. **THE OUTPUT MACHINE IS NOT ADDRESSED — design and code diverge here.**
+    The design says *a machine broadcasts an input carrying the id of the
+    output machine it wants, so completed chains and death reports come back
+    addressed*. **That is not built.** `Message.ReturnTo` is the address of the
+    INPUT machine that started the thought; every arrival goes there, and the
+    harness then hands the finished thought to an output machine by a direct
+    call. So *arrival narrows* is real — the candidates are exactly the chains
+    that reached that machine's codes — but the narrowing is a local filter,
+    not routing. Nothing yet lets one broadcast name where it wants its answer
+    delivered.
+
+5. **What a thought does with a death event.**
+    **John's answer, 2026-08-02, and it is the "carry the cluster back"
+    option made precise.** A node knows which cluster it is in, so when it
+    forks it reports not only how many routes it created but **which clusters
+    it sent them into** — *2 into A, 3 into B, 1 into C*. The origin keeps a
+    live count per cluster; when the bus fires a death for B, it subtracts B's
+    count, and the thought's accounting closes instead of hanging.
+    **Refinement: track where routes are GOING, not where they have BEEN.** A
+    route that passed through a cluster and moved on is not stranded when that
+    cluster dies, so the count must be decremented as each cluster reports.
+    Cost is one address per outgoing route in a report. The bus fires one when a cluster
    leaves, at cluster granularity, because a route is stranded by the departure
    of whatever holds its next node. But **a thought does not track which
    clusters its routes are sitting in** — routes fan out and the origin only

@@ -14,24 +14,59 @@ namespace OpenPlexus.Worlds;
 /// <para>
 /// No seed is needed because nothing is fitted: the mapping from
 /// (offset, contents) to a code is a fixed transform, which is legal precisely
-/// because a constant is not a codebook. Every machine produces the same code
-/// for the same cell, forever, with nothing to synchronise.
+/// because a constant is not a codebook. <b>Every machine produces the same
+/// code for the same cell, forever, with nothing to synchronise</b> — the
+/// red-ball property, which is the whole reason a quantiser is not trained.
 /// </para>
 /// </remarks>
 public sealed class SnakeQuantizer : IQuantizer<SnakeView>
 {
-    /// <inheritdoc/>
-    public byte Modality => throw new NotImplementedException();
+    /// <summary>Vision. Two modalities never collide.</summary>
+    public const byte Vision = 1;
+
+    private readonly bool _includeEmpty;
+
+    /// <param name="includeEmpty">
+    /// Whether an <see cref="Cell.Empty"/> cell emits a code at all.
+    /// <b>Required rather than defaulted, because it is an open question and
+    /// both answers are arms.</b> Emitting them makes empty space a
+    /// first-class observation and costs a code per cell; withholding them
+    /// makes "nothing there" mean nothing rather than something. Under onsets
+    /// the cost is small either way, since a cell that stays empty is silent.
+    /// </param>
+    public SnakeQuantizer(bool includeEmpty) => _includeEmpty = includeEmpty;
 
     /// <inheritdoc/>
+    public byte Modality => Vision;
+
+    /// <inheritdoc/>
+    public IReadOnlyCollection<Code> Codify(SnakeView view)
+    {
+        ArgumentNullException.ThrowIfNull(view);
+
+        var codes = new List<Code>(view.Cells.Count);
+        foreach (var cell in view.Cells)
+        {
+            if (!_includeEmpty && cell.Content == Cell.Empty) continue;
+            codes.Add(Encode(cell));
+        }
+
+        return codes;
+    }
+
+    /// <summary>
+    /// Packs an offset and a content into one value.
+    /// </summary>
     /// <remarks>
-    /// <b>Open question, deliberately not settled here:</b> whether an
-    /// <see cref="Cell.Empty"/> cell emits a code at all. Emitting them makes
-    /// empty space a first-class observation and costs a code per cell;
-    /// withholding them makes the view sparse and makes "nothing there" mean
-    /// nothing rather than something. Under onsets the cost is small either
-    /// way, since a cell that stays empty is silent.
+    /// The offsets occupy separate bit ranges from each other and from the
+    /// content, so no two distinct cells can collide — <b>a collision here
+    /// would make two different situations one observation</b>, which is the
+    /// opposite of the property centring exists to give.
     /// </remarks>
-    public IReadOnlyCollection<Code> Codify(SnakeView view) =>
-        throw new NotImplementedException();
+    internal static Code Encode(Seen cell)
+    {
+        var dx = (ulong)(ushort)(short)cell.Dx;
+        var dy = (ulong)(ushort)(short)cell.Dy;
+        return new Code(Vision, (dx << 24) | (dy << 8) | (byte)cell.Content);
+    }
 }

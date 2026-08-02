@@ -4,16 +4,25 @@ What every piece is and what every method does, in words. No bodies, no
 implementations — this is the mental model, and the code is meant to match it
 exactly. If they ever disagree, this file is wrong and gets fixed.
 
-**Status: every type exists. `Code`, `Node` and `LiveSet` are implemented and
-tested; everything else is a stub.** Each unimplemented field shows up as a
-`CS0169` build warning, so the count is a rough progress bar — 27 when the
-stubs landed, 23 now.
+**Status: every type exists. `Code`, `Node`, `LiveSet`, `Snake` and
+`SnakeQuantizer` are implemented and tested; everything else is a stub.** Each
+unimplemented field shows up as a `CS0169` build warning, so the count is a
+rough progress bar — 27 when the stubs landed, **19** now.
 
-**25 tests pass, and four mutations were run to confirm they bite**: dropping
-the partner marginal from the edge weight, charging nothing under `Best`
-pricing, removing the cycle check, and letting persistence reset a start time.
-Each turned exactly the test that claims to cover it red. A test has proved
-nothing until it has been seen to fail for the right reason.
+**43 tests pass, and nine mutations have been run to confirm they bite.** A
+test has proved nothing until it has been seen to fail for the right reason.
+
+| Mutation | Caught by |
+|---|---|
+| edge weight ignores the partner's marginal | the distractor test |
+| `Best` pricing charges nothing | budget-never-rises |
+| the cycle check is removed | the revisit test |
+| persistence resets a start time | the duration test |
+| running out of energy resets the run | ends-rather-than-resets |
+| the view is board-absolute, not head-centred | offsets-from-the-head |
+| food restores no energy | eating-restores |
+| the offset is dropped from a code | three quantiser tests |
+| the contents are dropped from a code | different-contents |
 
 Scope: **snake**, running on one machine, with every boundary shaped so the
 same code runs across many. Static background is out of scope for now — see
@@ -330,9 +339,21 @@ why an arbitrary sensor can be attached without the graph knowing what it is.
 
 ## `Worlds/`
 
+### `SnakeSettings`
+
+Every constant named and **none defaulted** — width, height, starting energy,
+energy per step, energy per fruit. A constant that never changes looks like the
+background, so requiring each one is how a number gets set on purpose.
+**`Sight` is `int?` and `null` means the whole board, still centred** — the two
+are arms of one experiment, not a feature and its disabled state.
+
 ### `Snake`
 
-- **`Step(action)`** — advances one tick.
+- **`Step(action)`** — advances one tick. **A dead run does not step**, it
+  throws. Collision is checked before the tail vacates, so reversing into the
+  neck is fatal; note that a length-3 snake cannot self-intersect any other
+  way, because the tail leaves a cell in the same step the head could reach it.
+- **`Length`** — grows by one per fruit.
 - **`View()`** — the **head-centred local** grid. Centred so the same situation
   in two places is one observation, which is what makes anything recur at all;
   local so food is usually unseen, which is what gives *act to disambiguate*

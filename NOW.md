@@ -17,93 +17,103 @@ when it is done. Nothing may cite it. Rewritten at the end of every turn — see
 
 ---
 
-## THE SENSES RUNS WERE UNDERPOWERED — n=150 where +0.03 needs 840
+**UNDERPOWERED**: senses runs used n=150 where detecting +0.03 needs 840. The
+seed spreads reported all session, 0.038 to 0.330, are the signature. Nothing
+has been re-run.
 
-John's question: too many things that should have helped have not. The flaw is
-arithmetic. The seed spreads reported all session, 0.038 to 0.330, are its
-signature, and every senses measurement is null where every snake measurement
-works. **Nothing has been re-run.**
+## THE POWERED RE-RUN — `out/powered-rerun.txt`
 
-## THE POWERED RE-RUN — in flight, `out/powered-rerun.txt`
+Six runs at 1,000 questions across both front ends and three seeds, because an
+audit found **three refutations resting on 120-150-question runs** where +0.03
+needs 840: the flood as a cross-modal walk, surprise/rarity refuelling, and
+many-origins. All three are the broadcast line.
 
-Six runs at 1,000 questions, `lsh` and `kmeans`, three seeds. It exists because
-an audit of the README's 33 ruled-out entries found **three refutations resting
-on 120-150-question senses runs** where detecting +0.03 needs 840: the flood as
-a cross-modal walk, surprise/rarity refuelling, and many-origins. All three are
-the broadcast line and none has had a powered test.
+`lsh` seeds 0 and 1 are in and null, as the front-end finding predicts. **The
+`kmeans` half is where the question is answered and has not run.** Fix
+`flood-many`'s budget first — it gives up on 0.999 of questions.
 
-First cell: under `lsh`, flood-one 0.0871 and flood-many 0.1066 against chance
-0.108. Still null under the hash, as the front-end finding predicts. **The
-`kmeans` half is where the question is answered** and has not run. `flood-many`
-costs 411s a seed and gives up on 0.999 of questions, so its budget is wrong
-for a graph this dense.
+## REPORT `busiest`, NOT `messages` — the design's own column
+
+Nothing here runs in parallel: `broadcast.flood` is a single-threaded loop and
+every node is a dict entry. So the seconds a run takes are TOTAL work, and the
+number the design is about is `Flood.busiest()`. Measured in the run in flight:
+199,062 expansions per question against a busiest node's 13,920 — **14.3× —
+so 411s of total work is about 29s of distributed wall clock.** Every cost
+reported this session led with the wrong column.
 
 ## AGREED 2026-08-02, NOT BUILT — start here
 
-1. **Snake gets an energy bar.** It depletes, fruit restores it, and running
-   out ENDS the run rather than resetting. John's call, and his reasoning is
-   the mechanism: what survives longer learns more, so a policy that does not
-   eat generates less experience. **That is selection without a reward** — no
-   external judge, nothing declaring food good. It is the smallest thing that
-   gives the system something to lose, and without something to lose no
-   preference is possible at all.
+1. **BUILT — snake's energy bar.** See the README; `SELECTING_ENERGY = 200` is
+   measured, not chosen. What is left is USING it: no experiment runs with
+   energy on, so no policy has yet been selected against.
 
 2. **Re-run the three broadcast refutations at 1,000 questions.** In flight;
-   see below. `flood-many` needs its budget re-swept for a graph this dense
-   before its cell means anything.
+   see below.
 
 3. **Split the anchor as well as the codebooks.** The disagreement result had
-   one clean word surface per digit shared by both codebooks by construction.
-   A real federation has no such thing. This is the test that decides whether
-   k-means is genuinely legal.
+   one clean word per digit shared by both codebooks by construction; a real
+   federation has none. This decides whether k-means is genuinely legal.
 
-4. **THE FRONT END SHOULD BE AS WEAK AS POSSIBLE.** John's observation,
-   2026-08-02, and it is already the project's own argument in `surfaces.py`:
-   *clustering by similarity is an identity assignment, and identity is the
-   walk's job.* So "k-means walks better than the hash" may mean **the walk is
-   not doing its job**, not that the hash is bad — a good clusterer answers the
-   question upstream where nothing can audit it. The front end's only mandate
-   is decision 1's ❌ for no-discretisation: make recurrence possible so a
-   statistic can form. **The ensemble front end is the right shape for exactly
-   this reason** — many coarse codes, each meaning little, combination left to
-   the counts. Reread today's "the front end is the bottleneck" against this.
+4. **Many snake games into one graph.** John's idea. The win is not
+   parallelism — N games is close to one game N times longer — it is EVIDENCE:
+   N× the occasions per code, which is the axis that made the senses graph
+   unwalkable. It also tests interleaved independent sources writing to one
+   graph, which is what a federation is. **`Flood` has no broadcast id**, so
+   two thoughts in flight would mix their routes and their death counts; that
+   is the Dijkstra-Scholten bookkeeping needing a per-thought identifier and it
+   is not there.
+
+5. **Random centres from a shared seed**, as a legal middle between the hash
+   and a fitted codebook. A seed fixes where k-means STARTS, not where it ends,
+   so seeded fitting does not make two nodes agree — but centres drawn from a
+   shared seed and never moved are data-free and agree exactly, partitioning by
+   Voronoi cell rather than half-space. Untried. Honest caveat: random centres
+   do not know where the data is either.
+
+6. **THE FRONT END SHOULD BE AS WEAK AS POSSIBLE.** John's observation, and
+   already the project's own argument in `surfaces.py`: *clustering by
+   similarity is an identity assignment, and identity is the walk's job.* So
+   "k-means walks better than the hash" may mean **the walk is not doing its
+   job** — a good clusterer answers the question upstream where nothing audits
+   it. The front end's only mandate is decision 1's ❌ for no-discretisation:
+   make recurrence possible. **The ensemble is the right shape for this
+   reason.** Reread "the front end is the bottleneck" against it.
+
+   **John's counter, accepted:** with the same front end on BOTH arms, a walk
+   beating random is attributable to the walk. **Relative claims are safe under
+   any quantiser; absolute ones are not.**
 
 ## Waiting on John
 
-**Which chain to render.** Agreed in principle — arrival narrows, prediction
-ranks, brevity breaks ties — and nothing is built. The prediction half exists
-now, so the ranking step has a mechanism for the first time.
+- **Which chain to render** — agreed in principle (arrival narrows, prediction
+  ranks, brevity breaks ties), nothing built. The prediction half now exists.
+- **Whether ARC-AGI-3 is next** — the objection stands: counting needs
+  recurrence and ARC withholds it by design.
 
-**Whether ARC-AGI-3 is next.** The objection stands: counting needs
-recurrence and ARC withholds it by design.
+**Preference**: three honest sources exist; reward is rejected and curiosity
+loses to random, so homeostasis is the one left. Action 1 builds it.
 
-## Nothing in this design wants anything
+**Ensemble front end**: built; budget pins at the TOP of its grid. Sweep higher,
+then three seeds at whatever interior maximum appears.
 
-John's finding. Three honest sources of preference exist and this design has
-none: reward is rejected, homeostasis needs running out to END the stream and
-death here resets, and curiosity loses to random in every form. **Action 1
-above is the fix.**
-
-**Ensemble front end**: built, budget pins at the TOP of its grid (0.2200
-against chance 0.100, seeds 0.038/0.292/0.330). A grid that goes higher, then
-three seeds at whatever interior maximum it finds.
-
-**`--repeats` may do nothing**, unmeasured: it replays the same recordings and
-repeated identical evidence does not sharpen a ratio.
+**`--repeats` may do nothing**: it replays the same recordings, and repeated
+identical evidence does not sharpen a ratio. Unmeasured.
 
 **Columns**: neighbour-conditioned works. Left: conditioning on a SUMMARY of
 the neighbours rather than the single one in the direction of travel.
 
-## Snake: no multimodality yet (vision, plus hearing in `snake_hearing.py`;
-action and interoception designed, not built), and nothing beats random play.
+**Snake**: no multimodality yet — vision, plus hearing in `snake_hearing.py`;
+action and interoception designed, not built. Nothing beats random play.
 
-## Prediction: two holes open
+## Prediction and forgetting: four holes
 
-- **Prediction error does not drive the asking yet.** Still a fixed fraction.
-- **Automatic dial tuning is designed and not built.** A node scoring candidate
-  values for its own dial against its own prediction error — local, so C1-legal;
-  never ending, so C4-legal. **Named risk**: minimising surprise can be won by
-  never looking at anything surprising, so score error per observation MADE.
+- **Prediction error does not drive the asking.** Still a fixed fraction.
+- **Automatic dial tuning** is designed, not built: a node scoring candidates
+  for its own dial against its own prediction error, local and never-ending.
+  **Risk**: minimising surprise is won by never looking at anything
+  surprising, so score error per observation MADE.
+- **Nothing has swept the half-life**, now known to change answers.
+- **Eviction has no policy** — nothing measures memory pressure.
 
 ## Forgetting: built, one half untested
 
@@ -116,32 +126,24 @@ action and interoception designed, not built), and nothing beats random play.
 
 ## Decided
 
-- **No tokenizer.** Its vocabulary is learned from a corpus we never saw.
-- **Facts are dropped**, not islanded — a separate corpus sharing no referent.
-- **No pre-commit hook.** Every red preflight so far was caught immediately.
-- **Mutations run in CI, sharded six ways.** Locally the command is
-  `--only <the ones just added>`; `--changed` is what let a live mutation reach
-  a commit.
+- **No tokenizer**; **facts are dropped**, not islanded; **no pre-commit hook**.
+- **Mutations run in CI, sharded six ways.** Locally use
+  `--only <the ones just added>`; `--changed` let a live mutation reach a commit.
 
 ## Known debts
 
-- **`deployment.py` and `agreement.py` are dead** — imported by nothing but
-  their own tests, and `deployment.py` budgets predecessor-era `w × d`
-  associative memory. **`tasks/xsl.py` has no caller.**
+- **`deployment.py`, `agreement.py`, `tasks/xsl.py` are dead** — tests only.
 - **DISTRIBUTED: entry point and in-process agreement done, container left.**
-  `node_main.py` runs a node on TCP; a `Federation` agrees with a whole
-  `CoOccurrence` on every read. Left: latency, departure, partition.
-- **`experiments/` has thirteen scripts and no harness**, and the link columns
-  in `surfaces_pipeline.py` still step in tenths.
-- **§5's ⬜ "refuse when nothing was written — the machinery exists" is
-  unverified.** Every refusal in the package is an ownership refusal or the
-  asking experiment's detachability rate. Neither is that.
-- **The written channel's dials were chosen, not measured**, and
-  `--silence/--mistake/--corrupt` exist so they can be swept. Nothing has.
+  `node_main.py` runs a node on TCP. Left: latency, departure, partition.
+- **`experiments/` has fifteen scripts and no harness**; the link columns in
+  `surfaces_pipeline.py` step in tenths.
+- **§5's "refuse when nothing was written — the machinery exists" is
+  unverified.** Every refusal in the package is an ownership refusal instead.
+- **The written channel's dials were chosen, not measured**, and nothing has
+  swept `--silence/--mistake/--corrupt`.
 
-## Reading leads, none of them read
+## Reading leads, unread
 
-- **Predictive coding**, and the dark room measured today as the named risk.
-- **Interventional causal discovery under a budget** — when does structure say
-  what you need not test?
-- **AnyBURL** — lands near 0.31 where ours lands at 0.247.
+**Predictive coding** (the dark room is its named risk, measured);
+**interventional causal discovery under a budget**; **AnyBURL**, near 0.31
+where ours lands at 0.247.

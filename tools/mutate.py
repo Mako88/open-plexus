@@ -80,6 +80,7 @@ COMPOSITION = ROOT / "openplexus" / "composition.py"
 ASKING = ROOT / "openplexus" / "tasks" / "asking.py"
 PATHWAYS = ROOT / "openplexus" / "pathways.py"
 BROADCAST = ROOT / "openplexus" / "broadcast.py"
+SNAKE = ROOT / "openplexus" / "tasks" / "snake.py"
 
 
 @dataclass(frozen=True)
@@ -895,6 +896,28 @@ MUTATIONS = [
         path=SURFACES,
         old="        weights = 1 << np.arange(self.bits - 1, -1, -1)",
         new="        weights = 1 << np.arange(self.bits)",
+    ),
+    Mutation(
+        name="the-snake-view-is-not-centred",
+        breaks="the only thing that makes a situation RECUR. Indexing the view "
+               "from the board's origin instead of the head makes an identical "
+               "local situation in two places into two different observations, "
+               "so nothing ever happens twice and no statistic can form -- "
+               "while the board still plays and every arm still runs",
+        path=SNAKE,
+        old="        return tuple(self._cell(head_x + dx, head_y + dy)",
+        new="        return tuple(self._cell(dx + self.sight, dy + self.sight)",
+    ),
+    Mutation(
+        name="the-snake-sees-through-walls",
+        breaks="the boundary of the world, which is the one feature always "
+               "available to learn position from. Open space is already "
+               "uninformative here, so removing the walls leaves a task that "
+               "keeps producing observations and contains almost nothing to "
+               "learn",
+        path=SNAKE,
+        old="            return WALL",
+        new="            return EMPTY",
     ),
     Mutation(
         name="the-broadcast-never-buries-a-dead-route",

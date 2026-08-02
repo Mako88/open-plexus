@@ -75,14 +75,21 @@ and saved builds, repeatedly.
   land, wearing the appearance of one that did.
 - **Search before you build, and by capability rather than by the name you would
   have used.** A negative search result is not a finding until it was a wide one.
-- **New mechanisms default to off**, so earlier results stay reproducible —
-  **and ship with a run that turns them on.** Off-by-default protects the
-  baseline; a committed run with it ON is the only thing that stops the
-  mechanism being lost. This is how the project keeps producing code that is
-  built, correct, and never used: a flaw is noticed, a fix is built, the fix is
-  left off so the numbers do not move, and nobody ever moves them.
+- **A new mechanism goes ON, as a replacement or as an arm.** John's rule,
+  2026-08-02, replacing "default to off so earlier results stay reproducible" —
+  which was how this project kept producing code that was built, correct and
+  never used. A flaw gets noticed, a fix gets built, the fix is left off so the
+  numbers do not move, and nobody ever moves them.
+
+  **There are only two cases and neither wants off.** Either the mechanism
+  exists because the old numbers were WRONG — snake's energy, where nothing was
+  at stake so every policy number meant nothing — and then preserving them
+  preserves noise. Or it is one of several ways to do a thing, and then both
+  run and get compared. Off-by-default is what you choose when you have decided
+  in advance not to look.
+
   `tools/check_orphans.py` catches a module with no caller. It cannot catch a
-  flag with no run.
+  flag with no run, which is the same failure one layer in.
 
 ---
 

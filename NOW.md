@@ -17,17 +17,27 @@ when it is done. Nothing may cite it. Rewritten at the end of every turn — see
 
 ---
 
-**UNDERPOWERED**: senses runs used n=150 where detecting +0.03 needs 840. The
-seed spreads reported all session, 0.038 to 0.330, are the signature. Nothing
-has been re-run.
-
-**Powered re-run: DONE**, `out/powered-rerun.txt`, and two of the three
-refutations did not survive — see the README. Surprise/rarity refuelling was
-not re-run and is still on 150-question evidence.
+**UNDERPOWERED**: senses runs used n=150 where +0.03 needs 840. Only the flood
+and many-origins have been re-run; surprise/rarity refuelling has not.
 
 **Report `busiest`, not `messages`.** Nothing runs in parallel; serial seconds
 are TOTAL work. `Flood.busiest()` is what a distributed run would cost —
 9.5× to 22.4× less. Every cost reported this session led with the wrong column.
+
+## THE FLOOD IS THE DIRECTION — John's call, 2026-08-02
+
+**Taken on architecture, not on the numbers**, and he said so: it matches the
+incumbent and does not beat it, and what it has is a shape that survives
+distribution. Recorded so it is not re-litigated when a cell comes back level.
+
+His design, fuller than the README carries: a node converts an input and
+broadcasts it **with the id of the machine the answer should return to**; every
+node holding a match fires and **reports how many it expects to send**.
+
+**A node that vanishes BEFORE the walk reaches it costs nothing** — his point,
+and right: the walk never goes there, the answer is poorer, the accounting is
+untouched. The real case is one that vanishes **holding a live route**, whose
+death report never arrives. That is what decision 9's deadline is for.
 
 ## PRIORITY, REORDERED BY JOHN 2026-08-02
 
@@ -52,47 +62,42 @@ are TOTAL work. `Flood.busiest()` is what a distributed run would cost —
    one clean word per digit shared by both codebooks by construction; a real
    federation has none. This decides whether k-means is genuinely legal.
 
-4. **Many snake games into one graph.** John's idea. The win is not
-   parallelism — N games is close to one game N times longer — it is EVIDENCE:
-   N× the occasions per code, which is the axis that made the senses graph
-   unwalkable. It also tests interleaved independent sources writing to one
-   graph, which is what a federation is. **`Flood` has no broadcast id**, so
-   two thoughts in flight would mix their routes and their death counts; that
-   is the Dijkstra-Scholten bookkeeping needing a per-thought identifier and it
-   is not there.
+4. **Many snake games into one graph.** The win is EVIDENCE, not parallelism:
+   N× the occasions per code, the axis that made the senses graph unwalkable.
+   It also tests interleaved independent sources writing to one graph, which is
+   what a federation is. **`Flood` has no broadcast id**, so two thoughts in
+   flight would mix their routes and their death counts.
 
-5. **Random centres from a shared seed**, as a legal middle between the hash
-   and a fitted codebook. A seed fixes where k-means STARTS, not where it ends,
-   so seeded fitting does not make two nodes agree — but centres drawn from a
-   shared seed and never moved are data-free and agree exactly, partitioning by
-   Voronoi cell rather than half-space. Untried. Honest caveat: random centres
-   do not know where the data is either.
+5. **k-means with per-node codebooks, and with groups sharing one.** John wants
+   this tried rather than parked — his theory is that k-means may simply be a
+   better way to identify a thing, and the disagreement result says the walk
+   survives it. **His own constraint: it must not help the system cheat.** The
+   test that decides it is splitting the ANCHOR too, since the measured result
+   had one clean word per digit shared by both codebooks.
 
-6. **THE FRONT END SHOULD BE AS WEAK AS POSSIBLE.** John's observation, and
-   already the project's own argument in `surfaces.py`: *clustering by
-   similarity is an identity assignment, and identity is the walk's job.* So
-   "k-means walks better than the hash" may mean **the walk is not doing its
-   job** — a good clusterer answers the question upstream where nothing audits
-   it. The front end's only mandate is decision 1's ❌ for no-discretisation:
-   make recurrence possible. **The ensemble is the right shape for this
-   reason.** Reread "the front end is the bottleneck" against it.
+6. **The front end should be as WEAK as possible** — `surfaces.py` already
+   argues it: *clustering by similarity is an identity assignment, and identity
+   is the walk's job.* Its only mandate is decision 1's ❌ for
+   no-discretisation: make recurrence possible. **The ensemble is the right
+   shape for this reason** — coarse codes meaning almost nothing, the
+   combination left to the graph.
 
-   **John's counter, accepted:** with the same front end on BOTH arms, a walk
-   beating random is attributable to the walk. **Relative claims are safe under
-   any quantiser; absolute ones are not.**
+   **John's counter, accepted and it narrows mine:** k-means only ever sees one
+   modality, so it cannot connect a picture to a sound — **the cross-modal
+   claim is untouched by the quantiser.** What it does take over is
+   within-modality identity, which was never the interesting claim. And with
+   the same front end on both arms, a walk beating random is attributable to
+   the walk: **relative claims are safe under any quantiser, absolute ones are
+   not.**
 
-## Waiting on John
-
-- **Which chain to render** — agreed in principle (arrival narrows, prediction
-  ranks, brevity breaks ties), nothing built. The prediction half now exists.
-- **Whether ARC-AGI-3 is next** — the objection stands: counting needs
-  recurrence and ARC withholds it by design.
+**Waiting on John**: which chain to render (agreed in principle, nothing
+built); whether ARC-AGI-3 is next (counting needs recurrence, ARC withholds it).
 
 **Preference**: three honest sources exist; reward is rejected and curiosity
 loses to random, so homeostasis is the one left. Action 1 builds it.
 
-**Ensemble front end**: built; budget pins at the TOP of its grid. Sweep higher,
-then three seeds at whatever interior maximum appears.
+**Ensemble front end**: built; budget pins at the TOP of its grid. Sweep
+higher, then three seeds at whatever interior maximum appears.
 
 **`--repeats` may do nothing**: it replays the same recordings, and repeated
 identical evidence does not sharpen a ratio. Unmeasured.
@@ -105,13 +110,13 @@ action and interoception designed, not built. Nothing beats random play.
 
 ## Prediction and forgetting: four holes
 
-- **Prediction error does not drive the asking.** Still a fixed fraction.
+- **Prediction error does not drive the asking**; **nothing has swept the
+  half-life**, now known to change answers; **eviction has no policy** because
+  nothing measures memory pressure.
 - **Automatic dial tuning** is designed, not built: a node scoring candidates
   for its own dial against its own prediction error, local and never-ending.
-  **Risk**: minimising surprise is won by never looking at anything
-  surprising, so score error per observation MADE.
-- **Nothing has swept the half-life**, now known to change answers.
-- **Eviction has no policy** — nothing measures memory pressure.
+  **Risk**: minimising surprise is won by never looking at anything surprising,
+  so score error per observation MADE.
 
 ## Forgetting: built, one half untested
 
@@ -131,14 +136,12 @@ action and interoception designed, not built. Nothing beats random play.
 ## Known debts
 
 - **`deployment.py`, `agreement.py`, `tasks/xsl.py` are dead** — tests only.
+  **`experiments/` has fifteen scripts and no harness.**
 - **DISTRIBUTED: entry point and in-process agreement done, container left.**
-  `node_main.py` runs a node on TCP. Left: latency, departure, partition.
-- **`experiments/` has fifteen scripts and no harness**; the link columns in
-  `surfaces_pipeline.py` step in tenths.
-- **§5's "refuse when nothing was written — the machinery exists" is
-  unverified.** Every refusal in the package is an ownership refusal instead.
-- **The written channel's dials were chosen, not measured**, and nothing has
-  swept `--silence/--mistake/--corrupt`.
+  Left: latency, departure, partition — which is priority 1.
+- **§5's "refuse when nothing was written" is unverified**; every refusal in
+  the package is an ownership refusal instead.
+- **The written channel's dials were chosen, not measured.**
 
 ## Reading leads, unread
 

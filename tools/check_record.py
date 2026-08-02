@@ -53,7 +53,7 @@ LIMIT = 420
 #: Files whose bullet lines are bounded, and what each is for.
 WATCHED = {
     "README.md": "one option per line: what it is, what killed it, what revives it",
-    "NOW.md": "what is unfinished; findings belong in the README",
+    "NOW.md": "what is unfinished. A finding SPLITS: the claim goes to the README, the numbers stay with the run in out/",
 }
 
 #: A whole-file bound, so the two failures cannot trade places. The README was

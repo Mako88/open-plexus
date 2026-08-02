@@ -7,52 +7,54 @@ appears here that is not in the README. An approved piece of work cannot go
 quiet, which is how the LSH front end was agreed and then dropped for two
 sessions.
 
-**A finding updates a line; it never appends one.** Settled results belong in the
-README, which carries the claim; this file carries only what is unfinished.
-Delete a line when it is done. Nothing may cite this file. Rewritten at the end
-of every turn — see `.claude/skills/monitor`.
+**A finding updates a line; it never appends one.** And a finding SPLITS: the
+claim goes to the README, the numbers stay with the run in `out/`. "Settled
+results belong in the README" was the wording here and it is wrong — it invites
+whole tables into prose, which is what `CLAUDE.md` refuses and what the record
+check keeps catching. This file carries only what is unfinished. Delete a line
+when it is done. Nothing may cite it. Rewritten at the end of every turn — see
+`.claude/skills/monitor`.
 
 ---
 
 ## Waiting on John
 
 **Which chain to render.** Agreed in principle — arrival narrows, prediction
-ranks, brevity breaks ties — and nothing is built. The prediction half now
-exists, so the ranking step has a mechanism for the first time.
+ranks, brevity breaks ties — and nothing is built. The prediction half exists
+now, so the ranking step has a mechanism for the first time.
 
-**Whether ARC-AGI-3 is next.** Snake was built as the step before it and has
-produced results. The objection stands: counting needs recurrence and ARC
-withholds it by design.
+**Whether ARC-AGI-3 is next.** The objection stands: counting needs
+recurrence and ARC withholds it by design.
 
 ## THE GAP JOHN FOUND: nothing in this design wants anything
 
 His question, 2026-08-02: is there any reason to pursue the fruit? **There is
-not.** `food` is a column measuring an accident — `committed` eats the most (52)
-because it blunders furthest, not because it is trying.
+not.** `food` measures an accident — `committed` eats the most because it
+blunders furthest, not because it is trying.
 
-**A score and an energy are different things and only one is foreign here.** A
-score is external: something outside decides what is good and tells the system.
-An energy depletes and food restores it, and nothing says being full is good —
-it is a SENSATION, an interoceptive channel like `ate` and `died`.
+**A score is external and an energy is a sensation**, so only the first is
+foreign here. But **energy alone supplies no preference**: a system that feels
+hunger and predicts it perfectly is indifferent to being hungry. Three honest
+sources exist and this design has none — external reward is rejected;
+homeostasis needs running out to END the stream, and death here resets; and
+curiosity loses to random in every form tried.
 
-**But energy alone still supplies no preference.** A system that feels hunger
-and predicts it perfectly is indifferent to being hungry; a perfect predictor is
-content in any state it can foresee. Only three honest sources exist:
+**Recommended, not built**: energy as an INPUT-ONLY channel, because hunger
+correlates with time-since-food and that is predictable structure. **Not a
+score.**
 
-- **External reward** — rejected by the design.
-- **Homeostasis with real consequences** — if running out ENDS the stream, then
-  policies that do not eat generate less experience. That is selection, not
-  preference. **It does not exist here**: death resets and the run continues, so
-  there is no pressure at all. It would need a run that can genuinely end, or a
-  population.
-- **Curiosity** — an intrinsic preference for learning. Built, measured, and it
-  loses to random in every form tried.
+## THE SENSES GRAPH IS STARVED — settled, in the README. What follows
 
-**Recommended, and not built**: energy as an input-only channel, because
-hunger correlates with time-since-food and that is predictable structure, which
-is what this system eats. **Not a score.** And "does it pursue the fruit" stays
-the wrong question until something supplies preference — the right one is "does
-it learn the world", which held-out prediction already measures.
+Every cross-modal null measured on it says nothing about any mechanism: it has
+about 12 occasions per code where the incumbent walk needs sixty.
+
+- **Nothing has tried to fix it.** More occasions, fewer codes, or more
+  `--repeats`. Fewer codes costs purity, so it is a trade-off and **it is not
+  known whether any setting of this corpus clears sixty per code.** That is
+  the first thing to find out, and it decides whether the senses task is
+  usable at all.
+- **Every earlier senses result needs re-reading against this**, the
+  word-channel comparison included — all of it ran in the starved regime.
 
 ## The live thread: columns that can read each other
 
@@ -67,31 +69,27 @@ graph is what surfaces are for. The build is to let a column's prediction
 condition on its neighbours' current surfaces as well as its own — a bound
 triple again, which `Predictor` already holds.
 
-**Named risk before building**: binding on neighbours multiplies the state space
-by the neighbour alphabet, and `bound` is already multiplicative. The cheap
-version conditions on a SUMMARY of the neighbours rather than their identities.
+**Named risk**: binding on neighbours multiplies the state space by the
+neighbour alphabet. The cheap version conditions on a SUMMARY of them.
 
 ## Snake: built, and what it cannot show
 
 `tasks/snake.py`, `experiments/snake_prediction.py`, `snake_surfaces.py`.
 
-- **Open space teaches nothing.** A centred view of a featureless region is the
-  same view whichever way you went, so board size has to be chosen relative to
-  sight and most steps of a large board are wasted. Unmeasured how much.
-- **No multimodality yet.** The occasion carries vision only. Action and
-  interoception — ate, died, length — are designed as their own kinds in one
-  `SharedGraph` and are not built. That is what would make the stream
-  time-synced by construction rather than by alignment.
-- **Random play only.** Nothing chooses actions, so nothing tests whether acting
-  to disambiguate beats watching — the reason an interactive world was wanted.
+- **No multimodality yet.** The occasion carries vision, and hearing only in
+  `snake_hearing.py`. Action and interoception — ate, died, length — are
+  designed as their own kinds in one `SharedGraph` and are not built. That is
+  what would make the stream time-synced by construction, not by alignment.
+- **Nothing beats random play.** Five policies tried; the reason an interactive
+  world was wanted is still unanswered.
 
-## Prediction: built, and the two holes it has not closed
+## Prediction: built, two holes open
 
-`openplexus/prediction.py`. Prequential; `bound` beats `factored` 0.717 to
-0.437 over three seeds, shuffled control 0.005.
+`openplexus/prediction.py`, prequential. Results in the README and
+`out/snake-prediction.json`.
 
-- **Prediction error does not drive the asking yet.** The second hole the one
-  mechanism was meant to close. The asking budget is still a fixed fraction.
+- **Prediction error does not drive the asking yet.** The asking budget is
+  still a fixed fraction.
 - **Automatic dial tuning is designed and not built.** A node scoring a small
   set of candidate values for its own dial, prequentially, against its own
   prediction error — C1-legal because local, C4-legal because it never ends.
@@ -100,11 +98,10 @@ version conditions on a SUMMARY of the neighbours rather than their identities.
 
 ## Forgetting: built, one half untested
 
-`CoOccurrence(half_life=...)`, off by default. Decay on read, the clock is the
-node's own occasions, `evict`/`reinstate` with a boost.
+`CoOccurrence(half_life=...)`, off by default.
 
-- **Nothing has swept the half-life**, and it is now known to change answers
-  rather than only memory, so it needs sweeping like any other dial.
+- **Nothing has swept the half-life**, which is now known to change answers
+  and not only memory, so it needs sweeping like any other dial.
 - **Eviction has no policy.** `weakest` ranks by what is left; nothing decides
   when to call it, because that is memory pressure and nothing measures memory.
 
@@ -126,8 +123,8 @@ node's own occasions, `evict`/`reinstate` with a boost.
   `node_main.py` runs a node on TCP; a `Federation` across 4 owners agrees with
   a whole `CoOccurrence` on every read, still at 32 owners. Left: latency,
   departure, partition. `testbed/driver.py` measures a deleted network.
-- **The link columns in `surfaces_pipeline.py` step in tenths.**
-- **`experiments/` has eleven scripts and no harness.**
+- **`experiments/` has thirteen scripts and no harness**, and the link columns
+  in `surfaces_pipeline.py` still step in tenths.
 - **§5's ⬜ "refuse when nothing was written — the machinery exists" is
   unverified.** Every refusal in the package is an ownership refusal or the
   asking experiment's detachability rate. Neither is that.
@@ -138,7 +135,7 @@ node's own occasions, `evict`/`reinstate` with a boost.
 
 - **Predictive coding** — now the most relevant, since prediction exists and the
   dark-room failure is the named risk against tuning on it.
-- **Interventional causal discovery under a budget.** The sharper question:
-  when does structure say what you need not test?
-- **AnyBURL / rule mining over paths** — a rule-over-paths system lands near
-  0.31 where ours lands at 0.247, so our implementation is the limit.
+- **Interventional causal discovery under a budget** — when does structure say
+  what you need not test?
+- **AnyBURL / rule mining over paths** — lands near 0.31 where ours lands at
+  0.247, so our implementation is the limit.

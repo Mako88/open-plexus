@@ -24,6 +24,7 @@ public sealed class MachineTests : IDisposable
         Refuel = Refuel.Strength,
         Value = ArrivalValue.Strength,
         Accumulate = Accumulate.Sum,
+            Horizon = 6,
     };
 
     private readonly HybridBus _bus = new();

@@ -30,6 +30,7 @@ public sealed class NodeTests
             Refuel = refuel,
             Value = value,
             Accumulate = Accumulate.Sum,
+            Horizon = 6,
         };
 
     /// <summary>A message that has already walked, so the node is not an origin.</summary>

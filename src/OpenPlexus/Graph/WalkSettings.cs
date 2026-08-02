@@ -97,4 +97,32 @@ public sealed record WalkSettings
 
     /// <inheritdoc cref="Accumulate"/>
     public required Accumulate Accumulate { get; init; }
+
+    /// <summary>
+    /// The longest chain a route may carry. A route that reaches it dies.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A SAFETY, NOT PART OF THE DESIGN — and it had to exist, because the
+    /// design's own bound was measured to fail.</b> The claim was that stamina
+    /// is the whole of the schedule and no depth limit is needed, with
+    /// <see cref="StepCost.Best"/> the pricing that bounds the walk.
+    /// </para>
+    /// <para>
+    /// <b>That holds only where edge weights DIFFER.</b> Under `Best` the price
+    /// is the strongest partner's fuel, so a route down the best edge keeps its
+    /// budget exactly. In a near-deterministic world almost every weight is
+    /// near 1.0, every partner is the best partner, and NOTHING decays — the
+    /// cycle check becomes the only bound and the flood enumerates every simple
+    /// path. Measured on a clique with equal weights, messages from one origin:
+    /// 4 nodes → 15, 5 → 64, 6 → 325, 7 → 1,956, 8 → 13,699. Factorial.
+    /// </para>
+    /// <para>
+    /// <b>Required rather than defaulted</b>, and every route it kills is
+    /// counted as <see cref="Thinking.Accounting.Halted"/>, because a walk that
+    /// hit the horizon looks exactly like one that finished unless that is
+    /// reported. See open fork 8.
+    /// </para>
+    /// </remarks>
+    public required int Horizon { get; init; }
 }

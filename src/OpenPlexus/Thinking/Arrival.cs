@@ -47,7 +47,8 @@ public sealed record Arrival
 /// weight is conserved, and a refuelled budget creates weight from nothing.
 /// </para>
 /// </remarks>
-public readonly record struct Accounting(BroadcastId Broadcast, int Splits, int Deaths);
+public readonly record struct Accounting(
+    BroadcastId Broadcast, int Splits, int Deaths, int Halted = 0);
 
 /// <summary>
 /// What a node hands back when it fires.

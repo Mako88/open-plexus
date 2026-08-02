@@ -113,6 +113,7 @@ public sealed class Cluster : IReceiveEnvelopes
             if (fired.Reached is { } arrival) owing.Arrivals.Add(arrival);
             owing.Splits += fired.Accounting.Splits;
             owing.Deaths += fired.Accounting.Deaths;
+            owing.Halted += fired.Accounting.Halted;
         }
 
         foreach (var (destination, batch) in onward)
@@ -128,7 +129,7 @@ public sealed class Cluster : IReceiveEnvelopes
             await ReportAsync(to, new Report
             {
                 Arrivals = [.. owing.Arrivals],
-                Accounting = new Accounting(broadcast, owing.Splits, owing.Deaths),
+                Accounting = new Accounting(broadcast, owing.Splits, owing.Deaths, owing.Halted),
             }, ct).ConfigureAwait(false);
         }
     }
@@ -147,5 +148,7 @@ public sealed class Cluster : IReceiveEnvelopes
         public int Splits { get; set; }
 
         public int Deaths { get; set; }
+
+        public int Halted { get; set; }
     }
 }

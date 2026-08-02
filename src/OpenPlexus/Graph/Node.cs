@@ -200,6 +200,18 @@ public sealed class Node
                 Routes = 1,
             };
 
+        // THE HORIZON. Reached only because the budget provably does not bound
+        // this walk when weights are equal -- see WalkSettings.Horizon.
+        if (message.Chain.Length >= _settings.Horizon)
+        {
+            return new Fired
+            {
+                Outgoing = [],
+                Reached = reached,
+                Accounting = new Accounting(message.Broadcast, 0, Deaths: 1, Halted: 1),
+            };
+        }
+
         var weights = new Dictionary<Code, double>(row.Length);
         var fuels = new Dictionary<Code, double>(row.Length);
         var affordable = new List<double>(row.Length);

@@ -30,7 +30,7 @@ public sealed class Thought
     /// in one process and does not across a network, which is why it is
     /// asserted rather than trusted.
     /// </summary>
-    private int _live, _splits, _deaths;
+    private int _live, _splits, _deaths, _halted;
 
     private bool _released;
 
@@ -74,6 +74,18 @@ public sealed class Thought
     public int Deaths
     {
         get { lock (_gate) return _deaths; }
+    }
+
+    /// <summary>
+    /// Routes killed by the horizon rather than by economics.
+    /// </summary>
+    /// <remarks>
+    /// <b>A walk that hit the horizon looks exactly like one that finished
+    /// unless this is reported.</b>
+    /// </remarks>
+    public int Halted
+    {
+        get { lock (_gate) return _halted; }
     }
 
     /// <summary>How many distinct endpoints have been reached.</summary>
@@ -162,6 +174,7 @@ public sealed class Thought
 
             _splits += accounting.Splits;
             _deaths += accounting.Deaths;
+            _halted += accounting.Halted;
             _live += accounting.Splits - accounting.Deaths;
         }
     }

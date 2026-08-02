@@ -259,6 +259,46 @@ Recorded here so a decision does not go quiet.
      computes the same answer with nobody to ask" is gone. Recorded as ruled
      out unless something supplies placement agreement without a coordinator.
 
+8. **How the flood is bounded — MEASURED, and the design's own answer failed.**
+   The design says stamina is the whole of the schedule and no depth limit is
+   needed, with `Best` pricing the one measured to bound the walk. **That holds
+   only where edge weights DIFFER.** Under `Best` the price is the strongest
+   partner's fuel, so a route down the best edge keeps its budget *exactly*. In
+   a near-deterministic world almost every weight is near 1.0, every partner is
+   the best partner, nothing decays, and the cycle check becomes the only
+   bound — so the flood enumerates every simple path.
+
+   Measured on a clique with equal weights, messages from one origin:
+
+   | nodes | 4 | 5 | 6 | 7 | 8 |
+   |---|---|---|---|---|---|
+   | messages | 15 | 64 | 325 | 1,956 | 13,699 |
+
+   A `Horizon` was added as a safety, required rather than defaulted, and every
+   route it kills is counted as `Halted` — a walk that hit the horizon looks
+   exactly like one that finished unless that is reported. **It is a constant
+   nobody measured, which is the thing this project refuses everywhere else.**
+
+   **And it is not enough.** A 200-step snake run at `Horizon = 6` on a graph of
+   **13 nodes** halted **275,280** routes over 5 steps — roughly 55,000 route
+   expansions per step. Factorial in the horizon. This does not scale to a real
+   graph and something has to change.
+
+   **The root cause is that an occasion is a CLIQUE.** Every code in a frame is
+   paired with every other, so ten codes a frame build a dense graph by
+   construction, and a dense graph is what makes simple-path enumeration
+   explode. Candidates, none measured: sparser occasions (pair only some of
+   what co-occurs), a front end that produces fewer codes per moment, or
+   something that makes weights differ so `Best` can bite again. **A beam is
+   NOT a candidate** — capping how many partners are considered is already ❌
+   on `master` as "a constant nobody set on purpose, doing the cutting".
+
+9. **Random play dies in about five steps**, because the four actions are
+   absolute directions and reversing into the neck is instantly fatal. That is
+   the floor everything gets compared against, so it needs to be understood
+   before any number is read: a run that ends at step 5 has almost no
+   experience in it.
+
 5. **What a thought does with a death event.** The bus fires one when a cluster
    leaves, at cluster granularity, because a route is stranded by the departure
    of whatever holds its next node. But **a thought does not track which

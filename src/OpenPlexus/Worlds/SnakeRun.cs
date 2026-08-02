@@ -153,13 +153,20 @@ public sealed class SnakeRun : IDisposable
     private readonly Random _fallback;
     private readonly List<Exception> _faults = [];
 
+    /// <param name="includeEmpty">
+    /// Whether an empty cell emits a code. <b>Defaults to false — John's call,
+    /// 2026-08-02, on fork 8.</b> An occasion is a clique, so the number of
+    /// codes per frame sets how dense the graph is, and density is what makes
+    /// path enumeration explode. Measured at horizon 5, seed 1: 46,536 routes
+    /// halted with empty cells against 6 without.
+    /// </param>
     public SnakeRun(
         SnakeSettings world,
         WalkSettings dials,
         int seed,
         int clusters = 8,
         int replicas = 256,
-        bool includeEmpty = true)
+        bool includeEmpty = false)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(dials);

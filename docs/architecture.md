@@ -318,6 +318,12 @@ Recorded here so a decision does not go quiet.
    COST and says nothing whatever about whether the system plays well. Reading
    it as evidence of competence would be reading a number that is not there.
 
+   **✅ JOHN'S CALL, 2026-08-02: withhold empty cells, and it is now the
+   default.** The whole test suite went from 15 seconds to 1 on that change
+   alone, which is the four orders of magnitude showing up as wall clock.
+   It does not make the flood scale — it makes the graph smaller. The
+   factorial is still there.
+
    **The root cause is that an occasion is a CLIQUE.** Every code in a frame is
    paired with every other, so ten codes a frame build a dense graph by
    construction, and a dense graph is what makes simple-path enumeration
@@ -411,6 +417,25 @@ Recorded here so a decision does not go quiet.
     live count comes from splits and deaths; the in-flight counts come from the
     routing named in each report. Those are two independent quantities, and
     them agreeing is a real check where the old one held by construction.
+
+14. **WHAT DOES A STEP COST, once the sender cannot weigh? — John's question,
+    2026-08-02.** He proposed that a hop should cost the weight of the edge it
+    walks rather than a flat charge for leaving the node.
+    **His intuition is already what `Best` does, by a route he did not expect.**
+    The price is flat — the strongest partner's fuel — but the *payment* is the
+    taken edge's fuel, so the NET is edge-specific: a route down the best edge
+    breaks even exactly, and a route down a weaker edge loses the difference.
+    Cost per hop is therefore already "what that hop is worth", expressed as an
+    opportunity cost.
+    **And charging the taken edge directly does not work.** Price and payment
+    would be the same number, so `held - w + w = held` and stamina never moves
+    at all — strictly less bounded than today. Charging the mean instead is the
+    `Local` arm, refuted: about half a node's edges beat its own mean, so those
+    routes gain budget forever.
+    **The live problem is different from the one he identified**: `Best` is only
+    bounding when weights DIFFER — see fork 8. And receiver-weighing removes the
+    sender's ability to compute any of this, so fork 2 cannot land until this is
+    settled.
 
 13. **The in-flight accounting was wrong on 39% of real thoughts, and the
     check that found it had never been run. Fixed 2026-08-02.** `Balanced()`

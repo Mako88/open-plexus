@@ -191,6 +191,63 @@ public sealed class DepartureTests : IDisposable
         Assert.Equal(3, died.Accounting.Deaths);
     }
 
+    [Fact]
+    public async Task Tracking_costs_one_entry_per_cluster_and_not_per_route()
+    {
+        // WHAT THE BOOKKEEPING ACTUALLY COSTS. A node forking to hundreds of
+        // partners still names only the handful of clusters they went to, so a
+        // report grows with the size of the NETWORK and not with the size of
+        // the fan-out. That is the whole reason this is affordable.
+        var seen = new Listening();
+        using var _ = _bus.Subscribe(seen);
+
+        var ring = new Ring(seed: 7, replicas: 256);
+        var local = new LocalClusters(ring);
+        var marginals = new LocalMarginals(local);
+        var homes = new List<Cluster>();
+        var handles = new List<IDisposable>();
+
+        foreach (var name in (string[])["p", "q", "r", "s", "t"])
+        {
+            var address = new ClusterAddress(name);
+            ring.Join(address);
+            var cluster = new Cluster(address, _bus, ring, Dials, marginals);
+            local.Include(cluster);
+            homes.Add(cluster);
+            handles.Add(_bus.Subscribe(cluster));
+        }
+
+        var start = local.For(C(1));
+        for (var i = 2UL; i <= 300; i++)
+        {
+            start.Observe(C(i));
+            local.For(C(i)).Note();
+        }
+
+        var owner = homes.Single(c => c.Address == ring.OwnerOf(C(1)));
+        await owner.DeliverAsync(new Envelope
+        {
+            To = owner.Address,
+            Messages =
+            [
+                new Message
+                {
+                    Broadcast = BroadcastId.New(), ReturnTo = seen.Address, To = C(1),
+                    Held = 10.0, Chain = [C(1)], Carried = 1.0,
+                },
+            ],
+        });
+        await _bus.WhenQuiet().WaitAsync(Patience);
+        foreach (var handle in handles) handle.Dispose();
+
+        var forked = seen.Got.Single(r => r.Handled == 1 && r.From == owner.Address);
+
+        // 299 routes created, named in at most five entries.
+        Assert.Equal(299, forked.SentInto.Sum(r => r.Count));
+        Assert.True(forked.SentInto.Length <= 5,
+            $"{forked.SentInto.Length} entries for 299 routes");
+    }
+
     private sealed class Listening : IReceiveReports
     {
         private readonly List<Report> _got = [];

@@ -479,9 +479,72 @@ Recorded here so a decision does not go quiet.
     routing named in each report. Those are two independent quantities, and
     them agreeing is a real check where the old one held by construction.
 
+15. **STRENGTHENING ON USE — John, 2026-08-02.** A connection a thought walks
+    gets stronger; one a thought cannot continue down gets weaker. **Not
+    happening today: thinking is entirely read-only and only the rendezvous
+    writes.**
+    **The trap, and it is the reason to be careful rather than not to do it.**
+    `together / seen` currently estimates how often two codes actually
+    co-occurred. If use also increments it, the number stops estimating
+    anything about the world, the system's own behaviour becomes
+    indistinguishable from evidence, and every measurement built on it becomes
+    unreadable. It is also rich-get-richer: strong → walked → stronger,
+    which can collapse the graph into a few dominant paths regardless of the
+    world.
+    **Proposed resolution: keep TWO numbers.** `together` stays pure
+    observation; a separate `use` count feeds the COST but not the WEIGHT. The
+    reinforcement is real, the evidence is untouched, and whether use-based
+    cost helps becomes measurable against the observational number.
+
+16. **BACK-PROPAGATION — John, 2026-08-02.** Reinforce the chain that was
+    finally chosen.
+    **Objection: reinforcing a chain because it was chosen adds no
+    information.** It was chosen for being strongest; making it stronger is a
+    loop with no input, which is rich-get-richer with extra steps.
+    **It becomes real the moment the signal comes from OUTSIDE.** There is
+    exactly one honest external signal here — energy. Reinforce the chain that
+    preceded a fruit, not the chain that won the ranking. Nothing declares food
+    good; energy runs out if you do not eat, so survival does the declaring.
+    That would be the first credit assignment in this project rather than
+    bookkeeping.
+
+17. **FORGETTING — John, 2026-08-02**, and designed on `master` but unbuilt
+    here: `CoOccurrence(half_life)`, aged on read rather than swept, clocked on
+    **the node's own occasions** so a node nobody talks to does not forget
+    because the rest of the world got busy.
+
 14. **WHAT DOES A STEP COST, once the sender cannot weigh? — John's question,
-    2026-08-02.** He proposed that a hop should cost the weight of the edge it
-    walks rather than a flat charge for leaving the node.
+    2026-08-02, and his answer is better than the question.** He proposed that
+    a hop should cost the weight of the edge it walks rather than a flat charge
+    for leaving the node, and then sharpened it to an **INVERSE** cost: the
+    stronger the connection, the cheaper the step, so a route runs further down
+    strong edges than weak ones.
+
+    **He is wrong that `Best` penalises the best edge** — the price is the max
+    but the payment is the taken edge, so the best breaks even exactly.
+    **He is right about something better than what he said**: under `Best` the
+    cost of taking edge X depends on what OTHER edges that node happens to
+    have. Add a stronger sibling and X costs more, though nothing about X
+    changed. Cost should be a property of the connection alone.
+
+    **AND HIS FORM FIXES FORK 8.** Under `Best` a route down the best edge pays
+    exactly zero net, so in a near-deterministic world where nearly every
+    weight is near 1.0 nothing ever decays and only the cycle check bounds the
+    walk — which is the measured factorial. Under a strictly positive cost
+    every hop costs something, so the walk is **bounded by construction** and
+    the `Horizon` constant stops being needed.
+
+    **The detail that decides it.** These look equivalent and are not:
+
+    | cost | at weight 1.0 | bounded |
+    |---|---|---|
+    | `1 - weight` | 0 | no — the same failure as `Best` |
+    | `-log(weight)` | 0 | no — the same failure |
+    | `1 / weight` | **1** | **yes** |
+
+    Only a form strictly positive at perfect strength terminates. With
+    `1 / weight`, stamina reads as *how many perfect hops can I afford* — still
+    a scale to sweep, but a meaningful one rather than a magic number.
     **His intuition is already what `Best` does, by a route he did not expect.**
     The price is flat — the strongest partner's fuel — but the *payment* is the
     taken edge's fuel, so the NET is edge-specific: a route down the best edge

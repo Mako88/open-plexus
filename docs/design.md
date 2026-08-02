@@ -5,12 +5,12 @@ implementations — this is the mental model, and the code is meant to match it
 exactly. If they ever disagree, this file is wrong and gets fixed.
 
 **Status: every type exists. `Code`, `Node`, `LiveSet`, `Snake`,
-`SnakeQuantizer`, `Thought`, `Ring` and `HybridBus` are implemented and
-tested; everything else is a stub.** Each unimplemented field shows up as a
-`CS0169` build warning, so the count is a rough progress bar — 27 when the
-stubs landed, **12** now.
+`SnakeQuantizer`, `Thought`, `Ring`, `HybridBus` and `Cluster` are implemented
+and tested; only the learning path and the two machines are stubs.** Each
+unimplemented field shows up as a `CS0169` build warning, so the count is a
+rough progress bar — 27 when the stubs landed, **8** now.
 
-**78 tests pass, and twenty-nine mutations have been run to confirm they bite.**
+**88 tests pass, and thirty-six mutations have been run to confirm they bite.**
 A test has proved nothing until it has been seen to fail for the right reason.
 
 **Five mutations have SURVIVED across the project, and all five are recorded
@@ -46,6 +46,13 @@ better tests; two are kept and labelled.
 | `WhenQuiet` ignores work in flight | quiet-waits-for-a-delivery |
 | an unknown address is dropped | nothing-local-is-a-bug-not-a-drop |
 | a stale handle evicts its successor | stale-handle-does-not-evict |
+| one envelope per message rather than per destination | partners-in-one-cluster |
+| every partner is sent to the local cluster | partners-across-clusters |
+| reports are merged across thoughts | two-thoughts-reported-separately |
+| arrivals are never reported | arrivals-come-back |
+| nodes are not created on first mention | node-comes-into-existence |
+| the row is written without its lock | concurrent-deliveries-do-not-lose-counts |
+| the node's lock is held across the weighing | partners-can-fire-at-once (deadlocks) |
 
 **Survived, on `Ring`:**
 
@@ -211,13 +218,40 @@ economy lives.
 - **`Admit(code)`** — creates the node for a code this cluster owns and has not
   seen before. Nodes come into existence on first mention; nothing pre-creates
   the graph.
-- **`Deliver(envelope)`** — the economy. Unpacks the many messages in the
+- **`DeliverAsync(envelope)`** — the economy. Unpacks the many messages in the
   envelope, hands each to its node's `Fire`, collects every outgoing message,
   **regroups them by owning cluster**, and sends one envelope per destination.
   A node forking to 200 partners across 12 clusters produces 12 sends. Every
-  hop that stays inside this cluster never touches the wire at all.
-- **`ReportTo(thought)`** — batches arrivals and accounting back to the machine
-  that started the thought, addressed by the message's return address.
+  hop that stays inside this cluster never touches the wire at all. Measured by
+  counting sends, because a test that only checked what *arrived* could not
+  tell one envelope of three messages from three envelopes of one.
+- **Reports are keyed by machine AND broadcast.** One envelope can carry
+  messages from more than one thought, and merging their accounting is exactly
+  what the broadcast id exists to prevent.
+- **`Admit` does not check ownership, deliberately.** A message addressed here
+  under a ring view that has since moved on would be refused, and refusing
+  loses the count where accepting keeps it. **The consequence is recorded
+  rather than prevented**: while views disagree, two clusters can each hold a
+  partial row for one code and nothing merges them. That is the lost-count
+  scale of error C2 already admits, not a corruption.
+
+### `LocalMarginals`
+
+**Fork 2, now load-bearing.** `Node.Fire` needs the *partner's* marginal, and
+partners live in other clusters. This reads them straight out of whatever
+clusters happen to be in this process — **a C1 violation, named and kept in one
+place so it cannot be mistaken for a solved problem.** It works exactly as far
+as one process and no further: a second machine's nodes are simply not here,
+every edge pointing at one would weigh zero, and no route would ever leave.
+
+### `Node` is thread-safe, and the lock is never held across a weighing
+
+Two envelopes can be delivered to one cluster at once, so a node can be fired
+by two thoughts at once. `Fire` **snapshots the row and releases before it
+weighs anything** — weighing reads partners' nodes, and holding this node's
+lock while doing that deadlocks against a partner firing back. Edges are
+mutual, so that is an ordinary case rather than a corner. The mutation that
+holds the lock across the weighing hangs the test until its timeout.
 
 ---
 

@@ -35,6 +35,18 @@ public sealed class Node
     /// <inheritdoc cref="WalkSettings"/>
     private readonly WalkSettings _settings;
 
+    /// <summary>
+    /// Guards this node's own row and marginal, and nothing else.
+    /// </summary>
+    /// <remarks>
+    /// <b>Never held across a call to <see cref="IMarginals"/>.</b> Weighing an
+    /// edge reads the partner's node, so a node holding its own lock while
+    /// doing that would deadlock against a partner firing back at it — which
+    /// is an ordinary case, since edges are mutual. <see cref="Fire"/> takes a
+    /// snapshot and releases before it weighs anything.
+    /// </remarks>
+    private readonly Lock _gate = new();
+
     /// <summary>How many occasions this node fired on at all. Its own marginal.</summary>
     private double _seen;
 
@@ -73,12 +85,18 @@ public sealed class Node
     /// How many occasions this node fired on. <b>Public because a neighbour
     /// needs it</b> to weigh an edge pointing here — see <see cref="IMarginals"/>.
     /// </summary>
-    public double Seen => _seen;
+    public double Seen
+    {
+        get { lock (_gate) return _seen; }
+    }
 
     // ---- learning: these two are the entirety of what changes over time ----
 
     /// <summary>"I fired on this occasion." Adds one to the marginal.</summary>
-    public void Note() => _seen += 1.0;
+    public void Note()
+    {
+        lock (_gate) _seen += 1.0;
+    }
 
     /// <summary>
     /// "That code fired on the same occasion I did." Adds one to that partner's
@@ -97,16 +115,22 @@ public sealed class Node
                 "a code cannot be its own partner; counting one would make " +
                 "every statistic read its own presence as evidence", nameof(other));
 
-        _together[other] = _together.GetValueOrDefault(other) + 1.0;
+        lock (_gate) _together[other] = _together.GetValueOrDefault(other) + 1.0;
     }
 
     /// <summary>Reads back one cell of the row.</summary>
-    public double Together(Code other) => _together.GetValueOrDefault(other);
+    public double Together(Code other)
+    {
+        lock (_gate) return _together.GetValueOrDefault(other);
+    }
 
     /// <summary>
     /// Every code this node has ever co-occurred with. The fan-out of one hop.
     /// </summary>
-    public IReadOnlyCollection<Code> Partners() => _together.Keys;
+    public IReadOnlyCollection<Code> Partners()
+    {
+        lock (_gate) return [.. _together.Keys];
+    }
 
     // ---- thinking ----------------------------------------------------------
 
@@ -142,6 +166,17 @@ public sealed class Node
                 $"message addressed to {message.To} reached the node for {_code}",
                 nameof(message));
 
+        // SNAPSHOT FIRST, THEN WEIGH. Weighing reads partners' nodes, and
+        // holding this node's lock while doing that deadlocks against a partner
+        // firing back — which is ordinary, because edges are mutual.
+        KeyValuePair<Code, double>[] row;
+        double seen;
+        lock (_gate)
+        {
+            row = [.. _together];
+            seen = _seen;
+        }
+
         // An origin message has not travelled, so nothing arrived here and
         // there is no edge to value. Its strength is the starting 1.0.
         var isOrigin = message.Chain.Length <= 1;
@@ -151,7 +186,7 @@ public sealed class Node
         // so it cancels in a ranking and never has to be known — which is what
         // makes rarity-weighting C1-legal where PPMI is not.
         var carried = !isOrigin && _settings.Value == ArrivalValue.Lift
-            ? message.Carried / Math.Max(_seen, 1.0)
+            ? message.Carried / Math.Max(seen, 1.0)
             : message.Carried;
 
         var reached = isOrigin
@@ -165,13 +200,13 @@ public sealed class Node
                 Routes = 1,
             };
 
-        var weights = new Dictionary<Code, double>(_together.Count);
-        var fuels = new Dictionary<Code, double>(_together.Count);
-        var affordable = new List<double>(_together.Count);
+        var weights = new Dictionary<Code, double>(row.Length);
+        var fuels = new Dictionary<Code, double>(row.Length);
+        var affordable = new List<double>(row.Length);
 
-        foreach (var partner in _together.Keys)
+        foreach (var (partner, together) in row)
         {
-            var weight = WeightOf(partner, marginals);
+            var weight = WeightOf(together, partner, marginals);
             weights[partner] = weight;
 
             // THE FUEL AND THE SCORE ARE TWO QUANTITIES. The weight scores an
@@ -234,10 +269,10 @@ public sealed class Node
     /// and <see cref="IMarginals"/> is the seam where that shows.
     /// </para>
     /// </remarks>
-    private double WeightOf(Code partner, IMarginals marginals)
+    private static double WeightOf(double together, Code partner, IMarginals marginals)
     {
         var common = marginals.SeenOf(partner);
-        return common <= 0.0 ? 0.0 : _together[partner] / common;
+        return common <= 0.0 ? 0.0 : together / common;
     }
 
     /// <summary>

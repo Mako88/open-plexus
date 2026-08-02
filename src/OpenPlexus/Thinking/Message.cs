@@ -13,7 +13,15 @@ namespace OpenPlexus.Thinking;
 /// </remarks>
 public readonly record struct BroadcastId(Guid Value)
 {
-    public static BroadcastId New() => throw new NotImplementedException();
+    /// <summary>
+    /// A fresh id, minted without asking anyone.
+    /// </summary>
+    /// <remarks>
+    /// <b>C1 forbids a counter.</b> Any shared sequence would need every
+    /// machine to agree on what comes next, so this is a value large enough
+    /// that independent machines do not collide by accident.
+    /// </remarks>
+    public static BroadcastId New() => new(Guid.NewGuid());
 }
 
 /// <summary>

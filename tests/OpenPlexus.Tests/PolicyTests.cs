@@ -99,6 +99,38 @@ public sealed class PolicyTests
     }
 
     [Fact]
+    public async Task The_chain_outlives_random_by_more_than_noise()
+    {
+        // Measured at 200 seeds: chain 6.575 +/- 0.408, random 3.990 +/- 0.272.
+        // A gap of 2.585 against a combined standard error of 0.490 -- about
+        // five standard errors, so it survives a much smaller sample than that
+        // and this test uses 40 seeds.
+        var chain = await Over(40, Policy.Chain);
+        var random = await Over(40, Policy.Random);
+
+        Assert.True(chain.Average(r => r.Steps) > random.Average(r => r.Steps) * 1.3,
+            $"chain {chain.Average(r => r.Steps):F2} against random " +
+            $"{random.Average(r => r.Steps):F2}");
+    }
+
+    [Fact]
+    public async Task Repeating_the_last_action_cannot_outlive_the_board()
+    {
+        // WHY THE MEANS ARE NOT THE INTERESTING NUMBER. Walking straight from
+        // the centre of a 15-wide board hits the wall, so this policy is capped
+        // by geometry and never reaches 10 steps -- 0 of 200 measured. The
+        // chain passed 10 steps in 62 of 200. Same mean, entirely different
+        // shape, and the mean hides it.
+        var repeat = await Over(40, Policy.Repeat);
+
+        Assert.All(repeat, r => Assert.True(r.Steps <= 8, $"repeat survived {r.Steps}"));
+
+        // The companion: the chain is not capped the same way.
+        var chain = await Over(40, Policy.Chain);
+        Assert.Contains(chain, r => r.Steps > 8);
+    }
+
+    [Fact]
     public async Task Nothing_has_eaten_a_fruit_under_any_policy()
     {
         // Recorded so no claim of competence can quietly be made. Thirty seeds

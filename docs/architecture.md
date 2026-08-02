@@ -325,20 +325,36 @@ Recorded here so a decision does not go quiet.
    NOT a candidate** — capping how many partners are considered is already ❌
    on `master` as "a constant nobody set on purpose, doing the cutting".
 
-10. **DOES THE CHAIN DO ANYTHING? Measured 2026-08-02, and the answer is
-    "less than the dumbest possible policy".** 30 seeds, 300-step budget,
-    `includeEmpty: false`, `Horizon = 4`. The graph learns identically under
-    all three arms; only the choice differs.
+10. **DOES THE CHAIN DO ANYTHING? Measured 2026-08-02.** 200 seeds, 300-step
+    budget, `includeEmpty: false`, `Horizon = 4`. The graph learns identically
+    under all three arms; only the choice differs.
 
-    | policy | mean steps | max | fruit |
-    |---|---|---|---|
-    | chain | 4.77 | **17** | 0 |
-    | random | 2.70 | 9 | 0 |
-    | repeat the last action | **5.90** | 8 | 0 |
+    | policy | mean | sd | se | median | max | runs past 10 steps |
+    |---|---|---|---|---|---|---|
+    | chain | 6.575 | 5.772 | 0.408 | 4 | **39** | **62 / 200** |
+    | random | 3.990 | 3.840 | 0.272 | 3 | 28 | 8 / 200 |
+    | repeat the last action | 6.250 | 3.039 | 0.215 | **8** | 8 | 0 / 200 |
 
-    **The chain beats random and loses to repeat-last-action.** So there is no
-    evidence it contributes anything a trivial momentum rule does not, and some
-    evidence it contributes less.
+    **The chain beats random by about five standard errors** — a gap of 2.585
+    against a combined error of 0.490. That one is real.
+
+    **The chain and repeat-last-action are indistinguishable on the mean**:
+    0.325 apart against a combined error of 0.461, which is under one standard
+    error.
+
+    **AN EARLIER READING OF THIS AT 30 SEEDS SAID THE CHAIN LOSES TO REPEAT
+    (4.77 against 5.90) AND THAT WAS WRONG.** At 200 seeds the chain is
+    nominally ahead and the difference is inside the noise either way. Recorded
+    because the mistake is the instructive part: 30 seeds was not enough to
+    support a comparison, and the number was published without a spread beside
+    it.
+
+    **The means are the wrong column.** The distributions barely overlap in
+    shape. `repeat` is capped by geometry — a straight line from the centre of
+    a 15-wide board hits the wall — so it never reaches 10 steps in 200 runs,
+    and its median of 8 IS its maximum. The chain's median is worse at 4, and
+    its tail is far longer: 62 of 200 runs past 10 steps, against repeat's 0,
+    and a longest run of 39.
 
     **It is not merely echoing, though.** Of 77 chain-chosen moves over ten
     seeds, 28 repeated the last action — 36% against a chance rate of 25%. So

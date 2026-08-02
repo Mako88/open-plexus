@@ -5,17 +5,18 @@ implementations — this is the mental model, and the code is meant to match it
 exactly. If they ever disagree, this file is wrong and gets fixed.
 
 **Status: every type exists. `Code`, `Node`, `LiveSet`, `Snake`,
-`SnakeQuantizer`, `Thought` and `Ring` are implemented and tested; everything
-else is a stub.** Each unimplemented field shows up as a `CS0169` build
-warning, so the count is a rough progress bar — 27 when the stubs landed,
-**13** now.
+`SnakeQuantizer`, `Thought`, `Ring` and `HybridBus` are implemented and
+tested; everything else is a stub.** Each unimplemented field shows up as a
+`CS0169` build warning, so the count is a rough progress bar — 27 when the
+stubs landed, **12** now.
 
-**66 tests pass, and twenty-two mutations have been run to confirm they bite.**
+**78 tests pass, and twenty-nine mutations have been run to confirm they bite.**
 A test has proved nothing until it has been seen to fail for the right reason.
 
-**Three mutations SURVIVED on `Ring`, and all three are recorded rather than
-hidden** — a surviving mutation marks a vacuous region of the test set, and
-pretending otherwise is worse than the gap.
+**Five mutations have SURVIVED across the project, and all five are recorded
+rather than hidden** — a surviving mutation marks a vacuous region of the test
+set, and pretending otherwise is worse than the gap. Three were then closed by
+better tests; two are kept and labelled.
 
 | Mutation | Caught by |
 |---|---|
@@ -38,6 +39,13 @@ pretending otherwise is worse than the gap.
 | the splitmix finaliser is removed | adjacent-codes-do-not-land-together |
 | `Leave` does nothing | departed-codes-do-move |
 | the seed is dropped from cluster placement | a-different-seed-places-codes |
+| delivery becomes synchronous | sending-returns-before-the-receiver |
+| leaving fires no death | leaving-fires-a-death |
+| envelopes go to whoever subscribed first | envelope-reaches-the-cluster |
+| faults are swallowed | receiver-that-throws-surfaces |
+| `WhenQuiet` ignores work in flight | quiet-waits-for-a-delivery |
+| an unknown address is dropped | nothing-local-is-a-bug-not-a-drop |
+| a stale handle evicts its successor | stale-handle-does-not-evict |
 
 **Survived, on `Ring`:**
 
@@ -46,6 +54,13 @@ pretending otherwise is worse than the gap.
 | the seed is dropped from the code hash | **Fixed.** The seed was folded into *both* the code hash and cluster placement, and each covered for the other — removing either alone changed no answer. One implementation per behaviour, so it now lives on cluster placement alone, where a mutation does bite. |
 | the address tie-break is removed | Only reachable on a 64-bit collision between two cluster points, which no test produces. Kept because `List.Sort` is unstable, so a collision would otherwise let insertion order reach the answer. **A claim about improbability, not about tested behaviour.** |
 | the `Join` idempotence guard is removed | Joining twice re-adds the same points at the same positions, so no lookup changes its answer. The guard saves memory, not correctness, and no test can see it. |
+
+**Survived on `HybridBus`, then closed:**
+
+| Mutation | Why it survived, and what fixed it |
+|---|---|
+| routing ignores the address and takes the first subscriber | The test addressed the cluster that happened to be subscribed **first**, so "always pick the first" was indistinguishable from correct routing. **Fixed** by addressing the second subscriber. |
+| the handle's double-dispose guard is removed | `Leave` already refuses to remove an address that is not there, so a plain double dispose fires one death either way. The guard is only load-bearing when an address **rejoins** — a previous life's handle must not evict its successor, which C3 makes an ordinary case. **Fixed** by testing that. |
 
 Scope: **snake**, running on one machine, with every boundary shaped so the
 same code runs across many. Static background is out of scope for now — see
@@ -233,22 +248,60 @@ directory and nobody to ask.**
 allowed.** A misrouted message is a lost count, not a corruption — the
 statistics are counts over many occasions.
 
+### `IReceiveEnvelopes` / `IReceiveReports`
+
+What the bus actually hands things to. **The bus takes these rather than a
+`Cluster`, so it does not know what a cluster is** — transport and graph stay
+separable, and the bus is testable without a single node existing. `Cluster`
+implements the first; a machine implements the second.
+
 ### `IBus`
 
-- **`Subscribe(cluster)`** — a cluster becomes reachable. Returns a handle;
-  disposing it leaves the bus.
-- **`SendAsync(address, envelope)`** — get this envelope to that cluster.
-- **`Deaths`** — fires when a machine leaves, so thoughts waiting on routes
-  through it can release their state.
+- **`Subscribe(cluster)`**, **`Subscribe(machine)`** — becomes reachable.
+  Returns a handle; disposing it leaves the bus. **A handle from a previous
+  life cannot evict the subscriber that replaced it** — C3 says a cluster
+  vanishing is normal, so one returning under the same address is normal too.
+- **`SendAsync(address, envelope)`** — the thinking path, outbound.
+  **Returns before delivery happens.** A sender never waits on a receiver.
+- **`SendAsync(address, report)`** — the thinking path, back to the origin.
+- **`Deaths`** — fires when a **cluster** leaves. *Cluster* granularity rather
+  than machine, because a route is stranded by the departure of whatever holds
+  its next node, and a machine leaving is every one of its clusters leaving.
+
+**`SendAsync(machine, occasion)` was removed**: the learning path has no
+transport yet, because `LocalRendezvous` writes directly and the distributed
+one is unbuilt. It comes back with a caller.
+
+### `Report`
+
+Everything one cluster owes one machine for one broadcast, batched into a
+single send — the return path's counterpart to `Envelope`.
 
 ### `HybridBus`
 
-- **`_local`** — clusters in this process. `SendAsync` to one of these is a
-  **direct method call, not awaited on the sender's path, no serialization at
-  all.**
-- **`_peers`** — machines reachable over the wire. Same call, real latency.
-- **`_seed`** — the shared constant every quantizer and every ring is built
-  from. Handed out once and frozen, which C1 permits.
+**Only the local half exists.** There is no second machine, so there is no
+wire. `_peers` and the seed are gone from this class — a field nothing writes
+is dead state wearing the appearance of a feature, and the seed belongs to
+`Ring` and the quantisers that actually use it.
+
+- **`_clusters` / `_machines`** — everything in this process. A send to one of
+  these is a direct call dispatched to the thread pool: **the sender returns
+  before the receiver has finished**, which is what makes a fan-out parallel
+  rather than a queue. Asserted two ways — a send returning while the receiver
+  is still inside `DeliverAsync`, and two receivers each waiting for the other
+  to start, which serial delivery cannot satisfy.
+- **An address that is not local throws.** With no wire, an unknown address can
+  only be a routing bug, and a silent drop would be indistinguishable from the
+  ordinary C2 message loss it is not. When the wire lands, that same case
+  becomes a lost message.
+- **`Faults`** — a delivery that threw. A send that returns before delivery has
+  no other way to report failure, and swallowing is how a thing turns out never
+  to have been wired up.
+- **`WhenQuiet()`** — completes when nothing is in flight. **Not a C1 violation
+  and not a barrier the design relies on**: it observes one process's own
+  dispatch queue, no distributed agreement is involved, and nothing in the
+  thinking loop waits on it. It exists so a test or a harness can ask whether
+  the dust has settled without a sleep.
 
 **The speed difference between local and remote is not a wart, it is the
 experiment** — codes that land together are cheap to walk between, and that is

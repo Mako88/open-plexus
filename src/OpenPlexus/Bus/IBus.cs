@@ -1,8 +1,27 @@
-using OpenPlexus.Graph;
-using OpenPlexus.Learning;
 using OpenPlexus.Thinking;
 
 namespace OpenPlexus.Bus;
+
+/// <summary>Something that can be handed envelopes. A cluster, in practice.</summary>
+/// <remarks>
+/// The bus takes this rather than a <c>Cluster</c> so that <b>it does not know
+/// what a cluster is</b> — transport and graph stay separable, and the bus is
+/// testable without a single node existing.
+/// </remarks>
+public interface IReceiveEnvelopes
+{
+    ClusterAddress Address { get; }
+
+    Task DeliverAsync(Envelope envelope, CancellationToken ct = default);
+}
+
+/// <summary>Something that can be handed reports. A machine, in practice.</summary>
+public interface IReceiveReports
+{
+    MachineAddress Address { get; }
+
+    Task DeliverAsync(Report report, CancellationToken ct = default);
+}
 
 /// <summary>
 /// How anything reaches anything else.
@@ -19,22 +38,38 @@ public interface IBus
     /// <b>leaving is not silent</b> — it fires a death event, which is the
     /// whole reason this is a bus rather than point-to-point sends.
     /// </summary>
-    IDisposable Subscribe(Cluster cluster);
+    IDisposable Subscribe(IReceiveEnvelopes cluster);
 
-    /// <summary>Get this envelope to that cluster. The thinking path.</summary>
-    ValueTask SendAsync(ClusterAddress to, Envelope envelope, CancellationToken ct = default);
-
-    /// <summary>Get this occasion to whoever joins it. The learning path.</summary>
-    ValueTask SendAsync(MachineAddress to, Occasion occasion, CancellationToken ct = default);
+    /// <summary>A machine becomes reachable, so reports can come back to it.</summary>
+    IDisposable Subscribe(IReceiveReports machine);
 
     /// <summary>
-    /// A machine left. Thoughts waiting on routes through it can release their
-    /// state.
+    /// Get this envelope to that cluster. The thinking path, outbound.
     /// </summary>
     /// <remarks>
-    /// <b>Housekeeping, not correctness.</b> Under continuous input the system
-    /// acts on the best chain arrived so far, so a thought stranded by a
-    /// vanished machine leaks state rather than hanging anything.
+    /// <b>Returns before delivery happens.</b> A sender never waits on a
+    /// receiver — that is what makes a fan-out to many clusters parallel rather
+    /// than a queue.
     /// </remarks>
-    event Action<MachineAddress>? Deaths;
+    ValueTask SendAsync(ClusterAddress to, Envelope envelope, CancellationToken ct = default);
+
+    /// <summary>Get this report back to the machine that started the thought.</summary>
+    ValueTask SendAsync(MachineAddress to, Report report, CancellationToken ct = default);
+
+    /// <summary>
+    /// A cluster left. Routes that were heading into it are never coming back.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Cluster granularity, not machine.</b> A route is stranded by the
+    /// departure of whatever holds its next node, and that is a cluster; a
+    /// machine leaving is every one of its clusters leaving.
+    /// </para>
+    /// <para>
+    /// <b>What a thought should DO with this is not decided</b> — see open
+    /// fork 5. A thought does not track which clusters its routes are sitting
+    /// in, so it cannot tell whether a given death affects it.
+    /// </para>
+    /// </remarks>
+    event Action<ClusterAddress>? Deaths;
 }

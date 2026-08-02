@@ -12,7 +12,7 @@ namespace OpenPlexus.Graph;
 /// cluster is the envelope that makes that affordable, and it is a transport
 /// concern only — <b>it decides nothing about what fires.</b>
 /// </remarks>
-public sealed class Cluster
+public sealed class Cluster : IReceiveEnvelopes
 {
     /// <summary>Code to node, for every node this cluster holds.</summary>
     private readonly Dictionary<Code, Node> _nodes = [];
@@ -57,9 +57,6 @@ public sealed class Cluster
     /// Batches arrivals and accounting back to the machine that started the
     /// thought, addressed by the message's return address.
     /// </summary>
-    private Task ReportAsync(
-        MachineAddress returnTo,
-        IReadOnlyCollection<Arrival> arrivals,
-        Accounting accounting,
-        CancellationToken ct) => throw new NotImplementedException();
+    private Task ReportAsync(MachineAddress returnTo, Report report, CancellationToken ct) =>
+        throw new NotImplementedException();
 }

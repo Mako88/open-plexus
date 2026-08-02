@@ -17,28 +17,32 @@ when it is done. Nothing may cite it. Rewritten at the end of every turn — see
 
 ---
 
-## THE SENSES RUNS WERE UNDERPOWERED, and most of their nulls are suspect
+## THE SENSES RUNS WERE UNDERPOWERED — n=150 where +0.03 needs 840
 
-John's question, 2026-08-02: too many things that should have helped have not.
-He was right and the flaw is arithmetic, not mechanism.
+John's question: too many things that should have helped have not. The flaw is
+arithmetic. The seed spreads reported all session, 0.038 to 0.330, are its
+signature, and every senses measurement is null where every snake measurement
+works. **Nothing has been re-run.**
 
-    n = 150 questions  ->  std error 0.025
-    to detect +0.03 at 80% power     840 questions
-    runs actually used               120 to 150
+## THREE REFUTATIONS TO RE-RUN, and they are all the broadcast
 
-**Underpowered five to six times** for the effects being chased, and the seed
-spreads reported all session — 0.038 to 0.330 — are its signature. Several
-senses refutations are likely false negatives.
+John's question: what did we abandon on a failed test that may now be
+hindering us? Audited against the README's 33 ruled-out entries. Seven rest on
+senses-graph numbers; three of those are small effects measured at 120-150
+questions where +0.03 needs 840, under the hash, before the rank-blind metric
+was fixed:
 
-**And the pattern beneath it:** every senses measurement is null and every snake
-measurement works. The senses task has about 12 occasions per code, purity
-capped at 0.42, an ever-present distractor, and its cross-modal arm is the one
-`surfaces_pipeline.affordable()` prints a warning about. It is a bad instrument
-and it was used anyway.
+- **the broadcast flood as a cross-modal walk**
+- **refuelling on surprise, and valuing arrivals by rarity**
+- **many origins in place of edge kinds** — and the ensemble front end now
+  supplies far more origins than the four that were tested
 
-**Nothing has been re-run.** The flood nulls predate the rank-blind metric fix;
-the word-channel comparison ran in the starved regime under the hash; every
-senses result predates knowing the front end is the bottleneck.
+**All three are John's design, and none has had a properly powered test.**
+Re-run at ~1,000 questions before anything is built on their being dead.
+
+The other four survive for reasons that are not about power: the k-means ❌ is
+a C1 argument rather than a score, `MEAN` pricing was unbounded rather than
+weak, and the stamina-scale and `cross 1.0000` entries are facts about spread.
 
 ## Waiting on John
 

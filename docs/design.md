@@ -4,12 +4,12 @@ What every piece is and what every method does, in words. No bodies, no
 implementations — this is the mental model, and the code is meant to match it
 exactly. If they ever disagree, this file is wrong and gets fixed.
 
-**Status: every type exists. `Code`, `Node`, `LiveSet`, `Snake` and
-`SnakeQuantizer` are implemented and tested; everything else is a stub.** Each
-unimplemented field shows up as a `CS0169` build warning, so the count is a
-rough progress bar — 27 when the stubs landed, **19** now.
+**Status: every type exists. `Code`, `Node`, `LiveSet`, `Snake`,
+`SnakeQuantizer` and `Thought` are implemented and tested; everything else is a
+stub.** Each unimplemented field shows up as a `CS0169` build warning, so the
+count is a rough progress bar — 27 when the stubs landed, **14** now.
 
-**43 tests pass, and nine mutations have been run to confirm they bite.** A
+**56 tests pass, and fifteen mutations have been run to confirm they bite.** A
 test has proved nothing until it has been seen to fail for the right reason.
 
 | Mutation | Caught by |
@@ -23,6 +23,12 @@ test has proved nothing until it has been seen to fail for the right reason.
 | food restores no energy | eating-restores |
 | the offset is dropped from a code | three quantiser tests |
 | the contents are dropped from a code | different-contents |
+| `Sum` degrades to `Max` | sum-gathers-evidence |
+| the chain kept is the last, not the strongest | strongest-chain |
+| the live count ignores deaths | thought-is-over |
+| another broadcast's accounting is accepted | broadcast-refused |
+| release keeps the state | releasing-drops-state |
+| ties ignore chain length | tie-breaks-on-shorter |
 
 Scope: **snake**, running on one machine, with every boundary shaped so the
 same code runs across many. Static background is out of scope for now — see
@@ -300,9 +306,20 @@ One broadcast, on the machine that started it.
 - **`Best(n)`** — the top arrivals **right now**. Readable at any time, which
   is what continuous operation requires: the system acts on what has arrived so
   far and later arrivals refine it.
-- **`Balanced()`** — whether `origins + splits - deaths == live`. Exact in one
-  process, and not across a network, which is why this is asserted rather than
-  trusted.
+- **`Balanced()`** — whether `origins + splits - deaths == live`. **In one
+  process this catches a slip, not a network fault** — the live count is moved
+  by the same call that moves splits and deaths, so it holds by construction
+  unless those two paths diverge. Across a network it cannot hold at all, since
+  C2 loses reports and one lost death leaves the count above zero forever. That
+  is why nothing waits on it.
+- **`Receive(accounting)` refuses another broadcast's report.** Mixing two
+  thoughts' death counts is exactly what the broadcast id exists to prevent.
+- **Ties in `Best` break on the shorter chain**, then on the endpoint so the
+  order is deterministic. That is the agreed brevity rule and it costs nothing
+  here, but it only ever fires on an *exact* score tie, so it is **not** an
+  implementation of brevity as a ranking principle.
+- **A late arrival for a released thought is dropped, not refused.** C2 says
+  late is normal and there is nothing left for it to refine.
 - **`Release()`** — drop the state. Called on settle or on a death event.
   **Termination is housekeeping now, not correctness.**
 

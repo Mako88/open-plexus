@@ -105,7 +105,10 @@ necessarily words — an action is an output, and so is a structure.
 **7. What changes over time.** The thing that makes it learn.
 
 - ✅ The counts — *currently the whole of what learns.*
-- 🚧 Predict what comes with what, and learn from being wrong — *counts only go up, so nothing is ever wrong and nothing is ever corrected. Predicting relations is an error signal that is not next-token prediction. Agreed 2026-08-01, to build after the broadcast flood. It closes a second hole: prediction error decides when to ask rather than watch, which is currently a knob.*
+- ✅ Predict what comes next, and learn from being wrong — *`prediction.Predictor`, the first mechanism here that can be wrong. Scored **prequentially**: `learn` returns the surprise measured before the count is taken, so the model never sees the answer before being asked. On snake, hit@1 rises 0.49 → 0.72 over 4,000 steps, three seeds, against a shuffled control that stays under 0.10.*
+- ✅ Bind the state and the action into one surface — *`(state, action)` becomes a surface of its own, so an interaction is an ordinary pairwise count and a composite surface has an owner like any other. Costs `states × actions` surfaces, which is the whole price.*
+- ❌ ~~Factor the action instead of binding it~~ — *`Composition`'s form: three pairwise edges, halves combined with `min`. It cannot express an interaction and snake's dynamics are pure interaction. Final hit@1 over three seeds: bound **0.720 / 0.636 / 0.794** against factored **0.438 / 0.346 / 0.526**.* **Revives if** the state alphabet outgrows binding.
+- ⬜ Prediction error decides when to ask rather than watch — *the second hole one mechanism closes, and it is not built. The asking budget is still a fixed fraction nobody chose.*
 - ⬜ Learned representations for relations — *lets a relation never seen sit near ones that were, which counting cannot do.*
 - ⬜ Structure that reorganises, not just weights — *C4 claims the system keeps rearranging what it knows, and nothing implements that.*
 - ⬜ Compress — keep the boundaries that describe the stream in the fewest bits — *one principle that would supply forgetting, hierarchy and a reason to reorganise, all of which are missing.*

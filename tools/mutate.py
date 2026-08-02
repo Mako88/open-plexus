@@ -81,6 +81,7 @@ ASKING = ROOT / "openplexus" / "tasks" / "asking.py"
 PATHWAYS = ROOT / "openplexus" / "pathways.py"
 BROADCAST = ROOT / "openplexus" / "broadcast.py"
 SNAKE = ROOT / "openplexus" / "tasks" / "snake.py"
+PREDICTION = ROOT / "openplexus" / "prediction.py"
 
 
 @dataclass(frozen=True)
@@ -896,6 +897,29 @@ MUTATIONS = [
         path=SURFACES,
         old="        weights = 1 << np.arange(self.bits - 1, -1, -1)",
         new="        weights = 1 << np.arange(self.bits)",
+    ),
+    Mutation(
+        name="the-bound-surface-ignores-the-action",
+        breaks="the whole difference between the two bindings. A composite "
+               "surface that forgets which action was taken makes every action "
+               "from one state the same prediction -- which is exactly what "
+               "`factored` cannot express and `bound` exists to. The model "
+               "still learns, still improves, and is simply wrong about "
+               "anything the action decides",
+        path=PREDICTION,
+        old="        return -1 - (self._state_id(state) * self.actions + action)",
+        new="        return -1 - self._state_id(state)",
+    ),
+    Mutation(
+        name="smoothing-makes-a-first-sighting-certain",
+        breaks="the honest cost of knowing nothing. With the alphabet counting "
+               "only outcomes already SEEN, an empty model divides 1 by 1 and "
+               "reports its very first sighting at zero bits of surprise -- so "
+               "the error signal starts at its floor and can only rise, and a "
+               "curve that should fall cannot",
+        path=PREDICTION,
+        old="        alphabet = max(len(self._targets) + 1, 2)",
+        new="        alphabet = max(len(self._targets), 1)",
     ),
     Mutation(
         name="the-snake-view-is-not-centred",

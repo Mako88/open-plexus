@@ -43,18 +43,23 @@ curiosity loses to random in every form tried.
 correlates with time-since-food and that is predictable structure. **Not a
 score.**
 
-## THE SENSES GRAPH IS STARVED — settled, in the README. What follows
+## THE FRONT END IS THE BOTTLENECK — settled, in the README
 
-Every cross-modal null measured on it says nothing about any mechanism: it has
-about 12 occasions per code where the incumbent walk needs sixty.
+The hash tops out at `q_img` 0.42 and no walk clears chance on the graph it
+builds, at any bit count from 2 to 10. k-means reaches 0.90 and both walks
+clear chance. Decision 1 already priced k-means at twice the purity; **the
+price turns out to be a graph nothing can walk.**
 
-- **Nothing has tried to fix it.** More occasions, fewer codes, or more
-  `--repeats`. Fewer codes costs purity, so it is a trade-off and **it is not
-  known whether any setting of this corpus clears sixty per code.** That is
-  the first thing to find out, and it decides whether the senses task is
-  usable at all.
-- **Every earlier senses result needs re-reading against this**, the
-  word-channel comparison included — all of it ran in the starved regime.
+- **The choice is now a real one.** The hash is ✅ because it needs no data and
+  two nodes agree; k-means is ❌ because two nodes fitted on different samples
+  do not. Nothing here says take k-means — it says decision 1's ⬜, spending
+  codes where the data is WITHOUT fitting a codebook, is the load-bearing open
+  option in the whole project.
+- **Every earlier senses result ran under the hash**, so all of it sits below
+  the threshold where anything is measurable. Re-read accordingly.
+- **`--repeats` may do nothing.** It replays the same recordings, and repeated
+  identical evidence does not sharpen a ratio. Unmeasured, and it has been
+  used as though it added evidence.
 
 ## The live thread: columns that can read each other
 

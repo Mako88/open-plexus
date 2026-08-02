@@ -132,6 +132,10 @@ def main() -> int:
     # blind to any reordering. Chosen here as a handful, which is what an
     # answer would be.
     parser.add_argument("--top", type=int, default=5)
+    # WHICH FRONT END. `lsh` is the deployable one and tops out at q_img 0.42;
+    # `kmeans` reaches 0.90 at a matched code count and is decision 1's ruled-out
+    # arm, kept because "that gap is the price" was never measured downstream.
+    parser.add_argument("--front", choices=("lsh", "kmeans"), default="lsh")
     # A SAFETY, not part of the design, and chosen here as what returns in
     # about a minute per arm. `gave_up` reports how often it fired, because a
     # walk that gave up looks exactly like one that finished.
@@ -145,15 +149,18 @@ def main() -> int:
 
     started = time.time()
     corpus = read_corpus(args.images, args.repeats)
-    image_code = quantise("lsh", corpus.pixels, args.bits, 0, args.seed)
-    audio_code = quantise("lsh", corpus.sounds, args.bits, 0, args.seed)
+    lsh_image = quantise("lsh", corpus.pixels, args.bits, 0, args.seed)
+    k = max(len(set(lsh_image)), 1)
+    image_code = (lsh_image if args.front == "lsh"
+                  else quantise("kmeans", corpus.pixels, args.bits, k, args.seed))
+    audio_code = quantise(args.front, corpus.sounds, args.bits, k, args.seed)
 
     channel = written.Channel()
     heard_words, word_names, word_slots = renderings(
         corpus.pairs, channel, random.Random(0), NOISE)
     word_rows = np.array([written.features(w) for w in heard_words],
                          dtype=np.float64)
-    word_code = quantise("lsh", word_rows, args.bits, 0, args.seed)
+    word_code = quantise(args.front, word_rows, args.bits, k, args.seed)
 
     codes = max(max(image_code) + 1, max(audio_code) + 1, max(word_code) + 1)
     words = Words(width=codes,

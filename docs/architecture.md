@@ -222,3 +222,13 @@ Recorded here so a decision does not go quiet.
    columns falling out of the addressing. Limit: within-modality only, because
    two front ends never share a prefix. An arm, not a default.
 4. **Pricing under `cost: best`** needs every partner weight before any send.
+5. **What a thought does with a death event.** The bus fires one when a cluster
+   leaves, at cluster granularity, because a route is stranded by the departure
+   of whatever holds its next node. But **a thought does not track which
+   clusters its routes are sitting in** — routes fan out and the origin only
+   ever sees arrivals and counts. So on a death it cannot tell whether it was
+   affected. Options, none measured: release every unsettled thought (loses
+   live work), release none (leaks until something else decides), or have a
+   route's cluster be reported back so a thought knows its own exposure (costs
+   a field on every message). **This is the one thing the event bus was
+   introduced to fix, so leaving it unanswered would defeat the point.**

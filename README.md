@@ -155,6 +155,22 @@ necessarily words — an action is an output, and so is a structure.
 - ❌ ~~Train, then test~~ — *measures a system that stops, which is the one thing C4 forbids.*
 - ❌ ~~Bits per token on text~~ — *bounded by what an n-gram table does, so it cannot show what structure adds.*
 
+**11. Time.** How the stream's order gets into the graph, or fails to.
+
+*Numbered last and belongs between 1 and 2. Renumbering would strand fourteen
+`decision N` references across nine files, which is the ghost-reference problem
+this project has already had once.*
+
+- ✅ An occasion is a SET — *everything in one moment met everything else and nothing came first. Simple, and it means the graph cannot tell "A then B" from "A with B" anywhere.*
+- ✅ A window carries recent moments forward, written ONE WAY — *`moments.Window`. John's original design, found missing after the restructure. `span=0` is the old behaviour exactly.*
+- ✅ The storage was already directional and nothing used it — *`observed_with` writes one row; `pair` simply writes both. Writing a single direction costs no new storage and makes `conditional(now, before)` mean "how often now follows before".*
+- ⬜ Weight the window by how far back — *the obvious refinement, and it needs fractional counts the accumulator does not hold.*
+- ⬜ Duration — *nothing represents how long anything lasted, only that it was present.*
+- ❌ ~~A global clock~~ — *two nodes comparing when things happened is the agreement C1 forbids. `buckets.Join` is the C1-legal version: a bucket is a rendezvous that notices a coincidence and is discarded, and nothing is ever looked up by time.*
+- ❌ ~~Leaving sequence to the predictor~~ — *`Predictor` had to be handed `(state, action, next)` explicitly because the graph held no ordering, which puts time outside the representation where nothing else can use it.*
+- ✅ The graph can predict from order alone once it holds any — *0.153 with the window on against **0.000** with it off, three seeds, the control being that no temporal edge means no candidate to offer.*
+- ⬜ Bound surfaces in the GRAPH, not only in the predictor — *the graph reaches 0.153 where `Predictor` reaches 0.717 on the same world, because co-occurrence pools over actions and cannot hold a triple. **The same limitation as `factored` losing to `bound`, arrived at from the other side**, and the same repair: make `(state, action)` a surface.*
+
 ---
 
 ## The constraints

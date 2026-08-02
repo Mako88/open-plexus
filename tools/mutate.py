@@ -82,6 +82,7 @@ PATHWAYS = ROOT / "openplexus" / "pathways.py"
 BROADCAST = ROOT / "openplexus" / "broadcast.py"
 SNAKE = ROOT / "openplexus" / "tasks" / "snake.py"
 PREDICTION = ROOT / "openplexus" / "prediction.py"
+MOMENTS = ROOT / "openplexus" / "moments.py"
 
 
 @dataclass(frozen=True)
@@ -897,6 +898,18 @@ MUTATIONS = [
         path=SURFACES,
         old="        weights = 1 << np.arange(self.bits - 1, -1, -1)",
         new="        weights = 1 << np.arange(self.bits)",
+    ),
+    Mutation(
+        name="the-window-writes-time-symmetrically",
+        breaks="the only thing that makes an ORDER recoverable. A symmetric "
+               "write says these things go together and loses which came "
+               "first, which is exactly what the graph already did before this "
+               "module -- every count still accumulates, every walk still "
+               "runs, and `conditional(now, before)` silently stops meaning "
+               "how often now follows before",
+        path=MOMENTS,
+        old="                            self.index.observed_with(now, before)",
+        new="                            self.index.pair(now, before)",
     ),
     Mutation(
         name="the-bound-surface-ignores-the-action",

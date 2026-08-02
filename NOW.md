@@ -16,91 +16,79 @@ of every turn — see `.claude/skills/monitor`.
 
 ## Waiting on John
 
-**Which chain to render.** The flood returns many complete chains and nothing
-chooses among them. John named this as the piece he does not know how to do,
-and there is no candidate mechanism. Three offered, none agreed:
+**Which chain to render.** Agreed in principle — arrival narrows, prediction
+ranks, brevity breaks ties — and nothing is built. The prediction half now
+exists, so the ranking step has a mechanism for the first time.
 
-- **Let the world choose.** Output the chain whose consequences best predict
-  what arrives next. Needs the 🚧 prediction mechanism and no new knob, and it
-  makes the choice testable against the world rather than against an internal
-  score.
-- **Let arrival choose.** In John's own addressing design the input names an
-  output machine, so the candidates are exactly the chains that reach it.
-- **Let brevity choose.** The chain explaining the most input in the fewest
-  steps, which is §7's compression principle doing a second job.
+**Whether ARC-AGI-3 is next.** Snake was built as the step before it and has
+produced results. The objection stands: counting needs recurrence and ARC
+withholds it by design.
 
-**Whether ARC-AGI-3 is the target.** John's suggestion: feed frames in, wire
-outputs to the buttons, watch. It is the right KIND of target — it needs action,
-which §4 and §6 both name as missing, and it supplies an error signal for free.
-The objection is that counting needs recurrence and ARC withholds it by design;
-the interactive form weakens that but does not remove it. **A null there would
-not be informative**, because the action channel does not exist yet and the
-induction is hard, so a failure could not be attributed. Recommended
-intermediate: any environment where an action changes what is observed.
+## The live thread: columns that can read each other
 
-## The broadcast flood: built, measured, and null
+**What was refuted is INDEPENDENT columns.** Nine overlapping 3×3 windows on
+snake, one predictor each, none able to see another's surface — 0.510 on the
+strict measure against a single whole-view code's 0.650. A window cannot see
+what is about to enter it from outside.
 
-`openplexus/broadcast.py`, called by `experiments/senses_broadcast.py`. The gate,
-the pricing and both refutations are settled and in the README. 15 tests, 4
-mutations, all caught; preflight green.
+**Nothing let one column inform another, and that is the one thing this
+architecture is otherwise entirely about.** A column's surface is a surface; the
+graph is what surfaces are for. The build is to let a column's prediction
+condition on its neighbours' current surfaces as well as its own — a bound
+triple again, which `Predictor` already holds.
 
-**What is left, and it is the only live repair**: an origin's stamina scaled by
-how much that origin predicts, so a specific surface funds a long thought and a
-hub funds a short one. The gate governs which EDGES a route walks and says
-nothing about where a route STARTS, and the origins that hurt were the word
-hubs. Not built, and worth building only if the direction is being kept.
+**Named risk before building**: binding on neighbours multiplies the state space
+by the neighbour alphabet, and `bound` is already multiplicative. The cheap
+version conditions on a SUMMARY of the neighbours rather than their identities.
 
-**A second possibility, untried**: the senses graph may simply be too dense —
-169 nodes at mean degree 40.7, density 0.24, and the forward weights have a
-median of 0.0119 against a max of 0.5. A flood needs somewhere not to go.
+## Snake: built, and what it cannot show
 
-## The word channel: repaired and measured. What is LEFT
+`tasks/snake.py`, `experiments/snake_prediction.py`, `snake_surfaces.py`.
 
-Settled and moved to the README. The run is `out/word-channel-comparison.txt`
-and the three JSON files beside it; `--words label` stays the default so every
-earlier number is reproducible.
+- **Open space teaches nothing.** A centred view of a featureless region is the
+  same view whichever way you went, so board size has to be chosen relative to
+  sight and most steps of a large board are wasted. Unmeasured how much.
+- **No multimodality yet.** The occasion carries vision only. Action and
+  interoception — ate, died, length — are designed as their own kinds in one
+  `SharedGraph` and are not built. That is what would make the stream
+  time-synced by construction rather than by alignment.
+- **Random play only.** Nothing chooses actions, so nothing tests whether acting
+  to disambiguate beats watching — the reason an interactive world was wanted.
 
-**Unfinished:**
+## Prediction: built, and the two holes it has not closed
 
-- **The dials are chosen, not measured.** `silence 0.15 mistake 0.05
-  corrupt 0.30`, swept by `--silence/--mistake/--corrupt`, and nothing has.
-- **Nobody has asked what the byte channel is worth on its own terms.** Every
-  column here was built to score a channel of multiplicity 1. `link_img` counts
-  surfaces per word NODE, so a channel with 72 nodes per digit is measured on a
-  denominator that means something different — the comparison is sound in
-  direction and unsound in units.
-- **Order is discarded.** `features` is a bare byte histogram, so `three` and
-  `there` are one surface. The obvious extension, and it changes the SPACE
-  rather than the allocation, which is where §1 says such changes land.
+`openplexus/prediction.py`. Prequential; `bound` beats `factored` 0.717 to
+0.437 over three seeds, shuffled control 0.005.
 
-## Prediction, agreed and not started
+- **Prediction error does not drive the asking yet.** The second hole the one
+  mechanism was meant to close. The asking budget is still a fixed fraction.
+- **Automatic dial tuning is designed and not built.** A node scoring a small
+  set of candidate values for its own dial, prequentially, against its own
+  prediction error — C1-legal because local, C4-legal because it never ends.
+  **Named risk**: a system minimising surprise can win by never looking at
+  anything surprising, so error must be scored per observation MADE.
 
-Counts only go up, so nothing here can ever be wrong; predicting the next input
-supplies the missing error signal. **John's connection: prediction error is what
-should drive the asking**, which currently runs on a fixed budget fraction. One
-mechanism, two holes, no new knob.
+## Forgetting: built, one half untested
 
-Named risk, from active learning: uncertainty sampling chases irreducible noise.
-A surface unpredictable because it is random attracts every question and teaches
-nothing — structurally the ever-present distractor, one level up. Cheap proxy:
-ask where error is high **and falling**, not high and flat.
+`CoOccurrence(half_life=...)`, off by default. Decay on read, the clock is the
+node's own occasions, `evict`/`reinstate` with a boost.
+
+- **Nothing has swept the half-life**, and it is now known to change answers
+  rather than only memory, so it needs sweeping like any other dial.
+- **Eviction has no policy.** `weakest` ranks by what is left; nothing decides
+  when to call it, because that is memory pressure and nothing measures memory.
 
 ## Decided
 
 - **No tokenizer.** Its vocabulary is learned from a corpus we never saw.
 - **Facts are dropped**, not islanded — a separate corpus sharing no referent.
 - **No pre-commit hook.** Every red preflight so far was caught immediately.
-- **Video after the flood and the word channel.** It hands over prediction
-  targets for free, which is what the error signal needs, and continuity across
-  frames is an unsupervised answer to the multiplicity problem.
+- **Mutations run in CI, sharded six ways.** Locally the command is
+  `--only <the ones just added>`; `--changed` is what let a live mutation reach
+  a commit.
 
 ## Known debts
 
-- **FIXED, verdict survived, and it is in the README now.** Both depths run
-  matched; the flood loses at both and deeper is worse.
-- **Nine files reference `openplexus/distributed.py`, `openplexus/peer.py` or
-  `DECISIONS.md`**, none of which exist. A search for "is there a dimension
-  split" finds prose saying yes.
 - **`deployment.py` and `agreement.py` are dead** — imported by nothing but
   their own tests, and `deployment.py` budgets predecessor-era `w × d`
   associative memory. **`tasks/xsl.py` has no caller.**
@@ -109,16 +97,18 @@ ask where error is high **and falling**, not high and flat.
   a whole `CoOccurrence` on every read, still at 32 owners. Left: latency,
   departure, partition. `testbed/driver.py` measures a deleted network.
 - **The link columns in `surfaces_pipeline.py` step in tenths.**
-- **`experiments/` has nine scripts and no harness.**
+- **`experiments/` has eleven scripts and no harness.**
 - **§5's ⬜ "refuse when nothing was written — the machinery exists" is
   unverified.** Every refusal in the package is an ownership refusal or the
   asking experiment's detachability rate. Neither is that.
+- **The written channel's dials were chosen, not measured**, and
+  `--silence/--mistake/--corrupt` exist so they can be swept. Nothing has.
 
 ## Reading leads, none of them read
 
-- **Predictive coding** — read first; prediction now has two jobs here.
-- **AnyBURL / rule mining over paths** — a rule-over-paths system lands near
-  0.31 where ours lands at 0.247, so our implementation is the limit: length-2
-  only, one confidence per route shape, evidence summed rather than combined.
+- **Predictive coding** — now the most relevant, since prediction exists and the
+  dark-room failure is the named risk against tuning on it.
 - **Interventional causal discovery under a budget.** The sharper question:
   when does structure say what you need not test?
+- **AnyBURL / rule mining over paths** — a rule-over-paths system lands near
+  0.31 where ours lands at 0.247, so our implementation is the limit.

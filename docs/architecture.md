@@ -208,7 +208,14 @@ Recorded here so a decision does not go quiet.
    overlapping intervals is a different job from joining matched instants, and
    `Join` was built for the second.
    1b. **What manufactures change for a static world**, so a thing that never
-   changes does not become invisible. No candidate.
+   changes does not become invisible. **John's candidate, 2026-08-02: an input
+   machine has a firing frequency** and re-asserts what it is sensing on that
+   beat, whether or not anything changed. That is the microsaccade — change
+   manufactured on purpose. It is *not* a return to tick-sampling as long as
+   the beat is far slower than the frame rate: the background gets counted, but
+   at a rate that does not swamp real events. **The beat is the dial and
+   nothing has measured it.** Its risk is the one onsets exist to avoid — set
+   it too fast and every persistent code becomes a hub again.
 2. **Who computes the edge weight.** `forward` strength is
    `together(here, other) / seen(other)` — the *partner's* marginal, which the
    sender cannot know. Either the receiver weighs (message carries `together`,
@@ -222,6 +229,36 @@ Recorded here so a decision does not go quiet.
    columns falling out of the addressing. Limit: within-modality only, because
    two front ends never share a prefix. An arm, not a default.
 4. **Pricing under `cost: best`** needs every partner weight before any send.
+6. **Broadcast to every cluster, or route by the ring? — John, 2026-08-02.**
+   His proposal: put a message on the bus, let **every** cluster look at it and
+   decide whether it holds a node that wants it. No ring, no address.
+   **The distinction that decides it is origin versus hop.** An *origin* has no
+   address by nature — *what is this thing I am sensing* cannot be routed,
+   because you do not know what you are looking for, and that is the flood's
+   whole advantage over targeted routing. A *hop* is the opposite: a route
+   standing on a node knows exactly which partner it is walking to. That is an
+   address, and routing it costs nothing.
+   So the live question is narrower than it first looks: **broadcast the
+   origin, route the hops** — currently both are routed. Broadcasting hops as
+   well would multiply every message by the number of clusters, which is O(N)
+   traffic per hop where the ring is O(1).
+   **His locality observation is right and is available either way**: see fork
+   3, where codes that live together are cheap to walk between without paying
+   the broadcast cost.
+
+7. **How clusters are grouped — John's follow-up, 2026-08-02.**
+   - **By modality: rejected by John, and he is right.** It puts a picture and
+     a sound on different machines by construction, which is the one link the
+     design exists to make.
+   - **By code prefix** — fork 3. Similar codes land together. Data-free, no
+     coordinator. Limit: within-modality only.
+   - **By time of creation** — codes made in the same window share a cluster,
+     so things that co-occur live together. **Breaks the property everything
+     else rests on**: two machines seeing the same red ball at different times
+     would compute different owners for the same code, and "every machine
+     computes the same answer with nobody to ask" is gone. Recorded as ruled
+     out unless something supplies placement agreement without a coordinator.
+
 5. **What a thought does with a death event.** The bus fires one when a cluster
    leaves, at cluster granularity, because a route is stranded by the departure
    of whatever holds its next node. But **a thought does not track which

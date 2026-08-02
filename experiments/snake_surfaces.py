@@ -12,6 +12,12 @@ This puts the real front end on. Three arms, same world, same seeds:
     whole      the whole view through `Hyperplanes`, one code per step
     patches    every overlapping 3x3 window through the same hash, one code
                each, and ONE PREDICTOR PER WINDOW POSITION
+    neighbours the same windows, except each one also sees the code of the
+               window it is moving TOWARDS. What a window lacks is what is
+               about to enter it, and what is about to enter it comes from the
+               direction of travel -- so this conditions on ONE neighbour
+               rather than all eight, which would multiply the state space by
+               the neighbour alphabet eight times over
 
 `patches` is the column arrangement made concrete: small units, each seeing a
 slice, each predicting only its own slice. It should win on recurrence — a 3x3
@@ -55,7 +61,7 @@ from openplexus.prediction import Predictor  # noqa: E402
 from openplexus.surfaces import Hyperplanes, centred  # noqa: E402
 from openplexus.tasks.snake import ACTIONS, Snake, patches  # noqa: E402
 
-ARMS = ("exact", "whole", "patches")
+ARMS = ("exact", "whole", "patches", "neighbours")
 
 #: Seeds, chosen here as this project's floor of three.
 SEEDS = (0, 1, 2)
@@ -114,6 +120,26 @@ def play(arm: str, seed: int, steps: int, shuffled: bool = False) -> dict:
         return list(hyperplanes.codes(centred(rows)))
 
     columns = len(encode(sample))
+    side = int(columns ** 0.5)
+
+    def conditioned(codes, at, action):
+        """What column `at` predicts FROM. Its own code, or its own and the
+        code of the window it is heading towards.
+
+        A window cannot see what is about to enter it, and what is about to
+        enter it comes from the direction of travel — so one neighbour carries
+        almost all of the missing information, where all eight would multiply
+        the state space by the neighbour alphabet eight times over.
+        """
+        if arm != "neighbours":
+            return codes[at]
+        dx, dy = ACTIONS[action]
+        left, top = at % side, at // side
+        beside, below = left + dx, top + dy
+        neighbour = (codes[below * side + beside]
+                     if 0 <= beside < side and 0 <= below < side else -1)
+        return hash((codes[at], neighbour))
+
     predictors = [Predictor(actions=len(ACTIONS)) for _ in range(columns)]
     state = encode(world.view())
     hits: list[float] = []
@@ -130,10 +156,15 @@ def play(arm: str, seed: int, steps: int, shuffled: bool = False) -> dict:
         # that were right. With one column that is the ordinary hit@1; with
         # nine it is how much of the next observation was foreseen, which is
         # the honest generalisation and not a max over columns.
+        #
+        # THE TARGET IS ALWAYS THE COLUMN'S OWN NEXT CODE, in every arm. Only
+        # what it predicts FROM changes, so a richer condition cannot win by
+        # being asked an easier question.
         right = 0
         for at, predictor in enumerate(predictors):
-            right += predictor.hit(state[at], action, following[at])
-            predictor.learn(state[at], action, following[at])
+            from_here = conditioned(state, at, action)
+            right += predictor.hit(from_here, action, following[at])
+            predictor.learn(from_here, action, following[at])
         hits.append(right / columns)
         # THE STRICT MEASURE, and the only one comparable across arms. `share`
         # rewards being right about 8 of 9 easy sub-tasks; this asks the same

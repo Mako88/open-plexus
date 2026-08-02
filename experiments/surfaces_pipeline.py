@@ -15,9 +15,15 @@ what the walk recovered:
                           majority digit is that word's
     cross                 of the AUDIO codes an image code's class holds, the
                           share that agree with it. The cross-sensory question
-    crossed               how many image codes reached any audio code at all, so
-                          a `cross` of 0 from a collapse and one from nothing
-                          being reached are not read as the same answer
+    crossed               audio codes reached PER IMAGE CODE — a mean, not a
+                          share, so it runs above 1 and 3.1491 is not a bug.
+                          It exists so a `cross` of 0 from a collapse and one
+                          from nothing being reached are not read as the same
+                          answer, and 0 still means nothing was reached.
+                          **The description here used to say "how many image
+                          codes reached any audio code at all"**, which is a
+                          share and is not what the code computes: `reached`
+                          counts (image code, audio surface) PAIRS
 
 Four arms, and the third is the one that matters:
 

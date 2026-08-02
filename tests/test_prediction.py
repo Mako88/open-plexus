@@ -158,5 +158,56 @@ class ArgumentsAreRefused(unittest.TestCase):
             self.assertIsInstance(predictor.surprise(0, 0, 9), float)
 
 
+class AdaptiveIsMemoryWhereItHasSomeAndGeneralisationWhereItDoesNot(
+        unittest.TestCase):
+    """What the counterfactual measurement earned: the two arms are not
+    better and worse, so take the bound surface where it has evidence and
+    fall back to factoring where it has none. No threshold — "has this pair
+    ever been counted" is a question with an answer."""
+
+    def test_it_matches_bound_on_a_pair_it_has_seen(self):
+        one, other = Predictor(actions=2), Predictor(actions=2,
+                                                     binding="adaptive")
+        for _ in range(30):
+            one.learn(0, 0, 100)
+            other.learn(0, 0, 100)
+        self.assertTrue(other.hit(0, 0, 100))
+        self.assertAlmostEqual(other.probability(0, 0, 100),
+                               one.probability(0, 0, 100))
+
+    def test_it_falls_back_where_bound_would_have_nothing(self):
+        """The companion, and the whole point: bound alone answers nothing
+        here, so a matching score would mean the fallback never fired.
+
+        **The halves have to OVERLAP for factoring to offer anything.** A first
+        version of this fixture gave `left` and `right` disjoint targets, and
+        `min` scored every candidate at zero — factoring generalises by
+        composing two views of the SAME outcome, so where they share no outcome
+        it has nothing to compose. That is a real limitation of the fallback and
+        not a fault in it.
+        """
+        bound = Predictor(actions=2, binding="bound")
+        adaptive = Predictor(actions=2, binding="adaptive")
+        for predictor in (bound, adaptive):
+            for _ in range(40):
+                predictor.learn(0, 0, 100)
+                predictor.learn(1, 0, 100)
+                predictor.learn(1, 1, 100)
+                predictor.learn(2, 1, 100)
+                predictor.learn(2, 0, 200)
+        # (0, 1) was never counted by either, and 100 follows both halves.
+        self.assertEqual(bound.scores(0, 1), {})
+        self.assertTrue(adaptive.scores(0, 1),
+                        "adaptive must offer candidates where bound cannot")
+
+    def test_it_writes_both_tables(self):
+        """Without both writes there is nothing to fall back TO."""
+        adaptive = Predictor(actions=2, binding="adaptive")
+        for _ in range(20):
+            adaptive.learn(0, 0, 100)
+        self.assertGreater(adaptive.bound_evidence(0, 0), 0)
+        self.assertIsNotNone(adaptive._factored)
+
+
 if __name__ == "__main__":
     unittest.main()

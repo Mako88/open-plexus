@@ -17,6 +17,29 @@ when it is done. Nothing may cite it. Rewritten at the end of every turn — see
 
 ---
 
+## THE SENSES RUNS WERE UNDERPOWERED, and most of their nulls are suspect
+
+John's question, 2026-08-02: too many things that should have helped have not.
+He was right and the flaw is arithmetic, not mechanism.
+
+    n = 150 questions  ->  std error 0.025
+    to detect +0.03 at 80% power     840 questions
+    runs actually used               120 to 150
+
+**Underpowered five to six times** for the effects being chased, and the seed
+spreads reported all session — 0.038 to 0.330 — are its signature. Several
+senses refutations are likely false negatives.
+
+**And the pattern beneath it:** every senses measurement is null and every snake
+measurement works. The senses task has about 12 occasions per code, purity
+capped at 0.42, an ever-present distractor, and its cross-modal arm is the one
+`surfaces_pipeline.affordable()` prints a warning about. It is a bad instrument
+and it was used anyway.
+
+**Nothing has been re-run.** The flood nulls predate the rank-blind metric fix;
+the word-channel comparison ran in the starved regime under the hash; every
+senses result predates knowing the front end is the bottleneck.
+
 ## Waiting on John
 
 **Which chain to render.** Agreed in principle — arrival narrows, prediction
@@ -26,22 +49,16 @@ now, so the ranking step has a mechanism for the first time.
 **Whether ARC-AGI-3 is next.** The objection stands: counting needs
 recurrence and ARC withholds it by design.
 
-## THE GAP JOHN FOUND: nothing in this design wants anything
+## Nothing in this design wants anything
 
-His question, 2026-08-02: is there any reason to pursue the fruit? **There is
-not.** `food` measures an accident — `committed` eats the most because it
-blunders furthest, not because it is trying.
+John's finding: there is no reason to pursue the fruit, so `food` measures an
+accident. A score is external and an energy is a sensation, so only the first
+is foreign — but **energy alone supplies no preference** either. Three honest
+sources exist and this design has none: reward is rejected, homeostasis needs
+running out to END the stream and death here resets, and curiosity loses to
+random in every form tried.
 
-**A score is external and an energy is a sensation**, so only the first is
-foreign here. But **energy alone supplies no preference**: a system that feels
-hunger and predicts it perfectly is indifferent to being hungry. Three honest
-sources exist and this design has none — external reward is rejected;
-homeostasis needs running out to END the stream, and death here resets; and
-curiosity loses to random in every form tried.
-
-**Recommended, not built**: energy as an INPUT-ONLY channel, because hunger
-correlates with time-since-food and that is predictable structure. **Not a
-score.**
+**Recommended, not built**: energy as an INPUT-ONLY channel. Not a score.
 
 ## THE ENSEMBLE FRONT END: built, budget not swept
 
@@ -54,39 +71,14 @@ sweep at its edge has not swept and a spread containing chance is not a finding.
 **Next: a grid that goes higher**, then three seeds at whatever interior maximum
 it finds.
 
-## THE FRONT END IS THE BOTTLENECK — settled, in the README
+**`--repeats` may do nothing**, unmeasured: it replays the same recordings, and
+repeated identical evidence does not sharpen a ratio. It has been used
+throughout as though it added evidence.
 
-The hash tops out at `q_img` 0.42 and no walk clears chance on the graph it
-builds, at any bit count from 2 to 10. k-means reaches 0.90 and both walks
-clear chance. Decision 1 already priced k-means at twice the purity; **the
-price turns out to be a graph nothing can walk.**
+## Columns: neighbour-conditioned works, settled in the README
 
-- **The choice is now a real one.** The hash is ✅ because it needs no data and
-  two nodes agree; k-means is ❌ because two nodes fitted on different samples
-  do not. Nothing here says take k-means — it says decision 1's ⬜, spending
-  codes where the data is WITHOUT fitting a codebook, is the load-bearing open
-  option in the whole project.
-- **Every earlier senses result ran under the hash**, so all of it sits below
-  the threshold where anything is measurable. Re-read accordingly.
-- **`--repeats` may do nothing.** It replays the same recordings, and repeated
-  identical evidence does not sharpen a ratio. Unmeasured, and it has been
-  used as though it added evidence.
-
-## The live thread: columns that can read each other
-
-**What was refuted is INDEPENDENT columns.** Nine overlapping 3×3 windows on
-snake, one predictor each, none able to see another's surface — 0.510 on the
-strict measure against a single whole-view code's 0.650. A window cannot see
-what is about to enter it from outside.
-
-**Nothing let one column inform another, and that is the one thing this
-architecture is otherwise entirely about.** A column's surface is a surface; the
-graph is what surfaces are for. The build is to let a column's prediction
-condition on its neighbours' current surfaces as well as its own — a bound
-triple again, which `Predictor` already holds.
-
-**Named risk**: binding on neighbours multiplies the state space by the
-neighbour alphabet. The cheap version conditions on a SUMMARY of them.
+Left: conditioning on a SUMMARY of the neighbours rather than one, which is
+what would let a column read more than the direction it is heading.
 
 ## Snake: built, two gaps
 

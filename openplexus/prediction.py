@@ -60,9 +60,23 @@ import math
 from openplexus.composition import Composition
 from openplexus.grounding import STATISTICS, CoOccurrence, Statistic
 
-#: How the action is conditioned on. See the module docstring; `bound` is exact
-#: and multiplicative, `factored` is cheap and cannot express an interaction.
-BINDINGS = ("bound", "factored")
+#: How the action is conditioned on. `bound` is exact and multiplicative,
+#: `factored` is cheap and cannot express an interaction.
+#:
+#: **`adaptive` is neither, and it is what the counterfactual measurement
+#: earned.** The two are not better and worse — on a pair it has SEEN bound
+#: wins 0.742 to 0.455, and on one never counted bound scores 0.000 where
+#: factored scores 0.162 against a chance of 0.0019. They are MEMORY and
+#: GENERALISATION. So use the bound surface where it has any evidence at all
+#: and fall back to factoring where it has none.
+#:
+#: **The rule needs no threshold.** "Has this pair ever been counted" is a
+#: question with an answer; "has it been counted enough" would be a dial. A
+#: threshold above one is the obvious refinement and is not built.
+#:
+#: It costs both writes on every observation, which is the price of having
+#: both tables to read from.
+BINDINGS = ("bound", "factored", "adaptive")
 
 
 class Predictor:
@@ -118,16 +132,31 @@ class Predictor:
 
     def seen(self, state: int, action: int) -> float:
         """How much evidence exists for this state and action."""
-        if self.binding == "bound":
+        if self.binding in ("bound", "adaptive"):
             return self.index.seen(self._bound(state, action))
         return float(len(self._targets))
 
+    def bound_evidence(self, state: int, action: int) -> float:
+        """How much has been counted for this exact pair. Zero means never."""
+        return self.index.seen(self._bound(state, action))
+
     def scores(self, state: int, action: int) -> dict[int, float]:
         """Every candidate next observation, scored. Empty when nothing is known."""
+        if self.binding == "adaptive":
+            # MEMORY WHERE IT EXISTS, GENERALISATION WHERE IT DOES NOT.
+            return (self._bound_scores(state, action)
+                    if self.bound_evidence(state, action) > 0
+                    else self._factored_scores(state, action))
         if self.binding == "bound":
-            here = self._bound(state, action)
-            return {other: self.statistic(self.index, other, here)
-                    for other in self.index.partners(here)}
+            return self._bound_scores(state, action)
+        return self._factored_scores(state, action)
+
+    def _bound_scores(self, state: int, action: int) -> dict[int, float]:
+        here = self._bound(state, action)
+        return {other: self.statistic(self.index, other, here)
+                for other in self.index.partners(here)}
+
+    def _factored_scores(self, state: int, action: int) -> dict[int, float]:
         if self._factored is None:
             return {}
         left = self._state_id(state)
@@ -163,7 +192,10 @@ class Predictor:
         # flip between "this" and "anything else", which is the honest statement
         # of knowing nothing.
         alphabet = max(len(self._targets) + 1, 2)
-        if self.binding == "bound":
+        bound = (self.binding == "bound"
+                 or (self.binding == "adaptive"
+                     and self.bound_evidence(state, action) > 0))
+        if bound:
             here = self._bound(state, action)
             total = self.index.seen(here)
             count = self.index.together(here, actual)
@@ -196,9 +228,9 @@ class Predictor:
         without anything being learned.
         """
         cost = self.surprise(state, action, actual)
-        if self.binding == "bound":
+        if self.binding in ("bound", "adaptive"):
             self.index.observe((self._bound(state, action), actual))
-        else:
+        if self.binding in ("factored", "adaptive"):
             self._observe_factored(state, action, actual)
         self._target_id(actual)
         return cost

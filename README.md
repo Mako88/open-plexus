@@ -116,7 +116,8 @@ necessarily words — an action is an output, and so is a structure.
 - ✅ Predict what comes next, and learn from being wrong — *`prediction.Predictor`, the first mechanism here that can be wrong. Scored **prequentially**: `learn` returns the surprise measured before the count is taken, so the model never sees the answer before being asked. On snake, hit@1 rises 0.49 → 0.72 over 4,000 steps, three seeds, against a shuffled control that stays under 0.10.*
 - ✅ Bind the state and the action into one surface — *`(state, action)` becomes a surface of its own, so an interaction is an ordinary pairwise count and a composite surface has an owner like any other. Costs `states × actions` surfaces, which is the whole price.*
 - ✅ Binding and factoring are MEMORY and GENERALISATION — *on a pair it has SEEN, bound wins 0.742 to 0.455; on one held out and never learned from, **bound scores 0.000 and factored 0.162 against a chance of 0.0019**, because a bound surface for an uncounted pair has nothing to look up. John's criterion for DEMONSTRATING understanding, and the world scores it.*
-- ⬜ Bind on demand — *bind where the evidence exists and fall back to factoring where it does not, which answers the multiplicative cost of binding without giving up the interaction. Both halves are now measured; nothing joins them.*
+- ✅ Bind on demand — *the bound surface where the pair has any evidence, factoring where it has none. Takes the better number on BOTH columns on every seed, 0.742 seen and 0.162 held out. **No threshold**: "ever counted" has an answer where "counted enough" is a dial. Costs both writes.*
+- ⬜ Factoring needs its halves to OVERLAP — *it composes two views of the SAME outcome, so where `left` and `right` share none, `min` scores everything at zero and it offers nothing.*
 - ⬜ Prediction error decides when to ask rather than watch — *the second hole one mechanism closes, and it is not built. The asking budget is still a fixed fraction nobody chose.*
 - ⬜ Learned representations for relations — *lets a relation never seen sit near ones that were, which counting cannot do.*
 - ⬜ Structure that reorganises, not just weights — *C4 claims the system keeps rearranging what it knows, and nothing implements that.*
@@ -162,14 +163,13 @@ necessarily words — an action is an output, and so is a structure.
 this project has already had once.*
 
 - ✅ An occasion is a SET — *everything in one moment met everything else and nothing came first. Simple, and it means the graph cannot tell "A then B" from "A with B" anywhere.*
-- ✅ A window carries recent moments forward, written ONE WAY — *`moments.Window`. John's original design, found missing after the restructure. `span=0` is the old behaviour exactly.*
-- ✅ The storage was already directional and nothing used it — *`observed_with` writes one row; `pair` simply writes both. Writing a single direction costs no new storage and makes `conditional(now, before)` mean "how often now follows before".*
+- ✅ A window carries recent moments forward, written ONE WAY — *`moments.Window`, John's original design, found missing after the restructure; `span=0` is the old behaviour exactly. **The storage was already directional and nothing used it**: `observed_with` writes one row where `pair` writes both, so time cost no new storage, only a decision about which direction to write.*
 - ⬜ Weight the window by how far back — *the obvious refinement, and it needs fractional counts the accumulator does not hold.*
 - ⬜ Duration — *nothing represents how long anything lasted, only that it was present.*
 - ❌ ~~A global clock~~ — *two nodes comparing when things happened is the agreement C1 forbids. `buckets.Join` is the C1-legal version: a bucket is a rendezvous that notices a coincidence and is discarded, and nothing is ever looked up by time.*
 - ❌ ~~Leaving sequence to the predictor~~ — *`Predictor` had to be handed `(state, action, next)` explicitly because the graph held no ordering, which puts time outside the representation where nothing else can use it.*
-- ✅ The graph can predict from order alone once it holds any — *0.153 with the window on against **0.000** with it off, three seeds, the control being that no temporal edge means no candidate to offer.*
-- ⬜ Bound surfaces in the GRAPH, not only in the predictor — *the graph reaches 0.153 where `Predictor` reaches 0.717 on the same world, because co-occurrence pools over actions and cannot hold a triple. **The same limitation as `factored` losing to `bound`, arrived at from the other side**, and the same repair: make `(state, action)` a surface.*
+- ✅ The graph can predict from order alone once it holds any — *0.153 with the window on against **0.000** with it off, the control being that no temporal edge means no candidate to offer.*
+- ⬜ Bound surfaces in the GRAPH, not only in the predictor — *the graph reaches 0.153 where `Predictor` reaches 0.717 on the same world, because co-occurrence pools over actions. **The same limitation as `factored` losing to `bound`**, and the same repair.*
 
 ---
 

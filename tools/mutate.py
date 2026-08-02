@@ -924,6 +924,17 @@ MUTATIONS = [
         new="        return -1 - self._state_id(state)",
     ),
     Mutation(
+        name="adaptive-never-falls-back",
+        breaks="the generalising half. Requiring evidence to be ABSENT rather "
+               "than present inverts the rule, so a pair with a record is "
+               "answered by factoring and a pair without one gets the bound "
+               "surface's empty row -- the arm keeps running, keeps scoring, "
+               "and is worst exactly where it was built to be best",
+        path=PREDICTION,
+        old="                    if self.bound_evidence(state, action) > 0",
+        new="                    if self.bound_evidence(state, action) == 0",
+    ),
+    Mutation(
         name="smoothing-makes-a-first-sighting-certain",
         breaks="the honest cost of knowing nothing. With the alphabet counting "
                "only outcomes already SEEN, an empty model divides 1 by 1 and "

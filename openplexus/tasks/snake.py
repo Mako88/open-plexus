@@ -159,6 +159,20 @@ class Snake:
         return tuple(self._cell(head_x + dx, head_y + dy)
                      for dy in span for dx in span)
 
+    def distance_to_food(self) -> float:
+        """How far the food is from the head, in cells.
+
+        **A fact about the world, not an observation.** Nothing may put this in
+        a view — it is here so a caller can RENDER it into a sensor reading, the
+        way `spoken` renders a digit into a waveform. A model reading it
+        directly is reading a label.
+        """
+        if self.food is None:
+            return 0.0
+        head_x, head_y = self.body[0]
+        return ((self.food[0] - head_x) ** 2
+                + (self.food[1] - head_y) ** 2) ** 0.5
+
     def step(self, action: int) -> Step:
         """Take one action and return what followed.
 

@@ -292,6 +292,30 @@ Recorded here so a decision does not go quiet.
    expansions per step. Factorial in the horizon. This does not scale to a real
    graph and something has to change.
 
+   **SWEPT, 2026-08-02.** `Sweep` runs the arms that already exist. Routes
+   halted at the horizon, 40-step budget, `Best` pricing, three seeds:
+
+   | horizon | empty cells kept | | | empty cells withheld | | |
+   |---|---|---|---|---|---|---|
+   | | seed 1 | seed 2 | seed 3 | seed 1 | seed 2 | seed 3 |
+   | 2 | 119 | 72 | 369 | 11 | 2 | 22 |
+   | 3 | 971 | 504 | 1,543 | 21 | 0 | 247 |
+   | 4 | 7,068 | 3,024 | 12,689 | 24 | 0 | 1,159 |
+   | 5 | 46,536 | 15,120 | 96,612 | 6 | 0 | 5,118 |
+
+   **Roughly sevenfold per extra hop**, which is the factorial growth showing
+   up as a constant ratio. And **withholding empty cells is worth about four
+   orders of magnitude** at horizon 5 on seed 1 — 46,536 against 6 — because it
+   is the number of codes per frame that sets how dense the clique is. That arm
+   already exists: `SnakeQuantizer(includeEmpty: false)`. **It still lets a
+   chain cause a move**, which is asserted, because an arm that costs nothing
+   by doing nothing is not a saving.
+
+   **What the sweep cannot say.** Runs last 1–14 steps and **nothing ever ate a
+   fruit** — across the whole grid, every arm, every seed. So this measures
+   COST and says nothing whatever about whether the system plays well. Reading
+   it as evidence of competence would be reading a number that is not there.
+
    **The root cause is that an occasion is a CLIQUE.** Every code in a frame is
    paired with every other, so ten codes a frame build a dense graph by
    construction, and a dense graph is what makes simple-path enumeration

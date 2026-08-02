@@ -22,7 +22,8 @@ public sealed class NodeTests
         Refuel refuel = Refuel.Strength,
         ArrivalValue value = ArrivalValue.Strength,
         double stamina = 1.0,
-        double charge = 0.0) => new()
+        double charge = 0.0,
+        int horizon = 6) => new()
         {
             Stamina = stamina,
             Cost = cost,
@@ -30,7 +31,7 @@ public sealed class NodeTests
             Refuel = refuel,
             Value = value,
             Accumulate = Accumulate.Sum,
-            Horizon = 6,
+            Horizon = horizon,
         };
 
     /// <summary>A message that has already walked, so the node is not an origin.</summary>
@@ -250,6 +251,56 @@ public sealed class NodeTests
         var fired = node.Fire(arriving, marginals);
 
         Assert.Contains(fired.Outgoing, m => m.Held > arriving.Held);
+    }
+
+    // ---- the horizon ------------------------------------------------------
+
+    [Fact]
+    public void A_route_that_has_walked_its_whole_horizon_stops_there()
+    {
+        var node = new Node(C(1), Dials(horizon: 3));
+        node.Observe(C(2));
+        var marginals = new Marginals().Set(C(2), 1);
+
+        // EXACTLY at the horizon, not one past it. A ratio test on the cost
+        // survives an off-by-one here; this does not, and an extra hop is worth
+        // roughly sevenfold on a dense graph.
+        var atLimit = node.Fire(Arriving(C(1), before: [C(8), C(9)]), marginals);
+
+        Assert.Empty(atLimit.Outgoing);
+        Assert.Equal(1, atLimit.Accounting.Halted);
+        Assert.Equal(1, atLimit.Accounting.Deaths);
+    }
+
+    [Fact]
+    public void A_route_one_short_of_the_horizon_takes_its_last_step()
+    {
+        // The companion. Without it the test above passes for a node that never
+        // emits anything, and the horizon would look like it worked while
+        // actually killing everything.
+        var node = new Node(C(1), Dials(horizon: 3));
+        node.Observe(C(2));
+        var marginals = new Marginals().Set(C(2), 1);
+
+        var oneShort = node.Fire(Arriving(C(1), before: C(9)), marginals);
+
+        Assert.Single(oneShort.Outgoing);
+        Assert.Equal(0, oneShort.Accounting.Halted);
+        Assert.Equal(3, oneShort.Outgoing[0].Chain.Length);
+    }
+
+    [Fact]
+    public void An_ordinary_death_is_not_a_halt()
+    {
+        // A route that ran out of anywhere to go and a route cut off by the
+        // horizon are both deaths, and reporting them as the same thing would
+        // hide the constant. Measured separately for exactly that reason.
+        var node = new Node(C(1), Dials());
+
+        var stranded = node.Fire(Arriving(C(1), before: C(9)), new Marginals());
+
+        Assert.Equal(1, stranded.Accounting.Deaths);
+        Assert.Equal(0, stranded.Accounting.Halted);
     }
 
     // ---- valuing ----------------------------------------------------------

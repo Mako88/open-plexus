@@ -34,6 +34,12 @@ public sealed class Thought
 
     private bool _released;
 
+    /// <summary>
+    /// Guards everything below. Reports arrive from several clusters at once,
+    /// on whatever thread the bus dispatched them to.
+    /// </summary>
+    private readonly Lock _gate = new();
+
     /// <param name="id">Which thought this is. Reports carrying another id are refused.</param>
     /// <param name="origins">
     /// How many codes the broadcast started from. Every origin is one live
@@ -53,22 +59,37 @@ public sealed class Thought
     public BroadcastId Id => _id;
 
     /// <summary>Routes still travelling by this thought's own accounting.</summary>
-    public int Live => _live;
+    public int Live
+    {
+        get { lock (_gate) return _live; }
+    }
 
     /// <summary>How many routes forked into more than one.</summary>
-    public int Splits => _splits;
+    public int Splits
+    {
+        get { lock (_gate) return _splits; }
+    }
 
     /// <summary>How many routes ended without reaching anywhere new.</summary>
-    public int Deaths => _deaths;
+    public int Deaths
+    {
+        get { lock (_gate) return _deaths; }
+    }
 
     /// <summary>How many distinct endpoints have been reached.</summary>
-    public int Endpoints => _arrivals.Count;
+    public int Endpoints
+    {
+        get { lock (_gate) return _arrivals.Count; }
+    }
 
     /// <summary>
     /// Whether the state has been dropped. A released thought accepts nothing
     /// further and answers with nothing.
     /// </summary>
-    public bool Released => _released;
+    public bool Released
+    {
+        get { lock (_gate) return _released; }
+    }
 
     /// <summary>
     /// Accumulates one arrival.
@@ -87,6 +108,9 @@ public sealed class Thought
     public void Receive(Arrival arrival)
     {
         ArgumentNullException.ThrowIfNull(arrival);
+
+        lock (_gate)
+        {
         if (_released) return;
 
         if (!_arrivals.TryGetValue(arrival.Endpoint, out var standing))
@@ -112,6 +136,7 @@ public sealed class Thought
             Best = stronger ? arrival.Best : standing.Best,
             Routes = standing.Routes + arrival.Routes,
         };
+        }
     }
 
     /// <summary>
@@ -131,11 +156,14 @@ public sealed class Thought
                 $"accounting for {accounting.Broadcast} reached the thought for {_id}",
                 nameof(accounting));
 
-        if (_released) return;
+        lock (_gate)
+        {
+            if (_released) return;
 
-        _splits += accounting.Splits;
-        _deaths += accounting.Deaths;
-        _live += accounting.Splits - accounting.Deaths;
+            _splits += accounting.Splits;
+            _deaths += accounting.Deaths;
+            _live += accounting.Splits - accounting.Deaths;
+        }
     }
 
     /// <summary>
@@ -155,12 +183,36 @@ public sealed class Thought
     {
         ArgumentOutOfRangeException.ThrowIfNegative(count);
 
-        return [.. _arrivals.Values
+        lock (_gate) return [.. Ranked().Take(count)];
+    }
+
+    /// <summary>
+    /// The top arrivals whose endpoint is one of these codes.
+    /// </summary>
+    /// <remarks>
+    /// <b>This is "arrival narrows" — selection is routing.</b> The candidates
+    /// are exactly the chains that reached the asking machine's own codes, so
+    /// nothing extra decides what is eligible. Ranking among them is a separate
+    /// question and currently only the score.
+    /// <para>
+    /// Not <c>Best(n)</c> then filter: the top n overall can contain none of
+    /// these codes while a chain that did reach one sits just below the cut.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<Arrival> BestAmong(IReadOnlyCollection<Code> codes, int count)
+    {
+        ArgumentNullException.ThrowIfNull(codes);
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+
+        var wanted = codes as HashSet<Code> ?? [.. codes];
+        lock (_gate) return [.. Ranked().Where(a => wanted.Contains(a.Endpoint)).Take(count)];
+    }
+
+    private IEnumerable<Arrival> Ranked() =>
+        _arrivals.Values
             .OrderByDescending(a => a.Score)
             .ThenBy(a => a.Chain.Length)
-            .ThenBy(a => a.Endpoint)
-            .Take(count)];
-    }
+            .ThenBy(a => a.Endpoint);
 
     /// <summary>
     /// Whether the accounting adds up. Asserted, never assumed.
@@ -172,14 +224,20 @@ public sealed class Thought
     /// network it cannot hold at all — C2 loses reports, and a lost death would
     /// leave the count above zero forever. That is why nothing waits on it.
     /// </remarks>
-    public bool Balanced() => _origins + _splits - _deaths == _live;
+    public bool Balanced()
+    {
+        lock (_gate) return _origins + _splits - _deaths == _live;
+    }
 
     /// <summary>
     /// Whether every route has returned or died by the thought's own
     /// accounting. <b>Not a deadline</b> — a deadline is a constant nobody
     /// measured, and the death event is what makes one unnecessary.
     /// </summary>
-    public bool Settled => _live == 0;
+    public bool Settled
+    {
+        get { lock (_gate) return _live == 0; }
+    }
 
     /// <summary>
     /// Drop the state. Called on settle, or on a death event for a machine this
@@ -192,7 +250,10 @@ public sealed class Thought
     /// </remarks>
     public void Release()
     {
-        _arrivals.Clear();
-        _released = true;
+        lock (_gate)
+        {
+            _arrivals.Clear();
+            _released = true;
+        }
     }
 }

@@ -5,12 +5,12 @@ implementations — this is the mental model, and the code is meant to match it
 exactly. If they ever disagree, this file is wrong and gets fixed.
 
 **Status: every type exists. `Code`, `Node`, `LiveSet`, `Snake`,
-`SnakeQuantizer`, `Thought`, `Ring`, `HybridBus`, `Cluster` and
-`LocalRendezvous` are implemented and tested; only the two machines are
-stubs.** Each unimplemented field shows up as a `CS0169` build warning, so the
-count is a rough progress bar — 27 when the stubs landed, **6** now.
+`SnakeQuantizer`, `Thought`, `Ring`, `HybridBus`, `Cluster`,
+`LocalRendezvous`, `InputMachine` and `OutputMachine` are all implemented and
+tested.** The `CS0169` progress bar is at **0**, down from 27 — every field has
+a body behind it. What remains is the end-to-end snake run.
 
-**100 tests pass, and forty-two mutations have been run to confirm they bite.**
+**112 tests pass, and forty-nine mutations have been run to confirm they bite.**
 A test has proved nothing until it has been seen to fail for the right reason.
 
 **Five mutations have SURVIVED across the project, and all five are recorded
@@ -59,6 +59,13 @@ better tests; two are kept and labelled.
 | live-to-live pairs are written | both-already-live-gain-nothing |
 | two onsets in a frame are counted twice | two-onsets-are-one-coincidence |
 | onsets never join the live set | onset-joins-with-everything-live |
+| silence still starts a thought | frame-that-changed-nothing |
+| learning is skipped | onset-writes-counts-and-starts-a-thought |
+| onsets are also reported as already live | what-just-started-is-not-live |
+| only the first origin per cluster is sent | origins-cost-one-envelope |
+| accounting is folded before arrivals | thought-walks-to-what-was-learned |
+| narrowing ignores the machine's codes | arrival-narrows |
+| nothing reached still returns a code | nothing-reached-is-a-real-answer |
 
 **Survived, on `Ring`:**
 

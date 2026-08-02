@@ -19,28 +19,25 @@ when it is done. Nothing may cite it. Rewritten at the end of every turn — see
 
 **UNDERPOWERED**: senses runs used n=150 where +0.03 needs 840. Only the flood
 and many-origins were re-run; surprise/rarity refuelling was not.
-**Report `busiest`, not `messages`** — serial seconds are TOTAL work;
-`busiest()` is what a distributed run costs, 9.5× to 22.4× less.
+**Report `busiest`, not `messages`** — serial seconds are TOTAL work.
 ## THE FLOOD IS THE DIRECTION — John's call, 2026-08-02
 
-**Taken on architecture, not on the numbers**, and he said so: it matches the
-incumbent and does not beat it, and what it has is a shape that survives
-distribution. Recorded so it is not re-litigated when a cell comes back level.
-**Its real advantage over targeted routing** — `federated.at(owner(surface))`,
-which is C1-legal and far cheaper — is that it needs no ADDRESS: for "what is
-this thing I am sensing", you cannot route, because you do not know what you
-are looking for.
+**Taken on architecture, not the numbers**: it matches the incumbent and does
+not beat it, and what it has is a shape that survives distribution. Recorded so
+it is not re-litigated when a cell comes back level. **Its advantage over
+targeted routing** — `federated.at(owner(surface))`, C1-legal and far cheaper —
+is that it needs no ADDRESS: for *what is this thing I am sensing* you cannot
+route, because you do not know what you are looking for.
 
 His design: a node converts an input and broadcasts it **with the id of the
 machine the answer should return to**; every node holding a match fires and
 **reports how many it expects to send**.
 
-**Departure costs the ANSWER but not the ACCOUNTING, at both ends.** A node
-gone before the walk arrives is never visited. One that dies after passing a
-route on has already put its contribution in the message. One that dies
-mid-processing loses only its own subtree — which is what losing it earlier
-would have lost too. **The only thing that differs is whether the origin knows
-the thought is over**, and that is exactly what decision 9's deadline is for.
+**Departure costs the ANSWER but not the ACCOUNTING.** Gone before the walk
+arrives, never visited; dies after passing a route on, its contribution is
+already in the message; dies mid-processing, loses only its own subtree, which
+losing it earlier would have lost too. **Only whether the ORIGIN KNOWS the
+thought is over differs** — action 7 is John's fix for that.
 
 ## PRIORITY, REORDERED BY JOHN 2026-08-02
 
@@ -57,22 +54,33 @@ the thought is over**, and that is exactly what decision 9's deadline is for.
 
 ## NOTHING TURNS A CHAIN INTO AN OUTPUT — checked, not remembered
 
-John asked how a chosen chain becomes an action. **It does not.** Nothing in
-`openplexus/` acts, emits, renders or drives anything; `flood` hands back
-`reached: {endpoint -> Arrival}` and stops, and **the three-step ranking is
-🚧, not built** — he thought it was. Every action anywhere in this project is
-an experiment's `rng.randrange` or a `snake_curiosity` policy. **No chain has
-ever caused anything.**
+**Nothing in `openplexus/` acts, emits, renders or drives anything.** `flood`
+hands back `reached: {endpoint -> Arrival}` and stops; **the three-step ranking
+is 🚧, not built.** Every action in this project is an experiment's
+`rng.randrange` or a `snake_curiosity` policy — a hand-written function reading
+`predictor.seen()`, not a chain arriving anywhere. **No chain has ever caused
+anything.**
 
-Two designs, and the agreed one is a hybrid: **outputs as nodes**, where a
-chain reaching one fires it and arrival IS the decision; or **everything
-returns to the origin**, which ranks and commits — which is where an "answer"
-comes from. Agreed: arrival NARROWS to the chains reaching the named output
-machine, and prediction ranks among those.
+Agreed shape: arrival NARROWS to the chains reaching the named output machine,
+prediction ranks among those. Outputs-as-nodes alone would make arrival the
+decision and commit to nothing.
 
 **4 🚧 in the README, checked 2026-08-02** so none goes quiet: *any node is an
 input or an output, machines carrying the addresses*; and *which chain to
 render* with its two live steps, *arrival narrows* and *prediction ranks*.
+
+7. **An event bus, and a death event on disconnect.** John's answer to the one
+   departure case that strands a thought: every node subscribes to a bus, and a
+   node LEAVING the bus fires a death event of its own. The origin can then
+   wait for every route to return or die without a deadline guessing for it.
+   **Tangent worth its own experiment**: several buses segment the graph, and
+   one bus per modality is a way to implement columns that costs nothing.
+
+8. **C# for the parallel node.** Discussed, not decided, and not otherwise
+   recorded. Python's GIL is why priority 1 cannot be done in-process. The
+   suggestion was a C# node speaking the existing socket protocol rather than a
+   port: `node_main.py` and `bucket_peer.py` already define that boundary, and
+   numpy has no comfortable equivalent for the front end.
 
 ## AGREED 2026-08-02, NOT BUILT
 
@@ -88,18 +96,14 @@ render* with its two live steps, *arrival narrows* and *prediction ranks*.
    help the system cheat.** What decides it is splitting the ANCHOR too — the
    measured result had one clean word per digit shared by both codebooks.
 
-6. **The front end should be as WEAK as possible** — `surfaces.py` already
-   argues it: *clustering by similarity is an identity assignment, and identity
-   is the walk's job.* Its only mandate is to make recurrence possible. **The
-   ensemble is the right shape for this** — coarse codes meaning almost
-   nothing, the combination left to the graph.
-
-   **John's counter, accepted:** k-means only ever sees one modality, so it
-   cannot connect a picture to a sound — **the cross-modal claim is untouched
-   by it.** It takes over within-modality identity, never the interesting
-   claim. And with one front end on both arms, a walk beating random is
-   attributable to the walk: **relative claims are safe, absolute ones are
-   not.**
+6. **The front end should be as WEAK as possible** — `surfaces.py` argues it:
+   *clustering by similarity is an identity assignment, and identity is the
+   walk's job.* **The ensemble is the right shape**: coarse codes meaning
+   almost nothing, the combination left to the graph. **John's counter,
+   accepted:** k-means sees one modality, so it cannot connect a picture to a
+   sound — the cross-modal claim is untouched by it, and it only takes over
+   within-modality identity. With one front end on both arms, **relative
+   claims are safe and absolute ones are not.**
 
 **Waiting on John**: whether ARC-AGI-3 is next — counting needs recurrence and
 ARC withholds it by design.
@@ -107,21 +111,18 @@ ARC withholds it by design.
 **Preference**: three honest sources exist; reward is rejected and curiosity
 loses to random, so homeostasis is the one left. Action 1 builds it.
 
-**Ensemble front end**: built; budget pins at the top of its grid. Sweep
-higher, then three seeds at the interior maximum.
-**`--repeats` may do nothing**: it replays the same recordings. Unmeasured.
-**Columns**: neighbour-conditioned works. Left: a SUMMARY of the neighbours
-rather than the single one in the direction of travel.
+**Ensemble front end**: budget pins at the top of its grid; sweep higher.
+**`--repeats` may do nothing**: it replays the same recordings.
+**Columns**: neighbour-conditioned works. Left: a SUMMARY of the neighbours.
 **Snake**: no multimodality yet — vision, plus hearing in `snake_hearing.py`;
 action and interoception designed, not built. Nothing beats random play.
-## Prediction and forgetting: four holes
+## Prediction and forgetting
 
-- **Prediction error does not drive the asking**; **the half-life is unswept**;
-  **eviction has no policy**, nothing measuring memory pressure.
-- **Automatic dial tuning** designed, not built: a node scoring candidates for
-  its own dial against its own prediction error. **Risk**: minimising surprise
-  is won by never looking at anything surprising — score error per observation
-  MADE.
+**Prediction error does not drive the asking**; **the half-life is unswept**;
+**eviction has no policy**. **Automatic dial tuning** designed, not built — a
+node scoring candidates for its own dial against its own prediction error.
+**Risk**: minimising surprise is won by never looking at anything surprising,
+so score error per observation MADE.
 
 ## Forgetting: built, one half untested
 
@@ -140,11 +141,10 @@ action and interoception designed, not built. Nothing beats random play.
 
 ## Known debts
 
-- **`deployment.py`, `agreement.py`, `tasks/xsl.py` are dead** — tests only;
-  **`experiments/` has fifteen scripts and no harness**; **the written
-  channel's dials were chosen, not measured**.
-- **§5's "refuse when nothing was written" is unverified** — every refusal in
-  the package is an ownership refusal instead.
+**`deployment.py`, `agreement.py`, `tasks/xsl.py` are dead** — tests only.
+**`experiments/` has fifteen scripts and no harness.** **The written channel's
+dials were chosen, not measured.** **§5's "refuse when nothing was written" is
+unverified** — every refusal in the package is an ownership refusal instead.
 
 **Reading leads, unread**: predictive coding (the dark room is its named risk);
 interventional causal discovery under a budget; AnyBURL, near 0.31 to our 0.247.

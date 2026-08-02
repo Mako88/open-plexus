@@ -21,10 +21,12 @@ including `master` — that a chain of reasoning has caused anything.
 **And the flood does not scale.** Those 5 steps halted 275,280 routes at the
 horizon on a graph of 13 nodes. See open fork 8.
 
-**And the chain beats random but not the board's geometry.** Over 200 seeds:
-chain 6.575 mean steps, random 3.990, repeat-last-action 6.250. Chain over
-random is about five standard errors; chain over repeat is under one. See open
-fork 10, including the 30-seed reading that got this backwards.
+**And the chain beats random but not the board's geometry.** Over 200 seeds,
+re-measured after the origin became a broadcast: chain 6.705 mean steps, random
+3.990, repeat-last-action 6.250. Chain over random is about six standard
+errors; chain over repeat is under one. See open fork 10, including the
+30-seed reading that got this backwards and the "nothing has ever eaten" claim
+that turned out to be a sample-size artefact.
 A test has proved nothing until it has been seen to fail for the right reason.
 
 **Five mutations have SURVIVED across the project, and all five are recorded

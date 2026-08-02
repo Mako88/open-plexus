@@ -151,11 +151,28 @@ public sealed class PolicyTests
     }
 
     [Fact]
-    public async Task Nothing_has_eaten_a_fruit_under_any_policy()
+    public async Task Fruit_is_rare_rather_than_impossible()
     {
-        // Recorded so no claim of competence can quietly be made. Thirty seeds
-        // across three policies produced zero fruit; this checks a slice of it.
-        foreach (var policy in (Policy[])[Policy.Chain, Policy.Random, Policy.Repeat])
-            Assert.All(await Over(6, policy), r => Assert.Equal(0, r.Ate));
+        // THIS TEST USED TO ASSERT NOBODY EVER ATE, AND THAT WAS WRONG. It was
+        // built from 30-seed samples, and at 200 seeds fruit does get taken:
+        // 7 times under the chain, 3 under repeat, 0 under random. Asserting
+        // the zero made a sample-size artefact look like a property, and a
+        // large enough run would have turned it red for the right reason with
+        // nobody watching.
+        //
+        // What is honest to assert is the rarity, so that a change which makes
+        // eating COMMON is noticed rather than absorbed.
+        //
+        // AND THIS IS A TRIPWIRE, NOT A MECHANISM TEST. No mutation of the
+        // production code turns it red: it asserts a property of the world and
+        // the policy together, not of anything one class does. Loosening the
+        // bound passes trivially, which is what a one-sided assertion does.
+        // Kept for what it would catch -- a change that makes the system
+        // suddenly competent, which nobody would want to discover by accident.
+        var chain = await Over(20, Policy.Chain);
+
+        Assert.True(chain.Sum(r => r.Ate) <= 3,
+            $"fruit is no longer rare: {chain.Sum(r => r.Ate)} in 20 runs");
+        Assert.True(chain.Sum(r => r.Steps) > 40, "the runs were too short to say anything");
     }
 }

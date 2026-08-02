@@ -333,21 +333,34 @@ Recorded here so a decision does not go quiet.
    NOT a candidate** — capping how many partners are considered is already ❌
    on `master` as "a constant nobody set on purpose, doing the cutting".
 
-10. **DOES THE CHAIN DO ANYTHING? Measured 2026-08-02.** 200 seeds, 300-step
-    budget, `includeEmpty: false`, `Horizon = 4`. The graph learns identically
-    under all three arms; only the choice differs.
+10. **DOES THE CHAIN DO ANYTHING? Re-measured 2026-08-02 after the origin
+    became a broadcast**, because every earlier number described code that no
+    longer exists. 200 seeds, 300-step budget, `Horizon = 4`, empty cells
+    withheld. The graph learns identically under all three arms; only the
+    choice differs.
 
-    | policy | mean | sd | se | median | max | runs past 10 steps |
-    |---|---|---|---|---|---|---|
-    | chain | 6.575 | 5.772 | 0.408 | 4 | **39** | **62 / 200** |
-    | random | 3.990 | 3.840 | 0.272 | 3 | 28 | 8 / 200 |
-    | repeat the last action | 6.250 | 3.039 | 0.215 | **8** | 8 | 0 / 200 |
+    | policy | mean | sd | se | median | max | past 10 steps | fruit |
+    |---|---|---|---|---|---|---|---|
+    | chain | 6.705 | 5.970 | 0.422 | 4 | **39** | **64 / 200** | **7** |
+    | random | 3.990 | 3.840 | 0.272 | 3 | 28 | 8 / 200 | 0 |
+    | repeat the last action | 6.250 | 3.039 | 0.215 | **8** | 8 | 0 / 200 | 3 |
 
-    **The chain beats random by about five standard errors** — a gap of 2.585
-    against a combined error of 0.490. That one is real.
+    **SOMETHING HAS EATEN A FRUIT.** Every previous entry here said nothing ever
+    had, and that was **a sample-size artefact**: it was measured at 30 seeds
+    and fruit turns out to happen about seven times in 200 runs. **No claim is
+    made that the broadcast caused it** — the old code has not been re-run at
+    200 seeds, so the honest statement is only that the earlier zero was too
+    small a sample to support.
+
+    Seven against three against zero is far too few to separate the arms. What
+    it does retire is the flat statement that nothing has ever eaten.
+
+    **The chain beats random by about six standard errors** — a gap of 2.715
+    against a combined error of 0.502. That one is real and has survived every
+    re-measurement.
 
     **The chain and repeat-last-action are indistinguishable on the mean**:
-    0.325 apart against a combined error of 0.461, which is under one standard
+    0.455 apart against a combined error of 0.474, which is under one standard
     error.
 
     **AN EARLIER READING OF THIS AT 30 SEEDS SAID THE CHAIN LOSES TO REPEAT

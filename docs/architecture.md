@@ -207,6 +207,52 @@ handed out once and frozen, which C1 permits.
 
 Recorded here so a decision does not go quiet.
 
+**They are not in numerical order and are deliberately NOT renumbered** — the
+code cites fork numbers in a dozen places, and renumbering would strand every
+one of them. That ghost-reference problem has bitten this project before. This
+index is the fix instead: it says where each one stands, so the file can be read
+by status rather than by scrolling.
+
+**Waiting on a decision — nothing can proceed without these**
+
+| | | |
+|---|---|---|
+| **14** | What a step costs, once the sender cannot weigh | **blocks 2** |
+| **2** | Who computes the edge weight | decided (receiver weighs) — blocked on 14 |
+| **8** | How the flood is bounded | still factorial; the cheap half is done |
+| **11** | The output machine is not addressed | needed before a second machine |
+| **12** | `Halted` is approximate, and the ordering that causes it | both orderings cost something |
+
+**Open, but nothing is blocked on them**
+
+| | |
+|---|---|
+| **1** | The distributed rendezvous — not needed until a second machine exists |
+| **1b** | What manufactures change for a static world — John's heartbeat is the only candidate |
+| **3** | Cluster placement: uniform hash against prefix locality |
+| **7** | How clusters are grouped — modality and time-of-creation both ruled out |
+
+**Settled**
+
+| | |
+|---|---|
+| **5** | ✅ What a thought does with a death event — built to John's design |
+| **6** | ✅ Broadcast the origin, route the hops — built |
+| **13** | ✅ The in-flight accounting was wrong on 39% of thoughts — fixed |
+| **4** | Folded into **14**, which is the same question asked properly |
+
+**Measured findings, not decisions**
+
+| | |
+|---|---|
+| **9** | Random play dies in about five steps, because reversing is fatal |
+| **10** | The chain beats random by six standard errors and ties with repeat-last-action |
+
+---
+
+
+Recorded here so a decision does not go quiet.
+
 1. **How a node learns who it fired with.** The rendezvous above. `master` has
    a C1-legal answer — `buckets.Join`: observations land in short time buckets,
    a bucket owner is computed locally by hash, the owner notices the
@@ -237,6 +283,8 @@ Recorded here so a decision does not go quiet.
    columns falling out of the addressing. Limit: within-modality only, because
    two front ends never share a prefix. An arm, not a default.
 4. **Pricing under `cost: best`** needs every partner weight before any send.
+   **Folded into fork 14**, which asks the same thing with the measurements
+   behind it. Kept as a number because deleting one would renumber the rest.
 6. **Broadcast to every cluster, or route by the ring? — John, 2026-08-02.**
    His proposal: put a message on the bus, let **every** cluster look at it and
    decide whether it holds a node that wants it. No ring, no address.

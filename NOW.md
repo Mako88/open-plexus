@@ -38,31 +38,21 @@ not be informative**, because the action channel does not exist yet and the
 induction is hard, so a failure could not be attributed. Recommended
 intermediate: any environment where an action changes what is observed.
 
-## The broadcast flood: built, and the many-origins claim is refuted
+## The broadcast flood: built, measured, and null
 
-`openplexus/broadcast.py`, called by `experiments/senses_broadcast.py`. The gate
-and the pricing are settled and in the README. `experiments/senses_broadcast.py`, `alternating` graph
-so a picture reaches a sound only through a word. 8 bits, 150 broadcasts,
-`best` pricing, chance about 0.108. `cross` by stamina —
-`out/senses-stamina-sweep.txt`:
+`openplexus/broadcast.py`, called by `experiments/senses_broadcast.py`. The gate,
+the pricing and both refutations are settled and in the README. 15 tests, 4
+mutations, all caught; preflight green.
 
-    stamina      0.002   0.005    0.01    0.02    0.05
-    flood-one   0.1081  0.1213  0.1209  0.1132  0.1082
-    flood-many  0.0959  0.1012  0.1013  0.1012  0.1017
+**What is left, and it is the only live repair**: an origin's stamina scaled by
+how much that origin predicts, so a specific surface funds a long thought and a
+hub funds a short one. The gate governs which EDGES a route walks and says
+nothing about where a route STARTS, and the origins that hurt were the word
+hubs. Not built, and worth building only if the direction is being kept.
 
-**`flood-many` is below chance at every budget** and costs 3–10× more,
-saturating from 0.005 up. **More origins made it worse, monotonically.**
-`flood-one` peaks at 0.1213 against 0.108 — an interior maximum, so the grid
-did sweep, but +0.013 on ONE rng seed is not a result.
-
-**Why more origins hurt, and it is diagnosable**: the extra origins are the
-word nodes, which are hubs. The `forward` gate decides which EDGES a route
-walks; it does nothing about where a route STARTS. A hub origin is ungated,
-and it floods.
-
-**Left**: three rng seeds, and origin stamina scaled by how much the origin
-predicts — a specific surface funding a long thought and a generic one not.
-That is the named repair and it is not built.
+**A second possibility, untried**: the senses graph may simply be too dense —
+169 nodes at mean degree 40.7, density 0.24, and the forward weights have a
+median of 0.0119 against a max of 0.5. A flood needs somewhere not to go.
 
 ## The word channel: repaired and measured. What is LEFT
 

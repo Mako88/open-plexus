@@ -1140,9 +1140,33 @@ def verify(quiet: bool = False) -> int:
     suite against the tree being committed, so nothing objected. CI caught it on
     push, which is the right backstop and the wrong place to find out.
 
+    **It also refuses while a harness is RUNNING**, which is a third failure and
+    the one the `.bak` check cannot see. Between two mutations there is no `.bak`
+    on disk and every original is present, so this returned 0 and preflight went
+    green in the gap — and a commit issued in that window is a commit against a
+    tree another process is about to edit. That happened on 2026-08-01: a killed
+    background run left `_entity_ids` mutated in `tasks/clutrr.py` and `forward`
+    symmetrised in `grounding.py`, with preflight passing seconds earlier.
+
+    The lock already existed and only `mutate.py` read it, to stop two harnesses
+    racing each other. Reading it here is what puts it on the commit path.
+
     Cheap enough to run before every commit, and it names WHICH mutation is
     present, which a red test does not.
     """
+    if LOCK.exists():
+        try:
+            owner = int(LOCK.read_text(encoding="utf-8").strip())
+        except (OSError, ValueError):
+            owner = None
+        if owner is not None and _is_running(owner):
+            print("A MUTATION HARNESS IS RUNNING RIGHT NOW.\n\n"
+                  f"  pid {owner} holds {LOCK.name}\n\n"
+                  "It edits source in place, so the tree you are about to\n"
+                  "measure or commit is not the tree you mean -- and between\n"
+                  "two mutations there is no .bak to notice. Wait for it, or\n"
+                  f"stop it and delete {LOCK.name}.")
+            return 1
     missing = []
     for mutation in MUTATIONS:
         try:

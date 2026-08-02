@@ -16,22 +16,27 @@ of every turn — see `.claude/skills/monitor`.
 
 ## Waiting on John
 
-**Decay, eviction to disk, and reinstatement.** His design, 2026-08-01: edges
-weaken over time; a node fired adds to its own lifespan; a node whose edges have
-worn away is written to disk on its own machine and loaded back if it ever fires
-again. It is C1-legal without trying, and it is the same primitive as the
-flood's stamina. Two amendments proposed and not yet answered:
+**Which chain to render.** The flood returns many complete chains and nothing
+chooses among them. John named this as the piece he does not know how to do,
+and there is no candidate mechanism. Three offered, none agreed:
 
-- **Archive the edges with the node, not just the node.** A node reinstated
-  empty has been forgotten in the only sense that matters.
-- **Reinstate with a boost, not the default weight**, or a node hovering at the
-  threshold pages in and out forever.
+- **Let the world choose.** Output the chain whose consequences best predict
+  what arrives next. Needs the 🚧 prediction mechanism and no new knob, and it
+  makes the choice testable against the world rather than against an internal
+  score.
+- **Let arrival choose.** In John's own addressing design the input names an
+  output machine, so the candidates are exactly the chains that reach it.
+- **Let brevity choose.** The chain explaining the most input in the fewest
+  steps, which is §7's compression principle doing a second job.
 
-Also unanswered: whether uniform decay is free. It should be — every statistic
-here is a ratio, so a common factor cancels — but lazy decay-on-read is not
-uniform unless each edge carries a stamp and is aged forward to now. Unmeasured.
-
-Not in the README until he answers, because it is proposed rather than approved.
+**Whether ARC-AGI-3 is the target.** John's suggestion: feed frames in, wire
+outputs to the buttons, watch. It is the right KIND of target — it needs action,
+which §4 and §6 both name as missing, and it supplies an error signal for free.
+The objection is that counting needs recurrence and ARC withholds it by design;
+the interactive form weakens that but does not remove it. **A null there would
+not be informative**, because the action channel does not exist yet and the
+induction is hard, so a failure could not be attributed. Recommended
+intermediate: any environment where an action changes what is observed.
 
 ## The broadcast flood: BUILT, not measured
 
@@ -61,34 +66,25 @@ discriminated by route kind. This has no kinds and its questions have none
 either, so the claim is that hundreds of surfaces firing at once converge. That
 is the first measurement and it needs the word channel repaired first.
 
-## The word channel: REPAIRED, and it cost the headline number
+## The word channel: repaired and measured. What is LEFT
 
-`openplexus/tasks/written.py` plus `--words written` in `surfaces_pipeline.py`.
-A word arrives as bytes, is written four ways, is sometimes corrupted, silent or
-naming another digit, and goes through the same hash as everything else.
-`label` stays the default so every earlier number is reproducible; the point is
-running both. At 10 bits over 4,000 occasions: **302 word surfaces, about 72 per
-digit, purity 0.7583**, against a multiplicity of 1 before.
+Settled and moved to the README. The run is `out/word-channel-comparison.txt`
+and the three JSON files beside it; `--words label` stays the default so every
+earlier number is reproducible.
 
-**The first comparison, `--quick`, 8 bits, seed 0, kmeans, `alternating`:**
+**Unfinished:**
 
-    label                   link_img 0.9000   cross 0.0000   crossed 0.0000   classes  1.05
-    written, dials at 0     link_img 0.1019   cross 0.0919   crossed 4.6272   classes 22.62
-    written, stock dials    link_img 0.1132   cross 0.0843   crossed 1.5614   classes  9.97
-
-**The fall is not channel noise.** The control has every dial at zero and
-`q_wrd 1.0000` — a perfectly reliable word, just several surfaces instead of
-one — and `link_img` still falls 0.9000 to 0.1019. **What the 0.9000 measured
-was one node per class**, which is a maximally strong hub: everything about a
-digit necessarily co-occurs with it. Multiplicity replaces it with fragments.
-
-The two channels fail differently rather than one working. Label gives tight
-classes that reach nothing across modalities; written reaches 4.6× and agrees
-on 9%, which is over-merge. **Neither shows the cross-modal claim at `--quick`.**
-
-**Not yet comparable to `cross 1.0000`**, which was measured at `--repeats 2`.
-The three-way run at `--repeats 2`, three seeds, three bit counts is in
-`out/word-channel-comparison.txt`. Read it before citing any of the above.
+- **The dials are chosen, not measured.** `silence 0.15 mistake 0.05
+  corrupt 0.30`. `--silence/--mistake/--corrupt` exist so they can be swept and
+  nothing has swept them.
+- **Nobody has asked what the byte channel is worth on its own terms.** Every
+  column here was built to score a channel of multiplicity 1. `link_img` counts
+  surfaces per word NODE, so a channel with 72 nodes per digit is measured on a
+  denominator that means something different — the comparison is sound in
+  direction and unsound in units.
+- **Order is discarded.** `features` is a bare byte histogram, so `three` and
+  `there` are one surface. The obvious extension, and it changes the SPACE
+  rather than the allocation, which is where §1 says such changes land.
 
 **Dials are dials.** `silence 0.15 mistake 0.05 corrupt 0.30` were chosen, not
 measured, and `--silence/--mistake/--corrupt` exist so a result that moves with
@@ -117,13 +113,15 @@ ask where error is high **and falling**, not high and flat.
 
 ## Known debts
 
-- **From the README audit, 2026-08-01.** `experiments/fb15k237_flood.py:264`
-  prints `+0.0136 margin, 0.35 arrived` as a **string literal**, not recomputed
-  on the queries the run sampled, so the comparison spans two query sets and two
-  floors. Two lines down, published full-test-set MRRs are compared against the
-  subsample floor and labelled "the same kind of floor" — that is where
-  `DistMult +0.0224` comes from against the README's correct `+0.0076`. Fix both
-  before the flood numbers are cited again.
+- **FIXED, and the fix changed the answer.** `fb15k237_flood.py` printed
+  `+0.0136 margin, 0.35 arrived` as a string literal from a full-test-set run,
+  while its own margins came from whatever subsample it drew. The capped
+  enumeration is now an arm in the same table, on the same queries, through the
+  same scoring loop. Published margins are no longer computed at all — the
+  subtraction across query sets is refused and both numbers are printed.
+  **A 25-query smoke run has the flood ABOVE the flat arm** (+0.0188 against
+  +0.0088) where the literal said it lost. 25 queries decides nothing; the real
+  run has not been done and no flood number should be cited until it is.
 - **Nine files reference `openplexus/distributed.py`, `openplexus/peer.py` or
   `DECISIONS.md`**, none of which exist. A search for "is there a dimension
   split" finds prose saying yes.

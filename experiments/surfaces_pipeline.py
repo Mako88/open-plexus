@@ -420,15 +420,23 @@ def main() -> int:
                               else quantise(front, pixels, bits, k, seed))
                 audio_code = (audio_lsh if front == "lsh"
                               else quantise(front, sounds, bits, k, seed))
-                # The surface layout needs one width for both modalities, so it
-                # takes the larger. An unused id costs nothing; an overlapping
+                # The surface layout needs one width for EVERY modality, so it
+                # takes the largest. An unused id costs nothing; an overlapping
                 # one would silently make an image code and an audio code the
                 # same surface.
-                codes = max(max(image_code) + 1, max(audio_code) + 1)
+                #
+                # **The word channel has to be in this max**, and was not: it is
+                # hashed separately, so at 10 bits it reached local id 1022
+                # inside a block sized 1021 from image and audio alone. It
+                # raised rather than colliding, which is the whole reason
+                # `Namespace` reserves a block instead of trusting arithmetic.
+                word_code = (quantise(front, word_rows, bits, k, seed)
+                             if args.words == "written" else None)
+                codes = max(max(image_code) + 1, max(audio_code) + 1,
+                            max(word_code) + 1 if word_code is not None else 0)
                 q_img, image_major = purity(image_code, list(digits.labels))
                 q_aud, audio_major = purity(audio_code, said)
                 if args.words == "written":
-                    word_code = quantise(front, word_rows, bits, k, seed)
                     q_wrd, word_major = purity(word_code, word_names)
                     words = Words(width=codes,
                                   per_occasion=[[word_code[i] for i in slot]

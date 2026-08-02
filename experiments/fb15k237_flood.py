@@ -111,6 +111,11 @@ def main() -> int:
     # two is the flat mechanism this is trying to beat, so three is the
     # first setting where the design does anything new.
     parser.add_argument("--depth", type=int, default=3)
+    # The comparison arm's budget, **carried from `fb15k237_typed.FANOUT`**,
+    # which is the run the +0.0136 came from. Not chosen here: matching it is
+    # the whole point, so the enumeration in this table is the same enumeration
+    # at the same setting rather than a weaker one that would flatter the flood.
+    parser.add_argument("--fanout", type=int, default=200)
     # Which gate to run. The two are not alternatives to be averaged --
     # they prune on different quantities and cost differently -- and a
     # run of one is often what the question needs.
@@ -204,7 +209,74 @@ def main() -> int:
     print(f"{'(none)':>9}{'-':>9}{floor_score['mrr']:>9.4f}{0.0:>+9.4f}"
           f"{'-':>9}{'-':>12}{'-':>9}{time.time() - started:>8.1f}")
 
+    def sweep(candidates):
+        """One arm, ranked over every query in both directions at every blend.
+
+        `candidates(start, asked)` returns `endpoint -> score`. Shared, so the
+        flood and the enumeration it is compared against go through ONE scoring
+        loop — otherwise a difference between two loops reads as a difference
+        between two mechanisms.
+        """
+        ranks: dict = {}
+        arrived = 0
+        for head, relation, tail in queries:
+            asked = relation_at[relation]
+            for direction in ("tail", "head"):
+                given, answer = ((head, tail) if direction == "tail"
+                                 else (tail, head))
+                found = candidates(entity_at[given], asked)
+                arrived += entity_at[answer] in found
+                vector = np.zeros(len(entities))
+                for endpoint, score in found.items():
+                    vector[endpoint] = score
+                top = vector.max()
+                if top > 0:
+                    vector /= top
+                # SWEPT ON EVERY ARM. Carrying the weight that won one arm
+                # would tune it against an untuned baseline. There is no
+                # validation split here, so the best is taken on TEST, which
+                # flatters both arms equally: an upper bound, not a score.
+                other = floor_of.vector(relation, direction)
+                for alpha in BLENDS:
+                    _, middle, _ = ranker.rank(
+                        alpha * vector + (1.0 - alpha) * other,
+                        given, relation, answer, direction)
+                    ranks.setdefault(alpha, []).append(middle)
+        return ranks, arrived
+
+    def summarise(ranks, arrived, **extra) -> dict:
+        by_alpha = {a: metrics(r)["mrr"] for a, r in ranks.items()}
+        best_alpha = max(by_alpha, key=lambda a: by_alpha[a])
+        got = metrics(ranks[best_alpha]) | {"best_alpha": best_alpha,
+                                            "by_alpha": by_alpha}
+        return got | {"margin": got["mrr"] - floor_score["mrr"],
+                      "arrived": arrived / (2 * len(queries))} | extra
+
     rows: list[dict] = [floor_score | {"arm": "relation only"}]
+
+    # THE ARM THIS IS MEASURED AGAINST, RUN HERE ON THESE QUERIES.
+    #
+    # It used to be a string literal — `print("+0.0136 margin, 0.35 arrived")` —
+    # carried over from a full-test-set run with a floor of 0.2334, while the
+    # flood's own margins came from whatever subsample this run drew. The number
+    # that refuted the flood therefore spanned two query sets and two floors.
+    # A pinned constant in a print is exactly what `tools/check_constants.py`
+    # refuses, and it survived by not looking like a constant.
+    began = time.time()
+
+    def enumerated(start, asked, fanout=args.fanout):
+        routes = ((first, second, end)
+                  for first, middle in out_of[start][:fanout]
+                  for second, end in out_of[middle][:fanout])
+        return types.score(routes, asked, statistic, accumulate="sum")
+
+    flat = summarise(*sweep(enumerated), arm="capped two-step",
+                     floor=None, gate="(flat)", expansions=None, gave_up=0.0)
+    rows.append(flat)
+    print(f"{'(flat)':>9}{'-':>9}{flat['mrr']:>9.4f}{flat['margin']:>+9.4f}"
+          f"{flat['arrived']:>9.4f}{'-':>12}{0.0:>9.4f}"
+          f"{time.time() - began:>8.1f}")
+
     for gate, table in GATES.items():
       if args.gate not in (gate, "both"):
           continue
@@ -215,56 +287,38 @@ def main() -> int:
       # every cell of one arm as empty.
       for floor in (FLOORS if gate == "strength" else MEANING_FLOORS):
           began = time.time()
-          ranks, arrived, spent, quit_early = {}, 0, 0, 0
-          for head, relation, tail in queries:
-              asked = relation_at[relation]
-              for direction in ("tail", "head"):
-                  given, answer = ((head, tail) if direction == "tail"
-                                   else (tail, head))
-                  found, expansions, gave_up = flood(
-                      adjacency, entity_at[given], asked, types, statistic,
-                      floor=floor, depth=args.depth, ceiling=CEILING)
-                  spent += expansions
-                  quit_early += gave_up
-                  arrived += entity_at[answer] in found
-                  vector = np.zeros(len(entities))
-                  for endpoint, (score, _) in found.items():
-                      vector[endpoint] = score
-                  top = vector.max()
-                  if top > 0:
-                      vector /= top
-                  # SWEPT ON THIS ARM TOO. Carrying the weight that won the
-                  # capped enumeration would tune one arm and not the other,
-                  # which is the untuned-baseline mistake this project refuses.
-                  # There is no validation split here, so the best is taken on
-                  # TEST and that FLATTERS the flood -- it is an upper bound on
-                  # what the arm could do, not a score it earned.
-                  other = floor_of.vector(relation, direction)
-                  for alpha in BLENDS:
-                      _, middle, _ = ranker.rank(
-                          alpha * vector + (1.0 - alpha) * other,
-                          given, relation, answer, direction)
-                      ranks.setdefault(alpha, []).append(middle)
+          spent = quit_early = 0
+
+          def flooded(start, asked, floor=floor):
+              nonlocal spent, quit_early
+              found, expansions, gave_up = flood(
+                  adjacency, start, asked, types, statistic,
+                  floor=floor, depth=args.depth, ceiling=CEILING)
+              spent += expansions
+              quit_early += gave_up
+              return {endpoint: score for endpoint, (score, _) in found.items()}
+
           scored = 2 * len(queries)
-          by_alpha = {a: metrics(r)["mrr"] for a, r in ranks.items()}
-          best_alpha = max(by_alpha, key=lambda a: by_alpha[a])
-          got = metrics(ranks[best_alpha]) | {"best_alpha": best_alpha,
-                                              "by_alpha": by_alpha}
-          row = got | {"arm": "flood", "floor": floor, "depth": args.depth,
-                       "margin": got["mrr"] - floor_score["mrr"],
-                       "arrived": arrived / scored,
-                       "expansions": spent / scored,
-                       "gave_up": quit_early / scored}
-          row["gate"] = gate
+          row = summarise(*sweep(flooded), arm="flood", floor=floor,
+                          gate=gate, depth=args.depth,
+                          expansions=spent / scored,
+                          gave_up=quit_early / scored)
           rows.append(row)
-          print(f"{gate:>9}{floor:>9}{got['mrr']:>9.4f}{row['margin']:>+9.4f}"
+          print(f"{gate:>9}{floor:>9}{row['mrr']:>9.4f}{row['margin']:>+9.4f}"
                 f"{row['arrived']:>9.4f}{row['expansions']:>12.0f}"
                 f"{row['gave_up']:>9.4f}{time.time() - began:>8.1f}")
 
-    print("\nThe capped two-step enumeration this is measured against: "
-          "+0.0136 margin, 0.35 arrived.")
-    print("Published, against the same kind of floor: "
-          + "  ".join(f"{name} {mrr - floor_score['mrr']:+.4f}"
+    # PUBLISHED MRRs, NOT PUBLISHED MARGINS. Subtracting this run's floor from a
+    # full-test-set MRR was what produced `DistMult +0.0224` here against the
+    # README's +0.0076 -- two numbers for one quantity, three times apart,
+    # because the floors underneath them were measured on different query sets.
+    # A margin is only a margin against its own floor, so the subtraction is
+    # refused and both numbers are printed instead.
+    print(f"\nThis run's floor: MRR {floor_score['mrr']:.4f} over "
+          f"{2 * len(queries)} directed queries, seed {args.seed}.")
+    print("Published FULL-TEST-SET MRR, which this floor cannot be subtracted "
+          "from: "
+          + "  ".join(f"{name} {mrr:.4f}"
                       for name, (mrr, _) in sorted(PUBLISHED.items(),
                                                    key=lambda i: i[1][0])))
 

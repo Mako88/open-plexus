@@ -34,8 +34,12 @@ later.
 - ✅ Every count, nothing ever cut.
 - ❌ ~~Cut each surface's partners at the biggest score gap~~ — *refuses the ever-present distractor and evicts the word that names the concept.* **Revives if** something else supplies the refusal.
 - ❌ ~~Cap how many partners are even considered~~ — *a constant nobody set on purpose, and it turned out to be doing the cutting.*
-- ⬜ Forget by age or disuse — *unbounded growth is not survivable on a phone, and nothing currently decides what to drop.*
-- ⬜ Archive rather than delete — evict to a store on that node, never in the walk — *a machine that never forgets is fine; one that never compresses cannot form concepts. An archive nothing waits on is C1-legal where a shared database is not.*
+- 🚧 Edges weaken over time and a node with none left is written to disk — *John's design, agreed 2026-08-01. Firing adds to a node's own lifespan. Decay is per node and per edge, so nobody waits and C1 is untouched.*
+- 🚧 The archive keeps the EDGES, and reinstatement carries a boost — *a node loaded back empty has been forgotten in the only sense that matters, and one reinstated at its old weight thrashes across the threshold forever.*
+- 🚧 Decay is not a loss of accuracy, only of memory — *every statistic here is a ratio, so a factor applied to every count at a node cancels exactly. That makes the rate a memory-pressure dial rather than a tuned constant. **Unmeasured**, and it holds only for uniform decay.*
+- ⬜ Decay applied on read rather than by sweeping — *the only affordable form on billions of edges, and it is NOT uniform: edges touched at different times age by different amounts and the cancellation above breaks. Each edge has to carry a stamp and be aged forward to now.*
+- ⬜ Evict from the archive as well — *the disk store moves the problem rather than solving it; a machine that never deletes still fills up, and nothing decides what leaves permanently.*
+- ⬜ Forget by age or disuse, without the archive — *the version where eviction is deletion. Kept because it is what the above reduces to if archiving turns out to cost more than it returns.*
 
 **3. Identity.** What makes several surfaces one thing.
 
@@ -80,6 +84,8 @@ later.
 **6. Output.** Turning an answer into something that leaves the system. Not
 necessarily words — an action is an output, and so is a structure.
 
+- 🚧 Any node is an input or an output; the MACHINES carry the addresses — *John's design, 2026-08-01. A machine broadcasts an input carrying the id of the output machine it wants, so completed chains and death reports come back addressed. Machines are not nodes, hold no edges and are in no walk — which is why an arbitrary sensor or actuator can be attached without the graph knowing what it is.*
+- ⬜ Which chain to render, out of everything that came back — *the flood returns many complete chains and nothing chooses. **The open question John named**, and the piece with no candidate mechanism.*
 - ⬜ Words, fetched from the concept map — *they come from what was learned, so it cannot name what it does not have.*
 - ⬜ Words, composed by the system itself — *if it understands, it should be able to work out how to say things; nothing hands it grammar.*
 - ⬜ An action on the world — *the same channel intervention needs, which makes acting and answering one mechanism instead of two.*
@@ -115,6 +121,9 @@ necessarily words — an action is an output, and so is a structure.
 - ✅ Prequential — score as the stream arrives.
 - ✅ FB15k-237, floor established before anything was built on it — *its predecessor's leak is gone: rules mined from train score 0.45 on train and 0.0001 on test. What it hands over instead is the marginal, MRR 0.2334, and published DistMult and ComplEx sit at 0.241 and 0.247 — within 0.014 of a baseline with no structure in it. Report the margin, never the MRR.*
 - ✅ Beat a conventional system on the same input — *run, and the answer is "matched, on the part that is not the baseline". Against one floor: ours +0.0136, ComplEx +0.0136, DistMult +0.0076, but TransE +0.0606 and RotatE +0.1046. It matches the weaker half of the field and is nowhere near the stronger. Absolute MRR is the wrong column; most of everyone's is the marginal.*
+- ✅ The word arrives as bytes through the same hash as everything else — *`tasks/written.py`: four written forms per digit, sometimes corrupted, sometimes silent, sometimes naming another digit. 302 word surfaces at 10 bits, about 72 per digit, which the system has to discover are one thing.*
+- ❌ ~~One word node per class~~ — *a maximally strong hub, since everything about a digit necessarily co-occurs with it, and `link_img` was mostly it: 0.900/0.900/1.000 over three seeds against a multiplicity-only control's 0.100/0.100/0.105 at 10 bits, kmeans, `alternating`.* **Revives if** a task genuinely supplies one token per concept.
+- ❌ ~~`cross 1.0000` as the cross-modal result~~ — *one cell of a narrow regime. Under that channel `cross` runs 0.81–1.00 at 6 bits and falls to 0.000 at 10 with `crossed` also 0.000, so nothing was reached; the byte channel is lower everywhere and is the only one reaching anything at 10 bits.*
 - ⬜ Learn from live sensors, test on labelled data never trained on — *the only named way to tell whether a microphone-and-camera system learned anything.*
 - ⬜ Noise that is sticky rather than uniform — *real irrelevant co-occurrence recurs together; ours is white noise, so ideas refuted against it are untested rather than dead.*
 - ❌ ~~CLUTRR-symbolic as evidence of composition~~ — *62 facts counted from its two-hop rows, plus a bracketing search, answer 100% of the test split at every hop count; a shuffled table scores 0.12. What it measures is finding the order to apply knowledge in — the same facts folded left to right score 0.28.* **Revives if** a configuration is found whose relation algebra is not confluent.

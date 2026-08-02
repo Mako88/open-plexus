@@ -75,8 +75,40 @@ def offenders(path: pathlib.Path) -> list[tuple[int, int, str]]:
     return found
 
 
+def approved_but_not_built() -> str | None:
+    """`NOW.md` must account for every 🚧 in the README, and say how many.
+
+    **Size was checked and currency was not**, which is how an option stayed
+    marked approved-but-not-built for hours after it was built, measured and
+    committed. `NOW.md` declares the invariant in its own header — *every 🚧 in
+    the README appears here* — and nothing enforced it, so the one thing that
+    exists to stop work going quiet went quiet itself.
+
+    Counting rather than matching text is deliberate. A fuzzy match on the
+    option's wording would drift as the wording does, and would fail silently
+    in whichever direction was least noticed. A count cannot: adding a 🚧 or
+    resolving one breaks this until somebody looks at both files, which is the
+    entire point.
+    """
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    now = ROOT / "NOW.md"
+    if not now.exists():
+        return None
+    marks = sum(1 for line in readme.splitlines() if line.startswith("- 🚧"))
+    told = now.read_text(encoding="utf-8")
+    if f"{marks} 🚧" in told or (marks == 0 and "no 🚧" in told.lower()):
+        return None
+    return (f"README has {marks} 🚧 and NOW.md does not say so. Write "
+            f"'{marks} 🚧' there with each one named, or resolve the ones "
+            f"that are built — an option that is DONE and still reads as "
+            f"PENDING is what the invariant exists to catch")
+
+
 def main() -> int:
     problems = []
+    stale = approved_but_not_built()
+    if stale:
+        problems.append(stale)
     for name, purpose in WATCHED.items():
         path = ROOT / name
         if not path.exists():

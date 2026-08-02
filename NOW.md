@@ -18,76 +18,87 @@ when it is done. Nothing may cite it. Rewritten at the end of every turn — see
 ---
 
 **UNDERPOWERED**: senses runs used n=150 where +0.03 needs 840. Only the flood
-and many-origins have been re-run; surprise/rarity refuelling has not.
-
-**Report `busiest`, not `messages`** — serial seconds are TOTAL work, and
-`Flood.busiest()` is what a distributed run costs: 9.5× to 22.4× less.
-
+and many-origins were re-run; surprise/rarity refuelling was not.
+**Report `busiest`, not `messages`** — serial seconds are TOTAL work;
+`busiest()` is what a distributed run costs, 9.5× to 22.4× less.
 ## THE FLOOD IS THE DIRECTION — John's call, 2026-08-02
 
 **Taken on architecture, not on the numbers**, and he said so: it matches the
 incumbent and does not beat it, and what it has is a shape that survives
 distribution. Recorded so it is not re-litigated when a cell comes back level.
+**Its real advantage over targeted routing** — `federated.at(owner(surface))`,
+which is C1-legal and far cheaper — is that it needs no ADDRESS: for "what is
+this thing I am sensing", you cannot route, because you do not know what you
+are looking for.
 
-His design, fuller than the README carries: a node converts an input and
-broadcasts it **with the id of the machine the answer should return to**; every
-node holding a match fires and **reports how many it expects to send**.
+His design: a node converts an input and broadcasts it **with the id of the
+machine the answer should return to**; every node holding a match fires and
+**reports how many it expects to send**.
 
-**A node that vanishes BEFORE the walk reaches it costs nothing** — his point,
-and right: the walk never goes there, the answer is poorer, the accounting is
-untouched. The real case is one that vanishes **holding a live route**, whose
-death report never arrives. That is what decision 9's deadline is for.
+**Departure costs the ANSWER but not the ACCOUNTING, at both ends.** A node
+gone before the walk arrives is never visited. One that dies after passing a
+route on has already put its contribution in the message. One that dies
+mid-processing loses only its own subtree — which is what losing it earlier
+would have lost too. **The only thing that differs is whether the origin knows
+the thought is over**, and that is exactly what decision 9's deadline is for.
 
 ## PRIORITY, REORDERED BY JOHN 2026-08-02
 
-1. **Make `broadcast.flood` actually parallel.** It is the architecture and a
-   serial simulation is not testing it. **Honest scope**: `busiest()` already
-   measures what a parallel run would COST — 9.5x to 22.4x less than serial.
-   What a real implementation adds is **C2 and C3**: late messages, lost
-   messages, nodes vanishing mid-thought. That is untested and is the part that
-   could break the design. `bucket_peer.py` and `node_main.py` exist for it.
+1. **Make `broadcast.flood` actually parallel.** A serial simulation is not
+   testing the architecture. **Scope**: `busiest()` already measures what a
+   parallel run would COST. What a real one adds is **C2 and C3** — late
+   messages, lost messages, nodes vanishing mid-thought — and that is the part
+   that could break the design. `bucket_peer.py` and `node_main.py` exist for
+   it. Python cannot do it in-process; the GIL is why.
 
-2. **Turn death on in snake and re-run everything policy-related.** The old
-   numbers are meaningless with nothing to lose.
+2. **Turn death on in snake and re-run everything policy-related.**
 
 3. **k-means, experimented with rather than parked** — see action 5.
 
-**THE FOUR 🚧, checked 2026-08-02** so none goes quiet: *any node is an input
-or an output, machines carrying the addresses*; and *which chain to render* with
-its two live steps, *arrival narrows* and *prediction ranks*.
+## NOTHING TURNS A CHAIN INTO AN OUTPUT — checked, not remembered
+
+John asked how a chosen chain becomes an action. **It does not.** Nothing in
+`openplexus/` acts, emits, renders or drives anything; `flood` hands back
+`reached: {endpoint -> Arrival}` and stops, and **the three-step ranking is
+🚧, not built** — he thought it was. Every action anywhere in this project is
+an experiment's `rng.randrange` or a `snake_curiosity` policy. **No chain has
+ever caused anything.**
+
+Two designs, and the agreed one is a hybrid: **outputs as nodes**, where a
+chain reaching one fires it and arrival IS the decision; or **everything
+returns to the origin**, which ranks and commits — which is where an "answer"
+comes from. Agreed: arrival NARROWS to the chains reaching the named output
+machine, and prediction ranks among those.
+
+**4 🚧 in the README, checked 2026-08-02** so none goes quiet: *any node is an
+input or an output, machines carrying the addresses*; and *which chain to
+render* with its two live steps, *arrival narrows* and *prediction ranks*.
 
 ## AGREED 2026-08-02, NOT BUILT
 
-3. **Split the anchor as well as the codebooks.** The disagreement result had
-   one clean word per digit shared by both codebooks by construction; a real
-   federation has none. This decides whether k-means is genuinely legal.
-
 4. **Many snake games into one graph.** The win is EVIDENCE, not parallelism:
-   N× the occasions per code, the axis that made the senses graph unwalkable.
-   It also tests interleaved independent sources writing to one graph, which is
-   what a federation is. **`Flood` has no broadcast id**, so two thoughts in
-   flight would mix their routes and their death counts.
+   N× occasions per code, the axis that made the senses graph unwalkable. It
+   also tests interleaved sources writing to one graph, which is what a
+   federation is. **`Flood` has no broadcast id**, so two thoughts in flight
+   would mix their routes and their death counts.
 
-5. **k-means with per-node codebooks, and with groups sharing one.** John wants
-   this tried rather than parked — his theory is that k-means may simply be a
-   better way to identify a thing, and the disagreement result says the walk
-   survives it. **His own constraint: it must not help the system cheat.** The
-   test that decides it is splitting the ANCHOR too, since the measured result
-   had one clean word per digit shared by both codebooks.
+5. **k-means with per-node codebooks, and groups sharing one.** John's theory
+   is that it may simply be a better way to identify a thing, and the
+   disagreement result says the walk survives it. **His constraint: it must not
+   help the system cheat.** What decides it is splitting the ANCHOR too — the
+   measured result had one clean word per digit shared by both codebooks.
 
 6. **The front end should be as WEAK as possible** — `surfaces.py` already
    argues it: *clustering by similarity is an identity assignment, and identity
-   is the walk's job.* Its only mandate is decision 1's ❌ for
-   no-discretisation: make recurrence possible. **The ensemble is the right
-   shape for this reason** — coarse codes meaning almost nothing, the
-   combination left to the graph.
+   is the walk's job.* Its only mandate is to make recurrence possible. **The
+   ensemble is the right shape for this** — coarse codes meaning almost
+   nothing, the combination left to the graph.
 
-   **John's counter, accepted and it narrows mine:** k-means only ever sees one
-   modality, so it cannot connect a picture to a sound — **the cross-modal
-   claim is untouched by the quantiser.** What it does take over is
-   within-modality identity, which was never the interesting claim. And with
-   the same front end on both arms, a walk beating random is attributable to
-   the walk: **relative claims are safe under any quantiser, absolute ones are
+   **John's counter, accepted:** k-means only ever sees one modality, so it
+   cannot connect a picture to a sound — **the cross-modal claim is untouched
+   by it.** It takes over within-modality identity, never the interesting
+   claim. And with one front end on both arms, a walk beating random is
+   attributable to the walk: **relative claims are safe, absolute ones are
    not.**
 
 **Waiting on John**: whether ARC-AGI-3 is next — counting needs recurrence and
@@ -96,29 +107,21 @@ ARC withholds it by design.
 **Preference**: three honest sources exist; reward is rejected and curiosity
 loses to random, so homeostasis is the one left. Action 1 builds it.
 
-**Ensemble front end**: built; budget pins at the TOP of its grid. Sweep
+**Ensemble front end**: built; budget pins at the top of its grid. Sweep
 higher, then three seeds at the interior maximum.
-
-**`--repeats` may do nothing**: it replays the same recordings, so the evidence
-is not fresh. Unmeasured.
-
+**`--repeats` may do nothing**: it replays the same recordings. Unmeasured.
 **Columns**: neighbour-conditioned works. Left: a SUMMARY of the neighbours
 rather than the single one in the direction of travel.
-
 **Snake**: no multimodality yet — vision, plus hearing in `snake_hearing.py`;
-action and interoception designed, not built. Nothing beats random play, and
-**no experiment turns the energy on**, so those numbers are the meaningless
-ones priority 2 exists to replace.
-
+action and interoception designed, not built. Nothing beats random play.
 ## Prediction and forgetting: four holes
 
-- **Prediction error does not drive the asking**; **the half-life is unswept**,
-  now known to change answers; **eviction has no policy**, nothing measuring
-  memory pressure.
+- **Prediction error does not drive the asking**; **the half-life is unswept**;
+  **eviction has no policy**, nothing measuring memory pressure.
 - **Automatic dial tuning** designed, not built: a node scoring candidates for
   its own dial against its own prediction error. **Risk**: minimising surprise
-  is won by never looking at anything surprising, so score error per
-  observation MADE.
+  is won by never looking at anything surprising — score error per observation
+  MADE.
 
 ## Forgetting: built, one half untested
 
@@ -143,6 +146,5 @@ ones priority 2 exists to replace.
 - **§5's "refuse when nothing was written" is unverified** — every refusal in
   the package is an ownership refusal instead.
 
-**Reading leads, unread**: predictive coding (the dark room is its named risk,
-measured); interventional causal discovery under a budget; AnyBURL, near 0.31
-where ours lands at 0.247.
+**Reading leads, unread**: predictive coding (the dark room is its named risk);
+interventional causal discovery under a budget; AnyBURL, near 0.31 to our 0.247.

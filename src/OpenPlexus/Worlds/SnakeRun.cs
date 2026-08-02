@@ -49,6 +49,19 @@ public sealed record RunResult
     public required int Deaths { get; init; }
 
     /// <summary>
+    /// Thoughts whose accounting did not add up when the run read them.
+    /// </summary>
+    /// <remarks>
+    /// <b>An integrity check on the whole distributed accounting, run for real
+    /// rather than in a fixture.</b> `origins + splits - deaths == live` holds
+    /// by construction, but the per-cluster in-flight counts are built from an
+    /// entirely separate quantity — the routing named in each report — so the
+    /// two agreeing says the routes really were where the origin thought they
+    /// were.
+    /// </remarks>
+    public required int Unbalanced { get; init; }
+
+    /// <summary>
     /// Of the steps a chain chose, how many chose the action just taken.
     /// </summary>
     /// <remarks>
@@ -206,6 +219,7 @@ public sealed class SnakeRun : IDisposable
         SnakeAction? did = null;
         int taken = 0, byChain = 0, reachedNothing = 0, silent = 0, ate = 0, echoed = 0;
         long halted = 0;
+        var unbalanced = 0;
 
         for (; taken < steps && _snake.Alive; taken++)
         {
@@ -221,7 +235,12 @@ public sealed class SnakeRun : IDisposable
             Code? chosen = thought is null ? null : _hand.Choose(thought);
 
             if (thought is null) silent++;
-            else { halted += thought.Halted; if (chosen is null) reachedNothing++; }
+            else
+            {
+                halted += thought.Halted;
+                if (!thought.Balanced()) unbalanced++;
+                if (chosen is null) reachedNothing++;
+            }
 
             if (policy != Policy.Chain) chosen = null;
 
@@ -261,6 +280,7 @@ public sealed class SnakeRun : IDisposable
             Deaths = _eye.DeathsSeen,
             Halted = halted,
             EchoedLast = echoed,
+            Unbalanced = unbalanced,
         };
     }
 

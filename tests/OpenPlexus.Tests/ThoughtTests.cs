@@ -77,6 +77,46 @@ public sealed class ThoughtTests
     }
 
     [Fact]
+    public void A_count_that_ran_negative_strands_nothing_when_its_cluster_dies()
+    {
+        // REACHABLE, not hypothetical: reports arrive out of order, so a
+        // cluster can say "I handled these" before the upstream says "I sent
+        // them there". The count goes negative in between and cancels when the
+        // other report lands — but if that cluster DIES while it is negative,
+        // writing the negative off would MANUFACTURE live routes out of
+        // nothing and the thought would never settle.
+        var thought = Started(origins: 2);
+        thought.SentInto(A("alpha"), 2);
+
+        thought.Receive(Reporting(A("beta"), handled: 3, splits: 0, deaths: 0));
+        Assert.Equal(-3, thought.InFlightTo(A("beta")));
+
+        Assert.Equal(0, thought.Lost(A("beta")));
+
+        Assert.Equal(2, thought.Live);
+        Assert.Equal(0, thought.Deaths);
+    }
+
+    [Fact]
+    public void An_out_of_order_pair_cancels_when_the_other_half_lands()
+    {
+        // The companion, and the reason the negative is allowed at all:
+        // clamping it to zero threw the information away permanently and left
+        // the accounting wrong on 100 of 256 real thoughts.
+        var thought = Started(origins: 2);
+        thought.SentInto(A("alpha"), 2);
+
+        thought.Receive(Reporting(A("beta"), handled: 2, splits: 0, deaths: 0));
+        Assert.Equal(-2, thought.InFlightTo(A("beta")));
+
+        thought.Receive(Reporting(A("alpha"), handled: 2, splits: 0, deaths: 2,
+            new Routed(A("beta"), 2)));
+
+        Assert.Equal(0, thought.InFlightTo(A("beta")));
+        Assert.True(thought.Settled);
+    }
+
+    [Fact]
     public void Losing_the_last_cluster_settles_the_thought()
     {
         // This is what the event bus was introduced for: the origin stops

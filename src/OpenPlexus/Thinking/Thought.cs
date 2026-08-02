@@ -148,7 +148,12 @@ public sealed class Thought
     {
         lock (_gate)
         {
-            if (_released || !_inFlight.Remove(cluster, out var stranded)) return 0;
+            if (_released || !_inFlight.Remove(cluster, out var heading)) return 0;
+
+            // A negative count means reports about this cluster ran ahead of
+            // the sends that caused them. Nothing is stranded in that case, and
+            // writing off a negative would MANUFACTURE live routes.
+            var stranded = Math.Max(heading, 0);
 
             _deaths += stranded;
             _live -= stranded;
@@ -259,10 +264,26 @@ public sealed class Thought
         Receive(report.Accounting);
     }
 
+    /// <summary>
+    /// Adjusts the count of routes in flight toward a cluster.
+    /// </summary>
+    /// <remarks>
+    /// <b>A NEGATIVE COUNT IS ALLOWED, AND CLAMPING IT WAS A BUG.</b> Reports
+    /// arrive out of order, so a downstream cluster can say "I handled 3"
+    /// before the upstream says "I sent 3 there". Clamping the intermediate
+    /// negative to zero threw that away permanently, and the later increment
+    /// then counted routes that had already been handled — measured at 100 of
+    /// 256 thoughts failing <see cref="Balanced"/> on real runs.
+    /// <para>
+    /// Left negative, the pair cancels when the other report lands and the sum
+    /// stays right. C2 says out of order is normal; the accounting has to be
+    /// able to survive it rather than round it off.
+    /// </para>
+    /// </remarks>
     private void Move(ClusterAddress cluster, int by)
     {
         var now = _inFlight.GetValueOrDefault(cluster) + by;
-        if (now <= 0) _inFlight.Remove(cluster);
+        if (now == 0) _inFlight.Remove(cluster);
         else _inFlight[cluster] = now;
     }
 

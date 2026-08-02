@@ -11,15 +11,15 @@ runs across many.** Static background is out of scope — fork 1b.
 
 **Status marks: ✅ built ⬜ proposed, not written 🔬 experiment we want to run**
 
-**Everything in both diagrams below is now ✅ built and tested** — 122 tests,
-49 mutations. The ⬜ marks inside them are stale and are kept only until the
-next pass rewrites them; what is genuinely unbuilt is listed under **Open
-forks**, and the diagrams' one real ⬜ is *prediction ranks*, which needs a
-predictor that does not exist.
+**A chain has caused a move.** Over 200 seeds it survives 6.575 steps against
+random play's 3.990 — about five standard errors. That is the thing this design
+existed to make possible and it had never happened before, on this branch or on
+`master`. It does not yet beat repeating the last action, and nothing has ever
+eaten a fruit; see fork 10.
 
-**A chain has caused a move.** 2 of 5 steps at seed 1, against 0 of 3 in the
-blind control. That is the thing this whole design existed to make possible and
-it had never happened before, on this branch or on `master`.
+**What is built, and what is not**, is now marked in the diagrams themselves
+rather than described here. What is unbuilt or undecided lives under
+**Open forks** at the bottom, which is the part kept current.
 
 ---
 
@@ -46,23 +46,23 @@ way to have been built.
 flowchart LR
     subgraph L["LEARNING — forms connections (writes)"]
         direction TB
-        Obs["A moment happens on some machine<br/>⬜"]
-        Rendez["Rendezvous: who else fired then?<br/>⬜ NOT DESIGNED"]
-        Rows["Each node's own row gains a partner<br/>⬜"]
+        Obs["A moment happens on some machine<br/>✅"]
+        Rendez["Rendezvous: who else fired then?<br/>✅ local only — fork 1"]
+        Rows["Each node's own row gains a partner<br/>✅"]
         Obs --> Rendez --> Rows
     end
 
     subgraph T["THINKING — uses connections (reads)"]
         direction TB
-        Fire["A message reaches a node<br/>⬜"]
-        Fork["It forks to the node's partners<br/>⬜"]
-        Back["Arrivals return to the origin<br/>⬜"]
+        Fire["A message reaches a node<br/>✅"]
+        Fork["It forks to the node's partners<br/>✅"]
+        Back["Arrivals return to the origin<br/>✅"]
         Fire --> Fork --> Back
     end
 
     Rows -.->|"the counts ARE the edges"| Fire
 
-    style Rendez fill:#7c2d12,color:#fff
+    style Rendez fill:#374151,color:#fff
 ```
 
 **A connection is a count.** There is no edge object and no connect operation.
@@ -148,28 +148,28 @@ in flight.
 
 ```mermaid
 flowchart TD
-    World["World (snake)<br/>⬜"] -->|observation| InMachine
+    World["World (snake)<br/>✅"] -->|observation| InMachine
 
-    InMachine["Input machine<br/>codify: observation → Code[]<br/>shared seed, no training<br/>⬜"]
+    InMachine["Input machine<br/>codify: observation → Code[]<br/>fixed transform, no training<br/>✅"]
     InMachine --> Thought
 
-    Thought["Thought (origin)<br/>one per broadcast<br/>collects arrivals + deaths<br/>⬜"]
+    Thought["Thought (origin)<br/>one per broadcast<br/>collects arrivals + deaths<br/>✅"]
     Thought -->|"Message{ BroadcastId, ReturnTo,<br/>Chain, Held, Carried }"| Bus
 
-    Bus["HybridBus — ring says which cluster owns a code<br/>⬜"]
+    Bus["HybridBus — ring says which cluster owns a code<br/>✅ local half only"]
     Bus -->|"direct call, same process, no serialization"| LocalCluster
     Bus -->|"wire, other machine"| RemoteCluster
 
-    LocalCluster["Local cluster<br/>⬜"] --> Fire
-    RemoteCluster["Remote cluster<br/>⬜"] --> Fire
+    LocalCluster["Local cluster<br/>✅"] --> Fire
+    RemoteCluster["Remote cluster<br/>⬜ no wire yet"] --> Fire
 
-    Fire["Node fires<br/>price the step · pay each partner ·<br/>append self to chain · group by cluster<br/>⬜"]
+    Fire["Node fires<br/>price the step · pay each partner ·<br/>append self to chain · group by cluster<br/>✅"]
     Fire -->|"one message per CLUSTER reached,<br/>not per node"| Bus
     Fire -->|"Arrival / Death → ReturnTo"| Thought
-    Fire -.->|machine leaves| Death["Death event<br/>⬜"]
+    Fire -.->|machine leaves| Death["Death event<br/>✅ writes off routes in flight"]
     Death --> Thought
 
-    Thought -->|"arrival narrows → prediction ranks<br/>⬜"| OutMachine["Output machine<br/>⬜"]
+    Thought -->|"arrival narrows ✅<br/>prediction ranks ⬜"| OutMachine["Output machine<br/>✅ not addressed — fork 11"]
     OutMachine -->|action| World
 
     style Thought fill:#2d3748,color:#fff
@@ -411,6 +411,23 @@ Recorded here so a decision does not go quiet.
     live count comes from splits and deaths; the in-flight counts come from the
     routing named in each report. Those are two independent quantities, and
     them agreeing is a real check where the old one held by construction.
+
+13. **The in-flight accounting was wrong on 39% of real thoughts, and the
+    check that found it had never been run. Fixed 2026-08-02.** `Balanced()`
+    became a real check when fork 5 landed — the live count comes from splits
+    and deaths, the per-cluster counts from the routing named in each report,
+    two independent quantities. **Nothing had ever run it on a live thought.**
+    Run for the first time: **100 of 256 thoughts failed.**
+    **The cause was clamping.** Reports arrive out of order, so a downstream
+    cluster can say *I handled 3* before the upstream says *I sent 3 there*.
+    The count went negative in between and was clamped to zero, which threw the
+    information away permanently — so when the upstream report landed it added
+    routes that had already been handled. Left negative, the pair cancels and
+    the sum stays right. **0 of 256 after the fix.**
+    **C2 says out of order is normal, so the accounting has to survive it
+    rather than round it off.** A negative count is still refused as a source
+    of *stranded* routes when its cluster dies, since writing one off would
+    manufacture live routes out of nothing.
 
 12. **`Halted` is approximate, and the ordering that makes it so is
     load-bearing. Measured 2026-08-02.** At a fixed seed, 25 repeats on three

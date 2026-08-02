@@ -131,6 +131,26 @@ public sealed class PolicyTests
     }
 
     [Fact]
+    public async Task The_accounting_holds_on_every_real_thought()
+    {
+        // THE INTEGRITY CHECK, RUN FOR REAL RATHER THAN IN A FIXTURE. The live
+        // count comes from splits and deaths; the per-cluster in-flight counts
+        // come from the routing named in each report. Two independent
+        // quantities, so them agreeing says the routes really were where the
+        // origin thought they were.
+        //
+        // Measured at 60 seeds: 256 thoughts, 0 unbalanced. Before the clamp
+        // in `Thought.Move` was removed it was 100 of 256.
+        var runs = await Over(30, Policy.Chain);
+
+        Assert.Equal(0, runs.Sum(r => r.Unbalanced));
+
+        // The companion: thoughts actually ran, so the zero above is not the
+        // zero you get from never checking anything.
+        Assert.True(runs.Sum(r => r.Steps - r.Silent) > 50);
+    }
+
+    [Fact]
     public async Task Nothing_has_eaten_a_fruit_under_any_policy()
     {
         // Recorded so no claim of competence can quietly be made. Thirty seeds

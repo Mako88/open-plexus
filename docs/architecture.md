@@ -11,7 +11,15 @@ runs across many.** Static background is out of scope — fork 1b.
 
 **Status marks: ✅ built ⬜ proposed, not written 🔬 experiment we want to run**
 
-Nothing is built yet. Everything below is ⬜.
+**Everything in both diagrams below is now ✅ built and tested** — 122 tests,
+49 mutations. The ⬜ marks inside them are stale and are kept only until the
+next pass rewrites them; what is genuinely unbuilt is listed under **Open
+forks**, and the diagrams' one real ⬜ is *prediction ranks*, which needs a
+predictor that does not exist.
+
+**A chain has caused a move.** 2 of 5 steps at seed 1, against 0 of 3 in the
+blind control. That is the thing this whole design existed to make possible and
+it had never happened before, on this branch or on `master`.
 
 ---
 

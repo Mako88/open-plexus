@@ -1,16 +1,12 @@
-using OpenPlexus.Bus;
 using OpenPlexus.Codes;
+using OpenPlexus.Graph;
 
 namespace OpenPlexus.Learning;
 
 /// <summary>
-/// The join, when the whole live set is on one machine.
+/// The join, when every cluster is in one process.
 /// </summary>
 /// <remarks>
-/// <para>
-/// For each onset, pair it with everything live and tell each participant its
-/// partners. Free, because nobody has to be found.
-/// </para>
 /// <para>
 /// <b>IT DOES NOT TEST THE HARD PART, and that is why it is called Local.</b>
 /// Two machines seeing different halves of the same moment is the case that
@@ -28,12 +24,70 @@ namespace OpenPlexus.Learning;
 /// </remarks>
 public sealed class LocalRendezvous : IRendezvous
 {
-    private readonly IBus _bus;
-    private readonly Ring _ring;
+    private readonly LocalClusters _clusters;
 
-    public LocalRendezvous(IBus bus, Ring ring) => throw new NotImplementedException();
+    public LocalRendezvous(LocalClusters clusters)
+    {
+        ArgumentNullException.ThrowIfNull(clusters);
+        _clusters = clusters;
+    }
 
     /// <inheritdoc/>
-    public Task JoinAsync(Code onset, IReadOnlyCollection<Code> live, long now,
-        CancellationToken ct = default) => throw new NotImplementedException();
+    public ValueTask JoinAsync(Occasion occasion, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(occasion);
+
+        // A stable scene is silent. No onset, no occasion, nothing written.
+        if (occasion.Onsets.IsEmpty) return ValueTask.CompletedTask;
+
+        var present = new HashSet<Code>(occasion.Onsets);
+        present.UnionWith(occasion.Live);
+
+        // EVERYTHING PRESENT NOTES THE OCCASION, including what was already
+        // live and did not itself start. Two reasons, and the second is the
+        // load-bearing one.
+        //
+        // An occasion is a SET -- everything in one moment met everything else
+        // -- and something that was there was there.
+        //
+        // AND `seen` IS THE DENOMINATOR OF EVERY EDGE WEIGHT. A partner is
+        // scored `together(here, other) / seen(other)`, so a code that is
+        // present through many events and notes none of them would carry a
+        // tiny marginal against a large shared count, and score ABOVE 1.0 --
+        // turning the ever-present background into the strongest partner in
+        // the graph, which is the exact failure the forward weighting exists
+        // to prevent. Noting keeps `together(x, y) <= seen(y)`.
+        foreach (var code in present) _clusters.For(code).Note();
+
+        var written = new HashSet<(Code, Code)>();
+
+        foreach (var onset in occasion.Onsets)
+        {
+            foreach (var other in present)
+            {
+                if (other == onset) continue;
+
+                // Two onsets in one frame are one coincidence, not two. Without
+                // this they would each pair with the other and the count would
+                // double.
+                if (!written.Add(Unordered(onset, other))) continue;
+
+                // EACH SIDE WRITES ITS OWN ROW. A node that quietly kept both
+                // directions would be holding data it does not own, which is
+                // the shared state C1 forbids.
+                _clusters.For(onset).Observe(other);
+                _clusters.For(other).Observe(onset);
+            }
+        }
+
+        // ONSET-TO-EVERYTHING, never live-to-live. Two codes that were both
+        // already there did not just coincide -- they coincided whenever they
+        // started, and that was counted then. Incrementing them again on every
+        // unrelated onset would inflate exactly the stable background the
+        // weighting has to refuse.
+        return ValueTask.CompletedTask;
+    }
+
+    private static (Code, Code) Unordered(Code one, Code other) =>
+        one.CompareTo(other) <= 0 ? (one, other) : (other, one);
 }

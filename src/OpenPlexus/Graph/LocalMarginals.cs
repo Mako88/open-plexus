@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Graph;
@@ -30,15 +29,12 @@ namespace OpenPlexus.Graph;
 /// </remarks>
 public sealed class LocalMarginals : IMarginals
 {
-    private readonly ConcurrentDictionary<ClusterName, Cluster> _clusters = [];
+    private readonly LocalClusters _clusters;
 
-    private readonly record struct ClusterName(string Value);
-
-    /// <summary>Make a cluster's nodes readable to everything else in the process.</summary>
-    public void Include(Cluster cluster)
+    public LocalMarginals(LocalClusters clusters)
     {
-        ArgumentNullException.ThrowIfNull(cluster);
-        _clusters[new ClusterName(cluster.Address.Value)] = cluster;
+        ArgumentNullException.ThrowIfNull(clusters);
+        _clusters = clusters;
     }
 
     /// <summary>
@@ -50,13 +46,8 @@ public sealed class LocalMarginals : IMarginals
     /// nothing has ever seen has no marginal. Across machines it would be
     /// wrong, and silently so, which is why the class says what it is.
     /// </remarks>
-    public double SeenOf(Code code)
-    {
-        foreach (var cluster in _clusters.Values)
-        {
-            if (cluster.TryGet(code, out var node)) return node.Seen;
-        }
-
-        return 0.0;
-    }
+    public double SeenOf(Code code) =>
+        _clusters.TryOwner(code, out var cluster) && cluster.TryGet(code, out var node)
+            ? node.Seen
+            : 0.0;
 }

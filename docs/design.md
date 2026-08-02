@@ -5,12 +5,12 @@ implementations — this is the mental model, and the code is meant to match it
 exactly. If they ever disagree, this file is wrong and gets fixed.
 
 **Status: every type exists. `Code`, `Node`, `LiveSet`, `Snake`,
-`SnakeQuantizer`, `Thought`, `Ring`, `HybridBus` and `Cluster` are implemented
-and tested; only the learning path and the two machines are stubs.** Each
-unimplemented field shows up as a `CS0169` build warning, so the count is a
-rough progress bar — 27 when the stubs landed, **8** now.
+`SnakeQuantizer`, `Thought`, `Ring`, `HybridBus`, `Cluster` and
+`LocalRendezvous` are implemented and tested; only the two machines are
+stubs.** Each unimplemented field shows up as a `CS0169` build warning, so the
+count is a rough progress bar — 27 when the stubs landed, **6** now.
 
-**88 tests pass, and thirty-six mutations have been run to confirm they bite.**
+**100 tests pass, and forty-two mutations have been run to confirm they bite.**
 A test has proved nothing until it has been seen to fail for the right reason.
 
 **Five mutations have SURVIVED across the project, and all five are recorded
@@ -53,6 +53,12 @@ better tests; two are kept and labelled.
 | nodes are not created on first mention | node-comes-into-existence |
 | the row is written without its lock | concurrent-deliveries-do-not-lose-counts |
 | the node's lock is held across the weighing | partners-can-fire-at-once (deadlocks) |
+| only onsets note the occasion | shared-count-never-exceeds-marginal |
+| silence is not silent | occasion-with-no-onset-writes-nothing |
+| only one direction of a pair is written | onset-joins-in-both-directions |
+| live-to-live pairs are written | both-already-live-gain-nothing |
+| two onsets in a frame are counted twice | two-onsets-are-one-coincidence |
+| onsets never join the live set | onset-joins-with-everything-live |
 
 **Survived, on `Ring`:**
 
@@ -358,12 +364,41 @@ discrete without sampling it.
   Everything that persists produces nothing at all.
 - **`Live`** — the codes currently on.
 
-### `IRendezvous`
+### `Occasion` and `IRendezvous`
 
-How a node learns who it fired with.
+An `Occasion` is one moment's change: **what started**, and **what was already
+there**. A frame's onsets are one occasion, not one each — they came from a
+single observation, and splitting them would count a pair of simultaneous
+onsets twice.
 
-- **`JoinAsync(onset, live)`** — a code just started while these were already
-  live; make sure every one of them ends up with the others in its row.
+- **`JoinAsync(occasion)`** — make sure everything in it ends up in the others'
+  rows.
+
+**What a join writes, and the reasoning that fixes it:**
+
+- **Everything present notes the occasion — including what was already live and
+  did not itself start.** This looked optional and is not. `seen` is the
+  denominator of every edge weight, so a code present through many events that
+  noted none of them would carry a tiny marginal against a large shared count
+  and score **above 1.0** — turning the ever-present background into the
+  strongest partner in the graph, the exact failure the forward weighting
+  exists to prevent. Noting keeps `together(x, y) <= seen(y)`, which is
+  asserted over a 400-step random run.
+- **Onset-to-everything, never live-to-live.** Two codes that were both already
+  there did not just coincide; they coincided whenever they started and that
+  was counted then. Incrementing them again on every unrelated onset would
+  inflate precisely the stable background the weighting has to refuse.
+- **Two onsets in one frame are one coincidence, not two.**
+- **Both directions are written, each by its own node**, because a node holding
+  the other's row would be keeping data it does not own.
+
+### `LocalClusters`
+
+Every cluster in this process, and how to reach the node for a code — shared by
+`LocalMarginals` and `LocalRendezvous` so there is one rule, not two. **A code
+whose ring owner is not in this process throws rather than dropping the
+write**: with no wire that can only be a wiring error, and a silent drop would
+look exactly like the ordinary count loss it is not.
 
 ### `LocalRendezvous`
 

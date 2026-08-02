@@ -29,13 +29,16 @@ public sealed class ClusterTests : IDisposable
     private readonly HybridBus _bus = new();
     private readonly Counting _counted;
     private readonly Ring _ring = new(seed: 42, replicas: 64);
-    private readonly LocalMarginals _marginals = new();
+    private readonly LocalClusters _local;
+    private readonly LocalMarginals _marginals;
     private readonly List<IDisposable> _handles = [];
     private readonly Machine _origin = new(Origin);
 
     public ClusterTests()
     {
         _bus.Faults += failure => throw failure;
+        _local = new LocalClusters(_ring);
+        _marginals = new LocalMarginals(_local);
         _counted = new Counting(_bus);
         _handles.Add(_bus.Subscribe(_origin));
     }
@@ -122,7 +125,7 @@ public sealed class ClusterTests : IDisposable
         var address = new ClusterAddress(name);
         _ring.Join(address);
         var cluster = new Cluster(address, _counted, _ring, Dials, _marginals);
-        _marginals.Include(cluster);
+        _local.Include(cluster);
         _handles.Add(_bus.Subscribe(cluster));
         return cluster;
     }

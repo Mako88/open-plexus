@@ -70,5 +70,27 @@ public readonly record struct Message
 public sealed record Envelope
 {
     public required ClusterAddress To { get; init; }
+
     public required ImmutableArray<Message> Messages { get; init; }
+
+    /// <summary>
+    /// This envelope went to every cluster, so fire only what you already hold.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>John's call on fork 6, 2026-08-02: broadcast the initial input.</b>
+    /// An origin has no address by nature — <i>what is this thing I am
+    /// sensing</i> cannot be routed, because you do not know what you are
+    /// looking for. A hop is the opposite: a route standing on a node knows
+    /// exactly which partner it walks to, so hops stay routed.
+    /// </para>
+    /// <para>
+    /// <b>A broadcast never creates a node.</b> A routed message is addressed
+    /// to a code and brings it into existence on arrival; a broadcast is a
+    /// question put to everyone, and a cluster that has never seen that code
+    /// has nothing to say. Admitting on a broadcast would put every code on
+    /// every cluster.
+    /// </para>
+    /// </remarks>
+    public bool Everywhere { get; init; }
 }

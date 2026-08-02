@@ -91,9 +91,21 @@ public sealed class Cluster : IReceiveEnvelopes
         var onward = new Dictionary<ClusterAddress, List<Message>>();
         var owed = new Dictionary<(MachineAddress To, BroadcastId Broadcast), Owing>();
 
+        // A BROADCAST IS ONE PENDING UNIT PER CLUSTER, and that is what keeps
+        // the accounting working when the origin cannot know how many routes it
+        // started. The unit forks into however many of the broadcast codes this
+        // cluster actually holds, or dies if it holds none -- so every cluster
+        // replies, including with nothing, and the origin's count closes.
+        var fanned = 0;
+
         foreach (var message in envelope.Messages)
         {
+            // A broadcast never creates a node: a cluster that has never seen
+            // this code has nothing to say about it.
+            if (envelope.Everywhere && !_nodes.TryGetValue(message.To, out _)) continue;
+
             var fired = Admit(message.To).Fire(message, _marginals);
+            fanned++;
 
             foreach (var next in fired.Outgoing)
             {
@@ -114,7 +126,12 @@ public sealed class Cluster : IReceiveEnvelopes
             // which cluster it is in, so it can report not only that it forked
             // but where the forks are headed -- which is what lets an origin
             // know whether a cluster's death concerns it.
-            owing.Handled++;
+            //
+            // A BROADCAST'S NODES ARE NOT SEPARATELY IN FLIGHT. The origin sent
+            // one unit to this cluster, and these fired because the unit forked
+            // here -- counting each of them as handled would take credit for
+            // routes the origin never dispatched.
+            if (!envelope.Everywhere) owing.Handled++;
             foreach (var next in fired.Outgoing)
             {
                 var owner = _ring.OwnerOf(next.To);
@@ -126,6 +143,8 @@ public sealed class Cluster : IReceiveEnvelopes
             owing.Deaths += fired.Accounting.Deaths;
             owing.Halted += fired.Accounting.Halted;
         }
+
+        if (envelope.Everywhere) Unit(envelope, owed, fanned);
 
         // SEND ONWARD BEFORE REPORTING, AND THAT ORDER IS LOAD-BEARING.
         // A delivery that sends onward does so before it finishes, which is
@@ -160,6 +179,31 @@ public sealed class Cluster : IReceiveEnvelopes
                 Accounting = new Accounting(broadcast, owing.Splits, owing.Deaths, owing.Halted),
             }, ct).ConfigureAwait(false);
         }
+    }
+
+    /// <summary>
+    /// Books the broadcast's single pending unit: it became <paramref name="fanned"/>
+    /// routes, or died if this cluster held none of the codes.
+    /// </summary>
+    /// <remarks>
+    /// <b>A cluster holding nothing still replies</b>, and it has to. The origin
+    /// knows only how many clusters it broadcast to, so silence from one of them
+    /// is indistinguishable from a route still walking.
+    /// </remarks>
+    private static void Unit(
+        Envelope envelope,
+        Dictionary<(MachineAddress To, BroadcastId Broadcast), Owing> owed,
+        int fanned)
+    {
+        if (envelope.Messages.IsEmpty) return;
+
+        var sample = envelope.Messages[0];
+        var key = (sample.ReturnTo, sample.Broadcast);
+        if (!owed.TryGetValue(key, out var owing)) owed[key] = owing = new Owing();
+
+        owing.Handled++;
+        if (fanned == 0) owing.Deaths++;
+        else owing.Splits += fanned - 1;
     }
 
     /// <summary>

@@ -84,6 +84,29 @@ public sealed class HybridBus : IBus
     }
 
     /// <inheritdoc/>
+    public ValueTask<IReadOnlyCollection<ClusterAddress>> BroadcastAsync(
+        Envelope envelope, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(envelope);
+
+        List<(ClusterAddress Address, IReceiveEnvelopes Receiver)> everyone;
+        lock (_gate)
+        {
+            everyone = [.. _clusters.Select(pair => (pair.Key, pair.Value))];
+            _inFlight += everyone.Count;
+        }
+
+        foreach (var (address, receiver) in everyone)
+        {
+            var addressed = envelope with { To = address, Everywhere = true };
+            Dispatch(() => receiver.DeliverAsync(addressed, ct));
+        }
+
+        return ValueTask.FromResult<IReadOnlyCollection<ClusterAddress>>(
+            [.. everyone.Select(one => one.Address)]);
+    }
+
+    /// <inheritdoc/>
     public ValueTask SendAsync(MachineAddress to, Report report, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(report);

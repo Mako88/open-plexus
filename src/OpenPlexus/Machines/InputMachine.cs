@@ -33,6 +33,9 @@ public sealed class InputMachine<TFrame> : IReceiveReports
 
     private int _deaths;
 
+    /// <summary>A placeholder address; a broadcast is not addressed to anyone.</summary>
+    private static readonly ClusterAddress _everywhere = new("*");
+
     public InputMachine(
         MachineAddress address,
         IQuantizer<TFrame> quantizer,
@@ -111,32 +114,36 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         ArgumentOutOfRangeException.ThrowIfZero(origins.Count);
 
         var broadcast = BroadcastId.New();
-        var thought = new Thought(broadcast, origins.Count, _settings.Accumulate);
+
+        var messages = origins.Select(code => new Message
+        {
+            Broadcast = broadcast,
+            ReturnTo = _address,
+            To = code,
+            Held = _settings.Stamina,
+
+            // A chain ends with the node the message is addressed to, so an
+            // origin's chain is just itself.
+            Chain = [code],
+            Carried = 1.0,
+        });
+
+        // BROADCAST, NOT ROUTED -- John's call on fork 6. An origin has no
+        // address by nature: for "what is this thing I am sensing" you cannot
+        // route, because you do not know what you are looking for. The ring is
+        // not consulted here at all.
+        var reached = await _bus.BroadcastAsync(
+            new Envelope { To = _everywhere, Messages = [.. messages], Everywhere = true },
+            ct).ConfigureAwait(false);
+
+        // ONE PENDING UNIT PER CLUSTER. The origin cannot know how many routes
+        // it started -- that depends on who holds what, which is exactly the
+        // knowledge a broadcast exists to avoid needing. What it does know is
+        // how many clusters it asked, and every one of them replies.
+        var thought = new Thought(broadcast, Math.Max(reached.Count, 1), _settings.Accumulate);
         _thoughts[broadcast] = thought;
 
-        foreach (var batch in origins.GroupBy(_ring.OwnerOf))
-        {
-            var messages = batch.Select(code => new Message
-            {
-                Broadcast = broadcast,
-                ReturnTo = _address,
-                To = code,
-                Held = _settings.Stamina,
-
-                // A chain ends with the node the message is addressed to, so an
-                // origin's chain is just itself.
-                Chain = [code],
-                Carried = 1.0,
-            });
-
-            var envelope = new Envelope { To = batch.Key, Messages = [.. messages] };
-
-            // The origin's own first send counts too, or a cluster that dies
-            // before reporting anything would strand routes nobody knew about.
-            thought.SentInto(batch.Key, envelope.Messages.Length);
-
-            await _bus.SendAsync(batch.Key, envelope, ct).ConfigureAwait(false);
-        }
+        foreach (var cluster in reached) thought.SentInto(cluster, 1);
 
         return thought;
     }

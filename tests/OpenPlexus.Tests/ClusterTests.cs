@@ -95,6 +95,9 @@ public sealed class ClusterTests : IDisposable
 
         public ValueTask SendAsync(MachineAddress to, Report report, CancellationToken ct = default) =>
             inner.SendAsync(to, report, ct);
+
+        public ValueTask<IReadOnlyCollection<ClusterAddress>> BroadcastAsync(
+            Envelope envelope, CancellationToken ct = default) => inner.BroadcastAsync(envelope, ct);
     }
 
     public void Dispose()

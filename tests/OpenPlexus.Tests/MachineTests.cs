@@ -112,7 +112,13 @@ public sealed class MachineTests : IDisposable
         // each is the other.
         var thought = await Observe(1, C(1), C(2), C(3));
         Assert.NotNull(thought);
-        Assert.Equal(1, thought.Live + thought.Deaths - thought.Splits);
+
+        // A BROADCAST IS ONE PENDING UNIT PER CLUSTER, so the thought starts
+        // with as many routes as there are clusters — not as many as there are
+        // origin codes. The origin cannot know how many nodes will fire; that
+        // depends on who holds what, which is the knowledge a broadcast exists
+        // to avoid needing.
+        Assert.True(thought.Balanced());
     }
 
     [Fact]
@@ -159,22 +165,38 @@ public sealed class MachineTests : IDisposable
     }
 
     [Fact]
-    public async Task Origins_going_to_one_cluster_cost_one_envelope()
+    public async Task An_origin_goes_to_every_cluster_and_the_ring_is_not_asked()
     {
         var codes = Enumerable.Range(1, 12).Select(i => C((ulong)i)).ToArray();
         var thought = await _machine.ThinkAsync(codes);
         await _bus.WhenQuiet().WaitAsync(Patience);
 
-        // One envelope per cluster, not per code — the same economy the
-        // clusters use, applied at the origin.
-        var clusters = codes.Select(_ring.OwnerOf).Distinct().Count();
-        Assert.True(clusters < codes.Length, "every code landed on its own cluster");
-
-        // EVERY origin has to have been sent, or its route never reports and
-        // the thought never settles. `origins + splits - deaths == live` is
-        // true by construction, so asserting it here would prove nothing.
-        Assert.Equal(12, thought.Deaths);
+        // FORK 6. Every cluster is asked, and each replies — including the ones
+        // holding none of these codes, which is what lets the count close when
+        // the origin cannot know how many routes it started.
         Assert.True(thought.Settled);
+        Assert.True(thought.Balanced());
+
+        // Nothing has been learned, so no cluster holds any of these codes and
+        // every unit dies. Four clusters, four deaths.
+        Assert.Equal(4, thought.Deaths);
+    }
+
+    [Fact]
+    public async Task A_broadcast_never_creates_a_node()
+    {
+        // A routed message is addressed to a code and brings it into existence.
+        // A broadcast is a question put to everyone, and admitting on one would
+        // put every code on every cluster.
+        await _machine.ThinkAsync([C(500), C(501)]);
+        await _bus.WhenQuiet().WaitAsync(Patience);
+
+        Assert.False(_local.TryOwner(C(500), out var owner) && owner.TryGet(C(500), out _));
+
+        // The companion: learning DOES create it, so the assertion above is
+        // about broadcasts rather than about nodes never appearing.
+        await Observe(0, C(500), C(501));
+        Assert.True(_local.TryOwner(C(500), out var home) && home.TryGet(C(500), out _));
     }
 
     [Fact]

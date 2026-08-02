@@ -53,6 +53,17 @@ public interface IBus
     /// </remarks>
     ValueTask SendAsync(ClusterAddress to, Envelope envelope, CancellationToken ct = default);
 
+    /// <summary>
+    /// Put this envelope to every cluster at once.
+    /// </summary>
+    /// <remarks>
+    /// <b>Returns who it went to</b>, because the sender has to know how many
+    /// replies to expect — under a broadcast it cannot work that out from the
+    /// ring, and the whole point is that it did not need an address.
+    /// </remarks>
+    ValueTask<IReadOnlyCollection<ClusterAddress>> BroadcastAsync(
+        Envelope envelope, CancellationToken ct = default);
+
     /// <summary>Get this report back to the machine that started the thought.</summary>
     ValueTask SendAsync(MachineAddress to, Report report, CancellationToken ct = default);
 

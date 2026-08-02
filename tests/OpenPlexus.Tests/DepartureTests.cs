@@ -83,18 +83,18 @@ public sealed class DepartureTests : IDisposable
         var thought = await _machine.ThinkAsync(codes);
         await _bus.WhenQuiet().WaitAsync(Patience);
 
-        // THE ORIGIN'S OWN FIRST SEND IS TRACKED. Without it a cluster that
-        // dies before reporting anything would strand routes nobody knew about.
+        // ONE PENDING UNIT PER CLUSTER, and the origin's own send is tracked --
+        // without that a cluster dying before it replies would strand a unit
+        // nobody knew about.
         var doomed = new ClusterAddress("a");
-        var heading = thought.InFlightTo(doomed);
-        Assert.True(heading > 0, "no origin routed to the cluster under test");
-        Assert.Equal(20, thought.Live);
+        Assert.Equal(1, thought.InFlightTo(doomed));
+        Assert.Equal(4, thought.Live);
 
         _stubs[doomed].Dispose();
 
-        // The loss is exact, and those routes are deaths rather than a mystery.
-        Assert.Equal(20 - heading, thought.Live);
-        Assert.Equal(heading, thought.Deaths);
+        // The loss is exact, and it is a death rather than a mystery.
+        Assert.Equal(3, thought.Live);
+        Assert.Equal(1, thought.Deaths);
         Assert.Equal(0, thought.InFlightTo(doomed));
     }
 
@@ -118,20 +118,23 @@ public sealed class DepartureTests : IDisposable
     }
 
     [Fact]
-    public async Task A_cluster_this_thought_never_reached_strands_nothing()
+    public async Task One_departure_writes_off_one_cluster_and_not_the_rest()
     {
         // The companion. Without it the tests above pass for a machine that
         // writes off every route whenever anything at all departs.
+        //
+        // Under a broadcast every cluster is asked, so there is no cluster the
+        // thought never reached — what has to hold instead is that a departure
+        // takes ONE unit rather than all of them.
         var thought = await _machine.ThinkAsync([C(1)]);
         await _bus.WhenQuiet().WaitAsync(Patience);
 
-        var owner = _ring.OwnerOf(C(1));
-        var innocent = _stubs.Keys.First(a => a != owner);
+        Assert.Equal(4, thought.Live);
 
-        _stubs[innocent].Dispose();
+        _stubs[new ClusterAddress("c")].Dispose();
 
-        Assert.Equal(1, thought.Live);
-        Assert.Equal(0, thought.Deaths);
+        Assert.Equal(3, thought.Live);
+        Assert.Equal(1, thought.Deaths);
         Assert.False(thought.Settled);
     }
 

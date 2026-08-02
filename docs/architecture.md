@@ -77,6 +77,57 @@ join a network it has never spoken to and route correctly immediately.
 
 Buckets appear only on the learning path. The thinking loop never touches time.
 
+### The stream is split by CHANGE, not by time
+
+John, 2026-08-02. Input and output are continuous, and most things persist —
+a thing here in one moment is usually still here in the next.
+
+**Sampling a stream on a tick manufactures the distractor.** A code that stays
+present gets counted every tick and co-occurs with everything that happens
+while it is there, which is numerically enormous and means nothing. It is the
+ever-present hub the `forward` weighting exists to refuse, created on purpose.
+
+So a machine emits on **onset** and **offset**, never per tick. Persistence is
+the absence of a message.
+
+**The rule: on onset, a code joins with everything currently live, counted
+once.** Not onset-with-onset — a sound starting while a ball is already visible
+must connect, and that is the cross-modal binding the design exists for.
+
+What it buys, none of it measured:
+
+- **The window-width dial mostly dissolves.** The rendezvous becomes *did these
+  intervals OVERLAP*, not *did these instants MATCH*. If a thing was visible
+  two seconds, 50ms of clock skew is irrelevant. Overlap is robust against C2
+  where coincidence is brittle.
+- **Duration becomes representable** — decision 11's open ⬜. Offset minus
+  onset, falling out of the encoding rather than needing a mechanism.
+- **Order becomes real.** An occasion is currently a SET, so the graph cannot
+  tell *A then B* from *A with B* anywhere. Onsets are ordered events, which
+  gives `moments.Window`'s one-way write something honest to be directional
+  about. Order alone measured 0.153 against 0.000 with the window off.
+- **Traffic collapses.** A stable scene is silent.
+
+**Named risk: a thing that never changes becomes invisible.** No onset, no
+message, no count, no existence. Biology has this failure — a stabilised
+retinal image fades — and answers it with microsaccades, which manufacture
+change so the static world keeps reporting. We have no equivalent and no
+decision that we do not need one.
+
+### Continuous output downgrades termination
+
+If input never stops, thoughts are continuously initiated and permanently
+overlapping; there is no moment between thoughts. So the system acts on the
+best chain arrived **so far**, and later arrivals refine it.
+
+**Termination detection therefore drops from a correctness requirement to
+housekeeping.** A thought stranded by a vanished machine leaks state instead of
+hanging the system. Death events still release that state; they no longer
+decide whether an answer is ever produced.
+
+It also makes `BroadcastId` non-negotiable — there will always be many thoughts
+in flight.
+
 ---
 
 ## The thinking loop
@@ -147,7 +198,11 @@ Recorded here so a decision does not go quiet.
    a bucket owner is computed locally by hash, the owner notices the
    coincidence and tells each participant its partners, then the bucket is
    discarded. Measured at **exactly 1.0 messages per observation**. Undecided
-   whether to take that shape.
+   whether to take that shape. **Onsets change what it has to do**: joining
+   overlapping intervals is a different job from joining matched instants, and
+   `Join` was built for the second.
+   1b. **What manufactures change for a static world**, so a thing that never
+   changes does not become invisible. No candidate.
 2. **Who computes the edge weight.** `forward` strength is
    `together(here, other) / seen(other)` — the *partner's* marginal, which the
    sender cannot know. Either the receiver weighs (message carries `together`,

@@ -1,7 +1,7 @@
 """Cross-situational word learning trials, read from someone else's experiments.
 
 Every instrument this project has measured a grounding claim on was written here,
-and `DECISIONS.md` §10 names that as the standing weakness. These trials are not:
+and README decision 10 names that as the standing weakness. These trials are not:
 they are the stimuli from published cross-situational word-learning experiments,
 collected in `kachergis/XSLmodels` and fetched by `tools/fetch_kachergis.py`.
 

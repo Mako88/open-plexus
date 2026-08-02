@@ -44,11 +44,13 @@ across `openplexus/`, `tools/`, `tests/`, `testbed/` and `experiments/`.
   falls in, which bucket counts a pair, when a bucket closes. This does not
   re-derive any of it; it holds the open buckets for the ids it owns and calls
   the same helpers.
-- **`openplexus/peer.py`** serves the superposed store over sockets and is the
+- **`openplexus/peer.py` WAS DELETED.** It served the superposed store over
+  sockets and was the
   precedent for this split, not a thing to extend: it answers `read(concept,
   key)` against a `d x d` matrix, where this answers counting questions against
   a sparse table.
-- **`openplexus/distributed.py`** owns the slice protocol and its framing;
+- **`openplexus/distributed.py` WAS DELETED.** It owned the slice protocol and
+  its framing;
   `node_main` reuses that framing rather than either file inventing another.
 
 ## What is still NOT here

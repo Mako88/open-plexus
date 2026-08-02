@@ -75,7 +75,7 @@ def peer_mode(args) -> int:
     milliseconds per ROUND rather than wall clock for that reason.
 
     **What this does not duplicate:** the walk, the reader and the round counter
-    all already exist -- `openplexus/peer.py`, `search.beam`, and
+    all already exist -- `openplexus/peer.py` (DELETED), `search.beam`, and
     `RemoteConcepts.rounds`. `tools/peer_walk_timing.py` is the timing loop and
     already runs in process. This is the container and impairment wiring, which
     is the one part that was missing, and it reuses this file's own image, network

@@ -18,7 +18,7 @@ authority, so the terms are quoted rather than inferred from a missing file.
 **Attribution:** Zohar Jackson et al., *Free Spoken Digit Dataset*,
 github.com/Jakobovski/free-spoken-digit-dataset. **ShareAlike binds
 redistribution**, and `data/*/` is gitignored so nothing is redistributed — but
-the project's endgame is undecided (`DECISIONS.md` standing agreements) and a
+the project's endgame is undecided (README's constraints) and a
 ShareAlike corpus inside a product is a question somebody has to answer before
 that changes.
 

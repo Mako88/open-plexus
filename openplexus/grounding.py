@@ -57,7 +57,7 @@ walk, equivalence — across `openplexus/`, `tools/`, `tests/` and `experiments/
 
 An edge is kept only if each surface is in the other's top `k`. Mutuality is not
 a new idea here: it is the merge gate measured on OpenEA, where **a confidence
-gate made alignment worse and mutuality was what worked** (`DECISIONS.md` §10).
+gate made alignment worse and mutuality was what worked** (README decision 10).
 A one-sided rule lets a hub — which is precisely what a distractor present every
 time is — attach itself to every surface in the world, since it is in everyone's
 top list and nobody is in its.
@@ -66,7 +66,7 @@ top list and nobody is in its.
 how large a class is hands it something the real problem does not, so a failure
 under this rule is a strong refutation and a pass is a weak confirmation.
 Discovering the size instead is already an open option — *bound the enumeration
-by the biggest similarity gap* in `DECISIONS.md` §6 — and it is the follow-up,
+by the biggest similarity gap* in README decision 2 — and it is the follow-up,
 not a gap in this file.
 
 ## Determinism

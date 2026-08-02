@@ -59,7 +59,7 @@ Searched by capability — socket, serve, peer, wire, frame, protocol — across
 - **`openplexus/framing.py` owns the FRAMING** and `send`/`receive` are
   imported rather than re-written. A second length-prefix implementation is two
   chances to disagree about a header.
-- **`openplexus/peer.py` serves the SUPERPOSED STORE** — `read(concept, key)`
+- **`openplexus/peer.py` WAS DELETED.** It served the superposed store — `read(concept, key)`
   against a `d x d` matrix, with a fingerprint handshake because a diverged peer
   there answers with zeros that decode to a real token. This serves counting
   questions against a sparse table, where a wrong answer is a wrong integer and

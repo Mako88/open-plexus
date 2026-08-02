@@ -19,7 +19,7 @@ message is a bug and says so.
 Searched by capability — frame, length prefix, send, receive, recv — across
 `openplexus/` and `testbed/`.
 
-- **Extracted from the previous `openplexus/distributed.py`**, which is 722 lines
+- **Extracted from the since-deleted `openplexus/distributed.py`**, which was 722 lines
   of a distributed computation this architecture no longer performs. These 25
   lines were the only part `bucket_peer` needed, and carrying the other 700 to
   keep them would have been keeping a whole architecture for a struct.

@@ -48,11 +48,12 @@ across `openplexus/`, `tools/`, `tests/`, `testbed/` and `experiments/`.
 - **`openplexus/grounding.py` (`CoOccurrence`) IS used, not reimplemented** — one
   instance per node. `observed_with` exists because a sharded owner may write
   only its own direction of a pair.
-- **`openplexus/peer.py`** is point-to-point reads over real sockets against the
+- **`openplexus/peer.py` WAS DELETED.** It was point-to-point reads over real
+  sockets against the
   superposed store. This counts messages rather than sending them; it is the
   arithmetic that has to be right before a socket is worth wrapping around it.
-- **`openplexus/distributed.py`** is the driver-based dimension split, which is
-  the arrangement `DECISIONS.md` §9 records as the C1 violation this avoids.
+- **`openplexus/distributed.py` WAS DELETED.** It was the driver-based dimension
+  split, which README decision 8 now records as the C1 violation this avoids.
 
 ## What is still NOT here
 

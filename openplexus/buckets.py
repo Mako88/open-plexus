@@ -54,7 +54,9 @@ across `openplexus/`, `tools/`, `tests/`, `testbed/` and `experiments/`.
   bucket's whole output is pairs, and pairs are what that accumulator takes. The
   scoring path is therefore identical to the single-process one, which is what
   makes the comparison exact rather than approximate.
-- **`openplexus/distributed.py` and `openplexus/peer.py`** are real sockets and
+- **`openplexus/distributed.py` and `openplexus/peer.py` NO LONGER EXIST** —
+  deleted in the restructure, named here only so a search learns they are gone.
+  They were real sockets and
   real containers. This is the addressing and deadline logic, which is
   transport-agnostic and has to be right before any of it is worth wiring to a
   socket. `testbed/run.py` is where that happens.

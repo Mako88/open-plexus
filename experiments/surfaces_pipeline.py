@@ -40,9 +40,11 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
+import random
 import sys
 import time
 from collections import Counter, defaultdict
+from dataclasses import dataclass
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -57,7 +59,7 @@ from openplexus.grounding import (STATISTICS, CoOccurrence,  # noqa: E402
 from openplexus.grouping import codes as kmeans_codes  # noqa: E402
 from openplexus.surfaces import (Hyperplanes, centred, purity,  # noqa: E402
                                  spectra)
-from openplexus.tasks import mnist, spoken  # noqa: E402
+from openplexus.tasks import mnist, spoken, written  # noqa: E402
 
 MNIST_DATA = ROOT / "data" / "mnist"
 FSDD_DATA = ROOT / "data" / "fsdd"
@@ -82,6 +84,21 @@ ARM = "conditional"
 
 ARMS = ("image+word", "audio+word", "together", "alternating")
 FRONTS = ("lsh", "kmeans")
+
+#: How the word arrives. **`label` is the bug and the default**, kept because
+#: every earlier number in this table was measured on it and a mechanism that
+#: silently replaced it would make them unreproducible. It reserves one node per
+#: class and fills it from `said`, the scoring label — never wrong, never absent,
+#: multiplicity one against about a hundred image codes per digit.
+#:
+#: `written` is the repair: bytes through the same hash as everything else,
+#: several written forms, sometimes corrupted, sometimes silent, sometimes
+#: naming another digit. Measured at 10 bits over 4,000 occasions it gives 302
+#: word surfaces, about 72 per digit, at purity 0.7583.
+#:
+#: **Running both is the point.** The difference is what the supervised anchor
+#: was worth, which nothing has ever measured.
+WORD_CHANNELS = ("label", "written")
 
 
 #: What a CROSS-MODAL link costs, from `g40-01`'s sweep, readable at
@@ -117,7 +134,60 @@ def affordable(occasions: int, digits: int) -> None:
     print()
 
 
-def stream(arm: str, pairs, codes: int, image_code, audio_code, rng):
+@dataclass
+class Words:
+    """The word channel, as the stream sees it: a width and what is said when.
+
+    One shape for both channels, so `stream` has a single implementation. For
+    `label` this is never built — that path keeps its own draw inside the loop,
+    because moving it would change the order of `rng` calls and every earlier
+    number in this table with it.
+
+    Attributes:
+        width: How many word ids to reserve in the shared graph.
+        per_occasion: For each occasion, the LOCAL word ids present on it.
+            Empty where the channel was silent.
+        named: For each rendering, the digit it actually names. **Scoring
+            only** — a mistake names another digit and nothing in the stream
+            may see which.
+    """
+
+    width: int
+    per_occasion: list[list[int]]
+    named: list[int]
+
+
+def renderings(pairs, channel, rng, noise: int):
+    """What is written on each occasion, before any of it is quantised.
+
+    The primary word may be absent or may name another digit; `noise` further
+    words name other digits, which is the room talking about something else.
+    Returns the flat list of renderings, the digits they name, and which
+    renderings belong to which occasion.
+    """
+    said: list[bytes] = []
+    names: list[int] = []
+    per_occasion: list[list[int]] = []
+    for _, _, digit in pairs:
+        here: list[int] = []
+        heard = written.speak(channel, digit, rng)
+        if heard is not None:
+            named, word = heard
+            here.append(len(said))
+            said.append(word)
+            names.append(named)
+        for _ in range(noise):
+            other = rng.randrange(len(mnist.WORDS) - 1)
+            other = other if other < digit else other + 1
+            here.append(len(said))
+            said.append(written.render(other, rng, corrupt=channel.corrupt))
+            names.append(other)
+        per_occasion.append(here)
+    return said, names, per_occasion
+
+
+def stream(arm: str, pairs, codes: int, image_code, audio_code, rng,
+           words: "Words | None" = None):
     """One arm's occasions, laid out so a range test identifies the modality.
 
     Image codes `[0, codes)`, audio codes `[codes, 2*codes)`, then the words,
@@ -133,7 +203,7 @@ def stream(arm: str, pairs, codes: int, image_code, audio_code, rng):
     shared = SharedGraph()
     shared.reserve("image", codes)
     shared.reserve("audio", codes)
-    shared.reserve("word", len(mnist.WORDS))
+    shared.reserve("word", len(mnist.WORDS) if words is None else words.width)
     shared.reserve("distractor", DISTRACTORS)
 
     index = shared.index
@@ -141,7 +211,9 @@ def stream(arm: str, pairs, codes: int, image_code, audio_code, rng):
         picture, sound = image_code[image_row], audio_code[audio_row]
         if picture < 0 or sound < 0:
             continue
-        present = [("word", digit)]
+        present = ([("word", digit)] if words is None
+                   else [("word", local)
+                         for local in words.per_occasion[position]])
         if arm == "image+word":
             present.append(("image", picture))
         elif arm == "audio+word":
@@ -154,9 +226,13 @@ def stream(arm: str, pairs, codes: int, image_code, audio_code, rng):
             present.append(("image", picture) if position % 2 == 0
                            else ("audio", sound))
         # Noise is OTHER WORDS: things said in the room that are not about what
-        # is being shown.
-        for other in rng.choice(len(mnist.WORDS), NOISE, replace=False):
-            present.append(("word", int(other)))
+        # is being shown. The `written` channel has already put its own noise
+        # into `per_occasion`, so drawing again here would double it -- and the
+        # draw stays inside this loop for `label` because moving it would change
+        # the order of `rng` calls and every earlier number in this table.
+        if words is None:
+            for other in rng.choice(len(mnist.WORDS), NOISE, replace=False):
+                present.append(("word", int(other)))
         for extra in range(DISTRACTORS):
             present.append(("distractor", extra))
         # De-duplicated, because `present` was a SET and a repeated word must
@@ -177,20 +253,26 @@ def stream(arm: str, pairs, codes: int, image_code, audio_code, rng):
     return index
 
 
-def score(index, codes: int, image_major, audio_major) -> dict:
-    """What the walk recovered, per modality and across them."""
+def score(index, codes: int, image_major, audio_major, word_surfaces) -> dict:
+    """What the walk recovered, per modality and across them.
+
+    `word_surfaces` maps a digit to every word NODE that names it. Under the
+    `label` channel that is one node per digit; under `written` it is however
+    many surfaces the hash gave that digit, and the two go through this one
+    path so the columns mean the same thing in both.
+    """
     recovered = equivalence_classes(index, STATISTICS[ARM], None)
-    word = {digit: 2 * codes + digit for digit in range(len(mnist.WORDS))}
 
     hits = {"image": [0, 0], "audio": [0, 0]}
-    for digit, token in word.items():
-        for surface in recovered.get(token, frozenset({token})):
-            if surface < codes:
-                hits["image"][1] += 1
-                hits["image"][0] += image_major.get(surface) == digit
-            elif surface < 2 * codes:
-                hits["audio"][1] += 1
-                hits["audio"][0] += audio_major.get(surface - codes) == digit
+    for digit, tokens in word_surfaces.items():
+        for token in tokens:
+            for surface in recovered.get(token, frozenset({token})):
+                if surface < codes:
+                    hits["image"][1] += 1
+                    hits["image"][0] += image_major.get(surface) == digit
+                elif surface < 2 * codes:
+                    hits["audio"][1] += 1
+                    hits["audio"][0] += audio_major.get(surface - codes) == digit
 
     reached = agreed = 0
     for picture, digit in image_major.items():
@@ -228,7 +310,24 @@ def main() -> int:
                              "g40-01's measured ~300 occasions per digit, and "
                              "is where cross reaches 1.0000")
     parser.add_argument("--images", type=int, default=IMAGES)
+    parser.add_argument("--words", choices=WORD_CHANNELS, default="label",
+                        help="how the word arrives. 'label' is the default so "
+                             "every earlier number here stays reproducible; "
+                             "'written' is the repair. See WORD_CHANNELS")
+    # THE THREE DIALS, EXPOSED SO THEY CAN BE SWEPT RATHER THAN ASSUMED. At
+    # 0/0/0 the written channel is still MULTIPLE surfaces per digit but is
+    # perfectly reliable, which is the control that separates "no longer one
+    # node per class" from "now noisy" -- two changes the first run made at once.
+    parser.add_argument("--silence", type=float, default=None)
+    parser.add_argument("--mistake", type=float, default=None)
+    parser.add_argument("--corrupt", type=float, default=None)
     args = parser.parse_args()
+    if args.words == "label" and any(dial is not None for dial in
+                                     (args.silence, args.mistake, args.corrupt)):
+        raise SystemExit(
+            "--silence, --mistake and --corrupt are the written channel's "
+            "dials and do nothing under --words label. Setting them there "
+            "would give a sweep an arm that looks distinct and is not.")
 
     leftovers = sorted(ROOT.glob("**/*.py.bak"))
     if leftovers:
@@ -273,12 +372,38 @@ def main() -> int:
           f"{len(spoken.speakers(paths))} speakers, {len(pairs)} occasions")
     print(f"noise {NOISE}, distractors {DISTRACTORS}, statistic {ARM}, "
           f"chance for every purity is {chance:.4f}")
+
+    # THE WORD STREAM IS FIXED BEFORE ANY FRONT END RUNS, like the pixels and
+    # the spectra, so what varies across the table is the quantiser and not
+    # what was said. Its own seed is 0 rather than the sweep's, for the same
+    # reason: the arms compare front ends over ONE stream.
+    stock = written.Channel()
+    channel = written.Channel(
+        silence=stock.silence if args.silence is None else args.silence,
+        mistake=stock.mistake if args.mistake is None else args.mistake,
+        corrupt=stock.corrupt if args.corrupt is None else args.corrupt)
+    word_rows = word_names = word_slots = None
+    if args.words == "written":
+        heard_words, word_names, word_slots = renderings(
+            pairs, channel, random.Random(0), NOISE)
+        word_rows = np.array([written.features(w) for w in heard_words],
+                             dtype=np.float64)
+        silent = sum(1 for slot in word_slots if len(slot) == NOISE)
+        print(f"written channel: {len(heard_words)} renderings over "
+              f"{len(pairs)} occasions, {silent} of them silent, "
+              f"silence {channel.silence} mistake {channel.mistake} "
+              f"corrupt {channel.corrupt} -- ALL THREE ARE DIALS, not "
+              f"measurements, so a result that moves with them is about them")
+    else:
+        print("word channel: LABEL -- one node per class, read from `said`, "
+              "never wrong and never absent. This is the arm being repaired; "
+              "pass --words written for the repair")
     affordable(len(pairs), len(mnist.WORDS))
 
 
     header = (f"{'bits':>5}{'front':>8}{'arm':>15}{'codes':>7}{'q_img':>8}"
-              f"{'q_aud':>8}{'link_img':>10}{'link_aud':>10}{'cross':>8}"
-              f"{'crossed':>9}{'classes':>9}")
+              f"{'q_aud':>8}{'q_wrd':>8}{'link_img':>10}{'link_aud':>10}"
+              f"{'cross':>8}{'crossed':>9}{'classes':>9}")
     print(header)
     print("-" * len(header))
 
@@ -302,13 +427,30 @@ def main() -> int:
                 codes = max(max(image_code) + 1, max(audio_code) + 1)
                 q_img, image_major = purity(image_code, list(digits.labels))
                 q_aud, audio_major = purity(audio_code, said)
+                if args.words == "written":
+                    word_code = quantise(front, word_rows, bits, k, seed)
+                    q_wrd, word_major = purity(word_code, word_names)
+                    words = Words(width=codes,
+                                  per_occasion=[[word_code[i] for i in slot]
+                                                for slot in word_slots],
+                                  named=word_names)
+                    word_surfaces: dict[int, list[int]] = {
+                        digit: [] for digit in range(len(mnist.WORDS))}
+                    for surface, digit in word_major.items():
+                        word_surfaces[digit].append(2 * codes + surface)
+                else:
+                    words, q_wrd = None, 1.0
+                    word_surfaces = {digit: [2 * codes + digit]
+                                     for digit in range(len(mnist.WORDS))}
                 for arm in ARMS:
                     index = stream(arm, pairs, codes, image_code, audio_code,
-                                   np.random.default_rng(seed))
-                    row = score(index, codes, image_major, audio_major)
+                                   np.random.default_rng(seed), words)
+                    row = score(index, codes, image_major, audio_major,
+                                word_surfaces)
                     row.update({"bits": bits, "seed": seed, "front": front,
                                 "arm": arm, "codes": codes, "k": k,
                                 "q_img": q_img, "q_aud": q_aud,
+                                "q_wrd": q_wrd, "words": args.words,
                                 "chance": chance,
                                 # `codes` is the LAYOUT width, which for the
                                 # hash is 2**bits with most ids unused. What
@@ -317,7 +459,8 @@ def main() -> int:
                                 "used_aud": len({c for c in audio_code if c >= 0})})
                     emitted.append(row)
                     print(f"{bits:>5}{front:>8}{arm:>15}{codes:>7}"
-                          f"{q_img:>8.4f}{q_aud:>8.4f}{row['link_img']:>10.4f}"
+                          f"{q_img:>8.4f}{q_aud:>8.4f}{q_wrd:>8.4f}"
+                          f"{row['link_img']:>10.4f}"
                           f"{row['link_aud']:>10.4f}{row['cross']:>8.4f}"
                           f"{row['crossed']:>9.4f}{row['classes']:>9.2f}")
             print()

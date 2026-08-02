@@ -61,24 +61,38 @@ discriminated by route kind. This has no kinds and its questions have none
 either, so the claim is that hundreds of surfaces firing at once converge. That
 is the first measurement and it needs the word channel repaired first.
 
-## The word channel is a label, and the repair is to make it a modality
+## The word channel: REPAIRED, and it cost the headline number
 
-John's position is right — text is a legitimate input for a digital system, one
-of several that co-occur. The code does not implement it. In
-`surfaces_pipeline.py`:
+`openplexus/tasks/written.py` plus `--words written` in `surfaces_pipeline.py`.
+A word arrives as bytes, is written four ways, is sometimes corrupted, silent or
+naming another digit, and goes through the same hash as everything else.
+`label` stays the default so every earlier number is reproducible; the point is
+running both. At 10 bits over 4,000 occasions: **302 word surfaces, about 72 per
+digit, purity 0.7583**, against a multiplicity of 1 before.
 
-- `shared.reserve("word", len(mnist.WORDS))` — **one node per class**, ten in
-  total, where image has about a hundred codes per digit at 1024.
-- `present = [("word", digit)]`, from `said = [u.digit for u in heard]` — the
-  scoring label, never wrong, never absent. The correct word is on 100% of
-  occasions; each of the `NOISE = 2` wrong words on about 20%.
+**The first comparison, `--quick`, 8 bits, seed 0, kmeans, `alternating`:**
 
-**The repair follows from the position rather than retreating from it:** emit
-the word as bytes and LSH them, so one word becomes many surfaces the system
-must discover are one thing; let it be absent sometimes and wrong sometimes;
-include several written forms. **It is a precondition for the flood's headline
-measurement** — the many-seeds claim cannot be tested on a channel of
-multiplicity 1.
+    label                   link_img 0.9000   cross 0.0000   crossed 0.0000   classes  1.05
+    written, dials at 0     link_img 0.1019   cross 0.0919   crossed 4.6272   classes 22.62
+    written, stock dials    link_img 0.1132   cross 0.0843   crossed 1.5614   classes  9.97
+
+**The fall is not channel noise.** The control has every dial at zero and
+`q_wrd 1.0000` — a perfectly reliable word, just several surfaces instead of
+one — and `link_img` still falls 0.9000 to 0.1019. **What the 0.9000 measured
+was one node per class**, which is a maximally strong hub: everything about a
+digit necessarily co-occurs with it. Multiplicity replaces it with fragments.
+
+The two channels fail differently rather than one working. Label gives tight
+classes that reach nothing across modalities; written reaches 4.6× and agrees
+on 9%, which is over-merge. **Neither shows the cross-modal claim at `--quick`.**
+
+**Not yet comparable to `cross 1.0000`**, which was measured at `--repeats 2`.
+The three-way run at `--repeats 2`, three seeds, three bit counts is in
+`out/word-channel-comparison.txt`. Read it before citing any of the above.
+
+**Dials are dials.** `silence 0.15 mistake 0.05 corrupt 0.30` were chosen, not
+measured, and `--silence/--mistake/--corrupt` exist so a result that moves with
+them is visible as a result about them.
 
 ## Prediction, agreed and not started
 

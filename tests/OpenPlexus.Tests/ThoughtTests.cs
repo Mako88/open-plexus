@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Graph;
 using OpenPlexus.Thinking;
@@ -26,6 +27,102 @@ public sealed class ThoughtTests
 
     private static Thought Started(int origins = 1, Accumulate accumulate = Accumulate.Sum) =>
         new(Mine, origins, accumulate);
+
+    private static ClusterAddress A(string name) => new(name);
+
+    private static Report Reporting(ClusterAddress from, int handled, int splits, int deaths,
+        params Routed[] sentInto) => new()
+    {
+        From = from,
+        Handled = handled,
+        SentInto = [.. sentInto],
+        Arrivals = [],
+        Accounting = new Accounting(Mine, splits, deaths),
+    };
+
+    // ---- fork 5: a departure is exact, not a question ---------------------
+
+    [Fact]
+    public void A_cluster_leaving_takes_the_routes_that_were_heading_into_it()
+    {
+        var thought = Started(origins: 3);
+        thought.SentInto(A("alpha"), 2);
+        thought.SentInto(A("beta"), 1);
+
+        Assert.Equal(2, thought.InFlightTo(A("alpha")));
+        Assert.True(thought.Balanced());
+
+        // JOHN'S DESIGN. The origin knows how many of its routes were heading
+        // into alpha, so a departure is not a question about whether it was
+        // affected -- the loss is exact.
+        Assert.Equal(2, thought.Lost(A("alpha")));
+
+        Assert.Equal(1, thought.Live);
+        Assert.Equal(2, thought.Deaths);
+        Assert.Equal(0, thought.InFlightTo(A("alpha")));
+    }
+
+    [Fact]
+    public void A_cluster_this_thought_never_used_takes_nothing()
+    {
+        // The companion. Without it the test above passes for a Lost that
+        // writes off every route whatever died.
+        var thought = Started(origins: 3);
+        thought.SentInto(A("alpha"), 3);
+
+        Assert.Equal(0, thought.Lost(A("elsewhere")));
+
+        Assert.Equal(3, thought.Live);
+        Assert.Equal(0, thought.Deaths);
+    }
+
+    [Fact]
+    public void Losing_the_last_cluster_settles_the_thought()
+    {
+        // This is what the event bus was introduced for: the origin stops
+        // waiting on routes that are never coming back, with no deadline
+        // guessing on its behalf.
+        var thought = Started(origins: 2);
+        thought.SentInto(A("alpha"), 2);
+
+        Assert.False(thought.Settled);
+        thought.Lost(A("alpha"));
+
+        Assert.True(thought.Settled);
+        Assert.True(thought.Balanced());
+    }
+
+    [Fact]
+    public void A_report_moves_routes_off_the_cluster_that_handled_them()
+    {
+        var thought = Started(origins: 2);
+        thought.SentInto(A("alpha"), 2);
+
+        thought.Receive(Reporting(A("alpha"), handled: 2, splits: 1, deaths: 0,
+            new Routed(A("beta"), 3)));
+
+        Assert.Equal(0, thought.InFlightTo(A("alpha")));
+        Assert.Equal(3, thought.InFlightTo(A("beta")));
+        Assert.Equal(3, thought.Live);
+
+        // BALANCED IS NO LONGER A TAUTOLOGY. The live count comes from splits
+        // and deaths; the in-flight counts come from the routing in each
+        // report. Two independent quantities agreeing is a real check.
+        Assert.True(thought.Balanced());
+    }
+
+    [Fact]
+    public void Balanced_notices_when_the_routing_and_the_arithmetic_disagree()
+    {
+        var thought = Started(origins: 2);
+        thought.SentInto(A("alpha"), 2);
+
+        // Says it handled two and forked to three, but names nowhere they went.
+        thought.Receive(Reporting(A("alpha"), handled: 2, splits: 1, deaths: 0));
+
+        Assert.Equal(3, thought.Live);
+        Assert.False(thought.Balanced());
+    }
 
     // ---- accumulation -----------------------------------------------------
 
@@ -146,11 +243,13 @@ public sealed class ThoughtTests
     public void The_accounting_stays_balanced_while_it_runs()
     {
         var thought = Started(origins: 2);
+        thought.SentInto(A("alpha"), 2);
 
-        thought.Receive(new Accounting(Mine, Splits: 4, Deaths: 0));
+        thought.Receive(Reporting(A("alpha"), handled: 2, splits: 4, deaths: 0,
+            new Routed(A("beta"), 6)));
         Assert.True(thought.Balanced());
 
-        thought.Receive(new Accounting(Mine, Splits: 0, Deaths: 1));
+        thought.Receive(Reporting(A("beta"), handled: 1, splits: 0, deaths: 1));
         Assert.True(thought.Balanced());
 
         Assert.Equal(4, thought.Splits);

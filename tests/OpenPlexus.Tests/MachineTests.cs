@@ -146,6 +146,9 @@ public sealed class MachineTests : IDisposable
     {
         await _machine.DeliverAsync(new Report
         {
+            From = new ClusterAddress("a"),
+            Handled = 1,
+            SentInto = [],
             Arrivals = [],
             Accounting = new Accounting(BroadcastId.New(), 0, 1),
         });

@@ -129,10 +129,13 @@ public sealed class InputMachine<TFrame> : IReceiveReports
                 Carried = 1.0,
             });
 
-            await _bus.SendAsync(
-                batch.Key,
-                new Envelope { To = batch.Key, Messages = [.. messages] },
-                ct).ConfigureAwait(false);
+            var envelope = new Envelope { To = batch.Key, Messages = [.. messages] };
+
+            // The origin's own first send counts too, or a cluster that dies
+            // before reporting anything would strand routes nobody knew about.
+            thought.SentInto(batch.Key, envelope.Messages.Length);
+
+            await _bus.SendAsync(batch.Key, envelope, ct).ConfigureAwait(false);
         }
 
         return thought;
@@ -158,8 +161,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         if (!_thoughts.TryGetValue(report.Accounting.Broadcast, out var thought))
             return Task.CompletedTask;
 
-        foreach (var arrival in report.Arrivals) thought.Receive(arrival);
-        thought.Receive(report.Accounting);
+        thought.Receive(report);
 
         // SETTLING IS NOT RELEASING, and getting that wrong wiped the answer
         // before anything could read it. A settled thought is exactly the one
@@ -185,18 +187,30 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     }
 
     /// <summary>
-    /// A cluster left the bus.
+    /// A cluster left the bus. Every thought with routes in flight toward it
+    /// writes those off.
     /// </summary>
     /// <remarks>
-    /// <b>THIS COUNTS THE DEPARTURE AND DOES NOTHING ELSE, AND THAT IS OPEN
-    /// FORK 5 RATHER THAN A DECISION.</b> A thought does not track which
-    /// clusters its routes are sitting in, so it cannot tell whether a given
-    /// death affects it. Releasing every unsettled thought would throw away
-    /// live work; releasing none leaks whatever the departure stranded, which
-    /// is what happens here. The design says a stranded thought should leak
-    /// rather than hang — so this is survivable — but it is <b>not</b> the
-    /// answer the event bus was introduced to provide, and leaving it here
-    /// unlabelled would let the fork go quiet.
+    /// <para>
+    /// <b>John's design, 2026-08-02, and the answer fork 5 was waiting for.</b>
+    /// A thought now knows how many of its routes are heading into each
+    /// cluster, because every report says where the routes it created went. So
+    /// a departure is not a question — the loss is exact, those routes are
+    /// counted as deaths, and the thought settles by its own accounting.
+    /// </para>
+    /// <para>
+    /// <b>This is what the event bus was introduced for.</b> Without it an
+    /// origin waits on routes that are never coming back, and the only
+    /// alternative is a deadline guessing on its behalf.
+    /// </para>
     /// </remarks>
-    private void OnDeath(ClusterAddress gone) => Interlocked.Increment(ref _deaths);
+    private void OnDeath(ClusterAddress gone)
+    {
+        Interlocked.Increment(ref _deaths);
+
+        foreach (var (broadcast, thought) in _thoughts)
+        {
+            if (thought.Lost(gone) > 0 && thought.Settled) _thoughts.TryRemove(broadcast, out _);
+        }
+    }
 }

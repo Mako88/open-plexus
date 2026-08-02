@@ -393,9 +393,8 @@ Recorded here so a decision does not go quiet.
     not routing. Nothing yet lets one broadcast name where it wants its answer
     delivered.
 
-5. **What a thought does with a death event.**
-    **John's answer, 2026-08-02, and it is the "carry the cluster back"
-    option made precise.** A node knows which cluster it is in, so when it
+5. **What a thought does with a death event. ✅ BUILT — John's answer,
+    2026-08-02, and it is the "carry the cluster back" option made precise.** A node knows which cluster it is in, so when it
     forks it reports not only how many routes it created but **which clusters
     it sent them into** — *2 into A, 3 into B, 1 into C*. The origin keeps a
     live count per cluster; when the bus fires a death for B, it subtracts B's
@@ -403,7 +402,33 @@ Recorded here so a decision does not go quiet.
     **Refinement: track where routes are GOING, not where they have BEEN.** A
     route that passed through a cluster and moved on is not stranded when that
     cluster dies, so the count must be decremented as each cluster reports.
-    Cost is one address per outgoing route in a report. The bus fires one when a cluster
+    Cost is one address per outgoing route in a report.
+    **Built and measured**: a thought now tracks routes in flight per cluster,
+    a departure writes off exactly those and counts them as deaths, and a
+    thought whose every cluster leaves settles instead of waiting. A cluster
+    the thought never routed into strands nothing, which is asserted.
+    **Side effect worth having: `Balanced()` stopped being a tautology.** The
+    live count comes from splits and deaths; the in-flight counts come from the
+    routing named in each report. Those are two independent quantities, and
+    them agreeing is a real check where the old one held by construction.
+
+12. **`Halted` is approximate, and the ordering that makes it so is
+    load-bearing. Measured 2026-08-02.** At a fixed seed, 25 repeats on three
+    seeds: **every reported quantity is stable except `Halted`**, which varies
+    by a few percent every time — trajectory, choices, graph size and energy
+    never moved.
+    **Why.** A cluster sends its onward envelopes *before* its report, so a
+    downstream cluster can report a route's death before the upstream reports
+    the split that created it. The live count can touch zero early, the thought
+    settles, and a report still in flight is dropped along with its halt count.
+    **The obvious fix makes it far worse, and that was measured rather than
+    assumed.** Reporting first destabilised whole runs — steps, choices, graph
+    size and energy all varied at a fixed seed — because `WhenQuiet` could fire
+    in the gap between the report completing and the onward sends being issued,
+    so the harness acted on a thought still in flight. Sending onward first is
+    what keeps the bus from going quiet mid-thought.
+    So the two orderings each break something and neither is free. Nothing
+    measured says which cost is worse; only `Halted` is affected today. The bus fires one when a cluster
    leaves, at cluster granularity, because a route is stranded by the departure
    of whatever holds its next node. But **a thought does not track which
    clusters its routes are sitting in** — routes fan out and the origin only

@@ -1,3 +1,4 @@
+using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Graph;
 
@@ -31,6 +32,16 @@ public sealed class Thought
     /// asserted rather than trusted.
     /// </summary>
     private int _live, _splits, _deaths, _halted;
+
+    /// <summary>
+    /// How many of this thought's routes are in flight toward each cluster.
+    /// </summary>
+    /// <remarks>
+    /// <b>John's design, 2026-08-02, and the answer to what a death event is
+    /// for.</b> Without it a thought cannot tell whether a departing cluster
+    /// concerned it; with it, the loss is exact.
+    /// </remarks>
+    private readonly Dictionary<ClusterAddress, int> _inFlight = [];
 
     private bool _released;
 
@@ -101,6 +112,48 @@ public sealed class Thought
     public bool Released
     {
         get { lock (_gate) return _released; }
+    }
+
+    /// <summary>
+    /// Records that routes were sent into a cluster before any report came
+    /// back — the origin's own first send.
+    /// </summary>
+    public void SentInto(ClusterAddress cluster, int routes)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(routes);
+
+        lock (_gate)
+        {
+            if (_released) return;
+            _inFlight[cluster] = _inFlight.GetValueOrDefault(cluster) + routes;
+        }
+    }
+
+    /// <summary>Routes in flight toward a cluster right now.</summary>
+    public int InFlightTo(ClusterAddress cluster)
+    {
+        lock (_gate) return _inFlight.GetValueOrDefault(cluster);
+    }
+
+    /// <summary>
+    /// A cluster is gone. Every route in flight toward it is never coming back.
+    /// </summary>
+    /// <remarks>
+    /// <b>This is the whole reason the bus is a bus.</b> Those routes are
+    /// counted as deaths, so the thought settles by its own accounting rather
+    /// than waiting on a deadline that guesses for it.
+    /// </remarks>
+    /// <returns>How many routes were lost.</returns>
+    public int Lost(ClusterAddress cluster)
+    {
+        lock (_gate)
+        {
+            if (_released || !_inFlight.Remove(cluster, out var stranded)) return 0;
+
+            _deaths += stranded;
+            _live -= stranded;
+            return stranded;
+        }
     }
 
     /// <summary>
@@ -180,6 +233,40 @@ public sealed class Thought
     }
 
     /// <summary>
+    /// Folds in a whole report: what arrived, where routes went next, and the
+    /// termination arithmetic.
+    /// </summary>
+    /// <remarks>
+    /// <b>Arrivals first, accounting last</b>, because the accounting can
+    /// settle the thought.
+    /// </remarks>
+    public void Receive(Report report)
+    {
+        ArgumentNullException.ThrowIfNull(report);
+
+        foreach (var arrival in report.Arrivals) Receive(arrival);
+
+        lock (_gate)
+        {
+            if (!_released)
+            {
+                // Routes that reached this cluster are no longer heading there.
+                Move(report.From, -report.Handled);
+                foreach (var routed in report.SentInto) Move(routed.To, routed.Count);
+            }
+        }
+
+        Receive(report.Accounting);
+    }
+
+    private void Move(ClusterAddress cluster, int by)
+    {
+        var now = _inFlight.GetValueOrDefault(cluster) + by;
+        if (now <= 0) _inFlight.Remove(cluster);
+        else _inFlight[cluster] = now;
+    }
+
+    /// <summary>
     /// The top arrivals right now.
     /// </summary>
     /// <remarks>
@@ -231,15 +318,22 @@ public sealed class Thought
     /// Whether the accounting adds up. Asserted, never assumed.
     /// </summary>
     /// <remarks>
-    /// <b>In one process this catches a slip, not a network fault.</b> The live
-    /// count is maintained by the same call that moves splits and deaths, so
-    /// this holds by construction unless the two paths diverge. Across a
-    /// network it cannot hold at all — C2 loses reports, and a lost death would
-    /// leave the count above zero forever. That is why nothing waits on it.
+    /// <b>NO LONGER A TAUTOLOGY.</b> The first half — that origins plus splits
+    /// minus deaths equals the live count — holds by construction, because the
+    /// same call moves both. The second half does not: the per-cluster
+    /// in-flight counts are maintained from an entirely separate quantity, the
+    /// routing recorded in each report. Those two agreeing is a real check on
+    /// both.
+    /// <para>
+    /// Across a network it still cannot hold — C2 loses reports — which is why
+    /// nothing waits on it.
+    /// </para>
     /// </remarks>
     public bool Balanced()
     {
-        lock (_gate) return _origins + _splits - _deaths == _live;
+        lock (_gate)
+            return _origins + _splits - _deaths == _live
+                && _inFlight.Values.Sum() == _live;
     }
 
     /// <summary>

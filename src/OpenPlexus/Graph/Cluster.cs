@@ -110,12 +110,37 @@ public sealed class Cluster : IReceiveEnvelopes
             var key = (message.ReturnTo, message.Broadcast);
             if (!owed.TryGetValue(key, out var owing)) owed[key] = owing = new Owing();
 
+            // WHERE THE ROUTES WENT, per thought. John's design: a node knows
+            // which cluster it is in, so it can report not only that it forked
+            // but where the forks are headed -- which is what lets an origin
+            // know whether a cluster's death concerns it.
+            owing.Handled++;
+            foreach (var next in fired.Outgoing)
+            {
+                var owner = _ring.OwnerOf(next.To);
+                owing.SentInto[owner] = owing.SentInto.GetValueOrDefault(owner) + 1;
+            }
+
             if (fired.Reached is { } arrival) owing.Arrivals.Add(arrival);
             owing.Splits += fired.Accounting.Splits;
             owing.Deaths += fired.Accounting.Deaths;
             owing.Halted += fired.Accounting.Halted;
         }
 
+        // SEND ONWARD BEFORE REPORTING, AND THAT ORDER IS LOAD-BEARING.
+        // A delivery that sends onward does so before it finishes, which is
+        // what stops the bus going quiet while a thought is still propagating.
+        //
+        // MEASURED, by trying the other way round: reporting first destabilised
+        // whole runs -- steps, choices, graph size and energy all varied at a
+        // fixed seed, because `WhenQuiet` could fire in the gap between the
+        // report completing and these sends being issued, so the harness acted
+        // on a thought that was still in flight.
+        //
+        // The cost of this order is that a downstream cluster can report a
+        // route's death before the upstream reports the split that created it,
+        // which makes `Halted` approximate. Every other reported quantity is
+        // stable at a fixed seed. See open fork 12.
         foreach (var (destination, batch) in onward)
         {
             await _bus.SendAsync(
@@ -128,6 +153,9 @@ public sealed class Cluster : IReceiveEnvelopes
         {
             await ReportAsync(to, new Report
             {
+                From = _address,
+                Handled = owing.Handled,
+                SentInto = [.. owing.SentInto.Select(pair => new Routed(pair.Key, pair.Value))],
                 Arrivals = [.. owing.Arrivals],
                 Accounting = new Accounting(broadcast, owing.Splits, owing.Deaths, owing.Halted),
             }, ct).ConfigureAwait(false);
@@ -150,5 +178,9 @@ public sealed class Cluster : IReceiveEnvelopes
         public int Deaths { get; set; }
 
         public int Halted { get; set; }
+
+        public int Handled { get; set; }
+
+        public Dictionary<ClusterAddress, int> SentInto { get; } = [];
     }
 }

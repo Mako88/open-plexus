@@ -19,6 +19,9 @@ public sealed class HybridBusTests
 
     private static Report Reporting() => new()
     {
+        From = new ClusterAddress("somewhere"),
+        Handled = 1,
+        SentInto = [],
         Arrivals = [],
         Accounting = new Accounting(new BroadcastId(Guid.Empty), 0, 1),
     };

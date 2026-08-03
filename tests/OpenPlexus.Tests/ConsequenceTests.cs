@@ -16,7 +16,7 @@ public sealed class ConsequenceTests
         var score = new Consequence();
 
         // The true action's prediction lands; the counterfactual's does not.
-        score.Settle([C(1)], [C(9)], [C(9)], [C(1)]);
+        score.Settle([C(1)], [C(9)], [C(1)], [C(9)], [C(1)]);
 
         Assert.Equal(1.0, score.Knowing);
         Assert.Equal(0.0, score.Counterfactual);
@@ -31,7 +31,7 @@ public sealed class ConsequenceTests
         // The gap says the action is not in the model at all.
         var score = new Consequence();
 
-        score.Settle([C(1)], [C(1)], [C(9)], [C(1)]);
+        score.Settle([C(1)], [C(1)], [C(1)], [C(9)], [C(1)]);
 
         Assert.Equal(1.0, score.Knowing);
         Assert.Equal(1.0, score.Counterfactual);
@@ -45,8 +45,8 @@ public sealed class ConsequenceTests
         // silence is a property of the budget rather than of the model.
         var score = new Consequence();
 
-        score.Settle([], [C(1)], [C(1)], [C(1)]);
-        score.Settle([C(1)], [], [C(1)], [C(1)]);
+        score.Settle([], [C(1)], [], [C(1)], [C(1)]);
+        score.Settle([C(1)], [], [C(1)], [C(1)], [C(1)]);
 
         Assert.Equal(0, score.Asked);
     }
@@ -58,7 +58,7 @@ public sealed class ConsequenceTests
         // that counts nothing ever.
         var score = new Consequence();
 
-        score.Settle([C(1)], [C(2)], [C(3)], [C(1)]);
+        score.Settle([C(1)], [C(2)], [C(1)], [C(3)], [C(1)]);
 
         Assert.Equal(1, score.Asked);
     }
@@ -68,7 +68,7 @@ public sealed class ConsequenceTests
     {
         var score = new Consequence();
 
-        score.Settle([C(1)], [C(2)], [C(1)], [C(1)]);
+        score.Settle([C(1)], [C(2)], [C(1)], [C(1)], [C(1)]);
 
         Assert.Equal(1.0, score.Blind);
     }
@@ -78,7 +78,7 @@ public sealed class ConsequenceTests
     {
         var score = new Consequence();
 
-        score.Settle([C(1)], [C(1)], [C(9)], [C(1)]);
+        score.Settle([C(1)], [C(1)], [C(1)], [C(9)], [C(1)]);
 
         Assert.Equal(1, score.Asked);
         Assert.Equal(0, score.Differed);
@@ -87,12 +87,9 @@ public sealed class ConsequenceTests
     [Fact]
     public void Two_arms_naming_different_codes_are_counted_as_differing()
     {
-        // The companion, and together they are the wiring check: the action is
-        // the ONLY difference between the two questions, so identical answers
-        // every step mean it never reached the broadcast.
         var score = new Consequence();
 
-        score.Settle([C(1)], [C(2)], [C(9)], [C(1)]);
+        score.Settle([C(1)], [C(2)], [C(1)], [C(9)], [C(1)]);
 
         Assert.Equal(1, score.Differed);
     }
@@ -104,7 +101,7 @@ public sealed class ConsequenceTests
         // a re-ordering is not evidence the action reached anything.
         var score = new Consequence();
 
-        score.Settle([C(1), C(2)], [C(2), C(1)], [C(9)], [C(1)]);
+        score.Settle([C(1), C(2)], [C(2), C(1)], [C(1), C(2)], [C(9)], [C(1)]);
 
         Assert.Equal(0, score.Differed);
     }
@@ -117,8 +114,57 @@ public sealed class ConsequenceTests
         // not in the model" for something considerably stranger than that.
         var score = new Consequence();
 
-        score.Settle([C(9)], [C(1)], [C(9)], [C(1)]);
+        score.Settle([C(9)], [C(1)], [C(9)], [C(9)], [C(1)]);
 
         Assert.True(score.Gap < 0.0, $"gap {score.Gap}");
+    }
+
+    // ---- the third arm, which is what kills the surviving mutation ---------
+
+    [Fact]
+    public void A_difference_no_bigger_than_the_jitter_says_the_action_did_nothing()
+    {
+        // THE MUTATION THAT SURVIVED THREE ATTEMPTS. Delivery is concurrent, so
+        // asking the SAME question twice already lands somewhere else; here the
+        // counterfactual is exactly that far away and no further, which is what
+        // removing the action from the broadcast produces.
+        var score = new Consequence();
+
+        score.Settle([C(1), C(2)], [C(1), C(3)], [C(1), C(4)], [C(9)], [C(1)]);
+
+        Assert.Equal(score.Echoed, score.Apart, 6);
+        Assert.Equal(0.0, score.Moved, 6);
+
+        // AND `Differed` CANNOT SEE IT, which is the whole reason the third arm
+        // exists — it reads this as the action working.
+        Assert.Equal(1, score.Differed);
+    }
+
+    [Fact]
+    public void A_difference_bigger_than_the_jitter_says_the_action_is_in_the_walk()
+    {
+        // The companion. Asking twice lands in the same place; naming a different
+        // action moves both codes.
+        var score = new Consequence();
+
+        score.Settle([C(1), C(2)], [C(3), C(4)], [C(1), C(2)], [C(9)], [C(1)]);
+
+        Assert.Equal(0.0, score.Echoed, 6);
+        Assert.Equal(4.0, score.Apart, 6);
+        Assert.True(score.Moved > 0.0, $"moved {score.Moved}");
+    }
+
+    [Fact]
+    public void The_distance_is_symmetric_because_neither_side_is_the_reference()
+    {
+        // A prediction naming three codes the other missed is exactly as far away
+        // as one that missed three the other named.
+        var one = new Consequence();
+        var other = new Consequence();
+
+        one.Settle([C(1)], [C(1), C(2), C(3)], [C(1)], [C(9)], [C(1)]);
+        other.Settle([C(1), C(2), C(3)], [C(1)], [C(1), C(2), C(3)], [C(9)], [C(1)]);
+
+        Assert.Equal(one.Apart, other.Apart, 6);
     }
 }

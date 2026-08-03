@@ -46,6 +46,7 @@ public sealed class Consequence
     private int _namedElse, _rightElse;
     private int _blind, _rightBlind;
     private int _differed;
+    private int _apart, _echoed;
 
     /// <summary>How many pairs of predictions were made and scored.</summary>
     public int Asked
@@ -74,17 +75,59 @@ public sealed class Consequence
     /// differed 0, with the action correctly wired throughout.
     /// </para>
     /// <para>
-    /// So the original note stands: <b>the run's wiring of the action into the
-    /// prediction is not observable from outside</b>. Killing that mutation needs
-    /// a third arm asking the SAME action, to measure how much the walk differs
-    /// from itself. Not built, and recorded rather than left as a check that
-    /// quietly proves less than its name suggests.
+    /// <b>The third arm is what fixed it</b> — see <see cref="Echoed"/>. A count
+    /// on its own can never say whether a difference is the action or the jitter,
+    /// because it has nothing to compare the jitter against.
     /// </para>
     /// </remarks>
     public int Differed
     {
         get { lock (_gate) return _differed; }
     }
+
+    /// <summary>
+    /// How far a prediction lands from one made with a DIFFERENT action, in codes.
+    /// </summary>
+    /// <remarks>
+    /// <b>A size and not a flag.</b> Counting steps where the two arms disagreed
+    /// at all throws away how much they disagreed, which is the only thing that
+    /// can be compared against the jitter.
+    /// </remarks>
+    public double Apart
+    {
+        get { lock (_gate) return _asked == 0 ? 0.0 : _apart / (double)_asked; }
+    }
+
+    /// <summary>
+    /// How far a prediction lands from one made with the SAME action.
+    /// <b>The walk's distance from itself, and the mutation killer.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THIS IS THE ARM THE PROJECT SPENT THREE ATTEMPTS NOT HAVING.</b>
+    /// Delivery is concurrent, so two identical broadcasts already land in
+    /// different places; that floor is what <see cref="Differed"/> was
+    /// unknowingly measuring, which is why a positive count proved nothing and a
+    /// zero count proved nothing either.
+    /// </para>
+    /// <para>
+    /// <b>Measure the floor and the question becomes answerable.</b> If naming a
+    /// different action moves the prediction further than asking the same
+    /// question twice does, the action is in the walk. If the two distances match,
+    /// it is not — and removing the action from the broadcast entirely makes them
+    /// match by construction, which is exactly the mutation that used to survive.
+    /// </para>
+    /// </remarks>
+    public double Echoed
+    {
+        get { lock (_gate) return _asked == 0 ? 0.0 : _echoed / (double)_asked; }
+    }
+
+    /// <summary>
+    /// How much further a different action moves the prediction than asking twice
+    /// does. <b>Zero means the action is not in the walk.</b>
+    /// </summary>
+    public double Moved => Apart - Echoed;
 
     /// <summary>Codes named across every true-action prediction.</summary>
     public int Named
@@ -135,6 +178,10 @@ public sealed class Consequence
     /// </summary>
     /// <param name="knowing">What was named with the TRUE action in the question.</param>
     /// <param name="otherwise">What was named with a DIFFERENT action in it.</param>
+    /// <param name="again">
+    /// What was named asking the SAME question a second time. <b>The jitter
+    /// floor</b> — see <see cref="Echoed"/>.
+    /// </param>
     /// <param name="blind">The same many codes, drawn without consulting the graph.</param>
     /// <param name="actual">What the next observation turned out to contain.</param>
     /// <remarks>
@@ -146,11 +193,13 @@ public sealed class Consequence
     public void Settle(
         IReadOnlyCollection<Code> knowing,
         IReadOnlyCollection<Code> otherwise,
+        IReadOnlyCollection<Code> again,
         IReadOnlyCollection<Code> blind,
         IReadOnlyCollection<Code> actual)
     {
         ArgumentNullException.ThrowIfNull(knowing);
         ArgumentNullException.ThrowIfNull(otherwise);
+        ArgumentNullException.ThrowIfNull(again);
         ArgumentNullException.ThrowIfNull(blind);
         ArgumentNullException.ThrowIfNull(actual);
 
@@ -158,12 +207,21 @@ public sealed class Consequence
 
         var came = actual as HashSet<Code> ?? [.. actual];
 
-        var apart = !knowing.ToHashSet().SetEquals(otherwise);
+        var named = knowing.ToHashSet();
+        var apart = !named.SetEquals(otherwise);
+
+        // HOW FAR APART, NOT WHETHER. Both distances are counted the same way, so
+        // the comparison between them is of like with like.
+        var moved = Away(named, otherwise);
+        var jitter = again.Count == 0 ? 0 : Away(named, again);
 
         lock (_gate)
         {
             _asked++;
             if (apart) _differed++;
+
+            _apart += moved;
+            _echoed += jitter;
 
             _named += knowing.Count;
             _right += knowing.Count(came.Contains);
@@ -174,5 +232,21 @@ public sealed class Consequence
             _blind += blind.Count;
             _rightBlind += blind.Count(came.Contains);
         }
+    }
+
+    /// <summary>
+    /// How many codes one prediction holds that the other does not, both ways.
+    /// </summary>
+    /// <remarks>
+    /// <b>Symmetric, because neither side is the reference.</b> A prediction that
+    /// named three codes the other missed is exactly as far away as one that
+    /// missed three the other named.
+    /// </remarks>
+    private static int Away(HashSet<Code> one, IReadOnlyCollection<Code> other)
+    {
+        var theirs = other as HashSet<Code> ?? [.. other];
+
+        return one.Count(code => !theirs.Contains(code))
+            + theirs.Count(code => !one.Contains(code));
     }
 }

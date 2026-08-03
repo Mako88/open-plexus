@@ -47,6 +47,67 @@ public sealed class SnakeRunTests
         Assert.True(result.ReachedNothing > 0, "no thought ran at all");
     }
 
+    [Fact]
+    public async Task The_action_reaches_the_prediction_and_the_jitter_is_what_proves_it()
+    {
+        // THE MUTATION THAT SURVIVED THREE ATTEMPTS, KILLED. Removing the action
+        // from the prediction broadcast used to turn no test red, because the two
+        // available signals both proved nothing: a positive `Differed` is
+        // explained by concurrent delivery, and a zero `Differed` is explained by
+        // a small graph ranking the same codes whichever action is named.
+        //
+        // The third arm asks the SAME question twice and measures how far the walk
+        // lands from itself. That floor is what the counterfactual has to clear.
+        // NAMING ONE CODE, WHICH IS THE CONFIGURATION WHERE THE ACTION BITES.
+        // Under the default the walk names as many codes as the frame holds, and
+        // the difference an action makes is swamped -- measured inert at every
+        // sight radius tried. That is itself the "naming fewer predicted codes"
+        // row: coarse ranking informs and fine does not.
+        using var wired = new SnakeRun(World(), Dials(), seed: 1, names: 1);
+        var result = await wired.PlayAsync(500);
+
+        Assert.True(result.Consequence.Asked > 0, "no consequence was ever scored");
+
+        // THE JITTER FLOOR IS ZERO, AND THAT IS THE HALF NOBODY HAD MEASURED.
+        // The old note said a positive `Differed` proved nothing because
+        // concurrent delivery makes two identical broadcasts differ. It does not:
+        // asking the same question twice lands in exactly the same place, at every
+        // sight radius and both naming settings tried. So a difference between the
+        // arms cannot be blamed on the bus.
+        Assert.Equal(0.0, result.Consequence.Echoed, 6);
+
+        Assert.True(result.Consequence.Moved > 0.0,
+            $"naming a different action moved the prediction no further than asking "
+            + $"the same one twice: apart {result.Consequence.Apart}, "
+            + $"echoed {result.Consequence.Echoed}");
+
+        // AND IT PREDICTS BETTER FOR KNOWING, which is fork 18's own number.
+        Assert.True(result.Consequence.Gap > 0.0,
+            $"knowing {result.Consequence.Knowing} against "
+            + $"counterfactual {result.Consequence.Counterfactual}");
+    }
+
+    [Fact]
+    public async Task With_the_action_out_of_the_graph_it_moves_nothing()
+    {
+        // THE COMPANION, AND IT IS THE MUTATION ITSELF. `cut` keeps the action out
+        // of the occasion, so the action code has no edges and naming it in a
+        // prediction cannot reach anything. Whatever difference is left between
+        // the two arms is jitter, and the third arm measures exactly that -- so
+        // the two distances should meet.
+        //
+        // Without this, the test above passes for a harness that reports any
+        // positive number.
+        using var run = new SnakeRun(World(), Dials(), seed: 1, names: 1);
+        var result = await run.PlayAsync(500, cut: true);
+
+        Assert.True(result.Consequence.Asked > 0, "no consequence was ever scored");
+
+        Assert.True(result.Consequence.Moved <= 0.0,
+            $"an action with no edges still moved the prediction: "
+            + $"apart {result.Consequence.Apart}, echoed {result.Consequence.Echoed}");
+    }
+
     // ---- the run is honest about itself -----------------------------------
 
     [Fact]

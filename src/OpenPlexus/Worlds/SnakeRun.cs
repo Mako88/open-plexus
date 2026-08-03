@@ -327,6 +327,7 @@ public sealed class SnakeRun : IDisposable
 
         // The same prediction with a DIFFERENT action in it. Fork 18's control.
         IReadOnlyList<Code> otherwise = [];
+        IReadOnlyList<Code> again = [];
 
         for (; taken < steps && _snake.Alive; taken++)
         {
@@ -348,7 +349,7 @@ public sealed class SnakeRun : IDisposable
             // Whatever is predictable without knowing the action is equally
             // predictable in both arms, so it cancels in the gap -- there is no
             // need to strip persistence out by hand the way `_novelty` does.
-            _consequence.Settle(foreseen, otherwise, blind, present);
+            _consequence.Settle(foreseen, otherwise, again, blind, present);
 
             _before = [.. present];
             Remember(present);
@@ -410,6 +411,15 @@ public sealed class SnakeRun : IDisposable
             // regardless of what the body does, which is the thing that looks
             // like understanding and is not.
             (otherwise, _) = await ForeseeAsync(present, Instead(doing), ct).ConfigureAwait(false);
+
+            // THE THIRD ARM, AND IT IS WHAT MAKES THE OTHER TWO READABLE. The same
+            // question a second time, action and all. Delivery is concurrent, so
+            // two identical broadcasts already land in different places -- and
+            // without measuring that floor there is no way to tell a difference
+            // caused by the action from a difference caused by the jitter. Three
+            // earlier attempts to kill the surviving mutation failed for exactly
+            // this reason. See Consequence.Echoed.
+            (again, _) = await ForeseeAsync(present, doing, ct).ConfigureAwait(false);
 
             Perform(doing);
             did = cut ? null : doing;

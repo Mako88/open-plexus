@@ -232,7 +232,7 @@ condition is a superstition. The commit named in git holds the numbers.
 | `Adaptive` reflection on `Hunger` | Inverted: it wrote most where it helped least | A signal that discriminates; `Thwarted` does |
 | A deeper walk for prediction | Monotonically worse — without edge kinds, deeper reaches more and ranks worse | **Edge kinds**, and that refutation reproduced |
 | `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted, `Max` re-tried where its revival condition pointed and worse there too. **Both now DELETED** | Lift in the **cost**, which `Doubt` is the nearest thing to |
-| Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | A similarity gradient under the ranking |
+| Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | **REVIVED at one code.** Naming as many codes as the frame holds swamps the action entirely — fork 18's gap is flat at every sight radius. Naming ONE, it opens wide |
 | `Window` span | Null on snake; WORSE on `Babi`, an ordered corpus where before-and-after is the content, at an order of magnitude more traffic | **Edge kinds** — a carried edge is ranked against a simultaneous one as if they meant the same |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
 
@@ -271,13 +271,6 @@ process** — kept, because a real network loses reports.
 ---
 
 ## OPEN DEFECTS
-
-**A mutation survives.** Removing the action from `SnakeRun`'s prediction
-broadcast turns no test red. Three attempts failed instructively: a positive
-`Differed` count proves nothing, because concurrent delivery makes identical
-broadcasts differ, and zero proves nothing, because on a small graph the top
-codes are the same whichever action is named. **Killing it needs a third arm
-asking the same action**, to measure how far the walk lands from itself.
 
 **Fork 11 — the output machine is not addressed.** `Message.ReturnTo` is the
 input machine; the harness hands the finished thought over by direct call. Needed

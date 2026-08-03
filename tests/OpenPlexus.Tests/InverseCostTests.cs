@@ -31,6 +31,13 @@ public sealed class InverseCostTests
         // Far above the stamina on purpose: if the horizon fires first it hides
         // whether the economics bound anything.
         Horizon = 50,
+
+        // THIS FILE COMPARES COST FORMS, and `Best` only exists on the sender
+        // arm -- a receiver cannot price a hop at the sending node's strongest
+        // edge. Comparing them under different weighing would confound the two
+        // changes, so both run here. The receiver arm is covered in its own
+        // file, including that it stays bounded.
+        Weighing = Weighing.Sender,
     };
 
     /// <summary>A clique where every weight is exactly 1.0 — the worst case.</summary>

@@ -17,7 +17,7 @@ public sealed class LocalRendezvousTests
     private static readonly WalkSettings Dials = new()
     {
         Stamina = 10.0,
-        Cost = StepCost.Best,
+        Cost = StepCost.Inverse,
         Refuel = Refuel.Strength,
         Value = ArrivalValue.Strength,
         Accumulate = Accumulate.Sum,

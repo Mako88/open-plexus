@@ -96,6 +96,44 @@ public enum Accumulate
     Sum,
 }
 
+/// <summary>Which end of an edge works out how strong it is.</summary>
+public enum Weighing
+{
+    /// <summary>
+    /// The sender weighs, which needs the PARTNER's marginal and is therefore
+    /// a C1 violation — see <see cref="IMarginals"/>.
+    /// </summary>
+    Sender,
+
+    /// <summary>
+    /// The receiver weighs. <b>John's call on fork 2, and C1-legal by
+    /// construction.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The sender owns <c>together(me, you)</c> — its own row — and puts that
+    /// number in the message. The receiver divides by <c>seen(me)</c>, its own
+    /// marginal. <b>Neither node ever reads the other's data</b>, so nothing has
+    /// to be fetched, gossiped or cached.
+    /// </para>
+    /// <para>
+    /// <b>Fork 14 is what made this possible.</b> While a step was priced at
+    /// the node's strongest edge, the sender had to know every partner's weight
+    /// before it could send anything. Under <see cref="StepCost.Inverse"/> the
+    /// cost belongs to the edge, so the receiver can charge for the hop it just
+    /// took and the sender needs no weights at all.
+    /// </para>
+    /// <para>
+    /// <b>The cost is that the sender cannot prune.</b> It fans out to every
+    /// partner and each receiver works out that it should die — except that a
+    /// weight cannot exceed 1.0, so a hop cannot cost less than 1, and a sender
+    /// holding a budget of 1 or less can refuse the whole fan-out exactly. That
+    /// prune is C1-legal and needs nothing from anyone.
+    /// </para>
+    /// </remarks>
+    Receiver,
+}
+
 /// <summary>
 /// The swept dials.
 /// </summary>
@@ -130,6 +168,17 @@ public sealed record WalkSettings
 
     /// <inheritdoc cref="Accumulate"/>
     public required Accumulate Accumulate { get; init; }
+
+    /// <inheritdoc cref="Weighing"/>
+    /// <remarks>
+    /// <b>Defaults to <see cref="Weighing.Receiver"/> — John's call on fork 2,
+    /// and measured.</b> 100 seeds: behaviour is indistinguishable, 88.87 mean
+    /// steps against 95.12 either side of a standard error of about 5.5, and it
+    /// costs 26.7 messages a step against 17.0 — half again as many, not the
+    /// blow-up it might have been. That is the price of removing the C1
+    /// violation, paid in the currency C2 already says is cheap.
+    /// </remarks>
+    public Weighing Weighing { get; init; } = Weighing.Receiver;
 
     /// <summary>
     /// The longest chain a route may carry. A route that reaches it dies.

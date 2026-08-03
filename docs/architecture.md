@@ -218,7 +218,7 @@ by status rather than by scrolling.
 | | | |
 |---|---|---|
 | **14** | ✅ **BUILT** — inverse cost, `1/weight`. Answered fork 8 as a side effect. Unblocks 2 |
-| **2** | Who computes the edge weight | decided (receiver weighs) — blocked on 14 |
+| **2** | ✅ **BUILT** — receiver weighs, and it is the default |
 | **8** | ✅ **Answered by fork 14's inverse cost** — factorial became polynomial in the budget, and the horizon stopped firing |
 | **11** | The output machine is not addressed | needed before a second machine |
 | **12** | `Halted` is approximate, and the ordering that causes it | both orderings cost something |
@@ -270,7 +270,36 @@ Recorded here so a decision does not go quiet.
    at a rate that does not swamp real events. **The beat is the dial and
    nothing has measured it.** Its risk is the one onsets exist to avoid — set
    it too fast and every persistent code becomes a hub again.
-2. **Who computes the edge weight.** `forward` strength is
+2. **✅ BUILT, 2026-08-02 — the receiver weighs, and it is the default.** The
+   sender owns `together(me, you)` and puts that number in the message; the
+   receiver divides by `seen(me)`, its own marginal. **Neither node ever reads
+   the other's data**, so nothing is fetched, gossiped or cached — asserted by
+   handing the receiver arm an `IMarginals` that throws if anything asks it.
+
+   **Fork 14 is what unblocked it.** While a step was priced at the sending
+   node's strongest edge, the sender had to know every partner's weight before
+   it could send anything. Under inverse cost the price belongs to the edge, so
+   the receiver charges for the hop it just took.
+
+   **Measured, 100 seeds:** behaviour is indistinguishable — 88.87 mean steps
+   against the sender arm's 95.12, either side of a standard error of about
+   5.5 — and it costs **26.7 messages a step against 17.0**. Half again as
+   many, which is the price of removing the C1 violation and is not the
+   blow-up it might have been.
+
+   **The sender can still prune exactly once**, needing nothing from anyone: a
+   weight cannot exceed 1.0, so no hop costs less than 1, so a budget of 1 or
+   less cannot afford any partner at all.
+
+   **`StepCost` is refused under it rather than ignored.** A receiver prices at
+   `1/weight` on arrival and a sender has no weights, so `Best` and `Local` are
+   unreachable from there — and an argument that silently does nothing is a
+   sweep arm that looks distinct and is not.
+
+   **`IMarginals` and `LocalMarginals` survive only for the sender arm**, which
+   exists to price the comparison above. When that arm goes, they go.
+
+   *Original statement of the fork:* `forward` strength is
    `together(here, other) / seen(other)` — the *partner's* marginal, which the
    sender cannot know. Either the receiver weighs (message carries `together`,
    receiver divides by its own marginal — C1-legal by construction, but then

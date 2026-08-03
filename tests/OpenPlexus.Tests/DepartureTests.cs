@@ -19,7 +19,7 @@ public sealed class DepartureTests : IDisposable
 
     private static readonly WalkSettings Dials = new()
     {
-        Stamina = 10.0, Cost = StepCost.Best, Refuel = Refuel.Strength,
+        Stamina = 10.0, Cost = StepCost.Inverse, Refuel = Refuel.Strength,
         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 6,
     };
 

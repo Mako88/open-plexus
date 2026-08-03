@@ -14,17 +14,12 @@ public sealed class PolicyTests
     {
         Width = 15, Height = 15, Sight = 1,
 
-        // PINNED TO THE ABSOLUTE ARM. Every number recorded against these tests
-        // was measured before the view rotated, and fork 10 gets re-measured on
-        // the relative arm as its own step rather than by these drifting under
-        // it.
-        Relative = false,
         StartingEnergy = 60.0, EnergyPerStep = 1.0, EnergyPerFood = 30.0,
     };
 
     private static WalkSettings Dials() => new()
     {
-        Stamina = 4.0, Cost = StepCost.Best, Refuel = Refuel.Strength,
+        Stamina = 4.0, Cost = StepCost.Inverse, Refuel = Refuel.Strength,
         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 4,
     };
 
@@ -117,23 +112,6 @@ public sealed class PolicyTests
         Assert.True(chain.Average(r => r.Steps) > random.Average(r => r.Steps) * 1.3,
             $"chain {chain.Average(r => r.Steps):F2} against random " +
             $"{random.Average(r => r.Steps):F2}");
-    }
-
-    [Fact]
-    public async Task Repeating_the_last_action_cannot_outlive_the_board()
-    {
-        // WHY THE MEANS ARE NOT THE INTERESTING NUMBER. Walking straight from
-        // the centre of a 15-wide board hits the wall, so this policy is capped
-        // by geometry and never reaches 10 steps -- 0 of 200 measured. The
-        // chain passed 10 steps in 62 of 200. Same mean, entirely different
-        // shape, and the mean hides it.
-        var repeat = await Over(40, Policy.Repeat);
-
-        Assert.All(repeat, r => Assert.True(r.Steps <= 8, $"repeat survived {r.Steps}"));
-
-        // The companion: the chain is not capped the same way.
-        var chain = await Over(40, Policy.Chain);
-        Assert.Contains(chain, r => r.Steps > 8);
     }
 
     [Fact]

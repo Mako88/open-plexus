@@ -61,6 +61,9 @@ public sealed record RunResult
     /// </remarks>
     public required int Unbalanced { get; init; }
 
+    /// <summary>Every message the bus carried over the run.</summary>
+    public required long Messages { get; init; }
+
     /// <summary>
     /// Of the steps a chain chose, how many chose the action just taken.
     /// </summary>
@@ -292,6 +295,7 @@ public sealed class SnakeRun : IDisposable
             Halted = halted,
             EchoedLast = echoed,
             Unbalanced = unbalanced,
+            Messages = _bus.Messages,
         };
     }
 

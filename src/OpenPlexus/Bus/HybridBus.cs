@@ -30,6 +30,7 @@ public sealed class HybridBus : IBus
 
     /// <summary>Deliveries dispatched and not yet finished.</summary>
     private int _inFlight;
+    private long _messages;
 
     private TaskCompletionSource _quiet = Settled();
 
@@ -42,6 +43,19 @@ public sealed class HybridBus : IBus
     /// swallowing is how a thing turns out never to have been wired up.
     /// </summary>
     public event Action<Exception>? Faults;
+
+    /// <summary>
+    /// Every message put on the bus, across every envelope.
+    /// </summary>
+    /// <remarks>
+    /// What a real network would have had to carry. Counted because
+    /// <see cref="Graph.Weighing.Receiver"/> trades messages for exactness and
+    /// the trade is worth knowing the size of.
+    /// </remarks>
+    public long Messages
+    {
+        get { lock (_gate) return _messages; }
+    }
 
     /// <summary>Deliveries dispatched and not yet finished.</summary>
     public int InFlight
@@ -77,6 +91,7 @@ public sealed class HybridBus : IBus
         {
             if (!_clusters.TryGetValue(to, out receiver!)) throw Unreachable(to.Value);
             _inFlight++;
+            _messages += envelope.Messages.Length;
         }
 
         Dispatch(() => receiver.DeliverAsync(envelope, ct));
@@ -94,6 +109,7 @@ public sealed class HybridBus : IBus
         {
             everyone = [.. _clusters.Select(pair => (pair.Key, pair.Value))];
             _inFlight += everyone.Count;
+            _messages += (long)everyone.Count * envelope.Messages.Length;
         }
 
         foreach (var (address, receiver) in everyone)

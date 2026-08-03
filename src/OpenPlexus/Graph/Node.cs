@@ -68,6 +68,16 @@ public sealed class Node
             throw new ArgumentOutOfRangeException(nameof(settings),
                 "StepCost.Constant needs a Charge above zero");
 
+        // The receiver charges 1/weight for the hop it arrived on, so no other
+        // pricing is even reachable from there -- and a sender cannot compute
+        // `Best` or `Local` without the weights it no longer has. Refused rather
+        // than silently ignored.
+        if (settings.Weighing == Weighing.Receiver && settings.Cost != StepCost.Inverse)
+            throw new ArgumentException(
+                "Weighing.Receiver prices a hop at 1/weight on arrival, so StepCost does " +
+                "nothing under it; only StepCost.Inverse is meaningful there",
+                nameof(settings));
+
         if (settings.Cost == StepCost.Inverse && settings.Refuel != Refuel.Strength)
             throw new ArgumentException(
                 "StepCost.Inverse pays nothing back, so Refuel does nothing under it; " +
@@ -187,13 +197,36 @@ public sealed class Node
         // there is no edge to value. Its strength is the starting 1.0.
         var isOrigin = message.Chain.Length <= 1;
 
+        // THE RECEIVER WEIGHS THE EDGE IT ARRIVED ON. The sender put its own
+        // `together(sender, me)` in the message; this divides by its own
+        // marginal. Neither node reads the other's data, which is the whole of
+        // fork 2 -- and it is only possible because Inverse made the cost
+        // belong to the edge rather than to the sending node.
+        var held = message.Held;
+        var arriving = 1.0;
+
+        if (_settings.Weighing == Weighing.Receiver && !isOrigin)
+        {
+            arriving = seen <= 0.0 ? 0.0 : message.Together / seen;
+            if (arriving <= 0.0) return Died(message);
+
+            held -= 1.0 / arriving;
+            if (held <= 0.0) return Died(message);
+        }
+
         // LIFT DIVIDES BY THIS NODE'S OWN MARGINAL, which is the receiver's to
         // read. PPMI's global occasion total is identical for every candidate
         // so it cancels in a ranking and never has to be known — which is what
         // makes rarity-weighting C1-legal where PPMI is not.
-        var carried = !isOrigin && _settings.Value == ArrivalValue.Lift
-            ? message.Carried / Math.Max(seen, 1.0)
+        // Under receiver weighing the strength of the hop is only known here,
+        // so the path strength is completed on arrival rather than on send.
+        var travelled = _settings.Weighing == Weighing.Receiver
+            ? message.Carried * arriving
             : message.Carried;
+
+        var carried = !isOrigin && _settings.Value == ArrivalValue.Lift
+            ? travelled / Math.Max(seen, 1.0)
+            : travelled;
 
         var reached = isOrigin
             ? null
@@ -205,6 +238,19 @@ public sealed class Node
                 Best = carried,
                 Routes = 1,
             };
+
+        // A SENDER CAN STILL PRUNE EXACTLY ONCE, and it needs nothing from
+        // anyone to do it: a weight cannot exceed 1.0, so no hop can cost less
+        // than 1, so a budget of 1 or less cannot afford any partner at all.
+        if (_settings.Weighing == Weighing.Receiver && held <= 1.0)
+        {
+            return new Fired
+            {
+                Outgoing = [],
+                Reached = reached,
+                Accounting = new Accounting(message.Broadcast, 0, Deaths: 1),
+            };
+        }
 
         // THE HORIZON. Reached only because the budget provably does not bound
         // this walk when weights are equal -- see WalkSettings.Horizon.
@@ -224,7 +270,12 @@ public sealed class Node
 
         foreach (var (partner, together) in row)
         {
-            var weight = WeightOf(together, partner, marginals);
+            // Under receiver weighing the sender does not weigh anything; it
+            // hands over its own count and lets the far end do the division.
+            var weight = _settings.Weighing == Weighing.Receiver
+                ? 1.0
+                : WeightOf(together, partner, marginals);
+
             weights[partner] = weight;
 
             // THE FUEL AND THE SCORE ARE TWO QUANTITIES. The weight scores an
@@ -248,9 +299,13 @@ public sealed class Node
             // EVERY HOP COSTS AT LEAST 1 under Inverse, because a weight
             // cannot exceed 1.0 — which is what bounds the walk without a
             // horizon. `Best` has no such floor.
-            var left = _settings.Cost == StepCost.Inverse
-                ? message.Held - (1.0 / weight)
-                : message.Held - price + fuels[partner];
+            // The receiver charges for the hop when it arrives, so the sender
+            // passes its budget along untouched.
+            var left = _settings.Weighing == Weighing.Receiver
+                ? held
+                : _settings.Cost == StepCost.Inverse
+                    ? message.Held - (1.0 / weight)
+                    : message.Held - price + fuels[partner];
 
             if (left <= 0.0) continue;
 
@@ -259,7 +314,8 @@ public sealed class Node
                 To = partner,
                 Held = left,
                 Chain = message.Chain.Add(partner),
-                Carried = carried * weight,
+                Carried = _settings.Weighing == Weighing.Receiver ? carried : carried * weight,
+                Together = _together.GetValueOrDefault(partner),
             });
         }
 
@@ -278,6 +334,14 @@ public sealed class Node
                 Deaths: children == 0 ? 1 : 0),
         };
     }
+
+    /// <summary>A route that could not go on from here.</summary>
+    private static Fired Died(Message message) => new()
+    {
+        Outgoing = [],
+        Reached = null,
+        Accounting = new Accounting(message.Broadcast, 0, Deaths: 1),
+    };
 
     /// <summary>
     /// How strong the edge to a partner is: the shared count divided by

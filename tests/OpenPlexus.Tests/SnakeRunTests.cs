@@ -22,7 +22,7 @@ public sealed class SnakeRunTests
     private static WalkSettings Dials() => new()
     {
         Stamina = 4.0,
-        Cost = StepCost.Best,
+        Cost = StepCost.Inverse,
         Refuel = Refuel.Strength,
         Value = ArrivalValue.Strength,
         Accumulate = Accumulate.Sum,

@@ -32,6 +32,12 @@ public sealed class NodeTests
             Value = value,
             Accumulate = Accumulate.Sum,
             Horizon = horizon,
+
+            // PINNED TO THE ARM THESE TESTS ARE ABOUT, which is not the same as
+            // pinning to a configuration nobody uses. Every test here hands a
+            // `Marginals` stub, and only the sender arm reads one. The receiver
+            // arm -- the default, and the one the runs use -- has its own file.
+            Weighing = Weighing.Sender,
         };
 
     /// <summary>A message that has already walked, so the node is not an origin.</summary>

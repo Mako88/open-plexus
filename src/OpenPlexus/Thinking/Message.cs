@@ -47,6 +47,18 @@ public readonly record struct Message
     public required double Held { get; init; }
 
     /// <summary>
+    /// How many occasions the sender and the addressee both fired on — read
+    /// from the <b>sender's own row</b>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Half of the edge weight, carried so the other half never has to be
+    /// fetched.</b> The receiver divides this by its own marginal, so neither
+    /// node reads the other's data. Zero on an origin message, which has no
+    /// sender. Unused under <see cref="Graph.Weighing.Sender"/>.
+    /// </remarks>
+    public double Together { get; init; }
+
+    /// <summary>
     /// Every node walked, in order. <b>The cycle check and the explanation in
     /// one field</b> — a route may not revisit a node already in its own chain,
     /// which is a local check costing nothing because the chain is already

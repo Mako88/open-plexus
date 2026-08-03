@@ -72,6 +72,10 @@ public static class Sweep
             Value = ArrivalValue.Strength,
             Accumulate = Accumulate.Sum,
             Horizon = horizon,
+
+            // This sweeps COST arms, and `Best` and `Local` only exist on the
+            // sender side, so the sweep runs there to keep the arms comparable.
+            Weighing = Weighing.Sender,
         };
 
         using var run = new SnakeRun(world, dials, seed, includeEmpty: includeEmpty);

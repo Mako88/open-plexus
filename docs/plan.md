@@ -240,14 +240,12 @@ without a revival condition is a superstition rather than a finding.
 **Four are closed in code and cannot be fallen into again. Three are live and
 need discipline.**
 
-### Closed — kept only so nobody reintroduces them
+### Closed — named so nobody reintroduces them; the code comments carry the detail
 
-| was | closed by |
-|---|---|
-| **Consecutive integer seeds are not independent.** `new Random(~s)` **is** `new Random(s + 1)`, and neighbours agree far more than chance allows — spread **1.3 where the binomial says 3.1**. `Measured.StdErr` is taken across exactly those seeds, so every arm read as more significant than it was | `Seeds.Apart` mixes rather than offsets, and `Sweep.ArmAsync` mixes the counter before it reaches the run. Everything re-baselined: error bars widened, no claim changed |
-| **Numbers under different machine loads were not comparable** — walk self-agreement 0.8833 alone against 1.0000 under load | The suite runs one test at a time (`Parallelism.cs`). 2m57s against 1m32s |
-| **`Measured.Separation` returned 0 with no spread**, reading "indistinguishable" for arms that never varied and landed apart | Returns infinity for that case; the test that asserted on bare means now asserts on sigma |
-| **`WhenQuiet()` was not a "the walk finished" signal** and the name invited reading it as one | Renamed `WhenIdle()`. `Thought.Settled` is the finish signal |
+**Consecutive integer seeds are not independent** (`Seeds.Apart`, and `Sweep`
+mixes the counter). **Machine load moved the numbers** (the suite is serial now).
+**`Measured.Separation` returned 0 with no spread** (infinity for that case).
+**`WhenQuiet()` was not a finish signal** (renamed `WhenIdle()`).
 
 ### Live
 
@@ -311,9 +309,9 @@ it does not move.
 | **5** | ✅ A death writes off exactly the routes heading into the dead cluster |
 | **6** | ✅ Broadcast the origin, route the hops |
 | **12** | ✅ **CLOSED by 22's fix, confirmed against its own control.** A fixed seed now reproduces a run exactly, `Halted` included — `DeterminismTests` |
-| **18** | ✅ Score prediction of world state **conditional on the next action**. Built; `Consequence` reports the system does not yet model its own effect — gap 0.0165 ± 0.0086 intact against 0.0007 ± 0.0034 with the action wire cut, which is only 1.9 sigma and sits on a prediction that loses to a blind guess. **Blocked on temporal edges** |
+| **18** | ✅ Score prediction **conditional on the next action**. `Consequence` says the system does not yet model its own effect — 1.9 sigma, on a prediction that loses to a blind guess. **Blocked on temporal edges** |
 | **20** | ✅ Split budgets — deep to act, shallow to predict. Wins survival, mirroring and prediction at once |
-| **21** | ✅ Compression built. **A trade, not a win**: at a budget too small to compose it lifts accuracy 0.1827 → 0.7147; where the budget suffices it costs, 0.8462 → 0.7596. `Reflect = null` by default, and off is the control |
+| **21** | ✅ Compression built. **A trade, not a win**: 0.1827 → 0.7147 where the budget is too small to compose, 0.8462 → 0.7596 where it is not. Off by default, and off is the control |
 | **22** | ✅ **CLOSED.** A transiently-zero live count untracked thoughts mid-flight, and every later report was dropped. `InputMachine.Retire` asks twice. 0 of 39 unsettled, from 5–8 |
 | **23** | Can compression regulate itself? Not on this signal. `Thwarted` goes the right way at 5.1 sigma but swings only 1.19× against an effect running 0.18 to 0.83 |
 | **24** | ✅ Budget controller built, converges from both directions — and **aims at a moving target**: at 300 moments stamina 8 ties 24, at 1200 moments 24 wins by 7 sigma. `Budget = null` by default |

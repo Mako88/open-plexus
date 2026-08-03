@@ -121,10 +121,14 @@ public sealed class InputMachine<TFrame> : IReceiveReports
                 // WHAT THE FRONT END COULD SAY ABOUT WHICH THING IS WHICH, and
                 // null for every front end that cannot. See Occasion.Groups.
                 Groups = _quantizer.Bind(frame),
+
+                // AND WHICH OF THEM NAME THIS OCCASION RATHER THAN A KIND. Also
+                // null for every front end that cannot. See Occasion.Fleeting.
+                Fleeting = _quantizer.Fleeting(frame),
             }, ct)
             .ConfigureAwait(false);
 
-        return await ThinkAsync(changes.Started, null, ct).ConfigureAwait(false);
+        return await ThinkAsync(changes.Started, null, null, ct).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -137,10 +141,24 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// a caller passes one when the question wants a different depth from
     /// acting — see fork 20.
     /// </param>
+    /// <param name="asking">
+    /// Which origins are the same thing said several ways — <b>the question's
+    /// own grouping</b>, and the counterpart of <see cref="Occasion.Groups"/> on
+    /// the thinking path.
+    /// </param>
     /// <param name="ct">Cancellation.</param>
+    /// <remarks>
+    /// <b><paramref name="asking"/> matters only under
+    /// <see cref="Accumulate.Agreement"/></b>, where an endpoint is ranked by how
+    /// many distinct origins reached it. A question is broadcast from every code
+    /// of the attribute it names, so without the grouping three redundant codes
+    /// count as three independent witnesses — which is not what was asked and
+    /// destroyed a working result when it was tried.
+    /// </remarks>
     public async Task<Thought> ThinkAsync(
         IReadOnlyCollection<Code> origins,
         double? stamina = null,
+        IReadOnlyDictionary<Code, int>? asking = null,
         CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(origins);
@@ -187,7 +205,8 @@ public sealed class InputMachine<TFrame> : IReceiveReports
                 // What it does know is how many clusters it asked, and every one
                 // of them replies.
                 opened = new Thought(
-                    broadcast, Math.Max(reached.Count, 1), _settings.Accumulate, [.. origins]);
+                    broadcast, Math.Max(reached.Count, 1), _settings.Accumulate,
+                    [.. origins], asking);
 
                 foreach (var cluster in reached) opened.SentInto(cluster, 1);
 

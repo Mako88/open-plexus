@@ -52,6 +52,9 @@ public sealed class Cluster : IReceiveEnvelopes
     /// <summary>Every partner entry across every node here. The graph's size.</summary>
     public int Edges => _nodes.Values.Sum(node => node.Partners().Count);
 
+    /// <inheritdoc cref="Worlds.Plumbing.Widest"/>
+    public int Widest => _nodes.IsEmpty ? 0 : _nodes.Values.Max(node => node.Partners().Count);
+
     /// <summary>Whether the ring says this cluster owns that node.</summary>
     public bool Holds(Code code) => _ring.OwnerOf(code) == _address;
 

@@ -40,4 +40,19 @@ public interface IQuantizer<in TObservation>
     /// quantiser and changes no existing measurement.
     /// </remarks>
     IReadOnlyDictionary<Code, int>? Bind(TObservation observation) => null;
+
+    /// <summary>
+    /// Which of those codes name <i>this occasion</i> rather than a kind of
+    /// thing, when this front end can say. <b>Null by default, which is every
+    /// front end whose codes all recur.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>Only the front end can know this</b>, for the same reason only it can
+    /// segment: a code is opaque to the graph, and "this one will never be seen
+    /// again" is a fact about how it was minted. See
+    /// <see cref="Learning.Occasion.Fleeting"/> for what the rendezvous does with
+    /// it. Defaulted so that adding it breaks no existing quantiser and changes
+    /// no existing measurement.
+    /// </remarks>
+    IReadOnlySet<Code>? Fleeting(TObservation observation) => null;
 }

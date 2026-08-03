@@ -82,6 +82,41 @@ public sealed record Occasion
     public IReadOnlyDictionary<Code, int>? Groups { get; init; }
 
     /// <summary>
+    /// Which codes name THIS OCCASION rather than a kind of thing, when the
+    /// front end can say. <b>Null is today's behaviour: every code recurs, and
+    /// every pair is written both ways.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A FLEETING CODE IS RECORDED BY WHAT IT MET, AND DOES NOT RECORD INTO
+    /// IT.</b> The pair is written one way — <c>fleeting → lasting</c> — exactly
+    /// as <see cref="Recent"/> is, and for a reason of the same shape.
+    /// </para>
+    /// <para>
+    /// <b>The reverse edge can never be worth anything, and it is not free.</b>
+    /// A code minted fresh for one occasion is never seen again, so an entry for
+    /// it in a lasting node's row can never accumulate past its first count and
+    /// can never be evidence of anything. What it does do is sit there: the row
+    /// grows by one entry per occasion FOREVER, and cost is set by the widest row
+    /// — <see cref="Graph.Node.Fire"/> snapshots all of it and emits one message
+    /// per surviving partner. Measured on the binding world, the widest row went
+    /// from fourteen to a hundred and six between fifty scenes and eight hundred,
+    /// with no sign of levelling, while the same world without indexes saturated.
+    /// </para>
+    /// <para>
+    /// <b>The forward edge is the one the walk uses</b>, and it is untouched. A
+    /// question carries the index it is asking about, so the walk STARTS there
+    /// and never has to arrive at one.
+    /// </para>
+    /// <para>
+    /// <b>A fleeting code still notes the occasion</b>, or it would carry a
+    /// marginal smaller than the counts weighed against it and score above 1.0 —
+    /// see <see cref="LocalRendezvous"/>.
+    /// </para>
+    /// </remarks>
+    public IReadOnlySet<Code>? Fleeting { get; init; }
+
+    /// <summary>
     /// How much this occasion counts. One is something that happened.
     /// </summary>
     /// <remarks>

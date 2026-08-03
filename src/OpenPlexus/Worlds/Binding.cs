@@ -75,6 +75,26 @@ public sealed record BindingSettings
     /// </para>
     /// </remarks>
     public bool Tagged { get; init; }
+
+    /// <summary>
+    /// Whether the front end declares the index for what it is — <b>a code that
+    /// names this occasion and will never be seen again.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Requires <see cref="Tagged"/></b>, since there is nothing fleeting in
+    /// a world that hands out no indexes.
+    /// </para>
+    /// <para>
+    /// <b>It changes nothing the world emits, and it is the answer to the one
+    /// quantity that grew without bound.</b> The same codes arrive in the same
+    /// order; only the rendezvous stops writing the reverse edge, so an
+    /// attribute's row no longer gains a permanent entry per scene. See
+    /// <see cref="Learning.Occasion.Fleeting"/> for why that edge could never
+    /// have been worth anything.
+    /// </para>
+    /// </remarks>
+    public bool Fleeting { get; init; }
 }
 
 /// <summary>
@@ -115,6 +135,13 @@ public sealed record Scene
     /// rather than a kind of object.</b>
     /// </summary>
     public IReadOnlyList<Code> Tags { get; init; } = [];
+
+    /// <summary>
+    /// The codes that name this occasion rather than a kind of thing, or null
+    /// when the front end does not say. <b>The tags, when the world declares
+    /// them</b> — see <see cref="BindingSettings.Fleeting"/>.
+    /// </summary>
+    public IReadOnlySet<Code>? Passing { get; init; }
 
     /// <summary>How many objects the scene holds.</summary>
     public int Objects => Colours.Count;
@@ -203,6 +230,11 @@ public sealed class Binding
                 "a tag needs its object's group, or it pairs with the whole scene "
                 + "and indexes nothing", nameof(settings));
 
+        if (settings.Fleeting && !settings.Tagged)
+            throw new ArgumentException(
+                "nothing is fleeting in a world that hands out no indexes",
+                nameof(settings));
+
         _settings = settings;
 
         // TWO PURPOSES, SO THE TWO STREAMS SHARE NOTHING. See Seeds.Apart for
@@ -232,15 +264,13 @@ public sealed class Binding
     /// <summary>Every code one attribute of one concept produces.</summary>
     public IReadOnlyList<Code> Of(byte attribute, int concept)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(concept);
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(concept, _settings.Concepts);
 
-        return [.. Enumerable.Range(0, _settings.CodesPerAttribute)
-            .Select(slot => new Code(attribute, (ulong)((concept * 1000) + slot)))];
+        return Kinds.All(attribute, concept, _settings.CodesPerAttribute);
     }
 
     /// <summary>Which concept a code belongs to, whichever attribute it came from.</summary>
-    public static int Concept(Code code) => (int)(code.Value / 1000);
+    public static int Concept(Code code) => Kinds.Of(code);
 
     /// <summary>
     /// One scene: two distinct concepts, their four codes, and a binding that is
@@ -290,6 +320,7 @@ public sealed class Binding
             Shapes = shapes,
             Tags = tags,
             Groups = _settings.Segmented ? Segment(colours, shapes, codes, tags) : null,
+            Passing = _settings.Fleeting ? tags.ToHashSet() : null,
         };
     }
 
@@ -328,5 +359,5 @@ public sealed class Binding
     }
 
     private Code Pick(byte attribute, int concept) =>
-        new(attribute, (ulong)((concept * 1000) + _scenes.Next(_settings.CodesPerAttribute)));
+        Kinds.Pick(attribute, concept, _settings.CodesPerAttribute, _scenes);
 }

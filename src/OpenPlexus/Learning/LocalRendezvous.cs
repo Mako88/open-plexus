@@ -84,8 +84,16 @@ public sealed class LocalRendezvous : IRendezvous
                 // EACH SIDE WRITES ITS OWN ROW. A node that quietly kept both
                 // directions would be holding data it does not own, which is
                 // the shared state C1 forbids.
-                _clusters.For(onset).Observe(other, weight);
-                _clusters.For(other).Observe(onset, weight);
+                //
+                // AND A ROW DOES NOT RECORD A CODE THAT WILL NEVER RECUR. See
+                // Occasion.Fleeting: that entry can never gain a second count,
+                // so it is never evidence -- and it is what makes a lasting
+                // node's row grow without bound.
+                if (!Passing(occasion.Fleeting, other))
+                    _clusters.For(onset).Observe(other, weight);
+
+                if (!Passing(occasion.Fleeting, onset))
+                    _clusters.For(other).Observe(onset, weight);
             }
         }
 
@@ -103,7 +111,7 @@ public sealed class LocalRendezvous : IRendezvous
             if (present.Contains(past)) continue;
 
             foreach (var onset in occasion.Onsets)
-                if (past != onset)
+                if (past != onset && !Passing(occasion.Fleeting, onset))
                     _clusters.For(past).Observe(onset, weight);
         }
 
@@ -134,6 +142,18 @@ public sealed class LocalRendezvous : IRendezvous
             || !groups.TryGetValue(other, out var theirs)
             || mine == theirs;
     }
+
+    /// <summary>
+    /// Whether a code names this occasion rather than a kind of thing, so
+    /// nothing lasting should record it.
+    /// </summary>
+    /// <remarks>
+    /// <b>Unsaid means lasting</b>, which is what keeps this additive: a front
+    /// end that cannot tell behaves exactly as before. See
+    /// <see cref="Occasion.Fleeting"/>.
+    /// </remarks>
+    private static bool Passing(IReadOnlySet<Code>? fleeting, Code code) =>
+        fleeting is not null && fleeting.Contains(code);
 
     private static (Code, Code) Unordered(Code one, Code other) =>
         one.CompareTo(other) <= 0 ? (one, other) : (other, one);

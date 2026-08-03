@@ -692,6 +692,44 @@ machine can vary its own budget per thought without touching node state or
 reading anyone else's data. **The controller belongs at the machine** — which is
 where both failed attempts said the signal had to live.
 
+### Fork 24 built — and the plateau it targets moves with data volume
+
+**THE CONTROLLER WORKS AND ITS PREMISE DOES NOT.** Both halves are load-bearing.
+
+`Budget` probes half, current and double in rotation, keeps the smallest budget
+that is not materially worse, and reports where it settled and how often it
+moved. 9 unit tests against a synthetic world with a known answer.
+
+6 seeds, **1200 moments** (the earlier sweep was 300):
+
+| arm | accuracy | se | settled | moves | messages |
+|---|---|---|---|---|---|
+| hand-set 8 | 0.8759 | 0.0081 | 8.0 | 0 | 110,877 |
+| **hand-set 24** | **0.9351** | 0.0026 | 24.0 | 0 | 2,781,607 |
+| hunt from 2 | 0.6471 | 0.0211 | **12.0** | 21 | 304,642 |
+| hunt from 24 | 0.7594 | 0.0275 | **11.3** | 22 | 2,773,041 |
+
+**IT CONVERGES FROM BOTH DIRECTIONS** — 12.0 climbing from 2, 11.3 descending
+from 24. Where it lands does not depend on where it started, which is the one
+thing that would have made it a renamed constant.
+
+**AND THE PLATEAU IT AIMS AT IS NOT A PROPERTY OF THE WORLD.** At 300 moments
+stamina 8 and 24 were inside each other's error, which is what "overshooting
+costs 23-fold for nothing" rested on. At 1200 moments, **24 beats 8 by 0.9351 to
+0.8759 — about seven standard errors.** The plateau was a property of how little
+the graph had learned, not of the task. **The earlier finding was true at 300
+moments and false at 1200, and it is retracted at that length.**
+
+**The probes are a permanent tax.** Two thirds of questions run at a deliberately
+wrong budget and it never stops, which is most of the gap between hunting and
+hand-set. Probing more rarely is an obvious repair and is NOT worth making while
+the target is wrong.
+
+**This strengthens the case for a controller and refutes this controller's
+target.** If the best budget grows as the graph grows, a hand-set constant is
+certainly wrong — but "the smallest budget at the knee" chases a line that moves.
+**Default stays `Budget = null`**, so nothing changes silently anywhere.
+
 **What would discriminate is visible in the data and is not a route-level
 quantity.** Unanswered questions go 250 → 31 of 312 between the two budgets,
 an eightfold difference, against thwarted's 1.19× and hunger's inversion. **Whether the walk reached
@@ -767,7 +805,7 @@ by status rather than by scrolling.
 
 | | |
 |---|---|
-| **24** | **Stamina can set itself, and the signal is silence.** Accuracy plateaus at 8 while messages rise 23x to 24 — overshooting is invisible in the score. Silence has a knee at exactly the plateau; thwarted never plateaus at all. **Controller designed, not yet built** |
+| **24** | **Built, converges from both directions, and aims at a moving target.** Settles at ~11-12 from starts of 2 and 24 alike. But the plateau it targets is an artefact of run length: at 300 moments stamina 8 ties 24, at 1200 moments 24 wins by 7 sigma. **Off by default.** The case for a controller is stronger; this target is wrong |
 | **23** | **Can compression regulate itself? Not yet.** Counting budget deaths is INVERTED (0.3802 at stamina 4, 0.4887 at 8). John's correction — weight each death by the strength the route still carried — goes the right way at 5.1 sigma but swings only 1.19x against an effect that runs 0.18 to 0.83. **Next candidate: whether the walk reached what it was narrowing to**, an eightfold difference |
 | **22** | **A few thoughts never settle.** 5–7 of 39 questions on a senses run, and waiting twenty times longer barely moves it. `Balanced()` still passes, so the books agree with themselves while claiming routes the bus has already finished — an over-count of splits or an under-count of deaths. Every affected question reads as "nothing reached", which is **indistinguishable from a real silence in a score**, so every silent count in this project is an upper bound until this is closed. Found by the run report on its first execution |
 | **1** | The distributed rendezvous — not needed until a second machine exists |

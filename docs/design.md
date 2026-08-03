@@ -367,6 +367,45 @@ does not test the hard part**, which is fork 1.
     independent quantities agreeing is a real check, and it runs on every real
     thought.
 
+### `Budget` / `Budgeting`
+
+**Fork 24 — a machine hunting for its own stamina.** Holds no graph, no bus and
+no codes: it counts its own outcomes and nothing more.
+
+**C1-legal by construction.** Stamina is set by the *origin* when it builds a
+message and merely spent by nodes, so a machine varying its own budget touches
+no node state and reads nobody else's data.
+
+- **`Next()`** — the budget for the next question. Rotates through **half,
+  current, double**, so both directions are probed rather than drifted through.
+  Never below 1.0: a hop costs at least 1, so anything less buys nothing and the
+  downward probe would measure the same nothing forever.
+- **`Reached(anything)`** — whether that question reached **what it was narrowing
+  to**, not merely reached somewhere. The caller knows what it was looking for
+  and this class deliberately does not.
+- **`Stamina`**, **`Moves`** — where it is and how often it has shifted. `Moves`
+  is the wiring check: a controller that never moved and one that converged
+  instantly look identical otherwise.
+- **`Window`, `Worth`, `Most`** — samples per candidate, how much less silence a
+  bigger budget must buy, and the ceiling. **Both dials are world-independent**,
+  which is the argument for the trade: stamina is not, and the only way anyone
+  has found it is by sweeping.
+
+**Climbing is tested before halving, and the order is load-bearing.** Measured
+the other way round: just below the knee, the smaller and current probes are
+equally hopeless, so halving reads as free and the controller retreats from the
+budget the larger probe just showed to work. It oscillated below the knee
+forever.
+
+**A total failure is treated as unambiguous.** When no candidate reaches
+anything, a hill-climb is blind — every option scores the same nothing — so it
+climbs, and hands back to the ordinary rule the moment anything reaches.
+
+**MEASURED, AND THE TARGET IS WRONG.** It converges from both directions (12.0
+from a start of 2, 11.3 from 24), but the plateau it aims at is an artefact of
+run length: at 300 moments stamina 8 ties 24, and at 1200 moments 24 wins by
+seven standard errors. **Off by default** — see fork 24.
+
 ---
 
 ## `Machines/`

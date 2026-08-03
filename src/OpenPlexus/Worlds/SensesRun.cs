@@ -77,6 +77,15 @@ public sealed record SensesResult
     public required bool Reflecting { get; init; }
 
     /// <summary>
+    /// Where fork 24's hunt for stamina ended up, and how often it moved.
+    /// <b>Zero moves with hunting on means it never adjusted anything.</b>
+    /// </summary>
+    public required double Settled { get; init; }
+
+    /// <inheritdoc cref="Settled"/>
+    public required int Moves { get; init; }
+
+    /// <summary>
     /// The mean share of a question's deaths that were routes unable to pay for
     /// the hop they were on.
     /// </summary>
@@ -159,7 +168,8 @@ public sealed record SensesResult
             $"nodes={Nodes} edges={Edges} spread=[{string.Join(",", Spread)}] | " +
             $"chains={{{lengths}}} deepest={Deepest} | " +
             $"msgs={Messages} halted={Halted} unbalanced={Unbalanced} unsettled={Unsettled} " +
-            $"hunger={Hunger:F2} thwarted={Thwarted:F2}";
+            $"hunger={Hunger:F2} thwarted={Thwarted:F2} | " +
+            $"stamina={Settled} moves={Moves}";
 
         return Complaints.Count == 0
             ? line
@@ -198,6 +208,12 @@ public sealed class SensesRun : IDisposable
     private readonly InputMachine<IReadOnlyCollection<Code>> _senses;
     private readonly Senses _world;
     private readonly WalkSettings _dials;
+
+    /// <summary>
+    /// Fork 24. <b>Null when the stamina dial is hand-set</b>, which is the
+    /// control the sweep is measured against.
+    /// </summary>
+    private readonly Budget? _budget;
     private readonly List<Exception> _faults = [];
 
     public SensesRun(
@@ -212,6 +228,7 @@ public sealed class SensesRun : IDisposable
 
         _world = new Senses(world, seed);
         _dials = dials;
+        _budget = dials.Budget is null ? null : new Budget(dials.Stamina, dials.Budget);
         _ring = new Ring(seed, replicas);
         _local = new LocalClusters(_ring);
         _bus.Faults += failure => { lock (_faults) _faults.Add(failure); };
@@ -317,6 +334,8 @@ public sealed class SensesRun : IDisposable
             Unsettled = unsettled,
             Hunger = asked == 0 ? 0.0 : hunger / asked,
             Thwarted = asked == 0 ? 0.0 : thwarted / asked,
+            Settled = _budget?.Stamina ?? _dials.Stamina,
+            Moves = _budget?.Moves ?? 0,
         };
     }
 
@@ -344,7 +363,7 @@ public sealed class SensesRun : IDisposable
     private async Task<Asking> AskingAsync(int concept, CancellationToken ct)
     {
         var thought = await _senses
-            .ThinkAsync(_world.Of(Senses.Sight, concept), _dials.Stamina, ct)
+            .ThinkAsync(_world.Of(Senses.Sight, concept), _budget?.Next() ?? _dials.Stamina, ct)
             .ConfigureAwait(false);
 
         var settled = await SettleAsync(thought, ct).ConfigureAwait(false);
@@ -358,6 +377,11 @@ public sealed class SensesRun : IDisposable
             thought.Hunger,
             thought.Thwarted,
             thought.Best(int.MaxValue));
+
+        // FORK 24 IS TOLD WHETHER IT REACHED WHAT IT WAS NARROWING TO, not
+        // merely whether it reached somewhere. The caller knows what it was
+        // looking for and the controller deliberately does not.
+        _budget?.Reached(reached.Count > 0);
 
         _senses.Forget(thought.Id);
         return report;

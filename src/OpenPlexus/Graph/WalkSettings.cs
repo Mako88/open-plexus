@@ -1,3 +1,5 @@
+using OpenPlexus.Thinking;
+
 namespace OpenPlexus.Graph;
 
 /// <summary>How an arrival is valued, which is a different question from how a route is funded.</summary>
@@ -158,4 +160,14 @@ public sealed record WalkSettings
     /// <inheritdoc cref="Reflection"/>
     /// <remarks><b>Null is off, and off is the control.</b></remarks>
     public Reflection? Reflect { get; init; }
+
+    /// <summary>
+    /// Let a machine hunt for its own <see cref="Stamina"/> — <b>fork 24</b>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Null keeps the hand-set number, and that is the control.</b> When it is
+    /// set, <see cref="Stamina"/> is only where the hunt begins, and the
+    /// convergence test asserts the answer does not depend on it.
+    /// </remarks>
+    public Budgeting? Budget { get; init; }
 }

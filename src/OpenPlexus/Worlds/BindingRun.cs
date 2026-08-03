@@ -265,11 +265,14 @@ public sealed class BindingRun : IDisposable
     /// Shows scenes, and every <paramref name="every"/> of them asks which shape
     /// one of the objects just shown had.
     /// </summary>
+    /// <param name="moments">How many scenes to show.</param>
+    /// <param name="every">Ask on every nth scene.</param>
     /// <param name="votes">
     /// How many concurrent thoughts settle one question. <b>The walk disagrees
     /// with itself</b> — delivery is concurrent — so a single ask carries noise
     /// that a chance-level result could hide behind either way.
     /// </param>
+    /// <param name="ct">Cancellation.</param>
     public async Task<BindingResult> RunAsync(
         int moments, int every = 10, int votes = 3, CancellationToken ct = default)
     {

@@ -61,6 +61,8 @@ public interface IBus
     /// replies to expect — under a broadcast it cannot work that out from the
     /// ring, and the whole point is that it did not need an address.
     /// </remarks>
+    /// <param name="envelope">The messages, one per origin code.</param>
+    /// <param name="ct">Cancellation.</param>
     /// <param name="ready">
     /// Called with the clusters about to be asked, <b>before any of them is
     /// asked</b>. An origin has to record its thought inside this window: a

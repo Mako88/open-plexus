@@ -115,11 +115,13 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// Opens a thought, mints a broadcast id, and sends the origins to their
     /// owning clusters — <b>one envelope per cluster, not per code.</b>
     /// </summary>
+    /// <param name="origins">The codes the broadcast goes out from.</param>
     /// <param name="stamina">
     /// What each route starts with. <b>Null takes the dial's own value</b>;
     /// a caller passes one when the question wants a different depth from
     /// acting — see fork 20.
     /// </param>
+    /// <param name="ct">Cancellation.</param>
     public async Task<Thought> ThinkAsync(
         IReadOnlyCollection<Code> origins,
         double? stamina = null,

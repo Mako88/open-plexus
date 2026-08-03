@@ -9,9 +9,9 @@ namespace OpenPlexus.Graph;
 /// </summary>
 /// <remarks>
 /// <b>Local only, and that is the whole of it.</b> A code whose ring owner is
-/// not in this process cannot be reached at all — there is no wire. Both users
-/// of this class say what that costs them: see <see cref="LocalMarginals"/> and
-/// <see cref="Learning.LocalRendezvous"/>.
+/// not in this process cannot be reached at all — there is no wire. Its one
+/// remaining user says what that costs it: see
+/// <see cref="Learning.LocalRendezvous"/>, which is fork 1.
 /// </remarks>
 public sealed class LocalClusters
 {

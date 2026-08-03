@@ -1,38 +1,45 @@
-using System.Reflection;
 using System.Text.RegularExpressions;
-using OpenPlexus.Codes;
 
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// The docs, checked against the code that is actually there.
+/// The doc, checked against the code that is actually there — and against a size
+/// budget.
 /// </summary>
 /// <remarks>
 /// <para>
-/// <b>JOHN'S ASK, 2026-08-02: incremental doc updates miss things.</b> They do,
-/// and the failure mode is specific — something gets built, the doc it belongs
-/// in is not touched, and months later nobody can tell whether the omission
-/// means "undocumented" or "deleted". This runs on every <c>dotnet test</c>, so
-/// the gap cannot outlive the commit that opened it.
+/// <b>JOHN'S CALL, 2026-08-03: the docs got too big to load, so they stopped
+/// being read.</b> `architecture.md` reached 1,646 lines and `design.md` 756, and
+/// a doc nobody opens is worse than no doc because it still gets cited. Both were
+/// deleted; git holds them.
 /// </para>
 /// <para>
-/// <b>It checks both directions, and the second one is the load-bearing half.</b>
-/// A type named in the doc but absent from the code is a ghost reference. A type
-/// in the code but absent from the doc is the drift this project actually keeps
-/// suffering: <c>ArrivalValue.Lift</c> had no test at all, and a disconnected
-/// stamina parameter survived a build, 155 tests and three measurements.
+/// <b>What every piece does now lives in the XML comments beside the code, and
+/// the COMPILER enforces those.</b> `GenerateDocumentationFile` is on, so a
+/// `param` naming an argument that does not exist (CS1572/1573) or a `cref`
+/// pointing at a deleted type (CS1574) fails the build. That check cannot go
+/// stale, which no markdown file can promise. It found five ghost references to
+/// types deleted weeks earlier on the day it was switched on.
+/// </para>
+/// <para>
+/// <b>So this file is down to what a compiler cannot check: is the one remaining
+/// doc still small, and do the fork numbers the code cites still resolve.</b>
 /// </para>
 /// </remarks>
 public sealed class DocsTests
 {
     /// <summary>
-    /// Walks up from the test binary until it finds the repository.
+    /// The budget, in lines.
     /// </summary>
     /// <remarks>
-    /// <b>Throws rather than skipping</b> if it cannot find the docs. A doc check
-    /// that silently passes when it cannot read the docs is worse than no check,
-    /// because it reports green for a question it never asked.
+    /// <b>The number is arbitrary; having one is not.</b> It sits a little above
+    /// the current length, so ordinary edits pass and a doc that has started
+    /// growing without bound fails. <b>To add something, retire something</b> —
+    /// which is the whole mechanism, because nothing else has ever made anyone
+    /// delete a stale paragraph.
     /// </remarks>
+    private const int Budget = 320;
+
     private static string Repo()
     {
         var here = new DirectoryInfo(AppContext.BaseDirectory);
@@ -43,112 +50,51 @@ public sealed class DocsTests
             here = here.Parent;
         }
 
+        // Throws rather than skipping: a doc check that silently passes when it
+        // cannot read the docs reports green for a question it never asked.
         throw new DirectoryNotFoundException(
             $"no docs/ directory above {AppContext.BaseDirectory}");
     }
 
-    private static string Read(string name) =>
-        File.ReadAllText(Path.Combine(Repo(), "docs", name));
-
-    /// <summary>
-    /// Every public type the library exposes.
-    /// </summary>
-    /// <remarks>
-    /// <b>Nested types are excluded</b> — they are an implementation detail of
-    /// the type that holds them, and requiring a heading for each would train
-    /// everyone to add headings that say nothing.
-    /// </remarks>
-    private static IReadOnlyList<Type> Public() =>
-    [
-        .. typeof(Code).Assembly
-            .GetExportedTypes()
-            .Where(type => !type.IsNested)
-            .Where(type => type.Name is not ['<', ..])
-            .OrderBy(type => type.Name, StringComparer.Ordinal)
-    ];
-
-    /// <summary>Strips the arity marker so `Thought` matches `Thought`1`.</summary>
-    private static string Plain(Type type) =>
-        type.Name.Contains('`', StringComparison.Ordinal)
-            ? type.Name[..type.Name.IndexOf('`', StringComparison.Ordinal)]
-            : type.Name;
+    private static string Docs() => Path.Combine(Repo(), "docs");
 
     [Fact]
-    public void Every_public_type_is_described_in_the_design_doc()
+    public void The_docs_stay_within_their_budget()
     {
-        var design = Read("design.md");
-
-        var missing = Public()
-            .Select(Plain)
-            .Distinct(StringComparer.Ordinal)
-            .Where(name => !design.Contains($"`{name}", StringComparison.Ordinal))
+        var oversized = Directory
+            .EnumerateFiles(Docs(), "*.md")
+            .Select(path => (Name: Path.GetFileName(path), Lines: File.ReadAllLines(path).Length))
+            .Where(doc => doc.Lines > Budget)
             .ToList();
 
-        Assert.True(missing.Count == 0,
-            $"built and never written down: {string.Join(", ", missing)}");
+        Assert.True(oversized.Count == 0,
+            "over the budget of " + Budget + " lines: " +
+            string.Join(", ", oversized.Select(doc => $"{doc.Name} at {doc.Lines}")) +
+            ". Retire something rather than raising this.");
     }
 
     [Fact]
-    public void The_design_doc_names_something_that_exists()
+    public void There_is_still_only_one_doc()
     {
-        // THE COMPANION. Without it the test above passes for a doc consisting
-        // of every type name in one line, or for an assembly with no public
-        // types at all.
-        var design = Read("design.md");
-        var known = Public().Select(Plain).ToHashSet(StringComparer.Ordinal);
+        // THE COMPANION, AND WITHOUT IT THE BUDGET IS TRIVIAL TO DEFEAT: split the
+        // doc in two and every file is comfortably under the cap while the total
+        // is unchanged. A second doc is a decision, not an accident, so it should
+        // cost a deliberate edit here.
+        var docs = Directory.EnumerateFiles(Docs(), "*.md").Select(Path.GetFileName).ToList();
 
-        Assert.NotEmpty(known);
-
-        // Headings of the form `### `Something`` are the doc's own index, so a
-        // heading naming a type that no longer exists is a ghost reference.
-        // The closing backtick is required, so the folder headings -- `Codes/`,
-        // `Graph/` and the rest -- are not read as type names.
-        var headings = Regex
-            .Matches(design, @"^#{2,3} `([A-Za-z]+)(?:<[^`]*>)?`", RegexOptions.Multiline)
-            .Select(match => match.Groups[1].Value)
-            .Distinct(StringComparer.Ordinal)
-            .ToList();
-
-        Assert.NotEmpty(headings);
-
-        var ghosts = headings.Where(name => !known.Contains(name)).ToList();
-
-        Assert.True(ghosts.Count == 0,
-            $"documented and not built: {string.Join(", ", ghosts)}");
+        Assert.Equal(["plan.md"], docs);
     }
 
     [Fact]
-    public void The_project_structure_block_lists_the_folders_that_exist()
-    {
-        // A NEW FOLDER THAT NOBODY WROTE DOWN is the same drift as a new type,
-        // and it is worse: the structure block is the first thing anyone reads,
-        // so a gap there mis-frames everything below it.
-        var design = Read("design.md");
-
-        var folders = Directory
-            .EnumerateDirectories(Path.Combine(Repo(), "src", "OpenPlexus"))
-            .Select(Path.GetFileName)
-            .Where(name => name is not ("bin" or "obj"))
-            .OfType<string>()
-            .ToList();
-
-        Assert.NotEmpty(folders);
-
-        var missing = folders.Where(name => !design.Contains($"{name}/", StringComparison.Ordinal));
-
-        Assert.Empty(missing);
-    }
-
-    [Fact]
-    public void Every_fork_the_code_cites_is_in_the_architecture_index()
+    public void Every_fork_the_code_cites_is_in_the_index()
     {
         // THE GHOST-REFERENCE PROBLEM THAT HAS BITTEN THIS PROJECT BEFORE, which
         // is why forks are deliberately never renumbered. The code cites fork
         // numbers in a dozen places; this asserts each one still resolves.
-        var architecture = Read("architecture.md");
+        var plan = File.ReadAllText(Path.Combine(Docs(), "plan.md"));
 
         var listed = Regex
-            .Matches(architecture, @"\*\*(\d{1,2})\*\*")
+            .Matches(plan, @"\*\*(\d{1,2})\*\*")
             .Select(match => match.Groups[1].Value)
             .ToHashSet(StringComparer.Ordinal);
 
@@ -165,8 +111,7 @@ public sealed class DocsTests
         var cited = new SortedSet<string>(StringComparer.Ordinal);
 
         foreach (var path in source)
-            foreach (Match match in Regex.Matches(
-                File.ReadAllText(path), @"[Ff]ork (\d{1,2})"))
+            foreach (Match match in Regex.Matches(File.ReadAllText(path), @"[Ff]ork (\d{1,2})"))
                 cited.Add(match.Groups[1].Value);
 
         Assert.NotEmpty(cited);
@@ -175,5 +120,24 @@ public sealed class DocsTests
 
         Assert.True(dangling.Count == 0,
             $"the code cites forks the index does not list: {string.Join(", ", dangling)}");
+    }
+
+    [Fact]
+    public void The_library_is_built_with_the_doc_contract_switched_on()
+    {
+        // THE CHECK THAT PROTECTS THE OTHER CHECK. Everything above assumes the
+        // compiler is enforcing the XML comments; someone removing
+        // GenerateDocumentationFile to quiet a warning would silently take the
+        // real doc check with it, and nothing else would notice.
+        var project = File.ReadAllText(
+            Path.Combine(Repo(), "src", "OpenPlexus", "OpenPlexus.csproj"));
+
+        Assert.Contains("<GenerateDocumentationFile>true", project, StringComparison.Ordinal);
+
+        // And the assembly's own XML file is beside it, which is the same claim
+        // made against the build output rather than against the intent.
+        Assert.True(
+            File.Exists(Path.Combine(AppContext.BaseDirectory, "OpenPlexus.xml")),
+            "the library built without its documentation file");
     }
 }

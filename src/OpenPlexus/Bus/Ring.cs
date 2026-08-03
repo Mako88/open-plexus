@@ -124,7 +124,7 @@ public sealed class Ring
     /// that is recorded rather than hidden.</b> It is only reachable on a
     /// 64-bit hash collision between two cluster points, which no test
     /// produces. Absent a collision the point alone already determines the
-    /// order. It is kept because <see cref="List{T}.Sort"/> is not stable, so
+    /// order. It is kept because <see cref="List{T}.Sort()"/> is not stable, so
     /// without it a collision would let insertion order reach the answer — and
     /// that is a claim about improbability, not about tested behaviour.
     /// </remarks>

@@ -49,8 +49,8 @@ public sealed class HybridBus : IBus
     /// </summary>
     /// <remarks>
     /// What a real network would have had to carry. Counted because
-    /// <see cref="Graph.Weighing.Receiver"/> trades messages for exactness and
-    /// the trade is worth knowing the size of.
+    /// receiver-weighing trades messages for exactness — 26.7 a step against the
+    /// deleted sender arm's 17.0 — and the trade is worth knowing the size of.
     /// </remarks>
     public long Messages
     {

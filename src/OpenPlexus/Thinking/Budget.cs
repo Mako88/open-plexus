@@ -104,6 +104,7 @@ public sealed class Budget
 
     /// <param name="start">Where to begin. <b>The answer should not depend on it</b>,
     /// which is what the convergence test asserts.</param>
+    /// <param name="settings">The dials the hunt runs under.</param>
     public Budget(double start, Budgeting settings)
     {
         ArgumentNullException.ThrowIfNull(settings);

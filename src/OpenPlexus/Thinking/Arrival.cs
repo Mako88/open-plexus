@@ -85,6 +85,13 @@ public sealed record Arrival
 /// meanings, and a count throws the difference away.</b>
 /// </para>
 /// </remarks>
+/// <param name="Broadcast">Which thought this is about. Mixing two thoughts'
+/// counts is what the id exists to prevent.</param>
+/// <param name="Splits">Routes created beyond the one that arrived — <c>k-1</c>
+/// for a fan-out of <c>k</c>.</param>
+/// <param name="Deaths">Routes that ended here.</param>
+/// <param name="Halted">Of the deaths, how many hit the horizon rather than
+/// economics. Reported separately, or the constant would hide.</param>
 public readonly record struct Accounting(
     BroadcastId Broadcast,
     int Splits,

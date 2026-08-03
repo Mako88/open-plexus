@@ -115,7 +115,7 @@ public sealed record RunResult
 /// </summary>
 /// <remarks>
 /// <b>Controls that change ONE thing.</b> <see cref="SnakeRun.PlayAsync"/>'s
-/// <c>blind</c> flag changes two — it stops the action joining the occasion,
+/// <c>cut</c> flag changes two — it stops the action joining the occasion,
 /// which alters the graph <i>and</i> forces every move to be random — so it
 /// cannot say whether the chain helps. These can: the graph learns identically
 /// under all three and only the choice differs.
@@ -296,11 +296,12 @@ public sealed class SnakeRun : IDisposable
 
     /// <summary>Plays until the run ends or the step budget runs out.</summary>
     /// <param name="steps">The budget.</param>
-    /// <param name="blind">
+    /// <param name="cut">
     /// <b>The control arm: cuts the one wire that makes an action reachable.</b>
     /// With this set, what the snake did never joins the occasion, so an action
     /// code gains no edges and no walk can arrive at one.
     /// </param>
+    /// <param name="policy">What decides the move. <see cref="Policy"/>.</param>
     /// <param name="ct">Cancellation.</param>
     public async Task<RunResult> PlayAsync(
         int steps,

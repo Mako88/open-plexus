@@ -54,7 +54,7 @@ public readonly record struct Message
     /// <b>Half of the edge weight, carried so the other half never has to be
     /// fetched.</b> The receiver divides this by its own marginal, so neither
     /// node reads the other's data. Zero on an origin message, which has no
-    /// sender. Unused under <see cref="Graph.Weighing.Sender"/>.
+    /// sender.
     /// </remarks>
     public double Together { get; init; }
 

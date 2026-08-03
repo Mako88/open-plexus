@@ -1,9 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <!-- The doc contract lives in the compiler, not in a markdown file that
+         drifts. CS1572/1573 catch a <param> naming an argument that does not
+         exist; CS1574/0419 catch a cref pointing at something deleted. Both are
+         the ghost-reference failure this project keeps hitting. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- Not demanding a comment on EVERY public member: a required doc on a
+         record property produces restatements of the property name, which is
+         noise that trains everyone to ignore the check. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
 </Project>

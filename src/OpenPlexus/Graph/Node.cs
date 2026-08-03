@@ -39,11 +39,12 @@ public sealed class Node
     /// Guards this node's own row and marginal, and nothing else.
     /// </summary>
     /// <remarks>
-    /// <b>Never held across a call to <see cref="IMarginals"/>.</b> Weighing an
-    /// edge reads the partner's node, so a node holding its own lock while
-    /// doing that would deadlock against a partner firing back at it — which
-    /// is an ordinary case, since edges are mutual. <see cref="Fire"/> takes a
-    /// snapshot and releases before it weighs anything.
+    /// <b>Never held across anything that reads another node.</b> Weighing an
+    /// edge from the far side would read the partner's node, so a node holding
+    /// its own lock while doing that would deadlock against a partner firing
+    /// back at it — which is an ordinary case, since edges are mutual.
+    /// <see cref="Fire"/> takes a snapshot and releases before it weighs
+    /// anything.
     /// </remarks>
     private readonly Lock _gate = new();
 
@@ -72,8 +73,10 @@ public sealed class Node
     public Code Code => _code;
 
     /// <summary>
-    /// How many occasions this node fired on. <b>Public because a neighbour
-    /// needs it</b> to weigh an edge pointing here — see <see cref="IMarginals"/>.
+    /// How many occasions this node fired on. <b>Its own marginal, and the
+    /// denominator of every edge weight it receives</b> — a message carries the
+    /// sender's <c>together</c> and this node divides by this, so neither node
+    /// ever reads the other's data.
     /// </summary>
     public double Seen
     {
@@ -110,6 +113,7 @@ public sealed class Node
     /// would be holding data it does not own, which is the shared state C1
     /// forbids.
     /// </remarks>
+    /// <param name="other">The code that fired alongside this one.</param>
     /// <param name="by">
     /// <b>Must match the <see cref="Note"/> that goes with it.</b> The weight is
     /// the numerator and the denominator of the same edge, so a pair written

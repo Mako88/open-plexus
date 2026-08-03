@@ -593,6 +593,34 @@ already named the missing mechanism — **a one-way temporal window**, so the gr
 can hold *then* as well as *with*. Nothing action-conditional can work while
 every edge is simultaneous.
 
+### The surviving mutation is still surviving, and now for two reasons
+
+**Recorded on fork 19 and attacked with fork 18's new machinery: removing the
+action from `SnakeRun`'s prediction broadcast turns no test red.** `Consequence`
+looked like it could finally observe that — the action is the only difference
+between the two arms, so identical answers every step would mean it never
+arrived. **Measurement said no, twice, and both directions failed.**
+
+**A positive count proves nothing.** Delivery is concurrent, so two *identical*
+broadcasts already produce different arrivals. The mutation was run: the action
+was stripped from the prediction entirely and the check still passed.
+
+**And zero proves nothing either**, which is the more surprising half. On a small
+graph the top-ranked sensory codes are the same whichever action is named —
+measured at knowing 0.900, counterfactual 0.900, differed 0, **with the action
+correctly wired the whole time**. A complaint built on it fired on two legitimate
+runs before it was removed.
+
+**So the original note stands and is now evidenced rather than assumed: the
+run's wiring of the action into the prediction is not observable from outside.**
+Killing it needs a third arm asking the SAME action, to measure how much the walk
+differs from itself. Not built. `Differed` is reported and complained about by
+nothing.
+
+**This also explains part of why the gap is small.** On a graph this size the
+action frequently changes nothing about what gets ranked, so there is often no
+counterfactual to measure.
+
 **The random arm's larger gap is not evidence of anything** — it ran 26 steps
 against the chain's 128, and run length has already been shown to move a
 conclusion in this project today. Not compared.

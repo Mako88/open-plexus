@@ -89,6 +89,12 @@ public sealed record RunReport
             if (Result.Steps > 2 && Result.Consequence.Asked == 0)
                 wrong.Add("no consequence was ever predicted");
 
+            // `Consequence.Differed` IS DELIBERATELY NOT COMPLAINED ABOUT, and
+            // that was measured rather than decided. It fires on small graphs
+            // where the top-ranked vision codes are the same whichever action is
+            // named -- knowing=0.900, counter=0.900, differed=0, with the action
+            // wired correctly the whole time. It is reported and nothing more.
+
             return wrong;
         }
     }

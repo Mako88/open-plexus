@@ -45,11 +45,45 @@ public sealed class Consequence
     private int _named, _right;
     private int _namedElse, _rightElse;
     private int _blind, _rightBlind;
+    private int _differed;
 
     /// <summary>How many pairs of predictions were made and scored.</summary>
     public int Asked
     {
         get { lock (_gate) return _asked; }
+    }
+
+    /// <summary>
+    /// Steps where the two arms named different codes.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>REPORTED, AND IT IS NOT A WIRING CHECK IN EITHER DIRECTION.</b> It was
+    /// built to be one and measurement said no, twice.
+    /// </para>
+    /// <para>
+    /// <b>A positive count proves nothing</b>, because delivery is concurrent:
+    /// two IDENTICAL broadcasts already produce different arrivals. Removing the
+    /// action from the prediction entirely leaves this above zero, so the
+    /// mutation it was meant to kill SURVIVES.
+    /// </para>
+    /// <para>
+    /// <b>And zero proves nothing either</b>, which is the more surprising half.
+    /// On a small graph the top-ranked sensory codes are the same whichever
+    /// action is named — measured at knowing 0.900, counterfactual 0.900,
+    /// differed 0, with the action correctly wired throughout.
+    /// </para>
+    /// <para>
+    /// So the original note stands: <b>the run's wiring of the action into the
+    /// prediction is not observable from outside</b>. Killing that mutation needs
+    /// a third arm asking the SAME action, to measure how much the walk differs
+    /// from itself. Not built, and recorded rather than left as a check that
+    /// quietly proves less than its name suggests.
+    /// </para>
+    /// </remarks>
+    public int Differed
+    {
+        get { lock (_gate) return _differed; }
     }
 
     /// <summary>Codes named across every true-action prediction.</summary>
@@ -124,9 +158,12 @@ public sealed class Consequence
 
         var came = actual as HashSet<Code> ?? [.. actual];
 
+        var apart = !knowing.ToHashSet().SetEquals(otherwise);
+
         lock (_gate)
         {
             _asked++;
+            if (apart) _differed++;
 
             _named += knowing.Count;
             _right += knowing.Count(came.Contains);

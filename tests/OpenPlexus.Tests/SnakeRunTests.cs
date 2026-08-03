@@ -157,4 +157,5 @@ public sealed class SnakeRunTests
         Assert.Equal(without.Count + 1, with.Count);
         Assert.Contains(SnakeSense.Encode(Turn.Ahead), with);
     }
+
 }

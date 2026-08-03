@@ -74,6 +74,42 @@ public sealed class ConsequenceTests
     }
 
     [Fact]
+    public void Two_arms_naming_the_same_codes_are_counted_as_not_differing()
+    {
+        var score = new Consequence();
+
+        score.Settle([C(1)], [C(1)], [C(9)], [C(1)]);
+
+        Assert.Equal(1, score.Asked);
+        Assert.Equal(0, score.Differed);
+    }
+
+    [Fact]
+    public void Two_arms_naming_different_codes_are_counted_as_differing()
+    {
+        // The companion, and together they are the wiring check: the action is
+        // the ONLY difference between the two questions, so identical answers
+        // every step mean it never reached the broadcast.
+        var score = new Consequence();
+
+        score.Settle([C(1)], [C(2)], [C(9)], [C(1)]);
+
+        Assert.Equal(1, score.Differed);
+    }
+
+    [Fact]
+    public void Order_alone_does_not_count_as_differing()
+    {
+        // The two arms are compared as SETS. Ranking is a separate question and
+        // a re-ordering is not evidence the action reached anything.
+        var score = new Consequence();
+
+        score.Settle([C(1), C(2)], [C(2), C(1)], [C(9)], [C(1)]);
+
+        Assert.Equal(0, score.Differed);
+    }
+
+    [Fact]
     public void A_gap_can_be_negative_and_is_not_clamped()
     {
         // If naming the WRONG action predicted better, that is a real and very

@@ -147,8 +147,13 @@ public sealed class SensesTests
     {
         // THE RESULT THE PROJECT EXISTS FOR. Sight and touch never occur
         // together, so the pair being asked about has never been seen and a
-        // memoriser scores exactly zero. Measured at 12 seeds: 0.7906 +- 0.0234
+        // memoriser scores exactly zero. Measured at 12 seeds: 0.8077 +- 0.0215
         // against a chance of 0.0833.
+        //
+        // IT ROSE FROM 0.7906 WHEN FORK 22 WAS CLOSED, and that is the fix
+        // showing up rather than noise: questions were being read before their
+        // walk had finished, and "nothing reached yet" scores exactly like
+        // "nothing to say".
         //
         // RE-BASELINED 2026-08-03, and the correction is worth reading. This was
         // published as 0.8898 +- 0.0068 on consecutive integer seeds. Under

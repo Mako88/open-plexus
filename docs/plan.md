@@ -37,14 +37,14 @@ never co-occur; a binding world built so the architecture provably cannot answer
 it.
 
 **The result:** on the senses world the graph answers a question it was never
-told — **0.7906 ± 0.0234 against a chance of 0.0833**, while the scrambled
-control collapses to **0.0534 ± 0.0116**, below chance. 28.2 sigma apart, and a
-memoriser scores exactly zero there by construction.
+told — **0.8077 ± 0.0215 against a chance of 0.0833**, while the scrambled
+control collapses below chance. A memoriser scores exactly zero there.
 
-**The limit, measured 2026-08-03:** on the binding world it scores **0.5240 ±
-0.0268 against a chance of 0.5000**, while a control differing only in a fact the
-counts can hold scores **0.9167 ± 0.0095 on bit-identical input** — 13.8 sigma
-apart, and both arms build the same graph down to the last edge.
+**The limit, and it has been lifted.** The binding world was built so this
+architecture provably could not answer it, and it measured **0.5240 ± 0.0268
+against a chance of 0.5000**. With grouping, an index in the question and sender
+pricing it now scores **0.8798 ± 0.0148** — see 1a-next. **The three parts are
+off by default and the old numbers all still stand.**
 
 > **Every number above was re-baselined once `Seeds.Apart` reached `Sweep`, and
 > the correction is instructive.** The senses headline was published as 0.8898 ±
@@ -68,26 +68,15 @@ spreading-activation systems have done since the 1970s.
 change either moves that number or it does not, against a control at 0.9167 on
 identical input. **Do not build a new world for this; run that one.**
 
-### 1a. HALF BUILT, AND THE HALF THAT IS BUILT IS NOT THE HALF THAT MATTERS
+### 1a. Grouping — `Occasion.Groups`, `IQuantizer.Bind`, null by default
 
-**`Occasion.Groups` exists**: the front end can say which codes belong to which
-object, and the rendezvous refuses to pair across objects. `IQuantizer.Bind`
-supplies it and defaults to null, so nothing else changed.
+The front end says which codes belong to which object; the rendezvous refuses to
+pair across objects.
 
-**It works, mechanically, and the control is emphatic.** On the stable arm the
-graph collapses from 1,751 edges to 144 — the cross-object edges were never real
-— and accuracy goes 0.9167 → **1.0000 ± 0.0000** on the smaller graph.
-
-**And it does not lift the binding task: 0.5465 ± 0.0236, six tenths of a sigma
-from flat.** Pre-registered before the run, and it held.
-
-> **THE LESSON, AND IT IS THE NEXT STEP.** Grouping fixes **learning** — the
-> graph now holds only bindings that happened. It cannot fix **reference**: the
-> question is asked with a colour and nothing else, and a colour's aggregate
-> still points at its own kind whichever object it belonged to in the scene being
-> asked about. **An object file needs its index in the QUESTION, not only in the
-> occasion.** You cannot answer *what shape is this one* without a way to say
-> *this one*.
+**Alone it lifts nothing — 0.5465 ± 0.0236, pre-registered and held.** Grouping
+fixes **learning**; it cannot fix **reference**, because a question asked with a
+colour cannot say *which* object it means. **That is what sent the index into the
+question**, below.
 
 ### 1a-next. ✅ THE CEILING LIFTS — index in the question, sender weighs the edge
 
@@ -121,6 +110,13 @@ differing only in whether the question carries the index.** 12.2 sigma apart,
 shows the graph can **use** binding, not **discover** it. `Pricing.Sender`
 changes the ranking as well as the price, so the effect cannot be attributed to
 cost alone. It costs **5.9× the messages**.
+
+**And it costs nothing on the other two worlds — 12 seeds, not in the suite:**
+senses 0.8269 ± 0.0090 against 0.8077 ± 0.0215 (0.8 sigma), snake 186.6 ± 13.4
+steps against 172.0 ± 18.9 (0.6 sigma). **Indistinguishable where it was not
+needed, transformative where it was**, which is the case for promoting it —
+after someone decides whether a ranking change hiding inside a pricing change is
+acceptable.
 
 > **A CONFOUND IN THIS WORLD, FOUND HERE: short runs score above chance for
 > recency alone** — 0.63 at 60 scenes, decaying to 0.5 as history accumulates,

@@ -427,11 +427,42 @@ disconnection, which is a distinction this project has just been burned by.
 | `Sum` ≈ `Max` because few endpoints are reached twice | most arrivals come by one route | **27%** come by one route — 73% by several |
 | `Lift` ≈ `Strength` because marginals are alike | marginals cluster | marginals span **72×**, from 1 to 72 |
 
-**So the room for both dials to act is there and they do not use it**, which is
-a stranger result than either story and is recorded as unexplained rather than
-narrated. The next check is whether the top-ranked set actually reorders at all
-under `Lift` — if the same codes come out in the same order, the dial is inert
-because nothing near the cut is close enough to swap.
+**So the room for both dials to act is there and they do not use it.** A third
+explanation — that the top scores are too far apart for any reweighting to
+change the order — was checked and is also wrong:
+
+| measure | value |
+|---|---|
+| score ratio between the top two arrivals | median **1.12**, p90 1.75, max 5.0 |
+| how often `Lift` would swap the top two | **50%** of 487 predictions |
+
+**`Lift` reorders half of all predictions and the measured outcome does not
+move.** So the ordering is not being ignored — it is being changed constantly
+and changing nothing.
+
+### Which says the ranking carries no information
+
+The top candidates are separated by about 12%, and whichever of them is named,
+the chance of being right is the same. **The graph narrows to a decent candidate
+set and cannot discriminate within it.**
+
+That is `master`'s recurring finding in a new world: *walking further reaches the
+answer and cannot rank it — two steps from a well-connected node is about 1,300
+candidates and nothing says which one the question was about.* There, edge kinds
+supplied the discrimination. **Here there are no edge kinds and nothing else
+supplies it.**
+
+**It also explains the other nulls at once.** Deeper walks hurt because they
+enlarge a set that cannot be ranked. `Sum` and `Max` are alike because the
+routes agree about the set and not about the order. Prediction sits modestly
+above chance because the set is genuinely better than random and the pick within
+it is not.
+
+**So the bottleneck is not which valuation is used.** It is that nothing in the
+design discriminates within what a broadcast reaches. That is the thing to
+build, and the two candidates already named are **prediction error as a ranking
+signal** — the middle tier that is still unbuilt — and something like **edge
+kinds**, which this design has never had.
 
 **`master` measured `Sum` beating `Max` 0.1234 to 0.0834**, so this null is
 conditional on a world with a two-dozen-code alphabet and a two-hop walk.

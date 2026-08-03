@@ -4,9 +4,7 @@
 build if it grows past that. **To add something, retire something.** The previous
 `architecture.md` and `design.md` reached 15,260 and 6,602 words and stopped
 being loaded, which is the failure this replaces — a doc nobody reads is worse
-than no doc, because it still gets cited. *(The cap was lines until it turned out
-a markdown table row is one line however long it is, so compacting bought
-nothing. Words track the thing actually being spent.)*
+than no doc, because it still gets cited.
 
 **What every piece does lives in the XML comments next to the code**, and the
 compiler enforces that they refer to things that exist
@@ -18,15 +16,15 @@ Everything deleted is in git — `git log --diff-filter=D -- docs/`.
 
 ---
 
-## The goal, and what would count as reaching it
+## The goal
 
-A system that **understands** rather than performs: it can be asked *what would
-the world look like if I did X*, which a sequence model cannot be asked.
-Learning is a co-occurrence count; everything else is careful plumbing around it.
+A system that **understands** rather than performs — one that can be asked *what
+would the world look like if I did X*, which a sequence model cannot be. Learning
+is a co-occurrence count; everything else is plumbing around it.
 
-**Four constraints shape every decision.** C1: no node ever reads another node's
-data. C2: messages are late, jittered, out of order. C4: there is no episode
-boundary — no run that ends, so nothing may depend on training then testing.
+**Three constraints shape every decision.** C1: no node reads another's data.
+C2: messages are late, jittered, out of order. C4: no episode boundary, so
+nothing may depend on training then testing.
 
 ---
 
@@ -95,16 +93,16 @@ differing only in whether the question carries the index.** 12.2 sigma apart,
 
 | | without | with |
 |---|---|---|
-| grouping in the occasion | learns cross-object edges that never existed | stable control 0.9167 → 1.0000, edges 1751 → 144 |
-| index in the question | 0.5481 (chance) | **0.8798** |
-| sender pricing | 0.5726 at 150 scenes, and does not finish at 400 | 0.7095 at 150, 0.8798 at 400 |
+| grouping | cross-object edges that never existed | control 0.9167 → 1.0000, edges 1751 → 144 |
+| index in the question | 0.5481, chance | **0.8798** |
+| sender pricing | 0.5726 at 150 scenes; does not finish at 400 | 0.7095 at 150, 0.8798 at 400 |
 
 > **THE PREDICTION WAS HALF WRONG AND THAT IS WHY THE FIX WORKS.** The worry was
 > `tag → shape` being too *expensive*. The real fault was `colour → tag` being too
-> *cheap*: a fresh index has `seen = 1`, so under receiver pricing its arrival
-> weight is 1.0 — the cheapest hop the system can charge — and every attribute
-> accumulates one such partner per occurrence until the fan-out explodes. Sender
-> pricing inverts exactly that hop and leaves the useful one alone.
+> *cheap*: a fresh index has `seen = 1`, so its arrival weight is 1.0 — the
+> cheapest hop there is — and every attribute accumulates one such partner per
+> occurrence until the fan-out explodes. Sender pricing inverts that hop and
+> leaves the useful one alone.
 
 > **THE CAVEAT THAT MATTERS MOST, AND IT LIMITS THE CLAIM: THIS TASK IS
 > MEMORISABLE.** The index is grouped with its object's colour *and* shape, so
@@ -119,10 +117,9 @@ differing only in whether the question carries the index.** 12.2 sigma apart,
 > never directly observed** — the senses world's trick, applied to bound objects.
 > That is the next thing to build, and it is the honest test of step 1.
 
-**Three more caveats, all live.** The front end supplies grouping and index, so
-this shows the graph can **use** binding, not **discover** it. `Pricing.Sender`
-changes the ranking as well as the price, so the effect cannot be attributed to
-cost alone. It costs **5.9× the messages**.
+**Three more caveats.** The front end supplies grouping and index, so this shows
+the graph can **use** binding, not **discover** it. `Pricing.Sender` moves the
+ranking as well as the price. It costs **5.9× the messages**.
 
 **And it costs nothing on the other two worlds — 12 seeds, not in the suite:**
 senses 0.8269 ± 0.0090 against 0.8077 ± 0.0215 (0.8 sigma), snake 186.6 ± 13.4
@@ -142,15 +139,37 @@ Von der Malsburg and Singer bind by firing in phase, but a phase is an oscillato
 relationship in milliseconds and **C2 destroys exactly those**. Carried as a
 field it is not a phase, it is an index. Built as one, above.
 
-### 1c. If the tag feels like cheating — vector-symbolic binding
+### 1a-after. BUILD THIS NEXT — composition over bindings, designed not built
 
-Plate's Holographic Reduced Representations, Kanerva's hyperdimensional
-computing: bind role to filler with an invertible operation and superpose.
-`red⊛colour + ball⊛shape` differs from `blue⊛colour + ball⊛shape`. **C1-legal
-(local arithmetic on the message) and C2-immune (the structure rides inside the
-code).** It also delivers the **similarity gradient** named below as one of the
-three things that must become true. The cost is that codes stop being opaque
-identities, which is a real architectural commitment.
+**The honest test of step 1**, because the world above is memorisable. Design
+worked out 2026-08-03; nothing written.
+
+**The trap it is designed around:** to ask about a particular object you must
+refer to it, and any reference that touches the answer makes the answer directly
+observed. **So refer by CONJUNCTION** — the way people do, *the red round one* —
+and never let the referring attributes co-occur with the answer.
+
+- Each object gets an index and **three** attributes, drawn fresh per scene.
+- **Three moments per scene**, two objects each, grouped by index:
+  `{tag₀+A₀, tag₁+A₁}`, then `{tag₀+B₀, tag₁+B₁}`, then `{tag₀+C₀, tag₁+C₁}`.
+- **A, B and C never co-occur with each other. Ever.** Only an index ever links
+  them, which is the senses world's trick applied to bound objects.
+- **Ask with A₀ *and* B₀ — no index — for C₀.** Both reach `tag₀`; under `Sum`
+  it gets double the support of any other tag, so the conjunction is what selects
+  the object. Then `tag₀ → C₀`.
+
+**Why each control bites.** A memoriser scores zero — `A₀→C₀` was never observed.
+Ungrouped fails — `A₀` would pair with `tag₁` too. Untagged fails — nothing links
+the moments at all. Asking with `A₀` alone should be **at chance**, because one
+attribute cannot single out a scene, and that arm is the sharpest control here.
+
+### 1c. Vector-symbolic binding, if the index ever proves too weak
+
+Plate's HRR, Kanerva's hyperdimensional computing: bind role to filler with an
+invertible operation and superpose, so `red⊛colour + ball⊛shape` differs from
+`blue⊛colour + ball⊛shape`. C1-legal and C2-immune, and it delivers the
+**similarity gradient** named below. Costs opaque codes, which is a real
+commitment. **Not needed yet.**
 
 ### 2. Predictive coding — only surprise propagates
 
@@ -259,20 +278,20 @@ without a revival condition is a superstition rather than a finding.
 
 | what | what refuted it | what would revive it |
 |---|---|---|
-| `StepCost.Best` / `Local` / `Constant` | Factorial where inverse is polynomial — 5,000,003 messages against 1,111 on a 12-clique | A bound that does not rely on strictly positive cost at weight 1.0 |
-| `Refuel` | Nothing is paid back under inverse cost, so it did nothing | Any mechanism that returns budget to a route |
-| Sender-weighing, `IMarginals` | The C1 violation receiver-weighing removes; behaviour indistinguishable at 26.7 messages a step against 17.0 | Never — C1 is not negotiable. But **sending the sender's OWN marginal is a different thing and is legal** |
-| Absolute actions, unrotated view | 6.5 mean steps against 51.3, and one move in four instantly fatal | A world where the body has no heading |
-| Survival as the score | Repeating one turn circles forever: 133.71 steps against 92.85, and 2 fruit against 40 | Homeostatic drives, where survival stops being gameable by standing still |
-| A beam over partners | A constant nobody set, doing the cutting | A beam width the system sets for itself and reports |
-| Clusters grouped by modality | Puts a picture and a sound on different machines — the one link this design exists to make | Never |
-| Clusters grouped by time of creation | Two machines seeing one thing at different times compute different owners; placement-without-a-coordinator is gone | Any scheme supplying placement agreement without a coordinator |
-| `Adaptive` reflection scaled by `Hunger` | Inverted — 0.3802 at stamina 4, 0.4887 at 8, because inverse cost exists to exhaust the budget | A signal that discriminates; `Thwarted` goes the right way but swings only 1.19× |
-| A deeper walk for prediction | Monotonic, 5.5× end to end: novelty gap 0.0817 at budget 2 against 0.0147 at 8 | **Edge kinds.** This is `master`'s refutation of untyped walking, reproduced |
-| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, both inert, and both explanations for why were refuted too | Lift in the **cost** rather than the ranking — untried, and it is the tag proposal above |
-| Naming fewer codes in a prediction | Half true: coarse ranking carries information, fine ranking does not | A ranking with a similarity gradient under it |
-| `Window` span on snake | Measured null at 150 seeds | **Already revived — never run on a senses graph, where `master` measured 0.153 against 0.000** |
-| `includeEmpty: true` | 46,536 routes halted against 6, under `Best` pricing | **Already revived — inverse cost removed the reason, and at 60 seeds there is no clear winner** |
+| `StepCost.Best` / `Local` / `Constant` | Factorial where inverse is polynomial: 5,000,003 messages against 1,111 on a 12-clique | A bound not relying on positive cost at weight 1.0 |
+| `Refuel` | Nothing is paid back, so it did nothing | Anything that returns budget to a route |
+| Sender-weighing, `IMarginals` | A C1 violation; behaviour identical at 26.7 messages a step against 17.0 | Never. **But `Message.Seen` — the sender's OWN marginal — is legal and is now built** |
+| Absolute actions, unrotated view | 6.5 mean steps against 51.3; one move in four instantly fatal | A body with no heading |
+| Survival as the score | Circling wins: 133.71 steps against 92.85, 2 fruit against 40 | Homeostatic drives, where standing still stops paying |
+| A beam over partners | A constant nobody set, doing the cutting | A width the system sets itself and reports |
+| Clusters by modality | Splits picture from sound — the one link this design exists to make | Never |
+| Clusters by time of creation | Two machines compute different owners for one code | Placement agreement without a coordinator |
+| `Adaptive` reflection on `Hunger` | Inverted: 0.3802 at stamina 4, 0.4887 at 8 | A signal that discriminates; `Thwarted` is 1.19× |
+| A deeper walk for prediction | Monotonic, 5.5×: novelty gap 0.0817 at budget 2, 0.0147 at 8 | **Edge kinds** — `master`'s refutation of untyped walking, reproduced |
+| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, and both explanations refuted too | Lift in the **cost**. Untried; `Pricing.Sender` is the nearest thing built |
+| Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | A similarity gradient under the ranking |
+| `Window` span on snake | Null at 150 seeds | **Revived — never run on a senses graph, where `master` got 0.153 against 0.000** |
+| `includeEmpty: true` | 46,536 halts against 6, under `Best` | **Revived — inverse cost removed the reason; no clear winner at 60 seeds** |
 
 ---
 
@@ -350,10 +369,10 @@ it does not move.
 | **5** | ✅ A death writes off exactly the routes heading into the dead cluster |
 | **6** | ✅ Broadcast the origin, route the hops |
 | **12** | ✅ **CLOSED by 22's fix, confirmed against its own control.** A fixed seed now reproduces a run exactly, `Halted` included — `DeterminismTests` |
-| **18** | ✅ Score prediction **conditional on the next action**. `Consequence` says the system does not yet model its own effect — 1.9 sigma, on a prediction that loses to a blind guess. **Blocked on temporal edges** |
-| **20** | ✅ Split budgets — deep to act, shallow to predict. Wins survival, mirroring and prediction at once |
-| **21** | ✅ Compression built. **A trade, not a win**: 0.1827 → 0.7147 where the budget is too small to compose, 0.8462 → 0.7596 where it is not. Off by default, and off is the control |
-| **22** | ✅ **CLOSED.** A transiently-zero live count untracked thoughts mid-flight, and every later report was dropped. `InputMachine.Retire` asks twice. 0 of 39 unsettled, from 5–8 |
-| **23** | Can compression regulate itself? Not on this signal. `Thwarted` goes the right way at 5.1 sigma but swings only 1.19× against an effect running 0.18 to 0.83 |
-| **24** | ✅ Budget controller built, converges from both directions — and **aims at a moving target**: at 300 moments stamina 8 ties 24, at 1200 moments 24 wins by 7 sigma. `Budget = null` by default |
-| **25** | ✅ The binding world. Built to fail, and failed as predicted. See "Where it stands" |
+| **18** | ✅ Score prediction **conditional on the next action**. `Consequence` says the system does not model its own effect — 1.9 sigma, on a prediction that loses to a blind guess. **Blocked on temporal edges** |
+| **20** | ✅ Split budgets — deep to act, shallow to predict |
+| **21** | ✅ Compression. **A trade**: 0.1827 → 0.7147 where the budget cannot compose, 0.8462 → 0.7596 where it can. Off by default |
+| **22** | ✅ **CLOSED** — `InputMachine.Retire` asks twice. 0 of 39 unsettled, from 5–8 |
+| **23** | Compression self-regulating? Not on this signal. `Thwarted` is right at 5.1 sigma but swings 1.19× against an effect running 0.18 to 0.83 |
+| **24** | ✅ Budget controller converges from both directions and **aims at a moving target**: stamina 8 ties 24 at 300 moments, loses by 7 sigma at 1200. Off by default |
+| **25** | ✅ The binding world — built to fail, failed as predicted, **and since lifted**. See above |

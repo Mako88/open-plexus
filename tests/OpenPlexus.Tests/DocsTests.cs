@@ -118,6 +118,28 @@ public sealed class DocsTests
     }
 
     [Fact]
+    public void The_project_structure_block_lists_the_folders_that_exist()
+    {
+        // A NEW FOLDER THAT NOBODY WROTE DOWN is the same drift as a new type,
+        // and it is worse: the structure block is the first thing anyone reads,
+        // so a gap there mis-frames everything below it.
+        var design = Read("design.md");
+
+        var folders = Directory
+            .EnumerateDirectories(Path.Combine(Repo(), "src", "OpenPlexus"))
+            .Select(Path.GetFileName)
+            .Where(name => name is not ("bin" or "obj"))
+            .OfType<string>()
+            .ToList();
+
+        Assert.NotEmpty(folders);
+
+        var missing = folders.Where(name => !design.Contains($"{name}/", StringComparison.Ordinal));
+
+        Assert.Empty(missing);
+    }
+
+    [Fact]
     public void Every_fork_the_code_cites_is_in_the_architecture_index()
     {
         // THE GHOST-REFERENCE PROBLEM THAT HAS BITTEN THIS PROJECT BEFORE, which

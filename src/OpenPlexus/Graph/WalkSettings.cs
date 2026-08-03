@@ -67,6 +67,7 @@ public sealed record Reflection
 
     /// <summary>How many arrivals at most are written back.</summary>
     public required int Names { get; init; }
+
 }
 
 /// <summary>

@@ -557,6 +557,76 @@ measurement took one sweep.
 
 ---
 
+## A standing rule: a swept dial is a question the system should answer itself
+
+**John, 2026-08-02.** Wherever a sweep tells us a dial matters, the next move is
+to look for a **signal the system can read locally** and let it set the dial —
+not to write the winning value into the defaults and move on. His image is water,
+which is not tuned to run downhill.
+
+**This applies to every sweep already here and every sweep produced later.** A
+number chosen by whoever ran the sweep last is a constant nobody set on purpose,
+and this project refuses those everywhere else.
+
+**It is not free, and fork 23 is the proof.** The first attempt failed because
+the signal chosen did not carry the information, and it took two measurements to
+establish that. The rule is *attempt* it, and record the attempt either way —
+a failed self-regulation is a finding about what the system can and cannot sense
+about itself, which is worth more than the dial.
+
+---
+
+## Fork 23 — can compression regulate itself? Not on this signal
+
+**MEASURED TWICE, 2026-08-02, and the answer is no.** 8 seeds, 312 questions per
+arm, senses world.
+
+The idea: reflection helps where routes could not afford to reach what they
+wanted and costs where they could, and both conditions look locally visible. So
+scale the write by the share of routes that **died broke** — `Thought.Hunger` —
+and compression switches itself on and off with nobody setting a dial. It even
+closes a negative feedback loop: compression shortens routes, shorter routes
+starve less, reflection backs off.
+
+| arm | mean | stderr | seeds |
+|---|---|---|---|
+| off @ stamina 4 | 0.1795 | 0.0222 | 8 |
+| **fixed @ 4** | **0.7115** | 0.0221 | 8 |
+| adaptive @ 4 | 0.6442 | 0.0476 | 8 |
+| **off @ stamina 8** | **0.8269** | 0.0135 | 8 |
+| fixed @ 8 | 0.7692 | 0.0306 | 8 |
+| adaptive @ 8 | 0.7660 | 0.0157 | 8 |
+
+**Adaptive lands on top of fixed, not on top of off** — 0.7660 against fixed's
+0.7692 is nothing, and against off's 0.8269 it is 2.9 standard errors *worse*.
+Where it should have written nothing at all, it wrote nearly as much as the
+fixed arm.
+
+**THE REASON IS STRUCTURAL AND IT IS WORTH KEEPING.** Inverse cost exists to
+exhaust the budget — running out is *how a walk is bounded*, so it is the normal
+way nearly every route ends, at every scale. A larger budget buys more hops
+before that happens but barely changes the *fraction* of deaths that are
+starvation. **Hunger is close to scale-invariant, so it cannot tell a walk that
+reached everything from one that reached nothing.**
+
+**One correction was made and did not save it.** The first version counted a
+route that *arrived and then could not fan out* as starved; that route succeeded
+and is merely finished. Only a route that could not pay for the hop it was on,
+and so reached nothing, is genuinely starved. Fixing that moved adaptive@8 from
+0.7788 to 0.7660 — inside the noise.
+
+**`Adaptive` is deleted rather than parked**, per the standing rule on refuted
+arms. `Starved` and `Hunger` stay, reported in `SensesResult`, because knowing
+this quantity is flat is what stops the same attempt being made again blind.
+
+**What would discriminate is visible in the data and is not a route-level
+quantity.** Unanswered questions go 250 → 31 of 312 between the two budgets,
+an eightfold difference, while hunger barely moves. **Whether the walk reached
+what it was narrowing to** is the thing that differs — and that is known at the
+machine, not at the node. That is the next candidate, and it is open.
+
+---
+
 ## Fork 21 — compression, and what it actually bought
 
 **SWEPT ON THE SENSES WORLD, 2026-08-02.** 8 seeds, 400 moments, 12 concepts,
@@ -624,6 +694,7 @@ by status rather than by scrolling.
 
 | | |
 |---|---|
+| **23** | **Can compression regulate itself? Not on starvation.** Measured twice; hunger is close to scale-invariant because inverse cost exists to exhaust the budget. `Adaptive` deleted. **Next candidate: whether the walk reached what it was narrowing to** — an eightfold difference where hunger showed none |
 | **22** | **A few thoughts never settle.** 5–7 of 39 questions on a senses run, and waiting twenty times longer barely moves it. `Balanced()` still passes, so the books agree with themselves while claiming routes the bus has already finished — an over-count of splits or an under-count of deaths. Every affected question reads as "nothing reached", which is **indistinguishable from a real silence in a score**, so every silent count in this project is an upper bound until this is closed. Found by the run report on its first execution |
 | **1** | The distributed rendezvous — not needed until a second machine exists |
 | **1b** | What manufactures change for a static world — John's heartbeat is the only candidate |

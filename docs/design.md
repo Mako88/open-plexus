@@ -4,10 +4,14 @@ What every piece is and what every method does, in words. No bodies — this is
 the mental model, and the code is meant to match it exactly. **If they ever
 disagree, this file is wrong and gets fixed.**
 
-**Status, 2026-08-02: everything described here is built and tested.** 136
-tests, 0 unimplemented fields, 23 source files, ~3,100 lines. The loop runs end
-to end: a frame becomes codes, onsets form connections, a broadcast walks the
-graph, chains come back carrying their reasoning, and an action gets taken.
+**Status, 2026-08-02: everything described here is built and tested.** 28 source
+files, 0 unimplemented fields. The loop runs end to end: a frame becomes codes,
+onsets form connections, a broadcast walks the graph, chains come back carrying
+their reasoning, and an action gets taken.
+
+**The test count is deliberately not written here.** It rots between commits and
+a stale number in the first paragraph is exactly the drift this file exists to
+avoid — `DocsTests` checks what can be checked mechanically instead.
 
 **A chain causes moves.** On the arm in use, 200 seeds: the chain survives 92.85
 mean steps against random's 37.41 — about twelve standard errors — and takes 40
@@ -31,7 +35,7 @@ src/OpenPlexus/
   Learning/     onsets, offsets, and the join that forms connections
   Thinking/     messages, chains, thoughts
   Machines/     input and output, the world boundary
-  Worlds/       snake
+  Worlds/       snake, and the senses world that shares no code with it
 tests/OpenPlexus.Tests/
 ```
 
@@ -109,6 +113,12 @@ the composition stops being re-derived from scratch every time.
 - **`Weight`** — what a concluded occasion counts against an observed one.
   **Below 1.0, or a belief reinforces itself as fast as evidence does.**
 - **`Names`** — how many arrivals at most are written back.
+
+**`Adaptive` was here and is gone — fork 23.** It scaled the write by
+`Thought.Hunger` so compression would switch itself on where it helps and off
+where it costs. **Measured twice and it does not work:** inverse cost exists to
+exhaust the budget, so starvation is the normal way a route ends at every scale,
+and the adaptive arm landed on top of fixed instead of on top of off.
 
 **The risk is that the system learns its own hallucinations** — confirmation
 bias, literally — which is why there are two dials rather than one and why the
@@ -314,8 +324,14 @@ does not test the hard part**, which is fork 1.
 - **`Arrival`** — endpoint, summed score, the **strongest single** chain, and
   how many routes arrived. Recorded at **every node a route passes through**,
   not only where it stops.
-- **`Accounting`** — splits, deaths, and **halts** counted separately, because
-  reporting a horizon kill as an ordinary death would hide the constant.
+- **`Accounting`** — splits, deaths, **halts** and **starvation** counted
+  separately. Reporting a horizon kill as an ordinary death would hide the
+  constant; reporting a starved route as an ordinary one would hide **why** the
+  walk stopped, which is the signal fork 21 regulates itself with.
+
+  **Starved means the route ran out of budget rather than out of anywhere to
+  go.** It costs nothing to know — the node already tells the two cases apart to
+  decide whether to fan out — and nothing is consulted or shared to report it.
 - **`Fired`** — what a node hands back: outgoing, the arrival, the accounting.
 - **`Report`** — what a cluster owes one machine for one broadcast: `From`,
   arrivals, **`Handled`** and **`SentInto`**. Those last two are John's design
@@ -333,6 +349,11 @@ does not test the hard part**, which is fork 1.
   - **`Best(n)`** — readable at any time. Ties break on the shorter chain.
   - **`BestAmong(codes, n)`** — **arrival narrows**. Not `Best` then filter: the
     top *n* overall can contain none of these codes.
+  - **`Starved` / `Hunger`** — how many deaths were routes that died broke, and
+    that as a share of all deaths. **Nought means the graph ran out before the
+    budget did.** This is what makes compression self-regulating, and because
+    compression shortens routes, a graph that starts starving stops as it
+    compresses — a negative feedback loop with a fixed point.
   - **`Balanced()`** — **not a tautology.** The live count comes from splits and
     deaths; the in-flight counts come from the routing named in each report. Two
     independent quantities agreeing is a real check, and it runs on every real

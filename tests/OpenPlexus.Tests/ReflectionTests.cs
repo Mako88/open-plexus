@@ -90,6 +90,101 @@ public sealed class ReflectionTests
         Assert.Throws<ArgumentOutOfRangeException>(() => node.Observe(B, by));
     }
 
+    // ---- why a route died, which is what makes compression self-regulating ---
+
+    private static Message Arriving(Code to, double held, double together, params Code[] chain) =>
+        new()
+        {
+            Broadcast = BroadcastId.New(),
+            ReturnTo = new MachineAddress("m"),
+            To = to,
+            Held = held,
+            Chain = [.. chain],
+            Carried = 1.0,
+            Together = together,
+        };
+
+    [Fact]
+    public void A_route_that_could_not_pay_for_the_hop_it_was_on_says_so()
+    {
+        // It could not complete the hop it was already taking, so it reached
+        // NOTHING. That is the walk saying "I could not get there", and it is
+        // the condition under which minting a shortcut pays.
+        var node = new Node(B, Dials(null));
+        node.Note();
+        node.Observe(Z);
+
+        // Weight is together/seen = 1.0, so the hop costs 1 and 0.5 cannot pay.
+        var fired = node.Fire(Arriving(B, held: 0.5, together: 1.0, A, B));
+
+        Assert.Null(fired.Reached);
+        Assert.Equal(1, fired.Accounting.Deaths);
+        Assert.Equal(1, fired.Accounting.Starved);
+    }
+
+    [Fact]
+    public void A_route_that_arrived_and_stopped_there_is_not_starved()
+    {
+        // MEASURED, AND COUNTING THIS AS STARVATION BROKE THE SIGNAL. Inverse
+        // cost exists to exhaust the budget, so running out is how nearly every
+        // route ends. This one ARRIVED and produced its arrival; it is finished
+        // rather than thwarted, and calling it hungry made hunger high on every
+        // walk -- which turned the adaptive weight into the fixed one in
+        // disguise.
+        var node = new Node(B, Dials(null));
+        node.Note();
+        node.Observe(Z);
+
+        var fired = node.Fire(Arriving(B, held: 1.5, together: 1.0, A, B));
+
+        Assert.NotNull(fired.Reached);
+        Assert.Equal(1, fired.Accounting.Deaths);
+        Assert.Equal(0, fired.Accounting.Starved);
+    }
+
+    [Fact]
+    public void A_route_that_dies_having_run_out_of_partners_does_not()
+    {
+        // THE COMPANION, AND WITHOUT IT THE SIGNAL IS MEANINGLESS. If every
+        // death counted as starvation, hunger would be 1.0 on every walk and
+        // the adaptive weight would just be the fixed one wearing a disguise.
+        var node = new Node(B, Dials(null));
+        node.Note();
+        node.Observe(A);
+
+        // Plenty of budget; its only partner is already in the chain.
+        var fired = node.Fire(Arriving(B, held: 500.0, together: 1.0, A, B));
+
+        Assert.Equal(1, fired.Accounting.Deaths);
+        Assert.Equal(0, fired.Accounting.Starved);
+    }
+
+    [Fact]
+    public async Task A_walk_that_reached_everything_it_could_is_not_hungry()
+    {
+        using var world = new World(null);
+        await world.TeachAsync(times: 5);
+
+        var thought = await world.Machine.ThinkAsync([A], 500.0);
+        await world.SettleAsync(thought);
+
+        Assert.True(thought.Deaths > 0, "nothing died, so hunger is untested");
+        Assert.Equal(0.0, thought.Hunger);
+    }
+
+    [Fact]
+    public async Task A_walk_that_could_not_afford_the_graph_is()
+    {
+        // The companion. A budget too small to take a second hop starves.
+        using var world = new World(null);
+        await world.TeachAsync(times: 5);
+
+        var thought = await world.Machine.ThinkAsync([A], 2.0);
+        await world.SettleAsync(thought);
+
+        Assert.True(thought.Hunger > 0.0, $"hunger {thought.Hunger} on a starved walk");
+    }
+
     // ---- the mechanism ------------------------------------------------------
 
     private sealed class World : IDisposable

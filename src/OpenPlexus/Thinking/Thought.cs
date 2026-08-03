@@ -35,7 +35,7 @@ public sealed class Thought
     /// in one process and does not across a network, which is why it is
     /// asserted rather than trusted.
     /// </summary>
-    private int _live, _splits, _deaths, _halted;
+    private int _live, _splits, _deaths, _halted, _starved;
 
     /// <summary>
     /// How many of this thought's routes are in flight toward each cluster.
@@ -115,6 +115,36 @@ public sealed class Thought
     public int Halted
     {
         get { lock (_gate) return _halted; }
+    }
+
+    /// <summary>
+    /// Of the deaths, how many were routes that ran out of budget.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE SIGNAL THAT LETS COMPRESSION REGULATE ITSELF.</b> A walk whose
+    /// routes died broke could not afford to reach what it was looking for, and
+    /// that is exactly when minting a shortcut pays. A walk whose routes died
+    /// having run out of partners went everywhere there was to go, and there a
+    /// shortcut is one more edge to rank against.
+    /// </remarks>
+    public int Starved
+    {
+        get { lock (_gate) return _starved; }
+    }
+
+    /// <summary>
+    /// The share of this thought's deaths that were starvation, in 0..1.
+    /// </summary>
+    /// <remarks>
+    /// <b>Nought means the graph ran out before the budget did</b>, and nothing
+    /// is written back. One means every route died broke. Because compression
+    /// shortens routes, a graph that starts starving stops as it compresses --
+    /// which makes this a NEGATIVE FEEDBACK LOOP with a fixed point, rather than
+    /// a dial someone has to set and keep re-setting.
+    /// </remarks>
+    public double Hunger
+    {
+        get { lock (_gate) return _deaths == 0 ? 0.0 : _starved / (double)_deaths; }
     }
 
     /// <summary>How many distinct endpoints have been reached.</summary>
@@ -251,6 +281,7 @@ public sealed class Thought
             _splits += accounting.Splits;
             _deaths += accounting.Deaths;
             _halted += accounting.Halted;
+            _starved += accounting.Starved;
             _live += accounting.Splits - accounting.Deaths;
         }
     }

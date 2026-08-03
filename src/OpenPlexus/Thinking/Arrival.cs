@@ -47,8 +47,27 @@ public sealed record Arrival
 /// weight is conserved, and a refuelled budget creates weight from nothing.
 /// </para>
 /// </remarks>
+/// <param name="Starved">
+/// Of those deaths, how many were routes that <b>ran out of budget</b> rather
+/// than out of anywhere to go.
+/// </param>
+/// <remarks>
+/// <b><paramref name="Starved"/> IS THE SIGNAL THAT MAKES COMPRESSION SELF-REGULATING
+/// — John's ask, 2026-08-02: fewer knobs, more things that find their own
+/// level.</b> A route that dies holding too little to take another hop is the
+/// walk saying *I could not afford to get there*, and that is precisely the
+/// condition under which minting a shortcut helps — measured at 0.1827 → 0.7147.
+/// A route that dies having run out of partners is saying *I went everywhere
+/// there was to go*, and there compression only adds edges to rank against —
+/// measured at 0.8462 → 0.7596.
+/// <para>
+/// <b>It costs nothing to know.</b> The node already distinguishes the two cases
+/// to decide whether to fan out; this only reports which one happened. Nothing
+/// is consulted, nothing is shared, and no node learns anything about another.
+/// </para>
+/// </remarks>
 public readonly record struct Accounting(
-    BroadcastId Broadcast, int Splits, int Deaths, int Halted = 0);
+    BroadcastId Broadcast, int Splits, int Deaths, int Halted = 0, int Starved = 0);
 
 /// <summary>
 /// What a node hands back when it fires.

@@ -205,7 +205,10 @@ public sealed class Node
             // EVERY HOP COSTS AT LEAST 1, because a weight cannot exceed 1.0.
             // That is what bounds the walk.
             held -= 1.0 / arriving;
-            if (held <= 0.0) return Died(message);
+
+            // COULD NOT AFFORD THE HOP IT WAS ALREADY TAKING. Starvation, not
+            // exhaustion of the graph -- see Accounting.Starved.
+            if (held <= 0.0) return Starved(message);
         }
 
         var travelled = message.Carried * arriving;
@@ -278,7 +281,18 @@ public sealed class Node
         };
     }
 
-    /// <summary>A route that arrived but cannot afford to go on.</summary>
+    /// <summary>
+    /// A route that arrived and cannot afford to go further. <b>NOT starvation.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>MEASURED, AND COUNTING THIS AS STARVATION BROKE THE SIGNAL.</b> Inverse
+    /// cost exists to exhaust the budget — running out is how a walk is bounded,
+    /// so it is the normal way nearly every route ends. A route here <i>arrived</i>
+    /// and produced its arrival; it is finished, not thwarted. Marking it hungry
+    /// made <see cref="Thinking.Thought.Hunger"/> high on every walk, so the
+    /// adaptive weight was the fixed one wearing a disguise: 0.7788 against
+    /// off's 0.8333 where it should have written nothing at all.
+    /// </remarks>
     private static Fired Spent(Message message, Arrival? reached) => new()
     {
         Outgoing = [],
@@ -286,7 +300,21 @@ public sealed class Node
         Accounting = new Accounting(message.Broadcast, 0, Deaths: 1),
     };
 
-    /// <summary>A route that could not go on from here.</summary>
+    /// <summary>
+    /// A route that could not pay for the hop it was on. <b>Starvation</b>, and
+    /// it reaches nowhere at all — it did not survive the arrival.
+    /// </summary>
+    private static Fired Starved(Message message) => new()
+    {
+        Outgoing = [],
+        Reached = null,
+        Accounting = new Accounting(message.Broadcast, 0, Deaths: 1, Starved: 1),
+    };
+
+    /// <summary>
+    /// A route that could not go on from here because there was <b>nowhere to
+    /// go</b>, not because it was broke. The edge it arrived on weighs nothing.
+    /// </summary>
     private static Fired Died(Message message) => new()
     {
         Outgoing = [],

@@ -144,6 +144,7 @@ public sealed class Cluster : IReceiveEnvelopes
             owing.Splits += fired.Accounting.Splits;
             owing.Deaths += fired.Accounting.Deaths;
             owing.Halted += fired.Accounting.Halted;
+            owing.Starved += fired.Accounting.Starved;
         }
 
         if (envelope.Everywhere) Unit(envelope, owed, fanned);
@@ -178,7 +179,8 @@ public sealed class Cluster : IReceiveEnvelopes
                 Handled = owing.Handled,
                 SentInto = [.. owing.SentInto.Select(pair => new Routed(pair.Key, pair.Value))],
                 Arrivals = [.. owing.Arrivals],
-                Accounting = new Accounting(broadcast, owing.Splits, owing.Deaths, owing.Halted),
+                Accounting = new Accounting(
+                    broadcast, owing.Splits, owing.Deaths, owing.Halted, owing.Starved),
             }, ct).ConfigureAwait(false);
         }
     }
@@ -224,6 +226,9 @@ public sealed class Cluster : IReceiveEnvelopes
         public int Deaths { get; set; }
 
         public int Halted { get; set; }
+
+        /// <summary>Deaths that were routes running out of budget. Fork 21.</summary>
+        public int Starved { get; set; }
 
         public int Handled { get; set; }
 

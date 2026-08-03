@@ -76,6 +76,20 @@ public sealed record SensesResult
     /// <summary>Whether fork 21 was switched on for this run.</summary>
     public required bool Reflecting { get; init; }
 
+    /// <summary>
+    /// The mean share of a question's deaths that were routes unable to pay for
+    /// the hop they were on.
+    /// </summary>
+    /// <remarks>
+    /// <b>REPORTED BECAUSE IT FAILED, AND THE FAILURE IS THE USEFUL PART.</b>
+    /// Fork 23 tried to make compression self-regulating by scaling how much it
+    /// writes by this. It does not discriminate: inverse cost exists to exhaust
+    /// the budget, so starvation is the normal way a route ends at every scale.
+    /// Keeping it visible is how a future attempt can tell at a glance whether
+    /// that is still true rather than re-deriving it.
+    /// </remarks>
+    public required double Hunger { get; init; }
+
     /// <summary>The share of questions answered correctly.</summary>
     public double Accuracy => Asked == 0 ? 0.0 : Right / (double)Asked;
 
@@ -138,7 +152,8 @@ public sealed record SensesResult
             $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
             $"nodes={Nodes} edges={Edges} spread=[{string.Join(",", Spread)}] | " +
             $"chains={{{lengths}}} deepest={Deepest} | " +
-            $"msgs={Messages} halted={Halted} unbalanced={Unbalanced} unsettled={Unsettled}";
+            $"msgs={Messages} halted={Halted} unbalanced={Unbalanced} unsettled={Unsettled} " +
+            $"hunger={Hunger:F2}";
 
         return Complaints.Count == 0
             ? line
@@ -231,6 +246,7 @@ public sealed class SensesRun : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(every);
 
         int asked = 0, right = 0, silent = 0, unbalanced = 0, unsettled = 0;
+        var hunger = 0.0;
         long halted = 0;
 
         var reflected = 0;
@@ -254,11 +270,12 @@ public sealed class SensesRun : IDisposable
             if (moment % every != 0 || moment == 0) continue;
 
             var concept = moment % _world.Concepts;
-            var (answer, stopped, balanced, settled, everything) =
+            var (answer, stopped, balanced, settled, hungry, everything) =
                 await AskingAsync(concept, ct).ConfigureAwait(false);
 
             asked++;
             halted += stopped;
+            hunger += hungry;
             if (!balanced) unbalanced++;
             if (!settled) unsettled++;
 
@@ -291,6 +308,7 @@ public sealed class SensesRun : IDisposable
             Halted = halted,
             Unbalanced = unbalanced,
             Unsettled = unsettled,
+            Hunger = asked == 0 ? 0.0 : hunger / asked,
         };
     }
 
@@ -310,6 +328,7 @@ public sealed class SensesRun : IDisposable
         int Halted,
         bool Balanced,
         bool Settled,
+        double Hunger,
         IReadOnlyList<Arrival> Reached);
 
     /// <summary>The same question, with the plumbing left attached.</summary>
@@ -327,6 +346,7 @@ public sealed class SensesRun : IDisposable
             thought.Halted,
             thought.Balanced(),
             settled,
+            thought.Hunger,
             thought.Best(int.MaxValue));
 
         _senses.Forget(thought.Id);

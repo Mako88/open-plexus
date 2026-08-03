@@ -35,7 +35,7 @@ src/OpenPlexus/
   Learning/     onsets, offsets, and the join that forms connections
   Thinking/     messages, chains, thoughts
   Machines/     input and output, the world boundary
-  Worlds/       snake, and the senses world that shares no code with it
+  Worlds/       snake, the senses world, and the binding world built to fail
 tests/OpenPlexus.Tests/
 ```
 
@@ -616,6 +616,69 @@ asked, settled, and learning carries on, because C4 forbids a run that stops.
 - **`Unsettled`** — questions read before their walk finished. **Counted rather
   than absorbed**, because "nothing reached" and "not finished yet" are
   indistinguishable in a score. See fork 22.
+
+### `Binding` / `BindingSettings` / `Scene`
+
+**The third world, and the only one built in the expectation that it would
+fail.** Two objects in a scene, each with a colour and a shape, and the question
+is *which shape belongs to which colour*.
+
+**An occasion is a SET of co-occurring codes**, so a red ball beside a blue box
+and a blue ball beside a red box produce the identical set. The binding lives
+nowhere in what the machine receives, and this world is the smallest honest
+statement of that.
+
+- **`Concepts`**, **`CodesPerAttribute`** — required. Several codes per
+  attribute for the same reason `CodesPerSense` exists: one code apiece would
+  make identity a lookup.
+- **`Bound`** — **the control, and it runs the opposite way from
+  `Scrambled`.** There the control destroys structure and is expected to fail;
+  here it *adds* structure the counts can see and is expected to succeed. It
+  exists because "scored at chance" and "the harness never measured anything"
+  look identical from outside.
+- **`Scene`** — `Codes` is what the world shows; `Colours` and `Shapes` are
+  indexed **by object**, and that shared index *is* the binding. It is the one
+  thing in the record that `Codes` does not contain.
+- **`Next()`** — draws two distinct concepts and emits four codes **ordered by
+  concept, never by object**. Ordering by object would smuggle the binding past
+  the front door and every number here would be measuring the leak.
+- **`Apart(seed, purpose)`** — mixes a seed rather than offsetting it. **A
+  seeded `Random` in .NET normalises by magnitude**, so `new Random(~s)` *is*
+  `new Random(s + 1)`, and consecutive seeds produce streams that agree with
+  each other far more than chance allows. That understates every standard error
+  taken across those seeds; see the trap in `architecture.md`.
+
+### `BindingRun` / `BindingResult`
+
+The binding world wired to the graph, scored prequentially, with the question
+asked about **the scene just shown** — the binding is a fact about that scene
+and about nothing else.
+
+- **`RunAsync(moments, every, votes)`** — shows scenes and stops every *n* to
+  ask which shape one of the objects had, alternating between the two so nothing
+  rests on which was drawn first.
+- **The question is asked with the queried object's colour and nothing else, and
+  that is the finding arriving early.** There is no way here to say *this one*.
+  An object can only be named by its attributes, and its attributes are what is
+  being asked about — so broadcasting the whole scene as context would broadcast
+  the answer's competitor on exactly equal terms. **The failure shows up before
+  the answer: the question cannot be posed.**
+- **`Echoed` / `Echo`** — how often the answer named the queried colour's *own*
+  concept. **The mechanism rather than the score**, and it is what turns a null
+  result into a description: a colour co-occurs with its own kind's shape in
+  every scene it appears in, so the counts point there whichever object it
+  belonged to. Measured at 92% in **both** arms.
+- **`Swapped`** — how many of the *asked* scenes actually swapped. The fairness
+  of the coin in the subsample that was scored, rather than in the long run.
+- **`SawBoth` / `Forced`** — how often both candidates were in reach. **The
+  check that stops this world scoring chance for the wrong reason:** a forced
+  choice is only forced if both candidates were reached, and a weak edge is
+  expensive under inverse cost. At stamina 4 only 16% of questions are forced; at
+  12 it is 97%, which is why the headline is measured there.
+- **`Complaints`** — load-bearing here more than anywhere else in the project.
+  Every other world's headline is a number going *up*, where a disconnected dial
+  shows up as a disappointment. **This world predicts a number that stays flat,
+  and a broken harness produces exactly that.**
 
 ---
 

@@ -5,23 +5,32 @@ the open forks; `design.md` holds what every piece does. **This file holds only
 what those two cannot: what is in flight, what order was agreed, and the traps
 that are cheap to fall into twice.**
 
-**START AT "THE PLAN" BELOW.** Step 0 is a world built to FAIL, with the failure
-predicted in advance — do that before building anything meant to fix it.
+**STEP 0 IS DONE AND IT CAME OUT AS PREDICTED. START AT STEP 1 — BINDING BY
+PHASE.**
 
 ---
 
 ## Where it stands
 
-**214 tests, 0 warnings, branch `csharp`, head `9b8abbf`.**
+**228 tests, 0 warnings, branch `csharp`.**
 
-The loop runs end to end on **two worlds that share no code**: snake, and a
-senses world built so that sight and touch never co-occur, making a correct
-answer a two-hop composition and nothing else.
+The loop runs end to end on **three worlds that share no code**: snake, a senses
+world built so that sight and touch never co-occur, and a binding world built so
+that the architecture provably cannot answer it.
 
 **The headline result:** on the senses world the graph answers a question it was
 never told — **0.9974 accuracy with three concurrent votes**, against a chance of
 0.0833, while the scrambled control collapses below chance. A memoriser scores
 exactly zero there by construction.
+
+**The headline LIMIT, and it is now measured rather than argued — fork 25,
+2026-08-03.** On the binding world the system scores **0.5064 ± 0.0213 against a
+chance of 0.5000** over 16 seeds, while a control differing only in a fact the
+counts can hold scores **0.9247 ± 0.0072** on **bit-identical input** — 18.6
+standard errors apart, and both arms build the same graph down to the last edge.
+**The prediction was written before the first execution and the result sits on
+it.** Everything in "THE PLAN" below is therefore a measured next step rather
+than speculation.
 
 ---
 
@@ -40,10 +49,17 @@ measurement said something specific.**
 
 ## THE CEILING, and it is not scale or tuning
 
+**MEASURED 2026-08-03 — fork 25. This section used to be an argument and is now
+a result.**
+
 **An occasion is a SET of co-occurring codes.** So *"red ball left of blue box"*
 and *"blue ball left of red box"* produce the **identical code set**. No amount
 of counting, walking, compressing or scaling separates them, because the
 information was destroyed at the front door.
+
+**That is not a prediction any more.** Two worlds emitting bit-identical code
+sequences, one answerable by counting and one not: 0.9247 against 0.5064, same
+code, same dials, same graph — 48 nodes and 1,730 edges either way.
 
 **That is the binding problem, and everything else descends from it.** No new
 primitives, no roles, no variables, no relations — you cannot represent *X causes
@@ -58,17 +74,23 @@ the 1970s.
 
 ## THE PLAN — four borrowings, in build order
 
-### 0. FIRST: build the world this architecture provably cannot do
+### 0. ✅ DONE — the world this architecture provably cannot do
 
-**Before building any fix.** Two objects with swapped attributes, where the
-question is *which attribute belongs to which object*.
+**Built and measured 2026-08-03; the full write-up is fork 25 in
+`architecture.md`.** Two objects with swapped attributes, the question being
+*which attribute belongs to which object*. **The pre-registered prediction — at
+chance, not merely poorly — landed at 0.5064 ± 0.0213 against 0.5000.**
 
-**PRE-REGISTERED PREDICTION: the current system scores exactly at chance.** Not
-poorly — **at chance**, because the two situations are literally the same input.
+**The useful part is the mechanism, not the null.** `Echo` — the share of answers
+naming the queried colour's *own* kind — is **0.92 in both arms**. The system is
+not failing to choose; it is answering a question about co-occurrence correctly,
+because that is the only question its representation can hold. Being right half
+the time is the world's coin showing through.
 
-**If it does not fail, the model of the system in this document is wrong** and
-everything below needs revisiting before it is built. A day's work, and it turns
-the whole plan from speculation into a measured next step.
+**And the failure arrives before the answer.** There is no way here to say *this
+one*: an object can only be named by its attributes, and its attributes are what
+is being asked about. **The question cannot be posed** — which is the thing step
+1 has to fix, and it says what "fix" has to mean.
 
 ### 1. Binding by phase — von der Malsburg, Singer
 
@@ -83,6 +105,12 @@ rewrite.**
 
 **It lifts the representational ceiling from sets to structured sets**, which is
 the single change that makes everything below worth building.
+
+**AND IT NOW HAS A SCOREBOARD WAITING FOR IT.** Fork 25's binding world exists,
+is measured, and sits at chance. **Phase binding either moves that number or it
+does not**, against a control on identical input that already scores 0.9247 — so
+this is the first structural change in the project that can be falsified the day
+it lands rather than argued about. Do not build a new world for it; run this one.
 
 ### 2. Predictive coding — Rao & Ballard, Friston
 
@@ -160,6 +188,22 @@ honestly today.
 ---
 
 ## Traps, all of which cost time today
+
+**CONSECUTIVE INTEGER SEEDS ARE NOT INDEPENDENT, AND THIS ONE IS PROJECT-WIDE.**
+A seeded `Random` in .NET normalises by magnitude, so `new Random(~s)` *is*
+`new Random(s + 1)` — and neighbouring seeds produce streams that agree with each
+other far more than chance allows. Over seeds 1–8 a fair coin's count landed in a
+spread of **1.3 where the binomial says 3.1**. `Measured.StdErr` is computed
+across exactly those consecutive seeds, so **it comes out too small and a null
+reads as a significant departure**: fork 25's first measurement said five sigma
+below chance and was sitting on chance. Fixed inside the binding world by
+`Binding.Apart`, which mixes rather than offsets, with a test asserting the
+spread.
+
+**DECISION FOR JOHN, AND IT IS NOT MINE TO TAKE:** `Sweep.ArmAsync` hands out
+seeds 1..n. Mixing them there re-opens every number in `architecture.md`. Not
+doing it leaves every sigma taken over a handful of seeds softer than it reads —
+and the bias always runs toward *overstating* significance.
 
 **A dial swept at one data volume may be measuring the volume, not the dial.**
 The stamina plateau reversed between 300 and 1200 moments. Anything measured at

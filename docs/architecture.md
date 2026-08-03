@@ -13,6 +13,13 @@ assumed.
 **Current scope: snake, on one machine, every boundary shaped so the same code
 runs across many.** Static background is out of scope — fork 1b.
 
+**THE CEILING IS NOW MEASURED RATHER THAN ARGUED — fork 25, 2026-08-03.** A third
+world asks which attribute belongs to which object, and the system scores exactly
+at chance on it while a control differing only in a fact the counts can hold
+scores 0.9247 on **bit-identical input**. An occasion is a set, so *red ball
+beside blue box* and *blue ball beside red box* are the same input, and no amount
+of counting, walking, compressing or scaling separates them.
+
 **Status marks: ✅ built ⬜ proposed, not written 🔬 experiment we want to run**
 
 **A chain has caused a move.** Over 200 seeds it survives 6.575 steps against
@@ -902,6 +909,120 @@ with reflection on and off alike — so it is not caused by this mechanism.
 
 ---
 
+## FORK 25 — THE WORLD BUILT TO FAIL, AND IT FAILED EXACTLY AS PREDICTED
+
+**2026-08-03. The prediction was written before the first execution and is
+recorded in `BindingTests`: the system scores EXACTLY AT CHANCE.** Not poorly —
+at chance, because the two situations it is asked to separate are literally the
+same input. **A result meaningfully above chance would have meant the model of
+this architecture in the handoff was wrong**, and the four borrowings planned on
+top of it needed revisiting before any of them was built.
+
+**The world.** Two objects in a scene, each with a colour and a shape, drawn
+from eight kinds. A scene emits four codes — two colours, two shapes — and the
+question is which shape belonged to the object with a given colour. Chance is
+one in two, because the question is a forced choice between the two shapes
+actually present.
+
+**The two arms see the identical input, and that is asserted rather than
+argued.** Under `Bound` a colour keeps its own kind's shape for the life of the
+world; unbound, the pairing is drawn per scene from its own generator. **The
+emitted code sequence is bit-identical at the same seed, scene after scene, over
+2,000 scenes** — only which shape is answerable for which colour moves.
+
+### The result, 16 seeds, 400 scenes, stamina 12
+
+| arm | accuracy | stderr | echo | forced | sigma vs chance |
+|---|---|---|---|---|---|
+| **per-scene binding** | **0.5064** | 0.0213 | 0.9231 | 0.9712 | **0.3** |
+| stable binding (control) | **0.9247** | 0.0072 | 0.9247 | 0.9712 | — |
+
+**The two arms are 18.6 standard errors apart on identical input.** Same code,
+same dials, same question, same codes arriving in the same order. The only
+difference is whether the answer is a fact the counts can hold.
+
+**And both arms build the same graph down to the last edge** — 48 nodes and
+1,730 edges either way, asserted. Whatever separates them is therefore *not in
+there*.
+
+### The mechanism, which is more useful than the null
+
+**`Echo` — the share of answers naming the queried colour's OWN kind — is 0.92
+in BOTH arms.** A colour co-occurs with its own kind's shape in every scene it
+appears in, and with the other object's shape only when that kind happens to be
+the partner. So the counts point at the colour's own kind whichever object it
+actually belonged to, and `right = asked − swapped` holds question by question.
+
+**The system is not failing to choose. It is answering a question about
+co-occurrence correctly, because that is the only question its representation can
+hold.** Being right half the time is the world's coin showing through, not a
+degraded version of the right computation.
+
+### The failure arrives before the answer
+
+**There is no way in this architecture to say *this one*.** An object can only be
+named by its attributes, and its attributes are what the question is about — so
+supplying the scene as context would supply the answer's competitor on exactly
+equal terms. **The question cannot be posed**, and the accuracy is only what that
+looks like from the far end.
+
+### What would have refuted it, and did not
+
+- **Too shallow to reach the alternative.** At stamina 4 only 16% of questions
+  reach both candidates and a coin-flip score would be measuring what the walk
+  could afford. At stamina 12 it is **97%**, and the score does not move.
+- **Silence scored as wrong.** Zero silent questions at every stamina measured.
+- **The harness never measuring anything.** The control scores 0.92 through the
+  same code path, and `Complaints` fires on this world's own specific failures —
+  a walk that never left its origin, and a choice that was never forced.
+
+### It does not depend on depth, and the control decays with it
+
+| stamina | per-scene | stable | forced |
+|---|---|---|---|
+| 4 | 0.4359 | 0.9936 | 0.16 |
+| 8 | 0.4103 | 0.9679 | 0.66 |
+| 12 | 0.4359 | 0.9295 | 0.96 |
+
+*(4 seeds, and the per-scene column here is contaminated by the seed trap below —
+read the direction, not the value.)* **The control gets WORSE as the walk gets
+deeper**, which is fork 20's finding turning up in a third world: without edge
+kinds, depth reaches more and ranks worse.
+
+### THE TRAP THIS COST, AND IT IS PROJECT-WIDE
+
+**The first measurement read 0.4487 ± 0.0097 — five standard errors BELOW
+chance — and it was an artefact of seeding.**
+
+**A seeded `Random` in .NET normalises its seed by magnitude**, so `new
+Random(~s)` *is* `new Random(s + 1)`. The binding generator, introduced
+specifically to be independent of the scene generator, was the **next seed's
+scene generator**. Worse, and more generally:
+
+| seeding | swap count over seeds 1..16, of 39 | spread |
+|---|---|---|
+| `~seed` | 22,20,22,23,21,19,22,22,21,14,16,26,21,20,19,23 | **1.3** over seeds 1–8 |
+| mixed | 29,14,14,25,17,19,21,21,20,19,15,20,21,17,21,19 | 3.9 |
+| a fair coin, for scale | — | 3.12 |
+
+**Consecutive integer seeds produce streams that agree with each other far more
+than chance allows.** Every standard error in this project is computed *across
+seeds 1..n* by `Measured`, and `Sweep.ArmAsync` hands out exactly those
+consecutive integers. **Where the per-seed values are artificially tight, that
+standard error is too small and a null reads as a significant departure.**
+
+**Fixed in this world only, by `Binding.Apart` — the seed is mixed rather than
+offset, and a test asserts the spread instead of assuming it.** After the fix
+the swap rate is 312 of 624, exactly half, and the per-seed spread is 3.9.
+
+**NOT fixed in `Sweep`, and that is John's call rather than mine.** Mixing the
+seed there would change every arm ever measured, so it re-opens every number in
+this file. **What is certain is that any sigma in this document taken across
+fewer than about a dozen consecutive seeds is softer than it reads**, and the
+direction of the bias is always *overstating* significance.
+
+---
+
 ## Open forks
 
 Recorded here so a decision does not go quiet.
@@ -956,6 +1077,7 @@ by status rather than by scrolling.
 
 | | |
 |---|---|
+| **25** | ✅ **THE BINDING WORLD, BUILT TO FAIL, AND IT FAILED AS PREDICTED.** Pre-registered before the first run: exactly at chance. Measured 0.5064 ± 0.0213 against 0.5000 over 16 seeds, while the control on **identical input** scores 0.9247 ± 0.0072 — 18.6 sigma apart, same graph, 48 nodes and 1,730 edges either way. The system echoes the queried colour's own kind on 92% of questions in **both** arms, so being right half the time is the world's coin showing through rather than a degraded computation. **The plan's step 0 is done and the ceiling is now measured rather than argued.** Next: binding by phase |
 | **21** | **Compression buys depth-independence and pays for it in precision.** At a budget too small to compose, reflection lifts accuracy 0.1827 → 0.7147 and cuts unanswered questions from 250 to 56 of 312. At a budget that could already afford the walk it *costs*: 0.8462 → 0.7596. The graph grows 2.7× either way |
 | **10** | The chain outlives random by ~12 standard errors and takes more fruit; it loses survival to circling, and random eats more per step alive |
 

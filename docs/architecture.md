@@ -307,7 +307,22 @@ order to find what it cannot see.
 
 ## Stamina swept — and depth HURTS
 
-**Never swept until 2026-08-02, and it turns out to be the most consequential
+> **⚠ UNDER INVESTIGATION, 2026-08-02. Do not build on this yet.** Two follow-up
+> measurements disagree about *which* budget is doing the work. Varying only the
+> **prediction** budget, with the policy fixed at random and the action budget
+> fixed, moved nothing: 0.0164, 0.0159, 0.0162, 0.0149 for budgets 2, 3, 4 and
+> 8 — flat. But varying **both** budgets together moved a great deal, 0.0684
+> down to 0.0152 over the same range and the same fixed policy. Those cannot
+> both be right about the same cause, and they were taken in separate runs, so
+> anything that differs between runs was uncontrolled. A single run comparing
+> every combination is what settles it.
+>
+> **What is not in doubt:** at a shallow budget the chain becomes a pure mirror
+> — 100% of chain-chosen moves repeat the last action at stamina 2, against 2%
+> at stamina 8 — and that much is measured, reproduced and is what fork 20's
+> split budget was built for.
+
+**Never swept until 2026-08-02, and it may be the most consequential
 dial in the project.** 60 seeds, energy 200, empty cells withheld:
 
 | stamina | deepest chain | steps | messages | novelty gap | sigma |

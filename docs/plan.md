@@ -143,6 +143,14 @@ Keep internal variables in bounds and behaviour becomes goal-directed **with no
 reward function** — which matters, because survival proved gameable by circling.
 **Homeostasis has no episode boundary**, which fits C4.
 
+**`Homeostat` HAS SET THE BAR, AND NOT WHERE ANYBODY WOULD GUESS.** Idling fails
+exactly when the arithmetic says, and attending to whatever is lowest holds the
+body indefinitely — so the world is winnable, and only by looking at it. **But
+choosing by association scores BELOW random**: with nothing to say what an action
+is for, the walk repeats what it did last time in that state, which is fork 20's
+mirror again. **So step 4 must beat random, not idling** — and needs a bootstrap,
+since an action enters the graph only by being taken.
+
 **All four could land and still not be enough.** The confident claim is narrower:
 without structure, an internal error signal, a growing alphabet and a reason to
 act, no amount of scaling gets there.
@@ -160,6 +168,7 @@ act, no amount of scaling gets there.
 - [x] `Clevr` — fork 25's experiment on scene graphs generated in 2017
 - [x] `Rhythm` — the endless stationary stream prediction can be measured on
 - [x] `Motif` — recurring sets that should collapse into one code
+- [x] `Homeostat` — Ashby's bounded variables, where standing still stops paying
 - [ ] `Surprise` — the local prediction error of step 2
 - [ ] `Chunk` — the minted node of step 3
 - [ ] `Drives` — the bounded internal variables of step 4

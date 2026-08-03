@@ -195,6 +195,9 @@ public sealed class SnakeRun : IDisposable
     /// <summary>What was present last step, so this step's onsets can be found.</summary>
     private HashSet<Code> _before = [];
 
+    /// <summary>How long the chains that came back were.</summary>
+    private readonly Dictionary<int, int> _chains = [];
+
     public SnakeRun(
         SnakeSettings world,
         WalkSettings dials,
@@ -240,6 +243,30 @@ public sealed class SnakeRun : IDisposable
 
         _handles.Add(_bus.Subscribe(_eye));
         _hand = new OutputMachine(new MachineAddress("hand"), SnakeSense.Turns);
+    }
+
+    /// <summary>
+    /// Plays, and reports what the system actually did while playing.
+    /// </summary>
+    /// <remarks>
+    /// <b>Prefer this to <see cref="PlayAsync"/> for anything being measured.</b>
+    /// A <see cref="RunReport"/> carries the plumbing alongside the result, and
+    /// says outright when a quantity is out of the range it would be in if
+    /// everything were wired.
+    /// </remarks>
+    public async Task<RunReport> ReportAsync(
+        int steps, bool cut = false, Policy policy = Policy.Chain, CancellationToken ct = default)
+    {
+        var result = await PlayAsync(steps, cut, policy, ct).ConfigureAwait(false);
+
+        return new RunReport
+        {
+            Result = result,
+            Nodes = _clusters.Sum(cluster => cluster.Count),
+            Edges = _clusters.Sum(cluster => cluster.Edges),
+            Spread = [.. _clusters.Select(cluster => cluster.Count)],
+            ChainLengths = new Dictionary<int, int>(_chains),
+        };
     }
 
     /// <summary>Plays until the run ends or the step budget runs out.</summary>
@@ -298,6 +325,12 @@ public sealed class SnakeRun : IDisposable
                 halted += thought.Halted;
                 if (!thought.Balanced()) unbalanced++;
                 if (chosen is null) reachedNothing++;
+
+                // How far routes actually walked. A flood that only ever
+                // produces chains of length two is a one-hop lookup, and
+                // nothing else reported would show it.
+                foreach (var arrival in thought.Best(int.MaxValue))
+                    _chains[arrival.Chain.Length] = _chains.GetValueOrDefault(arrival.Chain.Length) + 1;
             }
 
             if (policy != Policy.Chain) chosen = null;

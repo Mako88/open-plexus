@@ -46,6 +46,9 @@ public sealed class Cluster : IReceiveEnvelopes
     /// <summary>How many nodes have come into existence here.</summary>
     public int Count => _nodes.Count;
 
+    /// <summary>Every partner entry across every node here. The graph's size.</summary>
+    public int Edges => _nodes.Values.Sum(node => node.Partners().Count);
+
     /// <summary>Whether the ring says this cluster owns that node.</summary>
     public bool Holds(Code code) => _ring.OwnerOf(code) == _address;
 

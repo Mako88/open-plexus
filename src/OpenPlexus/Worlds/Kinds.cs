@@ -57,6 +57,43 @@ public static class Kinds
     /// <summary>Which concept a code belongs to, whatever modality it came from.</summary>
     public static int Of(Code code) => (int)(code.Value / Stride);
 
+    /// <summary>
+    /// The code for a thing that arrives already named — <b>a word, a colour, a
+    /// shape</b>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The worlds built here number their concepts and the worlds read off
+    /// disk do not.</b> An external corpus hands over <i>cylinder</i> and
+    /// <i>bathroom</i>, so there is no concept number to stride by and something
+    /// has to turn a name into a code.
+    /// </para>
+    /// <para>
+    /// <b>A hash and not an interning table, which is the red-ball property.</b>
+    /// The same input must give the same code on every machine forever, and a
+    /// table numbered by order of first appearance gives two machines reading two
+    /// samples different codes for the same word. FNV-1a because
+    /// <see cref="string.GetHashCode()"/> is randomised per process, so a run
+    /// built on it would not reproduce itself — the property fork 12 protects.
+    /// </para>
+    /// </remarks>
+    /// <param name="modality">Which front end the name came from.</param>
+    /// <param name="name">The name, taken exactly as given.</param>
+    public static Code Named(byte modality, string name)
+    {
+        ArgumentNullException.ThrowIfNull(name);
+
+        var hash = 14695981039346656037UL;
+
+        foreach (var letter in name)
+        {
+            hash ^= letter;
+            hash *= 1099511628211UL;
+        }
+
+        return new Code(modality, hash);
+    }
+
     private static Code At(byte modality, int concept, int slot) =>
         new(modality, (ulong)((concept * Stride) + slot));
 }

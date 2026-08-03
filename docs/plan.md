@@ -32,10 +32,15 @@ nothing may depend on training then testing.
 
 ## What is standing
 
-**Four worlds sharing no world logic, over one `Fabric`.** Snake, where a chain
+**Five worlds sharing no world logic, over one `Fabric`.** Snake, where a chain
 can cause a move; senses, where sight and touch never co-occur so the answer can
 only be composed; binding, built so this architecture provably could not answer
-it and since lifted; and composition, where the answer was never observed at all.
+it and since lifted; composition, where the answer was never observed at all; and
+`Babi`, **which nobody here designed.**
+
+**AN EXTERNAL WORLD CANNOT FLATTER THIS ARCHITECTURE BY CONSTRUCTION**, which is
+the whole reason to read one — the other four were built by the same hands as the
+mechanisms they measure. `corpora/fetch.sh` gets the data; it is not vendored.
 
 **An occasion is a SET of co-occurring codes**, so *red ball beside blue box* and
 *blue ball beside red box* were the same input. That ceiling was
@@ -70,27 +75,10 @@ to an old one — run that one.**
 
 ### 1. Composition over bindings — built and answered
 
-**The honest test of the index**, because the world it lifted is *memorisable*.
-`Composed` documents its own shape. A memoriser scores exactly zero here.
-
-**Two things were needed, and both were architecture rather than tuning.**
-
-`Accumulate.Agreement` — **rank a candidate by how many DISTINCT ORIGINS reached
-it**, strength only to break a tie. That is what a conjunctive question asks and
-`Sum` cannot say it: strength varies far more between routes than the count of
-origins does, so one strong single-origin route outranks two weak agreeing ones.
-Nothing new travels for it — a chain already begins at its origin. **Provably
-inert on single-origin questions**, which is what makes the lift attributable.
-
-`Refer.Narrowed` — **read back whichever index the graph itself ranked first, and
-ask that one.** The evidence selecting an index lives in the origin's tally FOR
-that index and never travels through it, because two routes arriving at a node
-fire it twice and fan out independently. Two broadcasts, no index supplied.
-
-**What is left is the world's own ambiguity, not the walk's.** Two scenes sharing
-both referring values are genuinely indistinguishable by a conjunction, and how
-often that happens goes as `scenes / values²`. Widen the alphabet and the score
-follows it closely.
+**Closed by `Accumulate.Agreement` and `Refer.Narrowed`, both of which document
+themselves.** What is left is the world's own ambiguity rather than the walk's:
+two scenes sharing both referring values are genuinely indistinguishable by a
+conjunction, and widening the alphabet moves the score with it.
 
 ### 1a. RANKING BELONGS TO THE QUESTION, NOT TO THE MACHINE — decide this
 
@@ -119,6 +107,11 @@ fusion does with scores that are not comparable.
 an index. Each type documents why. **Promoting the last two is a live decision
 and both look overdue**; `Agreement` cannot be promoted until ranking moves onto
 the question.
+
+**AND THE EXTERNAL WORLD SAYS SENDER.** On `Babi` it is the only arm that moves
+anything at all — the sole configuration clearing the majority-class baseline,
+where both ranking dials are inert on the same corpus to six decimal places. A
+world with no stake in this design agrees with the promotion.
 
 **Vector-symbolic binding** (Plate, Kanerva) stays parked: the similarity
 gradient named below, at the cost of opaque codes. Not needed yet.
@@ -157,6 +150,7 @@ act, no amount of scaling gets there.
 - [x] `Fabric` — the bus/ring/clusters the three worlds used to each own
 - [x] `Measurement` — the range checks the three worlds used to each own
 - [x] `Composed` — the world of step 1, built and characterised, not yet lifted
+- [x] `Babi` — twenty tasks somebody else wrote, with published baselines
 - [ ] `Surprise` — the local prediction error of step 2
 - [ ] `Chunk` — the minted node of step 3
 - [ ] `Drives` — the bounded internal variables of step 4
@@ -224,7 +218,7 @@ condition is a superstition. The commit named in git holds the numbers.
 | A deeper walk for prediction | Monotonically worse — without edge kinds, deeper reaches more and ranks worse | **Edge kinds**, and that refutation reproduced |
 | `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted, `Max` re-tried where its revival condition pointed and worse there too. **Both now DELETED** | Lift in the **cost**, which `Doubt` is the nearest thing to |
 | Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | A similarity gradient under the ranking |
-| `Window` span on snake | Null there, at every seed count tried | **Revived — never run on a senses graph, which is what it was built for** |
+| `Window` span | Null on snake at every seed count; on `Babi`, an ordered corpus where before-and-after IS the content, it scores WORSE and costs an order of magnitude more traffic | **Edge kinds** — a carried-forward edge is currently ranked against a simultaneous one as if they meant the same thing |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
 
 ---

@@ -1,0 +1,303 @@
+using OpenPlexus.Graph;
+using OpenPlexus.Worlds;
+using Xunit.Abstractions;
+
+namespace OpenPlexus.Tests;
+
+/// <summary>
+/// The first world in this project that somebody else designed.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>JOHN'S ASK, 2026-08-03: STOP COMPARING ONLY AGAINST OUR OWN NUMBERS.</b>
+/// Four worlds were built here by the same hands that built the mechanisms they
+/// measure, so a good result on one of them can only say the mechanism does what
+/// its author expected. The bAbI tasks were written by other people to isolate
+/// capabilities nobody here chose, and they come with published baselines.
+/// </para>
+/// <para>
+/// <b>The corpus is fetched, not vendored.</b> It is CC BY 3.0 and eleven
+/// megabytes; <c>corpora/fetch.sh</c> gets it and <see cref="Corpus"/> says so
+/// when it is not there.
+/// </para>
+/// </remarks>
+public sealed class BabiTests(ITestOutputHelper output)
+{
+    /// <summary>
+    /// Where the task files are, or a failure that says how to get them.
+    /// </summary>
+    /// <remarks>
+    /// <b>Fails rather than skipping, which is this suite's standing rule.</b> A
+    /// green run that quietly never asked the question is the failure every check
+    /// here exists to avoid — see <see cref="Tree"/>.
+    /// </remarks>
+    private static string Corpus
+    {
+        get
+        {
+            var corpus = Path.Combine(Tree.Repo(), "corpora", "tasks_1-20_v1-2", "en");
+
+            Assert.True(Directory.Exists(corpus),
+                $"the bAbI corpus is not at {corpus}. Fetch it with:\n"
+                + "    bash corpora/fetch.sh");
+
+            return corpus;
+        }
+    }
+
+    private static BabiSettings World(int task, bool stories = true) => new()
+    {
+        Task = task, Corpus = Corpus, Stories = stories,
+    };
+
+    /// <summary>
+    /// <b>Deep, because the tasks that suit this architecture are chains.</b>
+    /// <i>Basic induction</i> reaches an answer through two intermediates, so a
+    /// budget that only affords one hop would measure the corpus rather than the
+    /// walk.
+    /// </summary>
+    private static WalkSettings Dials => Fixture.Dials(stamina: 8.0);
+
+    // ---- what the corpus is, asserted rather than described -----------------
+
+    [Fact]
+    public void A_statement_is_its_words_and_a_question_carries_its_answer()
+    {
+        var read = Babi.Read(
+        [
+            "1 Mary moved to the bathroom.",
+            "2 John went to the hallway.",
+            "3 Where is Mary? \tbathroom\t1",
+        ], stories: false);
+
+        Assert.Equal(3, read.Count);
+
+        Assert.Null(read[0].Answer);
+        Assert.False(read[0].Asking);
+        // COMPARED AS SEQUENCES AND NOT AS ImmutableArray, which compares the
+        // underlying array by reference and passes for nothing.
+        Assert.Equal(
+            new[] { "mary", "moved", "to", "the", "bathroom" }.Select(Babi.Of),
+            read[0].Words.AsEnumerable());
+
+        Assert.True(read[2].Asking);
+        Assert.Equal("bathroom", read[2].Answer);
+        Assert.Equal([Babi.Of("bathroom")], read[2].Answers.AsEnumerable());
+
+        // THE SUPPORTING FACT IDS ARE DROPPED, and that is the whole ethic of
+        // this world. They are the strong supervision the corpus authors ask
+        // people to do without, and a route told which sentence to look at is
+        // not doing the task.
+        Assert.DoesNotContain(Babi.Of("1"), read[2].Words);
+    }
+
+    [Fact]
+    public void A_story_begins_wherever_the_ids_reset()
+    {
+        var read = Babi.Read(
+        [
+            "1 Lily is a frog.",
+            "2 Lily is green.",
+            "1 Lily is a rhino.",
+            "2 Lily is grey.",
+        ], stories: true);
+
+        Assert.Equal([0, 0, 1, 1], read.Select(line => line.Story));
+
+        // AND THE STORY CODE IS IN THE SENTENCE, which is what makes it an
+        // observed thing rather than an episode boundary. C4 forbids the second.
+        Assert.Contains(Babi.Telling(0), read[0].Words);
+        Assert.Contains(Babi.Telling(1), read[2].Words);
+        Assert.NotEqual(Babi.Telling(0), Babi.Telling(1));
+    }
+
+    [Fact]
+    public void Off_by_default_nothing_names_the_story()
+    {
+        var read = Babi.Read(["1 Lily is a frog."], stories: false);
+
+        Assert.DoesNotContain(read[0].Words, code => code.Modality == Babi.Story);
+    }
+
+    [Fact]
+    public void A_word_gets_the_same_code_in_every_process()
+    {
+        // string.GetHashCode IS RANDOMISED PER PROCESS, so a run built on it
+        // would not reproduce itself -- which is the property fork 12 protects.
+        // The literal is the answer, so a change to the hash fails here rather
+        // than silently renumbering every code the world has ever emitted.
+        Assert.Equal(Babi.Of("mary"), Babi.Of("Mary"));
+        Assert.NotEqual(Babi.Of("mary"), Babi.Of("john"));
+        Assert.Equal(2250482198492670294UL, Babi.Of("mary").Value);
+    }
+
+    [Fact]
+    public void A_compound_answer_parses_as_more_than_one_word()
+    {
+        var read = Babi.Read(["1 What is Mary carrying? \tmilk,football\t2 3"], stories: false);
+
+        Assert.Equal(2, read[0].Answers.Length);
+        Assert.Equal([Babi.Of("milk"), Babi.Of("football")], read[0].Answers.AsEnumerable());
+    }
+
+    // ---- what the corpus says about itself ---------------------------------
+
+    [Fact]
+    public void Every_one_of_the_twenty_tasks_is_there_and_asks_something()
+    {
+        foreach (var task in Enumerable.Range(1, 20))
+        {
+            var world = new Babi(World(task));
+
+            Assert.NotEmpty(world.Lines);
+            Assert.Contains(world.Lines, line => line.Asking);
+            Assert.NotEmpty(world.Alphabet);
+
+            // THE MAJORITY-CLASS BASELINE IS THE ONE THAT MATTERS, and it is
+            // well above uniform on every task -- which is why a score is
+            // reported against it and not against 1/alphabet.
+            Assert.True(world.Commonest >= world.Chance,
+                $"task {task}: commonest {world.Commonest} below chance {world.Chance}");
+
+            output.WriteLine(
+                $"task {task,2}: lines={world.Lines.Count,5} " +
+                $"asked={world.Lines.Count(line => line.Asking),4} " +
+                $"alphabet={world.Alphabet.Count,3} compound={world.Compound,4} " +
+                $"commonest={world.Commonest:F4} chance={world.Chance:F4}");
+        }
+    }
+
+    // ---- what the graph does with it ---------------------------------------
+
+    /// <summary>How much of a task file a measurement reads.</summary>
+    /// <remarks>
+    /// <b>Enough to put a few hundred questions behind every arm.</b> A first pass
+    /// at 300 sentences gave task 16 thirty questions, where a five-question
+    /// difference is two standard errors and reads exactly like a mechanism —
+    /// which is the trap this project has already fallen into once.
+    /// </remarks>
+    private const int Sentences = 800;
+
+    private const int Repeats = 5;
+
+    private static async Task<double> ScoreAsync(
+        int task, WalkSettings dials, int seed, int span = 0)
+    {
+        using var run = new BabiRun(World(task), dials, seed, span);
+        return (await run.RunAsync(Sentences).ConfigureAwait(false)).Accuracy;
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(16)]
+    public async Task Sender_pricing_is_the_one_arm_this_corpus_moves_under(int task)
+    {
+        // THE EXTERNAL EVIDENCE FOR A PROMOTION THE PLAN CALLS OVERDUE. Sender
+        // pricing was invented for the tag experiment and has only ever been
+        // measured on worlds built here; this is somebody else's corpus saying
+        // the same thing, which is the whole reason for reading one.
+        var arms = await Sweep.AcrossAsync(Repeats,
+            ("receiver", seed => ScoreAsync(task, Dials, seed)),
+            ("sender", seed => ScoreAsync(task, Dials with { Pricing = Pricing.Sender }, seed)));
+
+        output.WriteLine(Sweep.Table(arms));
+
+        var receiver = arms[0];
+        var sender = arms[1];
+
+        Assert.True(sender.Mean > receiver.Mean,
+            $"sender pricing did not lift task {task}: {sender} against {receiver}");
+
+        Assert.True(sender.Separation(receiver) > 3.0,
+            $"the lift on task {task} is not separated: {sender} against {receiver}");
+    }
+
+    [Fact]
+    public async Task Ranking_alone_does_not_move_this_corpus()
+    {
+        // THE COMPANION, AND WITHOUT IT THE TEST ABOVE ONLY SAYS "SOMETHING
+        // MOVED". Agreement and doubt are the two dials that touch the ranking and
+        // not the price. Agreement is inert here to six decimal places and doubt
+        // shifts the score by a single question in two hundred and sixty-six --
+        // against a third of the questions for sender. So the lift above is the
+        // PRICE changing where routes die, and not a different mind about what
+        // was found.
+        var arms = await Sweep.AcrossAsync(Repeats,
+            ("receiver", seed => ScoreAsync(1, Dials, seed)),
+            ("agreement", seed =>
+                ScoreAsync(1, Dials with { Accumulate = Accumulate.Agreement }, seed)),
+            ("doubt", seed => ScoreAsync(1, Dials with { Doubt = 8.0 }, seed)),
+            ("sender", seed => ScoreAsync(1, Dials with { Pricing = Pricing.Sender }, seed)));
+
+        output.WriteLine(Sweep.Table(arms));
+
+        var control = arms[0].Mean;
+
+        Assert.All(arms.Skip(1).Take(2), ranking => Assert.True(
+            Math.Abs(ranking.Mean - control) < 0.01,
+            $"a ranking-only dial moved this corpus: {ranking} against {arms[0]}"));
+
+        // AND THE PRICE DIAL IS AN ORDER OF MAGNITUDE PAST THEM, which is what
+        // makes the comparison mean anything rather than saying the harness
+        // cannot see a difference at all.
+        Assert.True(arms[3].Mean - control > 0.1,
+            $"the price dial did not separate from the ranking ones: {arms[3]}");
+    }
+
+    [Fact]
+    public async Task The_window_costs_an_order_of_magnitude_and_scores_worse()
+    {
+        // THE REVIVAL CONDITION SAID "NEVER RUN WHERE IT WORKED", AND THIS IS
+        // WHERE IT SHOULD HAVE WORKED. The window exists to give the graph
+        // temporal edges; it measured null on snake, where what matters is what is
+        // visible now. A corpus of sentences in the order somebody wrote them is
+        // the opposite of that, and it is worse here rather than null.
+        using var without = new BabiRun(World(1), Dials, seed: 1);
+        using var with = new BabiRun(World(1), Dials, seed: 1, span: 2);
+
+        var plain = await without.RunAsync(Sentences);
+        var carried = await with.RunAsync(Sentences);
+
+        output.WriteLine($"span=0 {plain}");
+        output.WriteLine($"span=2 {carried}");
+
+        Assert.True(carried.Accuracy < plain.Accuracy,
+            $"the window did not cost accuracy: {carried.Accuracy} against {plain.Accuracy}");
+
+        Assert.True(carried.Messages > plain.Messages * 5,
+            $"the window was not the traffic it was measured to be: " +
+            $"{carried.Messages} against {plain.Messages}");
+    }
+
+    [Fact]
+    public async Task A_closed_vocabulary_makes_a_graph_the_walk_cannot_compose_in()
+    {
+        // THE STRUCTURAL FINDING, AND IT IS WHY THE SCORES HERE ARE WHAT THEY
+        // ARE. A bAbI task uses a few dozen words, so nearly every word co-occurs
+        // with nearly every other and the graph is close to complete. A route then
+        // spends its whole budget on breadth: at stamina 8 almost every chain that
+        // comes back is one hop, and paying thirty times the messages for stamina
+        // 16 does not change that -- it buys more of the same first hop.
+        //
+        // This is the same shape as the refuted `StepCost.Best` row, which was
+        // measured on a 12-clique. The difference is that nobody chose this
+        // clique: it is what a small closed vocabulary IS.
+        using var run = new BabiRun(World(15), Dials, seed: 1);
+        var result = await run.RunAsync(Sentences);
+
+        output.WriteLine(result.ToString());
+
+        var arrivals = result.ChainLengths.Values.Sum();
+        var direct = result.ChainLengths.GetValueOrDefault(2);
+
+        Assert.True(direct > arrivals * 0.9,
+            $"the walk composed more than expected here, which is worth knowing: " +
+            $"{direct} of {arrivals} arrivals were one hop");
+
+        // AND THE DENSITY THAT CAUSES IT, so a future run on a corpus with a real
+        // vocabulary can be told apart from this one at a glance.
+        Assert.True(result.Edges > result.Nodes * 8,
+            $"the graph is not the near-clique this was measuring: " +
+            $"{result.Edges} edges over {result.Nodes} nodes");
+    }
+}

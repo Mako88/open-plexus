@@ -19,3 +19,8 @@ artifacts/
 __pycache__/
 *.pyc
 out/
+
+# Fetched corpora. The data is somebody else's and large; the script that
+# fetches it is ours and small, so that one file stays.
+corpora/*
+!corpora/fetch.sh

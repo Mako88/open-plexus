@@ -179,21 +179,6 @@ public sealed class ThoughtTests
         Assert.Equal(2, arrival.Routes);
     }
 
-    [Fact]
-    public void Max_keeps_only_the_strongest_route()
-    {
-        // The companion to the test above. Both arms run, so "sum accumulates"
-        // is a difference from something rather than a description of the only
-        // behaviour there is.
-        var thought = Started(accumulate: Accumulate.Max);
-
-        thought.Receive(Reaching(C(9), 0.2, C(1)));
-        thought.Receive(Reaching(C(9), 0.3, C(2)));
-
-        var arrival = thought.Best(1).Single();
-        Assert.Equal(0.3, arrival.Score, precision: 10);
-        Assert.Equal(2, arrival.Routes);
-    }
 
     [Fact]
     public void The_explanation_is_the_strongest_chain_and_not_the_last_one()

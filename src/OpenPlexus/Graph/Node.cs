@@ -198,6 +198,10 @@ public sealed class Node
         var held = message.Held;
         var arriving = 1.0;
 
+        // What the edge is WORTH, as against what it costs. The two are the
+        // same number until Doubt says otherwise.
+        var believed = 1.0;
+
         if (!isOrigin)
         {
             // THE RECEIVER WEIGHS THE EDGE IT ARRIVED ON, and chooses WHICH
@@ -217,6 +221,20 @@ public sealed class Node
             // the one failure that takes the process with it.
             arriving = Math.Min(arriving, 1.0);
 
+            // SHRINKAGE APPLIES TO THE SCORE AND NOT TO THE PRICE, and measured,
+            // that separation is the whole of whether it works. One weight was
+            // doing both jobs -- it ranks a partner AND it says what the hop
+            // costs -- so pulling a thin edge's ratio down also made every hop
+            // dearer, the walk starved before it could compose, and the senses
+            // world fell from most questions right to almost none.
+            //
+            // The price below still comes from the raw ratio, so a hop still
+            // costs at least one and the walk stays bounded by construction.
+            // What moves is only how much a thin partner is BELIEVED.
+            believed = _settings.Doubt <= 0.0
+                ? arriving
+                : Math.Min(message.Together / (by + _settings.Doubt), 1.0);
+
             // EVERY HOP COSTS AT LEAST 1, because a weight cannot exceed 1.0.
             // That is what bounds the walk.
             held -= 1.0 / arriving;
@@ -226,15 +244,9 @@ public sealed class Node
             if (held <= 0.0) return Starved(message, message.Carried);
         }
 
-        var travelled = message.Carried * arriving;
+        var travelled = message.Carried * believed;
 
-        var carried = !isOrigin && _settings.Value == ArrivalValue.Lift
-
-            // Rare endpoints are worth more. PPMI's global occasion total is
-            // the same for every candidate, so it cancels in a ranking and
-            // never has to be known -- which is what makes this C1-legal.
-            ? travelled / Math.Max(seen, 1.0)
-            : travelled;
+        var carried = travelled;
 
         var reached = isOrigin
             ? null

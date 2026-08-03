@@ -43,7 +43,23 @@ it and since lifted; and composition, where the answer was never observed at all
 per-scene index is what lifts it.
 
 **The graphs are tiny.** Nothing here has been run at a size where its claims
-could break. Hold them loosely.
+could break. Hold them loosely — and the size dial that exists has already found
+one thing that was wrong.
+
+### ONE WEIGHT DOING TWO JOBS IS THIS DESIGN'S RECURRING FAULT
+
+**It has bitten twice.** An edge weight both RANKS a partner and PRICES the hop
+to it, and each attempt to improve one silently wrecked the other.
+`Pricing.Sender` moves the ranking while meaning to move the price. `Doubt` —
+shrinkage, so a partner seen once cannot claim the strongest edge in the graph on
+one accident — destroys the senses world applied to both, and repairs a real
+defect for free applied to the score alone.
+
+**So the general move is: find the number serving two masters and split it.**
+`Accumulate` is the next candidate. **And the standing rule — John, 2026-08-03 — is
+that a dial wanting different values in different worlds is the same fault**:
+prefer splitting it, or fusing the arms, over sweeping it. `DialTests` records
+which channel each dial may move and fails when one moves the other.
 
 ---
 
@@ -78,24 +94,18 @@ follows it closely.
 
 ### 1a. RANKING BELONGS TO THE QUESTION, NOT TO THE MACHINE — decide this
 
-**Agreement was run on the other two worlds and it is not universally right.**
-Inert on senses, where the several codes of one concept all reach the same places
-and there is nothing to disagree about. **Harmful on binding**, badly at first
-and still harmful after being told which origins are one attribute said several
-ways — because a deep walk reaches the echo *through* the index, so both
-candidates end up agreed by both groups and a weakly-reached-by-both outranks a
-strongly-reached-by-one.
+**Agreement is not universally right.** Inert on senses, harmful on binding even
+after being told which origins are one attribute said several ways — a deep walk
+reaches the echo *through* the index, so both candidates end up agreed by both
+groups and a weakly-reached-by-both outranks a strongly-reached-by-one.
 
-**That is not a dial wanting a sweep. Those are different KINDS of question.**
-Composition asks a conjunction: the thing meant is the one every origin reaches.
-Binding points with an index and supplies a colour for context: the origins are
-not equals and counting them says the wrong thing. **The asker knows which it is
-asking, and today cannot say** — `Accumulate` is set once on `WalkSettings` for
-every question a machine will ever put.
-
-**So move ranking onto the question**, beside the grouping that already travels
-with it. That is not another knob to tune; it is information the caller already
-holds. Until then `Agreement` stays off by default and suits conjunctions only.
+**Those are different KINDS of question.** Composition asks a conjunction: the
+thing meant is the one every origin reaches. Binding points with an index and
+supplies a colour for context, where the origins are not equals. **The asker
+knows which it is asking and today cannot say.** So move ranking onto the
+question, beside the grouping that already travels with it — or better, fuse the
+rankings by position rather than choosing between them, which is what rank
+fusion does with scores that are not comparable.
 
 - **Merging routes AT A NODE is the version `Narrowed` could not do.** Reading
   the index back costs a round trip and puts the referent in the machine's
@@ -110,8 +120,8 @@ an index. Each type documents why. **Promoting the last two is a live decision
 and both look overdue**; `Agreement` cannot be promoted until ranking moves onto
 the question.
 
-**Vector-symbolic binding** (Plate, Kanerva) stays parked: it would give the
-similarity gradient named below, at the cost of opaque codes. Not needed yet.
+**Vector-symbolic binding** (Plate, Kanerva) stays parked: the similarity
+gradient named below, at the cost of opaque codes. Not needed yet.
 
 ### 2. Predictive coding — only surprise propagates
 
@@ -156,22 +166,17 @@ act, no amount of scaling gets there.
 ## LATER — nothing is blocked on these
 
 - **Fork 1 is smaller than it looks.** A count that only increments is a
-  **G-Counter, a CRDT** — it converges under arbitrary reordering and loss with
-  no coordination. The counts need no protocol; only the join does.
-- **The one-way window on a senses graph.** Built, null on snake, **never run
-  where it was measured working.**
-- **Combinatorial codes** — several coarse hashes per item, so similarity becomes
-  overlap.
-- **Where the remaining message cost goes.** The curve is built and says node
-  count is not the problem — density is, and on a fixed alphabet inverse cost
-  already brakes it. What is left is the absolute constant, which is what step 2
-  attacks. **Nothing else should be optimised until step 2 has been tried.**
+  **G-Counter, a CRDT** — it converges under reordering and loss with no
+  coordination. The counts need no protocol; only the join does.
+- **The one-way window.** Built, null on snake, **never run where it worked.**
+- **The absolute message cost is what step 2 attacks.** Nothing else should be
+  optimised until it has been tried.
 - **Cold storage, once a row can be bounded at all.** A count that only
   increments is a CRDT, and **paging a node out to disk keeps that** — the count
   does not decrease, it stops being resident. **Decay does not**, so eviction
   must key on "not touched since", never on eroding the count itself.
-- **The knob pass, deliberately last.** A dial swept before the structural work
-  measures a system about to change underneath it.
+- **The knob pass, last.** A dial swept before the structural work measures a
+  system about to change underneath it.
 
 ### The wire, when the remote half lands — John, 2026-08-03
 
@@ -183,9 +188,8 @@ Only the local half of `HybridBus` exists, so none of this is built.
   **Not a pure barrier**: flush on idle *or* size *or* time, or a busy machine
   never sends.
 - **Bits, not JSON.** Addresses and modalities intern to small ints, a code is a
-  varint. Packed, a `Message` is a few dozen bytes plus nine per hop of `Chain`,
-  and **a sixth of the fixed part is the `Guid` broadcast id** — shorten it per
-  connection. The three `double`s are almost certainly `float`s.
+  varint, the `double`s are almost certainly `float`s, and **a sixth of a packed
+  message is the `Guid` broadcast id** — shorten it per connection.
 - **`Chain` is what costs** — cycle check and explanation in one field, free
   locally and not on a wire. **Split them:** a fixed-size approximate-membership
   filter for the hop, full chain rebuilt at the origin. A false positive is a
@@ -218,7 +222,7 @@ condition is a superstition. The commit named in git holds the numbers.
 | Clusters by time of creation | Two machines compute different owners for one code | Placement agreement without a coordinator |
 | `Adaptive` reflection on `Hunger` | Inverted: it wrote most where it helped least | A signal that discriminates; `Thwarted` does |
 | A deeper walk for prediction | Monotonically worse — without edge kinds, deeper reaches more and ranks worse | **Edge kinds**, and that refutation reproduced |
-| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, and both explanations refuted too. **`Max` re-tried on the composition world, where its revival condition pointed, and it is worse** | Lift in the **cost**. `Pricing.Sender` is the nearest thing built |
+| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted, `Max` re-tried where its revival condition pointed and worse there too. **Both now DELETED** | Lift in the **cost**, which `Doubt` is the nearest thing to |
 | Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | A similarity gradient under the ranking |
 | `Window` span on snake | Null there, at every seed count tried | **Revived — never run on a senses graph, which is what it was built for** |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
@@ -249,10 +253,8 @@ process** — kept, because a real network loses reports.
 - **A small sample can look like a mechanism.** One seed with a collapsing echo
   read as a discovery and was three questions.
 - **A MEAN OVER A POPULATION THE PROBLEM CREATED CANNOT SEE THE PROBLEM.** Mean
-  fan-out stayed flat across every run length on the world whose rows were
-  growing without bound, because the growth also mints a great many tiny nodes
-  that hold the average down. **`Plumbing.Widest` is what to read**, since cost
-  is set by the widest row and never by the average one.
+  fan-out stayed flat on the world whose rows grew without bound, because the
+  growth mints tiny nodes that hold the average down. **Read `Widest`.**
 - **Copies drift where nothing fails.** Three worlds each grew their own settle
   loop, complaint list and vote tally, and a difference between them would move a
   headline without failing a test. `DuplicationTests` is the budget now.

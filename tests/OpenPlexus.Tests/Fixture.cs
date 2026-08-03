@@ -19,10 +19,10 @@ namespace OpenPlexus.Tests;
 /// </para>
 /// <para>
 /// <b>What varies is a parameter; what has never varied is a constant here.</b>
-/// <see cref="ArrivalValue.Strength"/> and <see cref="Accumulate.Sum"/> are the
-/// defaults every measurement in the project was taken under, so an arm that
-/// wants otherwise says <c>with { Value = ... }</c> at the point of use and is
-/// visibly the exception.
+/// <see cref="Accumulate.Sum"/> is what every measurement in the project was
+/// taken under, so an arm that wants otherwise says
+/// <c>with { Accumulate = ... }</c> at the point of use and is visibly the
+/// exception.
 /// </para>
 /// </remarks>
 public static class Fixture
@@ -42,7 +42,6 @@ public static class Fixture
     {
         Stamina = stamina,
         Foresight = foresight,
-        Value = ArrivalValue.Strength,
         Accumulate = Accumulate.Sum,
         Horizon = horizon,
     };
@@ -64,11 +63,17 @@ public static class Fixture
 
     /// <summary>The senses world, clean unless a test asks for noise.</summary>
     public static SensesSettings Senses(
-        int concepts = 8, int codes = 3, double noise = 0.0) => new()
+        int concepts = 8,
+        int codes = 3,
+        double noise = 0.0,
+        int clutter = 0,
+        int pool = 0) => new()
     {
         Concepts = concepts,
         CodesPerSense = codes,
         Noise = noise,
+        Clutter = clutter,
+        Pool = pool,
     };
 
     /// <summary>The binding world.</summary>

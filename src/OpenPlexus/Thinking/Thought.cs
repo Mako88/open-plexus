@@ -342,9 +342,7 @@ public sealed class Thought
             // Many weak agreeing routes should outrank one strong route, which
             // is the claim `Sum` makes and `Max` does not — 0.1234 against
             // 0.0834 on the typed walk.
-            Score = _accumulate == Accumulate.Max
-                ? Math.Max(standing.Score, arrival.Score)
-                : standing.Score + arrival.Score,
+            Score = standing.Score + arrival.Score,
 
             Chain = stronger ? arrival.Chain : standing.Chain,
             Best = stronger ? arrival.Best : standing.Best,

@@ -2,20 +2,6 @@ using OpenPlexus.Thinking;
 
 namespace OpenPlexus.Graph;
 
-/// <summary>How an arrival is valued, which is a different question from how a route is funded.</summary>
-public enum ArrivalValue
-{
-    /// <summary>Accumulated path strength. The best answer is the
-    /// best-supported one, and can only be the expected one.</summary>
-    Strength,
-
-    /// <summary>Path strength divided by how prevalent the endpoint is alone.
-    /// Confident <i>and</i> landing somewhere rare scores high. C1-legal where
-    /// PPMI is not: the global occasion total is identical for every candidate
-    /// so it cancels in a ranking, leaving one node's own marginal.</summary>
-    Lift,
-}
-
 /// <summary>
 /// Which end of an edge weighs it — <b>and therefore what a hop costs.</b>
 /// </summary>
@@ -60,11 +46,14 @@ public enum Pricing
 /// <summary>How a candidate accumulates evidence from the routes reaching it.</summary>
 public enum Accumulate
 {
-    /// <summary>The single strongest route.</summary>
-    Max,
-
-    /// <summary>Every route. Many weak agreeing routes outrank one strong
-    /// route — 0.1234 against max's 0.0834 on the typed walk.</summary>
+    /// <summary>
+    /// Every route. <b>Many weak agreeing routes outrank one strong route.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b><c>Max</c> — the single strongest route — is gone.</b> It was swept and
+    /// inert on the typed walk, and re-run on the composition world where its
+    /// revival condition pointed it lost there too.
+    /// </remarks>
     Sum,
 
     /// <summary>
@@ -165,6 +154,13 @@ public sealed record Reflection
 /// <item><b>`Weighing`</b> — the sender arm read the partner's marginal, which
 /// is the C1 violation the receiver arm exists to remove. `IMarginals` and
 /// `LocalMarginals` went with it.</item>
+/// <item><b>`ArrivalValue` and `Value`</b> — `Lift` divided an arrival by the
+/// endpoint's own prevalence. Swept, inert, and both explanations for why were
+/// refuted too, so the enum had one member left and the dial chose nothing.
+/// </item>
+/// <item><b>`Accumulate.Max`</b> — the single strongest route. Inert on the
+/// typed walk and worse on the composition world, which is where its revival
+/// condition sent it.</item>
 /// </list>
 /// </remarks>
 public sealed record WalkSettings
@@ -212,8 +208,38 @@ public sealed record WalkSettings
     /// stands.</remarks>
     public Pricing Pricing { get; init; } = Pricing.Receiver;
 
-    /// <inheritdoc cref="ArrivalValue"/>
-    public required ArrivalValue Value { get; init; }
+    /// <summary>
+    /// How much evidence a partner must show before its edge is believed —
+    /// <c>together / (seen + doubt)</c>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>MEASURED: THE WEIGHTING REFUSES A BACKGROUND BEAUTIFULLY AND IS FOOLED
+    /// BY A COINCIDENCE.</b> Clutter that is present at every moment costs
+    /// messages and does not move the score at all, which is the anti-hub
+    /// property working exactly as designed. Clutter drawn from a large pool —
+    /// each code rare — takes the senses world down hard, and gets worse the
+    /// larger the pool is.
+    /// </para>
+    /// <para>
+    /// <b>Because <c>together / seen</c> is a maximum-likelihood estimate with no
+    /// confidence in it.</b> A code seen ONCE, that happened to co-occur that
+    /// once, scores a weight of 1.0 — the strongest edge the system can hold, on
+    /// a single accident. And rare accidental co-occurrences are precisely what
+    /// a bigger world produces more of, so the failure grows with scale.
+    /// </para>
+    /// <para>
+    /// <b>The fix is shrinkage, and it is not new anywhere but here.</b> Adding a
+    /// constant to the denominator pulls a thinly-evidenced ratio toward zero and
+    /// leaves a well-evidenced one alone — Laplace's rule, the Dirichlet prior,
+    /// the smoothing in IDF and the saturation in BM25 are all this. A partner
+    /// seen once cannot then outscore one seen a hundred times.
+    /// </para>
+    /// <para>
+    /// <b>Zero is off, and off is every measurement taken before this existed.</b>
+    /// </para>
+    /// </remarks>
+    public double Doubt { get; init; }
 
     /// <inheritdoc cref="Accumulate"/>
     public required Accumulate Accumulate { get; init; }

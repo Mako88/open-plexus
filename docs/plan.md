@@ -1,10 +1,12 @@
 # Where this is going
 
-**This is the only doc, and it is capped.** `DocsTests` fails the build if it
-grows past the cap. **To add something, retire something.** The previous
-`architecture.md` and `design.md` reached 1,646 and 756 lines and stopped being
-loaded, which is the failure this replaces — a doc nobody reads is worse than no
-doc, because it still gets cited.
+**This is the only doc, and it is capped at 3,600 words.** `DocsTests` fails the
+build if it grows past that. **To add something, retire something.** The previous
+`architecture.md` and `design.md` reached 15,260 and 6,602 words and stopped
+being loaded, which is the failure this replaces — a doc nobody reads is worse
+than no doc, because it still gets cited. *(The cap was lines until it turned out
+a markdown table row is one line however long it is, so compacting bought
+nothing. Words track the thing actually being spent.)*
 
 **What every piece does lives in the XML comments next to the code**, and the
 compiler enforces that they refer to things that exist

@@ -29,16 +29,24 @@ namespace OpenPlexus.Tests;
 public sealed class DocsTests
 {
     /// <summary>
-    /// The budget, in lines.
+    /// The budget, in <b>words</b>.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>The number is arbitrary; having one is not.</b> It sits a little above
     /// the current length, so ordinary edits pass and a doc that has started
     /// growing without bound fails. <b>To add something, retire something</b> —
     /// which is the whole mechanism, because nothing else has ever made anyone
     /// delete a stale paragraph.
+    /// </para>
+    /// <para>
+    /// <b>IT WAS LINES, AND LINES WERE THE WRONG UNIT.</b> The thing being
+    /// budgeted is context, and a markdown table row is one line however long it
+    /// is — so an hour of compacting long table cells moved the count by two and
+    /// the doc was no cheaper to load. Words track what is actually being spent.
+    /// </para>
     /// </remarks>
-    private const int Budget = 320;
+    private const int Budget = 3_600;
 
     private static string Repo()
     {
@@ -63,13 +71,16 @@ public sealed class DocsTests
     {
         var oversized = Directory
             .EnumerateFiles(Docs(), "*.md")
-            .Select(path => (Name: Path.GetFileName(path), Lines: File.ReadAllLines(path).Length))
-            .Where(doc => doc.Lines > Budget)
+            .Select(path => (
+                Name: Path.GetFileName(path),
+                Words: File.ReadAllText(path)
+                    .Split([' ', '\n', '\r', '\t'], StringSplitOptions.RemoveEmptyEntries).Length))
+            .Where(doc => doc.Words > Budget)
             .ToList();
 
         Assert.True(oversized.Count == 0,
-            "over the budget of " + Budget + " lines: " +
-            string.Join(", ", oversized.Select(doc => $"{doc.Name} at {doc.Lines}")) +
+            "over the budget of " + Budget + " words: " +
+            string.Join(", ", oversized.Select(doc => $"{doc.Name} at {doc.Words}")) +
             ". Retire something rather than raising this.");
     }
 

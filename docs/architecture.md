@@ -619,9 +619,38 @@ and so reached nothing, is genuinely starved. Fixing that moved adaptive@8 from
 arms. `Starved` and `Hunger` stay, reported in `SensesResult`, because knowing
 this quantity is flat is what stops the same attempt being made again blind.
 
+### John's correction: weight the death by what the route was still worth
+
+**MEASURED, 8 seeds, and it separates — but not enough.** His point: something
+real happens at low stamina, so the condition exists and the proxy was wrong.
+Carried strength decays multiplicatively, so a route cut off after one hop dies
+**strong** and one that petered out over four dies **weak** — same event,
+opposite meanings, and a count throws the difference away. `Thought.Thwarted` is
+the share of *died strength* the budget killed.
+
+| arm | mean | stderr | seeds |
+|---|---|---|---|
+| thwarted @ 4 | 0.8761 | 0.0155 | 8 |
+| thwarted @ 8 | 0.7364 | 0.0223 | 8 |
+| hunger @ 4 | 0.3802 | 0.0138 | 8 |
+| hunger @ 8 | 0.4887 | 0.0155 | 8 |
+
+**HUNGER WAS NOT FLAT — IT WAS INVERTED**, and that is a sharper finding than
+"it does not discriminate". It is *higher* at the budget where compression
+hurts, so the adaptive arm wrote MORE in exactly the regime where writing costs
+accuracy. It was anti-correlated with what it needed to track.
+
+**Thwarted goes the right way at 5.1 standard errors.** The correction is
+validated as a direction.
+
+**And it is still not enough to gate the mechanism.** A 1.19× swing (0.8761 to
+0.7364) is being asked to control an effect that runs 0.18 to 0.83. A linear
+scaling cannot switch compression off; sharpening it takes an exponent, which is
+another constant nobody set. **Kept and reported, not wired to anything.**
+
 **What would discriminate is visible in the data and is not a route-level
 quantity.** Unanswered questions go 250 → 31 of 312 between the two budgets,
-an eightfold difference, while hunger barely moves. **Whether the walk reached
+an eightfold difference, against thwarted's 1.19× and hunger's inversion. **Whether the walk reached
 what it was narrowing to** is the thing that differs — and that is known at the
 machine, not at the node. That is the next candidate, and it is open.
 
@@ -694,7 +723,7 @@ by status rather than by scrolling.
 
 | | |
 |---|---|
-| **23** | **Can compression regulate itself? Not on starvation.** Measured twice; hunger is close to scale-invariant because inverse cost exists to exhaust the budget. `Adaptive` deleted. **Next candidate: whether the walk reached what it was narrowing to** — an eightfold difference where hunger showed none |
+| **23** | **Can compression regulate itself? Not yet.** Counting budget deaths is INVERTED (0.3802 at stamina 4, 0.4887 at 8). John's correction — weight each death by the strength the route still carried — goes the right way at 5.1 sigma but swings only 1.19x against an effect that runs 0.18 to 0.83. **Next candidate: whether the walk reached what it was narrowing to**, an eightfold difference |
 | **22** | **A few thoughts never settle.** 5–7 of 39 questions on a senses run, and waiting twenty times longer barely moves it. `Balanced()` still passes, so the books agree with themselves while claiming routes the bus has already finished — an over-count of splits or an under-count of deaths. Every affected question reads as "nothing reached", which is **indistinguishable from a real silence in a score**, so every silent count in this project is an upper bound until this is closed. Found by the run report on its first execution |
 | **1** | The distributed rendezvous — not needed until a second machine exists |
 | **1b** | What manufactures change for a static world — John's heartbeat is the only candidate |

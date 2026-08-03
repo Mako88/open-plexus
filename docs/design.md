@@ -349,11 +349,19 @@ does not test the hard part**, which is fork 1.
   - **`Best(n)`** — readable at any time. Ties break on the shorter chain.
   - **`BestAmong(codes, n)`** — **arrival narrows**. Not `Best` then filter: the
     top *n* overall can contain none of these codes.
-  - **`Starved` / `Hunger`** — how many deaths were routes that died broke, and
-    that as a share of all deaths. **Nought means the graph ran out before the
-    budget did.** This is what makes compression self-regulating, and because
-    compression shortens routes, a graph that starts starving stops as it
-    compresses — a negative feedback loop with a fixed point.
+  - **`Starved` / `Hunger`** — how many deaths were routes that could not pay
+    for the hop they were on, and that as a share of all deaths. **Measured, and
+    it is INVERTED** — higher at the budget where compression hurts. Reported so
+    nobody tries it again blind. Fork 23.
+  - **`Thwarted`** — the share of *died strength* the budget killed, rather than
+    the share of deaths. **John's correction, and it goes the right way at 5.1
+    standard errors.** Strength decays multiplicatively, so a route cut off after
+    one hop dies strong and one that petered out over four dies weak — same
+    event, opposite meanings, and a count throws that away.
+
+    **Still not wired to anything.** It swings 1.19× against an effect that runs
+    0.18 to 0.83, so a linear scaling cannot gate compression and sharpening it
+    would take an exponent nobody set.
   - **`Balanced()`** — **not a tautology.** The live count comes from splits and
     deaths; the in-flight counts come from the routing named in each report. Two
     independent quantities agreeing is a real check, and it runs on every real

@@ -66,8 +66,33 @@ public sealed record Arrival
 /// is consulted, nothing is shared, and no node learns anything about another.
 /// </para>
 /// </remarks>
+/// <param name="Thwarted">
+/// The strength routes killed BY THE BUDGET still carried when they died.
+/// </param>
+/// <param name="Ended">
+/// The strength carried by every route that died here, whatever killed it.
+/// </param>
+/// <remarks>
+/// <b>JOHN'S CORRECTION, 2026-08-02, AND IT IS THE ONE THAT MATTERS.</b> Counting
+/// budget deaths does not discriminate, because inverse cost exists to exhaust
+/// the budget and running out is how nearly every route ends — see fork 23. What
+/// differs is HOW MUCH PROMISE A ROUTE STILL HELD when the money ran out.
+/// <para>
+/// Carried strength decays multiplicatively with every hop, so a route that dies
+/// broke after one hop dies <b>strong</b> — it was on a good path and got cut
+/// off — while one that dies broke after four dies <b>weak</b>, and the budget
+/// merely finished what decay had already done. <b>Same event, opposite
+/// meanings, and a count throws the difference away.</b>
+/// </para>
+/// </remarks>
 public readonly record struct Accounting(
-    BroadcastId Broadcast, int Splits, int Deaths, int Halted = 0, int Starved = 0);
+    BroadcastId Broadcast,
+    int Splits,
+    int Deaths,
+    int Halted = 0,
+    int Starved = 0,
+    double Thwarted = 0.0,
+    double Ended = 0.0);
 
 /// <summary>
 /// What a node hands back when it fires.

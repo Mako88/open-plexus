@@ -90,6 +90,12 @@ public sealed record SensesResult
     /// </remarks>
     public required double Hunger { get; init; }
 
+    /// <summary>
+    /// The mean share of DIED STRENGTH that the budget killed. <b>Fork 23's
+    /// second candidate, and John's correction.</b>
+    /// </summary>
+    public required double Thwarted { get; init; }
+
     /// <summary>The share of questions answered correctly.</summary>
     public double Accuracy => Asked == 0 ? 0.0 : Right / (double)Asked;
 
@@ -153,7 +159,7 @@ public sealed record SensesResult
             $"nodes={Nodes} edges={Edges} spread=[{string.Join(",", Spread)}] | " +
             $"chains={{{lengths}}} deepest={Deepest} | " +
             $"msgs={Messages} halted={Halted} unbalanced={Unbalanced} unsettled={Unsettled} " +
-            $"hunger={Hunger:F2}";
+            $"hunger={Hunger:F2} thwarted={Thwarted:F2}";
 
         return Complaints.Count == 0
             ? line
@@ -246,7 +252,7 @@ public sealed class SensesRun : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(every);
 
         int asked = 0, right = 0, silent = 0, unbalanced = 0, unsettled = 0;
-        var hunger = 0.0;
+        double hunger = 0.0, thwarted = 0.0;
         long halted = 0;
 
         var reflected = 0;
@@ -270,12 +276,13 @@ public sealed class SensesRun : IDisposable
             if (moment % every != 0 || moment == 0) continue;
 
             var concept = moment % _world.Concepts;
-            var (answer, stopped, balanced, settled, hungry, everything) =
+            var (answer, stopped, balanced, settled, hungry, cutOff, everything) =
                 await AskingAsync(concept, ct).ConfigureAwait(false);
 
             asked++;
             halted += stopped;
             hunger += hungry;
+            thwarted += cutOff;
             if (!balanced) unbalanced++;
             if (!settled) unsettled++;
 
@@ -309,6 +316,7 @@ public sealed class SensesRun : IDisposable
             Unbalanced = unbalanced,
             Unsettled = unsettled,
             Hunger = asked == 0 ? 0.0 : hunger / asked,
+            Thwarted = asked == 0 ? 0.0 : thwarted / asked,
         };
     }
 
@@ -329,6 +337,7 @@ public sealed class SensesRun : IDisposable
         bool Balanced,
         bool Settled,
         double Hunger,
+        double Thwarted,
         IReadOnlyList<Arrival> Reached);
 
     /// <summary>The same question, with the plumbing left attached.</summary>
@@ -347,6 +356,7 @@ public sealed class SensesRun : IDisposable
             thought.Balanced(),
             settled,
             thought.Hunger,
+            thought.Thwarted,
             thought.Best(int.MaxValue));
 
         _senses.Forget(thought.Id);

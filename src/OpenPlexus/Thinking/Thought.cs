@@ -36,6 +36,7 @@ public sealed class Thought
     /// asserted rather than trusted.
     /// </summary>
     private int _live, _splits, _deaths, _halted, _starved;
+    private double _thwarted, _ended;
 
     /// <summary>
     /// How many of this thought's routes are in flight toward each cluster.
@@ -145,6 +146,26 @@ public sealed class Thought
     public double Hunger
     {
         get { lock (_gate) return _deaths == 0 ? 0.0 : _starved / (double)_deaths; }
+    }
+
+    /// <summary>
+    /// The share of the strength that died which was killed BY THE BUDGET.
+    /// </summary>
+    /// <remarks>
+    /// <b>JOHN'S CORRECTION, AND THE REASON <see cref="Hunger"/> FAILED.</b>
+    /// Counting budget deaths says nothing, because inverse cost exists to
+    /// exhaust the budget and running out is how nearly every route ends.
+    /// Weighting each death by what the route was still worth does say
+    /// something: strength decays multiplicatively, so a route cut off after one
+    /// hop dies STRONG and one that petered out over four dies WEAK.
+    /// <para>
+    /// <b>High means the walk was cut off while it was still going somewhere</b>,
+    /// which is when a shortcut is worth minting.
+    /// </para>
+    /// </remarks>
+    public double Thwarted
+    {
+        get { lock (_gate) return _ended <= 0.0 ? 0.0 : _thwarted / _ended; }
     }
 
     /// <summary>How many distinct endpoints have been reached.</summary>
@@ -282,6 +303,8 @@ public sealed class Thought
             _deaths += accounting.Deaths;
             _halted += accounting.Halted;
             _starved += accounting.Starved;
+            _thwarted += accounting.Thwarted;
+            _ended += accounting.Ended;
             _live += accounting.Splits - accounting.Deaths;
         }
     }

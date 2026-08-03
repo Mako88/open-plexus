@@ -200,7 +200,7 @@ public sealed class Node
             // together(sender, me) in the message; this divides by its own
             // marginal. Neither node reads the other's data.
             arriving = seen <= 0.0 ? 0.0 : message.Together / seen;
-            if (arriving <= 0.0) return Died(message);
+            if (arriving <= 0.0) return Died(message, message.Carried);
 
             // EVERY HOP COSTS AT LEAST 1, because a weight cannot exceed 1.0.
             // That is what bounds the walk.
@@ -208,7 +208,7 @@ public sealed class Node
 
             // COULD NOT AFFORD THE HOP IT WAS ALREADY TAKING. Starvation, not
             // exhaustion of the graph -- see Accounting.Starved.
-            if (held <= 0.0) return Starved(message);
+            if (held <= 0.0) return Starved(message, message.Carried);
         }
 
         var travelled = message.Carried * arriving;
@@ -234,7 +234,7 @@ public sealed class Node
 
         // A SENDER CAN STILL PRUNE EXACTLY ONCE, needing nothing from anyone:
         // no hop costs less than 1, so a budget of 1 or less affords nothing.
-        if (held <= 1.0) return Spent(message, reached);
+        if (held <= 1.0) return Spent(message, reached, carried);
 
         // THE HORIZON, a backstop that has not fired since the cost became
         // inverse -- see WalkSettings.Horizon.
@@ -244,7 +244,8 @@ public sealed class Node
             {
                 Outgoing = [],
                 Reached = reached,
-                Accounting = new Accounting(message.Broadcast, 0, Deaths: 1, Halted: 1),
+                Accounting = new Accounting(
+                    message.Broadcast, 0, Deaths: 1, Halted: 1, Ended: carried),
             };
         }
 
@@ -277,7 +278,12 @@ public sealed class Node
             Accounting = new Accounting(
                 message.Broadcast,
                 Splits: children > 0 ? children - 1 : 0,
-                Deaths: children == 0 ? 1 : 0),
+                Deaths: children == 0 ? 1 : 0,
+
+                // NOT THWARTED: it went everywhere there was to go. Its strength
+                // is still booked, because the ratio needs a denominator that
+                // includes the healthy endings or it is 1.0 by construction.
+                Ended: children == 0 ? carried : 0.0),
         };
     }
 
@@ -293,32 +299,42 @@ public sealed class Node
     /// adaptive weight was the fixed one wearing a disguise: 0.7788 against
     /// off's 0.8333 where it should have written nothing at all.
     /// </remarks>
-    private static Fired Spent(Message message, Arrival? reached) => new()
+    private static Fired Spent(Message message, Arrival? reached, double carried) => new()
     {
         Outgoing = [],
         Reached = reached,
-        Accounting = new Accounting(message.Broadcast, 0, Deaths: 1),
+
+        // A BUDGET DEATH, AND ITS STRENGTH IS THE WHOLE POINT. It arrived and
+        // could not go on; whether that mattered depends entirely on how much
+        // promise it still held -- see the note on Accounting.Thwarted.
+        Accounting = new Accounting(
+            message.Broadcast, 0, Deaths: 1, Thwarted: carried, Ended: carried),
     };
 
     /// <summary>
     /// A route that could not pay for the hop it was on. <b>Starvation</b>, and
     /// it reaches nowhere at all — it did not survive the arrival.
     /// </summary>
-    private static Fired Starved(Message message) => new()
+    private static Fired Starved(Message message, double carried) => new()
     {
         Outgoing = [],
         Reached = null,
-        Accounting = new Accounting(message.Broadcast, 0, Deaths: 1, Starved: 1),
+        Accounting = new Accounting(
+            message.Broadcast, 0, Deaths: 1, Starved: 1,
+            Thwarted: carried, Ended: carried),
     };
 
     /// <summary>
     /// A route that could not go on from here because there was <b>nowhere to
     /// go</b>, not because it was broke. The edge it arrived on weighs nothing.
     /// </summary>
-    private static Fired Died(Message message) => new()
+    private static Fired Died(Message message, double carried) => new()
     {
         Outgoing = [],
         Reached = null,
-        Accounting = new Accounting(message.Broadcast, 0, Deaths: 1),
+
+        // NOT THWARTED: there was no edge to walk, so no budget would have
+        // helped it.
+        Accounting = new Accounting(message.Broadcast, 0, Deaths: 1, Ended: carried),
     };
 }

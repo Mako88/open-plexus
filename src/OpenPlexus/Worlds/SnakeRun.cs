@@ -108,6 +108,19 @@ public sealed record RunResult
     /// finished unless this is reported.</b>
     /// </summary>
     public required long Halted { get; init; }
+
+    /// <summary>
+    /// Steps where the concurrent votes did not all name the same action.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE WIRING CHECK ON VOTING, AND IT IS THE POINT OF MEASURING IT AT
+    /// ALL.</b> Voting exists because the walk disagrees with itself — 0.8833
+    /// agreement on the senses world, where a majority of three recovered 0.9688
+    /// to 0.9974. If voting changes no outcome here, this says whether that is
+    /// because the walk already agrees with itself or because the votes never
+    /// happened. Zero at one vote by construction.
+    /// </remarks>
+    public required int Disagreed { get; init; }
 }
 
 /// <summary>
@@ -280,9 +293,13 @@ public sealed class SnakeRun : IDisposable
     /// everything were wired.
     /// </remarks>
     public async Task<RunReport> ReportAsync(
-        int steps, bool cut = false, Policy policy = Policy.Chain, CancellationToken ct = default)
+        int steps,
+        bool cut = false,
+        Policy policy = Policy.Chain,
+        int votes = 1,
+        CancellationToken ct = default)
     {
-        var result = await PlayAsync(steps, cut, policy, ct).ConfigureAwait(false);
+        var result = await PlayAsync(steps, cut, policy, votes, ct).ConfigureAwait(false);
 
         return new RunReport
         {
@@ -302,17 +319,23 @@ public sealed class SnakeRun : IDisposable
     /// code gains no edges and no walk can arrive at one.
     /// </param>
     /// <param name="policy">What decides the move. <see cref="Policy"/>.</param>
+    /// <param name="votes">
+    /// How many concurrent thoughts decide one move.
+    /// </param>
     /// <param name="ct">Cancellation.</param>
     public async Task<RunResult> PlayAsync(
         int steps,
         bool cut = false,
         Policy policy = Policy.Chain,
+        int votes = 1,
         CancellationToken ct = default)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(steps);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(votes);
 
         Code? did = null;
         int taken = 0, byChain = 0, reachedNothing = 0, silent = 0, ate = 0, echoed = 0;
+        var disagreed = 0;
         long halted = 0;
         var unbalanced = 0;
 
@@ -352,7 +375,16 @@ public sealed class SnakeRun : IDisposable
             // harness affordance -- see the note on this class.
             await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
 
-            Code? chosen = thought is null ? null : _hand.Choose(thought);
+            Code? chosen = null;
+
+            if (thought is not null)
+            {
+                var voted = await VoteAsync(thought, votes, ct).ConfigureAwait(false);
+                chosen = voted.Chosen;
+                halted += voted.Halted;
+                unbalanced += voted.Unbalanced;
+                if (voted.Disagreed) disagreed++;
+            }
 
             if (thought is null) silent++;
             else
@@ -421,12 +453,77 @@ public sealed class SnakeRun : IDisposable
             Deaths = _eye.DeathsSeen,
             Halted = halted,
             EchoedLast = echoed,
+            Disagreed = disagreed,
             Unbalanced = unbalanced,
             Messages = _bus.Messages,
             Foresight = _foresight,
             Novelty = _novelty,
             Consequence = _consequence,
         };
+    }
+
+    /// <summary>
+    /// Decides the move, optionally by asking the same question several times at
+    /// once and taking the majority.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The mechanism the other two worlds already had, and snake did not.</b>
+    /// Delivery is concurrent, so an identical question does not always get an
+    /// identical answer — measured at 0.8833 agreement on the senses world, where
+    /// voting recovered 0.9688 to 0.9974. <b>Every snake number taken at one vote
+    /// is therefore a lower bound taken at the noisy end.</b>
+    /// </para>
+    /// <para>
+    /// <b>The extra thoughts re-ask from the SAME origins and never re-learn.</b>
+    /// <see cref="Thought.Started"/> is the origin set, so the graph is written
+    /// once by <c>ObserveAsync</c> and read <paramref name="votes"/> times —
+    /// otherwise voting would be teaching, and the arm would beat its control for
+    /// a reason that has nothing to do with agreement.
+    /// </para>
+    /// <para>
+    /// <b>One vote is the default</b>, so it is off unless a caller asks and the
+    /// existing measurements are untouched by its arrival.
+    /// </para>
+    /// </remarks>
+    private async Task<(Code? Chosen, long Halted, int Unbalanced, bool Disagreed)> VoteAsync(
+        Thought first, int votes, CancellationToken ct)
+    {
+        if (votes <= 1) return (_hand.Choose(first), 0, 0, false);
+
+        var asking = new Task<Thought>[votes - 1];
+        for (var i = 0; i < asking.Length; i++)
+            asking[i] = _eye.ThinkAsync(first.Started, _dials.Stamina, ct);
+
+        var others = await Task.WhenAll(asking).ConfigureAwait(false);
+        await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
+
+        // SILENCE GETS NO VOTE. A walk that reached no action has no opinion, and
+        // counting it would let the quietest arm decide.
+        var tally = new Dictionary<Code, int>();
+        long halted = 0;
+        var unbalanced = 0;
+
+        foreach (var one in others)
+        {
+            if (_hand.Choose(one) is { } code) tally[code] = tally.GetValueOrDefault(code) + 1;
+            halted += one.Halted;
+            if (!one.Balanced()) unbalanced++;
+            _eye.Forget(one.Id);
+        }
+
+        if (_hand.Choose(first) is { } mine) tally[mine] = tally.GetValueOrDefault(mine) + 1;
+
+        // Ties break on the code, so the answer does not depend on which thought
+        // finished first -- which is the very thing being voted on.
+        // NOT UNANIMOUS AMONG THE VOTES THAT HAD AN OPINION. One distinct answer
+        // means every walk that reached an action reached the same one.
+        var disagreed = tally.Count > 1;
+
+        return tally.Count == 0
+            ? (null, halted, unbalanced, false)
+            : (tally.OrderByDescending(e => e.Value).ThenBy(e => e.Key).First().Key,
+               halted, unbalanced, disagreed);
     }
 
     /// <summary>

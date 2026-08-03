@@ -259,8 +259,14 @@ two run lengths, and a conclusion that does not hold at both is not one.**
 nothing.** `ThinkAsync`'s stamina was, and survived a build, 155 tests, a mutation
 run and three measurements. **Every run type reports `Complaints`; read them.**
 
-**Voting exists only on `SensesRun` and `BindingRun`.** `SnakeRun` asks once, so
-every snake number is a lower bound taken at the noisy end.
+**~~Voting exists only on `SensesRun` and `BindingRun`, so every snake number is
+a lower bound taken at the noisy end.~~ BUILT AND MEASURED, AND THE CAVEAT WAS
+WRONG.** `SnakeRun.PlayAsync(votes:)` exists and is off by default, because the
+snake walk disagrees with itself on **0.0018 ± 0.0018 of steps** — one standard
+error from zero — against roughly one question in eight on senses. Three turns
+over a few dozen nodes wins by a margin delivery order does not overturn.
+**Asserted as traffic rather than as outcome**, since "voting changed nothing" is
+also what a disconnected dial looks like.
 
 ---
 

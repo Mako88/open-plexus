@@ -266,18 +266,11 @@ every snake number is a lower bound taken at the noisy end.
 
 ## OPEN DEFECTS
 
-**Fork 22 is CLOSED, 2026-08-03, and it was a bug rather than a distributed
-problem.** `InputMachine` untracked a thought the instant its live count hit
-zero — and **a live count of zero is not durable**: reports arrive out of order,
-so it dips transiently whenever a downstream death is folded before the upstream
-split that created it. One thread saw the dip and untracked the thought while
-others were still folding, and every later report was dropped. Diagnosed by
-counting reports sent against reports folded: **every stuck thought had sent more
-than it folded.** Retirement now asks twice — settled last look, settled now,
-nothing folded in between, which is Mattern's shape at the scale of one machine.
-**0 unsettled of 39 on every seed in both worlds, where it was 5–8. Silent counts
-are no longer upper bounds**, and the suite got a minute faster because it had
-been waiting out hangs.
+**Fork 22 is CLOSED — see the fork index. Silent counts are no longer upper
+bounds.** The lesson worth keeping: it was diagnosed by counting reports *sent*
+against reports *folded*, and neither number existed before. **When an accounting
+disagrees with reality, count the raw thing rather than reasoning about the
+derived one.**
 
 **A mutation still survives.** Removing the action from `SnakeRun`'s prediction
 broadcast turns no test red. Three attempts to kill it failed and the failures

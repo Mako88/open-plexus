@@ -117,6 +117,64 @@ public sealed class ReceiverWeighingTests
     }
 
     [Fact]
+    public void Lift_divides_an_arrival_by_the_receivers_own_prevalence()
+    {
+        // A DIAL WITH NO TEST IS INDISTINGUISHABLE FROM A DEAD ONE, which is
+        // the lesson from the budget parameter that was declared, passed and
+        // silently dropped. `Lift` was read in exactly one place and asserted
+        // nowhere.
+        //
+        // A common node and a rare one, reached identically: together 4 against
+        // a marginal of 4 is a weight of 1.0 either way, so under Strength the
+        // arrivals are equal. Under Lift the common one is divided by its own
+        // prevalence and the rare one is not.
+        static Node Built(ArrivalValue value, double seen)
+        {
+            var node = new Node(C(1), new WalkSettings
+            {
+                Stamina = 10.0, Value = value, Accumulate = Accumulate.Sum, Horizon = 50,
+            });
+
+            for (var i = 0; i < seen; i++) node.Note();
+            node.Observe(C(2));
+            return node;
+        }
+
+        static double Reached(ArrivalValue value, double seen) =>
+            Built(value, seen).Fire(Arriving(C(1), together: seen)).Reached!.Score;
+
+        Assert.Equal(Reached(ArrivalValue.Strength, 4), Reached(ArrivalValue.Strength, 40), precision: 10);
+
+        // Rarity is worth more: the endpoint seen 4 times outscores the one
+        // seen 40 times by exactly their ratio.
+        Assert.Equal(10.0, Reached(ArrivalValue.Lift, 4) / Reached(ArrivalValue.Lift, 40), precision: 6);
+    }
+
+    [Fact]
+    public void Lift_leaves_an_origin_alone()
+    {
+        // The companion. An origin has not travelled, so there is no edge to
+        // value and nothing to divide -- and without this the test above passes
+        // for a Lift applied indiscriminately.
+        var node = new Node(C(1), new WalkSettings
+        {
+            Stamina = 10.0, Value = ArrivalValue.Lift, Accumulate = Accumulate.Sum, Horizon = 50,
+        });
+
+        for (var i = 0; i < 40; i++) node.Note();
+        node.Observe(C(2));
+
+        var origin = node.Fire(new Message
+        {
+            Broadcast = BroadcastId.New(), ReturnTo = new MachineAddress("t"),
+            To = C(1), Held = 10.0, Chain = [C(1)], Carried = 1.0, Together = 0.0,
+        });
+
+        Assert.Null(origin.Reached);
+        Assert.Equal(1.0, origin.Outgoing.Single().Carried, precision: 10);
+    }
+
+    [Fact]
     public void The_walk_stays_bounded_on_the_receiver_arm_too()
     {
         // The bound has to survive the move, or fork 2 would have undone

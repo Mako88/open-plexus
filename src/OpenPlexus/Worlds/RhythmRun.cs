@@ -1,0 +1,314 @@
+using OpenPlexus.Bus;
+using OpenPlexus.Codes;
+using OpenPlexus.Graph;
+using OpenPlexus.Learning;
+using OpenPlexus.Machines;
+using OpenPlexus.Thinking;
+
+namespace OpenPlexus.Worlds;
+
+/// <summary>
+/// What the rhythm world measured. <b>Counts, not claims.</b>
+/// </summary>
+public sealed record RhythmResult : Questioned
+{
+    /// <inheritdoc cref="Learning.Window"/>
+    public required int Span { get; init; }
+
+    /// <inheritdoc cref="Rhythm.Ceiling"/>
+    public required double Ceiling { get; init; }
+
+    /// <inheritdoc cref="Rhythm.Marginal"/>
+    public required double Marginal { get; init; }
+
+    /// <summary>Moments the cycle called for and got.</summary>
+    public required int Kept { get; init; }
+
+    /// <summary>Of those, how many were predicted right.</summary>
+    public required int Foreseen { get; init; }
+
+    /// <summary>Moments that broke the rule.</summary>
+    public required int Broke { get; init; }
+
+    /// <summary>
+    /// Of the violations, how many were nonetheless predicted right.
+    /// </summary>
+    /// <remarks>
+    /// <b>SHOULD BE AT CHANCE AND IS REPORTED SO IT CAN BE CHECKED.</b> A
+    /// violation is unpredictable by construction, so anything above a blind draw
+    /// here means the world is leaking — the "random" symbol is not independent of
+    /// what came before, and every other number would be built on that.
+    /// </remarks>
+    public required int Caught { get; init; }
+
+    /// <summary>The score on the moments that were predictable at all.</summary>
+    public double Expected => Kept == 0 ? 0.0 : Foreseen / (double)Kept;
+
+    /// <inheritdoc cref="Caught"/>
+    public double Surprised => Broke == 0 ? 0.0 : Caught / (double)Broke;
+
+    /// <summary>Bets that were settled against the moment AFTER the one they were for.</summary>
+    public required int Late { get; init; }
+
+    /// <summary>
+    /// Of those, how many named the symbol two moments ahead instead of one.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE DIAGNOSTIC, AND IT IS THE WHOLE FINDING OF THIS WORLD.</b> A graph
+    /// that predicts the NEXT symbol at chance while predicting the one after it
+    /// far above chance has learnt real temporal structure and learnt it at the
+    /// wrong offset — which is a different fault from having learnt nothing, and
+    /// the two are indistinguishable in an accuracy alone.
+    /// </remarks>
+    public required int Skipped { get; init; }
+
+    /// <inheritdoc cref="Skipped"/>
+    public double TwoAhead => Late == 0 ? 0.0 : Skipped / (double)Late;
+
+    /// <summary>How much of what was achievable was achieved, in 0..1.</summary>
+    /// <remarks>
+    /// <b>Against the ceiling rather than against one.</b> A perfect model is
+    /// wrong on every violation, so scoring against a perfect run makes the best
+    /// possible system look broken in proportion to how noisy the world is.
+    /// </remarks>
+    public double OfCeiling => Ceiling <= 0.0 ? 0.0 : Accuracy / Ceiling;
+
+    /// <inheritdoc/>
+    protected override string Shown => "moments";
+
+    /// <inheritdoc/>
+    /// <remarks><b>Two — this world's task is one hop, from now to next.</b></remarks>
+    protected override int Composes => 2;
+
+    /// <inheritdoc/>
+    protected override string Stalled => "no route walked at all";
+
+    /// <inheritdoc/>
+    protected override void Beyond(List<string> wrong)
+    {
+        ArgumentNullException.ThrowIfNull(wrong);
+
+        if (Kept == 0) wrong.Add("the cycle never once played through");
+
+        // THE WORLD'S OWN INTEGRITY CHECK. A violation is a draw from everything
+        // the cycle did not call for, so predicting them above chance means the
+        // stream is not what it says it is.
+        if (Broke > 50 && Surprised > Chance * 3)
+            wrong.Add($"violations were predicted at {Surprised:F2}, far above chance "
+                + $"{Chance:F2} — the world is leaking what it is about to do");
+    }
+
+    public override string ToString() =>
+        $"span={Span} moments={Moments} asked={Asked} right={Right} silent={Silent} | " +
+        $"accuracy={Accuracy:F4} ofCeiling={OfCeiling:F4} " +
+        $"expected={Expected:F4} surprised={Surprised:F4} twoAhead={TwoAhead:F4} | " +
+        $"ceiling={Ceiling:F4} marginal={Marginal:F4} chance={Chance:F4} | " +
+        $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
+        $"nodes={Nodes} edges={Edges} widest={Widest} spread=[{string.Join(",", Spread)}] | " +
+        $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | " +
+        $"msgs={Messages} halted={Halted} unbalanced={Unbalanced} unsettled={Unsettled}{Wrong}";
+}
+
+/// <summary>
+/// The rhythm world, wired to the graph.
+/// </summary>
+/// <remarks>
+/// <b>Predicts rather than answers, and is scored prequentially.</b> At every
+/// moment the graph is asked what comes next, the answer is held, the next moment
+/// arrives and settles the bet, and learning carries on throughout. Nothing stops
+/// and nothing is tested afterwards, which is what C4 requires.
+/// </remarks>
+public sealed class RhythmRun : IDisposable
+{
+    private readonly Fabric _fabric;
+    private readonly InputMachine<Code> _ear;
+    private readonly Rhythm _world;
+    private readonly WalkSettings _dials;
+    private readonly int _span;
+
+    /// <param name="world">The shape of the stream.</param>
+    /// <param name="dials">The walk.</param>
+    /// <param name="seed">The world's generator and the ring's, so a run reproduces.</param>
+    /// <param name="span">
+    /// How many moments a departed symbol is carried for. <b>Zero leaves this
+    /// world with no edges at all</b>, because nothing here is ever simultaneous
+    /// with anything — see <see cref="Rhythm"/>.
+    /// </param>
+    /// <param name="clusters">How many clusters the codes are spread over.</param>
+    /// <param name="replicas">Ring replicas per cluster.</param>
+    public RhythmRun(
+        RhythmSettings world,
+        WalkSettings dials,
+        int seed,
+        int span = 1,
+        int clusters = 8,
+        int replicas = 256)
+    {
+        ArgumentNullException.ThrowIfNull(world);
+        ArgumentNullException.ThrowIfNull(dials);
+
+        _world = new Rhythm(world, seed);
+        _dials = dials;
+        _span = span;
+        _fabric = new Fabric(dials, seed, clusters, replicas);
+
+        _ear = new InputMachine<Code>(
+            new MachineAddress("ear"), new Hearing(), new LocalRendezvous(_fabric.Local),
+            _fabric.Bus, _fabric.Ring, dials, span);
+
+        _fabric.Subscribe(_ear);
+    }
+
+    /// <summary>The world this run is listening to.</summary>
+    public Rhythm World => _world;
+
+    /// <summary>One symbol is already a code; there is nothing to quantise.</summary>
+    private sealed class Hearing : IQuantizer<Code>
+    {
+        public byte Modality => Rhythm.Beat;
+
+        public IReadOnlyCollection<Code> Codify(Code observation) => [observation];
+    }
+
+    /// <summary>
+    /// Listens, and at every moment bets on the next one.
+    /// </summary>
+    /// <param name="moments">How long to listen for.</param>
+    /// <param name="ct">Cancellation.</param>
+    /// <remarks>
+    /// <b>The bet is placed BEFORE the next symbol is drawn</b>, which is the
+    /// whole discipline of a prequential score. Drawing first and asking
+    /// afterwards would let the world's own generator advance inside the question,
+    /// and the number would be meaningless in a way nothing downstream could see.
+    /// </remarks>
+    public async Task<RhythmResult> RunAsync(int moments, CancellationToken ct = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(moments);
+
+        int asked = 0, right = 0, silent = 0, unbalanced = 0, unsettled = 0;
+        int kept = 0, foreseen = 0, broke = 0, caught = 0;
+        long halted = 0;
+
+        var reflected = 0;
+        var chains = new Chains();
+
+        int late = 0, skipped = 0;
+        Code? bet = null, older = null;
+
+        for (var moment = 0; moment < moments; moment++)
+        {
+            var (shown, violated) = _world.Next();
+
+            // SETTLE THE PREVIOUS BET FIRST, against what has just arrived.
+            if (bet is not null)
+            {
+                asked++;
+                if (violated) broke++; else kept++;
+
+                if (bet.Value == shown)
+                {
+                    right++;
+                    if (violated) caught++; else foreseen++;
+                }
+            }
+
+            // AND SETTLE THE ONE BEFORE IT AGAINST THE SAME MOMENT, which is the
+            // diagnostic rather than the score -- see Skipped. Only the moments
+            // the cycle called for, or a violation would count against an offset
+            // that was never predictable at either distance.
+            if (older is not null && !violated)
+            {
+                late++;
+                if (older.Value == shown) skipped++;
+            }
+
+            older = bet;
+
+            var observed = await _ear.ObserveAsync(shown, moment, ct).ConfigureAwait(false);
+            await _fabric.QuietAsync(ct).ConfigureAwait(false);
+
+            if (observed is not null)
+                reflected += await _ear.ReflectAsync(observed, moment, ct).ConfigureAwait(false);
+
+            // AND NOW BET ON THE NEXT ONE, from what is being heard right now.
+            var (guess, stopped, balanced, settled, reached) =
+                await GuessAsync(shown, ct).ConfigureAwait(false);
+
+            halted += stopped;
+            if (!balanced) unbalanced++;
+            if (!settled) unsettled++;
+            if (guess is null && bet is not null) silent++;
+
+            chains.Fold(reached);
+            bet = guess;
+        }
+
+        _fabric.Failures();
+
+        return new RhythmResult
+        {
+            Span = _span,
+            Moments = moments,
+            Asked = asked,
+            Right = right,
+            Silent = silent,
+            Kept = kept,
+            Foreseen = foreseen,
+            Broke = broke,
+            Caught = caught,
+            Late = late,
+            Skipped = skipped,
+            Ceiling = _world.Ceiling,
+            Marginal = _world.Marginal,
+            Chance = _world.Chance,
+            Reflections = Reflections.Of(_dials, reflected),
+            Plumbing = _fabric.Facts(chains, unbalanced),
+            Halted = halted,
+            Unsettled = unsettled,
+        };
+    }
+
+    /// <summary>One bet, with the plumbing left attached.</summary>
+    private readonly record struct Guess(
+        Code? Next,
+        int Halted,
+        bool Balanced,
+        bool Settled,
+        IReadOnlyList<Arrival> Reached);
+
+    /// <summary>
+    /// Broadcasts what is being heard and reads back what usually follows it.
+    /// </summary>
+    /// <remarks>
+    /// <b>The symbol itself is struck out of the candidates.</b> A route that
+    /// walks nowhere ends where it began, so without this the graph would answer
+    /// every question with the thing it was just told — and this stream never
+    /// repeats a symbol twice running, so that answer is always wrong and would
+    /// read as the walk having no model at all.
+    /// </remarks>
+    private async Task<Guess> GuessAsync(Code heard, CancellationToken ct)
+    {
+        var thought = await _ear
+            .ThinkAsync([heard], _dials.Foresight ?? _dials.Stamina, null, ct)
+            .ConfigureAwait(false);
+
+        var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
+
+        var reached = thought
+            .BestOf(Rhythm.Beat, 2)
+            .Where(arrival => arrival.Endpoint != heard)
+            .ToList();
+
+        var guess = new Guess(
+            reached.Count == 0 ? null : reached[0].Endpoint,
+            thought.Halted,
+            thought.Balanced(),
+            settled,
+            thought.Best(int.MaxValue));
+
+        _ear.Forget(thought.Id);
+        return guess;
+    }
+
+    public void Dispose() => _fabric.Dispose();
+}

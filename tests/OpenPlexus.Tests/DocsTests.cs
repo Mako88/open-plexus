@@ -45,8 +45,19 @@ public sealed class DocsTests
     /// is — so an hour of compacting long table cells moved the count by two and
     /// the doc was no cheaper to load. Words track what is actually being spent.
     /// </para>
+    /// <para>
+    /// <b>RAISED FROM 2,800 — JOHN'S CALL, 2026-08-03, AND ONLY AFTER A FULL
+    /// COMPRESSION PASS.</b> The old number was set when there were four worlds;
+    /// three more arrived in one session, two of them external and each needing a
+    /// line in the standing list, a build box and a refutation row. The pass that
+    /// preceded this retired a closed section, a superseded LATER item and about a
+    /// hundred and fifty words of prose about the document itself.
+    /// <b>The test is meant to force that pass, not to be raised instead of
+    /// it</b> — so raising it without one is the failure, and the number moving is
+    /// not.
+    /// </para>
     /// </remarks>
-    private const int Budget = 2_800;
+    private const int Budget = 3_000;
 
     private static string Repo() => Tree.Repo();
 

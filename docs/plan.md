@@ -1,20 +1,16 @@
 # Where this is going
 
 **The only doc, capped at 2,800 words by `DocsTests`. To add something, retire
-something.** Its predecessors grew past the point of being loaded and kept being
-cited anyway, which is the failure this exists to prevent.
+something.** Its predecessors grew past being loadable and kept being cited
+anyway, which is the failure this exists to prevent.
 
-**What every piece does lives in the XML comments beside the code**, and the
-compiler enforces that they refer to things that exist
-(`GenerateDocumentationFile`; CS1572/1573/1574 are build errors). That cannot go
-stale.
+**What every piece does lives in the XML comments beside the code**, where the
+compiler enforces that every reference resolves and nothing can go stale.
 
-**This file is forward-facing and records no results.** A measurement is
-something that happened; a plan is something to do. `DocsTests` fails the build
-when a measured quantity appears here — a score, a spread, a separation, a tick
-against a closed fork. Findings live in the commit that produced them, in the
-comment beside the mechanism they are about, and in the test that asserts them.
-Deleted docs are in git.
+**This file is forward-facing and records no results.** `DocsTests` fails the
+build when a measured quantity appears here. Findings live in the commit that
+produced them, in the comment beside the mechanism, and in the test that asserts
+them. Deleted docs are in git.
 
 ---
 
@@ -157,6 +153,7 @@ act, no amount of scaling gets there.
 - [x] `Composed` — the world of step 1, built and characterised, not yet lifted
 - [x] `Babi` — twenty tasks somebody else wrote, with published baselines
 - [x] `Clevr` — fork 25's experiment on scene graphs generated in 2017
+- [x] `Rhythm` — the endless stationary stream prediction can be measured on
 - [ ] `Surprise` — the local prediction error of step 2
 - [ ] `Chunk` — the minted node of step 3
 - [ ] `Drives` — the bounded internal variables of step 4
@@ -168,7 +165,6 @@ act, no amount of scaling gets there.
 - **Fork 1 is smaller than it looks.** A count that only increments is a
   **G-Counter, a CRDT** — it converges under reordering and loss with no
   coordination. The counts need no protocol; only the join does.
-- **The one-way window.** Built, null on snake, **never run where it worked.**
 - **The absolute message cost is what step 2 attacks.** Nothing else should be
   optimised until it has been tried.
 - **Cold storage, once a row can be bounded at all.** **Paging a node out to disk
@@ -182,25 +178,23 @@ act, no amount of scaling gets there.
 
 Only the local half of `HybridBus` exists, so none of this is built.
 
-- **Coalesce a settling wave into one send.** `Cluster.DeliverAsync` already
-  regroups by cluster. **Hold remote envelopes until local traffic drains, then
-  one datagram per destination.** `WhenIdle()` is the trigger and is C1-legal.
-  **Not a pure barrier**: flush on idle *or* size *or* time, or a busy machine
-  never sends.
+- **Coalesce a settling wave into one send.** Hold remote envelopes until local
+  traffic drains, then one datagram per destination; `WhenIdle()` is the trigger
+  and is C1-legal. **Not a pure barrier** — flush on idle *or* size *or* time, or
+  a busy machine never sends.
 - **Bits, not JSON.** Addresses and modalities intern to small ints, a code is a
   varint, the `double`s are almost certainly `float`s, and **a sixth of a packed
   message is the `Guid` broadcast id** — shorten it per connection.
 - **`Chain` is what costs** — cycle check and explanation in one field, free
-  locally and not on a wire. **Split them:** a fixed-size approximate-membership
-  filter for the hop, full chain rebuilt at the origin. A false positive is a
-  route wrongly refusing a partner — the loss C2 admits.
-- **Voting multiplies the wrong half — John, 2026-08-03.** `votes: n` is n
-  independent broadcasts, so it pays n floods to insure against loss on the way
-  back. **One thought, redundant reports**: the flood is determined by the graph,
-  and what C2 loses is the return path.
-- **UDP is the matching transport, not a compromise.** C2 already assumes loss,
-  and **TCP's head-of-line blocking would stall every thought behind one lost
-  packet.** QUIC's unreliable datagram extension (RFC 9221) is the shape.
+  locally and not on a wire. **Split them:** an approximate-membership filter for
+  the hop, full chain rebuilt at the origin. A false positive is a route wrongly
+  refusing a partner, which is the loss C2 admits.
+- **Voting multiplies the wrong half — John, 2026-08-03.** `votes: n` pays n
+  floods to insure against loss on the way back. **One thought, redundant
+  reports**: the flood is the graph's, and what C2 loses is the return path.
+- **UDP matches, and is not a compromise.** C2 assumes loss, and **TCP's
+  head-of-line blocking would stall every thought behind one lost packet.**
+  QUIC's unreliable datagram extension (RFC 9221) is the shape.
 
 ---
 
@@ -264,15 +258,22 @@ process** — kept, because a real network loses reports.
 ## OPEN DEFECTS
 
 **A mutation survives.** Removing the action from `SnakeRun`'s prediction
-broadcast turns no test red. Three attempts failed, instructively: a positive
-`Differed` count proves nothing because concurrent delivery makes identical
-broadcasts differ, and a zero count proves nothing because on a small graph the
-top codes are the same whichever action is named. **Killing it needs a third arm
+broadcast turns no test red. Three attempts failed instructively: a positive
+`Differed` count proves nothing, because concurrent delivery makes identical
+broadcasts differ, and zero proves nothing, because on a small graph the top
+codes are the same whichever action is named. **Killing it needs a third arm
 asking the same action**, to measure how far the walk lands from itself.
 
 **Fork 11 — the output machine is not addressed.** `Message.ReturnTo` is the
 input machine; the harness hands the finished thought over by direct call. Needed
 before a second machine exists.
+
+**THE WINDOW CANNOT RECORD IMMEDIATE SUCCESSION.** A code stopping as another
+starts joins neither `Live` nor `Recent`, so where nothing overlaps the graph
+learns the relation one step too far back — on `Rhythm`, next-symbol prediction
+sits at chance while two-ahead climbs far above it. Snake hid it by overlapping.
+**Carrying before reading would move every measurement ever taken**, so this is a
+defect and not an edit.
 
 ---
 

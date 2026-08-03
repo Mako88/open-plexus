@@ -157,7 +157,7 @@ public sealed class Cluster : IReceiveEnvelopes
         //
         // MEASURED, by trying the other way round: reporting first destabilised
         // whole runs -- steps, choices, graph size and energy all varied at a
-        // fixed seed, because `WhenQuiet` could fire in the gap between the
+        // fixed seed, because `WhenIdle` could fire in the gap between the
         // report completing and these sends being issued, so the harness acted
         // on a thought that was still in flight.
         //

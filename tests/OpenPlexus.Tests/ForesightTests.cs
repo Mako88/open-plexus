@@ -210,7 +210,7 @@ public sealed class ForesightTests
         async Task<IReadOnlyList<Code>> Asking(Code action)
         {
             var thought = await eye.ThinkAsync([state, action]);
-            await bus.WhenQuiet().WaitAsync(TimeSpan.FromSeconds(5));
+            await bus.WhenIdle().WaitAsync(TimeSpan.FromSeconds(5));
             return [.. thought.BestOf(1, 4).Select(a => a.Endpoint)];
         }
 

@@ -80,7 +80,7 @@ public sealed class DepartureTests : IDisposable
     {
         var codes = Enumerable.Range(1, 20).Select(i => C((ulong)i)).ToArray();
         var thought = await _machine.ThinkAsync(codes);
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
 
         // ONE PENDING UNIT PER CLUSTER, and the origin's own send is tracked --
         // without that a cluster dying before it replies would strand a unit
@@ -105,7 +105,7 @@ public sealed class DepartureTests : IDisposable
         // could end it — and a deadline is a constant nobody measured.
         var thought = await _machine.ThinkAsync(
             [.. Enumerable.Range(1, 20).Select(i => C((ulong)i))]);
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
 
         Assert.False(thought.Settled);
 
@@ -126,7 +126,7 @@ public sealed class DepartureTests : IDisposable
         // thought never reached — what has to hold instead is that a departure
         // takes ONE unit rather than all of them.
         var thought = await _machine.ThinkAsync([C(1)]);
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Equal(4, thought.Live);
 
@@ -177,7 +177,7 @@ public sealed class DepartureTests : IDisposable
             ],
         });
 
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
 
         // Two reports come back: the origin's fork, then the three children
         // finding nowhere to go. The first is the one that names destinations.
@@ -237,7 +237,7 @@ public sealed class DepartureTests : IDisposable
                 },
             ],
         });
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
         foreach (var handle in handles) handle.Dispose();
 
         var forked = seen.Got.Single(r => r.Handled == 1 && r.From == owner.Address);

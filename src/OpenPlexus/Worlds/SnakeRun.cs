@@ -350,7 +350,7 @@ public sealed class SnakeRun : IDisposable
 
             // Wait for the dust to settle before deciding. Turn-based world,
             // harness affordance -- see the note on this class.
-            await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
+            await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
 
             Code? chosen = thought is null ? null : _hand.Choose(thought);
 
@@ -466,7 +466,7 @@ public sealed class SnakeRun : IDisposable
         // want opposite depths -- fork 20.
         var thought = await _eye.ThinkAsync(
             [.. present, doing], _dials.Foresight, ct).ConfigureAwait(false);
-        await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
+        await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
 
         var wanted = _names ?? present.Count;
         var foreseen = thought.BestOf(SnakeQuantizer.Vision, wanted)

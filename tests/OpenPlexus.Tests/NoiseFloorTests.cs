@@ -65,16 +65,18 @@ public sealed class NoiseFloorTests
         // WHAT DOES HOLD EVERYWHERE: a different question gets a different
         // answer, so whatever disagreement there is sits around an answer rather
         // than standing in for the absence of one.
-        //
-        // ASSERTED ON THE MEANS AND NOT ON SIGMA, DELIBERATELY. Under load both
-        // arms have zero spread -- 1.0000 and 0.0000 -- and `Separation` returns
-        // 0 there by design, because two measurements with no variance must not
-        // be reported as significantly different. That guard is right in general
-        // and exactly wrong here, where the arms are perfectly separated rather
-        // than indistinguishable.
         Assert.True(s.Mean - o.Mean > 0.5,
             $"same {s} against different {o}: asking the same question again is "
             + "no more likely to repeat the answer than asking a different one");
+
+        // AND NOW ON SIGMA AS WELL, WHICH THIS TEST USED TO REFUSE TO DO. Under
+        // load both arms have zero spread -- 1.0000 and 0.0000 -- and
+        // `Separation` used to return 0 there, reading "indistinguishable" for
+        // arms that are perfectly separated. It reports infinity for that case
+        // now, so the claim can be made the same way as every other claim here
+        // instead of on a bare mean with a paragraph of apology.
+        Assert.True(s.Separation(o) > 3.0,
+            $"same {s} against different {o} is only {s.Separation(o):F1} sigma");
     }
 
     [Fact]

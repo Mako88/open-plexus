@@ -17,10 +17,16 @@ namespace OpenPlexus.Tests;
 /// need revisiting before any of them was built.
 /// </para>
 /// <para>
-/// <b>Measured, 16 seeds, stamina 12: 0.5064 ± 0.0213 against a chance of
-/// 0.5000</b> — three tenths of a standard error — while the control arm, which
-/// differs only in a fact the counts can hold, scores 0.9247 ± 0.0072. Eighteen
-/// standard errors apart, on identical input.
+/// <b>Measured, 16 seeds, stamina 12: 0.5240 ± 0.0268 against a chance of
+/// 0.5000</b> — nine tenths of a standard error — while the control arm, which
+/// differs only in a fact the counts can hold, scores 0.9167 ± 0.0095. Nearly
+/// fourteen standard errors apart, on identical input.
+/// </para>
+/// <para>
+/// <b>Re-baselined 2026-08-03 once <see cref="Seeds.Apart"/> reached
+/// <see cref="Sweep"/>.</b> The first reading was 0.5064 ± 0.0213 against
+/// 0.9247 ± 0.0072; the claim is unchanged and every error bar is wider, which
+/// is what removing correlated seeds is supposed to do.
 /// </para>
 /// <para>
 /// <b>The proof is the world tests, not the accuracy.</b> Two scenes with
@@ -183,7 +189,7 @@ public sealed class BindingTests
     /// weak one, and a weak edge is expensive under inverse cost — so at stamina 4
     /// only 16% of questions reach both candidates and a coin-flip score would be
     /// measuring what the walk could afford rather than what it preferred. Both
-    /// candidates are in reach on 97% of questions here.
+    /// candidates are in reach on 98.7% of questions here.
     /// </remarks>
     private const double Deep = 12.0;
 
@@ -209,7 +215,7 @@ public sealed class BindingTests
         // THE PRE-REGISTERED PREDICTION, AND IT LANDED. Two objects, attributes
         // that swap, an input that is identical either way -- so the answer is a
         // coin, and nothing in the graph can make it otherwise. Measured at 16
-        // seeds: 0.5064 +- 0.0213 against a chance of 0.5000.
+        // seeds: 0.5240 +- 0.0268 against a chance of 0.5000, which is 0.9 sigma.
         var unbound = await Accuracy(bound: false);
 
         // TWO-SIDED, because "at chance" is the claim and a win would refute it
@@ -230,7 +236,7 @@ public sealed class BindingTests
         // look identical from outside. Here a colour keeps its shape, so plain
         // co-occurrence carries the answer -- same code, same dials, same
         // question, same input, and the only difference is a fact the counts can
-        // hold. Measured at 16 seeds: 0.9247 +- 0.0072, which is 18.6 sigma clear.
+        // hold. Measured at 16 seeds: 0.9167 +- 0.0095, which is 13.8 sigma clear.
         var bound = await Accuracy(bound: true);
         var unbound = await Accuracy(bound: false);
 
@@ -264,7 +270,9 @@ public sealed class BindingTests
         // description. A colour co-occurs with its own kind's shape in every scene
         // it appears in, and with the other object's shape only when that kind
         // happens to be the partner -- so the counts point at the colour's own
-        // kind whichever object it belonged to. Measured at 92% in BOTH arms.
+        // kind whichever object it belonged to. Measured at 0.9167 in BOTH arms,
+        // which is the control's accuracy to four decimal places -- because in
+        // the stable world echoing IS the right answer.
         //
         // That is the whole of it: the system is not failing to choose. It is
         // answering a question about co-occurrence correctly, because that is the

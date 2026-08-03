@@ -81,7 +81,7 @@ public sealed class MachineTests : IDisposable
     private async Task<Thought?> Observe(long now, params Code[] frame)
     {
         var thought = await _machine.ObserveAsync(frame, now);
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
         return thought;
     }
 
@@ -165,7 +165,7 @@ public sealed class MachineTests : IDisposable
     {
         var codes = Enumerable.Range(1, 12).Select(i => C((ulong)i)).ToArray();
         var thought = await _machine.ThinkAsync(codes);
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
 
         // FORK 6. Every cluster is asked, and each replies — including the ones
         // holding none of these codes, which is what lets the count close when
@@ -185,7 +185,7 @@ public sealed class MachineTests : IDisposable
         // A broadcast is a question put to everyone, and admitting on one would
         // put every code on every cluster.
         await _machine.ThinkAsync([C(500), C(501)]);
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
 
         Assert.False(_local.TryOwner(C(500), out var owner) && owner.TryGet(C(500), out _));
 
@@ -209,7 +209,7 @@ public sealed class MachineTests : IDisposable
 
         await machine.ObserveAsync([C(1), C(2)], 0);
         await machine.ObserveAsync([C(1), C(2), C(3)], 1);
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
 
         var second = seen.Occasions[1];
         Assert.Equal([C(3)], second.Onsets.ToArray());
@@ -249,7 +249,7 @@ public sealed class MachineTests : IDisposable
         using var __ = _bus.Subscribe(machine);
 
         await machine.ThinkAsync([C(700)], 3.5);
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Equal(3.5, seen.Held.Single(), precision: 10);
     }
@@ -267,7 +267,7 @@ public sealed class MachineTests : IDisposable
         using var __ = _bus.Subscribe(machine);
 
         await machine.ThinkAsync([C(701)], null);
-        await _bus.WhenQuiet().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Equal(Dials.Stamina, seen.Held.Single(), precision: 10);
     }

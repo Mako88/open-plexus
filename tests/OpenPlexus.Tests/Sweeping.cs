@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
 
@@ -46,16 +47,41 @@ public sealed record Measured
     /// How many standard errors separate this arm from another.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>The number this project keeps working out by hand and getting wrong.</b>
-    /// Returns 0 when neither arm has any spread to speak of, so two arms
-    /// measured once each are never reported as different.
+    /// Two arms measured once each have no spread and are never reported as
+    /// different, however far apart their single readings landed.
+    /// </para>
+    /// <para>
+    /// <b>ZERO SPREAD OVER MANY SEEDS IS THE OPPOSITE CASE, AND RETURNING 0 THERE
+    /// WAS WRONG.</b> Arms that were measured repeatedly, never varied, and landed
+    /// on different numbers — 1.0000 against 0.0000 — are <i>perfectly</i>
+    /// separated, not indistinguishable. That reading forced at least one test to
+    /// assert on bare means with a paragraph explaining why, which is a workaround
+    /// for a defect rather than a finding.
+    /// </para>
     /// </remarks>
+    /// <returns>
+    /// Standard errors between the means; <see cref="double.PositiveInfinity"/>
+    /// when repeated measurement found no spread at all and the means still
+    /// differ; 0 when there is not enough data to say anything.
+    /// </returns>
     public double Separation(Measured other)
     {
         ArgumentNullException.ThrowIfNull(other);
 
+        var apart = Math.Abs(Mean - other.Mean);
         var spread = Math.Sqrt((StdErr * StdErr) + (other.StdErr * other.StdErr));
-        return spread <= 0.0 ? 0.0 : Math.Abs(Mean - other.Mean) / spread;
+
+        if (spread > 0.0) return apart / spread;
+
+        // NOT ENOUGH DATA TO HAVE A SPREAD AT ALL. One reading apiece says
+        // nothing about whether a second pair would land the same way.
+        if (Seeds < 2 || other.Seeds < 2) return 0.0;
+
+        // Measured repeatedly and never varied. Identical means are identical;
+        // different means are as separated as anything can be.
+        return apart == 0.0 ? 0.0 : double.PositiveInfinity;
     }
 
     public override string ToString() => string.Create(
@@ -82,7 +108,30 @@ public sealed record Measured
 /// </remarks>
 public static class Sweep
 {
-    /// <summary>Runs one arm across seeds 1..<paramref name="seeds"/>.</summary>
+    /// <summary>
+    /// What a sweep's seeds are for, as far as <see cref="Seeds.Apart"/> is
+    /// concerned. Arbitrary, and fixed forever — changing it renumbers every
+    /// measurement in the project.
+    /// </summary>
+    private const uint Purpose = 0x5EED_0001;
+
+    /// <summary>
+    /// Runs one arm across <paramref name="seeds"/> seeds.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE COUNTER IS MIXED BEFORE IT REACHES THE RUN, AND THAT IS NOT
+    /// COSMETIC.</b> This used to hand out 1, 2, 3… directly, and .NET's seeded
+    /// <see cref="Random"/> gives near-neighbour seeds streams that agree with
+    /// each other far more than chance allows. <see cref="Measured.StdErr"/> is
+    /// computed across exactly these seeds, so that agreement came straight off
+    /// the standard error and made every arm look more significant than it was.
+    /// See <see cref="Seeds.Apart"/> for the measurement.
+    /// <para>
+    /// <b>Every arm still gets the same sequence</b>, because the mixing is a
+    /// pure function of the index — so arms remain paired seed for seed, which
+    /// is what makes a control a control.
+    /// </para>
+    /// </remarks>
     public static async Task<Measured> ArmAsync(
         string arm, int seeds, Func<int, Task<double>> run)
     {
@@ -92,8 +141,8 @@ public static class Sweep
 
         var values = new List<double>(seeds);
 
-        for (var seed = 1; seed <= seeds; seed++)
-            values.Add(await run(seed).ConfigureAwait(false));
+        for (var index = 1; index <= seeds; index++)
+            values.Add(await run(Seeds.Apart(index, Purpose)).ConfigureAwait(false));
 
         return new Measured { Arm = arm, Values = values };
     }

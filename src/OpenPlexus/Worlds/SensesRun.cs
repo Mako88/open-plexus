@@ -279,7 +279,7 @@ public sealed class SensesRun : IDisposable
         {
             var thought = await _senses
                 .ObserveAsync(_world.Moment(), moment, ct).ConfigureAwait(false);
-            await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
+            await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
 
             // FORK 21 REFLECTS ON WHAT WAS OBSERVED AND NEVER ON WHAT WAS ASKED.
             // Writing a question's own answer back would teach the graph the
@@ -450,7 +450,7 @@ public sealed class SensesRun : IDisposable
     /// <returns>Whether it settled rather than running out of patience.</returns>
     private async Task<bool> SettleAsync(Thought thought, CancellationToken ct)
     {
-        await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
+        await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
 
         // REAL ELAPSED TIME, NOT AN ITERATION COUNT. `Task.Delay(1)` on Windows
         // sleeps about fifteen milliseconds, so counting one per pass made a
@@ -461,7 +461,7 @@ public sealed class SensesRun : IDisposable
         while (!thought.Settled && Environment.TickCount64 < until)
         {
             await Task.Delay(1, ct).ConfigureAwait(false);
-            await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
+            await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
         }
 
         return thought.Settled;

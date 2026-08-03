@@ -35,14 +35,22 @@ never co-occur; a binding world built so the architecture provably cannot answer
 it.
 
 **The result:** on the senses world the graph answers a question it was never
-told — **0.9974 with three votes against a chance of 0.0833**, while the
-scrambled control collapses below chance. A memoriser scores exactly zero there
-by construction.
+told — **0.7906 ± 0.0234 against a chance of 0.0833**, while the scrambled
+control collapses to **0.0534 ± 0.0116**, below chance. 28.2 sigma apart, and a
+memoriser scores exactly zero there by construction.
 
-**The limit, measured 2026-08-03:** on the binding world it scores **0.5064 ±
-0.0213 against a chance of 0.5000**, while a control differing only in a fact the
-counts can hold scores **0.9247 ± 0.0072 on bit-identical input** — 18.6 sigma
+**The limit, measured 2026-08-03:** on the binding world it scores **0.5240 ±
+0.0268 against a chance of 0.5000**, while a control differing only in a fact the
+counts can hold scores **0.9167 ± 0.0095 on bit-identical input** — 13.8 sigma
 apart, and both arms build the same graph down to the last edge.
+
+> **Every number above was re-baselined once `Seeds.Apart` reached `Sweep`, and
+> the correction is instructive.** The senses headline was published as 0.8898 ±
+> 0.0068 on consecutive integer seeds; under decorrelated ones the **spread
+> across seeds triples** and the mean falls about one true standard deviation.
+> The claims are untouched and every error bar is wider. **Numbers elsewhere in
+> this file that are not marked re-baselined are pre-correction** — in
+> particular the 0.9974 three-vote figure, which has not been re-run.
 
 **An occasion is a SET of co-occurring codes.** *Red ball beside blue box* and
 *blue ball beside red box* are the same input. **That is the binding problem, and
@@ -154,11 +162,41 @@ alphabet, and a reason to act, no amount of scaling this gets there.
   working, 0.153 against 0.000.** Cheapest thing on this list, and predictive
   coding needs it.
 - **Combinatorial codes** — several coarse hashes per item, so similarity becomes
-  overlap and comes free. `master` measured conjunction purity at 0.9845 and
-  never built it. Largely subsumed by 1c if that is taken.
+  overlap and comes free. `master` measured conjunction purity at 0.9845.
+  Largely subsumed by 1c if that is taken.
 - **The scaling curve**, which hands back fork 24's real target for free.
 - **The knob pass, deliberately last.** A dial swept before the structural work
   is measuring a system about to change underneath it.
+
+### THE WIRE, when the remote half lands — John, 2026-08-03
+
+**Only the local half of `HybridBus` exists**, so none of this is built. Recorded
+now because the shape of it changes what the local half should look like.
+
+- **Coalesce a whole settling wave into one send.** `Cluster.DeliverAsync`
+  already regroups by owning cluster, so wire cost is distinct clusters reached
+  rather than nodes. **John's extension: hold outgoing remote envelopes until the
+  machine's own local traffic has drained, then send one datagram per
+  destination.** `WhenIdle()` is the natural trigger and is C1-legal — it
+  observes one process's own dispatch queue. **Must not be a pure barrier**: flush
+  on idle *or* a size *or* a time bound, or a machine that never goes idle never
+  sends.
+- **Bits, not JSON.** A machine address and a modality intern to small integers, a
+  code is a varint, `Held`/`Carried`/`Together` are fine as floats. **`Chain` is
+  what actually costs** — it is the cycle check and the explanation carried in one
+  field, which is free locally and is not free on a wire. **So split them:** send
+  a fixed-size approximate-membership filter for the hop's cycle check, and
+  rebuild the full chain at the origin from the arrival reports. A filter's false
+  positive is a route wrongly refusing a partner, which is the same magnitude of
+  error C2 already admits.
+- **UDP is not a compromise here, it is the matching transport.** C2 already says
+  messages are late, jittered, out of order and lost, and the system is built to
+  survive that; **TCP's head-of-line blocking would actively hurt**, stalling
+  every other thought behind one lost packet. What John wants — datagrams with a
+  connection's conveniences — is QUIC's unreliable datagram extension (RFC 9221).
+  **The one thing that is not loss-tolerant is the accounting**, which is the same
+  reason Mattern replaces Dijkstra–Scholten above. Transport choice and the fork
+  22 fix are one decision.
 
 ---
 
@@ -188,38 +226,29 @@ withheld: predicts better, a tenth of the messages).
 
 ---
 
-## TRAPS, every one of which has cost time here
+## TRAPS
 
-**Consecutive integer seeds are not independent.** A seeded `Random` in .NET
-normalises by magnitude, so `new Random(~s)` **is** `new Random(s + 1)`, and
-neighbouring seeds produce streams that agree far more than chance allows — a
-spread of **1.3 where the binomial says 3.1**. `Measured.StdErr` is computed
-across exactly those seeds, so **it comes out too small and a null reads as
-significant**: the binding world's first measurement said five sigma below chance
-and was sitting on chance. `Binding.Apart` mixes rather than offsets, with a test
-asserting the spread. **`Sweep.ArmAsync` still hands out seeds 1..n — fixing it
-re-opens every number ever measured, so it is John's call.** Until then, any sigma
-over a handful of consecutive seeds is softer than it reads, always in the
-direction of overstating.
+**Four are closed in code and cannot be fallen into again. Three are live and
+need discipline.**
+
+### Closed — kept only so nobody reintroduces them
+
+| was | closed by |
+|---|---|
+| **Consecutive integer seeds are not independent.** `new Random(~s)` **is** `new Random(s + 1)`, and neighbours agree far more than chance allows — spread **1.3 where the binomial says 3.1**. `Measured.StdErr` is taken across exactly those seeds, so every arm read as more significant than it was | `Seeds.Apart` mixes rather than offsets, and `Sweep.ArmAsync` mixes the counter before it reaches the run. Everything re-baselined: error bars widened, no claim changed |
+| **Numbers under different machine loads were not comparable** — walk self-agreement 0.8833 alone against 1.0000 under load | The suite runs one test at a time (`Parallelism.cs`). 2m57s against 1m32s |
+| **`Measured.Separation` returned 0 with no spread**, reading "indistinguishable" for arms that never varied and landed apart | Returns infinity for that case; the test that asserted on bare means now asserts on sigma |
+| **`WhenQuiet()` was not a "the walk finished" signal** and the name invited reading it as one | Renamed `WhenIdle()`. `Thought.Settled` is the finish signal |
+
+### Live
 
 **A dial swept at one data volume may be measuring the volume.** The stamina
-plateau reversed between 300 and 1200 moments.
-
-**Numbers taken under different machine loads are not comparable.** The walk's
-agreement with itself is 0.8833 run alone and 1.0000 inside the full parallel
-suite.
-
-**`Measured.Separation` returns 0 when neither arm has spread.** Correct in
-general, and exactly wrong for 1.0000 against 0.0000. Assert on the means there.
-
-**`WhenQuiet()` is not a "the walk finished" signal.** In-flight hits zero in the
-gap between a cluster handling a message and dispatching what it produced. Use
-`Thought.Settled`.
+plateau reversed between 300 and 1,200 moments. **Convention: every sweep runs at
+two run lengths, and a conclusion that does not hold at both is not one.**
 
 **A dial can be declared, documented, passed at every call site and connected to
-nothing.** `ThinkAsync`'s stamina was, and survived a build, 155 tests, a
-mutation run and three measurements. **Every run type now reports `Complaints`;
-read them.**
+nothing.** `ThinkAsync`'s stamina was, and survived a build, 155 tests, a mutation
+run and three measurements. **Every run type reports `Complaints`; read them.**
 
 **Voting exists only on `SensesRun` and `BindingRun`.** `SnakeRun` asks once, so
 every snake number is a lower bound taken at the noisy end.

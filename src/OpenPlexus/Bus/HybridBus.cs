@@ -167,7 +167,7 @@ public sealed class HybridBus : IBus
     /// count cannot dip to zero while a thought is still propagating.
     /// </para>
     /// </remarks>
-    public Task WhenQuiet()
+    public Task WhenIdle()
     {
         lock (_gate) return _inFlight == 0 ? Task.CompletedTask : _quiet.Task;
     }

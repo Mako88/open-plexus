@@ -147,8 +147,16 @@ public sealed class SensesTests
     {
         // THE RESULT THE PROJECT EXISTS FOR. Sight and touch never occur
         // together, so the pair being asked about has never been seen and a
-        // memoriser scores exactly zero. Measured at 12 seeds: 0.8898 +- 0.0068
+        // memoriser scores exactly zero. Measured at 12 seeds: 0.7906 +- 0.0234
         // against a chance of 0.0833.
+        //
+        // RE-BASELINED 2026-08-03, and the correction is worth reading. This was
+        // published as 0.8898 +- 0.0068 on consecutive integer seeds. Under
+        // `Seeds.Apart` the spread across seeds TRIPLES -- 0.081 against 0.024 --
+        // and the mean falls about one true standard deviation. So the old error
+        // bar was understating by more than three times, and the old mean was a
+        // favourable draw sitting inside a spread nobody could see. The claim is
+        // untouched; the confidence in it was inflated.
         var real = await Accuracy(stamina: 8.0, scrambled: false);
 
         // AGAINST THE SPREAD, NOT THE BARE MEAN. Three standard errors clear of
@@ -163,8 +171,8 @@ public sealed class SensesTests
         // A CONTROL TESTS THE DATA, NOT THE CODE. Every mechanism runs
         // identically; only the structure the world contains is destroyed. If
         // accuracy survived this it was never composition. Measured at 12
-        // seeds: 0.0311 +- 0.0086, which is BELOW chance, and two thirds of
-        // questions get no answer at all.
+        // seeds: 0.0534 +- 0.0116, which is BELOW chance, and most questions get
+        // no answer at all. The two arms are 28.2 sigma apart.
         var scrambled = await Accuracy(stamina: 8.0, scrambled: true);
         var real = await Accuracy(stamina: 8.0, scrambled: false);
 

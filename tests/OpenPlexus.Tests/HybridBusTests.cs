@@ -86,7 +86,7 @@ public sealed class HybridBusTests
         // let a mutation that ignores the address entirely and always picks
         // `_clusters.Values.First()` survive every assertion here.
         await bus.SendAsync(beta.Address, To("beta"));
-        await bus.WhenQuiet().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Single(beta.Got);
 
@@ -95,7 +95,7 @@ public sealed class HybridBusTests
         Assert.Empty(alpha.Got);
 
         await bus.SendAsync(alpha.Address, To("alpha"));
-        await bus.WhenQuiet().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Single(alpha.Got);
         Assert.Single(beta.Got);
@@ -109,7 +109,7 @@ public sealed class HybridBusTests
         using var _ = bus.Subscribe(machine);
 
         await bus.SendAsync(machine.Address, Reporting());
-        await bus.WhenQuiet().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Single(machine.Got);
     }
@@ -151,7 +151,7 @@ public sealed class HybridBusTests
         await bus.SendAsync(alpha.Address, To("alpha"));
         await bus.SendAsync(beta.Address, To("beta"));
 
-        await bus.WhenQuiet().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Single(alpha.Got);
         Assert.Single(beta.Got);
@@ -168,7 +168,7 @@ public sealed class HybridBusTests
         await bus.SendAsync(slow.Address, To("slow"));
         await slow.Entered.Task.WaitAsync(Patience);
 
-        var quiet = bus.WhenQuiet();
+        var quiet = bus.WhenIdle();
         Assert.False(quiet.IsCompleted);
 
         gate.SetResult();
@@ -193,7 +193,7 @@ public sealed class HybridBusTests
         // send lands. Without this the assertions below pass for a bus that
         // never delivered anything at all.
         await bus.SendAsync(alpha.Address, To("alpha"));
-        await bus.WhenQuiet().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Patience);
         Assert.Single(alpha.Got);
         Assert.Empty(departures);
 
@@ -234,7 +234,7 @@ public sealed class HybridBusTests
         gone.Dispose();
 
         await bus.SendAsync(returned.Address, To("alpha"));
-        await bus.WhenQuiet().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Single(returned.Got);
     }
@@ -264,7 +264,7 @@ public sealed class HybridBusTests
         using var _ = bus.Subscribe(broken);
 
         await bus.SendAsync(broken.Address, To("broken"));
-        await bus.WhenQuiet().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Patience);
 
         // A send that returns before delivery has no other way to report
         // failure, and swallowing is how a thing turns out never to have been
@@ -284,7 +284,7 @@ public sealed class HybridBusTests
 
         await bus.SendAsync(broken.Address, To("broken"));
 
-        await bus.WhenQuiet().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Patience);
     }
 
     [Fact]
@@ -295,7 +295,7 @@ public sealed class HybridBusTests
         using var _ = bus.Subscribe(alpha);
 
         for (var i = 0; i < 200; i++) await bus.SendAsync(alpha.Address, To("alpha"));
-        await bus.WhenQuiet().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Equal(200, alpha.Got.Count);
         Assert.Equal(0, bus.InFlight);

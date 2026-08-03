@@ -144,48 +144,11 @@ public sealed class Binding
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.CodesPerAttribute);
 
         _settings = settings;
-        _scenes = new Random(Apart(seed, 0x9E37_79B9));
-        _binding = new Random(Apart(seed, 0x85EB_CA6B));
-    }
 
-    /// <summary>
-    /// Turns a seed and a purpose into a generator seed that is nowhere near its
-    /// neighbours.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>MEASURED, 2026-08-03, AND IT COST A FALSE RESULT BEFORE IT WAS FOUND.</b>
-    /// A seeded <see cref="Random"/> in .NET normalises its seed by magnitude, so
-    /// <c>new Random(~s)</c> is <c>new Random(s + 1)</c> — the "separate"
-    /// generator here was the NEXT SEED'S scene generator. Worse, consecutive
-    /// integer seeds produce streams whose per-seed statistics come out far
-    /// tighter than chance allows: over seeds 1..8 the swap count landed in
-    /// 19..23 of 39, a spread of about 1.3 where a fair coin gives 3.1.
-    /// </para>
-    /// <para>
-    /// <b>That understates every standard error taken across those seeds</b>, and
-    /// it read as a five-sigma departure from chance that was not there. So the
-    /// seed is mixed rather than offset, and a test measures the spread instead of
-    /// assuming it.
-    /// </para>
-    /// <para>
-    /// <b>Deliberately not <see cref="HashCode.Combine{T1, T2}"/></b>, which is
-    /// randomised per process and would make a run irreproducible — the opposite
-    /// of what a seed is for.
-    /// </para>
-    /// </remarks>
-    public static int Apart(int seed, uint purpose)
-    {
-        unchecked
-        {
-            var mixed = (uint)seed ^ purpose;
-            mixed = (mixed ^ (mixed >> 16)) * 0x7FEB_352D;
-            mixed = (mixed ^ (mixed >> 15)) * 0x846C_A68B;
-            mixed ^= mixed >> 16;
-
-            // Positive, because the magnitude is all the generator reads anyway.
-            return (int)(mixed & 0x7FFF_FFFF);
-        }
+        // TWO PURPOSES, SO THE TWO STREAMS SHARE NOTHING. See Seeds.Apart for
+        // what happens when they are merely offset from each other.
+        _scenes = new Random(Seeds.Apart(seed, 0x9E37_79B9));
+        _binding = new Random(Seeds.Apart(seed, 0x85EB_CA6B));
     }
 
     /// <summary>How many kinds of thing there are.</summary>

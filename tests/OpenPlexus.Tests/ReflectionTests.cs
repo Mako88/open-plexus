@@ -229,7 +229,7 @@ public sealed class ReflectionTests
         }
 
         public Task Quiet() =>
-            Bus.WhenQuiet().WaitAsync(TimeSpan.FromSeconds(30));
+            Bus.WhenIdle().WaitAsync(TimeSpan.FromSeconds(30));
 
         /// <summary>
         /// Waits on the THOUGHT'S OWN ACCOUNTING rather than on the bus.
@@ -237,7 +237,7 @@ public sealed class ReflectionTests
         /// <remarks>
         /// <b>The bus going quiet does not mean the walk finished.</b> In-flight
         /// hits zero in the gap between a cluster handling a message and
-        /// dispatching what that message produced, so <c>WhenQuiet</c> can
+        /// dispatching what that message produced, so <c>WhenIdle</c> can
         /// return mid-walk — fork 12, observed here as a thought with
         /// <c>live=2, deaths=0</c> and no arrivals at all. <see cref="Thought.Settled"/>
         /// is the signal that every route has returned or died.

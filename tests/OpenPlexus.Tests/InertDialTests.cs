@@ -66,7 +66,7 @@ public sealed class InertDialTests
         {
             var thought = await eye.ObserveAsync(
                 new SnakeFrame { View = snake.View(), Did = did }, step);
-            await bus.WhenQuiet().WaitAsync(TimeSpan.FromSeconds(5));
+            await bus.WhenIdle().WaitAsync(TimeSpan.FromSeconds(5));
 
             if (thought is not null)
                 foreach (var arrival in thought.Best(int.MaxValue))

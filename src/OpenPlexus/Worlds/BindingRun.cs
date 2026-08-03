@@ -293,7 +293,7 @@ public sealed class BindingRun : IDisposable
 
             var thought = await _eyes
                 .ObserveAsync(scene.Codes, moment, ct).ConfigureAwait(false);
-            await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
+            await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
 
             // Reflection sees what was OBSERVED and never what was asked, for the
             // same reason it does in the senses world: writing a question's own
@@ -445,14 +445,14 @@ public sealed class BindingRun : IDisposable
     /// </summary>
     private async Task<bool> SettleAsync(Thought thought, CancellationToken ct)
     {
-        await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
+        await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
 
         var until = Environment.TickCount64 + (long)Waiting.TotalMilliseconds;
 
         while (!thought.Settled && Environment.TickCount64 < until)
         {
             await Task.Delay(1, ct).ConfigureAwait(false);
-            await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
+            await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
         }
 
         return thought.Settled;

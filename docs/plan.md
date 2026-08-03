@@ -67,8 +67,7 @@ appeared to want opposite pricing, mirrored almost exactly — until the receive
 arm was given budget, at which point it won BOTH halves. So there is no per-hop
 conflict; there is a cost. Sender reaches a comparable answer for a fraction of
 the traffic, and on a near-clique graph the budget receiver needs cannot be paid
-at all. **The trap one axis over: two dials compared at one setting of a third
-are a comparison of the third.**
+at all. **The trap it walked into is in TRAPS.**
 
 ---
 
@@ -245,8 +244,11 @@ process** — kept, because a real network loses reports.
 
 **Live:**
 
-- **A dial swept at one data volume may be measuring the volume.** The stamina
-  plateau reversed between short runs and long ones. **Sweep at two run lengths.**
+- **A DIAL MEASURED AT ONE SETTING OF ANOTHER MAY BE MEASURING THAT ONE.** The
+  stamina plateau reversed between short runs and long ones; and two pricings
+  compared at one stamina read as a per-hop conflict that simply vanished at a
+  higher one. **Sweep at two run lengths, and never compare two dials with a
+  third pinned.**
 - **Short runs on the binding world score above chance for RECENCY ALONE**, and
   it decays with data. **Nothing under a few hundred scenes measures binding
   there.**

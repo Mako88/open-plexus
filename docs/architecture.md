@@ -254,9 +254,9 @@ by status rather than by scrolling.
 
 | | | |
 |---|---|---|
-| **14** | ✅ **BUILT** — inverse cost, `1/weight`. Answered fork 8 as a side effect. Unblocks 2 |
-| **2** | ✅ **BUILT** — receiver weighs, and it is the default |
-| **8** | ✅ **Answered by fork 14's inverse cost** — factorial became polynomial in the budget, and the horizon stopped firing |
+| **18** | **What to score.** Survival is disqualified: the arm that survives longest is the one that circles and eats nothing | **blocks 15 and 16** |
+| **15** | Strengthening a connection a thought walks | gated on 18 — it would be tuned against whatever we score |
+| **16** | Back-propagation from an outside signal | gated on 18, same reason |
 | **11** | The output machine is not addressed | needed before a second machine |
 | **12** | `Halted` is approximate, and the ordering that causes it | both orderings cost something |
 
@@ -268,22 +268,26 @@ by status rather than by scrolling.
 | **1b** | What manufactures change for a static world — John's heartbeat is the only candidate |
 | **3** | Cluster placement: uniform hash against prefix locality |
 | **7** | How clusters are grouped — modality and time-of-creation both ruled out |
+| **17** | Forgetting — designed on `master`, unbuilt here |
 
 **Settled**
 
 | | |
 |---|---|
-| **5** | ✅ What a thought does with a death event — built to John's design |
-| **6** | ✅ Broadcast the origin, route the hops — built |
-| **13** | ✅ The in-flight accounting was wrong on 39% of thoughts — fixed |
+| **2** | ✅ Receiver weighs, and it is the default |
+| **5** | ✅ A death writes off exactly the routes heading into the dead cluster |
+| **6** | ✅ Broadcast the origin, route the hops |
+| **8** | ✅ Answered by 14 — factorial became polynomial in the budget |
+| **9** | ✅ Answered by relative inputs — reversing is no longer an action |
+| **13** | ✅ The in-flight accounting was wrong on 39% of thoughts; the clamp was the bug |
+| **14** | ✅ Inverse cost, `1/weight`. Answered 8 as a side effect and unblocked 2 |
 | **4** | Folded into **14**, which is the same question asked properly |
 
 **Measured findings, not decisions**
 
 | | |
 |---|---|
-| **9** | Random play dies in about five steps, because reversing is fatal |
-| **10** | The chain beats random by six standard errors and ties with repeat-last-action |
+| **10** | The chain outlives random by ~12 standard errors and takes more fruit; it loses survival to circling, and random eats more per step alive |
 
 ---
 
@@ -600,6 +604,21 @@ Recorded here so a decision does not go quiet.
     live count comes from splits and deaths; the in-flight counts come from the
     routing named in each report. Those are two independent quantities, and
     them agreeing is a real check where the old one held by construction.
+
+18. **WHAT TO SCORE — open, and it blocks the two feedback forks.**
+    Survival is disqualified: repeating one turn is a circle the snake holds
+    forever, so it outlives every other arm and eats **two** fruit in 200 runs
+    against the chain's forty. **The arm that survives longest is the one that
+    achieves least.**
+    Lowering the energy kills the circling artefact — at 80 energy or below the
+    chain outlives repeat — but it does **not** make eating and surviving the
+    same thing: random still takes more fruit per step alive at most settings.
+    Candidates, none chosen: **fruit per step alive** (the only column so far
+    not won by standing still); **fruit outright** (honest but rare); something
+    that penalises circling directly (which risks scoring the mechanism rather
+    than the outcome).
+    **Forks 15 and 16 wait on this**, because a feedback loop tuned against the
+    wrong score is worse than no feedback loop.
 
 15. **STRENGTHENING ON USE — John, 2026-08-02.** A connection a thought walks
     gets stronger; one a thought cannot continue down gets weaker. **Not

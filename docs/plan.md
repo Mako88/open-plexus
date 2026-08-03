@@ -232,7 +232,7 @@ condition is a superstition. The commit named in git holds the numbers.
 | A deeper walk for prediction | Monotonically worse — without edge kinds, deeper reaches more and ranks worse | **Edge kinds**, and that refutation reproduced |
 | `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted, `Max` re-tried where its revival condition pointed and worse there too. **Both now DELETED** | Lift in the **cost**, which `Doubt` is the nearest thing to |
 | Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | **REVIVED at one code.** Naming as many codes as the frame holds swamps the action entirely — fork 18's gap is flat at every sight radius. Naming ONE, it opens wide |
-| `Window` span | Null on snake; WORSE on `Babi`, an ordered corpus where before-and-after is the content, at an order of magnitude more traffic | **Edge kinds** — a carried edge is ranked against a simultaneous one as if they meant the same |
+| `Window` span | Null on snake and WORSE on `Babi`, at an order of magnitude more traffic — but **it is the whole task on `Rhythm`**, where at zero the graph forms no edges at all. So the arm is live and world-dependent, which is the recurring fault wearing a new hat | **Edge kinds** — a carried edge is ranked against a simultaneous one as if they meant the same, which is why it helps where everything is temporal and hurts where things overlap |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
 | `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift on the conjunction and ALL of its cost on binding. **Two candidates whose orders invert score identically under RRF for every damping constant**, so it ties exactly where it is needed and the tiebreak answers | A question with many candidates, or a fusion that separates by something other than position |
 
@@ -276,12 +276,8 @@ process** — kept, because a real network loses reports.
 input machine; the harness hands the finished thought over by direct call. Needed
 before a second machine exists.
 
-**THE WINDOW CANNOT RECORD IMMEDIATE SUCCESSION.** A code stopping as another
-starts joins neither `Live` nor `Recent`, so where nothing overlaps the graph
-learns the relation one step too far back — on `Rhythm`, next-symbol prediction
-sits at chance while two-ahead climbs far above it. Snake hid it by overlapping.
-**Carrying before reading would move every measurement ever taken**, so this is a
-defect and not an edit.
+**Nothing else outstanding here** — the window's phase error and the surviving
+mutation are both closed.
 
 ---
 

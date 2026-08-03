@@ -25,13 +25,18 @@ public sealed class WindowTests
         var window = new Window(span: 2);
         window.Carry([C(1)], [], now: 10);
 
+        // FROM THE MOMENT IT STOPPED, AND THAT IS THE FIX RATHER THAN A DETAIL.
+        // The input machine now carries before it reads, so a code is available to
+        // whatever starts in the same moment it left -- which is the immediate
+        // predecessor, and it used to be the one relation the window could never
+        // record. See the note on Recent.
+        Assert.Contains(C(1), window.Recent(10));
         Assert.Contains(C(1), window.Recent(11));
-        Assert.Contains(C(1), window.Recent(12));
 
-        // Three moments later it is gone: too long and everything is eventually
+        // AND FOR EXACTLY `span` MOMENTS. Too long and everything is eventually
         // adjacent to everything, which is the density that makes a graph
         // unwalkable.
-        Assert.DoesNotContain(C(1), window.Recent(13));
+        Assert.DoesNotContain(C(1), window.Recent(12));
     }
 
     [Fact]

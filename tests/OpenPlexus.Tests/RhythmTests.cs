@@ -88,36 +88,42 @@ public sealed class RhythmTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task The_window_learns_real_structure_at_the_wrong_offset()
+    public async Task The_window_records_the_immediate_predecessor()
     {
-        // THE FINDING, AND IT IS AN ARCHITECTURAL ONE RATHER THAN A SCORE.
+        // THIS WORLD FOUND THE OFFSET BUG AND THIS TEST IS WHAT HOLDS THE FIX.
         //
-        // A code that stops in the same moment another starts is deliberately NOT
-        // joined: `Live` is what was already there AND STILL IS, and the window is
-        // read before what just stopped is carried into it. On snake that is
-        // sensible, because codes overlap and a thing that ends as another begins
-        // did not persist through the onset.
+        // A code that stops in the same moment another starts is not in `Live` --
+        // which is what was already there AND STILL IS -- so the window is the
+        // only thing that can join it to its successor. The window used to be READ
+        // before what just stopped was carried into it, so the immediate
+        // predecessor was the one relation it could never record: the graph learnt
+        // the step before that instead, and predicted the next symbol at chance
+        // while predicting the one AFTER it far above chance.
         //
-        // Here nothing ever overlaps -- one symbol per moment -- so the immediate
-        // predecessor is exactly the code that stops as its successor starts, and
-        // it is therefore the ONE relation the window can never record. What gets
-        // recorded instead is the moment before that. The graph learns the stream
-        // perfectly well and learns it one step out of phase.
-        //
-        // That is a different fault from having learnt nothing, and an accuracy
-        // alone cannot tell them apart -- which is why this world reports both
-        // offsets.
+        // Carrying before reading fixes the phase. The two offsets are both still
+        // reported, because an accuracy alone cannot tell "learnt nothing" from
+        // "learnt it one step out", and a regression would look like the former.
         using var run = new RhythmRun(World(), Fixture.Dials(stamina: 4.0), seed: 1, span: 1);
         var result = await run.RunAsync(600);
 
         output.WriteLine(result.ToString());
 
-        Assert.True(result.TwoAhead > result.Chance * 3,
-            $"the two-ahead symbol was not predicted either, so the diagnosis is "
-            + $"wrong and the graph simply learnt nothing: {result.TwoAhead}");
+        Assert.True(result.Expected > result.Chance * 5,
+            $"the next symbol was not learnt: {result.Expected} against "
+            + $"chance {result.Chance}");
 
-        Assert.True(result.TwoAhead > result.Expected * 3,
-            $"the offset is not skewed: next={result.Expected} after={result.TwoAhead}");
+        // AND THE PHASE IS RIGHT WAY ROUND NOW, which is the half that would have
+        // caught the original bug. Predicting two ahead is what a walk one step
+        // out of phase does, and it should now be the thing at chance.
+        Assert.True(result.Expected > result.TwoAhead * 5,
+            $"the offset is skewed again: next={result.Expected} after={result.TwoAhead}");
+
+        // AND A VIOLATION IS STILL NEVER FORESEEN, which is the world's own
+        // integrity check: it is a draw from everything the cycle did not call for.
+        Assert.True(result.Surprised < result.Chance * 3,
+            $"violations were foreseen at {result.Surprised}");
+
+        Assert.Empty(result.Complaints);
     }
 
     [Fact]
@@ -150,9 +156,9 @@ public sealed class RhythmTests(ITestOutputHelper output)
 
         // THE SCORE DOES, and by more than the margin anybody would call a dial
         // effect. A sweep taken at one length here would be reading the length.
-        Assert.True(extended.TwoAhead - short_.TwoAhead > 0.05,
+        Assert.True(extended.Expected - short_.Expected > 0.05,
             $"the score no longer climbs with data, so this world has saturated "
             + $"and the two-length rule could be relaxed: "
-            + $"{short_.TwoAhead} to {extended.TwoAhead}");
+            + $"{short_.Expected} to {extended.Expected}");
     }
 }

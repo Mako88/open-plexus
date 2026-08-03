@@ -40,8 +40,17 @@ public sealed class Window
     }
 
     /// <summary>What is still being carried, as of now.</summary>
+    /// <remarks>
+    /// <b>STRICTLY INSIDE THE SPAN, AND THE STRICTNESS IS WHAT KEEPS ZERO
+    /// MEANING OFF.</b> A code is carried into the very moment it stopped, because
+    /// the input machine now carries before it reads, so <c>now - departed</c> is
+    /// zero for whatever just left. Admitting that at <c>span = 0</c> would form edges
+    /// in the arm that exists to form none, and every measurement taken under it
+    /// would silently change meaning. With this strict, <c>span = 0</c> carries
+    /// nothing and <c>span = 1</c> carries exactly the previous frame.
+    /// </remarks>
     public IReadOnlyCollection<Code> Recent(long now) =>
-        [.. _departed.Where(entry => now - entry.Value <= _span).Select(entry => entry.Key)];
+        [.. _departed.Where(entry => now - entry.Value < _span).Select(entry => entry.Key)];
 
     /// <summary>
     /// Takes what just stopped, and drops what has been carried long enough.
@@ -58,7 +67,7 @@ public sealed class Window
         foreach (var code in started) _departed.Remove(code);
         foreach (var code in stopped) _departed[code] = now;
 
-        foreach (var code in _departed.Where(e => now - e.Value > _span).Select(e => e.Key).ToArray())
+        foreach (var code in _departed.Where(e => now - e.Value >= _span).Select(e => e.Key).ToArray())
             _departed.Remove(code);
     }
 }

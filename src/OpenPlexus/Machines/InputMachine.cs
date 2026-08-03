@@ -105,10 +105,19 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         var onsets = changes.Started.ToHashSet();
         ImmutableArray<Code> live = [.. _liveSet.Live.Where(code => !onsets.Contains(code))];
 
-        // What has recently stopped, carried forward so a thing that ended
-        // before the next began can still be linked to it.
-        ImmutableArray<Code> recent = [.. _window.Recent(now)];
+        // WHAT HAS RECENTLY STOPPED, AND THE ORDER OF THESE TWO LINES IS THE
+        // WHOLE OF THE TEMPORAL EDGE. Carrying AFTER reading meant the code that
+        // stopped as this one started was not yet in the window, so it could never
+        // join -- and since `Live` is what was already there AND STILL IS, it was
+        // excluded from that too. The immediate predecessor was therefore the one
+        // relation the graph could never record: on a stream where nothing
+        // overlaps, it learnt the step before that instead, measured on `Rhythm`
+        // as predicting the next symbol at chance and the one after it far above.
+        //
+        // Carrying first makes the previous frame available to this one. `Window`
+        // counts strictly inside the span to keep zero meaning off.
         _window.Carry(changes.Stopped, changes.Started, now);
+        ImmutableArray<Code> recent = [.. _window.Recent(now)];
 
         await _rendezvous.JoinAsync(
             new Occasion

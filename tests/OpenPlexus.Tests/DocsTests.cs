@@ -46,7 +46,7 @@ public sealed class DocsTests
     /// the doc was no cheaper to load. Words track what is actually being spent.
     /// </para>
     /// </remarks>
-    private const int Budget = 3_600;
+    private const int Budget = 2_800;
 
     private static string Repo()
     {

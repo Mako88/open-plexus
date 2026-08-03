@@ -10,50 +10,10 @@ namespace OpenPlexus.Worlds;
 /// <summary>
 /// What the binding world measured. <b>Counts, not claims.</b>
 /// </summary>
-public sealed record BindingResult
+public sealed record BindingResult : Questioned
 {
-    /// <summary>Scenes shown.</summary>
-    public required int Moments { get; init; }
-
-    /// <summary>Questions asked — a colour, answered with one of the two shapes present.</summary>
-    public required int Asked { get; init; }
-
-    /// <summary>Of those, how many named the shape that colour was actually bound to.</summary>
-    public required int Right { get; init; }
-
-    /// <summary>Of those, how many reached neither shape in the scene.</summary>
-    public required int Silent { get; init; }
-
-    /// <summary>What a blind guess would score.</summary>
-    public required double Chance { get; init; }
-
     /// <summary>Whether a colour kept its shape for the life of the world.</summary>
     public required bool Bound { get; init; }
-
-    /// <summary>Conclusions written back as observations. Zero when fork 21 is off.</summary>
-    public required int Reflected { get; init; }
-
-    /// <summary>Whether fork 21 was switched on for this run.</summary>
-    public required bool Reflecting { get; init; }
-
-    /// <summary>Nodes across every cluster.</summary>
-    public required int Nodes { get; init; }
-
-    /// <summary>Partner entries across every node.</summary>
-    public required int Edges { get; init; }
-
-    /// <summary>How many nodes each cluster holds.</summary>
-    public required IReadOnlyList<int> Spread { get; init; }
-
-    /// <summary>How long the chains that came back were, by length.</summary>
-    /// <remarks>
-    /// <b>A colour and a shape occur in the same scene</b>, so the answer here is
-    /// reachable in one hop and a chain of length two is enough. That is the
-    /// opposite of the senses world, where nothing shallower than three could be
-    /// the task — and it is why "the walk was too shallow" is not available as an
-    /// explanation for anything measured here.
-    /// </remarks>
-    public required IReadOnlyDictionary<int, int> ChainLengths { get; init; }
 
     /// <summary>
     /// How often a question reached BOTH shapes in the scene.
@@ -91,34 +51,28 @@ public sealed record BindingResult
     /// </remarks>
     public required int Swapped { get; init; }
 
-    /// <summary>What the bus carried.</summary>
-    public required long Messages { get; init; }
-
-    /// <summary>Routes killed by the horizon rather than by economics.</summary>
-    public required long Halted { get; init; }
-
-    /// <summary>Thoughts whose own accounting did not close.</summary>
-    public required int Unbalanced { get; init; }
-
-    /// <summary>Questions read before their walk had finished — fork 22.</summary>
-    public required int Unsettled { get; init; }
-
-    /// <summary>The share of questions answered correctly.</summary>
-    public double Accuracy => Asked == 0 ? 0.0 : Right / (double)Asked;
-
     /// <summary>The share of questions where both candidates were in reach.</summary>
     public double Forced => Asked == 0 ? 0.0 : SawBoth / (double)Asked;
 
     /// <summary>The share of answers that named the queried colour's own concept.</summary>
     public double Echo => Asked == 0 ? 0.0 : Echoed / (double)Asked;
 
-    /// <summary>How far a route actually walked, at most.</summary>
-    public int Deepest => ChainLengths.Count == 0 ? 0 : ChainLengths.Keys.Max();
+    /// <inheritdoc/>
+    protected override string Shown => "scenes";
 
-    /// <summary>
-    /// Everything out of the range it would be in if this world were wired the
-    /// way it is supposed to be.
-    /// </summary>
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>Two, because a colour and a shape occur in the same scene</b>, so the
+    /// answer is reachable in one hop. That is the opposite of the senses world —
+    /// and it is why "the walk was too shallow" is not available as an explanation
+    /// for anything measured here.
+    /// </remarks>
+    protected override int Composes => 2;
+
+    /// <inheritdoc/>
+    protected override string Stalled => "no route ever left its origin";
+
+    /// <inheritdoc/>
     /// <remarks>
     /// <b>Load-bearing here more than anywhere else in the project.</b> Every
     /// other world's headline is a number going UP, where a disconnected dial
@@ -127,62 +81,25 @@ public sealed record BindingResult
     /// So the complaints are what stands between "measured at chance" and "never
     /// measured anything".
     /// </remarks>
-    public IReadOnlyList<string> Complaints
+    protected override void Beyond(List<string> wrong)
     {
-        get
-        {
-            var wrong = new List<string>();
+        ArgumentNullException.ThrowIfNull(wrong);
 
-            if (Moments == 0) wrong.Add("the run showed no scenes");
-            if (Asked == 0) wrong.Add("nothing was ever asked");
-            if (Nodes == 0) wrong.Add("no node ever came into existence");
-            if (Edges == 0) wrong.Add("no connection was ever formed");
-            if (Messages == 0) wrong.Add("the bus carried nothing");
-            if (Unbalanced > 0) wrong.Add($"{Unbalanced} thoughts did not balance");
-            if (Unsettled > 0) wrong.Add($"{Unsettled} questions were read before their walk finished");
-
-            // A colour reaches a shape in one hop, so a chain of two is the task.
-            // Anything shallower means nothing ever left the code it started on.
-            if (Deepest < 2)
-                wrong.Add($"no route ever left its origin — deepest chain {Deepest}");
-
-            if (Asked > 0 && Silent >= Asked) wrong.Add("every question went unanswered");
-
-            // THE ONE THAT IS SPECIFIC TO THIS WORLD. See SawBoth: a chance score
-            // means nothing if the choice was never actually forced.
-            if (Asked > 0 && SawBoth * 2 < Asked)
-                wrong.Add($"only {SawBoth} of {Asked} questions reached both candidates");
-
-            if (Spread.Count(count => count > 0) < 2) wrong.Add("every node landed on one cluster");
-
-            if (Reflecting && Reflected == 0)
-                wrong.Add("reflection was switched on and wrote nothing");
-            if (!Reflecting && Reflected > 0)
-                wrong.Add($"reflection was off and still wrote {Reflected}");
-
-            return wrong;
-        }
+        // See SawBoth: a chance score means nothing if the choice was never
+        // actually forced.
+        if (Asked > 0 && SawBoth * 2 < Asked)
+            wrong.Add($"only {SawBoth} of {Asked} questions reached both candidates");
     }
 
-    public override string ToString()
-    {
-        var lengths = string.Join(
-            " ", ChainLengths.OrderBy(e => e.Key).Select(e => $"{e.Key}:{e.Value}"));
-
-        var line =
-            $"binding={(Bound ? "stable" : "per-scene")} " +
-            $"moments={Moments} asked={Asked} right={Right} silent={Silent} " +
-            $"accuracy={Accuracy:F4} chance={Chance:F4} forced={Forced:F4} " +
-            $"echo={Echo:F4} swapped={Swapped} | " +
-            $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
-            $"nodes={Nodes} edges={Edges} spread=[{string.Join(",", Spread)}] | " +
-            $"chains={{{lengths}}} deepest={Deepest} | " +
-            $"msgs={Messages} halted={Halted} unbalanced={Unbalanced} unsettled={Unsettled}";
-
-        return Complaints.Count == 0
-            ? line
-            : $"{line} || WRONG: {string.Join("; ", Complaints)}";
-    }
+    public override string ToString() =>
+        $"binding={(Bound ? "stable" : "per-scene")} " +
+        $"moments={Moments} asked={Asked} right={Right} silent={Silent} " +
+        $"accuracy={Accuracy:F4} chance={Chance:F4} forced={Forced:F4} " +
+        $"echo={Echo:F4} swapped={Swapped} | " +
+        $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
+        $"nodes={Nodes} edges={Edges} spread=[{string.Join(",", Spread)}] | " +
+        $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | " +
+        $"msgs={Messages} halted={Halted} unbalanced={Unbalanced} unsettled={Unsettled}{Wrong}";
 }
 
 /// <summary>
@@ -243,6 +160,8 @@ public sealed class BindingRun : IDisposable
         public IReadOnlyCollection<Code> Codify(Scene observation) => observation.Codes;
 
         public IReadOnlyDictionary<Code, int>? Bind(Scene observation) => observation.Groups;
+
+        public IReadOnlySet<Code>? Fleeting(Scene observation) => observation.Passing;
     }
 
     /// <summary>
@@ -269,7 +188,7 @@ public sealed class BindingRun : IDisposable
         long halted = 0;
 
         var reflected = 0;
-        var chains = new Dictionary<int, int>();
+        var chains = new Chains();
 
         for (var moment = 0; moment < moments; moment++)
         {
@@ -297,13 +216,16 @@ public sealed class BindingRun : IDisposable
 
             asked++;
             halted += stopped;
+
+            // `Landed` here means BOTH candidate shapes were in reach, so the
+            // forced choice really was forced -- see Answered.Landed.
             if (both) sawBoth++;
+
             if (!balanced) unbalanced++;
             if (!settled) unsettled++;
             if (scene.Shapes[which] != scene.Colours[which]) swapped++;
 
-            foreach (var arrival in reached)
-                chains[arrival.Chain.Length] = chains.GetValueOrDefault(arrival.Chain.Length) + 1;
+            chains.Fold(reached);
 
             if (answer is null) silent++;
             else if (answer == scene.Shapes[which]) right++;
@@ -324,56 +246,24 @@ public sealed class BindingRun : IDisposable
             Swapped = swapped,
             Chance = Binding.Chance,
             Bound = _world.Bound,
-            Reflected = reflected,
-            Reflecting = _dials.Reflect is not null,
-            Nodes = _fabric.Nodes,
-            Edges = _fabric.Edges,
-            Spread = _fabric.Spread,
-            ChainLengths = chains,
-            Messages = _fabric.Bus.Messages,
+            Reflections = Reflections.Of(_dials, reflected),
+            Plumbing = _fabric.Facts(chains, unbalanced),
             Halted = halted,
-            Unbalanced = unbalanced,
             Unsettled = unsettled,
         };
     }
-
-    /// <summary>One question, with the plumbing left attached.</summary>
-    private readonly record struct Asking(
-        int? Answer,
-        bool Both,
-        int Halted,
-        bool Balanced,
-        bool Settled,
-        IReadOnlyList<Arrival> Reached);
 
     /// <summary>
     /// Asks which shape one object had, several times at once, and takes the
     /// majority.
     /// </summary>
-    private async Task<Asking> AskingAsync(
+    private async Task<Answered> AskingAsync(
         Scene scene, int which, int votes, CancellationToken ct)
     {
-        var asking = new Task<Asking>[votes];
+        var asking = new Task<Answered>[votes];
         for (var i = 0; i < votes; i++) asking[i] = OnceAsync(scene, which, ct);
 
-        var answers = await Task.WhenAll(asking).ConfigureAwait(false);
-
-        // MOST VOTES WINS, AND SILENCE DOES NOT GET ONE.
-        var tally = new Dictionary<int, int>();
-        foreach (var answer in answers)
-            if (answer.Answer is { } shape) tally[shape] = tally.GetValueOrDefault(shape) + 1;
-
-        var chosen = tally.Count == 0
-            ? (int?)null
-            : tally.OrderByDescending(e => e.Value).ThenBy(e => e.Key).First().Key;
-
-        return new Asking(
-            chosen,
-            answers.Any(one => one.Both),
-            answers.Sum(one => one.Halted),
-            answers.All(one => one.Balanced),
-            answers.All(one => one.Settled),
-            [.. answers.SelectMany(one => one.Reached)]);
+        return Answered.Voted(await Task.WhenAll(asking).ConfigureAwait(false));
     }
 
     /// <summary>
@@ -386,19 +276,30 @@ public sealed class BindingRun : IDisposable
     /// which is identity doing work rather than a lookup — so the comparison is
     /// on what the code stands for.
     /// </remarks>
-    private async Task<Asking> OnceAsync(Scene scene, int which, CancellationToken ct)
+    private async Task<Answered> OnceAsync(Scene scene, int which, CancellationToken ct)
     {
         // THE QUESTION CARRIES THE INDEX WHEN THE WORLD HANDS ONE OUT. Without
         // it there is no way to say *this one*: an object can only be named by
         // its attributes, and its attributes are what is being asked about. With
         // it, the question is "the object I am pointing at, which is this colour
         // -- what shape is it".
+        var colour = _world.Of(Binding.Colour, scene.Colours[which]);
+
         IReadOnlyCollection<Code> origins = scene.Tags.Count > which
-            ? [.. _world.Of(Binding.Colour, scene.Colours[which]), scene.Tags[which]]
-            : _world.Of(Binding.Colour, scene.Colours[which]);
+            ? [.. colour, scene.Tags[which]]
+            : colour;
+
+        // WHICH ORIGINS ARE ONE THING SAID SEVERAL WAYS. Every code of the
+        // colour is the same colour, and the index is something else entirely --
+        // so under `Agreement` they are two witnesses rather than four. Without
+        // this the colour outvotes the index three to one and the answer is the
+        // echo, which is exactly what the index was added to beat.
+        var asking = new Dictionary<Code, int>();
+        foreach (var code in colour) asking[code] = 0;
+        if (scene.Tags.Count > which) asking[scene.Tags[which]] = 1;
 
         var thought = await _eyes
-            .ThinkAsync(origins, _dials.Stamina, ct)
+            .ThinkAsync(origins, _dials.Stamina, asking, ct)
             .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
@@ -421,13 +322,8 @@ public sealed class BindingRun : IDisposable
             seen.Add(concept);
         }
 
-        var report = new Asking(
-            answer,
-            seen.Count == candidates.Count,
-            thought.Halted,
-            thought.Balanced(),
-            settled,
-            thought.Best(int.MaxValue));
+        var report = Answered.From(
+            thought, answer, seen.Count == candidates.Count, settled);
 
         _eyes.Forget(thought.Id);
         return report;

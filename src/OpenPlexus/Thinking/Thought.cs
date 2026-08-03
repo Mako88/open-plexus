@@ -21,6 +21,36 @@ public sealed class Thought
     private readonly Dictionary<Code, Arrival> _arrivals = [];
 
     /// <summary>
+    /// Endpoint code to the distinct origins that have reached it.
+    /// </summary>
+    /// <remarks>
+    /// <b>Kept beside the arrivals rather than inside them, because an arrival is
+    /// a wire type.</b> A report carries one route's account of itself; which
+    /// origins agree is a fact about the whole thought and can only be known
+    /// where they are collected. See <see cref="Accumulate.Agreement"/>.
+    /// </remarks>
+    private readonly Dictionary<Code, HashSet<Code>> _agreeing = [];
+
+    /// <summary>
+    /// Origin code to the one code that speaks for its group.
+    /// </summary>
+    /// <remarks>
+    /// <b>SEVERAL CODES FOR ONE THING ARE ONE PIECE OF EVIDENCE, NOT SEVERAL, AND
+    /// MEASURING OTHERWISE BROKE A WORKING RESULT.</b> A question is broadcast
+    /// from every code of the attribute it names — because the walk must reach
+    /// whichever one the scene happened to show — so an endpoint reached "from
+    /// three origins" may have been reached from one attribute three ways.
+    /// Counting those as three destroyed the binding world's score, by letting a
+    /// shape reached from three redundant colour codes outrank the shape reached
+    /// from the index that actually carried the binding.
+    /// <para>
+    /// <b>Empty when the asker says nothing</b>, which is every question whose
+    /// origins really are independent — and then a code speaks for itself.
+    /// </para>
+    /// </remarks>
+    private readonly Dictionary<Code, Code> _speaksFor = [];
+
+    /// <summary>
     /// How evidence from several routes reaching one endpoint is combined.
     /// </summary>
     private readonly Accumulate _accumulate;
@@ -75,11 +105,16 @@ public sealed class Thought
     /// cannot know how many routes it started, only how many clusters replied.
     /// Kept so a settled thought can be written back as an occasion; see fork 21.
     /// </param>
+    /// <param name="asking">
+    /// Which origins are the same thing said several ways, when the asker can
+    /// say. <b>Null is every question whose origins are independent.</b>
+    /// </param>
     public Thought(
         BroadcastId id,
         int origins,
         Accumulate accumulate,
-        ImmutableArray<Code> started = default)
+        ImmutableArray<Code> started = default,
+        IReadOnlyDictionary<Code, int>? asking = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(origins);
 
@@ -88,6 +123,20 @@ public sealed class Thought
         _accumulate = accumulate;
         _live = origins;
         _started = started.IsDefault ? [] : started;
+
+        // ONE SPOKESMAN PER GROUP, PICKED DETERMINISTICALLY. Whichever code sorts
+        // first stands for the group, so two thoughts asked the same question
+        // count agreement the same way whatever order the origins arrived in.
+        if (asking is null) return;
+
+        var speaking = new Dictionary<int, Code>();
+
+        foreach (var code in _started.OrderBy(one => one))
+            if (asking.TryGetValue(code, out var group) && speaking.TryAdd(group, code))
+                speaking[group] = code;
+
+        foreach (var code in _started)
+            if (asking.TryGetValue(code, out var group)) _speaksFor[code] = speaking[group];
     }
 
     public BroadcastId Id => _id;
@@ -265,6 +314,19 @@ public sealed class Thought
         {
         if (_released) return;
 
+        // WHERE THIS ROUTE STARTED. A chain begins at its origin and ends at the
+        // node the message was addressed to, so the first entry is the origin --
+        // and an origin produces no arrival, so a chain that came back always has
+        // at least two.
+        if (!arrival.Chain.IsDefaultOrEmpty)
+        {
+            if (!_agreeing.TryGetValue(arrival.Endpoint, out var origins))
+                _agreeing[arrival.Endpoint] = origins = [];
+
+            var from = arrival.Chain[0];
+            origins.Add(_speaksFor.GetValueOrDefault(from, from));
+        }
+
         if (!_arrivals.TryGetValue(arrival.Endpoint, out var standing))
         {
             _arrivals[arrival.Endpoint] = arrival;
@@ -433,11 +495,38 @@ public sealed class Thought
             return [.. Ranked().Where(a => a.Endpoint.Modality == modality).Take(count)];
     }
 
-    private IEnumerable<Arrival> Ranked() =>
-        _arrivals.Values
-            .OrderByDescending(a => a.Score)
-            .ThenBy(a => a.Chain.Length)
-            .ThenBy(a => a.Endpoint);
+    /// <summary>
+    /// How many distinct origins have reached an endpoint.
+    /// </summary>
+    /// <remarks>
+    /// <b>The evidence a conjunctive question actually asks for</b> — see
+    /// <see cref="Accumulate.Agreement"/>. Readable so a caller can say why one
+    /// candidate outranked another, which a score alone cannot.
+    /// </remarks>
+    public int Agreeing(Code endpoint)
+    {
+        lock (_gate) return _agreeing.TryGetValue(endpoint, out var origins) ? origins.Count : 0;
+    }
+
+    /// <remarks>
+    /// <b>Ties break on the shorter chain, then on the endpoint</b>, so the order
+    /// is deterministic and does not depend on which route happened to land
+    /// first.
+    /// </remarks>
+    private IEnumerable<Arrival> Ranked()
+    {
+        // AGREEMENT FIRST AND STRENGTH ONLY TO BREAK A TIE. Sorting on score with
+        // agreement as the tiebreak would be the same ranking as `Sum`, because
+        // an exact score tie almost never happens -- the order of the keys is the
+        // whole change.
+        var ranked = _accumulate == Accumulate.Agreement
+            ? _arrivals.Values
+                .OrderByDescending(a => _agreeing.TryGetValue(a.Endpoint, out var by) ? by.Count : 0)
+                .ThenByDescending(a => a.Score)
+            : _arrivals.Values.OrderByDescending(a => a.Score);
+
+        return ranked.ThenBy(a => a.Chain.Length).ThenBy(a => a.Endpoint);
+    }
 
     /// <summary>
     /// Whether the accounting adds up. Asserted, never assumed.
@@ -485,6 +574,7 @@ public sealed class Thought
         lock (_gate)
         {
             _arrivals.Clear();
+            _agreeing.Clear();
             _released = true;
         }
     }

@@ -95,9 +95,9 @@ public sealed class Budget
     /// <summary>Which candidate is being sampled: 0 smaller, 1 current, 2 larger.</summary>
     private int _trying;
 
-    /// <summary>Questions asked, and questions that reached nothing, per candidate.</summary>
+    /// <summary>Samples taken, and what they cost, per candidate.</summary>
     private readonly int[] _asked = new int[3];
-    private readonly int[] _silent = new int[3];
+    private readonly double[] _cost = new double[3];
 
     /// <summary>How many times the estimate has moved. Reported, never read.</summary>
     private int _moves;
@@ -158,12 +158,35 @@ public sealed class Budget
     /// The caller knows what it was looking for and this class deliberately does
     /// not — which is what keeps it free of modality, codes and the graph.
     /// </remarks>
-    public void Reached(bool anything)
+    public void Reached(bool anything) => Note(anything ? 0.0 : 1.0);
+
+    /// <summary>
+    /// Reports what the question just asked COST, on any scale the caller likes.
+    /// <b>Lower is better and nothing here knows what it means.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE GENERAL FORM, AND <see cref="Reached"/> IS ONE INSTANCE OF IT.</b>
+    /// Silence is a cost of one; anything the caller can score is a cost too. A
+    /// prediction budget's cost is the NEGATIVE of how far the guess beat a blind
+    /// draw, which is a quantity the harness already computes on every step and
+    /// has never been fed to anything.
+    /// </para>
+    /// <para>
+    /// <b>The rule does not change with the signal, and that is the point.</b>
+    /// Try smaller, try current, try larger; keep the smallest that is not
+    /// materially worse. What differs between two hunts is only what they call
+    /// worse — so a second controller would have been the same class with one
+    /// line changed, and <see cref="Budgeting.Worth"/> is read on whatever scale
+    /// the cost is on.
+    /// </para>
+    /// </remarks>
+    public void Note(double cost)
     {
         lock (_gate)
         {
             _asked[_trying]++;
-            if (!anything) _silent[_trying]++;
+            _cost[_trying] += cost;
 
             if (_asked[_trying] < _settings.Window) return;
 
@@ -173,7 +196,7 @@ public sealed class Budget
             Decide();
             _trying = 0;
             Array.Clear(_asked);
-            Array.Clear(_silent);
+            Array.Clear(_cost);
         }
     }
 
@@ -189,9 +212,9 @@ public sealed class Budget
     /// </remarks>
     private void Decide()
     {
-        var smaller = Silence(0);
-        var current = Silence(1);
-        var larger = Silence(2);
+        var smaller = Cost(0);
+        var current = Cost(1);
+        var larger = Cost(2);
 
         // NOTHING REACHED ANYWHERE, AND A HILL-CLIMB IS BLIND HERE. Measured: a
         // budget of 1 against a world needing 8 sees every candidate score the
@@ -202,6 +225,11 @@ public sealed class Budget
         // means the budget is insufficient or there is nothing to reach, and in
         // both cases more budget is the only lever this class has. So climb, and
         // hand back to the ordinary rule the moment anything reaches.
+        //
+        // ONLY REACHABLE ON THE SILENCE SIGNAL, where a cost of one is total
+        // failure by construction. A scored cost is on the caller's own scale and
+        // will not sit at exactly one, which is correct -- there is no such thing
+        // as unambiguously total failure on an arbitrary score.
         if (smaller >= 1.0 && current >= 1.0 && larger >= 1.0)
         {
             if (_stamina >= _settings.Most) return;
@@ -231,6 +259,6 @@ public sealed class Budget
         }
     }
 
-    private double Silence(int candidate) =>
-        _asked[candidate] == 0 ? 0.0 : _silent[candidate] / (double)_asked[candidate];
+    private double Cost(int candidate) =>
+        _asked[candidate] == 0 ? 0.0 : _cost[candidate] / _asked[candidate];
 }

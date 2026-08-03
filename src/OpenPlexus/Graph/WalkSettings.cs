@@ -66,6 +66,33 @@ public enum Accumulate
     /// <summary>Every route. Many weak agreeing routes outrank one strong
     /// route — 0.1234 against max's 0.0834 on the typed walk.</summary>
     Sum,
+
+    /// <summary>
+    /// <b>How many DISTINCT ORIGINS reached it</b>, and strength only to break a
+    /// tie.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THIS IS WHAT A CONJUNCTION IS, AND <see cref="Sum"/> CANNOT EXPRESS
+    /// IT.</b> Ask with two things at once and the thing you meant is the one
+    /// BOTH of them reach, where everything else is reached by one. That is a
+    /// count of origins agreeing — and summing path strengths does not measure
+    /// it, because strength varies far more between routes than the count does,
+    /// so one strong single-origin route outranks two weak agreeing ones.
+    /// </para>
+    /// <para>
+    /// <b>It also fixes what <see cref="Sum"/> over-counts.</b> Many routes from
+    /// ONE origin are one piece of evidence arriving by several paths, not
+    /// several pieces; <see cref="Sum"/> adds them all and this does not.
+    /// </para>
+    /// <para>
+    /// <b>Nothing new travels for it.</b> A chain begins at its origin and is
+    /// already carried for the cycle check, so the origin is in every arrival
+    /// that comes back — the count is taken at the machine that asked, which
+    /// reads nobody else's data.
+    /// </para>
+    /// </remarks>
+    Agreement,
 }
 
 /// <summary>

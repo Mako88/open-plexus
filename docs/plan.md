@@ -1,14 +1,20 @@
 # Where this is going
 
 **The only doc, capped at 2,800 words by `DocsTests`. To add something, retire
-something.** Its predecessors reached 15,260 and 6,602 words, stopped being
-loaded, and kept getting cited — which is the failure this exists to prevent.
+something.** Its predecessors grew past the point of being loaded and kept being
+cited anyway, which is the failure this exists to prevent.
 
 **What every piece does lives in the XML comments beside the code**, and the
 compiler enforces that they refer to things that exist
 (`GenerateDocumentationFile`; CS1572/1573/1574 are build errors). That cannot go
-stale. This file holds only what code comments cannot: **where we are going, what
-to try next, and what not to try again.** Deleted docs are in git.
+stale.
+
+**This file is forward-facing and records no results.** A measurement is
+something that happened; a plan is something to do. `DocsTests` fails the build
+when a measured quantity appears here — a score, a spread, a separation, a tick
+against a closed fork. Findings live in the commit that produced them, in the
+comment beside the mechanism they are about, and in the test that asserts them.
+Deleted docs are in git.
 
 ---
 
@@ -24,25 +30,20 @@ nothing may depend on training then testing.
 
 ---
 
-## Where it stands
+## What is standing
 
-**Three worlds sharing no code.** Snake; a senses world where sight and touch
-never co-occur; a binding world built so this architecture provably could not
-answer it.
-
-- **Senses — 0.8077 ± 0.0215 against a chance of 0.0833**, scrambled control
-  below chance. A memoriser scores exactly zero there by construction. **Still
-  the most interesting result**, and it is transitive association done very well.
-- **Binding — was 0.5240 ± 0.0268 against a chance of 0.5000. Now 0.8798 ±
-  0.0148**, see 1a-next. **Every part of that lift is off by default**, so the
-  older numbers stand unchanged.
-- **The graphs are tiny** — 15 nodes on snake, 48 on binding. Nothing here has
-  been run at a size where its claims could break. Hold them loosely.
+**Four worlds sharing no world logic, over one `Fabric`.** Snake, where a chain
+can cause a move; senses, where sight and touch never co-occur so the answer can
+only be composed; binding, built so this architecture provably could not answer
+it and since lifted; and composition, where the answer was never observed at all.
 
 **An occasion is a SET of co-occurring codes**, so *red ball beside blue box* and
-*blue ball beside red box* were the same input. That was the ceiling, and it was
-**representational, not a matter of scale**: the two arms received bit-identical
-input and built identical graphs.
+*blue ball beside red box* were the same input. That ceiling was
+**representational, not a matter of scale** — and `Occasion.Groups` plus a
+per-scene index is what lifts it.
+
+**The graphs are tiny.** Nothing here has been run at a size where its claims
+could break. Hold them loosely.
 
 ---
 
@@ -51,78 +52,64 @@ input and built identical graphs.
 **The binding world is the scoreboard. Do not build a new world to test a change
 to an old one — run that one.**
 
-### 1a. Grouping — built, and alone it lifts nothing
+### 1. Composition over bindings — built and answered
 
-`Occasion.Groups` + `IQuantizer.Bind`, null by default: the front end says which
-codes belong to which object, and the rendezvous refuses to pair across objects.
-The stable control goes 0.9167 → **1.0000** with edges collapsing 1,751 → 144,
-because the cross-object edges were never real.
+**The honest test of the index**, because the world it lifted is *memorisable*.
+`Composed` documents its own shape. A memoriser scores exactly zero here.
 
-**But 0.5465 ± 0.0236 on the real task — pre-registered as a null, and it held.**
-Grouping fixes *learning*; it cannot fix *reference*, because a question asked
-with a colour cannot say **which** object it means.
+**Two things were needed, and both were architecture rather than tuning.**
 
-### 1a-next. The index in the question, and sender pricing — the lift
+`Accumulate.Agreement` — **rank a candidate by how many DISTINCT ORIGINS reached
+it**, strength only to break a tie. That is what a conjunctive question asks and
+`Sum` cannot say it: strength varies far more between routes than the count of
+origins does, so one strong single-origin route outranks two weak agreeing ones.
+Nothing new travels for it — a chain already begins at its origin. **Provably
+inert on single-origin questions**, which is what makes the lift attributable.
 
-`BindingSettings.Tagged` gives each object a contentless code of its own, fresh
-each scene, in its own group, and the question carries the queried object's.
-`Pricing.Sender` divides by the **sender's** marginal instead of the receiver's —
-C1-legal, since a node sending its own count about itself reads nobody else's
-data (`Message.Seen`).
+`Refer.Narrowed` — **read back whichever index the graph itself ranked first, and
+ask that one.** The evidence selecting an index lives in the origin's tally FOR
+that index and never travels through it, because two routes arriving at a node
+fire it twice and fan out independently. Two broadcasts, no index supplied.
 
-**16 seeds, 400 scenes: 0.8798 ± 0.0148 against 0.5481 ± 0.0227 for the same
-thing without the index.** 12.2 sigma apart, 25.7 clear of chance, **improving
-with data** — 0.7095 at 150 scenes.
+**What is left is the world's own ambiguity, not the walk's.** Two scenes sharing
+both referring values are genuinely indistinguishable by a conjunction, and how
+often that happens goes as `scenes / values²`. Widen the alphabet and the score
+follows it closely.
 
-> **THE PREDICTION WAS BACKWARDS, AND THAT IS WHY THE FIX WORKS.** The worry was
-> `tag → shape` being too *expensive*. The fault was `colour → tag` being too
-> *cheap*: a fresh index has `seen = 1`, so its arrival weight is 1.0 — the
-> cheapest hop there is — and every attribute accumulates one such partner per
-> occurrence until the fan-out explodes. Under receiver pricing the 400-scene run
-> does not finish at all.
+### 1a. RANKING BELONGS TO THE QUESTION, NOT TO THE MACHINE — decide this
 
-> **THE CAVEAT THAT LIMITS THE CLAIM: this task is MEMORISABLE.** The index is
-> grouped with its object's shape, so the occasion being asked about wrote the
-> answer directly, and a lookup table scores 1.0. **It is not a composition
-> result.** What it shows is what fork 25 denied — that the binding can be
-> *represented* at all. That is the floor rising, not the ceiling.
+**Agreement was run on the other two worlds and it is not universally right.**
+Inert on senses, where the several codes of one concept all reach the same places
+and there is nothing to disagree about. **Harmful on binding**, badly at first
+and still harmful after being told which origins are one attribute said several
+ways — because a deep walk reaches the echo *through* the index, so both
+candidates end up agreed by both groups and a weakly-reached-by-both outranks a
+strongly-reached-by-one.
 
-**Three more caveats.** The front end supplies grouping and index, so this shows
-the graph can **use** binding, not **discover** it. `Pricing.Sender` moves the
-ranking as well as the price. It costs **5.9× the messages**.
+**That is not a dial wanting a sweep. Those are different KINDS of question.**
+Composition asks a conjunction: the thing meant is the one every origin reaches.
+Binding points with an index and supplies a colour for context: the origins are
+not equals and counting them says the wrong thing. **The asker knows which it is
+asking, and today cannot say** — `Accumulate` is set once on `WalkSettings` for
+every question a machine will ever put.
 
-**Costs nothing on the other worlds** (12 seeds, not in the suite): senses 0.8269
-± 0.0090 against 0.8077 ± 0.0215; snake 186.6 ± 13.4 steps against 172.0 ± 18.9.
-Both under 1 sigma. **Indistinguishable where unneeded, transformative where
-needed** — the case for promoting it, once someone decides whether a ranking
-change hiding inside a pricing change is acceptable.
+**So move ranking onto the question**, beside the grouping that already travels
+with it. That is not another knob to tune; it is information the caller already
+holds. Until then `Agreement` stays off by default and suits conjunctions only.
 
-### 1a-after. BUILD THIS NEXT — composition over bindings, designed not built
+- **Merging routes AT A NODE is the version `Narrowed` could not do.** Reading
+  the index back costs a round trip and puts the referent in the machine's
+  hands; a node combining concurrent routes of one broadcast would keep it in the
+  graph. It needs a wait, which C2 makes expensive — but it is the honest form.
+- **`Accumulate.Max` was re-tried here, where its revival condition pointed, and
+  is worse.** Stamina is nearly an exponent on cost and buys nothing.
 
-**The honest test of step 1**, because the world above is memorisable.
+**Three things must be switched on and none is the default** —
+`Accumulate.Agreement`, `Pricing.Sender`, and `Fleeting` on any world that mints
+an index. Each type documents why. **Promoting the last two is a live decision
+and both look overdue**; `Agreement` cannot be promoted until ranking moves onto
+the question.
 
-**The trap it is designed around:** to ask about a particular object you must
-refer to it, and any reference that touches the answer makes the answer directly
-observed. **So refer by CONJUNCTION** — *the red round one* — and never let the
-referring attributes co-occur with the answer.
-
-- Each object gets an index and **three** attributes, drawn fresh per scene.
-- **Three moments per scene**, two objects each, grouped by index:
-  `{tag₀+A₀, tag₁+A₁}`, then `{tag₀+B₀, tag₁+B₁}`, then `{tag₀+C₀, tag₁+C₁}`.
-- **A, B and C never co-occur with each other.** Only an index links them, which
-  is the senses world's trick applied to bound objects.
-- **Ask with A₀ *and* B₀ — no index — for C₀.** Both reach `tag₀`; under `Sum` it
-  gets double the support of any other tag, so the conjunction selects the object.
-
-**Why each control bites.** A memoriser scores zero: `A₀→C₀` was never observed.
-Ungrouped fails: `A₀` would pair with `tag₁` too. Untagged fails: nothing links
-the moments. **Asking with `A₀` alone should sit at chance** — one attribute
-cannot single out a scene — and that arm is the sharpest control of the set.
-
-### 1b / 1c. Settled and parked
-
-**Phase** is an oscillator relationship in milliseconds and **C2 destroys exactly
-those**; carried as a field it is an index, not a phase. Built as one, above.
 **Vector-symbolic binding** (Plate, Kanerva) stays parked: it would give the
 similarity gradient named below, at the cost of opaque codes. Not needed yet.
 
@@ -138,9 +125,8 @@ uncertainty felt rather than scored. **Arguably the biggest single gap.**
 Fork 21 mints edges; it should mint **nodes**. When a set of codes recurs, create
 a code standing for the set. Threshold is minimum description length, not a
 constant. **This is what lets the alphabet GROW** — today the quantiser fixes it
-forever. Fork 21's measured trade is the **utility problem** from
-explanation-based learning (Minton, SOAR): utility belongs per chunk, not as one
-global `Weight`.
+forever. Fork 21's trade is the **utility problem** from explanation-based
+learning (Minton, SOAR): utility belongs per chunk, not as one global `Weight`.
 
 ### 4. Homeostatic drives — Ashby
 
@@ -159,7 +145,8 @@ act, no amount of scaling gets there.
 - [x] `Binding` — the world that measured the ceiling, and then lifted it
 - [x] `Seeds` — decorrelated seeding for every sweep
 - [x] `Fabric` — the bus/ring/clusters the three worlds used to each own
-- [ ] `Composed` — the world of 1a-after
+- [x] `Measurement` — the range checks the three worlds used to each own
+- [x] `Composed` — the world of step 1, built and characterised, not yet lifted
 - [ ] `Surprise` — the local prediction error of step 2
 - [ ] `Chunk` — the minted node of step 3
 - [ ] `Drives` — the bounded internal variables of step 4
@@ -172,12 +159,17 @@ act, no amount of scaling gets there.
   **G-Counter, a CRDT** — it converges under arbitrary reordering and loss with
   no coordination. The counts need no protocol; only the join does.
 - **The one-way window on a senses graph.** Built, null on snake, **never run
-  where `master` measured it working** (0.153 against 0.000).
+  where it was measured working.**
 - **Combinatorial codes** — several coarse hashes per item, so similarity becomes
-  overlap. `master` measured conjunction purity at 0.9845.
-- **The scaling curve**, which hands back fork 24's real target for free.
-- **`Complaints` is duplicated** between `SensesResult` and `BindingResult` —
-  about 25 identical lines, worth extracting.
+  overlap.
+- **Where the remaining message cost goes.** The curve is built and says node
+  count is not the problem — density is, and on a fixed alphabet inverse cost
+  already brakes it. What is left is the absolute constant, which is what step 2
+  attacks. **Nothing else should be optimised until step 2 has been tried.**
+- **Cold storage, once a row can be bounded at all.** A count that only
+  increments is a CRDT, and **paging a node out to disk keeps that** — the count
+  does not decrease, it stops being resident. **Decay does not**, so eviction
+  must key on "not touched since", never on eroding the count itself.
 - **The knob pass, deliberately last.** A dial swept before the structural work
   measures a system about to change underneath it.
 
@@ -191,10 +183,17 @@ Only the local half of `HybridBus` exists, so none of this is built.
   **Not a pure barrier**: flush on idle *or* size *or* time, or a busy machine
   never sends.
 - **Bits, not JSON.** Addresses and modalities intern to small ints, a code is a
-  varint. **`Chain` is what costs** — cycle check and explanation in one field,
-  free locally and not on a wire. **Split them:** a fixed-size
-  approximate-membership filter for the hop, full chain rebuilt at the origin. A
-  false positive is a route wrongly refusing a partner — the loss C2 admits.
+  varint. Packed, a `Message` is a few dozen bytes plus nine per hop of `Chain`,
+  and **a sixth of the fixed part is the `Guid` broadcast id** — shorten it per
+  connection. The three `double`s are almost certainly `float`s.
+- **`Chain` is what costs** — cycle check and explanation in one field, free
+  locally and not on a wire. **Split them:** a fixed-size approximate-membership
+  filter for the hop, full chain rebuilt at the origin. A false positive is a
+  route wrongly refusing a partner — the loss C2 admits.
+- **Voting multiplies the wrong half — John, 2026-08-03.** `votes: n` is n
+  independent broadcasts, so it pays n floods to insure against loss on the way
+  back. **One thought, redundant reports**: the flood is determined by the graph,
+  and what C2 loses is the return path.
 - **UDP is the matching transport, not a compromise.** C2 already assumes loss,
   and **TCP's head-of-line blocking would stall every thought behind one lost
   packet.** QUIC's unreliable datagram extension (RFC 9221) is the shape.
@@ -205,24 +204,24 @@ Only the local half of `HybridBus` exists, so none of this is built.
 
 **Three columns, one line each, enforced by a test.** The third matters most: a
 refutation is conditional on its configuration, so a row without a revival
-condition is a superstition.
+condition is a superstition. The commit named in git holds the numbers.
 
 | what | what refuted it | what would revive it |
 |---|---|---|
-| `StepCost.Best` / `Local` / `Constant` | Factorial where inverse is polynomial: 5,000,003 messages against 1,111 on a 12-clique | A bound not relying on positive cost at weight 1.0 |
+| `StepCost.Best` / `Local` / `Constant` | Factorial message growth where inverse cost is polynomial | A bound not relying on positive cost at weight 1.0 |
 | `Refuel` | Nothing is paid back, so it did nothing | Anything that returns budget to a route |
-| Sender-*weighing*, `IMarginals` | A C1 violation; behaviour identical at 26.7 messages a step against 17.0 | Never. **But `Message.Seen` — the sender's OWN marginal — is legal and is built** |
-| Absolute actions, unrotated view | 6.5 mean steps against 51.3; one move in four instantly fatal | A body with no heading |
-| Survival as the score | Circling wins: 133.71 steps against 92.85, 2 fruit against 40 | Homeostatic drives, where standing still stops paying |
+| Sender-*weighing*, `IMarginals` | A C1 violation, and behaviour was identical without it | Never. **But `Message.Seen` — the sender's OWN marginal — is legal and is built** |
+| Absolute actions, unrotated view | One move in four instantly fatal | A body with no heading |
+| Survival as the score | Circling wins: it lives longest and eats least | Homeostatic drives, where standing still stops paying |
 | A beam over partners | A constant nobody set, doing the cutting | A width the system sets itself and reports |
 | Clusters by modality | Splits picture from sound — the one link this design exists to make | Never |
 | Clusters by time of creation | Two machines compute different owners for one code | Placement agreement without a coordinator |
-| `Adaptive` reflection on `Hunger` | Inverted: 0.3802 at stamina 4, 0.4887 at 8 | A signal that discriminates; `Thwarted` is 1.19× |
-| A deeper walk for prediction | Monotonic, 5.5×: novelty gap 0.0817 at budget 2, 0.0147 at 8 | **Edge kinds** — `master`'s refutation of untyped walking, reproduced |
-| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, and both explanations refuted too | Lift in the **cost**. `Pricing.Sender` is the nearest thing built |
+| `Adaptive` reflection on `Hunger` | Inverted: it wrote most where it helped least | A signal that discriminates; `Thwarted` does |
+| A deeper walk for prediction | Monotonically worse — without edge kinds, deeper reaches more and ranks worse | **Edge kinds**, and that refutation reproduced |
+| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, and both explanations refuted too. **`Max` re-tried on the composition world, where its revival condition pointed, and it is worse** | Lift in the **cost**. `Pricing.Sender` is the nearest thing built |
 | Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | A similarity gradient under the ranking |
-| `Window` span on snake | Null at 150 seeds | **Revived — never run on a senses graph, where `master` got 0.153 against 0.000** |
-| `includeEmpty: true` | 46,536 halts against 6, under `Best` | **Revived — inverse cost removed the reason; no clear winner at 60 seeds** |
+| `Window` span on snake | Null there, at every seed count tried | **Revived — never run on a senses graph, which is what it was built for** |
+| `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
 
 ---
 
@@ -230,29 +229,33 @@ condition is a superstition.
 
 **Closed in code — named so nobody reintroduces them.** Consecutive integer seeds
 are not independent (`Seeds.Apart`, and `Sweep` mixes the counter).
-`Measured.Separation` returned 0 with no spread (infinity now).
-`WhenQuiet()` was not a finish signal (renamed `WhenIdle()`).
-
-**And one that was never a trap at all.** "The walk disagrees with itself —
-0.8833 alone, 1.0000 under load, so numbers under different loads are not
-comparable" **was fork 22**: questions were read before their walk finished, and
-under load walks had longer to settle. Now **1.0000 ± 0.0000**, asserted.
-**Voting existed because of that number and buys nothing in one process** — kept,
-because a real network loses reports, but it is no longer evidence of anything.
-The suite stays serial: cheap, and it removes the question.
+`Measured.Separation` returned zero where repeated measurement found no spread at
+all (infinity now). `WhenQuiet()` was not a finish signal (renamed `WhenIdle()`).
+Questions were read before their walk had finished, which made every number taken
+under one load incomparable with any other (fork 22; the suite is serial and
+`Unsettled` is asserted). **Voting survives that fix and buys nothing in one
+process** — kept, because a real network loses reports.
 
 **Live:**
 
 - **A dial swept at one data volume may be measuring the volume.** The stamina
-  plateau reversed between 300 and 1,200 moments. **Sweep at two run lengths.**
-- **Short runs on the binding world score above chance for recency alone** — 0.63
-  at 60 scenes, decaying to 0.5. **Nothing under a few hundred scenes measures
-  anything there.**
+  plateau reversed between short runs and long ones. **Sweep at two run lengths.**
+- **Short runs on the binding world score above chance for RECENCY ALONE**, and
+  it decays with data. **Nothing under a few hundred scenes measures binding
+  there.**
 - **A dial can be declared, documented, passed everywhere and connected to
-  nothing.** `ThinkAsync`'s stamina was, and survived 155 tests and three
+  nothing.** `ThinkAsync`'s stamina was, and survived the whole suite and three
   measurements. **Every run reports `Complaints`; read them.**
-- **A small sample can look like a mechanism.** One seed at 40 scenes gave 1.0000
-  with the echo collapsing — three questions. At 32 seeds it was 1.4 sigma.
+- **A small sample can look like a mechanism.** One seed with a collapsing echo
+  read as a discovery and was three questions.
+- **A MEAN OVER A POPULATION THE PROBLEM CREATED CANNOT SEE THE PROBLEM.** Mean
+  fan-out stayed flat across every run length on the world whose rows were
+  growing without bound, because the growth also mints a great many tiny nodes
+  that hold the average down. **`Plumbing.Widest` is what to read**, since cost
+  is set by the widest row and never by the average one.
+- **Copies drift where nothing fails.** Three worlds each grew their own settle
+  loop, complaint list and vote tally, and a difference between them would move a
+  headline without failing a test. `DuplicationTests` is the budget now.
 
 ---
 
@@ -273,20 +276,21 @@ before a second machine exists.
 
 ## FORK NUMBERS THE CODE CITES
 
-**Never renumbered** — `DocsTests` asserts each still resolves.
+**Never renumbered** — `DocsTests` asserts each still resolves. Closed forks stay
+listed because the code still points at them.
 
 | | |
 |---|---|
-| **1** | The distributed rendezvous. Not needed until a second machine; see the CRDT note |
-| **3** | Cluster placement: uniform hash against prefix locality. Open |
-| **5** | ✅ A death writes off exactly the routes heading into the dead cluster |
-| **6** | ✅ Broadcast the origin, route the hops |
-| **11** | The output machine is not addressed. Open, above |
-| **12** | ✅ **CLOSED by 22's fix, confirmed against its own control.** A fixed seed now reproduces a run exactly, `Halted` included |
-| **18** | ✅ Score prediction **conditional on the next action**. `Consequence` says the system does not model its own effect — 1.9 sigma, on a prediction that loses to a blind guess. **Blocked on temporal edges** |
-| **20** | ✅ Split budgets — deep to act, shallow to predict |
-| **21** | ✅ Compression. **A trade**: 0.1827 → 0.7147 where the budget cannot compose, 0.8462 → 0.7596 where it can. Off by default |
-| **22** | ✅ **CLOSED** — a transiently-zero live count untracked thoughts mid-flight and every later report was dropped. `InputMachine.Retire` asks twice. 0 of 39 unsettled, from 5–8 |
-| **23** | Compression self-regulating? Not on this signal. `Thwarted` is right at 5.1 sigma but swings 1.19× against an effect running 0.18 to 0.83 |
-| **24** | ✅ Budget controller converges from both directions and **aims at a moving target**: stamina 8 ties 24 at 300 moments, loses by 7 sigma at 1,200. Off by default |
-| **25** | ✅ The binding world — built to fail, failed as predicted, **and since lifted** |
+| **1** | The distributed rendezvous. **Open** — not needed until a second machine; see the CRDT note |
+| **3** | Cluster placement: uniform hash against prefix locality. **Open** |
+| **5** | A death writes off exactly the routes heading into the dead cluster. Closed |
+| **6** | Broadcast the origin, route the hops. Closed |
+| **11** | The output machine is not addressed. **Open**, above |
+| **12** | A fixed seed reproduces a run exactly, `Halted` included. Closed by 22's fix |
+| **18** | Score prediction **conditional on the next action**. `Consequence` says the system does not model its own effect. **Blocked on temporal edges** |
+| **20** | Split budgets — deep to act, shallow to predict. Closed |
+| **21** | Compression. A trade: it pays where the budget cannot compose and costs where it can. Off by default |
+| **22** | A transiently-zero live count untracked thoughts mid-flight and dropped every later report. `InputMachine.Retire` asks twice. Closed |
+| **23** | Compression self-regulating? Not on this signal. `Thwarted` is the right shape and swings too little against the effect |
+| **24** | Budget controller converges from both directions and **aims at a moving target**. Off by default |
+| **25** | The binding world — built to fail, failed as predicted, and since lifted |

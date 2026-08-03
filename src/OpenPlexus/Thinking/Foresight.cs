@@ -105,7 +105,22 @@ public sealed class Foresight
     /// alongside**, so every hit rate here is reported against what guessing
     /// would have managed on the same moment.
     /// </param>
-    public void Settle(
+    /// <returns>
+    /// How far THIS ONE prediction beat its blind draw, in 0..1 either way.
+    /// </returns>
+    /// <remarks>
+    /// <b>THE PER-PREDICTION GAP WAS ALWAYS COMPUTED AND ALWAYS THROWN AWAY.</b>
+    /// Only the running totals were kept, so the one quantity that says whether a
+    /// budget is earning its cost — on this step, against its own control — could
+    /// not be fed to anything. It is what lets the prediction budget hunt its own
+    /// level; see <see cref="Budget.Note"/>.
+    /// <para>
+    /// Zero for a prediction that named nothing, which is the honest reading: a
+    /// guess that was never made did not beat a blind draw and did not lose to
+    /// one either.
+    /// </para>
+    /// </remarks>
+    public double Settle(
         IReadOnlyCollection<Code> predicted,
         IReadOnlyCollection<Code> actual,
         IReadOnlyCollection<Code> control)
@@ -114,10 +129,11 @@ public sealed class Foresight
         ArgumentNullException.ThrowIfNull(actual);
         ArgumentNullException.ThrowIfNull(control);
 
-        if (predicted.Count == 0) return;
+        if (predicted.Count == 0) return 0.0;
 
         var came = actual as HashSet<Code> ?? [.. actual];
         var right = predicted.Count(came.Contains);
+        var blind = control.Count(came.Contains);
 
         lock (_gate)
         {
@@ -125,7 +141,9 @@ public sealed class Foresight
             if (right > 0) _hit++;
             _guessed += predicted.Count;
             _right += right;
-            _chance += control.Count(came.Contains);
+            _chance += blind;
         }
+
+        return (right - blind) / (double)predicted.Count;
     }
 }

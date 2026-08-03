@@ -367,6 +367,43 @@ does not test the hard part**, which is fork 1.
     independent quantities agreeing is a real check, and it runs on every real
     thought.
 
+### `Consequence`
+
+**FORK 18'S METRIC — what this project scores, by John's call.** Not survival,
+which is disqualified: the arm that lives longest circles and eats nothing,
+133.71 mean steps against the chain's 92.85 and two fruit against forty. Not
+passive prediction either, which asks *what comes next* and can be answered well
+by something with no idea it is present in the world at all.
+
+**The question is "what will the world look like if I do X".** A world model
+rather than a sequence model, and the difference is that it can be asked a
+counterfactual.
+
+- **`Settle(knowing, otherwise, blind, actual)`** — one prediction made with the
+  **true** action in the question, one with a **different** action, one drawn
+  without consulting the graph, all against what the world actually did.
+- **`Knowing`**, **`Counterfactual`**, **`Blind`** — precision of each.
+- **`Gap`** — `Knowing − Counterfactual`. **The number.**
+
+**THE CONTROL IS THE SAME PREDICTION WITH A DIFFERENT ACTION IN IT**, and it is
+what makes this measure understanding rather than familiarity. Same graph, same
+budget, same walk, same narrowing, same number of codes named — only the action
+inside the question differs.
+
+- If naming the true action predicts better, the graph holds something about
+  **its own effect on the world**.
+- If the two score alike, it is predicting the next frame regardless of what it
+  does — **exactly the thing that looks like understanding and is not**, and no
+  accuracy number alone would separate them.
+
+**Scored against everything present rather than only what changed.** Whatever is
+predictable without knowing the action is equally predictable in both arms, so it
+cancels in the gap; there is nothing to strip out by hand.
+
+**A step where either arm named nothing is not counted**, rather than counted as
+a miss — otherwise the gap would depend on how often each arm stayed silent, and
+silence is a property of the budget rather than the model.
+
 ### `Budget` / `Budgeting`
 
 **Fork 24 — a machine hunting for its own stamina.** Holds no graph, no bus and

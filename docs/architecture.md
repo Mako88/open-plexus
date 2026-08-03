@@ -557,6 +557,48 @@ measurement took one sweep.
 
 ---
 
+## Fork 18's metric, built and measured: the answer is currently no
+
+**`Consequence` asks what the world will look like if I do X**, and its control
+is the same prediction with a DIFFERENT action in it. Same graph, same budget,
+same walk, same narrowing, same number of codes named — only the action inside
+the question changes. `Gap = Knowing − Counterfactual`.
+
+12 seeds, 300-step budget, snake:
+
+| arm | gap | se | knowing | counter | blind | steps |
+|---|---|---|---|---|---|---|
+| chain | 0.0165 | 0.0086 | 0.371 | 0.354 | **0.543** | 128 |
+| random | 0.0273 | 0.0081 | 0.290 | 0.263 | **0.423** | 26 |
+| **chain, wire cut** | **0.0007** | 0.0034 | 0.275 | 0.274 | 0.437 | 26 |
+
+**THE CONTROL WORKS, AND THAT IS THE RESULT WORTH HAVING.** Cutting the one wire
+that makes an action reachable drives the gap to 0.0007 ± 0.0034 —
+indistinguishable from zero — while the intact arm sits at 0.0165 ± 0.0086. So
+the metric is measuring the action's contribution and not an artefact of the
+walk. **A metric whose control does not move is not a metric.**
+
+**AND THE ANSWER IT GIVES IS NO.** 0.0165 ± 0.0086 is about 1.9 standard errors
+from zero: suggestive at best, and this project has retracted more than that.
+
+**WORSE, IT SITS ON A PREDICTION THAT LOSES TO A BLIND GUESS.** Knowing scores
+0.371 against a blind draw's 0.543 on the same moments. **The graph predicts the
+next frame worse than picking codes at random from the alphabet it has seen.**
+That reproduces fork 19's finding from a new direction, and it means the gap is
+a small difference between two bad numbers.
+
+**So fork 18 is answered as a measurement and blocked as a result.** The metric
+is ready and honest; what it needs is a prediction worth conditioning. Fork 19
+already named the missing mechanism — **a one-way temporal window**, so the graph
+can hold *then* as well as *with*. Nothing action-conditional can work while
+every edge is simultaneous.
+
+**The random arm's larger gap is not evidence of anything** — it ran 26 steps
+against the chain's 128, and run length has already been shown to move a
+conclusion in this project today. Not compared.
+
+---
+
 ## A standing rule: a swept dial is a question the system should answer itself
 
 **John, 2026-08-02.** Wherever a sweep tells us a dial matters, the next move is
@@ -795,7 +837,7 @@ by status rather than by scrolling.
 |---|---|---|
 | **19** | ✅ Prediction built — and it loses to a blind guess, because the graph holds **no temporal edges**. Next mechanism named: a one-way window |
 | **20** | ✅ **Split budgets — deep to act, shallow to predict.** Wins survival, mirroring and prediction at once |
-| **18** | ✅ **ANSWERED, 2026-08-02.** Score **prediction of world state conditional on the next action** — John's own formulation, and the only candidate that is about understanding rather than performance. Cross-modal composition is the cross-world check. **Not yet built: today's prediction is passive**, and a model of *how the world responds to me* is a different quantity | unblocks 15 and 16 |
+| **18** | ✅ **BUILT AND MEASURED.** The control works — cutting the action wire drops the gap to 0.0007 ± 0.0034 against 0.0165 ± 0.0086 intact. But the gap is only 1.9 sigma and sits on a prediction that LOSES TO A BLIND GUESS, 0.371 against 0.543. **Blocked on fork 19's temporal window.** Original call: | Score **prediction of world state conditional on the next action** — John's own formulation, and the only candidate that is about understanding rather than performance. Cross-modal composition is the cross-world check. **Not yet built: today's prediction is passive**, and a model of *how the world responds to me* is a different quantity | unblocks 15 and 16 |
 | **15** | Strengthening a connection a thought walks | unblocked by 18 |
 | **16** | Back-propagation from an outside signal | unblocked by 18 |
 | **11** | The output machine is not addressed | needed before a second machine |

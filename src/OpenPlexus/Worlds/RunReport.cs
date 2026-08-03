@@ -83,6 +83,12 @@ public sealed record RunReport
             if (Result.Novelty.Guessed > 50 && Result.Novelty.Chance == 0)
                 wrong.Add("the blind control never scored, so the gap means nothing");
 
+            // FORK 18'S WIRING CHECK. A counterfactual that was never asked
+            // leaves `Gap` at exactly zero, which reads identically to "the
+            // action is not in the model" -- the two must not be confusable.
+            if (Result.Steps > 2 && Result.Consequence.Asked == 0)
+                wrong.Add("no consequence was ever predicted");
+
             return wrong;
         }
     }
@@ -105,7 +111,11 @@ public sealed record RunReport
         report.Append(CultureInfo.InvariantCulture,
             $"foresaw={Result.Foresight.Precision:F3} blind={Result.Foresight.Blind:F3} ");
         report.Append(CultureInfo.InvariantCulture,
-            $"novelGap={NoveltyGap:F4}");
+            $"novelGap={NoveltyGap:F4} | ");
+        report.Append(CultureInfo.InvariantCulture,
+            $"knowing={Result.Consequence.Knowing:F3} " +
+            $"counter={Result.Consequence.Counterfactual:F3} " +
+            $"actionGap={Result.Consequence.Gap:F4}");
 
         if (Complaints.Count > 0)
             report.Append(CultureInfo.InvariantCulture, $" || WRONG: {string.Join("; ", Complaints)}");

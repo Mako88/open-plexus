@@ -84,6 +84,12 @@ public sealed record RunResult
     public required Foresight Novelty { get; init; }
 
     /// <summary>
+    /// <b>FORK 18'S METRIC — what this project scores, by John's call.</b>
+    /// </summary>
+    /// <inheritdoc cref="Thinking.Consequence"/>
+    public required Consequence Consequence { get; init; }
+
+    /// <summary>
     /// Of the steps a chain chose, how many chose the action just taken.
     /// </summary>
     /// <remarks>
@@ -190,6 +196,9 @@ public sealed class SnakeRun : IDisposable
     private readonly int? _names;
     private readonly Foresight _foresight = new();
     private readonly Foresight _novelty = new();
+
+    /// <summary>Fork 18's metric. <inheritdoc cref="Consequence"/></summary>
+    private readonly Consequence _consequence = new();
 
     /// <summary>Every vision code seen, so a blind guess can draw from the same alphabet.</summary>
     private readonly List<Code> _alphabet = [];
@@ -309,6 +318,9 @@ public sealed class SnakeRun : IDisposable
         IReadOnlyList<Code> foreseen = [];
         IReadOnlyList<Code> blind = [];
 
+        // The same prediction with a DIFFERENT action in it. Fork 18's control.
+        IReadOnlyList<Code> otherwise = [];
+
         for (; taken < steps && _snake.Alive; taken++)
         {
             var before = _snake.Energy;
@@ -323,6 +335,12 @@ public sealed class SnakeRun : IDisposable
             // Scored against what STARTED, which is the part persistence does
             // not answer for free.
             _novelty.Settle(foreseen, [.. present.Where(c => !_before.Contains(c))], blind);
+
+            // FORK 18, AND IT IS SCORED AGAINST EVERYTHING PRESENT ON PURPOSE.
+            // Whatever is predictable without knowing the action is equally
+            // predictable in both arms, so it cancels in the gap -- there is no
+            // need to strip persistence out by hand the way `_novelty` does.
+            _consequence.Settle(foreseen, otherwise, blind, present);
 
             _before = [.. present];
             Remember(present);
@@ -372,6 +390,14 @@ public sealed class SnakeRun : IDisposable
             // different one.
             (foreseen, blind) = await ForeseeAsync(present, doing, ct).ConfigureAwait(false);
 
+            // THE CONTROL, AND IT CHANGES EXACTLY ONE THING. Same graph, same
+            // budget, same walk, same narrowing, same number of codes named --
+            // only the action inside the question differs. If this scores as
+            // well as the real one, the graph is predicting the next frame
+            // regardless of what the body does, which is the thing that looks
+            // like understanding and is not.
+            (otherwise, _) = await ForeseeAsync(present, Instead(doing), ct).ConfigureAwait(false);
+
             Perform(doing);
             did = cut ? null : doing;
 
@@ -398,7 +424,32 @@ public sealed class SnakeRun : IDisposable
             Messages = _bus.Messages,
             Foresight = _foresight,
             Novelty = _novelty,
+            Consequence = _consequence,
         };
+    }
+
+    /// <summary>
+    /// A different action from the one about to be taken.
+    /// </summary>
+    /// <remarks>
+    /// <b>Deterministic, and it draws on no generator.</b> A counterfactual
+    /// chosen at random would either need its own stream or perturb the blind
+    /// control's — and a control sharing a generator with the arm it controls
+    /// has already caused a wrong result here once.
+    /// <para>
+    /// <c>IndexOf</c> returns -1 for something absent, which has also bitten
+    /// this project, so the miss is handled rather than wrapped.
+    /// </para>
+    /// </remarks>
+    private static Code Instead(Code doing)
+    {
+        var turns = SnakeSense.Turns;
+        var at = -1;
+
+        for (var i = 0; i < turns.Count; i++)
+            if (turns[i] == doing) { at = i; break; }
+
+        return at < 0 ? turns[0] : turns[(at + 1) % turns.Count];
     }
 
     /// <summary>

@@ -435,6 +435,64 @@ the move this design refuses.
 - **`RunResult`** — counts, not claims. `ChosenByChain`, `EchoedLast`,
   `Unbalanced`, `Halted`, `Messages`, `Ate`.
 
+### `RunReport`
+
+**Everything a snake run can say about itself, printed at the end of it.** The
+answer to a failure this project keeps having: a number is swept, barely moves,
+and much later it turns out something was never wired the way anyone thought.
+
+- **`Nodes`**, **`Edges`**, **`Spread`**, **`ChainLengths`**, **`Silence`**,
+  **`Deepest`**, **`NoveltyGap`**.
+- **`Complaints`** — **the part that matters.** Every entry is a quantity that
+  would be out of range only if something had come unwired, and a test reads the
+  list on every run. **Adding a number here without a range says nothing; the
+  range is the check.** The sharpest one is `Deepest < 2`: a walk that never
+  leaves its origin is a one-hop lookup wearing the name of a flood, and nothing
+  else in the report would show it.
+
+### `Senses` / `SensesSettings`
+
+**The second world, and it shares no code with snake.** No space, no movement,
+no actions, no energy, nothing to lose, no time pressure. **If a finding holds
+here too it was about the architecture; if it does not, it was about snake.**
+
+An occasion shows either **sight with sound**, or **sound with touch**. **Sight
+and touch are never shown together, not once** — enforced in `Moment()` rather
+than left to a caller, and asserted over 5,000 moments before any result is read
+from the world.
+
+The question is: *given a sight, what does it feel like?* **A memoriser scores
+exactly zero**, because the pair being asked about has never occurred. Getting
+it right requires walking sight → sound → touch.
+
+- **`Concepts`**, **`CodesPerSense`**, **`Noise`** — all required.
+  `CodesPerSense` must exceed one, or identity is a lookup table and *a concept
+  is what you reach by walking* does no work.
+- **`Scrambled`** — **the control, and it tests the DATA rather than the code.**
+  Each sense is paired with a random concept instead of the right one. Every
+  mechanism runs identically; only the structure the world contains is
+  destroyed. If accuracy survives it, it was never composition.
+
+### `SensesRun` / `SensesResult`
+
+The senses world wired to the graph, **scored prequentially** — a question is
+asked, settled, and learning carries on, because C4 forbids a run that stops.
+
+- **`RunAsync(moments, every)`** — shows moments and stops every *n* to ask.
+  **Fork 21 reflects on what was observed and never on what was asked**, or the
+  score would climb because the measurement had leaked into the training.
+- **`AskAsync(concept)`** — broadcasts the sight codes, narrows with
+  `BestOf(Touch, 1)`. **Waits on `Thought.Settled`, not on the bus** — see
+  `WhenQuiet`.
+- **`SensesResult`** — the same self-reporting `RunReport` gives snake, plus
+  `Reflected` and `Reflecting` so a run says out loud whether fork 21 was even
+  running. Its world-specific complaint is **`Deepest < 3`**: sight reaches touch
+  only through sound, so a correct answer is a chain of length three and
+  anything shallower is not the task.
+- **`Unsettled`** — questions read before their walk finished. **Counted rather
+  than absorbed**, because "nothing reached" and "not finished yet" are
+  indistinguishable in a score. See fork 22.
+
 ---
 
 ## The small types, so nothing here is unnamed
@@ -452,6 +510,50 @@ the move this design refuses.
 | `SnakeView`, `Seen` | The rotated window, and one cell of it |
 | `SnakeSettings` | Width, height, sight, and the three energy numbers. **Every one required**, because a constant that never changes looks like the background |
 | `SnakeFrame` | A view plus the code for what the body just did |
+
+---
+
+## The measuring tools, which live in the test project
+
+**Not part of the system.** They measure it, so they sit with the tests rather
+than in the library.
+
+### The sweep harness — `Sweep` / `Measured`
+
+**John's ask, 2026-08-02.** Every measurement here used to be a throwaway test
+file that printed a line and was deleted, so the seed loop, the averaging and
+the spread were rewritten each time — and the spread was usually what got
+dropped.
+
+- **`Sweep.ArmAsync(arm, seeds, run)`** — one arm across seeds 1..n.
+- **`Sweep.AcrossAsync(seeds, arms)`** — several arms over the same seeds.
+- **`Sweep.Table(arms)`** — a markdown table with sigma against the first arm,
+  ready to paste into the architecture doc.
+- **`Measured.Mean`, `.StdErr`, `.Separation(other)`** — **the spread is not
+  optional, and that is the point of the type.** Every bare mean this project
+  has published has had to be retracted or hedged: *chain loses to repeat* at 30
+  seeds became *indistinguishable* at 200, and a fork-21 table went in with
+  "spread not computed" written across it. A harness that cannot report a mean
+  without its standard error cannot make that mistake again.
+- **`Separation` returns 0 when neither arm has spread**, so two arms measured
+  once each are never reported as different.
+
+### The doc check — `DocsTests`
+
+**John's ask: incremental doc updates miss things.** They do, and the failure is
+specific — something gets built, the doc it belongs in is not touched, and later
+nobody can tell whether the omission means *undocumented* or *deleted*. This
+runs on every `dotnet test`, so a gap cannot outlive the commit that opened it.
+
+- **Every public type appears in this file.** Found `Senses`, `SensesRun`,
+  `SensesSettings`, `SensesResult` and `RunReport` missing on its first run —
+  the whole second world and the run report.
+- **Every heading names a type that exists** — the ghost-reference direction.
+- **Every fork number the code cites is in the architecture index.** This is why
+  forks are never renumbered, and now it is checked rather than remembered.
+- **It throws rather than skipping if it cannot find `docs/`.** A check that
+  passes silently when it could not read the thing it checks is worse than no
+  check, because it reports green for a question it never asked.
 
 ---
 

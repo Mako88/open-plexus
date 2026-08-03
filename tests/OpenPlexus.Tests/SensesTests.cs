@@ -128,21 +128,19 @@ public sealed class SensesTests
         Accumulate = Accumulate.Sum, Horizon = 50,
     };
 
-    private static async Task<double> Accuracy(double stamina, bool scrambled, int seeds = 5)
-    {
-        var got = new List<double>();
-        for (var seed = 1; seed <= seeds; seed++)
-        {
-            using var run = new SensesRun(new SensesSettings
+    private static Task<Measured> Accuracy(double stamina, bool scrambled, int seeds = 5) =>
+        Sweep.ArmAsync(
+            scrambled ? $"scrambled@{stamina}" : $"world@{stamina}",
+            seeds,
+            async seed =>
             {
-                Concepts = 12, CodesPerSense = 3, Noise = 0.1, Scrambled = scrambled,
-            }, Dials(stamina), seed);
+                using var run = new SensesRun(new SensesSettings
+                {
+                    Concepts = 12, CodesPerSense = 3, Noise = 0.1, Scrambled = scrambled,
+                }, Dials(stamina), seed);
 
-            got.Add((await run.RunAsync(400, every: 10)).Accuracy);
-        }
-
-        return got.Average();
-    }
+                return (await run.RunAsync(400, every: 10)).Accuracy;
+            });
 
     [Fact]
     public async Task It_answers_a_question_it_was_never_told()
@@ -153,7 +151,10 @@ public sealed class SensesTests
         // against a chance of 0.0833.
         var real = await Accuracy(stamina: 8.0, scrambled: false);
 
-        Assert.True(real > 0.5, $"accuracy {real:F4} against a chance of {1.0 / 12:F4}");
+        // AGAINST THE SPREAD, NOT THE BARE MEAN. Three standard errors clear of
+        // chance, so a lucky run of seeds cannot carry the project's headline
+        // claim on its own.
+        Assert.True(real.Mean - (3 * real.StdErr) > 1.0 / 12, $"{real} against chance {1.0 / 12:F4}");
     }
 
     [Fact]
@@ -165,8 +166,15 @@ public sealed class SensesTests
         // seeds: 0.0311 +- 0.0086, which is BELOW chance, and two thirds of
         // questions get no answer at all.
         var scrambled = await Accuracy(stamina: 8.0, scrambled: true);
+        var real = await Accuracy(stamina: 8.0, scrambled: false);
 
-        Assert.True(scrambled < 0.1, $"the control still scored {scrambled:F4}");
+        Assert.True(scrambled.Mean < 0.1, $"the control still scored {scrambled}");
+
+        // AND THE TWO ARMS ARE GENUINELY APART, which a pair of bare means
+        // cannot say. Anything under about three sigma is a difference this
+        // project has retracted before.
+        Assert.True(real.Separation(scrambled) > 3.0,
+            $"{real} against {scrambled} is only {real.Separation(scrambled):F1} sigma");
     }
 
     [Fact]
@@ -182,8 +190,8 @@ public sealed class SensesTests
         var shallow = await Accuracy(stamina: 2.0, scrambled: false);
         var deep = await Accuracy(stamina: 8.0, scrambled: false);
 
-        Assert.Equal(0.0, shallow);
-        Assert.True(deep > shallow + 0.5, $"deep {deep:F4} against shallow {shallow:F4}");
+        Assert.Equal(0.0, shallow.Mean);
+        Assert.True(deep.Mean > shallow.Mean + 0.5, $"deep {deep} against shallow {shallow}");
     }
 
     // ---- the run says what it did ------------------------------------------

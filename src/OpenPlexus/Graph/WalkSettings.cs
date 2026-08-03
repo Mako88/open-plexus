@@ -82,6 +82,42 @@ public enum Accumulate
     /// </para>
     /// </remarks>
     Agreement,
+
+    /// <summary>
+    /// <b>Both, fused by POSITION rather than by value</b> — reciprocal rank
+    /// fusion over the <see cref="Sum"/> order and the <see cref="Agreement"/>
+    /// order.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>JOHN'S IDEA, AND IT IS AIMED AT DISSOLVING THE DIAL RATHER THAN MOVING
+    /// IT.</b> The two rankings are each right about a different KIND of question:
+    /// a conjunction wants the candidate every origin reached, an indexed question
+    /// wants the strongest route. Choosing between them means the asker has to
+    /// say which it is asking, which it currently cannot. Fusing them means
+    /// nobody has to.
+    /// </para>
+    /// <para>
+    /// <b>By position, because the two scores are not comparable.</b> A count of
+    /// origins is a small integer and a path strength is a product of weights;
+    /// no weighted sum of the two means anything, and any constant balancing them
+    /// would be exactly the dial this is trying to remove. Reciprocal rank fusion
+    /// (Cormack, Clarke and Buettcher) adds <c>1/(k + rank)</c> across the orders,
+    /// which needs only that each list is sorted — and it is the standard answer
+    /// to combining rankings whose scores share no scale.
+    /// </para>
+    /// <para>
+    /// <b><c>k</c> damps the top of each list</b> so that one ranking putting a
+    /// candidate first cannot by itself settle the fusion; the conventional 60 is
+    /// used and is not a swept dial, because a value chosen per world would be the
+    /// fault this exists to remove.
+    /// </para>
+    /// <para>
+    /// <b>Ranking only</b>, like both of its inputs: it reorders what came back
+    /// and cannot change where a route died, so the message count is untouched.
+    /// </para>
+    /// </remarks>
+    Fused,
 }
 
 /// <summary>

@@ -93,9 +93,8 @@ groups and a weakly-reached-by-both outranks a strongly-reached-by-one.
 thing meant is the one every origin reaches. Binding points with an index and
 supplies a colour for context, where the origins are not equals. **The asker
 knows which it is asking and today cannot say.** So move ranking onto the
-question, beside the grouping that already travels with it — or better, fuse the
-rankings by position rather than choosing between them, which is what rank
-fusion does with scores that are not comparable.
+question, beside the grouping that already travels with it. **Fusing the two
+orders instead was tried and is refuted below**, so this is what is left.
 
 - **Merging routes AT A NODE is the version `Narrowed` could not do.** Reading
   the index back costs a round trip and puts the referent in the machine's
@@ -235,6 +234,7 @@ condition is a superstition. The commit named in git holds the numbers.
 | Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | **REVIVED at one code.** Naming as many codes as the frame holds swamps the action entirely — fork 18's gap is flat at every sight radius. Naming ONE, it opens wide |
 | `Window` span | Null on snake; WORSE on `Babi`, an ordered corpus where before-and-after is the content, at an order of magnitude more traffic | **Edge kinds** — a carried edge is ranked against a simultaneous one as if they meant the same |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
+| `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift on the conjunction and ALL of its cost on binding. **Two candidates whose orders invert score identically under RRF for every damping constant**, so it ties exactly where it is needed and the tiebreak answers | A question with many candidates, or a fusion that separates by something other than position |
 
 ---
 

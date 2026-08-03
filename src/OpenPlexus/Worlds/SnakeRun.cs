@@ -114,11 +114,17 @@ public sealed record RunResult
     /// </summary>
     /// <remarks>
     /// <b>THE WIRING CHECK ON VOTING, AND IT IS THE POINT OF MEASURING IT AT
-    /// ALL.</b> Voting exists because the walk disagrees with itself — 0.8833
-    /// agreement on the senses world, where a majority of three recovered 0.9688
-    /// to 0.9974. If voting changes no outcome here, this says whether that is
-    /// because the walk already agrees with itself or because the votes never
-    /// happened. Zero at one vote by construction.
+    /// ALL.</b> "Voting changed nothing" is also exactly what a disconnected dial
+    /// looks like, so the outcome cannot be the check. Zero at one vote by
+    /// construction.
+    /// <para>
+    /// <b>Measured at 0.0018 ± 0.0018 of steps, and the senses walk now disagrees
+    /// on none at all.</b> Voting was built because the walk disagreed with itself
+    /// — 0.8833 on senses — and that turned out to be fork 22: questions were
+    /// being read before their walk had finished. **So voting buys nothing in one
+    /// process.** It is kept because a real network loses reports and redundancy
+    /// is the honest answer to C2, but it is no longer evidence of anything.
+    /// </para>
     /// </remarks>
     public required int Disagreed { get; init; }
 }
@@ -181,18 +187,11 @@ public enum Policy
 /// </remarks>
 public sealed class SnakeRun : IDisposable
 {
-    private static readonly TimeSpan Patience = TimeSpan.FromSeconds(30);
-
-    private readonly HybridBus _bus = new();
-    private readonly Ring _ring;
-    private readonly LocalClusters _local;
-    private readonly List<Cluster> _clusters = [];
-    private readonly List<IDisposable> _handles = [];
+    private readonly Fabric _fabric;
     private readonly InputMachine<SnakeFrame> _eye;
     private readonly OutputMachine _hand;
     private readonly Snake _snake;
     private readonly Random _fallback;
-    private readonly List<Exception> _faults = [];
     private readonly SnakeSense _sense;
     private readonly WalkSettings _dials;
 
@@ -253,33 +252,18 @@ public sealed class SnakeRun : IDisposable
         _snake = new Snake(world, seed);
         _fallback = new Random(seed);
         _guessing = new Random(~seed);
-        _ring = new Ring(seed, replicas);
-        _local = new LocalClusters(_ring);
-
-        // A delivery that throws would otherwise vanish, and a run reporting
-        // numbers built on swallowed failures is worse than one that stops.
-        _bus.Faults += failure => { lock (_faults) _faults.Add(failure); };
-
-        for (var i = 0; i < clusters; i++)
-        {
-            var address = new ClusterAddress($"c{i}");
-            _ring.Join(address);
-            var cluster = new Cluster(address, _bus, _ring, dials);
-            _local.Include(cluster);
-            _clusters.Add(cluster);
-            _handles.Add(_bus.Subscribe(cluster));
-        }
+        _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _eye = new InputMachine<SnakeFrame>(
             new MachineAddress("eye"),
             _sense,
-            new LocalRendezvous(_local),
-            _bus,
-            _ring,
+            new LocalRendezvous(_fabric.Local),
+            _fabric.Bus,
+            _fabric.Ring,
             dials,
             span);
 
-        _handles.Add(_bus.Subscribe(_eye));
+        _fabric.Subscribe(_eye);
         _hand = new OutputMachine(new MachineAddress("hand"), SnakeSense.Turns);
     }
 
@@ -304,9 +288,9 @@ public sealed class SnakeRun : IDisposable
         return new RunReport
         {
             Result = result,
-            Nodes = _clusters.Sum(cluster => cluster.Count),
-            Edges = _clusters.Sum(cluster => cluster.Edges),
-            Spread = [.. _clusters.Select(cluster => cluster.Count)],
+            Nodes = _fabric.Nodes,
+            Edges = _fabric.Edges,
+            Spread = _fabric.Spread,
             ChainLengths = new Dictionary<int, int>(_chains),
         };
     }
@@ -373,7 +357,7 @@ public sealed class SnakeRun : IDisposable
 
             // Wait for the dust to settle before deciding. Turn-based world,
             // harness affordance -- see the note on this class.
-            await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
+            await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             Code? chosen = null;
 
@@ -437,7 +421,7 @@ public sealed class SnakeRun : IDisposable
             if (_snake.Alive && _snake.Energy > before) ate++;
         }
 
-        Failures();
+        _fabric.Failures();
 
         return new RunResult
         {
@@ -449,13 +433,13 @@ public sealed class SnakeRun : IDisposable
             FinalLength = _snake.Length,
             FinalEnergy = _snake.Energy,
             Alive = _snake.Alive,
-            Nodes = _clusters.Sum(cluster => cluster.Count),
+            Nodes = _fabric.Nodes,
             Deaths = _eye.DeathsSeen,
             Halted = halted,
             EchoedLast = echoed,
             Disagreed = disagreed,
             Unbalanced = unbalanced,
-            Messages = _bus.Messages,
+            Messages = _fabric.Bus.Messages,
             Foresight = _foresight,
             Novelty = _novelty,
             Consequence = _consequence,
@@ -496,7 +480,7 @@ public sealed class SnakeRun : IDisposable
             asking[i] = _eye.ThinkAsync(first.Started, _dials.Stamina, ct);
 
         var others = await Task.WhenAll(asking).ConfigureAwait(false);
-        await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
+        await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
         // SILENCE GETS NO VOTE. A walk that reached no action has no opinion, and
         // counting it would let the quietest arm decide.
@@ -563,7 +547,7 @@ public sealed class SnakeRun : IDisposable
         // want opposite depths -- fork 20.
         var thought = await _eye.ThinkAsync(
             [.. present, doing], _dials.Foresight, ct).ConfigureAwait(false);
-        await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
+        await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
         var wanted = _names ?? present.Count;
         var foreseen = thought.BestOf(SnakeQuantizer.Vision, wanted)
@@ -595,16 +579,5 @@ public sealed class SnakeRun : IDisposable
 
     private void Perform(Code code) => _snake.Steer(SnakeSense.Turned(code)!.Value);
 
-    private void Failures()
-    {
-        lock (_faults)
-        {
-            if (_faults.Count > 0) throw new AggregateException(_faults);
-        }
-    }
-
-    public void Dispose()
-    {
-        foreach (var handle in _handles) handle.Dispose();
-    }
+    public void Dispose() => _fabric.Dispose();
 }

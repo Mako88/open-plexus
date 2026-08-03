@@ -205,20 +205,10 @@ public sealed record BindingResult
 /// </remarks>
 public sealed class BindingRun : IDisposable
 {
-    private static readonly TimeSpan Patience = TimeSpan.FromSeconds(30);
-
-    /// <summary>How long a question waits for its own walk. Every expiry is counted.</summary>
-    private static readonly TimeSpan Waiting = TimeSpan.FromMilliseconds(250);
-
-    private readonly HybridBus _bus = new();
-    private readonly Ring _ring;
-    private readonly LocalClusters _local;
-    private readonly List<Cluster> _clusters = [];
-    private readonly List<IDisposable> _handles = [];
+    private readonly Fabric _fabric;
     private readonly InputMachine<Scene> _eyes;
     private readonly Binding _world;
     private readonly WalkSettings _dials;
-    private readonly List<Exception> _faults = [];
 
     public BindingRun(
         BindingSettings world,
@@ -232,25 +222,13 @@ public sealed class BindingRun : IDisposable
 
         _world = new Binding(world, seed);
         _dials = dials;
-        _ring = new Ring(seed, replicas);
-        _local = new LocalClusters(_ring);
-        _bus.Faults += failure => { lock (_faults) _faults.Add(failure); };
-
-        for (var i = 0; i < clusters; i++)
-        {
-            var address = new ClusterAddress($"c{i}");
-            _ring.Join(address);
-            var cluster = new Cluster(address, _bus, _ring, dials);
-            _local.Include(cluster);
-            _clusters.Add(cluster);
-            _handles.Add(_bus.Subscribe(cluster));
-        }
+        _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _eyes = new InputMachine<Scene>(
-            new MachineAddress("scene"), new Passthrough(), new LocalRendezvous(_local),
-            _bus, _ring, dials);
+            new MachineAddress("scene"), new Passthrough(), new LocalRendezvous(_fabric.Local),
+            _fabric.Bus, _fabric.Ring, dials);
 
-        _handles.Add(_bus.Subscribe(_eyes));
+        _fabric.Subscribe(_eyes);
     }
 
     /// <summary>
@@ -299,7 +277,7 @@ public sealed class BindingRun : IDisposable
 
             var thought = await _eyes
                 .ObserveAsync(scene, moment, ct).ConfigureAwait(false);
-            await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
+            await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             // Reflection sees what was OBSERVED and never what was asked, for the
             // same reason it does in the senses world: writing a question's own
@@ -333,7 +311,7 @@ public sealed class BindingRun : IDisposable
             if (answer == scene.Colours[which]) echoed++;
         }
 
-        Failures();
+        _fabric.Failures();
 
         return new BindingResult
         {
@@ -348,11 +326,11 @@ public sealed class BindingRun : IDisposable
             Bound = _world.Bound,
             Reflected = reflected,
             Reflecting = _dials.Reflect is not null,
-            Nodes = _clusters.Sum(cluster => cluster.Count),
-            Edges = _clusters.Sum(cluster => cluster.Edges),
-            Spread = [.. _clusters.Select(cluster => cluster.Count)],
+            Nodes = _fabric.Nodes,
+            Edges = _fabric.Edges,
+            Spread = _fabric.Spread,
             ChainLengths = chains,
-            Messages = _bus.Messages,
+            Messages = _fabric.Bus.Messages,
             Halted = halted,
             Unbalanced = unbalanced,
             Unsettled = unsettled,
@@ -423,7 +401,7 @@ public sealed class BindingRun : IDisposable
             .ThinkAsync(origins, _dials.Stamina, ct)
             .ConfigureAwait(false);
 
-        var settled = await SettleAsync(thought, ct).ConfigureAwait(false);
+        var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
         var candidates = scene.Shapes.ToHashSet();
         var ranked = thought.BestOf(Binding.Shape, int.MaxValue);
@@ -455,34 +433,5 @@ public sealed class BindingRun : IDisposable
         return report;
     }
 
-    /// <summary>
-    /// Waits on the THOUGHT'S OWN ACCOUNTING, not on the bus — fork 12.
-    /// </summary>
-    private async Task<bool> SettleAsync(Thought thought, CancellationToken ct)
-    {
-        await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
-
-        var until = Environment.TickCount64 + (long)Waiting.TotalMilliseconds;
-
-        while (!thought.Settled && Environment.TickCount64 < until)
-        {
-            await Task.Delay(1, ct).ConfigureAwait(false);
-            await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
-        }
-
-        return thought.Settled;
-    }
-
-    private void Failures()
-    {
-        lock (_faults)
-        {
-            if (_faults.Count > 0) throw new AggregateException(_faults);
-        }
-    }
-
-    public void Dispose()
-    {
-        foreach (var handle in _handles) handle.Dispose();
-    }
+    public void Dispose() => _fabric.Dispose();
 }

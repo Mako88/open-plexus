@@ -187,24 +187,7 @@ public sealed record SensesResult
 /// </remarks>
 public sealed class SensesRun : IDisposable
 {
-    private static readonly TimeSpan Patience = TimeSpan.FromSeconds(30);
-
-    /// <summary>
-    /// How long a question waits for its own walk to finish.
-    /// </summary>
-    /// <remarks>
-    /// <b>Short, and every expiry is counted rather than absorbed.</b> A wait
-    /// that quietly gives up produces an answer of "nothing reached" that is
-    /// really "not finished yet", and the two are indistinguishable in a score.
-    /// See <see cref="SensesResult.Unsettled"/>.
-    /// </remarks>
-    private static readonly TimeSpan Waiting = TimeSpan.FromMilliseconds(250);
-
-    private readonly HybridBus _bus = new();
-    private readonly Ring _ring;
-    private readonly LocalClusters _local;
-    private readonly List<Cluster> _clusters = [];
-    private readonly List<IDisposable> _handles = [];
+    private readonly Fabric _fabric;
     private readonly InputMachine<IReadOnlyCollection<Code>> _senses;
     private readonly Senses _world;
     private readonly WalkSettings _dials;
@@ -214,7 +197,6 @@ public sealed class SensesRun : IDisposable
     /// control the sweep is measured against.
     /// </summary>
     private readonly Budget? _budget;
-    private readonly List<Exception> _faults = [];
 
     public SensesRun(
         SensesSettings world,
@@ -229,25 +211,13 @@ public sealed class SensesRun : IDisposable
         _world = new Senses(world, seed);
         _dials = dials;
         _budget = dials.Budget is null ? null : new Budget(dials.Stamina, dials.Budget);
-        _ring = new Ring(seed, replicas);
-        _local = new LocalClusters(_ring);
-        _bus.Faults += failure => { lock (_faults) _faults.Add(failure); };
-
-        for (var i = 0; i < clusters; i++)
-        {
-            var address = new ClusterAddress($"c{i}");
-            _ring.Join(address);
-            var cluster = new Cluster(address, _bus, _ring, dials);
-            _local.Include(cluster);
-            _clusters.Add(cluster);
-            _handles.Add(_bus.Subscribe(cluster));
-        }
+        _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _senses = new InputMachine<IReadOnlyCollection<Code>>(
-            new MachineAddress("senses"), new Passthrough(), new LocalRendezvous(_local),
-            _bus, _ring, dials);
+            new MachineAddress("senses"), new Passthrough(), new LocalRendezvous(_fabric.Local),
+            _fabric.Bus, _fabric.Ring, dials);
 
-        _handles.Add(_bus.Subscribe(_senses));
+        _fabric.Subscribe(_senses);
     }
 
     /// <summary>The codes are already codes; there is nothing to quantise.</summary>
@@ -279,7 +249,7 @@ public sealed class SensesRun : IDisposable
         {
             var thought = await _senses
                 .ObserveAsync(_world.Moment(), moment, ct).ConfigureAwait(false);
-            await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
+            await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             // FORK 21 REFLECTS ON WHAT WAS OBSERVED AND NEVER ON WHAT WAS ASKED.
             // Writing a question's own answer back would teach the graph the
@@ -313,7 +283,7 @@ public sealed class SensesRun : IDisposable
             else if (Senses.Concept(answer.Value) == concept) right++;
         }
 
-        Failures();
+        _fabric.Failures();
 
         return new SensesResult
         {
@@ -324,11 +294,11 @@ public sealed class SensesRun : IDisposable
             Chance = _world.Chance,
             Reflected = reflected,
             Reflecting = _dials.Reflect is not null,
-            Nodes = _clusters.Sum(cluster => cluster.Count),
-            Edges = _clusters.Sum(cluster => cluster.Edges),
-            Spread = [.. _clusters.Select(cluster => cluster.Count)],
+            Nodes = _fabric.Nodes,
+            Edges = _fabric.Edges,
+            Spread = _fabric.Spread,
             ChainLengths = chains,
-            Messages = _bus.Messages,
+            Messages = _fabric.Bus.Messages,
             Halted = halted,
             Unbalanced = unbalanced,
             Unsettled = unsettled,
@@ -416,7 +386,7 @@ public sealed class SensesRun : IDisposable
             .ThinkAsync(_world.Of(Senses.Sight, concept), _budget?.Next() ?? _dials.Stamina, ct)
             .ConfigureAwait(false);
 
-        var settled = await SettleAsync(thought, ct).ConfigureAwait(false);
+        var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
         var reached = thought.BestOf(Senses.Touch, 1);
         var report = new Asking(
@@ -437,46 +407,5 @@ public sealed class SensesRun : IDisposable
         return report;
     }
 
-    /// <summary>
-    /// Waits on the THOUGHT'S OWN ACCOUNTING, not on the bus.
-    /// </summary>
-    /// <remarks>
-    /// <b>The bus going quiet does not mean the walk finished.</b> In-flight
-    /// reaches zero in the gap between a cluster handling a message and
-    /// dispatching what that message produced — fork 12. Reading a thought
-    /// there gives an answer of "nothing reached" that is really "not
-    /// finished", and the two are indistinguishable downstream.
-    /// </remarks>
-    /// <returns>Whether it settled rather than running out of patience.</returns>
-    private async Task<bool> SettleAsync(Thought thought, CancellationToken ct)
-    {
-        await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
-
-        // REAL ELAPSED TIME, NOT AN ITERATION COUNT. `Task.Delay(1)` on Windows
-        // sleeps about fifteen milliseconds, so counting one per pass made a
-        // two-second budget wait for thirty -- which looked exactly like a hang
-        // and is the same class of mistake as trusting an unmeasured constant.
-        var until = Environment.TickCount64 + (long)Waiting.TotalMilliseconds;
-
-        while (!thought.Settled && Environment.TickCount64 < until)
-        {
-            await Task.Delay(1, ct).ConfigureAwait(false);
-            await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
-        }
-
-        return thought.Settled;
-    }
-
-    private void Failures()
-    {
-        lock (_faults)
-        {
-            if (_faults.Count > 0) throw new AggregateException(_faults);
-        }
-    }
-
-    public void Dispose()
-    {
-        foreach (var handle in _handles) handle.Dispose();
-    }
+    public void Dispose() => _fabric.Dispose();
 }

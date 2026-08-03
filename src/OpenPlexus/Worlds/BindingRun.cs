@@ -410,8 +410,17 @@ public sealed class BindingRun : IDisposable
     /// </remarks>
     private async Task<Asking> OnceAsync(Scene scene, int which, CancellationToken ct)
     {
+        // THE QUESTION CARRIES THE INDEX WHEN THE WORLD HANDS ONE OUT. Without
+        // it there is no way to say *this one*: an object can only be named by
+        // its attributes, and its attributes are what is being asked about. With
+        // it, the question is "the object I am pointing at, which is this colour
+        // -- what shape is it".
+        IReadOnlyCollection<Code> origins = scene.Tags.Count > which
+            ? [.. _world.Of(Binding.Colour, scene.Colours[which]), scene.Tags[which]]
+            : _world.Of(Binding.Colour, scene.Colours[which]);
+
         var thought = await _eyes
-            .ThinkAsync(_world.Of(Binding.Colour, scene.Colours[which]), _dials.Stamina, ct)
+            .ThinkAsync(origins, _dials.Stamina, ct)
             .ConfigureAwait(false);
 
         var settled = await SettleAsync(thought, ct).ConfigureAwait(false);

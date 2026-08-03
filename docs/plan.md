@@ -89,32 +89,40 @@ from flat.** Pre-registered before the run, and it held.
 > occasion.** You cannot answer *what shape is this one* without a way to say
 > *this one*.
 
-### 1a-next. The index in the query — an ephemeral tag
+### 1a-next. BUILT AND MEASURED — the index does not clear the bar
 
-**Each object in a scene gets a contentless code of its own, and every attribute
-of that object co-occurs with it.** Then `red → tag₁ → ball` is the two-hop
-composition the senses world already does at 0.9974, and the emitted code set
-finally differs between the two bindings.
+**`BindingSettings.Tagged`.** Each object gets a contentless code of its own,
+fresh every scene, in its own group; the question carries the queried object's
+tag. That is Pylyshyn's visual index and Teyler & DiScenna's hippocampal index,
+and it needs no new mechanism — it is one more code in the occasion.
 
-**Prior art, and it is strong.** Pylyshyn's visual indexes (FINSTs) and Kahneman
-& Treisman's *object files*: a temporary pointer assigned by attention on
-spatiotemporal grounds, **before any feature is identified**. Teyler & DiScenna's
-hippocampal indexing theory is the same idea one level up — store an arbitrary
-index, reactivate it, and the pattern comes back. In this architecture it is just
-another code in the occasion, so it is **C1-legal and needs no new mechanism**.
+**32 seeds: tagged beats segmented-only by 1.4 sigma at 60 scenes and 1.6 at
+100 — under this project's 3-sigma bar — at 6.6× the messages and 3.7× the
+edges.** Longer runs, where the confound below is absent, **time out entirely**.
 
-> **CHECK THE ECONOMICS FIRST — this is reasoning from the design, not a
-> measurement, and it is an hour to settle.** A receiver divides by *its own*
-> marginal and a hop costs `1/weight`. So `red → tag` is cheap (the tag's
-> marginal is 1, weight 1.0) but `tag → ball` prices at `seen(ball)`, which is
-> large. **The hop that carries the answer may be unaffordable exactly when the
-> tag is doing its job.** `ArrivalValue.Lift` divides out endpoint prevalence in
-> the *ranking* but not in the *cost*.
+> **THE PREDICTION WAS HALF WRONG, AND THE HALF THAT WAS WRONG IS THE USEFUL
+> ONE.** The worry was that `tag → shape` would be too *expensive*
+> (`seen(shape)`). The real problem is that `colour → tag` is too *cheap*: a
+> fresh tag has `seen = 1`, so its arrival weight is 1.0 and the hop costs the
+> minimum possible. **An attribute accumulates one maximally-cheap tag partner
+> per occurrence**, so the fan-out grows without bound and the flood explodes.
+> **An ephemeral index is a fan-out catastrophe under an economy that prices
+> arrival by the receiver's own marginal.**
 
-**Honest caveat to state in the write-up:** a tag supplied by the front end tests
-whether the graph can *use* binding, not whether it can *discover* it. That is
-the right split — vision solves binding at attention, not in association cortex —
-but it has to be said out loud.
+> **A NEW CONFOUND IN THIS WORLD, FOUND HERE: short runs score above chance for
+> recency alone.** Both arms sit at 0.63 at 60 scenes and decay toward 0.5 as
+> history accumulates, because the scene just observed dominates a sparse
+> aggregate. **Any binding-world number taken under a few hundred scenes is
+> measuring recency**, and the tag's whole feasible range is inside that.
+
+**So the index is right and the economy is wrong**, which points at the same
+place three findings now do: **edge kinds.** A pointer-following hop and an
+association hop cannot share one price. See `ArrivalValue.Lift` in the refuted
+table — inert as a *ranking*, untried as a *cost*, and the cost is where the
+prevalence term is actually needed.
+
+**Honest caveat that still stands:** a tag supplied by the front end tests
+whether the graph can *use* binding, not whether it can *discover* it.
 
 ### 1b. Phase, and why it is probably 1a wearing a different name
 
@@ -177,7 +185,7 @@ it out of the plan** and planning something that already exists fails the build.
 
 - [x] `Binding` — the world that measures the ceiling
 - [x] `Seeds` — decorrelated seeding for every sweep
-- [ ] `Tag` — the ephemeral per-object code that puts an index in the QUESTION
+- [x] `Binding` — the world; `Tagged` and `Segmented` are step 1a, measured
 - [ ] `Surprise` — the local prediction error of step 2
 - [ ] `Chunk` — the minted node of step 3
 - [ ] `Drives` — the bounded internal variables of step 4

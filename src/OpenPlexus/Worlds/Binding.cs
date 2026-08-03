@@ -57,6 +57,24 @@ public sealed record BindingSettings
     /// <see cref="Learning.Occasion.Groups"/>.
     /// </remarks>
     public bool Segmented { get; init; }
+
+    /// <summary>
+    /// Whether each object also gets a contentless code of its own, fresh every
+    /// scene — <b>the index, and it can go in the question.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Requires <see cref="Segmented"/></b>, because an ungrouped tag pairs
+    /// with everything in the scene and carries nothing at all.
+    /// </para>
+    /// <para>
+    /// <b>This is what grouping alone could not do.</b> Grouping fixed learning
+    /// and left reference unsolved: a question asked with a colour cannot say
+    /// *which* object it means, and the colour's aggregate points at its own kind
+    /// regardless. A tag is how you point.
+    /// </para>
+    /// </remarks>
+    public bool Tagged { get; init; }
 }
 
 /// <summary>
@@ -90,6 +108,13 @@ public sealed record Scene
     /// say. <b>This is the only place the binding is expressed as data.</b>
     /// </summary>
     public IReadOnlyDictionary<Code, int>? Groups { get; init; }
+
+    /// <summary>
+    /// The contentless index for each object, or empty when the world does not
+    /// hand them out. <b>Fresh every scene, so it names an occasion of an object
+    /// rather than a kind of object.</b>
+    /// </summary>
+    public IReadOnlyList<Code> Tags { get; init; } = [];
 
     /// <summary>How many objects the scene holds.</summary>
     public int Objects => Colours.Count;
@@ -133,6 +158,12 @@ public sealed class Binding
     public const byte Shape = 21;
 
     /// <summary>
+    /// Which object this is, and nothing else about it. <b>A contentless index —
+    /// see <see cref="BindingSettings.Tagged"/>.</b>
+    /// </summary>
+    public const byte Tag = 22;
+
+    /// <summary>
     /// How many objects a scene holds. <b>Two, and not a dial</b> — the question
     /// is whether the architecture can bind at all, and two is where that becomes
     /// answerable. More objects make the same point more expensively.
@@ -155,11 +186,22 @@ public sealed class Binding
     /// </remarks>
     private readonly Random _binding;
 
+    /// <summary>Scenes shown, so a tag can be fresh every time.</summary>
+    private long _moment;
+
     public Binding(BindingSettings settings, int seed)
     {
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentOutOfRangeException.ThrowIfLessThan(settings.Concepts, PerScene);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.CodesPerAttribute);
+
+        // An ungrouped tag pairs with everything in the scene, so it would carry
+        // nothing at all -- and an arm that looks distinct and is not is exactly
+        // how this project has fooled itself before.
+        if (settings.Tagged && !settings.Segmented)
+            throw new ArgumentException(
+                "a tag needs its object's group, or it pairs with the whole scene "
+                + "and indexes nothing", nameof(settings));
 
         _settings = settings;
 
@@ -222,7 +264,16 @@ public sealed class Binding
         Code colourLow = Pick(Colour, low), colourHigh = Pick(Colour, high);
         Code shapeLow = Pick(Shape, low), shapeHigh = Pick(Shape, high);
 
-        IReadOnlyCollection<Code> codes = [colourLow, colourHigh, shapeLow, shapeHigh];
+        // FRESH EVERY SCENE, so a tag names this occasion of this object and
+        // never a kind of object. That is the whole difference between an index
+        // and a category, and it is why `seen` for a tag is always one.
+        var at = _moment++;
+        IReadOnlyList<Code> tags = _settings.Tagged
+            ? [.. Enumerable.Range(0, PerScene).Select(obj => new Code(Tag, (ulong)((at * PerScene) + obj)))]
+            : [];
+
+        IReadOnlyCollection<Code> codes =
+            [colourLow, colourHigh, shapeLow, shapeHigh, .. tags];
 
         // DRAWN EITHER WAY AND USED ONLY WHEN UNBOUND, so the binding generator
         // advances identically in both arms and a future arm added between them
@@ -237,7 +288,8 @@ public sealed class Binding
             Codes = codes,
             Colours = colours,
             Shapes = shapes,
-            Groups = _settings.Segmented ? Segment(colours, shapes, codes) : null,
+            Tags = tags,
+            Groups = _settings.Segmented ? Segment(colours, shapes, codes, tags) : null,
         };
     }
 
@@ -252,12 +304,19 @@ public sealed class Binding
     /// says nothing about what either of them is.
     /// </remarks>
     private Dictionary<Code, int> Segment(
-        IReadOnlyList<int> colours, IReadOnlyList<int> shapes, IReadOnlyCollection<Code> codes)
+        IReadOnlyList<int> colours,
+        IReadOnlyList<int> shapes,
+        IReadOnlyCollection<Code> codes,
+        IReadOnlyList<Code> tags)
     {
         var groups = new Dictionary<Code, int>();
 
+        for (var obj = 0; obj < tags.Count; obj++) groups[tags[obj]] = obj;
+
         foreach (var code in codes)
         {
+            if (code.Modality == Tag) continue;
+
             var concept = Concept(code);
             var which = code.Modality == Colour ? colours : shapes;
 

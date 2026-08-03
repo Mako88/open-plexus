@@ -352,6 +352,40 @@ public sealed class BindingTests
             $"{segmented} against chance {Binding.Chance:F4}, tolerance {tolerance:F4}");
     }
 
+    [Fact]
+    public void A_tag_without_its_group_is_refused_rather_than_accepted()
+    {
+        // AN ARM THAT LOOKS DISTINCT AND IS NOT is how this project has fooled
+        // itself before. An ungrouped tag pairs with every code in the scene, so
+        // it indexes nothing and the arm would quietly measure the untagged one.
+        Assert.Throws<ArgumentException>(() =>
+            new Binding(World(bound: false) with { Tagged = true }, seed: 1));
+    }
+
+    [Fact]
+    public async Task The_tag_reaches_the_graph_and_costs_what_it_costs()
+    {
+        // THE WIRING CHECK, AND DELIBERATELY NOT A CLAIM THAT IT WORKS. Measured
+        // at 32 seeds the tagged arm beats segmented-only by 1.4 to 1.6 sigma,
+        // which is under this project's bar, at 6.6x the messages. What IS
+        // certain is that it is connected: a fresh index per object per scene
+        // means the graph grows without bound, and that is visible in the counts.
+        using var flat = new BindingRun(
+            World(bound: false) with { Segmented = true }, Dials(Deep), seed: 1);
+        using var tagged = new BindingRun(
+            World(bound: false) with { Segmented = true, Tagged = true }, Dials(Deep), seed: 1);
+
+        var without = await flat.RunAsync(60, every: 4);
+        var with = await tagged.RunAsync(60, every: 4);
+
+        Assert.True(with.Nodes > without.Nodes * 2,
+            $"{with.Nodes} nodes against {without.Nodes} — the tags never reached the graph");
+
+        // THE COST, ASSERTED SO IT CANNOT QUIETLY IMPROVE OR WORSEN UNNOTICED.
+        Assert.True(with.Messages > without.Messages * 3,
+            $"{with.Messages} messages against {without.Messages}");
+    }
+
     // ---- the run says what it did -------------------------------------------
 
     [Fact]

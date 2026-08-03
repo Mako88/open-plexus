@@ -290,12 +290,12 @@ walk lands from itself.
 input machine; the harness hands the finished thought over by a direct call.
 Needed before a second machine exists.
 
-**Fork 12 — `Halted` is approximate, and it may not be any more.** A cluster
-sends onward before reporting, so a downstream death can be reported before the
-upstream split that created it; reporting first was measured and destabilised
-whole runs. **That reordering is still there, but the loss it caused was the fork
-22 bug**, and late reports are now folded rather than dropped. **Needs
-re-measuring at a fixed seed before anyone believes either way.**
+**Fork 12 is CLOSED too — see the index. The system is now deterministic at a
+fixed seed**, which it never was. **The lesson: its old description understated
+it because it was measured at a configuration where the symptom could not
+appear** (horizon 50, where the backstop never fires and `Halted` is always
+zero). A quantity that cannot move in the arm you measured is not evidence that
+it does not move.
 
 ---
 
@@ -310,7 +310,7 @@ re-measuring at a fixed seed before anyone believes either way.**
 | **3** | Cluster placement: uniform hash against prefix locality. Open |
 | **5** | ✅ A death writes off exactly the routes heading into the dead cluster |
 | **6** | ✅ Broadcast the origin, route the hops |
-| **12** | `Halted` is approximate — probably fixed as a side effect of 22, unmeasured. Above |
+| **12** | ✅ **CLOSED by 22's fix, confirmed against its own control.** A fixed seed now reproduces a run exactly, `Halted` included — `DeterminismTests` |
 | **18** | ✅ Score prediction of world state **conditional on the next action**. Built; `Consequence` reports the system does not yet model its own effect — gap 0.0165 ± 0.0086 intact against 0.0007 ± 0.0034 with the action wire cut, which is only 1.9 sigma and sits on a prediction that loses to a blind guess. **Blocked on temporal edges** |
 | **20** | ✅ Split budgets — deep to act, shallow to predict. Wins survival, mirroring and prediction at once |
 | **21** | ✅ Compression built. **A trade, not a win**: at a budget too small to compose it lifts accuracy 0.1827 → 0.7147; where the budget suffices it costs, 0.8462 → 0.7596. `Reflect = null` by default, and off is the control |

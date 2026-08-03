@@ -10,17 +10,9 @@ namespace OpenPlexus.Tests;
 /// </summary>
 public sealed class PolicyTests
 {
-    private static SnakeSettings World() => new()
-    {
-        Width = 15, Height = 15, Sight = 1,
+    private static SnakeSettings World() => Fixture.Snake();
 
-        StartingEnergy = 60.0, EnergyPerStep = 1.0, EnergyPerFood = 30.0,
-    };
-
-    private static WalkSettings Dials() => new()
-    {
-        Stamina = 4.0, Foresight = 2.0,         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 4,
-    };
+    private static WalkSettings Dials() => Fixture.Dials(foresight: 2.0, horizon: 4);
 
     private static async Task<RunResult> Play(int seed, Policy policy)
     {

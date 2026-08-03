@@ -18,13 +18,7 @@ public sealed class ReceiverWeighingTests
 {
     private static Code C(ulong value) => new(Modality: 1, value);
 
-    private static WalkSettings Dials(double stamina = 10.0) => new()
-    {
-        Stamina = stamina,
-        Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum,
-        Horizon = 50,
-    };
+    private static WalkSettings Dials(double stamina = 10.0) => Fixture.Dials(stamina);
 
     private static Message Arriving(Code to, double together, double held = 10.0) => new()
     {

@@ -34,22 +34,15 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class DeterminismTests
 {
-    private static SnakeSettings World => new()
-    {
-        Width = 15, Height = 15, Sight = 2,
-        StartingEnergy = 200, EnergyPerStep = 1, EnergyPerFood = 50,
-    };
+    private static SnakeSettings World => Fixture.Snake(sight: 2, energy: 200, perFood: 50);
 
     /// <summary>
     /// <b>Horizon 3, so the backstop actually fires.</b> At the default of 50 it
     /// never does under inverse cost, <c>Halted</c> is zero everywhere, and this
     /// test would pass without asking anything.
     /// </summary>
-    private static WalkSettings Dials => new()
-    {
-        Stamina = 8.0, Foresight = 2.0, Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum, Horizon = 3,
-    };
+    private static WalkSettings Dials =>
+        Fixture.Dials(stamina: 8.0, foresight: 2.0, horizon: 3);
 
     private static async Task<RunResult> PlayAsync(int seed)
     {

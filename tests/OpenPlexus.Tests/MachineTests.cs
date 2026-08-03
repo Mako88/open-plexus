@@ -15,46 +15,23 @@ public sealed class MachineTests : IDisposable
 {
     private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
 
-    private static Code C(ulong value) => new(Modality: 1, value);
+    private static Code C(ulong value) => Fixture.C(value);
 
-    private static readonly WalkSettings Dials = new()
-    {
-        Stamina = 10.0,
-        Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum,
-            Horizon = 6,
-    };
+    private static readonly WalkSettings Dials = Fixture.Dials(stamina: 10.0, horizon: 6);
 
-    private readonly HybridBus _bus = new();
-    private readonly Ring _ring = new(seed: 42, replicas: 64);
-    private readonly LocalClusters _local;
-    private readonly LocalRendezvous _rendezvous;
-    private readonly List<IDisposable> _handles = [];
+    private readonly Bench _bench = new(Dials, listening: true);
     private readonly InputMachine<Code[]> _machine;
 
     public MachineTests()
     {
-        _local = new LocalClusters(_ring);
-        _rendezvous = new LocalRendezvous(_local);
-        _bus.Faults += failure => throw failure;
-        foreach (var name in (string[])["a", "b", "c", "d"])
-        {
-            var address = new ClusterAddress(name);
-            _ring.Join(address);
-            var cluster = new Cluster(address, _bus, _ring, Dials);
-            _local.Include(cluster);
-            _handles.Add(_bus.Subscribe(cluster));
-        }
-
         _machine = new InputMachine<Code[]>(
-            new MachineAddress("eye"), new Passthrough(), _rendezvous, _bus, _ring, Dials);
-        _handles.Add(_bus.Subscribe(_machine));
+            new MachineAddress("eye"), new Passthrough(),
+            _bench.Rendezvous, _bench.Bus, _bench.Ring, Dials);
+
+        _bench.Subscribe(_machine);
     }
 
-    public void Dispose()
-    {
-        foreach (var handle in _handles) handle.Dispose();
-    }
+    public void Dispose() => _bench.Dispose();
 
     /// <summary>A front end that hands back exactly what it was given.</summary>
     private sealed class Passthrough : IQuantizer<Code[]>
@@ -81,7 +58,7 @@ public sealed class MachineTests : IDisposable
     private async Task<Thought?> Observe(long now, params Code[] frame)
     {
         var thought = await _machine.ObserveAsync(frame, now);
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bench.Bus.WhenIdle().WaitAsync(Patience);
         return thought;
     }
 
@@ -102,7 +79,7 @@ public sealed class MachineTests : IDisposable
         await Observe(0, C(1), C(2));
 
         // LEARNING happened...
-        Assert.Equal(1.0, _local.For(C(1)).Together(C(2)));
+        Assert.Equal(1.0, _bench.Local.For(C(1)).Together(C(2)));
 
         // ...and THINKING happened. Two paths, one call, and the companion for
         // each is the other.
@@ -180,7 +157,7 @@ public sealed class MachineTests : IDisposable
     {
         var codes = Enumerable.Range(1, 12).Select(i => C((ulong)i)).ToArray();
         var thought = await _machine.ThinkAsync(codes);
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bench.Bus.WhenIdle().WaitAsync(Patience);
 
         // FORK 6. Every cluster is asked, and each replies — including the ones
         // holding none of these codes, which is what lets the count close when
@@ -200,14 +177,14 @@ public sealed class MachineTests : IDisposable
         // A broadcast is a question put to everyone, and admitting on one would
         // put every code on every cluster.
         await _machine.ThinkAsync([C(500), C(501)]);
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bench.Bus.WhenIdle().WaitAsync(Patience);
 
-        Assert.False(_local.TryOwner(C(500), out var owner) && owner.TryGet(C(500), out _));
+        Assert.False(_bench.Local.TryOwner(C(500), out var owner) && owner.TryGet(C(500), out _));
 
         // The companion: learning DOES create it, so the assertion above is
         // about broadcasts rather than about nodes never appearing.
         await Observe(0, C(500), C(501));
-        Assert.True(_local.TryOwner(C(500), out var home) && home.TryGet(C(500), out _));
+        Assert.True(_bench.Local.TryOwner(C(500), out var home) && home.TryGet(C(500), out _));
     }
 
     [Fact]
@@ -219,12 +196,12 @@ public sealed class MachineTests : IDisposable
         // though the local one unions the two and cannot tell.
         var seen = new Recording();
         var machine = new InputMachine<Code[]>(
-            new MachineAddress("probe"), new Passthrough(), seen, _bus, _ring, Dials);
-        using var _ = _bus.Subscribe(machine);
+            new MachineAddress("probe"), new Passthrough(), seen, _bench.Bus, _bench.Ring, Dials);
+        using var _ = _bench.Bus.Subscribe(machine);
 
         await machine.ObserveAsync([C(1), C(2)], 0);
         await machine.ObserveAsync([C(1), C(2), C(3)], 1);
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bench.Bus.WhenIdle().WaitAsync(Patience);
 
         var second = seen.Occasions[1];
         Assert.Equal([C(3)], second.Onsets.ToArray());
@@ -257,14 +234,14 @@ public sealed class MachineTests : IDisposable
         // destination -- so a sweep of it measured a disconnected dial and
         // reported it inert. Nothing else in the system could have noticed.
         var seen = new Watching();
-        using var _ = _bus.Subscribe(seen);
+        using var _ = _bench.Bus.Subscribe(seen);
 
         var machine = new InputMachine<Code[]>(
-            new MachineAddress("probe"), new Passthrough(), new Nothing(), _bus, _ring, Dials);
-        using var __ = _bus.Subscribe(machine);
+            new MachineAddress("probe"), new Passthrough(), new Nothing(), _bench.Bus, _bench.Ring, Dials);
+        using var __ = _bench.Bus.Subscribe(machine);
 
         await machine.ThinkAsync([C(700)], 3.5);
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bench.Bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Equal(3.5, seen.Held.Single(), precision: 10);
     }
@@ -275,14 +252,14 @@ public sealed class MachineTests : IDisposable
         // The companion. Without it the test above passes for a machine that
         // ignores its own settings instead.
         var seen = new Watching();
-        using var _ = _bus.Subscribe(seen);
+        using var _ = _bench.Bus.Subscribe(seen);
 
         var machine = new InputMachine<Code[]>(
-            new MachineAddress("probe2"), new Passthrough(), new Nothing(), _bus, _ring, Dials);
-        using var __ = _bus.Subscribe(machine);
+            new MachineAddress("probe2"), new Passthrough(), new Nothing(), _bench.Bus, _bench.Ring, Dials);
+        using var __ = _bench.Bus.Subscribe(machine);
 
         await machine.ThinkAsync([C(701)], null);
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bench.Bus.WhenIdle().WaitAsync(Patience);
 
         Assert.Equal(Dials.Stamina, seen.Held.Single(), precision: 10);
     }
@@ -387,7 +364,7 @@ public sealed class MachineTests : IDisposable
         // indistinguishable from a graph that had nothing to say.
         var bus = new RepliesImmediately();
         var machine = new InputMachine<Code[]>(
-            new MachineAddress("m"), new Passthrough(), new Nothing(), bus, _ring, Dials);
+            new MachineAddress("m"), new Passthrough(), new Nothing(), bus, _bench.Ring, Dials);
         bus.Machine = machine;
 
         var thought = await machine.ThinkAsync([C(1)]);
@@ -484,7 +461,7 @@ public sealed class MachineTests : IDisposable
         // releases nothing.
         Assert.Equal(0, _machine.DeathsSeen);
 
-        _handles[0].Dispose();
+        _bench.Depart();
 
         Assert.Equal(1, _machine.DeathsSeen);
     }

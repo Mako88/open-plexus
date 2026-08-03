@@ -15,6 +15,17 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class NoiseFloorTests
 {
+    /// <summary>
+    /// The noisy senses world, with something already learned in it.
+    /// </summary>
+    /// <remarks>
+    /// <b>The teaching is not optional.</b> Every question on a fresh graph
+    /// reaches nothing, and two walks that both reached nothing agree perfectly —
+    /// which would read as a walk that never disagrees with itself.
+    /// </remarks>
+    private static SensesRun Taught(int seed) => new(
+        Fixture.Senses(concepts: 12, noise: 0.1), Fixture.Dials(stamina: 8.0), seed);
+
     [Fact]
     public async Task The_same_question_does_not_always_get_the_same_answer()
     {
@@ -22,14 +33,7 @@ public sealed class NoiseFloorTests
 
         for (var seed = 1; seed <= 6; seed++)
         {
-            using var run = new SensesRun(new SensesSettings
-            {
-                Concepts = 12, CodesPerSense = 3, Noise = 0.1,
-            }, new WalkSettings
-            {
-                Stamina = 8.0, Value = ArrivalValue.Strength,
-                Accumulate = Accumulate.Sum, Horizon = 50,
-            }, seed);
+            using var run = Taught(seed);
 
             // Learn something first, or every question reaches nothing.
             await run.RunAsync(400, every: 10);
@@ -97,14 +101,7 @@ public sealed class NoiseFloorTests
 
         for (var seed = 1; seed <= 5; seed++)
         {
-            using var run = new SensesRun(new SensesSettings
-            {
-                Concepts = 12, CodesPerSense = 3, Noise = 0.1,
-            }, new WalkSettings
-            {
-                Stamina = 8.0, Value = ArrivalValue.Strength,
-                Accumulate = Accumulate.Sum, Horizon = 50,
-            }, seed);
+            using var run = Taught(seed);
 
             await run.RunAsync(400, every: 10);
 

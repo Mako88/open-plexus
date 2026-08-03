@@ -21,17 +21,9 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class InertDialTests
 {
-    private static SnakeSettings World() => new()
-    {
-        Width = 15, Height = 15, Sight = 1,
-        StartingEnergy = 200.0, EnergyPerStep = 1.0, EnergyPerFood = 30.0,
-    };
+    private static SnakeSettings World() => Fixture.Snake(energy: 200.0);
 
-    private static WalkSettings Dials() => new()
-    {
-        Stamina = 4.0, Foresight = 2.0, Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum, Horizon = 50,
-    };
+    private static WalkSettings Dials() => Fixture.Dials(foresight: 2.0);
 
     [Fact]
     public async Task Most_arrivals_are_reached_by_more_than_one_route()

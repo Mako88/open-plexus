@@ -65,6 +65,7 @@ public sealed record RunResult
     /// <summary>Every message the bus carried over the run.</summary>
     public required long Messages { get; init; }
 
+
     /// <summary>
     /// How well the graph foresaw what it was about to see, given what it was
     /// about to do.
@@ -229,8 +230,8 @@ public sealed class SnakeRun : IDisposable
     /// <summary>What was present last step, so this step's onsets can be found.</summary>
     private HashSet<Code> _before = [];
 
-    /// <summary>How long the chains that came back were.</summary>
-    private readonly Dictionary<int, int> _chains = [];
+    /// <inheritdoc cref="Chains"/>
+    private readonly Chains _chains = new();
 
     public SnakeRun(
         SnakeSettings world,
@@ -253,6 +254,7 @@ public sealed class SnakeRun : IDisposable
         _fallback = new Random(seed);
         _guessing = new Random(~seed);
         _fabric = new Fabric(dials, seed, clusters, replicas);
+
 
         _eye = new InputMachine<SnakeFrame>(
             new MachineAddress("eye"),
@@ -288,10 +290,7 @@ public sealed class SnakeRun : IDisposable
         return new RunReport
         {
             Result = result,
-            Nodes = _fabric.Nodes,
-            Edges = _fabric.Edges,
-            Spread = _fabric.Spread,
-            ChainLengths = new Dictionary<int, int>(_chains),
+            Plumbing = _fabric.Facts(_chains, result.Unbalanced),
         };
     }
 
@@ -344,6 +343,7 @@ public sealed class SnakeRun : IDisposable
             // not answer for free.
             _novelty.Settle(foreseen, [.. present.Where(c => !_before.Contains(c))], blind);
 
+
             // FORK 18, AND IT IS SCORED AGAINST EVERYTHING PRESENT ON PURPOSE.
             // Whatever is predictable without knowing the action is equally
             // predictable in both arms, so it cancels in the gap -- there is no
@@ -377,11 +377,7 @@ public sealed class SnakeRun : IDisposable
                 if (!thought.Balanced()) unbalanced++;
                 if (chosen is null) reachedNothing++;
 
-                // How far routes actually walked. A flood that only ever
-                // produces chains of length two is a one-hop lookup, and
-                // nothing else reported would show it.
-                foreach (var arrival in thought.Best(int.MaxValue))
-                    _chains[arrival.Chain.Length] = _chains.GetValueOrDefault(arrival.Chain.Length) + 1;
+                _chains.Fold(thought.Best(int.MaxValue));
             }
 
             if (policy != Policy.Chain) chosen = null;
@@ -477,37 +473,27 @@ public sealed class SnakeRun : IDisposable
 
         var asking = new Task<Thought>[votes - 1];
         for (var i = 0; i < asking.Length; i++)
-            asking[i] = _eye.ThinkAsync(first.Started, _dials.Stamina, ct);
+            asking[i] = _eye.ThinkAsync(first.Started, _dials.Stamina, null, ct);
 
         var others = await Task.WhenAll(asking).ConfigureAwait(false);
         await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
-        // SILENCE GETS NO VOTE. A walk that reached no action has no opinion, and
-        // counting it would let the quietest arm decide.
-        var tally = new Dictionary<Code, int>();
+        var opinions = new List<Code?>(votes);
         long halted = 0;
         var unbalanced = 0;
 
         foreach (var one in others)
         {
-            if (_hand.Choose(one) is { } code) tally[code] = tally.GetValueOrDefault(code) + 1;
+            opinions.Add(_hand.Choose(one));
             halted += one.Halted;
             if (!one.Balanced()) unbalanced++;
             _eye.Forget(one.Id);
         }
 
-        if (_hand.Choose(first) is { } mine) tally[mine] = tally.GetValueOrDefault(mine) + 1;
+        opinions.Add(_hand.Choose(first));
 
-        // Ties break on the code, so the answer does not depend on which thought
-        // finished first -- which is the very thing being voted on.
-        // NOT UNANIMOUS AMONG THE VOTES THAT HAD AN OPINION. One distinct answer
-        // means every walk that reached an action reached the same one.
-        var disagreed = tally.Count > 1;
-
-        return tally.Count == 0
-            ? (null, halted, unbalanced, false)
-            : (tally.OrderByDescending(e => e.Value).ThenBy(e => e.Key).First().Key,
-               halted, unbalanced, disagreed);
+        var vote = Majority.Of(opinions);
+        return (vote.Chosen, halted, unbalanced, vote.Disagreed);
     }
 
     /// <summary>
@@ -546,7 +532,10 @@ public sealed class SnakeRun : IDisposable
         // A SHALLOWER BUDGET FOR THE PREDICTION, because the two questions
         // want opposite depths -- fork 20.
         var thought = await _eye.ThinkAsync(
-            [.. present, doing], _dials.Foresight, ct).ConfigureAwait(false);
+            [.. present, doing],
+            _dials.Foresight,
+            null,
+            ct).ConfigureAwait(false);
         await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
         var wanted = _names ?? present.Count;

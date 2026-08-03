@@ -4,105 +4,66 @@ using System.Text;
 namespace OpenPlexus.Worlds;
 
 /// <summary>
-/// Everything a run can say about itself, printed at the end of it.
+/// Everything a snake run can say about itself, printed at the end of it.
 /// </summary>
 /// <remarks>
-/// <para>
-/// <b>John's ask, 2026-08-02, and the reason is the failure this project keeps
-/// having:</b> a number is swept, it barely moves, and much later it turns out
-/// something was not wired the way anyone thought. A run that reports its own
-/// plumbing makes that visible on the spot instead of after the conclusions.
-/// </para>
-/// <para>
-/// <b><see cref="Complaints"/> is the part that matters.</b> Every entry is a
-/// quantity that would be out of range only if something had come unwired, and
-/// a test asserts the list is empty. Adding a number here without a range says
-/// nothing; the range is the check.
-/// </para>
+/// <b>What is peculiar to snake, over the checks in <see cref="Measurement"/>.</b>
+/// Snake is the one world here that acts rather than answering, so it has steps
+/// and silence and predictions where the other two have questions.
 /// </remarks>
-public sealed record RunReport
+public sealed record RunReport : Measurement
 {
     public required RunResult Result { get; init; }
-
-    /// <summary>Nodes across every cluster.</summary>
-    public required int Nodes { get; init; }
-
-    /// <summary>Partner entries across every node — the graph's size.</summary>
-    public required int Edges { get; init; }
-
-    /// <summary>How many nodes each cluster holds.</summary>
-    public required IReadOnlyList<int> Spread { get; init; }
-
-    /// <summary>
-    /// How long the chains that came back were, by length.
-    /// </summary>
-    /// <remarks>
-    /// <b>The single most revealing line.</b> A walk that only ever produces
-    /// chains of length two is a one-hop lookup wearing the name of a flood,
-    /// and nothing else in the report would show it.
-    /// </remarks>
-    public required IReadOnlyDictionary<int, int> ChainLengths { get; init; }
 
     /// <summary>The share of steps that produced no onset and so no thought.</summary>
     public double Silence => Result.Steps == 0 ? 0.0 : Result.Silent / (double)Result.Steps;
 
-    /// <summary>How far a route actually walked, at most.</summary>
-    public int Deepest => ChainLengths.Count == 0 ? 0 : ChainLengths.Keys.Max();
-
     /// <summary>What the graph foresaw of what CHANGED, over a blind draw.</summary>
     public double NoveltyGap => Result.Novelty.Precision - Result.Novelty.Blind;
 
-    /// <summary>
-    /// Everything that is out of the range it would be in if the system were
-    /// wired the way it is supposed to be.
-    /// </summary>
-    public IReadOnlyList<string> Complaints
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>Two, because snake's task is one hop.</b> An action code joins the
+    /// occasion it was taken in, so a chain of two reaches one — and anything
+    /// shallower means the walk is not walking.
+    /// </remarks>
+    protected override int Composes => 2;
+
+    /// <inheritdoc/>
+    protected override string Stalled => "no route walked at all";
+
+    /// <inheritdoc/>
+    protected override void Peculiar(List<string> wrong)
     {
-        get
-        {
-            var wrong = new List<string>();
+        ArgumentNullException.ThrowIfNull(wrong);
 
-            if (Result.Steps == 0) wrong.Add("the run took no steps");
-            if (Nodes == 0) wrong.Add("no node ever came into existence");
-            if (Edges == 0) wrong.Add("no connection was ever formed");
-            if (Result.Messages == 0) wrong.Add("the bus carried nothing");
-            if (Result.Unbalanced > 0) wrong.Add($"{Result.Unbalanced} thoughts did not balance");
+        if (Result.Steps == 0) wrong.Add("the run took no steps");
+        if (Result.Silent >= Result.Steps) wrong.Add("every step was silent");
+        if (Result.Steps > 2 && Result.Novelty.Asked == 0)
+            wrong.Add("nothing was ever predicted");
 
-            // A route that never leaves its origin means the walk is not
-            // walking, and every result would be about one-hop association.
-            if (Deepest < 2) wrong.Add($"no route walked at all — deepest chain {Deepest}");
+        // GUARDED BY SAMPLE SIZE, because a short run is not a broken one. A
+        // three-step run genuinely has almost nothing to predict, and a check
+        // that fires on that trains everyone to ignore the list.
+        if (Result.Novelty.Guessed > 50 && Result.Novelty.Chance == 0)
+            wrong.Add("the blind control never scored, so the gap means nothing");
 
-            if (Result.Silent >= Result.Steps) wrong.Add("every step was silent");
-            if (Spread.Count(count => count > 0) < 2) wrong.Add("every node landed on one cluster");
-            if (Result.Steps > 2 && Result.Novelty.Asked == 0)
-                wrong.Add("nothing was ever predicted");
+        // FORK 18'S WIRING CHECK. A counterfactual that was never asked leaves
+        // `Gap` at exactly zero, which reads identically to "the action is not in
+        // the model" -- the two must not be confusable.
+        if (Result.Steps > 2 && Result.Consequence.Asked == 0)
+            wrong.Add("no consequence was ever predicted");
 
-            // GUARDED BY SAMPLE SIZE, because a short run is not a broken one.
-            // A three-step run genuinely has almost nothing to predict, and a
-            // check that fires on that trains everyone to ignore the list.
-            if (Result.Novelty.Guessed > 50 && Result.Novelty.Chance == 0)
-                wrong.Add("the blind control never scored, so the gap means nothing");
-
-            // FORK 18'S WIRING CHECK. A counterfactual that was never asked
-            // leaves `Gap` at exactly zero, which reads identically to "the
-            // action is not in the model" -- the two must not be confusable.
-            if (Result.Steps > 2 && Result.Consequence.Asked == 0)
-                wrong.Add("no consequence was ever predicted");
-
-            // `Consequence.Differed` IS DELIBERATELY NOT COMPLAINED ABOUT, and
-            // that was measured rather than decided. It fires on small graphs
-            // where the top-ranked vision codes are the same whichever action is
-            // named -- knowing=0.900, counter=0.900, differed=0, with the action
-            // wired correctly the whole time. It is reported and nothing more.
-
-            return wrong;
-        }
+        // `Consequence.Differed` IS DELIBERATELY NOT COMPLAINED ABOUT, and that
+        // was measured rather than decided. It fires on small graphs where the
+        // top-ranked vision codes are the same whichever action is named --
+        // knowing=0.900, counter=0.900, differed=0, with the action wired
+        // correctly the whole time. It is reported and nothing more.
     }
 
     public override string ToString()
     {
         var report = new StringBuilder();
-        var lengths = string.Join(" ", ChainLengths.OrderBy(e => e.Key).Select(e => $"{e.Key}:{e.Value}"));
 
         report.Append(CultureInfo.InvariantCulture,
             $"steps={Result.Steps} alive={Result.Alive} ate={Result.Ate} ");
@@ -111,9 +72,9 @@ public sealed record RunReport
         report.Append(CultureInfo.InvariantCulture,
             $"nodes={Nodes} edges={Edges} spread=[{string.Join(",", Spread)}] | ");
         report.Append(CultureInfo.InvariantCulture,
-            $"chains={{{lengths}}} deepest={Deepest} | ");
+            $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | ");
         report.Append(CultureInfo.InvariantCulture,
-            $"msgs={Result.Messages} halted={Result.Halted} unbalanced={Result.Unbalanced} | ");
+            $"msgs={Messages} halted={Result.Halted} unbalanced={Unbalanced} | ");
         report.Append(CultureInfo.InvariantCulture,
             $"foresaw={Result.Foresight.Precision:F3} blind={Result.Foresight.Blind:F3} ");
         report.Append(CultureInfo.InvariantCulture,
@@ -123,8 +84,7 @@ public sealed record RunReport
             $"counter={Result.Consequence.Counterfactual:F3} " +
             $"actionGap={Result.Consequence.Gap:F4}");
 
-        if (Complaints.Count > 0)
-            report.Append(CultureInfo.InvariantCulture, $" || WRONG: {string.Join("; ", Complaints)}");
+        report.Append(Wrong);
 
         return report.ToString();
     }

@@ -10,72 +10,8 @@ namespace OpenPlexus.Worlds;
 /// <summary>
 /// What the senses world measured. <b>Counts, not claims.</b>
 /// </summary>
-public sealed record SensesResult
+public sealed record SensesResult : Questioned
 {
-    /// <summary>Moments shown.</summary>
-    public required int Moments { get; init; }
-
-    /// <summary>Questions asked — a sight, answered with a touch.</summary>
-    public required int Asked { get; init; }
-
-    /// <summary>Of those, how many named the right concept's touch first.</summary>
-    public required int Right { get; init; }
-
-    /// <summary>Of those, how many the graph had nothing at all to say about.</summary>
-    public required int Silent { get; init; }
-
-    /// <summary>What a blind guess would score.</summary>
-    public required double Chance { get; init; }
-
-    /// <summary>
-    /// Conclusions written back as observations. <b>Zero when fork 21 is off</b>,
-    /// which is how a run says out loud whether the mechanism was even running.
-    /// </summary>
-    public required int Reflected { get; init; }
-
-    /// <summary>Nodes across every cluster.</summary>
-    public required int Nodes { get; init; }
-
-    /// <summary>Partner entries across every node.</summary>
-    public required int Edges { get; init; }
-
-    /// <summary>How many nodes each cluster holds.</summary>
-    public required IReadOnlyList<int> Spread { get; init; }
-
-    /// <summary>
-    /// How long the chains that came back were, by length.
-    /// </summary>
-    /// <remarks>
-    /// <b>The single most revealing line in this world.</b> Sight reaches touch
-    /// only through sound, so a correct answer is a chain of length three. If
-    /// nothing ever walked that far, any accuracy here came from somewhere other
-    /// than composition and the headline number means nothing.
-    /// </remarks>
-    public required IReadOnlyDictionary<int, int> ChainLengths { get; init; }
-
-    /// <summary>What the bus carried.</summary>
-    public required long Messages { get; init; }
-
-    /// <summary>Routes killed by the horizon rather than by economics.</summary>
-    public required long Halted { get; init; }
-
-    /// <summary>Thoughts whose own accounting did not close.</summary>
-    public required int Unbalanced { get; init; }
-
-    /// <summary>
-    /// Questions read before their walk had finished.
-    /// </summary>
-    /// <remarks>
-    /// <b>Counted rather than absorbed.</b> A walk that had not finished
-    /// produces "nothing reached", which is indistinguishable in a score from a
-    /// graph that genuinely had nothing to say -- so a run where this is not
-    /// zero has a silent-count that cannot be trusted.
-    /// </remarks>
-    public required int Unsettled { get; init; }
-
-    /// <summary>Whether fork 21 was switched on for this run.</summary>
-    public required bool Reflecting { get; init; }
-
     /// <summary>
     /// Where fork 24's hunt for stamina ended up, and how often it moved.
     /// <b>Zero moves with hunting on means it never adjusted anything.</b>
@@ -105,76 +41,38 @@ public sealed record SensesResult
     /// </summary>
     public required double Thwarted { get; init; }
 
-    /// <summary>The share of questions answered correctly.</summary>
-    public double Accuracy => Asked == 0 ? 0.0 : Right / (double)Asked;
+    /// <inheritdoc/>
+    protected override string Shown => "moments";
 
-    /// <summary>How far a route actually walked, at most.</summary>
-    public int Deepest => ChainLengths.Count == 0 ? 0 : ChainLengths.Keys.Max();
-
-    /// <summary>
-    /// Everything out of the range it would be in if this world were wired the
-    /// way it is supposed to be.
-    /// </summary>
+    /// <inheritdoc/>
     /// <remarks>
-    /// <b>John's ask, and it is the same one <see cref="RunReport"/> answers for
-    /// snake:</b> a number gets swept, barely moves, and much later it turns out
-    /// something was never connected. Every entry here is a quantity that could
-    /// only be out of range if something had come unwired.
+    /// <b>Three, and it is the whole task.</b> Sight and touch never co-occur, so
+    /// reaching one from the other is a two-hop chain of length three. If nothing
+    /// ever walked that far, any accuracy here came from somewhere other than
+    /// composition and the headline number means nothing.
     /// </remarks>
-    public IReadOnlyList<string> Complaints
+    protected override int Composes => 3;
+
+    /// <inheritdoc/>
+    protected override string Stalled => "no route composed anything";
+
+    /// <inheritdoc/>
+    protected override void Beyond(List<string> wrong)
     {
-        get
-        {
-            var wrong = new List<string>();
-
-            if (Moments == 0) wrong.Add("the run showed no moments");
-            if (Asked == 0) wrong.Add("nothing was ever asked");
-            if (Nodes == 0) wrong.Add("no node ever came into existence");
-            if (Edges == 0) wrong.Add("no connection was ever formed");
-            if (Messages == 0) wrong.Add("the bus carried nothing");
-            if (Unbalanced > 0) wrong.Add($"{Unbalanced} thoughts did not balance");
-            if (Unsettled > 0) wrong.Add($"{Unsettled} questions were read before their walk finished");
-
-            // THE ONE THAT IS SPECIFIC TO THIS WORLD. Sight and touch never
-            // co-occur, so reaching one from the other is a two-hop chain of
-            // length three. Anything shallower is not the task.
-            if (Deepest < 3)
-                wrong.Add($"no route composed anything — deepest chain {Deepest}");
-
-            if (Asked > 0 && Silent >= Asked) wrong.Add("every question went unanswered");
-            if (Spread.Count(count => count > 0) < 2) wrong.Add("every node landed on one cluster");
-
-            // FORK 21'S OWN WIRING CHECK. A dial that is on and does nothing is
-            // a sweep arm that looks distinct and is not, which is exactly how
-            // this project has fooled itself before.
-            if (Reflecting && Reflected == 0)
-                wrong.Add("reflection was switched on and wrote nothing");
-            if (!Reflecting && Reflected > 0)
-                wrong.Add($"reflection was off and still wrote {Reflected}");
-
-            return wrong;
-        }
+        // Nothing beyond the asking. Fork 24's numbers are reported rather than
+        // ranged, because a controller that never moved is a finding and not a
+        // fault -- see Settled.
     }
 
-    public override string ToString()
-    {
-        var lengths = string.Join(
-            " ", ChainLengths.OrderBy(e => e.Key).Select(e => $"{e.Key}:{e.Value}"));
-
-        var line =
-            $"moments={Moments} asked={Asked} right={Right} silent={Silent} " +
-            $"accuracy={Accuracy:F4} chance={Chance:F4} | " +
-            $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
-            $"nodes={Nodes} edges={Edges} spread=[{string.Join(",", Spread)}] | " +
-            $"chains={{{lengths}}} deepest={Deepest} | " +
-            $"msgs={Messages} halted={Halted} unbalanced={Unbalanced} unsettled={Unsettled} " +
-            $"hunger={Hunger:F2} thwarted={Thwarted:F2} | " +
-            $"stamina={Settled} moves={Moves}";
-
-        return Complaints.Count == 0
-            ? line
-            : $"{line} || WRONG: {string.Join("; ", Complaints)}";
-    }
+    public override string ToString() =>
+        $"moments={Moments} asked={Asked} right={Right} silent={Silent} " +
+        $"accuracy={Accuracy:F4} chance={Chance:F4} | " +
+        $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
+        $"nodes={Nodes} edges={Edges} spread=[{string.Join(",", Spread)}] | " +
+        $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | " +
+        $"msgs={Messages} halted={Halted} unbalanced={Unbalanced} unsettled={Unsettled} " +
+        $"hunger={Hunger:F2} thwarted={Thwarted:F2} | " +
+        $"stamina={Settled} moves={Moves}{Wrong}";
 }
 
 /// <summary>
@@ -243,7 +141,7 @@ public sealed class SensesRun : IDisposable
         long halted = 0;
 
         var reflected = 0;
-        var chains = new Dictionary<int, int>();
+        var chains = new Chains();
 
         for (var moment = 0; moment < moments; moment++)
         {
@@ -273,11 +171,7 @@ public sealed class SensesRun : IDisposable
             if (!balanced) unbalanced++;
             if (!settled) unsettled++;
 
-            // How far routes actually walked. Sight reaches touch only through
-            // sound, so a correct answer is a chain of length three -- and a run
-            // that never produced one cannot have composed anything.
-            foreach (var arrival in everything)
-                chains[arrival.Chain.Length] = chains.GetValueOrDefault(arrival.Chain.Length) + 1;
+            chains.Fold(everything);
 
             if (answer is null) silent++;
             else if (Senses.Concept(answer.Value) == concept) right++;
@@ -292,15 +186,9 @@ public sealed class SensesRun : IDisposable
             Right = right,
             Silent = silent,
             Chance = _world.Chance,
-            Reflected = reflected,
-            Reflecting = _dials.Reflect is not null,
-            Nodes = _fabric.Nodes,
-            Edges = _fabric.Edges,
-            Spread = _fabric.Spread,
-            ChainLengths = chains,
-            Messages = _fabric.Bus.Messages,
+            Reflections = Reflections.Of(_dials, reflected),
+            Plumbing = _fabric.Facts(chains, unbalanced),
             Halted = halted,
-            Unbalanced = unbalanced,
             Unsettled = unsettled,
             Hunger = asked == 0 ? 0.0 : hunger / asked,
             Thwarted = asked == 0 ? 0.0 : thwarted / asked,
@@ -352,21 +240,7 @@ public sealed class SensesRun : IDisposable
 
         var answers = await Task.WhenAll(asking).ConfigureAwait(false);
 
-        // MOST VOTES WINS, AND SILENCE DOES NOT GET ONE. A walk that reached
-        // nothing has no opinion; counting it would let the quietest arm decide.
-        var tally = new Dictionary<Code, int>();
-        foreach (var answer in answers)
-            if (answer.Answer is { } code)
-                tally[code] = tally.GetValueOrDefault(code) + 1;
-
-        if (tally.Count == 0) return null;
-
-        // Ties break on the code, so the answer does not depend on which thought
-        // happened to finish first -- which is the very thing being voted on.
-        return tally
-            .OrderByDescending(entry => entry.Value)
-            .ThenBy(entry => entry.Key)
-            .First().Key;
+        return Majority.Of(answers.Select(answer => answer.Answer)).Chosen;
     }
 
     /// <summary>One question, with the plumbing left attached.</summary>
@@ -383,7 +257,7 @@ public sealed class SensesRun : IDisposable
     private async Task<Asking> AskingAsync(int concept, CancellationToken ct)
     {
         var thought = await _senses
-            .ThinkAsync(_world.Of(Senses.Sight, concept), _budget?.Next() ?? _dials.Stamina, ct)
+            .ThinkAsync(_world.Of(Senses.Sight, concept), _budget?.Next() ?? _dials.Stamina, null, ct)
             .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);

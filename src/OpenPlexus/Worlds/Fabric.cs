@@ -83,6 +83,35 @@ public sealed class Fabric : IDisposable
     /// <summary>How many nodes each cluster holds.</summary>
     public IReadOnlyList<int> Spread => [.. _clusters.Select(cluster => cluster.Count)];
 
+    /// <inheritdoc cref="Plumbing.Widest"/>
+    public int Widest => _clusters.Count == 0 ? 0 : _clusters.Max(cluster => cluster.Widest);
+
+    /// <summary>
+    /// What the machinery did, in the form every world's result carries it.
+    /// </summary>
+    /// <remarks>
+    /// <b>Read at the end of a run, never during one.</b> Everything here is a
+    /// live total over the clusters, so a <see cref="Plumbing"/> taken mid-run is
+    /// a snapshot of an unfinished graph rather than a wrong number.
+    /// </remarks>
+    /// <param name="chains">The histogram the run collected as it went.</param>
+    /// <param name="unbalanced">Thoughts whose own accounting did not close.</param>
+    public Plumbing Facts(Chains chains, int unbalanced)
+    {
+        ArgumentNullException.ThrowIfNull(chains);
+
+        return new Plumbing
+        {
+            Nodes = Nodes,
+            Edges = Edges,
+            Widest = Widest,
+            Spread = Spread,
+            ChainLengths = chains.ByLength,
+            Messages = Bus.Messages,
+            Unbalanced = unbalanced,
+        };
+    }
+
     /// <summary>Puts a machine on the bus and keeps the handle.</summary>
     public void Subscribe(IReceiveReports machine)
     {

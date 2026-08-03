@@ -12,16 +12,9 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class Fork10Tests
 {
-    private static SnakeSettings World(double energy) => new()
-    {
-        Width = 15, Height = 15, Sight = 1,
-        StartingEnergy = energy, EnergyPerStep = 1.0, EnergyPerFood = 30.0,
-    };
+    private static SnakeSettings World(double energy) => Fixture.Snake(energy: energy);
 
-    private static WalkSettings Dials() => new()
-    {
-        Stamina = 4.0, Foresight = 2.0,         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 50,
-    };
+    private static WalkSettings Dials() => Fixture.Dials(foresight: 2.0);
 
     private static async Task<List<RunResult>> Over(int seeds, Policy policy, double energy)
     {

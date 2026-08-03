@@ -100,15 +100,13 @@ public sealed class Senses
     /// <summary>Every code one sense produces for one concept.</summary>
     public IReadOnlyList<Code> Of(byte sense, int concept)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(concept);
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(concept, _settings.Concepts);
 
-        return [.. Enumerable.Range(0, _settings.CodesPerSense)
-            .Select(slot => new Code(sense, (ulong)((concept * 1000) + slot)))];
+        return Kinds.All(sense, concept, _settings.CodesPerSense);
     }
 
     /// <summary>Which concept a code belongs to, whatever sense it came from.</summary>
-    public static int Concept(Code code) => (int)(code.Value / 1000);
+    public static int Concept(Code code) => Kinds.Of(code);
 
     /// <summary>
     /// One moment: two senses of one concept, sometimes with a stray code from
@@ -139,5 +137,5 @@ public sealed class Senses
     }
 
     private Code Pick(byte sense, int concept) =>
-        new(sense, (ulong)((concept * 1000) + _rng.Next(_settings.CodesPerSense)));
+        Kinds.Pick(sense, concept, _settings.CodesPerSense, _rng);
 }

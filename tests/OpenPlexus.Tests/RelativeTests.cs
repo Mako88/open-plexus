@@ -10,16 +10,9 @@ namespace OpenPlexus.Tests;
 /// </summary>
 public sealed class RelativeTests
 {
-    private static SnakeSettings World() => new()
-    {
-        Width = 15, Height = 15, Sight = 1,
-        StartingEnergy = 60.0, EnergyPerStep = 1.0, EnergyPerFood = 30.0,
-    };
+    private static SnakeSettings World() => Fixture.Snake();
 
-    private static WalkSettings Dials() => new()
-    {
-        Stamina = 4.0,         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 50,
-    };
+    private static WalkSettings Dials() => Fixture.Dials();
 
     private static Cell At(SnakeView view, int dx, int dy) =>
         view.Cells.Single(c => c.Dx == dx && c.Dy == dy).Content;

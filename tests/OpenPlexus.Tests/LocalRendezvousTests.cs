@@ -12,45 +12,19 @@ namespace OpenPlexus.Tests;
 /// </summary>
 public sealed class LocalRendezvousTests
 {
-    private static Code C(ulong value) => new(Modality: 1, value);
+    private static Code C(ulong value) => Fixture.C(value);
 
-    private static readonly WalkSettings Dials = new()
-    {
-        Stamina = 10.0,
-        Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum,
-            Horizon = 6,
-    };
-
-    private readonly HybridBus _bus = new();
-    private readonly Ring _ring = new(seed: 42, replicas: 64);
-    private readonly LocalClusters _local;
-    private readonly LocalRendezvous _rendezvous;
-
-    public LocalRendezvousTests()
-    {
-        _local = new LocalClusters(_ring);
-        _rendezvous = new LocalRendezvous(_local);
-
-        // Several clusters, so codes really are spread and the join has to
-        // reach across them rather than into one dictionary.
-        foreach (var name in (string[])["a", "b", "c", "d"])
-        {
-            var address = new ClusterAddress(name);
-            _ring.Join(address);
-            _local.Include(new Cluster(address, _bus, _ring, Dials));
-        }
-    }
+    private readonly Bench _bench = new(Fixture.Dials(stamina: 10.0, horizon: 6));
 
     private ValueTask Join(Code[] onsets, params Code[] live) =>
-        _rendezvous.JoinAsync(new Occasion
+        _bench.Rendezvous.JoinAsync(new Occasion
         {
             Onsets = [.. onsets],
             Live = [.. live],
             At = 0,
         });
 
-    private Node Node(Code code) => _local.For(code);
+    private Node Node(Code code) => _bench.Node(code);
 
     // ---- silence ----------------------------------------------------------
 
@@ -218,7 +192,7 @@ public sealed class LocalRendezvousTests
 
         // Confirms the spread is real, so the assertions above are not all
         // happening inside one dictionary.
-        var owners = codes.Select(code => _ring.OwnerOf(code)).Distinct().Count();
+        var owners = codes.Select(code => _bench.Ring.OwnerOf(code)).Distinct().Count();
         Assert.True(owners > 1, $"all eight codes landed on {owners} cluster");
 
         Assert.Equal(7, Node(codes[0]).Partners().Count);

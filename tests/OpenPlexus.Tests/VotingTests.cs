@@ -23,17 +23,9 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class VotingTests
 {
-    private static SnakeSettings World => new()
-    {
-        Width = 15, Height = 15, Sight = 2,
-        StartingEnergy = 200, EnergyPerStep = 1, EnergyPerFood = 50,
-    };
+    private static SnakeSettings World => Fixture.Snake(sight: 2, energy: 200, perFood: 50);
 
-    private static WalkSettings Dials => new()
-    {
-        Stamina = 8.0, Foresight = 2.0, Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum, Horizon = 50,
-    };
+    private static WalkSettings Dials => Fixture.Dials(stamina: 8.0, foresight: 2.0);
 
     private static async Task<RunResult> PlayAsync(int seed, int votes)
     {

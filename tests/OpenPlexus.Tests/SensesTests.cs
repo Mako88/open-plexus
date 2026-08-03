@@ -15,10 +15,8 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class SensesTests
 {
-    private static SensesSettings Clean(int concepts = 8, int codes = 3) => new()
-    {
-        Concepts = concepts, CodesPerSense = codes, Noise = 0.0,
-    };
+    private static SensesSettings Clean(int concepts = 8, int codes = 3) =>
+        Fixture.Senses(concepts, codes);
 
     [Fact]
     public void Sight_and_touch_are_never_shown_together()
@@ -122,11 +120,7 @@ public sealed class SensesTests
 
     // ---- what the world is for ---------------------------------------------
 
-    private static WalkSettings Dials(double stamina) => new()
-    {
-        Stamina = stamina, Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum, Horizon = 50,
-    };
+    private static WalkSettings Dials(double stamina) => Fixture.Dials(stamina);
 
     private static Task<Measured> Accuracy(double stamina, bool scrambled, int seeds = 5) =>
         Sweep.ArmAsync(

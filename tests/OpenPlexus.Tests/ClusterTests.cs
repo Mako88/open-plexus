@@ -15,15 +15,9 @@ public sealed class ClusterTests : IDisposable
     private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
     private static readonly MachineAddress Origin = new("origin");
 
-    private static Code C(ulong value) => new(Modality: 1, value);
+    private static Code C(ulong value) => Fixture.C(value);
 
-    private static readonly WalkSettings Dials = new()
-    {
-        Stamina = 10.0,
-        Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum,
-            Horizon = 6,
-    };
+    private static readonly WalkSettings Dials = Fixture.Dials(stamina: 10.0, horizon: 6);
 
     private readonly HybridBus _bus = new();
     private readonly Counting _counted;

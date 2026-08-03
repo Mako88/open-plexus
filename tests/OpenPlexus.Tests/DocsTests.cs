@@ -48,23 +48,28 @@ public sealed class DocsTests
     /// </remarks>
     private const int Budget = 2_800;
 
-    private static string Repo()
-    {
-        var here = new DirectoryInfo(AppContext.BaseDirectory);
+    private static string Repo() => Tree.Repo();
 
-        while (here is not null)
-        {
-            if (Directory.Exists(Path.Combine(here.FullName, "docs"))) return here.FullName;
-            here = here.Parent;
-        }
+    private static string Docs() => Tree.Docs();
 
-        // Throws rather than skipping: a doc check that silently passes when it
-        // cannot read the docs reports green for a question it never asked.
-        throw new DirectoryNotFoundException(
-            $"no docs/ directory above {AppContext.BaseDirectory}");
-    }
+    private static string Plan() => File.ReadAllText(Path.Combine(Docs(), "plan.md"));
 
-    private static string Docs() => Path.Combine(Repo(), "docs");
+    /// <summary>
+    /// What a finding looks like in prose, so the doc can be kept clear of them.
+    /// </summary>
+    /// <remarks>
+    /// <b>Deliberately syntactic rather than clever.</b> The point is not to
+    /// detect the idea of a result — it is to make the rule so mechanical that
+    /// nobody has to argue about whether a paragraph counts.
+    /// </remarks>
+    private static readonly (string What, string Pattern)[] Findings =
+    [
+        ("a measured score", @"\d\.\d{3,}"),
+        ("a spread", @"±|\+-"),
+        ("a sigma count", @"(?i)\bsigma\b"),
+        ("a result marker", @"✅|❌"),
+        ("a measured comparison", @"\d[\d,.]* (?:\w+ )*against \d"),
+    ];
 
     [Fact]
     public void The_docs_stay_within_their_budget()
@@ -97,12 +102,67 @@ public sealed class DocsTests
     }
 
     [Fact]
+    public void The_plan_looks_forward_and_records_no_findings()
+    {
+        // JOHN'S CALL, 2026-08-03: THE PLAN IS WHERE THE PROJECT IS GOING, AND A
+        // RESULT IS SOMETHING THAT ALREADY HAPPENED. The two were mixed, and the
+        // findings won -- roughly half the doc was scores, and the sections
+        // saying what to build next were the ones getting compacted to make room
+        // under the word budget.
+        //
+        // Worse, a finding written here goes stale silently. The commit that
+        // produced a number is the honest home for it, the comment beside the
+        // mechanism is where anyone touching that mechanism will actually see it,
+        // and the test that asserts it is the only copy that cannot drift.
+        //
+        // THE GUARDS ARE NOT FINDINGS. `DO NOT RE-TRY` and `TRAPS` say what not
+        // to do, which is a forward-facing instruction -- so they stay, and this
+        // is what keeps their evidence column a reason rather than a readout.
+        var plan = Plan();
+        var lines = plan.Split('\n');
+
+        var recorded = new List<string>();
+
+        foreach (var (what, pattern) in Findings)
+            foreach (var line in lines)
+                if (Regex.IsMatch(line, pattern))
+                    recorded.Add($"{what}: {line.Trim()}");
+
+        Assert.True(recorded.Count == 0,
+            "the plan records findings, and it is meant to be forward-facing. "
+            + "Put the number in the commit, in the XML comment beside the "
+            + "mechanism, or in the test that asserts it:\n"
+            + string.Join("\n", recorded.Take(10)));
+    }
+
+    [Fact]
+    public void The_forward_facing_check_can_still_fail()
+    {
+        // THE COMPANION, AND WITHOUT IT THE CHECK ABOVE PASSES FOR A PATTERN SET
+        // THAT MATCHES NOTHING. Every rule is asserted against a line that must
+        // trip it, so a regex quietly broken by an edit is caught here rather
+        // than by the doc slowly refilling with results.
+        var findings = new[]
+        {
+            "Binding — 0.5240, now 0.8798 on the world built to be impossible",
+            "0.8077 ± 0.0215 against a chance of 0.0833",
+            "12.2 sigma apart, 25.7 clear of chance",
+            "| **12** | ✅ CLOSED by 22's fix |",
+            "5,000,003 messages against 1,111 on a 12-clique",
+        };
+
+        Assert.All(findings, line => Assert.True(
+            Findings.Any(rule => Regex.IsMatch(line, rule.Pattern)),
+            $"nothing in the rule set notices this is a finding: {line}"));
+    }
+
+    [Fact]
     public void Every_fork_the_code_cites_is_in_the_index()
     {
         // THE GHOST-REFERENCE PROBLEM THAT HAS BITTEN THIS PROJECT BEFORE, which
         // is why forks are deliberately never renumbered. The code cites fork
         // numbers in a dozen places; this asserts each one still resolves.
-        var plan = File.ReadAllText(Path.Combine(Docs(), "plan.md"));
+        var plan = Plan();
 
         var listed = Regex
             .Matches(plan, @"\*\*(\d{1,2})\*\*")
@@ -111,17 +171,9 @@ public sealed class DocsTests
 
         Assert.NotEmpty(listed);
 
-        var source = Directory
-            .EnumerateFiles(Path.Combine(Repo(), "src"), "*.cs", SearchOption.AllDirectories)
-            .Where(path => !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}",
-                StringComparison.Ordinal))
-            .ToList();
-
-        Assert.NotEmpty(source);
-
         var cited = new SortedSet<string>(StringComparer.Ordinal);
 
-        foreach (var path in source)
+        foreach (var path in Tree.Sources("src"))
             foreach (Match match in Regex.Matches(File.ReadAllText(path), @"[Ff]ork (\d{1,2})"))
                 cited.Add(match.Groups[1].Value);
 
@@ -150,7 +202,7 @@ public sealed class DocsTests
             .ToHashSet(StringComparer.Ordinal);
 
         var boxes = Regex.Matches(
-            File.ReadAllText(Path.Combine(Docs(), "plan.md")),
+            Plan(),
             @"^- \[( |x)\] `([A-Za-z]+)`",
             RegexOptions.Multiline);
 
@@ -175,7 +227,7 @@ public sealed class DocsTests
         // expired -- the empty-cell workaround and the temporal window. A row
         // without a revival condition is a superstition rather than a finding,
         // so the shape is enforced rather than encouraged.
-        var lines = File.ReadAllLines(Path.Combine(Docs(), "plan.md"));
+        var lines = Plan().Split('\n');
 
         var start = Array.FindIndex(lines, line =>
             line.StartsWith("## DO NOT RE-TRY", StringComparison.Ordinal));

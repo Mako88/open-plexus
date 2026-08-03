@@ -8,18 +8,11 @@ namespace OpenPlexus.Tests;
 /// </summary>
 public sealed class SnakeTests
 {
-    private static SnakeSettings Board(int? sight = 1, double energy = 100.0, double perFood = 50.0) => new()
-    {
-        Width = 21,
-        Height = 21,
-        Sight = sight,
-
-        // These tests are about absolute movement and an unrotated view, so
-        // they say so rather than riding on whatever the default happens to be.
-        StartingEnergy = energy,
-        EnergyPerStep = 1.0,
-        EnergyPerFood = perFood,
-    };
+    // A bigger board than the measured runs use, and the energy is named rather
+    // than defaulted: these tests are about absolute movement and an unrotated
+    // view, so they say what they are riding on.
+    private static SnakeSettings Board(int? sight = 1, double energy = 100.0, double perFood = 50.0) =>
+        Fixture.Snake(sight, energy, perFood, size: 21);
 
     private static Cell SeenAt(SnakeView view, int dx, int dy) =>
         view.Cells.Single(c => c.Dx == dx && c.Dy == dy).Content;

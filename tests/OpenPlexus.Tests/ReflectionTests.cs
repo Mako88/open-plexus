@@ -30,14 +30,8 @@ public sealed class ReflectionTests
 
     private static readonly Code A = C(1), B = C(2), Z = C(3);
 
-    private static WalkSettings Dials(Reflection? reflect) => new()
-    {
-        Stamina = 8.0,
-        Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum,
-        Horizon = 20,
-        Reflect = reflect,
-    };
+    private static WalkSettings Dials(Reflection? reflect) =>
+        Fixture.Dials(stamina: 8.0, horizon: 20) with { Reflect = reflect };
 
     /// <summary>The codes are already codes; there is nothing to quantise.</summary>
     private sealed class Passthrough : IQuantizer<IReadOnlyCollection<Code>>
@@ -275,18 +269,29 @@ public sealed class ReflectionTests
         Assert.True(world.Local.For(B).Together(Z) > 0.0);
     }
 
+    /// <summary>
+    /// Teaches, walks from <c>A</c>, and writes back whatever the walk reached.
+    /// </summary>
+    /// <remarks>
+    /// <b>The arm and its control differ in the settings and in nothing else</b>,
+    /// which is the whole comparison — so they run the same sequence rather than
+    /// two copies of it that could quietly come apart.
+    /// </remarks>
+    private static async Task<int> TaughtThenReflectedAsync(World world)
+    {
+        await world.TeachAsync(times: 5);
+
+        var thought = await world.Machine.ThinkAsync([A]);
+        await world.SettleAsync(thought);
+
+        return await world.Machine.ReflectAsync(thought, now: 99);
+    }
+
     [Fact]
     public async Task Reflection_mints_the_edge_that_did_not_exist()
     {
         using var world = new World(Eager);
-        await world.TeachAsync(times: 5);
-
-        var thought = await world.Machine.ThinkAsync(
-            [A]);
-        await world.SettleAsync(thought);
-
-        var written = await world.Machine.ReflectAsync(
-            thought, now: 99);
+        var written = await TaughtThenReflectedAsync(world);
 
         Assert.True(written > 0, "the walk reached nothing worth writing down");
         Assert.True(world.Local.For(A).Together(Z) > 0.0,
@@ -298,14 +303,7 @@ public sealed class ReflectionTests
     {
         // The companion, and it is the control the measurement will use.
         using var world = new World(null);
-        await world.TeachAsync(times: 5);
-
-        var thought = await world.Machine.ThinkAsync(
-            [A]);
-        await world.SettleAsync(thought);
-
-        var written = await world.Machine.ReflectAsync(
-            thought, now: 99);
+        var written = await TaughtThenReflectedAsync(world);
 
         Assert.Equal(0, written);
         Assert.Equal(0.0, world.Local.For(A).Together(Z));

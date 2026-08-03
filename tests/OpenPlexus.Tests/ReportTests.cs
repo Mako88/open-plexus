@@ -15,17 +15,9 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class ReportTests
 {
-    private static SnakeSettings World() => new()
-    {
-        Width = 15, Height = 15, Sight = 1,
-        StartingEnergy = 200.0, EnergyPerStep = 1.0, EnergyPerFood = 30.0,
-    };
+    private static SnakeSettings World() => Fixture.Snake(energy: 200.0);
 
-    private static WalkSettings Dials(double stamina = 4.0) => new()
-    {
-        Stamina = stamina, Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum, Horizon = 50,
-    };
+    private static WalkSettings Dials(double stamina = 4.0) => Fixture.Dials(stamina);
 
     [Fact]
     public async Task Nothing_in_a_run_is_out_of_range()

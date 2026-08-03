@@ -9,23 +9,9 @@ namespace OpenPlexus.Tests;
 /// </summary>
 public sealed class SnakeRunTests
 {
-    private static SnakeSettings World(int? sight = 1) => new()
-    {
-        Width = 15,
-        Height = 15,
-        Sight = sight,
-        StartingEnergy = 60.0,
-        EnergyPerStep = 1.0,
-        EnergyPerFood = 30.0,
-    };
+    private static SnakeSettings World(int? sight = 1) => Fixture.Snake(sight);
 
-    private static WalkSettings Dials() => new()
-    {
-        Stamina = 4.0, Foresight = 2.0,
-        Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum,
-            Horizon = 6,
-    };
+    private static WalkSettings Dials() => Fixture.Dials(foresight: 2.0, horizon: 6);
 
     // ---- the headline -----------------------------------------------------
 

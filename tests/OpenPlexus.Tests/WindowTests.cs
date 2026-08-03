@@ -11,33 +11,11 @@ namespace OpenPlexus.Tests;
 /// </summary>
 public sealed class WindowTests
 {
-    private static Code C(ulong value) => new(Modality: 1, value);
+    private static Code C(ulong value) => Fixture.C(value);
 
-    private static readonly WalkSettings Dials = new()
-    {
-        Stamina = 10.0, Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum, Horizon = 50,
-    };
+    private readonly Bench _bench = new(Fixture.Dials(stamina: 10.0));
 
-    private readonly HybridBus _bus = new();
-    private readonly Ring _ring = new(seed: 42, replicas: 64);
-    private readonly LocalClusters _local;
-    private readonly LocalRendezvous _rendezvous;
-
-    public WindowTests()
-    {
-        _local = new LocalClusters(_ring);
-        _rendezvous = new LocalRendezvous(_local);
-
-        foreach (var name in (string[])["a", "b", "c", "d"])
-        {
-            var address = new ClusterAddress(name);
-            _ring.Join(address);
-            _local.Include(new Cluster(address, _bus, _ring, Dials));
-        }
-    }
-
-    private Node Node(Code code) => _local.For(code);
+    private Node Node(Code code) => _bench.Node(code);
 
     // ---- what the window holds --------------------------------------------
 
@@ -90,7 +68,7 @@ public sealed class WindowTests
         // broadcast of what has just happened can walk forward to what usually
         // follows; a broadcast of what follows cannot walk back. Simultaneity
         // stays symmetric, because nothing came first.
-        await _rendezvous.JoinAsync(new Occasion
+        await _bench.Rendezvous.JoinAsync(new Occasion
         {
             Onsets = [C(9)], Live = [], Recent = [C(1)], At = 1,
         });
@@ -104,7 +82,7 @@ public sealed class WindowTests
     {
         // The companion, and the reason the test above is about direction
         // rather than about one of the writes being missing.
-        await _rendezvous.JoinAsync(new Occasion
+        await _bench.Rendezvous.JoinAsync(new Occasion
         {
             Onsets = [C(9)], Live = [C(2)], Recent = [], At = 1,
         });
@@ -116,7 +94,7 @@ public sealed class WindowTests
     [Fact]
     public async Task A_carried_code_that_is_present_again_is_not_joined_twice()
     {
-        await _rendezvous.JoinAsync(new Occasion
+        await _bench.Rendezvous.JoinAsync(new Occasion
         {
             Onsets = [C(9)], Live = [C(1)], Recent = [C(1)], At = 1,
         });
@@ -128,7 +106,7 @@ public sealed class WindowTests
     [Fact]
     public async Task A_carried_code_does_not_note_an_occasion_it_was_not_in()
     {
-        await _rendezvous.JoinAsync(new Occasion
+        await _bench.Rendezvous.JoinAsync(new Occasion
         {
             Onsets = [C(9)], Live = [], Recent = [C(1)], At = 1,
         });

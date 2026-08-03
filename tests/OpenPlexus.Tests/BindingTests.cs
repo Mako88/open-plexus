@@ -37,10 +37,8 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class BindingTests
 {
-    private static BindingSettings World(bool bound, int concepts = 8, int codes = 3) => new()
-    {
-        Concepts = concepts, CodesPerAttribute = codes, Bound = bound,
-    };
+    private static BindingSettings World(bool bound, int concepts = 8, int codes = 3) =>
+        Fixture.Binding(bound, concepts, codes);
 
     // ---- what the world is, asserted rather than described ------------------
 
@@ -193,11 +191,7 @@ public sealed class BindingTests
     /// </remarks>
     private const double Deep = 12.0;
 
-    private static WalkSettings Dials(double stamina) => new()
-    {
-        Stamina = stamina, Value = ArrivalValue.Strength,
-        Accumulate = Accumulate.Sum, Horizon = 50,
-    };
+    private static WalkSettings Dials(double stamina) => Fixture.Dials(stamina);
 
     private static Task<Measured> Accuracy(bool bound, int seeds = 8) =>
         Sweep.ArmAsync(
@@ -356,10 +350,7 @@ public sealed class BindingTests
     /// Grouping in the occasion, the index in the question, and the edge weighed
     /// from the sender's end. <b>The three together are what lift it.</b>
     /// </summary>
-    private static BindingSettings Bound => new()
-    {
-        Concepts = 8, CodesPerAttribute = 3, Segmented = true, Tagged = true,
-    };
+    private static BindingSettings Bound => Fixture.Binding(segmented: true, tagged: true);
 
     private static WalkSettings Priced(Pricing pricing) => Dials(Deep) with { Pricing = pricing };
 

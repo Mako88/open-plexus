@@ -106,8 +106,21 @@ differing only in whether the question carries the index.** 12.2 sigma apart,
 > accumulates one such partner per occurrence until the fan-out explodes. Sender
 > pricing inverts exactly that hop and leaves the useful one alone.
 
-**Three caveats, all live.** The front end supplies grouping and index, so this
-shows the graph can **use** binding, not **discover** it. `Pricing.Sender`
+> **THE CAVEAT THAT MATTERS MOST, AND IT LIMITS THE CLAIM: THIS TASK IS
+> MEMORISABLE.** The index is grouped with its object's colour *and* shape, so
+> the occasion being asked about wrote `tag → shape` directly. **A memoriser
+> scores 1.0 here**, where on the senses world a memoriser scores exactly zero by
+> construction. So this is **not** a composition result.
+>
+> **What it does show is exactly what fork 25 denied.** The ceiling was
+> *representational*: the code set was identical under both bindings, so nothing
+> could store which-went-with-which at all. It can now. **Whether it can COMPOSE
+> over bindings is a separate question and needs a world where the answer was
+> never directly observed** — the senses world's trick, applied to bound objects.
+> That is the next thing to build, and it is the honest test of step 1.
+
+**Three more caveats, all live.** The front end supplies grouping and index, so
+this shows the graph can **use** binding, not **discover** it. `Pricing.Sender`
 changes the ranking as well as the price, so the effect cannot be attributed to
 cost alone. It costs **5.9× the messages**.
 
@@ -123,13 +136,11 @@ acceptable.
 > because the scene just observed dominates a sparse aggregate. **Nothing under a
 > few hundred scenes measures anything here.**
 
-### 1b. Phase, and why it is probably 1a wearing a different name
+### 1b. Phase — settled, and it was 1a under another name
 
-Von der Malsburg and Singer bind by **firing in phase**. But phase is a
-continuous oscillator relationship measured in milliseconds, and **C2 says
-messages are late, jittered and out of order** — which is precisely what destroys
-it. Carried as a *message field*, it is not phase at all; it is a tag. **So build
-1a, and call it what it is.**
+Von der Malsburg and Singer bind by firing in phase, but a phase is an oscillator
+relationship in milliseconds and **C2 destroys exactly those**. Carried as a
+field it is not a phase, it is an index. Built as one, above.
 
 ### 1c. If the tag feels like cheating — vector-symbolic binding
 

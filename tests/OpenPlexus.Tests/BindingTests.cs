@@ -377,6 +377,15 @@ public sealed class BindingTests
         // AND IT IMPROVES WITH DATA -- 0.7095 at 150 scenes, 0.8798 at 400 --
         // which is the opposite of the recency artefact that inflates short runs
         // here, and is the reason this is measured long rather than short.
+        //
+        // THIS TASK IS MEMORISABLE AND THE CLAIM IS LIMITED ACCORDINGLY. The
+        // index is grouped with its object's colour AND shape, so the occasion
+        // being asked about wrote `tag -> shape` directly; a memoriser scores 1.0
+        // here, where on the senses world it scores exactly zero by construction.
+        // So this is NOT composition. What it is, is the thing fork 25 said was
+        // impossible: the code set was identical under both bindings, so nothing
+        // could store which-went-with-which at all, and now it can. Composition
+        // over bindings needs a world where the answer was never observed.
         var indexed = await Sweep.ArmAsync("indexed", 8, async seed =>
         {
             using var run = new BindingRun(Bound, Priced(Pricing.Sender), seed);

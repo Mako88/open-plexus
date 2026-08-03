@@ -30,6 +30,9 @@ public sealed class LocalClusters
         _clusters[cluster.Address] = cluster;
     }
 
+    /// <summary>Every cluster in this process.</summary>
+    public IEnumerable<Cluster> All => _clusters.Values;
+
     /// <summary>The cluster the ring says owns this code, if it is in this process.</summary>
     public bool TryOwner(Code code, out Cluster cluster) =>
         _clusters.TryGetValue(_ring.OwnerOf(code), out cluster!);

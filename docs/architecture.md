@@ -400,6 +400,44 @@ usually adjacent to what is being sensed. They are currently the same number.
 
 ---
 
+## `Value` and `Accumulate` swept — both inert, and both explanations refuted
+
+**Never tried until 2026-08-02.** Eight arms in one run, 50 seeds each. Under a
+fixed random policy every trajectory is identical — 33 steps, 5 fruit in every
+arm — so only the dials move:
+
+| value / accumulate | novelty gap |
+|---|---|
+| Strength / Sum | 0.0800 ± 0.0077 |
+| Strength / Max | 0.0805 ± 0.0081 |
+| Lift / Sum | 0.0739 ± 0.0080 |
+| Lift / Max | 0.0729 ± 0.0083 |
+
+**All four inside a standard error of each other.** Under the live policy the
+same holds: 85, 75, 86 and 72 mean steps, all within their own errors.
+
+**Both dials are wired, and that was checked rather than assumed** — `Lift` had
+no test at all and now has two, both of which bite. So this is a null, not a
+disconnection, which is a distinction this project has just been burned by.
+
+**And the two obvious explanations were checked and are both wrong.**
+
+| explanation | prediction | measured |
+|---|---|---|
+| `Sum` ≈ `Max` because few endpoints are reached twice | most arrivals come by one route | **27%** come by one route — 73% by several |
+| `Lift` ≈ `Strength` because marginals are alike | marginals cluster | marginals span **72×**, from 1 to 72 |
+
+**So the room for both dials to act is there and they do not use it**, which is
+a stranger result than either story and is recorded as unexplained rather than
+narrated. The next check is whether the top-ranked set actually reorders at all
+under `Lift` — if the same codes come out in the same order, the dial is inert
+because nothing near the cut is close enough to swap.
+
+**`master` measured `Sum` beating `Max` 0.1234 to 0.0834**, so this null is
+conditional on a world with a two-dozen-code alphabet and a two-hop walk.
+
+---
+
 ## Open forks
 
 Recorded here so a decision does not go quiet.

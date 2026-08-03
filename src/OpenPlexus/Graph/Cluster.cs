@@ -46,6 +46,9 @@ public sealed class Cluster : IReceiveEnvelopes
     /// <summary>How many nodes have come into existence here.</summary>
     public int Count => _nodes.Count;
 
+    /// <summary>Every code this cluster holds a node for.</summary>
+    public IEnumerable<Code> Codes => _nodes.Keys;
+
     /// <summary>Every partner entry across every node here. The graph's size.</summary>
     public int Edges => _nodes.Values.Sum(node => node.Partners().Count);
 

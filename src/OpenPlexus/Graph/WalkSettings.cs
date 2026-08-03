@@ -26,6 +26,50 @@ public enum Accumulate
 }
 
 /// <summary>
+/// FORK 21 — when a conclusion is worth writing down as an observation.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>Borrowed from slime mold, thresholded like a crystal.</b> <i>Physarum</i>
+/// solves a maze with no brain and no global view: tubes carrying high flux
+/// thicken and low-flux tubes atrophy, entirely locally — which is the only kind
+/// of mechanism C1 permits. So a route walked often enough is minted as a direct
+/// edge, and the composition stops being re-derived from scratch every time.
+/// </para>
+/// <para>
+/// <b>Left alone that collapses the graph into a hairball</b>, so the threshold
+/// comes from nucleation: a new phase forms only above a critical size, because
+/// below it the surface cost exceeds the volume gain. An abstraction is minted
+/// only when the pattern is frequent enough to pay for its own storage.
+/// </para>
+/// <para>
+/// <b>THE RISK IS THAT THE SYSTEM LEARNS ITS OWN HALLUCINATIONS</b> — confirmation
+/// bias, literally, and it is the reason both dials exist rather than one. Null
+/// on <see cref="WalkSettings.Reflect"/> is the control, and it is off.
+/// </para>
+/// </remarks>
+public sealed record Reflection
+{
+    /// <summary>
+    /// The score an arrival must reach before it is worth minting. <b>The
+    /// nucleation threshold</b>, and the only thing standing between this and a
+    /// complete graph.
+    /// </summary>
+    public required double Threshold { get; init; }
+
+    /// <summary>
+    /// What a concluded occasion counts against an observed one.
+    /// </summary>
+    /// <remarks>
+    /// <b>Below 1.0, or a belief reinforces itself as fast as evidence does.</b>
+    /// </remarks>
+    public required double Weight { get; init; }
+
+    /// <summary>How many arrivals at most are written back.</summary>
+    public required int Names { get; init; }
+}
+
+/// <summary>
 /// The swept dials.
 /// </summary>
 /// <remarks>
@@ -109,4 +153,8 @@ public sealed record WalkSettings
     /// look like one that finished.
     /// </remarks>
     public required int Horizon { get; init; }
+
+    /// <inheritdoc cref="Reflection"/>
+    /// <remarks><b>Null is off, and off is the control.</b></remarks>
+    public Reflection? Reflect { get; init; }
 }

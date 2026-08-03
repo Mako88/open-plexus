@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Graph;
@@ -25,6 +26,9 @@ public sealed class Thought
     private readonly Accumulate _accumulate;
 
     private readonly int _origins;
+
+    /// <summary>The codes this thought went out from. Never changes.</summary>
+    private readonly ImmutableArray<Code> _started;
 
     /// <summary>
     /// The accounting. <c>origins + splits - deaths == live</c> holds exactly
@@ -57,7 +61,17 @@ public sealed class Thought
     /// route before anything has been heard back.
     /// </param>
     /// <param name="accumulate">How several routes reaching one endpoint combine.</param>
-    public Thought(BroadcastId id, int origins, Accumulate accumulate)
+    /// <param name="started">
+    /// The codes the broadcast went out from. <b>Not the same quantity as
+    /// <paramref name="origins"/></b>, which counts clusters asked — a thought
+    /// cannot know how many routes it started, only how many clusters replied.
+    /// Kept so a settled thought can be written back as an occasion; see fork 21.
+    /// </param>
+    public Thought(
+        BroadcastId id,
+        int origins,
+        Accumulate accumulate,
+        ImmutableArray<Code> started = default)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(origins);
 
@@ -65,9 +79,13 @@ public sealed class Thought
         _origins = origins;
         _accumulate = accumulate;
         _live = origins;
+        _started = started.IsDefault ? [] : started;
     }
 
     public BroadcastId Id => _id;
+
+    /// <inheritdoc cref="_started"/>
+    public ImmutableArray<Code> Started => _started;
 
     /// <summary>Routes still travelling by this thought's own accounting.</summary>
     public int Live

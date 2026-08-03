@@ -82,10 +82,22 @@ public sealed class Node
 
     // ---- learning: these two are the entirety of what changes over time ----
 
-    /// <summary>"I fired on this occasion." Adds one to the marginal.</summary>
-    public void Note()
+    /// <summary>
+    /// "I fired on this occasion." Adds to the marginal.
+    /// </summary>
+    /// <param name="by">
+    /// How much this occasion counts. <b>One for something observed; less for
+    /// something merely concluded</b> — see fork 21. A count became a weight so
+    /// that a reflected occasion cannot outweigh a real one.
+    /// </param>
+    public void Note(double by = 1.0)
     {
-        lock (_gate) _seen += 1.0;
+        if (by <= 0.0)
+            throw new ArgumentOutOfRangeException(nameof(by),
+                "an occasion worth nothing is not an occasion; it would move " +
+                "`together` without moving `seen` and score the pair above 1.0");
+
+        lock (_gate) _seen += by;
     }
 
     /// <summary>
@@ -98,14 +110,24 @@ public sealed class Node
     /// would be holding data it does not own, which is the shared state C1
     /// forbids.
     /// </remarks>
-    public void Observe(Code other)
+    /// <param name="by">
+    /// <b>Must match the <see cref="Note"/> that goes with it.</b> The weight is
+    /// the numerator and the denominator of the same edge, so a pair written
+    /// heavier than it was noted would score above 1.0 — the exact failure the
+    /// forward weighting exists to prevent.
+    /// </param>
+    public void Observe(Code other, double by = 1.0)
     {
         if (other == _code)
             throw new ArgumentException(
                 "a code cannot be its own partner; counting one would make " +
                 "every statistic read its own presence as evidence", nameof(other));
 
-        lock (_gate) _together[other] = _together.GetValueOrDefault(other) + 1.0;
+        if (by <= 0.0)
+            throw new ArgumentOutOfRangeException(nameof(by),
+                "a coincidence worth nothing is not a coincidence");
+
+        lock (_gate) _together[other] = _together.GetValueOrDefault(other) + by;
     }
 
     /// <summary>Reads back one cell of the row.</summary>

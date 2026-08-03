@@ -300,6 +300,88 @@ public sealed class MachineTests : IDisposable
             ValueTask.CompletedTask;
     }
 
+    // ---- the registration window -------------------------------------------
+
+    /// <summary>
+    /// A bus that replies before <c>BroadcastAsync</c> returns.
+    /// </summary>
+    /// <remarks>
+    /// <b>Not a contrived case — it is what the real bus does.</b> Dispatch is
+    /// <c>Task.Run</c>, so a cluster can finish and report back while the origin
+    /// is still inside the broadcast call. This one does it deterministically.
+    /// </remarks>
+    private sealed class RepliesImmediately : IBus
+    {
+        private readonly ClusterAddress _one = new("eager");
+
+        public IReceiveReports? Machine { get; set; }
+
+        public ValueTask<IReadOnlyCollection<ClusterAddress>> BroadcastAsync(
+            Envelope envelope,
+            CancellationToken ct = default,
+            Action<IReadOnlyCollection<ClusterAddress>>? ready = null)
+        {
+            IReadOnlyCollection<ClusterAddress> everyone = [_one];
+            ready?.Invoke(everyone);
+
+            // THE WHOLE POINT: the reply lands before the caller gets control
+            // back. If the thought was recorded after the broadcast returned,
+            // this report is dropped and the thought never settles.
+            Machine!.DeliverAsync(new Report
+            {
+                From = _one,
+                Handled = 1,
+                SentInto = [],
+                Arrivals = [],
+                Accounting = new Accounting(
+                    envelope.Messages[0].Broadcast, Splits: 0, Deaths: 1),
+            }, ct).GetAwaiter().GetResult();
+
+            return ValueTask.FromResult(everyone);
+        }
+
+        public ValueTask SendAsync(ClusterAddress to, Envelope envelope, CancellationToken ct = default) =>
+            ValueTask.CompletedTask;
+
+        public ValueTask SendAsync(MachineAddress to, Report report, CancellationToken ct = default) =>
+            ValueTask.CompletedTask;
+
+        public IDisposable Subscribe(IReceiveEnvelopes cluster) => new Handle();
+
+        public IDisposable Subscribe(IReceiveReports machine) => new Handle();
+
+        /// <summary>Nothing ever leaves here; the race is the subject, not death.</summary>
+        public event Action<ClusterAddress>? Deaths
+        {
+            add { }
+            remove { }
+        }
+
+        private sealed class Handle : IDisposable
+        {
+            public void Dispose() { }
+        }
+    }
+
+    [Fact]
+    public async Task A_reply_that_beats_the_broadcast_back_is_not_lost()
+    {
+        // MEASURED, AND IT WAS LOSING THEM. Registering the thought after the
+        // broadcast returned dropped every report that raced it -- the thought
+        // then held no arrivals and never settled, which downstream is
+        // indistinguishable from a graph that had nothing to say.
+        var bus = new RepliesImmediately();
+        var machine = new InputMachine<Code[]>(
+            new MachineAddress("m"), new Passthrough(), new Nothing(), bus, _ring, Dials);
+        bus.Machine = machine;
+
+        var thought = await machine.ThinkAsync([C(1)]);
+
+        Assert.True(thought.Settled,
+            "the only reply was dropped, so the thought is still waiting on it");
+        Assert.Equal(1, thought.Deaths);
+    }
+
     // ---- the output path --------------------------------------------------
 
     [Fact]

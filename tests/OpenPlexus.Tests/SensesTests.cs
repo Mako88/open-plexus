@@ -185,4 +185,75 @@ public sealed class SensesTests
         Assert.Equal(0.0, shallow);
         Assert.True(deep > shallow + 0.5, $"deep {deep:F4} against shallow {shallow:F4}");
     }
+
+    // ---- the run says what it did ------------------------------------------
+
+    [Fact]
+    public async Task Every_run_reports_its_own_plumbing_and_has_nothing_to_complain_about()
+    {
+        // JOHN'S ASK, AND IT IS THE SAME CHECK SNAKE ALREADY HAD. A number gets
+        // swept, barely moves, and much later it turns out something was never
+        // connected. This reads the complaints on a real run so that cannot sit
+        // undetected behind a plausible-looking accuracy.
+        using var run = new SensesRun(new SensesSettings
+        {
+            Concepts = 12, CodesPerSense = 3, Noise = 0.1,
+        }, Dials(8.0), seed: 1);
+
+        var result = await run.RunAsync(400, every: 10);
+
+        // EVERY COMPLAINT EXCEPT THE ONE THAT IS OPEN. Fork 22: a few thoughts
+        // never settle, and the report is what found it -- 7 of 39 questions on
+        // this run's first execution. It is allowed here by NAME rather than by
+        // weakening the check, so anything else appearing still fails.
+        Assert.DoesNotContain(result.Complaints, one => !one.Contains("walk finished"));
+
+        // AND IT IS BOUNDED, so a regression that made it worse cannot pass.
+        Assert.True(result.Unsettled < result.Asked / 4,
+            $"{result.Unsettled} of {result.Asked} questions outran their own walk");
+
+        // The companion: the report is not empty of everything. A complaints
+        // list that is empty because nothing was ever measured would pass the
+        // assertion above and mean the opposite of what it looks like.
+        Assert.True(result.Deepest >= 3, $"deepest chain {result.Deepest}");
+        Assert.True(result.Messages > 0);
+        Assert.True(result.Nodes > 0);
+    }
+
+    [Fact]
+    public async Task A_run_that_never_composed_anything_says_so()
+    {
+        // The companion to the companion. At a stamina that cannot afford two
+        // hops the complaint MUST fire -- otherwise the check above is passing
+        // for a report that can never fail.
+        using var run = new SensesRun(new SensesSettings
+        {
+            Concepts = 12, CodesPerSense = 3, Noise = 0.1,
+        }, Dials(2.0), seed: 1);
+
+        var result = await run.RunAsync(200, every: 10);
+
+        Assert.Contains(result.Complaints, one => one.Contains("composed"));
+    }
+
+    [Fact]
+    public async Task A_dial_that_is_on_and_does_nothing_is_reported()
+    {
+        // FORK 21'S WIRING CHECK, and it is the exact failure mode this project
+        // has hit before: a parameter declared, documented, passed at every call
+        // site, and connected to nothing. Reflection on with a threshold nothing
+        // can reach writes nothing, and the run has to say so out loud.
+        using var run = new SensesRun(new SensesSettings
+        {
+            Concepts = 12, CodesPerSense = 3, Noise = 0.1,
+        }, Dials(8.0) with
+        {
+            Reflect = new Reflection { Threshold = 1e9, Weight = 0.5, Names = 3 },
+        }, seed: 1);
+
+        var result = await run.RunAsync(200, every: 10);
+
+        Assert.Equal(0, result.Reflected);
+        Assert.Contains(result.Complaints, one => one.Contains("wrote nothing"));
+    }
 }

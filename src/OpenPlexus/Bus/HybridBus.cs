@@ -100,7 +100,9 @@ public sealed class HybridBus : IBus
 
     /// <inheritdoc/>
     public ValueTask<IReadOnlyCollection<ClusterAddress>> BroadcastAsync(
-        Envelope envelope, CancellationToken ct = default)
+        Envelope envelope,
+        CancellationToken ct = default,
+        Action<IReadOnlyCollection<ClusterAddress>>? ready = null)
     {
         ArgumentNullException.ThrowIfNull(envelope);
 
@@ -112,14 +114,25 @@ public sealed class HybridBus : IBus
             _messages += (long)everyone.Count * envelope.Messages.Length;
         }
 
+        IReadOnlyCollection<ClusterAddress> addresses = [.. everyone.Select(one => one.Address)];
+
+        // WHO IS ABOUT TO BE ASKED, BEFORE ANYONE IS ASKED.
+        //
+        // MEASURED, and it was losing reports. Dispatch is `Task.Run`, so a
+        // cluster could finish and report back before the caller had recorded
+        // the broadcast -- and a report for an unknown broadcast is dropped by
+        // design, because C2 says late is normal. The thought then never settled
+        // and held no arrivals at all, which reads downstream as "the graph had
+        // nothing to say" rather than as a lost message.
+        ready?.Invoke(addresses);
+
         foreach (var (address, receiver) in everyone)
         {
             var addressed = envelope with { To = address, Everywhere = true };
             Dispatch(() => receiver.DeliverAsync(addressed, ct));
         }
 
-        return ValueTask.FromResult<IReadOnlyCollection<ClusterAddress>>(
-            [.. everyone.Select(one => one.Address)]);
+        return ValueTask.FromResult(addresses);
     }
 
     /// <inheritdoc/>

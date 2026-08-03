@@ -89,6 +89,30 @@ differently depending where it stands.
   50 with stamina 4. Kept because an unbounded walk is the failure that takes
   the process with it, and every route it kills is counted so a run that hit it
   cannot look like one that finished.
+- **`Reflect`** — `Reflection?`, **fork 21, and null is off.** Off is the
+  control, so the mechanism can be measured against the same code with nothing
+  else changed.
+
+### `Reflection`
+
+**A conclusion becomes an observation.** Borrowed from *Physarum polycephalum*,
+which solves a maze with no brain and no global view: tubes carrying high flux
+thicken and low-flux tubes atrophy, entirely locally — which is the only kind of
+mechanism C1 permits. A route walked often enough is minted as a direct edge, so
+the composition stops being re-derived from scratch every time.
+
+- **`Threshold`** — the score an arrival must reach to be worth minting. **The
+  nucleation threshold**, borrowed from crystallisation: a new phase forms only
+  above a critical size, because below it the surface cost exceeds the volume
+  gain. Without it every thought writes everything and the graph collapses into
+  a complete one.
+- **`Weight`** — what a concluded occasion counts against an observed one.
+  **Below 1.0, or a belief reinforces itself as fast as evidence does.**
+- **`Names`** — how many arrivals at most are written back.
+
+**The risk is that the system learns its own hallucinations** — confirmation
+bias, literally — which is why there are two dials rather than one and why the
+default is off.
 
 ### `Node`
 
@@ -100,10 +124,18 @@ shared clock. **That is C1 holding, in one class.**
 an entry going from absent to 1 *is* the connection forming.
 
 - **`Code`**, **`Seen`** — its identity and its own marginal.
-- **`Note()`** — "I fired on this occasion." Adds one to the marginal.
-- **`Observe(other)`** — "that code fired with me." Adds one to that partner's
-  entry. **Writes only this node's row**; the partner writes its own, because a
-  node holding both directions would be keeping data it does not own.
+- **`Note(by = 1.0)`** — "I fired on this occasion." Adds `by` to the marginal.
+- **`Observe(other, by = 1.0)`** — "that code fired with me." Adds `by` to that
+  partner's entry. **Writes only this node's row**; the partner writes its own,
+  because a node holding both directions would be keeping data it does not own.
+
+  **A count became a weight for fork 21**, so a conclusion can be written down
+  more lightly than an observation. `by` **must match between the `Observe` and
+  the `Note` that go with it** — the same number is the numerator and the
+  denominator of one edge, and a pair written heavier than it was noted scores
+  above 1.0, which is the ever-present-partner failure the forward weighting
+  exists to prevent. Non-positive is refused: it would move `together` without
+  moving `seen` at all.
 - **`Together(other)`**, **`Partners()`** — reads.
 - **`Fire(message)`** — the whole of thinking, and **it takes only the
   message**. There is no way to hand a node another node's data, which is what
@@ -187,9 +219,15 @@ and route correctly immediately.
 - **`SendAsync(cluster, envelope)`** — **returns before delivery happens**. A
   sender never waits on a receiver, which is what makes a fan-out parallel
   rather than a queue.
-- **`BroadcastAsync(envelope)`** — to every cluster at once. **Returns who it
-  went to**, because under a broadcast the sender cannot work that out from the
-  ring and the whole point is that it needed no address.
+- **`BroadcastAsync(envelope, ct, ready)`** — to every cluster at once.
+  **Returns who it went to**, because under a broadcast the sender cannot work
+  that out from the ring and the whole point is that it needed no address.
+
+  **`ready` is called with that list before any cluster is asked**, and an origin
+  has to record its thought inside that window. Dispatch is `Task.Run`, so a
+  cluster can reply before the call returns, and a report for an unknown
+  broadcast is dropped. Measured: registering afterwards lost those reports
+  entirely, leaving a thought that never settled and held no arrivals.
 - **`SendAsync(machine, report)`** — the return path.
 - **`Deaths`** — fires when a **cluster** leaves. Cluster granularity, because a
   route is stranded by the departure of whatever holds its next node.
@@ -199,6 +237,14 @@ and route correctly immediately.
 - **`WhenQuiet()`** — completes when nothing is in flight. Not a C1 violation
   and nothing in the thinking loop waits on it; it exists so a harness can ask
   whether the dust settled without a sleep.
+
+  **IT IS NOT A "THE WALK FINISHED" SIGNAL, and reading it as one was a bug.**
+  In-flight reaches zero in the gap between a cluster handling a message and
+  dispatching what that message produced — fork 12. A harness that reads a
+  thought there gets "nothing reached", which is indistinguishable in a score
+  from a graph that genuinely had nothing to say. **`Thought.Settled` is the
+  signal**, and where a harness still has to give up waiting, every expiry is
+  counted rather than absorbed.
 - **`Messages`** — every message the bus carried. What a real network would have
   had to send.
 - **Only the local half exists.** An address that is not local **throws**: with
@@ -305,10 +351,30 @@ sensor can attach without the graph knowing what it is.
   joining the onsets with what was already live; **think** by broadcasting from
   the onsets. Persistence produces neither. **Learning happens before thinking**,
   because C4 forbids a run that stops so there is no "before training".
-- **`ThinkAsync(origins)`** — **broadcasts, and never consults the ring.** An
-  origin has no address by nature: for *what is this thing I am sensing* you
-  cannot route, not knowing what you are looking for. Seeds one pending unit per
-  cluster reached.
+- **`ThinkAsync(origins, stamina = null)`** — **broadcasts, and never consults
+  the ring.** An origin has no address by nature: for *what is this thing I am
+  sensing* you cannot route, not knowing what you are looking for. Seeds one
+  pending unit per cluster reached.
+
+  **The thought is recorded inside the bus's `ready` callback, before the first
+  cluster is asked, and that order is load-bearing.** Dispatch is `Task.Run`, so
+  a cluster can finish and report back before `BroadcastAsync` returns — and a
+  report for an unknown broadcast is dropped by design. Registering afterwards
+  silently lost those: the thought then never settled and held **no arrivals at
+  all**, which downstream is indistinguishable from a graph that had nothing to
+  say. Measured, and covered by a bus that replies inside the window.
+- **`ReflectAsync(thought, now)`** — **fork 21: a conclusion becomes an
+  observation.** Takes the arrivals above the nucleation threshold, drops any the
+  walk started from, and joins them as an occasion at the discount weight.
+
+  **The reached codes are the onsets and the origins are merely live**, which is
+  not a detail: onsets pair with everything present, live never pairs with live,
+  so the origins do not re-pair with each other. That coincidence was counted
+  when it was observed, and counting it again on every thought would inflate
+  exactly the association the walk set out from.
+
+  Returns how many conclusions were written, and **zero when reflection is off** —
+  which is what lets a run report say whether the mechanism was even running.
 - **`DeliverAsync(report)`** — folds it in. **Settling is not releasing**, and
   getting that wrong destroyed the answer at the moment it became final.
 - **`OnDeath(cluster)`** — every thought writes off the routes heading there.

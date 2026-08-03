@@ -143,24 +143,102 @@ public sealed class InputMachine<TFrame> : IReceiveReports
             Carried = 1.0,
         });
 
+        Thought? opened = null;
+
         // BROADCAST, NOT ROUTED -- John's call on fork 6. An origin has no
         // address by nature: for "what is this thing I am sensing" you cannot
         // route, because you do not know what you are looking for. The ring is
         // not consulted here at all.
-        var reached = await _bus.BroadcastAsync(
+        await _bus.BroadcastAsync(
             new Envelope { To = _everywhere, Messages = [.. messages], Everywhere = true },
-            ct).ConfigureAwait(false);
+            ct,
 
-        // ONE PENDING UNIT PER CLUSTER. The origin cannot know how many routes
-        // it started -- that depends on who holds what, which is exactly the
-        // knowledge a broadcast exists to avoid needing. What it does know is
-        // how many clusters it asked, and every one of them replies.
-        var thought = new Thought(broadcast, Math.Max(reached.Count, 1), _settings.Accumulate);
-        _thoughts[broadcast] = thought;
+            // REGISTERED BEFORE THE FIRST CLUSTER IS ASKED, AND THAT ORDER IS
+            // LOAD-BEARING. Doing this after the broadcast returned lost every
+            // report that beat it back, because a report for a broadcast this
+            // machine does not know is dropped -- so the thought never settled
+            // and held no arrivals, which reads as "the graph had nothing to
+            // say" and is indistinguishable from a real silence.
+            reached =>
+            {
+                // ONE PENDING UNIT PER CLUSTER. The origin cannot know how many
+                // routes it started -- that depends on who holds what, which is
+                // exactly the knowledge a broadcast exists to avoid needing.
+                // What it does know is how many clusters it asked, and every one
+                // of them replies.
+                opened = new Thought(
+                    broadcast, Math.Max(reached.Count, 1), _settings.Accumulate, [.. origins]);
 
-        foreach (var cluster in reached) thought.SentInto(cluster, 1);
+                foreach (var cluster in reached) opened.SentInto(cluster, 1);
 
-        return thought;
+                _thoughts[broadcast] = opened;
+            }).ConfigureAwait(false);
+
+        return opened ?? throw new InvalidOperationException(
+            "the bus broadcast without announcing who it was about to ask, so " +
+            "the thought could not be recorded before the replies arrived");
+    }
+
+    /// <summary>
+    /// Writes a settled thought's conclusions back as an occasion.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 21, AND IT IS THE COMPRESSION PRINCIPLE FINALLY BUILT.</b> A
+    /// conclusion becomes an observation: what the walk reached is joined to
+    /// what it started from, so a route walked often enough becomes a direct
+    /// edge and the composition stops being re-derived every time.
+    /// </para>
+    /// <para>
+    /// <b>The reached codes are the onsets and the origins are merely live</b>,
+    /// which is not a detail. Onsets pair with everything present; live never
+    /// pairs with live. So the origins do NOT re-pair with each other — that
+    /// coincidence was counted when it was actually observed, and counting it
+    /// again on every thought would inflate exactly the association the walk
+    /// started from.
+    /// </para>
+    /// <para>
+    /// <b>Nothing here waits for the thought.</b> A caller reflects what has
+    /// arrived so far, which is what C4 requires of a system with no moment
+    /// between thoughts.
+    /// </para>
+    /// </remarks>
+    /// <returns>How many conclusions were written. Zero when reflection is off.</returns>
+    public async ValueTask<int> ReflectAsync(
+        Thought thought,
+        long now,
+        CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(thought);
+
+        if (_settings.Reflect is not { } reflect) return 0;
+
+        var starting = thought.Started.ToHashSet();
+        if (starting.Count == 0) return 0;
+
+        // ABOVE THE THRESHOLD AND NOT SOMEWHERE WE STARTED. Minting an edge from
+        // an origin to itself is not compression, and a conclusion below the
+        // nucleation threshold is not worth its own storage.
+        ImmutableArray<Code> reached =
+        [
+            .. thought.Best(reflect.Names)
+                .Where(arrival => arrival.Score >= reflect.Threshold)
+                .Select(arrival => arrival.Endpoint)
+                .Where(code => !starting.Contains(code))
+        ];
+
+        if (reached.IsEmpty) return 0;
+
+        await _rendezvous.JoinAsync(
+            new Occasion
+            {
+                Onsets = reached,
+                Live = [.. starting],
+                At = now,
+                Weight = reflect.Weight,
+            }, ct).ConfigureAwait(false);
+
+        return reached.Length;
     }
 
     /// <summary>

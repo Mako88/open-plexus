@@ -43,6 +43,19 @@ public sealed record Occasion
 
     /// <summary>When, by the observing machine's own clock.</summary>
     public required long At { get; init; }
+
+    /// <summary>
+    /// How much this occasion counts. One is something that happened.
+    /// </summary>
+    /// <remarks>
+    /// <b>FORK 21 — below one is something the system merely concluded.</b> A
+    /// thought that settles can be fed back as an occasion, which is how a route
+    /// walked often enough becomes a direct edge and stops being re-derived. The
+    /// discount is the whole defence against the system learning its own
+    /// hallucinations: a conclusion may reinforce what it already believes, but
+    /// it must never do so as fast as seeing it would.
+    /// </remarks>
+    public double Weight { get; init; } = 1.0;
 }
 
 /// <summary>

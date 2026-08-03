@@ -557,6 +557,47 @@ measurement took one sweep.
 
 ---
 
+## Fork 21 — compression, and what it actually bought
+
+**SWEPT ON THE SENSES WORLD, 2026-08-02.** 8 seeds, 400 moments, 12 concepts,
+3 codes per sense, 10% noise, 312 questions per arm. **Spread not computed** —
+these are single-sweep means and should be read as a direction, not a margin.
+
+| reflect | stamina | accuracy | unanswered | written | edges |
+|---|---|---|---|---|---|
+| off | 4 | 0.1827 | 250 | 0 | 515 |
+| weight 0.25 | 4 | 0.4936 | 143 | 6,034 | 1,313 |
+| **weight 0.5** | **4** | **0.7147** | **56** | 6,480 | 1,339 |
+| threshold 0.2 | 4 | 0.5192 | 137 | 6,079 | 1,329 |
+| **off** | **8** | **0.8462** | **31** | 0 | **515** |
+| weight 0.25 | 8 | 0.7853 | 33 | 7,823 | 1,367 |
+| weight 0.5 | 8 | 0.7596 | 29 | 8,207 | 1,371 |
+| threshold 0.2 | 8 | 0.7885 | 32 | 7,809 | 1,350 |
+
+**IT DOES EXACTLY WHAT THE SLIME MOLD PREDICTS, AND THAT IS THE FINDING.** At a
+budget too small to walk sight → sound → touch, reflection turns the two-hop
+route into a one-hop edge: accuracy nearly quadruples and the unanswered count
+falls from 250 to 56. **The composition stops needing to be re-derived.**
+
+**AND IT IS NOT FREE.** Where the budget could already afford the walk, every
+arm with reflection on scores *worse* than off — 0.8462 down to 0.7596 at the
+heaviest. The graph is 2.7× denser in every reflecting arm, and the minted edges
+are ranked against the real ones. **That is the confirmation-bias tax arriving
+on schedule**, and it is the reason the discount exists.
+
+**So it is a trade, not a win**, and which side is right depends on whether
+depth or precision is scarce. Nothing here is promoted to a default.
+
+**`Weight` is the dial that matters; `Threshold` barely moved anything** — 0.2
+scored 0.5192 against 0.25-weight's 0.4936, well inside where these means could
+sit. **Heavier is better when depth is short** (0.7147 at 0.5 against 0.4936 at
+0.25) and worse when it is not, which is the same trade seen twice.
+
+**Fork 22 is uniform across every arm** — 34 to 58 unsettled questions per 312,
+with reflection on and off alike — so it is not caused by this mechanism.
+
+---
+
 ## Open forks
 
 Recorded here so a decision does not go quiet.
@@ -573,9 +614,9 @@ by status rather than by scrolling.
 |---|---|---|
 | **19** | ✅ Prediction built — and it loses to a blind guess, because the graph holds **no temporal edges**. Next mechanism named: a one-way window |
 | **20** | ✅ **Split budgets — deep to act, shallow to predict.** Wins survival, mirroring and prediction at once |
-| **18** | **What to score.** Survival is disqualified: the arm that survives longest is the one that circles and eats nothing | **blocks 15 and 16** |
-| **15** | Strengthening a connection a thought walks | gated on 18 — it would be tuned against whatever we score |
-| **16** | Back-propagation from an outside signal | gated on 18, same reason |
+| **18** | ✅ **ANSWERED, 2026-08-02.** Score **prediction of world state conditional on the next action** — John's own formulation, and the only candidate that is about understanding rather than performance. Cross-modal composition is the cross-world check. **Not yet built: today's prediction is passive**, and a model of *how the world responds to me* is a different quantity | unblocks 15 and 16 |
+| **15** | Strengthening a connection a thought walks | unblocked by 18 |
+| **16** | Back-propagation from an outside signal | unblocked by 18 |
 | **11** | The output machine is not addressed | needed before a second machine |
 | **12** | `Halted` is approximate, and the ordering that causes it | both orderings cost something |
 
@@ -583,6 +624,7 @@ by status rather than by scrolling.
 
 | | |
 |---|---|
+| **22** | **A few thoughts never settle.** 5–7 of 39 questions on a senses run, and waiting twenty times longer barely moves it. `Balanced()` still passes, so the books agree with themselves while claiming routes the bus has already finished — an over-count of splits or an under-count of deaths. Every affected question reads as "nothing reached", which is **indistinguishable from a real silence in a score**, so every silent count in this project is an upper bound until this is closed. Found by the run report on its first execution |
 | **1** | The distributed rendezvous — not needed until a second machine exists |
 | **1b** | What manufactures change for a static world — John's heartbeat is the only candidate |
 | **3** | Cluster placement: uniform hash against prefix locality |
@@ -601,11 +643,14 @@ by status rather than by scrolling.
 | **13** | ✅ The in-flight accounting was wrong on 39% of thoughts; the clamp was the bug |
 | **14** | ✅ Inverse cost, `1/weight`. Answered 8 as a side effect and unblocked 2 |
 | **4** | Folded into **14**, which is the same question asked properly |
+| **21** | ✅ **Compression built — a conclusion becomes an observation.** Slime mold's flux reinforcement, thresholded like a crystal. Off by default, and off is the control |
+| **18** | ✅ **JOHN'S CALL: score prediction of world state CONDITIONAL ON THE NEXT ACTION**, with cross-modal composition as the cross-world check. Unblocks 15 and 16 |
 
 **Measured findings, not decisions**
 
 | | |
 |---|---|
+| **21** | **Compression buys depth-independence and pays for it in precision.** At a budget too small to compose, reflection lifts accuracy 0.1827 → 0.7147 and cuts unanswered questions from 250 to 56 of 312. At a budget that could already afford the walk it *costs*: 0.8462 → 0.7596. The graph grows 2.7× either way |
 | **10** | The chain outlives random by ~12 standard errors and takes more fruit; it loses survival to circling, and random eats more per step alive |
 
 ---

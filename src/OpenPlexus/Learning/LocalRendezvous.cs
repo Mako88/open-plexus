@@ -57,7 +57,9 @@ public sealed class LocalRendezvous : IRendezvous
         // turning the ever-present background into the strongest partner in
         // the graph, which is the exact failure the forward weighting exists
         // to prevent. Noting keeps `together(x, y) <= seen(y)`.
-        foreach (var code in present) _clusters.For(code).Note();
+        var weight = occasion.Weight;
+
+        foreach (var code in present) _clusters.For(code).Note(weight);
 
         var written = new HashSet<(Code, Code)>();
 
@@ -75,8 +77,8 @@ public sealed class LocalRendezvous : IRendezvous
                 // EACH SIDE WRITES ITS OWN ROW. A node that quietly kept both
                 // directions would be holding data it does not own, which is
                 // the shared state C1 forbids.
-                _clusters.For(onset).Observe(other);
-                _clusters.For(other).Observe(onset);
+                _clusters.For(onset).Observe(other, weight);
+                _clusters.For(other).Observe(onset, weight);
             }
         }
 
@@ -95,7 +97,7 @@ public sealed class LocalRendezvous : IRendezvous
 
             foreach (var onset in occasion.Onsets)
                 if (past != onset)
-                    _clusters.For(past).Observe(onset);
+                    _clusters.For(past).Observe(onset, weight);
         }
 
         // ONSET-TO-EVERYTHING, never live-to-live. Two codes that were both

@@ -305,6 +305,38 @@ order to find what it cannot see.
 
 ---
 
+## Stamina swept — and depth HURTS
+
+**Never swept until 2026-08-02, and it turns out to be the most consequential
+dial in the project.** 60 seeds, energy 200, empty cells withheld:
+
+| stamina | deepest chain | steps | messages | novelty gap | sigma |
+|---|---|---|---|---|---|
+| 1.5 | 2 | 80.6 ± 6.9 | 373k | 0.0531 ± 0.0041 | 13 |
+| **2** | 2 | 83.9 ± 6.8 | 374k | **0.0605 ± 0.0039** | **15.5** |
+| 3 | 3 | 75.9 ± 6.1 | 561k | 0.0225 ± 0.0028 | 8 |
+| 4 | 4 | 84.5 ± 7.4 | 910k | 0.0042 ± 0.0025 | 1.7 |
+
+**Monotonic, and it is not close.** A two-hop walk predicts **fourteen times
+better** than a four-hop one. Survival is flat across every arm — 76 to 85, all
+inside each other's error — and the shallow walk costs **2.4× fewer messages**.
+So a stamina of 2 is better on the one thing that discriminates, the same on
+everything else, and cheaper.
+
+**Why: without edge kinds, depth reaches more and ranks worse.** `master`
+measured the same thing and said it plainly — *walking further than one step
+without the types reaches the answer and cannot rank it; two steps from a
+degree-37 entity is about 1,300 candidates and nothing says which one the
+question was about.* That refutation was on FB15k-237 and it reproduces here on
+a world that shares nothing with it except the absence of typed edges.
+
+**Which raises fork 20: one budget is serving two questions badly.** Prediction
+wants the shallowest walk that reaches anything, because direct association *is*
+the signal. Reaching an action code may want more depth, since an action is not
+usually adjacent to what is being sensed. They are currently the same number.
+
+---
+
 ## Open forks
 
 Recorded here so a decision does not go quiet.
@@ -320,6 +352,7 @@ by status rather than by scrolling.
 | | | |
 |---|---|---|
 | **19** | ✅ Prediction built — and it loses to a blind guess, because the graph holds **no temporal edges**. Next mechanism named: a one-way window |
+| **20** | One stamina serves both prediction and action-finding, and they want opposite depths | opened by the stamina sweep |
 | **18** | **What to score.** Survival is disqualified: the arm that survives longest is the one that circles and eats nothing | **blocks 15 and 16** |
 | **15** | Strengthening a connection a thought walks | gated on 18 — it would be tuned against whatever we score |
 | **16** | Back-propagation from an outside signal | gated on 18, same reason |

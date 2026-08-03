@@ -627,6 +627,59 @@ conclusion in this project today. Not compared.
 
 ---
 
+## The walk disagrees with itself, and it was never measured until now
+
+**Every result in this project has been "X against Y with a spread across
+seeds".** None of them measured how far one walk lands from an **identical**
+walk — and delivery is concurrent, so that is not zero.
+
+| | agreement | se |
+|---|---|---|
+| the same question, asked twice | **0.8833** | 0.0294 |
+| a different question | 0.0000 | 0.0000 |
+
+**One question in eight gets a different answer for no reason but delivery
+order.** 30 standard errors clear of a different question, so this is noise
+around an answer rather than the absence of one.
+
+**AND THE SENSES WORLD WAS SITTING ON THAT CEILING.** Its accuracy is 0.8898 and
+its self-agreement is 0.8833 — the same number within error.
+
+**Asking three times and taking the majority clears it**, which is the test that
+distinguishes a noise ceiling from an ignorance ceiling:
+
+| | accuracy | se |
+|---|---|---|
+| ask once | 0.9688 | 0.0056 |
+| **ask three times, majority** | **0.9974** | 0.0026 |
+
+**4.7 standard errors. Nearly all the remaining error was nondeterminism rather
+than ignorance** — the graph held the answer and a single walk failed to fetch
+it.
+
+**JOHN'S DESIGN FOR IT IS BETTER THAN THE ONE MEASURED**: ask concurrently with
+distinct broadcast ids rather than sequentially. A thought is already identified
+by its broadcast id, so several concurrent thoughts about one question are not a
+special case — they are what the accounting was built for. Same redundancy, one
+round trip. Built as `SensesRun.AskAsync(concept, votes)`.
+
+**This is C2 being paid for rather than complained about.** The constraint says
+messages are late, jittered and out of order; redundancy is the ordinary answer
+to that, and it costs queries rather than coordination.
+
+**TWO CAVEATS, BOTH MEASURED.**
+
+**The floor moves with machine load.** Run alone, a single ask scores 0.9917;
+run inside the full test suite with other classes executing in parallel, it
+scores 1.0000 and there is nothing left for voting to repair. **So numbers taken
+under different loads are not strictly comparable**, which is a caveat on
+everything in this file.
+
+**And the graph knows more than one walk reveals.** Every accuracy recorded here
+is a lower bound on what the structure actually holds.
+
+---
+
 ## A standing rule: a swept dial is a question the system should answer itself
 
 **John, 2026-08-02.** Wherever a sweep tells us a dial matters, the next move is

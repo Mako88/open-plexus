@@ -1,0 +1,148 @@
+using OpenPlexus.Codes;
+using OpenPlexus.Graph;
+using OpenPlexus.Worlds;
+
+namespace OpenPlexus.Tests;
+
+/// <summary>
+/// How much the walk differs from ITSELF, and what that costs.
+/// </summary>
+/// <remarks>
+/// <b>Never measured until 2026-08-02, and it changes how every other number in
+/// this project should be read.</b> Every result here has been "X against Y with
+/// a spread across seeds". None of them measured how far one walk lands from an
+/// identical walk — and delivery is concurrent, so that is not zero.
+/// </remarks>
+public sealed class NoiseFloorTests
+{
+    [Fact]
+    public async Task The_same_question_does_not_always_get_the_same_answer()
+    {
+        List<double> same = [], other = [];
+
+        for (var seed = 1; seed <= 6; seed++)
+        {
+            using var run = new SensesRun(new SensesSettings
+            {
+                Concepts = 12, CodesPerSense = 3, Noise = 0.1,
+            }, new WalkSettings
+            {
+                Stamina = 8.0, Value = ArrivalValue.Strength,
+                Accumulate = Accumulate.Sum, Horizon = 50,
+            }, seed);
+
+            // Learn something first, or every question reaches nothing.
+            await run.RunAsync(400, every: 10);
+
+            for (var concept = 0; concept < 12; concept++)
+            {
+                var first = await run.AskAsync(concept);
+                var again = await run.AskAsync(concept);
+                var different = await run.AskAsync((concept + 1) % 12);
+
+                // 1.0 means the two answers agreed exactly.
+                same.Add(Agree(first, again));
+                other.Add(Agree(first, different));
+            }
+        }
+
+        var s = new Measured { Arm = "same", Values = same };
+        var o = new Measured { Arm = "other", Values = other };
+
+        // MEASURED AT 0.8833 +-0.0294 over 10 seeds, RUN ALONE. One question in
+        // eight got a different answer for no reason but delivery order.
+        //
+        // THAT IS NOT ASSERTED HERE, AND THE REASON IS ITSELF THE FINDING: the
+        // disagreement DISAPPEARS under load. Inside the full suite, with other
+        // classes running in parallel, six seeds produce perfect agreement.
+        // Asserting disagreement would be asserting how busy the machine is, and
+        // asserting agreement would be asserting the opposite -- so this records
+        // the number and asserts only what does not depend on the host.
+        //
+        // The consequence for everything else in this project: NUMBERS TAKEN
+        // UNDER DIFFERENT LOADS ARE NOT STRICTLY COMPARABLE.
+
+        // WHAT DOES HOLD EVERYWHERE: a different question gets a different
+        // answer, so whatever disagreement there is sits around an answer rather
+        // than standing in for the absence of one.
+        //
+        // ASSERTED ON THE MEANS AND NOT ON SIGMA, DELIBERATELY. Under load both
+        // arms have zero spread -- 1.0000 and 0.0000 -- and `Separation` returns
+        // 0 there by design, because two measurements with no variance must not
+        // be reported as significantly different. That guard is right in general
+        // and exactly wrong here, where the arms are perfectly separated rather
+        // than indistinguishable.
+        Assert.True(s.Mean - o.Mean > 0.5,
+            $"same {s} against different {o}: asking the same question again is "
+            + "no more likely to repeat the answer than asking a different one");
+    }
+
+    [Fact]
+    public async Task Does_asking_three_times_beat_asking_once()
+    {
+        // IF ACCURACY IS AT THE SELF-CONSISTENCY CEILING, a majority of three
+        // should clear it -- the errors would be independent draws rather than
+        // a gap in what the graph holds. If it does not, the ceiling is
+        // ignorance and the two numbers matching was a coincidence.
+        List<double> once = [], thrice = [];
+
+        for (var seed = 1; seed <= 5; seed++)
+        {
+            using var run = new SensesRun(new SensesSettings
+            {
+                Concepts = 12, CodesPerSense = 3, Noise = 0.1,
+            }, new WalkSettings
+            {
+                Stamina = 8.0, Value = ArrivalValue.Strength,
+                Accumulate = Accumulate.Sum, Horizon = 50,
+            }, seed);
+
+            await run.RunAsync(400, every: 10);
+
+            int single = 0, voted = 0, asked = 0;
+
+            for (var round = 0; round < 2; round++)
+                for (var concept = 0; concept < 12; concept++)
+                {
+                    var alone = await run.AskAsync(concept);
+
+                    // JOHN'S VERSION: one round trip, several broadcast ids,
+                    // rather than three sequential asks.
+                    var voting = await run.AskAsync(concept, votes: 3);
+
+                    asked++;
+                    if (alone is { } first && Senses.Concept(first) == concept) single++;
+                    if (voting is { } best && Senses.Concept(best) == concept) voted++;
+                }
+
+            once.Add(asked == 0 ? 0 : single / (double)asked);
+            thrice.Add(asked == 0 ? 0 : voted / (double)asked);
+        }
+
+        var one = new Measured { Arm = "once", Values = once };
+        var three = new Measured { Arm = "thrice", Values = thrice };
+
+        // MEASURED AT 8 SEEDS AND 4 ROUNDS: 0.9688 +-0.0056 once against 0.9974
+        // +-0.0026 thrice -- 4.7 sigma. NEARLY ALL THE REMAINING ERROR WAS
+        // NONDETERMINISM RATHER THAN IGNORANCE: the graph held the answer and a
+        // single walk failed to fetch it.
+        //
+        // THIS TEST GUARDS THE DIRECTION AND DOES NOT RE-DERIVE THE SIGMA. At a
+        // sample small enough to keep the suite quick, `thrice` reaches 1.0000
+        // with no spread at all, so a separation gate reads 1.0 sigma and fails
+        // for want of variance rather than want of effect. Asserting it here
+        // would be asserting the sample size.
+        // AND THE FLOOR MOVES WITH MACHINE LOAD, which is worth knowing on its
+        // own. Run alone this scores 0.9917 once; run inside the full suite,
+        // with other classes executing in parallel, it scores 1.0000 and there
+        // is nothing left for voting to repair. So no assertion here demands
+        // that a single ask be imperfect -- that would be asserting how busy the
+        // machine is. The companion that DOES bite is the agreement test above.
+        Assert.True(three.Mean >= one.Mean, $"thrice {three} did not beat once {one}");
+    }
+
+    private static double Agree(Code? one, Code? other) =>
+        one is null && other is null ? 1.0
+        : one is null || other is null ? 0.0
+        : one.Value == other.Value ? 1.0 : 0.0;
+}

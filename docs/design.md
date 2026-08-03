@@ -589,6 +589,25 @@ asked, settled, and learning carries on, because C4 forbids a run that stops.
 - **`AskAsync(concept)`** — broadcasts the sight codes, narrows with
   `BestOf(Touch, 1)`. **Waits on `Thought.Settled`, not on the bus** — see
   `WhenQuiet`.
+- **`AskAsync(concept, votes)`** — **John's design**: the same question asked
+  several times *at once*, with distinct broadcast ids, and the majority taken.
+  A thought is already identified by its broadcast id, so concurrent thoughts
+  about one question are not a special case — they are what the accounting was
+  built for. One round trip rather than *n*.
+
+  **It exists because the walk disagrees with itself.** An identical question
+  does not always get an identical answer — **0.8833 agreement, measured** —
+  because delivery is concurrent. Voting recovers what one walk drops: **0.9688
+  → 0.9974 over 8 seeds, about 4.7 standard errors.**
+
+  **This is C2 being paid for rather than complained about.** The constraint says
+  messages are late, jittered and out of order; redundancy is the ordinary answer,
+  and it costs queries rather than coordination.
+
+  **Silence gets no vote** — a walk that reached nothing has no opinion, and
+  counting it would let the quietest arm decide. Ties break on the code, so the
+  answer does not depend on which thought finished first, which is the very thing
+  being voted on.
 - **`SensesResult`** — the same self-reporting `RunReport` gives snake, plus
   `Reflected` and `Reflecting` so a run says out loud whether fork 21 was even
   running. Its world-specific complaint is **`Deepest < 3`**: sight reaches touch

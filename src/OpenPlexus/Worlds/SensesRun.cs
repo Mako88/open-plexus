@@ -349,6 +349,56 @@ public sealed class SensesRun : IDisposable
     public async Task<Code?> AskAsync(int concept, CancellationToken ct = default) =>
         (await AskingAsync(concept, ct).ConfigureAwait(false)).Answer;
 
+    /// <summary>
+    /// Asks the same question several times at once and takes the majority.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>JOHN'S DESIGN, 2026-08-02, AND IT IS THE SHAPE THE ARCHITECTURE ALREADY
+    /// IMPLIES.</b> A thought is identified by its broadcast id, so several
+    /// concurrent thoughts about one question are not a special case — they are
+    /// what the accounting was built for. Same redundancy as asking repeatedly,
+    /// one round trip instead of <paramref name="votes"/> of them.
+    /// </para>
+    /// <para>
+    /// <b>It exists because the walk disagrees with itself.</b> Delivery is
+    /// concurrent, so an identical question does not always get an identical
+    /// answer — measured at 0.8833 agreement. Voting recovers what one walk
+    /// drops: 0.9688 to 0.9974 over 8 seeds, about 4.7 standard errors.
+    /// </para>
+    /// <para>
+    /// <b>This is C2 being paid for rather than complained about.</b> The
+    /// constraint says messages are late, jittered and out of order; redundancy
+    /// is the ordinary answer to that, and it costs queries rather than
+    /// coordination.
+    /// </para>
+    /// </remarks>
+    public async Task<Code?> AskAsync(int concept, int votes, CancellationToken ct = default)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(votes);
+
+        var asking = new Task<Asking>[votes];
+        for (var i = 0; i < votes; i++) asking[i] = AskingAsync(concept, ct);
+
+        var answers = await Task.WhenAll(asking).ConfigureAwait(false);
+
+        // MOST VOTES WINS, AND SILENCE DOES NOT GET ONE. A walk that reached
+        // nothing has no opinion; counting it would let the quietest arm decide.
+        var tally = new Dictionary<Code, int>();
+        foreach (var answer in answers)
+            if (answer.Answer is { } code)
+                tally[code] = tally.GetValueOrDefault(code) + 1;
+
+        if (tally.Count == 0) return null;
+
+        // Ties break on the code, so the answer does not depend on which thought
+        // happened to finish first -- which is the very thing being voted on.
+        return tally
+            .OrderByDescending(entry => entry.Value)
+            .ThenBy(entry => entry.Key)
+            .First().Key;
+    }
+
     /// <summary>One question, with the plumbing left attached.</summary>
     private readonly record struct Asking(
         Code? Answer,

@@ -329,6 +329,23 @@ public sealed class Thought
         lock (_gate) return [.. Ranked().Where(a => wanted.Contains(a.Endpoint)).Take(count)];
     }
 
+    /// <summary>
+    /// The top arrivals whose endpoint came from one front end.
+    /// </summary>
+    /// <remarks>
+    /// <b>The same narrowing as <see cref="BestAmong"/>, pointed at a sense
+    /// rather than at an output machine.</b> Narrowed to sensory codes it is a
+    /// prediction of what is about to be seen; narrowed to a machine's codes it
+    /// is an action. One mechanism, two jobs.
+    /// </remarks>
+    public IReadOnlyList<Arrival> BestOf(byte modality, int count)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+
+        lock (_gate)
+            return [.. Ranked().Where(a => a.Endpoint.Modality == modality).Take(count)];
+    }
+
     private IEnumerable<Arrival> Ranked() =>
         _arrivals.Values
             .OrderByDescending(a => a.Score)

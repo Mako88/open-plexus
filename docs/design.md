@@ -383,8 +383,11 @@ the move this design refuses.
 
 ## What is deliberately absent
 
-- **Prediction.** Needed for the middle ranking step and for deciding when to
-  ask rather than watch.
+- **Temporal edges.** Every edge is within-moment: the rendezvous joins an
+  onset with what was live in the *same* occasion, so nothing links moment *t*
+  to moment *t+1*. **This is why prediction loses to a blind guess** — fork 19.
+- **Prediction ranking chains.** `Foresight` scores predictions; nothing yet
+  uses that score to rank one chain over another.
 - **Forgetting.** Designed on `master` — half-life, aged on read, clocked on the
   node's own occasions — and unbuilt here. Fork 17.
 - **The wire.** No second machine exists, so `IPeer` was deleted rather than

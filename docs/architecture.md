@@ -254,6 +254,7 @@ by status rather than by scrolling.
 
 | | | |
 |---|---|---|
+| **19** | ✅ Prediction built — and it loses to a blind guess, because the graph holds **no temporal edges**. Next mechanism named: a one-way window |
 | **18** | **What to score.** Survival is disqualified: the arm that survives longest is the one that circles and eats nothing | **blocks 15 and 16** |
 | **15** | Strengthening a connection a thought walks | gated on 18 — it would be tuned against whatever we score |
 | **16** | Back-propagation from an outside signal | gated on 18, same reason |
@@ -604,6 +605,60 @@ Recorded here so a decision does not go quiet.
     live count comes from splits and deaths; the in-flight counts come from the
     routing named in each report. Those are two independent quantities, and
     them agreeing is a real check where the old one held by construction.
+
+19. **PREDICTION IS BUILT AND IT PREDICTS WORSE THAN GUESSING. Measured
+    2026-08-02, and the diagnosis is the useful part.**
+
+    **John's constraint, and it decides the design:** the goal is understanding,
+    not prediction. Not *what is the most likely next thing* — a sequence model,
+    which cannot be asked a counterfactual — but *what would the world look like
+    if I did X*. So the question carries a candidate action in it.
+
+    **It needed no new mechanism.** The flood already works out what is
+    associated with a set of codes. Broadcast the current view **plus the chosen
+    action** and narrow the arrivals to **sensory** codes rather than the output
+    machine's — `Thought.BestOf(modality, n)`, the same narrowing that already
+    does output selection, pointed at a sense. Scored prequentially: the guess
+    is settled against the next observation before anything is counted.
+
+    **The result, 100 seeds a cell**, precision being the share of named codes
+    that turned up:
+
+    | energy | questions | foresaw | precision | blind |
+    |---|---|---|---|---|
+    | 80 | 6,067 | 0.905 | 0.584 | **0.647** |
+    | 200 | 9,165 | 0.845 | 0.548 | **0.621** |
+
+    **A blind draw from the same alphabet beats it, at both settings.** Not a
+    small margin and not a wash.
+
+    **AND THE REASON IS STRUCTURAL: THE GRAPH HOLDS NO TEMPORAL EDGES AT ALL.**
+    The rendezvous joins an onset with what was live **in the same occasion**,
+    so every edge is within-moment. Nothing links moment *t* to moment *t+1*.
+    The graph is being asked what comes next by a structure that has only ever
+    recorded what happens *together*. `master` measured exactly this and named
+    the control: **0.153 with a window on against 0.000 with it off, "the
+    control being that no temporal edge means no candidate to offer"**. What
+    little is scored here comes from codes that persist across frames, not from
+    anything the graph knows about succession.
+
+    **So the next mechanism is named rather than guessed at**: `moments.Window`
+    — a window that carries recent moments forward, **written one way**. The
+    storage is already directional (`Observe` writes one row where a pair writes
+    both), so time costs no new storage, only a decision about which direction
+    to write.
+
+    **Conditioning shows up as rank, not exclusion**, which is the mechanism
+    rather than a shortfall in it. Asked with `Left`, the graph ranks what
+    `Left` leads to above what `Right` leads to — but it reaches both, because
+    the state alone has co-occurred with each. A broadcast expresses preference
+    as economics, not as selection.
+
+    **A mutation survives here and is recorded rather than hidden:** removing
+    the action from `SnakeRun`'s prediction broadcast does not turn any test
+    red. The counterfactual is asserted at the `Thought` level, where two
+    actions over one state produce different rankings; the run's *wiring* of
+    that is not separately observable from outside.
 
 18. **WHAT TO SCORE — open, and it blocks the two feedback forks.**
     Survival is disqualified: repeating one turn is a circle the snake holds

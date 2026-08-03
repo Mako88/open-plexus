@@ -85,7 +85,7 @@ public sealed class PolicyTests
         // choice.
         var random = await Play(3, Policy.Random);
         var blind = new SnakeRun(World(), Dials(), 3);
-        var cut = await blind.PlayAsync(300, blind: true);
+        var cut = await blind.PlayAsync(300, cut: true);
         blind.Dispose();
 
         Assert.Equal(0, random.ChosenByChain);

@@ -55,7 +55,7 @@ public sealed class SnakeRunTests
         // dials, one wire cut.
         using var run = new SnakeRun(World(), Dials(), seed: 1);
 
-        var result = await run.PlayAsync(200, blind: true);
+        var result = await run.PlayAsync(200, cut: true);
 
         Assert.Equal(0, result.ChosenByChain);
         Assert.True(result.ReachedNothing > 0, "no thought ran at all");

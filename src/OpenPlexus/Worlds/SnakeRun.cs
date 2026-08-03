@@ -3,6 +3,7 @@ using OpenPlexus.Codes;
 using OpenPlexus.Graph;
 using OpenPlexus.Learning;
 using OpenPlexus.Machines;
+using OpenPlexus.Thinking;
 
 namespace OpenPlexus.Worlds;
 
@@ -63,6 +64,12 @@ public sealed record RunResult
 
     /// <summary>Every message the bus carried over the run.</summary>
     public required long Messages { get; init; }
+
+    /// <summary>
+    /// How well the graph foresaw what it was about to see, given what it was
+    /// about to do.
+    /// </summary>
+    public required Foresight Foresight { get; init; }
 
     /// <summary>
     /// Of the steps a chain chose, how many chose the action just taken.
@@ -155,6 +162,22 @@ public sealed class SnakeRun : IDisposable
     private readonly Snake _snake;
     private readonly Random _fallback;
     private readonly List<Exception> _faults = [];
+    private readonly SnakeSense _sense = new();
+    private readonly Foresight _foresight = new();
+
+    /// <summary>Every vision code seen, so a blind guess can draw from the same alphabet.</summary>
+    private readonly List<Code> _alphabet = [];
+
+    /// <summary>
+    /// The blind guess draws from here and NOT from the policy's own stream.
+    /// </summary>
+    /// <remarks>
+    /// <b>Sharing one generator would make the control change the thing it is
+    /// controlling for</b> — adding prediction moved the random policy's
+    /// trajectory and broke a test that had nothing to do with prediction,
+    /// which is how a measurement quietly stops measuring what it says.
+    /// </remarks>
+    private readonly Random _guessing;
 
     public SnakeRun(
         SnakeSettings world,
@@ -169,6 +192,7 @@ public sealed class SnakeRun : IDisposable
 
         _snake = new Snake(world, seed);
         _fallback = new Random(seed);
+        _guessing = new Random(~seed);
         _ring = new Ring(seed, replicas);
         _local = new LocalClusters(_ring);
 
@@ -188,7 +212,7 @@ public sealed class SnakeRun : IDisposable
 
         _eye = new InputMachine<SnakeFrame>(
             new MachineAddress("eye"),
-            new SnakeSense(),
+            _sense,
             new LocalRendezvous(_local),
             _bus,
             _ring,
@@ -203,15 +227,12 @@ public sealed class SnakeRun : IDisposable
     /// <param name="blind">
     /// <b>The control arm: cuts the one wire that makes an action reachable.</b>
     /// With this set, what the snake did never joins the occasion, so an action
-    /// code gains no edges and no walk can arrive at one. Everything else about
-    /// the run is identical, which is what makes
-    /// <see cref="RunResult.ChosenByChain"/> a measurement rather than a
-    /// number that was always going to be positive.
+    /// code gains no edges and no walk can arrive at one.
     /// </param>
     /// <param name="ct">Cancellation.</param>
     public async Task<RunResult> PlayAsync(
         int steps,
-        bool blind = false,
+        bool cut = false,
         Policy policy = Policy.Chain,
         CancellationToken ct = default)
     {
@@ -222,10 +243,20 @@ public sealed class SnakeRun : IDisposable
         long halted = 0;
         var unbalanced = 0;
 
+        IReadOnlyList<Code> foreseen = [];
+        IReadOnlyList<Code> blind = [];
+
         for (; taken < steps && _snake.Alive; taken++)
         {
             var before = _snake.Energy;
             var frame = new SnakeFrame { View = _snake.View(), Did = did };
+            var present = _sense.Codify(frame);
+
+            // PREQUENTIAL: last step's guess is settled against this step's
+            // world BEFORE anything is counted, so the graph never sees the
+            // answer before being asked.
+            _foresight.Settle(foreseen, present, blind);
+            Remember(present);
 
             var thought = await _eye.ObserveAsync(frame, taken, ct).ConfigureAwait(false);
 
@@ -259,8 +290,15 @@ public sealed class SnakeRun : IDisposable
                 doing = policy == Policy.Repeat && did is { } last ? last : Anything();
             }
 
+            // WHAT WOULD THE WORLD LOOK LIKE IF I DID THIS? A second broadcast
+            // carrying the chosen action, narrowed to sensory codes rather than
+            // to the output machine's. Same flood, different question -- and it
+            // is conditional on the action, so a different action would ask a
+            // different one.
+            (foreseen, blind) = await ForeseeAsync(present, doing, ct).ConfigureAwait(false);
+
             Perform(doing);
-            did = blind ? null : doing;
+            did = cut ? null : doing;
 
             if (_snake.Alive && _snake.Energy > before) ate++;
         }
@@ -283,7 +321,44 @@ public sealed class SnakeRun : IDisposable
             EchoedLast = echoed,
             Unbalanced = unbalanced,
             Messages = _bus.Messages,
+            Foresight = _foresight,
         };
+    }
+
+    /// <summary>
+    /// Asks the graph what it expects to see next, given what is about to be
+    /// done, and draws a blind guess of the same size to score it against.
+    /// </summary>
+    private async Task<(IReadOnlyList<Code> Foreseen, IReadOnlyList<Code> Blind)> ForeseeAsync(
+        IReadOnlyCollection<Code> present, Code doing, CancellationToken ct)
+    {
+        if (present.Count == 0) return ([], []);
+
+        var thought = await _eye.ThinkAsync([.. present, doing], ct).ConfigureAwait(false);
+        await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
+
+        // As many codes as an observation holds: predicting an
+        // observation-sized set rather than a number nobody chose.
+        var wanted = present.Count;
+        var foreseen = thought.BestOf(SnakeQuantizer.Vision, wanted)
+            .Select(a => a.Endpoint).ToArray();
+
+        _eye.Forget(thought.Id);
+
+        var blind = _alphabet.Count == 0
+            ? []
+            : Enumerable.Range(0, foreseen.Length)
+                .Select(_ => _alphabet[_guessing.Next(_alphabet.Count)])
+                .ToArray();
+
+        return (foreseen, blind);
+    }
+
+    private void Remember(IReadOnlyCollection<Code> present)
+    {
+        foreach (var code in present)
+            if (code.Modality == SnakeQuantizer.Vision && !_alphabet.Contains(code))
+                _alphabet.Add(code);
     }
 
     /// <summary>Whether a code names something this world can actually do.</summary>

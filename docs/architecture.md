@@ -4,7 +4,11 @@ The living map. Updated as pieces land, so the shape is visible without
 reading the code.
 
 **Method-level detail lives in [design.md](design.md)** — what every piece is
-and what every method does, in words.
+and what every method does, in words. **It was rewritten against the code on
+2026-08-02** after the refuted arms were deleted; before that it described a
+system that no longer existed, which is the failure this pair of files exists to
+prevent. Every public type in the source is named in it, checked rather than
+assumed.
 
 **Current scope: snake, on one machine, every boundary shaped so the same code
 runs across many.** Static background is out of scope — fork 1b.

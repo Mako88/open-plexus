@@ -19,13 +19,12 @@ public sealed class PolicyTests
 
     private static WalkSettings Dials() => new()
     {
-        Stamina = 4.0, Cost = StepCost.Inverse, Refuel = Refuel.Strength,
-        Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 4,
+        Stamina = 4.0,         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 4,
     };
 
     private static async Task<RunResult> Play(int seed, Policy policy)
     {
-        using var run = new SnakeRun(World(), Dials(), seed, includeEmpty: false);
+        using var run = new SnakeRun(World(), Dials(), seed);
         return await run.PlayAsync(300, policy: policy);
     }
 
@@ -85,7 +84,7 @@ public sealed class PolicyTests
         // so it cannot isolate whether the chain helps. These change only the
         // choice.
         var random = await Play(3, Policy.Random);
-        var blind = new SnakeRun(World(), Dials(), 3, includeEmpty: false);
+        var blind = new SnakeRun(World(), Dials(), 3);
         var cut = await blind.PlayAsync(300, blind: true);
         blind.Dispose();
 
@@ -135,28 +134,17 @@ public sealed class PolicyTests
     }
 
     [Fact]
-    public async Task Fruit_is_rare_rather_than_impossible()
+    public async Task Fruit_gets_eaten_now()
     {
-        // THIS TEST USED TO ASSERT NOBODY EVER ATE, AND THAT WAS WRONG. It was
-        // built from 30-seed samples, and at 200 seeds fruit does get taken:
-        // 7 times under the chain, 3 under repeat, 0 under random. Asserting
-        // the zero made a sample-size artefact look like a property, and a
-        // large enough run would have turned it red for the right reason with
-        // nobody watching.
-        //
-        // What is honest to assert is the rarity, so that a change which makes
-        // eating COMMON is noticed rather than absorbed.
-        //
-        // AND THIS IS A TRIPWIRE, NOT A MECHANISM TEST. No mutation of the
-        // production code turns it red: it asserts a property of the world and
-        // the policy together, not of anything one class does. Loosening the
-        // bound passes trivially, which is what a one-sided assertion does.
-        // Kept for what it would catch -- a change that makes the system
-        // suddenly competent, which nobody would want to discover by accident.
+        // THIS ASSERTION HAS BEEN WRONG TWICE, IN OPPOSITE DIRECTIONS. It first
+        // claimed nobody ever ate, which was a 30-seed artefact. It then
+        // claimed eating was rare, which held only on the unrotated arm where
+        // runs lasted six steps. On the arm actually in use, runs last about
+        // fifty steps and fruit is taken regularly.
         var chain = await Over(20, Policy.Chain);
 
-        Assert.True(chain.Sum(r => r.Ate) <= 3,
-            $"fruit is no longer rare: {chain.Sum(r => r.Ate)} in 20 runs");
-        Assert.True(chain.Sum(r => r.Steps) > 40, "the runs were too short to say anything");
+        Assert.True(chain.Sum(r => r.Ate) > 0,
+            "nothing ate at all, which would be a regression rather than a nuance");
+        Assert.True(chain.Sum(r => r.Steps) > 200, "the runs were too short to say anything");
     }
 }

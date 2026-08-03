@@ -14,14 +14,13 @@ public sealed class Fork10Tests
 {
     private static SnakeSettings World(double energy) => new()
     {
-        Width = 15, Height = 15, Sight = 1, Relative = true,
+        Width = 15, Height = 15, Sight = 1,
         StartingEnergy = energy, EnergyPerStep = 1.0, EnergyPerFood = 30.0,
     };
 
     private static WalkSettings Dials() => new()
     {
-        Stamina = 4.0, Cost = StepCost.Inverse, Refuel = Refuel.Strength,
-        Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 50,
+        Stamina = 4.0,         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 50,
     };
 
     private static async Task<List<RunResult>> Over(int seeds, Policy policy, double energy)

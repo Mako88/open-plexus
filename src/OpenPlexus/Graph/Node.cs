@@ -64,32 +64,6 @@ public sealed class Node
             throw new ArgumentOutOfRangeException(nameof(settings),
                 "a route with no stamina cannot take its first step");
 
-        if (settings.Cost == StepCost.Constant && settings.Charge <= 0.0)
-            throw new ArgumentOutOfRangeException(nameof(settings),
-                "StepCost.Constant needs a Charge above zero");
-
-        // The receiver charges 1/weight for the hop it arrived on, so no other
-        // pricing is even reachable from there -- and a sender cannot compute
-        // `Best` or `Local` without the weights it no longer has. Refused rather
-        // than silently ignored.
-        if (settings.Weighing == Weighing.Receiver && settings.Cost != StepCost.Inverse)
-            throw new ArgumentException(
-                "Weighing.Receiver prices a hop at 1/weight on arrival, so StepCost does " +
-                "nothing under it; only StepCost.Inverse is meaningful there",
-                nameof(settings));
-
-        if (settings.Cost == StepCost.Inverse && settings.Refuel != Refuel.Strength)
-            throw new ArgumentException(
-                "StepCost.Inverse pays nothing back, so Refuel does nothing under it; " +
-                "an argument that silently does nothing is a sweep arm that is not one",
-                nameof(settings));
-
-        if (settings.Cost != StepCost.Constant && settings.Charge != 0.0)
-            throw new ArgumentException(
-                "Charge is the price for StepCost.Constant and does nothing " +
-                "otherwise; setting both would give a sweep an arm that is not one",
-                nameof(settings));
-
         _code = code;
         _settings = settings;
     }
@@ -173,18 +147,16 @@ public sealed class Node
     /// already being carried.
     /// </para>
     /// </remarks>
-    public Fired Fire(Message message, IMarginals marginals)
+    public Fired Fire(Message message)
     {
-        ArgumentNullException.ThrowIfNull(marginals);
-
         if (message.To != _code)
             throw new ArgumentException(
                 $"message addressed to {message.To} reached the node for {_code}",
                 nameof(message));
 
-        // SNAPSHOT FIRST, THEN WEIGH. Weighing reads partners' nodes, and
-        // holding this node's lock while doing that deadlocks against a partner
-        // firing back — which is ordinary, because edges are mutual.
+        // SNAPSHOT FIRST. Nothing here reads another node, so there is no
+        // deadlock to avoid any more -- but the row must not move underneath a
+        // fan-out, and two thoughts can fire this node at once.
         KeyValuePair<Code, double>[] row;
         double seen;
         lock (_gate)
@@ -197,34 +169,30 @@ public sealed class Node
         // there is no edge to value. Its strength is the starting 1.0.
         var isOrigin = message.Chain.Length <= 1;
 
-        // THE RECEIVER WEIGHS THE EDGE IT ARRIVED ON. The sender put its own
-        // `together(sender, me)` in the message; this divides by its own
-        // marginal. Neither node reads the other's data, which is the whole of
-        // fork 2 -- and it is only possible because Inverse made the cost
-        // belong to the edge rather than to the sending node.
         var held = message.Held;
         var arriving = 1.0;
 
-        if (_settings.Weighing == Weighing.Receiver && !isOrigin)
+        if (!isOrigin)
         {
+            // THE RECEIVER WEIGHS THE EDGE IT ARRIVED ON. The sender put its own
+            // together(sender, me) in the message; this divides by its own
+            // marginal. Neither node reads the other's data.
             arriving = seen <= 0.0 ? 0.0 : message.Together / seen;
             if (arriving <= 0.0) return Died(message);
 
+            // EVERY HOP COSTS AT LEAST 1, because a weight cannot exceed 1.0.
+            // That is what bounds the walk.
             held -= 1.0 / arriving;
             if (held <= 0.0) return Died(message);
         }
 
-        // LIFT DIVIDES BY THIS NODE'S OWN MARGINAL, which is the receiver's to
-        // read. PPMI's global occasion total is identical for every candidate
-        // so it cancels in a ranking and never has to be known — which is what
-        // makes rarity-weighting C1-legal where PPMI is not.
-        // Under receiver weighing the strength of the hop is only known here,
-        // so the path strength is completed on arrival rather than on send.
-        var travelled = _settings.Weighing == Weighing.Receiver
-            ? message.Carried * arriving
-            : message.Carried;
+        var travelled = message.Carried * arriving;
 
         var carried = !isOrigin && _settings.Value == ArrivalValue.Lift
+
+            // Rare endpoints are worth more. PPMI's global occasion total is
+            // the same for every candidate, so it cancels in a ranking and
+            // never has to be known -- which is what makes this C1-legal.
             ? travelled / Math.Max(seen, 1.0)
             : travelled;
 
@@ -239,21 +207,12 @@ public sealed class Node
                 Routes = 1,
             };
 
-        // A SENDER CAN STILL PRUNE EXACTLY ONCE, and it needs nothing from
-        // anyone to do it: a weight cannot exceed 1.0, so no hop can cost less
-        // than 1, so a budget of 1 or less cannot afford any partner at all.
-        if (_settings.Weighing == Weighing.Receiver && held <= 1.0)
-        {
-            return new Fired
-            {
-                Outgoing = [],
-                Reached = reached,
-                Accounting = new Accounting(message.Broadcast, 0, Deaths: 1),
-            };
-        }
+        // A SENDER CAN STILL PRUNE EXACTLY ONCE, needing nothing from anyone:
+        // no hop costs less than 1, so a budget of 1 or less affords nothing.
+        if (held <= 1.0) return Spent(message, reached);
 
-        // THE HORIZON. Reached only because the budget provably does not bound
-        // this walk when weights are equal -- see WalkSettings.Horizon.
+        // THE HORIZON, a backstop that has not fired since the cost became
+        // inverse -- see WalkSettings.Horizon.
         if (message.Chain.Length >= _settings.Horizon)
         {
             return new Fired
@@ -264,58 +223,20 @@ public sealed class Node
             };
         }
 
-        var weights = new Dictionary<Code, double>(row.Length);
-        var fuels = new Dictionary<Code, double>(row.Length);
-        var affordable = new List<double>(row.Length);
+        var outgoing = ImmutableArray.CreateBuilder<Message>(row.Length);
 
         foreach (var (partner, together) in row)
         {
-            // Under receiver weighing the sender does not weigh anything; it
-            // hands over its own count and lets the far end do the division.
-            var weight = _settings.Weighing == Weighing.Receiver
-                ? 1.0
-                : WeightOf(together, partner, marginals);
-
-            weights[partner] = weight;
-
-            // THE FUEL AND THE SCORE ARE TWO QUANTITIES. The weight scores an
-            // arrival; the fuel decides whether the route can keep going. Under
-            // Refuel.Strength they are the same number, which is why they
-            // looked like one thing until surprise needed them apart.
-            var fuel = Fuel(weight);
-            fuels[partner] = fuel;
-            if (fuel > 0.0) affordable.Add(fuel);
-        }
-
-        // Under Inverse the cost belongs to the edge, not to the node, so
-        // there is no single price for leaving here.
-        var price = _settings.Cost == StepCost.Inverse ? 0.0 : PriceOfAStep(affordable);
-        var outgoing = ImmutableArray.CreateBuilder<Message>(weights.Count);
-
-        foreach (var (partner, weight) in weights)
-        {
-            if (weight <= 0.0 || message.Chain.Contains(partner)) continue;
-
-            // EVERY HOP COSTS AT LEAST 1 under Inverse, because a weight
-            // cannot exceed 1.0 — which is what bounds the walk without a
-            // horizon. `Best` has no such floor.
-            // The receiver charges for the hop when it arrives, so the sender
-            // passes its budget along untouched.
-            var left = _settings.Weighing == Weighing.Receiver
-                ? held
-                : _settings.Cost == StepCost.Inverse
-                    ? message.Held - (1.0 / weight)
-                    : message.Held - price + fuels[partner];
-
-            if (left <= 0.0) continue;
+            // The cycle check: free, because the chain is already travelling.
+            if (message.Chain.Contains(partner)) continue;
 
             outgoing.Add(message with
             {
                 To = partner,
-                Held = left,
+                Held = held,
                 Chain = message.Chain.Add(partner),
-                Carried = _settings.Weighing == Weighing.Receiver ? carried : carried * weight,
-                Together = _together.GetValueOrDefault(partner),
+                Carried = carried,
+                Together = together,
             });
         }
 
@@ -327,7 +248,7 @@ public sealed class Node
             Reached = reached,
 
             // One route became `children` routes, so the live count moves by
-            // the difference — a split is not the birth of `children` new ones.
+            // the difference -- a split is not the birth of `children` new ones.
             Accounting = new Accounting(
                 message.Broadcast,
                 Splits: children > 0 ? children - 1 : 0,
@@ -335,74 +256,19 @@ public sealed class Node
         };
     }
 
+    /// <summary>A route that arrived but cannot afford to go on.</summary>
+    private static Fired Spent(Message message, Arrival? reached) => new()
+    {
+        Outgoing = [],
+        Reached = reached,
+        Accounting = new Accounting(message.Broadcast, 0, Deaths: 1),
+    };
+
     /// <summary>A route that could not go on from here.</summary>
     private static Fired Died(Message message) => new()
     {
         Outgoing = [],
         Reached = null,
         Accounting = new Accounting(message.Broadcast, 0, Deaths: 1),
-    };
-
-    /// <summary>
-    /// How strong the edge to a partner is: the shared count divided by
-    /// <i>the partner's</i> marginal — <b>how well the partner predicts me.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// That direction is what refuses a thing present everywhere: it co-occurs
-    /// with you constantly and predicts nothing in particular. Measured at
-    /// 0.0000 for a distractor against 0.9800 for a real link, where every
-    /// symmetrising rule admitted the distractor — 0 of 24.
-    /// </para>
-    /// <para>
-    /// <b>This is the method that cannot work as written across machines</b>,
-    /// and <see cref="IMarginals"/> is the seam where that shows.
-    /// </para>
-    /// </remarks>
-    private static double WeightOf(double together, Code partner, IMarginals marginals)
-    {
-        var common = marginals.SeenOf(partner);
-        return common <= 0.0 ? 0.0 : together / common;
-    }
-
-    /// <summary>
-    /// What a route is paid for taking an edge of this weight.
-    /// </summary>
-    /// <remarks>
-    /// <b>Deliberately separate from the score.</b> They are the same number
-    /// under <see cref="Refuel.Strength"/>, which is why they looked like one
-    /// thing until surprise needed them apart.
-    /// </remarks>
-    private double Fuel(double weight) => _settings.Refuel switch
-    {
-        Refuel.Strength => weight,
-
-        // A route survives by walking edges that were unlikely. Local, because
-        // it needs one node's own row and one marginal, where PPMI needs the
-        // global total C1 forbids.
-        Refuel.Surprise => weight > 0.0 && weight < 1.0 ? -Math.Log2(weight) : 0.0,
-
-        _ => throw new UnreachableException(),
-    };
-
-    /// <summary>
-    /// What leaving this node costs, computed once from every partner's fuel.
-    /// </summary>
-    private double PriceOfAStep(IReadOnlyCollection<double> affordable) => _settings.Cost switch
-    {
-        StepCost.Constant => _settings.Charge,
-
-        // REFUTED and kept so the refutation can be re-run: about half a node's
-        // edges are above its own mean, so a route taking above-mean steps
-        // gains budget forever.
-        StepCost.Local => affordable.Count == 0 ? 0.0 : affordable.Sum() / affordable.Count,
-
-        // Opportunity cost: the step is charged what the best step here would
-        // have cost. Budget is therefore non-increasing, and strictly
-        // decreasing for anything but the strongest edge, so the walk is
-        // bounded without a constant.
-        StepCost.Best => affordable.Count == 0 ? 0.0 : affordable.Max(),
-
-        _ => throw new UnreachableException(),
     };
 }

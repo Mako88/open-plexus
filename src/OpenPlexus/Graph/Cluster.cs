@@ -23,25 +23,21 @@ public sealed class Cluster : IReceiveEnvelopes
     private readonly IBus _bus;
     private readonly Ring _ring;
     private readonly WalkSettings _settings;
-    private readonly IMarginals _marginals;
 
     public Cluster(
         ClusterAddress address,
         IBus bus,
         Ring ring,
-        WalkSettings settings,
-        IMarginals marginals)
+        WalkSettings settings)
     {
         ArgumentNullException.ThrowIfNull(bus);
         ArgumentNullException.ThrowIfNull(ring);
         ArgumentNullException.ThrowIfNull(settings);
-        ArgumentNullException.ThrowIfNull(marginals);
 
         _address = address;
         _bus = bus;
         _ring = ring;
         _settings = settings;
-        _marginals = marginals;
     }
 
     /// <inheritdoc cref="_address"/>
@@ -104,7 +100,7 @@ public sealed class Cluster : IReceiveEnvelopes
             // this code has nothing to say about it.
             if (envelope.Everywhere && !_nodes.TryGetValue(message.To, out _)) continue;
 
-            var fired = Admit(message.To).Fire(message, _marginals);
+            var fired = Admit(message.To).Fire(message);
             fanned++;
 
             foreach (var next in fired.Outgoing)

@@ -20,8 +20,6 @@ public sealed class MachineTests : IDisposable
     private static readonly WalkSettings Dials = new()
     {
         Stamina = 10.0,
-        Cost = StepCost.Inverse,
-        Refuel = Refuel.Strength,
         Value = ArrivalValue.Strength,
         Accumulate = Accumulate.Sum,
             Horizon = 6,
@@ -39,13 +37,11 @@ public sealed class MachineTests : IDisposable
         _local = new LocalClusters(_ring);
         _rendezvous = new LocalRendezvous(_local);
         _bus.Faults += failure => throw failure;
-
-        var marginals = new LocalMarginals(_local);
         foreach (var name in (string[])["a", "b", "c", "d"])
         {
             var address = new ClusterAddress(name);
             _ring.Join(address);
-            var cluster = new Cluster(address, _bus, _ring, Dials, marginals);
+            var cluster = new Cluster(address, _bus, _ring, Dials);
             _local.Include(cluster);
             _handles.Add(_bus.Subscribe(cluster));
         }

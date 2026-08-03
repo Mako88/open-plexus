@@ -18,23 +18,12 @@ public sealed class ReceiverWeighingTests
 {
     private static Code C(ulong value) => new(Modality: 1, value);
 
-    /// <summary>Would throw if anything asked it. Nothing should.</summary>
-    private sealed class Nobody : IMarginals
-    {
-        public double SeenOf(Code code) =>
-            throw new InvalidOperationException(
-                "the receiver arm must never read another node's marginal");
-    }
-
     private static WalkSettings Dials(double stamina = 10.0) => new()
     {
         Stamina = stamina,
-        Cost = StepCost.Inverse,
-        Refuel = Refuel.Strength,
         Value = ArrivalValue.Strength,
         Accumulate = Accumulate.Sum,
         Horizon = 50,
-        Weighing = Weighing.Receiver,
     };
 
     private static Message Arriving(Code to, double together, double held = 10.0) => new()
@@ -49,16 +38,16 @@ public sealed class ReceiverWeighingTests
     };
 
     [Fact]
-    public void Nothing_reads_another_nodes_marginal()
+    public void A_node_needs_nothing_but_its_own_row_to_fire()
     {
-        // THE WHOLE CLAIM, asserted by making the alternative throw.
+        // THE WHOLE CLAIM, and it is now structural rather than asserted: there
+        // is no way to hand a node another node's data, because `Fire` takes
+        // only the message. `IMarginals` is gone with the sender arm.
         var node = new Node(C(1), Dials());
         for (var i = 0; i < 4; i++) node.Note();
         node.Observe(C(2));
 
-        var fired = node.Fire(Arriving(C(1), together: 4.0), new Nobody());
-
-        Assert.Single(fired.Outgoing);
+        Assert.Single(node.Fire(Arriving(C(1), together: 4.0)).Outgoing);
     }
 
     [Fact]
@@ -74,8 +63,8 @@ public sealed class ReceiverWeighingTests
         for (var i = 0; i < 4; i++) weak.Note();
         weak.Observe(C(2));
 
-        var afterStrong = strong.Fire(Arriving(C(1), together: 4.0), new Nobody());
-        var afterWeak = weak.Fire(Arriving(C(1), together: 1.0), new Nobody());
+        var afterStrong = strong.Fire(Arriving(C(1), together: 4.0));
+        var afterWeak = weak.Fire(Arriving(C(1), together: 1.0));
 
         Assert.Equal(9.0, afterStrong.Outgoing.Single().Held, precision: 10);
         Assert.Equal(6.0, afterWeak.Outgoing.Single().Held, precision: 10);
@@ -89,7 +78,7 @@ public sealed class ReceiverWeighingTests
         node.Observe(C(2));
 
         // together 1 against a marginal of 100 is 0.01, costing 100.
-        var fired = node.Fire(Arriving(C(1), together: 1.0, held: 10.0), new Nobody());
+        var fired = node.Fire(Arriving(C(1), together: 1.0, held: 10.0));
 
         Assert.Empty(fired.Outgoing);
         Assert.Equal(1, fired.Accounting.Deaths);
@@ -105,7 +94,7 @@ public sealed class ReceiverWeighingTests
         for (var i = 0; i < 4; i++) node.Note();
         node.Observe(C(2));
 
-        var fired = node.Fire(Arriving(C(1), together: 2.0), new Nobody());
+        var fired = node.Fire(Arriving(C(1), together: 2.0));
 
         Assert.NotNull(fired.Reached);
         Assert.Equal(0.5, fired.Reached.Score, precision: 10);
@@ -119,7 +108,7 @@ public sealed class ReceiverWeighingTests
         for (var i = 0; i < 3; i++) node.Observe(C(2));
         node.Observe(C(3));
 
-        var sent = node.Fire(Arriving(C(1), together: 4.0), new Nobody())
+        var sent = node.Fire(Arriving(C(1), together: 4.0))
             .Outgoing.ToDictionary(m => m.To, m => m.Together);
 
         // Read from the sender's own row, which is the half it owns.
@@ -161,7 +150,7 @@ public sealed class ReceiverWeighingTests
             depth++;
             var next = new List<Message>();
             foreach (var message in frontier)
-                foreach (var onward in nodes[message.To].Fire(message, new Nobody()).Outgoing)
+                foreach (var onward in nodes[message.To].Fire(message).Outgoing)
                 {
                     next.Add(onward);
                     messages++;
@@ -175,19 +164,6 @@ public sealed class ReceiverWeighingTests
     }
 
     [Fact]
-    public void Pricing_that_cannot_reach_the_receiver_is_refused()
-    {
-        // `Best` prices a hop at the SENDING node's strongest edge, which a
-        // receiver has no way to know. Refused rather than silently ignored.
-        Assert.Throws<ArgumentException>(() => new Node(C(1), new WalkSettings
-        {
-            Stamina = 4.0, Cost = StepCost.Best, Refuel = Refuel.Strength,
-            Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum,
-            Horizon = 50, Weighing = Weighing.Receiver,
-        }));
-    }
-
-    [Fact]
     public void A_budget_that_cannot_afford_a_perfect_hop_refuses_the_whole_fan_out()
     {
         // The one prune a sender can still do, and it needs nothing from
@@ -197,11 +173,11 @@ public sealed class ReceiverWeighingTests
         node.Observe(C(2));
         node.Observe(C(3));
 
-        var broke = node.Fire(Arriving(C(1), together: 4.0, held: 1.5), new Nobody());
+        var broke = node.Fire(Arriving(C(1), together: 4.0, held: 1.5));
         Assert.Empty(broke.Outgoing);
 
         // The companion: a budget that CAN afford one still fans out.
-        var solvent = node.Fire(Arriving(C(1), together: 4.0, held: 3.0), new Nobody());
+        var solvent = node.Fire(Arriving(C(1), together: 4.0, held: 3.0));
         Assert.Equal(2, solvent.Outgoing.Length);
     }
 }

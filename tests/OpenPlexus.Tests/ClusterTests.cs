@@ -20,8 +20,6 @@ public sealed class ClusterTests : IDisposable
     private static readonly WalkSettings Dials = new()
     {
         Stamina = 10.0,
-        Cost = StepCost.Inverse,
-        Refuel = Refuel.Strength,
         Value = ArrivalValue.Strength,
         Accumulate = Accumulate.Sum,
             Horizon = 6,
@@ -31,7 +29,6 @@ public sealed class ClusterTests : IDisposable
     private readonly Counting _counted;
     private readonly Ring _ring = new(seed: 42, replicas: 64);
     private readonly LocalClusters _local;
-    private readonly LocalMarginals _marginals;
     private readonly List<IDisposable> _handles = [];
     private readonly Machine _origin = new(Origin);
 
@@ -39,7 +36,6 @@ public sealed class ClusterTests : IDisposable
     {
         _bus.Faults += failure => throw failure;
         _local = new LocalClusters(_ring);
-        _marginals = new LocalMarginals(_local);
         _counted = new Counting(_bus);
         _handles.Add(_bus.Subscribe(_origin));
     }
@@ -128,7 +124,7 @@ public sealed class ClusterTests : IDisposable
     {
         var address = new ClusterAddress(name);
         _ring.Join(address);
-        var cluster = new Cluster(address, _counted, _ring, Dials, _marginals);
+        var cluster = new Cluster(address, _counted, _ring, Dials);
         _local.Include(cluster);
         _handles.Add(_bus.Subscribe(cluster));
         return cluster;

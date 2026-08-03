@@ -16,7 +16,6 @@ public sealed class SnakeTests
 
         // These tests are about absolute movement and an unrotated view, so
         // they say so rather than riding on whatever the default happens to be.
-        Relative = false,
         StartingEnergy = energy,
         EnergyPerStep = 1.0,
         EnergyPerFood = perFood,
@@ -103,7 +102,7 @@ public sealed class SnakeTests
         {
             var before = snake.Energy;
             var food = snake.View().Cells.FirstOrDefault(c => c.Content == Cell.Food);
-            snake.Step(Toward(food));
+            snake.Steer(Toward(food));
             if (snake.Alive && snake.Energy > before) ate = true;
         }
 
@@ -111,10 +110,15 @@ public sealed class SnakeTests
         Assert.True(snake.Length > length);
     }
 
-    private static SnakeAction Toward(Seen food) =>
-        Math.Abs(food.Dx) >= Math.Abs(food.Dy)
-            ? food.Dx >= 0 ? SnakeAction.East : SnakeAction.West
-            : food.Dy >= 0 ? SnakeAction.South : SnakeAction.North;
+    /// <summary>
+    /// The view is rotated, so `Dx` is ahead and `Dy` is to the right — and
+    /// there is no way to turn back, so something behind has to be circled to.
+    /// </summary>
+    private static Turn Toward(Seen food) =>
+        food.Dy > 0 ? Turn.Right
+        : food.Dy < 0 ? Turn.Left
+        : food.Dx >= 0 ? Turn.Ahead
+        : Turn.Right;
 
     // ---- the view recurs --------------------------------------------------
 

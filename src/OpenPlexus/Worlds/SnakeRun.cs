@@ -155,22 +155,13 @@ public sealed class SnakeRun : IDisposable
     private readonly Snake _snake;
     private readonly Random _fallback;
     private readonly List<Exception> _faults = [];
-    private readonly bool _relative;
 
-    /// <param name="includeEmpty">
-    /// Whether an empty cell emits a code. <b>Defaults to false — John's call,
-    /// 2026-08-02, on fork 8.</b> An occasion is a clique, so the number of
-    /// codes per frame sets how dense the graph is, and density is what makes
-    /// path enumeration explode. Measured at horizon 5, seed 1: 46,536 routes
-    /// halted with empty cells against 6 without.
-    /// </param>
     public SnakeRun(
         SnakeSettings world,
         WalkSettings dials,
         int seed,
         int clusters = 8,
-        int replicas = 256,
-        bool includeEmpty = false)
+        int replicas = 256)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(dials);
@@ -185,12 +176,11 @@ public sealed class SnakeRun : IDisposable
         // numbers built on swallowed failures is worse than one that stops.
         _bus.Faults += failure => { lock (_faults) _faults.Add(failure); };
 
-        var marginals = new LocalMarginals(_local);
         for (var i = 0; i < clusters; i++)
         {
             var address = new ClusterAddress($"c{i}");
             _ring.Join(address);
-            var cluster = new Cluster(address, _bus, _ring, dials, marginals);
+            var cluster = new Cluster(address, _bus, _ring, dials);
             _local.Include(cluster);
             _clusters.Add(cluster);
             _handles.Add(_bus.Subscribe(cluster));
@@ -198,17 +188,14 @@ public sealed class SnakeRun : IDisposable
 
         _eye = new InputMachine<SnakeFrame>(
             new MachineAddress("eye"),
-            new SnakeSense(includeEmpty),
+            new SnakeSense(),
             new LocalRendezvous(_local),
             _bus,
             _ring,
             dials);
 
         _handles.Add(_bus.Subscribe(_eye));
-        _relative = world.Relative;
-        _hand = new OutputMachine(
-            new MachineAddress("hand"),
-            _relative ? SnakeSense.Turns : SnakeSense.Actions);
+        _hand = new OutputMachine(new MachineAddress("hand"), SnakeSense.Turns);
     }
 
     /// <summary>Plays until the run ends or the step budget runs out.</summary>
@@ -300,19 +287,12 @@ public sealed class SnakeRun : IDisposable
     }
 
     /// <summary>Whether a code names something this world can actually do.</summary>
-    private bool Understood(Code code) =>
-        _relative ? SnakeSense.Turned(code) is not null : SnakeSense.Decode(code) is not null;
+    private static bool Understood(Code code) => SnakeSense.Turned(code) is not null;
 
     /// <summary>A move nobody reasoned about. The floor everything is measured against.</summary>
-    private Code Anything() => _relative
-        ? SnakeSense.Encode((Turn)_fallback.Next(3))
-        : SnakeSense.Encode((SnakeAction)_fallback.Next(4));
+    private Code Anything() => SnakeSense.Encode((Turn)_fallback.Next(3));
 
-    private void Perform(Code code)
-    {
-        if (_relative) _snake.Steer(SnakeSense.Turned(code)!.Value);
-        else _snake.Step(SnakeSense.Decode(code)!.Value);
-    }
+    private void Perform(Code code) => _snake.Steer(SnakeSense.Turned(code)!.Value);
 
     private void Failures()
     {

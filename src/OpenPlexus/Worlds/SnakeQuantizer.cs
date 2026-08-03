@@ -24,18 +24,6 @@ public sealed class SnakeQuantizer : IQuantizer<SnakeView>
     /// <summary>Vision. Two modalities never collide.</summary>
     public const byte Vision = 1;
 
-    private readonly bool _includeEmpty;
-
-    /// <param name="includeEmpty">
-    /// Whether an <see cref="Cell.Empty"/> cell emits a code at all.
-    /// <b>Required rather than defaulted, because it is an open question and
-    /// both answers are arms.</b> Emitting them makes empty space a
-    /// first-class observation and costs a code per cell; withholding them
-    /// makes "nothing there" mean nothing rather than something. Under onsets
-    /// the cost is small either way, since a cell that stays empty is silent.
-    /// </param>
-    public SnakeQuantizer(bool includeEmpty) => _includeEmpty = includeEmpty;
-
     /// <inheritdoc/>
     public byte Modality => Vision;
 
@@ -47,7 +35,10 @@ public sealed class SnakeQuantizer : IQuantizer<SnakeView>
         var codes = new List<Code>(view.Cells.Count);
         foreach (var cell in view.Cells)
         {
-            if (!_includeEmpty && cell.Content == Cell.Empty) continue;
+            // EMPTY CELLS EMIT NOTHING. An occasion is a clique, so the number
+            // of codes per frame sets how dense the graph is -- measured at
+            // 46,536 routes halted with them against 6 without.
+            if (cell.Content == Cell.Empty) continue;
             codes.Add(Encode(cell));
         }
 

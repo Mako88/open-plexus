@@ -203,6 +203,39 @@ handed out once and frozen, which C1 permits.
 
 ---
 
+## What was deleted, and why deleting it was the point
+
+**John's rule, 2026-08-02: a decided option kept around as a control sneaks back
+in and causes havoc later.** So the refuted arms are gone from the code rather
+than parked in it. Their measurements stay here; the code does not.
+
+| Deleted | Measured against it |
+|---|---|
+| `StepCost.Best` / `Local` / `Constant` | `Best` was factorial where inverse is polynomial — 5,000,003 messages against 1,111 on a 12-clique |
+| `Refuel` | Nothing is paid back under inverse cost, so it did nothing |
+| `Charge` | The price for `Constant`, which is gone |
+| `Weighing.Sender`, `IMarginals`, `LocalMarginals` | The C1 violation the receiver arm exists to remove. **`Node.Fire` now takes only the message** — there is no longer a way to hand a node another node's data |
+| The unrotated view and absolute actions | 6.5 mean steps against 51.3, and one move in four was instantly fatal |
+| `includeEmpty: true` | 46,536 routes halted against 6 |
+
+**The energy sweep, 100 seeds a cell** — `Chain:steps/fruit`:
+
+| energy | food | chain | random | repeat | longest | most fruit |
+|---|---|---|---|---|---|---|
+| 20 | 30 | 20/3 | 19/5 | 16/1 | chain | random |
+| 40 | 30 | 37/8 | 30/10 | 30/1 | chain | random |
+| 80 | 30 | 64/12 | 37/13 | 57/1 | chain | random |
+| 80 | 100 | 62/14 | 37/13 | 57/1 | **chain** | **chain** |
+| 200 | 30 | 96/17 | 38/13 | **139**/1 | repeat | chain |
+
+**Lowering the energy does kill the circling artefact** — repeat only wins
+survival at 200 energy, and at 80 or below the chain outlives it. **But it does
+not make eating and surviving the same thing**: random still takes more fruit
+per step alive at most settings. Only `energy 80, food 100` has the chain
+winning both, and by one fruit.
+
+---
+
 ## Open forks
 
 Recorded here so a decision does not go quiet.

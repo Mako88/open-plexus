@@ -19,8 +19,7 @@ public sealed class DepartureTests : IDisposable
 
     private static readonly WalkSettings Dials = new()
     {
-        Stamina = 10.0, Cost = StepCost.Inverse, Refuel = Refuel.Strength,
-        Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 6,
+        Stamina = 10.0,         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 6,
     };
 
     private readonly HybridBus _bus = new();
@@ -148,10 +147,9 @@ public sealed class DepartureTests : IDisposable
 
         var ring = new Ring(seed: 7, replicas: 64);
         var local = new LocalClusters(ring);
-        var marginals = new LocalMarginals(local);
         var address = new ClusterAddress("solo");
         ring.Join(address);
-        var cluster = new Cluster(address, _bus, ring, Dials, marginals);
+        var cluster = new Cluster(address, _bus, ring, Dials);
         local.Include(cluster);
         using var __ = _bus.Subscribe(cluster);
 
@@ -206,7 +204,6 @@ public sealed class DepartureTests : IDisposable
 
         var ring = new Ring(seed: 7, replicas: 256);
         var local = new LocalClusters(ring);
-        var marginals = new LocalMarginals(local);
         var homes = new List<Cluster>();
         var handles = new List<IDisposable>();
 
@@ -214,7 +211,7 @@ public sealed class DepartureTests : IDisposable
         {
             var address = new ClusterAddress(name);
             ring.Join(address);
-            var cluster = new Cluster(address, _bus, ring, Dials, marginals);
+            var cluster = new Cluster(address, _bus, ring, Dials);
             local.Include(cluster);
             homes.Add(cluster);
             handles.Add(_bus.Subscribe(cluster));

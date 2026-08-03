@@ -17,8 +17,6 @@ public sealed class LocalRendezvousTests
     private static readonly WalkSettings Dials = new()
     {
         Stamina = 10.0,
-        Cost = StepCost.Inverse,
-        Refuel = Refuel.Strength,
         Value = ArrivalValue.Strength,
         Accumulate = Accumulate.Sum,
             Horizon = 6,
@@ -40,7 +38,7 @@ public sealed class LocalRendezvousTests
         {
             var address = new ClusterAddress(name);
             _ring.Join(address);
-            _local.Include(new Cluster(address, _bus, _ring, Dials, new LocalMarginals(_local)));
+            _local.Include(new Cluster(address, _bus, _ring, Dials));
         }
     }
 

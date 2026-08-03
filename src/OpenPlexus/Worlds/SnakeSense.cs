@@ -43,14 +43,10 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
 
     private readonly SnakeQuantizer _vision;
 
-    public SnakeSense(bool includeEmpty) => _vision = new SnakeQuantizer(includeEmpty);
+    public SnakeSense() => _vision = new SnakeQuantizer();
 
     /// <summary>Where the turn codes start, clear of the four direction codes.</summary>
     private const ulong Turning = 16;
-
-    /// <summary>The four codes an absolute action can be.</summary>
-    public static IReadOnlyList<Code> Actions { get; } =
-        [.. Enum.GetValues<SnakeAction>().Select(Encode)];
 
     /// <summary>
     /// The three codes a turn can be. <b>Three, not four</b> — Back does not
@@ -59,17 +55,8 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
     public static IReadOnlyList<Code> Turns { get; } =
         [.. Enum.GetValues<Turn>().Select(Encode)];
 
-    /// <summary>The code for one action. A fixed transform, so every machine agrees.</summary>
-    public static Code Encode(SnakeAction action) => new(Proprioception, (ulong)action);
-
     /// <summary>The code for one turn. Kept clear of the direction codes.</summary>
     public static Code Encode(Turn turn) => new(Proprioception, Turning + (ulong)turn);
-
-    /// <summary>The action a code means, if it means one at all.</summary>
-    public static SnakeAction? Decode(Code code) =>
-        code.Modality == Proprioception && code.Value <= (ulong)SnakeAction.West
-            ? (SnakeAction)code.Value
-            : null;
 
     /// <summary>The turn a code means, if it means one at all.</summary>
     public static Turn? Turned(Code code) =>

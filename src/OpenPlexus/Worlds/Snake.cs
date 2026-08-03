@@ -30,10 +30,11 @@ public readonly record struct Seen(int Dx, int Dy, Cell Content);
 /// What the snake can see. <b>Head-centred and local.</b>
 /// </summary>
 /// <remarks>
-/// <b>Centred</b> so the same situation in two places is one observation, which
-/// is what makes anything recur at all. <b>Local</b> so the food is usually
-/// unseen, which is what gives <i>act to disambiguate</i> something to
-/// disambiguate.
+/// <b>Centred and rotated</b>, so the same situation is one observation whatever
+/// place and whatever orientation it happens in. Measured: runs last 51.3 steps
+/// against 6.5 unrotated, and new codes per step fall from 0.98 to 0.19.
+/// <b>Local</b> so the food is usually unseen, which is what gives <i>act to
+/// disambiguate</i> something to disambiguate.
 /// </remarks>
 public sealed record SnakeView
 {
@@ -58,25 +59,6 @@ public sealed record SnakeSettings
     /// and its disabled state.
     /// </summary>
     public int? Sight { get; init; }
-
-    /// <summary>
-    /// Whether the view rotates with the snake's heading.
-    /// </summary>
-    /// <remarks>
-    /// <b>Centring made the same situation in two PLACES one observation; this
-    /// extends that to two ORIENTATIONS.</b> A wall directly ahead is one code
-    /// whichever way the snake happens to be pointing, where an unrotated view
-    /// gives four. Both arms exist because the trade is real: rotation loses
-    /// absolute direction, so food-to-the-north and food-to-the-east become the
-    /// same observation.
-    /// </remarks>
-    /// <remarks>
-    /// <b>Defaults to true — measured, 200 seeds.</b> Runs last 51.3 steps
-    /// against 6.5 unrotated, because reversing into the neck stops being an
-    /// action that exists. New codes per step fall from 0.98 to 0.19, which is
-    /// the recurrence the rotation buys.
-    /// </remarks>
-    public bool Relative { get; init; } = true;
 
     public required double StartingEnergy { get; init; }
     public required double EnergyPerStep { get; init; }
@@ -251,7 +233,7 @@ public sealed class Snake
         void Look(int dx, int dy)
         {
             var content = At(head.X + dx, head.Y + dy);
-            var (ax, ay) = _settings.Relative ? Facing(dx, dy) : (dx, dy);
+            var (ax, ay) = Facing(dx, dy);
             cells.Add(new Seen(ax, ay, content));
         }
 

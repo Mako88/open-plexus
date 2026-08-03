@@ -1,0 +1,71 @@
+using OpenPlexus.Codes;
+using OpenPlexus.Graph;
+
+namespace OpenPlexus.Thinking;
+
+/// <summary>
+/// What the asker knows about its own question, and the machine does not.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>RANKING BELONGS TO THE QUESTION, NOT TO THE MACHINE — and this is where it
+/// moved to.</b> <see cref="Accumulate.Agreement"/> is right on a conjunction and
+/// harmful on an indexed question, so it could never be a default and sweeping it
+/// per world is the recurring fault. Fusing the two orders by position was tried
+/// instead and is refuted: two candidates whose orders invert tie exactly, for
+/// every damping constant, which is the case a fusion was wanted for. So the
+/// asker says.
+/// </para>
+/// <para>
+/// <b>It travels beside the grouping because the two are the same kind of
+/// thing.</b> Both are facts about what is being asked that only the asker can
+/// know — which origins are one attribute said several ways, and whether the
+/// origins are equals whose agreement means something. Neither is a property of
+/// the graph, and neither can be worked out from the codes.
+/// </para>
+/// <para>
+/// <b>Null is a question that says nothing</b>, which is every question asked
+/// before this existed: independent origins, ranked by strength. That is what
+/// keeps every measurement taken up to now still standing.
+/// </para>
+/// </remarks>
+public sealed record Question
+{
+    /// <summary>
+    /// How several routes reaching one endpoint combine.
+    /// </summary>
+    /// <remarks>
+    /// <b><see cref="Accumulate.Sum"/> unless the asker says otherwise</b>, and
+    /// that is the control every earlier number was taken under.
+    /// </remarks>
+    public Accumulate Ranking { get; init; } = Accumulate.Sum;
+
+    /// <summary>
+    /// Which origins are the same thing said several ways.
+    /// </summary>
+    /// <remarks>
+    /// <b>Null is every question whose origins really are independent.</b> A
+    /// question is broadcast from every code of the attribute it names, so without
+    /// this a shape reached from three redundant colour codes counts as three
+    /// witnesses — which is not what was asked, and destroyed a working result
+    /// when it was tried.
+    /// </remarks>
+    public IReadOnlyDictionary<Code, int>? Asking { get; init; }
+
+    /// <summary>A question that ranks by agreement between its origins.</summary>
+    /// <remarks>
+    /// <b>The conjunction: the thing meant is the one every origin reached.</b>
+    /// Modality is the grouping key, because it is what distinguishes one
+    /// attribute from another.
+    /// </remarks>
+    public static Question Conjoining(IEnumerable<Code> origins)
+    {
+        ArgumentNullException.ThrowIfNull(origins);
+
+        return new Question
+        {
+            Ranking = Accumulate.Agreement,
+            Asking = origins.ToDictionary(code => code, code => (int)code.Modality),
+        };
+    }
+}

@@ -29,10 +29,11 @@ public sealed class ComposedTests
     /// </summary>
     private static WalkSettings Dials =>
         Fixture.Dials(stamina: 8.0)
-            with { Pricing = Pricing.Sender, Accumulate = Accumulate.Agreement };
+            with { Pricing = Pricing.Sender };
 
     /// <summary>The ranking this world was measured under before agreement.</summary>
-    private static WalkSettings Sum => Dials with { Accumulate = Accumulate.Sum };
+    /// <summary>The ranking this world was measured under before agreement.</summary>
+    private const Accumulate Summed = Accumulate.Sum;
 
     private const int Scenes = 400;
 
@@ -198,13 +199,16 @@ public sealed class ComposedTests
     }
 
     private static async Task<(Measured Accuracy, double Reference)> MeasureAsync(
-        Refer refer, WalkSettings? dials = null, ComposedSettings? world = null)
+        Refer refer,
+        WalkSettings? dials = null,
+        ComposedSettings? world = null,
+        Accumulate ranking = Accumulate.Agreement)
     {
         var reference = 0.0;
 
         var accuracy = await Sweep.ArmAsync($"{refer}", Repeats, async seed =>
         {
-            using var run = new ComposedRun(world ?? World(), dials ?? Dials, seed);
+            using var run = new ComposedRun(world ?? World(), dials ?? Dials, seed, ranking);
             var result = await run.RunAsync(Scenes, refer, every: 10).ConfigureAwait(false);
 
             reference += result.Reference / Repeats;
@@ -227,7 +231,7 @@ public sealed class ComposedTests
         // ranked first, at every run length tried, with the message count
         // BIT-IDENTICAL because nothing about the walk changes.
         var agreeing = await MeasureAsync(Refer.Narrowed);
-        var summed = await MeasureAsync(Refer.Narrowed, Sum);
+        var summed = await MeasureAsync(Refer.Narrowed, ranking: Summed);
 
         Assert.True(agreeing.Reference > summed.Reference * 1.4,
             $"pointed right {agreeing.Reference:F2} of the time against "
@@ -245,7 +249,7 @@ public sealed class ComposedTests
         // ranking change is doing something general and the conjunction claim is
         // not attributable.
         var agreeing = await MeasureAsync(Refer.Single);
-        var summed = await MeasureAsync(Refer.Single, Sum);
+        var summed = await MeasureAsync(Refer.Single, ranking: Summed);
 
         Assert.Equal(summed.Accuracy.Mean, agreeing.Accuracy.Mean, precision: 10);
     }

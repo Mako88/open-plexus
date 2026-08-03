@@ -150,24 +150,22 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// a caller passes one when the question wants a different depth from
     /// acting — see fork 20.
     /// </param>
-    /// <param name="asking">
-    /// Which origins are the same thing said several ways — <b>the question's
-    /// own grouping</b>, and the counterpart of <see cref="Occasion.Groups"/> on
-    /// the thinking path.
+    /// <param name="question">
+    /// What the asker knows about its own question — <b>how it wants ranking, and
+    /// which of its origins are one thing said several ways.</b> Null asks the way
+    /// everything asked before <see cref="Question"/> existed.
     /// </param>
     /// <param name="ct">Cancellation.</param>
     /// <remarks>
-    /// <b><paramref name="asking"/> matters only under
-    /// <see cref="Accumulate.Agreement"/></b>, where an endpoint is ranked by how
-    /// many distinct origins reached it. A question is broadcast from every code
-    /// of the attribute it names, so without the grouping three redundant codes
-    /// count as three independent witnesses — which is not what was asked and
-    /// destroyed a working result when it was tried.
+    /// <b>THE RANKING IS THE QUESTION'S AND NOT THE MACHINE'S</b>, because
+    /// <see cref="Accumulate.Agreement"/> is right on a conjunction and harmful on
+    /// an indexed one — see <see cref="Question"/> for why fusing them instead was
+    /// refuted.
     /// </remarks>
     public async Task<Thought> ThinkAsync(
         IReadOnlyCollection<Code> origins,
         double? stamina = null,
-        IReadOnlyDictionary<Code, int>? asking = null,
+        Question? question = null,
         CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(origins);
@@ -214,8 +212,9 @@ public sealed class InputMachine<TFrame> : IReceiveReports
                 // What it does know is how many clusters it asked, and every one
                 // of them replies.
                 opened = new Thought(
-                    broadcast, Math.Max(reached.Count, 1), _settings.Accumulate,
-                    [.. origins], asking);
+                    broadcast, Math.Max(reached.Count, 1),
+                    question?.Ranking ?? Accumulate.Sum,
+                    [.. origins], question?.Asking);
 
                 foreach (var cluster in reached) opened.SentInto(cluster, 1);
 

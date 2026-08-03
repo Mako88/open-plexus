@@ -299,7 +299,11 @@ public sealed class BindingRun : IDisposable
         if (scene.Tags.Count > which) asking[scene.Tags[which]] = 1;
 
         var thought = await _eyes
-            .ThinkAsync(origins, _dials.Stamina, asking, ct)
+            // THE GROUPING TRAVELS AND THE RANKING DOES NOT ASK FOR AGREEMENT.
+            // This world points with an index and supplies a colour for context,
+            // so its origins are not equals — counting how many of them agree is
+            // the wrong question here, and measured harmful.
+            .ThinkAsync(origins, _dials.Stamina, new Question { Asking = asking }, ct)
             .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);

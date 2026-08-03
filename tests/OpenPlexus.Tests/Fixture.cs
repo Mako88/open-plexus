@@ -42,7 +42,7 @@ public static class Fixture
     {
         Stamina = stamina,
         Foresight = foresight,
-        Accumulate = Accumulate.Sum,
+
         Horizon = horizon,
     };
 

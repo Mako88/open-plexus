@@ -49,12 +49,6 @@ public sealed class DialTests
     /// </summary>
     private static readonly Dictionary<string, string> HandSet = new(StringComparer.Ordinal)
     {
-        ["Accumulate"] =
-            "NOT A LEVEL TO FIND — a property of the QUESTION. A conjunction "
-            + "wants agreement between origins and an indexed question does not, "
-            + "and the asker knows which it is asking. It belongs on the question "
-            + "rather than on the machine, and that is the open work",
-
         ["Pricing"] =
             "a choice between two C1-legal weightings rather than a continuum. "
             + "Which end weighs an edge is not a quantity that can be hunted",
@@ -102,12 +96,10 @@ public sealed class DialTests
     /// </remarks>
     private static readonly Dictionary<string, bool> Ranking = new(StringComparer.Ordinal)
     {
-        ["Accumulate"] = true,
         ["Doubt"] = true,
     };
 
     [Theory]
-    [InlineData("Accumulate")]
     [InlineData("Doubt")]
     public async Task A_ranking_dial_does_not_touch_the_price(string dial)
     {
@@ -117,7 +109,6 @@ public sealed class DialTests
 
         var moved = dial switch
         {
-            "Accumulate" => plain with { Accumulate = Accumulate.Agreement },
             "Doubt" => plain with { Doubt = 8.0 },
             _ => throw new ArgumentOutOfRangeException(nameof(dial)),
         };
@@ -197,6 +188,6 @@ public sealed class DialTests
         // and failed the build until somebody said what it was. `Value` left
         // when `ArrivalValue.Lift` was deleted, because an enum with one member
         // is a dial that chooses nothing.
-        Assert.Equal(6, HandSet.Count);
+        Assert.Equal(5, HandSet.Count);
     }
 }

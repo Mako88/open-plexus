@@ -181,10 +181,47 @@ public sealed class BabiTests(ITestOutputHelper output)
     private const int Repeats = 5;
 
     private static async Task<double> ScoreAsync(
-        int task, WalkSettings dials, int seed, int span = 0)
+        int task,
+        WalkSettings dials,
+        int seed,
+        int span = 0,
+        Accumulate ranking = Accumulate.Sum)
     {
-        using var run = new BabiRun(World(task), dials, seed, span);
+        using var run = new BabiRun(World(task), dials, seed, span, ranking);
         return (await run.RunAsync(Sentences).ConfigureAwait(false)).Accuracy;
+    }
+
+    [Fact]
+    public async Task Sender_buys_at_a_low_budget_what_receiver_needs_a_high_one_for()
+    {
+        // THE CHECK THAT SHOULD HAVE COME FIRST, AND IT CHANGES WHAT THE SENDER
+        // RESULT MEANS. Two pricings compared at ONE stamina is a comparison of
+        // the stamina: on  the receiver arm looked beaten until it was
+        // given budget, and then it won both halves outright.
+        //
+        // Here receiver climbs with stamina toward sender rather than sitting
+        // below it, so the lift is a BUDGET effect and not a better ranking. What
+        // makes sender the right default anyway is the cost: a bAbI task uses a
+        // few dozen words, so the graph is close to complete and traffic goes
+        // roughly as fan-out to the power of depth. The budget that rescued
+        // receiver on CLEVR cannot be paid here at all -- a single run at stamina
+        // 64 did not finish in the time three whole sweeps took.
+        var climbing = new List<double>();
+
+        foreach (var stamina in new[] { 8.0, 16.0 })
+        {
+            using var probe = new BabiRun(
+                World(16), Fixture.Dials(stamina: stamina), seed: 1);
+
+            var seen = await probe.RunAsync(400);
+            climbing.Add(seen.Accuracy);
+
+            output.WriteLine($"stamina={stamina} receiver acc={seen.Accuracy:F4} msgs={seen.Messages}");
+        }
+
+        Assert.True(climbing[1] > climbing[0],
+            $"receiver did not climb with budget, so the sender lift is a better "
+            + $"ranking after all: {climbing[0]} to {climbing[1]}");
     }
 
     [Theory]
@@ -225,7 +262,7 @@ public sealed class BabiTests(ITestOutputHelper output)
         var arms = await Sweep.AcrossAsync(Repeats,
             ("receiver", seed => ScoreAsync(1, Dials, seed)),
             ("agreement", seed =>
-                ScoreAsync(1, Dials with { Accumulate = Accumulate.Agreement }, seed)),
+                ScoreAsync(1, Dials, seed, ranking: Accumulate.Agreement)),
             ("doubt", seed => ScoreAsync(1, Dials with { Doubt = 8.0 }, seed)),
             ("sender", seed => ScoreAsync(1, Dials with { Pricing = Pricing.Sender }, seed)));
 

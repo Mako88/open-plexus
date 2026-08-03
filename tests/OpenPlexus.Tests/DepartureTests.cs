@@ -19,7 +19,7 @@ public sealed class DepartureTests : IDisposable
 
     private static readonly WalkSettings Dials = new()
     {
-        Stamina = 10.0, Accumulate = Accumulate.Sum, Horizon = 6,
+        Stamina = 10.0, Horizon = 6,
     };
 
     private readonly HybridBus _bus = new();

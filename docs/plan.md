@@ -62,13 +62,13 @@ that a dial wanting different values in different worlds is the same fault**:
 prefer splitting it, or fusing the arms, over sweeping it. `DialTests` records
 which channel each dial may move and fails when one moves the other.
 
-**`Clevr` FOUND A SHARPER VERSION: ONE QUESTION WHOSE TWO HOPS WANT OPPOSITE
-VALUES.** An index is seen once and an attribute in most scenes, so `Receiver`
-makes attribute-to-index the cheapest hop and index-to-attribute the dearest, and
-`Sender` inverts that pair exactly. Reference is the first hop and the answer the
-second, and the two arms very nearly mirror each other. **No per-world default
-fixes that, because it is not per world** — the strongest argument yet for pricing
-belonging to the hop.
+**`Clevr` LOOKED LIKE A SHARPER VERSION AND WAS A BUDGET ARTIFACT.** The two hops
+appeared to want opposite pricing, mirrored almost exactly — until the receiver
+arm was given budget, at which point it won BOTH halves. So there is no per-hop
+conflict; there is a cost. Sender reaches a comparable answer for a fraction of
+the traffic, and on a near-clique graph the budget receiver needs cannot be paid
+at all. **The trap one axis over: two dials compared at one setting of a third
+are a comparison of the third.**
 
 ---
 
@@ -82,19 +82,12 @@ to an old one — run that one.**
 **Closed by `Accumulate.Agreement` and `Refer.Narrowed`, which document
 themselves.** What is left is the world's own ambiguity, not the walk's.
 
-### 1a. RANKING BELONGS TO THE QUESTION, NOT TO THE MACHINE — decide this
+### 1a. RANKING BELONGS TO THE QUESTION — moved, and the dial is gone
 
-**Agreement is not universally right.** Inert on senses, harmful on binding even
-after being told which origins are one attribute said several ways — a deep walk
-reaches the echo *through* the index, so both candidates end up agreed by both
-groups and a weakly-reached-by-both outranks a strongly-reached-by-one.
-
-**Those are different KINDS of question.** Composition asks a conjunction: the
-thing meant is the one every origin reaches. Binding points with an index and
-supplies a colour for context, where the origins are not equals. **The asker
-knows which it is asking and today cannot say.** So move ranking onto the
-question, beside the grouping that already travels with it. **Fusing the two
-orders instead was tried and is refuted below**, so this is what is left.
+**Agreement is right on a conjunction and harmful on an indexed question**, so it
+was never a level to find. It now travels on `Question`, beside the grouping that
+was already going there, and `WalkSettings` has one dial fewer. Fusing the two
+orders so nobody had to say was built first and is refuted below.
 
 - **Merging routes AT A NODE is the version `Narrowed` could not do.** Reading
   the index back costs a round trip and puts the referent in the machine's
@@ -234,6 +227,7 @@ condition is a superstition. The commit named in git holds the numbers.
 | Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | **REVIVED at one code.** Naming as many codes as the frame holds swamps the action entirely — fork 18's gap is flat at every sight radius. Naming ONE, it opens wide |
 | `Window` span | Null on snake and WORSE on `Babi`, at an order of magnitude more traffic — but **it is the whole task on `Rhythm`**, where at zero the graph forms no edges at all. So the arm is live and world-dependent, which is the recurring fault wearing a new hat | **Edge kinds** — a carried edge is ranked against a simultaneous one as if they meant the same, which is why it helps where everything is temporal and hurts where things overlap |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
+| `Pricing.Balanced` — `together / sqrt(seen·seen)`, cosine's denominator | **Times out.** The geometric mean sits BETWEEN the marginals, so weights rise and hops go cheaper than under either arm — the walk explodes rather than compromising. Built for a conflict that was a budget artifact anyway | A bound on the walk that does not rely on the weight being the reciprocal of one marginal — the same condition `StepCost.Best` needs |
 | `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift on the conjunction and ALL of its cost on binding. **Two candidates whose orders invert score identically under RRF for every damping constant**, so it ties exactly where it is needed and the tiebreak answers | A question with many candidates, or a fusion that separates by something other than position |
 
 ---

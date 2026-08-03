@@ -513,8 +513,6 @@ public sealed class Thought
     /// </remarks>
     private IEnumerable<Arrival> Ranked()
     {
-        if (_accumulate == Accumulate.Fused) return Fused();
-
         // AGREEMENT FIRST AND STRENGTH ONLY TO BREAK A TIE. Sorting on score with
         // agreement as the tiebreak would be the same ranking as `Sum`, because
         // an exact score tie almost never happens -- the order of the keys is the
@@ -532,41 +530,6 @@ public sealed class Thought
     private int Agreed(Arrival arrival) =>
         _agreeing.TryGetValue(arrival.Endpoint, out var by) ? by.Count : 0;
 
-    /// <summary>
-    /// The two orders combined by position — <see cref="Accumulate.Fused"/>.
-    /// </summary>
-    /// <remarks>
-    /// <b>Ranks are taken from the SAME tie-breaking as the arms themselves</b>,
-    /// so fusing two orders that each already break ties deterministically cannot
-    /// introduce an order nobody chose.
-    /// </remarks>
-    private IEnumerable<Arrival> Fused()
-    {
-        // THE CONVENTIONAL CONSTANT, AND IT IS DELIBERATELY NOT A DIAL. See
-        // Accumulate.Fused: a value tuned per world would be the very fault
-        // fusing is meant to remove.
-        const double Damping = 60.0;
-
-        var byStrength = _arrivals.Values
-            .OrderByDescending(a => a.Score)
-            .ThenBy(a => a.Chain.Length).ThenBy(a => a.Endpoint)
-            .Select((arrival, rank) => (arrival.Endpoint, rank))
-            .ToDictionary(one => one.Endpoint, one => one.rank);
-
-        var byAgreement = _arrivals.Values
-            .OrderByDescending(Agreed)
-            .ThenByDescending(a => a.Score)
-            .ThenBy(a => a.Chain.Length).ThenBy(a => a.Endpoint)
-            .Select((arrival, rank) => (arrival.Endpoint, rank))
-            .ToDictionary(one => one.Endpoint, one => one.rank);
-
-        return _arrivals.Values
-            .OrderByDescending(a =>
-                (1.0 / (Damping + byStrength[a.Endpoint]))
-                + (1.0 / (Damping + byAgreement[a.Endpoint])))
-            .ThenBy(a => a.Chain.Length)
-            .ThenBy(a => a.Endpoint);
-    }
 
     /// <summary>
     /// Whether the accounting adds up. Asserted, never assumed.

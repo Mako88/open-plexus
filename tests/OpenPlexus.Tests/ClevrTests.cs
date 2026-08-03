@@ -140,12 +140,59 @@ public sealed class ClevrTests(ITestOutputHelper output)
     {
         using var run = new ClevrRun(
             World(scenes),
-            Dials with { Pricing = pricing, Accumulate = Accumulate.Agreement },
+            Dials with { Pricing = pricing },
             seed: 1);
 
         var result = await run.RunAsync(refer);
         output.WriteLine($"pricing={pricing,-8} {result}");
         return result;
+    }
+
+    [Fact]
+    public async Task Weighing_from_both_ends_serves_both_hops()
+    {
+        // ALL THREE AT THE SAME, GENEROUS BUDGET — which is the comparison that
+        // should have been made first. At stamina 8 the receiver arm looked beaten
+        // on the answer and the two arms read as a per-hop conflict no default
+        // could fix. That was the budget: an index is seen once and an attribute
+        // in most scenes, so index-to-attribute is receiver pricing's dearest hop,
+        // and it simply could not be afforded. Given enough, it can.
+        var arms = new List<(double Reference, double Accuracy, long Messages)>();
+
+        foreach (var pricing in new[] { Pricing.Receiver, Pricing.Sender })
+        {
+            using var probe = new ClevrRun(
+                World(180), Fixture.Dials(stamina: 32.0) with { Pricing = pricing }, seed: 1);
+
+            var seen = await probe.RunAsync(Refer.Conjunction);
+            arms.Add((seen.Reference, seen.Accuracy, seen.Messages));
+
+            output.WriteLine(
+                $"{pricing,-8} ref={seen.Reference:F4} acc={seen.Accuracy:F4} "
+                + $"silent={seen.Silent} msgs={seen.Messages}");
+        }
+
+        var receiver = arms[0];
+        var sender = arms[1];
+
+        // THE CORRECTION, HELD AS A TEST. Receiver takes both halves once it can
+        // pay, so there is no conflict to split a dial over -- and a regression
+        // that reintroduced the apparent conflict would land here.
+        Assert.True(receiver.Reference > sender.Reference,
+            $"receiver did not win the reference at budget: "
+            + $"{receiver.Reference} against {sender.Reference}");
+
+        Assert.True(receiver.Accuracy > sender.Accuracy * 0.8,
+            $"receiver did not come near sender on the answer at budget: "
+            + $"{receiver.Accuracy} against {sender.Accuracy}");
+
+        // AND SENDER IS NOT THE CHEAP ARM EITHER, which was the other half of the
+        // story and also wrong. At a matched budget it costs several times more:
+        // what it actually does is reach a good ANSWER at a low budget, where
+        // receiver needs a high one and pays for the reference as well.
+        Assert.True(sender.Messages > receiver.Messages,
+            $"sender was cheaper at a matched budget after all: "
+            + $"{sender.Messages} against {receiver.Messages}");
     }
 
     [Fact]

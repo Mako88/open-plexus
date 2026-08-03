@@ -134,6 +134,9 @@ public sealed class BabiRun : IDisposable
     private readonly Babi _world;
     private readonly WalkSettings _dials;
 
+    /// <summary>How this world's question wants its candidates ranked.</summary>
+    private readonly Accumulate _ranking;
+
     /// <summary>
     /// The answers seen so far, which is what the narrowing may choose from.
     /// </summary>
@@ -170,6 +173,7 @@ public sealed class BabiRun : IDisposable
         WalkSettings dials,
         int seed,
         int span = 0,
+        Accumulate ranking = Accumulate.Sum,
         int clusters = 8,
         int replicas = 256)
     {
@@ -179,6 +183,7 @@ public sealed class BabiRun : IDisposable
         _world = new Babi(world);
         _dials = dials;
         _span = span;
+        _ranking = ranking;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _reader = new InputMachine<Sentence>(
@@ -368,7 +373,8 @@ public sealed class BabiRun : IDisposable
         ImmutableArray<Code> origins, IReadOnlyCollection<Code> candidates, CancellationToken ct)
     {
         var thought = await _reader
-            .ThinkAsync(origins, _dials.Stamina, null, ct).ConfigureAwait(false);
+            .ThinkAsync(origins, _dials.Stamina, new Question { Ranking = _ranking }, ct)
+            .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 

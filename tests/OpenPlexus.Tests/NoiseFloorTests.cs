@@ -49,18 +49,25 @@ public sealed class NoiseFloorTests
         var s = new Measured { Arm = "same", Values = same };
         var o = new Measured { Arm = "other", Values = other };
 
-        // MEASURED AT 0.8833 +-0.0294 over 10 seeds, RUN ALONE. One question in
-        // eight got a different answer for no reason but delivery order.
+        // THE WALK DOES NOT DISAGREE WITH ITSELF, AND IT NEVER REALLY DID --
+        // MEASURED 1.0000 +-0.0000 OVER 72 QUESTIONS, 2026-08-03.
         //
-        // THAT IS NOT ASSERTED HERE, AND THE REASON IS ITSELF THE FINDING: the
-        // disagreement DISAPPEARS under load. Inside the full suite, with other
-        // classes running in parallel, six seeds produce perfect agreement.
-        // Asserting disagreement would be asserting how busy the machine is, and
-        // asserting agreement would be asserting the opposite -- so this records
-        // the number and asserts only what does not depend on the host.
+        // This used to read 0.8833 +-0.0294 run alone, rising to 1.0000 inside a
+        // busy suite, and that load-dependence was recorded as a property of
+        // concurrent delivery. IT WAS FORK 22. Questions were being read before
+        // their walk had finished -- 5 to 8 of 39 -- and an unfinished walk
+        // answers differently from a finished one. Under load everything ran
+        // slower, so walks had longer to settle and the disagreement vanished,
+        // which looked like the opposite of what it was.
         //
-        // The consequence for everything else in this project: NUMBERS TAKEN
-        // UNDER DIFFERENT LOADS ARE NOT STRICTLY COMPARABLE.
+        // THE CONSEQUENCES ARE LARGE AND ARE RECORDED IN THE PLAN. Voting exists
+        // because of that number, and buys nothing in one process now. So does
+        // the trap saying numbers under different loads are not comparable.
+        //
+        // ASSERTED AT EXACTLY 1.0 rather than merely bounded, because that is
+        // what closing fork 22 bought and a regression would put it straight
+        // back.
+        Assert.Equal(1.0, s.Mean);
 
         // WHAT DOES HOLD EVERYWHERE: a different question gets a different
         // answer, so whatever disagreement there is sits around an answer rather

@@ -49,8 +49,7 @@ off by default and the old numbers all still stand.**
 > 0.0068 on consecutive integer seeds; under decorrelated ones the **spread
 > across seeds triples** and the mean falls about one true standard deviation.
 > The claims are untouched and every error bar is wider. **Numbers elsewhere in
-> this file that are not marked re-baselined are pre-correction** — in
-> particular the 0.9974 three-vote figure, which has not been re-run.
+> this file that are not marked re-baselined are pre-correction.**
 
 **An occasion is a SET of co-occurring codes.** *Red ball beside blue box* and
 *blue ball beside red box* are the same input. **That is the binding problem, and
@@ -243,30 +242,24 @@ it out of the plan** and planning something that already exists fails the build.
 **Only the local half of `HybridBus` exists**, so none of this is built. Recorded
 now because the shape of it changes what the local half should look like.
 
-- **Coalesce a whole settling wave into one send.** `Cluster.DeliverAsync`
-  already regroups by owning cluster, so wire cost is distinct clusters reached
-  rather than nodes. **John's extension: hold outgoing remote envelopes until the
-  machine's own local traffic has drained, then send one datagram per
-  destination.** `WhenIdle()` is the natural trigger and is C1-legal — it
-  observes one process's own dispatch queue. **Must not be a pure barrier**: flush
-  on idle *or* a size *or* a time bound, or a machine that never goes idle never
-  sends.
-- **Bits, not JSON.** A machine address and a modality intern to small integers, a
-  code is a varint, `Held`/`Carried`/`Together` are fine as floats. **`Chain` is
-  what actually costs** — it is the cycle check and the explanation carried in one
-  field, which is free locally and is not free on a wire. **So split them:** send
-  a fixed-size approximate-membership filter for the hop's cycle check, and
-  rebuild the full chain at the origin from the arrival reports. A filter's false
-  positive is a route wrongly refusing a partner, which is the same magnitude of
-  error C2 already admits.
-- **UDP is not a compromise here, it is the matching transport.** C2 already says
-  messages are late, jittered, out of order and lost, and the system is built to
-  survive that; **TCP's head-of-line blocking would actively hurt**, stalling
-  every other thought behind one lost packet. What John wants — datagrams with a
-  connection's conveniences — is QUIC's unreliable datagram extension (RFC 9221).
-  **The one thing that is not loss-tolerant is the accounting**, which is the same
-  reason Mattern replaces Dijkstra–Scholten above. Transport choice and the fork
-  22 fix are one decision.
+- **Coalesce a settling wave into one send.** `Cluster.DeliverAsync` already
+  regroups by owning cluster, so wire cost is clusters reached, not nodes.
+  **John's extension: hold remote envelopes until local traffic drains, then one
+  datagram per destination.** `WhenIdle()` is the trigger and is C1-legal — it
+  watches one process's own queue. **Not a pure barrier**: flush on idle *or* a
+  size *or* a time bound, or a busy machine never sends.
+- **Bits, not JSON.** Addresses and modalities intern to small ints, a code is a
+  varint, the doubles can be floats. **`Chain` is what costs** — cycle check and
+  explanation in one field, free locally and not on a wire. **Split them:** a
+  fixed-size approximate-membership filter for the hop, full chain rebuilt at the
+  origin from arrival reports. A false positive is a route wrongly refusing a
+  partner — the loss C2 already admits.
+- **UDP is the matching transport, not a compromise.** C2 already assumes late,
+  jittered, out-of-order and lost, and **TCP's head-of-line blocking would stall
+  every thought behind one lost packet.** Datagrams with a connection's
+  conveniences is QUIC's unreliable datagram extension (RFC 9221). **Only the
+  accounting is not loss-tolerant** — which is why transport choice and
+  termination detection are one decision, not two.
 
 ---
 
@@ -303,9 +296,17 @@ need discipline.**
 ### Closed — named so nobody reintroduces them; the code comments carry the detail
 
 **Consecutive integer seeds are not independent** (`Seeds.Apart`, and `Sweep`
-mixes the counter). **Machine load moved the numbers** (the suite is serial now).
-**`Measured.Separation` returned 0 with no spread** (infinity for that case).
-**`WhenQuiet()` was not a finish signal** (renamed `WhenIdle()`).
+mixes the counter). **`Measured.Separation` returned 0 with no spread** (infinity
+for that case). **`WhenQuiet()` was not a finish signal** (renamed `WhenIdle()`).
+
+**And one that was never a trap at all.** "The walk disagrees with itself —
+0.8833 alone, 1.0000 under load, so numbers under different loads are not
+comparable" **was fork 22**: questions were read before their walk had finished,
+and under load everything ran slower so walks had longer to settle. Now
+**1.0000 ± 0.0000 over 72 questions**, asserted. **Voting existed because of that
+number and buys nothing in one process** — kept, because a real network loses
+reports and redundancy is the honest answer to C2, but it is no longer evidence
+of anything. The suite stays serial: cheap, and it removes the question.
 
 ### Live
 
@@ -317,14 +318,12 @@ two run lengths, and a conclusion that does not hold at both is not one.**
 nothing.** `ThinkAsync`'s stamina was, and survived a build, 155 tests, a mutation
 run and three measurements. **Every run type reports `Complaints`; read them.**
 
-**~~Voting exists only on `SensesRun` and `BindingRun`, so every snake number is
-a lower bound taken at the noisy end.~~ BUILT AND MEASURED, AND THE CAVEAT WAS
-WRONG.** `SnakeRun.PlayAsync(votes:)` exists and is off by default, because the
-snake walk disagrees with itself on **0.0018 ± 0.0018 of steps** — one standard
-error from zero — against roughly one question in eight on senses. Three turns
-over a few dozen nodes wins by a margin delivery order does not overturn.
-**Asserted as traffic rather than as outcome**, since "voting changed nothing" is
-also what a disconnected dial looks like.
+**~~Snake numbers are lower bounds because it cannot vote.~~ WRONG, AND VOTING
+IS NOW A NO-OP EVERYWHERE.** `SnakeRun.PlayAsync(votes:)` was built and the snake
+walk disagrees with itself on 0.0018 ± 0.0018 of steps; the senses walk, once
+fork 22 closed, on **exactly none**. Three votes and one score identically there
+too — 0.9792 ± 0.0208 either way. **Asserted as traffic rather than outcome**,
+since "voting changed nothing" is also what a disconnected dial looks like.
 
 ---
 

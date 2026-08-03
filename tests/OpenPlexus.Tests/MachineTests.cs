@@ -234,6 +234,72 @@ public sealed class MachineTests : IDisposable
         }
     }
 
+    [Fact]
+    public async Task A_budget_handed_to_a_thought_reaches_the_messages()
+    {
+        // THE WIRING TEST THIS PARAMETER SHOULD HAVE HAD FROM THE START. It was
+        // added, passed at the call site, and silently dropped at the
+        // destination -- so a sweep of it measured a disconnected dial and
+        // reported it inert. Nothing else in the system could have noticed.
+        var seen = new Watching();
+        using var _ = _bus.Subscribe(seen);
+
+        var machine = new InputMachine<Code[]>(
+            new MachineAddress("probe"), new Passthrough(), new Nothing(), _bus, _ring, Dials);
+        using var __ = _bus.Subscribe(machine);
+
+        await machine.ThinkAsync([C(700)], 3.5);
+        await _bus.WhenQuiet().WaitAsync(Patience);
+
+        Assert.Equal(3.5, seen.Held.Single(), precision: 10);
+    }
+
+    [Fact]
+    public async Task Handing_no_budget_takes_the_dial_it_was_built_with()
+    {
+        // The companion. Without it the test above passes for a machine that
+        // ignores its own settings instead.
+        var seen = new Watching();
+        using var _ = _bus.Subscribe(seen);
+
+        var machine = new InputMachine<Code[]>(
+            new MachineAddress("probe2"), new Passthrough(), new Nothing(), _bus, _ring, Dials);
+        using var __ = _bus.Subscribe(machine);
+
+        await machine.ThinkAsync([C(701)], null);
+        await _bus.WhenQuiet().WaitAsync(Patience);
+
+        Assert.Equal(Dials.Stamina, seen.Held.Single(), precision: 10);
+    }
+
+    /// <summary>Catches what a broadcast actually put on the bus.</summary>
+    private sealed class Watching : IReceiveEnvelopes
+    {
+        private readonly List<double> _held = [];
+
+        public ClusterAddress Address { get; } = new("watcher");
+
+        public IReadOnlyList<double> Held
+        {
+            get { lock (_held) return [.. _held]; }
+        }
+
+        public Task DeliverAsync(Envelope envelope, CancellationToken ct = default)
+        {
+            lock (_held)
+                foreach (var message in envelope.Messages)
+                    if (!_held.Contains(message.Held)) _held.Add(message.Held);
+
+            return Task.CompletedTask;
+        }
+    }
+
+    private sealed class Nothing : IRendezvous
+    {
+        public ValueTask JoinAsync(Occasion occasion, CancellationToken ct = default) =>
+            ValueTask.CompletedTask;
+    }
+
     // ---- the output path --------------------------------------------------
 
     [Fact]

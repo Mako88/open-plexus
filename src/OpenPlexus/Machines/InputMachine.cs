@@ -135,7 +135,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
             Broadcast = broadcast,
             ReturnTo = _address,
             To = code,
-            Held = _settings.Stamina,
+            Held = stamina ?? _settings.Stamina,
 
             // A chain ends with the node the message is addressed to, so an
             // origin's chain is just itself.

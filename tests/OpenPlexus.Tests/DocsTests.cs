@@ -123,6 +123,75 @@ public sealed class DocsTests
     }
 
     [Fact]
+    public void A_ticked_box_means_the_type_exists_and_an_unticked_one_means_it_does_not()
+    {
+        // JOHN'S ASK, 2026-08-03: KEEP THE PLAN AND THE CODE IN SYNC, IN BOTH
+        // DIRECTIONS. Building something forces it out of the plan, because the
+        // box stays wrong until someone ticks it; and planning to build
+        // something that already exists fails immediately rather than sitting
+        // there looking like work.
+        var known = typeof(Codes.Code).Assembly
+            .GetExportedTypes()
+            .Where(type => !type.IsNested)
+            .Select(type => type.Name.Contains('`', StringComparison.Ordinal)
+                ? type.Name[..type.Name.IndexOf('`', StringComparison.Ordinal)]
+                : type.Name)
+            .ToHashSet(StringComparer.Ordinal);
+
+        var boxes = Regex.Matches(
+            File.ReadAllText(Path.Combine(Docs(), "plan.md")),
+            @"^- \[( |x)\] `([A-Za-z]+)`",
+            RegexOptions.Multiline);
+
+        Assert.NotEmpty(boxes);
+
+        var wrong = boxes
+            .Select(box => (Ticked: box.Groups[1].Value == "x", Type: box.Groups[2].Value))
+            .Where(entry => entry.Ticked != known.Contains(entry.Type))
+            .Select(entry => entry.Ticked
+                ? $"{entry.Type} is ticked and does not exist"
+                : $"{entry.Type} exists and is not ticked")
+            .ToList();
+
+        Assert.True(wrong.Count == 0, string.Join("; ", wrong));
+    }
+
+    [Fact]
+    public void Every_refuted_row_says_what_would_revive_it()
+    {
+        // A REFUTATION IS CONDITIONAL ON ITS CONFIGURATION, and this project has
+        // already had to revive two arms whose reason for being dead had quietly
+        // expired -- the empty-cell workaround and the temporal window. A row
+        // without a revival condition is a superstition rather than a finding,
+        // so the shape is enforced rather than encouraged.
+        var lines = File.ReadAllLines(Path.Combine(Docs(), "plan.md"));
+
+        var start = Array.FindIndex(lines, line =>
+            line.StartsWith("## DO NOT RE-TRY", StringComparison.Ordinal));
+
+        Assert.True(start >= 0, "the refuted section is gone");
+
+        var rows = lines
+            .Skip(start)
+            .TakeWhile(line => !line.StartsWith("## ", StringComparison.Ordinal) || line == lines[start])
+            .Where(line => line.StartsWith("| ", StringComparison.Ordinal))
+            .Where(line => !line.Contains("---", StringComparison.Ordinal))
+            .Skip(1)
+            .ToList();
+
+        Assert.NotEmpty(rows);
+
+        var malformed = rows
+            .Where(row => row.Split('|', StringSplitOptions.TrimEntries)
+                .Where(cell => cell.Length > 0).Count() != 3)
+            .ToList();
+
+        Assert.True(malformed.Count == 0,
+            "a refuted row must be `what | what refuted it | what would revive it`, " +
+            $"all on one line: {string.Join(" // ", malformed)}");
+    }
+
+    [Fact]
     public void The_library_is_built_with_the_doc_contract_switched_on()
     {
         // THE CHECK THAT PROTECTS THE OTHER CHECK. Everything above assumes the

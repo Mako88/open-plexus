@@ -146,13 +146,23 @@ alphabet, and a reason to act, no amount of scaling this gets there.
 
 ---
 
+## TO BUILD — a ticked box means the type exists, and a test checks
+
+**This is the sync mechanism.** An entry naming a type must be unticked while
+that type does not exist and ticked once it does, so **building something forces
+it out of the plan** and planning something that already exists fails the build.
+
+- [x] `Binding` — the world that measures the ceiling
+- [x] `Seeds` — decorrelated seeding for every sweep
+- [ ] `Tag` — the ephemeral per-object code of step 1a
+- [ ] `Surprise` — the local prediction error of step 2
+- [ ] `Chunk` — the minted node of step 3
+- [ ] `Drives` — the bounded internal variables of step 4
+
+---
+
 ## LATER — worth doing, nothing is blocked on them
 
-- **Fix termination detection properly.** Fork 22 below is a *distributed*
-  problem, and Dijkstra–Scholten (what is built) is correct only under delivery
-  assumptions C2 says we do not have. **Mattern's four-counter method** and
-  **Safra's algorithm** are the standard robust replacements; the four-counter
-  one specifically tolerates in-transit and out-of-order messages.
 - **Fork 1 is smaller than it looks.** A co-occurrence count that only increments
   is a **G-Counter, which is a CRDT** — it converges under arbitrary reordering,
   duplication and delay with no coordination. So the counts need no protocol;
@@ -200,29 +210,28 @@ now because the shape of it changes what the local half should look like.
 
 ---
 
-## DO NOT RE-TRY — refuted, with the number that refuted it
+## DO NOT RE-TRY
 
-| | |
-|---|---|
-| `StepCost.Best` / `Local` / `Constant` | Factorial where inverse cost is polynomial — **5,000,003 messages against 1,111** on a 12-clique. Only a form strictly positive at weight 1.0 terminates; `1/weight` is it |
-| `Refuel` | Nothing is paid back under inverse cost, so it did nothing |
-| Sender-weighing, `IMarginals` | The C1 violation receiver-weighing removes. Behaviour indistinguishable (88.87 steps against 95.12, se ≈ 5.5) at **26.7 messages a step against 17.0** |
-| Absolute actions, unrotated view | **6.5 mean steps against 51.3**, and one move in four was instantly fatal |
-| Survival as the score | Repeating one turn is a circle held forever: **133.71 steps against the chain's 92.85, and 2 fruit against 40.** The arm that survives longest achieves least |
-| A beam over partners | A constant nobody set, doing the cutting. Refused on `master` and still refused |
-| Clusters grouped by modality | Puts a picture and a sound on different machines by construction — the one link this design exists to make |
-| Clusters grouped by time of creation | Two machines seeing the same thing at different times compute different owners, and placement-without-a-coordinator is gone |
-| `Adaptive` reflection scaled by `Hunger` | **Inverted** (0.3802 at stamina 4, 0.4887 at 8). Inverse cost exists to exhaust the budget, so starvation is how nearly every route ends at every scale |
-| A deeper walk for prediction | Monotonic and about 5.5× end to end: novelty gap **0.0817 at budget 2 against 0.0147 at 8.** Direct association *is* the predictive signal |
-| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, both inert, and both explanations for why were refuted too |
-| Naming fewer codes in a prediction | Half true. The ranking carries **coarse** information and no fine ranking — an earlier "carries none at all" was retracted |
+**Three columns, one line each, and a test enforces the shape.** The third is the
+one that matters: a refutation is conditional on its configuration, so a row
+without a revival condition is a superstition rather than a finding.
 
-**Two that are conditional rather than dead.** `Window` at span 0 is a null *on
-snake*, where almost everything persists frame to frame — `master` measured the
-opposite on a senses graph. `includeEmpty: false` was worth four orders of
-magnitude under `Best` pricing; under inverse cost that reason is gone and at 60
-seeds there is **no clear winner** (included: acts far more, survives longer;
-withheld: predicts better, a tenth of the messages).
+| what | what refuted it | what would revive it |
+|---|---|---|
+| `StepCost.Best` / `Local` / `Constant` | Factorial where inverse is polynomial — 5,000,003 messages against 1,111 on a 12-clique | A bound that does not rely on strictly positive cost at weight 1.0 |
+| `Refuel` | Nothing is paid back under inverse cost, so it did nothing | Any mechanism that returns budget to a route |
+| Sender-weighing, `IMarginals` | The C1 violation receiver-weighing removes; behaviour indistinguishable at 26.7 messages a step against 17.0 | Never — C1 is not negotiable. But **sending the sender's OWN marginal is a different thing and is legal** |
+| Absolute actions, unrotated view | 6.5 mean steps against 51.3, and one move in four instantly fatal | A world where the body has no heading |
+| Survival as the score | Repeating one turn circles forever: 133.71 steps against 92.85, and 2 fruit against 40 | Homeostatic drives, where survival stops being gameable by standing still |
+| A beam over partners | A constant nobody set, doing the cutting | A beam width the system sets for itself and reports |
+| Clusters grouped by modality | Puts a picture and a sound on different machines — the one link this design exists to make | Never |
+| Clusters grouped by time of creation | Two machines seeing one thing at different times compute different owners; placement-without-a-coordinator is gone | Any scheme supplying placement agreement without a coordinator |
+| `Adaptive` reflection scaled by `Hunger` | Inverted — 0.3802 at stamina 4, 0.4887 at 8, because inverse cost exists to exhaust the budget | A signal that discriminates; `Thwarted` goes the right way but swings only 1.19× |
+| A deeper walk for prediction | Monotonic, 5.5× end to end: novelty gap 0.0817 at budget 2 against 0.0147 at 8 | **Edge kinds.** This is `master`'s refutation of untyped walking, reproduced |
+| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, both inert, and both explanations for why were refuted too | Lift in the **cost** rather than the ranking — untried, and it is the tag proposal above |
+| Naming fewer codes in a prediction | Half true: coarse ranking carries information, fine ranking does not | A ranking with a similarity gradient under it |
+| `Window` span on snake | Measured null at 150 seeds | **Already revived — never run on a senses graph, where `master` measured 0.153 against 0.000** |
+| `includeEmpty: true` | 46,536 routes halted against 6, under `Best` pricing | **Already revived — inverse cost removed the reason, and at 60 seeds there is no clear winner** |
 
 ---
 
@@ -257,11 +266,18 @@ every snake number is a lower bound taken at the noisy end.
 
 ## OPEN DEFECTS
 
-**Fork 22 — a few thoughts never settle.** Re-measured 2026-08-03 and **still
-live**: 5–8 of 39 questions on senses, 2–7 of 39 on binding. `Balanced()` passes
-throughout, so the books agree with themselves while claiming routes the bus has
-finished. **Every silent count in this project is an upper bound until this is
-closed.** See Mattern above.
+**Fork 22 is CLOSED, 2026-08-03, and it was a bug rather than a distributed
+problem.** `InputMachine` untracked a thought the instant its live count hit
+zero — and **a live count of zero is not durable**: reports arrive out of order,
+so it dips transiently whenever a downstream death is folded before the upstream
+split that created it. One thread saw the dip and untracked the thought while
+others were still folding, and every later report was dropped. Diagnosed by
+counting reports sent against reports folded: **every stuck thought had sent more
+than it folded.** Retirement now asks twice — settled last look, settled now,
+nothing folded in between, which is Mattern's shape at the scale of one machine.
+**0 unsettled of 39 on every seed in both worlds, where it was 5–8. Silent counts
+are no longer upper bounds**, and the suite got a minute faster because it had
+been waiting out hangs.
 
 **A mutation still survives.** Removing the action from `SnakeRun`'s prediction
 broadcast turns no test red. Three attempts to kill it failed and the failures
@@ -275,10 +291,12 @@ walk lands from itself.
 input machine; the harness hands the finished thought over by a direct call.
 Needed before a second machine exists.
 
-**Fork 12 — `Halted` is approximate**, and both orderings cost something. A
-cluster sends onward before reporting, so a downstream death can be reported
-before the upstream split that created it. Reporting first was measured and
-destabilised whole runs.
+**Fork 12 — `Halted` is approximate, and it may not be any more.** A cluster
+sends onward before reporting, so a downstream death can be reported before the
+upstream split that created it; reporting first was measured and destabilised
+whole runs. **That reordering is still there, but the loss it caused was the fork
+22 bug**, and late reports are now folded rather than dropped. **Needs
+re-measuring at a fixed seed before anyone believes either way.**
 
 ---
 
@@ -293,11 +311,11 @@ destabilised whole runs.
 | **3** | Cluster placement: uniform hash against prefix locality. Open |
 | **5** | ✅ A death writes off exactly the routes heading into the dead cluster |
 | **6** | ✅ Broadcast the origin, route the hops |
-| **12** | `Halted` is approximate. Open, above |
+| **12** | `Halted` is approximate — probably fixed as a side effect of 22, unmeasured. Above |
 | **18** | ✅ Score prediction of world state **conditional on the next action**. Built; `Consequence` reports the system does not yet model its own effect — gap 0.0165 ± 0.0086 intact against 0.0007 ± 0.0034 with the action wire cut, which is only 1.9 sigma and sits on a prediction that loses to a blind guess. **Blocked on temporal edges** |
 | **20** | ✅ Split budgets — deep to act, shallow to predict. Wins survival, mirroring and prediction at once |
 | **21** | ✅ Compression built. **A trade, not a win**: at a budget too small to compose it lifts accuracy 0.1827 → 0.7147; where the budget suffices it costs, 0.8462 → 0.7596. `Reflect = null` by default, and off is the control |
-| **22** | Thoughts that never settle. Open, above |
+| **22** | ✅ **CLOSED.** A transiently-zero live count untracked thoughts mid-flight, and every later report was dropped. `InputMachine.Retire` asks twice. 0 of 39 unsettled, from 5–8 |
 | **23** | Can compression regulate itself? Not on this signal. `Thwarted` goes the right way at 5.1 sigma but swings only 1.19× against an effect running 0.18 to 0.83 |
 | **24** | ✅ Budget controller built, converges from both directions — and **aims at a moving target**: at 300 moments stamina 8 ties 24, at 1200 moments 24 wins by 7 sigma. `Budget = null` by default |
 | **25** | ✅ The binding world. Built to fail, and failed as predicted. See "Where it stands" |

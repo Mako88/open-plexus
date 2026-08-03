@@ -301,12 +301,10 @@ public sealed class BindingTests
 
         var result = await run.RunAsync(400, every: 10);
 
-        // EVERY COMPLAINT EXCEPT THE ONE THAT IS OPEN -- fork 22, allowed by name
-        // rather than by weakening the check.
-        Assert.DoesNotContain(result.Complaints, one => !one.Contains("walk finished"));
-
-        Assert.True(result.Unsettled < result.Asked / 4,
-            $"{result.Unsettled} of {result.Asked} questions outran their own walk");
+        // EVERY COMPLAINT, WITH NOTHING EXEMPTED -- fork 22 is closed, so the
+        // exemption this used to carry is gone with it.
+        Assert.Empty(result.Complaints);
+        Assert.Equal(0, result.Unsettled);
 
         // The choice was actually forced: both candidates were in reach, so a
         // coin-flip score is a preference and not an accident of what was found.

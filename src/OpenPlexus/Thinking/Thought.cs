@@ -39,6 +39,13 @@ public sealed class Thought
     private double _thwarted, _ended;
 
     /// <summary>
+    /// Whole reports folded in. <b>Fork 22's diagnostic</b> — against the bus's
+    /// own count of reports sent, it says whether a thought that never settles is
+    /// missing a report or miscounting the ones it got.
+    /// </summary>
+    private int _reports;
+
+    /// <summary>
     /// How many of this thought's routes are in flight toward each cluster.
     /// </summary>
     /// <remarks>
@@ -172,6 +179,12 @@ public sealed class Thought
     public int Endpoints
     {
         get { lock (_gate) return _arrivals.Count; }
+    }
+
+    /// <inheritdoc cref="_reports"/>
+    public int Reports
+    {
+        get { lock (_gate) return _reports; }
     }
 
     /// <summary>
@@ -327,6 +340,8 @@ public sealed class Thought
         {
             if (!_released)
             {
+                _reports++;
+
                 // Routes that reached this cluster are no longer heading there.
                 Move(report.From, -report.Handled);
                 foreach (var routed in report.SentInto) Move(routed.To, routed.Count);

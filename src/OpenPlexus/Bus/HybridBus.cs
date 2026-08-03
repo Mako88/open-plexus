@@ -31,6 +31,7 @@ public sealed class HybridBus : IBus
     /// <summary>Deliveries dispatched and not yet finished.</summary>
     private int _inFlight;
     private long _messages;
+    private long _reports;
 
     private TaskCompletionSource _quiet = Settled();
 
@@ -61,6 +62,19 @@ public sealed class HybridBus : IBus
     public int InFlight
     {
         get { lock (_gate) return _inFlight; }
+    }
+
+    /// <summary>
+    /// Reports put on the return path, across every thought.
+    /// </summary>
+    /// <remarks>
+    /// <b>Counted separately from <see cref="Messages"/> so a report that never
+    /// arrives can be distinguished from one that was never sent.</b> Fork 22
+    /// turned on exactly that question, and nothing recorded either half of it.
+    /// </remarks>
+    public long Reports
+    {
+        get { lock (_gate) return _reports; }
     }
 
     /// <inheritdoc/>
@@ -145,6 +159,7 @@ public sealed class HybridBus : IBus
         {
             if (!_machines.TryGetValue(to, out receiver!)) throw Unreachable(to.Value);
             _inFlight++;
+            _reports++;
         }
 
         Dispatch(() => receiver.DeliverAsync(report, ct));

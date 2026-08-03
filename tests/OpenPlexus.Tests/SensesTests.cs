@@ -218,15 +218,18 @@ public sealed class SensesTests
 
         var result = await run.RunAsync(400, every: 10);
 
-        // EVERY COMPLAINT EXCEPT THE ONE THAT IS OPEN. Fork 22: a few thoughts
-        // never settle, and the report is what found it -- 7 of 39 questions on
-        // this run's first execution. It is allowed here by NAME rather than by
-        // weakening the check, so anything else appearing still fails.
-        Assert.DoesNotContain(result.Complaints, one => !one.Contains("walk finished"));
+        // EVERY COMPLAINT, WITH NOTHING EXEMPTED. This used to allow fork 22 by
+        // name -- 7 of 39 questions never settled -- and fork 22 is closed: a
+        // transiently-zero live count was untracking thoughts while reports were
+        // still in flight, and every report after that was dropped. See
+        // `InputMachine.Retire`.
+        Assert.Empty(result.Complaints);
 
-        // AND IT IS BOUNDED, so a regression that made it worse cannot pass.
-        Assert.True(result.Unsettled < result.Asked / 4,
-            $"{result.Unsettled} of {result.Asked} questions outran their own walk");
+        // ASSERTED AT ZERO RATHER THAN BOUNDED, which is what closing it means.
+        // While this was merely bounded, every silent count in the project was an
+        // upper bound, because "nothing reached" and "not finished yet" are
+        // indistinguishable in a score.
+        Assert.Equal(0, result.Unsettled);
 
         // The companion: the report is not empty of everything. A complaints
         // list that is empty because nothing was ever measured would pass the

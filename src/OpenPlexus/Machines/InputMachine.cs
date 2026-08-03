@@ -32,6 +32,12 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// <summary>Thoughts this machine started and has not released.</summary>
     private readonly ConcurrentDictionary<BroadcastId, Thought> _thoughts = [];
 
+    /// <summary>
+    /// How many reports each settled thought had folded when it was last looked
+    /// at. <b>The second wave of <see cref="Retire"/>.</b>
+    /// </summary>
+    private readonly ConcurrentDictionary<BroadcastId, int> _quiet = [];
+
     private int _deaths;
 
     /// <summary>A placeholder address; a broadcast is not addressed to anyone.</summary>
@@ -129,6 +135,8 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     {
         ArgumentNullException.ThrowIfNull(origins);
         ArgumentOutOfRangeException.ThrowIfZero(origins.Count);
+
+        Retire();
 
         var broadcast = BroadcastId.New();
 
@@ -247,32 +255,86 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// A cluster's arrivals and accounting came back.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>Arrivals are folded before the accounting</b>, because the accounting
     /// can settle the thought and a settled thought is released — an arrival
     /// applied after that would be dropped.
+    /// </para>
     /// <para>
-    /// A report for a broadcast this machine does not know is dropped. C2 says
-    /// late is normal, and a thought that has already settled has nothing left
-    /// to refine.
+    /// <b>NOTHING IS UNTRACKED HERE, AND THAT IS FORK 22'S FIX.</b> This used to
+    /// stop tracking a thought the moment <see cref="Thought.Settled"/> went
+    /// true. <b>A live count of zero is not a durable state</b> — reports arrive
+    /// out of order, so it dips to zero transiently whenever a downstream death
+    /// is folded before the upstream split that created it, which is fork 12
+    /// exactly. One thread would see that dip and untrack the thought while other
+    /// threads were still folding reports that pushed the count back up, and
+    /// every report after that was dropped at the lookup above. The thought could
+    /// then never settle.
+    /// </para>
+    /// <para>
+    /// <b>Measured: 7 of 60 questions stuck, every one of them with more reports
+    /// sent than folded</b>, and waiting twelve times longer did not move it. So
+    /// fork 12 and fork 22 were one bug seen from two sides. Retirement moved to
+    /// <see cref="Retire"/>, which asks twice.
     /// </para>
     /// </remarks>
     public Task DeliverAsync(Report report, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(report);
 
-        if (!_thoughts.TryGetValue(report.Accounting.Broadcast, out var thought))
-            return Task.CompletedTask;
-
-        thought.Receive(report);
-
-        // SETTLING IS NOT RELEASING, and getting that wrong wiped the answer
-        // before anything could read it. A settled thought is exactly the one
-        // whose arrivals are complete, so releasing it there would destroy the
-        // result at the moment it became final. This stops TRACKING it — the
-        // caller holds the object it was handed and reads it at its leisure.
-        if (thought.Settled) _thoughts.TryRemove(report.Accounting.Broadcast, out _);
+        if (_thoughts.TryGetValue(report.Accounting.Broadcast, out var thought))
+            thought.Receive(report);
 
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Stops tracking thoughts that have finished, <b>asking twice before
+    /// believing it</b>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Mattern's shape, at the scale of one machine.</b> A single look at a
+    /// termination condition can catch it mid-flicker; two consecutive looks with
+    /// <i>no report in between</i> cannot, because a report is the only thing that
+    /// can move the count. So a thought is retired when it was settled last time,
+    /// is settled now, and folded nothing in between.
+    /// </para>
+    /// <para>
+    /// <b>The residual window is named rather than claimed away:</b> a report can
+    /// land between the last read of <see cref="Thought.Reports"/> and the
+    /// removal. That retires a thought a moment early, which costs a late
+    /// arrival — the ordinary C2 loss the design already admits — where the bug
+    /// this replaces cost the whole thought, permanently.
+    /// </para>
+    /// <para>
+    /// Called when a new thought opens, so the cost is bounded by how many
+    /// thoughts one machine has in flight rather than by a timer.
+    /// </para>
+    /// </remarks>
+    private void Retire()
+    {
+        foreach (var (broadcast, thought) in _thoughts)
+        {
+            if (!thought.Settled)
+            {
+                _quiet.TryRemove(broadcast, out _);
+                continue;
+            }
+
+            var folded = thought.Reports;
+
+            // Settled when we last looked, and nothing has arrived since.
+            if (_quiet.TryGetValue(broadcast, out var before) && before == folded)
+            {
+                _thoughts.TryRemove(broadcast, out _);
+                _quiet.TryRemove(broadcast, out _);
+            }
+            else
+            {
+                _quiet[broadcast] = folded;
+            }
+        }
     }
 
     /// <summary>
@@ -285,6 +347,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// </remarks>
     public void Forget(BroadcastId broadcast)
     {
+        _quiet.TryRemove(broadcast, out _);
         if (_thoughts.TryRemove(broadcast, out var thought)) thought.Release();
     }
 

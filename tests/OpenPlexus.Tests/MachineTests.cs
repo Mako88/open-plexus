@@ -134,13 +134,28 @@ public sealed class MachineTests : IDisposable
     }
 
     [Fact]
-    public async Task A_settled_thought_is_released_rather_than_kept()
+    public async Task A_settled_thought_is_retired_but_not_the_instant_it_settles()
     {
         await Observe(0, C(1), C(2));
 
-        // Termination is housekeeping, and in one process with nothing lost
-        // every route really does return or die.
-        Assert.Equal(0, _machine.Pending);
+        // NOT ZERO, AND THAT IS FORK 22'S FIX RATHER THAN A REGRESSION. This
+        // used to untrack a thought the moment its live count hit zero, and a
+        // live count of zero is not durable: reports arrive out of order, so it
+        // dips transiently whenever a downstream death is folded before the
+        // upstream split that created it. A thought untracked in that dip lost
+        // every later report and could never settle -- 7 of 60 questions on the
+        // senses world.
+        Assert.Equal(1, _machine.Pending);
+
+        // Retirement asks TWICE instead, on the two following thoughts: settled
+        // last time, settled now, and nothing folded in between. A report is the
+        // only thing that can move the count, so two clean looks cannot both
+        // land inside a flicker.
+        await Observe(1, C(3), C(4));
+        await Observe(2, C(5), C(6));
+
+        // So the machine runs a couple of thoughts behind rather than growing.
+        Assert.True(_machine.Pending <= 2, $"{_machine.Pending} thoughts still tracked");
     }
 
     [Fact]

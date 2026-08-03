@@ -69,6 +69,13 @@ public sealed class LocalRendezvous : IRendezvous
             {
                 if (other == onset) continue;
 
+                // STEP 1A: TWO THINGS IN ONE MOMENT ARE NOT ONE OCCASION. Where
+                // the front end could say which codes belong to which object,
+                // pairing across objects is refused -- otherwise a colour joins
+                // both shapes present and the binding is destroyed at the front
+                // door, which is what fork 25 measured.
+                if (!Bound(occasion.Groups, onset, other)) continue;
+
                 // Two onsets in one frame are one coincidence, not two. Without
                 // this they would each pair with the other and the count would
                 // double.
@@ -106,6 +113,26 @@ public sealed class LocalRendezvous : IRendezvous
         // unrelated onset would inflate exactly the stable background the
         // weighting has to refuse.
         return ValueTask.CompletedTask;
+    }
+
+    /// <summary>
+    /// Whether two codes are allowed to pair, given what the front end could say
+    /// about which thing each belongs to.
+    /// </summary>
+    /// <remarks>
+    /// <b>Ungrouped pairs with everything</b>, and that is what keeps this
+    /// additive rather than a rewrite: a front end that can segment some of what
+    /// it sees is not forced to lie about the rest, and a front end that can
+    /// segment none of it behaves exactly as before.
+    /// </remarks>
+    private static bool Bound(IReadOnlyDictionary<Code, int>? groups, Code one, Code other)
+    {
+        if (groups is null) return true;
+
+        // Either being unassigned means nothing is being claimed about them.
+        return !groups.TryGetValue(one, out var mine)
+            || !groups.TryGetValue(other, out var theirs)
+            || mine == theirs;
     }
 
     private static (Code, Code) Unordered(Code one, Code other) =>

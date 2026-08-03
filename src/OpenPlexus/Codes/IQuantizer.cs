@@ -27,4 +27,17 @@ public interface IQuantizer<in TObservation>
     /// The codes present in this observation. Several, not one.
     /// </summary>
     IReadOnlyCollection<Code> Codify(TObservation observation);
+
+    /// <summary>
+    /// Which of those codes belong to which thing, when this front end can say.
+    /// <b>Null by default, which is every front end that cannot.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>Segmentation is a front-end job, not a graph job</b> — see
+    /// <see cref="Learning.Occasion.Groups"/>. A retina hands the cortex an
+    /// already-grouped signal; nothing downstream has to work out which edges
+    /// belonged to which object. Defaulted so that adding it breaks no existing
+    /// quantiser and changes no existing measurement.
+    /// </remarks>
+    IReadOnlyDictionary<Code, int>? Bind(TObservation observation) => null;
 }

@@ -45,6 +45,43 @@ public sealed record Occasion
     public required long At { get; init; }
 
     /// <summary>
+    /// Which codes belong to which thing, when the front end can say. <b>Null is
+    /// today's behaviour: one moment, one group, everything pairs.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>STEP 1A — AN OCCASION STOPS BEING A FLAT SET.</b> Fork 25 measured the
+    /// ceiling: two objects with swapped attributes emit the identical code set,
+    /// so no amount of counting separates *red ball beside blue box* from *blue
+    /// ball beside red box*. This is the smallest change that lifts it — the
+    /// pairing is gated by group, so a colour joins only the shape it actually
+    /// belonged to.
+    /// </para>
+    /// <para>
+    /// <b>Pylyshyn's visual indexes and Kahneman &amp; Treisman's object files.</b>
+    /// A contentless pointer assigned by attention on spatiotemporal grounds,
+    /// *before* any feature is identified — which is where biology solves binding,
+    /// and it is not in association cortex. <b>It is not a phase</b>: a phase is a
+    /// continuous oscillator relationship measured in milliseconds, and C2 says
+    /// messages are late, jittered and out of order, which is exactly what
+    /// destroys one. A group travels inside the occasion and lateness cannot
+    /// touch it.
+    /// </para>
+    /// <para>
+    /// <b>A code that is absent from the map is UNGROUPED and pairs with
+    /// everything</b>, which is what makes this additive: a front end that can
+    /// segment some of what it sees is not forced to lie about the rest.
+    /// </para>
+    /// <para>
+    /// <b>What it does not do:</b> the front end supplies the grouping, so this
+    /// tests whether the graph can USE binding, not whether it can DISCOVER it.
+    /// That is the right split — vision groups at attention — but it is not the
+    /// whole problem and must not be written up as if it were.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyDictionary<Code, int>? Groups { get; init; }
+
+    /// <summary>
     /// How much this occasion counts. One is something that happened.
     /// </summary>
     /// <remarks>

@@ -289,6 +289,69 @@ public sealed class BindingTests
         Assert.InRange(result.Right, result.Asked - result.Swapped - 4, result.Asked - result.Swapped + 4);
     }
 
+    // ---- step 1a: grouping fixes learning and does not fix reference --------
+
+    private static Task<Measured> Segmented(bool bound, int seeds = 8) =>
+        Sweep.ArmAsync(
+            bound ? "stable segmented" : "per-scene segmented",
+            seeds,
+            async seed =>
+            {
+                using var run = new BindingRun(
+                    World(bound) with { Segmented = true }, Dials(Deep), seed);
+
+                return (await run.RunAsync(400, every: 10)).Accuracy;
+            });
+
+    [Fact]
+    public async Task Grouping_removes_the_edges_that_were_never_real()
+    {
+        // THE MECHANISM CHECK, AND IT IS UNAMBIGUOUS. Pairing gated by object
+        // means a colour never joins the other object's shape, so the graph
+        // holds only bindings that actually happened. Measured at 16 seeds:
+        // 1,751 edges flat against 144 segmented, and the stable control rises
+        // from 0.9167 to a perfect 1.0000 on the smaller graph.
+        using var flat = new BindingRun(World(bound: true), Dials(Deep), seed: 1);
+        using var grouped = new BindingRun(
+            World(bound: true) with { Segmented = true }, Dials(Deep), seed: 1);
+
+        var loose = await flat.RunAsync(400, every: 10);
+        var tight = await grouped.RunAsync(400, every: 10);
+
+        // Same codes, same order, same count of nodes -- only which pairs were
+        // written differs, which is the whole of what grouping does.
+        Assert.Equal(loose.Nodes, tight.Nodes);
+        Assert.True(tight.Edges * 4 < loose.Edges,
+            $"{tight.Edges} edges against {loose.Edges}, which is not the collapse expected");
+
+        Assert.True(tight.Accuracy > loose.Accuracy,
+            $"segmented {tight.Accuracy:F4} against flat {loose.Accuracy:F4}");
+    }
+
+    [Fact]
+    public async Task And_it_still_does_not_lift_the_binding_task()
+    {
+        // PRE-REGISTERED BEFORE THE FIRST RUN OF THIS ARM, and it held: grouping
+        // does NOT move the per-scene score. Measured at 16 seeds, 0.5465 +-
+        // 0.0236 against flat's 0.5240 +- 0.0268 -- six tenths of a standard
+        // error.
+        //
+        // AND THE REASON IS THE USEFUL PART. Grouping fixes LEARNING: the graph
+        // now holds only bindings that happened. It cannot fix REFERENCE, because
+        // the question is still asked with a colour and nothing else, and a
+        // colour's aggregate still points at its own kind whichever object it
+        // belonged to in the scene being asked about.
+        //
+        // **So an object file needs its INDEX in the question, not only in the
+        // occasion.** That is the next arm, and this is what says so.
+        var segmented = await Segmented(bound: false);
+
+        var tolerance = Math.Max(3 * segmented.StdErr, 0.05);
+
+        Assert.True(Math.Abs(segmented.Mean - Binding.Chance) < tolerance,
+            $"{segmented} against chance {Binding.Chance:F4}, tolerance {tolerance:F4}");
+    }
+
     // ---- the run says what it did -------------------------------------------
 
     [Fact]

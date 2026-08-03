@@ -65,10 +65,31 @@ spreading-activation systems have done since the 1970s.
 ## NEXT — structure, and it has a scoreboard already waiting
 
 **The binding world exists, is measured, and sits at chance.** Any structural
-change either moves that number or it does not, against a control at 0.9247 on
+change either moves that number or it does not, against a control at 0.9167 on
 identical input. **Do not build a new world for this; run that one.**
 
-### 1a. Bind by an ephemeral tag — object files
+### 1a. HALF BUILT, AND THE HALF THAT IS BUILT IS NOT THE HALF THAT MATTERS
+
+**`Occasion.Groups` exists**: the front end can say which codes belong to which
+object, and the rendezvous refuses to pair across objects. `IQuantizer.Bind`
+supplies it and defaults to null, so nothing else changed.
+
+**It works, mechanically, and the control is emphatic.** On the stable arm the
+graph collapses from 1,751 edges to 144 — the cross-object edges were never real
+— and accuracy goes 0.9167 → **1.0000 ± 0.0000** on the smaller graph.
+
+**And it does not lift the binding task: 0.5465 ± 0.0236, six tenths of a sigma
+from flat.** Pre-registered before the run, and it held.
+
+> **THE LESSON, AND IT IS THE NEXT STEP.** Grouping fixes **learning** — the
+> graph now holds only bindings that happened. It cannot fix **reference**: the
+> question is asked with a colour and nothing else, and a colour's aggregate
+> still points at its own kind whichever object it belonged to in the scene being
+> asked about. **An object file needs its index in the QUESTION, not only in the
+> occasion.** You cannot answer *what shape is this one* without a way to say
+> *this one*.
+
+### 1a-next. The index in the query — an ephemeral tag
 
 **Each object in a scene gets a contentless code of its own, and every attribute
 of that object co-occurs with it.** Then `red → tag₁ → ball` is the two-hop
@@ -156,7 +177,7 @@ it out of the plan** and planning something that already exists fails the build.
 
 - [x] `Binding` — the world that measures the ceiling
 - [x] `Seeds` — decorrelated seeding for every sweep
-- [ ] `Tag` — the ephemeral per-object code of step 1a
+- [ ] `Tag` — the ephemeral per-object code that puts an index in the QUESTION
 - [ ] `Surprise` — the local prediction error of step 2
 - [ ] `Chunk` — the minted node of step 3
 - [ ] `Drives` — the bounded internal variables of step 4

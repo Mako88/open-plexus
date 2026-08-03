@@ -111,7 +111,17 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         _window.Carry(changes.Stopped, changes.Started, now);
 
         await _rendezvous.JoinAsync(
-            new Occasion { Onsets = changes.Started, Live = live, Recent = recent, At = now }, ct)
+            new Occasion
+            {
+                Onsets = changes.Started,
+                Live = live,
+                Recent = recent,
+                At = now,
+
+                // WHAT THE FRONT END COULD SAY ABOUT WHICH THING IS WHICH, and
+                // null for every front end that cannot. See Occasion.Groups.
+                Groups = _quantizer.Bind(frame),
+            }, ct)
             .ConfigureAwait(false);
 
         return await ThinkAsync(changes.Started, null, ct).ConfigureAwait(false);

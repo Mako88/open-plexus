@@ -45,6 +45,18 @@ public sealed record BindingSettings
     /// </para>
     /// </remarks>
     public bool Bound { get; init; }
+
+    /// <summary>
+    /// Whether the front end can say which codes belong to which object —
+    /// <b>step 1a, and the arm this world was built to make falsifiable.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>It changes nothing the world emits.</b> The same four codes arrive in
+    /// the same order; only the grouping alongside them appears, so the arm is
+    /// still measured against bit-identical input. See
+    /// <see cref="Learning.Occasion.Groups"/>.
+    /// </remarks>
+    public bool Segmented { get; init; }
 }
 
 /// <summary>
@@ -72,6 +84,12 @@ public sealed record Scene
 
     /// <summary>The shape each object has, at the same index as its colour.</summary>
     public required IReadOnlyList<int> Shapes { get; init; }
+
+    /// <summary>
+    /// Which code belongs to which object, or null when the front end cannot
+    /// say. <b>This is the only place the binding is expressed as data.</b>
+    /// </summary>
+    public IReadOnlyDictionary<Code, int>? Groups { get; init; }
 
     /// <summary>How many objects the scene holds.</summary>
     public int Objects => Colours.Count;
@@ -201,23 +219,53 @@ public sealed class Binding
 
         // BY CONCEPT, NEVER BY OBJECT. See Scene.Codes -- ordering by object
         // would leak the binding into the sequence.
-        IReadOnlyCollection<Code> codes =
-        [
-            Pick(Colour, low), Pick(Colour, high),
-            Pick(Shape, low), Pick(Shape, high),
-        ];
+        Code colourLow = Pick(Colour, low), colourHigh = Pick(Colour, high);
+        Code shapeLow = Pick(Shape, low), shapeHigh = Pick(Shape, high);
+
+        IReadOnlyCollection<Code> codes = [colourLow, colourHigh, shapeLow, shapeHigh];
 
         // DRAWN EITHER WAY AND USED ONLY WHEN UNBOUND, so the binding generator
         // advances identically in both arms and a future arm added between them
         // cannot silently shift one.
         var swapped = _binding.Next(2) == 1 && !_settings.Bound;
 
+        IReadOnlyList<int> colours = [first, second];
+        IReadOnlyList<int> shapes = swapped ? [second, first] : [first, second];
+
         return new Scene
         {
             Codes = codes,
-            Colours = [first, second],
-            Shapes = swapped ? [second, first] : [first, second],
+            Colours = colours,
+            Shapes = shapes,
+            Groups = _settings.Segmented ? Segment(colours, shapes, codes) : null,
         };
+    }
+
+    /// <summary>
+    /// Which of the four codes belongs to which object.
+    /// </summary>
+    /// <remarks>
+    /// <b>Built from the OBJECTS and not from the codes</b>, which is the whole
+    /// content of it: the code set is identical whichever way the scene is bound,
+    /// and this is the one thing that differs. It is the front end saying *these
+    /// two belong to the same thing* — which is what a visual index is, and it
+    /// says nothing about what either of them is.
+    /// </remarks>
+    private Dictionary<Code, int> Segment(
+        IReadOnlyList<int> colours, IReadOnlyList<int> shapes, IReadOnlyCollection<Code> codes)
+    {
+        var groups = new Dictionary<Code, int>();
+
+        foreach (var code in codes)
+        {
+            var concept = Concept(code);
+            var which = code.Modality == Colour ? colours : shapes;
+
+            for (var obj = 0; obj < which.Count; obj++)
+                if (which[obj] == concept) { groups[code] = obj; break; }
+        }
+
+        return groups;
     }
 
     private Code Pick(byte attribute, int concept) =>

@@ -215,7 +215,7 @@ public sealed class BindingRun : IDisposable
     private readonly LocalClusters _local;
     private readonly List<Cluster> _clusters = [];
     private readonly List<IDisposable> _handles = [];
-    private readonly InputMachine<IReadOnlyCollection<Code>> _eyes;
+    private readonly InputMachine<Scene> _eyes;
     private readonly Binding _world;
     private readonly WalkSettings _dials;
     private readonly List<Exception> _faults = [];
@@ -246,19 +246,25 @@ public sealed class BindingRun : IDisposable
             _handles.Add(_bus.Subscribe(cluster));
         }
 
-        _eyes = new InputMachine<IReadOnlyCollection<Code>>(
+        _eyes = new InputMachine<Scene>(
             new MachineAddress("scene"), new Passthrough(), new LocalRendezvous(_local),
             _bus, _ring, dials);
 
         _handles.Add(_bus.Subscribe(_eyes));
     }
 
-    /// <summary>The codes are already codes; there is nothing to quantise.</summary>
-    private sealed class Passthrough : IQuantizer<IReadOnlyCollection<Code>>
+    /// <summary>
+    /// The codes are already codes; there is nothing to quantise. <b>What it does
+    /// do is pass the segmentation through</b> — see
+    /// <see cref="Learning.Occasion.Groups"/>.
+    /// </summary>
+    private sealed class Passthrough : IQuantizer<Scene>
     {
         public byte Modality => Binding.Colour;
 
-        public IReadOnlyCollection<Code> Codify(IReadOnlyCollection<Code> observation) => observation;
+        public IReadOnlyCollection<Code> Codify(Scene observation) => observation.Codes;
+
+        public IReadOnlyDictionary<Code, int>? Bind(Scene observation) => observation.Groups;
     }
 
     /// <summary>
@@ -292,7 +298,7 @@ public sealed class BindingRun : IDisposable
             var scene = _world.Next();
 
             var thought = await _eyes
-                .ObserveAsync(scene.Codes, moment, ct).ConfigureAwait(false);
+                .ObserveAsync(scene, moment, ct).ConfigureAwait(false);
             await _bus.WhenIdle().WaitAsync(Patience, ct).ConfigureAwait(false);
 
             // Reflection sees what was OBSERVED and never what was asked, for the

@@ -307,36 +307,69 @@ order to find what it cannot see.
 
 ## Stamina swept — and depth HURTS
 
-> **⚠ RESOLVED AND NOT AS FIRST READ, 2026-08-02.** All four combinations in
-> **one run**, policy fixed at random so every trajectory is identical (34
-> steps in each arm):
->
-> | action budget | prediction budget | novelty gap |
-> |---|---|---|
-> | 2 | 2 | 0.0740 ± 0.0073 |
-> | 2 | **4** | 0.0744 ± 0.0069 |
-> | 4 | **2** | 0.0155 ± 0.0041 |
-> | 4 | 4 | 0.0157 ± 0.0040 |
->
-> **The ACTION budget determines the prediction gap entirely, and the
-> PREDICTION budget does nothing at all.** Which is the opposite of what fork
-> 20's split was built on.
->
-> **The likely reason the prediction budget is inert**: a prediction names as
-> many codes as an observation holds, and at any budget there are already more
-> sensory arrivals than that. The top few are the one-hop arrivals either way —
-> a deeper walk adds arrivals that rank below the cut and never appear.
->
-> **The reason the action budget matters is NOT established.** Under a fixed
-> random policy the action broadcast changes nothing about the world, the
-> trajectory or the learning, and yet it moves the number by a factor of five.
-> Recorded as unexplained rather than given a story. **`Foresight` is kept
-> because it costs nothing and is measured inert; it should be deleted if
-> nothing explains this.**
->
-> **What is not in doubt:** at a shallow budget the chain becomes a pure mirror
-> — 100% of chain-chosen moves repeat the last action at stamina 2, against 2%
-> at stamina 8.
+> **⚠ THE FIRST THREE READINGS OF THIS WERE MEASURING A DISCONNECTED DIAL.**
+> `ThinkAsync` grew a `stamina` parameter that was declared, documented, passed
+> at every call site — and dropped at the destination, where the message was
+> still built from `_settings.Stamina`. So only one budget ever reached a
+> message, the prediction budget "measured inert", and a fivefold effect got
+> attributed to the action budget with no mechanism. **There was no mystery.**
+> It survived a build, 155 passing tests, a mutation run and three measurements,
+> because nothing asserted that a budget handed to a thought reaches the
+> messages it sends. Something does now.
+
+**Swept properly once the dial was connected**, policy fixed at random and the
+action budget fixed at 8, so every trajectory is identical — 33 steps and 5
+fruit in every arm — and only the prediction budget moves:
+
+| prediction budget | novelty gap |
+|---|---|
+| 1.5 | 0.0815 ± 0.0064 |
+| **2** | **0.0817 ± 0.0082** |
+| 3 | 0.0348 ± 0.0054 |
+| 4 | 0.0169 ± 0.0046 |
+| 8 | 0.0147 ± 0.0042 |
+
+**Monotonic, about 5.5× from end to end, and 6.9 standard errors between 2 and
+4.** A shallow walk predicts far better, and with the trajectory held identical
+there is nothing else it could be. Direct association *is* the predictive
+signal; a deeper walk reaches more and ranks worse — which is `master`'s own
+refutation of walking further without edge types, reproducing on a world that
+shares nothing with FB15k-237 except the absence of typed edges.
+
+### And the split budget pays
+
+Under the live policy, 50 seeds:
+
+| action | prediction | steps | echo | novelty gap |
+|---|---|---|---|---|
+| 2 | 2 | 82 | 100% | 0.0588 ± 0.0039 |
+| 4 | 4 | 94 | 79% | 0.0046 ± 0.0026 |
+| **8** | **2** | **116** | **2%** | **0.2418 ± 0.0142** |
+
+**Deep for acting, shallow for predicting** — longest survival, almost no
+mirroring, and a gap four times any other arm. That is what fork 20 was for, and
+it only became visible after the dial was connected.
+
+**But it is NOT strictly better, and the first draft of this paragraph said it
+was.** Fruit goes the other way:
+
+| action budget | fruit over 50 seeds |
+|---|---|
+| 2 | 5 |
+| 4 | **8** |
+| 8 | **1** |
+
+**Momentum finds food; deliberation avoids death.** At an action budget of 4 the
+chain is 80% mirror and sweeps ground; at 8 it is 2% mirror, survives half again
+as long, and eats almost nothing. Repeating one turn forever — pure momentum —
+eats nothing either, so this is not monotonic in either direction and the counts
+are single digits over 50 seeds.
+
+**So the default stays at an action budget of 4** rather than moving to the arm
+that wins the columns I happen to be looking at. Three tests went red when it
+was moved to 8, and one of them was the fruit comparison telling the truth.
+Which arm is right depends on **fork 18 — what to score** — which is still
+open.
 
 **Never swept until 2026-08-02.** 60 seeds, energy 200, empty cells withheld:
 
@@ -382,7 +415,7 @@ by status rather than by scrolling.
 | | | |
 |---|---|---|
 | **19** | ✅ Prediction built — and it loses to a blind guess, because the graph holds **no temporal edges**. Next mechanism named: a one-way window |
-| **20** | One stamina serves both prediction and action-finding, and they want opposite depths | opened by the stamina sweep |
+| **20** | ✅ **Split budgets — deep to act, shallow to predict.** Wins survival, mirroring and prediction at once |
 | **18** | **What to score.** Survival is disqualified: the arm that survives longest is the one that circles and eats nothing | **blocks 15 and 16** |
 | **15** | Strengthening a connection a thought walks | gated on 18 — it would be tuned against whatever we score |
 | **16** | Back-propagation from an outside signal | gated on 18, same reason |

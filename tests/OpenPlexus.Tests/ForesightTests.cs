@@ -228,15 +228,26 @@ public sealed class ForesightTests
         // ECONOMICS, not as selection. A sequential walk ranks its frontier and
         // picks; a broadcast cannot rank anything globally, but it can make one
         // kind of edge cheaper to keep walking.
-        Assert.True(
-            expectingLeft.ToList().IndexOf(afterLeft) < expectingLeft.ToList().IndexOf(afterRight),
-            "asking with Left did not rank the thing Left leads to first");
+        // NOTE `IndexOf` RETURNS -1 FOR SOMETHING ABSENT, so comparing two
+        // indices directly reads "not reached at all" as "ranked first". This
+        // asks the question properly: the thing the action leads to must be
+        // there, and must come before the alternative if the alternative is
+        // there at all.
+        static void Prefers(IReadOnlyList<Code> ranked, Code wanted, Code other)
+        {
+            var mine = ranked.ToList().IndexOf(wanted);
+            var theirs = ranked.ToList().IndexOf(other);
+
+            Assert.True(mine >= 0, $"{wanted} was not reached at all");
+            Assert.True(theirs < 0 || mine < theirs,
+                $"{wanted} ranked {mine} against {other} at {theirs}");
+        }
+
+        Prefers(expectingLeft, afterLeft, afterRight);
 
         // The companion: the mirror holds, so this is conditioning rather than
         // one code simply outranking the other everywhere.
-        Assert.True(
-            expectingRight.ToList().IndexOf(afterRight) < expectingRight.ToList().IndexOf(afterLeft),
-            "asking with Right did not rank the thing Right leads to first");
+        Prefers(expectingRight, afterRight, afterLeft);
     }
 
     private sealed class Straight : IQuantizer<Code[]>

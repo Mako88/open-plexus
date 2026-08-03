@@ -174,7 +174,7 @@ public sealed class SnakeRun : IDisposable
     private readonly Snake _snake;
     private readonly Random _fallback;
     private readonly List<Exception> _faults = [];
-    private readonly SnakeSense _sense = new();
+    private readonly SnakeSense _sense;
     private readonly Foresight _foresight = new();
     private readonly Foresight _novelty = new();
 
@@ -201,12 +201,14 @@ public sealed class SnakeRun : IDisposable
         int seed,
         int clusters = 8,
         int replicas = 256,
-        int span = 0)
+        int span = 0,
+        bool includeEmpty = false)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(dials);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(clusters);
 
+        _sense = new SnakeSense(includeEmpty);
         _snake = new Snake(world, seed);
         _fallback = new Random(seed);
         _guessing = new Random(~seed);

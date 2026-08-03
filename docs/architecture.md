@@ -240,6 +240,71 @@ winning both, and by one fruit.
 
 ---
 
+## The wiring audit — John's ask, 2026-08-02
+
+**"Changes made very little difference, only to find out stuff wasn't wired up
+the way we expected."** So this is a check of what is actually happening rather
+than what the code says should happen. It found three things.
+
+**1. The walk is two hops.** Every arrival's chain is length 2 or 3 — never
+longer, over 126 arrivals. A step costs `1/weight` and typical weights are
+around 0.5, so a stamina of 4 buys **two hops**. What is called a flood is a
+two-step association today. `master` found two steps is where the payoff is, so
+this is not wrong — but **stamina is a live dial that has never been swept**,
+and calling it a flood oversells it.
+
+**2. Nearly half of all steps are silent.** 47% over 60 seeds produce no onset
+at all: with empty cells withheld and `sight = 1`, open space shows only the
+body, and the codes are identical frame after frame. **The system does not
+think on those steps.** Including empty cells takes silence to 16%.
+
+**3. The graph is tiny — about 15 nodes a run.** There is no saturation risk;
+the opposite. Snake at `sight = 1` with empty cells withheld has an alphabet of
+a couple of dozen codes, so **there is very little in this world to learn**.
+
+### And the empty-cell workaround has outlived its reason
+
+Withholding empty cells was worth four orders of magnitude when `Best` pricing
+let the flood enumerate every simple path. **Inverse cost bounds the walk by
+construction, so that reason is gone** — measured, `Halted = 0` in both arms.
+The arm was deleted as refuted and has been **put back**, because a refutation
+is conditional on its configuration and this one's configuration no longer
+exists. 60 seeds:
+
+| empty cells | steps | silent | chain-chosen | fruit | messages | novelty gap |
+|---|---|---|---|---|---|---|
+| withheld | 4,920 | **47%** | 1,874 | 11 | 918k | 0.0080 ± 0.0020 |
+| included | 5,980 | **16%** | 4,849 | 15 | **9.95M** | 0.0049 ± 0.0016 |
+
+**No clear winner.** Including them means the system acts far more and survives
+longer; withholding them predicts better and costs a tenth of the messages.
+
+### Headroom — is there room to improve at all?
+
+A sighted policy that walks at the fruit and refuses an obvious death, 200
+seeds:
+
+| sight | oracle steps | oracle fruit/run |
+|---|---|---|
+| whole board | 293.8 ± 7.6 | 25.69 |
+| **1** | **231.2 ± 2.8** | **1.04** |
+| 3 | 345.5 ± 9.1 | 5.04 |
+
+**At the sensor we actually use**, against random 37 steps / 0.18 fruit and the
+chain's 93 / 0.25:
+
+- **Survival: the chain has closed 29% of the gap**, and 2.5× remains.
+- **Fruit: the chain has closed 8%**, and 4× remains.
+
+**So the measurement is not saturated** — there is real room in both columns and
+the chain sits meaningfully above random in both. But note what `sight` does to
+the fruit ceiling: 1.04 at radius 1 against 25.69 with the whole board. **Most
+of the achievable fruit is behind the sensor, not behind the learning.** If
+fruit is to be the score, the sensor has to widen or something has to act in
+order to find what it cannot see.
+
+---
+
 ## Open forks
 
 Recorded here so a decision does not go quiet.

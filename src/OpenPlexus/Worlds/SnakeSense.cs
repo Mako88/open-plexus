@@ -43,7 +43,7 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
 
     private readonly SnakeQuantizer _vision;
 
-    public SnakeSense() => _vision = new SnakeQuantizer();
+    public SnakeSense(bool includeEmpty = false) => _vision = new SnakeQuantizer(includeEmpty);
 
     /// <summary>Where the turn codes start, clear of the four direction codes.</summary>
     private const ulong Turning = 16;

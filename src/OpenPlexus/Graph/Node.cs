@@ -200,11 +200,22 @@ public sealed class Node
 
         if (!isOrigin)
         {
-            // THE RECEIVER WEIGHS THE EDGE IT ARRIVED ON. The sender put its own
-            // together(sender, me) in the message; this divides by its own
-            // marginal. Neither node reads the other's data.
-            arriving = seen <= 0.0 ? 0.0 : message.Together / seen;
+            // THE RECEIVER WEIGHS THE EDGE IT ARRIVED ON, and chooses WHICH
+            // MARGINAL to divide by. The sender put its own together(sender, me)
+            // and its own seen in the message, so either end can weigh it and
+            // neither node reads the other's data. See Pricing.
+            var by = _settings.Pricing == Pricing.Sender ? message.Seen : seen;
+
+            arriving = by <= 0.0 ? 0.0 : message.Together / by;
             if (arriving <= 0.0) return Died(message, message.Carried);
+
+            // A WEIGHT CANNOT EXCEED 1.0 UNDER EITHER PRICING, because
+            // together(a, b) never exceeds either marginal -- which is what
+            // makes the hop cost at least 1 and the walk bounded by
+            // construction. Clamped rather than trusted: a partial row written
+            // under a moved ring view could break it, and an unbounded walk is
+            // the one failure that takes the process with it.
+            arriving = Math.Min(arriving, 1.0);
 
             // EVERY HOP COSTS AT LEAST 1, because a weight cannot exceed 1.0.
             // That is what bounds the walk.
@@ -267,6 +278,10 @@ public sealed class Node
                 Chain = message.Chain.Add(partner),
                 Carried = carried,
                 Together = together,
+
+                // THIS NODE'S OWN COUNT, ABOUT ITSELF. The receiver may divide
+                // by it instead of by its own -- see Pricing.
+                Seen = seen,
             });
         }
 

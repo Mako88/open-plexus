@@ -89,40 +89,43 @@ from flat.** Pre-registered before the run, and it held.
 > occasion.** You cannot answer *what shape is this one* without a way to say
 > *this one*.
 
-### 1a-next. BUILT AND MEASURED — the index does not clear the bar
+### 1a-next. ✅ THE CEILING LIFTS — index in the question, sender weighs the edge
 
-**`BindingSettings.Tagged`.** Each object gets a contentless code of its own,
-fresh every scene, in its own group; the question carries the queried object's
-tag. That is Pylyshyn's visual index and Teyler & DiScenna's hippocampal index,
-and it needs no new mechanism — it is one more code in the occasion.
+**`BindingSettings.Tagged`** gives each object a contentless code of its own,
+fresh every scene, in its own group, and the question carries the queried
+object's. **`Pricing.Sender`** divides by the *sender's* marginal instead of the
+receiver's — C1-legal, because a node sending its own count about itself reads
+nobody else's data (`Message.Seen`).
 
-**32 seeds: tagged beats segmented-only by 1.4 sigma at 60 scenes and 1.6 at
-100 — under this project's 3-sigma bar — at 6.6× the messages and 3.7× the
-edges.** Longer runs, where the confound below is absent, **time out entirely**.
+**16 seeds, 400 scenes: 0.8798 ± 0.0148, against a control at 0.5481 ± 0.0227
+differing only in whether the question carries the index.** 12.2 sigma apart,
+25.7 clear of chance, on a world that measured **at chance** before this.
+**And it improves with data** — 0.7095 at 150 scenes, 0.8798 at 400.
 
-> **THE PREDICTION WAS HALF WRONG, AND THE HALF THAT WAS WRONG IS THE USEFUL
-> ONE.** The worry was that `tag → shape` would be too *expensive*
-> (`seen(shape)`). The real problem is that `colour → tag` is too *cheap*: a
-> fresh tag has `seen = 1`, so its arrival weight is 1.0 and the hop costs the
-> minimum possible. **An attribute accumulates one maximally-cheap tag partner
-> per occurrence**, so the fan-out grows without bound and the flood explodes.
-> **An ephemeral index is a fan-out catastrophe under an economy that prices
-> arrival by the receiver's own marginal.**
+**All three parts are load-bearing**, each with its own control:
 
-> **A NEW CONFOUND IN THIS WORLD, FOUND HERE: short runs score above chance for
-> recency alone.** Both arms sit at 0.63 at 60 scenes and decay toward 0.5 as
-> history accumulates, because the scene just observed dominates a sparse
-> aggregate. **Any binding-world number taken under a few hundred scenes is
-> measuring recency**, and the tag's whole feasible range is inside that.
+| | without | with |
+|---|---|---|
+| grouping in the occasion | learns cross-object edges that never existed | stable control 0.9167 → 1.0000, edges 1751 → 144 |
+| index in the question | 0.5481 (chance) | **0.8798** |
+| sender pricing | 0.5726 at 150 scenes, and does not finish at 400 | 0.7095 at 150, 0.8798 at 400 |
 
-**So the index is right and the economy is wrong**, which points at the same
-place three findings now do: **edge kinds.** A pointer-following hop and an
-association hop cannot share one price. See `ArrivalValue.Lift` in the refuted
-table — inert as a *ranking*, untried as a *cost*, and the cost is where the
-prevalence term is actually needed.
+> **THE PREDICTION WAS HALF WRONG AND THAT IS WHY THE FIX WORKS.** The worry was
+> `tag → shape` being too *expensive*. The real fault was `colour → tag` being too
+> *cheap*: a fresh index has `seen = 1`, so under receiver pricing its arrival
+> weight is 1.0 — the cheapest hop the system can charge — and every attribute
+> accumulates one such partner per occurrence until the fan-out explodes. Sender
+> pricing inverts exactly that hop and leaves the useful one alone.
 
-**Honest caveat that still stands:** a tag supplied by the front end tests
-whether the graph can *use* binding, not whether it can *discover* it.
+**Three caveats, all live.** The front end supplies grouping and index, so this
+shows the graph can **use** binding, not **discover** it. `Pricing.Sender`
+changes the ranking as well as the price, so the effect cannot be attributed to
+cost alone. It costs **5.9× the messages**.
+
+> **A CONFOUND IN THIS WORLD, FOUND HERE: short runs score above chance for
+> recency alone** — 0.63 at 60 scenes, decaying to 0.5 as history accumulates,
+> because the scene just observed dominates a sparse aggregate. **Nothing under a
+> few hundred scenes measures anything here.**
 
 ### 1b. Phase, and why it is probably 1a wearing a different name
 

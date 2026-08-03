@@ -16,6 +16,47 @@ public enum ArrivalValue
     Lift,
 }
 
+/// <summary>
+/// Which end of an edge weighs it — <b>and therefore what a hop costs.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>BOTH ARE C1-LEGAL AND ONLY ONE HAS EVER BEEN BUILT.</b> The message
+/// carries <see cref="Thinking.Message.Together"/> and now
+/// <see cref="Thinking.Message.Seen"/>, so the receiver can divide by either
+/// marginal without reading anything it does not own.
+/// </para>
+/// <para>
+/// <b>The tag experiment is what asked for this.</b> An ephemeral index has
+/// <c>seen = 1</c>, so under <see cref="Receiver"/> every attribute accumulates
+/// one maximally-cheap partner per occurrence and the fan-out explodes —
+/// measured at 6.6× the messages, and timing out entirely on longer runs.
+/// Weighing from the sender inverts exactly that hop: reaching a fresh index
+/// from a common attribute becomes expensive, and leaving the index for what it
+/// points at stays cheap.
+/// </para>
+/// <para>
+/// <b>It changes the ranking as well as the price</b>, because one weight does
+/// both jobs — so a result under this arm cannot be attributed to cost alone.
+/// Said out loud rather than discovered later.
+/// </para>
+/// </remarks>
+public enum Pricing
+{
+    /// <summary>
+    /// <c>together / seen(receiver)</c> — <i>how characteristic is where you came
+    /// from, of me</i>. <b>The default, and everything measured so far.</b>
+    /// Arriving somewhere popular is expensive, which is the anti-hub property.
+    /// </summary>
+    Receiver,
+
+    /// <summary>
+    /// <c>together / seen(sender)</c> — <i>how characteristic am I, of where you
+    /// came from</i>. Leaving somewhere popular is expensive instead.
+    /// </summary>
+    Sender,
+}
+
 /// <summary>How a candidate accumulates evidence from the routes reaching it.</summary>
 public enum Accumulate
 {
@@ -137,6 +178,12 @@ public sealed record WalkSettings
     /// </para>
     /// </remarks>
     public double? Foresight { get; init; }
+
+    /// <inheritdoc cref="Graph.Pricing"/>
+    /// <remarks><b><see cref="Graph.Pricing.Receiver"/> is the default and the
+    /// control</b>, so every measurement taken before this existed still
+    /// stands.</remarks>
+    public Pricing Pricing { get; init; } = Pricing.Receiver;
 
     /// <inheritdoc cref="ArrivalValue"/>
     public required ArrivalValue Value { get; init; }

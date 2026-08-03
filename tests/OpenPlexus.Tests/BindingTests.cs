@@ -352,6 +352,78 @@ public sealed class BindingTests
             $"{segmented} against chance {Binding.Chance:F4}, tolerance {tolerance:F4}");
     }
 
+    /// <summary>
+    /// Grouping in the occasion, the index in the question, and the edge weighed
+    /// from the sender's end. <b>The three together are what lift it.</b>
+    /// </summary>
+    private static BindingSettings Bound => new()
+    {
+        Concepts = 8, CodesPerAttribute = 3, Segmented = true, Tagged = true,
+    };
+
+    private static WalkSettings Priced(Pricing pricing) => Dials(Deep) with { Pricing = pricing };
+
+    [Fact]
+    public async Task The_ceiling_lifts_when_the_index_is_in_the_question_and_the_sender_weighs()
+    {
+        // THE RESULT THIS WORLD WAS BUILT TO MAKE FALSIFIABLE. Fork 25 measured
+        // the architecture at chance on a task it provably could not do, and this
+        // is the same world, the same questions, the same scoring -- lifted.
+        //
+        // Measured at 16 seeds, 400 scenes: 0.8798 +- 0.0148 against a control at
+        // 0.5481 +- 0.0227 that differs ONLY in whether the question carries the
+        // index. 12.2 sigma apart, 25.7 sigma clear of chance.
+        //
+        // AND IT IMPROVES WITH DATA -- 0.7095 at 150 scenes, 0.8798 at 400 --
+        // which is the opposite of the recency artefact that inflates short runs
+        // here, and is the reason this is measured long rather than short.
+        var indexed = await Sweep.ArmAsync("indexed", 8, async seed =>
+        {
+            using var run = new BindingRun(Bound, Priced(Pricing.Sender), seed);
+            return (await run.RunAsync(400, every: 10)).Accuracy;
+        });
+
+        var blind = await Sweep.ArmAsync("no index", 8, async seed =>
+        {
+            using var run = new BindingRun(
+                Bound with { Tagged = false }, Priced(Pricing.Sender), seed);
+
+            return (await run.RunAsync(400, every: 10)).Accuracy;
+        });
+
+        Assert.True(indexed.Mean > 0.75, $"{indexed}");
+        Assert.True(indexed.Separation(blind) > 3.0,
+            $"{indexed} against {blind} is only {indexed.Separation(blind):F1} sigma");
+    }
+
+    [Fact]
+    public async Task And_the_index_alone_is_not_enough_without_the_pricing()
+    {
+        // THE OTHER HALF OF THE CONTROL, and it is what says the pricing is
+        // load-bearing rather than incidental. Same world, same index, same
+        // question -- weighed from the receiver's end instead. Measured at 16
+        // seeds and 150 scenes: 0.5726 +- 0.0196 against sender's 0.7095 +-
+        // 0.0235, and at 400 scenes the receiver arm does not finish at all.
+        //
+        // Shorter than the test above on purpose: the receiver arm's fan-out is
+        // what makes the long run infeasible, so measuring it long would measure
+        // the timeout.
+        var received = await Sweep.ArmAsync("receiver", 8, async seed =>
+        {
+            using var run = new BindingRun(Bound, Priced(Pricing.Receiver), seed);
+            return (await run.RunAsync(150, every: 4)).Accuracy;
+        });
+
+        var sent = await Sweep.ArmAsync("sender", 8, async seed =>
+        {
+            using var run = new BindingRun(Bound, Priced(Pricing.Sender), seed);
+            return (await run.RunAsync(150, every: 4)).Accuracy;
+        });
+
+        Assert.True(sent.Separation(received) > 2.0,
+            $"{sent} against {received} is only {sent.Separation(received):F1} sigma");
+    }
+
     [Fact]
     public void A_tag_without_its_group_is_refused_rather_than_accepted()
     {

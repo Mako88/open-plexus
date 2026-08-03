@@ -59,6 +59,27 @@ public readonly record struct Message
     public double Together { get; init; }
 
     /// <summary>
+    /// The sender's own marginal — how many occasions <i>it</i> fired on.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>C1-LEGAL BY THE SAME ARGUMENT <see cref="Together"/> IS.</b> A node
+    /// sending its own count about itself is not reading anybody else's data.
+    /// This is the opposite direction from the refuted sender-weighing arm, which
+    /// needed the <i>partner's</i> marginal and therefore gossip and staleness.
+    /// </para>
+    /// <para>
+    /// <b>It exists so an edge can be weighed from either end.</b> Dividing by
+    /// the receiver's marginal asks *how characteristic is where you came from,
+    /// of me*; dividing by this asks *how characteristic am I, of where you came
+    /// from*. Those are different questions and the walk currently only has one
+    /// of them — see <see cref="Graph.Pricing"/>.
+    /// </para>
+    /// <para>Zero on an origin message, which has no sender.</para>
+    /// </remarks>
+    public double Seen { get; init; }
+
+    /// <summary>
     /// Every node walked, in order. <b>The cycle check and the explanation in
     /// one field</b> — a route may not revisit a node already in its own chain,
     /// which is a local check costing nothing because the chain is already

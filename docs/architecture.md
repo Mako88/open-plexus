@@ -478,9 +478,29 @@ Both results hold and they are about different scales.
 support "nothing discriminates within the reached set".** The graph discriminates
 coarsely and not finely, which is a different problem with different repairs.
 
-**And it is immediately actionable: naming fewer codes is better.** The harness
-names as many as an observation holds, about three. Naming one scores 0.1324
-against 0.0839 — the dial exists as `names` and its best setting is the smallest.
+**"Naming fewer is better" was the first reading and is half true.** Precision
+rising as the set shrinks is close to tautological once the ranking is known to
+be informative — that is what precision-at-1 against precision-at-k *means*. The
+column that was not looked at is how often a prediction names anything real at
+all:
+
+| codes named | precision | names something real |
+|---|---|---|
+| 1 | **0.2215** | 0.221 |
+| 3 | 0.1647 | 0.354 |
+| 8 | 0.1510 | **0.405** |
+
+**It is a precision-against-recall dial, not a free win.** Naming one is right
+2.7× as often as chance but says nothing useful four times in five; naming eight
+is right 1.85× as often and catches something twice as often. And the gap over
+blind separates them by only about 2.6 standard errors, which is suggestive
+rather than settled.
+
+**Which end is better depends on what the prediction is FOR**, and that is
+fork 18 again. If it is to rank chains, what matters is whether it separates one
+chain from another — not its precision in isolation. **So `names` is left at an
+observation's worth and recorded as undecided rather than tuned toward whichever
+column was looked at first.**
 
 **The lesson is the rule that produced it.** *A diagnosis is a claim about
 behaviour; check the failure is repairable before proposing the repair.* The

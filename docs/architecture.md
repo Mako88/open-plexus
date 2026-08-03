@@ -648,6 +648,50 @@ validated as a direction.
 scaling cannot switch compression off; sharpening it takes an exponent, which is
 another constant nobody set. **Kept and reported, not wired to anything.**
 
+### Fork 24 — the stamina curve, and the signal that DOES have a knee
+
+**JOHN'S REDIRECT, 2026-08-02, AND IT IS THE BETTER QUESTION.** Rather than using
+the signal to gate compression, use it to set **stamina** — the most load-bearing
+hand-set constant in the system, which snake wants at 2 and this world wants at
+8, with nobody knowing why except by sweeping.
+
+6 seeds, 300 moments, senses world, reflection off:
+
+| stamina | accuracy | se | thwarted | silent/asked | messages |
+|---|---|---|---|---|---|
+| 2 | 0.0000 | 0.0000 | 0.9368 | 1.000 | 7,804 |
+| 3 | 0.0517 | 0.0194 | 0.8618 | 0.948 | 8,144 |
+| 4 | 0.2069 | 0.0126 | 0.8195 | 0.770 | 9,182 |
+| 6 | 0.6782 | 0.0262 | 0.7097 | 0.276 | 11,778 |
+| **8** | **0.7874** | 0.0187 | 0.6502 | **0.144** | **16,005** |
+| 12 | 0.8046 | 0.0247 | 0.5288 | 0.126 | 32,819 |
+| 16 | 0.8046 | 0.0247 | 0.4387 | 0.121 | 71,442 |
+| 24 | 0.7874 | 0.0314 | 0.3035 | 0.126 | **370,655** |
+
+**OVERSHOOTING IS EXPENSIVE AND INVISIBLE IN THE SCORE.** Accuracy is flat from 8
+to 24 — every arm inside every other's error — while messages rise **23-fold**.
+So the target is not "enough budget", it is **the smallest budget that reaches
+the plateau**, and a metric that only watches accuracy cannot see the difference.
+
+**THWARTED CANNOT BE THE STOPPING SIGNAL.** It falls smoothly and monotonically,
+0.9368 to 0.3035, and **never plateaus** — it keeps improving long after accuracy
+has stopped, with no knee to detect. That is a measured reason to leave it
+unwired rather than a hunch, and it closes the question the previous commit left
+open.
+
+**SILENCE HAS THE KNEE, AND IT IS IN THE RIGHT PLACE.** 0.770 → 0.276 → 0.144 →
+0.126 → 0.121: it flattens at stamina 8, exactly where accuracy does.
+
+**So the rule needs no target percentage.** Raise the budget while silence keeps
+falling; stop when it flattens. A gradient, not a setpoint — and any sane
+flatness tolerance lands on 8 to 12.
+
+**It is C1-legal, which is the part worth checking before building.** Stamina is
+set by the ORIGIN when it builds the message and merely spent by nodes, so a
+machine can vary its own budget per thought without touching node state or
+reading anyone else's data. **The controller belongs at the machine** — which is
+where both failed attempts said the signal had to live.
+
 **What would discriminate is visible in the data and is not a route-level
 quantity.** Unanswered questions go 250 → 31 of 312 between the two budgets,
 an eightfold difference, against thwarted's 1.19× and hunger's inversion. **Whether the walk reached
@@ -723,6 +767,7 @@ by status rather than by scrolling.
 
 | | |
 |---|---|
+| **24** | **Stamina can set itself, and the signal is silence.** Accuracy plateaus at 8 while messages rise 23x to 24 — overshooting is invisible in the score. Silence has a knee at exactly the plateau; thwarted never plateaus at all. **Controller designed, not yet built** |
 | **23** | **Can compression regulate itself? Not yet.** Counting budget deaths is INVERTED (0.3802 at stamina 4, 0.4887 at 8). John's correction — weight each death by the strength the route still carried — goes the right way at 5.1 sigma but swings only 1.19x against an effect that runs 0.18 to 0.83. **Next candidate: whether the walk reached what it was narrowing to**, an eightfold difference |
 | **22** | **A few thoughts never settle.** 5–7 of 39 questions on a senses run, and waiting twenty times longer barely moves it. `Balanced()` still passes, so the books agree with themselves while claiming routes the bus has already finished — an over-count of splits or an under-count of deaths. Every affected question reads as "nothing reached", which is **indistinguishable from a real silence in a score**, so every silent count in this project is an upper bound until this is closed. Found by the run report on its first execution |
 | **1** | The distributed rendezvous — not needed until a second machine exists |

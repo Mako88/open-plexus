@@ -32,15 +32,15 @@ nothing may depend on training then testing.
 
 ## What is standing
 
-**Five worlds sharing no world logic, over one `Fabric`.** Snake, where a chain
+**Six worlds sharing no world logic, over one `Fabric`.** Snake, where a chain
 can cause a move; senses, where sight and touch never co-occur so the answer can
 only be composed; binding, built so this architecture provably could not answer
 it and since lifted; composition, where the answer was never observed at all; and
-`Babi`, **which nobody here designed.**
+**two nobody here designed** — `Babi` and `Clevr`.
 
 **AN EXTERNAL WORLD CANNOT FLATTER THIS ARCHITECTURE BY CONSTRUCTION**, which is
-the whole reason to read one — the other four were built by the same hands as the
-mechanisms they measure. `corpora/fetch.sh` gets the data; it is not vendored.
+why to read one: the other four were built by the same hands as the mechanisms
+they measure. `corpora/fetch.sh` fetches; nothing is vendored.
 
 **An occasion is a SET of co-occurring codes**, so *red ball beside blue box* and
 *blue ball beside red box* were the same input. That ceiling was
@@ -66,6 +66,14 @@ that a dial wanting different values in different worlds is the same fault**:
 prefer splitting it, or fusing the arms, over sweeping it. `DialTests` records
 which channel each dial may move and fails when one moves the other.
 
+**`Clevr` FOUND A SHARPER VERSION: ONE QUESTION WHOSE TWO HOPS WANT OPPOSITE
+VALUES.** An index is seen once and an attribute in most scenes, so `Receiver`
+makes attribute-to-index the cheapest hop and index-to-attribute the dearest, and
+`Sender` inverts that pair exactly. Reference is the first hop and the answer the
+second, and the two arms very nearly mirror each other. **No per-world default
+fixes that, because it is not per world** — the strongest argument yet for pricing
+belonging to the hop.
+
 ---
 
 ## NEXT
@@ -75,10 +83,8 @@ to an old one — run that one.**
 
 ### 1. Composition over bindings — built and answered
 
-**Closed by `Accumulate.Agreement` and `Refer.Narrowed`, both of which document
-themselves.** What is left is the world's own ambiguity rather than the walk's:
-two scenes sharing both referring values are genuinely indistinguishable by a
-conjunction, and widening the alphabet moves the score with it.
+**Closed by `Accumulate.Agreement` and `Refer.Narrowed`, which document
+themselves.** What is left is the world's own ambiguity, not the walk's.
 
 ### 1a. RANKING BELONGS TO THE QUESTION, NOT TO THE MACHINE — decide this
 
@@ -108,13 +114,12 @@ an index. Each type documents why. **Promoting the last two is a live decision
 and both look overdue**; `Agreement` cannot be promoted until ranking moves onto
 the question.
 
-**AND THE EXTERNAL WORLD SAYS SENDER.** On `Babi` it is the only arm that moves
-anything at all — the sole configuration clearing the majority-class baseline,
-where both ranking dials are inert on the same corpus to six decimal places. A
-world with no stake in this design agrees with the promotion.
+**AND BOTH EXTERNAL WORLDS SAY SENDER.** On `Babi` it is the only arm that moves
+anything, and the sole one clearing the majority-class baseline, with both
+ranking dials inert beside it. On `Clevr` it is what makes the second hop
+affordable at all.
 
-**Vector-symbolic binding** (Plate, Kanerva) stays parked: the similarity
-gradient named below, at the cost of opaque codes. Not needed yet.
+**Vector-symbolic binding** (Plate, Kanerva) stays parked.
 
 ### 2. Predictive coding — only surprise propagates
 
@@ -151,6 +156,7 @@ act, no amount of scaling gets there.
 - [x] `Measurement` — the range checks the three worlds used to each own
 - [x] `Composed` — the world of step 1, built and characterised, not yet lifted
 - [x] `Babi` — twenty tasks somebody else wrote, with published baselines
+- [x] `Clevr` — fork 25's experiment on scene graphs generated in 2017
 - [ ] `Surprise` — the local prediction error of step 2
 - [ ] `Chunk` — the minted node of step 3
 - [ ] `Drives` — the bounded internal variables of step 4
@@ -165,10 +171,10 @@ act, no amount of scaling gets there.
 - **The one-way window.** Built, null on snake, **never run where it worked.**
 - **The absolute message cost is what step 2 attacks.** Nothing else should be
   optimised until it has been tried.
-- **Cold storage, once a row can be bounded at all.** A count that only
-  increments is a CRDT, and **paging a node out to disk keeps that** — the count
-  does not decrease, it stops being resident. **Decay does not**, so eviction
-  must key on "not touched since", never on eroding the count itself.
+- **Cold storage, once a row can be bounded at all.** **Paging a node out to disk
+  keeps the CRDT property** — the count does not decrease, it stops being
+  resident. **Decay does not**, so eviction must key on "not touched since",
+  never on eroding the count itself.
 - **The knob pass, last.** A dial swept before the structural work measures a
   system about to change underneath it.
 
@@ -218,7 +224,7 @@ condition is a superstition. The commit named in git holds the numbers.
 | A deeper walk for prediction | Monotonically worse — without edge kinds, deeper reaches more and ranks worse | **Edge kinds**, and that refutation reproduced |
 | `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted, `Max` re-tried where its revival condition pointed and worse there too. **Both now DELETED** | Lift in the **cost**, which `Doubt` is the nearest thing to |
 | Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | A similarity gradient under the ranking |
-| `Window` span | Null on snake at every seed count; on `Babi`, an ordered corpus where before-and-after IS the content, it scores WORSE and costs an order of magnitude more traffic | **Edge kinds** — a carried-forward edge is currently ranked against a simultaneous one as if they meant the same thing |
+| `Window` span | Null on snake; WORSE on `Babi`, an ordered corpus where before-and-after is the content, at an order of magnitude more traffic | **Edge kinds** — a carried edge is ranked against a simultaneous one as if they meant the same |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
 
 ---
@@ -246,9 +252,9 @@ process** — kept, because a real network loses reports.
   measurements. **Every run reports `Complaints`; read them.**
 - **A small sample can look like a mechanism.** One seed with a collapsing echo
   read as a discovery and was three questions.
-- **A MEAN OVER A POPULATION THE PROBLEM CREATED CANNOT SEE THE PROBLEM.** Mean
-  fan-out stayed flat on the world whose rows grew without bound, because the
-  growth mints tiny nodes that hold the average down. **Read `Widest`.**
+- **A MEAN OVER A POPULATION THE PROBLEM CREATED CANNOT SEE IT.** Fan-out stayed
+  flat where rows grew without bound: the growth mints tiny nodes that hold the
+  average down. **Read `Widest`.**
 - **Copies drift where nothing fails.** Three worlds each grew their own settle
   loop, complaint list and vote tally, and a difference between them would move a
   headline without failing a test. `DuplicationTests` is the budget now.

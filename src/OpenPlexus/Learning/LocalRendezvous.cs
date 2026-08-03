@@ -80,6 +80,24 @@ public sealed class LocalRendezvous : IRendezvous
             }
         }
 
+        // THE TEMPORAL EDGE, and it is written ONE WAY. A code that stopped
+        // before this moment records what followed it; what followed records
+        // nothing about it. So a broadcast can walk forward from what just
+        // happened and cannot walk back, which is the only thing that makes an
+        // edge mean "then" rather than "with".
+        //
+        // The departed do NOT note the occasion -- they were not in it. The
+        // invariant still holds, because this edge is weighed by the RECEIVER's
+        // marginal and the receiver is an onset, which did note.
+        foreach (var past in occasion.Recent)
+        {
+            if (present.Contains(past)) continue;
+
+            foreach (var onset in occasion.Onsets)
+                if (past != onset)
+                    _clusters.For(past).Observe(onset);
+        }
+
         // ONSET-TO-EVERYTHING, never live-to-live. Two codes that were both
         // already there did not just coincide -- they coincided whenever they
         // started, and that was counted then. Incrementing them again on every

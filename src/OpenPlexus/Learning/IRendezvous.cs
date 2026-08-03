@@ -29,6 +29,18 @@ public sealed record Occasion
     /// <summary>What was already there when they started.</summary>
     public required ImmutableArray<Code> Live { get; init; }
 
+    /// <summary>
+    /// What had recently stopped, carried forward by the window.
+    /// </summary>
+    /// <remarks>
+    /// <b>These join ONE WAY — the past records the future and not the
+    /// reverse.</b> That asymmetry is the whole of what makes an edge temporal:
+    /// a broadcast of what has just happened can walk forward to what usually
+    /// follows, and a broadcast of what follows cannot walk back. Simultaneity
+    /// stays symmetric, because nothing came first.
+    /// </remarks>
+    public ImmutableArray<Code> Recent { get; init; } = [];
+
     /// <summary>When, by the observing machine's own clock.</summary>
     public required long At { get; init; }
 }

@@ -240,6 +240,14 @@ there**. A frame's onsets are one occasion, not one each.
 - **Two onsets in one frame are one coincidence.**
 - **Both directions written, each by its own node.**
 
+**A `Window` carries departed codes forward**, so a thing that stopped before
+the next began can still be linked to it. **Those join ONE WAY — the past
+records the future and not the reverse**, which is the whole of what makes an
+edge temporal: a broadcast of what just happened can walk forward, and one of
+what follows cannot walk back. Simultaneity stays symmetric, because nothing
+came first. `Span = 0` is the old behaviour exactly, and is the default —
+sweeping it 0 to 8 moved nothing measurable, see fork 19.
+
 `LocalRendezvous` writes directly because every cluster is in one process. **It
 does not test the hard part**, which is fork 1.
 
@@ -383,11 +391,9 @@ the move this design refuses.
 
 ## What is deliberately absent
 
-- **Temporal edges.** Every edge is within-moment: the rendezvous joins an
-  onset with what was live in the *same* occasion, so nothing links moment *t*
-  to moment *t+1*. **This is why prediction loses to a blind guess** — fork 19.
 - **Prediction ranking chains.** `Foresight` scores predictions; nothing yet
-  uses that score to rank one chain over another.
+  uses that score to rank one chain over another. That is the middle tier of
+  output selection and the reason prediction was built.
 - **Forgetting.** Designed on `master` — half-life, aged on read, clocked on the
   node's own occasions — and unbuilt here. Fork 17.
 - **The wire.** No second machine exists, so `IPeer` was deleted rather than

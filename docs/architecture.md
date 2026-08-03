@@ -654,6 +654,41 @@ Recorded here so a decision does not go quiet.
     the state alone has co-occurred with each. A broadcast expresses preference
     as economics, not as selection.
 
+    **THE MEASUREMENT WAS WRONG, NOT THE MECHANISM — corrected 2026-08-02.**
+    Predicting the whole next observation is mostly predicting **persistence**,
+    which is free: most codes are still there next frame whatever anyone does,
+    and a blind draw from a small alphabet is very good at "the same again". On
+    that measure the graph scores 0.58 against a blind 0.64 and looks worse than
+    chance.
+
+    **Scored against what actually STARTED, the graph wins.** Per seed over 150
+    seeds, precision on onsets minus the blind draw's:
+
+    | span | gap | se | sigma |
+    |---|---|---|---|
+    | 0 | 0.0094 | 0.0015 | **6.3** |
+    | 2 | 0.0130 | 0.0018 | 7.3 |
+    | 4 | 0.0104 | 0.0018 | 5.9 |
+    | 8 | 0.0121 | 0.0019 | 6.3 |
+
+    **This is the first positive result in the project that is not about
+    survival.** The graph knows something about what is coming.
+
+    **AND THE WINDOW DOES NOT MEASURABLY HELP.** Span 0 — no temporal edges at
+    all — already achieves it, and the differences between spans are inside a
+    standard error and a half of each other. An earlier reading off aggregated
+    totals suggested the gap grew with span; **the per-seed spread says that was
+    noise**, which is the second time a bare mean has misled here.
+
+    **So simultaneity alone carries the predictive signal in this world**: a
+    code that has co-occurred with what is present tends to turn up next, and
+    explicit succession adds nothing on top of that. `master` measured the
+    opposite on its senses graph — 0.153 with a window against 0.000 without —
+    so this null is **conditional on snake**, where almost everything visible
+    persists frame to frame. The window is kept at span 0 by default rather than
+    deleted, because a refutation is conditional on its configuration and this
+    one has only met one world.
+
     **A mutation survives here and is recorded rather than hidden:** removing
     the action from `SnakeRun`'s prediction broadcast does not turn any test
     red. The counterfactual is asserted at the `Thought` level, where two

@@ -72,6 +72,18 @@ public sealed record RunResult
     public required Foresight Foresight { get; init; }
 
     /// <summary>
+    /// The same predictions, scored only against what CHANGED.
+    /// </summary>
+    /// <remarks>
+    /// <b>Predicting the whole next observation is mostly predicting
+    /// persistence</b>, and persistence is free — most codes are still there
+    /// next frame whatever anyone does. Scoring against the onsets alone asks
+    /// the only part of the question that is not already answered by saying
+    /// "the same again".
+    /// </remarks>
+    public required Foresight Novelty { get; init; }
+
+    /// <summary>
     /// Of the steps a chain chose, how many chose the action just taken.
     /// </summary>
     /// <remarks>
@@ -164,6 +176,7 @@ public sealed class SnakeRun : IDisposable
     private readonly List<Exception> _faults = [];
     private readonly SnakeSense _sense = new();
     private readonly Foresight _foresight = new();
+    private readonly Foresight _novelty = new();
 
     /// <summary>Every vision code seen, so a blind guess can draw from the same alphabet.</summary>
     private readonly List<Code> _alphabet = [];
@@ -179,12 +192,16 @@ public sealed class SnakeRun : IDisposable
     /// </remarks>
     private readonly Random _guessing;
 
+    /// <summary>What was present last step, so this step's onsets can be found.</summary>
+    private HashSet<Code> _before = [];
+
     public SnakeRun(
         SnakeSettings world,
         WalkSettings dials,
         int seed,
         int clusters = 8,
-        int replicas = 256)
+        int replicas = 256,
+        int span = 0)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(dials);
@@ -216,7 +233,8 @@ public sealed class SnakeRun : IDisposable
             new LocalRendezvous(_local),
             _bus,
             _ring,
-            dials);
+            dials,
+            span);
 
         _handles.Add(_bus.Subscribe(_eye));
         _hand = new OutputMachine(new MachineAddress("hand"), SnakeSense.Turns);
@@ -256,6 +274,12 @@ public sealed class SnakeRun : IDisposable
             // world BEFORE anything is counted, so the graph never sees the
             // answer before being asked.
             _foresight.Settle(foreseen, present, blind);
+
+            // Scored against what STARTED, which is the part persistence does
+            // not answer for free.
+            _novelty.Settle(foreseen, [.. present.Where(c => !_before.Contains(c))], blind);
+
+            _before = [.. present];
             Remember(present);
 
             var thought = await _eye.ObserveAsync(frame, taken, ct).ConfigureAwait(false);
@@ -322,6 +346,7 @@ public sealed class SnakeRun : IDisposable
             Unbalanced = unbalanced,
             Messages = _bus.Messages,
             Foresight = _foresight,
+            Novelty = _novelty,
         };
     }
 

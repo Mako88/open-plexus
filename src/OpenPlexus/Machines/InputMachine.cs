@@ -23,6 +23,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     private readonly MachineAddress _address;
     private readonly IQuantizer<TFrame> _quantizer;
     private readonly LiveSet _liveSet = new();
+    private readonly Window _window;
     private readonly IRendezvous _rendezvous;
     private readonly IBus _bus;
     private readonly Ring _ring;
@@ -42,7 +43,8 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         IRendezvous rendezvous,
         IBus bus,
         Ring ring,
-        WalkSettings settings)
+        WalkSettings settings,
+        int span = 0)
     {
         ArgumentNullException.ThrowIfNull(quantizer);
         ArgumentNullException.ThrowIfNull(rendezvous);
@@ -56,6 +58,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         _bus = bus;
         _ring = ring;
         _settings = settings;
+        _window = new Window(span);
 
         _bus.Deaths += OnDeath;
     }
@@ -96,8 +99,13 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         var onsets = changes.Started.ToHashSet();
         ImmutableArray<Code> live = [.. _liveSet.Live.Where(code => !onsets.Contains(code))];
 
+        // What has recently stopped, carried forward so a thing that ended
+        // before the next began can still be linked to it.
+        ImmutableArray<Code> recent = [.. _window.Recent(now)];
+        _window.Carry(changes.Stopped, changes.Started, now);
+
         await _rendezvous.JoinAsync(
-            new Occasion { Onsets = changes.Started, Live = live, At = now }, ct)
+            new Occasion { Onsets = changes.Started, Live = live, Recent = recent, At = now }, ct)
             .ConfigureAwait(false);
 
         return await ThinkAsync(changes.Started, ct).ConfigureAwait(false);

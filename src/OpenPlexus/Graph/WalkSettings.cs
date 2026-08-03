@@ -65,6 +65,32 @@ public sealed record WalkSettings
     /// </remarks>
     public required double Stamina { get; init; }
 
+    /// <summary>
+    /// The budget for a prediction, when it should differ from the budget for
+    /// acting. Null means they are the same.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 20, AND IT IS FORCED BY MEASUREMENT RATHER THAN CHOSEN.</b> One
+    /// budget was serving two questions that want opposite depths.
+    /// </para>
+    /// <para>
+    /// <b>Prediction wants the shallowest walk that reaches anything.</b>
+    /// Direct association <i>is</i> the signal: at stamina 2 the novelty gap is
+    /// 0.0605 ± 0.0039 and at stamina 4 it is 0.0042 ± 0.0025 — fourteen times
+    /// worse, because without edge kinds a deeper walk reaches more and ranks
+    /// worse.
+    /// </para>
+    /// <para>
+    /// <b>Choosing an action needs more.</b> At stamina 2 <i>every one</i> of
+    /// 139 chain-chosen moves repeated the last action: the action just taken is
+    /// in the current occasion, so one hop reaches it and nothing else, and the
+    /// chain becomes a pure mirror. Depth is what lets another action be
+    /// reached at all.
+    /// </para>
+    /// </remarks>
+    public double? Foresight { get; init; }
+
     /// <inheritdoc cref="ArrivalValue"/>
     public required ArrivalValue Value { get; init; }
 

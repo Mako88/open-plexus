@@ -19,7 +19,7 @@ public sealed class PolicyTests
 
     private static WalkSettings Dials() => new()
     {
-        Stamina = 4.0,         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 4,
+        Stamina = 4.0, Foresight = 2.0,         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 4,
     };
 
     private static async Task<RunResult> Play(int seed, Policy policy)

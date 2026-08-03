@@ -108,15 +108,22 @@ public sealed class InputMachine<TFrame> : IReceiveReports
             new Occasion { Onsets = changes.Started, Live = live, Recent = recent, At = now }, ct)
             .ConfigureAwait(false);
 
-        return await ThinkAsync(changes.Started, ct).ConfigureAwait(false);
+        return await ThinkAsync(changes.Started, null, ct).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Opens a thought, mints a broadcast id, and sends the origins to their
     /// owning clusters — <b>one envelope per cluster, not per code.</b>
     /// </summary>
+    /// <param name="stamina">
+    /// What each route starts with. <b>Null takes the dial's own value</b>;
+    /// a caller passes one when the question wants a different depth from
+    /// acting — see fork 20.
+    /// </param>
     public async Task<Thought> ThinkAsync(
-        IReadOnlyCollection<Code> origins, CancellationToken ct = default)
+        IReadOnlyCollection<Code> origins,
+        double? stamina = null,
+        CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(origins);
         ArgumentOutOfRangeException.ThrowIfZero(origins.Count);

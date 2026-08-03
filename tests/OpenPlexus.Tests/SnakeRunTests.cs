@@ -21,7 +21,7 @@ public sealed class SnakeRunTests
 
     private static WalkSettings Dials() => new()
     {
-        Stamina = 4.0,
+        Stamina = 4.0, Foresight = 2.0,
         Value = ArrivalValue.Strength,
         Accumulate = Accumulate.Sum,
             Horizon = 6,

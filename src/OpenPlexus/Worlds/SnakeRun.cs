@@ -175,6 +175,7 @@ public sealed class SnakeRun : IDisposable
     private readonly Random _fallback;
     private readonly List<Exception> _faults = [];
     private readonly SnakeSense _sense;
+    private readonly WalkSettings _dials;
     private readonly Foresight _foresight = new();
     private readonly Foresight _novelty = new();
 
@@ -211,6 +212,7 @@ public sealed class SnakeRun : IDisposable
         ArgumentNullException.ThrowIfNull(dials);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(clusters);
 
+        _dials = dials;
         _sense = new SnakeSense(includeEmpty);
         _snake = new Snake(world, seed);
         _fallback = new Random(seed);
@@ -394,7 +396,10 @@ public sealed class SnakeRun : IDisposable
     {
         if (present.Count == 0) return ([], []);
 
-        var thought = await _eye.ThinkAsync([.. present, doing], ct).ConfigureAwait(false);
+        // A SHALLOWER BUDGET FOR THE PREDICTION, because the two questions
+        // want opposite depths -- fork 20.
+        var thought = await _eye.ThinkAsync(
+            [.. present, doing], _dials.Foresight, ct).ConfigureAwait(false);
         await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
 
         // As many codes as an observation holds: predicting an

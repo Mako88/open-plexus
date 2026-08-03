@@ -27,7 +27,7 @@ public sealed class ForesightTests
 
     private static WalkSettings Dials() => new()
     {
-        Stamina = 4.0, Value = ArrivalValue.Strength,
+        Stamina = 4.0, Foresight = 2.0, Value = ArrivalValue.Strength,
         Accumulate = Accumulate.Sum, Horizon = 50,
     };
 

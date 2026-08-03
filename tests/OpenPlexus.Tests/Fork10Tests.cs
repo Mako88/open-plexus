@@ -20,7 +20,7 @@ public sealed class Fork10Tests
 
     private static WalkSettings Dials() => new()
     {
-        Stamina = 4.0,         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 50,
+        Stamina = 4.0, Foresight = 2.0,         Value = ArrivalValue.Strength, Accumulate = Accumulate.Sum, Horizon = 50,
     };
 
     private static async Task<List<RunResult>> Over(int seeds, Policy policy, double energy)

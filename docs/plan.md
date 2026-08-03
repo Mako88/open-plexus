@@ -132,6 +132,11 @@ constant. **This is what lets the alphabet GROW** — today the quantiser fixes 
 forever. Fork 21's trade is the **utility problem** from explanation-based
 learning (Minton, SOAR): utility belongs per chunk, not as one global `Weight`.
 
+**`Motif` HAS ALREADY SAID WHAT THIS IS NOT ABOUT.** A familiar set completes
+perfectly without any chunking, because its members co-occur and the counts are
+right. **So step 3 is not being asked to fix an accuracy — it is being asked to
+stop paying for one**, and the number to beat is the traffic per completion.
+
 ### 4. Homeostatic drives — Ashby
 
 Keep internal variables in bounds and behaviour becomes goal-directed **with no
@@ -154,6 +159,7 @@ act, no amount of scaling gets there.
 - [x] `Babi` — twenty tasks somebody else wrote, with published baselines
 - [x] `Clevr` — fork 25's experiment on scene graphs generated in 2017
 - [x] `Rhythm` — the endless stationary stream prediction can be measured on
+- [x] `Motif` — recurring sets that should collapse into one code
 - [ ] `Surprise` — the local prediction error of step 2
 - [ ] `Chunk` — the minted node of step 3
 - [ ] `Drives` — the bounded internal variables of step 4

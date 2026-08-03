@@ -240,6 +240,53 @@ winning both, and by one fruit.
 
 ---
 
+## A SECOND WORLD, AND IT ANSWERS SOMETHING IT WAS NEVER TOLD
+
+**Built 2026-08-02, and it shares no code with snake** — no space, no movement,
+no actions, no energy, nothing to lose. Three senses. An occasion shows either
+**sight with sound**, or **sound with touch**. **Sight and touch are never shown
+together, not once**, which is asserted over 5,000 moments rather than trusted.
+
+Then: *given a sight, what does it feel like?*
+
+**A memoriser scores exactly zero**, because the pair has never occurred.
+Getting it right requires walking sight → sound → touch — the two-step
+composition that decides whether this is a graph database with extra steps.
+
+**12 concepts, 3 codes a sense, 10% noise, 12 seeds, scored prequentially:**
+
+| | accuracy | chance | no answer |
+|---|---|---|---|
+| **the world** | **0.8898 ± 0.0068** | 0.0833 | 55 / 708 |
+| **scrambled control** | **0.0311 ± 0.0086** | 0.0833 | 443 / 708 |
+
+**Eleven times chance, and the control collapses below chance.** Every mechanism
+runs identically in both arms; only the structure the world contains is
+destroyed. So the accuracy is coming from composition and from nothing else.
+
+**This is the closest thing to an answer the project has produced** for its own
+deciding question — *does a relational objective buy reasoning; can it produce
+something it was never told?* On this task, measured against its own control:
+yes.
+
+### And it reverses the snake finding about depth
+
+| stamina | accuracy | questions answered |
+|---|---|---|
+| 2 | **0.0000** | 0 of 708 |
+| 4 | 0.1384 ± 0.0149 | 105 of 708 |
+| 8 | **0.8884 ± 0.0053** | 651 of 708 |
+
+**In snake a deeper walk dilutes prediction and shallow wins. Here depth IS the
+mechanism** — sight reaches touch only through sound, so a budget that cannot
+afford two hops answers nothing at all.
+
+**Which is exactly why the second world was worth building, and it lands on the
+first try.** The stamina finding was about snake. Every other number in this
+file is still one world wide until it has been run here too.
+
+---
+
 ## The wiring audit — John's ask, 2026-08-02
 
 **"Changes made very little difference, only to find out stuff wasn't wired up

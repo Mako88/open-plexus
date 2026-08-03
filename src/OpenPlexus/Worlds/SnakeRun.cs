@@ -176,6 +176,18 @@ public sealed class SnakeRun : IDisposable
     private readonly List<Exception> _faults = [];
     private readonly SnakeSense _sense;
     private readonly WalkSettings _dials;
+
+    /// <summary>
+    /// How many codes a prediction names. Null means as many as an observation
+    /// holds.
+    /// </summary>
+    /// <remarks>
+    /// <b>A handle on the ranking, not on the graph.</b> If the order the
+    /// arrivals come in carries information, naming more of them must dilute
+    /// precision; if precision is flat in this, the order carries nothing and
+    /// only the set does.
+    /// </remarks>
+    private readonly int? _names;
     private readonly Foresight _foresight = new();
     private readonly Foresight _novelty = new();
 
@@ -206,13 +218,15 @@ public sealed class SnakeRun : IDisposable
         int clusters = 8,
         int replicas = 256,
         int span = 0,
-        bool includeEmpty = false)
+        bool includeEmpty = false,
+        int? names = null)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(dials);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(clusters);
 
         _dials = dials;
+        _names = names;
         _sense = new SnakeSense(includeEmpty);
         _snake = new Snake(world, seed);
         _fallback = new Random(seed);
@@ -402,9 +416,7 @@ public sealed class SnakeRun : IDisposable
             [.. present, doing], _dials.Foresight, ct).ConfigureAwait(false);
         await _bus.WhenQuiet().WaitAsync(Patience, ct).ConfigureAwait(false);
 
-        // As many codes as an observation holds: predicting an
-        // observation-sized set rather than a number nobody chose.
-        var wanted = present.Count;
+        var wanted = _names ?? present.Count;
         var foreseen = thought.BestOf(SnakeQuantizer.Vision, wanted)
             .Select(a => a.Endpoint).ToArray();
 

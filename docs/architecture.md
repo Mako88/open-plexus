@@ -440,32 +440,53 @@ change the order — was checked and is also wrong:
 move.** So the ordering is not being ignored — it is being changed constantly
 and changing nothing.
 
-### Which says the ranking carries no information
+### Which said the ranking carries no information — and that was WRONG
 
-The top candidates are separated by about 12%, and whichever of them is named,
-the chance of being right is the same. **The graph narrows to a decent candidate
-set and cannot discriminate within it.**
+**Retracted the same day it was written.** The claim was that whichever
+candidate is named the chance of being right is the same, so the graph narrows
+to a set and cannot discriminate within it. It was built on one observation —
+`Lift` swapping the top two half the time and changing nothing — with no test of
+the claim itself.
 
-That is `master`'s recurring finding in a new world: *walking further reaches the
-answer and cannot rank it — two steps from a well-connected node is about 1,300
-candidates and nothing says which one the question was about.* There, edge kinds
-supplied the discrimination. **Here there are no edge kinds and nothing else
-supplies it.**
+**The test: sweep how many codes a prediction names.** If the order carries
+information, naming more must dilute precision. Policy fixed at random, 40
+seeds:
 
-**It also explains the other nulls at once.** Deeper walks hurt because they
-enlarge a set that cannot be ranked. `Sum` and `Max` are alike because the
-routes agree about the set and not about the order. Prediction sits modestly
-above chance because the set is genuinely better than random and the pick within
-it is not.
+| codes named | precision | blind | gap |
+|---|---|---|---|
+| **1** | **0.2215** | 0.0826 | **0.1324 ± 0.0162** |
+| 2 | 0.1667 | 0.0910 | 0.0758 ± 0.0095 |
+| 3 | 0.1647 | 0.0848 | 0.0839 ± 0.0088 |
+| 5 | 0.1575 | 0.0789 | 0.0872 ± 0.0071 |
+| 8 | 0.1510 | 0.0817 | 0.0787 ± 0.0077 |
+| 12 | 0.1510 | 0.0831 | 0.0769 ± 0.0080 |
 
-**So the bottleneck is not which valuation is used.** It is that nothing in the
-design discriminates within what a broadcast reaches. That is the thing to
-build, and the two candidates already named are **prediction error as a ranking
-signal** — the middle tier that is still unbuilt — and something like **edge
-kinds**, which this design has never had.
+**Precision falls from 0.2215 to 0.1510 as the set grows, so the ranking is
+informative.** The single top-ranked code is right **2.7× as often as chance**;
+by the eighth it is 1.85×.
 
-**`master` measured `Sum` beating `Max` 0.1234 to 0.0834**, so this null is
-conditional on a world with a two-dozen-code alphabet and a two-hop walk.
+### The true shape: coarse ranking, no fine ranking
+
+Both results hold and they are about different scales.
+
+- **Between the top and the tail, the order carries real information** — a 47%
+  drop in precision from first to eighth.
+- **Between adjacent top candidates it carries almost none** — the top two are
+  separated by 12% in score, so `Lift` swapping them costs nothing.
+
+**That is a much narrower statement than the one it replaces, and it does not
+support "nothing discriminates within the reached set".** The graph discriminates
+coarsely and not finely, which is a different problem with different repairs.
+
+**And it is immediately actionable: naming fewer codes is better.** The harness
+names as many as an observation holds, about three. Naming one scores 0.1324
+against 0.0839 — the dial exists as `names` and its best setting is the smallest.
+
+**The lesson is the rule that produced it.** *A diagnosis is a claim about
+behaviour; check the failure is repairable before proposing the repair.* The
+repair proposed one tick earlier — build something to discriminate within the
+reached set — was aimed at a failure that had never been measured, and the
+measurement took one sweep.
 
 ---
 

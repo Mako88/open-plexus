@@ -307,23 +307,38 @@ order to find what it cannot see.
 
 ## Stamina swept — and depth HURTS
 
-> **⚠ UNDER INVESTIGATION, 2026-08-02. Do not build on this yet.** Two follow-up
-> measurements disagree about *which* budget is doing the work. Varying only the
-> **prediction** budget, with the policy fixed at random and the action budget
-> fixed, moved nothing: 0.0164, 0.0159, 0.0162, 0.0149 for budgets 2, 3, 4 and
-> 8 — flat. But varying **both** budgets together moved a great deal, 0.0684
-> down to 0.0152 over the same range and the same fixed policy. Those cannot
-> both be right about the same cause, and they were taken in separate runs, so
-> anything that differs between runs was uncontrolled. A single run comparing
-> every combination is what settles it.
+> **⚠ RESOLVED AND NOT AS FIRST READ, 2026-08-02.** All four combinations in
+> **one run**, policy fixed at random so every trajectory is identical (34
+> steps in each arm):
+>
+> | action budget | prediction budget | novelty gap |
+> |---|---|---|
+> | 2 | 2 | 0.0740 ± 0.0073 |
+> | 2 | **4** | 0.0744 ± 0.0069 |
+> | 4 | **2** | 0.0155 ± 0.0041 |
+> | 4 | 4 | 0.0157 ± 0.0040 |
+>
+> **The ACTION budget determines the prediction gap entirely, and the
+> PREDICTION budget does nothing at all.** Which is the opposite of what fork
+> 20's split was built on.
+>
+> **The likely reason the prediction budget is inert**: a prediction names as
+> many codes as an observation holds, and at any budget there are already more
+> sensory arrivals than that. The top few are the one-hop arrivals either way —
+> a deeper walk adds arrivals that rank below the cut and never appear.
+>
+> **The reason the action budget matters is NOT established.** Under a fixed
+> random policy the action broadcast changes nothing about the world, the
+> trajectory or the learning, and yet it moves the number by a factor of five.
+> Recorded as unexplained rather than given a story. **`Foresight` is kept
+> because it costs nothing and is measured inert; it should be deleted if
+> nothing explains this.**
 >
 > **What is not in doubt:** at a shallow budget the chain becomes a pure mirror
 > — 100% of chain-chosen moves repeat the last action at stamina 2, against 2%
-> at stamina 8 — and that much is measured, reproduced and is what fork 20's
-> split budget was built for.
+> at stamina 8.
 
-**Never swept until 2026-08-02, and it may be the most consequential
-dial in the project.** 60 seeds, energy 200, empty cells withheld:
+**Never swept until 2026-08-02.** 60 seeds, energy 200, empty cells withheld:
 
 | stamina | deepest chain | steps | messages | novelty gap | sigma |
 |---|---|---|---|---|---|

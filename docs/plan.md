@@ -186,10 +186,8 @@ its ceiling it absorbs anything.)*
   falls from nearly every step to one in forty, **at a third of the messages** —
   and the evidence toll cannot land there at all, a coarse code weighing nearly one
   against its own fine code so the hop is free and depth explodes.
-- **AND THE SCORE COLLAPSES, BECAUSE THE SILENCE WAS THE EXPLORATION.** The body
-  locks onto the first action that ever earned credit and takes it on 393 of 400
-  steps. **Ranking by agreement rather than summed strength changes nothing** —
-  only one action is reachable at all, so there is nothing to rank.
+- **AND THE SCORE COLLAPSES, BECAUSE THE SILENCE WAS THE EXPLORATION** — one action
+  on 393 of 400 steps, and no ranking changes it because only one is reachable.
 - **REPLAY.** Re-run experience when nothing is arriving. **`WhenIdle()` triggers
   it**, and a body that cannot bootstrap is what it is for.
 - **INHIBITION — EXPRESSIBLE, AND IT DOES NOT PAY YET.** "Punishment is
@@ -211,22 +209,18 @@ its ceiling it absorbs anything.)*
 - **`Question.Downstream` (Dayan) is unaskable**: it wants the REVERSE temporal
   edge a carried code does not write — see `Kind.Before`.
 
-### 10. A REASON TO SEEK
+### 10. A REASON TO SEEK — **and it cannot be a walk**
 
-- **`Drives` wants to STAY ALIVE; nothing wants to FIND OUT**, though
-  `Surprise.Rate` is a quantity the machine reads about itself.
-- **`Kind.Informed` is the shape**: a second write when an act produced something
-  unpredicted — `Kind.Helped` with `Surprise` as the third factor.
-- **NOVELTY DECAYS WITH NOTHING DECAYING**: `informed / seen` falls as an act
-  becomes predictable. **The anti-hub weighting already does it.**
-- **ERROR IS NOT PROGRESS — the noisy television.** Seeking error alone rewards
-  whatever is least learnable; Schmidhuber's claim is about compression PROGRESS.
-- **IT REPLACES THE BOOTSTRAP.** The credit cell is empty until something has
-  helped, so the arm is mostly its own coin toss — **and TRAPS calls a fallback a
-  control arm nobody meant to run.**
-- **BUILT, AND NOT MEASURABLE ON `Homeostat`: THE PREDICTION WALK RETURNS NOTHING
-  THERE.** Every moment reads as maximally surprising, so the dense arm writes
-  always and the selective one never. **`Tending` is where to re-run it.**
+- **`Drives` wants to STAY ALIVE; nothing wants to FIND OUT.** `Kind.Informed` is
+  the shape: a second write when an act produced something unpredicted, `Surprise`
+  standing where `Drives` does, computed from the machine's own error.
+- **BUILT, AND IT CANNOT REACH THE FAULT.** Every cell is written only for acts
+  TAKEN, so it ranks what has been tried and cannot send a body to what has not.
+- **NOVELTY WOULD DECAY WITH NOTHING DECAYING** — `informed / seen` falls as an act
+  becomes predictable, handing over from seeking to exploiting with no schedule.
+  **Worth having once something can actually explore.**
+- **ERROR IS NOT PROGRESS — the noisy television.** Schmidhuber's claim is about
+  compression PROGRESS, not error.
 
 ### 11. NOTHING HERE PLANS
 
@@ -239,22 +233,26 @@ its ceiling it absorbs anything.)*
 
 ### WHAT A WHOLE SESSION OF THIS SAYS — 2026-08-04
 
+
 - **EVERY MECHANISM BUILT WORKS AND EVERY ONE FAILS THE SAME WAY.** Paths,
   backoff, curiosity, the trace, grains, the toll: each does what it was built to
   do, and **every configuration that lets the walk SPEAK scores worse than
   random.**
-- **SO THE SILENCE WAS NEVER THE PROBLEM — IT WAS THE EXPLORATION.** Solvable
-  three ways, and each one removes the coin toss that was carrying the arm.
-- **AND EVERYTHING TRIED SO FAR CHANGED THE READ SIDE.** Questions, paths, tolls
-  and grains change how credit is REACHED; the trace changes how WIDELY it is
-  written. **Nothing has changed WHAT is written, and nothing has given the body a
-  reason to try the acts it has not tried.**
-- **WHICH MAKES STEP 10 LOAD-BEARING.** A body that only takes the act it already
-  believes in learns nothing about the others, so the credit cell records one
-  action forever. **Exploration is what makes the statistic mean anything.**
-- **`Kind.Helped` IS STILL A FREQUENCY**: `helped / seen` is a hit rate, where ΔP
-  is `P(better | act) − P(better | not act)` and needs a base rate nothing records.
-  **The second untried half.**
+- **THE SILENCE WAS NEVER THE PROBLEM — IT WAS THE EXPLORATION.** Solvable three
+  ways, each removing the coin toss that was carrying the arm.
+- **EVERYTHING TRIED CHANGED THE READ SIDE.** Questions, paths, tolls and grains
+  change how credit is REACHED; the trace how WIDELY it is written. **Nothing
+  changed WHAT is written, or gave the body a reason to try what it has not.**
+- **EXPLORATION CANNOT COME FROM THE WALK — this is structural.** Every cell is
+  keyed on *(state, act)* and **written only for acts TAKEN**, so no walk can
+  recommend an untried act. Measured: `Worthwhile`, `Agreed` and `Curious` produce
+  a BYTE-IDENTICAL run, only one action being reachable under any of them.
+- **SO IT MUST BE EXTRA-GRAPH, AND THERE IS A C1-LEGAL PLACE.** A machine knows
+  what IT has done — its own history is its own data — so an actuator can prefer
+  what it has tried least. **Count-based exploration owned by the machine, not the
+  graph.** The coin toss is its degenerate form and should be deliberate.
+- **`Kind.Helped` IS STILL A FREQUENCY**: `helped / seen` is a hit rate where ΔP is
+  `P(better | act) − P(better | not act)`, needing a base rate nothing records.
 
 - **NONE OF IT IS A SUFFICIENCY ARGUMENT** — all of it could land and still not be
   enough. The narrower claim: without structure, an internal error signal, a
@@ -392,12 +390,12 @@ process** — kept, because a real network loses reports.
   silence drifts it toward the random bar for free, and that reads as the change
   working. **Report silence beside the score.** It cannot carry an arm PAST the
   bar; that is arithmetic.
-- **AND THE CONVERSE, WHICH COST A WHOLE SESSION: THE FALLBACK IS THE ONLY
-  EXPLORATION THIS DESIGN HAS.** Silent on nearly every step means acting at random
-  on nearly every step, so **every mechanism that CURES the silence removes the
-  exploration** — the body locks onto the first act that ever earned credit and the
-  change reads as harmful when it merely exposed a policy the coin toss was hiding.
-  Measured: silence 399 of 400 down to 10, and then ONE action on 393 steps.
+- **AND THE CONVERSE, WHICH COST A SESSION: THE FALLBACK IS THE ONLY EXPLORATION
+  THERE IS.** Silent on nearly every step means acting at random on nearly every
+  step, so **every mechanism that CURES the silence removes the exploration** — the
+  body locks onto the first act that earned credit, and the change reads as harmful
+  when it merely exposed a policy the coin toss was hiding. Measured: silence 399
+  of 400 down to 10, then ONE action on 393 steps.
 - **AND A SILENCE HAS TWO CAUSES THAT LOOK IDENTICAL AND WANT OPPOSITE FIXES**: an
   empty cell, or a walk that cannot AFFORD to reach one. **Spend more and see
   whether the voice returns** — on `Tending` it does, from silent on nearly every

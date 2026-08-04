@@ -102,6 +102,34 @@ public enum Gardening
     /// <see cref="Thinking.Question.Agreed"/> counts distinct origins instead.
     /// </remarks>
     Concurring,
+
+    /// <summary>
+    /// The CURIOUS question first and the credit question only where it is silent —
+    /// <b>step 10, inverted, and aimed at the lock-in rather than the bootstrap.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE MEASURED FAULT IS NOT SILENCE, IT IS LOCK-IN.</b> With grains and the
+    /// traffic toll the walk speaks on 390 of 400 steps and takes ONE action on 393
+    /// of them. An action enters the graph only by being taken, so the act never
+    /// tried is the act never learnt about, and the loop closes on itself.
+    /// </para>
+    /// <para>
+    /// <b>SO CURIOSITY CANNOT BE A FALLBACK HERE.</b> Asking it only where the
+    /// credit cell is silent would fire on one step in forty — it has to compete
+    /// with the credit, not wait behind it. <b>This asks it FIRST.</b>
+    /// </para>
+    /// <para>
+    /// <b>AND THE HAND-OVER NEEDS NO SCHEDULE, WHICH IS THE PART WORTH HAVING.</b>
+    /// Early on nothing is predicted, so nearly every act is informative and the
+    /// body ranges widely. As the model improves, <c>informed / seen</c> falls on
+    /// its own for an act that has become predictable — the marginal keeps rising
+    /// while the cell stops — so curiosity goes quiet exactly where it has been
+    /// satisfied and the credit question takes over. <b>No dial, no decay, and
+    /// nothing anybody has to tune.</b>
+    /// </para>
+    /// </remarks>
+    Seeking,
 }
 
 /// <summary>What the garden measured. <b>Counts, not claims.</b></summary>
@@ -279,6 +307,11 @@ public sealed class TendingRun : IDisposable
         // breaking even looks like here, so it is what earns the full band.
         var sensing = new Sensing(_settings.Drain * _settings.Plants);
 
+        // STEP 10'S THIRD FACTOR, and null for every arm that does not seek. Held
+        // here rather than handed to the machine, so switching it on does not also
+        // switch on step 2's broadcast gating.
+        var surprise = choosing == Gardening.Seeking ? new Surprise() : null;
+
         // THE TRACE, NEWEST LAST, HELD AS THE MACHINE ACTUALLY WROTE EACH ONE.
         // Rebuilding an occasion from the codes gets a NEIGHBOURING occasion --
         // onsets separated from what was already live, the window's carried codes
@@ -305,10 +338,29 @@ public sealed class TendingRun : IDisposable
                     choosing switch
                     {
                         Gardening.Concurring => Question.Agreed(),
+
+                        // CURIOSITY FIRST, CREDIT SECOND -- see Gardening.Seeking.
+                        // Asked the other way round it would fire on one step in
+                        // forty and could not touch the lock-in.
+                        Gardening.Seeking => Question.Curious(),
+
                         _ when Credits(choosing) => Question.Worthwhile(),
                         _ => null,
                     },
                     ct).ConfigureAwait(false);
+
+            // WHERE CURIOSITY HAS NOTHING TO SAY, THE CREDIT CELL ANSWERS. That is
+            // the arm settling into exploitation as its model fills in, and it
+            // needs no schedule -- see Gardening.Seeking.
+            if (choosing == Gardening.Seeking && walked.Chosen is null)
+            {
+                var known = await ChosenAsync(felt, chains, Question.Worthwhile(), ct)
+                    .ConfigureAwait(false);
+
+                walked = (known.Chosen,
+                    walked.Settled && known.Settled,
+                    walked.Balanced && known.Balanced);
+            }
 
             if (!walked.Balanced) unbalanced++;
             if (!walked.Settled) unsettled++;
@@ -377,6 +429,12 @@ public sealed class TendingRun : IDisposable
                 if (trace.Count > reach) trace.RemoveAt(0);
             }
 
+            // WHAT THE GRAPH EXPECTS OF THE NEXT MOMENT, asked after the occasion is
+            // written so the prediction sees the graph the body has just moved
+            // through, and settled one step from now against what arrives.
+            if (surprise is not null)
+                surprise.Expect(await ForeseeingAsync(occasion, chains, ct).ConfigureAwait(false));
+
             if (world.Step(chose)) held++;
         }
 
@@ -405,7 +463,32 @@ public sealed class TendingRun : IDisposable
     /// <summary>Whether this arm writes the credit cell at all.</summary>
     private static bool Credits(Gardening how) =>
         how is Gardening.Credited or Gardening.Traced or Gardening.Smeared
-            or Gardening.Concurring;
+            or Gardening.Concurring or Gardening.Seeking;
+
+    /// <summary>What the graph expects to be true next, narrowed to what is felt.</summary>
+    /// <remarks>
+    /// <b>NARROWED TO THE PLANTS AND NOT TO ACTIONS.</b> A prediction naming the
+    /// next act would be scored against a choice this run is about to make, so it
+    /// would be right or wrong for reasons that have nothing to do with the model.
+    /// </remarks>
+    private async Task<IReadOnlyList<Code>> ForeseeingAsync(
+        ImmutableArray<Code> felt, Chains chains, CancellationToken ct)
+    {
+        var thought = await _body
+            .ThinkAsync(felt, _dials.Stamina, Question.Following(), ct).ConfigureAwait(false);
+
+        await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
+        chains.Fold(thought.Best(int.MaxValue));
+
+        var named = thought.Best(int.MaxValue)
+            .Where(arrival => arrival.Endpoint.Modality != Tending.Did)
+            .Take(_settings.Plants)
+            .Select(arrival => arrival.Endpoint)
+            .ToList();
+
+        _body.Forget(thought.Id);
+        return named;
+    }
 
     /// <summary>
     /// How far back the credit reaches, in steps.

@@ -203,11 +203,10 @@ its ceiling it absorbs anything.)*
   on 393 of 400 steps, and no ranking changes it because only one is reachable.
 - **REPLAY.** Re-run experience when nothing is arriving. **`WhenIdle()` triggers
   it**, and a body that cannot bootstrap is what it is for.
-- **INHIBITION — EXPRESSIBLE, AND IT DOES NOT PAY YET.** "Punishment is
-  unavailable" was **the wrong CRDT, not a law**: a **PN-Counter** is two
-  G-Counters read as a difference. `Kind.Hindered` costs a KIND, not a wider row,
-  and **must discount the SCORE and never the price**. **Still no better than the
-  one-sided count** where most acts are wrong most of the time.
+- **INHIBITION — EXPRESSIBLE, AND IT DOES NOT PAY YET.** A **PN-Counter** is two
+  G-Counters read as a difference, so "punishment is unavailable" was **the wrong
+  CRDT, not a law**. `Kind.Hindered` costs a kind, not a wider row, and **must
+  discount the SCORE and never the price**.
 
 ### 9. RELATIONAL PATHS — built, and the idea behind them refuted
 
@@ -224,10 +223,10 @@ its ceiling it absorbs anything.)*
 ### 10. A REASON TO SEEK — **and it cannot be a walk**
 
 - **`Drives` wants to STAY ALIVE; nothing wants to FIND OUT.** The shape was
-  `Informed`: a second write when an act produced something unpredicted, `Surprise`
-  standing where `Drives` does, computed from the machine's own error.
-- **BUILT, AND IT CANNOT REACH THE FAULT.** Every cell is written only for acts
-  TAKEN, so it ranks what has been tried and cannot send a body to what has not.
+  `Informed` — a second write when an act produced something unpredicted, priced by
+  `Surprise` where `Drives` stands. **BUILT, AND IT CANNOT REACH THE FAULT**: every
+  cell is written only for acts TAKEN, so it ranks what has been tried and cannot
+  send a body to what has not.
 - **NOVELTY WOULD DECAY WITH NOTHING DECAYING** — `informed / seen` falls as an act
   becomes predictable, with no schedule. **Worth having once something can
   explore.**
@@ -256,9 +255,9 @@ its ceiling it absorbs anything.)*
   **It works and round-robins, scoring below the coin toss.**
 - **EVERYTHING TRIED CHANGED THE READ SIDE, SO ΔP CHANGES WHAT IS WRITTEN.**
   `Node.Contingency` subtracts the base rate a hit rate cannot see, off a marginal
-  split by relation and not off the row. **Built, audited, driving nothing yet**,
-  and a base rate not varying by state could not re-rank anything. **Exploration
-  generates the data, a contingency makes it mean something, neither suffices.**
+  split by relation and not off the row. **Audited at the unit level, wired, and
+  `Homeostat` ABSORBS IT** — see the trap below. **Exploration generates the data,
+  a contingency makes it mean something, neither suffices.**
 
 - **NONE OF IT IS A SUFFICIENCY ARGUMENT.** The narrower claim: without structure,
   an internal error signal, a growing alphabet, a reason to act, a reason to seek,
@@ -386,6 +385,9 @@ process** — kept, because a real network loses reports.
 - **A dial can be declared, documented, passed everywhere and connected to
   nothing.** `ThinkAsync`'s stamina was, and survived three measurements.
   **Every run reports `Complaints`; read them.**
+- **A RANKING ARM NEEDS SOMETHING TO RANK.** On `Homeostat` the walk offers two
+  actions on one step in six hundred, so a re-ranking reproduces its control
+  exactly — *no opportunity* reading as *no effect*. **Read `Choices`.**
 - **A CHECK CAN BE WIRED AND UNABLE TO FIRE, which reads as passing.** Two worlds
   counted `unbalanced` off a variable nothing incremented; step 10's selective arm
   reproduced its control down to the edge count. **Arm a check that has always read

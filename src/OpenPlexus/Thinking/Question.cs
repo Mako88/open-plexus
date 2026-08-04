@@ -92,4 +92,35 @@ public sealed record Question
     /// </remarks>
     public static Question Worthwhile() => new() { Through = Graph.Kind.Helped };
 
+    /// <summary>
+    /// Whether a credit cell is read against the BASE RATE rather than on its own.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>IT IS THE QUESTION'S CALL AND NOT A DIAL, for the reason at the top of
+    /// this file.</b> Whether the background matters is a fact about what is being
+    /// asked — a prediction wants the association, a choice wants the contrast —
+    /// and a dial wanting different values in different worlds is this design's
+    /// recurring fault wearing a new hat.
+    /// </para>
+    /// <para>
+    /// <b>False is every question asked before the base rate was recorded</b>, so
+    /// <see cref="Worthwhile"/> stays exactly as it was measured and remains this
+    /// arm's control.
+    /// </para>
+    /// </remarks>
+    public bool Contrasted { get; init; }
+
+    /// <summary>
+    /// <see cref="Worthwhile"/> AGAINST WHAT WOULD HAVE HAPPENED ANYWAY — <b>ΔP,
+    /// and the one thing a hit rate structurally cannot say.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>ONE THING CHANGES BETWEEN THIS AND <see cref="Worthwhile"/>.</b> The same
+    /// cells are written and the same relation is walked; what moves is that a
+    /// partner is believed by how much it RAISES the chance of improvement rather
+    /// than by how often it accompanied one. See <see cref="Graph.Node.Contingency"/>.
+    /// </remarks>
+    public static Question Contingent() =>
+        new() { Through = Graph.Kind.Helped, Contrasted = true };
 }

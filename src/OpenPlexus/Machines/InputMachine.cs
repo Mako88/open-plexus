@@ -359,6 +359,10 @@ public sealed class InputMachine<TFrame> : IReceiveReports
             // cannot see the question -- see Message.Through. Null is every
             // question asked before edge kinds existed.
             Through = question?.Through,
+
+            // AND WHETHER THE CREDIT CELL IS READ AGAINST THE BASE RATE, carried
+            // the same way and for the same reason. See Question.Contrasted.
+            Contrasted = question?.Contrasted ?? false,
             Held = stamina ?? _settings.Stamina,
 
             // A chain ends with the node the message is addressed to, so an

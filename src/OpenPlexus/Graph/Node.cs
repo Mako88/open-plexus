@@ -208,19 +208,32 @@ public sealed class Node
     public double Contingency(Code act)
     {
         lock (_gate)
-        {
-            var taken = _together.GetValueOrDefault(new Edge(act, Kind.With)).Count;
-            var helped = _together.GetValueOrDefault(new Edge(act, Kind.Helped)).Count;
+            return Contrast(
+                taken: _together.GetValueOrDefault(new Edge(act, Kind.With)).Count,
+                helped: _together.GetValueOrDefault(new Edge(act, Kind.Helped)).Count,
+                occasions: _noted.GetValueOrDefault(Kind.With),
+                improved: _noted.GetValueOrDefault(Kind.Helped));
+    }
 
-            var occasions = _noted.GetValueOrDefault(Kind.With);
-            var improved = _noted.GetValueOrDefault(Kind.Helped);
+    /// <summary>
+    /// The arithmetic itself, over four numbers one node owns.
+    /// </summary>
+    /// <remarks>
+    /// <b>ONE COPY, TWO CALLERS, AND THE SECOND IS WHY IT IS SEPARATE.</b>
+    /// <see cref="Contingency"/> looks the four up under the lock;
+    /// <see cref="Fire"/> reads them off the snapshot it has already taken, because
+    /// a fan-out must not re-enter the lock once per partner. Writing the
+    /// subtraction twice is the duplication <c>DuplicationTests</c> exists to
+    /// refuse.
+    /// </remarks>
+    private static double Contrast(
+        double taken, double helped, double occasions, double improved)
+    {
+        var without = occasions - taken;
 
-            var without = occasions - taken;
+        if (taken <= 0.0 || without <= 0.0) return 0.0;
 
-            if (taken <= 0.0 || without <= 0.0) return 0.0;
-
-            return (helped / taken) - ((improved - helped) / without);
-        }
+        return (helped / taken) - ((improved - helped) / without);
     }
 
     /// <summary>
@@ -369,10 +382,18 @@ public sealed class Node
         // fan-out, and two thoughts can fire this node at once.
         KeyValuePair<Edge, Tie>[] row;
         double seen;
+        double occasions;
+        double improved;
         lock (_gate)
         {
             row = [.. _together];
             seen = _seen;
+
+            // THE BASE RATE, TAKEN IN THE SAME BREATH AS THE ROW. Two scalars, and
+            // reading them here rather than per partner is what keeps a contrastive
+            // fan-out the same number of lock acquisitions as an ordinary one.
+            occasions = _noted.GetValueOrDefault(Kind.With);
+            improved = _noted.GetValueOrDefault(Kind.Helped);
         }
 
         // An origin message has not travelled, so nothing arrived here and
@@ -427,6 +448,19 @@ public sealed class Node
             // walk stays bounded. See Message.Against and Kind.Hindered.
             if (message.Against > 0.0 && message.Together > 0.0)
                 believed *= message.Together / (message.Together + message.Against);
+
+            // AND THE BASE RATE DISCOUNTS THE SCORE, ON THAT SAME SIDE OF THE LINE
+            // AND FOR THE FIFTH TIME. ΔP is at most one, so this can only ever
+            // believe a partner LESS -- it never makes one cheaper or dearer to
+            // reach, and the price above still comes from the raw ratio.
+            //
+            // CLAMPED AT NOUGHT, WHICH IS WHERE THE INHIBITION IS. An act that does
+            // no better than standing aside is believed nothing at all rather than
+            // believed negatively; a negative score would invert the ranking it was
+            // meant to lower. See Kind.Hindered for the same clamp and the same
+            // reason.
+            if (message.Contrasted)
+                believed *= Math.Max(0.0, message.Contrast);
 
             // EVERY HOP COSTS AT LEAST 1, AND UNDER BOTH TOLLS. Under `Evidence`
             // because a weight cannot exceed 1.0; under `Traffic` because a row
@@ -502,6 +536,22 @@ public sealed class Node
             against[edge.Partner] = against.GetValueOrDefault(edge.Partner) + tie.Count;
         }
 
+        // AND THE ORDINARY CELL, WHERE THE QUESTION WANTS A CONTRAST. `helped` is
+        // the numerator of P(better | act) and this is its denominator -- how often
+        // the act was taken here at all -- and the walk about to happen is over the
+        // credit cells, so the ordinary ones are not otherwise looked at. Built in
+        // one pass over a row already copied, exactly as the negative half above.
+        Dictionary<Code, double>? taken = null;
+
+        if (message.Contrasted)
+            foreach (var (edge, tie) in row)
+            {
+                if (edge.Kind != Kind.With) continue;
+
+                taken ??= [];
+                taken[edge.Partner] = taken.GetValueOrDefault(edge.Partner) + tie.Count;
+            }
+
         foreach (var (edge, tie) in row)
         {
             // A CELL WITH A NEGATIVE COUNTERPART IS READ AS THE DIFFERENCE, and
@@ -548,6 +598,17 @@ public sealed class Node
 
                 // WHAT ARGUES AGAINST THIS EDGE. See Message.Against.
                 Against = opposed,
+
+                // AND WHAT IT IS WORTH ABOVE DOING SOMETHING ELSE. Only the sender
+                // can work this out -- the base rate is its own marginal -- so it
+                // is computed here and carried. See Message.Contrast.
+                Contrast = message.Contrasted && edge.Kind == Kind.Helped
+                    ? Contrast(
+                        taken: taken?.GetValueOrDefault(edge.Partner) ?? 0.0,
+                        helped: tie.Count,
+                        occasions: occasions,
+                        improved: improved)
+                    : 0.0,
 
                 // WHAT IT ARRIVED ON, carried so the far end knows what it is
                 // holding without reading anything it does not own.

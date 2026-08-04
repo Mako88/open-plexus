@@ -140,6 +140,34 @@ public readonly record struct Message
     public Graph.Kind? Through { get; init; }
 
     /// <summary>
+    /// Whether this walk reads a credit cell against the base rate. <b>Set once at
+    /// the origin and copied along every hop</b>, exactly as <see cref="Through"/>
+    /// is and for the same reason — a node cannot see the question.
+    /// </summary>
+    public bool Contrasted { get; init; }
+
+    /// <summary>
+    /// How much the partner this message is addressed to RAISES the chance that
+    /// things get better — <b>ΔP, computed by the sender about its own row.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>CARRIED RATHER THAN LOOKED UP, by the same argument as
+    /// <see cref="Together"/> and <see cref="Against"/>.</b> The base rate is the
+    /// SENDER's marginal, so only the sender can compute this — and telling the
+    /// receiver costs a field where asking would cost a round trip and a C1
+    /// violation.
+    /// </para>
+    /// <para>
+    /// <b>Zero is every message sent before the base rate was recorded</b>, and is
+    /// also what an act with no complement to compare against reads — the two are
+    /// indistinguishable here on purpose, because <see cref="Contrasted"/> is what
+    /// says whether anything should be made of it.
+    /// </para>
+    /// </remarks>
+    public double Contrast { get; init; }
+
+    /// <summary>
     /// Every node walked, in order. <b>The cycle check and the explanation in
     /// one field</b> — a route may not revisit a node already in its own chain,
     /// which is a local check costing nothing because the chain is already

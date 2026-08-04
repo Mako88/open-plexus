@@ -523,6 +523,91 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task The_credit_cell_read_against_the_base_rate()
+    {
+        // ΔP AGAINST THE HIT RATE, AND `Credited` IS THE CONTROL. The same cells
+        // are written, the same relation is walked, the same occasion is joined a
+        // step late on the same condition; what moves is that a partner is believed
+        // by how much it RAISED the chance of improvement rather than by how often
+        // it accompanied one. One thing changes.
+        var arms = await Sweep.AcrossAsync(
+            12,
+            ("blind", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Blind)).Viable;
+            }),
+            ("credited", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
+            }),
+            ("contingent", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Contingent)).Viable;
+            }));
+
+        output.WriteLine(Sweep.Table(arms));
+
+        // AND THE SILENCE BESIDE THE SCORE, WHICH MATTERS MORE FOR THIS ARM THAN
+        // FOR ITS CONTROL. A contingency reads nought where an act has no
+        // complement to compare against as well as where it truly makes no
+        // difference, and both are believed nothing -- so this arm can go quiet for
+        // a reason that is not a judgement about any act, and a quieter arm drifts
+        // toward the blind bar for free.
+        var reports = new List<HomeostatResult>();
+
+        foreach (var arm in (Attending[])[Attending.Credited, Attending.Contingent])
+        {
+            using var run = new HomeostatRun(World(), Dials, seed: 1);
+            var result = await run.RunAsync(Steps, arm);
+            reports.Add(result);
+
+            output.WriteLine(
+                $"{arm,-11} silent={result.Silent,3}/{result.Steps} "
+                + $"choices={result.Choices,3} viable={result.Viable:F4} "
+                + $"attended=[{string.Join(",", result.Attended)}] "
+                + $"states={result.States} edges={result.Edges}");
+        }
+
+        var bar = arms.First(one => one.Arm == "blind");
+        var hitRate = arms.First(one => one.Arm == "credited");
+        var contingency = arms.First(one => one.Arm == "contingent");
+
+        Assert.True(hitRate.Mean > bar.Mean,
+            $"the control stopped beating the bar ({hitRate.Mean:F4} against "
+            + $"{bar.Mean:F4}), so there is nothing here to compare against");
+
+        // THE ARM REPRODUCES ITS CONTROL EXACTLY, AND THE REASON IS MEASURED
+        // RATHER THAN GUESSED. `Contingent` is a change to how candidates are
+        // RANKED, and across this sweep the walk offered two actions on sixteen of
+        // ten thousand four hundred steps -- one in six hundred and fifty. On every
+        // other speaking step it offered exactly one, and a ranking applied to a
+        // list of length one is arithmetic that cannot change an answer: `BestOf`
+        // sorts and takes, so even a score driven to nought still returns that one
+        // candidate.
+        //
+        // SO THIS IS NOT A REFUTATION OF ΔP. It is the world absorbing the change,
+        // which is the thing the plan says to check for BEFORE running an arm and
+        // which was not checked. The unit audit stands -- two acts with an
+        // identical cell read +0.125 and -0.25 against different backgrounds -- and
+        // nothing about it has been tested here either way.
+        //
+        // AND IT GENERALISES PAST THIS ARM, WHICH IS THE FINDING WORTH KEEPING:
+        // `Homeostat` cannot discriminate ANY pure re-ranking. Every future arm
+        // that changes the order of candidates rather than which candidates exist
+        // needs a different world or a wider walk, and `Choices` is how to tell
+        // before spending a sweep on it.
+        Assert.Equal(hitRate.Mean, contingency.Mean, precision: 2);
+
+        Assert.True(reports[1].Choices <= 2,
+            $"the walk now offers a choice on {reports[1].Choices} steps of "
+            + $"{Steps}, so a ranking arm may finally be measurable here and the "
+            + "reproduction above needs re-reading rather than explaining away");
+    }
+
+    [Fact]
     public async Task The_credit_arm_reaches_its_level_fast_and_more_data_does_not_help()
     {
         // THE SILENCE HERE IS NOT THE SILENCE THE LAST TWO COMMITS WERE ABOUT.

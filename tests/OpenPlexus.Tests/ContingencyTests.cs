@@ -1,6 +1,8 @@
+using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Graph;
 using OpenPlexus.Learning;
+using OpenPlexus.Thinking;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -226,5 +228,147 @@ public sealed class ContingencyTests(ITestOutputHelper output)
 
         // AND `Seen` COUNTED BOTH, which is what it did before this existed.
         Assert.Equal(2.0, bench.Node(C(1)).Seen);
+    }
+
+    // ---- what the walk does with it ---------------------------------------
+
+    private static Message Origin(Code code) => new()
+    {
+        Broadcast = BroadcastId.New(),
+        ReturnTo = new MachineAddress("test"),
+        To = code,
+        Held = 10.0,
+        Chain = [code],
+        Carried = 1.0,
+    };
+
+    /// <summary>
+    /// Two acts whose hit rates rank them one way and whose contingencies rank
+    /// them the other.
+    /// </summary>
+    /// <remarks>
+    /// The rider is taken rarely and helps often — <b>and improvement is common
+    /// enough that it would have happened anyway.</b> The worker is taken far more
+    /// and helps a smaller share of the time, but nearly all the improvement there
+    /// ever was happened under it.
+    /// </remarks>
+    private static Node Pair()
+    {
+        var node = new Node(C(1), Fixture.Dials(stamina: 10.0));
+
+        node.Note(100.0, Kind.With);
+        node.Note(50.0, Kind.Helped);
+
+        // Rider: taken 10, helped 7 -- hit rate 0.70.
+        node.Observe(C(2), 10.0, Kind.With);
+        node.Observe(C(2), 7.0, Kind.Helped);
+
+        // Worker: taken 60, helped 36 -- hit rate 0.60.
+        node.Observe(C(3), 60.0, Kind.With);
+        node.Observe(C(3), 36.0, Kind.Helped);
+
+        return node;
+    }
+
+    [Fact]
+    public void The_sender_works_out_the_contrast_because_only_it_has_the_base_rate()
+    {
+        var node = Pair();
+
+        var fired = node.Fire(Origin(C(1)) with { Through = Kind.Helped, Contrasted = true });
+
+        var contrast = fired.Outgoing.ToDictionary(one => one.To, one => one.Contrast);
+
+        foreach (var (act, value) in contrast)
+            output.WriteLine($"{act.Value}  ΔP {value:+0.0000;-0.0000}");
+
+        // BOTH ARE POSITIVE -- both acts really do beat standing aside -- SO THIS IS
+        // A CLAIM ABOUT ORDER AND NOT ABOUT SIGN.
+        Assert.True(contrast[C(2)] > 0.0);
+        Assert.True(contrast[C(3)] > contrast[C(2)],
+            $"the act that captured nearly all the improvement reads "
+            + $"{contrast[C(3)]:F4} against the rider's {contrast[C(2)]:F4}, so the "
+            + "contrast is not seeing the background");
+
+        // AND THE HIT RATE RANKS THEM THE OTHER WAY, which is the whole point --
+        // without this the two orderings might agree and prove nothing.
+        Assert.True(
+            node.Together(C(2), Kind.Helped) / node.Together(C(2), Kind.With)
+            > node.Together(C(3), Kind.Helped) / node.Together(C(3), Kind.With));
+    }
+
+    [Fact]
+    public void And_a_question_that_does_not_ask_for_it_carries_nought()
+    {
+        // `Worthwhile` IS THIS ARM'S CONTROL, so it has to be untouched. A walk
+        // that never asked for a contrast must not pay for one or be ranked by one,
+        // or every number `Credited` ever produced is measuring something else.
+        var fired = Pair().Fire(Origin(C(1)) with { Through = Kind.Helped });
+
+        Assert.NotEmpty(fired.Outgoing);
+        Assert.All(fired.Outgoing, one => Assert.Equal(0.0, one.Contrast));
+        Assert.All(fired.Outgoing, one => Assert.False(one.Contrasted));
+    }
+
+    [Fact]
+    public void The_receiver_believes_it_less_and_is_never_charged_more_to_reach_it()
+    {
+        // THE RECURRING FAULT, CHECKED RATHER THAN ASSUMED. It has bitten four
+        // times: a number that ranks a partner AND prices the hop to it means every
+        // discount also starves the route, the walk falls quiet, and the change
+        // reads as harmful when it merely made everything unreachable. `Doubt` and
+        // `Kind.Hindered` are both on the score side of that line; so is this, and
+        // the assertion is that the budget left is IDENTICAL.
+        var node = new Node(C(2), Fixture.Dials(stamina: 10.0));
+        node.Note(4.0, Kind.With);
+        node.Observe(C(5), 1.0, Kind.With);
+
+        var arriving = new Message
+        {
+            Broadcast = BroadcastId.New(),
+            ReturnTo = new MachineAddress("test"),
+            To = C(2),
+            Held = 10.0,
+            Chain = [C(1), C(2)],
+            Carried = 1.0,
+            Together = 4.0,
+        };
+
+        var plain = node.Fire(arriving);
+        var halved = node.Fire(arriving with { Contrasted = true, Contrast = 0.5 });
+
+        output.WriteLine($"score {plain.Reached!.Score:F4} -> {halved.Reached!.Score:F4}");
+        output.WriteLine($"held  {plain.Outgoing[0].Held:F4} -> {halved.Outgoing[0].Held:F4}");
+
+        Assert.Equal(plain.Reached!.Score * 0.5, halved.Reached!.Score, precision: 10);
+        Assert.Equal(plain.Outgoing[0].Held, halved.Outgoing[0].Held, precision: 10);
+    }
+
+    [Fact]
+    public void An_act_no_better_than_standing_aside_is_believed_nothing()
+    {
+        // THE INHIBITION, AND THE CLAMP THAT MAKES IT SAFE. A negative score would
+        // not lower a ranking, it would INVERT it -- the more strongly an act is
+        // contra-indicated the more negative it gets, and a sort would put the
+        // worst act first. So it is clamped at nought, which is the same clamp and
+        // the same reason as `Kind.Hindered`'s.
+        var node = new Node(C(2), Fixture.Dials(stamina: 10.0));
+        node.Note(4.0, Kind.With);
+        node.Observe(C(5), 1.0, Kind.With);
+
+        var arriving = new Message
+        {
+            Broadcast = BroadcastId.New(),
+            ReturnTo = new MachineAddress("test"),
+            To = C(2),
+            Held = 10.0,
+            Chain = [C(1), C(2)],
+            Carried = 1.0,
+            Together = 4.0,
+            Contrasted = true,
+        };
+
+        Assert.Equal(0.0, node.Fire(arriving with { Contrast = 0.0 }).Reached!.Score);
+        Assert.Equal(0.0, node.Fire(arriving with { Contrast = -0.9 }).Reached!.Score);
     }
 }

@@ -152,6 +152,36 @@ public enum Attending
     /// </remarks>
     Contested,
 
+    /// <summary>
+    /// <see cref="Credited"/> READ AGAINST THE BASE RATE — <b>ΔP, and the first
+    /// change here to what is WRITTEN rather than to what is asked.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Credited"/> IS ITS CONTROL AND ONE THING SEPARATES THEM.</b>
+    /// The same cells are written, the same relation is walked, the same occasion
+    /// is joined a step late on the same condition. What moves is that a partner is
+    /// believed by how much it RAISED the chance of improvement rather than by how
+    /// often it accompanied one.
+    /// </para>
+    /// <para>
+    /// <b>THE FAILURE IT IS AIMED AT: an act that helps six times in ten looks
+    /// strong until things improved six times in ten anyway.</b> A hit rate holds
+    /// one number for an act that works and an act that rides the background, and
+    /// the states a body finds itself in are the ones its own actions produced — so
+    /// the background is exactly what a count of what-was-done cannot see. See
+    /// <see cref="Graph.Node.Contingency"/>.
+    /// </para>
+    /// <para>
+    /// <b>ITS SILENCE IS THE THING TO READ BESIDE ITS SCORE, AND MORE SO THAN
+    /// <see cref="Credited"/>'s.</b> A contingency is nought where an act has no
+    /// complement to compare against as well as where it truly makes no
+    /// difference, and both read as <i>believe this nothing</i> — so this arm can
+    /// fall silent for a reason that is not a judgement about any act.
+    /// </para>
+    /// </remarks>
+    Contingent,
+
 }
 
 /// <summary>
@@ -192,6 +222,29 @@ public sealed record HomeostatResult : Measurement
     /// extra steps. See the note on the bootstrap in <see cref="HomeostatRun"/>.
     /// </remarks>
     public required int Silent { get; init; }
+
+    /// <summary>
+    /// Steps where the walk offered MORE THAN ONE action — <b>the only steps on
+    /// which a ranking can possibly matter.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>SILENCE SAYS THE WALK PROPOSED NOTHING; THIS SAYS IT PROPOSED NO
+    /// CHOICE</b>, and the two are entirely different failures. An arm can be
+    /// eloquent on nearly every step, score well, and still have had exactly one
+    /// candidate every time — in which case however it ranks them is arithmetic
+    /// performed on a list of length one.
+    /// </para>
+    /// <para>
+    /// <b>IT IS A CHECK THAT HAS TO BE ARMED, WHICH IS WHY IT IS REPORTED RATHER
+    /// THAN ASSERTED HERE.</b> A change to how partners are RANKED cannot be
+    /// measured on a run where this is near nought: the arm will reproduce its
+    /// control exactly, and an exact reproduction reads as "no effect" when what
+    /// happened is "no opportunity". That is the trap this project names, and it
+    /// caught a real arm.
+    /// </para>
+    /// </remarks>
+    public required int Choices { get; init; }
 
     /// <summary>
     /// The share of transitions that improved the most-at-risk variable —
@@ -253,7 +306,8 @@ public sealed record HomeostatResult : Measurement
     }
 
     public override string ToString() =>
-        $"choosing={Choosing} steps={Steps} held={Held} silent={Silent} | " +
+        $"choosing={Choosing} steps={Steps} held={Held} silent={Silent} " +
+        $"choices={Choices} | " +
         $"viable={Viable:F4} idling={Idling} | " +
         $"nodes={Nodes} edges={Edges} widest={Widest} spread=[{string.Join(",", Spread)}] | " +
         $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | " +
@@ -363,7 +417,7 @@ public sealed class HomeostatRun : IDisposable
         var world = new Homeostat(_settings);
         var rng = new Random(Seed);
 
-        int held = 0, silent = 0, unbalanced = 0, unsettled = 0;
+        int held = 0, silent = 0, unbalanced = 0, unsettled = 0, choices = 0;
         var attended = new int[_settings.Needs];
         var chains = new Chains();
 
@@ -409,6 +463,7 @@ public sealed class HomeostatRun : IDisposable
                     chains,
                     choosing switch
                     {
+                        Attending.Contingent => Question.Contingent(),
                         Attending.Credited or Attending.Marked
                             or Attending.Contested => Question.Worthwhile(),
                         _ => null,
@@ -421,6 +476,7 @@ public sealed class HomeostatRun : IDisposable
             // that could not fire, in the world step 4's conclusion rests on.
             if (!walked.Balanced) unbalanced++;
             if (!walked.Settled) unsettled++;
+            if (walked.Candidates > 1) choices++;
 
             var chosen = choosing switch
             {
@@ -501,7 +557,7 @@ public sealed class HomeostatRun : IDisposable
                 owed = (occasion, step);
             }
             else if (choosing is Attending.Credited or Attending.Marked
-                     or Attending.Contested)
+                     or Attending.Contested or Attending.Contingent)
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
                 // ordinary cell is untouched and this arm changes one thing.
@@ -559,6 +615,7 @@ public sealed class HomeostatRun : IDisposable
             Steps = steps,
             Held = held,
             Silent = silent,
+            Choices = choices,
             Improving = sensing.Improving,
             Attended = attended,
             States = sensing.States,
@@ -596,10 +653,12 @@ public sealed class HomeostatRun : IDisposable
     /// <param name="Chosen">Which need to attend to, or null if nothing was reached.</param>
     /// <param name="Settled">Whether the walk had finished when it was read.</param>
     /// <param name="Balanced">Whether the thought's own accounting closed.</param>
-    private readonly record struct Walked(int? Chosen, bool Settled, bool Balanced)
+    private readonly record struct Walked(
+        int? Chosen, bool Settled, bool Balanced, int Candidates)
     {
         /// <summary>An arm that decided without walking. There is nothing to fold.</summary>
-        public static Walked None => new(null, Settled: true, Balanced: true);
+        public static Walked None =>
+            new(null, Settled: true, Balanced: true, Candidates: 0);
     }
 
     /// <summary>
@@ -619,13 +678,19 @@ public sealed class HomeostatRun : IDisposable
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
         var reached = thought.BestOf(Homeostat.Act, 1);
+
+        // HOW MANY ACTIONS THE WALK ACTUALLY OFFERED, which is a different question
+        // from whether it offered one. A ranking arm can only be measured where
+        // there is something to rank. See HomeostatResult.Choices.
+        var candidates = thought.BestOf(Homeostat.Act, int.MaxValue).Count;
+
         chains.Fold(thought.Best(int.MaxValue));
 
         var chosen = reached.Count == 0 ? (int?)null : Homeostat.Attended(reached[0].Endpoint);
         var balanced = thought.Balanced();
 
         _body.Forget(thought.Id);
-        return new Walked(chosen, settled, balanced);
+        return new Walked(chosen, settled, balanced, candidates);
     }
 
     public void Dispose() => _fabric.Dispose();

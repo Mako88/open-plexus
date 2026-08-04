@@ -81,6 +81,7 @@ public sealed class ReportTests
             Steps = 10,
             Held = 5,
             Silent = 0,
+            Choices = 0,
             Improving = 0.0,
             Attended = [1, 1, 1, 1],
             States = 3,

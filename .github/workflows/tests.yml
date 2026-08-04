@@ -1,0 +1,77 @@
+# The suite, on every push and pull request.
+#
+# WHY THIS EXISTS: the suite passed six minutes locally and is still growing, so
+# the feedback loop had started to cost real attention. Running it here does not
+# make it faster -- it makes it somebody else's six minutes.
+#
+# THE SUITE IS SERIAL AND MUST STAY SERIAL. `Parallelism.cs` disables xUnit
+# parallelisation as a MEASUREMENT decision, not a convenience: under load the
+# ordering that produces the walk's disagreement with itself stops happening, so
+# a parallel run scored the agreement perfect where a serial one did not. Do not
+# add `-m` or `--parallel` here to save minutes. That would hide the class of
+# defect this project keeps finding.
+name: tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # A newer push supersedes an older run on the same branch. The suite is long
+  # and nobody reads the result of a commit that has already been replaced.
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      # THE CORPORA ARE NOT IN THE REPOSITORY and are about a hundred megabytes,
+      # so they are cached rather than fetched every run. Keyed on the fetch
+      # script: it names the URLs and what is extracted, so a change to either
+      # invalidates the cache, which is the only thing that should.
+      - name: Cache corpora
+        id: corpora
+        uses: actions/cache@v4
+        with:
+          path: |
+            corpora/tasks_1-20_v1-2
+            corpora/CLEVR_v1.0
+          key: corpora-${{ hashFiles('corpora/fetch.sh') }}
+
+      # NOT CONDITIONAL ON A CACHE HIT. The script already checks for what it
+      # fetches and says "already at ..." -- so a partial cache repairs itself
+      # instead of leaving a world to fail with a message about a missing file.
+      - name: Fetch corpora
+        run: bash corpora/fetch.sh
+
+      - name: Build
+        run: dotnet build --configuration Debug --nologo
+
+      # WARNINGS ARE PART OF THE CONTRACT HERE. `DocsTests` asserts the library
+      # builds with its documentation file on, and the XML comments are where
+      # this project keeps what every piece does -- so a warning about a missing
+      # `param` tag is a doc going stale, not noise.
+      - name: Warnings
+        run: |
+          dotnet build --configuration Debug --nologo --no-incremental 2>&1 \
+            | grep -E "warning (CS|xUnit)" && {
+              echo "::error::the build is not warning-clean"
+              exit 1
+            } || echo "warning-clean"
+
+      - name: Test
+        run: dotnet test --configuration Debug --nologo --no-build --verbosity quiet

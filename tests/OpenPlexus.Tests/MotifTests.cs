@@ -1,3 +1,4 @@
+using OpenPlexus.Learning;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -132,5 +133,173 @@ public sealed class MotifTests(ITestOutputHelper output)
             $"minting would hold {result.Compressed} entries for the sets; "
             + $"pairwise holds {result.Uncompressed}, and the whole graph "
             + $"{result.Edges} with noise. Each question costs {result.Traffic:F0} messages.");
+    }
+
+    // ---- step 3, built ------------------------------------------------------
+
+    [Fact]
+    public void A_name_is_derived_from_the_members_and_never_assigned()
+    {
+        // THE PROPERTY THAT MAKES MINTING LEGAL AT ALL. A counter would give two
+        // machines different codes for the same set, and this whole design rests
+        // on a code meaning the same thing everywhere forever -- the same
+        // constraint that rules out a fitted codebook in step 8.
+        var one = new Chunk();
+        var other = new Chunk();
+
+        var set = new[] { Motif.Of(3), Motif.Of(1), Motif.Of(2) };
+        var shuffled = new[] { Motif.Of(2), Motif.Of(3), Motif.Of(1) };
+
+        // Twice each, because the first arrival of a set has not yet paid for a
+        // name -- see the description-length note on `Chunk`.
+        one.Notice(set);
+        other.Notice(shuffled);
+
+        var mine = one.Notice(set);
+        var theirs = other.Notice(shuffled);
+
+        Assert.NotNull(mine);
+        Assert.Equal(mine, theirs);
+
+        // AN OCCASION IS A SET, so the order it arrived in cannot reach the name.
+        Assert.Equal(Chunk.Minted, mine!.Value.Modality);
+    }
+
+    [Fact]
+    public void The_threshold_is_description_length_and_not_a_constant()
+    {
+        // NOTHING HERE WAS CHOSEN, which is the point: a constant nobody set doing
+        // the cutting is already a refuted row. Naming wins when n(S-1) > S, so a
+        // set of four pays for itself on its second arrival and a pair never does.
+        var four = new Chunk();
+        var set = new[] { Motif.Of(1), Motif.Of(2), Motif.Of(3), Motif.Of(4) };
+
+        Assert.Null(four.Notice(set));
+        Assert.NotNull(four.Notice(set));
+
+        // A PAIR IS NEVER WORTH A NAME. n(2-1) > 2 wants n > 2, so it mints on the
+        // third -- naming a pair saves nothing until it is genuinely frequent.
+        var two = new Chunk();
+        var pair = new[] { Motif.Of(7), Motif.Of(8) };
+
+        Assert.Null(two.Notice(pair));
+        Assert.Null(two.Notice(pair));
+        Assert.NotNull(two.Notice(pair));
+
+        // AND A LONE CODE IS NEVER A CHUNK, at any count at all.
+        var alone = new Chunk();
+        for (var i = 0; i < 50; i++) Assert.Null(alone.Notice([Motif.Of(9)]));
+    }
+
+    [Fact]
+    public async Task Minting_a_node_buys_the_traffic_it_was_supposed_to()
+    {
+        // THE NUMBER TO BEAT, AND IT IS COST AND NOT ACCURACY. A familiar set
+        // already completes perfectly without any of this, so step 3 is not asked
+        // to fix an accuracy -- it is asked to stop paying for one.
+        var dials = Fixture.Dials(stamina: 4.0);
+
+        using var flat = new MotifRun(World(), dials, seed: 1);
+        using var chunked = new MotifRun(World(), dials, seed: 1, chunking: true);
+
+        var without = await flat.RunAsync(600);
+        var with = await chunked.RunAsync(600);
+
+        output.WriteLine(without.ToString());
+        output.WriteLine(with.ToString());
+        output.WriteLine(
+            $"traffic {without.Traffic:F0} -> {with.Traffic:F0}, "
+            + $"widest {without.Widest} -> {with.Widest}, "
+            + $"edges {without.Edges} -> {with.Edges}, "
+            + $"accuracy {without.Accuracy:F4} -> {with.Accuracy:F4}");
+
+        Assert.Empty(without.Complaints);
+        Assert.Empty(with.Complaints);
+
+        // THE ALPHABET GREW, which is the half of step 3 that nothing else here
+        // can do -- and it grew by exactly the number of recurring sets.
+        Assert.True(with.Nodes > without.Nodes,
+            $"nothing was minted: {with.Nodes} against {without.Nodes}");
+
+        Assert.Equal(without.Motifs, with.Coined);
+    }
+
+    [Fact]
+    public async Task What_the_minting_costs_and_what_it_buys_over_seeds()
+    {
+        // ONE SEED IS NOT A RESULT, and this project's history is mostly claims
+        // that did not survive their second sweep.
+        var dials = Fixture.Dials(stamina: 4.0);
+
+        var arms = await Sweep.AcrossAsync(
+            6,
+            ("traffic off", async seed =>
+            {
+                using var run = new MotifRun(World(), dials, seed);
+                return (await run.RunAsync(600)).Traffic;
+            }),
+            ("traffic on", async seed =>
+            {
+                using var run = new MotifRun(World(), dials, seed, chunking: true);
+                return (await run.RunAsync(600)).Traffic;
+            }));
+
+        var accuracy = await Sweep.AcrossAsync(
+            6,
+            ("accuracy off", async seed =>
+            {
+                using var run = new MotifRun(World(), dials, seed);
+                return (await run.RunAsync(600)).Accuracy;
+            }),
+            ("accuracy on", async seed =>
+            {
+                using var run = new MotifRun(World(), dials, seed, chunking: true);
+                return (await run.RunAsync(600)).Accuracy;
+            }));
+
+        var size = await Sweep.AcrossAsync(
+            6,
+            ("edges off", async seed =>
+            {
+                using var run = new MotifRun(World(), dials, seed);
+                return (await run.RunAsync(600)).Edges;
+            }),
+            ("edges on", async seed =>
+            {
+                using var run = new MotifRun(World(), dials, seed, chunking: true);
+                return (await run.RunAsync(600)).Edges;
+            }));
+
+        output.WriteLine(Sweep.Table(arms));
+        output.WriteLine(Sweep.Table(accuracy));
+        output.WriteLine(Sweep.Table(size));
+
+        // THE CLAIM STEP 3 WAS ASKED FOR, AND IT IS THE ONLY ONE THAT LANDS.
+        // Traffic per completion, and nothing else, is what the plan named.
+        Assert.True(arms[1].Separation(arms[0]) > 5.0 && arms[1].Mean < arms[0].Mean,
+            $"minting did not buy the traffic: {arms[1].Mean:F0} against "
+            + $"{arms[0].Mean:F0}");
+
+        // AND THE TWO IT DOES NOT, ASSERTED SO THEY CANNOT BE FORGOTTEN.
+        //
+        // THE GRAPH GETS BIGGER, NOT SMALLER. The arithmetic saving is real and
+        // tiny: 72 pairwise entries for the sets against 24 minted, against a
+        // whole graph of about 2,300. The noise dominates the row count, so six
+        // new nodes carrying their own entries more than eat a 48-entry saving.
+        // The MDL argument is about the SETS and the graph is mostly not sets.
+        Assert.True(size[1].Mean > size[0].Mean,
+            "the graph got smaller, so the storage half of the MDL argument has "
+            + "started paying and this note is out of date");
+
+        // AND IT COSTS ACCURACY. Completion now routes member -> name -> member
+        // where it used to go member -> member, and the members no longer pair
+        // with each other at all. THE LIKELY READING, UNVERIFIED: a minted node is
+        // a hub BY CONSTRUCTION, and `Pricing.Receiver` exists to make arriving
+        // somewhere popular expensive -- so step 3 mints exactly the shape the
+        // weighting is built to refuse. `Pricing.Sender` on this world is what
+        // would test it.
+        Assert.True(accuracy[1].Mean < accuracy[0].Mean,
+            "chunking stopped costing accuracy, so the hub reading above needs "
+            + "re-running rather than repeating");
     }
 }

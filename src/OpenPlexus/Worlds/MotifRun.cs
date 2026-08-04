@@ -46,22 +46,45 @@ public sealed record MotifResult : Questioned
     {
         ArgumentNullException.ThrowIfNull(wrong);
 
-        // THE ALPHABET IS FIXED AT THE QUANTISER AND CANNOT GROW, WHICH IS THE
-        // POINT OF STEP 3. Until `Chunk` exists, the node count can never exceed
-        // the symbols the world emits -- and a run where it did would mean
-        // something was minting nodes that nobody has built yet.
-        if (Nodes > Symbols)
-            wrong.Add($"the graph holds {Nodes} nodes for {Symbols} symbols, so "
-                + "something is minting an alphabet and step 3 is not built");
+        // THE ALPHABET GROWS ONLY WHERE SOMETHING IS MEANT TO BE GROWING IT, and
+        // this is the check in both directions. With chunking off the node count
+        // can never exceed the symbols the world emits, because the quantiser
+        // fixes the alphabet forever -- a run that exceeded it would mean
+        // something was minting behind everyone's back. With chunking on, minting
+        // nothing at all is the mechanism failing silently.
+        if (!Chunking && Nodes > Symbols)
+            wrong.Add($"the graph holds {Nodes} nodes for {Symbols} symbols with "
+                + "chunking off, so something is minting an alphabet");
+
+        if (Chunking && Coined == 0)
+            wrong.Add("chunking was switched on and minted nothing");
+
+        if (!Chunking && Coined > 0)
+            wrong.Add($"chunking was off and still minted {Coined}");
+
+        // AND A DETECTOR THAT MINTS NEARLY EVERYTHING HAS FOUND NO STRUCTURE. The
+        // world draws its noise without replacement from a much larger alphabet,
+        // so an exact whole-moment repeat is the motif and essentially nothing
+        // else -- if this fires, the compression below is a renaming.
+        if (Chunking && Motifs > 0 && Coined > Motifs)
+            wrong.Add($"minted {Coined} names for {Motifs} recurring sets, so the "
+                + "detector is naming the noise");
     }
 
     /// <summary>How many distinct codes the world can emit.</summary>
     public required int Symbols { get; init; }
 
+    /// <summary>Whether step 3 was switched on for this run.</summary>
+    public required bool Chunking { get; init; }
+
+    /// <inheritdoc cref="Learning.Chunk.Coined"/>
+    public required int Coined { get; init; }
+
     public override string ToString() =>
         $"motifs={Motifs} moments={Moments} asked={Asked} right={Right} silent={Silent} | " +
         $"accuracy={Accuracy:F4} chance={Chance:F4} | " +
         $"edges={Edges} compressed={Compressed} uncompressed={Uncompressed} | " +
+        $"chunking={(Chunking ? "on" : "off")} coined={Coined} | " +
         $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
         $"nodes={Nodes} widest={Widest} spread=[{string.Join(",", Spread)}] | " +
         $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | " +
@@ -85,10 +108,24 @@ public sealed class MotifRun : IDisposable
     private readonly MotifSettings _settings;
     private readonly WalkSettings _dials;
 
+    /// <inheritdoc cref="Learning.Chunk"/>
+    private readonly Chunk? _chunks;
+
+    /// <param name="world">The stream to watch.</param>
+    /// <param name="dials">The walk.</param>
+    /// <param name="seed">This run's own generator.</param>
+    /// <param name="chunking">
+    /// <b>Step 3, and OFF is every measurement taken before it.</b> It has to be
+    /// an arm: minting a node moves counts that were already measured, exactly as
+    /// splitting the window's carried edge did.
+    /// </param>
+    /// <param name="clusters">How many clusters to stand up.</param>
+    /// <param name="replicas">Ring points per cluster.</param>
     public MotifRun(
         MotifSettings world,
         WalkSettings dials,
         int seed,
+        bool chunking = false,
         int clusters = 8,
         int replicas = 256)
     {
@@ -99,13 +136,17 @@ public sealed class MotifRun : IDisposable
         _settings = world;
         _dials = dials;
         _fabric = new Fabric(dials, seed, clusters, replicas);
+        _chunks = chunking ? new Chunk() : null;
 
         _eyes = new InputMachine<ImmutableArray<Code>>(
             new MachineAddress("eyes"), new Seeing(), new LocalRendezvous(_fabric.Local),
-            _fabric.Bus, _fabric.Ring, dials);
+            _fabric.Bus, _fabric.Ring, dials, chunks: _chunks);
 
         _fabric.Subscribe(_eyes);
     }
+
+    /// <inheritdoc cref="Learning.Chunk"/>
+    public Chunk? Chunks => _chunks;
 
     /// <summary>The world this run is watching.</summary>
     public Motif World => _world;
@@ -192,6 +233,8 @@ public sealed class MotifRun : IDisposable
             Plumbing = _fabric.Facts(chains, unbalanced),
             Halted = halted,
             Unsettled = unsettled,
+            Chunking = _chunks is not null,
+            Coined = _chunks?.Coined ?? 0,
         };
     }
 

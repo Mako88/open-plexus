@@ -29,6 +29,10 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// <remarks><b>Null is off, and off is every measurement taken before it.</b></remarks>
     private readonly Surprise? _surprise;
 
+    /// <inheritdoc cref="Learning.Chunk"/>
+    /// <remarks><b>Null is off, and off is every measurement taken before it.</b></remarks>
+    private readonly Chunk? _chunks;
+
     /// <summary>The last occasion this machine wrote, exactly as written.</summary>
     private Occasion? _joined;
     private readonly IRendezvous _rendezvous;
@@ -58,7 +62,8 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         Ring ring,
         WalkSettings settings,
         int span = 0,
-        Surprise? surprise = null)
+        Surprise? surprise = null,
+        Chunk? chunks = null)
     {
         ArgumentNullException.ThrowIfNull(quantizer);
         ArgumentNullException.ThrowIfNull(rendezvous);
@@ -74,6 +79,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         _settings = settings;
         _window = new Window(span);
         _surprise = surprise;
+        _chunks = chunks;
 
         _bus.Deaths += OnDeath;
     }
@@ -150,10 +156,34 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         _window.Carry(changes.Stopped, changes.Started, now);
         ImmutableArray<Code> recent = [.. _window.Recent(now)];
 
+        // STEP 3 — A SET THAT KEEPS ARRIVING WHOLE GETS A NAME, and the name then
+        // stands in for it.
+        //
+        // THE CHUNK BECOMES THE ONSET AND ITS MEMBERS BECOME MERELY LIVE, which is
+        // where the whole compression comes from and it needed no new rule: an
+        // occasion already pairs onsets with everything and NEVER live with live.
+        // So the members pair with the name and stop pairing with each other --
+        // S(S-1) entries collapse to 2S, and a member's fan-out falls from S-1 to
+        // one. Everything present still notes the occasion, so `together` cannot
+        // exceed `seen` and the bound that terminates a walk is untouched.
+        // THE CANDIDATE IS THE WHOLE MOMENT AND NOT THE ONSETS, and that was
+        // measured rather than assumed. An onset set is the moment MINUS whatever
+        // happened to carry over from the frame before it, so a set that always
+        // arrives whole still presents as a different subset every time one of its
+        // codes was already live -- and each of those subsets recurs often enough
+        // to earn its own name. Measured on `Motif`: sixteen names for six
+        // recurring sets, every extra one a partial view of a set already named.
+        ImmutableArray<Code> present = [.. changes.Started, .. live];
+
+        var minted = _chunks?.Notice(present);
+
+        var starting = minted is { } named ? [named] : changes.Started;
+        var standing = minted is null ? live : present;
+
         var joined = new Occasion
             {
-                Onsets = changes.Started,
-                Live = live,
+                Onsets = starting,
+                Live = standing,
                 Recent = recent,
                 At = now,
                 Weight = worth,
@@ -181,8 +211,11 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         // above rather than before it. An expected onset still moves the counts,
         // or the graph stops getting better at the thing it already predicts and
         // the silence stops being earned. What is skipped is the broadcast.
+        // AND THE BROADCAST GOES OUT FROM THE NAME, which is the compression
+        // arriving in the thinking path as well as in the graph: one origin where
+        // there were S, and the walk reaches the members through it.
         if (_surprise is null)
-            return await ThinkAsync(changes.Started, null, asking, ct).ConfigureAwait(false);
+            return await ThinkAsync(starting, null, asking, ct).ConfigureAwait(false);
 
         // BOTH HALVES OF THE ERROR, AND ONLY THE POSITIVE ONE TRAVELS. What was
         // expected and did not arrive is counted where it is computed and goes

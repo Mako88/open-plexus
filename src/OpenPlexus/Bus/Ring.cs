@@ -149,49 +149,18 @@ public sealed class Ring
     /// what the seed varies is where the clusters sit.
     /// </remarks>
     private static ulong PointOf(Code code) =>
-        Mix(Fold(Fold(Basis, code.Modality), code.Value));
+        Agreed.Mix(Agreed.Fold(Agreed.Fold(Agreed.Basis, code.Modality), code.Value));
 
     private ulong PointOf(ClusterAddress address, int replica)
     {
-        var hash = Fold(Basis, (ulong)_seed);
+        var hash = Agreed.Fold(Agreed.Basis, (ulong)_seed);
 
-        // NOT string.GetHashCode. That is randomised per process in .NET, so a
-        // ring built from it would put the same code on a different cluster in
-        // every process — and "every machine computes the same answer" would
-        // fail silently, which is the one failure this class cannot have.
-        foreach (var character in address.Value) hash = Fold(hash, character);
+        // NOT string.GetHashCode -- see Agreed. That is randomised per process in
+        // .NET, so a ring built from it would put the same code on a different
+        // cluster in every process, and "every machine computes the same answer"
+        // would fail silently, which is the one failure this class cannot have.
+        foreach (var character in address.Value) hash = Agreed.Fold(hash, character);
 
-        return Mix(Fold(hash, (ulong)replica));
-    }
-
-    private const ulong Basis = 0xcbf29ce484222325;
-    private const ulong Prime = 0x100000001b3;
-
-    /// <summary>FNV-1a over the eight bytes of a value.</summary>
-    private static ulong Fold(ulong hash, ulong value)
-    {
-        for (var shift = 0; shift < 64; shift += 8)
-        {
-            hash ^= (byte)(value >> shift);
-            hash *= Prime;
-        }
-
-        return hash;
-    }
-
-    /// <summary>
-    /// The splitmix64 finaliser. FNV alone leaves neighbouring values close
-    /// together, and codes for adjacent cells of one view are neighbouring
-    /// values — without this they would land on one cluster by accident rather
-    /// than by the decision fork 3 records.
-    /// </summary>
-    private static ulong Mix(ulong value)
-    {
-        value ^= value >> 30;
-        value *= 0xbf58476d1ce4e5b9;
-        value ^= value >> 27;
-        value *= 0x94d049bb133111eb;
-        value ^= value >> 31;
-        return value;
+        return Agreed.Mix(Agreed.Fold(hash, (ulong)replica));
     }
 }

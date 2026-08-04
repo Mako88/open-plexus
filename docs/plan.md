@@ -64,15 +64,13 @@ to an old one — run that one.**
 ### 1a. RANKING BELONGS TO THE QUESTION — moved, and the dial is gone
 
 - **It travels on `Question`**, and `WalkSettings` has one dial fewer.
-- **Merging routes AT A NODE is the version `Narrowed` could not do.** Reading the
-  index back costs a round trip and puts the referent in the machine's hands; a
-  node combining concurrent routes keeps it in the graph. Needs a wait — expensive
-  under C2, and the honest form.
-- **`Pricing` IS STILL HAND-SET AND A CONTROLLER FOR IT IS REFUTED.** The trade
-  was thought to be density and budget, both locally observable — but the better
-  arm on `Babi` is the *dearer* one, and `Senses` scores the two identically.
-  **What is missing is not the controller but the SIGNAL**, which is fork 23's
-  lesson a third time.
+- **Merging routes AT A NODE is the version `Narrowed` could not do** — reading
+  the index back puts the referent in the machine's hands, where a node combining
+  concurrent routes keeps it in the graph. Needs a wait: expensive under C2, and
+  the honest form.
+- **`Pricing` IS STILL HAND-SET AND A CONTROLLER FOR IT IS REFUTED.** **What is
+  missing is not the controller but the SIGNAL** — fork 23's lesson a third time,
+  and the refuted row holds why.
 
 ### 2. Predictive coding — only surprise propagates
 
@@ -83,14 +81,22 @@ to an old one — run that one.**
 
 ### 3. Chunking — MDL
 
-- Fork 21 mints edges; it should mint **nodes**: when a set recurs, mint a code
-  standing for it. Threshold is minimum description length, not a constant.
-- **This lets the alphabet GROW**; today the quantiser fixes it forever.
-- Fork 21's trade is the **utility problem** (Minton, SOAR): utility belongs per
-  chunk, not as one global `Weight`.
-- **`Motif` HAS SAID WHAT THIS IS NOT ABOUT.** A familiar set completes perfectly
-  with no chunking. **Step 3 is not asked to fix an accuracy but to stop paying for
-  one** — the number to beat is traffic per completion.
+- **`Chunk` mints a NODE where fork 21 mints an edge**, so the alphabet GROWS
+  where the quantiser fixed it forever. **The name is DERIVED from the sorted
+  members**, so two machines mint the same code with nothing to ask — the ring's
+  trick, and the only minting C1 permits.
+- **The threshold is description length and nothing was chosen**: naming wins at
+  `n(S-1) > S`, so a set of four pays on its second arrival.
+- **IT BUYS THE TRAFFIC AND NOTHING ELSE.** Per completion it falls threefold on
+  `Motif` — the number step 3 was set. **But the graph gets BIGGER and accuracy
+  costs a little**: the sets are a tiny share of a row count the noise dominates,
+  so MDL's storage half never shows.
+- **A MINTED NODE IS A HUB BY CONSTRUCTION and `Pricing.Receiver` refuses hubs** —
+  the likely reading of that cost, unverified; `Pricing.Sender` here tests it.
+  **The candidate is the whole MOMENT and not the onsets**, or partial views earn
+  their own names.
+- Open: the **utility problem** (Minton, SOAR) — utility belongs per chunk, and a
+  chunk that stops recurring earns nothing.
 
 ### 4. Homeostatic drives — Ashby
 
@@ -130,13 +136,11 @@ to an old one — run that one.**
   not a node**: minting `not-X` would double an alphabet to represent unboundedly
   many absent things. `Rhythm` complains when the predictor foresees nearly
   everything while nearly nothing it named happens.
-- **SUPERSESSION — THE CHANNEL IS BUILT, NOTHING READS IT.** Counts only
-  increment, which is the G-Counter property and exactly what forbids
-  most-recent-wins. **Do not decay**, which breaks convergence. `Tie.Count` stays
-  monotonic and `Tie.When` rides beside it as an LWW-Register taking the later
-  STAMP; **the two must never merge**, because LWW discards concurrent writes.
-  **What is left is both consumers**: recency ranking on `Question`, and eviction
-  on "not touched since". Across machines it wants a Lamport clock.
+- **SUPERSESSION — THE CHANNEL IS BUILT, NOTHING READS IT.** `Tie.When` rides
+  beside the count as an LWW-Register and **the two must never merge**; `Tie`
+  holds why. **Do not decay**, which breaks convergence. **What is left is both
+  consumers**: recency ranking on `Question`, and eviction on "not touched
+  since". Across machines it wants a Lamport clock.
 - **MULTI-TOKEN OUTPUT, concurrently. Splits in two.** *Simultaneous* actions are
   nearly free and **fork 11 built the addressing**; what is left is a world that
   wants two. *Ordered* sequences need edge kinds.
@@ -165,10 +169,9 @@ to an old one — run that one.**
 - **Three-factor Hebbian learning needs neither** (Izhikevich 2007, the distal
   reward problem): keep a fading trace of what recently fired, and let a third
   signal consolidate what is still in it, most credit to the most recent.
-- **`Window` IS that trace, ungated.** Drives supply the third factor — out of
-  bounds is bad, returning is good — and `Surprise` is a second candidate.
-- **Safe for the CRDT property**: the trace is transient state deciding how much to
-  add, and the counts stay monotonic.
+- **`Window` IS that trace, ungated.** Drives supply the third factor and
+  `Surprise` is a second candidate — and it stays **safe for the CRDT property**,
+  the trace being transient state deciding how much to add while counts only rise.
 
 ### 8. Also likely necessary
 
@@ -205,7 +208,7 @@ to an old one — run that one.**
 
 ## TO BUILD — a ticked box means the type exists, and a test checks
 
-- [ ] `Chunk` — the minted node of step 3
+- [x] `Chunk` — the minted node of step 3. **Built, and it is a trade**
 - [x] `Drives` — step 4's third factor. **Built, and it does not clear the bar**
 
 ---
@@ -218,17 +221,17 @@ to an old one — run that one.**
 - **The absolute message cost is what step 2 attacks.** Nothing else should be
   optimised until it has been tried.
 - **Cold storage, once a row can be bounded.** **Paging a node out keeps the CRDT
-  property** — the count does not decrease, it stops being resident. **Decay does
-  not**, so eviction keys on "not touched since", never on eroding a count.
+  property** — the count does not decrease, it stops being resident. Decay does
+  not.
 - **The knob pass, last.** A dial swept before the structural work measures a
   system about to change underneath it.
 
 ### The scaling wall — measure it before cutting anything
 
-- **STEP ZERO IS TO BUILD SOMETHING BIG ENOUGH TO BREAK.** The largest graph run
-  here is a few thousand nodes, so any optimisation now aims at a wall nobody has
-  hit. Full `Clevr` and the ten-thousand-story `Babi` both reach far larger;
-  **measure, then cut.** Then, in order of leverage:
+- **STEP ZERO IS TO BUILD SOMETHING BIG ENOUGH TO BREAK.** The largest graph here
+  is a few thousand nodes, so any optimisation now aims at a wall nobody has hit.
+  Full `Clevr` and the ten-thousand-story `Babi` reach far larger; **measure, then
+  cut.** In order of leverage:
 - **BOUND THE ROW.** Cap a node at K partners. This is the one that matters: it
   turns *cost per thought grows with data forever* into *cost per thought is
   constant*. Approximate-nearest-neighbour indexes run at billions on this trick.
@@ -310,8 +313,7 @@ real network loses reports.
 **Live:**
 
 - **A DIAL MEASURED AT ONE SETTING OF ANOTHER MAY BE MEASURING THAT ONE.** The
-  stamina plateau reversed between short and long runs; two pricings compared at
-  one stamina read as a conflict that vanished at a higher one. **Sweep at two run
+  stamina plateau reversed between short and long runs. **Sweep at two run
   lengths, and never compare dials with a third pinned.**
 - **Short runs on the binding world score above chance for RECENCY ALONE**, and it
   decays with data. **Nothing under a few hundred scenes measures binding there.**
@@ -331,9 +333,9 @@ real network loses reports.
 - **A MEAN OVER A POPULATION THE PROBLEM CREATED CANNOT SEE IT.** Fan-out stayed
   flat where rows grew without bound: the growth mints tiny nodes that hold the
   average down. **Read `Widest`.**
-- **Copies drift where nothing fails.** Three worlds each grew their own settle
-  loop, complaint list and vote tally, and a difference between them would move a
-  headline without failing a test. `DuplicationTests` is the budget now.
+- **Copies drift where nothing fails**, and a difference between two copies moves
+  a headline without failing a test — three worlds each grew their own settle
+  loop. `DuplicationTests` is the budget now.
 - **THE TEST SUITE IS SERIAL ON PURPOSE.** Parallel, the walk's agreement with
   itself measured perfect where alone it did not — load removes the ordering that
   produces the disagreement, so parallelism HID a real defect. See

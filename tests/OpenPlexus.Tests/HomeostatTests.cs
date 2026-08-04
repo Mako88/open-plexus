@@ -646,6 +646,64 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task And_the_win_is_not_the_one_sided_count_being_handed_a_smaller_budget()
+    {
+        // THE CONFOUND, AND IT IS A REAL ONE. `Contested` reinforces on BOTH
+        // outcomes where `Credited` reinforces only on improvement, so it joins
+        // roughly twice as many occasions -- which raises `seen`, lowers every
+        // weight, and makes every hop dearer. That is a smaller budget wearing a
+        // different name, and it would produce exactly the shape measured above.
+        //
+        // THE TEST THAT SETTLES IT NEEDS NO NEW CODE: if inhibition were only a
+        // budget change, its score could never EXCEED what the one-sided count
+        // reaches at its own best budget. So find that best.
+        var peaks = new Dictionary<string, (double Stamina, double Mean, double Err)>();
+
+        foreach (var stamina in (double[])[2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0, 8.0])
+        {
+            output.WriteLine($"--- stamina {stamina} ---");
+
+            var arms = await ArmsAsync(
+                Fixture.Dials(stamina), 24, Attending.Credited, Attending.Contested);
+
+            foreach (var arm in arms)
+                if (!peaks.TryGetValue(arm.Arm, out var best) || arm.Mean > best.Mean)
+                    peaks[arm.Arm] = (stamina, arm.Mean, arm.StdErr);
+        }
+
+        var oneSided = peaks["credited"];
+        var inhibited = peaks["contested"];
+
+        output.WriteLine(
+            $"credited peaks {oneSided.Mean:F4} at stamina {oneSided.Stamina:F1}; "
+            + $"contested peaks {inhibited.Mean:F4} at stamina {inhibited.Stamina:F1}");
+
+        // THE TWO ARMS PEAK AT DIFFERENT BUDGETS, which is the whole reason a sweep
+        // at one stamina got the wrong answer. This is the trap the plan already
+        // names -- a dial measured at one setting of another may be measuring that
+        // one -- and it is what the refuted row was built on.
+        Assert.True(inhibited.Stamina > oneSided.Stamina,
+            $"both arms now peak at the same budget ({oneSided.Stamina:F1}), so the "
+            + "single-stamina sweep that produced the refutation was not obviously "
+            + "wrong and this explanation needs re-reading");
+
+        // AND INHIBITION'S PEAK CLEARS THE ONE-SIDED COUNT'S PEAK. A budget change
+        // cannot do that: no setting of a dial makes an arm score above what that
+        // same arm reaches at its own best setting. So the negative cell is buying
+        // something the budget cannot.
+        var apart = (inhibited.Mean - oneSided.Mean)
+            / Math.Sqrt((inhibited.Err * inhibited.Err) + (oneSided.Err * oneSided.Err));
+
+        output.WriteLine($"peak against peak: {apart:F2} sigma");
+
+        Assert.True(apart > 2.0,
+            $"inhibition's best ({inhibited.Mean:F4}) no longer clears the "
+            + $"one-sided count's best ({oneSided.Mean:F4}) -- {apart:F2} sigma -- "
+            + "so the reversal above is explained by the budget after all and the "
+            + "refuted row should go back to being refuted");
+    }
+
+    [Fact]
     public async Task The_credit_cell_read_against_the_base_rate()
     {
         // ΔP AGAINST THE HIT RATE, AND `Credited` IS THE CONTROL. The same cells

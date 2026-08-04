@@ -369,7 +369,7 @@ condition is a superstition.**
 | `Pricing.Balanced` — cosine's denominator | **Times out.** The geometric mean sits BETWEEN the marginals, so weights rise and the walk explodes | A bound not relying on the weight being one marginal's reciprocal |
 | `Pricing.Driven` — the node picking the marginal per hop | **Two local rules, both worse than the hand-set arm in BOTH worlds**: a per-hop choice puts routes on different scales and the ranking stops meaning anything. **The premise was wrong — on `Babi` the better arm is the DEARER one** | A local quantity predicting which arm wins, on a world where they differ: `Senses` scores them alike |
 | `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift and all its cost. **Two candidates whose orders invert tie identically under RRF for every damping constant** | Many candidates, or a fusion separating by something other than position |
-| Inhibition on `Homeostat` | Folding the negative cell into the COUNT mutes the walk — that number is the ranking AND the price. Discounting the SCORE alone recovers most of it and loses to the one-sided count **at ONE stamina, which is the corner everything in step 4 was measured in** | **REVIVED, AND NOT BY THE CONDITION WRITTEN HERE.** One budget up it WINS decisively, and the one-sided count is the arm that collapses |
+| Inhibition on `Homeostat` | Folding the negative cell into the COUNT mutes the walk — that number is the ranking AND the price. Discounting the SCORE alone recovers most of it and loses to the one-sided count **at ONE stamina, which is the corner everything in step 4 was measured in** | **REVIVED, AND NOT BY THE CONDITION WRITTEN HERE.** Its PEAK clears the one-sided count's PEAK, so no budget change explains it, and the one-sided count is the arm that collapses |
 | `Ranked` as step 4's fix | **The lift was the bootstrap's coin toss** — silent far more often, and a varying code thins every edge so routes starve before reaching an action. **Kept: it lifts a real ceiling, and buys nothing alone** | Anything making the walk prefer a partner other than the one it took last time |
 | Widening the walk to cure step 4's silence — `Kindred`, `Foreseeing`, `Backing` | **All three.** Through `With`: louder and below the bar. Through `After`: silent everywhere. Backoff overrides nothing and scores the same, **so the widening costs even where it overrides nothing** | **A likeness the GRAPH DID NOT COMPUTE**, which is step 8's front end and nothing short of it |
 | A trained quantiser — k-means on `master` | Two machines fitted on different samples give the same input different codes, and nothing downstream detects it | Never fitted. **A hash that spends its bits where the data is, without being fitted, is step 8's unbuilt middle** |
@@ -398,11 +398,11 @@ process** — kept, because a real network loses reports.
   was measured at, `Homeostat`'s walk offers two actions on one step in six
   hundred, so a re-ranking reproduces its control exactly — *no opportunity*
   reading as *no effect*. **Read `Choices`.**
-- **AND THAT CORNER HELD A REFUTATION THAT REVERSES OUTSIDE IT.** Doubling the
-  budget offers a choice on a fifth of steps and **inhibition goes from losing to
-  winning outright**. **A SWEEP AT ONE BUDGET IS A SWEEP AT ONE SETTING OF
-  ANOTHER DIAL** — the trap already written here, and it cost a refutation. **Every
-  arm in step 4 is owed a re-run.**
+- **TWO ARMS CAN PEAK AT DIFFERENT BUDGETS, AND THEN ONE SWEEP COMPARES ONE AT ITS
+  BEST AND THE OTHER AT ITS WORST.** Inhibition peaks two settings above the
+  one-sided count and was refuted at the count's peak. **Sweep the dial for BOTH
+  arms and compare PEAK TO PEAK** — a difference at one setting is not a ranking.
+  **Every arm in step 4 is owed that.**
 - **A CHECK CAN BE WIRED AND UNABLE TO FIRE, which reads as passing.** Two worlds
   counted `unbalanced` off a variable nothing incremented; step 10's selective arm
   reproduced its control down to the edge count. **Arm a check that has always read

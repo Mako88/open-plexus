@@ -56,6 +56,19 @@ public sealed record RhythmResult : Questioned
     /// <summary>Moments where nothing was broadcast because nothing was surprising.</summary>
     public required int Unspoken { get; init; }
 
+    /// <summary>
+    /// The share of what was expected that did not happen, or zero when step 2 is
+    /// off. <b>ABSENCE — the negative half, and the guard on the half above.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THIS WORLD BETS EXACTLY ONE SYMBOL A MOMENT, so here it is one minus the
+    /// precision of the bet</b> and it should track <see cref="Expected"/>
+    /// downward. It earns its keep on any front end that can expect more than one
+    /// thing at once, where a predictor naming the whole alphabet would otherwise
+    /// read as a perfectly modelled world — see <see cref="Learning.Surprise"/>.
+    /// </remarks>
+    public required double Overreached { get; init; }
+
     /// <summary>Bets that were settled against the moment AFTER the one they were for.</summary>
     public required int Late { get; init; }
 
@@ -111,7 +124,7 @@ public sealed record RhythmResult : Questioned
         $"span={Span} moments={Moments} asked={Asked} right={Right} silent={Silent} | " +
         $"accuracy={Accuracy:F4} ofCeiling={OfCeiling:F4} " +
         $"expected={Expected:F4} surprised={Surprised:F4} twoAhead={TwoAhead:F4} | " +
-        $"expecting={Expecting:F4} unspoken={Unspoken} | " +
+        $"expecting={Expecting:F4} overreached={Overreached:F4} unspoken={Unspoken} | " +
         $"ceiling={Ceiling:F4} marginal={Marginal:F4} chance={Chance:F4} | " +
         $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
         $"nodes={Nodes} edges={Edges} widest={Widest} spread=[{string.Join(",", Spread)}] | " +
@@ -146,6 +159,11 @@ public sealed class RhythmRun : IDisposable
     /// How many moments a departed symbol is carried for. <b>Zero leaves this
     /// world with no edges at all</b>, because nothing here is ever simultaneous
     /// with anything — see <see cref="Rhythm"/>.
+    /// </param>
+    /// <param name="surprising">
+    /// Whether step 2 is on. <b>Off is every measurement taken before
+    /// <see cref="Learning.Surprise"/> existed</b>: every onset is broadcast,
+    /// nothing is suppressed, and both internal signals read zero.
     /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
@@ -282,6 +300,7 @@ public sealed class RhythmRun : IDisposable
             Skipped = skipped,
             Expecting = _surprise?.Rate ?? 0.0,
             Unspoken = _surprise?.Silent ?? 0,
+            Overreached = _surprise?.Overreach ?? 0.0,
             Ceiling = _world.Ceiling,
             Marginal = _world.Marginal,
             Chance = _world.Chance,

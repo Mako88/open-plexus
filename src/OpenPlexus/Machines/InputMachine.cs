@@ -150,7 +150,11 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         if (_surprise is null)
             return await ThinkAsync(changes.Started, null, null, ct).ConfigureAwait(false);
 
-        var residual = _surprise.Residual(changes.Started);
+        // BOTH HALVES OF THE ERROR, AND ONLY THE POSITIVE ONE TRAVELS. What was
+        // expected and did not arrive is counted where it is computed and goes
+        // nowhere: there is no code for the thing that did not happen, so absence
+        // is a signal the machine can read about itself and never a broadcast.
+        var residual = _surprise.Residual(changes.Started).Surprising;
 
         return residual.Count == 0
             ? null

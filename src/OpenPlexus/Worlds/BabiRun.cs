@@ -158,6 +158,10 @@ public sealed class BabiRun : IDisposable
     /// How many sentences a departed word is carried for — <b>the one-way
     /// temporal edge of <see cref="Window"/>, and zero is off.</b>
     /// </param>
+    /// <param name="ranking">
+    /// How several routes reaching one endpoint combine. <b>The asker's call and
+    /// not the machine's</b> — see <see cref="Thinking.Question"/>.
+    /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
     /// <remarks>

@@ -29,10 +29,9 @@
   runs them in one table; `corpora/fetch.sh` fetches rather than vendoring.
 - **THE ARM THAT BEAT RANDOM IS NO LONGER ONE WORLD OLD, AND IT DID NOT
   TRANSFER.** `Tending` is a second body — plants dry, water reaches only what is
-  underfoot and lands a step late — and `Kind.Helped` there is indistinguishable
-  from acting at random. **Not because it ranks badly: because it is SILENT on
-  nearly every step.** More states, and a credit cell keyed on the state that
-  earned it covers almost none of them.
+  underfoot and lands a step late — and `Kind.Helped` there **LOSES to acting at
+  random** once the walk can afford to speak at all. Step 4's anti-correlation,
+  in world two.
 - **An occasion is a SET**, so *red ball beside blue box* and *blue ball beside red
   box* were one input — a ceiling that was **representational, not scale**.
   `Occasion.Groups` lifts it.
@@ -54,8 +53,8 @@
 - `Occasion.Groups` — which codes belong to which object. `Occasion.Sequence` —
   what came first. `Occasion.Fleeting` — this code will never recur.
   `HomeostatSettings.Ranked` — where each variable stands against the others.
-- **Each is defended in its own file and the total is defended nowhere.** Every one
-  tests whether the graph can USE a fact, never whether it can DISCOVER it.
+- **Each is defended in its own file and the total nowhere.** Every one tests
+  whether the graph can USE a fact, never whether it can DISCOVER it.
 - **`Ranked` is the one to watch**: *lowest of the four* is relational, and
   relational facts are what this design exists to learn.
 - **A fifth needs an argument against the other four**, not just for itself.
@@ -66,9 +65,9 @@
   `Pricing.Sender` moves the ranking to move the price; `Doubt` destroys the senses
   world applied to both and repairs a real defect applied to the score alone;
   negative evidence muted the walk until it too was kept off the price.
-- **`Doubt` SPLIT THE ARITHMETIC AND LEFT THE STATISTIC** — believed and cost still
-  read one number, so evidence set the budget. **`Toll` splits the statistic**:
-  `Traffic` charges `1 + log₂(entries)`, what the hop costs in messages.
+- **`Doubt` SPLIT THE ARITHMETIC AND LEFT THE STATISTIC** — both still read one
+  number. **`Toll` splits the statistic**: `Traffic` charges `1 + log₂(entries)`,
+  what the hop costs in messages.
 - **AND IT FOUND THAT THE CONTROL DEGENERATES.** Where every weight is exactly
   one, `1 / weight` IS the refuted constant cost and growth on a clique is
   factorial. **The `StepCost` row's revival condition, met.**
@@ -88,8 +87,8 @@ its ceiling it absorbs anything.)*
 
 ### 1. RANKING BELONGS TO THE QUESTION — moved onto `Question`, and the dial is gone
 
-- **Merging routes AT A NODE is the version `Narrowed` could not do** — reading the
-  index back puts the referent in the machine's hands. Needs a wait: dear under C2.
+- **Merging routes AT A NODE is the version `Narrowed` could not do.** Needs a
+  wait: dear under C2.
 - **`Pricing` IS HAND-SET AND A CONTROLLER IS REFUTED. The missing thing is the
   SIGNAL** — fork 23 again.
 
@@ -120,7 +119,6 @@ its ceiling it absorbs anything.)*
 - Bounded internal variables make behaviour goal-directed **with no reward
   function**. **No episode boundary**, fitting C4.
   **AND EVERY ACT PAYS OFF AT ONCE, so this world cannot see steps 7, 10 or 11.**
-- **`Homeostat` SETS THE BAR, AND THE BAR IS RANDOM.**
 - **SO ASSOCIATION IS ANTI-CORRELATED, not merely uninformative.** A count of what
   was done converges on the POLICY that did it, and the states a body is in are
   the ones its own actions produced. **This waits wherever the graph learns from
@@ -148,10 +146,9 @@ its ceiling it absorbs anything.)*
   everything. **A SIGNAL, not a node**: minting `not-X` would double an alphabet
   to hold unboundedly many absent things.
 - **SUPERSESSION — THE CHANNEL IS BUILT, NOTHING READS IT.** `Tie.When` rides
-  beside the count as an LWW-Register and **the two must never merge**; `Tie` holds
-  why. **Do not decay.** **Both consumers are left**: recency ranking on
-  `Question`, and eviction on "not touched since". Across machines it wants a
-  Lamport clock.
+  beside the count as an LWW-Register and **the two must never merge**. **Do not
+  decay.** **Both consumers are left**: recency ranking, and eviction on "not
+  touched since". Across machines it wants a Lamport clock.
 - **MULTI-TOKEN OUTPUT.** *Simultaneous* actions are nearly free and **fork 11
   built the addressing**; what is left is a world that wants two.
 
@@ -167,18 +164,16 @@ its ceiling it absorbs anything.)*
 
 ### 7. Credit over time — eligibility traces, and `Window` is already one
 
-- **The gap: nothing learns that an act led somewhere good three steps later.**
+- **Nothing learns that an act led somewhere good three steps later.**
   **Three-factor Hebbian learning needs no reward function and no
-  backpropagation** (Izhikevich 2007): a fading trace, and a third signal
-  consolidating what is in it.
-- **BUILT ON `Tending`, and it does not pay.** The trace reaches back an
-  instrumental sequence — cross, pour, wait — weighted by recency; `Smeared` is the
-  control. **Counts only rise, so the CRDT property holds.**
-- **IT WRITES MORE AND CHANGES NOTHING: coverage was not scarce, CREDIT EVENTS
-  ARE.** The body is silent, acts at random, rarely improves anything.
-- **AND EXPERIENCE MAKES IT WORSE.** Quadruple the run: states more than triple
-  while credit cells grow less than half again. **Coverage FALLS** — states arrive
-  faster than credit ever can.
+  backpropagation** (Izhikevich 2007).
+- **BUILT ON `Tending`.** The trace reaches back an instrumental sequence — cross,
+  pour, wait — weighted by recency; `Smeared` is the control. **Counts only rise.**
+- **IT WRITES MORE AND CHANGES NOTHING**, and the arm it was measured against was
+  silent for a reason nobody checked — see the trap below.
+- **AND EXPERIENCE MAKES COVERAGE WORSE, which is measured directly and survives
+  the correction below.** Quadruple the run: states more than triple while credit
+  cells grow less than half again. **Coverage FALLS.**
 
 ### 8. Similarity — **and step 9 promoted it from an option to the only route**
 
@@ -194,13 +189,15 @@ its ceiling it absorbs anything.)*
   machine forever, so a fitted codebook is out — **and a uniform hash is agreed and
   unwalkable**, because the data is concentrated where uniform codes are not.
 - **GRAINS ARE THE HALF NEEDING NO FITTING, AND THEY ARE BUILT.** Say each reading
-  COARSELY as well as finely and put both in the occasion: states differing finely
-  share the coarse code and meet at that node. **The hierarchy IS the likeness** —
-  nothing learnt, and two machines drop the same bits. **The `Groups` trick a
-  fourth time**, asking the front end least.
-- **THE COARSE CODES ARE SHARED — that much is measured. What they buy is not**,
-  because every credit arm on `Tending` is a coin toss, so **the world absorbs the
-  change.** Instrument at fault, not the arm.
+  COARSELY as well as finely: states differing finely share the coarse code and
+  meet there. **The hierarchy IS the likeness** — nothing learnt, and two machines
+  drop the same bits. **The `Groups` trick a fourth time.**
+- **THE COARSE CODES ARE SHARED — that much is measured. What they buy is NOT
+  YET KNOWN**, and the reason was a misdiagnosis of mine: at the stamina those runs
+  used, the walk could not AFFORD to reach an action at all. **Grains at a budget
+  the walk can pay is untested** — and grains make hubs, which `Pricing.Receiver`
+  refuses, so `Toll.Traffic` is the arm to pair them with. **It times out at depth;
+  that pairing is the open experiment.**
 - **REPLAY.** Re-run experience when nothing is arriving. **`WhenIdle()` triggers
   it**, and a body that cannot bootstrap is what it is for.
 - **INHIBITION — EXPRESSIBLE, AND IT DOES NOT PAY YET.** "Punishment is
@@ -223,9 +220,8 @@ its ceiling it absorbs anything.)*
   likeness is made of co-occurrence and carries the policy with it; **a likeness
   the graph did not compute cannot be.** Step 7 measured why it is not optional:
   **coverage FALLS as a run lengthens.**
-- **`Question.Downstream` — the successor representation (Dayan) — is unaskable**:
-  it wants the REVERSE temporal edge a carried code does not write. **A real design
-  question** — see `Kind.Before`.
+- **`Question.Downstream` (Dayan) is unaskable**: it wants the REVERSE temporal
+  edge a carried code does not write — see `Kind.Before`.
 
 ### 10. A REASON TO SEEK — the drive this design has never had
 
@@ -244,8 +240,7 @@ its ceiling it absorbs anything.)*
 - **BUILT, AND NOT MEASURABLE ON `Homeostat`: THE PREDICTION WALK RETURNS NOTHING
   THERE.** Every moment reads as maximally surprising, so the dense arm writes
   always and the selective one never. **Neither is evidence about curiosity.**
-- **AND IT IS WHAT `Tending` IS SHORT OF**: silent, so random, so credit never
-  fires. **The bootstrap is the blocker there.**
+- **AND `Tending` IS WHERE TO RE-RUN IT**, at a budget the walk can pay.
 
 ### 11. NOTHING HERE PLANS. Every action is a reflex
 
@@ -385,7 +380,6 @@ process** — kept, because a real network loses reports.
   stamina plateau reversed between short and long runs. **Sweep at two run lengths,
   never with a third pinned.** **`Toll` is the sharpest case**: it changes what a
   unit of `Stamina` BUYS, so its arms compare on spend and nothing else.
-- **Short runs on the binding world score above chance for RECENCY ALONE.**
 - **A dial can be declared, documented, passed everywhere and connected to
   nothing.** `ThinkAsync`'s stamina was, and survived three measurements.
   **Every run reports `Complaints`; read them.**
@@ -397,6 +391,11 @@ process** — kept, because a real network loses reports.
   silence drifts it toward the random bar for free, and that reads as the change
   working. **Report silence beside the score** — step 9 is louder AND worse, which
   neither number says alone. It cannot carry an arm PAST the bar; that is arithmetic.
+- **AND A SILENCE HAS TWO CAUSES THAT LOOK IDENTICAL AND WANT OPPOSITE FIXES**: an
+  empty cell, or a walk that cannot AFFORD to reach one. **Spend more and see
+  whether the voice returns** — on `Tending` it does, from silent on nearly every
+  step to silent on a quarter, and a whole session's worth of notes had read that
+  silence as coverage.
 - **A small sample can look like a mechanism.** One seed of step 4's credit arm
   showed a clean monotone learning curve that six seeds flattened to nothing.
 - **A MEAN OVER A POPULATION THE PROBLEM CREATED CANNOT SEE IT.** Fan-out stayed

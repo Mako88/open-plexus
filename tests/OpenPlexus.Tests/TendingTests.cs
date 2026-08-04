@@ -353,6 +353,71 @@ public sealed class TendingTests(ITestOutputHelper output)
         Assert.Empty(blurred.Complaints);
     }
 
+    /// <summary>
+    /// Is the arm silent because it has nothing to say, or because it cannot
+    /// AFFORD to say it?
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PLAN ALREADY NAMES THIS DISTINCTION AND I READ PAST IT.</b> `Chain`
+    /// went quiet on `Homeostat` because routes could not afford to reach an
+    /// action — a budget problem, and spending more bought the voice back — where
+    /// the credit arm went quiet because its cell was empty. <b>The two look
+    /// identical in a silence count and want opposite fixes</b>, and the only thing
+    /// that separates them is spending more and seeing whether the voice returns.
+    /// </para>
+    /// <para>
+    /// <b>ON THIS WORLD IT IS THE BUDGET.</b> An action is two hops from a felt
+    /// state here — through the position code or through another plant's band — so
+    /// a walk with four units of stamina reaches one almost never, and the arm that
+    /// looked like a coverage failure was a walk that could not pay.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task Whether_the_silence_is_the_cell_or_the_budget()
+    {
+        var world = new TendingSettings { Plants = 3, Bands = 4 };
+
+        output.WriteLine($"{"stamina",8} {"credit",7} {"silent",8} {"msgs",9}");
+
+        foreach (var stamina in (double[])[4.0, 8.0, 12.0])
+        {
+            using var run = new TendingRun(world, Fixture.Dials(stamina), seed: 1);
+            var credit = await run.RunAsync(Steps, Gardening.Credited);
+
+            output.WriteLine(
+                $"{stamina,8:F0} {credit.Viable,7:F3} {$"{credit.Silent}/{Steps}",8} "
+                + $"{credit.Messages,9}");
+        }
+
+        using var poor = new TendingRun(world, Fixture.Dials(4.0), seed: 1);
+        using var rich = new TendingRun(world, Fixture.Dials(12.0), seed: 1);
+
+        var shallow = await poor.RunAsync(Steps, Gardening.Credited);
+        var deep = await rich.RunAsync(Steps, Gardening.Credited);
+
+        // THE SILENCE IS THE BUDGET, AND SPENDING MORE BUYS THE VOICE BACK. If this
+        // ever stops holding, the arm has become a coverage failure instead and
+        // every note written about it needs re-reading.
+        Assert.True(deep.Silent < shallow.Silent / 2,
+            $"more budget did not buy the voice back ({deep.Silent} against "
+            + $"{shallow.Silent}), so the silence here is the credit cell being "
+            + "empty rather than the walk being unable to pay, and that wants the "
+            + "opposite fix");
+
+        // AND WHAT IT SAYS WHEN IT CAN SPEAK IS WORSE THAN A COIN TOSS, which is
+        // step 4's original finding arriving in the second world: a count of what
+        // was done converges on the policy that did it.
+        using var random = new TendingRun(world, Fixture.Dials(12.0), seed: 1);
+        var blind = await random.RunAsync(Steps, Gardening.Blind);
+
+        Assert.True(deep.Viable < blind.Viable,
+            $"the credit arm has stopped losing to a coin toss once it can afford "
+            + $"to speak ({deep.Viable:F4} against {blind.Viable:F4})");
+
+        Assert.Empty(deep.Complaints);
+    }
+
     /// <summary>One arm of a sweep, so two tables cannot drift apart.</summary>
     private static (string, Func<int, Task<double>>) Arm(
         string name, Gardening how, TendingSettings? world = null) =>

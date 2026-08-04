@@ -29,8 +29,8 @@
   only be composed; binding, built to be unanswerable and since lifted;
   composition, where the answer was never observed; and **two nobody here
   designed** — `Babi` and `Clevr`. `ScoreboardTests` runs them in one table.
-- **AN EXTERNAL WORLD CANNOT FLATTER THIS ARCHITECTURE BY CONSTRUCTION**, which is
-  why to read one. `corpora/fetch.sh` fetches; nothing is vendored.
+- **AN EXTERNAL WORLD CANNOT FLATTER THIS ARCHITECTURE BY CONSTRUCTION.**
+  `corpora/fetch.sh` fetches; nothing is vendored.
 - **An occasion is a SET**, so *red ball beside blue box* and *blue ball beside
   red box* were one input. That ceiling was **representational, not scale**;
   `Occasion.Groups` lifts it.
@@ -65,8 +65,8 @@ to an old one — run that one.**
 - **It travels on `Question`**, and `WalkSettings` has one dial fewer.
 - **Merging routes AT A NODE is the version `Narrowed` could not do.** Reading the
   index back costs a round trip and puts the referent in the machine's hands; a
-  node combining concurrent routes keeps it in the graph. Needs a wait, which C2
-  makes expensive — but it is the honest form.
+  node combining concurrent routes keeps it in the graph. Needs a wait — expensive
+  under C2, and the honest form.
 - **`Pricing` IS STILL HAND-SET AND A CONTROLLER FOR IT IS REFUTED.** The trade
   was thought to be density and budget, both locally observable — but the better
   arm on `Babi` is the *dearer* one, and `Senses` scores the two identically.
@@ -104,17 +104,18 @@ to an old one — run that one.**
   action is for, the walk repeats what it did last time in that state — fork 20's
   mirror. **So step 4 must beat random, not idling**, and needs a bootstrap, since
   an action enters the graph only by being taken.
-- **`Drives` IS BUILT AND DOES NOT CLEAR THAT BAR.** It weights an occasion by
-  whether the most-at-risk variable improved — positive band only, so counts stay
-  monotonic and a bad transition is written FAINTLY, not undone.
-- **THE DELIVERY FAILS, NOT THE SIGNAL — a delay-only control says so.** Credit
-  prices the occasion BEFORE it, so the arm writes late: **the delay costs nine
-  times what the credit buys**, and the credit moves the arm the right way.
-- **A TOP-UP recovers part of that and still loses to plain association.** Adding
-  twice is what a G-Counter is for: reinforcing is legal, punishing is not.
-- **SUSPECTED:** the top-up rewrites the occasion as all-onsets, so a code that
-  was LIVE pairs differently the second time. **Reinforcing an occasion already
-  written is not expressible yet** — which step 7's trace also needs.
+- **`Drives` IS BUILT AND THREE ARMS FAIL THE BAR.** It weights an occasion by
+  whether the most-at-risk variable improved, positive band only, so counts stay
+  monotonic. **A delay-only control isolates the delivery**: the delay costs nine
+  times what the credit buys. **A top-up recovers part of that** — reinforcing the
+  occasion the machine actually wrote, since a rebuilt one pairs differently — and
+  still loses to no credit at all.
+- **SO THE CREDIT IS NOT THE MISSING PIECE.** Reinforcement likely DEEPENS the
+  groove it should fix: the walk repeats what it did last time in a state, and
+  rewarding that strengthens the loop.
+- **THE TASK IS RELATIONAL, and a count between two codes cannot be.** *Attend to
+  whichever is lowest* is about which variable holds the minimum — the same limit
+  as *A is north of B*. **Step 4 may be waiting on variable binding.**
 
 ### 5. WHAT A CO-OCCURRENCE COUNT STRUCTURALLY CANNOT DO — John, 2026-08-03
 

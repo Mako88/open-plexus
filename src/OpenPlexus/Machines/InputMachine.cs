@@ -28,6 +28,9 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// <inheritdoc cref="Learning.Surprise"/>
     /// <remarks><b>Null is off, and off is every measurement taken before it.</b></remarks>
     private readonly Surprise? _surprise;
+
+    /// <summary>The last occasion this machine wrote, exactly as written.</summary>
+    private Occasion? _joined;
     private readonly IRendezvous _rendezvous;
     private readonly IBus _bus;
     private readonly Ring _ring;
@@ -147,8 +150,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         _window.Carry(changes.Stopped, changes.Started, now);
         ImmutableArray<Code> recent = [.. _window.Recent(now)];
 
-        await _rendezvous.JoinAsync(
-            new Occasion
+        var joined = new Occasion
             {
                 Onsets = changes.Started,
                 Live = live,
@@ -169,8 +171,11 @@ public sealed class InputMachine<TFrame> : IReceiveReports
                 // AND WHICH OF THEM NAME THIS OCCASION RATHER THAN A KIND. Also
                 // null for every front end that cannot. See Occasion.Fleeting.
                 Fleeting = _quantizer.Fleeting(frame),
-            }, ct)
-            .ConfigureAwait(false);
+            };
+
+        _joined = joined;
+
+        await _rendezvous.JoinAsync(joined, ct).ConfigureAwait(false);
 
         // ONLY THE SURPRISE PROPAGATES — step 2, and it happens AFTER the join
         // above rather than before it. An expected onset still moves the counts,
@@ -188,6 +193,53 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         return residual.Count == 0
             ? null
             : await ThinkAsync(residual, null, asking, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// The last occasion this machine wrote, <b>exactly as it was written.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>SO IT CAN BE REINFORCED, and reconstructing it is not the same thing.</b>
+    /// What joins is not the codes the caller handed over: onsets are separated
+    /// from what was already live, the window's carried codes are folded in, and
+    /// the front end may have said something about grouping, order or which codes
+    /// are fleeting. Rebuilding all of that from the outside gets a NEIGHBOURING
+    /// occasion — measured on `Homeostat`, where a top-up written as all-onsets
+    /// paired codes that had been live and lost to not topping up at all.
+    /// </remarks>
+    public Occasion? Joined => _joined;
+
+    /// <summary>
+    /// Writes an occasion again, carrying what it turned out to be worth —
+    /// <b>learning with no thinking, which is what a trace consolidating needs.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ADDING TWICE IS WHAT A G-COUNTER IS FOR.</b> The counts stay monotonic,
+    /// so this converges exactly as the first write did — and it is why
+    /// reinforcement is expressible here and punishment is not: there is no
+    /// second write that can take something back.
+    /// </para>
+    /// <para>
+    /// <b>Nothing is broadcast.</b> The moment has already been thought about; what
+    /// is happening now is the graph being told how much that moment was worth,
+    /// which is a fact about learning and not a question.
+    /// </para>
+    /// </remarks>
+    /// <param name="occasion">One this machine wrote — see <see cref="Joined"/>.</param>
+    /// <param name="worth">
+    /// What to add, over and above what was written the first time. <b>Positive</b>:
+    /// an occasion worth nothing is not an occasion, and a count that could stop
+    /// increasing is not a G-Counter.
+    /// </param>
+    /// <param name="ct">Cancellation.</param>
+    public ValueTask ReinforceAsync(
+        Occasion occasion, double worth, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(occasion);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(worth);
+
+        return _rendezvous.JoinAsync(occasion with { Weight = worth }, ct);
     }
 
     /// <summary>

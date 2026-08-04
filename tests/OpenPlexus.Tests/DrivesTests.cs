@@ -139,14 +139,24 @@ public sealed class DrivesTests(ITestOutputHelper output)
             $"the delay stopped costing, so the decomposition recorded here no "
             + $"longer holds: {delayed} against {chain}");
 
-        // DROPPING THE DELAY RECOVERS PART OF WHAT IT COST and does not get back
-        // to plain association. SUSPECTED, AND NOT YET SHOWN: the top-up rewrites
-        // the occasion as `Onsets = every code, Live = empty`, so a code that was
-        // LIVE rather than STARTED the first time is paired differently the
-        // second — it reinforces a neighbouring occasion rather than the one it
-        // means to, and inflates the marginals of everything present. Fixing that
-        // wants the machine to be able to reinforce an occasion it already wrote,
-        // which nothing here can express yet.
+        // DROPPING THE DELAY RECOVERS PART OF WHAT IT COST, and reinforcing the
+        // occasion the machine ACTUALLY WROTE recovers more — the rebuilt version
+        // paired codes that had been live rather than started, and that was worth
+        // finding. Neither gets back to plain association.
+        //
+        // SO THE CREDIT IS NOT THE MISSING PIECE, AND THREE ARMS SAY SO. A
+        // faithful, undelayed, correctly-scoped third factor still LOSES to not
+        // having one. The likeliest reading is that reinforcement deepens the
+        // groove it is supposed to fix: the walk already repeats what it did last
+        // time in a state — fork 20's mirror — and rewarding whatever it did when
+        // things improved makes that loop stronger, not smarter.
+        //
+        // AND THE TASK IS RELATIONAL, WHICH IS THE DEEPER PROBLEM. "Attend to
+        // whichever need is lowest" is not a fact about any state's band values;
+        // it is about which variable currently holds the minimum. A count between
+        // two codes cannot say that, for the same reason it cannot say *A is
+        // north of B* — see VARIABLE BINDING. Step 4 may be waiting on step 8
+        // rather than on a better credit signal.
         Assert.True(topped > driven,
             $"the top-up did not beat the delay it replaced: {topped} against {driven}");
 

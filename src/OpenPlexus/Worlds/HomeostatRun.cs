@@ -232,6 +232,9 @@ public sealed class HomeostatRun : IDisposable
         // say what it was worth.
         (ImmutableArray<Code> Codes, long At)? owed = null;
 
+        // WHAT IS OWED A TOP-UP, held as the machine actually wrote it.
+        Occasion? topping = null;
+
         for (var step = 0; step < steps; step++)
         {
             var felt = world.Feels();
@@ -285,20 +288,21 @@ public sealed class HomeostatRun : IDisposable
                 // AND THE PREVIOUS OCCASION COLLECTS WHAT IT EARNED. Only the
                 // surplus above one, and only when there is one: a G-Counter can
                 // be added to twice and can never be added to less.
-                if (owed is { } due && drives.Credit > 1.0)
+                //
+                // THE OCCASION THE MACHINE WROTE, NOT ONE REBUILT FROM THE CODES.
+                // Rebuilding gets a neighbouring occasion -- onsets separated from
+                // what was already live, the window's carried codes folded in --
+                // and measured, that lost to not topping up at all.
+                if (topping is { } due && drives.Credit > 1.0)
                 {
-                    await _joining.JoinAsync(new Occasion
-                    {
-                        Onsets = due.Codes,
-                        Live = [],
-                        At = due.At,
-                        Weight = drives.Credit - 1.0,
-                    }, ct).ConfigureAwait(false);
+                    await _body
+                        .ReinforceAsync(due, drives.Credit - 1.0, ct)
+                        .ConfigureAwait(false);
 
                     await _fabric.QuietAsync(ct).ConfigureAwait(false);
                 }
 
-                owed = (occasion, step);
+                topping = _body.Joined;
             }
             else if (choosing is Attending.Driven or Attending.Delayed)
             {

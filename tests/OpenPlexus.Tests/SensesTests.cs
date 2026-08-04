@@ -1,8 +1,10 @@
 using OpenPlexus.Codes;
 using OpenPlexus.Graph;
 using OpenPlexus.Worlds;
+using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
+
 
 /// <summary>
 /// The second world, and the property the whole experiment rests on.
@@ -13,7 +15,7 @@ namespace OpenPlexus.Tests;
 /// and nothing downstream could tell the difference. So it is asserted here
 /// rather than trusted.
 /// </remarks>
-public sealed class SensesTests
+public sealed class SensesTests(ITestOutputHelper output)
 {
     private static SensesSettings Clean(int concepts = 8, int codes = 3) =>
         Fixture.Senses(concepts, codes);
@@ -274,4 +276,108 @@ public sealed class SensesTests
         Assert.Equal(0, result.Reflected);
         Assert.Contains(result.Complaints, one => one.Contains("wrote nothing"));
     }
+
+    // ---- C2, checked rather than assumed ------------------------------------
+
+    [Fact]
+    public async Task Lateness_is_survived_rather_than_assumed_to_be_survivable()
+    {
+        // C2 IS STILL NOT TESTED, AND THIS IS WHY -- which is worth more than the
+        // green tick it produces.
+        //
+        // Lateness is injected and absorbed COMPLETELY: accuracy is identical to
+        // four places on every seed, on a world scoring 0.6552 against a chance of
+        // 0.0833, with 304 of 11,925 deliveries held back fifty milliseconds each.
+        //
+        // THE REASON IS THE HARNESS, NOT THE DESIGN. A held-back delivery is
+        // delayed INSIDE the in-flight count, so `WhenIdle` does not fire while it
+        // is waiting -- and every reader here waits for quiet before it reads. A
+        // late message therefore turns into the harness waiting longer, never into
+        // a message that arrives after somebody has acted. No amount of delay
+        // under `Fabric`'s thirty-second patience can escape that.
+        //
+        // SO WHAT THIS ESTABLISHES IS NARROW: the bus, the accounting and the walk
+        // are unharmed by deliveries arriving out of order and far apart. What it
+        // does NOT establish is the thing C2 actually claims -- that the design
+        // survives acting on what has arrived so far while something is still in
+        // flight. That needs a reader on a DEADLINE rather than one waiting for
+        // quiet, and every reader in this project waits for quiet.
+        //
+        // The original note stands: every measurement here runs in one process
+        // with in-memory delivery.
+        //
+        // Thread-pool dispatch already reorders. What it never produces is a
+        // message arriving LONG after its siblings, which is what a real network
+        // adds and the case that can outlive a thought's patience. So a few
+        // percent of deliveries are held back by far longer than a walk takes.
+        //
+        // THIS WORLD, AND CHOOSING IT WAS THE WHOLE DIFFICULTY. The binding world
+        // is the usual scoreboard and CANNOT SEE THIS from either end: its unbound
+        // arm scores the world's coin rather than the system, so both arms return
+        // an identical number whatever the bus does -- measured, 0.5577 against
+        // 0.5577 to four places -- and its bound-and-segmented arm sits at exactly
+        // 1.0000 with every answer an echo. A world that is at chance or at its
+        // ceiling can absorb any amount of damage without moving.
+        //
+        // Sight and touch NEVER CO-OCCUR here, so the answer cannot be looked up
+        // and can only be composed across hops. That is precisely what lateness
+        // disturbs, and it scores well clear of chance without saturating.
+        var world = new SensesSettings { Concepts = 12, CodesPerSense = 3, Noise = 0.1 };
+        var late = new Bus.Lateness(Share: 0.02, Delay: TimeSpan.FromMilliseconds(50), Seed: 7);
+
+        var arms = await Sweep.AcrossAsync(
+            4,
+            ("on time", async seed =>
+            {
+                using var run = new SensesRun(world, Dials(6.0), seed);
+                return (await run.RunAsync(300, every: 10)).Accuracy;
+            }),
+            ("late", async seed =>
+            {
+                using var run = new SensesRun(world, Dials(6.0), seed, late: late);
+                return (await run.RunAsync(300, every: 10)).Accuracy;
+            }));
+
+        using var jittered = new SensesRun(world, Dials(6.0), seed: 1, late: late);
+        var result = await jittered.RunAsync(300, every: 10);
+
+        output.WriteLine(Sweep.Table(arms));
+        output.WriteLine(result.ToString());
+        output.WriteLine(
+            $"held back {jittered.Delayed} of {result.Messages} deliveries, "
+            + $"{arms[1].Separation(arms[0]):F1} sigma apart");
+
+        // THE ARM ACTUALLY DID SOMETHING. A jitter arm that delayed nothing is a
+        // control wearing the arm's name, which is the failure this project keeps
+        // having -- so this is asserted before anything is read from the table.
+        Assert.True(jittered.Delayed > 0,
+            "no delivery was ever held back, so this measured the control twice");
+
+        // AND THE WORLD CAN STILL SEE A DIFFERENCE, or "unchanged" would be a
+        // claim about a measurement that cannot move. Both guards are here because
+        // the binding world failed each of them in turn.
+        Assert.True(
+            arms[0].Mean > 2.0 * SensesChance && arms[0].Mean < 0.95,
+            $"the on-time arm is at chance or at its ceiling ({arms[0].Mean:F4}), "
+            + "so it could not detect a degradation either");
+
+        // THE ACCOUNTING CLOSES UNDER LATENESS. `Balanced` is built from a
+        // quantity entirely separate from the live count -- the routing named in
+        // each report -- so the two agreeing says the distributed bookkeeping is
+        // not disturbed by deliveries arriving far out of order.
+        Assert.Equal(0, result.Unbalanced);
+        Assert.Equal(0, result.Unsettled);
+
+        // AND THE ABSORPTION IS ASSERTED AS ABSORPTION. If this ever starts
+        // failing, lateness has begun to REACH the score -- which would mean a
+        // reader stopped waiting for quiet, and the note at the top of this test
+        // needs rewriting rather than repeating.
+        Assert.True(arms[1].Separation(arms[0]) < 1.0,
+            $"lateness now moves the score ({arms[1].Mean:F4} against "
+            + $"{arms[0].Mean:F4}, {arms[1].Separation(arms[0]):F1} sigma), so it "
+            + "is no longer being absorbed by the harness waiting for it");
+    }
+
+    /// <summary>What a blind guess is worth on the configuration above.</summary>
+    private const double SensesChance = 1.0 / 12.0;
 }

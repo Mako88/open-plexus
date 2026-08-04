@@ -22,8 +22,69 @@ namespace OpenPlexus.Bus;
 /// is, and here it costs nothing extra — see open fork 3.
 /// </para>
 /// </remarks>
+/// <summary>
+/// Lateness, injected — <b>C2 made real instead of assumed.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>EVERY MEASUREMENT IN THIS PROJECT HAS RUN IN ONE PROCESS WITH IN-MEMORY
+/// DELIVERY.</b> C2 says messages are late, jittered and out of order, and the
+/// whole design rests on that being survivable — but nothing had ever checked it.
+/// Thread-pool dispatch already reorders; what it never produces is a message
+/// arriving LONG after its siblings, which is the case a real network adds and
+/// the one that can outlive a thought's patience.
+/// </para>
+/// <para>
+/// <b>A SMALL SHARE, DELAYED A LOT — not everything delayed a little.</b> Delaying
+/// every message would multiply run times by the scheduler's resolution and
+/// measure the harness rather than the design. A few percent arriving very late
+/// is both the realistic shape and the one that actually stresses settling.
+/// </para>
+/// <para>
+/// <b>The delay is INSIDE the dispatched task, so the in-flight count still
+/// covers it</b> and <see cref="HybridBus.WhenIdle"/> keeps meaning what it
+/// means. A late message is late, not uncounted.
+/// </para>
+/// </remarks>
+/// <param name="Share">The fraction of deliveries held back, in 0..1.</param>
+/// <param name="Delay">How long a held-back delivery waits.</param>
+/// <param name="Seed">
+/// The generator, so a jittered run is as reproducible as thread scheduling
+/// allows — which is not very, and that is C2 rather than a defect.
+/// </param>
+public readonly record struct Lateness(double Share, TimeSpan Delay, int Seed);
+
 public sealed class HybridBus : IBus
 {
+    /// <inheritdoc cref="Bus.Lateness"/>
+    private readonly Lateness? _late;
+
+    private readonly Random? _jitter;
+
+    /// <param name="late">
+    /// Lateness to inject. <b>Null is every measurement taken before this
+    /// existed</b>, and is the control.
+    /// </param>
+    public HybridBus(Lateness? late = null)
+    {
+        if (late is not { } setting) return;
+
+        ArgumentOutOfRangeException.ThrowIfNegative(setting.Share);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(setting.Share, 1.0);
+
+        _late = setting;
+        _jitter = new Random(setting.Seed);
+    }
+
+    /// <summary>How many deliveries were actually held back.</summary>
+    /// <remarks>
+    /// <b>Reported, because a jitter arm that delayed nothing is a control
+    /// wearing the arm's name</b> — the failure this project keeps having.
+    /// </remarks>
+    public long Delayed => Interlocked.Read(ref _delayed);
+
+    private long _delayed;
+
     private readonly Dictionary<ClusterAddress, IReceiveEnvelopes> _clusters = [];
     private readonly Dictionary<MachineAddress, IReceiveReports> _machines = [];
 
@@ -255,6 +316,22 @@ public sealed class HybridBus : IBus
         {
             try
             {
+                // LATE, BEFORE DELIVERY AND INSIDE THE IN-FLIGHT COUNT. See
+                // `Lateness`. Drawn under the lock because `Random` is not
+                // thread-safe and a torn draw would be a defect in the harness
+                // rather than in the thing being measured.
+                if (_late is { } setting)
+                {
+                    bool hold;
+                    lock (_gate) hold = _jitter!.NextDouble() < setting.Share;
+
+                    if (hold)
+                    {
+                        Interlocked.Increment(ref _delayed);
+                        await Task.Delay(setting.Delay).ConfigureAwait(false);
+                    }
+                }
+
                 await delivery().ConfigureAwait(false);
             }
             catch (Exception failure)

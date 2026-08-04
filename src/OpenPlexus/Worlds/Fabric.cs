@@ -45,11 +45,25 @@ public sealed class Fabric : IDisposable
     private readonly List<IDisposable> _handles = [];
     private readonly List<Exception> _faults = [];
 
-    public Fabric(WalkSettings dials, int seed, int clusters = 8, int replicas = 256)
+    /// <param name="dials">The walk every cluster is built with.</param>
+    /// <param name="seed">The ring's seed, and the jitter's.</param>
+    /// <param name="clusters">How many clusters to stand up.</param>
+    /// <param name="replicas">Ring points per cluster.</param>
+    /// <param name="late">
+    /// <inheritdoc cref="Lateness" path="/summary"/> <b>Null is every measurement
+    /// taken before it existed.</b>
+    /// </param>
+    public Fabric(
+        WalkSettings dials,
+        int seed,
+        int clusters = 8,
+        int replicas = 256,
+        Lateness? late = null)
     {
         ArgumentNullException.ThrowIfNull(dials);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(clusters);
 
+        Bus = new HybridBus(late);
         Ring = new Ring(seed, replicas);
         Local = new LocalClusters(Ring);
 
@@ -68,7 +82,7 @@ public sealed class Fabric : IDisposable
         }
     }
 
-    public HybridBus Bus { get; } = new();
+    public HybridBus Bus { get; }
 
     public Ring Ring { get; }
 

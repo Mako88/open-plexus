@@ -96,12 +96,24 @@ public sealed class SensesRun : IDisposable
     /// </summary>
     private readonly Budget? _budget;
 
+    /// <param name="world">The senses to show.</param>
+    /// <param name="dials">The walk.</param>
+    /// <param name="seed">This run's own generator.</param>
+    /// <param name="clusters">How many clusters to stand up.</param>
+    /// <param name="replicas">Ring points per cluster.</param>
+    /// <param name="late">
+    /// <inheritdoc cref="Bus.Lateness" path="/summary"/> <b>This is the world that
+    /// can see it.</b> Sight and touch never co-occur here, so the answer can only
+    /// be COMPOSED across hops — which is precisely what lateness disturbs, where a
+    /// world whose answer is one hop away would survive anything.
+    /// </param>
     public SensesRun(
         SensesSettings world,
         WalkSettings dials,
         int seed,
         int clusters = 8,
-        int replicas = 256)
+        int replicas = 256,
+        Bus.Lateness? late = null)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(dials);
@@ -109,7 +121,7 @@ public sealed class SensesRun : IDisposable
         _world = new Senses(world, seed);
         _dials = dials;
         _budget = dials.Budget is null ? null : new Budget(dials.Stamina, dials.Budget);
-        _fabric = new Fabric(dials, seed, clusters, replicas);
+        _fabric = new Fabric(dials, seed, clusters, replicas, late);
 
         _senses = new InputMachine<IReadOnlyCollection<Code>>(
             new MachineAddress("senses"), new Passthrough(), new LocalRendezvous(_fabric.Local),
@@ -117,6 +129,9 @@ public sealed class SensesRun : IDisposable
 
         _fabric.Subscribe(_senses);
     }
+
+    /// <inheritdoc cref="Bus.HybridBus.Delayed"/>
+    public long Delayed => _fabric.Bus.Delayed;
 
     /// <summary>The codes are already codes; there is nothing to quantise.</summary>
     private sealed class Passthrough : IQuantizer<IReadOnlyCollection<Code>>

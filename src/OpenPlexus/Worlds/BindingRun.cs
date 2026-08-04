@@ -127,19 +127,30 @@ public sealed class BindingRun : IDisposable
     private readonly Binding _world;
     private readonly WalkSettings _dials;
 
+    /// <param name="world">The scenes to show.</param>
+    /// <param name="dials">The walk.</param>
+    /// <param name="seed">This run's own generator.</param>
+    /// <param name="clusters">How many clusters to stand up.</param>
+    /// <param name="replicas">Ring points per cluster.</param>
+    /// <param name="late">
+    /// <inheritdoc cref="Bus.Lateness" path="/summary"/> <b>The scoreboard world
+    /// is where C2 gets checked</b>, because the plan's own rule is to run the
+    /// world that already measures rather than to build one for the occasion.
+    /// </param>
     public BindingRun(
         BindingSettings world,
         WalkSettings dials,
         int seed,
         int clusters = 8,
-        int replicas = 256)
+        int replicas = 256,
+        Bus.Lateness? late = null)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(dials);
 
         _world = new Binding(world, seed);
         _dials = dials;
-        _fabric = new Fabric(dials, seed, clusters, replicas);
+        _fabric = new Fabric(dials, seed, clusters, replicas, late);
 
         _eyes = new InputMachine<Scene>(
             new MachineAddress("scene"), new Passthrough(), new LocalRendezvous(_fabric.Local),
@@ -147,6 +158,9 @@ public sealed class BindingRun : IDisposable
 
         _fabric.Subscribe(_eyes);
     }
+
+    /// <inheritdoc cref="Bus.HybridBus.Delayed"/>
+    public long Delayed => _fabric.Bus.Delayed;
 
     /// <summary>
     /// The codes are already codes; there is nothing to quantise. <b>What it does

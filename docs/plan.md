@@ -274,11 +274,16 @@ to an old one — run that one.**
 ### The wire, when the remote half lands — John, 2026-08-03
 
 - **Only the local half of `HybridBus` exists, so none of this is built.**
-- **C2 HAS NEVER BEEN TESTED AGAINST REAL JITTER — John, 2026-08-04.** Every
-  measurement runs in one process with in-memory delivery, so lateness and
-  reordering are an assumption the design rests on and nothing has checked. Two
-  machines with injected latency is what checks it, and CI is a fair environment
-  for it.
+- **C2 IS STILL NOT TESTED, AND NOW THE REASON IS KNOWN.** `Lateness` injects it
+  and the composition world **absorbs it completely** — identical accuracy to four
+  places, accounting closed. **The harness is why, not the design**: a held-back
+  delivery is delayed inside the in-flight count, so `WhenIdle` does not fire
+  while it waits, and **every reader here waits for quiet.** Lateness becomes
+  waiting and never becomes acting-without-it.
+- **SO THE HARD HALF NEEDS A READER ON A DEADLINE**, not a bigger delay — nothing
+  under `Fabric`'s patience can escape a wait. That, or two machines. **What is
+  established meanwhile**: the bus, the accounting and the walk are unharmed by
+  deliveries arriving far out of order.
 - **Coalesce a settling wave into one send.** Hold remote envelopes until local
   traffic drains, then one datagram per destination; `WhenIdle()` is the trigger
   and is C1-legal. **Not a pure barrier** — flush on idle *or* size *or* time, or a

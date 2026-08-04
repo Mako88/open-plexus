@@ -38,10 +38,9 @@
 
 - **Variable binding** — the row names a relation and cannot hold a fact ABOUT one,
   so nothing transfers. `BindingGapTests` is the scoreboard.
-- **Both routes are built** — `Kind.Code` for facts ABOUT a relation,
-  `Occasion.Roles` and `Kind.Role` for a cell naming no argument. **What is left is
-  the READOUT**: an actuator that turns *this fills south-of's second slot* into an
-  act.
+- **Built end to end** — `Kind.Code`, `Occasion.Roles`, `Kind.Role`, and a walk
+  through `Kind.Fills` arrives at the right slot of a relation the filler was never
+  seen in. **What is left is a WORLD that needs it**: `Clutrr`, `gSCAN`.
 - **A front end for real perception** — a hash spending its bits where the data is
   without being fitted. Grains are the half needing no fitting; this is the other.
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and

@@ -171,4 +171,96 @@ public sealed class RoleTests(ITestOutputHelper output)
         Assert.NotEmpty(reached);
         Assert.DoesNotContain(Land(5), reached);
     }
+
+    // ---- the readout -------------------------------------------------------
+
+    /// <summary>A front end that hands back exactly what it was given.</summary>
+    private sealed class Handed : IQuantizer<Code[]>
+    {
+        public byte Modality => 7;
+
+        public IReadOnlyCollection<Code> Codify(Code[] frame) => frame;
+    }
+
+    [Fact]
+    public async Task A_walk_from_a_new_filler_arrives_at_the_slot_it_belongs_in()
+    {
+        // THE READOUT, AND IT NEEDS NO NEW MECHANISM. A role is a CODE, so a walk
+        // can arrive at one and `BestOf` can narrow to the reserved modality
+        // relations live on. Asking "what slot does this belong in" turns out to be
+        // an ordinary question.
+        //
+        // THE DISCRIMINATING CLAIM IS THE SLOT AND NOT THE RELATION. Reaching
+        // `south-of` at all is easy -- it is all over the graph. Reaching
+        // `south-of/1` ABOVE `south-of/0` is the binding: it says the new landmark
+        // goes in the SECOND slot, which is the half a fact about relations alone
+        // could never supply.
+        var dials = Fixture.Dials(stamina: 20.0, horizon: 8);
+
+        using var bench = new Bench(dials, listening: true);
+
+        var machine = new Machines.InputMachine<Code[]>(
+            new Bus.MachineAddress("eye"), new Handed(),
+            bench.Rendezvous, bench.Bus, bench.Ring, dials);
+
+        bench.Subscribe(machine);
+
+        // Four arrangements, each told BOTH ways.
+        for (var pair = 0; pair < 4; pair++)
+            await SeenAsync(
+                bench.Rendezvous, Land((ulong)((pair * 2) + 10)),
+                Land((ulong)((pair * 2) + 11)), at: pair);
+
+        // And a fifth told ONE WAY. Nothing anywhere says this landmark is south
+        // of anything.
+        var fresh = Land(90);
+
+        await bench.Rendezvous.JoinAsync(new Occasion
+        {
+            Onsets = [fresh, Land(91)],
+            Live = [],
+            At = 9,
+            As = Above,
+            Roles = new Dictionary<Code, int> { [fresh] = 0, [Land(91)] = 1 },
+        });
+
+        Assert.Equal(0.0, bench.Node(fresh).Together(Below.Role(1)));
+
+        // THROUGH THE ROLE EDGE AND NOTHING ELSE. Walking `With` as well reaches
+        // the other filler of this very arrangement in one hop and lands on the
+        // WRONG slot at least as strongly as the right one -- measured, and it is
+        // step 9's refutation arriving in a new place.
+        var thought = await machine.ThinkAsync(
+            [fresh], dials.Stamina, new Thinking.Question { Through = Kind.Fills });
+        await bench.Bus.WhenIdle().WaitAsync(TimeSpan.FromSeconds(10));
+
+        var slots = thought!.BestOf(Kind.Relations, 8);
+
+        foreach (var arrival in slots)
+            output.WriteLine(
+                $"{Name(arrival.Endpoint)} {arrival.Score:F4}");
+
+        Assert.NotEmpty(slots);
+
+        var second = slots.FirstOrDefault(one => one.Endpoint == Below.Role(1));
+        var first = slots.FirstOrDefault(one => one.Endpoint == Below.Role(0));
+
+        Assert.True(second is not null,
+            "the walk never reached the inverse's second slot, so the fact is in "
+            + "the graph and cannot be spent");
+
+        Assert.True(first is null || second.Score > first.Score,
+            $"the walk reaches the inverse's FIRST slot at least as strongly as its "
+            + "second, so it has learnt the relation and not the binding");
+    }
+
+    /// <summary>Which slot a relation code is, for a readable failure.</summary>
+    private static string Name(Code code) =>
+        code == Above.Code ? "north-of"
+        : code == Below.Code ? "south-of"
+        : code == Above.Role(0) ? "north-of/0"
+        : code == Above.Role(1) ? "north-of/1"
+        : code == Below.Role(0) ? "south-of/0"
+        : code == Below.Role(1) ? "south-of/1"
+        : code.ToString();
 }

@@ -135,9 +135,13 @@ public sealed class LocalRendezvous : IRendezvous
 
                 var role = filled.Role(slot);
 
-                _clusters.For(role).Note(weight, Kind.With);
-                _clusters.For(filler).Observe(role, weight, Kind.With, occasion.At);
-                _clusters.For(role).Observe(filler, weight, Kind.With, occasion.At);
+                // UNDER ITS OWN KIND, or the binding does not survive one hop.
+                // Two fillers of one arrangement co-occur under `With`, so a walk
+                // reaches the WRONG slot through the other filler as fast as it
+                // reaches the right one. See Kind.Fills.
+                _clusters.For(role).Note(weight, Kind.Fills);
+                _clusters.For(filler).Observe(role, weight, Kind.Fills, occasion.At);
+                _clusters.For(role).Observe(filler, weight, Kind.Fills, occasion.At);
             }
 
         var written = new HashSet<(Code, Code)>();

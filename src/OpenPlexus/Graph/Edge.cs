@@ -81,6 +81,18 @@ public readonly record struct Kind : IComparable<Kind>
     /// every partner it has not met.
     /// </para>
     /// </remarks>
+    /// <param name="relation">The relation's name, taken exactly as given.</param>
+    public static Kind Of(string relation)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(relation);
+
+        var hash = Agreed.Basis;
+
+        foreach (var letter in relation) hash = Agreed.Fold(hash, letter);
+
+        return new Kind(Agreed.Mix(hash));
+    }
+
     /// <summary>
     /// The modality a relation's own code lives on. <b>Reserved, and no front end
     /// may use it</b> — a relation is not something a sense produces.
@@ -146,18 +158,6 @@ public readonly record struct Kind : IComparable<Kind>
         ArgumentOutOfRangeException.ThrowIfNegative(slot);
 
         return new Code(Relations, Agreed.Mix(Agreed.Fold(_name, (ulong)slot + 1)));
-    }
-
-    /// <param name="relation">The relation's name, taken exactly as given.</param>
-    public static Kind Of(string relation)
-    {
-        ArgumentException.ThrowIfNullOrEmpty(relation);
-
-        var hash = Agreed.Basis;
-
-        foreach (var letter in relation) hash = Agreed.Fold(hash, letter);
-
-        return new Kind(Agreed.Mix(hash));
     }
 
     /// <summary>
@@ -294,6 +294,27 @@ public readonly record struct Kind : IComparable<Kind>
     /// </para>
     /// </remarks>
     public static Kind Hindered { get; } = Of("hindered");
+
+    /// <summary>
+    /// A code fills a SLOT of a relation — <b>the edge the role channel writes, and
+    /// it needs its own kind or the binding does not survive one hop.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>WRITTEN AS <see cref="With"/> IT WAS DESTROYED IMMEDIATELY, AND THAT WAS
+    /// MEASURED.</b> Two landmarks of one arrangement co-occur, so a walk from the
+    /// first reached the SECOND slot through the second landmark in exactly one hop
+    /// — tying with its own slot and outranking the answer. The graph held the
+    /// binding and the walk smeared it.
+    /// </para>
+    /// <para>
+    /// <b>IT IS STEP 9'S REFUTATION IN A NEW PLACE</b>: through <see cref="With"/> a
+    /// walk reaches everything and the distinction dissolves. The remedy is the one
+    /// that settled it there — a relation of its own, so
+    /// <see cref="Thinking.Question.Through"/> can walk role edges and nothing else.
+    /// </para>
+    /// </remarks>
+    public static Kind Fills { get; } = Of("fills");
 
     /// <summary>
     /// The relation's name where one is known, and its number where it is not.

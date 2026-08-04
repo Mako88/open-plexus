@@ -24,6 +24,10 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     private readonly IQuantizer<TFrame> _quantizer;
     private readonly LiveSet _liveSet = new();
     private readonly Window _window;
+
+    /// <inheritdoc cref="Learning.Surprise"/>
+    /// <remarks><b>Null is off, and off is every measurement taken before it.</b></remarks>
+    private readonly Surprise? _surprise;
     private readonly IRendezvous _rendezvous;
     private readonly IBus _bus;
     private readonly Ring _ring;
@@ -50,7 +54,8 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         IBus bus,
         Ring ring,
         WalkSettings settings,
-        int span = 0)
+        int span = 0,
+        Surprise? surprise = null)
     {
         ArgumentNullException.ThrowIfNull(quantizer);
         ArgumentNullException.ThrowIfNull(rendezvous);
@@ -65,6 +70,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         _ring = ring;
         _settings = settings;
         _window = new Window(span);
+        _surprise = surprise;
 
         _bus.Deaths += OnDeath;
     }
@@ -137,7 +143,18 @@ public sealed class InputMachine<TFrame> : IReceiveReports
             }, ct)
             .ConfigureAwait(false);
 
-        return await ThinkAsync(changes.Started, null, null, ct).ConfigureAwait(false);
+        // ONLY THE SURPRISE PROPAGATES — step 2, and it happens AFTER the join
+        // above rather than before it. An expected onset still moves the counts,
+        // or the graph stops getting better at the thing it already predicts and
+        // the silence stops being earned. What is skipped is the broadcast.
+        if (_surprise is null)
+            return await ThinkAsync(changes.Started, null, null, ct).ConfigureAwait(false);
+
+        var residual = _surprise.Residual(changes.Started);
+
+        return residual.Count == 0
+            ? null
+            : await ThinkAsync(residual, null, null, ct).ConfigureAwait(false);
     }
 
     /// <summary>

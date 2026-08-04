@@ -127,6 +127,48 @@ public sealed class RhythmTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task Only_the_surprise_propagates_and_the_traffic_collapses()
+    {
+        // STEP 2, MEASURED AGAINST THE BASELINE THIS WORLD WAS BUILT TO HOLD.
+        // Rao & Ballard: what travels is the residual, and a perfectly predicted
+        // input is silent. The claim is that traffic falls a long way while the
+        // score does not -- if the score fell with it, the system would just be
+        // thinking less.
+        var dials = Fixture.Dials(stamina: 4.0);
+
+        using var loud = new RhythmRun(World(), dials, seed: 1, span: 1);
+        using var quiet = new RhythmRun(World(), dials, seed: 1, span: 1, surprising: true);
+
+        var before = await loud.RunAsync(600);
+        var after = await quiet.RunAsync(600);
+
+        output.WriteLine($"off {before}");
+        output.WriteLine($"on  {after}");
+
+        // THE TRAFFIC COLLAPSE. A stationary world stops broadcasting once it is
+        // predicted, which is the whole economic argument for step 2.
+        Assert.True(after.Messages < before.Messages * 0.75,
+            $"traffic did not collapse: {after.Messages} against {before.Messages}");
+
+        // AND THE SYSTEM STILL PREDICTS. Silence bought by a broken predictor is
+        // not a saving, it is a system that has stopped working -- and the two
+        // look identical in a message count alone.
+        Assert.True(after.Expected > before.Expected * 0.8,
+            $"the score went with the traffic: {after.Expected} against {before.Expected}");
+
+        // THE INTERNAL ERROR SIGNAL EXISTS AT ALL, which is the part no dial in
+        // this project has ever had. Every error until now was computed by the
+        // harness from outside, where no controller could read it.
+        Assert.True(after.Expecting > 0.0, "nothing was ever expected");
+        Assert.True(after.Unspoken > 0, "no moment was ever silent");
+
+        output.WriteLine(
+            $"expected {after.Expecting:F4} of onsets, stayed silent on "
+            + $"{after.Unspoken} moments, and spent "
+            + $"{after.Messages / (double)before.Messages:P0} of the traffic");
+    }
+
+    [Fact]
     public async Task The_world_is_stationary_and_the_score_is_still_climbing()
     {
         // THE TRAP THIS WORLD EXISTS TO MAKE ANSWERABLE, AND IT ANSWERS IT THE

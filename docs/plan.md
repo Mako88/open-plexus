@@ -63,10 +63,9 @@ prefer splitting it, or fusing the arms, over sweeping it. `DialTests` records
 which channel each dial may move and fails when one moves the other.
 
 **`Clevr` LOOKED LIKE A SHARPER VERSION AND WAS A BUDGET ARTIFACT.** The two hops
-appeared to want opposite pricing, mirrored almost exactly — until the receiver
-arm was given budget, at which point it won BOTH halves. No per-hop conflict:
-a cost. Sender reaches an answer at a low budget, and on a near-clique the budget
-receiver needs cannot be paid at all. **The trap it walked into is in TRAPS.**
+appeared to want opposite pricing, mirrored almost exactly, until the receiver
+arm was given budget — at which point it won BOTH halves. **The trap it walked
+into is in TRAPS.**
 
 ---
 
@@ -94,25 +93,26 @@ orders so nobody had to say was built first and is refuted below.
 - **`Accumulate.Max` was re-tried here, where its revival condition pointed, and
   is worse.** Stamina is nearly an exponent on cost and buys nothing.
 
-**Three things must be switched on and none is the default** —
-`Accumulate.Agreement`, `Pricing.Sender`, and `Fleeting` on any world that mints
-an index. Each type documents why. **Promoting the last two is a live decision
-and both look overdue**; `Agreement` cannot be promoted until ranking moves onto
-the question.
-
-**AND BOTH EXTERNAL WORLDS SAY SENDER.** On `Babi` it is the only arm that moves
-anything, and the sole one clearing the majority-class baseline, with both
-ranking dials inert beside it. On `Clevr` it is what makes the second hop
-affordable at all.
+**`Pricing` IS THE ARM STILL HAND-SET, AND PROMOTING IT WAS NOT TAKEN.** The
+trade belongs to graph density and available budget rather than to the question —
+on a near-clique the receiver arm cannot be given the budget at all, and on a
+sparse graph with rare indexes it wins once it can pay. Both quantities are
+locally observable, so it wants a controller and not a default. **`Fleeting` has
+nothing global to promote**: where it applies, the right value is already set for
+a written reason.
 
 **Vector-symbolic binding** (Plate, Kanerva) stays parked.
 
 ### 2. Predictive coding — only surprise propagates
 
-Rao & Ballard, Friston. An expected onset is silent. **Traffic collapses**; the
-system gets an **internal error signal**, which it has never had — error is
-measured by the harness from outside; and it **unblocks drives**, which need
-uncertainty felt rather than scored. **Arguably the biggest single gap.**
+Rao & Ballard, Friston. An expected onset is silent. **Built**: on `Rhythm`
+traffic falls about a third with the score bit-identical, and `Surprise.Rate` is
+the first quantity a controller could read from inside rather than from outside.
+
+**THE OBSERVATION BROADCAST IS SUPPRESSED, NOT THE PREDICTION** — the walk making
+the expectation still runs and costs more, so the saving is partial. **Making
+prediction itself conditional on surprise is the deeper version**, and what would
+let this drive a dial.
 
 ### 3. Chunking — MDL
 
@@ -159,7 +159,7 @@ act, no amount of scaling gets there.
 - [x] `Rhythm` — the endless stationary stream prediction can be measured on
 - [x] `Motif` — recurring sets that should collapse into one code
 - [x] `Homeostat` — Ashby's bounded variables, where standing still stops paying
-- [ ] `Surprise` — the local prediction error of step 2
+- [x] `Surprise` — the local prediction error of step 2
 - [ ] `Chunk` — the minted node of step 3
 - [ ] `Drives` — the bounded internal variables of step 4
 

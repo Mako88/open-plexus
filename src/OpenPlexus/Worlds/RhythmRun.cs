@@ -47,6 +47,15 @@ public sealed record RhythmResult : Questioned
     /// <inheritdoc cref="Caught"/>
     public double Surprised => Broke == 0 ? 0.0 : Caught / (double)Broke;
 
+    /// <summary>
+    /// The share of onsets the system already expected, or zero when step 2 is
+    /// off. <b>The internal error signal.</b>
+    /// </summary>
+    public required double Expecting { get; init; }
+
+    /// <summary>Moments where nothing was broadcast because nothing was surprising.</summary>
+    public required int Unspoken { get; init; }
+
     /// <summary>Bets that were settled against the moment AFTER the one they were for.</summary>
     public required int Late { get; init; }
 
@@ -102,6 +111,7 @@ public sealed record RhythmResult : Questioned
         $"span={Span} moments={Moments} asked={Asked} right={Right} silent={Silent} | " +
         $"accuracy={Accuracy:F4} ofCeiling={OfCeiling:F4} " +
         $"expected={Expected:F4} surprised={Surprised:F4} twoAhead={TwoAhead:F4} | " +
+        $"expecting={Expecting:F4} unspoken={Unspoken} | " +
         $"ceiling={Ceiling:F4} marginal={Marginal:F4} chance={Chance:F4} | " +
         $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
         $"nodes={Nodes} edges={Edges} widest={Widest} spread=[{string.Join(",", Spread)}] | " +
@@ -126,6 +136,9 @@ public sealed class RhythmRun : IDisposable
     private readonly WalkSettings _dials;
     private readonly int _span;
 
+    /// <inheritdoc cref="Learning.Surprise"/>
+    private readonly Surprise? _surprise;
+
     /// <param name="world">The shape of the stream.</param>
     /// <param name="dials">The walk.</param>
     /// <param name="seed">The world's generator and the ring's, so a run reproduces.</param>
@@ -141,6 +154,7 @@ public sealed class RhythmRun : IDisposable
         WalkSettings dials,
         int seed,
         int span = 1,
+        bool surprising = false,
         int clusters = 8,
         int replicas = 256)
     {
@@ -150,11 +164,12 @@ public sealed class RhythmRun : IDisposable
         _world = new Rhythm(world, seed);
         _dials = dials;
         _span = span;
+        _surprise = surprising ? new Surprise() : null;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _ear = new InputMachine<Code>(
             new MachineAddress("ear"), new Hearing(), new LocalRendezvous(_fabric.Local),
-            _fabric.Bus, _fabric.Ring, dials, span);
+            _fabric.Bus, _fabric.Ring, dials, span, _surprise);
 
         _fabric.Subscribe(_ear);
     }
@@ -241,6 +256,13 @@ public sealed class RhythmRun : IDisposable
 
             chains.Fold(reached);
             bet = guess;
+
+            // WHAT THE SYSTEM NOW EXPECTS, handed to the input path so that an
+            // onset matching it is never broadcast. This is the same bet the
+            // score is settled against, so the traffic saved and the prediction
+            // measured are the same prediction -- and a run cannot quietly
+            // silence itself on an expectation nobody scored.
+            _surprise?.Expect(bet is { } one ? [one] : []);
         }
 
         _fabric.Failures();
@@ -258,6 +280,8 @@ public sealed class RhythmRun : IDisposable
             Caught = caught,
             Late = late,
             Skipped = skipped,
+            Expecting = _surprise?.Rate ?? 0.0,
+            Unspoken = _surprise?.Silent ?? 0,
             Ceiling = _world.Ceiling,
             Marginal = _world.Marginal,
             Chance = _world.Chance,

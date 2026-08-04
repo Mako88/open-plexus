@@ -1,3 +1,4 @@
+using OpenPlexus.Codes;
 using OpenPlexus.Graph;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -116,6 +117,276 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             $"attending at random did nearly as well as attending to what is "
             + $"lowest, so the world does not discriminate: "
             + $"{random.Viable} against {lowest.Viable}");
+    }
+
+    // ---- step 4's blocker: the front end ------------------------------------
+
+    /// <summary>What a felt state says about magnitude, as a comparable string.</summary>
+    private static string Bands(IEnumerable<Code> felt) =>
+        string.Join(",", felt.Where(code => code.Modality < Homeostat.Rank)
+            .OrderBy(code => code.Modality).Select(code => code.Value));
+
+    /// <summary>What it says about order. See <see cref="Homeostat.Standing"/>.</summary>
+    private static string Positions(Homeostat body) =>
+        string.Join(",", Enumerable.Range(0, body.Needs).Select(body.Standing));
+
+    [Fact]
+    public void A_band_cannot_say_which_is_lowest_and_a_rank_can()
+    {
+        // THE CEILING, ASSERTED RATHER THAN ARGUED, AND IT IS FORK 25's SHAPE IN A
+        // SECOND WORLD. Two states of one body whose variables sit in the SAME
+        // bands and in a DIFFERENT order. A front end that emits bands alone emits
+        // the identical code set for both, so no amount of counting can separate
+        // them -- and which is lowest is the only fact this world turns on.
+        var ranked = new Homeostat(World() with { Ranked = true });
+
+        var before = ranked.Feels();
+        var wasStanding = Positions(ranked);
+
+        // Everything falls, and attending to the first one puts it back on top.
+        // One step is enough because the drains are uneven.
+        ranked.Step(attend: 0);
+
+        var after = ranked.Feels();
+        var nowStanding = Positions(ranked);
+
+        output.WriteLine($"bands {Bands(before)} -> {Bands(after)}");
+        output.WriteLine($"ranks {wasStanding} -> {nowStanding}");
+
+        // SAME BANDS. This is the state a banded front end cannot tell from the
+        // one before it.
+        Assert.Equal(Bands(before), Bands(after));
+
+        // DIFFERENT ORDER, and it is the ordering that carries the answer.
+        Assert.NotEqual(wasStanding, nowStanding);
+
+        // ADDITIVE: the ranks are extra codes and the band codes are untouched, so
+        // switching the arm off reproduces every earlier measurement exactly.
+        var plain = new Homeostat(World()).Feels();
+        Assert.Equal(plain.Length * 2, before.Length);
+        Assert.All(plain, code => Assert.Contains(code, before));
+
+        // AND THE ORDERING IS A PERMUTATION, never a near-miss: every position is
+        // held by exactly one variable, so the front end cannot emit a rank no
+        // variable holds -- a state the graph would learn about and the body can
+        // never be in again.
+        var standing = Enumerable.Range(0, ranked.Needs).Select(ranked.Standing).ToList();
+        Assert.Equal(Enumerable.Range(0, ranked.Needs), standing.Order());
+    }
+
+    [Fact]
+    public async Task The_ceiling_policy_stops_being_a_constant_to_the_graph()
+    {
+        // THE SECOND HALF OF THE DIAGNOSIS, AND THE SURPRISING ONE. Attending to
+        // whatever is lowest holds the body so steady that every banded code sits
+        // still: measured at EXACTLY ONE distinct state over four hundred steps.
+        // The correct policy is, to the graph, a constant -- so there is no state
+        // variation for a state-conditional association to attach to, and state
+        // variety correlates with FAILURE rather than with information.
+        //
+        // Drains are uneven, so which variable is worst rotates while the values
+        // barely move. The ordering varies exactly where the magnitudes do not.
+        using var banded = new HomeostatRun(World(), Dials, seed: 1);
+        using var ranked = new HomeostatRun(World() with { Ranked = true }, Dials, seed: 1);
+
+        var flat = await banded.RunAsync(Steps, Attending.Lowest);
+        var varied = await ranked.RunAsync(Steps, Attending.Lowest);
+
+        output.WriteLine($"banded states={flat.States} viable={flat.Viable:F4}");
+        output.WriteLine($"ranked states={varied.States} viable={varied.Viable:F4}");
+
+        Assert.Equal(1, flat.States);
+        Assert.True(varied.States > 1,
+            "the ranked front end is as blind to the ceiling policy as the banded "
+            + $"one, so it cannot be what step 4 was waiting on: {varied.States} states");
+
+        // AND IT IS STILL THE CEILING. A front end that changed what the body can
+        // do would be a different world rather than a better description of one.
+        Assert.Equal(flat.Viable, varied.Viable, 6);
+
+        Assert.Empty(varied.Complaints);
+    }
+
+    [Fact]
+    public async Task What_the_ordering_is_worth_to_an_arm_that_has_to_act()
+    {
+        // THE QUESTION STEP 4 IS ACTUALLY ABOUT, and the two changes are separate
+        // arms because they are two changes. `Chain` ranked asks whether being
+        // able to EXPRESS the task is enough on its own; `Topped` ranked asks
+        // whether the credit -- refuted three times over on a front end where the
+        // correct policy was a constant -- has something to attach to now.
+        //
+        // THE BAR IS BLIND AND NOT IDLE. Choosing by association already scores
+        // below drawing at random, so beating idling would only say the
+        // arithmetic works.
+        var ranked = World() with { Ranked = true };
+
+        var arms = await Sweep.AcrossAsync(
+            5,
+            ("blind", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Blind)).Viable;
+            }),
+            ("chain", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Chain)).Viable;
+            }),
+            ("chain+ranked", async seed =>
+            {
+                using var run = new HomeostatRun(ranked, Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Chain)).Viable;
+            }),
+            ("topped+ranked", async seed =>
+            {
+                using var run = new HomeostatRun(ranked, Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Topped)).Viable;
+            }),
+            ("lowest", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Lowest)).Viable;
+            }));
+
+        output.WriteLine(Sweep.Table(arms));
+
+        // THE CONFOUND THAT WOULD MAKE ALL OF THAT WORTHLESS, AND IT HAS TO BE
+        // MEASURED RATHER THAN ARGUED AWAY. The bootstrap acts AT RANDOM when the
+        // walk proposes nothing, so an arm that is silent more often is a blind
+        // arm wearing the chain's name -- and moving TOWARDS the blind bar is
+        // exactly what more silence would produce. A ranked front end doubles the
+        // codes in an occasion, which is every reason to expect its walk to behave
+        // differently, so this is not a remote possibility.
+        var silence = await Sweep.AcrossAsync(
+            5,
+            ("chain silent", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                var result = await run.RunAsync(Steps, Attending.Chain);
+                return result.Silent / (double)result.Steps;
+            }),
+            ("chain+ranked silent", async seed =>
+            {
+                using var run = new HomeostatRun(ranked, Dials, seed);
+                var result = await run.RunAsync(Steps, Attending.Chain);
+                return result.Silent / (double)result.Steps;
+            }));
+
+        output.WriteLine(Sweep.Table(silence));
+
+        // AND THE SILENCE IS WHERE THE LIFT CAME FROM. Read the two tables
+        // together rather than the first alone: the ranked arm looks better and
+        // is silent three times as often, which is the same thing said twice.
+        // `Every_point_the_chain_arm_scores_comes_from_its_own_coin_toss` spends
+        // the budget to separate them, and the lift does not survive it.
+        Assert.True(
+            silence[1].Separation(silence[0]) > 2.0,
+            "the ranked arm is no longer measurably more silent, so the confound "
+            + "this table exists to expose has gone and the reading above can be "
+            + "taken at face value again");
+
+        // THE CEILING AND THE BAR STILL BRACKET EVERYTHING, or the world stopped
+        // measuring what it measures and no row above means anything.
+        var bar = arms.First(one => one.Arm == "blind");
+        var ceiling = arms.First(one => one.Arm == "lowest");
+
+        Assert.True(ceiling.Mean > bar.Mean + 0.2,
+            $"the world stopped discriminating: {ceiling.Mean:F4} against {bar.Mean:F4}");
+
+        // AND EVERY ARM THAT CONSULTS THE GRAPH IS STILL BELOW THE BAR, ranked or
+        // not, credited or not. That is what step 4 has to move.
+        foreach (var arm in arms.Where(one => one.Arm != "blind" && one.Arm != "lowest"))
+            Assert.True(arm.Mean < bar.Mean,
+                $"{arm.Arm} beat drawing at random ({arm.Mean:F4} against "
+                + $"{bar.Mean:F4}), which is what step 4 is for -- if this fires, "
+                + "the baseline has moved and the plan's step 4 needs rewriting");
+    }
+
+    [Fact]
+    public async Task Every_point_the_chain_arm_scores_comes_from_its_own_coin_toss()
+    {
+        // THE CONTROL THAT KILLED THE RESULT, AND IT IS THE FINDING NOW.
+        //
+        // A ranked front end looked like it lifted the arm -- 0.1370 to 0.2350,
+        // half the way to the blind bar. It is silent three times as often, and
+        // the bootstrap acts AT RANDOM when the walk says nothing, so the arm
+        // moved towards the random bar for the reason that would move it there
+        // anyway. Buying the voice back with budget is the test.
+        //
+        // WHY IT GOES SILENT: a near-constant code concentrates its counts. With
+        // bands alone every variable sits in band 4 for most of a run, so
+        // `together(need, act)` piles onto a handful of pairs and the edge to an
+        // action is fat and cheap. A code that VARIES spreads the same occasions
+        // over many more pairs, every edge is thinner, a step costs 1/weight, and
+        // routes starve before reaching an action. Same shape as the fleeting
+        // index: a front end expressive enough to state the problem fragments the
+        // statistics that made the walk affordable.
+        //
+        // AND SPENDING THE BUDGET ANSWERS IT. Silence falls, and so does the
+        // score -- both front ends, monotonically. The graph's voice is not
+        // merely uninformative here, it is ANTI-CORRELATED with what the body
+        // needs, and every point this arm ever scored came from ignoring it.
+        // BOTH FRONT ENDS AT BOTH BUDGETS, because comparing them at one stamina
+        // would be measuring the stamina -- the trap this project has already
+        // walked into with the plateau. Sixteen is not here: the ranked arm passed
+        // three million messages at eight and the bus runs out of patience above
+        // it, which is itself the cost being reported.
+        // BOTH FRONT ENDS AT BOTH BUDGETS, because comparing them at one stamina
+        // would be measuring the stamina -- the trap this project already walked
+        // into with the plateau. Sixteen is not here: the ranked arm passed three
+        // million messages at eight and the bus runs out of patience above it,
+        // which is itself the cost being reported.
+        var scores = new Dictionary<(bool Ranked, double Stamina), HomeostatResult>();
+
+        foreach (var ranked in (bool[])[false, true])
+            foreach (var stamina in (double[])[4.0, 8.0])
+            {
+                using var run = new HomeostatRun(
+                    World() with { Ranked = ranked }, Fixture.Dials(stamina), seed: 1);
+
+                var result = await run.RunAsync(Steps, Attending.Chain);
+                scores[(ranked, stamina)] = result;
+
+                output.WriteLine(
+                    $"{(ranked ? "ranked" : "banded"),-6} stamina={stamina,-5} "
+                    + $"silent={result.Silent,3}/{result.Steps} "
+                    + $"viable={result.Viable:F4} "
+                    + $"attended=[{string.Join(",", result.Attended)}] "
+                    + $"states={result.States} edges={result.Edges} "
+                    + $"widest={result.Widest} msgs={result.Messages}");
+
+                Assert.Empty(result.Complaints);
+            }
+
+        using var idle = new HomeostatRun(World(), Dials, seed: 1);
+        var doingNothing = await idle.RunAsync(Steps, Attending.Idle);
+
+        // QUIETER IS WORSE, ON BOTH FRONT ENDS. This is the whole claim, and it is
+        // asserted on each front end separately so that neither can carry it.
+        foreach (var ranked in (bool[])[false, true])
+            Assert.True(
+                scores[(ranked, 8.0)].Silent < scores[(ranked, 4.0)].Silent
+                && scores[(ranked, 8.0)].Viable < scores[(ranked, 4.0)].Viable,
+                $"ranked={ranked}: spending the budget did not buy a quieter and "
+                + "worse arm, so the score is no longer the coin toss and this "
+                + "finding has expired");
+
+        // AND AT THE POINT WHERE THE WALK DECIDES ALMOST EVERY STEP, CHOOSING BY
+        // ASSOCIATION IS WORTH NO MORE THAN DOING NOTHING AT ALL. That is a
+        // sharper statement than "below random" and it is the one to beat.
+        Assert.True(scores[(false, 8.0)].Viable <= doingNothing.Viable + 0.02,
+            $"the near-silent chain arm beat idling: "
+            + $"{scores[(false, 8.0)].Viable:F4} against {doingNothing.Viable:F4}");
+
+        // THE ORDERING IS NOT INERT, THOUGH, AND SAYING SO IS THE HONEST HALF.
+        // Banded at this budget collapses onto one action and NEVER TOUCHES the
+        // two fastest-draining variables; ranked spreads across all four and
+        // leans on the fastest, which is the shape the ceiling has. It changes
+        // what the body attends to, in the right direction, and does not turn
+        // that into a body that survives.
+        Assert.Contains(0, scores[(false, 8.0)].Attended);
+        Assert.DoesNotContain(0, scores[(true, 8.0)].Attended);
     }
 
     [Fact]

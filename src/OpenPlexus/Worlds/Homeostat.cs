@@ -38,6 +38,48 @@ public sealed record HomeostatSettings
 
     /// <summary>How many bands a variable's value is quantised into.</summary>
     public int Bands { get; init; } = 5;
+
+    /// <summary>
+    /// Whether the front end also says <b>where each variable stands relative to
+    /// the others</b> — step 4's blocker, and OFF is every measurement taken
+    /// before it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>TWO MEASUREMENTS SAID THE FRONT END WAS THE PROBLEM, FROM OPPOSITE
+    /// DIRECTIONS.</b> A band is an ABSOLUTE fact about one variable, and
+    /// <i>attend to whichever is lowest</i> is a RELATIONAL fact about all of
+    /// them — the same limit as <c>A is north of B</c>. And the ceiling policy
+    /// holds the body so steady that every banded code sits still: it visits
+    /// exactly ONE state, so the correct policy is, to the graph, a constant with
+    /// no state variation for a state-conditional association to attach to.
+    /// </para>
+    /// <para>
+    /// <b>A RANK FIXES BOTH AT ONCE, AND THE SECOND IS THE SURPRISING HALF.</b>
+    /// Drains are uneven, so attending to the lowest makes which-variable-is-worst
+    /// ROTATE while the values themselves barely move. The ordering varies exactly
+    /// where the magnitudes do not, which is what gives a well-behaved run
+    /// something to be conditional on.
+    /// </para>
+    /// <para>
+    /// <b>IT IS THE <see cref="Learning.Occasion.Groups"/> SPLIT AGAIN, AND THE
+    /// SAME CAVEAT APPLIES WORD FOR WORD.</b> Comparison is pre-attentive here
+    /// exactly as segmentation is there — Ashby's units deviate against each
+    /// other by their physics, not by deliberation. So the front end supplies the
+    /// ORDERING and the graph must still learn what an ordering MEANS: nothing
+    /// says rank nought is the urgent end rather than the safe one, and nothing
+    /// connects <c>Act:2</c> to <c>Need+2</c>. <b>This tests whether the graph can
+    /// USE an ordinal, not whether it can DISCOVER ordering</b>, and it must not
+    /// be written up as if it were the whole problem.
+    /// </para>
+    /// <para>
+    /// <b>ADDITIVE: the bands are untouched and the rank codes are extra</b>, so
+    /// off reproduces every earlier number exactly and on leaves the graph holding
+    /// both facts. Which of the two matters is the graph's job to find, which is
+    /// the right split and the reason the rank does not simply replace the band.
+    /// </para>
+    /// </remarks>
+    public bool Ranked { get; init; }
 }
 
 /// <summary>
@@ -74,6 +116,19 @@ public sealed class Homeostat
     /// <summary>What the body can do about it.</summary>
     public const byte Act = 79;
 
+    /// <summary>
+    /// Where variable <c>i</c> stands against the others; its modality is
+    /// <c>Rank + i</c> and its value is the position, nought being lowest.
+    /// </summary>
+    /// <remarks>
+    /// <b>Far enough from <see cref="Need"/> that the two blocks cannot meet</b>,
+    /// and the constructor refuses a body with more variables than the gap holds
+    /// rather than letting a rank quietly land on a need's modality — which would
+    /// be one code meaning two things, this design's recurring fault at its most
+    /// literal.
+    /// </remarks>
+    public const byte Rank = 120;
+
     private readonly HomeostatSettings _settings;
     private readonly double[] _at;
 
@@ -85,6 +140,13 @@ public sealed class Homeostat
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Bands);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Drain);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Restore);
+
+        // ONE MODALITY BLOCK MUST NOT RUN INTO THE NEXT. See Rank.
+        if (Need + settings.Needs > Rank || Rank + settings.Needs > byte.MaxValue + 1)
+            throw new ArgumentOutOfRangeException(nameof(settings),
+                $"{settings.Needs} variables do not fit between the need block at "
+                + $"{Need} and the rank block at {Rank}; a rank would land on a "
+                + "need's modality and one code would mean two things");
 
         _settings = settings;
         _at = [.. Enumerable.Repeat(1.0, settings.Needs)];
@@ -147,14 +209,23 @@ public sealed class Homeostat
 
     /// <summary>What the body can feel about itself, as codes.</summary>
     /// <remarks>
+    /// <para>
     /// <b>A band and not a number.</b> The graph holds codes, so an internal
     /// variable has to be quantised exactly as an external sense is — and that is
     /// the point of step 4 rather than a compromise: a drive is felt as a state,
     /// not read as a float.
+    /// </para>
+    /// <para>
+    /// <b>AND, WHERE THE BODY CAN SAY SO, WHERE EACH ONE STANDS AGAINST THE
+    /// OTHERS.</b> A band cannot express <i>lowest</i>, which is the one fact this
+    /// world turns on — see <see cref="HomeostatSettings.Ranked"/>. The ranks are
+    /// EXTRA codes rather than replacements, so the arm is additive and the graph
+    /// holds the absolute fact and the relational one at once.
+    /// </para>
     /// </remarks>
     public ImmutableArray<Code> Feels()
     {
-        var felt = new Code[_at.Length];
+        var felt = new Code[_settings.Ranked ? _at.Length * 2 : _at.Length];
 
         for (var which = 0; which < _at.Length; which++)
         {
@@ -163,7 +234,39 @@ public sealed class Homeostat
                 (byte)(Need + which), (ulong)Math.Clamp(band, 0, _settings.Bands - 1));
         }
 
+        if (!_settings.Ranked) return [.. felt];
+
+        for (var which = 0; which < _at.Length; which++)
+            felt[_at.Length + which] = new Code((byte)(Rank + which), (ulong)Standing(which));
+
         return [.. felt];
+    }
+
+    /// <summary>
+    /// Where variable <paramref name="which"/> stands against the others.
+    /// <b>Nought is the lowest</b>, which is the one this world's task is about.
+    /// </summary>
+    /// <remarks>
+    /// <b>TIES BREAK ON THE INDEX, so the ordering is a permutation and never a
+    /// near-miss.</b> Two variables at the same value would otherwise both claim a
+    /// position and the front end would emit a rank no variable held — a state the
+    /// graph would learn about and that the body can never be in again.
+    /// </remarks>
+    public int Standing(int which)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(which);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(which, _at.Length);
+
+        var below = 0;
+
+        for (var other = 0; other < _at.Length; other++)
+        {
+            if (other == which) continue;
+
+            if (_at[other] < _at[which] || (_at[other] == _at[which] && other < which)) below++;
+        }
+
+        return below;
     }
 
     /// <summary>The code for attending to one variable.</summary>

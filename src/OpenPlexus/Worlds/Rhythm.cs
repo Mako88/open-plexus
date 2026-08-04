@@ -90,9 +90,6 @@ public sealed class Rhythm
             .Take(settings.Period)];
     }
 
-    /// <summary>The repeating pattern, in order.</summary>
-    public IReadOnlyList<int> Cycle => _cycle;
-
     /// <summary>
     /// The best any model could do: everything but the violations.
     /// </summary>
@@ -140,9 +137,6 @@ public sealed class Rhythm
         ArgumentOutOfRangeException.ThrowIfNegative(symbol);
         return new Code(Beat, (ulong)symbol);
     }
-
-    /// <summary>Which symbol a code is.</summary>
-    public static int Symbol(Code code) => (int)code.Value;
 
     /// <inheritdoc cref="RhythmSettings.Period"/>
     public int Period => _settings.Period;

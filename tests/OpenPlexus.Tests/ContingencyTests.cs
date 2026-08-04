@@ -232,16 +232,6 @@ public sealed class ContingencyTests(ITestOutputHelper output)
 
     // ---- what the walk does with it ---------------------------------------
 
-    private static Message Origin(Code code) => new()
-    {
-        Broadcast = BroadcastId.New(),
-        ReturnTo = new MachineAddress("test"),
-        To = code,
-        Held = 10.0,
-        Chain = [code],
-        Carried = 1.0,
-    };
-
     /// <summary>
     /// Two acts whose hit rates rank them one way and whose contingencies rank
     /// them the other.
@@ -275,7 +265,7 @@ public sealed class ContingencyTests(ITestOutputHelper output)
     {
         var node = Pair();
 
-        var fired = node.Fire(Origin(C(1)) with { Through = Kind.Helped, Contrasted = true });
+        var fired = node.Fire(Fixture.Origin(C(1)) with { Through = Kind.Helped, Contrasted = true });
 
         var contrast = fired.Outgoing.ToDictionary(one => one.To, one => one.Contrast);
 
@@ -303,11 +293,32 @@ public sealed class ContingencyTests(ITestOutputHelper output)
         // `Worthwhile` IS THIS ARM'S CONTROL, so it has to be untouched. A walk
         // that never asked for a contrast must not pay for one or be ranked by one,
         // or every number `Credited` ever produced is measuring something else.
-        var fired = Pair().Fire(Origin(C(1)) with { Through = Kind.Helped });
+        var fired = Pair().Fire(Fixture.Origin(C(1)) with { Through = Kind.Helped });
 
         Assert.NotEmpty(fired.Outgoing);
         Assert.All(fired.Outgoing, one => Assert.Equal(0.0, one.Contrast));
         Assert.All(fired.Outgoing, one => Assert.False(one.Contrasted));
+    }
+
+    /// <summary>
+    /// A node with one partner onward, and a message already arriving at it.
+    /// </summary>
+    /// <remarks>
+    /// <b>An ORIGIN is not weighed at all</b> — nothing arrived, so there is no
+    /// edge to value — and everything below is about what the receiver does with
+    /// the edge it came in on. So the chain has two codes in it.
+    /// </remarks>
+    private static (Node Node, Message Arriving) Receiving()
+    {
+        var node = new Node(C(2), Fixture.Dials(stamina: 10.0));
+        node.Note(4.0, Kind.With);
+        node.Observe(C(5), 1.0, Kind.With);
+
+        return (node, Fixture.Origin(C(2)) with
+        {
+            Chain = [C(1), C(2)],
+            Together = 4.0,
+        });
     }
 
     [Fact]
@@ -319,20 +330,7 @@ public sealed class ContingencyTests(ITestOutputHelper output)
         // reads as harmful when it merely made everything unreachable. `Doubt` and
         // `Kind.Hindered` are both on the score side of that line; so is this, and
         // the assertion is that the budget left is IDENTICAL.
-        var node = new Node(C(2), Fixture.Dials(stamina: 10.0));
-        node.Note(4.0, Kind.With);
-        node.Observe(C(5), 1.0, Kind.With);
-
-        var arriving = new Message
-        {
-            Broadcast = BroadcastId.New(),
-            ReturnTo = new MachineAddress("test"),
-            To = C(2),
-            Held = 10.0,
-            Chain = [C(1), C(2)],
-            Carried = 1.0,
-            Together = 4.0,
-        };
+        var (node, arriving) = Receiving();
 
         var plain = node.Fire(arriving);
         var halved = node.Fire(arriving with { Contrasted = true, Contrast = 0.5 });
@@ -352,21 +350,9 @@ public sealed class ContingencyTests(ITestOutputHelper output)
         // contra-indicated the more negative it gets, and a sort would put the
         // worst act first. So it is clamped at nought, which is the same clamp and
         // the same reason as `Kind.Hindered`'s.
-        var node = new Node(C(2), Fixture.Dials(stamina: 10.0));
-        node.Note(4.0, Kind.With);
-        node.Observe(C(5), 1.0, Kind.With);
+        var (node, plain) = Receiving();
 
-        var arriving = new Message
-        {
-            Broadcast = BroadcastId.New(),
-            ReturnTo = new MachineAddress("test"),
-            To = C(2),
-            Held = 10.0,
-            Chain = [C(1), C(2)],
-            Carried = 1.0,
-            Together = 4.0,
-            Contrasted = true,
-        };
+        var arriving = plain with { Contrasted = true };
 
         Assert.Equal(0.0, node.Fire(arriving with { Contrast = 0.0 }).Reached!.Score);
         Assert.Equal(0.0, node.Fire(arriving with { Contrast = -0.9 }).Reached!.Score);

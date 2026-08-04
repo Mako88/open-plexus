@@ -43,10 +43,12 @@ namespace OpenPlexus.Codes;
 /// and the half that does not require seeing the data first.
 /// </para>
 /// <para>
-/// <b><see cref="Code.Prefix"/> ALREADY ANTICIPATED IT.</b> Its note says LSH codes
-/// near in Hamming distance share prefixes — which is exactly this, for a front
-/// end whose codes come from hyperplanes rather than from bands. Only fork 3 ever
-/// read it.
+/// <b>A DELETED <c>Code.Prefix</c> ALREADY ANTICIPATED IT.</b> Its note said LSH
+/// codes near in Hamming distance share prefixes — which is exactly this, for a
+/// front end whose codes come from hyperplanes rather than from bands. <b>Nothing
+/// ever called it</b>: it was written for fork 3, which is still open, and the
+/// idea arrived here by another road instead. Three lines to write again if fork 3
+/// ever wants them.
 /// </para>
 /// </remarks>
 public static class Grains

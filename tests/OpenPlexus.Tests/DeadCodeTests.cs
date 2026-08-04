@@ -45,48 +45,32 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     /// thing should be wired or deleted and nobody has done it — which is the
     /// point of writing it down rather than the failure of it.
     /// </remarks>
-    private static readonly Dictionary<string, string> Unused = new(StringComparer.Ordinal)
-    {
-        ["Code.Prefix"] =
-            "OPEN FORK 3 — cluster placement by prefix locality. Cited in prose "
-            + "and called by nothing since the day it was written. Step 8's grains "
-            + "are the same idea arriving by another road, so this is either that "
-            + "mechanism's home or it goes",
-
-        ["Drives.Better"] = "the raw counts `Improving` is derived from, and it "
-            + "is now audited and exposed — these three are the next to go or to "
-            + "earn a reader",
-        ["Drives.Worse"] = "the counts `Improving` is derived from",
-        ["Drives.Same"] = "the counts `Improving` is derived from",
-
-        ["Chunk.Noticed"] =
-            "the denominator that says whether minting was SELECTIVE — a detector "
-            + "that mints nearly everything has found no structure. Reported by "
-            + "`ToString` and asserted by nothing",
-
-        ["Foresight.Foresaw"] =
-            "the share of predictions that named something real, beside "
-            + "`Precision` which is used. Kept as the pair reads together",
-
-        // ---- PRE-DATING THIS FILE, AND LISTING THEM IS A HOLDING POSITION ----
-        //
-        // Every one of these is a world's own vocabulary that its run does not
-        // read, so the honest options are the same two: wire it to something that
-        // asserts, or delete it. They are NOT deleted here only because a long
-        // session is the wrong time to cut into four worlds nobody was touching,
-        // and a list somebody has to look at beats a silence nobody does.
-
-        ["Clevr.Material"] = "a scene attribute the run never asks about",
-        ["Clevr.Thing"] = "a scene attribute the run never asks about",
-        ["Motif.Cue"] = "the motif's own cue code, never read back",
-        ["MotifRun.Chunks"] = "reported by `ToString` and asserted by nothing",
-        ["Rhythm.Cycle"] = "the stream's period, never read back",
-        ["Rhythm.Symbol"] = "the stream's alphabet, never read back",
-        ["RunReport.NoveltyGap"] = "reported and asserted by nothing",
-        ["RunReport.Silence"] = "reported and asserted by nothing",
-        ["Senses.Aside"] = "clutter's own modality, never read back",
-        ["SnakeSense.Proprioception"] = "the body's own modality, never read back",
-    };
+    /// <remarks>
+    /// <b>EMPTY, AND THE THREE WAYS IT GOT THERE ARE WORTH KEEPING.</b> Sixteen
+    /// entries were resolved rather than re-explained, and none of the three moves
+    /// was "write a better reason":
+    /// <list type="bullet">
+    /// <item><b>Made non-public.</b> Five were used inside their own file and
+    /// nowhere else — a world's own modality byte, its own cue, its own code
+    /// constructors. A member with no caller outside its type was never public
+    /// code; it was a private detail with the wrong keyword, and the budget is what
+    /// noticed.</item>
+    /// <item><b>Deleted.</b> Three had no caller anywhere at all. <c>Code.Prefix</c>
+    /// was written for open fork 3, cited in prose, and never once run — and step
+    /// 8's grains reached the same idea by another road, so the fork can write its
+    /// three lines again if it ever wants them.</item>
+    /// <item><b>Asserted.</b> Eight were computed every run and printed in a
+    /// <c>ToString</c>, which is precisely how a quantity goes on looking alive:
+    /// shown to whoever reads the output and free to be wrong forever. Each now has
+    /// a test comparing it to something.</item>
+    /// </list>
+    /// <b>THE LIST BEING EMPTY IS NOT THE POINT AND SHOULD NOT BECOME ONE.</b> A
+    /// written reason is a perfectly good outcome — "nobody has got to it yet"
+    /// included. What is not allowed is silence, and what this file buys is that
+    /// the next unwired mechanism arrives ALONE rather than among sixteen.
+    /// </remarks>
+    private static readonly Dictionary<string, string> Unused =
+        new(StringComparer.Ordinal);
 
     /// <summary>What a record or a runtime generates and nobody writes.</summary>
     private static readonly HashSet<string> Generated = new(StringComparer.Ordinal)
@@ -161,7 +145,12 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // THE POINT OF THE FILE. The number is what it is today; having one is what
         // stops the next unwired mechanism arriving unnoticed beside these. IT
         // SHOULD ONLY EVER FALL — every entry is something to wire or delete.
-        Assert.Equal(16, Unused.Count);
+        //
+        // AT NOUGHT, AND THAT MAKES THIS THE STRICTEST THE CHECK CAN BE: the next
+        // public member to lose its last caller fails the test above outright, with
+        // nowhere to sit quietly. Raising this is a deliberate edit and should read
+        // as one.
+        Assert.Empty(Unused);
     }
 
     /// <summary>

@@ -412,6 +412,11 @@ process** — kept, because a real network loses reports.
   flat where rows grew without bound, because the growth mints tiny nodes that
   hold the average down. **Read `Widest`.**
 - **Copies drift where nothing fails.** `DuplicationTests` is the budget.
+- **NOTHING FAILS WHEN A PUBLIC MEMBER LOSES ITS LAST CALLER**, so a mechanism can
+  be written, documented, cited here and never once run — reading exactly like one
+  that works. `DeadCodeTests` is the budget and **it is at nought**, so the next
+  one arrives alone. **A `cref` is not a call**, which is how they stay looking
+  alive; **a `ToString` is not an assertion**, which is how eight of them did.
 - **THE TEST SUITE IS SERIAL ON PURPOSE.** Parallel, the walk's agreement with
   itself measured perfect where alone it did not — load removes the ordering that
   produces the disagreement, so parallelism HID a defect. `Parallelism.cs`.

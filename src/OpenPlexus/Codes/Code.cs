@@ -31,21 +31,4 @@ public readonly record struct Code(byte Modality, ulong Value) : IComparable<Cod
         var modality = Modality.CompareTo(other.Modality);
         return modality != 0 ? modality : Value.CompareTo(other.Value);
     }
-
-    /// <summary>
-    /// The top <paramref name="bits"/> bits of <see cref="Value"/>.
-    /// </summary>
-    /// <remarks>
-    /// Used only by the cluster-placement locality arm — open fork 3. LSH
-    /// codes near in Hamming distance share prefixes, so hashing a prefix puts
-    /// similar codes on the same machine, which is a column falling out of the
-    /// addressing rather than being built. Limit: within-modality only, since
-    /// two front ends never share a prefix.
-    /// </remarks>
-    public ulong Prefix(int bits)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(bits);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(bits, 64);
-        return bits == 0 ? 0UL : Value >> (64 - bits);
-    }
 }

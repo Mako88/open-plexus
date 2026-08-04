@@ -88,8 +88,18 @@ public sealed class DocsTests
     /// number the build refuses to go past. The gap between the two is one
     /// session's working room and nothing more.
     /// </para>
+    /// <para>
+    /// <b>RAISED TO 5,400 — JOHN'S CALL, 2026-08-04, AND IT IS A DEBT RATHER THAN
+    /// A NEW LEVEL.</b> The gap above is ONE session's room and the previous
+    /// session ended without spending its compaction pass, so this one began
+    /// already carrying that session's drift and had to trim something real to
+    /// afford every sentence it added. <b>The compaction pass at the end of this
+    /// session brings this number back to 4,800</b>, and a later session finding it
+    /// still at 5,400 has found a pass that did not happen rather than a ceiling
+    /// that moved.
+    /// </para>
     /// </remarks>
-    private const int Ceiling = 4_800;
+    private const int Ceiling = 5_400;
 
     /// <summary>
     /// The budget for PROSE, as against structure.

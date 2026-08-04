@@ -173,7 +173,7 @@ public sealed class Clevr
     public const byte Shape = 52;
 
     /// <summary>One of two materials.</summary>
-    public const byte Material = 53;
+    private const byte Material = 53;
 
     /// <summary>The index standing for one object. See <see cref="ClevrSettings.Tagged"/>.</summary>
     public const byte Object = 54;
@@ -293,7 +293,7 @@ public sealed class Clevr
     /// which is a hub joining every scene to every other and the exact opposite of
     /// what an index is for.
     /// </remarks>
-    public static Code Thing(int scene, int slot)
+    internal static Code Thing(int scene, int slot)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(scene);
         ArgumentOutOfRangeException.ThrowIfNegative(slot);

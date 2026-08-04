@@ -39,7 +39,7 @@ public sealed record SnakeFrame
 public sealed class SnakeSense : IQuantizer<SnakeFrame>
 {
     /// <summary>What the body did. A sense like any other.</summary>
-    public const byte Proprioception = 2;
+    private const byte Proprioception = 2;
 
     private readonly SnakeQuantizer _vision;
 

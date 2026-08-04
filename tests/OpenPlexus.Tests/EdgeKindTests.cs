@@ -39,17 +39,6 @@ public sealed class EdgeKindTests
         return bench;
     }
 
-    /// <summary>A broadcast standing on its first node, with budget to spend.</summary>
-    private static Message Origin(Code code) => new()
-    {
-        Broadcast = BroadcastId.New(),
-        ReturnTo = new MachineAddress("test"),
-        To = code,
-        Held = 10.0,
-        Chain = [code],
-        Carried = 1.0,
-    };
-
     // ---- off changes nothing ----------------------------------------------
 
     [Fact]
@@ -219,7 +208,7 @@ public sealed class EdgeKindTests
         node.Observe(C(2), 1.0, Kind.With);
         node.Observe(C(3), 1.0, Kind.After);
 
-        var asking = Origin(C(1)) with { Through = Kind.After };
+        var asking = Fixture.Origin(C(1)) with { Through = Kind.After };
 
         var fired = node.Fire(asking);
 
@@ -237,7 +226,7 @@ public sealed class EdgeKindTests
         node.Observe(C(2), 1.0, Kind.With);
         node.Observe(C(3), 1.0, Kind.After);
 
-        var fired = node.Fire(Origin(C(1)));
+        var fired = node.Fire(Fixture.Origin(C(1)));
 
         Assert.Equal(2, fired.Outgoing.Length);
     }
@@ -253,7 +242,7 @@ public sealed class EdgeKindTests
         node.Observe(C(2), 1.0, Kind.With);
         node.Observe(C(2), 1.0, Kind.After);
 
-        var fired = node.Fire(Origin(C(1)));
+        var fired = node.Fire(Fixture.Origin(C(1)));
 
         // Two entries, and the second is refused because the chain already
         // carries C(2) after the first.
@@ -299,7 +288,7 @@ public sealed class EdgeKindTests
         node.Observe(C(2), 1.0, Kind.With);
         node.Observe(C(3), 1.0, north);
 
-        var fired = node.Fire(Origin(C(1)) with { Through = north });
+        var fired = node.Fire(Fixture.Origin(C(1)) with { Through = north });
 
         Assert.Equal([C(3)], fired.Outgoing.Select(message => message.To));
         Assert.Equal(north, fired.Outgoing[0].Kind);

@@ -117,7 +117,7 @@ public sealed class Senses
     /// Something present and irrelevant. <b>A modality of its own, so it can
     /// never be an answer</b> — see <see cref="SensesSettings.Clutter"/>.
     /// </summary>
-    public const byte Aside = 13;
+    private const byte Aside = 13;
 
     private readonly SensesSettings _settings;
     private readonly Random _rng;

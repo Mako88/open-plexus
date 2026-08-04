@@ -95,6 +95,25 @@ public static class Fixture
 
     /// <summary>A code in the plain test modality.</summary>
     public static Code C(ulong value) => new(Modality: 1, value);
+
+    /// <summary>
+    /// A broadcast standing on its first node, with budget to spend.
+    /// </summary>
+    /// <remarks>
+    /// <b>Written out twice before `DuplicationTests` refused it</b>, which is the
+    /// check doing its job: two copies of the message a walk STARTS from are two
+    /// places for a field's default to drift, and a walk that begins differently in
+    /// two files is two different experiments wearing one name.
+    /// </remarks>
+    public static Thinking.Message Origin(Code code) => new()
+    {
+        Broadcast = Thinking.BroadcastId.New(),
+        ReturnTo = new MachineAddress("test"),
+        To = code,
+        Held = 10.0,
+        Chain = [code],
+        Carried = 1.0,
+    };
 }
 
 /// <summary>

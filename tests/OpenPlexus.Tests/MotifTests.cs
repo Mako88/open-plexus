@@ -222,6 +222,22 @@ public sealed class MotifTests(ITestOutputHelper output)
             $"nothing was minted: {with.Nodes} against {without.Nodes}");
 
         Assert.Equal(without.Motifs, with.Coined);
+
+        // AND THE MINTING WAS SELECTIVE, WHICH `Coined` ALONE CANNOT SAY. A detector
+        // that minted every whole moment it ever saw would report the same node
+        // growth and the same coined count and would have found NO STRUCTURE -- it
+        // would have renamed the stream, and the compression would be arithmetic
+        // rather than real. The denominator is what tells those apart.
+        var detector = chunked.Chunks!;
+
+        output.WriteLine(
+            $"coined {detector.Coined} of {detector.Noticed} distinct moments");
+
+        Assert.True(detector.Coined * 10 < detector.Noticed,
+            $"minting stopped being selective: {detector.Coined} of "
+            + $"{detector.Noticed} distinct moments. A detector over a tenth of "
+            + "what it sees is renaming the stream rather than finding a motif, "
+            + "and the alphabet growth above stops meaning anything");
     }
 
     [Fact]

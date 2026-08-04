@@ -112,7 +112,7 @@ public sealed class Motif
     /// <b>Half, rounded down, and at least one.</b> Showing all but one makes the
     /// completion a lookup; showing one makes it a marginal.
     /// </remarks>
-    public int Cue => Math.Max(1, _settings.Size / 2);
+    private int Cue => Math.Max(1, _settings.Size / 2);
 
     /// <summary>One moment: either a whole set, or that many codes at random.</summary>
     /// <returns>The codes shown, and which set they were if any.</returns>

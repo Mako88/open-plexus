@@ -26,6 +26,39 @@ public enum Attending
 
     /// <summary>Whichever variable is lowest. <b>The ceiling.</b></summary>
     Lowest,
+
+    /// <summary>
+    /// The graph again, with what it learns WEIGHTED BY WHETHER THINGS GOT
+    /// BETTER — <b>step 4's third factor.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A SEPARATE ARM BECAUSE IT CHANGES TWO THINGS, and saying so is the
+    /// point.</b> It weights the occasion by <see cref="Drives.Credit"/>, and it
+    /// writes that occasion ONE STEP LATE — an act can only be priced by what
+    /// followed it, so the credit for a transition belongs to the occasion before
+    /// it. <see cref="Chain"/> is left exactly as it was measured.
+    /// </para>
+    /// <para>
+    /// <b>The bar is <see cref="Blind"/> and not <see cref="Idle"/>.</b> Choosing
+    /// by association already scores below drawing at random, which is what step 4
+    /// exists to fix; beating idling would only mean the arithmetic still works.
+    /// </para>
+    /// </remarks>
+    Driven,
+
+    /// <summary>
+    /// <see cref="Driven"/>'s delay WITHOUT its credit — <b>the control that says
+    /// which of the two changes did the work.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE ARM CHANGES TWO THINGS, so on its own it can attribute neither.</b>
+    /// Writing an occasion one step late means every walk sees a graph one
+    /// occasion staler, which is a difference all by itself. This writes just as
+    /// late and always at weight one, so the gap between this and
+    /// <see cref="Driven"/> is the credit and nothing else.
+    /// </remarks>
+    Delayed,
 }
 
 /// <summary>
@@ -155,6 +188,16 @@ public sealed class HomeostatRun : IDisposable
         int held = 0, silent = 0, unbalanced = 0;
         var chains = new Chains();
 
+        // THE UNIT IS THE WORLD'S OWN, NOT A CONSTANT. One step's fall of the
+        // fastest-draining variable is what breaking even looks like here, so it
+        // is what earns the full band -- see Drives.
+        var drives = new Drives(_settings.Drain * _settings.Needs);
+
+        // WHAT IS OWED A WEIGHT. The occasion for a step cannot be written until
+        // the step after it, because until then nothing has happened that could
+        // say what it was worth.
+        (ImmutableArray<Code> Codes, long At)? owed = null;
+
         for (var step = 0; step < steps; step++)
         {
             var felt = world.Feels();
@@ -162,6 +205,11 @@ public sealed class HomeostatRun : IDisposable
             // WHAT IS FELT AND WHAT IS DONE ARE ONE OCCASION. The action joins the
             // state it was taken in, which is the only way a later walk from a
             // state can reach an action at all.
+            // FEEL BEFORE ANYTHING ELSE, so the credit standing here is for the
+            // transition that just happened -- which is the one the occasion
+            // being held was responsible for.
+            drives.Feel(world.At);
+
             var chosen = choosing switch
             {
                 Attending.Idle => (int?)null,
@@ -181,7 +229,8 @@ public sealed class HomeostatRun : IDisposable
             // actions, does walking choose better than drawing at random. That is
             // the question step 4 is about, and the fallback is counted so the
             // share of the run the graph actually decided is visible.
-            if (choosing == Attending.Chain && chosen is null)
+            if (choosing is Attending.Chain or Attending.Driven or Attending.Delayed
+                && chosen is null)
             {
                 silent++;
                 chosen = rng.Next(world.Needs);
@@ -191,8 +240,31 @@ public sealed class HomeostatRun : IDisposable
                 ? [.. felt, Homeostat.Attending(which)]
                 : felt;
 
-            await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
-            await _fabric.QuietAsync(ct).ConfigureAwait(false);
+            if (choosing is Attending.Driven or Attending.Delayed)
+            {
+                // ONE STEP LATE, AND WEIGHTED BY WHAT FOLLOWED. The occasion held
+                // from last step is written now, priced by the transition it
+                // produced; this step's occasion is held in its place. The walk
+                // above already ran against the graph as it stood, so what is
+                // delayed is the LEARNING and never the thinking.
+                if (owed is { } last)
+                {
+                    var worth = choosing == Attending.Driven ? drives.Credit : 1.0;
+
+                    await _body
+                        .ObserveAsync(last.Codes, last.At, worth: worth, ct: ct)
+                        .ConfigureAwait(false);
+
+                    await _fabric.QuietAsync(ct).ConfigureAwait(false);
+                }
+
+                owed = (occasion, step);
+            }
+            else
+            {
+                await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
+                await _fabric.QuietAsync(ct).ConfigureAwait(false);
+            }
 
             if (world.Step(chosen)) held++;
         }

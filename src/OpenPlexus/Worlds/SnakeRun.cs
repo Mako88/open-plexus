@@ -372,7 +372,7 @@ public sealed class SnakeRun : IDisposable
             // cell written, the chain reached an action ZERO times on every seed
             // and the body moved entirely at random. See Kind.Before.
             var thought = await _eye
-                .ObserveAsync(frame, taken, _kinds ? Question.Preceding() : null, ct)
+                .ObserveAsync(frame, taken, _kinds ? Question.Preceding() : null, ct: ct)
                 .ConfigureAwait(false);
 
             // Wait for the dust to settle before deciding. Turn-based world,

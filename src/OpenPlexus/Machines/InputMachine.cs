@@ -108,10 +108,23 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// observation made before edge kinds existed</b> — an undirected flood that
     /// walks whatever it finds.
     /// </param>
+    /// <param name="worth">
+    /// What this occasion counts for. <b>One is something that happened</b>, and
+    /// below or above it is the third factor of step 4 saying how much the moment
+    /// earned — see <see cref="Learning.Drives"/>. Never zero or negative: counts
+    /// only increment, and a factor that could cancel one would break the
+    /// convergence the whole coordination-free design rests on.
+    /// </param>
     /// <param name="ct">Cancellation.</param>
     public async Task<Thought?> ObserveAsync(
-        TFrame frame, long now, Question? asking = null, CancellationToken ct = default)
+        TFrame frame,
+        long now,
+        Question? asking = null,
+        double worth = 1.0,
+        CancellationToken ct = default)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(worth);
+
         var changes = _liveSet.Update(_quantizer.Codify(frame), now);
         if (changes.Started.IsEmpty) return null;
 
@@ -141,6 +154,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
                 Live = live,
                 Recent = recent,
                 At = now,
+                Weight = worth,
 
                 // WHAT THE FRONT END COULD SAY ABOUT WHICH THING IS WHICH, and
                 // null for every front end that cannot. See Occasion.Groups.

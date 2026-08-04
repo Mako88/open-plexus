@@ -24,11 +24,11 @@
 
 ## What is standing
 
-- **Six worlds sharing no world logic, over one `Fabric`.** Snake, where a chain
+- **Eight worlds sharing no world logic, over one `Fabric`.** Snake, where a chain
   can cause a move; senses, where sight and touch never co-occur so the answer can
-  only be composed; binding, built so this architecture provably could not answer
-  it and since lifted; composition, where the answer was never observed at all;
-  and **two nobody here designed** — `Babi` and `Clevr`.
+  only be composed; binding, built to be unanswerable and since lifted;
+  composition, where the answer was never observed; and **two nobody here
+  designed** — `Babi` and `Clevr`. `ScoreboardTests` runs them in one table.
 - **AN EXTERNAL WORLD CANNOT FLATTER THIS ARCHITECTURE BY CONSTRUCTION**, which is
   why to read one. `corpora/fetch.sh` fetches; nothing is vendored.
 - **An occasion is a SET**, so *red ball beside blue box* and *blue ball beside
@@ -65,8 +65,8 @@ to an old one — run that one.**
 - **It travels on `Question`**, and `WalkSettings` has one dial fewer.
 - **Merging routes AT A NODE is the version `Narrowed` could not do.** Reading the
   index back costs a round trip and puts the referent in the machine's hands; a
-  node combining concurrent routes of one broadcast keeps it in the graph. Needs a
-  wait, which C2 makes expensive — but it is the honest form.
+  node combining concurrent routes keeps it in the graph. Needs a wait, which C2
+  makes expensive — but it is the honest form.
 - **`Pricing` IS STILL HAND-SET AND A CONTROLLER FOR IT IS REFUTED.** The trade
   was thought to be density and budget, both locally observable — but the better
   arm on `Babi` is the *dearer* one, and `Senses` scores the two identically.
@@ -84,28 +84,35 @@ to an old one — run that one.**
 
 ### 3. Chunking — MDL
 
-- Fork 21 mints edges; it should mint **nodes**. When a set of codes recurs, mint a
-  code standing for the set. Threshold is minimum description length, not a constant.
+- Fork 21 mints edges; it should mint **nodes**: when a set recurs, mint a code
+  standing for it. Threshold is minimum description length, not a constant.
 - **This is what lets the alphabet GROW** — today the quantiser fixes it forever.
 - Fork 21's trade is the **utility problem** from explanation-based learning
   (Minton, SOAR): utility belongs per chunk, not as one global `Weight`.
 - **`Motif` HAS SAID WHAT THIS IS NOT ABOUT.** A familiar set completes perfectly
-  with no chunking, because its members co-occur and the counts are right. **Step 3
-  is not asked to fix an accuracy but to stop paying for one** — the number to beat
-  is traffic per completion.
+  with no chunking. **Step 3 is not asked to fix an accuracy but to stop paying for
+  one** — the number to beat is traffic per completion.
 
 ### 4. Homeostatic drives — Ashby
 
 - Keep internal variables in bounds and behaviour becomes goal-directed **with no
   reward function**, which matters because survival proved gameable by circling.
   **No episode boundary**, which fits C4.
-- **`Homeostat` HAS SET THE BAR, AND NOT WHERE ANYBODY WOULD GUESS.** Attending to
-  whatever is lowest holds the body indefinitely, so the world is winnable and only
-  by looking at it.
+- **`Homeostat` HAS SET THE BAR.** Attending to whatever is lowest holds the body
+  indefinitely, so the world is winnable and only by looking at it.
 - **But choosing by association scores BELOW random**: with nothing to say what an
   action is for, the walk repeats what it did last time in that state — fork 20's
   mirror. **So step 4 must beat random, not idling**, and needs a bootstrap, since
   an action enters the graph only by being taken.
+- **`Drives` IS BUILT AND DOES NOT CLEAR THAT BAR.** It weights an occasion by
+  whether the most-at-risk variable improved — positive band only, so counts stay
+  monotonic and a bad transition is written FAINTLY rather than undone.
+- **THE DELIVERY FAILS, NOT THE SIGNAL, and a delay-only control says so.** Credit
+  prices the occasion BEFORE it, so the arm writes a step late: **the delay costs
+  nine times what the credit buys**, and the credit moves the arm the right way.
+- **So it wants a TOP-UP, not a delay**: write at once, add the remainder when the
+  outcome lands. A G-Counter can be added to twice, which is what makes it legal —
+  and it is what `Window`-as-trace is for.
 
 ### 5. WHAT A CO-OCCURRENCE COUNT STRUCTURALLY CANNOT DO — John, 2026-08-03
 
@@ -113,19 +120,16 @@ to an old one — run that one.**
 
 - **ABSENCE — BUILT AS A SIGNAL, NOTHING ACTS ON IT.** `Surprise` returns both
   halves of the signed error; `Overreach` tells a solved world from a predictor
-  naming everything, which `Rate` alone cannot and which is the one failure step 2
-  can cause rather than measure. **Absence is a SIGNAL, not a node** — minting
-  `not-X` would double an alphabet to represent unboundedly many absent things.
-  **What is left is a consumer**: a second internal quantity, and a third-factor
-  candidate for step 7.
+  naming everything, which is the one failure step 2 can cause rather than
+  measure. **A SIGNAL, not a node** — minting `not-X` would double an alphabet to
+  represent unboundedly many absent things. **What is left is a consumer.**
 - **SUPERSESSION — THE CHANNEL IS BUILT, NOTHING READS IT.** Counts only
   increment, which is the G-Counter property and exactly what forbids
   most-recent-wins. **Do not decay**, which breaks convergence. `Tie.Count` stays
   monotonic and `Tie.When` rides beside it as an LWW-Register taking the later
-  STAMP, not the later arrival; **the two must never merge**, because LWW discards
-  concurrent writes. **What is left is both consumers**: ranking by recency, which
-  belongs on `Question`, and eviction on "not touched since". Across machines it
-  wants a Lamport clock, which needs no coordinator.
+  STAMP; **the two must never merge**, because LWW discards concurrent writes.
+  **What is left is both consumers**: recency ranking on `Question`, and eviction
+  on "not touched since". Across machines it wants a Lamport clock.
 - **MULTI-TOKEN OUTPUT, concurrently. Splits in two.** *Simultaneous* actions are
   nearly free — `BestOf` returns many and many thoughts are already in flight,
   which is what `BroadcastId` is for — and **fork 11 built the addressing**; what
@@ -136,11 +140,9 @@ to an old one — run that one.**
 - **A row entry is `(Code, Kind)` to `(count, when)`**, with `With` and `After`,
   and supersession rode in beside it for the single price.
 - **The front end SAYS the order inside the occasion** — John's insight, the
-  `Groups` trick again, because a phase cannot survive C2 and an order travelling
-  inside the occasion cannot be reached by lateness.
-- **`Occasion.Sequence` is additive and needs no arm.** Splitting the window's
-  carried edge moves counts already measured, so that half is an arm and OFF is
-  every earlier number.
+  `Groups` trick again, because a phase cannot survive C2. `Occasion.Sequence` is
+  additive; splitting the window's carried edge moves measured counts, so that
+  half is an arm and OFF is every earlier number.
 - **`Question.Through` restricts a walk to one relation**, and it is what answered
   fork 18. `Babi` is not a question about what follows, which is why kinds help
   there without rescuing the window.
@@ -207,7 +209,7 @@ to an old one — run that one.**
 ## TO BUILD — a ticked box means the type exists, and a test checks
 
 - [ ] `Chunk` — the minted node of step 3
-- [ ] `Drives` — the bounded internal variables of step 4
+- [x] `Drives` — step 4's third factor. **Built, and it does not clear the bar**
 
 ---
 
@@ -287,13 +289,13 @@ condition is a superstition. The commit named in git holds the numbers.**
 | Clusters by time of creation | Two machines compute different owners for one code | Placement agreement without a coordinator |
 | `Adaptive` reflection on `Hunger` | Inverted: it wrote most where it helped least | A signal that discriminates; `Thwarted` does |
 | A deeper walk for prediction | Monotonically worse — without edge kinds, deeper reaches more and ranks worse | **Edge kinds**, and that refutation reproduced |
-| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted, `Max` re-tried where its revival condition pointed and worse there too. **Both now DELETED** | Lift in the **cost**, which `Doubt` is the nearest thing to |
-| Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | **REVIVED at one code.** Naming as many codes as the frame holds swamps the action entirely — fork 18's gap is flat at every sight radius. Naming ONE, it opens wide |
+| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted, `Max` worse where its revival condition pointed. **Both DELETED** | Lift in the **cost**, which `Doubt` is nearest to |
+| Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | **REVIVED at one code.** Naming as many as the frame holds swamps the action; naming ONE, the gap opens wide |
 | `Window` span | Null on snake, WORSE on `Babi` at an order of magnitude more traffic, and **the whole task on `Rhythm`**, where at zero the graph forms no edges. **Its revival condition has been RUN and half-held**: kinds recover much of the accuracy and most of the traffic at every budget, and carrying still loses to not carrying | **Something that makes a carried edge worth its row.** Kinds were the structural half and are not enough alone |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
-| `Pricing.Balanced` — `together / sqrt(seen·seen)`, cosine's denominator | **Times out.** The geometric mean sits BETWEEN the marginals, so weights rise and hops go cheaper than under either arm — the walk explodes rather than compromising. Built for a conflict that was a budget artifact anyway | A bound on the walk that does not rely on the weight being the reciprocal of one marginal — the same condition `StepCost.Best` needs |
+| `Pricing.Balanced` — cosine's denominator | **Times out.** The geometric mean sits BETWEEN the marginals, so weights rise and the walk explodes rather than compromising. Built for a conflict that was a budget artifact | A bound not relying on the weight being one marginal's reciprocal — `StepCost.Best`'s condition |
 | `Pricing.Driven` — the node picking the marginal per hop | **Two local rules, both worse than the better hand-set arm in BOTH worlds.** Preferring the receiver where affordable fell below *both*: a per-hop choice puts routes on different scales and the ranking stops meaning anything. **The premise was wrong — on `Babi` the better arm is the DEARER one** | A local quantity that predicts which arm wins, on a world where they differ: `Senses` scores them identically |
-| `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift on the conjunction and ALL of its cost on binding. **Two candidates whose orders invert score identically under RRF for every damping constant**, so it ties exactly where it is needed and the tiebreak answers | A question with many candidates, or a fusion that separates by something other than position |
+| `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift and all its cost. **Two candidates whose orders invert tie identically under RRF for every damping constant**, so it ties exactly where it is needed | Many candidates, or a fusion separating by something other than position |
 
 ---
 

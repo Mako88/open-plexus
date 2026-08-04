@@ -46,6 +46,29 @@ public abstract record Measurement
     /// <inheritdoc cref="Worlds.Plumbing.Unbalanced"/>
     public int Unbalanced => Plumbing.Unbalanced;
 
+    /// <summary>
+    /// Walks read before they had finished — fork 22.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>Counted rather than absorbed.</b> A walk that had not finished produces
+    /// "nothing reached", which is indistinguishable from a graph that genuinely
+    /// had nothing to say — so a run where this is not zero has a silent-count
+    /// that cannot be trusted.
+    /// </para>
+    /// <para>
+    /// <b>IT LIVES HERE AND NOT ON <see cref="Questioned"/>, AND IT WAS MOVED
+    /// BECAUSE A WORLD WENT WITHOUT IT.</b> <c>Homeostat</c> asks nothing and
+    /// still walks, so it sat outside the only place this check existed: it
+    /// discarded what <c>SettleAsync</c> returned, and an unfinished walk there
+    /// reads as "the graph proposed no action" and is converted into a random
+    /// act by the bootstrap. That is fork 22 wearing the costume of the very
+    /// result step 4 rests on. <b>Anything that walks can suffer it, so anything
+    /// that walks inherits the check.</b>
+    /// </para>
+    /// </remarks>
+    public required int Unsettled { get; init; }
+
     /// <inheritdoc cref="Worlds.Plumbing.Deepest"/>
     public int Deepest => Plumbing.Deepest;
 
@@ -88,6 +111,9 @@ public abstract record Measurement
             if (Spread.Count(count => count > 0) < 2)
                 wrong.Add("every node landed on one cluster");
 
+            if (Unsettled > 0)
+                wrong.Add($"{Unsettled} walks were read before they had finished");
+
             Peculiar(wrong);
 
             return wrong;
@@ -126,17 +152,6 @@ public abstract record Questioned : Measurement
     /// <summary>Routes killed by the horizon rather than by economics.</summary>
     public required long Halted { get; init; }
 
-    /// <summary>
-    /// Questions read before their walk had finished — fork 22.
-    /// </summary>
-    /// <remarks>
-    /// <b>Counted rather than absorbed.</b> A walk that had not finished produces
-    /// "nothing reached", which is indistinguishable in a score from a graph that
-    /// genuinely had nothing to say — so a run where this is not zero has a
-    /// silent-count that cannot be trusted.
-    /// </remarks>
-    public required int Unsettled { get; init; }
-
     /// <inheritdoc cref="Worlds.Reflections"/>
     public required Reflections Reflections { get; init; }
 
@@ -162,8 +177,6 @@ public abstract record Questioned : Measurement
 
         if (Moments == 0) wrong.Add($"the run showed no {Shown}");
         if (Asked == 0) wrong.Add("nothing was ever asked");
-        if (Unsettled > 0)
-            wrong.Add($"{Unsettled} questions were read before their walk finished");
         if (Asked > 0 && Silent >= Asked) wrong.Add("every question went unanswered");
 
         // FORK 21'S OWN WIRING CHECK. A dial that is on and does nothing is a

@@ -74,7 +74,8 @@ public sealed record RunReport : Measurement
         report.Append(CultureInfo.InvariantCulture,
             $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | ");
         report.Append(CultureInfo.InvariantCulture,
-            $"msgs={Messages} halted={Result.Halted} unbalanced={Unbalanced} | ");
+            $"msgs={Messages} halted={Result.Halted} unbalanced={Unbalanced} "
+            + $"unsettled={Unsettled} | ");
         report.Append(CultureInfo.InvariantCulture,
             $"foresaw={Result.Foresight.Precision:F3} blind={Result.Foresight.Blind:F3} ");
         report.Append(CultureInfo.InvariantCulture,

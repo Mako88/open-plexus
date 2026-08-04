@@ -104,15 +104,26 @@ public sealed record HomeostatResult : Measurement
     /// <summary>How long doing nothing would have lasted.</summary>
     public required int Idling { get; init; }
 
-    /// <summary>Steps where the walk had nothing to say and the body did nothing.</summary>
     /// <summary>How many times each need was attended to. <b>The diagnostic.</b></summary>
     public required IReadOnlyList<int> Attended { get; init; }
-    /// <summary>How many DISTINCT states the body was ever in, as the graph sees
-    /// them. <b>A policy cannot be conditional on a state the graph cannot tell
-    /// apart.</b></summary>
+
+    /// <summary>
+    /// How many DISTINCT states the body was ever in, as the graph sees them.
+    /// <b>A policy cannot be conditional on a state the graph cannot tell
+    /// apart.</b>
+    /// </summary>
     public required int States { get; init; }
 
-
+    /// <summary>
+    /// Steps where the walk proposed no action, <b>so the bootstrap acted at
+    /// random instead.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>NOT "the body did nothing" — it acts, and the act is a coin toss.</b>
+    /// So this is the share of an arm that is measuring its own fallback rather
+    /// than the graph, and an arm whose silence is high is a random policy with
+    /// extra steps. See the note on the bootstrap in <see cref="HomeostatRun"/>.
+    /// </remarks>
     public required int Silent { get; init; }
 
     /// <summary>The share of the run spent viable. <b>The score.</b></summary>
@@ -156,7 +167,7 @@ public sealed record HomeostatResult : Measurement
         $"viable={Viable:F4} idling={Idling} | " +
         $"nodes={Nodes} edges={Edges} widest={Widest} spread=[{string.Join(",", Spread)}] | " +
         $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | " +
-        $"msgs={Messages} unbalanced={Unbalanced}{Wrong}";
+        $"msgs={Messages} unbalanced={Unbalanced} unsettled={Unsettled}{Wrong}";
 }
 
 /// <summary>
@@ -227,7 +238,7 @@ public sealed class HomeostatRun : IDisposable
         var world = new Homeostat(_settings);
         var rng = new Random(Seed);
 
-        int held = 0, silent = 0, unbalanced = 0;
+        int held = 0, silent = 0, unbalanced = 0, unsettled = 0;
         var attended = new int[_settings.Needs];
         var states = new HashSet<string>(StringComparer.Ordinal);
         var chains = new Chains();
@@ -258,12 +269,25 @@ public sealed class HomeostatRun : IDisposable
             drives.Feel(world.At);
             states.Add(string.Join(",", felt.Select(code => $"{code.Modality}:{code.Value}")));
 
+            // THE ARMS THAT NEVER CONSULT THE GRAPH DECIDE WITHOUT A WALK, so
+            // there is nothing to fold for them and `None` is silent.
+            var walked = choosing is Attending.Idle or Attending.Blind or Attending.Lowest
+                ? Walked.None
+                : await ChosenAsync(felt, chains, ct).ConfigureAwait(false);
+
+            // THESE TWO WERE DECLARED HERE AND NEVER MOVED, so this world alone
+            // reported `unbalanced=0` unconditionally and had no unsettled count
+            // at all -- while every other world folded both. Two range checks
+            // that could not fire, in the world step 4's conclusion rests on.
+            if (!walked.Balanced) unbalanced++;
+            if (!walked.Settled) unsettled++;
+
             var chosen = choosing switch
             {
                 Attending.Idle => (int?)null,
                 Attending.Blind => rng.Next(world.Needs),
                 Attending.Lowest => world.Lowest,
-                _ => await ChosenAsync(felt, chains, ct).ConfigureAwait(false),
+                _ => walked.Chosen,
             };
 
             // THE BOOTSTRAP, AND WITHOUT IT THIS ARM IS DEGENERATE. An action code
@@ -358,8 +382,27 @@ public sealed class HomeostatRun : IDisposable
             Attended = attended,
             States = states.Count,
             Idling = world.Idling,
+            Unsettled = unsettled,
             Plumbing = _fabric.Facts(chains, unbalanced),
         };
+    }
+
+    /// <summary>
+    /// What one walk produced, and <b>whether it was in any state to be read.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE TWO TRAVEL WITH THE ANSWER BECAUSE DISCARDING THEM IS HOW THIS WENT
+    /// WRONG.</b> An unsettled walk answers "no action", which the bootstrap turns
+    /// into a coin toss — so a run could be measuring randomness and reporting it
+    /// as the graph's choice, with nothing saying so.
+    /// </remarks>
+    /// <param name="Chosen">Which need to attend to, or null if nothing was reached.</param>
+    /// <param name="Settled">Whether the walk had finished when it was read.</param>
+    /// <param name="Balanced">Whether the thought's own accounting closed.</param>
+    private readonly record struct Walked(int? Chosen, bool Settled, bool Balanced)
+    {
+        /// <summary>An arm that decided without walking. There is nothing to fold.</summary>
+        public static Walked None => new(null, Settled: true, Balanced: true);
     }
 
     /// <summary>
@@ -370,21 +413,22 @@ public sealed class HomeostatRun : IDisposable
     /// <see cref="Thought.BestOf"/>. Nothing tells the walk what an action does;
     /// it has only ever seen actions beside the states they were taken in.
     /// </remarks>
-    private async Task<int?> ChosenAsync(
+    private async Task<Walked> ChosenAsync(
         ImmutableArray<Code> felt, Chains chains, CancellationToken ct)
     {
         var thought = await _body
             .ThinkAsync(felt, _dials.Stamina, null, ct).ConfigureAwait(false);
 
-        await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
+        var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
         var reached = thought.BestOf(Homeostat.Act, 1);
         chains.Fold(thought.Best(int.MaxValue));
 
         var chosen = reached.Count == 0 ? (int?)null : Homeostat.Attended(reached[0].Endpoint);
+        var balanced = thought.Balanced();
 
         _body.Forget(thought.Id);
-        return chosen;
+        return new Walked(chosen, settled, balanced);
     }
 
     public void Dispose() => _fabric.Dispose();

@@ -558,7 +558,15 @@ public sealed class InputMachine<TFrame> : IReceiveReports
 
         foreach (var (broadcast, thought) in _thoughts)
         {
-            if (thought.Lost(gone) > 0 && thought.Settled) _thoughts.TryRemove(broadcast, out _);
+            if (thought.Lost(gone) <= 0 || !thought.Settled) continue;
+
+            // BOTH MAPS, OR THE SECOND ONE GROWS FOREVER. `Retire` only ever
+            // reaches `_quiet` entries whose thought is still tracked, so a
+            // thought removed here left its entry behind with nothing that could
+            // ever collect it — a slow leak keyed by broadcast id, which is
+            // unique per thought and therefore never reused.
+            _thoughts.TryRemove(broadcast, out _);
+            _quiet.TryRemove(broadcast, out _);
         }
     }
 }

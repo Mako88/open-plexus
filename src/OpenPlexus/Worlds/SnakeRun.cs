@@ -62,6 +62,18 @@ public sealed record RunResult
     /// </remarks>
     public required int Unbalanced { get; init; }
 
+    /// <summary>
+    /// Walks read before they had finished — <b>fork 22, and snake was the last
+    /// world without the check.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THREE READS PER STEP, AND EVERY ONE OF THEM MATTERS DIFFERENTLY.</b> An
+    /// unfinished choice becomes a move made at random and counted as the chain's;
+    /// an unfinished prediction names fewer codes than the walk reached and reads
+    /// as a worse predictor. Both are silent, and both look like results.
+    /// </remarks>
+    public required int Unsettled { get; init; }
+
     /// <summary>Every message the bus carried over the run.</summary>
     public required long Messages { get; init; }
 
@@ -301,6 +313,7 @@ public sealed class SnakeRun : IDisposable
         return new RunReport
         {
             Result = result,
+            Unsettled = result.Unsettled,
             Plumbing = _fabric.Facts(_chains, result.Unbalanced),
         };
     }
@@ -332,6 +345,7 @@ public sealed class SnakeRun : IDisposable
         var disagreed = 0;
         long halted = 0;
         var unbalanced = 0;
+        var unsettled = 0;
 
         IReadOnlyList<Code> foreseen = [];
         IReadOnlyList<Code> blind = [];
@@ -375,9 +389,15 @@ public sealed class SnakeRun : IDisposable
                 .ObserveAsync(frame, taken, _kinds ? Question.Preceding() : null, ct: ct)
                 .ConfigureAwait(false);
 
-            // Wait for the dust to settle before deciding. Turn-based world,
-            // harness affordance -- see the note on this class.
-            await _fabric.QuietAsync(ct).ConfigureAwait(false);
+            // WAIT ON THE THOUGHT'S OWN ACCOUNTING, NOT ON THE BUS. This was
+            // `QuietAsync` alone, which is fork 22 exactly: in-flight reaches zero
+            // in the gap between a cluster handling a message and dispatching what
+            // that message produced, so a thought read there says "reached
+            // nothing" where the truth is "not finished" -- and here that becomes
+            // a move made at random and counted as the chain's. Every other world
+            // settles; snake is the oldest and never got the fix.
+            if (thought is null) await _fabric.QuietAsync(ct).ConfigureAwait(false);
+            else if (!await _fabric.SettleAsync(thought, ct).ConfigureAwait(false)) unsettled++;
 
             Code? chosen = null;
 
@@ -387,6 +407,7 @@ public sealed class SnakeRun : IDisposable
                 chosen = voted.Chosen;
                 halted += voted.Halted;
                 unbalanced += voted.Unbalanced;
+                unsettled += voted.Unsettled;
                 if (voted.Disagreed) disagreed++;
             }
 
@@ -421,7 +442,9 @@ public sealed class SnakeRun : IDisposable
             // to the output machine's. Same flood, different question -- and it
             // is conditional on the action, so a different action would ask a
             // different one.
-            (foreseen, blind) = await ForeseeAsync(present, doing, ct).ConfigureAwait(false);
+            bool closed;
+            (foreseen, blind, closed) = await ForeseeAsync(present, doing, ct).ConfigureAwait(false);
+            if (!closed) unsettled++;
 
             // THE CONTROL, AND IT CHANGES EXACTLY ONE THING. Same graph, same
             // budget, same walk, same narrowing, same number of codes named --
@@ -429,7 +452,9 @@ public sealed class SnakeRun : IDisposable
             // well as the real one, the graph is predicting the next frame
             // regardless of what the body does, which is the thing that looks
             // like understanding and is not.
-            (otherwise, _) = await ForeseeAsync(present, Instead(doing), ct).ConfigureAwait(false);
+            (otherwise, _, closed) =
+                await ForeseeAsync(present, Instead(doing), ct).ConfigureAwait(false);
+            if (!closed) unsettled++;
 
             // THE THIRD ARM, AND IT IS WHAT MAKES THE OTHER TWO READABLE. The same
             // question a second time, action and all. Delivery is concurrent, so
@@ -438,7 +463,8 @@ public sealed class SnakeRun : IDisposable
             // caused by the action from a difference caused by the jitter. Three
             // earlier attempts to kill the surviving mutation failed for exactly
             // this reason. See Consequence.Echoed.
-            (again, _) = await ForeseeAsync(present, doing, ct).ConfigureAwait(false);
+            (again, _, closed) = await ForeseeAsync(present, doing, ct).ConfigureAwait(false);
+            if (!closed) unsettled++;
 
             Perform(doing);
             did = cut ? null : doing;
@@ -464,6 +490,7 @@ public sealed class SnakeRun : IDisposable
             EchoedLast = echoed,
             Disagreed = disagreed,
             Unbalanced = unbalanced,
+            Unsettled = unsettled,
             Messages = _fabric.Bus.Messages,
             Foresight = _foresight,
             Novelty = _novelty,
@@ -495,24 +522,29 @@ public sealed class SnakeRun : IDisposable
     /// existing measurements are untouched by its arrival.
     /// </para>
     /// </remarks>
-    private async Task<(Code? Chosen, long Halted, int Unbalanced, bool Disagreed)> VoteAsync(
-        Thought first, int votes, CancellationToken ct)
+    private async Task<(Code? Chosen, long Halted, int Unbalanced, int Unsettled, bool Disagreed)>
+        VoteAsync(Thought first, int votes, CancellationToken ct)
     {
-        if (votes <= 1) return (_hand.Choose(first), 0, 0, false);
+        if (votes <= 1) return (_hand.Choose(first), 0, 0, 0, false);
 
         var asking = new Task<Thought>[votes - 1];
         for (var i = 0; i < asking.Length; i++)
             asking[i] = _eye.ThinkAsync(first.Started, _dials.Stamina, null, ct);
 
         var others = await Task.WhenAll(asking).ConfigureAwait(false);
-        await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
         var opinions = new List<Code?>(votes);
         long halted = 0;
         var unbalanced = 0;
+        var unsettled = 0;
 
         foreach (var one in others)
         {
+            // EACH VOTE IS A WALK AND EACH IS READ, so each is settled. A vote
+            // read early is a random opinion dressed as agreement, which would
+            // move `Disagreed` -- the one number this arm exists to produce.
+            if (!await _fabric.SettleAsync(one, ct).ConfigureAwait(false)) unsettled++;
+
             opinions.Add(_hand.Choose(one));
             halted += one.Halted;
             if (!one.Balanced()) unbalanced++;
@@ -522,7 +554,7 @@ public sealed class SnakeRun : IDisposable
         opinions.Add(_hand.Choose(first));
 
         var vote = Majority.Of(opinions);
-        return (vote.Chosen, halted, unbalanced, vote.Disagreed);
+        return (vote.Chosen, halted, unbalanced, unsettled, vote.Disagreed);
     }
 
     /// <summary>
@@ -553,10 +585,12 @@ public sealed class SnakeRun : IDisposable
     /// Asks the graph what it expects to see next, given what is about to be
     /// done, and draws a blind guess of the same size to score it against.
     /// </summary>
-    private async Task<(IReadOnlyList<Code> Foreseen, IReadOnlyList<Code> Blind)> ForeseeAsync(
-        IReadOnlyCollection<Code> present, Code doing, CancellationToken ct)
+    private async Task<(IReadOnlyList<Code> Foreseen, IReadOnlyList<Code> Blind, bool Settled)>
+        ForeseeAsync(IReadOnlyCollection<Code> present, Code doing, CancellationToken ct)
     {
-        if (present.Count == 0) return ([], []);
+        // NOTHING WAS ASKED, so nothing failed to settle. A step with no codes
+        // must not read as an unfinished walk.
+        if (present.Count == 0) return ([], [], true);
 
         // A SHALLOWER BUDGET FOR THE PREDICTION, because the two questions
         // want opposite depths -- fork 20.
@@ -573,7 +607,12 @@ public sealed class SnakeRun : IDisposable
             _dials.Foresight,
             _kinds ? Question.Following() : null,
             ct).ConfigureAwait(false);
-        await _fabric.QuietAsync(ct).ConfigureAwait(false);
+
+        // SETTLED, NOT MERELY QUIET. A prediction read mid-flight names fewer
+        // codes than the walk actually reached, which lowers precision on a walk
+        // that was working -- and fork 18's whole result is a GAP between two
+        // predictions, so an unfinished one on either side moves it either way.
+        var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
         var wanted = _names ?? present.Count;
         var foreseen = thought.BestOf(SnakeQuantizer.Vision, wanted)
@@ -587,7 +626,7 @@ public sealed class SnakeRun : IDisposable
                 .Select(_ => _alphabet[_guessing.Next(_alphabet.Count)])
                 .ToArray();
 
-        return (foreseen, blind);
+        return (foreseen, blind, settled);
     }
 
     private void Remember(IReadOnlyCollection<Code> present)

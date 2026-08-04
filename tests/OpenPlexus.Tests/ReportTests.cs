@@ -61,6 +61,47 @@ public sealed class ReportTests
     }
 
     [Fact]
+    public void An_unfinished_walk_is_complained_about_rather_than_absorbed()
+    {
+        // THE COMPANION FOR FORK 22'S CHECK, and it is needed twice over.
+        //
+        // Snake read every thought on `QuietAsync` alone and never once asked
+        // whether the walk had finished -- the bus going quiet is not a finish
+        // signal, which is the trap this project named and then left standing in
+        // its oldest world. `Homeostat` had the same hole from the other side: it
+        // called `SettleAsync` and threw the answer away.
+        //
+        // ARMING BOTH MOVED NO NUMBER -- ten seeds of a thousand steps report
+        // zero. That is the good outcome and it is exactly why this test exists:
+        // a check that always reads zero is indistinguishable from a check that
+        // cannot fire, and the second is what the last two commits were about.
+        var wired = new HomeostatResult
+        {
+            Choosing = Attending.Chain,
+            Steps = 10,
+            Held = 5,
+            Silent = 0,
+            Attended = [1, 1, 1, 1],
+            States = 3,
+            Idling = 19,
+            Unsettled = 3,
+            Plumbing = new Plumbing
+            {
+                Nodes = 4,
+                Edges = 6,
+                Widest = 2,
+                Spread = [2, 2],
+                ChainLengths = new Dictionary<int, int> { [2] = 4 },
+                Messages = 40,
+                Unbalanced = 0,
+            },
+        };
+
+        Assert.Contains(wired.Complaints, c => c.Contains("before they had finished"));
+        Assert.Empty((wired with { Unsettled = 0 }).Complaints);
+    }
+
+    [Fact]
     public async Task A_report_says_how_far_routes_actually_went()
     {
         using var run = new SnakeRun(World(), Dials(), seed: 3);

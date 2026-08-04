@@ -99,13 +99,14 @@ public sealed class SignalTests(ITestOutputHelper output)
     /// the same claim as "it can drive this".</b>
     /// </para>
     /// <para>
-    /// <b><see cref="Learning.Surprise.Overreach"/> CANNOT BE AUDITED BY THIS PAIR
-    /// AT ALL.</b> It is a ratio over predictions MADE, and the bad policy here
-    /// makes none — so its nought is an empty denominator and not a reading.
-    /// Auditing it needs two arms that BOTH predict, one well and one by naming
-    /// everything, which is the precise failure it was built to catch and which no
-    /// arm here produces. <b>The signal built to catch a failure has never been
-    /// shown to catch it.</b>
+    /// <b><see cref="Learning.Surprise.Overreach"/> CANNOT BE AUDITED BY THIS PAIR,
+    /// AND IS ALREADY AUDITED ELSEWHERE.</b> It is a ratio over predictions MADE
+    /// and the bad policy here makes none, so its nought is an empty denominator
+    /// rather than a reading. <b>But `SurpriseTests` does the audit properly and
+    /// always did</b>: a predictor naming twenty codes to catch one reads a rate of
+    /// exactly one, identical to an honest predictor's, and `Overreach` separates
+    /// them completely. <b>That is the right level for it</b> — the claim is
+    /// arithmetic, so a constructed pair demonstrates it better than a world could.
     /// </para>
     /// </remarks>
     [Fact]
@@ -137,16 +138,16 @@ public sealed class SignalTests(ITestOutputHelper output)
             $"`Surprise.Rate` does not tell a predictor from one that cannot "
             + $"predict ({predicts.Expecting:F4} against {cannot.Expecting:F4})");
 
-        // BUT `Overreach` CANNOT BE AUDITED BY THIS PAIR AT ALL, AND THAT IS THE
-        // FINDING RATHER THAN A GAP IN THE TEST. It is a ratio over PREDICTIONS
-        // MADE, and the bad policy here makes none — so its nought is an empty
-        // denominator rather than a reading, and the two numbers being far apart
-        // says nothing whatever about whether the signal discriminates.
+        // `Overreach` IS NOT AUDITABLE BY THIS PAIR, and it does not need to be.
+        // It is a ratio over PREDICTIONS MADE and the bad policy here makes none,
+        // so its nought is an empty denominator rather than a reading -- the two
+        // numbers sitting far apart says nothing about discrimination.
         //
-        // WHAT ITS AUDIT NEEDS IS A PAIR THAT BOTH PREDICT, one well and one by
-        // naming everything — which is the exact failure `Overreach` was built to
-        // catch, and no arm in this project produces it. SO THE SIGNAL BUILT TO
-        // CATCH A FAILURE HAS NEVER BEEN SHOWN TO CATCH IT.
+        // ITS REAL AUDIT IS IN `SurpriseTests` AND ALWAYS WAS: a predictor naming
+        // twenty codes to catch one reads a rate of exactly one, identical to an
+        // honest predictor's, and `Overreach` tells them apart completely. That is
+        // the right level for an arithmetic claim, and a world arm would be weaker
+        // evidence rather than stronger.
         Assert.Equal(0.0, cannot.Overreached);
 
         Assert.True(cannot.Expecting == 0.0,

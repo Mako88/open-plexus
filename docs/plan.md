@@ -93,9 +93,10 @@ its ceiling it absorbs anything.)*
 - **`Drives.Improving` PASSES**, monotone from ceiling to coin toss to idling, and
   was dead code an hour earlier. **`Surprise.Rate` passes and is partly CIRCULAR**
   — it IS prediction quality, so it can drive a beam or a budget, not prediction.
-- **`Overreach` CANNOT BE AUDITED YET**: a ratio over predictions MADE, where the
-  bad arm makes none. It needs two arms that both predict, one by naming
-  everything — **the failure it exists to catch, which no arm produces.**
+- **`Overreach` IS AUDITED, in `SurpriseTests` and always was** — a predictor
+  naming twenty codes to catch one reads a rate of exactly one, and only the
+  negative half tells it from an honest one. **The world-level gate cannot reach
+  it**, its denominator being predictions MADE.
 
 ### 2. Predictive coding — only surprise propagates
 
@@ -144,9 +145,9 @@ its ceiling it absorbs anything.)*
 **Consequences of the design, not missing features. Ordered by cost.**
 
 - **ABSENCE — BUILT AS A SIGNAL, AND WIRED.** `Surprise` returns both halves of
-  the signed error. **A SIGNAL, not a node**: minting `not-X` would double an
-  alphabet to hold unboundedly many absent things. **`Overreach` is unaudited —
-  see step 1.**
+  the signed error, and `Overreach` tells a solved world from a predictor naming
+  everything. **A SIGNAL, not a node**: minting `not-X` would double an alphabet
+  to hold unboundedly many absent things.
 - **SUPERSESSION — THE CHANNEL IS BUILT, NOTHING READS IT.** `Tie.When` rides
   beside the count as an LWW-Register and **the two must never merge. Do not
   decay.** **Both consumers are left**: recency ranking, and eviction on "not

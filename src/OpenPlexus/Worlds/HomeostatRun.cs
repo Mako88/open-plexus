@@ -105,6 +105,14 @@ public sealed record HomeostatResult : Measurement
     public required int Idling { get; init; }
 
     /// <summary>Steps where the walk had nothing to say and the body did nothing.</summary>
+    /// <summary>How many times each need was attended to. <b>The diagnostic.</b></summary>
+    public required IReadOnlyList<int> Attended { get; init; }
+    /// <summary>How many DISTINCT states the body was ever in, as the graph sees
+    /// them. <b>A policy cannot be conditional on a state the graph cannot tell
+    /// apart.</b></summary>
+    public required int States { get; init; }
+
+
     public required int Silent { get; init; }
 
     /// <summary>The share of the run spent viable. <b>The score.</b></summary>
@@ -220,6 +228,8 @@ public sealed class HomeostatRun : IDisposable
         var rng = new Random(Seed);
 
         int held = 0, silent = 0, unbalanced = 0;
+        var attended = new int[_settings.Needs];
+        var states = new HashSet<string>(StringComparer.Ordinal);
         var chains = new Chains();
 
         // THE UNIT IS THE WORLD'S OWN, NOT A CONSTANT. One step's fall of the
@@ -246,6 +256,7 @@ public sealed class HomeostatRun : IDisposable
             // transition that just happened -- which is the one the occasion
             // being held was responsible for.
             drives.Feel(world.At);
+            states.Add(string.Join(",", felt.Select(code => $"{code.Modality}:{code.Value}")));
 
             var chosen = choosing switch
             {
@@ -273,6 +284,9 @@ public sealed class HomeostatRun : IDisposable
                 silent++;
                 chosen = rng.Next(world.Needs);
             }
+
+            if (chosen is { } picked && picked >= 0 && picked < attended.Length)
+                attended[picked]++;
 
             ImmutableArray<Code> occasion = chosen is { } which
                 ? [.. felt, Homeostat.Attending(which)]
@@ -341,6 +355,8 @@ public sealed class HomeostatRun : IDisposable
             Steps = steps,
             Held = held,
             Silent = silent,
+            Attended = attended,
+            States = states.Count,
             Idling = world.Idling,
             Plumbing = _fabric.Facts(chains, unbalanced),
         };

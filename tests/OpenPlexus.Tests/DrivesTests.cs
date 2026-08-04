@@ -99,7 +99,10 @@ public sealed class DrivesTests(ITestOutputHelper output)
                 var result = await run.RunAsync(Steps, arm);
 
                 scored[arm].Add(result.Viable);
-                output.WriteLine($"seed={seed} {arm,-7} viable={result.Viable:F4} {result}");
+                output.WriteLine(
+                    $"seed={seed} {arm,-7} viable={result.Viable:F4} "
+                    + $"silent={result.Silent}/{result.Steps} "
+                    + $"states={result.States} attended=[{string.Join(",", result.Attended)}]");
             }
 
         foreach (var (arm, runs) in scored)

@@ -34,7 +34,7 @@
 
 ## TO BUILD
 
-### The two that matter most
+### Look necessary for the goal, and absent
 
 - **Variable binding** — the row names a relation and cannot hold a fact ABOUT one,
   so nothing transfers to new arguments. `BindingGapTests` is the scoreboard.
@@ -42,6 +42,12 @@
   channel (larger, buys transfer).
 - **A front end for real perception** — a hash spending its bits where the data is
   without being fitted. Grains are the half needing no fitting; this is the other.
+- **A goal that is not the current state.** `Drives` wants to stay in bounds and
+  the rollout predicts; nothing can hold a state that is NOT current and steer
+  toward it. Planning needs a target, and sub-goals are what serve many tasks.
+- **Temporal abstraction.** `Chunk` names a set of codes seen together; nothing
+  names a SEQUENCE OF ACTS. Without it every plan is a flat list of steps and each
+  one costs a whole walk.
 
 ### Worlds that are missing
 

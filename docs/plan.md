@@ -45,7 +45,7 @@
 - **Eviction and cold storage are the escape hatches, BOTH UNBUILT.** If forgetting
   is necessary rather than optional, this is the expensive thing to walk back.
 
-### FOUR THINGS THE FRONT END IS HANDED, AND NOBODY WAS COUNTING THEM
+### FOUR THINGS THE FRONT END IS HANDED
 
 - `Occasion.Groups` — which codes belong to which object. `Occasion.Sequence` —
   what came first. `Occasion.Fleeting` — this code will never recur.
@@ -160,10 +160,10 @@ its ceiling it absorbs anything.)*
   (Izhikevich 2007).
 - **BUILT ON `Tending`**, reaching back cross-pour-wait, weighted by recency;
   `Smeared` is the control. **Counts only rise.**
-- **IT WRITES MORE AND CHANGES NOTHING**, and the arm it was measured against was
+- **IT WRITES MORE AND CHANGES NOTHING**, the arm it was measured against being
   silent for a reason nobody checked.
-- **EXPERIENCE MAKES COVERAGE WORSE**: quadruple the run and states more than
-  triple while credit cells grow less than half again.
+- **EXPERIENCE MAKES COVERAGE WORSE**: quadrupling a run more than triples the
+  states while the credit cells grow less than half again.
 
 ### 8. Similarity — **and step 9 promoted it from an option to the only route**
 
@@ -179,13 +179,13 @@ its ceiling it absorbs anything.)*
   machine forever, so a fitted codebook is out — **and a uniform hash is agreed and
   unwalkable**, because the data is concentrated where uniform codes are not.
 - **GRAINS ARE THE HALF NEEDING NO FITTING, AND THEY ARE BUILT.** Say each reading
-  COARSELY as well as finely: states differing finely share the coarse code and
-  meet there. **The hierarchy IS the likeness** — nothing learnt, and two machines
-  drop the same bits. **The `Groups` trick a fourth time.**
+  COARSELY as well as finely: states differing finely share the coarse code and meet
+  there. **The hierarchy IS the likeness** — nothing learnt, two machines dropping
+  the same bits, **the `Groups` trick a fourth time.**
 - **PAIRED WITH `Toll.Traffic` THEY SOLVE THE REACHABILITY OUTRIGHT**: silence
-  falls from nearly every step to one in forty, **at a third of the messages** —
-  and the evidence toll cannot land there at all, a coarse code weighing nearly one
-  against its own fine code so the hop is free and depth explodes.
+  falls from nearly every step to one in forty, at a third of the messages — where
+  the evidence toll cannot land at all, a coarse code weighing nearly one against
+  its own fine code so the hop is free and depth explodes.
 - **AND THE SCORE COLLAPSES, BECAUSE THE SILENCE WAS THE EXPLORATION** — one action
   on 393 of 400 steps, and no ranking changes it because only one is reachable.
 - **REPLAY.** Re-run experience when nothing is arriving. **`WhenIdle()` triggers
@@ -235,11 +235,10 @@ its ceiling it absorbs anything.)*
 
 
 - **EVERY MECHANISM BUILT WORKS AND EVERY ONE FAILS THE SAME WAY.** Paths,
-  backoff, curiosity, the trace, grains, the toll: each does what it was built to
-  do, and **every configuration that lets the walk SPEAK scores worse than
-  random.**
+  backoff, curiosity, the trace, grains, the toll, count-based exploration: each
+  does what it was built to do, and **every one scores worse than random.**
 - **THE SILENCE WAS NEVER THE PROBLEM — IT WAS THE EXPLORATION.** Solvable three
-  ways, each removing the coin toss that was carrying the arm.
+  ways, each removing the coin toss carrying the arm.
 - **EVERYTHING TRIED CHANGED THE READ SIDE.** Questions, paths, tolls and grains
   change how credit is REACHED; the trace how WIDELY it is written. **Nothing
   changed WHAT is written, or gave the body a reason to try what it has not.**
@@ -248,16 +247,21 @@ its ceiling it absorbs anything.)*
   recommend an untried act. Measured: `Worthwhile`, `Agreed` and `Curious` produce
   a BYTE-IDENTICAL run, only one action being reachable under any of them.
 - **SO IT MUST BE EXTRA-GRAPH, AND THERE IS A C1-LEGAL PLACE.** A machine knows
-  what IT has done — its own history is its own data — so an actuator can prefer
-  what it has tried least. **Count-based exploration owned by the machine, not the
-  graph.** The coin toss is its degenerate form and should be deliberate.
-- **`Kind.Helped` IS STILL A FREQUENCY**: `helped / seen` is a hit rate where ΔP is
+  what IT has done — its own history is its own data — so `Venturing` weighs the
+  walk's opinion against `√(ln t / n)` on the actuator's own tally. **Count-based
+  exploration owned by the machine, not the graph.**
+- **IT WORKS AND IS NOT ENOUGH: the body round-robins**, every act tried equally,
+  scoring BELOW the coin toss. **Uniform exploration is as poor a policy as
+  lock-in** — the bonus falls as designed and the value it hands over to never
+  grows. **Exploration generates the data; a contingency makes it mean something;
+  neither is sufficient alone**, which is why every single-mechanism arm failed.
+- **`Kind.Helped` IS STILL A FREQUENCY**: a hit rate where ΔP is
   `P(better | act) − P(better | not act)`, needing a base rate nothing records.
 
-- **NONE OF IT IS A SUFFICIENCY ARGUMENT** — all of it could land and still not be
-  enough. The narrower claim: without structure, an internal error signal, a
-  growing alphabet, a reason to act, a reason to seek, a way to plan, supersession,
-  absence, concurrent output and a bounded row, scaling does not get there.
+- **NONE OF IT IS A SUFFICIENCY ARGUMENT.** The narrower claim: without structure,
+  an internal error signal, a growing alphabet, a reason to act, a reason to seek,
+  a way to plan, supersession, absence, concurrent output and a bounded row,
+  scaling does not get there.
 
 ---
 
@@ -384,8 +388,8 @@ process** — kept, because a real network loses reports.
   **Every run reports `Complaints`; read them.**
 - **A CHECK CAN BE WIRED AND UNABLE TO FIRE, which reads as passing.** Two worlds
   counted `unbalanced` off a variable nothing incremented; step 10's selective arm
-  reproduced its control down to the edge count. **Arming a check that has always
-  read zero is the only way to tell the two apart.**
+  reproduced its control down to the edge count. **Arm a check that has always read
+  zero.**
 - **A FALLBACK IS A CONTROL ARM NOBODY MEANT TO RUN.** Anything raising an arm's
   silence drifts it toward the random bar for free, and that reads as the change
   working. **Report silence beside the score.** It cannot carry an arm PAST the
@@ -406,8 +410,7 @@ process** — kept, because a real network loses reports.
 - **A MEAN OVER A POPULATION THE PROBLEM CREATED CANNOT SEE IT.** Fan-out stayed
   flat where rows grew without bound, because the growth mints tiny nodes that
   hold the average down. **Read `Widest`.**
-- **Copies drift where nothing fails**, and a difference between two moves a
-  headline without failing a test. `DuplicationTests` is the budget now.
+- **Copies drift where nothing fails.** `DuplicationTests` is the budget.
 - **THE TEST SUITE IS SERIAL ON PURPOSE.** Parallel, the walk's agreement with
   itself measured perfect where alone it did not — load removes the ordering that
   produces the disagreement, so parallelism HID a defect. `Parallelism.cs`.

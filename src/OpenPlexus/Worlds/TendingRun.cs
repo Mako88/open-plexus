@@ -128,8 +128,50 @@ public enum Gardening
     /// satisfied and the credit question takes over. <b>No dial, no decay, and
     /// nothing anybody has to tune.</b>
     /// </para>
+    /// <para>
+    /// <b>MEASURED, AND IT CANNOT REACH THE FAULT.</b> It produces a byte-identical
+    /// run to <see cref="Credited"/> and <see cref="Concurring"/>, because
+    /// <see cref="Graph.Kind.Informed"/> is written only for acts TAKEN — so it
+    /// ranks what has been tried and cannot send a body to what has not.
+    /// <see cref="Venturing"/> is where that goes instead.
+    /// </para>
     /// </remarks>
     Seeking,
+
+    /// <summary>
+    /// The graph proposes and THE MACHINE'S OWN HISTORY disposes — <b>exploration
+    /// where it can actually live, which is not in the walk.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NO WALK CAN RECOMMEND AN ACT THE BODY HAS NEVER TAKEN.</b> Every cell is
+    /// keyed on <i>(state, act)</i> and written only for acts taken, so three
+    /// different questions over three different statistics produce one identical
+    /// run. That is structural, not a tuning failure, and no fourth statistic
+    /// fixes it.
+    /// </para>
+    /// <para>
+    /// <b>BUT A MACHINE KNOWS WHAT IT HAS DONE, and its own history is its own
+    /// data.</b> So the tally lives on the actuator, C1-legal by exactly the
+    /// argument that makes <see cref="Thinking.Message.Seen"/> legal — a node
+    /// sending its own count about itself is not reading anybody else's.
+    /// </para>
+    /// <para>
+    /// <b>OPTIMISM UNDER UNCERTAINTY, and the bonus form is the standard one:</b>
+    /// <c>√(ln t / n)</c> falls as an act is tried and rises as the run goes on, so
+    /// an act neglected long enough is eventually revisited and one tried often
+    /// stops being urged. <b>The coin toss is the degenerate version of this</b> —
+    /// a bonus that never falls.
+    /// </para>
+    /// <para>
+    /// <b>THE ONE REAL JUDGEMENT IS SCALE, AND IT IS SAID OUT LOUD.</b> Path
+    /// strengths and a count bonus are not in the same units, so either could
+    /// swamp the other by accident of magnitude. Both are normalised to their own
+    /// maximum before being added, which chooses no constant and makes the trade
+    /// one-for-one — <b>and that IS a choice, just a visible one.</b>
+    /// </para>
+    /// </remarks>
+    Venturing,
 }
 
 /// <summary>What the garden measured. <b>Counts, not claims.</b></summary>
@@ -344,6 +386,7 @@ public sealed class TendingRun : IDisposable
                         // forty and could not touch the lock-in.
                         Gardening.Seeking => Question.Curious(),
 
+                        Gardening.Venturing => Question.Worthwhile(),
                         _ when Credits(choosing) => Question.Worthwhile(),
                         _ => null,
                     },
@@ -365,11 +408,26 @@ public sealed class TendingRun : IDisposable
             if (!walked.Balanced) unbalanced++;
             if (!walked.Settled) unsettled++;
 
+            // THE MACHINE OVERRULES THE WALK FROM ITS OWN HISTORY -- see
+            // Gardening.Venturing. Asked separately because it needs the graph's
+            // opinion of EVERY act rather than only its favourite.
+            int? ventured = null;
+
+            if (choosing == Gardening.Venturing)
+            {
+                var weighed = await WeighedAsync(felt, chains, Question.Worthwhile(), ct)
+                    .ConfigureAwait(false);
+
+                ventured = Venture(weighed.Scores, doing, step);
+                walked = (ventured, weighed.Settled, weighed.Balanced);
+            }
+
             var chose = choosing switch
             {
                 Gardening.Idle => (int?)null,
                 Gardening.Blind => rng.Next(Tending.Actions),
                 Gardening.Best => world.Best(),
+                Gardening.Venturing => ventured,
                 _ => walked.Chosen,
             };
 
@@ -463,7 +521,67 @@ public sealed class TendingRun : IDisposable
     /// <summary>Whether this arm writes the credit cell at all.</summary>
     private static bool Credits(Gardening how) =>
         how is Gardening.Credited or Gardening.Traced or Gardening.Smeared
-            or Gardening.Concurring or Gardening.Seeking;
+            or Gardening.Concurring or Gardening.Seeking or Gardening.Venturing;
+
+    /// <summary>
+    /// What the graph made of each action, ranked, rather than just its favourite.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE TOP ONE IS NOT ENOUGH FOR A MACHINE THAT MEANS TO OVERRULE IT.</b>
+    /// Weighing the walk against a count needs the walk's opinion of EVERY act,
+    /// including the ones it thinks little of, and an act it never reached scores
+    /// nought rather than being absent.
+    /// </remarks>
+    private async Task<(IReadOnlyDictionary<int, double> Scores, bool Settled, bool Balanced)>
+        WeighedAsync(
+            ImmutableArray<Code> felt, Chains chains, Question? asking, CancellationToken ct)
+    {
+        var thought = await _body
+            .ThinkAsync(felt, _dials.Stamina, asking, ct).ConfigureAwait(false);
+
+        var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
+        chains.Fold(thought.Best(int.MaxValue));
+
+        var scores = thought.BestOf(Tending.Did, int.MaxValue)
+            .GroupBy(arrival => Tending.Done(arrival.Endpoint))
+            .ToDictionary(one => one.Key, one => one.Max(arrival => arrival.Score));
+
+        var balanced = thought.Balanced();
+        _body.Forget(thought.Id);
+
+        return (scores, settled, balanced);
+    }
+
+    /// <summary>
+    /// The graph's opinion and the machine's own history, added on one scale.
+    /// </summary>
+    /// <remarks>
+    /// <b>BOTH TERMS NORMALISED TO THEIR OWN MAXIMUM</b>, so neither swamps the
+    /// other by accident of units and no constant is chosen. See
+    /// <see cref="Gardening.Venturing"/>.
+    /// </remarks>
+    private static int Venture(IReadOnlyDictionary<int, double> scores, int[] tried, int step)
+    {
+        var bonus = new double[tried.Length];
+
+        for (var act = 0; act < tried.Length; act++)
+            bonus[act] = Math.Sqrt(Math.Log(step + 2.0) / (tried[act] + 1.0));
+
+        var believed = scores.Count == 0 ? 1.0 : Math.Max(scores.Values.Max(), double.Epsilon);
+        var curious = bonus.Max();
+
+        var best = 0;
+        var most = double.MinValue;
+
+        for (var act = 0; act < tried.Length; act++)
+        {
+            var worth = (scores.GetValueOrDefault(act) / believed) + (bonus[act] / curious);
+
+            if (worth > most) { most = worth; best = act; }
+        }
+
+        return best;
+    }
 
     /// <summary>What the graph expects to be true next, narrowed to what is felt.</summary>
     /// <remarks>

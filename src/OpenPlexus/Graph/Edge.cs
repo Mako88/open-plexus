@@ -81,6 +81,41 @@ public readonly record struct Kind : IComparable<Kind>
     /// every partner it has not met.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// The modality a relation's own code lives on. <b>Reserved, and no front end
+    /// may use it</b> — a relation is not something a sense produces.
+    /// </summary>
+    public const byte Relations = 255;
+
+    /// <summary>
+    /// This relation AS A CODE, so it can be a partner in a row rather than only a
+    /// key into one.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NOTHING IN THIS DESIGN HAS EVER COUNTED A RELATION.</b> A row entry is
+    /// <c>(partner, relation) → count</c> and the count is about the PAIR, so there
+    /// is nowhere to put <i>north-of is the inverse of south-of</i> — a fact about
+    /// the relation whatever its arguments. Two relations co-occur on every
+    /// observation and have no cell between them.
+    /// </para>
+    /// <para>
+    /// <b>AS A CODE IT NEEDS NO NEW MECHANISM.</b> The identity is already derived
+    /// and already agreed by every machine without asking one, so a relation can
+    /// join an occasion like anything else and a fact about relations becomes an
+    /// ordinary count. <b>What this does NOT buy is applying that fact to particular
+    /// arguments</b>, which is the binding half.
+    /// </para>
+    /// <para>
+    /// <b>AND IT MAKES A SUPERHUB, WHICH IS THE THING TO CHECK BEFORE BUILDING ON
+    /// IT.</b> A relation co-occurs with every code it ever related, so its row grows
+    /// without bound — and a row of weight-one edges is FREE to fan out of under
+    /// <see cref="Toll.Evidence"/>, which is how grains made depth explode.
+    /// <see cref="WalkSettings.Row"/> is the bound that exists for it.
+    /// </para>
+    /// </remarks>
+    public Code Code => new(Relations, _name);
+
     /// <param name="relation">The relation's name, taken exactly as given.</param>
     public static Kind Of(string relation)
     {

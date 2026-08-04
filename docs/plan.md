@@ -37,9 +37,9 @@
 ### Look necessary for the goal, and absent
 
 - **Variable binding** — the row names a relation and cannot hold a fact ABOUT one,
-  so nothing transfers to new arguments. `BindingGapTests` is the scoreboard.
-  Two routes: relations as CODES (small, buys facts about relations) or a role
-  channel (larger, buys transfer).
+  so nothing transfers. `BindingGapTests` is the scoreboard.
+- **Relations as codes PASSED ITS HUB GATE** — `Kind.Code`, bounded row. What is
+  left is the ROLE CHANNEL, which is what buys transfer to new arguments.
 - **A front end for real perception** — a hash spending its bits where the data is
   without being fitted. Grains are the half needing no fitting; this is the other.
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and

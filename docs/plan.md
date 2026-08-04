@@ -26,15 +26,14 @@
 - **Ten worlds sharing no world logic, over one `Fabric`** — including binding,
   built to be unanswerable and since lifted, and **two nobody here designed**,
   `Babi` and `Clevr`, which cannot flatter this architecture. `ScoreboardTests`
-  runs them in one table; `corpora/fetch.sh` fetches rather than vendoring.
+  runs them in one table.
 - **THE ARM THAT BEAT RANDOM IS NO LONGER ONE WORLD OLD, AND IT DID NOT
   TRANSFER.** `Tending` is a second body — plants dry, water reaches only what is
   underfoot and lands a step late — and `Kind.Helped` there **LOSES to acting at
   random** once the walk can afford to speak at all. Step 4's anti-correlation,
   in world two.
 - **An occasion is a SET**, so *red ball beside blue box* and *blue ball beside red
-  box* were one input — a ceiling that was **representational, not scale**.
-  `Occasion.Groups` lifts it.
+  box* were one input — **representational, not scale**. `Occasion.Groups` lifts it.
 - **The graphs are tiny.** Nothing has run at a size where its claims could break;
   hold them loosely.
 
@@ -63,19 +62,17 @@
 
 - **IT HAS BITTEN FOUR TIMES.** A weight both RANKS a partner and PRICES the hop.
   `Pricing.Sender` moves the ranking to move the price; `Doubt` destroys the senses
-  world applied to both and repairs a real defect applied to the score alone;
-  negative evidence muted the walk until it too was kept off the price.
+  world applied to both and repairs a defect applied to the score alone; negative
+  evidence muted the walk until it too was kept off the price.
 - **`Doubt` SPLIT THE ARITHMETIC AND LEFT THE STATISTIC** — both still read one
   number. **`Toll` splits the statistic**: `Traffic` charges `1 + log₂(entries)`,
   what the hop costs in messages.
 - **AND IT FOUND THAT THE CONTROL DEGENERATES.** Where every weight is exactly
   one, `1 / weight` IS the refuted constant cost and growth on a clique is
   factorial. **The `StepCost` row's revival condition, met.**
-- **A dial wanting different values in different worlds is the same fault.** Split
-  it or fuse the arms rather than sweep; `DialTests` records which channel each
-  dial may move.
-- **A conflict between two dials may be a BUDGET ARTIFACT** — `Clevr` was one; the
-  trap is in TRAPS.
+- **A dial wanting different values in different worlds is the same fault**;
+  `DialTests` records which channel each dial may move.
+- **A conflict between two dials may be a BUDGET ARTIFACT** — `Clevr` was one.
 
 ---
 
@@ -95,11 +92,11 @@ its ceiling it absorbs anything.)*
 ### 2. Predictive coding — only surprise propagates
 
 - Rao & Ballard, Friston. An expected onset is silent. **Built.**
-- **THE OBSERVATION IS SUPPRESSED, NOT THE PREDICTION.** **Prediction conditional
-  on surprise is the deeper version.**
-- **THE WRITE PATH IS NOT GATED AT ALL**, and *the expectation would decay*
-  **does not hold where nothing decays**. Rescorla and Wagner: learning tracks
-  ERROR, not frequency; `Occasion.Weight` is the channel. **The payoff is cost.**
+- **THE OBSERVATION IS SUPPRESSED, NOT THE PREDICTION**; conditioning the
+  prediction itself is the deeper version.
+- **THE WRITE PATH IS NOT GATED AT ALL**, and *the expectation would decay* **does
+  not hold where nothing decays**. `Occasion.Weight` is the channel; the payoff is
+  cost.
 
 ### 3. Chunking — MDL. **`Chunk` is built, and it is a trade**
 
@@ -157,23 +154,21 @@ its ceiling it absorbs anything.)*
 - **A row entry is `(Code, Kind)` to `(count, when)`**, and supersession rode in
   beside it for the single price. `Kind` holds every argument in full.
 - **The front end SAYS the order inside the occasion** — the `Groups` trick again,
-  because a phase cannot survive C2. `Occasion.Sequence` is additive; splitting the
-  window's carried edge moves measured counts, so that half is an arm.
-- **`Question.Through` restricts a walk to one relation**: it answered fork 18 and
-  walks step 4's credit cell. **One kind was the limit — see step 9.**
+  because a phase cannot survive C2. `Occasion.Sequence` is additive.
+- **`Question.Through` restricts a walk to one relation**, and one kind was the
+  limit — see step 9.
 
 ### 7. Credit over time — eligibility traces, and `Window` is already one
 
 - **Nothing learns that an act led somewhere good three steps later.**
   **Three-factor Hebbian learning needs no reward function and no
   backpropagation** (Izhikevich 2007).
-- **BUILT ON `Tending`.** The trace reaches back an instrumental sequence — cross,
-  pour, wait — weighted by recency; `Smeared` is the control. **Counts only rise.**
+- **BUILT ON `Tending`**, reaching back an instrumental sequence — cross, pour,
+  wait — weighted by recency; `Smeared` is the control. **Counts only rise.**
 - **IT WRITES MORE AND CHANGES NOTHING**, and the arm it was measured against was
   silent for a reason nobody checked — see the trap below.
-- **AND EXPERIENCE MAKES COVERAGE WORSE, which is measured directly and survives
-  the correction below.** Quadruple the run: states more than triple while credit
-  cells grow less than half again. **Coverage FALLS.**
+- **AND EXPERIENCE MAKES COVERAGE WORSE**, measured directly: quadruple the run
+  and states more than triple while credit cells grow less than half again.
 
 ### 8. Similarity — **and step 9 promoted it from an option to the only route**
 
@@ -192,12 +187,14 @@ its ceiling it absorbs anything.)*
   COARSELY as well as finely: states differing finely share the coarse code and
   meet there. **The hierarchy IS the likeness** — nothing learnt, and two machines
   drop the same bits. **The `Groups` trick a fourth time.**
-- **THE COARSE CODES ARE SHARED — that much is measured. What they buy is NOT
-  YET KNOWN**, and the reason was a misdiagnosis of mine: at the stamina those runs
-  used, the walk could not AFFORD to reach an action at all. **Grains at a budget
-  the walk can pay is untested** — and grains make hubs, which `Pricing.Receiver`
-  refuses, so `Toll.Traffic` is the arm to pair them with. **It times out at depth;
-  that pairing is the open experiment.**
+- **PAIRED WITH `Toll.Traffic` THEY SOLVE THE REACHABILITY OUTRIGHT**: silence on
+  `Tending` falls from nearly every step to one in forty, **at a third of the
+  messages** — and the evidence toll cannot even land there, because a coarse code
+  co-occurs with its own fine code every time, so that edge weighs nearly one, the
+  hop costs nearly nothing and depth explodes. **The split this session opened with,
+  arriving at the problem it was built for.**
+- **AND THE SCORE IS FAR BELOW A COIN TOSS.** The graph can finally speak in a body
+  and what it says is wrong.
 - **REPLAY.** Re-run experience when nothing is arriving. **`WhenIdle()` triggers
   it**, and a body that cannot bootstrap is what it is for.
 - **INHIBITION — EXPRESSIBLE, AND IT DOES NOT PAY YET.** "Punishment is
@@ -206,32 +203,27 @@ its ceiling it absorbs anything.)*
   and **must discount the SCORE and never the price**. **Still no better than the
   one-sided count** where most acts are wrong most of the time.
 
-### 9. RELATIONAL PATHS — built, and the idea it was built for is refuted
+### 9. RELATIONAL PATHS — built, and the idea behind them refuted
 
-- **`Question.Path` walks a relation per hop**, Path Ranking's move (Lao & Cohen).
-  The mechanism is right.
+- **`Question.Path` walks a relation per hop** — Path Ranking (Lao & Cohen).
 - **A FIXED PATH TRADES COVERAGE AGAINST PRECISION WITH NO MIDDLE.** Through
   `With` it reaches almost everything and the credit dissolves; through `After` the
   composition is empty. **Backoff settles it**: narrow first, widening only on
   silence, overrides nothing and scores the same.
-- **SO THE SILENCE IS THE PRICE OF THE CONTRAST**: anything wide enough to be
-  non-silent converges on what was DONE most.
-- **WHICH MAKES STEP 8'S FRONT END THE ONLY ROUTE LEFT.** Every graph-internal
-  likeness is made of co-occurrence and carries the policy with it; **a likeness
-  the graph did not compute cannot be.** Step 7 measured why it is not optional:
-  **coverage FALLS as a run lengthens.**
+- **SO NO GRAPH-INTERNAL LIKENESS CAN HELP** — every one is made of co-occurrence
+  and carries the policy with it. **A likeness the graph did not compute cannot
+  be**, which is step 8.
 - **`Question.Downstream` (Dayan) is unaskable**: it wants the REVERSE temporal
   edge a carried code does not write — see `Kind.Before`.
 
-### 10. A REASON TO SEEK — the drive this design has never had
+### 10. A REASON TO SEEK
 
-- **`Drives` makes the system want to STAY ALIVE. Nothing makes it want to FIND
-  OUT**, though `Surprise.Rate` is a quantity it reads about itself.
+- **`Drives` wants to STAY ALIVE; nothing wants to FIND OUT**, though
+  `Surprise.Rate` is a quantity the machine reads about itself.
 - **`Kind.Informed` is the shape**: a second write when an act produced something
-  unpredicted — `Kind.Helped` with `Surprise` as the third factor, so no more a
-  smuggled reward than Ashby's bounds are.
-- **NOVELTY DECAYS WITH NOTHING DECAYING**: `informed / seen` falls on its own as
-  an act becomes predictable. **The anti-hub weighting already does it.**
+  unpredicted — `Kind.Helped` with `Surprise` as the third factor.
+- **NOVELTY DECAYS WITH NOTHING DECAYING**: `informed / seen` falls as an act
+  becomes predictable. **The anti-hub weighting already does it.**
 - **ERROR IS NOT PROGRESS — the noisy television.** Seeking error alone rewards
   whatever is least learnable; Schmidhuber's claim is about compression PROGRESS.
 - **IT REPLACES THE BOOTSTRAP.** The credit cell is empty until something has
@@ -239,24 +231,36 @@ its ceiling it absorbs anything.)*
   control arm nobody meant to run.**
 - **BUILT, AND NOT MEASURABLE ON `Homeostat`: THE PREDICTION WALK RETURNS NOTHING
   THERE.** Every moment reads as maximally surprising, so the dense arm writes
-  always and the selective one never. **Neither is evidence about curiosity.**
-- **AND `Tending` IS WHERE TO RE-RUN IT**, at a budget the walk can pay.
+  always and the selective one never. **`Tending` is where to re-run it.**
 
-### 11. NOTHING HERE PLANS. Every action is a reflex
+### 11. NOTHING HERE PLANS
 
 - **`Consequence` asks *what would the world look like if I did X*, ONE step, and
-  stops.** No sequence held as a unit, no means-ends. **A world model that rolls
-  forward once is an expensive reflex.**
-- **The rollout needs nothing built.** `Foresight` already predicts the next frame
-  from view-and-action; feed that prediction back as a synthetic occasion and ask
-  again. Craik's small-scale model, Tolman's cognitive map, MuZero's search half.
+  stops.** **A world model that rolls forward once is an expensive reflex.**
+- **The rollout needs nothing built**: feed `Foresight`'s prediction back as a
+  synthetic occasion and ask again. Craik, Tolman, MuZero's search half.
 - **The risk is compounding error**, which every learned simulator is worst at, so
   depth wants its own control.
 
-### THE PATTERN UNDER ALL OF IT
+### WHAT A WHOLE SESSION OF THIS SAYS — 2026-08-04
 
-- **None of this is a sufficiency argument** — all of it could land and still not
-  be enough. The narrower claim: without structure, an internal error signal, a
+- **EVERY MECHANISM BUILT WORKS AND EVERY ONE FAILS THE SAME WAY.** Paths,
+  backoff, curiosity, the trace, grains, the toll: each does what it was built to
+  do, and **every configuration that lets the walk SPEAK in a body scores worse
+  than random.**
+- **SO THE SILENCE WAS NEVER THE PROBLEM.** It is solvable three ways — budget,
+  toll, grain — and solving it only reveals the answer underneath.
+- **AND EVERYTHING TRIED SO FAR CHANGED THE READ SIDE.** Questions, paths, tolls
+  and grains change how credit is REACHED; the trace changes how WIDELY it is
+  written. **Nothing has changed WHAT is written.**
+- **`Kind.Helped` IS STILL A FREQUENCY.** *This act preceded an improvement*
+  correlates with *this is what I usually do*, because the acts taken most are the
+  acts most likely to precede anything. **`helped / seen` is a hit rate; ΔP is
+  `P(better | act) − P(better | not act)`** and needs the base rate, which nothing
+  records. **That is the untried half.**
+
+- **NONE OF IT IS A SUFFICIENCY ARGUMENT** — all of it could land and still not be
+  enough. The narrower claim: without structure, an internal error signal, a
   growing alphabet, a reason to act, a reason to seek, a way to plan, supersession,
   absence, concurrent output and a bounded row, scaling does not get there.
 

@@ -418,6 +418,66 @@ public sealed class TendingTests(ITestOutputHelper output)
         Assert.Empty(deep.Complaints);
     }
 
+    /// <summary>
+    /// Grains make hubs, and the anti-hub weighting refuses hubs — <b>step 3's
+    /// open question turning up in a second place.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A COARSE CODE IS SHARED BY MANY STATES BY CONSTRUCTION. That is the
+    /// point of it, and it is also what makes it a hub.</b> Under
+    /// <see cref="Pricing.Receiver"/> a hop is priced <c>together / seen</c> from
+    /// the far end, so arriving somewhere popular is dear — <b>the generalisation
+    /// is refused for being general.</b>
+    /// </para>
+    /// <para>
+    /// <b>AND UNDER <see cref="Toll.Evidence"/> IT IS WORSE THAN DEAR, IT IS
+    /// UNBOUNDED.</b> A coarse code co-occurs with its own fine code every single
+    /// time, so that edge weighs nearly one and <c>1 / weight</c> charges nearly
+    /// nothing — a deep budget then buys a dozen hops through a fan-out of forty
+    /// and the run does not land at all. <b>Measured: it times out.</b>
+    /// </para>
+    /// <para>
+    /// <b><see cref="Toll.Traffic"/> IS THE ARM BUILT FOR EXACTLY THIS.</b> Charge
+    /// the hop <c>1 + log₂(entries)</c> — what arriving there will cost in
+    /// messages — and a hub becomes dear to ENTER while staying as BELIEVED as the
+    /// evidence says. That is the split the whole session opened with, arriving at
+    /// the problem it was built for.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task What_a_hub_costs_to_enter_against_what_it_is_believed()
+    {
+        var graded = new TendingSettings { Plants = 3, Bands = 4, Grains = 3 };
+
+        output.WriteLine($"{"walk",-16} {"credit",7} {"silent",8} {"widest",6} {"msgs",9}");
+
+        foreach (var (name, dials) in
+            (( string, WalkSettings )[])
+            [("evidence s4", Fixture.Dials(4.0)),
+             ("traffic s8", Fixture.Dials(8.0) with { Toll = Toll.Traffic }),
+             ("traffic s12", Fixture.Dials(12.0) with { Toll = Toll.Traffic }),
+             ("traffic s16", Fixture.Dials(16.0) with { Toll = Toll.Traffic })])
+        {
+            using var run = new TendingRun(graded, dials, seed: 1);
+            var credit = await run.RunAsync(Steps, Gardening.Credited);
+
+            output.WriteLine(
+                $"{name,-16} {credit.Viable,7:F3} {$"{credit.Silent}/{Steps}",8} "
+                + $"{credit.Widest,6} {credit.Messages,9}");
+        }
+
+        // ASSERTED: THE TRAFFIC TOLL LANDS WHERE THE EVIDENCE TOLL CANNOT.
+        // A grained world at depth is the shape that makes inverse cost unbounded —
+        // every coarse edge weighs nearly one, so nearly every hop is free — and a
+        // toll priced in row width cannot have that failure by construction.
+        using var priced = new TendingRun(graded, Fixture.Dials(12.0) with { Toll = Toll.Traffic }, seed: 1);
+        var landed = await priced.RunAsync(Steps, Gardening.Credited);
+
+        Assert.True(landed.Messages > 0);
+        Assert.Empty(landed.Complaints);
+    }
+
     /// <summary>One arm of a sweep, so two tables cannot drift apart.</summary>
     private static (string, Func<int, Task<double>>) Arm(
         string name, Gardening how, TendingSettings? world = null) =>

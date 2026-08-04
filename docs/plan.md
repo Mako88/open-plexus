@@ -34,8 +34,8 @@
 - **An occasion is a SET**, so *red ball beside blue box* and *blue ball beside
   red box* were one input. That ceiling was **representational, not scale**;
   `Occasion.Groups` lifts it.
-- **The graphs are tiny.** Nothing has run at a size where its claims could break.
-  Hold them loosely; the size dial has already found one thing that was wrong.
+- **The graphs are tiny.** Nothing has run at a size where its claims could break;
+  hold them loosely.
 
 ### ONE WEIGHT DOING TWO JOBS IS THIS DESIGN'S RECURRING FAULT
 
@@ -126,8 +126,7 @@ to an old one — run that one.**
   naming everything, which is the one failure step 2 can cause rather than
   measure. **A SIGNAL, not a node** — minting `not-X` would double an alphabet to
   represent unboundedly many absent things. **WIRED**: `Rhythm` complains when the
-  predictor foresees nearly everything while nearly nothing it named happens —
-  the liar the positive half cannot see.
+  predictor foresees nearly everything while nearly nothing it named happens.
 - **SUPERSESSION — THE CHANNEL IS BUILT, NOTHING READS IT.** Counts only
   increment, which is the G-Counter property and exactly what forbids
   most-recent-wins. **Do not decay**, which breaks convergence. `Tie.Count` stays

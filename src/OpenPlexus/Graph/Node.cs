@@ -531,6 +531,14 @@ public sealed class Node
             if (message.Contrasted)
                 believed *= Math.Max(0.0, message.Contrast);
 
+            // AND RECENCY DISCOUNTS THE SCORE, ON THE SAME SIDE OF THE LINE AS
+            // EVERY OTHER THING THAT ARGUES ABOUT AN EDGE RATHER THAN PRICING IT.
+            // A stale entry is believed less and is never made harder to REACH:
+            // nothing here decays, so a superseded count still stands at whatever
+            // it reached, and this is the only way a walk can prefer what is still
+            // true. See Question.Recent.
+            if (message.Recent) believed *= message.Fresh;
+
             // EVERY HOP COSTS AT LEAST 1, AND UNDER BOTH TOLLS. Under `Evidence`
             // because a weight cannot exceed 1.0; under `Traffic` because a row
             // with a single entry still costs the one that is added to the log.
@@ -605,6 +613,25 @@ public sealed class Node
             against[edge.Partner] = against.GetValueOrDefault(edge.Partner) + tie.Count;
         }
 
+        // HOW FAST THIS ROW IS WRITTEN, IN ITS OWN CLOCK. The span between its
+        // oldest and newest stamps, divided by how many entries there are, is the
+        // mean gap between writes -- and dividing an age by that removes the clock's
+        // units, which is what stops a recency preference being a dial wanting a
+        // different value in every world. See Message.Fresh.
+        var newest = 0L;
+        var oldest = long.MaxValue;
+
+        if (message.Recent)
+            foreach (var (_, tie) in row)
+            {
+                newest = Math.Max(newest, tie.When);
+                oldest = Math.Min(oldest, tie.When);
+            }
+
+        var interval = message.Recent && row.Length > 0 && newest > oldest
+            ? (newest - oldest) / (double)row.Length
+            : 0.0;
+
         // AND THE ORDINARY CELL, WHERE THE QUESTION WANTS A CONTRAST. `helped` is
         // the numerator of P(better | act) and this is its denominator -- how often
         // the act was taken here at all -- and the walk about to happen is over the
@@ -667,6 +694,16 @@ public sealed class Node
 
                 // WHAT ARGUES AGAINST THIS EDGE. See Message.Against.
                 Against = opposed,
+
+                // HOW CURRENT THIS ENTRY IS, in units of this row's own rhythm. One
+                // where the row has no spread, which is the honest reading: entries
+                // all written at once are all equally current, and ranking them
+                // would invent a staleness that is not there.
+                Fresh = !message.Recent
+                    ? 0.0
+                    : interval <= 0.0
+                        ? 1.0
+                        : 1.0 / (1.0 + ((newest - tie.When) / interval)),
 
                 // AND WHAT IT IS WORTH ABOVE DOING SOMETHING ELSE. Only the sender
                 // can work this out -- the base rate is its own marginal -- so it

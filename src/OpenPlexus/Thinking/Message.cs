@@ -168,6 +168,43 @@ public readonly record struct Message
     public bool Unheeding { get; init; }
 
     /// <summary>
+    /// Whether this walk prefers recently-touched entries. <b>Set once at the
+    /// origin and copied along every hop</b>; see <see cref="Question.Recent"/>.
+    /// </summary>
+    public bool Recent { get; init; }
+
+    /// <summary>
+    /// How current this entry is, <b>in units of the sending row's own writing
+    /// rhythm</b> — one for the freshest, falling toward nought for the stale.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE SCALE COMES FROM THE ROW AND NOT FROM THE CLOCK, WHICH IS THE WHOLE
+    /// DIFFICULTY.</b> An age in raw clock units means nothing without knowing what
+    /// a unit IS — steps on one world, milliseconds on another — so any threshold
+    /// over it is a dial wanting a different value per world, which is this design's
+    /// recurring fault. Dividing the age by the row's OWN mean interval between
+    /// writes removes the unit entirely: a node that fires constantly and one that
+    /// fires rarely both read "one interval ago" the same way.
+    /// </para>
+    /// <para>
+    /// <b>SO IT IS BUILT FROM COUNTS THE SENDER ALREADY HOLDS</b> — the row's oldest
+    /// and newest stamps and how many entries there are — and it needs no dial, no
+    /// signal to be found first, and nothing the world has to supply. <b>That is the
+    /// shape the negative cell turned out to have</b>, arrived at deliberately this
+    /// time.
+    /// </para>
+    /// <para>
+    /// <b>One where a row has no spread to speak of</b>, which is the honest reading:
+    /// entries all written at once are all equally current, and forcing a ranking
+    /// over them would invent staleness that is not there. <b>Nought where
+    /// <see cref="Recent"/> is false</b>, because a question that did not ask should
+    /// not be carrying an answer.
+    /// </para>
+    /// </remarks>
+    public double Fresh { get; init; }
+
+    /// <summary>
     /// How much the partner this message is addressed to RAISES the chance that
     /// things get better — <b>ΔP, computed by the sender about its own row.</b>
     /// </summary>

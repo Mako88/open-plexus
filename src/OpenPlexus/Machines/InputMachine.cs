@@ -364,6 +364,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
             // the same way and for the same reason. See Question.Contrasted.
             Contrasted = question?.Contrasted ?? false,
             Unheeding = question?.Unheeding ?? false,
+            Recent = question?.Recent ?? false,
             Held = stamina ?? _settings.Stamina,
 
             // A chain ends with the node the message is addressed to, so an

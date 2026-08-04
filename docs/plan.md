@@ -152,10 +152,13 @@ its ceiling it absorbs anything.)*
   the signed error, and `Overreach` tells a solved world from a predictor naming
   everything. **A SIGNAL, not a node**: minting `not-X` would double an alphabet
   to hold unboundedly many absent things.
-- **SUPERSESSION — THE CHANNEL IS BUILT AND EVICTION READS IT.** `Tie.When` rides
-  beside the count as an LWW-Register and **the two must never merge. Do not
-  decay.** **One consumer is left**: recency ranking, which belongs on `Question`.
-  Across machines it wants a Lamport clock.
+- **SUPERSESSION — BUILT, AND BOTH CONSUMERS READ IT.** `Tie.When` rides beside the
+  count as an LWW-Register and **the two must never merge. Do not decay.**
+  `WalkSettings.Row` evicts on it; `Question.Recent` ranks on it, so a walk can
+  prefer what is still true without anything eroding. **The scale is the row's own
+  mean interval between writes**, which is what keeps it off the dial list — an age
+  in raw clock units wants a different threshold per world. Across machines it wants
+  a Lamport clock.
 - **MULTI-TOKEN OUTPUT.** *Simultaneous* actions are nearly free — **fork 11 built
   the addressing** — and what is left is a world that wants two.
 

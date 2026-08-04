@@ -126,6 +126,33 @@ public sealed record Question
     public bool Unheeding { get; init; }
 
     /// <summary>
+    /// Whether the walk prefers what was touched RECENTLY — <b>supersession's
+    /// second consumer, and the only way this design has of preferring a current
+    /// fact to a stale one.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NOTHING HERE DECAYS, SO A SUPERSEDED FACT IS AS LOUD AS A CURRENT
+    /// ONE.</b> A count that stopped rising still stands at whatever it reached, and
+    /// in a world that changes that is exactly the wrong behaviour. Eroding it is
+    /// not available — that breaks convergence — so the only move left is to let a
+    /// question say it cares when, and <see cref="Graph.Tie.When"/> has ridden
+    /// beside every count since edge kinds landed waiting to be asked.
+    /// </para>
+    /// <para>
+    /// <b>THE QUESTION'S CALL AND NOT A DIAL, and here that is load-bearing rather
+    /// than tidy.</b> <i>What usually follows this</i> wants the association however
+    /// old; <i>what should I do now</i> wants what is still true. Those are
+    /// different questions about one row, and a dial would have to be wrong for one
+    /// of them in every world.
+    /// </para>
+    /// <para>
+    /// <b>False is every question asked before this existed.</b>
+    /// </para>
+    /// </remarks>
+    public bool Recent { get; init; }
+
+    /// <summary>
     /// <see cref="Worthwhile"/> AGAINST WHAT WOULD HAVE HAPPENED ANYWAY — <b>ΔP,
     /// and the one thing a hit rate structurally cannot say.</b>
     /// </summary>

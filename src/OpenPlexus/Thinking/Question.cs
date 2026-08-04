@@ -162,20 +162,6 @@ public sealed record Question
     };
 
     /// <summary>
-    /// A question about what is worth FINDING OUT here — <b>step 10, and the
-    /// question a body with nothing to go on should ask.</b>
-    /// </summary>
-    /// <remarks>
-    /// <b>THE SAME WIDTH AS <see cref="Worthwhile"/> AND A DIFFERENT STATISTIC</b>,
-    /// which is what keeps it clear of step 9's refutation: widening a walk until
-    /// it stops being silent re-introduces the behaviour policy, and this does not
-    /// widen anything. It ranks by the share of times an act taught the machine
-    /// something rather than by the share of times it helped the body. See
-    /// <see cref="Graph.Kind.Informed"/>.
-    /// </remarks>
-    public static Question Curious() => new() { Through = Graph.Kind.Informed };
-
-    /// <summary>
     /// A question about what helps where this is HEADING, rather than where it is
     /// — <b>one step of lookahead, and it is step 11 in miniature.</b>
     /// </summary>

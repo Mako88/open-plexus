@@ -171,9 +171,6 @@ public sealed class Tending
         return _settings.Drain * (which + 1);
     }
 
-    /// <summary>Everything drying, added up.</summary>
-    public double Drying => Enumerable.Range(0, _settings.Plants).Sum(Dries);
-
     /// <summary>Whether every plant is inside its bounds.</summary>
     public bool Viable => _damp.All(wet => wet >= _settings.Floor);
 
@@ -185,7 +182,7 @@ public sealed class Tending
     /// so a run can be compared against the best a body could do with the same
     /// actions and the same travel.
     /// </remarks>
-    public int Driest
+    private int Driest
     {
         get
         {

@@ -86,6 +86,9 @@ public sealed class Fabric : IDisposable
     /// <inheritdoc cref="Plumbing.Widest"/>
     public int Widest => _clusters.Count == 0 ? 0 : _clusters.Max(cluster => cluster.Widest);
 
+    /// <inheritdoc cref="Graph.Cluster.Temporal"/>
+    public int Temporal => _clusters.Sum(cluster => cluster.Temporal);
+
     /// <summary>
     /// What the machinery did, in the form every world's result carries it.
     /// </summary>

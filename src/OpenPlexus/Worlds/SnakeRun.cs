@@ -207,6 +207,15 @@ public sealed class SnakeRun : IDisposable
     /// only the set does.
     /// </remarks>
     private readonly int? _names;
+
+    /// <summary>
+    /// Whether the action is recorded as coming BEFORE what was then seen, and
+    /// the prediction asks only for what follows — <b>fork 18, via step 6.</b>
+    /// </summary>
+    private readonly bool _kinds;
+
+    /// <inheritdoc cref="Graph.Cluster.Temporal"/>
+    public int TemporalCells => _fabric.Temporal;
     private readonly Foresight _foresight = new();
     private readonly Foresight _novelty = new();
 
@@ -241,7 +250,8 @@ public sealed class SnakeRun : IDisposable
         int replicas = 256,
         int span = 0,
         bool includeEmpty = false,
-        int? names = null)
+        int? names = null,
+        bool kinds = false)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(dials);
@@ -249,7 +259,8 @@ public sealed class SnakeRun : IDisposable
 
         _dials = dials;
         _names = names;
-        _sense = new SnakeSense(includeEmpty);
+        _kinds = kinds;
+        _sense = new SnakeSense(includeEmpty, ordered: kinds);
         _snake = new Snake(world, seed);
         _fallback = new Random(seed);
         _guessing = new Random(~seed);
@@ -259,7 +270,7 @@ public sealed class SnakeRun : IDisposable
         _eye = new InputMachine<SnakeFrame>(
             new MachineAddress("eye"),
             _sense,
-            new LocalRendezvous(_fabric.Local),
+            new LocalRendezvous(_fabric.Local, kinds),
             _fabric.Bus,
             _fabric.Ring,
             dials,
@@ -541,10 +552,18 @@ public sealed class SnakeRun : IDisposable
 
         // A SHALLOWER BUDGET FOR THE PREDICTION, because the two questions
         // want opposite depths -- fork 20.
+        //
+        // AND FORK 18: WHAT FOLLOWS, NOT WHAT ACCOMPANIES. `What will the world
+        // look like if I do X` is a question about consequence, and until the row
+        // could hold a temporal cell there was no way to ask it -- the action and
+        // the view that followed it were one flat occasion, so a walk from the
+        // action reached whatever merely co-occurred with it. With kinds on, the
+        // front end says the action came first and this asks only for what came
+        // after.
         var thought = await _eye.ThinkAsync(
             [.. present, doing],
             _dials.Foresight,
-            null,
+            _kinds ? Question.Following() : null,
             ct).ConfigureAwait(false);
         await _fabric.QuietAsync(ct).ConfigureAwait(false);
 

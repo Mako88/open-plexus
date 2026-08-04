@@ -42,6 +42,21 @@ public interface IQuantizer<in TObservation>
     IReadOnlyDictionary<Code, int>? Bind(TObservation observation) => null;
 
     /// <summary>
+    /// What order those codes came in, when this front end can say. <b>Null by
+    /// default, which is every front end for which nothing came first.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE ORDER IS A FRONT-END JOB FOR THE SAME REASON SEGMENTATION IS.</b>
+    /// A phase cannot survive C2 — late, jittered, out-of-order messages are
+    /// exactly what destroys an oscillator relationship — so the order has to
+    /// travel INSIDE the occasion, where lateness cannot reach it. Only the front
+    /// end knows it: by the time codes are in the graph they are a set. See
+    /// <see cref="Learning.Occasion.Sequence"/>. Defaulted so that adding it
+    /// breaks no existing quantiser and changes no existing measurement.
+    /// </remarks>
+    IReadOnlyDictionary<Code, int>? Order(TObservation observation) => null;
+
+    /// <summary>
     /// Which of those codes name <i>this occasion</i> rather than a kind of
     /// thing, when this front end can say. <b>Null by default, which is every
     /// front end whose codes all recur.</b>

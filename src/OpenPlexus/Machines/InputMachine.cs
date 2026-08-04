@@ -137,6 +137,12 @@ public sealed class InputMachine<TFrame> : IReceiveReports
                 // null for every front end that cannot. See Occasion.Groups.
                 Groups = _quantizer.Bind(frame),
 
+                // AND WHAT ORDER THEY CAME IN, where the front end can say and
+                // null everywhere else. The order has to be said HERE, inside the
+                // occasion, because a phase cannot survive C2 — see
+                // Occasion.Sequence.
+                Sequence = _quantizer.Order(frame),
+
                 // AND WHICH OF THEM NAME THIS OCCASION RATHER THAN A KIND. Also
                 // null for every front end that cannot. See Occasion.Fleeting.
                 Fleeting = _quantizer.Fleeting(frame),

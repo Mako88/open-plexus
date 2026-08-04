@@ -207,6 +207,16 @@ public sealed class Node
         get { lock (_gate) return _together.Count; }
     }
 
+    /// <summary>
+    /// How many entries of one relation the row holds. <b>Zero <see cref="Kind.After"/>
+    /// means nothing temporal was ever written</b>, which tells an arm that did
+    /// nothing apart from an arm that was never connected.
+    /// </summary>
+    public int Entered(Kind kind)
+    {
+        lock (_gate) return _together.Keys.Count(edge => edge.Kind == kind);
+    }
+
     // ---- thinking ----------------------------------------------------------
 
     /// <summary>

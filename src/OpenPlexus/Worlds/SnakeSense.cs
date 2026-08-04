@@ -43,7 +43,19 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
 
     private readonly SnakeQuantizer _vision;
 
-    public SnakeSense(bool includeEmpty = false) => _vision = new SnakeQuantizer(includeEmpty);
+    /// <summary>Whether this front end says the action came first — <b>fork 18.</b></summary>
+    private readonly bool _ordered;
+
+    /// <param name="includeEmpty">Whether empty cells produce codes.</param>
+    /// <param name="ordered">
+    /// Whether the action is said to come BEFORE what was then seen — <b>fork 18,
+    /// and OFF is every measurement taken before edge kinds existed.</b>
+    /// </param>
+    public SnakeSense(bool includeEmpty = false, bool ordered = false)
+    {
+        _vision = new SnakeQuantizer(includeEmpty);
+        _ordered = ordered;
+    }
 
     /// <summary>Where the turn codes start, clear of the four direction codes.</summary>
     private const ulong Turning = 16;
@@ -77,5 +89,41 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
         var codes = new List<Code>(_vision.Codify(frame.View));
         if (frame.Did is { } did) codes.Add(did);
         return codes;
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ACTION CAME FIRST, AND THE VIEW IS WHAT FOLLOWED IT — FORK 18.</b>
+    /// <see cref="SnakeFrame.Did"/> is the move already taken and the view is the
+    /// world after it, so they are not simultaneous and never were. Written as
+    /// one occasion with no order they became a <c>With</c> pair, which says the
+    /// view ACCOMPANIED the action — indistinguishable from the view having been
+    /// there when the action was chosen, and that is precisely why fork 18 was
+    /// blocked on temporal edges.
+    /// </para>
+    /// <para>
+    /// <b>One way, action to view.</b> The past records the future and the reverse
+    /// is not written, so a broadcast carrying an action can walk to what usually
+    /// follows it — which is <i>what will the world look like if I do X</i>, and is
+    /// the question this project exists to be able to ask.
+    /// </para>
+    /// <para>
+    /// <b>Null when there was no action</b>, which is the first frame and every
+    /// frame under the cut control: with nothing to come first, nothing is
+    /// ordered and the occasion is the flat set it always was.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyDictionary<Code, int>? Order(SnakeFrame frame)
+    {
+        ArgumentNullException.ThrowIfNull(frame);
+
+        if (!_ordered || frame.Did is not { } did) return null;
+
+        var order = new Dictionary<Code, int> { [did] = 0 };
+
+        foreach (var code in _vision.Codify(frame.View)) order[code] = 1;
+
+        return order;
     }
 }

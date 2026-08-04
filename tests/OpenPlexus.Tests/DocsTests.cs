@@ -69,6 +69,62 @@ public sealed class DocsTests
     /// </remarks>
     private const int Budget = 4_000;
 
+    /// <summary>
+    /// The budget for PROSE, as against structure.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>JOHN'S RULE, 2026-08-04: PREFER CUTTING PROSE OVER CUTTING LISTS.</b> A
+    /// total word budget is indifferent to what gets retired, so when the doc goes
+    /// over, whatever is easiest to delete goes — and that is usually a table row
+    /// or a bullet, because a paragraph reads as though it is holding an argument
+    /// together. It is the wrong instinct: a bullet is a reminder, and a reminder
+    /// is all this doc has to be. <b>The connective tissue can be rederived; the
+    /// item cannot.</b>
+    /// </para>
+    /// <para>
+    /// <b>It sits well above the current count and far below the total</b>, so
+    /// prose has room to exist where a bullet genuinely will not do, and no room
+    /// to creep back into being the default shape.
+    /// </para>
+    /// </remarks>
+    private const int Prose = 400;
+
+    /// <summary>
+    /// Whether a line is structure rather than prose.
+    /// </summary>
+    /// <remarks>
+    /// <b>Deliberately syntactic, like the findings rules.</b> The point is not to
+    /// judge whether a paragraph is earning its place — it is to make the
+    /// distinction mechanical enough that nobody has to argue about it. A heading,
+    /// a bullet, a table row, a quote, and the wrapped continuation of a bullet
+    /// all count as structure.
+    /// </remarks>
+    private static bool Structural(string line)
+    {
+        var trimmed = line.TrimStart();
+
+        if (trimmed.Length == 0) return true;
+
+        if ("-|#>".Contains(trimmed[0], StringComparison.Ordinal)) return true;
+
+        // AN ASTERISK IS A BULLET ONLY WITH A SPACE AFTER IT. `**` opens bold,
+        // and this doc leads nearly every sentence with it — counting those as
+        // structure would let prose pass the budget by shouting, which is the
+        // one way this check could be worth nothing.
+        if (trimmed[0] == '*')
+            return trimmed.Length > 1 && trimmed[1] == ' ';
+
+        // `1.` and friends — an ordered list is a list.
+        if (char.IsAsciiDigit(trimmed[0]) && trimmed.Contains('.', StringComparison.Ordinal))
+            return true;
+
+        // A WRAPPED BULLET IS STILL A BULLET. Markdown continues a list item on an
+        // indented line, and counting those as prose would make the rule punish
+        // line wrapping rather than paragraphs.
+        return line.StartsWith("  ", StringComparison.Ordinal);
+    }
+
     private static string Repo() => Tree.Repo();
 
     private static string Docs() => Tree.Docs();
@@ -108,6 +164,42 @@ public sealed class DocsTests
             "over the budget of " + Budget + " words: " +
             string.Join(", ", oversized.Select(doc => $"{doc.Name} at {doc.Words}")) +
             ". Retire something rather than raising this.");
+    }
+
+    [Fact]
+    public void The_doc_is_mostly_structure_and_not_mostly_prose()
+    {
+        var wordy = Directory
+            .EnumerateFiles(Docs(), "*.md")
+            .Select(path => (
+                Name: Path.GetFileName(path),
+                Words: File.ReadAllLines(path)
+                    .Where(line => !Structural(line))
+                    .Sum(line => line.Split(
+                        [' ', '\t'], StringSplitOptions.RemoveEmptyEntries).Length)))
+            .Where(doc => doc.Words > Prose)
+            .ToList();
+
+        Assert.True(wordy.Count == 0,
+            "over the prose budget of " + Prose + " words: "
+            + string.Join(", ", wordy.Select(doc => $"{doc.Name} at {doc.Words}"))
+            + ". Turn a paragraph into bullets rather than deleting a list item — "
+            + "the connective tissue is what can be rederived.");
+    }
+
+    [Fact]
+    public void The_prose_check_can_still_tell_the_two_apart()
+    {
+        // THE COMPANION, and without it the check above passes for a predicate
+        // that calls everything structural.
+        Assert.True(Structural("- a bullet"));
+        Assert.True(Structural("| a | table | row |"));
+        Assert.True(Structural("## a heading"));
+        Assert.True(Structural("  a wrapped bullet"));
+        Assert.True(Structural("1. an ordered item"));
+
+        Assert.False(Structural("A sentence that is just a sentence."));
+        Assert.False(Structural("**Bold prose is still prose.**"));
     }
 
     [Fact]

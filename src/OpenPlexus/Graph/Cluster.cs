@@ -61,6 +61,9 @@ public sealed class Cluster : IReceiveEnvelopes
     /// <inheritdoc cref="Worlds.Plumbing.Widest"/>
     public int Widest => _nodes.IsEmpty ? 0 : _nodes.Values.Max(node => node.Entries);
 
+    /// <summary>Row entries here that mean <i>then</i> rather than <i>with</i>.</summary>
+    public int Temporal => _nodes.Values.Sum(node => node.Entered(Kind.After));
+
     /// <summary>Whether the ring says this cluster owns that node.</summary>
     public bool Holds(Code code) => _ring.OwnerOf(code) == _address;
 

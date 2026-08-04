@@ -71,10 +71,7 @@ TRAPS.**
 **The binding world is the scoreboard. Do not build a new world to test a change
 to an old one — run that one.**
 
-### 1. Composition over bindings — built and answered
-
-**Closed by `Accumulate.Agreement` and `Refer.Narrowed`, which document
-themselves.** What is left is the world's own ambiguity, not the walk's.
+### 1. Composition over bindings — closed by `Accumulate.Agreement` and `Refer.Narrowed`, which document themselves
 
 ### 1a. RANKING BELONGS TO THE QUESTION — moved, and the dial is gone
 
@@ -86,19 +83,17 @@ and `WalkSettings` has one dial fewer. What is left here is unbuilt:
   hands; a node combining concurrent routes of one broadcast would keep it in the
   graph. It needs a wait, which C2 makes expensive — but it is the honest form.
 
-**`Pricing` IS THE ARM STILL HAND-SET, AND PROMOTING IT WAS NOT TAKEN.** The
-trade belongs to graph density and available budget rather than to the question —
-on a near-clique the receiver arm cannot be given the budget at all, and on a
-sparse graph with rare indexes it wins once it can pay. Both quantities are
-locally observable, so it wants a controller and not a default. **`Fleeting` has
-nothing global to promote**: where it applies, the right value is already set for
-a written reason.
+**`Pricing` IS THE ARM STILL HAND-SET, AND A CONTROLLER FOR IT HAS NOW BEEN TRIED
+AND REFUTED.** The trade was thought to belong to graph density and available
+budget, both locally observable — but the better arm on `Babi` is the *dearer*
+one, so affordability does not pick the winner, and `Senses` scores the two arms
+identically. **What is missing is not the controller but the SIGNAL**, which is
+fork 23's lesson arriving a third time. **`Fleeting` has nothing global to
+promote**: where it applies, the right value is already set for a written reason.
 
 ### 2. Predictive coding — only surprise propagates
 
-Rao & Ballard, Friston. An expected onset is silent. **Built** — and
-`Surprise.Rate` is the first quantity a controller could read from inside rather
-than from outside.
+Rao & Ballard, Friston. An expected onset is silent. **Built.**
 
 **THE OBSERVATION BROADCAST IS SUPPRESSED, NOT THE PREDICTION** — the walk making
 the expectation still runs and costs more, so the saving is partial. **Making
@@ -197,6 +192,14 @@ add, and the counts stay monotonic.
 - **REPLAY.** Re-run experience when nothing is arriving: consolidates, learns
   from rare events, interleaves old with new against interference. **`WhenIdle()`
   is already the trigger**, and fork 21 is its cousin.
+- **A FRONT END FOR REAL PERCEPTION — measured once as THE binding constraint,
+  and every world here is symbolic, so nothing has hit that wall since.** The
+  red-ball property needs codes identical on every machine forever, so a fitted
+  codebook is out. **But a uniform hash is agreed and unwalkable**: at a matched
+  code count k-means cleared chance on every seed and LSH on none, because the
+  data is concentrated where uniform codes are not. **Spending codes where the
+  data is WITHOUT fitting one is the unbuilt middle** — the front end makes a
+  thing STANDARD, and identifying it is the graph's job.
 - **INHIBITION.** The graph is purely excitatory — nothing says *this rules that
   out*. Buys competition between candidates, and a second route to absence.
 
@@ -311,6 +314,7 @@ condition is a superstition. The commit named in git holds the numbers.
 | `Window` span | Null on snake and WORSE on `Babi`, at an order of magnitude more traffic — but **it is the whole task on `Rhythm`**, where at zero the graph forms no edges at all. **Its revival condition has now been RUN and half-held**: edge kinds recover much of the accuracy and most of the traffic at every budget swept, and carrying still loses to not carrying | **Something that makes a carried edge worth its row.** Kinds were the structural half and are not enough alone; the walk still ranks a temporal partner against a simultaneous one whenever the question does not say which it wants |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
 | `Pricing.Balanced` — `together / sqrt(seen·seen)`, cosine's denominator | **Times out.** The geometric mean sits BETWEEN the marginals, so weights rise and hops go cheaper than under either arm — the walk explodes rather than compromising. Built for a conflict that was a budget artifact anyway | A bound on the walk that does not rely on the weight being the reciprocal of one marginal — the same condition `StepCost.Best` needs |
+| `Pricing.Driven` — the node picking the marginal per hop | **Two local rules, both worse than the better hand-set arm in BOTH worlds.** Preferring the receiver where affordable fell below *both*, because a per-hop choice puts routes on different scales and the ranking stops meaning anything; splitting score from price recovered some and not enough. Taking the dearer end was the cheapest arm measured anywhere and lost accuracy either side. **The premise was wrong — on `Babi` the better arm is the DEARER one** | A local quantity that predicts which arm wins, on a world where they differ: `Senses` scores them identically |
 | `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift on the conjunction and ALL of its cost on binding. **Two candidates whose orders invert score identically under RRF for every damping constant**, so it ties exactly where it is needed and the tiebreak answers | A question with many candidates, or a fusion that separates by something other than position |
 
 ---
@@ -371,7 +375,7 @@ listed because the code still points at them.
 | **6** | Broadcast the origin, route the hops. Closed |
 | **11** | The output machine is not addressed. **Open**, above |
 | **12** | A fixed seed reproduces a run exactly, `Halted` included. Closed by 22's fix |
-| **18** | Score prediction **conditional on the next action**. `Consequence` says the system does not model its own effect. **Blocked on temporal edges** |
+| **18** | Score prediction **conditional on the next action**. `Consequence` says the system does not model its own effect. **UNBLOCKED by step 6** — the temporal edge it waited for is now its own cell, and `Question.Through` is how it would be asked |
 | **20** | Split budgets — deep to act, shallow to predict. Closed |
 | **21** | Compression. A trade: it pays where the budget cannot compose and costs where it can. Off by default |
 | **22** | A transiently-zero live count untracked thoughts mid-flight and dropped every later report. `InputMachine.Retire` asks twice. Closed |

@@ -304,6 +304,15 @@ public sealed class Node
                 ? arriving
                 : Math.Min(message.Together / (by + _settings.Doubt), 1.0);
 
+            // AND THE NEGATIVE HALF DISCOUNTS THE SCORE, ON THE SAME SIDE OF THAT
+            // LINE AND FOR THE SAME REASON. `helped / (helped + hindered)` is at
+            // most one, so a partner that hurt more than it helped is believed
+            // less and is never made harder to REACH -- the price above still
+            // comes from the raw ratio, so a hop still costs at least one and the
+            // walk stays bounded. See Message.Against and Kind.Hindered.
+            if (message.Against > 0.0 && message.Together > 0.0)
+                believed *= message.Together / (message.Together + message.Against);
+
             // EVERY HOP COSTS AT LEAST 1, because a weight cannot exceed 1.0.
             // That is what bounds the walk.
             held -= 1.0 / arriving;
@@ -368,18 +377,21 @@ public sealed class Node
             // positive cell, not a route.
             if (edge.Kind == Kind.Hindered) continue;
 
-            var carrying = tie.Count;
-
-            if (edge.Kind == Kind.Helped && against is not null
-                && against.TryGetValue(edge.Partner, out var hurt))
-            {
-                // CLAMPED, BECAUSE A NEGATIVE WEIGHT BREAKS THE BOUND that makes a
-                // hop cost at least one and the walk terminate. At or below
-                // nought the partner is not walked at all -- which is the whole of
-                // what inhibition buys: an edge that says `not that one`.
-                carrying -= hurt;
-                if (carrying <= 0.0) continue;
-            }
+            // THE NEGATIVE HALF IS CARRIED, NOT APPLIED HERE, AND THAT WAS
+            // MEASURED TWICE OVER. Folding it into the count -- by subtracting or
+            // by scaling -- discounts the RANKING and the PRICE together, because
+            // this one number is still both. Every discounted partner became
+            // dearer to reach, routes starved, and the walk went quiet: silence
+            // rose from 330 of 400 steps to 387 and the arm gave back what the
+            // credit had bought, under a hard cut and a soft scaling alike.
+            //
+            // So it rides on the message and the receiver applies it to the score
+            // alone -- which is exactly what `Doubt` does, for exactly the same
+            // reason, having been got wrong the same way once already.
+            var opposed = edge.Kind == Kind.Helped && against is not null
+                && against.TryGetValue(edge.Partner, out var hurt)
+                    ? hurt
+                    : 0.0;
 
             // The cycle check: free, because the chain is already travelling.
             // ON THE PARTNER AND NOT ON THE ENTRY: a route that reached B by
@@ -400,7 +412,10 @@ public sealed class Node
                 Held = held,
                 Chain = message.Chain.Add(edge.Partner),
                 Carried = carried,
-                Together = carrying,
+                Together = tie.Count,
+
+                // WHAT ARGUES AGAINST THIS EDGE. See Message.Against.
+                Against = opposed,
 
                 // WHAT IT ARRIVED ON, carried so the far end knows what it is
                 // holding without reading anything it does not own.

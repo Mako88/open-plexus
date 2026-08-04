@@ -80,6 +80,34 @@ public readonly record struct Message
     public double Seen { get; init; }
 
     /// <summary>
+    /// Evidence AGAINST the edge being travelled — the N half of the PN-Counter,
+    /// carried so the far end can discount without reading anything.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>C1-LEGAL BY THE SAME ARGUMENT <see cref="Together"/> IS</b>: it is the
+    /// sender's own row entry, about a pair the sender holds, put into the message
+    /// rather than looked up across a boundary.
+    /// </para>
+    /// <para>
+    /// <b>IT TRAVELS BECAUSE IT MUST REACH THE SCORE WITHOUT REACHING THE
+    /// PRICE.</b> Applying it where the sender fans out folds it into
+    /// <see cref="Together"/>, which is both the ranking and the cost of the hop —
+    /// so every discounted partner also became dearer to reach, routes starved,
+    /// and the walk fell quiet. Measured: silence rose from 330 of 400 steps to
+    /// 387 and the arm lost what the credit had bought. <b>That is the recurring
+    /// fault of this design in its purest form</b>, and
+    /// <see cref="Graph.WalkSettings.Doubt"/> exists because of the identical
+    /// mistake made once before.
+    /// </para>
+    /// <para>
+    /// <b>Zero is every message sent before the negative half existed</b>, and
+    /// leaves the score exactly where it was.
+    /// </para>
+    /// </remarks>
+    public double Against { get; init; }
+
+    /// <summary>
     /// What relation this message arrived on. <b>Meaningless on an origin, which
     /// has not travelled.</b>
     /// </summary>

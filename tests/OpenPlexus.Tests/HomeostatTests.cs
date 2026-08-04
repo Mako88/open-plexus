@@ -470,22 +470,27 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             + $"({control.Mean:F4}), so the gain is the extra cell or its "
             + "staleness rather than the contrast, and the claim is wrong");
 
-        // AND THE NEGATIVE HALF OVER-PRUNES, WHICH IS A RESULT AND NOT A BUG.
-        // `Contested` writes `Kind.Hindered` when things got worse and the walk
-        // reads the difference, so the CRDT objection to punishment is gone -- two
-        // monotonic counters, convergence untouched, one kind rather than a wider
-        // row. It still loses to the one-sided version.
+        // AND THE NEGATIVE HALF STILL DOES NOT PAY, AFTER THREE SHAPES OF IT.
+        // `Contested` writes `Kind.Hindered` when things got worse, so the CRDT
+        // objection to punishment is gone -- two monotonic counters, convergence
+        // untouched, one kind rather than a wider row.
         //
-        // WHY: only one of four acts is right at any moment here, so the negative
-        // cell fills roughly three times faster than the positive one and drives
-        // nearly every pair to nought or below -- where a hard clamp refuses to
-        // walk it at all. Measured, the graph goes almost completely mute: silent
-        // 394 of 400 steps against the credited arm's 330, which is a coin toss
-        // wearing an arm's name.
+        // WHAT IT COST, AND THE ARC IS THE FINDING. Subtract-and-clamp scored
+        // 0.5800 and left the walk silent on 394 of 400 steps; scaling the count
+        // instead of cutting it moved nothing, 0.5806 and 387. Both fold the
+        // discount into `Together`, which is STILL both the ranking and the price
+        // of the hop -- so every discounted partner also became dearer to reach
+        // and routes starved. That is this design's recurring fault, and `Doubt`
+        // exists because the identical mistake was made once before.
         //
-        // SO THE SHAPE IS WRONG RATHER THAN THE IDEA. A difference cuts; what this
-        // wants is something that DOWN-WEIGHTS -- a ratio, or shrinkage in the
-        // denominator the way `Doubt` already does it.
+        // CARRYING IT ON THE MESSAGE AND DISCOUNTING THE SCORE ALONE RECOVERS MOST
+        // OF IT: 0.6633, silence down to 371. So the `Doubt` precedent generalises
+        // and the separation is worth having.
+        //
+        // IT IS STILL NOT AN IMPROVEMENT. Against the one-sided count it is about
+        // 1.6 sigma down -- no longer clearly worse, and nowhere near better. On a
+        // world where most acts are wrong most of the time, knowing WHICH ones
+        // were wrong adds nothing the positive cell was not already saying.
         var contested = arms.First(one => one.Arm == "contested");
 
         Assert.True(contested.Mean < contrasted.Mean,

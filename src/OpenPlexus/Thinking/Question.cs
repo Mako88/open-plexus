@@ -112,6 +112,20 @@ public sealed record Question
     public bool Contrasted { get; init; }
 
     /// <summary>
+    /// Whether the walk IGNORES what argues against a partner. <b>False is every
+    /// question asked before this existed.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>IT EXISTS TO BE TURNED OFF, AND ONLY AS A CONTROL.</b> An arm that writes
+    /// <see cref="Graph.Kind.Hindered"/> changes TWO things against one that does
+    /// not: the negative cell is written, which alters what every later occasion is
+    /// weighed against, and it is READ, which discounts a partner's score. Those
+    /// are different mechanisms and an arm that does both can attribute neither.
+    /// Setting this true writes the cell and ignores it.
+    /// </remarks>
+    public bool Unheeding { get; init; }
+
+    /// <summary>
     /// <see cref="Worthwhile"/> AGAINST WHAT WOULD HAVE HAPPENED ANYWAY — <b>ΔP,
     /// and the one thing a hit rate structurally cannot say.</b>
     /// </summary>

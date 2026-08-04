@@ -101,6 +101,15 @@ public readonly record struct Message
     /// mistake made once before.
     /// </para>
     /// <para>
+    /// <b>AND IT IS INERT, WHICH WAS MEASURED AFTER ALL OF THE ABOVE WAS
+    /// WRITTEN.</b> An arm that writes <see cref="Graph.Kind.Hindered"/> and
+    /// IGNORES this field reproduces the arm that reads it to four decimal places
+    /// at three budgets. The whole of the negative half's effect is the second
+    /// write raising the act's marginal; nothing is coming from this discount.
+    /// <b>The honest options are the two this project always names — delete it, or
+    /// find the world where it earns its field.</b>
+    /// </para>
+    /// <para>
     /// <b>Zero is every message sent before the negative half existed</b>, and
     /// leaves the score exactly where it was.
     /// </para>
@@ -145,6 +154,18 @@ public readonly record struct Message
     /// is and for the same reason — a node cannot see the question.
     /// </summary>
     public bool Contrasted { get; init; }
+
+    /// <summary>
+    /// Whether this walk IGNORES what argues against a partner. <b>False is every
+    /// message sent before the control existed</b>; see
+    /// <see cref="Question.Unheeding"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Named for the exception rather than the rule</b>, because a struct cannot
+    /// carry a field initialiser without a constructor and the default has to be
+    /// what every earlier measurement did.
+    /// </remarks>
+    public bool Unheeding { get; init; }
 
     /// <summary>
     /// How much the partner this message is addressed to RAISES the chance that

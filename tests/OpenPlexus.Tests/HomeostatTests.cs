@@ -786,6 +786,51 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task The_negative_cell_works_entirely_through_the_write_and_not_the_discount()
+    {
+        // `Contested` CHANGES TWO THINGS AGAINST `Credited` AND I ATTRIBUTED IT TO
+        // THE WRONG ONE. It WRITES `Kind.Hindered` when things got worse, and it
+        // READS that cell to discount a partner's score. The documentation on
+        // `Kind.Hindered`, on `Message.Against` and in the plan all describe the
+        // READ as the mechanism -- "a partner that hurt more than it helped is
+        // believed less", carried on the message so it reaches the score without
+        // reaching the price.
+        //
+        // `Unheeded` WRITES THE CELL AND IGNORES IT, and it reproduces `Contested`
+        // to four decimal places at every budget. The discount contributes NOTHING.
+        var apart = new List<string>();
+
+        foreach (var stamina in (double[])[4.0, 8.0, 12.0])
+        {
+            output.WriteLine($"--- stamina {stamina} ---");
+
+            var arms = await ArmsAsync(
+                Fixture.Dials(stamina), 24,
+                Attending.Credited, Attending.Unheeded, Attending.Contested);
+
+            var deaf = arms.First(one => one.Arm == "unheeded");
+            var heeding = arms.First(one => one.Arm == "contested");
+
+            if (Math.Abs(deaf.Mean - heeding.Mean) > 0.02)
+                apart.Add($"stamina {stamina}: {deaf.Mean:F4} against {heeding.Mean:F4}");
+        }
+
+        // SO WHAT THE NEGATIVE CELL ACTUALLY DOES IS INFLATE A MARGINAL. The second
+        // join raises `seen` for every code in an occasion that went badly -- the
+        // ACT's marginal included -- and every helped-cell weight is
+        // `together / seen(act)`. An act that often hurts therefore ranks lower
+        // through its DENOMINATOR, with no subtraction anywhere.
+        //
+        // AND THAT IS A CONTRAST BUILT OUT OF TWO RISING COUNTS AND NOTHING ELSE:
+        // no PN-Counter read, no carried field, no clamp. It is also the cheapest
+        // thing in the design, because the occasion was already being written.
+        Assert.True(apart.Count == 0,
+            "the discount has started contributing something: "
+            + string.Join("; ", apart)
+            + ". The read side is no longer inert and the note above is wrong.");
+    }
+
+    [Fact]
     public async Task The_credit_cell_read_against_the_base_rate()
     {
         // ΔP AGAINST THE HIT RATE, AND `Credited` IS THE CONTROL. The same cells

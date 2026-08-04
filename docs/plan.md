@@ -212,10 +212,15 @@ its ceiling it absorbs anything.)*
   one-sided count rules NONE of them out, so the extra reach is junk and the arm
   falls to the bar. **`Blind` is flat because it never asks.** An arm that can say
   *not that one* climbs first, and peaks later and higher.
-- **SO THE THING TO BUILD IS WHATEVER ELSE CAN REFUSE A PARTNER.** ΔP clamped at
-  nought does NOT do it — it tracks the one-sided count down — so lowering a score
-  toward nought is not the same act as ruling a route out. **That difference is the
-  next thing to understand.**
+- **AND THE MECHANISM IS NOT THE ONE `Kind.Hindered` DOCUMENTS.** An arm that
+  writes the negative cell and IGNORES it reproduces the arm that reads it exactly.
+  **The discount is inert; the WRITE is the whole effect** — a second join raises
+  the act's `seen`, and every credit weight is `together / seen(act)`, so an act
+  that hurts ranks lower through its DENOMINATOR.
+- **INHIBITION IS TWO RISING COUNTS AND NO SUBTRACTION**, needing neither the
+  carried field nor the clamp. **`Message.Against` is now inert and owed a deletion
+  or a world that earns it**, and ΔP tracking the one-sided count down is the same
+  lesson: a read-side discount is not the act of ruling a route out.
 
 ### 9. RELATIONAL PATHS — built, and the idea behind them refuted
 

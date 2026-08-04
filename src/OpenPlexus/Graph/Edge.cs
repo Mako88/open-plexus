@@ -207,13 +207,22 @@ public readonly record struct Kind
     /// Widening the row a second time is what that note forbids, and this does not.
     /// </para>
     /// <para>
-    /// <b>THE SUBTRACTION HAPPENS WHERE THE SENDER FANS OUT</b>, reading its own
-    /// row and nobody else's, so C1 is untouched. <b>Clamped at nought</b>: a
-    /// negative weight would break <c>together &lt;= seen</c>, which is the bound
-    /// that makes every hop cost at least one and the walk terminate. A partner
-    /// whose net is nought or less is not walked at all — <b>and that is
-    /// inhibition</b>, an edge saying <i>this rules that out</i> rather than merely
-    /// failing to recommend it.
+    /// <b>AND THE READ SIDE OF IT IS INERT — MEASURED, AND IT OVERTURNS WHAT THIS
+    /// NOTE USED TO SAY.</b> The subtraction happens where the sender fans out,
+    /// carried on <see cref="Thinking.Message.Against"/> so it reaches the score
+    /// without reaching the price. An arm that writes this cell and IGNORES it
+    /// reproduces the arm that reads it to four decimal places at every budget, so
+    /// the discount contributes nothing whatever.
+    /// </para>
+    /// <para>
+    /// <b>WHAT WORKS IS THE WRITE, AND IT WORKS THROUGH A MARGINAL.</b> Writing this
+    /// cell joins the occasion a second time, which raises <c>seen</c> for every
+    /// code in it — <b>the ACT's marginal included</b>. Every credit weight is
+    /// <c>together / seen(act)</c>, so an act that often hurts ranks lower through
+    /// its DENOMINATOR. <b>That is inhibition, and it is built from two rising
+    /// counts with no subtraction anywhere</b> — cheaper than the mechanism this
+    /// note was written to justify, and it needs neither the carried field nor the
+    /// clamp.
     /// </para>
     /// <para>
     /// <b>Together the two cells are a contingency rather than a frequency.</b>

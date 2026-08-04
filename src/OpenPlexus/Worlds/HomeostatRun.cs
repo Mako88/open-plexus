@@ -153,6 +153,27 @@ public enum Attending
     Contested,
 
     /// <summary>
+    /// <see cref="Contested"/>'s WRITES WITHOUT ITS DISCOUNT — <b>the control that
+    /// says which half of the negative cell is doing the work.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ARM CHANGES TWO THINGS, so on its own it can attribute neither.</b>
+    /// Writing <see cref="Graph.Kind.Hindered"/> reinforces the occasion a SECOND
+    /// time whenever things got worse — which raises every participating code's
+    /// marginal, lowers every weight read against it, and makes every hop dearer.
+    /// That is a budget change and a learning signal at once. READING the cell is a
+    /// separate mechanism: a partner that hurt more than it helped is believed less.
+    /// </para>
+    /// <para>
+    /// <b>This writes the cell and ignores it</b>, so the gap between this and
+    /// <see cref="Contested"/> is the discount and nothing else — and the gap
+    /// between this and <see cref="Credited"/> is the extra write and nothing else.
+    /// </para>
+    /// </remarks>
+    Unheeded,
+
+    /// <summary>
     /// <see cref="Credited"/> READ AGAINST THE BASE RATE — <b>ΔP, and the first
     /// change here to what is WRITTEN rather than to what is asked.</b>
     /// </summary>
@@ -464,6 +485,7 @@ public sealed class HomeostatRun : IDisposable
                     choosing switch
                     {
                         Attending.Contingent => Question.Contingent(),
+                        Attending.Unheeded => Question.Worthwhile() with { Unheeding = true },
                         Attending.Credited or Attending.Marked
                             or Attending.Contested => Question.Worthwhile(),
                         _ => null,
@@ -557,7 +579,8 @@ public sealed class HomeostatRun : IDisposable
                 owed = (occasion, step);
             }
             else if (choosing is Attending.Credited or Attending.Marked
-                     or Attending.Contested or Attending.Contingent)
+                     or Attending.Contested or Attending.Contingent
+                     or Attending.Unheeded)
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
                 // ordinary cell is untouched and this arm changes one thing.
@@ -580,7 +603,8 @@ public sealed class HomeostatRun : IDisposable
                 if (crediting is { } earned)
                 {
                     var helped = choosing == Attending.Marked || sensing.Credit > 1.0;
-                    var hurt = choosing == Attending.Contested && sensing.Credit < 1.0;
+                    var hurt = choosing is Attending.Contested or Attending.Unheeded
+                        && sensing.Credit < 1.0;
 
                     if (helped || hurt)
                     {
@@ -653,6 +677,10 @@ public sealed class HomeostatRun : IDisposable
     /// <param name="Chosen">Which need to attend to, or null if nothing was reached.</param>
     /// <param name="Settled">Whether the walk had finished when it was read.</param>
     /// <param name="Balanced">Whether the thought's own accounting closed.</param>
+    /// <param name="Candidates">
+    /// How many actions the walk actually offered. <b>A ranking arm can only be
+    /// measured where this exceeds one</b> — see <see cref="HomeostatResult.Choices"/>.
+    /// </param>
     private readonly record struct Walked(
         int? Chosen, bool Settled, bool Balanced, int Candidates)
     {

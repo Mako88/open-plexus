@@ -446,7 +446,7 @@ public sealed class Node
             // less and is never made harder to REACH -- the price above still
             // comes from the raw ratio, so a hop still costs at least one and the
             // walk stays bounded. See Message.Against and Kind.Hindered.
-            if (message.Against > 0.0 && message.Together > 0.0)
+            if (!message.Unheeding && message.Against > 0.0 && message.Together > 0.0)
                 believed *= message.Together / (message.Together + message.Against);
 
             // AND THE BASE RATE DISCOUNTS THE SCORE, ON THAT SAME SIDE OF THE LINE

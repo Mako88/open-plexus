@@ -33,6 +33,15 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// <remarks><b>Null is off, and off is every measurement taken before it.</b></remarks>
     private readonly Chunk? _chunks;
 
+    /// <summary>
+    /// Whether the WRITE path is gated by surprise as well as the read path.
+    /// </summary>
+    /// <remarks>
+    /// <b>Off is every measurement taken before step 2's second half</b>, and it has
+    /// to be an arm because it moves counts that were already measured.
+    /// </remarks>
+    private readonly bool _gated;
+
     /// <summary>The last occasion this machine wrote, exactly as written.</summary>
     private Occasion? _joined;
     private readonly IRendezvous _rendezvous;
@@ -63,7 +72,8 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         WalkSettings settings,
         int span = 0,
         Surprise? surprise = null,
-        Chunk? chunks = null)
+        Chunk? chunks = null,
+        bool gated = false)
     {
         ArgumentNullException.ThrowIfNull(quantizer);
         ArgumentNullException.ThrowIfNull(rendezvous);
@@ -80,6 +90,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         _window = new Window(span);
         _surprise = surprise;
         _chunks = chunks;
+        _gated = gated;
 
         _bus.Deaths += OnDeath;
     }
@@ -180,13 +191,49 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         var starting = minted is { } named ? [named] : changes.Started;
         var standing = minted is null ? live : present;
 
+        // BOTH HALVES OF THE ERROR, SETTLED ONCE. `Residual` spends the expectation
+        // and moves every counter behind it, so it must be called exactly once per
+        // observation -- and it is needed BEFORE the join now that the write path
+        // can read it, where it used to be needed only after.
+        var residual = _surprise?.Residual(changes.Started);
+
+        // STEP 2'S SECOND HALF: HOW MUCH OF THIS MOMENT IS WORTH LEARNING FROM.
+        //
+        // THE READ PATH HAS BEEN GATED SINCE `Surprise` LANDED AND THE WRITE PATH
+        // NEVER WAS, and the comment below the join used to explain why: an expected
+        // onset must still move the counts, or the graph stops getting better at
+        // what it already predicts. THAT ARGUMENT IS ABOUT PRECISION AND THE COST OF
+        // GIVING IT UP IS BLOCKING -- Rescorla and Wagner's whole claim is that
+        // learning is proportional to prediction ERROR, so a cue added alongside one
+        // that ALREADY predicts the outcome should acquire nothing. A pure
+        // co-occurrence count hands it the full association, and that is a known
+        // empirical failure of contiguity rather than a quirk of this design.
+        //
+        // THE SHARE THAT SURPRISED IS THE WEIGHT, which needs no dial: a wholly
+        // expected moment is worth nothing to learn from and a wholly unexpected one
+        // is worth exactly what it always was. `Occasion.Weight` is the channel the
+        // plan named, and scaling the WHOLE occasion rather than picking codes out
+        // of it is what keeps `together <= seen` -- both sides scale together.
+        var surprising = _gated && residual is { } settled && changes.Started.Length > 0
+            ? settled.Surprising.Count / (double)changes.Started.Length
+            : 1.0;
+
+        // NOTHING SURPRISED, SO THERE IS NOTHING TO LEARN. `Observe` refuses a
+        // weight of nought outright -- a coincidence worth nothing is not one -- so
+        // the moment is not joined at all rather than joined at zero.
+        if (surprising <= 0.0)
+            return residual is { Surprising.Count: 0 }
+                ? null
+                : await ThinkAsync(residual!.Value.Surprising, null, asking, ct)
+                    .ConfigureAwait(false);
+
         var joined = new Occasion
             {
                 Onsets = starting,
                 Live = standing,
                 Recent = recent,
                 At = now,
-                Weight = worth,
+                Weight = worth * surprising,
 
                 // WHAT THE FRONT END COULD SAY ABOUT WHICH THING IS WHICH, and
                 // null for every front end that cannot. See Occasion.Groups.
@@ -207,25 +254,22 @@ public sealed class InputMachine<TFrame> : IReceiveReports
 
         await _rendezvous.JoinAsync(joined, ct).ConfigureAwait(false);
 
-        // ONLY THE SURPRISE PROPAGATES — step 2, and it happens AFTER the join
-        // above rather than before it. An expected onset still moves the counts,
-        // or the graph stops getting better at the thing it already predicts and
-        // the silence stops being earned. What is skipped is the broadcast.
+        // ONLY THE SURPRISE PROPAGATES — step 2. What is skipped here is the
+        // BROADCAST; whether the write above was skipped too is `gated`, and off is
+        // every measurement taken before that existed.
         // AND THE BROADCAST GOES OUT FROM THE NAME, which is the compression
         // arriving in the thinking path as well as in the graph: one origin where
         // there were S, and the walk reaches the members through it.
-        if (_surprise is null)
+        if (residual is not { } prediction)
             return await ThinkAsync(starting, null, asking, ct).ConfigureAwait(false);
 
         // BOTH HALVES OF THE ERROR, AND ONLY THE POSITIVE ONE TRAVELS. What was
         // expected and did not arrive is counted where it is computed and goes
         // nowhere: there is no code for the thing that did not happen, so absence
         // is a signal the machine can read about itself and never a broadcast.
-        var residual = _surprise.Residual(changes.Started).Surprising;
-
-        return residual.Count == 0
+        return prediction.Surprising.Count == 0
             ? null
-            : await ThinkAsync(residual, null, asking, ct).ConfigureAwait(false);
+            : await ThinkAsync(prediction.Surprising, null, asking, ct).ConfigureAwait(false);
     }
 
     /// <summary>

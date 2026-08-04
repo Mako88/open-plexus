@@ -193,6 +193,10 @@ public sealed class RhythmRun : IDisposable
     /// <see cref="Question.Recent"/>. <b>Off is every measurement taken before it
     /// existed</b>, and it has nothing to say on a stream that never turns.
     /// </param>
+    /// <param name="gated">
+    /// Whether the WRITE path is gated by surprise too — <b>step 2's second half.</b>
+    /// Off is every measurement taken before it existed.
+    /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
     public RhythmRun(
@@ -203,6 +207,7 @@ public sealed class RhythmRun : IDisposable
         bool surprising = false,
         double carried = 1.0,
         bool recent = false,
+        bool gated = false,
         int clusters = 8,
         int replicas = 256)
     {
@@ -219,7 +224,7 @@ public sealed class RhythmRun : IDisposable
         _ear = new InputMachine<Code>(
             new MachineAddress("ear"), new Hearing(),
             new LocalRendezvous(_fabric.Local, carried: carried),
-            _fabric.Bus, _fabric.Ring, dials, span, _surprise);
+            _fabric.Bus, _fabric.Ring, dials, span, _surprise, gated: gated);
 
         _fabric.Subscribe(_ear);
     }

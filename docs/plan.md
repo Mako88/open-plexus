@@ -23,14 +23,11 @@
 
 ## What is standing
 
-- **Ten worlds sharing no world logic, over one `Fabric`** — including binding,
-  built to be unanswerable and since lifted, and **two nobody here designed**,
-  `Babi` and `Clevr`, which cannot flatter this architecture.
-- **THE ARM THAT BEAT RANDOM IS NO LONGER ONE WORLD OLD, AND IT DID NOT
-  TRANSFER.** `Tending` is a second body — plants dry, water reaches only what is
-  underfoot and lands a step late — and `Kind.Helped` there **LOSES to acting at
-  random** once the walk can afford to speak at all. Step 4's anti-correlation,
-  in world two.
+- **Ten worlds sharing no world logic, over one `Fabric`**, including **two nobody
+  here designed** — `Babi` and `Clevr`, which cannot flatter this architecture.
+- **THE ARM THAT BEAT RANDOM DID NOT TRANSFER.** `Tending` is a second body, and
+  `Kind.Helped` there **LOSES to acting at random** once the walk can afford to
+  speak. Step 4's anti-correlation, in world two.
 - **An occasion is a SET**, so *red ball beside blue box* and *blue ball beside red
   box* were one input — **representational, not scale**. `Occasion.Groups` lifts it.
 - **The graphs are tiny.** Nothing has run at a size where its claims could break;
@@ -43,18 +40,18 @@
 - **Nothing can be unlearned, only outvoted.** `Kind.Hindered` buys back
   *contradiction* and not *forgetting*: a PN-Counter's halves both rise.
 - **EVICTION IS BUILT AND FORGETTING IS SURVIVABLE.** `WalkSettings.Row` caps a
-  node at K entries and drops the least recently touched — **on `Tie.When`, never
-  by eroding a count**, which is why this is expressible where decay is not. On
-  `Motif` a third of the natural row costs no accuracy at well under half the
-  messages, and the knee is below that. **Cold storage is still unbuilt**, and it
-  is what makes an evicted count recoverable rather than gone.
+  node at K entries and drops the least recently touched — **on `Tie.When`, never by
+  eroding a count**, which is why this is expressible where decay is not. On `Motif`
+  a third of the row costs no accuracy at well under half the messages, and the knee
+  is below that. **Cold storage is still unbuilt**, and is what would make an evicted
+  count recoverable.
 
 ### FOUR THINGS THE FRONT END IS HANDED
 
 - `Occasion.Groups` — which codes belong to which object. `Occasion.Sequence` —
   what came first. `Occasion.Fleeting` — this code will never recur.
   `HomeostatSettings.Ranked` — where each variable stands against the others.
-- **Each is defended in its own file and the total nowhere.** Every one tests
+- **Each is defended in its own file and the total nowhere**, and every one tests
   whether the graph can USE a fact, never whether it can DISCOVER it.
 - **`Ranked` is the one to watch**: *lowest of the four* is relational, and
   relational facts are what this design exists to learn.
@@ -69,9 +66,9 @@
 - **`Doubt` SPLIT THE ARITHMETIC AND LEFT THE STATISTIC** — both still read one
   number. **`Toll` splits the statistic**: `Traffic` charges `1 + log₂(entries)`,
   what the hop costs in messages.
-- **AND IT FOUND THAT THE CONTROL DEGENERATES.** Where every weight is exactly
-  one, `1 / weight` IS the refuted constant cost and growth on a clique is
-  factorial. **The `StepCost` row's revival condition, met.**
+- **AND THE CONTROL DEGENERATES.** Where every weight is one, `1 / weight` IS the
+  refuted constant cost and clique growth is factorial. **`StepCost`'s revival
+  condition, met.**
 - **A dial wanting different values in different worlds is the same fault**;
   `DialTests` records which channel each dial may move.
 - **A conflict between two dials may be a BUDGET ARTIFACT** — `Clevr` was one.
@@ -106,10 +103,14 @@ its ceiling it absorbs anything.)*
 
 - Rao & Ballard, Friston. An expected onset is silent. **Built.**
 - **THE OBSERVATION IS SUPPRESSED, NOT THE PREDICTION**; conditioning the
-  prediction itself is the deeper version.
-- **THE WRITE PATH IS NOT GATED AT ALL**, and *the expectation would decay* **does
-  not hold where nothing decays**. `Occasion.Weight` is the channel; the payoff is
-  cost.
+  prediction is the deeper version.
+- **THE WRITE PATH IS GATED TOO, AND THE PAYOFF IS NOT COST — IT IS BLOCKING.**
+  Rescorla and Wagner: learning is proportional to prediction ERROR, so a cue added
+  beside one that ALREADY predicts should acquire nothing. **A contiguity count
+  hands it the full association** (Kamin). The share of a moment that surprised is
+  the weight, so no dial. **Off by default.**
+- **AND NO WORLD HERE CAN SHOW IT.** `Rhythm` shows one symbol a moment, so a
+  second cue never stands beside a first and only the cost is measurable.
 
 ### 3. Chunking — MDL. **`Chunk` is built, and it is a trade**
 
@@ -245,13 +246,11 @@ its ceiling it absorbs anything.)*
 ### 10. A REASON TO SEEK — **and it cannot be a walk**
 
 - **`Drives` wants to STAY ALIVE; nothing wants to FIND OUT.** The shape was
-  `Informed` — a second write when an act produced something unpredicted, priced by
-  `Surprise` where `Drives` stands. **BUILT, AND IT CANNOT REACH THE FAULT**: every
-  cell is written only for acts TAKEN, so it ranks what has been tried and cannot
-  send a body to what has not.
-- **NOVELTY WOULD DECAY WITH NOTHING DECAYING** — `informed / seen` falls as an act
-  becomes predictable, with no schedule. **Worth having once something can
-  explore.**
+  `Informed`, a second write when an act produced something unpredicted. **BUILT AND
+  IT CANNOT REACH THE FAULT**: every cell is written only for acts TAKEN, so it
+  ranks what has been tried and cannot send a body to what has not. **Worth another
+  go once something can explore** — `informed / seen` falls as an act becomes
+  predictable, so novelty decays with nothing decaying.
 - **ERROR IS NOT PROGRESS — the noisy television.** Schmidhuber's claim is about
   compression PROGRESS, not error.
 
@@ -304,7 +303,8 @@ its ceiling it absorbs anything.)*
 - [x] `Grains` — step 8's front end, and the coarse codes are shared
 - [x] `Tending` — the **second body**, and it does not confirm step 4
 - [ ] The rollout of step 11
-- [ ] Surprise on the write path — step 2's second half
+- [ ] **A world where several cues arrive together and only some carry the
+  outcome** — nothing here can show what gating the write buys
 - [ ] **A world an arm can bootstrap in** — every credit arm on `Tending` is a
   coin toss, so nothing downstream of the bootstrap can be measured there
 
@@ -314,8 +314,6 @@ its ceiling it absorbs anything.)*
 
 - **Fork 1 is smaller than it looks** — see the bet above. The counts need no
   protocol; only the join does.
-- **The absolute message cost is what step 2 attacks**, and nothing else should be
-  optimised first.
 - **Cold storage, once a row can be bounded.** **Paging a node out keeps the CRDT
   property**: the count does not decrease, it stops being resident. Decay does not.
 - **The knob pass, last.** A dial swept before the structural work measures a

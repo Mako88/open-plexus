@@ -198,16 +198,16 @@ its ceiling it absorbs anything.)*
 
 ### 9. RELATIONAL PATHS — built, and the idea behind them refuted
 
-- **`Question.Path` walks a relation per hop** — Path Ranking (Lao & Cohen).
+- **BUILT, REFUTED, DELETED.** A relation per hop — Path Ranking (Lao & Cohen).
 - **A FIXED PATH TRADES COVERAGE AGAINST PRECISION WITH NO MIDDLE.** Through
-  `With` it reaches almost everything and the credit dissolves; through `After` the
-  composition is empty. **Backoff settles it**: narrow first, widening only on
-  silence, overrides nothing and scores the same.
-- **SO NO GRAPH-INTERNAL LIKENESS CAN HELP** — every one is made of co-occurrence
-  and carries the policy with it. **A likeness the graph did not compute cannot
-  be**, which is step 8.
-- **`Question.Downstream` (Dayan) is unaskable**: it wants the REVERSE temporal
-  edge a carried code does not write — see `Kind.Before`.
+  `With` it reaches everything and the credit dissolves; through `After` the
+  composition is empty. **Backoff settles it**: narrow first, widening on silence
+  alone, overrides nothing and scores the same.
+- **NO GRAPH-INTERNAL LIKENESS CAN HELP** — every one is made of co-occurrence and
+  carries the policy with it, which is why step 8 is the front end.
+- **`Downstream` (Dayan) was unaskable anyway**: it wants the REVERSE temporal
+  edge a carried code does not write — see `Kind.Before`. **That is the revival
+  condition; rebuilding a per-hop walk is a morning.**
 
 ### 10. A REASON TO SEEK — **and it cannot be a walk**
 
@@ -271,9 +271,8 @@ its ceiling it absorbs anything.)*
 - [x] `Drives` — step 4's third factor. **Wanted its own cell; see step 4**
 - [x] `Toll` — the weight split. **Measured against its control on spend, not
   on stamina; see the trap about one dial measured at another's setting**
-- [x] `Question.Path` — step 9's mixed-kind walk. **Built, and the idea it was
-  built for is refuted; see step 9**
-- [x] `Kind.Informed` — step 10's curiosity. **Unmeasurable so far; see step 10**
+- [ ] ~~`Question.Path`~~ — **built, refuted and DELETED; see step 9**
+- [ ] ~~`Kind.Informed`~~ — **built and deleted: no walk reaches an untried act**
 - [x] `Grains` — step 8's front end, and the coarse codes are shared
 - [x] `Tending` — the **second body**, and it does not confirm step 4
 - [ ] The rollout of step 11

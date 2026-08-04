@@ -377,25 +377,6 @@ public sealed class Node
         // how many hops have already been taken. A carried counter would be the
         // same fact twice, free to disagree with the chain under C2.
         //
-        // A ROUTE THAT HAS WALKED THE WHOLE PATH IS FINISHED, NOT BROKE. It has
-        // already produced its arrival above; what it must not do is take a hop
-        // the question did not ask for. Counted as a death with no strength
-        // thwarted, exactly as running out of partners is -- no budget would have
-        // helped it.
-        if (message.Path is { } path)
-        {
-            var hop = message.Chain.Length - 1;
-
-            if (hop >= path.Length)
-                return new Fired
-                {
-                    Outgoing = [],
-                    Reached = reached,
-                    Accounting = new Accounting(
-                        message.Broadcast, 0, Deaths: 1, Ended: carried),
-                };
-        }
-
         var outgoing = ImmutableArray.CreateBuilder<Message>(row.Length);
 
         // THE NEGATIVE HALF OF THE PN-COUNTER, READ ONCE FOR THE WHOLE FAN-OUT.
@@ -447,13 +428,6 @@ public sealed class Node
             // ranking things that merely accompany -- which is the whole of why
             // a deeper walk for prediction was monotonically worse.
             if (message.Through is { } only && edge.Kind != only) continue;
-
-            // AND WHAT IT WILL WALK AT THIS PARTICULAR HOP -- step 9. The two are
-            // never both set: a question names one relation for the whole walk or
-            // one per hop, and allowing both would be a second field restricting
-            // the same choice.
-            if (message.Path is { } route && edge.Kind != route[message.Chain.Length - 1])
-                continue;
 
             outgoing.Add(message with
             {

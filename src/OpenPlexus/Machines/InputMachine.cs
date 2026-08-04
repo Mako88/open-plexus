@@ -345,10 +345,6 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         ArgumentNullException.ThrowIfNull(origins);
         ArgumentOutOfRangeException.ThrowIfZero(origins.Count);
 
-        // A QUESTION THAT RESTRICTS ONE HOP TWO WAYS IS REFUSED HERE RATHER THAN
-        // RESOLVED SILENTLY -- see Question.Checked.
-        question?.Checked();
-
         Retire();
 
         var broadcast = BroadcastId.New();
@@ -363,10 +359,6 @@ public sealed class InputMachine<TFrame> : IReceiveReports
             // cannot see the question -- see Message.Through. Null is every
             // question asked before edge kinds existed.
             Through = question?.Through,
-
-            // AND THE PER-HOP VERSION, step 9. Which hop a route is on is read
-            // off its chain, so nothing but the template itself travels.
-            Path = question?.Path,
             Held = stamina ?? _settings.Stamina,
 
             // A chain ends with the node the message is addressed to, so an

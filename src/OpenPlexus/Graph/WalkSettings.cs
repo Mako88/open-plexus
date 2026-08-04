@@ -295,6 +295,34 @@ public sealed record WalkSettings
     /// </remarks>
     public double? Foresight { get; init; }
 
+    /// <summary>
+    /// The most entries one node's row may hold. <b>Null is unbounded, which is
+    /// every measurement taken before this existed.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE SCALING WALL, AND THE ONLY THING THAT TURNS <i>cost grows with data
+    /// forever</i> INTO <i>cost is constant</i>.</b> Cost per thought is set by the
+    /// widest row rather than by the node count, and <see cref="Node.Fire"/> emits
+    /// one message per ENTRY — so a cap here is a cap on the fan-out, which is the
+    /// trick approximate-nearest-neighbour indexes run at billions on.
+    /// </para>
+    /// <para>
+    /// <b>IT EVICTS ON "NOT TOUCHED SINCE" AND NEVER BY ERODING A COUNT</b>, which
+    /// is the distinction the whole coordination-free design rests on. A count that
+    /// decreased would break convergence; an entry that stops being RESIDENT does
+    /// not — the number was not revised, it was paged out. <see cref="Tie.When"/>
+    /// is what makes that possible and this is its first consumer.
+    /// </para>
+    /// <para>
+    /// <b>IT IS ALSO THE ONLY FORGETTING THIS DESIGN HAS.</b> The bet is that
+    /// nothing can be unlearned, only outvoted — and the plan names eviction as the
+    /// expensive thing to walk back if forgetting turns out to be necessary rather
+    /// than optional. <b>A cap makes that testable instead of assumed.</b>
+    /// </para>
+    /// </remarks>
+    public int? Row { get; init; }
+
     /// <inheritdoc cref="Graph.Pricing"/>
     /// <remarks><b><see cref="Graph.Pricing.Receiver"/> is the default and the
     /// control</b>, so every measurement taken before this existed still

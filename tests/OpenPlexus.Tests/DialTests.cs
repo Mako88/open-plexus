@@ -78,6 +78,13 @@ public sealed class DialTests(ITestOutputHelper output)
             + "quantity that can be hunted; how deep to go already has a "
             + "controller, and that is `Stamina`",
 
+        ["Row"] =
+            "OPEN, AND IT IS A CAPACITY RATHER THAN A LEVEL. What a node can "
+            + "AFFORD to hold is a fact about the machine, not about the run, so "
+            + "there is nothing in the walk for it to be hunted from — the honest "
+            + "driver is available memory. What a run CAN say is whether the cap "
+            + "is biting, and `Widest` already reports that",
+
         ["Foresight"] =
             "OPEN, AND THE MOST TRACTABLE ONE LEFT. The prediction budget is "
             + "hand-set, yet its feedback is already computed every single step — "
@@ -319,6 +326,14 @@ public sealed class DialTests(ITestOutputHelper output)
         // RAISED TO SIX FOR `Toll`, WHICH IS THE ARGUMENT THIS FILE WANTS HAD.
         // It buys the split the plan has called outstanding three times over: a
         // sixth knob against the row entry finally doing one job.
-        Assert.Equal(6, HandSet.Count);
+        //
+        // AND TO SEVEN FOR `Row`, WHICH IS A DIFFERENT KIND OF ARGUMENT. It is not
+        // a level to be found: what a node can afford to hold is a fact about the
+        // machine rather than about the run, so it belongs with `Pricing` and
+        // `Toll` as a knob nothing in the walk could hunt. What it buys is the only
+        // forgetting this design has -- the bet is that nothing can be unlearned,
+        // only outvoted, and until now there was no way to test whether that bet is
+        // survivable.
+        Assert.Equal(7, HandSet.Count);
     }
 }

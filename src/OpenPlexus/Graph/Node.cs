@@ -279,7 +279,76 @@ public sealed class Node
         var edge = new Edge(other, kind ?? Kind.With);
 
         lock (_gate)
+        {
             _together[edge] = _together.GetValueOrDefault(edge).Plus(by, when);
+
+            Evict();
+        }
+    }
+
+    /// <summary>
+    /// Drops the least recently touched entries until the row fits its cap.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NOT TOUCHED SINCE, NEVER A COUNT ERODED.</b> Halving a count to make room
+    /// would break the G-Counter property and with it the convergence the whole
+    /// coordination-free design rests on. Removing an entry does not: the number was
+    /// never revised downward, it stopped being resident. <b>That is the same
+    /// distinction cold storage would rest on</b>, and it is why this is expressible
+    /// where decay is not.
+    /// </para>
+    /// <para>
+    /// <b>THE TIE-BREAK IS NOT COSMETIC.</b> Every pair written in one occasion
+    /// shares a clock exactly, so on a full row the entries competing to be dropped
+    /// are usually all stamped the same — and picking among them by dictionary order
+    /// would make a fixed seed stop reproducing its run, which is fork 12. The key's
+    /// own order settles it.
+    /// </para>
+    /// <para>
+    /// <b>An entry written by a caller with no clock to offer is stamped nought</b>,
+    /// so it is evicted first. That is the honest ordering — nothing is known about
+    /// when it was touched — and it is why a bounded row and a clockless caller do
+    /// not belong together.
+    /// </para>
+    /// </remarks>
+    private void Evict()
+    {
+        if (_settings.Row is not { } cap) return;
+
+        // ONE PASS PER ENTRY DROPPED, AND A WRITE DROPS AT MOST ONE. Sorting the
+        // row would be the obvious way and it is the wrong complexity for the one
+        // structure this exists to make cheap: a sort on every write past the cap
+        // is worse than the unbounded row it replaces. **This is still linear in
+        // the cap** — the plan names Space-Saving as what a real bound uses, and
+        // that stays the honest thing to reach for if the cap ever gets large.
+        while (_together.Count > cap)
+        {
+            var worst = default(KeyValuePair<Edge, Tie>);
+            var found = false;
+
+            foreach (var entry in _together)
+            {
+                if (found && !Older(entry, worst)) continue;
+
+                worst = entry;
+                found = true;
+            }
+
+            _together.Remove(worst.Key);
+        }
+    }
+
+    /// <summary>Which of two entries a bounded row gives up first.</summary>
+    private static bool Older(KeyValuePair<Edge, Tie> one, KeyValuePair<Edge, Tie> than)
+    {
+        if (one.Value.When != than.Value.When) return one.Value.When < than.Value.When;
+
+        var partner = one.Key.Partner.CompareTo(than.Key.Partner);
+
+        return partner != 0
+            ? partner < 0
+            : one.Key.Kind.CompareTo(than.Key.Kind) < 0;
     }
 
     /// <summary>

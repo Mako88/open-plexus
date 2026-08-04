@@ -43,11 +43,24 @@ namespace OpenPlexus.Graph;
 /// was already wasting — <c>RowWidthTests</c> holds the number.
 /// </para>
 /// </remarks>
-public readonly record struct Kind
+public readonly record struct Kind : IComparable<Kind>
 {
     private readonly ulong _name;
 
     private Kind(ulong name) => _name = name;
+
+    /// <summary>
+    /// An arbitrary but STABLE order over relations.
+    /// </summary>
+    /// <remarks>
+    /// <b>It means nothing and it has to exist.</b> Eviction breaks ties on the
+    /// entry's clock, and two entries written in one occasion share a clock exactly
+    /// — so without a total order on the key, which entry a bounded row drops
+    /// depends on dictionary iteration and a fixed seed stops reproducing a run.
+    /// That is fork 12's property, and it is worth more than the order being
+    /// meaningful.
+    /// </remarks>
+    public int CompareTo(Kind other) => _name.CompareTo(other._name);
 
     /// <summary>
     /// The relation of this name, <b>agreed by every machine without asking

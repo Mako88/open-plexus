@@ -42,8 +42,12 @@
   no coordinator — which is what buys C1 and C2.
 - **Nothing can be unlearned, only outvoted.** `Kind.Hindered` buys back
   *contradiction* and not *forgetting*: a PN-Counter's halves both rise.
-- **Eviction and cold storage are the escape hatches, BOTH UNBUILT.** If forgetting
-  is necessary rather than optional, this is the expensive thing to walk back.
+- **EVICTION IS BUILT AND FORGETTING IS SURVIVABLE.** `WalkSettings.Row` caps a
+  node at K entries and drops the least recently touched — **on `Tie.When`, never
+  by eroding a count**, which is why this is expressible where decay is not. On
+  `Motif` a third of the natural row costs no accuracy at well under half the
+  messages, and the knee is below that. **Cold storage is still unbuilt**, and it
+  is what makes an evicted count recoverable rather than gone.
 
 ### FOUR THINGS THE FRONT END IS HANDED
 
@@ -148,10 +152,10 @@ its ceiling it absorbs anything.)*
   the signed error, and `Overreach` tells a solved world from a predictor naming
   everything. **A SIGNAL, not a node**: minting `not-X` would double an alphabet
   to hold unboundedly many absent things.
-- **SUPERSESSION — THE CHANNEL IS BUILT, NOTHING READS IT.** `Tie.When` rides
+- **SUPERSESSION — THE CHANNEL IS BUILT AND EVICTION READS IT.** `Tie.When` rides
   beside the count as an LWW-Register and **the two must never merge. Do not
-  decay.** **Both consumers are left**: recency ranking, and eviction on "not
-  touched since". Across machines it wants a Lamport clock.
+  decay.** **One consumer is left**: recency ranking, which belongs on `Question`.
+  Across machines it wants a Lamport clock.
 - **MULTI-TOKEN OUTPUT.** *Simultaneous* actions are nearly free — **fork 11 built
   the addressing** — and what is left is a world that wants two.
 
@@ -318,11 +322,11 @@ its ceiling it absorbs anything.)*
 - **STEP ZERO IS TO BUILD SOMETHING BIG ENOUGH TO BREAK.** The largest graph here
   is a few thousand nodes, so any optimisation aims at a wall nobody has hit. Full
   `Clevr` and the ten-thousand-story `Babi` reach far larger. In order of leverage:
-- **BOUND THE ROW.** Cap a node at K partners: *cost grows with data forever*
-  becomes *cost is constant*, the trick approximate-nearest-neighbour indexes run
-  at billions on. **Evict on "not touched since", never by eroding a count** — the
-  `when` channel provides it, so supersession and scaling share one mechanism.
-  Top-K in bounded memory is heavy-hitters; Space-Saving bounds the error.
+- **BOUND THE ROW — BUILT.** `WalkSettings.Row` caps a node's entries: *cost grows
+  with data forever* becomes *cost is constant*, the trick approximate-nearest-
+  neighbour indexes run at billions on. **Evicts on "not touched since", never by
+  eroding a count**, so supersession and scaling share one mechanism. **The eviction
+  scan is linear in the cap** — Space-Saving is what a large one wants.
 - **A SELF-SET BEAM, revival condition now met.** The refuted row asks a width the
   system sets itself; `Surprise.Rate` is one signal, a node's row statistics another.
 - **Hierarchy, which is what step 3 is really for.** Walk a thousand chunks, not a

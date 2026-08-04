@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OpenPlexus.Tests;
@@ -29,77 +30,30 @@ namespace OpenPlexus.Tests;
 public sealed class DocsTests
 {
     /// <summary>
-    /// The budget, in <b>words</b>.
+    /// The most words ONE item may spend. <b>The cap that replaced the doc-wide
+    /// one</b> — see the test that reads it.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>The number is arbitrary; having one is not.</b> It sits a little above
-    /// the current length, so ordinary edits pass and a doc that has started
-    /// growing without bound fails. <b>To add something, retire something</b> —
-    /// which is the whole mechanism, because nothing else has ever made anyone
-    /// delete a stale paragraph.
-    /// </para>
-    /// <para>
-    /// <b>IT WAS LINES, AND LINES WERE THE WRONG UNIT.</b> The thing being
-    /// budgeted is context, and a markdown table row is one line however long it
-    /// is — so an hour of compacting long table cells moved the count by two and
-    /// the doc was no cheaper to load. Words track what is actually being spent.
-    /// </para>
-    /// <para>
-    /// <b>RAISED FROM 2,800 — JOHN'S CALL, 2026-08-03, AND ONLY AFTER A FULL
-    /// COMPRESSION PASS.</b> The old number was set when there were four worlds;
-    /// three more arrived in one session, two of them external and each needing a
-    /// line in the standing list, a build box and a refutation row. The pass that
-    /// preceded this retired a closed section, a superseded LATER item and about a
-    /// hundred and fifty words of prose about the document itself.
-    /// <b>The test is meant to force that pass, not to be raised instead of
-    /// it</b> — so raising it without one is the failure, and the number moving is
-    /// not.
-    /// </para>
-    /// <para>
-    /// <b>RAISED AGAIN TO 4,000 — JOHN'S CALL, 2026-08-03, AND FOR A DIFFERENT
-    /// REASON.</b> Not compaction this time but scope: the plan now carries the
-    /// three structural limits of a co-occurrence count and the approach to each,
-    /// edge kinds, credit over time, variable binding, replay, inhibition and the
-    /// scaling order. <b>"I really don't want to lose stuff just because the plan
-    /// is too big"</b> — and an idea that never reaches the doc is lost the moment
-    /// the session ends, which is a worse failure than a doc that takes longer to
-    /// read. The budget still exists, and it still forces a pass when it bites.
-    /// </para>
-    /// </remarks>
-    private const int Budget = 4_000;
+    private const int Item = 45;
 
     /// <summary>
-    /// The ceiling the build actually enforces, as against the target above.
+    /// Every section the plan is allowed to have, in order.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// <b>JOHN'S CALL, 2026-08-04: DO NOT COMPACT MID-SESSION.</b> Trimming after
-    /// every edit costs attention during the work and produces a worse doc than
-    /// one pass over the whole thing at the end, when what the session actually
-    /// found is known. So the doc is allowed to drift above
-    /// <see cref="Budget"/> while a session runs, and the session ends with a
-    /// compaction pass back under it.
-    /// </para>
-    /// <para>
-    /// <b>THE CEILING IS WHAT STOPS THE DISCIPLINE FROM QUIETLY LAPSING.</b> A
-    /// target nobody enforces is a target that drifts forever, which is the exact
-    /// failure the word budget was introduced to prevent — so there is still a
-    /// number the build refuses to go past. The gap between the two is one
-    /// session's working room and nothing more.
-    /// </para>
-    /// <para>
-    /// <b>RAISED TO 5,400 — JOHN'S CALL, 2026-08-04, AND IT IS A DEBT RATHER THAN
-    /// A NEW LEVEL.</b> The gap above is ONE session's room and the previous
-    /// session ended without spending its compaction pass, so this one began
-    /// already carrying that session's drift and had to trim something real to
-    /// afford every sentence it added. <b>The compaction pass at the end of this
-    /// session brings this number back to 4,800</b>, and a later session finding it
-    /// still at 5,400 has found a pass that did not happen rather than a ceiling
-    /// that moved.
-    /// </para>
+    /// <b>John's shape, 2026-08-04</b>: the goal, the constraints, what is not yet
+    /// done, what was tried and what would revive it, the traps, and the fork index
+    /// the code cites. <b>Anything built and decided is not on this list</b>,
+    /// because it is in the code.
     /// </remarks>
-    private const int Ceiling = 5_400;
+    private static readonly string[] Sections =
+    [
+        "The goal",
+        "The constraints",
+        "TO BUILD",
+        "DO NOT RE-TRY",
+        "TRAPS",
+        "OPEN DEFECTS",
+        "FORK NUMBERS THE CODE CITES",
+    ];
 
     /// <summary>
     /// The budget for PROSE, as against structure.
@@ -181,22 +135,112 @@ public sealed class DocsTests
     ];
 
     [Fact]
-    public void The_docs_stay_within_their_budget()
+    public void No_single_item_outgrows_a_line()
     {
-        var oversized = Directory
-            .EnumerateFiles(Docs(), "*.md")
-            .Select(path => (
-                Name: Path.GetFileName(path),
-                Words: File.ReadAllText(path)
-                    .Split([' ', '\n', '\r', '\t'], StringSplitOptions.RemoveEmptyEntries).Length))
-            .Where(doc => doc.Words > Ceiling)
+        // JOHN'S CALL, 2026-08-04: CAP THE ITEM, NOT THE DOC. A doc-wide ceiling
+        // punishes having twelve ideas, which is the wrong thing to discourage. It
+        // made several sessions trim good sentences to afford new ones, and the
+        // trimming produced worse prose than one pass would have.
+        //
+        // WHAT ACTUALLY GOES WRONG IS AN ITEM BECOMING AN ESSAY. Eleven had, and
+        // between them they were 38% of the doc while saying what the XML comments
+        // beside the code already said better. So the rule is per item: name the
+        // thing, say enough to recognise it on return, stop. TWELVE NEW IDEAS NOW
+        // COST TWELVE LINES and nothing has to be retired to make room.
+        var swollen = new List<string>();
+
+        foreach (var path in Directory.EnumerateFiles(Docs(), "*.md"))
+            foreach (var item in Items(File.ReadAllText(path)))
+            {
+                var words = item
+                    .Split([' ', '\n', '\r', '\t'], StringSplitOptions.RemoveEmptyEntries)
+                    .Length;
+
+                if (words > Item)
+                    swollen.Add($"{Path.GetFileName(path)}: {words} words — {Opening(item)}");
+            }
+
+        Assert.True(swollen.Count == 0,
+            $"{swollen.Count} item(s) over the per-item cap of {Item} words. Say what "
+            + "the thing is and enough to recognise it later; the reasoning belongs in "
+            + "the XML comment beside the mechanism:\n  "
+            + string.Join("\n  ", swollen.Take(10)));
+    }
+
+    /// <summary>
+    /// The doc as a list of ITEMS — bullets and table rows, each with its wrapped
+    /// continuation lines folded back in.
+    /// </summary>
+    /// <remarks>
+    /// <b>A wrapped bullet is ONE item</b>, or the cap would be punishing line width
+    /// rather than length. Headings and paragraphs are not items; the prose budget
+    /// governs those.
+    /// </remarks>
+    private static IEnumerable<string> Items(string doc)
+    {
+        var item = new StringBuilder();
+
+        foreach (var line in doc.Split('\n'))
+        {
+            var trimmed = line.TrimStart();
+
+            var starts = trimmed.StartsWith("- ", StringComparison.Ordinal)
+                || (trimmed.StartsWith('|')
+                    && !trimmed.StartsWith("|---", StringComparison.Ordinal));
+
+            if (starts)
+            {
+                if (item.Length > 0) yield return item.ToString();
+                item.Clear();
+                item.Append(trimmed);
+            }
+            else if (item.Length > 0 && line.StartsWith("  ", StringComparison.Ordinal))
+            {
+                item.Append(' ').Append(trimmed);
+            }
+            else if (item.Length > 0)
+            {
+                yield return item.ToString();
+                item.Clear();
+            }
+        }
+
+        if (item.Length > 0) yield return item.ToString();
+    }
+
+    /// <summary>Enough of an item to find it by.</summary>
+    private static string Opening(string item) =>
+        item.Length <= 60 ? item : string.Concat(item.AsSpan(0, 60), "...");
+
+    [Fact]
+    public void The_item_cap_can_tell_a_wrapped_bullet_from_a_long_one()
+    {
+        // THE COMPANION, and without it the cap above passes for a reader that
+        // splits every bullet at its line breaks and therefore never sees a long
+        // one. Two lines of one item must count as one item of both.
+        var wrapped = Items("- one two three\n  four five six\n").Single();
+
+        Assert.Equal("- one two three four five six", wrapped);
+
+        Assert.Equal(2, Items("- one\n- two\n").Count());
+        Assert.Equal(2, Items("| a | b |\n|---|---|\n| c | d |\n").Count());
+    }
+
+    [Fact]
+    public void The_doc_holds_these_sections_and_no_others()
+    {
+        // THE OTHER HALF OF CAPPING THE ITEM RATHER THAN THE DOC. Nothing else stops
+        // a new prose section appearing beside the lists — which is exactly how
+        // "WHAT A WHOLE SESSION OF THIS SAYS" arrived, 289 words of findings in the
+        // one doc whose own first rule is that findings live in the commit.
+        //
+        // ADDING A SECTION IS A DECISION and should cost a deliberate edit here.
+        var found = File.ReadLines(Path.Combine(Docs(), "plan.md"))
+            .Where(line => line.StartsWith("## ", StringComparison.Ordinal))
+            .Select(line => line[3..].Trim())
             .ToList();
 
-        Assert.True(oversized.Count == 0,
-            "over the CEILING of " + Ceiling + " words (target " + Budget + "): " +
-            string.Join(", ", oversized.Select(doc => $"{doc.Name} at {doc.Words}")) +
-            ". A session ends with a compaction pass back under the target. " +
-            "Retire something rather than raising either number.");
+        Assert.Equal(Sections, found);
     }
 
     [Fact]
@@ -329,40 +373,6 @@ public sealed class DocsTests
 
         Assert.True(dangling.Count == 0,
             $"the code cites forks the index does not list: {string.Join(", ", dangling)}");
-    }
-
-    [Fact]
-    public void A_ticked_box_means_the_type_exists_and_an_unticked_one_means_it_does_not()
-    {
-        // JOHN'S ASK, 2026-08-03: KEEP THE PLAN AND THE CODE IN SYNC, IN BOTH
-        // DIRECTIONS. Building something forces it out of the plan, because the
-        // box stays wrong until someone ticks it; and planning to build
-        // something that already exists fails immediately rather than sitting
-        // there looking like work.
-        var known = typeof(Codes.Code).Assembly
-            .GetExportedTypes()
-            .Where(type => !type.IsNested)
-            .Select(type => type.Name.Contains('`', StringComparison.Ordinal)
-                ? type.Name[..type.Name.IndexOf('`', StringComparison.Ordinal)]
-                : type.Name)
-            .ToHashSet(StringComparer.Ordinal);
-
-        var boxes = Regex.Matches(
-            Plan(),
-            @"^- \[( |x)\] `([A-Za-z]+)`",
-            RegexOptions.Multiline);
-
-        Assert.NotEmpty(boxes);
-
-        var wrong = boxes
-            .Select(box => (Ticked: box.Groups[1].Value == "x", Type: box.Groups[2].Value))
-            .Where(entry => entry.Ticked != known.Contains(entry.Type))
-            .Select(entry => entry.Ticked
-                ? $"{entry.Type} is ticked and does not exist"
-                : $"{entry.Type} exists and is not ticked")
-            .ToList();
-
-        Assert.True(wrong.Count == 0, string.Join("; ", wrong));
     }
 
     [Fact]

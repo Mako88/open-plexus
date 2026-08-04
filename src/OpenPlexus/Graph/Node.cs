@@ -65,6 +65,26 @@ public sealed class Node
     /// <summary>How many occasions this node fired on at all. Its own marginal.</summary>
     private double _seen;
 
+    /// <summary>
+    /// How much of that marginal was of each relation — <b>the base rate a hit
+    /// rate cannot see.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>IT IS NOT THE ROW AND THAT IS THE WHOLE OF WHY IT IS AFFORDABLE.</b> This
+    /// is keyed by RELATION and not by partner, so it is bounded by how many
+    /// relations exist and never by how many codes this node has met.
+    /// <see cref="Tie"/> names the row as the scaling wall; this sits beside it and
+    /// does not widen it.
+    /// </para>
+    /// <para>
+    /// <b>Every entry only ever rises</b>, so the G-Counter property is untouched —
+    /// and the quantity read off it, <see cref="Contingency"/>, can still fall. That
+    /// is the same argument that made <see cref="Kind.Hindered"/> legal.
+    /// </para>
+    /// </remarks>
+    private readonly Dictionary<Kind, double> _noted = [];
+
     /// <param name="code">This node's identity.</param>
     /// <param name="settings">
     /// The dials. Validated here so a node cannot exist holding a contradictory
@@ -107,14 +127,100 @@ public sealed class Node
     /// something merely concluded</b> — see fork 21. A count became a weight so
     /// that a reflected occasion cannot outweigh a real one.
     /// </param>
-    public void Note(double by = 1.0)
+    /// <param name="of">
+    /// Which relation this occasion was about. <b><see cref="Seen"/> counts it
+    /// either way</b>, so nothing already measured moves — what this adds is a
+    /// second tally, split by relation, which is what a base rate is made of.
+    /// <b>Null is a caller with nothing to say</b>, and leaves the split alone.
+    /// </param>
+    public void Note(double by = 1.0, Kind? of = null)
     {
         if (by <= 0.0)
             throw new ArgumentOutOfRangeException(nameof(by),
                 "an occasion worth nothing is not an occasion; it would move " +
                 "`together` without moving `seen` and score the pair above 1.0");
 
-        lock (_gate) _seen += by;
+        lock (_gate)
+        {
+            _seen += by;
+
+            if (of is { } relation)
+                _noted[relation] = _noted.GetValueOrDefault(relation) + by;
+        }
+    }
+
+    /// <summary>
+    /// How much of this node's marginal was of one relation.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE DENOMINATOR AND THE NUMERATOR OF THE BASE RATE.</b>
+    /// <c>Noted(With)</c> is how many ordinary occasions this node was in;
+    /// <c>Noted(Helped)</c> is how many of them were followed by something getting
+    /// better. Neither is a fact about any partner, which is what makes the
+    /// contrast below cost nothing per edge.
+    /// </remarks>
+    public double Noted(Kind of)
+    {
+        lock (_gate) return _noted.GetValueOrDefault(of);
+    }
+
+    /// <summary>
+    /// How much taking one act CHANGES the chance that things get better —
+    /// <b>ΔP, and the thing a co-occurrence count structurally could not say.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Kind.Helped"/> IS A HIT RATE AND THIS IS A CONTINGENCY.</b>
+    /// <c>helped / taken</c> answers <i>when I did this, how often did things
+    /// improve</i>, which sounds like the question and is not: an act that helps
+    /// six times in ten looks strong until you notice things improved six times in
+    /// ten anyway. Rescorla and Wagner's quantity is
+    /// <c>P(better | act) − P(better | ¬act)</c>, and the second term is what
+    /// nothing here recorded.
+    /// </para>
+    /// <para>
+    /// <b>THE BASE RATE HAS TO VARY BY STATE OR IT CANNOT RE-RANK ANYTHING.</b> A
+    /// world-level rate — <see cref="Learning.Drives"/>'s, say — subtracts the same
+    /// number from every candidate, and an ordering is unchanged by subtracting a
+    /// constant from all of it. So it is read from THIS node's own tallies, and the
+    /// complement term still moves per act because both its parts do.
+    /// </para>
+    /// <para>
+    /// <b>C1 IS UNTOUCHED AND THAT IS NOT A COINCIDENCE.</b> All four numbers —
+    /// the pair's two cells and this node's two marginals — are things this node
+    /// owns, so the contrast is computed where the fan-out already happens and
+    /// nothing reads another node's data.
+    /// </para>
+    /// <para>
+    /// <b>NOUGHT WHERE THERE IS NO CONTRAST TO DRAW</b>: an act never taken here,
+    /// or one taken on every occasion this node ever had, leaves one side of the
+    /// subtraction with an empty denominator. <b>That is a reading of "nothing to
+    /// say" and not of "no effect"</b>, and the two are indistinguishable in the
+    /// number — which is why silence is reported beside a score and not folded
+    /// into it.
+    /// </para>
+    /// </remarks>
+    /// <param name="act">The partner whose contribution is being asked about.</param>
+    /// <returns>
+    /// The difference of the two rates, in -1..1. <b>Negative is inhibition</b> —
+    /// things went better without this act than with it.
+    /// </returns>
+    public double Contingency(Code act)
+    {
+        lock (_gate)
+        {
+            var taken = _together.GetValueOrDefault(new Edge(act, Kind.With)).Count;
+            var helped = _together.GetValueOrDefault(new Edge(act, Kind.Helped)).Count;
+
+            var occasions = _noted.GetValueOrDefault(Kind.With);
+            var improved = _noted.GetValueOrDefault(Kind.Helped);
+
+            var without = occasions - taken;
+
+            if (taken <= 0.0 || without <= 0.0) return 0.0;
+
+            return (helped / taken) - ((improved - helped) / without);
+        }
     }
 
     /// <summary>

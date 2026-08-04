@@ -229,8 +229,8 @@ its ceiling it absorbs anything.)*
 - **BUILT, AND IT CANNOT REACH THE FAULT.** Every cell is written only for acts
   TAKEN, so it ranks what has been tried and cannot send a body to what has not.
 - **NOVELTY WOULD DECAY WITH NOTHING DECAYING** — `informed / seen` falls as an act
-  becomes predictable, handing over from seeking to exploiting with no schedule.
-  **Worth having once something can actually explore.**
+  becomes predictable, with no schedule. **Worth having once something can
+  explore.**
 - **ERROR IS NOT PROGRESS — the noisy television.** Schmidhuber's claim is about
   compression PROGRESS, not error.
 
@@ -248,18 +248,17 @@ its ceiling it absorbs anything.)*
 - **EVERY MECHANISM BUILT WORKS AND EVERY ONE FAILS ALIKE.** Paths, backoff,
   curiosity, the trace, grains, the toll, count-based exploration: each does what
   it was built to do, and **every one scores worse than random.**
-- **THE SILENCE WAS NEVER THE PROBLEM — IT WAS THE EXPLORATION**, solvable three
-  ways, each removing the coin toss that was carrying the arm.
 - **EXPLORATION CANNOT COME FROM THE WALK — structural.** Every cell is keyed on
   *(state, act)* and **written only for acts TAKEN**, so no walk recommends an
   untried one. Measured: three questions over three statistics, one identical run.
 - **SO IT IS EXTRA-GRAPH, AND C1 PERMITS IT.** A machine knows what IT has done, so
   `Venturing` weighs the walk against `√(ln t / n)` on the actuator's own tally.
   **It works and round-robins, scoring below the coin toss.**
-- **EVERYTHING TRIED CHANGED THE READ SIDE. Nothing changed WHAT is written.**
-  `Kind.Helped` is still a hit rate where ΔP is `P(better|act) − P(better|¬act)`,
-  needing a base rate nothing records. **Exploration generates the data, a
-  contingency makes it mean something, and neither suffices alone.**
+- **EVERYTHING TRIED CHANGED THE READ SIDE, SO ΔP CHANGES WHAT IS WRITTEN.**
+  `Node.Contingency` subtracts the base rate a hit rate cannot see, off a marginal
+  split by relation and not off the row. **Built, audited, driving nothing yet**,
+  and a base rate not varying by state could not re-rank anything. **Exploration
+  generates the data, a contingency makes it mean something, neither suffices.**
 
 - **NONE OF IT IS A SUFFICIENCY ARGUMENT.** The narrower claim: without structure,
   an internal error signal, a growing alphabet, a reason to act, a reason to seek,

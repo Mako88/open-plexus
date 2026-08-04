@@ -82,7 +82,13 @@ public sealed class LocalRendezvous : IRendezvous
         // to prevent. Noting keeps `together(x, y) <= seen(y)`.
         var weight = occasion.Weight;
 
-        foreach (var code in present) _clusters.For(code).Note(weight);
+        // AND THE MARGINAL IS SPLIT BY RELATION AS WELL AS TOTALLED. `Seen` counts
+        // this occasion either way, so every number already measured is where it
+        // was; what is new is a second tally saying how many of a node's occasions
+        // were ORDINARY and how many were a reinforcement of some kind. That split
+        // is the base rate `Node.Contingency` subtracts, and without it a credit
+        // cell is a hit rate that cannot see what would have happened anyway.
+        foreach (var code in present) _clusters.For(code).Note(weight, occasion.As ?? Kind.With);
 
         var written = new HashSet<(Code, Code)>();
 

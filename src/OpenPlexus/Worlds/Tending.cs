@@ -28,7 +28,34 @@ public sealed record TendingSettings
     public double Floor { get; init; } = 0.25;
 
     /// <summary>How many bands a moisture level is quantised into.</summary>
-    public int Bands { get; init; } = 5;
+    public int Bands { get; init; } = 8;
+
+    /// <summary>
+    /// How many COARSENESSES each moisture reading is said at — <b>step 8, and
+    /// ONE is every measurement taken before it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE MEASURED PROBLEM IS COVERAGE, AND IT GETS WORSE WITH EXPERIENCE.</b>
+    /// Quadrupling a run here grows the distinct states more than three times over
+    /// while the credit cells grow less than half again, so a cell keyed on the
+    /// state that earned it falls further behind the longer the body runs.
+    /// </para>
+    /// <para>
+    /// <b>SAYING EACH READING COARSELY AS WELL AS FINELY IS WHAT LETS TWO STATES
+    /// MEET.</b> They differ in the fine band and share the coarse one, so credit
+    /// earned in either is reachable from the other — <b>without anything deciding
+    /// they are similar</b>, which is what step 9 refuted. See
+    /// <see cref="Codes.Grains"/>.
+    /// </para>
+    /// <para>
+    /// <b>THE BANDS WENT FROM FIVE TO EIGHT WITH THIS, and that is not a free
+    /// choice.</b> Halving a five-band reading gives two and then one, so there is
+    /// barely a hierarchy to build; a power of two halves cleanly all the way down
+    /// and the grains are then a strict summary of one another.
+    /// </para>
+    /// </remarks>
+    public int Grains { get; init; } = 1;
 }
 
 /// <summary>
@@ -94,6 +121,9 @@ public sealed class Tending
     private readonly TendingSettings _settings;
     private readonly double[] _damp;
 
+    /// <summary>How many modalities each plant actually uses. See <see cref="Codes.Grains.Spans"/>.</summary>
+    private readonly int _grains;
+
     /// <summary>What was poured last step and lands this one. <b>The delay.</b></summary>
     private int? _poured;
 
@@ -108,12 +138,15 @@ public sealed class Tending
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Drain);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Restore);
 
-        // THE MODALITY BLOCK MUST NOT RUN OFF THE END, and a plant landing on
-        // another world's modality would be one code meaning two things — this
-        // design's recurring fault at its most literal.
-        if (Damp + settings.Plants > byte.MaxValue + 1)
+        // EACH PLANT OWNS ONE MODALITY PER GRAIN, and the whole block must fit --
+        // a plant landing on another's modality would be one code meaning two
+        // things, this design's recurring fault at its most literal.
+        _grains = Grains.Spans(settings.Bands, settings.Grains);
+
+        if (Damp + (settings.Plants * _grains) > byte.MaxValue + 1)
             throw new ArgumentOutOfRangeException(nameof(settings),
-                $"{settings.Plants} plants do not fit in the modality block at {Damp}");
+                $"{settings.Plants} plants at {_grains} grains do not fit in the "
+                + $"modality block at {Damp}");
 
         _settings = settings;
         _damp = [.. Enumerable.Repeat(1.0, settings.Plants)];
@@ -223,18 +256,25 @@ public sealed class Tending
     /// </remarks>
     public ImmutableArray<Code> Feels()
     {
-        var felt = new Code[_damp.Length + 1];
+        var felt = ImmutableArray.CreateBuilder<Code>();
 
         for (var which = 0; which < _damp.Length; which++)
         {
-            var band = (int)(_damp[which] * _settings.Bands);
-            felt[which] = new Code(
-                (byte)(Damp + which), (ulong)Math.Clamp(band, 0, _settings.Bands - 1));
+            var band = Math.Clamp((int)(_damp[which] * _settings.Bands), 0, _settings.Bands - 1);
+
+            // EACH PLANT OWNS A BLOCK OF MODALITIES, one per grain, so a coarse
+            // reading of one plant can never collide with a fine reading of
+            // another -- see Grains.Of.
+            felt.AddRange(Grains.Of(
+                (byte)(Damp + (which * _grains)),
+                band,
+                _settings.Bands,
+                _settings.Grains));
         }
 
-        felt[_damp.Length] = new Code(Where, (ulong)_at);
+        felt.Add(new Code(Where, (ulong)_at));
 
-        return [.. felt];
+        return felt.ToImmutable();
     }
 
     /// <summary>The code for doing one thing.</summary>

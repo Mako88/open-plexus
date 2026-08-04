@@ -39,7 +39,7 @@
 - **The graphs are tiny.** Nothing has run at a size where its claims could break;
   hold them loosely.
 
-### THE BET THE WHOLE DESIGN RESTS ON — name it, do not re-argue it
+### THE BET THE DESIGN RESTS ON — name it, do not re-argue it
 
 - **COUNTS ONLY EVER RISE.** The G-Counter property, and it buys convergence with
   no coordinator — which is what buys C1 and C2.
@@ -104,15 +104,13 @@ its ceiling it absorbs anything.)*
 
 ### 3. Chunking — MDL. **`Chunk` is built, and it is a trade**
 
-- **It mints a NODE where fork 21 mints an edge**, so the alphabet GROWS where the
-  quantiser fixed it forever. **The name is DERIVED from the sorted members**, so
-  two machines agree with nothing to ask — the only minting C1 permits. **The
-  threshold is description length**, not a constant.
+- **It mints a NODE where fork 21 mints an edge**, so the alphabet GROWS. **The
+  name is DERIVED from the sorted members**, so two machines agree with nothing to
+  ask. **The threshold is description length**, not a constant.
 - **IT BUYS THE TRAFFIC AND NOTHING ELSE.** The graph gets BIGGER and accuracy
   costs a little; the sets are a tiny share of a row count the noise dominates.
-- **A MINTED NODE IS A HUB BY CONSTRUCTION and `Pricing.Receiver` refuses hubs** —
-  the likely reading of that cost. **`Toll.Traffic` tests it**: a chunk should
-  become dear to ENTER and still believed.
+- **A MINTED NODE IS A HUB and `Pricing.Receiver` refuses hubs** — the likely
+  reading of that cost. **`Toll.Traffic` tests it.**
 - Open: **only a WHOLE moment is a candidate**, so a set inside a larger one is
   invisible — pair-merging (Sequitur, BPE) composes. And **utility belongs per
   chunk** (Minton, SOAR).
@@ -169,39 +167,42 @@ its ceiling it absorbs anything.)*
 
 ### 7. Credit over time — eligibility traces, and `Window` is already one
 
-- **The gap: nothing learns that an act led somewhere good three steps later**,
-  with no reward function and no backpropagation. **Three-factor Hebbian learning
-  needs neither** (Izhikevich 2007): a fading trace, and a third signal
-  consolidating what is still in it.
+- **The gap: nothing learns that an act led somewhere good three steps later.**
+  **Three-factor Hebbian learning needs no reward function and no
+  backpropagation** (Izhikevich 2007): a fading trace, and a third signal
+  consolidating what is in it.
 - **BUILT ON `Tending`, and it does not pay.** The trace reaches back an
   instrumental sequence — cross, pour, wait — weighted by recency; `Smeared` is the
-  control saying recency is not the point. **Counts only rise, so the CRDT property
-  holds.**
-- **IT WRITES MORE AND CHANGES NOTHING: coverage was not what was scarce, CREDIT
-  EVENTS ARE.** The body is silent, so it acts at random, so it rarely improves the
-  worst plant, so there is little to spread.
-- **AND EXPERIENCE MAKES IT WORSE.** Quadruple the run: distinct states more than
-  triple while credit cells grow less than half again. **Coverage does not stall,
-  it FALLS** — states arrive faster than credit ever can.
+  control. **Counts only rise, so the CRDT property holds.**
+- **IT WRITES MORE AND CHANGES NOTHING: coverage was not scarce, CREDIT EVENTS
+  ARE.** The body is silent, acts at random, rarely improves anything.
+- **AND EXPERIENCE MAKES IT WORSE.** Quadruple the run: states more than triple
+  while credit cells grow less than half again. **Coverage FALLS** — states arrive
+  faster than credit ever can.
 
 ### 8. Similarity — **and step 9 promoted it from an option to the only route**
 
 - **VARIABLE BINDING.** *A is north of B* is a count between two codes, so it
   cannot apply to a new A and B. **This un-parks vector-symbolic binding**;
-  `Clutrr` and `gSCAN` are the worlds that would force it.
-- **IT WAS BUILT ONCE, ON `master`, AND DID NOT CROSS THE REWRITE.**
-  **`surfaces.py`** put near inputs on near codes by random-hyperplane LSH
-  (Charikar), bits being the granularity dial. **`grounding.equivalence_classes`**
-  walked mutual-top-k co-occurrence to components — the distributional hypothesis
-  (Harris), and **step 9 refutes that half here**: a likeness read off the rows is
-  made of co-occurrence. `Code.Prefix` alone survives, read by fork 3.
+  `Clutrr` and `gSCAN` would force it.
+- **BUILT ONCE ON `master` AND DID NOT CROSS.** `surfaces.py` put near inputs on
+  near codes by random-hyperplane LSH (Charikar); `grounding.equivalence_classes`
+  read likeness off the rows — **and step 9 refutes that half**, being made of
+  co-occurrence. `Code.Prefix` alone survives, read by fork 3.
 - **A FRONT END FOR REAL PERCEPTION — measured once as THE binding constraint, and
   now the only route to generalisation as well.** Codes must be identical on every
   machine forever, so a fitted codebook is out — **and a uniform hash is agreed and
   unwalkable**, because the data is concentrated where uniform codes are not.
-  **Spending codes where the data is WITHOUT fitting one is the unbuilt middle.**
-- **REPLAY.** Re-run experience when nothing is arriving: consolidates, learns from
-  rare events, interleaves old against new. **`WhenIdle()` triggers it.**
+- **GRAINS ARE THE HALF NEEDING NO FITTING, AND THEY ARE BUILT.** Say each reading
+  COARSELY as well as finely and put both in the occasion: states differing finely
+  share the coarse code and meet at that node. **The hierarchy IS the likeness** —
+  nothing learnt, and two machines drop the same bits. **The `Groups` trick a
+  fourth time**, asking the front end least.
+- **THE COARSE CODES ARE SHARED — that much is measured. What they buy is not**,
+  because every credit arm on `Tending` is a coin toss, so **the world absorbs the
+  change.** Instrument at fault, not the arm.
+- **REPLAY.** Re-run experience when nothing is arriving. **`WhenIdle()` triggers
+  it**, and a body that cannot bootstrap is what it is for.
 - **INHIBITION — EXPRESSIBLE, AND IT DOES NOT PAY YET.** "Punishment is
   unavailable" was **the wrong CRDT, not a law**: a **PN-Counter** is two
   G-Counters read as a difference. `Kind.Hindered` costs a KIND, not a wider row,
@@ -216,14 +217,12 @@ its ceiling it absorbs anything.)*
   `With` it reaches almost everything and the credit dissolves; through `After` the
   composition is empty. **Backoff settles it**: narrow first, widening only on
   silence, overrides nothing and scores the same.
-- **SO THE SILENCE IS THE PRICE OF THE CONTRAST.** Anything wide enough to be
-  non-silent converges on what was DONE most — step 4's diagnosis, from a new
-  direction.
+- **SO THE SILENCE IS THE PRICE OF THE CONTRAST**: anything wide enough to be
+  non-silent converges on what was DONE most.
 - **WHICH MAKES STEP 8'S FRONT END THE ONLY ROUTE LEFT.** Every graph-internal
   likeness is made of co-occurrence and carries the policy with it; **a likeness
-  the graph did not compute cannot be.** Step 7 then measured why it is not
-  optional: **coverage FALLS as a run lengthens**, so states must stop being all
-  distinct.
+  the graph did not compute cannot be.** Step 7 measured why it is not optional:
+  **coverage FALLS as a run lengthens.**
 - **`Question.Downstream` — the successor representation (Dayan) — is unaskable**:
   it wants the REVERSE temporal edge a carried code does not write. **A real design
   question** — see `Kind.Before`.
@@ -243,13 +242,10 @@ its ceiling it absorbs anything.)*
   helped, so the arm is mostly its own coin toss — **and TRAPS calls a fallback a
   control arm nobody meant to run.**
 - **BUILT, AND NOT MEASURABLE ON `Homeostat`: THE PREDICTION WALK RETURNS NOTHING
-  THERE**, the same empty `after` that silenced step 9. Every moment reads as
-  maximally surprising, so the dense arm writes always and the selective one never.
-  **Neither is evidence about curiosity.** `Tending` carries a window by default
-  and is where to re-run it.
-- **AND IT IS WHAT `Tending` IS ACTUALLY SHORT OF**: the body is silent, so it acts
-  at random, so credit almost never fires. **The bootstrap is the blocker there,
-  not the spreading.**
+  THERE.** Every moment reads as maximally surprising, so the dense arm writes
+  always and the selective one never. **Neither is evidence about curiosity.**
+- **AND IT IS WHAT `Tending` IS SHORT OF**: silent, so random, so credit never
+  fires. **The bootstrap is the blocker there.**
 
 ### 11. NOTHING HERE PLANS. Every action is a reflex
 
@@ -279,10 +275,13 @@ its ceiling it absorbs anything.)*
   on stamina; see the trap about one dial measured at another's setting**
 - [x] `Question.Path` — step 9's mixed-kind walk. **Built, and the idea it was
   built for is refuted; see step 9**
-- [ ] `Kind.Informed` — step 10's curiosity
+- [x] `Kind.Informed` — step 10's curiosity. **Unmeasurable so far; see step 10**
+- [x] `Grains` — step 8's front end, and the coarse codes are shared
 - [x] `Tending` — the **second body**, and it does not confirm step 4
 - [ ] The rollout of step 11
 - [ ] Surprise on the write path — step 2's second half
+- [ ] **A world an arm can bootstrap in** — every credit arm on `Tending` is a
+  coin toss, so nothing downstream of the bootstrap can be measured there
 
 ---
 

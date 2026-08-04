@@ -259,11 +259,106 @@ public sealed class TendingTests(ITestOutputHelper output)
         Assert.Empty(traced.Complaints);
     }
 
+    /// <summary>
+    /// Step 8 — <b>the same reading said coarsely as well as finely, and it is the
+    /// only likeness left that the graph did not compute.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>COVERAGE IS THE MEASURED BOTTLENECK AND IT GETS WORSE WITH
+    /// EXPERIENCE.</b> Quadrupling a run here grows the states more than three
+    /// times over while the credit cells grow less than half again, so a cell keyed
+    /// on the state that earned it falls further behind the longer the body runs.
+    /// Step 7 could not fix that by spreading credit further back, and step 9
+    /// established it cannot be fixed by asking a wider question.
+    /// </para>
+    /// <para>
+    /// <b>SO STATES HAVE TO STOP BEING ALL DISTINCT.</b> Two states differing in
+    /// the fine band share the coarse one, and meet at that node — with nothing
+    /// deciding they are similar and nothing derived from what the body did.
+    /// </para>
+    /// <para>
+    /// <b>THE READING IS THE STATE COUNT BESIDE THE SILENCE.</b> Grains should cut
+    /// the distinct states and the silence together; if the states fall and the
+    /// silence does not, the coarse codes are being written and not walked.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task Saying_it_coarsely_as_well_as_finely_against_saying_it_once()
+    {
+        var graded = World() with { Grains = 3 };
+
+        var arms = await Sweep.AcrossAsync(
+            8,
+            Arm("blind", Gardening.Blind),
+            Arm("credited", Gardening.Credited),
+            Arm("credited+grained", Gardening.Credited, graded),
+            Arm("traced+grained", Gardening.Traced, graded),
+            Arm("best", Gardening.Best));
+
+        output.WriteLine(Sweep.Table(arms));
+
+        foreach (var (name, world, how) in
+            (( string, TendingSettings, Gardening )[])
+            [("fine", World(), Gardening.Credited),
+             ("grained", graded, Gardening.Credited),
+             ("grained+traced", graded, Gardening.Traced)])
+        {
+            using var run = new TendingRun(world, Dials, seed: 1);
+            var result = await run.RunAsync(Steps, how);
+
+            output.WriteLine(
+                $"{name,-15} silent={result.Silent,3}/{result.Steps} "
+                + $"viable={result.Viable:F4} states={result.States} "
+                + $"edges={result.Edges} widest={result.Widest} msgs={result.Messages}");
+        }
+
+        using var fine = new TendingRun(World(), Dials, seed: 1);
+        using var coarse = new TendingRun(graded, Dials, seed: 1);
+
+        var sharp = await fine.RunAsync(Steps, Gardening.Credited);
+        var blurred = await coarse.RunAsync(Steps, Gardening.Credited);
+
+        // THE STATE COUNT CANNOT FALL AND EXPECTING IT TO WAS A MISREADING OF THE
+        // INSTRUMENT. `Felt.Key` counts distinct code SETS, and grains ADD codes
+        // without removing any — so two states that differ finely still differ as
+        // sets, however much they now share. The count is unchanged by
+        // construction and says nothing either way.
+        //
+        // WHAT THE MECHANISM ACTUALLY CLAIMS is that a coarse code is SHARED where
+        // a fine one is not, and a shared code is a node many states meet at —
+        // which shows up as a WIDER row, not a smaller state count.
+        Assert.Equal(sharp.States, blurred.States);
+
+        Assert.True(blurred.Widest > sharp.Widest,
+            $"the coarse codes are not shared by anything ({blurred.Widest} against "
+            + $"{sharp.Widest}), so they are a cost with no likeness in them");
+
+        // AND THE HONEST READING OF THE SCORE: THIS WORLD CANNOT MEASURE ANY OF IT
+        // YET. Every credit arm here is silent on 399 of 400 steps and scores
+        // exactly what a coin toss scores, so what is being compared is four copies
+        // of the same random policy. THE BOOTSTRAP DOMINATES EVERYTHING
+        // DOWNSTREAM.
+        //
+        // THAT IS THE PLAN'S OWN RULE ABOUT A WORLD ABSORBING A CHANGE — at chance
+        // or at its ceiling it says nothing — and it is the instrument at fault
+        // rather than the arm. The garden has four plants at eight bands across
+        // four positions, so the credit cell can never populate within a run; it
+        // has to be shrunk until an arm can get off the ground, and only then
+        // grown back.
+        Assert.True(blurred.Silent > Steps * 0.9,
+            "an arm here has stopped being nearly all coin toss, so this world can "
+            + "now discriminate credit arms and the note above is out of date");
+
+        Assert.Empty(blurred.Complaints);
+    }
+
     /// <summary>One arm of a sweep, so two tables cannot drift apart.</summary>
-    private static (string, Func<int, Task<double>>) Arm(string name, Gardening how) =>
+    private static (string, Func<int, Task<double>>) Arm(
+        string name, Gardening how, TendingSettings? world = null) =>
         (name, async seed =>
         {
-            using var run = new TendingRun(World(), Dials, seed);
+            using var run = new TendingRun(world ?? World(), Dials, seed);
             return (await run.RunAsync(Steps, how)).Viable;
         });
 }

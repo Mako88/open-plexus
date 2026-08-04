@@ -143,35 +143,14 @@ public enum Attending
     /// </para>
     /// <para>
     /// <b>This writes <see cref="Graph.Kind.Hindered"/> when the most-at-risk
-    /// variable got worse</b>, and the walk reads the difference. Both counts still
-    /// only ever rise — the PN-Counter property — so nothing about convergence
-    /// changes. See <see cref="Graph.Kind.Hindered"/> for why the plan's "counts
-    /// only increment, so punishment is unavailable" was the wrong CRDT rather
-    /// than a law.
+    /// variable got worse</b>, and the second join raises the ACT's own marginal —
+    /// so an act that often hurts sinks through the denominator every credit weight
+    /// already divides by. Both counts still only rise, so convergence is untouched.
+    /// <b>Nothing reads the negative cell; writing it is the entire mechanism</b>,
+    /// which was measured rather than intended — see <see cref="Graph.Kind.Hindered"/>.
     /// </para>
     /// </remarks>
     Contested,
-
-    /// <summary>
-    /// <see cref="Contested"/>'s WRITES WITHOUT ITS DISCOUNT — <b>the control that
-    /// says which half of the negative cell is doing the work.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>THE ARM CHANGES TWO THINGS, so on its own it can attribute neither.</b>
-    /// Writing <see cref="Graph.Kind.Hindered"/> reinforces the occasion a SECOND
-    /// time whenever things got worse — which raises every participating code's
-    /// marginal, lowers every weight read against it, and makes every hop dearer.
-    /// That is a budget change and a learning signal at once. READING the cell is a
-    /// separate mechanism: a partner that hurt more than it helped is believed less.
-    /// </para>
-    /// <para>
-    /// <b>This writes the cell and ignores it</b>, so the gap between this and
-    /// <see cref="Contested"/> is the discount and nothing else — and the gap
-    /// between this and <see cref="Credited"/> is the extra write and nothing else.
-    /// </para>
-    /// </remarks>
-    Unheeded,
 
     /// <summary>
     /// <see cref="Credited"/> READ AGAINST THE BASE RATE — <b>ΔP, and the first
@@ -485,7 +464,6 @@ public sealed class HomeostatRun : IDisposable
                     choosing switch
                     {
                         Attending.Contingent => Question.Contingent(),
-                        Attending.Unheeded => Question.Worthwhile() with { Unheeding = true },
                         Attending.Credited or Attending.Marked
                             or Attending.Contested => Question.Worthwhile(),
                         _ => null,
@@ -579,8 +557,7 @@ public sealed class HomeostatRun : IDisposable
                 owed = (occasion, step);
             }
             else if (choosing is Attending.Credited or Attending.Marked
-                     or Attending.Contested or Attending.Contingent
-                     or Attending.Unheeded)
+                     or Attending.Contested or Attending.Contingent)
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
                 // ordinary cell is untouched and this arm changes one thing.
@@ -603,8 +580,7 @@ public sealed class HomeostatRun : IDisposable
                 if (crediting is { } earned)
                 {
                     var helped = choosing == Attending.Marked || sensing.Credit > 1.0;
-                    var hurt = choosing is Attending.Contested or Attending.Unheeded
-                        && sensing.Credit < 1.0;
+                    var hurt = choosing == Attending.Contested && sensing.Credit < 1.0;
 
                     if (helped || hurt)
                     {

@@ -80,43 +80,6 @@ public readonly record struct Message
     public double Seen { get; init; }
 
     /// <summary>
-    /// Evidence AGAINST the edge being travelled — the N half of the PN-Counter,
-    /// carried so the far end can discount without reading anything.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>C1-LEGAL BY THE SAME ARGUMENT <see cref="Together"/> IS</b>: it is the
-    /// sender's own row entry, about a pair the sender holds, put into the message
-    /// rather than looked up across a boundary.
-    /// </para>
-    /// <para>
-    /// <b>IT TRAVELS BECAUSE IT MUST REACH THE SCORE WITHOUT REACHING THE
-    /// PRICE.</b> Applying it where the sender fans out folds it into
-    /// <see cref="Together"/>, which is both the ranking and the cost of the hop —
-    /// so every discounted partner also became dearer to reach, routes starved,
-    /// and the walk fell quiet. Measured: silence rose from 330 of 400 steps to
-    /// 387 and the arm lost what the credit had bought. <b>That is the recurring
-    /// fault of this design in its purest form</b>, and
-    /// <see cref="Graph.WalkSettings.Doubt"/> exists because of the identical
-    /// mistake made once before.
-    /// </para>
-    /// <para>
-    /// <b>AND IT IS INERT, WHICH WAS MEASURED AFTER ALL OF THE ABOVE WAS
-    /// WRITTEN.</b> An arm that writes <see cref="Graph.Kind.Hindered"/> and
-    /// IGNORES this field reproduces the arm that reads it to four decimal places
-    /// at three budgets. The whole of the negative half's effect is the second
-    /// write raising the act's marginal; nothing is coming from this discount.
-    /// <b>The honest options are the two this project always names — delete it, or
-    /// find the world where it earns its field.</b>
-    /// </para>
-    /// <para>
-    /// <b>Zero is every message sent before the negative half existed</b>, and
-    /// leaves the score exactly where it was.
-    /// </para>
-    /// </remarks>
-    public double Against { get; init; }
-
-    /// <summary>
     /// What relation this message arrived on. <b>Meaningless on an origin, which
     /// has not travelled.</b>
     /// </summary>
@@ -154,18 +117,6 @@ public readonly record struct Message
     /// is and for the same reason — a node cannot see the question.
     /// </summary>
     public bool Contrasted { get; init; }
-
-    /// <summary>
-    /// Whether this walk IGNORES what argues against a partner. <b>False is every
-    /// message sent before the control existed</b>; see
-    /// <see cref="Question.Unheeding"/>.
-    /// </summary>
-    /// <remarks>
-    /// <b>Named for the exception rather than the rule</b>, because a struct cannot
-    /// carry a field initialiser without a constructor and the default has to be
-    /// what every earlier measurement did.
-    /// </remarks>
-    public bool Unheeding { get; init; }
 
     /// <summary>
     /// Whether this walk prefers recently-touched entries. <b>Set once at the
@@ -211,7 +162,7 @@ public readonly record struct Message
     /// <remarks>
     /// <para>
     /// <b>CARRIED RATHER THAN LOOKED UP, by the same argument as
-    /// <see cref="Together"/> and <see cref="Against"/>.</b> The base rate is the
+    /// <see cref="Together"/>.</b> The base rate is the
     /// SENDER's marginal, so only the sender can compute this — and telling the
     /// receiver costs a field where asking would cost a round trip and a C1
     /// violation.

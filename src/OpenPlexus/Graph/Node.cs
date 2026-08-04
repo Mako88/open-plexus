@@ -509,15 +509,6 @@ public sealed class Node
                 ? arriving
                 : Math.Min(message.Together / (by + _settings.Doubt), 1.0);
 
-            // AND THE NEGATIVE HALF DISCOUNTS THE SCORE, ON THE SAME SIDE OF THAT
-            // LINE AND FOR THE SAME REASON. `helped / (helped + hindered)` is at
-            // most one, so a partner that hurt more than it helped is believed
-            // less and is never made harder to REACH -- the price above still
-            // comes from the raw ratio, so a hop still costs at least one and the
-            // walk stays bounded. See Message.Against and Kind.Hindered.
-            if (!message.Unheeding && message.Against > 0.0 && message.Together > 0.0)
-                believed *= message.Together / (message.Together + message.Against);
-
             // AND THE BASE RATE DISCOUNTS THE SCORE, ON THAT SAME SIDE OF THE LINE
             // AND FOR THE FIFTH TIME. ΔP is at most one, so this can only ever
             // believe a partner LESS -- it never makes one cheaper or dearer to
@@ -599,20 +590,6 @@ public sealed class Node
         //
         var outgoing = ImmutableArray.CreateBuilder<Message>(row.Length);
 
-        // THE NEGATIVE HALF OF THE PN-COUNTER, READ ONCE FOR THE WHOLE FAN-OUT.
-        // Built from the snapshot rather than looked up per partner, so inhibition
-        // costs one pass over a row that has already been copied. See
-        // `Kind.Hindered`.
-        Dictionary<Code, double>? against = null;
-
-        foreach (var (edge, tie) in row)
-        {
-            if (edge.Kind != Kind.Hindered) continue;
-
-            against ??= [];
-            against[edge.Partner] = against.GetValueOrDefault(edge.Partner) + tie.Count;
-        }
-
         // HOW FAST THIS ROW IS WRITTEN, IN ITS OWN CLOCK. The span between its
         // oldest and newest stamps, divided by how many entries there are, is the
         // mean gap between writes -- and dividing an age by that removes the clock's
@@ -650,26 +627,10 @@ public sealed class Node
 
         foreach (var (edge, tie) in row)
         {
-            // A CELL WITH A NEGATIVE COUNTERPART IS READ AS THE DIFFERENCE, and
-            // the counterpart itself is never walked -- it is evidence about the
-            // positive cell, not a route.
+            // A HINDERED CELL IS EVIDENCE AND NEVER A ROUTE, so it is not walked.
+            // What it does is raise the act's own marginal when it is written --
+            // see Kind.Hindered -- and nothing reads it here.
             if (edge.Kind == Kind.Hindered) continue;
-
-            // THE NEGATIVE HALF IS CARRIED, NOT APPLIED HERE, AND THAT WAS
-            // MEASURED TWICE OVER. Folding it into the count -- by subtracting or
-            // by scaling -- discounts the RANKING and the PRICE together, because
-            // this one number is still both. Every discounted partner became
-            // dearer to reach, routes starved, and the walk went quiet: silence
-            // rose from 330 of 400 steps to 387 and the arm gave back what the
-            // credit had bought, under a hard cut and a soft scaling alike.
-            //
-            // So it rides on the message and the receiver applies it to the score
-            // alone -- which is exactly what `Doubt` does, for exactly the same
-            // reason, having been got wrong the same way once already.
-            var opposed = edge.Kind == Kind.Helped && against is not null
-                && against.TryGetValue(edge.Partner, out var hurt)
-                    ? hurt
-                    : 0.0;
 
             // The cycle check: free, because the chain is already travelling.
             // ON THE PARTNER AND NOT ON THE ENTRY: a route that reached B by
@@ -691,9 +652,6 @@ public sealed class Node
                 Chain = message.Chain.Add(edge.Partner),
                 Carried = carried,
                 Together = tie.Count,
-
-                // WHAT ARGUES AGAINST THIS EDGE. See Message.Against.
-                Against = opposed,
 
                 // HOW CURRENT THIS ENTRY IS, in units of this row's own rhythm. One
                 // where the row has no spread, which is the honest reading: entries

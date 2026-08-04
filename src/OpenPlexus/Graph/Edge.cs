@@ -207,41 +207,23 @@ public readonly record struct Kind : IComparable<Kind>
     /// <para>
     /// <b>THE PLAN SAID PUNISHMENT WAS UNAVAILABLE, AND IT WAS THE WRONG CRDT
     /// RATHER THAN A LAW.</b> Counts must only increase, so a factor that could go
-    /// negative would break convergence — true of ONE counter. A <b>PN-Counter</b>
-    /// (Shapiro et al., 2011) is TWO G-Counters, and its value is read as the
-    /// difference: each side only ever rises, each merges by taking the larger,
-    /// and the derived quantity can still fall. Convergence is untouched.
-    /// <see cref="Helped"/> is P and this is N.
+    /// negative would break convergence — true of ONE counter, and this is the
+    /// second. <see cref="Helped"/> is the other.
     /// </para>
     /// <para>
-    /// <b>IT COSTS A KIND AND NOT A FIELD, WHICH IS WHY IT IS AFFORDABLE.</b> The
-    /// row is keyed by <c>(partner, kind)</c>, so this is one more entry per
-    /// partner that earns one — the cost model <see cref="Tie"/> already names.
-    /// Widening the row a second time is what that note forbids, and this does not.
+    /// <b>IT WORKS THROUGH A MARGINAL AND NOT THROUGH A SUBTRACTION, AND THAT WAS
+    /// MEASURED THE HARD WAY.</b> Writing this cell joins the occasion a SECOND
+    /// time, which raises <c>seen</c> for every code in it — <b>the ACT's marginal
+    /// included</b>. Every credit weight is <c>together / seen(act)</c>, so an act
+    /// that often hurts sinks through its DENOMINATOR. Two rising counts, no
+    /// subtraction, and it costs nothing because the occasion was already written.
     /// </para>
     /// <para>
-    /// <b>AND THE READ SIDE OF IT IS INERT — MEASURED, AND IT OVERTURNS WHAT THIS
-    /// NOTE USED TO SAY.</b> The subtraction happens where the sender fans out,
-    /// carried on <see cref="Thinking.Message.Against"/> so it reaches the score
-    /// without reaching the price. An arm that writes this cell and IGNORES it
-    /// reproduces the arm that reads it to four decimal places at every budget, so
-    /// the discount contributes nothing whatever.
-    /// </para>
-    /// <para>
-    /// <b>WHAT WORKS IS THE WRITE, AND IT WORKS THROUGH A MARGINAL.</b> Writing this
-    /// cell joins the occasion a second time, which raises <c>seen</c> for every
-    /// code in it — <b>the ACT's marginal included</b>. Every credit weight is
-    /// <c>together / seen(act)</c>, so an act that often hurts ranks lower through
-    /// its DENOMINATOR. <b>That is inhibition, and it is built from two rising
-    /// counts with no subtraction anywhere</b> — cheaper than the mechanism this
-    /// note was written to justify, and it needs neither the carried field nor the
-    /// clamp.
-    /// </para>
-    /// <para>
-    /// <b>Together the two cells are a contingency rather than a frequency.</b>
-    /// <c>(helped − hindered) / seen</c> is the shape of Rescorla and Wagner's
-    /// ΔP: what a count of co-occurrence structurally cannot say is whether the
-    /// thing helped MORE than it hurt, and two monotonic counters can.
+    /// <b>A DISCOUNT CARRIED TO THE RECEIVER WAS BUILT FIRST AND IS DELETED.</b> An
+    /// arm that wrote this cell and IGNORED that discount reproduced the arm that
+    /// read it to four decimal places at three budgets — including on a world where
+    /// an act is good in one state and bad in another, which was the one condition
+    /// under which it should have mattered.
     /// </para>
     /// </remarks>
     public static Kind Hindered { get; } = Of("hindered");

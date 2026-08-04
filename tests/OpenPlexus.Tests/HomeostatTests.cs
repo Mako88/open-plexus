@@ -522,47 +522,49 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         }
     }
 
-    [Fact]
-    public async Task The_credit_cell_read_against_the_base_rate()
+    /// <summary>
+    /// The contingency, its control and the bar, all at one budget.
+    /// </summary>
+    /// <remarks>
+    /// <b>ONE PLACE, BECAUSE THE TWO MEASUREMENTS BELOW DIFFER ONLY IN STAMINA.</b>
+    /// The whole claim is that the same three arms behave differently at two
+    /// budgets, and that is worth nothing if they are not the same three arms —
+    /// which is what <c>DuplicationTests</c> was saying when it refused the second
+    /// copy.
+    /// </remarks>
+    private async Task<IReadOnlyList<Measured>> ContingencyAsync(
+        WalkSettings dials, int seeds)
     {
-        // ΔP AGAINST THE HIT RATE, AND `Credited` IS THE CONTROL. The same cells
-        // are written, the same relation is walked, the same occasion is joined a
-        // step late on the same condition; what moves is that a partner is believed
-        // by how much it RAISED the chance of improvement rather than by how often
-        // it accompanied one. One thing changes.
         var arms = await Sweep.AcrossAsync(
-            12,
+            seeds,
             ("blind", async seed =>
             {
-                using var run = new HomeostatRun(World(), Dials, seed);
+                using var run = new HomeostatRun(World(), dials, seed);
                 return (await run.RunAsync(Steps, Attending.Blind)).Viable;
             }),
             ("credited", async seed =>
             {
-                using var run = new HomeostatRun(World(), Dials, seed);
+                using var run = new HomeostatRun(World(), dials, seed);
                 return (await run.RunAsync(Steps, Attending.Credited)).Viable;
             }),
             ("contingent", async seed =>
             {
-                using var run = new HomeostatRun(World(), Dials, seed);
+                using var run = new HomeostatRun(World(), dials, seed);
                 return (await run.RunAsync(Steps, Attending.Contingent)).Viable;
             }));
 
         output.WriteLine(Sweep.Table(arms));
 
-        // AND THE SILENCE BESIDE THE SCORE, WHICH MATTERS MORE FOR THIS ARM THAN
-        // FOR ITS CONTROL. A contingency reads nought where an act has no
-        // complement to compare against as well as where it truly makes no
+        // AND THE SILENCE AND THE CHOICE COUNT BESIDE THE SCORE, WHICH MATTER MORE
+        // FOR THIS ARM THAN FOR ITS CONTROL. A contingency reads nought where an act
+        // has no complement to compare against as well as where it truly makes no
         // difference, and both are believed nothing -- so this arm can go quiet for
         // a reason that is not a judgement about any act, and a quieter arm drifts
         // toward the blind bar for free.
-        var reports = new List<HomeostatResult>();
-
         foreach (var arm in (Attending[])[Attending.Credited, Attending.Contingent])
         {
-            using var run = new HomeostatRun(World(), Dials, seed: 1);
+            using var run = new HomeostatRun(World(), dials, seed: 1);
             var result = await run.RunAsync(Steps, arm);
-            reports.Add(result);
 
             output.WriteLine(
                 $"{arm,-11} silent={result.Silent,3}/{result.Steps} "
@@ -572,12 +574,27 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         }
 
         var bar = arms.First(one => one.Arm == "blind");
+        var control = arms.First(one => one.Arm == "credited");
+
+        Assert.True(control.Mean > bar.Mean,
+            $"the control stopped beating the bar ({control.Mean:F4} against "
+            + $"{bar.Mean:F4}), so there is nothing here to compare against");
+
+        return arms;
+    }
+
+    [Fact]
+    public async Task The_credit_cell_read_against_the_base_rate()
+    {
+        // ΔP AGAINST THE HIT RATE, AND `Credited` IS THE CONTROL. The same cells
+        // are written, the same relation is walked, the same occasion is joined a
+        // step late on the same condition; what moves is that a partner is believed
+        // by how much it RAISED the chance of improvement rather than by how often
+        // it accompanied one. One thing changes.
+        var arms = await ContingencyAsync(Dials, seeds: 12);
+
         var hitRate = arms.First(one => one.Arm == "credited");
         var contingency = arms.First(one => one.Arm == "contingent");
-
-        Assert.True(hitRate.Mean > bar.Mean,
-            $"the control stopped beating the bar ({hitRate.Mean:F4} against "
-            + $"{bar.Mean:F4}), so there is nothing here to compare against");
 
         // THE ARM REPRODUCES ITS CONTROL EXACTLY, AND THE REASON IS MEASURED
         // RATHER THAN GUESSED. `Contingent` is a change to how candidates are
@@ -595,16 +612,60 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         // nothing about it has been tested here either way.
         //
         // AND IT GENERALISES PAST THIS ARM, WHICH IS THE FINDING WORTH KEEPING:
-        // `Homeostat` cannot discriminate ANY pure re-ranking. Every future arm
-        // that changes the order of candidates rather than which candidates exist
-        // needs a different world or a wider walk, and `Choices` is how to tell
-        // before spending a sweep on it.
+        // at THIS BUDGET `Homeostat` cannot discriminate any pure re-ranking. Every
+        // arm that changes the order of candidates rather than which candidates
+        // exist needs a wider walk or another world, and `Choices` is how to tell
+        // before spending a sweep on it. The test below spends the wider walk.
         Assert.Equal(hitRate.Mean, contingency.Mean, precision: 2);
 
-        Assert.True(reports[1].Choices <= 2,
-            $"the walk now offers a choice on {reports[1].Choices} steps of "
-            + $"{Steps}, so a ranking arm may finally be measurable here and the "
+        using var probe = new HomeostatRun(World(), Dials, seed: 1);
+        var choices = (await probe.RunAsync(Steps, Attending.Contingent)).Choices;
+
+        Assert.True(choices <= 2,
+            $"the walk now offers a choice on {choices} steps of {Steps}, so a "
+            + "ranking arm may finally be measurable at THIS budget and the "
             + "reproduction above needs re-reading rather than explaining away");
+    }
+
+    [Fact]
+    public async Task And_again_at_the_budget_where_this_world_offers_a_choice()
+    {
+        // THE MEASUREMENT THE LAST ONE COULD NOT TAKE. At the stamina every credit
+        // arm here was measured at, the walk reaches one action and a re-ranking has
+        // nothing to re-rank. AT DOUBLE THAT BUDGET IT REACHES TWO on about a fifth
+        // of steps, and the credit arm itself scores far better -- so this is not a
+        // handicapped corner of the world, it is a better-run version of it, and
+        // the setting the whole of step 4 was measured at is the corner.
+        var arms = await ContingencyAsync(Fixture.Dials(stamina: 8.0), seeds: 32);
+
+        var hitRate = arms.First(one => one.Arm == "credited");
+        var contingency = arms.First(one => one.Arm == "contingent");
+
+        output.WriteLine($"separation {contingency.Separation(hitRate):F2} sigma");
+
+        // AND THE ANSWER IS THAT IT DOES NOT SEPARATE. The arm is no longer
+        // reproducing its control -- the numbers differ and the choice counts
+        // roughly double, so the mechanism IS reaching the walk -- and the
+        // difference is inside the noise.
+        //
+        // THE SEED COUNT IS WHY THAT IS SAID FLATLY. At twelve seeds the contingency
+        // sat 1.22 sigma above its control, which is the shape of a result about to
+        // be believed; at thirty-two it sits at 0.78. THE GAP NARROWED AS EVIDENCE
+        // ARRIVED, which is what noise does and what a mechanism does not. This
+        // project has been caught by a small sample once already -- one seed of step
+        // 4's credit arm drew a clean learning curve that six seeds flattened.
+        //
+        // WHY IT MAY STILL PAY ELSEWHERE, stated so it is not re-argued: here every
+        // act is available in every state and helps or does not, so the background
+        // barely varies BY STATE -- and a base rate that does not vary by state is a
+        // constant, which re-ranks nothing. That is the same arithmetic that killed
+        // the world-level base rate, one remove out. What would test it is a world
+        // where some states are recoverable and others are not.
+        Assert.True(contingency.Separation(hitRate) < 2.0,
+            $"the contingency now separates from the hit rate "
+            + $"({contingency.Mean:F4} against {hitRate.Mean:F4}), which is step "
+            + "4's second cell finally paying and should be recorded as that "
+            + "rather than as a null");
     }
 
     [Fact]

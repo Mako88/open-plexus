@@ -255,9 +255,14 @@ its ceiling it absorbs anything.)*
   **It works and round-robins, scoring below the coin toss.**
 - **EVERYTHING TRIED CHANGED THE READ SIDE, SO ΔP CHANGES WHAT IS WRITTEN.**
   `Node.Contingency` subtracts the base rate a hit rate cannot see, off a marginal
-  split by relation and not off the row. **Audited at the unit level, wired, and
-  `Homeostat` ABSORBS IT** — see the trap below. **Exploration generates the data,
-  a contingency makes it mean something, neither suffices.**
+  split by relation and not off the row. **Audited at the unit level, wired, and it
+  does not separate from the hit rate** where the walk offers a choice at all.
+- **AND THE LIKELY REASON IS THE SAME ARITHMETIC ONE REMOVE OUT.** On `Homeostat`
+  every act is available in every state, so the background barely varies BY STATE —
+  and a base rate that does not vary by state is a constant, which re-ranks
+  nothing. **What would test it is a world where some states are recoverable and
+  others are not.** **Exploration generates the data, a contingency makes it mean
+  something, neither suffices.**
 
 - **NONE OF IT IS A SUFFICIENCY ARGUMENT.** The narrower claim: without structure,
   an internal error signal, a growing alphabet, a reason to act, a reason to seek,
@@ -385,9 +390,12 @@ process** — kept, because a real network loses reports.
 - **A dial can be declared, documented, passed everywhere and connected to
   nothing.** `ThinkAsync`'s stamina was, and survived three measurements.
   **Every run reports `Complaints`; read them.**
-- **A RANKING ARM NEEDS SOMETHING TO RANK.** On `Homeostat` the walk offers two
-  actions on one step in six hundred, so a re-ranking reproduces its control
-  exactly — *no opportunity* reading as *no effect*. **Read `Choices`.**
+- **A RANKING ARM NEEDS SOMETHING TO RANK.** At the stamina every credit arm here
+  was measured at, `Homeostat`'s walk offers two actions on one step in six
+  hundred, so a re-ranking reproduces its control exactly — *no opportunity*
+  reading as *no effect*. **Read `Choices`.** **Doubling the budget offers a choice
+  on a fifth of steps**, so the setting the whole of step 4 was measured at is a
+  corner rather than the world.
 - **A CHECK CAN BE WIRED AND UNABLE TO FIRE, which reads as passing.** Two worlds
   counted `unbalanced` off a variable nothing incremented; step 10's selective arm
   reproduced its control down to the edge count. **Arm a check that has always read

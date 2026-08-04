@@ -641,6 +641,144 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             + $"every state's: {narrow.Mean:F4} against {wider.Mean:F4}");
     }
 
+    /// <summary>
+    /// <b>A consequence is not a resemblance</b> — what helps where the body is
+    /// heading, against what helped where it has been.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THIS WORLD HAD NO TEMPORAL CELLS AT ALL, WHICH NOBODY HAD NOTICED.</b>
+    /// Every occasion was a flat set under <c>With</c>, so <c>after</c> was empty
+    /// everywhere and no question about what FOLLOWS could reach anything. The
+    /// span that fills it is the refuted `Window` row revived by its own condition:
+    /// a carried edge is the only thing that can answer this question.
+    /// </para>
+    /// <para>
+    /// <b>THREE ARMS, BECAUSE THE SPAN CHANGES TWO THINGS.</b> Carrying a window
+    /// adds edges to the graph AND makes a new question askable, so `credited` at
+    /// the same span is the control that separates them — same graph, old question.
+    /// Without it a lift here could be the extra edges rather than the lookahead,
+    /// which is the mistake `Delayed` and `Marked` exist to prevent elsewhere.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task What_helps_where_it_is_heading_against_what_helped_where_it_has_been()
+    {
+        var arms = await Sweep.AcrossAsync(
+            12,
+            ("blind", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Blind)).Viable;
+            }),
+            ("credited", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
+            }),
+            ("credited+carried", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed, span: 1);
+                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
+            }),
+            ("foreseeing", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed, span: 1);
+                return (await run.RunAsync(Steps, Attending.Foreseeing)).Viable;
+            }),
+
+            // THE SYNTHESIS: the narrow question, widened only where it was
+            // silent. See Attending.Backing for why this is a real test either
+            // way — the general question's answers are worse than a coin toss on
+            // average, and this replaces a coin toss with them.
+            ("backing", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Backing)).Viable;
+            }),
+            ("lowest", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Lowest)).Viable;
+            }));
+
+        output.WriteLine(Sweep.Table(arms));
+
+        // THE SILENCE BESIDE THE SCORE, AND THE EDGE COUNT BESIDE BOTH. A span
+        // that wrote no temporal cells at all would leave `foreseeing` unable to
+        // take its first hop, which reads as silence and not as a wiring fault —
+        // so the edge count is what tells an arm that did nothing from one that
+        // was never connected.
+        // AND THE SPAN IS SWEPT, WHICH IS THE ONLY WAY TO TELL A CHECK THAT FIRED
+        // AND FOUND NOTHING FROM ONE THAT COULD NOT FIRE. A lookahead arm silent
+        // on every step of a run either has no `after` cell to take its first hop
+        // through, or has them and finds no `helped` cell beyond — and those want
+        // opposite fixes. If widening the window moves the silence at all, the
+        // path is wired and the graph is merely sparse.
+        foreach (var (arm, span) in
+            (( Attending, int )[])[(Attending.Credited, 0), (Attending.Credited, 1),
+                (Attending.Foreseeing, 1), (Attending.Foreseeing, 3),
+                (Attending.Foreseeing, 8), (Attending.Backing, 0)])
+        {
+            using var run = new HomeostatRun(World(), Dials, seed: 1, span: span);
+            var result = await run.RunAsync(Steps, arm);
+
+            output.WriteLine(
+                $"{arm,-11} span={span} silent={result.Silent,3}/{result.Steps} "
+                + $"viable={result.Viable:F4} states={result.States} "
+                + $"edges={result.Edges} msgs={result.Messages}");
+        }
+
+        // THE CARRIED WINDOW DID WRITE CELLS, so the lookahead arm is not silent
+        // for want of wiring — it is silent because the composition it asks for is
+        // empty. Widening the window from one moment to eight triples the messages
+        // and moves the silence not at all, which is the check firing rather than
+        // failing to.
+        using var carried = new HomeostatRun(World(), Dials, seed: 1, span: 1);
+        var withEdges = await carried.RunAsync(Steps, Attending.Foreseeing);
+
+        using var flat = new HomeostatRun(World(), Dials, seed: 1);
+        var withoutEdges = await flat.RunAsync(Steps, Attending.Foreseeing);
+
+        Assert.True(withEdges.Edges > withoutEdges.Edges,
+            $"carrying a window wrote no extra cells ({withEdges.Edges} against "
+            + $"{withoutEdges.Edges}), so the silence above is a wiring fault "
+            + "rather than an empty composition and means something different");
+
+        // AND THE FINDING THAT MATTERS, WHICH IS NOT ABOUT EITHER PATH.
+        //
+        // `backing` asks the narrow question FIRST and widens only where it was
+        // silent, so every answer the credit cell had is preserved and only the
+        // coin tosses are replaced. It scores what `kindred` scores. THE WIDENING
+        // IS WHAT COSTS, AND IT COSTS EVEN WHEN IT OVERRIDES NOTHING.
+        //
+        // SO THE GENERAL QUESTION'S ANSWERS ARE WORSE THAN A COIN TOSS, and the
+        // reason is step 4's own diagnosis arriving from a new direction: a walk
+        // wide enough to be non-silent converges on what was DONE most, and in a
+        // body what was done most is what put the body here. Widening is
+        // un-contrasting.
+        //
+        // THE SILENCE IS THEREFORE NOT A DEFECT TO BE FIXED BY WIDENING. It is
+        // the price of the contrast, and every graph-internal notion of similarity
+        // is built out of co-occurrence and so carries the behaviour policy with
+        // it. That is what promotes step 8's front-end similarity from an option
+        // to the only route left: a likeness the graph did not compute cannot be
+        // contaminated by what the body did.
+        var bar = arms.First(one => one.Arm == "blind");
+        var narrow = arms.First(one => one.Arm == "credited");
+        var backed = arms.First(one => one.Arm == "backing");
+
+        Assert.True(backed.Mean < bar.Mean,
+            $"backing off to the wider question has stopped losing to a coin toss "
+            + $"({backed.Mean:F4} against {bar.Mean:F4}) — if this now clears the "
+            + "bar, the claim that widening re-introduces the behaviour policy is "
+            + "wrong and the DO-NOT-RE-TRY row should be re-read");
+
+        Assert.True(narrow.Mean > backed.Mean,
+            $"asking only the credit cell and tossing a coin otherwise has stopped "
+            + $"beating backoff: {narrow.Mean:F4} against {backed.Mean:F4}");
+    }
+
     [Fact]
     public async Task The_credit_arm_reaches_its_level_fast_and_more_data_does_not_help()
     {

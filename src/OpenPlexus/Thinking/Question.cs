@@ -162,6 +162,37 @@ public sealed record Question
     };
 
     /// <summary>
+    /// A question about what helps where this is HEADING, rather than where it is
+    /// — <b>one step of lookahead, and it is step 11 in miniature.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NOT A LIKENESS AT ALL, WHICH IS WHY IT IS WORTH TRYING AFTER ONE
+    /// FAILED.</b> <see cref="Alike"/> spends credit earned in states that resemble
+    /// this one, and a shared moment turned out to resemble nearly everything. This
+    /// asks something narrower and better posed: <i>what usually follows here, and
+    /// what was worth doing THERE.</i>
+    /// </para>
+    /// <para>
+    /// <b>TWO HOPS, NO NEW CELL, AND NO NEW EDGE KIND.</b>
+    /// <see cref="Graph.Kind.After"/> is what usually follows and
+    /// <see cref="Graph.Kind.Helped"/> is what was worth doing — both already
+    /// written. What it needs is a world that HAS temporal cells, which is a
+    /// carried window and nothing more.
+    /// </para>
+    /// <para>
+    /// <b>IT IS A ROLLOUT OF DEPTH ONE, EXPRESSED AS A QUERY.</b> Step 11's
+    /// complaint is that this design predicts one frame and stops; this is the
+    /// cheapest thing shaped like planning that the graph can already answer, and
+    /// it costs a walk rather than a simulator.
+    /// </para>
+    /// </remarks>
+    public static Question Ahead() => new()
+    {
+        Path = [Graph.Kind.After, Graph.Kind.Helped],
+    };
+
+    /// <summary>
     /// The same question asked through shared FUTURES rather than shared moments —
     /// <b>the successor representation, walked.</b>
     /// </summary>

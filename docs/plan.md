@@ -125,7 +125,7 @@ its ceiling it absorbs anything.)*
   function**, survival having proved gameable. **No episode boundary**, fitting C4.
 - **`Homeostat` SETS THE BAR, AND THE BAR IS RANDOM.** Attending to whatever is
   lowest holds the body indefinitely, so the world is winnable only by looking at
-  it. **Every point the plain arm scored came from its bootstrap coin toss.**
+  it.
 - **SO ASSOCIATION IS ANTI-CORRELATED, not merely uninformative.** A count of what
   was done converges on the POLICY that did it, and the states a body is in are the
   ones its own actions produced. **Contiguity is not contingency**
@@ -138,8 +138,8 @@ its ceiling it absorbs anything.)*
 - **WHAT IS LEFT IS NOT INEXPERIENCE.** The arm is silent for most steps and short
   of the ceiling, and **quadrupling the run moves neither.** The state count keeps
   growing, so a credit cell keyed on the state it was earned in never covers them.
-- **AND THE SILENCE IS NOW SOLVABLE — IT IS THE LIKENESS THAT IS NOT.** Step 9
-  collapses it and loses the score with it. **Steps 9 and 10 are what is left.**
+- **AND THE SILENCE IS THE PRICE OF THE CONTRAST — step 9 settled that.** Anything
+  wide enough to cure it re-introduces the policy. **Step 8, then step 10.**
 
 ### 5. WHAT A CO-OCCURRENCE COUNT STRUCTURALLY CANNOT DO — John, 2026-08-03
 
@@ -179,26 +179,22 @@ its ceiling it absorbs anything.)*
   immediately previous transition and nothing longer. **Safe for the CRDT
   property**: the trace decides how much to add, and counts only rise.
 
-### 8. Similarity, and the generalisation that runs through it
+### 8. Similarity — **and step 9 promoted it from an option to the only route**
 
 - **VARIABLE BINDING.** *A is north of B* is a count between two codes, so it
   cannot apply to a new A and B. **This un-parks vector-symbolic binding**;
   `Clutrr` and `gSCAN` are the worlds that would force it.
-- **IT WAS BUILT ONCE, ON `master`, AND DID NOT CROSS THE REWRITE.** Neither is
-  here: **`surfaces.py`** put near inputs on near codes by random-hyperplane LSH
-  (Charikar), bits being the granularity dial; **`grounding.equivalence_classes`**
-  walked mutual-top-k co-occurrence to connected components — **similarity DERIVED
-  from the rows, needing no front end.** `Code.Prefix` alone survives, read by
-  fork 3.
-- **The second is the cheap one to port**, and it is the distributional hypothesis
-  (Harris): two codes are alike if their rows are alike, which is a walk rather
-  than a metric.
-- **A FRONT END FOR REAL PERCEPTION — measured once as THE binding constraint**,
-  and every world here is symbolic, so nothing has hit that wall since. Codes must
-  be identical on every machine forever, so a fitted codebook is out — **and a
-  uniform hash is agreed and unwalkable**, because the data is concentrated where
-  uniform codes are not. **Spending codes where the data is WITHOUT fitting one is
-  the unbuilt middle.**
+- **IT WAS BUILT ONCE, ON `master`, AND DID NOT CROSS THE REWRITE.**
+  **`surfaces.py`** put near inputs on near codes by random-hyperplane LSH
+  (Charikar), bits being the granularity dial. **`grounding.equivalence_classes`**
+  walked mutual-top-k co-occurrence to components — the distributional hypothesis
+  (Harris), and **step 9 refutes that half here**: a likeness read off the rows is
+  made of co-occurrence. `Code.Prefix` alone survives, read by fork 3.
+- **A FRONT END FOR REAL PERCEPTION — measured once as THE binding constraint, and
+  now the only route to generalisation as well.** Codes must be identical on every
+  machine forever, so a fitted codebook is out — **and a uniform hash is agreed and
+  unwalkable**, because the data is concentrated where uniform codes are not.
+  **Spending codes where the data is WITHOUT fitting one is the unbuilt middle.**
 - **REPLAY.** Re-run experience when nothing is arriving: consolidates, learns
   from rare events, interleaves old against new. **`WhenIdle()` is the trigger**,
   and fork 21 is its cousin.
@@ -210,24 +206,23 @@ its ceiling it absorbs anything.)*
 
 ### 9. RELATIONAL PATHS — a walk of MIXED kinds, and the first attack on step 8
 
-- **BUILT, and `Question.Path` walks a relation per hop.** `Through` took one kind
-  for the whole walk, so a route could never change relation — which is what
-  carrying credit between states needs.
-- **A SHARED MOMENT IS TOO CHEAP A NOTION OF ALIKE — measured, and in the
-  refutation table.** `With` is dense, so one hop reaches almost everything and the
-  credit dissolves into the behaviour policy. **The silence really does collapse**,
-  so the coverage half of step 4's gap is answerable; the likeness was wrong.
-- **A SHARED FUTURE IS SHARPER AND CANNOT YET BE ASKED.** `Question.Downstream`
-  wants the REVERSE temporal edge, which is exactly what a carried code does not
-  write: it had already stopped, so it never noted the occasion and `together`
-  could exceed `seen`. **A real design question, not an oversight** — see
-  `Kind.Before`.
-- **An ordered list of kinds, one per hop, makes that a query.** Path Ranking (Lao
-  & Cohen) is the same move in knowledge-base completion, and the successor
-  representation (Dayan) is what it computes: **two states are alike if they lead
-  to similar futures**, and `After` is already a one-step successor count.
-- **NO METRIC ON CODES IS NEEDED**, which is why this comes first. It composes the
-  kinds already paid for and rides beside `Through`.
+- **BUILT — `Question.Path` walks a relation per hop**, where `Through` named one
+  for the whole walk. Path Ranking (Lao & Cohen) is the same move in
+  knowledge-base completion. **The mechanism is right and the idea is refuted.**
+- **A FIXED PATH TRADES COVERAGE AGAINST PRECISION WITH NO MIDDLE.** Through
+  `With` it reaches almost everything and the credit dissolves; through `After` the
+  composition is empty and the walk is silent at every window width. **Same
+  failure, opposite ends** — and **backoff settles it**: asking narrow FIRST and
+  widening only on silence overrides nothing and still scores the same.
+- **SO THE SILENCE IS THE PRICE OF THE CONTRAST, NOT A DEFECT.** A walk wide
+  enough to be non-silent converges on what was DONE most, and in a body that is
+  what put the body here — step 4's own diagnosis, from a new direction.
+- **WHICH MAKES STEP 8'S FRONT END THE ONLY ROUTE LEFT.** Every graph-internal
+  likeness is made of co-occurrence and carries the policy with it; **a likeness
+  the graph did not compute cannot be.**
+- **`Question.Downstream` — the successor representation (Dayan) — remains
+  unaskable**: it wants the REVERSE temporal edge, which a carried code does not
+  write. **A real design question** — see `Kind.Before`.
 
 ### 10. A REASON TO SEEK — the drive this design has never had
 
@@ -273,7 +268,8 @@ its ceiling it absorbs anything.)*
 - [x] `Drives` — step 4's third factor. **Wanted its own cell; see step 4**
 - [x] `Toll` — the weight split. **Measured against its control on spend, not
   on stamina; see the trap about one dial measured at another's setting**
-- [ ] `Question.Path` — step 9's mixed-kind walk
+- [x] `Question.Path` — step 9's mixed-kind walk. **Built, and the idea it was
+  built for is refuted; see step 9**
 - [ ] `Kind.Informed` — step 10's curiosity
 - [ ] A **second world with a body**, so step 4 and step 10 are not one world old
 - [ ] The rollout of step 11
@@ -364,7 +360,7 @@ condition is a superstition.**
 | `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift and all its cost. **Two candidates whose orders invert tie identically under RRF for every damping constant** | Many candidates, or a fusion separating by something other than position |
 | Inhibition on `Homeostat` | Folding the negative cell into the COUNT mutes the walk — that number is the ranking AND the price. Discounting the SCORE alone recovers most of it and **still loses to the one-sided count**, where most acts are wrong most of the time | A world where the wrong act is informative and RARE. **The PN-Counter itself is sound and stays** |
 | `Ranked` as step 4's fix | **The lift was the bootstrap's coin toss** — silent far more often, and a varying code thins every edge so routes starve before reaching an action. **Kept: it lifts a real ceiling, and buys nothing alone** | Anything making the walk prefer a partner other than the one it took last time |
-| `Kindred` — a shared MOMENT as the notion of alike | **Louder and worse.** Silence collapses, so the coverage problem is genuinely solved, and the score falls below drawing at random: `With` is dense, so one hop reaches almost every state and the credit averages back into the behaviour policy | **A sharper likeness.** `Question.Downstream` — states whose FUTURES agree — and it needs the reverse temporal edge a carried code does not write |
+| Widening the walk to cure step 4's silence — `Kindred`, `Foreseeing`, `Backing` | **All three, and backoff is what settles it.** Through `With`: louder and below the bar. Through `After`: silent on every step at every window width. Asking narrow FIRST and widening only on silence overrides nothing and scores the same — **so the widening costs even where it overrides nothing.** A walk wide enough to be non-silent converges on what was DONE most | **A likeness the GRAPH DID NOT COMPUTE.** Every graph-internal one is made of co-occurrence and carries the behaviour policy with it, so this is step 8's front end and nothing short of it |
 | A trained quantiser — k-means on `master` | Two machines fitted on different samples give the same input different codes, and nothing downstream detects it | Never fitted. **A hash that spends its bits where the data is, without being fitted, is step 8's unbuilt middle** |
 
 ---

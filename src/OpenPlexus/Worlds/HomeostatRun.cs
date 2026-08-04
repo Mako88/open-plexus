@@ -197,6 +197,72 @@ public enum Attending
     /// </para>
     /// </remarks>
     Kindred,
+
+    /// <summary>
+    /// <see cref="Credited"/> asking what helps where the body is HEADING —
+    /// <b>lookahead rather than likeness, and step 11 at depth one.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>WHY THIS AFTER <see cref="Kindred"/> FAILED.</b> Likeness was the wrong
+    /// idea rather than a badly tuned one: any cheap notion of <i>alike</i> reaches
+    /// most of the world, and credit averaged over most of the world is the
+    /// behaviour policy again. <b>A CONSEQUENCE IS NOT A RESEMBLANCE</b> — what
+    /// usually follows this state is a far smaller set than what merely co-occurs
+    /// with it, and it is the set that actually bears on what to do now.
+    /// </para>
+    /// <para>
+    /// <b>IT NEEDS THIS WORLD TO HAVE TEMPORAL CELLS AT ALL, WHICH IT DID NOT.</b>
+    /// Every occasion here was a flat set, so <c>after</c> was empty everywhere.
+    /// The span that fills it is a refuted row being revived by its own condition —
+    /// see the constructor.
+    /// </para>
+    /// <para>
+    /// <b>THE SPAN CHANGES TWO THINGS AT ONCE, so the arm cannot attribute
+    /// either.</b> Carrying a window adds edges to the graph AND lets a new
+    /// question be asked. <see cref="Credited"/> run at the same span is the
+    /// control that separates them: same graph, old question.
+    /// </para>
+    /// </remarks>
+    Foreseeing,
+
+    /// <summary>
+    /// The precise question first, and the general one ONLY where it was silent —
+    /// <b>backoff, and it is the synthesis of two failures rather than a third
+    /// idea.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A FIXED PATH TRADES COVERAGE AGAINST PRECISION WITH NO MIDDLE, WHICH IS
+    /// WHAT STEP 9 ACTUALLY FOUND.</b> <see cref="Kindred"/> asks through
+    /// <c>With</c>, which is dense: it reaches nearly every state, so the credit
+    /// averages into the behaviour policy and the arm scores below a coin toss.
+    /// <see cref="Foreseeing"/> asks through <c>After</c>, which is sparse: the
+    /// composition is empty, the walk is silent on every step of a run at every
+    /// window width, and the arm IS a coin toss. <b>Same failure, opposite ends.</b>
+    /// </para>
+    /// <para>
+    /// <b>SO ASK THE NARROW QUESTION FIRST AND WIDEN ONLY ON SILENCE.</b> That is
+    /// Katz backoff — the estimator language modelling has used for forty years for
+    /// exactly this shape of problem, where the specific statistic is right when it
+    /// exists and absent most of the time. <see cref="Question.Worthwhile"/> where
+    /// the credit cell has something to say; <see cref="Question.Alike"/> only
+    /// where it does not.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS A REAL TEST RATHER THAN A HOPEFUL ONE.</b> <c>Kindred</c> scored
+    /// BELOW drawing at random, so the general question's answers are worse than a
+    /// coin toss on average — and this arm replaces a coin toss with exactly those
+    /// answers. <b>If it loses, the general question is simply bad. If it wins, the
+    /// general question was only bad because it was overriding the specific one</b>,
+    /// and those are different diagnoses wanting different things next.
+    /// </para>
+    /// <para>
+    /// <b>It costs a second walk on the steps where the first said nothing</b>, and
+    /// the message count reports that.
+    /// </para>
+    /// </remarks>
+    Backing,
 }
 
 /// <summary>
@@ -303,10 +369,44 @@ public sealed class HomeostatRun : IDisposable
     private readonly LocalRendezvous _joining;
     private readonly WalkSettings _dials;
 
+    /// <summary>How many moments a departed code is carried for.</summary>
+    private readonly int _span;
+
+    /// <param name="world">The shape of the body.</param>
+    /// <param name="dials">The walk.</param>
+    /// <param name="seed">The world's generator and the ring's, so a run reproduces.</param>
+    /// <param name="span">
+    /// How many moments a departed code is carried for — <b>and zero is every
+    /// measurement this world has ever produced.</b>
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// <b>THIS WORLD HAD NO TEMPORAL CELLS AT ALL, AND NOBODY HAD NOTICED.</b>
+    /// Every occasion here is a flat set written under <see cref="Kind.With"/>, so
+    /// <c>after</c> and <c>before</c> are empty and every question about what
+    /// FOLLOWS reaches nothing. That is why step 4's world could be asked what
+    /// helped HERE and never what helps where it is HEADING.
+    /// </para>
+    /// <para>
+    /// <b>THE SPAN IS A REFUTED ROW, AND ITS REVIVAL CONDITION IS WHAT THIS IS.</b>
+    /// Carrying was null on snake, worse on `Babi` and ruinous on `Rhythm`, and the
+    /// row asks for <i>something that makes a carried edge worth its row</i>. A
+    /// carried edge is the only thing that can answer <c>[After, Helped]</c>, and
+    /// that question cannot be asked any other way — so the cost now buys something
+    /// rather than merely existing.
+    /// </para>
+    /// <para>
+    /// <b>Zero is the control and stays the default</b>, so every number this world
+    /// has produced still stands and the span is an arm rather than a change.
+    /// </para>
+    /// </remarks>
+    /// <param name="clusters">How many clusters the fabric holds.</param>
+    /// <param name="replicas">Ring replicas per cluster.</param>
     public HomeostatRun(
         HomeostatSettings world,
         WalkSettings dials,
         int seed,
+        int span = 0,
         int clusters = 8,
         int replicas = 256)
     {
@@ -316,13 +416,14 @@ public sealed class HomeostatRun : IDisposable
         _settings = world;
         _dials = dials;
         Seed = seed;
+        _span = span;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _joining = new LocalRendezvous(_fabric.Local);
 
         _body = new InputMachine<ImmutableArray<Code>>(
             new MachineAddress("body"), new Feeling(), _joining,
-            _fabric.Bus, _fabric.Ring, dials);
+            _fabric.Bus, _fabric.Ring, dials, span);
 
         _fabric.Subscribe(_body);
     }
@@ -402,12 +503,35 @@ public sealed class HomeostatRun : IDisposable
                         // earned nothing can still be advised -- step 9.
                         Attending.Kindred => Question.Alike(),
 
+                        // AND THE HOP FORWARD RATHER THAN SIDEWAYS: what usually
+                        // follows here, and what was worth doing there.
+                        Attending.Foreseeing => Question.Ahead(),
+
                         Attending.Credited or Attending.Marked
-                            or Attending.Contested => Question.Worthwhile(),
+                            or Attending.Contested
+                            or Attending.Backing => Question.Worthwhile(),
 
                         _ => null,
                     },
                     ct).ConfigureAwait(false);
+
+            // BACKOFF: THE GENERAL QUESTION ONLY WHERE THE PRECISE ONE WAS SILENT.
+            // Asked second and never instead, so a state whose own credit cell has
+            // something to say is answered by it and the wider walk cannot override
+            // it -- which is exactly what `Kindred` did wrong. See Attending.Backing.
+            if (choosing == Attending.Backing && walked.Chosen is null)
+            {
+                var wider = await ChosenAsync(felt, chains, Question.Alike(), ct)
+                    .ConfigureAwait(false);
+
+                // THE PLUMBING OF BOTH WALKS COUNTS, not just the one that
+                // answered. A second walk that failed to settle is still a second
+                // walk, and hiding it would understate what this arm costs.
+                walked = new Walked(
+                    wider.Chosen,
+                    walked.Settled && wider.Settled,
+                    walked.Balanced && wider.Balanced);
+            }
 
             // THESE TWO WERE DECLARED HERE AND NEVER MOVED, so this world alone
             // reported `unbalanced=0` unconditionally and had no unsettled count
@@ -495,7 +619,8 @@ public sealed class HomeostatRun : IDisposable
                 owed = (occasion, step);
             }
             else if (choosing is Attending.Credited or Attending.Marked
-                     or Attending.Contested or Attending.Kindred)
+                     or Attending.Contested or Attending.Kindred
+                     or Attending.Foreseeing or Attending.Backing)
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
                 // ordinary cell is untouched and this arm changes one thing.

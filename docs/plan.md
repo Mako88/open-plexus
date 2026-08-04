@@ -154,18 +154,16 @@ its ceiling it absorbs anything.)*
   to hold unboundedly many absent things.
 - **SUPERSESSION — BUILT, AND BOTH CONSUMERS READ IT.** `Tie.When` rides beside the
   count as an LWW-Register and **the two must never merge. Do not decay.**
-  `WalkSettings.Row` evicts on it; `Question.Recent` ranks on it, so a walk can
-  prefer what is still true without anything eroding. **The scale is the row's own
-  mean interval between writes**, which is what keeps it off the dial list — an age
-  in raw clock units wants a different threshold per world. Across machines it wants
-  a Lamport clock.
-- **AND RECENCY IS A NOISE FILTER BEFORE IT IS A SUPERSESSION MECHANISM.** A one-off
-  wrong edge is written once and never refreshed while a true one keeps being
-  touched, so it pays even where nothing goes stale — **which is the only thing here
-  that removes an error a non-decaying count cannot.**
-- **`RhythmSettings.Turns` IS THE ONLY NON-STATIONARY THING IN ANY WORLD.** It
-  redraws the cycle and leaves ceiling, chance and marginal exactly where they were,
-  so **the answer moves and the difficulty does not.**
+  `WalkSettings.Row` evicts on it; `Question.Recent` ranks on it, so a walk prefers
+  what is still true without anything eroding. **The scale is the row's own mean
+  interval between writes** — an age in raw clock units wants a threshold per world,
+  which is what keeps this off the dial list. Across machines it wants a Lamport
+  clock.
+- **RECENCY IS A NOISE FILTER BEFORE IT IS SUPERSESSION.** A one-off wrong edge is
+  never refreshed while a true one is, so it pays even where nothing goes stale —
+  **the only thing here that removes an error a non-decaying count cannot.**
+- **`RhythmSettings.Turns` IS THE ONLY NON-STATIONARY THING IN ANY WORLD**, moving
+  the answer and not the difficulty.
 - **MULTI-TOKEN OUTPUT.** *Simultaneous* actions are nearly free — **fork 11 built
   the addressing** — and what is left is a world that wants two.
 
@@ -219,22 +217,18 @@ its ceiling it absorbs anything.)*
   it**, and a body that cannot bootstrap is what it is for.
 - **INHIBITION — AND IT IS THE BEST ARM THIS PROJECT HAS.** A **PN-Counter** is two
   G-Counters read as a difference, so "punishment is unavailable" was **the wrong
-  CRDT, not a law**. `Kind.Hindered` costs a kind, not a wider row, and **must
-  discount the SCORE and never the price**.
+  CRDT, not a law**. `Kind.Hindered` costs a kind, not a wider row.
 - **EVERY ARM THAT CONSULTS THE GRAPH GETS WORSE THE FURTHER IT MAY REACH, AND
   INHIBITION IS THE ONLY EXCEPTION.** More stamina reaches more partners and a
   one-sided count rules NONE of them out, so the extra reach is junk and the arm
   falls to the bar. **`Blind` is flat because it never asks.** An arm that can say
   *not that one* climbs first, and peaks later and higher.
 - **AND THE MECHANISM IS NOT THE ONE `Kind.Hindered` DOCUMENTS.** An arm that
-  writes the negative cell and IGNORES it reproduces the arm that reads it exactly.
-  **The discount is inert; the WRITE is the whole effect** — a second join raises
-  the act's `seen`, and every credit weight is `together / seen(act)`, so an act
-  that hurts ranks lower through its DENOMINATOR.
-- **INHIBITION IS TWO RISING COUNTS AND NO SUBTRACTION**, needing neither the
-  carried field nor the clamp. **`Message.Against` is now inert and owed a deletion
-  or a world that earns it**, and ΔP tracking the one-sided count down is the same
-  lesson: a read-side discount is not the act of ruling a route out.
+  writes the negative cell and IGNORES it reproduces the arm that reads it exactly:
+  **the discount is inert, the WRITE is the whole effect** — a second join raises
+  the act's `seen`, so an act that hurts sinks through its DENOMINATOR. **Two rising
+  counts, no subtraction.** `Message.Against` is owed a deletion or a world earning
+  it, and ΔP is the same lesson: a read-side discount does not rule a route out.
 
 ### 9. RELATIONAL PATHS — built, and the idea behind them refuted
 

@@ -478,8 +478,8 @@ public sealed class TendingTests(ITestOutputHelper output)
         foreach (var (name, how) in
             (( string, Gardening )[])
             [("oracle", Gardening.Best), ("blind", Gardening.Blind),
-             ("credited", Gardening.Credited), ("concurring", Gardening.Concurring),
-             ("seeking", Gardening.Seeking), ("venturing", Gardening.Venturing)])
+             ("credited", Gardening.Credited), ("venturing", Gardening.Venturing),
+             ("traced", Gardening.Traced), ("smeared", Gardening.Smeared)])
         {
             using var run = new TendingRun(graded, deep, seed: 1);
             var result = await run.RunAsync(Steps, how);

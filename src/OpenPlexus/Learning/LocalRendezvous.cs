@@ -118,6 +118,28 @@ public sealed class LocalRendezvous : IRendezvous
         // cell is a hit rate that cannot see what would have happened anyway.
         foreach (var code in present) _clusters.For(code).Note(weight, occasion.As ?? Kind.With);
 
+        // THE FIFTH CHANNEL: EACH FILLER MEETS ITS OWN SLOT. `Roles` says which
+        // argument position a code occupies in `As`, and pairing a filler with
+        // `As.Role(slot)` puts it in a cell that names NO ARGUMENT -- so the same
+        // cell accumulates across every pair the relation was ever observed on,
+        // which is the thing a count between two fillers structurally cannot do.
+        //
+        // AND IT IS THE `Groups` TRICK ONCE MORE, which is why it costs so little:
+        // the front end says what it is looking at, the graph finds the regularity.
+        // A filler meets ITS slot and no other, exactly as an attribute meets its
+        // own object and no other.
+        if (occasion.As is { } filled && occasion.Roles is { } roles)
+            foreach (var (filler, slot) in roles)
+            {
+                if (!present.Contains(filler)) continue;
+
+                var role = filled.Role(slot);
+
+                _clusters.For(role).Note(weight, Kind.With);
+                _clusters.For(filler).Observe(role, weight, Kind.With, occasion.At);
+                _clusters.For(role).Observe(filler, weight, Kind.With, occasion.At);
+            }
+
         var written = new HashSet<(Code, Code)>();
 
         foreach (var onset in occasion.Onsets)

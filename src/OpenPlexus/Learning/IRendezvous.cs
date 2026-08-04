@@ -166,6 +166,34 @@ public sealed record Occasion
     public Graph.Kind? As { get; init; }
 
     /// <summary>
+    /// Which SLOT of <see cref="As"/> each code fills. <b>Null is every occasion
+    /// ever written</b>, and needs <see cref="As"/> to mean anything.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE FIFTH THING THE FRONT END IS HANDED, AND IT OWES AN ARGUMENT AGAINST
+    /// THE OTHER FOUR.</b> <see cref="Groups"/> says which codes belong to one
+    /// OBJECT and cannot say which object is the subject. <see cref="Fleeting"/> is
+    /// about recurrence. <c>Ranked</c> is about magnitude. <see cref="Sequence"/> is
+    /// the near miss — it is the same SHAPE, an integer per code — and it means
+    /// <i>when</i>, so using it for argument position would write temporal edges for
+    /// a spatial relation and be actively misread.
+    /// </para>
+    /// <para>
+    /// <b>IT SAYS WHAT IS BEING LOOKED AT, NEVER WHAT TO CONCLUDE.</b> <i>B fills
+    /// slot two</i> is an observation a front end genuinely has. <i>south-of is
+    /// north-of reversed</i> is the fact in question, and handing that over would
+    /// make the whole thing a lookup table — the line every one of the other four
+    /// stays on.
+    /// </para>
+    /// <para>
+    /// <b>What it buys is a cell that names no argument</b>: see
+    /// <see cref="Graph.Kind.Role"/>.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyDictionary<Code, int>? Roles { get; init; }
+
+    /// <summary>
     /// How much this occasion counts. One is something that happened.
     /// </summary>
     /// <remarks>

@@ -27,8 +27,8 @@
 - **Nothing is unlearned, only outvoted or evicted.** Decay is not available;
   eviction on "not touched since" is.
 - **Codes must be identical on every machine forever** — so nothing fitted, ever.
-- **A front end may say what it is looking at, never what to conclude.** Four
-  channels do; a fifth needs an argument against the other four.
+- **A front end may say what it is looking at, never what to conclude.** Five
+  channels do; a sixth needs an argument against the other five.
 
 ---
 
@@ -38,8 +38,10 @@
 
 - **Variable binding** — the row names a relation and cannot hold a fact ABOUT one,
   so nothing transfers. `BindingGapTests` is the scoreboard.
-- **Relations as codes PASSED ITS HUB GATE** — `Kind.Code`, bounded row. What is
-  left is the ROLE CHANNEL, which is what buys transfer to new arguments.
+- **Both routes are built** — `Kind.Code` for facts ABOUT a relation,
+  `Occasion.Roles` and `Kind.Role` for a cell naming no argument. **What is left is
+  the READOUT**: an actuator that turns *this fills south-of's second slot* into an
+  act.
 - **A front end for real perception** — a hash spending its bits where the data is
   without being fitted. Grains are the half needing no fitting; this is the other.
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and

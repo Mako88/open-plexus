@@ -116,6 +116,38 @@ public readonly record struct Kind : IComparable<Kind>
     /// </remarks>
     public Code Code => new(Relations, _name);
 
+    /// <summary>
+    /// One SLOT of this relation, as a code — <b>the thing a fact can be about
+    /// that no particular argument is.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THIS IS WHAT BUYS TRANSFER, AND <see cref="Code"/> ALONE DOES NOT.</b>
+    /// Knowing <i>north-of relates to south-of</i> does not tell a system to swap
+    /// the arguments. A count between <c>north-of/1</c> and <c>south-of/2</c> does:
+    /// it says <b>whatever fills the first slot of one fills the second slot of the
+    /// other</b>, and that sentence names no argument at all.
+    /// </para>
+    /// <para>
+    /// <b>SO THE FACT ACCUMULATES ACROSS EVERY PAIR AND APPLIES TO PAIRS NEVER
+    /// SEEN.</b> Two observations of different landmarks write the same cell, which
+    /// is precisely what a count between two landmark codes could never do — the
+    /// gap <c>BindingGapTests</c> holds.
+    /// </para>
+    /// <para>
+    /// <b>DERIVED, LIKE EVERYTHING ELSE HERE.</b> The slot is folded into the hash,
+    /// so two machines agree on <c>north-of/1</c> with nothing to ask and no table
+    /// to share.
+    /// </para>
+    /// </remarks>
+    /// <param name="slot">Which argument position, from nought.</param>
+    public Code Role(int slot)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(slot);
+
+        return new Code(Relations, Agreed.Mix(Agreed.Fold(_name, (ulong)slot + 1)));
+    }
+
     /// <param name="relation">The relation's name, taken exactly as given.</param>
     public static Kind Of(string relation)
     {

@@ -114,17 +114,41 @@ to an old one — run that one.**
   ANTI-CORRELATED here, not merely uninformative** — the walk reaches what was
   done last time in this state, and in a body that is precisely what failed to
   prevent the state. Fork 20's mirror at its sharpest.
-- **`Drives` IS BUILT AND THREE ARMS FAIL THE BAR** — credit, credit without the
-  delay, and the delay alone. **All lose to no credit at all**, and reinforcement
-  likely DEEPENS the groove it should fix.
+- **`Drives` IS BUILT AND THREE ARMS FAILED THE BAR** — credit, credit without the
+  delay, and the delay alone. **All lost to no credit at all**, because all three
+  wrote a HEAVIER number into the cell that already means *this was done here*.
+  Reinforcing that deepens the groove it was meant to fix.
+- **THE CREDIT NEEDED ITS OWN CELL, AND THAT IS THE FIRST ARM TO BEAT RANDOM.**
+  `Kind.Helped` records *this pair, and things got better after* as a SECOND
+  statistic; `Question.Worthwhile()` walks that one alone. Ranking is then the
+  share of times an act helped rather than how often it was taken, and the
+  contrast falls out of the anti-hub weighting already there — `seen(act)` is the
+  denominator. **Nothing is punished and nothing decays**: an act that did not
+  help gets no second write, and both counts stay monotonic.
+- **THE CONTRAST IS WHAT DID IT, and a control says so.** `Marked` writes the same
+  second cell, equally stale, on EVERY step regardless of outcome, and walks it
+  the same way — it loses to the bar and to no credit at all. The condition is the
+  whole of the gain.
+- **AND `Ranked` NOW PAYS, having bought nothing alone.** The ordering was
+  necessary and not sufficient: with no contrastive signal there was nothing for a
+  better representation to attach to.
+- **Silence cannot explain any of it.** The bootstrap acts at random, so coin
+  tosses pull an arm TOWARDS the bar and can never carry it past.
+- **WHAT IS LEFT ON STEP 4:** the arm is **mostly silent** — the credit cell is
+  empty until something has helped — and it sits below the ceiling. Both are room,
+  not refutations.
 - **THE FRONT END WAS A REAL CEILING AND IS NOT THE CAUSE.** *Attend to whichever
   is lowest* is relational, and a band is absolute: two states with identical
   bands can have opposite answers, and the ceiling policy held the body so still
   it visited ONE state. **`Ranked` lifts both and buys the arm nothing.** It does
   change what is attended to, in the ceiling's direction, at 27× the messages.
-- **NEITHER THE SIGNAL NOR THE REPRESENTATION, THEN.** What is left is that a
-  count cannot prefer one of several equally-frequent partners. **That points at
-  INHIBITION and at variable binding**, not at a better third factor.
+- **THE GENERAL LESSON, AND IT IS BIGGER THAN THIS WORLD.** A count of what was
+  done converges on the POLICY that did it — *P(act | state)* — and the states a
+  body finds itself in are the ones its own actions produced. So the association
+  actively encodes the wrong act for the state and is self-confirming.
+  **Contiguity is not contingency** (Rescorla–Wagner, and this is `ΔP` in the
+  shape the design allows). Anywhere the graph learns from its own behaviour,
+  the same confound is waiting.
 
 ### 5. WHAT A CO-OCCURRENCE COUNT STRUCTURALLY CANNOT DO — John, 2026-08-03
 

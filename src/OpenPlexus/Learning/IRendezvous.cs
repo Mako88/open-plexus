@@ -145,6 +145,27 @@ public sealed record Occasion
     public IReadOnlyDictionary<Code, int>? Sequence { get; init; }
 
     /// <summary>
+    /// Which relation this occasion's pairs are written in. <b>Null is every
+    /// occasion ever written: simultaneity, or whatever
+    /// <see cref="Sequence"/> says.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FOR WRITING A SECOND STATISTIC ABOUT A MOMENT THAT HAS ALREADY BEEN
+    /// WRITTEN</b> — see <see cref="Graph.Kind.Helped"/>. The same occasion is
+    /// joined twice: once as what happened, and once, later and only if it earned
+    /// it, as what turned out to be worth doing.
+    /// </para>
+    /// <para>
+    /// <b>It overrides <see cref="Sequence"/> rather than combining with it</b>,
+    /// because a cell is <c>(partner, kind)</c> and a pair cannot be filed under
+    /// two kinds at once. The ordering was already recorded by the first write;
+    /// this write is about something else.
+    /// </para>
+    /// </remarks>
+    public Graph.Kind? As { get; init; }
+
+    /// <summary>
     /// How much this occasion counts. One is something that happened.
     /// </summary>
     /// <remarks>

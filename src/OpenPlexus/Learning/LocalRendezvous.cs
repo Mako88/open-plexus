@@ -104,6 +104,22 @@ public sealed class LocalRendezvous : IRendezvous
                 // double.
                 if (!written.Add(Unordered(onset, other))) continue;
 
+                // A SECOND STATISTIC ABOUT A MOMENT ALREADY WRITTEN, and it takes
+                // precedence over the ordering because a cell is (partner, kind)
+                // and one pair cannot be filed under two at once. The order was
+                // recorded by the first write; this write is about something else.
+                // See Occasion.As and Kind.Helped.
+                if (occasion.As is { } relation)
+                {
+                    if (!Passing(occasion.Fleeting, other))
+                        _clusters.For(onset).Observe(other, weight, relation, occasion.At);
+
+                    if (!Passing(occasion.Fleeting, onset))
+                        _clusters.For(other).Observe(onset, weight, relation, occasion.At);
+
+                    continue;
+                }
+
                 // WHAT THE FRONT END SAID ABOUT ORDER INSIDE THIS MOMENT. Where
                 // it said nothing, nothing came first and the pair is symmetric,
                 // which is every occasion emitted before Sequence existed.

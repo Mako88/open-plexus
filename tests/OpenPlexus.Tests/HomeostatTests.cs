@@ -390,6 +390,101 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task Credit_in_its_own_cell_against_credit_on_top_of_the_old_one()
+    {
+        // STEP 4'S SECOND ATTEMPT, AND THE ONE THING IT CHANGES IS CONTRAST.
+        // Three credit arms failed by writing a heavier number into the cell that
+        // already means "this was done here" -- which deepens the groove. This
+        // writes a SECOND cell and walks that one instead, so the ranking is the
+        // share of times an act helped rather than how often it was taken.
+        var ranked = World() with { Ranked = true };
+
+        var arms = await Sweep.AcrossAsync(
+            12,
+            ("blind", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Blind)).Viable;
+            }),
+            ("chain", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Chain)).Viable;
+            }),
+            ("topped", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Topped)).Viable;
+            }),
+            ("marked", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Marked)).Viable;
+            }),
+            ("lowest", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Lowest)).Viable;
+            }),
+            ("credited", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
+            }),
+            ("credited+ranked", async seed =>
+            {
+                using var run = new HomeostatRun(ranked, Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
+            }));
+
+        output.WriteLine(Sweep.Table(arms));
+
+        var bar = arms.First(one => one.Arm == "blind");
+        var contrasted = arms.First(one => one.Arm == "credited");
+        var control = arms.First(one => one.Arm == "marked");
+
+        // THE FIRST ARM IN THIS PROJECT TO BEAT DRAWING AT RANDOM. Everything that
+        // consults the graph had scored below the bar, which is what step 4 exists
+        // to fix.
+        Assert.True(
+            contrasted.Mean > bar.Mean && contrasted.Separation(bar) > 3.0,
+            $"the credit cell stopped beating the bar: {contrasted.Mean:F4} "
+            + $"against {bar.Mean:F4}");
+
+        // AND THE CONTRAST IS WHAT DID IT, WHICH IS THE ONLY REASON THE ROW ABOVE
+        // MEANS ANYTHING. `marked` writes the same second cell, one step stale,
+        // into the same relation, and walks it the same way -- it differs by the
+        // CONDITION alone. It does not beat the bar and it does not beat `chain`.
+        Assert.True(control.Mean < bar.Mean,
+            $"writing the second cell unconditionally also beats the bar "
+            + $"({control.Mean:F4}), so the gain is the extra cell or its "
+            + "staleness rather than the contrast, and the claim is wrong");
+
+        Assert.True(contrasted.Separation(control) > 3.0,
+            $"the conditioned and unconditioned arms are no longer separable: "
+            + $"{contrasted.Mean:F4} against {control.Mean:F4}");
+
+        // THE SILENCE CANNOT EXPLAIN IT, AND THE ARGUMENT NEEDS NO MEASUREMENT.
+        // The bootstrap acts AT RANDOM, so mixing coin tosses into an arm pulls it
+        // TOWARDS the blind bar and can never carry it past. An arm that is mostly
+        // silent and still scores well above `blind` must be getting that from the
+        // steps it did decide. Reported anyway, because the share matters for what
+        // to do next: the credit cell is EMPTY until something has helped, so this
+        // arm starts as pure coin toss and speaks only where it has learnt.
+        foreach (var arm in (Attending[])[Attending.Chain, Attending.Credited])
+        {
+            using var run = new HomeostatRun(World(), Dials, seed: 1);
+            var result = await run.RunAsync(Steps, arm);
+
+            output.WriteLine(
+                $"{arm,-9} silent={result.Silent,3}/{result.Steps} "
+                + $"viable={result.Viable:F4} "
+                + $"attended=[{string.Join(",", result.Attended)}] "
+                + $"states={result.States} edges={result.Edges}");
+        }
+    }
+
+    [Fact]
     public async Task The_graph_has_no_reason_to_act_yet_and_the_baseline_says_so()
     {
         // THE BASELINE FOR STEP 4, AND IT IS EXPECTED TO BE POOR. Nothing tells

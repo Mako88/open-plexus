@@ -85,6 +85,49 @@ public enum Attending
     /// </para>
     /// </remarks>
     Topped,
+
+    /// <summary>
+    /// The credit in ITS OWN CELL, and the walk asks what is WORTH doing rather
+    /// than what was done — <b>step 4's second attempt, and the first that is
+    /// contrastive.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>WHY THE FIRST THREE FAILED, IN ONE SENTENCE:</b> they all wrote a HEAVIER
+    /// number into the same cell, and that cell already means <i>this was done
+    /// here</i> — so reinforcing it deepens exactly the groove it was meant to fix.
+    /// </para>
+    /// <para>
+    /// <b>This writes a SECOND cell instead.</b> The occasion is joined as usual,
+    /// and one step later — when the outcome is known — the same occasion is joined
+    /// again under <see cref="Graph.Kind.Helped"/>, but only if the most-at-risk
+    /// variable improved. The choice then walks that cell alone, so it ranks by the
+    /// share of times an action helped rather than by how often it was taken.
+    /// Nothing is punished; an act that did not help simply gets no second write.
+    /// </para>
+    /// <para>
+    /// <b>THE BOOTSTRAP MATTERS MORE HERE THAN ANYWHERE.</b> Until something has
+    /// helped, the credit cell is empty and the walk has nothing to say — so this
+    /// arm is nearly all coin toss early on, and its silence is the thing to read
+    /// beside its score.
+    /// </para>
+    /// </remarks>
+    Credited,
+
+    /// <summary>
+    /// <see cref="Credited"/>'s SECOND CELL WITHOUT ITS CONDITION — <b>the control
+    /// that says whether the contrast did the work.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE ARM CHANGES TWO THINGS, so on its own it can attribute neither.</b>
+    /// It writes a pair into a cell nothing else writes, and it walks that cell
+    /// instead of the ordinary one — which on its own is a walk over a ONE-STEP
+    /// STALE association, and staleness is a difference all by itself. This writes
+    /// the same second cell on EVERY step regardless of whether anything improved,
+    /// so the gap between this and <see cref="Credited"/> is the condition and
+    /// nothing else.
+    /// </remarks>
+    Marked,
 }
 
 /// <summary>
@@ -256,6 +299,10 @@ public sealed class HomeostatRun : IDisposable
         // WHAT IS OWED A TOP-UP, held as the machine actually wrote it.
         Occasion? topping = null;
 
+        // AND WHAT IS OWED A CREDIT CELL, held the same way and for the same
+        // reason: a rebuilt occasion pairs differently. See InputMachine.Joined.
+        Occasion? crediting = null;
+
         for (var step = 0; step < steps; step++)
         {
             var felt = world.Feels();
@@ -271,9 +318,19 @@ public sealed class HomeostatRun : IDisposable
 
             // THE ARMS THAT NEVER CONSULT THE GRAPH DECIDE WITHOUT A WALK, so
             // there is nothing to fold for them and `None` is silent.
-            var walked = choosing is Attending.Idle or Attending.Blind or Attending.Lowest
+            //
+            // AND `Credited` ASKS A DIFFERENT QUESTION OF THE SAME GRAPH: what is
+            // worth doing here, which is a walk over the credit cell alone. See
+            // Kind.Helped.
+            var walked = !Walks(choosing)
                 ? Walked.None
-                : await ChosenAsync(felt, chains, ct).ConfigureAwait(false);
+                : await ChosenAsync(
+                    felt,
+                    chains,
+                    choosing is Attending.Credited or Attending.Marked
+                        ? Question.Worthwhile()
+                        : null,
+                    ct).ConfigureAwait(false);
 
             // THESE TWO WERE DECLARED HERE AND NEVER MOVED, so this world alone
             // reported `unbalanced=0` unconditionally and had no unsettled count
@@ -301,9 +358,7 @@ public sealed class HomeostatRun : IDisposable
             // actions, does walking choose better than drawing at random. That is
             // the question step 4 is about, and the fallback is counted so the
             // share of the run the graph actually decided is visible.
-            if (choosing is Attending.Chain or Attending.Driven or Attending.Delayed
-                    or Attending.Topped
-                && chosen is null)
+            if (Walks(choosing) && chosen is null)
             {
                 silent++;
                 chosen = rng.Next(world.Needs);
@@ -362,6 +417,33 @@ public sealed class HomeostatRun : IDisposable
 
                 owed = (occasion, step);
             }
+            else if (choosing is Attending.Credited or Attending.Marked)
+            {
+                // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
+                // ordinary cell is untouched and this arm changes one thing.
+                await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
+                await _fabric.QuietAsync(ct).ConfigureAwait(false);
+
+                // AND THE PREVIOUS MOMENT COLLECTS A SECOND CELL IF IT EARNED ONE.
+                // The credit standing here belongs to the transition that just
+                // happened, which is the one the held occasion caused -- so an act
+                // is priced by what followed it. `Credit` above one is the band
+                // `Drives` gives an improvement; at or below one nothing is
+                // written, and that absence is the whole of the contrast.
+                // `Marked` writes it unconditionally, which is the control: same
+                // cell, same staleness, no contrast.
+                if (crediting is { } earned
+                    && (choosing == Attending.Marked || drives.Credit > 1.0))
+                {
+                    await _body
+                        .ReinforceAsync(earned with { As = Kind.Helped }, 1.0, ct)
+                        .ConfigureAwait(false);
+
+                    await _fabric.QuietAsync(ct).ConfigureAwait(false);
+                }
+
+                crediting = _body.Joined;
+            }
             else
             {
                 await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
@@ -386,6 +468,22 @@ public sealed class HomeostatRun : IDisposable
             Plumbing = _fabric.Facts(chains, unbalanced),
         };
     }
+
+    /// <summary>
+    /// Whether this arm decides by consulting the graph.
+    /// </summary>
+    /// <remarks>
+    /// <b>ONE LIST, BECAUSE IT WAS TWO AND THEY DRIFTED IMMEDIATELY.</b> The arms
+    /// that walk were enumerated once for "fold the walk's accounting" and again
+    /// for "fall back to a random act when the walk says nothing", and a new arm
+    /// was added to the first and not the second. It walked, said nothing, and the
+    /// body then simply did not act — scoring EXACTLY what idling scores with
+    /// <c>attended</c> all zero and <c>silent</c> at nought, which reads as a
+    /// finding rather than as a missing line. Named by what is true of them rather
+    /// than by listing them, so a new arm is included by default.
+    /// </remarks>
+    private static bool Walks(Attending how) =>
+        how is not (Attending.Idle or Attending.Blind or Attending.Lowest);
 
     /// <summary>
     /// What one walk produced, and <b>whether it was in any state to be read.</b>
@@ -414,10 +512,10 @@ public sealed class HomeostatRun : IDisposable
     /// it has only ever seen actions beside the states they were taken in.
     /// </remarks>
     private async Task<Walked> ChosenAsync(
-        ImmutableArray<Code> felt, Chains chains, CancellationToken ct)
+        ImmutableArray<Code> felt, Chains chains, Question? asking, CancellationToken ct)
     {
         var thought = await _body
-            .ThinkAsync(felt, _dials.Stamina, null, ct).ConfigureAwait(false);
+            .ThinkAsync(felt, _dials.Stamina, asking, ct).ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 

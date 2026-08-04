@@ -82,6 +82,16 @@ public sealed record Question
     /// </remarks>
     public static Question Preceding() => new() { Through = Graph.Kind.Before };
 
+    /// <summary>A question about WHAT IS WORTH DOING here, not what was done.</summary>
+    /// <remarks>
+    /// <b>The contrastive question, and the whole of step 4's second attempt.</b>
+    /// Walking the ordinary cell ranks by <i>P(act | state)</i>, which is the
+    /// behaviour policy that wrote it — so the walk recommends whatever it did
+    /// last time, and in a body that is precisely what put the body here. This
+    /// walks the other cell instead. See <see cref="Graph.Kind.Helped"/>.
+    /// </remarks>
+    public static Question Worthwhile() => new() { Through = Graph.Kind.Helped };
+
     /// <summary>A question that ranks by agreement between its origins.</summary>
     /// <remarks>
     /// <b>The conjunction: the thing meant is the one every origin reached.</b>

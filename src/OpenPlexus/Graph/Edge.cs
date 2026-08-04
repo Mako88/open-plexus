@@ -88,6 +88,55 @@ public enum Kind
     /// </para>
     /// </remarks>
     Before,
+
+    /// <summary>
+    /// They met, <b>and things got better afterwards</b> — the contrastive half of
+    /// step 4's third factor.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>IT IS A DIFFERENT CATEGORY OF RELATION FROM THE OTHER THREE, AND SAYING
+    /// SO IS THE HONEST PART.</b> <see cref="With"/>, <see cref="After"/> and
+    /// <see cref="Before"/> are facts about WHEN two codes met; this is a fact
+    /// about what happened next to a body. It rides in the same slot because the
+    /// slot is *which statistic about this pair*, and that is exactly what it is —
+    /// but nobody should read the four as one taxonomy.
+    /// </para>
+    /// <para>
+    /// <b>MEASURED: A COUNT OF WHAT WAS DONE CONVERGES ON THE POLICY THAT DID
+    /// IT.</b> A state and the act taken in it join one occasion, so
+    /// <c>together(state, act)</c> estimates <i>P(act | state)</i> — which is the
+    /// behaviour policy and nothing else. Worse, the states a body finds itself in
+    /// are the ones its own actions produced: attend one variable and the others
+    /// drain, so "the others are at the floor" becomes strongly associated with the
+    /// action that drained them. On <c>Homeostat</c> the arm settled on ONE action,
+    /// never touched the two fastest-draining needs, and scored exactly what doing
+    /// nothing scores.
+    /// </para>
+    /// <para>
+    /// <b>WEIGHTING THE OCCASION CANNOT FIX THAT, WHICH IS WHY THREE CREDIT ARMS
+    /// FAILED.</b> A heavier write lands on the SAME cell, so it deepens the groove
+    /// it was meant to correct. What is needed is a contrast — this pair against
+    /// the alternatives — and a contrast needs a second statistic to divide by,
+    /// not a bigger number in the first one.
+    /// </para>
+    /// <para>
+    /// <b>SO THE CREDIT GETS ITS OWN CELL, AND THE CONTRAST FALLS OUT OF THE
+    /// EXISTING WEIGHTING.</b> A hop is priced <c>together / seen(receiver)</c>,
+    /// and <c>seen(act)</c> counts every occasion the action was in — so this cell
+    /// over that marginal is the share of the times an action was taken that it
+    /// helped. An action taken constantly and rarely useful is refused by the
+    /// anti-hub property that already exists. <b>Nothing is punished and nothing
+    /// decays</b>: an act that did not help simply gets no second write, and both
+    /// counts stay monotonic, so the G-Counter property is untouched.
+    /// </para>
+    /// <para>
+    /// <b>It is the project's own remedy applied once more</b> — one number was
+    /// saying both <i>this was done here</i> and <i>this is worth doing here</i>,
+    /// and those are two statistics.
+    /// </para>
+    /// </remarks>
+    Helped,
 }
 
 /// <summary>

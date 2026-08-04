@@ -125,7 +125,8 @@ public sealed class SurpriseTests
         // reads a perfect rate, so only the negative half can raise it.
         var lying = new RhythmResult
         {
-            Span = 1, Ceiling = 1.0, Marginal = 0.1, Kept = 100, Foreseen = 100,
+            Span = 1, Depth = 1, Rolled = 0.0,
+            Ceiling = 1.0, Marginal = 0.1, Kept = 100, Foreseen = 100,
             Broke = 0, Caught = 0, Late = 0, Skipped = 0,
             Expecting = 1.0, Overreached = 0.95, Unspoken = 100,
             Moments = 300, Asked = 300, Right = 100, Silent = 0, Chance = 0.1,

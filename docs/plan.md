@@ -256,12 +256,15 @@ its ceiling it absorbs anything.)*
 
 ### 11. NOTHING HERE PLANS
 
-- **`Consequence` asks *what would the world look like if I did X*, ONE step, and
-  stops.** **A world model that rolls forward once is an expensive reflex.**
-- **The rollout needs nothing built**: feed `Foresight`'s prediction back as a
-  synthetic occasion and ask again. Craik, Tolman, MuZero's search half.
-- **The risk is compounding error**, which every learned simulator is worst at, so
-  depth wants its own control.
+- **`Consequence` asks *what would the world look like if I did X*.** **One step is
+  an expensive reflex.**
+- **THE ROLLOUT IS BUILT AND NEEDED NOTHING NEW** — feed the prediction back as a
+  synthetic moment and ask again, thinking without observing so the graph never
+  learns from its own guesses. Craik, Tolman, MuZero's search half.
+- **COMPOUNDING ERROR IS MILD HERE AND THAT IS ABOUT THE WORLD.** A cycle is an
+  ATTRACTOR: every symbol predicts its successor, so a wrong guess still lands on
+  the rails. **A world whose dynamics BRANCH would punish it far harder.** What
+  argues against depth here is cost — every step is a whole walk.
 
 ### WHAT A WHOLE SESSION OF THIS SAYS — 2026-08-04
 
@@ -302,7 +305,6 @@ its ceiling it absorbs anything.)*
 - [ ] ~~`Kind.Informed`~~ — **built and deleted: no walk reaches an untried act**
 - [x] `Grains` — step 8's front end, and the coarse codes are shared
 - [x] `Tending` — the **second body**, and it does not confirm step 4
-- [ ] The rollout of step 11
 - [ ] **A world where several cues arrive together and only some carry the
   outcome** — nothing here can show what gating the write buys
 - [ ] **A world an arm can bootstrap in** — every credit arm on `Tending` is a
@@ -346,14 +348,11 @@ its ceiling it absorbs anything.)*
 - **Coalesce a settling wave into one send.** Hold remote envelopes until local
   traffic drains, then one datagram per destination; `WhenIdle()` is the trigger.
   **Not a pure barrier** — flush on idle *or* size *or* time.
-- **Bits, not JSON.** Modalities intern to small ints, a code is a varint, and
-  **a sixth of a packed message is the `Guid` broadcast id** — shorten it per
-  connection.
+- **Bits, not JSON.** Modalities intern to small ints, a code is a varint, and **a
+  sixth of a packed message is the `Guid` broadcast id**.
 - **`Chain` is what costs** — cycle check and explanation in one field, free
   locally and not on a wire. **Split them:** an approximate-membership filter for
   the hop, full chain rebuilt at the origin.
-- **Voting multiplies the wrong half. One thought, redundant reports**: the flood
-  is the graph's, and what C2 loses is the return path.
 - **UDP matches.** C2 assumes loss, and **TCP's head-of-line blocking would stall
   every thought behind one lost packet.** QUIC's unreliable datagram extension
   (RFC 9221) is the shape.

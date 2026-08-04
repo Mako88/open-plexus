@@ -87,6 +87,29 @@ public sealed record RhythmResult : Questioned
     /// <inheritdoc cref="Skipped"/>
     public double TwoAhead => Late == 0 ? 0.0 : Skipped / (double)Late;
 
+    /// <summary>How many steps ahead the rollout reached. <b>One is no rollout.</b></summary>
+    public required int Depth { get; init; }
+
+    /// <summary>
+    /// What share of the rolled predictions were right, <b>settled against the
+    /// moment they were actually about.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CEILING DOES NOT MOVE WITH DEPTH HERE, WHICH IS WHY THIS WORLD IS THE
+    /// RIGHT ONE FOR IT.</b> A cycle is exactly as predictable four steps out as one
+    /// — the symbol is determined either way — so <see cref="Ceiling"/> is the same
+    /// number at every depth and ANY decay is compounding error and nothing else.
+    /// On a world whose far future were genuinely harder, the two would be
+    /// impossible to tell apart.
+    /// </para>
+    /// <para>
+    /// <b>At depth one this is the ordinary score arrived at by another road</b>,
+    /// which is the check that the rollout has not disturbed the reflex it extends.
+    /// </para>
+    /// </remarks>
+    public required double Rolled { get; init; }
+
     /// <summary>How much of what was achievable was achieved, in 0..1.</summary>
     /// <remarks>
     /// <b>Against the ceiling rather than against one.</b> A perfect model is
@@ -162,6 +185,9 @@ public sealed class RhythmRun : IDisposable
     /// <inheritdoc cref="Learning.Surprise"/>
     private readonly Surprise? _surprise;
 
+    /// <summary>How many steps ahead the rollout reaches. <b>One is no rollout.</b></summary>
+    private readonly int _depth;
+
     /// <summary>
     /// What the prediction asks for. <b>Null is every measurement taken before
     /// recency existed</b>, and is what a stationary stream wants — nothing here
@@ -197,6 +223,11 @@ public sealed class RhythmRun : IDisposable
     /// Whether the WRITE path is gated by surprise too — <b>step 2's second half.</b>
     /// Off is every measurement taken before it existed.
     /// </param>
+    /// <param name="depth">
+    /// How many steps ahead to roll — <b>step 11, and one is the reflex this
+    /// project already had.</b> Each extra step feeds the last prediction back in
+    /// as a synthetic moment and asks again.
+    /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
     public RhythmRun(
@@ -208,6 +239,7 @@ public sealed class RhythmRun : IDisposable
         double carried = 1.0,
         bool recent = false,
         bool gated = false,
+        int depth = 1,
         int clusters = 8,
         int replicas = 256)
     {
@@ -218,6 +250,7 @@ public sealed class RhythmRun : IDisposable
         _dials = dials;
         _span = span;
         _surprise = surprising ? new Surprise() : null;
+        _depth = depth < 1 ? 1 : depth;
         _asking = recent ? new Question { Recent = true } : null;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
@@ -265,6 +298,15 @@ public sealed class RhythmRun : IDisposable
         int late = 0, skipped = 0;
         Code? bet = null, older = null;
 
+        // STEP 11'S ROLLOUT. A prediction made now is settled `_depth` moments from
+        // now, so the bets in flight are held in order and the oldest falls due
+        // first. At depth one this holds exactly one bet and settles it against the
+        // very next moment, which is what the score above already does -- and the
+        // two agreeing is the check that the rollout has not quietly changed the
+        // one-step case.
+        var rolling = new Queue<Code?>();
+        int far = 0, farRight = 0;
+
         for (var moment = 0; moment < moments; moment++)
         {
             var (shown, violated) = _world.Next();
@@ -294,6 +336,19 @@ public sealed class RhythmRun : IDisposable
 
             older = bet;
 
+            // SETTLE THE ROLLED BET THAT FALLS DUE NOW, before this moment adds
+            // another to the queue.
+            if (rolling.Count >= _depth)
+            {
+                var due = rolling.Dequeue();
+
+                if (due is not null)
+                {
+                    far++;
+                    if (due.Value == shown) farRight++;
+                }
+            }
+
             var observed = await _ear.ObserveAsync(shown, moment, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
@@ -312,6 +367,18 @@ public sealed class RhythmRun : IDisposable
             chains.Fold(reached);
             bet = guess;
 
+            // AND ROLL IT FORWARD, feeding each prediction back in as though it had
+            // been heard. NOTHING IS OBSERVED HERE: a synthetic moment must never
+            // reach the rendezvous, or the graph learns from its own guesses and
+            // every count downstream is measuring the model's imagination. Thinking
+            // without observing is exactly what `ThinkAsync` already is.
+            var reach = guess;
+
+            for (var step = 1; step < _depth && reach is not null; step++)
+                reach = (await GuessAsync(reach.Value, ct).ConfigureAwait(false)).Next;
+
+            rolling.Enqueue(reach);
+
             // WHAT THE SYSTEM NOW EXPECTS, handed to the input path so that an
             // onset matching it is never broadcast. This is the same bet the
             // score is settled against, so the traffic saved and the prediction
@@ -325,6 +392,8 @@ public sealed class RhythmRun : IDisposable
         return new RhythmResult
         {
             Span = _span,
+            Depth = _depth,
+            Rolled = far == 0 ? 0.0 : farRight / (double)far,
             Moments = moments,
             Asked = asked,
             Right = right,

@@ -532,28 +532,29 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     /// which is what <c>DuplicationTests</c> was saying when it refused the second
     /// copy.
     /// </remarks>
+    private async Task<IReadOnlyList<Measured>> ArmsAsync(
+        WalkSettings dials, int seeds, params Attending[] arms)
+    {
+        var swept = await Sweep.AcrossAsync(
+            seeds,
+            [.. arms.Select(arm => (
+                arm.ToString().ToLowerInvariant(),
+                new Func<int, Task<double>>(async seed =>
+                {
+                    using var run = new HomeostatRun(World(), dials, seed);
+                    return (await run.RunAsync(Steps, arm)).Viable;
+                })))]);
+
+        output.WriteLine(Sweep.Table(swept));
+
+        return swept;
+    }
+
     private async Task<IReadOnlyList<Measured>> ContingencyAsync(
         WalkSettings dials, int seeds)
     {
-        var arms = await Sweep.AcrossAsync(
-            seeds,
-            ("blind", async seed =>
-            {
-                using var run = new HomeostatRun(World(), dials, seed);
-                return (await run.RunAsync(Steps, Attending.Blind)).Viable;
-            }),
-            ("credited", async seed =>
-            {
-                using var run = new HomeostatRun(World(), dials, seed);
-                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
-            }),
-            ("contingent", async seed =>
-            {
-                using var run = new HomeostatRun(World(), dials, seed);
-                return (await run.RunAsync(Steps, Attending.Contingent)).Viable;
-            }));
-
-        output.WriteLine(Sweep.Table(arms));
+        var arms = await ArmsAsync(
+            dials, seeds, Attending.Blind, Attending.Credited, Attending.Contingent);
 
         // AND THE SILENCE AND THE CHOICE COUNT BESIDE THE SCORE, WHICH MATTER MORE
         // FOR THIS ARM THAN FOR ITS CONTROL. A contingency reads nought where an act
@@ -581,6 +582,67 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             + $"{bar.Mean:F4}), so there is nothing here to compare against");
 
         return arms;
+    }
+
+    [Fact]
+    public async Task Inhibition_loses_at_the_budget_it_was_refuted_at_and_wins_above_it()
+    {
+        // THE REFUTED ROW, RE-RUN BECAUSE ITS EVIDENCE TURNED OUT TO BE TAKEN IN A
+        // CORNER. "Inhibition on `Homeostat` ... still loses to the one-sided
+        // count" was measured at one stamina, which is the stamina everything in
+        // step 4 was measured at -- and `Choices` has since shown that at that
+        // setting the walk reaches one action and the world cannot see a ranking.
+        //
+        // SO THE QUESTION IS WHETHER THE REFUTATION IS ABOUT INHIBITION OR ABOUT
+        // THE BUDGET, and it is about the budget.
+        var scored = new Dictionary<double, (double Credited, double Contested, double Sigma)>();
+
+        foreach (var stamina in (double[])[4.0, 8.0, 12.0])
+        {
+            output.WriteLine($"--- stamina {stamina} ---");
+
+            var arms = await ArmsAsync(
+                Fixture.Dials(stamina), 24,
+                Attending.Blind, Attending.Credited, Attending.Contested);
+
+            var credited = arms.First(one => one.Arm == "credited");
+            var contested = arms.First(one => one.Arm == "contested");
+
+            scored[stamina] = (credited.Mean, contested.Mean, contested.Separation(credited));
+        }
+
+        // THE RECORDED REFUTATION REPRODUCES WHERE IT WAS TAKEN. Without this the
+        // reversal below is just as likely to be the world having moved.
+        Assert.True(scored[4.0].Contested < scored[4.0].Credited,
+            $"inhibition no longer loses at the budget it was refuted at "
+            + $"({scored[4.0].Contested:F4} against {scored[4.0].Credited:F4}), so "
+            + "the row's evidence has expired for some reason other than this one");
+
+        // AND IT REVERSES COMPLETELY ONE BUDGET UP. The one-sided count collapses
+        // as the walk is allowed to reach further -- more budget reaches more
+        // partners and nothing rules any of them out -- while the arm that can say
+        // NOT THAT ONE keeps its footing. By stamina 12 the one-sided count is at
+        // the blind bar and inhibition is still holding the body.
+        Assert.True(scored[8.0].Sigma > 3.0 && scored[8.0].Contested > scored[8.0].Credited,
+            $"inhibition does not beat the one-sided count at the wider budget: "
+            + $"{scored[8.0].Contested:F4} against {scored[8.0].Credited:F4} at "
+            + $"{scored[8.0].Sigma:F2} sigma");
+
+        // THE SHAPE IS THE FINDING RATHER THAN THE WIN, and it is the second time
+        // today the same shape has turned up: a mechanism that SUPPRESSES options
+        // makes the budget stop mattering. The carried-edge discount flattened the
+        // same cliff on `Rhythm` without raising its peak; this flattens it and
+        // raises the peak.
+        Assert.True(
+            scored[12.0].Credited < scored[4.0].Credited - 0.2,
+            $"the one-sided count no longer collapses with budget "
+            + $"({scored[12.0].Credited:F4} against {scored[4.0].Credited:F4}), so "
+            + "there is no cliff here and the claim above is about something else");
+
+        Assert.True(
+            scored[12.0].Contested > scored[4.0].Contested,
+            $"inhibition stopped being budget-robust: {scored[12.0].Contested:F4} "
+            + $"at stamina 12 against {scored[4.0].Contested:F4} at stamina 4");
     }
 
     [Fact]

@@ -5,10 +5,8 @@
 - **Let it drift while a session runs; compact in one pass at the end** — John,
   2026-08-04. Piecemeal trimming costs attention and cuts in ignorance of what the
   session will find. **The ceiling stops that becoming permanent drift.**
-- **Prose is the cheapest thing to lose and the easiest to rederive** — a bullet
-  is a reminder, a paragraph is that plus connective tissue. **John, 2026-08-04.**
 - **What every piece does lives in the XML comments**, where the compiler enforces
-  that every reference resolves.
+  that every reference resolves — including why prose goes first.
 - **Forward-facing, no results.** Findings live in the commit, the comment beside
   the mechanism, and the test that asserts them. Deleted docs are in git.
 
@@ -26,11 +24,11 @@
 
 ## What is standing
 
-- **Eight worlds sharing no world logic, over one `Fabric`.** Snake, where a chain
-  can cause a move; senses, where sight and touch never co-occur so the answer can
-  only be composed; binding, built to be unanswerable and since lifted;
-  composition, where the answer was never observed; and **two nobody here
-  designed** — `Babi` and `Clevr`. `ScoreboardTests` runs them in one table.
+- **Nine worlds sharing no world logic, over one `Fabric`** — including binding,
+  built to be unanswerable and since lifted; composition, where the answer was
+  never observed; `Homeostat`, where a body must keep itself in bounds; and **two
+  nobody here designed**, `Babi` and `Clevr`. `ScoreboardTests` runs them in one
+  table.
 - **AN EXTERNAL WORLD CANNOT FLATTER THIS ARCHITECTURE.** `corpora/fetch.sh`
   fetches; nothing is vendored.
 - **An occasion is a SET**, so *red ball beside blue box* and *blue ball beside
@@ -45,8 +43,9 @@
   improving one wrecked the other. `Pricing.Sender` moves the ranking meaning to
   move the price; `Doubt` destroys the senses world applied to both and repairs a
   real defect applied to the score alone.
-- **The general move: find the number serving two masters and split it.**
-  `Accumulate` is the next candidate.
+- **The general move: find the number serving two masters and split it.** The row
+  entry still ranks AND prices with one number, and that split is the outstanding
+  one.
 - **A dial wanting different values in different worlds is the same fault** —
   John, 2026-08-03. Split it or fuse the arms rather than sweep. `DialTests`
   records which channel each dial may move.
@@ -74,8 +73,6 @@ to an old one — run that one.**
   arm on `Babi` is the *dearer* one, and `Senses` scores the two identically.
   **What is missing is not the controller but the SIGNAL**, which is fork 23's
   lesson a third time.
-- **`Fleeting` has nothing global to promote**: where it applies, the right value
-  is already set.
 
 ### 2. Predictive coding — only surprise propagates
 
@@ -101,34 +98,38 @@ to an old one — run that one.**
   function**, survival having proved gameable by circling. **No episode
   boundary**, which fits C4.
 - **`Homeostat` HAS SET THE BAR.** Attending to whatever is lowest holds the body
-  indefinitely, so the world is winnable and only by looking at it.
-- **But choosing by association scores BELOW random**: with nothing to say what an
-  action is for, the walk repeats what it did last time in that state — fork 20's
-  mirror. **So step 4 must beat random, not idling**, and needs a bootstrap, since
-  an action enters the graph only by being taken.
-- **`Drives` IS BUILT AND THREE ARMS FAIL THE BAR.** It weights an occasion by
-  whether the most-at-risk variable improved, positive band only, so counts stay
-  monotonic. **A delay-only control isolates the delivery**: the delay costs nine
-  times what the credit buys. **A top-up recovers part of that** — reinforcing the
-  occasion the machine actually wrote, since a rebuilt one pairs differently — and
-  still loses to no credit at all.
-- **SO THE CREDIT IS NOT THE MISSING PIECE.** Reinforcement likely DEEPENS the
-  groove it should fix: the walk repeats what it did last time in a state, and
-  rewarding that strengthens the loop.
-- **THE TASK IS RELATIONAL, and a count between two codes cannot be.** *Attend to
-  whichever is lowest* is about which variable holds the minimum — the same limit
-  as *A is north of B*. **Step 4 may be waiting on variable binding.**
+  indefinitely, so the world is winnable and only by looking at it. **The bar is
+  random, not idling**, and an arm needs a bootstrap, since an action enters the
+  graph only by being taken.
+- **EVERY POINT THE ARM SCORES COMES FROM THAT BOOTSTRAP.** Spend the budget until
+  the walk decides nearly every step and the score falls to *idling's exactly*,
+  attending one variable almost always and the two FASTEST-DRAINING ones never.
+  **Quieter is worse, monotonically, on both front ends. So association is
+  ANTI-CORRELATED here, not merely uninformative** — the walk reaches what was
+  done last time in this state, and in a body that is precisely what failed to
+  prevent the state. Fork 20's mirror at its sharpest.
+- **`Drives` IS BUILT AND THREE ARMS FAIL THE BAR** — credit, credit without the
+  delay, and the delay alone. **All lose to no credit at all**, and reinforcement
+  likely DEEPENS the groove it should fix.
+- **THE FRONT END WAS A REAL CEILING AND IS NOT THE CAUSE.** *Attend to whichever
+  is lowest* is relational, and a band is absolute: two states with identical
+  bands can have opposite answers, and the ceiling policy held the body so still
+  it visited ONE state. **`Ranked` lifts both and buys the arm nothing.** It does
+  change what is attended to, in the ceiling's direction, at 27× the messages.
+- **NEITHER THE SIGNAL NOR THE REPRESENTATION, THEN.** What is left is that a
+  count cannot prefer one of several equally-frequent partners. **That points at
+  INHIBITION and at variable binding**, not at a better third factor.
 
 ### 5. WHAT A CO-OCCURRENCE COUNT STRUCTURALLY CANNOT DO — John, 2026-08-03
 
 **Consequences of the design, not missing features. Ordered by cost.**
 
-- **ABSENCE — BUILT AS A SIGNAL, NOTHING ACTS ON IT.** `Surprise` returns both
-  halves of the signed error; `Overreach` tells a solved world from a predictor
-  naming everything, which is the one failure step 2 can cause rather than
-  measure. **A SIGNAL, not a node** — minting `not-X` would double an alphabet to
-  represent unboundedly many absent things. **WIRED**: `Rhythm` complains when the
-  predictor foresees nearly everything while nearly nothing it named happens.
+- **ABSENCE — BUILT AS A SIGNAL, AND WIRED.** `Surprise` returns both halves of
+  the signed error, and `Overreach` tells a solved world from a predictor naming
+  everything — the one failure step 2 can cause rather than measure. **A SIGNAL,
+  not a node**: minting `not-X` would double an alphabet to represent unboundedly
+  many absent things. `Rhythm` complains when the predictor foresees nearly
+  everything while nearly nothing it named happens.
 - **SUPERSESSION — THE CHANNEL IS BUILT, NOTHING READS IT.** Counts only
   increment, which is the G-Counter property and exactly what forbids
   most-recent-wins. **Do not decay**, which breaks convergence. `Tie.Count` stays
@@ -137,9 +138,8 @@ to an old one — run that one.**
   **What is left is both consumers**: recency ranking on `Question`, and eviction
   on "not touched since". Across machines it wants a Lamport clock.
 - **MULTI-TOKEN OUTPUT, concurrently. Splits in two.** *Simultaneous* actions are
-  nearly free — `BestOf` returns many and many thoughts are already in flight,
-  which is what `BroadcastId` is for — and **fork 11 built the addressing**; what
-  is left is a world that wants two. *Ordered* sequences need edge kinds.
+  nearly free and **fork 11 built the addressing**; what is left is a world that
+  wants two. *Ordered* sequences need edge kinds.
 
 ### 6. EDGE KINDS — BUILT, and the row was widened once
 
@@ -152,14 +152,9 @@ to an old one — run that one.**
 - **`Question.Through` restricts a walk to one relation**, and it is what answered
   fork 18. `Babi` is not a question about what follows, which is why kinds help
   there without rescuing the window.
-- **THE ONE-WAY RULE WAS A WORKAROUND FOR THE MISSING KIND, and step 6 retired
-  it.** Both ways used to mean *with*, because one cell per pair left asymmetry as
-  the only way to say *then*. **Measured**: forward-only left an actuator — which
-  broadcasts the consequence and must reach the cause — nothing to walk.
-- **ONLY WHERE BOTH CODES NOTED THE OCCASION**, so `Sequence` and never `Recent`:
-  a carried code had stopped, so a reverse edge into it is weighed against a
-  marginal that never counted the moment and `together` could exceed `seen`,
-  breaking the bound that terminates the walk.
+- **The one-way rule was a workaround for the missing kind, and step 6 retired
+  it** — with the bound that keeps `together <= seen`. `Kind.Before` holds both
+  arguments in full.
 - **`Rhythm` cannot measure this**: nothing there is ever simultaneous, so every
   cell is already temporal and splitting them is an isomorphism.
 
@@ -197,14 +192,10 @@ to an old one — run that one.**
 
 ### THE PATTERN UNDER ALL OF IT
 
-- **A row entry was one number doing several jobs**: it ranked, it priced, and it
-  was the only memory of the pair — no order, no recency, no kind. The recurring
-  fault at the level of the DATA STRUCTURE rather than of a dial.
-- **The remedy was to make it a record**, and it was widened ONCE: kinds,
-  supersession and eviction metadata for a single price.
-- **The price was paid and is measurable** — the row is a third wider on `Babi`,
-  which is the scaling wall arriving sooner.
-- **It still ranks and prices with one number.** That split is the one outstanding.
+- **A row entry was one number doing several jobs** — the recurring fault at the
+  level of the DATA STRUCTURE rather than of a dial. **The remedy was to make it a
+  record**, widened ONCE, and the price is measurable: the row is a third wider on
+  `Babi`, which is the scaling wall arriving sooner.
 - **None of this is a sufficiency argument.** All of it could land and still not be
   enough. The narrower claim: without structure, an internal error signal, a
   growing alphabet, a reason to act, supersession, absence, concurrent output and a
@@ -297,11 +288,12 @@ condition is a superstition. The commit named in git holds the numbers.**
 | A deeper walk for prediction | Monotonically worse — without edge kinds, deeper reaches more and ranks worse | **Edge kinds**, and that refutation reproduced |
 | `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted, `Max` worse where its revival condition pointed. **Both DELETED** | Lift in the **cost**, which `Doubt` is nearest to |
 | Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | **REVIVED at one code.** Naming as many as the frame holds swamps the action; naming ONE, the gap opens wide |
-| `Window` span | Null on snake, WORSE on `Babi` at an order of magnitude more traffic, and **the whole task on `Rhythm`**, where at zero the graph forms no edges. **Its revival condition has been RUN and half-held**: kinds recover much of the accuracy and most of the traffic at every budget, and carrying still loses to not carrying | **Something that makes a carried edge worth its row.** Kinds were the structural half and are not enough alone |
+| `Window` span | Null on snake, WORSE on `Babi` at an order of magnitude more traffic, and **the whole task on `Rhythm`**, where at zero the graph forms no edges. **Its revival condition has been RUN and half-held**: kinds recover much of both and carrying still loses to not carrying | **Something that makes a carried edge worth its row.** Kinds were the structural half and are not enough alone |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
 | `Pricing.Balanced` — cosine's denominator | **Times out.** The geometric mean sits BETWEEN the marginals, so weights rise and the walk explodes rather than compromising. Built for a conflict that was a budget artifact | A bound not relying on the weight being one marginal's reciprocal — `StepCost.Best`'s condition |
-| `Pricing.Driven` — the node picking the marginal per hop | **Two local rules, both worse than the better hand-set arm in BOTH worlds.** Preferring the receiver where affordable fell below *both*: a per-hop choice puts routes on different scales and the ranking stops meaning anything. **The premise was wrong — on `Babi` the better arm is the DEARER one** | A local quantity that predicts which arm wins, on a world where they differ: `Senses` scores them identically |
+| `Pricing.Driven` — the node picking the marginal per hop | **Two local rules, both worse than the better hand-set arm in BOTH worlds**, because a per-hop choice puts routes on different scales and the ranking stops meaning anything. **The premise was wrong — on `Babi` the better arm is the DEARER one** | A local quantity that predicts which arm wins, on a world where they differ: `Senses` scores them identically |
 | `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift and all its cost. **Two candidates whose orders invert tie identically under RRF for every damping constant**, so it ties exactly where it is needed | Many candidates, or a fusion separating by something other than position |
+| `Ranked` as step 4's fix | **The lift was the bootstrap's coin toss** — silent three times as often, and quieter is worse on both front ends. A varying code thins every edge, so routes starve before reaching an action. **Kept: it lifts a real ceiling** | Anything making the walk prefer a partner other than the one it took last time |
 
 ---
 
@@ -310,8 +302,8 @@ condition is a superstition. The commit named in git holds the numbers.**
 **Closed in code, named so nobody reintroduces them:** consecutive integer seeds
 are not independent (`Seeds.Apart`); `Measured.Separation` returned zero where
 repeated measurement found no spread (infinity now); `WhenQuiet()` was not a
-finish signal (`WhenIdle()`); questions were read before their walk had finished,
-making every number incomparable with any other (fork 22, `Unsettled` asserted).
+finish signal (`WhenIdle()`); walks were read before they had finished (fork 22,
+`Unsettled` on `Measurement`, so a new world cannot go without it).
 **Voting survives that fix and buys nothing in one process** — kept, because a
 real network loses reports.
 
@@ -326,6 +318,14 @@ real network loses reports.
 - **A dial can be declared, documented, passed everywhere and connected to
   nothing.** `ThinkAsync`'s stamina was, and survived the whole suite and three
   measurements. **Every run reports `Complaints`; read them.**
+- **A CHECK CAN BE WIRED AND UNABLE TO FIRE, which reads as passing.** Two worlds
+  counted `unbalanced` off a variable nothing incremented, and snake never asked
+  whether a walk had finished. **Arming a check that has always read zero is the
+  only way to tell the two apart.**
+- **A FALLBACK IS A CONTROL ARM NOBODY MEANT TO RUN.** Where an arm acts at random
+  when the walk says nothing, anything raising its silence drifts it toward the
+  random bar for free — and that reads as the change working. **Report silence
+  beside the score, and spend budget until the two arms match on it.**
 - **A small sample can look like a mechanism.** One seed with a collapsing echo
   read as a discovery and was three questions.
 - **A MEAN OVER A POPULATION THE PROBLEM CREATED CANNOT SEE IT.** Fan-out stayed
@@ -360,7 +360,7 @@ listed because the code still points at them.
 | **6** | Broadcast the origin, route the hops. Closed |
 | **11** | The output machine is addressed: a finished thought is PUBLISHED and the bus routes it by code, so N actuators act on one broadcast without holding it. **Closed — no world runs two yet** |
 | **12** | A fixed seed reproduces a run exactly, `Halted` included. Closed by 22's fix |
-| **18** | Score prediction **conditional on the next action**. **ANSWERED BY STEP 6** — action ordered first, prediction asking what follows, actuator asking what preceded. A different action moves the prediction further than without kinds on **every seed of twelve**, foresight rises on ten, and the comparison is paired because the baseline is near zero rather than the exact zero five seeds suggested. **The survival cost was not one** — see the refuted row |
+| **18** | Score prediction **conditional on the next action**. **ANSWERED BY STEP 6** — action ordered first, prediction asking what follows, actuator asking what preceded, and it holds on every seed of twelve. **The survival cost was not one** — see the refuted row |
 | **20** | Split budgets — deep to act, shallow to predict. Closed |
 | **21** | Compression. A trade: it pays where the budget cannot compose and costs where it can. Off by default |
 | **22** | A transiently-zero live count untracked thoughts mid-flight and dropped every later report. `InputMachine.Retire` asks twice. Closed |

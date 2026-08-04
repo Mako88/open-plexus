@@ -485,6 +485,89 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task The_credit_arm_reaches_its_level_fast_and_more_data_does_not_help()
+    {
+        // THE SILENCE HERE IS NOT THE SILENCE THE LAST TWO COMMITS WERE ABOUT.
+        // `Chain` went quiet because routes could not AFFORD to reach an action --
+        // a budget problem, and spending more bought the voice back. This arm goes
+        // quiet because the credit cell is EMPTY until something has helped, and
+        // no budget walks an edge that does not exist.
+        //
+        // SO THE PREDICTION WAS THAT A LONGER RUN WOULD FILL IT AND THE SCORE
+        // WOULD RISE. IT IS REFUTED, AND BY THIS PROJECT'S OWN NAMED TRAP. At seed
+        // 1 the score climbs 0.4150 -> 0.5938 -> 0.7025 across 400, 800 and 1600
+        // steps, which reads exactly like a learning curve. Across six seeds the
+        // rise is 0.2 sigma and there is no curve at all -- seed 1 is simply a bad
+        // start that recovers. One seed showing a monotone trend is the shape a
+        // small sample makes on its own.
+        //
+        // WHAT THAT MEANS: the arm reaches its level inside 400 steps and stays
+        // there, silent 86% of the time, well below the ceiling. The gap is NOT
+        // inexperience and will not close with more data.
+        //
+        // THE LIKELY REASON, AND IT IS THE NEXT THING TO ATTACK: distinct states
+        // keep growing -- 92 at 400 steps, 207 at 1600 -- so a credit cell keyed
+        // on the state it was earned in can never densely cover them. Nothing
+        // carries what was learnt in one state across to a similar one, because
+        // every generalisation here runs through similarity and there is none.
+        // That is step 8's argument arriving from a third direction.
+        // ACROSS SEEDS, because one seed showing a monotone rise is the shape a
+        // small sample makes on its own -- a named trap here.
+        var ranked = World() with { Ranked = true };
+
+        var curve = await Sweep.AcrossAsync(
+            6,
+            ("400", async seed =>
+            {
+                using var run = new HomeostatRun(ranked, Dials, seed);
+                return (await run.RunAsync(400, Attending.Credited)).Viable;
+            }),
+            ("800", async seed =>
+            {
+                using var run = new HomeostatRun(ranked, Dials, seed);
+                return (await run.RunAsync(800, Attending.Credited)).Viable;
+            }),
+            ("1600", async seed =>
+            {
+                using var run = new HomeostatRun(ranked, Dials, seed);
+                return (await run.RunAsync(1600, Attending.Credited)).Viable;
+            }));
+
+        output.WriteLine(Sweep.Table(curve));
+
+        foreach (var steps in (int[])[400, 1600])
+        {
+            using var run = new HomeostatRun(ranked, Dials, seed: 1);
+            var result = await run.RunAsync(steps, Attending.Credited);
+
+            output.WriteLine(
+                $"steps={steps,-5} silent={result.Silent,4}/{result.Steps} "
+                + $"({result.Silent / (double)result.Steps:P0}) "
+                + $"viable={result.Viable:F4} "
+                + $"attended=[{string.Join(",", result.Attended)}] "
+                + $"states={result.States} edges={result.Edges}");
+
+            Assert.Empty(result.Complaints);
+        }
+
+        // FLAT, AND ASSERTED AS FLAT. Quadrupling the run does not move the score
+        // by even one standard error, which is the finding -- if this ever starts
+        // failing because a longer run scores BETTER, the arm has begun
+        // generalising and the note above needs rewriting rather than repeating.
+        Assert.True(curve[2].Separation(curve[0]) < 2.0,
+            $"a longer run now scores measurably better ({curve[2].Mean:F4} at "
+            + $"1600 against {curve[0].Mean:F4} at 400, "
+            + $"{curve[2].Separation(curve[0]):F1} sigma) -- the arm has started "
+            + "learning from data it previously could not use");
+
+        // AND IT IS STILL SHORT OF THE CEILING at every length, so the room is
+        // real and is not going to be filled by running for longer.
+        Assert.All(curve, arm => Assert.True(arm.Mean < 0.95,
+            $"{arm.Arm} reached the ceiling ({arm.Mean:F4}), so this world has "
+            + "stopped having anything left to measure"));
+    }
+
+    [Fact]
     public async Task The_graph_has_no_reason_to_act_yet_and_the_baseline_says_so()
     {
         // THE BASELINE FOR STEP 4, AND IT IS EXPECTED TO BE POOR. Nothing tells

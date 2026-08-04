@@ -134,9 +134,13 @@ to an old one — run that one.**
   better representation to attach to.
 - **Silence cannot explain any of it.** The bootstrap acts at random, so coin
   tosses pull an arm TOWARDS the bar and can never carry it past.
-- **WHAT IS LEFT ON STEP 4:** the arm is **mostly silent** — the credit cell is
-  empty until something has helped — and it sits below the ceiling. Both are room,
-  not refutations.
+- **WHAT IS LEFT ON STEP 4, AND IT IS NOT INEXPERIENCE.** The arm is silent most
+  of the time and sits below the ceiling, and **quadrupling the run does not move
+  it** — no learning curve at all across seeds, though one seed alone shows a
+  clean one. **The state count keeps growing**, so a credit cell keyed on the
+  state it was earned in can never densely cover them, and nothing carries what
+  was learnt in one state to a similar one. **Step 8's argument from a third
+  direction.**
 - **THE FRONT END WAS A REAL CEILING AND IS NOT THE CAUSE.** *Attend to whichever
   is lowest* is relational, and a band is absolute: two states with identical
   bands can have opposite answers, and the ceiling policy held the body so still

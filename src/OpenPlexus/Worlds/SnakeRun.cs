@@ -365,7 +365,15 @@ public sealed class SnakeRun : IDisposable
             _before = [.. present];
             Remember(present);
 
-            var thought = await _eye.ObserveAsync(frame, taken, ct).ConfigureAwait(false);
+            // CHOOSING AN ACTION WALKS BACKWARDS FROM A CONSEQUENCE TO ITS CAUSE.
+            // The occasion says the action came first, so the forward cell runs
+            // action -> view; broadcasting the view and hoping to arrive at an
+            // action has no forward edge to use. Measured: with only the forward
+            // cell written, the chain reached an action ZERO times on every seed
+            // and the body moved entirely at random. See Kind.Before.
+            var thought = await _eye
+                .ObserveAsync(frame, taken, _kinds ? Question.Preceding() : null, ct)
+                .ConfigureAwait(false);
 
             // Wait for the dust to settle before deciding. Turn-based world,
             // harness affordance -- see the note on this class.

@@ -144,6 +144,14 @@ to an old one — run that one.**
 - **`Question.Through` restricts a walk to one relation**, and it is what answered
   fork 18. `Babi` is not a question about what follows, which is why kinds help
   there without rescuing the window.
+- **THE ONE-WAY RULE WAS A WORKAROUND FOR THE MISSING KIND, and step 6 retired
+  it.** Both ways used to mean *with*, because one cell per pair left asymmetry as
+  the only way to say *then*. **Measured**: forward-only left an actuator — which
+  broadcasts the consequence and must reach the cause — nothing to walk.
+- **ONLY WHERE BOTH CODES NOTED THE OCCASION**, so `Sequence` and never `Recent`:
+  a carried code had stopped, so a reverse edge into it is weighed against a
+  marginal that never counted the moment and `together` could exceed `seen`,
+  breaking the bound that terminates the walk.
 - **`Rhythm` cannot measure this**: nothing there is ever simultaneous, so every
   cell is already temporal and splitting them is an isomorphism.
 
@@ -344,7 +352,7 @@ listed because the code still points at them.
 | **6** | Broadcast the origin, route the hops. Closed |
 | **11** | The output machine is addressed: a finished thought is PUBLISHED and the bus routes it by code, so N actuators act on one broadcast without holding it. **Closed — no world runs two yet** |
 | **12** | A fixed seed reproduces a run exactly, `Halted` included. Closed by 22's fix |
-| **18** | Score prediction **conditional on the next action**. **ANSWERED BY STEP 6, where it had been a flat zero** — with the action ordered first and the walk asking only what follows, the gap and the movement above jitter are positive on every seed swept; without kinds a different action gives the IDENTICAL prediction. **What is left: the gap opens because the FALSE action predicts worse, and the body survives worse too** — the model gained and the policy did not |
+| **18** | Score prediction **conditional on the next action**. **ANSWERED BY STEP 6, where it had been a flat zero** — with the action ordered first, the walk asking what follows and the actuator asking what preceded, the gap and the movement above jitter are positive on every seed swept, and absolute foresight rises on most; without kinds a different action gives the IDENTICAL prediction. **What is left is the one seed where the body still does worse** |
 | **20** | Split budgets — deep to act, shallow to predict. Closed |
 | **21** | Compression. A trade: it pays where the budget cannot compose and costs where it can. Off by default |
 | **22** | A transiently-zero live count untracked thoughts mid-flight and dropped every later report. `InputMachine.Retire` asks twice. Closed |

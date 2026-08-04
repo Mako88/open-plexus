@@ -146,7 +146,7 @@ public sealed class SensesRun : IDisposable
         for (var moment = 0; moment < moments; moment++)
         {
             var thought = await _senses
-                .ObserveAsync(_world.Moment(), moment, ct).ConfigureAwait(false);
+                .ObserveAsync(_world.Moment(), moment, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             // FORK 21 REFLECTS ON WHAT WAS OBSERVED AND NEVER ON WHAT WAS ASKED.

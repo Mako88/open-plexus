@@ -191,7 +191,7 @@ public sealed class HomeostatRun : IDisposable
                 ? [.. felt, Homeostat.Attending(which)]
                 : felt;
 
-            await _body.ObserveAsync(occasion, step, ct).ConfigureAwait(false);
+            await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             if (world.Step(chosen)) held++;

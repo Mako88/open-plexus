@@ -192,7 +192,7 @@ public sealed class ClevrRun : IDisposable
 
         foreach (var scene in _world.Scenes)
         {
-            var observed = await _eyes.ObserveAsync(scene, at++, ct).ConfigureAwait(false);
+            var observed = await _eyes.ObserveAsync(scene, at++, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             // REFLECTION SEES WHAT WAS OBSERVED AND NEVER WHAT WAS ASKED, exactly

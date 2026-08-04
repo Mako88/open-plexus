@@ -101,7 +101,16 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// there is no "before training" for the walk to sit in.
     /// </para>
     /// </remarks>
-    public async Task<Thought?> ObserveAsync(TFrame frame, long now, CancellationToken ct = default)
+    /// <param name="frame">What the sense just read.</param>
+    /// <param name="now">The observing machine's own clock.</param>
+    /// <param name="asking">
+    /// What the resulting broadcast is a question ABOUT. <b>Null is every
+    /// observation made before edge kinds existed</b> — an undirected flood that
+    /// walks whatever it finds.
+    /// </param>
+    /// <param name="ct">Cancellation.</param>
+    public async Task<Thought?> ObserveAsync(
+        TFrame frame, long now, Question? asking = null, CancellationToken ct = default)
     {
         var changes = _liveSet.Update(_quantizer.Codify(frame), now);
         if (changes.Started.IsEmpty) return null;
@@ -154,7 +163,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         // or the graph stops getting better at the thing it already predicts and
         // the silence stops being earned. What is skipped is the broadcast.
         if (_surprise is null)
-            return await ThinkAsync(changes.Started, null, null, ct).ConfigureAwait(false);
+            return await ThinkAsync(changes.Started, null, asking, ct).ConfigureAwait(false);
 
         // BOTH HALVES OF THE ERROR, AND ONLY THE POSITIVE ONE TRAVELS. What was
         // expected and did not arrive is counted where it is computed and goes
@@ -164,7 +173,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
 
         return residual.Count == 0
             ? null
-            : await ThinkAsync(residual, null, null, ct).ConfigureAwait(false);
+            : await ThinkAsync(residual, null, asking, ct).ConfigureAwait(false);
     }
 
     /// <summary>

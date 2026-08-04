@@ -264,7 +264,7 @@ public sealed class ComposedRun : IDisposable
             foreach (var codes in episode.Moments)
             {
                 var thought = await _eyes
-                    .ObserveAsync(new Moment(codes, episode.Groups), at++, ct)
+                    .ObserveAsync(new Moment(codes, episode.Groups), at++, ct: ct)
                     .ConfigureAwait(false);
 
                 await _fabric.QuietAsync(ct).ConfigureAwait(false);

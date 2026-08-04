@@ -47,13 +47,47 @@ public enum Kind
     /// whole of what makes an edge temporal.</b>
     /// </summary>
     /// <remarks>
-    /// <b>The past records the future and not the reverse</b>, so a broadcast of
-    /// what has just happened can walk forward to what usually follows and a
-    /// broadcast of what follows cannot walk back. That rule already governed
-    /// <see cref="Learning.Occasion.Recent"/>; what is new is that the count
-    /// lands in its own cell instead of being added to the simultaneous one.
+    /// <b>The past records the future</b>, so a broadcast of what has just
+    /// happened can walk forward to what usually follows. That rule already
+    /// governed <see cref="Learning.Occasion.Recent"/>; what is new is that the
+    /// count lands in its own cell instead of being added to the simultaneous one.
     /// </remarks>
     After,
+
+    /// <summary>
+    /// The partner came BEFORE this node. <b>The same fact as <see cref="After"/>
+    /// read from the other end, and it is a SEPARATE CELL rather than a symmetric
+    /// one.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ONE-WAY RULE WAS A WORKAROUND FOR THE MISSING KIND, AND STEP 6
+    /// RETIRED WHAT IT WAS WORKING AROUND.</b> Writing a temporal pair both ways
+    /// used to destroy it: with one cell per pair, a reverse write made the edge
+    /// mean <i>with</i>, and the asymmetry was the only thing keeping <i>then</i>
+    /// distinguishable. A row that can say which relation it holds does not need
+    /// that trick — <c>before</c> and <c>after</c> are different cells and neither
+    /// collapses into <c>with</c>.
+    /// </para>
+    /// <para>
+    /// <b>MEASURED, AND IT WAS A SEVERED PATH RATHER THAN A PREFERENCE.</b> On
+    /// snake the action is said to come before the view it produced. With only the
+    /// forward cell written, choosing an action — which broadcasts the CURRENT
+    /// VIEW and has to reach an action code — had no edge to walk at all, and the
+    /// chain reached an action zero times on every seed. The body moved at random
+    /// while the prediction improved.
+    /// </para>
+    /// <para>
+    /// <b>ONLY WHERE BOTH CODES WERE IN THE OCCASION</b>, which is
+    /// <see cref="Learning.Occasion.Sequence"/> and never
+    /// <see cref="Learning.Occasion.Recent"/>. A carried code had already stopped,
+    /// so it does not note the occasion; a reverse edge INTO it would be weighed
+    /// against a marginal that never counted this moment, and
+    /// <c>together</c> could exceed <c>seen</c> — which breaks the bound that
+    /// makes every hop cost at least one and the walk terminate.
+    /// </para>
+    /// </remarks>
+    Before,
 }
 
 /// <summary>

@@ -73,6 +73,15 @@ public sealed record Question
     /// </remarks>
     public static Question Following() => new() { Through = Graph.Kind.After };
 
+    /// <summary>A question about what USUALLY PRECEDED what is being asked.</summary>
+    /// <remarks>
+    /// <b>THE QUESTION AN ACTUATOR ASKS.</b> Choosing what to do broadcasts the
+    /// situation and has to arrive at an action, which is walking from a
+    /// consequence back to its cause — the opposite direction from prediction, and
+    /// it is a different question rather than the same one read backwards.
+    /// </remarks>
+    public static Question Preceding() => new() { Through = Graph.Kind.Before };
+
     /// <summary>A question that ranks by agreement between its origins.</summary>
     /// <remarks>
     /// <b>The conjunction: the thing meant is the one every origin reached.</b>

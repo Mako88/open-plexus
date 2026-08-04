@@ -111,12 +111,24 @@ public sealed class LocalRendezvous : IRendezvous
 
                 if (order != 0)
                 {
-                    // ONE WAY, EARLIER TO LATER, and the reverse is not written
-                    // -- that is the whole of what makes the edge mean `then`.
                     var (first, second) = order < 0 ? (onset, other) : (other, onset);
 
+                    // BOTH WAYS, IN DIFFERENT CELLS. The one-way rule existed
+                    // because a single cell per pair could not say `then` except
+                    // by being asymmetric; a row that holds the kind does not
+                    // need that, and paying for it severed every path that has
+                    // to walk from a consequence back to its cause -- measured
+                    // on snake, where choosing an action stopped working
+                    // entirely. See Kind.Before.
                     if (!Passing(occasion.Fleeting, second))
                         _clusters.For(first).Observe(second, weight, Kind.After, occasion.At);
+
+                    // SAFE HERE AND NOT FOR A CARRIED CODE, because both of
+                    // these were IN the occasion and both noted it -- so the
+                    // reverse edge is weighed against a marginal that counted
+                    // this moment, and `together` cannot exceed `seen`.
+                    if (!Passing(occasion.Fleeting, first))
+                        _clusters.For(second).Observe(first, weight, Kind.Before, occasion.At);
 
                     continue;
                 }

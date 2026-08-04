@@ -257,7 +257,7 @@ public sealed class RhythmRun : IDisposable
 
             older = bet;
 
-            var observed = await _ear.ObserveAsync(shown, moment, ct).ConfigureAwait(false);
+            var observed = await _ear.ObserveAsync(shown, moment, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             if (observed is not null)

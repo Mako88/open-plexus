@@ -293,7 +293,7 @@ public sealed class BabiRun : IDisposable
                 shown++;
 
                 var observed = await _reader
-                    .ObserveAsync(line, at++, ct).ConfigureAwait(false);
+                    .ObserveAsync(line, at++, ct: ct).ConfigureAwait(false);
 
                 await _fabric.QuietAsync(ct).ConfigureAwait(false);
 

@@ -138,7 +138,7 @@ public sealed class MotifRun : IDisposable
         {
             var (shown, _) = _world.Next();
 
-            var observed = await _eyes.ObserveAsync(shown, moment, ct).ConfigureAwait(false);
+            var observed = await _eyes.ObserveAsync(shown, moment, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             if (observed is not null)

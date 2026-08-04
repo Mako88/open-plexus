@@ -195,7 +195,7 @@ public sealed class BindingRun : IDisposable
             var scene = _world.Next();
 
             var thought = await _eyes
-                .ObserveAsync(scene, moment, ct).ConfigureAwait(false);
+                .ObserveAsync(scene, moment, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             // Reflection sees what was OBSERVED and never what was asked, for the

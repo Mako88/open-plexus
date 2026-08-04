@@ -69,6 +69,7 @@ public sealed class Fork18Tests(ITestOutputHelper output)
         var moved = new Dictionary<bool, List<double>> { [false] = [], [true] = [] };
         var gap = new Dictionary<bool, List<double>> { [false] = [], [true] = [] };
         var asked = new Dictionary<bool, int> { [false] = 0, [true] = 0 };
+        var chosen = new Dictionary<bool, List<int>> { [false] = [], [true] = [] };
 
         foreach (var seed in (int[])[3, 7, 11, 17, 23])
             foreach (var kinds in new[] { false, true })
@@ -79,6 +80,7 @@ public sealed class Fork18Tests(ITestOutputHelper output)
                 moved[kinds].Add(result.Consequence.Moved);
                 gap[kinds].Add(result.Consequence.Gap);
                 asked[kinds] += result.Consequence.Asked;
+                chosen[kinds].Add(result.ChosenByChain);
 
                 output.WriteLine(
                     $"seed={seed} kinds={kinds} asked={result.Consequence.Asked} " +
@@ -89,6 +91,8 @@ public sealed class Fork18Tests(ITestOutputHelper output)
                     $"echoed={result.Consequence.Echoed:F4} " +
                     $"moved={result.Consequence.Moved:F4} " +
                     $"steps={result.Steps} temporal={run.TemporalCells} " +
+                    $"byChain={result.ChosenByChain} " +
+                    $"reachedNothing={result.ReachedNothing} " +
                     $"msgs={result.Messages}");
             }
 
@@ -110,13 +114,17 @@ public sealed class Fork18Tests(ITestOutputHelper output)
         Assert.All(moved[true], one => Assert.True(one > 0.0, $"moved {one}"));
         Assert.All(gap[true], one => Assert.True(one > 0.0, $"gap {one}"));
 
-        // AND THE HONEST SHAPE OF IT: the gap opens because naming a FALSE
-        // action predicts worse, not because naming the true one predicts
-        // better. That is discrimination rather than improved foresight, and
-        // saying so here stops the number being read as the latter.
-        Assert.True(asked[true] < asked[false],
-            "the temporal arm asked at least as many questions, so the caveat "
-            + "about a smaller sample no longer applies and should be removed");
+        // AND THE BODY STILL CHOOSES. THIS IS A REGRESSION TEST FOR A SEVERED
+        // PATH, not a quality bar. Ordering the occasion writes action -> view,
+        // and choosing an action broadcasts the VIEW and has to arrive at an
+        // action -- so with only the forward cell written there was no edge to
+        // walk, the chain reached an action zero times on every seed, and the
+        // snake moved entirely at random while its predictions improved. A
+        // world model bought by throwing away the policy is not a trade this
+        // project would take, and the number that says so is this one.
+        Assert.All(chosen[true], one => Assert.True(one > 0,
+            "the chain reached an action zero times: the acting walk has been "
+            + "severed again, and `Kind.Before` is what keeps it reachable"));
     }
 
     /// <summary>

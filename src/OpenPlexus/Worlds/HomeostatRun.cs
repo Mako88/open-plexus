@@ -28,65 +28,6 @@ public enum Attending
     Lowest,
 
     /// <summary>
-    /// The graph again, with what it learns WEIGHTED BY WHETHER THINGS GOT
-    /// BETTER — <b>step 4's third factor.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>A SEPARATE ARM BECAUSE IT CHANGES TWO THINGS, and saying so is the
-    /// point.</b> It weights the occasion by <see cref="Drives.Credit"/>, and it
-    /// writes that occasion ONE STEP LATE — an act can only be priced by what
-    /// followed it, so the credit for a transition belongs to the occasion before
-    /// it. <see cref="Chain"/> is left exactly as it was measured.
-    /// </para>
-    /// <para>
-    /// <b>The bar is <see cref="Blind"/> and not <see cref="Idle"/>.</b> Choosing
-    /// by association already scores below drawing at random, which is what step 4
-    /// exists to fix; beating idling would only mean the arithmetic still works.
-    /// </para>
-    /// </remarks>
-    Driven,
-
-    /// <summary>
-    /// <see cref="Driven"/>'s delay WITHOUT its credit — <b>the control that says
-    /// which of the two changes did the work.</b>
-    /// </summary>
-    /// <remarks>
-    /// <b>THE ARM CHANGES TWO THINGS, so on its own it can attribute neither.</b>
-    /// Writing an occasion one step late means every walk sees a graph one
-    /// occasion staler, which is a difference all by itself. This writes just as
-    /// late and always at weight one, so the gap between this and
-    /// <see cref="Driven"/> is the credit and nothing else.
-    /// </remarks>
-    Delayed,
-
-    /// <summary>
-    /// The credit as a TOP-UP rather than a delay — <b>write at once, add the
-    /// rest when the outcome lands.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>MEASURED: THE DELAY COSTS NINE TIMES WHAT THE CREDIT BUYS.</b> So the
-    /// credit is kept and the delay is not. The occasion is written immediately at
-    /// weight one, exactly as <see cref="Chain"/> writes it, and a step later the
-    /// SAME occasion is written again carrying whatever the transition earned
-    /// beyond one.
-    /// </para>
-    /// <para>
-    /// <b>ADDING TWICE IS WHAT A G-COUNTER IS FOR</b>, which is the whole reason
-    /// this is legal where subtracting would not be. A transition that went badly
-    /// simply gets no second write; there is no punishment available, only degrees
-    /// of reinforcement, and that is a property of the CRDT rather than a choice.
-    /// </para>
-    /// <para>
-    /// <b>The top-up is LEARNING WITHOUT THINKING</b>, so it goes to the
-    /// rendezvous directly. Sending it back through the input machine would find
-    /// no onsets — the codes are already live — and would join nothing at all.
-    /// </para>
-    /// </remarks>
-    Topped,
-
-    /// <summary>
     /// The credit in ITS OWN CELL, and the walk asks what is WORTH doing rather
     /// than what was done — <b>step 4's second attempt, and the first that is
     /// contrastive.</b>
@@ -328,10 +269,7 @@ public sealed class HomeostatRun : IDisposable
     private readonly InputMachine<ImmutableArray<Code>> _body;
     private readonly HomeostatSettings _settings;
 
-    /// <summary>
-    /// The join, held so a top-up can write without thinking — see
-    /// <see cref="Attending.Topped"/>.
-    /// </summary>
+    /// <summary>The join, held so a write can happen without thinking.</summary>
     private readonly LocalRendezvous _joining;
     private readonly WalkSettings _dials;
 
@@ -426,14 +364,6 @@ public sealed class HomeostatRun : IDisposable
         // is what earns the full band -- see Drives.
         var sensing = new Sensing(_settings.Drain * _settings.Needs);
 
-        // WHAT IS OWED A WEIGHT. The occasion for a step cannot be written until
-        // the step after it, because until then nothing has happened that could
-        // say what it was worth.
-        (ImmutableArray<Code> Codes, long At)? owed = null;
-
-        // WHAT IS OWED A TOP-UP, held as the machine actually wrote it.
-        Occasion? topping = null;
-
         // AND WHAT IS OWED A CREDIT CELL, held the same way and for the same
         // reason: a rebuilt occasion pairs differently. See InputMachine.Joined.
         Occasion? crediting = null;
@@ -510,53 +440,7 @@ public sealed class HomeostatRun : IDisposable
                 ? [.. felt, Homeostat.Attending(which)]
                 : felt;
 
-            if (choosing == Attending.Topped)
-            {
-                // AT ONCE, AT WEIGHT ONE -- the walk and the graph see exactly
-                // what `Chain` sees, so nothing is delayed.
-                await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
-                await _fabric.QuietAsync(ct).ConfigureAwait(false);
-
-                // AND THE PREVIOUS OCCASION COLLECTS WHAT IT EARNED. Only the
-                // surplus above one, and only when there is one: a G-Counter can
-                // be added to twice and can never be added to less.
-                //
-                // THE OCCASION THE MACHINE WROTE, NOT ONE REBUILT FROM THE CODES.
-                // Rebuilding gets a neighbouring occasion -- onsets separated from
-                // what was already live, the window's carried codes folded in --
-                // and measured, that lost to not topping up at all.
-                if (topping is { } due && sensing.Credit > 1.0)
-                {
-                    await _body
-                        .ReinforceAsync(due, sensing.Credit - 1.0, ct)
-                        .ConfigureAwait(false);
-
-                    await _fabric.QuietAsync(ct).ConfigureAwait(false);
-                }
-
-                topping = _body.Joined;
-            }
-            else if (choosing is Attending.Driven or Attending.Delayed)
-            {
-                // ONE STEP LATE, AND WEIGHTED BY WHAT FOLLOWED. The occasion held
-                // from last step is written now, priced by the transition it
-                // produced; this step's occasion is held in its place. The walk
-                // above already ran against the graph as it stood, so what is
-                // delayed is the LEARNING and never the thinking.
-                if (owed is { } last)
-                {
-                    var worth = choosing == Attending.Driven ? sensing.Credit : 1.0;
-
-                    await _body
-                        .ObserveAsync(last.Codes, last.At, worth: worth, ct: ct)
-                        .ConfigureAwait(false);
-
-                    await _fabric.QuietAsync(ct).ConfigureAwait(false);
-                }
-
-                owed = (occasion, step);
-            }
-            else if (choosing is Attending.Credited or Attending.Marked
+            if (choosing is Attending.Credited or Attending.Marked
                      or Attending.Contested or Attending.Contingent)
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the

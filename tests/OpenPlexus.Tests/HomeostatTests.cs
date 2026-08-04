@@ -212,9 +212,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     {
         // THE QUESTION STEP 4 IS ACTUALLY ABOUT, and the two changes are separate
         // arms because they are two changes. `Chain` ranked asks whether being
-        // able to EXPRESS the task is enough on its own; `Topped` ranked asks
-        // whether the credit -- refuted three times over on a front end where the
-        // correct policy was a constant -- has something to attach to now.
+        // able to EXPRESS the task is enough on its own.
         //
         // THE BAR IS BLIND AND NOT IDLE. Choosing by association already scores
         // below drawing at random, so beating idling would only say the
@@ -237,11 +235,6 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             {
                 using var run = new HomeostatRun(ranked, Dials, seed);
                 return (await run.RunAsync(Steps, Attending.Chain)).Viable;
-            }),
-            ("topped+ranked", async seed =>
-            {
-                using var run = new HomeostatRun(ranked, Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Topped)).Viable;
             }),
             ("lowest", async seed =>
             {
@@ -410,11 +403,6 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             {
                 using var run = new HomeostatRun(World(), Dials, seed);
                 return (await run.RunAsync(Steps, Attending.Chain)).Viable;
-            }),
-            ("topped", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Topped)).Viable;
             }),
             ("marked", async seed =>
             {
@@ -712,7 +700,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         // same treatment: each is swept and read at ITS OWN best budget.
         //
         // AND THE ATTRIBUTION HOLDS. `Credited` peaks at 0.7347; the unconditioned
-        // control, plain association and the top-up all peak BELOW the blind bar.
+        // control and plain association both peak BELOW the blind bar.
         // The contrast is what did it, and that now survives being swept instead of
         // sampled.
         var peaks = new Dictionary<string, double>();
@@ -723,7 +711,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
 
             var arms = await ArmsAsync(
                 Fixture.Dials(stamina), 24,
-                Attending.Blind, Attending.Chain, Attending.Marked, Attending.Topped);
+                Attending.Blind, Attending.Chain, Attending.Marked);
 
             foreach (var arm in arms)
                 peaks[arm.Arm] = Math.Max(peaks.GetValueOrDefault(arm.Arm, 0.0), arm.Mean);
@@ -732,7 +720,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         output.WriteLine(string.Join(
             "  ", peaks.Select(one => $"{one.Key}={one.Value:F4}")));
 
-        foreach (var control in (string[])["chain", "marked", "topped"])
+        foreach (var control in (string[])["chain", "marked"])
             Assert.True(peaks[control] < peaks["blind"],
                 $"`{control}` now beats the blind bar at its own best budget "
                 + $"({peaks[control]:F4} against {peaks["blind"]:F4}), so step 4's "
@@ -786,27 +774,24 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task The_arms_that_never_reach_the_bar_at_any_budget()
+    public async Task The_contingency_is_dominated_rather_than_refuted()
     {
-        // THE EVIDENCE THE COLLAPSE NEEDS. John's rule is that an arm exists only
-        // while alternatives are actively being tested, and a loser is deleted with
-        // a revival row rather than kept switchable. What that rule needs first is a
-        // refutation taken at each arm's OWN best budget -- because one taken at a
-        // single setting is what cost this project the inhibition result.
+        // A TIE IS NOT A REFUTATION, and the distinction decides what its row says.
+        // `Contingent` clears the bar comfortably at its own best budget and sits
+        // inside the noise of the one-sided count it was built to improve on, while
+        // inhibition clears both. So its revival condition is about what would
+        // SEPARATE it rather than about what killed it.
         //
-        // `Driven` weights the occasion by the credit and writes it a step late.
-        // `Delayed` is that delay without the credit. Both peak FAR below drawing at
-        // random, at the lowest budget swept, and fall from there.
+        // SWEPT AT ITS OWN PEAK because a comparison at one budget is what cost this
+        // project the inhibition result: two arms can peak two settings apart.
         var peaks = new Dictionary<string, (double Stamina, double Mean)>();
 
-        foreach (var stamina in (double[])[2.0, 3.0, 4.0, 6.0, 8.0, 12.0])
+        foreach (var stamina in (double[])[2.0, 3.0, 4.0, 6.0, 8.0])
         {
             output.WriteLine($"--- stamina {stamina} ---");
 
             var arms = await ArmsAsync(
-                Fixture.Dials(stamina), 24,
-                Attending.Blind, Attending.Driven, Attending.Delayed,
-                Attending.Contingent);
+                Fixture.Dials(stamina), 24, Attending.Blind, Attending.Contingent);
 
             foreach (var arm in arms)
                 if (!peaks.TryGetValue(arm.Arm, out var best) || arm.Mean > best.Mean)
@@ -816,23 +801,11 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         foreach (var (name, best) in peaks)
             output.WriteLine($"PEAK {name,-11} {best.Mean:F4} at stamina {best.Stamina:F1}");
 
-        var bar = peaks["blind"].Mean;
-
-        foreach (var beaten in (string[])["driven", "delayed"])
-            Assert.True(peaks[beaten].Mean < bar - 0.1,
-                $"`{beaten}` reaches {peaks[beaten].Mean:F4} at its own best budget "
-                + $"against a bar of {bar:F4}, so it is no longer refuted and the "
-                + "row recording it should say that instead");
-
-        // AND THE CONTINGENCY IS NOT REFUTED, IT IS DOMINATED. It clears the bar
-        // comfortably at its own peak and sits inside the noise of the one-sided
-        // count it was meant to improve on, while inhibition clears both. A tie is
-        // not a refutation, so its row is about what would separate it rather than
-        // about what killed it.
-        Assert.True(peaks["contingent"].Mean > bar,
-            $"the contingency stopped beating the bar ({peaks["contingent"].Mean:F4} "
-            + $"against {bar:F4}), which would make it refuted rather than merely "
-            + "dominated and changes what its row should say");
+        Assert.True(peaks["contingent"].Mean > peaks["blind"].Mean,
+            $"the contingency stopped beating the bar "
+            + $"({peaks["contingent"].Mean:F4} against {peaks["blind"].Mean:F4}), "
+            + "which would make it refuted rather than merely dominated and changes "
+            + "what its row should say");
     }
 
     [Fact]

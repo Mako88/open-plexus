@@ -175,6 +175,40 @@ public enum Kind
     /// </para>
     /// </remarks>
     Hindered,
+
+    /// <summary>
+    /// They met, <b>and what followed was not what the machine expected</b> — step
+    /// 10, and the first thing here that gives the system a reason to SEEK rather
+    /// than to survive.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Helped"/> SAYS THE BODY GOT BETTER; THIS SAYS THE MODEL DID.</b>
+    /// They are the same shape and a different third factor: one is priced by
+    /// <see cref="Learning.Drives"/> reading the body, the other by
+    /// <see cref="Learning.Surprise"/> reading the machine's own prediction error.
+    /// <b>Both are computed from the system's own state</b>, so neither is a reward
+    /// handed in from outside — the argument that makes Ashby's bounds legitimate
+    /// makes this legitimate by the same step.
+    /// </para>
+    /// <para>
+    /// <b>NOVELTY DECAYS WITH NOTHING DECAYING, WHICH IS WHY THIS FITS HERE AT
+    /// ALL.</b> A count that only rises looks like the wrong instrument for
+    /// <i>new</i>, and it is not: the walk reads <c>informed / seen</c>, and as an
+    /// act becomes predictable the cell stops growing while the marginal keeps
+    /// going, so its ranking falls on its own. <b>The anti-hub weighting already
+    /// does the forgetting</b>, and no count is ever reduced.
+    /// </para>
+    /// <para>
+    /// <b>IT IS AIMED AT THE BOOTSTRAP AND NOT AT THE SCORE.</b> Step 4's arm is
+    /// silent until something has helped, so most of a run is the fallback coin
+    /// toss — which TRAPS names as a control arm nobody meant to run. This is what
+    /// makes those steps deliberate. <b>Step 9 established that the silence cannot
+    /// be cured by asking a WIDER question</b>; this asks a different one, of the
+    /// same width, so it does not inherit that refutation.
+    /// </para>
+    /// </remarks>
+    Informed,
 }
 
 /// <summary>

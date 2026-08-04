@@ -263,6 +263,87 @@ public enum Attending
     /// </para>
     /// </remarks>
     Backing,
+
+    /// <summary>
+    /// <see cref="Credited"/> with a REASON TO SEEK where it had a coin toss —
+    /// <b>step 10, and it aims at the bootstrap rather than at the score.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>WHAT THIS DESIGN HAS NEVER HAD.</b> <see cref="Learning.Drives"/> makes
+    /// the body want to stay alive; nothing makes it want to find out.
+    /// <see cref="Learning.Surprise"/> is a quantity the machine reads about
+    /// itself and no action has ever been chosen to move it.
+    /// </para>
+    /// <para>
+    /// <b>THE SAME SHAPE AS THE CREDIT CELL, WITH A DIFFERENT THIRD FACTOR.</b>
+    /// Each step the graph is asked what usually FOLLOWS, and the answer is held.
+    /// The step after, what actually arrived is compared against it, and the
+    /// occasion that caused the transition earns
+    /// <see cref="Graph.Kind.Informed"/> if the machine was WRONG — exactly as it
+    /// earns <see cref="Graph.Kind.Helped"/> if the body improved.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS ASKED SECOND, NEVER INSTEAD.</b> The credit cell answers where
+    /// it has anything to say; curiosity replaces the fallback and nothing else. So
+    /// this is <see cref="Backing"/>'s structure with a different second question —
+    /// and where backoff's wider walk lost, this one does not widen at all, which
+    /// is what keeps it clear of step 9's refutation.
+    /// </para>
+    /// <para>
+    /// <b>IT NEEDS TEMPORAL CELLS, so it runs at a span.</b> A prediction of what
+    /// follows cannot be made in a world whose occasions are all flat sets, which
+    /// is what this world was until the span arrived.
+    /// </para>
+    /// <para>
+    /// <b>MEASURED, AND IT FAILS — AND NOT BY WIDENING, WHICH IS WHY IT MATTERS.</b>
+    /// The walk is one hop, exactly as narrow as <see cref="Credited"/>'s, and the
+    /// arm still collapses: silence falls and the score falls with it. <b>THE CELL
+    /// IS WRITTEN TOO OFTEN.</b> Early on the machine predicts nothing, so nearly
+    /// every transition is surprising, nearly every occasion earns
+    /// <see cref="Graph.Kind.Informed"/>, and <i>what was informative here</i>
+    /// becomes <i>what was done here</i> — the behaviour policy, reached by a third
+    /// route.
+    /// </para>
+    /// <para>
+    /// <b>THAT IS THE NOISY-TELEVISION PROBLEM, AND SCHMIDHUBER'S CLAIM WAS NEVER
+    /// ABOUT ERROR.</b> Prediction error alone is maximised by noise; what is meant
+    /// to be sought is COMPRESSION PROGRESS — the error coming DOWN. Rewarding the
+    /// error itself rewards whatever is least learnable. <see cref="Probing"/> is
+    /// that correction.
+    /// </para>
+    /// </remarks>
+    Curious,
+
+    /// <summary>
+    /// <see cref="Curious"/> written SELECTIVELY — <b>the control that says whether
+    /// curiosity failed, or only the signal did.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ONE THING CHANGES: WHEN THE CELL IS WRITTEN.</b> Everything else — the
+    /// prediction, the question, the fallback structure — is
+    /// <see cref="Curious"/> exactly. This writes
+    /// <see cref="Graph.Kind.Informed"/> only where the machine did WORSE than its
+    /// own running average, so the cell stays rare by construction and rarity is
+    /// the thing being tested.
+    /// </para>
+    /// <para>
+    /// <b>NO CONSTANT ANYWHERE.</b> The threshold is the machine's own
+    /// <see cref="Learning.Surprise.Rate"/>, which is a quantity it already keeps
+    /// about itself — so this is a dial that sets itself rather than a sixth knob,
+    /// which is the standing ask.
+    /// </para>
+    /// <para>
+    /// <b>WHAT IT SEPARATES.</b> <see cref="Credited"/> works and is written
+    /// rarely; three arms that write densely all collapse to the behaviour policy.
+    /// If this recovers, <b>selectivity is the mechanism</b> and the semantics of
+    /// the second cell barely matter. If it does not, the contrast in
+    /// <see cref="Graph.Kind.Helped"/> is doing something rarity alone cannot
+    /// explain.
+    /// </para>
+    /// </remarks>
+    Probing,
 }
 
 /// <summary>
@@ -461,6 +542,14 @@ public sealed class HomeostatRun : IDisposable
         // is what earns the full band -- see Drives.
         var drives = new Drives(_settings.Drain * _settings.Needs);
 
+        // STEP 10'S THIRD FACTOR, and null for every arm that does not seek. Held
+        // by the run rather than handed to the machine on purpose: passing it to
+        // `InputMachine` would also switch on step 2's broadcast gating, and an arm
+        // that changed the walk AND the learning could attribute neither.
+        var surprise = choosing is Attending.Curious or Attending.Probing
+            ? new Surprise()
+            : null;
+
         // WHAT IS OWED A WEIGHT. The occasion for a step cannot be written until
         // the step after it, because until then nothing has happened that could
         // say what it was worth.
@@ -509,28 +598,43 @@ public sealed class HomeostatRun : IDisposable
 
                         Attending.Credited or Attending.Marked
                             or Attending.Contested
-                            or Attending.Backing => Question.Worthwhile(),
+                            or Attending.Backing
+                            or Attending.Curious or Attending.Probing
+                                => Question.Worthwhile(),
 
                         _ => null,
                     },
                     ct).ConfigureAwait(false);
 
-            // BACKOFF: THE GENERAL QUESTION ONLY WHERE THE PRECISE ONE WAS SILENT.
-            // Asked second and never instead, so a state whose own credit cell has
-            // something to say is answered by it and the wider walk cannot override
-            // it -- which is exactly what `Kindred` did wrong. See Attending.Backing.
-            if (choosing == Attending.Backing && walked.Chosen is null)
+            // A SECOND QUESTION ONLY WHERE THE FIRST WAS SILENT, AND NEVER INSTEAD.
+            // A state whose own credit cell has something to say is answered by it,
+            // so the second walk cannot override a specific answer -- which is
+            // exactly what `Kindred` did wrong.
+            //
+            // THE TWO SECOND QUESTIONS ARE NOT THE SAME KIND OF THING, AND STEP 9
+            // IS WHY. `Backing` asks a WIDER walk, which is refuted: anything wide
+            // enough to stop being silent converges on what was done most. `Curious`
+            // asks a walk of the SAME width over a DIFFERENT statistic, so it does
+            // not inherit that.
+            var second = choosing switch
             {
-                var wider = await ChosenAsync(felt, chains, Question.Alike(), ct)
+                Attending.Backing => Question.Alike(),
+                Attending.Curious or Attending.Probing => Question.Curious(),
+                _ => null,
+            };
+
+            if (second is not null && walked.Chosen is null)
+            {
+                var again = await ChosenAsync(felt, chains, second, ct)
                     .ConfigureAwait(false);
 
                 // THE PLUMBING OF BOTH WALKS COUNTS, not just the one that
                 // answered. A second walk that failed to settle is still a second
                 // walk, and hiding it would understate what this arm costs.
                 walked = new Walked(
-                    wider.Chosen,
-                    walked.Settled && wider.Settled,
-                    walked.Balanced && wider.Balanced);
+                    again.Chosen,
+                    walked.Settled && again.Settled,
+                    walked.Balanced && again.Balanced);
             }
 
             // THESE TWO WERE DECLARED HERE AND NEVER MOVED, so this world alone
@@ -620,7 +724,8 @@ public sealed class HomeostatRun : IDisposable
             }
             else if (choosing is Attending.Credited or Attending.Marked
                      or Attending.Contested or Attending.Kindred
-                     or Attending.Foreseeing or Attending.Backing)
+                     or Attending.Foreseeing or Attending.Backing
+                     or Attending.Curious or Attending.Probing)
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
                 // ordinary cell is untouched and this arm changes one thing.
@@ -656,9 +761,55 @@ public sealed class HomeostatRun : IDisposable
 
                         await _fabric.QuietAsync(ct).ConfigureAwait(false);
                     }
+
+                    // STEP 10 -- THE OTHER THIRD FACTOR, AND IT IS SCORED AGAINST
+                    // THE MACHINE RATHER THAN THE BODY. The expectation held from
+                    // last step is settled against what is felt now; a transition
+                    // that was NOT foreseen taught the model something, and the
+                    // occasion that caused it earns its own cell. See
+                    // Kind.Informed.
+                    if (surprise is not null)
+                    {
+                        // THE RUNNING AVERAGE, READ BEFORE THIS MOMENT JOINS IT.
+                        // `Probing` writes only where the machine did worse than
+                        // it usually does, so the threshold is a quantity the
+                        // machine already keeps about itself rather than a knob.
+                        var usually = surprise.Rate;
+
+                        var residual = surprise.Residual(felt);
+
+                        var foreseen = felt.Length == 0
+                            ? 1.0
+                            : 1.0 - (residual.Surprising.Count / (double)felt.Length);
+
+                        // AND THE ONE THING THAT DIFFERS BETWEEN THE TWO ARMS.
+                        // `Curious` takes any surprise at all -- which early on is
+                        // every transition, so the cell stops discriminating. See
+                        // Attending.Probing.
+                        var worthKnowing = residual.Surprising.Count > 0
+                            && (choosing == Attending.Curious || foreseen < usually);
+
+                        if (worthKnowing)
+                        {
+                            await _body
+                                .ReinforceAsync(
+                                    earned with { As = Kind.Informed }, 1.0, ct)
+                                .ConfigureAwait(false);
+
+                            await _fabric.QuietAsync(ct).ConfigureAwait(false);
+                        }
+                    }
                 }
 
                 crediting = _body.Joined;
+
+                // AND WHAT THE GRAPH EXPECTS OF THE NEXT MOMENT, ASKED AFTER THE
+                // OCCASION IS WRITTEN so the prediction sees the graph the body
+                // has actually just moved through. Held, and settled one step from
+                // now against what arrives.
+                if (surprise is not null)
+                    surprise.Expect(
+                        await ExpectingAsync(occasion, chains, ct).ConfigureAwait(false));
             }
             else
             {
@@ -743,6 +894,52 @@ public sealed class HomeostatRun : IDisposable
 
         _body.Forget(thought.Id);
         return new Walked(chosen, settled, balanced);
+    }
+
+    /// <summary>
+    /// What the graph expects to be true next — <b>step 10's third factor, and the
+    /// only thing here the machine can be WRONG about.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NARROWED TO WHAT THE BODY FEELS AND NOT TO ACTIONS.</b> A prediction that
+    /// named the next act would be scored against a choice this run is about to
+    /// make, so it would be right or wrong for reasons that have nothing to do with
+    /// the model.
+    /// </para>
+    /// <para>
+    /// <b>SCORED AGAINST WHAT IS FELT RATHER THAN AGAINST ONSETS</b>, which is a
+    /// departure from <see cref="Surprise"/>'s own reading and deliberate here: a
+    /// band that was predicted and stayed put is a prediction that came TRUE, and
+    /// counting it absent would make a still body read as maximally surprising.
+    /// </para>
+    /// </remarks>
+    private async Task<IReadOnlyList<Code>> ExpectingAsync(
+        ImmutableArray<Code> felt, Chains chains, CancellationToken ct)
+    {
+        var thought = await _body
+            .ThinkAsync(felt, _dials.Stamina, Question.Following(), ct)
+            .ConfigureAwait(false);
+
+        await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
+        chains.Fold(thought.Best(int.MaxValue));
+
+        // ONE PER NEED, which is as many codes as the next moment can hold. Naming
+        // more would make the machine right by exhaustion, which is the failure
+        // `Surprise.Overreach` exists to catch.
+        //
+        // EVERY NEED IS ITS OWN MODALITY -- need `i` is `Need + i` -- so the
+        // narrowing is a band of modalities rather than one, and `BestOf` takes
+        // exactly one. Ranked order is preserved by taking from `Best`.
+        var named = thought.Best(int.MaxValue)
+            .Where(arrival => arrival.Endpoint.Modality >= Homeostat.Need
+                && arrival.Endpoint.Modality < Homeostat.Need + _settings.Needs)
+            .Take(_settings.Needs)
+            .Select(arrival => arrival.Endpoint)
+            .ToList();
+
+        _body.Forget(thought.Id);
+        return named;
     }
 
     public void Dispose() => _fabric.Dispose();

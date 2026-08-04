@@ -696,6 +696,24 @@ public sealed class HomeostatTests(ITestOutputHelper output)
                 using var run = new HomeostatRun(World(), Dials, seed);
                 return (await run.RunAsync(Steps, Attending.Backing)).Viable;
             }),
+
+            // STEP 10 — the same structure as `backing` with a question of the
+            // SAME width over a different statistic, so it does not inherit step
+            // 9's refutation. It needs temporal cells to have a prediction at all.
+            ("curious", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed, span: 1);
+                return (await run.RunAsync(Steps, Attending.Curious)).Viable;
+            }),
+
+            // AND THE SAME CELL WRITTEN SELECTIVELY — the control that separates
+            // "curiosity is the wrong idea" from "surprise LEVEL is the wrong
+            // signal for it". See Attending.Probing.
+            ("probing", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed, span: 1);
+                return (await run.RunAsync(Steps, Attending.Probing)).Viable;
+            }),
             ("lowest", async seed =>
             {
                 using var run = new HomeostatRun(World(), Dials, seed);
@@ -718,7 +736,8 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         foreach (var (arm, span) in
             (( Attending, int )[])[(Attending.Credited, 0), (Attending.Credited, 1),
                 (Attending.Foreseeing, 1), (Attending.Foreseeing, 3),
-                (Attending.Foreseeing, 8), (Attending.Backing, 0)])
+                (Attending.Foreseeing, 8), (Attending.Backing, 0),
+                (Attending.Curious, 1), (Attending.Probing, 1)])
         {
             using var run = new HomeostatRun(World(), Dials, seed: 1, span: span);
             var result = await run.RunAsync(Steps, arm);
@@ -777,6 +796,47 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         Assert.True(narrow.Mean > backed.Mean,
             $"asking only the credit cell and tossing a coin otherwise has stopped "
             + $"beating backoff: {narrow.Mean:F4} against {backed.Mean:F4}");
+
+        // ---- AND STEP 10 IS NOT MEASURED HERE, WHICH IS THE HONEST READING ----
+        //
+        // `curious` and `probing` look like an arm and its control and they are
+        // not, because the thing they both depend on is empty. THE PREDICTION WALK
+        // RETURNS NOTHING: `after` is as sparse here as `foreseeing` already
+        // showed, so `Question.Following()` reaches no code worth naming.
+        //
+        // BOTH READINGS FOLLOW FROM THAT ONE FACT. With nothing predicted, every
+        // moment is maximally surprising -- so `curious` writes its cell on nearly
+        // every step, the cell becomes as dense as `With`, and it collapses to the
+        // behaviour policy exactly as step 9's arms did. And `probing`, which asks
+        // for a step WORSE than the running average, can never fire at all, because
+        // the average is already the floor.
+        //
+        // SO NEITHER ARM IS EVIDENCE ABOUT CURIOSITY. This is the live trap about
+        // a check that is wired and unable to fire, caught by the only thing that
+        // catches it: `probing` reproduces `credited` down to the edge count, and
+        // an arm that writes a new cell cannot leave the graph the same size.
+        var spanned = arms.First(one => one.Arm == "credited+carried");
+        var probing = arms.First(one => one.Arm == "probing");
+
+        Assert.Equal(spanned.Mean, probing.Mean, 4);
+
+        using var probed = new HomeostatRun(World(), Dials, seed: 1, span: 1);
+        var selective = await probed.RunAsync(Steps, Attending.Probing);
+
+        using var credited = new HomeostatRun(World(), Dials, seed: 1, span: 1);
+        var plain = await credited.RunAsync(Steps, Attending.Credited);
+
+        Assert.Equal(plain.Edges, selective.Edges);
+
+        // AND THE DENSE ARM DID WRITE, which is what says the difference between
+        // the two is the threshold rather than the wiring.
+        using var seeking = new HomeostatRun(World(), Dials, seed: 1, span: 1);
+        var dense = await seeking.RunAsync(Steps, Attending.Curious);
+
+        Assert.True(dense.Edges > plain.Edges,
+            $"the unconditional curiosity arm wrote no cells either "
+            + $"({dense.Edges} against {plain.Edges}), so the fault is the wiring "
+            + "and not the threshold, and this reads as something different");
     }
 
     [Fact]

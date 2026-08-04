@@ -85,9 +85,8 @@ its ceiling it absorbs anything.)*
 
 ### 1. RANKING BELONGS TO THE QUESTION — moved onto `Question`, and the dial is gone
 
-- **Merging routes AT A NODE is the version `Narrowed` could not do** — reading
-  the index back puts the referent in the machine's hands. Needs a wait: dear
-  under C2.
+- **Merging routes AT A NODE is the version `Narrowed` could not do** — reading the
+  index back puts the referent in the machine's hands. Needs a wait: dear under C2.
 - **`Pricing` IS HAND-SET AND A CONTROLLER IS REFUTED. The missing thing is the
   SIGNAL** — fork 23, a third time.
 
@@ -95,13 +94,12 @@ its ceiling it absorbs anything.)*
 
 - Rao & Ballard, Friston. An expected onset is silent. **Built.**
 - **THE OBSERVATION IS SUPPRESSED, NOT THE PREDICTION** — the walk making the
-  expectation still runs, so the saving is partial. **Prediction itself conditional
-  on surprise is the deeper version.**
+  expectation still runs. **Prediction conditional on surprise is the deeper
+  version.**
 - **AND THE WRITE PATH IS NOT GATED AT ALL.** The stated reason — *the expectation
-  would decay* — **does not hold where nothing decays**: a well-predicted pair needs
-  no reinforcement to stay predicted. Rescorla and Wagner's claim is that learning
-  tracks ERROR and not frequency, and `Occasion.Weight` is the channel. **The
-  payoff is cost**: it silences the WRITE path as step 2 silenced the THINK path.
+  would decay* — **does not hold where nothing decays**. Rescorla and Wagner:
+  learning tracks ERROR, not frequency, and `Occasion.Weight` is the channel.
+  **The payoff is cost** — it silences the WRITE path as step 2 silenced thinking.
 
 ### 3. Chunking — MDL. **`Chunk` is built, and it is a trade**
 
@@ -113,8 +111,8 @@ its ceiling it absorbs anything.)*
   costs a little; the sets are a tiny share of a row count the noise dominates, so
   MDL's storage half never shows.
 - **A MINTED NODE IS A HUB BY CONSTRUCTION and `Pricing.Receiver` refuses hubs** —
-  the likely reading of that cost. **`Toll.Traffic` is the arm that tests it**: a
-  chunk should become dear to ENTER and still believed.
+  the likely reading of that cost. **`Toll.Traffic` tests it**: a chunk should
+  become dear to ENTER and still believed.
 - Open: **only a WHOLE moment is a candidate**, so a set inside a larger one is
   invisible — pair-merging (Sequitur, BPE) composes. And the **utility problem**
   (Minton, SOAR): utility belongs per chunk.
@@ -123,18 +121,21 @@ its ceiling it absorbs anything.)*
 
 - Bounded internal variables make behaviour goal-directed **with no reward
   function**, survival having proved gameable. **No episode boundary**, fitting C4.
+  **AND EVERY ACT PAYS OFF AT ONCE, so this world cannot see steps 7, 10 or 11.**
 - **`Homeostat` SETS THE BAR, AND THE BAR IS RANDOM.** Attending to whatever is
   lowest holds the body indefinitely, so the world is winnable only by looking at
   it.
 - **SO ASSOCIATION IS ANTI-CORRELATED, not merely uninformative.** A count of what
   was done converges on the POLICY that did it, and the states a body is in are the
-  ones its own actions produced. **Contiguity is not contingency**
-  (Rescorla–Wagner), and this waits anywhere the graph learns from itself.
+  ones its own actions produced. **Contiguity is not contingency**, and this waits
+  anywhere the graph learns from itself.
 - **THE CREDIT NEEDED ITS OWN CELL, AND THAT IS THE FIRST ARM TO BEAT THE BAR.**
   Three earlier arms wrote a HEAVIER number into the cell meaning *this was done
-  here*, deepening the groove. `Kind.Helped` is a SECOND statistic and
-  `Question.Worthwhile()` walks it alone. **Nothing is punished, both counts only
-  rise.** `Marked` is the control and loses to the bar.
+  here*, deepening the groove. `Kind.Helped` is a SECOND statistic, walked alone.
+  **Nothing is punished, both counts only rise.** `Marked` is the control.
+- **AND ITS VIRTUE IS RARITY, WHICH FOUR ARMS SINCE HAVE ESTABLISHED.** Every
+  second cell written DENSELY collapses back to the behaviour policy, whatever it
+  claims to mean.
 - **WHAT IS LEFT IS NOT INEXPERIENCE.** The arm is silent for most steps and short
   of the ceiling, and **quadrupling the run moves neither.** The state count keeps
   growing, so a credit cell keyed on the state it was earned in never covers them.
@@ -196,8 +197,7 @@ its ceiling it absorbs anything.)*
   unwalkable**, because the data is concentrated where uniform codes are not.
   **Spending codes where the data is WITHOUT fitting one is the unbuilt middle.**
 - **REPLAY.** Re-run experience when nothing is arriving: consolidates, learns
-  from rare events, interleaves old against new. **`WhenIdle()` is the trigger**,
-  and fork 21 is its cousin.
+  from rare events, interleaves old against new. **`WhenIdle()` is the trigger.**
 - **INHIBITION — EXPRESSIBLE, AND IT DOES NOT PAY YET.** "Punishment is
   unavailable" was **the wrong CRDT, not a law**: a **PN-Counter** is two
   G-Counters read as a difference. `Kind.Hindered` costs a KIND, not a wider row,
@@ -206,17 +206,16 @@ its ceiling it absorbs anything.)*
 
 ### 9. RELATIONAL PATHS — a walk of MIXED kinds, and the first attack on step 8
 
-- **BUILT — `Question.Path` walks a relation per hop**, where `Through` named one
-  for the whole walk. Path Ranking (Lao & Cohen) is the same move in
-  knowledge-base completion. **The mechanism is right and the idea is refuted.**
+- **BUILT — `Question.Path` walks a relation per hop**, Path Ranking's move (Lao
+  & Cohen). **The mechanism is right and the idea is refuted.**
 - **A FIXED PATH TRADES COVERAGE AGAINST PRECISION WITH NO MIDDLE.** Through
   `With` it reaches almost everything and the credit dissolves; through `After` the
-  composition is empty and the walk is silent at every window width. **Same
-  failure, opposite ends** — and **backoff settles it**: asking narrow FIRST and
-  widening only on silence overrides nothing and still scores the same.
-- **SO THE SILENCE IS THE PRICE OF THE CONTRAST, NOT A DEFECT.** A walk wide
-  enough to be non-silent converges on what was DONE most, and in a body that is
-  what put the body here — step 4's own diagnosis, from a new direction.
+  composition is empty and the walk is silent at every window width. **And backoff
+  settles it**: narrow FIRST, widening only on silence, overrides nothing and
+  scores the same.
+- **SO THE SILENCE IS THE PRICE OF THE CONTRAST, NOT A DEFECT.** Anything wide
+  enough to be non-silent converges on what was DONE most — step 4's diagnosis,
+  from a new direction.
 - **WHICH MAKES STEP 8'S FRONT END THE ONLY ROUTE LEFT.** Every graph-internal
   likeness is made of co-occurrence and carries the policy with it; **a likeness
   the graph did not compute cannot be.**
@@ -227,20 +226,26 @@ its ceiling it absorbs anything.)*
 ### 10. A REASON TO SEEK — the drive this design has never had
 
 - **`Drives` makes the system want to STAY ALIVE. Nothing makes it want to FIND
-  OUT.** `Surprise.Rate` is a quantity the machine reads about itself, and no
-  action is ever chosen to move it.
+  OUT**, though `Surprise.Rate` is a quantity it reads about itself.
 - **`Kind.Informed` is the shape**: a second write when an act produced something
-  the machine failed to predict — `Kind.Helped` with `Surprise` as the third factor
-  instead of `Drives`. **Computed from the machine's own error**, so no more a
-  smuggled reward than Ashby's bounds are. Schmidhuber, Oudeyer and Kaplan,
-  exploration bonuses: **one shape.**
-- **NOVELTY DECAYS WITH NOTHING DECAYING**, which is why this fits here at all:
-  `informed / seen` falls on its own as an act becomes predictable, because the
-  marginal keeps rising while the cell stops. **The anti-hub weighting already
-  does it.**
+  unpredicted — `Kind.Helped` with `Surprise` as the third factor, so no more a
+  smuggled reward than Ashby's bounds are.
+- **NOVELTY DECAYS WITH NOTHING DECAYING**: `informed / seen` falls on its own as
+  an act becomes predictable, because the marginal keeps rising while the cell
+  stops. **The anti-hub weighting already does it.**
+- **ERROR IS NOT PROGRESS — the noisy television.** Seeking prediction error alone
+  rewards whatever is least learnable; Schmidhuber's claim is about compression
+  PROGRESS, and rarity is what a second cell needs.
 - **IT REPLACES THE BOOTSTRAP.** The credit cell is empty until something has
   helped, so the arm is mostly its own coin toss — **and TRAPS calls a fallback a
   control arm nobody meant to run.**
+- **BUILT, AND NOT MEASURABLE ON `Homeostat`: THE PREDICTION WALK RETURNS
+  NOTHING THERE**, the same empty `after` that silenced step 9. So every moment
+  reads as maximally surprising — the dense arm writes on nearly every step and
+  collapses, the selective one can never fire. **Neither is evidence about
+  curiosity.**
+- **STEP 10 AND STEP 11 ARE BOTH BLOCKED ON A WORLD THAT CAN BE PREDICTED AT
+  ALL.** That is the concrete case for the second body.
 
 ### 11. NOTHING HERE PLANS. Every action is a reflex
 
@@ -250,8 +255,8 @@ its ceiling it absorbs anything.)*
 - **The rollout needs nothing built.** `Foresight` already predicts the next frame
   from view-and-action; feed that prediction back as a synthetic occasion and ask
   again. Craik's small-scale model, Tolman's cognitive map, MuZero's search half.
-- **The risk is compounding error** — a prediction of a prediction is what every
-  learned simulator is worst at, so depth wants its own control.
+- **The risk is compounding error**, which every learned simulator is worst at, so
+  depth wants its own control.
 
 ### THE PATTERN UNDER ALL OF IT
 
@@ -301,8 +306,8 @@ its ceiling it absorbs anything.)*
   supersession and scaling share one mechanism. Top-K in bounded memory is the
   heavy-hitters problem; Space-Saving bounds the error.
 - **A SELF-SET BEAM, whose revival condition is now met.** The refuted row asks a
-  width the system sets itself and reports; `Surprise.Rate` is one signal to set
-  it from, a node's own row statistics a second.
+  width the system sets itself; `Surprise.Rate` is one signal, a node's own row
+  statistics a second.
 - **Hierarchy, which is what step 3 is really for.** Do not walk a million nodes;
   walk a thousand chunks.
 
@@ -316,15 +321,15 @@ its ceiling it absorbs anything.)*
   reader that acts on what has arrived, or two machines. **Established meanwhile**:
   bus, accounting and walk are unharmed by arrivals far out of order.
 - **Coalesce a settling wave into one send.** Hold remote envelopes until local
-  traffic drains, then one datagram per destination; `WhenIdle()` is the trigger
-  and is C1-legal. **Not a pure barrier** — flush on idle *or* size *or* time.
+  traffic drains, then one datagram per destination; `WhenIdle()` is the trigger.
+  **Not a pure barrier** — flush on idle *or* size *or* time.
 - **Bits, not JSON.** Modalities intern to small ints, a code is a varint, the
   `double`s are probably `float`s, and **a sixth of a packed message is the `Guid`
   broadcast id** — shorten it per connection.
 - **`Chain` is what costs** — cycle check and explanation in one field, free
   locally and not on a wire. **Split them:** an approximate-membership filter for
   the hop, full chain rebuilt at the origin. A false positive is a route wrongly
-  refusing a partner, the loss C2 admits.
+  refusing a partner.
 - **Voting multiplies the wrong half.** **One thought, redundant reports**: the
   flood is the graph's, and what C2 loses is the return path.
 - **UDP matches, and is not a compromise.** C2 assumes loss, and **TCP's
@@ -394,15 +399,13 @@ process** — kept, because a real network loses reports.
   random bar for free, and that reads as the change working. **Report silence
   beside the score** — step 9 is louder AND worse, which neither number says
   alone. It cannot carry an arm PAST the bar, though; that much is arithmetic.
-- **A small sample can look like a mechanism.** One seed with a collapsing echo
-  read as a discovery and was three questions; one seed of step 4's credit arm
+- **A small sample can look like a mechanism.** One seed of step 4's credit arm
   showed a clean monotone learning curve that six seeds flattened to nothing.
 - **A MEAN OVER A POPULATION THE PROBLEM CREATED CANNOT SEE IT.** Fan-out stayed
   flat where rows grew without bound, because the growth mints tiny nodes that
   hold the average down. **Read `Widest`.**
-- **Copies drift where nothing fails**, and a difference between two copies moves
-  a headline without failing a test — three worlds each grew their own settle
-  loop. `DuplicationTests` is the budget now.
+- **Copies drift where nothing fails**, and a difference between two moves a
+  headline without failing a test. `DuplicationTests` is the budget now.
 - **THE TEST SUITE IS SERIAL ON PURPOSE.** Parallel, the walk's agreement with
   itself measured perfect where alone it did not: load removes the ordering that
   produces the disagreement, so parallelism HID a real defect. `Parallelism.cs`.

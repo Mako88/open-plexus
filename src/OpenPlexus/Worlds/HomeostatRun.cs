@@ -534,13 +534,12 @@ public sealed class HomeostatRun : IDisposable
 
         int held = 0, silent = 0, unbalanced = 0, unsettled = 0;
         var attended = new int[_settings.Needs];
-        var states = new HashSet<string>(StringComparer.Ordinal);
         var chains = new Chains();
 
         // THE UNIT IS THE WORLD'S OWN, NOT A CONSTANT. One step's fall of the
         // fastest-draining variable is what breaking even looks like here, so it
         // is what earns the full band -- see Drives.
-        var drives = new Drives(_settings.Drain * _settings.Needs);
+        var sensing = new Sensing(_settings.Drain * _settings.Needs);
 
         // STEP 10'S THIRD FACTOR, and null for every arm that does not seek. Held
         // by the run rather than handed to the machine on purpose: passing it to
@@ -572,8 +571,7 @@ public sealed class HomeostatRun : IDisposable
             // FEEL BEFORE ANYTHING ELSE, so the credit standing here is for the
             // transition that just happened -- which is the one the occasion
             // being held was responsible for.
-            drives.Feel(world.At);
-            states.Add(string.Join(",", felt.Select(code => $"{code.Modality}:{code.Value}")));
+            sensing.Note(world.At, felt);
 
             // THE ARMS THAT NEVER CONSULT THE GRAPH DECIDE WITHOUT A WALK, so
             // there is nothing to fold for them and `None` is silent.
@@ -691,10 +689,10 @@ public sealed class HomeostatRun : IDisposable
                 // Rebuilding gets a neighbouring occasion -- onsets separated from
                 // what was already live, the window's carried codes folded in --
                 // and measured, that lost to not topping up at all.
-                if (topping is { } due && drives.Credit > 1.0)
+                if (topping is { } due && sensing.Credit > 1.0)
                 {
                     await _body
-                        .ReinforceAsync(due, drives.Credit - 1.0, ct)
+                        .ReinforceAsync(due, sensing.Credit - 1.0, ct)
                         .ConfigureAwait(false);
 
                     await _fabric.QuietAsync(ct).ConfigureAwait(false);
@@ -711,7 +709,7 @@ public sealed class HomeostatRun : IDisposable
                 // delayed is the LEARNING and never the thinking.
                 if (owed is { } last)
                 {
-                    var worth = choosing == Attending.Driven ? drives.Credit : 1.0;
+                    var worth = choosing == Attending.Driven ? sensing.Credit : 1.0;
 
                     await _body
                         .ObserveAsync(last.Codes, last.At, worth: worth, ct: ct)
@@ -747,8 +745,8 @@ public sealed class HomeostatRun : IDisposable
                 // Kind.Hindered.
                 if (crediting is { } earned)
                 {
-                    var helped = choosing == Attending.Marked || drives.Credit > 1.0;
-                    var hurt = choosing == Attending.Contested && drives.Credit < 1.0;
+                    var helped = choosing == Attending.Marked || sensing.Credit > 1.0;
+                    var hurt = choosing == Attending.Contested && sensing.Credit < 1.0;
 
                     if (helped || hurt)
                     {
@@ -829,7 +827,7 @@ public sealed class HomeostatRun : IDisposable
             Held = held,
             Silent = silent,
             Attended = attended,
-            States = states.Count,
+            States = sensing.States,
             Idling = world.Idling,
             Unsettled = unsettled,
             Plumbing = _fabric.Facts(chains, unbalanced),

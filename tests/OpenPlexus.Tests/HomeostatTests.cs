@@ -550,6 +550,24 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     /// cannot be the mechanism.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// One arm of a sweep: a name, a way of choosing, and the settings to run it
+    /// under.
+    /// </summary>
+    /// <remarks>
+    /// <b>EXTRACTED BECAUSE THE CLONE BUDGET CAUGHT IT.</b> Two sweeps here opened
+    /// with the same four arms written out longhand, which is how a pair of tables
+    /// come to be measured under settings that have quietly drifted apart — the
+    /// exact failure `Fixture` exists to prevent one level up.
+    /// </remarks>
+    private static (string, Func<int, Task<double>>) Arm(
+        string name, Attending how, HomeostatSettings? world = null, int span = 0) =>
+        (name, async seed =>
+        {
+            using var run = new HomeostatRun(world ?? World(), Dials, seed, span);
+            return (await run.RunAsync(Steps, how)).Viable;
+        });
+
     [Fact]
     public async Task Asking_what_helped_in_states_like_this_one_against_asking_only_this_one()
     {
@@ -557,36 +575,12 @@ public sealed class HomeostatTests(ITestOutputHelper output)
 
         var arms = await Sweep.AcrossAsync(
             12,
-            ("blind", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Blind)).Viable;
-            }),
-            ("credited", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
-            }),
-            ("kindred", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Kindred)).Viable;
-            }),
-            ("credited+ranked", async seed =>
-            {
-                using var run = new HomeostatRun(ranked, Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
-            }),
-            ("kindred+ranked", async seed =>
-            {
-                using var run = new HomeostatRun(ranked, Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Kindred)).Viable;
-            }),
-            ("lowest", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Lowest)).Viable;
-            }));
+            Arm("blind", Attending.Blind),
+            Arm("credited", Attending.Credited),
+            Arm("kindred", Attending.Kindred),
+            Arm("credited+ranked", Attending.Credited, ranked),
+            Arm("kindred+ranked", Attending.Kindred, ranked),
+            Arm("lowest", Attending.Lowest));
 
         output.WriteLine(Sweep.Table(arms));
 
@@ -666,59 +660,27 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     {
         var arms = await Sweep.AcrossAsync(
             12,
-            ("blind", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Blind)).Viable;
-            }),
-            ("credited", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
-            }),
-            ("credited+carried", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed, span: 1);
-                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
-            }),
-            ("foreseeing", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed, span: 1);
-                return (await run.RunAsync(Steps, Attending.Foreseeing)).Viable;
-            }),
+            Arm("blind", Attending.Blind),
+            Arm("credited", Attending.Credited),
+            Arm("credited+carried", Attending.Credited, span: 1),
+            Arm("foreseeing", Attending.Foreseeing, span: 1),
 
             // THE SYNTHESIS: the narrow question, widened only where it was
             // silent. See Attending.Backing for why this is a real test either
             // way — the general question's answers are worse than a coin toss on
             // average, and this replaces a coin toss with them.
-            ("backing", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Backing)).Viable;
-            }),
+            Arm("backing", Attending.Backing),
 
             // STEP 10 — the same structure as `backing` with a question of the
             // SAME width over a different statistic, so it does not inherit step
             // 9's refutation. It needs temporal cells to have a prediction at all.
-            ("curious", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed, span: 1);
-                return (await run.RunAsync(Steps, Attending.Curious)).Viable;
-            }),
+            Arm("curious", Attending.Curious, span: 1),
 
             // AND THE SAME CELL WRITTEN SELECTIVELY — the control that separates
             // "curiosity is the wrong idea" from "surprise LEVEL is the wrong
             // signal for it". See Attending.Probing.
-            ("probing", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed, span: 1);
-                return (await run.RunAsync(Steps, Attending.Probing)).Viable;
-            }),
-            ("lowest", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Lowest)).Viable;
-            }));
+            Arm("probing", Attending.Probing, span: 1),
+            Arm("lowest", Attending.Lowest));
 
         output.WriteLine(Sweep.Table(arms));
 

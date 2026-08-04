@@ -23,13 +23,16 @@
 
 ## What is standing
 
-- **Nine worlds sharing no world logic, over one `Fabric`** — including binding,
-  built to be unanswerable and since lifted; composition, where the answer was
-  never observed; and **two nobody here designed**, `Babi` and `Clevr`, which
-  cannot flatter this architecture. `ScoreboardTests` runs them in one table, and
-  `corpora/fetch.sh` fetches rather than vendoring.
-- **THE ARM THAT BEATS RANDOM IS ONE WORLD OLD** — `Kind.Helped` is measured on
-  `Homeostat` alone, and no other world has a body to try it on.
+- **Ten worlds sharing no world logic, over one `Fabric`** — including binding,
+  built to be unanswerable and since lifted, and **two nobody here designed**,
+  `Babi` and `Clevr`, which cannot flatter this architecture. `ScoreboardTests`
+  runs them in one table; `corpora/fetch.sh` fetches rather than vendoring.
+- **THE ARM THAT BEAT RANDOM IS NO LONGER ONE WORLD OLD, AND IT DID NOT
+  TRANSFER.** `Tending` is a second body — plants dry, water reaches only what is
+  underfoot and lands a step late — and `Kind.Helped` there is indistinguishable
+  from acting at random. **Not because it ranks badly: because it is SILENT on
+  nearly every step.** More states, and a credit cell keyed on the state that
+  earned it covers almost none of them.
 - **An occasion is a SET**, so *red ball beside blue box* and *blue ball beside red
   box* were one input — a ceiling that was **representational, not scale**.
   `Occasion.Groups` lifts it.
@@ -88,7 +91,7 @@ its ceiling it absorbs anything.)*
 - **Merging routes AT A NODE is the version `Narrowed` could not do** — reading the
   index back puts the referent in the machine's hands. Needs a wait: dear under C2.
 - **`Pricing` IS HAND-SET AND A CONTROLLER IS REFUTED. The missing thing is the
-  SIGNAL** — fork 23, a third time.
+  SIGNAL** — fork 23 again.
 
 ### 2. Predictive coding — only surprise propagates
 
@@ -123,22 +126,22 @@ its ceiling it absorbs anything.)*
   function**, survival having proved gameable. **No episode boundary**, fitting C4.
   **AND EVERY ACT PAYS OFF AT ONCE, so this world cannot see steps 7, 10 or 11.**
 - **`Homeostat` SETS THE BAR, AND THE BAR IS RANDOM.** Attending to whatever is
-  lowest holds the body indefinitely, so the world is winnable only by looking at
-  it.
+  lowest holds the body, so the world is winnable only by looking at it.
 - **SO ASSOCIATION IS ANTI-CORRELATED, not merely uninformative.** A count of what
   was done converges on the POLICY that did it, and the states a body is in are the
-  ones its own actions produced. **Contiguity is not contingency**, and this waits
-  anywhere the graph learns from itself.
+  ones its own actions produced. **This waits anywhere the graph learns from
+  itself.**
 - **THE CREDIT NEEDED ITS OWN CELL, AND THAT IS THE FIRST ARM TO BEAT THE BAR.**
   Three earlier arms wrote a HEAVIER number into the cell meaning *this was done
-  here*, deepening the groove. `Kind.Helped` is a SECOND statistic, walked alone.
-  **Nothing is punished, both counts only rise.** `Marked` is the control.
-- **AND ITS VIRTUE IS RARITY, WHICH FOUR ARMS SINCE HAVE ESTABLISHED.** Every
-  second cell written DENSELY collapses back to the behaviour policy, whatever it
-  claims to mean.
-- **WHAT IS LEFT IS NOT INEXPERIENCE.** The arm is silent for most steps and short
-  of the ceiling, and **quadrupling the run moves neither.** The state count keeps
-  growing, so a credit cell keyed on the state it was earned in never covers them.
+  here*. `Kind.Helped` is a SECOND statistic, walked alone; `Marked` is the
+  control. **Nothing is punished, both counts only rise.**
+- **ITS VIRTUE IS RARITY — four arms since say so.** Every second cell written
+  DENSELY collapses back to the behaviour policy, whatever it claims to mean.
+  **And rarity is also why it does not survive a second world**: too rare to cover
+  the states.
+- **WHAT IS LEFT IS NOT INEXPERIENCE.** The arm is silent for most steps, and
+  **quadrupling the run moves neither silence nor score.** The state count grows,
+  so a cell keyed on the state that earned it never covers them.
 - **AND THE SILENCE IS THE PRICE OF THE CONTRAST — step 9 settled that.** Anything
   wide enough to cure it re-introduces the policy. **Step 8, then step 10.**
 
@@ -156,8 +159,7 @@ its ceiling it absorbs anything.)*
   `Question`, and eviction on "not touched since". Across machines it wants a
   Lamport clock.
 - **MULTI-TOKEN OUTPUT.** *Simultaneous* actions are nearly free and **fork 11
-  built the addressing**; what is left is a world that wants two. *Ordered*
-  sequences need edge kinds.
+  built the addressing**; what is left is a world that wants two.
 
 ### 6. EDGE KINDS — BUILT, and the row was widened once
 
@@ -175,10 +177,10 @@ its ceiling it absorbs anything.)*
   with no reward function and no backpropagation. **Three-factor Hebbian learning
   needs neither** (Izhikevich 2007): a fading trace of what recently fired, and a
   third signal consolidating what is still in it, most credit to the most recent.
-- **`Window` IS that trace, ungated**, and `Kind.Helped` is now the third factor
-  it would consolidate. **The conjunction is NOT built** — `Drives.Feel` prices the
-  immediately previous transition and nothing longer. **Safe for the CRDT
-  property**: the trace decides how much to add, and counts only rise.
+- **`Window` IS that trace, ungated**, and `Kind.Helped` is the third factor it
+  would consolidate. **The conjunction is NOT built** — `Drives.Feel` prices the
+  previous transition and nothing longer. **Safe for the CRDT property**: the trace
+  decides how much to add, and counts only rise. **`Tending` is where it shows.**
 
 ### 8. Similarity — **and step 9 promoted it from an option to the only route**
 
@@ -250,8 +252,8 @@ its ceiling it absorbs anything.)*
 ### 11. NOTHING HERE PLANS. Every action is a reflex
 
 - **`Consequence` asks *what would the world look like if I did X*, ONE step, and
-  stops.** No sequence of acts held as a unit, no means-ends. **A world model that
-  rolls forward once is an expensive reflex.**
+  stops.** No sequence held as a unit, no means-ends. **A world model that rolls
+  forward once is an expensive reflex.**
 - **The rollout needs nothing built.** `Foresight` already predicts the next frame
   from view-and-action; feed that prediction back as a synthetic occasion and ask
   again. Craik's small-scale model, Tolman's cognitive map, MuZero's search half.
@@ -276,7 +278,7 @@ its ceiling it absorbs anything.)*
 - [x] `Question.Path` — step 9's mixed-kind walk. **Built, and the idea it was
   built for is refuted; see step 9**
 - [ ] `Kind.Informed` — step 10's curiosity
-- [ ] A **second world with a body**, so step 4 and step 10 are not one world old
+- [x] `Tending` — the **second body**, and it does not confirm step 4
 - [ ] The rollout of step 11
 - [ ] Surprise on the write path — step 2's second half
 
@@ -289,7 +291,7 @@ its ceiling it absorbs anything.)*
 - **The absolute message cost is what step 2 attacks**, and nothing else should be
   optimised first.
 - **Cold storage, once a row can be bounded.** **Paging a node out keeps the CRDT
-  property** — the count does not decrease, it stops being resident. Decay does not.
+  property**: the count does not decrease, it stops being resident. Decay does not.
 - **The knob pass, last.** A dial swept before the structural work measures a
   system about to change under it.
 
@@ -299,12 +301,11 @@ its ceiling it absorbs anything.)*
   is a few thousand nodes, so any optimisation now aims at a wall nobody has hit.
   Full `Clevr` and the ten-thousand-story `Babi` reach far larger; **measure, then
   cut.** In order of leverage:
-- **BOUND THE ROW.** Cap a node at K partners: *cost per thought grows with data
-  forever* becomes *cost per thought is constant*, the trick
-  approximate-nearest-neighbour indexes run at billions on. **Evict on "not touched
-  since", never by eroding a count** — the `when` channel provides it, so
-  supersession and scaling share one mechanism. Top-K in bounded memory is the
-  heavy-hitters problem; Space-Saving bounds the error.
+- **BOUND THE ROW.** Cap a node at K partners: *cost grows with data forever*
+  becomes *cost is constant*, the trick approximate-nearest-neighbour indexes run
+  at billions on. **Evict on "not touched since", never by eroding a count** — the
+  `when` channel provides it, so supersession and scaling share one mechanism.
+  Top-K in bounded memory is heavy-hitters; Space-Saving bounds the error.
 - **A SELF-SET BEAM, whose revival condition is now met.** The refuted row asks a
   width the system sets itself; `Surprise.Rate` is one signal, a node's own row
   statistics a second.
@@ -323,18 +324,17 @@ its ceiling it absorbs anything.)*
 - **Coalesce a settling wave into one send.** Hold remote envelopes until local
   traffic drains, then one datagram per destination; `WhenIdle()` is the trigger.
   **Not a pure barrier** — flush on idle *or* size *or* time.
-- **Bits, not JSON.** Modalities intern to small ints, a code is a varint, the
-  `double`s are probably `float`s, and **a sixth of a packed message is the `Guid`
-  broadcast id** — shorten it per connection.
+- **Bits, not JSON.** Modalities intern to small ints, a code is a varint, and
+  **a sixth of a packed message is the `Guid` broadcast id** — shorten it per
+  connection.
 - **`Chain` is what costs** — cycle check and explanation in one field, free
   locally and not on a wire. **Split them:** an approximate-membership filter for
-  the hop, full chain rebuilt at the origin. A false positive is a route wrongly
-  refusing a partner.
+  the hop, full chain rebuilt at the origin.
 - **Voting multiplies the wrong half.** **One thought, redundant reports**: the
   flood is the graph's, and what C2 loses is the return path.
-- **UDP matches, and is not a compromise.** C2 assumes loss, and **TCP's
-  head-of-line blocking would stall every thought behind one lost packet.** QUIC's
-  unreliable datagram extension (RFC 9221) is the shape.
+- **UDP matches.** C2 assumes loss, and **TCP's head-of-line blocking would stall
+  every thought behind one lost packet.** QUIC's unreliable datagram extension
+  (RFC 9221) is the shape.
 
 ---
 
@@ -382,18 +382,17 @@ process** — kept, because a real network loses reports.
 **Live:**
 
 - **A DIAL MEASURED AT ONE SETTING OF ANOTHER MAY BE MEASURING THAT ONE.** The
-  stamina plateau reversed between short and long runs. **Sweep at two run
-  lengths, and never compare dials with a third pinned.** **`Toll` is the sharpest
-  case yet**: it changes what a unit of `Stamina` BUYS, so the two arms are
-  comparable on spend and on nothing else.
+  stamina plateau reversed between short and long runs. **Sweep at two run lengths,
+  never with a third pinned.** **`Toll` is the sharpest case**: it changes what a
+  unit of `Stamina` BUYS, so its arms compare on spend and nothing else.
 - **Short runs on the binding world score above chance for RECENCY ALONE.**
-  **Nothing under a few hundred scenes measures binding there.**
 - **A dial can be declared, documented, passed everywhere and connected to
   nothing.** `ThinkAsync`'s stamina was, and survived three measurements.
   **Every run reports `Complaints`; read them.**
 - **A CHECK CAN BE WIRED AND UNABLE TO FIRE, which reads as passing.** Two worlds
-  counted `unbalanced` off a variable nothing incremented. **Arming a check that
-  has always read zero is the only way to tell the two apart.**
+  counted `unbalanced` off a variable nothing incremented; step 10's selective arm
+  reproduced its control down to the edge count. **Arming a check that has always
+  read zero is the only way to tell the two apart.**
 - **A FALLBACK IS A CONTROL ARM NOBODY MEANT TO RUN.** Where an arm acts at random
   when the walk says nothing, anything raising its silence drifts it toward the
   random bar for free, and that reads as the change working. **Report silence
@@ -407,8 +406,8 @@ process** — kept, because a real network loses reports.
 - **Copies drift where nothing fails**, and a difference between two moves a
   headline without failing a test. `DuplicationTests` is the budget now.
 - **THE TEST SUITE IS SERIAL ON PURPOSE.** Parallel, the walk's agreement with
-  itself measured perfect where alone it did not: load removes the ordering that
-  produces the disagreement, so parallelism HID a real defect. `Parallelism.cs`.
+  itself measured perfect where alone it did not — load removes the ordering that
+  produces the disagreement, so parallelism HID a defect. `Parallelism.cs`.
 
 ---
 

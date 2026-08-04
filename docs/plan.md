@@ -78,26 +78,26 @@ to an old one — run that one.**
 ### 2. Predictive coding — only surprise propagates
 
 - Rao & Ballard, Friston. An expected onset is silent. **Built.**
-- **THE OBSERVATION BROADCAST IS SUPPRESSED, NOT THE PREDICTION** — the walk making
-  the expectation still runs, so the saving is partial. **Making prediction itself
-  conditional on surprise is the deeper version**, and what would drive a dial.
+- **THE OBSERVATION IS SUPPRESSED, NOT THE PREDICTION** — the walk making the
+  expectation still runs, so the saving is partial. **Making prediction itself
+  conditional on surprise is the deeper version**, and would drive a dial.
 
 ### 3. Chunking — MDL
 
 - Fork 21 mints edges; it should mint **nodes**: when a set recurs, mint a code
   standing for it. Threshold is minimum description length, not a constant.
-- **This is what lets the alphabet GROW** — today the quantiser fixes it forever.
-- Fork 21's trade is the **utility problem** from explanation-based learning
-  (Minton, SOAR): utility belongs per chunk, not as one global `Weight`.
+- **This lets the alphabet GROW** — today the quantiser fixes it forever.
+- Fork 21's trade is the **utility problem** (Minton, SOAR): utility belongs per
+  chunk, not as one global `Weight`.
 - **`Motif` HAS SAID WHAT THIS IS NOT ABOUT.** A familiar set completes perfectly
   with no chunking. **Step 3 is not asked to fix an accuracy but to stop paying for
   one** — the number to beat is traffic per completion.
 
 ### 4. Homeostatic drives — Ashby
 
-- Keep internal variables in bounds and behaviour becomes goal-directed **with no
-  reward function**, which matters because survival proved gameable by circling.
-  **No episode boundary**, which fits C4.
+- Bounded internal variables make behaviour goal-directed **with no reward
+  function**, survival having proved gameable by circling. **No episode
+  boundary**, which fits C4.
 - **`Homeostat` HAS SET THE BAR.** Attending to whatever is lowest holds the body
   indefinitely, so the world is winnable and only by looking at it.
 - **But choosing by association scores BELOW random**: with nothing to say what an
@@ -106,13 +106,15 @@ to an old one — run that one.**
   an action enters the graph only by being taken.
 - **`Drives` IS BUILT AND DOES NOT CLEAR THAT BAR.** It weights an occasion by
   whether the most-at-risk variable improved — positive band only, so counts stay
-  monotonic and a bad transition is written FAINTLY rather than undone.
-- **THE DELIVERY FAILS, NOT THE SIGNAL, and a delay-only control says so.** Credit
-  prices the occasion BEFORE it, so the arm writes a step late: **the delay costs
-  nine times what the credit buys**, and the credit moves the arm the right way.
-- **So it wants a TOP-UP, not a delay**: write at once, add the remainder when the
-  outcome lands. A G-Counter can be added to twice, which is what makes it legal —
-  and it is what `Window`-as-trace is for.
+  monotonic and a bad transition is written FAINTLY, not undone.
+- **THE DELIVERY FAILS, NOT THE SIGNAL — a delay-only control says so.** Credit
+  prices the occasion BEFORE it, so the arm writes late: **the delay costs nine
+  times what the credit buys**, and the credit moves the arm the right way.
+- **A TOP-UP recovers part of that and still loses to plain association.** Adding
+  twice is what a G-Counter is for: reinforcing is legal, punishing is not.
+- **SUSPECTED:** the top-up rewrites the occasion as all-onsets, so a code that
+  was LIVE pairs differently the second time. **Reinforcing an occasion already
+  written is not expressible yet** — which step 7's trace also needs.
 
 ### 5. WHAT A CO-OCCURRENCE COUNT STRUCTURALLY CANNOT DO — John, 2026-08-03
 

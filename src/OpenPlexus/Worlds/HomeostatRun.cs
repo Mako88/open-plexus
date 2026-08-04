@@ -59,6 +59,32 @@ public enum Attending
     /// <see cref="Driven"/> is the credit and nothing else.
     /// </remarks>
     Delayed,
+
+    /// <summary>
+    /// The credit as a TOP-UP rather than a delay — <b>write at once, add the
+    /// rest when the outcome lands.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>MEASURED: THE DELAY COSTS NINE TIMES WHAT THE CREDIT BUYS.</b> So the
+    /// credit is kept and the delay is not. The occasion is written immediately at
+    /// weight one, exactly as <see cref="Chain"/> writes it, and a step later the
+    /// SAME occasion is written again carrying whatever the transition earned
+    /// beyond one.
+    /// </para>
+    /// <para>
+    /// <b>ADDING TWICE IS WHAT A G-COUNTER IS FOR</b>, which is the whole reason
+    /// this is legal where subtracting would not be. A transition that went badly
+    /// simply gets no second write; there is no punishment available, only degrees
+    /// of reinforcement, and that is a property of the CRDT rather than a choice.
+    /// </para>
+    /// <para>
+    /// <b>The top-up is LEARNING WITHOUT THINKING</b>, so it goes to the
+    /// rendezvous directly. Sending it back through the input machine would find
+    /// no onsets — the codes are already live — and would join nothing at all.
+    /// </para>
+    /// </remarks>
+    Topped,
 }
 
 /// <summary>
@@ -138,6 +164,12 @@ public sealed class HomeostatRun : IDisposable
     private readonly Fabric _fabric;
     private readonly InputMachine<ImmutableArray<Code>> _body;
     private readonly HomeostatSettings _settings;
+
+    /// <summary>
+    /// The join, held so a top-up can write without thinking — see
+    /// <see cref="Attending.Topped"/>.
+    /// </summary>
+    private readonly LocalRendezvous _joining;
     private readonly WalkSettings _dials;
 
     public HomeostatRun(
@@ -155,8 +187,10 @@ public sealed class HomeostatRun : IDisposable
         Seed = seed;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
+        _joining = new LocalRendezvous(_fabric.Local);
+
         _body = new InputMachine<ImmutableArray<Code>>(
-            new MachineAddress("body"), new Feeling(), new LocalRendezvous(_fabric.Local),
+            new MachineAddress("body"), new Feeling(), _joining,
             _fabric.Bus, _fabric.Ring, dials);
 
         _fabric.Subscribe(_body);
@@ -230,6 +264,7 @@ public sealed class HomeostatRun : IDisposable
             // the question step 4 is about, and the fallback is counted so the
             // share of the run the graph actually decided is visible.
             if (choosing is Attending.Chain or Attending.Driven or Attending.Delayed
+                    or Attending.Topped
                 && chosen is null)
             {
                 silent++;
@@ -240,7 +275,32 @@ public sealed class HomeostatRun : IDisposable
                 ? [.. felt, Homeostat.Attending(which)]
                 : felt;
 
-            if (choosing is Attending.Driven or Attending.Delayed)
+            if (choosing == Attending.Topped)
+            {
+                // AT ONCE, AT WEIGHT ONE -- the walk and the graph see exactly
+                // what `Chain` sees, so nothing is delayed.
+                await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
+                await _fabric.QuietAsync(ct).ConfigureAwait(false);
+
+                // AND THE PREVIOUS OCCASION COLLECTS WHAT IT EARNED. Only the
+                // surplus above one, and only when there is one: a G-Counter can
+                // be added to twice and can never be added to less.
+                if (owed is { } due && drives.Credit > 1.0)
+                {
+                    await _joining.JoinAsync(new Occasion
+                    {
+                        Onsets = due.Codes,
+                        Live = [],
+                        At = due.At,
+                        Weight = drives.Credit - 1.0,
+                    }, ct).ConfigureAwait(false);
+
+                    await _fabric.QuietAsync(ct).ConfigureAwait(false);
+                }
+
+                owed = (occasion, step);
+            }
+            else if (choosing is Attending.Driven or Attending.Delayed)
             {
                 // ONE STEP LATE, AND WEIGHTED BY WHAT FOLLOWED. The occasion held
                 // from last step is written now, priced by the transition it

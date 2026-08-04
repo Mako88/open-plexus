@@ -88,6 +88,7 @@ public sealed class DrivesTests(ITestOutputHelper output)
             [Attending.Chain] = [],
             [Attending.Delayed] = [],
             [Attending.Driven] = [],
+            [Attending.Topped] = [],
             [Attending.Lowest] = [],
         };
 
@@ -112,8 +113,13 @@ public sealed class DrivesTests(ITestOutputHelper output)
 
         output.WriteLine(
             $"chain={chain:F4} delayed={delayed:F4} driven={driven:F4} blind={blind:F4}");
+        var topped = scored[Attending.Topped].Average();
+
         output.WriteLine(
             $"delay alone = {delayed - chain:F4}   credit alone = {driven - delayed:F4}");
+        output.WriteLine(
+            $"topped = {topped:F4}   topped - chain = {topped - chain:F4}   "
+            + $"topped - blind = {topped - blind:F4}");
 
         // THE CEILING IS STILL THE CEILING, which is the check that says the
         // world has not been broken by the new arm rather than a claim about it.
@@ -133,11 +139,22 @@ public sealed class DrivesTests(ITestOutputHelper output)
             $"the delay stopped costing, so the decomposition recorded here no "
             + $"longer holds: {delayed} against {chain}");
 
-        // AND THE ARM STILL LOSES TO RANDOM, which is what step 4 is for and is
+        // DROPPING THE DELAY RECOVERS PART OF WHAT IT COST and does not get back
+        // to plain association. SUSPECTED, AND NOT YET SHOWN: the top-up rewrites
+        // the occasion as `Onsets = every code, Live = empty`, so a code that was
+        // LIVE rather than STARTED the first time is paired differently the
+        // second — it reinforces a neighbouring occasion rather than the one it
+        // means to, and inflates the marginals of everything present. Fixing that
+        // wants the machine to be able to reinforce an occasion it already wrote,
+        // which nothing here can express yet.
+        Assert.True(topped > driven,
+            $"the top-up did not beat the delay it replaced: {topped} against {driven}");
+
+        // AND EVERY ARM STILL LOSES TO RANDOM, which is what step 4 is for and is
         // not yet done. Asserted so that a change which fixes it FAILS here and
         // has to say so.
-        Assert.True(driven < blind,
-            "the driven arm now beats random: step 4's bar has been cleared and "
-            + "this test should be saying that instead");
+        Assert.True(Math.Max(driven, topped) < blind,
+            "an arm now beats random: step 4's bar has been cleared and this "
+            + "test should be saying that instead");
     }
 }

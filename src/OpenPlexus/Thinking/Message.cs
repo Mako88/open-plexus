@@ -140,6 +140,27 @@ public readonly record struct Message
     public Graph.Kind? Through { get; init; }
 
     /// <summary>
+    /// A relation PER HOP, in order — <b>the walk that may change relation as it
+    /// goes.</b> Null is every question that names one relation or none.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>WHICH HOP THIS IS COMES FROM <see cref="Chain"/> AND IS NOT CARRIED.</b>
+    /// A chain ends with the node the message is addressed to and begins at the
+    /// origin, so the number of hops already taken is its length minus one — which
+    /// means the position in the path is derivable at every node from what is
+    /// already travelling. <b>A separate counter would be a second copy of the same
+    /// fact</b>, free to disagree with the chain under C2.
+    /// </para>
+    /// <para>
+    /// <b>A route that has walked the whole path stops.</b> It arrives, it is
+    /// scored, and it emits nothing: the question asked for a path of that shape
+    /// and anything further is a different question.
+    /// </para>
+    /// </remarks>
+    public ImmutableArray<Graph.Kind>? Path { get; init; }
+
+    /// <summary>
     /// Every node walked, in order. <b>The cycle check and the explanation in
     /// one field</b> — a route may not revisit a node already in its own chain,
     /// which is a local check costing nothing because the chain is already

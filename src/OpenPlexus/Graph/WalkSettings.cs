@@ -44,6 +44,89 @@ public enum Pricing
 
 }
 
+/// <summary>
+/// What a hop is CHARGED — <b>the outstanding half of this design's recurring
+/// fault, and the one number still doing both jobs.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>IT HAS BITTEN THREE TIMES AND <see cref="WalkSettings.Doubt"/> ONLY SPLIT
+/// HALF OF IT.</b> A row entry ranks a partner AND prices the hop to it. Doubt
+/// separated what an edge is BELIEVED from what it COSTS — but both are still
+/// functions of the same statistic, <c>together / seen</c>, so improving the
+/// evidence still moves the budget and a result under either can never be
+/// attributed to one alone. <b>The split this dial makes is of the STATISTIC and
+/// not of the arithmetic over it.</b>
+/// </para>
+/// <para>
+/// <b>THE BUDGET IS SPENT ON MESSAGES, SO PRICE IT IN MESSAGES.</b>
+/// <see cref="Node.Fire"/> emits one message per surviving row ENTRY, so what a
+/// hop actually costs the system is the width of the row it lands in — which
+/// <see cref="Node.Entries"/> already calls the cost, and which the scaling
+/// section already names as the thing to bound. How well-evidenced the edge was
+/// has nothing to do with it.
+/// </para>
+/// <para>
+/// <b>NOTHING NEW TRAVELS AND NOTHING IS READ THAT IS NOT OWNED.</b> The
+/// receiver charges from its OWN snapshot, taken before it weighs anything, so
+/// this is a strictly smaller claim on other nodes' data than either
+/// <see cref="Pricing"/> arm — the message does not have to carry a thing.
+/// </para>
+/// </remarks>
+public enum Toll
+{
+    /// <summary>
+    /// <c>1 / weight</c> — <b>the default, the control, and every measurement
+    /// taken up to now.</b> A weak edge is dear to cross.
+    /// </summary>
+    Evidence,
+
+    /// <summary>
+    /// <c>1 + log₂(entries)</c> — <b>what arriving here will cost in traffic.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE LOG IS THE SAME ARGUMENT <see cref="Learning.Chunk"/> MINTS BY, and
+    /// it is description length rather than a curve somebody liked.</b> Saying
+    /// which of <c>n</c> partners a route took costs <c>log₂ n</c> bits, so a hop
+    /// into a node of a thousand partners is ten times the hop into a node of two
+    /// — not five hundred times, which is what the raw fan-out would charge and
+    /// which would refuse a hub harder than the anti-hub weighting already does.
+    /// </para>
+    /// <para>
+    /// <b>THE ONE ADDED IS WHAT KEEPS THE WALK BOUNDED, and it is exactly the
+    /// condition the refuted <c>StepCost</c> row asks for.</b> Those arms died of
+    /// factorial message growth because a perfect edge could cost nothing; here
+    /// the cheapest possible hop — into a node with a single partner — still costs
+    /// one, so a budget of <c>B</c> buys at most <c>B</c> steps and the bound does
+    /// not rest on any weight being below 1.0. <b>A bound not relying on positive
+    /// cost at weight 1.0 is what that row named as its revival condition.</b>
+    /// </para>
+    /// <para>
+    /// <b>IT IS ALSO THE ARM FOR STEP 3'S OPEN QUESTION.</b> A minted node is a
+    /// hub by construction and <see cref="Pricing.Receiver"/> refuses hubs, which
+    /// is the unverified reading of why chunking costs a little accuracy. Under
+    /// this a chunk becomes <i>expensive to enter and still believed</i>, which is
+    /// the reading that should be true — so the two dials together say whether
+    /// that explanation holds.
+    /// </para>
+    /// <para>
+    /// <b>WHAT IT COSTS: STAMINA STOPS CAPPING DEPTH UNIFORMLY, AND
+    /// <see cref="WalkSettings.Horizon"/> BECOMES LOAD-BEARING AGAIN.</b> Under
+    /// <see cref="Evidence"/> the worst case is one hop per unit of budget
+    /// everywhere. Under this the price is local: a route crossing narrow rows
+    /// pays two a hop and one crossing wide ones pays six, so the SAME budget
+    /// walks three times as deep through a sparse region. <b>That is the dial
+    /// working — spend where it is cheap — and it is also how a run that landed in
+    /// seconds on one world fails to land at all on another.</b> The horizon has
+    /// not fired since the cost became inverse; under this it is the only uniform
+    /// bound left, and a ladder swept here must be read against the message count
+    /// rather than against the dial.
+    /// </para>
+    /// </remarks>
+    Traffic,
+}
+
 /// <summary>How a candidate accumulates evidence from the routes reaching it.</summary>
 public enum Accumulate
 {
@@ -217,6 +300,16 @@ public sealed record WalkSettings
     /// control</b>, so every measurement taken before this existed still
     /// stands.</remarks>
     public Pricing Pricing { get; init; } = Pricing.Receiver;
+
+    /// <inheritdoc cref="Graph.Toll"/>
+    /// <remarks>
+    /// <b><see cref="Graph.Toll.Evidence"/> is the default and the control</b>, so
+    /// every measurement taken before this existed still stands. <b>It is
+    /// independent of <see cref="Pricing"/> on purpose</b>: that dial chooses
+    /// which marginal weighs an edge and therefore moves both jobs at once, which
+    /// is the fault rather than the fix.
+    /// </remarks>
+    public Toll Toll { get; init; } = Toll.Evidence;
 
     /// <summary>
     /// How much evidence a partner must show before its edge is believed —

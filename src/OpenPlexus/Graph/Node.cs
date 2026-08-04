@@ -35,8 +35,14 @@ public sealed class Node
     /// <b>IT WAS <c>Code</c> TO <c>double</c>, AND THAT NUMBER WAS DOING FOUR
     /// JOBS.</b> It ranked a partner, it priced the hop to it, it was the only
     /// memory of the pair, and it held simultaneity and sequence in one cell. The
-    /// first two are split by <see cref="WalkSettings.Doubt"/>; the last two are
-    /// what <see cref="Edge"/> and <see cref="Tie"/> split here.
+    /// last two are what <see cref="Edge"/> and <see cref="Tie"/> split here.
+    /// <para>
+    /// <b>THE FIRST TWO TOOK TWO GOES.</b> <see cref="WalkSettings.Doubt"/> split
+    /// the ARITHMETIC — what an edge is believed against what it costs — and left
+    /// both reading the same statistic, so evidence still set the price.
+    /// <see cref="Toll"/> splits the STATISTIC, and with it on, this row does one
+    /// job.
+    /// </para>
     /// </remarks>
     private readonly Dictionary<Edge, Tie> _together = [];
 
@@ -313,9 +319,20 @@ public sealed class Node
             if (message.Against > 0.0 && message.Together > 0.0)
                 believed *= message.Together / (message.Together + message.Against);
 
-            // EVERY HOP COSTS AT LEAST 1, because a weight cannot exceed 1.0.
-            // That is what bounds the walk.
-            held -= 1.0 / arriving;
+            // EVERY HOP COSTS AT LEAST 1, AND UNDER BOTH TOLLS. Under `Evidence`
+            // because a weight cannot exceed 1.0; under `Traffic` because a row
+            // with a single entry still costs the one that is added to the log.
+            // That is what bounds the walk -- see Toll.
+            //
+            // AND THE TRAFFIC TOLL READS THIS NODE'S OWN SNAPSHOT AND NOTHING
+            // ELSE. It is the width of the row the route just landed in, which is
+            // exactly how many messages the fan-out below can emit, so the budget
+            // is denominated in the thing it is actually spent on. `Entries`
+            // rather than `Partners` for the same reason that property says: a
+            // partner met in two relations is two messages.
+            held -= _settings.Toll == Toll.Traffic
+                ? 1.0 + Math.Log2(Math.Max(row.Length, 1))
+                : 1.0 / arriving;
 
             // COULD NOT AFFORD THE HOP IT WAS ALREADY TAKING. Starvation, not
             // exhaustion of the graph -- see Accounting.Starved.
@@ -352,6 +369,31 @@ public sealed class Node
                 Accounting = new Accounting(
                     message.Broadcast, 0, Deaths: 1, Halted: 1, Ended: carried),
             };
+        }
+
+        // WHICH RELATION THIS HOP MAY TAKE, WHEN THE QUESTION NAMED A PATH. The
+        // position is read off the chain rather than carried: a chain begins at
+        // the origin and ends at the node being fired, so its length minus one is
+        // how many hops have already been taken. A carried counter would be the
+        // same fact twice, free to disagree with the chain under C2.
+        //
+        // A ROUTE THAT HAS WALKED THE WHOLE PATH IS FINISHED, NOT BROKE. It has
+        // already produced its arrival above; what it must not do is take a hop
+        // the question did not ask for. Counted as a death with no strength
+        // thwarted, exactly as running out of partners is -- no budget would have
+        // helped it.
+        if (message.Path is { } path)
+        {
+            var hop = message.Chain.Length - 1;
+
+            if (hop >= path.Length)
+                return new Fired
+                {
+                    Outgoing = [],
+                    Reached = reached,
+                    Accounting = new Accounting(
+                        message.Broadcast, 0, Deaths: 1, Ended: carried),
+                };
         }
 
         var outgoing = ImmutableArray.CreateBuilder<Message>(row.Length);
@@ -405,6 +447,13 @@ public sealed class Node
             // ranking things that merely accompany -- which is the whole of why
             // a deeper walk for prediction was monotonically worse.
             if (message.Through is { } only && edge.Kind != only) continue;
+
+            // AND WHAT IT WILL WALK AT THIS PARTICULAR HOP -- step 9. The two are
+            // never both set: a question names one relation for the whole walk or
+            // one per hop, and allowing both would be a second field restricting
+            // the same choice.
+            if (message.Path is { } route && edge.Kind != route[message.Chain.Length - 1])
+                continue;
 
             outgoing.Add(message with
             {

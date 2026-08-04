@@ -151,6 +151,52 @@ public enum Attending
     /// </para>
     /// </remarks>
     Contested,
+
+    /// <summary>
+    /// <see cref="Credited"/> writing exactly the same graph, ASKED A WIDER
+    /// QUESTION — <b>step 9, and the attack on the silence rather than the
+    /// score.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ONE THING CHANGES, AND IT IS THE QUESTION.</b> Every write here is
+    /// byte-for-byte what <see cref="Credited"/> writes: the occasion as it
+    /// happened, and the second cell a step later only if the most-at-risk
+    /// variable improved. What moves is that the choice walks
+    /// <see cref="Thinking.Question.Alike"/> instead of
+    /// <see cref="Thinking.Question.Worthwhile"/>.
+    /// </para>
+    /// <para>
+    /// <b>BECAUSE THE SCORE WAS NEVER THE PROBLEM — THE SILENCE WAS.</b>
+    /// <c>Worthwhile</c> asks the credit cell of the codes felt right now, and
+    /// most of the time every one of them is empty, so the arm falls back on its
+    /// coin toss for the great majority of a run. That is not inexperience:
+    /// quadrupling the run moves neither the silence nor the score, because the
+    /// state count grows as fast as the coverage does.
+    /// </para>
+    /// <para>
+    /// <b>So the walk takes one hop OUT FIRST.</b> Anything that has shared a
+    /// moment with what is felt now, and then what helped THERE — credit earned in
+    /// a state this one merely resembles, spent in a state that earned none.
+    /// </para>
+    /// <para>
+    /// <b>MEASURED, AND IT IS THE SECOND FAILURE THE COMMENT PREDICTED: LOUDER AND
+    /// WORSE.</b> The silence really does collapse — the coverage problem is
+    /// genuinely gone — and the score falls below drawing at random. <b>A shared
+    /// moment is too cheap a notion of alike.</b> <see cref="Graph.Kind.With"/> is
+    /// symmetric and dense, so one hop reaches nearly everything, "states like this
+    /// one" becomes "almost every state", and the credit averages back into the
+    /// behaviour policy step 4 exists to escape.
+    /// </para>
+    /// <para>
+    /// <b>KEPT AS THE MEASURED CONTROL FOR A SHARPER NOTION OF ALIKE.</b>
+    /// <see cref="Thinking.Question.Downstream"/> is that notion — states whose
+    /// FUTURES agree rather than whose moments do — and it cannot be asked here
+    /// yet: the reverse temporal edge it needs is exactly the one a carried code
+    /// does not write. See <see cref="Graph.Kind.Before"/>.
+    /// </para>
+    /// </remarks>
+    Kindred,
 }
 
 /// <summary>
@@ -350,10 +396,17 @@ public sealed class HomeostatRun : IDisposable
                 : await ChosenAsync(
                     felt,
                     chains,
-                    choosing is Attending.Credited or Attending.Marked
-                            or Attending.Contested
-                        ? Question.Worthwhile()
-                        : null,
+                    choosing switch
+                    {
+                        // ONE HOP OUT BEFORE THE CREDIT CELL, so a state that
+                        // earned nothing can still be advised -- step 9.
+                        Attending.Kindred => Question.Alike(),
+
+                        Attending.Credited or Attending.Marked
+                            or Attending.Contested => Question.Worthwhile(),
+
+                        _ => null,
+                    },
                     ct).ConfigureAwait(false);
 
             // THESE TWO WERE DECLARED HERE AND NEVER MOVED, so this world alone
@@ -442,7 +495,7 @@ public sealed class HomeostatRun : IDisposable
                 owed = (occasion, step);
             }
             else if (choosing is Attending.Credited or Attending.Marked
-                     or Attending.Contested)
+                     or Attending.Contested or Attending.Kindred)
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
                 // ordinary cell is untouched and this arm changes one thing.

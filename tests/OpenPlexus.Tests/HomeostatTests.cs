@@ -522,6 +522,125 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// Step 9 — <b>the walk that takes one hop out before asking the credit cell,
+    /// and the reading is the SILENCE.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>WHAT IS LEFT OF STEP 4 IS NOT INEXPERIENCE.</b> The credit arm is silent
+    /// for the great majority of a run and quadrupling the run moves neither the
+    /// silence nor the score, because the state count grows as fast as the coverage
+    /// does. A cell keyed on the state it was earned in cannot cover states that
+    /// keep arriving.
+    /// </para>
+    /// <para>
+    /// <b>SO THE QUESTION MOVES AND NOTHING ELSE DOES.</b> `Kindred` writes exactly
+    /// what `Credited` writes — same occasion, same second cell, same condition —
+    /// and walks <c>With</c> then <c>Helped</c> rather than <c>Helped</c> alone. If
+    /// the silence falls and the score holds, credit generalised. <b>If the silence
+    /// falls and the score falls with it, credit was spread somewhere it did not
+    /// belong</b>, which is the failure this shape can cause and is the reason the
+    /// two are read together.
+    /// </para>
+    /// <para>
+    /// <b>AND A QUIETER ARM CANNOT BE READ AS A BETTER ONE.</b> The bootstrap acts
+    /// at random, so silence pulls an arm TOWARDS the blind bar — a rise in score
+    /// with a rise in silence would be the trap, and it is arithmetic that it
+    /// cannot be the mechanism.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task Asking_what_helped_in_states_like_this_one_against_asking_only_this_one()
+    {
+        var ranked = World() with { Ranked = true };
+
+        var arms = await Sweep.AcrossAsync(
+            12,
+            ("blind", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Blind)).Viable;
+            }),
+            ("credited", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
+            }),
+            ("kindred", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Kindred)).Viable;
+            }),
+            ("credited+ranked", async seed =>
+            {
+                using var run = new HomeostatRun(ranked, Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Credited)).Viable;
+            }),
+            ("kindred+ranked", async seed =>
+            {
+                using var run = new HomeostatRun(ranked, Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Kindred)).Viable;
+            }),
+            ("lowest", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Lowest)).Viable;
+            }));
+
+        output.WriteLine(Sweep.Table(arms));
+
+        // THE SILENCE BESIDE THE SCORE, WHICH IS THE WHOLE POINT OF THE ARM.
+        foreach (var arm in (Attending[])[Attending.Credited, Attending.Kindred])
+        {
+            using var plain = new HomeostatRun(World(), Dials, seed: 1);
+            var flat = await plain.RunAsync(Steps, arm);
+
+            using var run = new HomeostatRun(ranked, Dials, seed: 1);
+            var varied = await run.RunAsync(Steps, arm);
+
+            output.WriteLine(
+                $"{arm,-9} silent={flat.Silent,3}/{flat.Steps} viable={flat.Viable:F4} "
+                + $"msgs={flat.Messages} | ranked silent={varied.Silent,3} "
+                + $"viable={varied.Viable:F4} msgs={varied.Messages}");
+        }
+
+        // MEASURED, AND REFUTED IN THE SHAPE THE COMMENT ABOVE NAMED IN ADVANCE.
+        // THE MECHANISM WORKS EXACTLY AS BUILT: silence falls from 330 of 400
+        // steps to 48, so the walk now has something to say almost every step and
+        // the coverage problem step 4 stalled on is genuinely gone.
+        //
+        // AND WHAT IT SAYS IS WORSE THAN A COIN TOSS: 0.0971 against a blind bar
+        // of 0.3546, below even `chain`. The credit did not generalise, it
+        // DISSOLVED.
+        //
+        // WHY, AND IT IS ONE SENTENCE: `With` IS TOO CHEAP A NOTION OF ALIKE. It
+        // is symmetric and dense, so one hop out of a felt code reaches nearly
+        // every code that has ever shared a moment with it -- which in this world
+        // is most bands of most needs. "States like this one" becomes "almost
+        // every state", the credit averages over all of them, and the ranking
+        // collapses back to whatever helped most often ANYWHERE. That is the
+        // behaviour policy again, which is precisely the anti-correlation step 4
+        // exists to escape, arrived at by a new route.
+        //
+        // THE TWO NUMBERS TOGETHER ARE WHAT SAY THIS, AND EITHER ALONE WOULD LIE.
+        // The silence alone reads as a triumph. The score alone reads as a walk
+        // that broke. Together they say the walk reached further and found mush.
+        var bar = arms.First(one => one.Arm == "blind");
+        var narrow = arms.First(one => one.Arm == "credited");
+        var wider = arms.First(one => one.Arm == "kindred");
+
+        Assert.True(wider.Mean < bar.Mean && wider.Separation(bar) > 3.0,
+            $"a shared MOMENT has stopped being too cheap a notion of alike "
+            + $"({wider.Mean:F4} against a bar of {bar.Mean:F4}) — if this now "
+            + "clears the bar, the DO-NOT-RE-TRY row has expired and the revival "
+            + "condition should be re-read rather than the row deleted");
+
+        Assert.True(narrow.Mean > wider.Mean,
+            $"asking only this state's own credit has stopped beating asking "
+            + $"every state's: {narrow.Mean:F4} against {wider.Mean:F4}");
+    }
+
     [Fact]
     public async Task The_credit_arm_reaches_its_level_fast_and_more_data_does_not_help()
     {

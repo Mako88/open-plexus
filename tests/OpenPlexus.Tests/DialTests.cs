@@ -1,5 +1,8 @@
+using OpenPlexus.Bus;
 using OpenPlexus.Graph;
+using OpenPlexus.Thinking;
 using OpenPlexus.Worlds;
+using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
 
@@ -30,7 +33,7 @@ namespace OpenPlexus.Tests;
 /// the internal signal first", which is what step 2 is really for.
 /// </para>
 /// </remarks>
-public sealed class DialTests
+public sealed class DialTests(ITestOutputHelper output)
 {
     /// <summary>Dials something already sets from what the run is doing.</summary>
     private static readonly Dictionary<string, string> Driven = new(StringComparer.Ordinal)
@@ -68,6 +71,12 @@ public sealed class DialTests
             + "data: every message arriving carries the sender's marginal, so a "
             + "node could shrink relative to how much evidence it typically sees. "
             + "Its own inbox, so C1-legal, and world-independent by construction",
+
+        ["Toll"] =
+            "a choice between two statistics to charge from rather than a "
+            + "continuum, exactly as `Pricing` is. WHAT it prices in is not a "
+            + "quantity that can be hunted; how deep to go already has a "
+            + "controller, and that is `Stamina`",
 
         ["Foresight"] =
             "OPEN, AND THE MOST TRACTABLE ONE LEFT. The prediction budget is "
@@ -131,6 +140,124 @@ public sealed class DialTests
         Assert.NotEqual(shallow, deep);
     }
 
+    /// <summary>
+    /// <b><see cref="Toll"/> IS THE FIRST DIAL CLAIMED TO MOVE THE PRICE AND
+    /// NOTHING ELSE</b>, and this is the same fingerprint read the other way
+    /// round.
+    /// </summary>
+    /// <remarks>
+    /// <b>A price dial must move the traffic, or it is connected to nothing</b> —
+    /// which is the failure `ThinkAsync`'s stamina survived three measurements as.
+    /// The ranking half is asserted where it can be seen directly: the weight a
+    /// partner is believed at is untouched by this dial, so a walk under either
+    /// toll ranks the same partners in the same order and only gets a different
+    /// distance for its money.
+    /// </remarks>
+    [Fact]
+    public async Task The_traffic_toll_moves_the_price()
+    {
+        var evidence = Fixture.Dials(stamina: 8.0);
+        var traffic = evidence with { Toll = Toll.Traffic };
+
+        Assert.NotEqual(evidence, traffic);
+
+        Assert.NotEqual(await MessagesAsync(evidence), await MessagesAsync(traffic));
+    }
+
+    /// <summary>
+    /// And the walk is still bounded under it — <b>the one failure that takes the
+    /// process with it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE REFUTED <c>StepCost</c> ARMS DIED OF EXACTLY THIS</b>, at five
+    /// million messages on a twelve-clique where inverse cost took 1,111. A clique
+    /// of equal weights is the shape that kills a cost which can reach zero: every
+    /// edge is perfect, so under anything proportional to the weight a route pays
+    /// nothing and the fan-out is factorial. Here the cheapest hop still costs the
+    /// one that is added to the log.
+    /// </remarks>
+    [Fact]
+    public void And_the_walk_is_still_bounded_where_the_evidence_toll_degenerates()
+    {
+        var evidence = Sweep(Toll.Evidence);
+        var traffic = Sweep(Toll.Traffic);
+
+        output.WriteLine($"12-clique, stamina 8: evidence={evidence} traffic={traffic}");
+
+        // WHAT THE CLIQUE ACTUALLY MEASURES, AND IT IS NOT WHAT IT WAS BUILT FOR.
+        // Every node here noted once and met eleven partners once, so every weight
+        // is EXACTLY 1.0 -- and `1 / weight` at weight one is the constant cost
+        // that `StepCost.Constant` was refuted as. So the control is not merely
+        // dearer here, it is the refuted arm in disguise: a budget of 8 buys 8
+        // free hops out of a fan-out of 11 and the growth is factorial.
+        //
+        // THAT IS THE REFUTATION ROW'S REVIVAL CONDITION READ OUT LOUD -- "a bound
+        // not relying on positive cost at weight 1.0". Inverse cost relies on it,
+        // and this is the shape where it is not there to rely on.
+        Assert.True(evidence > 1_000_000,
+            $"the control was expected to run away on an equal-weight clique and "
+            + $"passed only {evidence} messages — if this has been fixed, the "
+            + "argument for a traffic toll is weaker than it was written up as");
+
+        // AND THE TRAFFIC TOLL HOLDS EXACTLY WHERE THE OTHER LETS GO, because a
+        // row of eleven costs `1 + log2(11)` whatever the counts in it say.
+        Assert.True(traffic < 1_000,
+            $"the traffic toll was not bounded: {traffic} messages");
+    }
+
+    /// <summary>
+    /// One walk over a 12-clique of equal weights, driven by hand.
+    /// </summary>
+    /// <remarks>
+    /// <b>BY HAND RATHER THAN OVER A BUS</b>, because what is counted is what the
+    /// NODES produce. A bus would put delivery, ordering and settling into a
+    /// number that is meant to be arithmetic.
+    /// </remarks>
+    private static long Sweep(Toll toll)
+    {
+        var dials = Fixture.Dials(stamina: 8.0) with { Toll = toll };
+
+        var clique = Enumerable.Range(1, 12).Select(one => Fixture.C((ulong)one)).ToList();
+        var nodes = clique.ToDictionary(code => code, code => new Node(code, dials));
+
+        foreach (var code in clique)
+        {
+            nodes[code].Note();
+            foreach (var other in clique.Where(other => other != code)) nodes[code].Observe(other);
+        }
+
+        var queue = new Queue<Message>();
+
+        queue.Enqueue(new Message
+        {
+            Broadcast = BroadcastId.New(),
+            ReturnTo = new MachineAddress("in"),
+            To = clique[0],
+            Held = dials.Stamina,
+            Chain = [clique[0]],
+            Carried = 1.0,
+        });
+
+        var sent = 0L;
+
+        // A CEILING SO A RUNAWAY IS A FAILING NUMBER RATHER THAN A HUNG SUITE.
+        // The chain's cycle check bounds this shape at 11!/3! either way, so
+        // nothing here can actually reach it — it is the backstop for a change
+        // that has lost the cycle check as well.
+        while (queue.Count > 0 && sent < 5_000_000)
+        {
+            var message = queue.Dequeue();
+
+            foreach (var outgoing in nodes[message.To].Fire(message).Outgoing)
+            {
+                sent++;
+                queue.Enqueue(outgoing);
+            }
+        }
+
+        return sent;
+    }
+
     /// <summary>One fixed run, so the only thing that differs is the dial.</summary>
     private static async Task<long> MessagesAsync(WalkSettings dials)
     {
@@ -188,6 +315,10 @@ public sealed class DialTests
         // and failed the build until somebody said what it was. `Value` left
         // when `ArrivalValue.Lift` was deleted, because an enum with one member
         // is a dial that chooses nothing.
-        Assert.Equal(5, HandSet.Count);
+        //
+        // RAISED TO SIX FOR `Toll`, WHICH IS THE ARGUMENT THIS FILE WANTS HAD.
+        // It buys the split the plan has called outstanding three times over: a
+        // sixth knob against the row entry finally doing one job.
+        Assert.Equal(6, HandSet.Count);
     }
 }

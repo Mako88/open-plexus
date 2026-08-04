@@ -1,16 +1,15 @@
 # Where this is going
 
-**The only doc, capped at 2,800 words by `DocsTests`. To add something, retire
+**The only doc, capped at 4,000 words by `DocsTests`. To add something, retire
 something.** Its predecessors grew past being loadable and kept being cited
 anyway, which is the failure this exists to prevent.
 
 **What every piece does lives in the XML comments beside the code**, where the
 compiler enforces that every reference resolves and nothing can go stale.
 
-**This file is forward-facing and records no results.** `DocsTests` fails the
-build when a measured quantity appears here. Findings live in the commit that
-produced them, in the comment beside the mechanism, and in the test that asserts
-them. Deleted docs are in git.
+**This file is forward-facing and records no results.** Findings live in the
+commit that produced them, in the comment beside the mechanism, and in the test
+that asserts them. Deleted docs are in git.
 
 ---
 
@@ -40,8 +39,7 @@ they measure. `corpora/fetch.sh` fetches; nothing is vendored.
 
 **An occasion is a SET of co-occurring codes**, so *red ball beside blue box* and
 *blue ball beside red box* were the same input. That ceiling was
-**representational, not a matter of scale** — and `Occasion.Groups` plus a
-per-scene index is what lifts it.
+**representational, not a matter of scale**, and `Occasion.Groups` lifts it.
 
 **The graphs are tiny.** Nothing here has been run at a size where its claims
 could break. Hold them loosely — and the size dial that exists has already found
@@ -62,10 +60,9 @@ that a dial wanting different values in different worlds is the same fault**:
 prefer splitting it, or fusing the arms, over sweeping it. `DialTests` records
 which channel each dial may move and fails when one moves the other.
 
-**`Clevr` LOOKED LIKE A SHARPER VERSION AND WAS A BUDGET ARTIFACT.** The two hops
-appeared to want opposite pricing, mirrored almost exactly, until the receiver
-arm was given budget — at which point it won BOTH halves. **The trap it walked
-into is in TRAPS.**
+**A CONFLICT BETWEEN TWO DIALS MAY BE A BUDGET ARTIFACT.** `Clevr` looked like a
+sharper version of the pricing split and was one. **The trap it walked into is in
+TRAPS.**
 
 ---
 
@@ -81,17 +78,13 @@ themselves.** What is left is the world's own ambiguity, not the walk's.
 
 ### 1a. RANKING BELONGS TO THE QUESTION — moved, and the dial is gone
 
-**Agreement is right on a conjunction and harmful on an indexed question**, so it
-was never a level to find. It now travels on `Question`, beside the grouping that
-was already going there, and `WalkSettings` has one dial fewer. Fusing the two
-orders so nobody had to say was built first and is refuted below.
+**It travels on `Question`**, beside the grouping that was already going there,
+and `WalkSettings` has one dial fewer. What is left here is unbuilt:
 
 - **Merging routes AT A NODE is the version `Narrowed` could not do.** Reading
   the index back costs a round trip and puts the referent in the machine's
   hands; a node combining concurrent routes of one broadcast would keep it in the
   graph. It needs a wait, which C2 makes expensive — but it is the honest form.
-- **`Accumulate.Max` was re-tried here, where its revival condition pointed, and
-  is worse.** Stamina is nearly an exponent on cost and buys nothing.
 
 **`Pricing` IS THE ARM STILL HAND-SET, AND PROMOTING IT WAS NOT TAKEN.** The
 trade belongs to graph density and available budget rather than to the question —
@@ -103,9 +96,9 @@ a written reason.
 
 ### 2. Predictive coding — only surprise propagates
 
-Rao & Ballard, Friston. An expected onset is silent. **Built**: on `Rhythm`
-traffic falls about a third with the score bit-identical, and `Surprise.Rate` is
-the first quantity a controller could read from inside rather than from outside.
+Rao & Ballard, Friston. An expected onset is silent. **Built** — and
+`Surprise.Rate` is the first quantity a controller could read from inside rather
+than from outside.
 
 **THE OBSERVATION BROADCAST IS SUPPRESSED, NOT THE PREDICTION** — the walk making
 the expectation still runs and costs more, so the saving is partial. **Making
@@ -131,25 +124,27 @@ Keep internal variables in bounds and behaviour becomes goal-directed **with no
 reward function** — which matters, because survival proved gameable by circling.
 **Homeostasis has no episode boundary**, which fits C4.
 
-**`Homeostat` HAS SET THE BAR, AND NOT WHERE ANYBODY WOULD GUESS.** Idling fails
-exactly when the arithmetic says, and attending to whatever is lowest holds the
-body indefinitely — so the world is winnable, and only by looking at it. **But
-choosing by association scores BELOW random**: with nothing to say what an action
-is for, the walk repeats what it did last time in that state, which is fork 20's
-mirror again. **So step 4 must beat random, not idling** — and needs a bootstrap,
-since an action enters the graph only by being taken.
+**`Homeostat` HAS SET THE BAR, AND NOT WHERE ANYBODY WOULD GUESS.** Attending to
+whatever is lowest holds the body indefinitely, so the world is winnable and only
+by looking at it. **But choosing by association scores BELOW random**: with
+nothing to say what an action is for, the walk repeats what it did last time in
+that state, which is fork 20's mirror again. **So step 4 must beat random, not
+idling** — and needs a bootstrap, since an action enters the graph only by being
+taken.
 
 ### 5. WHAT A CO-OCCURRENCE COUNT STRUCTURALLY CANNOT DO — John, 2026-08-03
 
 **Three limits that are not missing features but consequences of the design**, and
 the approach for each. **Ordered here by cost.**
 
-- **ABSENCE.** The graph records what co-occurred; nothing represents *did not
-  happen*. **Nearly built already:** `Surprise` computes `onsets \ expected` and
-  discards the mirror. `expected \ onsets` **is** absence — the negative half of a
-  signed prediction error. **Absence is a SIGNAL, not a node**; minting `not-X`
-  would double an alphabet to represent unboundedly many things that are not
-  there.
+- **ABSENCE — BUILT AS A SIGNAL, AND NOTHING ACTS ON IT YET.** `Surprise` returns
+  both halves of the signed error, and `Overreach` is what tells a solved world
+  from a predictor naming everything — which `Rate` alone cannot, and which is the
+  one failure step 2 can cause rather than measure. **Absence is a SIGNAL, not a
+  node**; minting `not-X` would double an alphabet to represent unboundedly many
+  things that are not there. **What is left is a consumer**: it is the second
+  quantity a controller could read from inside, and a third-factor candidate for
+  step 7.
 - **SUPERSESSION.** Counts only increment, which is the G-Counter property that
   makes them converge with no coordination — and exactly what forbids
   most-recent-wins. **Do not decay**, which breaks convergence. **Add a second
@@ -217,17 +212,10 @@ output and a bounded row, no amount of scaling gets there.
 
 ## TO BUILD — a ticked box means the type exists, and a test checks
 
-- [x] `Binding` — the world that measured the ceiling, and then lifted it
-- [x] `Seeds` — decorrelated seeding for every sweep
-- [x] `Fabric` — the bus/ring/clusters the three worlds used to each own
-- [x] `Measurement` — the range checks the three worlds used to each own
-- [x] `Composed` — the world of step 1, built and characterised, not yet lifted
-- [x] `Babi` — twenty tasks somebody else wrote, with published baselines
-- [x] `Clevr` — fork 25's experiment on scene graphs generated in 2017
-- [x] `Rhythm` — the endless stationary stream prediction can be measured on
-- [x] `Motif` — recurring sets that should collapse into one code
-- [x] `Homeostat` — Ashby's bounded variables, where standing still stops paying
-- [x] `Surprise` — the local prediction error of step 2
+**Standing, and each documents itself:** `Binding`, `Composed`, `Babi`, `Clevr`,
+`Rhythm`, `Motif`, `Homeostat`, `Surprise`, over `Fabric`, `Seeds` and
+`Measurement`.
+
 - [ ] `Chunk` — the minted node of step 3
 - [ ] `Drives` — the bounded internal variables of step 4
 
@@ -322,11 +310,10 @@ condition is a superstition. The commit named in git holds the numbers.
 ## TRAPS
 
 **Closed in code — named so nobody reintroduces them.** Consecutive integer seeds
-are not independent (`Seeds.Apart`, and `Sweep` mixes the counter).
-`Measured.Separation` returned zero where repeated measurement found no spread at
-all (infinity now). `WhenQuiet()` was not a finish signal (renamed `WhenIdle()`).
-Questions were read before their walk had finished, which made every number taken
-under one load incomparable with any other (fork 22; the suite is serial and
+are not independent (`Seeds.Apart`). `Measured.Separation` returned zero where
+repeated measurement found no spread at all (infinity now). `WhenQuiet()` was not
+a finish signal (`WhenIdle()`). Questions were read before their walk had
+finished, which made every number incomparable with any other (fork 22;
 `Unsettled` is asserted). **Voting survives that fix and buys nothing in one
 process** — kept, because a real network loses reports.
 
@@ -359,8 +346,7 @@ process** — kept, because a real network loses reports.
 input machine; the harness hands the finished thought over by direct call. Needed
 before a second machine exists.
 
-**Nothing else outstanding here** — the window's phase error and the surviving
-mutation are both closed.
+**Nothing else outstanding.**
 
 ---
 

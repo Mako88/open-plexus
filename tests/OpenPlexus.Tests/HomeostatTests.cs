@@ -704,6 +704,88 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task Step_fours_attribution_survives_being_swept_rather_than_sampled()
+    {
+        // THE RE-RUN THE INHIBITION REVERSAL MADE NECESSARY. Every claim in step 4
+        // was taken at one stamina, and one of them turned out to be a comparison
+        // between one arm's peak and another arm's way up. So the controls get the
+        // same treatment: each is swept and read at ITS OWN best budget.
+        //
+        // AND THE ATTRIBUTION HOLDS. `Credited` peaks at 0.7347; the unconditioned
+        // control, plain association and the top-up all peak BELOW the blind bar.
+        // The contrast is what did it, and that now survives being swept instead of
+        // sampled.
+        var peaks = new Dictionary<string, double>();
+
+        foreach (var stamina in (double[])[2.0, 3.0, 4.0, 6.0, 8.0])
+        {
+            output.WriteLine($"--- stamina {stamina} ---");
+
+            var arms = await ArmsAsync(
+                Fixture.Dials(stamina), 24,
+                Attending.Blind, Attending.Chain, Attending.Marked, Attending.Topped);
+
+            foreach (var arm in arms)
+                peaks[arm.Arm] = Math.Max(peaks.GetValueOrDefault(arm.Arm, 0.0), arm.Mean);
+        }
+
+        output.WriteLine(string.Join(
+            "  ", peaks.Select(one => $"{one.Key}={one.Value:F4}")));
+
+        foreach (var control in (string[])["chain", "marked", "topped"])
+            Assert.True(peaks[control] < peaks["blind"],
+                $"`{control}` now beats the blind bar at its own best budget "
+                + $"({peaks[control]:F4} against {peaks["blind"]:F4}), so step 4's "
+                + "attribution no longer rests on the contrast alone and the claim "
+                + "needs rewriting rather than re-asserting");
+    }
+
+    [Fact]
+    public async Task Every_arm_but_one_gets_worse_the_further_it_is_allowed_to_reach()
+    {
+        // THE PATTERN UNDER TODAY'S RESULTS, AND IT IS THE SIMPLEST STATEMENT OF
+        // THEM. `Blind` never consults the graph and is flat in the budget. EVERY
+        // arm that does consult it declines as the walk is allowed to reach
+        // further: more stamina reaches more partners, and a count that can only
+        // say what HELPED rules none of them out, so the extra reach is all junk.
+        //
+        // `Contested` IS THE EXCEPTION, and it is the only arm here that can say
+        // NOT THAT ONE. It still declines eventually -- nothing here is immune --
+        // but it climbs first, peaks two budgets later, and peaks higher.
+        var narrow = Fixture.Dials(stamina: 4.0);
+        var wide = Fixture.Dials(stamina: 12.0);
+
+        var near = await ArmsAsync(
+            narrow, 24, Attending.Chain, Attending.Credited, Attending.Contested);
+
+        var far = await ArmsAsync(
+            wide, 24, Attending.Chain, Attending.Credited, Attending.Contested);
+
+        double At(IReadOnlyList<Measured> arms, Attending arm) =>
+            arms.First(one => one.Arm == arm.ToString().ToLowerInvariant()).Mean;
+
+        foreach (var arm in (Attending[])[Attending.Chain, Attending.Credited])
+        {
+            output.WriteLine($"{arm,-10} {At(near, arm):F4} -> {At(far, arm):F4}");
+
+            Assert.True(At(far, arm) < At(near, arm),
+                $"`{arm}` stopped losing ground to a wider walk "
+                + $"({At(far, arm):F4} against {At(near, arm):F4}), so the pattern "
+                + "this test records has changed");
+        }
+
+        output.WriteLine(
+            $"contested   {At(near, Attending.Contested):F4} -> "
+            + $"{At(far, Attending.Contested):F4}");
+
+        Assert.True(At(far, Attending.Contested) > At(near, Attending.Contested),
+            $"inhibition no longer gains from a wider walk "
+            + $"({At(far, Attending.Contested):F4} against "
+            + $"{At(near, Attending.Contested):F4}), so it is no longer the "
+            + "exception and today's reading of these results is wrong");
+    }
+
+    [Fact]
     public async Task The_credit_cell_read_against_the_base_rate()
     {
         // ΔP AGAINST THE HIT RATE, AND `Credited` IS THE CONTROL. The same cells

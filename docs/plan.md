@@ -207,10 +207,15 @@ its ceiling it absorbs anything.)*
   G-Counters read as a difference, so "punishment is unavailable" was **the wrong
   CRDT, not a law**. `Kind.Hindered` costs a kind, not a wider row, and **must
   discount the SCORE and never the price**.
-- **WHAT IT BUYS IS ROBUSTNESS TO BUDGET, WHICH IS WHY IT LOOKED WORTHLESS.** More
-  stamina reaches more partners and a one-sided count rules NONE of them out, so it
-  collapses to the bar; an arm that can say *not that one* keeps its footing and
-  climbs. **Measured at three budgets — see the refuted row.**
+- **EVERY ARM THAT CONSULTS THE GRAPH GETS WORSE THE FURTHER IT MAY REACH, AND
+  INHIBITION IS THE ONLY EXCEPTION.** More stamina reaches more partners and a
+  one-sided count rules NONE of them out, so the extra reach is junk and the arm
+  falls to the bar. **`Blind` is flat because it never asks.** An arm that can say
+  *not that one* climbs first, and peaks later and higher.
+- **SO THE THING TO BUILD IS WHATEVER ELSE CAN REFUSE A PARTNER.** ΔP clamped at
+  nought does NOT do it — it tracks the one-sided count down — so lowering a score
+  toward nought is not the same act as ruling a route out. **That difference is the
+  next thing to understand.**
 
 ### 9. RELATIONAL PATHS — built, and the idea behind them refuted
 

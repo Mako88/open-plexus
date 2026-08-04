@@ -56,8 +56,18 @@ public sealed class DocsTests
     /// it</b> — so raising it without one is the failure, and the number moving is
     /// not.
     /// </para>
+    /// <para>
+    /// <b>RAISED AGAIN TO 4,000 — JOHN'S CALL, 2026-08-03, AND FOR A DIFFERENT
+    /// REASON.</b> Not compaction this time but scope: the plan now carries the
+    /// three structural limits of a co-occurrence count and the approach to each,
+    /// edge kinds, credit over time, variable binding, replay, inhibition and the
+    /// scaling order. <b>"I really don't want to lose stuff just because the plan
+    /// is too big"</b> — and an idea that never reaches the doc is lost the moment
+    /// the session ends, which is a worse failure than a doc that takes longer to
+    /// read. The budget still exists, and it still forces a pass when it bites.
+    /// </para>
     /// </remarks>
-    private const int Budget = 3_000;
+    private const int Budget = 4_000;
 
     private static string Repo() => Tree.Repo();
 

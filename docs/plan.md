@@ -101,8 +101,6 @@ locally observable, so it wants a controller and not a default. **`Fleeting` has
 nothing global to promote**: where it applies, the right value is already set for
 a written reason.
 
-**Vector-symbolic binding** (Plate, Kanerva) stays parked.
-
 ### 2. Predictive coding — only surprise propagates
 
 Rao & Ballard, Friston. An expected onset is silent. **Built**: on `Rhythm`
@@ -141,9 +139,79 @@ is for, the walk repeats what it did last time in that state, which is fork 20's
 mirror again. **So step 4 must beat random, not idling** — and needs a bootstrap,
 since an action enters the graph only by being taken.
 
-**All four could land and still not be enough.** The confident claim is narrower:
-without structure, an internal error signal, a growing alphabet and a reason to
-act, no amount of scaling gets there.
+### 5. WHAT A CO-OCCURRENCE COUNT STRUCTURALLY CANNOT DO — John, 2026-08-03
+
+**Three limits that are not missing features but consequences of the design**, and
+the approach for each. **Ordered here by cost.**
+
+- **ABSENCE.** The graph records what co-occurred; nothing represents *did not
+  happen*. **Nearly built already:** `Surprise` computes `onsets \ expected` and
+  discards the mirror. `expected \ onsets` **is** absence — the negative half of a
+  signed prediction error. **Absence is a SIGNAL, not a node**; minting `not-X`
+  would double an alphabet to represent unboundedly many things that are not
+  there.
+- **SUPERSESSION.** Counts only increment, which is the G-Counter property that
+  makes them converge with no coordination — and exactly what forbids
+  most-recent-wins. **Do not decay**, which breaks convergence. **Add a second
+  channel instead: an LWW-Register is also a CRDT.** `together` stays monotonic
+  and a `when` rides beside it; the two must never merge, because LWW discards
+  concurrent writes — right for state, ruinous for learning. `Occasion.At` exists,
+  so this is buildable now; across machines it wants a Lamport clock, which needs
+  no coordinator. Ranking by recency then belongs on `Question`, not on a dial.
+- **MULTI-TOKEN OUTPUT**, and concurrently. **Splits in two.** *Simultaneous*
+  actions are nearly free — `BestOf` already returns many, and many thoughts are
+  already in flight, which is what `BroadcastId` is for. What is missing is
+  several output machines, so **fork 11 is the enabler and not plumbing.**
+  *Ordered* sequences need edge kinds.
+
+### 6. EDGE KINDS — promoted, because three roads end here
+
+**A row entry becomes `(Code, Kind)` and not `Code`**, with kinds at least
+`With` and `After`. It is the revival condition on **two** refuted rows, and it is
+what ordered output needs. **John's insight, and it is the `Groups` trick again:**
+a phase cannot survive C2, so the front end SAYS the order inside the occasion,
+where lateness cannot touch it — exactly as grouping did for binding. It also
+explains the window: a carried edge is currently written into the same channel as
+a simultaneous one, so the walk cannot tell *follows* from *accompanies*.
+
+### 7. Credit over time — eligibility traces, and `Window` is already one
+
+**The gap: nothing learns that an act led somewhere good three steps later.** No
+reward function is available and backpropagation is not either. **Three-factor
+Hebbian learning is the answer that needs neither** (Izhikevich 2007, the distal
+reward problem): keep a fading trace of what recently fired, and let a third
+signal consolidate whatever is still in it, most credit to the most recent.
+**`Window` IS that trace, ungated.** Drives supply the third factor — out of
+bounds is bad, returning is good — and `Surprise` is a second candidate. **Safe
+for the CRDT property**, because the trace is transient state deciding how much to
+add, and the counts stay monotonic.
+
+### 8. Also likely necessary
+
+- **VARIABLE BINDING.** *A is north of B* is a count between two codes, so it
+  cannot apply to a new A and B. Without it every generalisation runs through
+  similarity. **This is what un-parks vector-symbolic binding**, and `Clutrr` and
+  `gSCAN` are the worlds that would force it.
+- **REPLAY.** Re-run experience when nothing is arriving: consolidates, learns
+  from rare events, interleaves old with new against interference. **`WhenIdle()`
+  is already the trigger**, and fork 21 is its cousin.
+- **INHIBITION.** The graph is purely excitatory — nothing says *this rules that
+  out*. Buys competition between candidates, and a second route to absence.
+
+### THE PATTERN UNDER ALL OF IT
+
+**A row entry is one number doing several jobs**: it ranks, it prices, and it is
+the only memory of the pair — no order, no recency, no kind. That is the
+recurring fault at the level of the DATA STRUCTURE rather than of a dial, and the
+general remedy is the same: **make it a record, `(count, when, kind)`.** That one
+change carries kinds, supersession and eviction metadata together, and it has a
+single price — memory per edge, which is the scaling wall. **So widen the row
+once, not three times.**
+
+**None of this is a sufficiency argument.** All of it could land and still not be
+enough. The confident claim stays narrower: without structure, an internal error
+signal, a growing alphabet, a reason to act, supersession, absence, concurrent
+output and a bounded row, no amount of scaling gets there.
 
 ---
 
@@ -178,6 +246,27 @@ act, no amount of scaling gets there.
   never on eroding the count itself.
 - **The knob pass, last.** A dial swept before the structural work measures a
   system about to change underneath it.
+
+### The scaling wall — measure it before cutting anything
+
+**STEP ZERO IS TO BUILD SOMETHING BIG ENOUGH TO BREAK.** The largest graph ever
+run here is a few thousand nodes, so any optimisation now is aimed at a wall
+nobody has hit. Full `Clevr` and the ten-thousand-story `Babi` both reach a far
+larger graph; **measure, then cut.** Then, in order of leverage:
+
+- **BOUND THE ROW.** Cap a node at K partners. This is the one that matters: it
+  turns *cost per thought grows with data forever* into *cost per thought is
+  constant*, which is the difference between a system that gets permanently
+  slower as it learns and one that does not. Approximate-nearest-neighbour indexes
+  run at billions on this trick. **Evict on "not touched since", never by eroding
+  a count** — and that is exactly what the `when` channel above provides, so
+  supersession and scaling share one mechanism.
+- **A SELF-SET BEAM, whose revival condition is now met.** The refuted row asks
+  for a width the system sets itself and reports; until `Surprise.Rate` there was
+  no internal signal to set one from, and a node's own row statistics are a
+  second.
+- **Hierarchy, which is what step 3 is really for.** Do not walk a million nodes;
+  walk a thousand chunks.
 
 ### The wire, when the remote half lands — John, 2026-08-03
 

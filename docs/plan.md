@@ -125,7 +125,9 @@ to an old one — run that one.**
   halves of the signed error; `Overreach` tells a solved world from a predictor
   naming everything, which is the one failure step 2 can cause rather than
   measure. **A SIGNAL, not a node** — minting `not-X` would double an alphabet to
-  represent unboundedly many absent things. **What is left is a consumer.**
+  represent unboundedly many absent things. **WIRED**: `Rhythm` complains when the
+  predictor foresees nearly everything while nearly nothing it named happens —
+  the liar the positive half cannot see.
 - **SUPERSESSION — THE CHANNEL IS BUILT, NOTHING READS IT.** Counts only
   increment, which is the G-Counter property and exactly what forbids
   most-recent-wins. **Do not decay**, which breaks convergence. `Tie.Count` stays

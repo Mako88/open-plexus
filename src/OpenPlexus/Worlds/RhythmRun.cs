@@ -115,6 +115,16 @@ public sealed record RhythmResult : Questioned
         // THE WORLD'S OWN INTEGRITY CHECK. A violation is a draw from everything
         // the cycle did not call for, so predicting them above chance means the
         // stream is not what it says it is.
+        // ABSENCE, WIRED. `Overreach` existed and nothing read it, which is the
+        // named trap about a dial connected to nothing. This is the failure it
+        // was built to catch: a predictor that names everything foresees every
+        // onset, reads a rate near one, and silences the machine on a lie --
+        // and the positive half cannot tell that from a solved world.
+        if (Moments > 50 && Expecting > 0.9 && Overreached > 0.5)
+            wrong.Add($"the predictor foresaw {Expecting:F2} of onsets while "
+                + $"{Overreached:F2} of what it named never happened — it is "
+                + "naming everything, and the silence it buys is not earned");
+
         if (Broke > 50 && Surprised > Chance * 3)
             wrong.Add($"violations were predicted at {Surprised:F2}, far above chance "
                 + $"{Chance:F2} — the world is leaking what it is about to do");

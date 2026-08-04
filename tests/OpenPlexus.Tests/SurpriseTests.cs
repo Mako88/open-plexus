@@ -1,4 +1,5 @@
 using OpenPlexus.Codes;
+using OpenPlexus.Worlds;
 using OpenPlexus.Learning;
 
 namespace OpenPlexus.Tests;
@@ -113,6 +114,33 @@ public sealed class SurpriseTests
         Assert.Equal(0.0, surprise.Rate);
         Assert.Equal(1.0, surprise.Overreach);
         Assert.Equal(0, surprise.Silent);
+    }
+
+    [Fact]
+    public void A_world_complains_when_the_predictor_is_naming_everything()
+    {
+        // THE CONSUMER, AND WITHOUT ONE THIS IS A DIAL CONNECTED TO NOTHING —
+        // a named trap here, and one `Overreach` was sitting in until now. The
+        // liar is invisible in the positive half: it foresees every onset and
+        // reads a perfect rate, so only the negative half can raise it.
+        var lying = new RhythmResult
+        {
+            Span = 1, Ceiling = 1.0, Marginal = 0.1, Kept = 100, Foreseen = 100,
+            Broke = 0, Caught = 0, Late = 0, Skipped = 0,
+            Expecting = 1.0, Overreached = 0.95, Unspoken = 100,
+            Moments = 300, Asked = 300, Right = 100, Silent = 0, Chance = 0.1,
+            Reflections = Reflections.Of(Fixture.Dials(stamina: 4.0), 0),
+            Plumbing = new Plumbing
+            {
+                Nodes = 12, Edges = 40, Widest = 6, Spread = [12],
+                ChainLengths = new Dictionary<int, int> { [2] = 300 },
+                Messages = 1000, Unbalanced = 0,
+            },
+            Halted = 0, Unsettled = 0,
+        };
+
+        Assert.Contains(lying.Complaints,
+            one => one.Contains("naming everything", StringComparison.Ordinal));
     }
 
     [Fact]

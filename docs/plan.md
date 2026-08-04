@@ -1,14 +1,16 @@
 # Where this is going
 
-- **The only doc. Two budgets, both enforced by `DocsTests`: total words, and
-  PROSE words.** To add something, retire something — and prefer cutting prose.
-- **Prose is the cheapest thing here to lose and the easiest to rederive.** A
-  bullet is a reminder; a paragraph is a reminder plus connective tissue nobody
-  needs. **John's rule, 2026-08-04.**
-- **What every piece does lives in the XML comments beside the code**, where the
-  compiler enforces that every reference resolves.
-- **Forward-facing, no results.** Findings live in the commit, in the comment
-  beside the mechanism, and in the test that asserts them. Deleted docs are in git.
+- **The only doc. `DocsTests` holds a word TARGET, a hard CEILING, and a separate
+  PROSE cap.** To add something, retire something — and prefer cutting prose.
+- **Let it drift while a session runs; compact in one pass at the end** — John,
+  2026-08-04. Piecemeal trimming costs attention and cuts in ignorance of what the
+  session will find. **The ceiling stops that becoming permanent drift.**
+- **Prose is the cheapest thing to lose and the easiest to rederive** — a bullet
+  is a reminder, a paragraph is that plus connective tissue. **John, 2026-08-04.**
+- **What every piece does lives in the XML comments**, where the compiler enforces
+  that every reference resolves.
+- **Forward-facing, no results.** Findings live in the commit, the comment beside
+  the mechanism, and the test that asserts them. Deleted docs are in git.
 
 ---
 
@@ -29,8 +31,8 @@
   only be composed; binding, built to be unanswerable and since lifted;
   composition, where the answer was never observed; and **two nobody here
   designed** — `Babi` and `Clevr`. `ScoreboardTests` runs them in one table.
-- **AN EXTERNAL WORLD CANNOT FLATTER THIS ARCHITECTURE BY CONSTRUCTION.**
-  `corpora/fetch.sh` fetches; nothing is vendored.
+- **AN EXTERNAL WORLD CANNOT FLATTER THIS ARCHITECTURE.** `corpora/fetch.sh`
+  fetches; nothing is vendored.
 - **An occasion is a SET**, so *red ball beside blue box* and *blue ball beside
   red box* were one input. That ceiling was **representational, not scale**;
   `Occasion.Groups` lifts it.
@@ -40,16 +42,16 @@
 ### ONE WEIGHT DOING TWO JOBS IS THIS DESIGN'S RECURRING FAULT
 
 - **It has bitten twice.** A weight both RANKS a partner and PRICES the hop, and
-  each attempt to improve one wrecked the other. `Pricing.Sender` moves the
-  ranking while meaning to move the price. `Doubt` destroys the senses world
-  applied to both and repairs a real defect applied to the score alone.
+  improving one wrecked the other. `Pricing.Sender` moves the ranking meaning to
+  move the price; `Doubt` destroys the senses world applied to both and repairs a
+  real defect applied to the score alone.
 - **The general move: find the number serving two masters and split it.**
   `Accumulate` is the next candidate.
 - **A dial wanting different values in different worlds is the same fault** —
-  John, 2026-08-03. Prefer splitting it, or fusing the arms, over sweeping it.
-  `DialTests` records which channel each dial may move.
-- **A conflict between two dials may be a BUDGET ARTIFACT.** `Clevr` looked like a
-  sharper version of the pricing split and was one; the trap is in TRAPS.
+  John, 2026-08-03. Split it or fuse the arms rather than sweep. `DialTests`
+  records which channel each dial may move.
+- **A conflict between two dials may be a BUDGET ARTIFACT** — `Clevr` was one; the
+  trap is in TRAPS.
 
 ---
 
@@ -72,8 +74,8 @@ to an old one — run that one.**
   arm on `Babi` is the *dearer* one, and `Senses` scores the two identically.
   **What is missing is not the controller but the SIGNAL**, which is fork 23's
   lesson a third time.
-- **`Fleeting` has nothing global to promote**: where it applies the right value
-  is already set for a written reason.
+- **`Fleeting` has nothing global to promote**: where it applies, the right value
+  is already set.
 
 ### 2. Predictive coding — only surprise propagates
 
@@ -86,7 +88,7 @@ to an old one — run that one.**
 
 - Fork 21 mints edges; it should mint **nodes**: when a set recurs, mint a code
   standing for it. Threshold is minimum description length, not a constant.
-- **This lets the alphabet GROW** — today the quantiser fixes it forever.
+- **This lets the alphabet GROW**; today the quantiser fixes it forever.
 - Fork 21's trade is the **utility problem** (Minton, SOAR): utility belongs per
   chunk, not as one global `Weight`.
 - **`Motif` HAS SAID WHAT THIS IS NOT ABOUT.** A familiar set completes perfectly

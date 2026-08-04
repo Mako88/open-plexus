@@ -70,6 +70,28 @@ public sealed class DocsTests
     private const int Budget = 4_000;
 
     /// <summary>
+    /// The ceiling the build actually enforces, as against the target above.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>JOHN'S CALL, 2026-08-04: DO NOT COMPACT MID-SESSION.</b> Trimming after
+    /// every edit costs attention during the work and produces a worse doc than
+    /// one pass over the whole thing at the end, when what the session actually
+    /// found is known. So the doc is allowed to drift above
+    /// <see cref="Budget"/> while a session runs, and the session ends with a
+    /// compaction pass back under it.
+    /// </para>
+    /// <para>
+    /// <b>THE CEILING IS WHAT STOPS THE DISCIPLINE FROM QUIETLY LAPSING.</b> A
+    /// target nobody enforces is a target that drifts forever, which is the exact
+    /// failure the word budget was introduced to prevent — so there is still a
+    /// number the build refuses to go past. The gap between the two is one
+    /// session's working room and nothing more.
+    /// </para>
+    /// </remarks>
+    private const int Ceiling = 4_800;
+
+    /// <summary>
     /// The budget for PROSE, as against structure.
     /// </summary>
     /// <remarks>
@@ -157,13 +179,14 @@ public sealed class DocsTests
                 Name: Path.GetFileName(path),
                 Words: File.ReadAllText(path)
                     .Split([' ', '\n', '\r', '\t'], StringSplitOptions.RemoveEmptyEntries).Length))
-            .Where(doc => doc.Words > Budget)
+            .Where(doc => doc.Words > Ceiling)
             .ToList();
 
         Assert.True(oversized.Count == 0,
-            "over the budget of " + Budget + " words: " +
+            "over the CEILING of " + Ceiling + " words (target " + Budget + "): " +
             string.Join(", ", oversized.Select(doc => $"{doc.Name} at {doc.Words}")) +
-            ". Retire something rather than raising this.");
+            ". A session ends with a compaction pass back under the target. " +
+            "Retire something rather than raising either number.");
     }
 
     [Fact]

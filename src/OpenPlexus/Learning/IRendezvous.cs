@@ -117,6 +117,34 @@ public sealed record Occasion
     public IReadOnlySet<Code>? Fleeting { get; init; }
 
     /// <summary>
+    /// What order the codes of this moment came in, when the front end can say.
+    /// <b>Null is today's behaviour: nothing came first, so everything pairs
+    /// symmetrically.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>STEP 6 — THE FRONT END SAYS THE ORDER, AND IT IS THE <see cref="Groups"/>
+    /// TRICK AGAIN.</b> A phase cannot survive C2: an oscillator relationship
+    /// measured in milliseconds is exactly what late, jittered, out-of-order
+    /// messages destroy. An order that travels INSIDE the occasion cannot be
+    /// touched by lateness, because by the time anything is late the ordering has
+    /// already been said.
+    /// </para>
+    /// <para>
+    /// <b>Lower comes first, and a pair with different ranks writes ONE WAY</b> —
+    /// exactly as <see cref="Recent"/> does, and for the same reason: what makes
+    /// an edge mean <i>then</i> rather than <i>with</i> is that the reverse is not
+    /// written. Equal ranks are simultaneous and stay symmetric.
+    /// </para>
+    /// <para>
+    /// <b>A code absent from the map is UNORDERED and pairs symmetrically with
+    /// everything</b>, which is what keeps this additive: a front end that can
+    /// sequence some of what it emits is not forced to lie about the rest.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyDictionary<Code, int>? Sequence { get; init; }
+
+    /// <summary>
     /// How much this occasion counts. One is something that happened.
     /// </summary>
     /// <remarks>

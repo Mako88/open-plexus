@@ -80,6 +80,38 @@ public readonly record struct Message
     public double Seen { get; init; }
 
     /// <summary>
+    /// What relation this message arrived on. <b>Meaningless on an origin, which
+    /// has not travelled.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>Carried rather than looked up</b>, by the same argument that carries
+    /// <see cref="Together"/>: the sending node knows what its own entry meant,
+    /// and telling the receiver costs a field where asking would cost a round
+    /// trip and a C1 violation.
+    /// </remarks>
+    public Graph.Kind Kind { get; init; }
+
+    /// <summary>
+    /// Which relation this thought is willing to walk. <b>Null walks everything,
+    /// which is every question asked before kinds existed.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE QUESTION'S CALL, AND NOT A DIAL.</b> Whether <i>follows</i> or
+    /// <i>accompanies</i> is wanted is a fact about what is being asked — the same
+    /// argument that moved ranking onto <see cref="Question"/>, and the standing
+    /// rule that a dial wanting different values in different worlds is the
+    /// recurring fault wearing a new hat.
+    /// </para>
+    /// <para>
+    /// <b>It rides on the message because the node cannot see the question.</b>
+    /// <see cref="Graph.Node.Fire"/> knows only what arrived, so the restriction
+    /// is set once at the origin and copied along every hop.
+    /// </para>
+    /// </remarks>
+    public Graph.Kind? Through { get; init; }
+
+    /// <summary>
     /// Every node walked, in order. <b>The cycle check and the explanation in
     /// one field</b> — a route may not revisit a node already in its own chain,
     /// which is a local check costing nothing because the chain is already

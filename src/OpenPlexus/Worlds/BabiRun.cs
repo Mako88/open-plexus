@@ -26,6 +26,17 @@ public sealed record BabiResult : Questioned
     /// </summary>
     public required int Span { get; init; }
 
+    /// <summary>
+    /// Whether a carried word got its own cell — <b>step 6.</b> Reported for the
+    /// same reason <see cref="Span"/> is.
+    /// </summary>
+    /// <remarks>
+    /// <b>IT IS ONLY MEANINGFUL WITH A SPAN.</b> At zero nothing is carried, so
+    /// there is no temporal edge to separate and this changes nothing at all —
+    /// which is worth reading in the output rather than deducing.
+    /// </remarks>
+    public required bool Kinds { get; init; }
+
     /// <inheritdoc cref="Babi.Commonest"/>
     public required double Commonest { get; init; }
 
@@ -97,6 +108,7 @@ public sealed record BabiResult : Questioned
 
     public override string ToString() =>
         $"task={Task} stories={(Stories ? "on" : "off")} span={Span} " +
+        $"kinds={(Kinds ? "on" : "off")} " +
         $"sentences={Moments} asked={Asked} right={Right} silent={Silent} " +
         $"compound={Compound} blind={Blind} | " +
         $"accuracy={Accuracy:F4} expressible={Expressible:F4} " +
@@ -162,6 +174,10 @@ public sealed class BabiRun : IDisposable
     /// How several routes reaching one endpoint combine. <b>The asker's call and
     /// not the machine's</b> — see <see cref="Thinking.Question"/>.
     /// </param>
+    /// <param name="kinds">
+    /// Whether a word carried from an earlier sentence gets its own cell —
+    /// <b>step 6, and THIS IS THE WORLD THAT MEASURES IT.</b>
+    /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
     /// <remarks>
@@ -178,6 +194,7 @@ public sealed class BabiRun : IDisposable
         int seed,
         int span = 0,
         Accumulate ranking = Accumulate.Sum,
+        bool kinds = false,
         int clusters = 8,
         int replicas = 256)
     {
@@ -188,10 +205,12 @@ public sealed class BabiRun : IDisposable
         _dials = dials;
         _span = span;
         _ranking = ranking;
+        _kinds = kinds;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _reader = new InputMachine<Sentence>(
-            new MachineAddress("reader"), new Reading(), new LocalRendezvous(_fabric.Local),
+            new MachineAddress("reader"), new Reading(),
+            new LocalRendezvous(_fabric.Local, kinds),
             _fabric.Bus, _fabric.Ring, dials, span);
 
         _fabric.Subscribe(_reader);
@@ -199,6 +218,9 @@ public sealed class BabiRun : IDisposable
 
     /// <inheritdoc cref="Window"/>
     private readonly int _span;
+
+    /// <inheritdoc cref="Graph.Kind"/>
+    private readonly bool _kinds;
 
     /// <summary>The world this run is reading.</summary>
     public Babi World => _world;
@@ -314,6 +336,7 @@ public sealed class BabiRun : IDisposable
             Task = _world.Task,
             Stories = _world.Stories,
             Span = _span,
+            Kinds = _kinds,
             Moments = shown,
             Asked = asked,
             Right = right,

@@ -145,29 +145,36 @@ the approach for each. **Ordered here by cost.**
   things that are not there. **What is left is a consumer**: it is the second
   quantity a controller could read from inside, and a third-factor candidate for
   step 7.
-- **SUPERSESSION.** Counts only increment, which is the G-Counter property that
-  makes them converge with no coordination — and exactly what forbids
-  most-recent-wins. **Do not decay**, which breaks convergence. **Add a second
-  channel instead: an LWW-Register is also a CRDT.** `together` stays monotonic
-  and a `when` rides beside it; the two must never merge, because LWW discards
-  concurrent writes — right for state, ruinous for learning. `Occasion.At` exists,
-  so this is buildable now; across machines it wants a Lamport clock, which needs
-  no coordinator. Ranking by recency then belongs on `Question`, not on a dial.
+- **SUPERSESSION — THE CHANNEL IS BUILT AND NOTHING READS IT.** Counts only
+  increment, which is the G-Counter property that makes them converge with no
+  coordination and exactly what forbids most-recent-wins. **Do not decay**, which
+  breaks convergence. So `Tie.Count` stays monotonic and `Tie.When` rides beside
+  it as an LWW-Register, taking the later STAMP rather than the later arrival —
+  the two must never merge, because LWW discards concurrent writes. **What is
+  left is both consumers**: ranking by recency, which belongs on `Question` and
+  not on a dial, and eviction on "not touched since". Across machines it wants a
+  Lamport clock, which needs no coordinator.
 - **MULTI-TOKEN OUTPUT**, and concurrently. **Splits in two.** *Simultaneous*
   actions are nearly free — `BestOf` already returns many, and many thoughts are
   already in flight, which is what `BroadcastId` is for. What is missing is
   several output machines, so **fork 11 is the enabler and not plumbing.**
   *Ordered* sequences need edge kinds.
 
-### 6. EDGE KINDS — promoted, because three roads end here
+### 6. EDGE KINDS — BUILT, and the row was widened once
 
-**A row entry becomes `(Code, Kind)` and not `Code`**, with kinds at least
-`With` and `After`. It is the revival condition on **two** refuted rows, and it is
-what ordered output needs. **John's insight, and it is the `Groups` trick again:**
-a phase cannot survive C2, so the front end SAYS the order inside the occasion,
-where lateness cannot touch it — exactly as grouping did for binding. It also
-explains the window: a carried edge is currently written into the same channel as
-a simultaneous one, so the walk cannot tell *follows* from *accompanies*.
+**A row entry is `(Code, Kind)` to `(count, when)`**, with `With` and `After`, and
+the supersession channel rode in beside it for the single price. The front end
+SAYS the order inside the occasion — **John's insight, the `Groups` trick again**,
+because a phase cannot survive C2 and an order travelling inside the occasion
+cannot be reached by lateness. `Occasion.Sequence` is additive and needs no arm;
+splitting the window's carried edge moves counts that were already measured, so
+that half is an arm and OFF is every earlier number.
+
+**What is left is the walk.** `Question.Through` restricts a thought to one
+relation and nothing yet asks that way — `Babi` is not a question about what
+follows, which is why kinds help there without rescuing the window.
+**`Rhythm` cannot measure this**: nothing there is ever simultaneous, so every
+cell is already temporal and splitting them is an isomorphism.
 
 ### 7. Credit over time — eligibility traces, and `Window` is already one
 
@@ -195,13 +202,14 @@ add, and the counts stay monotonic.
 
 ### THE PATTERN UNDER ALL OF IT
 
-**A row entry is one number doing several jobs**: it ranks, it prices, and it is
-the only memory of the pair — no order, no recency, no kind. That is the
+**A row entry was one number doing several jobs**: it ranked, it priced, and it
+was the only memory of the pair — no order, no recency, no kind. That was the
 recurring fault at the level of the DATA STRUCTURE rather than of a dial, and the
-general remedy is the same: **make it a record, `(count, when, kind)`.** That one
-change carries kinds, supersession and eviction metadata together, and it has a
-single price — memory per edge, which is the scaling wall. **So widen the row
-once, not three times.**
+remedy was the same one: **make it a record.** `(Code, Kind)` to `(count, when)`
+is built, and it was widened ONCE — kinds, supersession and eviction metadata for
+a single price. **The price was paid and is measurable**: the row is a third
+wider on `Babi`, which is the scaling wall arriving sooner. **It still ranks and
+prices with one number**, and that split is the one still outstanding.
 
 **None of this is a sufficiency argument.** All of it could land and still not be
 enough. The confident claim stays narrower: without structure, an internal error
@@ -300,7 +308,7 @@ condition is a superstition. The commit named in git holds the numbers.
 | A deeper walk for prediction | Monotonically worse — without edge kinds, deeper reaches more and ranks worse | **Edge kinds**, and that refutation reproduced |
 | `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted, `Max` re-tried where its revival condition pointed and worse there too. **Both now DELETED** | Lift in the **cost**, which `Doubt` is the nearest thing to |
 | Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | **REVIVED at one code.** Naming as many codes as the frame holds swamps the action entirely — fork 18's gap is flat at every sight radius. Naming ONE, it opens wide |
-| `Window` span | Null on snake and WORSE on `Babi`, at an order of magnitude more traffic — but **it is the whole task on `Rhythm`**, where at zero the graph forms no edges at all. So the arm is live and world-dependent, which is the recurring fault wearing a new hat | **Edge kinds** — a carried edge is ranked against a simultaneous one as if they meant the same, which is why it helps where everything is temporal and hurts where things overlap |
+| `Window` span | Null on snake and WORSE on `Babi`, at an order of magnitude more traffic — but **it is the whole task on `Rhythm`**, where at zero the graph forms no edges at all. **Its revival condition has now been RUN and half-held**: edge kinds recover much of the accuracy and most of the traffic at every budget swept, and carrying still loses to not carrying | **Something that makes a carried edge worth its row.** Kinds were the structural half and are not enough alone; the walk still ranks a temporal partner against a simultaneous one whenever the question does not say which it wants |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — inverse cost removed the reason; no clear winner since** |
 | `Pricing.Balanced` — `together / sqrt(seen·seen)`, cosine's denominator | **Times out.** The geometric mean sits BETWEEN the marginals, so weights rise and hops go cheaper than under either arm — the walk explodes rather than compromising. Built for a conflict that was a budget artifact anyway | A bound on the walk that does not rely on the weight being the reciprocal of one marginal — the same condition `StepCost.Best` needs |
 | `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift on the conjunction and ALL of its cost on binding. **Two candidates whose orders invert score identically under RRF for every damping constant**, so it ties exactly where it is needed and the tiebreak answers | A question with many candidates, or a fusion that separates by something other than position |

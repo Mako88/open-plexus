@@ -27,10 +27,18 @@ public sealed class Node
     private readonly Code _code;
 
     /// <summary>
-    /// Partner code to count: how many occasions that code and this one both
-    /// fired on. <b>The node's whole row, and the only thing that learns.</b>
+    /// Partner and relation, to count and clock: how many occasions that code and
+    /// this one met on, and in what relation. <b>The node's whole row, and the
+    /// only thing that learns.</b>
     /// </summary>
-    private readonly Dictionary<Code, double> _together = [];
+    /// <remarks>
+    /// <b>IT WAS <c>Code</c> TO <c>double</c>, AND THAT NUMBER WAS DOING FOUR
+    /// JOBS.</b> It ranked a partner, it priced the hop to it, it was the only
+    /// memory of the pair, and it held simultaneity and sequence in one cell. The
+    /// first two are split by <see cref="WalkSettings.Doubt"/>; the last two are
+    /// what <see cref="Edge"/> and <see cref="Tie"/> split here.
+    /// </remarks>
+    private readonly Dictionary<Edge, Tie> _together = [];
 
     /// <inheritdoc cref="WalkSettings"/>
     private readonly WalkSettings _settings;
@@ -120,7 +128,16 @@ public sealed class Node
     /// heavier than it was noted would score above 1.0 — the exact failure the
     /// forward weighting exists to prevent.
     /// </param>
-    public void Observe(Code other, double by = 1.0)
+    /// <param name="kind">
+    /// What the entry means. <b><see cref="Kind.With"/> is every write made before
+    /// kinds existed</b>, so a caller that does not say gets exactly the old
+    /// behaviour and every measurement taken up to now still stands.
+    /// </param>
+    /// <param name="when">
+    /// The observing machine's clock, for the supersession channel. <b>Zero is a
+    /// caller with no clock to offer</b> and leaves the entry's stamp alone.
+    /// </param>
+    public void Observe(Code other, double by = 1.0, Kind kind = Kind.With, long when = 0)
     {
         if (other == _code)
             throw new ArgumentException(
@@ -131,21 +148,63 @@ public sealed class Node
             throw new ArgumentOutOfRangeException(nameof(by),
                 "a coincidence worth nothing is not a coincidence");
 
-        lock (_gate) _together[other] = _together.GetValueOrDefault(other) + by;
-    }
+        var edge = new Edge(other, kind);
 
-    /// <summary>Reads back one cell of the row.</summary>
-    public double Together(Code other)
-    {
-        lock (_gate) return _together.GetValueOrDefault(other);
+        lock (_gate)
+            _together[edge] = _together.GetValueOrDefault(edge).Plus(by, when);
     }
 
     /// <summary>
-    /// Every code this node has ever co-occurred with. The fan-out of one hop.
+    /// Reads back the whole pair, however it was met. <b>The sum across kinds,
+    /// which is what the single cell used to hold.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE WALK DOES NOT USE THIS, and that is the point of it existing
+    /// separately.</b> Summing is right for asking <i>how connected are these
+    /// two</i> and wrong for stepping, because stepping is exactly where
+    /// <i>follows</i> must not be added to <i>accompanies</i>.
+    /// </remarks>
+    public double Together(Code other)
+    {
+        lock (_gate)
+            return _together
+                .Where(entry => entry.Key.Partner == other)
+                .Sum(entry => entry.Value.Count);
+    }
+
+    /// <summary>Reads back one cell of the row.</summary>
+    public double Together(Code other, Kind kind)
+    {
+        lock (_gate) return _together.GetValueOrDefault(new Edge(other, kind)).Count;
+    }
+
+    /// <summary>
+    /// When this cell was last written, by the observing machine's own clock.
+    /// <b>The supersession channel, and nothing ranks by it yet.</b>
+    /// </summary>
+    public long When(Code other, Kind kind = Kind.With)
+    {
+        lock (_gate) return _together.GetValueOrDefault(new Edge(other, kind)).When;
+    }
+
+    /// <summary>
+    /// Every code this node has ever met. The fan-out of one hop, in <b>distinct
+    /// partners</b>.
     /// </summary>
     public IReadOnlyCollection<Code> Partners()
     {
-        lock (_gate) return [.. _together.Keys];
+        lock (_gate) return [.. _together.Keys.Select(edge => edge.Partner).Distinct()];
+    }
+
+    /// <summary>
+    /// How many entries the row holds. <b>THE COST, as against
+    /// <see cref="Partners"/>'s count</b> — <see cref="Fire"/> emits one message
+    /// per ENTRY, so a partner met in two relations is two messages and the
+    /// scaling wall is built of these and not of distinct codes.
+    /// </summary>
+    public int Entries
+    {
+        get { lock (_gate) return _together.Count; }
     }
 
     // ---- thinking ----------------------------------------------------------
@@ -183,7 +242,7 @@ public sealed class Node
         // SNAPSHOT FIRST. Nothing here reads another node, so there is no
         // deadlock to avoid any more -- but the row must not move underneath a
         // fan-out, and two thoughts can fire this node at once.
-        KeyValuePair<Code, double>[] row;
+        KeyValuePair<Edge, Tie>[] row;
         double seen;
         lock (_gate)
         {
@@ -278,18 +337,32 @@ public sealed class Node
 
         var outgoing = ImmutableArray.CreateBuilder<Message>(row.Length);
 
-        foreach (var (partner, together) in row)
+        foreach (var (edge, tie) in row)
         {
             // The cycle check: free, because the chain is already travelling.
-            if (message.Chain.Contains(partner)) continue;
+            // ON THE PARTNER AND NOT ON THE ENTRY: a route that reached B by
+            // accompaniment must not reach it again by sequence, or one node
+            // appears twice in a chain that exists to say where the route has
+            // been.
+            if (message.Chain.Contains(edge.Partner)) continue;
+
+            // WHAT THE QUESTION WILL WALK, and null is every question asked
+            // before kinds existed. A question about what FOLLOWS should not be
+            // ranking things that merely accompany -- which is the whole of why
+            // a deeper walk for prediction was monotonically worse.
+            if (message.Through is { } only && edge.Kind != only) continue;
 
             outgoing.Add(message with
             {
-                To = partner,
+                To = edge.Partner,
                 Held = held,
-                Chain = message.Chain.Add(partner),
+                Chain = message.Chain.Add(edge.Partner),
                 Carried = carried,
-                Together = together,
+                Together = tie.Count,
+
+                // WHAT IT ARRIVED ON, carried so the far end knows what it is
+                // holding without reading anything it does not own.
+                Kind = edge.Kind,
 
                 // THIS NODE'S OWN COUNT, ABOUT ITSELF. The receiver may divide
                 // by it instead of by its own -- see Pricing.

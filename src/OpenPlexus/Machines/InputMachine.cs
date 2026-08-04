@@ -201,6 +201,11 @@ public sealed class InputMachine<TFrame> : IReceiveReports
             Broadcast = broadcast,
             ReturnTo = _address,
             To = code,
+
+            // SET ONCE AT THE ORIGIN AND COPIED ALONG EVERY HOP, because a node
+            // cannot see the question -- see Message.Through. Null is every
+            // question asked before edge kinds existed.
+            Through = question?.Through,
             Held = stamina ?? _settings.Stamina,
 
             // A chain ends with the node the message is addressed to, so an

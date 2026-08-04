@@ -52,6 +52,27 @@ public sealed record Question
     /// </remarks>
     public IReadOnlyDictionary<Code, int>? Asking { get; init; }
 
+    /// <summary>
+    /// Which relation the walk may step through. <b>Null walks everything, which
+    /// is every question asked before edge kinds existed.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>ASKING WHAT FOLLOWS IS A DIFFERENT QUESTION FROM ASKING WHAT
+    /// ACCOMPANIES</b>, and until the row could tell them apart it was not
+    /// possible to say which was meant. A deeper walk for prediction was
+    /// monotonically worse precisely because it could not: every extra hop
+    /// reached more things that merely co-occurred and ranked them against the
+    /// thing that actually came next.
+    /// </remarks>
+    public Graph.Kind? Through { get; init; }
+
+    /// <summary>A question about what USUALLY FOLLOWS what is being asked.</summary>
+    /// <remarks>
+    /// <b>The temporal walk, and it is one line because the row now holds the
+    /// distinction.</b>
+    /// </remarks>
+    public static Question Following() => new() { Through = Graph.Kind.After };
+
     /// <summary>A question that ranks by agreement between its origins.</summary>
     /// <remarks>
     /// <b>The conjunction: the thing meant is the one every origin reached.</b>

@@ -49,11 +49,17 @@ public sealed class Cluster : IReceiveEnvelopes
     /// <summary>Every code this cluster holds a node for.</summary>
     public IEnumerable<Code> Codes => _nodes.Keys;
 
-    /// <summary>Every partner entry across every node here. The graph's size.</summary>
-    public int Edges => _nodes.Values.Sum(node => node.Partners().Count);
+    /// <summary>Every row entry across every node here. The graph's size.</summary>
+    /// <remarks>
+    /// <b>ENTRIES AND NOT DISTINCT PARTNERS, because entries are what cost.</b>
+    /// <see cref="Node.Fire"/> emits one message per entry, so a partner met both
+    /// alongside and after is two messages — and with kinds off the two counts
+    /// are the same number, which is what keeps every earlier reading comparable.
+    /// </remarks>
+    public int Edges => _nodes.Values.Sum(node => node.Entries);
 
     /// <inheritdoc cref="Worlds.Plumbing.Widest"/>
-    public int Widest => _nodes.IsEmpty ? 0 : _nodes.Values.Max(node => node.Partners().Count);
+    public int Widest => _nodes.IsEmpty ? 0 : _nodes.Values.Max(node => node.Entries);
 
     /// <summary>Whether the ring says this cluster owns that node.</summary>
     public bool Holds(Code code) => _ring.OwnerOf(code) == _address;

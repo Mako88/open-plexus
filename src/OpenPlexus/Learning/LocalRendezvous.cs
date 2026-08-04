@@ -26,10 +26,33 @@ public sealed class LocalRendezvous : IRendezvous
 {
     private readonly LocalClusters _clusters;
 
-    public LocalRendezvous(LocalClusters clusters)
+    /// <inheritdoc cref="Graph.Kind"/>
+    private readonly bool _kinds;
+
+    /// <param name="clusters">Where the codes live.</param>
+    /// <param name="kinds">
+    /// Whether a temporal pair gets its own cell — <b>step 6, and OFF is every
+    /// measurement taken before it existed.</b>
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// <b>IT HAS TO BE AN ARM, BECAUSE IT MOVES COUNTS THAT WERE ALREADY
+    /// MEASURED.</b> A carried edge is currently added to the same cell as a
+    /// simultaneous one, so splitting them is not additive the way
+    /// <see cref="Occasion.Groups"/> was — the same history produces a different
+    /// graph. Every number taken up to now was taken with this off, and stays
+    /// comparable only while it can still be turned off.
+    /// </para>
+    /// <para>
+    /// <b>The revival condition on two refuted rows is exactly this arm being
+    /// on</b>, so it is the thing to sweep and not a default to assume.
+    /// </para>
+    /// </remarks>
+    public LocalRendezvous(LocalClusters clusters, bool kinds = false)
     {
         ArgumentNullException.ThrowIfNull(clusters);
         _clusters = clusters;
+        _kinds = kinds;
     }
 
     /// <inheritdoc/>
@@ -81,6 +104,23 @@ public sealed class LocalRendezvous : IRendezvous
                 // double.
                 if (!written.Add(Unordered(onset, other))) continue;
 
+                // WHAT THE FRONT END SAID ABOUT ORDER INSIDE THIS MOMENT. Where
+                // it said nothing, nothing came first and the pair is symmetric,
+                // which is every occasion emitted before Sequence existed.
+                var order = Ordered(occasion.Sequence, onset, other);
+
+                if (order != 0)
+                {
+                    // ONE WAY, EARLIER TO LATER, and the reverse is not written
+                    // -- that is the whole of what makes the edge mean `then`.
+                    var (first, second) = order < 0 ? (onset, other) : (other, onset);
+
+                    if (!Passing(occasion.Fleeting, second))
+                        _clusters.For(first).Observe(second, weight, Kind.After, occasion.At);
+
+                    continue;
+                }
+
                 // EACH SIDE WRITES ITS OWN ROW. A node that quietly kept both
                 // directions would be holding data it does not own, which is
                 // the shared state C1 forbids.
@@ -90,10 +130,10 @@ public sealed class LocalRendezvous : IRendezvous
                 // so it is never evidence -- and it is what makes a lasting
                 // node's row grow without bound.
                 if (!Passing(occasion.Fleeting, other))
-                    _clusters.For(onset).Observe(other, weight);
+                    _clusters.For(onset).Observe(other, weight, Kind.With, occasion.At);
 
                 if (!Passing(occasion.Fleeting, onset))
-                    _clusters.For(other).Observe(onset, weight);
+                    _clusters.For(other).Observe(onset, weight, Kind.With, occasion.At);
             }
         }
 
@@ -112,7 +152,13 @@ public sealed class LocalRendezvous : IRendezvous
 
             foreach (var onset in occasion.Onsets)
                 if (past != onset && !Passing(occasion.Fleeting, onset))
-                    _clusters.For(past).Observe(onset, weight);
+
+                    // AND THIS IS THE CELL THE WINDOW WAS ALWAYS WANTING. With
+                    // kinds off it lands on top of the simultaneous count, which
+                    // is why the span arm helps where everything is sequential
+                    // and hurts where things overlap.
+                    _clusters.For(past).Observe(
+                        onset, weight, _kinds ? Kind.After : Kind.With, occasion.At);
         }
 
         // ONSET-TO-EVERYTHING, never live-to-live. Two codes that were both
@@ -154,6 +200,29 @@ public sealed class LocalRendezvous : IRendezvous
     /// </remarks>
     private static bool Passing(IReadOnlySet<Code>? fleeting, Code code) =>
         fleeting is not null && fleeting.Contains(code);
+
+    /// <summary>
+    /// Which of two codes the front end said came first, within one moment.
+    /// <b>Zero is simultaneous</b> — either because nothing was said about them,
+    /// or because what was said gave them the same rank.
+    /// </summary>
+    /// <remarks>
+    /// <b>THIS NEEDS NO ARM, WHERE THE WINDOW DID.</b> No occasion emitted before
+    /// <see cref="Occasion.Sequence"/> existed carries one, so a front end that
+    /// cannot sequence produces exactly the graph it always did — which is the
+    /// same additivity <see cref="Occasion.Groups"/> has. Splitting the window's
+    /// carried edge is different in kind: that history already exists and its
+    /// counts move.
+    /// </remarks>
+    private static int Ordered(IReadOnlyDictionary<Code, int>? sequence, Code one, Code other)
+    {
+        if (sequence is null) return 0;
+
+        return !sequence.TryGetValue(one, out var mine)
+            || !sequence.TryGetValue(other, out var theirs)
+            ? 0
+            : mine.CompareTo(theirs);
+    }
 
     private static (Code, Code) Unordered(Code one, Code other) =>
         one.CompareTo(other) <= 0 ? (one, other) : (other, one);

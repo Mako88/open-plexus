@@ -307,6 +307,74 @@ public sealed class BabiTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task Edge_kinds_are_the_windows_revival_condition_and_this_is_where_it_is_run()
+    {
+        // THE ROW SAID THE REVIVAL CONDITION WAS EDGE KINDS, AND THIS IS THE
+        // WORLD IT POINTED AT. A carried word was written into the same cell as
+        // a word from the same sentence, so `follows` was added to `accompanies`
+        // and the walk ranked the sum. Rhythm cannot measure this -- nothing
+        // there is ever simultaneous, so every cell is temporal already and
+        // splitting them is an isomorphism.
+        // AND THE CONTROL MATTERS MORE THAN THE COMPARISON. Splitting one cell in
+        // two halves the count in each, and the count IS the weight, and the
+        // weight is the reciprocal of the hop price -- so kinds make every
+        // temporal hop dearer whether or not they rank better. A walk that
+        // scores higher on a third of the traffic may simply be a walk on a
+        // smaller budget, and on a near-clique a smaller budget is known to
+        // help. So the arm is swept against the budget it is confounded with.
+        foreach (var stamina in new[] { 4.0, 6.0, 8.0 })
+        {
+            var dials = Fixture.Dials(stamina: stamina);
+
+            using var fused = new BabiRun(World(1), dials, seed: 1, span: 2);
+            using var split = new BabiRun(World(1), dials, seed: 1, span: 2, kinds: true);
+
+            var together = await fused.RunAsync(Sentences);
+            var apart = await split.RunAsync(Sentences);
+
+            output.WriteLine($"stamina={stamina} kinds=off {together}");
+            output.WriteLine($"stamina={stamina} kinds=on  {apart}");
+
+            // THE LIFT SURVIVES THE CONTROL, at every budget swept. Lowering the
+            // budget on the fused arm does not reproduce the split arm's score --
+            // it makes it worse -- so this is a ranking effect and not the cost
+            // artifact it is confounded with.
+            Assert.True(apart.Accuracy >= together.Accuracy,
+                $"kinds did not help at stamina {stamina}: " +
+                $"{apart.Accuracy} against {together.Accuracy}");
+
+            // AND IT IS CHEAPER, which is the opposite of what a bigger row
+            // predicts. Separating the cells halves each count, so a temporal hop
+            // costs more and the walk stops wandering down edges that meant two
+            // things at once.
+            Assert.True(apart.Messages < together.Messages,
+                $"kinds did not pay for themselves at stamina {stamina}: " +
+                $"{apart.Messages} against {together.Messages}");
+        }
+
+        // AND THE ROW IS WIDER FOR IT, which is the price named on `Tie` and the
+        // one that meets the scaling wall.
+        using var priced = new BabiRun(World(1), Dials, seed: 1, span: 2, kinds: true);
+        using var plain = new BabiRun(World(1), Dials, seed: 1);
+
+        var split2 = await priced.RunAsync(Sentences);
+        var none = await plain.RunAsync(Sentences);
+
+        output.WriteLine($"span=0 baseline  {none}");
+
+        Assert.True(split2.Widest > none.Widest,
+            $"the split did not widen the row: {split2.Widest} against {none.Widest}");
+
+        // THE REFUTATION STANDS, NARROWED. Edge kinds recover much of what the
+        // window cost and do not pay for it: carrying words across sentences is
+        // still worse on this task than not carrying them at all. The revival
+        // condition has been RUN rather than merely waited for.
+        Assert.True(split2.Accuracy < none.Accuracy,
+            $"the window is no longer a loss on bAbI: " +
+            $"{split2.Accuracy} against {none.Accuracy}");
+    }
+
+    [Fact]
     public async Task A_closed_vocabulary_makes_a_graph_the_walk_cannot_compose_in()
     {
         // THE STRUCTURAL FINDING, AND IT IS WHY THE SCORES HERE ARE WHAT THEY

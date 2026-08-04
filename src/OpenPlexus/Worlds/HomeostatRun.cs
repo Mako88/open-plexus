@@ -93,36 +93,6 @@ public enum Attending
     /// </remarks>
     Contested,
 
-    /// <summary>
-    /// <see cref="Credited"/> READ AGAINST THE BASE RATE — <b>ΔP, and the first
-    /// change here to what is WRITTEN rather than to what is asked.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b><see cref="Credited"/> IS ITS CONTROL AND ONE THING SEPARATES THEM.</b>
-    /// The same cells are written, the same relation is walked, the same occasion
-    /// is joined a step late on the same condition. What moves is that a partner is
-    /// believed by how much it RAISED the chance of improvement rather than by how
-    /// often it accompanied one.
-    /// </para>
-    /// <para>
-    /// <b>THE FAILURE IT IS AIMED AT: an act that helps six times in ten looks
-    /// strong until things improved six times in ten anyway.</b> A hit rate holds
-    /// one number for an act that works and an act that rides the background, and
-    /// the states a body finds itself in are the ones its own actions produced — so
-    /// the background is exactly what a count of what-was-done cannot see. See
-    /// <see cref="Graph.Node.Contingency"/>.
-    /// </para>
-    /// <para>
-    /// <b>ITS SILENCE IS THE THING TO READ BESIDE ITS SCORE, AND MORE SO THAN
-    /// <see cref="Credited"/>'s.</b> A contingency is nought where an act has no
-    /// complement to compare against as well as where it truly makes no
-    /// difference, and both read as <i>believe this nothing</i> — so this arm can
-    /// fall silent for a reason that is not a judgement about any act.
-    /// </para>
-    /// </remarks>
-    Contingent,
-
 }
 
 /// <summary>
@@ -393,7 +363,6 @@ public sealed class HomeostatRun : IDisposable
                     chains,
                     choosing switch
                     {
-                        Attending.Contingent => Question.Contingent(),
                         Attending.Credited or Attending.Marked
                             or Attending.Contested => Question.Worthwhile(),
                         _ => null,
@@ -441,7 +410,7 @@ public sealed class HomeostatRun : IDisposable
                 : felt;
 
             if (choosing is Attending.Credited or Attending.Marked
-                     or Attending.Contested or Attending.Contingent)
+                     or Attending.Contested)
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
                 // ordinary cell is untouched and this arm changes one thing.

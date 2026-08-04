@@ -85,9 +85,8 @@
 
 ### Housekeeping
 
-- **Collapse the rest of the arms.** `Marked` and `Contingent` are beaten at their
-  own peaks and `Contested` won; removing `Contingent` takes `Node.Contingency` and
-  the split marginal with it.
+- **Collapse `Marked`**, the last beaten arm. It is `Credited`'s control, so the
+  claim it evidences goes with it.
 - **The knob pass, LAST.** A dial swept before the structural work measures a
   system about to change under it.
 
@@ -134,7 +133,7 @@ condition is a superstition.**
 | `Accumulate.Fused` | Half of agreement's lift and all its cost; inverted orders tie identically under RRF | Many candidates, or a fusion separating by something other than position |
 | The carried negative discount (`Message.Against`) | Inert — an arm ignoring it reproduced the arm reading it. **Deleted** | A world where an act's harm is confined to a few states |
 | `Driven` / `Delayed` / `Topped` — credit as a heavier write | All three peak far below the bar at their own best budget. **Deleted** | Anything making a heavier write into *this was done here* mean something else |
-| `Attending.Contingent` — ΔP over the credit cell | Not refuted, DOMINATED: inside the noise of the one-sided count, and inhibition clears both | A world where some states are recoverable and others are not, so the base rate varies BY STATE |
+| ΔP over the credit cell (`Attending.Contingent`) | Not refuted, DOMINATED: it ties the one-sided count and inhibition clears both. **Deleted** | A world where some states are recoverable and others are not, so the base rate varies BY STATE |
 | `Ranked` as step 4's fix | The lift was the bootstrap's coin toss, and a varying code thins every edge | Anything making the walk prefer a partner other than the one it took last |
 | Widening the walk — `Kindred`, `Foreseeing`, `Backing` | All three: louder and below the bar, or silent everywhere | **A likeness the GRAPH DID NOT COMPUTE** — step 8 and nothing short of it |
 | A trained quantiser — k-means | Two machines fitted on different samples code the same input differently | Never fitted |

@@ -65,26 +65,6 @@ public sealed class Node
     /// <summary>How many occasions this node fired on at all. Its own marginal.</summary>
     private double _seen;
 
-    /// <summary>
-    /// How much of that marginal was of each relation — <b>the base rate a hit
-    /// rate cannot see.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>IT IS NOT THE ROW AND THAT IS THE WHOLE OF WHY IT IS AFFORDABLE.</b> This
-    /// is keyed by RELATION and not by partner, so it is bounded by how many
-    /// relations exist and never by how many codes this node has met.
-    /// <see cref="Tie"/> names the row as the scaling wall; this sits beside it and
-    /// does not widen it.
-    /// </para>
-    /// <para>
-    /// <b>Every entry only ever rises</b>, so the G-Counter property is untouched —
-    /// and the quantity read off it, <see cref="Contingency"/>, can still fall. That
-    /// is the same argument that made <see cref="Kind.Hindered"/> legal.
-    /// </para>
-    /// </remarks>
-    private readonly Dictionary<Kind, double> _noted = [];
-
     /// <param name="code">This node's identity.</param>
     /// <param name="settings">
     /// The dials. Validated here so a node cannot exist holding a contradictory
@@ -127,113 +107,14 @@ public sealed class Node
     /// something merely concluded</b> — see fork 21. A count became a weight so
     /// that a reflected occasion cannot outweigh a real one.
     /// </param>
-    /// <param name="of">
-    /// Which relation this occasion was about. <b><see cref="Seen"/> counts it
-    /// either way</b>, so nothing already measured moves — what this adds is a
-    /// second tally, split by relation, which is what a base rate is made of.
-    /// <b>Null is a caller with nothing to say</b>, and leaves the split alone.
-    /// </param>
-    public void Note(double by = 1.0, Kind? of = null)
+    public void Note(double by = 1.0)
     {
         if (by <= 0.0)
             throw new ArgumentOutOfRangeException(nameof(by),
                 "an occasion worth nothing is not an occasion; it would move " +
                 "`together` without moving `seen` and score the pair above 1.0");
 
-        lock (_gate)
-        {
-            _seen += by;
-
-            if (of is { } relation)
-                _noted[relation] = _noted.GetValueOrDefault(relation) + by;
-        }
-    }
-
-    /// <summary>
-    /// How much of this node's marginal was of one relation.
-    /// </summary>
-    /// <remarks>
-    /// <b>THE DENOMINATOR AND THE NUMERATOR OF THE BASE RATE.</b>
-    /// <c>Noted(With)</c> is how many ordinary occasions this node was in;
-    /// <c>Noted(Helped)</c> is how many of them were followed by something getting
-    /// better. Neither is a fact about any partner, which is what makes the
-    /// contrast below cost nothing per edge.
-    /// </remarks>
-    public double Noted(Kind of)
-    {
-        lock (_gate) return _noted.GetValueOrDefault(of);
-    }
-
-    /// <summary>
-    /// How much taking one act CHANGES the chance that things get better —
-    /// <b>ΔP, and the thing a co-occurrence count structurally could not say.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b><see cref="Kind.Helped"/> IS A HIT RATE AND THIS IS A CONTINGENCY.</b>
-    /// <c>helped / taken</c> answers <i>when I did this, how often did things
-    /// improve</i>, which sounds like the question and is not: an act that helps
-    /// six times in ten looks strong until you notice things improved six times in
-    /// ten anyway. Rescorla and Wagner's quantity is
-    /// <c>P(better | act) − P(better | ¬act)</c>, and the second term is what
-    /// nothing here recorded.
-    /// </para>
-    /// <para>
-    /// <b>THE BASE RATE HAS TO VARY BY STATE OR IT CANNOT RE-RANK ANYTHING.</b> A
-    /// world-level rate — <see cref="Learning.Drives"/>'s, say — subtracts the same
-    /// number from every candidate, and an ordering is unchanged by subtracting a
-    /// constant from all of it. So it is read from THIS node's own tallies, and the
-    /// complement term still moves per act because both its parts do.
-    /// </para>
-    /// <para>
-    /// <b>C1 IS UNTOUCHED AND THAT IS NOT A COINCIDENCE.</b> All four numbers —
-    /// the pair's two cells and this node's two marginals — are things this node
-    /// owns, so the contrast is computed where the fan-out already happens and
-    /// nothing reads another node's data.
-    /// </para>
-    /// <para>
-    /// <b>NOUGHT WHERE THERE IS NO CONTRAST TO DRAW</b>: an act never taken here,
-    /// or one taken on every occasion this node ever had, leaves one side of the
-    /// subtraction with an empty denominator. <b>That is a reading of "nothing to
-    /// say" and not of "no effect"</b>, and the two are indistinguishable in the
-    /// number — which is why silence is reported beside a score and not folded
-    /// into it.
-    /// </para>
-    /// </remarks>
-    /// <param name="act">The partner whose contribution is being asked about.</param>
-    /// <returns>
-    /// The difference of the two rates, in -1..1. <b>Negative is inhibition</b> —
-    /// things went better without this act than with it.
-    /// </returns>
-    public double Contingency(Code act)
-    {
-        lock (_gate)
-            return Contrast(
-                taken: _together.GetValueOrDefault(new Edge(act, Kind.With)).Count,
-                helped: _together.GetValueOrDefault(new Edge(act, Kind.Helped)).Count,
-                occasions: _noted.GetValueOrDefault(Kind.With),
-                improved: _noted.GetValueOrDefault(Kind.Helped));
-    }
-
-    /// <summary>
-    /// The arithmetic itself, over four numbers one node owns.
-    /// </summary>
-    /// <remarks>
-    /// <b>ONE COPY, TWO CALLERS, AND THE SECOND IS WHY IT IS SEPARATE.</b>
-    /// <see cref="Contingency"/> looks the four up under the lock;
-    /// <see cref="Fire"/> reads them off the snapshot it has already taken, because
-    /// a fan-out must not re-enter the lock once per partner. Writing the
-    /// subtraction twice is the duplication <c>DuplicationTests</c> exists to
-    /// refuse.
-    /// </remarks>
-    private static double Contrast(
-        double taken, double helped, double occasions, double improved)
-    {
-        var without = occasions - taken;
-
-        if (taken <= 0.0 || without <= 0.0) return 0.0;
-
-        return (helped / taken) - ((improved - helped) / without);
+        lock (_gate) _seen += by;
     }
 
     /// <summary>
@@ -451,18 +332,10 @@ public sealed class Node
         // fan-out, and two thoughts can fire this node at once.
         KeyValuePair<Edge, Tie>[] row;
         double seen;
-        double occasions;
-        double improved;
         lock (_gate)
         {
             row = [.. _together];
             seen = _seen;
-
-            // THE BASE RATE, TAKEN IN THE SAME BREATH AS THE ROW. Two scalars, and
-            // reading them here rather than per partner is what keeps a contrastive
-            // fan-out the same number of lock acquisitions as an ordinary one.
-            occasions = _noted.GetValueOrDefault(Kind.With);
-            improved = _noted.GetValueOrDefault(Kind.Helped);
         }
 
         // An origin message has not travelled, so nothing arrived here and
@@ -519,9 +392,6 @@ public sealed class Node
             // believed negatively; a negative score would invert the ranking it was
             // meant to lower. See Kind.Hindered for the same clamp and the same
             // reason.
-            if (message.Contrasted)
-                believed *= Math.Max(0.0, message.Contrast);
-
             // AND RECENCY DISCOUNTS THE SCORE, ON THE SAME SIDE OF THE LINE AS
             // EVERY OTHER THING THAT ARGUES ABOUT AN EDGE RATHER THAN PRICING IT.
             // A stale entry is believed less and is never made harder to REACH:
@@ -609,22 +479,6 @@ public sealed class Node
             ? (newest - oldest) / (double)row.Length
             : 0.0;
 
-        // AND THE ORDINARY CELL, WHERE THE QUESTION WANTS A CONTRAST. `helped` is
-        // the numerator of P(better | act) and this is its denominator -- how often
-        // the act was taken here at all -- and the walk about to happen is over the
-        // credit cells, so the ordinary ones are not otherwise looked at. Built in
-        // one pass over a row already copied, exactly as the negative half above.
-        Dictionary<Code, double>? taken = null;
-
-        if (message.Contrasted)
-            foreach (var (edge, tie) in row)
-            {
-                if (edge.Kind != Kind.With) continue;
-
-                taken ??= [];
-                taken[edge.Partner] = taken.GetValueOrDefault(edge.Partner) + tie.Count;
-            }
-
         foreach (var (edge, tie) in row)
         {
             // A HINDERED CELL IS EVIDENCE AND NEVER A ROUTE, so it is not walked.
@@ -662,17 +516,6 @@ public sealed class Node
                     : interval <= 0.0
                         ? 1.0
                         : 1.0 / (1.0 + ((newest - tie.When) / interval)),
-
-                // AND WHAT IT IS WORTH ABOVE DOING SOMETHING ELSE. Only the sender
-                // can work this out -- the base rate is its own marginal -- so it
-                // is computed here and carried. See Message.Contrast.
-                Contrast = message.Contrasted && edge.Kind == Kind.Helped
-                    ? Contrast(
-                        taken: taken?.GetValueOrDefault(edge.Partner) ?? 0.0,
-                        helped: tie.Count,
-                        occasions: occasions,
-                        improved: improved)
-                    : 0.0,
 
                 // WHAT IT ARRIVED ON, carried so the far end knows what it is
                 // holding without reading anything it does not own.

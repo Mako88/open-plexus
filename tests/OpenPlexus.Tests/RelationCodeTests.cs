@@ -45,7 +45,7 @@ public sealed class RelationCodeTests(ITestOutputHelper output)
             // Two landmarks met once each in this relation, and the inverse
             // relation met on the same occasion -- which is what makes it the
             // inverse rather than merely another relation.
-            node.Note(1.0, Kind.With);
+            node.Note();
 
             node.Observe(Fixture.C((ulong)(pair * 2)), 1.0, Kind.With, when: pair);
             node.Observe(Fixture.C((ulong)((pair * 2) + 1)), 1.0, Kind.With, when: pair);

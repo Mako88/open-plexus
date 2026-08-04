@@ -405,8 +405,6 @@ public sealed class InputMachine<TFrame> : IReceiveReports
             Through = question?.Through,
 
             // AND WHETHER THE CREDIT CELL IS READ AGAINST THE BASE RATE, carried
-            // the same way and for the same reason. See Question.Contrasted.
-            Contrasted = question?.Contrasted ?? false,
             Recent = question?.Recent ?? false,
             Held = stamina ?? _settings.Stamina,
 

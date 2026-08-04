@@ -110,13 +110,7 @@ public sealed class LocalRendezvous : IRendezvous
         // to prevent. Noting keeps `together(x, y) <= seen(y)`.
         var weight = occasion.Weight;
 
-        // AND THE MARGINAL IS SPLIT BY RELATION AS WELL AS TOTALLED. `Seen` counts
-        // this occasion either way, so every number already measured is where it
-        // was; what is new is a second tally saying how many of a node's occasions
-        // were ORDINARY and how many were a reinforcement of some kind. That split
-        // is the base rate `Node.Contingency` subtracts, and without it a credit
-        // cell is a hit rate that cannot see what would have happened anyway.
-        foreach (var code in present) _clusters.For(code).Note(weight, occasion.As ?? Kind.With);
+        foreach (var code in present) _clusters.For(code).Note(weight);
 
         // THE FIFTH CHANNEL: EACH FILLER MEETS ITS OWN SLOT. `Roles` says which
         // argument position a code occupies in `As`, and pairing a filler with
@@ -139,7 +133,7 @@ public sealed class LocalRendezvous : IRendezvous
                 // Two fillers of one arrangement co-occur under `With`, so a walk
                 // reaches the WRONG slot through the other filler as fast as it
                 // reaches the right one. See Kind.Fills.
-                _clusters.For(role).Note(weight, Kind.Fills);
+                _clusters.For(role).Note(weight);
                 _clusters.For(filler).Observe(role, weight, Kind.Fills, occasion.At);
                 _clusters.For(role).Observe(filler, weight, Kind.Fills, occasion.At);
             }

@@ -25,8 +25,7 @@
 
 - **Ten worlds sharing no world logic, over one `Fabric`** — including binding,
   built to be unanswerable and since lifted, and **two nobody here designed**,
-  `Babi` and `Clevr`, which cannot flatter this architecture. `ScoreboardTests`
-  runs them in one table.
+  `Babi` and `Clevr`, which cannot flatter this architecture.
 - **THE ARM THAT BEAT RANDOM IS NO LONGER ONE WORLD OLD, AND IT DID NOT
   TRANSFER.** `Tending` is a second body — plants dry, water reaches only what is
   underfoot and lands a step late — and `Kind.Helped` there **LOSES to acting at
@@ -37,15 +36,14 @@
 - **The graphs are tiny.** Nothing has run at a size where its claims could break;
   hold them loosely.
 
-### THE BET THE DESIGN RESTS ON — name it, do not re-argue it
+### THE BET — name it, do not re-argue it
 
 - **COUNTS ONLY EVER RISE.** The G-Counter property, and it buys convergence with
   no coordinator — which is what buys C1 and C2.
-- **The price is that nothing can be unlearned, only outvoted.** `Kind.Hindered`
-  buys back *contradiction* and not *forgetting*: a PN-Counter's halves both rise.
-- **Eviction and cold storage are the escape hatches, and BOTH ARE UNBUILT.** If
-  forgetting is necessary rather than optional, this is the expensive thing to walk
-  back. **Nothing so far says it is.**
+- **Nothing can be unlearned, only outvoted.** `Kind.Hindered` buys back
+  *contradiction* and not *forgetting*: a PN-Counter's halves both rise.
+- **Eviction and cold storage are the escape hatches, BOTH UNBUILT.** If forgetting
+  is necessary rather than optional, this is the expensive thing to walk back.
 
 ### FOUR THINGS THE FRONT END IS HANDED, AND NOBODY WAS COUNTING THEM
 
@@ -114,20 +112,17 @@ its ceiling it absorbs anything.)*
 ### 4. Homeostatic drives — Ashby. **The arm beats random**
 
 - Bounded internal variables make behaviour goal-directed **with no reward
-  function**. **No episode boundary**, fitting C4.
+  function**, and **no episode boundary**, fitting C4.
   **AND EVERY ACT PAYS OFF AT ONCE, so this world cannot see steps 7, 10 or 11.**
 - **SO ASSOCIATION IS ANTI-CORRELATED, not merely uninformative.** A count of what
   was done converges on the POLICY that did it, and the states a body is in are
   the ones its own actions produced. **This waits wherever the graph learns from
   itself.**
-- **THE CREDIT NEEDED ITS OWN CELL, AND THAT IS THE FIRST ARM TO BEAT THE BAR.**
+- **THE CREDIT NEEDED ITS OWN CELL, AND IT IS THE FIRST ARM TO BEAT THE BAR.**
   Three earlier arms wrote a HEAVIER number into the cell meaning *this was done
-  here*. `Kind.Helped` is a SECOND statistic, walked alone; `Marked` is the
-  control. **Nothing is punished, both counts only rise.**
+  here*. `Kind.Helped` is a SECOND statistic; `Marked` is the control.
 - **ITS VIRTUE IS RARITY — four arms since say so.** Every second cell written
   DENSELY collapses back to the behaviour policy, whatever it claims to mean.
-  **And rarity is also why it does not survive a second world**: too rare to cover
-  the states.
 - **WHAT IS LEFT IS NOT INEXPERIENCE.** The arm is silent for most steps, and
   **quadrupling the run moves neither silence nor score.** The state count grows,
   so a cell keyed on the state that earned it never covers them.
@@ -160,15 +155,15 @@ its ceiling it absorbs anything.)*
 
 ### 7. Credit over time — eligibility traces, and `Window` is already one
 
-- **Nothing learns that an act led somewhere good three steps later.**
-  **Three-factor Hebbian learning needs no reward function and no
-  backpropagation** (Izhikevich 2007).
-- **BUILT ON `Tending`**, reaching back an instrumental sequence — cross, pour,
-  wait — weighted by recency; `Smeared` is the control. **Counts only rise.**
+- **Nothing learns that an act led somewhere good three steps later**, and
+  three-factor Hebbian learning needs no reward function and no backpropagation
+  (Izhikevich 2007).
+- **BUILT ON `Tending`**, reaching back cross-pour-wait, weighted by recency;
+  `Smeared` is the control. **Counts only rise.**
 - **IT WRITES MORE AND CHANGES NOTHING**, and the arm it was measured against was
-  silent for a reason nobody checked — see the trap below.
-- **AND EXPERIENCE MAKES COVERAGE WORSE**, measured directly: quadruple the run
-  and states more than triple while credit cells grow less than half again.
+  silent for a reason nobody checked.
+- **EXPERIENCE MAKES COVERAGE WORSE**: quadruple the run and states more than
+  triple while credit cells grow less than half again.
 
 ### 8. Similarity — **and step 9 promoted it from an option to the only route**
 
@@ -187,14 +182,14 @@ its ceiling it absorbs anything.)*
   COARSELY as well as finely: states differing finely share the coarse code and
   meet there. **The hierarchy IS the likeness** — nothing learnt, and two machines
   drop the same bits. **The `Groups` trick a fourth time.**
-- **PAIRED WITH `Toll.Traffic` THEY SOLVE THE REACHABILITY OUTRIGHT**: silence on
-  `Tending` falls from nearly every step to one in forty, **at a third of the
-  messages** — and the evidence toll cannot even land there, because a coarse code
-  co-occurs with its own fine code every time, so that edge weighs nearly one, the
-  hop costs nearly nothing and depth explodes. **The split this session opened with,
-  arriving at the problem it was built for.**
-- **AND THE SCORE IS FAR BELOW A COIN TOSS.** The graph can finally speak in a body
-  and what it says is wrong.
+- **PAIRED WITH `Toll.Traffic` THEY SOLVE THE REACHABILITY OUTRIGHT**: silence
+  falls from nearly every step to one in forty, **at a third of the messages** —
+  and the evidence toll cannot land there at all, a coarse code weighing nearly one
+  against its own fine code so the hop is free and depth explodes.
+- **AND THE SCORE COLLAPSES, BECAUSE THE SILENCE WAS THE EXPLORATION.** The body
+  locks onto the first action that ever earned credit and takes it on 393 of 400
+  steps. **Ranking by agreement rather than summed strength changes nothing** —
+  only one action is reachable at all, so there is nothing to rank.
 - **REPLAY.** Re-run experience when nothing is arriving. **`WhenIdle()` triggers
   it**, and a body that cannot bootstrap is what it is for.
 - **INHIBITION — EXPRESSIBLE, AND IT DOES NOT PAY YET.** "Punishment is
@@ -246,18 +241,20 @@ its ceiling it absorbs anything.)*
 
 - **EVERY MECHANISM BUILT WORKS AND EVERY ONE FAILS THE SAME WAY.** Paths,
   backoff, curiosity, the trace, grains, the toll: each does what it was built to
-  do, and **every configuration that lets the walk SPEAK in a body scores worse
-  than random.**
-- **SO THE SILENCE WAS NEVER THE PROBLEM.** It is solvable three ways — budget,
-  toll, grain — and solving it only reveals the answer underneath.
+  do, and **every configuration that lets the walk SPEAK scores worse than
+  random.**
+- **SO THE SILENCE WAS NEVER THE PROBLEM — IT WAS THE EXPLORATION.** Solvable
+  three ways, and each one removes the coin toss that was carrying the arm.
 - **AND EVERYTHING TRIED SO FAR CHANGED THE READ SIDE.** Questions, paths, tolls
   and grains change how credit is REACHED; the trace changes how WIDELY it is
-  written. **Nothing has changed WHAT is written.**
-- **`Kind.Helped` IS STILL A FREQUENCY.** *This act preceded an improvement*
-  correlates with *this is what I usually do*, because the acts taken most are the
-  acts most likely to precede anything. **`helped / seen` is a hit rate; ΔP is
-  `P(better | act) − P(better | not act)`** and needs the base rate, which nothing
-  records. **That is the untried half.**
+  written. **Nothing has changed WHAT is written, and nothing has given the body a
+  reason to try the acts it has not tried.**
+- **WHICH MAKES STEP 10 LOAD-BEARING.** A body that only takes the act it already
+  believes in learns nothing about the others, so the credit cell records one
+  action forever. **Exploration is what makes the statistic mean anything.**
+- **`Kind.Helped` IS STILL A FREQUENCY**: `helped / seen` is a hit rate, where ΔP
+  is `P(better | act) − P(better | not act)` and needs a base rate nothing records.
+  **The second untried half.**
 
 - **NONE OF IT IS A SUFFICIENCY ARGUMENT** — all of it could land and still not be
   enough. The narrower claim: without structure, an internal error signal, a
@@ -364,7 +361,7 @@ condition is a superstition.**
 | `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift and all its cost. **Two candidates whose orders invert tie identically under RRF for every damping constant** | Many candidates, or a fusion separating by something other than position |
 | Inhibition on `Homeostat` | Folding the negative cell into the COUNT mutes the walk — that number is the ranking AND the price. Discounting the SCORE alone recovers most of it and **still loses to the one-sided count**, where most acts are wrong most of the time | A world where the wrong act is informative and RARE. **The PN-Counter itself is sound and stays** |
 | `Ranked` as step 4's fix | **The lift was the bootstrap's coin toss** — silent far more often, and a varying code thins every edge so routes starve before reaching an action. **Kept: it lifts a real ceiling, and buys nothing alone** | Anything making the walk prefer a partner other than the one it took last time |
-| Widening the walk to cure step 4's silence — `Kindred`, `Foreseeing`, `Backing` | **All three, and backoff is what settles it.** Through `With`: louder and below the bar. Through `After`: silent on every step at every window width. Asking narrow FIRST and widening only on silence overrides nothing and scores the same — **so the widening costs even where it overrides nothing.** A walk wide enough to be non-silent converges on what was DONE most | **A likeness the GRAPH DID NOT COMPUTE.** Every graph-internal one is made of co-occurrence and carries the behaviour policy with it, so this is step 8's front end and nothing short of it |
+| Widening the walk to cure step 4's silence — `Kindred`, `Foreseeing`, `Backing` | **All three.** Through `With`: louder and below the bar. Through `After`: silent everywhere. Backoff overrides nothing and scores the same, **so the widening costs even where it overrides nothing** | **A likeness the GRAPH DID NOT COMPUTE**, which is step 8's front end and nothing short of it |
 | A trained quantiser — k-means on `master` | Two machines fitted on different samples give the same input different codes, and nothing downstream detects it | Never fitted. **A hash that spends its bits where the data is, without being fitted, is step 8's unbuilt middle** |
 
 ---
@@ -393,8 +390,14 @@ process** — kept, because a real network loses reports.
   read zero is the only way to tell the two apart.**
 - **A FALLBACK IS A CONTROL ARM NOBODY MEANT TO RUN.** Anything raising an arm's
   silence drifts it toward the random bar for free, and that reads as the change
-  working. **Report silence beside the score** — step 9 is louder AND worse, which
-  neither number says alone. It cannot carry an arm PAST the bar; that is arithmetic.
+  working. **Report silence beside the score.** It cannot carry an arm PAST the
+  bar; that is arithmetic.
+- **AND THE CONVERSE, WHICH COST A WHOLE SESSION: THE FALLBACK IS THE ONLY
+  EXPLORATION THIS DESIGN HAS.** Silent on nearly every step means acting at random
+  on nearly every step, so **every mechanism that CURES the silence removes the
+  exploration** — the body locks onto the first act that ever earned credit and the
+  change reads as harmful when it merely exposed a policy the coin toss was hiding.
+  Measured: silence 399 of 400 down to 10, and then ONE action on 393 steps.
 - **AND A SILENCE HAS TWO CAUSES THAT LOOK IDENTICAL AND WANT OPPOSITE FIXES**: an
   empty cell, or a walk that cannot AFFORD to reach one. **Spend more and see
   whether the voice returns** — on `Tending` it does, from silent on nearly every

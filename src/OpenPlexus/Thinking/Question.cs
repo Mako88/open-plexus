@@ -250,6 +250,33 @@ public sealed record Question
     /// </remarks>
     public static Question Worthwhile() => new() { Through = Graph.Kind.Helped };
 
+    /// <summary>
+    /// The same question, ranked by how many ORIGINS agree rather than by summed
+    /// route strength — <b>the answer to a graph with hubs in it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>GRAINS PUT HUBS IN THE GRAPH ON PURPOSE, AND <see cref="Accumulate.Sum"/>
+    /// CANNOT COPE WITH THEM.</b> A coarse code is reached from many of the codes
+    /// felt at once, and from it many routes run on to the same action — so one
+    /// piece of evidence arrives by a dozen paths and is counted a dozen times.
+    /// <b>Measured on `Tending`: the arm collapses onto a single action</b>, moving
+    /// left on 393 of 400 steps and watering twice, which is step 4's original
+    /// one-action failure arriving by a new road.
+    /// </para>
+    /// <para>
+    /// <b><see cref="Accumulate.Agreement"/> counts DISTINCT ORIGINS and is exactly
+    /// the fix</b>: many routes from one origin are one piece of evidence arriving
+    /// several ways, and it says so. Nothing new travels for it — the chain already
+    /// carries its origin for the cycle check.
+    /// </para>
+    /// </remarks>
+    public static Question Agreed() => new()
+    {
+        Through = Graph.Kind.Helped,
+        Ranking = Accumulate.Agreement,
+    };
+
     /// <summary>A question that ranks by agreement between its origins.</summary>
     /// <remarks>
     /// <b>The conjunction: the thing meant is the one every origin reached.</b>

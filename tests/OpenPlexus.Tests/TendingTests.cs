@@ -467,6 +467,28 @@ public sealed class TendingTests(ITestOutputHelper output)
                 + $"{credit.Widest,6} {credit.Messages,9}");
         }
 
+        // AND WHAT IT ACTUALLY CHOOSES, now that it can speak on nearly every
+        // step. A score below the bar says the answer is wrong; the action counts
+        // say HOW it is wrong, and those are different diagnoses. An arm that
+        // waters constantly and never travels has learnt "watering helps" and
+        // missed that it must go somewhere first; one that mirrors the oracle's
+        // spread and still loses has a subtler fault.
+        var deep = Fixture.Dials(8.0) with { Toll = Toll.Traffic };
+
+        foreach (var (name, how) in
+            (( string, Gardening )[])
+            [("oracle", Gardening.Best), ("blind", Gardening.Blind),
+             ("credited", Gardening.Credited), ("concurring", Gardening.Concurring)])
+        {
+            using var run = new TendingRun(graded, deep, seed: 1);
+            var result = await run.RunAsync(Steps, how);
+
+            output.WriteLine(
+                $"{name,-10} viable={result.Viable:F3} travelling={result.Travelling:F3} "
+                + $"doing=[{string.Join(",", result.Doing)}] "
+                + $"watered=[{string.Join(",", result.Watered)}]");
+        }
+
         // ASSERTED: THE TRAFFIC TOLL LANDS WHERE THE EVIDENCE TOLL CANNOT.
         // A grained world at depth is the shape that makes inverse cost unbounded —
         // every coarse edge weighs nearly one, so nearly every hop is free — and a

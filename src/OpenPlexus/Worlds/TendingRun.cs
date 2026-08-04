@@ -89,6 +89,19 @@ public enum Gardening
     /// is simply coverage.
     /// </remarks>
     Smeared,
+
+    /// <summary>
+    /// <see cref="Credited"/> ranked by AGREEMENT rather than by summed strength —
+    /// <b>the arm for a graph with hubs in it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>ONE THING CHANGES AND IT IS THE RANKING.</b> Grains put hubs in the graph
+    /// deliberately, and a hub gives one piece of evidence a dozen paths to arrive
+    /// by — which <see cref="Accumulate.Sum"/> counts as a dozen pieces. Measured,
+    /// the arm collapses onto ONE action: left on 393 of 400 steps, watering twice.
+    /// <see cref="Thinking.Question.Agreed"/> counts distinct origins instead.
+    /// </remarks>
+    Concurring,
 }
 
 /// <summary>What the garden measured. <b>Counts, not claims.</b></summary>
@@ -289,7 +302,12 @@ public sealed class TendingRun : IDisposable
                 : await ChosenAsync(
                     felt,
                     chains,
-                    Credits(choosing) ? Question.Worthwhile() : null,
+                    choosing switch
+                    {
+                        Gardening.Concurring => Question.Agreed(),
+                        _ when Credits(choosing) => Question.Worthwhile(),
+                        _ => null,
+                    },
                     ct).ConfigureAwait(false);
 
             if (!walked.Balanced) unbalanced++;
@@ -386,7 +404,8 @@ public sealed class TendingRun : IDisposable
 
     /// <summary>Whether this arm writes the credit cell at all.</summary>
     private static bool Credits(Gardening how) =>
-        how is Gardening.Credited or Gardening.Traced or Gardening.Smeared;
+        how is Gardening.Credited or Gardening.Traced or Gardening.Smeared
+            or Gardening.Concurring;
 
     /// <summary>
     /// How far back the credit reaches, in steps.

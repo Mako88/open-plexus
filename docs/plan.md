@@ -159,6 +159,8 @@ its ceiling it absorbs anything.)*
 
 - **A row entry is `(Code, Kind)` to `(count, when)`**, and supersession rode in
   beside it for the single price. `Kind` holds every argument in full.
+- **A RELATION IS A DERIVED NAME, NOT AN ENUM MEMBER** — a front end mints one with
+  no recompile, agreed by hash as `Chunk`'s is, in the padding the enum wasted.
 - **The front end SAYS the order inside the occasion** — the `Groups` trick again,
   because a phase cannot survive C2. `Occasion.Sequence` is additive.
 - **`Question.Through` restricts a walk to one relation**, and one kind was the
@@ -221,8 +223,8 @@ its ceiling it absorbs anything.)*
 
 ### 10. A REASON TO SEEK — **and it cannot be a walk**
 
-- **`Drives` wants to STAY ALIVE; nothing wants to FIND OUT.** `Kind.Informed` is
-  the shape: a second write when an act produced something unpredicted, `Surprise`
+- **`Drives` wants to STAY ALIVE; nothing wants to FIND OUT.** The shape was
+  `Informed`: a second write when an act produced something unpredicted, `Surprise`
   standing where `Drives` does, computed from the machine's own error.
 - **BUILT, AND IT CANNOT REACH THE FAULT.** Every cell is written only for acts
   TAKEN, so it ranks what has been tried and cannot send a body to what has not.

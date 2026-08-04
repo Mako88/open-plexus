@@ -29,9 +29,57 @@ namespace OpenPlexus.Graph;
 /// row, by at most one entry per kind per partner, and that is the price named in
 /// full on <see cref="Tie"/>.
 /// </para>
+/// <para>
+/// <b>AND IT IS NOT AN ENUM, BECAUSE AN ENUM CANNOT GROW WITHOUT A RECOMPILE —
+/// JOHN'S ASK.</b> A relation is named by <see cref="Of"/>, which derives a
+/// <see cref="ulong"/> from the name the way <see cref="Learning.Chunk"/> derives
+/// a node's, so a front end can mint <i>north-of</i> and two machines agree with
+/// nothing to ask. <b>The five below are ordinary calls to it</b> and hold no
+/// privilege the arithmetic does not give them.
+/// </para>
+/// <para>
+/// <b>IT COSTS NOTHING, AND THAT WAS MEASURED BEFORE IT WAS BUILT.</b> The enum's
+/// four bytes were followed by four of padding, so the name lands in space the row
+/// was already wasting — <c>RowWidthTests</c> holds the number.
+/// </para>
 /// </remarks>
-public enum Kind
+public readonly record struct Kind
 {
+    private readonly ulong _name;
+
+    private Kind(ulong name) => _name = name;
+
+    /// <summary>
+    /// The relation of this name, <b>agreed by every machine without asking
+    /// one.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Agreed"/> AND NOT <see cref="object.GetHashCode"/>, for the
+    /// red-ball reason.</b> String hashing is randomised per process, so a relation
+    /// named that way would be a different cell in every run and on every machine —
+    /// the same defect that makes an interning table wrong for
+    /// <see cref="Worlds.Kinds.Named"/>.
+    /// </para>
+    /// <para>
+    /// <b>THE NAME IS THE IDENTITY AND NOTHING ELSE IS.</b> Two machines that call
+    /// this with the same string hold the same cell, and one that has never heard
+    /// of a relation simply has no entry for it — which is what a row does with
+    /// every partner it has not met.
+    /// </para>
+    /// </remarks>
+    /// <param name="relation">The relation's name, taken exactly as given.</param>
+    public static Kind Of(string relation)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(relation);
+
+        var hash = Agreed.Basis;
+
+        foreach (var letter in relation) hash = Agreed.Fold(hash, letter);
+
+        return new Kind(Agreed.Mix(hash));
+    }
+
     /// <summary>
     /// They were in the same moment. <b>Symmetric, and everything measured before
     /// kinds existed.</b>
@@ -40,7 +88,7 @@ public enum Kind
     /// Nothing came first, so both sides write each other and the pair means the
     /// same read from either end.
     /// </remarks>
-    With,
+    public static Kind With { get; } = Of("with");
 
     /// <summary>
     /// The partner came AFTER this node. <b>One-way, and that asymmetry is the
@@ -52,7 +100,7 @@ public enum Kind
     /// governed <see cref="Learning.Occasion.Recent"/>; what is new is that the
     /// count lands in its own cell instead of being added to the simultaneous one.
     /// </remarks>
-    After,
+    public static Kind After { get; } = Of("after");
 
     /// <summary>
     /// The partner came BEFORE this node. <b>The same fact as <see cref="After"/>
@@ -87,7 +135,7 @@ public enum Kind
     /// makes every hop cost at least one and the walk terminate.
     /// </para>
     /// </remarks>
-    Before,
+    public static Kind Before { get; } = Of("before");
 
     /// <summary>
     /// They met, <b>and things got better afterwards</b> — the contrastive half of
@@ -136,7 +184,7 @@ public enum Kind
     /// and those are two statistics.
     /// </para>
     /// </remarks>
-    Helped,
+    public static Kind Helped { get; } = Of("helped");
 
     /// <summary>
     /// They met, <b>and things got WORSE afterwards</b> — the negative half, and
@@ -174,41 +222,29 @@ public enum Kind
     /// thing helped MORE than it hurt, and two monotonic counters can.
     /// </para>
     /// </remarks>
-    Hindered,
+    public static Kind Hindered { get; } = Of("hindered");
 
     /// <summary>
-    /// They met, <b>and what followed was not what the machine expected</b> — step
-    /// 10, and the first thing here that gives the system a reason to SEEK rather
-    /// than to survive.
+    /// The relation's name where one is known, and its number where it is not.
     /// </summary>
     /// <remarks>
-    /// <para>
-    /// <b><see cref="Helped"/> SAYS THE BODY GOT BETTER; THIS SAYS THE MODEL DID.</b>
-    /// They are the same shape and a different third factor: one is priced by
-    /// <see cref="Learning.Drives"/> reading the body, the other by
-    /// <see cref="Learning.Surprise"/> reading the machine's own prediction error.
-    /// <b>Both are computed from the system's own state</b>, so neither is a reward
-    /// handed in from outside — the argument that makes Ashby's bounds legitimate
-    /// makes this legitimate by the same step.
-    /// </para>
-    /// <para>
-    /// <b>NOVELTY DECAYS WITH NOTHING DECAYING, WHICH IS WHY THIS FITS HERE AT
-    /// ALL.</b> A count that only rises looks like the wrong instrument for
-    /// <i>new</i>, and it is not: the walk reads <c>informed / seen</c>, and as an
-    /// act becomes predictable the cell stops growing while the marginal keeps
-    /// going, so its ranking falls on its own. <b>The anti-hub weighting already
-    /// does the forgetting</b>, and no count is ever reduced.
-    /// </para>
-    /// <para>
-    /// <b>IT IS AIMED AT THE BOOTSTRAP AND NOT AT THE SCORE.</b> Step 4's arm is
-    /// silent until something has helped, so most of a run is the fallback coin
-    /// toss — which TRAPS names as a control arm nobody meant to run. This is what
-    /// makes those steps deliberate. <b>Step 9 established that the silence cannot
-    /// be cured by asking a WIDER question</b>; this asks a different one, of the
-    /// same width, so it does not inherit that refutation.
-    /// </para>
+    /// <b>PRESENTATION, AND NEVER IDENTITY.</b> A derived name is an opaque number
+    /// and a failing assertion that prints one teaches nobody anything, so the five
+    /// built here are spelled back out. <b>A relation minted by a front end prints
+    /// as its number</b>, which is honest: nothing in this process knows the string
+    /// it came from, and nothing needs to.
     /// </remarks>
-    Informed,
+    public override string ToString() =>
+        Spelled.GetValueOrDefault(_name) ?? $"kind:{_name:x16}";
+
+    private static readonly Dictionary<ulong, string> Spelled = new()
+    {
+        [With._name] = "with",
+        [After._name] = "after",
+        [Before._name] = "before",
+        [Helped._name] = "helped",
+        [Hindered._name] = "hindered",
+    };
 }
 
 /// <summary>

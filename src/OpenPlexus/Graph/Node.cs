@@ -135,15 +135,18 @@ public sealed class Node
     /// forward weighting exists to prevent.
     /// </param>
     /// <param name="kind">
-    /// What the entry means. <b><see cref="Kind.With"/> is every write made before
-    /// kinds existed</b>, so a caller that does not say gets exactly the old
-    /// behaviour and every measurement taken up to now still stands.
+    /// What the entry means. <b>Null is <see cref="Kind.With"/>, which is every
+    /// write made before kinds existed</b>, so a caller that does not say gets
+    /// exactly the old behaviour and every measurement taken up to now still
+    /// stands. <b>It is nullable rather than defaulted because a kind stopped being
+    /// an enum</b> — a derived name is not a compile-time constant, and the
+    /// alternative was a zero value masquerading as a relation.
     /// </param>
     /// <param name="when">
     /// The observing machine's clock, for the supersession channel. <b>Zero is a
     /// caller with no clock to offer</b> and leaves the entry's stamp alone.
     /// </param>
-    public void Observe(Code other, double by = 1.0, Kind kind = Kind.With, long when = 0)
+    public void Observe(Code other, double by = 1.0, Kind? kind = null, long when = 0)
     {
         if (other == _code)
             throw new ArgumentException(
@@ -154,7 +157,7 @@ public sealed class Node
             throw new ArgumentOutOfRangeException(nameof(by),
                 "a coincidence worth nothing is not a coincidence");
 
-        var edge = new Edge(other, kind);
+        var edge = new Edge(other, kind ?? Kind.With);
 
         lock (_gate)
             _together[edge] = _together.GetValueOrDefault(edge).Plus(by, when);
@@ -188,9 +191,9 @@ public sealed class Node
     /// When this cell was last written, by the observing machine's own clock.
     /// <b>The supersession channel, and nothing ranks by it yet.</b>
     /// </summary>
-    public long When(Code other, Kind kind = Kind.With)
+    public long When(Code other, Kind? kind = null)
     {
-        lock (_gate) return _together.GetValueOrDefault(new Edge(other, kind)).When;
+        lock (_gate) return _together.GetValueOrDefault(new Edge(other, kind ?? Kind.With)).When;
     }
 
     /// <summary>

@@ -29,17 +29,22 @@ namespace OpenPlexus.Tests;
 public sealed class RowWidthTests(ITestOutputHelper output)
 {
     /// <summary>
-    /// What a relation would cost if it stopped being an enum.
+    /// What a relation cost while it was still an enum.
     /// </summary>
     /// <remarks>
-    /// <b>JOHN'S ASK: a static enum cannot grow, so the system cannot mint a new
-    /// relation without a recompile.</b> Two shapes answer it — a derived
-    /// <see cref="ulong"/> name, hashed from the relation's definition so two
-    /// machines agree with nothing to ask, or a full <see cref="Code"/>, which
-    /// also gives relations a modality of their own and so lets a walk be narrowed
-    /// to a FAMILY of relations the way <c>BestOf</c> narrows endpoints.
+    /// <b>THE SHAPE THAT WAS REPLACED, KEPT SO THE CLAIM CAN STILL FAIL.</b>
+    /// <see cref="Kind"/> now derives a <see cref="ulong"/> name and this file used
+    /// to measure that against the enum — but once the derived name was adopted,
+    /// comparing <see cref="Edge"/> to a hand-written copy of itself was a check
+    /// that could not fire, which is what TRAPS names. Measuring against what was
+    /// actually given up is the version that can.
     /// </remarks>
-    private readonly record struct Named(Code Partner, ulong Relation);
+    private enum Fixed
+    {
+        With,
+    }
+
+    private readonly record struct Enumerated(Code Partner, Fixed Relation);
 
     private readonly record struct Coded(Code Partner, Code Relation);
 
@@ -50,10 +55,10 @@ public sealed class RowWidthTests(ITestOutputHelper output)
         var value = Unsafe.SizeOf<Tie>();
 
         output.WriteLine($"Code   {Unsafe.SizeOf<Code>(),3}");
-        output.WriteLine($"Edge   {key,3}  (Code + Kind)");
+        output.WriteLine($"Edge   {key,3}  (Code + derived Kind)");
         output.WriteLine($"Tie    {value,3}  (count + when)");
         output.WriteLine($"entry  {key + value,3}");
-        output.WriteLine($"Named  {Unsafe.SizeOf<Named>(),3}  (Code + ulong relation)");
+        output.WriteLine($"was    {Unsafe.SizeOf<Enumerated>(),3}  (Code + enum relation)");
         output.WriteLine($"Coded  {Unsafe.SizeOf<Coded>(),3}  (Code + Code relation)");
 
         // THE BUDGET. The number is what it is today; having one is the point, and
@@ -67,15 +72,15 @@ public sealed class RowWidthTests(ITestOutputHelper output)
     public void A_relation_named_by_a_derived_number_costs_nothing_extra()
     {
         // THE ANSWER TO "WHAT DOES DYNAMIC COST", AND IT IS A SURPRISE: nothing.
-        // `Kind` is an enum over `int`, and the four bytes it needs are followed by
-        // four bytes of padding to align the struct — so a `ulong` naming the
-        // relation lands exactly in the space the enum was already wasting.
+        // The enum was an `int`, and the four bytes it needed were followed by four
+        // bytes of padding to align the struct — so the `ulong` naming the relation
+        // landed exactly in the space the enum was already wasting.
         //
-        // SO THE ALPHABET OF RELATIONS CAN GROW FOR FREE, and the argument against
-        // it is not memory. It is that a derived name must be agreed by every
+        // SO THE ALPHABET OF RELATIONS GREW FOR FREE, and the argument against it
+        // was never memory. It is that a derived name must be agreed by every
         // machine with nothing to ask, which is `Chunk`'s trick and not a new
         // problem.
-        Assert.Equal(Unsafe.SizeOf<Edge>(), Unsafe.SizeOf<Named>());
+        Assert.Equal(Unsafe.SizeOf<Enumerated>(), Unsafe.SizeOf<Edge>());
     }
 
     [Fact]

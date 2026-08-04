@@ -261,4 +261,86 @@ public sealed class EdgeKindTests
         Assert.Equal(2, fired.Outgoing.Length);
         Assert.All(fired.Outgoing, message => Assert.Equal(C(2), message.To));
     }
+
+    // ---- a relation nobody compiled ---------------------------------------
+
+    [Fact]
+    public void A_relation_this_build_has_never_heard_of_is_a_cell_like_any_other()
+    {
+        // JOHN'S ASK, AND THE WHOLE OF IT. A static enum cannot grow, so every
+        // relation the system could ever hold had to be decided by whoever last
+        // compiled it -- which is the wrong place to decide what a front end is
+        // allowed to say. `north-of` is not in this source anywhere.
+        var north = Kind.Of("north-of");
+
+        var node = new Node(C(1), Fixture.Dials(stamina: 10.0));
+        node.Note();
+        node.Observe(C(2), 1.0, north);
+
+        Assert.Equal(1.0, node.Together(C(2), north));
+
+        // AND IT IS ITS OWN CELL rather than landing in the simultaneous one,
+        // which is the property the whole of step 6 rests on.
+        Assert.Equal(0.0, node.Together(C(2), Kind.With));
+        Assert.Equal(1, node.Entered(north));
+    }
+
+    [Fact]
+    public void And_a_question_can_be_narrowed_to_it()
+    {
+        // THE END-TO-END VERSION. Holding the cell is not the claim -- the claim is
+        // that a walk can be restricted to a relation the build never knew about,
+        // exactly as `Following()` restricts one to `After`. If this passes and the
+        // one above fails there is a write path and no read path.
+        var north = Kind.Of("north-of");
+
+        var node = new Node(C(1), Fixture.Dials(stamina: 10.0));
+        node.Note();
+        node.Observe(C(2), 1.0, Kind.With);
+        node.Observe(C(3), 1.0, north);
+
+        var fired = node.Fire(Origin(C(1)) with { Through = north });
+
+        Assert.Equal([C(3)], fired.Outgoing.Select(message => message.To));
+        Assert.Equal(north, fired.Outgoing[0].Kind);
+    }
+
+    [Fact]
+    public void The_five_built_in_relations_are_ordinary_calls_to_the_same_door()
+    {
+        // THE TRAP THIS CLOSES, AND IT IS A REAL ONE. If the built-in relations were
+        // reserved numbers and minted ones were hashes, a front end naming its
+        // relation "with" would get a DIFFERENT cell from the one every write in
+        // this project already lands in -- two statistics under one word, which is
+        // this design's recurring fault arriving by a new road. One rule instead:
+        // a relation's identity is the hash of its name, always.
+        Assert.Equal(Kind.With, Kind.Of("with"));
+        Assert.Equal(Kind.After, Kind.Of("after"));
+        Assert.Equal(Kind.Before, Kind.Of("before"));
+        Assert.Equal(Kind.Helped, Kind.Of("helped"));
+        Assert.Equal(Kind.Hindered, Kind.Of("hindered"));
+
+        // AND DISTINCT NAMES ARE DISTINCT CELLS, without which the above is
+        // satisfied by every name hashing to the same number.
+        Assert.NotEqual(Kind.With, Kind.After);
+        Assert.NotEqual(Kind.Of("north-of"), Kind.Of("south-of"));
+    }
+
+    [Fact]
+    public void And_the_number_a_name_derives_to_is_fixed_forever()
+    {
+        // THE RED-BALL PROPERTY, APPLIED TO RELATIONS. Two machines must agree on
+        // what `north-of` means with nothing to ask, so the arithmetic behind the
+        // name is not free to move -- changing `Agreed` would silently renumber
+        // every relation every machine has ever written, which is the same reason
+        // `Kinds.Stride` is fixed and the same reason a fitted codebook is out.
+        //
+        // PINNED THROUGH `ToString` ON PURPOSE. The number is not public and should
+        // not be: it is an identity, not a value anything reads.
+        Assert.Equal("kind:5dc8b6d758901f40", Kind.Of("north-of").ToString());
+
+        // AND THE FIVE SPELL THEMSELVES BACK OUT, so an assertion that fails prints
+        // something a person can act on.
+        Assert.Equal("after", Kind.After.ToString());
+    }
 }

@@ -96,13 +96,11 @@ its ceiling it absorbs anything.)*
 ### 2. Predictive coding — only surprise propagates
 
 - Rao & Ballard, Friston. An expected onset is silent. **Built.**
-- **THE OBSERVATION IS SUPPRESSED, NOT THE PREDICTION** — the walk making the
-  expectation still runs. **Prediction conditional on surprise is the deeper
-  version.**
-- **AND THE WRITE PATH IS NOT GATED AT ALL.** The stated reason — *the expectation
-  would decay* — **does not hold where nothing decays**. Rescorla and Wagner:
-  learning tracks ERROR, not frequency, and `Occasion.Weight` is the channel.
-  **The payoff is cost** — it silences the WRITE path as step 2 silenced thinking.
+- **THE OBSERVATION IS SUPPRESSED, NOT THE PREDICTION.** **Prediction conditional
+  on surprise is the deeper version.**
+- **THE WRITE PATH IS NOT GATED AT ALL**, and *the expectation would decay*
+  **does not hold where nothing decays**. Rescorla and Wagner: learning tracks
+  ERROR, not frequency; `Occasion.Weight` is the channel. **The payoff is cost.**
 
 ### 3. Chunking — MDL. **`Chunk` is built, and it is a trade**
 
@@ -111,25 +109,23 @@ its ceiling it absorbs anything.)*
   two machines agree with nothing to ask — the only minting C1 permits. **The
   threshold is description length**, not a constant.
 - **IT BUYS THE TRAFFIC AND NOTHING ELSE.** The graph gets BIGGER and accuracy
-  costs a little; the sets are a tiny share of a row count the noise dominates, so
-  MDL's storage half never shows.
+  costs a little; the sets are a tiny share of a row count the noise dominates.
 - **A MINTED NODE IS A HUB BY CONSTRUCTION and `Pricing.Receiver` refuses hubs** —
   the likely reading of that cost. **`Toll.Traffic` tests it**: a chunk should
   become dear to ENTER and still believed.
 - Open: **only a WHOLE moment is a candidate**, so a set inside a larger one is
-  invisible — pair-merging (Sequitur, BPE) composes. And the **utility problem**
-  (Minton, SOAR): utility belongs per chunk.
+  invisible — pair-merging (Sequitur, BPE) composes. And **utility belongs per
+  chunk** (Minton, SOAR).
 
 ### 4. Homeostatic drives — Ashby. **The arm beats random**
 
 - Bounded internal variables make behaviour goal-directed **with no reward
-  function**, survival having proved gameable. **No episode boundary**, fitting C4.
+  function**. **No episode boundary**, fitting C4.
   **AND EVERY ACT PAYS OFF AT ONCE, so this world cannot see steps 7, 10 or 11.**
-- **`Homeostat` SETS THE BAR, AND THE BAR IS RANDOM.** Attending to whatever is
-  lowest holds the body, so the world is winnable only by looking at it.
+- **`Homeostat` SETS THE BAR, AND THE BAR IS RANDOM.**
 - **SO ASSOCIATION IS ANTI-CORRELATED, not merely uninformative.** A count of what
-  was done converges on the POLICY that did it, and the states a body is in are the
-  ones its own actions produced. **This waits anywhere the graph learns from
+  was done converges on the POLICY that did it, and the states a body is in are
+  the ones its own actions produced. **This waits wherever the graph learns from
   itself.**
 - **THE CREDIT NEEDED ITS OWN CELL, AND THAT IS THE FIRST ARM TO BEAT THE BAR.**
   Three earlier arms wrote a HEAVIER number into the cell meaning *this was done
@@ -175,12 +171,18 @@ its ceiling it absorbs anything.)*
 
 - **The gap: nothing learns that an act led somewhere good three steps later**,
   with no reward function and no backpropagation. **Three-factor Hebbian learning
-  needs neither** (Izhikevich 2007): a fading trace of what recently fired, and a
-  third signal consolidating what is still in it, most credit to the most recent.
-- **`Window` IS that trace, ungated**, and `Kind.Helped` is the third factor it
-  would consolidate. **The conjunction is NOT built** — `Drives.Feel` prices the
-  previous transition and nothing longer. **Safe for the CRDT property**: the trace
-  decides how much to add, and counts only rise. **`Tending` is where it shows.**
+  needs neither** (Izhikevich 2007): a fading trace, and a third signal
+  consolidating what is still in it.
+- **BUILT ON `Tending`, and it does not pay.** The trace reaches back an
+  instrumental sequence — cross, pour, wait — weighted by recency; `Smeared` is the
+  control saying recency is not the point. **Counts only rise, so the CRDT property
+  holds.**
+- **IT WRITES MORE AND CHANGES NOTHING: coverage was not what was scarce, CREDIT
+  EVENTS ARE.** The body is silent, so it acts at random, so it rarely improves the
+  worst plant, so there is little to spread.
+- **AND EXPERIENCE MAKES IT WORSE.** Quadruple the run: distinct states more than
+  triple while credit cells grow less than half again. **Coverage does not stall,
+  it FALLS** — states arrive faster than credit ever can.
 
 ### 8. Similarity — **and step 9 promoted it from an option to the only route**
 
@@ -198,32 +200,33 @@ its ceiling it absorbs anything.)*
   machine forever, so a fitted codebook is out — **and a uniform hash is agreed and
   unwalkable**, because the data is concentrated where uniform codes are not.
   **Spending codes where the data is WITHOUT fitting one is the unbuilt middle.**
-- **REPLAY.** Re-run experience when nothing is arriving: consolidates, learns
-  from rare events, interleaves old against new. **`WhenIdle()` is the trigger.**
+- **REPLAY.** Re-run experience when nothing is arriving: consolidates, learns from
+  rare events, interleaves old against new. **`WhenIdle()` triggers it.**
 - **INHIBITION — EXPRESSIBLE, AND IT DOES NOT PAY YET.** "Punishment is
   unavailable" was **the wrong CRDT, not a law**: a **PN-Counter** is two
   G-Counters read as a difference. `Kind.Hindered` costs a KIND, not a wider row,
   and **must discount the SCORE and never the price**. **Still no better than the
   one-sided count** where most acts are wrong most of the time.
 
-### 9. RELATIONAL PATHS — a walk of MIXED kinds, and the first attack on step 8
+### 9. RELATIONAL PATHS — built, and the idea it was built for is refuted
 
-- **BUILT — `Question.Path` walks a relation per hop**, Path Ranking's move (Lao
-  & Cohen). **The mechanism is right and the idea is refuted.**
+- **`Question.Path` walks a relation per hop**, Path Ranking's move (Lao & Cohen).
+  The mechanism is right.
 - **A FIXED PATH TRADES COVERAGE AGAINST PRECISION WITH NO MIDDLE.** Through
   `With` it reaches almost everything and the credit dissolves; through `After` the
-  composition is empty and the walk is silent at every window width. **And backoff
-  settles it**: narrow FIRST, widening only on silence, overrides nothing and
-  scores the same.
-- **SO THE SILENCE IS THE PRICE OF THE CONTRAST, NOT A DEFECT.** Anything wide
-  enough to be non-silent converges on what was DONE most — step 4's diagnosis,
-  from a new direction.
+  composition is empty. **Backoff settles it**: narrow first, widening only on
+  silence, overrides nothing and scores the same.
+- **SO THE SILENCE IS THE PRICE OF THE CONTRAST.** Anything wide enough to be
+  non-silent converges on what was DONE most — step 4's diagnosis, from a new
+  direction.
 - **WHICH MAKES STEP 8'S FRONT END THE ONLY ROUTE LEFT.** Every graph-internal
   likeness is made of co-occurrence and carries the policy with it; **a likeness
-  the graph did not compute cannot be.**
-- **`Question.Downstream` — the successor representation (Dayan) — remains
-  unaskable**: it wants the REVERSE temporal edge, which a carried code does not
-  write. **A real design question** — see `Kind.Before`.
+  the graph did not compute cannot be.** Step 7 then measured why it is not
+  optional: **coverage FALLS as a run lengthens**, so states must stop being all
+  distinct.
+- **`Question.Downstream` — the successor representation (Dayan) — is unaskable**:
+  it wants the REVERSE temporal edge a carried code does not write. **A real design
+  question** — see `Kind.Before`.
 
 ### 10. A REASON TO SEEK — the drive this design has never had
 
@@ -233,21 +236,20 @@ its ceiling it absorbs anything.)*
   unpredicted — `Kind.Helped` with `Surprise` as the third factor, so no more a
   smuggled reward than Ashby's bounds are.
 - **NOVELTY DECAYS WITH NOTHING DECAYING**: `informed / seen` falls on its own as
-  an act becomes predictable, because the marginal keeps rising while the cell
-  stops. **The anti-hub weighting already does it.**
-- **ERROR IS NOT PROGRESS — the noisy television.** Seeking prediction error alone
-  rewards whatever is least learnable; Schmidhuber's claim is about compression
-  PROGRESS, and rarity is what a second cell needs.
+  an act becomes predictable. **The anti-hub weighting already does it.**
+- **ERROR IS NOT PROGRESS — the noisy television.** Seeking error alone rewards
+  whatever is least learnable; Schmidhuber's claim is about compression PROGRESS.
 - **IT REPLACES THE BOOTSTRAP.** The credit cell is empty until something has
   helped, so the arm is mostly its own coin toss — **and TRAPS calls a fallback a
   control arm nobody meant to run.**
-- **BUILT, AND NOT MEASURABLE ON `Homeostat`: THE PREDICTION WALK RETURNS
-  NOTHING THERE**, the same empty `after` that silenced step 9. So every moment
-  reads as maximally surprising — the dense arm writes on nearly every step and
-  collapses, the selective one can never fire. **Neither is evidence about
-  curiosity.**
-- **STEP 10 AND STEP 11 ARE BOTH BLOCKED ON A WORLD THAT CAN BE PREDICTED AT
-  ALL.** That is the concrete case for the second body.
+- **BUILT, AND NOT MEASURABLE ON `Homeostat`: THE PREDICTION WALK RETURNS NOTHING
+  THERE**, the same empty `after` that silenced step 9. Every moment reads as
+  maximally surprising, so the dense arm writes always and the selective one never.
+  **Neither is evidence about curiosity.** `Tending` carries a window by default
+  and is where to re-run it.
+- **AND IT IS WHAT `Tending` IS ACTUALLY SHORT OF**: the body is silent, so it acts
+  at random, so credit almost never fires. **The bootstrap is the blocker there,
+  not the spreading.**
 
 ### 11. NOTHING HERE PLANS. Every action is a reflex
 
@@ -306,11 +308,10 @@ its ceiling it absorbs anything.)*
   at billions on. **Evict on "not touched since", never by eroding a count** — the
   `when` channel provides it, so supersession and scaling share one mechanism.
   Top-K in bounded memory is heavy-hitters; Space-Saving bounds the error.
-- **A SELF-SET BEAM, whose revival condition is now met.** The refuted row asks a
-  width the system sets itself; `Surprise.Rate` is one signal, a node's own row
-  statistics a second.
-- **Hierarchy, which is what step 3 is really for.** Do not walk a million nodes;
-  walk a thousand chunks.
+- **A SELF-SET BEAM, revival condition now met.** The refuted row asks a width the
+  system sets itself; `Surprise.Rate` is one signal, a node's row statistics another.
+- **Hierarchy, which is what step 3 is really for.** Walk a thousand chunks, not a
+  million nodes.
 
 ### The wire, when the remote half lands — John, 2026-08-03
 
@@ -330,8 +331,8 @@ its ceiling it absorbs anything.)*
 - **`Chain` is what costs** — cycle check and explanation in one field, free
   locally and not on a wire. **Split them:** an approximate-membership filter for
   the hop, full chain rebuilt at the origin.
-- **Voting multiplies the wrong half.** **One thought, redundant reports**: the
-  flood is the graph's, and what C2 loses is the return path.
+- **Voting multiplies the wrong half. One thought, redundant reports**: the flood
+  is the graph's, and what C2 loses is the return path.
 - **UDP matches.** C2 assumes loss, and **TCP's head-of-line blocking would stall
   every thought behind one lost packet.** QUIC's unreliable datagram extension
   (RFC 9221) is the shape.
@@ -393,11 +394,10 @@ process** — kept, because a real network loses reports.
   counted `unbalanced` off a variable nothing incremented; step 10's selective arm
   reproduced its control down to the edge count. **Arming a check that has always
   read zero is the only way to tell the two apart.**
-- **A FALLBACK IS A CONTROL ARM NOBODY MEANT TO RUN.** Where an arm acts at random
-  when the walk says nothing, anything raising its silence drifts it toward the
-  random bar for free, and that reads as the change working. **Report silence
-  beside the score** — step 9 is louder AND worse, which neither number says
-  alone. It cannot carry an arm PAST the bar, though; that much is arithmetic.
+- **A FALLBACK IS A CONTROL ARM NOBODY MEANT TO RUN.** Anything raising an arm's
+  silence drifts it toward the random bar for free, and that reads as the change
+  working. **Report silence beside the score** — step 9 is louder AND worse, which
+  neither number says alone. It cannot carry an arm PAST the bar; that is arithmetic.
 - **A small sample can look like a mechanism.** One seed of step 4's credit arm
   showed a clean monotone learning curve that six seeds flattened to nothing.
 - **A MEAN OVER A POPULATION THE PROBLEM CREATED CANNOT SEE IT.** Fan-out stayed

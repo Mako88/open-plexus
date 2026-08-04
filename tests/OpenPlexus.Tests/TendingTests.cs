@@ -174,4 +174,96 @@ public sealed class TendingTests(ITestOutputHelper output)
         Assert.True(credited.Edges > 0);
         Assert.Empty(credited.Complaints);
     }
+
+    /// <summary>
+    /// Step 7 — <b>the credit reaching back past the step that earned it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>COVERAGE IS THE DIAGNOSED BOTTLENECK, FROM THREE DIRECTIONS.</b> The
+    /// credit arm is silent on nearly every step here and on most steps of
+    /// `Homeostat`; step 9 established that the silence cannot be cured by asking a
+    /// WIDER question, because anything wide enough converges on the behaviour
+    /// policy. <b>The remaining move is to widen what is WRITTEN.</b>
+    /// </para>
+    /// <para>
+    /// <b>AND THE ONE THING THIS WORLD HAS THAT THE OTHER DOES NOT is a move —
+    /// an act that improves nothing and is the only reason the next act can
+    /// help.</b> A one-step signal must rate it worthless. A trace can credit it.
+    /// </para>
+    /// <para>
+    /// <b>THE SPAN IS THE WORLD'S OWN ARITHMETIC</b> — crossing the garden, pouring,
+    /// and waiting a step for it to land — so no constant is chosen, and a trace of
+    /// ONE is <c>Credited</c> exactly.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task Credit_that_reaches_back_against_credit_for_the_last_step_alone()
+    {
+        var arms = await Sweep.AcrossAsync(
+            8,
+            Arm("blind", Gardening.Blind),
+            Arm("credited", Gardening.Credited),
+            Arm("traced", Gardening.Traced),
+            Arm("smeared", Gardening.Smeared),
+            Arm("best", Gardening.Best));
+
+        output.WriteLine(Sweep.Table(arms));
+
+        foreach (var how in
+            (Gardening[])[Gardening.Credited, Gardening.Traced, Gardening.Smeared])
+        {
+            using var run = new TendingRun(World(), Dials, seed: 1);
+            var result = await run.RunAsync(Steps, how);
+
+            output.WriteLine(
+                $"{how,-9} silent={result.Silent,3}/{result.Steps} "
+                + $"viable={result.Viable:F4} travelling={result.Travelling:F4} "
+                + $"states={result.States} edges={result.Edges} msgs={result.Messages}");
+        }
+
+        // ASSERTED: THE TRACE ACTUALLY WROTE MORE THAN THE LAST STEP.
+        //
+        // This is the live trap about a check that is wired and unable to fire,
+        // and it caught step 10's selective arm reproducing its control down to
+        // the edge count. An arm that reaches further back must leave a bigger
+        // graph behind it; if it does not, whatever the score says is about
+        // something else.
+        using var reaching = new TendingRun(World(), Dials, seed: 1);
+        var traced = await reaching.RunAsync(Steps, Gardening.Traced);
+
+        using var immediate = new TendingRun(World(), Dials, seed: 1);
+        var oneStep = await immediate.RunAsync(Steps, Gardening.Credited);
+
+        Assert.True(traced.Edges > oneStep.Edges,
+            $"the trace wrote no more cells than crediting the last step alone "
+            + $"({traced.Edges} against {oneStep.Edges}), so it is not reaching "
+            + "back at all and its score is about something else");
+
+        // AND THE RUN LENGTH, WHICH IS THE ONLY THING THAT SEPARATES "STUCK" FROM
+        // "NOT YET". Step 4's arm on `Homeostat` was silent and short of the
+        // ceiling, and quadrupling the run moved neither — which is what turned a
+        // patience problem into a structural one. The same check has to be run
+        // here before this arm is written up as refuted.
+        foreach (var longer in (int[])[400, 1600])
+        {
+            using var run = new TendingRun(World(), Dials, seed: 1);
+            var result = await run.RunAsync(longer, Gardening.Traced);
+
+            output.WriteLine(
+                $"traced {longer,5} steps silent={result.Silent,5}/{result.Steps} "
+                + $"({result.Silent / (double)result.Steps:P0}) viable={result.Viable:F4} "
+                + $"states={result.States} edges={result.Edges}");
+        }
+
+        Assert.Empty(traced.Complaints);
+    }
+
+    /// <summary>One arm of a sweep, so two tables cannot drift apart.</summary>
+    private static (string, Func<int, Task<double>>) Arm(string name, Gardening how) =>
+        (name, async seed =>
+        {
+            using var run = new TendingRun(World(), Dials, seed);
+            return (await run.RunAsync(Steps, how)).Viable;
+        });
 }

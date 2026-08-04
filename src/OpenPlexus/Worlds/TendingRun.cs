@@ -40,6 +40,55 @@ public enum Gardening
     /// plant forever. <b>Whatever this scores, the gap it leaves is step 7.</b>
     /// </remarks>
     Credited,
+
+    /// <summary>
+    /// The credit spread back over everything still in the trace — <b>step 7, and
+    /// the first thing here that can say an act led somewhere good LATER.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THREE-FACTOR HEBBIAN LEARNING, AND IT NEEDS NEITHER A REWARD FUNCTION
+    /// NOR BACKPROPAGATION</b> (Izhikevich 2007, the distal reward problem): a
+    /// fading record of what recently fired, and a third signal that consolidates
+    /// whatever is still in it, most credit to the most recent.
+    /// <see cref="Credited"/> is the same mechanism with a trace of length one.
+    /// </para>
+    /// <para>
+    /// <b>IT IS AIMED AT COVERAGE, WHICH IS THE DIAGNOSED BOTTLENECK.</b> One
+    /// credit event writes one cell under <see cref="Credited"/>, so the credit
+    /// covers a vanishing share of a state count that keeps growing — measured here
+    /// as silence on nearly every step. Under this, one event writes a cell for
+    /// every state still in the trace. <b>Step 9 established that the coverage
+    /// cannot be fixed by asking a WIDER question; this widens what is WRITTEN
+    /// instead.</b>
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE ONLY THING THAT CAN CREDIT A MOVE.</b> A move improves
+    /// nothing, so a one-step signal must rate it worthless — while the watering it
+    /// enabled is two steps away. A trace reaching back that far is what makes
+    /// means-ends expressible at all.
+    /// </para>
+    /// <para>
+    /// <b>SAFE FOR THE CRDT PROPERTY.</b> The trace is transient state deciding how
+    /// MUCH to add; every count still only rises, so convergence is untouched. That
+    /// is the same argument that makes <see cref="Graph.Kind.Helped"/> legal.
+    /// </para>
+    /// </remarks>
+    Traced,
+
+    /// <summary>
+    /// <see cref="Traced"/>'s trace WITHOUT its decay — <b>the control that says
+    /// whether recency did the work, or merely writing more did.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE ARM CHANGES TWO THINGS, so on its own it can attribute neither.</b> A
+    /// trace writes more cells AND weights them by how recent they are. This writes
+    /// the same cells over the same span at full weight, so the gap between this
+    /// and <see cref="Traced"/> is the recency and nothing else — and if the two
+    /// match, <i>most credit to the most recent</i> is decoration and the mechanism
+    /// is simply coverage.
+    /// </remarks>
+    Smeared,
 }
 
 /// <summary>What the garden measured. <b>Counts, not claims.</b></summary>
@@ -217,8 +266,15 @@ public sealed class TendingRun : IDisposable
         // breaking even looks like here, so it is what earns the full band.
         var sensing = new Sensing(_settings.Drain * _settings.Plants);
 
-        // WHAT IS OWED A SECOND CELL, held as the machine actually wrote it.
-        Occasion? crediting = null;
+        // THE TRACE, NEWEST LAST, HELD AS THE MACHINE ACTUALLY WROTE EACH ONE.
+        // Rebuilding an occasion from the codes gets a NEIGHBOURING occasion --
+        // onsets separated from what was already live, the window's carried codes
+        // folded in -- and measured elsewhere, that loses to not writing at all.
+        //
+        // ONE DEEP IS `Credited` EXACTLY, which is what makes the arms comparable:
+        // the only thing that moves is how far back the credit reaches.
+        var trace = new List<Occasion>();
+        var reach = Reaches(choosing, _settings);
 
         for (var step = 0; step < steps; step++)
         {
@@ -233,7 +289,7 @@ public sealed class TendingRun : IDisposable
                 : await ChosenAsync(
                     felt,
                     chains,
-                    choosing == Gardening.Credited ? Question.Worthwhile() : null,
+                    Credits(choosing) ? Question.Worthwhile() : null,
                     ct).ConfigureAwait(false);
 
             if (!walked.Balanced) unbalanced++;
@@ -268,20 +324,40 @@ public sealed class TendingRun : IDisposable
             await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
-            // AND THE PREVIOUS MOMENT COLLECTS A SECOND CELL IF IT EARNED ONE.
-            // Identical to `Homeostat`'s `Credited`, on purpose: the arm is the
-            // one already measured and only the world is new.
-            if (choosing == Gardening.Credited
-                && crediting is { } earned && sensing.Credit > 1.0)
+            // AND WHATEVER IS STILL IN THE TRACE COLLECTS A CELL IF THE BODY
+            // IMPROVED. The credit standing here belongs to the transition that
+            // just happened, and under a trace that transition is credited to
+            // everything that led to it rather than to the last step alone.
+            //
+            // MOST TO THE MOST RECENT, and the weight is `1 / (age + 1)` -- a
+            // reciprocal rather than a constant somebody picked, so there is no
+            // sixth knob and the newest step still earns exactly the 1.0 that
+            // `Credited` writes.
+            if (Credits(choosing) && sensing.Credit > 1.0)
             {
-                await _body
-                    .ReinforceAsync(earned with { As = Kind.Helped }, 1.0, ct)
-                    .ConfigureAwait(false);
+                for (var back = 0; back < trace.Count; back++)
+                {
+                    var age = trace.Count - 1 - back;
+
+                    var worth = choosing == Gardening.Smeared ? 1.0 : 1.0 / (age + 1);
+
+                    await _body
+                        .ReinforceAsync(trace[back] with { As = Kind.Helped }, worth, ct)
+                        .ConfigureAwait(false);
+                }
 
                 await _fabric.QuietAsync(ct).ConfigureAwait(false);
             }
 
-            crediting = _body.Joined;
+            // THE TRACE FADES BY DROPPING ITS OLDEST, which is what makes it a
+            // WINDOW rather than a memory. It is NOT cleared on consolidation:
+            // a trace that emptied itself every time credit arrived could never
+            // credit two overlapping sequences, and counts only rise anyway.
+            if (_body.Joined is { } wrote)
+            {
+                trace.Add(wrote);
+                if (trace.Count > reach) trace.RemoveAt(0);
+            }
 
             if (world.Step(chose)) held++;
         }
@@ -307,6 +383,24 @@ public sealed class TendingRun : IDisposable
     /// <summary>Whether this arm consults the graph at all.</summary>
     private static bool Walks(Gardening how) =>
         how is not (Gardening.Idle or Gardening.Blind or Gardening.Best);
+
+    /// <summary>Whether this arm writes the credit cell at all.</summary>
+    private static bool Credits(Gardening how) =>
+        how is Gardening.Credited or Gardening.Traced or Gardening.Smeared;
+
+    /// <summary>
+    /// How far back the credit reaches, in steps.
+    /// </summary>
+    /// <remarks>
+    /// <b>DERIVED FROM THE WORLD AND NEVER SET.</b> The longest thing worth
+    /// crediting here is a whole instrumental sequence: cross the garden, water
+    /// what is underfoot, and wait a step for it to land. That is
+    /// <c>Plants - 1</c> moves plus the pour plus the landing, so the arithmetic
+    /// names the number and nobody has to. <b>One is <see cref="Gardening.Credited"/>
+    /// exactly</b>, which is what makes the arms comparable.
+    /// </remarks>
+    private static int Reaches(Gardening how, TendingSettings world) =>
+        how is Gardening.Traced or Gardening.Smeared ? world.Plants + 1 : 1;
 
     /// <summary>One walk, and whether it was in any state to be read.</summary>
     private async Task<(int? Chosen, bool Settled, bool Balanced)> ChosenAsync(

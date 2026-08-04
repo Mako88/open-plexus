@@ -175,6 +175,12 @@ public sealed class RhythmRun : IDisposable
     /// <see cref="Learning.Surprise"/> existed</b>: every onset is broadcast,
     /// nothing is suppressed, and both internal signals read zero.
     /// </param>
+    /// <param name="carried">
+    /// What a carried pair counts for against a simultaneous one — <b>the window's
+    /// standing revival condition.</b> One is every measurement taken before it,
+    /// and this world is where the arm has most to lose: nothing here is ever
+    /// simultaneous, so EVERY edge it holds is a carried one.
+    /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
     public RhythmRun(
@@ -183,6 +189,7 @@ public sealed class RhythmRun : IDisposable
         int seed,
         int span = 1,
         bool surprising = false,
+        double carried = 1.0,
         int clusters = 8,
         int replicas = 256)
     {
@@ -196,7 +203,8 @@ public sealed class RhythmRun : IDisposable
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _ear = new InputMachine<Code>(
-            new MachineAddress("ear"), new Hearing(), new LocalRendezvous(_fabric.Local),
+            new MachineAddress("ear"), new Hearing(),
+            new LocalRendezvous(_fabric.Local, carried: carried),
             _fabric.Bus, _fabric.Ring, dials, span, _surprise);
 
         _fabric.Subscribe(_ear);

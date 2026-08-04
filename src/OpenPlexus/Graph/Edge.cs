@@ -137,6 +137,44 @@ public enum Kind
     /// </para>
     /// </remarks>
     Helped,
+
+    /// <summary>
+    /// They met, <b>and things got WORSE afterwards</b> — the negative half, and
+    /// the first thing in this design that can say <i>not that one</i>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PLAN SAID PUNISHMENT WAS UNAVAILABLE, AND IT WAS THE WRONG CRDT
+    /// RATHER THAN A LAW.</b> Counts must only increase, so a factor that could go
+    /// negative would break convergence — true of ONE counter. A <b>PN-Counter</b>
+    /// (Shapiro et al., 2011) is TWO G-Counters, and its value is read as the
+    /// difference: each side only ever rises, each merges by taking the larger,
+    /// and the derived quantity can still fall. Convergence is untouched.
+    /// <see cref="Helped"/> is P and this is N.
+    /// </para>
+    /// <para>
+    /// <b>IT COSTS A KIND AND NOT A FIELD, WHICH IS WHY IT IS AFFORDABLE.</b> The
+    /// row is keyed by <c>(partner, kind)</c>, so this is one more entry per
+    /// partner that earns one — the cost model <see cref="Tie"/> already names.
+    /// Widening the row a second time is what that note forbids, and this does not.
+    /// </para>
+    /// <para>
+    /// <b>THE SUBTRACTION HAPPENS WHERE THE SENDER FANS OUT</b>, reading its own
+    /// row and nobody else's, so C1 is untouched. <b>Clamped at nought</b>: a
+    /// negative weight would break <c>together &lt;= seen</c>, which is the bound
+    /// that makes every hop cost at least one and the walk terminate. A partner
+    /// whose net is nought or less is not walked at all — <b>and that is
+    /// inhibition</b>, an edge saying <i>this rules that out</i> rather than merely
+    /// failing to recommend it.
+    /// </para>
+    /// <para>
+    /// <b>Together the two cells are a contingency rather than a frequency.</b>
+    /// <c>(helped − hindered) / seen</c> is the shape of Rescorla and Wagner's
+    /// ΔP: what a count of co-occurrence structurally cannot say is whether the
+    /// thing helped MORE than it hurt, and two monotonic counters can.
+    /// </para>
+    /// </remarks>
+    Hindered,
 }
 
 /// <summary>

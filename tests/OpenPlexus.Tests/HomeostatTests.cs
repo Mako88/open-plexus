@@ -435,6 +435,16 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             {
                 using var run = new HomeostatRun(ranked, Dials, seed);
                 return (await run.RunAsync(Steps, Attending.Credited)).Viable;
+            }),
+            ("contested", async seed =>
+            {
+                using var run = new HomeostatRun(World(), Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Contested)).Viable;
+            }),
+            ("contested+ranked", async seed =>
+            {
+                using var run = new HomeostatRun(ranked, Dials, seed);
+                return (await run.RunAsync(Steps, Attending.Contested)).Viable;
             }));
 
         output.WriteLine(Sweep.Table(arms));
@@ -460,6 +470,29 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             + $"({control.Mean:F4}), so the gain is the extra cell or its "
             + "staleness rather than the contrast, and the claim is wrong");
 
+        // AND THE NEGATIVE HALF OVER-PRUNES, WHICH IS A RESULT AND NOT A BUG.
+        // `Contested` writes `Kind.Hindered` when things got worse and the walk
+        // reads the difference, so the CRDT objection to punishment is gone -- two
+        // monotonic counters, convergence untouched, one kind rather than a wider
+        // row. It still loses to the one-sided version.
+        //
+        // WHY: only one of four acts is right at any moment here, so the negative
+        // cell fills roughly three times faster than the positive one and drives
+        // nearly every pair to nought or below -- where a hard clamp refuses to
+        // walk it at all. Measured, the graph goes almost completely mute: silent
+        // 394 of 400 steps against the credited arm's 330, which is a coin toss
+        // wearing an arm's name.
+        //
+        // SO THE SHAPE IS WRONG RATHER THAN THE IDEA. A difference cuts; what this
+        // wants is something that DOWN-WEIGHTS -- a ratio, or shrinkage in the
+        // denominator the way `Doubt` already does it.
+        var contested = arms.First(one => one.Arm == "contested");
+
+        Assert.True(contested.Mean < contrasted.Mean,
+            $"subtracting the negative cell now beats the one-sided count "
+            + $"({contested.Mean:F4} against {contrasted.Mean:F4}), so the "
+            + "over-pruning note above has expired and needs re-running");
+
         Assert.True(contrasted.Separation(control) > 3.0,
             $"the conditioned and unconditioned arms are no longer separable: "
             + $"{contrasted.Mean:F4} against {control.Mean:F4}");
@@ -471,7 +504,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         // steps it did decide. Reported anyway, because the share matters for what
         // to do next: the credit cell is EMPTY until something has helped, so this
         // arm starts as pure coin toss and speaks only where it has learnt.
-        foreach (var arm in (Attending[])[Attending.Chain, Attending.Credited])
+        foreach (var arm in (Attending[])[Attending.Chain, Attending.Credited, Attending.Contested])
         {
             using var run = new HomeostatRun(World(), Dials, seed: 1);
             var result = await run.RunAsync(Steps, arm);

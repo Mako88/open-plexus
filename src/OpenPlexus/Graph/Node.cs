@@ -347,8 +347,40 @@ public sealed class Node
 
         var outgoing = ImmutableArray.CreateBuilder<Message>(row.Length);
 
+        // THE NEGATIVE HALF OF THE PN-COUNTER, READ ONCE FOR THE WHOLE FAN-OUT.
+        // Built from the snapshot rather than looked up per partner, so inhibition
+        // costs one pass over a row that has already been copied. See
+        // `Kind.Hindered`.
+        Dictionary<Code, double>? against = null;
+
         foreach (var (edge, tie) in row)
         {
+            if (edge.Kind != Kind.Hindered) continue;
+
+            against ??= [];
+            against[edge.Partner] = against.GetValueOrDefault(edge.Partner) + tie.Count;
+        }
+
+        foreach (var (edge, tie) in row)
+        {
+            // A CELL WITH A NEGATIVE COUNTERPART IS READ AS THE DIFFERENCE, and
+            // the counterpart itself is never walked -- it is evidence about the
+            // positive cell, not a route.
+            if (edge.Kind == Kind.Hindered) continue;
+
+            var carrying = tie.Count;
+
+            if (edge.Kind == Kind.Helped && against is not null
+                && against.TryGetValue(edge.Partner, out var hurt))
+            {
+                // CLAMPED, BECAUSE A NEGATIVE WEIGHT BREAKS THE BOUND that makes a
+                // hop cost at least one and the walk terminate. At or below
+                // nought the partner is not walked at all -- which is the whole of
+                // what inhibition buys: an edge that says `not that one`.
+                carrying -= hurt;
+                if (carrying <= 0.0) continue;
+            }
+
             // The cycle check: free, because the chain is already travelling.
             // ON THE PARTNER AND NOT ON THE ENTRY: a route that reached B by
             // accompaniment must not reach it again by sequence, or one node
@@ -368,7 +400,7 @@ public sealed class Node
                 Held = held,
                 Chain = message.Chain.Add(edge.Partner),
                 Carried = carried,
-                Together = tie.Count,
+                Together = carrying,
 
                 // WHAT IT ARRIVED ON, carried so the far end knows what it is
                 // holding without reading anything it does not own.

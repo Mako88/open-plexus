@@ -218,8 +218,16 @@ to an old one — run that one.**
   concentrated where uniform codes are not. **Spending codes where the data is
   WITHOUT fitting one is the unbuilt middle** — the front end makes a thing
   STANDARD, and identifying it is the graph's job.
-- **INHIBITION.** The graph is purely excitatory — nothing says *this rules that
-  out*. Buys competition between candidates, and a second route to absence.
+- **INHIBITION — EXPRESSIBLE NOW, AND THE FIRST SHAPE OVER-PRUNES.** "Counts only
+  increment, so punishment is unavailable" was **the wrong CRDT, not a law**: a
+  **PN-Counter** is two G-Counters read as a difference, each monotonic, and
+  convergence is untouched. `Kind.Hindered` is the negative half of `Helped`, so
+  it costs a KIND and not a wider row. **The subtraction happens in the sender's
+  own row**, and a pair at nought is not walked — an edge that says *not that
+  one*. **Measured: it loses to the one-sided count**, because where most acts are
+  wrong most of the time the negative cell fills faster and mutes nearly
+  everything. **A difference cuts where this wants a down-weight** — a ratio, or
+  shrinkage in the denominator as `Doubt` does.
 
 ### THE PATTERN UNDER ALL OF IT
 
@@ -329,6 +337,7 @@ condition is a superstition. The commit named in git holds the numbers.**
 | `Pricing.Balanced` — cosine's denominator | **Times out.** The geometric mean sits BETWEEN the marginals, so weights rise and the walk explodes rather than compromising. Built for a conflict that was a budget artifact | A bound not relying on the weight being one marginal's reciprocal — `StepCost.Best`'s condition |
 | `Pricing.Driven` — the node picking the marginal per hop | **Two local rules, both worse than the better hand-set arm in BOTH worlds**, because a per-hop choice puts routes on different scales and the ranking stops meaning anything. **The premise was wrong — on `Babi` the better arm is the DEARER one** | A local quantity that predicts which arm wins, on a world where they differ: `Senses` scores them identically |
 | `Accumulate.Fused` — rank fusion over the two orders | Half of agreement's lift and all its cost. **Two candidates whose orders invert tie identically under RRF for every damping constant**, so it ties exactly where it is needed | Many candidates, or a fusion separating by something other than position |
+| Inhibition as a DIFFERENCE — `helped − hindered`, clamped | **Mutes the graph.** Where most acts are wrong most of the time the negative cell fills faster than the positive one, nearly every pair reaches nought, and a hard clamp refuses to walk it — silent on 98% of steps against the one-sided arm's 82% | A combination that DOWN-WEIGHTS rather than cuts: a ratio, or shrinkage in the denominator as `Doubt` does. **The PN-Counter itself is sound and stays** |
 | `Ranked` as step 4's fix | **The lift was the bootstrap's coin toss** — silent three times as often, and quieter is worse on both front ends. A varying code thins every edge, so routes starve before reaching an action. **Kept: it lifts a real ceiling** | Anything making the walk prefer a partner other than the one it took last time |
 
 ---

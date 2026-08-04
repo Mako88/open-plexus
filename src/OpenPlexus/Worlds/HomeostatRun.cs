@@ -128,6 +128,29 @@ public enum Attending
     /// nothing else.
     /// </remarks>
     Marked,
+
+    /// <summary>
+    /// <see cref="Credited"/> with the NEGATIVE half as well — <b>a contingency
+    /// rather than a one-sided count, and the first inhibition in this design.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b><see cref="Credited"/> can only ever say what helped.</b> An act that was
+    /// taken and made things worse gets no second write, so it is merely
+    /// un-recommended — it still sits in the ordinary cell, and nothing anywhere
+    /// says <i>not that one</i>. That is one-sided evidence, and
+    /// <c>helped / seen</c> is a hit rate rather than a contingency.
+    /// </para>
+    /// <para>
+    /// <b>This writes <see cref="Graph.Kind.Hindered"/> when the most-at-risk
+    /// variable got worse</b>, and the walk reads the difference. Both counts still
+    /// only ever rise — the PN-Counter property — so nothing about convergence
+    /// changes. See <see cref="Graph.Kind.Hindered"/> for why the plan's "counts
+    /// only increment, so punishment is unavailable" was the wrong CRDT rather
+    /// than a law.
+    /// </para>
+    /// </remarks>
+    Contested,
 }
 
 /// <summary>
@@ -328,6 +351,7 @@ public sealed class HomeostatRun : IDisposable
                     felt,
                     chains,
                     choosing is Attending.Credited or Attending.Marked
+                            or Attending.Contested
                         ? Question.Worthwhile()
                         : null,
                     ct).ConfigureAwait(false);
@@ -417,7 +441,8 @@ public sealed class HomeostatRun : IDisposable
 
                 owed = (occasion, step);
             }
-            else if (choosing is Attending.Credited or Attending.Marked)
+            else if (choosing is Attending.Credited or Attending.Marked
+                     or Attending.Contested)
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
                 // ordinary cell is untouched and this arm changes one thing.
@@ -432,14 +457,27 @@ public sealed class HomeostatRun : IDisposable
                 // written, and that absence is the whole of the contrast.
                 // `Marked` writes it unconditionally, which is the control: same
                 // cell, same staleness, no contrast.
-                if (crediting is { } earned
-                    && (choosing == Attending.Marked || drives.Credit > 1.0))
+                //
+                // AND `Contested` ALSO WRITES THE NEGATIVE CELL when the
+                // most-at-risk variable got worse, so the walk reads a difference
+                // rather than a hit rate. Both counts still only rise; see
+                // Kind.Hindered.
+                if (crediting is { } earned)
                 {
-                    await _body
-                        .ReinforceAsync(earned with { As = Kind.Helped }, 1.0, ct)
-                        .ConfigureAwait(false);
+                    var helped = choosing == Attending.Marked || drives.Credit > 1.0;
+                    var hurt = choosing == Attending.Contested && drives.Credit < 1.0;
 
-                    await _fabric.QuietAsync(ct).ConfigureAwait(false);
+                    if (helped || hurt)
+                    {
+                        await _body
+                            .ReinforceAsync(
+                                earned with { As = hurt ? Kind.Hindered : Kind.Helped },
+                                1.0,
+                                ct)
+                            .ConfigureAwait(false);
+
+                        await _fabric.QuietAsync(ct).ConfigureAwait(false);
+                    }
                 }
 
                 crediting = _body.Joined;

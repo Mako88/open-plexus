@@ -162,6 +162,13 @@ public sealed class RhythmRun : IDisposable
     /// <inheritdoc cref="Learning.Surprise"/>
     private readonly Surprise? _surprise;
 
+    /// <summary>
+    /// What the prediction asks for. <b>Null is every measurement taken before
+    /// recency existed</b>, and is what a stationary stream wants — nothing here
+    /// goes stale unless the world turns.
+    /// </summary>
+    private readonly Question? _asking;
+
     /// <param name="world">The shape of the stream.</param>
     /// <param name="dials">The walk.</param>
     /// <param name="seed">The world's generator and the ring's, so a run reproduces.</param>
@@ -181,6 +188,11 @@ public sealed class RhythmRun : IDisposable
     /// and this world is where the arm has most to lose: nothing here is ever
     /// simultaneous, so EVERY edge it holds is a carried one.
     /// </param>
+    /// <param name="recent">
+    /// Whether the prediction PREFERS WHAT IS STILL TRUE — see
+    /// <see cref="Question.Recent"/>. <b>Off is every measurement taken before it
+    /// existed</b>, and it has nothing to say on a stream that never turns.
+    /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
     public RhythmRun(
@@ -190,6 +202,7 @@ public sealed class RhythmRun : IDisposable
         int span = 1,
         bool surprising = false,
         double carried = 1.0,
+        bool recent = false,
         int clusters = 8,
         int replicas = 256)
     {
@@ -200,6 +213,7 @@ public sealed class RhythmRun : IDisposable
         _dials = dials;
         _span = span;
         _surprise = surprising ? new Surprise() : null;
+        _asking = recent ? new Question { Recent = true } : null;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _ear = new InputMachine<Code>(
@@ -350,7 +364,7 @@ public sealed class RhythmRun : IDisposable
     private async Task<Guess> GuessAsync(Code heard, CancellationToken ct)
     {
         var thought = await _ear
-            .ThinkAsync([heard], _dials.Foresight ?? _dials.Stamina, null, ct)
+            .ThinkAsync([heard], _dials.Foresight ?? _dials.Stamina, _asking, ct)
             .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);

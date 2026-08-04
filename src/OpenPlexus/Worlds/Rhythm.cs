@@ -28,6 +28,30 @@ public sealed record RhythmSettings
     /// ceiling a number rather than an aspiration.
     /// </remarks>
     public double Violations { get; init; } = 0.1;
+
+    /// <summary>
+    /// After how many moments the cycle is REDRAWN. <b>Null never turns, which is
+    /// every measurement taken before this existed.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ONLY NON-STATIONARY THING IN ANY WORLD HERE, AND SUPERSESSION HAS
+    /// NOTHING TO SAY WITHOUT IT.</b> Nothing in this design decays, so a count that
+    /// stopped rising still stands at whatever it reached — which is only a defect
+    /// where the answer CHANGES. Every world here keeps its rules for the whole run,
+    /// so the machinery for preferring what is still true had no way to be right or
+    /// wrong.
+    /// </para>
+    /// <para>
+    /// <b>THE STATISTICS DO NOT MOVE AND THAT IS THE POINT.</b> A new cycle is drawn
+    /// the same way, over the same alphabet, at the same period and the same
+    /// violation rate — so the ceiling, the chance line and the marginal baseline
+    /// are all exactly where they were. <b>What changes is the answer and not the
+    /// difficulty</b>, which is what keeps this from being a world that drifts under
+    /// a dial being swept over it.
+    /// </para>
+    /// </remarks>
+    public int? Turns { get; init; }
 }
 
 /// <summary>
@@ -64,7 +88,7 @@ public sealed class Rhythm
     public const byte Beat = 60;
 
     private readonly RhythmSettings _settings;
-    private readonly int[] _cycle;
+    private int[] _cycle;
     private readonly Random _rng;
     private int _at;
 
@@ -82,13 +106,25 @@ public sealed class Rhythm
         _settings = settings;
         _rng = new Random(seed);
 
-        // THE CYCLE IS DRAWN ONCE AND NEVER REDRAWN. It is the stationary part:
-        // the statistics of this stream must not move, or a dial swept over a long
-        // run would be measuring the world changing under it.
-        _cycle = [.. Enumerable.Range(0, settings.Symbols)
-            .OrderBy(_ => _rng.Next())
-            .Take(settings.Period)];
+        // THE CYCLE IS DRAWN ONCE AND REDRAWN ONLY IF THE WORLD IS ASKED TO TURN.
+        // It is the stationary part: the statistics of this stream must not move,
+        // or a dial swept over a long run would be measuring the world changing
+        // under it. `Turns` moves the ANSWER and leaves the statistics alone.
+        _cycle = Drawn();
     }
+
+    /// <summary>A fresh cycle, drawn exactly as the first one was.</summary>
+    private int[] Drawn() =>
+        [.. Enumerable.Range(0, _settings.Symbols)
+            .OrderBy(_ => _rng.Next())
+            .Take(_settings.Period)];
+
+    /// <summary>
+    /// How many times the cycle has been redrawn. <b>Zero on a world that never
+    /// turns</b>, which is what makes an arm that meant to turn and did not visible
+    /// rather than silent.
+    /// </summary>
+    public int Turned { get; private set; }
 
     /// <summary>
     /// The best any model could do: everything but the violations.
@@ -117,6 +153,16 @@ public sealed class Rhythm
     /// <returns>The symbol shown, and whether it broke the rule.</returns>
     public (Code Shown, bool Violated) Next()
     {
+        // THE WORLD CHANGES ITS MIND, and it does so BEFORE the moment is drawn so
+        // that the turn is complete rather than half-applied. `Wanted` is what any
+        // observer would have to predict, and after this line it means the new
+        // cycle for everybody -- including whatever is scoring the prediction.
+        if (_settings.Turns is { } every && _at > 0 && _at % every == 0)
+        {
+            _cycle = Drawn();
+            Turned++;
+        }
+
         var wanted = Wanted(_at++);
 
         if (_rng.NextDouble() >= _settings.Violations) return (Of(wanted), false);

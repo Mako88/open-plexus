@@ -159,6 +159,13 @@ its ceiling it absorbs anything.)*
   mean interval between writes**, which is what keeps it off the dial list — an age
   in raw clock units wants a different threshold per world. Across machines it wants
   a Lamport clock.
+- **AND RECENCY IS A NOISE FILTER BEFORE IT IS A SUPERSESSION MECHANISM.** A one-off
+  wrong edge is written once and never refreshed while a true one keeps being
+  touched, so it pays even where nothing goes stale — **which is the only thing here
+  that removes an error a non-decaying count cannot.**
+- **`RhythmSettings.Turns` IS THE ONLY NON-STATIONARY THING IN ANY WORLD.** It
+  redraws the cycle and leaves ceiling, chance and marginal exactly where they were,
+  so **the answer moves and the difficulty does not.**
 - **MULTI-TOKEN OUTPUT.** *Simultaneous* actions are nearly free — **fork 11 built
   the addressing** — and what is left is a world that wants two.
 

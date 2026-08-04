@@ -152,8 +152,8 @@ the approach for each. **Ordered here by cost.**
 - **MULTI-TOKEN OUTPUT**, and concurrently. **Splits in two.** *Simultaneous*
   actions are nearly free — `BestOf` already returns many, and many thoughts are
   already in flight, which is what `BroadcastId` is for. What is missing is
-  several output machines, so **fork 11 is the enabler and not plumbing.**
-  *Ordered* sequences need edge kinds.
+  several output machines, and **fork 11 built that** — what is left is a world
+  that wants two. *Ordered* sequences need edge kinds.
 
 ### 6. EDGE KINDS — BUILT, and the row was widened once
 
@@ -354,11 +354,7 @@ process** — kept, because a real network loses reports.
 
 ## OPEN DEFECTS
 
-**Fork 11 — the output machine is not addressed.** `Message.ReturnTo` is the
-input machine; the harness hands the finished thought over by direct call. Needed
-before a second machine exists.
-
-**Nothing else outstanding.**
+**Nothing outstanding.**
 
 ---
 
@@ -373,7 +369,7 @@ listed because the code still points at them.
 | **3** | Cluster placement: uniform hash against prefix locality. **Open** |
 | **5** | A death writes off exactly the routes heading into the dead cluster. Closed |
 | **6** | Broadcast the origin, route the hops. Closed |
-| **11** | The output machine is not addressed. **Open**, above |
+| **11** | The output machine is addressed: a finished thought is PUBLISHED and the bus routes it by code, so N actuators act on one broadcast without holding it. **Closed — no world runs two yet** |
 | **12** | A fixed seed reproduces a run exactly, `Halted` included. Closed by 22's fix |
 | **18** | Score prediction **conditional on the next action**. `Consequence` says the system does not model its own effect. **UNBLOCKED by step 6** — the temporal edge it waited for is now its own cell, and `Question.Through` is how it would be asked |
 | **20** | Split budgets — deep to act, shallow to predict. Closed |

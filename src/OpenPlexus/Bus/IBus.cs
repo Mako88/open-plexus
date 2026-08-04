@@ -24,6 +24,23 @@ public interface IReceiveReports
 }
 
 /// <summary>
+/// Something that wants to hear about finished thoughts reaching codes it cares
+/// about. <b>An output machine, in practice — fork 11.</b>
+/// </summary>
+/// <remarks>
+/// <b>Separate from <see cref="IReceiveReports"/> on purpose.</b> A report is
+/// mid-flight bookkeeping addressed to the one machine doing the accounting; this
+/// is a finished result addressed to nobody in particular and routed by what it
+/// reached. A machine can be both, and an output machine is only this.
+/// </remarks>
+public interface IReceiveArrivals
+{
+    MachineAddress Address { get; }
+
+    Task DeliverAsync(Settled settled, CancellationToken ct = default);
+}
+
+/// <summary>
 /// How anything reaches anything else.
 /// </summary>
 /// <remarks>
@@ -42,6 +59,25 @@ public interface IBus
 
     /// <summary>A machine becomes reachable, so reports can come back to it.</summary>
     IDisposable Subscribe(IReceiveReports machine);
+
+    /// <summary>
+    /// A machine asks to hear about finished thoughts that reached any of these
+    /// codes — <b>fork 11, and the routing is by CODE rather than by address.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>This is what lets a second output machine exist.</b> The asker publishes
+    /// once and does not know who listens; every machine that registered an
+    /// interest gets the same finished thought, so N actuators act on one
+    /// broadcast without a coordinator and without any of them holding the
+    /// <see cref="Thought"/>.
+    /// </para>
+    /// <para>
+    /// <b>The graph is not involved.</b> A node never learns that one of its codes
+    /// means an action, which is what keeps an arbitrary actuator attachable.
+    /// </para>
+    /// </remarks>
+    IDisposable Listen(IReceiveArrivals machine, IReadOnlyCollection<Codes.Code> codes);
 
     /// <summary>
     /// Get this envelope to that cluster. The thinking path, outbound.
@@ -76,6 +112,17 @@ public interface IBus
 
     /// <summary>Get this report back to the machine that started the thought.</summary>
     ValueTask SendAsync(MachineAddress to, Report report, CancellationToken ct = default);
+
+    /// <summary>
+    /// Announce a finished thought to every machine listening for a code it
+    /// reached — <b>fork 11.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>Nothing happens if nobody is listening</b>, which is every measurement
+    /// taken before this existed: publishing is what the harness used to do by
+    /// direct call, and a run with no output machine simply has no listeners.
+    /// </remarks>
+    ValueTask PublishAsync(Settled settled, CancellationToken ct = default);
 
     /// <summary>
     /// A cluster left. Routes that were heading into it are never coming back.

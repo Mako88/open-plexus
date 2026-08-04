@@ -72,6 +72,12 @@ public sealed class ClusterTests : IDisposable
 
         public IDisposable Subscribe(IReceiveReports machine) => inner.Subscribe(machine);
 
+        public IDisposable Listen(IReceiveArrivals machine, IReadOnlyCollection<Code> codes) =>
+            inner.Listen(machine, codes);
+
+        public ValueTask PublishAsync(Settled settled, CancellationToken ct = default) =>
+            inner.PublishAsync(settled, ct);
+
         public ValueTask SendAsync(ClusterAddress to, Envelope envelope, CancellationToken ct = default)
         {
             lock (_envelopes)

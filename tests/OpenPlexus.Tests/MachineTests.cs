@@ -342,6 +342,15 @@ public sealed class MachineTests : IDisposable
 
         public IDisposable Subscribe(IReceiveReports machine) => new Handle();
 
+        // NOT SILENT. This double exists to reproduce one race on the report
+        // path; a test that reached fork 11's path through it would be measuring
+        // a fake rather than the bus.
+        public IDisposable Listen(IReceiveArrivals machine, IReadOnlyCollection<Code> codes) =>
+            throw new NotSupportedException("this double does not route arrivals");
+
+        public ValueTask PublishAsync(Settled settled, CancellationToken ct = default) =>
+            throw new NotSupportedException("this double does not route arrivals");
+
         /// <summary>Nothing ever leaves here; the race is the subject, not death.</summary>
         public event Action<ClusterAddress>? Deaths
         {

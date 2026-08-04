@@ -162,6 +162,45 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     }
 
     /// <summary>
+    /// Announces a finished thought to whatever is listening for what it reached
+    /// — <b>fork 11, and this is the call that replaces handing an output machine
+    /// the thought object.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>IT REFUSES AN UNSETTLED THOUGHT, WHICH IS THE WHOLE SAFETY OF THE
+    /// SHAPE.</b> A listener cannot judge for itself whether a walk has finished
+    /// without either duplicating the settle loop or reading it early, and
+    /// reading a question before its walk had finished is fork 22 — it made every
+    /// number taken under one load incomparable with any other. This machine
+    /// knows, so this machine is the one allowed to say.
+    /// </para>
+    /// <para>
+    /// <b>Nothing happens if nobody is listening</b>, which is every run that has
+    /// no output machine — so this can be called unconditionally by a harness
+    /// that does not know whether anything is attached.
+    /// </para>
+    /// </remarks>
+    public ValueTask PublishAsync(Thought thought, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(thought);
+
+        if (!thought.Settled)
+            throw new InvalidOperationException(
+                "an unsettled thought cannot be published: routes are still in "
+                + "flight, so what it reached is a function of when it was read "
+                + "rather than of what the graph holds — see fork 22");
+
+        return _bus.PublishAsync(
+            new Settled
+            {
+                Broadcast = thought.Id,
+                From = _address,
+                Arrivals = [.. thought.Best(int.MaxValue)],
+            }, ct);
+    }
+
+    /// <summary>
     /// Opens a thought, mints a broadcast id, and sends the origins to their
     /// owning clusters — <b>one envelope per cluster, not per code.</b>
     /// </summary>

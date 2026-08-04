@@ -26,6 +26,18 @@ public sealed class HybridBus : IBus
 {
     private readonly Dictionary<ClusterAddress, IReceiveEnvelopes> _clusters = [];
     private readonly Dictionary<MachineAddress, IReceiveReports> _machines = [];
+
+    /// <summary>
+    /// Who wants to hear about a finished thought reaching which code — <b>fork
+    /// 11, and the routing table that lets a second output machine exist.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>Keyed by CODE and not by address</b>, because the machine publishing a
+    /// finished thought must not have to know who is listening — that would be a
+    /// coordinator, and the whole design refuses one.
+    /// </remarks>
+    private readonly Dictionary<Codes.Code, List<IReceiveArrivals>> _listeners = [];
+
     private readonly Lock _gate = new();
 
     /// <summary>Deliveries dispatched and not yet finished.</summary>
@@ -33,7 +45,7 @@ public sealed class HybridBus : IBus
     private long _messages;
     private long _reports;
 
-    private TaskCompletionSource _quiet = Settled();
+    private TaskCompletionSource _quiet = Quiet();
 
     /// <inheritdoc/>
     public event Action<ClusterAddress>? Deaths;
@@ -93,6 +105,57 @@ public sealed class HybridBus : IBus
 
         lock (_gate) _machines.Add(machine.Address, machine);
         return new Leaving(this, machine.Address);
+    }
+
+    /// <inheritdoc/>
+    public IDisposable Listen(IReceiveArrivals machine, IReadOnlyCollection<Codes.Code> codes)
+    {
+        ArgumentNullException.ThrowIfNull(machine);
+        ArgumentNullException.ThrowIfNull(codes);
+        ArgumentOutOfRangeException.ThrowIfZero(codes.Count);
+
+        lock (_gate)
+            foreach (var code in codes)
+            {
+                if (!_listeners.TryGetValue(code, out var waiting))
+                    _listeners[code] = waiting = [];
+
+                waiting.Add(machine);
+            }
+
+        return new Listening(this, machine, codes);
+    }
+
+    /// <inheritdoc/>
+    public ValueTask PublishAsync(Settled settled, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(settled);
+
+        // WHO CARES ABOUT ANYTHING THIS REACHED, each counted once however many
+        // of its codes were reached -- a machine that owns four actions and had
+        // three of them arrive is still one machine being told once.
+        List<IReceiveArrivals> told;
+        lock (_gate)
+        {
+            if (_listeners.Count == 0) return ValueTask.CompletedTask;
+
+            var interested = new HashSet<IReceiveArrivals>();
+
+            foreach (var arrival in settled.Arrivals)
+                if (_listeners.TryGetValue(arrival.Endpoint, out var waiting))
+                    interested.UnionWith(waiting);
+
+            if (interested.Count == 0) return ValueTask.CompletedTask;
+
+            told = [.. interested];
+            _inFlight += told.Count;
+            _reports += told.Count;
+        }
+
+        foreach (var machine in told)
+            Dispatch(() => machine.DeliverAsync(settled, ct));
+
+        return ValueTask.CompletedTask;
     }
 
     /// <inheritdoc/>
@@ -213,14 +276,14 @@ public sealed class HybridBus : IBus
             if (--_inFlight == 0)
             {
                 settling = _quiet;
-                _quiet = Settled();
+                _quiet = Quiet();
             }
         }
 
         settling?.TrySetResult();
     }
 
-    private static TaskCompletionSource Settled() =>
+    private static TaskCompletionSource Quiet() =>
         new(TaskCreationOptions.RunContinuationsAsynchronously);
 
     private static InvalidOperationException Unreachable(string address) =>
@@ -242,6 +305,36 @@ public sealed class HybridBus : IBus
     private void Leave(MachineAddress address)
     {
         lock (_gate) _machines.Remove(address);
+    }
+
+    /// <summary>
+    /// A listener stops listening. <b>Silent, unlike a cluster leaving</b> —
+    /// nothing is in flight toward a listener that could be stranded by it, so
+    /// there is no death to report.
+    /// </summary>
+    private void Deafen(IReceiveArrivals machine, IReadOnlyCollection<Codes.Code> codes)
+    {
+        lock (_gate)
+            foreach (var code in codes)
+                if (_listeners.TryGetValue(code, out var waiting))
+                {
+                    waiting.Remove(machine);
+                    if (waiting.Count == 0) _listeners.Remove(code);
+                }
+    }
+
+    private sealed class Listening(
+        HybridBus bus, IReceiveArrivals machine, IReadOnlyCollection<Codes.Code> codes)
+        : IDisposable
+    {
+        private bool _gone;
+
+        public void Dispose()
+        {
+            if (_gone) return;
+            _gone = true;
+            bus.Deafen(machine, codes);
+        }
     }
 
     private sealed class Leaving : IDisposable

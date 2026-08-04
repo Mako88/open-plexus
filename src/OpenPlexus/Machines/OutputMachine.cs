@@ -22,12 +22,24 @@ namespace OpenPlexus.Machines;
 /// place is exactly the move this design refuses.
 /// </para>
 /// </remarks>
-public sealed class OutputMachine
+public sealed class OutputMachine : IReceiveArrivals
 {
     private readonly MachineAddress _address;
 
     /// <summary>The codes that mean an action. For snake, four.</summary>
     private readonly HashSet<Code> _codes;
+
+    /// <summary>
+    /// What has been published to this machine and not yet taken.
+    /// </summary>
+    /// <remarks>
+    /// <b>Keyed by broadcast, because several thoughts are in flight at once</b>
+    /// — that is what <see cref="BroadcastId"/> is for, and it is also what makes
+    /// concurrent output expressible rather than merely unwritten.
+    /// </remarks>
+    private readonly Dictionary<BroadcastId, Settled> _heard = [];
+
+    private readonly Lock _gate = new();
 
     public OutputMachine(MachineAddress address, IReadOnlyCollection<Code> codes)
     {
@@ -75,5 +87,73 @@ public sealed class OutputMachine
 
         var reached = thought.BestAmong(_codes, 1);
         return reached.Count == 0 ? null : reached[0];
+    }
+
+    // ---- fork 11: the same decision, reached without holding the thought ----
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>ALREADY SETTLED WHEN IT GETS HERE.</b> This machine does no settle
+    /// arithmetic of its own — it cannot, without either a second copy of the
+    /// loop or reading a walk that has not finished, which is fork 22's trap. The
+    /// machine that owned the thought knew, and said.
+    /// </remarks>
+    public Task DeliverAsync(Settled settled, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(settled);
+        ct.ThrowIfCancellationRequested();
+
+        lock (_gate) _heard[settled.Broadcast] = settled;
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// The chosen action for a thought that was published to this machine, and
+    /// <b>forgetting it in the same breath.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>The same rule as <see cref="Choose(Thought)"/> — arrival narrows, then
+    /// rank</b> — over arrivals that arrived by address instead of by direct
+    /// call. Nothing about the decision changes; what changes is that this
+    /// machine no longer has to be handed the asker's thought, which is what
+    /// makes a second one possible.
+    /// </para>
+    /// <para>
+    /// <b>Taken once.</b> A published thought is a finished result, not a
+    /// standing fact, and leaving it in would let one broadcast drive an action
+    /// twice and grow the map forever.
+    /// </para>
+    /// </remarks>
+    /// <returns>
+    /// The chosen code, or null when nothing was published for that broadcast or
+    /// nothing in it reached this machine. <b>Null is a real answer.</b>
+    /// </returns>
+    public Code? Take(BroadcastId broadcast)
+    {
+        Settled? settled;
+        lock (_gate)
+        {
+            if (!_heard.Remove(broadcast, out settled)) return null;
+        }
+
+        var best = settled.Arrivals
+            .Where(arrival => _codes.Contains(arrival.Endpoint))
+            .OrderByDescending(arrival => arrival.Score)
+            .ToList();
+
+        return best.Count == 0 ? null : best[0].Endpoint;
+    }
+
+    /// <summary>How many published thoughts are waiting to be taken.</summary>
+    /// <remarks>
+    /// <b>Read it.</b> A machine nobody takes from grows without bound, and a
+    /// count that only ever climbs is how that becomes visible instead of
+    /// becoming a leak.
+    /// </remarks>
+    public int Waiting
+    {
+        get { lock (_gate) return _heard.Count; }
     }
 }

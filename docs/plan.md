@@ -84,14 +84,18 @@ its ceiling it absorbs anything.)*
 
 - **Merging routes AT A NODE is the version `Narrowed` could not do.** Dear
   under C2.
-- **`Pricing` IS HAND-SET AND A CONTROLLER IS REFUTED. The missing thing is the
+- **`Pricing` IS HAND-SET AND ITS CONTROLLER REFUTED. The missing thing is the
   SIGNAL** — fork 23 again.
-- **SO AUDIT A SIGNAL BEFORE DRIVING FROM IT — `SignalTests` is that gate.** Three
-  controllers failed the same way (`Hunger` INVERTED, `Thwarted` too small), and
-  **one question catches all three**: does the number move in opposite directions
-  between a policy that works and one that does not?
-- **`Drives.Improving` PASSES**, monotone from ceiling to coin toss to idling —
-  and it was dead code an hour earlier.
+- **AUDIT A SIGNAL BEFORE DRIVING FROM IT — `SignalTests` is the gate.** Three
+  controllers failed alike (`Hunger` INVERTED, `Thwarted` too small), and **one
+  question catches all three**: does it move in opposite directions between a
+  policy that works and one that does not?
+- **`Drives.Improving` PASSES**, monotone from ceiling to coin toss to idling, and
+  was dead code an hour earlier. **`Surprise.Rate` passes and is partly CIRCULAR**
+  — it IS prediction quality, so it can drive a beam or a budget, not prediction.
+- **`Overreach` CANNOT BE AUDITED YET**: a ratio over predictions MADE, where the
+  bad arm makes none. It needs two arms that both predict, one by naming
+  everything — **the failure it exists to catch, which no arm produces.**
 
 ### 2. Predictive coding — only surprise propagates
 
@@ -109,8 +113,8 @@ its ceiling it absorbs anything.)*
   ask. **The threshold is description length**, not a constant.
 - **IT BUYS THE TRAFFIC AND NOTHING ELSE.** The graph gets BIGGER and accuracy
   costs a little; the sets are a tiny share of a row count the noise dominates.
-- **A MINTED NODE IS A HUB and `Pricing.Receiver` refuses hubs** — the likely
-  reading of that cost. **`Toll.Traffic` tests it.**
+- **A MINTED NODE IS A HUB and `Pricing.Receiver` refuses hubs**; `Toll.Traffic`
+  tests it.
 - Open: **only a WHOLE moment is a candidate**, so a set inside a larger one is
   invisible — pair-merging (Sequitur, BPE) composes. And **utility belongs per
   chunk** (Minton, SOAR).
@@ -126,7 +130,7 @@ its ceiling it absorbs anything.)*
   itself.**
 - **THE CREDIT NEEDED ITS OWN CELL, AND IT IS THE FIRST ARM TO BEAT THE BAR.**
   Three earlier arms wrote a HEAVIER number into the cell meaning *this was done
-  here*. `Kind.Helped` is a SECOND statistic; `Marked` is the control.
+  here*. `Kind.Helped` is a SECOND statistic, `Marked` the control.
 - **ITS VIRTUE IS RARITY — four arms since say so.** Every second cell written
   DENSELY collapses back to the behaviour policy, whatever it claims to mean.
 - **WHAT IS LEFT IS NOT INEXPERIENCE.** The arm is silent for most steps, and
@@ -140,15 +144,15 @@ its ceiling it absorbs anything.)*
 **Consequences of the design, not missing features. Ordered by cost.**
 
 - **ABSENCE — BUILT AS A SIGNAL, AND WIRED.** `Surprise` returns both halves of
-  the signed error, and `Overreach` tells a solved world from a predictor naming
-  everything. **A SIGNAL, not a node**: minting `not-X` would double an alphabet
-  to hold unboundedly many absent things.
+  the signed error. **A SIGNAL, not a node**: minting `not-X` would double an
+  alphabet to hold unboundedly many absent things. **`Overreach` is unaudited —
+  see step 1.**
 - **SUPERSESSION — THE CHANNEL IS BUILT, NOTHING READS IT.** `Tie.When` rides
-  beside the count as an LWW-Register and **the two must never merge**. **Do not
+  beside the count as an LWW-Register and **the two must never merge. Do not
   decay.** **Both consumers are left**: recency ranking, and eviction on "not
   touched since". Across machines it wants a Lamport clock.
-- **MULTI-TOKEN OUTPUT.** *Simultaneous* actions are nearly free and **fork 11
-  built the addressing**; what is left is a world that wants two.
+- **MULTI-TOKEN OUTPUT.** *Simultaneous* actions are nearly free — **fork 11 built
+  the addressing** — and what is left is a world that wants two.
 
 ### 6. EDGE KINDS — BUILT, and the row was widened once
 
@@ -238,28 +242,21 @@ its ceiling it absorbs anything.)*
 
 ### WHAT A WHOLE SESSION OF THIS SAYS — 2026-08-04
 
-
-- **EVERY MECHANISM BUILT WORKS AND EVERY ONE FAILS THE SAME WAY.** Paths,
-  backoff, curiosity, the trace, grains, the toll, count-based exploration: each
-  does what it was built to do, and **every one scores worse than random.**
-- **THE SILENCE WAS NEVER THE PROBLEM — IT WAS THE EXPLORATION.** Solvable three
-  ways, each removing the coin toss carrying the arm.
-- **EVERYTHING TRIED CHANGED THE READ SIDE.** Questions, paths, tolls and grains
-  change how credit is REACHED; the trace how WIDELY it is written. **Nothing
-  changed WHAT is written, or gave the body a reason to try what it has not.**
+- **EVERY MECHANISM BUILT WORKS AND EVERY ONE FAILS ALIKE.** Paths, backoff,
+  curiosity, the trace, grains, the toll, count-based exploration: each does what
+  it was built to do, and **every one scores worse than random.**
+- **THE SILENCE WAS NEVER THE PROBLEM — IT WAS THE EXPLORATION**, solvable three
+  ways, each removing the coin toss that was carrying the arm.
 - **EXPLORATION CANNOT COME FROM THE WALK — structural.** Every cell is keyed on
-  *(state, act)* and **written only for acts TAKEN**, so no walk can recommend an
+  *(state, act)* and **written only for acts TAKEN**, so no walk recommends an
   untried one. Measured: three questions over three statistics, one identical run.
-- **SO IT MUST BE EXTRA-GRAPH, AND THERE IS A C1-LEGAL PLACE.** A machine knows
-  what IT has done — its own history is its own data — so `Venturing` weighs the
-  walk's opinion against `√(ln t / n)` on the actuator's own tally. **Count-based
-  exploration owned by the machine, not the graph.**
-- **IT WORKS AND IS NOT ENOUGH: the body round-robins**, scoring BELOW the coin
-  toss. **Uniform exploration is as poor a policy as lock-in.** **Exploration
-  generates the data; a contingency makes it mean something; neither suffices
-  alone** — which is why every single-mechanism arm failed.
-- **`Kind.Helped` IS STILL A FREQUENCY**: a hit rate where ΔP is
-  `P(better | act) − P(better | not act)`, needing a base rate nothing records.
+- **SO IT IS EXTRA-GRAPH, AND C1 PERMITS IT.** A machine knows what IT has done, so
+  `Venturing` weighs the walk against `√(ln t / n)` on the actuator's own tally.
+  **It works and round-robins, scoring below the coin toss.**
+- **EVERYTHING TRIED CHANGED THE READ SIDE. Nothing changed WHAT is written.**
+  `Kind.Helped` is still a hit rate where ΔP is `P(better|act) − P(better|¬act)`,
+  needing a base rate nothing records. **Exploration generates the data, a
+  contingency makes it mean something, and neither suffices alone.**
 
 - **NONE OF IT IS A SUFFICIENCY ARGUMENT.** The narrower claim: without structure,
   an internal error signal, a growing alphabet, a reason to act, a reason to seek,
@@ -299,9 +296,8 @@ its ceiling it absorbs anything.)*
 ### The scaling wall — measure it before cutting anything
 
 - **STEP ZERO IS TO BUILD SOMETHING BIG ENOUGH TO BREAK.** The largest graph here
-  is a few thousand nodes, so any optimisation now aims at a wall nobody has hit.
-  Full `Clevr` and the ten-thousand-story `Babi` reach far larger; **measure, then
-  cut.** In order of leverage:
+  is a few thousand nodes, so any optimisation aims at a wall nobody has hit. Full
+  `Clevr` and the ten-thousand-story `Babi` reach far larger. In order of leverage:
 - **BOUND THE ROW.** Cap a node at K partners: *cost grows with data forever*
   becomes *cost is constant*, the trick approximate-nearest-neighbour indexes run
   at billions on. **Evict on "not touched since", never by eroding a count** — the

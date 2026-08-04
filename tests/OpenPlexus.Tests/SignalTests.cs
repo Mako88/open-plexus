@@ -76,6 +76,85 @@ public sealed class SignalTests(ITestOutputHelper output)
             + $"({(blind.Improving <= 0 ? "—" : $"{best.Improving / blind.Improving:F2}x")})");
     }
 
+    /// <summary>
+    /// The other two candidates, through the same gate — <b>and one of them
+    /// passes for a reason that disqualifies it from half of what it was wanted
+    /// for.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THREE INTERNAL SIGNALS WERE CLAIMED AND ONLY ONE HAD BEEN AUDITED</b>, so
+    /// these are the other two. `Rhythm` supplies the good and bad policies the
+    /// way `Homeostat` does: a carried window predicts what follows, and a span of
+    /// nought writes no temporal cell at all in a world where nothing is ever
+    /// simultaneous, so it can predict nothing.
+    /// </para>
+    /// <para>
+    /// <b><see cref="Learning.Surprise.Rate"/> PASSES AND IS PARTLY CIRCULAR.</b> It
+    /// is the share of onsets that were foreseen, so on a world scored by
+    /// prediction it separates the two policies almost by definition — which makes
+    /// it a fine signal for driving something ELSE (a beam, a budget, when to
+    /// explore) and a poor one for driving prediction itself, where it would be
+    /// measuring its own output. <b>Worth saying, because "it discriminates" is not
+    /// the same claim as "it can drive this".</b>
+    /// </para>
+    /// <para>
+    /// <b><see cref="Learning.Surprise.Overreach"/> CANNOT BE AUDITED BY THIS PAIR
+    /// AT ALL.</b> It is a ratio over predictions MADE, and the bad policy here
+    /// makes none — so its nought is an empty denominator and not a reading.
+    /// Auditing it needs two arms that BOTH predict, one well and one by naming
+    /// everything, which is the precise failure it was built to catch and which no
+    /// arm here produces. <b>The signal built to catch a failure has never been
+    /// shown to catch it.</b>
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task The_other_two_signals_through_the_same_gate()
+    {
+        var world = new RhythmSettings { Symbols = 12, Period = 5, Violations = 0.1 };
+
+        using var carried = new RhythmRun(world, Dials, seed: 1, span: 1, surprising: true);
+        using var flat = new RhythmRun(world, Dials, seed: 1, span: 0, surprising: true);
+
+        var predicts = await carried.RunAsync(300);
+        var cannot = await flat.RunAsync(300);
+
+        output.WriteLine($"{"span",5} {"acc",8} {"rate",8} {"overreach",10}");
+
+        foreach (var one in (RhythmResult[])[predicts, cannot])
+            output.WriteLine(
+                $"{one.Span,5} {one.Accuracy,8:F4} {one.Expecting,8:F4} "
+                + $"{one.Overreached,10:F4}");
+
+        // THE WORLD DOES ITS JOB FIRST, as always.
+        Assert.True(predicts.Accuracy > cannot.Accuracy,
+            $"a carried window no longer predicts better than none "
+            + $"({predicts.Accuracy:F4} against {cannot.Accuracy:F4}), so there is "
+            + "no good-and-bad pair here to audit a signal against");
+
+        // AND THE SIGNAL SEPARATES THEM.
+        Assert.True(predicts.Expecting > cannot.Expecting,
+            $"`Surprise.Rate` does not tell a predictor from one that cannot "
+            + $"predict ({predicts.Expecting:F4} against {cannot.Expecting:F4})");
+
+        // BUT `Overreach` CANNOT BE AUDITED BY THIS PAIR AT ALL, AND THAT IS THE
+        // FINDING RATHER THAN A GAP IN THE TEST. It is a ratio over PREDICTIONS
+        // MADE, and the bad policy here makes none — so its nought is an empty
+        // denominator rather than a reading, and the two numbers being far apart
+        // says nothing whatever about whether the signal discriminates.
+        //
+        // WHAT ITS AUDIT NEEDS IS A PAIR THAT BOTH PREDICT, one well and one by
+        // naming everything — which is the exact failure `Overreach` was built to
+        // catch, and no arm in this project produces it. SO THE SIGNAL BUILT TO
+        // CATCH A FAILURE HAS NEVER BEEN SHOWN TO CATCH IT.
+        Assert.Equal(0.0, cannot.Overreached);
+
+        Assert.True(cannot.Expecting == 0.0,
+            "the arm that was meant to predict nothing has started predicting, so "
+            + "the note above about an empty denominator no longer holds and "
+            + "`Overreach` may now be auditable by this pair after all");
+    }
+
     [Fact]
     public async Task And_a_signal_that_cannot_tell_them_apart_is_named_as_such()
     {

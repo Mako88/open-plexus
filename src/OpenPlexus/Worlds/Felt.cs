@@ -64,6 +64,9 @@ public sealed class Sensing
     /// <inheritdoc cref="Learning.Drives.Credit"/>
     public double Credit => _drives.Credit;
 
+    /// <inheritdoc cref="Learning.Drives.Improving"/>
+    public double Improving => _drives.Improving;
+
     /// <summary>
     /// How many DISTINCT states the body has been in, as the graph sees them.
     /// </summary>

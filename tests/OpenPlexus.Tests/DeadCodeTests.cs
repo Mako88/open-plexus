@@ -53,12 +53,9 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
             + "are the same idea arriving by another road, so this is either that "
             + "mechanism's home or it goes",
 
-        ["Drives.Improving"] =
-            "AN INTERNAL SIGNAL WITH NO CONSUMER, and the project has exactly "
-            + "three. Read by nothing, which makes the honest count of signals the "
-            + "SYSTEM can act on zero. Wire it or drop it",
-
-        ["Drives.Better"] = "the counts `Improving` is derived from",
+        ["Drives.Better"] = "the raw counts `Improving` is derived from, and it "
+            + "is now audited and exposed — these three are the next to go or to "
+            + "earn a reader",
         ["Drives.Worse"] = "the counts `Improving` is derived from",
         ["Drives.Same"] = "the counts `Improving` is derived from",
 
@@ -164,7 +161,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         // THE POINT OF THE FILE. The number is what it is today; having one is what
         // stops the next unwired mechanism arriving unnoticed beside these. IT
         // SHOULD ONLY EVER FALL — every entry is something to wire or delete.
-        Assert.Equal(17, Unused.Count);
+        Assert.Equal(16, Unused.Count);
     }
 
     /// <summary>

@@ -82,10 +82,16 @@ its ceiling it absorbs anything.)*
 
 ### 1. RANKING BELONGS TO THE QUESTION — moved onto `Question`, and the dial is gone
 
-- **Merging routes AT A NODE is the version `Narrowed` could not do.** Needs a
-  wait: dear under C2.
+- **Merging routes AT A NODE is the version `Narrowed` could not do.** Dear
+  under C2.
 - **`Pricing` IS HAND-SET AND A CONTROLLER IS REFUTED. The missing thing is the
   SIGNAL** — fork 23 again.
+- **SO AUDIT A SIGNAL BEFORE DRIVING FROM IT — `SignalTests` is that gate.** Three
+  controllers failed the same way (`Hunger` INVERTED, `Thwarted` too small), and
+  **one question catches all three**: does the number move in opposite directions
+  between a policy that works and one that does not?
+- **`Drives.Improving` PASSES**, monotone from ceiling to coin toss to idling —
+  and it was dead code an hour earlier.
 
 ### 2. Predictive coding — only surprise propagates
 
@@ -160,8 +166,8 @@ its ceiling it absorbs anything.)*
   (Izhikevich 2007).
 - **BUILT ON `Tending`**, reaching back cross-pour-wait, weighted by recency;
   `Smeared` is the control. **Counts only rise.**
-- **IT WRITES MORE AND CHANGES NOTHING**, the arm it was measured against being
-  silent for a reason nobody checked.
+- **IT WRITES MORE AND CHANGES NOTHING**, measured against an arm that was silent
+  for a reason nobody checked.
 - **EXPERIENCE MAKES COVERAGE WORSE**: quadrupling a run more than triples the
   states while the credit cells grow less than half again.
 
@@ -198,16 +204,15 @@ its ceiling it absorbs anything.)*
 
 ### 9. RELATIONAL PATHS — built, and the idea behind them refuted
 
-- **BUILT, REFUTED, DELETED.** A relation per hop — Path Ranking (Lao & Cohen).
+- **BUILT, REFUTED, DELETED** — a relation per hop, Path Ranking (Lao & Cohen).
 - **A FIXED PATH TRADES COVERAGE AGAINST PRECISION WITH NO MIDDLE.** Through
   `With` it reaches everything and the credit dissolves; through `After` the
   composition is empty. **Backoff settles it**: narrow first, widening on silence
   alone, overrides nothing and scores the same.
 - **NO GRAPH-INTERNAL LIKENESS CAN HELP** — every one is made of co-occurrence and
   carries the policy with it, which is why step 8 is the front end.
-- **`Downstream` (Dayan) was unaskable anyway**: it wants the REVERSE temporal
-  edge a carried code does not write — see `Kind.Before`. **That is the revival
-  condition; rebuilding a per-hop walk is a morning.**
+- **`Downstream` (Dayan) was unaskable anyway**, wanting the REVERSE temporal edge
+  a carried code does not write — see `Kind.Before`. **The revival condition.**
 
 ### 10. A REASON TO SEEK — **and it cannot be a walk**
 
@@ -242,19 +247,17 @@ its ceiling it absorbs anything.)*
 - **EVERYTHING TRIED CHANGED THE READ SIDE.** Questions, paths, tolls and grains
   change how credit is REACHED; the trace how WIDELY it is written. **Nothing
   changed WHAT is written, or gave the body a reason to try what it has not.**
-- **EXPLORATION CANNOT COME FROM THE WALK — this is structural.** Every cell is
-  keyed on *(state, act)* and **written only for acts TAKEN**, so no walk can
-  recommend an untried act. Measured: `Worthwhile`, `Agreed` and `Curious` produce
-  a BYTE-IDENTICAL run, only one action being reachable under any of them.
+- **EXPLORATION CANNOT COME FROM THE WALK — structural.** Every cell is keyed on
+  *(state, act)* and **written only for acts TAKEN**, so no walk can recommend an
+  untried one. Measured: three questions over three statistics, one identical run.
 - **SO IT MUST BE EXTRA-GRAPH, AND THERE IS A C1-LEGAL PLACE.** A machine knows
   what IT has done — its own history is its own data — so `Venturing` weighs the
   walk's opinion against `√(ln t / n)` on the actuator's own tally. **Count-based
   exploration owned by the machine, not the graph.**
-- **IT WORKS AND IS NOT ENOUGH: the body round-robins**, every act tried equally,
-  scoring BELOW the coin toss. **Uniform exploration is as poor a policy as
-  lock-in** — the bonus falls as designed and the value it hands over to never
-  grows. **Exploration generates the data; a contingency makes it mean something;
-  neither is sufficient alone**, which is why every single-mechanism arm failed.
+- **IT WORKS AND IS NOT ENOUGH: the body round-robins**, scoring BELOW the coin
+  toss. **Uniform exploration is as poor a policy as lock-in.** **Exploration
+  generates the data; a contingency makes it mean something; neither suffices
+  alone** — which is why every single-mechanism arm failed.
 - **`Kind.Helped` IS STILL A FREQUENCY**: a hit rate where ΔP is
   `P(better | act) − P(better | not act)`, needing a base rate nothing records.
 
@@ -397,8 +400,7 @@ process** — kept, because a real network loses reports.
   THERE IS.** Silent on nearly every step means acting at random on nearly every
   step, so **every mechanism that CURES the silence removes the exploration** — the
   body locks onto the first act that earned credit, and the change reads as harmful
-  when it merely exposed a policy the coin toss was hiding. Measured: silence 399
-  of 400 down to 10, then ONE action on 393 steps.
+  when it merely exposed a policy the coin toss was hiding.
 - **AND A SILENCE HAS TWO CAUSES THAT LOOK IDENTICAL AND WANT OPPOSITE FIXES**: an
   empty cell, or a walk that cannot AFFORD to reach one. **Spend more and see
   whether the voice returns** — on `Tending` it does, from silent on nearly every

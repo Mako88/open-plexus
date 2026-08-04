@@ -193,6 +193,29 @@ public sealed record HomeostatResult : Measurement
     /// </remarks>
     public required int Silent { get; init; }
 
+    /// <summary>
+    /// The share of transitions that improved the most-at-risk variable —
+    /// <b>a signal the MACHINE computes about itself, and the first one exposed
+    /// where it can be audited.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>IT WAS COMPUTED EVERY STEP AND READ BY NOTHING</b>, which the dead-code
+    /// budget caught — and it had been described as one of the three internal
+    /// signals this project has, making the honest count of signals the SYSTEM can
+    /// act on zero.
+    /// </para>
+    /// <para>
+    /// <b>EXPOSED RATHER THAN WIRED TO A CONTROLLER, AND THAT ORDER IS THE WHOLE
+    /// LESSON OF FORK 23.</b> Three controllers have been built here and all three
+    /// failed for want of a signal that DISCRIMINATES: `Hunger` was inverted,
+    /// `Thwarted` had the right shape and swung too little. <b>So a candidate
+    /// signal gets audited before anything is driven by it</b> — see
+    /// <see cref="Worlds.Homeostat"/>'s tests.
+    /// </para>
+    /// </remarks>
+    public required double Improving { get; init; }
+
     /// <summary>The share of the run spent viable. <b>The score.</b></summary>
     /// <remarks>
     /// <b>Time viable, not time until failure.</b> Homeostasis has no episode
@@ -536,6 +559,7 @@ public sealed class HomeostatRun : IDisposable
             Steps = steps,
             Held = held,
             Silent = silent,
+            Improving = sensing.Improving,
             Attended = attended,
             States = sensing.States,
             Idling = world.Idling,

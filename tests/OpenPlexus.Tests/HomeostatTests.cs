@@ -786,6 +786,56 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task The_arms_that_never_reach_the_bar_at_any_budget()
+    {
+        // THE EVIDENCE THE COLLAPSE NEEDS. John's rule is that an arm exists only
+        // while alternatives are actively being tested, and a loser is deleted with
+        // a revival row rather than kept switchable. What that rule needs first is a
+        // refutation taken at each arm's OWN best budget -- because one taken at a
+        // single setting is what cost this project the inhibition result.
+        //
+        // `Driven` weights the occasion by the credit and writes it a step late.
+        // `Delayed` is that delay without the credit. Both peak FAR below drawing at
+        // random, at the lowest budget swept, and fall from there.
+        var peaks = new Dictionary<string, (double Stamina, double Mean)>();
+
+        foreach (var stamina in (double[])[2.0, 3.0, 4.0, 6.0, 8.0, 12.0])
+        {
+            output.WriteLine($"--- stamina {stamina} ---");
+
+            var arms = await ArmsAsync(
+                Fixture.Dials(stamina), 24,
+                Attending.Blind, Attending.Driven, Attending.Delayed,
+                Attending.Contingent);
+
+            foreach (var arm in arms)
+                if (!peaks.TryGetValue(arm.Arm, out var best) || arm.Mean > best.Mean)
+                    peaks[arm.Arm] = (stamina, arm.Mean);
+        }
+
+        foreach (var (name, best) in peaks)
+            output.WriteLine($"PEAK {name,-11} {best.Mean:F4} at stamina {best.Stamina:F1}");
+
+        var bar = peaks["blind"].Mean;
+
+        foreach (var beaten in (string[])["driven", "delayed"])
+            Assert.True(peaks[beaten].Mean < bar - 0.1,
+                $"`{beaten}` reaches {peaks[beaten].Mean:F4} at its own best budget "
+                + $"against a bar of {bar:F4}, so it is no longer refuted and the "
+                + "row recording it should say that instead");
+
+        // AND THE CONTINGENCY IS NOT REFUTED, IT IS DOMINATED. It clears the bar
+        // comfortably at its own peak and sits inside the noise of the one-sided
+        // count it was meant to improve on, while inhibition clears both. A tie is
+        // not a refutation, so its row is about what would separate it rather than
+        // about what killed it.
+        Assert.True(peaks["contingent"].Mean > bar,
+            $"the contingency stopped beating the bar ({peaks["contingent"].Mean:F4} "
+            + $"against {bar:F4}), which would make it refuted rather than merely "
+            + "dominated and changes what its row should say");
+    }
+
+    [Fact]
     public async Task The_credit_cell_read_against_the_base_rate()
     {
         // ΔP AGAINST THE HIT RATE, AND `Credited` IS THE CONTROL. The same cells

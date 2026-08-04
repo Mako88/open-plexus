@@ -63,8 +63,6 @@
 
 ### Owed re-runs
 
-- **Every arm in step 4, swept peak-to-peak.** One sweep at one budget compared one
-  arm at its best against another on its way up, and that cost a refutation.
 - **The eligibility trace, re-run against a silence nobody had checked.** It wrote
   more and changed nothing, measured against an arm that was quiet for budget
   reasons.
@@ -87,8 +85,9 @@
 
 ### Housekeeping
 
-- **Collapse the arms.** `Attending` holds refuted arms and decided ones; only
-  controls and a winner should survive. Same sweep for every other arm enum.
+- **Collapse the arms — the evidence is in.** `Driven`, `Delayed`, `Topped`,
+  `Marked` and `Contingent` are all beaten at their own peaks; `Contested` won.
+  Deleting them takes `Node.Contingency` and the split marginal with it.
 - **The knob pass, LAST.** A dial swept before the structural work measures a
   system about to change under it.
 
@@ -134,6 +133,8 @@ condition is a superstition.**
 | `Pricing.Driven` | Two local rules, both worse in both worlds; a per-hop choice puts routes on different scales | A local quantity predicting which arm wins, on a world where they differ |
 | `Accumulate.Fused` | Half of agreement's lift and all its cost; inverted orders tie identically under RRF | Many candidates, or a fusion separating by something other than position |
 | The carried negative discount (`Message.Against`) | Inert — an arm ignoring it reproduced the arm reading it. **Deleted** | A world where an act's harm is confined to a few states |
+| `Driven` / `Delayed` — credit as a heavier write, one step late | Peak far below the blind bar at their OWN best budget. Superseded by a second cell | Anything making a heavier write into the same cell mean something different |
+| `Attending.Contingent` — ΔP over the credit cell | Not refuted, DOMINATED: inside the noise of the one-sided count, and inhibition clears both | A world where some states are recoverable and others are not, so the base rate varies BY STATE |
 | `Ranked` as step 4's fix | The lift was the bootstrap's coin toss, and a varying code thins every edge | Anything making the walk prefer a partner other than the one it took last |
 | Widening the walk — `Kindred`, `Foreseeing`, `Backing` | All three: louder and below the bar, or silent everywhere | **A likeness the GRAPH DID NOT COMPUTE** — step 8 and nothing short of it |
 | A trained quantiser — k-means | Two machines fitted on different samples code the same input differently | Never fitted |

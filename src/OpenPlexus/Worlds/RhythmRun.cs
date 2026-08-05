@@ -182,7 +182,6 @@ public sealed class RhythmRun : IDisposable
     private readonly WalkSettings _dials;
 
     /// <inheritdoc cref="Learning.Surprise"/>
-    private readonly Surprise? _surprise;
 
     /// <summary>How many steps ahead the rollout reaches. <b>One is no rollout.</b></summary>
     private readonly int _depth;
@@ -211,7 +210,6 @@ public sealed class RhythmRun : IDisposable
 
         _world = new Rhythm(world, seed);
         _dials = dials;
-        _surprise = new Surprise();
         _depth = dials.Depth < 1 ? 1 : dials.Depth;
         _asking = new Question { Recent = true };
         _fabric = new Fabric(dials, seed, clusters, replicas);
@@ -338,7 +336,12 @@ public sealed class RhythmRun : IDisposable
             // score is settled against, so the traffic saved and the prediction
             // measured are the same prediction -- and a run cannot quietly
             // silence itself on an expectation nobody scored.
-            _surprise?.Expect(bet is { } one ? [one] : []);
+            // NOTHING IS EXPECTED FROM HERE ANY MORE. This fed a `Surprise` that
+            // `Residual` was never called on, so `_onsets` never moved and `Rate`
+            // was 0.0 BY CONSTRUCTION in every arm -- a scoreboard that could not
+            // read anything but nought, which `SignalTests` reported as two
+            // predictors being indistinguishable. The machine holds the one
+            // instance that is fed both halves; see `InputMachine`.
         }
 
         _fabric.Failures();
@@ -358,9 +361,9 @@ public sealed class RhythmRun : IDisposable
             Caught = caught,
             Late = late,
             Skipped = skipped,
-            Expecting = _surprise?.Rate ?? 0.0,
-            Unspoken = _surprise?.Silent ?? 0,
-            Overreached = _surprise?.Overreach ?? 0.0,
+            Expecting = _ear.Expects.Rate,
+            Unspoken = _ear.Expects.Silent,
+            Overreached = _ear.Expects.Overreach,
             Ceiling = _world.Ceiling,
             Marginal = _world.Marginal,
             Chance = _world.Chance,

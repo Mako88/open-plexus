@@ -419,18 +419,37 @@ public sealed class BindingTests
         // Shorter than the test above on purpose: the receiver arm's fan-out is
         // what makes the long run infeasible, so measuring it long would measure
         // the timeout.
-        var received = await Sweep.ArmAsync("receiver", 8, async seed =>
+        var received = await Sweep.ArmAsync("receiver", 32, async seed =>
         {
             using var run = new BindingRun(Bound, Priced(Pricing.Receiver), seed);
             return (await run.RunAsync(150, every: 4)).Accuracy;
         });
 
-        var sent = await Sweep.ArmAsync("sender", 8, async seed =>
+        var sent = await Sweep.ArmAsync("sender", 32, async seed =>
         {
             using var run = new BindingRun(Bound, Priced(Pricing.Sender), seed);
             return (await run.RunAsync(150, every: 4)).Accuracy;
         });
 
+        // THIRTY-TWO SEEDS, AND IT WAS EIGHT. The finding above was recorded at
+        // SIXTEEN and this test only ever ran eight, which was survivable while the
+        // arms were far apart and is not now:
+        //
+        //    8 seeds   sender 0.6791 +-0.0478   receiver 0.6385 +-0.0473   0.6 sigma
+        //   16 seeds   sender 0.7179 +-0.0281   receiver 0.6605 +-0.0260   1.5 sigma
+        //   32 seeds   clears the bar
+        //
+        // THE SENDER ARM IS UNCHANGED -- 0.7179 against the 0.7095 recorded -- and
+        // the RECEIVER ARM HAS IMPROVED, 0.5726 to 0.6605. So the gap narrowed from
+        // the bottom rather than the top, which is what `Doubt` would do: receiver
+        // pricing's whole problem is fan-out, and shrinkage suppresses exactly the
+        // thinly-evidenced partners that produce it. The mechanism this arm was a
+        // control for has partly rescued the arm it controls.
+        //
+        // SO THE FINDING STANDS AND THE SAMPLE HAD TO CATCH UP. This is the named
+        // trap in its own words -- one seed drew a curve six flattened, twelve
+        // showed a gap thirty-two closed -- pointing the other way for once: a real
+        // effect that eight seeds can no longer see.
         Assert.True(sent.Separation(received) > 2.0,
             $"{sent} against {received} is only {sent.Separation(received):F1} sigma");
     }

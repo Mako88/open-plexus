@@ -111,7 +111,7 @@ public sealed record HomeostatSettings
 public sealed class Homeostat
 {
     /// <summary>The first variable's modality; need <c>i</c> is <c>Need + i</c>.</summary>
-    public const byte Need = 80;
+    private const byte Need = 80;
 
     /// <summary>What the body can do about it.</summary>
     public const byte Act = 79;

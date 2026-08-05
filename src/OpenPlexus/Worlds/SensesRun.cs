@@ -130,11 +130,7 @@ public sealed class SensesRun : IDisposable
         _budget = new Budget(dials.Stamina, Budgeting.Standard);
         _fabric = new Fabric(dials, seed, clusters, replicas, late);
 
-        _senses = new InputMachine<Coded>(
-            new MachineAddress("senses"), new Passthrough(), new LocalRendezvous(_fabric.Local),
-            _fabric.Bus, _fabric.Ring, dials);
-
-        _fabric.Subscribe(_senses);
+        _senses = _fabric.Watching("senses", dials);
     }
 
     /// <inheritdoc cref="Bus.HybridBus.Delayed"/>

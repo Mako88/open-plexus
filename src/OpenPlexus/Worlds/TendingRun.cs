@@ -249,11 +249,7 @@ public sealed class TendingRun : IDisposable
         _dials = dials;
         Seed = seed;
 
-        _body = new InputMachine<Coded>(
-            new MachineAddress("gardener"), new Passthrough(), new LocalRendezvous(_fabric.Local),
-            _fabric.Bus, _fabric.Ring, dials);
-
-        _fabric.Subscribe(_body);
+        _body = _fabric.Watching("gardener", dials);
     }
 
     /// <summary>The seed this run was built with.</summary>

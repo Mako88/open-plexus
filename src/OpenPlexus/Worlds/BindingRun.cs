@@ -152,11 +152,7 @@ public sealed class BindingRun : IDisposable
         _dials = dials;
         _fabric = new Fabric(dials, seed, clusters, replicas, late);
 
-        _eyes = new InputMachine<Coded>(
-            new MachineAddress("scene"), new Passthrough(), new LocalRendezvous(_fabric.Local),
-            _fabric.Bus, _fabric.Ring, dials);
-
-        _fabric.Subscribe(_eyes);
+        _eyes = _fabric.Watching("scene", dials);
     }
 
     /// <inheritdoc cref="Bus.HybridBus.Delayed"/>

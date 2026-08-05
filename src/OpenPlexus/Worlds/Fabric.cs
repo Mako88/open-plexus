@@ -1,5 +1,8 @@
 using OpenPlexus.Bus;
+using OpenPlexus.Codes;
 using OpenPlexus.Graph;
+using OpenPlexus.Learning;
+using OpenPlexus.Machines;
 using OpenPlexus.Thinking;
 
 namespace OpenPlexus.Worlds;
@@ -163,6 +166,31 @@ public sealed class Fabric : IDisposable
     {
         ArgumentNullException.ThrowIfNull(machine);
         _handles.Add(Bus.Subscribe(machine));
+    }
+
+    /// <summary>
+    /// A sense that takes codes as they come, wired up and listening.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE SAME SIX STATEMENTS WERE IN EVERY WORLD, AND MAKING THE FRONT END
+    /// SHARED IS WHAT MADE THEM IDENTICAL.</b> While each run built its own nested
+    /// quantiser the construction differed by that one word, which was enough to
+    /// keep <c>DuplicationTests</c> quiet; with <see cref="Codes.Passthrough"/>
+    /// named once, <c>ClevrRun</c> and <c>MotifRun</c> became the same six lines
+    /// and the budget said so immediately. <b>The duplication was always there —
+    /// what changed is that it became detectable.</b>
+    /// </remarks>
+    /// <param name="name">What to call this machine on the bus.</param>
+    /// <param name="dials">The walk this sense thinks with.</param>
+    public InputMachine<Coded> Watching(string name, WalkSettings dials)
+    {
+        var machine = new InputMachine<Coded>(
+            new MachineAddress(name), new Passthrough(), new LocalRendezvous(Local),
+            Bus, Ring, dials);
+
+        Subscribe(machine);
+
+        return machine;
     }
 
     /// <summary>Waits for the dispatch queue to drain.</summary>

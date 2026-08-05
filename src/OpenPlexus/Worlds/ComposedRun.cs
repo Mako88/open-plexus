@@ -188,11 +188,7 @@ public sealed class ComposedRun : IDisposable
         _dials = dials;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
-        _eyes = new InputMachine<Coded>(
-            new MachineAddress("scene"), new Passthrough(), new LocalRendezvous(_fabric.Local),
-            _fabric.Bus, _fabric.Ring, dials);
-
-        _fabric.Subscribe(_eyes);
+        _eyes = _fabric.Watching("scene", dials);
     }
 
     /// <summary>One moment of a scene, carrying the scene's segmentation with it.</summary>

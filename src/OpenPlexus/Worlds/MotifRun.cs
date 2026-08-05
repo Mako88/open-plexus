@@ -146,11 +146,7 @@ public sealed class MotifRun : IDisposable
         _dials = dials;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
-        _eyes = new InputMachine<Coded>(
-            new MachineAddress("eyes"), new Passthrough(), new LocalRendezvous(_fabric.Local),
-            _fabric.Bus, _fabric.Ring, dials);
-
-        _fabric.Subscribe(_eyes);
+        _eyes = _fabric.Watching("eyes", dials);
     }
 
     /// <inheritdoc cref="Learning.Chunk"/>

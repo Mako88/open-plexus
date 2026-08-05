@@ -123,7 +123,7 @@ public sealed class Babi
     /// places from objects would be a parser the system did not earn, and it would
     /// hand the narrowing step the answer's type for free.
     /// </remarks>
-    public const byte Word = 40;
+    private const byte Word = 40;
 
     /// <summary>The fleeting code naming one story. See <see cref="BabiSettings.Stories"/>.</summary>
     public const byte Story = 41;

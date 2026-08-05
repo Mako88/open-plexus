@@ -107,7 +107,7 @@ public sealed record TendingSettings
 public sealed class Tending
 {
     /// <summary>Plant <c>i</c>'s moisture band rides on modality <c>Damp + i</c>.</summary>
-    public const byte Damp = 140;
+    private const byte Damp = 140;
 
     /// <summary>Where the body is standing.</summary>
     public const byte Where = 139;

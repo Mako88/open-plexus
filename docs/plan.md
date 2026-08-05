@@ -57,9 +57,9 @@
 - **One whose dynamics BRANCH** — a cycle is an attractor, so the rollout's
   compounding error is untested.
 - **One an arm can bootstrap in** — every credit arm on `Tending` is a coin toss.
-- **One big enough to break** — the largest graph here is a few thousand nodes, so
-  every optimisation aims at a wall nobody has hit. Full `Clevr`, ten-thousand-story
-  `Babi`.
+- **One with a HEAVY TAIL.** A wider alphabet grows the graph and leaves the widest
+  row alone; rows grow without bound only where one code accompanies nearly
+  everything. Zipf — text's shape, and no world's here.
 
 ### Owed re-runs
 

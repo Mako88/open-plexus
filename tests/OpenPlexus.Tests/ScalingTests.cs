@@ -93,4 +93,70 @@ public sealed class ScalingTests
 
         return (messages / (double)Repeats / scenes, widest);
     }
+
+    /// <summary>One alphabet size, run long enough to fill the graph it implies.</summary>
+    /// <remarks>
+    /// <b>MOMENTS SCALE WITH THE ALPHABET OR THE GRAPH GETS SPARSER RATHER THAN
+    /// BIGGER.</b> At a fixed run length a wider alphabet means each concept is seen
+    /// fewer times, so the widest row FALLS and the world becomes unlearnable —
+    /// measured, 400 moments took the widest row from 6 to 3 and accuracy to nought
+    /// as concepts went 8 to 512. That is a smaller graph wearing a bigger alphabet.
+    /// </remarks>
+    private static async Task<(int Nodes, int Widest, long Messages)> WiderAsync(
+        int concepts, int? cap)
+    {
+        using var run = new SensesRun(
+            Fixture.Senses(concepts: concepts),
+            Fixture.Dials(stamina: 4.0) with { Row = cap },
+            seed: 1);
+
+        var result = await run.RunAsync(concepts * 40, every: 10);
+
+        return (result.Nodes, result.Widest, result.Messages);
+    }
+
+    [Fact]
+    public async Task A_wider_alphabet_grows_the_graph_and_not_the_row()
+    {
+        // WHERE THE WALL IS NOT, WHICH IS WORTH KNOWING BEFORE BUILDING A WORLD TO
+        // FIND IT. Sixty-four times the alphabet gives sixty-four times the nodes
+        // and SIXTY-FOUR TIMES THE EDGES -- and leaves the widest row exactly where
+        // it started.
+        //
+        // COST PER THOUGHT IS SET BY THE WIDEST ROW, so a graph that grows this way
+        // does not get dearer to think in. `Senses` gives every concept a fixed
+        // handful of partners, and spreading concepts thinner gives each FEWER
+        // co-occurrences rather than more.
+        var narrow = await WiderAsync(8, cap: null);
+        var wide = await WiderAsync(512, cap: null);
+
+        Assert.True(wide.Nodes > narrow.Nodes * 32,
+            $"the alphabet stopped growing the graph: {narrow.Nodes} to {wide.Nodes}");
+
+        Assert.Equal(narrow.Widest, wide.Widest);
+    }
+
+    [Fact]
+    public async Task So_the_row_cap_never_bites_and_that_is_the_requirement_it_states()
+    {
+        // THE CAP IS INERT HERE, IDENTICALLY, at every alphabet size -- which says
+        // the world rather than the cap. A row grows without bound only where ONE
+        // node meets MANY DIFFERENT partners, and nothing in `Senses` does: each
+        // concept meets a fixed handful.
+        //
+        // SO "A WORLD BIG ENOUGH TO BREAK" IS NOT "MORE NODES". It is a HEAVY TAIL
+        // -- a co-occurrence distribution where a few codes accompany nearly
+        // everything. Text is exactly that shape and none of these worlds is, which
+        // is why the scaling wall has never been reached here and why more concepts
+        // will not reach it.
+        var free = await WiderAsync(512, cap: null);
+        var capped = await WiderAsync(512, cap: 32);
+
+        Assert.Equal(free.Widest, capped.Widest);
+        Assert.Equal(free.Messages, capped.Messages);
+
+        Assert.True(free.Widest < 32,
+            $"the widest row reached {free.Widest} against a cap of 32, so the cap "
+            + "is now biting and this world has grown a tail after all");
+    }
 }

@@ -72,12 +72,17 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
     {
         using var run = new SensesRun(Fixture.Senses(concepts: 12), Dials(), seed: 3);
 
-        // READS 0.3305 ABOVE A CHANCE OF 0.0833, DOWN FROM 0.7787 ON 2026-08-05.
-        // THE DROP IS THE SPAN AND IT IS A DECISION, NOT A REGRESSION: measured one
-        // mechanism at a time from the old baseline, `+doubt` and `+row` are exactly
-        // free and `+span` alone takes 0.8621 to 0.3448. This world's moments are
-        // independent draws, so a window joins things that never co-occurred.
-        return new Line("senses", await run.RunAsync(300, every: 10), Floor: 0.22, Ceiling: 450_000);
+        // READS 0.3305 ABOVE A CHANCE OF 0.0833, AGAINST 0.7787 BEFORE 2026-08-05,
+        // AND THE WINDOW IS NOT WHAT IS LEFT. With the span off the traffic is back
+        // to 11,708 messages from 202,943, so the carried edges are gone — and the
+        // node count is 141 against 106, which is thirty-five MINTED names.
+        //
+        // CHUNKING IS THE REMAINING LOSS, AND IT IS THE SAME MECHANISM TWICE. A
+        // moment here is two codes, so a chunk covering it writes `name-sight` and
+        // `name-sound` and DESTROYS the sight-sound edge, which is the entire task:
+        // reaching touch from sight runs through sound and nowhere else. The plan
+        // already names the fix — chunk candidates BELOW a whole moment.
+        return new Line("senses", await run.RunAsync(300, every: 10), Floor: 0.22, Ceiling: 60_000);
     }
 
     private static async Task<Line> ComposedAsync()
@@ -87,8 +92,8 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
             Dials() with { Pricing = Pricing.Sender },
             seed: 3);
 
-        // READS 0.1652 ABOVE A CHANCE OF 0.0417, down from 0.1997.
-        return new Line("composed", await run.RunAsync(300), Floor: 0.11, Ceiling: 1_400_000);
+        // READS ABOUT 0.1997 ABOVE A CHANCE OF 0.0417.
+        return new Line("composed", await run.RunAsync(300), Floor: 0.13, Ceiling: 200_000);
     }
 
     private static async Task<Line> MotifAsync()
@@ -103,6 +108,7 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
         // it, on the world step 3 was built for. That is not a floor being lowered
         // to fit; it is an open question, and the number is what makes it visible.
         return new Line("motif", await run.RunAsync(300, every: 10), Floor: 0.27, Ceiling: 5_000_000);
+        
     }
 
     private static async Task<Line> RhythmAsync()
@@ -110,11 +116,14 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
         using var run = new RhythmRun(
             new RhythmSettings { Symbols = 12, Period = 5, Violations = 0.1 },
 
-            // THE SPAN IS THE TASK HERE. It was `RhythmRun`'s own default, then
-            // briefly nobody's, and it is the brain's default now — so this line
-            // no longer has to say so. Nothing overlaps on this world, so with no
-            // window there are no temporal cells at all.
-            Dials(),
+            // THE SPAN IS THE TASK HERE, AND SAYING SO IS THE OPEN PROBLEM RATHER
+            // THAN THE SOLUTION. Nothing overlaps on this world, so with no window
+            // there are no temporal cells at all and it asks NOTHING. A global
+            // window was tried on 2026-08-05 and broke three other worlds'
+            // controls, so it is set here — by a test, which is the wrong side of
+            // the line. See `WalkSettings.Span`: the brain should read this off
+            // the stream.
+            Dials() with { Span = 1 },
             seed: 3);
 
         // READS 0.8080 ABOVE A CHANCE OF 0.0833, UP FROM 0.1800 — the largest move
@@ -138,11 +147,9 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
             Dials() with { Pricing = Pricing.Sender },
             seed: 3);
 
-        // READS 0.1266 ABOVE A CHANCE OF 0.1667, down from 0.1942. THE SPAN AGAIN,
-        // and this is the world the refutation row already named — sentences are
-        // independent of one another, so carrying words across them costs traffic
-        // and buys nothing. Expected, and taken knowingly.
-        return new Line("babi", await run.RunAsync(400), Floor: 0.084, Ceiling: 3_200_000);
+        // READS ABOUT 0.1942 ABOVE A CHANCE OF 0.1667. The window costs this world
+        // too — the refutation row named it — and it is off again.
+        return new Line("babi", await run.RunAsync(400), Floor: 0.13, Ceiling: 1_200_000);
     }
 
     private static async Task<Line> ClevrAsync()

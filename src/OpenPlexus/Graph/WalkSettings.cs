@@ -423,22 +423,41 @@ public sealed record WalkSettings
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>ONE IS THE FLOOR NOW, AND THIS IS THE DIAL THAT ARGUED HARDEST AGAINST
-    /// John's rule.</b> The refutation table has it null on snake, WORSE on bAbI,
-    /// and the whole task on <see cref="Worlds.Rhythm"/> — measured at nought,
-    /// Rhythm asks no questions at all. So it is neither a winner nor a loser: it
-    /// is <b>a claim about the STREAM</b>, and the only world it hurts is the one
-    /// whose sentences are independent of one another.
+    /// <b>IT WAS CASHED IN AT ONE ON 2026-08-05 AND CASHED BACK OUT THE SAME
+    /// NIGHT, and the reason is worth more than the number.</b> A global window
+    /// does not merely cost accuracy on a world whose moments are independent — it
+    /// BREAKS THE CONTROL. <c>Composed</c> is built so that with no index nothing
+    /// links the moments and the score is exactly zero; with a window it reads
+    /// 0.16, because carrying manufactures the very link the control exists to
+    /// withhold. <c>Senses</c> does the same at 0.005. <b>Three worlds stopped
+    /// being valid experiments</b>, which is a strictly worse failure than a
+    /// world scoring badly.
     /// </para>
     /// <para>
-    /// <b>It is on anyway, because a zero here was an off switch and there are
-    /// none of those left.</b> What that costs is bAbI, knowingly and on the
-    /// record. <b>What it buys is that the real fix becomes the only way out</b> —
-    /// the revival row asks for something making a carried edge worth its row, and
-    /// a dial that could be quietly set to nought is how that stayed unbuilt.
+    /// <b>MEASURED ONE MECHANISM ON FROM THE BASELINE — the only direction that
+    /// attributes anything.</b> On <c>Senses</c>: baseline 0.8621, <c>+doubt</c>
+    /// 0.8621, <c>+row</c> 0.8621, <c>+span</c> 0.3448. Doubt and the row cap are
+    /// EXACTLY free; the window is the whole loss. And on <c>Rhythm</c> the same
+    /// window is worth 0.26 to 0.89 <i>and</i> makes the run cheaper.
+    /// </para>
+    /// <para>
+    /// <b>SO IT IS NOT A WINNER, NOT A LOSER, AND NOT A SWITCH: it is a CLAIM
+    /// ABOUT THE STREAM</b>, exactly as <see cref="Row"/> is a claim about the
+    /// machine. Nought is the value that keeps every world's control valid, and a
+    /// stream whose moments genuinely follow one another says so.
+    /// </para>
+    /// <para>
+    /// <b>THE REAL FIX IS THAT THE BRAIN SHOULD SET IT — John's rule, 2026-08-05:
+    /// all control belongs on the brain side, and a world may only hand over
+    /// input.</b> The signal exists and is local: a carried pair that never recurs
+    /// is noise, so the share of <see cref="Kind.After"/> cells whose count ever
+    /// passed one separates these worlds completely — near zero on independent
+    /// draws, high on a cycle. That is a node's own row statistic, which is what
+    /// the plan's self-set beam asks for, and it is the next build rather than a
+    /// dial anybody should sweep.
     /// </para>
     /// </remarks>
-    public int Span { get; init; } = 1;
+    public int Span { get; init; }
 
     /// <inheritdoc cref="Accumulate"/>
     public Accumulate Ranking { get; init; } = Accumulate.Sum;

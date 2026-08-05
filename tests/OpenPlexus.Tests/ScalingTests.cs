@@ -146,9 +146,11 @@ public sealed class ScalingTests
         //
         // SO "A WORLD BIG ENOUGH TO BREAK" IS NOT "MORE NODES". It is a HEAVY TAIL
         // -- a co-occurrence distribution where a few codes accompany nearly
-        // everything. Text is exactly that shape and none of these worlds is, which
-        // is why the scaling wall has never been reached here and why more concepts
-        // will not reach it.
+        // everything. Text is exactly that shape.
+        //
+        // THAT REQUIREMENT IS NOW MET, BY `SensesSettings.Skew`, and `TailTests`
+        // is where the cap does bite. Read this pair together: the cap is inert
+        // here because of the DISTRIBUTION and not because it is a bad bound.
         var free = await WiderAsync(512, cap: null);
         var capped = await WiderAsync(512, cap: 32);
 

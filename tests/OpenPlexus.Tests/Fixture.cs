@@ -67,13 +67,15 @@ public static class Fixture
         int codes = 3,
         double noise = 0.0,
         int clutter = 0,
-        int pool = 0) => new()
+        int pool = 0,
+        double skew = 0.0) => new()
     {
         Concepts = concepts,
         CodesPerSense = codes,
         Noise = noise,
         Clutter = clutter,
         Pool = pool,
+        Skew = skew,
     };
 
     /// <summary>The binding world.</summary>

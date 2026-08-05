@@ -54,9 +54,6 @@
 - **One an arm can bootstrap in** — every credit arm on `Tending` is a coin toss.
 - **One that NEEDS variable binding** — `Clutrr`, `gSCAN`. The mechanism is built and
   measured only on constructed cases; `BindingGapTests` is the scoreboard.
-- **One with a HEAVY TAIL.** A wider alphabet grows the graph and leaves the widest
-  row alone; rows grow without bound only where one code accompanies nearly
-  everything. Zipf — text's shape, and no world's here.
 
 ### Owed re-runs
 
@@ -79,7 +76,8 @@
   what is left.
 - **Cold storage** — what makes an evicted count recoverable rather than gone.
 - **A row cap that varies by node** — a node seen ten thousand times has more to say
-  than one seen twice. `k · log(seen)` is local and scale-free.
+  than one seen twice. `k · log(seen)` is local and scale-free. Measure it on
+  `Skew`, the one setting where a cap is not inert.
 - **Space-Saving for the row cap** — the eviction scan is linear in the cap.
 
 ### Housekeeping

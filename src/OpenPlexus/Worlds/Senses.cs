@@ -77,6 +77,40 @@ public sealed record SensesSettings
     /// <b>That claim has never been tested at a size where it could fail.</b>
     /// </remarks>
     public int Pool { get; init; }
+
+    /// <summary>
+    /// How unequally the pool is drawn from. <b>Zero is uniform; higher is a
+    /// heavier tail.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE SHAPE NO WORLD HERE HAD, AND THE SCALING MEASUREMENT IS WHY.</b>
+    /// Sixty-four times the alphabet gave sixty-four times the nodes and left the
+    /// widest row exactly where it started, so cost per thought never moved. A row
+    /// grows without bound only where ONE code accompanies NEARLY EVERYTHING, and
+    /// spreading an alphabet thinner gives each code FEWER co-occurrences rather
+    /// than more. More nodes was the wrong axis.
+    /// </para>
+    /// <para>
+    /// <b>AND <see cref="Pool"/> ALONE CANNOT MAKE THAT SHAPE, because its two
+    /// extremes are opposite and both UNIFORM.</b> A small pool makes every
+    /// irrelevant code ubiquitous; a large one makes every one rare. Zipf is the
+    /// distribution that holds BOTH AT ONCE — a handful of codes at nearly every
+    /// moment and a long thin tail behind them — so the ever-present background and
+    /// the single-accident coincidence stop being separate arms and become one run.
+    /// That is text's shape, and it is the one distribution a row cap could
+    /// plausibly be for.
+    /// </para>
+    /// <para>
+    /// <b>Rank <c>k</c> is drawn with probability proportional to
+    /// <c>1/k^Skew</c></b>, over the whole pool. At zero this takes the uniform
+    /// path unchanged rather than a Zipf draw with a flat exponent — the two agree
+    /// in distribution and NOT in how many numbers they take from the generator, so
+    /// routing zero through here would move every existing clutter measurement
+    /// while looking like it changed nothing.
+    /// </para>
+    /// </remarks>
+    public double Skew { get; init; }
 }
 
 /// <summary>
@@ -125,6 +159,17 @@ public sealed class Senses
     /// <summary>Draws the clutter, and <b>nothing else</b>.</summary>
     private readonly Random _aside;
 
+    /// <summary>
+    /// The cumulative Zipf weights over the pool. <b>Null when the draw is
+    /// uniform</b> — see <see cref="SensesSettings.Skew"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Built once and never refitted, which the codes rule requires.</b> It is
+    /// a property of the world's settings rather than of anything observed, so two
+    /// machines given the same settings build the same table.
+    /// </remarks>
+    private readonly double[]? _ranks;
+
     public Senses(SensesSettings settings, int seed)
     {
         ArgumentNullException.ThrowIfNull(settings);
@@ -134,12 +179,21 @@ public sealed class Senses
 
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Clutter);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Pool);
+        ArgumentOutOfRangeException.ThrowIfNegative(settings.Skew);
 
         // An arm that looks distinct and is not is how this project has fooled
         // itself before: clutter drawn from an empty pool is no clutter at all.
         if (settings.Clutter > 0 && settings.Pool <= 0)
             throw new ArgumentException(
                 "clutter needs a pool to draw from", nameof(settings));
+
+        // AND A SKEW OVER NOTHING IS THE SAME FAULT ONE STEP ALONG. A pool of one
+        // is uniform whatever the exponent says, so a run configured that way
+        // would report a heavy tail it does not have.
+        if (settings.Skew > 0.0 && settings.Pool < 2)
+            throw new ArgumentException(
+                "a skew needs a pool of at least two to be unequal over",
+                nameof(settings));
 
         _settings = settings;
         _rng = new Random(seed);
@@ -148,6 +202,35 @@ public sealed class Senses
         // arms must see the same concepts in the same order or a change in score
         // has two explanations instead of one -- see Seeds.Apart.
         _aside = new Random(Seeds.Apart(seed, 0xA51D_E001));
+
+        _ranks = settings.Skew > 0.0 ? Ranks(settings.Pool, settings.Skew) : null;
+    }
+
+    /// <summary>
+    /// The cumulative <c>1/k^skew</c> weights over a pool, normalised to end at
+    /// one.
+    /// </summary>
+    /// <remarks>
+    /// <b>The table rather than a closed form, because the closed form is only
+    /// approximate.</b> Inverse transform on a continuous approximation would give
+    /// a distribution close to Zipf and identical on no machine — fork 12 wants a
+    /// seed to reproduce a run exactly, and a table plus a binary search does that
+    /// for the cost of one array the size of the pool.
+    /// </remarks>
+    private static double[] Ranks(int pool, double skew)
+    {
+        var cumulative = new double[pool];
+        var total = 0.0;
+
+        for (var k = 0; k < pool; k++)
+        {
+            total += 1.0 / Math.Pow(k + 1, skew);
+            cumulative[k] = total;
+        }
+
+        for (var k = 0; k < pool; k++) cumulative[k] /= total;
+
+        return cumulative;
     }
 
     /// <summary>How many things there are to know about.</summary>
@@ -196,11 +279,34 @@ public sealed class Senses
         // be one code counted twice rather than two things being here.
         for (var i = 0; i < _settings.Clutter; i++)
         {
-            var aside = new Code(Aside, (ulong)_aside.Next(_settings.Pool));
+            var aside = new Code(Aside, (ulong)Irrelevant());
             if (!codes.Contains(aside)) codes.Add(aside);
         }
 
         return codes;
+    }
+
+    /// <summary>Which irrelevant code turns up, uniform or skewed.</summary>
+    /// <remarks>
+    /// <b>The uniform branch is the ORIGINAL CALL and not an equivalent of it.</b>
+    /// A Zipf table with a zero exponent draws uniformly too, but off
+    /// <see cref="Random.NextDouble"/> rather than <see cref="Random.Next(int)"/> —
+    /// so every clutter measurement already taken would shift under a change that
+    /// reads as a no-op. See <see cref="SensesSettings.Skew"/>.
+    /// </remarks>
+    private int Irrelevant()
+    {
+        if (_ranks is null) return _aside.Next(_settings.Pool);
+
+        var drawn = _aside.NextDouble();
+
+        // THE FIRST RANK WHOSE CUMULATIVE WEIGHT COVERS THE DRAW. `BinarySearch`
+        // returns the complement of the insertion point when there is no exact
+        // hit, which is that rank; an exact hit is that rank too.
+        var found = Array.BinarySearch(_ranks, drawn);
+        var rank = found >= 0 ? found : ~found;
+
+        return Math.Min(rank, _settings.Pool - 1);
     }
 
     private Code Pick(byte sense, int concept) =>

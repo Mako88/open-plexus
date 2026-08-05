@@ -22,10 +22,24 @@ permissions:
   contents: read
 
 concurrency:
-  # A newer push supersedes an older run on the same branch. The suite is long
-  # and nobody reads the result of a commit that has already been replaced.
+  # A RUNNING SUITE IS NEVER KILLED; A WAITING ONE IS REPLACED.
+  #
+  # This was `cancel-in-progress: true`, on the reasoning that nobody reads the
+  # result of a commit that has already been replaced. TRUE OF THE COMMIT AND
+  # FALSE OF THE RUN: with a suite this long and pushes landing faster than it
+  # finishes, EVERY run got killed by the next one and the branch went hours
+  # without a single complete result. That is how thirty-five failures sat unseen
+  # through seven consecutive commits -- each push cancelled the run that would
+  # have reported them.
+  #
+  # `false` gives what is actually wanted, because GitHub keeps at most ONE
+  # pending run per group: the run in flight is left alone to finish and report,
+  # a newly queued run waits behind it, and a THIRD arrival cancels the one still
+  # waiting rather than the one working. So intermediate commits are skipped
+  # without any finished work being thrown away, and whatever is newest when the
+  # queue clears is what gets tested.
   group: tests-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   suite:

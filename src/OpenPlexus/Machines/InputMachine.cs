@@ -201,12 +201,50 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         // codes was already live -- and each of those subsets recurs often enough
         // to earn its own name. Measured on `Motif`: sixteen names for six
         // recurring sets, every extra one a partial view of a set already named.
+        // AND A NAME MAY NOT COVER THE WHOLE MOMENT, which is the rule that made
+        // this sub-moment at all. When it did, the only entries written were
+        // name-to-member -- everything the name's own definition already says --
+        // and the member-to-member relations that ARE the task on `Senses` were
+        // gone. See `Chunk` for the two defects that one rule closes.
         ImmutableArray<Code> present = [.. changes.Started, .. live];
 
-        var minted = _chunks.Notice(present);
+        var folded = _chunks.Notice(present, onsets);
 
-        var starting = minted is { } named ? [named] : changes.Started;
-        var standing = minted is null ? live : present;
+        ImmutableArray<Code> starting, standing;
+
+        if (!folded.Folded)
+        {
+            starting = changes.Started;
+            standing = live;
+        }
+        else
+        {
+            // A NAME IS AN ONSET WHEN IT COVERS ONE. A part assembled entirely
+            // from codes that were already live did not start now, and calling it
+            // an onset would claim something arrived that did not -- which is the
+            // one thing a front end is never allowed to say.
+            var began = folded.Codes
+                .Where(code => folded.Names.TryGetValue(code, out var members)
+                    ? members.Any(onsets.Contains)
+                    : onsets.Contains(code))
+                .ToImmutableArray();
+
+            var begun = began.ToHashSet();
+
+            starting = began;
+
+            // EVERYTHING ELSE PRESENT STANDS, AND THE ABSORBED MEMBERS STAND WITH
+            // IT. That is where the compression comes from and it needs no new
+            // rule: an occasion pairs onsets with everything and NEVER live with
+            // live, so a member notes the occasion and stops pairing with its
+            // fellows. What is different now is that the name has something OTHER
+            // than its own members to pair with.
+            standing =
+            [
+                .. folded.Codes.Where(code => !begun.Contains(code)),
+                .. folded.Absorbed,
+            ];
+        }
 
         // BOTH HALVES OF THE ERROR, SETTLED ONCE. `Residual` spends the expectation
         // and moves every counter behind it, so it must be called exactly once per

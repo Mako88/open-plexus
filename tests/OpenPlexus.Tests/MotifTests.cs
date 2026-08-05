@@ -153,45 +153,140 @@ public sealed class MotifTests(ITestOutputHelper output)
         var set = new[] { Motif.Of(3), Motif.Of(1), Motif.Of(2) };
         var shuffled = new[] { Motif.Of(2), Motif.Of(3), Motif.Of(1) };
 
-        // Twice each, because the first arrival of a set has not yet paid for a
-        // name -- see the description-length note on `Chunk`.
-        one.Notice(set);
-        other.Notice(shuffled);
+        // AGAINST A BACKGROUND, AND THIS TEST USED NOT TO HAVE ONE. A world where
+        // a single set is the only thing that ever happens cannot tell a detector
+        // from a counter: every code is in hand every round, so the marginals
+        // EQUAL the joint and nothing is more frequent than chance. That is not a
+        // quirk of the check -- it is true, and it is why the noise control was
+        // minting 715 names while nothing here noticed. See `Chunk.Chance`.
+        var background = new[] { Motif.Of(10), Motif.Of(11), Motif.Of(12) };
 
-        var mine = one.Notice(set);
-        var theirs = other.Notice(shuffled);
+        Chunk.Substitution mine = default, theirs = default;
 
-        Assert.NotNull(mine);
-        Assert.Equal(mine, theirs);
+        for (var i = 0; i < 40; i++)
+        {
+            mine = one.Notice(set, set.ToHashSet());
+            one.Notice(background, background.ToHashSet());
 
-        // AN OCCASION IS A SET, so the order it arrived in cannot reach the name.
-        Assert.Equal(Chunk.Minted, mine!.Value.Modality);
+            theirs = other.Notice(shuffled, shuffled.ToHashSet());
+            other.Notice(background, background.ToHashSet());
+        }
+
+        Assert.True(mine.Folded);
+
+        // AN OCCASION IS A SET, so the order it arrived in cannot reach the name
+        // -- and two machines that merged in different orders must still land on
+        // the same code, which is why a name is hashed from its ORIGINALS rather
+        // than from the two halves that happened to meet.
+        // AS SEQUENCES. `ImmutableArray` compares its underlying array by
+        // REFERENCE, so `Assert.Equal` on two of them formats the failure as a
+        // collection and decides it on identity -- which reads as "collections
+        // differ" over two printouts that are character for character the same.
+        Assert.Equal(mine.Codes.AsEnumerable(), theirs.Codes.AsEnumerable());
+        Assert.Equal(mine.Names.Keys.Order(), theirs.Names.Keys.Order());
+        Assert.All(mine.Names.Keys, name => Assert.Equal(Chunk.Minted, name.Modality));
+    }
+
+    [Fact]
+    public void A_name_may_not_cover_the_whole_moment()
+    {
+        // THE RULE THAT MADE THIS SUB-MOMENT, AND IT CLOSES TWO DEFECTS AT ONCE.
+        // Substitution makes the name the onset and the members merely live, and
+        // an occasion never pairs live with live -- so when the name covers
+        // everything present, every member-to-member relation is destroyed and the
+        // only entries written are name-to-member, which the name's own definition
+        // already records. `Senses` fell 0.8621 to 0.4138 on exactly this: a
+        // moment there is TWO codes, so every chunk was the whole moment and the
+        // sight-sound edge it destroyed is the entire task.
+        var pair = new Chunk();
+        var two = new[] { Motif.Of(7), Motif.Of(8) };
+
+        // However often it arrives. There is no count at which swallowing the
+        // whole moment starts being a compression of it.
+        for (var i = 0; i < 50; i++) Assert.False(pair.Notice(two, two.ToHashSet()).Folded);
+
+        // AND A LONE CODE IS NEVER A CHUNK, at any count at all.
+        var alone = new Chunk();
+        var lone = new[] { Motif.Of(9) };
+        for (var i = 0; i < 50; i++) Assert.False(alone.Notice(lone, lone.ToHashSet()).Folded);
+    }
+
+    [Fact]
+    public void And_what_is_left_over_is_what_the_name_has_to_pair_with()
+    {
+        // THE COMPANION, AND WITHOUT IT THE RULE ABOVE READS AS "NEVER FOLD". A
+        // moment with something left standing DOES fold, and what survives is the
+        // name beside the remainder -- which is what gives a conjunction several
+        // distinct origins to be a conjunction OF. `Accumulate.Agreement` read
+        // exactly equal to `Sum` while one name stood for the whole moment.
+        var chunk = new Chunk();
+        var three = new[] { Motif.Of(1), Motif.Of(2), Motif.Of(3) };
+        var background = new[] { Motif.Of(10), Motif.Of(11), Motif.Of(12) };
+
+        // AGAINST A BACKGROUND. See `A_name_is_derived_from_the_members_and_never
+        // _assigned` for why a set that is the only thing in the world can never
+        // beat chance: with everything in hand every round, the marginals are the
+        // joint.
+        var folded = chunk.Notice(three, three.ToHashSet());
+
+        for (var i = 0; i < 40 && !folded.Folded; i++)
+        {
+            chunk.Notice(background, background.ToHashSet());
+            folded = chunk.Notice(three, three.ToHashSet());
+        }
+
+        Assert.True(folded.Folded);
+
+        // TWO THINGS IN HAND, NOT ONE: a name covering a pair, and the code it
+        // could not swallow.
+        Assert.Equal(2, folded.Codes.Length);
+        Assert.Single(folded.Names);
+        Assert.Equal(2, folded.Names.Values.Single().Length);
+
+        // AND EVERY ORIGINAL IS STILL ACCOUNTED FOR -- absorbed or standing, and
+        // never dropped.
+        Assert.Equal(
+            three.Order(),
+            folded.Absorbed.Concat(folded.Codes.Where(one => !folded.Names.ContainsKey(one))).Order());
     }
 
     [Fact]
     public void The_threshold_is_description_length_and_not_a_constant()
     {
         // NOTHING HERE WAS CHOSEN, which is the point: a constant nobody set doing
-        // the cutting is already a refuted row. Naming wins when n(S-1) > S, so a
-        // set of four pays for itself on its second arrival and a pair never does.
+        // the cutting is already a refuted row. Naming wins when n(S-1) > S.
+        //
+        // THE CANDIDATE IS A PAIR, SO THE FIRST NAME ALWAYS COSTS THREE ARRIVALS
+        // -- n > 2 at S = 2 -- however large the moment is. What buys the larger
+        // sets is COMPOSITION rather than a lower threshold: once a pair has a
+        // name the name is itself a candidate, and a merged set of three mints
+        // when n(3-1) > 3, which is its SECOND arrival.
         var four = new Chunk();
         var set = new[] { Motif.Of(1), Motif.Of(2), Motif.Of(3), Motif.Of(4) };
+        var background = new[] { Motif.Of(10), Motif.Of(11), Motif.Of(12) };
 
-        Assert.Null(four.Notice(set));
-        Assert.NotNull(four.Notice(set));
+        // AND IT MUST ALSO BEAT CHANCE, so the first two arrivals mint nothing for
+        // the description-length reason and a set with no background never mints
+        // at all. See `Chunk.Chance`.
+        Assert.False(four.Notice(set, set.ToHashSet()).Folded);
+        Assert.False(four.Notice(set, set.ToHashSet()).Folded);
 
-        // A PAIR IS NEVER WORTH A NAME. n(2-1) > 2 wants n > 2, so it mints on the
-        // third -- naming a pair saves nothing until it is genuinely frequent.
-        var two = new Chunk();
-        var pair = new[] { Motif.Of(7), Motif.Of(8) };
+        var folded = four.Notice(set, set.ToHashSet());
 
-        Assert.Null(two.Notice(pair));
-        Assert.Null(two.Notice(pair));
-        Assert.NotNull(two.Notice(pair));
+        for (var i = 0; i < 40 && !folded.Folded; i++)
+        {
+            four.Notice(background, background.ToHashSet());
+            folded = four.Notice(set, set.ToHashSet());
+        }
 
-        // AND A LONE CODE IS NEVER A CHUNK, at any count at all.
-        var alone = new Chunk();
-        for (var i = 0; i < 50; i++) Assert.Null(alone.Notice([Motif.Of(9)]));
+        Assert.True(folded.Folded);
+
+        // AND THE WHOLE MOMENT IS COVERED BY TWO NAMES RATHER THAN ONE, which is
+        // the guard doing its work: folding to a single name would leave nothing
+        // for it to be in relation with, so the second merge is refused and the
+        // two halves pair with each other instead.
+        Assert.Equal(2, folded.Codes.Length);
+        Assert.Equal(2, folded.Names.Count);
     }
 
     // ---- WHAT CHUNKING BOUGHT, AND WHY THE MEASUREMENT IS GONE ------------

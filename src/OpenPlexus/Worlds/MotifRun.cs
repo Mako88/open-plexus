@@ -53,13 +53,29 @@ public sealed record MotifResult : Questioned
         if (Coined == 0)
             wrong.Add("chunking minted nothing at all");
 
-        // AND A DETECTOR THAT MINTS NEARLY EVERYTHING HAS FOUND NO STRUCTURE. The
-        // world draws its noise without replacement from a much larger alphabet,
-        // so an exact whole-moment repeat is the motif and essentially nothing
-        // else -- if this fires, the compression below is a renaming.
-        if (Motifs > 0 && Coined > Motifs)
-            wrong.Add($"minted {Coined} names for {Motifs} recurring sets, so the "
-                + "detector is naming the noise");
+        // AND A DETECTOR THAT MINTS NEARLY EVERYTHING HAS FOUND NO STRUCTURE.
+        //
+        // THE BOUND WAS `Coined > Motifs` AND THAT WAS A WHOLE-MOMENT ARTEFACT.
+        // While only an entire moment could be a candidate, the one legitimate
+        // name in this world was the motif itself, so one name per motif was the
+        // ceiling. Candidates are sub-moment now -- pair-merging, which composes
+        // -- and every recurring PART of a motif is a legitimate name too. A set
+        // of size S contains 2^S - S - 1 subsets of size two or more, and that
+        // times the motif count is what a perfectly selective detector could mint
+        // here. Derived from the world, like the description-length threshold it
+        // is checking, and not chosen.
+        if (Motifs > 0)
+        {
+            // `Compressed` IS the sets written as one node each, so it is the
+            // motif count times the size and the size falls straight out of it.
+            var size = Compressed / Motifs;
+            var parts = Motifs * ((1 << size) - size - 1);
+
+            if (Coined > parts)
+                wrong.Add($"minted {Coined} names where {Motifs} sets of {size} "
+                    + $"hold {parts} recurring parts, so the detector is naming "
+                    + "the noise");
+        }
     }
 
     /// <summary>How many distinct codes the world can emit.</summary>

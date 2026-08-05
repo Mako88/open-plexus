@@ -1,10 +1,11 @@
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Learning;
 
 /// <summary>
-/// A code minted for a set that keeps arriving whole — <b>step 3, and the thing
-/// that lets the alphabet GROW.</b>
+/// A code minted for a set that keeps arriving together — <b>step 3, and the
+/// thing that lets the alphabet GROW.</b>
 /// </summary>
 /// <remarks>
 /// <para>
@@ -37,53 +38,65 @@ namespace OpenPlexus.Learning;
 /// <b>THE THRESHOLD IS DERIVED TOO — MINIMUM DESCRIPTION LENGTH, NOT A
 /// CONSTANT.</b> Describing <c>n</c> occurrences of an S-code set costs
 /// <c>n·S·log₂A</c> bits; naming it costs <c>S·log₂A</c> once to define plus
-/// <c>n·log₂A</c> to use. Naming wins when <c>n(S-1) &gt; S</c>, so a set of four
-/// pays for itself on its SECOND arrival and a pair never quite does. <b>Nothing
-/// here was chosen</b>, which is the point: a constant nobody set doing the
-/// cutting is a refuted row already.
+/// <c>n·log₂A</c> to use. Naming wins when <c>n(S-1) &gt; S</c>. <b>Nothing here
+/// was chosen</b>, which is the point: a constant nobody set doing the cutting is
+/// a refuted row already.
+/// <para>
+/// <b>THE CANDIDATE IS A PAIR, SO THE FIRST NAME ALWAYS COSTS THREE ARRIVALS</b> —
+/// <c>n &gt; 2</c> at <c>S = 2</c> — however large the moment is. What reaches the
+/// larger sets is COMPOSITION and not a lower bar: a merged candidate of three
+/// mints when <c>n(3-1) &gt; 3</c>, which is its second arrival. The inequality is
+/// untouched; what changed is that it now weighs a PART of the moment.
+/// </para>
 /// </para>
 /// <para>
-/// <b>WHAT IT DOES NOT DO, SAID PLAINLY.</b> Only a WHOLE moment is a candidate.
-/// A set embedded inside a larger moment is invisible to this, because enumerating
-/// subsets is exponential and no threshold rescues that. So this finds *things that
-/// keep happening identically* and not *parts that keep happening together* —
-/// which is the smaller half of chunking and must not be written up as the whole
-/// of it. The utility problem (Minton, SOAR) is the same boundary from the other
-/// side: utility belongs per chunk, and a chunk that never recurs again is a row
-/// entry earning its keep on nothing.
+/// <b>AND A CHUNK MAY NOT COVER THE WHOLE MOMENT — the rule this class was
+/// missing, and it is one rule closing two defects.</b> Substitution makes the
+/// name the onset and the members merely live, and an occasion pairs onsets with
+/// everything while never pairing live with live. That IS the compression: the
+/// members stop pairing with each other. But when the name covers everything
+/// present there is nothing left for it to be in relation WITH, so the only
+/// entries written are name-to-member — which the definition of the name already
+/// records. <b>A name standing for the entire moment is not a compression of that
+/// moment; it is a deletion of it.</b>
+/// <list type="bullet">
+/// <item><b><see cref="Worlds.Senses"/> fell 0.8621 to 0.4138</b> the day
+/// substitution became unconditional. A moment there is two codes, so every chunk
+/// was the whole moment, and the sight–sound edge it destroyed is the entire
+/// task — reaching touch from sight runs through sound and nowhere else. Under
+/// this rule a two-code moment can never be chunked at all.</item>
+/// <item><b><see cref="Graph.Accumulate.Agreement"/> read EXACTLY equal to
+/// <see cref="Graph.Accumulate.Sum"/>.</b> A conjunction is several distinct
+/// origins agreeing and one name in place of a moment is one origin. A chunk
+/// leaving at least one other thing standing leaves a conjunction something to
+/// be a conjunction OF.</item>
+/// </list>
+/// </para>
+/// <para>
+/// <b>SO THE CANDIDATE IS A PAIR AND NOT THE MOMENT, WHICH IS ALSO WHAT MAKES
+/// SUB-MOMENT STRUCTURE REACHABLE AT ALL.</b> Enumerating the subsets of a moment
+/// is exponential and no threshold rescues that, which is why this only ever
+/// considered the whole of one. Pair-merging is the tractable road the literature
+/// already took — Sequitur and BPE both — and it COMPOSES: once a pair has a name
+/// the name is itself a candidate, so <c>{A,B}</c> becomes <c>AB</c> and then
+/// <c>{AB,C}</c> becomes <c>ABC</c>, and a set of any size is reachable through
+/// quadratic work per moment rather than exponential. <b>This finds parts that
+/// keep happening together and not merely things that keep happening
+/// identically</b>, which is the half that was missing and was written up plainly
+/// as missing.
+/// </para>
+/// <para>
+/// <b>A CHUNK IS NAMED BY ITS ORIGINAL MEMBERS AND NEVER BY THE PATH THAT REACHED
+/// IT.</b> Two machines see different data, so they merge in different orders —
+/// one reaches <c>{A,B,C}</c> as <c>AB</c> then <c>+C</c>, the other as
+/// <c>BC</c> then <c>+A</c>. Naming a merge by its two halves would give those two
+/// different codes for one set and the red-ball property would be gone with
+/// nothing failing. Hashing the sorted ORIGINALS makes the name a pure function of
+/// what is covered, so every path to a set arrives at the same code.
 /// </para>
 /// </remarks>
 public sealed class Chunk
 {
-    // ---- WHAT SUBSTITUTION COSTS, MEASURED 2026-08-05 ----------------------
-    //
-    // MINTING BECAME UNCONDITIONAL AND THAT MADE A HIDDEN TRADE VISIBLE. The name
-    // REPLACES the moment's onsets, so the members stop pairing with each other --
-    // which is the whole compression, S(S-1) entries collapsing to 2S, and is also
-    // the entire structure of a world whose task is the relation BETWEEN members.
-    //
-    //   * `Senses` fell 0.8621 to 0.4138. A moment there is two codes, so a chunk
-    //     covering it writes `name`-sight and `name`-sound and destroys the
-    //     sight-sound edge -- and reaching touch from sight runs through sound and
-    //     nowhere else.
-    //
-    //   * `Accumulate.Agreement` went INERT, reading exactly equal to `Sum`. A
-    //     conjunction is several distinct origins agreeing, and one name in place
-    //     of a moment is one origin.
-    //
-    // THE OBVIOUS ALTERNATIVE WAS TRIED AND IS NOT THE ANSWER. Emitting the name
-    // ALONGSIDE the onsets rather than instead of them scores far better --
-    // `Motif` 0.7931 to 0.9655, `Senses` 0.4138 to 0.4483 -- but it costs `Motif`
-    // four times the traffic and abandons the compression this class exists for,
-    // and `Senses` is still nowhere near its 0.8621. IT BUYS A SCORE BY GIVING UP
-    // THE MECHANISM, and it does not fix the world it was meant to fix.
-    //
-    // WHAT IS ACTUALLY NEEDED IS ON THE PLAN: chunk candidates BELOW a whole
-    // moment. `Notice` is handed the ENTIRE moment, so every chunk is the whole of
-    // it and there is never anything left over for the name to pair with. Utility
-    // per chunk (Minton, SOAR) is the other half -- a name that does not pay for
-    // itself should not survive.
-
     /// <summary>
     /// The modality every minted code carries.
     /// </summary>
@@ -96,14 +109,24 @@ public sealed class Chunk
     /// </remarks>
     public const byte Minted = 200;
 
-    /// <summary>How many times each whole-moment set has arrived.</summary>
+    /// <summary>How many times each candidate set has been seen together.</summary>
     private readonly Dictionary<ulong, int> _seen = [];
 
-    /// <summary>How big each of those sets was, kept for the threshold.</summary>
-    private readonly Dictionary<ulong, int> _size = [];
+    /// <summary>What each candidate covers, in original codes.</summary>
+    private readonly Dictionary<ulong, ImmutableArray<Code>> _members = [];
 
     /// <summary>Sets that have paid for their own name.</summary>
     private readonly HashSet<ulong> _minted = [];
+
+    /// <summary>How often each thing has been in hand when pairs were counted.</summary>
+    /// <remarks>
+    /// <b>THE MARGINALS, AND WITHOUT THEM THE THRESHOLD CANNOT SEE CHANCE.</b>
+    /// See <see cref="Count"/>.
+    /// </remarks>
+    private readonly Dictionary<Code, int> _occurs = [];
+
+    /// <summary>How many times pairs have been counted at all.</summary>
+    private long _rounds;
 
     private readonly Lock _gate = new();
 
@@ -113,11 +136,17 @@ public sealed class Chunk
         get { lock (_gate) return _minted.Count; }
     }
 
-    /// <summary>How many distinct whole moments have been noticed at all.</summary>
+    /// <summary>How many distinct candidates have been noticed at all.</summary>
     /// <remarks>
     /// <b>THE DENOMINATOR THAT SAYS WHETHER MINTING WAS SELECTIVE.</b> A detector
     /// that mints nearly everything it sees has found no structure — it has just
     /// renamed the stream, and the compression is arithmetic rather than real.
+    /// <para>
+    /// <b>IT COUNTS PAIRS NOW AND NOT MOMENTS, so it is a much larger number and
+    /// against a much larger denominator.</b> A moment of S codes offers S(S-1)/2
+    /// candidates rather than one, and the ratio to <see cref="Coined"/> is what
+    /// stays comparable.
+    /// </para>
     /// </remarks>
     public int Noticed
     {
@@ -125,7 +154,34 @@ public sealed class Chunk
     }
 
     /// <summary>
-    /// Takes one moment's onsets and says whether they now have a name.
+    /// What a moment became once its named parts were folded up.
+    /// </summary>
+    /// <param name="Codes">
+    /// The moment after substitution — <b>originals that were not absorbed, plus
+    /// a name for each part that was.</b>
+    /// </param>
+    /// <param name="Names">
+    /// Each name that appeared, against the original codes it covers.
+    /// <b>Empty when nothing was folded</b>, which is the common case and the one
+    /// a caller should be able to test cheaply.
+    /// </param>
+    public readonly record struct Substitution(
+        ImmutableArray<Code> Codes,
+        ImmutableDictionary<Code, ImmutableArray<Code>> Names)
+    {
+        /// <summary>A moment that kept every code it arrived with.</summary>
+        public static Substitution Of(IReadOnlyCollection<Code> codes) =>
+            new([.. codes], ImmutableDictionary<Code, ImmutableArray<Code>>.Empty);
+
+        /// <summary>Whether anything was folded at all.</summary>
+        public bool Folded => !Names.IsEmpty;
+
+        /// <summary>Every original code that is now inside a name.</summary>
+        public IEnumerable<Code> Absorbed => Names.Values.SelectMany(one => one);
+    }
+
+    /// <summary>
+    /// Takes one moment and folds up whatever part of it has earned a name.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -134,40 +190,35 @@ public sealed class Chunk
     /// code is a function of the members and nothing about the count reaches it.
     /// </para>
     /// <para>
-    /// <b>A set of one is never a chunk.</b> The description-length inequality is
-    /// <c>n(S-1) &gt; S</c>, which no <c>n</c> satisfies at <c>S = 1</c>; the guard
-    /// is here as well so the arithmetic never has to be trusted at the boundary.
+    /// <b>THE MERGE LOOP COUNTS THE REDUCED SET AS WELL AS THE ORIGINAL ONE, and
+    /// that is what makes chunks above a pair reachable.</b> Once <c>{A,B}</c>
+    /// folds, the next pass sees <c>{AB,C}</c> and counts THAT pair, so a set of
+    /// three earns a name by the same inequality that gave the pair one.
+    /// </para>
+    /// <para>
+    /// <b>A pair is counted even where it cannot be used.</b> A two-code moment can
+    /// never be folded — the name would cover all of it — but the pair is evidence
+    /// wherever it appears, and refusing to count it here would make a candidate's
+    /// count depend on which moments happened to be small.
     /// </para>
     /// </remarks>
-    /// <param name="onsets">What started this moment.</param>
-    /// <returns>The code standing for this set, or null if it has not earned one.</returns>
-    public Code? Notice(IReadOnlyCollection<Code> onsets)
+    /// <param name="moment">Everything present, onsets and what was already live.</param>
+    /// <param name="onsets">
+    /// Which of them started now. <b>The relations among THESE are what a fold
+    /// destroys and nothing recreates</b> — see the guard on <see cref="Fold"/>.
+    /// </param>
+    public Substitution Notice(IReadOnlyCollection<Code> moment, IReadOnlySet<Code> onsets)
     {
+        ArgumentNullException.ThrowIfNull(moment);
         ArgumentNullException.ThrowIfNull(onsets);
 
-        if (onsets.Count < 2) return null;
+        if (moment.Count < 2) return Substitution.Of(moment);
 
-        var key = Name(onsets);
-
-        lock (_gate)
-        {
-            var count = _seen.GetValueOrDefault(key) + 1;
-            _seen[key] = count;
-            _size[key] = onsets.Count;
-
-            if (_minted.Contains(key)) return new Code(Minted, key);
-
-            // MINIMUM DESCRIPTION LENGTH, and every term of it is the world's own
-            // arithmetic. See the note on this class.
-            if ((long)count * (onsets.Count - 1) <= onsets.Count) return null;
-
-            _minted.Add(key);
-            return new Code(Minted, key);
-        }
+        lock (_gate) return Fold(moment, onsets, counting: true);
     }
 
     /// <summary>
-    /// Whether this set already has a name, <b>without counting the look as an
+    /// Folds a set with what is already named, <b>without counting the look as an
     /// arrival.</b>
     /// </summary>
     /// <remarks>
@@ -175,15 +226,237 @@ public sealed class Chunk
     /// question is not evidence that the set occurred, and letting it count would
     /// mean the act of asking could mint the very chunk being asked about.
     /// </remarks>
-    public Code? Named(IReadOnlyCollection<Code> codes)
+    public Substitution Named(IReadOnlyCollection<Code> codes)
     {
         ArgumentNullException.ThrowIfNull(codes);
 
-        if (codes.Count < 2) return null;
+        if (codes.Count < 2) return Substitution.Of(codes);
 
-        var key = Name(codes);
+        // A QUESTION HAS NO ONSETS, so every code in it counts as one. Asking
+        // about a set is asking about the whole of it, and a name swallowing all
+        // of it would answer with a code standing for the question.
+        lock (_gate) return Fold(codes, codes.ToHashSet(), counting: false);
+    }
 
-        lock (_gate) return _minted.Contains(key) ? new Code(Minted, key) : null;
+    /// <summary>
+    /// The merge loop — <b>count the pairs, fold the best named one, repeat.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE GUARD IS ABOUT THE ONSETS AND NOT ABOUT THE MOMENT, and getting
+    /// that wrong cost most of the fix.</b> Refusing only to cover the whole
+    /// moment took <see cref="Worlds.Senses"/> from 0.4138 back to 0.6103 and no
+    /// further, against a pre-chunking 0.8077 — because a moment is the onsets
+    /// PLUS whatever was still live, so a two-onset moment with one code carried
+    /// over reads as three things, and a fold could swallow both onsets while
+    /// leaving the carried code standing. The count guard was satisfied; the
+    /// sight–sound edge was still destroyed.
+    /// </para>
+    /// <para>
+    /// <b>WHAT A FOLD DESTROYS IS EXACTLY THE RELATIONS AMONG WHAT IT ABSORBS.</b>
+    /// An occasion pairs onsets with everything and never live with live, so
+    /// absorbing every onset into ONE name removes every pair the moment was
+    /// evidence for and replaces them with name-to-member — which the name's own
+    /// definition already records. So the rule is that the onsets may not all end
+    /// up inside a single name: <b>at least two things must still carry one</b>,
+    /// unless only one onset arrived and there was never a pair to keep.
+    /// Counting happens first regardless, so evidence is never lost — only the
+    /// substitution is refused.
+    /// </para>
+    /// </remarks>
+    private Substitution Fold(
+        IReadOnlyCollection<Code> moment, IReadOnlySet<Code> onsets, bool counting)
+    {
+        var current = moment.Distinct().Order().ToList();
+
+        // WHAT EACH THING IN HAND COVERS. An original covers itself; a name covers
+        // what it was minted for. This is what keeps the naming a function of the
+        // originals rather than of the merge path.
+        var covers = current.ToDictionary(one => one, one => ImmutableArray.Create(one));
+
+        var names = ImmutableDictionary.CreateBuilder<Code, ImmutableArray<Code>>();
+
+        // HOW MANY THINGS MUST STILL CARRY AN ONSET WHEN THIS IS DONE. Two, so a
+        // pair of onsets can never collapse into one origin -- or one, where only
+        // one onset arrived and there was no pair to protect in the first place.
+        var wanted = Math.Min(2, current.Count(one => onsets.Contains(one)));
+
+        while (current.Count >= 2)
+        {
+            if (counting) Count(current, covers);
+
+            // A FOLD FROM TWO COVERS THE WHOLE MOMENT. See above.
+            if (current.Count < 3) break;
+
+            if (!Best(current, covers, onsets, wanted, out var left, out var right, out var key))
+                break;
+
+            var members = _members[key];
+            var name = new Code(Minted, key);
+
+            current.Remove(left);
+            current.Remove(right);
+            current.Add(name);
+            current.Sort();
+
+            covers[name] = members;
+
+            // A NAME MAY SWALLOW A NAME, so what is reported is what SURVIVED. An
+            // inner name is not in the moment any more and telling a caller it was
+            // would move codes to live that are not there at all.
+            names.Remove(left);
+            names.Remove(right);
+            names[name] = members;
+        }
+
+        return new Substitution([.. current], names.ToImmutable());
+    }
+
+    /// <summary>
+    /// Counts every pair in hand, and mints the ones that have paid for themselves.
+    /// </summary>
+    /// <remarks>
+    /// <b>QUADRATIC IN THE MOMENT AND THAT IS THE WHOLE COST OF REACHING BELOW
+    /// IT.</b> Enumerating subsets is exponential; enumerating pairs and letting
+    /// them compose is not, and it reaches the same sets over repeated arrivals.
+    /// </remarks>
+    private void Count(List<Code> current, Dictionary<Code, ImmutableArray<Code>> covers)
+    {
+        // THE MARGINALS AND THE DENOMINATOR, TAKEN OVER THE SAME POPULATION AS THE
+        // JOINT COUNTS BELOW -- one round of counting, whether it is a moment's
+        // first pass or a later one over what the merges left.
+        _rounds++;
+        foreach (var one in current) _occurs[one] = _occurs.GetValueOrDefault(one) + 1;
+
+        for (var i = 0; i < current.Count; i++)
+        {
+            for (var j = i + 1; j < current.Count; j++)
+            {
+                var members = covers[current[i]].AddRange(covers[current[j]]).Sort();
+                var key = Name(members);
+
+                var count = _seen.GetValueOrDefault(key) + 1;
+                _seen[key] = count;
+                _members[key] = members;
+
+                if (_minted.Contains(key)) continue;
+
+                // MINIMUM DESCRIPTION LENGTH, and every term of it is the world's
+                // own arithmetic. See the note on this class.
+                if ((long)count * (members.Length - 1) <= members.Length) continue;
+
+                // AND IT MUST ALSO BEAT CHANCE, WHICH DESCRIPTION LENGTH NEVER
+                // ASKED. MDL weighs naming against NOT naming and is satisfied by
+                // any pair frequent enough to be worth a symbol -- including one
+                // that is frequent only because both its halves are. Measured on
+                // `Motif`: the structured world minted 245 names for 6 recurring
+                // sets and THE PURE-NOISE CONTROL MINTED 715. A detector finding
+                // three times more structure in noise than in signal has found
+                // none, and since this exists to make the graph SMALLER, the
+                // control's 4,676 edges against the structured world's 2,733 is
+                // the mechanism running backwards.
+                if (count <= Chance(current[i], current[j])) continue;
+
+                _minted.Add(key);
+            }
+        }
+    }
+
+    /// <summary>
+    /// What two things would co-occur by accident, <b>and the spread around it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE EXPECTATION IS THE PRODUCT OF THE MARGINALS, which is independence
+    /// and nothing more.</b> Two things each in hand often will meet often without
+    /// either telling you anything about the other, and that is the entire
+    /// population of the noise this was minting.
+    /// </para>
+    /// <para>
+    /// <b>THE SPREAD IS THE SQUARE ROOT, WHICH IS THE NULL MODEL'S OWN AND NOT A
+    /// CHOICE.</b> Occurrences of an independent pair are Poisson about that
+    /// expectation, so the deviation is <c>√λ</c> by the distribution's own
+    /// arithmetic — the same move the description-length inequality makes, applied
+    /// to the question it never asked.
+    /// </para>
+    /// <para>
+    /// <b>THE THREE IS BORROWED AND IS THE ONE CHOSEN NUMBER HERE — say so rather
+    /// than dress it up.</b> Three standard errors is already this project's bar
+    /// for believing a difference: <see cref="Worlds.Senses"/>'s headline claim is
+    /// asserted against exactly that, so a name is now held to the same standard
+    /// as a result. It is a constant nobody derived, which is a refuted row's
+    /// shape, and the honest defence is only that it is the bar already in use. A
+    /// sweep is what would settle it.
+    /// </para>
+    /// </remarks>
+    private double Chance(Code left, Code right)
+    {
+        if (_rounds == 0) return 0.0;
+
+        var expected =
+            (double)_occurs.GetValueOrDefault(left) * _occurs.GetValueOrDefault(right) / _rounds;
+
+        return expected + (3 * Math.Sqrt(expected));
+    }
+
+    /// <summary>
+    /// The best already-named pair in hand, <b>chosen the same way on every
+    /// machine.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE MOST-SEEN PAIR, AND THE TIE BREAKS ON THE NAME.</b> Two candidates
+    /// standing equal is what a small or repetitive world produces constantly, and
+    /// leaving those to the enumeration order would make the fold depend on
+    /// something nobody chose — which is the fault this project has now found in
+    /// the walk's accumulator and in the fly's inhibition both.
+    /// </remarks>
+    private bool Best(
+        List<Code> current,
+        Dictionary<Code, ImmutableArray<Code>> covers,
+        IReadOnlySet<Code> onsets,
+        int wanted,
+        out Code left,
+        out Code right,
+        out ulong key)
+    {
+        left = default;
+        right = default;
+        key = 0;
+
+        var best = -1;
+
+        // WHAT CARRIES AN ONSET RIGHT NOW. A fold turns two of these into one, so
+        // it may only run while that still leaves enough standing.
+        var bearing = current.Count(one => covers[one].Any(onsets.Contains));
+
+        for (var i = 0; i < current.Count; i++)
+        {
+            for (var j = i + 1; j < current.Count; j++)
+            {
+                var members = covers[current[i]].AddRange(covers[current[j]]).Sort();
+                var candidate = Name(members);
+
+                if (!_minted.Contains(candidate)) continue;
+
+                // THE ONSET GUARD. Merging two bearers leaves one where there were
+                // two; merging a bearer with a bystander leaves the count alone.
+                var merging =
+                    (covers[current[i]].Any(onsets.Contains) ? 1 : 0)
+                    + (covers[current[j]].Any(onsets.Contains) ? 1 : 0);
+
+                if (merging == 2 && bearing - 1 < wanted) continue;
+
+                var count = _seen.GetValueOrDefault(candidate);
+                if (count < best || (count == best && candidate >= key)) continue;
+
+                best = count;
+                key = candidate;
+                left = current[i];
+                right = current[j];
+            }
+        }
+
+        return best >= 0;
     }
 
     /// <summary>

@@ -51,7 +51,22 @@ public sealed class MachineTests : IDisposable
     private async Task<Thought?> Ask(long now, params Code[] frame)
     {
         await Observe(now, []);
-        return await Observe(now + 1, frame);
+
+        // AND IT SAYS IT IS ASKING, WHICH IT ALWAYS WAS. Step 2 makes a fully
+        // predicted OBSERVATION silent -- that is the mechanism, not a fault -- and
+        // these tests train a cue until the machine expects it and then hand it
+        // that very cue, so the machine correctly answered "I already knew that"
+        // and returned nothing. A QUESTION IS A REQUEST FOR AN ANSWER AND IS NEVER
+        // SUPPRESSED.
+        //
+        // `new Question()` NARROWS NOTHING: `Through` is null, which walks
+        // everything -- so this is the same walk the bare observation did, and the
+        // only thing that changed is that the machine is now told which of the two
+        // it is being asked to do.
+        var thought = await _machine.ObserveAsync(frame, now + 1, new Question());
+        await _bench.Bus.WhenIdle().WaitAsync(Fixture.Patience);
+
+        return thought;
     }
 
     private async Task<Thought?> Observe(long now, params Code[] frame)

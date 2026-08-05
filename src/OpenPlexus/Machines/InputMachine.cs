@@ -35,6 +35,18 @@ public sealed class InputMachine<TFrame> : IReceiveReports
 
     /// <summary>The last occasion this machine wrote, exactly as written.</summary>
     private Occasion? _joined;
+
+    /// <summary>
+    /// The last thought this machine had, <b>which is what it expects next.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>Null clears the expectation rather than keeping the old one.</b> A
+    /// moment that produced no thought produced no prediction, and carrying a
+    /// stale one forward would silence an onset on the strength of a walk that
+    /// happened two moments ago -- which is the fault <see cref="Surprise.Expect"/>
+    /// replaces rather than accumulates to avoid.
+    /// </remarks>
+    private Thought? _foreseen;
     private readonly IRendezvous _rendezvous;
     private readonly IBus _bus;
     private readonly Ring _ring;
@@ -216,6 +228,24 @@ public sealed class InputMachine<TFrame> : IReceiveReports
 
         var folded = _chunks.Notice(present, onsets, bound);
 
+        // STEP 2, AND UNTIL NOW IT RAN NOWHERE. `Surprise.Expect` had exactly one
+        // caller in the whole of `src` -- `RhythmRun`, on a private instance of its
+        // own -- so THIS machine's expectation was empty at every observation in
+        // every world. `Rate` and `Overreach` read 0.0000 always, `Silent` never
+        // moved, every onset counted as surprising, and the write-path share below
+        // computed a constant 1.0. "Only the surprise propagates" was suppressing
+        // nothing anywhere.
+        //
+        // WHAT THE MACHINE THOUGHT LAST TIME IS WHAT IT EXPECTS NOW, which needs no
+        // settling point inside this method: a walk gets a whole observation cycle
+        // to finish, and reading it here rather than at the moment it was launched
+        // is what fork 22 already cost this project once.
+        //
+        // ONE CODE, AND THAT IS NOT A CONSTANT PICKED HERE. Naming fewer predicted
+        // codes was measured, half-refuted -- coarse ranking informs and fine does
+        // not -- and revived AT ONE. See the plan's table.
+        if (_foreseen is { } last) _surprise.Expect(last.Best(1).Select(one => one.Endpoint));
+
         ImmutableArray<Code> starting, standing;
 
         if (!folded.Folded)
@@ -283,11 +313,17 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         // NOTHING SURPRISED, SO THERE IS NOTHING TO LEARN. `Observe` refuses a
         // weight of nought outright -- a coincidence worth nothing is not one -- so
         // the moment is not joined at all rather than joined at zero.
+        // A QUESTION IS ABOUT WHAT IS BEING SHOWN AND NOT ABOUT WHAT SURPRISED.
+        // Step 2 gates an OBSERVATION's broadcast by its surprise, and that is the
+        // whole mechanism -- but the origins of a QUESTION are the onsets
+        // themselves. Asking about a cue the machine has learnt to expect leaves
+        // `Surprising` empty, and a walk with no origins reaches nothing, so the
+        // better the graph knew the answer the more certainly it returned none.
+        IReadOnlyList<Code> origins =
+            asking is null ? residual.Surprising : changes.Started;
+
         if (surprising <= 0.0)
-            return residual.Surprising.Count == 0
-                ? null
-                : await ThinkAsync(residual.Surprising, null, asking, ct)
-                    .ConfigureAwait(false);
+            return await ForeseeAsync(origins, asking, ct).ConfigureAwait(false);
 
         var joined = new Occasion
             {
@@ -329,9 +365,48 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         // expected and did not arrive is counted where it is computed and goes
         // nowhere: there is no code for the thing that did not happen, so absence
         // is a signal the machine can read about itself and never a broadcast.
-        return residual.Surprising.Count == 0
-            ? null
-            : await ThinkAsync(residual.Surprising, null, asking, ct).ConfigureAwait(false);
+        return await ForeseeAsync(origins, asking, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Thinks, and remembers the thought as this machine's expectation.
+    /// </summary>
+    /// <remarks>
+    /// <b>Every path out of an observation goes through here</b>, because an
+    /// expectation that is set on one branch and not the other is a prediction
+    /// whose denominator depends on which way the moment happened to go.
+    /// </remarks>
+    private async Task<Thought?> ForeseeAsync(
+        IReadOnlyList<Code> surprising, Question? asking, CancellationToken ct)
+    {
+        // NOTHING SURPRISED, SO THERE IS NOTHING TO THINK ABOUT -- step 2, and it
+        // is only reachable now that anything is ever expected.
+        //
+        // AND THE EXPECTATION IS CLEARED RATHER THAN LEFT STANDING, which is the
+        // half a silent moment used to skip. `_foreseen` feeds `Surprise.Expect`,
+        // and that replaces rather than accumulates precisely so an onset is never
+        // silenced by a walk two moments old -- so a path that returns without
+        // touching it would reinstate the fault by the back door.
+        //
+        // AND IT DOES NOT APPLY TO A QUESTION, WHICH IS THE HOLE THIS NEARLY
+        // OPENED. Step 2's claim is about an OBSERVATION: a moment that was
+        // entirely predicted need not be broadcast, because the broadcast is what
+        // costs. A question is a request for an answer, and refusing to walk
+        // because the input was expected would mean nothing predictable can ever
+        // be ASKED about -- every world's accuracy silently gutted in exactly the
+        // cases the graph had learnt best. `MachineTests` caught it by asking
+        // about a code the machine had just been taught to expect.
+        if (surprising.Count == 0)
+        {
+            _foreseen = null;
+            return null;
+        }
+
+        var thought = await ThinkAsync(surprising, null, asking, ct).ConfigureAwait(false);
+
+        _foreseen = thought;
+
+        return thought;
     }
 
     /// <summary>

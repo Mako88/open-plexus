@@ -50,6 +50,7 @@ jobs:
           path: |
             corpora/tasks_1-20_v1-2
             corpora/CLEVR_v1.0
+            corpora/tatoeba_eng.tsv
           key: corpora-${{ hashFiles('corpora/fetch.sh') }}
 
       # NOT CONDITIONAL ON A CACHE HIT. The script already checks for what it

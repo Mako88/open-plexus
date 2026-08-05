@@ -43,7 +43,8 @@
   toward it. Planning needs a target, and sub-goals are what serve many tasks.
 - **An answer that is no code it has ever seen.** Answering is ARRIVING somewhere,
   so yes/no and counting questions ask for a token the world never shows.
-  `BabiTests` names the tasks this puts out of reach.
+  `BabiTests` names the tasks; `PrimerTests` says why feeding it English does not
+  fix it.
 - **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
   sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
   — everything else carries over. An act is already a code.
@@ -81,7 +82,9 @@
 - **A row cap that varies by node** — a node seen ten thousand times has more to say
   than one seen twice. `k · log(seen)` is local and scale-free. Measure it on
   `Skew`, the one setting where a cap is not inert.
-- **Space-Saving for the row cap** — the eviction scan is linear in the cap.
+- **Space-Saving for the row cap** — the eviction scan is linear in the cap. Real
+  text is what needs it: swallowing any is ruinous at a cap the questions still
+  work under.
 
 ### Housekeeping
 

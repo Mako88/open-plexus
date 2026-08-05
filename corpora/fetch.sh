@@ -33,6 +33,32 @@ echo "en/     1,000 training stories per task, which is the harder published set
 echo "en-10k/ 10,000, which is the setting most reported numbers use"
 echo
 
+# Tatoeba — the English sentence export. CC BY 2.0 FR, (c) Tatoeba contributors.
+#
+# WHY THIS IS HERE: six bAbI tasks score exactly nought because their answers --
+# `yes`, `no`, `maybe`, the counting words -- never occur as WORDS in the corpus,
+# only in the answer column, so there is no node for the walk to arrive at. This
+# is the plain English that puts them in the graph.
+#
+# SHORT EVERYDAY SENTENCES RATHER THAN PROSE, deliberately. `yes` and `no` are
+# things people say to each other; narrative uses them only inside dialogue, so a
+# novel of the same size carries far fewer of them.
+#
+# The download is 25 MB compressed and 108 MB extracted, which is the largest
+# thing here -- but only the first few tens of thousands of lines are ever read,
+# and the export has no smaller published slice.
+tatoeba_url="https://downloads.tatoeba.org/exports/per_language/eng/eng_sentences.tsv.bz2"
+tatoeba_file="$here/tatoeba_eng.tsv"
+
+if [ -f "$tatoeba_file" ]; then
+  echo "Tatoeba: already at $tatoeba_file"
+else
+  echo "Tatoeba: fetching 25 MB from $tatoeba_url"
+  curl -sS -L --max-time 600 -o "$here/tatoeba_eng.tsv.bz2" "$tatoeba_url"
+  bunzip2 -kf "$here/tatoeba_eng.tsv.bz2"
+  echo "Tatoeba: extracted to $tatoeba_file"
+fi
+
 # CLEVR — Johnson et al. 2017, "CLEVR: A Diagnostic Dataset for Compositional
 # Language and Elementary Visual Reasoning". CC BY 4.0, (c) 2017 Facebook, Inc.
 #

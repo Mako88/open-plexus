@@ -37,6 +37,16 @@ public sealed record BabiResult : Questioned
     /// </remarks>
     public required bool Kinds { get; init; }
 
+    /// <summary>
+    /// How many sentences of plain English were shown before the task —
+    /// <see cref="Primer"/>, and nought is off.
+    /// </summary>
+    /// <remarks>
+    /// <b>Reported for the reason <see cref="Span"/> is:</b> an arm nobody can see
+    /// in the output is an arm that looks distinct and is not.
+    /// </remarks>
+    public required int Primed { get; init; }
+
     /// <inheritdoc cref="Babi.Commonest"/>
     public required double Commonest { get; init; }
 
@@ -108,7 +118,7 @@ public sealed record BabiResult : Questioned
 
     public override string ToString() =>
         $"task={Task} stories={(Stories ? "on" : "off")} span={Span} " +
-        $"kinds={(Kinds ? "on" : "off")} " +
+        $"kinds={(Kinds ? "on" : "off")} primed={Primed} " +
         $"sentences={Moments} asked={Asked} right={Right} silent={Silent} " +
         $"compound={Compound} blind={Blind} | " +
         $"accuracy={Accuracy:F4} expressible={Expressible:F4} " +
@@ -180,6 +190,10 @@ public sealed class BabiRun : IDisposable
     /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
+    /// <param name="primer">
+    /// <inheritdoc cref="Primer" path="/summary"/> <b>Null is the control</b>, and
+    /// it is the arm every number before 2026-08-04 was taken under.
+    /// </param>
     /// <remarks>
     /// <b>THIS IS THE FIRST WORLD THE WINDOW COULD POSSIBLY WORK ON.</b> It was
     /// built to give the graph temporal edges, measured null on snake, and never
@@ -196,7 +210,8 @@ public sealed class BabiRun : IDisposable
         Accumulate ranking = Accumulate.Sum,
         bool kinds = false,
         int clusters = 8,
-        int replicas = 256)
+        int replicas = 256,
+        Primer? primer = null)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(dials);
@@ -206,6 +221,7 @@ public sealed class BabiRun : IDisposable
         _span = span;
         _ranking = ranking;
         _kinds = kinds;
+        _primer = primer?.Lines ?? [];
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _reader = new InputMachine<Sentence>(
@@ -221,6 +237,10 @@ public sealed class BabiRun : IDisposable
 
     /// <inheritdoc cref="Graph.Kind"/>
     private readonly bool _kinds;
+
+    /// <inheritdoc cref="Primer"/>
+    /// <remarks><b>Empty when nothing was primed</b>, which is the control.</remarks>
+    private readonly IReadOnlyList<Sentence> _primer;
 
     /// <summary>The world this run is reading.</summary>
     public Babi World => _world;
@@ -279,12 +299,28 @@ public sealed class BabiRun : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(votes);
 
         int shown = 0, asked = 0, right = 0, silent = 0, blind = 0;
-        int unbalanced = 0, unsettled = 0, compound = 0;
+        int unbalanced = 0, unsettled = 0, compound = 0, primed = 0;
         long halted = 0;
 
         var reflected = 0;
         var chains = new Chains();
         var at = 0L;
+
+        // THE ENGLISH FIRST, IN THE SAME RUN AND ON THE SAME GRAPH. Nothing is
+        // reset between this and the task -- there is no train-then-test here and
+        // C4 forbids one, so the primer is simply what the system saw earlier.
+        // It is never ASKED anything, so it cannot contribute a right answer; all
+        // it can do is put words in the graph and join them to each other.
+        foreach (var line in _primer)
+        {
+            primed++;
+
+            var seen = await _reader.ObserveAsync(line, at++, ct: ct).ConfigureAwait(false);
+            await _fabric.QuietAsync(ct).ConfigureAwait(false);
+
+            if (seen is not null)
+                reflected += await _reader.ReflectAsync(seen, at, ct).ConfigureAwait(false);
+        }
 
         foreach (var line in _world.Lines.Take(sentences))
         {
@@ -337,6 +373,7 @@ public sealed class BabiRun : IDisposable
             Stories = _world.Stories,
             Span = _span,
             Kinds = _kinds,
+            Primed = primed,
             Moments = shown,
             Asked = asked,
             Right = right,

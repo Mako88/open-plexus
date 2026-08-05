@@ -333,7 +333,13 @@ public sealed class Thought
             return;
         }
 
-        var stronger = arrival.Best > standing.Best;
+        // A TOTAL ORDER, AND `>` WAS NOT ONE. Two routes of EQUAL strength left the
+        // chain belonging to whichever arrived first, and `Chain.Length` is a sort
+        // key in `Ranked` -- so delivery order reached the ranking through a
+        // comparison that looks like it could not carry it. Measured on CLEVR:
+        // identical graph, identical message count, and the accuracy moving over
+        // four runs of one seed by half the world's whole margin above chance.
+        var stronger = Beats(arrival, standing);
 
         _arrivals[arrival.Endpoint] = new Arrival
         {
@@ -506,10 +512,56 @@ public sealed class Thought
         lock (_gate) return _agreeing.TryGetValue(endpoint, out var origins) ? origins.Count : 0;
     }
 
+    /// <summary>
+    /// Which of two arrivals is the better EXPLANATION, as a total order.
+    /// </summary>
+    /// <remarks>
+    /// <b>STRONGEST FIRST, THEN SHORTEST, THEN THE CODES THEMSELVES.</b> The last
+    /// clause is what makes it total: without it two equally strong routes of
+    /// equal length are indistinguishable and the winner is whichever the network
+    /// delivered first, which is not a property of the graph at all.
+    /// </remarks>
+    private static bool Beats(Arrival arriving, Arrival standing)
+    {
+        var strength = arriving.Best.CompareTo(standing.Best);
+        if (strength != 0) return strength > 0;
+
+        var mine = arriving.Chain.IsDefaultOrEmpty ? [] : arriving.Chain;
+        var theirs = standing.Chain.IsDefaultOrEmpty ? [] : standing.Chain;
+
+        if (mine.Length != theirs.Length) return mine.Length < theirs.Length;
+
+        for (var step = 0; step < mine.Length; step++)
+        {
+            var order = mine[step].CompareTo(theirs[step]);
+            if (order != 0) return order < 0;
+        }
+
+        // THE SAME CHAIN ARRIVING TWICE. Keeping the standing one is the stable
+        // choice; swapping identical things is how a sort stops being a function.
+        return false;
+    }
+
+    /// <summary>
+    /// How close two summed scores must be before they count as tied.
+    /// </summary>
+    /// <remarks>
+    /// <b>BECAUSE THE SUM ITSELF IS NOT ORDER-INDEPENDENT.</b> A score is folded in
+    /// arrival order and floating-point addition is not associative, so the same
+    /// routes arriving in a different order give a score differing in the last
+    /// bits. Comparing raw doubles lets that difference decide a ranking — which is
+    /// C2 reaching the answer through the arithmetic rather than through the
+    /// design. <b>Relative, because scores here span orders of magnitude</b>, and
+    /// far below any gap that means something.
+    /// </remarks>
+    private const double Tied = 1e-9;
+
     /// <remarks>
     /// <b>Ties break on the shorter chain, then on the endpoint</b>, so the order
     /// is deterministic and does not depend on which route happened to land
-    /// first.
+    /// first. <b>That claim was FALSE until 2026-08-05 and this comment was
+    /// asserting it three lines from the violation</b> — see <see cref="Beats"/>
+    /// and <see cref="Tied"/>.
     /// </remarks>
     private IEnumerable<Arrival> Ranked()
     {
@@ -517,13 +569,24 @@ public sealed class Thought
         // agreement as the tiebreak would be the same ranking as `Sum`, because
         // an exact score tie almost never happens -- the order of the keys is the
         // whole change.
-        var ranked = _accumulate == Accumulate.Agreement
-            ? _arrivals.Values
-                .OrderByDescending(a => Agreed(a))
-                .ThenByDescending(a => a.Score)
-            : _arrivals.Values.OrderByDescending(a => a.Score);
+        return _arrivals.Values.Order(Comparer<Arrival>.Create((left, right) =>
+        {
+            if (_accumulate == Accumulate.Agreement)
+            {
+                var agreeing = Agreed(right).CompareTo(Agreed(left));
+                if (agreeing != 0) return agreeing;
+            }
 
-        return ranked.ThenBy(a => a.Chain.Length).ThenBy(a => a.Endpoint);
+            var gap = left.Score - right.Score;
+            var scale = Math.Max(Math.Abs(left.Score), Math.Abs(right.Score));
+
+            if (Math.Abs(gap) > Tied * Math.Max(1.0, scale)) return gap > 0 ? -1 : 1;
+
+            var mine = left.Chain.IsDefaultOrEmpty ? 0 : left.Chain.Length;
+            var theirs = right.Chain.IsDefaultOrEmpty ? 0 : right.Chain.Length;
+
+            return mine != theirs ? mine.CompareTo(theirs) : left.Endpoint.CompareTo(right.Endpoint);
+        }));
     }
 
     /// <summary>How many distinct origins reached an arrival's endpoint.</summary>

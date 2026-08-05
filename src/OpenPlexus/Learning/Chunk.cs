@@ -55,6 +55,35 @@ namespace OpenPlexus.Learning;
 /// </remarks>
 public sealed class Chunk
 {
+    // ---- WHAT SUBSTITUTION COSTS, MEASURED 2026-08-05 ----------------------
+    //
+    // MINTING BECAME UNCONDITIONAL AND THAT MADE A HIDDEN TRADE VISIBLE. The name
+    // REPLACES the moment's onsets, so the members stop pairing with each other --
+    // which is the whole compression, S(S-1) entries collapsing to 2S, and is also
+    // the entire structure of a world whose task is the relation BETWEEN members.
+    //
+    //   * `Senses` fell 0.8621 to 0.4138. A moment there is two codes, so a chunk
+    //     covering it writes `name`-sight and `name`-sound and destroys the
+    //     sight-sound edge -- and reaching touch from sight runs through sound and
+    //     nowhere else.
+    //
+    //   * `Accumulate.Agreement` went INERT, reading exactly equal to `Sum`. A
+    //     conjunction is several distinct origins agreeing, and one name in place
+    //     of a moment is one origin.
+    //
+    // THE OBVIOUS ALTERNATIVE WAS TRIED AND IS NOT THE ANSWER. Emitting the name
+    // ALONGSIDE the onsets rather than instead of them scores far better --
+    // `Motif` 0.7931 to 0.9655, `Senses` 0.4138 to 0.4483 -- but it costs `Motif`
+    // four times the traffic and abandons the compression this class exists for,
+    // and `Senses` is still nowhere near its 0.8621. IT BUYS A SCORE BY GIVING UP
+    // THE MECHANISM, and it does not fix the world it was meant to fix.
+    //
+    // WHAT IS ACTUALLY NEEDED IS ON THE PLAN: chunk candidates BELOW a whole
+    // moment. `Notice` is handed the ENTIRE moment, so every chunk is the whole of
+    // it and there is never anything left over for the name to pair with. Utility
+    // per chunk (Minton, SOAR) is the other half -- a name that does not pay for
+    // itself should not survive.
+
     /// <summary>
     /// The modality every minted code carries.
     /// </summary>

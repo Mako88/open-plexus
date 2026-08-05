@@ -41,6 +41,9 @@
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and
   the rollout predicts; nothing can hold a state that is NOT current and steer
   toward it. Planning needs a target, and sub-goals are what serve many tasks.
+- **An answer that is no code it has ever seen.** Answering is ARRIVING somewhere,
+  so yes/no and counting questions ask for a token the world never shows.
+  `BabiTests` names the tasks this puts out of reach.
 - **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
   sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
   — everything else carries over. An act is already a code.

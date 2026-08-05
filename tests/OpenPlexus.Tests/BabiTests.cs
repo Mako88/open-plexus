@@ -167,6 +167,69 @@ public sealed class BabiTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// The tasks whose answer is a word the world never shows.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FOUND BY RUNNING ALL TWENTY AND ASKING WHY SIX WERE EXACTLY NOUGHT.</b>
+    /// Not nearly nought — <i>exactly</i>, on every question, which is the shape of
+    /// a thing that cannot happen rather than a thing done badly.
+    /// </para>
+    /// <para>
+    /// <b>19 IS HERE BECAUSE THE CHECK PUT IT HERE.</b> The list was written from
+    /// the five tasks whose score was nought with nothing compound about them, and
+    /// 19 was set aside as the compound case. It reaches none of its twelve answers
+    /// either — a path like <c>n,w</c> is neither a word nor one answer — so it
+    /// fails BOTH ways, and the honest count of what this design cannot express on
+    /// this benchmark is six rather than five.
+    /// </para>
+    /// </remarks>
+    private static readonly int[] Unspeakable = [6, 7, 10, 17, 18, 19];
+
+    [Fact]
+    public void Six_tasks_answer_with_a_word_the_corpus_never_shows()
+    {
+        // THE CEILING THIS ARCHITECTURE HAS, STATED AS A PROPERTY OF THE CORPUS SO
+        // IT COSTS NO WALK TO CHECK. An answer here is a CODE THE WALK ARRIVED AT,
+        // and a code enters the graph only by being observed in a sentence. `yes`,
+        // `no`, `maybe` and the counting words are never in a sentence -- they
+        // appear only in the answer column. So there is no node to arrive at, and
+        // no budget, pricing or depth can conjure one.
+        //
+        // THIS IS NOT A BUG AND IT IS NOT TUNING. It is the price of answering by
+        // ARRIVING somewhere: the system can only ever say what it has seen, and a
+        // yes/no question asks it to produce a token the world does not contain.
+        // SIX of the twenty are unreachable, so any mean over all twenty is really
+        // a mean over fourteen with six structural zeroes dragging it -- which is
+        // the difference between 0.2507 and 0.3582, and the reason to report both.
+        foreach (var task in Enumerable.Range(1, 20))
+        {
+            var world = new Babi(World(task));
+
+            var shown = world.Lines
+                .SelectMany(line => line.Words)
+                .ToHashSet();
+
+            var reachable = world.Alphabet.Count(answer => shown.Contains(Babi.Of(answer)));
+
+            output.WriteLine(
+                $"task {task,2}: {reachable,2} of {world.Alphabet.Count,2} answers "
+                + $"are words the corpus ever shows");
+
+            if (Unspeakable.Contains(task))
+                Assert.True(reachable == 0,
+                    $"task {task} can now reach {reachable} of its answers, so the "
+                    + "structural zero has an exception and the ceiling claim needs "
+                    + "re-reading rather than re-asserting");
+            else
+                Assert.True(reachable > 0,
+                    $"task {task} cannot reach ANY of its answers either, so the "
+                    + "list above is incomplete and more of the benchmark is out of "
+                    + "reach than it says");
+        }
+    }
+
     // ---- what the graph does with it ---------------------------------------
 
     /// <summary>How much of a task file a measurement reads.</summary>

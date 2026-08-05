@@ -49,16 +49,47 @@ public sealed class FlagTests(ITestOutputHelper output)
     /// and the behaviour stays — or it loses and the whole mechanism goes with a
     /// revival row. Nothing leaves this list by being renamed.
     /// </remarks>
+    /// <remarks>
+    /// <b>SORTED BY WHAT THE EVIDENCE ALREADY SAYS, because "turn everything on"
+    /// is three different jobs and only one of them is easy.</b> Checked against
+    /// the refutation table on 2026-08-04: NONE of these is a refuted loser. Every
+    /// arm the table refuted was already deleted from the code, and what is left
+    /// there is doc comments the table itself cites.
+    /// </remarks>
     private static readonly HashSet<string> Switches = new(StringComparer.Ordinal)
     {
-        // ---- RAW BOOLEANS ---------------------------------------------------
-        "Kinds", "Surprising", "Gated", "Chunking", "Recent", "IncludeEmpty",
+        // ---- WON ALREADY, SO THE FLAG SHOULD GO AND THE BEHAVIOUR STAY ------
+        //
+        // `Doubt` repairs the rare-coincidence defect and is free where it is not
+        // needed -- measured identical to ten places on the clean world. `Row` was
+        // proved free under a heavy tail and near-free on a flat one, and is the
+        // difference between possible and impossible on text. `Names` is the
+        // table's own "REVIVED at one code".
+        //
+        // THE COST OF CASHING THESE IN IS THAT EVERY BASELINE MOVES, which is why
+        // they are still here rather than done in passing.
+        "Doubt", "Row", "Names",
 
-        // ---- NULL MEANS OFF -------------------------------------------------
-        "Row", "Reflect", "Budget", "Names", "Foresight",
+        // ---- WORLD-DEPENDENT, WHICH IS NOT THE SAME AS OFF ------------------
+        //
+        // `Span` is refuted on snake and bAbI and is THE WHOLE TASK on `Rhythm`,
+        // where nothing overlaps and there are no temporal cells without it. So it
+        // is not a loser and it is not a winner; it is a claim about the STREAM.
+        // Deleting it would take `Rhythm` with it. `Kinds` only means anything
+        // beside it.
+        //
+        // AND THIS PAIR IS WHAT YESTERDAY'S REGRESSION WAS MADE OF: a per-world
+        // default is a scattered piece of KNOWLEDGE, not just a scattered knob.
+        "Span", "Kinds",
 
-        // ---- ZERO MEANS OFF -------------------------------------------------
-        "Span", "Doubt",
+        // ---- UNRESOLVED, AND EACH NEEDS ITS TOGGLE RUN ----------------------
+        //
+        // `IncludeEmpty` is the table's "revived, no clear winner since".
+        // `Reflect` is recorded as a trade. `Surprising` and `Gated` bite on
+        // `Rhythm` and are inert on text. `Chunking`, `Recent`, `Budget` and
+        // `Foresight` have each been measured on exactly one world.
+        "Surprising", "Gated", "Chunking", "Recent", "IncludeEmpty", "Reflect",
+        "Budget", "Foresight",
     };
 
     [Fact]

@@ -177,7 +177,7 @@ public sealed record RhythmResult : Questioned
 public sealed class RhythmRun : IDisposable
 {
     private readonly Fabric _fabric;
-    private readonly InputMachine<Code> _ear;
+    private readonly InputMachine<Coded> _ear;
     private readonly Rhythm _world;
     private readonly WalkSettings _dials;
 
@@ -216,8 +216,8 @@ public sealed class RhythmRun : IDisposable
         _asking = new Question { Recent = true };
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
-        _ear = new InputMachine<Code>(
-            new MachineAddress("ear"), new Hearing(),
+        _ear = new InputMachine<Coded>(
+            new MachineAddress("ear"), new Passthrough(),
             new LocalRendezvous(_fabric.Local, carried: dials.Carried),
             _fabric.Bus, _fabric.Ring, dials);
 
@@ -226,14 +226,6 @@ public sealed class RhythmRun : IDisposable
 
     /// <summary>The world this run is listening to.</summary>
     public Rhythm World => _world;
-
-    /// <summary>One symbol is already a code; there is nothing to quantise.</summary>
-    private sealed class Hearing : IQuantizer<Code>
-    {
-        public byte Modality => Rhythm.Beat;
-
-        public IReadOnlyCollection<Code> Codify(Code observation) => [observation];
-    }
 
     /// <summary>
     /// Listens, and at every moment bets on the next one.
@@ -311,7 +303,7 @@ public sealed class RhythmRun : IDisposable
                 }
             }
 
-            var observed = await _ear.ObserveAsync(shown, moment, ct: ct).ConfigureAwait(false);
+            var observed = await _ear.ObserveAsync(Coded.Of(shown), moment, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             if (observed is not null)

@@ -123,7 +123,7 @@ public sealed record BindingResult : Questioned
 public sealed class BindingRun : IDisposable
 {
     private readonly Fabric _fabric;
-    private readonly InputMachine<Scene> _eyes;
+    private readonly InputMachine<Coded> _eyes;
     private readonly Binding _world;
     private readonly WalkSettings _dials;
 
@@ -152,7 +152,7 @@ public sealed class BindingRun : IDisposable
         _dials = dials;
         _fabric = new Fabric(dials, seed, clusters, replicas, late);
 
-        _eyes = new InputMachine<Scene>(
+        _eyes = new InputMachine<Coded>(
             new MachineAddress("scene"), new Passthrough(), new LocalRendezvous(_fabric.Local),
             _fabric.Bus, _fabric.Ring, dials);
 
@@ -161,22 +161,6 @@ public sealed class BindingRun : IDisposable
 
     /// <inheritdoc cref="Bus.HybridBus.Delayed"/>
     public long Delayed => _fabric.Bus.Delayed;
-
-    /// <summary>
-    /// The codes are already codes; there is nothing to quantise. <b>What it does
-    /// do is pass the segmentation through</b> — see
-    /// <see cref="Learning.Occasion.Groups"/>.
-    /// </summary>
-    private sealed class Passthrough : IQuantizer<Scene>
-    {
-        public byte Modality => Binding.Colour;
-
-        public IReadOnlyCollection<Code> Codify(Scene observation) => observation.Codes;
-
-        public IReadOnlyDictionary<Code, int>? Bind(Scene observation) => observation.Groups;
-
-        public IReadOnlySet<Code>? Fleeting(Scene observation) => observation.Passing;
-    }
 
     /// <summary>
     /// Shows scenes, and every <paramref name="every"/> of them asks which shape
@@ -209,7 +193,12 @@ public sealed class BindingRun : IDisposable
             var scene = _world.Next();
 
             var thought = await _eyes
-                .ObserveAsync(scene, moment, ct: ct).ConfigureAwait(false);
+                .ObserveAsync(
+                    new Coded
+                    {
+                        Codes = scene.Codes, Groups = scene.Groups, Passing = scene.Passing,
+                    },
+                    moment, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             // Reflection sees what was OBSERVED and never what was asked, for the

@@ -99,7 +99,7 @@ public sealed record ClevrResult : Questioned
 public sealed class ClevrRun : IDisposable
 {
     private readonly Fabric _fabric;
-    private readonly InputMachine<Sighting> _eyes;
+    private readonly InputMachine<Coded> _eyes;
     private readonly Clevr _world;
     private readonly WalkSettings _dials;
 
@@ -124,8 +124,8 @@ public sealed class ClevrRun : IDisposable
         _dials = dials;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
-        _eyes = new InputMachine<Sighting>(
-            new MachineAddress("eyes"), new Looking(), new LocalRendezvous(_fabric.Local),
+        _eyes = new InputMachine<Coded>(
+            new MachineAddress("eyes"), new Passthrough(), new LocalRendezvous(_fabric.Local),
             _fabric.Bus, _fabric.Ring, dials);
 
         _fabric.Subscribe(_eyes);
@@ -133,39 +133,6 @@ public sealed class ClevrRun : IDisposable
 
     /// <summary>The world this run is reading.</summary>
     public Clevr World => _world;
-
-    /// <summary>
-    /// The front end, which does no vision at all.
-    /// </summary>
-    /// <remarks>
-    /// <b>The scene graph IS the quantised signal.</b> CLEVR ships every object's
-    /// colour, size, shape and material already separated, which is exactly the
-    /// segmented input <see cref="Occasion.Groups"/> says a retina hands over —
-    /// so what is being measured here is what the graph does with segmentation,
-    /// not whether segmentation is possible.
-    /// </remarks>
-    private sealed class Looking : IQuantizer<Sighting>
-    {
-        public byte Modality => Clevr.Colour;
-
-        public IReadOnlyCollection<Code> Codify(Sighting observation)
-        {
-            ArgumentNullException.ThrowIfNull(observation);
-            return observation.Codes;
-        }
-
-        public IReadOnlyDictionary<Code, int>? Bind(Sighting observation)
-        {
-            ArgumentNullException.ThrowIfNull(observation);
-            return observation.Groups;
-        }
-
-        public IReadOnlySet<Code>? Fleeting(Sighting observation)
-        {
-            ArgumentNullException.ThrowIfNull(observation);
-            return observation.Fleeting;
-        }
-    }
 
     /// <summary>Shows every scene and asks what is asked about it.</summary>
     /// <param name="refer">How a question refers to the object it is about.</param>
@@ -185,7 +152,12 @@ public sealed class ClevrRun : IDisposable
 
         foreach (var scene in _world.Scenes)
         {
-            var observed = await _eyes.ObserveAsync(scene, at++, ct: ct).ConfigureAwait(false);
+            var observed = await _eyes.ObserveAsync(
+                new Coded
+                {
+                    Codes = scene.Codes, Groups = scene.Groups, Passing = scene.Fleeting,
+                },
+                at++, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             // REFLECTION SEES WHAT WAS OBSERVED AND NEVER WHAT WAS ASKED, exactly

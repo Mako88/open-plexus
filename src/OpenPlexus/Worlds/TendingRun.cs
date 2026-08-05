@@ -223,7 +223,7 @@ public sealed class TendingRun : IDisposable
 {
     private readonly TendingSettings _settings;
     private readonly Fabric _fabric;
-    private readonly InputMachine<ImmutableArray<Code>> _body;
+    private readonly InputMachine<Coded> _body;
     private readonly WalkSettings _dials;
     /// <param name="world">The shape of the garden.</param>
     /// <param name="dials">The walk.</param>
@@ -249,8 +249,8 @@ public sealed class TendingRun : IDisposable
         _dials = dials;
         Seed = seed;
 
-        _body = new InputMachine<ImmutableArray<Code>>(
-            new MachineAddress("gardener"), new Feeling(), new LocalRendezvous(_fabric.Local),
+        _body = new InputMachine<Coded>(
+            new MachineAddress("gardener"), new Passthrough(), new LocalRendezvous(_fabric.Local),
             _fabric.Bus, _fabric.Ring, dials);
 
         _fabric.Subscribe(_body);
@@ -258,14 +258,6 @@ public sealed class TendingRun : IDisposable
 
     /// <summary>The seed this run was built with.</summary>
     public int Seed { get; }
-
-    /// <summary>The codes are already codes; there is nothing to quantise.</summary>
-    private sealed class Feeling : IQuantizer<ImmutableArray<Code>>
-    {
-        public byte Modality => Tending.Damp;
-
-        public IReadOnlyCollection<Code> Codify(ImmutableArray<Code> observation) => observation;
-    }
 
     /// <summary>Tends the garden for a while.</summary>
     /// <param name="steps">How long to run for.</param>
@@ -365,7 +357,7 @@ public sealed class TendingRun : IDisposable
                 ? [.. felt, Tending.Doing(did)]
                 : felt;
 
-            await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
+            await _body.ObserveAsync(Coded.Of(occasion), step, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             // AND WHATEVER IS STILL IN THE TRACE COLLECTS A CELL IF THE BODY

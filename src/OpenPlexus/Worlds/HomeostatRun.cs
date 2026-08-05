@@ -232,7 +232,7 @@ public sealed record HomeostatResult : Measurement
 public sealed class HomeostatRun : IDisposable
 {
     private readonly Fabric _fabric;
-    private readonly InputMachine<ImmutableArray<Code>> _body;
+    private readonly InputMachine<Coded> _body;
     private readonly HomeostatSettings _settings;
 
     /// <summary>The join, held so a write can happen without thinking.</summary>
@@ -279,8 +279,8 @@ public sealed class HomeostatRun : IDisposable
 
         _joining = new LocalRendezvous(_fabric.Local);
 
-        _body = new InputMachine<ImmutableArray<Code>>(
-            new MachineAddress("body"), new Feeling(), _joining,
+        _body = new InputMachine<Coded>(
+            new MachineAddress("body"), new Passthrough(), _joining,
             _fabric.Bus, _fabric.Ring, dials);
 
         _fabric.Subscribe(_body);
@@ -288,14 +288,6 @@ public sealed class HomeostatRun : IDisposable
 
     /// <summary>The seed this run was built with.</summary>
     public int Seed { get; }
-
-    /// <summary>The codes are already codes; there is nothing to quantise.</summary>
-    private sealed class Feeling : IQuantizer<ImmutableArray<Code>>
-    {
-        public byte Modality => Homeostat.Need;
-
-        public IReadOnlyCollection<Code> Codify(ImmutableArray<Code> observation) => observation;
-    }
 
     /// <summary>Runs the body for a while.</summary>
     /// <param name="steps">How long to run for.</param>
@@ -397,7 +389,7 @@ public sealed class HomeostatRun : IDisposable
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
                 // ordinary cell is untouched and this arm changes one thing.
-                await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
+                await _body.ObserveAsync(Coded.Of(occasion), step, ct: ct).ConfigureAwait(false);
                 await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
                 // AND THE PREVIOUS MOMENT COLLECTS A SECOND CELL IF IT EARNED ONE.
@@ -434,7 +426,7 @@ public sealed class HomeostatRun : IDisposable
             }
             else
             {
-                await _body.ObserveAsync(occasion, step, ct: ct).ConfigureAwait(false);
+                await _body.ObserveAsync(Coded.Of(occasion), step, ct: ct).ConfigureAwait(false);
                 await _fabric.QuietAsync(ct).ConfigureAwait(false);
             }
 

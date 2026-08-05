@@ -118,7 +118,7 @@ public sealed record MotifResult : Questioned
 public sealed class MotifRun : IDisposable
 {
     private readonly Fabric _fabric;
-    private readonly InputMachine<ImmutableArray<Code>> _eyes;
+    private readonly InputMachine<Coded> _eyes;
     private readonly Motif _world;
     private readonly MotifSettings _settings;
     private readonly WalkSettings _dials;
@@ -146,8 +146,8 @@ public sealed class MotifRun : IDisposable
         _dials = dials;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
-        _eyes = new InputMachine<ImmutableArray<Code>>(
-            new MachineAddress("eyes"), new Seeing(), new LocalRendezvous(_fabric.Local),
+        _eyes = new InputMachine<Coded>(
+            new MachineAddress("eyes"), new Passthrough(), new LocalRendezvous(_fabric.Local),
             _fabric.Bus, _fabric.Ring, dials);
 
         _fabric.Subscribe(_eyes);
@@ -158,14 +158,6 @@ public sealed class MotifRun : IDisposable
 
     /// <summary>The world this run is watching.</summary>
     public Motif World => _world;
-
-    /// <summary>The codes are already codes; there is nothing to quantise.</summary>
-    private sealed class Seeing : IQuantizer<ImmutableArray<Code>>
-    {
-        public byte Modality => Motif.Token;
-
-        public IReadOnlyCollection<Code> Codify(ImmutableArray<Code> observation) => observation;
-    }
 
     /// <summary>
     /// Shows moments, and every <paramref name="every"/> of them asks a set to
@@ -187,7 +179,7 @@ public sealed class MotifRun : IDisposable
         {
             var (shown, _) = _world.Next();
 
-            var observed = await _eyes.ObserveAsync(shown, moment, ct: ct).ConfigureAwait(false);
+            var observed = await _eyes.ObserveAsync(Coded.Of(shown), moment, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             if (observed is not null)

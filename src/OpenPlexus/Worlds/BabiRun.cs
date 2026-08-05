@@ -145,7 +145,7 @@ public sealed record BabiResult : Questioned
 public sealed class BabiRun : IDisposable
 {
     private readonly Fabric _fabric;
-    private readonly InputMachine<Sentence> _reader;
+    private readonly InputMachine<Coded> _reader;
     private readonly Babi _world;
     private readonly WalkSettings _dials;
 
@@ -197,8 +197,8 @@ public sealed class BabiRun : IDisposable
         _primer = primer?.Lines ?? [];
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
-        _reader = new InputMachine<Sentence>(
-            new MachineAddress("reader"), new Reading(),
+        _reader = new InputMachine<Coded>(
+            new MachineAddress("reader"), new Passthrough(),
             new LocalRendezvous(_fabric.Local),
             _fabric.Bus, _fabric.Ring, dials);
 
@@ -217,37 +217,27 @@ public sealed class BabiRun : IDisposable
     public Babi World => _world;
 
     /// <summary>
-    /// The front end: a sentence is its words, and the story code names the
-    /// occasion rather than a kind.
+    /// One sentence as the brain receives it — <b>the world's own knowledge, and
+    /// the only kind a front end is allowed to carry.</b>
     /// </summary>
     /// <remarks>
-    /// <b>As dumb as it is possible to be, and that is the claim.</b> No
-    /// stop-list, no tagger, no template — see the note on <see cref="Babi"/>.
+    /// <b>THE STORY CODE IS MINTED FRESH PER STORY AND NEVER SEEN AGAIN</b>, and
+    /// only this world can know that: a code is opaque to the graph, and "this one
+    /// will never recur" is a fact about how it was minted. See
+    /// <see cref="Codes.Coded.Passing"/>. <b>Null when the arm is off</b>, which is
+    /// the control — there is then no story code in the sentence to name.
     /// </remarks>
-    private sealed class Reading : IQuantizer<Sentence>
+    private static Coded Told(Sentence line)
     {
-        public byte Modality => Babi.Word;
+        ArgumentNullException.ThrowIfNull(line);
 
-        public IReadOnlyCollection<Code> Codify(Sentence observation)
+        var telling = Babi.Telling(line.Story);
+
+        return new Coded
         {
-            ArgumentNullException.ThrowIfNull(observation);
-            return observation.Words;
-        }
-
-        /// <summary>
-        /// The story code, which is minted fresh per story and never seen again.
-        /// </summary>
-        /// <remarks>
-        /// <b>Null when the arm is off</b>, which is the control — and then there
-        /// is no story code in the sentence to name.
-        /// </remarks>
-        public IReadOnlySet<Code>? Fleeting(Sentence observation)
-        {
-            ArgumentNullException.ThrowIfNull(observation);
-
-            var telling = Babi.Telling(observation.Story);
-            return observation.Words.Contains(telling) ? new HashSet<Code> { telling } : null;
-        }
+            Codes = line.Words,
+            Passing = line.Words.Contains(telling) ? new HashSet<Code> { telling } : null,
+        };
     }
 
     /// <summary>
@@ -286,7 +276,7 @@ public sealed class BabiRun : IDisposable
         {
             primed++;
 
-            var seen = await _reader.ObserveAsync(line, at++, ct: ct).ConfigureAwait(false);
+            var seen = await _reader.ObserveAsync(Told(line), at++, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             if (seen is not null)
@@ -300,7 +290,7 @@ public sealed class BabiRun : IDisposable
                 shown++;
 
                 var observed = await _reader
-                    .ObserveAsync(line, at++, ct: ct).ConfigureAwait(false);
+                    .ObserveAsync(Told(line), at++, ct: ct).ConfigureAwait(false);
 
                 await _fabric.QuietAsync(ct).ConfigureAwait(false);
 

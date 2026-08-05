@@ -86,7 +86,7 @@ public sealed record SensesResult : Questioned
 public sealed class SensesRun : IDisposable
 {
     private readonly Fabric _fabric;
-    private readonly InputMachine<IReadOnlyCollection<Code>> _senses;
+    private readonly InputMachine<Coded> _senses;
     private readonly Senses _world;
     private readonly WalkSettings _dials;
 
@@ -130,7 +130,7 @@ public sealed class SensesRun : IDisposable
         _budget = new Budget(dials.Stamina, Budgeting.Standard);
         _fabric = new Fabric(dials, seed, clusters, replicas, late);
 
-        _senses = new InputMachine<IReadOnlyCollection<Code>>(
+        _senses = new InputMachine<Coded>(
             new MachineAddress("senses"), new Passthrough(), new LocalRendezvous(_fabric.Local),
             _fabric.Bus, _fabric.Ring, dials);
 
@@ -139,14 +139,6 @@ public sealed class SensesRun : IDisposable
 
     /// <inheritdoc cref="Bus.HybridBus.Delayed"/>
     public long Delayed => _fabric.Bus.Delayed;
-
-    /// <summary>The codes are already codes; there is nothing to quantise.</summary>
-    private sealed class Passthrough : IQuantizer<IReadOnlyCollection<Code>>
-    {
-        public byte Modality => Senses.Sight;
-
-        public IReadOnlyCollection<Code> Codify(IReadOnlyCollection<Code> observation) => observation;
-    }
 
     /// <summary>
     /// Shows moments, and every <paramref name="every"/> of them stops to ask
@@ -168,7 +160,7 @@ public sealed class SensesRun : IDisposable
         for (var moment = 0; moment < moments; moment++)
         {
             var thought = await _senses
-                .ObserveAsync(_world.Moment(), moment, ct: ct).ConfigureAwait(false);
+                .ObserveAsync(Coded.Of(_world.Moment()), moment, ct: ct).ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             // FORK 21 REFLECTS ON WHAT WAS OBSERVED AND NEVER ON WHAT WAS ASKED.

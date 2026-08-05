@@ -163,7 +163,7 @@ public sealed record ComposedResult : Questioned
 public sealed class ComposedRun : IDisposable
 {
     private readonly Fabric _fabric;
-    private readonly InputMachine<Moment> _eyes;
+    private readonly InputMachine<Coded> _eyes;
     private readonly Composed _world;
     private readonly WalkSettings _dials;
 
@@ -188,7 +188,7 @@ public sealed class ComposedRun : IDisposable
         _dials = dials;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
-        _eyes = new InputMachine<Moment>(
+        _eyes = new InputMachine<Coded>(
             new MachineAddress("scene"), new Passthrough(), new LocalRendezvous(_fabric.Local),
             _fabric.Bus, _fabric.Ring, dials);
 
@@ -199,28 +199,6 @@ public sealed class ComposedRun : IDisposable
     public readonly record struct Moment(
         IReadOnlyCollection<Code> Codes,
         IReadOnlyDictionary<Code, int>? Groups);
-
-    /// <summary>
-    /// The codes are already codes; there is nothing to quantise. <b>What it does
-    /// do is pass the segmentation through.</b>
-    /// </summary>
-    /// <remarks>
-    /// <b>It does NOT declare the indexes fleeting, and that is the difference
-    /// from the binding world.</b> There the question carried the index, so the
-    /// walk began at one and the edge back into the attribute's row was dead
-    /// weight. Here the question deliberately withholds the index, so
-    /// <c>attribute → index</c> is the hop the whole task runs through. The row
-    /// growth that <see cref="Occasion.Fleeting"/> removes there is unavoidable
-    /// here, and bounding it needs eviction rather than omission.
-    /// </remarks>
-    private sealed class Passthrough : IQuantizer<Moment>
-    {
-        public byte Modality => Composed.First;
-
-        public IReadOnlyCollection<Code> Codify(Moment observation) => observation.Codes;
-
-        public IReadOnlyDictionary<Code, int>? Bind(Moment observation) => observation.Groups;
-    }
 
     /// <summary>
     /// Shows scenes, and every <paramref name="every"/> of them asks what the
@@ -256,7 +234,8 @@ public sealed class ComposedRun : IDisposable
             foreach (var codes in episode.Moments)
             {
                 var thought = await _eyes
-                    .ObserveAsync(new Moment(codes, episode.Groups), at++, ct: ct)
+                    .ObserveAsync(
+                        new Coded { Codes = codes, Groups = episode.Groups }, at++, ct: ct)
                     .ConfigureAwait(false);
 
                 await _fabric.QuietAsync(ct).ConfigureAwait(false);

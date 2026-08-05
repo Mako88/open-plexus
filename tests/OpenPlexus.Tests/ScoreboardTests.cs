@@ -17,11 +17,27 @@ namespace OpenPlexus.Tests;
 /// described as winning everywhere, which nobody could check cheaply.
 /// </para>
 /// <para>
-/// <b>IT ASSERTS ALMOST NOTHING ON PURPOSE.</b> Each world already owns its own
-/// claims, asserted in its own file against its own chance level; repeating them
-/// here would be a second copy to drift. What this owns is the COMPARISON — that
-/// every world still runs, still beats its own chance, and still reports what it
-/// is complaining about — and the table it prints, which is the artefact.
+/// <b>IT ASSERTS THE SHAPE OF EACH LINE AND NOT THE CLAIM BEHIND IT.</b> Each
+/// world already owns its own claims, asserted in its own file against its own
+/// chance level; repeating them here would be a second copy to drift. What this
+/// owns is the COMPARISON — and the table it prints, which is the artefact.
+/// </para>
+/// <para>
+/// <b>THE FLOOR USED TO BE CHANCE, AND THAT LEFT A FACTOR OF TEN TO FALL
+/// THROUGH.</b> Senses reads 0.86 against a chance of 0.08, so every mechanism in
+/// it could have come unwired at once and this file would still have gone green.
+/// A bar set where nothing can touch it is the <c>TRAPS</c> entry about a check
+/// that is wired and unable to fire, and it was sitting in the one place whose
+/// whole job is to notice a change that broke something everywhere.
+/// </para>
+/// <para>
+/// <b>SO THE THREE ASSERTIONS ARE THREE DIFFERENT FAILURES, and none of them is a
+/// quality bar.</b> A floor per world catches a mechanism going missing; a
+/// ceiling on messages catches a walk that exploded; an empty complaint list
+/// catches a world whose walk stopped walking while its score held up. <b>Every
+/// number here is placed BELOW what the world reads today with room to spare</b>,
+/// because a golden value that has to be edited after every honest improvement
+/// gets edited without being read.
 /// </para>
 /// <para>
 /// <b>Small runs, deliberately.</b> This is a board to read at a glance and to
@@ -32,8 +48,20 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class ScoreboardTests(ITestOutputHelper output)
 {
-    /// <summary>One world's line on the board.</summary>
-    private sealed record Line(string World, Questioned Result)
+    /// <summary>One world's line on the board, and the two bars it must clear.</summary>
+    /// <param name="Floor">
+    /// The least this world may score ABOVE ITS OWN CHANCE. <b>Not a target</b> —
+    /// it is placed roughly a third below what the world reads today, so an
+    /// ordinary shift in either direction passes and a mechanism going missing
+    /// does not.
+    /// </param>
+    /// <param name="Ceiling">
+    /// The most this world may spend in messages. <b>Roughly twice what it spends
+    /// today</b>, because the failure being caught is a walk that exploded rather
+    /// than one that got dearer — <c>Pricing.Balanced</c> timed out entirely and
+    /// the receiver arm on CLEVR was measured at 6.6× before it did.
+    /// </param>
+    private sealed record Line(string World, Questioned Result, double Floor, long Ceiling)
     {
         public double Above => Result.Accuracy - Result.Chance;
     }
@@ -43,7 +71,13 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
     private static async Task<Line> SensesAsync()
     {
         using var run = new SensesRun(Fixture.Senses(concepts: 12), Dials(), seed: 3);
-        return new Line("senses", await run.RunAsync(300, every: 10));
+
+        // READS 0.3305 ABOVE A CHANCE OF 0.0833, DOWN FROM 0.7787 ON 2026-08-05.
+        // THE DROP IS THE SPAN AND IT IS A DECISION, NOT A REGRESSION: measured one
+        // mechanism at a time from the old baseline, `+doubt` and `+row` are exactly
+        // free and `+span` alone takes 0.8621 to 0.3448. This world's moments are
+        // independent draws, so a window joins things that never co-occurred.
+        return new Line("senses", await run.RunAsync(300, every: 10), Floor: 0.22, Ceiling: 450_000);
     }
 
     private static async Task<Line> ComposedAsync()
@@ -53,7 +87,8 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
             Dials() with { Pricing = Pricing.Sender },
             seed: 3);
 
-        return new Line("composed", await run.RunAsync(300));
+        // READS 0.1652 ABOVE A CHANCE OF 0.0417, down from 0.1997.
+        return new Line("composed", await run.RunAsync(300), Floor: 0.11, Ceiling: 1_400_000);
     }
 
     private static async Task<Line> MotifAsync()
@@ -63,7 +98,11 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
             Dials(),
             seed: 3);
 
-        return new Line("motif", await run.RunAsync(300, every: 10));
+        // READS 0.4138 ABOVE A CHANCE OF 0.0345, DOWN FROM 0.6552, AND CHUNKING IS
+        // THE WHOLE OF IT — 0.8276 with the minting suppressed against 0.4483 with
+        // it, on the world step 3 was built for. That is not a floor being lowered
+        // to fit; it is an open question, and the number is what makes it visible.
+        return new Line("motif", await run.RunAsync(300, every: 10), Floor: 0.27, Ceiling: 5_000_000);
     }
 
     private static async Task<Line> RhythmAsync()
@@ -71,14 +110,20 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
         using var run = new RhythmRun(
             new RhythmSettings { Symbols = 12, Period = 5, Violations = 0.1 },
 
-            // THE SPAN IS THE TASK HERE, and it was `RhythmRun`'s own default
-            // until the dials moved to the brain. Nothing overlaps on this world,
-            // so with no window there are no temporal cells at all and the
-            // scoreboard would be reading a crippled world.
-            Dials() with { Span = 1 },
+            // THE SPAN IS THE TASK HERE. It was `RhythmRun`'s own default, then
+            // briefly nobody's, and it is the brain's default now — so this line
+            // no longer has to say so. Nothing overlaps on this world, so with no
+            // window there are no temporal cells at all.
+            Dials(),
             seed: 3);
 
-        return new Line("rhythm", await run.RunAsync(300));
+        // READS 0.8080 ABOVE A CHANCE OF 0.0833, UP FROM 0.1800 — the largest move
+        // any world has made here, and it got CHEAPER doing it. The window, the
+        // surprise gate and the recency preference all went on at once, and this is
+        // the world all three are about. Measured at `Span = 0` it asks NOTHING AT
+        // ALL, so the regression that took the window off it lands under every
+        // bar here at once — see `The_floor_is_placed_where_a_lost_mechanism_trips_it`.
+        return new Line("rhythm", await run.RunAsync(300), Floor: 0.54, Ceiling: 30_000);
     }
 
     private static async Task<Line> BabiAsync()
@@ -93,7 +138,11 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
             Dials() with { Pricing = Pricing.Sender },
             seed: 3);
 
-        return new Line("babi", await run.RunAsync(400));
+        // READS 0.1266 ABOVE A CHANCE OF 0.1667, down from 0.1942. THE SPAN AGAIN,
+        // and this is the world the refutation row already named — sentences are
+        // independent of one another, so carrying words across them costs traffic
+        // and buys nothing. Expected, and taken knowingly.
+        return new Line("babi", await run.RunAsync(400), Floor: 0.084, Ceiling: 3_200_000);
     }
 
     private static async Task<Line> ClevrAsync()
@@ -121,7 +170,15 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
             Dials() with { Pricing = Pricing.Sender },
             seed: 3);
 
-        return new Line("clevr", await run.RunAsync());
+        // READS 0.0659 ABOVE A CHANCE OF 0.3626 — THE THINNEST MARGIN ON THE
+        // BOARD, so its floor is the one doing the least work. That is the world
+        // being honest rather than the bar being slack: real scenes, a chance
+        // level a third of the way up, and a graph that has barely formed at 700.
+        // READS 0.0960 ABOVE A CHANCE OF 0.3626, UP FROM 0.0659, ON A QUARTER OF
+        // THE TRAFFIC — 9,096,347 messages to 2,161,860 and the widest row 701 to
+        // 32. That is the row cap doing exactly what it was cashed in for, on the
+        // only world here whose fan-out was ever large enough to need it.
+        return new Line("clevr", await run.RunAsync(), Floor: 0.064, Ceiling: 5_000_000);
     }
 
     [Fact]
@@ -157,12 +214,80 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
         Assert.All(board, line => Assert.True(line.Result.Asked > 0,
             $"{line.World} asked nothing at all"));
 
-        // AND BEAT ITS OWN CHANCE. Not a quality bar — each world owns its real
-        // thresholds — but a floor that catches a change which broke the walk
-        // everywhere at once, which is exactly what a board is for.
-        Assert.All(board, line => Assert.True(line.Above > 0.0,
-            $"{line.World} is at or below chance: {line.Result.Accuracy} "
-            + $"against {line.Result.Chance}"));
+        // AND CLEARED ITS OWN FLOOR, WHICH IS NOT THE SAME AS BEATING CHANCE. A
+        // world can lose every mechanism it has and still sit above a chance level
+        // ten times below it, which is what this bar used to be.
+        Assert.All(board, line => Assert.True(line.Above >= line.Floor,
+            $"{line.World} is at {line.Above:F4} above chance, under its floor of "
+            + $"{line.Floor:F4} — accuracy {line.Result.Accuracy:F4} against a "
+            + $"chance of {line.Result.Chance:F4}. Something it depends on is gone, "
+            + "or the floor is being moved without being read."));
+
+        // AND DID NOT EXPLODE. The score says nothing about what the walk spent
+        // getting there, and the two failures this project has actually had —
+        // `Pricing.Balanced` and the receiver arm on CLEVR — were both a walk
+        // whose cost ran away rather than one whose answers got worse.
+        Assert.All(board, line => Assert.True(line.Result.Messages <= line.Ceiling,
+            $"{line.World} spent {line.Result.Messages} messages against a ceiling "
+            + $"of {line.Ceiling}. That is a walk that exploded, not one that got "
+            + "dearer."));
+
+        // AND IS NOT COMPLAINING. `Complaints` is where "the walk never left its
+        // origin" lives, and a world CAN hold its score while its walk stops
+        // walking — one-hop association is a real signal on several of these. The
+        // list is printed above either way; this is what makes it a check.
+        Assert.All(board, line => Assert.True(line.Result.Complaints.Count == 0,
+            $"{line.World} is complaining: {string.Join("; ", line.Result.Complaints)}"));
     }
 
+    /// <summary>
+    /// The floor for <c>rhythm</c> is placed where the regression that prompted
+    /// this file actually lands.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A BAR NOBODY HAS SEEN FIRE IS A BAR NOBODY KNOWS THE HEIGHT OF</b> —
+    /// the <c>TRAPS</c> entry says to arm anything that has always read zero, and
+    /// a floor is exactly that shape. So the known break is run against the known
+    /// bar, here, once.
+    /// </para>
+    /// <para>
+    /// <b>IT IS THE BREAK THAT ALREADY HAPPENED.</b> <c>RhythmRun</c> defaulted
+    /// <see cref="WalkSettings.Span"/> to 1 until the dials moved to the brain,
+    /// which defaults it to 0 — and on this world the window IS the task, so the
+    /// migration took the whole thing off and 452 tests stayed green. <b>Measured:
+    /// this world asks NOTHING at a span of nought</b>, so the drop is not a
+    /// narrow miss of the floor but the entire line disappearing.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public async Task The_floor_is_placed_where_a_lost_mechanism_trips_it()
+    {
+        var line = await RhythmAsync();
+
+        using var without = new RhythmRun(
+            new RhythmSettings { Symbols = 12, Period = 5, Violations = 0.1 },
+
+            // THE ONE DIFFERENCE, AND IT HAS TO BE SAID OUT LOUD NOW. This was
+            // `Dials()` — the migration's own default — until the span was cashed
+            // in at one on 2026-08-05, at which point both arms became the same run
+            // and this test failed saying its own floor was decorative. IT WAS
+            // RIGHT: a control that silently becomes the treatment is the exact
+            // trap this file exists to guard, and it caught itself.
+            Dials() with { Span = 0 },
+            seed: 3);
+
+        var lost = await without.RunAsync(300);
+        var above = lost.Accuracy - lost.Chance;
+
+        output.WriteLine(
+            $"rhythm with a window: {line.Above:F4} above chance over {line.Result.Asked} asked");
+        output.WriteLine(
+            $"rhythm without one:   {above:F4} above chance over {lost.Asked} asked");
+        output.WriteLine($"the floor sits at     {line.Floor:F4}");
+
+        Assert.True(above < line.Floor,
+            $"the crippled world reads {above:F4} above chance, which its own floor "
+            + $"of {line.Floor:F4} would let through. The floor is decorative.");
+    }
 }

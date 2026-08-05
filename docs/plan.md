@@ -36,8 +36,9 @@
 
 ### Look necessary for the goal, and absent
 
-- **A front end for real perception** — a hash spending its bits where the data is
-  without being fitted. Grains are the half needing no fitting; this is the other.
+- **A world with a real-valued signal to point `Winnow` at.** The front end is
+  built and measured; nothing here reads a number rather than a symbol. CLEVR's
+  `3d_coords` is real data in a world that scores, and the loader discards it.
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and
   the rollout predicts; nothing can hold a state that is NOT current and steer
   toward it. Planning needs a target, and sub-goals are what serve many tasks.
@@ -66,6 +67,18 @@
   reasons.
 
 ### Mechanisms
+
+- **A span the brain reads off the stream** — a carried pair that never recurs is
+  noise, so the share of `Kind.After` cells whose count passed one separates a
+  cycle from independent draws. A node's own row statistic; see `WalkSettings.Span`.
+- **Chunk candidates BELOW a whole moment.** A chunk covering the moment writes
+  `name`-to-member and destroys member-to-member, which IS the task on `Senses`
+  and is why agreement went inert. Pair-merging (Sequitur, BPE) composes.
+- **The adapter is the only thing between a world and the brain** — John, 2026-08-05.
+  `Tending` bands its own moisture and calls `Grains` itself; that is a world
+  deciding how it is coded. `IQuantizer` is already the interface.
+- **Fork 24 lives on one world.** A controller six worlds never call is on the
+  wrong side of that line.
 
 - **A reason to seek** — every cell is written for acts TAKEN, so no walk reaches an
   untried one. Revives once something can explore.
@@ -152,6 +165,9 @@ condition is a superstition.**
   partner AND prices the hop. It has bitten five times.
 - **A dial measured at one setting of another may be measuring that one.** Sweep at
   two run lengths, never with a third pinned.
+- **Measure one mechanism ON from a known baseline, never one OFF from all-on.**
+  The second direction read small for everything on 2026-08-05; whatever was
+  already broken was doing the damage.
 - **Two arms can peak at different budgets**, so one sweep compares one at its best
   and the other on its way up. Compare PEAK TO PEAK.
 - **A ranking arm needs something to rank.** `Homeostat` at stamina 4 offers a
@@ -181,7 +197,10 @@ condition is a superstition.**
 
 ## OPEN DEFECTS
 
-**Nothing outstanding.**
+- **`Accumulate.Agreement` reads EXACTLY equal to `Sum`** on `Composed` and
+  `Ranking`. A conjunction needs several distinct origins and a minted name
+  collapses them. Not the arrival-order fix — the pre-fix `Thought` fails
+  identically.
 
 ---
 
@@ -196,7 +215,7 @@ condition is a superstition.**
 | **5** | A death writes off routes into the dead cluster. Closed |
 | **6** | Broadcast the origin, route the hops. Closed |
 | **11** | A finished thought is published and routed by code, so N actuators act on one broadcast. Closed |
-| **12** | A fixed seed reproduces a run exactly. Closed |
+| **12** | A fixed seed reproduces a run exactly. Closed — REOPENED and reclosed 2026-08-05; `Receive` folded arrivals in delivery order |
 | **18** | Prediction conditional on the next action. Answered by edge kinds |
 | **20** | Split budgets — deep to act, shallow to predict. Closed |
 | **21** | Compression as an edge. A trade; off |

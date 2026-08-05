@@ -208,7 +208,13 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         // gone. See `Chunk` for the two defects that one rule closes.
         ImmutableArray<Code> present = [.. changes.Started, .. live];
 
-        var folded = _chunks.Notice(present, onsets);
+        // WHAT THE FRONT END SAID WAS ONE THING, READ ONCE AND USED TWICE: a name
+        // may not be minted ACROSS two of them, and a name minted inside one has
+        // to join it or the gate stops applying to the very code that replaced its
+        // members. See `Chunk.Fold`.
+        var bound = _quantizer.Bind(frame);
+
+        var folded = _chunks.Notice(present, onsets, bound);
 
         ImmutableArray<Code> starting, standing;
 
@@ -293,7 +299,11 @@ public sealed class InputMachine<TFrame> : IReceiveReports
 
                 // WHAT THE FRONT END COULD SAY ABOUT WHICH THING IS WHICH, and
                 // null for every front end that cannot. See Occasion.Groups.
-                Groups = _quantizer.Bind(frame),
+                // A NAME JOINS THE OBJECT ITS MEMBERS CAME FROM, because a minted
+                // code is one the front end never saw and therefore one no group
+                // contains -- so without this it pairs with everything and the
+                // gate is off for exactly the code standing in for the members.
+                Groups = Grouped(bound, folded),
 
                 // AND WHAT ORDER THEY CAME IN, where the front end can say and
                 // null everywhere else. The order has to be said HERE, inside the
@@ -322,6 +332,37 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         return residual.Surprising.Count == 0
             ? null
             : await ThinkAsync(residual.Surprising, null, asking, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// The front end's grouping, with every minted name joined to the object its
+    /// members came from.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE MEMBERS CANNOT DISAGREE, because a candidate spanning two groups was
+    /// refused before it was ever folded</b> — see <see cref="Learning.Chunk"/>. So
+    /// the first member that has a group settles it, and a name whose members were
+    /// all ungrouped stays ungrouped, which is what it was.
+    /// </remarks>
+    private static IReadOnlyDictionary<Code, int>? Grouped(
+        IReadOnlyDictionary<Code, int>? bound, Chunk.Substitution folded)
+    {
+        if (bound is null || !folded.Folded) return bound;
+
+        var grouped = new Dictionary<Code, int>(bound);
+
+        foreach (var (name, members) in folded.Names)
+        {
+            foreach (var member in members)
+            {
+                if (!bound.TryGetValue(member, out var group)) continue;
+
+                grouped[name] = group;
+                break;
+            }
+        }
+
+        return grouped;
     }
 
     /// <summary>

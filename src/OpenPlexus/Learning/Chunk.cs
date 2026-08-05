@@ -207,14 +207,21 @@ public sealed class Chunk
     /// Which of them started now. <b>The relations among THESE are what a fold
     /// destroys and nothing recreates</b> — see the guard on <see cref="Fold"/>.
     /// </param>
-    public Substitution Notice(IReadOnlyCollection<Code> moment, IReadOnlySet<Code> onsets)
+    /// <param name="groups">
+    /// Which codes the front end said were one thing, or null where it cannot say.
+    /// <b>A CHUNK MAY NOT SPAN TWO OF THEM</b> — see <see cref="Fold"/>.
+    /// </param>
+    public Substitution Notice(
+        IReadOnlyCollection<Code> moment,
+        IReadOnlySet<Code> onsets,
+        IReadOnlyDictionary<Code, int>? groups = null)
     {
         ArgumentNullException.ThrowIfNull(moment);
         ArgumentNullException.ThrowIfNull(onsets);
 
         if (moment.Count < 2) return Substitution.Of(moment);
 
-        lock (_gate) return Fold(moment, onsets, counting: true);
+        lock (_gate) return Fold(moment, onsets, groups, counting: true);
     }
 
     /// <summary>
@@ -235,7 +242,7 @@ public sealed class Chunk
         // A QUESTION HAS NO ONSETS, so every code in it counts as one. Asking
         // about a set is asking about the whole of it, and a name swallowing all
         // of it would answer with a code standing for the question.
-        lock (_gate) return Fold(codes, codes.ToHashSet(), counting: false);
+        lock (_gate) return Fold(codes, codes.ToHashSet(), null, counting: false);
     }
 
     /// <summary>
@@ -264,8 +271,23 @@ public sealed class Chunk
     /// substitution is refused.
     /// </para>
     /// </remarks>
+    /// <remarks>
+    /// <b>AND A NAME MAY NOT SPAN TWO GROUPS, WHICH IS A REGRESSION THIS CLASS
+    /// CAUSED AND NOT A PRECAUTION.</b> <see cref="Worlds.Binding"/> gates pairing
+    /// by object so that a colour never joins the other object's shape, and its
+    /// graph collapsed twelvefold when it did. A minted name is a code the front
+    /// end never saw, so it appears in no group, so it paired with EVERYTHING —
+    /// and the collapse went from 144 edges against 1,751 to 3,054 against 3,258.
+    /// <b>A chunk covering two objects asserts exactly the binding the world says
+    /// did not happen</b>, so it is refused; a chunk inside one object inherits it,
+    /// which <see cref="Machines.InputMachine{TFrame}"/> writes back into the
+    /// grouping.
+    /// </remarks>
     private Substitution Fold(
-        IReadOnlyCollection<Code> moment, IReadOnlySet<Code> onsets, bool counting)
+        IReadOnlyCollection<Code> moment,
+        IReadOnlySet<Code> onsets,
+        IReadOnlyDictionary<Code, int>? groups,
+        bool counting)
     {
         var current = moment.Distinct().Order().ToList();
 
@@ -288,7 +310,8 @@ public sealed class Chunk
             // A FOLD FROM TWO COVERS THE WHOLE MOMENT. See above.
             if (current.Count < 3) break;
 
-            if (!Best(current, covers, onsets, wanted, out var left, out var right, out var key))
+            if (!Best(current, covers, onsets, wanted, groups,
+                    out var left, out var right, out var key))
                 break;
 
             var members = _members[key];
@@ -415,6 +438,7 @@ public sealed class Chunk
         Dictionary<Code, ImmutableArray<Code>> covers,
         IReadOnlySet<Code> onsets,
         int wanted,
+        IReadOnlyDictionary<Code, int>? groups,
         out Code left,
         out Code right,
         out ulong key)
@@ -446,6 +470,9 @@ public sealed class Chunk
 
                 if (merging == 2 && bearing - 1 < wanted) continue;
 
+                // AND IT MAY NOT SPAN TWO OBJECTS. See the note on `Fold`.
+                if (Spans(members, groups)) continue;
+
                 var count = _seen.GetValueOrDefault(candidate);
                 if (count < best || (count == best && candidate >= key)) continue;
 
@@ -457,6 +484,34 @@ public sealed class Chunk
         }
 
         return best >= 0;
+    }
+
+    /// <summary>
+    /// Whether a candidate reaches across two things the front end kept apart.
+    /// </summary>
+    /// <remarks>
+    /// <b>AN UNGROUPED MEMBER IS NOT A SECOND GROUP.</b> A front end may group
+    /// some of a moment and not the rest — <see cref="Worlds.Clevr"/> does — and
+    /// treating "no group" as its own would forbid a name covering an object and
+    /// the background it arrived with, which is not a binding claim about two
+    /// objects at all.
+    /// </remarks>
+    private static bool Spans(
+        IReadOnlyCollection<Code> members, IReadOnlyDictionary<Code, int>? groups)
+    {
+        if (groups is null) return false;
+
+        int? seen = null;
+
+        foreach (var member in members)
+        {
+            if (!groups.TryGetValue(member, out var group)) continue;
+            if (seen is { } already && already != group) return true;
+
+            seen = group;
+        }
+
+        return false;
     }
 
     /// <summary>

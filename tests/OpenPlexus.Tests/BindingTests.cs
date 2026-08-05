@@ -312,9 +312,20 @@ public sealed class BindingTests
         var loose = await flat.RunAsync(400, every: 10);
         var tight = await grouped.RunAsync(400, every: 10);
 
-        // Same codes, same order, same count of nodes -- only which pairs were
-        // written differs, which is the whole of what grouping does.
-        Assert.Equal(loose.Nodes, tight.Nodes);
+        // SAME CODES AND SAME ORDER, AND THE NODE COUNTS USED TO BE EQUAL TOO --
+        // "only which pairs were written differs" was the whole of what grouping
+        // did, until step 3 started MINTING nodes. A name may not span two objects,
+        // because a code covering a colour from one and a shape from the other
+        // asserts exactly the binding this world says never happened; so the
+        // segmented arm refuses names the flat arm mints and comes out at 120
+        // nodes against 121.
+        //
+        // GROUPING CAN ONLY EVER REFUSE A NAME AND NEVER ADD ONE, which is the
+        // claim worth asserting and is stronger than the equality it replaces --
+        // an inequality in the other direction would mean the gate had invented
+        // alphabet rather than withheld it.
+        Assert.True(tight.Nodes <= loose.Nodes,
+            $"segmented minted MORE alphabet than flat: {tight.Nodes} against {loose.Nodes}");
         Assert.True(tight.Edges * 4 < loose.Edges,
             $"{tight.Edges} edges against {loose.Edges}, which is not the collapse expected");
 

@@ -33,6 +33,7 @@ public sealed class Foresight
     private readonly Lock _gate = new();
 
     private int _asked;
+    private int _quiet;
     private int _hit;
     private int _guessed;
     private int _right;
@@ -42,6 +43,24 @@ public sealed class Foresight
     public int Asked
     {
         get { lock (_gate) return _asked; }
+    }
+
+    /// <summary>
+    /// How many predictions named NOTHING and were therefore not questions.
+    /// </summary>
+    /// <remarks>
+    /// <b>COUNTED RATHER THAN DISCARDED, and the difference is a whole diagnosis.</b>
+    /// An empty guess must not score as an asked-and-missed, or a graph that said
+    /// nothing would look like one that was wrong — but dropping it without a tally
+    /// leaves <see cref="Asked"/> quietly short of the step count with nothing to
+    /// explain the gap. A caller comparing the two then reads "some steps did not
+    /// ask" and cannot tell that from a harness that skipped them. <b>The silence
+    /// and the question together are the step count</b>, which is the invariant a
+    /// test can actually hold.
+    /// </remarks>
+    public int Quiet
+    {
+        get { lock (_gate) return _quiet; }
     }
 
     /// <summary>
@@ -130,7 +149,14 @@ public sealed class Foresight
         ArgumentNullException.ThrowIfNull(actual);
         ArgumentNullException.ThrowIfNull(control);
 
-        if (predicted.Count == 0) return 0.0;
+        // AN EMPTY GUESS IS NOT A QUESTION, BUT IT IS NOT NOTHING EITHER. See
+        // <see cref="Quiet"/>: scoring it would make a silent graph look wrong, and
+        // discarding it unrecorded makes a silent graph look absent.
+        if (predicted.Count == 0)
+        {
+            lock (_gate) _quiet++;
+            return 0.0;
+        }
 
         var came = actual as HashSet<Code> ?? [.. actual];
         var right = predicted.Count(came.Contains);

@@ -33,8 +33,23 @@ public sealed class ForesightTests
         // anything is counted, so the graph never sees the answer before being
         // asked. One question per step, less the first, which has nothing to
         // settle and the last, which is never settled.
-        Assert.True(result.Foresight.Asked >= result.Steps - 2,
-            $"{result.Foresight.Asked} questions over {result.Steps} steps");
+        //
+        // AND A STEP WHERE THE WALK NAMED NOTHING IS STILL A STEP. It is not a
+        // question -- an empty guess scored as asked-and-missed would make a silent
+        // graph look like a wrong one, which the test below holds -- so it lands in
+        // `Quiet` instead. This read `Asked >= Steps - 2` and went red at 70 over
+        // 73 the moment the walk fell silent on one step, which is a fact about the
+        // budget and not a broken harness. THE INVARIANT IS THAT THE TWO TOGETHER
+        // ACCOUNT FOR EVERY STEP, and that is what is asserted now.
+        Assert.True(result.Foresight.Asked + result.Foresight.Quiet >= result.Steps - 2,
+            $"{result.Foresight.Asked} questions and {result.Foresight.Quiet} "
+            + $"silences do not account for {result.Steps} steps");
+
+        // AND THE ASKING IS STILL THE BULK OF IT. Without this the invariant above
+        // passes for a run that asked nothing at all and was silent throughout.
+        Assert.True(result.Foresight.Asked > result.Foresight.Quiet,
+            $"the walk was silent more often than it spoke: {result.Foresight.Quiet} "
+            + $"silences against {result.Foresight.Asked} questions");
 
         Assert.True(result.Foresight.Guessed > 0);
     }

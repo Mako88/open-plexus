@@ -37,12 +37,30 @@ public sealed class DeterminismTests
     private static SnakeSettings World => Fixture.Snake(sight: 2, energy: 200, perFood: 50);
 
     /// <summary>
-    /// <b>Horizon 3, so the backstop actually fires.</b> At the default of 50 it
+    /// <b>Horizon 2, so the backstop actually fires.</b> At the default of 50 it
     /// never does under inverse cost, <c>Halted</c> is zero everywhere, and this
     /// test would pass without asking anything.
     /// </summary>
+    /// <remarks>
+    /// <b>IT WAS 3 AND 3 STOPPED FIRING, WHICH IS A FACT ABOUT THE WALK AND NOT
+    /// ABOUT THIS TEST.</b> A horizon only bites where routes try to go past it,
+    /// and on this world they no longer do — measured at stamina 8, and the depth
+    /// does not move when the budget does:
+    /// <code>
+    ///   horizon   halted   deepest   chains
+    ///         1      302         0   (none complete)
+    ///         2      138         2   2:88
+    ///         3        0         2   2:88
+    ///         6        0         2   2:88
+    /// </code>
+    /// <b>Every chain is length two — one hop — at every budget from 8 to 64.</b>
+    /// So 3 sits above anything the walk reaches and can never fire; 1 kills every
+    /// route before a chain completes and leaves nothing to compare. 2 is the only
+    /// setting where the backstop fires AND chains still finish, which is what this
+    /// file needs. The bar below is unchanged and reads 138 against it.
+    /// </remarks>
     private static WalkSettings Dials =>
-        Fixture.Dials(stamina: 8.0, foresight: 2.0, horizon: 3);
+        Fixture.Dials(stamina: 8.0, foresight: 2.0, horizon: 2);
 
     private static async Task<RunResult> PlayAsync(int seed)
     {

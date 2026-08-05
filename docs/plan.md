@@ -77,8 +77,6 @@
 - **The adapter is the only thing between a world and the brain** — John, 2026-08-05.
   `Tending` bands its own moisture and calls `Grains` itself; that is a world
   deciding how it is coded. `IQuantizer` is already the interface.
-- **Fork 24 lives on one world.** A controller six worlds never call is on the
-  wrong side of that line.
 
 - **A reason to seek** — every cell is written for acts TAKEN, so no walk reaches an
   untried one. Revives once something can explore.
@@ -154,6 +152,7 @@ condition is a superstition.**
 | `Question.Path` — a relation per hop | A fixed path trades coverage against precision with no middle. **Deleted** | `Downstream` wants the reverse temporal edge, which `Kind.Before` now writes |
 | `Kind.Informed` — a cell for what surprised | No walk reaches an untried act. **Deleted** | Anything that can explore |
 | `Attending.Marked` — the credit cell, unconditioned | Peaks below the blind bar. It was `Credited`'s CONTROL, so ruling out the extra cell and the staleness goes with it. **Deleted** | A second cell written on anything but the outcome — re-take the control |
+| Fork 24, the budget controller | `Moves` never left nought on the one world that ran it — three budgets sampled forever, none chosen. Billing the probe cost a quarter of `Senses`. **Deleted** | A world where the right budget VARIES |
 
 ---
 
@@ -208,9 +207,6 @@ condition is a superstition.**
   `Ranking`, and **the minted name is NOT why** — it ties identically with
   chunking suppressed outright. Not the arrival-order fix either. Two
   explanations are spent and the defect is untouched.
-- **Fork 24 hunts forever and never decides.** `Moves` reads nought on `Senses`,
-  so the controller samples three budgets round the clock and settles on none.
-  The probe no longer costs accuracy; what it buys is still nothing.
 
 ---
 
@@ -231,5 +227,5 @@ condition is a superstition.**
 | **21** | Compression as an edge. A trade; off |
 | **22** | A transiently-zero live count dropped later reports. Closed |
 | **23** | Compression self-regulating? Not on any signal found yet |
-| **24** | Budget controller aims at a moving target. Off by default |
+| **24** | Budget controller aims at a moving target. Deleted — see the table |
 | **25** | The binding world — built to fail, failed as predicted, since lifted |

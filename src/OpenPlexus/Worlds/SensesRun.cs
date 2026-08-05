@@ -101,7 +101,6 @@ public sealed class SensesRun : IDisposable
     /// what is left is six worlds that never call it, which the plan names as
     /// work and not as an arm.
     /// </remarks>
-    private readonly Budget _budget;
 
     /// <param name="world">The senses to show.</param>
     /// <param name="dials">The walk.</param>
@@ -127,7 +126,6 @@ public sealed class SensesRun : IDisposable
 
         _world = new Senses(world, seed);
         _dials = dials;
-        _budget = new Budget(dials.Stamina, Budgeting.Standard);
         _fabric = new Fabric(dials, seed, clusters, replicas, late);
 
         _senses = _fabric.Watching("senses", dials);
@@ -202,8 +200,8 @@ public sealed class SensesRun : IDisposable
             Unsettled = unsettled,
             Hunger = asked == 0 ? 0.0 : hunger / asked,
             Thwarted = asked == 0 ? 0.0 : thwarted / asked,
-            Settled = _budget.Stamina,
-            Moves = _budget.Moves,
+            Settled = _dials.Stamina,
+            Moves = 0,
         };
     }
 
@@ -272,7 +270,7 @@ public sealed class SensesRun : IDisposable
         var origin = _world.Of(Senses.Sight, concept);
 
         var thought = await _senses
-            .ThinkAsync(origin, _budget.Stamina, null, ct)
+            .ThinkAsync(origin, _dials.Stamina, null, ct)
             .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
@@ -302,30 +300,6 @@ public sealed class SensesRun : IDisposable
         // arrived; one that beats it clearly did. NOTHING HERE READS WHETHER THE
         // ANSWER WAS RIGHT: the margin is the walk's own, so the controller still
         // cannot see the score, which is what keeps C4 intact.
-        // AND THE PROBE IS ASKED SEPARATELY AND NEVER SCORED, which is the whole
-        // of the fix. C4 leaves no free question -- every question here IS the
-        // measurement -- so the hunt cannot borrow one. It can ask its OWN, and
-        // pay in traffic rather than in accuracy. Measured on `Senses`: 0.6051
-        // billed against 0.8154 unbilled, and the second is what a run that never
-        // probes reads too, so the probe was the entire cost.
-        var trying = _budget.Next();
-
-        if (Math.Abs(trying - _budget.Stamina) < double.Epsilon)
-        {
-            _budget.Note(Separation(reached));
-        }
-        else
-        {
-            var probe = await _senses.ThinkAsync(origin, trying, null, ct)
-                .ConfigureAwait(false);
-
-            await _fabric.SettleAsync(probe, ct).ConfigureAwait(false);
-
-            _budget.Note(Separation(probe.BestOf(Senses.Touch, 2)));
-
-            _senses.Forget(probe.Id);
-        }
-
         _senses.Forget(thought.Id);
         return report;
     }

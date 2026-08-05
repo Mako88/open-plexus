@@ -37,16 +37,38 @@ public sealed class EvictionTests(ITestOutputHelper output)
         new(C(1), Fixture.Dials(stamina: 10.0) with { Row = cap });
 
     [Fact]
-    public void An_unbounded_row_is_every_measurement_taken_before_this_existed()
+    public void The_default_bounds_the_row_and_only_a_lifted_cap_holds_everything()
     {
-        // THE ARM'S OFF POSITION, ASSERTED RATHER THAN ASSUMED. Null is unbounded,
-        // and a cap that quietly applied by default would silently change every
-        // number this project has.
-        var node = new Node(C(1), Fixture.Dials(stamina: 10.0));
+        // THIS ASSERTED 48 ENTRIES OFF `Fixture.Dials` AND SAID WHY: "a cap that
+        // quietly applied by default would silently change every number this
+        // project has". THAT IS EXACTLY WHAT THEN HAPPENED. `Row` was a nullable
+        // with null meaning unbounded, and it became a plain int defaulting to 32 --
+        // so the arm's off position stopped existing and this test went on asserting
+        // it. The warning was right and it was aimed at its own future.
+        //
+        // THERE IS NO OFF POSITION TO ASSERT ANY MORE, BY DESIGN. `Fixture.Unbounded`
+        // is a million and its own doc says why it replaced the null: unbounded as a
+        // state the brain could be configured into is an off switch by another name,
+        // and what is left is a QUANTITY that gets swept. So what this holds now is
+        // both ends of that sweep, which is the honest version of the same claim.
+        var capped = new Node(C(1), Fixture.Dials(stamina: 10.0));
 
-        for (var partner = 2UL; partner < 50; partner++) node.Observe(C(partner), when: 1);
+        var lifted = new Node(
+            C(1), Fixture.Dials(stamina: 10.0) with { Row = Fixture.Unbounded });
 
-        Assert.Equal(48, node.Entries);
+        for (var partner = 2UL; partner < 50; partner++)
+        {
+            capped.Observe(C(partner), when: 1);
+            lifted.Observe(C(partner), when: 1);
+        }
+
+        // THE SHIPPED BRAIN FORGETS, and every measurement taken since it started
+        // doing so is a measurement of a bounded row whether or not it said so.
+        Assert.Equal(32, capped.Entries);
+
+        // AND LIFTING IT HOLDS ALL 48, which is what makes the cap a sweep rather
+        // than a wall -- and what every measurement taken BEFORE it existed was.
+        Assert.Equal(48, lifted.Entries);
     }
 
     [Fact]

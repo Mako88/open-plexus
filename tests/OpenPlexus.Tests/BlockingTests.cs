@@ -62,14 +62,29 @@ public sealed class BlockingTests(ITestOutputHelper output)
     /// </remarks>
     private static async Task<Bench> TrainedAsync()
     {
-        var bench = new Bench(Fixture.Dials(stamina: 10.0));
+        // THE WINDOW IS NAMED HERE BECAUSE THIS BENCH IS A SEQUENCE, and leaving it
+        // to the brain's default of NOUGHT is what made every number in this file
+        // read 0.00. A cue and its outcome are handed over as CONSECUTIVE moments,
+        // so `First` and `Outcome` are never simultaneous and the only thing that
+        // can join them is a carried one. With no window there is no edge to block,
+        // no edge to keep, and the whole experiment measures an empty graph -- which
+        // is precisely what `RhythmTests` asserts from the other side, that a span
+        // of nought leaves that world with no edges at all.
+        //
+        // NOUGHT IS THE RIGHT DEFAULT AND THIS IS THE STATED EXCEPTION. See
+        // `WalkSettings.Span`: it is a claim about the STREAM rather than a switch,
+        // nought keeps every world's control valid, and a stream whose moments
+        // genuinely follow one another says so. This one does.
+        var dials = Fixture.Dials(stamina: 10.0) with { Span = 1 };
+
+        var bench = new Bench(dials);
 
         // THE MACHINE CARRIES ITS OWN SURPRISE AND ITS OWN SPAN NOW. Both were
         // constructor arguments until 2026-08-04; the gate is unconditional and
         // the span comes off the settings, so there is nothing to hand in.
         var machine = new InputMachine<IReadOnlyCollection<Code>>(
             new MachineAddress("cue"), new Handed(), bench.Rendezvous,
-            bench.Bus, bench.Ring, Fixture.Dials(stamina: 10.0));
+            bench.Bus, bench.Ring, dials);
 
         var at = 0L;
 

@@ -36,19 +36,14 @@
 
 ### Look necessary for the goal, and absent
 
-- **Variable binding** — the row names a relation and cannot hold a fact ABOUT one,
-  so nothing transfers. `BindingGapTests` is the scoreboard.
-- **Built end to end** — `Kind.Code`, `Occasion.Roles`, `Kind.Role`, and a walk
-  through `Kind.Fills` arrives at the right slot of a relation the filler was never
-  seen in. **What is left is a WORLD that needs it**: `Clutrr`, `gSCAN`.
 - **A front end for real perception** — a hash spending its bits where the data is
   without being fitted. Grains are the half needing no fitting; this is the other.
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and
   the rollout predicts; nothing can hold a state that is NOT current and steer
   toward it. Planning needs a target, and sub-goals are what serve many tasks.
-- **Temporal abstraction.** `Chunk` names a set of codes seen together; nothing
-  names a SEQUENCE OF ACTS. Without it every plan is a flat list of steps and each
-  one costs a whole walk.
+- **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
+  sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
+  — everything else carries over. An act is already a code.
 
 ### Worlds that are missing
 
@@ -57,6 +52,8 @@
 - **One whose dynamics BRANCH** — a cycle is an attractor, so the rollout's
   compounding error is untested.
 - **One an arm can bootstrap in** — every credit arm on `Tending` is a coin toss.
+- **One that NEEDS variable binding** — `Clutrr`, `gSCAN`. The mechanism is built and
+  measured only on constructed cases; `BindingGapTests` is the scoreboard.
 - **One with a HEAVY TAIL.** A wider alphabet grows the graph and leaves the widest
   row alone; rows grow without bound only where one code accompanies nearly
   everything. Zipf — text's shape, and no world's here.
@@ -81,6 +78,8 @@
 - **Multi-token output** — fork 11 built the addressing; a world that wants two is
   what is left.
 - **Cold storage** — what makes an evicted count recoverable rather than gone.
+- **A row cap that varies by node** — a node seen ten thousand times has more to say
+  than one seen twice. `k · log(seen)` is local and scale-free.
 - **Space-Saving for the row cap** — the eviction scan is linear in the cap.
 
 ### Housekeeping

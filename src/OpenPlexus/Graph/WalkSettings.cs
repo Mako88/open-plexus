@@ -270,13 +270,15 @@ public sealed record WalkSettings
     public required double Stamina { get; init; }
 
     /// <summary>
-    /// The budget for a prediction, when it should differ from the budget for
-    /// acting. Null means they are the same.
+    /// The budget for a prediction, which is not the budget for acting.
     /// </summary>
     /// <remarks>
     /// <para>
     /// <b>FORK 20, AND IT IS FORCED BY MEASUREMENT RATHER THAN CHOSEN.</b> One
-    /// budget was serving two questions that want opposite depths.
+    /// budget was serving two questions that want opposite depths. <b>There is no
+    /// shared-budget arm any more</b> — the two numbers below are what the
+    /// measurement says, and "they are the same" was never a finding, only the
+    /// state of the code before anybody looked.
     /// </para>
     /// <para>
     /// <b>Prediction wants the shallowest walk that reaches anything.</b>
@@ -293,13 +295,21 @@ public sealed record WalkSettings
     /// reached at all.
     /// </para>
     /// </remarks>
-    public double? Foresight { get; init; }
+    public double Foresight { get; init; } = 2.0;
 
     /// <summary>
-    /// The most entries one node's row may hold. <b>Null is unbounded, which is
-    /// every measurement taken before this existed.</b>
+    /// The most entries one node's row may hold.
     /// </summary>
     /// <remarks>
+    /// <para>
+    /// <b>CASHED IN AT 32 — John's call, 2026-08-04. There is no unbounded arm any
+    /// more.</b> It was proved free under a heavy tail and near-free on a flat one,
+    /// and on real text it is the difference between possible and impossible: the
+    /// tail measurement cut messages by 69% for identical accuracy. <b>An arm that
+    /// costs nothing where it is not needed and rescues the case where it is has
+    /// won</b>, and what was left was the cost of moving every baseline — which is
+    /// not a reason to keep a way of switching it off.
+    /// </para>
     /// <para>
     /// <b>THE SCALING WALL, AND THE ONLY THING THAT TURNS <i>cost grows with data
     /// forever</i> INTO <i>cost is constant</i>.</b> Cost per thought is set by the
@@ -321,7 +331,7 @@ public sealed record WalkSettings
     /// than optional. <b>A cap makes that testable instead of assumed.</b>
     /// </para>
     /// </remarks>
-    public int? Row { get; init; }
+    public int Row { get; init; } = 32;
 
     /// <inheritdoc cref="Graph.Pricing"/>
     /// <remarks><b><see cref="Graph.Pricing.Receiver"/> is the default and the
@@ -367,10 +377,14 @@ public sealed record WalkSettings
     /// seen once cannot then outscore one seen a hundred times.
     /// </para>
     /// <para>
-    /// <b>Zero is off, and off is every measurement taken before this existed.</b>
+    /// <b>CASHED IN AT 8.0 — John's call, 2026-08-04. There is no undoubted arm any
+    /// more.</b> It repairs the rare-coincidence defect and is free where it is not
+    /// needed — measured identical to ten decimal places on the clean world. That
+    /// is the definition of a won arm, and the only thing that had been holding it
+    /// here was that turning it on moves every baseline.
     /// </para>
     /// </remarks>
-    public double Doubt { get; init; }
+    public double Doubt { get; init; } = 8.0;
 
     /// <summary>
     /// The longest chain a route may carry. A route that reaches it dies.
@@ -407,57 +421,35 @@ public sealed record WalkSettings
     /// <summary>
     /// How many frames a departed code is carried for — <see cref="Learning.Window"/>.
     /// </summary>
-    /// <remarks><b>Zero is off</b>, and off is what the refutation row is about.</remarks>
-    public int Span { get; init; }
+    /// <remarks>
+    /// <para>
+    /// <b>ONE IS THE FLOOR NOW, AND THIS IS THE DIAL THAT ARGUED HARDEST AGAINST
+    /// John's rule.</b> The refutation table has it null on snake, WORSE on bAbI,
+    /// and the whole task on <see cref="Worlds.Rhythm"/> — measured at nought,
+    /// Rhythm asks no questions at all. So it is neither a winner nor a loser: it
+    /// is <b>a claim about the STREAM</b>, and the only world it hurts is the one
+    /// whose sentences are independent of one another.
+    /// </para>
+    /// <para>
+    /// <b>It is on anyway, because a zero here was an off switch and there are
+    /// none of those left.</b> What that costs is bAbI, knowingly and on the
+    /// record. <b>What it buys is that the real fix becomes the only way out</b> —
+    /// the revival row asks for something making a carried edge worth its row, and
+    /// a dial that could be quietly set to nought is how that stayed unbuilt.
+    /// </para>
+    /// </remarks>
+    public int Span { get; init; } = 1;
 
     /// <inheritdoc cref="Accumulate"/>
     public Accumulate Ranking { get; init; } = Accumulate.Sum;
 
     /// <summary>
-    /// Whether a carried code gets its own cell rather than sharing the
-    /// simultaneous one — <b>step 6</b>, and see <see cref="Kind"/>.
-    /// </summary>
-    /// <remarks>
-    /// <b>Only meaningful with a <see cref="Span"/>.</b> At zero nothing is
-    /// carried, so there is no temporal edge to separate.
-    /// </remarks>
-    public bool Kinds { get; init; }
-
-    /// <summary>
-    /// Whether only what SURPRISED is broadcast — <b>step 2</b>, and see
-    /// <see cref="Learning.Surprise"/>.
-    /// </summary>
-    /// <remarks>
-    /// <b>MEASURED INERT ON TEXT, WHICH IS WORTH KNOWING BEFORE REACHING FOR
-    /// IT.</b> The gate suppresses what was predicted, and independent sentences
-    /// predict nothing of each other — so everything surprises and nothing is
-    /// suppressed. It bites on <see cref="Worlds.Rhythm"/>, which repeats.
-    /// </remarks>
-    public bool Surprising { get; init; }
-
-    /// <summary>
-    /// Whether the WRITE path is gated by surprise as well as the read path.
-    /// </summary>
-    /// <remarks>
-    /// <b>Gating the write is a claim about LEARNING; gating the read is a claim
-    /// about COST.</b> Two arms, and only with <see cref="Surprising"/> on.
-    /// </remarks>
-    public bool Gated { get; init; }
-
-    /// <summary>
-    /// Whether a set that keeps arriving whole earns a name — <b>step 3</b>, and
-    /// see <see cref="Learning.Chunk"/>.
-    /// </summary>
-    public bool Chunking { get; init; }
-
-    /// <summary>
     /// What a carried code's occasion is worth against a simultaneous one.
     /// </summary>
-    /// <remarks><b>One is no discount</b>, which is the control.</remarks>
+    /// <remarks><b>One is no discount.</b> A quantity rather than a switch — the
+    /// refutation table killed the discount arm, so this is the surviving
+    /// value.</remarks>
     public double Carried { get; init; } = 1.0;
-
-    /// <summary>Whether a question prefers what was seen recently.</summary>
-    public bool Recent { get; init; }
 
     /// <summary>How many steps ahead a rollout predicts.</summary>
     /// <remarks>
@@ -468,25 +460,14 @@ public sealed record WalkSettings
     public int Depth { get; init; } = 1;
 
     /// <summary>
-    /// Whether an observation with nothing in it is still an occasion.
-    /// </summary>
-    /// <remarks><b>Revived, and no clear winner since.</b></remarks>
-    public bool IncludeEmpty { get; init; }
-
-    /// <summary>
-    /// How many predicted codes a question names. <b>Null lets the walk decide.</b>
-    /// </summary>
-    /// <remarks><b>Revived at ONE code</b> — coarse ranking informs, fine does not.</remarks>
-    public int? Names { get; init; }
-
-
-    /// <summary>
-    /// Let a machine hunt for its own <see cref="Stamina"/> — <b>fork 24</b>.
+    /// How many predicted codes a question names.
     /// </summary>
     /// <remarks>
-    /// <b>Null keeps the hand-set number, and that is the control.</b> When it is
-    /// set, <see cref="Stamina"/> is only where the hunt begins, and the
-    /// convergence test asserts the answer does not depend on it.
+    /// <b>CASHED IN AT ONE — the refutation table's own "REVIVED at one code".</b>
+    /// Coarse ranking informs and fine ranking does not, which is a finding rather
+    /// than a preference, so there is no arm here to keep.
     /// </remarks>
-    public Budgeting? Budget { get; init; }
+    public int Names { get; init; } = 1;
+
+
 }

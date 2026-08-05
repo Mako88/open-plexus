@@ -48,7 +48,7 @@ public sealed class TailTests(ITestOutputHelper output)
     private readonly record struct Arm(
         Measured Scored, double Messages, double Nodes, double Widest);
 
-    private async Task<Arm> ArmAsync(string name, double skew, int? cap, double doubt = 0.0)
+    private async Task<Arm> ArmAsync(string name, double skew, int cap, double doubt = 0.0)
     {
         double messages = 0.0, nodes = 0.0, widest = 0.0;
 
@@ -90,9 +90,9 @@ public sealed class TailTests(ITestOutputHelper output)
     [Fact]
     public async Task A_heavy_tail_is_where_the_row_cap_finally_bites()
     {
-        var flat = await ArmAsync("flat, free", skew: 0.0, cap: null);
+        var flat = await ArmAsync("flat, free", skew: 0.0, cap: Fixture.Unbounded);
         var flatCapped = await ArmAsync("flat, capped", skew: 0.0, cap: 32);
-        var tail = await ArmAsync("tail, free", Tail, cap: null);
+        var tail = await ArmAsync("tail, free", Tail, cap: Fixture.Unbounded);
         var tailCapped = await ArmAsync("tail, capped", Tail, cap: 32);
 
         // THE PLAN'S ITEM, ANSWERED. The row cap has been inert in every world
@@ -142,8 +142,8 @@ public sealed class TailTests(ITestOutputHelper output)
         // cap on as with it off, to ten places, so the two are orthogonal: the
         // entries `Doubt` corrects SURVIVE the cap. A mid-rank code under Zipf is
         // touched recently AND evidenced thinly, and recency cannot see that.
-        var free = await ArmAsync("free", Tail, cap: null);
-        var doubted = await ArmAsync("free, doubted", Tail, cap: null, doubt: 8.0);
+        var free = await ArmAsync("free", Tail, cap: Fixture.Unbounded);
+        var doubted = await ArmAsync("free, doubted", Tail, cap: Fixture.Unbounded, doubt: 8.0);
         var capped = await ArmAsync("capped", Tail, cap: 32);
         var both = await ArmAsync("capped, doubted", Tail, cap: 32, doubt: 8.0);
 

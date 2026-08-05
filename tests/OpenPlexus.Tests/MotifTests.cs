@@ -107,21 +107,24 @@ public sealed class MotifTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task The_alphabet_cannot_grow_and_the_graph_pays_pairwise_forever()
+    public async Task The_graph_pays_pairwise_and_the_minted_form_would_be_smaller()
     {
-        // THE BASELINE FOR STEP 3, STATED AS TWO FACTS THE MECHANISM MUST CHANGE.
+        // THE BASELINE FOR STEP 3, AND IT USED TO BE TWO FACTS. The first was that
+        // the node count never exceeds the symbols the world emits, because the
+        // quantiser fixes the alphabet and nothing could mint a code -- <b>that
+        // half is gone, because minting is unconditional since 2026-08-05 and the
+        // alphabet growing is now the mechanism working.</b> `Coined` is the
+        // check that replaced it, and `MotifResult` fails a run that minted
+        // nothing.
         //
-        // First, the node count never exceeds the symbols the world emits: the
-        // quantiser fixes the alphabet and nothing here can mint a code. Second,
-        // the graph holds the sets pairwise -- more entries than the minted form
-        // would need -- and it re-derives the completion by walking every time,
-        // which is what `Traffic` counts.
+        // WHAT REMAINS IS THE FACT THE MECHANISM EXISTS TO CHANGE: the graph holds
+        // the sets pairwise, which is more entries than the minted form would
+        // need, and it re-derives the completion by walking every time -- which is
+        // what `Traffic` counts.
         using var run = new MotifRun(World(), Fixture.Dials(stamina: 4.0), seed: 1);
         var result = await run.RunAsync(600);
 
         output.WriteLine(result.ToString());
-
-        Assert.True(result.Nodes <= 60, $"the alphabet grew to {result.Nodes}");
 
         // THE SETS ALONE ALREADY COST MORE THAN THE MINTED FORM WOULD, before any
         // of the noise is counted.
@@ -191,131 +194,22 @@ public sealed class MotifTests(ITestOutputHelper output)
         for (var i = 0; i < 50; i++) Assert.Null(alone.Notice([Motif.Of(9)]));
     }
 
-    [Fact]
-    public async Task Minting_a_node_buys_the_traffic_it_was_supposed_to()
-    {
-        // THE NUMBER TO BEAT, AND IT IS COST AND NOT ACCURACY. A familiar set
-        // already completes perfectly without any of this, so step 3 is not asked
-        // to fix an accuracy -- it is asked to stop paying for one.
-        var dials = Fixture.Dials(stamina: 4.0);
-
-        using var flat = new MotifRun(World(), dials, seed: 1);
-        using var chunked = new MotifRun(World(), dials with { Chunking = true }, seed: 1);
-
-        var without = await flat.RunAsync(600);
-        var with = await chunked.RunAsync(600);
-
-        output.WriteLine(without.ToString());
-        output.WriteLine(with.ToString());
-        output.WriteLine(
-            $"traffic {without.Traffic:F0} -> {with.Traffic:F0}, "
-            + $"widest {without.Widest} -> {with.Widest}, "
-            + $"edges {without.Edges} -> {with.Edges}, "
-            + $"accuracy {without.Accuracy:F4} -> {with.Accuracy:F4}");
-
-        Assert.Empty(without.Complaints);
-        Assert.Empty(with.Complaints);
-
-        // THE ALPHABET GREW, which is the half of step 3 that nothing else here
-        // can do -- and it grew by exactly the number of recurring sets.
-        Assert.True(with.Nodes > without.Nodes,
-            $"nothing was minted: {with.Nodes} against {without.Nodes}");
-
-        Assert.Equal(without.Motifs, with.Coined);
-
-        // AND THE MINTING WAS SELECTIVE, WHICH `Coined` ALONE CANNOT SAY. A detector
-        // that minted every whole moment it ever saw would report the same node
-        // growth and the same coined count and would have found NO STRUCTURE -- it
-        // would have renamed the stream, and the compression would be arithmetic
-        // rather than real. The denominator is what tells those apart.
-        var detector = chunked.Chunks!;
-
-        output.WriteLine(
-            $"coined {detector.Coined} of {detector.Noticed} distinct moments");
-
-        Assert.True(detector.Coined * 10 < detector.Noticed,
-            $"minting stopped being selective: {detector.Coined} of "
-            + $"{detector.Noticed} distinct moments. A detector over a tenth of "
-            + "what it sees is renaming the stream rather than finding a motif, "
-            + "and the alphabet growth above stops meaning anything");
-    }
-
-    [Fact]
-    public async Task What_the_minting_costs_and_what_it_buys_over_seeds()
-    {
-        // ONE SEED IS NOT A RESULT, and this project's history is mostly claims
-        // that did not survive their second sweep.
-        var dials = Fixture.Dials(stamina: 4.0);
-
-        var arms = await Sweep.AcrossAsync(
-            6,
-            ("traffic off", async seed =>
-            {
-                using var run = new MotifRun(World(), dials, seed);
-                return (await run.RunAsync(600)).Traffic;
-            }),
-            ("traffic on", async seed =>
-            {
-                using var run = new MotifRun(World(), dials with { Chunking = true }, seed);
-                return (await run.RunAsync(600)).Traffic;
-            }));
-
-        var accuracy = await Sweep.AcrossAsync(
-            6,
-            ("accuracy off", async seed =>
-            {
-                using var run = new MotifRun(World(), dials, seed);
-                return (await run.RunAsync(600)).Accuracy;
-            }),
-            ("accuracy on", async seed =>
-            {
-                using var run = new MotifRun(World(), dials with { Chunking = true }, seed);
-                return (await run.RunAsync(600)).Accuracy;
-            }));
-
-        var size = await Sweep.AcrossAsync(
-            6,
-            ("edges off", async seed =>
-            {
-                using var run = new MotifRun(World(), dials, seed);
-                return (await run.RunAsync(600)).Edges;
-            }),
-            ("edges on", async seed =>
-            {
-                using var run = new MotifRun(World(), dials with { Chunking = true }, seed);
-                return (await run.RunAsync(600)).Edges;
-            }));
-
-        output.WriteLine(Sweep.Table(arms));
-        output.WriteLine(Sweep.Table(accuracy));
-        output.WriteLine(Sweep.Table(size));
-
-        // THE CLAIM STEP 3 WAS ASKED FOR, AND IT IS THE ONLY ONE THAT LANDS.
-        // Traffic per completion, and nothing else, is what the plan named.
-        Assert.True(arms[1].Separation(arms[0]) > 5.0 && arms[1].Mean < arms[0].Mean,
-            $"minting did not buy the traffic: {arms[1].Mean:F0} against "
-            + $"{arms[0].Mean:F0}");
-
-        // AND THE TWO IT DOES NOT, ASSERTED SO THEY CANNOT BE FORGOTTEN.
-        //
-        // THE GRAPH GETS BIGGER, NOT SMALLER. The arithmetic saving is real and
-        // tiny: 72 pairwise entries for the sets against 24 minted, against a
-        // whole graph of about 2,300. The noise dominates the row count, so six
-        // new nodes carrying their own entries more than eat a 48-entry saving.
-        // The MDL argument is about the SETS and the graph is mostly not sets.
-        Assert.True(size[1].Mean > size[0].Mean,
-            "the graph got smaller, so the storage half of the MDL argument has "
-            + "started paying and this note is out of date");
-
-        // AND IT COSTS ACCURACY. Completion now routes member -> name -> member
-        // where it used to go member -> member, and the members no longer pair
-        // with each other at all. THE LIKELY READING, UNVERIFIED: a minted node is
-        // a hub BY CONSTRUCTION, and `Pricing.Receiver` exists to make arriving
-        // somewhere popular expensive -- so step 3 mints exactly the shape the
-        // weighting is built to refuse. `Pricing.Sender` on this world is what
-        // would test it.
-        Assert.True(accuracy[1].Mean < accuracy[0].Mean,
-            "chunking stopped costing accuracy, so the hub reading above needs "
-            + "re-running rather than repeating");
-    }
+    // ---- WHAT CHUNKING BOUGHT, AND WHY THE MEASUREMENT IS GONE ------------
+    //
+    // TWO TESTS STOOD HERE AND BOTH COMPARED CHUNKING AGAINST ITS OWN ABSENCE:
+    // `Minting_a_node_buys_the_traffic_it_was_supposed_to` and
+    // `What_the_minting_costs_and_what_it_buys_over_seeds`. Step 3 became
+    // unconditional on 2026-08-04 -- John's rule, you build it and it is ON -- so
+    // both arms are now the same run and the comparison is not expressible.
+    //
+    // WHAT THEY FOUND, so it is not lost with them: minting cut traffic and cost
+    // a little accuracy over six seeds, and the unverified reading of the
+    // accuracy cost was that a minted node is a hub by construction and
+    // `Pricing.Receiver` refuses hubs. `Toll.Traffic` is the arm that should
+    // invert that, and it is a named alternative rather than a switch, so THAT
+    // comparison is still expressible and is the one worth taking.
+    //
+    // The complaint list is what guards the mechanism now: `MotifResult` fails a
+    // run that minted nothing at all, and one that minted more names than the
+    // world has recurring sets.
 }

@@ -26,21 +26,12 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     private readonly Window _window;
 
     /// <inheritdoc cref="Learning.Surprise"/>
-    /// <remarks><b>Null is off, and off is every measurement taken before it.</b></remarks>
-    private readonly Surprise? _surprise;
+    /// <remarks><b>Every machine has one. There is no ungated arm.</b></remarks>
+    private readonly Surprise _surprise = new();
 
     /// <inheritdoc cref="Learning.Chunk"/>
-    /// <remarks><b>Null is off, and off is every measurement taken before it.</b></remarks>
-    private readonly Chunk? _chunks;
-
-    /// <summary>
-    /// Whether the WRITE path is gated by surprise as well as the read path.
-    /// </summary>
-    /// <remarks>
-    /// <b>Off is every measurement taken before step 2's second half</b>, and it has
-    /// to be an arm because it moves counts that were already measured.
-    /// </remarks>
-    private readonly bool _gated;
+    /// <remarks><b>Every machine has one. There is no unchunked arm.</b></remarks>
+    private readonly Chunk _chunks = new();
 
     /// <summary>The last occasion this machine wrote, exactly as written.</summary>
     private Occasion? _joined;
@@ -63,17 +54,22 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// <summary>A placeholder address; a broadcast is not addressed to anyone.</summary>
     private static readonly ClusterAddress _everywhere = new("*");
 
+    /// <remarks>
+    /// <b>THE SPAN COMES OFF THE SETTINGS AND NOT OFF THE CALLER — the regression
+    /// of 2026-08-04 is why.</b> It used to be a parameter every world passed, and
+    /// two worlds passed a default of their own; when the dial moved to the brain
+    /// those defaults were lost and Rhythm silently stopped asking questions with
+    /// all 452 tests green. <b>A per-caller default is a scattered piece of
+    /// KNOWLEDGE, not just a scattered knob</b>, so there is no longer a way to
+    /// scatter it.
+    /// </remarks>
     public InputMachine(
         MachineAddress address,
         IQuantizer<TFrame> quantizer,
         IRendezvous rendezvous,
         IBus bus,
         Ring ring,
-        WalkSettings settings,
-        int span = 0,
-        Surprise? surprise = null,
-        Chunk? chunks = null,
-        bool gated = false)
+        WalkSettings settings)
     {
         ArgumentNullException.ThrowIfNull(quantizer);
         ArgumentNullException.ThrowIfNull(rendezvous);
@@ -87,15 +83,36 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         _bus = bus;
         _ring = ring;
         _settings = settings;
-        _window = new Window(span);
-        _surprise = surprise;
-        _chunks = chunks;
-        _gated = gated;
+        _window = new Window(settings.Span);
 
         _bus.Deaths += OnDeath;
     }
 
     public MachineAddress Address => _address;
+
+    /// <summary>
+    /// The names this machine has minted — <see cref="Learning.Chunk"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Readable because a world has to be able to complain about it.</b> The
+    /// chunker used to be handed in, so a world could count what it had built;
+    /// now that every machine has one unconditionally, the count has to come back
+    /// out or <see cref="Worlds.MotifResult"/> would be reading a chunker nothing
+    /// writes to and reporting nought forever.
+    /// </remarks>
+    public Chunk Chunks => _chunks;
+
+    /// <summary>
+    /// What this machine expects next — <see cref="Learning.Surprise"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Readable for the reason <see cref="Chunks"/> is.</b> The surprise used
+    /// to be handed in, so a bench could prime it and then check what the gate
+    /// did; now that every machine has one unconditionally, priming has to go
+    /// through here. <b>It is the mechanism's own state and not a dial</b> — there
+    /// is nothing to switch, only something to ask.
+    /// </remarks>
+    public Surprise Expects => _surprise;
 
     /// <summary>Thoughts started and not yet settled or released.</summary>
     public int Pending => _thoughts.Count;
@@ -186,7 +203,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         // recurring sets, every extra one a partial view of a set already named.
         ImmutableArray<Code> present = [.. changes.Started, .. live];
 
-        var minted = _chunks?.Notice(present);
+        var minted = _chunks.Notice(present);
 
         var starting = minted is { } named ? [named] : changes.Started;
         var standing = minted is null ? live : present;
@@ -195,7 +212,7 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         // and moves every counter behind it, so it must be called exactly once per
         // observation -- and it is needed BEFORE the join now that the write path
         // can read it, where it used to be needed only after.
-        var residual = _surprise?.Residual(changes.Started);
+        var residual = _surprise.Residual(changes.Started);
 
         // STEP 2'S SECOND HALF: HOW MUCH OF THIS MOMENT IS WORTH LEARNING FROM.
         //
@@ -214,17 +231,18 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         // is worth exactly what it always was. `Occasion.Weight` is the channel the
         // plan named, and scaling the WHOLE occasion rather than picking codes out
         // of it is what keeps `together <= seen` -- both sides scale together.
-        var surprising = _gated && residual is { } settled && changes.Started.Length > 0
-            ? settled.Surprising.Count / (double)changes.Started.Length
+        // THE WRITE PATH IS GATED UNCONDITIONALLY NOW -- John's call, 2026-08-04.
+        var surprising = changes.Started.Length > 0
+            ? residual.Surprising.Count / (double)changes.Started.Length
             : 1.0;
 
         // NOTHING SURPRISED, SO THERE IS NOTHING TO LEARN. `Observe` refuses a
         // weight of nought outright -- a coincidence worth nothing is not one -- so
         // the moment is not joined at all rather than joined at zero.
         if (surprising <= 0.0)
-            return residual is { Surprising.Count: 0 }
+            return residual.Surprising.Count == 0
                 ? null
-                : await ThinkAsync(residual!.Value.Surprising, null, asking, ct)
+                : await ThinkAsync(residual.Surprising, null, asking, ct)
                     .ConfigureAwait(false);
 
         var joined = new Occasion
@@ -255,21 +273,17 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         await _rendezvous.JoinAsync(joined, ct).ConfigureAwait(false);
 
         // ONLY THE SURPRISE PROPAGATES — step 2. What is skipped here is the
-        // BROADCAST; whether the write above was skipped too is `gated`, and off is
-        // every measurement taken before that existed.
+        // BROADCAST, and the write above is gated too.
         // AND THE BROADCAST GOES OUT FROM THE NAME, which is the compression
         // arriving in the thinking path as well as in the graph: one origin where
         // there were S, and the walk reaches the members through it.
-        if (residual is not { } prediction)
-            return await ThinkAsync(starting, null, asking, ct).ConfigureAwait(false);
-
         // BOTH HALVES OF THE ERROR, AND ONLY THE POSITIVE ONE TRAVELS. What was
         // expected and did not arrive is counted where it is computed and goes
         // nowhere: there is no code for the thing that did not happen, so absence
         // is a signal the machine can read about itself and never a broadcast.
-        return prediction.Surprising.Count == 0
+        return residual.Surprising.Count == 0
             ? null
-            : await ThinkAsync(prediction.Surprising, null, asking, ct).ConfigureAwait(false);
+            : await ThinkAsync(residual.Surprising, null, asking, ct).ConfigureAwait(false);
     }
 
     /// <summary>

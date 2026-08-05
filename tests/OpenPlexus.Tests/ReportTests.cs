@@ -35,16 +35,14 @@ public sealed class ReportTests
     [Fact]
     public async Task Both_front_ends_stay_in_range()
     {
-        // The empty-cell arms are the two configurations actually in use, and
-        // an unwiring that only showed up in one of them would be missed.
-        foreach (var empty in (bool[])[false, true])
-        {
-            using var run = new SnakeRun(World(), Dials() with { IncludeEmpty = empty }, seed: 3);
-            var report = await run.ReportAsync(500);
+        // ONE FRONT END NOW. The empty-cell arm was the other configuration this
+        // looped over; empty cells are unconditional since 2026-08-04, so there is
+        // one wiring left to keep in range.
+        using var run = new SnakeRun(World(), Dials(), seed: 3);
+        var report = await run.ReportAsync(500);
 
-            Assert.True(report.Complaints.Count == 0,
-                $"empty={empty}: {string.Join("; ", report.Complaints)}\n{report}");
-        }
+        Assert.True(report.Complaints.Count == 0,
+            $"{string.Join("; ", report.Complaints)}\n{report}");
     }
 
     [Fact]

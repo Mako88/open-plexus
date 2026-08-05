@@ -172,7 +172,7 @@ public sealed class EvictionTests(ITestOutputHelper output)
 
     /// <summary>One cap, averaged over seeds.</summary>
     private static async Task<(double Accuracy, double Messages, double Widest)> CappedAsync(
-        int? cap)
+        int cap)
     {
         double accuracy = 0.0, messages = 0.0, widest = 0.0;
 
@@ -207,7 +207,7 @@ public sealed class EvictionTests(ITestOutputHelper output)
         // to the high forties; capped at sixteen the world still scores its
         // ceiling, on roughly half the edges and well under half the messages. The
         // graph was carrying a great deal it never used.
-        var whole = await CappedAsync(null);
+        var whole = await CappedAsync(Fixture.Unbounded);
         var third = await CappedAsync(16);
 
         output.WriteLine(

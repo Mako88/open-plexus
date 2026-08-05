@@ -27,18 +27,39 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public static class Fixture
 {
+    /// <summary>
+    /// A row cap so large no world here reaches it — <b>the top of the sweep, and
+    /// no longer a way to switch the cap off.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>IT REPLACED A NULL, AND THE DIFFERENCE IS NOT COSMETIC.</b> A nullable
+    /// cap made <i>unbounded</i> a state the brain could be configured into, which
+    /// is an off switch by another name — <see cref="WalkSettings.Row"/> is 32 now
+    /// and there is no null. What is left is a QUANTITY, and a quantity is swept:
+    /// a measurement that reads the cap at one end of its range and the other is
+    /// how anybody knows 32 is the right number, which is the opposite of an arm
+    /// nobody can turn off.
+    /// </remarks>
+    public const int Unbounded = 1_000_000;
+
     /// <summary>The walk, with only what a test actually varies exposed.</summary>
     /// <param name="stamina">What each route starts with, in perfect hops.</param>
     /// <param name="foresight">
-    /// The shallower budget for a prediction — fork 20. Null means the two
-    /// questions share one budget.
+    /// The shallower budget for a prediction — fork 20. <b>There is no
+    /// shared-budget arm any more</b>, so this defaults to what the brain does.
     /// </param>
     /// <param name="horizon">
     /// The chain-length backstop. <b>Lower it to make it actually fire</b>; at 50
     /// it never does under inverse cost.
     /// </param>
+    /// <remarks>
+    /// <b>IT NAMES ONLY WHAT A TEST VARIES, AND AFTER 2026-08-04 THAT IS THREE
+    /// NUMBERS.</b> Everything else — the doubt, the row cap, the span, the
+    /// naming, the kinds, the surprise, the chunking — is on and has no off, so
+    /// there is nothing for a fixture to switch.
+    /// </remarks>
     public static WalkSettings Dials(
-        double stamina = 4.0, double? foresight = null, int horizon = 50) => new()
+        double stamina = 4.0, double foresight = 2.0, int horizon = 50) => new()
     {
         Stamina = stamina,
         Foresight = foresight,

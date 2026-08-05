@@ -42,8 +42,6 @@ public sealed class DialTests(ITestOutputHelper output)
             "fork 24 — `Budget` hunts it from whether the walk reached what it "
             + "was narrowing to. Off by default, which is its own open question",
 
-        ["Budget"] =
-            "the controller itself, so it is the switch rather than a level",
     };
 
     /// <summary>
@@ -79,7 +77,8 @@ public sealed class DialTests(ITestOutputHelper output)
             + "controller, and that is `Stamina`",
 
         ["Row"] =
-            "OPEN, AND IT IS A CAPACITY RATHER THAN A LEVEL. What a node can "
+            "OPEN, AND IT IS A CAPACITY RATHER THAN A LEVEL. Cashed in at 32; "
+            + "what a node can "
             + "AFFORD to hold is a fact about the machine, not about the run, so "
             + "there is nothing in the walk for it to be hunted from — the honest "
             + "driver is available memory. What a run CAN say is whether the cap "
@@ -102,31 +101,18 @@ public sealed class DialTests(ITestOutputHelper output)
 
         ["Span"] =
             "a capacity rather than a level, like `Row`. How far back to carry is "
-            + "a claim about the stream, and the refutation row says it costs its "
+            + "a claim about the STREAM, and the refutation row says it costs its "
             + "row without paying — so what it needs is a reason to exist, not a "
-            + "controller",
+            + "controller. It is ON everywhere since 2026-08-04 and known to hurt "
+            + "bAbI, which is the pressure that makes the reason worth finding",
 
         ["Ranking"] =
             "a choice between accumulation rules rather than a continuum, exactly "
             + "as `Pricing` and `Toll` are. WHICH rule is not a quantity",
 
-        ["Kinds"] =
-            "a structural claim rather than a level — whether a carried edge gets "
-            + "its own cell. On or off, with nothing between to hunt",
 
-        ["Surprising"] =
-            "OPEN, AND MEASURED INERT ON TEXT. The gate suppresses what was "
-            + "predicted, and independent sentences predict nothing of each other. "
-            + "It is on or off rather than a level; what it needs is a world whose "
-            + "stream repeats, and `Rhythm` is the one that has it",
 
-        ["Gated"] =
-            "the write-path half of `Surprising`, and on or off for the same "
-            + "reason. It is a claim about LEARNING where the other is about COST",
 
-        ["Chunking"] =
-            "step 3, on or off. What a chunk COSTS to keep is a level and belongs "
-            + "to `Chunk` itself; whether to name sets at all is not",
 
         ["Carried"] =
             "OPEN. What a carried occasion is worth against a simultaneous one is "
@@ -134,22 +120,16 @@ public sealed class DialTests(ITestOutputHelper output)
             + "carried-edge discount row says a weight was not what the window "
             + "needed, so this waits on that being answered rather than tuned",
 
-        ["Recent"] =
-            "a question's preference rather than a level, and on or off",
 
         ["Depth"] =
             "OPEN, AND THE PLAN CALLS IT OUT. Every rollout step is a whole walk, "
             + "so depth currently borrows `Stamina`'s budget. It wants its own "
             + "control, and that is an item rather than an excuse",
 
-        ["IncludeEmpty"] =
-            "revived with no clear winner since, so it is an open ARM rather than "
-            + "a level. Whether an empty moment is an occasion is a claim about "
-            + "the world, not a quantity to hunt",
 
         ["Names"] =
-            "REVIVED AT ONE CODE. Coarse ranking informs and fine does not, so the "
-            + "useful settings are one and null — a choice rather than a continuum",
+            "CASHED IN AT ONE CODE. Coarse ranking informs and fine does not, so "
+            + "the number is a finding rather than a level anybody should hunt",
     };
 
     /// <summary>
@@ -185,7 +165,10 @@ public sealed class DialTests(ITestOutputHelper output)
 
         var moved = dial switch
         {
-            "Doubt" => plain with { Doubt = 8.0 },
+            // MOVED OFF THE DEFAULT RATHER THAN ON FROM ZERO. Doubt was cashed in
+            // at 8.0 on 2026-08-04, so `with { Doubt = 8.0 }` is now the SAME
+            // record and this assertion compared a run against itself.
+            "Doubt" => plain with { Doubt = 32.0 },
             _ => throw new ArgumentOutOfRangeException(nameof(dial)),
         };
 
@@ -394,19 +377,23 @@ public sealed class DialTests(ITestOutputHelper output)
         // forgetting this design has -- the bet is that nothing can be unlearned,
         // only outvoted, and until now there was no way to test whether that bet is
         // survivable.
-        // AND TO EIGHTEEN, WHICH IS NOT ELEVEN NEW KNOBS. John moved the dials out
-        // of the worlds and into the brain on 2026-08-04, and every one of these
-        // already existed as a `*Run` constructor argument -- somewhere this census
-        // enumerates `WalkSettings` and therefore could not look. THE BUDGET WAS
-        // MEASURING ITS OWN BLIND SPOT: a file whose whole job is to notice a sixth
-        // dial arriving beside five could not see eleven of them.
+        // IT WENT TO EIGHTEEN AND THEN BACK TO TWELVE, AND NEITHER MOVE WAS ABOUT
+        // KNOBS BEING ADDED OR REMOVED. John moved the dials out of the worlds and
+        // into the brain on 2026-08-04, and eleven of them had been `*Run`
+        // constructor arguments -- somewhere this census could not look, because it
+        // enumerates `WalkSettings`. THE BUDGET WAS MEASURING ITS OWN BLIND SPOT: a
+        // file whose job is to notice a sixth dial arriving beside five could not
+        // see eleven of them.
         //
-        // EIGHTEEN IS THE HONEST NUMBER AND IT IS MUCH WORSE THAN SEVEN. That is
-        // the argument this file exists to force, and it could not be had while
-        // eleven of the knobs were hiding in world constructors.
+        // THEN SIX WENT AWAY THE SAME DAY, and that WAS a real fall. `Kinds`,
+        // `Surprising`, `Gated`, `Chunking`, `Recent` and `IncludeEmpty` were all
+        // on/off flags, and John's rule is that you build it and it is ON. A dial
+        // with two positions where one of them is "not running" was never a level
+        // to hunt, so removing it removes a question nobody could have answered.
+        // `Budget` went with them: the controller is unconditional now, so it is
+        // not a switch and not a level either.
         //
-        // THE NUMBER IS THE HONEST ONE NOW, and it is much worse than seven. That
-        // is the argument this file exists to force.
-        Assert.Equal(18, HandSet.Count);
+        // TWELVE IS THE HONEST NUMBER, and it is still much worse than seven.
+        Assert.Equal(12, HandSet.Count);
     }
 }

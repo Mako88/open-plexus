@@ -58,38 +58,16 @@ public sealed class FlagTests(ITestOutputHelper output)
     /// </remarks>
     private static readonly HashSet<string> Switches = new(StringComparer.Ordinal)
     {
-        // ---- WON ALREADY, SO THE FLAG SHOULD GO AND THE BEHAVIOUR STAY ------
+        // ---- THE ONE THAT IS A TRADE AND NOT A WINNER OR A LOSER ------------
         //
-        // `Doubt` repairs the rare-coincidence defect and is free where it is not
-        // needed -- measured identical to ten places on the clean world. `Row` was
-        // proved free under a heavy tail and near-free on a flat one, and is the
-        // difference between possible and impossible on text. `Names` is the
-        // table's own "REVIVED at one code".
-        //
-        // THE COST OF CASHING THESE IN IS THAT EVERY BASELINE MOVES, which is why
-        // they are still here rather than done in passing.
-        "Doubt", "Row", "Names",
-
-        // ---- WORLD-DEPENDENT, WHICH IS NOT THE SAME AS OFF ------------------
-        //
-        // `Span` is refuted on snake and bAbI and is THE WHOLE TASK on `Rhythm`,
-        // where nothing overlaps and there are no temporal cells without it. So it
-        // is not a loser and it is not a winner; it is a claim about the STREAM.
-        // Deleting it would take `Rhythm` with it. `Kinds` only means anything
-        // beside it.
-        //
-        // AND THIS PAIR IS WHAT YESTERDAY'S REGRESSION WAS MADE OF: a per-world
-        // default is a scattered piece of KNOWLEDGE, not just a scattered knob.
-        "Span", "Kinds",
-
-        // ---- UNRESOLVED, AND EACH NEEDS ITS TOGGLE RUN ----------------------
-        //
-        // `IncludeEmpty` is the table's "revived, no clear winner since".
-        // `Reflect` is recorded as a trade. `Surprising` and `Gated` bite on
-        // `Rhythm` and are inert on text. `Chunking`, `Recent`, `Budget` and
-        // `Foresight` have each been measured on exactly one world.
-        "Surprising", "Gated", "Chunking", "Recent", "IncludeEmpty", "Reflect",
-        "Budget", "Foresight",
+        // JOHN'S CALL, 2026-08-04: everything else went ON and the way to switch it
+        // off went with it. `Reflect` stays a toggle because fork 21's own note
+        // says why -- the risk is that the system learns its own hallucinations,
+        // confirmation bias literally, and null is the control that says whether it
+        // is doing that. THE THRESHOLD HAS NO SIGNAL YET (fork 23: `Hunger`
+        // inverted, `Thwarted` swung too little), so this is a mechanism that
+        // cannot yet be told when to stop, which is not the same as one that lost.
+        "Reflect",
     };
 
     [Fact]
@@ -124,7 +102,7 @@ public sealed class FlagTests(ITestOutputHelper output)
         // decision: won and became unconditional, or lost and was deleted. There
         // is no edit that should raise this, because raising it means somebody
         // built something and left a way to not run it.
-        Assert.True(Switches.Count <= 13,
+        Assert.True(Switches.Count <= 1,
             $"{Switches.Count} on/off flags, which is more than when this rule was "
             + "made. Something was built with a way to switch it off.");
 

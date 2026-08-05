@@ -211,15 +211,15 @@ public sealed class RhythmRun : IDisposable
 
         _world = new Rhythm(world, seed);
         _dials = dials;
-        _surprise = dials.Surprising ? new Surprise() : null;
+        _surprise = new Surprise();
         _depth = dials.Depth < 1 ? 1 : dials.Depth;
-        _asking = dials.Recent ? new Question { Recent = true } : null;
+        _asking = new Question { Recent = true };
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _ear = new InputMachine<Code>(
             new MachineAddress("ear"), new Hearing(),
             new LocalRendezvous(_fabric.Local, carried: dials.Carried),
-            _fabric.Bus, _fabric.Ring, dials, dials.Span, _surprise, gated: dials.Gated);
+            _fabric.Bus, _fabric.Ring, dials);
 
         _fabric.Subscribe(_ear);
     }
@@ -400,7 +400,7 @@ public sealed class RhythmRun : IDisposable
     private async Task<Guess> GuessAsync(Code heard, CancellationToken ct)
     {
         var thought = await _ear
-            .ThinkAsync([heard], _dials.Foresight ?? _dials.Stamina, _asking, ct)
+            .ThinkAsync([heard], _dials.Foresight, _asking, ct)
             .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);

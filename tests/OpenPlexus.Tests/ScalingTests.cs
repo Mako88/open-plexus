@@ -103,7 +103,7 @@ public sealed class ScalingTests
     /// as concepts went 8 to 512. That is a smaller graph wearing a bigger alphabet.
     /// </remarks>
     private static async Task<(int Nodes, int Widest, long Messages)> WiderAsync(
-        int concepts, int? cap)
+        int concepts, int cap)
     {
         using var run = new SensesRun(
             Fixture.Senses(concepts: concepts),
@@ -127,8 +127,8 @@ public sealed class ScalingTests
         // does not get dearer to think in. `Senses` gives every concept a fixed
         // handful of partners, and spreading concepts thinner gives each FEWER
         // co-occurrences rather than more.
-        var narrow = await WiderAsync(8, cap: null);
-        var wide = await WiderAsync(512, cap: null);
+        var narrow = await WiderAsync(8, cap: Fixture.Unbounded);
+        var wide = await WiderAsync(512, cap: Fixture.Unbounded);
 
         Assert.True(wide.Nodes > narrow.Nodes * 32,
             $"the alphabet stopped growing the graph: {narrow.Nodes} to {wide.Nodes}");
@@ -151,7 +151,7 @@ public sealed class ScalingTests
         // THAT REQUIREMENT IS NOW MET, BY `SensesSettings.Skew`, and `TailTests`
         // is where the cap does bite. Read this pair together: the cap is inert
         // here because of the DISTRIBUTION and not because it is a bad bound.
-        var free = await WiderAsync(512, cap: null);
+        var free = await WiderAsync(512, cap: Fixture.Unbounded);
         var capped = await WiderAsync(512, cap: 32);
 
         Assert.Equal(free.Widest, capped.Widest);

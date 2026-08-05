@@ -195,7 +195,7 @@ public sealed class Node
     /// </remarks>
     private void Evict()
     {
-        if (_settings.Row is not { } cap) return;
+        var cap = _settings.Row;
 
         // ONE PASS PER ENTRY DROPPED, AND A WRITE DROPS AT MOST ONE. Sorting the
         // row would be the obvious way and it is the wrong complexity for the one
@@ -378,9 +378,10 @@ public sealed class Node
             // The price below still comes from the raw ratio, so a hop still
             // costs at least one and the walk stays bounded by construction.
             // What moves is only how much a thin partner is BELIEVED.
-            believed = _settings.Doubt <= 0.0
-                ? arriving
-                : Math.Min(message.Together / (by + _settings.Doubt), 1.0);
+            // SHRINKAGE IS UNCONDITIONAL NOW. There is no undoubted arm to fall
+            // back to -- `arriving` is still what PRICES the hop, and this is only
+            // what BELIEVES it, which is the split `Doubt` was built to make.
+            believed = Math.Min(message.Together / (by + _settings.Doubt), 1.0);
 
             // AND THE BASE RATE DISCOUNTS THE SCORE, ON THAT SAME SIDE OF THE LINE
             // AND FOR THE FIFTH TIME. ΔP is at most one, so this can only ever

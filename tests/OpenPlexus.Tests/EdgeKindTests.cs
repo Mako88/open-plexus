@@ -23,12 +23,11 @@ public sealed class EdgeKindTests
     /// One moment holding <c>C(1)</c> and <c>C(2)</c>, with whatever the front end
     /// could say about their order.
     /// </summary>
-    private static async Task<Bench> Moment(
-        IReadOnlyDictionary<Code, int>? sequence, bool kinds = false)
+    private static async Task<Bench> Moment(IReadOnlyDictionary<Code, int>? sequence)
     {
         var bench = new Bench(Fixture.Dials(stamina: 10.0));
 
-        await new LocalRendezvous(bench.Local, kinds).JoinAsync(new Occasion
+        await new LocalRendezvous(bench.Local).JoinAsync(new Occasion
         {
             Onsets = [C(1), C(2)],
             Live = [],
@@ -41,62 +40,21 @@ public sealed class EdgeKindTests
 
     // ---- off changes nothing ----------------------------------------------
 
-    [Fact]
-    public async Task With_kinds_off_a_carried_edge_lands_where_it_always_did()
-    {
-        // EVERY MEASUREMENT TAKEN UP TO NOW WAS TAKEN THIS WAY. The window's
-        // carried edge is added to the same cell as a simultaneous one, which is
-        // the defect -- and reproducing it exactly is what keeps the old numbers
-        // comparable with the new ones.
-        var bench = new Bench(Fixture.Dials(stamina: 10.0));
-        var rendezvous = new LocalRendezvous(bench.Local, kinds: false);
+    // ---- THE TWO ARM TESTS THAT STOOD HERE ---------------------------------
+    //
+    // `With_kinds_off_a_carried_edge_lands_where_it_always_did` reproduced the
+    // DEFECT -- a carried edge sharing the simultaneous cell -- and
+    // `A_pair_met_both_ways_is_one_entry_off_and_two_on` compared one cell against
+    // two. Step 6 became unconditional on 2026-08-04, so neither arm exists to
+    // compare against and both tests are gone rather than rewritten.
+    //
+    // WHAT THEY ESTABLISHED, kept because the rest of this file rests on it: a
+    // pair met simultaneously and then sequentially is ONE row entry when the
+    // cells are shared and TWO when they are not, and sharing is what made a
+    // deeper walk monotonically worse. The refutation table records the kinds as
+    // the fix, and the remaining tests below assert what a temporal edge does now
+    // that there is only one way for it to be written.
 
-        await rendezvous.JoinAsync(new Occasion
-        {
-            Onsets = [C(9)], Live = [], Recent = [C(1)], At = 5,
-        });
-
-        Assert.Equal(1.0, bench.Node(C(1)).Together(C(9), Kind.With));
-        Assert.Equal(0.0, bench.Node(C(1)).Together(C(9), Kind.After));
-    }
-
-    [Fact]
-    public async Task A_pair_met_both_ways_is_one_entry_off_and_two_on()
-    {
-        // THE PRICE, IN THE ONE UNIT THAT MATTERS. Memory per edge is the
-        // scaling wall and cost per thought is set by the widest row, so the
-        // split has to be paid for in entries and is worth saying out loud.
-        var off = new Bench(Fixture.Dials(stamina: 10.0));
-        var on = new Bench(Fixture.Dials(stamina: 10.0));
-
-        foreach (var (bench, kinds) in new[] { (off, false), (on, true) })
-        {
-            var rendezvous = new LocalRendezvous(bench.Local, kinds);
-
-            // Met alongside, then met again as a predecessor.
-            await rendezvous.JoinAsync(new Occasion
-            {
-                Onsets = [C(1), C(9)], Live = [], At = 1,
-            });
-
-            await rendezvous.JoinAsync(new Occasion
-            {
-                Onsets = [C(9)], Live = [], Recent = [C(1)], At = 2,
-            });
-        }
-
-        Assert.Equal(1, off.Node(C(1)).Entries);
-        Assert.Equal(2, on.Node(C(1)).Entries);
-
-        // AND THE PAIR TOTALS THE SAME EITHER WAY, which is what says the split
-        // moved the counts apart rather than losing or inventing one.
-        Assert.Equal(2.0, off.Node(C(1)).Together(C(9)));
-        Assert.Equal(2.0, on.Node(C(1)).Together(C(9)));
-
-        // Separated: once alongside, once after.
-        Assert.Equal(1.0, on.Node(C(1)).Together(C(9), Kind.With));
-        Assert.Equal(1.0, on.Node(C(1)).Together(C(9), Kind.After));
-    }
 
     // ---- what the kinds mean ----------------------------------------------
 
@@ -104,7 +62,7 @@ public sealed class EdgeKindTests
     public async Task A_temporal_edge_is_still_written_one_way()
     {
         var bench = new Bench(Fixture.Dials(stamina: 10.0));
-        var rendezvous = new LocalRendezvous(bench.Local, kinds: true);
+        var rendezvous = new LocalRendezvous(bench.Local);
 
         await rendezvous.JoinAsync(new Occasion
         {
@@ -135,11 +93,11 @@ public sealed class EdgeKindTests
     [Fact]
     public async Task A_sequence_needs_no_arm_because_no_history_carries_one()
     {
-        // The asymmetry with the window, and the reason only one of them is
-        // behind a flag: an occasion that says nothing about order produces
-        // exactly the graph it always did.
+        // AN ORDER SAID INSIDE THE OCCASION IS NOT THE WINDOW, and the difference
+        // survived the window becoming unconditional: this pair is sequential
+        // because the FRONT END said so, not because one of them had stopped.
         var bench = await Moment(
-            new Dictionary<Code, int> { [C(1)] = 0, [C(2)] = 1 }, kinds: false);
+            new Dictionary<Code, int> { [C(1)] = 0, [C(2)] = 1 });
 
         Assert.Equal(1.0, bench.Node(C(1)).Together(C(2), Kind.After));
     }

@@ -137,7 +137,7 @@ public sealed class RhythmTests(ITestOutputHelper output)
         var dials = Fixture.Dials(stamina: 4.0);
 
         using var loud = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
-        using var quiet = new RhythmRun(World(), dials with { Span = 1, Surprising = true }, seed: 1);
+        using var quiet = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
 
         var before = await loud.RunAsync(600);
         var after = await quiet.RunAsync(600);

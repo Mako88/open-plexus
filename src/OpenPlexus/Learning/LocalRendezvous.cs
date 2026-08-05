@@ -26,34 +26,15 @@ public sealed class LocalRendezvous : IRendezvous
 {
     private readonly LocalClusters _clusters;
 
-    /// <inheritdoc cref="Graph.Kind"/>
-    private readonly bool _kinds;
-
     /// <summary>What a carried pair counts for, against a simultaneous one.</summary>
     private readonly double _carried;
 
     /// <param name="clusters">Where the codes live.</param>
-    /// <param name="kinds">
-    /// Whether a temporal pair gets its own cell — <b>step 6, and OFF is every
-    /// measurement taken before it existed.</b>
-    /// </param>
     /// <param name="carried">
     /// What a CARRIED pair is worth, as a share of what a simultaneous one is
     /// worth — <b>the standing revival condition on the window's refuted row.</b>
     /// </param>
     /// <remarks>
-    /// <para>
-    /// <b>IT HAS TO BE AN ARM, BECAUSE IT MOVES COUNTS THAT WERE ALREADY
-    /// MEASURED.</b> A carried edge is currently added to the same cell as a
-    /// simultaneous one, so splitting them is not additive the way
-    /// <see cref="Occasion.Groups"/> was — the same history produces a different
-    /// graph. Every number taken up to now was taken with this off, and stays
-    /// comparable only while it can still be turned off.
-    /// </para>
-    /// <para>
-    /// <b>The revival condition on two refuted rows is exactly this arm being
-    /// on</b>, so it is the thing to sweep and not a default to assume.
-    /// </para>
     /// <para>
     /// <b>AND THE DISCOUNT IS THE OTHER ROW'S REVIVAL CONDITION — <i>something that
     /// makes a carried edge worth its row</i>.</b> Two codes that were carried
@@ -72,14 +53,13 @@ public sealed class LocalRendezvous : IRendezvous
     /// carries the standing risk that anything making a route dearer starves it.
     /// </para>
     /// </remarks>
-    public LocalRendezvous(LocalClusters clusters, bool kinds = false, double carried = 1.0)
+    public LocalRendezvous(LocalClusters clusters, double carried = 1.0)
     {
         ArgumentNullException.ThrowIfNull(clusters);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(carried);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(carried, 1.0);
 
         _clusters = clusters;
-        _kinds = kinds;
         _carried = carried;
     }
 
@@ -243,13 +223,16 @@ public sealed class LocalRendezvous : IRendezvous
                     // AND IT IS THE ONE WRITE THE DISCOUNT APPLIES TO. These two
                     // codes were not in one moment -- one had already stopped --
                     // so at full weight the row says `followed` is evidence as
-                    // strong as `accompanied`. Nothing else here is discounted,
-                    // which is what makes this an arm rather than a rescaling of
-                    // the whole graph.
+                    // strong as `accompanied`. Nothing else here is discounted.
+                    //
+                    // THE CELL IS ALWAYS `After` NOW -- step 6 is unconditional,
+                    // John's call 2026-08-04. Sharing the simultaneous cell was
+                    // the arm that made a deeper walk monotonically worse, and the
+                    // refutation table records the kinds as what fixed it.
                     _clusters.For(past).Observe(
                         onset,
                         weight * _carried,
-                        _kinds ? Kind.After : Kind.With,
+                        Kind.After,
                         occasion.At);
         }
 

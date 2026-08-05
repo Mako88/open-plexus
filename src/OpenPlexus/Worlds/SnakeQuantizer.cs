@@ -24,25 +24,17 @@ public sealed class SnakeQuantizer : IQuantizer<SnakeView>
     /// <summary>Vision. Two modalities never collide.</summary>
     public const byte Vision = 1;
 
-    private readonly bool _includeEmpty;
-
-    /// <param name="includeEmpty">
-    /// Whether an empty cell emits a code.
-    /// </param>
     /// <remarks>
-    /// <b>THIS ARM WAS DELETED AND IS BACK, because the refutation that killed
-    /// it was conditional on a configuration that no longer exists.</b>
-    /// Withholding empty cells was worth four orders of magnitude when `Best`
-    /// pricing let the flood enumerate every simple path. Inverse cost bounds
-    /// the walk by construction, so that reason is gone — and an audit found
-    /// what withholding costs instead: with only the body visible in open
-    /// space, the codes are often identical frame after frame and <b>47% of steps
-    /// produce no onset at all</b> — measured over 60 seeds; a single-seed
-    /// reading said 89% and was not a measurement. Including empty cells takes
-    /// silence to 16%, at ten times the messages.
+    /// <b>AN EMPTY CELL EMITS A CODE, AND THERE IS NO ARM THAT DOES NOT — John's
+    /// call, 2026-08-04.</b> Withholding them was worth four orders of magnitude
+    /// when `Best` pricing let the flood enumerate every simple path; inverse cost
+    /// bounds the walk by construction, so that reason is gone. What withholding
+    /// costs instead was audited: with only the body visible in open space the
+    /// codes are often identical frame after frame and <b>47% of steps produce no
+    /// onset at all</b> — measured over 60 seeds, where a single-seed reading said
+    /// 89% and was not a measurement. Including them takes silence to 16%, at ten
+    /// times the messages.
     /// </remarks>
-    public SnakeQuantizer(bool includeEmpty = false) => _includeEmpty = includeEmpty;
-
     /// <inheritdoc/>
     public byte Modality => Vision;
 
@@ -54,7 +46,6 @@ public sealed class SnakeQuantizer : IQuantizer<SnakeView>
         var codes = new List<Code>(view.Cells.Count);
         foreach (var cell in view.Cells)
         {
-            if (!_includeEmpty && cell.Content == Cell.Empty) continue;
             codes.Add(Encode(cell));
         }
 

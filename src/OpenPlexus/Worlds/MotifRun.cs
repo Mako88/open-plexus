@@ -47,35 +47,23 @@ public sealed record MotifResult : Questioned
         ArgumentNullException.ThrowIfNull(wrong);
 
         // THE ALPHABET GROWS ONLY WHERE SOMETHING IS MEANT TO BE GROWING IT, and
-        // this is the check in both directions. With chunking off the node count
-        // can never exceed the symbols the world emits, because the quantiser
-        // fixes the alphabet forever -- a run that exceeded it would mean
-        // something was minting behind everyone's back. With chunking on, minting
-        // nothing at all is the mechanism failing silently.
-        if (!Chunking && Nodes > Symbols)
-            wrong.Add($"the graph holds {Nodes} nodes for {Symbols} symbols with "
-                + "chunking off, so something is minting an alphabet");
-
-        if (Chunking && Coined == 0)
-            wrong.Add("chunking was switched on and minted nothing");
-
-        if (!Chunking && Coined > 0)
-            wrong.Add($"chunking was off and still minted {Coined}");
+        // this is the check. Chunking is unconditional now, so minting nothing at
+        // all is the mechanism failing silently and there is no off arm left to
+        // check the other direction against.
+        if (Coined == 0)
+            wrong.Add("chunking minted nothing at all");
 
         // AND A DETECTOR THAT MINTS NEARLY EVERYTHING HAS FOUND NO STRUCTURE. The
         // world draws its noise without replacement from a much larger alphabet,
         // so an exact whole-moment repeat is the motif and essentially nothing
         // else -- if this fires, the compression below is a renaming.
-        if (Chunking && Motifs > 0 && Coined > Motifs)
+        if (Motifs > 0 && Coined > Motifs)
             wrong.Add($"minted {Coined} names for {Motifs} recurring sets, so the "
                 + "detector is naming the noise");
     }
 
     /// <summary>How many distinct codes the world can emit.</summary>
     public required int Symbols { get; init; }
-
-    /// <summary>Whether step 3 was switched on for this run.</summary>
-    public required bool Chunking { get; init; }
 
     /// <inheritdoc cref="Learning.Chunk.Coined"/>
     public required int Coined { get; init; }
@@ -84,7 +72,7 @@ public sealed record MotifResult : Questioned
         $"motifs={Motifs} moments={Moments} asked={Asked} right={Right} silent={Silent} | " +
         $"accuracy={Accuracy:F4} chance={Chance:F4} | " +
         $"edges={Edges} compressed={Compressed} uncompressed={Uncompressed} | " +
-        $"chunking={(Chunking ? "on" : "off")} coined={Coined} | " +
+        $"coined={Coined} | " +
         $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
         $"nodes={Nodes} widest={Widest} spread=[{string.Join(",", Spread)}] | " +
         $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | " +
@@ -109,7 +97,7 @@ public sealed class MotifRun : IDisposable
     private readonly WalkSettings _dials;
 
     /// <inheritdoc cref="Learning.Chunk"/>
-    private readonly Chunk? _chunks;
+
 
     /// <param name="world">The stream to watch.</param>
     /// <param name="dials">The walk.</param>
@@ -130,17 +118,16 @@ public sealed class MotifRun : IDisposable
         _settings = world;
         _dials = dials;
         _fabric = new Fabric(dials, seed, clusters, replicas);
-        _chunks = dials.Chunking ? new Chunk() : null;
 
         _eyes = new InputMachine<ImmutableArray<Code>>(
             new MachineAddress("eyes"), new Seeing(), new LocalRendezvous(_fabric.Local),
-            _fabric.Bus, _fabric.Ring, dials, chunks: _chunks);
+            _fabric.Bus, _fabric.Ring, dials);
 
         _fabric.Subscribe(_eyes);
     }
 
     /// <inheritdoc cref="Learning.Chunk"/>
-    public Chunk? Chunks => _chunks;
+    public Chunk Chunks => _eyes.Chunks;
 
     /// <summary>The world this run is watching.</summary>
     public Motif World => _world;
@@ -227,8 +214,7 @@ public sealed class MotifRun : IDisposable
             Plumbing = _fabric.Facts(chains, unbalanced),
             Halted = halted,
             Unsettled = unsettled,
-            Chunking = _chunks is not null,
-            Coined = _chunks?.Coined ?? 0,
+            Coined = _eyes.Chunks.Coined,
         };
     }
 

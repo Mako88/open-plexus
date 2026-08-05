@@ -45,6 +45,22 @@ public sealed record Budgeting
     /// stamina 24 against 16,005 at 8, for no accuracy at all.
     /// </remarks>
     public required double Most { get; init; }
+
+    /// <summary>
+    /// The settings the hunt runs under everywhere. <b>Both numbers are
+    /// world-INDEPENDENT, which is the whole argument for the trade.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>IT IS A CONSTANT AND NOT A DIAL, and that distinction is the point of
+    /// fork 24.</b> Stamina is world-dependent — snake wants about 2 and the
+    /// senses world about 8, and the only way anybody ever found either was by
+    /// sweeping. Replacing one world-dependent constant with two
+    /// world-independent ones that work across a wide range is progress;
+    /// exposing those two as knobs would give the world back the choice this
+    /// exists to take away from it.
+    /// </remarks>
+    public static Budgeting Standard { get; } =
+        new() { Window = 20, Worth = 0.02, Most = 64.0 };
 }
 
 /// <summary>

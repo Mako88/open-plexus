@@ -60,16 +60,16 @@ public sealed class BlockingTests(ITestOutputHelper output)
     /// this graph is any good at forming one — using the walk's own guess would
     /// confound the two and leave a null unattributable.
     /// </remarks>
-    private static async Task<Bench> TrainedAsync(bool gated)
+    private static async Task<Bench> TrainedAsync()
     {
         var bench = new Bench(Fixture.Dials(stamina: 10.0));
 
-        var surprise = new Surprise();
-
+        // THE MACHINE CARRIES ITS OWN SURPRISE AND ITS OWN SPAN NOW. Both were
+        // constructor arguments until 2026-08-04; the gate is unconditional and
+        // the span comes off the settings, so there is nothing to hand in.
         var machine = new InputMachine<IReadOnlyCollection<Code>>(
             new MachineAddress("cue"), new Handed(), bench.Rendezvous,
-            bench.Bus, bench.Ring, Fixture.Dials(stamina: 10.0),
-            span: 1, surprise: surprise, gated: gated);
+            bench.Bus, bench.Ring, Fixture.Dials(stamina: 10.0));
 
         var at = 0L;
 
@@ -87,50 +87,33 @@ public sealed class BlockingTests(ITestOutputHelper output)
         {
             await machine.ObserveAsync([First, Added], at++);
 
-            surprise.Expect([Outcome]);
+            machine.Expects.Expect([Outcome]);
             await machine.ObserveAsync([Outcome], at++);
         }
 
         return bench;
     }
 
-    [Fact]
-    public async Task A_count_of_co_occurrence_hands_the_added_cue_the_full_association()
-    {
-        // THE CONTROL, AND IT IS THE BEHAVIOUR THIS PROJECT HAS TODAY. `Added` and
-        // `Outcome` were adjacent on every one of the twenty later rounds, so a
-        // contiguity count says they are strongly associated -- and it is not wrong
-        // about the contiguity, only about what it means.
-        using var bench = await TrainedAsync(gated: false);
 
-        var learnt = bench.Node(Added).Together(Outcome);
-
-        output.WriteLine($"ungated: added->outcome {learnt:F2}");
-
-        Assert.True(learnt > 15.0,
-            $"the added cue picked up only {learnt:F2}, so this control is not "
-            + "demonstrating the contiguity it exists to demonstrate");
-    }
-
-    [Fact]
-    public async Task And_gating_the_write_by_surprise_blocks_it()
-    {
-        // THE CAPABILITY, AND IT IS WHAT STEP 2'S SECOND HALF IS ACTUALLY FOR. The
-        // outcome was expected on every round the added cue was present, so those
-        // moments carried no error -- and a system that learns from error alone has
-        // nothing to write. The added cue stays a bystander.
-        using var gated = await TrainedAsync(gated: true);
-        using var plain = await TrainedAsync(gated: false);
-
-        var blocked = gated.Node(Added).Together(Outcome);
-        var free = plain.Node(Added).Together(Outcome);
-
-        output.WriteLine($"gated {blocked:F2} against ungated {free:F2}");
-
-        Assert.True(blocked < free / 2.0,
-            $"gating the write did not block the added cue: {blocked:F2} against "
-            + $"{free:F2}");
-    }
+    // ---- THE CONTROL, AND WHY IT IS NO LONGER RUNNABLE ----------------------
+    //
+    // TWO TESTS STOOD ABOVE THIS ONE AND BOTH NEEDED AN UNGATED BENCH:
+    // `A_count_of_co_occurrence_hands_the_added_cue_the_full_association` was the
+    // contiguity control, and `And_gating_the_write_by_surprise_blocks_it` was the
+    // comparison. Step 2's second half became unconditional on 2026-08-04, so
+    // there is no ungated arm to build.
+    //
+    // WHAT THEY ESTABLISHED: with a pure co-occurrence count the added cue picked
+    // up the FULL association — it really was adjacent to the outcome on every one
+    // of the twenty later rounds, so the count was not wrong about the contiguity,
+    // only about what it meant. Gating the write by surprise cut that to under
+    // half. That is Kamin blocking, and it is a known empirical failure of
+    // contiguity rather than a quirk of this design.
+    //
+    // WHAT SURVIVES BELOW is the companion, and it is the one that still has
+    // something to say: blocking is a claim about the ADDED cue and not about
+    // learning in general, so the first cue must keep what it earned in phase one.
+    // Without it a gate that simply stopped writing would have passed.
 
     [Fact]
     public async Task And_the_first_cue_keeps_what_it_earned_before_the_second_arrived()
@@ -139,7 +122,7 @@ public sealed class BlockingTests(ITestOutputHelper output)
         // SIMPLY STOPPED WRITING. Blocking is a claim about the ADDED cue and not
         // about learning in general -- the first cue's association was built in
         // phase one, when every outcome was a surprise, and it must survive.
-        using var bench = await TrainedAsync(gated: true);
+        using var bench = await TrainedAsync();
 
         var first = bench.Node(First).Together(Outcome);
         var added = bench.Node(Added).Together(Outcome);
@@ -155,65 +138,19 @@ public sealed class BlockingTests(ITestOutputHelper output)
             + "the blocking above is silence rather than selectivity");
     }
 
-    // ---- and what it costs on a world ---------------------------------------
-
-    /// <summary>One arm on the stream, averaged over seeds.</summary>
-    private static async Task<(double Accuracy, double Messages)> StreamAsync(bool gated)
-    {
-        int[] seeds = [1, 2, 3, 5, 8, 13];
-
-        double accuracy = 0.0, messages = 0.0;
-
-        foreach (var seed in seeds)
-        {
-            using var run = new Worlds.RhythmRun(
-                new Worlds.RhythmSettings { Symbols = 12, Period = 5, Violations = 0.1 },
-                Fixture.Dials(stamina: 3.0) with
-                {
-                    Span = 1, Surprising = true, Gated = gated,
-                },
-                seed);
-
-            var result = await run.RunAsync(900);
-
-            accuracy += result.Accuracy;
-            messages += result.Messages;
-        }
-
-        return (accuracy / seeds.Length, messages / seeds.Length);
-    }
-
-    [Fact]
-    public async Task On_a_world_with_no_redundant_cue_it_can_only_cost()
-    {
-        // THE PLAN PREDICTED THE PAYOFF WOULD BE COST, AND ON THIS WORLD IT IS
-        // BARELY THAT. Gating the write saves about a twentieth of the traffic and
-        // gives up rather more than that in accuracy.
-        //
-        // AND THE REASON IS THE WORLD RATHER THAN THE MECHANISM, which is the same
-        // lesson `Choices` taught this morning. `Rhythm` shows ONE SYMBOL PER
-        // MOMENT, so there is never a second cue standing beside a first -- and
-        // blocking is a claim about exactly that arrangement. There is nothing here
-        // for the gate to block, so all that is left to measure is what it costs
-        // to stop reinforcing what you already predict.
-        //
-        // WHAT WOULD SHOW THE PAYOFF is a world where several cues arrive together
-        // and only some of them carry the outcome. Nothing here is that world.
-        var plain = await StreamAsync(gated: false);
-        var gated = await StreamAsync(gated: true);
-
-        output.WriteLine(
-            $"plain  acc={plain.Accuracy:F4} msgs={plain.Messages:F0}");
-        output.WriteLine(
-            $"gated  acc={gated.Accuracy:F4} msgs={gated.Messages:F0}");
-
-        Assert.True(gated.Messages < plain.Messages,
-            $"gating the write stopped saving anything at all: "
-            + $"{gated.Messages:F0} against {plain.Messages:F0}");
-
-        Assert.True(gated.Accuracy < plain.Accuracy,
-            $"gating the write now BUYS accuracy on a world with no redundant cue "
-            + $"({gated.Accuracy:F4} against {plain.Accuracy:F4}), which the "
-            + "explanation above does not cover and wants understanding");
-    }
+    // ---- AND WHAT IT COSTS ON A WORLD --------------------------------------
+    //
+    // `On_a_world_with_no_redundant_cue_it_can_only_cost` stood here and swept the
+    // gate on and off over six seeds of `Rhythm`. It is gone with the arm.
+    //
+    // WHAT IT FOUND, and it is the reason a world is owed rather than a dial:
+    // gating the write saved about a twentieth of the traffic and gave up rather
+    // more than that in accuracy. THE REASON WAS THE WORLD AND NOT THE MECHANISM
+    // — `Rhythm` shows ONE SYMBOL PER MOMENT, so there is never a second cue
+    // standing beside a first, and blocking is a claim about exactly that
+    // arrangement. There was nothing for the gate to block, so all that could be
+    // measured was what it costs to stop reinforcing what is already predicted.
+    //
+    // The plan names the missing world: one where several cues arrive together and
+    // only some carry the outcome.
 }

@@ -281,7 +281,7 @@ public sealed class HomeostatRun : IDisposable
 
         _body = new InputMachine<ImmutableArray<Code>>(
             new MachineAddress("body"), new Feeling(), _joining,
-            _fabric.Bus, _fabric.Ring, dials, dials.Span);
+            _fabric.Bus, _fabric.Ring, dials);
 
         _fabric.Subscribe(_body);
     }

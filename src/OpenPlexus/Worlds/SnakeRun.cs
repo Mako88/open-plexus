@@ -248,7 +248,7 @@ public sealed class SnakeRun : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(clusters);
 
         _dials = dials;
-        _sense = new SnakeSense(dials.IncludeEmpty, ordered: dials.Kinds);
+        _sense = new SnakeSense();
         _snake = new Snake(world, seed);
         _fallback = new Random(seed);
         _guessing = new Random(~seed);
@@ -258,11 +258,10 @@ public sealed class SnakeRun : IDisposable
         _eye = new InputMachine<SnakeFrame>(
             new MachineAddress("eye"),
             _sense,
-            new LocalRendezvous(_fabric.Local, dials.Kinds),
+            new LocalRendezvous(_fabric.Local),
             _fabric.Bus,
             _fabric.Ring,
-            dials,
-            dials.Span);
+            dials);
 
         _fabric.Subscribe(_eye);
         _hand = new OutputMachine(new MachineAddress("hand"), SnakeSense.Turns);
@@ -362,7 +361,7 @@ public sealed class SnakeRun : IDisposable
             // cell written, the chain reached an action ZERO times on every seed
             // and the body moved entirely at random. See Kind.Before.
             var thought = await _eye
-                .ObserveAsync(frame, taken, _dials.Kinds ? Question.Preceding() : null, ct: ct)
+                .ObserveAsync(frame, taken, Question.Preceding(), ct: ct)
                 .ConfigureAwait(false);
 
             // WAIT ON THE THOUGHT'S OWN ACCOUNTING, NOT ON THE BUS. This was
@@ -581,7 +580,7 @@ public sealed class SnakeRun : IDisposable
         var thought = await _eye.ThinkAsync(
             [.. present, doing],
             _dials.Foresight,
-            _dials.Kinds ? Question.Following() : null,
+            Question.Following(),
             ct).ConfigureAwait(false);
 
         // SETTLED, NOT MERELY QUIET. A prediction read mid-flight names fewer
@@ -590,7 +589,7 @@ public sealed class SnakeRun : IDisposable
         // predictions, so an unfinished one on either side moves it either way.
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
-        var wanted = _dials.Names ?? present.Count;
+        var wanted = _dials.Names;
         var foreseen = thought.BestOf(SnakeQuantizer.Vision, wanted)
             .Select(a => a.Endpoint).ToArray();
 

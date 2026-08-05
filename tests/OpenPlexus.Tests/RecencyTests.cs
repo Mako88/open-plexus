@@ -176,93 +176,30 @@ public sealed class RecencyTests(ITestOutputHelper output)
         Assert.Equal(current.Reached!.Score * 0.25, stale.Reached!.Score, precision: 10);
     }
 
-    // ---- and a world that changes its mind ---------------------------------
-
-    private static Worlds.RhythmSettings Turning(int? turns) => new()
-    {
-        Symbols = 12, Period = 5, Violations = 0.1, Turns = turns,
-    };
-
-    private static async Task<double> StreamAsync(int? turns, bool recent, int seed)
-    {
-        using var run = new Worlds.RhythmRun(
-            Turning(turns),
-            Fixture.Dials(stamina: 3.0) with { Span = 1, Recent = recent },
-            seed);
-
-        return (await run.RunAsync(900)).Accuracy;
-    }
-
-    private static async Task<double> MeanAsync(int? turns, bool recent)
-    {
-        int[] seeds = [1, 2, 3, 5, 8, 13, 21, 34];
-
-        var total = 0.0;
-        foreach (var seed in seeds) total += await StreamAsync(turns, recent, seed);
-
-        return total / seeds.Length;
-    }
-
-    [Fact]
-    public async Task It_suppresses_a_one_off_edge_even_where_nothing_goes_stale()
-    {
-        // I EXPECTED THIS TO BE THE NULL CONTROL AND IT IS NOT, which is worth more
-        // than the control would have been. Nothing SUPERSEDES anything on a stream
-        // that never turns, so preferring the recent should have had nothing to
-        // prefer -- and it is worth a tenth of the score.
-        //
-        // THE REASON IS THE VIOLATIONS. One moment in ten shows a symbol the cycle
-        // did not call for, and that writes an edge which is WRONG and is then
-        // never touched again -- while the cycle's true edges are refreshed every
-        // period. So "recently touched" and "true" correlate here for a reason
-        // that has nothing to do with the world changing: RECENCY IS A NOISE FILTER
-        // BEFORE IT IS A SUPERSESSION MECHANISM, and a one-off error is exactly
-        // what a count that never decays cannot otherwise get rid of.
-        var plain = await MeanAsync(turns: null, recent: false);
-        var dated = await MeanAsync(turns: null, recent: true);
-
-        output.WriteLine($"stationary  plain={plain:F4} recent={dated:F4}");
-
-        Assert.True(dated > plain,
-            $"preferring the recent stopped filtering the one-off edges "
-            + $"({dated:F4} against {plain:F4})");
-    }
-
-    [Fact]
-    public async Task And_it_recovers_part_of_what_a_world_changing_its_mind_costs()
-    {
-        // THE MEASUREMENT SUPERSESSION HAS BEEN WAITING FOR SINCE EDGE KINDS
-        // LANDED. `Tie.When` has ridden beside every count in this project, no walk
-        // consulted it, and NO WORLD COULD SAY WHETHER THAT MATTERED -- every one
-        // of them keeps its rules for the whole run.
-        //
-        // THE CLAIM IS ABOUT THE PENALTY AND NOT THE SCORE, because a turning world
-        // is simply harder and a bigger gain there could be nothing but more
-        // headroom. What a superseding mechanism must do is lose LESS to the turn
-        // than a mechanism without one.
-        var stationary = await MeanAsync(turns: null, recent: false);
-        var turning = await MeanAsync(turns: 300, recent: false);
-
-        var stationaryDated = await MeanAsync(turns: null, recent: true);
-        var turningDated = await MeanAsync(turns: 300, recent: true);
-
-        var plainCost = stationary - turning;
-        var datedCost = stationaryDated - turningDated;
-
-        output.WriteLine($"plain   {stationary:F4} -> {turning:F4}  cost {plainCost:F4}");
-        output.WriteLine(
-            $"recent  {stationaryDated:F4} -> {turningDated:F4}  cost {datedCost:F4}");
-        output.WriteLine($"recovered {1.0 - (datedCost / plainCost):P0} of the penalty");
-
-        // THE WORLD REALLY DOES COST SOMETHING, or there is no penalty to recover
-        // and the rest of this is arithmetic on noise.
-        Assert.True(plainCost > 0.1,
-            $"a turning world costs a walk with no sense of when only "
-            + $"{plainCost:F4}, so it is not much of a turn");
-
-        Assert.True(datedCost < plainCost,
-            $"preferring what is still true loses just as much to a world that "
-            + $"changes its mind ({datedCost:F4} against {plainCost:F4}), so "
-            + "supersession is built, wired, measurable at last, and inert");
-    }
+    // ---- AND A WORLD THAT CHANGES ITS MIND ---------------------------------
+    //
+    // TWO WORLD-LEVEL TESTS STOOD HERE AND BOTH COMPARED RECENCY AGAINST ITS OWN
+    // ABSENCE: `It_suppresses_a_one_off_edge_even_where_nothing_goes_stale` and
+    // `And_it_recovers_part_of_what_a_world_changing_its_mind_costs`. Preferring
+    // what is still true became unconditional on 2026-08-04 -- John's rule -- so
+    // neither can be expressed and both are gone rather than rewritten.
+    //
+    // WHAT THEY FOUND, kept because it is the reason the mechanism is on:
+    //
+    //   * ON A STREAM THAT NEVER TURNS IT STILL PAYS, which was expected to be the
+    //     null control and was not. Nothing supersedes anything there, but one
+    //     moment in ten shows a symbol the cycle did not call for, and preferring
+    //     what was touched recently suppresses exactly those one-off edges. Worth
+    //     about a tenth of the score.
+    //
+    //   * ON A WORLD THAT TURNS IT RECOVERS PART OF THE PENALTY. A turning world
+    //     costs a walk with no sense of when; a walk that prefers what is still
+    //     true loses strictly less to the same turn. That was the first
+    //     measurement `Tie.When` had ever been read by -- it rode beside every
+    //     count in the project with no walk consulting it and no world able to say
+    //     whether that mattered.
+    //
+    // The unit tests above still assert the mechanism itself: the newest entry is
+    // wholly believed, an entry touched again becomes current again, and it moves
+    // the ranking and never the price.
 }

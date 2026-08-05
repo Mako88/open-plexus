@@ -43,19 +43,13 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
 
     private readonly SnakeQuantizer _vision;
 
-    /// <summary>Whether this front end says the action came first — <b>fork 18.</b></summary>
-    private readonly bool _ordered;
-
-    /// <param name="includeEmpty">Whether empty cells produce codes.</param>
-    /// <param name="ordered">
-    /// Whether the action is said to come BEFORE what was then seen — <b>fork 18,
-    /// and OFF is every measurement taken before edge kinds existed.</b>
-    /// </param>
-    public SnakeSense(bool includeEmpty = false, bool ordered = false)
-    {
-        _vision = new SnakeQuantizer(includeEmpty);
-        _ordered = ordered;
-    }
+    /// <remarks>
+    /// <b>NOTHING TO CONFIGURE — John's call, 2026-08-04.</b> Empty cells produce
+    /// codes and the action is said to come BEFORE what was then seen. Both were
+    /// switches; withholding empty cells left 47% of steps with no onset at all,
+    /// and without the order the chain reached an action zero times on every seed.
+    /// </remarks>
+    public SnakeSense() => _vision = new SnakeQuantizer();
 
     /// <summary>Where the turn codes start, clear of the four direction codes.</summary>
     private const ulong Turning = 16;
@@ -118,7 +112,7 @@ public sealed class SnakeSense : IQuantizer<SnakeFrame>
     {
         ArgumentNullException.ThrowIfNull(frame);
 
-        if (!_ordered || frame.Did is not { } did) return null;
+        if (frame.Did is not { } did) return null;
 
         var order = new Dictionary<Code, int> { [did] = 0 };
 

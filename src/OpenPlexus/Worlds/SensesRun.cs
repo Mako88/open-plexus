@@ -91,10 +91,17 @@ public sealed class SensesRun : IDisposable
     private readonly WalkSettings _dials;
 
     /// <summary>
-    /// Fork 24. <b>Null when the stamina dial is hand-set</b>, which is the
-    /// control the sweep is measured against.
+    /// Fork 24. <b>Always hunting — there is no hand-set arm here any more.</b>
+    /// <see cref="WalkSettings.Stamina"/> is where the hunt STARTS, and the
+    /// convergence test asserts the answer does not depend on it.
     /// </summary>
-    private readonly Budget? _budget;
+    /// <remarks>
+    /// <b>THIS IS THE ONLY WORLD THE CONTROLLER IS WIRED INTO, and that is a gap
+    /// rather than a setting.</b> The dial that used to switch it off is gone;
+    /// what is left is six worlds that never call it, which the plan names as
+    /// work and not as an arm.
+    /// </remarks>
+    private readonly Budget _budget;
 
     /// <param name="world">The senses to show.</param>
     /// <param name="dials">The walk.</param>
@@ -120,7 +127,7 @@ public sealed class SensesRun : IDisposable
 
         _world = new Senses(world, seed);
         _dials = dials;
-        _budget = dials.Budget is null ? null : new Budget(dials.Stamina, dials.Budget);
+        _budget = new Budget(dials.Stamina, Budgeting.Standard);
         _fabric = new Fabric(dials, seed, clusters, replicas, late);
 
         _senses = new InputMachine<IReadOnlyCollection<Code>>(
@@ -207,8 +214,8 @@ public sealed class SensesRun : IDisposable
             Unsettled = unsettled,
             Hunger = asked == 0 ? 0.0 : hunger / asked,
             Thwarted = asked == 0 ? 0.0 : thwarted / asked,
-            Settled = _budget?.Stamina ?? _dials.Stamina,
-            Moves = _budget?.Moves ?? 0,
+            Settled = _budget.Stamina,
+            Moves = _budget.Moves,
         };
     }
 
@@ -272,7 +279,7 @@ public sealed class SensesRun : IDisposable
     private async Task<Asking> AskingAsync(int concept, CancellationToken ct)
     {
         var thought = await _senses
-            .ThinkAsync(_world.Of(Senses.Sight, concept), _budget?.Next() ?? _dials.Stamina, null, ct)
+            .ThinkAsync(_world.Of(Senses.Sight, concept), _budget.Next(), null, ct)
             .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
@@ -290,7 +297,7 @@ public sealed class SensesRun : IDisposable
         // FORK 24 IS TOLD WHETHER IT REACHED WHAT IT WAS NARROWING TO, not
         // merely whether it reached somewhere. The caller knows what it was
         // looking for and the controller deliberately does not.
-        _budget?.Reached(reached.Count > 0);
+        _budget.Reached(reached.Count > 0);
 
         _senses.Forget(thought.Id);
         return report;

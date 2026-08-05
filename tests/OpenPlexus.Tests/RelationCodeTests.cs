@@ -36,7 +36,7 @@ public sealed class RelationCodeTests(ITestOutputHelper output)
     /// The relation node as observation would leave it: paired once with every
     /// landmark it ever related, and on every occasion with its own inverse.
     /// </summary>
-    private static Node Related(int? cap = null)
+    private static Node Related(int cap = Fixture.Unbounded)
     {
         var node = new Node(Above.Code, Fixture.Dials(stamina: 10.0) with { Row = cap });
 

@@ -20,22 +20,15 @@ public sealed record BabiResult : Questioned
     public required bool Stories { get; init; }
 
     /// <summary>
-    /// How many sentences a departed word was carried for — <see cref="Window"/>,
-    /// and zero is off. <b>Reported because an arm nobody can see in the output
-    /// is an arm that looks distinct and is not.</b>
-    /// </summary>
-    public required int Span { get; init; }
-
-    /// <summary>
-    /// Whether a carried word got its own cell — <b>step 6.</b> Reported for the
-    /// same reason <see cref="Span"/> is.
+    /// How many sentences a departed word was carried for — <see cref="Window"/>.
+    /// <b>Reported because a number nobody can see in the output is a number that
+    /// looks the same at every setting.</b>
     /// </summary>
     /// <remarks>
-    /// <b>IT IS ONLY MEANINGFUL WITH A SPAN.</b> At zero nothing is carried, so
-    /// there is no temporal edge to separate and this changes nothing at all —
-    /// which is worth reading in the output rather than deducing.
+    /// <b>THIS IS THE WORLD THE SPAN IS REFUTED ON</b>, and it is on anyway
+    /// because a zero here was an off switch. See <see cref="WalkSettings.Span"/>.
     /// </remarks>
-    public required bool Kinds { get; init; }
+    public required int Span { get; init; }
 
     /// <summary>
     /// How many sentences of plain English were shown before the task —
@@ -46,21 +39,6 @@ public sealed record BabiResult : Questioned
     /// in the output is an arm that looks distinct and is not.
     /// </remarks>
     public required int Primed { get; init; }
-
-    /// <summary>
-    /// Whether only what SURPRISED was broadcast — step 2, and off is every
-    /// number this world reported before 2026-08-04.
-    /// </summary>
-    /// <remarks>
-    /// <b>An observation ends in a WALK</b>, so a run that reads a corpus thinks
-    /// about every sentence in it. This is the gate that stops that once the text
-    /// stops being new, and <see cref="Gated"/> says whether the write path was
-    /// gated too.
-    /// </remarks>
-    public required bool Surprising { get; init; }
-
-    /// <inheritdoc cref="Surprising"/>
-    public required bool Gated { get; init; }
 
     /// <inheritdoc cref="Babi.Commonest"/>
     public required double Commonest { get; init; }
@@ -133,8 +111,7 @@ public sealed record BabiResult : Questioned
 
     public override string ToString() =>
         $"task={Task} stories={(Stories ? "on" : "off")} span={Span} " +
-        $"kinds={(Kinds ? "on" : "off")} primed={Primed} " +
-        $"surprise={(Surprising ? Gated ? "gated" : "on" : "off")} " +
+        $"primed={Primed} " +
         $"sentences={Moments} asked={Asked} right={Right} silent={Silent} " +
         $"compound={Compound} blind={Blind} | " +
         $"accuracy={Accuracy:F4} expressible={Expressible:F4} " +
@@ -222,9 +199,8 @@ public sealed class BabiRun : IDisposable
 
         _reader = new InputMachine<Sentence>(
             new MachineAddress("reader"), new Reading(),
-            new LocalRendezvous(_fabric.Local, dials.Kinds),
-            _fabric.Bus, _fabric.Ring, dials, dials.Span,
-            dials.Surprising ? new Surprise() : null, gated: dials.Gated);
+            new LocalRendezvous(_fabric.Local),
+            _fabric.Bus, _fabric.Ring, dials);
 
         _fabric.Subscribe(_reader);
     }
@@ -367,10 +343,7 @@ public sealed class BabiRun : IDisposable
             Task = _world.Task,
             Stories = _world.Stories,
             Span = _dials.Span,
-            Kinds = _dials.Kinds,
             Primed = primed,
-            Surprising = _dials.Surprising,
-            Gated = _dials.Gated,
             Moments = shown,
             Asked = asked,
             Right = right,

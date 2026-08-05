@@ -251,7 +251,7 @@ public sealed class TendingRun : IDisposable
 
         _body = new InputMachine<ImmutableArray<Code>>(
             new MachineAddress("gardener"), new Feeling(), new LocalRendezvous(_fabric.Local),
-            _fabric.Bus, _fabric.Ring, dials, dials.Span);
+            _fabric.Bus, _fabric.Ring, dials);
 
         _fabric.Subscribe(_body);
     }

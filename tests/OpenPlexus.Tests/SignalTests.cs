@@ -114,8 +114,8 @@ public sealed class SignalTests(ITestOutputHelper output)
     {
         var world = new RhythmSettings { Symbols = 12, Period = 5, Violations = 0.1 };
 
-        using var carried = new RhythmRun(world, Dials with { Span = 1, Surprising = true }, seed: 1);
-        using var flat = new RhythmRun(world, Dials with { Span = 0, Surprising = true }, seed: 1);
+        using var carried = new RhythmRun(world, Dials with { Span = 1 }, seed: 1);
+        using var flat = new RhythmRun(world, Dials with { Span = 0 }, seed: 1);
 
         var predicts = await carried.RunAsync(300);
         var cannot = await flat.RunAsync(300);

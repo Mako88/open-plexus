@@ -176,6 +176,13 @@ condition is a superstition.**
   that has always read zero.
 - **A dial can be declared, documented, passed everywhere and connected to
   nothing.** Every run reports `Complaints`; read them.
+- **AND A DIAL CAN BE SET ON THE SETTINGS AND READ FROM A PARAMETER.**
+  `InputMachine` took `span` and `gated` as arguments while `WalkSettings` held
+  the same names unread. **A sweep that cannot reach is silent, not wrong, and
+  silence reads as free.**
+- **A number in a commit message is a claim, not a record.** An attribution
+  everybody trusted was taken through exactly that unread dial, and cost two
+  sessions before anybody re-measured it.
 - **A fallback is a control arm nobody meant to run** — silence drifts an arm toward
   the random bar for free. Report silence beside the score.
 - **And the fallback is often the only exploration there is**, so curing silence can
@@ -198,9 +205,14 @@ condition is a superstition.**
 ## OPEN DEFECTS
 
 - **`Accumulate.Agreement` reads EXACTLY equal to `Sum`** on `Composed` and
-  `Ranking`. A conjunction needs several distinct origins and a minted name
-  collapses them. Not the arrival-order fix — the pre-fix `Thought` fails
-  identically.
+  `Ranking`, and **the minted name is NOT why** — it ties identically with
+  chunking suppressed outright. Not the arrival-order fix either. Two
+  explanations are spent and the defect is untouched.
+- **`Surprise.Rate` and `Overreach` read nought on `Rhythm`**, whose own private
+  `Surprise` is the only one a world still feeds. `SignalTests` is the scoreboard.
+- **`Senses` sits below its pre-cashing baseline with the span already at
+  nought.** The span alone is the whole of the original fall and chunking
+  measures nearly free, so what is left has no owner.
 
 ---
 

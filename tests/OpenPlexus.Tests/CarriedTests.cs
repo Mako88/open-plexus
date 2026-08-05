@@ -40,10 +40,11 @@ public sealed class CarriedTests(ITestOutputHelper output)
 
     private static readonly int[] Seeds = [1, 2, 3, 5, 8, 13];
 
-    private static async Task<(double Accuracy, double Messages)> ArmAsync(
+    private static async Task<(double Accuracy, double Messages, int Deepest)> ArmAsync(
         double carried, double stamina)
     {
         double accuracy = 0.0, messages = 0.0;
+        var deepest = 0;
 
         foreach (var seed in Seeds)
         {
@@ -53,9 +54,10 @@ public sealed class CarriedTests(ITestOutputHelper output)
 
             accuracy += result.Accuracy;
             messages += result.Messages;
+            deepest = Math.Max(deepest, result.Plumbing.Deepest);
         }
 
-        return (accuracy / Seeds.Length, messages / Seeds.Length);
+        return (accuracy / Seeds.Length, messages / Seeds.Length, deepest);
     }
 
     [Fact]
@@ -72,7 +74,7 @@ public sealed class CarriedTests(ITestOutputHelper output)
         foreach (var carried in (double[])[1.0, 0.5, 0.25])
             foreach (var stamina in (double[])[1.5, 2.0, 3.0, 4.0, 8.0, 16.0])
             {
-                var (accuracy, messages) = await ArmAsync(carried, stamina);
+                var (accuracy, messages, _) = await ArmAsync(carried, stamina);
                 grid.Add((carried, stamina, accuracy, messages));
 
                 output.WriteLine(
@@ -107,47 +109,82 @@ public sealed class CarriedTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task What_it_does_buy_is_a_dial_that_stops_punishing_a_wrong_setting()
+    public async Task The_wrong_setting_costs_everything_and_the_cliff_it_flattened_is_gone()
     {
-        // AND THIS IS WHY THE ARM IS NOT SIMPLY DELETED. Undiscounted, accuracy
-        // falls off a cliff as the budget rises -- the walk can afford depth, depth
-        // reaches more things that merely follow at a distance, and prediction gets
-        // worse the more it is allowed to think. Discounted, the same sweep is
-        // FLAT: the extra budget buys hops the walk then ranks too low to matter.
+        // THIS WAS THE ARM'S ONE REMAINING DEFENCE AND IT NO LONGER HOLDS. The claim
+        // was that a dial whose WRONG setting costs nothing is a partial answer to
+        // this design's recurring fault of dials wanting different values in
+        // different worlds: undiscounted accuracy fell off a cliff as the budget
+        // rose, and discounting flattened it.
         //
-        // A DIAL WANTING DIFFERENT VALUES IN DIFFERENT WORLDS IS THIS DESIGN'S
-        // RECURRING FAULT, and a dial whose wrong setting costs nothing is a
-        // partial answer to it. It is not the row's revival condition and should
-        // not be recorded as one.
+        // BOTH HALVES ARE GONE. There is no cliff -- the undiscounted arm is flat
+        // across a fourfold budget -- and the wrong setting does not cost nothing,
+        // it costs everything. What is asserted below is what is actually there.
         var spread = new Dictionary<double, List<double>>();
+        var traffic = new Dictionary<double, List<double>>();
+        var reach = new Dictionary<double, List<int>>();
 
         foreach (var carried in (double[])[1.0, 0.5])
         {
             spread[carried] = [];
+            traffic[carried] = [];
+            reach[carried] = [];
 
             foreach (var stamina in (double[])[4.0, 8.0, 16.0])
             {
-                var (accuracy, _) = await ArmAsync(carried, stamina);
+                var (accuracy, messages, deepest) = await ArmAsync(carried, stamina);
+
                 spread[carried].Add(accuracy);
+                traffic[carried].Add(messages);
+                reach[carried].Add(deepest);
             }
 
             output.WriteLine(
                 $"carried={carried:F2} "
-                + $"{string.Join(" ", spread[carried].Select(one => one.ToString("F4")))} "
-                + $"range={spread[carried].Max() - spread[carried].Min():F4}");
+                + $"acc=[{string.Join(" ", spread[carried].Select(one => one.ToString("F4")))}] "
+                + $"msgs=[{string.Join(" ", traffic[carried].Select(one => one.ToString("F0")))}] "
+                + $"deepest=[{string.Join(" ", reach[carried])}]");
         }
 
         var plain = spread[1.0].Max() - spread[1.0].Min();
-        var cut = spread[0.5].Max() - spread[0.5].Min();
 
-        Assert.True(plain > 0.05,
-            $"overspending stopped costing the undiscounted arm ({plain:F4} across "
-            + "the sweep), so there is no cliff here to flatten and this test is "
-            + "measuring nothing");
+        // THERE IS NO CLIFF LEFT TO FLATTEN, AND THE REASON IS NOT ABOUT THIS DIAL.
+        // Undiscounted accuracy was supposed to fall as the budget rose -- the walk
+        // affords depth, depth reaches things that merely follow at a distance, and
+        // prediction gets worse for thinking harder. Quadrupling the budget now
+        // changes NOTHING: 0.8505 at stamina 4, 8 and 16, from the SAME 774 chains
+        // at the SAME depth of two. Only the traffic moves, 15,922 to 27,278.
+        //
+        // BUDGET BUYS MESSAGES AND NOT REACH, which is a fact about the walk rather
+        // than about the discount, and snake says the same thing from its own side:
+        // depth two at every budget from 8 to 64. The cliff needed extra budget to
+        // purchase extra depth and it no longer does.
+        Assert.True(plain < 0.01,
+            $"the undiscounted arm has become budget-sensitive again ({plain:F4} "
+            + "across the sweep), so overspending costs something once more and the "
+            + "cliff this dial was said to flatten is back -- which would mean the "
+            + "walk has started buying depth with budget");
 
-        Assert.True(cut < plain / 4.0,
-            $"the discounted arm is now as budget-sensitive as the plain one "
-            + $"({cut:F4} against {plain:F4})");
+        // AND THE BUDGET REACHES THE WALK, so the flatness above is the walk's
+        // answer and not a dial connected to nothing. Traffic rises by two thirds
+        // across the same sweep.
+        Assert.True(traffic[1.0][^1] > traffic[1.0][0] * 1.25,
+            $"the budget stopped moving the traffic ({traffic[1.0][^1]:F0} against "
+            + $"{traffic[1.0][0]:F0}), so this sweep is not reaching the walk at all");
+
+        // AND THE DISCOUNT IS NOT A HARMLESS WRONG SETTING -- IT IS TOTAL. This test
+        // existed to say that a dial whose wrong value costs nothing is a partial
+        // answer to dials wanting different values in different worlds. On this
+        // world the wrong value costs EVERYTHING: nought accuracy at every budget,
+        // and `Deepest` nought, meaning not one chain completes.
+        //
+        // EVERY EDGE HERE IS A CARRIED EDGE -- one symbol a moment, so nothing is
+        // ever simultaneous -- so discounting carried edges is a global halving of
+        // every weight in the world rather than a discount on a class. The
+        // refutation row already says this starves the walk; what it did not say is
+        // that it starves it completely and at any budget.
+        Assert.All(spread[0.5], one => Assert.Equal(0.0, one, precision: 10));
+        Assert.All(reach[0.5], one => Assert.Equal(0, one));
     }
 
     [Fact]

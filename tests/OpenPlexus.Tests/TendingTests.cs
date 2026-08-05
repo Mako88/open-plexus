@@ -323,11 +323,30 @@ public sealed class TendingTests(ITestOutputHelper output)
                 + $"edges={result.Edges} widest={result.Widest} msgs={result.Messages}");
         }
 
-        using var fine = new TendingRun(World(), Dials, seed: 1);
-        using var coarse = new TendingRun(graded, Dials, seed: 1);
+        // THE ROW CAP HAS TO COME OFF FOR THIS COMPARISON, AND FOR AS LONG AS THIS
+        // TEST HAS EXISTED IT DID NOT. `Widest` is `max(node.Entries)` and entries
+        // are clipped at `WalkSettings.Row`, so at the shipped cap of 32 BOTH runs
+        // saturate and the assertion below compares 32 against 32 — which it did,
+        // and then reported "the coarse codes are not shared by anything", which is
+        // the opposite of the truth. Lifted, they read 135 fine against 450 coarse.
+        //
+        // THAT IS THE NAMED TRAP EXACTLY: a dial measured at one setting of another
+        // is measuring that one. The cap and the grain are both cashed-in dials and
+        // they interact, so the claim about the CODING has to be read where the cap
+        // is not clipping it.
+        var loose = Dials with { Row = Fixture.Unbounded };
+
+        using var fine = new TendingRun(World(), loose, seed: 1);
+        using var coarse = new TendingRun(graded, loose, seed: 1);
 
         var sharp = await fine.RunAsync(Steps, Gardening.Credited);
         var blurred = await coarse.RunAsync(Steps, Gardening.Credited);
+
+        // AND THE GUARD, so this can never silently read the cap again. A saturated
+        // row is not a measurement of anything; it is the bound, reported.
+        Assert.True(sharp.Widest < Fixture.Unbounded && blurred.Widest < Fixture.Unbounded,
+            $"a row reached the lifted cap ({sharp.Widest}, {blurred.Widest}), so "
+            + "these numbers are the bound rather than the sharing");
 
         // THE STATE COUNT CANNOT FALL AND EXPECTING IT TO WAS A MISREADING OF THE
         // INSTRUMENT. `Felt.Key` counts distinct code SETS, and grains ADD codes
@@ -343,6 +362,13 @@ public sealed class TendingTests(ITestOutputHelper output)
         Assert.True(blurred.Widest > sharp.Widest,
             $"the coarse codes are not shared by anything ({blurred.Widest} against "
             + $"{sharp.Widest}), so they are a cost with no likeness in them");
+
+        // WHAT THE PAIR OF DIALS COSTS, AND IT IS WORTH READING OFF THE LINE ABOVE:
+        // the sharing grains buy is roughly threefold, and the shipped cap of 32
+        // clips ALL of it — both runs saturate there. Grains are not inert; their
+        // product is being thrown away by the bound. Whether 32 is still the right
+        // number once something depends on that likeness is a question for the knob
+        // pass, and this is the measurement it should start from.
 
         // AND THE HONEST READING OF THE SCORE: THIS WORLD CANNOT MEASURE ANY OF IT
         // YET. Every credit arm here is silent on 399 of 400 steps and scores

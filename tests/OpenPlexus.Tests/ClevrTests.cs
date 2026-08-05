@@ -136,11 +136,17 @@ public sealed class ClevrTests(ITestOutputHelper output)
     /// </remarks>
     private const int Scenes = 700;
 
-    private async Task<ClevrResult> RunAsync(Refer refer, Pricing pricing, int scenes = Scenes)
+    /// <param name="row">
+    /// The row cap. <b>Lift it for anything reading <see cref="ClevrResult.Widest"/></b>
+    /// — entries are clipped at the cap, so a saturated row reports the bound and
+    /// not the graph. See the row-growth test below.
+    /// </param>
+    private async Task<ClevrResult> RunAsync(
+        Refer refer, Pricing pricing, int scenes = Scenes, int row = 32)
     {
         using var run = new ClevrRun(
             World(scenes),
-            Dials with { Pricing = pricing },
+            Dials with { Pricing = pricing, Row = row },
             seed: 1);
 
         var result = await run.RunAsync(refer);
@@ -261,8 +267,21 @@ public sealed class ClevrTests(ITestOutputHelper output)
         // Read `Widest` and never the mean: the growth mints a great many tiny
         // index nodes, and they hold `Edges / Nodes` flat while the handful of
         // attribute nodes the walk actually passes through grow without bound.
-        var few = await RunAsync(Refer.Conjunction, Pricing.Receiver, scenes: 100);
-        var many = await RunAsync(Refer.Conjunction, Pricing.Receiver, scenes: 400);
+        // AND THE CAP COMES OFF TO READ IT, because `Widest` is clipped at
+        // `WalkSettings.Row` — a row that grows "without bound" saturates at the
+        // bound, and both corpus sizes then report the SAME number and this
+        // assertion fails while the growth it describes is really happening. That is
+        // exactly how the companion test on `Tending` came to report the opposite of
+        // the truth for as long as it existed.
+        var few = await RunAsync(
+            Refer.Conjunction, Pricing.Receiver, scenes: 100, row: Fixture.Unbounded);
+        var many = await RunAsync(
+            Refer.Conjunction, Pricing.Receiver, scenes: 400, row: Fixture.Unbounded);
+
+        // THE GUARD FIRST. A saturated row is the bound, reported.
+        Assert.True(few.Widest < Fixture.Unbounded && many.Widest < Fixture.Unbounded,
+            $"a row reached the lifted cap ({few.Widest}, {many.Widest}), so these "
+            + "numbers are the bound rather than the growth");
 
         Assert.True(many.Widest > few.Widest * 3,
             $"the widest row did not grow with the corpus: {many.Widest} against {few.Widest}");

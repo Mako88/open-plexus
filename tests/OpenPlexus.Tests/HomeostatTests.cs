@@ -640,11 +640,26 @@ public sealed class HomeostatTests(ITestOutputHelper output)
 
         output.WriteLine($"peak against peak: {apart:F2} sigma");
 
-        Assert.True(apart > 2.0,
-            $"inhibition's best ({inhibited.Mean:F4}) no longer clears the "
-            + $"one-sided count's best ({oneSided.Mean:F4}) -- {apart:F2} sigma -- "
-            + "so the reversal above is explained by the budget after all and the "
-            + "refuted row should go back to being refuted");
+        // AND IT NO LONGER DOES, WHICH IS THE REVERSAL REVERSING. Inhibition's peak
+        // reads 0.7259 against the one-sided count's 0.7434 -- MINUS 0.56 sigma, so
+        // not beaten, but not distinguishable either. The claim that the negative
+        // cell buys something a budget cannot is not supported by this measurement.
+        //
+        // THE ROW STANDS AS REFUTED UNTIL SOMETHING SHOWS OTHERWISE. That is the
+        // conservative reading and it is the right one: "indistinguishable at peak"
+        // is not evidence FOR the mechanism, and this reversal was the only thing
+        // holding the row open. What it is not is evidence that inhibition is
+        // harmful -- half a standard error the other way is nothing at all.
+        //
+        // ASSERTED AS INDISTINGUISHABLE RATHER THAN AS A LOSS, so that either
+        // direction moving is news. John's call, 2026-08-05: adjust it now, and put
+        // the two arms against each other properly when the baselines are redone.
+        Assert.True(Math.Abs(apart) < 2.0,
+            $"the two peaks have separated ({inhibited.Mean:F4} inhibited against "
+            + $"{oneSided.Mean:F4} one-sided, {apart:F2} sigma). If inhibition is "
+            + "ahead the reversal is back and the row reopens; if it is behind, the "
+            + "negative cell is now actively costing something. Either wants "
+            + "reading rather than this bar wants moving");
     }
 
     [Fact]
@@ -796,15 +811,33 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             Assert.Empty(result.Complaints);
         }
 
-        // FLAT, AND ASSERTED AS FLAT. Quadrupling the run does not move the score
-        // by even one standard error, which is the finding -- if this ever starts
-        // failing because a longer run scores BETTER, the arm has begun
-        // generalising and the note above needs rewriting rather than repeating.
-        Assert.True(curve[2].Separation(curve[0]) < 2.0,
-            $"a longer run now scores measurably better ({curve[2].Mean:F4} at "
-            + $"1600 against {curve[0].Mean:F4} at 400, "
-            + $"{curve[2].Separation(curve[0]):F1} sigma) -- the arm has started "
-            + "learning from data it previously could not use");
+        // NOT FLAT. IT FALLS, MONOTONICALLY, AND MORE DATA MAKES THIS ARM WORSE:
+        //
+        //    400   0.6450 +-0.0575
+        //    800   0.4723 +-0.0353   2.6 sigma below 400
+        //   1600   0.3844 +-0.0158   4.4 sigma below 400
+        //
+        // THE OLD ASSERTION COULD NOT SEE THE DIFFERENCE BETWEEN THIS AND THE GOOD
+        // NEWS. It required `Separation < 2.0` and its message read "a longer run
+        // now scores measurably BETTER -- the arm has started learning from data it
+        // previously could not use". `Measured.Separation` is UNSIGNED, so a
+        // collapse and a breakthrough trip the same bar and print the same
+        // sentence. It reported a 40% fall as generalisation.
+        //
+        // SO THE DIRECTION IS ASSERTED SEPARATELY FROM THE SIZE. That an arm gets
+        // worse with data is a defect worth someone's attention -- credit written
+        // over a longer run is evidently accumulating something that misleads the
+        // walk -- and it is recorded here rather than smoothed into a wider bar.
+        Assert.True(curve[2].Mean < curve[0].Mean,
+            $"the credit arm has stopped degrading with data ({curve[2].Mean:F4} at "
+            + $"1600 against {curve[0].Mean:F4} at 400) -- that is GOOD NEWS and the "
+            + "note above wants rewriting rather than repeating");
+
+        // AND THE FALL IS MONOTONE, so it is a trend and not one bad length.
+        Assert.True(curve[1].Mean < curve[0].Mean && curve[2].Mean < curve[1].Mean,
+            $"the fall is no longer monotone ({curve[0].Mean:F4}, {curve[1].Mean:F4}, "
+            + $"{curve[2].Mean:F4}), so whatever this arm is doing with more data "
+            + "has changed shape and wants re-reading");
 
         // AND IT IS STILL SHORT OF THE CEILING at every length, so the room is
         // real and is not going to be filled by running for longer.

@@ -118,6 +118,23 @@ public sealed class Chunk
     /// <summary>Sets that have paid for their own name.</summary>
     private readonly HashSet<ulong> _minted = [];
 
+    /// <summary>How often each name has actually stood in for something.</summary>
+    /// <remarks>
+    /// <b>A MINTED NAME THAT IS NEVER FOLDED HAS NEVER ENTERED THE GRAPH.</b> It
+    /// costs no row entry and joins no occasion — it is a candidate that passed a
+    /// threshold and then lost every merge it was offered for, and counting it as
+    /// alphabet overstates what the detector did.
+    /// <para>
+    /// <b>AND THE UTILITY PROBLEM IS THE SAME INEQUALITY COUNTED ON USES</b> —
+    /// Minton and SOAR, and it needs no new constant. Minting asks whether a set
+    /// is seen often enough to be worth a symbol; KEEPING it asks whether the
+    /// symbol was then USED often enough to repay the definition, which is
+    /// <c>u(S-1) &gt; S</c> over uses rather than over sightings. A name applied
+    /// once is a row entry earning its keep on nothing.
+    /// </para>
+    /// </remarks>
+    private readonly Dictionary<ulong, int> _used = [];
+
     /// <summary>How often each thing has been in hand when pairs were counted.</summary>
     /// <remarks>
     /// <b>THE MARGINALS, AND WITHOUT THEM THE THRESHOLD CANNOT SEE CHANCE.</b>
@@ -134,6 +151,21 @@ public sealed class Chunk
     public int Coined
     {
         get { lock (_gate) return _minted.Count; }
+    }
+
+    /// <summary>How many minted names have ever stood in for anything.</summary>
+    /// <remarks>
+    /// <b>THE ALPHABET THAT ACTUALLY GREW</b>, as against the one that passed a
+    /// threshold. See <see cref="_used"/>.
+    /// </remarks>
+    public int Applied
+    {
+        get
+        {
+            lock (_gate)
+                return _used.Count(one =>
+                    (long)one.Value * (_members[one.Key].Length - 1) > _members[one.Key].Length);
+        }
     }
 
     /// <summary>How many distinct candidates have been noticed at all.</summary>
@@ -323,6 +355,7 @@ public sealed class Chunk
             current.Sort();
 
             covers[name] = members;
+            _used[key] = _used.GetValueOrDefault(key) + 1;
 
             // A NAME MAY SWALLOW A NAME, so what is reported is what SURVIVED. An
             // inner name is not in the moment any more and telling a caller it was

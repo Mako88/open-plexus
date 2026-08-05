@@ -50,8 +50,11 @@ public sealed record MotifResult : Questioned
         // this is the check. Chunking is unconditional now, so minting nothing at
         // all is the mechanism failing silently and there is no off arm left to
         // check the other direction against.
-        if (Coined == 0)
-            wrong.Add("chunking minted nothing at all");
+        // AND IT IS `Applied` RATHER THAN `Coined`, because a name that never
+        // stood in for anything never entered the graph and a name applied once
+        // never repaid its own definition. See `Chunk.Applied`.
+        if (Applied == 0)
+            wrong.Add("chunking minted nothing that paid for itself");
 
         // AND A DETECTOR THAT MINTS NEARLY EVERYTHING HAS FOUND NO STRUCTURE.
         //
@@ -71,10 +74,10 @@ public sealed record MotifResult : Questioned
             var size = Compressed / Motifs;
             var parts = Motifs * ((1 << size) - size - 1);
 
-            if (Coined > parts)
-                wrong.Add($"minted {Coined} names where {Motifs} sets of {size} "
-                    + $"hold {parts} recurring parts, so the detector is naming "
-                    + "the noise");
+            if (Applied > parts)
+                wrong.Add($"{Applied} names paid for themselves where {Motifs} sets "
+                    + $"of {size} hold {parts} recurring parts, so the detector is "
+                    + "naming the noise");
         }
     }
 
@@ -83,6 +86,9 @@ public sealed record MotifResult : Questioned
 
     /// <inheritdoc cref="Learning.Chunk.Coined"/>
     public required int Coined { get; init; }
+
+    /// <inheritdoc cref="Learning.Chunk.Applied"/>
+    public required int Applied { get; init; }
 
     /// <inheritdoc cref="Learning.Chunk.Noticed"/>
     /// <remarks>
@@ -99,7 +105,7 @@ public sealed record MotifResult : Questioned
         $"motifs={Motifs} moments={Moments} asked={Asked} right={Right} silent={Silent} | " +
         $"accuracy={Accuracy:F4} chance={Chance:F4} | " +
         $"edges={Edges} compressed={Compressed} uncompressed={Uncompressed} | " +
-        $"coined={Coined} noticed={Noticed} | " +
+        $"coined={Coined} applied={Applied} noticed={Noticed} | " +
         $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
         $"nodes={Nodes} widest={Widest} spread=[{string.Join(",", Spread)}] | " +
         $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | " +
@@ -230,6 +236,7 @@ public sealed class MotifRun : IDisposable
             Halted = halted,
             Unsettled = unsettled,
             Coined = _eyes.Chunks.Coined,
+            Applied = _eyes.Chunks.Applied,
             Noticed = _eyes.Chunks.Noticed,
         };
     }

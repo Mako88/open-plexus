@@ -208,8 +208,6 @@ condition is a superstition.**
   `Ranking`, and **the minted name is NOT why** — it ties identically with
   chunking suppressed outright. Not the arrival-order fix either. Two
   explanations are spent and the defect is untouched.
-- **`Surprise.Rate` and `Overreach` read nought on `Rhythm`**, whose own private
-  `Surprise` is the only one a world still feeds. `SignalTests` is the scoreboard.
 - **Fork 24 probes on questions that are SCORED.** `Budget.Next` answers at half
   the settled stamina while hunting, so a world needing depth answers those
   wrong. `Moves` reads nought, so it never stops. Bypassing it restores `Senses`

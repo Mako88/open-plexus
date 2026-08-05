@@ -28,7 +28,17 @@ public sealed class TendingTests(ITestOutputHelper output)
 {
     private static TendingSettings World() => new();
 
-    private static WalkSettings Dials => Fixture.Dials(stamina: 4.0);
+    /// <summary>
+    /// <b>The span is named here now, and it used to be the world's default.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>`TendingRun` opened with `span: 1` until the dials moved to the brain on
+    /// 2026-08-04, and the brain's default is nought.</b> Every number this file has
+    /// ever produced was taken with a one-frame window, so saying so here is what
+    /// keeps them comparable — and a silent drop to nought is exactly the change
+    /// that passes a suite while measuring a different world.
+    /// </remarks>
+    private static WalkSettings Dials => Fixture.Dials(stamina: 4.0) with { Span = 1 };
 
     private const int Steps = 400;
 
@@ -382,7 +392,7 @@ public sealed class TendingTests(ITestOutputHelper output)
 
         foreach (var stamina in (double[])[4.0, 8.0, 12.0])
         {
-            using var run = new TendingRun(world, Fixture.Dials(stamina), seed: 1);
+            using var run = new TendingRun(world, Fixture.Dials(stamina) with { Span = 1 }, seed: 1);
             var credit = await run.RunAsync(Steps, Gardening.Credited);
 
             output.WriteLine(
@@ -390,8 +400,8 @@ public sealed class TendingTests(ITestOutputHelper output)
                 + $"{credit.Messages,9}");
         }
 
-        using var poor = new TendingRun(world, Fixture.Dials(4.0), seed: 1);
-        using var rich = new TendingRun(world, Fixture.Dials(12.0), seed: 1);
+        using var poor = new TendingRun(world, Fixture.Dials(4.0) with { Span = 1 }, seed: 1);
+        using var rich = new TendingRun(world, Fixture.Dials(12.0) with { Span = 1 }, seed: 1);
 
         var shallow = await poor.RunAsync(Steps, Gardening.Credited);
         var deep = await rich.RunAsync(Steps, Gardening.Credited);
@@ -408,7 +418,7 @@ public sealed class TendingTests(ITestOutputHelper output)
         // AND WHAT IT SAYS WHEN IT CAN SPEAK IS WORSE THAN A COIN TOSS, which is
         // step 4's original finding arriving in the second world: a count of what
         // was done converges on the policy that did it.
-        using var random = new TendingRun(world, Fixture.Dials(12.0), seed: 1);
+        using var random = new TendingRun(world, Fixture.Dials(12.0) with { Span = 1 }, seed: 1);
         var blind = await random.RunAsync(Steps, Gardening.Blind);
 
         Assert.True(deep.Viable < blind.Viable,
@@ -454,10 +464,10 @@ public sealed class TendingTests(ITestOutputHelper output)
 
         foreach (var (name, dials) in
             (( string, WalkSettings )[])
-            [("evidence s4", Fixture.Dials(4.0)),
-             ("traffic s8", Fixture.Dials(8.0) with { Toll = Toll.Traffic }),
-             ("traffic s12", Fixture.Dials(12.0) with { Toll = Toll.Traffic }),
-             ("traffic s16", Fixture.Dials(16.0) with { Toll = Toll.Traffic })])
+            [("evidence s4", Fixture.Dials(4.0) with { Span = 1 }),
+             ("traffic s8", Fixture.Dials(8.0) with { Span = 1, Toll = Toll.Traffic }),
+             ("traffic s12", Fixture.Dials(12.0) with { Span = 1, Toll = Toll.Traffic }),
+             ("traffic s16", Fixture.Dials(16.0) with { Span = 1, Toll = Toll.Traffic })])
         {
             using var run = new TendingRun(graded, dials, seed: 1);
             var credit = await run.RunAsync(Steps, Gardening.Credited);
@@ -473,7 +483,7 @@ public sealed class TendingTests(ITestOutputHelper output)
         // waters constantly and never travels has learnt "watering helps" and
         // missed that it must go somewhere first; one that mirrors the oracle's
         // spread and still loses has a subtler fault.
-        var deep = Fixture.Dials(8.0) with { Toll = Toll.Traffic };
+        var deep = Fixture.Dials(8.0) with { Span = 1, Toll = Toll.Traffic };
 
         foreach (var (name, how) in
             (( string, Gardening )[])

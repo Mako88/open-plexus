@@ -70,7 +70,12 @@ public sealed class ScoreboardTests(ITestOutputHelper output)
     {
         using var run = new RhythmRun(
             new RhythmSettings { Symbols = 12, Period = 5, Violations = 0.1 },
-            Dials(),
+
+            // THE SPAN IS THE TASK HERE, and it was `RhythmRun`'s own default
+            // until the dials moved to the brain. Nothing overlaps on this world,
+            // so with no window there are no temporal cells at all and the
+            // scoreboard would be reading a crippled world.
+            Dials() with { Span = 1 },
             seed: 3);
 
         return new Line("rhythm", await run.RunAsync(300));

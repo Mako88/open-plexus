@@ -28,6 +28,36 @@ namespace OpenPlexus.Tests;
 public static class Fixture
 {
     /// <summary>
+    /// How long a settling wave is given before the harness calls it a hang —
+    /// <b>a deadlock detector, and never a claim about speed.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>IT WAS FIVE SECONDS IN FOUR FILES AND 5, 10 AND 30 INLINE IN EIGHT MORE,
+    /// AND CI HAD STARTED FLAPPING ON IT.</b> Two <c>MachineTests</c> failed a run
+    /// with <see cref="TimeoutException"/> and passed the one before it, having
+    /// changed nothing — so the RED SET WAS NOT STABLE, and a suite whose failures
+    /// come and go cannot be the baseline anything is measured against.
+    /// </para>
+    /// <para>
+    /// <b>THE CONSTANT WAS SIZED BEFORE EVERY MECHANISM WAS SWITCHED ON.</b> One
+    /// <c>Motif</c> run now moves 360,000 messages where the number that chose
+    /// five seconds was measured against a fraction of that, so what the bound
+    /// actually tested by the end was how loaded the runner happened to be.
+    /// <b>A wall-clock bound on a workload that grew is a measurement of the
+    /// machine.</b>
+    /// </para>
+    /// <para>
+    /// <b>SO IT IS GENEROUS ON PURPOSE.</b> The only question this is entitled to
+    /// answer is whether the bus ever goes quiet at all; a run that is merely slow
+    /// is not a run that is wrong. Anything wanting to assert a COST should assert
+    /// the message count, which is deterministic — <see cref="Worlds.RunReport"/>
+    /// already carries it — rather than the clock, which is not.
+    /// </para>
+    /// </remarks>
+    public static readonly TimeSpan Patience = TimeSpan.FromSeconds(120);
+
+    /// <summary>
     /// A row cap so large no world here reaches it — <b>the top of the sweep, and
     /// no longer a way to switch the cap off.</b>
     /// </summary>

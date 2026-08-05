@@ -12,7 +12,6 @@ namespace OpenPlexus.Tests;
 /// </summary>
 public sealed class ClusterTests : IDisposable
 {
-    private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
     private static readonly MachineAddress Origin = new("origin");
 
     private static Code C(ulong value) => Fixture.C(value);
@@ -220,7 +219,7 @@ public sealed class ClusterTests : IDisposable
         }
 
         await Deliver(start, Origins(C(1)));
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Equal(3, homes.Values.Distinct().Count());
         Assert.Equal(3, _counted.EnvelopesTo([.. homes.Values]));
@@ -238,7 +237,7 @@ public sealed class ClusterTests : IDisposable
         cluster.Admit(C(2)).Note();
 
         await Deliver(cluster, Origins(C(1)));
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         var accounting = _origin.Got.Select(r => r.Accounting).ToArray();
 
@@ -255,7 +254,7 @@ public sealed class ClusterTests : IDisposable
         var cluster = Join("only");
 
         await Deliver(cluster, Origins(C(1)));
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         var report = Assert.Single(_origin.Got);
         Assert.Empty(report.Arrivals);
@@ -272,7 +271,7 @@ public sealed class ClusterTests : IDisposable
         var second = Origins(C(2));
 
         await Deliver(cluster, first, second);
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         var broadcasts = _origin.Got.Select(r => r.Accounting.Broadcast).ToHashSet();
         Assert.Equal(2, broadcasts.Count);
@@ -295,7 +294,7 @@ public sealed class ClusterTests : IDisposable
         far.Admit(C(2)).Note();
 
         await Deliver(start, Origins(C(1)));
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await _bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         // THE CHAIN OF REASONING ARRIVED, carrying where it had been. This is
         // the first point in the project where a route crosses a boundary.
@@ -342,8 +341,8 @@ public sealed class ClusterTests : IDisposable
             .Select(i => Task.Run(() => Deliver(cluster, Origins(i % 2 == 0 ? C(1) : C(2)))))
             .ToArray();
 
-        await Task.WhenAll(storm).WaitAsync(Patience);
-        await _bus.WhenIdle().WaitAsync(Patience);
+        await Task.WhenAll(storm).WaitAsync(Fixture.Patience);
+        await _bus.WhenIdle().WaitAsync(Fixture.Patience);
     }
 
 }

@@ -223,7 +223,7 @@ public sealed class ReflectionTests
         }
 
         public Task Quiet() =>
-            Bus.WhenIdle().WaitAsync(TimeSpan.FromSeconds(30));
+            Bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         /// <summary>
         /// Waits on the THOUGHT'S OWN ACCOUNTING rather than on the bus.

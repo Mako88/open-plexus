@@ -9,7 +9,6 @@ namespace OpenPlexus.Tests;
 /// </summary>
 public sealed class HybridBusTests
 {
-    private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
 
     private static Envelope To(string cluster) => new()
     {
@@ -47,7 +46,7 @@ public sealed class HybridBusTests
         public async Task DeliverAsync(Envelope envelope, CancellationToken ct = default)
         {
             Entered.TrySetResult();
-            await Held.WaitAsync(Patience, ct);
+            await Held.WaitAsync(Fixture.Patience, ct);
             if (Throws is { } failure) throw failure;
             lock (_got) _got.Add(envelope);
         }
@@ -86,7 +85,7 @@ public sealed class HybridBusTests
         // let a mutation that ignores the address entirely and always picks
         // `_clusters.Values.First()` survive every assertion here.
         await bus.SendAsync(beta.Address, To("beta"));
-        await bus.WhenIdle().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Single(beta.Got);
 
@@ -95,7 +94,7 @@ public sealed class HybridBusTests
         Assert.Empty(alpha.Got);
 
         await bus.SendAsync(alpha.Address, To("alpha"));
-        await bus.WhenIdle().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Single(alpha.Got);
         Assert.Single(beta.Got);
@@ -109,7 +108,7 @@ public sealed class HybridBusTests
         using var _ = bus.Subscribe(machine);
 
         await bus.SendAsync(machine.Address, Reporting());
-        await bus.WhenIdle().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Single(machine.Got);
     }
@@ -128,7 +127,7 @@ public sealed class HybridBusTests
         // The receiver is still inside DeliverAsync and the send has already
         // returned. That is the whole of "unawaited": a fan-out to many
         // clusters is parallel rather than a queue.
-        await slow.Entered.Task.WaitAsync(Patience);
+        await slow.Entered.Task.WaitAsync(Fixture.Patience);
         Assert.Empty(slow.Got);
         Assert.Equal(1, bus.InFlight);
     }
@@ -151,7 +150,7 @@ public sealed class HybridBusTests
         await bus.SendAsync(alpha.Address, To("alpha"));
         await bus.SendAsync(beta.Address, To("beta"));
 
-        await bus.WhenIdle().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Single(alpha.Got);
         Assert.Single(beta.Got);
@@ -166,13 +165,13 @@ public sealed class HybridBusTests
         using var _ = bus.Subscribe(slow);
 
         await bus.SendAsync(slow.Address, To("slow"));
-        await slow.Entered.Task.WaitAsync(Patience);
+        await slow.Entered.Task.WaitAsync(Fixture.Patience);
 
         var quiet = bus.WhenIdle();
         Assert.False(quiet.IsCompleted);
 
         gate.SetResult();
-        await quiet.WaitAsync(Patience);
+        await quiet.WaitAsync(Fixture.Patience);
 
         Assert.Equal(0, bus.InFlight);
     }
@@ -193,7 +192,7 @@ public sealed class HybridBusTests
         // send lands. Without this the assertions below pass for a bus that
         // never delivered anything at all.
         await bus.SendAsync(alpha.Address, To("alpha"));
-        await bus.WhenIdle().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
         Assert.Single(alpha.Got);
         Assert.Empty(departures);
 
@@ -234,7 +233,7 @@ public sealed class HybridBusTests
         gone.Dispose();
 
         await bus.SendAsync(returned.Address, To("alpha"));
-        await bus.WhenIdle().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Single(returned.Got);
     }
@@ -264,7 +263,7 @@ public sealed class HybridBusTests
         using var _ = bus.Subscribe(broken);
 
         await bus.SendAsync(broken.Address, To("broken"));
-        await bus.WhenIdle().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         // A send that returns before delivery has no other way to report
         // failure, and swallowing is how a thing turns out never to have been
@@ -284,7 +283,7 @@ public sealed class HybridBusTests
 
         await bus.SendAsync(broken.Address, To("broken"));
 
-        await bus.WhenIdle().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
     }
 
     [Fact]
@@ -295,7 +294,7 @@ public sealed class HybridBusTests
         using var _ = bus.Subscribe(alpha);
 
         for (var i = 0; i < 200; i++) await bus.SendAsync(alpha.Address, To("alpha"));
-        await bus.WhenIdle().WaitAsync(Patience);
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Equal(200, alpha.Got.Count);
         Assert.Equal(0, bus.InFlight);

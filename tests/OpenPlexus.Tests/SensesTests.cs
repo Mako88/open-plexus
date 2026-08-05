@@ -160,6 +160,13 @@ public sealed class SensesTests(ITestOutputHelper output)
         // untouched; the confidence in it was inflated.
         var real = await Accuracy(stamina: 8.0, scrambled: false);
 
+        // AND IT IS REPORTED WHETHER OR NOT IT PASSES. The bar below is chance,
+        // and the project's headline claim is 0.80 -- so this test went on passing
+        // while chunking took the score to 0.4138, because 0.41 clears chance by
+        // three standard errors just as comfortably as 0.81 does. A number nobody
+        // can read is a number that can halve without failing anything.
+        output.WriteLine($"{real} against chance {1.0 / 12:F4}");
+
         // AGAINST THE SPREAD, NOT THE BARE MEAN. Three standard errors clear of
         // chance, so a lucky run of seeds cannot carry the project's headline
         // claim on its own.

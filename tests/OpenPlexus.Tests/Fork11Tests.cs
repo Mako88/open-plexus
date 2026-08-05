@@ -73,7 +73,7 @@ public sealed class Fork11Tests
         using var two = bus.Listen(voice, voice.Codes);
 
         await bus.PublishAsync(Finished(C(10), C(21)));
-        await bus.WhenIdle().WaitAsync(TimeSpan.FromSeconds(5));
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Equal([C(10)], hands.Did);
         Assert.Equal([C(21)], voice.Did);
@@ -92,7 +92,7 @@ public sealed class Fork11Tests
         using var handle = bus.Listen(voice, voice.Codes);
 
         await bus.PublishAsync(Finished(C(10), C(11)));
-        await bus.WhenIdle().WaitAsync(TimeSpan.FromSeconds(5));
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Empty(voice.Did);
         Assert.Equal(0, voice.Waiting);
@@ -108,7 +108,7 @@ public sealed class Fork11Tests
         bus.Faults += failure => throw failure;
 
         await bus.PublishAsync(Finished(C(10)));
-        await bus.WhenIdle().WaitAsync(TimeSpan.FromSeconds(5));
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public sealed class Fork11Tests
         handle.Dispose();
 
         await bus.PublishAsync(Finished(C(10)));
-        await bus.WhenIdle().WaitAsync(TimeSpan.FromSeconds(5));
+        await bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         Assert.Empty(hands.Did);
     }

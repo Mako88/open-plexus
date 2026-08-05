@@ -232,7 +232,7 @@ public sealed class RoleTests(ITestOutputHelper output)
         // step 9's refutation arriving in a new place.
         var thought = await machine.ThinkAsync(
             [fresh], dials.Stamina, new Thinking.Question { Through = Kind.Fills });
-        await bench.Bus.WhenIdle().WaitAsync(TimeSpan.FromSeconds(10));
+        await bench.Bus.WhenIdle().WaitAsync(Fixture.Patience);
 
         var slots = thought!.BestOf(Kind.Relations, 8);
 

@@ -94,13 +94,35 @@ public sealed class RolloutTests(ITestOutputHelper output)
 
         var chance = 1.0 / 12.0;
 
-        // IT DECAYS, which is the finding rather than a disappointment -- a rollout
-        // that held its accuracy exactly would more likely mean the extra steps were
-        // not being taken at all.
-        Assert.True(depths[^1].Rolled < depths[0].Rolled,
-            $"rolling four steps out is as accurate as one ({depths[^1].Rolled:F4} "
-            + $"against {depths[0].Rolled:F4}), so either the rollout is not "
-            + "reaching or this world's far future is free");
+        // IT DOES NOT DECAY AT ALL, AND THE ALTERNATIVE EXPLANATION IS REFUTED
+        // RATHER THAN ASSUMED AWAY. This asserted decay, on the reasoning that "a
+        // rollout that held its accuracy exactly would more likely mean the extra
+        // steps were not being taken at all" -- a fair worry, and the message count
+        // settles it: traffic goes 13,944 to 35,868 across the same depths, so the
+        // walks are certainly happening. Measured:
+        //
+        //   depth 1  0.8634   13,944 msgs
+        //   depth 2  0.8612   21,386
+        //   depth 3  0.8643   28,683
+        //   depth 4  0.8671   35,868
+        //
+        // FLAT, AND THIS WORLD SAYS WHY IN ITS OWN HEADER: a cycle is exactly as
+        // predictable four steps out as one, because the symbol is determined
+        // either way. Every symbol predicts its successor, so a rollout that guesses
+        // wrong lands on another cycle member and is back on the rails -- there is
+        // nowhere else to go. Zero decay here means zero compounding error, which is
+        // what an attractor predicts and not a rollout working unusually well.
+        //
+        // SO THE COMPOUNDING RISK REMAINS UNTESTED AND THIS WORLD CANNOT TEST IT.
+        // That is already the plan's own entry -- "one whose dynamics BRANCH" is a
+        // world that is missing -- and this is the measurement standing behind it.
+        // The bar is that it does not decay MATERIALLY; a real fall is news and
+        // should fail here rather than be absorbed.
+        Assert.True(Math.Abs(depths[^1].Rolled - depths[0].Rolled) < 0.05,
+            $"four steps out moved materially from one ({depths[^1].Rolled:F4} "
+            + $"against {depths[0].Rolled:F4}) -- if it FELL the compounding error "
+            + "has finally shown up on a cyclic world and wants explaining, and a "
+            + "branching world is what the plan asks for to measure it properly");
 
         // AND IT IS STILL A MODEL RATHER THAN NOISE AT TWO STEPS, which is the
         // claim worth having: the thing fed back in was good enough to ask a

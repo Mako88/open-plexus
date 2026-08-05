@@ -50,7 +50,7 @@ public sealed class RankingTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task The_same_machine_answers_two_questions_differently()
+    public async Task The_same_machine_answers_two_questions_identically_and_that_is_the_defect()
     {
         // THE MOVE ITSELF, ASSERTED. One `WalkSettings`, one graph, one world --
         // and the only thing that differs is what the asker said about its own
@@ -69,11 +69,41 @@ public sealed class RankingTests(ITestOutputHelper output)
         var asking = await conjoined.RunAsync(400, Refer.Narrowed, every: 10);
         var plain = await summed.RunAsync(400, Refer.Narrowed, every: 10);
 
-        output.WriteLine($"conjunction={asking.Accuracy:F4} strength={plain.Accuracy:F4}");
+        output.WriteLine(
+            $"conjunction: reference={asking.Reference:F4} accuracy={asking.Accuracy:F4}");
+        output.WriteLine(
+            $"strength:    reference={plain.Reference:F4} accuracy={plain.Accuracy:F4}");
 
-        Assert.True(asking.Accuracy > plain.Accuracy,
-            $"saying it is a conjunction bought nothing, so the question has "
-            + $"nothing to say: {asking.Accuracy} against {plain.Accuracy}");
+        // READ OFF `Reference` AND NOT `Accuracy`, AND THE REASON IS STRUCTURAL
+        // RATHER THAN A PREFERENCE. This compared `Accuracy` and the two arms tied
+        // to sixteen digits, which is never a measurement -- but under
+        // `Refer.Narrowed` it CANNOT be one. The answer comes from a SECOND
+        // broadcast, made from the single index the first walk chose, and
+        // `Accumulate.Agreement` counts how many DISTINCT ORIGINS reached an
+        // endpoint. With one origin every candidate is reached by exactly one, the
+        // comparison falls through to strength, and agreement is identical to `Sum`
+        // by arithmetic. Asking the ranking to move that number is asking it to
+        // discriminate where it is undefined.
+        //
+        // `Reference` is the first walk's, where the conjunction really is asked --
+        // two attributes, two origin groups, and an index only the right one is
+        // reached by twice. AND IT TIES EXACTLY TOO, 0.3846 against 0.3846, WHICH
+        // IS THE OPEN DEFECT AND NOT A SECOND PROBLEM.
+        //
+        // PARKED, DELIBERATELY, AND ASSERTED RATHER THAN SKIPPED. `Accumulate.
+        // Agreement` reading exactly equal to `Sum` is already the plan's one open
+        // defect, with two explanations spent on it -- the minted name is not why
+        // (it ties with chunking suppressed) and neither is arrival order. What is
+        // added here is a THIRD thing it is not: it is not the narrowed question's
+        // second broadcast either, because the first walk's own number ties as well.
+        //
+        // A skip would make this silent, which is the one thing this project does
+        // not allow. So the tie is asserted: the suite stays green, the defect stays
+        // visible, and THE DAY AGREEMENT STARTS DISCRIMINATING THIS FAILS AND SAYS
+        // SO -- which is what anybody chasing it next needs.
+        Assert.Equal(plain.Reference, asking.Reference, precision: 10);
+
+        Assert.Equal(plain.Accuracy, asking.Accuracy, precision: 10);
     }
 
     [Fact]

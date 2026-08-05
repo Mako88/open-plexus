@@ -360,8 +360,15 @@ public sealed class SnakeRun : IDisposable
             // action has no forward edge to use. Measured: with only the forward
             // cell written, the chain reached an action ZERO times on every seed
             // and the body moved entirely at random. See Kind.Before.
+            // HELD IN ONE PLACE AND HANDED TO BOTH, because the votes used to ask a
+            // DIFFERENT question from the thought they were voting on -- see
+            // `VoteAsync`. A repeat measurement that repeats something else is not a
+            // repeat, and the only way to be sure they match is for there to be one
+            // of them.
+            var asking = Question.Preceding();
+
             var thought = await _eye
-                .ObserveAsync(frame, taken, Question.Preceding(), ct: ct)
+                .ObserveAsync(frame, taken, asking, ct: ct)
                 .ConfigureAwait(false);
 
             // WAIT ON THE THOUGHT'S OWN ACCOUNTING, NOT ON THE BUS. This was
@@ -378,7 +385,7 @@ public sealed class SnakeRun : IDisposable
 
             if (thought is not null)
             {
-                var voted = await VoteAsync(thought, votes, ct).ConfigureAwait(false);
+                var voted = await VoteAsync(thought, votes, asking, ct).ConfigureAwait(false);
                 chosen = voted.Chosen;
                 halted += voted.Halted;
                 unbalanced += voted.Unbalanced;
@@ -498,15 +505,23 @@ public sealed class SnakeRun : IDisposable
     /// </para>
     /// </remarks>
     private async Task<(Code? Chosen, long Halted, int Unbalanced, int Unsettled, bool Disagreed)>
-        VoteAsync(Thought first, int votes, CancellationToken ct)
+        VoteAsync(Thought first, int votes, Question? asking, CancellationToken ct)
     {
         if (votes <= 1) return (_hand.Choose(first), 0, 0, 0, false);
 
-        var asking = new Task<Thought>[votes - 1];
-        for (var i = 0; i < asking.Length; i++)
-            asking[i] = _eye.ThinkAsync(first.Started, _dials.Stamina, null, ct);
+        // THE SAME QUESTION, AND IT USED TO BE A DIFFERENT ONE. This passed `null`
+        // here while the thought being voted on was asked with `Question.Preceding`,
+        // so two of every three votes walked with NO NARROWING AT ALL. That is two
+        // faults in one line: a repeat measurement that does not repeat the
+        // measurement, and an unnarrowed walk that does not terminate -- with any
+        // vote count above one, five steps of snake never settled and the suite read
+        // a `TimeoutException` from `SettleAsync` waiting on a bus that stayed busy.
+        // One vote finishes the same five steps in 203ms.
+        var walking = new Task<Thought>[votes - 1];
+        for (var i = 0; i < walking.Length; i++)
+            walking[i] = _eye.ThinkAsync(first.Started, _dials.Stamina, asking, ct);
 
-        var others = await Task.WhenAll(asking).ConfigureAwait(false);
+        var others = await Task.WhenAll(walking).ConfigureAwait(false);
 
         var opinions = new List<Code?>(votes);
         long halted = 0;

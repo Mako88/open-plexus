@@ -98,14 +98,43 @@ public sealed class SnakeRunTests
         //
         // Without this, the test above passes for a harness that reports any
         // positive number.
+        // AND THE MUTATION IS KILLED HARDER THAN THIS TEST USED TO EXPECT. It asked
+        // for `Asked > 0` and then for `Moved <= 0` -- a control arm that still
+        // scores questions but finds no difference in them. What actually happens is
+        // that the cut arm scores NOTHING: with the action outside the occasion its
+        // code has no edges, the walk reaches nothing, and `Consequence.Settle`
+        // returns early on an empty prediction. The measurement does not shrink, it
+        // disappears.
+        //
+        // THAT IS A SILENCE, SO IT WAS SPENT AGAINST -- the named trap says an empty
+        // cell and a walk that cannot afford one look identical in a zero and want
+        // opposite fixes. Swept on the budget these questions actually read, which is
+        // FORESIGHT and not stamina (fork 20 split them, and sweeping stamina here
+        // moves nothing at all):
+        //
+        //   foresight   uncut asked   uncut moved   CUT asked
+        //         2.0            42        0.3333           0
+        //         4.0            58        1.3793           0
+        //         8.0            58        1.6207           0
+        //        16.0            58        1.6207           0
+        //
+        // The uncut arm responds to the dial, so the dial is read; the cut arm is
+        // nought at eight times the budget. The silence is the WIRE.
         using var run = new SnakeRun(World(), Dials() with { Names = 1 }, seed: 1);
         var result = await run.PlayAsync(500, cut: true);
 
-        Assert.True(result.Consequence.Asked > 0, "no consequence was ever scored");
+        Assert.Equal(0, result.Consequence.Asked);
 
-        Assert.True(result.Consequence.Moved <= 0.0,
-            $"an action with no edges still moved the prediction: "
-            + $"apart {result.Consequence.Apart}, echoed {result.Consequence.Echoed}");
+        // AND THE CONTRAST IS WHAT MAKES THAT A KILL RATHER THAN A BROKEN HARNESS.
+        // Same world, same dials, same seed, same step count -- only the wire
+        // differs. If this arm also scored nothing, the test above would be passing
+        // on a harness that never ran.
+        using var whole = new SnakeRun(World(), Dials() with { Names = 1 }, seed: 1);
+        var intact = await whole.PlayAsync(500);
+
+        Assert.True(intact.Consequence.Asked > 0,
+            "the intact arm scored nothing either, so this is not the wire being cut "
+            + "-- the consequence harness is not running at all");
     }
 
     // ---- the run is honest about itself -----------------------------------

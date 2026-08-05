@@ -304,29 +304,5 @@ public sealed class SensesRun : IDisposable
         return report;
     }
 
-    /// <summary>
-    /// How clearly the best answer beat the next — <b>a cost, so lower is
-    /// better.</b>
-    /// </summary>
-    /// <remarks>
-    /// <b>NOTHING REACHED IS THE WORST AND COSTS ONE</b>, which is exactly what
-    /// <see cref="Budget.Reached"/> reported and keeps the two scales comparable.
-    /// A lone arrival separated everything it found, so it costs nothing. Two
-    /// arrivals cost the share of the winner the runner-up took — a tie costs
-    /// one, and a rout costs nothing.
-    /// </remarks>
-    private static double Separation(IReadOnlyList<Arrival> reached)
-    {
-        if (reached.Count == 0) return 1.0;
-        if (reached.Count == 1) return 0.0;
-
-        var best = reached[0].Score;
-
-        // A NON-POSITIVE WINNER SEPARATES NOTHING. Scores are accumulated route
-        // strengths and cannot be negative, so this is the degenerate case where
-        // the walk arrived with no weight at all.
-        return best <= 0.0 ? 1.0 : Math.Clamp(reached[1].Score / best, 0.0, 1.0);
-    }
-
     public void Dispose() => _fabric.Dispose();
 }

@@ -112,8 +112,9 @@ public sealed class Foresight
     /// <b>THE PER-PREDICTION GAP WAS ALWAYS COMPUTED AND ALWAYS THROWN AWAY.</b>
     /// Only the running totals were kept, so the one quantity that says whether a
     /// budget is earning its cost — on this step, against its own control — could
-    /// not be fed to anything. It is what lets the prediction budget hunt its own
-    /// level; see <see cref="Budget.Note"/>.
+    /// not be fed to anything. <b>Fork 24 was the thing that would have read it
+    /// and it is gone</b> — deleted 2026-08-05 for never deciding anything — so
+    /// this is a quantity computed, reported, and still fed to nothing.
     /// <para>
     /// Zero for a prediction that named nothing, which is the honest reading: a
     /// guess that was never made did not beat a blind draw and did not lose to

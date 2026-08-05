@@ -59,20 +59,20 @@ jobs:
       - name: Fetch corpora
         run: bash corpora/fetch.sh
 
+      # WARNINGS ARE PART OF THE CONTRACT HERE AND THE BUILD ENFORCES IT NOW.
+      # `DocsTests` asserts the library builds with its documentation file on, and
+      # the XML comments are where this project keeps what every piece does -- so
+      # a warning about a missing `param` tag is a doc going stale, not noise.
+      #
+      # THIS WAS A SEPARATE STEP GREPPING FOR `warning (CS|xUnit)`, AND
+      # `TreatWarningsAsErrors` KILLED IT WITHOUT ANYBODY NOTICING. The compiler
+      # emits `error CS1574` now, so the grep matches nothing, so the step would
+      # print "warning-clean" and pass -- on a build that had already failed above
+      # it. A CHECK THAT CANNOT FIRE READS AS A PASS, which is this project's own
+      # trap, reintroduced by the commit that closed it. Deleted rather than
+      # repaired: the gate belongs in the build, where everybody runs it.
       - name: Build
-        run: dotnet build --configuration Debug --nologo
-
-      # WARNINGS ARE PART OF THE CONTRACT HERE. `DocsTests` asserts the library
-      # builds with its documentation file on, and the XML comments are where
-      # this project keeps what every piece does -- so a warning about a missing
-      # `param` tag is a doc going stale, not noise.
-      - name: Warnings
-        run: |
-          dotnet build --configuration Debug --nologo --no-incremental 2>&1 \
-            | grep -E "warning (CS|xUnit)" && {
-              echo "::error::the build is not warning-clean"
-              exit 1
-            } || echo "warning-clean"
+        run: dotnet build --configuration Debug --nologo --no-incremental
 
       # QUIET IS FOR THE BUILD, AND THE CONSOLE LOGGER IS FOR THE RESULT. At
       # `--verbosity quiet` alone this step printed the NAME of every failing

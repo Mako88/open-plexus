@@ -84,8 +84,6 @@
 
 ### Housekeeping
 
-- **Collapse `Marked`**, the last beaten arm. It is `Credited`'s control, so the
-  claim it evidences goes with it.
 - **The knob pass, LAST.** A dial swept before the structural work measures a
   system about to change under it.
 
@@ -138,6 +136,7 @@ condition is a superstition.**
 | A trained quantiser — k-means | Two machines fitted on different samples code the same input differently | Never fitted |
 | `Question.Path` — a relation per hop | A fixed path trades coverage against precision with no middle. **Deleted** | `Downstream` wants the reverse temporal edge, which `Kind.Before` now writes |
 | `Kind.Informed` — a cell for what surprised | No walk reaches an untried act. **Deleted** | Anything that can explore |
+| `Attending.Marked` — the credit cell, unconditioned | Peaks below the blind bar. It was `Credited`'s CONTROL, so ruling out the extra cell and the staleness goes with it. **Deleted** | A second cell written on anything but the outcome — re-take the control |
 
 ---
 

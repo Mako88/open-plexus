@@ -404,11 +404,6 @@ public sealed class HomeostatTests(ITestOutputHelper output)
                 using var run = new HomeostatRun(World(), Dials, seed);
                 return (await run.RunAsync(Steps, Attending.Chain)).Viable;
             }),
-            ("marked", async seed =>
-            {
-                using var run = new HomeostatRun(World(), Dials, seed);
-                return (await run.RunAsync(Steps, Attending.Marked)).Viable;
-            }),
             ("lowest", async seed =>
             {
                 using var run = new HomeostatRun(World(), Dials, seed);
@@ -439,7 +434,6 @@ public sealed class HomeostatTests(ITestOutputHelper output)
 
         var bar = arms.First(one => one.Arm == "blind");
         var contrasted = arms.First(one => one.Arm == "credited");
-        var control = arms.First(one => one.Arm == "marked");
 
         // THE FIRST ARM IN THIS PROJECT TO BEAT DRAWING AT RANDOM. Everything that
         // consults the graph had scored below the bar, which is what step 4 exists
@@ -449,14 +443,15 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             $"the credit cell stopped beating the bar: {contrasted.Mean:F4} "
             + $"against {bar.Mean:F4}");
 
-        // AND THE CONTRAST IS WHAT DID IT, WHICH IS THE ONLY REASON THE ROW ABOVE
-        // MEANS ANYTHING. `marked` writes the same second cell, one step stale,
-        // into the same relation, and walks it the same way -- it differs by the
-        // CONDITION alone. It does not beat the bar and it does not beat `chain`.
-        Assert.True(control.Mean < bar.Mean,
-            $"writing the second cell unconditionally also beats the bar "
-            + $"({control.Mean:F4}), so the gain is the extra cell or its "
-            + "staleness rather than the contrast, and the claim is wrong");
+        // THE CONTRAST BEING WHAT DID IT IS NO LONGER MEASURED HERE, AND THAT IS
+        // DELIBERATE. `marked` wrote the same second cell unconditionally -- same
+        // relation, same one-step staleness, differing by the CONDITION alone --
+        // and it was the arm that ruled out "the extra cell" and "the staleness"
+        // as explanations. It lost and was collapsed under the delete-the-loser
+        // rule, so what it evidenced went with it: peak 0.3167 against a blind bar
+        // of 0.3668, less than half `credited`'s 0.7347. The plan's table carries
+        // the numbers and the revival condition. Anything reviving that arm has to
+        // re-take this comparison rather than cite it.
 
         // AND THE NEGATIVE HALF STILL DOES NOT PAY, AFTER THREE SHAPES OF IT.
         // `Contested` writes `Kind.Hindered` when things got worse, so the CRDT
@@ -485,10 +480,6 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             $"subtracting the negative cell now beats the one-sided count "
             + $"({contested.Mean:F4} against {contrasted.Mean:F4}), so the "
             + "over-pruning note above has expired and needs re-running");
-
-        Assert.True(contrasted.Separation(control) > 3.0,
-            $"the conditioned and unconditioned arms are no longer separable: "
-            + $"{contrasted.Mean:F4} against {control.Mean:F4}");
 
         // THE SILENCE CANNOT EXPLAIN IT, AND THE ARGUMENT NEEDS NO MEASUREMENT.
         // The bootstrap acts AT RANDOM, so mixing coin tosses into an arm pulls it
@@ -657,17 +648,20 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task Step_fours_attribution_survives_being_swept_rather_than_sampled()
+    public async Task Plain_association_peaks_below_the_bar_at_its_own_best_budget()
     {
         // THE RE-RUN THE INHIBITION REVERSAL MADE NECESSARY. Every claim in step 4
         // was taken at one stamina, and one of them turned out to be a comparison
-        // between one arm's peak and another arm's way up. So the controls get the
-        // same treatment: each is swept and read at ITS OWN best budget.
+        // between one arm's peak and another arm's way up. So the control gets the
+        // same treatment: swept, and read at ITS OWN best budget.
         //
-        // AND THE ATTRIBUTION HOLDS. `Credited` peaks at 0.7347; the unconditioned
-        // control and plain association both peak BELOW the blind bar.
-        // The contrast is what did it, and that now survives being swept instead of
-        // sampled.
+        // WHAT SURVIVES `Marked`'S COLLAPSE IS THE HALF THAT NEEDS NO SECOND CELL.
+        // Plain association peaks BELOW the blind bar -- 0.2680 at stamina 2
+        // against 0.3668 -- so `Credited`'s 0.7347 is not something any walk over
+        // the ordinary cell was going to reach. That is worth asserting on its own:
+        // it is what makes the credit cell the thing that changed rather than the
+        // walking. The unconditioned control peaked at 0.3167 and is recorded in
+        // the plan's table rather than run here.
         var peaks = new Dictionary<string, double>();
 
         foreach (var stamina in (double[])[2.0, 3.0, 4.0, 6.0, 8.0])
@@ -675,8 +669,7 @@ public sealed class HomeostatTests(ITestOutputHelper output)
             output.WriteLine($"--- stamina {stamina} ---");
 
             var arms = await ArmsAsync(
-                Fixture.Dials(stamina), 24,
-                Attending.Blind, Attending.Chain, Attending.Marked);
+                Fixture.Dials(stamina), 24, Attending.Blind, Attending.Chain);
 
             foreach (var arm in arms)
                 peaks[arm.Arm] = Math.Max(peaks.GetValueOrDefault(arm.Arm, 0.0), arm.Mean);
@@ -685,12 +678,11 @@ public sealed class HomeostatTests(ITestOutputHelper output)
         output.WriteLine(string.Join(
             "  ", peaks.Select(one => $"{one.Key}={one.Value:F4}")));
 
-        foreach (var control in (string[])["chain", "marked"])
-            Assert.True(peaks[control] < peaks["blind"],
-                $"`{control}` now beats the blind bar at its own best budget "
-                + $"({peaks[control]:F4} against {peaks["blind"]:F4}), so step 4's "
-                + "attribution no longer rests on the contrast alone and the claim "
-                + "needs rewriting rather than re-asserting");
+        Assert.True(peaks["chain"] < peaks["blind"],
+            $"`chain` now beats the blind bar at its own best budget "
+            + $"({peaks["chain"]:F4} against {peaks["blind"]:F4}), so walking the "
+            + "ordinary cell is enough after all and step 4's premise needs "
+            + "rewriting rather than re-asserting");
     }
 
     [Fact]

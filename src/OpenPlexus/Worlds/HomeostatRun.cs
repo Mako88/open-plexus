@@ -11,7 +11,7 @@ namespace OpenPlexus.Worlds;
 /// <summary>How the body decides what to attend to.</summary>
 /// <remarks>
 /// <b>Controls that change ONE thing.</b> The body, the drains and the score are
-/// identical under all four; only the choice moves.
+/// identical under every arm; only the choice moves.
 /// </remarks>
 public enum Attending
 {
@@ -52,23 +52,19 @@ public enum Attending
     /// arm is nearly all coin toss early on, and its silence is the thing to read
     /// beside its score.
     /// </para>
+    /// <para>
+    /// <b>AND THE CONTROL THAT ATTRIBUTED THIS TO THE CONTRAST IS GONE, so the
+    /// attribution is now a RECORD rather than a re-runnable comparison.</b>
+    /// <c>Marked</c> wrote the same second cell unconditionally — same relation,
+    /// same one-step staleness, differing by the condition alone — and peaked at
+    /// 0.3167 against a blind bar of 0.3668, below plain association's own peak
+    /// region and less than half of this arm's 0.7347. It was collapsed under the
+    /// delete-the-loser rule; the revival condition is in the plan's table. What
+    /// is asserted below is only the surviving half: plain association peaks below
+    /// the bar too.
+    /// </para>
     /// </remarks>
     Credited,
-
-    /// <summary>
-    /// <see cref="Credited"/>'s SECOND CELL WITHOUT ITS CONDITION — <b>the control
-    /// that says whether the contrast did the work.</b>
-    /// </summary>
-    /// <remarks>
-    /// <b>THE ARM CHANGES TWO THINGS, so on its own it can attribute neither.</b>
-    /// It writes a pair into a cell nothing else writes, and it walks that cell
-    /// instead of the ordinary one — which on its own is a walk over a ONE-STEP
-    /// STALE association, and staleness is a difference all by itself. This writes
-    /// the same second cell on EVERY step regardless of whether anything improved,
-    /// so the gap between this and <see cref="Credited"/> is the condition and
-    /// nothing else.
-    /// </remarks>
-    Marked,
 
     /// <summary>
     /// <see cref="Credited"/> with the NEGATIVE half as well — <b>a contingency
@@ -363,8 +359,8 @@ public sealed class HomeostatRun : IDisposable
                     chains,
                     choosing switch
                     {
-                        Attending.Credited or Attending.Marked
-                            or Attending.Contested => Question.Worthwhile(),
+                        Attending.Credited or Attending.Contested
+                            => Question.Worthwhile(),
                         _ => null,
                     },
                     ct).ConfigureAwait(false);
@@ -409,8 +405,7 @@ public sealed class HomeostatRun : IDisposable
                 ? [.. felt, Homeostat.Attending(which)]
                 : felt;
 
-            if (choosing is Attending.Credited or Attending.Marked
-                     or Attending.Contested)
+            if (choosing is Attending.Credited or Attending.Contested)
             {
                 // WRITTEN AS IT HAPPENED, exactly as `Chain` writes it, so the
                 // ordinary cell is untouched and this arm changes one thing.
@@ -423,8 +418,6 @@ public sealed class HomeostatRun : IDisposable
                 // is priced by what followed it. `Credit` above one is the band
                 // `Drives` gives an improvement; at or below one nothing is
                 // written, and that absence is the whole of the contrast.
-                // `Marked` writes it unconditionally, which is the control: same
-                // cell, same staleness, no contrast.
                 //
                 // AND `Contested` ALSO WRITES THE NEGATIVE CELL when the
                 // most-at-risk variable got worse, so the walk reads a difference
@@ -432,7 +425,7 @@ public sealed class HomeostatRun : IDisposable
                 // Kind.Hindered.
                 if (crediting is { } earned)
                 {
-                    var helped = choosing == Attending.Marked || sensing.Credit > 1.0;
+                    var helped = sensing.Credit > 1.0;
                     var hurt = choosing == Attending.Contested && sensing.Credit < 1.0;
 
                     if (helped || hurt)

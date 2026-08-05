@@ -90,6 +90,40 @@ public sealed class DialTests(ITestOutputHelper output)
             + "hand-set, yet its feedback is already computed every single step — "
             + "the graph's guess is scored against what actually arrived. That is "
             + "the signal fork 24 needed and it is sitting there unused",
+
+        // ---- ARRIVED FROM THE WORLDS, 2026-08-04 ---------------------------
+        //
+        // NONE OF THESE IS NEW. Every one was already a dial, passed to a `*Run`
+        // constructor where this census could not see it -- so the budget below
+        // jumping from seven is the CHECK BEING FIXED rather than the system
+        // growing knobs. Several had DIFFERENT DEFAULTS in different worlds,
+        // which is the sharpest form of the fault: `Ranking` was `Sum` on bAbI
+        // and `Agreement` on CLEVR, so a world decided how the brain thought.
+
+        ["Span"] =
+            "a capacity rather than a level, like `Row`. How far back to carry is "
+            + "a claim about the stream, and the refutation row says it costs its "
+            + "row without paying — so what it needs is a reason to exist, not a "
+            + "controller",
+
+        ["Ranking"] =
+            "a choice between accumulation rules rather than a continuum, exactly "
+            + "as `Pricing` and `Toll` are. WHICH rule is not a quantity",
+
+        ["Kinds"] =
+            "a structural claim rather than a level — whether a carried edge gets "
+            + "its own cell. On or off, with nothing between to hunt",
+
+        ["Surprising"] =
+            "OPEN, AND MEASURED INERT ON TEXT. The gate suppresses what was "
+            + "predicted, and independent sentences predict nothing of each other. "
+            + "It is on or off rather than a level; what it needs is a world whose "
+            + "stream repeats, and `Rhythm` is the one that has it",
+
+        ["Gated"] =
+            "the write-path half of `Surprising`, and on or off for the same "
+            + "reason. It is a claim about LEARNING where the other is about COST",
+
     };
 
     /// <summary>
@@ -334,6 +368,16 @@ public sealed class DialTests(ITestOutputHelper output)
         // forgetting this design has -- the bet is that nothing can be unlearned,
         // only outvoted, and until now there was no way to test whether that bet is
         // survivable.
-        Assert.Equal(7, HandSet.Count);
+        // AND TO TWELVE, WHICH IS NOT FIVE NEW KNOBS. John moved the dials out
+        // of the worlds and into the brain on 2026-08-04, and every one of these
+        // already existed as a `*Run` constructor argument -- somewhere this census
+        // enumerates `WalkSettings` and therefore could not look. THE BUDGET WAS
+        // MEASURING ITS OWN BLIND SPOT: a file whose whole job is to notice a sixth
+        // dial arriving beside five could not see five of them, with more still to come as the
+        // remaining worlds are migrated.
+        //
+        // THE NUMBER IS THE HONEST ONE NOW, and it is much worse than seven. That
+        // is the argument this file exists to force.
+        Assert.Equal(12, HandSet.Count);
     }
 }

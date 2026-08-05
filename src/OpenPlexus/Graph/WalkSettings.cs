@@ -389,6 +389,62 @@ public sealed record WalkSettings
     /// <remarks><b>Null is off, and off is the control.</b></remarks>
     public Reflection? Reflect { get; init; }
 
+    // ---- WHAT THE WORLDS USED TO DECIDE -------------------------------------
+    //
+    // JOHN'S CALL, 2026-08-04: THE DIALS BELONG TO THE BRAIN AND NOT TO THE
+    // WORLD. Every one of these was a constructor argument on some `*Run`, which
+    // meant a world chose how the thinking worked -- and the same dial had
+    // DIFFERENT DEFAULTS in different worlds: `Ranking` was `Sum` on bAbI and
+    // `Agreement` on CLEVR, `Span` was 0 in three worlds and 1 in two others. A
+    // world was silently deciding the architecture it was meant to be testing.
+    //
+    // AND IT IS WHY THE DIAL CENSUS COULD NOT SEE THEM. `DialTests` enumerates
+    // this type's properties, so a dial passed to a machine's constructor was
+    // invisible to the budget whose entire job is to notice dials arriving. The
+    // count going up when these moved is the census finally telling the truth
+    // rather than the system growing knobs.
+
+    /// <summary>
+    /// How many frames a departed code is carried for — <see cref="Learning.Window"/>.
+    /// </summary>
+    /// <remarks><b>Zero is off</b>, and off is what the refutation row is about.</remarks>
+    public int Span { get; init; }
+
+    /// <inheritdoc cref="Accumulate"/>
+    public Accumulate Ranking { get; init; } = Accumulate.Sum;
+
+    /// <summary>
+    /// Whether a carried code gets its own cell rather than sharing the
+    /// simultaneous one — <b>step 6</b>, and see <see cref="Kind"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Only meaningful with a <see cref="Span"/>.</b> At zero nothing is
+    /// carried, so there is no temporal edge to separate.
+    /// </remarks>
+    public bool Kinds { get; init; }
+
+    /// <summary>
+    /// Whether only what SURPRISED is broadcast — <b>step 2</b>, and see
+    /// <see cref="Learning.Surprise"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>MEASURED INERT ON TEXT, WHICH IS WORTH KNOWING BEFORE REACHING FOR
+    /// IT.</b> The gate suppresses what was predicted, and independent sentences
+    /// predict nothing of each other — so everything surprises and nothing is
+    /// suppressed. It bites on <see cref="Worlds.Rhythm"/>, which repeats.
+    /// </remarks>
+    public bool Surprising { get; init; }
+
+    /// <summary>
+    /// Whether the WRITE path is gated by surprise as well as the read path.
+    /// </summary>
+    /// <remarks>
+    /// <b>Gating the write is a claim about LEARNING; gating the read is a claim
+    /// about COST.</b> Two arms, and only with <see cref="Surprising"/> on.
+    /// </remarks>
+    public bool Gated { get; init; }
+
+
     /// <summary>
     /// Let a machine hunt for its own <see cref="Stamina"/> — <b>fork 24</b>.
     /// </summary>

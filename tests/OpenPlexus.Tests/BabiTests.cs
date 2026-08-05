@@ -243,14 +243,14 @@ public sealed class BabiTests(ITestOutputHelper output)
 
     private const int Repeats = 5;
 
-    private static async Task<double> ScoreAsync(
-        int task,
-        WalkSettings dials,
-        int seed,
-        int span = 0,
-        Accumulate ranking = Accumulate.Sum)
+    /// <remarks>
+    /// <b>THE ARMS ARE DIALS ON THE BRAIN NOW, not arguments to the world</b> —
+    /// John's call, 2026-08-04. A world says what it is looking at; how the walk
+    /// treats it is not its business.
+    /// </remarks>
+    private static async Task<double> ScoreAsync(int task, WalkSettings dials, int seed)
     {
-        using var run = new BabiRun(World(task), dials, seed, span, ranking);
+        using var run = new BabiRun(World(task), dials, seed);
         return (await run.RunAsync(Sentences).ConfigureAwait(false)).Accuracy;
     }
 
@@ -325,7 +325,7 @@ public sealed class BabiTests(ITestOutputHelper output)
         var arms = await Sweep.AcrossAsync(Repeats,
             ("receiver", seed => ScoreAsync(1, Dials, seed)),
             ("agreement", seed =>
-                ScoreAsync(1, Dials, seed, ranking: Accumulate.Agreement)),
+                ScoreAsync(1, Dials with { Ranking = Accumulate.Agreement }, seed)),
             ("doubt", seed => ScoreAsync(1, Dials with { Doubt = 8.0 }, seed)),
             ("sender", seed => ScoreAsync(1, Dials with { Pricing = Pricing.Sender }, seed)));
 
@@ -353,7 +353,7 @@ public sealed class BabiTests(ITestOutputHelper output)
         // visible now. A corpus of sentences in the order somebody wrote them is
         // the opposite of that, and it is worse here rather than null.
         using var without = new BabiRun(World(1), Dials, seed: 1);
-        using var with = new BabiRun(World(1), Dials, seed: 1, span: 2);
+        using var with = new BabiRun(World(1), Dials with { Span = 2 }, seed: 1);
 
         var plain = await without.RunAsync(Sentences);
         var carried = await with.RunAsync(Sentences);
@@ -389,8 +389,8 @@ public sealed class BabiTests(ITestOutputHelper output)
         {
             var dials = Fixture.Dials(stamina: stamina);
 
-            using var fused = new BabiRun(World(1), dials, seed: 1, span: 2);
-            using var split = new BabiRun(World(1), dials, seed: 1, span: 2, kinds: true);
+            using var fused = new BabiRun(World(1), dials with { Span = 2 }, seed: 1);
+            using var split = new BabiRun(World(1), dials with { Span = 2, Kinds = true }, seed: 1);
 
             var together = await fused.RunAsync(Sentences);
             var apart = await split.RunAsync(Sentences);
@@ -417,7 +417,7 @@ public sealed class BabiTests(ITestOutputHelper output)
 
         // AND THE ROW IS WIDER FOR IT, which is the price named on `Tie` and the
         // one that meets the scaling wall.
-        using var priced = new BabiRun(World(1), Dials, seed: 1, span: 2, kinds: true);
+        using var priced = new BabiRun(World(1), Dials with { Span = 2, Kinds = true }, seed: 1);
         using var plain = new BabiRun(World(1), Dials, seed: 1);
 
         var split2 = await priced.RunAsync(Sentences);

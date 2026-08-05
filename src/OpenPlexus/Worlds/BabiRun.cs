@@ -47,6 +47,21 @@ public sealed record BabiResult : Questioned
     /// </remarks>
     public required int Primed { get; init; }
 
+    /// <summary>
+    /// Whether only what SURPRISED was broadcast — step 2, and off is every
+    /// number this world reported before 2026-08-04.
+    /// </summary>
+    /// <remarks>
+    /// <b>An observation ends in a WALK</b>, so a run that reads a corpus thinks
+    /// about every sentence in it. This is the gate that stops that once the text
+    /// stops being new, and <see cref="Gated"/> says whether the write path was
+    /// gated too.
+    /// </remarks>
+    public required bool Surprising { get; init; }
+
+    /// <inheritdoc cref="Surprising"/>
+    public required bool Gated { get; init; }
+
     /// <inheritdoc cref="Babi.Commonest"/>
     public required double Commonest { get; init; }
 
@@ -119,6 +134,7 @@ public sealed record BabiResult : Questioned
     public override string ToString() =>
         $"task={Task} stories={(Stories ? "on" : "off")} span={Span} " +
         $"kinds={(Kinds ? "on" : "off")} primed={Primed} " +
+        $"surprise={(Surprising ? Gated ? "gated" : "on" : "off")} " +
         $"sentences={Moments} asked={Asked} right={Right} silent={Silent} " +
         $"compound={Compound} blind={Blind} | " +
         $"accuracy={Accuracy:F4} expressible={Expressible:F4} " +
@@ -156,8 +172,6 @@ public sealed class BabiRun : IDisposable
     private readonly Babi _world;
     private readonly WalkSettings _dials;
 
-    /// <summary>How this world's question wants its candidates ranked.</summary>
-    private readonly Accumulate _ranking;
 
     /// <summary>
     /// The answers seen so far, which is what the narrowing may choose from.
@@ -176,18 +190,6 @@ public sealed class BabiRun : IDisposable
     /// <param name="world">Which task, from where, and with which arms on.</param>
     /// <param name="dials">The walk.</param>
     /// <param name="seed">The ring's seed, so placement reproduces.</param>
-    /// <param name="span">
-    /// How many sentences a departed word is carried for — <b>the one-way
-    /// temporal edge of <see cref="Window"/>, and zero is off.</b>
-    /// </param>
-    /// <param name="ranking">
-    /// How several routes reaching one endpoint combine. <b>The asker's call and
-    /// not the machine's</b> — see <see cref="Thinking.Question"/>.
-    /// </param>
-    /// <param name="kinds">
-    /// Whether a word carried from an earlier sentence gets its own cell —
-    /// <b>step 6, and THIS IS THE WORLD THAT MEASURES IT.</b>
-    /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
     /// <param name="primer">
@@ -206,9 +208,6 @@ public sealed class BabiRun : IDisposable
         BabiSettings world,
         WalkSettings dials,
         int seed,
-        int span = 0,
-        Accumulate ranking = Accumulate.Sum,
-        bool kinds = false,
         int clusters = 8,
         int replicas = 256,
         Primer? primer = null)
@@ -218,28 +217,24 @@ public sealed class BabiRun : IDisposable
 
         _world = new Babi(world);
         _dials = dials;
-        _span = span;
-        _ranking = ranking;
-        _kinds = kinds;
         _primer = primer?.Lines ?? [];
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _reader = new InputMachine<Sentence>(
             new MachineAddress("reader"), new Reading(),
-            new LocalRendezvous(_fabric.Local, kinds),
-            _fabric.Bus, _fabric.Ring, dials, span);
+            new LocalRendezvous(_fabric.Local, dials.Kinds),
+            _fabric.Bus, _fabric.Ring, dials, dials.Span,
+            dials.Surprising ? new Surprise() : null, gated: dials.Gated);
 
         _fabric.Subscribe(_reader);
     }
 
-    /// <inheritdoc cref="Window"/>
-    private readonly int _span;
-
-    /// <inheritdoc cref="Graph.Kind"/>
-    private readonly bool _kinds;
-
     /// <inheritdoc cref="Primer"/>
-    /// <remarks><b>Empty when nothing was primed</b>, which is the control.</remarks>
+    /// <remarks>
+    /// <b>Empty when nothing was primed</b>, which is the control. <b>This stays a
+    /// world's business rather than the brain's</b> — it is DATA to read, not a
+    /// choice about how to think.
+    /// </remarks>
     private readonly IReadOnlyList<Sentence> _primer;
 
     /// <summary>The world this run is reading.</summary>
@@ -371,9 +366,11 @@ public sealed class BabiRun : IDisposable
         {
             Task = _world.Task,
             Stories = _world.Stories,
-            Span = _span,
-            Kinds = _kinds,
+            Span = _dials.Span,
+            Kinds = _dials.Kinds,
             Primed = primed,
+            Surprising = _dials.Surprising,
+            Gated = _dials.Gated,
             Moments = shown,
             Asked = asked,
             Right = right,
@@ -437,7 +434,7 @@ public sealed class BabiRun : IDisposable
         ImmutableArray<Code> origins, IReadOnlyCollection<Code> candidates, CancellationToken ct)
     {
         var thought = await _reader
-            .ThinkAsync(origins, _dials.Stamina, new Question { Ranking = _ranking }, ct)
+            .ThinkAsync(origins, _dials.Stamina, new Question { Ranking = _dials.Ranking }, ct)
             .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);

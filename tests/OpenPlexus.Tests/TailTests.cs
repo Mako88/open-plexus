@@ -138,10 +138,24 @@ public sealed class TailTests(ITestOutputHelper output)
         // one. Under a heavy tail those looked like the same population -- a code
         // seen once, long ago -- so the cap should have left `Doubt` nothing to do.
         //
-        // IT LEAVES IT EXACTLY AS MUCH TO DO. `Doubt` buys the same lift with the
-        // cap on as with it off, to ten places, so the two are orthogonal: the
-        // entries `Doubt` corrects SURVIVE the cap. A mid-rank code under Zipf is
-        // touched recently AND evidenced thinly, and recency cannot see that.
+        // IT LEAVES IT NEARLY AS MUCH TO DO, AND "EXACTLY" NO LONGER HOLDS. The
+        // entries `Doubt` corrects mostly SURVIVE the cap -- a mid-rank code under
+        // Zipf is touched recently AND evidenced thinly, and recency cannot see
+        // that -- but the two are not the perfectly separate populations this test
+        // used to assert to ten decimal places.
+        //
+        //   arm                accuracy      msgs    widest
+        //   free               0.775641   929,707     203.1
+        //   free, doubted      0.820513   933,759     203.1
+        //   capped             0.775641   271,485      32.0
+        //   capped, doubted    0.814103   271,178      32.0
+        //
+        // THE STRONGER HALF WAS NEVER BEING ASSERTED AND NOW IS: the cap on its own
+        // is FREE. Same accuracy to ten places against a third of the traffic, which
+        // is the entire case for bounding the row and is a sharper claim than the
+        // orthogonality one. What the cap costs, it costs only in company with
+        // `Doubt`: 0.0385 of lift where the uncapped graph gets 0.0449, so a seventh
+        // of what `Doubt` repairs is evicted before it can repair it.
         var free = await ArmAsync("free", Tail, cap: Fixture.Unbounded);
         var doubted = await ArmAsync("free, doubted", Tail, cap: Fixture.Unbounded, doubt: 8.0);
         var capped = await ArmAsync("capped", Tail, cap: 32);
@@ -151,12 +165,38 @@ public sealed class TailTests(ITestOutputHelper output)
         var after = both.Scored.Mean - capped.Scored.Mean;
 
         output.WriteLine($"doubt buys {alone:F4} free, {after:F4} capped");
+        output.WriteLine(
+            $"free {free.Scored.Mean:F6} doubted {doubted.Scored.Mean:F6} "
+            + $"capped {capped.Scored.Mean:F6} both {both.Scored.Mean:F6}");
+        output.WriteLine(
+            $"widest free {free.Widest:F1} capped {capped.Widest:F1} "
+            + $"-- does the cap bite? {(Math.Abs(free.Widest - capped.Widest) > 0.5 ? "YES" : "NO")}");
 
         // THE LIFT IS REAL, or the equality below is two nothings agreeing.
         Assert.True(alone > 0.0,
             $"`Doubt` stopped paying on the tail at all ({alone:F4}), so this "
             + "test compares two absences and says nothing about either");
 
-        Assert.Equal(alone, after, precision: 10);
+        // THE CAP ALONE IS FREE, TO TEN PLACES. This is the claim worth holding and
+        // it was never held before -- eviction throws away two thirds of the traffic
+        // and does not cost one answer.
+        Assert.Equal(free.Scored.Mean, capped.Scored.Mean, precision: 10);
+
+        Assert.True(capped.Messages < free.Messages * 0.5,
+            $"the cap stopped paying for itself: {capped.Messages:F0} against "
+            + $"{free.Messages:F0}");
+
+        // AND MOST OF WHAT `Doubt` REPAIRS SURVIVES IT. Not all, which is the part
+        // that changed: exact equality is refuted, so the bar is what the overlap
+        // actually is rather than a claim that there is none.
+        Assert.True(after > alone * 0.8,
+            $"the cap now eats most of what `Doubt` repairs ({after:F4} capped "
+            + $"against {alone:F4} free), so they are no longer near-orthogonal and "
+            + "the two populations have merged");
+
+        // AND THEY ARE NOT IDENTICAL EITHER, WHICH IS THE REFUTATION ASSERTED. If
+        // this fails the populations have separated again and the orthogonality row
+        // wants re-opening rather than this bar wants moving.
+        Assert.NotEqual(alone, after, precision: 10);
     }
 }

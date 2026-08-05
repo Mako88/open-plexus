@@ -91,7 +91,22 @@ public sealed class ReceiverWeighingTests
         var fired = node.Fire(Arriving(C(1), together: 2.0));
 
         Assert.NotNull(fired.Reached);
-        Assert.Equal(0.5, fired.Reached.Score, precision: 10);
+
+        // THE SCORE IS DAMPED BY DOUBT AND THE COST IS NOT, WHICH IS THE WHOLE
+        // SPLIT `Doubt` WAS BUILT TO MAKE -- one weight ranking a partner AND
+        // pricing the hop is this design's named recurring fault, and this is where
+        // the two numbers come apart. The tests above assert `Held` and so read the
+        // undamped price; this one asserts `Score` and reads the belief.
+        //
+        // together 2 against a marginal of 4 is 0.5 undamped, and 2/(4+8) once the
+        // doubt the brain ships is in the denominator. This read 0.5 until doubt was
+        // cashed in at 8.0 and nothing here said what it depended on.
+        //
+        // SO THE ASSUMPTION IS ASSERTED RATHER THAN CARRIED. If the dial moves again
+        // this fails on the line that names it, instead of on an opaque comparison
+        // of two decimals that tells nobody which of them is wrong.
+        Assert.Equal(8.0, Dials().Doubt, precision: 10);
+        Assert.Equal(2.0 / (4.0 + 8.0), fired.Reached.Score, precision: 10);
     }
 
     [Fact]

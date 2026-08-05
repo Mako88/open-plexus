@@ -153,6 +153,81 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         Assert.Empty(Unused);
     }
 
+    [Fact]
+    public void And_a_public_type_the_library_itself_never_names_is_not_wired()
+    {
+        // THE HOLE THE MEMBER SCAN CANNOT SEE, and `Winnow` fell straight through
+        // it: built, documented, measured, and reaching NO WORLD -- while every
+        // member read as used because `WinnowTests` names them. A member scan asks
+        // whether anything calls a method; it never asks whether the library
+        // itself has heard of the TYPE.
+        //
+        // AND TESTS DO NOT COUNT HERE, WHICH THEY DELIBERATELY DO ABOVE. That
+        // asymmetry is the point rather than an inconsistency: a world's
+        // `RunAsync` exists for the harness to call, so a test IS its caller and
+        // counting it is right. Nothing exists for a test to CONSTRUCT -- a type
+        // the library never names is a mechanism wired to nothing, whatever its
+        // own tests do with it.
+        var source = Sources()
+            .Where(file => file.Key.Contains(
+                $"{Path.DirectorySeparatorChar}src{Path.DirectorySeparatorChar}",
+                StringComparison.Ordinal))
+            .ToList();
+
+        var orphans = new List<string>();
+
+        foreach (var type in typeof(Code).Assembly.GetTypes().Where(one => one.IsPublic))
+        {
+            var name = type.Name.Split('`')[0];
+
+            var named = source
+                .Where(file => !file.Key.EndsWith($"{name}.cs", StringComparison.Ordinal))
+                .Any(file => Regex.IsMatch(file.Value, @"\b" + Regex.Escape(name) + @"\b"));
+
+            if (!named && !Unwired.ContainsKey(name)) orphans.Add(name);
+        }
+
+        Assert.True(orphans.Count == 0,
+            $"{orphans.Count} public type(s) nothing in `src` names. Wire it, "
+            + "delete it, or write down why it stays: "
+            + string.Join(", ", orphans.Order(StringComparer.Ordinal)));
+    }
+
+    /// <summary>Public types the library never names, each with its reason.</summary>
+    /// <remarks>
+    /// <b>TEN ENTRY POINTS AND ONE ORPHAN, WHICH IS THE WHOLE VALUE OF THE
+    /// CHECK.</b> A world's run exists for a harness to call, so a test IS its
+    /// caller and the library never naming it is correct. `Winnow` is not that: it
+    /// is a mechanism, and a mechanism the library has never heard of is wired to
+    /// nothing however thoroughly its own tests exercise it.
+    /// </remarks>
+    private static readonly Dictionary<string, string> Unwired = new(StringComparer.Ordinal)
+    {
+        ["BabiRun"] = Harness,
+        ["BindingRun"] = Harness,
+        ["ClevrRun"] = Harness,
+        ["ComposedRun"] = Harness,
+        ["HomeostatRun"] = Harness,
+        ["MotifRun"] = Harness,
+        ["SensesRun"] = Harness,
+        ["SnakeRun"] = Harness,
+        ["TendingRun"] = Harness,
+
+        ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
+            + "cannot see a caller sitting beside it.",
+
+        ["Winnow"] = "BUILT, DOCUMENTED, MEASURED AND REACHING NO WORLD. This is "
+            + "the entry this check was written for: `WinnowTests` names every "
+            + "member, so the member scan reported it live for as long as it has "
+            + "existed. `Banded` and `Marked` are mounted on `Tending`; mounting "
+            + "this beside them is the next step and it is not done.",
+    };
+
+    /// <summary>Why a world's run is not named by the library.</summary>
+    private const string Harness =
+        "a world's run is the HARNESS's entry point, so a test is its rightful "
+        + "caller and the library naming it would be the surprise.";
+
     /// <summary>
     /// What using a member actually looks like, as against merely spelling it.
     /// </summary>

@@ -129,43 +129,95 @@ public sealed class RhythmTests(ITestOutputHelper output)
     [Fact]
     public async Task Only_the_surprise_propagates_and_the_traffic_collapses()
     {
-        // STEP 2, MEASURED AGAINST THE BASELINE THIS WORLD WAS BUILT TO HOLD.
-        // Rao & Ballard: what travels is the residual, and a perfectly predicted
-        // input is silent. The claim is that traffic falls a long way while the
-        // score does not -- if the score fell with it, the system would just be
-        // thinking less.
+        // STEP 2. Rao & Ballard: what travels is the residual, and a perfectly
+        // predicted input is silent. The claim is that traffic falls a long way
+        // while the score does not -- if the score fell with it, the system would
+        // just be thinking less.
+        //
+        // THE COLLAPSE IS MEASURED WITHIN ONE RUN NOW, AND IT HAS TO BE. This test
+        // used to build `loud` and `quiet` and compare them -- but the two were
+        // constructed with IDENTICAL arguments and the same seed, because the
+        // `Surprising` boolean that separated them was deleted when everything went
+        // on. The off-arm went with it and the two runs became one run compared to
+        // itself, which is why it read 15922 against 15922. A tie to the last digit
+        // is never a measurement.
+        //
+        // AND THERE IS NO OFF-ARM TO PUT BACK, BY DESIGN -- you build it and it is
+        // on. So the claim has to be stated without one, which it can be: Rao &
+        // Ballard say a PREDICTED input is silent, so traffic per step must FALL as
+        // the world becomes predicted. That is a claim about one run over time, and
+        // it is the stronger statement of the two.
         var dials = Fixture.Dials(stamina: 4.0);
 
-        using var loud = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
-        using var quiet = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
+        const int Opening = 200;
+        const int Whole = 900;
 
-        var before = await loud.RunAsync(600);
-        var after = await quiet.RunAsync(600);
+        using var early = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
+        using var entire = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
 
-        output.WriteLine($"off {before}");
-        output.WriteLine($"on  {after}");
+        var opening = await early.RunAsync(Opening);
+        var whole = await entire.RunAsync(Whole);
 
-        // THE TRAFFIC COLLAPSE. A stationary world stops broadcasting once it is
-        // predicted, which is the whole economic argument for step 2.
-        Assert.True(after.Messages < before.Messages * 0.75,
-            $"traffic did not collapse: {after.Messages} against {before.Messages}");
+        output.WriteLine($"opening {opening}");
+        output.WriteLine($"whole   {whole}");
+
+        // THE SUBTRACTION IS SOUND BECAUSE THE SEED IS FIXED -- fork 12, and the
+        // determinism suite holds it. The long run's first two hundred steps ARE the
+        // short run, so the difference is what the remaining steps cost.
+        var opened = opening.Messages / (double)Opening;
+        var later = (whole.Messages - opening.Messages) / (double)(Whole - Opening);
+
+        output.WriteLine($"traffic per step: {opened:F1} opening, {later:F1} later");
+
+        var hushEarly = opening.Unspoken / (double)Opening;
+        var hushLate = (whole.Unspoken - opening.Unspoken) / (double)(Whole - Opening);
+
+        output.WriteLine($"silent share: {hushEarly:P1} opening, {hushLate:P1} later");
+
+        // THE GATE WORKS AND THE ECONOMIC ARGUMENT DOES NOT, AND THOSE ARE TWO
+        // CLAIMS THAT HAVE ALWAYS BEEN READ AS ONE.
+        //
+        // The gate half holds: the share of moments that stay silent RISES as the
+        // world becomes predicted, 40.0% over the opening against 43.3% after it.
+        // That is Rao & Ballard's claim proper -- a predicted input is silent -- and
+        // it is measured here for the first time, because the arm this test used to
+        // compare against was itself.
+        Assert.True(hushLate >= hushEarly,
+            $"the silent share fell as prediction improved ({hushLate:P1} later "
+            + $"against {hushEarly:P1} in the opening), so the gate is not tracking "
+            + "the prediction at all");
+
+        // THE ECONOMIC HALF IS REFUTED AT THESE SETTINGS, AND THIS ASSERTS THE
+        // REFUTATION SO IT CANNOT DRIFT BACK UNNOTICED. Traffic per step RISES,
+        // 20.6 to 30.6, because the widest row goes 6 to 10 over the same stretch
+        // and `Fire` emits one message per entry. Row growth swamps a three-point
+        // gain in silence, so "predicted input is silent" does not buy "traffic
+        // collapses" -- not while the row is still growing on a world whose
+        // statistics never move.
+        //
+        // IF THIS FAILS, THE ARGUMENT HAS BEEN RESCUED and the refuted row wants
+        // re-opening rather than this test wants fixing.
+        Assert.True(later > opened,
+            $"traffic per step no longer rises ({later:F1} against {opened:F1}), so "
+            + "step 2's economic argument may have been rescued -- re-open the "
+            + "refuted row rather than adjusting this bar");
 
         // AND THE SYSTEM STILL PREDICTS. Silence bought by a broken predictor is
         // not a saving, it is a system that has stopped working -- and the two
         // look identical in a message count alone.
-        Assert.True(after.Expected > before.Expected * 0.8,
-            $"the score went with the traffic: {after.Expected} against {before.Expected}");
+        Assert.True(whole.Expected > opening.Expected * 0.8,
+            $"the score went with the traffic: {whole.Expected} against {opening.Expected}");
 
         // THE INTERNAL ERROR SIGNAL EXISTS AT ALL, which is the part no dial in
         // this project has ever had. Every error until now was computed by the
         // harness from outside, where no controller could read it.
-        Assert.True(after.Expecting > 0.0, "nothing was ever expected");
-        Assert.True(after.Unspoken > 0, "no moment was ever silent");
+        Assert.True(whole.Expecting > 0.0, "nothing was ever expected");
+        Assert.True(whole.Unspoken > 0, "no moment was ever silent");
 
         output.WriteLine(
-            $"expected {after.Expecting:F4} of onsets, stayed silent on "
-            + $"{after.Unspoken} moments, and spent "
-            + $"{after.Messages / (double)before.Messages:P0} of the traffic");
+            $"expected {whole.Expecting:F4} of onsets, stayed silent on "
+            + $"{whole.Unspoken} moments, and spent "
+            + $"{later / opened:P0} of the opening traffic per step");
     }
 
     [Fact]

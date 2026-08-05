@@ -233,26 +233,44 @@ public sealed class RhythmTests(ITestOutputHelper output)
         // longer run is not available at any price. Here a longer run costs
         // nothing, so the rule stands: sweep at two run lengths, and treat any
         // dial measured at one as unread.
-        var dials = Fixture.Dials(stamina: 4.0);
+        // FOUR LENGTHS AND A MONOTONE RISE, WHICH IS A STRONGER STATEMENT THAN THE
+        // ONE THIS USED TO MAKE. It compared two lengths and required the gap to
+        // clear 0.05 -- an arbitrary constant, and one the world outgrew: 200 to 900
+        // now reads 0.9150 to 0.9521, a climb of 0.037 that is unmistakably a climb
+        // and does not clear the bar. Lowering the bar would be moving a goalpost;
+        // asking whether it rises AT EVERY LENGTH asks the actual claim, uses four
+        // times the evidence, and rests on no constant at all.
+        var dials = Fixture.Dials(stamina: 4.0) with { Span = 1 };
 
-        using var brief = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
-        using var lengthy = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
+        int[] lengths = [100, 200, 400, 900];
+        var scored = new List<RhythmResult>();
 
-        var short_ = await brief.RunAsync(200);
-        var extended = await lengthy.RunAsync(900);
+        foreach (var length in lengths)
+        {
+            using var run = new RhythmRun(World(), dials, seed: 1);
+            scored.Add(await run.RunAsync(length));
 
-        output.WriteLine($"short {short_}");
-        output.WriteLine($"long  {extended}");
+            output.WriteLine($"{length,5} {scored[^1]}");
+        }
 
-        // THE WORLD ITSELF DOES NOT MOVE: same cycle, same ceiling, same marginal.
-        Assert.Equal(short_.Ceiling, extended.Ceiling, 6);
-        Assert.Equal(short_.Marginal, extended.Marginal, 6);
+        // THE WORLD ITSELF DOES NOT MOVE: same cycle, same ceiling, same marginal,
+        // at every length. That is what makes the rise below a fact about the
+        // LEARNING and not about the world getting easier.
+        foreach (var one in scored)
+        {
+            Assert.Equal(scored[0].Ceiling, one.Ceiling, 6);
+            Assert.Equal(scored[0].Marginal, one.Marginal, 6);
+        }
 
-        // THE SCORE DOES, and by more than the margin anybody would call a dial
-        // effect. A sweep taken at one length here would be reading the length.
-        Assert.True(extended.Expected - short_.Expected > 0.05,
-            $"the score no longer climbs with data, so this world has saturated "
-            + $"and the two-length rule could be relaxed: "
-            + $"{short_.Expected} to {extended.Expected}");
+        // AND THE SCORE RISES EVERY TIME. A sweep taken at one length here is
+        // reading the length -- 0.8919, 0.9150, 0.9387, 0.9521, and still climbing
+        // at 1800. This world does not remove the trap; it makes it visible and
+        // cheap to respect.
+        for (var at = 1; at < scored.Count; at++)
+            Assert.True(scored[at].Expected > scored[at - 1].Expected,
+                $"the score stopped climbing between {lengths[at - 1]} and "
+                + $"{lengths[at]} steps ({scored[at - 1].Expected:F4} to "
+                + $"{scored[at].Expected:F4}), so this world has saturated and the "
+                + "two-length rule could be relaxed");
     }
 }

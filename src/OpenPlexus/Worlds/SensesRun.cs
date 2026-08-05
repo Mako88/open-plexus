@@ -266,13 +266,18 @@ public sealed class SensesRun : IDisposable
     /// <summary>The same question, with the plumbing left attached.</summary>
     private async Task<Asking> AskingAsync(int concept, CancellationToken ct)
     {
+        // THE ANSWER IS ALWAYS ASKED AT THE SETTLED BUDGET. Fork 24's probe used
+        // to BE this question, so a third of the run was answered at half the
+        // depth the world needs and marked wrong when it failed.
+        var origin = _world.Of(Senses.Sight, concept);
+
         var thought = await _senses
-            .ThinkAsync(_world.Of(Senses.Sight, concept), _budget.Next(), null, ct)
+            .ThinkAsync(origin, _budget.Stamina, null, ct)
             .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
-        var reached = thought.BestOf(Senses.Touch, 1);
+        var reached = thought.BestOf(Senses.Touch, 2);
         var report = new Asking(
             reached.Count == 0 ? null : reached[0].Endpoint,
             thought.Halted,
@@ -282,13 +287,71 @@ public sealed class SensesRun : IDisposable
             thought.Thwarted,
             thought.Best(int.MaxValue));
 
-        // FORK 24 IS TOLD WHETHER IT REACHED WHAT IT WAS NARROWING TO, not
-        // merely whether it reached somewhere. The caller knows what it was
-        // looking for and the controller deliberately does not.
-        _budget.Reached(reached.Count > 0);
+        // FORK 24 IS TOLD HOW CLEARLY IT ARRIVED, NOT MERELY WHETHER IT DID.
+        //
+        // REACHING IS NOT ANSWERING, and `Reached` could not tell them apart: a
+        // walk at half the budget still reaches SOME touch code, so the probe
+        // scored as a success while answering wrong -- and the probe is billed,
+        // because every question here is the measurement. Measured on `Senses`:
+        // 0.6051 with the controller against 0.8154 with it bypassed.
+        //
+        // SO THE COST IS THE SEPARATION, which `Note` was always the general form
+        // for -- its own note says a richer cost "is a quantity the harness
+        // already computes and has never been fed to anything". A top answer that
+        // barely beats the runner-up did not discriminate, however surely it
+        // arrived; one that beats it clearly did. NOTHING HERE READS WHETHER THE
+        // ANSWER WAS RIGHT: the margin is the walk's own, so the controller still
+        // cannot see the score, which is what keeps C4 intact.
+        // AND THE PROBE IS ASKED SEPARATELY AND NEVER SCORED, which is the whole
+        // of the fix. C4 leaves no free question -- every question here IS the
+        // measurement -- so the hunt cannot borrow one. It can ask its OWN, and
+        // pay in traffic rather than in accuracy. Measured on `Senses`: 0.6051
+        // billed against 0.8154 unbilled, and the second is what a run that never
+        // probes reads too, so the probe was the entire cost.
+        var trying = _budget.Next();
+
+        if (Math.Abs(trying - _budget.Stamina) < double.Epsilon)
+        {
+            _budget.Note(Separation(reached));
+        }
+        else
+        {
+            var probe = await _senses.ThinkAsync(origin, trying, null, ct)
+                .ConfigureAwait(false);
+
+            await _fabric.SettleAsync(probe, ct).ConfigureAwait(false);
+
+            _budget.Note(Separation(probe.BestOf(Senses.Touch, 2)));
+
+            _senses.Forget(probe.Id);
+        }
 
         _senses.Forget(thought.Id);
         return report;
+    }
+
+    /// <summary>
+    /// How clearly the best answer beat the next — <b>a cost, so lower is
+    /// better.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>NOTHING REACHED IS THE WORST AND COSTS ONE</b>, which is exactly what
+    /// <see cref="Budget.Reached"/> reported and keeps the two scales comparable.
+    /// A lone arrival separated everything it found, so it costs nothing. Two
+    /// arrivals cost the share of the winner the runner-up took — a tie costs
+    /// one, and a rout costs nothing.
+    /// </remarks>
+    private static double Separation(IReadOnlyList<Arrival> reached)
+    {
+        if (reached.Count == 0) return 1.0;
+        if (reached.Count == 1) return 0.0;
+
+        var best = reached[0].Score;
+
+        // A NON-POSITIVE WINNER SEPARATES NOTHING. Scores are accumulated route
+        // strengths and cannot be negative, so this is the degenerate case where
+        // the walk arrived with no weight at all.
+        return best <= 0.0 ? 1.0 : Math.Clamp(reached[1].Score / best, 0.0, 1.0);
     }
 
     public void Dispose() => _fabric.Dispose();

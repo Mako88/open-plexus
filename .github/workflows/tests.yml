@@ -74,5 +74,14 @@ jobs:
               exit 1
             } || echo "warning-clean"
 
+      # QUIET IS FOR THE BUILD, AND THE CONSOLE LOGGER IS FOR THE RESULT. At
+      # `--verbosity quiet` alone this step printed the NAME of every failing
+      # test and the message of none of them, so the only way to learn why
+      # anything failed was to reproduce it locally -- which is how a handoff
+      # came to say "12 red, every one diagnosed" on a run that was 35 red. A
+      # suite nobody can read the failure of is a suite that gets diagnosed by
+      # sampling.
       - name: Test
-        run: dotnet test --configuration Debug --nologo --no-build --verbosity quiet
+        run: |
+          dotnet test --configuration Debug --nologo --no-build \
+            --verbosity quiet --logger "console;verbosity=normal"

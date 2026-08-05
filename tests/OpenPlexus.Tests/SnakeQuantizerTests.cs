@@ -82,15 +82,21 @@ public sealed class SnakeQuantizerTests
             EnergyPerFood = 50.0,
         }, seed: 3);
 
-        var codes = new SnakeQuantizer().Codify(snake.View());
+        var view = snake.View();
+        var codes = new SnakeQuantizer().Codify(view);
 
-        // Empty cells are silent, so a 5x5 window yields only what is there.
-        Assert.True(codes.Count < 25);
+        // EVERY CELL EMITS, EMPTY ONES INCLUDED -- John's call, 2026-08-04; the
+        // audit that settled it is on `SnakeQuantizer.Modality`. This asserted
+        // the opposite until then, and what it is worth asserting NOW is the
+        // encoder's own claim: distinct cells cannot collide into one code,
+        // because two situations reading as one observation is the exact
+        // opposite of what a front end is for.
+        Assert.Equal(view.Cells.Count, codes.Count);
         Assert.Equal(codes.Count, codes.Distinct().Count());
     }
 
     [Fact]
-    public void An_empty_cell_emits_nothing()
+    public void An_empty_cell_emits_a_code_like_every_other()
     {
         var view = Viewing(
             new Seen(0, 0, Cell.Body),
@@ -99,14 +105,23 @@ public sealed class SnakeQuantizerTests
 
         var codes = new SnakeQuantizer().Codify(view);
 
-        // An occasion is a clique, so the codes per frame set how dense the
-        // graph is -- measured at 46,536 routes halted with empty cells against
-        // 6 without.
-        Assert.Equal(2, codes.Count);
+        // THIS ASSERTED THE WITHHOLDING UNTIL JOHN OVERRULED IT, 2026-08-04. An
+        // occasion is a clique, so codes per frame set how dense the graph is --
+        // 46,536 routes halted with empty cells against 6 without. That was
+        // measured under `Best` pricing, where the flood could enumerate every
+        // simple path; inverse cost bounds the walk by construction, so the
+        // saving is no longer being bought from anything. What withholding COST
+        // is what settled it: 47% of steps producing no onset at all over sixty
+        // seeds. See `SnakeQuantizer.Modality`.
+        Assert.Equal(3, codes.Count);
+        Assert.Equal(3, codes.Distinct().Count());
 
-        // The companion: the cells that mean something are still all there.
-        Assert.DoesNotContain(Cell.Empty, view.Cells.Take(0).Select(c => c.Content));
-        Assert.Equal(2, codes.Distinct().Count());
+        // AND THE COMPANION THAT USED TO SIT HERE COULD NOT FIRE. It read
+        // `view.Cells.Take(0)`, so it asked whether an EMPTY sequence contained
+        // an empty cell and was true however the quantiser behaved -- a check
+        // wired and unable to fire, which is a named trap in the plan and reads
+        // as passing forever. What it meant to say is that nothing was dropped.
+        Assert.Equal(view.Cells.Count, codes.Count);
     }
 
     [Fact]

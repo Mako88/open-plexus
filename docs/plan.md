@@ -96,6 +96,11 @@
 - **Space-Saving for the row cap** — the eviction scan is linear in the cap. Real
   text is what needs it: swallowing any is ruinous at a cap the questions still
   work under.
+- **Evict on EVIDENCE rather than on recency** — eviction is LRU, whose textbook
+  failure is the ubiquitous item that is always recently touched. `Doubt` already
+  computes the better key, and the cap is measurably eating what `Doubt` repairs.
+- **Cold storage as DEMOTION rather than forgetting** — the same change makes the
+  graph a database instead of a cache, and it is a solved shape (LSM, tiering).
 
 ### Housekeeping
 
@@ -138,14 +143,14 @@ condition is a superstition.**
 | `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted. **Deleted** | Lift in the **cost** |
 | Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | **REVIVED at one code** |
 | `Window` span | Null on snake, worse on `Babi`, and the whole task on `Rhythm` | **Something making a carried edge worth its ROW.** Kinds were half; a weight is not the other |
-| A carried-edge discount | Moves along the frontier the budget already describes, and starves the walk below it | A world where carried and simultaneous edges compete in one row |
+| A carried-edge discount | Moves along the frontier the budget already describes, and starves the walk COMPLETELY — nought accuracy and not one chain completed, at every budget | A world where carried and simultaneous edges compete in one row |
 | `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — no clear winner since** |
 | `Pricing.Balanced` | Times out — the geometric mean sits between the marginals, so weights rise and the walk explodes | A bound not relying on the weight being one marginal's reciprocal |
 | `Pricing.Driven` | Two local rules, both worse in both worlds; a per-hop choice puts routes on different scales | A local quantity predicting which arm wins, on a world where they differ |
 | `Accumulate.Fused` | Half of agreement's lift and all its cost; inverted orders tie identically under RRF | Many candidates, or a fusion separating by something other than position |
 | The carried negative discount (`Message.Against`) | Inert — an arm ignoring it reproduced the arm reading it. **Deleted** | A world where an act's harm is confined to a few states |
 | `Driven` / `Delayed` / `Topped` — credit as a heavier write | All three peak far below the bar at their own best budget. **Deleted** | Anything making a heavier write into *this was done here* mean something else |
-| ΔP over the credit cell (`Attending.Contingent`) | Not refuted, DOMINATED: it ties the one-sided count and inhibition clears both. **Deleted** | A world where some states are recoverable and others are not, so the base rate varies BY STATE |
+| ΔP over the credit cell (`Attending.Contingent`) | Not refuted, DOMINATED: it tied the one-sided count and inhibition cleared both — no longer. **Deleted** | A world where some states are recoverable and others are not, so the base rate varies BY STATE |
 | `Ranked` as step 4's fix | The lift was the bootstrap's coin toss, and a varying code thins every edge | Anything making the walk prefer a partner other than the one it took last |
 | Widening the walk — `Kindred`, `Foreseeing`, `Backing` | All three: louder and below the bar, or silent everywhere | **A likeness the GRAPH DID NOT COMPUTE** — step 8 and nothing short of it |
 | A trained quantiser — k-means | Two machines fitted on different samples code the same input differently | Never fitted |
@@ -190,6 +195,19 @@ condition is a superstition.**
   cannot afford to reach one. Spend more and see if the voice returns.
 - **A small sample can look like a mechanism.** One seed drew a clean learning curve
   six flattened; twelve seeds showed a gap thirty-two closed.
+- **AND IT HIDES A REAL EFFECT AS WELL AS INVENTING ONE.** A separation eight seeds
+  could not see was plain at four times that. Count seeds in BOTH directions.
+- **A STATISTIC READ OFF A BOUNDED QUANTITY READS THE BOUND.** `Widest` is clipped by
+  `Row`, so two saturated rows compare equal forever. Four tests did it, and one
+  reported the opposite of the truth for as long as it existed.
+- **An unsigned separation cannot tell a collapse from a breakthrough.**
+  `Measured.Separation` called a steep fall "the arm has started learning". Assert
+  the DIRECTION apart from the size.
+- **A dial can be wired to ONE WORLD IN TEN.** `Names` is read by `SnakeRun` and
+  nothing else, and was cashed in citing a finding as though it were general.
+- **Seeds that change nothing make every separation infinite.** bAbI is a fixed
+  corpus in a fixed order, so every arm's spread is nought and a significance bar
+  there passes for any difference at all.
 - **A mean over a population the problem created cannot see it.** Read `Widest`.
 - **A `cref` is not a call and a `ToString` is not an assertion** — both are how a
   dead mechanism goes on looking alive. `DeadCodeTests` is the budget.
@@ -204,9 +222,13 @@ condition is a superstition.**
 ## OPEN DEFECTS
 
 - **`Accumulate.Agreement` reads EXACTLY equal to `Sum`** on `Composed` and
-  `Ranking`, and **the minted name is NOT why** — it ties identically with
-  chunking suppressed outright. Not the arrival-order fix either. Two
-  explanations are spent and the defect is untouched.
+  `Ranking`. Three explanations spent: not the minted name, not arrival order, not
+  the narrowed second broadcast. **Next: whether `_agreeing` is populated at all** —
+  nought everywhere would tie every comparison.
+
+- **The credit arm gets WORSE with more data on `Homeostat`**, monotonically across
+  three run lengths. Asserted as a decline; nobody has asked what a longer run
+  accumulates that misleads the walk.
 
 ---
 

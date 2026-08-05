@@ -68,11 +68,22 @@ public sealed record MotifResult : Questioned
     /// <inheritdoc cref="Learning.Chunk.Coined"/>
     public required int Coined { get; init; }
 
+    /// <inheritdoc cref="Learning.Chunk.Noticed"/>
+    /// <remarks>
+    /// <b>THE DENOMINATOR, AND IT IS REPORTED BECAUSE CHUNKING IS AN OPEN
+    /// QUESTION AS OF 2026-08-05.</b> Minting is unconditional now and costs this
+    /// world half its accuracy — 0.8276 with the naming suppressed against 0.4483
+    /// with it. Whether that is the detector naming NOISE or naming the right sets
+    /// and the walk paying for the hop is exactly the ratio of these two numbers,
+    /// and it was not visible from outside.
+    /// </remarks>
+    public required int Noticed { get; init; }
+
     public override string ToString() =>
         $"motifs={Motifs} moments={Moments} asked={Asked} right={Right} silent={Silent} | " +
         $"accuracy={Accuracy:F4} chance={Chance:F4} | " +
         $"edges={Edges} compressed={Compressed} uncompressed={Uncompressed} | " +
-        $"coined={Coined} | " +
+        $"coined={Coined} noticed={Noticed} | " +
         $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
         $"nodes={Nodes} widest={Widest} spread=[{string.Join(",", Spread)}] | " +
         $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | " +
@@ -215,6 +226,7 @@ public sealed class MotifRun : IDisposable
             Halted = halted,
             Unsettled = unsettled,
             Coined = _eyes.Chunks.Coined,
+            Noticed = _eyes.Chunks.Noticed,
         };
     }
 

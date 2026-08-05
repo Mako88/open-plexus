@@ -17,9 +17,18 @@ public sealed class DepartureTests : IDisposable
 
     private static Code C(ulong value) => new(Modality: 1, value);
 
+    /// <remarks>
+    /// <b>THE ROW IS UNBOUNDED HERE AND THAT IS THE MEASUREMENT, NOT A DODGE.</b>
+    /// This file asks what DEPARTURE TRACKING costs — one entry per cluster rather
+    /// than one per route — so it builds a node holding 299 routes on purpose. The
+    /// cap was cashed in at 32 on 2026-08-05, which would truncate the very row
+    /// being counted and turn a question about tracking into a question about
+    /// eviction. <see cref="WalkSettings.Row"/> is a QUANTITY, and reading it at
+    /// the top of its range is how anybody knows what 32 is buying.
+    /// </remarks>
     private static readonly WalkSettings Dials = new()
     {
-        Stamina = 10.0, Horizon = 6,
+        Stamina = 10.0, Horizon = 6, Row = Fixture.Unbounded,
     };
 
     private readonly HybridBus _bus = new();

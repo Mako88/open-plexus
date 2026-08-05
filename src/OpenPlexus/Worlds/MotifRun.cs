@@ -114,18 +114,12 @@ public sealed class MotifRun : IDisposable
     /// <param name="world">The stream to watch.</param>
     /// <param name="dials">The walk.</param>
     /// <param name="seed">This run's own generator.</param>
-    /// <param name="chunking">
-    /// <b>Step 3, and OFF is every measurement taken before it.</b> It has to be
-    /// an arm: minting a node moves counts that were already measured, exactly as
-    /// splitting the window's carried edge did.
-    /// </param>
     /// <param name="clusters">How many clusters to stand up.</param>
     /// <param name="replicas">Ring points per cluster.</param>
     public MotifRun(
         MotifSettings world,
         WalkSettings dials,
         int seed,
-        bool chunking = false,
         int clusters = 8,
         int replicas = 256)
     {
@@ -136,7 +130,7 @@ public sealed class MotifRun : IDisposable
         _settings = world;
         _dials = dials;
         _fabric = new Fabric(dials, seed, clusters, replicas);
-        _chunks = chunking ? new Chunk() : null;
+        _chunks = dials.Chunking ? new Chunk() : null;
 
         _eyes = new InputMachine<ImmutableArray<Code>>(
             new MachineAddress("eyes"), new Seeing(), new LocalRendezvous(_fabric.Local),

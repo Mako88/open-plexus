@@ -168,8 +168,11 @@ public sealed class BlockingTests(ITestOutputHelper output)
         {
             using var run = new Worlds.RhythmRun(
                 new Worlds.RhythmSettings { Symbols = 12, Period = 5, Violations = 0.1 },
-                Fixture.Dials(stamina: 3.0), seed,
-                span: 1, surprising: true, gated: gated);
+                Fixture.Dials(stamina: 3.0) with
+                {
+                    Span = 1, Surprising = true, Gated = gated,
+                },
+                seed);
 
             var result = await run.RunAsync(900);
 

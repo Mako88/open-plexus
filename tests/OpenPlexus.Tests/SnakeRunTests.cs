@@ -63,7 +63,7 @@ public sealed class SnakeRunTests
         // the difference an action makes is swamped -- measured inert at every
         // sight radius tried. That is itself the "naming fewer predicted codes"
         // row: coarse ranking informs and fine does not.
-        using var wired = new SnakeRun(World(), Dials(), seed: 1, names: 1);
+        using var wired = new SnakeRun(World(), Dials() with { Names = 1 }, seed: 1);
         var result = await wired.PlayAsync(500);
 
         Assert.True(result.Consequence.Asked > 0, "no consequence was ever scored");
@@ -98,7 +98,7 @@ public sealed class SnakeRunTests
         //
         // Without this, the test above passes for a harness that reports any
         // positive number.
-        using var run = new SnakeRun(World(), Dials(), seed: 1, names: 1);
+        using var run = new SnakeRun(World(), Dials() with { Names = 1 }, seed: 1);
         var result = await run.PlayAsync(500, cut: true);
 
         Assert.True(result.Consequence.Asked > 0, "no consequence was ever scored");

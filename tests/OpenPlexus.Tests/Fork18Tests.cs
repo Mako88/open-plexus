@@ -40,7 +40,7 @@ public sealed class Fork18Tests(ITestOutputHelper output)
         // here, and it has already caught one arm that survived three
         // measurements.
         using var flat = new SnakeRun(World(), Dials(), seed: 3);
-        using var ordered = new SnakeRun(World(), Dials(), seed: 3, kinds: true);
+        using var ordered = new SnakeRun(World(), Dials() with { Kinds = true }, seed: 3);
 
         await flat.PlayAsync(120);
         await ordered.PlayAsync(120);
@@ -83,7 +83,7 @@ public sealed class Fork18Tests(ITestOutputHelper output)
         foreach (var seed in (int[])[3, 7, 11, 17, 23, 31, 41, 47, 59, 67, 73, 83])
             foreach (var kinds in new[] { false, true })
             {
-                using var run = new SnakeRun(World(), Dials(), seed, kinds: kinds);
+                using var run = new SnakeRun(World(), Dials() with { Kinds = kinds }, seed);
                 var result = await run.PlayAsync(Steps);
 
                 moved[kinds].Add(result.Consequence.Moved);

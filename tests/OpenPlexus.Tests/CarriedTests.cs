@@ -47,8 +47,7 @@ public sealed class CarriedTests(ITestOutputHelper output)
 
         foreach (var seed in Seeds)
         {
-            using var run = new RhythmRun(
-                World(), Fixture.Dials(stamina), seed, span: 1, carried: carried);
+            using var run = new RhythmRun(World(), Fixture.Dials(stamina) with { Span = 1, Carried = carried }, seed);
 
             var result = await run.RunAsync(Moments);
 

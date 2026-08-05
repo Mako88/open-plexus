@@ -124,6 +124,32 @@ public sealed class DialTests(ITestOutputHelper output)
             "the write-path half of `Surprising`, and on or off for the same "
             + "reason. It is a claim about LEARNING where the other is about COST",
 
+        ["Chunking"] =
+            "step 3, on or off. What a chunk COSTS to keep is a level and belongs "
+            + "to `Chunk` itself; whether to name sets at all is not",
+
+        ["Carried"] =
+            "OPEN. What a carried occasion is worth against a simultaneous one is "
+            + "a genuine continuum and nothing hunts it — but the refuted "
+            + "carried-edge discount row says a weight was not what the window "
+            + "needed, so this waits on that being answered rather than tuned",
+
+        ["Recent"] =
+            "a question's preference rather than a level, and on or off",
+
+        ["Depth"] =
+            "OPEN, AND THE PLAN CALLS IT OUT. Every rollout step is a whole walk, "
+            + "so depth currently borrows `Stamina`'s budget. It wants its own "
+            + "control, and that is an item rather than an excuse",
+
+        ["IncludeEmpty"] =
+            "revived with no clear winner since, so it is an open ARM rather than "
+            + "a level. Whether an empty moment is an occasion is a claim about "
+            + "the world, not a quantity to hunt",
+
+        ["Names"] =
+            "REVIVED AT ONE CODE. Coarse ranking informs and fine does not, so the "
+            + "useful settings are one and null — a choice rather than a continuum",
     };
 
     /// <summary>
@@ -368,16 +394,19 @@ public sealed class DialTests(ITestOutputHelper output)
         // forgetting this design has -- the bet is that nothing can be unlearned,
         // only outvoted, and until now there was no way to test whether that bet is
         // survivable.
-        // AND TO TWELVE, WHICH IS NOT FIVE NEW KNOBS. John moved the dials out
+        // AND TO EIGHTEEN, WHICH IS NOT ELEVEN NEW KNOBS. John moved the dials out
         // of the worlds and into the brain on 2026-08-04, and every one of these
         // already existed as a `*Run` constructor argument -- somewhere this census
         // enumerates `WalkSettings` and therefore could not look. THE BUDGET WAS
         // MEASURING ITS OWN BLIND SPOT: a file whose whole job is to notice a sixth
-        // dial arriving beside five could not see five of them, with more still to come as the
-        // remaining worlds are migrated.
+        // dial arriving beside five could not see eleven of them.
+        //
+        // EIGHTEEN IS THE HONEST NUMBER AND IT IS MUCH WORSE THAN SEVEN. That is
+        // the argument this file exists to force, and it could not be had while
+        // eleven of the knobs were hiding in world constructors.
         //
         // THE NUMBER IS THE HONEST ONE NOW, and it is much worse than seven. That
         // is the argument this file exists to force.
-        Assert.Equal(12, HandSet.Count);
+        Assert.Equal(18, HandSet.Count);
     }
 }

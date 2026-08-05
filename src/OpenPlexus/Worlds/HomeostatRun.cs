@@ -239,16 +239,9 @@ public sealed class HomeostatRun : IDisposable
     private readonly LocalRendezvous _joining;
     private readonly WalkSettings _dials;
 
-    /// <summary>How many moments a departed code is carried for.</summary>
-    private readonly int _span;
-
     /// <param name="world">The shape of the body.</param>
     /// <param name="dials">The walk.</param>
     /// <param name="seed">The world's generator and the ring's, so a run reproduces.</param>
-    /// <param name="span">
-    /// How many moments a departed code is carried for — <b>and zero is every
-    /// measurement this world has ever produced.</b>
-    /// </param>
     /// <remarks>
     /// <para>
     /// <b>THIS WORLD HAD NO TEMPORAL CELLS AT ALL, AND NOBODY HAD NOTICED.</b>
@@ -276,24 +269,19 @@ public sealed class HomeostatRun : IDisposable
         HomeostatSettings world,
         WalkSettings dials,
         int seed,
-        int span = 0,
         int clusters = 8,
         int replicas = 256)
     {
-        ArgumentNullException.ThrowIfNull(world);
-        ArgumentNullException.ThrowIfNull(dials);
-
+        _fabric = Fabric.Standing(world, dials, seed, clusters, replicas);
         _settings = world;
         _dials = dials;
         Seed = seed;
-        _span = span;
-        _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _joining = new LocalRendezvous(_fabric.Local);
 
         _body = new InputMachine<ImmutableArray<Code>>(
             new MachineAddress("body"), new Feeling(), _joining,
-            _fabric.Bus, _fabric.Ring, dials, span);
+            _fabric.Bus, _fabric.Ring, dials, dials.Span);
 
         _fabric.Subscribe(_body);
     }

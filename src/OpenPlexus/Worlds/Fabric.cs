@@ -45,6 +45,35 @@ public sealed class Fabric : IDisposable
     private readonly List<IDisposable> _handles = [];
     private readonly List<Exception> _faults = [];
 
+    /// <summary>
+    /// The standing preamble every world runner opens with: check what it was
+    /// handed, then stand up the fabric.
+    /// </summary>
+    /// <remarks>
+    /// <b>EXTRACTED BECAUSE THE DIAL MIGRATION MADE THE WORLDS IDENTICAL HERE, and
+    /// the clone budget said so within the hour.</b> Once a world stopped choosing
+    /// its own arms, every runner's constructor became the same four lines — which
+    /// is the migration working rather than a fault, but duplicated code is
+    /// duplicated whatever produced it.
+    /// <para>
+    /// <b>The honest fix is a shared base for the runners</b>, which is a larger
+    /// change than this and is written down rather than half-done here.
+    /// </para>
+    /// </remarks>
+    /// <param name="world">The world's own settings, checked and not otherwise used.</param>
+    /// <param name="dials">The walk.</param>
+    /// <param name="seed">The ring's seed.</param>
+    /// <param name="clusters">How many clusters the fabric holds.</param>
+    /// <param name="replicas">Ring replicas per cluster.</param>
+    public static Fabric Standing(
+        object world, WalkSettings dials, int seed, int clusters, int replicas)
+    {
+        ArgumentNullException.ThrowIfNull(world);
+        ArgumentNullException.ThrowIfNull(dials);
+
+        return new Fabric(dials, seed, clusters, replicas);
+    }
+
     /// <param name="dials">The walk every cluster is built with.</param>
     /// <param name="seed">The ring's seed, and the jitter's.</param>
     /// <param name="clusters">How many clusters to stand up.</param>

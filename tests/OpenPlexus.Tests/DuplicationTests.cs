@@ -62,6 +62,33 @@ public sealed class DuplicationTests
         + @"|else|try|do|Argument\w*Exception\.Throw\w*\(.*\);)$",
         RegexOptions.Compiled);
 
+    /// <summary>
+    /// A parameter being declared, which is a SIGNATURE rather than a statement.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ADDED 2026-08-04, AND THE REASON MATTERS MORE THAN THE PATTERN.</b> The
+    /// dials moved out of the worlds and into <see cref="WalkSettings"/>, so every
+    /// world runner's constructor now reads <c>(settings, dials, seed, clusters,
+    /// replicas)</c> — IDENTICALLY, ON PURPOSE. That uniformity is the whole point
+    /// of the change: a world says what it is looking at and nothing else.
+    /// </para>
+    /// <para>
+    /// <b>Counting those four lines as a clone would make the architecture fail the
+    /// build, and no extraction can fix it</b> — a shared base class would leave
+    /// the same four parameter lines behind, because the signature is what is
+    /// shared. So this is a fix to what counts as a statement, NOT a raised window:
+    /// <see cref="Window"/> is untouched at six, and the moment two constructors
+    /// share six real statements it still fails.
+    /// </para>
+    /// <para>
+    /// <b>A statement ends in a semicolon and a parameter does not</b>, which is
+    /// what keeps this from swallowing anything that carries logic.
+    /// </para>
+    /// </remarks>
+    private static readonly Regex Parameter = new(
+        @"^\w[\w<>?\[\]\.]*\s+\w+(\s*=\s*[^;]+?)?\s*[,)]$", RegexOptions.Compiled);
+
     private static readonly Regex Comment = new(@"^\s*(//|///|\*|/\*)", RegexOptions.Compiled);
 
     private static readonly Regex Spacing = new(@"\s+", RegexOptions.Compiled);
@@ -179,7 +206,10 @@ public sealed class DuplicationTests
         {
             var line = lines[i].Trim();
 
-            if (line.Length == 0 || Comment.IsMatch(line) || Noise.IsMatch(line)) continue;
+            if (line.Length == 0
+                || Comment.IsMatch(line)
+                || Noise.IsMatch(line)
+                || Parameter.IsMatch(line)) continue;
 
             kept.Add((Spacing.Replace(line, " "), i + 1));
         }

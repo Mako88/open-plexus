@@ -180,7 +180,6 @@ public sealed class RhythmRun : IDisposable
     private readonly InputMachine<Code> _ear;
     private readonly Rhythm _world;
     private readonly WalkSettings _dials;
-    private readonly int _span;
 
     /// <inheritdoc cref="Learning.Surprise"/>
     private readonly Surprise? _surprise;
@@ -198,48 +197,12 @@ public sealed class RhythmRun : IDisposable
     /// <param name="world">The shape of the stream.</param>
     /// <param name="dials">The walk.</param>
     /// <param name="seed">The world's generator and the ring's, so a run reproduces.</param>
-    /// <param name="span">
-    /// How many moments a departed symbol is carried for. <b>Zero leaves this
-    /// world with no edges at all</b>, because nothing here is ever simultaneous
-    /// with anything — see <see cref="Rhythm"/>.
-    /// </param>
-    /// <param name="surprising">
-    /// Whether step 2 is on. <b>Off is every measurement taken before
-    /// <see cref="Learning.Surprise"/> existed</b>: every onset is broadcast,
-    /// nothing is suppressed, and both internal signals read zero.
-    /// </param>
-    /// <param name="carried">
-    /// What a carried pair counts for against a simultaneous one — <b>the window's
-    /// standing revival condition.</b> One is every measurement taken before it,
-    /// and this world is where the arm has most to lose: nothing here is ever
-    /// simultaneous, so EVERY edge it holds is a carried one.
-    /// </param>
-    /// <param name="recent">
-    /// Whether the prediction PREFERS WHAT IS STILL TRUE — see
-    /// <see cref="Question.Recent"/>. <b>Off is every measurement taken before it
-    /// existed</b>, and it has nothing to say on a stream that never turns.
-    /// </param>
-    /// <param name="gated">
-    /// Whether the WRITE path is gated by surprise too — <b>step 2's second half.</b>
-    /// Off is every measurement taken before it existed.
-    /// </param>
-    /// <param name="depth">
-    /// How many steps ahead to roll — <b>step 11, and one is the reflex this
-    /// project already had.</b> Each extra step feeds the last prediction back in
-    /// as a synthetic moment and asks again.
-    /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
     public RhythmRun(
         RhythmSettings world,
         WalkSettings dials,
         int seed,
-        int span = 1,
-        bool surprising = false,
-        double carried = 1.0,
-        bool recent = false,
-        bool gated = false,
-        int depth = 1,
         int clusters = 8,
         int replicas = 256)
     {
@@ -248,16 +211,15 @@ public sealed class RhythmRun : IDisposable
 
         _world = new Rhythm(world, seed);
         _dials = dials;
-        _span = span;
-        _surprise = surprising ? new Surprise() : null;
-        _depth = depth < 1 ? 1 : depth;
-        _asking = recent ? new Question { Recent = true } : null;
+        _surprise = dials.Surprising ? new Surprise() : null;
+        _depth = dials.Depth < 1 ? 1 : dials.Depth;
+        _asking = dials.Recent ? new Question { Recent = true } : null;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _ear = new InputMachine<Code>(
             new MachineAddress("ear"), new Hearing(),
-            new LocalRendezvous(_fabric.Local, carried: carried),
-            _fabric.Bus, _fabric.Ring, dials, span, _surprise, gated: gated);
+            new LocalRendezvous(_fabric.Local, carried: dials.Carried),
+            _fabric.Bus, _fabric.Ring, dials, dials.Span, _surprise, gated: dials.Gated);
 
         _fabric.Subscribe(_ear);
     }
@@ -391,7 +353,7 @@ public sealed class RhythmRun : IDisposable
 
         return new RhythmResult
         {
-            Span = _span,
+            Span = _dials.Span,
             Depth = _depth,
             Rolled = far == 0 ? 0.0 : farRight / (double)far,
             Moments = moments,

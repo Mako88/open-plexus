@@ -186,8 +186,9 @@ public sealed class RecencyTests(ITestOutputHelper output)
     private static async Task<double> StreamAsync(int? turns, bool recent, int seed)
     {
         using var run = new Worlds.RhythmRun(
-            Turning(turns), Fixture.Dials(stamina: 3.0), seed,
-            span: 1, recent: recent);
+            Turning(turns),
+            Fixture.Dials(stamina: 3.0) with { Span = 1, Recent = recent },
+            seed);
 
         return (await run.RunAsync(900)).Accuracy;
     }

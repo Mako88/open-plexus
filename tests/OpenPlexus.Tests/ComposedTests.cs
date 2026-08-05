@@ -208,7 +208,7 @@ public sealed class ComposedTests
 
         var accuracy = await Sweep.ArmAsync($"{refer}", Repeats, async seed =>
         {
-            using var run = new ComposedRun(world ?? World(), dials ?? Dials, seed, ranking);
+            using var run = new ComposedRun(world ?? World(), (dials ?? Dials) with { Ranking = ranking }, seed);
             var result = await run.RunAsync(Scenes, refer, every: 10).ConfigureAwait(false);
 
             reference += result.Reference / Repeats;

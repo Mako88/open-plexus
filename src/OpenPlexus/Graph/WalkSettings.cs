@@ -444,6 +444,41 @@ public sealed record WalkSettings
     /// </remarks>
     public bool Gated { get; init; }
 
+    /// <summary>
+    /// Whether a set that keeps arriving whole earns a name — <b>step 3</b>, and
+    /// see <see cref="Learning.Chunk"/>.
+    /// </summary>
+    public bool Chunking { get; init; }
+
+    /// <summary>
+    /// What a carried code's occasion is worth against a simultaneous one.
+    /// </summary>
+    /// <remarks><b>One is no discount</b>, which is the control.</remarks>
+    public double Carried { get; init; } = 1.0;
+
+    /// <summary>Whether a question prefers what was seen recently.</summary>
+    public bool Recent { get; init; }
+
+    /// <summary>How many steps ahead a rollout predicts.</summary>
+    /// <remarks>
+    /// <b>One is a single step.</b> The plan wants this to get its own control
+    /// rather than borrowing <see cref="Stamina"/>, because every rollout step is
+    /// a whole walk.
+    /// </remarks>
+    public int Depth { get; init; } = 1;
+
+    /// <summary>
+    /// Whether an observation with nothing in it is still an occasion.
+    /// </summary>
+    /// <remarks><b>Revived, and no clear winner since.</b></remarks>
+    public bool IncludeEmpty { get; init; }
+
+    /// <summary>
+    /// How many predicted codes a question names. <b>Null lets the walk decide.</b>
+    /// </summary>
+    /// <remarks><b>Revived at ONE code</b> — coarse ranking informs, fine does not.</remarks>
+    public int? Names { get; init; }
+
 
     /// <summary>
     /// Let a machine hunt for its own <see cref="Stamina"/> — <b>fork 24</b>.

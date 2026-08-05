@@ -63,8 +63,8 @@ public sealed class RankingTests(ITestOutputHelper output)
             Values = 24, CodesPerValue = 3, Segmented = true, Tagged = true,
         };
 
-        using var conjoined = new ComposedRun(world, dials, seed: 1, Accumulate.Agreement);
-        using var summed = new ComposedRun(world, dials, seed: 1, Accumulate.Sum);
+        using var conjoined = new ComposedRun(world, dials with { Ranking = Accumulate.Agreement }, seed: 1);
+        using var summed = new ComposedRun(world, dials with { Ranking = Accumulate.Sum }, seed: 1);
 
         var asking = await conjoined.RunAsync(400, Refer.Narrowed, every: 10);
         var plain = await summed.RunAsync(400, Refer.Narrowed, every: 10);

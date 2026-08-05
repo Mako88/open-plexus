@@ -78,7 +78,7 @@ public sealed class RhythmTests(ITestOutputHelper output)
         // simultaneous with anything, so an occasion's onsets pair with an empty
         // live set and there is nothing to learn -- unless a departed symbol is
         // carried forward into the next moment.
-        using var run = new RhythmRun(World(), Fixture.Dials(stamina: 4.0), seed: 1, span: 0);
+        using var run = new RhythmRun(World(), Fixture.Dials(stamina: 4.0) with { Span = 0 }, seed: 1);
         var result = await run.RunAsync(300);
 
         output.WriteLine(result.ToString());
@@ -103,7 +103,7 @@ public sealed class RhythmTests(ITestOutputHelper output)
         // Carrying before reading fixes the phase. The two offsets are both still
         // reported, because an accuracy alone cannot tell "learnt nothing" from
         // "learnt it one step out", and a regression would look like the former.
-        using var run = new RhythmRun(World(), Fixture.Dials(stamina: 4.0), seed: 1, span: 1);
+        using var run = new RhythmRun(World(), Fixture.Dials(stamina: 4.0) with { Span = 1 }, seed: 1);
         var result = await run.RunAsync(600);
 
         output.WriteLine(result.ToString());
@@ -136,8 +136,8 @@ public sealed class RhythmTests(ITestOutputHelper output)
         // thinking less.
         var dials = Fixture.Dials(stamina: 4.0);
 
-        using var loud = new RhythmRun(World(), dials, seed: 1, span: 1);
-        using var quiet = new RhythmRun(World(), dials, seed: 1, span: 1, surprising: true);
+        using var loud = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
+        using var quiet = new RhythmRun(World(), dials with { Span = 1, Surprising = true }, seed: 1);
 
         var before = await loud.RunAsync(600);
         var after = await quiet.RunAsync(600);
@@ -183,8 +183,8 @@ public sealed class RhythmTests(ITestOutputHelper output)
         // dial measured at one as unread.
         var dials = Fixture.Dials(stamina: 4.0);
 
-        using var brief = new RhythmRun(World(), dials, seed: 1, span: 1);
-        using var lengthy = new RhythmRun(World(), dials, seed: 1, span: 1);
+        using var brief = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
+        using var lengthy = new RhythmRun(World(), dials with { Span = 1 }, seed: 1);
 
         var short_ = await brief.RunAsync(200);
         var extended = await lengthy.RunAsync(900);

@@ -39,7 +39,7 @@ public sealed class ReportTests
         // an unwiring that only showed up in one of them would be missed.
         foreach (var empty in (bool[])[false, true])
         {
-            using var run = new SnakeRun(World(), Dials(), seed: 3, includeEmpty: empty);
+            using var run = new SnakeRun(World(), Dials() with { IncludeEmpty = empty }, seed: 3);
             var report = await run.ReportAsync(500);
 
             Assert.True(report.Complaints.Count == 0,

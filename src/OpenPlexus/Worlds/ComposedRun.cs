@@ -168,23 +168,16 @@ public sealed class ComposedRun : IDisposable
     private readonly WalkSettings _dials;
 
     /// <summary>How this world's question wants its candidates ranked.</summary>
-    private readonly Accumulate _ranking;
 
     /// <param name="world">The world's shape.</param>
     /// <param name="dials">The walk.</param>
     /// <param name="seed">The world's generator and the ring's.</param>
-    /// <param name="ranking">
-    /// How this world's question wants its candidates ranked. <b>A conjunction by
-    /// default, because that is what this world asks</b> — the parameter exists so
-    /// a test can show that asking otherwise costs the result.
-    /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
     public ComposedRun(
         ComposedSettings world,
         WalkSettings dials,
         int seed,
-        Accumulate ranking = Accumulate.Agreement,
         int clusters = 8,
         int replicas = 256)
     {
@@ -193,7 +186,6 @@ public sealed class ComposedRun : IDisposable
 
         _world = new Composed(world, seed);
         _dials = dials;
-        _ranking = ranking;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _eyes = new InputMachine<Moment>(
@@ -341,7 +333,7 @@ public sealed class ComposedRun : IDisposable
         var origins = Origins(episode, which, refer);
 
         var thought = await _eyes
-            .ThinkAsync(origins, _dials.Stamina, Asking(origins, _ranking), ct)
+            .ThinkAsync(origins, _dials.Stamina, Asking(origins, _dials.Ranking), ct)
             .ConfigureAwait(false);
 
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);

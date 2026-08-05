@@ -25,9 +25,10 @@ namespace OpenPlexus.Tests;
 /// enumerates <see cref="WalkSettings"/>, and these were never there.
 /// </para>
 /// <para>
-/// <b>The remaining list is the migration, and it may only ever shrink.</b> That is
-/// deliberate — a to-do list that fails the build is one that gets done, and one
-/// that cannot grow is one nobody adds to by accident.
+/// <b>THE LIST REACHED NOUGHT ON THE DAY IT WAS WRITTEN.</b> It began as fifteen
+/// dials across seven worlds and was a to-do list that failed the build, which is
+/// the only kind that gets done. It is kept at nought rather than deleted, because
+/// what it guards is not the migration — it is the next world somebody adds.
 /// </para>
 /// </remarks>
 public sealed class ShapeTests(ITestOutputHelper output)
@@ -47,32 +48,15 @@ public sealed class ShapeTests(ITestOutputHelper output)
     };
 
     /// <summary>
-    /// Dials still living on a world, each waiting to move to
-    /// <see cref="WalkSettings"/>.
+    /// Dials still living on a world. <b>Empty, and it stays empty.</b>
     /// </summary>
     /// <remarks>
-    /// <b>THIS LIST MAY ONLY SHRINK.</b> bAbI went first as the vertical slice that
-    /// proves the pattern; the rest follow. Every entry is a place where a world is
-    /// still deciding something that belongs to the brain.
+    /// <b>Fifteen, across seven worlds, and now none.</b> Kept as an empty set
+    /// rather than deleted so the check reads the same way it did while the work
+    /// was outstanding — anything that shows up here again is a regression with a
+    /// name, not a mystery.
     /// </remarks>
-    private static readonly HashSet<string> NotYetMoved = new(StringComparer.Ordinal)
-    {
-        "ClevrRun.ranking",
-        "ComposedRun.ranking",
-        "HomeostatRun.span",
-        "MotifRun.chunking",
-        "RhythmRun.span",
-        "RhythmRun.surprising",
-        "RhythmRun.carried",
-        "RhythmRun.recent",
-        "RhythmRun.gated",
-        "RhythmRun.depth",
-        "SnakeRun.span",
-        "SnakeRun.includeEmpty",
-        "SnakeRun.names",
-        "SnakeRun.kinds",
-        "TendingRun.span",
-    };
+    private static readonly HashSet<string> NotYetMoved = new(StringComparer.Ordinal);
 
     [Fact]
     public void No_world_takes_a_dial_that_belongs_to_the_brain()
@@ -126,9 +110,10 @@ public sealed class ShapeTests(ITestOutputHelper output)
         // is no ordinary edit that should raise this: every entry is a world
         // deciding something the brain should decide, and the whole direction of
         // travel is towards nought.
-        Assert.True(NotYetMoved.Count <= 15,
-            $"{NotYetMoved.Count} dials still live on worlds, which is more than "
-            + "when this was written. The list is meant to shrink.");
+        Assert.True(NotYetMoved.Count == 0,
+            $"{NotYetMoved.Count} dials live on worlds again. This reached NOUGHT on "
+            + "2026-08-04 and the only direction left is back up, which is the "
+            + "one this must never go.");
     }
 
     /// <summary>Every world runner, found rather than listed.</summary>

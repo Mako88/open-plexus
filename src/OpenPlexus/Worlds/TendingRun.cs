@@ -225,15 +225,9 @@ public sealed class TendingRun : IDisposable
     private readonly Fabric _fabric;
     private readonly InputMachine<ImmutableArray<Code>> _body;
     private readonly WalkSettings _dials;
-    private readonly int _span;
-
     /// <param name="world">The shape of the garden.</param>
     /// <param name="dials">The walk.</param>
     /// <param name="seed">The world's generator and the ring's, so a run reproduces.</param>
-    /// <param name="span">
-    /// How many moments a departed code is carried for. <b>One by default, and
-    /// that is a departure from every other world here.</b>
-    /// </param>
     /// <remarks>
     /// <b>THE CARRIED WINDOW IS ON BY DEFAULT BECAUSE THIS WORLD IS ABOUT TIME.</b>
     /// A span of nought writes no <c>after</c> cells at all, and a world built so
@@ -247,22 +241,17 @@ public sealed class TendingRun : IDisposable
         TendingSettings world,
         WalkSettings dials,
         int seed,
-        int span = 1,
         int clusters = 8,
         int replicas = 256)
     {
-        ArgumentNullException.ThrowIfNull(world);
-        ArgumentNullException.ThrowIfNull(dials);
-
+        _fabric = Fabric.Standing(world, dials, seed, clusters, replicas);
         _settings = world;
         _dials = dials;
-        _span = span;
         Seed = seed;
-        _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _body = new InputMachine<ImmutableArray<Code>>(
             new MachineAddress("gardener"), new Feeling(), new LocalRendezvous(_fabric.Local),
-            _fabric.Bus, _fabric.Ring, dials, span);
+            _fabric.Bus, _fabric.Ring, dials, dials.Span);
 
         _fabric.Subscribe(_body);
     }

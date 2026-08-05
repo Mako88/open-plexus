@@ -208,24 +208,6 @@ public sealed class SnakeRun : IDisposable
     private readonly SnakeSense _sense;
     private readonly WalkSettings _dials;
 
-    /// <summary>
-    /// How many codes a prediction names. Null means as many as an observation
-    /// holds.
-    /// </summary>
-    /// <remarks>
-    /// <b>A handle on the ranking, not on the graph.</b> If the order the
-    /// arrivals come in carries information, naming more of them must dilute
-    /// precision; if precision is flat in this, the order carries nothing and
-    /// only the set does.
-    /// </remarks>
-    private readonly int? _names;
-
-    /// <summary>
-    /// Whether the action is recorded as coming BEFORE what was then seen, and
-    /// the prediction asks only for what follows — <b>fork 18, via step 6.</b>
-    /// </summary>
-    private readonly bool _kinds;
-
     /// <inheritdoc cref="Graph.Cluster.Temporal"/>
     public int TemporalCells => _fabric.Temporal;
     private readonly Foresight _foresight = new();
@@ -259,20 +241,14 @@ public sealed class SnakeRun : IDisposable
         WalkSettings dials,
         int seed,
         int clusters = 8,
-        int replicas = 256,
-        int span = 0,
-        bool includeEmpty = false,
-        int? names = null,
-        bool kinds = false)
+        int replicas = 256)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(dials);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(clusters);
 
         _dials = dials;
-        _names = names;
-        _kinds = kinds;
-        _sense = new SnakeSense(includeEmpty, ordered: kinds);
+        _sense = new SnakeSense(dials.IncludeEmpty, ordered: dials.Kinds);
         _snake = new Snake(world, seed);
         _fallback = new Random(seed);
         _guessing = new Random(~seed);
@@ -282,11 +258,11 @@ public sealed class SnakeRun : IDisposable
         _eye = new InputMachine<SnakeFrame>(
             new MachineAddress("eye"),
             _sense,
-            new LocalRendezvous(_fabric.Local, kinds),
+            new LocalRendezvous(_fabric.Local, dials.Kinds),
             _fabric.Bus,
             _fabric.Ring,
             dials,
-            span);
+            dials.Span);
 
         _fabric.Subscribe(_eye);
         _hand = new OutputMachine(new MachineAddress("hand"), SnakeSense.Turns);
@@ -386,7 +362,7 @@ public sealed class SnakeRun : IDisposable
             // cell written, the chain reached an action ZERO times on every seed
             // and the body moved entirely at random. See Kind.Before.
             var thought = await _eye
-                .ObserveAsync(frame, taken, _kinds ? Question.Preceding() : null, ct: ct)
+                .ObserveAsync(frame, taken, _dials.Kinds ? Question.Preceding() : null, ct: ct)
                 .ConfigureAwait(false);
 
             // WAIT ON THE THOUGHT'S OWN ACCOUNTING, NOT ON THE BUS. This was
@@ -605,7 +581,7 @@ public sealed class SnakeRun : IDisposable
         var thought = await _eye.ThinkAsync(
             [.. present, doing],
             _dials.Foresight,
-            _kinds ? Question.Following() : null,
+            _dials.Kinds ? Question.Following() : null,
             ct).ConfigureAwait(false);
 
         // SETTLED, NOT MERELY QUIET. A prediction read mid-flight names fewer
@@ -614,7 +590,7 @@ public sealed class SnakeRun : IDisposable
         // predictions, so an unfinished one on either side moves it either way.
         var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
-        var wanted = _names ?? present.Count;
+        var wanted = _dials.Names ?? present.Count;
         var foreseen = thought.BestOf(SnakeQuantizer.Vision, wanted)
             .Select(a => a.Endpoint).ToArray();
 

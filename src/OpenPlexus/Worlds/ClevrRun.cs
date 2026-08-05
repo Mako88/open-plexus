@@ -104,22 +104,16 @@ public sealed class ClevrRun : IDisposable
     private readonly WalkSettings _dials;
 
     /// <summary>How this world's question wants its candidates ranked.</summary>
-    private readonly Accumulate _ranking;
 
     /// <param name="world">How much to read, and which arms are on.</param>
     /// <param name="dials">The walk.</param>
     /// <param name="seed">The ring's seed.</param>
-    /// <param name="ranking">
-    /// How this world's question wants its candidates ranked. <b>A conjunction by
-    /// default</b> — the filters name an object by agreeing about it.
-    /// </param>
     /// <param name="clusters">How many clusters the codes are spread over.</param>
     /// <param name="replicas">Ring replicas per cluster.</param>
     public ClevrRun(
         ClevrSettings world,
         WalkSettings dials,
         int seed,
-        Accumulate ranking = Accumulate.Agreement,
         int clusters = 8,
         int replicas = 256)
     {
@@ -128,7 +122,6 @@ public sealed class ClevrRun : IDisposable
 
         _world = new Clevr(world);
         _dials = dials;
-        _ranking = ranking;
         _fabric = new Fabric(dials, seed, clusters, replicas);
 
         _eyes = new InputMachine<Sighting>(
@@ -382,7 +375,7 @@ public sealed class ClevrRun : IDisposable
     /// </remarks>
     private Question Asking(ImmutableArray<Code> origins) => new()
     {
-        Ranking = _ranking,
+        Ranking = _dials.Ranking,
         Asking = origins.ToDictionary(code => code, code => (int)code.Modality),
     };
 

@@ -200,7 +200,7 @@ public sealed class MotifTests(ITestOutputHelper output)
         var dials = Fixture.Dials(stamina: 4.0);
 
         using var flat = new MotifRun(World(), dials, seed: 1);
-        using var chunked = new MotifRun(World(), dials, seed: 1, chunking: true);
+        using var chunked = new MotifRun(World(), dials with { Chunking = true }, seed: 1);
 
         var without = await flat.RunAsync(600);
         var with = await chunked.RunAsync(600);
@@ -256,7 +256,7 @@ public sealed class MotifTests(ITestOutputHelper output)
             }),
             ("traffic on", async seed =>
             {
-                using var run = new MotifRun(World(), dials, seed, chunking: true);
+                using var run = new MotifRun(World(), dials with { Chunking = true }, seed);
                 return (await run.RunAsync(600)).Traffic;
             }));
 
@@ -269,7 +269,7 @@ public sealed class MotifTests(ITestOutputHelper output)
             }),
             ("accuracy on", async seed =>
             {
-                using var run = new MotifRun(World(), dials, seed, chunking: true);
+                using var run = new MotifRun(World(), dials with { Chunking = true }, seed);
                 return (await run.RunAsync(600)).Accuracy;
             }));
 
@@ -282,7 +282,7 @@ public sealed class MotifTests(ITestOutputHelper output)
             }),
             ("edges on", async seed =>
             {
-                using var run = new MotifRun(World(), dials, seed, chunking: true);
+                using var run = new MotifRun(World(), dials with { Chunking = true }, seed);
                 return (await run.RunAsync(600)).Edges;
             }));
 

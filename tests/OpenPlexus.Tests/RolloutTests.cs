@@ -40,8 +40,7 @@ public sealed class RolloutTests(ITestOutputHelper output)
 
         foreach (var seed in Seeds)
         {
-            using var run = new RhythmRun(
-                World(), Fixture.Dials(stamina: 3.0), seed, span: 1, depth: depth);
+            using var run = new RhythmRun(World(), Fixture.Dials(stamina: 3.0) with { Span = 1, Depth = depth }, seed);
 
             var result = await run.RunAsync(600);
 

@@ -15,6 +15,15 @@
          record property produces restatements of the property name, which is
          noise that trains everyone to ignore the check. -->
     <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+    <!-- AND A WARNING FAILS THE BUILD HERE AND NOT ONLY IN CI. The workflow has
+         always had a separate step grepping for `warning (CS|xUnit)`, so the gate
+         existed, but `dotnet build` SUCCEEDED locally on the same tree, and the
+         two disagreeing is what let a red branch be pushed and called clean on
+         2026-08-05: deleting a type left two dangling crefs, the local build
+         reported success, and no test ran in CI at all.
+         A CHECK THAT ONLY RUNS SOMEWHERE ELSE IS A CHECK NOBODY RUNS. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
 </Project>

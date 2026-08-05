@@ -223,7 +223,13 @@ public sealed class TendingRun : IDisposable
 {
     private readonly TendingSettings _settings;
     private readonly Fabric _fabric;
-    private readonly InputMachine<Coded> _body;
+    private readonly InputMachine<Tended> _body;
+
+    /// <summary>
+    /// The body's front ends — <b>moisture is a real vector and position is a
+    /// name, so they are quantised differently and land in one occasion.</b>
+    /// </summary>
+    private readonly Compound<Tended> _senses;
     private readonly WalkSettings _dials;
     /// <param name="world">The shape of the garden.</param>
     /// <param name="dials">The walk.</param>
@@ -249,7 +255,17 @@ public sealed class TendingRun : IDisposable
         _dials = dials;
         Seed = seed;
 
-        _body = _fabric.Watching("gardener", dials);
+        // THE BANDS AND THE GRAIN ARE ADAPTER SETTINGS AND LIVE ON THIS SIDE.
+        // The world holds moisture as numbers; how finely to say them is a
+        // decision about how the brain thinks -- John's line, 2026-08-05.
+        _senses = new Compound<Tended>(
+        [
+            new Banded<Tended>(one => one.Damp, Tending.Damp, world.Bands, world.Grains),
+            new Marked<Tended>(one => one.At, Tending.Where),
+            new Marked<Tended>(one => one.Did, Tending.Did),
+        ]);
+
+        _body = _fabric.Watching("gardener", dials, _senses);
     }
 
     /// <summary>The seed this run was built with.</summary>
@@ -290,7 +306,8 @@ public sealed class TendingRun : IDisposable
 
         for (var step = 0; step < steps; step++)
         {
-            var felt = world.Feels();
+            var frame = world.Sensed();
+            ImmutableArray<Code> felt = [.. _senses.Codify(frame)];
 
             // FEEL FIRST, so the credit standing here belongs to the transition
             // that has just happened -- which is the one the held occasion caused.
@@ -349,11 +366,12 @@ public sealed class TendingRun : IDisposable
             if (chose is { } what && what >= 0 && what < doing.Length) doing[what]++;
             if (chose == 2) watered[world.Standing]++;
 
-            ImmutableArray<Code> occasion = chose is { } did
-                ? [.. felt, Tending.Doing(did)]
-                : felt;
-
-            await _body.ObserveAsync(Coded.Of(occasion), step, ct: ct).ConfigureAwait(false);
+            // THE ACT RIDES IN THE FRAME NOW RATHER THAN BEING APPENDED AS A
+            // CODE. It is the same code on the same modality -- `Marked` mints
+            // what `Tending.Doing` minted -- but the world no longer decides it.
+            await _body
+                .ObserveAsync(frame with { Did = chose }, step, ct: ct)
+                .ConfigureAwait(false);
             await _fabric.QuietAsync(ct).ConfigureAwait(false);
 
             // AND WHATEVER IS STILL IN THE TRACE COLLECTS A CELL IF THE BODY

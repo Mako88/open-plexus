@@ -107,7 +107,7 @@ public sealed record TendingSettings
 public sealed class Tending
 {
     /// <summary>Plant <c>i</c>'s moisture band rides on modality <c>Damp + i</c>.</summary>
-    private const byte Damp = 140;
+    internal const byte Damp = 140;
 
     /// <summary>Where the body is standing.</summary>
     public const byte Where = 139;
@@ -251,28 +251,8 @@ public sealed class Tending
     /// proprioception. <b>Nothing here says which plant is driest</b>, and nothing
     /// says which plant is reachable — those are what the graph is for.
     /// </remarks>
-    public ImmutableArray<Code> Feels()
-    {
-        var felt = ImmutableArray.CreateBuilder<Code>();
-
-        for (var which = 0; which < _damp.Length; which++)
-        {
-            var band = Math.Clamp((int)(_damp[which] * _settings.Bands), 0, _settings.Bands - 1);
-
-            // EACH PLANT OWNS A BLOCK OF MODALITIES, one per grain, so a coarse
-            // reading of one plant can never collide with a fine reading of
-            // another -- see Grains.Of.
-            felt.AddRange(Grains.Of(
-                (byte)(Damp + (which * _grains)),
-                band,
-                _settings.Bands,
-                _settings.Grains));
-        }
-
-        felt.Add(new Code(Where, (ulong)_at));
-
-        return felt.ToImmutable();
-    }
+    public Tended Sensed(int? did = null) =>
+        new() { Damp = _damp, At = _at, Did = did };
 
     /// <summary>The code for doing one thing.</summary>
     public static Code Doing(int what)
@@ -311,4 +291,28 @@ public sealed class Tending
         if (driest == _at) return 2;
         return driest < _at ? 0 : 1;
     }
+}
+
+/// <summary>
+/// One moment of the garden as the body senses it — <b>numbers and indices, and
+/// no codes at all.</b>
+/// </summary>
+/// <remarks>
+/// <b>THIS IS THE LINE JOHN DREW, 2026-08-05: what the world IS stays, how the
+/// brain THINKS goes.</b> Moisture is a real vector because that is what a
+/// moisture sense reads; which tile the body stands on is an index because a
+/// position is a name. How finely to band the one and whether to hash the other
+/// are decisions about coding, and they now live with the quantisers — see
+/// <see cref="Codes.Banded{TFrame}"/> and <see cref="Codes.Marked{TFrame}"/>.
+/// </remarks>
+public readonly record struct Tended
+{
+    /// <summary>Each plant's moisture, in order.</summary>
+    public required IReadOnlyList<double> Damp { get; init; }
+
+    /// <summary>Which plant the body is standing at.</summary>
+    public required int At { get; init; }
+
+    /// <summary>What the body just did, or null where it did nothing.</summary>
+    public int? Did { get; init; }
 }

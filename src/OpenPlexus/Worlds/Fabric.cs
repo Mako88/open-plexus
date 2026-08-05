@@ -182,10 +182,24 @@ public sealed class Fabric : IDisposable
     /// </remarks>
     /// <param name="name">What to call this machine on the bus.</param>
     /// <param name="dials">The walk this sense thinks with.</param>
-    public InputMachine<Coded> Watching(string name, WalkSettings dials)
+    public InputMachine<Coded> Watching(string name, WalkSettings dials) =>
+        Watching(name, dials, new Passthrough());
+
+    /// <summary>
+    /// A sense with a front end of its own, wired up and listening.
+    /// </summary>
+    /// <remarks>
+    /// <b>ONE MACHINE PER BODY AND NOT PER SENSOR.</b> A body reading several
+    /// streams hands them all to one machine through
+    /// <see cref="Codes.Compound{TFrame}"/>, because an occasion is what pairs
+    /// codes together and a sensor on its own machine could never co-occur with
+    /// anything — which is the sight–sound edge, and the whole point.
+    /// </remarks>
+    public InputMachine<TFrame> Watching<TFrame>(
+        string name, WalkSettings dials, IQuantizer<TFrame> sense)
     {
-        var machine = new InputMachine<Coded>(
-            new MachineAddress(name), new Passthrough(), new LocalRendezvous(Local),
+        var machine = new InputMachine<TFrame>(
+            new MachineAddress(name), sense, new LocalRendezvous(Local),
             Bus, Ring, dials);
 
         Subscribe(machine);

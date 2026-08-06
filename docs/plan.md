@@ -68,9 +68,9 @@
 - **Positing something never observed.** Four things mint codes and every one
   derives from what was PRESENT, so nothing can imagine. Gate it as `Chunk` does —
   description length AND beating chance. **`Stated` gives a posited thing PARTS.**
-- **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
-  sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
-  — everything else carries over. An act is already a code.
+- **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. Naming
+  in order is the easy half — **the candidates are the work**, since `Chunk` reads
+  one moment and a sequence spans several. `Stated.Instance` already folds in order.
 
 ### Worlds that are missing
 
@@ -96,8 +96,7 @@
 
 - **Reification beyond one world.** `Stated` is the general form — n-ary,
   role-typed, a star not a clique. It undercuts the slot hub by two orders of
-  magnitude on `Clutrr`; whether it carries anywhere else is unmeasured, and
-  `Clutrr` still hand-rolls its own.
+  magnitude on `Clutrr`; whether it carries anywhere ELSE is unmeasured.
 
 - **A span the brain reads off the stream** — a carried pair that never recurs is
   noise, so the share of `Kind.After` cells whose count passed one separates a
@@ -110,7 +109,8 @@
   deciding how it is coded. `IQuantizer` is already the interface.
 
 - **A reason to seek** — every cell is written for acts TAKEN, so no walk reaches an
-  untried one. Revives once something can explore.
+  untried one. `Kind.Meddled` is where the seeking would be RECORDED; nothing yet
+  does the seeking.
 - **Reach that does not cost what reach costs now.** On `Clutrr` the silence is a
   walk that cannot afford to arrive, never an empty cell — and buying it is
   superlinear: messages grew far faster than coverage across the sweep.
@@ -133,6 +133,9 @@
 - **Evict on EVIDENCE rather than on recency** — eviction is LRU, whose textbook
   failure is the ubiquitous item that is always recently touched. `Doubt` already
   computes the better key, and the cap is measurably eating what `Doubt` repairs.
+- **TinyLFU is that eviction's solved shape** — a frequency sketch plus an ADMISSION
+  policy, so a new entry must out-argue the victim it would displace. Composes with
+  Space-Saving rather than competing.
 - **Cold storage as DEMOTION rather than forgetting** — what makes an evicted count
   recoverable rather than gone, and it makes the graph a database instead of a
   cache. A solved shape (LSM, tiering).

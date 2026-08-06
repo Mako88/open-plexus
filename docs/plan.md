@@ -48,9 +48,6 @@
 - **AND AN ANSWER NOT IN FRONT OF IT.** `Clutrr` scores nought where the answer is
   stated nowhere in the story, and every reply is a relation the story DID state.
   The code exists; it is never preferred over what is locally present.
-- **Coverage is AFFORDABILITY, and the bill is the problem.** Spending more buys it
-  on `Clutrr` — the silence is a walk that cannot reach, never an empty cell — but
-  the messages grow far faster than the coverage does.
 - **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
   sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
   — everything else carries over. An act is already a code.
@@ -78,24 +75,23 @@
   noise, so the share of `Kind.After` cells whose count passed one separates a
   cycle from independent draws. A node's own row statistic; see `WalkSettings.Span`.
 - **Chunk candidates BELOW a whole moment.** A chunk covering the moment writes
-  `name`-to-member and destroys member-to-member, which IS the task on `Senses`
-  and is why agreement went inert. Pair-merging (Sequitur, BPE) composes.
+  `name`-to-member and destroys member-to-member, which IS the task on `Senses`.
+  Pair-merging (Sequitur, BPE) composes; utility belongs per chunk (Minton, SOAR).
 - **The adapter is the only thing between a world and the brain** — John, 2026-08-05.
   `Tending` bands its own moisture and calls `Grains` itself; that is a world
   deciding how it is coded. `IQuantizer` is already the interface.
 
 - **A reason to seek** — every cell is written for acts TAKEN, so no walk reaches an
   untried one. Revives once something can explore.
-- **Depth wants its own control** — every rollout step is a whole walk.
+- **Reach that does not cost what reach costs now.** On `Clutrr` the silence is a
+  walk that cannot afford to arrive, never an empty cell — and buying it is
+  superlinear: messages grew far faster than coverage across the sweep.
 - **A self-set beam** — a width the system sets itself; `Surprise.Rate` or a node's
   own row statistics.
 - **Conditioning the prediction itself**, rather than suppressing the observation.
-- **Chunk candidates below a whole moment** — pair-merging (Sequitur, BPE)
-  composes; utility belongs per chunk (Minton, SOAR).
 - **Hierarchy** — walk a thousand chunks, not a million nodes. What step 3 is for.
 - **Multi-token output** — fork 11 built the addressing; a world that wants two is
   what is left.
-- **Cold storage** — what makes an evicted count recoverable rather than gone.
 - **A row cap that varies by node** — a node seen ten thousand times has more to say
   than one seen twice. `k · log(seen)` is local and scale-free. Measure it on
   `Skew`, the one setting where a cap is not inert.
@@ -105,8 +101,9 @@
 - **Evict on EVIDENCE rather than on recency** — eviction is LRU, whose textbook
   failure is the ubiquitous item that is always recently touched. `Doubt` already
   computes the better key, and the cap is measurably eating what `Doubt` repairs.
-- **Cold storage as DEMOTION rather than forgetting** — the same change makes the
-  graph a database instead of a cache, and it is a solved shape (LSM, tiering).
+- **Cold storage as DEMOTION rather than forgetting** — what makes an evicted count
+  recoverable rather than gone, and it makes the graph a database instead of a
+  cache. A solved shape (LSM, tiering).
 
 ### Housekeeping
 

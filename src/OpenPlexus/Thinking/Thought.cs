@@ -614,8 +614,13 @@ public sealed class Thought
                 if (agreeing != 0) return agreeing;
             }
 
-            var gap = left.Score - right.Score;
-            var scale = Math.Max(Math.Abs(left.Score), Math.Abs(right.Score));
+            // PER HOP RATHER THAN IN TOTAL, when the asker says so. See
+            // Accumulate.Steady: total strength is mostly a measure of distance.
+            var mine = _accumulate == Accumulate.Steady ? Sustained(left) : left.Score;
+            var theirs = _accumulate == Accumulate.Steady ? Sustained(right) : right.Score;
+
+            var gap = mine - theirs;
+            var scale = Math.Max(Math.Abs(mine), Math.Abs(theirs));
 
             if (Math.Abs(gap) > Tied * Math.Max(1.0, scale)) return gap > 0 ? -1 : 1;
 
@@ -626,6 +631,23 @@ public sealed class Thought
                 ? shorter.CompareTo(longer)
                 : left.Endpoint.CompareTo(right.Endpoint);
         }));
+    }
+
+    /// <summary>
+    /// The strongest route's strength per hop — <b>its geometric mean.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>A CHAIN HOLDS ITS ORIGIN AND ITS ENDPOINT, so the hops are one fewer than
+    /// its length.</b> An origin produces no arrival, so a chain that came back has
+    /// at least two entries and the count is at least one — but a defaulted chain
+    /// is guarded rather than trusted, because a root of nought would rank a ghost
+    /// first.
+    /// </remarks>
+    private static double Sustained(Arrival arrival)
+    {
+        var hops = arrival.Chain.IsDefaultOrEmpty ? 0 : arrival.Chain.Length - 1;
+
+        return hops <= 0 ? arrival.Best : Math.Pow(arrival.Best, 1.0 / hops);
     }
 
     /// <summary>How many distinct origins reached an arrival's endpoint.</summary>

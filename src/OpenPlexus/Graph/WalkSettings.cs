@@ -226,6 +226,41 @@ public enum Accumulate
     /// </remarks>
     Agreement,
 
+    /// <summary>
+    /// The strongest route's strength <b>PER HOP</b> rather than in total — its
+    /// geometric mean along the chain.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>STRENGTH MULTIPLIES, SO TOTAL STRENGTH IS MOSTLY A MEASURE OF
+    /// DISTANCE.</b> A code sitting in the moment is one hop at weight near one; a
+    /// code that has to be inferred is four hops at a fraction of that. Ranked on
+    /// the total, near beats far almost whatever either one MEANS — which is one
+    /// number doing two jobs, saying both <i>this is near</i> and <i>this is
+    /// meant</i>.
+    /// </para>
+    /// <para>
+    /// <b>MEASURED, AND IT IS THE WHOLE OF WHY A WALK ANSWERS WITH WHAT IT WAS JUST
+    /// TOLD.</b> On <see cref="Worlds.Clutrr"/> the right answer is REACHED on a
+    /// third of the fresh stories it answers and chosen on none of them. Nothing
+    /// about reach, budget or representation stands in the way; it loses the
+    /// ranking every time.
+    /// </para>
+    /// <para>
+    /// <b>THE DENOMINATOR HAS TO BE DISTANCE AND NOT FREQUENCY, WHICH COST A
+    /// REFUTED ROW TO LEARN.</b> Dividing by the endpoint's own base rate was tried
+    /// first and is inert — the candidates' marginals barely differ, so it divides
+    /// by nearly a constant. The confound was never how COMMON a code is; it is how
+    /// FAR it is.
+    /// </para>
+    /// <para>
+    /// <b>Nothing new travels for it.</b> The strongest route and its chain already
+    /// ride on every arrival, so this is arithmetic over what is there — unlike the
+    /// base-rate version, which needed the endpoint's marginal on the wire.
+    /// </para>
+    /// </remarks>
+    Steady,
+
 }
 
 /// <summary>

@@ -45,9 +45,9 @@
 - **An answer that is no code it has ever seen.** Answering is ARRIVING somewhere,
   so yes/no and counting questions ask for a token the world never shows.
   `BabiTests` names the tasks; `PrimerTests` says why English does not fix it.
-- **AND AN ANSWER NOT IN FRONT OF IT — A RANKING FAULT, MEASURED.** On `Clutrr` the
-  right answer is REACHED on a third of fresh stories and chosen on none. Strength
-  multiplies, so the confound is DISTANCE, not frequency.
+- **AND AN ANSWER NOT IN FRONT OF IT — HALF ANSWERED.** `Accumulate.Steady` ranks
+  per hop and takes `Clutrr` from none right to some, free, on the same walk. It
+  does not beat the two-step loop and the two together are worse than either.
 - **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
   sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
   — everything else carries over. An act is already a code.

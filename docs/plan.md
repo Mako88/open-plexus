@@ -1,13 +1,17 @@
 # Where this is going
 
+**A DIFFERENT BET FROM `csharp`, ON PURPOSE.** That branch counts co-occurrences and
+walks them. This one holds COMMITMENTS and repairs them when they break. The
+substrate is shared; the thing being counted is not. `csharp` is not abandoned and
+nothing here refutes it — read its refutation table before repeating anything.
+
 - **The only doc, and it holds nothing that is finished.** What a built mechanism
   does lives in its XML comments, where the compiler enforces every reference.
 - **Findings live in the commit** that produced them, and in the test that asserts
   them. Never here.
-- **One line an item.** A cap per ITEM, not per doc — twelve new ideas cost twelve
-  lines and nothing has to be retired to make room.
-- **Built and decided means GONE FROM HERE, and it means no arm either** — John,
-  2026-08-04. A winner becomes the code; losers are deleted, leaving a revival row.
+- **One line an item.** A cap per ITEM, not per doc.
+- **Built and decided means GONE FROM HERE, and it means no arm either.** A winner
+  becomes the code; losers are deleted, leaving a revival row.
 
 ---
 
@@ -15,286 +19,197 @@
 
 - **Understand rather than perform** — answer *what would the world look like if I
   did X*, which a sequence model cannot be.
-- **AND THAT IS `do(X)`, WHICH NO AMOUNT OF COUNTING `X` YIELDS.** Every cell is
-  written for acts a policy TOOK, so wanting an act and the act working are
-  confounded. An act drawn without consulting the state is not — see `Kind.Meddled`.
-- **Learning is a co-occurrence count.** Everything else is plumbing around it.
+- **A COUNT IS NEVER WRONG; A COMMITMENT IS.** A co-occurrence cell that mispredicts
+  becomes a slightly different number. A commitment that mispredicts is WRONG ABOUT
+  SOMETHING, and which something is the whole of what can be learnt from it.
+- **The representation is the residue of repaired failures**, not a thing designed
+  up front. Distinctions get minted because something is needed to tell two
+  conflated cases apart.
 
 ## The constraints
 
-- **C1** — no node reads another's data.
-- **C2** — messages are late, jittered, out of order.
-- **C3** — a cluster vanishing mid-thought is NORMAL, not an error. It was missing
-  from this list and never from the code; `Ring`, `DepartureTests` and
-  `Thought.Lost` all cite it, and it is what makes the in-flight accounting exist.
-- **C4** — no episode boundary, so nothing may depend on train-then-test.
-- **Counts only ever rise.** The G-Counter property buys convergence with no
-  coordinator, which is what buys C1 and C2.
-- **Nothing is unlearned, only outvoted or evicted.** Decay is not available;
-  eviction on "not touched since" is.
-- **Codes must be identical on every machine forever.** Two machines that code the
-  same input differently share nothing, so the codebook cannot depend on the sample
-  either of them happened to see.
-- **AND THAT RULE IS ABOUT SEMANTICS, NOT ADAPTATION — John, 2026-08-06.** A front
-  end may say *this is the same thing you saw six times*, never *this is a red
-  ball*. **A convergent identity code is legal; a labelled one is not.**
-- **A front end may say what it is looking at, never what to conclude.** Five
-  channels do; a sixth needs an argument against the other five.
+Carried unchanged from `csharp`. They are about the machine, not the architecture.
 
----
+- **C1** — no node reads another's data. A commitment records its OWN hits and
+  misses.
+- **C2** — messages are late, jittered, out of order.
+- **C3** — a cluster vanishing mid-thought is NORMAL, not an error.
+- **C4** — no episode boundary, so nothing may depend on train-then-test.
+- **Counts only ever rise.** Hits and misses are BOTH G-Counters, and reliability is
+  their ratio — so convergence holds with no coordinator.
+- **Repair ADDS a narrower commitment and never edits the old one.** Monotonicity is
+  preserved rather than strained, and the eviction tension that blocked positing on
+  `csharp` does not arise: a commitment specialised out of relevance stops firing.
+- **Codes must be identical on every machine forever.** A specialised commitment's
+  identity derives from its parent and the condition added.
+- **A front end may say what it is looking at, never what to conclude.** And the
+  rule is about SEMANTICS, not adaptation — *this is the same thing you saw six
+  times*, never *this is a red ball*.
 
 ## TO BUILD
 
-### Look necessary for the goal, and absent
+### The primitive
 
-- **NOTHING CAN PROPOSE A CODE — only recognise one.** `Chunk`, `Macro`, `Stated`
-  and `Winnow` all NAME what arrived; the walk RANKS what it reached. That one
-  absence is what positing, a goal, an unseen answer and a macro's use all wait on.
+    Commitment := scope (codes that must all be present)
+                → expects (a code that should follow)
+                + hits, misses
 
-- **A world with a WIDE real-valued signal to point `Winnow` at.** Built and mounted
-  nowhere. The empirical guard is done — `Winnow.Distinct` counts tags actually
-  emitted, since the declared width cannot see a low intrinsic dimension.
-- **WHY THE WALK LOSES TO A COIN TOSS ON `Homeostat` EVEN WITH A CAUSAL EDGE.** A
-  span supplies the act-to-outcome cells and does NOT clear the blind bar; the
-  missing edge explained the mirror and not the loss.
-- **A BODY THAT SAYS WHICH ACTS IT WAS ASSIGNED.** `Kind.Meddled` and
-  `Occasion.Forced` are built and no world sets them, so the interventional cell
-  exists and is empty. `Homeostat`'s bootstrap already MAKES the interventions.
-- **A goal that is not the current state.** `Drives` wants to stay in bounds and
-  the rollout predicts; nothing can hold a state that is NOT current and steer
-  toward it. Planning needs a target, and sub-goals are what serve many tasks.
-- **An answer that is no code it has ever seen.** Answering is ARRIVING somewhere,
-  so yes/no and counting questions ask for a token the world never shows.
-  `BabiTests` names the tasks; `PrimerTests` says why English does not fix it.
-- **AND AN ANSWER NOT IN FRONT OF IT — HALF ANSWERED.** `Accumulate.Steady` ranks
-  per hop and takes `Clutrr` from none right to some, free, on the same walk. It
-  does not beat the two-step loop and the two together are worse than either.
-- **Positing something never observed.** `Stated` already BUILDS one — a star whose
-  fillers never met — so the mechanism is not what is missing. **The policy is**: a
-  reason to build one, gated as `Chunk` gates.
-- **A proposer that only RESTRUCTURES cannot hallucinate.** Replacing a group's
-  pairwise edges with a star through one new node is pure description length — it
-  invents no content, only a shortcut. Fork 21 predicts and is off; this does not.
-- **And the origin machine can SEE a group legally** — it collects every arrival,
-  which is where `Agreement` already counts distinct origins. A broadcast from k
-  codes that all reach each other has found one without reading anybody's row.
-- **A WALK THAT CAN USE A MACRO.** `Macro` mints them and nothing reaches one — it
-  is an ORIGIN and a TARGET, one hop where five were, which is `Motif`'s traffic
-  argument applied to time. Where hierarchy starts.
+- **It fires when its scope is satisfied, and is then right or wrong about
+  something specific.** That is the entire difference from a count.
+- **A prediction carries its provenance** — which commitments entailed it. `csharp`
+  already built this and used it for cycle-checking; see its `Chain`.
+- **Failure blames the provenance, not the world.** A commitment in many failures
+  and few hits is the culprit — the same `together / seen` arithmetic, pointed at
+  commitments instead of codes.
+- **Repair is SPECIALISATION.** *Whenever X, expect Y* becomes *whenever X and Z,
+  expect Y*, where Z is what most distinguishes the failures from the hits.
+- **Action is EXPERIMENT** — act to test the commitment whose failure would be most
+  informative. Interventional by construction; see `csharp`'s `Kind.Meddled`.
+- **A goal is a commitment about a state that does not currently hold**, and
+  planning is the attribution machinery run backwards.
 
-### Worlds that are missing
+---
 
-- **One where several cues arrive together and only some carry the outcome** — the
-  write-path gate blocks, and no world here can show what that buys.
-- **One whose dynamics BRANCH** — a cycle is an attractor, so the rollout's
-  compounding error is untested.
-- **One an arm can bootstrap in** — every credit arm on `Tending` is a coin toss.
-- **One needing variable binding that is not kinship** — `gSCAN`. `Clutrr` measures
-  the role channel on somebody else's data; a second world is what says whether that
-  carries beyond kinship.
-- **POSITING ON A SECOND WORLD.** `Posit` mints a hub and drops what it stands for,
-  and it wins on `Latent` — the one world built to suit it. Everywhere else it is
-  unmeasured and off.
-- **One where ONE origin sends MANY routes** — the over-counting `Agreement` exists
-  against, and nothing here produces it. Two comparable routes outsum one, so
-  origins and strength coincide; that is why it tied `Sum`. See `Thought.Divides`.
 
-### Owed re-runs
+### Step one, and nothing else until it runs
 
-- **The eligibility trace, re-run against a silence nobody had checked.** It wrote
-  more and changed nothing, measured against an arm that was quiet for budget
-  reasons.
+- **`Commitment`** — scope, expects, hits, misses. Fire when scope is a subset of
+  the moment.
+- **Blame** — rank the commitments that entailed a failed prediction by miss rate.
+- **Repair** — mint a child with ONE added scope code, the one most present in
+  misses and most absent in hits.
+- **The world:** `csharp`'s plan already names it — *several cues arrive together
+  and only some carry the outcome*. A broad commitment must specialise to survive.
 
-### Mechanisms
+### Look necessary and absent
 
-- **Reification beyond one world.** `Stated` is the general form — n-ary,
-  role-typed, a star not a clique. It undercuts the slot hub by two orders of
-  magnitude on `Clutrr`; whether it carries anywhere ELSE is unmeasured.
+- **NEGATION IN A SCOPE, AND IT MAY NOT BE OPTIONAL.** *Whenever X and NOT Z* — and
+  the distinguishing feature between a failure and a hit is very often that
+  something was ABSENT. Refused in step one; expect to need it.
+- **Sequence in a scope** — *X then Y* rather than *X and Y*. `csharp`'s `Kind.After`
+  is the shape.
+- **Roles in a scope** — a condition naming no argument is what buys transfer. See
+  `csharp`'s `Kind.Role`, which is the one part of its edge vocabulary worth keeping.
+- **A commitment ABOUT commitments** — metacognition, and where a self-model would
+  start.
+- **What to do when a commitment cannot be saved by any single added condition.**
+  Two conflated cases with no distinguishing code present is the signal that a NEW
+  code is needed — which is positing with a reason.
 
-- **A span the brain reads off the stream** — a carried pair that never recurs is
-  noise, so the share of `Kind.After` cells whose count passed one separates a
-  cycle from independent draws. A node's own row statistic; see `WalkSettings.Span`.
-- **Chunk candidates BELOW a whole moment.** A chunk covering the moment writes
-  `name`-to-member and destroys member-to-member, which IS the task on `Senses`.
-  Pair-merging (Sequitur, BPE) composes; utility belongs per chunk (Minton, SOAR).
-- **The adapter is the only thing between a world and the brain** — John, 2026-08-05.
-  `Tending` bands its own moisture and calls `Grains` itself; that is a world
-  deciding how it is coded. `IQuantizer` is already the interface.
+### Known limits, carried as work rather than discovered later
 
-- **A reason to seek** — every cell is written for acts TAKEN, so no walk reaches an
-  untried one. `Kind.Meddled` is where the seeking would be RECORDED; nothing yet
-  does the seeking.
-- **Reach that does not cost what reach costs now.** On `Clutrr` the silence is a
-  walk that cannot afford to arrive, never an empty cell — and buying it is
-  superlinear: messages grew far faster than coverage across the sweep.
-- **Conditioning the prediction itself**, rather than suppressing the observation.
-- **Routes never coalesce, and the walk is personalised PageRank done the dear
-  way.** `k` routes reaching one node each fan out over its whole row. Accumulating
-  a residual and pushing once is Andersen–Chung–Lang, and `k` grows with depth.
-- **And a chain would not survive it** — the cycle check exists because this
-  enumerates paths, and a residual walk does not need one. Provenance is what is
-  traded; `Split Chain` is the half already named.
-- **Hierarchy** — walk a thousand chunks, not a million nodes. What step 3 is for.
-- **Multi-token output** — fork 11 built the addressing; a world that wants two is
-  what is left.
-- **A row cap that varies by node** — a node seen ten thousand times has more to say
-  than one seen twice. `k · log(seen)` is local and scale-free. Measure it on
-  `Skew`, the one setting where a cap is not inert.
-- **Space-Saving serves THREE jobs, not the one it is listed for** — eviction's
-  linear scan, `Fanout.Shoulder`'s sort on every fire, and top-k. Its buckets ARE
-  the shoulder, so the cut becomes free rather than costing a sort.
-- **Evict on EVIDENCE rather than on recency** — eviction is LRU, whose textbook
-  failure is the ubiquitous item that is always recently touched. `Doubt` already
-  computes the better key, and the cap is measurably eating what `Doubt` repairs.
-- **TinyLFU is that eviction's solved shape** — a frequency sketch plus an ADMISSION
-  policy, so a new entry must out-argue the victim it would displace. Composes with
-  Space-Saving rather than competing.
-- **Cold storage as DEMOTION rather than forgetting** — what makes an evicted count
-  recoverable rather than gone, and it makes the graph a database instead of a
-  cache. A solved shape (LSM, tiering).
+- **THE SCOPE LANGUAGE IS THE CEILING.** Whatever a scope cannot say, the system can
+  never learn — this is ILP's language-bias problem and it is what killed the field.
+- **Quantisation noise is the interface risk.** ILP dies on noisy symbols; the front
+  end produces exactly those. Graded reliability is the defence and it is untested.
+- **Blame diffuses when many commitments entail one prediction.** The historical
+  failure. Keep predictions shallowly entailed until it is measured.
 
-### Housekeeping
+---
 
-- **The knob pass, LAST.** A dial swept before the structural work measures a
-  system about to change under it.
+### What comes over from `csharp`, and what does not
 
-### The wire, when the remote half lands
+**Bring — the substrate, which is architecture-independent and proven.**
 
-- **Only the local half of `HybridBus` exists.**
-- **C2 is untested and the harness is why** — every reader here waits for quiet, so
-  lateness becomes waiting. Needs a reader on a DEADLINE, or two machines.
-- **Coalesce a settling wave into one send** — flush on idle *or* size *or* time.
-- **Bits, not JSON** — a sixth of a packed message is the `Guid` broadcast id.
-- **Split `Chain`** — an approximate-membership filter for the hop, full chain
-  rebuilt at the origin.
-- **UDP, not TCP** — head-of-line blocking would stall every thought behind one lost
-  packet. QUIC's unreliable datagram extension (RFC 9221).
-- **Fork 1, the distributed rendezvous** — smaller than it looks; the counts need no
-  protocol, only the join does.
+| | |
+|---|---|
+| `Agreed`, `Seeds` | The hash and the seed discipline. Load-bearing for the red-ball property |
+| `Code` | The identity type |
+| `Bus`, `Ring`, `Addresses` | The distributed half. Storage behind it is replaced |
+| `IQuantizer`, `Coded`, `Winnow`, `Grains`, `Banded`, `Passthrough` | Front ends. Independent of what consumes them |
+| `LiveSet`, `Window` | Moments and the stream |
+| `Measurement`, `Questioned`, `Measured`, `Sweep`, `Plumbing`, `Seeds.Apart` | The measurement harness |
+| **`DocsTests`, `DeadCodeTests`, `DuplicationTests`, `DialTests`** | **The budgets. Bring these FIRST** |
+| The traps list and the refutation-table discipline | The epistemics engine, and the most valuable thing in the repo |
+| Every world | A world is a PROBLEM and problems outlive architectures |
+
+**Leave — all of it is rung-one machinery built on counting co-occurrence.**
+
+`Node`, `Edge`, `Kind`, `Tie` · `Thought`, `Message`, `Arrival`, `Question`,
+`WalkSettings` and every dial on it — `Accumulate`, `Pricing`, `Toll`, `Fanout`,
+`Doubt`, `Row`, `Span` · `Chunk`, `Macro`, `Stated`, `Posit` · `Drives`,
+`Foresight`, `Consequence`, `Reflection`.
+
+**Bring the IDEAS out of the minters without the mechanisms.** `Paying`'s two bars —
+description length AND beating chance, because MDL alone minted 715 names on pure
+noise. `Stated`'s star-not-a-clique. `Macro`'s sorted-versus-ordered naming.
+`Kind.Role`'s argument that a cell naming no argument is what transfers.
+
+---
+
+### What the field already knows
+
+**Borrow the problem, not the mechanism.** This is not a new idea and pretending
+otherwise would waste months.
+
+- **DreamCoder** (Ellis et al., PLDI 2021) — grows its own library of abstractions
+  under MDL pressure, and BOOTSTRAPS: learns `filter`, uses it to learn `max`, then
+  `nth largest`, then `sort`. The existence proof for representation-as-residue.
+- **Popper / Learning From Failures** (Cropper & Morel, 2021) — generate, test,
+  **constrain**. A failed hypothesis yields constraints that prune the space. This
+  design's core loop, already formalised.
+- **XCS** (Wilson) — the innovation that made classifier systems work was separating
+  credit assignment from selection and making fitness **accuracy-based rather than
+  strength-based**, because strength-based systems delete low-reward rules that are
+  still correct in their niche. Do not repeat that.
+- **Why none of it scaled**: noise sensitivity, hand-specified language bias, and no
+  way to learn from probabilistic or sensory background knowledge. Neurosymbolic ILP
+  is the live attempt.
+- **AND THE FAILURE WAS AT THE INTERFACE WITH PERCEPTION, NOT IN THE LOGIC** — which
+  is the one place this project is unusually well placed, because its substrate
+  manufactures symbols. That is the bet, said plainly.
 
 ---
 
 ## DO NOT RE-TRY
 
 **A refutation is conditional on its configuration, so a row without a revival
-condition is a superstition.**
+condition is a superstition.** These carry from `csharp` and from the literature;
+its own table holds thirty more that are about the walk and do not apply here.
 
 | what | what refuted it | what would revive it |
 |---|---|---|
-| `StepCost.Best` / `Local` / `Constant` | Factorial message growth where inverse cost is polynomial | **MET by `Toll.Traffic`** |
-| `Refuel` | Nothing is paid back, so it did nothing | Anything returning budget to a route |
-| Sender-*weighing*, `IMarginals` | A C1 violation, and behaviour was identical without it | Never. `Message.Seen` is the legal version |
-| Absolute actions, unrotated view | One move in four instantly fatal | A body with no heading |
-| Survival as the score | Circling wins. Snake cannot discriminate policies at all | Homeostatic drives, where standing still stops paying |
-| A beam over partners | A constant nobody set, doing the cutting | **MET by `Fanout.Shoulder`** — the row's widest gap, reported as `Pruned` |
-| A beam at the row's own MEAN | Far too permissive: kept nearly everything and bought about a third where a constant of two bought eight times | A threshold reading the row's SHAPE rather than its level |
+| Strength-based fitness for rules | XCS: it deletes low-reward rules that are still CORRECT in their niche. Accuracy-based fitness is the fix | Never. Score a rule by how well it predicts, not by what it earns |
+| MDL alone as a minting gate | On `csharp`'s `Motif` the pure-noise control minted 715 names against structured 245 | Never alone. Pair it with beating chance |
+| A minted name joining the occasion it completes | Its members are gone, so its only partner is its own last member. Broke two controls on `Rhythm` | A name reached by inference, never written as a partner |
+| Hand-specified language bias | ILP's own post-mortem: mode declarations are where the human puts the answer in | A scope language the failures themselves extend |
 | Clusters by modality | Splits picture from sound, the one link this design exists to make | Never |
-| Clusters by time of creation | Two machines compute different owners for one code | Placement agreement without a coordinator |
-| `Adaptive` reflection on `Hunger` | Inverted: it wrote most where it helped least | A signal that discriminates |
-| A deeper walk for prediction | Monotonically worse without edge kinds | **Edge kinds**, and that refutation reproduced |
-| `ArrivalValue.Lift`, `Accumulate.Max` | Swept, inert, both explanations refuted. **Deleted** | Lift in the **cost** |
-| Naming fewer predicted codes | Half true: coarse ranking informs, fine does not | **REVIVED at one code** |
-| `Window` span | Null on snake, worse on `Babi`, and the whole task on `Rhythm` | **Something making a carried edge worth its ROW.** Kinds were half; a weight is not the other |
-| A carried-edge discount | Moves along the frontier the budget already describes, and starves the walk COMPLETELY — nought accuracy and not one chain completed, at every budget | A world where carried and simultaneous edges compete in one row |
-| `includeEmpty: true` | Ruinous under `Best` pricing | **Revived — no clear winner since** |
-| `Pricing.Balanced` | Times out — the geometric mean sits between the marginals, so weights rise and the walk explodes | A bound not relying on the weight being one marginal's reciprocal |
-| `Pricing.Driven` | Two local rules, both worse in both worlds; a per-hop choice puts routes on different scales | A local quantity predicting which arm wins, on a world where they differ |
-| `Accumulate.Fused` | Half of agreement's lift and all its cost; inverted orders tie identically under RRF | Many candidates, or a fusion separating by something other than position |
-| The carried negative discount (`Message.Against`) | Inert — an arm ignoring it reproduced the arm reading it. **Deleted** | A world where an act's harm is confined to a few states |
-| `Driven` / `Delayed` / `Topped` — credit as a heavier write | All three peak far below the bar at their own best budget. **Deleted** | Anything making a heavier write into *this was done here* mean something else |
-| ΔP over the credit cell (`Attending.Contingent`) | Not refuted, DOMINATED: it tied the one-sided count and inhibition cleared both — no longer. **Deleted** | A world where some states are recoverable and others are not, so the base rate varies BY STATE |
-| `Ranked` as step 4's fix | The lift was the bootstrap's coin toss, and a varying code thins every edge | Anything making the walk prefer a partner other than the one it took last |
-| Widening the walk — `Kindred`, `Foreseeing`, `Backing` | All three: louder and below the bar, or silent everywhere | **A likeness the GRAPH DID NOT COMPUTE** — step 8 and nothing short of it |
-| A trained quantiser — k-means | Two machines fitted on different samples code the same input differently | **A codebook reaching the same answer from any sample ORDER, emitting identity and never a label** |
-| `Question.Path` — a relation per hop | A fixed path trades coverage against precision with no middle. **Deleted** | `Downstream` wants the reverse temporal edge, which `Kind.Before` now writes |
-| `Kind.Informed` — a cell for what surprised | No walk reaches an untried act. **Deleted** | Anything that can explore |
-| `Attending.Marked` — the credit cell, unconditioned | Peaks below the blind bar. It was `Credited`'s CONTROL, so ruling out the extra cell and the staleness goes with it. **Deleted** | A second cell written on anything but the outcome — re-take the control |
-| `Winnow` over CLEVR's `3d_coords` | Three inputs give only C(3, samples) distinct wirings, so the corpus collapses onto a handful of tags. **Closed in code** — the constructor refuses it | A reading wide enough to fill the sheet |
-| Banded position codes on CLEVR | Halves the reference at every budget it survives and times out above, peak to peak. No kept question is spatial, so it is row width bought with noise | A world whose QUESTION is spatial |
-| Asking again where a task merely LOOKS deep | bAbI's one-, two- and three-fact tasks: worse on the first and no better on the rest. One walk already reaches there | A world where one walk is at chance while answering confidently |
-| Asking again UNCONDITIONALLY | Discards the first walk's evidence to gamble on one intermediate. Took `Clevr` to about a third | Never as a default. `Question.Steps` is the legal version |
-| Ranking an arrival against the endpoint's BASE RATE | Inert alone, harmful with two walks: the candidates' marginals barely differ, so it divides by nearly a constant. **Deleted** | Candidate answers differing WIDELY in frequency |
-| A span as the `Homeostat` chain arm's fix | The cells appear and it still loses to blind, at many times the cost. Its gain tracked its own rising silence | Anything making the walk beat chance where the evidence EXISTS |
-| A macro name joining the occasion it completes | Its members are gone, so its only partner is its own last member. 38 edges on a world built for nought | A macro reached by the WALK, never written as a partner |
-| Fork 24, the budget controller | `Moves` never left nought on the one world that ran it — three budgets sampled forever, none chosen. Billing the probe cost a quarter of `Senses`. **Deleted** | A world where the right budget VARIES |
+| A trained quantiser fitted per machine | Two machines fitted on different samples code the same input differently | A codebook reaching the same answer from any sample ORDER |
 
 ---
 
 ## TRAPS
 
-**Named so nobody reintroduces them.**
+**Named so nobody reintroduces them.** These are about MEASUREMENT, so they survive
+the change of architecture entirely. `csharp`'s list holds a dozen more.
 
-- **One weight doing two jobs is this design's recurring fault** — it ranks a
-  partner AND prices the hop. It has bitten five times.
-- **A dial measured at one setting of another may be measuring that one.** Sweep at
-  two run lengths, never with a third pinned.
-- **Measure one mechanism ON from a known baseline, never one OFF from all-on.**
-  The second direction read small for everything on 2026-08-05; whatever was
-  already broken was doing the damage.
-- **Two arms can peak at different budgets**, so one sweep compares one at its best
-  and the other on its way up. Compare PEAK TO PEAK.
-- **A ranking arm needs something to rank.** `Homeostat` at stamina 4 offers a
-  choice on one step in six hundred. Read `Choices`; on a walk read
-  `Thought.Divides`.
-- **AN ARM TIES WHEN WHAT IT RANKS BY IS IMPLIED BY WHAT IT REPLACES.** Two
-  comparable routes outsum one, so `Agreement` and `Sum` order alike here — read as
-  a bug for four sessions. **An arm needs the two statistics to DISAGREE.**
 - **A check can be wired and unable to fire**, which reads as passing. Arm anything
   that has always read zero.
 - **A dial can be declared, documented, passed everywhere and connected to
   nothing.** Every run reports `Complaints`; read them.
-- **AND A DIAL CAN BE SET ON THE SETTINGS AND READ FROM A PARAMETER.**
-  `InputMachine` took `span` and `gated` as arguments while `WalkSettings` held
-  the same names unread. **A sweep that cannot reach is silent, not wrong, and
-  silence reads as free.**
-- **A number in a commit message is a claim, not a record.** An attribution
-  everybody trusted was taken through exactly that unread dial, and cost two
-  sessions before anybody re-measured it.
 - **A fallback is a control arm nobody meant to run** — silence drifts an arm toward
   the random bar for free. Report silence beside the score.
-- **And the fallback is often the only exploration there is**, so curing silence can
-  remove it and read as harm.
-- **A silence has two causes wanting opposite fixes** — an empty cell, or a walk that
-  cannot afford to reach one. Spend more and see if the voice returns.
-- **A CORPUS CAN CONTAIN ITS OWN ANSWER, and then a score measures the leak.** Every
-  short `Clutrr` story states the relation it asks for, so reaching it composed
-  nothing. Split what was in front of it from what was not, and score them apart.
-- **A CHEAPER WALK THAT KEEPS ITS SCORE MAY HAVE STOPPED DOING THE TASK.** Beaming
-  `Clevr` to two partners left accuracy alone and took reference to nearly nought —
-  the answer never needed the object. Watch the diagnostic channel, not the headline.
-- **A small sample can look like a mechanism.** One seed drew a clean learning curve
-  six flattened; twelve seeds showed a gap thirty-two closed.
-- **AND IT HIDES A REAL EFFECT AS WELL AS INVENTING ONE.** A separation eight seeds
-  could not see was plain at four times that. Count seeds in BOTH directions.
-- **A STATISTIC READ OFF A BOUNDED QUANTITY READS THE BOUND.** `Widest` is clipped by
-  `Row`, so two saturated rows compare equal forever. Four tests did it, and one
-  reported the opposite of the truth for as long as it existed.
-- **An unsigned separation cannot tell a collapse from a breakthrough.**
-  `Measured.Separation` called a steep fall "the arm has started learning". Assert
-  the DIRECTION apart from the size.
-- **A dial can be wired to ONE WORLD IN TEN.** `Names` is read by `SnakeRun` and
-  nothing else, and was cashed in citing a finding as though it were general.
-- **Seeds that change nothing make every separation infinite.** bAbI and CLEVR are
-  fixed corpora in fixed order, so every arm's spread is nought and a significance
-  bar there passes for any difference at all.
-- **A similarity code is a hub at the coarse end and an index at the fine end.**
-  Both widen every row it joins, and cost is set by the widest row — generalising
-  is paid for out of the walk's budget.
-- **A mean over a population the problem created cannot see it.** Read `Widest`.
-- **A `cref` is not a call and a `ToString` is not an assertion** — both are how a
-  dead mechanism goes on looking alive. `DeadCodeTests` is the budget.
-- **Copies drift where nothing fails.** `DuplicationTests` is the budget.
-- **The test suite is serial on purpose** — parallel load hid a real disagreement.
-- **Closed in code**: consecutive seeds are not independent (`Seeds.Apart`);
-  `Measured.Separation` returned zero for no spread; `WhenQuiet()` was not a finish
-  signal; walks were read before finishing (fork 22).
+- **A ranking arm needs something to rank, AND ITS STATISTIC MUST DISAGREE WITH THE
+  CONTROL'S.** Two comparable routes outsum one, so `Agreement` and `Sum` ordered
+  alike everywhere and four sessions read a tautology as a bug.
+- **Measure one mechanism ON from a known baseline, never one OFF from all-on.**
+- **A small sample can look like a mechanism, AND IT HIDES A REAL EFFECT TOO.** Count
+  seeds in both directions.
+- **A number in a commit message is a claim, not a record.**
+- **A dial can be wired to ONE WORLD IN TEN**, and cashed in citing a finding as
+  though it were general.
+- **A CORPUS CAN CONTAIN ITS OWN ANSWER, and then a score measures the leak.**
+- **Two arms can peak at different budgets.** Compare PEAK TO PEAK.
+- **AND A MECHANISM CAN BE RIGHT AND ITS OBVIOUS WIRING WRONG.** Minting a name is
+  not the same decision as where the name goes; `csharp` broke two controls learning
+  that.
 
 ---
 
 ## OPEN DEFECTS
 
-- *(none — the credit arm's decline was diagnosed rather than parked; see the
-  act-to-outcome item above.)*
+- *(none — nothing is built yet. The first entry here should be a thing measured and
+  not understood, never a thing not yet attempted.)*
 
 ---
 
@@ -302,9 +217,13 @@ condition is a superstition.**
 
 **Never renumbered** — `DocsTests` asserts each resolves.
 
+**Inherited whole from `csharp` and NOT renumbered.** Most concern the walk and go
+with it; they stay listed because that code is still on this branch until it is
+stripped, and a number that stops resolving is how a citation rots.
+
 | | |
 |---|---|
-| **1** | The distributed rendezvous. Open |
+| **1** | The distributed rendezvous. Open, and inherited unchanged |
 | **3** | Cluster placement: uniform hash against prefix locality. Open |
 | **5** | A death writes off routes into the dead cluster. Closed |
 | **6** | Broadcast the origin, route the hops. Closed |
@@ -315,5 +234,5 @@ condition is a superstition.**
 | **21** | Compression as an edge. A trade; off |
 | **22** | A transiently-zero live count dropped later reports. Closed |
 | **23** | Compression self-regulating? Not on any signal found yet |
-| **24** | Budget controller aims at a moving target. Deleted — see the table |
+| **24** | Budget controller aims at a moving target. Deleted |
 | **25** | The binding world — built to fail, failed as predicted, since lifted |

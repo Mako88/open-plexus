@@ -85,3 +85,33 @@ else
     "CLEVR_v1.0/README.txt" "CLEVR_v1.0/LICENSE.txt" "CLEVR_v1.0/COPYRIGHT.txt"
   echo "CLEVR: extracted the validation split to $clevr_dir"
 fi
+
+# CLUTRR — Sinha et al. 2019, "CLUTRR: A Diagnostic Benchmark for Inductive
+# Reasoning from Text". CC BY-NC 4.0, (c) 2019 Facebook, Inc.
+#
+# WHY THIS IS HERE: `Kind.Role` is the only mechanism in this design that can
+# hold a fact naming no argument -- whatever fills one slot of a relation fills
+# another slot of a different one -- and it has only ever been measured on cases
+# built here. This is kinship composition on somebody else's data: `grandson`
+# then `brother` is `grandson`, whoever the people are.
+#
+# NO LANGUAGE MODEL IS NEEDED AND NONE IS CLAIMED. The chain ships as columns --
+# `story_edges` says which pairs are joined, `edge_types` says with what,
+# `query_edge` says which pair is asked about -- exactly as CLEVR ships its scene
+# graph. The English story is ignored.
+#
+# ONLY THE TEST SPLIT. It carries chains of two to ten hops where train carries
+# two to three, so it holds both the short chains a rule can be learned from and
+# the long ones that need the rule composed. The split means nothing to a system
+# with no training phase; the chain length is what matters, and this is the file
+# that has the range.
+clutrr_url="https://raw.githubusercontent.com/kliang5/CLUTRR_huggingface_dataset/main/gen_train23_test2to10/test.csv"
+clutrr_file="$here/clutrr_test.csv"
+
+if [ -f "$clutrr_file" ]; then
+  echo "CLUTRR: already at $clutrr_file"
+else
+  echo "CLUTRR: fetching 1.9 MB from $clutrr_url"
+  curl -sS -L --max-time 300 -o "$clutrr_file" "$clutrr_url"
+  echo "CLUTRR: fetched to $clutrr_file"
+fi

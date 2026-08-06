@@ -46,6 +46,12 @@
   so yes/no and counting questions ask for a token the world never shows.
   `BabiTests` names the tasks; `PrimerTests` says why feeding it English does not
   fix it.
+- **A route from a front end to `Occasion.Roles`.** `Coded` carries four of the five
+  channels and not this one, so nothing in the library has ever written a role cell
+  and `Kind.Role` is measured only on hand-built occasions. `Clutrr` groups instead.
+- **A conclusion that can be asked from.** `Clutrr` answers a two-hop chain clear of
+  chance and scores nought from three: composing twice needs the first result to
+  become the next question, and nothing can hold one.
 - **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
   sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
   — everything else carries over. An act is already a code.
@@ -57,8 +63,9 @@
 - **One whose dynamics BRANCH** — a cycle is an attractor, so the rollout's
   compounding error is untested.
 - **One an arm can bootstrap in** — every credit arm on `Tending` is a coin toss.
-- **One that NEEDS variable binding** — `Clutrr`, `gSCAN`. The mechanism is built and
-  measured only on constructed cases; `BindingGapTests` is the scoreboard.
+- **One needing variable binding that is not kinship** — `gSCAN`. `Clutrr` is built
+  and answers one composition; the mechanism itself is still measured only on
+  constructed cases, because no front end can reach it.
 
 ### Owed re-runs
 

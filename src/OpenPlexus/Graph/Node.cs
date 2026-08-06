@@ -491,7 +491,7 @@ public sealed class Node
         // threshold is the row's OWN mean count, so nothing here was chosen: a row
         // with a heavy head and a long tail cuts the tail, and a row of equal counts
         // cuts nothing at all. See WalkSettings.Narrowing.
-        if (_settings.Narrowing)
+        if (_settings.Fanout == Fanout.Shoulder)
         {
             var eligible = row
                 .Where(entry => entry.Key.Kind != Kind.Hindered
@@ -535,35 +535,6 @@ public sealed class Node
             }
             else walking = eligible;
         }
-        else if (_settings.Beam > 0 && row.Length > _settings.Beam)
-        {
-            var eligible = row
-                .Where(entry => entry.Key.Kind != Kind.Hindered
-                    && !message.Chain.Contains(entry.Key.Partner)
-                    && (message.Through is not { } only || entry.Key.Kind == only))
-                .ToArray();
-
-            if (eligible.Length > _settings.Beam)
-            {
-                // STRONGEST FIRST, THEN THE KEY'S OWN ORDER. A count tie is what a
-                // small or repetitive world produces constantly, and leaving those
-                // to the snapshot's order would put the walk at the mercy of
-                // dictionary iteration -- fork 12's property.
-                Array.Sort(eligible, (left, right) =>
-                {
-                    var strength = right.Value.Count.CompareTo(left.Value.Count);
-                    if (strength != 0) return strength;
-
-                    var partner = left.Key.Partner.CompareTo(right.Key.Partner);
-                    return partner != 0 ? partner : left.Key.Kind.CompareTo(right.Key.Kind);
-                });
-
-                pruned = eligible.Length - _settings.Beam;
-                walking = eligible[.._settings.Beam];
-            }
-            else walking = eligible;
-        }
-
         foreach (var (edge, tie) in walking)
         {
             // A HINDERED CELL IS EVIDENCE AND NEVER A ROUTE, so it is not walked.

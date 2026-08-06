@@ -127,6 +127,65 @@ public enum Toll
     Traffic,
 }
 
+/// <summary>
+/// How many partners a node sends to on one hop — <b>the base of the exponent
+/// every message count is raised to.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>MESSAGES GO AS FAN-OUT TO THE POWER OF DEPTH, so this is the only dial
+/// measured with orders of magnitude in it.</b> Thirty-two partners at depth four
+/// is about a million; eight is four thousand. The row cap bounds the width and
+/// the walk still spends all of it.
+/// </para>
+/// <para>
+/// <b>A SWEPT CONSTANT FOUND THE TARGET AND IS DELETED.</b> "A beam over partners"
+/// is a refuted row for being a constant nobody set doing the cutting; a beam of
+/// two was swept only to learn where quality breaks, and keeping the ruler after
+/// reading it is what this project deletes.
+/// </para>
+/// </remarks>
+public enum Fanout
+{
+    /// <summary>
+    /// Every partner. <b>The default, and every measurement taken up to now.</b>
+    /// </summary>
+    All,
+
+    /// <summary>
+    /// The partners above the row's own <b>widest gap</b>, with the rest booked as
+    /// <see cref="Thinking.Accounting.Pruned"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE REFUTED BEAM'S REVIVAL CONDITION: a width the system sets itself and
+    /// REPORTS.</b> A node sorts its own row and cuts at the largest drop between
+    /// consecutive counts. Nothing is chosen — a gap is a statement about the shape
+    /// of this row, and no number comes from anybody.
+    /// </para>
+    /// <para>
+    /// <b>THE MEAN WAS TRIED FIRST AND READS A ROW'S LEVEL RATHER THAN ITS
+    /// SHAPE.</b> It kept nearly everything and bought about a third off the
+    /// messages, where a swept constant of two bought eight times. Recorded as a
+    /// refuted row so nobody reaches for the obvious rule again.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS BETTER, NOT MERELY CHEAPER, WHERE IT HAS BEEN MEASURED.</b> On
+    /// <see cref="Worlds.Clutrr"/> it roughly doubles recall and raises composition
+    /// at three budgets while cutting messages between four and thirty times. The
+    /// count of composed answers barely moves, so what it removes is WRONG ones:
+    /// the weak edges were distractors rather than negligible.
+    /// </para>
+    /// <para>
+    /// <b>ITS FAILURE MODE IS A FLAT ROW, AND IT IS UNTESTED.</b> A row of nearly
+    /// equal counts has no shoulder, so the widest gap is one unit sitting
+    /// somewhere arbitrary and this will cut there with total confidence. The mean
+    /// degraded gracefully and this does not.
+    /// </para>
+    /// </remarks>
+    Shoulder,
+}
+
 /// <summary>How a candidate accumulates evidence from the routes reaching it.</summary>
 public enum Accumulate
 {
@@ -333,62 +392,8 @@ public sealed record WalkSettings
     /// </remarks>
     public int Row { get; init; } = 32;
 
-    /// <summary>
-    /// How many partners a node may send to on one hop. <b>Nought is every
-    /// measurement ever taken here: send to all of them.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>A MEASURING INSTRUMENT AND NOT A MECHANISM, AND THE DIFFERENCE IS A
-    /// REFUTED ROW.</b> "A beam over partners" was tried and killed for being <i>a
-    /// constant nobody set, doing the cutting</i>, and its revival condition is <b>a
-    /// width the system sets itself and reports</b>. This is neither — it is a dial
-    /// swept to find WHERE quality breaks, so that a self-set rule has a target to
-    /// be judged against. Anything that ships derives its width from a node's own
-    /// row.
-    /// </para>
-    /// <para>
-    /// <b>IT IS THE BASE OF AN EXPONENT, WHICH IS WHY IT IS WORTH THE CARE.</b>
-    /// Messages go roughly as fan-out to the power of depth, so the difference
-    /// between sending to thirty-two partners and eight is not four times at depth
-    /// four, it is two hundred and fifty-six times. That is the only lever measured
-    /// so far with orders of magnitude in it.
-    /// </para>
-    /// <para>
-    /// <b>THE STRONGEST EDGES SURVIVE, AND THE TIE BREAKS ON THE KEY.</b> Route
-    /// strength MULTIPLIES along a chain, so a route leaving by a weak edge arrives
-    /// carrying almost nothing — the flood spends most of itself delivering score
-    /// that cannot change a ranking. Ties break on partner then kind, because
-    /// leaving that to dictionary order is how a fixed seed stops reproducing a
-    /// run; see fork 12.
-    /// </para>
-    /// </remarks>
-    public int Beam { get; init; }
-
-    /// <summary>
-    /// Whether a node works out its OWN fan-out from its own row.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>THE REVIVAL CONDITION FOR THE REFUTED BEAM, WHICH ASKED FOR A WIDTH THE
-    /// SYSTEM SETS ITSELF AND REPORTS.</b> A node sends to the partners whose count
-    /// reaches its row's own mean, and reports the rest as
-    /// <see cref="Thinking.Accounting.Pruned"/>. Nothing is chosen: the threshold is
-    /// a statistic of the row it cuts.
-    /// </para>
-    /// <para>
-    /// <b>IT CUTS HARD WHERE THERE IS SKEW AND NOT AT ALL WHERE THERE IS NONE, which
-    /// is the property that makes it honest.</b> A row of one big count and a tail
-    /// of ones has a mean above the tail, so the tail goes; a row of equal counts
-    /// has every entry at the mean, so every entry survives. A world with no
-    /// structure to exploit is not quietly starved.
-    /// </para>
-    /// <para>
-    /// <b>It overrides <see cref="Beam"/></b>, which is a swept constant and a
-    /// measuring instrument.
-    /// </para>
-    /// </remarks>
-    public bool Narrowing { get; init; }
+    /// <inheritdoc cref="Graph.Fanout"/>
+    public Fanout Fanout { get; init; } = Fanout.All;
 
     /// <inheritdoc cref="Graph.Pricing"/>
     /// <remarks><b><see cref="Graph.Pricing.Receiver"/> is the default and the

@@ -136,7 +136,7 @@ condition is a superstition.**
 | Sender-*weighing*, `IMarginals` | A C1 violation, and behaviour was identical without it | Never. `Message.Seen` is the legal version |
 | Absolute actions, unrotated view | One move in four instantly fatal | A body with no heading |
 | Survival as the score | Circling wins. Snake cannot discriminate policies at all | Homeostatic drives, where standing still stops paying |
-| A beam over partners | A constant nobody set, doing the cutting | **MET by `WalkSettings.Narrowing`** — the row's widest gap, reported as `Pruned` |
+| A beam over partners | A constant nobody set, doing the cutting | **MET by `Fanout.Shoulder`** — the row's widest gap, reported as `Pruned` |
 | A beam at the row's own MEAN | Far too permissive: kept nearly everything and bought about a third where a constant of two bought eight times | A threshold reading the row's SHAPE rather than its level |
 | Clusters by modality | Splits picture from sound, the one link this design exists to make | Never |
 | Clusters by time of creation | Two machines compute different owners for one code | Placement agreement without a coordinator |

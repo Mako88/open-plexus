@@ -50,6 +50,12 @@ public sealed class DialTests(ITestOutputHelper output)
     /// </summary>
     private static readonly Dictionary<string, string> HandSet = new(StringComparer.Ordinal)
     {
+        ["Fanout"] =
+            "a choice between sending to every partner and sending above the row's "
+            + "own shoulder. The quantity that could be hunted is the WIDTH, and "
+            + "the row already sets that from its widest gap — what is left is "
+            + "which of two rules applies, which is not a level",
+
         ["Pricing"] =
             "a choice between two C1-legal weightings rather than a continuum. "
             + "Which end weighs an edge is not a quantity that can be hunted",
@@ -393,7 +399,17 @@ public sealed class DialTests(ITestOutputHelper output)
         // `Budget` went with them: the controller is unconditional now, so it is
         // not a switch and not a level either.
         //
-        // TWELVE IS THE HONEST NUMBER, and it is still much worse than seven.
-        Assert.Equal(12, HandSet.Count);
+        // AND TO THIRTEEN FOR `Fanout`, WHICH IS THE ARGUMENT THIS FILE EXISTS TO
+        // FORCE. It is not a level: the WIDTH is the quantity that could be hunted
+        // and a node already sets that from its own row's widest gap, so what is
+        // left is which of two named rules applies -- the same shape as `Pricing`
+        // and `Toll`. It arrived as a bool and as a swept integer beside it, and
+        // both were wrong: `FlagTests` refuses an on/off switch and the integer was
+        // a ruler kept after it had been read. What it buys is the only change
+        // measured here with orders of magnitude in it, and it is BETTER rather
+        // than merely cheaper on the one world where the chain is load-bearing.
+        //
+        // THIRTEEN IS THE HONEST NUMBER, and it is still much worse than seven.
+        Assert.Equal(13, HandSet.Count);
     }
 }

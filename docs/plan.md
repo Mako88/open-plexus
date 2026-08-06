@@ -45,9 +45,9 @@
 - **An answer that is no code it has ever seen.** Answering is ARRIVING somewhere,
   so yes/no and counting questions ask for a token the world never shows.
   `BabiTests` names the tasks; `PrimerTests` says why English does not fix it.
-- **AND AN ANSWER NOT IN FRONT OF IT.** `Clutrr` scores nought where the answer is
-  stated nowhere in the story, and every reply is a relation the story DID state.
-  The code exists; it is never preferred over what is locally present.
+- **AND AN ANSWER NOT IN FRONT OF IT — A RANKING FAULT, MEASURED.** On `Clutrr` the
+  right answer is REACHED on a third of fresh stories and chosen on none. Strength
+  multiplies, so the confound is DISTANCE, not frequency.
 - **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
   sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
   — everything else carries over. An act is already a code.
@@ -167,6 +167,7 @@ condition is a superstition.**
 | Banded position codes on CLEVR | Halves the reference at every budget it survives and times out above, peak to peak. No kept question is spatial, so it is row width bought with noise | A world whose QUESTION is spatial |
 | Asking again where a task merely LOOKS deep | bAbI's one-, two- and three-fact tasks: worse on the first and no better on the rest. One walk already reaches there | A world where one walk is at chance while answering confidently |
 | Asking again UNCONDITIONALLY | Discards the first walk's evidence to gamble on one intermediate. Took `Clevr` to about a third | Never as a default. `Question.Steps` is the legal version |
+| Ranking an arrival against the endpoint's BASE RATE | Inert alone, harmful with two walks: the candidates' marginals barely differ, so it divides by nearly a constant. **Deleted** | Candidate answers differing WIDELY in frequency |
 | Fork 24, the budget controller | `Moves` never left nought on the one world that ran it — three budgets sampled forever, none chosen. Billing the probe cost a quarter of `Senses`. **Deleted** | A world where the right budget VARIES |
 
 ---

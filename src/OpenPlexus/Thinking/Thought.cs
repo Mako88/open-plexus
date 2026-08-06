@@ -619,10 +619,12 @@ public sealed class Thought
 
             if (Math.Abs(gap) > Tied * Math.Max(1.0, scale)) return gap > 0 ? -1 : 1;
 
-            var mine = left.Chain.IsDefaultOrEmpty ? 0 : left.Chain.Length;
-            var theirs = right.Chain.IsDefaultOrEmpty ? 0 : right.Chain.Length;
+            var shorter = left.Chain.IsDefaultOrEmpty ? 0 : left.Chain.Length;
+            var longer = right.Chain.IsDefaultOrEmpty ? 0 : right.Chain.Length;
 
-            return mine != theirs ? mine.CompareTo(theirs) : left.Endpoint.CompareTo(right.Endpoint);
+            return shorter != longer
+                ? shorter.CompareTo(longer)
+                : left.Endpoint.CompareTo(right.Endpoint);
         }));
     }
 

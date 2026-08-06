@@ -225,6 +225,7 @@ public enum Accumulate
     /// </para>
     /// </remarks>
     Agreement,
+
 }
 
 /// <summary>

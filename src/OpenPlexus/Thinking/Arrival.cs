@@ -30,6 +30,8 @@ public sealed record Arrival
 
     /// <summary>How many routes reached here.</summary>
     public required int Routes { get; init; }
+
+
 }
 
 /// <summary>

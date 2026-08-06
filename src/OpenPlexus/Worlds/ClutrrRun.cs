@@ -23,6 +23,31 @@ public sealed record ClutrrResult : Questioned
     public required int Steps { get; init; }
 
     /// <summary>
+    /// Across fresh stories, how many DISTINCT candidate answers the walk reached
+    /// at all.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE DIFFERENCE BETWEEN A RANKING FAULT AND A REACH FAULT, and they want
+    /// opposite fixes.</b> If a walk arrives at one candidate it does not matter
+    /// how they are ranked — there is nothing to rank — and every re-ranking will
+    /// read as inert. Only above one is the ordering doing any work.
+    /// </remarks>
+    public required int Candidates { get; init; }
+
+    /// <summary>
+    /// On fresh stories, how often the CORRECT answer was among the candidates the
+    /// walk reached at all.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE MEASUREMENT THAT SEPARATES A RANKING FAULT FROM A REACH FAULT ONCE
+    /// AND FOR ALL.</b> If this is nought, no ordering of what was reached can ever
+    /// be right, and every re-ranking is inert by construction — which is what a
+    /// base-rate ranking measured, to the digit, before this counter existed to
+    /// explain it.
+    /// </remarks>
+    public required int Held { get; init; }
+
+    /// <summary>
     /// Right and asked, broken down by how many hops the chain was.
     /// </summary>
     /// <remarks>
@@ -198,6 +223,8 @@ public sealed class ClutrrRun : IDisposable
         Question? asking = null, CancellationToken ct = default)
     {
         int asked = 0, right = 0, silent = 0, unbalanced = 0, unsettled = 0;
+        var seenCandidates = 0;
+        var reachedRight = 0;
         int toldAsked = 0, toldRight = 0, toldQuiet = 0;
         int freshAsked = 0, freshRight = 0, freshQuiet = 0, echoed = 0;
         long halted = 0;
@@ -229,6 +256,11 @@ public sealed class ClutrrRun : IDisposable
             chains.Fold(answered.Reached);
 
             var answer = answered.Answer;
+            if (!story.Restated)
+            {
+                seenCandidates += answered.Candidates;
+                if (answered.Held) reachedRight++;
+            }
 
             asked++;
             var correct = answer is { } reached && reached == story.Answer.Role(0);
@@ -280,6 +312,8 @@ public sealed class ClutrrRun : IDisposable
             Recalled = (toldAsked, toldRight, toldQuiet),
             Fresh = (freshAsked, freshRight, freshQuiet),
             Echoed = echoed,
+            Candidates = seenCandidates,
+            Held = reachedRight,
             Halted = halted,
             Reflections = Reflections.Of(_dials, 0),
             Plumbing = _fabric.Facts(chains, unbalanced),
@@ -365,7 +399,9 @@ public sealed class ClutrrRun : IDisposable
         int Halted,
         bool Balanced,
         bool Settled,
-        IReadOnlyList<Arrival> Reached);
+        IReadOnlyList<Arrival> Reached,
+        int Candidates,
+        bool Held);
 
     /// <summary>
     /// Writes one stated relation as a NODE joining its people and its type.
@@ -442,6 +478,8 @@ public sealed class ClutrrRun : IDisposable
         var settled = true;
         IReadOnlyList<Arrival> reached = [];
         Code? answer = null;
+        var candidates = 0;
+        var held = false;
 
         for (var step = 0; step < asking.Steps; step++)
         {
@@ -457,8 +495,11 @@ public sealed class ClutrrRun : IDisposable
             settled &= quiet;
             reached = thought.Best(int.MaxValue);
 
-            var best = thought.BestAmong(answers, 1);
-            answer = best.Count == 0 ? null : best[0].Endpoint;
+            // EVERY candidate reached, not just the winner -- see Candidates.
+            var among = thought.BestAmong(answers, int.MaxValue);
+            candidates = among.Count;
+            held = among.Any(one => one.Endpoint == story.Answer.Role(0));
+            answer = among.Count == 0 ? null : among[0].Endpoint;
 
             // WHAT THIS WALK CONCLUDED, AS THE NEXT ONE'S ORIGINS. The conclusion
             // is not written back -- fork 21 is what would do that, and writing a
@@ -471,7 +512,7 @@ public sealed class ClutrrRun : IDisposable
             _reading.Forget(thought.Id);
         }
 
-        return new Answering(answer, halted, balanced, settled, reached);
+        return new Answering(answer, halted, balanced, settled, reached, candidates, held);
     }
 
     public void Dispose() => _fabric.Dispose();

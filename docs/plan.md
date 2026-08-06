@@ -15,6 +15,9 @@
 
 - **Understand rather than perform** — answer *what would the world look like if I
   did X*, which a sequence model cannot be.
+- **AND THAT IS `do(X)`, WHICH NO AMOUNT OF COUNTING `X` YIELDS.** Every cell is
+  written for acts a policy TOOK, so wanting an act and the act working are
+  confounded. An act drawn without consulting the state is not — see `Kind.Meddled`.
 - **Learning is a co-occurrence count.** Everything else is plumbing around it.
 
 ## The constraints
@@ -47,6 +50,9 @@
 - **A world with a WIDE real-valued signal to point `Winnow` at.** Built and mounted
   nowhere. The empirical guard is done — `Winnow.Distinct` counts tags actually
   emitted, since the declared width cannot see a low intrinsic dimension.
+- **A BODY THAT SAYS WHICH ACTS IT WAS ASSIGNED.** `Kind.Meddled` and
+  `Occasion.Forced` are built and no world sets them, so the interventional cell
+  exists and is empty. Needs a world that acts AND carries a span.
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and
   the rollout predicts; nothing can hold a state that is NOT current and steer
   toward it. Planning needs a target, and sub-goals are what serve many tasks.
@@ -266,9 +272,10 @@ condition is a superstition.**
 
 ## OPEN DEFECTS
 
-- **The credit arm gets WORSE with more data on `Homeostat`**, monotonically across
-  three run lengths. Asserted as a decline; nobody has asked what a longer run
-  accumulates that misleads the walk.
+- **The credit arm gets WORSE with more data on `Homeostat`**, monotonically.
+  **Next: `Span` is nought there, so no act-to-outcome edge exists at all** — the
+  chain arm asks which act ACCOMPANIED states like this, which is a mirror that
+  more data only sharpens.
 
 ---
 

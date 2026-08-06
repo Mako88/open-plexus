@@ -170,8 +170,20 @@ public sealed class LocalRendezvous : IRendezvous
                     // to walk from a consequence back to its cause -- measured
                     // on snake, where choosing an action stopped working
                     // entirely. See Kind.Before.
+                    // AND WHETHER THE THING THAT CAME FIRST WAS CHOSEN OR ASSIGNED.
+                    // The same pair, in a different cell, when nothing about the
+                    // state selected `first` -- which is what makes what followed
+                    // it interventional rather than merely observed. See
+                    // Occasion.Forced and Kind.Meddled. It REPLACES `After`
+                    // rather than joining it, or one occasion is counted twice and
+                    // the observational row absorbs the evidence it exists to be
+                    // compared against.
+                    var forward = occasion.Forced?.Contains(first) == true
+                        ? Kind.Meddled
+                        : Kind.After;
+
                     if (!Passing(occasion.Fleeting, second))
-                        _clusters.For(first).Observe(second, weight, Kind.After, occasion.At);
+                        _clusters.For(first).Observe(second, weight, forward, occasion.At);
 
                     // SAFE HERE AND NOT FOR A CARRIED CODE, because both of
                     // these were IN the occasion and both noted it -- so the
@@ -229,10 +241,17 @@ public sealed class LocalRendezvous : IRendezvous
                     // John's call 2026-08-04. Sharing the simultaneous cell was
                     // the arm that made a deeper walk monotonically worse, and the
                     // refutation table records the kinds as what fixed it.
+                    // AND THIS IS WHERE THE INTERVENTION ACTUALLY LANDS. An act and
+                    // its outcome are never in one moment, so this loop -- a code
+                    // that has already stopped, recording what started next -- is
+                    // the only cell in the design that can hold a causal claim at
+                    // all. If nothing about the state selected `past`, what
+                    // followed it is interventional evidence and belongs somewhere
+                    // else entirely. See Kind.Meddled and Occasion.Forced.
                     _clusters.For(past).Observe(
                         onset,
                         weight * _carried,
-                        Kind.After,
+                        occasion.Forced?.Contains(past) == true ? Kind.Meddled : Kind.After,
                         occasion.At);
         }
 

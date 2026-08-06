@@ -105,4 +105,25 @@ public interface IQuantizer<in TObservation>
     /// </para>
     /// </remarks>
     IReadOnlyDictionary<Code, int>? Filling(TObservation observation) => null;
+
+    /// <summary>
+    /// Which codes were ASSIGNED rather than selected. <b>Null by default, which
+    /// is every occasion this design has ever written.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE SIXTH CHANNEL, AND IT OWES AN ARGUMENT AGAINST THE OTHER FIVE.</b>
+    /// None of them can carry it: grouping is about objects, fleetingness about
+    /// recurrence, order about time, and the two relation channels about what a
+    /// moment STATES. This is about how the moment came to happen at all, which is
+    /// a fact nothing in the moment records. See
+    /// <see cref="Learning.Occasion.Forced"/> and <see cref="Graph.Kind.Meddled"/>
+    /// — it is the difference between <c>P(y | x)</c> and <c>P(y | do(x))</c>, and
+    /// no amount of counting the first yields the second.
+    /// <para>
+    /// <b>It stays on the line the other five stay on.</b> <i>I picked this without
+    /// looking at the state</i> is something the body knows about what it did;
+    /// what follows from it is left to the walk.
+    /// </para>
+    /// </remarks>
+    IReadOnlySet<Code>? Forced(TObservation observation) => null;
 }

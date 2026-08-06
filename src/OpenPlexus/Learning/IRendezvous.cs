@@ -145,6 +145,36 @@ public sealed record Occasion
     public IReadOnlyDictionary<Code, int>? Sequence { get; init; }
 
     /// <summary>
+    /// Which of this occasion's codes were ASSIGNED rather than selected — <b>the
+    /// one bit that separates an intervention from an observation.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NULL IS EVERY OCCASION EVER WRITTEN, and that is exactly the problem it
+    /// exists for.</b> Every count in this design is over acts something already
+    /// wanted to take, so the whole graph holds <c>P(outcome | act)</c> and the
+    /// stated goal asks for <c>P(outcome | do(act))</c>. See
+    /// <see cref="Graph.Kind.Meddled"/>: a code drawn without consulting the state
+    /// carries no confound, so what follows it is interventional evidence.
+    /// </para>
+    /// <para>
+    /// <b>IT ONLY MOVES THE FORWARD TEMPORAL EDGE, and that is deliberate rather
+    /// than partial.</b> What is being separated is <i>this was done, then that
+    /// followed</i>; simultaneity says nothing causal, and the reverse edge is
+    /// <see cref="Graph.Kind.Before"/> reading the same fact backwards, where the
+    /// distinction would mean nothing. So a forced code's <see cref="Graph.Kind.After"/>
+    /// cells become <see cref="Graph.Kind.Meddled"/> cells and every other channel
+    /// this occasion writes is untouched.
+    /// </para>
+    /// <para>
+    /// <b>IT SAYS WHAT HAPPENED AND NEVER WHAT TO CONCLUDE.</b> <i>I picked this
+    /// one without looking</i> is a fact the body has and the graph cannot recover;
+    /// what follows from it is left entirely to the walk.
+    /// </para>
+    /// </remarks>
+    public IReadOnlySet<Code>? Forced { get; init; }
+
+    /// <summary>
     /// Which relation this occasion's pairs are written in. <b>Null is every
     /// occasion ever written: simultaneity, or whatever
     /// <see cref="Sequence"/> says.</b>

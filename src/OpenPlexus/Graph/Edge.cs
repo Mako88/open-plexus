@@ -317,6 +317,45 @@ public readonly record struct Kind : IComparable<Kind>
     public static Kind Fills { get; } = Of("fills");
 
     /// <summary>
+    /// The partner came after this node, <b>and this node was MADE to happen
+    /// rather than chosen.</b> <see cref="After"/>'s interventional twin.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THIS IS THE ONE CELL IN THE DESIGN THAT ANSWERS THE QUESTION THE PROJECT
+    /// EXISTS FOR.</b> The goal is <i>what would the world look like if I did X</i>,
+    /// and every count here is over acts the policy actually TOOK — so
+    /// <see cref="After"/> holds <c>P(outcome | act)</c> among the acts something
+    /// already wanted to take, which is not the same quantity and cannot be turned
+    /// into it by counting more. Wanting an act and the act working are confounded
+    /// wherever the same thing chose both.
+    /// </para>
+    /// <para>
+    /// <b>AN ACT DRAWN AT RANDOM BREAKS THAT CONFOUND BY CONSTRUCTION, WHICH IS
+    /// WHAT A RANDOMISED TRIAL IS.</b> Nothing about the state selected it, so
+    /// what followed it cannot be explained by whatever would have selected it —
+    /// and a count over those occasions IS <c>P(outcome | do(act))</c>. The only
+    /// thing needed to have both is somewhere separate to put them.
+    /// </para>
+    /// <para>
+    /// <b>IT REPLACES <see cref="After"/> AND NEVER ACCOMPANIES IT.</b> A cell is
+    /// <c>(partner, kind)</c>, so writing both would count one occasion twice and
+    /// make the observational row include the interventional evidence it exists to
+    /// be compared against. <see cref="Thinking.Question.Through"/> walking this
+    /// and nothing else is a walk that has only ever seen interventions.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE REVIVAL CONDITION TWO DELETED ROWS ASKED FOR.</b>
+    /// <c>Kind.Informed</c> died because no walk reaches an untried act, and the
+    /// plan's "a reason to seek" is parked on the same fact. An act that is
+    /// sometimes forced is tried, so both are reachable again — the exploration is
+    /// what fills this cell, and this cell is what makes the exploration worth more
+    /// than noise.
+    /// </para>
+    /// </remarks>
+    public static Kind Meddled { get; } = Of("meddled");
+
+    /// <summary>
     /// The relation's name where one is known, and its number where it is not.
     /// </summary>
     /// <remarks>

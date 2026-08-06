@@ -57,4 +57,7 @@ public sealed class Passthrough : IQuantizer<Coded>
 
     /// <inheritdoc/>
     public IReadOnlyDictionary<Code, int>? Filling(Coded observation) => observation.Filling;
+
+    /// <inheritdoc/>
+    public IReadOnlySet<Code>? Forced(Coded observation) => observation.Assigned;
 }

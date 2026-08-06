@@ -53,6 +53,9 @@ public readonly record struct Coded
     /// <inheritdoc cref="IQuantizer{TObservation}.Filling"/>
     public IReadOnlyDictionary<Code, int>? Filling { get; init; }
 
+    /// <inheritdoc cref="IQuantizer{TObservation}.Forced"/>
+    public IReadOnlySet<Code>? Assigned { get; init; }
+
     /// <summary>Codes and nothing else, which is most of them.</summary>
     public static Coded Of(IReadOnlyCollection<Code> codes) => new() { Codes = codes };
 

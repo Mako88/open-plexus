@@ -37,6 +37,16 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     private Occasion? _joined;
 
     /// <summary>
+    /// Which codes of the PREVIOUS frame nothing about the state selected.
+    /// </summary>
+    /// <remarks>
+    /// <b>Remembered because a code is carried the frame AFTER it stopped</b>, so
+    /// by then the quantiser is being asked about a different moment. See
+    /// <see cref="Occasion.Forced"/>.
+    /// </remarks>
+    private IReadOnlySet<Code>? _assigned;
+
+    /// <summary>
     /// The last thought this machine had, <b>which is what it expects next.</b>
     /// </summary>
     /// <remarks>
@@ -193,8 +203,27 @@ public sealed class InputMachine<TFrame> : IReceiveReports
         //
         // Carrying first makes the previous frame available to this one. `Window`
         // counts strictly inside the span to keep zero meaning off.
-        _window.Carry(changes.Stopped, changes.Started, now);
+        // AND WHICH OF THEM NOTHING CHOSE. A code that has just STOPPED was live in
+        // the frame before this one, so its forcedness is a frame old by the time
+        // it is carried -- which is why it is remembered rather than read here.
+        // See Occasion.Forced.
+        _window.Carry(changes.Stopped, changes.Started, now, _assigned);
         ImmutableArray<Code> recent = [.. _window.Recent(now)];
+
+        var assigned = _quantizer.Forced(frame);
+        _assigned = assigned;
+
+        // THIS MOMENT'S AND THE CARRIED ONES TOGETHER, because the cell that
+        // matters is written from a CARRIED code to an onset and the rendezvous
+        // looks the sender up in one set. Null stays null, so a body that never
+        // says anything costs nothing.
+        var carried = _window.Forced(now);
+
+        IReadOnlySet<Code>? forced = carried.Count == 0
+            ? assigned
+            : assigned is null
+                ? carried
+                : new HashSet<Code>(carried.Concat(assigned));
 
         // STEP 3 — A SET THAT KEEPS ARRIVING WHOLE GETS A NAME, and the name then
         // stands in for it.
@@ -360,6 +389,12 @@ public sealed class InputMachine<TFrame> : IReceiveReports
                 // until one says otherwise.
                 As = _quantizer.Relating(frame),
                 Roles = _quantizer.Filling(frame),
+
+                // AND WHICH OF THEM NOTHING ABOUT THE STATE SELECTED, this moment's
+                // and the carried ones together. Null for every front end that
+                // observes rather than acts, which is all of them until a body says
+                // otherwise. See Occasion.Forced.
+                Forced = forced,
             };
 
         _joined = joined;

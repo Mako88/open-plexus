@@ -214,6 +214,37 @@ public sealed class Commitment
         }
     }
 
+    /// <summary>Takes over another commitment's record, when it is the same claim said shorter.</summary>
+    /// <param name="from">The commitment being rewritten.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ONE PLACE EVIDENCE MOVES, AND IT IS NOT AN EXCEPTION TO NEVER EDITING
+    /// A COMMITMENT.</b> Rung five does not change what is claimed — it changes how
+    /// the claim is written, by putting a name where its members were. The two entail
+    /// exactly the same moments, which <c>Unfold</c> is what checks.
+    /// </para>
+    /// <para>
+    /// <b>Making it re-earn its record would punish being compressed</b>, and a
+    /// mechanism whose reward is losing its evidence is one nobody would run.
+    /// </para>
+    /// </remarks>
+    public void Carry(Commitment from)
+    {
+        ArgumentNullException.ThrowIfNull(from);
+
+        Hits = from.Hits;
+        Misses = from.Misses;
+        Abstains = from.Abstains;
+
+        _accuracy = from._accuracy;
+        _seen = from._seen;
+
+        // THE TALLY COMES TOO, and the codes now hidden inside the name are harmless
+        // in it: they are present in every firing this can have, so they separate
+        // nothing and repair will never choose one.
+        foreach (var (code, seen) in from._separations) _separations[code] = seen;
+    }
+
     /// <summary>Drops the tally, keeping everything that decides whether it fires.</summary>
     /// <remarks>
     /// <b>THE TABLE IS WHAT BLOWS UP, NOT THE COMMITMENT.</b> Four fields have to

@@ -32,16 +32,26 @@ public sealed class StepOneTests(ITestOutputHelper output)
             $"recent={learned.Recent:F3} resident={learned.Resident} "
             + $"sound={learned.Sound} unsound={learned.Unsound} found={learned.Found}");
 
-        Assert.True(learned.Recent > 0.95, $"only {learned.Recent:F3} over the last tenth");
+        Assert.True(learned.Recent > 0.97, $"only {learned.Recent:F3} over the last tenth");
 
         // AN ACCURACY CAN BE REACHED BY MEMORISING, so the count goes beside it. The
         // world's own basis holds eight rules; a learner at ten thousand commitments
         // has not found the structure whatever it scores.
-        Assert.True(learned.Resident < 500, $"{learned.Resident} commitments resident");
+        Assert.True(learned.Resident < 100, $"{learned.Resident} commitments resident");
 
         // AND SOUNDNESS IS THE NUMBER THIS IS ACTUALLY JUDGED ON -- rules that are
         // TRUE of the world, checked by enumeration rather than against one basis.
-        Assert.True(learned.Sound > 20, $"only {learned.Sound} sound commitments");
+        //
+        // A RAW COUNT IS THE WRONG BAR AND WAS SET AT ONE FOR A WHILE. Subsumption
+        // compresses, so a population that got BETTER holds fewer sound rules than
+        // one that never dropped a redundant specific -- and the bar then punishes
+        // exactly the mechanism it was meant to reward. The share is what survives
+        // compression.
+        Assert.True(learned.Sound > 10, $"only {learned.Sound} sound commitments");
+
+        Assert.True(
+            learned.Sound / (double)(learned.Sound + learned.Unsound) > 0.3,
+            $"{learned.Sound} sound against {learned.Unsound} not");
 
         // SILENCE IS A CONTROL ARM NOBODY MEANT TO RUN. One round, before anything
         // has been minted, is the whole of it.

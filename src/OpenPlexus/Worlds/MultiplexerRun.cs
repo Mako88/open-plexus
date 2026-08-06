@@ -72,6 +72,23 @@ public sealed record Learned
     /// <summary>Children minted by repair.</summary>
     public required long Repaired { get; init; }
 
+    /// <summary>Codes minted to stand for sub-scopes that kept recurring.</summary>
+    /// <remarks>
+    /// <b>Rung five's only visible output, and the thing that says whether the machine
+    /// holds a CONCEPT rather than a pile of correct rules.</b> Zero means everything
+    /// learnt was learnt separately.
+    /// </remarks>
+    public required int Named { get; init; }
+
+    /// <summary>Names that stand for a set containing another name.</summary>
+    /// <remarks>
+    /// <b>THE ONLY NUMBER THAT SAYS WHETHER A SECOND LEVEL EXISTS.</b> Naming a
+    /// hundred sets of raw codes is one level of structure however many there are;
+    /// one name built on another is the recursion the whole rung is for, and it is
+    /// what DreamCoder's bootstrapping means. Zero is a flat vocabulary.
+    /// </remarks>
+    public required int Stacked { get; init; }
+
     /// <summary>Commitments that have spent their whole repair budget.</summary>
     /// <remarks>
     /// <b>A GUARD HAS TO BE SHOWN NOT TO BE GUARDING.</b> Anything above zero means
@@ -152,7 +169,12 @@ public sealed class MultiplexerRun
         for (long round = 0; round < rounds; round++)
         {
             var shown = _world.Next();
-            var moment = shown.Cues.ToHashSet();
+
+            // FOLDED ONCE AND USED EVERYWHERE. Matching, covering and the tally all
+            // take the same moment, so a minted name can be matched on, minted
+            // against and chosen as a repair condition -- which is what makes a
+            // second level of structure reachable rather than merely representable.
+            var moment = _held.Moment(shown.Cues.ToHashSet());
 
             var firing = _held.Firing(moment);
             var vote = _held.Predict(firing);
@@ -171,23 +193,35 @@ public sealed class MultiplexerRun
 
             _held.Settle(firing, moment, shown.Outcome);
 
+            // THE SWEEP IS NOT PART OF FAILING, and it sat inside the failure branch
+            // for the whole of step one. Once the learner is right most of the time,
+            // the chance of a wrong round landing on a sweep round is the miss rate
+            // itself -- so subsumption and culling ran a few times in thirty thousand
+            // rounds and read as mechanisms that did nothing.
+            if (round % sweep == sweep - 1)
+            {
+                _held.Subsume();
+                _held.Abstract();
+                _held.Cull();
+            }
+
             if (vote.Expects == shown.Outcome) continue;
 
             _held.Cover(moment, shown.Outcome);
 
             if (_held.Mend(firing, shown.Outcome) is not null) repaired++;
-
-            if (round % sweep == sweep - 1)
-            {
-                _held.Subsume();
-                _held.Cull();
-            }
         }
 
         var truths = _world.Truths();
 
+        // SPELLED BACK OUT BEFORE THE WORLD IS ASKED. A world knows nothing about
+        // minted codes, so a rule written in them can only be checked once its names
+        // are expanded -- and a rewrite that changed what a commitment CLAIMS would
+        // show up right here as a rule that had stopped being true.
         var experienced = _held.All.Where(one => one.Seen >= _floor).ToList();
-        var sound = experienced.Count(one => _world.Sound(one.Scope, one.Expects));
+
+        var sound = experienced.Count(
+            one => _world.Sound(_held.Names.Unfold(one.Scope), one.Expects));
 
         return new Learned
         {
@@ -202,7 +236,12 @@ public sealed class MultiplexerRun
             Settled = settled,
             Answered = answered,
             Resident = _held.Count,
-            Found = truths.Count(truth => _held.Holds(Commitment.Name(truth.Scope, truth.Expects))),
+            Found = truths.Count(truth => _held.All.Any(
+                one => one.Expects == truth.Expects
+                    && _held.Names.Unfold(one.Scope).SequenceEqual(truth.Scope))),
+            Named = _held.Names.Count,
+            Stacked = _held.Names.Means.Count(
+                one => one.Value.Any(member => _held.Names.Knows(member))),
             Truths = truths.Length,
             Repaired = repaired,
         };

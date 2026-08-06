@@ -216,6 +216,20 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   policy is designed.
 - **Rung five, and it goes up.** When several commitments share a sub-scope, mint a
   code for the shared part and rewrite them in terms of it.
+- **AND WHAT IT CAN NAME IS A SET, NEVER A VARIABLE.** The multiplexer's real
+  redundancy is *these positions are the address, whatever they say*. Naming sets
+  cannot reach that; it is rung four.
+- **SO THE TWO RUNGS ARE NOT INDEPENDENT.** A code carrying position AND value
+  together makes the shared thing unnameable. What is shared is the position, and
+  nothing emits a code for one.
+- **JOHN'S PROPOSAL, AND IT JOINS THEM.** Let `Winnow` emit SEVERAL codes per
+  reading, so near readings overlap. The shared part of *bit three is zero* and *bit
+  three is one* then IS a code, and naming can reach it.
+- **Which would buy part of rung four without unification** — a variable becoming a
+  shared sub-code rather than a binding. Cheapest test of the most expensive rung,
+  and unmeasured.
+- **What it costs is the soundness check.** A scope stops mapping to pinned bits, so
+  the sharpest measurement here stops working as written. Say so before running it.
 - **That code is then available inside any future scope**, including one that
   abstracts again — the recursion DreamCoder gets `sort` out of.
 - **Its trigger is redundancy, not failure**, so it is the one rung a failure does not
@@ -377,6 +391,9 @@ change of architecture entirely.
 - **A small sample can look like a mechanism, AND IT HIDES A REAL EFFECT TOO.** Count
   seeds in both directions.
 - **A number in a commit message is a claim, not a record.**
+- **A PERIODIC SWEEP INSIDE A CONDITIONAL RUNS AT THAT CONDITION'S RATE.** Subsumption
+  and culling sat inside the failure branch, so at high accuracy they ran a handful of
+  times in thirty thousand rounds and read as mechanisms that bought nothing.
 - **A dial can be wired to ONE WORLD IN TEN**, and cashed in citing a finding as
   though it were general.
 - **A CORPUS CAN CONTAIN ITS OWN ANSWER, and then a score measures the leak.** A
@@ -391,12 +408,11 @@ change of architecture entirely.
 
 ## OPEN DEFECTS
 
-- **MOST OF WHAT IT HOLDS IS NOT TRUE.** On six bits the experienced population runs
-  about two unsound commitments for every sound one, while scoring well — so the vote
-  is carrying rules that the soundness check refuses.
-- **AND IT STOPS SHORT OF THE PUBLISHED ACCURACY.** Close on six bits and further off
-  on eleven, with the gap widening rather than the run being too short — measured at
-  four hundred thousand rounds and flat.
+- **MORE OF WHAT IT HOLDS IS UNSOUND THAN SOUND.** The vote scores well while
+  carrying rules the soundness check refuses, at both widths — so what the vote
+  tolerates is not what the world rewards.
+- **AND ELEVEN BITS IS FURTHER OFF THAN SIX**, so the gap grows with the number of
+  relevant bits. That is the scaling number, and it is pointing the wrong way.
 - **`Abstain` IS UNARMED IN ANY RUN.** Nothing in one process can die, so C3's third
   outcome is exercised only by unit tests. It reads zero for the same reason a check
   reads zero when it cannot fire.
@@ -435,5 +451,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **31** | The table spills without changing what fires, and reproducibly. Open |
 | **32** | Entailment depth capped at 1, horizon at K=1. Both come off when blame diffusion has a number — a cap with no trigger is a permanent decision nobody made. Open |
 | **33** | Unification's per-match cost against a subset test. Probed before the ladder's escalation policy, not after. Open |
-| **34** | Rung five: does a name minted from shared sub-scopes clear `Paying`'s two bars where the true abstraction is known? Open |
-| **35** | Two unsound commitments resident for every sound one, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
+| **34** | Rung five names nothing at six bits and names and STACKS at eleven. The plan said this world had an answer key for it; it does not, because its structure is positional. Open |
+| **35** | More unsound commitments resident than sound ones, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
+| **36** | Graded codes: does `Winnow` emitting several codes per reading make a position nameable, and what does it cost the search and the soundness check? Open |

@@ -45,6 +45,7 @@ public sealed class Population
     private readonly CommittingSettings _dials;
     private readonly Random _blind;
 
+    private readonly Naming _names = new();
     private readonly Dictionary<Code, Commitment> _byName = [];
     private readonly Dictionary<Code, List<Commitment>> _byCode = [];
     private readonly Dictionary<Code, int> _minted = [];
@@ -69,6 +70,21 @@ public sealed class Population
 
     /// <summary>Every commitment, in a stable order.</summary>
     public IEnumerable<Commitment> All => _byName.Values.OrderBy(one => one.Identity);
+
+    /// <summary>What has been given a name, and what each name stands for.</summary>
+    public Naming Names => _names;
+
+    /// <summary>
+    /// A moment with every minted name whose members are present added to it.
+    /// </summary>
+    /// <param name="raw">What the front end said.</param>
+    /// <remarks>
+    /// <b>EVERYTHING DOWNSTREAM SEES THE FOLDED MOMENT.</b> Matching, covering and
+    /// the tally all take it, so a name can be matched on, minted against, and chosen
+    /// as a repair condition — which is what makes a second level of structure
+    /// reachable rather than merely representable.
+    /// </remarks>
+    public IReadOnlySet<Code> Moment(IReadOnlySet<Code> raw) => _names.Fold(raw);
 
     /// <summary>Whether a commitment with this name is resident.</summary>
     /// <param name="name">What the commitment is called.</param>
@@ -278,6 +294,56 @@ public sealed class Population
         foreach (var one in doomed) Remove(one);
 
         return doomed.Count;
+    }
+
+    /// <summary>
+    /// Gives a name to the sub-scope most worth one, and rewrites what holds it.
+    /// </summary>
+    /// <returns>How many commitments were said shorter.</returns>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ONLY OPERATOR HERE THAT GOES UP.</b> Everything else narrows: covering
+    /// mints one-code claims, repair adds conditions, subsumption and culling remove.
+    /// Without this the machine can be arbitrarily accurate and hold no concept —
+    /// every rule of the world learnt, and no name for the thing they share.
+    /// </para>
+    /// <para>
+    /// <b>A REWRITE IS NOT A NEW CLAIM, so the record moves with it.</b> The
+    /// commitment entails exactly the moments it did before, because the name is
+    /// added to a moment precisely when its members are all there.
+    /// </para>
+    /// </remarks>
+    public int Abstract()
+    {
+        if (Abstracting.Shared(All, _dials) is not { } shared) return 0;
+
+        var name = _names.Mint(shared);
+
+        var said = 0;
+
+        foreach (var one in All.ToList())
+        {
+            if (!shared.All(one.Scope.Contains)) continue;
+
+            var scope = one.Scope.Where(code => !shared.Contains(code)).Append(name).ToImmutableArray();
+
+            var shorter = new Commitment(scope, one.Expects);
+
+            // A COLLISION IS A MERGE NOBODY ASKED FOR. Two commitments can be the
+            // same claim once the name replaces the members, and taking the record
+            // of whichever was rewritten last would be a coin toss deciding what is
+            // believed -- so the second is left alone rather than silently folded.
+            if (Holds(shorter.Identity)) continue;
+
+            shorter.Carry(one);
+
+            Remove(one);
+            Add(shorter);
+
+            said++;
+        }
+
+        return said;
     }
 
     /// <summary>Drops the least accurate commitments when there are too many.</summary>

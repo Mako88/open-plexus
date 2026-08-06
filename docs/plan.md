@@ -165,6 +165,7 @@ condition is a superstition.**
 | `Attending.Marked` — the credit cell, unconditioned | Peaks below the blind bar. It was `Credited`'s CONTROL, so ruling out the extra cell and the staleness goes with it. **Deleted** | A second cell written on anything but the outcome — re-take the control |
 | `Winnow` over CLEVR's `3d_coords` | Three inputs give only C(3, samples) distinct wirings, so the corpus collapses onto a handful of tags. **Closed in code** — the constructor refuses it | A reading wide enough to fill the sheet |
 | Banded position codes on CLEVR | Halves the reference at every budget it survives and times out above, peak to peak. No kept question is spatial, so it is row width bought with noise | A world whose QUESTION is spatial |
+| Asking again where a task merely LOOKS deep | bAbI's one-, two- and three-fact tasks: worse on the first and no better on the rest. One walk already reaches there | A world where one walk is at chance while answering confidently |
 | Asking again UNCONDITIONALLY | Discards the first walk's evidence to gamble on one intermediate. Took `Clevr` to about a third | Never as a default. `Question.Steps` is the legal version |
 | Fork 24, the budget controller | `Moves` never left nought on the one world that ran it — three budgets sampled forever, none chosen. Billing the probe cost a quarter of `Senses`. **Deleted** | A world where the right budget VARIES |
 

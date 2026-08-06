@@ -253,11 +253,22 @@ public sealed class BabiRun : IDisposable
     /// <see cref="SensesRun"/>.
     /// </param>
     /// <param name="ct">Cancellation.</param>
+    /// <param name="asking">
+    /// What the asker knows. <b><see cref="Question.Steps"/> is the one this world
+    /// can test WITHIN itself</b> — task 1 is a single supporting fact and tasks 2
+    /// and 3 are two and three, so the same corpus, graph and budget vary only in
+    /// how many hops an answer needs. See the note on that property.
+    /// </param>
     public async Task<BabiResult> RunAsync(
-        int sentences = int.MaxValue, int votes = 1, CancellationToken ct = default)
+        int sentences = int.MaxValue,
+        int votes = 1,
+        Question? asking = null,
+        CancellationToken ct = default)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sentences);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(votes);
+
+        var question = asking ?? new Question();
 
         int shown = 0, asked = 0, right = 0, silent = 0, blind = 0;
         int unbalanced = 0, unsettled = 0, compound = 0, primed = 0;
@@ -309,7 +320,7 @@ public sealed class BabiRun : IDisposable
             if (_alphabet.Count == 0) blind++;
 
             var (answer, stopped, balanced, settled, everything) =
-                await AskingAsync(line, votes, ct).ConfigureAwait(false);
+                await AskingAsync(line, votes, question, ct).ConfigureAwait(false);
 
             halted += stopped;
             if (!balanced) unbalanced++;
@@ -368,7 +379,8 @@ public sealed class BabiRun : IDisposable
     /// nowhere ends on the code it started from — so without this the narrowing
     /// would reward exactly the routes that did no work.
     /// </remarks>
-    private async Task<Asking> AskingAsync(Sentence line, int votes, CancellationToken ct)
+    private async Task<Asking> AskingAsync(
+        Sentence line, int votes, Question question, CancellationToken ct)
     {
         var origins = line.Words;
         var asked = origins.ToHashSet();
@@ -378,7 +390,8 @@ public sealed class BabiRun : IDisposable
         if (candidates.Count == 0) return new Asking(null, 0, true, true, []);
 
         var asking = new Task<Asking>[votes];
-        for (var i = 0; i < votes; i++) asking[i] = OnceAsync(origins, candidates, ct);
+        for (var i = 0; i < votes; i++)
+            asking[i] = OnceAsync(origins, candidates, question, ct);
 
         var answers = await Task.WhenAll(asking).ConfigureAwait(false);
 
@@ -394,25 +407,49 @@ public sealed class BabiRun : IDisposable
 
     /// <summary>One walk.</summary>
     private async Task<Asking> OnceAsync(
-        ImmutableArray<Code> origins, IReadOnlyCollection<Code> candidates, CancellationToken ct)
+        ImmutableArray<Code> origins,
+        IReadOnlyCollection<Code> candidates,
+        Question asking,
+        CancellationToken ct)
     {
-        var thought = await _reader
-            .ThinkAsync(origins, _dials.Stamina, new Question { Ranking = _dials.Ranking }, ct)
-            .ConfigureAwait(false);
+        var question = asking with { Ranking = _dials.Ranking };
 
-        var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
+        var halted = 0;
+        var balanced = true;
+        var settled = true;
+        IReadOnlyList<Arrival> reached = [];
+        Code? answer = null;
+        var walking = origins;
 
-        var reached = thought.BestAmong(candidates, 1);
+        // ONE WALK, OR SEVERAL EACH FROM WHAT THE LAST CONCLUDED. See Question.Steps
+        // -- and the answer is read from the LAST walk, so a step that adds nothing
+        // reads as a loss rather than as free.
+        for (var step = 0; step < question.Steps; step++)
+        {
+            if (walking.IsEmpty) break;
 
-        var report = new Asking(
-            reached.Count == 0 ? null : reached[0].Endpoint,
-            thought.Halted,
-            thought.Balanced(),
-            settled,
-            thought.Best(int.MaxValue));
+            var thought = await _reader
+                .ThinkAsync(walking, _dials.Stamina, question, ct)
+                .ConfigureAwait(false);
 
-        _reader.Forget(thought.Id);
-        return report;
+            var quiet = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
+
+            halted += thought.Halted;
+            balanced &= thought.Balanced();
+            settled &= quiet;
+            reached = thought.Best(int.MaxValue);
+
+            var best = thought.BestAmong(candidates, 1);
+            answer = best.Count == 0 ? null : best[0].Endpoint;
+
+            walking = step + 1 < question.Steps
+                ? thought.Next(question.Width, question.Between)
+                : [];
+
+            _reader.Forget(thought.Id);
+        }
+
+        return new Asking(answer, halted, balanced, settled, reached);
     }
 
     public void Dispose() => _fabric.Dispose();

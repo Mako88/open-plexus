@@ -122,6 +122,15 @@ public sealed record Question
     /// <b>AND MORE IS NOT BETTER.</b> Three steps measured worse than two on the
     /// world where two works, which is the rollout's compounding error.
     /// </para>
+    /// <para>
+    /// <b>THE NUMBER OF HOPS A TASK NEEDS DOES NOT PREDICT IT, AND THAT WAS THE
+    /// OBVIOUS GUESS.</b> bAbI's tasks 1, 2 and 3 want one, two and three
+    /// supporting facts, so the same corpus, graph and budget vary only in depth —
+    /// and a second walk is worse on the one-fact task and no better on the other
+    /// two. <b>The condition is whether ONE walk can reach the answer at all, not
+    /// how deep the answer nominally is</b>: on bAbI one walk already scores well
+    /// clear of chance everywhere, so it never enters the regime this helps in.
+    /// </para>
     /// </remarks>
     public int Steps { get; init; } = 1;
 

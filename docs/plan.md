@@ -201,6 +201,9 @@ condition is a superstition.**
   remove it and read as harm.
 - **A silence has two causes wanting opposite fixes** — an empty cell, or a walk that
   cannot afford to reach one. Spend more and see if the voice returns.
+- **A CORPUS CAN CONTAIN ITS OWN ANSWER, and then a score measures the leak.** Every
+  short `Clutrr` story states the relation it asks for, so reaching it composed
+  nothing. Split what was in front of it from what was not, and score them apart.
 - **A small sample can look like a mechanism.** One seed drew a clean learning curve
   six flattened; twelve seeds showed a gap thirty-two closed.
 - **AND IT HIDES A REAL EFFECT AS WELL AS INVENTING ONE.** A separation eight seeds

@@ -65,8 +65,23 @@ public readonly record struct Sample
 /// already, which is the EASY end and was written down here as the hard one.
 /// </para>
 /// </remarks>
-public sealed class Graded
+public sealed class Graded : IWorld<IReadOnlyList<double>>
 {
+    /// <inheritdoc/>
+    public int Outcomes => 2;
+
+    /// <summary>The same round, in the shape every world shares.</summary>
+    Turn<IReadOnlyList<double>> IWorld<IReadOnlyList<double>>.Next()
+    {
+        var shown = Next();
+
+        return new Turn<IReadOnlyList<double>>
+        {
+            Seen = shown.Reading,
+            Outcome = (int)shown.Outcome.Value,
+        };
+    }
+
     private readonly GradedSettings _settings;
     private readonly Random _rng;
 

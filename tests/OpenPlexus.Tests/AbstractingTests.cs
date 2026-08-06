@@ -1,3 +1,4 @@
+using OpenPlexus.Machines;
 using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
@@ -29,7 +30,7 @@ public sealed class AbstractingTests(ITestOutputHelper output)
 
         var moment = new HashSet<Code>(scope.Select(Of));
 
-        for (var settle = 0; settle < 40; settle++) one.Settle(Outcome.Hit, moment, 0.1);
+        for (var settle = 0; settle < 40; settle++) one.Settle(Verdict.Hit, moment, 0.1);
 
         return one;
     }
@@ -250,10 +251,10 @@ public sealed class AbstractingTests(ITestOutputHelper output)
         // what the world is made of. Rung five is not idle here; it is answering a
         // different question from the one the plan asked it.
         var six = new MultiplexerRun(
-            new MultiplexerSettings { Address = 2 }, new CommittingSettings(), seed: 1).Run(30000);
+            new MultiplexerSettings { Address = 2 }, new Brain(new CommittingSettings(), 1), seed: 1).Run(30000);
 
         var eleven = new MultiplexerRun(
-            new MultiplexerSettings { Address = 3 }, new CommittingSettings(), seed: 1).Run(30000);
+            new MultiplexerSettings { Address = 3 }, new Brain(new CommittingSettings(), 1), seed: 1).Run(30000);
 
         foreach (var learned in (Learned[])[six, eleven])
             output.WriteLine(

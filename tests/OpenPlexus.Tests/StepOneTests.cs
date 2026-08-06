@@ -1,3 +1,4 @@
+using OpenPlexus.Machines;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -20,7 +21,7 @@ public sealed class StepOneTests(ITestOutputHelper output)
     private static Learned Run(int address, Choosing choosing, int seed) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = address },
-            new CommittingSettings { Choosing = choosing },
+            new Brain(new CommittingSettings { Choosing = choosing }, seed),
             seed).Run(Rounds);
 
     [Fact]

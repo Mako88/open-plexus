@@ -1,3 +1,5 @@
+using OpenPlexus.Codes;
+using OpenPlexus.Machines;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -14,10 +16,10 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class GradedTests(ITestOutputHelper output)
 {
-    private static Sensed Run(Fronting fronting, double crowding, int seed = 1, int address = 3) =>
+    private static Tally Run(Fronting fronting, double crowding, int seed = 1, int address = 3) =>
         new GradedRun(
             new GradedSettings { Address = address, Crowding = crowding },
-            new CommittingSettings(),
+            new Brain(new CommittingSettings(), seed),
             fronting,
             seed).Run(40000);
 
@@ -116,7 +118,7 @@ public sealed class GradedTests(ITestOutputHelper output)
         // would fire identically on every reading and the tag would separate nothing.
         // `Winnow` refuses that outright, which is how this was found -- the fixed
         // geometry that works for a fly is degenerate on a narrow reading.
-        var (narrow, reach, winners) = GradedRun.Geometry(6);
+        var (narrow, reach, winners) = Winnowing.Sheet(6);
 
         Assert.Equal(2, reach);
         Assert.True(narrow <= 15, $"{narrow} cells from only fifteen distinct wirings");
@@ -124,7 +126,7 @@ public sealed class GradedTests(ITestOutputHelper output)
 
         // AND A WIDER READING GETS THE SHEET IT ASKED FOR, so the cap is a floor
         // effect rather than a ceiling on everything.
-        var (wide, _, _) = GradedRun.Geometry(20);
+        var (wide, _, _) = Winnowing.Sheet(20);
 
         Assert.Equal(20 * 40, wide);
         Assert.True(wide > narrow);

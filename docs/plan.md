@@ -55,6 +55,14 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   Parent-plus-condition gave one scope two.
 - **A front end may say what it is looking at, never what to conclude** — *this is
   the same thing you saw six times*, never *this is a red ball*.
+- **ONE BRAIN, AND A WORLD MAY NEVER REACH INTO IT.** Brain dials are built once and
+  handed in; a world turns only its own. `csharp` had `Ranking` set one way on bAbI
+  and another on CLEVR, so a WORLD decided how the brain thought.
+- **Every score was then a comparison between two brains as much as two problems.**
+  `SeparationTests` fails the build if anything in a world names a brain type, because
+  the rule was broken within an hour of being agreed.
+- **The translation is a third thing and belongs at the join.** Whether a reading is
+  banded or winnowed is neither a fact about the problem nor a setting on the brain.
 - **Adaptation lives above the codes and never inside them.** The feature basis is a
   constant of the design; a learned feature is a minted name over co-firing codes.
 - **So the demand for resolution may change how finely the front end cuts, and never

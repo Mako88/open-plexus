@@ -24,13 +24,13 @@ public sealed class PopulationTests
 
         for (long settle = 0; settle < hits; settle++)
             one.Settle(
-                Outcome.Hit,
+                Verdict.Hit,
                 settle < hits * inHits ? Moment(1, marker) : Moment(1),
                 0.1);
 
         for (long settle = 0; settle < misses; settle++)
             one.Settle(
-                Outcome.Miss,
+                Verdict.Miss,
                 settle < misses * inMisses ? Moment(1, marker) : Moment(1),
                 0.1);
 
@@ -97,7 +97,7 @@ public sealed class PopulationTests
             for (ulong marker = 10; marker < 210; marker++)
                 if (noise.Next(2) == 0) moment.Add(Of(marker));
 
-            one.Settle(settle % 2 == 0 ? Outcome.Hit : Outcome.Miss, moment, 0.1);
+            one.Settle(settle % 2 == 0 ? Verdict.Hit : Verdict.Miss, moment, 0.1);
         }
 
         Assert.Null(Repair.Discriminator(one, dials, null));
@@ -121,8 +121,8 @@ public sealed class PopulationTests
 
         var one = One(1, 1);
 
-        for (var settle = 0; settle < 40; settle++) one.Settle(Outcome.Hit, Moment(1, 5), 0.1);
-        for (var settle = 0; settle < 40; settle++) one.Settle(Outcome.Miss, Moment(1, 6), 0.1);
+        for (var settle = 0; settle < 40; settle++) one.Settle(Verdict.Hit, Moment(1, 5), 0.1);
+        for (var settle = 0; settle < 40; settle++) one.Settle(Verdict.Miss, Moment(1, 6), 0.1);
 
         var drawn = new HashSet<Code>();
 
@@ -164,7 +164,7 @@ public sealed class PopulationTests
         var held = new Population(new CommittingSettings(), seed: 1);
 
         var accurate = One(1, 1);
-        for (var settle = 0; settle < 60; settle++) accurate.Settle(Outcome.Hit, Moment(1), 0.1);
+        for (var settle = 0; settle < 60; settle++) accurate.Settle(Verdict.Hit, Moment(1), 0.1);
         held.Add(accurate);
 
         foreach (ulong which in (ulong[])[2, 3, 4])
@@ -172,7 +172,7 @@ public sealed class PopulationTests
             var mediocre = One(0, which);
 
             for (var settle = 0; settle < 60; settle++)
-                mediocre.Settle(settle % 2 == 0 ? Outcome.Hit : Outcome.Miss, Moment(which), 0.1);
+                mediocre.Settle(settle % 2 == 0 ? Verdict.Hit : Verdict.Miss, Moment(which), 0.1);
 
             held.Add(mediocre);
         }
@@ -219,8 +219,8 @@ public sealed class PopulationTests
 
         for (var settle = 0; settle < 60; settle++)
         {
-            general.Settle(Outcome.Hit, Moment(1), 0.1);
-            specific.Settle(Outcome.Hit, Moment(1, 2), 0.1);
+            general.Settle(Verdict.Hit, Moment(1), 0.1);
+            specific.Settle(Verdict.Hit, Moment(1, 2), 0.1);
         }
 
         held.Add(general);
@@ -242,8 +242,8 @@ public sealed class PopulationTests
 
         for (var settle = 0; settle < 60; settle++)
         {
-            general.Settle(settle % 2 == 0 ? Outcome.Hit : Outcome.Miss, Moment(1), 0.1);
-            specific.Settle(Outcome.Hit, Moment(1, 2), 0.1);
+            general.Settle(settle % 2 == 0 ? Verdict.Hit : Verdict.Miss, Moment(1), 0.1);
+            specific.Settle(Verdict.Hit, Moment(1, 2), 0.1);
         }
 
         held.Add(general);
@@ -266,7 +266,7 @@ public sealed class PopulationTests
             // take is known rather than incidental.
             for (var settle = 0; settle < 60; settle++)
                 one.Settle(
-                    (ulong)(settle % 4) < which ? Outcome.Hit : Outcome.Miss, Moment(which), 0.1);
+                    (ulong)(settle % 4) < which ? Verdict.Hit : Verdict.Miss, Moment(which), 0.1);
 
             held.Add(one);
         }

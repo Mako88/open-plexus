@@ -71,10 +71,10 @@ public sealed class Cycle
     public long Repaired { get; private set; }
 
     /// <summary>Predictions over the last tenth that were right.</summary>
-    public long Settled { get; private set; }
+    private long Settled { get; set; }
 
     /// <summary>Predictions over the last tenth that were answered at all.</summary>
-    public long Answered { get; private set; }
+    private long Answered { get; set; }
 
     /// <summary>The round a trailing window first held the target, or zero if never.</summary>
     public long Reached { get; private set; }

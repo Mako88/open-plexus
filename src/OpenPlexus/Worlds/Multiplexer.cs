@@ -152,8 +152,33 @@ public readonly record struct Truth
 /// must never be written up as though it were.
 /// </para>
 /// </remarks>
-public sealed class Multiplexer
+public sealed class Multiplexer : IWorld<IReadOnlyList<int>>
 {
+    /// <inheritdoc/>
+    public int Outcomes => 2;
+
+    /// <summary>
+    /// The same round, said in the world's own terms rather than in codes.
+    /// </summary>
+    /// <remarks>
+    /// <b>EXPLICIT, BECAUSE A WORLD KEEPS ITS OWN VOICE.</b> <see cref="Next"/> says
+    /// what this world has always said and is what its own tests read; this says the
+    /// same thing in the shape every world shares, so that one brain can be handed
+    /// any of them without a world knowing a brain exists.
+    /// </remarks>
+    Turn<IReadOnlyList<int>> IWorld<IReadOnlyList<int>>.Next()
+    {
+        var shown = Next();
+
+        return new Turn<IReadOnlyList<int>>
+        {
+            Seen = [.. shown.Cues
+                .OrderBy(Codes.Bits.Position)
+                .Select(Codes.Bits.Value)],
+            Outcome = (int)shown.Outcome.Value,
+        };
+    }
+
     /// <summary>The modality for one bit, carrying its position and its value.</summary>
     /// <remarks>
     /// <b>One code per (position, value) and never one per position.</b> A code

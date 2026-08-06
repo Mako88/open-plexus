@@ -89,9 +89,9 @@ public sealed class CommitmentTests
     {
         var one = One(1);
 
-        one.Settle(Outcome.Hit, Moment(1, 5), 0.1);
-        one.Settle(Outcome.Miss, Moment(1, 6), 0.1);
-        one.Settle(Outcome.Hit, Moment(1, 5), 0.1);
+        one.Settle(Verdict.Hit, Moment(1, 5), 0.1);
+        one.Settle(Verdict.Miss, Moment(1, 6), 0.1);
+        one.Settle(Verdict.Hit, Moment(1, 5), 0.1);
 
         Assert.Equal(2, one.Hits);
         Assert.Equal(1, one.Misses);
@@ -108,12 +108,12 @@ public sealed class CommitmentTests
         // wired and unable to fire.
         var one = One(1);
 
-        one.Settle(Outcome.Hit, Moment(1, 5), 0.1);
+        one.Settle(Verdict.Hit, Moment(1, 5), 0.1);
 
         var accuracy = one.Accuracy;
 
-        one.Settle(Outcome.Abstain, Moment(1, 7), 0.1);
-        one.Settle(Outcome.Abstain, Moment(1, 7), 0.1);
+        one.Settle(Verdict.Abstain, Moment(1, 7), 0.1);
+        one.Settle(Verdict.Abstain, Moment(1, 7), 0.1);
 
         Assert.Equal(2, one.Abstains);
         Assert.Equal(1, one.Hits);
@@ -135,9 +135,9 @@ public sealed class CommitmentTests
         // every time, and it would add a condition already required.
         var one = One(1);
 
-        one.Settle(Outcome.Hit, Moment(1, 5), 0.1);
-        one.Settle(Outcome.Miss, Moment(1, 6), 0.1);
-        one.Settle(Outcome.Miss, Moment(1, 6), 0.1);
+        one.Settle(Verdict.Hit, Moment(1, 5), 0.1);
+        one.Settle(Verdict.Miss, Moment(1, 6), 0.1);
+        one.Settle(Verdict.Miss, Moment(1, 6), 0.1);
 
         Assert.False(one.Separations.ContainsKey(Of(1)));
 
@@ -154,17 +154,17 @@ public sealed class CommitmentTests
         // practice and introduces no number `Recency` did not already fix.
         var one = One(1);
 
-        one.Settle(Outcome.Hit, Moment(1), 0.1);
+        one.Settle(Verdict.Hit, Moment(1), 0.1);
         Assert.Equal(1.0, one.Accuracy, 6);
 
-        one.Settle(Outcome.Miss, Moment(1), 0.1);
+        one.Settle(Verdict.Miss, Moment(1), 0.1);
         Assert.Equal(0.5, one.Accuracy, 6);
 
         // AND IT TRACKS WHERE THE LIFETIME AVERAGE CANNOT. After a long run of hits
         // and then a world that changed, the two answers come apart -- which is the
         // whole of why both are kept.
-        for (var settle = 0; settle < 200; settle++) one.Settle(Outcome.Hit, Moment(1), 0.1);
-        for (var settle = 0; settle < 40; settle++) one.Settle(Outcome.Miss, Moment(1), 0.1);
+        for (var settle = 0; settle < 200; settle++) one.Settle(Verdict.Hit, Moment(1), 0.1);
+        for (var settle = 0; settle < 40; settle++) one.Settle(Verdict.Miss, Moment(1), 0.1);
 
         Assert.True(one.Accuracy < 0.2, $"the local estimate did not track: {one.Accuracy:F3}");
         Assert.True(one.Reliability > 0.8, $"the lifetime average tracked: {one.Reliability:F3}");
@@ -178,7 +178,7 @@ public sealed class CommitmentTests
         // built -- that dropping it changes nothing a moment can see.
         var one = One(1, 2);
 
-        one.Settle(Outcome.Hit, Moment(1, 2, 5), 0.1);
+        one.Settle(Verdict.Hit, Moment(1, 2, 5), 0.1);
         Assert.NotEmpty(one.Separations);
 
         one.Forget();

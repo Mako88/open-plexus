@@ -4,7 +4,7 @@ using OpenPlexus.Codes;
 namespace OpenPlexus.Commitments;
 
 /// <summary>What a settlement said about one commitment that fired.</summary>
-public enum Outcome
+public enum Verdict
 {
     /// <summary>What it expected was there.</summary>
     Hit,
@@ -168,13 +168,13 @@ public sealed class Commitment
     /// <param name="outcome">What the settlement said.</param>
     /// <param name="moment">What was live when it fired.</param>
     /// <param name="recency">How fast the local estimate forgets, in 0..1.</param>
-    public void Settle(Outcome outcome, IReadOnlySet<Code> moment, double recency)
+    public void Settle(Verdict outcome, IReadOnlySet<Code> moment, double recency)
     {
         ArgumentNullException.ThrowIfNull(moment);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(recency);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(recency, 1.0);
 
-        if (outcome == Outcome.Abstain)
+        if (outcome == Verdict.Abstain)
         {
             // NOTHING ELSE MOVES, INCLUDING THE TABLE. A settlement that could not
             // say is not evidence about which code separates anything, and letting
@@ -184,7 +184,7 @@ public sealed class Commitment
             return;
         }
 
-        var hit = outcome == Outcome.Hit;
+        var hit = outcome == Verdict.Hit;
 
         if (hit) Hits++; else Misses++;
 

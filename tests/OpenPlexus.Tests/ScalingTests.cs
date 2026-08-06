@@ -1,3 +1,4 @@
+using OpenPlexus.Machines;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -28,7 +29,7 @@ public sealed class ScalingTests(ITestOutputHelper output)
         {
             var learned = new MultiplexerRun(
                 new MultiplexerSettings { Address = address },
-                new CommittingSettings(),
+                new Brain(new CommittingSettings(), 1),
                 seed: 1).Run(60000);
 
             seen.Add((address, learned));
@@ -61,7 +62,7 @@ public sealed class ScalingTests(ITestOutputHelper output)
         // learning -- a scaling result manufactured by its own statistic.
         var wide = new MultiplexerRun(
             new MultiplexerSettings { Address = 4 },
-            new CommittingSettings(),
+            new Brain(new CommittingSettings(), 1),
             seed: 1).Run(20000);
 
         output.WriteLine(
@@ -73,7 +74,7 @@ public sealed class ScalingTests(ITestOutputHelper output)
         // none of them is quietly dropping a case.
         var narrow = new MultiplexerRun(
             new MultiplexerSettings { Address = 2 },
-            new CommittingSettings(),
+            new Brain(new CommittingSettings(), 1),
             seed: 1).Run(20000);
 
         Assert.Equal(0, narrow.Unchecked);
@@ -88,7 +89,7 @@ public sealed class ScalingTests(ITestOutputHelper output)
         // window can do.
         static Learned Run(long rounds) => new MultiplexerRun(
             new MultiplexerSettings { Address = 2 },
-            new CommittingSettings(),
+            new Brain(new CommittingSettings(), 1),
             seed: 3).Run(rounds);
 
         var shorter = Run(30000);

@@ -181,8 +181,8 @@ public sealed class Population
 
         foreach (var commitment in firing)
             commitment.Settle(
-                arrived is null ? Outcome.Abstain
-                    : commitment.Expects == arrived ? Outcome.Hit : Outcome.Miss,
+                arrived is null ? Verdict.Abstain
+                    : commitment.Expects == arrived ? Verdict.Hit : Verdict.Miss,
                 moment,
                 _dials.Recency);
     }

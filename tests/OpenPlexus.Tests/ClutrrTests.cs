@@ -111,60 +111,51 @@ public sealed class ClutrrTests(ITestOutputHelper output)
     // ---- what the graph does with it ---------------------------------------
 
     [Fact]
-    public async Task One_composition_carries_and_two_do_not()
+    public void Every_short_chain_restates_its_own_answer_so_a_score_over_all_of_them_lies()
     {
-        // THE FINDING, AND IT IS THE ROLLOUT GAP IN A NEW PLACE. A two-hop chain
-        // needs ONE composition applied and the graph does it far above chance. A
-        // three-hop chain needs the result of that composition to become the input
-        // to the next one, and there is nothing here that can hold a conclusion and
-        // ask again from it -- so it scores nought, not badly.
-        //
-        // THE BUDGET IS PART OF THE CLAIM. At stamina 8 the walk cannot afford to
-        // reach an answer at all and every length reads silent, which is the named
-        // trap about a silence having two causes. This is the one that spends.
-        using var run = new ClutrrRun(
-            World(stories: 300), Fixture.Dials(stamina: 32.0), seed: 1);
+        // THE CONTAMINATION, AND TWO COMMITS REPORTED IT AS COMPOSITION. When the
+        // answer is `grandson` and a premise is also `grandson`, the answer's slot
+        // code is already in a moment the graph just read -- so arriving at it
+        // composes nothing. Every two-hop story restates; longer ones mostly do
+        // not, so chain length was silently measuring contamination.
+        var world = new Clutrr(World(stories: 300));
 
-        var result = await run.RunAsync();
+        var byHops = world.Stories
+            .GroupBy(story => story.Hops)
+            .OrderBy(group => group.Key)
+            .ToList();
 
-        output.WriteLine(result.ToString());
-        foreach (var (hops, asked, right) in result.ByHops)
-            output.WriteLine($"  {hops,2} hops: {right,3}/{asked,-3} "
-                + $"{(asked == 0 ? 0 : right / (double)asked):F3}");
+        foreach (var group in byHops)
+            output.WriteLine($"  {group.Key,2} hops: "
+                + $"{group.Count(story => story.Restated)}/{group.Count()} restated");
 
-        var shallow = result.ByHops.Single(one => one.Hops == 2);
-        var deeper = result.ByHops.Where(one => one.Hops >= 3).ToList();
+        Assert.All(
+            byHops.Single(group => group.Key == 2),
+            story => Assert.True(story.Restated));
 
-        Assert.True(shallow.Asked > 0, "no two-hop chain was asked about at all");
+        // AND THE LONG ONES MOSTLY DO NOT, which is what leaves anything to measure.
+        var deep = world.Stories.Where(story => story.Hops >= 4).ToList();
 
-        // ONE HOP OF COMPOSITION, WELL CLEAR OF GUESSING.
-        Assert.True(
-            shallow.Right / (double)shallow.Asked > result.Chance * 3,
-            $"two-hop chains did not beat chance: {shallow.Right} of {shallow.Asked}");
-
-        // AND TWO HOPS OF IT, AT OR BELOW GUESSING. Asserted as the CEILING it is,
-        // so anything that lifts it lands here as a failure and gets read.
-        var tried = deeper.Sum(one => one.Asked);
-        var got = deeper.Sum(one => one.Right);
-
-        Assert.True(tried > 0, "no chain longer than two was asked about at all");
-        Assert.True(got / (double)tried < result.Chance,
-            $"chains past two hops beat chance -- the ceiling moved, read why: "
-            + $"{got} of {tried}");
+        Assert.NotEmpty(deep);
+        Assert.True(deep.Count(story => !story.Restated) > deep.Count / 2);
     }
 
     [Fact]
-    public async Task The_role_channel_lifts_the_deep_chains_and_grouping_does_not()
+    public async Task Nothing_composes_and_what_it_says_instead_is_always_something_it_was_told()
     {
-        // THE FIRST MEASUREMENT OF `Kind.Role` ON DATA NOBODY HERE GENERATED, and
-        // the first at all through a front end rather than a hand-built occasion.
+        // THE REAL FINDING, AND IT REPLACES TWO CLAIMS THAT WERE CONTAMINATION.
+        // On a story whose answer is stated nowhere in it, the graph scores NOUGHT
+        // -- and that is not silence and not budget. It answers, confidently, with
+        // a relation the story itself stated, which is wrong BY CONSTRUCTION since
+        // a fresh story's answer is by definition not one of those.
         //
-        // BOTH ARMS WRITE THE SAME PAIR. Grouping puts a person beside the slot
-        // code they fill and the pair lands under `With`; the role channel derives
-        // the slot and the pair lands under `Fills`. So this is one mechanism
-        // measured ON from a baseline that already works, which is the trap the
-        // plan names -- not a mechanism measured against nothing.
-        var arms = new List<(bool Roled, ClutrrResult Result)>();
+        // SO THE DEFECT IS NOT "CANNOT AFFORD TO REACH IT". The walk is anchored to
+        // the codes in front of it and a composed answer needs it to prefer a
+        // relation that is NOT. This is the plan's "an answer that is no code it has
+        // ever seen", arriving from a new direction and sharper: the answer code
+        // EXISTS in the graph, written by other stories -- it is simply never
+        // preferred over what is locally present.
+        var arms = new List<ClutrrResult>();
 
         foreach (var roled in new[] { false, true })
         {
@@ -172,34 +163,35 @@ public sealed class ClutrrTests(ITestOutputHelper output)
                 World(stories: 300, roled: roled), Fixture.Dials(stamina: 32.0), seed: 1);
 
             var result = await run.RunAsync();
-            arms.Add((roled, result));
-
+            arms.Add(result);
             output.WriteLine($"roled={roled,-5} {result}");
-            foreach (var (hops, asked, right) in result.ByHops)
-                output.WriteLine($"    {hops,2} hops: {right,3}/{asked}");
         }
 
-        var grouped = arms[0].Result;
-        var filled = arms[1].Result;
+        var grouped = arms[0];
+        var filled = arms[1];
 
-        // GROUPING CANNOT REACH PAST THE SECOND HOP. Asserted as the FLOOR it is.
-        Assert.True(Deep(grouped) < grouped.Chance,
-            $"the grouping baseline composed after all: {Deep(grouped)}");
+        foreach (var arm in arms)
+        {
+            // NOUGHT. Asserted as the floor it is, so anything that composes lands
+            // here as a failure and gets read rather than passing quietly.
+            Assert.Equal(0, arm.Fresh.Right);
 
-        // AND THE ROLE CHANNEL CAN. This is the whole claim the cell was built on:
-        // a count between two people is about those two people, and a count between
-        // a relation's slots names nobody -- so it applies to people never seen
-        // together.
-        Assert.True(Deep(filled) > filled.Chance,
-            $"the role channel did not beat chance on deep chains: {Deep(filled)}");
+            // AND EVERYTHING IT DID SAY WAS AN ECHO. This is what separates "cannot
+            // reach the answer" from "reaches the wrong kind of thing".
+            var spoke = arm.Fresh.Asked - arm.Fresh.Silent;
 
-        Assert.True(Deep(filled) > Deep(grouped) * 4,
-            $"the role channel did not clearly beat grouping on deep chains: "
-            + $"{Deep(filled)} against {Deep(grouped)}");
+            Assert.True(spoke > 0, "the walk was silent on every fresh story");
+            Assert.Equal(spoke, arm.Echoed);
+        }
 
-        // AND IT IS NOT JUST LOUDER. A walk that answered more by saying more would
-        // show up here, and it does not: it is less silent AND more right.
-        Assert.True(filled.Silent < grouped.Silent);
-        Assert.True(filled.Accuracy > grouped.Accuracy);
+        // THE ROLE CHANNEL IS STILL A REAL WIN, AND IT IS A WIN AT RECALL. It roughly
+        // doubles the share of restated answers found, and it is less silent as well
+        // as more right -- so it is not merely louder. What it does not do is
+        // compose, and the previous commit said it did.
+        Assert.True(filled.Recall > grouped.Recall * 1.5,
+            $"the role channel did not clearly beat grouping at recall: "
+            + $"{filled.Recall} against {grouped.Recall}");
+
+        Assert.True(filled.Fresh.Silent < grouped.Fresh.Silent);
     }
 }

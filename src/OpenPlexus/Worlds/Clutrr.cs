@@ -95,6 +95,30 @@ public sealed record Story
     public required string Says { get; init; }
 
     /// <summary>
+    /// Whether the answer's relation is <b>also stated somewhere in the chain</b>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE LINE BETWEEN RECALL AND COMPOSITION, AND WITHOUT IT A SCORE MEANS
+    /// NOTHING.</b> When the answer is <i>grandson</i> and one of the premises is
+    /// also <i>grandson</i>, the answer's slot code is already in a moment the
+    /// graph just read — so a walk can arrive at it by association alone, having
+    /// composed nothing. It is not a corrupt row; the corpus is entitled to
+    /// generate it, and CLUTRR's own difficulty comes from the chain rather than
+    /// from the vocabulary.
+    /// </para>
+    /// <para>
+    /// <b>IT IS EVERY TWO-HOP STORY, WHICH IS WHY THIS EXISTS.</b> All thirty-eight
+    /// of them in the first three hundred restate their answer, so a headline
+    /// "two-hop chains beat chance" is a claim about recall wearing composition's
+    /// clothes — and it was published as composition before anybody checked. Longer
+    /// chains restate far less often, so the two must be scored apart or chain
+    /// length silently measures contamination.
+    /// </para>
+    /// </remarks>
+    public required bool Restated { get; init; }
+
+    /// <summary>
     /// How many hops the chain is. <b>The one number a result must be broken down
     /// by</b> — see <see cref="ClutrrSettings.Longest"/>.
     /// </summary>
@@ -234,14 +258,17 @@ public sealed class Clutrr
             var says = row.GetValueOrDefault("target_text", "").Trim();
             if (says.Length == 0) continue;
 
+            var answer = Kind.Of(says);
+
             kept.Add(new Story
             {
                 Index = kept.Count,
                 People = people,
                 Edges = edges,
                 Query = (from, to),
-                Answer = Kind.Of(says),
+                Answer = answer,
                 Says = says,
+                Restated = edges.Any(edge => edge.Relation == answer),
             });
         }
 

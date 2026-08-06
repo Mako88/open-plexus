@@ -31,26 +31,47 @@ public sealed record ClutrrResult : Questioned
     public required ImmutableArray<(int Hops, int Asked, int Right)> ByHops { get; init; }
 
     /// <summary>
-    /// Accuracy on chains longer than three hops — <b>the only number that can
-    /// show composition rather than recall.</b>
+    /// Asked and right on stories whose answer was <b>also stated in the chain.</b>
     /// </summary>
     /// <remarks>
-    /// <b>Three, because that is where the corpus's own training split stops.</b>
-    /// CLUTRR's generalisation setting trains on two and three and tests to ten,
-    /// so a chain of four is the shortest one nobody could have been told the
-    /// answer to. The split means nothing to a system with no training phase, but
-    /// the LENGTH still marks where recall stops being available.
+    /// <b>RECALL, AND IT MUST NOT BE ADDED TO THE OTHER.</b> See
+    /// <see cref="Story.Restated"/>: the answer's slot code is already in a moment
+    /// the graph just read, so arriving at it composes nothing.
     /// </remarks>
-    public double Composed
-    {
-        get
-        {
-            var deep = ByHops.Where(one => one.Hops > 3).ToList();
-            var asked = deep.Sum(one => one.Asked);
+    public required (int Asked, int Right, int Silent) Recalled { get; init; }
 
-            return asked == 0 ? 0.0 : deep.Sum(one => one.Right) / (double)asked;
-        }
-    }
+    /// <summary>
+    /// Asked and right on stories whose answer <b>appears nowhere in the chain.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE ONLY NUMBER ON THIS RECORD THAT CAN SHOW COMPOSITION.</b> The answer
+    /// was never in front of the graph, so reaching it means applying something
+    /// learned on other stories about relations rather than about people.
+    /// </remarks>
+    public required (int Asked, int Right, int Silent) Fresh { get; init; }
+
+    /// <summary>
+    /// Of the fresh stories that were answered at all, how many were answered with
+    /// a relation <b>the story itself stated.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE DIAGNOSTIC THAT SAYS RETRIEVAL FROM COMPOSITION.</b> A fresh story's
+    /// answer is by definition not among its stated relations, so every one of
+    /// these is wrong BY CONSTRUCTION — and a walk that scores nought while filling
+    /// this counter is not failing to afford an answer, it is confidently returning
+    /// the wrong KIND of thing. That is a different defect from silence and wants
+    /// the opposite fix.
+    /// </remarks>
+    public required int Echoed { get; init; }
+
+    /// <summary>Of the stories that restated their answer, the share got right.</summary>
+    public double Recall => Recalled.Asked == 0 ? 0.0 : Recalled.Right / (double)Recalled.Asked;
+
+    /// <summary>
+    /// Of the stories that did not, the share got right — <b>the headline, and the
+    /// one an earlier commit reported wrongly.</b>
+    /// </summary>
+    public double Composed => Fresh.Asked == 0 ? 0.0 : Fresh.Right / (double)Fresh.Asked;
 
     /// <inheritdoc/>
     protected override string Shown => "stories";
@@ -79,9 +100,12 @@ public sealed record ClutrrResult : Questioned
     }
 
     public override string ToString() =>
-        $"fleeting={Carried} roled={Roled} | stories={Moments} asked={Asked} right={Right} "
-        + $"silent={Silent} | accuracy={Accuracy:F4} composed={Composed:F4} "
-        + $"chance={Chance:F4} | nodes={Nodes} edges={Edges} widest={Widest} | "
+        $"fleeting={Carried} roled={Roled} | stories={Moments} asked={Asked} "
+        + $"right={Right} silent={Silent} | accuracy={Accuracy:F4} "
+        + $"recall={Recall:F4} ({Recalled.Right}/{Recalled.Asked}) "
+        + $"composed={Composed:F4} ({Fresh.Right}/{Fresh.Asked}, quiet {Fresh.Silent}) "
+        + $"echoed={Echoed} chance={Chance:F4} | "
+        + $"nodes={Nodes} edges={Edges} widest={Widest} | "
         + $"msgs={Messages} halted={Halted} unsettled={Unsettled}{Wrong}";
 }
 
@@ -165,6 +189,8 @@ public sealed class ClutrrRun : IDisposable
     public async Task<ClutrrResult> RunAsync(CancellationToken ct = default)
     {
         int asked = 0, right = 0, silent = 0, unbalanced = 0, unsettled = 0;
+        int toldAsked = 0, toldRight = 0, toldQuiet = 0;
+        int freshAsked = 0, freshRight = 0, freshQuiet = 0, echoed = 0;
         long halted = 0;
 
         var chains = new Chains();
@@ -201,6 +227,23 @@ public sealed class ClutrrRun : IDisposable
             var tally = byHops.GetValueOrDefault(story.Hops);
             byHops[story.Hops] = (tally.Asked + 1, tally.Right + (correct ? 1 : 0));
 
+            // RECALL AND COMPOSITION ARE DIFFERENT QUESTIONS. See Story.Restated.
+            if (story.Restated)
+            {
+                toldAsked++;
+                if (correct) toldRight++;
+                if (answer is null) toldQuiet++;
+            }
+            else
+            {
+                freshAsked++;
+                if (correct) freshRight++;
+                if (answer is null) freshQuiet++;
+
+                // DID IT JUST HAND BACK SOMETHING THE STORY SAID? See Echoed.
+                else if (story.Edges.Any(edge => edge.Relation.Role(0) == answer)) echoed++;
+            }
+
             // AND THE ANSWER ONLY AFTER IT WAS GUESSED. The query edge is what
             // turns a chain into a rule: without it the graph sees the hops and
             // never what they add up to. Written here, it can only ever help the
@@ -221,6 +264,9 @@ public sealed class ClutrrRun : IDisposable
             Right = right,
             Silent = silent,
             Chance = _world.Chance,
+            Recalled = (toldAsked, toldRight, toldQuiet),
+            Fresh = (freshAsked, freshRight, freshQuiet),
+            Echoed = echoed,
             Halted = halted,
             Reflections = Reflections.Of(_dials, 0),
             Plumbing = _fabric.Facts(chains, unbalanced),

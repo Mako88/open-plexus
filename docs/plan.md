@@ -44,11 +44,13 @@
   toward it. Planning needs a target, and sub-goals are what serve many tasks.
 - **An answer that is no code it has ever seen.** Answering is ARRIVING somewhere,
   so yes/no and counting questions ask for a token the world never shows.
-  `BabiTests` names the tasks; `PrimerTests` says why feeding it English does not
-  fix it.
-- **A conclusion that can be asked from.** `Clutrr`'s deep chains are LIFTED by the
-  role channel and still far from solved, and a second composition has nothing to
-  hold the first one's result in.
+  `BabiTests` names the tasks; `PrimerTests` says why English does not fix it.
+- **AND AN ANSWER NOT IN FRONT OF IT.** `Clutrr` scores nought where the answer is
+  stated nowhere in the story, and every reply is a relation the story DID state.
+  The code exists; it is never preferred over what is locally present.
+- **A conclusion that can be asked from.** Nothing composes on `Clutrr` at all, in
+  either arm — the role channel doubles RECALL and leaves composition at nought.
+  Applying a rule twice needs somewhere to put the first result.
 - **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
   sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
   — everything else carries over. An act is already a code.

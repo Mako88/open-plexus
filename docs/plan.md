@@ -95,13 +95,27 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **What to do when a commitment cannot be saved by any single added condition.**
   Two conflated cases with no distinguishing code present is the signal that a NEW
   code is needed — which is positing with a reason.
+- **AND THAT SIGNAL CAN BE AIMED AT THE FRONT END.** A failure nothing present
+  explains is a localised demand for RESOLUTION: winnow these moments finer. It
+  closes the loop to perception, which every system in this family left open.
 
 ### Known limits, carried as work rather than discovered later
 
 - **THE SCOPE LANGUAGE IS THE CEILING.** Whatever a scope cannot say, the system can
   never learn — this is ILP's language-bias problem and it is what killed the field.
-- **Quantisation noise is the interface risk.** ILP dies on noisy symbols; the front
-  end produces exactly those. Graded reliability is the defence and it is untested.
+- **QUANTISATION BOUNDARY NOISE IS THE INTERFACE RISK, AND REPAIR AMPLIFIES IT.**
+  Two identical worlds either side of a band emit unrelated codes, so a coding
+  artifact reads as a failure and specialising on it MINTS THE ARTIFACT.
+- **Counting degrades gracefully here and repairing does not.** `csharp` splits a
+  boundary across two cells and averages; this fragments. Said out loud as what the
+  change COSTS.
+- **`Winnow` IS THE DEFENCE AND IT IS MOUNTED NOWHERE.** Overlapping winner sets mean
+  near-identical readings share most of their codes, so a scope that is a SUBSET
+  still fires and the boundary stops being a cliff. Population coding.
+- **What graded codes cost is SEARCH** — many more possible scopes, and blame over
+  more of them. Measure it rather than assuming the robustness is free.
+- **A miss could be PARTIAL, weighted by overlap.** Either elegant or a way to make
+  everything mushy. Unmeasured.
 - **Blame diffuses when many commitments entail one prediction.** The historical
   failure. Keep predictions shallowly entailed until it is measured.
 

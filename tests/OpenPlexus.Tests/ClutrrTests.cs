@@ -35,8 +35,8 @@ public sealed class ClutrrTests(ITestOutputHelper output)
     }
 
     private static ClutrrSettings World(
-        int stories = 300, bool fleeting = false, bool roled = false) =>
-        new() { Corpus = Corpus, Stories = stories, Fleeting = fleeting, Roled = roled };
+        int stories = 300, bool fleeting = false, Slots slots = Slots.Grouped) =>
+        new() { Corpus = Corpus, Stories = stories, Fleeting = fleeting, Slots = slots };
 
     /// <summary>Asking again from what the last walk concluded, or not.</summary>
     /// <remarks>
@@ -164,14 +164,14 @@ public sealed class ClutrrTests(ITestOutputHelper output)
         // preferred over what is locally present.
         var arms = new List<ClutrrResult>();
 
-        foreach (var roled in new[] { false, true })
+        foreach (var slots in new[] { Slots.Grouped, Slots.Roled })
         {
             using var run = new ClutrrRun(
-                World(stories: 300, roled: roled), Fixture.Dials(stamina: 32.0), seed: 1);
+                World(stories: 300, slots: slots), Fixture.Dials(stamina: 32.0), seed: 1);
 
             var result = await run.RunAsync();
             arms.Add(result);
-            output.WriteLine($"roled={roled,-5} {result}");
+            output.WriteLine($"slots={slots,-8} {result}");
         }
 
         var grouped = arms[0];
@@ -259,5 +259,56 @@ public sealed class ClutrrTests(ITestOutputHelper output)
         // is a mechanism unlocked and not a world solved.
         Assert.True(twice.Fresh.Silent > twice.Fresh.Asked / 2,
             "the coverage problem has gone away and nobody noticed");
+    }
+
+    [Fact]
+    public async Task A_relationship_that_is_a_NODE_costs_a_fraction_of_one_that_is_a_slot()
+    {
+        // THE ROLE CHANNEL'S COST IS STRUCTURAL, AND THIS IS WHAT REMOVES IT. A slot
+        // code is ONE node shared by every relation of that name ever seen, so a
+        // walk leaving a person for its slot lands in a superhub holding every
+        // filler in the corpus. A reified statement joins its two people and its
+        // type and nothing else, so its fan-out is three however large the corpus
+        // grows.
+        //
+        // AND IT KEEPS BOTH LEVELS. An instance is seen once, so nothing
+        // accumulates on it and nothing would transfer -- the type-level cell
+        // between two relations' slots is still written, which is what carries a
+        // rule from one story to the next.
+        var arms = new Dictionary<Slots, ClutrrResult>();
+
+        foreach (var slots in new[] { Slots.Grouped, Slots.Roled, Slots.Reified })
+        {
+            using var run = new ClutrrRun(
+                World(stories: 300, slots: slots), Fixture.Dials(stamina: 32.0), seed: 1);
+
+            arms[slots] = await run.RunAsync(new Question { Steps = 2 });
+            output.WriteLine($"{slots,-8} {arms[slots]}");
+        }
+
+        var grouped = arms[Slots.Grouped];
+        var roled = arms[Slots.Roled];
+        var reified = arms[Slots.Reified];
+
+        // FAR CHEAPER THAN THE SLOT ARM, which is the claim reification makes.
+        Assert.True(reified.Messages * 10 < roled.Messages,
+            $"reifying did not undercut the slot hub: {reified.Messages} against {roled.Messages}");
+
+        // AND CHEAPER THAN THE BASELINE TOO, rather than merely cheaper than the
+        // expensive arm.
+        Assert.True(reified.Messages < grouped.Messages,
+            $"reifying cost more than grouping: {reified.Messages} against {grouped.Messages}");
+
+        // IT KEEPS THE SLOT ARM'S RECALL GAIN. Roughly double the baseline, which is
+        // what `Roled` bought at thirty times the price.
+        Assert.True(reified.Recall > grouped.Recall * 1.5,
+            $"reifying lost the recall gain: {reified.Recall} against {grouped.Recall}");
+
+        // AND DOES NOT DESTROY COMPOSITION, which is what `Roled` does -- `Fills`
+        // anchors a walk to what is locally present and the second step has to
+        // escape exactly that.
+        Assert.True(reified.Composed > roled.Composed * 5,
+            $"reifying composed no better than the slot arm: "
+            + $"{reified.Composed} against {roled.Composed}");
     }
 }

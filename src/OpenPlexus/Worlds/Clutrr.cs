@@ -5,6 +5,57 @@ using OpenPlexus.Graph;
 
 namespace OpenPlexus.Worlds;
 
+/// <summary>
+/// How a stated relation is written into the graph — <b>three ways of saying the
+/// same fact, and they are not equivalent.</b>
+/// </summary>
+public enum Slots
+{
+    /// <summary>
+    /// Each person grouped with the slot code they fill, so the pair lands under
+    /// <see cref="Graph.Kind.With"/>. <b>The baseline every earlier number used.</b>
+    /// </summary>
+    Grouped,
+
+    /// <summary>
+    /// The role channel — <see cref="Learning.Occasion.Roles"/>, landing under
+    /// <see cref="Graph.Kind.Fills"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>MEASURED: it roughly doubles recall and costs about thirty times the
+    /// messages.</b> The cost is structural rather than incidental: a slot code is
+    /// ONE node shared by every relation of that name ever seen, so a walk leaving
+    /// a person for its slot lands in a superhub holding every filler in the
+    /// corpus.
+    /// </remarks>
+    Roled,
+
+    /// <summary>
+    /// A node per stated relationship — <b>the relation itself, reified.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>IT REPLACES A SUPERHUB WITH A SMALL LOCAL NODE, which is the point.</b>
+    /// The instance joins its two people and its relation's type and nothing else,
+    /// so its fan-out is three however large the corpus grows. A walk crosses
+    /// <c>person → instance → person</c> precisely, where
+    /// <see cref="Roled"/> crosses <c>person → slot → every filler ever</c>.
+    /// </para>
+    /// <para>
+    /// <b>IT IS ADDITIVE AND NOT A REPLACEMENT.</b> An instance is seen once, so
+    /// nothing accumulates on it and nothing transfers — the type-level cell
+    /// between two relations' slots is still what carries a rule from one story to
+    /// another. This writes both.
+    /// </para>
+    /// <para>
+    /// <b>AND THE INSTANCE IS FLEETING.</b> A node minted per stated relation that
+    /// lasted would grow every type's row by one entry forever, which is the fault
+    /// measured on the binding world.
+    /// </para>
+    /// </remarks>
+    Reified,
+}
+
 /// <summary>How much of CLUTRR to read.</summary>
 public sealed record ClutrrSettings
 {
@@ -40,27 +91,8 @@ public sealed record ClutrrSettings
     /// </remarks>
     public bool Fleeting { get; init; }
 
-    /// <summary>
-    /// Whether the slots are said through the role channel rather than through
-    /// grouping.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>OFF IS THE BASELINE AND IT IS A REAL ONE.</b> Grouping a person with the
-    /// slot code they fill writes the same PAIR the role channel writes — the
-    /// difference is the kind it lands under, <see cref="Graph.Kind.With"/> against
-    /// <see cref="Graph.Kind.Fills"/>, and whether the two fillers of one statement
-    /// can reach each other. So this is one mechanism measured ON from something
-    /// that already works, which is the trap the plan names.
-    /// </para>
-    /// <para>
-    /// <b>ON, THE SLOT CODES LEAVE THE MOMENT ENTIRELY.</b> The channel derives
-    /// them from <see cref="Learning.Occasion.As"/>, so the moment is just the two
-    /// people and the front end says which of them fills which slot — which is the
-    /// whole point: the cell that results names no person at all.
-    /// </para>
-    /// </remarks>
-    public bool Roled { get; init; }
+    /// <inheritdoc cref="Worlds.Slots"/>
+    public Slots Slots { get; init; } = Slots.Grouped;
 
 }
 
@@ -171,6 +203,12 @@ public sealed class Clutrr
     /// </remarks>
     public const byte Person = 70;
 
+    /// <summary>
+    /// The modality a reified relationship rides on. <b>Its own, so a walk can be
+    /// narrowed to relationships without reaching people or relation types.</b>
+    /// </summary>
+    public const byte Held = 71;
+
     private readonly ClutrrSettings _settings;
 
     /// <param name="settings">How much to read.</param>
@@ -224,6 +262,17 @@ public sealed class Clutrr
     /// the same file mint the same person with nothing to ask —
     /// <see cref="Kinds.Named"/> for the reason a hash of the string would not do.
     /// </remarks>
+    /// <summary>
+    /// One stated relationship of one story, as a code — <b>the relation reified.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>Derived from the story and the position in its chain</b>, so two machines
+    /// reading the same file mint the same instance with nothing to ask.
+    /// </remarks>
+    public static Code Stating(int story, int edge) =>
+        Kinds.Named(Held, string.Create(
+            CultureInfo.InvariantCulture, $"r{story}:{edge}"));
+
     public static Code Who(int story, int slot) =>
         Kinds.Named(Person, string.Create(
             CultureInfo.InvariantCulture, $"{story}:{slot}"));
@@ -458,8 +507,8 @@ public sealed class Clutrr
     /// <inheritdoc cref="ClutrrSettings.Fleeting"/>
     public bool Carried => _settings.Fleeting;
 
-    /// <inheritdoc cref="ClutrrSettings.Roled"/>
-    public bool Roled => _settings.Roled;
+    /// <inheritdoc cref="ClutrrSettings.Slots"/>
+    public Slots Slots => _settings.Slots;
 
 
     public override string ToString() =>

@@ -71,6 +71,10 @@
 
 ### Mechanisms
 
+- **Reification beyond one world.** A relationship as a NODE undercuts the slot hub
+  by two orders of magnitude on `Clutrr` and keeps both levels. Whether it carries
+  anywhere else is unmeasured.
+
 - **A span the brain reads off the stream** — a carried pair that never recurs is
   noise, so the share of `Kind.After` cells whose count passed one separates a
   cycle from independent draws. A node's own row statistic; see `WalkSettings.Span`.

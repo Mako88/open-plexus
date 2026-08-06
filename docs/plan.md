@@ -68,9 +68,9 @@
 - **Positing something never observed.** Four things mint codes and every one
   derives from what was PRESENT, so nothing can imagine. Gate it as `Chunk` does —
   description length AND beating chance. **`Stated` gives a posited thing PARTS.**
-- **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. Naming
-  in order is the easy half — **the candidates are the work**, since `Chunk` reads
-  one moment and a sequence spans several. `Stated.Instance` already folds in order.
+- **A WALK THAT CAN USE A MACRO.** `Macro` mints them and nothing reaches one — it
+  is an ORIGIN and a TARGET, one hop where five were, which is `Motif`'s traffic
+  argument applied to time. Where hierarchy starts.
 
 ### Worlds that are missing
 
@@ -201,6 +201,7 @@ condition is a superstition.**
 | Asking again where a task merely LOOKS deep | bAbI's one-, two- and three-fact tasks: worse on the first and no better on the rest. One walk already reaches there | A world where one walk is at chance while answering confidently |
 | Asking again UNCONDITIONALLY | Discards the first walk's evidence to gamble on one intermediate. Took `Clevr` to about a third | Never as a default. `Question.Steps` is the legal version |
 | Ranking an arrival against the endpoint's BASE RATE | Inert alone, harmful with two walks: the candidates' marginals barely differ, so it divides by nearly a constant. **Deleted** | Candidate answers differing WIDELY in frequency |
+| A macro name joining the occasion it completes | Its members are gone, so its only partner is its own last member. 38 edges on a world built for nought | A macro reached by the WALK, never written as a partner |
 | Fork 24, the budget controller | `Moves` never left nought on the one world that ran it — three budgets sampled forever, none chosen. Billing the probe cost a quarter of `Senses`. **Deleted** | A world where the right budget VARIES |
 
 ---

@@ -33,6 +33,9 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// <remarks><b>Every machine has one. There is no unchunked arm.</b></remarks>
     private readonly Chunk _chunks = new();
 
+    /// <inheritdoc cref="Macro"/>
+    private readonly Macro _macros = new();
+
     /// <summary>The last occasion this machine wrote, exactly as written.</summary>
     private Occasion? _joined;
 
@@ -123,6 +126,10 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// writes to and reporting nought forever.
     /// </remarks>
     public Chunk Chunks => _chunks;
+
+    /// <inheritdoc cref="Macro"/>
+    /// <remarks><b>Readable for the reason <see cref="Chunks"/> is.</b></remarks>
+    public Macro Macros => _macros;
 
     /// <summary>
     /// What this machine expects next — <see cref="Learning.Surprise"/>.
@@ -310,6 +317,48 @@ public sealed class InputMachine<TFrame> : IReceiveReports
                 .. folded.Absorbed,
             ];
         }
+
+        // STEP 3'S OTHER HALF -- A NAME FOR AN ORDER RATHER THAN FOR A SET. See
+        // `Macro`. A chunk names what arrived TOGETHER; this names what keeps
+        // arriving ONE AFTER ANOTHER, and the two are different claims about a
+        // world so neither can stand in for the other.
+        //
+        // ONE ONSET PER MOMENT OR NOTHING, AND THE LIMIT IS STATED RATHER THAN
+        // PAPERED OVER. A sequence needs an unambiguous unit per step, and a moment
+        // holding three onsets does not say which of them the sequence is made of --
+        // guessing would mint an order the world never claimed. So a moment that
+        // begins with exactly one thing extends the sequence and every other moment
+        // BREAKS it, which is the honest reading and is exactly right on a stream
+        // of single symbols. Naming a whole moment first is what would lift this,
+        // and that is the plan's sub-moment chunking item rather than this one.
+        Code? made = null;
+
+        if (starting.Length == 1) made = _macros.Notice(starting[0]);
+        else _macros.Broke();
+
+        // AND IT DOES NOT JOIN THE OCCASION -- MEASURED, AND THE ARM THAT DID
+        // BROKE TWO CONTROLS ON `Rhythm`.
+        //
+        // Adding the completed name to the onsets is what a chunk does, and it is
+        // WRONG HERE for a reason that only shows up in time. A chunk's members are
+        // in the moment with it, so `Chunk.Fold` absorbs them and the name pairs
+        // with everything EXCEPT what it stands for. A macro's members are in
+        // moments already written and gone -- so the only thing left for it to pair
+        // with is its own LAST member, which is name-to-member, the one edge that
+        // must never be written.
+        //
+        // WHAT IT COST, and both are the same failure the temporal window was
+        // cashed back out for: `Rhythm` at span nought is built to hold NO edges,
+        // and it held 38 -- the name manufactured the very link the control exists
+        // to withhold. And the silent share fell from 26% to nought, because a
+        // freshly minted name is surprising by construction, so the write-path gate
+        // stopped tracking the prediction and started tracking the minting.
+        //
+        // SO A MACRO IS NOT A CO-OCCURRENCE PARTNER. What it is for is being an
+        // ORIGIN and a TARGET -- one hop where five were, which is the traffic
+        // argument `Motif` makes for chunking, applied to time -- and that is a
+        // question a walk asks rather than something the write path does.
+        _ = made;
 
         // BOTH HALVES OF THE ERROR, SETTLED ONCE. `Residual` spends the expectation
         // and moves every counter behind it, so it must be called exactly once per

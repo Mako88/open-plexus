@@ -135,15 +135,16 @@ public sealed class Chunk
     /// </remarks>
     private readonly Dictionary<ulong, int> _used = [];
 
-    /// <summary>How often each thing has been in hand when pairs were counted.</summary>
+    /// <summary>
+    /// Whether a candidate has earned a name — <b>the marginals AND the two bars,
+    /// held where <see cref="Macro"/> can ask them too.</b>
+    /// </summary>
     /// <remarks>
-    /// <b>THE MARGINALS, AND WITHOUT THEM THE THRESHOLD CANNOT SEE CHANCE.</b>
-    /// See <see cref="Count"/>.
+    /// <b>THE MARGINALS AND THE THRESHOLD USED TO LIVE HERE</b>, and a second
+    /// detector minting by its own copy of that arithmetic is the one duplication
+    /// that could silently stop agreeing. See <see cref="Paying"/>.
     /// </remarks>
-    private readonly Dictionary<Code, int> _occurs = [];
-
-    /// <summary>How many times pairs have been counted at all.</summary>
-    private long _rounds;
+    private readonly Paying _paying = new();
 
     private readonly Lock _gate = new();
 
@@ -163,8 +164,7 @@ public sealed class Chunk
         get
         {
             lock (_gate)
-                return _used.Count(one =>
-                    (long)one.Value * (_members[one.Key].Length - 1) > _members[one.Key].Length);
+                return _used.Count(one => Paying.Repays(one.Value, _members[one.Key].Length));
         }
     }
 
@@ -381,8 +381,7 @@ public sealed class Chunk
         // THE MARGINALS AND THE DENOMINATOR, TAKEN OVER THE SAME POPULATION AS THE
         // JOINT COUNTS BELOW -- one round of counting, whether it is a moment's
         // first pass or a later one over what the merges left.
-        _rounds++;
-        foreach (var one in current) _occurs[one] = _occurs.GetValueOrDefault(one) + 1;
+        _paying.Counted(current);
 
         for (var i = 0; i < current.Count; i++)
         {
@@ -399,7 +398,7 @@ public sealed class Chunk
 
                 // MINIMUM DESCRIPTION LENGTH, and every term of it is the world's
                 // own arithmetic. See the note on this class.
-                if ((long)count * (members.Length - 1) <= members.Length) continue;
+                if (!Paying.Repays(count, members.Length)) continue;
 
                 // AND IT MUST ALSO BEAT CHANCE, WHICH DESCRIPTION LENGTH NEVER
                 // ASKED. MDL weighs naming against NOT naming and is satisfied by
@@ -411,48 +410,11 @@ public sealed class Chunk
                 // none, and since this exists to make the graph SMALLER, the
                 // control's 4,676 edges against the structured world's 2,733 is
                 // the mechanism running backwards.
-                if (count <= Chance(current[i], current[j])) continue;
+                if (!_paying.Beats(count, current[i], current[j])) continue;
 
                 _minted.Add(key);
             }
         }
-    }
-
-    /// <summary>
-    /// What two things would co-occur by accident, <b>and the spread around it.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>THE EXPECTATION IS THE PRODUCT OF THE MARGINALS, which is independence
-    /// and nothing more.</b> Two things each in hand often will meet often without
-    /// either telling you anything about the other, and that is the entire
-    /// population of the noise this was minting.
-    /// </para>
-    /// <para>
-    /// <b>THE SPREAD IS THE SQUARE ROOT, WHICH IS THE NULL MODEL'S OWN AND NOT A
-    /// CHOICE.</b> Occurrences of an independent pair are Poisson about that
-    /// expectation, so the deviation is <c>√λ</c> by the distribution's own
-    /// arithmetic — the same move the description-length inequality makes, applied
-    /// to the question it never asked.
-    /// </para>
-    /// <para>
-    /// <b>THE THREE IS BORROWED AND IS THE ONE CHOSEN NUMBER HERE — say so rather
-    /// than dress it up.</b> Three standard errors is already this project's bar
-    /// for believing a difference: <see cref="Worlds.Senses"/>'s headline claim is
-    /// asserted against exactly that, so a name is now held to the same standard
-    /// as a result. It is a constant nobody derived, which is a refuted row's
-    /// shape, and the honest defence is only that it is the bar already in use. A
-    /// sweep is what would settle it.
-    /// </para>
-    /// </remarks>
-    private double Chance(Code left, Code right)
-    {
-        if (_rounds == 0) return 0.0;
-
-        var expected =
-            (double)_occurs.GetValueOrDefault(left) * _occurs.GetValueOrDefault(right) / _rounds;
-
-        return expected + (3 * Math.Sqrt(expected));
     }
 
     /// <summary>

@@ -44,12 +44,15 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   episode boundary.
 - **Repair ADDS a narrower commitment and never edits the old one**, so monotonicity
   is preserved rather than strained.
-- **Subsumption is the one exception and it is deliberate.** A child more specific
-  than its parent and at least as accurate REPLACES it, or never-delete means
-  never-bounded.
-- **Codes are identical on every machine forever.** A specialised commitment's
-  identity derives from its parent and the condition added, so two nodes repairing
-  alike converge without speaking.
+- **Subsumption is the one exception and it is deliberate.** Where a scope and a
+  narrower version of it are equally accurate, the GENERAL one stays — the narrower
+  says nothing extra and covers less.
+- **Keeping the narrower one is how a population drifts to one rule per instance**,
+  which is the memorising this design is otherwise careful about. XCS is this way
+  round for the same reason.
+- **Codes are identical on every machine forever.** A commitment's identity derives
+  from its SCOPE, so every repair path that reaches a scope converges on one name.
+  Parent-plus-condition gave one scope two.
 - **A front end may say what it is looking at, never what to conclude** — *this is
   the same thing you saw six times*, never *this is a red ball*.
 - **Adaptation lives above the codes and never inside them.** The feature basis is a
@@ -100,6 +103,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   stops the winner monopolising the learning.
 - **And the weight is accuracy, never hit count** — the strength-versus-accuracy
   refutation, arriving somewhere nobody expects it.
+- **A PLAIN SUM IS THE SAME FAULT AGAIN.** Three commitments right half the time
+  outvote one that is always right, so the population's COUNT decides. Accuracy is
+  raised to a power first, which is XCS's own answer.
 - **The margin between first and second is a confidence, free.** A persistently thin
   margin is the two-conflated-cases signal, already instrumented.
 - **A miss is decided by settlement and never by a deadline** — *the settlement closed
@@ -119,6 +125,12 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   arrived — stale under lateness, never wrong by race.
 - **Repair is SPECIALISATION, and it is gated.** *Whenever X, expect Y* becomes
   *whenever X and Z, expect Y*, where Z clears the bars below.
+- **AND Z IS WHAT THE HITS HAD, WHICH IS THE OPPOSITE OF WHAT IS EASY TO SAY.** A
+  conjunctive child keeps the firings Z was in, so Z must lead in the HITS.
+  Backwards, it mints a child that is reliably wrong.
+- **A code more present in the MISSES is the right condition for a NEGATED one**,
+  which is rung two. Conflating the two is how one sentence describes both and fits
+  neither.
 
 ### The repair gate, which is the whole difference from overfitting
 
@@ -149,8 +161,12 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   the world `csharp`'s own plan lists as missing.
 - **Generated, so no corpus can contain its own answer**, and XCS's canonical
   benchmark, so the external baseline is free.
-- **And its ground truth is a known rule set.** Scoring which true rules were found
-  beats scoring a hit rate, because it is what catches right-for-the-wrong-reason.
+- **And its ground truth is checkable by enumeration**, so a rule can be asked
+  whether it is TRUE rather than whether it is the one expected. That is what catches
+  right-for-the-wrong-reason.
+- **A SINGLE ANSWER KEY WOULD MARK THE BASIS RATHER THAN THE LEARNER.** The world
+  admits several correct rule sets, and the first run found one that was not the key's
+  — scoring it against the key alone read as failure.
 
 ### What step one has to hit
 
@@ -160,7 +176,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   seeds, counted in both directions.
 - **A resident commitment count near the size of the true rule set.** High accuracy at
   ten thousand commitments is memorisation, and the count is what catches it.
-- **How many true rules were found exactly.** The number step one is judged on.
+- **How many resident commitments are SOUND** — true of the world, by enumeration
+  rather than against a basis. The number step one is judged on, reported beside the
+  unsound count because a count alone can be reached by minting everything.
 - **Eleven bits reported with no bar**, as the scaling number.
 - **The switching multiplexer** — flip the target mid-run, report steps to recover.
   The direct test of whether the local decaying estimate earns its keep.
@@ -373,8 +391,15 @@ change of architecture entirely.
 
 ## OPEN DEFECTS
 
-- *(none — nothing is built yet. The first entry here should be a thing measured and
-  not understood, never a thing not yet attempted.)*
+- **MOST OF WHAT IT HOLDS IS NOT TRUE.** On six bits the experienced population runs
+  about two unsound commitments for every sound one, while scoring well — so the vote
+  is carrying rules that the soundness check refuses.
+- **AND IT STOPS SHORT OF THE PUBLISHED ACCURACY.** Close on six bits and further off
+  on eleven, with the gap widening rather than the run being too short — measured at
+  four hundred thousand rounds and flat.
+- **`Abstain` IS UNARMED IN ANY RUN.** Nothing in one process can die, so C3's third
+  outcome is exercised only by unit tests. It reads zero for the same reason a check
+  reads zero when it cannot fire.
 
 ---
 
@@ -411,3 +436,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **32** | Entailment depth capped at 1, horizon at K=1. Both come off when blame diffusion has a number — a cap with no trigger is a permanent decision nobody made. Open |
 | **33** | Unification's per-match cost against a subset test. Probed before the ladder's escalation policy, not after. Open |
 | **34** | Rung five: does a name minted from shared sub-scopes clear `Paying`'s two bars where the true abstraction is known? Open |
+| **35** | Two unsound commitments resident for every sound one, while the score holds. Is the vote robust to them, or are they why it stops short? Open |

@@ -1,3 +1,4 @@
+using OpenPlexus.Commitments;
 using OpenPlexus.Bus;
 using OpenPlexus.Graph;
 using OpenPlexus.Thinking;
@@ -44,12 +45,57 @@ public sealed class DialTests(ITestOutputHelper output)
 
     };
 
+    /// <summary>Every dial in the tree, wherever its settings record lives.</summary>
+    private static IEnumerable<System.Reflection.PropertyInfo> Census() =>
+        typeof(WalkSettings).GetProperties()
+            .Concat(typeof(CommittingSettings).GetProperties());
+
     /// <summary>
     /// Dials nothing drives, each with the reason. <b>A reason, not an excuse</b>
     /// — several of these say outright that nobody has found the signal yet.
     /// </summary>
     private static readonly Dictionary<string, string> HandSet = new(StringComparer.Ordinal)
     {
+        // ---- ARRIVED WITH THE COMMITMENT BRANCH ----------------------------
+
+        ["Recency"] =
+            "OPEN, AND FORK 27 IS THE WHOLE OF IT. How fast the local estimate "
+            + "forgets is the one number that decides whether keeping a second "
+            + "estimate beside the G-Counters was worth it. The switching "
+            + "multiplexer is the world that could hunt it and it has not been run",
+
+        ["Floor"] =
+            "how many misses before a proportion can be tested at all. It is a "
+            + "property of the TEST rather than of the world -- below it no "
+            + "statistic has power, and that is arithmetic rather than a level",
+
+        ["Alpha"] =
+            "how much noise the separation bar admits. A choice about what counts "
+            + "as evidence, and the correction beside it is what makes the number "
+            + "mean anything; hunting it would be hunting a standard of proof",
+
+        ["Budget"] =
+            "a runaway guard rather than a level, and it BOUND before it guarded "
+            + "at eight -- repair stopped while the world was still unlearnt. What "
+            + "a bound like this needs is to be shown not binding, which the "
+            + "children-minted count reports directly",
+
+        ["Capacity"] =
+            "a capacity rather than a level, exactly as `Row` is. What a machine "
+            + "can afford to hold is a fact about the machine and not about the "
+            + "run, so there is nothing here for a controller to hunt",
+
+        ["Sharpness"] =
+            "OPEN, AND THE MOST TRACTABLE OF THESE. How steeply the vote favours "
+            + "the accurate over the many is XCS's own exponent, and the signal is "
+            + "already computed every round -- the margin between the winner and "
+            + "the runner-up says whether the population is being outvoted by count",
+
+        ["Choosing"] =
+            "the control arm, and a choice between two rules that both do "
+            + "something rather than a mechanism and its own absence. WHICH rule "
+            + "picks the added condition is not a quantity",
+
         ["Fanout"] =
             "a choice between sending to every partner and sending above the row's "
             + "own shoulder. The quantity that could be hunted is the WIDTH, and "
@@ -324,8 +370,12 @@ public sealed class DialTests(ITestOutputHelper output)
     [Fact]
     public void Every_dial_is_either_driven_or_has_a_written_reason_it_is_not()
     {
-        var dials = typeof(WalkSettings)
-            .GetProperties()
+        // BOTH SETTINGS TYPES, BECAUSE THIS FILE HAS ALREADY MEASURED ITS OWN BLIND
+        // SPOT ONCE. It enumerated `WalkSettings` while eleven dials sat in `*Run`
+        // constructors where it could not look. A second brain arriving with seven
+        // knobs of its own would have repeated that exactly, and the census would
+        // have reported the same thirteen while the real number was twenty.
+        var dials = Census()
             .Select(one => one.Name)
             .ToHashSet(StringComparer.Ordinal);
 
@@ -410,6 +460,19 @@ public sealed class DialTests(ITestOutputHelper output)
         // than merely cheaper on the one world where the chain is load-bearing.
         //
         // THIRTEEN IS THE HONEST NUMBER, and it is still much worse than seven.
-        Assert.Equal(13, HandSet.Count);
+        //
+        // AND TO TWENTY FOR THE COMMITMENT BRANCH, WHICH IS SEVEN AT ONCE AND HAS TO
+        // BE ARGUED FOR RATHER THAN NOTED. Three of them are not levels at all --
+        // `Floor` is a property of the test, `Capacity` is a fact about the machine,
+        // `Choosing` is which of two rules applies. `Budget` is a guard that has
+        // already been caught binding. That leaves `Recency`, `Alpha` and
+        // `Sharpness` as knobs somebody will have to find a signal for, and two of
+        // the three have one sitting unused: the switching world for the first and
+        // the vote's own margin for the last.
+        //
+        // THE CENSUS WAS EXTENDED IN THE SAME EDIT, and that matters more than the
+        // count. A second brain with its own settings record would have been
+        // invisible to this file exactly as eleven `*Run` arguments once were.
+        Assert.Equal(20, HandSet.Count);
     }
 }

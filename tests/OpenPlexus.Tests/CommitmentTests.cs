@@ -1,0 +1,200 @@
+using System.Collections.Immutable;
+using OpenPlexus.Codes;
+using OpenPlexus.Commitments;
+
+namespace OpenPlexus.Tests;
+
+/// <summary>
+/// The primitive: what it is called, when it fires, and what a settlement does to it.
+/// </summary>
+public sealed class CommitmentTests
+{
+    private static Code Of(ulong value) => new(1, value);
+
+    private static Commitment One(params ulong[] scope) =>
+        new([.. scope.Select(Of)], Of(99));
+
+    private static HashSet<Code> Moment(params ulong[] codes) => [.. codes.Select(Of)];
+
+    // ---- what it is called -------------------------------------------------
+
+    [Fact]
+    public void A_name_comes_from_the_scope_and_not_from_the_path_that_reached_it()
+    {
+        // THE PLAN SAID PARENT PLUS THE CONDITION ADDED, AND THAT GIVES ONE SCOPE TWO
+        // NAMES. Two nodes adding the same pair of codes in a different order would
+        // reach the same commitment and call it two things, so it would be its own
+        // sibling -- on top of the sibling problem that is already expected.
+        Assert.Equal(One(1, 2, 3).Identity, One(3, 1, 2).Identity);
+        Assert.Equal(One(1, 2).Identity, One(2, 1, 1).Identity);
+
+        Assert.NotEqual(One(1, 2).Identity, One(1, 2, 3).Identity);
+        Assert.NotEqual(One(1, 2).Identity, new Commitment([Of(1), Of(2)], Of(98)).Identity);
+
+        // AND A SCOPE MAY NOT BE THE PREFIX OF ANOTHER AND REACH THE SAME NAME, which
+        // is what folding the length in first is for.
+        Assert.NotEqual(
+            Commitment.Name([Of(1), Of(2)], Of(3)),
+            Commitment.Name([Of(1)], Of(2)));
+    }
+
+    [Fact]
+    public void It_is_named_in_the_modality_a_scope_can_hold()
+    {
+        // A COMMITMENT'S IDENTITY IS A `Code`, WHICH IS WHY METACOGNITION AND
+        // ABSTRACTION NEED NO NEW MACHINERY: it can sit inside another scope.
+        Assert.Equal(Commitment.Committed, One(1).Identity.Modality);
+
+        var about = new Commitment([One(1).Identity], Of(50));
+
+        Assert.True(about.Fires(new HashSet<Code> { One(1).Identity }));
+    }
+
+    [Fact]
+    public void An_empty_scope_is_refused()
+    {
+        // A COMMITMENT WITH NO SCOPE FIRES ALWAYS, which is not a commitment.
+        Assert.Throws<ArgumentException>(() => new Commitment([], Of(1)));
+        Assert.Throws<ArgumentException>(() => Commitment.Name([], Of(1)));
+    }
+
+    // ---- when it fires -----------------------------------------------------
+
+    [Fact]
+    public void It_fires_when_its_scope_is_a_subset_and_not_otherwise()
+    {
+        Assert.True(One(1, 2).Fires(Moment(1, 2, 3)));
+        Assert.True(One(1, 2).Fires(Moment(1, 2)));
+        Assert.False(One(1, 2).Fires(Moment(1, 3)));
+        Assert.False(One(1, 2).Fires(Moment()));
+    }
+
+    [Fact]
+    public void Narrowing_is_saying_everything_the_other_says_and_more()
+    {
+        Assert.True(One(1, 2).Narrows(One(1)));
+        Assert.False(One(1).Narrows(One(1, 2)));
+        Assert.False(One(1, 2).Narrows(One(1, 2)));
+        Assert.False(One(1, 3).Narrows(One(2)));
+
+        // AND NEVER ACROSS TWO EXPECTATIONS. A scope that says something else is not
+        // a narrower version of this, it is a different claim.
+        Assert.False(new Commitment([Of(1), Of(2)], Of(98)).Narrows(One(1)));
+    }
+
+    // ---- what a settlement does --------------------------------------------
+
+    [Fact]
+    public void A_hit_and_a_miss_move_counters_that_only_rise()
+    {
+        var one = One(1);
+
+        one.Settle(Outcome.Hit, Moment(1, 5), 0.1);
+        one.Settle(Outcome.Miss, Moment(1, 6), 0.1);
+        one.Settle(Outcome.Hit, Moment(1, 5), 0.1);
+
+        Assert.Equal(2, one.Hits);
+        Assert.Equal(1, one.Misses);
+        Assert.Equal(3, one.Fired);
+        Assert.Equal(2 / 3.0, one.Reliability, 6);
+    }
+
+    [Fact]
+    public void An_abstain_moves_nothing_but_its_own_counter()
+    {
+        // C3 REQUIRES THIS, AND A RUN IN ONE PROCESS CANNOT REACH IT -- nothing here
+        // can die, so this is the only place the path is exercised at all. Without
+        // it the counter reads zero for the reason a check reads zero when it is
+        // wired and unable to fire.
+        var one = One(1);
+
+        one.Settle(Outcome.Hit, Moment(1, 5), 0.1);
+
+        var accuracy = one.Accuracy;
+
+        one.Settle(Outcome.Abstain, Moment(1, 7), 0.1);
+        one.Settle(Outcome.Abstain, Moment(1, 7), 0.1);
+
+        Assert.Equal(2, one.Abstains);
+        Assert.Equal(1, one.Hits);
+        Assert.Equal(0, one.Misses);
+        Assert.Equal(1, one.Seen);
+        Assert.Equal(accuracy, one.Accuracy);
+
+        // AND IT LEAVES THE TALLY ALONE. A settlement that could not say is not
+        // evidence about which code separates anything, so letting it in would make
+        // repair depend on how often the network was unwell.
+        Assert.False(one.Separations.ContainsKey(Of(7)));
+    }
+
+    [Fact]
+    public void The_tally_is_over_what_came_along_and_never_over_the_scope()
+    {
+        // EVERY SCOPE CODE IS PRESENT IN EVERY FIRING BY DEFINITION, so a tally over
+        // the scope separates nothing at all -- it would be the code repair picks
+        // every time, and it would add a condition already required.
+        var one = One(1);
+
+        one.Settle(Outcome.Hit, Moment(1, 5), 0.1);
+        one.Settle(Outcome.Miss, Moment(1, 6), 0.1);
+        one.Settle(Outcome.Miss, Moment(1, 6), 0.1);
+
+        Assert.False(one.Separations.ContainsKey(Of(1)));
+
+        Assert.Equal(new Separation { InHits = 1 }, one.Separations[Of(5)]);
+        Assert.Equal(new Separation { InMisses = 2 }, one.Separations[Of(6)]);
+    }
+
+    [Fact]
+    public void The_local_estimate_starts_where_the_evidence_is_and_then_forgets()
+    {
+        // WIDROW-HOFF FROM ZERO SAYS A COMMITMENT RIGHT ONCE IS A TENTH RIGHT, so a
+        // fresh one is indistinguishable from a refuted one and loses every vote it
+        // should win. Averaging until there is enough to forget is XCS's own
+        // practice and introduces no number `Recency` did not already fix.
+        var one = One(1);
+
+        one.Settle(Outcome.Hit, Moment(1), 0.1);
+        Assert.Equal(1.0, one.Accuracy, 6);
+
+        one.Settle(Outcome.Miss, Moment(1), 0.1);
+        Assert.Equal(0.5, one.Accuracy, 6);
+
+        // AND IT TRACKS WHERE THE LIFETIME AVERAGE CANNOT. After a long run of hits
+        // and then a world that changed, the two answers come apart -- which is the
+        // whole of why both are kept.
+        for (var settle = 0; settle < 200; settle++) one.Settle(Outcome.Hit, Moment(1), 0.1);
+        for (var settle = 0; settle < 40; settle++) one.Settle(Outcome.Miss, Moment(1), 0.1);
+
+        Assert.True(one.Accuracy < 0.2, $"the local estimate did not track: {one.Accuracy:F3}");
+        Assert.True(one.Reliability > 0.8, $"the lifetime average tracked: {one.Reliability:F3}");
+    }
+
+    [Fact]
+    public void Forgetting_drops_the_tally_and_keeps_what_decides_whether_it_fires()
+    {
+        // THE TABLE IS WHAT BLOWS UP, NOT THE COMMITMENT. Fork 31 is whether it can
+        // go and come back without changing what fires; this is the half that is
+        // built -- that dropping it changes nothing a moment can see.
+        var one = One(1, 2);
+
+        one.Settle(Outcome.Hit, Moment(1, 2, 5), 0.1);
+        Assert.NotEmpty(one.Separations);
+
+        one.Forget();
+
+        Assert.Empty(one.Separations);
+        Assert.Equal(1, one.Hits);
+        Assert.True(one.Fires(Moment(1, 2, 5)));
+        Assert.Equal(One(1, 2).Identity, one.Identity);
+    }
+
+    [Fact]
+    public void A_scope_is_held_in_order_so_two_of_them_can_be_compared()
+    {
+        var one = new Commitment([Of(9), Of(2), Of(5)], Of(1));
+
+        Assert.Equal<IEnumerable<Code>>([Of(2), Of(5), Of(9)], one.Scope);
+        Assert.Equal(ImmutableArray.Create(Of(2), Of(5), Of(9)).ToList(), one.Scope.ToList());
+    }
+}

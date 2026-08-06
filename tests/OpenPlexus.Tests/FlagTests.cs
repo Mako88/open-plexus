@@ -1,3 +1,4 @@
+using OpenPlexus.Commitments;
 using OpenPlexus.Graph;
 using Xunit.Abstractions;
 
@@ -73,8 +74,11 @@ public sealed class FlagTests(ITestOutputHelper output)
     [Fact]
     public void No_dial_is_an_on_off_switch()
     {
-        var flags = typeof(WalkSettings)
-            .GetProperties()
+        // BOTH SETTINGS TYPES. A second brain's control arm arrived as a `bool` and
+        // this file could not see it, which is the same blind spot the dial census
+        // has already been caught in once.
+        var flags = typeof(WalkSettings).GetProperties()
+            .Concat(typeof(CommittingSettings).GetProperties())
             .Where(one => one.PropertyType == typeof(bool))
             .Select(one => one.Name)
             .ToList();

@@ -374,8 +374,11 @@ public sealed class ComposedRun : IDisposable
     private async Task<Answered> AgainAsync(
         Thought first, Episode episode, int which, bool settled, CancellationToken ct)
     {
-        var pointing = first.BestOf(Composed.Tag, 1);
-        var chosen = pointing.Count == 0 ? (Code?)null : pointing[0].Endpoint;
+        // THE SAME MECHANISM `Question.Steps` NAMES, and this world had it first.
+        // `Thought.Next` is that choice moved into the brain; what stays here is the
+        // turning, because settling is the harness's job.
+        var pointing = first.Next(1, Composed.Tag);
+        var chosen = pointing.Length == 0 ? (Code?)null : pointing[0];
         var right = Points(first, episode, which);
 
         _eyes.Forget(first.Id);

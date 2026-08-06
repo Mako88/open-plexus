@@ -1,5 +1,6 @@
 using OpenPlexus.Codes;
 using OpenPlexus.Graph;
+using OpenPlexus.Thinking;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
 
@@ -34,15 +35,14 @@ public sealed class ClutrrTests(ITestOutputHelper output)
     }
 
     private static ClutrrSettings World(
-        int stories = 300, bool fleeting = false, bool roled = false, int steps = 1) =>
-        new()
-        {
-            Corpus = Corpus,
-            Stories = stories,
-            Fleeting = fleeting,
-            Roled = roled,
-            Steps = steps,
-        };
+        int stories = 300, bool fleeting = false, bool roled = false) =>
+        new() { Corpus = Corpus, Stories = stories, Fleeting = fleeting, Roled = roled };
+
+    /// <summary>Asking again from what the last walk concluded, or not.</summary>
+    /// <remarks>
+    /// <b>ON THE QUESTION AND NOT ON A DIAL</b> — see <see cref="Question.Steps"/>.
+    /// </remarks>
+    private static Question Asking(int steps) => new() { Steps = steps };
 
     /// <summary>Right over asked on chains past three hops, and how deep it got.</summary>
     private static double Deep(ClutrrResult result) => result.Composed;
@@ -220,9 +220,9 @@ public sealed class ClutrrTests(ITestOutputHelper output)
         foreach (var steps in new[] { 1, 2 })
         {
             using var run = new ClutrrRun(
-                World(stories: 300, steps: steps), Fixture.Dials(stamina: 32.0), seed: 1);
+                World(stories: 300), Fixture.Dials(stamina: 32.0), seed: 1);
 
-            var result = await run.RunAsync();
+            var result = await run.RunAsync(Asking(steps));
             arms.Add((steps, result));
 
             var spoke = result.Fresh.Asked - result.Fresh.Silent;

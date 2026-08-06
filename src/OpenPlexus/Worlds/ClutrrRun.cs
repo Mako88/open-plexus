@@ -19,6 +19,9 @@ public sealed record ClutrrResult : Questioned
     /// <summary>Whether the slots were said through the role channel.</summary>
     public required bool Roled { get; init; }
 
+    /// <summary>How many walks each question got.</summary>
+    public required int Steps { get; init; }
+
     /// <summary>
     /// Right and asked, broken down by how many hops the chain was.
     /// </summary>
@@ -100,7 +103,7 @@ public sealed record ClutrrResult : Questioned
     }
 
     public override string ToString() =>
-        $"fleeting={Carried} roled={Roled} | stories={Moments} asked={Asked} "
+        $"fleeting={Carried} roled={Roled} steps={Steps} | stories={Moments} asked={Asked} "
         + $"right={Right} silent={Silent} | accuracy={Accuracy:F4} "
         + $"recall={Recall:F4} ({Recalled.Right}/{Recalled.Asked}) "
         + $"composed={Composed:F4} ({Fresh.Right}/{Fresh.Asked}, quiet {Fresh.Silent}) "
@@ -186,7 +189,13 @@ public sealed class ClutrrRun : IDisposable
 
     /// <summary>Shows every story and asks what is asked about it.</summary>
     /// <param name="ct">Cancellation.</param>
-    public async Task<ClutrrResult> RunAsync(CancellationToken ct = default)
+    /// <param name="asking">
+    /// What the asker knows. <b><see cref="Question.Steps"/> is what this world was
+    /// built to measure</b> — see the note there for why it is the asker's call and
+    /// not a dial.
+    /// </param>
+    public async Task<ClutrrResult> RunAsync(
+        Question? asking = null, CancellationToken ct = default)
     {
         int asked = 0, right = 0, silent = 0, unbalanced = 0, unsettled = 0;
         int toldAsked = 0, toldRight = 0, toldQuiet = 0;
@@ -196,6 +205,7 @@ public sealed class ClutrrRun : IDisposable
         var chains = new Chains();
         var byHops = new Dictionary<int, (int Asked, int Right)>();
         var answers = Answers;
+        var question = asking ?? new Question();
         var at = 0L;
 
         foreach (var story in _world.Stories)
@@ -209,7 +219,7 @@ public sealed class ClutrrRun : IDisposable
                 await ShowAsync(story, edge.From, edge.To, edge.Relation, at++, ct)
                     .ConfigureAwait(false);
 
-            var answered = await AskAsync(story, answers, ct).ConfigureAwait(false);
+            var answered = await AskAsync(story, answers, question, ct).ConfigureAwait(false);
 
             halted += answered.Halted;
             if (!answered.Balanced) unbalanced++;
@@ -259,6 +269,7 @@ public sealed class ClutrrRun : IDisposable
         {
             Carried = _world.Carried,
             Roled = _world.Roled,
+            Steps = question.Steps,
             Moments = _world.Stories.Count,
             Asked = asked,
             Right = right,
@@ -348,12 +359,12 @@ public sealed class ClutrrRun : IDisposable
     /// <summary>Asks which relation holds between the pair the question names.</summary>
     /// <remarks>
     /// <b>ONE WALK, OR SEVERAL WITH EACH STARTING FROM WHAT THE LAST CONCLUDED</b> —
-    /// see <see cref="ClutrrSettings.Steps"/>. The answer is read from the LAST walk
+    /// see <see cref="Question.Steps"/>. The answer is read from the LAST walk
     /// only, so a second step that adds nothing reads as the baseline getting worse
     /// rather than as a free win.
     /// </remarks>
     private async Task<Answering> AskAsync(
-        Story story, ImmutableArray<Code> answers, CancellationToken ct)
+        Story story, ImmutableArray<Code> answers, Question asking, CancellationToken ct)
     {
         var origins = ImmutableArray.Create(
             story.Who(story.Query.From), story.Who(story.Query.To));
@@ -364,12 +375,12 @@ public sealed class ClutrrRun : IDisposable
         IReadOnlyList<Arrival> reached = [];
         Code? answer = null;
 
-        for (var step = 0; step < _world.Steps; step++)
+        for (var step = 0; step < asking.Steps; step++)
         {
             if (origins.IsEmpty) break;
 
             var thought = await _reading
-                .ThinkAsync(origins, _dials.Stamina, ct: ct).ConfigureAwait(false);
+                .ThinkAsync(origins, _dials.Stamina, asking, ct).ConfigureAwait(false);
 
             var quiet = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
@@ -385,8 +396,8 @@ public sealed class ClutrrRun : IDisposable
             // is not written back -- fork 21 is what would do that, and writing a
             // guess into the graph before it has been scored would contaminate the
             // very thing this measures.
-            origins = step + 1 < _world.Steps
-                ? [.. reached.Take(_world.Width).Select(one => one.Endpoint)]
+            origins = step + 1 < asking.Steps
+                ? thought.Next(asking.Width, asking.Between)
                 : [];
 
             _reading.Forget(thought.Id);

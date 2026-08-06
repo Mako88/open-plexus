@@ -500,6 +500,43 @@ public sealed class Thought
     }
 
     /// <summary>
+    /// What this thought concluded, <b>as the origins of another one.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE POLICY HALF OF ASKING AGAIN, AND THE LOOP ITSELF CANNOT LIVE HERE.</b>
+    /// Each step has to SETTLE before the next can read it, and settling is the
+    /// harness's job — a thought cannot wait for itself. So what belongs in the
+    /// brain is the choice of what a conclusion offers, and the harness owns the
+    /// turning.
+    /// </para>
+    /// <para>
+    /// <b>IT REPLACES TWO HAND-ROLLED COPIES.</b> <see cref="Worlds.Composed"/> and
+    /// <see cref="Worlds.Clevr"/> both read an index off a settled thought and
+    /// re-asked from it, each spelling out the same narrowing. That is
+    /// <c>DuplicationTests</c>'s rule — copies drift where nothing fails.
+    /// </para>
+    /// </remarks>
+    /// <param name="width">How many conclusions to carry forward.</param>
+    /// <param name="modality">
+    /// Which front end they must come from, or null for the best of any kind. See
+    /// <see cref="Question.Between"/>.
+    /// </param>
+    public ImmutableArray<Code> Next(int width, byte? modality = null)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
+
+        lock (_gate)
+            return
+            [
+                .. Ranked()
+                    .Where(one => modality is not { } only || one.Endpoint.Modality == only)
+                    .Take(width)
+                    .Select(one => one.Endpoint),
+            ];
+    }
+
+    /// <summary>
     /// How many distinct origins have reached an endpoint.
     /// </summary>
     /// <remarks>

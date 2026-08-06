@@ -62,35 +62,6 @@ public sealed record ClutrrSettings
     /// </remarks>
     public bool Roled { get; init; }
 
-    /// <summary>
-    /// How many walks one question gets, <b>each starting from what the last one
-    /// concluded.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>ONE IS EVERY MEASUREMENT EVER TAKEN HERE.</b> More is the smallest
-    /// possible test of the plan's <i>a conclusion that can be asked from</i>: a
-    /// settled thought's best arrivals become the next thought's origins, so a rule
-    /// applied once can be applied again to its own result.
-    /// </para>
-    /// <para>
-    /// <b>IT IS MEASURED IN THE WORLD AND BELONGS IN THE BRAIN, and that is said
-    /// plainly rather than left to look deliberate.</b> A world deciding how it
-    /// THINKS is worse than a world deciding how it is coded, which the plan
-    /// already names as a fault. This is an arm to find out whether the mechanism
-    /// is worth anything; if it is, it graduates to <c>InputMachine</c> and this
-    /// goes away.
-    /// </para>
-    /// <para>
-    /// <b>The answer is read from the LAST walk only.</b> Taking the best across all
-    /// of them would let step one's echo win every time and the arm could not be
-    /// told from the baseline.
-    /// </para>
-    /// </remarks>
-    public int Steps { get; init; } = 1;
-
-    /// <summary>How many of a walk's conclusions seed the next one.</summary>
-    public int Width { get; init; } = 4;
 }
 
 /// <summary>
@@ -208,8 +179,6 @@ public sealed class Clutrr
     {
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Stories);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Steps);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(settings.Width);
 
         _settings = settings;
 
@@ -492,11 +461,6 @@ public sealed class Clutrr
     /// <inheritdoc cref="ClutrrSettings.Roled"/>
     public bool Roled => _settings.Roled;
 
-    /// <inheritdoc cref="ClutrrSettings.Steps"/>
-    public int Steps => _settings.Steps;
-
-    /// <inheritdoc cref="ClutrrSettings.Width"/>
-    public int Width => _settings.Width;
 
     public override string ToString() =>
         $"stories={Stories.Count} relations={Relations.Count}";

@@ -93,6 +93,58 @@ public sealed record Question
     public static Question Worthwhile() => new() { Through = Graph.Kind.Helped };
 
     /// <summary>
+    /// How many walks this question gets, <b>each starting from what the last one
+    /// concluded.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ONE IS EVERY QUESTION ASKED BEFORE THIS EXISTED, and it must stay the
+    /// default, because asking again is RIGHT ON ONE WORLD AND HARMFUL ON
+    /// ANOTHER.</b> On <see cref="Worlds.Clutrr"/> a single walk cannot reach the
+    /// answer at all — it replies with a relation the story stated, which is wrong
+    /// by construction, at every budget. On <see cref="Worlds.Clevr"/> a single
+    /// walk already reaches it, and asking again throws that away to gamble on one
+    /// intermediate: measured, it took the accuracy to roughly a third.
+    /// </para>
+    /// <para>
+    /// <b>SO THE RULE IS THAT IT PAYS EXACTLY WHERE ONE WALK CANNOT REACH.</b> A
+    /// second step discards the first walk's evidence and stakes everything on the
+    /// intermediate being right, which is a good trade against a certainty of being
+    /// wrong and a bad one against a working answer.
+    /// </para>
+    /// <para>
+    /// <b>WHICH IS WHY IT LIVES HERE AND NOT ON A DIAL — the same argument
+    /// <see cref="Accumulate.Agreement"/> settled.</b> No setting is right for both
+    /// worlds, and sweeping it per world is the recurring fault. Only the asker
+    /// knows whether it is asking something a single walk could arrive at.
+    /// </para>
+    /// <para>
+    /// <b>AND MORE IS NOT BETTER.</b> Three steps measured worse than two on the
+    /// world where two works, which is the rollout's compounding error.
+    /// </para>
+    /// </remarks>
+    public int Steps { get; init; } = 1;
+
+    /// <summary>
+    /// How many of a walk's conclusions seed the next one. <b>Ignored unless
+    /// <see cref="Steps"/> asks for more than one.</b>
+    /// </summary>
+    public int Width { get; init; } = 4;
+
+    /// <summary>
+    /// Which front end the next walk's origins must come from, when the asker can
+    /// say. <b>Null takes the best of any kind.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE TWO WORLDS THAT HAND-ROLLED THIS BOTH NARROWED, AND ONE CANNOT.</b>
+    /// <see cref="Worlds.Composed"/> and <see cref="Worlds.Clevr"/> re-ask from an
+    /// INDEX, because they know the intermediate is an object; CLUTRR does not know
+    /// what its intermediate is, so it takes whatever the walk found. Both are the
+    /// same mechanism and the narrowing is the part only the asker can supply.
+    /// </remarks>
+    public byte? Between { get; init; }
+
+    /// <summary>
     /// Whether the walk prefers what was touched RECENTLY — <b>supersession's
     /// second consumer, and the only way this design has of preferring a current
     /// fact to a stale one.</b>

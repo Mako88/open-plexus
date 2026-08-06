@@ -48,9 +48,6 @@
 - **AND AN ANSWER NOT IN FRONT OF IT.** `Clutrr` scores nought where the answer is
   stated nowhere in the story, and every reply is a relation the story DID state.
   The code exists; it is never preferred over what is locally present.
-- **A conclusion that can be asked from — MEASURED, AND IT IS THE ONLY THING THAT
-  HAS EVER COMPOSED HERE.** A second walk from the first's arrivals breaks the echo
-  and beats chance on `Clutrr`. It lives in a world and belongs in `InputMachine`.
 - **Coverage is AFFORDABILITY, and the bill is the problem.** Spending more buys it
   on `Clutrr` — the silence is a walk that cannot reach, never an empty cell — but
   the messages grow far faster than the coverage does.
@@ -168,6 +165,7 @@ condition is a superstition.**
 | `Attending.Marked` — the credit cell, unconditioned | Peaks below the blind bar. It was `Credited`'s CONTROL, so ruling out the extra cell and the staleness goes with it. **Deleted** | A second cell written on anything but the outcome — re-take the control |
 | `Winnow` over CLEVR's `3d_coords` | Three inputs give only C(3, samples) distinct wirings, so the corpus collapses onto a handful of tags. **Closed in code** — the constructor refuses it | A reading wide enough to fill the sheet |
 | Banded position codes on CLEVR | Halves the reference at every budget it survives and times out above, peak to peak. No kept question is spatial, so it is row width bought with noise | A world whose QUESTION is spatial |
+| Asking again UNCONDITIONALLY | Discards the first walk's evidence to gamble on one intermediate. Took `Clevr` to about a third | Never as a default. `Question.Steps` is the legal version |
 | Fork 24, the budget controller | `Moves` never left nought on the one world that ran it — three budgets sampled forever, none chosen. Billing the probe cost a quarter of `Senses`. **Deleted** | A world where the right budget VARIES |
 
 ---

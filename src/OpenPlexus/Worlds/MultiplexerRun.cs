@@ -180,20 +180,7 @@ public sealed class MultiplexerRun
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sweep);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(window);
 
-        long right = 0, wrong = 0, silent = 0, repaired = 0;
-        long settled = 0, answered = 0;
-
-        // A TRAILING WINDOW AND NOT A RUNNING TOTAL, because a lifetime accuracy
-        // cannot cross a bar it spent the early rounds below -- so rounds-to-target
-        // read off a total would measure the length of the run.
-        var trailing = new Queue<bool>(window);
-        var standing = 0;
-        long reached = 0;
-
-        // THE LAST TENTH IS THE ASSESSMENT, and it is a reporting choice rather than
-        // a dial: a lifetime accuracy over a learning run measures how long the run
-        // was at least as much as it measures the mechanism.
-        var from = rounds - (rounds / 10);
+        var cycle = new Cycle(_held, rounds, sweep, target, window);
 
         for (long round = 0; round < rounds; round++)
         {
@@ -203,53 +190,7 @@ public sealed class MultiplexerRun
             // take the same moment, so a minted name can be matched on, minted
             // against and chosen as a repair condition -- which is what makes a
             // second level of structure reachable rather than merely representable.
-            var moment = _held.Moment(shown.Cues.ToHashSet());
-
-            var firing = _held.Firing(moment);
-            var vote = _held.Predict(firing);
-
-            if (vote.Expects is not { } said) silent++;
-            else
-            {
-                var hit = said == shown.Outcome;
-
-                if (hit) right++; else wrong++;
-
-                if (round >= from)
-                {
-                    answered++;
-                    if (hit) settled++;
-                }
-
-                trailing.Enqueue(hit);
-                if (hit) standing++;
-
-                if (trailing.Count > window && trailing.Dequeue()) standing--;
-
-                if (reached == 0 && trailing.Count >= window
-                    && standing / (double)trailing.Count >= target)
-                    reached = round;
-            }
-
-            _held.Settle(firing, moment, shown.Outcome);
-
-            // THE SWEEP IS NOT PART OF FAILING, and it sat inside the failure branch
-            // for the whole of step one. Once the learner is right most of the time,
-            // the chance of a wrong round landing on a sweep round is the miss rate
-            // itself -- so subsumption and culling ran a few times in thirty thousand
-            // rounds and read as mechanisms that did nothing.
-            if (round % sweep == sweep - 1)
-            {
-                _held.Subsume();
-                _held.Abstract();
-                _held.Cull();
-            }
-
-            if (vote.Expects == shown.Outcome) continue;
-
-            _held.Cover(moment, shown.Outcome);
-
-            if (_held.Mend(firing, shown.Outcome) is not null) repaired++;
+            cycle.Step(_held.Moment(shown.Cues.ToHashSet()), shown.Outcome);
         }
 
         var truths = _world.Truths();
@@ -272,15 +213,15 @@ public sealed class MultiplexerRun
             Sound = sound,
             Unsound = checkable.Count - sound,
             Unchecked = experienced.Count - checkable.Count,
-            Reached = reached,
+            Reached = cycle.Reached,
             Exhausted = _held.Exhausted(_budget),
             Rounds = rounds,
-            Right = right,
-            Wrong = wrong,
-            Silent = silent,
+            Right = cycle.Right,
+            Wrong = cycle.Wrong,
+            Silent = cycle.Silent,
             Abstained = _held.All.Sum(one => one.Abstains),
-            Settled = settled,
-            Answered = answered,
+            Settled = cycle.Settled,
+            Answered = cycle.Answered,
             Resident = _held.Count,
             Found = truths.Count(truth => _held.All.Any(
                 one => one.Expects == truth.Expects
@@ -289,7 +230,7 @@ public sealed class MultiplexerRun
             Stacked = _held.Names.Means.Count(
                 one => one.Value.Any(member => _held.Names.Knows(member))),
             Truths = truths.Length,
-            Repaired = repaired,
+            Repaired = cycle.Repaired,
         };
     }
 }

@@ -215,15 +215,15 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["ClutrrRun"] = Harness,
         ["LatentRun"] = Harness,
         ["MultiplexerRun"] = Harness,
+        ["GradedRun"] = Harness,
 
         ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
             + "cannot see a caller sitting beside it.",
 
-        ["Winnow"] = "BUILT, DOCUMENTED, MEASURED AND REACHING NO WORLD. This is "
-            + "the entry this check was written for: `WinnowTests` names every "
-            + "member, so the member scan reported it live for as long as it has "
-            + "existed. `Banded` and `Marked` are mounted on `Tending`; mounting "
-            + "this beside them is the next step and it is not done.",
+        // `Winnow` WAS THE ENTRY THIS CHECK WAS WRITTEN FOR, and it is gone because
+        // it is now mounted rather than because the reason was reworded. `GradedRun`
+        // consumes it as one of two front-end arms, so the library has finally heard
+        // of the type its own plan called its defence.
     };
 
     /// <summary>Why a world's run is not named by the library.</summary>

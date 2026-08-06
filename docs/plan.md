@@ -262,8 +262,15 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   — ILP's language-bias problem, and what killed the field. The ladder is finite.
 - **The multiplexer does not test the bet.** Its inputs are already symbols, so step
   one measures the learner and measures the front end not at all.
-- **And `csharp` has exactly one world that reaches a graded front end**, whose credit
-  arms are a coin toss. So the central claim is measured nowhere today.
+- **THE INTERFACE COSTS MOST OF THE SCORE, AND THAT IS NOW MEASURED.** Same function
+  and same learner, with readings spread rather than handed over as bits: both front
+  ends fall from the mid nineties to near chance plus a tenth.
+- **`Winnow` IS MOUNTED AT LAST**, on a world built for it — and that world cannot
+  stress it. Crowding contracts every dimension toward one point, which leaves the
+  projection's relative pattern untouched.
+- **So what is needed is a world whose dimensions move INDEPENDENTLY.** The pairing,
+  not population coding, is what the flat numbers are about. Say it before anyone
+  reads them as a refutation.
 - **The front end's resolution is a hard floor.** A fixed projection can split what is
   separable at some resolution and can never invent a direction.
 - **Rung five is the only escape**, and it builds features above the floor, never
@@ -462,3 +469,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **35** | More unsound commitments resident than sound ones, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
 | **36** | Graded codes: does `Winnow` emitting several codes per reading make a position nameable, and what does it cost the search and the soundness check? Open |
 | **37** | The repair budget has an interior optimum that moves with the relevant bits. The driver nobody has wired: whether a parent still has failures no child covers. Open |
+| **38** | Spreading a reading over its range costs most of the score at both front ends. Is that fragmentation, or the search the extra codes buy? Open |
+| **39** | A reading under about ten dimensions has too few distinct wirings for a projection to expand into. Population coding has a floor, and it is not documented anywhere. Open |

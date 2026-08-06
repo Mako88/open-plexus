@@ -47,6 +47,10 @@
 
 ### Look necessary for the goal, and absent
 
+- **NOTHING CAN PROPOSE A CODE — only recognise one.** `Chunk`, `Macro`, `Stated`
+  and `Winnow` all NAME what arrived; the walk RANKS what it reached. That one
+  absence is what positing, a goal, an unseen answer and a macro's use all wait on.
+
 - **A world with a WIDE real-valued signal to point `Winnow` at.** Built and mounted
   nowhere. The empirical guard is done — `Winnow.Distinct` counts tags actually
   emitted, since the declared width cannot see a low intrinsic dimension.
@@ -65,9 +69,9 @@
 - **AND AN ANSWER NOT IN FRONT OF IT — HALF ANSWERED.** `Accumulate.Steady` ranks
   per hop and takes `Clutrr` from none right to some, free, on the same walk. It
   does not beat the two-step loop and the two together are worse than either.
-- **Positing something never observed.** Four things mint codes and every one
-  derives from what was PRESENT, so nothing can imagine. Gate it as `Chunk` does —
-  description length AND beating chance. **`Stated` gives a posited thing PARTS.**
+- **Positing something never observed.** `Stated` already BUILDS one — a star whose
+  fillers never met — so the mechanism is not what is missing. **The policy is**: a
+  reason to build one, gated as `Chunk` gates.
 - **A WALK THAT CAN USE A MACRO.** `Macro` mints them and nothing reaches one — it
   is an ORIGIN and a TARGET, one hop where five were, which is `Motif`'s traffic
   argument applied to time. Where hierarchy starts.

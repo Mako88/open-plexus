@@ -98,6 +98,9 @@
 - **A HUB ADDS UNLESS SOMETHING REMOVES WHAT IT REPLACED.** MDL prices a star
   INSTEAD of a clique; counts only rise, so both stand, every member's row gains an
   entry and fan-out GROWS. **Positing and eviction are one project.**
+- **AND MINTING THE HUB IS WHAT EVICTS THE CLIQUE.** The minter knows exactly which
+  pairwise edges a hub subsumes, and each member drops its OWN — eviction rather
+  than decay, so counts still only rise and C1 holds.
 - **One where ONE origin sends MANY routes** — the over-counting `Agreement` exists
   against, and nothing here produces it. Two comparable routes outsum one, so
   origins and strength coincide; that is why it tied `Sum`. See `Thought.Divides`.

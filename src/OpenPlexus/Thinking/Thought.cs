@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Graph;
+using OpenPlexus.Learning;
 
 namespace OpenPlexus.Thinking;
 
@@ -576,6 +577,90 @@ public sealed class Thought
     /// complaint and must not read as this one.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// The origins that all reached EACH OTHER, when there are enough of them to
+    /// be worth a hub — <b>a posited thing's candidate, found without reading
+    /// anybody's row.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>C1 SAYS NO NODE MAY SEE A GROUP, AND THIS IS NOT A NODE.</b> A node knows
+    /// its own row and could never discover that its partners are partners of one
+    /// another. A THOUGHT collects every arrival at the machine that asked, which is
+    /// exactly where <see cref="Accumulate.Agreement"/> already counts which origins
+    /// reached each endpoint — so a broadcast from several codes that all reach one
+    /// another has found a group out of routes that came back to it. Nothing new
+    /// travels and nobody's data is read.
+    /// </para>
+    /// <para>
+    /// <b>WHAT IT IS FOR: a hub minted over these is a thing that was never
+    /// observed.</b> Every minter in this design names something that was PRESENT —
+    /// a set that arrived, an order that recurred, a relation that was stated — and
+    /// this names the explanation for a group instead. <see cref="Paying.Cheaper"/>
+    /// is the gate, and it prices a shortcut rather than predicting anything, so it
+    /// can be wasteful and cannot be false.
+    /// </para>
+    /// <para>
+    /// <b>PEELED RATHER THAN SEARCHED, BECAUSE THE ANSWER MUST BE THE SAME ON EVERY
+    /// MACHINE.</b> Largest-clique is the obvious reading and it is neither cheap
+    /// nor unique — two machines could pick different equally-large groups and mint
+    /// different hubs for one structure, which is the red-ball property gone. So
+    /// this repeatedly drops whichever origin fails to reach all the others, which
+    /// terminates, is deterministic, and finds A group rather than the biggest.
+    /// </para>
+    /// <para>
+    /// <b>Empty when the group is too small to pay</b>, so a caller cannot mint
+    /// below the bar by mistake.
+    /// </para>
+    /// </remarks>
+    public ImmutableArray<Code> Grouped()
+    {
+        lock (_gate)
+        {
+            // ONLY THE ORIGINS, and only those something reached. An endpoint that
+            // was not asked from is not a member of the group being priced.
+            var group = _started.Where(_agreeing.ContainsKey).ToHashSet();
+
+            // PEEL ONE AT A TIME, WORST FIRST, AND RE-EVALUATE. Dropping everything
+            // that currently fails destroys the group it is trying to find: an
+            // outsider makes EVERY member fail against it, so a single sweep
+            // removes the outsider and the whole group with it. Removing only the
+            // least-connected origin and looking again leaves the group standing.
+            //
+            // TIES BREAK ON THE CODE, which is fork 12's property: two equally bad
+            // origins left to the set's own order would make one machine mint a hub
+            // over a group another machine never found.
+            while (group.Count > 0)
+            {
+                var worst = default(Code);
+                var fewest = 0;
+                var found = false;
+
+                foreach (var one in group)
+                {
+                    var reached = _agreeing[one];
+                    var mutual = group.Count(other => other != one && reached.Contains(other));
+
+                    // Already reached by every other member; nothing to answer for.
+                    if (mutual == group.Count - 1) continue;
+
+                    if (found && (mutual > fewest
+                        || (mutual == fewest && one.CompareTo(worst) >= 0))) continue;
+
+                    worst = one;
+                    fewest = mutual;
+                    found = true;
+                }
+
+                if (!found) break;
+
+                group.Remove(worst);
+            }
+
+            return Paying.Cheaper(group.Count) ? [.. group.Order()] : [];
+        }
+    }
+
     public int Divides
     {
         get

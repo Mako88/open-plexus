@@ -74,6 +74,29 @@ public sealed class Paying
         count * (members - 1) > members;
 
     /// <summary>
+    /// Whether a group is cheaper said as a STAR than as its own pairwise edges.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PROPOSER'S GATE, AND IT IS THE ONLY KIND OF PROPOSAL THAT CANNOT BE
+    /// WRONG ABOUT A WORLD.</b> <c>k</c> mutually-connected things hold
+    /// <c>k(k-1)/2</c> edges among them; a hub joining all of them holds <c>k</c>,
+    /// and costs one node to define. So this says the same counts more cheaply and
+    /// invents no content at all — <b>it can be wasteful and it cannot be
+    /// false</b>, which is a strictly weaker licence than fork 21 asks for and
+    /// enough for positing.
+    /// </para>
+    /// <para>
+    /// <b>FOUR IS WHERE IT STARTS PAYING AND NOBODY CHOSE THAT.</b> Three things
+    /// hold three edges against a hub's three plus one, so a triangle is not worth
+    /// a name; four hold six against five. The bar is arithmetic rather than a
+    /// constant, which is the whole reason to price a proposal this way.
+    /// </para>
+    /// </remarks>
+    public static bool Cheaper(int members) =>
+        members > 1 && members * (members - 1) / 2 > members + 1;
+
+    /// <summary>
     /// Whether a pair met more often than two independent things would.
     /// </summary>
     /// <remarks>

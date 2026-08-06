@@ -480,7 +480,41 @@ public sealed class Node
             ? (newest - oldest) / (double)row.Length
             : 0.0;
 
-        foreach (var (edge, tie) in row)
+        // THE BEAM, AND IT CUTS AFTER THE REFUSALS RATHER THAN BEFORE. Taking the
+        // strongest entries first and then dropping hindered cells, cycles and the
+        // wrong relation would spend the width on entries that were never going to
+        // be sent -- so a beam of eight could emit two. See WalkSettings.Beam.
+        var walking = row;
+
+        if (_settings.Beam > 0 && row.Length > _settings.Beam)
+        {
+            var eligible = row
+                .Where(entry => entry.Key.Kind != Kind.Hindered
+                    && !message.Chain.Contains(entry.Key.Partner)
+                    && (message.Through is not { } only || entry.Key.Kind == only))
+                .ToArray();
+
+            if (eligible.Length > _settings.Beam)
+            {
+                // STRONGEST FIRST, THEN THE KEY'S OWN ORDER. A count tie is what a
+                // small or repetitive world produces constantly, and leaving those
+                // to the snapshot's order would put the walk at the mercy of
+                // dictionary iteration -- fork 12's property.
+                Array.Sort(eligible, (left, right) =>
+                {
+                    var strength = right.Value.Count.CompareTo(left.Value.Count);
+                    if (strength != 0) return strength;
+
+                    var partner = left.Key.Partner.CompareTo(right.Key.Partner);
+                    return partner != 0 ? partner : left.Key.Kind.CompareTo(right.Key.Kind);
+                });
+
+                walking = eligible[.._settings.Beam];
+            }
+            else walking = eligible;
+        }
+
+        foreach (var (edge, tie) in walking)
         {
             // A HINDERED CELL IS EVIDENCE AND NEVER A ROUTE, so it is not walked.
             // What it does is raise the act's own marginal when it is written --

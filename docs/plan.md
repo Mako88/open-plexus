@@ -86,8 +86,9 @@
 - **Reach that does not cost what reach costs now.** On `Clutrr` the silence is a
   walk that cannot afford to arrive, never an empty cell — and buying it is
   superlinear: messages grew far faster than coverage across the sweep.
-- **A self-set beam** — a width the system sets itself; `Surprise.Rate` or a node's
-  own row statistics.
+- **A self-set beam — the only lever measured with orders of magnitude in it.**
+  Fan-out is the base of an exponent. Swept as a constant it held composition on
+  `Clutrr` and cut `Clevr` hundreds of times; the width must come from the row.
 - **Conditioning the prediction itself**, rather than suppressing the observation.
 - **Hierarchy** — walk a thousand chunks, not a million nodes. What step 3 is for.
 - **Multi-token output** — fork 11 built the addressing; a world that wants two is
@@ -203,6 +204,9 @@ condition is a superstition.**
 - **A CORPUS CAN CONTAIN ITS OWN ANSWER, and then a score measures the leak.** Every
   short `Clutrr` story states the relation it asks for, so reaching it composed
   nothing. Split what was in front of it from what was not, and score them apart.
+- **A CHEAPER WALK THAT KEEPS ITS SCORE MAY HAVE STOPPED DOING THE TASK.** Beaming
+  `Clevr` to two partners left accuracy alone and took reference to nearly nought —
+  the answer never needed the object. Watch the diagnostic channel, not the headline.
 - **A small sample can look like a mechanism.** One seed drew a clean learning curve
   six flattened; twelve seeds showed a gap thirty-two closed.
 - **AND IT HIDES A REAL EFFECT AS WELL AS INVENTING ONE.** A separation eight seeds

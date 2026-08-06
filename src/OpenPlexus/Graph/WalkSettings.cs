@@ -333,6 +333,38 @@ public sealed record WalkSettings
     /// </remarks>
     public int Row { get; init; } = 32;
 
+    /// <summary>
+    /// How many partners a node may send to on one hop. <b>Nought is every
+    /// measurement ever taken here: send to all of them.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A MEASURING INSTRUMENT AND NOT A MECHANISM, AND THE DIFFERENCE IS A
+    /// REFUTED ROW.</b> "A beam over partners" was tried and killed for being <i>a
+    /// constant nobody set, doing the cutting</i>, and its revival condition is <b>a
+    /// width the system sets itself and reports</b>. This is neither — it is a dial
+    /// swept to find WHERE quality breaks, so that a self-set rule has a target to
+    /// be judged against. Anything that ships derives its width from a node's own
+    /// row.
+    /// </para>
+    /// <para>
+    /// <b>IT IS THE BASE OF AN EXPONENT, WHICH IS WHY IT IS WORTH THE CARE.</b>
+    /// Messages go roughly as fan-out to the power of depth, so the difference
+    /// between sending to thirty-two partners and eight is not four times at depth
+    /// four, it is two hundred and fifty-six times. That is the only lever measured
+    /// so far with orders of magnitude in it.
+    /// </para>
+    /// <para>
+    /// <b>THE STRONGEST EDGES SURVIVE, AND THE TIE BREAKS ON THE KEY.</b> Route
+    /// strength MULTIPLIES along a chain, so a route leaving by a weak edge arrives
+    /// carrying almost nothing — the flood spends most of itself delivering score
+    /// that cannot change a ranking. Ties break on partner then kind, because
+    /// leaving that to dictionary order is how a fixed seed stops reproducing a
+    /// run; see fork 12.
+    /// </para>
+    /// </remarks>
+    public int Beam { get; init; }
+
     /// <inheritdoc cref="Graph.Pricing"/>
     /// <remarks><b><see cref="Graph.Pricing.Receiver"/> is the default and the
     /// control</b>, so every measurement taken before this existed still

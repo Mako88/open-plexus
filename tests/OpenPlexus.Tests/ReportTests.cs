@@ -142,6 +142,8 @@ public sealed class ReportTests
                 ChainLengths = new Dictionary<int, int> { [2] = 4 },
                 Messages = 40,
                 Unbalanced = 0,
+                Temporal = 2,
+                Meddled = 0,
             },
         };
 

@@ -64,6 +64,17 @@ public sealed class Cluster : IReceiveEnvelopes
     /// <summary>Row entries here that mean <i>then</i> rather than <i>with</i>.</summary>
     public int Temporal => _nodes.Values.Sum(node => node.Entered(Kind.After));
 
+    /// <summary>
+    /// Cells holding what followed an act NOTHING CHOSE — <see cref="Kind.Meddled"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>Nought means no interventional evidence exists in this graph at all</b>,
+    /// which reads identically to an intervention that taught nothing unless it is
+    /// reported. The trap this project names: a check that cannot fire reads as one
+    /// that passed.
+    /// </remarks>
+    public int Meddled => _nodes.Values.Sum(node => node.Entered(Kind.Meddled));
+
     /// <summary>Whether the ring says this cluster owns that node.</summary>
     public bool Holds(Code code) => _ring.OwnerOf(code) == _address;
 

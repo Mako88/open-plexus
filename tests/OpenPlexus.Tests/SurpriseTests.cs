@@ -140,6 +140,7 @@ public sealed class SurpriseTests
                 Nodes = 12, Edges = 40, Widest = 6, Spread = [12],
                 ChainLengths = new Dictionary<int, int> { [2] = 300 },
                 Messages = 1000, Unbalanced = 0,
+                Temporal = 2, Meddled = 0,
             },
             Halted = 0, Unsettled = 0,
         };

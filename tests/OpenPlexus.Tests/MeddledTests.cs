@@ -71,6 +71,25 @@ public sealed class MeddledTests
     }
 
     [Fact]
+    public async Task The_counter_that_reports_it_is_armed_rather_than_trusted()
+    {
+        // `Plumbing.Meddled` READS NOUGHT ON EVERY WORLD AND WILL UNTIL A BODY
+        // SETS THE FLAG, which is the named trap exactly: arm anything that has
+        // always read zero. `Cluster.Meddled` sums this expression over its nodes,
+        // so showing it non-zero here is what stops a nought elsewhere being the
+        // counter rather than the world.
+        var assigned = await Followed(new HashSet<Code> { C(1) });
+        var chosen = await Followed(null);
+
+        Assert.Equal(1, assigned.Node(C(1)).Entered(Kind.Meddled));
+        Assert.Equal(0, assigned.Node(C(1)).Entered(Kind.After));
+
+        // AND THE CONTROL READS THE OPPOSITE WAY ROUND.
+        Assert.Equal(0, chosen.Node(C(1)).Entered(Kind.Meddled));
+        Assert.Equal(1, chosen.Node(C(1)).Entered(Kind.After));
+    }
+
+    [Fact]
     public async Task It_is_still_written_ONE_WAY()
     {
         // The past records the future and the future records nothing about the

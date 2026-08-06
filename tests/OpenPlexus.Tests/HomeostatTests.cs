@@ -23,6 +23,35 @@ public sealed class HomeostatTests(ITestOutputHelper output)
 
     private const int Steps = 400;
 
+    [Fact]
+    public async Task This_world_holds_no_act_to_outcome_edge_AT_ALL()
+    {
+        // THE OPEN DEFECT'S DIAGNOSIS, AND IT NEEDS NO APPEAL TO NON-STATIONARITY.
+        // `Span` is nought here and this front end states no order, so not one
+        // `Kind.After` cell is ever written -- an act is joined to the state it was
+        // taken IN and never to what followed it.
+        //
+        // SO THE CHAIN ARM IS ASKING WHICH ACT ACCOMPANIED STATES LIKE THIS. That
+        // is a mirror of its own past policy with no outcome anywhere in it, which
+        // is why more data makes it monotonically worse -- more data sharpens the
+        // mirror -- and why the test below already records that every point it ever
+        // scored came from the bootstrap's coin toss. The coin toss is the only
+        // evidence in this world that nothing about the state selected.
+        //
+        // A CHECK THAT CANNOT FIRE READS AS ONE THAT PASSED, which is why this
+        // asserts the zero rather than trusting the reading: `Plumbing.Temporal`
+        // is new, and a counter wired to nothing would report nought here for the
+        // wrong reason. `RhythmTests` is where it is armed against a world that
+        // DOES carry a span.
+        using var run = new HomeostatRun(World(), Dials, seed: 1);
+        var result = await run.RunAsync(Steps, Attending.Chain);
+
+        Assert.Equal(0, result.Plumbing.Temporal);
+
+        // AND THE GRAPH IS NOT SIMPLY EMPTY, or the line above says nothing.
+        Assert.True(result.Plumbing.Edges > 0, "the run wrote no edges at all");
+    }
+
     // ---- what the world is, asserted rather than described -----------------
 
     [Fact]

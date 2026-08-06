@@ -50,9 +50,12 @@
 - **A world with a WIDE real-valued signal to point `Winnow` at.** Built and mounted
   nowhere. The empirical guard is done — `Winnow.Distinct` counts tags actually
   emitted, since the declared width cannot see a low intrinsic dimension.
+- **AN ACT-TO-OUTCOME EDGE ON `Homeostat`, WHICH HAS NONE.** Measured at nought
+  temporal cells: its `Span` is nought, so the chain arm asks which act
+  ACCOMPANIED states like this — a mirror more data only sharpens.
 - **A BODY THAT SAYS WHICH ACTS IT WAS ASSIGNED.** `Kind.Meddled` and
   `Occasion.Forced` are built and no world sets them, so the interventional cell
-  exists and is empty. Needs a world that acts AND carries a span.
+  exists and is empty. `Homeostat`'s bootstrap already MAKES the interventions.
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and
   the rollout predicts; nothing can hold a state that is NOT current and steer
   toward it. Planning needs a target, and sub-goals are what serve many tasks.
@@ -272,10 +275,8 @@ condition is a superstition.**
 
 ## OPEN DEFECTS
 
-- **The credit arm gets WORSE with more data on `Homeostat`**, monotonically.
-  **Next: `Span` is nought there, so no act-to-outcome edge exists at all** — the
-  chain arm asks which act ACCOMPANIED states like this, which is a mirror that
-  more data only sharpens.
+- *(none — the credit arm's decline was diagnosed rather than parked; see the
+  act-to-outcome item above.)*
 
 ---
 

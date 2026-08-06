@@ -136,6 +136,31 @@ public sealed record Plumbing
     /// <summary>Thoughts whose own accounting did not close.</summary>
     public required int Unbalanced { get; init; }
 
+    /// <summary>
+    /// Cells saying one thing FOLLOWED another — <see cref="Graph.Kind.After"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NOUGHT MEANS THE GRAPH HOLDS NO SEQUENCE AT ALL, AND IT WAS INVISIBLE
+    /// FROM OUTSIDE.</b> <c>Cluster.Temporal</c> has counted this all along and no
+    /// result reported it, so a world whose <see cref="WalkSettings.Span"/> is
+    /// nought and whose front end states no order writes not one temporal cell —
+    /// and every question it is then asked about what FOLLOWS what is answered out
+    /// of simultaneity, which reads as a hard task rather than as an absent
+    /// channel.
+    /// </para>
+    /// <para>
+    /// <b>It is the same complaint shape as a silent arm.</b> An act whose outcome
+    /// is never joined to it cannot be chosen by evidence about its outcome, however
+    /// much data arrives — which is a fact about the world's wiring and not about
+    /// the walk.
+    /// </para>
+    /// </remarks>
+    public required int Temporal { get; init; }
+
+    /// <inheritdoc cref="Graph.Cluster.Meddled"/>
+    public required int Meddled { get; init; }
+
     /// <summary>How far a route actually walked, at most.</summary>
     public int Deepest => ChainLengths.Count == 0 ? 0 : ChainLengths.Keys.Max();
 

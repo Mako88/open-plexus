@@ -135,6 +135,9 @@ public sealed class Fabric : IDisposable
     /// <inheritdoc cref="Graph.Cluster.Temporal"/>
     public int Temporal => _clusters.Sum(cluster => cluster.Temporal);
 
+    /// <inheritdoc cref="Graph.Cluster.Meddled"/>
+    public int Meddled => _clusters.Sum(cluster => cluster.Meddled);
+
     /// <summary>
     /// What the machinery did, in the form every world's result carries it.
     /// </summary>
@@ -158,6 +161,8 @@ public sealed class Fabric : IDisposable
             ChainLengths = chains.ByLength,
             Messages = Bus.Messages,
             Unbalanced = unbalanced,
+            Temporal = Temporal,
+            Meddled = Meddled,
         };
     }
 

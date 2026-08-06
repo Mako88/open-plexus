@@ -85,6 +85,13 @@ public sealed class RhythmTests(ITestOutputHelper output)
 
         Assert.Equal(0, result.Edges);
         Assert.Equal(0, result.Right);
+
+        // AND THE TEMPORAL COUNTER AGREES, which is what ARMS it. `Plumbing.Temporal`
+        // reads nought on `Homeostat` and that is the whole diagnosis of an open
+        // defect there -- so it has to be shown reading nought for the right reason
+        // here and above nought on the arm below, or it is a counter wired to
+        // nothing reporting what everybody hoped.
+        Assert.Equal(0, result.Plumbing.Temporal);
     }
 
     [Fact]
@@ -111,6 +118,17 @@ public sealed class RhythmTests(ITestOutputHelper output)
         Assert.True(result.Expected > result.Chance * 5,
             $"the next symbol was not learnt: {result.Expected} against "
             + $"chance {result.Chance}");
+
+        // THE OTHER HALF OF ARMING THE TEMPORAL COUNTER -- see the span-nought test
+        // above. A world that carries writes these cells in quantity, so a nought
+        // anywhere else is a fact about that world and not about the counter.
+        Assert.True(result.Plumbing.Temporal > 0,
+            "a world whose every edge is a carried one wrote no temporal cells, "
+            + "so the counter is measuring nothing");
+
+        // AND NOTHING HERE IS AN INTERVENTION. No body acts in this world, so the
+        // interventional cell must be empty -- the control for `Kind.Meddled`.
+        Assert.Equal(0, result.Plumbing.Meddled);
 
         // AND THE PHASE IS RIGHT WAY ROUND NOW, which is the half that would have
         // caught the original bug. Predicting two ahead is what a walk one step

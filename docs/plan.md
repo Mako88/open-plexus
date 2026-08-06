@@ -92,9 +92,12 @@
 - **One needing variable binding that is not kinship** — `gSCAN`. `Clutrr` measures
   the role channel on somebody else's data; a second world is what says whether that
   carries beyond kinship.
-- **A HUB MINTED OVER `Latent`'S GROUP.** The world is built, the group is found on
-  every question, and the cost a hub would remove grows fast with the channels.
-  Nothing mints yet — the write path is what is left.
+- **A HUB MINTED OVER `Latent`'S GROUP.** The world is built and the group is found
+  on every question. What is left is the write path — and see below, because it is
+  not the saving the arithmetic promises.
+- **A HUB ADDS UNLESS SOMETHING REMOVES WHAT IT REPLACED.** MDL prices a star
+  INSTEAD of a clique; counts only rise, so both stand, every member's row gains an
+  entry and fan-out GROWS. **Positing and eviction are one project.**
 - **One where ONE origin sends MANY routes** — the over-counting `Agreement` exists
   against, and nothing here produces it. Two comparable routes outsum one, so
   origins and strength coincide; that is why it tied `Sum`. See `Thought.Divides`.

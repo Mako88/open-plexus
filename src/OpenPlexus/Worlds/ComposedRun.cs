@@ -132,11 +132,21 @@ public sealed record ComposedResult : Questioned
         // a chance score says only that the harness never ran the task.
         if (Asked > 0 && Found == 0)
             wrong.Add("no walk ever reached the index it was asking about");
+
+        // AND THE CONJUNCTION HAS TO HAVE DIVIDED THE CANDIDATES, or an agreement
+        // ranking is `Sum` exactly and comparing the two measures nothing. This
+        // world broadcasts from two attributes on purpose, so one level here means
+        // the second attribute reached everything the first did -- which is the
+        // conjunction failing before any ranking gets to it. See Questioned.Divides.
+        if (Asked > 0 && Divides <= 1)
+            wrong.Add("every candidate agreed to one degree, so an agreement "
+                + "ranking here is summed strength under another name");
     }
 
     public override string ToString() =>
         $"refer={Referring} scenes={Moments} asked={Asked} right={Right} silent={Silent} " +
-        $"accuracy={Accuracy:F4} chance={Chance:F4} reference={Reference:F4} | " +
+        $"accuracy={Accuracy:F4} chance={Chance:F4} reference={Reference:F4} " +
+        $"divides={Divides} | " +
         $"reflect={(Reflecting ? "on" : "off")} wrote={Reflected} | " +
         $"nodes={Nodes} edges={Edges} widest={Widest} spread=[{string.Join(",", Spread)}] | " +
         $"chains={{{Plumbing.Lengths}}} deepest={Deepest} | " +
@@ -217,6 +227,7 @@ public sealed class ComposedRun : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(votes);
 
         int asked = 0, right = 0, silent = 0, found = 0, unbalanced = 0, unsettled = 0;
+
         long halted = 0;
 
         var reflected = 0;
@@ -257,6 +268,7 @@ public sealed class ComposedRun : IDisposable
             if (!answer.Balanced) unbalanced++;
             if (!answer.Settled) unsettled++;
             if (answer.Landed) found++;
+            chains.Divided(answer.Divides);
 
             chains.Fold(answer.Reached);
 
@@ -273,6 +285,7 @@ public sealed class ComposedRun : IDisposable
             Right = right,
             Silent = silent,
             Found = found,
+            Divides = chains.Divides,
             Chance = _world.Chance,
             Values = _world.Values,
             Referring = refer,
@@ -381,9 +394,18 @@ public sealed class ComposedRun : IDisposable
         var chosen = pointing.Length == 0 ? (Code?)null : pointing[0];
         var right = Points(first, episode, which);
 
+        // READ BEFORE FORGETTING, AND OFF THE FIRST WALK RATHER THAN THE SECOND.
+        // The conjunction is what `Accumulate.Agreement` is for, and it is asked
+        // HERE; the second broadcast goes out from one index, so its candidates
+        // agree to one degree by construction and it could only ever report one.
+        // Attributing that to the arm was one of the explanations this open defect
+        // already spent. See Thought.Divides.
+        var divided = first.Divides;
+
         _eyes.Forget(first.Id);
 
-        if (chosen is not { } index) return new Answered(null, false, 0, true, settled, []);
+        if (chosen is not { } index)
+            return new Answered(null, false, 0, true, settled, [], divided);
 
         var second = await _eyes
             .ThinkAsync([index], _dials.Stamina, null, ct).ConfigureAwait(false);
@@ -395,7 +417,11 @@ public sealed class ComposedRun : IDisposable
             second,
             reached.Count == 0 ? null : Composed.Value(reached[0].Endpoint),
             right,
-            settled && closed);
+            settled && closed) with
+        {
+            // THE CONJUNCTION'S SPREAD, NOT THE FOLLOW-UP'S. See `divided` above.
+            Divides = divided,
+        };
 
         _eyes.Forget(second.Id);
         return report;

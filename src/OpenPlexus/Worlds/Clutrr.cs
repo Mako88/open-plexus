@@ -258,21 +258,18 @@ public sealed class Clutrr
     /// One person of one story, as a code.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>Derived from the pair and never counted out</b>, so two machines reading
     /// the same file mint the same person with nothing to ask —
     /// <see cref="Kinds.Named"/> for the reason a hash of the string would not do.
+    /// </para>
+    /// <para>
+    /// <b><c>Stating</c> STOOD BESIDE THIS AND IS GONE.</b> It minted the reified
+    /// relation from the story and the position in its chain; that is
+    /// <see cref="Learning.Stated.Instance"/>'s job now, for any number of
+    /// arguments and in every world rather than this one.
+    /// </para>
     /// </remarks>
-    /// <summary>
-    /// One stated relationship of one story, as a code — <b>the relation reified.</b>
-    /// </summary>
-    /// <remarks>
-    /// <b>Derived from the story and the position in its chain</b>, so two machines
-    /// reading the same file mint the same instance with nothing to ask.
-    /// </remarks>
-    public static Code Stating(int story, int edge) =>
-        Kinds.Named(Held, string.Create(
-            CultureInfo.InvariantCulture, $"r{story}:{edge}"));
-
     public static Code Who(int story, int slot) =>
         Kinds.Named(Person, string.Create(
             CultureInfo.InvariantCulture, $"{story}:{slot}"));

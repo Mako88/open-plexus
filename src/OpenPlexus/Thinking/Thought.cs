@@ -550,6 +550,46 @@ public sealed class Thought
     }
 
     /// <summary>
+    /// How many DISTINCT agreement counts this thought's endpoints fall into —
+    /// <b>whether <see cref="Accumulate.Agreement"/> had anything to rank at
+    /// all.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ONE MEANS THE ARM IS INERT BY CONSTRUCTION, AND THEN IT MUST TIE WITH
+    /// <see cref="Accumulate.Sum"/> EXACTLY.</b> <see cref="Ranked"/> compares
+    /// agreement first and falls through to strength when it ties, so a thought
+    /// whose candidates all agree to the same degree is ranked by strength alone —
+    /// which is <see cref="Accumulate.Sum"/>, to the last bit. <b>That is not a
+    /// small difference and a bug is not needed to produce it.</b>
+    /// </para>
+    /// <para>
+    /// <b>IT EXISTS BECAUSE AN OPEN DEFECT SPENT THREE EXPLANATIONS WITHOUT
+    /// ASKING THIS.</b> Agreement read exactly equal to <see cref="Accumulate.Sum"/>
+    /// on two worlds, and the candidates were never checked for whether they
+    /// differed in the one quantity the arm ranks by. <b>A ranking arm needs
+    /// something to rank</b> — the same trap <c>Choices</c> was built for on the
+    /// homeostat, in the one other place a ranking arm can be silently starved.
+    /// </para>
+    /// <para>
+    /// <b>Nought is a thought that reached nowhere</b>, which is a different
+    /// complaint and must not read as this one.
+    /// </para>
+    /// </remarks>
+    public int Divides
+    {
+        get
+        {
+            lock (_gate)
+                return _arrivals.Keys
+                    .Select(endpoint =>
+                        _agreeing.TryGetValue(endpoint, out var origins) ? origins.Count : 0)
+                    .Distinct()
+                    .Count();
+        }
+    }
+
+    /// <summary>
     /// Which of two arrivals is the better EXPLANATION, as a total order.
     /// </summary>
     /// <remarks>

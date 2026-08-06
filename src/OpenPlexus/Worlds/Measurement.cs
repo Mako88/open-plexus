@@ -155,6 +155,28 @@ public abstract record Questioned : Measurement
     /// <inheritdoc cref="Worlds.Reflections"/>
     public required Reflections Reflections { get; init; }
 
+    /// <summary>
+    /// The most distinct agreement levels any one question's candidates fell
+    /// into — <b>whether <see cref="Graph.Accumulate.Agreement"/> ever had
+    /// anything to rank in this whole run.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ONE ACROSS A WHOLE RUN MEANS THE ARM WAS INERT BY CONSTRUCTION AND ITS
+    /// SCORE IS <see cref="Graph.Accumulate.Sum"/>'S, EXACTLY.</b> See
+    /// <see cref="Thinking.Thought.Divides"/>. It is required rather than
+    /// defaulted because a world that forgot to set it would read as a walk that
+    /// arrived nowhere, and a check that cannot fire reads as one that passed.
+    /// </para>
+    /// <para>
+    /// <b>THE MAXIMUM OVER THE RUN, NOT THE MEAN.</b> The claim being checked is
+    /// that NO question ever had a spread to rank by, so one question that did is
+    /// enough to refute it — and averaging would bury that single case under
+    /// every question with a single candidate.
+    /// </para>
+    /// </remarks>
+    public required int Divides { get; init; }
+
     /// <inheritdoc cref="Worlds.Reflections.Wrote"/>
     public int Reflected => Reflections.Wrote;
 

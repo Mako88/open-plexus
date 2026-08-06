@@ -169,11 +169,12 @@ public sealed class SensesRun : IDisposable
             if (moment % every != 0 || moment == 0) continue;
 
             var concept = moment % _world.Concepts;
-            var (answer, stopped, balanced, settled, hungry, cutOff, everything) =
+            var (answer, stopped, balanced, settled, hungry, cutOff, everything, divided) =
                 await AskingAsync(concept, ct).ConfigureAwait(false);
 
             asked++;
             halted += stopped;
+            chains.Divided(divided);
             hunger += hungry;
             thwarted += cutOff;
             if (!balanced) unbalanced++;
@@ -193,6 +194,7 @@ public sealed class SensesRun : IDisposable
             Asked = asked,
             Right = right,
             Silent = silent,
+            Divides = chains.Divides,
             Chance = _world.Chance,
             Reflections = Reflections.Of(_dials, reflected),
             Plumbing = _fabric.Facts(chains, unbalanced),
@@ -259,7 +261,10 @@ public sealed class SensesRun : IDisposable
         bool Settled,
         double Hunger,
         double Thwarted,
-        IReadOnlyList<Arrival> Reached);
+        IReadOnlyList<Arrival> Reached,
+
+        // WHETHER AGREEMENT HAD ANYTHING TO RANK -- see Questioned.Divides.
+        int Divides);
 
     /// <summary>The same question, with the plumbing left attached.</summary>
     private async Task<Asking> AskingAsync(int concept, CancellationToken ct)
@@ -283,7 +288,8 @@ public sealed class SensesRun : IDisposable
             settled,
             thought.Hunger,
             thought.Thwarted,
-            thought.Best(int.MaxValue));
+            thought.Best(int.MaxValue),
+            thought.Divides);
 
         // FORK 24 IS TOLD HOW CLEARLY IT ARRIVED, NOT MERELY WHETHER IT DID.
         //

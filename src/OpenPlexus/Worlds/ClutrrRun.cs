@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Graph;
+using OpenPlexus.Learning;
 using OpenPlexus.Thinking;
 
 namespace OpenPlexus.Worlds;
@@ -251,6 +252,7 @@ public sealed class ClutrrRun : IDisposable
             var answered = await AskAsync(story, answers, question, ct).ConfigureAwait(false);
 
             halted += answered.Halted;
+            chains.Divided(answered.Divides);
             if (!answered.Balanced) unbalanced++;
             if (!answered.Settled) unsettled++;
             chains.Fold(answered.Reached);
@@ -309,6 +311,7 @@ public sealed class ClutrrRun : IDisposable
             Right = right,
             Silent = silent,
             Chance = _world.Chance,
+            Divides = chains.Divides,
             Recalled = (toldAsked, toldRight, toldQuiet),
             Fresh = (freshAsked, freshRight, freshQuiet),
             Echoed = echoed,
@@ -401,7 +404,10 @@ public sealed class ClutrrRun : IDisposable
         bool Settled,
         IReadOnlyList<Arrival> Reached,
         int Candidates,
-        bool Held);
+        bool Held,
+
+        // WHETHER AGREEMENT HAD ANYTHING TO RANK -- see Questioned.Divides.
+        int Divides);
 
     /// <summary>
     /// Writes one stated relation as a NODE joining its people and its type.
@@ -436,28 +442,30 @@ public sealed class ClutrrRun : IDisposable
         long at,
         CancellationToken ct)
     {
-        var instance = Clutrr.Stating(story.Index, which);
-        var passing = new HashSet<Code> { instance };
+        // THE STAR IS `Stated`'S NOW AND NOT THIS WORLD'S. Every rule it followed
+        // was general -- a star rather than a clique, one small moment per arm, the
+        // instance fleeting whatever the arm says, the type-level cell written
+        // because an instance accumulates nothing -- and all four were written out
+        // here, for exactly two arguments, in the one world that happened to need
+        // them first. See `Stated`: the mechanism is n-ary now and the plan's
+        // reification item is about a SECOND world rather than about the code.
+        //
+        // WHAT MOVED: the instance's own code. It used to be derived from the story
+        // and the position in its chain and is now derived from the relation, its
+        // fillers and the clock. Both are arithmetic and agree on every machine; an
+        // instance is fleeting and nothing accumulates on it, so what the number IS
+        // was never load-bearing -- but it is a changed baseline and said so here.
+        var moments = Stated.Star(
+            relation,
+            [left, right],
+            at,
 
-        // THE TWO ARMS OF THE STAR, each carrying which slot its person fills.
-        foreach (var (person, slot) in new[] { (left, 0), (right, 1) })
-            await _reading.ObserveAsync(
-                new Coded
-                {
-                    Codes = [person, instance],
-                    Passing = _world.Carried
-                        ? new HashSet<Code> { instance, person }
-                        : passing,
-                    Relating = relation,
-                    Filling = new Dictionary<Code, int> { [person] = slot },
-                },
-                at, ct: ct).ConfigureAwait(false);
+            // `Carried` MEANS THE PEOPLE ARE FLEETING, so lasting is its opposite
+            // and null is the case where they pass. See ClutrrSettings.Carried.
+            lasting: _world.Carried ? null : new HashSet<Code> { left, right });
 
-        // AND WHAT KIND OF STATEMENT IT IS. One way, because the instance is
-        // fleeting: the type records what met it and does not record into it.
-        await _reading.ObserveAsync(
-            new Coded { Codes = [instance, relation.Code], Passing = passing },
-            at, ct: ct).ConfigureAwait(false);
+        foreach (var moment in moments)
+            await _reading.ObserveAsync(moment, at, ct: ct).ConfigureAwait(false);
     }
 
     /// <summary>Asks which relation holds between the pair the question names.</summary>
@@ -473,10 +481,7 @@ public sealed class ClutrrRun : IDisposable
         var origins = ImmutableArray.Create(
             story.Who(story.Query.From), story.Who(story.Query.To));
 
-        var halted = 0;
-        var balanced = true;
-        var settled = true;
-        IReadOnlyList<Arrival> reached = [];
+        var walked = new Walking();
         Code? answer = null;
         var candidates = 0;
         var held = false;
@@ -490,10 +495,7 @@ public sealed class ClutrrRun : IDisposable
 
             var quiet = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
-            halted += thought.Halted;
-            balanced &= thought.Balanced();
-            settled &= quiet;
-            reached = thought.Best(int.MaxValue);
+            walked.Absorb(thought, quiet);
 
             // EVERY candidate reached, not just the winner -- see Candidates.
             var among = thought.BestAmong(answers, int.MaxValue);
@@ -512,7 +514,9 @@ public sealed class ClutrrRun : IDisposable
             _reading.Forget(thought.Id);
         }
 
-        return new Answering(answer, halted, balanced, settled, reached, candidates, held);
+        return new Answering(
+            answer, walked.Halted, walked.Balanced, walked.Settled,
+            walked.Reached, candidates, held, walked.Divides);
     }
 
     public void Dispose() => _fabric.Dispose();

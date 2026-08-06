@@ -207,6 +207,7 @@ public sealed class MotifRun : IDisposable
 
             asked++;
             halted += thought.Halted;
+            chains.Divided(thought.Divides);
             if (!thought.Balanced()) unbalanced++;
             if (!settled) unsettled++;
 
@@ -229,6 +230,7 @@ public sealed class MotifRun : IDisposable
             Right = right,
             Silent = silent,
             Chance = _world.Chance,
+            Divides = chains.Divides,
             Compressed = _world.Compressed,
             Uncompressed = _world.Uncompressed,
             Reflections = Reflections.Of(_dials, reflected),

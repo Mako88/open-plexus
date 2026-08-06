@@ -68,6 +68,14 @@ public sealed record ClevrResult : Questioned
 
         if (!Tagged && Referring == Refer.Index)
             wrong.Add("the index arm was asked for on a world that mints no indexes");
+
+        // AND THE CONJUNCTION HAS TO HAVE DIVIDED THE CANDIDATES -- see
+        // Questioned.Divides. Exempted under `Refer.Index`, which supplies the
+        // object and so asks from ONE origin by design; there one level is
+        // correct rather than broken.
+        if (Asked > 0 && Divides <= 1 && Referring != Refer.Index)
+            wrong.Add("every candidate agreed to one degree, so an agreement "
+                + "ranking here is summed strength under another name");
     }
 
     public override string ToString() =>
@@ -140,6 +148,7 @@ public sealed class ClevrRun : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(votes);
 
         int asked = 0, right = 0, silent = 0, found = 0, unbalanced = 0, unsettled = 0;
+
         long halted = 0;
 
         var reflected = 0;
@@ -171,6 +180,7 @@ public sealed class ClevrRun : IDisposable
                 if (!answered.Balanced) unbalanced++;
                 if (!answered.Settled) unsettled++;
                 if (answered.Pointed) found++;
+            chains.Divided(answered.Divides);
 
                 chains.Fold(answered.Reached);
 
@@ -189,6 +199,7 @@ public sealed class ClevrRun : IDisposable
             Carried = _world.Fleeting,
             Moments = _world.Scenes.Count,
             Asked = asked,
+            Divides = chains.Divides,
             Right = right,
             Silent = silent,
             Found = found,
@@ -207,7 +218,10 @@ public sealed class ClevrRun : IDisposable
         int Halted,
         bool Balanced,
         bool Settled,
-        IReadOnlyList<Arrival> Reached);
+        IReadOnlyList<Arrival> Reached,
+
+        // WHETHER AGREEMENT HAD ANYTHING TO RANK -- see Questioned.Divides.
+        int Divides);
 
     /// <summary>Asks several times at once and takes the majority.</summary>
     private async Task<Answering> AskingAsync(
@@ -226,6 +240,11 @@ public sealed class ClevrRun : IDisposable
             Balanced = answers.All(one => one.Balanced),
             Settled = answers.All(one => one.Settled),
             Reached = [.. answers.SelectMany(one => one.Reached)],
+
+            // THE RICHEST VOTE, NOT THE POOLED ONE. Votes ask the SAME question
+            // concurrently, so pooling their candidates would manufacture a spread
+            // no single walk saw. See Questioned.Divides.
+            Divides = answers.Length == 0 ? 0 : answers.Max(one => one.Divides),
         };
     }
 
@@ -259,7 +278,8 @@ public sealed class ClevrRun : IDisposable
             thought.Halted,
             thought.Balanced(),
             settled,
-            thought.Best(int.MaxValue));
+            thought.Best(int.MaxValue),
+            thought.Divides);
 
         _eyes.Forget(thought.Id);
         return answered;
@@ -281,10 +301,16 @@ public sealed class ClevrRun : IDisposable
         bool settled,
         CancellationToken ct)
     {
+        // READ BEFORE FORGETTING, AND OFF THE FIRST WALK. The conjunction is asked
+        // there; the second broadcast goes out from ONE index, so its candidates
+        // agree to one degree by construction. See Questioned.Divides.
+        var divided = first.Divides;
+
         _eyes.Forget(first.Id);
 
         if (pointing.Count == 0)
-            return new Answering(null, pointed, first.Halted, first.Balanced(), settled, []);
+            return new Answering(
+                null, pointed, first.Halted, first.Balanced(), settled, [], divided);
 
         var second = await _eyes
             .ThinkAsync([pointing[0].Endpoint], _dials.Stamina, null, ct).ConfigureAwait(false);
@@ -298,7 +324,8 @@ public sealed class ClevrRun : IDisposable
             first.Halted + second.Halted,
             first.Balanced() && second.Balanced(),
             settled && closed,
-            second.Best(int.MaxValue));
+            second.Best(int.MaxValue),
+            divided);
 
         _eyes.Forget(second.Id);
         return answered;

@@ -178,6 +178,7 @@ public sealed class BindingRun : IDisposable
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(votes);
 
         int asked = 0, right = 0, silent = 0, sawBoth = 0, unbalanced = 0, unsettled = 0;
+
         int echoed = 0, swapped = 0;
         long halted = 0;
 
@@ -210,11 +211,12 @@ public sealed class BindingRun : IDisposable
             // first. Both objects are asked about equally often.
             var which = asked % Binding.PerScene;
 
-            var (answer, both, stopped, balanced, settled, reached) =
+            var (answer, both, stopped, balanced, settled, reached, divided) =
                 await AskingAsync(scene, which, votes, ct).ConfigureAwait(false);
 
             asked++;
             halted += stopped;
+            chains.Divided(divided);
 
             // `Landed` here means BOTH candidate shapes were in reach, so the
             // forced choice really was forced -- see Answered.Landed.
@@ -243,6 +245,7 @@ public sealed class BindingRun : IDisposable
             SawBoth = sawBoth,
             Echoed = echoed,
             Swapped = swapped,
+            Divides = chains.Divides,
             Chance = Binding.Chance,
             Bound = _world.Bound,
             Reflections = Reflections.Of(_dials, reflected),

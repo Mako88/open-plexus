@@ -21,12 +21,20 @@
 
 - **C1** — no node reads another's data.
 - **C2** — messages are late, jittered, out of order.
+- **C3** — a cluster vanishing mid-thought is NORMAL, not an error. It was missing
+  from this list and never from the code; `Ring`, `DepartureTests` and
+  `Thought.Lost` all cite it, and it is what makes the in-flight accounting exist.
 - **C4** — no episode boundary, so nothing may depend on train-then-test.
 - **Counts only ever rise.** The G-Counter property buys convergence with no
   coordinator, which is what buys C1 and C2.
 - **Nothing is unlearned, only outvoted or evicted.** Decay is not available;
   eviction on "not touched since" is.
-- **Codes must be identical on every machine forever** — so nothing fitted, ever.
+- **Codes must be identical on every machine forever.** Two machines that code the
+  same input differently share nothing, so the codebook cannot depend on the sample
+  either of them happened to see.
+- **AND THAT RULE IS ABOUT SEMANTICS, NOT ADAPTATION — John, 2026-08-06.** A front
+  end may say *this is the same thing you saw six times*, never *this is a red
+  ball*. **A convergent identity code is legal; a labelled one is not.**
 - **A front end may say what it is looking at, never what to conclude.** Five
   channels do; a sixth needs an argument against the other five.
 
@@ -37,9 +45,8 @@
 ### Look necessary for the goal, and absent
 
 - **A world with a WIDE real-valued signal to point `Winnow` at.** Built and mounted
-  nowhere. **The constructor's guard reads the DECLARED width** — data of fifty
-  inputs varying in three dimensions passes it and still collapses. Count distinct
-  tags over a sample instead.
+  nowhere. The empirical guard is done — `Winnow.Distinct` counts tags actually
+  emitted, since the declared width cannot see a low intrinsic dimension.
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and
   the rollout predicts; nothing can hold a state that is NOT current and steer
   toward it. Planning needs a target, and sub-goals are what serve many tasks.
@@ -51,7 +58,7 @@
   does not beat the two-step loop and the two together are worse than either.
 - **Positing something never observed.** Four things mint codes and every one
   derives from what was PRESENT, so nothing can imagine. Gate it as `Chunk` does —
-  description length AND beating chance — and mint it at a coarse grain.
+  description length AND beating chance. **`Stated` gives a posited thing PARTS.**
 - **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
   sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
   — everything else carries over. An act is already a code.
@@ -66,6 +73,9 @@
 - **One needing variable binding that is not kinship** — `gSCAN`. `Clutrr` measures
   the role channel on somebody else's data; a second world is what says whether that
   carries beyond kinship.
+- **One where ONE origin sends MANY routes** — the over-counting `Agreement` exists
+  against, and nothing here produces it. Two comparable routes outsum one, so
+  origins and strength coincide; that is why it tied `Sum`. See `Thought.Divides`.
 
 ### Owed re-runs
 
@@ -75,9 +85,10 @@
 
 ### Mechanisms
 
-- **Reification beyond one world.** A relationship as a NODE undercuts the slot hub
-  by two orders of magnitude on `Clutrr` and keeps both levels. Whether it carries
-  anywhere else is unmeasured.
+- **Reification beyond one world.** `Stated` is the general form — n-ary,
+  role-typed, a star not a clique. It undercuts the slot hub by two orders of
+  magnitude on `Clutrr`; whether it carries anywhere else is unmeasured, and
+  `Clutrr` still hand-rolls its own.
 
 - **A span the brain reads off the stream** — a carried pair that never recurs is
   noise, so the share of `Kind.After` cells whose count passed one separates a
@@ -169,7 +180,7 @@ condition is a superstition.**
 | ΔP over the credit cell (`Attending.Contingent`) | Not refuted, DOMINATED: it tied the one-sided count and inhibition cleared both — no longer. **Deleted** | A world where some states are recoverable and others are not, so the base rate varies BY STATE |
 | `Ranked` as step 4's fix | The lift was the bootstrap's coin toss, and a varying code thins every edge | Anything making the walk prefer a partner other than the one it took last |
 | Widening the walk — `Kindred`, `Foreseeing`, `Backing` | All three: louder and below the bar, or silent everywhere | **A likeness the GRAPH DID NOT COMPUTE** — step 8 and nothing short of it |
-| A trained quantiser — k-means | Two machines fitted on different samples code the same input differently | Never fitted |
+| A trained quantiser — k-means | Two machines fitted on different samples code the same input differently | **A codebook reaching the same answer from any sample ORDER, emitting identity and never a label** |
 | `Question.Path` — a relation per hop | A fixed path trades coverage against precision with no middle. **Deleted** | `Downstream` wants the reverse temporal edge, which `Kind.Before` now writes |
 | `Kind.Informed` — a cell for what surprised | No walk reaches an untried act. **Deleted** | Anything that can explore |
 | `Attending.Marked` — the credit cell, unconditioned | Peaks below the blind bar. It was `Credited`'s CONTROL, so ruling out the extra cell and the staleness goes with it. **Deleted** | A second cell written on anything but the outcome — re-take the control |
@@ -196,7 +207,11 @@ condition is a superstition.**
 - **Two arms can peak at different budgets**, so one sweep compares one at its best
   and the other on its way up. Compare PEAK TO PEAK.
 - **A ranking arm needs something to rank.** `Homeostat` at stamina 4 offers a
-  choice on one step in six hundred. Read `Choices`.
+  choice on one step in six hundred. Read `Choices`; on a walk read
+  `Thought.Divides`.
+- **AN ARM TIES WHEN WHAT IT RANKS BY IS IMPLIED BY WHAT IT REPLACES.** Two
+  comparable routes outsum one, so `Agreement` and `Sum` order alike here — read as
+  a bug for four sessions. **An arm needs the two statistics to DISAGREE.**
 - **A check can be wired and unable to fire**, which reads as passing. Arm anything
   that has always read zero.
 - **A dial can be declared, documented, passed everywhere and connected to
@@ -250,11 +265,6 @@ condition is a superstition.**
 ---
 
 ## OPEN DEFECTS
-
-- **`Accumulate.Agreement` reads EXACTLY equal to `Sum`** on `Composed` and
-  `Ranking`. Three explanations spent: not the minted name, not arrival order, not
-  the narrowed second broadcast. **Next: whether `_agreeing` is populated at all** —
-  nought everywhere would tie every comparison.
 
 - **The credit arm gets WORSE with more data on `Homeostat`**, monotonically across
   three run lengths. Asserted as a decline; nobody has asked what a longer run

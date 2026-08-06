@@ -25,13 +25,20 @@ namespace OpenPlexus.Worlds;
 /// <param name="Balanced">Whether the thought's own accounting closed.</param>
 /// <param name="Settled">Whether it finished, rather than running out of patience.</param>
 /// <param name="Reached">Everything that arrived, for the chain histogram.</param>
+/// <param name="Divides">
+/// <inheritdoc cref="Thought.Divides" path="/summary"/>
+/// <b>Carried out of the thought because a released one answers with nothing</b>,
+/// and because an arm that had nothing to rank must be visible in the report
+/// rather than only in a debugger. See <see cref="Thought.Divides"/>.
+/// </param>
 public readonly record struct Answered(
     int? Named,
     bool Landed,
     int Halted,
     bool Balanced,
     bool Settled,
-    IReadOnlyList<Arrival> Reached)
+    IReadOnlyList<Arrival> Reached,
+    int Divides)
 {
     /// <summary>
     /// Reads a thought into a report.
@@ -54,7 +61,8 @@ public readonly record struct Answered(
             thought.Halted,
             thought.Balanced(),
             settled,
-            thought.Best(int.MaxValue));
+            thought.Best(int.MaxValue),
+            thought.Divides);
     }
 
     /// <summary>
@@ -75,6 +83,13 @@ public readonly record struct Answered(
             votes.Sum(one => one.Halted),
             votes.All(one => one.Balanced),
             votes.All(one => one.Settled),
-            [.. votes.SelectMany(one => one.Reached)]);
+            [.. votes.SelectMany(one => one.Reached)],
+
+            // THE MOST ANY ONE VOTE HAD TO RANK, NOT THE SUM AND NOT THE MEAN.
+            // Votes are concurrent asks of the SAME question, so pooling them
+            // would manufacture a spread no single walk ever saw -- and the claim
+            // being checked is about one walk's candidates. The best case is the
+            // honest one: if even the richest vote divided nothing, none did.
+            votes.Count == 0 ? 0 : votes.Max(one => one.Divides));
     }
 }

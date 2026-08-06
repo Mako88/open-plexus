@@ -198,7 +198,7 @@ public sealed class ComposedTests
             + $"{narrowed.Reference:F3} of the time");
     }
 
-    private static async Task<(Measured Accuracy, double Reference)> MeasureAsync(
+    private static async Task<(Measured Accuracy, double Reference, int Divides)> MeasureAsync(
         Refer refer,
         WalkSettings? dials = null,
         ComposedSettings? world = null,
@@ -206,16 +206,22 @@ public sealed class ComposedTests
     {
         var reference = 0.0;
 
+        // THE DEEPEST SPREAD ANY SEED SAW -- see Questioned.Divides. Carried out
+        // of the sweep because the open defect below turns on whether the arm had
+        // anything to rank, and that cannot be read from an accuracy.
+        var divides = 0;
+
         var accuracy = await Sweep.ArmAsync($"{refer}", Repeats, async seed =>
         {
             using var run = new ComposedRun(world ?? World(), (dials ?? Dials) with { Ranking = ranking }, seed);
             var result = await run.RunAsync(Scenes, refer, every: 10).ConfigureAwait(false);
 
             reference += result.Reference / Repeats;
+            divides = Math.Max(divides, result.Divides);
             return result.Accuracy;
         }).ConfigureAwait(false);
 
-        return (accuracy, reference);
+        return (accuracy, reference, divides);
     }
 
     [Fact]
@@ -246,15 +252,36 @@ public sealed class ComposedTests
         //                      where the conjunction really is asked, and it ties
         //                      as well.
         //
-        // WHAT IS LEFT UNCHECKED is whether `_agreeing` is populated at all on this
-        // path -- `Agreed` counts distinct origins per endpoint and returns nought
-        // for an endpoint it has never heard of, and nought for every candidate
-        // would tie every comparison exactly like this. That is where the next
-        // person should start, and it wants an assertion on the GROUPING rather
-        // than another sweep of the arm.
+        //   the empty count   NO. `Divides` reads 2 -- the candidates fall into
+        //                     two agreement levels, so `_agreeing` is populated
+        //                     and the grouping works. Asserted just below.
+        //
+        // WHAT IS LEFT, AND IT IS NOT A BUG: `Sum` ALREADY COUNTS AGREEMENT HERE.
+        // Two routes of comparable strength outsum one, so the endpoint with two
+        // distinct origins is also the endpoint with the larger sum, and the two
+        // orders coincide. Agreement can only diverge where strength varies MORE
+        // between routes than the origin count does -- which is exactly what
+        // `Accumulate.Agreement`'s own remarks assert, and what this world says is
+        // false. The unit tests separate them by making one route nine times the
+        // strength of another; nothing on this world produces that disparity.
+        //
+        // SO THE NEXT MOVE IS NOT ANOTHER EXPLANATION FOR THE TIE. It is a world
+        // where ONE origin sends MANY routes -- which is the over-counting the arm
+        // was really built against and which no world here currently produces.
         //
         // ASSERTED RATHER THAN SKIPPED so the suite is green and the defect is not
         // silent. The day agreement discriminates, this fails and says so.
+        // THE FOURTH EXPLANATION, MEASURED AND RULED OUT. `Divides` reads 2 here:
+        // the candidates DO fall into two agreement levels, so `_agreeing` is
+        // populated, the grouping works, and the arm has something to rank. It
+        // ties anyway. Armed rather than described -- if this ever reads one, the
+        // tie is arithmetic and every agreement measurement on this world was
+        // secretly `Sum`.
+        Assert.True(agreeing.Divides > 1,
+            $"the candidates fell into {agreeing.Divides} agreement levels, so an "
+            + "agreement ranking here is summed strength under another name and "
+            + "the tie below is arithmetic rather than a finding");
+
         Assert.Equal(summed.Reference, agreeing.Reference, precision: 10);
 
         Assert.True(agreeing.Accuracy.Separation(summed.Accuracy) < 2.0,

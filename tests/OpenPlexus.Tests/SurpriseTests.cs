@@ -130,6 +130,10 @@ public sealed class SurpriseTests
             Broke = 0, Caught = 0, Late = 0, Skipped = 0,
             Expecting = 1.0, Overreached = 0.95, Unspoken = 100,
             Moments = 300, Asked = 300, Right = 100, Silent = 0, Chance = 0.1,
+
+            // NOT PART OF WHAT THIS FIXTURE IS ABOUT, and two is the value that
+            // says so without tripping a complaint about an inert ranking arm.
+            Divides = 2,
             Reflections = Reflections.Of(Fixture.Dials(stamina: 4.0), 0),
             Plumbing = new Plumbing
             {

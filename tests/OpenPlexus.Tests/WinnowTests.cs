@@ -125,6 +125,76 @@ public sealed class WinnowTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void And_the_declared_width_is_NOT_what_decides_whether_it_collapses()
+    {
+        // THE GUARD ABOVE READS THE WIDTH THE CALLER DECLARED, AND REAL DATA
+        // ROUTINELY VARIES IN FAR FEWER DIMENSIONS THAN IT HAS NUMBERS. Twenty
+        // inputs sampled three at a time give 1,140 wirings against 800 cells, so
+        // the arithmetic is satisfied -- and a signal whose variation is really
+        // two-dimensional still collapses onto a handful of tags. That is the
+        // CLEVR failure with the one check that can see it removed.
+        //
+        // THE PAIR IS THE POINT. Same front end, same count of readings; the only
+        // thing that moves is the INTRINSIC dimension of what is handed in.
+        //
+        // MEASURED AT THIS SEED: full-rank 500 distinct tags of 500 readings, flat
+        // 178 of 500. Recorded rather than described -- and note it is a THIRD and
+        // not a hundredth, so the failure this catches is a degradation and the
+        // CLEVR case (three tags over four thousand objects) was its extreme.
+        var rng = new Random(20260806);
+
+        var full = Front();
+        var flat = Front();
+
+        // TWO FIXED DIRECTIONS, so every flat reading is a point on one plane
+        // embedded in twenty dimensions. Nothing about its DECLARED shape differs
+        // from the full-rank one.
+        var first = Reading(rng);
+        var second = Reading(rng);
+
+        const int Readings = 500;
+
+        for (var at = 0; at < Readings; at++)
+        {
+            full.Of(Reading(rng));
+
+            var a = rng.NextDouble() - 0.5;
+            var b = rng.NextDouble() - 0.5;
+
+            flat.Of([.. Enumerable.Range(0, Inputs)
+                .Select(i => (a * first[i]) + (b * second[i]))]);
+        }
+
+        output.WriteLine($"full={full.Distinct}/{full.Emitted} "
+            + $"flat={flat.Distinct}/{flat.Emitted}");
+
+        // THE FULL-RANK SIGNAL RESOLVES NEARLY EVERY READING APART.
+        Assert.True(full.Distinct > Readings * 0.9,
+            $"a twenty-dimensional signal gave only {full.Distinct} tags over "
+            + $"{full.Emitted} readings, so this front end is not working at all "
+            + "and the comparison below means nothing");
+
+        // AND THE FLAT ONE DOES NOT, HAVING PASSED EXACTLY THE SAME GUARD.
+        Assert.True(flat.Distinct * 2 < full.Distinct,
+            $"the two-dimensional signal gave {flat.Distinct} tags against "
+            + $"{full.Distinct} for the full-rank one -- if these are close, "
+            + "the declared-width guard was sufficient after all and this test "
+            + "is asserting a failure mode that does not exist");
+    }
+
+    [Fact]
+    public void A_front_end_nobody_has_shown_anything_to_reports_no_collapse()
+    {
+        // NOUGHT DISTINCT OVER NOUGHT READINGS IS NOT A COLLAPSE, and a caller
+        // dividing one by the other has to be able to tell. The named trap: a
+        // check that cannot fire reads as one that passed.
+        var front = Front();
+
+        Assert.Equal(0, front.Distinct);
+        Assert.Equal(0, front.Emitted);
+    }
+
+    [Fact]
     public void Every_cell_listens_to_a_few_inputs_and_never_to_one_twice()
     {
         // SPARSE IS THE HALF THE FLY CONTRIBUTES. A cell reading everything fires

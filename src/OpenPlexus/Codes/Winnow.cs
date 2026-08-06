@@ -71,9 +71,41 @@ public sealed class Winnow
     /// </summary>
     private const uint Codebook = 0x_5F1E_5C01;
 
+    /// <summary>
+    /// How many distinct tags are worth remembering before the question is
+    /// settled.
+    /// </summary>
+    /// <remarks>
+    /// <b>A BOUND ON THE WATCHING AND NOT ON THE FRONT END.</b> The question this
+    /// answers is <i>did the sheet collapse</i>, and a front end that has emitted
+    /// this many distinct tags has answered it — counting further would grow
+    /// without limit for no more information. Saturating for the same reason
+    /// <see cref="Wirings"/> saturates.
+    /// </remarks>
+    private const int Watch = 4096;
+
     private readonly byte _modality;
     private readonly int _inputs;
     private readonly int _winners;
+
+    /// <summary>The distinct tags seen so far, to <see cref="Watch"/>.</summary>
+    /// <remarks>
+    /// <b>Hashes rather than the tags themselves</b>, because what is being
+    /// counted is how many there are and never which. A collision would undercount
+    /// and so can only ever make this report a collapse that is not there — the
+    /// safe direction for a check whose whole job is to complain.
+    /// </remarks>
+    private readonly HashSet<int> _tags = [];
+
+    /// <summary>Guards <see cref="_tags"/> and <see cref="_emitted"/>.</summary>
+    /// <remarks>
+    /// <b>One machine may hand readings in from several threads</b>, and a torn
+    /// count here would read as a collapse. Taken after the tag is computed, so
+    /// nothing that costs anything happens inside it.
+    /// </remarks>
+    private readonly Lock _watching = new();
+
+    private long _emitted;
 
     /// <summary>
     /// Which inputs each cell listens to. <b>Cell <c>c</c> reads
@@ -118,8 +150,14 @@ public sealed class Winnow
         // the one adaptive step in the design has been switched off by arithmetic.
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(winners, cells);
 
-        // AND A NARROW READING CANNOT FILL A WIDE SHEET, WHICH IS A WHOLE SESSION
-        // THIS WOULD HAVE COST. There are only C(inputs, samples) distinct wirings,
+        // AND A NARROW READING CANNOT FILL A WIDE SHEET -- BUT THIS READS THE
+        // DECLARED WIDTH AND NOT THE REAL ONE, SO IT IS NECESSARY AND NOT
+        // SUFFICIENT. Fifty inputs whose variation is really three-dimensional pass
+        // it comfortably and still collapse onto a handful of tags, which is the
+        // CLEVR failure wearing a disguise this arithmetic cannot see. `Distinct`
+        // is the empirical half and the only one that can catch that.
+        //
+        // There are only C(inputs, samples) distinct wirings,
         // so beyond that every further cell REPEATS one -- it fires identically on
         // every reading forever and can never separate two of them. Measured on
         // CLEVR's `3d_coords`: three inputs over four thousand objects produced
@@ -244,6 +282,43 @@ public sealed class Winnow
     public int Cells => _wiring.Length;
 
     /// <summary>
+    /// How many DISTINCT tags this front end has actually emitted, up to
+    /// <see cref="Watch"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE HONEST VERSION OF THE CONSTRUCTOR'S GUARD, AND THE ONLY ONE THAT CAN
+    /// SEE A COLLAPSE.</b> That check compares the sheet against C(inputs,
+    /// samples) — the width the caller DECLARED — and real data routinely varies in
+    /// far fewer dimensions than it has numbers. Fifty inputs whose variation is
+    /// really three-dimensional pass the arithmetic and still emit a handful of
+    /// tags forever, which is exactly the CLEVR failure the guard was written for
+    /// and exactly the case it cannot detect.
+    /// </para>
+    /// <para>
+    /// <b>A COUNT AND NOT A VERDICT.</b> Nothing here decides what "too few" is —
+    /// that depends on how many things the world contains, which a front end has no
+    /// business knowing. It is reported beside <see cref="Emitted"/> so a caller
+    /// can say; see <c>WinnowTests</c>.
+    /// </para>
+    /// </remarks>
+    public int Distinct
+    {
+        get { lock (_watching) return _tags.Count; }
+    }
+
+    /// <summary>How many readings this front end has been handed.</summary>
+    /// <remarks>
+    /// <b>The denominator, and without it <see cref="Distinct"/> says nothing.</b>
+    /// Three distinct tags over three readings is a front end working perfectly;
+    /// three over four thousand is the collapse.
+    /// </remarks>
+    public long Emitted
+    {
+        get { lock (_watching) return _emitted; }
+    }
+
+    /// <summary>
     /// The codes present in one reading.
     /// </summary>
     /// <remarks>
@@ -313,6 +388,18 @@ public sealed class Winnow
         // hold -- so a stable order is worth more than a meaningless one.
         var winners = order.Take(_winners).Order().ToArray();
         foreach (var cell in winners) codes.Add(new Code(_modality, (ulong)cell));
+
+        // WHAT THE SHEET IS ACTUALLY RESOLVING, COUNTED RATHER THAN ASSUMED. See
+        // `Distinct` -- the constructor's guard reads the declared width, and this
+        // is the half of it that can see a reading whose real dimension is lower.
+        var tag = 17;
+        foreach (var cell in winners) tag = (tag * 31) + cell;
+
+        lock (_watching)
+        {
+            _emitted++;
+            if (_tags.Count < Watch) _tags.Add(tag);
+        }
 
         return codes.MoveToImmutable();
     }

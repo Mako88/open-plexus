@@ -308,10 +308,11 @@ public sealed class RhythmRun : IDisposable
                 reflected += await _ear.ReflectAsync(observed, moment, ct).ConfigureAwait(false);
 
             // AND NOW BET ON THE NEXT ONE, from what is being heard right now.
-            var (guess, stopped, balanced, settled, reached) =
+            var (guess, stopped, balanced, settled, reached, divided) =
                 await GuessAsync(shown, ct).ConfigureAwait(false);
 
             halted += stopped;
+            chains.Divided(divided);
             if (!balanced) unbalanced++;
             if (!settled) unsettled++;
             if (guess is null && bet is not null) silent++;
@@ -355,6 +356,7 @@ public sealed class RhythmRun : IDisposable
             Asked = asked,
             Right = right,
             Silent = silent,
+            Divides = chains.Divides,
             Kept = kept,
             Foreseen = foreseen,
             Broke = broke,
@@ -380,7 +382,10 @@ public sealed class RhythmRun : IDisposable
         int Halted,
         bool Balanced,
         bool Settled,
-        IReadOnlyList<Arrival> Reached);
+        IReadOnlyList<Arrival> Reached,
+
+        // WHETHER AGREEMENT HAD ANYTHING TO RANK -- see Questioned.Divides.
+        int Divides);
 
     /// <summary>
     /// Broadcasts what is being heard and reads back what usually follows it.
@@ -410,7 +415,8 @@ public sealed class RhythmRun : IDisposable
             thought.Halted,
             thought.Balanced(),
             settled,
-            thought.Best(int.MaxValue));
+            thought.Best(int.MaxValue),
+            thought.Divides);
 
         _ear.Forget(thought.Id);
         return guess;

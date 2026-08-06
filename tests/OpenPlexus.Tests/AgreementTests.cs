@@ -119,6 +119,58 @@ public sealed class AgreementTests
     }
 
     [Fact]
+    public void One_agreement_level_across_the_candidates_FORCES_the_tie_with_Sum()
+    {
+        // THE OPEN DEFECT'S FOURTH EXPLANATION, AND THE FIRST ONE THAT DOES NOT
+        // NEED A BUG. Agreement is compared first and falls through to strength
+        // when it ties -- so candidates that all agree to the same degree are
+        // ranked by strength alone, which IS `Sum`, to the last bit. Three
+        // explanations were spent on why the two read exactly equal and none of
+        // them asked whether the arm had anything to rank.
+        var byAgreement = Thinking(Accumulate.Agreement);
+        var bySum = Thinking(Accumulate.Sum);
+
+        foreach (var thought in (Thought[])[byAgreement, bySum])
+        {
+            // Three candidates, three DIFFERENT origins, one origin each. The
+            // agreement count is 1 everywhere and the strengths are far apart.
+            thought.Receive(Reaching(C(1), C(10), 0.2));
+            thought.Receive(Reaching(C(2), C(11), 0.7));
+            thought.Receive(Reaching(C(3), C(12), 0.5));
+        }
+
+        Assert.Equal(1, byAgreement.Divides);
+
+        Assert.Equal(
+            bySum.Best(3).Select(one => one.Endpoint),
+            byAgreement.Best(3).Select(one => one.Endpoint));
+    }
+
+    [Fact]
+    public void And_it_reads_above_one_the_moment_they_differ()
+    {
+        // ARM ANYTHING THAT HAS ALWAYS READ ZERO -- the companion that stops the
+        // check above passing for a statistic wired to a constant. Same shape as
+        // the first test in this file, which is the case agreement is FOR.
+        var thought = Thinking(Accumulate.Agreement);
+
+        thought.Receive(Reaching(C(1), C(10), 0.1));
+        thought.Receive(Reaching(C(2), C(10), 0.1));
+        thought.Receive(Reaching(C(1), C(11), 0.9));
+
+        Assert.Equal(2, thought.Divides);
+    }
+
+    [Fact]
+    public void A_thought_that_reached_nowhere_divides_nothing()
+    {
+        // NOUGHT IS A DIFFERENT COMPLAINT FROM ONE, and the two must not be
+        // confusable: one is an arm with nothing to rank, nought is a walk that
+        // never arrived.
+        Assert.Equal(0, Thinking(Accumulate.Agreement).Divides);
+    }
+
+    [Fact]
     public void An_endpoint_nothing_reached_agrees_with_nobody()
     {
         var thought = Thinking(Accumulate.Agreement);

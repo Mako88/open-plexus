@@ -319,10 +319,11 @@ public sealed class BabiRun : IDisposable
             if (line.Answers.Length != 1) compound++;
             if (_alphabet.Count == 0) blind++;
 
-            var (answer, stopped, balanced, settled, everything) =
+            var (answer, stopped, balanced, settled, everything, divided) =
                 await AskingAsync(line, votes, question, ct).ConfigureAwait(false);
 
             halted += stopped;
+            chains.Divided(divided);
             if (!balanced) unbalanced++;
             if (!settled) unsettled++;
 
@@ -349,6 +350,7 @@ public sealed class BabiRun : IDisposable
             Asked = asked,
             Right = right,
             Silent = silent,
+            Divides = chains.Divides,
             Compound = compound,
             Blind = blind,
             Alphabet = _world.Alphabet.Count,
@@ -367,7 +369,10 @@ public sealed class BabiRun : IDisposable
         int Halted,
         bool Balanced,
         bool Settled,
-        IReadOnlyList<Arrival> Reached);
+        IReadOnlyList<Arrival> Reached,
+
+        // WHETHER AGREEMENT HAD ANYTHING TO RANK -- see Questioned.Divides.
+        int Divides);
 
     /// <summary>
     /// Broadcasts a question's words and reads back the best answer among the
@@ -387,7 +392,10 @@ public sealed class BabiRun : IDisposable
 
         var candidates = _alphabet.Where(word => !asked.Contains(word)).ToHashSet();
 
-        if (candidates.Count == 0) return new Asking(null, 0, true, true, []);
+        // NOTHING WAS ASKED, SO NOTHING DIVIDED ANYTHING. Nought rather than one:
+        // no walk ran, which is a different report from a walk whose candidates
+        // all agreed to one degree. See Questioned.Divides.
+        if (candidates.Count == 0) return new Asking(null, 0, true, true, [], 0);
 
         var asking = new Task<Asking>[votes];
         for (var i = 0; i < votes; i++)
@@ -402,6 +410,9 @@ public sealed class BabiRun : IDisposable
             Balanced = answers.All(one => one.Balanced),
             Settled = answers.All(one => one.Settled),
             Reached = [.. answers.SelectMany(one => one.Reached)],
+
+            // THE RICHEST VOTE, NOT THE POOLED ONE. See Questioned.Divides.
+            Divides = answers.Length == 0 ? 0 : answers.Max(one => one.Divides),
         };
     }
 
@@ -414,10 +425,7 @@ public sealed class BabiRun : IDisposable
     {
         var question = asking with { Ranking = _dials.Ranking };
 
-        var halted = 0;
-        var balanced = true;
-        var settled = true;
-        IReadOnlyList<Arrival> reached = [];
+        var walked = new Walking();
         Code? answer = null;
         var walking = origins;
 
@@ -434,10 +442,7 @@ public sealed class BabiRun : IDisposable
 
             var quiet = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
-            halted += thought.Halted;
-            balanced &= thought.Balanced();
-            settled &= quiet;
-            reached = thought.Best(int.MaxValue);
+            walked.Absorb(thought, quiet);
 
             var best = thought.BestAmong(candidates, 1);
             answer = best.Count == 0 ? null : best[0].Endpoint;
@@ -449,7 +454,9 @@ public sealed class BabiRun : IDisposable
             _reader.Forget(thought.Id);
         }
 
-        return new Asking(answer, halted, balanced, settled, reached);
+        return new Asking(
+            answer, walked.Halted, walked.Balanced, walked.Settled,
+            walked.Reached, walked.Divides);
     }
 
     public void Dispose() => _fabric.Dispose();

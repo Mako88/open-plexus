@@ -36,6 +36,25 @@ public sealed class Chains
     /// A copy, so a result handed one cannot watch it move afterwards.
     /// </summary>
     public IReadOnlyDictionary<int, int> ByLength => new Dictionary<int, int>(_byLength);
+
+    /// <inheritdoc cref="Questioned.Divides"/>
+    public int Divides { get; private set; }
+
+    /// <summary>
+    /// Records how many agreement levels one question's candidates fell into.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE MAXIMUM, AND IT LIVES HERE BECAUSE IT IS A FACT ABOUT THE WALK
+    /// RATHER THAN THE SCORE.</b> Every asking world had grown its own counter and
+    /// its own <c>Math.Max</c>, which is the duplication budget's rule — two copies
+    /// drift where nothing fails. See <see cref="Thinking.Thought.Divides"/>.
+    /// </remarks>
+    public void Divided(int levels)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(levels);
+
+        Divides = Math.Max(Divides, levels);
+    }
 }
 
 /// <summary>

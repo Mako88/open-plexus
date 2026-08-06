@@ -98,6 +98,33 @@ public sealed class WinnowTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void A_sheet_wider_than_the_reading_can_fill_is_refused()
+    {
+        // THE BUDGET FOR THE FAILURE CLASS THAT COST THIS SESSION A PLAN ITEM. The
+        // plan named CLEVR's `3d_coords` as the real-valued signal to point this
+        // front end at; three inputs over four thousand objects produced three
+        // distinct tags, and one at two thousand cells. There are only
+        // C(inputs, samples) distinct wirings and every cell beyond that repeats
+        // one, so it fires identically on every reading and separates nothing.
+        //
+        // A NARROW SENSE FAILS SILENTLY OTHERWISE -- it emits codes, the graph
+        // counts them, and every object in the corpus carries the same tag. That
+        // reads as the architecture failing to generalise.
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => new Winnow(Modality, 3, 128, 2, 6));
+
+        // C(3, 2) is 3, so three cells is the widest honest sheet over that
+        // reading -- and it is allowed, because the limit is a fact about the
+        // reading rather than a preference about the sheet.
+        Assert.Equal(3, new Winnow(Modality, 3, 3, 2, 2).Cells);
+
+        // AND THE FRONT END AS IT IS ACTUALLY MOUNTED IS UNAFFECTED. C(20, 3) is
+        // 1,140 against 800 cells, so this check cannot be the reason a real sense
+        // stops working.
+        Assert.Equal(Cells, Front().Cells);
+    }
+
+    [Fact]
     public void Every_cell_listens_to_a_few_inputs_and_never_to_one_twice()
     {
         // SPARSE IS THE HALF THE FLY CONTRIBUTES. A cell reading everything fires

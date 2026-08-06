@@ -36,9 +36,9 @@
 
 ### Look necessary for the goal, and absent
 
-- **A world with a real-valued signal to point `Winnow` at.** The front end is
-  built and measured; nothing here reads a number rather than a symbol. CLEVR's
-  `3d_coords` is real data in a world that scores, and the loader discards it.
+- **A world with a WIDE real-valued signal to point `Winnow` at.** Built and
+  mounted nowhere. It needs many numbers per reading: three coordinates are
+  refuted below, and the constructor now refuses a sheet the reading cannot fill.
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and
   the rollout predicts; nothing can hold a state that is NOT current and steer
   toward it. Planning needs a target, and sub-goals are what serve many tasks.
@@ -157,6 +157,8 @@ condition is a superstition.**
 | `Question.Path` — a relation per hop | A fixed path trades coverage against precision with no middle. **Deleted** | `Downstream` wants the reverse temporal edge, which `Kind.Before` now writes |
 | `Kind.Informed` — a cell for what surprised | No walk reaches an untried act. **Deleted** | Anything that can explore |
 | `Attending.Marked` — the credit cell, unconditioned | Peaks below the blind bar. It was `Credited`'s CONTROL, so ruling out the extra cell and the staleness goes with it. **Deleted** | A second cell written on anything but the outcome — re-take the control |
+| `Winnow` over CLEVR's `3d_coords` | Three inputs give only C(3, samples) distinct wirings, so the corpus collapses onto a handful of tags. **Closed in code** — the constructor refuses it | A reading wide enough to fill the sheet |
+| Banded position codes on CLEVR | Halves the reference at every budget it survives and times out above, peak to peak. No kept question is spatial, so it is row width bought with noise | A world whose QUESTION is spatial |
 | Fork 24, the budget controller | `Moves` never left nought on the one world that ran it — three budgets sampled forever, none chosen. Billing the probe cost a quarter of `Senses`. **Deleted** | A world where the right budget VARIES |
 
 ---
@@ -205,9 +207,12 @@ condition is a superstition.**
   the DIRECTION apart from the size.
 - **A dial can be wired to ONE WORLD IN TEN.** `Names` is read by `SnakeRun` and
   nothing else, and was cashed in citing a finding as though it were general.
-- **Seeds that change nothing make every separation infinite.** bAbI is a fixed
-  corpus in a fixed order, so every arm's spread is nought and a significance bar
-  there passes for any difference at all.
+- **Seeds that change nothing make every separation infinite.** bAbI and CLEVR are
+  fixed corpora in fixed order, so every arm's spread is nought and a significance
+  bar there passes for any difference at all.
+- **A similarity code is a hub at the coarse end and an index at the fine end.**
+  Both widen every row it joins, and cost is set by the widest row — generalising
+  is paid for out of the walk's budget.
 - **A mean over a population the problem created cannot see it.** Read `Widest`.
 - **A `cref` is not a call and a `ToString` is not an assertion** — both are how a
   dead mechanism goes on looking alive. `DeadCodeTests` is the budget.

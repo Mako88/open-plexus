@@ -118,10 +118,57 @@ public sealed class Winnow
         // the one adaptive step in the design has been switched off by arithmetic.
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(winners, cells);
 
+        // AND A NARROW READING CANNOT FILL A WIDE SHEET, WHICH IS A WHOLE SESSION
+        // THIS WOULD HAVE COST. There are only C(inputs, samples) distinct wirings,
+        // so beyond that every further cell REPEATS one -- it fires identically on
+        // every reading forever and can never separate two of them. Measured on
+        // CLEVR's `3d_coords`: three inputs over four thousand objects produced
+        // three distinct tags at 128 cells and ONE at 2,000, against four thousand
+        // for the same front end on a fifty-number reading.
+        //
+        // IT IS NOT A CAP ON CELLS, IT IS A STATEMENT ABOUT THE READING. The fly
+        // expands fifty receptors onto two thousand cells because C(50, 6) is
+        // astronomical; expansion buys similarity only where there is room to
+        // expand INTO, and asking for more cells than that is claiming a resolution
+        // the sense does not have.
+        var distinct = Wirings(inputs, samples);
+
+        if (cells > distinct)
+            throw new ArgumentOutOfRangeException(nameof(cells),
+                $"{inputs} inputs sampled {samples} at a time give only {distinct} "
+                + $"distinct wirings, so {cells} cells cannot all differ. Widen the "
+                + "reading or narrow the sheet -- a repeated cell fires identically "
+                + "on every reading and separates nothing.");
+
         _modality = modality;
         _inputs = inputs;
         _winners = winners;
         _wiring = Wire(inputs, cells, samples);
+    }
+
+    /// <summary>
+    /// How many distinct sets of inputs a cell could possibly listen to.
+    /// </summary>
+    /// <remarks>
+    /// <b>Saturating rather than exact, because the honest answer for a real
+    /// sense overflows and the question is only ever "is it bigger than the
+    /// sheet".</b> C(50, 6) is about sixteen million and C(1000, 6) is past
+    /// anything a <see cref="long"/> holds, so the multiplication stops as soon as
+    /// it passes what any caller could ask for.
+    /// </remarks>
+    private static long Wirings(int inputs, int samples)
+    {
+        var total = 1L;
+
+        for (var step = 0; step < samples; step++)
+        {
+            total = total * (inputs - step) / (step + 1);
+
+            // NOTHING ABOVE THIS CAN CHANGE AN ANSWER, since `cells` is an `int`.
+            if (total > int.MaxValue) return int.MaxValue;
+        }
+
+        return total;
     }
 
     /// <summary>

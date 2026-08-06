@@ -92,9 +92,9 @@
 - **One needing variable binding that is not kinship** — `gSCAN`. `Clutrr` measures
   the role channel on somebody else's data; a second world is what says whether that
   carries beyond kinship.
-- **One with a HIDDEN COMMON CAUSE** — k observables driven by something
-  unobserved, so they co-occur and none causes the others. What `Thought.Grouped`
-  needs measuring against, and nothing here has one.
+- **A HUB MINTED OVER `Latent`'S GROUP.** The world is built, the group is found on
+  every question, and the cost a hub would remove grows fast with the channels.
+  Nothing mints yet — the write path is what is left.
 - **One where ONE origin sends MANY routes** — the over-counting `Agreement` exists
   against, and nothing here produces it. Two comparable routes outsum one, so
   origins and strength coincide; that is why it tied `Sum`. See `Thought.Divides`.

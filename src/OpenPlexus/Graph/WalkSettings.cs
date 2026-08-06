@@ -365,6 +365,31 @@ public sealed record WalkSettings
     /// </remarks>
     public int Beam { get; init; }
 
+    /// <summary>
+    /// Whether a node works out its OWN fan-out from its own row.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE REVIVAL CONDITION FOR THE REFUTED BEAM, WHICH ASKED FOR A WIDTH THE
+    /// SYSTEM SETS ITSELF AND REPORTS.</b> A node sends to the partners whose count
+    /// reaches its row's own mean, and reports the rest as
+    /// <see cref="Thinking.Accounting.Pruned"/>. Nothing is chosen: the threshold is
+    /// a statistic of the row it cuts.
+    /// </para>
+    /// <para>
+    /// <b>IT CUTS HARD WHERE THERE IS SKEW AND NOT AT ALL WHERE THERE IS NONE, which
+    /// is the property that makes it honest.</b> A row of one big count and a tail
+    /// of ones has a mean above the tail, so the tail goes; a row of equal counts
+    /// has every entry at the mean, so every entry survives. A world with no
+    /// structure to exploit is not quietly starved.
+    /// </para>
+    /// <para>
+    /// <b>It overrides <see cref="Beam"/></b>, which is a swept constant and a
+    /// measuring instrument.
+    /// </para>
+    /// </remarks>
+    public bool Narrowing { get; init; }
+
     /// <inheritdoc cref="Graph.Pricing"/>
     /// <remarks><b><see cref="Graph.Pricing.Receiver"/> is the default and the
     /// control</b>, so every measurement taken before this existed still

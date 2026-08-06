@@ -485,8 +485,57 @@ public sealed class Node
         // wrong relation would spend the width on entries that were never going to
         // be sent -- so a beam of eight could emit two. See WalkSettings.Beam.
         var walking = row;
+        var pruned = 0;
 
-        if (_settings.Beam > 0 && row.Length > _settings.Beam)
+        // THE WIDTH THE NODE SETS ITSELF, and it overrides the swept constant. The
+        // threshold is the row's OWN mean count, so nothing here was chosen: a row
+        // with a heavy head and a long tail cuts the tail, and a row of equal counts
+        // cuts nothing at all. See WalkSettings.Narrowing.
+        if (_settings.Narrowing)
+        {
+            var eligible = row
+                .Where(entry => entry.Key.Kind != Kind.Hindered
+                    && !message.Chain.Contains(entry.Key.Partner)
+                    && (message.Through is not { } only || entry.Key.Kind == only))
+                .ToArray();
+
+            if (eligible.Length > 1)
+            {
+                // STRONGEST FIRST, TIES ON THE KEY. Fork 12's property again: a
+                // count tie left to the snapshot's order would make a fixed seed
+                // stop reproducing its run.
+                Array.Sort(eligible, (left, right) =>
+                {
+                    var strength = right.Value.Count.CompareTo(left.Value.Count);
+                    if (strength != 0) return strength;
+
+                    var partner = left.Key.Partner.CompareTo(right.Key.Partner);
+                    return partner != 0 ? partner : left.Key.Kind.CompareTo(right.Key.Kind);
+                });
+
+                // CUT AT THE WIDEST GAP, WHICH IS THE ROW SAYING WHERE ITS OWN
+                // SHOULDER IS. The mean was tried first and is far too permissive --
+                // it kept nearly everything and bought about a third off the
+                // messages where a constant of two bought eight times. A gap is a
+                // statement about THIS row's shape and needs no number from anybody.
+                var edge = 0;
+                var widest = 0.0;
+
+                for (var at = 0; at < eligible.Length - 1; at++)
+                {
+                    var drop = eligible[at].Value.Count - eligible[at + 1].Value.Count;
+                    if (drop <= widest) continue;
+
+                    widest = drop;
+                    edge = at;
+                }
+
+                pruned = eligible.Length - (edge + 1);
+                walking = eligible[..(edge + 1)];
+            }
+            else walking = eligible;
+        }
+        else if (_settings.Beam > 0 && row.Length > _settings.Beam)
         {
             var eligible = row
                 .Where(entry => entry.Key.Kind != Kind.Hindered
@@ -509,6 +558,7 @@ public sealed class Node
                     return partner != 0 ? partner : left.Key.Kind.CompareTo(right.Key.Kind);
                 });
 
+                pruned = eligible.Length - _settings.Beam;
                 walking = eligible[.._settings.Beam];
             }
             else walking = eligible;
@@ -579,7 +629,12 @@ public sealed class Node
                 // NOT THWARTED: it went everywhere there was to go. Its strength
                 // is still booked, because the ratio needs a denominator that
                 // includes the healthy endings or it is 1.0 by construction.
-                Ended: children == 0 ? carried : 0.0),
+                Ended: children == 0 ? carried : 0.0,
+
+                // WHAT THE WIDTH REFUSED. The refuted beam's revival condition asks
+                // for a width the system sets itself AND REPORTS; this is the
+                // reporting half, and without it the cut is invisible.
+                Pruned: pruned),
         };
     }
 

@@ -92,6 +92,12 @@ public sealed record Arrival
 /// <param name="Deaths">Routes that ended here.</param>
 /// <param name="Halted">Of the deaths, how many hit the horizon rather than
 /// economics. Reported separately, or the constant would hide.</param>
+/// <param name="Pruned">
+/// How many partners a node's own width refused — <b>the reporting half of the
+/// refuted beam's revival condition</b>, which asked for a width the system sets
+/// itself AND reports. Without it the cut is invisible, and a walk quietly
+/// starved by its own threshold reads as a walk that ran out of graph.
+/// </param>
 public readonly record struct Accounting(
     BroadcastId Broadcast,
     int Splits,
@@ -99,7 +105,8 @@ public readonly record struct Accounting(
     int Halted = 0,
     int Starved = 0,
     double Thwarted = 0.0,
-    double Ended = 0.0);
+    double Ended = 0.0,
+    int Pruned = 0);
 
 /// <summary>
 /// What a node hands back when it fires.

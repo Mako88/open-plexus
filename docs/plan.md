@@ -86,9 +86,6 @@
 - **Reach that does not cost what reach costs now.** On `Clutrr` the silence is a
   walk that cannot afford to arrive, never an empty cell — and buying it is
   superlinear: messages grew far faster than coverage across the sweep.
-- **A self-set beam — the only lever measured with orders of magnitude in it.**
-  Fan-out is the base of an exponent. Swept as a constant it held composition on
-  `Clutrr` and cut `Clevr` hundreds of times; the width must come from the row.
 - **Conditioning the prediction itself**, rather than suppressing the observation.
 - **Hierarchy** — walk a thousand chunks, not a million nodes. What step 3 is for.
 - **Multi-token output** — fork 11 built the addressing; a world that wants two is
@@ -139,7 +136,8 @@ condition is a superstition.**
 | Sender-*weighing*, `IMarginals` | A C1 violation, and behaviour was identical without it | Never. `Message.Seen` is the legal version |
 | Absolute actions, unrotated view | One move in four instantly fatal | A body with no heading |
 | Survival as the score | Circling wins. Snake cannot discriminate policies at all | Homeostatic drives, where standing still stops paying |
-| A beam over partners | A constant nobody set, doing the cutting | A width the system sets itself and reports |
+| A beam over partners | A constant nobody set, doing the cutting | **MET by `WalkSettings.Narrowing`** — the row's widest gap, reported as `Pruned` |
+| A beam at the row's own MEAN | Far too permissive: kept nearly everything and bought about a third where a constant of two bought eight times | A threshold reading the row's SHAPE rather than its level |
 | Clusters by modality | Splits picture from sound, the one link this design exists to make | Never |
 | Clusters by time of creation | Two machines compute different owners for one code | Placement agreement without a coordinator |
 | `Adaptive` reflection on `Hunger` | Inverted: it wrote most where it helped least | A signal that discriminates |

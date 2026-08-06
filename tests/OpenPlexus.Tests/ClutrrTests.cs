@@ -34,8 +34,15 @@ public sealed class ClutrrTests(ITestOutputHelper output)
     }
 
     private static ClutrrSettings World(
-        int stories = 300, bool fleeting = false, bool roled = false) =>
-        new() { Corpus = Corpus, Stories = stories, Fleeting = fleeting, Roled = roled };
+        int stories = 300, bool fleeting = false, bool roled = false, int steps = 1) =>
+        new()
+        {
+            Corpus = Corpus,
+            Stories = stories,
+            Fleeting = fleeting,
+            Roled = roled,
+            Steps = steps,
+        };
 
     /// <summary>Right over asked on chains past three hops, and how deep it got.</summary>
     private static double Deep(ClutrrResult result) => result.Composed;
@@ -193,5 +200,64 @@ public sealed class ClutrrTests(ITestOutputHelper output)
             + $"{filled.Recall} against {grouped.Recall}");
 
         Assert.True(filled.Fresh.Silent < grouped.Fresh.Silent);
+    }
+
+    [Fact]
+    public async Task Asking_again_from_what_it_concluded_is_the_first_thing_that_composes()
+    {
+        // THE FLOOR MOVED, AND ONLY BY LETTING A CONCLUSION BE ASKED FROM. One walk
+        // answers fresh stories by echoing a relation the story stated, which is
+        // wrong by construction -- nought right, every time. A second walk starting
+        // from what the first concluded breaks the echo and lands answers that were
+        // never in front of it.
+        //
+        // THE DENOMINATOR IS WHAT IT ANSWERED, NOT WHAT IT WAS ASKED, and saying so
+        // is the honest part: this walk is silent on most fresh stories at any
+        // budget tried, so a share over all of them would report the silence and
+        // call it the mechanism. The silence is asserted separately below.
+        var arms = new List<(int Steps, ClutrrResult Result)>();
+
+        foreach (var steps in new[] { 1, 2 })
+        {
+            using var run = new ClutrrRun(
+                World(stories: 300, steps: steps), Fixture.Dials(stamina: 32.0), seed: 1);
+
+            var result = await run.RunAsync();
+            arms.Add((steps, result));
+
+            var spoke = result.Fresh.Asked - result.Fresh.Silent;
+            output.WriteLine($"steps={steps} fresh {result.Fresh.Right}/{spoke} answered "
+                + $"(of {result.Fresh.Asked} asked) echoed={result.Echoed} :: {result}");
+        }
+
+        var once = arms[0].Result;
+        var twice = arms[1].Result;
+
+        var spokeOnce = once.Fresh.Asked - once.Fresh.Silent;
+        var spokeTwice = twice.Fresh.Asked - twice.Fresh.Silent;
+
+        Assert.True(spokeOnce > 0 && spokeTwice > 0, "an arm was silent on every fresh story");
+
+        // ONE WALK CANNOT BE RIGHT HERE, AND NOT BY BAD LUCK. It answers with a
+        // relation the story stated and a fresh story's answer is never one of
+        // those, so nought is structural.
+        Assert.Equal(0, once.Fresh.Right);
+        Assert.Equal(spokeOnce, once.Echoed);
+
+        // TWO WALKS BREAK THE ECHO. That is the mechanism, apart from the score.
+        Assert.True(twice.Echoed < spokeTwice,
+            "the second walk still echoed everything it was told");
+
+        // AND ANSWER WELL ABOVE GUESSING, conditional on answering at all. Held as a
+        // floor, so a regression that puts the echo back lands here.
+        Assert.True(twice.Fresh.Right / (double)spokeTwice > twice.Chance * 3,
+            $"asking again did not beat chance: {twice.Fresh.Right} of {spokeTwice} "
+            + $"against a chance of {twice.Chance}");
+
+        // AND THE SILENCE IS REPORTED BESIDE THE SCORE, which the plan names as a
+        // trap in its own right: most fresh stories get no answer at all, so this
+        // is a mechanism unlocked and not a world solved.
+        Assert.True(twice.Fresh.Silent > twice.Fresh.Asked / 2,
+            "the coverage problem has gone away and nobody noticed");
     }
 }

@@ -346,29 +346,53 @@ public sealed class ClutrrRun : IDisposable
         IReadOnlyList<Arrival> Reached);
 
     /// <summary>Asks which relation holds between the pair the question names.</summary>
+    /// <remarks>
+    /// <b>ONE WALK, OR SEVERAL WITH EACH STARTING FROM WHAT THE LAST CONCLUDED</b> —
+    /// see <see cref="ClutrrSettings.Steps"/>. The answer is read from the LAST walk
+    /// only, so a second step that adds nothing reads as the baseline getting worse
+    /// rather than as a free win.
+    /// </remarks>
     private async Task<Answering> AskAsync(
         Story story, ImmutableArray<Code> answers, CancellationToken ct)
     {
         var origins = ImmutableArray.Create(
             story.Who(story.Query.From), story.Who(story.Query.To));
 
-        var thought = await _reading
-            .ThinkAsync(origins, _dials.Stamina, ct: ct).ConfigureAwait(false);
+        var halted = 0;
+        var balanced = true;
+        var settled = true;
+        IReadOnlyList<Arrival> reached = [];
+        Code? answer = null;
 
-        var settled = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
+        for (var step = 0; step < _world.Steps; step++)
+        {
+            if (origins.IsEmpty) break;
 
-        var reached = thought.BestAmong(answers, 1);
+            var thought = await _reading
+                .ThinkAsync(origins, _dials.Stamina, ct: ct).ConfigureAwait(false);
 
-        var answered = new Answering(
-            reached.Count == 0 ? null : reached[0].Endpoint,
-            thought.Halted,
-            thought.Balanced(),
-            settled,
-            thought.Best(int.MaxValue));
+            var quiet = await _fabric.SettleAsync(thought, ct).ConfigureAwait(false);
 
-        _reading.Forget(thought.Id);
+            halted += thought.Halted;
+            balanced &= thought.Balanced();
+            settled &= quiet;
+            reached = thought.Best(int.MaxValue);
 
-        return answered;
+            var best = thought.BestAmong(answers, 1);
+            answer = best.Count == 0 ? null : best[0].Endpoint;
+
+            // WHAT THIS WALK CONCLUDED, AS THE NEXT ONE'S ORIGINS. The conclusion
+            // is not written back -- fork 21 is what would do that, and writing a
+            // guess into the graph before it has been scored would contaminate the
+            // very thing this measures.
+            origins = step + 1 < _world.Steps
+                ? [.. reached.Take(_world.Width).Select(one => one.Endpoint)]
+                : [];
+
+            _reading.Forget(thought.Id);
+        }
+
+        return new Answering(answer, halted, balanced, settled, reached);
     }
 
     public void Dispose() => _fabric.Dispose();

@@ -48,9 +48,12 @@
 - **AND AN ANSWER NOT IN FRONT OF IT.** `Clutrr` scores nought where the answer is
   stated nowhere in the story, and every reply is a relation the story DID state.
   The code exists; it is never preferred over what is locally present.
-- **A conclusion that can be asked from.** Nothing composes on `Clutrr` at all, in
-  either arm — the role channel doubles RECALL and leaves composition at nought.
-  Applying a rule twice needs somewhere to put the first result.
+- **A conclusion that can be asked from — MEASURED, AND IT IS THE ONLY THING THAT
+  HAS EVER COMPOSED HERE.** A second walk from the first's arrivals breaks the echo
+  and beats chance on `Clutrr`. It lives in a world and belongs in `InputMachine`.
+- **Coverage, now that composition is not the binding constraint.** The composing
+  walk is silent on most fresh `Clutrr` stories, so the mechanism is unlocked and
+  the world is nowhere near solved.
 - **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
   sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
   — everything else carries over. An act is already a code.

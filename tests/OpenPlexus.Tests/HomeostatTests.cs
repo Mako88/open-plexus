@@ -24,6 +24,77 @@ public sealed class HomeostatTests(ITestOutputHelper output)
     private const int Steps = 400;
 
     [Fact]
+    public async Task Giving_it_a_span_is_what_puts_an_act_BEFORE_an_outcome()
+    {
+        // THE ARM THE DIAGNOSIS BELOW ASKS FOR. If the chain arm's trouble is that
+        // no act-to-outcome edge exists, then carrying one moment forward should
+        // make those cells exist -- and whether it also makes the arm BETTER is a
+        // separate question this reports rather than assumes.
+        //
+        // SPAN IS A CLAIM ABOUT THE STREAM AND NOT A DIAL, which is why it is
+        // measured here rather than swept. A homeostatic loop is a stream whose
+        // moments genuinely follow one another -- the claim is true of this world
+        // in a way it is false of `Composed`, where carrying manufactures the link
+        // the control exists to withhold.
+        // AND THE BLIND BAR AT BOTH SETTINGS, BECAUSE THE FALLBACK IS A CONTROL ARM
+        // NOBODY MEANT TO RUN. This world's chain arm acts AT RANDOM when the walk
+        // says nothing, and the test below already records that every point it ever
+        // scored came from exactly that -- so an arm whose silence ROSE has drifted
+        // toward the random bar for free, and a score read without the bar beside
+        // it cannot tell that from the graph having learnt something.
+        var scores = new Dictionary<(Attending How, int Span), HomeostatResult>();
+
+        foreach (var how in (Attending[])[Attending.Chain, Attending.Blind])
+            foreach (var span in (int[])[0, 1])
+            {
+                using var run = new HomeostatRun(World(), Dials with { Span = span }, seed: 1);
+                var result = await run.RunAsync(Steps, how);
+
+                scores[(how, span)] = result;
+
+                output.WriteLine(
+                    $"{how,-6} span={span} viable={result.Viable:F4} "
+                    + $"silent={result.Silent}/{result.Steps} "
+                    + $"temporal={result.Plumbing.Temporal} edges={result.Edges} "
+                    + $"widest={result.Widest} msgs={result.Messages}");
+            }
+
+        // THE MECHANISM, WHICH IS THE PART THIS ASSERTS. Nought against something
+        // is the whole claim: the cells that can hold a cause do not exist at one
+        // setting and do at the other.
+        Assert.Equal(0, scores[(Attending.Chain, 0)].Plumbing.Temporal);
+        Assert.True(scores[(Attending.Chain, 1)].Plumbing.Temporal > 0,
+            "carrying a moment forward wrote no temporal cells, so the span is not "
+            + "reaching this world's machine at all");
+
+        // AND THE SPAN IS NOT THE FIX, WHICH IS THE RESULT THIS TEST EXISTS FOR.
+        //
+        // Measured at 400 steps, seed 1: chain 0.1950 at span nought and 0.2450 at
+        // span one, against a BLIND arm at 0.2550 both times. So the cells that can
+        // hold a cause now exist -- 133 of them -- and the walk still does not
+        // reach a coin toss, at eight times the coin toss's message count.
+        //
+        // AND THE GAIN IS THE FALLBACK, NOT THE GRAPH. The chain arm's silence rose
+        // from 22 to 38 as the span came on, and a silent step ACTS AT RANDOM here,
+        // so the arm moved toward the random bar by the route that moves it there
+        // for free. That is the named trap firing exactly as written, and it is why
+        // this asserts the bar rather than the improvement.
+        //
+        // WHAT IT MEANS: "no act-to-outcome edge exists" explains why the chain arm
+        // is a mirror, and it is NOT sufficient to explain why the mirror loses to
+        // chance. Supplying the edge was the obvious remedy and it is refuted here.
+        foreach (var span in (int[])[0, 1])
+            Assert.True(
+                scores[(Attending.Chain, span)].Viable
+                    <= scores[(Attending.Blind, span)].Viable,
+                $"at span {span} the chain arm reached "
+                + $"{scores[(Attending.Chain, span)].Viable:F4} against a blind "
+                + $"{scores[(Attending.Blind, span)].Viable:F4} -- the walk has "
+                + "started beating chance here, which wants explaining rather than "
+                + "this bar wants moving");
+    }
+
+    [Fact]
     public async Task This_world_holds_no_act_to_outcome_edge_AT_ALL()
     {
         // THE OPEN DEFECT'S DIAGNOSIS, AND IT NEEDS NO APPEAL TO NON-STATIONARITY.

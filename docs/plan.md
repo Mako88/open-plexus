@@ -50,9 +50,9 @@
 - **A world with a WIDE real-valued signal to point `Winnow` at.** Built and mounted
   nowhere. The empirical guard is done — `Winnow.Distinct` counts tags actually
   emitted, since the declared width cannot see a low intrinsic dimension.
-- **AN ACT-TO-OUTCOME EDGE ON `Homeostat`, WHICH HAS NONE.** Measured at nought
-  temporal cells: its `Span` is nought, so the chain arm asks which act
-  ACCOMPANIED states like this — a mirror more data only sharpens.
+- **WHY THE WALK LOSES TO A COIN TOSS ON `Homeostat` EVEN WITH A CAUSAL EDGE.** A
+  span supplies the act-to-outcome cells and does NOT clear the blind bar; the
+  missing edge explained the mirror and not the loss.
 - **A BODY THAT SAYS WHICH ACTS IT WAS ASSIGNED.** `Kind.Meddled` and
   `Occasion.Forced` are built and no world sets them, so the interventional cell
   exists and is empty. `Homeostat`'s bootstrap already MAKES the interventions.
@@ -201,6 +201,7 @@ condition is a superstition.**
 | Asking again where a task merely LOOKS deep | bAbI's one-, two- and three-fact tasks: worse on the first and no better on the rest. One walk already reaches there | A world where one walk is at chance while answering confidently |
 | Asking again UNCONDITIONALLY | Discards the first walk's evidence to gamble on one intermediate. Took `Clevr` to about a third | Never as a default. `Question.Steps` is the legal version |
 | Ranking an arrival against the endpoint's BASE RATE | Inert alone, harmful with two walks: the candidates' marginals barely differ, so it divides by nearly a constant. **Deleted** | Candidate answers differing WIDELY in frequency |
+| A span as the `Homeostat` chain arm's fix | The cells appear and it still loses to blind, at many times the cost. Its gain tracked its own rising silence | Anything making the walk beat chance where the evidence EXISTS |
 | A macro name joining the occasion it completes | Its members are gone, so its only partner is its own last member. 38 edges on a world built for nought | A macro reached by the WALK, never written as a partner |
 | Fork 24, the budget controller | `Moves` never left nought on the one world that ran it — three budgets sampled forever, none chosen. Billing the probe cost a quarter of `Senses`. **Deleted** | A world where the right budget VARIES |
 

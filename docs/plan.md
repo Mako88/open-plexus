@@ -36,9 +36,10 @@
 
 ### Look necessary for the goal, and absent
 
-- **A world with a WIDE real-valued signal to point `Winnow` at.** Built and
-  mounted nowhere. It needs many numbers per reading: three coordinates are
-  refuted below, and the constructor now refuses a sheet the reading cannot fill.
+- **A world with a WIDE real-valued signal to point `Winnow` at.** Built and mounted
+  nowhere. **The constructor's guard reads the DECLARED width** — data of fifty
+  inputs varying in three dimensions passes it and still collapses. Count distinct
+  tags over a sample instead.
 - **A goal that is not the current state.** `Drives` wants to stay in bounds and
   the rollout predicts; nothing can hold a state that is NOT current and steer
   toward it. Planning needs a target, and sub-goals are what serve many tasks.
@@ -48,6 +49,9 @@
 - **AND AN ANSWER NOT IN FRONT OF IT — HALF ANSWERED.** `Accumulate.Steady` ranks
   per hop and takes `Clutrr` from none right to some, free, on the same walk. It
   does not beat the two-step loop and the two together are worse than either.
+- **Positing something never observed.** Four things mint codes and every one
+  derives from what was PRESENT, so nothing can imagine. Gate it as `Chunk` does —
+  description length AND beating chance — and mint it at a coarse grain.
 - **Temporal abstraction.** `Chunk` names a SET; a macro-act is a SEQUENCE. A
   sibling of `Chunk` whose name is derived from members IN ORDER rather than sorted
   — everything else carries over. An act is already a code.
@@ -91,15 +95,21 @@
   walk that cannot afford to arrive, never an empty cell — and buying it is
   superlinear: messages grew far faster than coverage across the sweep.
 - **Conditioning the prediction itself**, rather than suppressing the observation.
+- **Routes never coalesce, and the walk is personalised PageRank done the dear
+  way.** `k` routes reaching one node each fan out over its whole row. Accumulating
+  a residual and pushing once is Andersen–Chung–Lang, and `k` grows with depth.
+- **And a chain would not survive it** — the cycle check exists because this
+  enumerates paths, and a residual walk does not need one. Provenance is what is
+  traded; `Split Chain` is the half already named.
 - **Hierarchy** — walk a thousand chunks, not a million nodes. What step 3 is for.
 - **Multi-token output** — fork 11 built the addressing; a world that wants two is
   what is left.
 - **A row cap that varies by node** — a node seen ten thousand times has more to say
   than one seen twice. `k · log(seen)` is local and scale-free. Measure it on
   `Skew`, the one setting where a cap is not inert.
-- **Space-Saving for the row cap** — the eviction scan is linear in the cap. Real
-  text is what needs it: swallowing any is ruinous at a cap the questions still
-  work under.
+- **Space-Saving serves THREE jobs, not the one it is listed for** — eviction's
+  linear scan, `Fanout.Shoulder`'s sort on every fire, and top-k. Its buckets ARE
+  the shoulder, so the cut becomes free rather than costing a sort.
 - **Evict on EVIDENCE rather than on recency** — eviction is LRU, whose textbook
   failure is the ubiquitous item that is always recently touched. `Doubt` already
   computes the better key, and the cap is measurably eating what `Doubt` repairs.

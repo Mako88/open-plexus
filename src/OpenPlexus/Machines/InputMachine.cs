@@ -350,6 +350,16 @@ public sealed class InputMachine<TFrame> : IReceiveReports
                 // AND WHICH OF THEM NAME THIS OCCASION RATHER THAN A KIND. Also
                 // null for every front end that cannot. See Occasion.Fleeting.
                 Fleeting = _quantizer.Fleeting(frame),
+
+                // AND WHAT RELATION THE MOMENT STATES, WITH WHICH CODE IN WHICH
+                // SLOT. THE CHANNEL THAT HAD NO ROUTE: `Occasion.Roles` and
+                // `Kind.Role` were both built and neither could be reached from a
+                // front end, so every role cell ever counted came from an occasion
+                // a test built by hand. Null for every front end that observes
+                // things rather than relations between them, which is all of them
+                // until one says otherwise.
+                As = _quantizer.Relating(frame),
+                Roles = _quantizer.Filling(frame),
             };
 
         _joined = joined;

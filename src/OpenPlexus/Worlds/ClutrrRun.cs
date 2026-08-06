@@ -16,6 +16,9 @@ public sealed record ClutrrResult : Questioned
     /// <summary>Whether people were declared fleeting.</summary>
     public required bool Carried { get; init; }
 
+    /// <summary>Whether the slots were said through the role channel.</summary>
+    public required bool Roled { get; init; }
+
     /// <summary>
     /// Right and asked, broken down by how many hops the chain was.
     /// </summary>
@@ -76,7 +79,7 @@ public sealed record ClutrrResult : Questioned
     }
 
     public override string ToString() =>
-        $"fleeting={Carried} | stories={Moments} asked={Asked} right={Right} "
+        $"fleeting={Carried} roled={Roled} | stories={Moments} asked={Asked} right={Right} "
         + $"silent={Silent} | accuracy={Accuracy:F4} composed={Composed:F4} "
         + $"chance={Chance:F4} | nodes={Nodes} edges={Edges} widest={Widest} | "
         + $"msgs={Messages} halted={Halted} unsettled={Unsettled}{Wrong}";
@@ -103,16 +106,14 @@ public sealed record ClutrrResult : Questioned
 /// opposite: the walk has to ARRIVE at one, so it must last.
 /// </para>
 /// <para>
-/// <b>THE SLOTS ARE SAID THROUGH <see cref="Learning.Occasion.Groups"/> AND NOT
-/// THROUGH <see cref="Learning.Occasion.Roles"/>, AND THAT IS A GAP AND NOT A
-/// CHOICE.</b> <see cref="Kind.Role"/> is the mechanism built for this, and
-/// nothing in the library can reach it: <see cref="Coded"/> carries four of the
-/// five front-end channels and <c>Roles</c> is not one of them, so no front end
-/// has ever written a role cell and every number on <c>BindingGapTests</c> comes
-/// from an occasion a test constructed by hand. Grouping a filler with its slot
-/// code writes the same pair under <see cref="Kind.With"/> instead of
-/// <see cref="Kind.Fills"/>, which is a baseline the real channel can then be
-/// measured against rather than a replacement for it.
+/// <b>THE SLOTS ARE SAID TWO WAYS AND THAT IS THE ARM</b> — see
+/// <see cref="ClutrrSettings.Roled"/>. Grouping a filler with its slot code writes
+/// the same PAIR the role channel writes, under <see cref="Kind.With"/> rather than
+/// <see cref="Kind.Fills"/>, so it is a working baseline rather than a stand-in.
+/// <b>This world is the first caller in the library to reach the role channel at
+/// all</b>: <see cref="Coded"/> carried four of the five front-end channels until
+/// now, so every number on <c>BindingGapTests</c> came from an occasion a test
+/// constructed by hand.
 /// </para>
 /// </remarks>
 public sealed class ClutrrRun : IDisposable
@@ -214,6 +215,7 @@ public sealed class ClutrrRun : IDisposable
         return new ClutrrResult
         {
             Carried = _world.Carried,
+            Roled = _world.Roled,
             Moments = _world.Stories.Count,
             Asked = asked,
             Right = right,
@@ -248,21 +250,36 @@ public sealed class ClutrrRun : IDisposable
         var left = story.Who(from);
         var right = story.Who(to);
 
-        var codes = ImmutableArray.Create(left, relation.Role(0), right, relation.Role(1));
+        // THE ROLE CHANNEL DERIVES THE SLOT CODES, so on this arm the moment is
+        // just the two people. Off it, the slots have to be IN the moment and the
+        // grouping is what keeps each one with its own filler.
+        var codes = _world.Roled
+            ? ImmutableArray.Create(left, right)
+            : ImmutableArray.Create(left, relation.Role(0), right, relation.Role(1));
 
-        var groups = new Dictionary<Code, int>
-        {
-            [left] = 0,
-            [relation.Role(0)] = 0,
-            [right] = 1,
-            [relation.Role(1)] = 1,
-        };
+        var groups = _world.Roled
+            ? null
+            : new Dictionary<Code, int>
+            {
+                [left] = 0,
+                [relation.Role(0)] = 0,
+                [right] = 1,
+                [relation.Role(1)] = 1,
+            };
 
         await _reading.ObserveAsync(
             new Coded
             {
                 Codes = codes,
                 Groups = groups,
+
+                // WHICH RELATION THIS STATES AND WHO FILLS WHICH SLOT OF IT. See
+                // ClutrrSettings.Roled -- and note this is the first caller in the
+                // library to say either.
+                Relating = _world.Roled ? relation : null,
+                Filling = _world.Roled
+                    ? new Dictionary<Code, int> { [left] = 0, [right] = 1 }
+                    : null,
 
                 // A PERSON IS OF THIS STORY AND NOTHING ELSE -- but declaring that
                 // severs the chain, so it is the arm and not the default. See

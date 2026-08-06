@@ -33,8 +33,12 @@ public sealed class ClutrrTests(ITestOutputHelper output)
         }
     }
 
-    private static ClutrrSettings World(int stories = 300, bool fleeting = false) =>
-        new() { Corpus = Corpus, Stories = stories, Fleeting = fleeting };
+    private static ClutrrSettings World(
+        int stories = 300, bool fleeting = false, bool roled = false) =>
+        new() { Corpus = Corpus, Stories = stories, Fleeting = fleeting, Roled = roled };
+
+    /// <summary>Right over asked on chains past three hops, and how deep it got.</summary>
+    private static double Deep(ClutrrResult result) => result.Composed;
 
     // ---- what the corpus is, asserted rather than described -----------------
 
@@ -147,5 +151,55 @@ public sealed class ClutrrTests(ITestOutputHelper output)
         Assert.True(got / (double)tried < result.Chance,
             $"chains past two hops beat chance -- the ceiling moved, read why: "
             + $"{got} of {tried}");
+    }
+
+    [Fact]
+    public async Task The_role_channel_lifts_the_deep_chains_and_grouping_does_not()
+    {
+        // THE FIRST MEASUREMENT OF `Kind.Role` ON DATA NOBODY HERE GENERATED, and
+        // the first at all through a front end rather than a hand-built occasion.
+        //
+        // BOTH ARMS WRITE THE SAME PAIR. Grouping puts a person beside the slot
+        // code they fill and the pair lands under `With`; the role channel derives
+        // the slot and the pair lands under `Fills`. So this is one mechanism
+        // measured ON from a baseline that already works, which is the trap the
+        // plan names -- not a mechanism measured against nothing.
+        var arms = new List<(bool Roled, ClutrrResult Result)>();
+
+        foreach (var roled in new[] { false, true })
+        {
+            using var run = new ClutrrRun(
+                World(stories: 300, roled: roled), Fixture.Dials(stamina: 32.0), seed: 1);
+
+            var result = await run.RunAsync();
+            arms.Add((roled, result));
+
+            output.WriteLine($"roled={roled,-5} {result}");
+            foreach (var (hops, asked, right) in result.ByHops)
+                output.WriteLine($"    {hops,2} hops: {right,3}/{asked}");
+        }
+
+        var grouped = arms[0].Result;
+        var filled = arms[1].Result;
+
+        // GROUPING CANNOT REACH PAST THE SECOND HOP. Asserted as the FLOOR it is.
+        Assert.True(Deep(grouped) < grouped.Chance,
+            $"the grouping baseline composed after all: {Deep(grouped)}");
+
+        // AND THE ROLE CHANNEL CAN. This is the whole claim the cell was built on:
+        // a count between two people is about those two people, and a count between
+        // a relation's slots names nobody -- so it applies to people never seen
+        // together.
+        Assert.True(Deep(filled) > filled.Chance,
+            $"the role channel did not beat chance on deep chains: {Deep(filled)}");
+
+        Assert.True(Deep(filled) > Deep(grouped) * 4,
+            $"the role channel did not clearly beat grouping on deep chains: "
+            + $"{Deep(filled)} against {Deep(grouped)}");
+
+        // AND IT IS NOT JUST LOUDER. A walk that answered more by saying more would
+        // show up here, and it does not: it is less silent AND more right.
+        Assert.True(filled.Silent < grouped.Silent);
+        Assert.True(filled.Accuracy > grouped.Accuracy);
     }
 }

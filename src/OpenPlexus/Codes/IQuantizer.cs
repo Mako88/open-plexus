@@ -70,4 +70,39 @@ public interface IQuantizer<in TObservation>
     /// no existing measurement.
     /// </remarks>
     IReadOnlySet<Code>? Fleeting(TObservation observation) => null;
+
+    /// <summary>
+    /// Which relation this observation STATES, when this front end can say.
+    /// <b>Null by default, which is every front end that observes things rather
+    /// than relations between them.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE FIFTH CHANNEL, AND IT WAS THE ONE WITH NO ROUTE.</b>
+    /// <see cref="Learning.Occasion.Roles"/> and <see cref="Graph.Kind.Role"/> were
+    /// both built and neither could be reached: no method here produced them and
+    /// <see cref="Coded"/> carried the other four, so nothing in the library ever
+    /// wrote a role cell and every number measuring one came from an occasion a
+    /// test constructed by hand. See <see cref="Filling"/> for the half that names
+    /// the slots.
+    /// </remarks>
+    Graph.Kind? Relating(TObservation observation) => null;
+
+    /// <summary>
+    /// Which SLOT of that relation each code fills. <b>Null by default, and it
+    /// needs <see cref="Relating"/> to mean anything.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>IT SAYS WHAT IS BEING LOOKED AT AND NEVER WHAT TO CONCLUDE, which is the
+    /// line every one of the other four stays on.</b> <i>This code fills slot two</i>
+    /// is an observation a front end genuinely has — a parser knows its subject
+    /// from its object, and a body knows which hand it reached with.
+    /// <i>south-of is north-of reversed</i> is the fact under test, and handing that
+    /// over would make the whole thing a lookup table.
+    /// <para>
+    /// <b>What it buys is a cell naming no argument</b>, so the same cell
+    /// accumulates across every pair the relation was ever seen on and applies to
+    /// pairs never seen — see <see cref="Graph.Kind.Role"/>.
+    /// </para>
+    /// </remarks>
+    IReadOnlyDictionary<Code, int>? Filling(TObservation observation) => null;
 }

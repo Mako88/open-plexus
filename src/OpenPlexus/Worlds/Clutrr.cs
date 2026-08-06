@@ -39,6 +39,28 @@ public sealed record ClutrrSettings
     /// travel THROUGH one.
     /// </remarks>
     public bool Fleeting { get; init; }
+
+    /// <summary>
+    /// Whether the slots are said through the role channel rather than through
+    /// grouping.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>OFF IS THE BASELINE AND IT IS A REAL ONE.</b> Grouping a person with the
+    /// slot code they fill writes the same PAIR the role channel writes — the
+    /// difference is the kind it lands under, <see cref="Graph.Kind.With"/> against
+    /// <see cref="Graph.Kind.Fills"/>, and whether the two fillers of one statement
+    /// can reach each other. So this is one mechanism measured ON from something
+    /// that already works, which is the trap the plan names.
+    /// </para>
+    /// <para>
+    /// <b>ON, THE SLOT CODES LEAVE THE MOMENT ENTIRELY.</b> The channel derives
+    /// them from <see cref="Learning.Occasion.As"/>, so the moment is just the two
+    /// people and the front end says which of them fills which slot — which is the
+    /// whole point: the cell that results names no person at all.
+    /// </para>
+    /// </remarks>
+    public bool Roled { get; init; }
 }
 
 /// <summary>
@@ -407,6 +429,9 @@ public sealed class Clutrr
 
     /// <inheritdoc cref="ClutrrSettings.Fleeting"/>
     public bool Carried => _settings.Fleeting;
+
+    /// <inheritdoc cref="ClutrrSettings.Roled"/>
+    public bool Roled => _settings.Roled;
 
     public override string ToString() =>
         $"stories={Stories.Count} relations={Relations.Count}";

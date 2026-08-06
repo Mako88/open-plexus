@@ -72,6 +72,12 @@
 - **Positing something never observed.** `Stated` already BUILDS one — a star whose
   fillers never met — so the mechanism is not what is missing. **The policy is**: a
   reason to build one, gated as `Chunk` gates.
+- **A proposer that only RESTRUCTURES cannot hallucinate.** Replacing a group's
+  pairwise edges with a star through one new node is pure description length — it
+  invents no content, only a shortcut. Fork 21 predicts and is off; this does not.
+- **And the origin machine can SEE a group legally** — it collects every arrival,
+  which is where `Agreement` already counts distinct origins. A broadcast from k
+  codes that all reach each other has found one without reading anybody's row.
 - **A WALK THAT CAN USE A MACRO.** `Macro` mints them and nothing reaches one — it
   is an ORIGIN and a TARGET, one hop where five were, which is `Motif`'s traffic
   argument applied to time. Where hierarchy starts.

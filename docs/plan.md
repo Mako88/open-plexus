@@ -411,8 +411,15 @@ change of architecture entirely.
 - **MORE OF WHAT IT HOLDS IS UNSOUND THAN SOUND.** The vote scores well while
   carrying rules the soundness check refuses, at both widths — so what the vote
   tolerates is not what the world rewards.
-- **AND ELEVEN BITS IS FURTHER OFF THAN SIX**, so the gap grows with the number of
-  relevant bits. That is the scaling number, and it is pointing the wrong way.
+- **AND TWENTY BITS PLATEAUS RATHER THAN BEING SLOW.** The same score at a hundred
+  and fifty thousand rounds and at four hundred thousand, while sound rules keep
+  rising — so it refines and stops improving.
+- **THE REPAIR BUDGET IS A LEVEL AND WAS WRITTEN DOWN AS A GUARD.** Loosening it
+  crosses the target at twenty bits; removing it is worse at every width. An interior
+  optimum that moves with the relevant bits, and nothing reads that.
+- **ROUNDS-TO-TARGET GROWS FAST IN THE RELEVANT BITS.** Six, eleven and twenty differ
+  by one relevant bit each; the cost between them does not grow by one. That is the
+  number that predicts whether any of this reaches perception.
 - **`Abstain` IS UNARMED IN ANY RUN.** Nothing in one process can die, so C3's third
   outcome is exercised only by unit tests. It reads zero for the same reason a check
   reads zero when it cannot fire.
@@ -454,3 +461,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **34** | Rung five names nothing at six bits and names and STACKS at eleven. The plan said this world had an answer key for it; it does not, because its structure is positional. Open |
 | **35** | More unsound commitments resident than sound ones, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
 | **36** | Graded codes: does `Winnow` emitting several codes per reading make a position nameable, and what does it cost the search and the soundness check? Open |
+| **37** | The repair budget has an interior optimum that moves with the relevant bits. The driver nobody has wired: whether a parent still has failures no child covers. Open |

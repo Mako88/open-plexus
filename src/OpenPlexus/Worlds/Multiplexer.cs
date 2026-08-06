@@ -289,6 +289,27 @@ public sealed class Multiplexer
         return truths.ToImmutable();
     }
 
+    /// <summary>The widest gap this will enumerate across.</summary>
+    /// <remarks>
+    /// <b>Sixty-five thousand assignments per commitment, which is affordable across
+    /// a population and is where affordable stops.</b> The alternative is sampling,
+    /// and a soundness score that sampled would be a probability wearing the clothes
+    /// of a proof.
+    /// </remarks>
+    public const int Widest = 16;
+
+    /// <summary>Whether a scope pins enough that its soundness can be settled exactly.</summary>
+    /// <param name="scope">The codes that must be present.</param>
+    /// <remarks>
+    /// <b>A COUNT OF SOUND RULES IS A LIE IF THE UNCHECKABLE ONES ARE COUNTED AS
+    /// UNSOUND.</b> A one-code scope in a twenty-bit world leaves nineteen free, so
+    /// what cannot be settled is reported as its own number rather than folded into
+    /// the bad news.
+    /// </remarks>
+    public bool Checkable(ImmutableArray<Code> scope) =>
+        !scope.IsDefaultOrEmpty
+        && Bits - scope.Select(code => (int)(code.Value >> 1)).Distinct().Count() <= Widest;
+
     /// <summary>
     /// Whether a scope really does entail an expectation, for every world it allows.
     /// </summary>
@@ -314,9 +335,9 @@ public sealed class Multiplexer
         if (scope.IsDefaultOrEmpty) return false;
 
         // ENUMERATION IS EXPONENTIAL IN THE FREE BITS, so this is honest about where
-        // it stops rather than quietly sampling. Eleven bits is the largest world
-        // with published numbers, and it is comfortably inside.
-        if (Bits > 16) throw new InvalidOperationException("too wide to enumerate exactly");
+        // it stops rather than quietly sampling.
+        if (!Checkable(scope))
+            throw new InvalidOperationException("too many free bits to enumerate exactly");
 
         var pinned = new int?[Bits];
 

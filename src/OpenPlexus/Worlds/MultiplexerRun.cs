@@ -69,6 +69,25 @@ public sealed record Learned
     /// </remarks>
     public required int Unsound { get; init; }
 
+    /// <summary>Experienced commitments too general to settle by enumeration.</summary>
+    /// <remarks>
+    /// <b>NOT FOLDED INTO THE BAD NEWS.</b> A one-code scope in a twenty-bit world
+    /// leaves nineteen bits free, and counting what cannot be settled as unsound
+    /// would make the share of true rules fall with the width of the world for a
+    /// reason that has nothing to do with learning.
+    /// </remarks>
+    public required int Unchecked { get; init; }
+
+    /// <summary>The round a trailing window first held the target, or zero if never.</summary>
+    /// <remarks>
+    /// <b>THE SCALING NUMBER, AND THE ONE THAT PREDICTS WHETHER ANY OF THIS REACHES
+    /// PERCEPTION.</b> A final accuracy says how well a width was learnt; this says
+    /// what it COST, and how that cost grows with the number of relevant bits is the
+    /// whole question. A curve that is exponential in relevant bits is a dead end
+    /// found cheaply on a generated world rather than expensively on a real one.
+    /// </remarks>
+    public required long Reached { get; init; }
+
     /// <summary>Children minted by repair.</summary>
     public required long Repaired { get; init; }
 
@@ -152,14 +171,24 @@ public sealed class MultiplexerRun
 
     /// <summary>Runs the world and learns from it.</summary>
     /// <param name="rounds">How many rounds.</param>
-    /// <param name="sweep">How often to subsume and cull.</param>
-    public Learned Run(long rounds, int sweep = 1000)
+    /// <param name="sweep">How often to subsume, abstract and cull.</param>
+    /// <param name="target">The trailing accuracy <see cref="Learned.Reached"/> waits for.</param>
+    /// <param name="window">How many answered predictions that trailing accuracy is over.</param>
+    public Learned Run(long rounds, int sweep = 1000, double target = 0.9, int window = 2000)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(rounds);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sweep);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(window);
 
         long right = 0, wrong = 0, silent = 0, repaired = 0;
         long settled = 0, answered = 0;
+
+        // A TRAILING WINDOW AND NOT A RUNNING TOTAL, because a lifetime accuracy
+        // cannot cross a bar it spent the early rounds below -- so rounds-to-target
+        // read off a total would measure the length of the run.
+        var trailing = new Queue<bool>(window);
+        var standing = 0;
+        long reached = 0;
 
         // THE LAST TENTH IS THE ASSESSMENT, and it is a reporting choice rather than
         // a dial: a lifetime accuracy over a learning run measures how long the run
@@ -182,13 +211,24 @@ public sealed class MultiplexerRun
             if (vote.Expects is not { } said) silent++;
             else
             {
-                if (said == shown.Outcome) right++; else wrong++;
+                var hit = said == shown.Outcome;
+
+                if (hit) right++; else wrong++;
 
                 if (round >= from)
                 {
                     answered++;
-                    if (said == shown.Outcome) settled++;
+                    if (hit) settled++;
                 }
+
+                trailing.Enqueue(hit);
+                if (hit) standing++;
+
+                if (trailing.Count > window && trailing.Dequeue()) standing--;
+
+                if (reached == 0 && trailing.Count >= window
+                    && standing / (double)trailing.Count >= target)
+                    reached = round;
             }
 
             _held.Settle(firing, moment, shown.Outcome);
@@ -218,15 +258,21 @@ public sealed class MultiplexerRun
         // minted codes, so a rule written in them can only be checked once its names
         // are expanded -- and a rewrite that changed what a commitment CLAIMS would
         // show up right here as a rule that had stopped being true.
-        var experienced = _held.All.Where(one => one.Seen >= _floor).ToList();
+        var experienced = _held.All
+            .Where(one => one.Seen >= _floor)
+            .Select(one => (Scope: _held.Names.Unfold(one.Scope), one.Expects))
+            .ToList();
 
-        var sound = experienced.Count(
-            one => _world.Sound(_held.Names.Unfold(one.Scope), one.Expects));
+        var checkable = experienced.Where(one => _world.Checkable(one.Scope)).ToList();
+
+        var sound = checkable.Count(one => _world.Sound(one.Scope, one.Expects));
 
         return new Learned
         {
             Sound = sound,
-            Unsound = experienced.Count - sound,
+            Unsound = checkable.Count - sound,
+            Unchecked = experienced.Count - checkable.Count,
+            Reached = reached,
             Exhausted = _held.Exhausted(_budget),
             Rounds = rounds,
             Right = right,

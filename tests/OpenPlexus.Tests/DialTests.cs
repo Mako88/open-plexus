@@ -75,10 +75,12 @@ public sealed class DialTests(ITestOutputHelper output)
             + "mean anything; hunting it would be hunting a standard of proof",
 
         ["Budget"] =
-            "a runaway guard rather than a level, and it BOUND before it guarded "
-            + "at eight -- repair stopped while the world was still unlearnt. What "
-            + "a bound like this needs is to be shown not binding, which the "
-            + "children-minted count reports directly",
+            "OPEN, AND IT WAS CALLED A GUARD HERE UNTIL MEASUREMENT REFUTED THAT. "
+            + "Removing it is WORSE at every width and raising it is better at the "
+            + "widest, so it has an interior optimum and is a LEVEL. The optimum "
+            + "moves with the number of relevant bits, and nothing reads that yet -- "
+            + "the honest driver is whether a parent still has failures no child "
+            + "covers, which the gate already computes and throws away",
 
         ["Capacity"] =
             "a capacity rather than a level, exactly as `Row` is. What a machine "

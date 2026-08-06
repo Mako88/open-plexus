@@ -40,11 +40,19 @@ public sealed record CommittingSettings
 
     /// <summary>How many children one commitment may ever mint.</summary>
     /// <remarks>
-    /// <b>A runaway guard rather than a level, and it BOUND before it guarded.</b> At
-    /// eight, repair stopped while the world was still unlearnt — the count of
-    /// children was flat from twenty thousand rounds to four hundred thousand, and
-    /// the score was flat with it. What looked like a ceiling on the mechanism was a
-    /// ceiling on how many times it was allowed to try.
+    /// <para>
+    /// <b>IT WAS WRITTEN DOWN AS A RUNAWAY GUARD AND IT IS A LEVEL.</b> At eight it
+    /// bound before it guarded — repairs flat from twenty thousand rounds to four
+    /// hundred thousand, and the score flat with it. Raised, and the same shape
+    /// appeared one width up: at twenty bits it plateaus under this and crosses the
+    /// target when it is loosened.
+    /// </para>
+    /// <para>
+    /// <b>AND REMOVING IT IS WORSE AT EVERY WIDTH</b>, so it is not a cap to delete
+    /// either — unbounded repair over-specialises and the score falls. An interior
+    /// optimum is what a LEVEL has, and this one moves with the number of relevant
+    /// bits while nothing reads that.
+    /// </para>
     /// </remarks>
     public int Budget { get; init; } = 64;
 

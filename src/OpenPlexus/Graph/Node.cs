@@ -220,6 +220,38 @@ public sealed class Node
         }
     }
 
+    /// <summary>
+    /// Drops one entry, because something now stands for it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>EVICTION AND NEVER DECAY, WHICH IS THE ONLY REASON THIS IS EXPRESSIBLE
+    /// AT ALL.</b> A count that DECREASED would break the G-Counter property and
+    /// with it the convergence the whole coordination-free design rests on. An
+    /// entry that stops being RESIDENT does not: the number was never revised, it
+    /// was paged out. <see cref="WalkSettings.Row"/> already rests on that
+    /// distinction and this is its second consumer.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE HALF THAT MAKES A POSITED HUB PAY.</b> Minting a node over
+    /// a group ADDS an entry to every member's row, so on a graph that never
+    /// removes anything the fan-out GROWS and the description-length argument runs
+    /// backwards. Dropping what the hub now stands for is what turns
+    /// <c>k(k-1)/2</c> into <c>k</c> rather than into <c>k(k-1)/2</c> plus
+    /// <c>k</c>.
+    /// </para>
+    /// <para>
+    /// <b>NOTHING HERE READS ANOTHER NODE.</b> A node drops from its OWN row and
+    /// the partner drops from its own — the caller has to ask both, exactly as
+    /// <see cref="Observe"/> requires both sides to write.
+    /// </para>
+    /// </remarks>
+    /// <returns>Whether there was an entry to drop.</returns>
+    public bool Forget(Code other, Kind kind)
+    {
+        lock (_gate) return _together.Remove(new Edge(other, kind));
+    }
+
     /// <summary>Which of two entries a bounded row gives up first.</summary>
     private static bool Older(KeyValuePair<Edge, Tie> one, KeyValuePair<Edge, Tie> than)
     {

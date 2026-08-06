@@ -31,6 +31,17 @@ public sealed record LatentResult : Questioned
     /// <summary>The share of questions that found one.</summary>
     public double Grouping => Asked == 0 ? 0.0 : Found / (double)Asked;
 
+    /// <summary>
+    /// How many row entries the minting dropped because a hub now stands for them.
+    /// </summary>
+    /// <remarks>
+    /// <b>NOUGHT WITH THE ARM OFF, AND NOUGHT WITH IT ON MEANS IT MINTED
+    /// NOTHING.</b> Counts only ever rise, so a hub added beside the clique it
+    /// replaces makes every row WIDER -- this is the number that says the
+    /// description-length argument was actually carried out rather than half of it.
+    /// </remarks>
+    public required int Subsumed { get; init; }
+
     /// <summary>Messages the bus carried per question asked.</summary>
     /// <remarks>
     /// <b>THE COST A HUB WOULD ATTACK, and the reason accuracy is not the headline
@@ -74,7 +85,7 @@ public sealed record LatentResult : Questioned
     public override string ToString() =>
         $"channels={Channels} causes={Causes} moments={Moments} asked={Asked} " +
         $"right={Right} silent={Silent} | accuracy={Accuracy:F4} chance={Chance:F4} " +
-        $"grouping={Grouping:F4} divides={Divides} | " +
+        $"grouping={Grouping:F4} subsumed={Subsumed} divides={Divides} | " +
         $"nodes={Nodes} edges={Edges} widest={Widest} | " +
         $"msgs={Messages} traffic={Traffic:F0} halted={Halted} " +
         $"unbalanced={Unbalanced} unsettled={Unsettled}{Wrong}";
@@ -121,14 +132,25 @@ public sealed class LatentRun : IDisposable
     /// Shows moments, and every <paramref name="every"/> of them hides one channel
     /// and asks what it showed.
     /// </summary>
+    /// <param name="moments">How many moments to show.</param>
+    /// <param name="every">Ask on every nth moment.</param>
+    /// <param name="posit">
+    /// Whether a group found by a question is minted as a hub, and the edges it
+    /// stands for dropped. <b>Off is the control and every measurement taken before
+    /// this existed.</b> See <see cref="InputMachine{TFrame}.PositAsync"/>.
+    /// </param>
+    /// <param name="ct">Cancellation.</param>
     public async Task<LatentResult> RunAsync(
-        int moments, int every = 10, CancellationToken ct = default)
+        int moments, int every = 10, bool posit = false, CancellationToken ct = default)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(moments);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(every);
 
         int asked = 0, right = 0, silent = 0, found = 0, unbalanced = 0, unsettled = 0;
         long halted = 0;
+
+        // HOW MANY SUBSUMED ENTRIES THE MINTING DROPPED. See LatentResult.Subsumed.
+        var subsumed = 0;
 
         var chains = new Chains();
 
@@ -174,6 +196,12 @@ public sealed class LatentRun : IDisposable
             // THE CANDIDATE FOR A POSITED HUB, COUNTED. See LatentResult.Found.
             if (!thought.Grouped().IsEmpty) found++;
 
+            // AND MINTED, WHEN THE ARM IS ON. The decision is the machine's -- this
+            // world only says when a thought is finished being read.
+            if (posit)
+                subsumed += await _eyes
+                    .PositAsync(thought, moment, ct).ConfigureAwait(false);
+
             var reached = thought.BestAmong(candidates, 1);
 
             if (reached.Count == 0) silent++;
@@ -193,6 +221,7 @@ public sealed class LatentRun : IDisposable
             Right = right,
             Silent = silent,
             Found = found,
+            Subsumed = subsumed,
             Chance = _world.Chance,
             Divides = chains.Divides,
             Reflections = Reflections.Of(_dials, 0),

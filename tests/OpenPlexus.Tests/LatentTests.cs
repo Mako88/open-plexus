@@ -101,6 +101,61 @@ public sealed class LatentTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task Positing_a_hub_AND_dropping_what_it_stands_for()
+    {
+        // THE PAYOFF, AND THE ARM IS ON AGAINST A CONTROL RATHER THAN ON ALONE.
+        // A hub added beside the clique it replaces makes every member's row WIDER,
+        // because counts only ever rise -- so what is under test is not "does
+        // minting help" but "does minting AND subsuming carry out the arithmetic".
+        var scores = new Dictionary<bool, LatentResult>();
+
+        foreach (var posit in (bool[])[false, true])
+        {
+            using var run = new LatentRun(World(channels: 8), Dials, seed: 1);
+            var result = await run.RunAsync(Moments, posit: posit);
+
+            scores[posit] = result;
+
+            output.WriteLine(
+                $"posit={posit,-5} accuracy={result.Accuracy:F4} "
+                + $"widest={result.Widest} edges={result.Edges} nodes={result.Nodes} "
+                + $"subsumed={result.Subsumed} traffic={result.Traffic:F0}");
+        }
+
+        // THE CONTROL DROPS NOTHING, or the arm is not the thing being measured.
+        Assert.Equal(0, scores[false].Subsumed);
+
+        // AND THE ARM ACTUALLY CARRIED IT OUT. Nought here with the arm on would
+        // mean it minted nothing and every number below is the control twice.
+        Assert.True(scores[true].Subsumed > 0,
+            "the arm dropped no entries, so nothing was ever minted");
+
+        // AND THE ARITHMETIC COMES TRUE. Measured at eight channels, seed 1:
+        // 1,176 edges and 14,567 messages a question become 986 and 11,733, with
+        // 610 entries subsumed and 27 hubs minted -- a SMALLER graph and a cheaper
+        // walk out of ADDING nodes to it, which only works because the minting
+        // dropped what it stands for.
+        Assert.True(scores[true].Edges < scores[false].Edges,
+            $"minting left {scores[true].Edges} edges against {scores[false].Edges} "
+            + "-- the hub was added and nothing was taken away");
+
+        Assert.True(scores[true].Traffic < scores[false].Traffic,
+            $"minting cost {scores[true].Traffic:F0} messages a question against "
+            + $"{scores[false].Traffic:F0} -- a hub that does not cut the fan-out "
+            + "is paying for itself in the one currency it exists to save");
+
+        // AND IT COST NO ACCURACY, which is what makes it compression rather than
+        // damage. The sibling that was one hop is TWO through the hub, so this is
+        // the walk affording the extra step rather than a free lunch.
+        Assert.Equal(scores[false].Accuracy, scores[true].Accuracy, precision: 10);
+
+        // THE HUBS ARE REAL NODES AND THERE ARE FEWER OF THEM THAN THE EDGES THEY
+        // REPLACED, which is the description-length claim in one line.
+        Assert.True(scores[true].Nodes > scores[false].Nodes,
+            "no hub node ever entered the graph");
+    }
+
+    [Fact]
     public async Task And_the_cost_a_hub_would_attack_grows_with_the_channels()
     {
         // THE ARITHMETIC THE WHOLE CLAIM RESTS ON, MEASURED RATHER THAN ASSERTED.

@@ -739,6 +739,62 @@ public sealed class InputMachine<TFrame> : IReceiveReports
     /// </para>
     /// </remarks>
     /// <returns>How many conclusions were written. Zero when reflection is off.</returns>
+    /// <summary>
+    /// Mints a node for whatever would explain this thought's group, and drops the
+    /// edges it now stands for.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE FIRST THING IN THIS DESIGN THAT PROPOSES RATHER THAN RECOGNISES.</b>
+    /// Every minter names something that was present; this names the explanation
+    /// for a group of origins that all reached one another, and what it names was
+    /// never in any moment. See <see cref="Posit"/> and
+    /// <see cref="Thought.Grouped"/>.
+    /// </para>
+    /// <para>
+    /// <b>IT IS SAFE WHERE FORK 21 IS NOT, AND THE DIFFERENCE IS PRECISE.</b>
+    /// Reflection writes back a CONCLUSION, so a wrong one becomes evidence and the
+    /// system learns its own hallucinations. This writes back a SHORTCUT: the same
+    /// counts, said through one node instead of many. It can be wasteful and it
+    /// cannot be false, which is why it needs no threshold beyond the arithmetic.
+    /// </para>
+    /// <para>
+    /// <b>MINTING AND SUBSUMING ARE ONE OPERATION.</b> Counts only ever rise, so a
+    /// hub added beside the clique it replaces makes every member's row WIDER and
+    /// the fan-out larger — the description-length argument backwards. Dropping the
+    /// group's own edges is what makes it true, and it is legal because an evicted
+    /// entry was paged out rather than revised.
+    /// </para>
+    /// <para>
+    /// <b>The brain decides, never the world.</b> A world hands over input; whether
+    /// a group is worth a name is the thinking, and it lives here.
+    /// </para>
+    /// </remarks>
+    /// <param name="thought">A settled walk. Read before it is forgotten.</param>
+    /// <param name="at">This machine's clock.</param>
+    /// <param name="ct">Cancellation.</param>
+    /// <returns>How many subsumed entries were dropped, and nought if nothing was minted.</returns>
+    public async ValueTask<int> PositAsync(
+        Thought thought, long at, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(thought);
+
+        var group = thought.Grouped();
+
+        // BELOW THE BAR, OR NOTHING REACHED ANYTHING. `Grouped` already refuses a
+        // group too small to pay, so there is no threshold to repeat here.
+        if (group.IsEmpty) return 0;
+
+        var hub = Posit.Over(group);
+
+        foreach (var arm in Posit.Star(hub, group, at))
+            await _rendezvous.JoinAsync(arm, ct).ConfigureAwait(false);
+
+        // AND THE EDGES THE HUB NOW STANDS FOR GO. After the arms, so the graph is
+        // never left holding a group with neither its own edges nor a hub.
+        return await _rendezvous.SubsumeAsync(group, ct).ConfigureAwait(false);
+    }
+
     public async ValueTask<int> ReflectAsync(
         Thought thought,
         long now,

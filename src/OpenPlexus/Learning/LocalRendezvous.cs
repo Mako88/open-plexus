@@ -60,6 +60,7 @@ public sealed class LocalRendezvous : IRendezvous
         ArgumentOutOfRangeException.ThrowIfGreaterThan(carried, 1.0);
 
         _clusters = clusters;
+
         _carried = carried;
     }
 
@@ -320,4 +321,14 @@ public sealed class LocalRendezvous : IRendezvous
 
     private static (Code, Code) Unordered(Code one, Code other) =>
         one.CompareTo(other) <= 0 ? (one, other) : (other, one);
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <b>The local half owns its rows, so it can actually do this.</b> See
+    /// <see cref="Posit.Subsume"/> for why only the minter can know which edges a
+    /// hub stands for.
+    /// </remarks>
+    public ValueTask<int> SubsumeAsync(
+        IReadOnlyCollection<Code> group, CancellationToken ct = default) =>
+        ValueTask.FromResult(Posit.Subsume(_clusters, group));
 }

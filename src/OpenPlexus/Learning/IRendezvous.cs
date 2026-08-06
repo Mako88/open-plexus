@@ -255,4 +255,26 @@ public interface IRendezvous
     /// design exists for. Counted once per occasion, never per tick.
     /// </remarks>
     ValueTask JoinAsync(Occasion occasion, CancellationToken ct = default);
+
+    /// <summary>
+    /// Drop the edges among a group, because something now stands for them.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE OTHER HALF OF MINTING A HUB, AND NOT AN OPTIMISATION OF IT.</b>
+    /// Counts only ever rise, so joining a hub to a group leaves the group's own
+    /// edges standing too — every member's row gains an entry and the fan-out GROWS
+    /// where the description-length argument said it should fall. See
+    /// <see cref="Posit.Subsume"/>.
+    /// </para>
+    /// <para>
+    /// <b>Defaulted to nothing so a rendezvous that cannot reach its rows is not
+    /// forced to pretend it can.</b> Only the local one owns nodes; a remote half
+    /// would have to send this, which is a wire question and not this one.
+    /// </para>
+    /// </remarks>
+    /// <returns>How many entries were dropped.</returns>
+    ValueTask<int> SubsumeAsync(
+        IReadOnlyCollection<Code> group, CancellationToken ct = default) =>
+        ValueTask.FromResult(0);
 }

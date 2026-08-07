@@ -48,7 +48,7 @@ public sealed class GradedRun
         IQuantizer<IReadOnlyList<double>> sensing = fronting == Fronting.Winnowed
             ? new Winnowing(Multiplexer.Bit, made.Width)
             : new Banded<IReadOnlyList<double>>(
-                reading => reading, Multiplexer.Bit, Bands, Grains);
+                reading => reading, Multiplexer.Bit, made.Width, Bands, Grains);
 
         _trial = new Trial<IReadOnlyList<double>>(made, sensing, brain);
     }

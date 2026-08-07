@@ -115,3 +115,162 @@ else
   curl -sS -L --max-time 300 -o "$clutrr_file" "$clutrr_url"
   echo "CLUTRR: fetched to $clutrr_file"
 fi
+
+# CIFAR-10 — Krizhevsky 2009, "Learning Multiple Layers of Features from Tiny
+# Images". Freely distributed by the University of Toronto.
+#
+# WHY THIS IS HERE, AND WHY CLEVR IS NOT ENOUGH. Step four is the only place the
+# project's own bet gets measured, and it needs a world where the front end has
+# to MAKE the symbols. Every corpus above ships its symbols already separated --
+# CLEVR's scene graphs give every object's colour, size, shape and material as
+# JSON, which is exactly the front end this architecture would otherwise have to
+# fake. That was the right trade for the worlds above and it is precisely wrong
+# here: an encoder has nothing to encode and "raw" has nothing to be raw about.
+#
+# THE IMAGES ARE THE POINT, SO THE NO-IMAGES SHORTCUT IS NOT AVAILABLE. CLEVR
+# with pictures is 18 GB. CIFAR-10 is 162 MB, and it is what the fly-hash
+# lineage was measured on -- Dasgupta, Stevens and Navlakha evaluate on data of
+# this shape, so `Winnow` is being asked a question its source paper asked.
+#
+# AND IT HAS A PUBLISHED NUMBER FOR THE ARM TO SIT AGAINST: a linear probe on
+# frozen CLIP ViT-B/32 features scores about 95% here. A raw-pixel `Winnow` that
+# lands anywhere near that is the finding; one that does not is also a finding,
+# and a cheaper one to get than 18 GB.
+#
+# THE BINARY DISTRIBUTION RATHER THAN THE PYTHON ONE. The `.pkl` version needs
+# an interpreter to open; this one is fixed-width records -- one label byte then
+# 3072 pixel bytes -- which C# reads with a `BinaryReader` and no dependency.
+cifar_url="https://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz"
+cifar_dir="$here/cifar-10-batches-bin"
+
+if [ -f "$cifar_dir/test_batch.bin" ]; then
+  echo "CIFAR-10: already at $cifar_dir"
+else
+  echo "CIFAR-10: fetching 162 MB from $cifar_url"
+  curl -sS -L --max-time 1800 -o "$here/cifar-10-binary.tar.gz" "$cifar_url"
+  tar -xzf "$here/cifar-10-binary.tar.gz" -C "$here"
+  echo "CIFAR-10: extracted to $cifar_dir"
+fi
+
+# ---------------------------------------------------------------------------
+# THE ENCODERS, WHICH ARE NOT CORPORA AND LIVE HERE ANYWAY.
+#
+# They are somebody else's, they are large, and nothing in the repository should
+# carry them -- which is the same argument the file opens with, so they get the
+# same treatment rather than a second mechanism.
+#
+# WHAT THEY ARE FOR: the arm against raw. The bet is that `Winnow` -- a fixed
+# random projection and a k-winners-take-all, no weights and no training --
+# recovers enough of what a trained encoder buys. That claim is unfalsifiable
+# without something trained to lose to, so these are the yardstick.
+#
+# FROZEN IS WHAT MAKES THEM LEGAL HERE. The red-ball property says two machines
+# must agree about what they are looking at, and a published file of constants
+# satisfies it exactly as `Winnow`'s arithmetic-derived wiring does: same file,
+# same numbers, every machine, forever. An encoder that adapted during a run
+# would be a codebook fitted to the data, which the property forbids outright.
+#
+# AND A FRONT END MAY SAY WHAT IT IS LOOKING AT, NEVER WHAT TO CONCLUDE. That
+# rule is why the MobileNet graph gets cut below -- see the note there.
+# ---------------------------------------------------------------------------
+
+encoders="$here/encoders"
+
+# CLIP ViT-B/32, vision tower only — Radford et al. 2021, "Learning Transferable
+# Visual Models From Natural Language Supervision". Original weights MIT, (c)
+# 2021 OpenAI; this ONNX export by Qdrant.
+#
+# THE STRONG ARM, AND THE EXPENSIVE ONE. 224x224x3 in, 512 floats out, ~88M
+# constants, ~4.4 GFLOPs an image. Measured on an i7-4790 (2014, four cores):
+# 46 ms an image on four threads, 101 ms on one, 416 MB resident.
+#
+# IT EMITS AN EMBEDDING AND NOT CLASS SCORES, which is why it needs no surgery.
+clip_dir="$encoders/clip-vit-b32-vision"
+clip_repo="https://huggingface.co/Qdrant/clip-ViT-B-32-vision/resolve/main"
+
+if [ -f "$clip_dir/model.onnx" ]; then
+  echo "CLIP: already at $clip_dir"
+else
+  echo "CLIP: fetching 352 MB from $clip_repo"
+  mkdir -p "$clip_dir"
+  for file in model.onnx config.json preprocessor_config.json; do
+    curl -sS -L --max-time 900 -o "$clip_dir/$file" "$clip_repo/$file"
+  done
+  echo "CLIP: fetched to $clip_dir"
+fi
+
+# MobileNetV3-Small — Howard et al. 2019, "Searching for MobileNetV3". Apache
+# 2.0; these are the `timm` lamb_in1k weights, ONNX export by onnx-community.
+#
+# THE ARM THAT FITS THE BUDGET. Same measurement, same machine: 1.7 ms an image
+# on four threads and 3.3 ms on one, against CLIP's 46 and 101. Thirty times
+# cheaper on one core, and 6 MB against 352.
+#
+# THE FLOP RATIO OVERSTATES IT AND THE WALL CLOCK IS WHAT MATTERS. MobileNet is
+# memory-bound and barely uses a second core (3.3 ms on one thread, 1.7 on
+# four); CLIP is compute-bound and nearly halves. For twenty phones each running
+# one encoder that is the good direction.
+#
+# DO NOT REACH FOR THE QUANTIZED BUILD WITHOUT MEASURING. `model_int8.onnx` in
+# the same repository is TWENTY TIMES SLOWER than fp32 on the 2014 machine --
+# 35-42 ms an image -- because Haswell has no VNNI and the int8 kernels fall
+# through to a slow path. It would win on a phone with int8 silicon. That is the
+# whole point: it is a fact about the target and not about the file.
+mobilenet_dir="$encoders/mobilenetv3-small"
+mobilenet_repo="https://huggingface.co/onnx-community/mobilenetv3_small_100.lamb_in1k/resolve/main"
+
+if [ -f "$mobilenet_dir/model.onnx" ]; then
+  echo "MobileNetV3: already at $mobilenet_dir"
+else
+  echo "MobileNetV3: fetching 10 MB from $mobilenet_repo"
+  mkdir -p "$mobilenet_dir"
+  curl -sS -L --max-time 300 -o "$mobilenet_dir/model.onnx" "$mobilenet_repo/onnx/model.onnx"
+  for file in config.json preprocessor_config.json; do
+    curl -sS -L --max-time 120 -o "$mobilenet_dir/$file" "$mobilenet_repo/$file"
+  done
+  echo "MobileNetV3: fetched to $mobilenet_dir"
+fi
+
+# AND THE PUBLISHED EXPORT ENDS AT A 1000-WAY CLASSIFIER, WHICH BREAKS THE RULE.
+# A front end may say what it is looking at and never what to conclude, and a
+# vector of ImageNet class scores is a conclusion -- it says "this is a red
+# ball", which is the one thing forbidden. CLIP needs no such surgery because
+# its vision tower emits an embedding by construction.
+#
+# SO THE GRAPH IS CUT ONE `Gemm` EARLY, at the 1024-d pooled features the
+# classifier reads from. Nothing is retrained and nothing is chosen: the cut is
+# at the layer boundary the architecture already has, and the output is renamed
+# `features` so nothing downstream depends on a `timm` export's internal node
+# name.
+#
+# IT NEEDS `onnx` AND SAYS SO RATHER THAN FAILING QUIETLY. This is the only step
+# here that is not a download, and a machine without the package gets a named
+# reason instead of a missing file.
+headless="$mobilenet_dir/model_headless.onnx"
+
+if [ -f "$headless" ]; then
+  echo "MobileNetV3: headless encoder already at $headless"
+elif python -c "import onnx" 2>/dev/null; then
+  echo "MobileNetV3: cutting the classifier off"
+  python - "$mobilenet_dir/model.onnx" "$headless" <<'CUT'
+import sys
+import onnx
+from onnx.utils import extract_model
+
+source, target = sys.argv[1], sys.argv[2]
+extract_model(source, target, ['pixel_values'], ['/flatten/Flatten_output_0'])
+
+model = onnx.load(target)
+model.graph.output[0].name = 'features'
+for node in model.graph.node:
+    node.output[:] = ['features' if o == '/flatten/Flatten_output_0' else o
+                      for o in node.output]
+onnx.save(model, target)
+onnx.checker.check_model(onnx.load(target))
+CUT
+  echo "MobileNetV3: headless encoder at $headless (1024-d 'features')"
+else
+  echo "MobileNetV3: SKIPPED the headless cut -- no python with the 'onnx'"
+  echo "             package. Install it and re-run, or the cheap arm will be"
+  echo "             stuck emitting 1000 class scores instead of a reading."
+fi

@@ -349,17 +349,56 @@ public sealed class Population
     /// <summary>Drops the least accurate commitments when there are too many.</summary>
     /// <returns>How many were dropped.</returns>
     /// <remarks>
+    /// <para>
     /// <b>A capacity rather than a level, exactly as `csharp`'s row cap is.</b> What
     /// a machine can afford to hold is a fact about the machine and not about the
     /// run, so there is nothing here for a controller to hunt.
+    /// </para>
+    /// <para>
+    /// <b>AND IT USED TO FILTER TO <c>Seen >= Floor</c> FIRST, WHICH INVERTED IT
+    /// ENTIRELY.</b> Inexperienced commitments were immortal, so the ask —
+    /// <c>Count - Capacity</c> — routinely exceeded the whole eligible list and the
+    /// accuracy ordering never got to choose. Every commitment was deleted the moment
+    /// it had enough evidence to be judged, good or bad. On CIFAR the population's
+    /// <c>Seen</c> topped out at 19 against a floor of 20, for ten thousand
+    /// commitments over forty thousand rounds: not one ever crossed.
+    /// </para>
+    /// <para>
+    /// <b>IT COST MORE THAN HALF THE SCORE — 0.240 against 0.550 at ten-way chance
+    /// of 0.100</b>, and it had never fired anywhere else because no earlier world
+    /// overshot the capacity at all. <c>Graded</c> holds 371 commitments and the
+    /// multiplexer 203, so both sit under the cap and returned identical numbers with
+    /// this path disabled. The first world wide enough to reach the cap is the first
+    /// one that could have found this.
+    /// </para>
+    /// <para>
+    /// <b>SO EXPERIENCE PROTECTS THE ACCURATE RATHER THAN CONDEMNING EVERYONE.</b> A
+    /// commitment with no evidence sorts as if it were exactly average, which is what
+    /// it is — XCS deletes young classifiers too and only declines to let their
+    /// unformed fitness scale the odds. Making them immortal was the departure.
+    /// </para>
     /// </remarks>
     public int Cull()
     {
         if (Count <= _dials.Capacity) return 0;
 
-        var doomed = All
+        // AN UNJUDGED COMMITMENT SORTS AT THE MEDIAN OF THE JUDGED, WHICH IS THE ONLY
+        // WORLD-INDEPENDENT PLACE TO PUT IT. A fixed midpoint of 0.5 would be a claim
+        // about the world: on a ten-way problem the judged sit near 0.2, so half would
+        // rank ABOVE every commitment carrying evidence and the young would be immortal
+        // again by another route. The median introduces no dial and cannot be wrong
+        // about a world it has not seen.
+        var judged = All
             .Where(one => one.Seen >= _dials.Floor)
-            .OrderBy(one => one.Accuracy)
+            .Select(one => one.Accuracy)
+            .Order()
+            .ToList();
+
+        var unjudged = judged.Count == 0 ? 0.0 : judged[judged.Count / 2];
+
+        var doomed = All
+            .OrderBy(one => one.Seen >= _dials.Floor ? one.Accuracy : unjudged)
+            .ThenBy(one => one.Seen >= _dials.Floor ? 1 : 0)
             .ThenBy(one => one.Identity)
             .Take(Count - _dials.Capacity)
             .ToList();

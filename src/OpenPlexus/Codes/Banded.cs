@@ -35,6 +35,7 @@ public sealed class Banded<TFrame> : IQuantizer<TFrame>
 {
     private readonly Func<TFrame, IReadOnlyList<double>> _reading;
     private readonly byte _first;
+    private readonly int _width;
     private readonly int _bands;
     private readonly int _grains;
     private readonly int _spans;
@@ -45,20 +46,66 @@ public sealed class Banded<TFrame> : IQuantizer<TFrame>
     /// of them, one per grain</b>, so a coarse reading of one can never collide
     /// with a fine reading of another — see <see cref="Grains.Of"/>.
     /// </param>
+    /// <param name="width">How many dimensions the reading has.</param>
     /// <param name="bands">How finely the finest grain cuts the range.</param>
     /// <param name="grains">How many times to say it again, more coarsely.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// The block would not fit under 256, or the reading is not <paramref name="width"/> wide.
+    /// </exception>
+    /// <remarks>
+    /// <para>
+    /// <b>THE WIDTH IS TAKEN SO THE BLOCK CAN BE CHECKED, AND THAT CHECK WAS THE
+    /// WHOLE REASON FOR ADDING IT.</b> A modality is ONE BYTE and a dimension owns
+    /// <see cref="Spans"/> of them, so a reading of 128 dimensions at two spans runs
+    /// out — and the arithmetic that assigns them is an unchecked cast, so it WRAPPED
+    /// rather than failed. Dimension 0 and dimension 128 came out with identical
+    /// codes, which means two different images were the same observation and nothing
+    /// anywhere said so.
+    /// </para>
+    /// <para>
+    /// <b>IT WAS ALREADY KNOWN AND GUARDED IN EXACTLY ONE WORLD.</b>
+    /// <see cref="Worlds.Tending"/> refuses more plants than its block holds, and that
+    /// guard has sat there while <see cref="Machines.GradedRun"/> built the same type
+    /// with no check at all. A defence mounted on one caller is the failure this repo
+    /// keeps re-finding, so it moves here where it covers all of them.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE CEILING ON THIS FRONT END REACHING PERCEPTION.</b> Roughly
+    /// fifty dimensions at two spans is all a byte affords beside the modalities
+    /// already spoken for — an eight-by-eight thumbnail and nothing wider.
+    /// <see cref="Winnow"/> has no such ceiling because every code it emits rides on
+    /// ONE modality, which is a structural difference between the two front ends and
+    /// not a matter of degree.
+    /// </para>
+    /// </remarks>
     public Banded(
-        Func<TFrame, IReadOnlyList<double>> reading, byte first, int bands, int grains)
+        Func<TFrame, IReadOnlyList<double>> reading,
+        byte first,
+        int width,
+        int bands,
+        int grains)
     {
         ArgumentNullException.ThrowIfNull(reading);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(bands);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(grains);
 
+        var spans = Grains.Spans(bands, grains);
+        var wants = first + (width * spans);
+
+        if (wants > byte.MaxValue + 1)
+            throw new ArgumentOutOfRangeException(
+                nameof(width),
+                $"{width} dimensions at {spans} span(s) from modality {first} needs "
+                + $"{wants} modalities and a byte holds 256. Widen the grain, start the "
+                + "block lower, or use a front end whose codes share one modality.");
+
         _reading = reading;
         _first = first;
+        _width = width;
         _bands = bands;
         _grains = grains;
-        _spans = Grains.Spans(bands, grains);
+        _spans = spans;
     }
 
     /// <inheritdoc/>
@@ -76,6 +123,16 @@ public sealed class Banded<TFrame> : IQuantizer<TFrame>
     public IReadOnlyCollection<Code> Codify(TFrame observation)
     {
         var reading = _reading(observation);
+
+        // OR THE DECLARED WIDTH IS A PROMISE NOBODY KEPT. The block was sized against
+        // it at construction, so a reading that outgrows it wraps exactly as before
+        // and the guard above would be decoration.
+        if (reading.Count != _width)
+            throw new ArgumentOutOfRangeException(
+                nameof(observation),
+                $"this sense was built for {_width} dimensions and was handed "
+                + $"{reading.Count}.");
+
         var codes = ImmutableArray.CreateBuilder<Code>(reading.Count * _spans);
 
         for (var which = 0; which < reading.Count; which++)

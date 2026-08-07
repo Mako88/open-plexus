@@ -79,7 +79,12 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **Three — the scaling exponent.** How observations-to-target grows with the number
   of relevant bits is what predicts whether this ever reaches perception.
 - **Four — a world where `Winnow` does real work**, with a frozen published encoder as
-  an arm against raw. Only here does the project's own bet get measured.
+  an arm against raw. `Cifar` is that world; the raw half is measured and the encoder
+  arm is fetched and not mounted.
+- **The encoders are in `corpora/encoders` and `fetch.sh` gets them.** CLIP ViT-B/32
+  and MobileNetV3-Small, both frozen, so the red-ball property survives them.
+- **The cheap one needed its classifier cut off.** A vector of class scores is a
+  conclusion, and a front end may never have one.
 - **Resist polishing step one.** It is the least informative part when it passes.
 
 ### The primitive
@@ -418,6 +423,20 @@ change of architecture entirely.
 - **Two arms can peak at different budgets.** Compare PEAK TO PEAK.
 - **AND A MECHANISM CAN BE RIGHT AND ITS OBVIOUS WIRING WRONG.** Minting a name is not
   the same decision as where the name goes; `csharp` broke two controls learning that.
+- **A FILTER BEFORE A `Take` INVERTS AN EVICTION RULE WHEN THE POPULATION OVERSHOOTS.**
+  The ask exceeded the eligible list, so the accuracy ordering chose nothing:
+  everything experienced died and the young were immortal.
+- **AND THE TELL WAS A DISTRIBUTION, NOT A SCORE.** Every commitment in the population
+  topped out one short of the floor it was tested against. <b>A hard ceiling immediately
+  below a threshold is never a coincidence</b> — read the spread, not the mean.
+- **A GUARD MOUNTED ON ONE CALLER IS NOT MOUNTED.** `Tending` refused a modality block
+  that would not fit while `Banded` itself took anything; past 128 dimensions the byte
+  wrapped and two different pictures became one observation, silently.
+- **A CODE PATH GUARDED BY A CAP IS UNTESTED UNTIL SOMETHING REACHES THE CAP.** Both
+  of the above sat unexercised for the life of the repo because no world was wide
+  enough. `Graded` holds 371 commitments; `Cifar` holds ten thousand.
+- **ONE SEED IS NOT A COMPARISON AND WILL HAPPILY INVERT.** Winnowing beat bands on
+  seed one and lost to them over five. Error bars before ordering, every time.
 
 ---
 
@@ -438,6 +457,22 @@ change of architecture entirely.
 - **`Abstain` IS UNARMED IN ANY RUN.** Nothing in one process can die, so C3's third
   outcome is exercised only by unit tests. It reads zero for the same reason a check
   reads zero when it cannot fire.
+- **THE CENTRAL BET IS NOT SUPPORTED BY ITS OWN FIRST HONEST MEASUREMENT.** On CIFAR
+  at equal code count, bands are AHEAD of winnowing over five seeds — inside two
+  standard errors, so not a refutation, and nowhere near the claim.
+- **WINNOW'S ONLY DEMONSTRATED ADVANTAGE IS STRUCTURAL, AND IT IS REAL.** A modality
+  is one byte and `Banded` spends a block per dimension, so it tops out at a thumbnail
+  a few pixels across. Winnow has no such ceiling.
+- **MORE RESOLUTION IS WORSE, AND THAT IS OUTSIDE THE SEED SPREAD.** Four times the
+  information at four times the code count scores LOWER — the search cost this doc
+  predicted, on the first world that could show it.
+- **SO THE NEXT QUESTION IS WHETHER A TRAINED FRONT END CLEARS THE SAME BAR**, which
+  says whether the ceiling is the front end or the learner behind it.
+- **A WORLD THAT DRAWS WITH REPLACEMENT PAYS FOR MEMORISING, AND THIS ONE DID.** An
+  unbounded population's score tracked how often an image RECURRED rather than what it
+  had learnt; only a bounded one held up as recurrence went away.
+- **So any world built from a finite bag needs that sweep run** before its score means
+  anything at all.
 
 ---
 

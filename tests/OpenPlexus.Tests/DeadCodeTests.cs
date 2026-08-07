@@ -216,6 +216,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["LatentRun"] = Harness,
         ["MultiplexerRun"] = Harness,
         ["GradedRun"] = Harness,
+        ["CifarRun"] = Harness,
 
         ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
             + "cannot see a caller sitting beside it.",

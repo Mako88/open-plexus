@@ -260,7 +260,8 @@ public sealed class TendingRun : IDisposable
         // decision about how the brain thinks -- John's line, 2026-08-05.
         _senses = new Compound<Tended>(
         [
-            new Banded<Tended>(one => one.Damp, Tending.Damp, world.Bands, world.Grains),
+            new Banded<Tended>(
+                one => one.Damp, Tending.Damp, world.Plants, world.Bands, world.Grains),
             new Marked<Tended>(one => one.At, Tending.Where),
             new Marked<Tended>(one => one.Did, Tending.Did),
         ]);

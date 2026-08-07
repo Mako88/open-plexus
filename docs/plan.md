@@ -86,34 +86,18 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   conclusion, and a front end may never have one.
 - **AND THE ANSWER CAME BACK AGAINST THE BET.** See the grid under OPEN DEFECTS: the
   learner is fine and the front end is the ceiling.
-- **Five — a world whose answer depends on an ARRANGEMENT of recurring parts**, because
-  step four cannot test what this design is for and now says so in its own doc.
-- **CIFAR measures the front end and measures the bet not at all.** A draw is
-  single-shot and independent, so settlement is trivial, `Abstain` cannot fire, depth is
-  always one, and rungs three and four have nothing to bite on.
-- **A TEN-WAY LABEL HAS NO PARTS AND NO ARRANGEMENT**, so no score on it can tell a
-  front end that manufactures REUSABLE symbols from one that emits a holistic blob per
-  picture. Both separate ten classes; only the first leads anywhere.
-- **Which is the property reasoning actually needs** — the same code firing for the
-  same part across different wholes, so a scope naming it transfers.
-- **Rendered scenes, and GENERATED rather than fetched.** CLEVR is that shape and its
-  scene graph is the ANSWER KEY rather than the input, but generating them keeps the
-  property the multiplexer was chosen for: no corpus can contain its own answer.
-- **And it restores soundness by enumeration on a world made of photons**, which is the
-  instrument step four had to do without.
-- **AND IT MUST BE UNSCOREABLE BY A BAG OF PARTS, which is the whole design
-  constraint.** The same objects in two arrangements must have OPPOSITE answers.
-- **Or recognition passes as reasoning and step four repeats with better pictures.** A
-  front end that names the parts and forgets where they were should score CHANCE.
-- **Six — Monk-2, which is a day's work and arrives with a published number.** A
-  counting concept a conjunctive scope CANNOT express is the cheapest probe of the
-  language ceiling there is.
-- **Seven — the rung the failures demand, and never the rung that sounds next.**
-  Choosing one before a failure asks for it is hand-specified language bias by a side
-  door, which is the thing this design exists to avoid.
-- **THE LANGUAGE CEILING IS NOT THE BINDING CONSTRAINT YET AND THE GRID SAYS SO.** The
-  front end is worth many times what everything left between the learner and a linear
-  probe could be.
+- **Five — `Arranged` is built, and it inverted step four's verdict.** Same parts in two
+  arrangements, opposite answers, soundness by enumeration on photons.
+- **Six — the repair gate, which is where everything now points.** Three rules, three
+  worlds, three winners, and no combination best on two.
+- **AND THAT IS THE LIVE PROBLEM RATHER THAN THE NEXT RUNG.** A per-world optimum on a
+  brain dial is a world deciding how the brain thinks, which this design forbids.
+- **Seven — Monk-2, a day's work with a published number.** A counting concept a
+  conjunctive scope CANNOT express, and the cheapest language-ceiling probe there is.
+- **Eight — the rung the failures demand, and never the rung that sounds next.** Choosing
+  before a failure asks is hand-specified bias by a side door.
+- **AND NO FAILURE HAS ASKED YET.** On the one world that can say, twelve one-code rules
+  cover everything held out — so the language is nowhere near binding.
 - **The two-learner head-to-head is a side quest and blocks nothing**, being cheap now
   that both are co-resident.
 - **Resist polishing step one.** It is the least informative part when it passes.
@@ -319,8 +303,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   separable at some resolution and can never invent a direction.
 - **AND THE FLOOR IS WHERE THE SCORE GOES, MEASURED RATHER THAN FEARED.** Same learner,
   same world, raw pixels against a trained embedding — see `EncodedTests`.
-- **Rung five is the only escape**, and it builds features above the floor, never
-  below it. That made it a later luxury; it makes it the critical path now.
+- **BUT HOW THE PROJECTION IS AIMED BEAT BOTH, AND RUNG FIVE WAS NOT INVOLVED.** Reading
+  one patch at a time loses nothing a linear probe can find; reading the whole picture
+  loses a tenth. See `Tiling`.
 - **Nothing can be learnt from one example.** The gate needs N misses by construction,
   and the escape is not a smaller N — that is the 715-names failure — it is rung five.
 - **The table is what blows up, not the commitments.** Repair needs a table per code
@@ -433,6 +418,9 @@ condition is a superstition.
 | Reading C4 as a reason not to hold observations back | It constrains the LEARNER, not the experimenter, who is outside the machine and always was | Never. If the learner can tell it happened, that is a bug in the examination |
 | A score on a trained front end with no probe beside it | Two unknowns multiplied, and a published bar was measured on another bench | Never. Same features, same held-out set, or the bar is decoration |
 | Minting on every failure | It walks the whole `code -> outcome` space, which is a lookup table however it is scored | Never ungated. `Surprising.AnyFailure` survives as the ARM and not as a setting |
+| Tuning a vote dial until both worlds pass | The peak of `Sharpness` moves between worlds, so it is the world's number and not the brain's | Never per world. A vote whose shape needs no number at all |
+| Repair gated only on the vote being wrong | It hides the rules most needing specialisation — the ones wrong while the population is right | Never as the ONLY gate; `Mending` keeps it as an arm |
+| `Mending.Earned` — repair on any earned failure, ignoring children | `Uncovered` dominates it everywhere measured, being the same rule with the redundant repairs removed | Never. Revive the child test, not the arm |
 
 ---
 
@@ -517,15 +505,19 @@ change of architecture entirely.
   reads zero when it cannot fire.
 - **THE CENTRAL BET IS REFUTED ON THE ONLY WORLD BUILT TO TEST IT**, with a control in
   every cell of the grid. `EncodedTests` holds it and the commit records the numbers.
-- **THE FRONT END IS THE CEILING AND THE LEARNER IS NOT.** Changing only the front end
-  moves the same learner most of the way to the probe's score.
+- **THE FRONT END IS THE CEILING AND THE LEARNER IS NOT — ON CIFAR.** Changing only the
+  front end moves the same learner most of the way to the probe's score.
+- **AND ON `Arranged` IT IS FLATLY THE REVERSE.** A probe on the tiled codes loses
+  nothing a probe on pixels finds, a handful of one-code rules cover every withheld
+  scene, and the machine still falls well short of both.
 - **On raw pixels the population and the probe are TIED**, so the information is not
   there for either to find. Nothing done to the learner could have bought it.
 - **AND THE COMMITMENT MACHINERY IS COMPETITIVE GIVEN SYMBOLS WORTH HAVING**, recovering
   most of a linear probe on the identical vectors. That was not the expected result.
 - **SO WHAT FAILS IS *A FIXED PROJECTION MANUFACTURES THE SYMBOLS*, and not the rest.**
-- **THE ESCAPE IS RUNG FIVE AND IT IS THE CRITICAL PATH NOW**, not a later luxury. It
-  is the only mechanism here that can raise a front-end floor.
+- **RUNG FIVE WAS CALLED THE ONLY ESCAPE AND PATCH TOKENS GOT THERE FIRST.** A front end
+  that reads parts rather than pictures raised the floor to perfect on the one world
+  where perfect is knowable, and it abstracts nothing.
 - **The seed spread on that grid is unmeasured**, which is not the same as small.
 - **AND GOOD SYMBOLS ARE NOT FREE: the encoded arm costs an order more codes a moment**,
   so the price of the ceiling coming off is search.
@@ -561,6 +553,18 @@ change of architecture entirely.
   returns at scale.
 - **AND THE GATE HAS ERROR BARS NOW: it leads on EVERY seed, counted both ways.** The
   accuracy ordering is no longer the single run this doc warns about.
+- **AND THE SAME GATE IS BEHIND ON EVERY SEED ON `Arranged`, ON BOTH FRONT ENDS.**
+  Self-limiting genesis stops early and never mints most of the rules that solve the
+  world. Fork 40 asked whether that happens; it does.
+- **THREE DIALS IN A ROW HAVE A BEST VALUE THAT MOVES WITH THE WORLD.** `Sharpness`,
+  `Weighing` and `Mending` each win one world and ruin another, and no combination wins
+  two. That is a world reaching into the brain.
+- **AND THE REASON IS NOT A LEVEL NOBODY TUNED.** *Which rule needs specialising* and
+  *did the population get this wrong* are different questions, and whether they align
+  is a fact about the world. No per-round switch serves both.
+- **THE VOTE THREW AWAY PART OF A WORLD IT HAD ALREADY SOLVED.** Every sound rule
+  resident and believed well above the false ones, and the readout still lost — a crowd
+  outvoting one rule that is always right.
 
 ---
 
@@ -599,11 +603,12 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **34** | Rung five names nothing at six bits and names and STACKS at eleven. The plan said this world had an answer key for it; it does not, because its structure is positional. Open |
 | **35** | More unsound commitments resident than sound ones, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
 | **36** | Graded codes: does `Winnow` emitting several codes per reading make a position nameable, and what does it cost the search and the soundness check? Open |
-| **37** | The repair budget has an interior optimum that moves with the relevant bits. The driver nobody has wired: whether a parent still has failures no child covers. Open |
+| **37** | The repair budget has an interior optimum moving with the relevant bits. Its driver is BUILT — `Mending.Uncovered` asks whether any firing commitment narrows this one. Best on the clean multiplexer, ruinous on `Arranged`. Open |
 | **38** | Spreading a reading over its range costs most of the score at both front ends. Is that fragmentation, or the search the extra codes buy? Open |
 | **39** | A reading under about ten dimensions has too few distinct wirings for a projection to expand into. Population coding has a floor, and it is not documented anywhere. Open |
-| **40** | Does `Surprising.Unaccounted` starve genesis at some width? It is self-limiting by construction, which is also how a mechanism quietly stops. The signal nobody reads: whether a failure's outcome is proposed by anything at all. Open |
+| **40** | Does `Surprising.Unaccounted` starve genesis? YES, and at a WORLD rather than a width. On `Arranged` it stops early and holds a fraction of the sound one-code rules the ungated arm does, behind on every seed. Closed |
 | **41** | The held-out gap as a function of RECURRENCE. A bounded population shows none at four draws an image; the question is where it opens, and that is the number that says how big a bag a world needs. Open |
-| **42** | Rung five is the critical path now, being the only mechanism that raises a front-end floor. Does a minted name over co-firing codes close any of the gap between raw pixels and a trained embedding? Open |
+| **42** | Rung five was called the only mechanism that raises a front-end floor. Patch tokens raised it to perfect on `Arranged` while abstracting nothing, so the question is now whether rung five buys anything a better-aimed projection does not. Open |
 | **43** | Given symbols worth having, a conjunctive rule learner reaches 86% of a linear probe on the same vectors. What is the remaining 14%, and is it the scope language or the vote? Open |
 | **44** | The tiled front end's patch is the arranged world's cell, so it is told where the parts are. Does the advantage survive a patch grid that does not divide the world's? Open |
+| **45** | Three repair gates, three worlds, three winners, and conjoining two keeps one and loses the other. Is there a per-COMMITMENT signal separating *needs specialising* from *is being outvoted*? Open |

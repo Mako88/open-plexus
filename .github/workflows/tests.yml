@@ -53,10 +53,26 @@ jobs:
         with:
           dotnet-version: "10.0.x"
 
-      # THE CORPORA ARE NOT IN THE REPOSITORY and are about a hundred megabytes,
+      # THE CORPORA ARE NOT IN THE REPOSITORY and are about six hundred megabytes,
       # so they are cached rather than fetched every run. Keyed on the fetch
       # script: it names the URLs and what is extracted, so a change to either
       # invalidates the cache, which is the only thing that should.
+      #
+      # AND THE PATH LIST WENT STALE WHEN TWO LARGE CORPORA WERE ADDED TO THE
+      # SCRIPT AND NOT TO THIS. CIFAR-10 is 162 MB and the frozen encoders are
+      # 352 MB, so every run re-fetched half a gigabyte while reporting a cache
+      # hit on the four small ones. It was invisible until it was not: a run
+      # spent 30m15s here and died with curl's exit 28, which is CIFAR's own
+      # `--max-time 1800` elapsing against a slow academic host. The suite never
+      # built.
+      #
+      # A CACHE THAT COVERS SOME OF WHAT IT IS FOR STILL READS AS A HIT, which is
+      # this project's own trap wearing CI clothes -- the check ran, reported
+      # success, and protected nothing that mattered.
+      #
+      # THE KEY CARRIES A VERSION BECAUSE THE HASH ALONE WOULD NOT REFRESH IT.
+      # `fetch.sh` is unchanged, so the old key still matches and would restore
+      # the four-path cache and never save the new paths.
       - name: Cache corpora
         id: corpora
         uses: actions/cache@v4
@@ -66,7 +82,9 @@ jobs:
             corpora/CLEVR_v1.0
             corpora/tatoeba_eng.tsv
             corpora/clutrr_test.csv
-          key: corpora-${{ hashFiles('corpora/fetch.sh') }}
+            corpora/cifar-10-batches-bin
+            corpora/encoders
+          key: corpora-v2-${{ hashFiles('corpora/fetch.sh') }}
 
       # NOT CONDITIONAL ON A CACHE HIT. The script already checks for what it
       # fetches and says "already at ..." -- so a partial cache repairs itself

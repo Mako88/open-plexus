@@ -187,20 +187,39 @@ public sealed class Population
                 _dials.Recency);
     }
 
-    /// <summary>Mints a one-code commitment for everything live, where none is held.</summary>
+    /// <summary>Mints a one-code commitment for everything live, if the moment surprised.</summary>
     /// <param name="moment">What was live.</param>
     /// <param name="arrived">What followed it.</param>
-    /// <returns>How many were new.</returns>
+    /// <param name="firing">What fired, for asking whether anything accounted for it.</param>
+    /// <returns>How many were new, and zero where nothing was surprising.</returns>
     /// <remarks>
+    /// <para>
     /// <b>PROMISCUOUS ON PURPOSE, AND THE GATES DO THE WORK.</b> Popper is generate,
     /// test, constrain; blame and repair are the second and third, and without this
     /// there is no first — nothing to be wrong, so nothing to learn from. One code
     /// rather than the whole moment, because a whole-moment scope never fires twice
     /// and a covering probability is a mode declaration wearing a hat.
+    /// </para>
+    /// <para>
+    /// <b>AND THE GATE THE PLAN NAMED HAD NEVER BEEN MOUNTED, so <i>promiscuous</i>
+    /// meant EXHAUSTIVE.</b> Minting on every failure walks the whole
+    /// <c>code → outcome</c> space given enough failures: on winnowed CIFAR that space
+    /// is 25,600 and the population reached 23,762 against a capacity of 2,000. See
+    /// <see cref="Surprising"/> for why <i>nothing proposed it</i> is the condition and
+    /// <i>the vote was wrong</i> is not.
+    /// </para>
     /// </remarks>
-    public int Cover(IReadOnlySet<Code> moment, Code arrived)
+    public int Cover(IReadOnlySet<Code> moment, Code arrived, ImmutableArray<Commitment> firing)
     {
         ArgumentNullException.ThrowIfNull(moment);
+
+        // THE GATE IS READ HERE BECAUSE THIS IS WHERE THE DIALS LIVE. Putting it in
+        // `Cycle` would give the learning loop a second opinion about the brain's
+        // numbers, and there is exactly one place those are allowed to be read.
+        if (_dials.Surprising == Surprising.Unaccounted
+            && !firing.IsDefaultOrEmpty
+            && firing.Any(one => one.Expects == arrived))
+            return 0;
 
         var minted = 0;
 

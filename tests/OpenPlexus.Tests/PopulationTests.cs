@@ -288,13 +288,53 @@ public sealed class PopulationTests
     {
         var held = new Population(new CommittingSettings(), seed: 1);
 
-        Assert.Equal(3, held.Cover(Moment(1, 2, 3), Says(1)));
+        // NOTHING FIRED, so every gate agrees the moment was unaccounted for.
+        Assert.Equal(3, held.Cover(Moment(1, 2, 3), Says(1), []));
         Assert.Equal(3, held.Count);
-        Assert.Equal(0, held.Cover(Moment(1, 2, 3), Says(1)));
+        Assert.Equal(0, held.Cover(Moment(1, 2, 3), Says(1), []));
 
         Assert.All(held.All, one => Assert.Single(one.Scope));
 
         // A DIFFERENT OUTCOME IS A DIFFERENT CLAIM, so the same moment mints again.
-        Assert.Equal(3, held.Cover(Moment(1, 2, 3), Says(0)));
+        Assert.Equal(3, held.Cover(Moment(1, 2, 3), Says(0), []));
+    }
+
+    /// <summary>
+    /// <b>A FAILURE THE POPULATION ALREADY HAD AN ACCOUNT OF IS NOT SURPRISING.</b>
+    /// </summary>
+    /// <remarks>
+    /// Something fired and proposed what arrived and was outvoted; that is a claim the
+    /// population holds and weighed badly, which is repair's business. Minting there
+    /// fills the population with restatements of what it already says — and on a wide
+    /// front end it walks the whole <c>code → outcome</c> space.
+    /// </remarks>
+    [Fact]
+    public void Genesis_is_gated_on_nothing_having_proposed_what_arrived()
+    {
+        foreach (var rule in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
+        {
+            var held = new Population(new CommittingSettings { Surprising = rule }, seed: 1);
+
+            // ONE COMMITMENT THAT PROPOSES OUTCOME 1, and a moment where it fires.
+            held.Add(One(1, 1));
+
+            var moment = Moment(1, 2, 3);
+            var firing = held.Firing(moment);
+
+            Assert.Single(firing);
+
+            // THE VOTE SAID 1 AND 1 ARRIVED IS NOT A FAILURE AT ALL; what is being
+            // tested is the failure where something DID propose what arrived.
+            var minted = held.Cover(moment, Says(1), firing);
+
+            if (rule == Surprising.Unaccounted)
+                Assert.Equal(0, minted);
+            else
+                Assert.Equal(2, minted);
+
+            // AND NEITHER RULE IS SATISFIED BY AN OUTCOME NOBODY PROPOSED, or the gate
+            // would be refusing genesis outright rather than refusing restatements.
+            Assert.Equal(3, held.Cover(moment, Says(7), firing));
+        }
     }
 }

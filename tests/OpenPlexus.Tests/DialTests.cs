@@ -98,6 +98,16 @@ public sealed class DialTests(ITestOutputHelper output)
             + "something rather than a mechanism and its own absence. WHICH rule "
             + "picks the added condition is not a quantity",
 
+        ["Surprising"] =
+            "which rule decides a moment was unaccounted for, and not a quantity "
+            + "either -- `AnyFailure` is the arm and it is what ran before this was "
+            + "mounted at all. THE THING A CONTROLLER WOULD HUNT IS ALREADY GONE: "
+            + "minting on every failure walks the whole code-to-outcome space, which "
+            + "on winnowed CIFAR is 25,600 claims and reached 23,762. Gating on "
+            + "whether ANYTHING proposed what arrived is self-limiting by "
+            + "construction -- promiscuous while the population accounts for nothing "
+            + "and quiet once it does -- so there is no level here to aim at",
+
         ["Fanout"] =
             "a choice between sending to every partner and sending above the row's "
             + "own shoulder. The quantity that could be hunted is the WIDTH, and "
@@ -475,6 +485,20 @@ public sealed class DialTests(ITestOutputHelper output)
         // THE CENSUS WAS EXTENDED IN THE SAME EDIT, and that matters more than the
         // count. A second brain with its own settings record would have been
         // invisible to this file exactly as eleven `*Run` arguments once were.
-        Assert.Equal(20, HandSet.Count);
+        //
+        // AND TO TWENTY-ONE FOR `Surprising`, WHICH IS THE SAME NAME COMING BACK IN A
+        // DIFFERENT SHAPE AND OWES AN ARGUMENT FOR THAT. It left in the cull above as
+        // an on/off flag, and John's rule is right: a switch whose off position is
+        // "not running" was never a level to hunt. What returns is two named rules
+        // that BOTH mint -- `AnyFailure` on any failure at all, `Unaccounted` only
+        // where nothing that fired proposed what arrived -- which is the shape
+        // `Choosing` and `Fanout` already have, and it is a comparison rather than a
+        // mechanism beside its own absence.
+        //
+        // IT ALSO EARNED THE RETURN, WHICH A FLAG NEVER DID. On winnowed CIFAR the
+        // old rule minted 414,087 commitments in twenty thousand rounds against
+        // 23,296, ran seven and a half times slower, and scored LOWER. A dial nobody
+        // can hunt is still worth having when the two rules differ by that much.
+        Assert.Equal(21, HandSet.Count);
     }
 }

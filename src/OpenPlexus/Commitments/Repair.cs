@@ -17,9 +17,55 @@ public enum Choosing
     Present,
 }
 
+/// <summary>What counts as surprising enough to mint on.</summary>
+/// <remarks>
+/// <b>Two rules that both do something, exactly as <see cref="Choosing"/> is.</b> A
+/// boolean would put the arm in the code forever as a way of not running genesis
+/// properly; naming both makes it a comparison.
+/// </remarks>
+public enum Surprising
+{
+    /// <summary>Any failure at all. What ran before anything gated this.</summary>
+    AnyFailure,
+
+    /// <summary>Nothing that fired even proposed what arrived.</summary>
+    Unaccounted,
+}
+
 /// <summary>Every number the commitment machinery is allowed to have.</summary>
 public sealed record CommittingSettings
 {
+    /// <summary>
+    /// What has to be true of a failure before genesis mints on it.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PLAN SAYS `Surprise` GATES GENESIS AND HAS NEVER RUN, AND ON A WIDE
+    /// FRONT END THAT IS NOT A DETAIL.</b> Covering mints one commitment per live code,
+    /// and a winnowed eight-by-eight thumbnail is 128 live codes over a sheet of 2,560
+    /// cells. With ten outcomes the complete one-code space is 25,600 — and minting on
+    /// every failure took the population to 23,762 against a capacity of 2,000. Genesis
+    /// was not promiscuous, it was ENUMERATING, and a complete enumeration of
+    /// <c>code → outcome</c> is a lookup table however it is scored.
+    /// </para>
+    /// <para>
+    /// <b>AND THE DIVISION OF LABOUR IS XCS'S OWN.</b> Covering exists for a moment
+    /// nothing accounts for; the wrongness of a rule that DID account for it is what
+    /// repair is for. A failure where something fired and proposed the right answer and
+    /// was outvoted needs no new commitment — it needs the vote to weigh better, which
+    /// accuracy already does. Minting there fills the population with restatements of
+    /// claims it already holds.
+    /// </para>
+    /// <para>
+    /// <b>SO IT IS PROMISCUOUS EARLY AND QUIET LATE, WHICH IS THE SHAPE THE PLAN ASKED
+    /// FOR.</b> With nothing held, nothing proposes anything and every failure mints.
+    /// Once the outcome space is covered, the right answer is usually proposed by
+    /// something among the hundreds that fire, and genesis stops on its own rather than
+    /// against a number somebody chose.
+    /// </para>
+    /// </remarks>
+    public Surprising Surprising { get; init; } = Surprising.Unaccounted;
+
     /// <summary>How fast the local estimate forgets, in 0..1.</summary>
     /// <remarks>
     /// <b>Widrow-Hoff's rate, and fork 27 in one number.</b> At one it remembers only

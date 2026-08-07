@@ -70,6 +70,15 @@ public sealed class Cycle
     /// <summary>Children minted by repair.</summary>
     public long Repaired { get; private set; }
 
+    /// <summary>Commitments minted by genesis.</summary>
+    /// <remarks>
+    /// <b>REPORTED BECAUSE A GATE THAT DOES NOTHING AND A GATE THAT DOES EVERYTHING
+    /// LOOK ALIKE FROM THE SCORE.</b> The resident count is what survives culling and
+    /// says nothing about the rate this ran at — and the rate is the whole question,
+    /// since minting on every failure enumerates the <c>code → outcome</c> space.
+    /// </remarks>
+    public long Minted { get; private set; }
+
     /// <summary>Predictions over the last tenth that were right.</summary>
     private long Settled { get; set; }
 
@@ -135,7 +144,11 @@ public sealed class Cycle
         // COVERING AND REPAIR BOTH RUN ONLY ON A FAILURE. Minting every round would
         // fill the population with restatements of moments already predicted, and
         // repairing every round would spend the budget on commitments that work.
-        _held.Cover(moment, arrived);
+        //
+        // AND COVERING IS GATED AGAIN INSIDE, on whether anything that fired proposed
+        // what arrived -- a failure the population already had an account of is
+        // repair's business and not genesis's. `Surprising` is the dial.
+        Minted += _held.Cover(moment, arrived, firing);
 
         if (_held.Mend(firing, arrived) is not null) Repaired++;
     }

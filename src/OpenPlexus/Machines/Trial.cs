@@ -71,6 +71,15 @@ public sealed record Tally
     /// <summary>Children minted by repair.</summary>
     public required long Repaired { get; init; }
 
+    /// <summary>Commitments minted by genesis, before anything culled them.</summary>
+    /// <remarks>
+    /// <b>The rate genesis ran at, which <see cref="Resident"/> cannot show.</b> A
+    /// population held at capacity looks identical whether covering minted two hundred
+    /// commitments or two hundred thousand, and the difference between those is the
+    /// difference between learning and enumerating.
+    /// </remarks>
+    public required long Minted { get; init; }
+
     /// <summary>Commitments resident at the end.</summary>
     public required int Resident { get; init; }
 
@@ -181,6 +190,7 @@ public sealed class Trial<TSeen>
             Recent = cycle.Recent,
             Reached = cycle.Reached,
             Repaired = cycle.Repaired,
+            Minted = cycle.Minted,
             Resident = held.Count,
             Named = held.Names.Count,
             Stacked = held.Names.Means.Count(one => one.Value.Any(held.Names.Knows)),

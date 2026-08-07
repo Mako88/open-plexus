@@ -66,6 +66,7 @@ public sealed class SeparationTests
             if (!Path.GetFileName(path).StartsWith("Multiplexer", StringComparison.Ordinal)
                 && !Path.GetFileName(path).StartsWith("Graded", StringComparison.Ordinal)
                 && !Path.GetFileName(path).StartsWith("Cifar", StringComparison.Ordinal)
+                && !Path.GetFileName(path).StartsWith("Arranged", StringComparison.Ordinal)
                 && !Path.GetFileName(path).StartsWith("IWorld", StringComparison.Ordinal))
                 continue;
 

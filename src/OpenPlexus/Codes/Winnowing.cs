@@ -49,6 +49,23 @@ public sealed class Winnowing : IQuantizer<IReadOnlyList<double>>
     public IReadOnlyCollection<Code> Codify(IReadOnlyList<double> observation) =>
         _winnow.Of(observation);
 
+    /// <summary>How many distinct things this front end has said.</summary>
+    /// <remarks>
+    /// <b>PASSED THROUGH BECAUSE THE COLLAPSE IS INVISIBLE FROM THE OTHER SIDE.</b> A
+    /// front end emitting one tag for every reading in the world looks, to whatever
+    /// consumes it, exactly like a world with one thing in it — and the constructor's
+    /// guard reads the DECLARED width, which real data routinely overstates. Reaching
+    /// it required holding a <see cref="Winnow"/> rather than a translation, so nothing
+    /// that took the arm could read it.
+    /// </remarks>
+    public int Distinct => _winnow.Distinct;
+
+    /// <summary>How many readings it was handed.</summary>
+    /// <remarks>
+    /// <b>The denominator, and without it <see cref="Distinct"/> says nothing.</b>
+    /// </remarks>
+    public long Emitted => _winnow.Emitted;
+
     /// <summary>How wide a sheet a reading of this many dimensions can support.</summary>
     /// <param name="width">How many dimensions are read.</param>
     /// <remarks>

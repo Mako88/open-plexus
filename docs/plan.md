@@ -606,3 +606,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **41** | The held-out gap as a function of RECURRENCE. A bounded population shows none at four draws an image; the question is where it opens, and that is the number that says how big a bag a world needs. Open |
 | **42** | Rung five is the critical path now, being the only mechanism that raises a front-end floor. Does a minted name over co-firing codes close any of the gap between raw pixels and a trained embedding? Open |
 | **43** | Given symbols worth having, a conjunctive rule learner reaches 86% of a linear probe on the same vectors. What is the remaining 14%, and is it the scope language or the vote? Open |
+| **44** | The tiled front end's patch is the arranged world's cell, so it is told where the parts are. Does the advantage survive a patch grid that does not divide the world's? Open |

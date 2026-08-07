@@ -96,7 +96,19 @@ jobs:
       # came to say "12 red, every one diagnosed" on a run that was 35 red. A
       # suite nobody can read the failure of is a suite that gets diagnosed by
       # sampling.
+      # SWEEPS ARE EXCLUDED AND THEY ARE NOT TESTS. A fact marked `kind=sweep`
+      # asserts nothing -- it prints a grid, because a threshold written before
+      # the first run is a prediction dressed as a check. One session added
+      # several hundred runs of twenty and thirty thousand rounds that way and
+      # took the suite past the timeout above, which does not merely lose the
+      # numbers: IT KILLS THE RUN THAT WOULD HAVE REPORTED THE REAL FAILURES,
+      # and the note on `cancel-in-progress` is about exactly that outcome
+      # arriving by a different road.
+      #
+      # `dotnet test --filter "kind=sweep"` takes the measurements again. They
+      # are still compiled here, so a rotted reference still fails the build.
       - name: Test
         run: |
           dotnet test --configuration Debug --nologo --no-build \
+            --filter "kind!=sweep" \
             --verbosity quiet --logger "console;verbosity=normal"

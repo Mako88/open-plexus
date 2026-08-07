@@ -54,6 +54,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void The_gap_between_what_it_was_shown_and_what_it_was_not()
     {
         foreach (var rounds in new[] { 10_000, 40_000 })
@@ -87,6 +88,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void What_the_vote_costs_when_the_population_already_knows_which_rules_are_true()
     {
         // THE ONE ARM WITH A CLEAN TARGET, SWEPT ON THE ONE DIAL THE PLAN NAMED. Tiled
@@ -142,6 +144,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void And_the_other_half_of_the_decoupling_where_the_target_is_known()
     {
         // THE SIDE OF THE PREDICTION THAT MUST NOT MOVE. Repair on this world is not
@@ -173,6 +176,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_the_gate_that_was_load_bearing_on_photographs_is_one_here()
     {
         // ONE SEED IS NOT A COMPARISON AND WILL HAPPILY INVERT, which this repo has

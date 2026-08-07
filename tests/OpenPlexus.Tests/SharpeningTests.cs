@@ -42,6 +42,7 @@ public sealed class SharpeningTests(ITestOutputHelper output)
             seed).Run(Rounds);
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_a_sharper_vote_is_worth_anything_where_the_rules_can_be_checked()
     {
         foreach (var address in new[] { 2, 3 })
@@ -93,6 +94,7 @@ public sealed class SharpeningTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void An_expectation_worth_its_best_advocate_rather_than_all_of_them()
     {
         // THE POINT OF THE ARM IS THAT IT NEEDS NO PER-WORLD NUMBER. A sum over N
@@ -146,6 +148,7 @@ public sealed class SharpeningTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Repair_that_waits_for_a_commitment_to_be_wrong_rather_than_the_vote()
     {
         // THE INCONSISTENCY, ARGUED FROM THE PLAN'S OWN TEXT BEFORE IT WAS MEASURED. An
@@ -211,6 +214,7 @@ public sealed class SharpeningTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void And_whether_a_sharp_vote_is_only_sharp_because_nothing_lies_to_it()
     {
         // THE WAY THE RESULT COULD BE A TRAP, TESTED RATHER THAN CAVEATED. Raising the

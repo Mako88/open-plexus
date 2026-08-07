@@ -465,6 +465,9 @@ change of architecture entirely.
   ELSE.** *Promiscuous on purpose* meant EXHAUSTIVE for the life of the repo.
 - **A COST CAN BE IN MEMORY WHILE EVERY INSTRUMENT WATCHES TIME.** No report has ever
   carried a byte count, so what actually bounded the run was invisible to all of them.
+- **AN ONLINE SCORE BELOW WHAT THE FINAL POPULATION GETS ON FRESH OBSERVATIONS IS A
+  CHURN SIGNAL.** It means the population is being destroyed and rebuilt faster than the
+  trailing window can read it, and the run understates its own machine.
 - **A DEPENDENCY'S DEFAULTS CAN BREAK REPRODUCIBILITY SILENTLY.** Parallel inference
   reorders float reductions, and a code is a QUANTISED number — so a reading at a band
   boundary codes differently run to run. Fork 12, arriving from outside.
@@ -525,8 +528,8 @@ change of architecture entirely.
   commitments times distinct codes, exactly as this doc predicted.
 - **Gating genesis attacks that at the root**, and the spill is still the answer when it
   returns at scale.
-- **THE GATE'S SCORE IS ONE SEED AND IS NOT YET A COMPARISON.** Its mint rate and clock
-  are structural; the accuracy ordering is a single run and this doc says that inverts.
+- **AND THE GATE HAS ERROR BARS NOW: it leads on EVERY seed, counted both ways.** The
+  accuracy ordering is no longer the single run this doc warns about.
 
 ---
 

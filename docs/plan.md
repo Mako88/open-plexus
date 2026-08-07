@@ -79,12 +79,28 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **Three — the scaling exponent.** How observations-to-target grows with the number
   of relevant bits is what predicts whether this ever reaches perception.
 - **Four — a world where `Winnow` does real work**, with a frozen published encoder as
-  an arm against raw. `Cifar` is that world; the raw half is measured and the encoder
-  arm is fetched and not mounted.
+  an arm against raw. `Cifar` is that world and BOTH HALVES ARE NOW MEASURED.
 - **The encoders are in `corpora/encoders` and `fetch.sh` gets them.** CLIP ViT-B/32
   and MobileNetV3-Small, both frozen, so the red-ball property survives them.
 - **The cheap one needed its classifier cut off.** A vector of class scores is a
   conclusion, and a front end may never have one.
+- **AND THE ANSWER CAME BACK AGAINST THE BET.** See the grid under OPEN DEFECTS: the
+  learner is fine and the front end is the ceiling.
+- **Five — a world whose answer depends on an ARRANGEMENT of recurring parts**, because
+  step four cannot test what this design is for and now says so in its own doc.
+- **CIFAR measures the front end and measures the bet not at all.** A draw is
+  single-shot and independent, so settlement is trivial, `Abstain` cannot fire, depth is
+  always one, and rungs three and four have nothing to bite on.
+- **A TEN-WAY LABEL HAS NO PARTS AND NO ARRANGEMENT**, so no score on it can tell a
+  front end that manufactures REUSABLE symbols from one that emits a holistic blob per
+  picture. Both separate ten classes; only the first leads anywhere.
+- **Which is the property reasoning actually needs** — the same code firing for the
+  same part across different wholes, so a scope naming it transfers.
+- **Rendered scenes, and GENERATED rather than fetched.** CLEVR is that shape and its
+  scene graph is the ANSWER KEY rather than the input, but generating them keeps the
+  property the multiplexer was chosen for: no corpus can contain its own answer.
+- **And it restores soundness by enumeration on a world made of photons**, which is the
+  instrument step four had to do without.
 - **Resist polishing step one.** It is the least informative part when it passes.
 
 ### The primitive
@@ -286,8 +302,10 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   reads them as a refutation.
 - **The front end's resolution is a hard floor.** A fixed projection can split what is
   separable at some resolution and can never invent a direction.
+- **AND THE FLOOR IS WHERE THE SCORE GOES, MEASURED RATHER THAN FEARED.** Same learner,
+  same world, raw pixels against a trained embedding — see `EncodedTests`.
 - **Rung five is the only escape**, and it builds features above the floor, never
-  below it.
+  below it. That made it a later luxury; it makes it the critical path now.
 - **Nothing can be learnt from one example.** The gate needs N misses by construction,
   and the escape is not a smaller N — that is the 715-names failure — it is rung five.
 - **The table is what blows up, not the commitments.** Repair needs a table per code
@@ -390,6 +408,9 @@ condition is a superstition.
 | Clusters by modality | Splits picture from sound, the one link this design exists to make | Never |
 | A trained quantiser fitted per machine | Two machines fitted on different samples code the same input differently | A codebook reaching the same answer from any sample ORDER |
 | Fixing a perception failure by changing the FEATURE BASIS | The fitted-quantiser refutation by a side door, and it gets proposed the first time a world will not code | Never. Resolution only; a new feature is a minted name above the codes |
+| Reading C4 as a reason not to hold observations back | It constrains the LEARNER, not the experimenter, who is outside the machine and always was | Never. If the learner can tell it happened, that is a bug in the examination |
+| A score on a trained front end with no probe beside it | Two unknowns multiplied, and a published bar was measured on another bench | Never. Same features, same held-out set, or the bar is decoration |
+| Minting on every failure | It walks the whole `code -> outcome` space, which is a lookup table however it is scored | Never ungated. `Surprising.AnyFailure` survives as the ARM and not as a setting |
 
 ---
 
@@ -437,6 +458,18 @@ change of architecture entirely.
   enough. `Graded` holds 371 commitments; `Cifar` holds ten thousand.
 - **ONE SEED IS NOT A COMPARISON AND WILL HAPPILY INVERT.** Winnowing beat bands on
   seed one and lost to them over five. Error bars before ordering, every time.
+- **AND ITS DUAL: A PERIODIC SWEEP AGAINST A PER-ROUND RATE THAT SCALES WITH THE FRONT
+  END.** Culling on the calendar while genesis mints per live code holds a population at
+  many times its capacity. `Graded` is too small to show it.
+- **A GATE NAMED IN THE PLAN AND MOUNTED NOWHERE MAKES THE WORD IT GATES MEAN SOMETHING
+  ELSE.** *Promiscuous on purpose* meant EXHAUSTIVE for the life of the repo.
+- **A COST CAN BE IN MEMORY WHILE EVERY INSTRUMENT WATCHES TIME.** No report has ever
+  carried a byte count, so what actually bounded the run was invisible to all of them.
+- **A DEPENDENCY'S DEFAULTS CAN BREAK REPRODUCIBILITY SILENTLY.** Parallel inference
+  reorders float reductions, and a code is a QUANTISED number — so a reading at a band
+  boundary codes differently run to run. Fork 12, arriving from outside.
+- **TAKING OUTPUT ZERO OF A GRAPH IS A SILENT WRONG ANSWER.** A pooled embedding and a
+  per-token hidden state are both plausible tensors and only one is a reading. Name it.
 
 ---
 
@@ -457,22 +490,43 @@ change of architecture entirely.
 - **`Abstain` IS UNARMED IN ANY RUN.** Nothing in one process can die, so C3's third
   outcome is exercised only by unit tests. It reads zero for the same reason a check
   reads zero when it cannot fire.
-- **THE CENTRAL BET IS NOT SUPPORTED BY ITS OWN FIRST HONEST MEASUREMENT.** On CIFAR
-  at equal code count, bands are AHEAD of winnowing over five seeds — inside two
-  standard errors, so not a refutation, and nowhere near the claim.
+- **THE CENTRAL BET IS REFUTED ON THE ONLY WORLD BUILT TO TEST IT**, with a control in
+  every cell of the grid. `EncodedTests` holds it and the commit records the numbers.
+- **THE FRONT END IS THE CEILING AND THE LEARNER IS NOT.** Changing only the front end
+  moves the same learner most of the way to the probe's score.
+- **On raw pixels the population and the probe are TIED**, so the information is not
+  there for either to find. Nothing done to the learner could have bought it.
+- **AND THE COMMITMENT MACHINERY IS COMPETITIVE GIVEN SYMBOLS WORTH HAVING**, recovering
+  most of a linear probe on the identical vectors. That was not the expected result.
+- **SO WHAT FAILS IS *A FIXED PROJECTION MANUFACTURES THE SYMBOLS*, and not the rest.**
+- **THE ESCAPE IS RUNG FIVE AND IT IS THE CRITICAL PATH NOW**, not a later luxury. It
+  is the only mechanism here that can raise a front-end floor.
+- **The seed spread on that grid is unmeasured**, which is not the same as small.
+- **AND GOOD SYMBOLS ARE NOT FREE: the encoded arm costs an order more codes a moment**,
+  so the price of the ceiling coming off is search.
+- **On CIFAR at equal code count, bands are AHEAD of winnowing over five seeds** —
+  inside two standard errors, so not a refutation, and nowhere near the claim.
 - **WINNOW'S ONLY DEMONSTRATED ADVANTAGE IS STRUCTURAL, AND IT IS REAL.** A modality
   is one byte and `Banded` spends a block per dimension, so it tops out at a thumbnail
   a few pixels across. Winnow has no such ceiling.
 - **MORE RESOLUTION IS WORSE, AND THAT IS OUTSIDE THE SEED SPREAD.** Four times the
   information at four times the code count scores LOWER — the search cost this doc
   predicted, on the first world that could show it.
-- **SO THE NEXT QUESTION IS WHETHER A TRAINED FRONT END CLEARS THE SAME BAR**, which
-  says whether the ceiling is the front end or the learner behind it.
 - **A WORLD THAT DRAWS WITH REPLACEMENT PAYS FOR MEMORISING, AND THIS ONE DID.** An
   unbounded population's score tracked how often an image RECURRED rather than what it
   had learnt; only a bounded one held up as recurrence went away.
-- **So any world built from a finite bag needs that sweep run** before its score means
-  anything at all.
+- **AND IT IS MEASURED NOW RATHER THAN MITIGATED.** `IWithholds` keeps images the world
+  never draws and `Trial.Examine` asks about them without teaching. `WithheldTests`.
+- **A BOUNDED POPULATION SHOWS NO GAP**, so the earlier memorising was a fact about an
+  UNBOUNDED one and not about drawing with replacement.
+- **`Surprise` IS MOUNTED AT LAST AND IT WAS LOAD-BEARING.** Ungated genesis walked the
+  whole `code -> outcome` space, cost most of the wall clock, and scored lower.
+- **THE RUN WAS MEMORY-BOUND AND NO INSTRUMENT WATCHED MEMORY.** `Separations` is
+  commitments times distinct codes, exactly as this doc predicted.
+- **Gating genesis attacks that at the root**, and the spill is still the answer when it
+  returns at scale.
+- **THE GATE'S SCORE IS ONE SEED AND IS NOT YET A COMPARISON.** Its mint rate and clock
+  are structural; the accuracy ordering is a single run and this doc says that inverts.
 
 ---
 
@@ -500,7 +554,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **23** | Compression self-regulating? Not on any signal found yet |
 | **24** | Budget controller aims at a moving target. Deleted |
 | **25** | The binding world — built to fail, failed as predicted, since lifted |
-| **26** | Genesis mints one commitment per live code per surprise. Does deletion clear them faster than surprise makes them? Open |
+| **26** | Genesis mints per live code per surprise: does deletion clear them faster than surprise makes them? The question was wrong — nothing gated it, so genesis simply walked a finite space. Closed |
 | **27** | Monotone counters merge, a local decaying estimate decides. Does the local one earn its keep? Open — predicted NO on a stationary world |
 | **28** | The horizon is K occasions, K=1. Open |
 | **29** | Divergent local repair mints siblings. Predicted survivable by subsumption. Open |
@@ -514,3 +568,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **37** | The repair budget has an interior optimum that moves with the relevant bits. The driver nobody has wired: whether a parent still has failures no child covers. Open |
 | **38** | Spreading a reading over its range costs most of the score at both front ends. Is that fragmentation, or the search the extra codes buy? Open |
 | **39** | A reading under about ten dimensions has too few distinct wirings for a projection to expand into. Population coding has a floor, and it is not documented anywhere. Open |
+| **40** | Does `Surprising.Unaccounted` starve genesis at some width? It is self-limiting by construction, which is also how a mechanism quietly stops. The signal nobody reads: whether a failure's outcome is proposed by anything at all. Open |
+| **41** | The held-out gap as a function of RECURRENCE. A bounded population shows none at four draws an image; the question is where it opens, and that is the number that says how big a bag a world needs. Open |
+| **42** | Rung five is the critical path now, being the only mechanism that raises a front-end floor. Does a minted name over co-firing codes close any of the gap between raw pixels and a trained embedding? Open |
+| **43** | Given symbols worth having, a conjunctive rule learner reaches 86% of a linear probe on the same vectors. What is the remaining 14%, and is it the scope language or the vote? Open |

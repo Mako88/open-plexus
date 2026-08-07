@@ -88,10 +88,13 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   learner is fine and the front end is the ceiling.
 - **Five — `Arranged` is built, and it inverted step four's verdict.** Same parts in two
   arrangements, opposite answers, soundness by enumeration on photons.
-- **Six — the repair gate, which is where everything now points.** Three rules, three
-  worlds, three winners, and no combination best on two.
-- **AND THAT IS THE LIVE PROBLEM RATHER THAN THE NEXT RUNG.** A per-world optimum on a
-  brain dial is a world deciding how the brain thinks, which this design forbids.
+- **Six — the repair gate, which everything pointed at until it did not.** Three rules,
+  three worlds, three winners, and no combination best on two.
+- **AND IT IS NOT THE LIVE PROBLEM, BECAUSE ALMOST NONE OF THE POPULATION IS READ.**
+  Fifteen of five hundred decide every withheld answer, so a gate that changes what is
+  HELD cannot reach what decides.
+- **SO THE LIVE PROBLEM IS WHICH RULE GETS THE SEAT**, and two arms at it have failed —
+  see the revival rows before trying a third.
 - **Seven — Monk-2, a day's work with a published number.** A counting concept a
   conjunctive scope CANNOT express, and the cheapest language-ceiling probe there is.
 - **Eight — the rung the failures demand, and never the rung that sounds next.** Choosing
@@ -564,9 +567,9 @@ change of architecture entirely.
 - **AND THE REASON IS NOT A LEVEL NOBODY TUNED.** *Which rule needs specialising* and
   *did the population get this wrong* are different questions, and whether they align
   is a fact about the world. No per-round switch serves both.
-- **THE VOTE THREW AWAY PART OF A WORLD IT HAD ALREADY SOLVED.** Every sound rule
-  resident and believed well above the false ones, and the readout still lost — a crowd
-  outvoting one rule that is always right.
+- **THE VOTE THREW AWAY PART OF A WORLD IT HAD ALREADY SOLVED**, with every sound rule
+  resident and believed well above the false ones — and under a scale-free vote it is not
+  a crowd doing it, it is a handful of deciders.
 - **THE CHILDREN THAT SINK `Arranged` ARE NOT MEMORISED, AND THAT WAS THE STANDING
   EXPLANATION.** A rule deleting children that stand on one repeated moment removed the
   same share as the rules blind to repetition, and reached the identical withheld score

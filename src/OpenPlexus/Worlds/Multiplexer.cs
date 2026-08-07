@@ -172,9 +172,13 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>
 
         return new Turn<IReadOnlyList<int>>
         {
+            // WRITTEN AS LAMBDAS BECAUSE THE PACKING NOW DECLARES ITS WIDTH. A method
+            // group cannot be converted where the method has an optional argument, and
+            // that is the compiler asking the right question: this world is bits, so it
+            // takes the default stride and says so.
             Seen = [.. shown.Cues
-                .OrderBy(Codes.Bits.Position)
-                .Select(Codes.Bits.Value)],
+                .OrderBy(code => Codes.Bits.Position(code))
+                .Select(code => Codes.Bits.Value(code))],
             Outcome = (int)shown.Outcome.Value,
         };
     }

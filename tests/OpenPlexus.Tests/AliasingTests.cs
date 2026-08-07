@@ -134,4 +134,41 @@ public sealed class AliasingTests(ITestOutputHelper output)
             Assert.Equal(winners, said.Count);
         }
     }
+
+    [Fact]
+    public void A_row_of_whole_numbers_cannot_pack_two_positions_onto_one_code()
+    {
+        // THE SAME FAULT AS `Banded`'S WRAP, IN THE SIMPLEST TRANSLATION THERE IS.
+        // `Bits` documented itself as reading whole numbers and packed
+        // `(position << 1) | value`, so position one holding nought and position nought
+        // holding two were THE SAME CODE. Two attributes conflated, silently, and every
+        // downstream number still plausible.
+        //
+        // IT HAD NEVER FIRED BECAUSE ITS ONLY CALLER WAS BITS. Which is this repo's own
+        // trap about a guard mounted on one caller, arriving in a packing instead --
+        // and the first world with a three-valued attribute would have walked into it.
+        Assert.Throws<ArgumentOutOfRangeException>(
+            () => Bits.Of(modality: 1, position: 0, value: 2));
+
+        // AND THE WIDE PACKING IS INJECTIVE, WHICH IS WHAT THE GUARD IS PROTECTING.
+        // Six positions of four values apiece is `Monk`'s widest attribute, and every
+        // one of the twenty-four must be its own code.
+        var seen = new HashSet<Code>();
+
+        for (var position = 0; position < 6; position++)
+        for (var value = 0; value < 4; value++)
+            Assert.True(seen.Add(Bits.Of(modality: 1, position, value, stride: 4)),
+                $"position {position} value {value} collided with something already said");
+
+        Assert.Equal(24, seen.Count);
+
+        // AND THE DEFAULT IS BYTE-FOR-BYTE WHAT WAS THERE, so no measurement taken on a
+        // binary world moves. Asserted rather than believed, because "this changes
+        // nothing" is the claim that most needs a check behind it.
+        for (var position = 0; position < 8; position++)
+        for (var value = 0; value < 2; value++)
+            Assert.Equal(
+                new Code(1, (ulong)((position << 1) | value)),
+                Bits.Of(modality: 1, position, value));
+    }
 }

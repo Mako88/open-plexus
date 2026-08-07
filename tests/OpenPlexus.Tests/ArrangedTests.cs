@@ -433,7 +433,8 @@ public sealed class ArrangedTests(ITestOutputHelper output)
                 + $"unseen {got.Tally.Unseen!.Accuracy:F3} against a ceiling of "
                 + $"{could.CoversUnseen:F3} · sound {got.Rules.Sound} unsound {got.Rules.Unsound} "
                 + $"(narrowed {got.Rules.Narrowed}, rootless {got.Rules.Rootless}) · "
-                + $"mean scope {got.Rules.Scope:F2}");
+                + $"believed {got.Rules.Trusted:F3} sound vs {got.Rules.Doubted:F3} "
+                + $"unsound · mean scope {got.Rules.Scope:F2}");
 
             // THE TWO WAYS AN UNSOUND RULE SURVIVES, AND THEY PARTITION. Either
             // subsumption had a general parent to absorb it into and declined, or there

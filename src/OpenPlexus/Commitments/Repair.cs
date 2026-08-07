@@ -32,6 +32,16 @@ public enum Surprising
     Unaccounted,
 }
 
+/// <summary>How the advocates for one expectation are added up.</summary>
+public enum Weighing
+{
+    /// <summary>Every advocate adds its weight. What ran before anything questioned it.</summary>
+    Summing,
+
+    /// <summary>An expectation is worth its best advocate and no more.</summary>
+    Strongest,
+}
+
 /// <summary>Every number the commitment machinery is allowed to have.</summary>
 public sealed record CommittingSettings
 {
@@ -121,6 +131,33 @@ public sealed record CommittingSettings
     /// </para>
     /// </remarks>
     public double Sharpness { get; init; } = 5.0;
+
+    /// <summary>Whether an expectation is worth its voters added up, or its best one.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>AND <see cref="Sharpness"/> TURNS OUT TO BE A WORKAROUND FOR THE SHAPE OF THIS
+    /// ONE.</b> A sum over N advocates scales with N however steeply each is weighted,
+    /// so raising the power does not remove the count from the decision — it only makes
+    /// the count need more members to win. The fault the doc above names is not that the
+    /// weights are too flat; it is that the aggregate is a SUM.
+    /// </para>
+    /// <para>
+    /// <b>WHICH IS WHY THE PEAK MOVES BETWEEN WORLDS, AND THAT IS THE PART THAT MATTERS.</b>
+    /// On <see cref="Worlds.Arranged"/> the score reaches its exact target at a power of
+    /// ten and sits a fifth short at five; on <see cref="Worlds.Multiplexer"/> five is the
+    /// peak and twenty is worse at both widths. A dial with a per-world optimum is a
+    /// world reaching into the brain by the back door — the one thing this design says
+    /// it will not have — so the answer cannot be to tune it.
+    /// </para>
+    /// <para>
+    /// <b><see cref="Weighing.Strongest"/> IS SCALE-FREE, WHICH IS THE PROPERTY BEING
+    /// TESTED.</b> An expectation is worth its best advocate and no more, so a thousand
+    /// mediocre rules cannot outvote one that is always right at ANY power, and the
+    /// number of voters stops being part of the answer. Whether that costs the
+    /// robustness a crowd buys is exactly what the arm is for.
+    /// </para>
+    /// </remarks>
+    public Weighing Weighing { get; init; } = Weighing.Summing;
 
     /// <summary>How the condition to add is picked.</summary>
     /// <remarks>

@@ -106,6 +106,31 @@ public sealed record Judged
     /// </remarks>
     public required int Rootless { get; init; }
 
+    /// <summary>
+    /// What the population BELIEVES about the rules that are true, against the rest.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE NUMBER THAT SAYS WHETHER SHARPENING THE VOTE COULD POSSIBLY HELP, AND IT
+    /// COSTS ONE PASS.</b> Every matching commitment votes for its expectation weighted
+    /// by its own accuracy raised to a power, which is XCS's answer to a crowd of
+    /// mediocre rules outvoting one that is always right. Raising the power only helps
+    /// if the crowd LOOKS worse from inside.
+    /// </para>
+    /// <para>
+    /// <b>AND THERE IS EVERY REASON TO FEAR IT DOES NOT.</b> A rule is unsound when the
+    /// world contradicts it SOMEWHERE, and a fifth of this world is never drawn — so a
+    /// rule wrong only about arrangements the learner has not been shown has a PERFECT
+    /// observed record. Where these two numbers meet, no weighting of what the
+    /// population knows can separate what is true from what merely has not been caught,
+    /// and the answer is not a dial.
+    /// </para>
+    /// </remarks>
+    public required double Trusted { get; init; }
+
+    /// <summary>The same, for the residents the world contradicts.</summary>
+    public required double Doubted { get; init; }
+
     /// <summary>How many codes a resident scope names, on average.</summary>
     /// <remarks>
     /// <b>THE MEMORISATION TELL, AND IT IS A DISTRIBUTION RATHER THAN A SCORE.</b> This
@@ -509,6 +534,12 @@ public sealed class ArrangedRun
         var trues = new List<(ImmutableArray<Code> Scope, Code Expects)>();
         var falses = new List<(ImmutableArray<Code> Scope, Code Expects)>();
 
+        // WHAT THE POPULATION BELIEVES ABOUT EACH, kept beside what the world says. The
+        // gap between them is the only thing that decides whether a sharper vote could
+        // help, and it costs one running total apiece.
+        var trusted = 0.0;
+        var doubted = 0.0;
+
         var codes = 0L;
         var held = 0;
 
@@ -576,11 +607,13 @@ public sealed class ArrangedRun
             else if (wrong)
             {
                 unsound++;
+                doubted += one.Accuracy;
                 falses.Add((scope, one.Expects));
             }
             else
             {
                 sound++;
+                trusted += one.Accuracy;
                 trues.Add((scope, one.Expects));
             }
         }
@@ -598,6 +631,8 @@ public sealed class ArrangedRun
             Layouts = scenes.Count,
             Narrowed = narrowed,
             Rootless = falses.Count - narrowed,
+            Trusted = sound == 0 ? 0.0 : trusted / sound,
+            Doubted = unsound == 0 ? 0.0 : doubted / unsound,
             Scope = held == 0 ? 0.0 : codes / (double)held,
         };
     }

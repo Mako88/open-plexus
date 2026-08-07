@@ -88,10 +88,23 @@ public sealed class DialTests(ITestOutputHelper output)
             + "run, so there is nothing here for a controller to hunt",
 
         ["Sharpness"] =
-            "OPEN, AND THE MOST TRACTABLE OF THESE. How steeply the vote favours "
-            + "the accurate over the many is XCS's own exponent, and the signal is "
-            + "already computed every round -- the margin between the winner and "
-            + "the runner-up says whether the population is being outvoted by count",
+            "OPEN, AND IT IS A LEVEL WHOSE OPTIMUM MOVES WITH THE WORLD, which is "
+            + "the worst shape a brain dial can have. `Arranged` reaches its exact "
+            + "target at ten and sits a fifth short at five; `Multiplexer` peaks at "
+            + "five and is worse at twenty on both widths. It also STEERS REPAIR -- "
+            + "blame ranks the provenance and the vote decides the provenance, so a "
+            + "sharper vote specialises less and finds fewer true rules. A per-world "
+            + "optimum is a world reaching into the brain, so the honest driver is "
+            + "not a controller on this number but a vote whose shape does not need "
+            + "one; `Weighing` is that arm",
+
+        ["Weighing"] =
+            "the arm for the line above, and a choice between two rules rather "
+            + "than a quantity -- as `Choosing` is. Whether an expectation is worth "
+            + "its advocates added up or its best one is not a level anything can "
+            + "hunt, and it exists because a SUM scales with the number of voters "
+            + "however steeply each is weighted, which is why `Sharpness` has a "
+            + "per-world peak at all",
 
         ["Choosing"] =
             "the control arm, and a choice between two rules that both do "
@@ -499,6 +512,24 @@ public sealed class DialTests(ITestOutputHelper output)
         // old rule minted 414,087 commitments in twenty thousand rounds against
         // 23,296, ran seven and a half times slower, and scored LOWER. A dial nobody
         // can hunt is still worth having when the two rules differ by that much.
-        Assert.Equal(21, HandSet.Count);
+        // AND TO TWENTY-TWO FOR `Weighing`, WHICH ARRIVES BECAUSE THE NUMBER ABOVE IT
+        // TURNED OUT TO BE UNHUNTABLE IN THE WORST WAY. `Sharpness` is a level whose
+        // optimum MOVES WITH THE WORLD -- `Arranged` reaches its exact target at ten
+        // and sits a fifth short at five, `Multiplexer` peaks at five and is worse at
+        // twenty at both widths. A per-world optimum on a brain dial is a world
+        // deciding how the brain thinks, which is the one thing this design says it
+        // will not have, so a controller on that number was never the answer.
+        //
+        // `Strongest` IS THE SHAPE THAT NEEDS NO NUMBER, and it half works: it reaches
+        // 1.000 on the arranged world at the DEFAULT power over five seeds, and it is
+        // worse than a sum on the clean multiplexer at both widths. Structurally it is
+        // the limit of high sharpness -- 105 repairs and 5.0 key rules at six bits,
+        // which is what `Sharpness = 20` gives to the digit.
+        //
+        // SO THE COUNT GOES UP AND THE ARGUMENT IS NOT SETTLED, which is the honest
+        // state and is what this budget exists to keep visible. Neither rule wins
+        // everywhere, and the reason is a coupling nobody designed rather than a
+        // number nobody has tuned -- see the commit that added it.
+        Assert.Equal(22, HandSet.Count);
     }
 }

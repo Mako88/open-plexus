@@ -91,6 +91,39 @@ public sealed class Cycle
     /// <summary>The share of answered predictions right over the last tenth.</summary>
     public double Recent => Answered == 0 ? 0.0 : Settled / (double)Answered;
 
+    /// <summary>How much of the winner's weight its lead accounted for, on average.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PLAN CALLS THIS ALREADY INSTRUMENTED AND IT WAS COMPUTED AND READ BY
+    /// NOBODY.</b> <i>The margin between first and second is a confidence, free. A
+    /// persistently thin margin is the two-conflated-cases signal, already
+    /// instrumented.</i> <see cref="Vote.Margin"/> has been calculated every round for
+    /// the life of the branch and nothing in the library has ever looked at it — one
+    /// assertion in a unit test was its entire readership. That is `Surprise` again, and
+    /// `Drives.Improving` before it.
+    /// </para>
+    /// <para>
+    /// <b>RELATIVE RATHER THAN ABSOLUTE, BECAUSE THE ABSOLUTE ONE IS NOT COMPARABLE
+    /// BETWEEN RUNS.</b> Weights are accuracies raised to <c>Sharpness</c>, so a sharper
+    /// vote collapses every weight toward nought and its margins with them — two
+    /// settings would report different numbers for identical behaviour. The lead as a
+    /// share of the winner is in nought to one whatever the power is.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE SIGNAL FOR THE DIAL NOBODY CAN SET.</b> Near one, the winner
+    /// stands alone and the vote is deciding on accuracy. Near nought, the runner-up is
+    /// level with it and the answer is being settled by how many advocates each side
+    /// happened to have — which is the count deciding, and is exactly what raising the
+    /// power is meant to prevent.
+    /// </para>
+    /// </remarks>
+    public double Confidence => Voted == 0 ? 0.0 : _leads / Voted;
+
+    /// <summary>Rounds anything fired on.</summary>
+    private long Voted { get; set; }
+
+    private double _leads;
+
     /// <summary>Predicts, scores, settles, sweeps, and repairs what was wrong.</summary>
     /// <param name="moment">What is live, already folded through any minted names.</param>
     /// <param name="arrived">What followed it.</param>
@@ -107,6 +140,14 @@ public sealed class Cycle
         else
         {
             var hit = said == arrived;
+
+            // GUARDED, BECAUSE A ZERO WEIGHT IS REACHABLE AND SILENT. Every accuracy
+            // starts at nought and `Sharpness` raises it to a power, so the first
+            // rounds of any run vote with weights of exactly nought -- and a lead
+            // divided by that is a NaN that poisons the mean for the whole run without
+            // ever failing anything.
+            Voted++;
+            if (vote.Weight > 0) _leads += vote.Margin / vote.Weight;
 
             if (hit) Right++; else Wrong++;
 

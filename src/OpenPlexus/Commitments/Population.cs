@@ -154,8 +154,18 @@ public sealed class Population
 
         foreach (var commitment in firing)
         {
-            weights.TryGetValue(commitment.Expects, out var so_far);
-            weights[commitment.Expects] = so_far + Math.Pow(commitment.Accuracy, _dials.Sharpness);
+            var weight = Math.Pow(commitment.Accuracy, _dials.Sharpness);
+
+            // A SUM SCALES WITH THE NUMBER OF ADVOCATES AND A MAXIMUM DOES NOT, which
+            // is the whole of the difference. Raising accuracy to a power makes a crowd
+            // need more members to outvote one commitment that is always right; it
+            // never takes the count out of the decision. See `CommittingSettings.Weighing`.
+            weights[commitment.Expects] =
+                weights.TryGetValue(commitment.Expects, out var so_far)
+                    ? _dials.Weighing == Weighing.Strongest
+                        ? Math.Max(so_far, weight)
+                        : so_far + weight
+                    : weight;
         }
 
         // ORDERED BY WEIGHT AND THEN BY CODE, so a tie -- which is what every

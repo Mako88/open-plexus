@@ -52,6 +52,80 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void What_the_vote_costs_when_the_population_already_knows_which_rules_are_true()
+    {
+        // THE ONE ARM WITH A CLEAN TARGET, SWEPT ON THE ONE DIAL THE PLAN NAMED. Tiled
+        // under `AnyFailure` holds every sound single-code rule on every seed, the
+        // front end loses nothing a linear probe can find, and the language covers the
+        // whole world at depth one. Everything is in place and it scores 0.800.
+        //
+        // AND THE POPULATION IS NOT CONFUSED ABOUT WHICH RULES ARE TRUE -- it believes
+        // the sound ones 1.000 and the unsound ones 0.522. So a crowd of rules that
+        // LOOK worse is outvoting a handful that look perfect, which is what raising
+        // accuracy to a power exists to stop, and five is evidently not enough of it:
+        // 0.522^5 is 0.039, and a few dozen of those agreeing beat one weight of 1.
+        //
+        // SO THIS IS A PREDICTION WITH A NUMBER ON IT. If the vote is the gap, the
+        // score climbs toward 1.000 as the power rises. If it does not, the gap is
+        // somewhere nobody has looked yet and this rules out the obvious place.
+        var settings = new ArrangedSettings { Side = 3, Cell = 3, Clutter = 1, Hold = 4 };
+
+        var could = new ArrangedRun(
+            settings, new Brain(new CommittingSettings(), seed: 1), Looking.Tiled, seed: 1)
+            .Reachable(depth: 1);
+
+        output.WriteLine(
+            $"target {could.CoversUnseen:F3} on the unseen, from {could.Alone.Length} "
+            + $"codes sound alone, {could.Least} of them enough");
+
+        // AND THE SCALE-FREE ARM AT THE DEFAULT POWER, WHICH IS THE WHOLE QUESTION. If
+        // `Strongest` reaches the target at five, the peak stops moving with the world
+        // and there is nothing left to tune. If it needs a power too, the count was
+        // never the fault and this rules that out.
+        foreach (var weighing in new[] { Weighing.Summing, Weighing.Strongest })
+        foreach (var sharpness in weighing == Weighing.Summing
+            ? new[] { 1.0, 5.0, 10.0, 20.0, 50.0 }
+            : [5.0])
+        {
+            var unseen = new List<double>();
+            var last = default(Grounded);
+
+            foreach (var seed in new[] { 1, 2, 3, 4, 5 })
+            {
+                var run = new ArrangedRun(
+                    settings,
+                    new Brain(
+                        new CommittingSettings
+                        {
+                            Surprising = Surprising.AnyFailure,
+                            Sharpness = sharpness,
+                            Weighing = weighing,
+                        },
+                        seed),
+                    Looking.Tiled,
+                    seed);
+
+                last = run.Run(20_000);
+                unseen.Add(last.Tally.Unseen!.Accuracy);
+            }
+
+            var mean = unseen.Average();
+            var spread = Math.Sqrt(
+                unseen.Sum(one => (one - mean) * (one - mean)) / (unseen.Count - 1));
+
+            output.WriteLine(
+                $"  {weighing,-9} sharpness {sharpness,4} | unseen {mean:F3} +/- "
+                + $"{spread / Math.Sqrt(unseen.Count):F3} | "
+                + $"[{string.Join(" ", unseen.Select(one => one.ToString("F3")))}] | "
+                + $"last run: {last!.Rules.Sound} sound {last.Rules.Unsound} unsound, "
+                + $"believed {last.Rules.Trusted:F3} vs {last.Rules.Doubted:F3}, "
+                + $"lead {last.Tally.Confidence:F3}");
+        }
+
+        Assert.True(true);
+    }
+
+    [Fact]
     public void Whether_the_gate_that_was_load_bearing_on_photographs_is_one_here()
     {
         // ONE SEED IS NOT A COMPARISON AND WILL HAPPILY INVERT, which this repo has

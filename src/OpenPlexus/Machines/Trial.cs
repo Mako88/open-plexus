@@ -65,6 +65,19 @@ public sealed record Tally
     /// <summary>The share of answered predictions right over the last tenth.</summary>
     public required double Recent { get; init; }
 
+    /// <summary>
+    /// How much of the winner's weight its lead over the runner-up accounted for.
+    /// </summary>
+    /// <remarks>
+    /// <b>ARMED HERE FOR THE FIRST TIME, AND THE PLAN SAID IT ALREADY WAS.</b> The
+    /// margin has been computed every round for the life of the branch and read by
+    /// nothing — see <see cref="Commitments.Cycle.Confidence"/>. Near nought it says the
+    /// answer is being settled by how many advocates each side had rather than by how
+    /// accurate any of them is, which is the one failure the vote's whole shape exists
+    /// to prevent and the one thing no score reports.
+    /// </remarks>
+    public required double Confidence { get; init; }
+
     /// <summary>The round a trailing window first held the target, or zero if never.</summary>
     public required long Reached { get; init; }
 
@@ -188,6 +201,7 @@ public sealed class Trial<TSeen>
             Wrong = cycle.Wrong,
             Silent = cycle.Silent,
             Recent = cycle.Recent,
+            Confidence = cycle.Confidence,
             Reached = cycle.Reached,
             Repaired = cycle.Repaired,
             Minted = cycle.Minted,

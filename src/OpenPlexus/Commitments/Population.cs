@@ -195,7 +195,32 @@ public sealed class Population
     /// what keeps C1 and stops the loudest one owning all the learning.
     /// </para>
     /// </remarks>
-    public Vote Predict(ImmutableArray<Commitment> firing)
+    public Vote Predict(ImmutableArray<Commitment> firing) => Predict(firing, deferring: false);
+
+    /// <summary>
+    /// The same vote, with each expectation's seat handed back to any general commitment
+    /// the narrower one has not earned it from.
+    /// </summary>
+    /// <param name="firing">What fired, from <see cref="Firing"/>.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>A SECOND READING OF ONE POPULATION, AND THAT IS THE WHOLE REASON IT IS NOT A
+    /// DIAL.</b> Making the vote defer was built as <c>Weighing.Proven</c> and was worse —
+    /// but it could not be READ, because the vote steers repair as much as it reports it,
+    /// so the arm changed what was learnt and what was said at once. See the plan's
+    /// revival row: what it asked for is exactly this, a population trained under one rule
+    /// and read back under the other.
+    /// </para>
+    /// <para>
+    /// <b>SO NOTHING CALLS THIS DURING A RUN.</b> <see cref="Machines.Trial{TSeen}.Examine"/>
+    /// asks it of the withheld set beside the ordinary vote, in the same read-only pass,
+    /// and the gap between the two answers is what fork 46 leaves open: whether the
+    /// deciders are the score, or merely where it happens to be counted.
+    /// </para>
+    /// </remarks>
+    public Vote Deferred(ImmutableArray<Commitment> firing) => Predict(firing, deferring: true);
+
+    private Vote Predict(ImmutableArray<Commitment> firing, bool deferring)
     {
         if (firing.IsDefaultOrEmpty) return default;
 
@@ -225,6 +250,33 @@ public sealed class Population
                         : so_far + weight
                     : weight;
         }
+
+        if (deferring)
+            foreach (var expects in weights.Keys.Order().ToList())
+            {
+                var seat = _byName[loudest[expects].By];
+
+                // THE SEAT CAN MOVE MORE THAN ONCE -- a grandparent takes it back from a
+                // parent that took it from a child -- and the loop is bounded by scope
+                // length, since every hand-back is strictly shorter.
+                for (var handed = true; handed;)
+                {
+                    handed = false;
+
+                    foreach (var general in firing)
+                    {
+                        if (general.Expects != seat.Expects || !seat.Narrows(general)) continue;
+                        if (!Absorbs(general, seat)) continue;
+
+                        seat = general;
+                        handed = true;
+                        break;
+                    }
+                }
+
+                loudest[expects] = (Math.Pow(seat.Accuracy, _dials.Sharpness), seat.Identity);
+                weights[expects] = loudest[expects].Weight;
+            }
 
         // ORDERED BY WEIGHT AND THEN BY CODE, so a tie -- which is what every
         // moment is before anything has been settled -- breaks the same way on

@@ -47,6 +47,20 @@ public sealed record Examined
     /// </remarks>
     public required int Deciders { get; init; }
 
+    /// <summary>
+    /// How many were right when each seat is handed back to a general rule that has not
+    /// been beaten off it.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE SAME POPULATION READ TWICE, WHICH IS WHAT THE REFUTED ARM COULD NOT BE.</b>
+    /// Making the vote defer DURING a run changes what is learnt as well as what is said,
+    /// because covering and repair both feed on the vote being wrong — so it mints
+    /// hundreds more commitments and the score it reports is of a different machine.
+    /// Against <see cref="Right"/> on one trained population, this is the readout on its
+    /// own, and the difference is fork 46's remaining question.
+    /// </remarks>
+    public required int Handed { get; init; }
+
     /// <summary>The share of answered predictions that were right.</summary>
     public double Accuracy => Answered == 0 ? 0.0 : Right / (double)Answered;
 
@@ -271,7 +285,7 @@ public sealed class Trial<TSeen>
     /// <b>EVERY CALL HERE IS READ-ONLY AND THAT IS LOAD-BEARING RATHER THAN
     /// INCIDENTAL.</b> <see cref="Population.Moment"/> folds names without minting one,
     /// <see cref="Population.Firing"/> gathers candidates without touching them, and
-    /// <see cref="Population.Predict"/> reads accuracies it does not write.
+    /// <c>Population.Predict</c> reads accuracies it does not write.
     /// <c>Settle</c>, <c>Cover</c> and <c>Mend</c> are the three that teach and none of
     /// them is called — an examination that moved a single counter would be a second
     /// training run wearing the word <i>held-out</i>, and the number would be worth
@@ -293,19 +307,24 @@ public sealed class Trial<TSeen>
 
         var answered = 0;
         var right = 0;
+        var handed = 0;
         var deciders = new HashSet<Code>();
 
         foreach (var turn in withholding.Withheld)
         {
             var moment = held.Moment(new HashSet<Code>(_sensing.Codify(turn.Seen)));
 
-            var vote = held.Predict(held.Firing(moment));
+            var firing = held.Firing(moment);
+            var vote = held.Predict(firing);
 
             if (vote.Expects is not { } said) continue;
 
             answered++;
             if (vote.By is { } by) deciders.Add(by);
             if (said == Brain.Says(turn.Outcome)) right++;
+
+            // THE SECOND READING OF THE SAME FIRING SET, and it teaches nothing either.
+            if (held.Deferred(firing).Expects == Brain.Says(turn.Outcome)) handed++;
         }
 
         return new Examined
@@ -314,6 +333,7 @@ public sealed class Trial<TSeen>
             Answered = answered,
             Right = right,
             Deciders = deciders.Count,
+            Handed = handed,
         };
     }
 }

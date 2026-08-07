@@ -424,7 +424,7 @@ condition is a superstition.
 | Tuning a vote dial until both worlds pass | The peak of `Sharpness` moves between worlds, so it is the world's number and not the brain's | Never per world. A vote whose shape needs no number at all |
 | Repair gated only on the vote being wrong | It hides the rules most needing specialisation — the ones wrong while the population is right | Never as the ONLY gate; `Mending` keeps it as an arm |
 | `Mending.Earned` — repair on any earned failure, ignoring children | `Uncovered` dominates it everywhere measured, being the same rule with the redundant repairs removed | Never. Revive the child test, not the arm |
-| The vote deferring to a general advocate unless the narrower earns it | Four points worse where it fires, three hundred more commitments, and inert by construction under permissive subsumption | Read a population back under it without letting it steer repair |
+| The vote deferring to a general advocate unless the narrower earns it | Four points worse where it fires, and read-only it changes not one withheld answer | Never. The deciders earn their seats by a wide margin on drawn data |
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Each condition halves where a rule can fire, so the bar caps DEPTH by world size | A bar whose expectation shrinks with depth too |
 
 ---
@@ -586,6 +586,9 @@ change of architecture entirely.
 - **AND MAKING THE VOTE APPLY SUBSUMPTION'S BAR IS WORSE RATHER THAN BETTER**, minting
   three hundred more commitments where it fires — because the vote steers repair as much
   as it reports it, so no change to it is only a readout.
+- **THE DECIDERS EARNED THEIR SEATS AND ARE STILL WRONG.** Handing every seat back to a
+  general rule that has not beaten it changes not one withheld answer, so the readout is
+  not the gap and drawn evidence cannot tell those rules apart.
 - **MORE UNSOUND RULES WITH FEWER SOUND ONES SCORED HIGHER THERE**, so what the withheld
   score tracks is not how much of the world the population has got right.
 

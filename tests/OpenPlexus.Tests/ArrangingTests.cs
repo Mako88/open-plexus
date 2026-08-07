@@ -150,6 +150,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // and the score should stay at the target. If it FALLS, the extra gate was
         // holding back damage rather than search, and the whole argument inverts.
         foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered, Mending.Improving })
+        foreach (var subsuming in new[] { Subsuming.Weaker, Subsuming.Insignificant })
         {
             var (unseen, last) = Sweep(
                 new CommittingSettings
@@ -157,11 +158,12 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                     Surprising = Surprising.AnyFailure,
                     Weighing = Weighing.Strongest,
                     Mending = mending,
+                    Subsuming = subsuming,
                 },
                 Looking.Tiled);
 
             output.WriteLine(
-                $"Strongest {mending,-8} | unseen {unseen.Average():F3} "
+                $"{mending,-9} {subsuming,-13} | unseen {unseen.Average():F3} "
                 + $"[{string.Join(" ", unseen.Select(one => one.ToString("F3")))}] | "
                 + $"{last.Rules.Sound} sound {last.Rules.Unsound} unsound, "
                 + $"repaired {last.Tally.Repaired}, lead {last.Tally.Confidence:F3}");

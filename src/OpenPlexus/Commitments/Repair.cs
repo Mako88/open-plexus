@@ -42,6 +42,65 @@ public enum Weighing
     Strongest,
 }
 
+/// <summary>What it takes for a narrower commitment to survive beside a general one.</summary>
+/// <remarks>
+/// <para>
+/// <b>THE ONE MECHANISM HERE THAT PREFERS GENERALITY, AND IT WAS WRITTEN UP AS NEVER
+/// FIRING ON EVIDENCE THAT DOES NOT SAY THAT.</b> <c>Judged.Narrowed</c> reads nought
+/// everywhere, and that was read as subsumption doing nothing. It counts something
+/// narrower: unsound residents that a resident SOUND one already covers. Swapping the
+/// rule below moves the resident count from 116 to 228 at eleven bits, so the clause
+/// fires constantly — the correction is recorded here because the wrong version was
+/// committed first.
+/// </para>
+/// <para>
+/// <b>WHAT `Narrowed` ACTUALLY SAYS IS THAT NOTHING SURVIVES UNDER A SOUND PARENT</b>,
+/// which is a fact about which rules are left rather than about whether the mechanism
+/// runs.
+/// </para>
+/// </remarks>
+public enum Subsuming
+{
+    /// <summary>
+    /// The general one must be AT LEAST AS ACCURATE. What ran before anything questioned it.
+    /// </summary>
+    /// <remarks>
+    /// <b>AND IT DELETES MORE THAN THE OTHER RULE, NOT LESS, WHICH WAS THE SURPRISE.</b>
+    /// The worry was that a memorised child is always a hair better and so always kept.
+    /// It is kept — but a hair the other way is enough to delete it, and over a run that
+    /// is most of them: this holds 116 residents at eleven bits where demanding
+    /// SIGNIFICANCE holds 228.
+    /// </remarks>
+    Weaker,
+
+    /// <summary>
+    /// The narrower one must be SIGNIFICANTLY better, by the test repair already owns.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A CHILD FIRES LESS OFTEN THAN ITS PARENT, SO ITS ADVANTAGE HAS TO CLEAR ITS OWN
+    /// SMALLER SAMPLE.</b> That is a two-proportion test, which is exactly what the
+    /// repair gate uses to decide whether a condition separates hits from misses — same
+    /// arithmetic, same <see cref="CommittingSettings.Alpha"/>, no new number.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS A LARGE, UNIFORM WIN UNDER NOISE AND A WASH WITHOUT IT.</b> On the
+    /// noisy multiplexer every repair gate gains about five points and roughly doubles
+    /// its sound rules — 0.737 to 0.787, 0.725 to 0.779, 0.731 to 0.778 — while on the
+    /// clean world it is level at six bits and slightly behind at eleven.
+    /// </para>
+    /// <para>
+    /// <b>WHICH IS THE FIRST RESULT IN THIS FAMILY WHOSE DIRECTION FOLLOWS FROM A
+    /// PROPERTY OF THE WORLD.</b> A significance test is what sampling error calls for,
+    /// and on a clean world a hair of advantage is real signal rather than luck — so
+    /// demanding proof throws away something true. It is still not one setting for every
+    /// world, but it is the first one whose right value the machine could in principle
+    /// detect for itself.
+    /// </para>
+    /// </remarks>
+    Insignificant,
+}
+
 /// <summary>What has to go wrong before repair is attempted at all.</summary>
 public enum Mending
 {
@@ -359,6 +418,16 @@ public sealed record CommittingSettings
     /// </remarks>
     public Mending Mending { get; init; } = Mending.Outvoted;
 
+    /// <summary>What it takes for a narrower commitment to survive beside a general one.</summary>
+    /// <remarks>
+    /// <b>THE ARM FOR A CLAUSE THAT HAS NEVER FIRED.</b> See <see cref="Subsuming"/>: the
+    /// design's one preference for generality requires the general rule to be at least as
+    /// accurate, and a memorised child is always a shade better. Whether demanding
+    /// SIGNIFICANCE instead is what the plan meant all along is a measurement rather than
+    /// a reading of it.
+    /// </remarks>
+    public Subsuming Subsuming { get; init; } = Subsuming.Weaker;
+
     /// <summary>How the condition to add is picked.</summary>
     /// <remarks>
     /// <b>THE MOST IMPORTANT COMPARISON IN STEP ONE, and it is a choice between two
@@ -458,6 +527,24 @@ public static class Repair
         // one that is obviously yes.
         return Normal.Tail(strongest) * candidates <= dials.Alpha ? best : null;
     }
+
+    /// <summary>
+    /// How many standard errors one hit rate leads another, positive when the first leads.
+    /// </summary>
+    /// <param name="hits">Firings the first one got right.</param>
+    /// <param name="fired">Firings the first one settled at all.</param>
+    /// <param name="otherHits">Firings the second one got right.</param>
+    /// <param name="otherFired">Firings the second one settled at all.</param>
+    /// <remarks>
+    /// <b>THE SAME ARITHMETIC AS <see cref="Divergence"/> UNDER A NAME THAT FITS THE
+    /// SECOND USE.</b> That one asks whether a code was present more often in the hits
+    /// than in the misses; this asks whether one commitment is more accurate than
+    /// another. Both are the pooled two-proportion z, and calling it by the first
+    /// question's parameter names at the second question's call site is how a formula
+    /// quietly gets used for something it does not answer.
+    /// </remarks>
+    public static double Ahead(long hits, long fired, long otherHits, long otherFired) =>
+        Divergence(hits, fired, otherHits, otherFired);
 
     /// <summary>
     /// How many standard errors apart two shares are, positive when the first leads.

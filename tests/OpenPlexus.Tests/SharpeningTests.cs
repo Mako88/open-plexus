@@ -168,8 +168,9 @@ public sealed class SharpeningTests(ITestOutputHelper output)
         {
             output.WriteLine($"{(1 << address) + address} bits, noise {noise:F2}:");
 
-            foreach (var weighing in new[] { Weighing.Summing, Weighing.Strongest })
+            foreach (var weighing in new[] { Weighing.Strongest })
             foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered, Mending.Improving })
+            foreach (var subsuming in new[] { Subsuming.Weaker, Subsuming.Insignificant })
             {
                 var recent = new List<double>();
                 var sound = new List<double>();
@@ -182,7 +183,12 @@ public sealed class SharpeningTests(ITestOutputHelper output)
                     var learned = new MultiplexerRun(
                         new MultiplexerSettings { Address = address, Noise = noise },
                         new Brain(
-                            new CommittingSettings { Weighing = weighing, Mending = mending },
+                            new CommittingSettings
+                            {
+                                Weighing = weighing,
+                                Mending = mending,
+                                Subsuming = subsuming,
+                            },
                             seed),
                         seed).Run(Rounds);
 
@@ -194,7 +200,7 @@ public sealed class SharpeningTests(ITestOutputHelper output)
                 }
 
                 output.WriteLine(
-                    $"  {weighing,-9} {mending,-8} | recent {recent.Average():F3} "
+                    $"  {mending,-9} {subsuming,-13} | recent {recent.Average():F3} "
                     + $"[{string.Join(" ", recent.Select(one => one.ToString("F3")))}] | "
                     + $"sound {sound.Average():F0} resident {resident.Average():F0} | "
                     + $"repaired {repaired.Average():F0} | of the key: {found.Average():F1}");

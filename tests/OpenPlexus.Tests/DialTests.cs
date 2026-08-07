@@ -110,6 +110,16 @@ public sealed class DialTests(ITestOutputHelper output)
             + "wrong` are different questions and no per-round switch stands in "
             + "for both. Not a level, and not a controller's job either",
 
+        ["Subsuming"] =
+            "OPEN, AND THE FIRST OF THESE WHOSE DIRECTION FOLLOWS FROM THE WORLD "
+            + "RATHER THAN FROM ITS RULE STRUCTURE. Demanding that a narrower "
+            + "commitment be SIGNIFICANTLY better before it survives is worth about "
+            + "five points on the noisy multiplexer under every repair gate and "
+            + "roughly doubles the sound rules; on a clean world it is level or "
+            + "slightly behind, because there a hair of advantage is real signal "
+            + "and a significance test throws it away. The honest driver would be "
+            + "an estimate of how much the world lies, which nothing computes",
+
         ["Weighing"] =
             "the arm for the line above, and a choice between two rules rather "
             + "than a quantity -- as `Choosing` is. Whether an expectation is worth "
@@ -550,6 +560,6 @@ public sealed class DialTests(ITestOutputHelper output)
         // world-independent, the repair gate already computes most of it, and it
         // separates the two cases these dials keep splitting the difference between.
         // The next entry in this list should be its DELETION of three of them.
-        Assert.Equal(23, HandSet.Count);
+        Assert.Equal(24, HandSet.Count);
     }
 }

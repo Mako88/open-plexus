@@ -382,7 +382,7 @@ public sealed class Population
 
         foreach (var specific in experienced)
             foreach (var general in experienced)
-                if (specific.Narrows(general) && general.Accuracy >= specific.Accuracy)
+                if (specific.Narrows(general) && Absorbs(general, specific))
                 {
                     doomed.Add(specific);
                     break;
@@ -391,6 +391,33 @@ public sealed class Population
         foreach (var one in doomed) Remove(one);
 
         return doomed.Count;
+    }
+
+    /// <summary>
+    /// Whether a general commitment takes a narrower one's place.
+    /// </summary>
+    /// <param name="general">The commitment that would stay.</param>
+    /// <param name="specific">The commitment that would go.</param>
+    /// <remarks>
+    /// <b>UNDER <see cref="Subsuming.Weaker"/> A HAIR OF ADVANTAGE SAVES THE CHILD, AND A
+    /// CHILD ALMOST ALWAYS HAS ONE.</b> It fires less often and has stored more of what
+    /// it fired on, so <i>equally accurate</i> is a measure-zero event and the clause is
+    /// unreachable — which is why nothing in any measured population has ever been
+    /// subsumed. The other rule asks the child to be SIGNIFICANTLY better against its own
+    /// smaller sample, by the two-proportion test the repair gate already uses.
+    /// </remarks>
+    private bool Absorbs(Commitment general, Commitment specific)
+    {
+        if (_dials.Subsuming == Subsuming.Weaker)
+            return general.Accuracy >= specific.Accuracy;
+
+        var ahead = Repair.Ahead(
+            specific.Hits,
+            specific.Hits + specific.Misses,
+            general.Hits,
+            general.Hits + general.Misses);
+
+        return Normal.Tail(ahead) > _dials.Alpha;
     }
 
     /// <summary>

@@ -132,7 +132,14 @@ public sealed class DialTests(ITestOutputHelper output)
             + "its advocates added up or its best one is not a level anything can "
             + "hunt, and it exists because a SUM scales with the number of voters "
             + "however steeply each is weighted, which is why `Sharpness` has a "
-            + "per-world peak at all",
+            + "per-world peak at all. AND THE THIRD RULE IS WHERE FORK 46 POINTS: "
+            + "of five hundred residents on `Arranged`, fifteen to twenty-two "
+            + "decide every withheld answer, so what the vote does with its top "
+            + "advocate IS the score. AND MAKING IT ASK SUBSUMPTION'S OWN "
+            + "QUESTION EVERY ROUND IS WORSE, not better: it is inert under a "
+            + "permissive subsumption by construction, and where it can fire it "
+            + "costs four points and mints three hundred more commitments, "
+            + "because the vote steers repair as well as reporting it",
 
         ["Choosing"] =
             "the control arm, and a choice between two rules that both do "

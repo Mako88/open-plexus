@@ -39,6 +39,14 @@ public enum Weighing
     Summing,
 
     /// <summary>An expectation is worth its best advocate and no more.</summary>
+    /// <remarks>
+    /// <b>AND UNDER IT THE VOTE PREFERS THE NARROWER RULE EVERY ROUND WHILE
+    /// <see cref="Population.Subsume"/> PREFERS THE GENERAL ONE EVERY THOUSANDTH.</b>
+    /// Making the vote defer unless the child has earned the seat — subsumption's own
+    /// bar, asked where the decision is made — was built and measured and is WORSE. See
+    /// the plan's revival row: it cannot be read as a change to the readout, because the
+    /// vote also steers repair.
+    /// </remarks>
     Strongest,
 }
 

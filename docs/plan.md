@@ -421,6 +421,7 @@ condition is a superstition.
 | Tuning a vote dial until both worlds pass | The peak of `Sharpness` moves between worlds, so it is the world's number and not the brain's | Never per world. A vote whose shape needs no number at all |
 | Repair gated only on the vote being wrong | It hides the rules most needing specialisation — the ones wrong while the population is right | Never as the ONLY gate; `Mending` keeps it as an arm |
 | `Mending.Earned` — repair on any earned failure, ignoring children | `Uncovered` dominates it everywhere measured, being the same rule with the redundant repairs removed | Never. Revive the child test, not the arm |
+| The vote deferring to a general advocate unless the narrower earns it | Four points worse where it fires, three hundred more commitments, and inert by construction under permissive subsumption | Read a population back under it without letting it steer repair |
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Each condition halves where a rule can fire, so the bar caps DEPTH by world size | A bar whose expectation shrinks with depth too |
 
 ---
@@ -579,6 +580,9 @@ change of architecture entirely.
   ONE EVERY THOUSANDTH.** Same statistic, opposite directions, and the one acting
   constantly wins — a child displaces its parent as decider, then answers what it has
   never seen.
+- **AND MAKING THE VOTE APPLY SUBSUMPTION'S BAR IS WORSE RATHER THAN BETTER**, minting
+  three hundred more commitments where it fires — because the vote steers repair as much
+  as it reports it, so no change to it is only a readout.
 - **MORE UNSOUND RULES WITH FEWER SOUND ONES SCORED HIGHER THERE**, so what the withheld
   score tracks is not how much of the world the population has got right.
 
@@ -629,4 +633,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **44** | The tiled front end's patch is the arranged world's cell, so it is told where the parts are. Does the advantage survive a patch grid that does not divide the world's? Open |
 | **45** | Three repair gates, three worlds, three winners, and conjoining two keeps one and loses the other. Is there a per-COMMITMENT signal separating *needs specialising* from *is being outvoted*? Open |
 | **46** | Of five hundred residents, fifteen to twenty-two decide every withheld answer on `Arranged`, and the arm perfect there decides with four. A population-level arm cannot reach what it does not displace. Closed |
-| **47** | The vote ranks on accuracy alone, so a child outvotes its parent the moment it looks better on drawn data. Does deferring unless the child is SIGNIFICANTLY better — subsumption's bar, applied every round — close the gap? Open |
+| **47** | Making the vote defer unless a child is significantly better costs four points where it can fire, and is inert under a permissive subsumption by construction. The vote steers repair, so it cannot be read as a readout change. Closed |

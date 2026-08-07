@@ -101,6 +101,10 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   property the multiplexer was chosen for: no corpus can contain its own answer.
 - **And it restores soundness by enumeration on a world made of photons**, which is the
   instrument step four had to do without.
+- **AND IT MUST BE UNSCOREABLE BY A BAG OF PARTS, which is the whole design
+  constraint.** The same objects in two arrangements must have OPPOSITE answers.
+- **Or recognition passes as reasoning and step four repeats with better pictures.** A
+  front end that names the parts and forgets where they were should score CHANCE.
 - **Resist polishing step one.** It is the least informative part when it passes.
 
 ### The primitive
@@ -362,6 +366,13 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   provenance, `Stated`'s star-not-a-clique, `Macro`'s sorted-versus-ordered naming,
   `Kind.Role`'s argument that a cell naming no argument transfers.
 - **Cite the idea, never the type** — a cite into deleted code is how a plan rots.
+- **BOTH LEARNERS ARE STILL CO-RESIDENT HERE, so the head-to-head needs no branch at
+  all.** `Graph`, `Learning` and `Thinking` sit beside `Commitments` in this tree.
+- **So it is one world, one front end, one held-out set and TWO READERS** — the cleanest
+  comparison this repo could produce, and the rewrite this doc budgeted for is smaller
+  than it says.
+- **A `Question` broadcast from a moment's codes is a per-step prediction in the walk's
+  OWN terms**, so neither learner has to be bent to fit the other's harness.
 
 ### What the field already knows
 
@@ -507,6 +518,15 @@ change of architecture entirely.
 - **The seed spread on that grid is unmeasured**, which is not the same as small.
 - **AND GOOD SYMBOLS ARE NOT FREE: the encoded arm costs an order more codes a moment**,
   so the price of the ceiling coming off is search.
+- **AND THAT PRICE IS PAID ON THE WRONG MACHINES.** Encoding is cheap and runs on the
+  input machines; the codes it makes multiply the search, which runs on the nodes.
+- **A POOLED EMBEDDING HAS NO PARTS AND CANNOT CARRY AN ARRANGEMENT.** The CLIP export
+  emits ONE vector for the whole picture — the holistic blob this doc warned about,
+  arriving dressed as the solution.
+- **So it answers *what is this a picture of* and can never answer *what is where*.**
+- **PATCH TOKENS ARE THE FIX AND THEY ARE A `fetch.sh` CHANGE, not an architecture
+  one.** A grid of regional readings is parts, and a scope can name a part.
+- **Untestable until a world needs parts**, which is why step five comes first.
 - **On CIFAR at equal code count, bands are AHEAD of winnowing over five seeds** —
   inside two standard errors, so not a refutation, and nowhere near the claim.
 - **WINNOW'S ONLY DEMONSTRATED ADVANTAGE IS STRUCTURAL, AND IT IS REAL.** A modality

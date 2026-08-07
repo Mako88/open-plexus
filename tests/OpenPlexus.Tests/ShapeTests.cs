@@ -1,5 +1,6 @@
 using System.Reflection;
 using OpenPlexus.Graph;
+using OpenPlexus.Machines;
 using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
@@ -37,14 +38,34 @@ public sealed class ShapeTests(ITestOutputHelper output)
     /// What a world's constructor is legitimately allowed to take.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>Every one of these is about WHAT IS BEING SHOWN or WHERE IT RUNS, never
     /// about how the walk behaves.</b> The world's own settings; the dials as one
     /// object; the seed; the cluster topology; the bus's lateness; and data to
     /// read. A new name here needs an argument, which is the point.
+    /// </para>
+    /// <para>
+    /// <b><c>brain</c> IS THE HANDING-IN THIS CHECK EXISTS TO ENFORCE, ARRIVING AS
+    /// SOMETHING IT DID NOT RECOGNISE.</b> <i>Brain dials are built once and handed in;
+    /// a world turns only its own.</i> A runner taking the whole brain as ONE object is
+    /// that rule kept — the dials are assembled outside and the world cannot reach a
+    /// single one of them. Taking a settings record instead would be the fault, so the
+    /// name is admitted with a TYPE beside it rather than on its own.
+    /// </para>
+    /// <para>
+    /// <b>AND THE TRANSLATION IS A THIRD THING THAT BELONGS AT THE JOIN.</b> Whether a
+    /// picture is read whole or in patches, whether a reading is banded or winnowed, and
+    /// which frozen encoder it passes through are none of them facts about the problem
+    /// and none of them settings on the brain — so <c>looking</c>, <c>fronting</c> and
+    /// <c>through</c> live exactly where <see cref="Machines.Trial{TSeen}"/> says the
+    /// choice is made. Putting them on the brain would be a brain that knows worlds
+    /// exist; putting them inside a world would be a world deciding what is perceived.
+    /// </para>
     /// </remarks>
     private static readonly HashSet<string> Allowed = new(StringComparer.Ordinal)
     {
         "world", "settings", "dials", "seed", "clusters", "replicas", "late", "primer",
+        "brain", "looking", "fronting", "through",
     };
 
     /// <summary>
@@ -70,6 +91,18 @@ public sealed class ShapeTests(ITestOutputHelper output)
                 foreach (var taken in made.GetParameters())
                 {
                     var name = taken.Name!;
+
+                    // AN EXEMPTION ON A NAME ALONE IS A HOLE IN THE GUARD, and this is
+                    // the one where it would matter: `brain` is admitted because it
+                    // hands over the whole brain at once, so a parameter called `brain`
+                    // that is a settings record -- or anything else a world could reach
+                    // a dial through -- is the exact fault this file was written for.
+                    if (name == "brain" && taken.ParameterType != typeof(Brain))
+                    {
+                        outstanding.Add($"{world.Name}.{name}:{taken.ParameterType.Name}");
+                        continue;
+                    }
+
                     if (Allowed.Contains(name)) continue;
 
                     outstanding.Add($"{world.Name}.{name}");

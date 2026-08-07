@@ -87,9 +87,24 @@ jobs:
       # THE KEY CARRIES A VERSION BECAUSE THE HASH ALONE WOULD NOT REFRESH IT.
       # `fetch.sh` is unchanged, so the old key still matches and would restore
       # the four-path cache and never save the new paths.
-      - name: Cache corpora
+      # AND FIXING THE PATH LIST DID NOT FIX THE CACHE, WHICH IS THE SAME TRAP
+      # ONE LAYER DOWN. `actions/cache` saves in a POST step, and it skips that
+      # step entirely on an exact key hit -- there is nothing to save when the
+      # key already matched. So the run that died mid-fetch saved the four
+      # corpora it had managed, under the v2 key; every run after it restored
+      # that partial payload, reported a HIT, re-fetched half a gigabyte, and
+      # then declined to save it because the key had matched. A cache that can
+      # never be repaired, keyed on a file that was not going to change again.
+      #
+      # SO THE SAVE IS ITS OWN STEP AND IT RUNS WHERE THE CONTENT IS COMPLETE:
+      # after the fetch and before the tests, with no `always()` on it. A fetch
+      # that fails takes the job down before this, which is what stops a partial
+      # payload being written under a good key a second time -- and a test
+      # failure no longer costs the download, which is what it cost every run
+      # since the sweeps went in.
+      - name: Restore corpora
         id: corpora
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             corpora/tasks_1-20_v1-2
@@ -98,13 +113,59 @@ jobs:
             corpora/clutrr_test.csv
             corpora/cifar-10-batches-bin
             corpora/encoders
-          key: corpora-v2-${{ hashFiles('corpora/fetch.sh') }}
+          key: corpora-v3-${{ hashFiles('corpora/fetch.sh') }}
+
+      # THE ONE STEP IN `fetch.sh` THAT IS NOT A DOWNLOAD, AND IT HAS BEEN
+      # SKIPPING HERE SINCE THE DAY IT WAS WRITTEN. MobileNet's published export
+      # ends at a 1000-way classifier, and a front end may say what it is looking
+      # at and never what to conclude -- so the graph is cut one `Gemm` early,
+      # which needs `onnx`. The runner has no such package, the script says so
+      # and carries on, and four `EncodedTests` have failed on the missing file
+      # ever since. A DEPENDENCY THAT ANNOUNCES ITS OWN ABSENCE IS STILL AN
+      # ABSENCE: the message went to a log nobody reads and the failure arrived
+      # six minutes later wearing a different name.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the encoder surgery
+        run: pip install --disable-pip-version-check onnx
 
       # NOT CONDITIONAL ON A CACHE HIT. The script already checks for what it
       # fetches and says "already at ..." -- so a partial cache repairs itself
       # instead of leaving a world to fail with a message about a missing file.
       - name: Fetch corpora
         run: bash corpora/fetch.sh
+
+      # AND THE SAVE BELOW IS ONLY SAFE IF WHAT IT SAVES IS COMPLETE, so the one
+      # thing `fetch.sh` is allowed to skip is asserted here rather than trusted.
+      # The script warns and carries on by design -- a machine without `onnx` is
+      # John's, and failing his fetch over a file only CI needs would be the
+      # wrong trade. What must not happen is CI writing that gap into a cache
+      # under a key that will match forever, which is the fault this whole block
+      # is about.
+      - name: The corpora are whole before they are cached
+        run: |
+          test -f corpora/encoders/mobilenetv3-small/model_headless.onnx \
+            || { echo "the headless encoder was not cut -- see 'Install the encoder surgery'"; exit 1; }
+
+      # WRITTEN OUT TWICE BECAUSE GITHUB ACTIONS DOES NOT READ YAML ANCHORS. An
+      # `&corpora` above and a `*corpora` here is the obvious way to keep one
+      # list, and it parses as a literal -- so the save would run against a path
+      # that does not exist and report success. The clone budget's own reason for
+      # existing, arriving somewhere it cannot be enforced.
+      - name: Save corpora
+        if: steps.corpora.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            corpora/tasks_1-20_v1-2
+            corpora/CLEVR_v1.0
+            corpora/tatoeba_eng.tsv
+            corpora/clutrr_test.csv
+            corpora/cifar-10-batches-bin
+            corpora/encoders
+          key: corpora-v3-${{ hashFiles('corpora/fetch.sh') }}
 
       # WARNINGS ARE PART OF THE CONTRACT HERE AND THE BUILD ENFORCES IT NOW.
       # `DocsTests` asserts the library builds with its documentation file on, and

@@ -124,6 +124,63 @@ public enum Mending
     /// </para>
     /// </remarks>
     Neglected,
+
+    /// <summary>
+    /// And only while forking this commitment has ever paid.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A PER-COMMITMENT SIGNAL RATHER THAN A PER-ROUND GATE, WHICH IS WHAT FORK 45
+    /// ASKS FOR.</b> <see cref="Uncovered"/> is the best thing measured on the clean
+    /// multiplexer and ruinous on <see cref="Worlds.Arranged"/>, and the difference is
+    /// not which rounds it fires on — it is that on one world specialising WORKS and on
+    /// the other there is nothing to gain. Nothing in the machine was asking which.
+    /// </para>
+    /// <para>
+    /// <b>AND THE ANSWER IS ALREADY LYING ABOUT IN THE POPULATION.</b> A parent whose
+    /// children are no more accurate than itself has learnt that splitting it buys
+    /// nothing; one whose children beat it has learnt the opposite. That is a fact the
+    /// commitments already hold about themselves, it needs no world to interpret it, and
+    /// it is the only feedback in reach that distinguishes <i>this rule needs
+    /// specialising</i> from <i>this rule is simply being outvoted</i>.
+    /// </para>
+    /// <para>
+    /// <b>THE FIRST FORK IS ALWAYS ALLOWED, BECAUSE THE SIGNAL DOES NOT EXIST UNTIL IT
+    /// HAS BEEN TRIED.</b> A parent with no children has no evidence either way, and
+    /// refusing on no evidence would make this a way of never repairing at all — which
+    /// is the shape of arm this repo deletes rather than keeps.
+    /// </para>
+    /// <para>
+    /// <b>AND IT SHOULD HAVE MADE <c>Budget</c> UNNECESSARY. IT DID NOT SELF-LIMIT AT
+    /// ALL.</b> It is the best thing measured on the clean multiplexer at both widths,
+    /// and on <see cref="Worlds.Arranged"/> it repairs MORE than the arm it was built to
+    /// restrain and lands in the same place.
+    /// </para>
+    /// <para>
+    /// <b>BECAUSE A MEMORISED CHILD BEATS ITS PARENT EASILY, WHICH MAKES THE SIGNAL
+    /// ACTIVELY MISLEADING RATHER THAN MERELY WEAK.</b> A narrow child that has stored a
+    /// corner of the drawn set is far more accurate than the general parent it came
+    /// from, so <i>has forking paid</i> answers YES forever — and every child it licenses
+    /// is a voter that is wrong about the world.
+    /// </para>
+    /// <para>
+    /// <b>WHICH IS THE SAME FAULT AS EVERY OTHER GATE HERE, AND SAYING SO IS WORTH MORE
+    /// THAN A FOURTH ATTEMPT.</b> <see cref="Outvoted"/>, <see cref="Uncovered"/>,
+    /// <see cref="Neglected"/> and this are all built from observed accuracy or observed
+    /// failure, and on a world whose drawn set can be memorised every one of them is
+    /// fooled the same way. The instrument that is not fooled is soundness by
+    /// enumeration, and that belongs to the experimenter rather than to the machine.
+    /// </para>
+    /// <para>
+    /// <b>SO THE NEXT THING TO TRY IS NOT A GATE.</b> Generality is the only proxy for
+    /// held-out truth the machine has, and the one mechanism that prefers it —
+    /// subsumption — requires the general rule to be AT LEAST AS ACCURATE. A memorised
+    /// child is always a shade better, so the clause never fires. Subsuming where the
+    /// child's advantage is not significant, using the two-proportion test repair
+    /// already owns, is the shape that follows from all of this.
+    /// </para>
+    /// </remarks>
+    Improving,
 }
 
 /// <summary>Every number the commitment machinery is allowed to have.</summary>

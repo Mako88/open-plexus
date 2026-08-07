@@ -149,7 +149,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // them directly -- so letting repair run on more rounds should change nothing
         // and the score should stay at the target. If it FALLS, the extra gate was
         // holding back damage rather than search, and the whole argument inverts.
-        foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered, Mending.Neglected })
+        foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered, Mending.Improving })
         {
             var (unseen, last) = Sweep(
                 new CommittingSettings

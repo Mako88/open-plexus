@@ -48,7 +48,19 @@ public sealed class Population
     private readonly Naming _names = new();
     private readonly Dictionary<Code, Commitment> _byName = [];
     private readonly Dictionary<Code, List<Commitment>> _byCode = [];
-    private readonly Dictionary<Code, int> _minted = [];
+
+    /// <summary>
+    /// What each commitment has forked into, by name.
+    /// </summary>
+    /// <remarks>
+    /// <b>NAMES RATHER THAN A COUNT, so a parent can be asked whether forking PAID.</b>
+    /// The count alone answers only how many times it has been tried, which is what a
+    /// budget needs and not what a decision does — see
+    /// <see cref="Mending.Improving"/>. A child that has since been culled simply
+    /// stops being found, which is the right answer: what is not resident is not
+    /// evidence.
+    /// </remarks>
+    private readonly Dictionary<Code, List<Code>> _minted = [];
 
     /// <param name="dials">Every number the machinery is allowed to have.</param>
     /// <param name="seed">The control arm's generator, used only when it is running.</param>
@@ -272,8 +284,14 @@ public sealed class Population
             // and the budget -- a handful, against the hundreds that fire. Putting it
             // first would make the instrument the cost of the run.
             .Where(one =>
-                (_dials.Mending != Mending.Uncovered && _dials.Mending != Mending.Neglected)
+                _dials.Mending == Mending.Outvoted
                 || !firing.Any(other => other.Narrows(one)))
+
+            // AND THE PER-COMMITMENT HALF, WHICH ONLY `Improving` ASKS. Last again, for
+            // the same reason the child test is: it walks a parent's children, and
+            // `Where` is lazy, so it runs for the handful that have already cleared
+            // everything else rather than for the hundreds that fire.
+            .Where(one => _dials.Mending != Mending.Improving || Improves(one))
 
             .OrderBy(one => one.Accuracy)
             .ThenBy(one => one.Identity);
@@ -284,7 +302,10 @@ public sealed class Population
 
             var child = new Commitment([.. culprit.Scope, added], culprit.Expects);
 
-            _minted[culprit.Identity] = Children(culprit.Identity) + 1;
+            if (!_minted.TryGetValue(culprit.Identity, out var born))
+                _minted[culprit.Identity] = born = [];
+
+            born.Add(child.Identity);
 
             if (Add(child)) return child;
         }
@@ -294,7 +315,35 @@ public sealed class Population
 
     /// <summary>How many children a commitment has minted.</summary>
     /// <param name="name">What the commitment is called.</param>
-    private int Children(Code name) => _minted.GetValueOrDefault(name);
+    private int Children(Code name) =>
+        _minted.TryGetValue(name, out var born) ? born.Count : 0;
+
+    /// <summary>
+    /// Whether forking this commitment has ever produced a better one.
+    /// </summary>
+    /// <param name="parent">The commitment being considered for repair.</param>
+    /// <remarks>
+    /// <b>TRUE WHERE IT HAS NEVER BEEN TRIED, because no evidence is not evidence
+    /// against.</b> A parent with no living children has learnt nothing about whether
+    /// splitting it helps, and refusing there would turn this into a way of never
+    /// repairing rather than a way of stopping when it stops paying.
+    /// </remarks>
+    private bool Improves(Commitment parent)
+    {
+        if (!_minted.TryGetValue(parent.Identity, out var born)) return true;
+
+        var living = false;
+
+        foreach (var name in born)
+        {
+            if (!_byName.TryGetValue(name, out var child)) continue;
+
+            living = true;
+            if (child.Accuracy > parent.Accuracy) return true;
+        }
+
+        return !living;
+    }
 
     /// <summary>How many commitments have spent their whole repair budget.</summary>
     /// <param name="budget">The budget each was given.</param>

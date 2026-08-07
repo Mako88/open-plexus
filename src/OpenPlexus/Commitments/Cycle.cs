@@ -189,7 +189,7 @@ public sealed class Cycle
         // THE TWO THAT DO NOT WAIT FOR THE VOTE. `Neglected` does wait, and its extra
         // condition lives inside `Mend` -- so the two halves of the conjunction are
         // applied where each is cheapest to ask, rather than both in one place.
-        if (_held.Dials.Mending == Mending.Uncovered
+        if (_held.Dials.Mending is Mending.Uncovered or Mending.Improving
             && _held.Mend(firing, arrived) is not null)
             Repaired++;
 

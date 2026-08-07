@@ -29,14 +29,14 @@ public sealed class ArrangingTests(ITestOutputHelper output)
     /// on a measurement file rather than on the library.
     /// </remarks>
     private static (List<double> Unseen, Grounded Last) Sweep(
-        CommittingSettings dials, Looking looking)
+        ArrangedSettings world, CommittingSettings dials, Looking looking)
     {
         var unseen = new List<double>();
         var last = default(Grounded);
 
         foreach (var seed in new[] { 1, 2, 3, 4, 5 })
         {
-            last = new ArrangedRun(Small, new Brain(dials, seed), looking, seed).Run(20_000);
+            last = new ArrangedRun(world, new Brain(dials, seed), looking, seed).Run(20_000);
             unseen.Add(last.Tally.Unseen!.Accuracy);
         }
 
@@ -123,6 +123,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
             : [5.0])
         {
             var (unseen, last) = Sweep(
+                Small,
                 new CommittingSettings
                 {
                     Surprising = Surprising.AnyFailure,
@@ -162,6 +163,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         foreach (var subsuming in new[] { Subsuming.Weaker, Subsuming.Insignificant })
         {
             var (unseen, last) = Sweep(
+                Small,
                 new CommittingSettings
                 {
                     Surprising = Surprising.AnyFailure,
@@ -181,6 +183,53 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                 + $"deciders {last.Tally.Unseen!.Deciders}/{last.Tally.Unseen.Answered} "
                 + $"handed {last.Tally.Unseen.Handed}/{last.Tally.Unseen.Answered}, "
                 + $"lead {last.Tally.Confidence:F3}");
+        }
+
+        Assert.True(true);
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_the_gap_is_a_fact_about_the_learner_or_about_how_much_it_was_shown()
+    {
+        // THREE INSTRUMENTS HAVE NOW SAID THE SAME THING AND NONE OF THEM SAID WHOSE
+        // FAULT IT IS. The children that cost this world a quarter of its score are not
+        // memorised, the population is not what is read, and handing every seat back to
+        // a general rule changes not one answer -- because those deciders ARE
+        // significantly better on what they were shown. A rule true of the drawn
+        // arrangements and false of the withheld ones has a perfect observed record, and
+        // no statistic over drawn data can see it.
+        //
+        // WHICH MAKES THE NEXT QUESTION ABOUT THE EXAM RATHER THAN THE MACHINE. `Hold`
+        // withholds every nth arrangement, so a LARGER value draws more of the world. If
+        // the gap is what the drawn set cannot distinguish, it closes as this rises. If
+        // it does not, the deciders are wrong for a reason coverage does not touch, and
+        // that rules out the last explanation this session has left.
+        //
+        // NOT COMPARABLE CELL TO CELL, AND SAYING SO IS THE POINT. Each value withholds a
+        // different set, so these are different exams -- what is readable is the
+        // DIRECTION and whether the drawn score moves with it.
+        foreach (var hold in new[] { 2, 4, 8, 16 })
+        foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered })
+        {
+            var (unseen, last) = Sweep(
+                Small with { Hold = hold },
+                new CommittingSettings
+                {
+                    Surprising = Surprising.AnyFailure,
+                    Weighing = Weighing.Strongest,
+                    Mending = mending,
+                    Subsuming = Subsuming.Insignificant,
+                },
+                Looking.Tiled);
+
+            output.WriteLine(
+                $"hold {hold,2} {mending,-9} | unseen {unseen.Average():F3} "
+                + $"[{string.Join(" ", unseen.Select(one => one.ToString("F3")))}] | "
+                + $"drawn {last.Tally.Recent:F3} | "
+                + $"{last.Rules.Sound} sound {last.Rules.Unsound} unsound, "
+                + $"resident {last.Tally.Resident} scope {last.Rules.Scope:F2}, "
+                + $"deciders {last.Tally.Unseen!.Deciders}/{last.Tally.Unseen.Answered}");
         }
 
         Assert.True(true);

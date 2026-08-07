@@ -589,6 +589,11 @@ change of architecture entirely.
 - **THE DECIDERS EARNED THEIR SEATS AND ARE STILL WRONG.** Handing every seat back to a
   general rule that has not beaten it changes not one withheld answer, so the readout is
   not the gap and drawn evidence cannot tell those rules apart.
+- **AND IT IS NOT COVERAGE EITHER.** Doubling how much of the world is drawn leaves the
+  gap flat while the drawn score stays perfect, and one-code rules hold the withheld set
+  with half the world held back.
+- **SO ON A WORLD WHOSE TRUE RULES ARE ONE CODE, ANY REPAIR IS DAMAGE**, and nothing
+  computed from inside can tell that this is such a world.
 - **MORE UNSOUND RULES WITH FEWER SOUND ONES SCORED HIGHER THERE**, so what the withheld
   score tracks is not how much of the world the population has got right.
 

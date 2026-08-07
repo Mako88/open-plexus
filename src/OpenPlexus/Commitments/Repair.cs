@@ -42,6 +42,16 @@ public enum Weighing
     Strongest,
 }
 
+/// <summary>What has to go wrong before repair is attempted at all.</summary>
+public enum Mending
+{
+    /// <summary>The vote had to be wrong. What ran before anything questioned it.</summary>
+    Outvoted,
+
+    /// <summary>A commitment had to be wrong and to have earned repair. Its own gates decide.</summary>
+    Earned,
+}
+
 /// <summary>Every number the commitment machinery is allowed to have.</summary>
 public sealed record CommittingSettings
 {
@@ -158,6 +168,66 @@ public sealed record CommittingSettings
     /// </para>
     /// </remarks>
     public Weighing Weighing { get; init; } = Weighing.Summing;
+
+    /// <summary>Whether repair waits for the VOTE to be wrong, or only for a commitment to be.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE PLAN ALREADY SAYS THESE ARE TWO DIFFERENT THINGS AND THE CODE TREATS THEM
+    /// AS ONE.</b> <i>An outvoted commitment still accrues its own hits and misses, which
+    /// keeps C1 and stops the winner monopolising the learning.</i> It accrues them and
+    /// then cannot act on them: covering and repair run only on a round the WINNER got
+    /// wrong, so a commitment that fired, was wrong, and was outvoted banks a miss it can
+    /// never spend.
+    /// </para>
+    /// <para>
+    /// <b>WHICH MAKES HOW HARD THE MACHINE SEARCHES A FUNCTION OF HOW GOOD ITS ANSWERS
+    /// ALREADY ARE, AND NOBODY DESIGNED THAT.</b> Measured rather than suspected:
+    /// concentrating the vote costs 169 repairs to 105 at six bits and 12.3 true rules to
+    /// 8.7 at eleven, and on a noisy world where both arms fail the same rounds they
+    /// repair identically and differ only in score.
+    /// </para>
+    /// <para>
+    /// <b>AND THE GATE TURNS OUT TO BE LOAD-BEARING, WHICH REFUTES THE PARAGRAPH ABOVE AS
+    /// AN ARGUMENT FOR REMOVING IT.</b> On <see cref="Worlds.Multiplexer"/>
+    /// <see cref="Mending.Earned"/> is better everywhere — 0.976 against 0.944 at eleven bits with
+    /// <see cref="Weighing.Strongest"/>. On <see cref="Worlds.Arranged"/> it is a disaster:
+    /// 1.000 falls to 0.763, because the gated arm repairs NINE times in twenty thousand
+    /// rounds and the ungated one mints eleven hundred and thirty children that then
+    /// compete in the vote. Sound rules rose from 36 to 119 and unsound ones from 178 to
+    /// 312, and the score went with the second number.
+    /// </para>
+    /// <para>
+    /// <b>SO <i>ONLY FIX WHAT IS BROKEN</i> IS THE RIGHT RULE AND THIS IS ANOTHER DIAL
+    /// WHOSE VALUE MOVES WITH THE WORLD — the disease and not the cure.</b> Where the true
+    /// rules are one code, repair has nothing useful to do and the brake protects the
+    /// population from itself; where they are three-code conjunctions, the brake starves
+    /// the only mechanism that can reach them. The readout cannot tell those apart because
+    /// being right and having nothing left to learn are the same observation to it.
+    /// </para>
+    /// <para>
+    /// <b>AND THE PLAN ALREADY NAMES THE SIGNAL THAT COULD.</b> Fork 37: <i>the driver
+    /// nobody has wired is whether a parent still has failures no child covers</i>. That
+    /// is vote-independent and world-independent, and it separates the two cases exactly —
+    /// a sound one-code rule has no uncovered failures and would not be repaired; an
+    /// over-general one has them and would. It is the honest answer to all three of these
+    /// dials and it is still unwired.
+    /// </para>
+    /// <para>
+    /// <b>AND <see cref="Mending.Earned"/> IS NOT "REPAIR EVERY ROUND".</b>
+    /// <see cref="Population.Mend"/> already refuses anything under
+    /// <see cref="Floor"/> misses, over <see cref="Budget"/> children, or without a
+    /// condition past the separation bar and its correction. Every gate the design
+    /// specifies stays; what goes is the one it did not.
+    /// </para>
+    /// <para>
+    /// <b>COVERING IS NOT MOVED WITH IT, AND THAT IS DELIBERATE.</b> Genesis mints per
+    /// live code, so running it on every round would walk the whole
+    /// <c>code → outcome</c> space -- the refutation that put `Surprising` back. Repair
+    /// adds ONE child to ONE parent that has already earned it, which is a bounded thing
+    /// to try.
+    /// </para>
+    /// </remarks>
+    public Mending Mending { get; init; } = Mending.Outvoted;
 
     /// <summary>How the condition to add is picked.</summary>
     /// <remarks>

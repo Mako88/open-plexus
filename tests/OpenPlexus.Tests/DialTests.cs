@@ -98,6 +98,18 @@ public sealed class DialTests(ITestOutputHelper output)
             + "not a controller on this number but a vote whose shape does not need "
             + "one; `Weighing` is that arm",
 
+        ["Mending"] =
+            "OPEN, AND IT IS THE THIRD DIAL IN A ROW WHOSE VALUE MOVES WITH THE "
+            + "WORLD. Whether repair waits for the VOTE to be wrong or only for a "
+            + "commitment to be: `Earned` is better everywhere on the multiplexer "
+            + "and turns 1.000 into 0.763 on `Arranged`, because where the true "
+            + "rules are one code the brake is protecting the population from "
+            + "eleven hundred children it does not need. `Only fix what is broken` "
+            + "is right; the readout just cannot tell being right from having "
+            + "nothing left to learn. Fork 37 names the signal that could -- "
+            + "whether a parent still has failures no child covers -- and it is "
+            + "the honest driver for this, `Weighing` and `Sharpness` alike",
+
         ["Weighing"] =
             "the arm for the line above, and a choice between two rules rather "
             + "than a quantity -- as `Choosing` is. Whether an expectation is worth "
@@ -526,10 +538,18 @@ public sealed class DialTests(ITestOutputHelper output)
         // the limit of high sharpness -- 105 repairs and 5.0 key rules at six bits,
         // which is what `Sharpness = 20` gives to the digit.
         //
-        // SO THE COUNT GOES UP AND THE ARGUMENT IS NOT SETTLED, which is the honest
-        // state and is what this budget exists to keep visible. Neither rule wins
-        // everywhere, and the reason is a coupling nobody designed rather than a
-        // number nobody has tuned -- see the commit that added it.
-        Assert.Equal(22, HandSet.Count);
+        // AND TO TWENTY-THREE FOR `Mending`, WHICH IS THE THIRD IN A ROW AND IS WHY
+        // THE COUNT RISING TWICE IN ONE SESSION IS THE FINDING RATHER THAN THE COST.
+        // `Sharpness`, `Weighing` and `Mending` all have a best value that moves
+        // between two worlds, and no combination of them is best on both -- so the
+        // answer is not another arm, and adding a fourth would be the same mistake
+        // with a different name.
+        //
+        // FORK 37 NAMES THE SIGNAL ALL THREE ARE STANDING IN FOR: whether a parent
+        // still has failures no child covers. It is vote-independent and
+        // world-independent, the repair gate already computes most of it, and it
+        // separates the two cases these dials keep splitting the difference between.
+        // The next entry in this list should be its DELETION of three of them.
+        Assert.Equal(23, HandSet.Count);
     }
 }

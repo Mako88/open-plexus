@@ -60,6 +60,16 @@ public sealed class Population
         _blind = new Random(seed);
     }
 
+    /// <summary>Every number the brain was handed.</summary>
+    /// <remarks>
+    /// <b>READ BY <see cref="Cycle"/>, WHICH OWNS THE LOOP AND NOT THE DIALS.</b> Handing
+    /// the same settings record to both would be two references to one object with two
+    /// chances to be given different ones — and a learning loop configured differently
+    /// from the population it drives is the sort of fault that shows up as a mechanism
+    /// that does nothing.
+    /// </remarks>
+    public CommittingSettings Dials => _dials;
+
     /// <summary>How many commitments are resident.</summary>
     /// <remarks>
     /// <b>Reported beside every score, because an accuracy can be reached by

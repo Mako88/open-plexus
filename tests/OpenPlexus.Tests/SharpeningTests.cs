@@ -146,6 +146,65 @@ public sealed class SharpeningTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Repair_that_waits_for_a_commitment_to_be_wrong_rather_than_the_vote()
+    {
+        // THE INCONSISTENCY, ARGUED FROM THE PLAN'S OWN TEXT BEFORE IT WAS MEASURED. An
+        // outvoted commitment still accrues its own hits and misses -- and then could
+        // never spend them, because repair ran only on a round the WINNER lost. So a
+        // commitment that fired, was wrong, and was outvoted banked a miss it could not
+        // act on, and how hard the machine searched became a function of how good its
+        // answers already were.
+        //
+        // AND THAT IS WHY NO SINGLE `Sharpness` SERVES BOTH WORLDS. Concentrating the
+        // vote is the right readout everywhere measured and the wrong search on a world
+        // whose true rules take three codes to say. Decoupling them is the only move
+        // that could give both.
+        //
+        // THE PREDICTION: `Strongest` with `Earned` keeps 1.000 on `Arranged` AND
+        // recovers the clean multiplexer toward what a plain sum gets. If it does not,
+        // the coupling was not the cause and the extra gate was load-bearing for a
+        // reason nobody has named.
+        foreach (var (address, noise) in new[] { (2, 0.0), (3, 0.0), (2, 0.15) })
+        {
+            output.WriteLine($"{(1 << address) + address} bits, noise {noise:F2}:");
+
+            foreach (var weighing in new[] { Weighing.Summing, Weighing.Strongest })
+            foreach (var mending in new[] { Mending.Outvoted, Mending.Earned })
+            {
+                var recent = new List<double>();
+                var sound = new List<double>();
+                var found = new List<double>();
+                var repaired = new List<double>();
+                var resident = new List<double>();
+
+                foreach (var seed in new[] { 1, 2, 3 })
+                {
+                    var learned = new MultiplexerRun(
+                        new MultiplexerSettings { Address = address, Noise = noise },
+                        new Brain(
+                            new CommittingSettings { Weighing = weighing, Mending = mending },
+                            seed),
+                        seed).Run(Rounds);
+
+                    recent.Add(learned.Recent);
+                    sound.Add(learned.Sound);
+                    found.Add(learned.Found);
+                    repaired.Add(learned.Repaired);
+                    resident.Add(learned.Resident);
+                }
+
+                output.WriteLine(
+                    $"  {weighing,-9} {mending,-8} | recent {recent.Average():F3} "
+                    + $"[{string.Join(" ", recent.Select(one => one.ToString("F3")))}] | "
+                    + $"sound {sound.Average():F0} resident {resident.Average():F0} | "
+                    + $"repaired {repaired.Average():F0} | of the key: {found.Average():F1}");
+            }
+        }
+
+        Assert.True(true);
+    }
+
+    [Fact]
     public void And_whether_a_sharp_vote_is_only_sharp_because_nothing_lies_to_it()
     {
         // THE WAY THE RESULT COULD BE A TRAP, TESTED RATHER THAN CAVEATED. Raising the

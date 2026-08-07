@@ -16,17 +16,52 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class ArrangingTests(ITestOutputHelper output)
 {
+    private static readonly ArrangedSettings Small =
+        new() { Side = 3, Cell = 3, Clutter = 1, Hold = 4 };
+
+    /// <summary>Five seeds of one configuration, and what the last one left behind.</summary>
+    /// <param name="dials">The brain, built once and handed to every seed.</param>
+    /// <param name="looking">How the picture is cut up.</param>
+    /// <remarks>
+    /// <b>ONE BRAIN PER CONFIGURATION AND FIVE SEEDS OF IT, because one seed is not a
+    /// comparison and this repo has watched an ordering invert.</b> Written out twice
+    /// before `DuplicationTests` refused the second, which is that budget doing its job
+    /// on a measurement file rather than on the library.
+    /// </remarks>
+    private static (List<double> Unseen, Grounded Last) Sweep(
+        CommittingSettings dials, Looking looking)
+    {
+        var unseen = new List<double>();
+        var last = default(Grounded);
+
+        foreach (var seed in new[] { 1, 2, 3, 4, 5 })
+        {
+            last = new ArrangedRun(Small, new Brain(dials, seed), looking, seed).Run(20_000);
+            unseen.Add(last.Tally.Unseen!.Accuracy);
+        }
+
+        return (unseen, last!);
+    }
+
+    /// <summary>The standard error of a handful of readings.</summary>
+    private static double Spread(List<double> readings)
+    {
+        var mean = readings.Average();
+
+        return Math.Sqrt(
+            readings.Sum(one => (one - mean) * (one - mean)) / (readings.Count - 1))
+            / Math.Sqrt(readings.Count);
+    }
+
     [Fact]
     public void The_gap_between_what_it_was_shown_and_what_it_was_not()
     {
-        var settings = new ArrangedSettings { Side = 3, Cell = 3, Clutter = 1, Hold = 4 };
-
         foreach (var rounds in new[] { 10_000, 40_000 })
         foreach (var looking in new[] { Looking.Whole, Looking.Tiled })
         foreach (var seed in new[] { 1, 2, 3 })
         {
             var run = new ArrangedRun(
-                settings, new Brain(new CommittingSettings(), seed), looking, seed);
+                Small, new Brain(new CommittingSettings(), seed), looking, seed);
 
             var got = run.Run(rounds);
             var bar = run.Measure();
@@ -68,10 +103,8 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // SO THIS IS A PREDICTION WITH A NUMBER ON IT. If the vote is the gap, the
         // score climbs toward 1.000 as the power rises. If it does not, the gap is
         // somewhere nobody has looked yet and this rules out the obvious place.
-        var settings = new ArrangedSettings { Side = 3, Cell = 3, Clutter = 1, Hold = 4 };
-
         var could = new ArrangedRun(
-            settings, new Brain(new CommittingSettings(), seed: 1), Looking.Tiled, seed: 1)
+            Small, new Brain(new CommittingSettings(), seed: 1), Looking.Tiled, seed: 1)
             .Reachable(depth: 1);
 
         output.WriteLine(
@@ -87,39 +120,51 @@ public sealed class ArrangingTests(ITestOutputHelper output)
             ? new[] { 1.0, 5.0, 10.0, 20.0, 50.0 }
             : [5.0])
         {
-            var unseen = new List<double>();
-            var last = default(Grounded);
-
-            foreach (var seed in new[] { 1, 2, 3, 4, 5 })
-            {
-                var run = new ArrangedRun(
-                    settings,
-                    new Brain(
-                        new CommittingSettings
-                        {
-                            Surprising = Surprising.AnyFailure,
-                            Sharpness = sharpness,
-                            Weighing = weighing,
-                        },
-                        seed),
-                    Looking.Tiled,
-                    seed);
-
-                last = run.Run(20_000);
-                unseen.Add(last.Tally.Unseen!.Accuracy);
-            }
-
-            var mean = unseen.Average();
-            var spread = Math.Sqrt(
-                unseen.Sum(one => (one - mean) * (one - mean)) / (unseen.Count - 1));
+            var (unseen, last) = Sweep(
+                new CommittingSettings
+                {
+                    Surprising = Surprising.AnyFailure,
+                    Sharpness = sharpness,
+                    Weighing = weighing,
+                },
+                Looking.Tiled);
 
             output.WriteLine(
-                $"  {weighing,-9} sharpness {sharpness,4} | unseen {mean:F3} +/- "
-                + $"{spread / Math.Sqrt(unseen.Count):F3} | "
+                $"  {weighing,-9} sharpness {sharpness,4} | unseen {unseen.Average():F3} +/- "
+                + $"{Spread(unseen):F3} | "
                 + $"[{string.Join(" ", unseen.Select(one => one.ToString("F3")))}] | "
-                + $"last run: {last!.Rules.Sound} sound {last.Rules.Unsound} unsound, "
+                + $"last run: {last.Rules.Sound} sound {last.Rules.Unsound} unsound, "
                 + $"believed {last.Rules.Trusted:F3} vs {last.Rules.Doubted:F3}, "
                 + $"lead {last.Tally.Confidence:F3}");
+        }
+
+        Assert.True(true);
+    }
+
+    [Fact]
+    public void And_the_other_half_of_the_decoupling_where_the_target_is_known()
+    {
+        // THE SIDE OF THE PREDICTION THAT MUST NOT MOVE. Repair on this world is not
+        // the constraint -- the rules that solve it are one code each and genesis mints
+        // them directly -- so letting repair run on more rounds should change nothing
+        // and the score should stay at the target. If it FALLS, the extra gate was
+        // holding back damage rather than search, and the whole argument inverts.
+        foreach (var mending in new[] { Mending.Outvoted, Mending.Earned })
+        {
+            var (unseen, last) = Sweep(
+                new CommittingSettings
+                {
+                    Surprising = Surprising.AnyFailure,
+                    Weighing = Weighing.Strongest,
+                    Mending = mending,
+                },
+                Looking.Tiled);
+
+            output.WriteLine(
+                $"Strongest {mending,-8} | unseen {unseen.Average():F3} "
+                + $"[{string.Join(" ", unseen.Select(one => one.ToString("F3")))}] | "
+                + $"{last.Rules.Sound} sound {last.Rules.Unsound} unsound, "
+                + $"repaired {last.Tally.Repaired}, lead {last.Tally.Confidence:F3}");
         }
 
         Assert.True(true);
@@ -133,15 +178,13 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // The single-seed reading says `Unaccounted` starves genesis on this world,
         // which is the OPPOSITE of what five seeds said on CIFAR, so it gets error bars
         // before it gets written down as anything.
-        var settings = new ArrangedSettings { Side = 3, Cell = 3, Clutter = 1, Hold = 4 };
-
         foreach (var looking in new[] { Looking.Whole, Looking.Tiled })
         {
             // HOISTED, BECAUSE THE CEILING IS A FACT ABOUT THE WORLD AND THE FRONT END
             // AND NEITHER MOVES WITH THE SEED. Recomputing it per run would spend most
             // of the grid's time confirming the same number twenty times.
             var could = new ArrangedRun(
-                settings, new Brain(new CommittingSettings(), seed: 1), looking, seed: 1)
+                Small, new Brain(new CommittingSettings(), seed: 1), looking, seed: 1)
                 .Reachable(depth: 1);
 
             output.WriteLine(
@@ -155,7 +198,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                 foreach (var seed in new[] { 1, 2, 3, 4, 5 })
                 {
                     var run = new ArrangedRun(
-                        settings,
+                        Small,
                         new Brain(new CommittingSettings { Surprising = gate }, seed),
                         looking,
                         seed);

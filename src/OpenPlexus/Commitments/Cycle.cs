@@ -180,17 +180,28 @@ public sealed class Cycle
             _held.Cull();
         }
 
+        // REPAIR NEED NOT WAIT FOR THE VOTE, AND WHETHER IT SHOULD IS AN ARM. The plan
+        // says an outvoted commitment still accrues its own hits and misses -- and then
+        // this early return meant it could never spend them, so how hard the machine
+        // searched was a function of how good its answers already were. `Mend` refuses
+        // anything short of the floor, over budget, or without a condition past the
+        // separation bar, so its own gates are not being loosened; only this one is.
+        if (_held.Dials.Mending == Mending.Earned && _held.Mend(firing, arrived) is not null)
+            Repaired++;
+
         if (vote.Expects == arrived) return;
 
-        // COVERING AND REPAIR BOTH RUN ONLY ON A FAILURE. Minting every round would
-        // fill the population with restatements of moments already predicted, and
-        // repairing every round would spend the budget on commitments that work.
+        // COVERING RUNS ONLY ON A FAILURE AND IS NOT MOVED WITH REPAIR. Genesis mints
+        // per live code, so running it every round walks the whole `code -> outcome`
+        // space -- which is the refutation that put `Surprising` back, and it would
+        // arrive again by this door.
         //
         // AND COVERING IS GATED AGAIN INSIDE, on whether anything that fired proposed
         // what arrived -- a failure the population already had an account of is
         // repair's business and not genesis's. `Surprising` is the dial.
         Minted += _held.Cover(moment, arrived, firing);
 
-        if (_held.Mend(firing, arrived) is not null) Repaired++;
+        if (_held.Dials.Mending == Mending.Outvoted && _held.Mend(firing, arrived) is not null)
+            Repaired++;
     }
 }

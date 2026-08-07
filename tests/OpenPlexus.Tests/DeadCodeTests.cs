@@ -221,6 +221,13 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
             + "cannot see a caller sitting beside it.",
 
+        ["Probe"] = "A CONTROL ARM, SO THE LIBRARY NAMING IT WOULD BE THE FAULT. It "
+            + "is the dullest learner there is, run over the same features the "
+            + "commitment population reads, and what it measures is how much of a "
+            + "problem is in the FRONT END rather than in the learner. Something "
+            + "inside `src` calling it would mean the architecture had started "
+            + "consulting its own yardstick, which is the one thing it must never do.",
+
         // `Winnow` WAS THE ENTRY THIS CHECK WAS WRITTEN FOR, and it is gone because
         // it is now mounted rather than because the reason was reworded. `GradedRun`
         // consumes it as one of two front-end arms, so the library has finally heard

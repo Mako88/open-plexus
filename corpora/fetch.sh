@@ -10,6 +10,32 @@ set -euo pipefail
 
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# ONE DOWNLOAD, WITH A HOST THAT CRAWLS TREATED AS A HOST THAT IS DOWN.
+#
+# WHY THIS EXISTS: CI died twice in a row here, thirty minutes each time, with
+# curl's exit 28 -- `cs.toronto.edu` accepted the connection for CIFAR and then
+# delivered almost nothing, so `--max-time 1800` elapsed in full. The suite never
+# built, and nine commits sat unvalidated behind a stalled socket.
+#
+# A PLAIN TIMEOUT IS THE WRONG INSTRUMENT FOR THAT. It cannot tell a large file
+# on a slow link from a dead transfer, so it has to be set long enough for the
+# former and then pays that in full for the latter. `--speed-limit` asks the
+# question directly: under ten kilobytes a second for a minute is not slow, it is
+# stopped, and it gives up in a minute rather than in half an hour.
+#
+# AND THE RETRIES ARE WHAT MAKE A BLIP COST SECONDS. Three of them, so a
+# transient refusal self-heals; `--retry-all-errors` because a stalled transfer
+# is not in curl's default retry set, which is the exact case this is for.
+#
+# IT WOULD NOT HAVE CAUGHT THE FAILURE THAT PROMPTED IT, AND SAYING SO IS THE
+# POINT. Measured after the fact, `cs.toronto.edu` was serving at about 106 kB/s
+# -- slow, and ten times over this floor, so the transfer never looks stopped and
+# this never fires. What it guards is a host that goes silent. The slow one is
+# handled by the timeout below and by the cache, and properly by a mirror.
+grab() {
+  curl -sS -L     --connect-timeout 30     --speed-limit 10000 --speed-time 60     --retry 3 --retry-delay 5 --retry-all-errors     "$@"
+}
+
 # bAbI — Weston et al. 2015, "Towards AI-Complete Question Answering: A Set of
 # Prerequisite Toy Tasks". CC BY 3.0, Copyright (c) 2015-present Facebook, Inc.
 #
@@ -23,7 +49,7 @@ if [ -d "$babi_dir/en" ]; then
   echo "bAbI: already at $babi_dir"
 else
   echo "bAbI: fetching 11.7 MB from $babi_url"
-  curl -sS -L --max-time 300 -o "$here/babi.tar.gz" "$babi_url"
+  grab --max-time 300 -o "$here/babi.tar.gz" "$babi_url"
   tar -xzf "$here/babi.tar.gz" -C "$here"
   echo "bAbI: extracted to $babi_dir"
 fi
@@ -54,7 +80,7 @@ if [ -f "$tatoeba_file" ]; then
   echo "Tatoeba: already at $tatoeba_file"
 else
   echo "Tatoeba: fetching 25 MB from $tatoeba_url"
-  curl -sS -L --max-time 600 -o "$here/tatoeba_eng.tsv.bz2" "$tatoeba_url"
+  grab --max-time 600 -o "$here/tatoeba_eng.tsv.bz2" "$tatoeba_url"
   bunzip2 -kf "$here/tatoeba_eng.tsv.bz2"
   echo "Tatoeba: extracted to $tatoeba_file"
 fi
@@ -78,7 +104,7 @@ if [ -f "$clevr_dir/scenes/CLEVR_val_scenes.json" ]; then
   echo "CLEVR: already at $clevr_dir"
 else
   echo "CLEVR: fetching 89 MB from $clevr_url"
-  curl -sS -L --max-time 900 -o "$here/clevr.zip" "$clevr_url"
+  grab --max-time 900 -o "$here/clevr.zip" "$clevr_url"
   unzip -o -q "$here/clevr.zip" -d "$here" \
     "CLEVR_v1.0/scenes/CLEVR_val_scenes.json" \
     "CLEVR_v1.0/questions/CLEVR_val_questions.json" \
@@ -112,7 +138,7 @@ if [ -f "$clutrr_file" ]; then
   echo "CLUTRR: already at $clutrr_file"
 else
   echo "CLUTRR: fetching 1.9 MB from $clutrr_url"
-  curl -sS -L --max-time 300 -o "$clutrr_file" "$clutrr_url"
+  grab --max-time 300 -o "$clutrr_file" "$clutrr_url"
   echo "CLUTRR: fetched to $clutrr_file"
 fi
 
@@ -147,7 +173,17 @@ if [ -f "$cifar_dir/test_batch.bin" ]; then
   echo "CIFAR-10: already at $cifar_dir"
 else
   echo "CIFAR-10: fetching 162 MB from $cifar_url"
-  curl -sS -L --max-time 1800 -o "$here/cifar-10-binary.tar.gz" "$cifar_url"
+  # AN HOUR, BECAUSE THIRTY MINUTES IS NOT ENOUGH AT THE RATE THIS HOST SERVES.
+  # It was 1800 and CI spent every second of it twice before dying with exit 28;
+  # 162 MB at the ~106 kB/s measured from two places is about twenty-five
+  # minutes, which is inside 1800 only when nothing else goes wrong.
+  #
+  # THIS BUYS ONE SLOW RUN AND THE CACHE TAKES IT FROM THERE, so it is a way of
+  # letting the cache get populated rather than a fix. The fix is a mirror, and
+  # picking one is a decision about PROVENANCE -- the red-ball property rests on
+  # every machine coding the same bytes, and this file's bAbI note is careful to
+  # say its mirror is byte-identical in layout. Nobody should choose that quickly.
+  grab --max-time 3600 -o "$here/cifar-10-binary.tar.gz" "$cifar_url"
   tar -xzf "$here/cifar-10-binary.tar.gz" -C "$here"
   echo "CIFAR-10: extracted to $cifar_dir"
 fi
@@ -194,7 +230,7 @@ else
   echo "CLIP: fetching 352 MB from $clip_repo"
   mkdir -p "$clip_dir"
   for file in model.onnx config.json preprocessor_config.json; do
-    curl -sS -L --max-time 900 -o "$clip_dir/$file" "$clip_repo/$file"
+    grab --max-time 900 -o "$clip_dir/$file" "$clip_repo/$file"
   done
   echo "CLIP: fetched to $clip_dir"
 fi
@@ -224,9 +260,9 @@ if [ -f "$mobilenet_dir/model.onnx" ]; then
 else
   echo "MobileNetV3: fetching 10 MB from $mobilenet_repo"
   mkdir -p "$mobilenet_dir"
-  curl -sS -L --max-time 300 -o "$mobilenet_dir/model.onnx" "$mobilenet_repo/onnx/model.onnx"
+  grab --max-time 300 -o "$mobilenet_dir/model.onnx" "$mobilenet_repo/onnx/model.onnx"
   for file in config.json preprocessor_config.json; do
-    curl -sS -L --max-time 120 -o "$mobilenet_dir/$file" "$mobilenet_repo/$file"
+    grab --max-time 120 -o "$mobilenet_dir/$file" "$mobilenet_repo/$file"
   done
   echo "MobileNetV3: fetched to $mobilenet_dir"
 fi

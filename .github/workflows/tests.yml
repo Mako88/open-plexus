@@ -44,7 +44,21 @@ concurrency:
 jobs:
   suite:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # NINETY, AND MOST OF IT IS FOR A COLD CACHE RATHER THAN FOR THE SUITE.
+    #
+    # It was 45, which was comfortable for the tests and is not comfortable for
+    # the fetch: `cs.toronto.edu` serves CIFAR at about 106 kB/s, so 162 MB is
+    # twenty-five minutes on its own, and a cache miss pays that plus half a
+    # gigabyte of everything else before a single test runs.
+    #
+    # A COLD CACHE IS RARE AND THE KEY SAYS WHEN. It misses only when
+    # `corpora/fetch.sh` changes, so this budget is spent about as often as that
+    # file is edited; every other run restores and skips the download entirely.
+    #
+    # AND THE SUITE ITSELF GOT SHORTER IN THE SAME BREATH, since the measurement
+    # sweeps are filtered out below. This is not room for the tests to sprawl
+    # into -- if the TEST step starts approaching this, that is a finding.
+    timeout-minutes: 90
 
     steps:
       - uses: actions/checkout@v4

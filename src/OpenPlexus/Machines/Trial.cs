@@ -4,6 +4,43 @@ using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Machines;
 
+/// <summary>
+/// What the population said about observations the world never drew.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>THE ONLY NUMBER ON A PERCEPTUAL WORLD THAT SEPARATES LEARNING FROM
+/// MEMORISING.</b> Where a world's true rule set can be enumerated, soundness answers
+/// that question exactly and this is redundant. Where it cannot — which is every world
+/// made of photographs, forever — a trailing accuracy over a bag drawn with
+/// replacement is indistinguishable from a lookup table, and this is the whole of the
+/// difference.
+/// </para>
+/// <para>
+/// <b>AND THE SILENCE IS REPORTED BESIDE THE SCORE RATHER THAN FOLDED INTO IT.</b> A
+/// population that fires on nothing it has not seen scores an excellent
+/// <see cref="Accuracy"/> over the handful it does answer, which is a fallback arm
+/// nobody meant to run. Both halves or neither.
+/// </para>
+/// </remarks>
+public sealed record Examined
+{
+    /// <summary>Withheld observations put to the population.</summary>
+    public required int Asked { get; init; }
+
+    /// <summary>How many of them anything fired on.</summary>
+    public required int Answered { get; init; }
+
+    /// <summary>How many of those were right.</summary>
+    public required int Right { get; init; }
+
+    /// <summary>The share of answered predictions that were right.</summary>
+    public double Accuracy => Answered == 0 ? 0.0 : Right / (double)Answered;
+
+    /// <summary>The share of withheld observations nothing fired on.</summary>
+    public double Silence => Asked == 0 ? 0.0 : (Asked - Answered) / (double)Asked;
+}
+
 /// <summary>What a trial did, in terms every world shares.</summary>
 /// <remarks>
 /// <b>NOTHING WORLD-SPECIFIC LIVES HERE.</b> An answer key, a soundness check, a count
@@ -52,6 +89,18 @@ public sealed record Tally
     /// four times as much to search, so a score without this rewards whoever talks more.
     /// </remarks>
     public required double Codes { get; init; }
+
+    /// <summary>
+    /// What it said about what it was never shown, or nothing if the world showed
+    /// everything.
+    /// </summary>
+    /// <remarks>
+    /// <b>NOTHING RATHER THAN ZERO WHERE A WORLD WITHHOLDS NOTHING.</b> A generated
+    /// world cannot contain its own answer and has nothing to hold back, so a zero here
+    /// would read as a learner that generalises to nothing at all — which is a check
+    /// that cannot fire reading as a failure instead of as absent.
+    /// </remarks>
+    public required Examined? Unseen { get; init; }
 }
 
 /// <summary>
@@ -100,6 +149,12 @@ public sealed class Trial<TSeen>
     /// <param name="sweep">How often to subsume, abstract and cull.</param>
     /// <param name="target">The trailing accuracy <see cref="Tally.Reached"/> waits for.</param>
     /// <param name="window">How many answered predictions that accuracy is over.</param>
+    /// <remarks>
+    /// <b>The held-out examination is taken at the END and is also callable at any
+    /// point</b> — see <see cref="Examine"/>. A curve over it says something a single
+    /// endpoint cannot: whether the gap to the drawn bag OPENS as the population fills,
+    /// which is what memorising looks like from outside.
+    /// </remarks>
     public Tally Run(long rounds, int sweep = 1000, double target = 0.9, int window = 2000)
     {
         var held = _brain.Held;
@@ -131,6 +186,58 @@ public sealed class Trial<TSeen>
             Stacked = held.Names.Means.Count(one => one.Value.Any(held.Names.Knows)),
             Exhausted = held.Exhausted(_brain.Dials.Budget),
             Codes = codes / (double)rounds,
+            Unseen = Examine(),
+        };
+    }
+
+    /// <summary>
+    /// Asks the population about observations the world never drew, and teaches it
+    /// nothing.
+    /// </summary>
+    /// <returns>What it said, or nothing where the world withholds nothing.</returns>
+    /// <remarks>
+    /// <para>
+    /// <b>EVERY CALL HERE IS READ-ONLY AND THAT IS LOAD-BEARING RATHER THAN
+    /// INCIDENTAL.</b> <see cref="Population.Moment"/> folds names without minting one,
+    /// <see cref="Population.Firing"/> gathers candidates without touching them, and
+    /// <see cref="Population.Predict"/> reads accuracies it does not write.
+    /// <c>Settle</c>, <c>Cover</c> and <c>Mend</c> are the three that teach and none of
+    /// them is called — an examination that moved a single counter would be a second
+    /// training run wearing the word <i>held-out</i>, and the number would be worth
+    /// less than no number.
+    /// </para>
+    /// <para>
+    /// <b>AND C4 IS UNTOUCHED, WHICH IS THE POINT THAT WAS BEING MISSED.</b> The
+    /// constraint is that the MACHINE may not depend on an episode boundary. It does
+    /// not: nothing here is fed back, the run does not pause, and the population cannot
+    /// tell this happened. The person reading the number is outside the machine, and
+    /// always was.
+    /// </para>
+    /// </remarks>
+    public Examined? Examine()
+    {
+        if (_world is not IWithholds<TSeen> withholding) return null;
+
+        var held = _brain.Held;
+
+        var answered = 0;
+        var right = 0;
+
+        foreach (var turn in withholding.Withheld)
+        {
+            var moment = held.Moment(new HashSet<Code>(_sensing.Codify(turn.Seen)));
+
+            if (held.Predict(held.Firing(moment)).Expects is not { } said) continue;
+
+            answered++;
+            if (said == Brain.Says(turn.Outcome)) right++;
+        }
+
+        return new Examined
+        {
+            Asked = withholding.Withheld.Count,
+            Answered = answered,
+            Right = right,
         };
     }
 }

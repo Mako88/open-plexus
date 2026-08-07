@@ -50,3 +50,46 @@ public interface IWorld<TSeen>
     /// </remarks>
     int Outcomes { get; }
 }
+
+/// <summary>
+/// A world built from a finite bag, holding some of it back.
+/// </summary>
+/// <typeparam name="TSeen">Whatever this world natively produces.</typeparam>
+/// <remarks>
+/// <para>
+/// <b>C4 CONSTRAINS THE LEARNER AND NOT THE EXPERIMENTER, AND CONFLATING THE TWO IS
+/// WHY THIS WAS MISSING.</b> <i>No episode boundary, so nothing may depend on
+/// train-then-test</i> forbids the MACHINE knowing about a boundary — it may not wait
+/// for one, switch behaviour at one, or be scored on a lifetime average that assumes
+/// one. Nothing in it forbids the person running the experiment from keeping some
+/// observations back and asking, from outside, what the population would have said.
+/// The learner is never told and cannot tell.
+/// </para>
+/// <para>
+/// <b>WITHOUT IT A WORLD THAT DRAWS WITH REPLACEMENT SCORES ITS OWN RECURRENCE.</b>
+/// <see cref="Cifar"/> draws ten thousand images forever, so at forty thousand rounds
+/// each has been seen four times and memorising a moment's winner set is entirely
+/// affordable. That already happened here — an unbounded population's score tracked how
+/// often an image RECURRED — and it was mitigated by bounding the population rather
+/// than measured. This measures it.
+/// </para>
+/// <para>
+/// <b>AND IT IS THE ONLY ANTI-MEMORISATION INSTRUMENT A PERCEPTUAL WORLD CAN HAVE.</b>
+/// The sharp one is soundness by enumeration, which needs a rule set to enumerate;
+/// <see cref="Multiplexer"/> has one and no world made of photographs ever will. On
+/// <see cref="Cifar"/> the choice is this or nothing but a score that cannot be
+/// distinguished from a lookup table.
+/// </para>
+/// </remarks>
+public interface IWithholds<TSeen>
+{
+    /// <summary>
+    /// Observations this world will never draw.
+    /// </summary>
+    /// <remarks>
+    /// <b>Fixed at construction and never touched by <see cref="IWorld{TSeen}.Next"/>,
+    /// which is what makes the number mean anything.</b> A held-out set the world could
+    /// wander into would measure the same thing the trailing accuracy does, more slowly.
+    /// </remarks>
+    IReadOnlyList<Turn<TSeen>> Withheld { get; }
+}

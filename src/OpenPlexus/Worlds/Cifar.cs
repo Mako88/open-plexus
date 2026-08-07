@@ -26,6 +26,26 @@ public sealed record CifarSettings
     /// </remarks>
     public int Images { get; init; } = 10_000;
 
+    /// <summary>How many further images to load and never draw.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ONLY THING ON THIS WORLD THAT CAN TELL LEARNING FROM MEMORISING.</b> The
+    /// bag is finite and the draw is with replacement, so at forty thousand rounds over
+    /// ten thousand images each has recurred four times — and a score over the drawn bag
+    /// cannot distinguish a learner that generalises from one holding a lookup table
+    /// keyed on a winner set. These are loaded, coded and scored exactly as the drawn
+    /// ones are, and <see cref="Cifar.Next"/> never reaches them.
+    /// </para>
+    /// <para>
+    /// <b>TAKEN AFTER THE DRAWN ONES IN THE FIXED FILE ORDER, so the split is a
+    /// position and not a sample.</b> A withheld set chosen by the world's own generator
+    /// would move with the seed, and two seeds would then be scored against two
+    /// different questions — which is the shape of thing <see cref="Seeds"/> exists
+    /// about.
+    /// </para>
+    /// </remarks>
+    public int Withheld { get; init; } = 2_000;
+
     /// <summary>How many pixels across, after box-averaging. Must divide 32.</summary>
     /// <remarks>
     /// <para>
@@ -86,7 +106,7 @@ public sealed record CifarSettings
 /// is why <c>fetch.sh</c> takes it over the pickled one.
 /// </para>
 /// </remarks>
-public sealed class Cifar : IWorld<IReadOnlyList<double>>
+public sealed class Cifar : IWorld<IReadOnlyList<double>>, IWithholds<IReadOnlyList<double>>
 {
     /// <summary>How many classes there are.</summary>
     public const int Classes = 10;
@@ -122,6 +142,9 @@ public sealed class Cifar : IWorld<IReadOnlyList<double>>
     /// <inheritdoc/>
     public int Outcomes => Classes;
 
+    /// <inheritdoc/>
+    public IReadOnlyList<Turn<IReadOnlyList<double>>> Withheld { get; }
+
     /// <summary>How many numbers one reading has.</summary>
     public int Width { get; }
 
@@ -138,7 +161,9 @@ public sealed class Cifar : IWorld<IReadOnlyList<double>>
     {
         ArgumentNullException.ThrowIfNull(settings);
         ArgumentOutOfRangeException.ThrowIfLessThan(settings.Images, 1);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.Images, Files.Length * Batch);
+        ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(
+            settings.Images + settings.Withheld, Files.Length * Batch);
         ArgumentOutOfRangeException.ThrowIfLessThan(settings.Side, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.Side, Stored);
 
@@ -155,6 +180,12 @@ public sealed class Cifar : IWorld<IReadOnlyList<double>>
 
         Width = settings.Side * settings.Side * (settings.Grey ? 1 : 3);
 
+        // THE WITHHELD ARE LOADED BY THE SAME READER AND CODED THE SAME WAY. A
+        // held-out set that arrived down a second path could differ from the drawn one
+        // by a bug rather than by learning, and the gap between the two scores is the
+        // whole product here.
+        var wanted = settings.Images + settings.Withheld;
+
         var readings = ImmutableArray.CreateBuilder<ImmutableArray<double>>();
         var labels = ImmutableArray.CreateBuilder<int>();
 
@@ -162,7 +193,7 @@ public sealed class Cifar : IWorld<IReadOnlyList<double>>
 
         foreach (var name in Files)
         {
-            if (labels.Count >= settings.Images) break;
+            if (labels.Count >= wanted) break;
 
             var path = Path.Combine(settings.Corpus, name);
 
@@ -173,19 +204,34 @@ public sealed class Cifar : IWorld<IReadOnlyList<double>>
 
             using var file = File.OpenRead(path);
 
-            while (labels.Count < settings.Images && file.ReadExactlyOrEnd(buffer))
+            while (labels.Count < wanted && file.ReadExactlyOrEnd(buffer))
             {
                 labels.Add(buffer[0]);
                 readings.Add(Read(buffer, settings));
             }
         }
 
-        if (labels.Count < settings.Images)
+        if (labels.Count < wanted)
             throw new InvalidDataException(
-                $"asked for {settings.Images} images and the corpus held {labels.Count}.");
+                $"asked for {settings.Images} images and {settings.Withheld} held back, "
+                + $"and the corpus held {labels.Count}.");
 
-        _readings = readings.ToImmutable();
-        _labels = labels.ToImmutable();
+        // THE SPLIT IS A POSITION IN A FIXED FILE ORDER AND NOT A DRAW, so every seed
+        // is scored against the same held-out question. Splitting with the world's own
+        // generator would give each seed a different exam.
+        _readings = [.. readings.Take(settings.Images)];
+        _labels = [.. labels.Take(settings.Images)];
+
+        Withheld =
+        [
+            .. Enumerable.Range(settings.Images, settings.Withheld)
+                .Select(at => new Turn<IReadOnlyList<double>>
+                {
+                    Seen = readings[at],
+                    Outcome = labels[at],
+                }),
+        ];
+
         _rng = new Random(seed);
     }
 

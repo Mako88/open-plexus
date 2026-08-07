@@ -29,6 +29,25 @@ public static class Tree
     public static string Docs() => Path.Combine(Repo(), "docs");
 
     /// <summary>
+    /// A fetched corpus, or a named reason it is not there.
+    /// </summary>
+    /// <param name="named">The directory <c>corpora/fetch.sh</c> extracts it to.</param>
+    /// <remarks>
+    /// <b>Throws with the command that fixes it, and never skips.</b> A corpus test
+    /// that quietly passes when the corpus is absent reports green for a question it
+    /// never asked — which is the same failure as a check wired so it cannot fire.
+    /// </remarks>
+    public static string Corpus(string named)
+    {
+        var corpus = Path.Combine(Repo(), "corpora", named);
+
+        return Directory.Exists(corpus)
+            ? corpus
+            : throw new DirectoryNotFoundException(
+                $"{named} is not at {corpus}. Fetch it with:\n    bash corpora/fetch.sh");
+    }
+
+    /// <summary>
     /// Every hand-written C# file under a directory of the repo.
     /// </summary>
     /// <remarks>

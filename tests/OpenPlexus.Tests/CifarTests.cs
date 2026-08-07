@@ -17,22 +17,15 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class CifarTests(ITestOutputHelper output)
 {
-    private static string Corpus
-    {
-        get
-        {
-            var corpus = Path.Combine(Tree.Repo(), "corpora", "cifar-10-batches-bin");
-
-            return Directory.Exists(corpus)
-                ? corpus
-                : throw new DirectoryNotFoundException(
-                    $"CIFAR-10 is not at {corpus}. Fetch it with:\n"
-                    + "    bash corpora/fetch.sh");
-        }
-    }
-
     private static CifarSettings World(int side = 8, bool grey = true, int images = 2000) =>
-        new() { Corpus = Corpus, Images = images, Side = side, Grey = grey };
+        new()
+        {
+            Corpus = Tree.Corpus("cifar-10-batches-bin"),
+            Images = images,
+            Withheld = 0,
+            Side = side,
+            Grey = grey,
+        };
 
     [Fact]
     public void A_reading_is_the_declared_width_and_lies_in_the_unit_range()

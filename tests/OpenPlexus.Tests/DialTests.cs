@@ -99,16 +99,16 @@ public sealed class DialTests(ITestOutputHelper output)
             + "one; `Weighing` is that arm",
 
         ["Mending"] =
-            "OPEN, AND IT IS THE THIRD DIAL IN A ROW WHOSE VALUE MOVES WITH THE "
-            + "WORLD. Whether repair waits for the VOTE to be wrong or only for a "
-            + "commitment to be: `Earned` is better everywhere on the multiplexer "
-            + "and turns 1.000 into 0.763 on `Arranged`, because where the true "
-            + "rules are one code the brake is protecting the population from "
-            + "eleven hundred children it does not need. `Only fix what is broken` "
-            + "is right; the readout just cannot tell being right from having "
-            + "nothing left to learn. Fork 37 names the signal that could -- "
-            + "whether a parent still has failures no child covers -- and it is "
-            + "the honest driver for this, `Weighing` and `Sharpness` alike",
+            "OPEN, AND ITS THREE RULES HAVE THREE DIFFERENT WORLDS. `Outvoted` "
+            + "takes `Arranged` at 1.000, `Uncovered` takes the clean multiplexer "
+            + "at 0.983 against 0.944, and `Neglected` -- the conjunction -- takes "
+            + "the noisy one at 0.771. Each is a disaster somewhere else: "
+            + "`Uncovered` turns 1.000 into 0.752. FORK 37'S DRIVER IS BUILT AND IS "
+            + "NOT THE ANSWER TO THIS: the rules most needing specialisation are "
+            + "the ones individually wrong while the population is collectively "
+            + "right, so `which rule needs work` and `did the population get this "
+            + "wrong` are different questions and no per-round switch stands in "
+            + "for both. Not a level, and not a controller's job either",
 
         ["Weighing"] =
             "the arm for the line above, and a choice between two rules rather "

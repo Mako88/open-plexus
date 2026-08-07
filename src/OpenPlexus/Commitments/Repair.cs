@@ -48,8 +48,82 @@ public enum Mending
     /// <summary>The vote had to be wrong. What ran before anything questioned it.</summary>
     Outvoted,
 
-    /// <summary>A commitment had to be wrong and to have earned repair. Its own gates decide.</summary>
-    Earned,
+    /// <summary>
+    /// And no child of it may have fired — the failure has to be one nothing accounts for.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 37'S DRIVER, AND IT NEEDS NO BOOKKEEPING AT ALL.</b> <i>Whether a parent
+    /// still has failures no child covers</i> reads like it wants a parent-to-children
+    /// index. It does not: a child's scope is its parent's plus a condition, so a child
+    /// can only fire where the parent fires. If no commitment among those firing NARROWS
+    /// this one, then this failure is in no child's territory — which is the whole of the
+    /// question, answered from the firing set.
+    /// </para>
+    /// <para>
+    /// <b>IT IS WHAT THE OTHER TWO ARE STANDING IN FOR.</b> The readout cannot tell being
+    /// right from having nothing left to learn, so <see cref="Outvoted"/> stops repairing
+    /// a world it has already solved and also stops repairing one it has not.
+    /// This asks the question directly and is indifferent to the vote and to the world.
+    /// </para>
+    /// <para>
+    /// <b>AND IT SELF-LIMITS THE WAY <c>Budget</c> WAS BUILT TO FAKE.</b> A parent forks,
+    /// its child takes over a region, and the parent stops forking there — so the cap on
+    /// children per parent stops being the thing that prevents a runaway. Fork 37 is
+    /// about that cap having an interior optimum nobody can hunt; this is the signal it
+    /// says would replace it.
+    /// </para>
+    /// </remarks>
+    Uncovered,
+
+    /// <summary>
+    /// The vote had to be wrong AND no child of the culprit may have fired.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CONJUNCTION OF THE OTHER TWO, AND IT IS NOT A FOURTH FREE PARAMETER.</b>
+    /// Each of the signals above is right on one world and wrong on the other, and they
+    /// fail in opposite directions: <see cref="Outvoted"/> asks <i>did the population get
+    /// this wrong</i>, which is too coarse where the answer needs specialising;
+    /// <see cref="Uncovered"/> asks <i>has anything taken responsibility for this
+    /// failure</i>, which is too eager where a child covers only the sliver its extra
+    /// code fires in. Neither is a level, so combining them adds nothing to tune.
+    /// </para>
+    /// <para>
+    /// <b>AND THE MEASUREMENTS SAY EXACTLY WHERE EACH BREAKS.</b> On
+    /// <see cref="Worlds.Arranged"/> the vote is already right, so <see cref="Outvoted"/>
+    /// repairs nine times in twenty thousand rounds and holds 1.000 while
+    /// <see cref="Uncovered"/> mints 1,349 children and falls to 0.752. On
+    /// <see cref="Worlds.Multiplexer"/> at eleven bits it is the reverse: 0.944 against
+    /// 0.983, with 90 sound rules to 80 and 13.0 of the key found to 12.3.
+    /// </para>
+    /// <para>
+    /// <b>AND IT KEEPS ONE HALF AND LOSES THE OTHER, WHICH SETTLES THE QUESTION AGAINST
+    /// ALL THREE.</b> On <see cref="Worlds.Arranged"/> it is 1.000 and byte-identical to
+    /// <see cref="Outvoted"/>, because a vote that is already right makes the conjunction
+    /// collapse to it. On the multiplexer it gives back nearly everything: 0.939 at eleven
+    /// bits against 0.983, and 0.922 at six against 0.990.
+    /// </para>
+    /// <para>
+    /// <b>AND NOT BY REPAIRING LESS, WHICH IS THE PART WORTH KEEPING.</b> It makes 1,158
+    /// repairs to <see cref="Uncovered"/>'s 1,182 and gets 61 sound rules to 90, 10.0 of
+    /// the key to 13.0. It repairs the WRONG PARENTS. The rules most in need of
+    /// specialising are the ones individually wrong while the population is collectively
+    /// right — so gating on the population being wrong is precisely the filter that hides
+    /// them, and on a world where the answer is already correct those same rules are
+    /// harmless and forking them only adds voters.
+    /// </para>
+    /// <para>
+    /// <b>SO NO COMBINATION OF THESE THREE IS BEST ON BOTH, AND UNDER NOISE A THIRD ONE
+    /// WINS.</b> <see cref="Outvoted"/> takes the arranged world, <see cref="Uncovered"/>
+    /// takes the clean multiplexer, and this takes the noisy one — 0.771 against 0.737 and
+    /// 0.725. Three worlds, three winners. The answer is not a better gate on the round;
+    /// it is that WHICH RULE NEEDS SPECIALISING and WHETHER THE POPULATION GOT THIS WRONG
+    /// are different questions whose alignment is a fact about the world&apos;s rule
+    /// structure, and no per-round switch can stand in for both.
+    /// </para>
+    /// </remarks>
+    Neglected,
 }
 
 /// <summary>Every number the commitment machinery is allowed to have.</summary>
@@ -188,13 +262,12 @@ public sealed record CommittingSettings
     /// </para>
     /// <para>
     /// <b>AND THE GATE TURNS OUT TO BE LOAD-BEARING, WHICH REFUTES THE PARAGRAPH ABOVE AS
-    /// AN ARGUMENT FOR REMOVING IT.</b> On <see cref="Worlds.Multiplexer"/>
-    /// <see cref="Mending.Earned"/> is better everywhere — 0.976 against 0.944 at eleven bits with
-    /// <see cref="Weighing.Strongest"/>. On <see cref="Worlds.Arranged"/> it is a disaster:
-    /// 1.000 falls to 0.763, because the gated arm repairs NINE times in twenty thousand
-    /// rounds and the ungated one mints eleven hundred and thirty children that then
-    /// compete in the vote. Sound rules rose from 36 to 119 and unsound ones from 178 to
-    /// 312, and the score went with the second number.
+    /// AN ARGUMENT FOR REMOVING IT.</b> On <see cref="Worlds.Multiplexer"/> at eleven bits,
+    /// dropping it takes 0.944 to 0.983 with <see cref="Weighing.Strongest"/>. On
+    /// <see cref="Worlds.Arranged"/> it is a disaster: 1.000 falls to 0.752, because the
+    /// gated arm repairs NINE times in twenty thousand rounds and the ungated one mints
+    /// 1,349 children that then compete in the vote. Sound rules rose from 36 to 137 and
+    /// unsound ones from 178 to 325, and the score went with the second number.
     /// </para>
     /// <para>
     /// <b>SO <i>ONLY FIX WHAT IS BROKEN</i> IS THE RIGHT RULE AND THIS IS ANOTHER DIAL
@@ -213,7 +286,7 @@ public sealed record CommittingSettings
     /// dials and it is still unwired.
     /// </para>
     /// <para>
-    /// <b>AND <see cref="Mending.Earned"/> IS NOT "REPAIR EVERY ROUND".</b>
+    /// <b>AND <see cref="Mending.Uncovered"/> IS NOT "REPAIR EVERY ROUND".</b>
     /// <see cref="Population.Mend"/> already refuses anything under
     /// <see cref="Floor"/> misses, over <see cref="Budget"/> children, or without a
     /// condition past the separation bar and its correction. Every gate the design

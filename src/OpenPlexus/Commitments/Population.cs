@@ -266,6 +266,15 @@ public sealed class Population
             .Where(one => one.Expects != arrived)
             .Where(one => one.Misses >= _dials.Floor)
             .Where(one => Children(one.Identity) < _dials.Budget)
+
+            // FORK 37'S DRIVER, AND IT IS LAST BECAUSE IT IS THE EXPENSIVE ONE. `Where`
+            // is lazy, so this runs only for commitments that already cleared the floor
+            // and the budget -- a handful, against the hundreds that fire. Putting it
+            // first would make the instrument the cost of the run.
+            .Where(one =>
+                (_dials.Mending != Mending.Uncovered && _dials.Mending != Mending.Neglected)
+                || !firing.Any(other => other.Narrows(one)))
+
             .OrderBy(one => one.Accuracy)
             .ThenBy(one => one.Identity);
 

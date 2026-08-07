@@ -169,7 +169,7 @@ public sealed class SharpeningTests(ITestOutputHelper output)
             output.WriteLine($"{(1 << address) + address} bits, noise {noise:F2}:");
 
             foreach (var weighing in new[] { Weighing.Summing, Weighing.Strongest })
-            foreach (var mending in new[] { Mending.Outvoted, Mending.Earned })
+            foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered, Mending.Neglected })
             {
                 var recent = new List<double>();
                 var sound = new List<double>();

@@ -186,7 +186,11 @@ public sealed class Cycle
         // searched was a function of how good its answers already were. `Mend` refuses
         // anything short of the floor, over budget, or without a condition past the
         // separation bar, so its own gates are not being loosened; only this one is.
-        if (_held.Dials.Mending == Mending.Earned && _held.Mend(firing, arrived) is not null)
+        // THE TWO THAT DO NOT WAIT FOR THE VOTE. `Neglected` does wait, and its extra
+        // condition lives inside `Mend` -- so the two halves of the conjunction are
+        // applied where each is cheapest to ask, rather than both in one place.
+        if (_held.Dials.Mending == Mending.Uncovered
+            && _held.Mend(firing, arrived) is not null)
             Repaired++;
 
         if (vote.Expects == arrived) return;
@@ -201,7 +205,8 @@ public sealed class Cycle
         // repair's business and not genesis's. `Surprising` is the dial.
         Minted += _held.Cover(moment, arrived, firing);
 
-        if (_held.Dials.Mending == Mending.Outvoted && _held.Mend(firing, arrived) is not null)
+        if (_held.Dials.Mending is Mending.Outvoted or Mending.Neglected
+            && _held.Mend(firing, arrived) is not null)
             Repaired++;
     }
 }

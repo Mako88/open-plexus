@@ -21,6 +21,33 @@ public readonly record struct Vote
     /// so it is reported from the first run rather than added when it is wanted.
     /// </remarks>
     public double Margin { get; init; }
+
+    /// <summary>
+    /// The best advocate for what won, or nothing if nothing fired.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>WHO DECIDED, WHICH NO REPORT HAS EVER ASKED.</b> Every instrument here counts
+    /// the POPULATION — how many are resident, how many are sound, how many were minted
+    /// and subsumed — and under <see cref="Weighing.Strongest"/> an expectation is worth
+    /// its best advocate and no more. So a population can be reshuffled at length while
+    /// the same few commitments answer every question, and nothing would show it.
+    /// </para>
+    /// <para>
+    /// <b>AND THAT IS FORK 46, ARRIVING FROM A NULL RESULT.</b> Two subsumption rules on
+    /// <see cref="Worlds.Arranged"/> left populations differing by a sixth in residents
+    /// and a seventh in unsound rules, and returned the identical withheld score on every
+    /// seed. Either the deciders are the same handful in both, or that is a coincidence
+    /// worth the same surprise.
+    /// </para>
+    /// <para>
+    /// <b>WELL DEFINED UNDER BOTH WEIGHINGS, WHICH IS WHY IT IS THE BEST ADVOCATE RATHER
+    /// THAN THE WINNER.</b> A sum has no single winner to name; the strongest advocate
+    /// for the winning expectation exists either way, and under
+    /// <see cref="Weighing.Strongest"/> it IS the decision.
+    /// </para>
+    /// </remarks>
+    public Code? By { get; init; }
 }
 
 /// <summary>
@@ -174,9 +201,18 @@ public sealed class Population
 
         var weights = new Dictionary<Code, double>();
 
+        // THE BEST ADVOCATE PER EXPECTATION, KEPT WHATEVER THE AGGREGATE IS. Under
+        // `Strongest` this is the decision itself; under `Summing` it is who spoke
+        // loudest for the side that won. Firing is already in identity order, so a tie
+        // resolves the same way on every machine.
+        var loudest = new Dictionary<Code, (double Weight, Code By)>();
+
         foreach (var commitment in firing)
         {
             var weight = Math.Pow(commitment.Accuracy, _dials.Sharpness);
+
+            if (!loudest.TryGetValue(commitment.Expects, out var best) || weight > best.Weight)
+                loudest[commitment.Expects] = (weight, commitment.Identity);
 
             // A SUM SCALES WITH THE NUMBER OF ADVOCATES AND A MAXIMUM DOES NOT, which
             // is the whole of the difference. Raising accuracy to a power makes a crowd
@@ -200,6 +236,7 @@ public sealed class Population
             Expects = ranked[0].Key,
             Weight = ranked[0].Value,
             Margin = ranked[0].Value - (ranked.Count > 1 ? ranked[1].Value : 0.0),
+            By = loudest[ranked[0].Key].By,
         };
     }
 

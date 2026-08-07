@@ -570,9 +570,15 @@ change of architecture entirely.
   EXPLANATION.** A rule deleting children that stand on one repeated moment removed the
   same share as the rules blind to repetition, and reached the identical withheld score
   on every seed.
-- **AND THE READOUT DID NOT MOVE WHILE THE POPULATION DID.** Two arms differing by a
-  sixth in residents and a seventh in unsound rules scored the same on all five seeds, so
-  a handful of top-believed rules is deciding that world.
+- **AND THE READOUT DID NOT MOVE WHILE THE POPULATION DID, BECAUSE ALMOST NONE OF IT IS
+  READ.** Of five hundred residents, fifteen to twenty-two decide every withheld answer,
+  and the arm that is perfect there decides with four.
+- **SO A POPULATION-LEVEL ARM CANNOT REACH WHAT IT DOES NOT DISPLACE**, which is every
+  gate, weighing and subsumption rule tried across four sessions.
+- **THE VOTE PREFERS THE NARROWER RULE EVERY ROUND WHILE SUBSUMPTION PREFERS THE GENERAL
+  ONE EVERY THOUSANDTH.** Same statistic, opposite directions, and the one acting
+  constantly wins — a child displaces its parent as decider, then answers what it has
+  never seen.
 - **MORE UNSOUND RULES WITH FEWER SOUND ONES SCORED HIGHER THERE**, so what the withheld
   score tracks is not how much of the world the population has got right.
 
@@ -622,4 +628,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **43** | Given symbols worth having, a conjunctive rule learner reaches 86% of a linear probe on the same vectors. What is the remaining 14%, and is it the scope language or the vote? Open |
 | **44** | The tiled front end's patch is the arranged world's cell, so it is told where the parts are. Does the advantage survive a patch grid that does not divide the world's? Open |
 | **45** | Three repair gates, three worlds, three winners, and conjoining two keeps one and loses the other. Is there a per-COMMITMENT signal separating *needs specialising* from *is being outvoted*? Open |
-| **46** | The withheld score on `Arranged` is identical across populations differing by a sixth in size and a seventh in unsound rules. Is `Strongest` deciding on a handful of rules, and is that the whole gap? Open |
+| **46** | Of five hundred residents, fifteen to twenty-two decide every withheld answer on `Arranged`, and the arm perfect there decides with four. A population-level arm cannot reach what it does not displace. Closed |
+| **47** | The vote ranks on accuracy alone, so a child outvotes its parent the moment it looks better on drawn data. Does deferring unless the child is SIGNIFICANTLY better — subsumption's bar, applied every round — close the gap? Open |

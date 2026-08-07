@@ -178,6 +178,7 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                 + $"repaired {last.Tally.Repaired} subsumed {last.Tally.Subsumed}, "
                 + $"resident {last.Tally.Resident} scope {last.Rules.Scope:F2} "
                 + $"occasions {last.Tally.Occasions:F1}, "
+                + $"deciders {last.Tally.Unseen!.Deciders}/{last.Tally.Unseen.Answered}, "
                 + $"lead {last.Tally.Confidence:F3}");
         }
 

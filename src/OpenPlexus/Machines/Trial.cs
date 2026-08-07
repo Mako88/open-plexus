@@ -34,6 +34,19 @@ public sealed record Examined
     /// <summary>How many of those were right.</summary>
     public required int Right { get; init; }
 
+    /// <summary>
+    /// How many DISTINCT commitments were the best advocate for an answer given here.
+    /// </summary>
+    /// <remarks>
+    /// <b>FORK 46, AND IT IS THE ONE READING THAT COULD MAKE FOUR SESSIONS OF ARMS MAKE
+    /// SENSE.</b> Every gate, weighing and subsumption rule tried so far changes the
+    /// POPULATION, and under <see cref="Commitments.Weighing.Strongest"/> the answer is
+    /// its best advocate and no more. Small against <see cref="Answered"/> means a
+    /// handful of rules are deciding the world and the rest are furniture — which would
+    /// say the remaining gap is about which rule WINS rather than about which are held.
+    /// </remarks>
+    public required int Deciders { get; init; }
+
     /// <summary>The share of answered predictions that were right.</summary>
     public double Accuracy => Answered == 0 ? 0.0 : Right / (double)Answered;
 
@@ -280,14 +293,18 @@ public sealed class Trial<TSeen>
 
         var answered = 0;
         var right = 0;
+        var deciders = new HashSet<Code>();
 
         foreach (var turn in withholding.Withheld)
         {
             var moment = held.Moment(new HashSet<Code>(_sensing.Codify(turn.Seen)));
 
-            if (held.Predict(held.Firing(moment)).Expects is not { } said) continue;
+            var vote = held.Predict(held.Firing(moment));
+
+            if (vote.Expects is not { } said) continue;
 
             answered++;
+            if (vote.By is { } by) deciders.Add(by);
             if (said == Brain.Says(turn.Outcome)) right++;
         }
 
@@ -296,6 +313,7 @@ public sealed class Trial<TSeen>
             Asked = withholding.Withheld.Count,
             Answered = answered,
             Right = right,
+            Deciders = deciders.Count,
         };
     }
 }

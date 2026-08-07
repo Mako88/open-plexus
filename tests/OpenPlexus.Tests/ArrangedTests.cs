@@ -80,6 +80,12 @@ public sealed class ArrangedTests(ITestOutputHelper output)
             Assert.Equal(1 - layout.Outcome, swapped.Outcome);
             Assert.Equal(Parts(layout), Parts(swapped));
 
+            // AND IT STAYS ON ITS OWN SIDE OF THE HELD-OUT LINE, which is what makes
+            // the exam balanced without anything balancing it. Withholding one half of
+            // a swapped pair would hand the withheld set a majority class, and a
+            // constant answer would then beat chance on it.
+            Assert.Equal(layout.Shown, swapped.Shown);
+
             // AND THE LIGHT IS THE SAME, which closes the other way a bag of parts
             // could leak. `Winnow` centres a reading before it projects it, so a
             // scene brighter on one answer than the other would be separable by
@@ -165,6 +171,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
             {
                 Places = [new Placed { Shape = shape, Cell = cell }],
                 Outcome = 0,
+                Shown = true,
             };
 
             var reading = world.Render(only);
@@ -215,6 +222,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
                 {
                     Places = [new Placed { Shape = shape, Cell = 0 }],
                     Outcome = 0,
+                    Shown = true,
                 });
 
                 var lit = 0;
@@ -287,7 +295,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         Assert.Equal(9, sensing.Patches);
 
         ImmutableHashSet<Code> Said(int shape, int cell) => [.. sensing.Codify(world.Render(
-            new Layout { Places = [new Placed { Shape = shape, Cell = cell }], Outcome = 0 }))];
+            new Layout { Places = [new Placed { Shape = shape, Cell = cell }], Outcome = 0, Shown = true }))];
 
         // THE SAME PART IN TWO PLACES SHARES CODES, which is the recurrence. A whole
         // picture projection shares none, because every winner reads pixels from
@@ -314,7 +322,7 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         // is why no shape here is a solid block, and this is the check that keeps it
         // that way from the front end's side rather than the world's.
         var nothing = ImmutableHashSet.CreateRange(
-            sensing.Codify(world.Render(new Layout { Places = [], Outcome = 0 })));
+            sensing.Codify(world.Render(new Layout { Places = [], Outcome = 0, Shown = true })));
 
         foreach (var shape in Enumerable.Range(0, Arranged.Shapes))
             Assert.NotEqual(nothing, Said(shape, cell: 4));
@@ -322,6 +330,119 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         output.WriteLine(
             $"{sensing.Distinct} distinct patches over {sensing.Emitted} readings, "
             + $"{wedge.Count} codes for a scene holding one part");
+    }
+
+    [Fact]
+    public void Both_front_ends_are_measured_against_the_dullest_learner_there_is()
+    {
+        // THE BAR, AND IT COSTS NOTHING BECAUSE IT NEEDS NO LEARNING. A probe reads the
+        // world and the front end and never the population, so this is a fact about how
+        // much of the problem each arm CARRIES -- available before any run, and the only
+        // thing that makes a run's number readable afterwards.
+        //
+        // AND THE PIXEL BAR IS THE SAME FOR BOTH ARMS BY CONSTRUCTION, which is what
+        // makes it the world's difficulty rather than a front end's.
+        var pixels = new List<double>();
+
+        foreach (var looking in new[] { Looking.Whole, Looking.Tiled })
+        {
+            var run = new ArrangedRun(
+                Small, new Brain(new CommittingSettings(), seed: 1), looking, seed: 1);
+
+            var bar = run.Measure();
+
+            pixels.Add(bar.OnPixels.Accuracy);
+
+            Assert.Equal(882, bar.OnCodes.Trained);
+            Assert.Equal(252, bar.OnCodes.Tested);
+
+            output.WriteLine(
+                $"{looking,-6} | pixels {bar.OnPixels.Accuracy:F3} "
+                + $"codes {bar.OnCodes.Accuracy:F3} over {bar.Features} features");
+        }
+
+        Assert.Equal(pixels[0], pixels[1], 12);
+    }
+
+    [Fact]
+    public void What_the_scope_language_could_hold_if_the_learner_were_perfect()
+    {
+        // THE PLAN'S RULE FOR EXTENDING THE LANGUAGE IS DECIDABLE AND NOTHING HAD
+        // DECIDED IT. Until this number exists, "the learner needs rung four" and "the
+        // learner is leaving something on the table" are the same observation, and
+        // picking a rung between them is the hand-specified bias the refutation table
+        // calls ILP's cause of death.
+        foreach (var looking in new[] { Looking.Whole, Looking.Tiled })
+        {
+            var run = new ArrangedRun(
+                Small, new Brain(new CommittingSettings(), seed: 1), looking, seed: 1);
+
+            foreach (var depth in new[] { 1, 2 })
+            {
+                var could = run.Reachable(depth);
+
+                Assert.Equal(depth, could.Depth);
+
+                output.WriteLine(
+                    $"{looking,-6} depth {could.Depth} | covers {could.Covers:F3} "
+                    + $"unseen {could.CoversUnseen:F3} | {could.Sound} sound scopes of "
+                    + $"{could.Considered} considered, {could.Least} of them cover it"
+                    + (could.Capped ? " | CAPPED" : string.Empty));
+
+                Assert.InRange(could.CoversUnseen, 0.0, 1.0);
+            }
+        }
+    }
+
+    [Fact]
+    public void Whether_the_learner_ever_holds_the_rules_its_own_genesis_can_mint()
+    {
+        // THE DIAGNOSIS, AND IT SPLITS THE GAP IN TWO. Genesis mints one-code
+        // commitments and nothing else, so a code that is SOUND ON ITS OWN is reachable
+        // by the very first thing the machine does. Whether the twelve are resident at
+        // the end separates a learner that never found them from one that found them and
+        // was outvoted -- and those two want completely different repairs.
+        // AND THE ARM IS THE GATE, BECAUSE IT DECIDES WHETHER THEY ARE EVER MINTED.
+        // `Unaccounted` is self-limiting by construction -- once anything proposes the
+        // outcome there is no surprise and genesis stops -- which is fork 40 exactly,
+        // and it is also how a mechanism quietly stops. On CIFAR the gate was
+        // load-bearing and beat the ungated arm on every seed. Here the world is small
+        // and the sound rules are one code each, so the gate may be starving it.
+        foreach (var looking in new[] { Looking.Whole, Looking.Tiled })
+        foreach (var gate in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
+        {
+            var run = new ArrangedRun(
+                Small,
+                new Brain(new CommittingSettings { Surprising = gate }, seed: 1),
+                looking,
+                seed: 1);
+
+            var could = run.Reachable(depth: 1);
+            var got = run.Run(20_000);
+
+            // WHAT IT HOLDS, SPELLED BACK OUT, so a minted name cannot hide a scope that
+            // is really one code wearing a hat.
+            var alone = Fixture.Alone(run.Held);
+
+            var found = could.Alone.Count(alone.Contains);
+
+            output.WriteLine(
+                $"{looking,-6} {gate,-11} | {found} of {could.Alone.Length} sound single "
+                + $"codes resident, of {got.Tally.Resident} commitments "
+                + $"({got.Tally.Minted} minted, {got.Tally.Repaired} repaired) · "
+                + $"unseen {got.Tally.Unseen!.Accuracy:F3} against a ceiling of "
+                + $"{could.CoversUnseen:F3} · sound {got.Rules.Sound} unsound {got.Rules.Unsound} "
+                + $"(narrowed {got.Rules.Narrowed}, rootless {got.Rules.Rootless}) · "
+                + $"mean scope {got.Rules.Scope:F2}");
+
+            // THE TWO WAYS AN UNSOUND RULE SURVIVES, AND THEY PARTITION. Either
+            // subsumption had a general parent to absorb it into and declined, or there
+            // was no parent and nothing in the mechanism set could have removed it --
+            // `Cull` returns early below capacity, and this world never reaches it.
+            Assert.Equal(got.Rules.Unsound, got.Rules.Narrowed + got.Rules.Rootless);
+
+            Assert.NotEmpty(could.Alone);
+        }
     }
 
     [Fact]
@@ -342,16 +463,16 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         // is what stops a vacuous rule being counted as a true one.
         Assert.Equal(
             run.World.Layouts().Count(),
-            got.Layouts);
+            got.Rules.Layouts);
 
-        Assert.True(got.Sound + got.Unsound + got.Inert > 0, "nothing was graded at all");
+        Assert.True(got.Rules.Sound + got.Rules.Unsound + got.Rules.Inert > 0, "nothing was graded at all");
 
         Assert.NotNull(got.Tally.Unseen);
 
         output.WriteLine(
             $"recent {got.Tally.Recent:F3} · resident {got.Tally.Resident} · "
-            + $"codes/round {got.Tally.Codes:F1} · sound {got.Sound} · "
-            + $"unsound {got.Unsound} · inert {got.Inert} over {got.Layouts} scenes");
+            + $"codes/round {got.Tally.Codes:F1} · sound {got.Rules.Sound} · "
+            + $"unsound {got.Rules.Unsound} · inert {got.Rules.Inert} over {got.Rules.Layouts} scenes");
 
         output.WriteLine(
             $"withheld: {got.Tally.Unseen!.Accuracy:F3} over "

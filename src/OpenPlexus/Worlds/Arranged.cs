@@ -77,6 +77,15 @@ public readonly record struct Layout
     /// <summary>Nought when the first marker is left of the second, one otherwise.</summary>
     public required int Outcome { get; init; }
 
+    /// <summary>Whether the world ever draws this, or holds its arrangement back.</summary>
+    /// <remarks>
+    /// <b>ON THE SCENE RATHER THAN ON A SECOND LIST, BECAUSE EVERYTHING THAT READS THE
+    /// SPACE NEEDS BOTH HALVES.</b> Soundness wants every scene and does not care;
+    /// a yardstick has to be fitted on one half and scored on the other, or it is not a
+    /// held-out number at all. Two methods returning two lists would let those drift.
+    /// </remarks>
+    public required bool Shown { get; init; }
+
     /// <summary>Two scenes are the same when they place the same things.</summary>
     /// <remarks>
     /// <b>Written out because the compiler's answer here is wrong and silent.</b> A
@@ -88,7 +97,9 @@ public readonly record struct Layout
     /// </remarks>
     /// <param name="other">The scene to compare against.</param>
     public bool Equals(Layout other) =>
-        Outcome == other.Outcome && Places.AsSpan().SequenceEqual(other.Places.AsSpan());
+        Outcome == other.Outcome
+        && Shown == other.Shown
+        && Places.AsSpan().SequenceEqual(other.Places.AsSpan());
 
     /// <inheritdoc/>
     public override int GetHashCode()
@@ -96,6 +107,7 @@ public readonly record struct Layout
         var hash = new HashCode();
 
         hash.Add(Outcome);
+        hash.Add(Shown);
         foreach (var placed in Places) hash.Add(placed);
 
         return hash.ToHashCode();
@@ -159,6 +171,9 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
 
     /// <summary>Arrangements the world draws from, as (first marker, second marker).</summary>
     private readonly ImmutableArray<(int First, int Second)> _drawn;
+
+    /// <summary>Arrangements it never draws.</summary>
+    private readonly ImmutableArray<(int First, int Second)> _kept;
 
     /// <inheritdoc/>
     public int Outcomes => 2;
@@ -243,11 +258,12 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
                 + "there is nothing left to draw.");
 
         _drawn = [.. drawn];
+        _kept = [.. kept];
 
         Withheld =
         [
-            .. kept
-                .SelectMany(one => Clutterings().Select(clutter => Compose(one, clutter)))
+            .. Layouts()
+                .Where(scene => !scene.Shown)
                 .Select(scene => new Turn<IReadOnlyList<double>>
                 {
                     Seen = Render(scene),
@@ -294,7 +310,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
             })
             .ToImmutableArray();
 
-        var scene = Compose(arrangement, clutter);
+        var scene = Compose(arrangement, clutter, shown: true);
 
         return new Turn<IReadOnlyList<double>>
         {
@@ -320,10 +336,10 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
         // every arrangement admits exactly as many scenes as every other.
         var clutterings = Clutterings().ToList();
 
-        foreach (var (low, high) in Pairs())
-        foreach (var arrangement in new[] { (low, high), (high, low) })
+        foreach (var (arrangements, shown) in new[] { (_drawn, true), (_kept, false) })
+        foreach (var arrangement in arrangements)
         foreach (var clutter in clutterings)
-            yield return Compose(arrangement, clutter);
+            yield return Compose(arrangement, clutter, shown);
     }
 
     /// <summary>
@@ -336,6 +352,13 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// probability — so knowing every part that is present tells you nothing whatever
     /// about the answer. That is the constraint the plan writes down as unscoreable by a
     /// bag of parts, said as a map rather than as a wish.
+    /// </remarks>
+    /// <remarks>
+    /// <b>AND IT STAYS ON ITS OWN SIDE OF THE HELD-OUT LINE.</b> Arrangements are
+    /// withheld in swapped PAIRS, so a scene the world draws swaps to one it draws and a
+    /// withheld one swaps to a withheld one. Which is why the exam is balanced without
+    /// anything balancing it, and why <see cref="Layout.Shown"/> is carried across rather
+    /// than recomputed.
     /// </remarks>
     public static Layout Swapped(Layout scene)
     {
@@ -352,7 +375,12 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
             .OrderBy(one => one.Cell)
             .ToImmutableArray();
 
-        return new Layout { Places = places, Outcome = 1 - scene.Outcome };
+        return new Layout
+        {
+            Places = places,
+            Outcome = 1 - scene.Outcome,
+            Shown = scene.Shown,
+        };
     }
 
     /// <summary>
@@ -522,9 +550,11 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
     /// The distractors, whose <see cref="Placed.Cell"/> is a SLOT among the cells the
     /// markers left free rather than a cell.
     /// </param>
+    /// <param name="shown">Whether the world draws this arrangement.</param>
     private Layout Compose(
         (int First, int Second) arrangement,
-        ImmutableArray<Placed> clutter)
+        ImmutableArray<Placed> clutter,
+        bool shown)
     {
         var free = Enumerable.Range(0, Cells)
             .Where(cell => cell != arrangement.First && cell != arrangement.Second)
@@ -546,6 +576,7 @@ public sealed class Arranged : IWorld<IReadOnlyList<double>>, IWithholds<IReadOn
             Outcome = arrangement.First % _settings.Side < arrangement.Second % _settings.Side
                 ? 0
                 : 1,
+            Shown = shown,
         };
     }
 }

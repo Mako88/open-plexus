@@ -150,6 +150,33 @@ public static class Fixture
     public static Code C(ulong value) => new(Modality: 1, value);
 
     /// <summary>
+    /// The ONE-CODE scopes a population holds, with any minted name spelled back out.
+    /// </summary>
+    /// <param name="held">What the brain holds.</param>
+    /// <remarks>
+    /// <b>WHAT GENESIS CAN MINT, WHICH IS THE QUESTION A SOUNDNESS COUNT CANNOT
+    /// ANSWER.</b> Covering mints one-code commitments and nothing else, so a code that
+    /// is sound ON ITS OWN is reachable by the very first thing the machine does.
+    /// Whether it is resident afterwards separates a learner that never found it from
+    /// one that found it and was outvoted — and those want different work.
+    /// <para>
+    /// <b>Unfolded, so a minted name cannot hide a scope that is really one code wearing
+    /// a hat.</b> Written out twice in two measurement files before `DuplicationTests`
+    /// refused the second, which is that budget doing exactly its job.
+    /// </para>
+    /// </remarks>
+    public static HashSet<Code> Alone(Commitments.Population held)
+    {
+        ArgumentNullException.ThrowIfNull(held);
+
+        return held.All
+            .Select(one => held.Names.Unfold(one.Scope))
+            .Where(scope => scope.Length == 1)
+            .Select(scope => scope[0])
+            .ToHashSet();
+    }
+
+    /// <summary>
     /// A broadcast standing on its first node, with budget to spend.
     /// </summary>
     /// <remarks>

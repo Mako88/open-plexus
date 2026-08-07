@@ -152,6 +152,12 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // them directly -- so letting repair run on more rounds should change nothing
         // and the score should stay at the target. If it FALLS, the extra gate was
         // holding back damage rather than search, and the whole argument inverts.
+        // AND THE OCCASION COUNT IS REPORTED BESIDE THE SCORE BECAUSE OF WHAT IT
+        // SETTLED HERE. A third subsumption rule weighing a child's advantage against
+        // the DISTINCT moments it stands on -- built to delete children that had
+        // memorised a corner of the drawn bag -- deleted an ordinary share of them and
+        // reached the identical withheld score on all five seeds. What sinks this cell
+        // is not children standing on one repeated scene.
         foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered, Mending.Improving })
         foreach (var subsuming in new[] { Subsuming.Weaker, Subsuming.Insignificant })
         {
@@ -169,7 +175,10 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                 $"{mending,-9} {subsuming,-13} | unseen {unseen.Average():F3} "
                 + $"[{string.Join(" ", unseen.Select(one => one.ToString("F3")))}] | "
                 + $"{last.Rules.Sound} sound {last.Rules.Unsound} unsound, "
-                + $"repaired {last.Tally.Repaired}, lead {last.Tally.Confidence:F3}");
+                + $"repaired {last.Tally.Repaired} subsumed {last.Tally.Subsumed}, "
+                + $"resident {last.Tally.Resident} scope {last.Rules.Scope:F2} "
+                + $"occasions {last.Tally.Occasions:F1}, "
+                + $"lead {last.Tally.Confidence:F3}");
         }
 
         Assert.True(true);

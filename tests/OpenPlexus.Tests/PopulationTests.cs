@@ -254,6 +254,48 @@ public sealed class PopulationTests
     }
 
     [Fact]
+    public void Neither_rule_can_see_that_a_child_has_only_ever_been_right_about_one_thing()
+    {
+        // A LIMIT CARRIED RATHER THAN DISCOVERED LATER, and the measurement that made it
+        // worth carrying is a NEGATIVE. A child right four hundred times about one
+        // moment has one observation, and both rules read it as four hundred: `Weaker`
+        // keeps it because a hair of advantage saves it, `Insignificant` keeps it
+        // because four hundred firings make that hair significant.
+        //
+        // AND WEIGHING THE ADVANTAGE AGAINST THE OCCASIONS INSTEAD WAS BUILT AND
+        // REFUTED. It removes exactly this child, and on the world the whole story was
+        // about it removed no more children than these two do and reached the same score
+        // seed for seed -- so what sinks that world is not this. See the plan's revival
+        // row before building it again.
+        var general = One(1, 1);
+        var specific = One(1, 1, 2);
+
+        for (ulong settle = 0; settle < 400; settle++)
+        {
+            general.Settle(
+                settle % 5 == 0 ? Verdict.Miss : Verdict.Hit, Moment(1, 100 + settle), 0.1);
+
+            // THE SAME MOMENT EVERY TIME, which is what a rule that has stored a corner
+            // of the drawn set actually looks like from inside.
+            specific.Settle(Verdict.Hit, Moment(1, 2), 0.1);
+        }
+
+        Assert.Equal(400L, specific.Fired);
+        Assert.Equal(1.0, specific.Occasions, 1);
+        Assert.True(general.Occasions > 100, $"the parent stands on {general.Occasions:F1}");
+
+        foreach (var subsuming in new[] { Subsuming.Weaker, Subsuming.Insignificant })
+        {
+            var held = new Population(new CommittingSettings { Subsuming = subsuming }, seed: 1);
+
+            held.Add(general);
+            held.Add(specific);
+
+            Assert.Equal(0, held.Subsume());
+        }
+    }
+
+    [Fact]
     public void The_worst_go_when_there_is_no_room()
     {
         var held = new Population(new CommittingSettings { Capacity = 2 }, seed: 1);

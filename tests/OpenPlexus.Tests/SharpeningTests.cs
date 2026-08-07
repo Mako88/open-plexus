@@ -180,6 +180,8 @@ public sealed class SharpeningTests(ITestOutputHelper output)
                 var found = new List<double>();
                 var repaired = new List<double>();
                 var resident = new List<double>();
+                var subsumed = new List<double>();
+                var occasions = new List<double>();
 
                 foreach (var seed in new[] { 1, 2, 3 })
                 {
@@ -200,13 +202,16 @@ public sealed class SharpeningTests(ITestOutputHelper output)
                     found.Add(learned.Found);
                     repaired.Add(learned.Repaired);
                     resident.Add(learned.Resident);
+                    subsumed.Add(learned.Tally.Subsumed);
+                    occasions.Add(learned.Tally.Occasions);
                 }
 
                 output.WriteLine(
                     $"  {mending,-9} {subsuming,-13} | recent {recent.Average():F3} "
                     + $"[{string.Join(" ", recent.Select(one => one.ToString("F3")))}] | "
                     + $"sound {sound.Average():F0} resident {resident.Average():F0} | "
-                    + $"repaired {repaired.Average():F0} | of the key: {found.Average():F1}");
+                    + $"repaired {repaired.Average():F0} subsumed {subsumed.Average():F0} | "
+                    + $"occasions {occasions.Average():F1} | of the key: {found.Average():F1}");
             }
         }
 

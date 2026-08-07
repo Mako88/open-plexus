@@ -70,6 +70,18 @@ public sealed class Cycle
     /// <summary>Children minted by repair.</summary>
     public long Repaired { get; private set; }
 
+    /// <summary>Narrower commitments a general one took the place of.</summary>
+    /// <remarks>
+    /// <b>THE MECHANISM THAT WAS WRITTEN UP AS NEVER FIRING ON EVIDENCE THAT COULD NOT
+    /// SAY.</b> <c>Judged.Narrowed</c> counts unsound residents a resident SOUND one
+    /// covers, which is a fact about what is left rather than about whether subsumption
+    /// runs — and reading its nought as the clause being unreachable cost a commit that
+    /// had to be corrected. This is the count that answers the question asked, and it is
+    /// here because `Subsuming` now has three rules and a null result between them is
+    /// unreadable without it.
+    /// </remarks>
+    public long Subsumed { get; private set; }
+
     /// <summary>Commitments minted by genesis.</summary>
     /// <remarks>
     /// <b>REPORTED BECAUSE A GATE THAT DOES NOTHING AND A GATE THAT DOES EVERYTHING
@@ -175,7 +187,7 @@ public sealed class Cycle
         // and read as mechanisms that did nothing.
         if (round % _sweep == _sweep - 1)
         {
-            _held.Subsume();
+            Subsumed += _held.Subsume();
             _held.Abstract();
             _held.Cull();
         }

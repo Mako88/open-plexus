@@ -421,6 +421,7 @@ condition is a superstition.
 | Tuning a vote dial until both worlds pass | The peak of `Sharpness` moves between worlds, so it is the world's number and not the brain's | Never per world. A vote whose shape needs no number at all |
 | Repair gated only on the vote being wrong | It hides the rules most needing specialisation — the ones wrong while the population is right | Never as the ONLY gate; `Mending` keeps it as an arm |
 | `Mending.Earned` — repair on any earned failure, ignoring children | `Uncovered` dominates it everywhere measured, being the same rule with the redundant repairs removed | Never. Revive the child test, not the arm |
+| Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Each condition halves where a rule can fire, so the bar caps DEPTH by world size | A bar whose expectation shrinks with depth too |
 
 ---
 
@@ -565,6 +566,15 @@ change of architecture entirely.
 - **THE VOTE THREW AWAY PART OF A WORLD IT HAD ALREADY SOLVED.** Every sound rule
   resident and believed well above the false ones, and the readout still lost — a crowd
   outvoting one rule that is always right.
+- **THE CHILDREN THAT SINK `Arranged` ARE NOT MEMORISED, AND THAT WAS THE STANDING
+  EXPLANATION.** A rule deleting children that stand on one repeated moment removed the
+  same share as the rules blind to repetition, and reached the identical withheld score
+  on every seed.
+- **AND THE READOUT DID NOT MOVE WHILE THE POPULATION DID.** Two arms differing by a
+  sixth in residents and a seventh in unsound rules scored the same on all five seeds, so
+  a handful of top-believed rules is deciding that world.
+- **MORE UNSOUND RULES WITH FEWER SOUND ONES SCORED HIGHER THERE**, so what the withheld
+  score tracks is not how much of the world the population has got right.
 
 ---
 
@@ -612,3 +622,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **43** | Given symbols worth having, a conjunctive rule learner reaches 86% of a linear probe on the same vectors. What is the remaining 14%, and is it the scope language or the vote? Open |
 | **44** | The tiled front end's patch is the arranged world's cell, so it is told where the parts are. Does the advantage survive a patch grid that does not divide the world's? Open |
 | **45** | Three repair gates, three worlds, three winners, and conjoining two keeps one and loses the other. Is there a per-COMMITMENT signal separating *needs specialising* from *is being outvoted*? Open |
+| **46** | The withheld score on `Arranged` is identical across populations differing by a sixth in size and a seventh in unsound rules. Is `Strongest` deciding on a handful of rules, and is that the whole gap? Open |

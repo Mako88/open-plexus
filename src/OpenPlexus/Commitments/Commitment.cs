@@ -66,10 +66,24 @@ public sealed class Commitment
     /// </remarks>
     public const byte Committed = 210;
 
+    /// <summary>
+    /// How many buckets the distinct-occasion register has.
+    /// </summary>
+    /// <remarks>
+    /// <b>ONE WORD PER COMMITMENT, AND THE WIDTH IS THE WORD RATHER THAN A CHOICE.</b>
+    /// An exact set of the occasions a commitment has fired in is commitments times
+    /// distinct moments — the same product that already makes
+    /// <see cref="Separations"/> the thing that blows up, arriving a second time for a
+    /// statistic that only has to tell A FEW from MANY. Sixty-four is how many bits are
+    /// in the register, so there is no size here anybody chose and none to hunt.
+    /// </remarks>
+    private const int Buckets = 64;
+
     private readonly Dictionary<Code, Separation> _separations = [];
 
     private double _accuracy;
     private long _seen;
+    private ulong _witness;
 
     /// <param name="scope">Codes that must all be present, in any order.</param>
     /// <param name="expects">The code that should follow.</param>
@@ -136,6 +150,65 @@ public sealed class Commitment
     /// </remarks>
     public long Seen => _seen;
 
+    /// <summary>
+    /// How many DISTINCT moments it has fired in, estimated.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A FIRING IS NOT AN OBSERVATION WHEN THE WORLD DRAWS THE SAME THING TWICE.</b>
+    /// <see cref="Fired"/> counts how often a commitment was answered;
+    /// this counts how much of what it was answered about was DIFFERENT. Where a world
+    /// redraws from a bag the two come apart by exactly the recurrence — and every
+    /// proportion this design tests is a claim about independent evidence, which the
+    /// first number is not.
+    /// </para>
+    /// <para>
+    /// <b>THE ONLY MEASURE OF GENERALITY HERE THAT IS NOT BUILT FROM ACCURACY, AND WHAT
+    /// IT WAS BUILT FOR IS REFUTED.</b> Every repair gate tried — the vote being wrong, a
+    /// failure nothing covers, forking having paid — is computed from observed accuracy
+    /// or observed failure, and the story was that on a world drawing with replacement
+    /// all of them are fooled by children standing on one repeated moment. Subsuming on
+    /// THIS instead of on firings said otherwise; see the revival row in the plan.
+    /// </para>
+    /// <para>
+    /// <b>IT IS KEPT AS AN INSTRUMENT BECAUSE IT SETTLED SOMETHING NO OTHER NUMBER
+    /// COULD.</b> On <see cref="Worlds.Arranged"/> a subsumption rule weighing advantage
+    /// against THIS deleted an ordinary 83% of children — the same share as the rules
+    /// that weigh it against firings — and landed on the identical withheld score, seed
+    /// for seed. The children that sink that world are not memorised. That is a negative
+    /// nothing in <see cref="Separations"/> or the counters could have produced.
+    /// </para>
+    /// <para>
+    /// <b>LINEAR COUNTING OVER A SINGLE WORD, WHICH IS EXACT WHERE IT MATTERS AND
+    /// SATURATES WHERE IT DOES NOT.</b> Each occasion sets one bit; the count is
+    /// recovered from how many bits are still clear. At one, two and three occasions it
+    /// reads 1.0, 2.0 and 3.1 — the regime the whole question lives in — and above about
+    /// two hundred it stops rising, which costs nothing because a proportion tested on
+    /// two hundred independent readings already has all the power it will ever need.
+    /// </para>
+    /// <para>
+    /// <b>LOCAL, LIKE <see cref="Accuracy"/> AND UNLIKE THE COUNTERS.</b> It never
+    /// merges and never travels, so C1 is untouched: what another node saw is not
+    /// evidence this one may count as its own. It is deterministic under a fixed seed,
+    /// which is all it has to be — two machines are not required to agree on it, because
+    /// neither is ever told it.
+    /// </para>
+    /// </remarks>
+    public double Occasions
+    {
+        get
+        {
+            var set = System.Numerics.BitOperations.PopCount(_witness);
+
+            // THE LAST BUCKET IS HELD BACK RATHER THAN DIVIDED BY ZERO. A full
+            // register is an estimate of infinity, and the clamp is what turns it into
+            // the largest number the word can honestly stand for.
+            var lit = Math.Min(set, Buckets - 1);
+
+            return lit == 0 ? 0.0 : -Buckets * Math.Log(1.0 - (lit / (double)Buckets));
+        }
+    }
+
     /// <summary>The tally repair reads: per code, how often it was there in each.</summary>
     public IReadOnlyDictionary<Code, Separation> Separations => _separations;
 
@@ -200,11 +273,20 @@ public sealed class Commitment
 
         _accuracy += rate * ((hit ? 1.0 : 0.0) - _accuracy);
 
+        var occasion = 0UL;
+
         // THE TALLY IS OVER WHAT WAS PRESENT AND NOT OVER THE SCOPE. Every scope
         // code is present in every firing by definition, so a tally over the scope
         // separates nothing; what repair needs is the codes that came ALONG.
         foreach (var code in moment)
         {
+            // AND THE OCCASION IS FOLDED IN THE SAME PASS, so counting what is
+            // DIFFERENT about a firing costs no walk of its own -- see
+            // <see cref="Occasions"/>. XOR because a moment is a SET: two machines
+            // walking it in different orders must reach the same word, and this is
+            // the one place where that comes free rather than from sorting.
+            occasion ^= Agreed.Mix(code.Value ^ Agreed.Mix(code.Modality));
+
             if (Scope.Contains(code)) continue;
 
             _separations.TryGetValue(code, out var seen);
@@ -212,6 +294,8 @@ public sealed class Commitment
                 ? seen with { InHits = seen.InHits + 1 }
                 : seen with { InMisses = seen.InMisses + 1 };
         }
+
+        _witness |= 1UL << (int)(Agreed.Mix(occasion) & (Buckets - 1));
     }
 
     /// <summary>Takes over another commitment's record, when it is the same claim said shorter.</summary>
@@ -238,6 +322,12 @@ public sealed class Commitment
 
         _accuracy = from._accuracy;
         _seen = from._seen;
+
+        // THE REGISTER COMES TOO, FOR THE REASON THE TALLY DOES. A rewrite entails
+        // exactly the moments it did before, so it has fired in exactly the same
+        // occasions -- and a mechanism whose reward is looking less general than it is
+        // would be one nobody would run.
+        _witness = from._witness;
 
         // THE TALLY COMES TOO, and the codes now hidden inside the name are harmless
         // in it: they are present in every firing this can have, so they separate

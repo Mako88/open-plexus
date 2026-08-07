@@ -118,7 +118,13 @@ public sealed class DialTests(ITestOutputHelper output)
             + "roughly doubles the sound rules; on a clean world it is level or "
             + "slightly behind, because there a hair of advantage is real signal "
             + "and a significance test throws it away. The honest driver would be "
-            + "an estimate of how much the world lies, which nothing computes",
+            + "an estimate of how much the world lies, which nothing computes. AND "
+            + "THE THIRD RULE IS REFUTED: weighing the advantage against the "
+            + "DISTINCT occasions a commitment stands on takes the noisy "
+            + "multiplexer to chance with no sound rules at all, because every "
+            + "condition a scope adds halves the moments it can fire in -- so "
+            + "independent evidence falls exponentially in DEPTH and the bar "
+            + "becomes a cap set by the size of the world",
 
         ["Weighing"] =
             "the arm for the line above, and a choice between two rules rather "

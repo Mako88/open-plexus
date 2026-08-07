@@ -412,10 +412,7 @@ public sealed class Population
             return general.Accuracy >= specific.Accuracy;
 
         var ahead = Repair.Ahead(
-            specific.Hits,
-            specific.Hits + specific.Misses,
-            general.Hits,
-            general.Hits + general.Misses);
+            specific.Hits, specific.Fired, general.Hits, general.Fired);
 
         return Normal.Tail(ahead) > _dials.Alpha;
     }

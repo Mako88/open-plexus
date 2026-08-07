@@ -171,6 +171,57 @@ public sealed class CommitmentTests
     }
 
     [Fact]
+    public void A_firing_is_not_an_observation_when_the_same_moment_keeps_coming_back()
+    {
+        // THE ONE MEASURE OF GENERALITY HERE THAT IS NOT BUILT FROM ACCURACY. Every
+        // repair gate tried so far reads observed accuracy or observed failure, and on
+        // a world whose drawn set can be memorised all of them are fooled the same way.
+        // A rule right four hundred times about ONE picture has fired four hundred
+        // times and seen one thing, and nothing in the machine was counting that.
+        var repeated = One(1);
+        var varied = One(1);
+
+        for (ulong settle = 0; settle < 400; settle++)
+        {
+            repeated.Settle(Verdict.Hit, Moment(1, 2), 0.1);
+            varied.Settle(Verdict.Hit, Moment(1, 100 + settle), 0.1);
+        }
+
+        // IDENTICAL BY EVERY COUNTER THE DESIGN ALREADY HAD, which is the point.
+        Assert.Equal(400L, repeated.Fired);
+        Assert.Equal(400L, varied.Fired);
+        Assert.Equal(repeated.Reliability, varied.Reliability, 6);
+
+        Assert.Equal(1.0, repeated.Occasions, 1);
+
+        // AND THE REGISTER SATURATES RATHER THAN COUNTING, which costs nothing: a
+        // proportion resting on two hundred independent readings has all the power it
+        // will ever need, and what this has to tell apart is A FEW from MANY.
+        Assert.True(varied.Occasions > 100,
+            $"four hundred distinct moments read as {varied.Occasions:F1} occasions");
+    }
+
+    [Fact]
+    public void And_the_occasions_are_counted_the_same_however_the_moment_is_walked()
+    {
+        // A MOMENT IS A SET, so two walks of it must reach one word -- the same
+        // property `Name` needs from a scope, and the reason the fold here is an XOR
+        // rather than a running hash.
+        var one = One(1);
+        var other = One(1);
+
+        one.Settle(Verdict.Hit, Moment(1, 7, 4), 0.1);
+        other.Settle(Verdict.Hit, Moment(4, 1, 7), 0.1);
+
+        Assert.Equal(one.Occasions, other.Occasions, 6);
+
+        one.Settle(Verdict.Hit, Moment(1, 4, 7), 0.1);
+
+        // AND A MOMENT ALREADY SEEN IS NOT A SECOND ONE.
+        Assert.Equal(other.Occasions, one.Occasions, 6);
+    }
+
+    [Fact]
     public void Forgetting_drops_the_tally_and_keeps_what_decides_whether_it_fires()
     {
         // THE TABLE IS WHAT BLOWS UP, NOT THE COMMITMENT. Fork 31 is whether it can

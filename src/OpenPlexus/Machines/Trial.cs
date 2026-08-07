@@ -84,6 +84,15 @@ public sealed record Tally
     /// <summary>Children minted by repair.</summary>
     public required long Repaired { get; init; }
 
+    /// <summary>Narrower commitments a general one took the place of.</summary>
+    /// <remarks>
+    /// <b>BESIDE <see cref="Repaired"/> BECAUSE THEY ARE THE TWO DIRECTIONS.</b> Repair
+    /// is the only thing here that makes a scope longer and subsumption is the only one
+    /// that prefers it shorter, so a population's drift toward one rule per instance is
+    /// the difference between these two numbers and was visible in neither.
+    /// </remarks>
+    public required long Subsumed { get; init; }
+
     /// <summary>Commitments minted by genesis, before anything culled them.</summary>
     /// <remarks>
     /// <b>The rate genesis ran at, which <see cref="Resident"/> cannot show.</b> A
@@ -95,6 +104,29 @@ public sealed record Tally
 
     /// <summary>Commitments resident at the end.</summary>
     public required int Resident { get; init; }
+
+    /// <summary>
+    /// How many DISTINCT moments a resident commitment stands on, on average.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>REPORTED RATHER THAN ACTED ON, WHICH IS <see cref="Confidence"/>'S POSITION AND
+    /// FOR A BETTER REASON.</b> Weighing a subsumption against this instead of against
+    /// firings was measured and refuted — see the plan's revival row — so nothing decides
+    /// on it. What it answers is whether a population's evidence is WIDE or merely LONG,
+    /// and no other number here can: a run that has settled a million times over four
+    /// hundred distinct moments and one that has seen a million different ones report the
+    /// same everything else.
+    /// </para>
+    /// <para>
+    /// <b>AND THE FIRST THING IT SAID WAS THAT THE OBVIOUS STORY WAS WRONG.</b> The
+    /// children that cost <see cref="Worlds.Arranged"/> a quarter of its score stand on
+    /// many distinct scenes, not on one drawn repeatedly — so they are true of what was
+    /// shown and false of what was not, which is a fault no statistic over drawn data can
+    /// see. <see cref="Commitment.Occasions"/> carries the cost: one word per commitment.
+    /// </para>
+    /// </remarks>
+    public required double Occasions { get; init; }
 
     /// <summary>Codes minted to stand for sub-scopes that kept recurring.</summary>
     public required int Named { get; init; }
@@ -204,8 +236,10 @@ public sealed class Trial<TSeen>
             Confidence = cycle.Confidence,
             Reached = cycle.Reached,
             Repaired = cycle.Repaired,
+            Subsumed = cycle.Subsumed,
             Minted = cycle.Minted,
             Resident = held.Count,
+            Occasions = held.Count == 0 ? 0.0 : held.All.Average(one => one.Occasions),
             Named = held.Names.Count,
             Stacked = held.Names.Means.Count(one => one.Value.Any(held.Names.Knows)),
             Exhausted = held.Exhausted(_brain.Dials.Budget),

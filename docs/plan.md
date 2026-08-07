@@ -105,6 +105,17 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   constraint.** The same objects in two arrangements must have OPPOSITE answers.
 - **Or recognition passes as reasoning and step four repeats with better pictures.** A
   front end that names the parts and forgets where they were should score CHANCE.
+- **Six — Monk-2, which is a day's work and arrives with a published number.** A
+  counting concept a conjunctive scope CANNOT express is the cheapest probe of the
+  language ceiling there is.
+- **Seven — the rung the failures demand, and never the rung that sounds next.**
+  Choosing one before a failure asks for it is hand-specified language bias by a side
+  door, which is the thing this design exists to avoid.
+- **THE LANGUAGE CEILING IS NOT THE BINDING CONSTRAINT YET AND THE GRID SAYS SO.** The
+  front end is worth many times what everything left between the learner and a linear
+  probe could be.
+- **The two-learner head-to-head is a side quest and blocks nothing**, being cheap now
+  that both are co-resident.
 - **Resist polishing step one.** It is the least informative part when it passes.
 
 ### The primitive

@@ -146,6 +146,17 @@ public sealed class DialTests(ITestOutputHelper output)
             + "something rather than a mechanism and its own absence. WHICH rule "
             + "picks the added condition is not a quantity",
 
+        ["Rooting"] =
+            "which live codes genesis may root on, and not a quantity -- `Anything` is "
+            + "the arm and is what ran before this existed. THE POINT OF THE RULE IS "
+            + "THAT IT HAS NO NUMBER IN IT: a base rate against a threshold would need "
+            + "the threshold, and nothing computed from inside a run can say what it "
+            + "should be, which is the fault three dials in this file already have. "
+            + "`Varying` asks only whether a code has EVER been absent, which is a "
+            + "question with one answer and no level to hunt -- and it repairs itself "
+            + "when a code stops being background, where a threshold would need a "
+            + "forgetting rate nobody can set either",
+
         ["Surprising"] =
             "which rule decides a moment was unaccounted for, and not a quantity "
             + "either -- `AnyFailure` is the arm and it is what ran before this was "
@@ -573,6 +584,23 @@ public sealed class DialTests(ITestOutputHelper output)
         // world-independent, the repair gate already computes most of it, and it
         // separates the two cases these dials keep splitting the difference between.
         // The next entry in this list should be its DELETION of three of them.
-        Assert.Equal(24, HandSet.Count);
+        //
+        // AND TO TWENTY-FIVE FOR `Rooting`, WHICH IS THE FOURTH AND OWES THE ARGUMENT
+        // THE PARAGRAPH ABOVE DEMANDS. The complaint about the other three is that each
+        // has a best VALUE that moves between worlds, so somebody has to choose a level
+        // and no world agrees on it. This one has no value to choose: `Varying` asks
+        // whether a code has ever been absent, which is a question with one answer.
+        //
+        // MEASURED BOTH WAYS BEFORE IT WAS ADDED, WHICH IS WHAT THE OTHER THREE DID NOT
+        // GET. Over five seeds it is 2.7 standard errors ahead where there is background
+        // and half a standard error apart where there is none -- so it wins one world
+        // and is INDISTINGUISHABLE on the other, rather than winning one and ruining the
+        // other, which is precisely the pattern that made the first three a finding.
+        //
+        // IT IS STILL AN ARM AND NOT A SETTING. `Anything` is what ran before it, the
+        // clean-world reading is a null result rather than proof of freeness, and 2.7
+        // standard errors is suggestive at five seeds and not decisive. Count seeds in
+        // both directions before this becomes the default.
+        Assert.Equal(25, HandSet.Count);
     }
 }

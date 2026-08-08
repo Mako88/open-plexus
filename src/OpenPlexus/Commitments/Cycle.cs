@@ -247,6 +247,11 @@ public sealed class Cycle
 
         var at = Stopwatch.GetTimestamp();
 
+        // NOTED BEFORE ANYTHING READS IT, so a code is counted live in the very moment
+        // genesis may be asked about it. Recording it after covering would let the first
+        // moment a code appears be judged against a table that had not seen it.
+        _held.Witness(moment);
+
         var firing = _held.Firing(moment);
         var vote = _held.Predict(firing);
 

@@ -1,4 +1,5 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
+using System.Runtime.InteropServices;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Commitments;
@@ -73,6 +74,20 @@ public sealed class Population
     private readonly Random _blind;
 
     private readonly Naming _names = new();
+
+    /// <summary>
+    /// Per code: the moment it first appeared, and how many it has been live in.
+    /// </summary>
+    /// <remarks>
+    /// <b>TWO NUMBERS, BECAUSE ONE CANNOT TELL ABSENT FROM NOT-YET-ARRIVED.</b> A code
+    /// live in every moment it has existed for has varied in nothing; a code live in
+    /// every moment SINCE ROUND FOUR HUNDRED is a code that arrived late, which is a
+    /// completely different thing and would otherwise read the same.
+    /// </remarks>
+    private readonly Dictionary<Code, (long First, long Live)> _liveness = [];
+
+    private long _moments;
+
     private readonly Dictionary<Code, Commitment> _byName = [];
     private readonly Dictionary<Code, List<Commitment>> _byCode = [];
 
@@ -345,10 +360,57 @@ public sealed class Population
         var minted = 0;
 
         foreach (var code in moment.Order())
+        {
+            // AND THE SECOND GATE ASKS WHICH CODE RATHER THAN WHETHER AT ALL. A code that
+            // has never once been absent separates nothing and cannot ever win a repair,
+            // but it can still be a ROOT -- and every child hanging off it inherits the
+            // useless code while being otherwise a perfectly good rule.
+            if (_dials.Rooting == Rooting.Varying && !Varied(code)) continue;
+
             if (Add(new Commitment([code], arrived))) minted++;
+        }
 
         return minted;
     }
+
+    /// <summary>
+    /// Notes which codes were live, so absence can be told from never-having-appeared.
+    /// </summary>
+    /// <param name="moment">What is live.</param>
+    /// <remarks>
+    /// <b>ONE ADD PER LIVE CODE AND NO SWEEP OVER WHAT IS KNOWN.</b> The obvious way to
+    /// ask whether a code has ever been absent is to walk everything known and subtract
+    /// the moment, which is linear in the vocabulary on every round and would cost more
+    /// on a wide world than the thing it is trying to save. Counting how many moments a
+    /// code has been live, against how many have passed since it first appeared, answers
+    /// the same question by arithmetic.
+    /// </remarks>
+    public void Witness(IReadOnlySet<Code> moment)
+    {
+        ArgumentNullException.ThrowIfNull(moment);
+
+        _moments++;
+
+        foreach (var code in moment)
+        {
+            ref var seen = ref CollectionsMarshal.GetValueRefOrAddDefault(
+                _liveness, code, out var existed);
+
+            if (!existed) seen = (First: _moments, Live: 0);
+
+            seen = seen with { Live = seen.Live + 1 };
+        }
+    }
+
+    /// <summary>Whether a code has been absent from a moment since it first appeared.</summary>
+    /// <param name="code">The code to ask about.</param>
+    /// <remarks>
+    /// <b>A code live in every moment since it arrived has varied in nothing</b>, so its
+    /// presence is not evidence about anything and a commitment rooted on it is a
+    /// commitment about the world existing.
+    /// </remarks>
+    private bool Varied(Code code) =>
+        _liveness.TryGetValue(code, out var seen) && seen.Live < (_moments - seen.First + 1);
 
     /// <summary>Repairs the worst commitment that just failed, if any has earned it.</summary>
     /// <param name="firing">What fired.</param>

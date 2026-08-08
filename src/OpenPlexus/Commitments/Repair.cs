@@ -32,6 +32,55 @@ public enum Surprising
     Unaccounted,
 }
 
+/// <summary>Which live codes genesis is allowed to mint a commitment on.</summary>
+/// <remarks>
+/// <para>
+/// <b>SEPARATE FROM <see cref="Surprising"/> BECAUSE THEY ASK DIFFERENT QUESTIONS.</b>
+/// That one gates WHEN genesis runs; this gates WHICH of the live codes it roots on when
+/// it does. Measured on a cluttered multiplexer, the surprise gate already keeps the
+/// minting RATE bounded — background costs about ten extra commitments and not a flood —
+/// so the two are not substitutes for one another.
+/// </para>
+/// <para>
+/// <b>AND WHAT BACKGROUND ACTUALLY COSTS IS INHERITANCE.</b> A code present in every
+/// moment can never win a repair, because the statistic that chooses conditions asks what
+/// separates hits from misses and finds the same proportion twice. It can still be a
+/// ROOT — and every child hanging off that root carries the useless code forever while
+/// being otherwise a perfectly good rule. On eight bits of pure background, half the
+/// resident population was rooted that way.
+/// </para>
+/// </remarks>
+public enum Rooting
+{
+    /// <summary>Any live code. What ran before anything gated this.</summary>
+    Anything,
+
+    /// <summary>
+    /// Only a code that has been ABSENT at least once — <b>a gate with no number in
+    /// it.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ALTERNATIVE WAS A BASE RATE AGAINST A THRESHOLD, AND THIS PROJECT HAS THREE
+    /// DIALS ALREADY WHOSE BEST VALUE MOVES WITH THE WORLD.</b> <i>Live in more than
+    /// nine tenths of moments</i> needs a nine tenths, and nothing computed from inside a
+    /// run can say what it should be. <i>Has never once been missing</i> needs nothing.
+    /// </para>
+    /// <para>
+    /// <b>AND IT REPAIRS ITSELF WHEN THE WORLD CHANGES, WHICH IS WHAT C4 ASKS.</b> A code
+    /// that stops being background becomes eligible the first moment it is absent, with
+    /// nothing having to notice or decay. A threshold would need to forget at some rate,
+    /// and that rate is another number nobody can set.
+    /// </para>
+    /// <para>
+    /// <b>The cost is a warm-up and it is honest rather than incidental.</b> In the first
+    /// moment nothing has been absent yet, so nothing roots — which is correct: background
+    /// cannot be told from signal before any variation has been seen.
+    /// </para>
+    /// </remarks>
+    Varying,
+}
+
 /// <summary>How the advocates for one expectation are added up.</summary>
 public enum Weighing
 {
@@ -283,6 +332,14 @@ public sealed record CommittingSettings
     /// </para>
     /// </remarks>
     public Surprising Surprising { get; init; } = Surprising.Unaccounted;
+
+    /// <summary>Which live codes genesis may root on.</summary>
+    /// <remarks>
+    /// <b>DEFAULTS TO WHAT RAN BEFORE IT EXISTED, so the arm is the exception and the
+    /// baseline is not silently moved.</b> The plan's rule: measure one mechanism ON from
+    /// a known baseline, never one OFF from all-on.
+    /// </remarks>
+    public Rooting Rooting { get; init; } = Rooting.Anything;
 
     /// <summary>How fast the local estimate forgets, in 0..1.</summary>
     /// <remarks>

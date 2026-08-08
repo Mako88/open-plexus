@@ -34,6 +34,20 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class ClutterCostTests(ITestOutputHelper output)
 {
+    private static double Recent(int clutter, bool gate, int seed) =>
+        new MultiplexerRun(
+            new MultiplexerSettings { Address = 2, Clutter = clutter },
+            new Brain(
+                new CommittingSettings { Rooting = gate ? Rooting.Varying : Rooting.Anything },
+                seed),
+            seed).Run(20_000).Recent;
+
+    private static Learned Gated(int clutter) =>
+        new MultiplexerRun(
+            new MultiplexerSettings { Address = 2, Clutter = clutter },
+            new Brain(new CommittingSettings { Rooting = Rooting.Varying }, seed: 1),
+            seed: 1).Run(20_000);
+
     private static Learned Run(int clutter) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = 2, Clutter = clutter },
@@ -65,6 +79,83 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
         // A soundness count moving with clutter would mean the answer key had started
         // reading the noise, which is a bug in the instrument rather than a finding.
         Assert.All(arms, one => Assert.Equal(0, one.Unchecked));
+    }
+
+    /// <summary>
+    /// <b>THE ARM: REFUSING TO ROOT ON A CODE THAT HAS NEVER BEEN ABSENT.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ONE MECHANISM ON FROM A KNOWN BASELINE, WHICH IS THE ONLY ORDER THIS PROJECT
+    /// ACCEPTS.</b> The grid above characterised the cost first, and it moved the fix:
+    /// the damage is not the minting RATE, which the surprise gate already bounds, but
+    /// that background becomes a PARENT whose children inherit a code that can never earn
+    /// its place.
+    /// </para>
+    /// <para>
+    /// <b>AND THE CLEAN COLUMN IS THE HALF THAT MATTERS.</b> A gate that helps where
+    /// there is background and costs nothing where there is none is a gate; one that buys
+    /// its win by damaging the clean world is <see cref="Mending"/> again — three rules,
+    /// three worlds, three winners — and this project has enough of those.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Refusing_to_root_on_what_never_varies()
+    {
+        int[] seeds = [1, 2, 3, 4, 5];
+
+        var arms = Fixture.Abreast(
+        [
+            .. new[] { (0, false), (0, true), (8, false), (8, true) }
+                .Select<(int Clutter, bool Gate), Func<Measured>>(one => () => new Measured
+                {
+                    Arm = $"clutter {one.Clutter} {(one.Gate ? "gated" : "open")}",
+                    Values = [.. seeds.Select(seed => Recent(one.Clutter, one.Gate, seed))],
+                }),
+        ]);
+
+        foreach (var arm in arms) output.WriteLine(arm.ToString());
+
+        // THE GATE AGAINST ITS OWN CONTROL, ON THE WORLD IT IS FOR AND THE WORLD IT MUST
+        // NOT DAMAGE. No bar on either: a threshold written before the first reading is a
+        // prediction dressed as a check, and both of these are first readings.
+        output.WriteLine(
+            $"cluttered: {arms[3].Separation(arms[2]):F1} standard errors apart");
+        output.WriteLine(
+            $"clean:     {arms[1].Separation(arms[0]):F1} standard errors apart");
+    }
+
+    /// <summary>
+    /// <b>AND THE GATE DOES WHAT IT SAYS, WHICH IS NOT A PREDICTION BUT A DEFINITION.</b>
+    /// </summary>
+    /// <remarks>
+    /// The grid above reports what refusing background is WORTH, and that is a first
+    /// reading over five seeds rather than a bar. This is the other half: whether the
+    /// mechanism did the thing it is named for. A gate that improved a score while
+    /// leaving background-rooted rules resident would be improving it for some other
+    /// reason, and the number would be believed anyway.
+    /// </remarks>
+    [Fact]
+    public void And_nothing_is_left_rooted_on_background_when_it_is_gated()
+    {
+        var run = new MultiplexerRun(
+            new MultiplexerSettings { Address = 2, Clutter = 8 },
+            new Brain(new CommittingSettings { Rooting = Rooting.Varying }, seed: 1),
+            seed: 1);
+
+        run.Run(20_000);
+
+        var background = Enumerable.Range(6, 8)
+            .Select(at => Codes.Bits.Of(Multiplexer.Bit, at, 1))
+            .ToHashSet();
+
+        var tainted = run.Held.All
+            .Select(one => run.Held.Names.Unfold(one.Scope))
+            .Count(scope => scope.Any(background.Contains));
+
+        output.WriteLine($"{tainted} resident commitments still carry an always-present code");
+
+        Assert.Equal(0, tainted);
     }
 
     /// <summary>

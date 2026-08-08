@@ -231,6 +231,59 @@ public sealed class SplitTests(ITestOutputHelper output)
         Assert.Equal(0, flipped);
     }
 
+    [Fact]
+    public void What_a_holder_says_survives_being_written_as_bytes_and_read_back()
+    {
+        // ASKED BECAUSE THE OTHER PAYLOAD BUILT THIS SESSION COULD NOT CROSS. `Recurrence`
+        // was committed as the thing that travels and had never been near a serialiser; it
+        // wrote its scope count and dropped both tables, silently and plausibly. Assuming
+        // `Testimony` is fine because it looks fine is the same reasoning that shipped
+        // that one.
+        //
+        // AND THE WEIGHTS ARE DOUBLES, WHICH IS WHY THIS IS NOT A FORMALITY. `Wire` exists
+        // in the shape it does because a value that comes back differing in its last bit
+        // codes differently at a band boundary -- and here a weight differing in its last
+        // bit reorders a vote whose margin was thin. Fork 12 with the two halves on
+        // different machines, where neither end can see that they disagree.
+        var (held, moments) = Trained(Weighing.Strongest, seed: 1);
+
+        var compared = 0;
+
+        foreach (var moment in moments)
+        {
+            var firing = held.Firing(moment);
+            if (firing.IsDefaultOrEmpty) continue;
+
+            var heard = Spread(firing, held, holders: 12);
+
+            var arrived = heard
+                .Select(one => OpenPlexus.Bus.Wire.Read<Testimony>(OpenPlexus.Bus.Wire.Write(one)))
+                .ToList();
+
+            // ON THE DECISION AND NOT ONLY ON THE FIELDS. Two testimonies comparing equal
+            // says the members survived; the same VOTE coming out says the arithmetic did,
+            // and that is the thing a machine on the far side actually acts on.
+            Assert.Equal(
+                Population.Decide(heard, Weighing.Strongest),
+                Population.Decide(arrived, Weighing.Strongest));
+
+            compared++;
+        }
+
+        Assert.True(compared > 500, $"only {compared} testimonies crossed");
+
+        // THE CHECK THAT ANYTHING WAS CARRIED. An empty testimony round-trips perfectly and
+        // decides identically, so a population too quiet to advocate would pass every line
+        // above without the format having been asked anything.
+        var spoke = moments
+            .Select(held.Firing)
+            .Where(firing => !firing.IsDefaultOrEmpty)
+            .Sum(firing => Spread(firing, held, 12).Count(one => !one.Silent));
+
+        Assert.True(spoke > 500,
+            $"only {spoke} holders had anything to say, so the round trip moved empty sets");
+    }
+
     // ---- what a missing holder costs ---------------------------------------
 
     [Fact]

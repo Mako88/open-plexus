@@ -219,6 +219,40 @@ public static class Fixture
     }
 
     /// <summary>
+    /// The four arrangements <c>Mending</c> shipped as one list, as the two settings they
+    /// turned out to be.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>SHARED SO THE GRIDS STAY COMPARABLE ACROSS FILES, WHICH IS THE WHOLE RISK OF
+    /// SPLITTING AN ENUM.</b> Four files sweep these cells and every finding in the
+    /// commits is labelled by them; four private copies of the mapping is four chances for
+    /// one row to mean something different from the row it is being read against.
+    /// </para>
+    /// <para>
+    /// <b>AND THE SILENT HALF IS WHY THIS EXISTS RATHER THAN A FIND-AND-REPLACE.</b> Two of
+    /// the old cells kept their names as GATES, so <c>Mending = Mending.Uncovered</c> still
+    /// compiles and now means <i>uncovered, after a failure</i> where it used to mean
+    /// <i>uncovered, every round</i>. The compiler catches the two renamed cells and says
+    /// nothing at all about the two that quietly changed arm.
+    /// </para>
+    /// <para>
+    /// <b>THE TWO CELLS THE SPLIT MAKES REACHABLE ARE NOT HERE.</b> An ungated repair every
+    /// round and the improving signal after a failure have never been measured, and adding
+    /// them to a grid in the same edit that rearranged it would mean no row could be
+    /// compared with the reading it replaced.
+    /// </para>
+    /// </remarks>
+    public static readonly (string Arm, Commitments.Mending Gate, Commitments.Repairing When)[]
+        Repairs =
+        [
+            ("after failure, no gate", Commitments.Mending.Ungated, Commitments.Repairing.AfterFailure),
+            ("after failure, gate", Commitments.Mending.Uncovered, Commitments.Repairing.AfterFailure),
+            ("every round, gate", Commitments.Mending.Uncovered, Commitments.Repairing.EveryRound),
+            ("every round, gate, paid", Commitments.Mending.Improving, Commitments.Repairing.EveryRound),
+        ];
+
+    /// <summary>
     /// Places every commitment on a holder, the way the ring would.
     /// </summary>
     /// <param name="all">The whole population.</param>

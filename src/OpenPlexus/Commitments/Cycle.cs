@@ -360,10 +360,11 @@ public sealed class Cycle
         // searched was a function of how good its answers already were. `Mend` refuses
         // anything short of the floor, over budget, or without a condition past the
         // separation bar, so its own gates are not being loosened; only this one is.
-        // THE TWO THAT DO NOT WAIT FOR THE VOTE. `Neglected` does wait, and its extra
-        // condition lives inside `Mend` -- so the two halves of the conjunction are
-        // applied where each is cheapest to ask, rather than both in one place.
-        if (_held.Dials.Mending is Mending.Uncovered or Mending.Improving
+        // AND WHICH RULES MAY BE REPAIRED IS A DIFFERENT SETTING, ASKED INSIDE `Mend`.
+        // The two were one enum until the axes were separated, and this loop read the
+        // combined value in two places -- so a cell that changed the gate also changed
+        // where the call sat, and no comparison could move one without the other.
+        if (_held.Dials.Repairing == Repairing.EveryRound
             && _held.Mend(firing, arrived) is not null)
             Repaired++;
 
@@ -383,7 +384,7 @@ public sealed class Cycle
 
         at = Mark(ref _covering, at);
 
-        if (_held.Dials.Mending is Mending.Outvoted or Mending.Neglected
+        if (_held.Dials.Repairing == Repairing.AfterFailure
             && _held.Mend(firing, arrived) is not null)
             Repaired++;
 

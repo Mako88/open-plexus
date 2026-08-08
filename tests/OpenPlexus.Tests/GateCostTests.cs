@@ -75,11 +75,27 @@ public sealed class GateCostTests(ITestOutputHelper output)
     /// instrument that costs four times what it needs to is an instrument nobody runs.
     /// </para>
     /// </remarks>
+    /// <summary>
+    /// The gate, on the timing it was measured with.
+    /// </summary>
+    /// <remarks>
+    /// <b>BOTH SETTINGS NAMED, BECAUSE ONE OF THEM USED TO BE IMPLIED.</b>
+    /// <c>Mending.Uncovered</c> meant the gate AND every-round repair while it was one
+    /// enum; naming only the gate now would silently move every reading in this file onto
+    /// the after-failure timing, where the same gate is six and a half standard errors
+    /// worse. Written once because two copies is two chances for one of them to drift.
+    /// </remarks>
+    private static CommittingSettings Gated => new()
+    {
+        Mending = Mending.Uncovered,
+        Repairing = Repairing.EveryRound,
+    };
+
     private Learned Run(int holders, int seed)
     {
         if (_ran.TryGetValue((holders, seed), out var already)) return already;
 
-        var brain = new Brain(new CommittingSettings { Mending = Mending.Uncovered }, seed);
+        var brain = new Brain(Gated, seed);
 
         // SET BEFORE THE RUN AND NEVER DURING IT. A placement that changed mid-run would
         // be a different machine either side of the change, and the score would be an
@@ -177,7 +193,7 @@ public sealed class GateCostTests(ITestOutputHelper output)
     {
         if (_arranged.TryGetValue((holders, seed), out var already)) return already;
 
-        var brain = new Brain(new CommittingSettings { Mending = Mending.Uncovered }, seed);
+        var brain = new Brain(Gated, seed);
 
         if (holders > 1)
             brain.Held.Placing = one => one.Identity.Value % (ulong)holders;

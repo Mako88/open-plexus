@@ -109,29 +109,68 @@ public enum Subsuming
     Insignificant,
 }
 
-/// <summary>What has to go wrong before repair is attempted at all.</summary>
+/// <summary>
+/// WHICH commitments repair may touch — <b>one of the two axes `Mending` used to be.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>IT WAS ONE SETTING DECIDING TWO INDEPENDENT THINGS WHILE BEING NAMED FOR ONE, which
+/// is a line on this repo&apos;s own trap list.</b> The four cells it shipped were a gate and
+/// a timing crossed together, so every comparison against it moved both axes at once — and
+/// a row in the plan&apos;s defect list about a world reaching into the brain rested on
+/// exactly that. Separated, every finding taken under the old names is still readable:
+/// </para>
+/// <para>
+/// <c>Outvoted</c> was <see cref="Ungated"/> with <see cref="Repairing.AfterFailure"/>.
+/// <c>Uncovered</c> was <see cref="Uncovered"/> with <see cref="Repairing.EveryRound"/>.
+/// <c>Improving</c> was <see cref="Improving"/> with <see cref="Repairing.EveryRound"/>.
+/// <c>Neglected</c> was <see cref="Uncovered"/> with <see cref="Repairing.AfterFailure"/>.
+/// </para>
+/// <para>
+/// <b>AND FORK 59 DISSOLVES RATHER THAN BEING DECIDED.</b> <c>Neglected</c> lost or tied on
+/// both worlds measured, so the arm rule said delete it — while being the only cell that
+/// isolated the gate axis, which is a cost that rule does not anticipate. Under two axes it
+/// is not a cell at all, so nothing has to be preserved and nothing has to be given up.
+/// </para>
+/// <para>
+/// <b>AND TWO ARRANGEMENTS NOBODY HAD ENUMERATED BECOME REACHABLE</b> — an ungated repair
+/// every round, and the improving signal after a failure. Neither has been measured. That
+/// they were unreachable rather than refused is the clearest evidence the list was hiding a
+/// grid.
+/// </para>
+/// </remarks>
 public enum Mending
 {
-    /// <summary>The vote had to be wrong. What ran before anything questioned it.</summary>
-    Outvoted,
+    /// <summary>
+    /// Anything that failed and cleared the floor and the budget. What ships.
+    /// </summary>
+    /// <remarks>
+    /// <b>NAMED FOR THE ABSENCE OF A GATE RATHER THAN FOR THE VOTE, WHICH IS WHAT
+    /// SEPARATING THE AXES REVEALED.</b> The old <c>Outvoted</c> meant <i>the vote had to
+    /// be wrong</i>, and that was never a property of the GATE — it was the timing beside
+    /// it doing the work. What this cell actually says is that no commitment is refused.
+    /// </remarks>
+    Ungated,
 
     /// <summary>
     /// And no child of it may have fired — the failure has to be one nothing accounts for.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>FORK 37'S DRIVER, AND IT NEEDS NO BOOKKEEPING AT ALL.</b> <i>Whether a parent
+    /// <b>FORK 37&apos;S DRIVER, AND IT NEEDS NO BOOKKEEPING AT ALL.</b> <i>Whether a parent
     /// still has failures no child covers</i> reads like it wants a parent-to-children
-    /// index. It does not: a child's scope is its parent's plus a condition, so a child
-    /// can only fire where the parent fires. If no commitment among those firing NARROWS
-    /// this one, then this failure is in no child's territory — which is the whole of the
-    /// question, answered from the firing set.
+    /// index. It does not: a child&apos;s scope is its parent&apos;s plus a condition, so a
+    /// child can only fire where the parent fires. If no commitment among those firing
+    /// NARROWS this one, then this failure is in no child&apos;s territory — which is the
+    /// whole of the question, answered from the firing set.
     /// </para>
     /// <para>
-    /// <b>IT IS WHAT THE OTHER TWO ARE STANDING IN FOR.</b> The readout cannot tell being
-    /// right from having nothing left to learn, so <see cref="Outvoted"/> stops repairing
-    /// a world it has already solved and also stops repairing one it has not.
-    /// This asks the question directly and is indifferent to the vote and to the world.
+    /// <b>AND ITS SIGN FLIPS WITH THE TIMING BESIDE IT, WHICH IS WHY THE SPLIT MATTERS.</b>
+    /// Every round on the clean multiplexer it is the best thing measured; after a failure
+    /// on the same world it is six and a half standard errors behind no gate at all. On
+    /// <see cref="Worlds.Arranged"/> it is inert in both timings to three metrics. Its size
+    /// is a fact about the world and its sign a fact about the timing, which is why no
+    /// single sentence about it has ever been safe.
     /// </para>
     /// <para>
     /// <b>AND IT SELF-LIMITS THE WAY <c>Budget</c> WAS BUILT TO FAKE.</b> A parent forks,
@@ -144,64 +183,15 @@ public enum Mending
     Uncovered,
 
     /// <summary>
-    /// The vote had to be wrong AND no child of the culprit may have fired.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>THE CONJUNCTION OF THE OTHER TWO, AND IT IS NOT A FOURTH FREE PARAMETER.</b>
-    /// Each of the signals above is right on one world and wrong on the other, and they
-    /// fail in opposite directions: <see cref="Outvoted"/> asks <i>did the population get
-    /// this wrong</i>, which is too coarse where the answer needs specialising;
-    /// <see cref="Uncovered"/> asks <i>has anything taken responsibility for this
-    /// failure</i>, which is too eager where a child covers only the sliver its extra
-    /// code fires in. Neither is a level, so combining them adds nothing to tune.
-    /// </para>
-    /// <para>
-    /// <b>AND THE MEASUREMENTS SAY EXACTLY WHERE EACH BREAKS.</b> On
-    /// <see cref="Worlds.Arranged"/> the vote is already right, so <see cref="Outvoted"/>
-    /// repairs nine times in twenty thousand rounds and holds 1.000 while
-    /// <see cref="Uncovered"/> mints 1,349 children and falls to 0.752. On
-    /// <see cref="Worlds.Multiplexer"/> at eleven bits it is the reverse: 0.944 against
-    /// 0.983, with 90 sound rules to 80 and 13.0 of the key found to 12.3.
-    /// </para>
-    /// <para>
-    /// <b>AND IT KEEPS ONE HALF AND LOSES THE OTHER, WHICH SETTLES THE QUESTION AGAINST
-    /// ALL THREE.</b> On <see cref="Worlds.Arranged"/> it is 1.000 and byte-identical to
-    /// <see cref="Outvoted"/>, because a vote that is already right makes the conjunction
-    /// collapse to it. On the multiplexer it gives back nearly everything: 0.939 at eleven
-    /// bits against 0.983, and 0.922 at six against 0.990.
-    /// </para>
-    /// <para>
-    /// <b>AND NOT BY REPAIRING LESS, WHICH IS THE PART WORTH KEEPING.</b> It makes 1,158
-    /// repairs to <see cref="Uncovered"/>'s 1,182 and gets 61 sound rules to 90, 10.0 of
-    /// the key to 13.0. It repairs the WRONG PARENTS. The rules most in need of
-    /// specialising are the ones individually wrong while the population is collectively
-    /// right — so gating on the population being wrong is precisely the filter that hides
-    /// them, and on a world where the answer is already correct those same rules are
-    /// harmless and forking them only adds voters.
-    /// </para>
-    /// <para>
-    /// <b>SO NO COMBINATION OF THESE THREE IS BEST ON BOTH, AND UNDER NOISE A THIRD ONE
-    /// WINS.</b> <see cref="Outvoted"/> takes the arranged world, <see cref="Uncovered"/>
-    /// takes the clean multiplexer, and this takes the noisy one — 0.771 against 0.737 and
-    /// 0.725. Three worlds, three winners. The answer is not a better gate on the round;
-    /// it is that WHICH RULE NEEDS SPECIALISING and WHETHER THE POPULATION GOT THIS WRONG
-    /// are different questions whose alignment is a fact about the world&apos;s rule
-    /// structure, and no per-round switch can stand in for both.
-    /// </para>
-    /// </remarks>
-    Neglected,
-
-    /// <summary>
     /// And only while forking this commitment has ever paid.
     /// </summary>
     /// <remarks>
     /// <para>
     /// <b>A PER-COMMITMENT SIGNAL RATHER THAN A PER-ROUND GATE, WHICH IS WHAT FORK 45
     /// ASKS FOR.</b> <see cref="Uncovered"/> is the best thing measured on the clean
-    /// multiplexer and ruinous on <see cref="Worlds.Arranged"/>, and the difference is
-    /// not which rounds it fires on — it is that on one world specialising WORKS and on
-    /// the other there is nothing to gain. Nothing in the machine was asking which.
+    /// multiplexer, and the difference between the worlds is not which rounds it fires on
+    /// — it is that on one world specialising WORKS and on the other there is nothing to
+    /// gain. Nothing in the machine was asking which.
     /// </para>
     /// <para>
     /// <b>AND THE ANSWER IS ALREADY LYING ABOUT IN THE POPULATION.</b> A parent whose
@@ -219,35 +209,42 @@ public enum Mending
     /// </para>
     /// <para>
     /// <b>AND IT SHOULD HAVE MADE <c>Budget</c> UNNECESSARY. IT DID NOT SELF-LIMIT AT
-    /// ALL.</b> It is the best thing measured on the clean multiplexer at both widths,
-    /// and on <see cref="Worlds.Arranged"/> it repairs MORE than the arm it was built to
-    /// restrain and lands in the same place.
-    /// </para>
-    /// <para>
-    /// <b>BECAUSE A MEMORISED CHILD BEATS ITS PARENT EASILY, WHICH MAKES THE SIGNAL
-    /// ACTIVELY MISLEADING RATHER THAN MERELY WEAK.</b> A narrow child that has stored a
-    /// corner of the drawn set is far more accurate than the general parent it came
-    /// from, so <i>has forking paid</i> answers YES forever — and every child it licenses
-    /// is a voter that is wrong about the world.
-    /// </para>
-    /// <para>
-    /// <b>WHICH IS THE SAME FAULT AS EVERY OTHER GATE HERE, AND SAYING SO IS WORTH MORE
-    /// THAN A FOURTH ATTEMPT.</b> <see cref="Outvoted"/>, <see cref="Uncovered"/>,
-    /// <see cref="Neglected"/> and this are all built from observed accuracy or observed
-    /// failure, and on a world whose drawn set can be memorised every one of them is
-    /// fooled the same way. The instrument that is not fooled is soundness by
-    /// enumeration, and that belongs to the experimenter rather than to the machine.
-    /// </para>
-    /// <para>
-    /// <b>SO THE NEXT THING TO TRY IS NOT A GATE.</b> Generality is the only proxy for
-    /// held-out truth the machine has, and the one mechanism that prefers it —
-    /// subsumption — requires the general rule to be AT LEAST AS ACCURATE. A memorised
-    /// child is always a shade better, so the clause never fires. Subsuming where the
-    /// child's advantage is not significant, using the two-proportion test repair
-    /// already owns, is the shape that follows from all of this.
+    /// ALL</b>, because a memorised child beats its parent easily — a narrow child that
+    /// has stored a corner of the drawn set is far more accurate than the general parent
+    /// it came from, so <i>has forking paid</i> answers YES forever.
     /// </para>
     /// </remarks>
     Improving,
+}
+
+/// <summary>
+/// WHEN repair runs — <b>the other axis, and the one that was doing most of the work.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>THE PLAN SAYS AN OUTVOTED COMMITMENT STILL ACCRUES ITS OWN HITS AND MISSES</b>, and
+/// waiting for the vote to be wrong meant it could never spend them — so how hard the
+/// machine searched was a function of how good its answers already were.
+/// </para>
+/// <para>
+/// <b>AND SEPARATING THIS FROM THE GATE IS WHAT SHOWED IT WAS THE LOAD-BEARING HALF.</b>
+/// Every-round repair leads on both worlds measured, while the gate beside it is inert on
+/// one of them to three metrics. The defect row calling this family a dial whose best value
+/// moves with the world was written when the setting was read as a list.
+/// </para>
+/// </remarks>
+public enum Repairing
+{
+    /// <summary>Every round, whatever the vote said.</summary>
+    EveryRound,
+
+    /// <summary>Only on a round the population got wrong. What ships.</summary>
+    /// <remarks>
+    /// <b>THE DEFAULT BECAUSE IT IS WHAT EVERY EXISTING NUMBER WAS TAKEN UNDER</b>, and
+    /// not because it won. Changing a shipped default and separating an axis in one edit
+    /// would move every measurement in the repo while calling itself a refactor.
+    /// </remarks>
+    AfterFailure,
 }
 
 /// <summary>Every number the commitment machinery is allowed to have.</summary>
@@ -424,7 +421,10 @@ public sealed record CommittingSettings
     /// to try.
     /// </para>
     /// </remarks>
-    public Mending Mending { get; init; } = Mending.Outvoted;
+    public Mending Mending { get; init; } = Mending.Ungated;
+
+    /// <inheritdoc cref="Commitments.Repairing"/>
+    public Repairing Repairing { get; init; } = Repairing.AfterFailure;
 
     /// <summary>What it takes for a narrower commitment to survive beside a general one.</summary>
     /// <remarks>

@@ -293,30 +293,13 @@ public sealed class Population
     /// what keeps C1 and stops the loudest one owning all the learning.
     /// </para>
     /// </remarks>
-    public Vote Predict(ImmutableArray<Commitment> firing) => Predict(firing, deferring: false);
+    public Vote Predict(ImmutableArray<Commitment> firing)
+    {
+        if (firing.IsDefaultOrEmpty) return default;
 
-    /// <summary>
-    /// The same vote, with each expectation's seat handed back to any general commitment
-    /// the narrower one has not earned it from.
-    /// </summary>
-    /// <param name="firing">What fired, from <see cref="Firing"/>.</param>
-    /// <remarks>
-    /// <para>
-    /// <b>A SECOND READING OF ONE POPULATION, AND THAT IS THE WHOLE REASON IT IS NOT A
-    /// DIAL.</b> Making the vote defer was built as <c>Weighing.Proven</c> and was worse —
-    /// but it could not be READ, because the vote steers repair as much as it reports it,
-    /// so the arm changed what was learnt and what was said at once. See the plan's
-    /// revival row: what it asked for is exactly this, a population trained under one rule
-    /// and read back under the other.
-    /// </para>
-    /// <para>
-    /// <b>SO NOTHING CALLS THIS DURING A RUN.</b> <see cref="Machines.Trial{TSeen}.Examine"/>
-    /// asks it of the withheld set beside the ordinary vote, in the same read-only pass,
-    /// and the gap between the two answers is what fork 46 leaves open: whether the
-    /// deciders are the score, or merely where it happens to be counted.
-    /// </para>
-    /// </remarks>
-    public Vote Deferred(ImmutableArray<Commitment> firing) => Predict(firing, deferring: true);
+        return Decide([Speak(firing)], _dials.Weighing);
+    }
+
 
     /// <summary>
     /// What this holder's fired commitments have to say, with nothing of the commitments
@@ -478,54 +461,6 @@ public sealed class Population
         };
     }
 
-    private Vote Predict(ImmutableArray<Commitment> firing, bool deferring)
-    {
-        if (firing.IsDefaultOrEmpty) return default;
-
-        var testimony = Speak(firing);
-
-        if (!deferring) return Decide([testimony], _dials.Weighing);
-
-        var handed_back = ImmutableArray.CreateBuilder<Advocacy>(testimony.Advocates.Length);
-
-        foreach (var advocacy in testimony.Advocates)
-        {
-            var seat = _byName[advocacy.By];
-
-            // THE SEAT CAN MOVE MORE THAN ONCE -- a grandparent takes it back from a
-            // parent that took it from a child -- and the loop is bounded by scope
-            // length, since every hand-back is strictly shorter.
-            for (var handed = true; handed;)
-            {
-                handed = false;
-
-                foreach (var general in firing)
-                {
-                    if (general.Expects != seat.Expects || !seat.Narrows(general)) continue;
-                    if (!Absorbs(general, seat)) continue;
-
-                    seat = general;
-                    handed = true;
-                    break;
-                }
-            }
-
-            // THE SUM IS REPLACED RATHER THAN ADJUSTED, which is what the seat handing
-            // back MEANS under either weighing: the expectation is worth what its rightful
-            // advocate is worth, and the crowd behind the child does not come with it.
-            handed_back.Add(new Advocacy
-            {
-                Expects = advocacy.Expects,
-                Weight = Math.Pow(seat.Accuracy, _dials.Sharpness),
-                By = seat.Identity,
-            });
-        }
-
-        return Decide(
-            [new Testimony { Advocates = handed_back.MoveToImmutable() }],
-            _dials.Weighing);
-    }
-
     /// <summary>Tells everything that fired what the settlement said.</summary>
     /// <param name="firing">What fired.</param>
     /// <param name="moment">What was live when it fired.</param>
@@ -662,7 +597,7 @@ public sealed class Population
             // and the budget -- a handful, against the hundreds that fire. Putting it
             // first would make the instrument the cost of the run.
             .Where(one =>
-                _dials.Mending == Mending.Outvoted
+                _dials.Mending == Mending.Ungated
                 || !firing.Any(other => Beside(other, one) && other.Narrows(one)))
 
             // AND THE PER-COMMITMENT HALF, WHICH ONLY `Improving` ASKS. Last again, for

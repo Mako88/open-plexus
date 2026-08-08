@@ -279,7 +279,8 @@ public sealed class SharpeningTests(ITestOutputHelper output)
             output.WriteLine($"{(1 << address) + address} bits, noise {noise:F2}:");
 
             foreach (var weighing in new[] { Weighing.Strongest })
-            foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered, Mending.Improving })
+            foreach (var (arm, gate, when) in Fixture.Repairs
+                .Where(one => one.Arm != "after failure, gate"))
             foreach (var subsuming in new[] { Subsuming.Weaker, Subsuming.Insignificant })
             {
                 var recent = new List<double>();
@@ -298,7 +299,8 @@ public sealed class SharpeningTests(ITestOutputHelper output)
                             new CommittingSettings
                             {
                                 Weighing = weighing,
-                                Mending = mending,
+                                Mending = gate,
+                                Repairing = when,
                                 Subsuming = subsuming,
                             },
                             seed),
@@ -314,7 +316,7 @@ public sealed class SharpeningTests(ITestOutputHelper output)
                 }
 
                 output.WriteLine(
-                    $"  {mending,-9} {subsuming,-13} | recent {recent.Average():F3} "
+                    $"  {arm,-23} {subsuming,-13} | recent {recent.Average():F3} "
                     + $"[{string.Join(" ", recent.Select(one => one.ToString("F3")))}] | "
                     + $"sound {sound.Average():F0} resident {resident.Average():F0} | "
                     + $"repaired {repaired.Average():F0} subsumed {subsumed.Average():F0} | "
@@ -343,17 +345,19 @@ public sealed class SharpeningTests(ITestOutputHelper output)
         // than bytes, because a heap figure moves with collection timing and could never
         // be barred; this cannot drift with the machine, so a budget on it would hold.
         foreach (var address in new[] { 2, 3 })
-        foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered })
+        foreach (var (arm, gate, when) in Fixture.Repairs
+            .Where(one => one.Arm is "after failure, no gate" or "every round, gate"))
         {
             var learned = new MultiplexerRun(
                 new MultiplexerSettings { Address = address },
-                new Brain(new CommittingSettings { Mending = mending }, seed: 1),
+                new Brain(
+                    new CommittingSettings { Mending = gate, Repairing = when }, seed: 1),
                 seed: 1).Run(Rounds);
 
             var spent = learned.Tally.Spent;
 
             output.WriteLine(
-                $"{(1 << address) + address,2} bits {mending,-9} | "
+                $"{(1 << address) + address,2} bits {arm,-23} | "
                 + $"resident {learned.Resident,5} separations {learned.Tally.Separations,8} "
                 + $"({learned.Tally.Separations / (double)Math.Max(learned.Resident, 1):F0} a rule) | "
                 + $"firing {spent.Firing,8:F0} settling {spent.Settling,8:F0} "

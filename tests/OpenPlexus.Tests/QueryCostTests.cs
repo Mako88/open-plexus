@@ -43,7 +43,14 @@ public sealed class QueryCostTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void How_many_round_trips_the_gate_would_cost_and_how_many_survive_a_cache()
     {
-        var dials = new CommittingSettings { Mending = Mending.Uncovered };
+        // BOTH SETTINGS NAMED. The gate was half of one enum and the timing the other
+        // half, so naming only the gate would move this onto an arm it was never measured
+        // on.
+        var dials = new CommittingSettings
+        {
+            Mending = Mending.Uncovered,
+            Repairing = Repairing.EveryRound,
+        };
         var brain = new Brain(dials, seed: 1);
 
         new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, seed: 1)

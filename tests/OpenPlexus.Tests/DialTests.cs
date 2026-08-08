@@ -88,27 +88,46 @@ public sealed class DialTests(ITestOutputHelper output)
             + "run, so there is nothing here for a controller to hunt",
 
         ["Sharpness"] =
-            "OPEN, AND IT IS A LEVEL WHOSE OPTIMUM MOVES WITH THE WORLD, which is "
-            + "the worst shape a brain dial can have. `Arranged` reaches its exact "
-            + "target at ten and sits a fifth short at five; `Multiplexer` peaks at "
-            + "five and is worse at twenty on both widths. It also STEERS REPAIR -- "
-            + "blame ranks the provenance and the vote decides the provenance, so a "
-            + "sharper vote specialises less and finds fewer true rules. A per-world "
-            + "optimum is a world reaching into the brain, so the honest driver is "
-            + "not a controller on this number but a vote whose shape does not need "
-            + "one; `Weighing` is that arm",
+            "OPEN, AND IT IS A PARAMETER OF `Summing` RATHER THAN A DIAL OF THE "
+            + "BRAIN -- re-filed rather than deleted, and the difference is that a "
+            + "deletion would commit to `Strongest` on evidence that does not "
+            + "support it. Under `Weighing.Strongest` it decides NOTHING: an "
+            + "expectation is worth `max(a)^S`, raising to a power is monotone, so "
+            + "the argmax never moves and three powers produce one identical run at "
+            + "both widths. Under `Summing` it swings the score by nearly forty "
+            + "points. So the row above it and this one are not independent axes, "
+            + "and a grid swept over both has a dead column. ITS DELETION HAS A "
+            + "TRIGGER NOW rather than an argument: it goes when `Summing` goes, "
+            + "and what decides that is `Strongest` against `Summing` at ONE fixed "
+            + "power on more than one world. A power tuned per world is a world "
+            + "reaching into the brain and disqualifies the arm whatever it scores",
 
         ["Mending"] =
-            "OPEN, AND ITS THREE RULES HAVE THREE DIFFERENT WORLDS. `Outvoted` "
-            + "takes `Arranged` at 1.000, `Uncovered` takes the clean multiplexer "
-            + "at 0.983 against 0.944, and `Neglected` -- the conjunction -- takes "
-            + "the noisy one at 0.771. Each is a disaster somewhere else: "
-            + "`Uncovered` turns 1.000 into 0.752. FORK 37'S DRIVER IS BUILT AND IS "
-            + "NOT THE ANSWER TO THIS: the rules most needing specialisation are "
-            + "the ones individually wrong while the population is collectively "
-            + "right, so `which rule needs work` and `did the population get this "
-            + "wrong` are different questions and no per-round switch stands in "
-            + "for both. Not a level, and not a controller's job either",
+            "OPEN, AND IT IS HALF OF WHAT IT USED TO BE. This was one setting "
+            + "deciding a gate and a timing at once, and every reading of it moved "
+            + "both -- so the census counted one name for two decisions and the "
+            + "defect row calling it a dial whose optimum moves with the world was "
+            + "taken on a list of crossed cells. What is left here is WHICH "
+            + "commitments repair may touch. Its sign flips with the timing beside "
+            + "it: every round on the clean multiplexer it leads, after a failure "
+            + "on the same world it is six and a half standard errors behind no "
+            + "gate at all, and on `Arranged` it is inert in both to three metrics. "
+            + "Not a level, so not a controller's job; the driver would be "
+            + "something that says whether specialising works on this world, which "
+            + "is fork 45",
+
+        ["Repairing"] =
+            "OPEN, AND IT ARRIVES BY SEPARATION RATHER THAN BY INVENTION, which is "
+            + "why the count rising is the finding rather than the cost. It was "
+            + "always being set -- `Uncovered` and `Improving` repaired every round "
+            + "and `Outvoted` and `Neglected` waited for a failure -- and nothing "
+            + "named it, so no comparison could move one axis without the other. "
+            + "Separated, this is the load-bearing half: every-round repair leads "
+            + "on both worlds measured, unseparated on the multiplexer and near two "
+            + "standard errors on `Arranged`. Not a level either. The plan's own "
+            + "argument says it should not need one -- an outvoted commitment "
+            + "accrues its own hits and misses, and waiting for the vote to be "
+            + "wrong is what stopped it spending them",
 
         ["Subsuming"] =
             "OPEN, AND THE FIRST OF THESE WHOSE DIRECTION FOLLOWS FROM THE WORLD "
@@ -580,6 +599,21 @@ public sealed class DialTests(ITestOutputHelper output)
         // ahead where there is background, 0.2 apart where there is none -- so it BECAME
         // the code and its arm was deleted. An arm that has won and stayed an arm is dead
         // code with a comparison attached.
-        Assert.Equal(24, HandSet.Count);
+        // AND TO TWENTY-FIVE, WHICH IS A NAME ARRIVING RATHER THAN A DECISION. `Mending`
+        // was one setting deciding a gate and a timing at once, so the census has been
+        // counting one entry for two things the machine was always doing -- `Uncovered`
+        // and `Improving` repaired every round while `Outvoted` and `Neglected` waited for
+        // a failure, and no comparison against the list could move either axis alone.
+        //
+        // SO THE HONEST COUNT WENT UP WHEN THE CONFLATION WAS REMOVED, and this file is
+        // the one place where that reads as progress rather than sprawl. A number that can
+        // only fall is a number people keep by hiding things inside existing names, which
+        // is exactly what happened here.
+        //
+        // AND IT SHOULD FALL TO TWENTY-THREE ON THE MEASUREMENT THIS SPLIT MAKES POSSIBLE.
+        // `Sharpness` is now a parameter of `Summing` rather than a dial of the brain --
+        // it decides nothing at all under `Strongest` -- so `Strongest` against `Summing`
+        // at ONE fixed power kills either two entries or none.
+        Assert.Equal(25, HandSet.Count);
     }
 }

@@ -46,18 +46,19 @@ public sealed class MendingTests(ITestOutputHelper output)
 
     private const int Seeds = 12;
 
-    private readonly Dictionary<(Mending Arm, int Seed), Learned> _ran = [];
+    private readonly Dictionary<(Mending Gate, Repairing When, int Seed), Learned> _ran = [];
 
-    private Learned Run(Mending arm, int seed)
+    private Learned Run(Mending gate, Repairing when, int seed)
     {
-        if (_ran.TryGetValue((arm, seed), out var already)) return already;
+        if (_ran.TryGetValue((gate, when, seed), out var already)) return already;
 
         var learned = new MultiplexerRun(
             new MultiplexerSettings { Address = Address },
-            new Brain(new CommittingSettings { Mending = arm }, seed),
+            new Brain(
+                new CommittingSettings { Mending = gate, Repairing = when }, seed),
             seed).Run(Rounds);
 
-        _ran[(arm, seed)] = learned;
+        _ran[(gate, when, seed)] = learned;
 
         return learned;
     }
@@ -67,19 +68,25 @@ public sealed class MendingTests(ITestOutputHelper output)
     /// <param name="of">What one arm on one seed is worth — the run and the metric together.</param>
     /// <remarks>
     /// <b>ORDERED SO EACH ROW DIFFERS FROM THE ONE ABOVE IT IN EXACTLY ONE THING.</b>
-    /// <c>Outvoted</c> to <c>Neglected</c> adds the gate; <c>Neglected</c> to
-    /// <c>Uncovered</c> moves repair off the failure branch; <c>Uncovered</c> to
-    /// <c>Improving</c> adds the did-forking-ever-pay test. Every separation printed is
-    /// against the first row, so the reading is cumulative and the differences between
-    /// adjacent rows are what the axes cost.
+    /// Row one to row two adds the gate; row two to row three moves repair off the failure
+    /// branch; row three to row four adds the did-forking-ever-pay test. Every separation
+    /// printed is against the first row, so the reading is cumulative and the differences
+    /// between adjacent rows are what the axes cost.
+    /// </remarks>
+    /// <remarks>
+    /// <b>THIS FILE IS WHY THE SETTING IS TWO SETTINGS NOW.</b> The four rows were four
+    /// values of one enum, and reading them as a list is what produced <i>a dial whose best
+    /// value moves with the world</i>; ordered so each row differs in one thing, they are a
+    /// two-by-two grid with a cell missing. <see cref="Fixture.Repairs"/> holds the same
+    /// four arrangements as the pairs they always were, so every number this file has
+    /// printed stays comparable with every number it prints next.
     /// </remarks>
     private static Task<IReadOnlyList<Measured>> Across(
-        int seeds, Func<Mending, int, double> of) =>
+        int seeds, Func<Mending, Repairing, int, double> of) =>
         Sweep.AcrossAsync(seeds,
-            ("after failure, no gate", seed => Task.FromResult(of(Mending.Outvoted, seed))),
-            ("after failure, gate", seed => Task.FromResult(of(Mending.Neglected, seed))),
-            ("every round, gate", seed => Task.FromResult(of(Mending.Uncovered, seed))),
-            ("every round, gate, paid", seed => Task.FromResult(of(Mending.Improving, seed))));
+            [.. Fixture.Repairs.Select<(string Arm, Mending Gate, Repairing When),
+                (string, Func<int, Task<double>>)>(
+                one => (one.Arm, seed => Task.FromResult(of(one.Gate, one.When, seed))))]);
 
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -94,7 +101,7 @@ public sealed class MendingTests(ITestOutputHelper output)
         })
         {
             output.WriteLine(name);
-            output.WriteLine(Sweep.Table(await Across(Seeds, (arm, seed) => metric(Run(arm, seed)))));
+            output.WriteLine(Sweep.Table(await Across(Seeds, (gate, when, seed) => metric(Run(gate, when, seed)))));
         }
 
         // THE ONE ASSERTION, AND IT IS THAT THE TWO AXES ARE NOT THE SAME AXIS. If adding
@@ -102,7 +109,7 @@ public sealed class MendingTests(ITestOutputHelper output)
         // then `Mending` really is a list and this file is measuring one thing twice --
         // which would be worth knowing and is the only outcome that makes the decomposition
         // pointless.
-        var repaired = await Across(Seeds, (arm, seed) => Run(arm, seed).Repaired);
+        var repaired = await Across(Seeds, (gate, when, seed) => Run(gate, when, seed).Repaired);
 
         Assert.True(
             Math.Abs(repaired[1].Mean - repaired[0].Mean) > 0.0
@@ -120,19 +127,20 @@ public sealed class MendingTests(ITestOutputHelper output)
     /// <summary>Four, because a scene world costs an order more than a bit world.</summary>
     private const int SceneSeeds = 4;
 
-    private readonly Dictionary<(Mending Arm, int Seed), Grounded> _arranged = [];
+    private readonly Dictionary<(Mending Gate, Repairing When, int Seed), Grounded> _arranged = [];
 
-    private Grounded OnArranged(Mending arm, int seed)
+    private Grounded OnArranged(Mending gate, Repairing when, int seed)
     {
-        if (_arranged.TryGetValue((arm, seed), out var already)) return already;
+        if (_arranged.TryGetValue((gate, when, seed), out var already)) return already;
 
         var got = new ArrangedRun(
             new ArrangedSettings { Side = 3, Cell = 3, Clutter = 1, Hold = 4 },
-            new Brain(new CommittingSettings { Mending = arm }, seed),
+            new Brain(
+                new CommittingSettings { Mending = gate, Repairing = when }, seed),
             Looking.Whole,
             seed).Run(Rounds);
 
-        _arranged[(arm, seed)] = got;
+        _arranged[(gate, when, seed)] = got;
 
         return got;
     }
@@ -159,14 +167,14 @@ public sealed class MendingTests(ITestOutputHelper output)
         {
             output.WriteLine(name);
             output.WriteLine(Sweep.Table(
-                await Across(SceneSeeds, (arm, seed) => metric(OnArranged(arm, seed)))));
+                await Across(SceneSeeds, (gate, when, seed) => metric(OnArranged(gate, when, seed)))));
         }
 
         // THE INSTRUMENT CHECK, AND IT IS ABOUT THE WITHHELD SET EXISTING. Every row above
         // reads a nullable, so a world that withheld nothing would print four zeroes and
         // agree with itself perfectly.
         var withheld = await Across(
-            SceneSeeds, (arm, seed) => OnArranged(arm, seed).Tally.Unseen?.Accuracy ?? 0.0);
+            SceneSeeds, (gate, when, seed) => OnArranged(gate, when, seed).Tally.Unseen?.Accuracy ?? 0.0);
 
         Assert.True(withheld[0].Mean > 0.0,
             "no withheld score came back, so every arm is a default and the grid is empty");

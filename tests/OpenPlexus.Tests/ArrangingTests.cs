@@ -159,7 +159,11 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // memorised a corner of the drawn bag -- deleted an ordinary share of them and
         // reached the identical withheld score on all five seeds. What sinks this cell
         // is not children standing on one repeated scene.
-        foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered, Mending.Improving })
+        // THE THREE CELLS THIS GRID WAS TAKEN OVER, AS THE PAIRS THEY TURNED OUT TO BE.
+        // `Mending` was one setting deciding a gate and a timing at once; the arms here are
+        // unchanged, and `Fixture.Repairs` is what keeps that true across the four files
+        // that sweep them.
+        foreach (var (arm, gate, when) in Fixture.Repairs.Where(one => one.Arm != "after failure, gate"))
         foreach (var subsuming in new[] { Subsuming.Weaker, Subsuming.Insignificant })
         {
             var (unseen, last) = Sweep(
@@ -168,20 +172,20 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                 {
                     Surprising = Surprising.AnyFailure,
                     Weighing = Weighing.Strongest,
-                    Mending = mending,
+                    Mending = gate,
+                    Repairing = when,
                     Subsuming = subsuming,
                 },
                 Looking.Tiled);
 
             output.WriteLine(
-                $"{mending,-9} {subsuming,-13} | unseen {unseen.Average():F3} "
+                $"{arm,-23} {subsuming,-13} | unseen {unseen.Average():F3} "
                 + $"[{string.Join(" ", unseen.Select(one => one.ToString("F3")))}] | "
                 + $"{last.Rules.Sound} sound {last.Rules.Unsound} unsound, "
                 + $"repaired {last.Tally.Repaired} subsumed {last.Tally.Subsumed}, "
                 + $"resident {last.Tally.Resident} scope {last.Rules.Scope:F2} "
                 + $"occasions {last.Tally.Occasions:F1}, "
                 + $"deciders {last.Tally.Unseen!.Deciders}/{last.Tally.Unseen.Answered} "
-                + $"handed {last.Tally.Unseen.Handed}/{last.Tally.Unseen.Answered}, "
                 + $"lead {last.Tally.Confidence:F3}");
         }
 
@@ -210,7 +214,8 @@ public sealed class ArrangingTests(ITestOutputHelper output)
         // different set, so these are different exams -- what is readable is the
         // DIRECTION and whether the drawn score moves with it.
         foreach (var hold in new[] { 2, 4, 8, 16 })
-        foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered })
+        foreach (var (arm, gate, when) in Fixture.Repairs
+            .Where(one => one.Arm is "after failure, no gate" or "every round, gate"))
         {
             var (unseen, last) = Sweep(
                 Small with { Hold = hold },
@@ -218,13 +223,14 @@ public sealed class ArrangingTests(ITestOutputHelper output)
                 {
                     Surprising = Surprising.AnyFailure,
                     Weighing = Weighing.Strongest,
-                    Mending = mending,
+                    Mending = gate,
+                    Repairing = when,
                     Subsuming = Subsuming.Insignificant,
                 },
                 Looking.Tiled);
 
             output.WriteLine(
-                $"hold {hold,2} {mending,-9} | unseen {unseen.Average():F3} "
+                $"hold {hold,2} {arm,-23} | unseen {unseen.Average():F3} "
                 + $"[{string.Join(" ", unseen.Select(one => one.ToString("F3")))}] | "
                 + $"drawn {last.Tally.Recent:F3} | "
                 + $"{last.Rules.Sound} sound {last.Rules.Unsound} unsound, "

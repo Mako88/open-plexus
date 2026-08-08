@@ -587,6 +587,12 @@ change of architecture entirely.
 - **AND A DEFAULT CAN SHORT-CIRCUIT THE MECHANISM BEING MEASURED.** `Mending.Outvoted`
   ships and skips the narrows test, so a sweep on defaults returned three identical arms
   for a gate that was never running.
+- **A DOCUMENTED PROMISE IS NOT A CHECK.** `Posted` said a fan-out was posts in flight
+  while both of its fan-outs awaited each post in turn — false from the day it was
+  written, and directly under the sentence describing the fault.
+- **AND THE CLOCK CAME FROM THE OTHER PATH.** The thinking side had never been timed across
+  a socket, so the defect was found by measuring the learning side — a check on one
+  mechanism reaching a fault in another.
 - **A BUDGET CAN BE SATISFIED BY A COINCIDENCE.** `Machines.Holder` read as wired because a
   tuple field in another file was spelt `Holder`; renaming it put two unmounted types onto
   the dead-code list at once.
@@ -610,21 +616,15 @@ change of architecture entirely.
 - **ROUNDS-TO-TARGET GROWS FAST IN THE RELEVANT BITS.** Six, eleven and twenty differ
   by one relevant bit each; the cost between them does not grow by one. That is the
   number that predicts whether any of this reaches perception.
-- **`Abstain` IS UNARMED IN ANY RUN.** Nothing in one process can die, so C3's third
-  outcome is exercised only by unit tests. It reads zero for the same reason a check
-  reads zero when it cannot fire.
-- **AND SPLITTING THE VOTE DID NOT ARM IT.** Losing a holder changes an answer and never
-  silences one, because something else always advocates — the third outcome needs a death
-  taking the LAST advocate.
-- **A REAL DEATH DOES SILENCE THE VOTE NOW, AND THAT IS THE PRECONDITION RATHER THAN THE
-  VERDICT.** Five of twelve holders held every advocate; killing them left seven answering
-  and no expectation at all.
-- **AND THE STATED REASON WAS WRONG: `Cycle.Step` TAKES A NON-NULLABLE OUTCOME.** No number
-  of machines and no number of deaths can produce an abstain, because the loop has no way to
-  say *the settlement could not tell*.
-- **`BroadcastAsync` AWAITS EACH POST IN TURN AGAINST ITS OWN DOCUMENTATION**, so twelve
-  clusters cost twelve round trips end to end. `AskAsync` does not; the thinking path is
-  left as found rather than changed beside a measurement.
+- **`Abstain` FIRES AT LAST, AND WHAT ARMED IT WAS A SIGNATURE AND NOT A FLEET.** The loop
+  took a non-nullable outcome, so no number of machines and no number of deaths could ever
+  have produced one.
+- **AND IT HAS ONLY EVER FIRED FROM A WORLD GOING QUIET, NEVER FROM A DEATH.** A death does
+  silence the vote, measured — but the outcome still arrives locally, so the distributed
+  half waits on the learner being mounted.
+- **A QUIET WORLD COSTS AN OBSERVATION AND NOT A RULE**, which is the primitive's claim
+  measured rather than argued. What it does to a world that is quiet MOST of the time is
+  unmeasured.
 - **THE CENTRAL BET IS REFUTED ON THE ONLY WORLD BUILT TO TEST IT**, with a control in
   every cell of the grid. `EncodedTests` holds it and the commit records the numbers.
 - **THE FRONT END IS THE CEILING AND THE LEARNER IS NOT — ON CIFAR.** Changing only the
@@ -780,7 +780,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **54** | Where between identical and disjoint streams naming stops converging. Answered, and there is no between: three quarters shared agrees as badly as nothing shared, and only identical evidence converges. One seed a row, so the ends carry it |
 | **55** | Whether a blinded repair gate costs anything. Answered on the multiplexer: children minted separates decisively over twelve seeds, and accuracy, residents and sound rules all move the same way at two standard errors. Open on any other world |
 | **56** | What the repair gate's query costs on a wire. Priced at one round trip and measured on loopback: 0.36ms at one holder, 0.93 at nine, so the fan-out is in flight at once. Open on a LAN and on building it |
-| **57** | Every node predicts its own output while the real wave verifies behind it, lossless where a learned short-circuit is not. The repair gate's query is where it first fits: a boolean usually answered no, and being wrong costs a rule. Open |
+| **57** | Every node predicts its own output while the real wave verifies behind it. What it saves is a LAN millisecond and an internet hundred, so where it pays is deployment. What a holder predicts from is a commitment about one |
 | **58** | The gate's sign flips with the timing: after a failure it is far worse than none, and every round `Uncovered` beat `Earned`. Two cells measured here, two in the revival rows. Open on any other world |
 | **59** | `Mending.Neglected` loses or ties on both worlds measured, so the arm rule says delete it — and it is the only cell isolating the gate axis, a cost that rule does not anticipate. Open |
 | **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |

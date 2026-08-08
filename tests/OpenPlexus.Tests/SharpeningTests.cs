@@ -34,12 +34,119 @@ public sealed class SharpeningTests(ITestOutputHelper output)
         double sharpness,
         int seed,
         double noise = 0.0,
-        Weighing weighing = Weighing.Summing) =>
+        Weighing weighing = Weighing.Summing,
+        int rounds = Rounds) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = address, Noise = noise },
             new Brain(
                 new CommittingSettings { Sharpness = sharpness, Weighing = weighing }, seed),
-            seed).Run(Rounds);
+            seed).Run(rounds);
+
+    /// <summary>Everything a run did, other than how confident it said it was.</summary>
+    /// <param name="learned">What the run reported.</param>
+    /// <remarks>
+    /// <b>SPELLED OUT RATHER THAN COMPARED AS A RECORD, BECAUSE THE ONE EXCLUSION IS THE
+    /// FINDING.</b> <c>Tally.Confidence</c> is a lead divided by a weight and both are
+    /// accuracies raised to the power under test, so it moves by construction; every other
+    /// number here is something the machine DID. A record equality would fail on the one
+    /// field that is supposed to differ and say nothing about the rest.
+    /// </remarks>
+    private static object Did(Learned learned) => new
+    {
+        learned.Recent,
+        learned.Sound,
+        learned.Unsound,
+        learned.Unchecked,
+        learned.Found,
+        learned.Resident,
+        learned.Silent,
+        learned.Reached,
+        learned.Repaired,
+        learned.Named,
+        learned.Stacked,
+        learned.Exhausted,
+    };
+
+    /// <summary>
+    /// <b>UNDER <see cref="Weighing.Strongest"/> THE VOTE'S POWER DECIDES NOTHING AT ALL,
+    /// AND UNDER A SUM IT DECIDES A GREAT DEAL.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ARGUMENT IS ONE LINE AND THE CHECK IS HERE BECAUSE THE PLAN ACTED ON THE
+    /// OTHER READING.</b> Under <c>Strongest</c> an expectation is worth
+    /// <c>max(a_i)^S</c>, and <c>x^S</c> is strictly increasing on the unit interval — so
+    /// <c>max(a_i^S) = (max a_i)^S</c> and the ORDER of expectations by weight is the order
+    /// by best accuracy, whatever S is. The winner, its best advocate, and therefore every
+    /// hit, miss, repair and mint are identical.
+    /// </para>
+    /// <para>
+    /// <b>WHICH MAKES `Sharpness` A DIAL OF <c>Summing</c> RATHER THAN A DIAL OF THE
+    /// BRAIN.</b> The plan's open defect says three dials in a row have a best value that
+    /// moves with the world — <c>Sharpness</c>, <c>Weighing</c> and <c>Mending</c> — and
+    /// two of those three are not independent axes: one of them switches the other off. A
+    /// grid swept over both has a whole column in which nothing varies.
+    /// </para>
+    /// <para>
+    /// <b>AND `DialTests` HAS THE NEAR-MISS WRITTEN DOWN, WHICH IS WHY THIS IS A CHECK AND
+    /// NOT A REMARK.</b> It records <c>Strongest</c> as <i>structurally the limit of high
+    /// sharpness</i>, which is true of <c>Summing</c> as S grows and is a weaker claim than
+    /// the one above: at the limit a dial stops MATTERING MUCH, and here it stops existing.
+    /// </para>
+    /// <para>
+    /// <b>THE SUM IS THE CONTROL AND IT IS THE HALF THAT CAN FAIL.</b> Three identical runs
+    /// would also be what an unwired dial produces, and this repo has a trap for exactly
+    /// that — a check can be wired and unable to fire. If the power moves nothing under a
+    /// sum either, it is connected to nothing and the first half means nothing.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_votes_power_decides_nothing_under_Strongest_and_the_sum_is_the_control()
+    {
+        // SHORTER THAN THE SWEEPS ABOVE ON PURPOSE. This asserts an ALGEBRAIC identity, and
+        // a longer run cannot make it more true -- what a longer run would buy is a bigger
+        // population for the sum to disagree over, and the control below already separates.
+        const int Short = 8000;
+
+        var powers = new[] { 1.0, 5.0, 20.0 };
+
+        foreach (var address in new[] { 2, 3 })
+        {
+            var strongest = powers
+                .Select(power => Run(address, power, seed: 1,
+                    weighing: Weighing.Strongest, rounds: Short))
+                .ToList();
+
+            foreach (var one in strongest)
+                Assert.Equal(Did(strongest[0]), Did(one));
+
+            // AND THE READOUT DOES MOVE, which is what says the dial reached the vote at
+            // all rather than being dropped on the floor before it. If this were equal too,
+            // the equality above would be the trivial kind.
+            Assert.True(
+                strongest.Select(one => one.Tally.Confidence).Distinct().Count() > 1,
+                "the confidence is identical at every power, so `Sharpness` is not reaching "
+                + "the vote and the identity above is being asserted of nothing");
+
+            var summing = powers
+                .Select(power => Run(address, power, seed: 1,
+                    weighing: Weighing.Summing, rounds: Short))
+                .ToList();
+
+            Assert.True(
+                summing.Select(Did).Distinct().Count() > 1,
+                $"at {(1 << address) + address} bits the power changes nothing under a sum "
+                + "either, so this file's control cannot fire");
+
+            output.WriteLine(
+                $"{(1 << address) + address} bits | strongest: "
+                + $"{strongest.Select(Did).Distinct().Count()} distinct run of "
+                + $"{powers.Length}, confidence "
+                + $"{string.Join(" ", strongest.Select(one => one.Tally.Confidence.ToString("F3")))}"
+                + $" | summing: {summing.Select(Did).Distinct().Count()} distinct, recent "
+                + $"{string.Join(" ", summing.Select(one => one.Recent.ToString("F3")))}");
+        }
+    }
 
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

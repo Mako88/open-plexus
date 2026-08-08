@@ -646,3 +646,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **45** | Three repair gates, three worlds, three winners, and conjoining two keeps one and loses the other. Is there a per-COMMITMENT signal separating *needs specialising* from *is being outvoted*? Open |
 | **46** | Of five hundred residents, fifteen to twenty-two decide every withheld answer on `Arranged`, and the arm perfect there decides with four. A population-level arm cannot reach what it does not displace. Closed |
 | **47** | Making the vote defer unless a child is significantly better costs four points where it can fire, and is inert under a permissive subsumption by construction. The vote steers repair, so it cannot be read as a readout change. Closed |
+| **48** | The multiplexer withholds nothing, so every instrument needing a held-out set is blind on the one world where depth is genuinely needed. Can a generated world hold assignments back without the learner being able to tell? Open |

@@ -42,7 +42,7 @@ public sealed class CifarTests(ITestOutputHelper output)
 
                 Assert.Equal(world.Width, turn.Seen.Count);
                 Assert.All(turn.Seen, one => Assert.InRange(one, 0.0, 1.0));
-                Assert.InRange(turn.Outcome, 0, Cifar.Classes - 1);
+                Assert.InRange(turn.Outcome!.Value, 0, Cifar.Classes - 1);
             }
         }
     }
@@ -95,7 +95,7 @@ public sealed class CifarTests(ITestOutputHelper output)
         var world = new Cifar(World(images: 10_000), seed: 2);
         var seen = new int[Cifar.Classes];
 
-        for (var round = 0; round < 20_000; round++) seen[world.Next().Outcome]++;
+        for (var round = 0; round < 20_000; round++) seen[world.Next().Outcome!.Value]++;
 
         output.WriteLine(string.Join(", ",
             seen.Select((count, label) => $"{Cifar.Named(label)} {count}")));

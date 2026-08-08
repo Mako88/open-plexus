@@ -12,13 +12,34 @@ public readonly record struct Turn<TSeen>
     /// <summary>What the world showed, in its own terms.</summary>
     public required TSeen Seen { get; init; }
 
-    /// <summary>Which outcome followed, as a small whole number.</summary>
+    /// <summary>
+    /// Which outcome followed, as a small whole number — <b>or nothing, where the
+    /// settlement could not say.</b>
+    /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>A NUMBER RATHER THAN A <c>Code</c>, so a world never mints one.</b> The
     /// outcome coding is shared across every world, because a brain that learnt a
     /// different alphabet per world would not be one brain.
+    /// </para>
+    /// <para>
+    /// <b>AND NULLABLE, BECAUSE A WORLD THAT DOES NOT KNOW HAD NO WAY TO SAY SO.</b> Most
+    /// moments in any real stream are followed by nothing anybody observes, and this type
+    /// could only express a stream where every one of them is. What was missing was a
+    /// world's ability to say <i>nothing followed that I saw</i>.
+    /// </para>
+    /// <para>
+    /// <b>IT SAYS WHAT IS BEING LOOKED AT AND NEVER WHAT TO CONCLUDE</b>, which is the line
+    /// every other thing a world is allowed to report stays on. What anything downstream
+    /// does about an unobserved outcome is not the world's business, and nothing here names
+    /// it.
+    /// </para>
+    /// <para>
+    /// <b>Every world that always knows its outcome is unchanged</b>, because an
+    /// <see langword="int"/> still assigns.
+    /// </para>
     /// </remarks>
-    public required int Outcome { get; init; }
+    public required int? Outcome { get; init; }
 }
 
 /// <summary>

@@ -171,7 +171,7 @@ public sealed class EncodedTests(ITestOutputHelper output)
         static List<(IReadOnlyList<double> Reading, int Outcome)> Beside(
             IReadOnlyList<Turn<IReadOnlyList<double>>> turns,
             IReadOnlyList<IReadOnlyList<double>> readings) =>
-            [.. turns.Select((one, at) => (readings[at], one.Outcome))];
+            [.. turns.Select((one, at) => (readings[at], one.Outcome!.Value))];
 
         static IReadOnlyList<IReadOnlyList<double>> Seen(
             IReadOnlyList<Turn<IReadOnlyList<double>>> turns) => [.. turns.Select(one => one.Seen)];

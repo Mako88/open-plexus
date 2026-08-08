@@ -98,6 +98,16 @@ public sealed record Tally
     /// <summary>Rounds where nothing fired, so there was no prediction to be wrong.</summary>
     public required long Silent { get; init; }
 
+    /// <summary>Rounds the world could not say the outcome of.</summary>
+    /// <remarks>
+    /// <b>REPORTED BECAUSE A VERDICT NOBODY COUNTS IS A VERDICT NOBODY KNOWS FIRED.</b>
+    /// `Abstain` was unreachable for the life of the branch and read exactly like a
+    /// mechanism that was working and never needed — which is this repo's oldest trap, a
+    /// check that is wired and unable to fire. Beside <see cref="Silent"/> it separates the
+    /// population having nothing to say from the WORLD having nothing to say.
+    /// </remarks>
+    public required long Abstained { get; init; }
+
     /// <summary>The share of answered predictions right over the last tenth.</summary>
     public required double Recent { get; init; }
 
@@ -289,7 +299,12 @@ public sealed class Trial<TSeen>
             var said = _sensing.Codify(turn.Seen);
             codes += said.Count;
 
-            cycle.Step(held.Moment(new HashSet<Code>(said)), Brain.Says(turn.Outcome));
+            // A ROUND THE WORLD COULD NOT SETTLE PASSES NOTHING RATHER THAN A NUMBER, and
+            // that is the whole of what arms `Abstain`. Every world that always knows its
+            // outcome reaches the same call it always did.
+            cycle.Step(
+                held.Moment(new HashSet<Code>(said)),
+                turn.Outcome is { } outcome ? Brain.Says(outcome) : null);
         }
 
         return new Tally
@@ -298,6 +313,7 @@ public sealed class Trial<TSeen>
             Right = cycle.Right,
             Wrong = cycle.Wrong,
             Silent = cycle.Silent,
+            Abstained = cycle.Abstained,
             Recent = cycle.Recent,
             Confidence = cycle.Confidence,
             Reached = cycle.Reached,
@@ -361,7 +377,15 @@ public sealed class Trial<TSeen>
         var handed = 0;
         var deciders = new HashSet<Code>();
 
-        foreach (var turn in withholding.Withheld)
+        // AND A WITHHELD OBSERVATION WITH NO OUTCOME IS NOT ASKED AT ALL, because there is
+        // nothing to score it against. Counting it would report as SILENCE -- a population
+        // that declined to answer -- when what happened is that the examiner had no answer
+        // key for that row, which is a completely different fact.
+        var answerable = withholding.Withheld.Where(one => one.Outcome is not null).ToList();
+
+        if (answerable.Count == 0) return null;
+
+        foreach (var turn in answerable)
         {
             var moment = held.Moment(new HashSet<Code>(_sensing.Codify(turn.Seen)));
 
@@ -372,15 +396,17 @@ public sealed class Trial<TSeen>
 
             answered++;
             if (vote.By is { } by) deciders.Add(by);
-            if (said == Brain.Says(turn.Outcome)) right++;
+            var outcome = Brain.Says(turn.Outcome!.Value);
+
+            if (said == outcome) right++;
 
             // THE SECOND READING OF THE SAME FIRING SET, and it teaches nothing either.
-            if (held.Deferred(firing).Expects == Brain.Says(turn.Outcome)) handed++;
+            if (held.Deferred(firing).Expects == outcome) handed++;
         }
 
         return new Examined
         {
-            Asked = withholding.Withheld.Count,
+            Asked = answerable.Count,
             Answered = answered,
             Right = right,
             Deciders = deciders.Count,

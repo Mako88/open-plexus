@@ -236,13 +236,69 @@ public sealed class Cycle
     private static double Milliseconds(long ticks) =>
         ticks * 1000.0 / Stopwatch.Frequency;
 
+    /// <summary>Rounds whose settlement could not say what followed.</summary>
+    /// <remarks>
+    /// <b>DIFFERENT FROM <see cref="Silent"/> AT BOTH ENDS, AND THE PAIR IS WHY EITHER
+    /// MEANS ANYTHING.</b> Silence is the POPULATION having nothing to say about a moment
+    /// whose outcome is known; this is the WORLD having nothing to say about a moment the
+    /// population may well have answered. One is a gap in what has been learnt and the
+    /// other is a gap in the evidence, and a run reporting only their sum could not tell
+    /// which it had.
+    /// </remarks>
+    public long Abstained { get; private set; }
+
     /// <summary>Predicts, scores, settles, sweeps, and repairs what was wrong.</summary>
     /// <param name="moment">What is live, already folded through any minted names.</param>
-    /// <param name="arrived">What followed it.</param>
-    public void Step(IReadOnlySet<Code> moment, Code arrived)
+    /// <param name="arrived">
+    /// What followed it, or nothing where the settlement could not say.
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// <b>A NULL OUTCOME IS THE THIRD VERDICT AND IT COULD NOT BE EXPRESSED HERE UNTIL
+    /// NOW.</b> <c>Commitment.Settle</c> has always handled <c>Verdict.Abstain</c>
+    /// correctly — nothing moves, not the counters and not the table — and
+    /// <c>Population.Settle</c> has always taken a nullable code. This signature was the
+    /// wall: no caller could pass one, so the plan's <i>`Abstain` is unarmed in any run</i>
+    /// was true for a reason that had nothing to do with there being one process.
+    /// </para>
+    /// <para>
+    /// <b>AND NOTHING ELSE IN THE ROUND HAPPENS, WHICH IS THE WHOLE CONTENT OF THE
+    /// VERDICT.</b> No score, because there is nothing to be right or wrong against. No
+    /// genesis, because a surprise needs something to have arrived. No repair, because
+    /// blame needs a failure. A monotone counter cannot retract a slur, so a round the
+    /// world could not settle must cost a commitment exactly nothing.
+    /// </para>
+    /// <para>
+    /// <b>THE SWEEP STILL RUNS, AND THAT IS DELIBERATE.</b> Subsumption, abstraction and
+    /// culling are on the calendar rather than on the outcome — this repo's trap list has a
+    /// line about a periodic sweep inside a conditional running at that condition's rate,
+    /// and skipping them here would reintroduce it keyed on how often the world was quiet.
+    /// </para>
+    /// </remarks>
+    public void Step(IReadOnlySet<Code> moment, Code? arrived)
     {
         ArgumentNullException.ThrowIfNull(moment);
 
+        if (arrived is not { } outcome)
+        {
+            Rounds++;
+            Abstained++;
+
+            _held.Witness(moment);
+            _held.Settle(_held.Firing(moment), moment, arrived: null);
+
+            Sweep(Rounds - 1, Stopwatch.GetTimestamp());
+            return;
+        }
+
+        Step(moment, outcome);
+    }
+
+    /// <summary>The ordinary round, where the settlement said something.</summary>
+    /// <param name="moment">What is live.</param>
+    /// <param name="arrived">What followed it.</param>
+    private void Step(IReadOnlySet<Code> moment, Code arrived)
+    {
         var round = Rounds++;
 
         var at = Stopwatch.GetTimestamp();
@@ -296,19 +352,7 @@ public sealed class Cycle
 
         at = Mark(ref _settling, at);
 
-        // THE SWEEP IS NOT PART OF FAILING, and it sat inside the failure branch for
-        // the whole of step one. Once the learner is right most of the time, the
-        // chance of a wrong round landing on a sweep round is the miss rate itself --
-        // so subsumption and culling ran a handful of times in thirty thousand rounds
-        // and read as mechanisms that did nothing.
-        if (round % _sweep == _sweep - 1)
-        {
-            Subsumed += _held.Subsume();
-            _held.Abstract();
-            _held.Cull();
-
-            at = Mark(ref _sweeping, at);
-        }
+        at = Sweep(round, at);
 
         // REPAIR NEED NOT WAIT FOR THE VOTE, AND WHETHER IT SHOULD IS AN ARM. The plan
         // says an outvoted commitment still accrues its own hits and misses -- and then
@@ -344,6 +388,38 @@ public sealed class Cycle
             Repaired++;
 
         Mark(ref _mending, at);
+    }
+
+    /// <summary>
+    /// Subsumes, abstracts and culls if this is a sweep round.
+    /// </summary>
+    /// <param name="round">Which round it is.</param>
+    /// <param name="at">The running mark.</param>
+    /// <returns>A fresh mark.</returns>
+    /// <remarks>
+    /// <para>
+    /// <b>THE SWEEP IS NOT PART OF FAILING, and it sat inside the failure branch for the
+    /// whole of step one.</b> Once the learner is right most of the time, the chance of a
+    /// wrong round landing on a sweep round is the miss rate itself -- so subsumption and
+    /// culling ran a handful of times in thirty thousand rounds and read as mechanisms
+    /// that bought nothing.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS NOT PART OF SETTLING EITHER, WHICH IS WHY IT IS ITS OWN METHOD NOW.</b>
+    /// A round the world could not settle skips every other thing this loop does and must
+    /// still sweep, or the calendar becomes conditional on how often the world was quiet --
+    /// the same trap by a new door.
+    /// </para>
+    /// </remarks>
+    private long Sweep(long round, long at)
+    {
+        if (round % _sweep != _sweep - 1) return at;
+
+        Subsumed += _held.Subsume();
+        _held.Abstract();
+        _held.Cull();
+
+        return Mark(ref _sweeping, at);
     }
 
     /// <summary>Charges the ticks since a mark to a phase, and returns a fresh mark.</summary>

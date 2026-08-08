@@ -131,7 +131,7 @@ public sealed class SplitRepairTests(ITestOutputHelper output)
             asks.Add(new Ask
             {
                 Moment = held.Moment(new HashSet<Code>(sensing.Codify(turn.Seen))),
-                Arrived = Brain.Says(turn.Outcome),
+                Arrived = Brain.Says(turn.Outcome!.Value),
             });
         }
 

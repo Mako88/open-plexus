@@ -39,6 +39,9 @@ public sealed record Learned
     /// <summary>Rounds where nothing fired.</summary>
     public long Silent => Tally.Silent;
 
+    /// <summary>Rounds the world could not say the outcome of.</summary>
+    public long Abstained => Tally.Abstained;
+
     /// <summary>The round a trailing window first held the target.</summary>
     public long Reached => Tally.Reached;
 

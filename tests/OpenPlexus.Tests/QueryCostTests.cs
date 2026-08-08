@@ -85,7 +85,7 @@ public sealed class QueryCostTests(ITestOutputHelper output)
             // varies makes half the population permanently a candidate and the other half
             // permanently not -- a traffic number measured against a world that was not
             // running.
-            var arrived = Brain.Says(turn.Outcome);
+            var arrived = Brain.Says(turn.Outcome!.Value);
 
             rounds++;
 

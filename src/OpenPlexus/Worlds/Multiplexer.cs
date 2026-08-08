@@ -83,6 +83,31 @@ public sealed record MultiplexerSettings
     /// </para>
     /// </remarks>
     public int Clutter { get; init; }
+
+    /// <summary>
+    /// The share of rounds whose outcome is never observed, in 0..1.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ZERO IS EVERY MEASUREMENT EVER TAKEN HERE, AND THE DRAW IS SHORT-CIRCUITED SO
+    /// THE GENERATOR IS UNTOUCHED AT ZERO.</b> A dial that consumed one number a round
+    /// even when off would move every existing figure on this world by shifting the
+    /// stream, which is fork 12 arriving as a feature.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS NOT A SIMULATION OF A NETWORK, WHICH IS WHY IT IS A WORLD DIAL.</b>
+    /// Most moments in any real stream are followed by nothing anybody observes; a
+    /// generated world can say so exactly and cheaply, and what anything downstream does
+    /// about it is not this world's business.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS NOT <see cref="Noise"/>.</b> Noise flips an outcome, so what is
+    /// reported is FALSE. This reports NOTHING. The two pull in opposite directions —
+    /// one is bad evidence and the other is absent evidence — and a single dial doing duty
+    /// for both would make every reading of either unreadable.
+    /// </para>
+    /// </remarks>
+    public double Unsettled { get; init; }
 }
 
 /// <summary>One round: what was shown, and what should follow it.</summary>
@@ -227,7 +252,12 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
             Seen = [.. shown.Cues
                 .OrderBy(code => Codes.Bits.Position(code))
                 .Select(code => Codes.Bits.Value(code))],
-            Outcome = (int)shown.Outcome.Value,
+            // THE ONE PLACE A WORLD MAY SAY IT DOES NOT KNOW. Short-circuited so a run
+            // with the dial off draws no random number and reproduces every figure this
+            // world has ever reported.
+            Outcome = _settings.Unsettled > 0 && _rng.NextDouble() < _settings.Unsettled
+                ? null
+                : (int)shown.Outcome.Value,
         };
     }
 

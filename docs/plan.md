@@ -488,6 +488,7 @@ condition is a superstition.
 | `Mending.Earned` — repair on any earned failure, ignoring children | `Uncovered` dominates it everywhere measured, being the same rule with the redundant repairs removed | Never. Revive the child test, not the arm |
 | The vote deferring to a general advocate unless the narrower earns it | Four points worse where it fires, and read-only it changes not one withheld answer | Never. The deciders earn their seats by a wide margin on drawn data |
 | Genesis rooting on a code that has never varied | 7.4 standard errors behind where there is background, 0.2 apart without it. Background becomes a PARENT and its children inherit it | A world where an always-present code is informative. None is known |
+| Handing every seat back to a general rule that has not beaten it, read-only | It changed not one withheld answer, and the in-run version cost four points | A world where drawn evidence can tell a parent from its child |
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Each condition halves where a rule can fire, so the bar caps DEPTH by world size | A bar whose expectation shrinks with depth too |
 
 ---
@@ -689,10 +690,12 @@ change of architecture entirely.
   is a fact about the world. No per-round switch serves both.
 - **AND `Sharpness` IS NOT AN AXIS UNDER `Strongest` AT ALL, WHICH IS THE SECOND LEG
   FLAGGED.** Raising to a power is monotone, so the argmax never moves: three powers, one
-  identical run, at both widths. It is a dial of `Summing`.
+  identical run, at both widths. It is a parameter of `Summing`.
 - **SO TWO OF THE THREE ARE NOT INDEPENDENT, AND A GRID SWEPT OVER BOTH HAS A DEAD
   COLUMN.** `DialTests` has the near miss — *the limit of high sharpness* — which is a
   claim about `Summing` and weaker than a dial that stops existing.
+- **AND THE THIRD LEG WAS TWO SETTINGS.** `Mending` is a gate and a timing now; every
+  reading behind the row moved both at once, and the timing leads on both worlds.
 - **THE VOTE THREW AWAY PART OF A WORLD IT HAD ALREADY SOLVED**, with every sound rule
   resident and believed well above the false ones — and under a scale-free vote it is not
   a crowd doing it, it is a handful of deciders.
@@ -771,7 +774,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **44** | The tiled front end's patch is the arranged world's cell, so it is told where the parts are. Does the advantage survive a patch grid that does not divide the world's? Open |
 | **45** | Three repair gates, three worlds, three winners, and conjoining two keeps one and loses the other. Is there a per-COMMITMENT signal separating *needs specialising* from *is being outvoted*? Open |
 | **46** | Of five hundred residents, fifteen to twenty-two decide every withheld answer on `Arranged`, and the arm perfect there decides with four. A population-level arm cannot reach what it does not displace. Closed |
-| **47** | Making the vote defer unless a child is significantly better costs four points where it can fire, and is inert under a permissive subsumption by construction. The vote steers repair, so it cannot be read as a readout change. Closed |
+| **47** | Making the vote defer costs four points where it can fire, and reading a trained population back that way changes not one withheld answer. Closed, and the arm is deleted with a revival row |
 | **48** | Can a generated world hold assignments back without the learner being able to tell? Closed — it can, and the draw rejects rather than picks, so a run withholding nothing keeps every number the world ever produced |
 | **49** | Matching and settling are nine tenths of the clock on a narrow world whose table never grows. Where do they go on a WIDE one, and is it the memory or the search that ends the run? Open |
 | **50** | `Monk`'s second puzzle admits no sound conjunction saying YES short of a whole instance. Which rung does that demand — a count, a negation, or a disjunction — and does the failure distinguish them? Open |
@@ -782,5 +785,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **56** | What the repair gate's query costs on a wire. Priced at one round trip and measured on loopback: 0.36ms at one holder, 0.93 at nine, so the fan-out is in flight at once. Open on a LAN and on building it |
 | **57** | Every node predicts its own output while the real wave verifies behind it. What it saves is a LAN millisecond and an internet hundred, so where it pays is deployment. What a holder predicts from is a commitment about one |
 | **58** | The gate's sign flips with the timing: after a failure it is far worse than none, and every round `Uncovered` beat `Earned`. Two cells measured here, two in the revival rows. Open on any other world |
-| **59** | `Mending.Neglected` loses or ties on both worlds measured, so the arm rule says delete it — and it is the only cell isolating the gate axis, a cost that rule does not anticipate. Open |
+| **59** | Dissolved rather than decided. The setting was a gate and a timing crossed, so the cell that isolated the gate axis is not a cell — it is a corner of a grid, and both axes are now settings. Closed |
 | **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |

@@ -236,6 +236,68 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void Holders_told_each_others_counts_mint_one_name_where_alone_they_mint_none()
+    {
+        // THE PAYOFF OF THE WHOLE NAMING ARC, ASKED OF `Population` RATHER THAN OF
+        // `Abstracting`. Every measurement so far has been of the gate in isolation; this
+        // is the operator the learner actually calls, on populations that hold a shard
+        // each, and it asks the two questions that matter together -- does a holder speak
+        // at all, and do the holders agree.
+        var (dials, all, whole) = Trained();
+
+        Assert.NotNull(whole);
+
+        const int Holders = 3;
+
+        var holders = Sharded(all, Holders)
+            .Select(shard =>
+            {
+                var held = new Population(dials, seed: 1);
+                foreach (var commitment in shard) held.Add(commitment);
+                return held;
+            })
+            .ToList();
+
+        // COUNTED BEFORE ANYTHING IS ABSTRACTED, because `Abstract` rewrites scopes -- so a
+        // holder that abstracted first would be telling the others about a population that
+        // no longer exists. In a deployment this is one round of exchange and here it is
+        // the same thing: everybody speaks from the same moment.
+        var counted = holders.Select(held => Recurrence.Of(held.All, dials)).ToList();
+
+        var minted = new List<Code>();
+
+        for (var holder = 0; holder < Holders; holder++)
+        {
+            // ALONE FIRST, AND IT HAS TO COME BACK NOUGHT. If a shard can name something
+            // by itself then this world does not show the problem being fixed, and the
+            // line below would be crediting the exchange with something free.
+            Assert.Equal(0, holders[holder].Abstract());
+
+            var heard = new Recurrence();
+
+            for (var other = 0; other < Holders; other++)
+                if (other != holder) heard.Absorb(counted[other]);
+
+            Assert.Equal(1, holders[holder].Abstract(heard) > 0 ? 1 : 0);
+
+            minted.AddRange(holders[holder].Names.Means.Select(one => one.Key));
+        }
+
+        // ONE NAME BETWEEN THEM, WHICH IS THE CLAIM. Three holders minting three names is
+        // three vocabularies and is the failure this arc has been about; three holders
+        // minting one is the mechanism working.
+        Assert.Single(minted.Distinct());
+
+        // AND IT IS THE NAME THE WHOLE POPULATION WOULD HAVE MINTED, so the exchange
+        // recovers the undistributed answer rather than merely agreeing on something.
+        Assert.Equal(Naming.Name(whole.Value), minted[0]);
+
+        output.WriteLine(
+            $"{Holders} holders, {minted.Count} names minted, "
+            + $"{minted.Distinct().Count()} distinct, matching the whole population");
+    }
+
+    [Fact]
     public void The_counts_survive_being_written_as_bytes_and_read_back()
     {
         // THE TYPE BUILT TO CROSS A WIRE COULD NOT CROSS ONE, AND NOTHING SAID SO.

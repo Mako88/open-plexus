@@ -821,10 +821,34 @@ public sealed class Population
     /// commitment entails exactly the moments it did before, because the name is
     /// added to a moment precisely when its members are all there.
     /// </para>
+    /// <para>
+    /// <b>AND THIS IS THE ONE OPERATOR THAT CANNOT DECIDE LOCALLY, WHICH IS WHY IT TAKES
+    /// AN ARGUMENT.</b> Its statistic is the whole population's, so a holder counting only
+    /// its own residents goes silent — measured in <c>SplitNamingTests</c>, where three
+    /// shards holding thirty-six eligible scopes each name nothing at all. Nothing else in
+    /// this class asks for anything from off the machine.
+    /// </para>
+    /// <para>
+    /// <b>AND SHARING OBSERVATIONS INSTEAD WOULD NOT DO, WHICH IS WHAT MAKES THE ARGUMENT
+    /// LOAD-BEARING RATHER THAN CONVENIENT.</b> <c>OverlapTests</c> puts two machines on
+    /// three quarters of one stream and they agree on names as badly as machines sharing
+    /// none — the gate picks one pair by argmax, so a small difference in evidence changes
+    /// the winner and everything built on it. Counts are the only thing that converges
+    /// them.
+    /// </para>
     /// </remarks>
-    public int Abstract()
+    /// <param name="heard">
+    /// What other holders counted, or nothing where this machine is alone.
+    /// <b>Theirs and never this one's</b> — these are added to what is counted here, so a
+    /// table that already included this holder would weigh it twice.
+    /// </param>
+    public int Abstract(Recurrence? heard = null)
     {
-        if (Abstracting.Shared(All, _dials) is not { } shared) return 0;
+        var counted = Recurrence.Of(All, _dials);
+
+        if (heard is not null) counted.Absorb(heard);
+
+        if (Abstracting.Shared(counted, _dials) is not { } shared) return 0;
 
         var name = _names.Mint(shared);
 

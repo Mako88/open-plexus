@@ -43,6 +43,19 @@ public readonly record struct Peer(string Host);
 /// awaiting each would turn a broadcast into a queue and put the network's latency into
 /// the search once per hop.
 /// </para>
+/// <para>
+/// <b>AND THAT PARAGRAPH WAS FALSE FROM THE DAY IT WAS WRITTEN, WHICH IS WHY IT IS STILL
+/// HERE.</b> Both fan-outs awaited each post in turn, so a broadcast cost the SUM of the
+/// hops and the origin was paced by the slowest machine in the fleet — the exact failure
+/// the sentence above describes, sitting underneath it. Nothing caught it because nothing
+/// on the thinking path had ever been timed across a socket; it turned up when the LEARNING
+/// path was, because that one is measured in milliseconds and a queue shows.
+/// </para>
+/// <para>
+/// <b>SO A DOCUMENTED PROMISE IS NOT A CHECK, AND THE ONLY REASON THIS ONE IS TRUE NOW IS
+/// THAT SOMETHING PUT A CLOCK ON IT.</b> The cost of a fan-out is in
+/// <c>AskedTests</c>: nine holders at two and a half times one, rather than at nine.
+/// </para>
 /// </remarks>
 public sealed class Posted : IBus, IAsyncDisposable
 {
@@ -288,7 +301,30 @@ public sealed class Posted : IBus, IAsyncDisposable
     }
 
     /// <inheritdoc/>
-    public async ValueTask<IReadOnlyCollection<ClusterAddress>> BroadcastAsync(
+    /// <remarks>
+    /// <para>
+    /// <b>FIRE AND FORGET, AND IT AWAITED EACH POST IN TURN UNTIL SOMETHING TIMED IT.</b>
+    /// The class remark two hundred lines up has always said a fan-out to twelve clusters
+    /// is twelve posts in flight rather than twelve round trips end to end. It was twelve
+    /// round trips: every send awaited its peer's acknowledgement before the next one left,
+    /// so a broadcast cost the SUM of the hops and the origin was paced by the slowest
+    /// machine in the fleet.
+    /// </para>
+    /// <para>
+    /// <b>WHICH PUT THE NETWORK'S LATENCY INTO THE SEARCH ONCE PER CLUSTER, exactly as that
+    /// remark warned.</b> Nothing measured it because nothing on the thinking path has ever
+    /// been timed across a real socket — the depth-of-a-thought number was taken on a wire
+    /// whose fan-out was a queue.
+    /// </para>
+    /// <para>
+    /// <b>AND A LOCAL CLUSTER IS DISPATCHED TOO, WHICH IS WHAT MAKES IT ACTUALLY FIRE AND
+    /// FORGET.</b> Delivering to a cluster that happens to live here by direct call inside
+    /// the loop would leave one machine in the fleet still able to pace a broadcast, and
+    /// which one would depend on where the ring put things. <see cref="HybridBus"/> has
+    /// always dispatched both alike.
+    /// </para>
+    /// </remarks>
+    public ValueTask<IReadOnlyCollection<ClusterAddress>> BroadcastAsync(
         Envelope envelope,
         CancellationToken ct = default,
         Action<IReadOnlyCollection<ClusterAddress>>? ready = null)
@@ -300,11 +336,65 @@ public sealed class Posted : IBus, IAsyncDisposable
         // nobody has heard of is dropped.
         ready?.Invoke(everyone);
 
-        foreach (var cluster in everyone)
-            await SendAsync(cluster, envelope with { To = cluster }, ct).ConfigureAwait(false);
+        foreach (var cluster in everyone) Fire(cluster, envelope with { To = cluster }, ct);
 
-        return everyone;
+        return ValueTask.FromResult(everyone);
     }
+
+    /// <summary>Sends without waiting, and without a fault nobody will ever read.</summary>
+    /// <param name="to">Which cluster.</param>
+    /// <param name="envelope">What it gets.</param>
+    /// <param name="ct">Cancellation.</param>
+    /// <remarks>
+    /// <b>THE THROW HAS TO GO SOMEWHERE, AND ON THIS PATH THERE IS NOWHERE.</b>
+    /// <see cref="SendAsync(ClusterAddress, Envelope, CancellationToken)"/> refuses a
+    /// cluster no machine has announced, and a broadcast only ever addresses what
+    /// <see cref="Known"/> held a moment ago — so the one way to reach that throw is a
+    /// cluster departing inside the window, which is C3 happening rather than a routing
+    /// bug. An unobserved faulted task would be the alternative, and it reports to nobody.
+    /// </remarks>
+    private void Fire(ClusterAddress to, Envelope envelope, CancellationToken ct) =>
+        Away(() => SendAsync(to, envelope, ct).AsTask(), ct);
+
+    /// <summary>Asks one holder without waiting for it.</summary>
+    /// <param name="who">Which holder.</param>
+    /// <param name="here">It, if it lives on this machine.</param>
+    /// <param name="there">Where it lives, if it does not.</param>
+    /// <param name="ask">The question.</param>
+    /// <param name="ct">Cancellation.</param>
+    private void Fire(
+        MachineAddress who, IReceiveAsks? here, string? there, Ask ask, CancellationToken ct) =>
+        Away(
+            () => here is not null
+                ? here.DeliverAsync(ask, ct)
+                : PostAsync(there!, $"ask/{Uri.EscapeDataString(who.Value)}", ask, ct),
+            ct);
+
+    /// <summary>
+    /// Runs a delivery on its own and drops whatever it throws.
+    /// </summary>
+    /// <param name="delivery">What to do.</param>
+    /// <param name="ct">Cancellation.</param>
+    /// <remarks>
+    /// <b>A FAULT ON THIS PATH HAS NOWHERE TO GO, AND AN UNOBSERVED TASK IS WORSE THAN A
+    /// SWALLOWED ONE.</b> The caller has already been handed its answer — who was asked, or
+    /// who is about to be sent to — so there is no return value left to carry a failure on.
+    /// What reaches here is a cluster or a holder departing inside the window between being
+    /// listed and being sent to, which is C3 happening rather than a routing bug.
+    /// </remarks>
+    private static void Away(Func<Task> delivery, CancellationToken ct) =>
+        _ = Task.Run(
+            async () =>
+            {
+                try
+                {
+                    await delivery().ConfigureAwait(false);
+                }
+                catch (Exception) when (!ct.IsCancellationRequested)
+                {
+                }
+            },
+            CancellationToken.None);
 
     /// <inheritdoc/>
     public async ValueTask SendAsync(
@@ -334,7 +424,7 @@ public sealed class Posted : IBus, IAsyncDisposable
     }
 
     /// <inheritdoc/>
-    public async ValueTask<IReadOnlyCollection<MachineAddress>> AskAsync(
+    public ValueTask<IReadOnlyCollection<MachineAddress>> AskAsync(
         Ask ask,
         CancellationToken ct = default,
         Action<IReadOnlyCollection<MachineAddress>>? ready = null)
@@ -360,22 +450,14 @@ public sealed class Posted : IBus, IAsyncDisposable
         // and an answer to an ask nobody remembers is dropped.
         ready?.Invoke(everyone);
 
-        // EVERY HOLDER ASKED AT ONCE, WHICH IS WHAT FORK 56 PRICED AND NOT WHAT THE OTHER
-        // FAN-OUT ON THIS CLASS DOES. `BroadcastAsync` awaits each post in turn, so twelve
-        // clusters cost twelve round trips end to end -- against its own remark two hundred
-        // lines up saying they are twelve posts in flight. That is left as found rather
-        // than changed here, because it is the thinking path and this is the learning one;
-        // it is a defect and it is written down as one.
-        //
-        // AND IT MATTERS HERE BECAUSE THIS IS THE THING BEING TIMED. The gate's query was
-        // priced at about nine asks a round, all askable at once, so ONE round trip -- and
-        // measuring that against a serialised fan-out would report nine.
-        await Task.WhenAll(going.Select(one => one.Here is { } here
-            ? here.DeliverAsync(ask, ct)
-            : PostAsync(one.There!, $"ask/{Uri.EscapeDataString(one.Who.Value)}", ask, ct)))
-            .ConfigureAwait(false);
+        // EVERY HOLDER ASKED AT ONCE AND NONE OF THEM WAITED ON, WHICH IS FORK 56'S PRICE.
+        // The gate's query is about nine asks a round, all askable at once, so ONE round
+        // trip -- and a fan-out that awaited each peer's acknowledgement would cost nine
+        // however concurrent the answers were.
+        foreach (var (who, here, there) in going)
+            Fire(who, here, there, ask, ct);
 
-        return everyone;
+        return ValueTask.FromResult(everyone);
     }
 
     /// <inheritdoc/>

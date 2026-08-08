@@ -1,4 +1,4 @@
-using OpenPlexus.Codes;
+﻿using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 
 namespace OpenPlexus.Tests;
@@ -328,7 +328,7 @@ public sealed class PopulationTests
     [Fact]
     public void Covering_mints_one_code_at_a_time_and_only_what_is_missing()
     {
-        var held = new Population(new CommittingSettings(), seed: 1);
+        var held = Varied(1, 2, 3);
 
         // NOTHING FIRED, so every gate agrees the moment was unaccounted for.
         Assert.Equal(3, held.Cover(Moment(1, 2, 3), Says(1), []));
@@ -355,7 +355,7 @@ public sealed class PopulationTests
     {
         foreach (var rule in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
         {
-            var held = new Population(new CommittingSettings { Surprising = rule }, seed: 1);
+            var held = Varied(new CommittingSettings { Surprising = rule }, 1, 2, 3);
 
             // ONE COMMITMENT THAT PROPOSES OUTCOME 1, and a moment where it fires.
             held.Add(One(1, 1));
@@ -379,4 +379,35 @@ public sealed class PopulationTests
             Assert.Equal(3, held.Cover(moment, Says(7), firing));
         }
     }
+
+    /// <summary>
+    /// A population that has already seen these codes come and go.
+    /// </summary>
+    /// <param name="dials">Every number the machinery is allowed to have.</param>
+    /// <param name="codes">The codes to establish as varying.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>GENESIS WILL NOT ROOT ON A CODE THAT HAS NEVER BEEN ABSENT, so a population
+    /// asked to cover before it has witnessed anything mints NOTHING.</b> That is the
+    /// gate working rather than a fault — but a test calling <see cref="Population.Cover"/>
+    /// straight out of the constructor is asking it to root on codes it has seen exactly
+    /// once each, and it correctly declines.
+    /// </para>
+    /// <para>
+    /// <b>SO THE PRECONDITION IS ESTABLISHED RATHER THAN ASSUMED.</b> One moment holding
+    /// the codes and one holding none of them is all it takes: after the second, every one
+    /// of them has been absent, and every one is eligible.
+    /// </para>
+    /// </remarks>
+    private static Population Varied(CommittingSettings dials, params ulong[] codes)
+    {
+        var held = new Population(dials, seed: 1);
+
+        held.Witness(Moment(codes));
+        held.Witness(new HashSet<Code>());
+
+        return held;
+    }
+
+    private static Population Varied(params ulong[] codes) => Varied(new CommittingSettings(), codes);
 }

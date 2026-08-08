@@ -437,6 +437,7 @@ condition is a superstition.
 | Repair gated only on the vote being wrong | It hides the rules most needing specialisation — the ones wrong while the population is right | Never as the ONLY gate; `Mending` keeps it as an arm |
 | `Mending.Earned` — repair on any earned failure, ignoring children | `Uncovered` dominates it everywhere measured, being the same rule with the redundant repairs removed | Never. Revive the child test, not the arm |
 | The vote deferring to a general advocate unless the narrower earns it | Four points worse where it fires, and read-only it changes not one withheld answer | Never. The deciders earn their seats by a wide margin on drawn data |
+| Genesis rooting on a code that has never varied | 7.4 standard errors behind where there is background, 0.2 apart without it. Background becomes a PARENT and its children inherit it | A world where an always-present code is informative. None is known |
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Each condition halves where a rule can fire, so the bar caps DEPTH by world size | A bar whose expectation shrinks with depth too |
 
 ---
@@ -667,6 +668,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **48** | Can a generated world hold assignments back without the learner being able to tell? Closed — it can, and the draw rejects rather than picks, so a run withholding nothing keeps every number the world ever produced |
 | **49** | Matching and settling are nine tenths of the clock on a narrow world whose table never grows. Where do they go on a WIDE one, and is it the memory or the search that ends the run? Open |
 | **50** | `Monk`'s second puzzle admits no sound conjunction saying YES short of a whole instance. Which rung does that demand — a count, a negation, or a disjunction — and does the failure distinguish them? Open |
-| **51** | A code live in every moment separates nothing, yet genesis roots on it and every commitment tallies it forever. Half answered — refusing the ROOT helps and costs a clean world nothing measurable. The tally half still doubles the table |
+| **51** | Genesis no longer roots on a code that has never varied. What is left is the TALLY: an always-present code is still an entry in every commitment's table forever, and background still roughly doubles it |
 | **52** | The commitment learner runs in one process, so C1 is kept by convention and C3's third outcome cannot fire. What does putting the vote on the wire cost in agreement-with-itself, against the in-process arm as control? Open |
 | **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |

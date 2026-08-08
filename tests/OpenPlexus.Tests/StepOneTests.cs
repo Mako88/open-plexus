@@ -54,9 +54,21 @@ public sealed class StepOneTests(ITestOutputHelper output)
             learned.Sound / (double)(learned.Sound + learned.Unsound) > 0.3,
             $"{learned.Sound} sound against {learned.Unsound} not");
 
-        // SILENCE IS A CONTROL ARM NOBODY MEANT TO RUN. One round, before anything
-        // has been minted, is the whole of it.
-        Assert.True(learned.Silent <= 1, $"silent on {learned.Silent} rounds");
+        // SILENCE IS A CONTROL ARM NOBODY MEANT TO RUN, and it is a handful of rounds at
+        // the very start rather than one.
+        //
+        // IT WAS ONE UNTIL GENESIS STOPPED ROOTING ON CODES THAT HAVE NEVER VARIED, and
+        // the extra rounds are that gate's warm-up arriving where it was predicted to.
+        // A code is only eligible once it has been ABSENT, and in the first moment nothing
+        // has, so the earliest rounds mint less and there is briefly nothing to fire. Every
+        // code here is present about half the time, so it resolves within a handful of
+        // draws and never recurs.
+        //
+        // THE BAR IS ON THE WARM-UP AND NOT ON THE RATE, which is why it stays this tight.
+        // Twenty is still nothing against thirty thousand, and a run that went quiet LATER
+        // would be a population being destroyed rather than a table filling up — that is
+        // the failure this assertion is for, and it can still fire.
+        Assert.True(learned.Silent <= 20, $"silent on {learned.Silent} rounds");
     }
 
     [Fact]

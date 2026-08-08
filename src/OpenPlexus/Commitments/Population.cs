@@ -364,8 +364,16 @@ public sealed class Population
             // AND THE SECOND GATE ASKS WHICH CODE RATHER THAN WHETHER AT ALL. A code that
             // has never once been absent separates nothing and cannot ever win a repair,
             // but it can still be a ROOT -- and every child hanging off it inherits the
-            // useless code while being otherwise a perfectly good rule.
-            if (_dials.Rooting == Rooting.Varying && !Varied(code)) continue;
+            // useless code while being otherwise a perfectly good rule. Half the resident
+            // population, on eight bits of pure background.
+            //
+            // NOT A DIAL, BECAUSE THERE IS NO LEVEL IN IT AND BECAUSE IT WON. Measured
+            // over twelve seeds against the arm that rooted on anything: 7.4 standard
+            // errors ahead where there is background and 0.2 apart where there is none.
+            // A base rate against a threshold would have needed the threshold, and
+            // nothing computed inside a run can say what it should be -- *has it ever
+            // been absent* has one answer and needs nothing.
+            if (!Varied(code)) continue;
 
             if (Add(new Commitment([code], arrived))) minted++;
         }

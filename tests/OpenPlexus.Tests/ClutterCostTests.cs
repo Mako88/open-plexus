@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -6,8 +6,7 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// What background costs, before anything is built to refuse it — <b>fork 51's control
-/// arm.</b>
+/// What background costs, and the invariant that keeps it out — <b>fork 51.</b>
 /// </summary>
 /// <remarks>
 /// <para>
@@ -18,36 +17,22 @@ namespace OpenPlexus.Tests;
 /// already there.
 /// </para>
 /// <para>
-/// <b>GENESIS AND THE TALLY HAVE NO SUCH GUARD, AND THIS MEASURES WHAT THAT COSTS.</b>
-/// Genesis mints one commitment per live code on a surprise, so every always-on code
-/// becomes a candidate for every outcome it ever sees — which is every outcome. And
-/// <see cref="Commitment.Settle"/> stores an entry per non-scope code in every moment a
-/// commitment fires on, so an always-on code is an entry in EVERY commitment's table,
-/// permanently, with a divergence pinned at nought for the life of the run.
+/// <b>GENESIS HAD NO SUCH GUARD AND NOW DOES, WHICH IS WHAT THE GRID BELOW IS AGAINST.</b>
+/// It used to mint one commitment per live code on a surprise, so background became a
+/// ROOT and every child hanging off it inherited a code that could never earn its place —
+/// half the resident population, on eight bits of it. <see cref="Population.Cover"/>
+/// refuses to root on a code that has never once been absent.
 /// </para>
 /// <para>
-/// <b>MEASURED BEFORE MITIGATED, WHICH IS THE ORDER THIS PROJECT KEEPS HAVING TO
-/// RELEARN.</b> A gate built first would be measured one-OFF-from-all-on against a world
-/// nobody had characterised. What the grid below establishes is the shape of the cost —
-/// and whether it is in the candidates, in the table, or in the score.
+/// <b>AND THE TALLY STILL HAS NO GUARD, WHICH IS THE HALF OF FORK 51 LEFT OPEN.</b>
+/// <see cref="Commitment.Settle"/> stores an entry per non-scope code in every moment a
+/// commitment fires on, so an always-on code is an entry in EVERY commitment's table with
+/// a divergence pinned at nought for the life of the run. The grid still shows the table
+/// roughly doubling under background, and that is what remains.
 /// </para>
 /// </remarks>
 public sealed class ClutterCostTests(ITestOutputHelper output)
 {
-    private static double Recent(int clutter, bool gate, int seed) =>
-        new MultiplexerRun(
-            new MultiplexerSettings { Address = 2, Clutter = clutter },
-            new Brain(
-                new CommittingSettings { Rooting = gate ? Rooting.Varying : Rooting.Anything },
-                seed),
-            seed).Run(20_000).Recent;
-
-    private static Learned Gated(int clutter) =>
-        new MultiplexerRun(
-            new MultiplexerSettings { Address = 2, Clutter = clutter },
-            new Brain(new CommittingSettings { Rooting = Rooting.Varying }, seed: 1),
-            seed: 1).Run(20_000);
-
     private static Learned Run(int clutter) =>
         new MultiplexerRun(
             new MultiplexerSettings { Address = 2, Clutter = clutter },
@@ -82,109 +67,28 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
     }
 
     /// <summary>
-    /// <b>THE ARM: REFUSING TO ROOT ON A CODE THAT HAS NEVER BEEN ABSENT.</b>
+    /// <b>NOTHING IS EVER ROOTED ON BACKGROUND, WHICH IS THE INVARIANT AND NOT A
+    /// SCORE.</b>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// <b>ONE MECHANISM ON FROM A KNOWN BASELINE, WHICH IS THE ONLY ORDER THIS PROJECT
-    /// ACCEPTS.</b> The grid above characterised the cost first, and it moved the fix:
-    /// the damage is not the minting RATE, which the surprise gate already bounds, but
-    /// that background becomes a PARENT whose children inherit a code that can never earn
-    /// its place.
+    /// <b>THIS IS WHAT THE GATE IS NAMED FOR, ASKED DIRECTLY.</b> Before it, half the
+    /// resident population at eight bits of background carried an always-present code, and
+    /// three quarters of those were otherwise perfectly good rules dragging one they had
+    /// inherited from a parent that should never have existed. A mechanism that improved
+    /// a score while leaving them resident would be improving it for some other reason,
+    /// and the number would be believed anyway.
     /// </para>
     /// <para>
-    /// <b>AND THE CLEAN COLUMN IS THE HALF THAT MATTERS.</b> A gate that helps where
-    /// there is background and costs nothing where there is none is a gate; one that buys
-    /// its win by damaging the clean world is <see cref="Mending"/> again — three rules,
-    /// three worlds, three winners — and this project has enough of those.
+    /// <b>AND THE COUNT IS NOUGHT RATHER THAN SMALL.</b> A code that has never been absent
+    /// cannot be a root, and a scope only grows by conditions repair chooses — which can
+    /// never be background, since its separation is nought by construction. So there is no
+    /// road by which one gets in, and anything above nought means a road exists that this
+    /// file does not know about.
     /// </para>
     /// </remarks>
     [Fact]
-    public void Refusing_to_root_on_what_never_varies()
-    {
-        // TWELVE, BECAUSE THIS READING DECIDES WHETHER THE ARM BECOMES THE CODE. Five
-        // said 2.7 standard errors on the cluttered world and half of one on the clean,
-        // which is enough to keep measuring and not enough to delete the alternative --
-        // and deleting the alternative is what happens next, so the number that justifies
-        // it has to be the better one. `ONE SEED IS NOT A COMPARISON AND WILL HAPPILY
-        // INVERT` is in the traps list; five is not much further along.
-        int[] seeds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-        var arms = Fixture.Abreast(
-        [
-            .. new[] { (0, false), (0, true), (8, false), (8, true) }
-                .Select<(int Clutter, bool Gate), Func<Measured>>(one => () => new Measured
-                {
-                    Arm = $"clutter {one.Clutter} {(one.Gate ? "gated" : "open")}",
-                    Values = [.. seeds.Select(seed => Recent(one.Clutter, one.Gate, seed))],
-                }),
-        ]);
-
-        foreach (var arm in arms) output.WriteLine(arm.ToString());
-
-        // THE GATE AGAINST ITS OWN CONTROL, ON THE WORLD IT IS FOR AND THE WORLD IT MUST
-        // NOT DAMAGE. No bar on either: a threshold written before the first reading is a
-        // prediction dressed as a check, and both of these are first readings.
-        output.WriteLine(
-            $"cluttered: {arms[3].Separation(arms[2]):F1} standard errors apart");
-        output.WriteLine(
-            $"clean:     {arms[1].Separation(arms[0]):F1} standard errors apart");
-    }
-
-    /// <summary>
-    /// <b>AND THE GATE DOES WHAT IT SAYS, WHICH IS NOT A PREDICTION BUT A DEFINITION.</b>
-    /// </summary>
-    /// <remarks>
-    /// The grid above reports what refusing background is WORTH, and that is a first
-    /// reading over five seeds rather than a bar. This is the other half: whether the
-    /// mechanism did the thing it is named for. A gate that improved a score while
-    /// leaving background-rooted rules resident would be improving it for some other
-    /// reason, and the number would be believed anyway.
-    /// </remarks>
-    [Fact]
-    public void And_nothing_is_left_rooted_on_background_when_it_is_gated()
-    {
-        var run = new MultiplexerRun(
-            new MultiplexerSettings { Address = 2, Clutter = 8 },
-            new Brain(new CommittingSettings { Rooting = Rooting.Varying }, seed: 1),
-            seed: 1);
-
-        run.Run(20_000);
-
-        var background = Enumerable.Range(6, 8)
-            .Select(at => Codes.Bits.Of(Multiplexer.Bit, at, 1))
-            .ToHashSet();
-
-        var tainted = run.Held.All
-            .Select(one => run.Held.Names.Unfold(one.Scope))
-            .Count(scope => scope.Any(background.Contains));
-
-        output.WriteLine($"{tainted} resident commitments still carry an always-present code");
-
-        Assert.Equal(0, tainted);
-    }
-
-    /// <summary>
-    /// <b>WHERE THE EXTRA TABLE ACTUALLY COMES FROM, RATHER THAN WHERE IT LOOKS LIKE IT
-    /// SHOULD.</b>
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Minting barely moves with background — the surprise gate absorbs it — so the
-    /// obvious story, that genesis floods the population with candidates, is wrong. What
-    /// grows is the table, and the question this answers is whether the growth is
-    /// commitments CARRYING a useless code or merely more commitments.
-    /// </para>
-    /// <para>
-    /// <b>An always-on code cannot be chosen as a condition and can still be a ROOT.</b>
-    /// Genesis mints one-code commitments per live code, so background becomes a parent —
-    /// and every child repair hangs off it inherits the useless code forever, while being
-    /// otherwise a perfectly good rule. That would show up exactly as this repo's grid
-    /// showed it: sound rules RISING with background rather than falling.
-    /// </para>
-    /// </remarks>
-    [Fact]
-    public void The_growth_is_rules_rooted_on_background_rather_than_more_rules()
+    public void Nothing_is_ever_rooted_on_a_code_that_has_not_varied()
     {
         var run = new MultiplexerRun(
             new MultiplexerSettings { Address = 2, Clutter = 8 },
@@ -206,16 +110,14 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
 
         output.WriteLine(
             $"{tainted} of {resident.Count} resident commitments carry a code that is "
-            + $"always present ({tainted / (double)resident.Count:P0})");
+            + "always present");
 
-        output.WriteLine(
-            $"of those, {resident.Count(scope => scope.Any(background.Contains) && scope.Length > 1)}"
-            + " have a real condition beside it");
-
-        // NO BAR, BECAUSE THE SHARE IS THE READING. What must hold is only that the
-        // question is answerable: if nothing were rooted on background the inference
-        // above would be refuted, and that is worth being able to see.
+        // AND THE POPULATION IS NOT EMPTY, so a nought above is the gate working rather
+        // than the run having learnt nothing at all -- which would satisfy the assertion
+        // for the wrong reason and is exactly the shape of a check that cannot fire.
         Assert.NotEmpty(resident);
+
+        Assert.Equal(0, tainted);
     }
 
     /// <summary>

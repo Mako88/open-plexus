@@ -10,6 +10,12 @@
 # a parallel run scored the agreement perfect where a serial one did not. Do not
 # add `-m` or `--parallel` here to save minutes. That would hide the class of
 # defect this project keeps finding.
+#
+# SHARDING ACROSS RUNNERS IS THE ONE THING THAT IS NOT THAT, and it is how the wall
+# clock comes down instead. The rule is about how busy ONE MACHINE is while it
+# measures; four runners each executing their own tests one at a time are four serial
+# runs at the load profile a serial run has. Nothing overlaps that could have seen
+# anything else overlap.
 name: tests
 
 on:
@@ -40,9 +46,17 @@ concurrency:
   # queue clears is what gets tested.
   group: tests-${{ github.ref }}
   cancel-in-progress: false
-
 jobs:
-  suite:
+  # THE CORPORA ARE FETCHED ONCE AND NOT ONCE PER SHARD, WHICH IS WHY THIS IS ITS OWN
+  # JOB. `cs.toronto.edu` serves CIFAR at about 106 kB/s and the payload is six hundred
+  # megabytes; four runners each pulling that on a cold cache is four times the load on a
+  # slow academic host for one copy of the same bytes, and the run that died on curl's
+  # exit 28 is what that looks like when it goes wrong.
+  #
+  # THE SHARDS RESTORE AND NEVER FETCH. If this saved, they hit; if it failed, they do
+  # not run at all -- a shard quietly re-fetching would put the four-way download back
+  # with nobody noticing it had returned.
+  corpora:
     runs-on: ubuntu-latest
     # NINETY, AND MOST OF IT IS FOR A COLD CACHE RATHER THAN FOR THE SUITE.
     #
@@ -179,6 +193,75 @@ jobs:
       # it. A CHECK THAT CANNOT FIRE READS AS A PASS, which is this project's own
       # trap, reintroduced by the commit that closed it. Deleted rather than
       # repaired: the gate belongs in the build, where everybody runs it.
+
+  # SHARDED ACROSS RUNNERS, AND THAT IS NOT THE PARALLELISM THE NOTE AT THE TOP FORBIDS.
+  # `Parallelism.cs` serialises the assembly because numbers move with how busy the
+  # MACHINE is -- the walk's agreement with itself reads 0.8833 alone and 1.0000 under
+  # load, so a run overlapping its own tests scores the flattering number and the defect
+  # goes invisible. Every shard below still runs its tests ONE AT A TIME, on its own
+  # runner, at the load profile a whole serial run would have had. What is parallel is
+  # the runners, and they cannot see each other.
+  #
+  # DO NOT ADD `-m` OR `--parallel` INSIDE A SHARD. That is the thing being avoided, and
+  # it would stay avoided right up until somebody read this block as permission.
+  #
+  # THE LAST SHARD IS A NEGATIVE FILTER SO NOTHING CAN GO UNRUN. Four lists of classes
+  # would mean a new test file landing in none of them and passing by being ABSENT,
+  # which is this project's oldest failure wearing a build-config hat. The heavy classes
+  # are named; the last shard is whatever is left, including every file nobody has
+  # written yet.
+  #
+  # THE SPLIT IS BY MEASURED COST AND WILL GO STALE. Taken at 1,254s over 617 tests,
+  # where the two walk worlds are a third of it between them. If one shard starts
+  # dominating, re-cut it: an unbalanced split costs wall clock and nothing else, so
+  # this is a tuning note rather than a correctness one.
+  suite:
+    needs: corpora
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    strategy:
+      # ONE SHARD FAILING MUST NOT CANCEL THE OTHERS, for the reason the concurrency
+      # block gives at length: a suite nobody gets a complete result from is a suite
+      # diagnosed by sampling. Three shards reporting and one red is four pieces of
+      # information; one red and three cancelled is one.
+      fail-fast: false
+
+      matrix:
+        shard:
+          - "(FullyQualifiedName~BindingTests|FullyQualifiedName~ClevrTests)"
+          - "(FullyQualifiedName~HomeostatTests|FullyQualifiedName~EncodedTests)"
+          - "(FullyQualifiedName~ArrangedTests|FullyQualifiedName~SensesTests|FullyQualifiedName~GradedTests|FullyQualifiedName~TailTests|FullyQualifiedName~TendingTests)"
+          - "(FullyQualifiedName!~BindingTests&FullyQualifiedName!~ClevrTests&FullyQualifiedName!~HomeostatTests&FullyQualifiedName!~EncodedTests&FullyQualifiedName!~ArrangedTests&FullyQualifiedName!~SensesTests&FullyQualifiedName!~GradedTests&FullyQualifiedName!~TailTests&FullyQualifiedName!~TendingTests)"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      # RESTORE ONLY, AND IT MUST HIT. The `corpora` job above has already fetched and
+      # saved under this exact key, so a miss here means that job's save did not happen
+      # -- and the right answer to that is to fail loudly rather than to quietly fetch
+      # six hundred megabytes on four runners at once.
+      - name: Restore corpora
+        id: corpora
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            corpora/tasks_1-20_v1-2
+            corpora/CLEVR_v1.0
+            corpora/tatoeba_eng.tsv
+            corpora/clutrr_test.csv
+            corpora/cifar-10-batches-bin
+            corpora/encoders
+          key: corpora-v3-${{ hashFiles('corpora/fetch.sh') }}
+
+      - name: The corpora arrived
+        run: |
+          test -f corpora/encoders/mobilenetv3-small/model_headless.onnx             || { echo "corpora cache did not restore -- see the 'corpora' job"; exit 1; }
+
       - name: Build
         run: dotnet build --configuration Debug --nologo --no-incremental
 
@@ -203,5 +286,5 @@ jobs:
       - name: Test
         run: |
           dotnet test --configuration Debug --nologo --no-build \
-            --filter "kind!=sweep" \
+            --filter "kind!=sweep&${{ matrix.shard }}" \
             --verbosity quiet --logger "console;verbosity=normal"

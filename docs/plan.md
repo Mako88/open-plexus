@@ -115,8 +115,11 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   or not by accident rather than by decision.
 - **Rung five loses the power to CERTIFY a redundancy and goes silent**; its evidence is
   the population and the population is what gets split.
-- **`Mending.Uncovered` loses the evidence to REFUSE a repair and over-fires**, which is
-  the same cause failing in the opposite direction.
+- **`Mending.Uncovered` loses the evidence to AIM a repair**, which is the same cause
+  failing in the opposite direction.
+- **AND THE GATE AIMS RATHER THAN LIMITS, WHICH IS NOT WHAT IT LOOKED LIKE.** `Mend` mints
+  once a round, so admitting covered commitments misdirects the attempt rather than adding
+  attempts.
 - **A COUNT MERGES AND A STRUCTURE DOES NOT, which is the line between the two fixes.**
   `Recurrence` ships frequencies and recovers rung five exactly; `Narrows` has nothing to
   add up and wants a round trip.
@@ -542,6 +545,12 @@ change of architecture entirely.
 - **A MECHANISM IS LOCAL OR POPULATION-WIDE BY ACCIDENT UNTIL SOMETHING SPLITS IT**, and
   nothing in one process can tell the two apart. Both halves of the ladder read the whole
   population and neither said so anywhere.
+- **A PREDICTION WRITTEN INTO A WIRING CHECK FAILS TWO WAYS AND READS THE SAME.** Genuinely
+  unwired and wired-but-backwards are one message; assert that arms DIFFER, never which
+  way.
+- **AND A DEFAULT CAN SHORT-CIRCUIT THE MECHANISM BEING MEASURED.** `Mending.Outvoted`
+  ships and skips the narrows test, so a sweep on defaults returned three identical arms
+  for a gate that was never running.
 - **AND A TIE-BREAK BY DICTIONARY WALK IS STABLE UNTIL THERE ARE TWO TABLES.** `Shared`
   resolved equal candidates by whichever its table reached first — reproducible in one
   process, arbitrary across a merge. Fork 12 by a new door.
@@ -712,7 +721,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **51** | Genesis no longer roots on a code that has never varied. What is left is the TALLY: an always-present code is still an entry in every commitment's table forever, and background still roughly doubles it |
 | **52** | The commitment learner runs in one process, so C1 is kept by convention. Half closed: the vote's arithmetic composes across holders, exactly under `Strongest`. The transport half is open — nothing has been late or died |
 | **54** | Naming is deterministic in the evidence, so two holders converge on identical streams and diverge on disjoint ones. The deployment case is neither — overlapping but not identical — and it decides whether rung five needs the wire. Open |
-| **55** | `Mending.Uncovered` over-fires under sharding at a measured rate. Whether over-repairing COSTS anything is not measured, and a gate wrong harmlessly is a different problem from one wrong expensively. Open |
+| **55** | Whether a blinded repair gate costs anything. Answered on the multiplexer: children minted separates decisively over twelve seeds, and accuracy, residents and sound rules all move the same way at two standard errors. Open on any other world |
 | **56** | *Does anybody hold a strict specialisation of this scope* is a boolean, so asking keeps C1 where reading would not. What the query costs per candidate per round is unasked. Open |
 | **57** | Every node predicts its own output while the real wave verifies behind it — speculation with a verification pass, lossless where a learned short-circuit is not. Nothing to buy until fork 32's cap comes off. Open |
 | **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |

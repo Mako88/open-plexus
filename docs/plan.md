@@ -103,10 +103,16 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   reports, finished thoughts and deaths between processes over real sockets.
 - **What crosses is THINKING and never LEARNING, which is fork 1.** An occasion writes its
   edges into locally-held clusters, so nothing learnt on one machine reaches another.
-- **And the commitment learner has no bus at all, so C1 holds by convention** — everything
-  that constraint exists for is untested and `Abstain` cannot fire. Fork 52.
+- **AND THE COMMITMENT LEARNER IS ON A BUS AT LAST, WHICH IS FORK 52'S TRANSPORT HALF.**
+  `Ask` and `Answer` carry counts and testimony between machines that share no object.
+- **PUSHED AND NEVER PULLED, WHICH IS JOHN'S RULE AND ALSO THE REVIVAL TABLE'S.** An awaited
+  request would decide a missing holder by the client's timeout, which is a deadline.
+- **BUT `Cycle` STILL ASKS ONLY ITSELF.** Mounting it makes the loop async — the harness
+  rewrite this doc budgets for, and fork 53. `DeadCodeTests` counts the gap by name.
 - **Distance costs the DEPTH of a thought, measured.** A round costs about four and a half
   times the per-hop delay, so a LAN is comfortable and the internet is a slower experiment.
+- **AND A ROUND OF ASKS IS UNDER A MILLISECOND ON LOOPBACK**, nine holders costing two and a
+  half times one — so the scatter is in flight at once rather than a queue.
 - **THE VOTE SPLITS EXACTLY, so fork 52's arithmetic half is closed.** `Speak` emits what a
   holder claims and `Decide` merges any number of those; a commitment never crosses.
 - **And the transport half is untouched** — nothing is late and nothing dies in any of it,
@@ -581,6 +587,9 @@ change of architecture entirely.
 - **AND A DEFAULT CAN SHORT-CIRCUIT THE MECHANISM BEING MEASURED.** `Mending.Outvoted`
   ships and skips the narrows test, so a sweep on defaults returned three identical arms
   for a gate that was never running.
+- **A BUDGET CAN BE SATISFIED BY A COINCIDENCE.** `Machines.Holder` read as wired because a
+  tuple field in another file was spelt `Holder`; renaming it put two unmounted types onto
+  the dead-code list at once.
 - **AND A TIE-BREAK BY DICTIONARY WALK IS STABLE UNTIL THERE ARE TWO TABLES.** `Shared`
   resolved equal candidates by whichever its table reached first — reproducible in one
   process, arbitrary across a merge. Fork 12 by a new door.
@@ -607,6 +616,15 @@ change of architecture entirely.
 - **AND SPLITTING THE VOTE DID NOT ARM IT.** Losing a holder changes an answer and never
   silences one, because something else always advocates — the third outcome needs a death
   taking the LAST advocate.
+- **A REAL DEATH DOES SILENCE THE VOTE NOW, AND THAT IS THE PRECONDITION RATHER THAN THE
+  VERDICT.** Five of twelve holders held every advocate; killing them left seven answering
+  and no expectation at all.
+- **AND THE STATED REASON WAS WRONG: `Cycle.Step` TAKES A NON-NULLABLE OUTCOME.** No number
+  of machines and no number of deaths can produce an abstain, because the loop has no way to
+  say *the settlement could not tell*.
+- **`BroadcastAsync` AWAITS EACH POST IN TURN AGAINST ITS OWN DOCUMENTATION**, so twelve
+  clusters cost twelve round trips end to end. `AskAsync` does not; the thinking path is
+  left as found rather than changed beside a measurement.
 - **THE CENTRAL BET IS REFUTED ON THE ONLY WORLD BUILT TO TEST IT**, with a control in
   every cell of the grid. `EncodedTests` holds it and the commit records the numbers.
 - **THE FRONT END IS THE CEILING AND THE LEARNER IS NOT — ON CIFAR.** Changing only the
@@ -669,6 +687,12 @@ change of architecture entirely.
 - **AND THE REASON IS NOT A LEVEL NOBODY TUNED.** *Which rule needs specialising* and
   *did the population get this wrong* are different questions, and whether they align
   is a fact about the world. No per-round switch serves both.
+- **AND `Sharpness` IS NOT AN AXIS UNDER `Strongest` AT ALL, WHICH IS THE SECOND LEG
+  FLAGGED.** Raising to a power is monotone, so the argmax never moves: three powers, one
+  identical run, at both widths. It is a dial of `Summing`.
+- **SO TWO OF THE THREE ARE NOT INDEPENDENT, AND A GRID SWEPT OVER BOTH HAS A DEAD
+  COLUMN.** `DialTests` has the near miss — *the limit of high sharpness* — which is a
+  claim about `Summing` and weaker than a dial that stops existing.
 - **THE VOTE THREW AWAY PART OF A WORLD IT HAD ALREADY SOLVED**, with every sound rule
   resident and believed well above the false ones — and under a scale-free vote it is not
   a crowd doing it, it is a handful of deciders.
@@ -752,10 +776,10 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **49** | Matching and settling are nine tenths of the clock on a narrow world whose table never grows. Where do they go on a WIDE one, and is it the memory or the search that ends the run? Open |
 | **50** | `Monk`'s second puzzle admits no sound conjunction saying YES short of a whole instance. Which rung does that demand — a count, a negation, or a disjunction — and does the failure distinguish them? Open |
 | **51** | Genesis no longer roots on a code that has never varied. What is left is the TALLY: an always-present code is still an entry in every commitment's table forever, and background still roughly doubles it |
-| **52** | The commitment learner runs in one process, so C1 is kept by convention. Half closed: the vote's arithmetic composes across holders, exactly under `Strongest`. The transport half is open — nothing has been late or died |
+| **52** | The vote's arithmetic composes and its transport is real: counts and testimony cross sockets, and a dead machine is silence the asker counts. Open on C2, which TCP cannot show, and on mounting any of it in `Cycle` |
 | **54** | Where between identical and disjoint streams naming stops converging. Answered, and there is no between: three quarters shared agrees as badly as nothing shared, and only identical evidence converges. One seed a row, so the ends carry it |
 | **55** | Whether a blinded repair gate costs anything. Answered on the multiplexer: children minted separates decisively over twelve seeds, and accuracy, residents and sound rules all move the same way at two standard errors. Open on any other world |
-| **56** | What the repair gate's query costs on a wire. Priced: about nine asks a round, all askable at once, so one round trip. The structural cache removes a sixth. Open on building it |
+| **56** | What the repair gate's query costs on a wire. Priced at one round trip and measured on loopback: 0.36ms at one holder, 0.93 at nine, so the fan-out is in flight at once. Open on a LAN and on building it |
 | **57** | Every node predicts its own output while the real wave verifies behind it, lossless where a learned short-circuit is not. The repair gate's query is where it first fits: a boolean usually answered no, and being wrong costs a rule. Open |
 | **58** | The gate's sign flips with the timing: after a failure it is far worse than none, and every round `Uncovered` beat `Earned`. Two cells measured here, two in the revival rows. Open on any other world |
 | **59** | `Mending.Neglected` loses or ties on both worlds measured, so the arm rule says delete it — and it is the only cell isolating the gate axis, a cost that rule does not anticipate. Open |

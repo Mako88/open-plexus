@@ -40,6 +40,43 @@ public sealed record Spent
 
     /// <summary>Choosing a condition and minting a child.</summary>
     public required double Mending { get; init; }
+
+    /// <summary>
+    /// <b>TWO RUNS THAT DIFFER ONLY IN HOW LONG THEY TOOK ARE THE SAME RUN.</b>
+    /// </summary>
+    /// <param name="other">The other clock, which is not compared.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>THE RULE ABOVE WAS WRITTEN AND BROKEN IN ONE COMMIT, AND ONLY THE COMPILER WAS
+    /// ENFORCING ANYTHING.</b> <i>Nothing may assert on it</i> is three lines up, and
+    /// this record went inside <see cref="Machines.Tally"/> — whose generated equality
+    /// asserts on every field it has. So the three <i>a fixed seed reproduces a run
+    /// exactly</i> tests began comparing a wall clock, and went red on a machine doing
+    /// nothing wrong. Fork 12, reopened by the instrument that was supposed to be the
+    /// one thing nobody could bar.
+    /// </para>
+    /// <para>
+    /// <b>AND THE HALF THAT WAS NOT RED WAS WORSE.</b> Every <c>Assert.NotEqual</c> over
+    /// a <see cref="Machines.Tally"/> passed the moment the clocks differed, which they
+    /// always do — so the controls beside those three tests could not fail. A check that
+    /// cannot fire reads as a pass, and this project has a line in its trap list about
+    /// exactly that.
+    /// </para>
+    /// <para>
+    /// <b>SO IT IS ENFORCED HERE RATHER THAN AT THE THREE CALL SITES.</b> Normalising the
+    /// clock away in each test would be a guard mounted on one caller, and the fourth
+    /// determinism test — written later, by somebody who never read this — would
+    /// reintroduce it. Excluding it by hand from <see cref="Machines.Tally"/>'s equality
+    /// would be worse still: that list would then have to be edited every time the report
+    /// grows a field, and the field that got forgotten would be silently uncompared.
+    /// Here, both records may grow freely and the clock never counts.
+    /// </para>
+    /// </remarks>
+    /// <returns><see langword="true"/> for any other clock at all.</returns>
+    public bool Equals(Spent? other) => other is not null;
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => 0;
 }
 
 /// <summary>

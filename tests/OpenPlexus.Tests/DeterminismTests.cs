@@ -1,4 +1,6 @@
+using OpenPlexus.Commitments;
 using OpenPlexus.Graph;
+using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 
 namespace OpenPlexus.Tests;
@@ -101,5 +103,56 @@ public sealed class DeterminismTests
         var run = await PlayAsync(seed: 1);
 
         Assert.True(run.Halted > 100, $"only {run.Halted} routes hit the horizon");
+    }
+
+    /// <summary>
+    /// A short multiplexer run, for the tests below that want a <see cref="Tally"/> and
+    /// do not care what is in it.
+    /// </summary>
+    private static Tally Counted() =>
+        new MultiplexerRun(
+            new MultiplexerSettings { Address = 2 },
+            new Brain(new CommittingSettings(), seed: 1),
+            seed: 1).Run(rounds: 200).Tally;
+
+    /// <summary>
+    /// <b>A WALL CLOCK IS NOT PART OF A RUN'S IDENTITY, AND FOR TWO DAYS IT WAS.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE THREE <i>a fixed seed reproduces a run exactly</i> TESTS WENT RED ON A
+    /// CORRECT MACHINE</b> the moment <see cref="Spent"/> joined <see cref="Tally"/>,
+    /// because a record compares every field it has and milliseconds do not repeat.
+    /// Every other number in those reports was identical to the digit. See
+    /// <see cref="Spent.Equals(Spent)"/> for why the fix is there rather than here.
+    /// </remarks>
+    [Fact]
+    public void Two_runs_differing_only_in_how_long_they_took_are_the_same_run()
+    {
+        var tally = Counted();
+
+        Assert.Equal(
+            tally,
+            tally with { Spent = tally.Spent with { Firing = tally.Spent.Firing + 1000.0 } });
+    }
+
+    /// <summary>
+    /// <b>THE COMPANION, AND IT IS THE HALF THAT WAS ACTUALLY DANGEROUS.</b>
+    /// </summary>
+    /// <remarks>
+    /// A clock inside the report did not merely turn three tests red. It made every
+    /// <c>Assert.NotEqual</c> over a <see cref="Tally"/> pass for free — the clocks
+    /// always differ, so the controls sitting beside those three tests could not fail
+    /// whatever the learner did. <b>Excluding the clock is what ARMS them</b>, and a
+    /// rule saying two reports are always equal would disarm them again just as
+    /// thoroughly, so it is asserted rather than assumed.
+    /// </remarks>
+    [Fact]
+    public void And_a_report_that_differs_anywhere_else_is_still_a_different_run()
+    {
+        var tally = Counted();
+
+        Assert.NotEqual(tally, tally with { Rounds = tally.Rounds + 1 });
+        Assert.NotEqual(tally, tally with { Right = tally.Right + 1 });
+        Assert.NotEqual(tally, tally with { Separations = tally.Separations + 1 });
     }
 }

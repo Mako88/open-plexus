@@ -56,6 +56,33 @@ public sealed record MultiplexerSettings
     /// </para>
     /// </remarks>
     public int Withheld { get; init; }
+
+    /// <summary>
+    /// How many extra bits are shown that are ALWAYS ONE and mean nothing.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 51: A CODE LIVE IN EVERY MOMENT SEPARATES NOTHING, AND NO WORLD HERE HAD
+    /// ONE.</b> Every multiplexer code is a (position, value) pair present about half the
+    /// time, so background — the thing that is simply always there — could not be studied
+    /// on the world where everything else is exactly known.
+    /// </para>
+    /// <para>
+    /// <b>WHAT THE LEARNER DOES WITH IT IS NOT THIS FILE'S BUSINESS, AND THE WORLD'S JOB
+    /// IS ONLY TO POSE IT.</b> A code present in every moment is present in every hit and
+    /// every miss alike, so any statistic asking what SEPARATES the two has nothing to
+    /// find in it — and whether anything downstream exploits that, or pays for the code
+    /// anyway in candidates and in stored counts, is exactly what this dial is for
+    /// measuring rather than for asserting.
+    /// </para>
+    /// <para>
+    /// <b>Always one rather than randomly constant, so the answer key is untouched.</b>
+    /// The function ignores these bits entirely, so a scope's soundness is decided the
+    /// same way whether they are enumerated or not — they add candidates and entries and
+    /// no information, which is precisely the thing being measured.
+    /// </para>
+    /// </remarks>
+    public int Clutter { get; init; }
 }
 
 /// <summary>One round: what was shown, and what should follow it.</summary>
@@ -241,8 +268,11 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Switch);
 
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(
-            settings.Withheld, 1 << (settings.Address + (1 << settings.Address)));
+        ArgumentOutOfRangeException.ThrowIfNegative(settings.Clutter);
+
+        var assignments = 1 << (settings.Address + (1 << settings.Address));
+
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(settings.Withheld, assignments);
 
         _settings = settings;
         _rng = new Random(seed);
@@ -252,8 +282,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
         // the generator consumed identically to before this existed.
         _kept = settings.Withheld == 0
             ? null
-            : [.. Enumerable.Range(0, 1 << (settings.Address + (1 << settings.Address)))
-                .Take((1 << (settings.Address + (1 << settings.Address))) - settings.Withheld)];
+            : [.. Enumerable.Range(0, assignments - settings.Withheld)];
 
         // THE FIRST MAPPING IS THE IDENTITY WHATEVER `Switch` SAYS, so a run that
         // never switches is exactly the published world and its numbers stay
@@ -264,8 +293,19 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
     /// <summary>How many data bits there are.</summary>
     public int Data => 1 << _settings.Address;
 
-    /// <summary>How many bits are shown in one round.</summary>
-    public int Bits => _settings.Address + Data;
+    /// <summary>
+    /// How many bits actually carry the function, which is what an assignment is.
+    /// </summary>
+    /// <remarks>
+    /// <b>SEPARATE FROM <see cref="Bits"/> SO CLUTTER AND WITHHOLDING STAY
+    /// ORTHOGONAL.</b> A withheld assignment is a setting of the bits that MATTER;
+    /// counting the always-one ones into it would make almost every assignment
+    /// unreachable and the held-out set mostly fiction.
+    /// </remarks>
+    public int Informative => _settings.Address + Data;
+
+    /// <summary>How many bits are shown in one round, clutter included.</summary>
+    public int Bits => Informative + _settings.Clutter;
 
     /// <summary>What a blind guess scores.</summary>
     /// <remarks>
@@ -304,7 +344,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
         {
             if (_settings.Withheld == 0) return [];
 
-            var total = 1 << Bits;
+            var total = 1 << Informative;
 
             return
             [
@@ -327,23 +367,31 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
         }
     }
 
-    /// <summary>One assignment as a whole number, most significant bit first.</summary>
-    private static int Assignment(int[] bits)
+    /// <summary>
+    /// The informative bits as one whole number, most significant first.
+    /// </summary>
+    /// <remarks>
+    /// <b>Clutter is not part of an assignment</b>, being the same in every one of them.
+    /// </remarks>
+    private int Assignment(int[] bits)
     {
         var packed = 0;
-        foreach (var bit in bits) packed = (packed << 1) | bit;
+        for (var which = 0; which < Informative; which++) packed = (packed << 1) | bits[which];
         return packed;
     }
 
-    /// <summary>The inverse of <see cref="Assignment"/>.</summary>
+    /// <summary>The inverse of <see cref="Assignment"/>, with the clutter put back.</summary>
     private int[] Spread(int assignment)
     {
         var bits = new int[Bits];
-        for (var which = Bits - 1; which >= 0; which--)
+
+        for (var which = Informative - 1; which >= 0; which--)
         {
             bits[which] = assignment & 1;
             assignment >>= 1;
         }
+
+        for (var which = Informative; which < Bits; which++) bits[which] = 1;
 
         return bits;
     }
@@ -369,7 +417,11 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
         // rejects, so the generator is consumed exactly as it always was.
         do
         {
-            for (var which = 0; which < bits.Length; which++) bits[which] = _rng.Next(2);
+            // THE INFORMATIVE BITS ARE DRAWN AND THE CLUTTER IS NOT, so a clutter dial
+            // takes nothing from the generator and a run with none is bit-for-bit the run
+            // that existed before the dial did.
+            for (var which = 0; which < Informative; which++) bits[which] = _rng.Next(2);
+            for (var which = Informative; which < bits.Length; which++) bits[which] = 1;
         }
         while (_kept is not null && !_kept.Contains(Assignment(bits)));
 

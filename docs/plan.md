@@ -107,6 +107,26 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   that constraint exists for is untested and `Abstain` cannot fire. Fork 52.
 - **Distance costs the DEPTH of a thought, measured.** A round costs about four and a half
   times the per-hop delay, so a LAN is comfortable and the internet is a slower experiment.
+- **THE VOTE SPLITS EXACTLY, so fork 52's arithmetic half is closed.** `Speak` emits what a
+  holder claims and `Decide` merges any number of those; a commitment never crosses.
+- **And the transport half is untouched** — nothing is late and nothing dies in any of it,
+  so a green split says nothing whatever about C2 or C3.
+- **WHAT BREAKS IS EVERY STATISTIC THAT IS POPULATION-WIDE**, and each mechanism was local
+  or not by accident rather than by decision.
+- **Rung five loses the power to CERTIFY a redundancy and goes silent**; its evidence is
+  the population and the population is what gets split.
+- **`Mending.Uncovered` loses the evidence to REFUSE a repair and over-fires**, which is
+  the same cause failing in the opposite direction.
+- **A COUNT MERGES AND A STRUCTURE DOES NOT, which is the line between the two fixes.**
+  `Recurrence` ships frequencies and recovers rung five exactly; `Narrows` has nothing to
+  add up and wants a round trip.
+- **Repair's own choice of condition survives splitting untouched**, being per-commitment —
+  so *decide local* is doing exactly what it was written to do.
+- **JOHN'S SPECULATION PROPOSAL, AND IT IS EARLY RATHER THAN WRONG.** Every node predicts
+  its own output at once while the real wave verifies behind it, which is lossless where a
+  learned short-circuit is not.
+- **Its depth to save is not there yet** — the distributed vote is one scatter-gather, so
+  this lands when fork 32's entailment cap comes off and not before.
 - **The two-learner head-to-head is a side quest and blocks nothing**, being cheap now
   that both are co-resident.
 - **Resist polishing step one.** It is the least informative part when it passes.
@@ -519,6 +539,12 @@ change of architecture entirely.
 - **AN ANSWER KEY IN THE WRONG ALPHABET SCORES NOUGHT AND LOOKS LIKE A VERDICT.** A key
   expecting a code the population can never hold reports no rule true, which reads
   exactly like a learner holding none.
+- **A MECHANISM IS LOCAL OR POPULATION-WIDE BY ACCIDENT UNTIL SOMETHING SPLITS IT**, and
+  nothing in one process can tell the two apart. Both halves of the ladder read the whole
+  population and neither said so anywhere.
+- **AND A TIE-BREAK BY DICTIONARY WALK IS STABLE UNTIL THERE ARE TWO TABLES.** `Shared`
+  resolved equal candidates by whichever its table reached first — reproducible in one
+  process, arbitrary across a merge. Fork 12 by a new door.
 
 ---
 
@@ -539,6 +565,9 @@ change of architecture entirely.
 - **`Abstain` IS UNARMED IN ANY RUN.** Nothing in one process can die, so C3's third
   outcome is exercised only by unit tests. It reads zero for the same reason a check
   reads zero when it cannot fire.
+- **AND SPLITTING THE VOTE DID NOT ARM IT.** Losing a holder changes an answer and never
+  silences one, because something else always advocates — the third outcome needs a death
+  taking the LAST advocate.
 - **THE CENTRAL BET IS REFUTED ON THE ONLY WORLD BUILT TO TEST IT**, with a control in
   every cell of the grid. `EncodedTests` holds it and the commit records the numbers.
 - **THE FRONT END IS THE CEILING AND THE LEARNER IS NOT — ON CIFAR.** Changing only the
@@ -643,7 +672,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | | |
 |---|---|
 | **1** | The distributed rendezvous. Open, and now the thing in the way: `Posted` carries the THINKING path between machines, and `LocalRendezvous` writes edges straight into locally-held clusters, so a machine can think across a wire and cannot learn across one |
-| **3** | Cluster placement: uniform hash against prefix locality. Open, and load-bearing now rather than theoretical — the ring decides who holds a code, so two machines that disagree about it route to different places |
+| **3** | Cluster placement: uniform hash against prefix locality. Open, with a measured case — a uniform ring separates a child from its parent, which is the pair `Mending.Uncovered` compares. Prefix placement recovers much of it at unmeasured cost in load |
 | **5** | A death writes off routes into the dead cluster. Closed |
 | **6** | Broadcast the origin, route the hops. Closed |
 | **11** | A finished thought is published and routed by code, so N actuators act on one broadcast. Closed |
@@ -681,5 +710,9 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **49** | Matching and settling are nine tenths of the clock on a narrow world whose table never grows. Where do they go on a WIDE one, and is it the memory or the search that ends the run? Open |
 | **50** | `Monk`'s second puzzle admits no sound conjunction saying YES short of a whole instance. Which rung does that demand — a count, a negation, or a disjunction — and does the failure distinguish them? Open |
 | **51** | Genesis no longer roots on a code that has never varied. What is left is the TALLY: an always-present code is still an entry in every commitment's table forever, and background still roughly doubles it |
-| **52** | The commitment learner runs in one process, so C1 is kept by convention and C3's third outcome cannot fire. What does putting the vote on the wire cost in agreement-with-itself, against the in-process arm as control? Open |
+| **52** | The commitment learner runs in one process, so C1 is kept by convention. Half closed: the vote's arithmetic composes across holders, exactly under `Strongest`. The transport half is open — nothing has been late or died |
+| **54** | Naming is deterministic in the evidence, so two holders converge on identical streams and diverge on disjoint ones. The deployment case is neither — overlapping but not identical — and it decides whether rung five needs the wire. Open |
+| **55** | `Mending.Uncovered` over-fires under sharding at a measured rate. Whether over-repairing COSTS anything is not measured, and a gate wrong harmlessly is a different problem from one wrong expensively. Open |
+| **56** | *Does anybody hold a strict specialisation of this scope* is a boolean, so asking keeps C1 where reading would not. What the query costs per candidate per round is unasked. Open |
+| **57** | Every node predicts its own output while the real wave verifies behind it — speculation with a verification pass, lossless where a learned short-circuit is not. Nothing to buy until fork 32's cap comes off. Open |
 | **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |

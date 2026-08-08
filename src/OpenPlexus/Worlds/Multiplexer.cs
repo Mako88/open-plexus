@@ -35,6 +35,27 @@ public sealed record MultiplexerSettings
     /// earning its keep here or earning it nowhere.
     /// </remarks>
     public int Switch { get; init; }
+
+    /// <summary>
+    /// How many of the <c>2^Bits</c> assignments are never drawn.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>FORK 48: THE ONE WORLD WHERE DEPTH IS GENUINELY NEEDED WITHHELD NOTHING, so
+    /// every instrument that wants a held-out set was blind exactly where it was most
+    /// wanted.</b> A generated world can hold assignments back and the learner cannot
+    /// tell, because there is no boundary to notice — the world simply never emits them,
+    /// which is what C4 asks and what a train-then-test split is not.
+    /// </para>
+    /// <para>
+    /// <b>TAKEN FROM THE END OF THE ASSIGNMENT ORDER, so the split is a position rather
+    /// than a sample</b> — <see cref="Cifar"/> and <see cref="Monk"/> both do this, and
+    /// for the reason those give: a held-out set chosen by the world's own generator
+    /// moves with the seed, and two seeds are then scored against two different
+    /// questions.
+    /// </para>
+    /// </remarks>
+    public int Withheld { get; init; }
 }
 
 /// <summary>One round: what was shown, and what should follow it.</summary>
@@ -152,7 +173,7 @@ public readonly record struct Truth
 /// must never be written up as though it were.
 /// </para>
 /// </remarks>
-public sealed class Multiplexer : IWorld<IReadOnlyList<int>>
+public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOnlyList<int>>
 {
     /// <inheritdoc/>
     public int Outcomes => 2;
@@ -197,6 +218,7 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>
 
     private readonly MultiplexerSettings _settings;
     private readonly Random _rng;
+    private readonly HashSet<int>? _kept;
 
     /// <summary>Which data bit each address value selects.</summary>
     private int[] _selects;
@@ -218,8 +240,20 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>
         ArgumentOutOfRangeException.ThrowIfGreaterThan(settings.Noise, 1.0);
         ArgumentOutOfRangeException.ThrowIfNegative(settings.Switch);
 
+        ArgumentOutOfRangeException.ThrowIfNegative(settings.Withheld);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(
+            settings.Withheld, 1 << (settings.Address + (1 << settings.Address)));
+
         _settings = settings;
         _rng = new Random(seed);
+
+        // NULL RATHER THAN A FULL SET WHEN NOTHING IS HELD BACK, so the draw's rejection
+        // test is skipped entirely rather than merely always passing. That is what keeps
+        // the generator consumed identically to before this existed.
+        _kept = settings.Withheld == 0
+            ? null
+            : [.. Enumerable.Range(0, 1 << (settings.Address + (1 << settings.Address)))
+                .Take((1 << (settings.Address + (1 << settings.Address))) - settings.Withheld)];
 
         // THE FIRST MAPPING IS THE IDENTITY WHATEVER `Switch` SAYS, so a run that
         // never switches is exactly the published world and its numbers stay
@@ -241,6 +275,79 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>
     /// </remarks>
     public static double Chance => 0.5;
 
+    /// <summary>
+    /// The assignments this world never draws, with what the function says about each.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE INSTRUMENT FORK 48 WAS ABOUT, AND THE MULTIPLEXER IS THE WORLD THAT NEEDED
+    /// IT MOST.</b> Depth is genuinely required here — a rule shorter than the address
+    /// plus one is unsound — so this is where a held-out score can say something no other
+    /// generated world can, and it was the one world that held nothing back.
+    /// </para>
+    /// <para>
+    /// <b>IT READS THE CURRENT MAPPING, exactly as <see cref="Truths"/> does.</b> On a
+    /// switching run the answer to a withheld assignment moves with the target, and
+    /// scoring against the answer it had at the start would measure the switch.
+    /// </para>
+    /// <para>
+    /// <b>AND IT CARRIES <see cref="Round.Answer"/> RATHER THAN THE EMITTED OUTCOME.</b>
+    /// Noise flips what a learner is TOLD, and nothing here is ever told to anyone — an
+    /// examination asks what the population would say about a case the world kept, so the
+    /// thing to mark it against is what the function says rather than what a lie would
+    /// have said.
+    /// </para>
+    /// </remarks>
+    public IReadOnlyList<Turn<IReadOnlyList<int>>> Withheld
+    {
+        get
+        {
+            if (_settings.Withheld == 0) return [];
+
+            var total = 1 << Bits;
+
+            return
+            [
+                .. Enumerable.Range(total - _settings.Withheld, _settings.Withheld)
+                    .Select(assignment =>
+                    {
+                        var bits = Spread(assignment);
+
+                        var address = 0;
+                        for (var which = 0; which < _settings.Address; which++)
+                            address = (address << 1) | bits[which];
+
+                        return new Turn<IReadOnlyList<int>>
+                        {
+                            Seen = bits,
+                            Outcome = bits[_settings.Address + _selects[address]],
+                        };
+                    }),
+            ];
+        }
+    }
+
+    /// <summary>One assignment as a whole number, most significant bit first.</summary>
+    private static int Assignment(int[] bits)
+    {
+        var packed = 0;
+        foreach (var bit in bits) packed = (packed << 1) | bit;
+        return packed;
+    }
+
+    /// <summary>The inverse of <see cref="Assignment"/>.</summary>
+    private int[] Spread(int assignment)
+    {
+        var bits = new int[Bits];
+        for (var which = Bits - 1; which >= 0; which--)
+        {
+            bits[which] = assignment & 1;
+            assignment >>= 1;
+        }
+
+        return bits;
+    }
+
     /// <summary>One round of the world.</summary>
     public Round Next()
     {
@@ -253,7 +360,18 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>
         _rounds++;
 
         var bits = new int[Bits];
-        for (var which = 0; which < bits.Length; which++) bits[which] = _rng.Next(2);
+
+        // DRAWN AND REDRAWN RATHER THAN PICKED FROM WHAT IS LEFT, AND THAT IS THE ONLY
+        // SHAPE THAT KEEPS EVERY NUMBER THIS WORLD HAS EVER PRODUCED. Picking an index
+        // out of the allowed assignments would take ONE draw from the generator where
+        // this takes `Bits` of them, so the whole stream shifts and no measurement taken
+        // before today stays comparable. With nothing withheld the loop below never
+        // rejects, so the generator is consumed exactly as it always was.
+        do
+        {
+            for (var which = 0; which < bits.Length; which++) bits[which] = _rng.Next(2);
+        }
+        while (_kept is not null && !_kept.Contains(Assignment(bits)));
 
         var address = 0;
         for (var which = 0; which < _settings.Address; which++)

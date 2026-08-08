@@ -137,4 +137,100 @@ public sealed class WithheldTests(ITestOutputHelper output)
 
         Assert.Null(run.Run(rounds: 2000, sweep: 500, target: 0.9, window: 500).Unseen);
     }
+
+    /// <summary>
+    /// <b>AND A WORLD THAT CAN WITHHOLD WHILE WITHHOLDING NOTHING REPORTS THE SAME.</b>
+    /// </summary>
+    /// <remarks>
+    /// The distinction above used to be carried by the interface alone — a world either
+    /// held things back or did not implement <c>IWithholds</c> — and that stopped being
+    /// true the moment the multiplexer gained a dial for it. An examination of an empty
+    /// set answers nothing, so every count is nought and the accuracy with them, which
+    /// reads as a population generalising to NOTHING rather than as a question nobody
+    /// asked.
+    /// </remarks>
+    [Fact]
+    public void A_world_that_could_withhold_and_does_not_reports_nothing_either()
+    {
+        var run = new MultiplexerRun(
+            new MultiplexerSettings { Address = 2 },
+            new Brain(new CommittingSettings(), 1),
+            seed: 1);
+
+        Assert.Null(run.Run(rounds: 2000, sweep: 500, target: 0.9, window: 500).Tally.Unseen);
+    }
+
+    /// <summary>
+    /// <b>FORK 48: THE ONE WORLD WHERE DEPTH IS NEEDED CAN HOLD SOMETHING BACK NOW.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A generated world can withhold without the learner being able to tell, because
+    /// there is no boundary to notice — the world simply never emits those assignments,
+    /// which is what C4 asks of the MACHINE and says nothing about the experimenter.
+    /// </para>
+    /// <para>
+    /// <b>The assertion is that the instrument exists and is not blind</b>, not what it
+    /// reads. A bar written before the first run is a prediction dressed as a check.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_multiplexer_can_hold_assignments_back_and_be_examined_on_them()
+    {
+        var run = new MultiplexerRun(
+            new MultiplexerSettings { Address = 2, Withheld = 16 },
+            new Brain(new CommittingSettings(), 1),
+            seed: 1);
+
+        var got = run.Run(rounds: 20_000);
+        var unseen = got.Tally.Unseen;
+
+        Assert.NotNull(unseen);
+
+        output.WriteLine(
+            $"drawn {got.Recent:F3} · withheld {unseen.Accuracy:F3} over {unseen.Asked} "
+            + $"assignments, silent {unseen.Silence:F3}, {unseen.Deciders} deciders");
+
+        Assert.Equal(16, unseen.Asked);
+
+        // THE INSTRUMENT IS ARMED RATHER THAN MERELY PRESENT. An examination that answers
+        // nothing reports nought and looks exactly like a learner that generalises to
+        // nothing, which is the trap the test above is about.
+        Assert.True(unseen.Answered > 0, "the examination answered nothing at all");
+    }
+
+    /// <summary>
+    /// <b>AND WHAT IS WITHHELD IS GENUINELY NEVER DRAWN.</b>
+    /// </summary>
+    /// <remarks>
+    /// The draw rejects and redraws rather than picking out of what is left, because
+    /// choosing an index would take one number from the generator where the bit-by-bit
+    /// draw takes several — so every measurement this world has ever produced would shift
+    /// under a dial that was supposed to be off. This is the half that says the rejection
+    /// actually rejects.
+    /// </remarks>
+    [Fact]
+    public void The_withheld_assignments_are_never_drawn_however_long_it_runs()
+    {
+        var world = new Multiplexer(
+            new MultiplexerSettings { Address = 2, Withheld = 16 }, seed: 4);
+
+        var held = new Multiplexer(new MultiplexerSettings { Address = 2, Withheld = 16 }, seed: 4)
+            .Withheld
+            .Select(one => string.Join(",", one.Seen))
+            .ToHashSet(StringComparer.Ordinal);
+
+        Assert.Equal(16, held.Count);
+
+        for (var draw = 0; draw < 20_000; draw++)
+        {
+            var shown = world.Next();
+
+            var bits = string.Join(",", shown.Cues
+                .OrderBy(code => Bits.Position(code))
+                .Select(code => Bits.Value(code)));
+
+            Assert.DoesNotContain(bits, held);
+        }
+    }
 }

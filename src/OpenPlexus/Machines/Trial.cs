@@ -46,12 +46,13 @@ public sealed record Examined
     /// say the remaining gap is about which rule WINS rather than about which are held.
     /// </remarks>
     /// <remarks>
-    /// <b>AND IT CAN ONLY EVER BE READ ON A WORLD THAT WITHHOLDS, WHICH IS A LIMIT ON THE
-    /// FINDING AND NOT A DETAIL.</b> A generated world holds nothing back, so
-    /// <c>Trial.Examine</c> returns nothing and this is unmeasurable on the multiplexer —
-    /// the one world where depth is genuinely needed, and therefore the one where a
-    /// handful of deciders would mean something different. <i>A finding on one world is a
-    /// finding about one world</i>, and this is currently that.
+    /// <b>AND IT COULD ONLY EVER BE READ ON A WORLD THAT WITHHOLDS, WHICH WAS A LIMIT ON
+    /// THE FINDING AND NOT A DETAIL.</b> A generated world held nothing back, so this was
+    /// unmeasurable on the multiplexer — the one world where depth is genuinely needed,
+    /// and therefore the one where a handful of deciders would mean something different.
+    /// <b>Fork 48 closed that: <see cref="Worlds.MultiplexerSettings.Withheld"/> keeps
+    /// assignments the world never draws</b>, so the reading exists on both kinds of
+    /// world now and <i>a finding on one world</i> need no longer be all this is.
     /// </remarks>
     public required int Deciders { get; init; }
 
@@ -342,6 +343,16 @@ public sealed class Trial<TSeen>
     public Examined? Examine()
     {
         if (_world is not IWithholds<TSeen> withholding) return null;
+
+        // AND A WORLD THAT CAN WITHHOLD BUT IS NOT WITHHOLDING REPORTS ABSENT RATHER THAN
+        // NOUGHT, WHICH IS THE SAME DISTINCTION ONE LAYER IN. It used to be carried by the
+        // interface alone — a world either held things back or did not implement this —
+        // and that stopped being true the moment `Multiplexer` gained a dial for it. An
+        // empty examination answers nothing, so every count is nought and the accuracy
+        // with them, which reads as a population that generalises to NOTHING rather than
+        // as a question nobody asked. `WithheldTests` names that trap and this is where it
+        // would have arrived from.
+        if (withholding.Withheld.Count == 0) return null;
 
         var held = _brain.Held;
 

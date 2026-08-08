@@ -22,8 +22,12 @@ namespace OpenPlexus.Tests;
 /// <b><see cref="Mending.Neglected"/> IS THE CELL THAT SEPARATES THEM AND HAS NEVER BEEN
 /// READ AS ONE.</b> It waits for the failure like <c>Outvoted</c> and takes the gate like
 /// <c>Uncovered</c>, so <c>Outvoted</c> against it isolates the GATE and it against
-/// <c>Uncovered</c> isolates WHEN. The fourth cell — every round with no gate — does not
-/// exist as a setting, and this file does not add one.
+/// <c>Uncovered</c> isolates WHEN. The fourth cell — every round with no gate — is not a
+/// setting today and WAS one: <c>Mending.Earned</c> sat exactly there, before the failure
+/// return, and its revival row records that <c>Uncovered</c> dominated it — <i>the same
+/// rule with the redundant repairs removed</i>, which is this axis under the mechanism's
+/// own vocabulary. So the gate helps every round and hurts after a failure, and the sign of
+/// a mechanism depends on the budget beside it.
 /// </para>
 /// <para>
 /// <b>AND THE REASON TO ASK NOW IS THAT THE GATE TURNED OUT TO BE NEARLY INERT
@@ -59,7 +63,8 @@ public sealed class MendingTests(ITestOutputHelper output)
     }
 
     /// <summary>Every arm on one metric, in the order that makes the axes readable.</summary>
-    /// <param name="metric">What to pull out of a run.</param>
+    /// <param name="seeds">How many seeds each arm is run over.</param>
+    /// <param name="of">What one arm on one seed is worth — the run and the metric together.</param>
     /// <remarks>
     /// <b>ORDERED SO EACH ROW DIFFERS FROM THE ONE ABOVE IT IN EXACTLY ONE THING.</b>
     /// <c>Outvoted</c> to <c>Neglected</c> adds the gate; <c>Neglected</c> to
@@ -68,12 +73,13 @@ public sealed class MendingTests(ITestOutputHelper output)
     /// against the first row, so the reading is cumulative and the differences between
     /// adjacent rows are what the axes cost.
     /// </remarks>
-    private Task<IReadOnlyList<Measured>> Across(Func<Learned, double> metric) =>
-        Sweep.AcrossAsync(Seeds,
-            ("after failure, no gate", seed => Task.FromResult(metric(Run(Mending.Outvoted, seed)))),
-            ("after failure, gate", seed => Task.FromResult(metric(Run(Mending.Neglected, seed)))),
-            ("every round, gate", seed => Task.FromResult(metric(Run(Mending.Uncovered, seed)))),
-            ("every round, gate, paid", seed => Task.FromResult(metric(Run(Mending.Improving, seed)))));
+    private static Task<IReadOnlyList<Measured>> Across(
+        int seeds, Func<Mending, int, double> of) =>
+        Sweep.AcrossAsync(seeds,
+            ("after failure, no gate", seed => Task.FromResult(of(Mending.Outvoted, seed))),
+            ("after failure, gate", seed => Task.FromResult(of(Mending.Neglected, seed))),
+            ("every round, gate", seed => Task.FromResult(of(Mending.Uncovered, seed))),
+            ("every round, gate, paid", seed => Task.FromResult(of(Mending.Improving, seed))));
 
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
@@ -88,7 +94,7 @@ public sealed class MendingTests(ITestOutputHelper output)
         })
         {
             output.WriteLine(name);
-            output.WriteLine(Sweep.Table(await Across(metric)));
+            output.WriteLine(Sweep.Table(await Across(Seeds, (arm, seed) => metric(Run(arm, seed)))));
         }
 
         // THE ONE ASSERTION, AND IT IS THAT THE TWO AXES ARE NOT THE SAME AXIS. If adding
@@ -96,7 +102,7 @@ public sealed class MendingTests(ITestOutputHelper output)
         // then `Mending` really is a list and this file is measuring one thing twice --
         // which would be worth knowing and is the only outcome that makes the decomposition
         // pointless.
-        var repaired = await Across(one => one.Repaired);
+        var repaired = await Across(Seeds, (arm, seed) => Run(arm, seed).Repaired);
 
         Assert.True(
             Math.Abs(repaired[1].Mean - repaired[0].Mean) > 0.0
@@ -109,5 +115,63 @@ public sealed class MendingTests(ITestOutputHelper output)
         // fact about a world; what this asks is only which HALF of the setting the
         // difference lives in, and a threshold would be a prediction dressed as a
         // requirement.
+    }
+
+    /// <summary>Four, because a scene world costs an order more than a bit world.</summary>
+    private const int SceneSeeds = 4;
+
+    private readonly Dictionary<(Mending Arm, int Seed), Grounded> _arranged = [];
+
+    private Grounded OnArranged(Mending arm, int seed)
+    {
+        if (_arranged.TryGetValue((arm, seed), out var already)) return already;
+
+        var got = new ArrangedRun(
+            new ArrangedSettings { Side = 3, Cell = 3, Clutter = 1, Hold = 4 },
+            new Brain(new CommittingSettings { Mending = arm }, seed),
+            Looking.Whole,
+            seed).Run(Rounds);
+
+        _arranged[(arm, seed)] = got;
+
+        return got;
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public async Task And_which_half_makes_the_setting_ruinous_on_the_other_world()
+    {
+        // A HYPOTHESIS UNDER TEST RATHER THAN A SWEEP FOR ITS OWN SAKE. `Mending.Uncovered`
+        // is recorded as ruinous on `Arranged`, and `GateCostTests` shows the gate nearly
+        // inert there -- so if that verdict is real it has to be the every-round half doing
+        // it, and the two after-failure rows should land together while the two every-round
+        // rows land together somewhere else.
+        //
+        // AND THE PREDICTION IS NOT IN AN ASSERTION, for the reason this suite has already
+        // paid for once: a check that encodes a guess fails identically whether the wiring
+        // is broken or the guess is backwards.
+        foreach (var (name, metric) in new (string, Func<Grounded, double>)[]
+        {
+            ("withheld accuracy", one => one.Tally.Unseen?.Accuracy ?? 0.0),
+            ("sound rules", one => one.Rules.Sound),
+            ("children minted by repair", one => one.Tally.Repaired),
+        })
+        {
+            output.WriteLine(name);
+            output.WriteLine(Sweep.Table(
+                await Across(SceneSeeds, (arm, seed) => metric(OnArranged(arm, seed)))));
+        }
+
+        // THE INSTRUMENT CHECK, AND IT IS ABOUT THE WITHHELD SET EXISTING. Every row above
+        // reads a nullable, so a world that withheld nothing would print four zeroes and
+        // agree with itself perfectly.
+        var withheld = await Across(
+            SceneSeeds, (arm, seed) => OnArranged(arm, seed).Tally.Unseen?.Accuracy ?? 0.0);
+
+        Assert.True(withheld[0].Mean > 0.0,
+            "no withheld score came back, so every arm is a default and the grid is empty");
+
+        // FOUR SEEDS RESOLVES A DIRECTION AND NOT A SEPARATION, so nothing here may be
+        // reported as a cost -- only as which rows landed together.
     }
 }

@@ -504,6 +504,9 @@ change of architecture entirely.
 - **AND A SETTING CAN DECIDE TWO INDEPENDENT THINGS WHILE BEING NAMED FOR ONE**, so every
   comparison against it moves both axes. The cell that separates them may already exist
   and never have been read as a control.
+- **READ THE REVIVAL ROWS BEFORE PROPOSING A MISSING ARM.** `Mending`'s fourth cell was
+  called absent here while its own row said *ignoring children* — the same axis in the
+  mechanism's words rather than the comparison's, which is how a search misses it.
 - **A small sample can look like a mechanism, AND IT HIDES A REAL EFFECT TOO.** Count
   seeds in both directions.
 - **A number in a commit message is a claim, not a record.**
@@ -751,5 +754,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **55** | Whether a blinded repair gate costs anything. Answered on the multiplexer: children minted separates decisively over twelve seeds, and accuracy, residents and sound rules all move the same way at two standard errors. Open on any other world |
 | **56** | What the repair gate's query costs on a wire. Priced: about nine asks a round, all askable at once, so one round trip. The structural cache removes a sixth. Open on building it |
 | **57** | Every node predicts its own output while the real wave verifies behind it, lossless where a learned short-circuit is not. The repair gate's query is where it first fits: a boolean usually answered no, and being wrong costs a rule. Open |
-| **58** | `Mending`'s two-by-two has three cells; every-round-with-no-gate is not a setting. Completing it is a decision about the machine rather than a measurement, and without it the interaction is a reading and not a result. Open |
+| **58** | The gate's sign flips with the timing: after a failure it is far worse than none, and every round `Uncovered` beat `Earned`. Two cells measured here, two in the revival rows. Open on any other world |
 | **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |

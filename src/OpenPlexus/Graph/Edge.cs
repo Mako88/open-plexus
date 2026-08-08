@@ -50,6 +50,24 @@ public readonly record struct Kind : IComparable<Kind>
     private Kind(ulong name) => _name = name;
 
     /// <summary>
+    /// The agreed name, for the wire and for nothing else.
+    /// </summary>
+    /// <remarks>
+    /// <b>INTERNAL BECAUSE A RELATION IS NAMED BY <see cref="Of"/> AND NOWHERE ELSE.</b>
+    /// The identity is the string every machine agrees on; a public way in from a raw
+    /// number would let a relation be minted that no machine could have named, which is
+    /// the interning-table fault this type exists to avoid. <see cref="Bus.Wire"/> needs
+    /// the number because a struct whose whole state is private serialises to nothing at
+    /// all — and would arrive as <see langword="default"/>, silently, on every message
+    /// carrying one.
+    /// </remarks>
+    internal ulong Name => _name;
+
+    /// <summary>The inverse of <see cref="Name"/>, for the wire and for nothing else.</summary>
+    /// <param name="name">A name that some machine produced with <see cref="Of"/>.</param>
+    internal static Kind From(ulong name) => new(name);
+
+    /// <summary>
     /// An arbitrary but STABLE order over relations.
     /// </summary>
     /// <remarks>

@@ -56,20 +56,6 @@ public sealed record Examined
     /// </remarks>
     public required int Deciders { get; init; }
 
-    /// <summary>
-    /// How many were right when each seat is handed back to a general rule that has not
-    /// been beaten off it.
-    /// </summary>
-    /// <remarks>
-    /// <b>THE SAME POPULATION READ TWICE, WHICH IS WHAT THE REFUTED ARM COULD NOT BE.</b>
-    /// Making the vote defer DURING a run changes what is learnt as well as what is said,
-    /// because covering and repair both feed on the vote being wrong — so it mints
-    /// hundreds more commitments and the score it reports is of a different machine.
-    /// Against <see cref="Right"/> on one trained population, this is the readout on its
-    /// own, and the difference is fork 46's remaining question.
-    /// </remarks>
-    public required int Handed { get; init; }
-
     /// <summary>The share of answered predictions that were right.</summary>
     public double Accuracy => Answered == 0 ? 0.0 : Right / (double)Answered;
 
@@ -374,7 +360,6 @@ public sealed class Trial<TSeen>
 
         var answered = 0;
         var right = 0;
-        var handed = 0;
         var deciders = new HashSet<Code>();
 
         // AND A WITHHELD OBSERVATION WITH NO OUTCOME IS NOT ASKED AT ALL, because there is
@@ -396,12 +381,7 @@ public sealed class Trial<TSeen>
 
             answered++;
             if (vote.By is { } by) deciders.Add(by);
-            var outcome = Brain.Says(turn.Outcome!.Value);
-
-            if (said == outcome) right++;
-
-            // THE SECOND READING OF THE SAME FIRING SET, and it teaches nothing either.
-            if (held.Deferred(firing).Expects == outcome) handed++;
+            if (said == Brain.Says(turn.Outcome!.Value)) right++;
         }
 
         return new Examined
@@ -410,7 +390,6 @@ public sealed class Trial<TSeen>
             Answered = answered,
             Right = right,
             Deciders = deciders.Count,
-            Handed = handed,
         };
     }
 }

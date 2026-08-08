@@ -51,6 +51,61 @@ public readonly record struct Vote
     public Code? By { get; init; }
 }
 
+/// <summary>One expectation's case, as the holder that made it would put it.</summary>
+/// <remarks>
+/// <b>THIS IS WHAT C1 ALLOWS TO CROSS AND THE COMMITMENT ITSELF IS NOT.</b> The plan says
+/// a commitment records its OWN hits and misses and TELLS anyone who needs them at the
+/// moment it speaks — so what travels is an expectation, a weight already computed from
+/// the speaker's own accuracy, and the name of its best advocate. A reader learns what is
+/// claimed and never what the claimant is made of.
+/// </remarks>
+public readonly record struct Advocacy
+{
+    /// <summary>What is expected to follow.</summary>
+    public required Code Expects { get; init; }
+
+    /// <summary>What the holder's own commitments put behind it.</summary>
+    public required double Weight { get; init; }
+
+    /// <summary>The strongest single commitment behind it, by identity.</summary>
+    public required Code By { get; init; }
+}
+
+/// <summary>
+/// Everything one holder has to say about a moment — <b>the wire payload of a vote.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>THE VOTE IS A FOLD AND ITS AGGREGATION IS ASSOCIATIVE, WHICH IS WHY THIS TYPE CAN
+/// EXIST AT ALL.</b> The vote keyed weights by expectation and
+/// combined them with a maximum or a sum; both compose in any order, so a holder can
+/// combine its own commitments first and a reader can combine the results. That is not a
+/// property this design was given — it is one it turned out to have, and fork 52 is
+/// cheap because of it. See <see cref="Population.Speak"/> and
+/// <see cref="Population.Decide"/>, which are the two halves it splits into.
+/// </para>
+/// <para>
+/// <b>AND ORDERED BY EXPECTATION, BECAUSE THE MERGE MUST NOT DEPEND ON WHO SPOKE
+/// FIRST.</b> Under C2 the partials arrive in whatever order the network chose. Fork 12
+/// has cost this project twice, and a vote that moved with delivery order would be the
+/// third time.
+/// </para>
+/// </remarks>
+public readonly record struct Testimony
+{
+    /// <summary>What the holder's commitments advocate, ordered by expectation.</summary>
+    public required ImmutableArray<Advocacy> Advocates { get; init; }
+
+    /// <summary>Nothing fired here, which is a real thing to say and not an absence.</summary>
+    /// <remarks>
+    /// <b>SILENCE AND ABSENCE ARE DIFFERENT AND C3 IS THE WHOLE REASON.</b> A holder that
+    /// answered with nothing has been heard from; a holder that died mid-vote has not, and
+    /// the merge may not treat them alike — one closes the count and the other is what
+    /// <c>Abstain</c> exists for.
+    /// </remarks>
+    public bool Silent => Advocates.IsDefaultOrEmpty;
+}
+
 /// <summary>
 /// Every commitment a machine holds, and the four things that happen to them.
 /// </summary>
@@ -235,9 +290,28 @@ public sealed class Population
     /// </remarks>
     public Vote Deferred(ImmutableArray<Commitment> firing) => Predict(firing, deferring: true);
 
-    private Vote Predict(ImmutableArray<Commitment> firing, bool deferring)
+    /// <summary>
+    /// What this holder's fired commitments have to say, with nothing of the commitments
+    /// in it — <b>the half of a vote that a machine may compute alone.</b>
+    /// </summary>
+    /// <param name="firing">What fired, from <see cref="Firing"/>.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>WEIGHTED BY ACCURACY AND NEVER BY HIT COUNT</b>, which is the
+    /// strength-versus-accuracy refutation and belongs here because here is where a
+    /// weight is made. A commitment right eight hundred times in sixteen hundred is not
+    /// better evidence than one right nine times in ten.
+    /// </para>
+    /// <para>
+    /// <b>AND THE POWER IS APPLIED BEFORE ANYTHING LEAVES.</b> <c>Sharpness</c> is a brain
+    /// dial, so raising accuracy to it is the speaker's business — shipping a raw accuracy
+    /// and letting the reader sharpen it would put one machine's dial on another machine's
+    /// arithmetic, and two holders that disagreed about it would be undetectable.
+    /// </para>
+    /// </remarks>
+    public Testimony Speak(ImmutableArray<Commitment> firing)
     {
-        if (firing.IsDefaultOrEmpty) return default;
+        if (firing.IsDefaultOrEmpty) return new Testimony { Advocates = [] };
 
         var weights = new Dictionary<Code, double>();
 
@@ -266,32 +340,101 @@ public sealed class Population
                     : weight;
         }
 
-        if (deferring)
-            foreach (var expects in weights.Keys.Order().ToList())
+        return new Testimony { Advocates = Spell(weights, loudest) };
+    }
+
+    /// <summary>Puts a weight table into the one order everything downstream assumes.</summary>
+    /// <param name="weights">Weight per expectation.</param>
+    /// <param name="loudest">Best advocate per expectation.</param>
+    private static ImmutableArray<Advocacy> Spell(
+        Dictionary<Code, double> weights,
+        Dictionary<Code, (double Weight, Code By)> loudest)
+    {
+        var advocates = ImmutableArray.CreateBuilder<Advocacy>(weights.Count);
+
+        foreach (var expects in weights.Keys.Order())
+            advocates.Add(new Advocacy
             {
-                var seat = _byName[loudest[expects].By];
+                Expects = expects,
+                Weight = weights[expects],
+                By = loudest[expects].By,
+            });
 
-                // THE SEAT CAN MOVE MORE THAN ONCE -- a grandparent takes it back from a
-                // parent that took it from a child -- and the loop is bounded by scope
-                // length, since every hand-back is strictly shorter.
-                for (var handed = true; handed;)
-                {
-                    handed = false;
+        return advocates.MoveToImmutable();
+    }
 
-                    foreach (var general in firing)
-                    {
-                        if (general.Expects != seat.Expects || !seat.Narrows(general)) continue;
-                        if (!Absorbs(general, seat)) continue;
+    /// <summary>
+    /// The vote, out of everything that was heard — <b>one holder or twenty, by the same
+    /// arithmetic.</b>
+    /// </summary>
+    /// <param name="heard">What each holder said. Order is not read.</param>
+    /// <param name="weighing">How advocates for one expectation combine.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>STATIC AND HOLDING NOTHING, BECAUSE THE MERGER IS NOT A PARTICIPANT.</b> Whoever
+    /// takes the vote may hold no commitments at all — an input machine asking a question
+    /// is the ordinary case — and a method that reached into a population to finish a vote
+    /// would make the asker a twenty-first voter without saying so.
+    /// </para>
+    /// <para>
+    /// <b>THE MERGE IS CANONICAL IN THE CONTRIBUTIONS AND NOT IN THE ARRIVALS.</b> Every
+    /// advocacy for one expectation is collected, then ordered by weight and identity
+    /// before anything is combined — so a partial that arrived last folds in exactly where
+    /// it would have folded in had it arrived first. C2 says the order is the network's
+    /// choice; fork 12 says a result that moves with a choice nobody made is a defect, and
+    /// it has been reopened twice already.
+    /// </para>
+    /// <para>
+    /// <b>AND UNDER <see cref="Weighing.Summing"/> A SHARDED VOTE IS STILL NOT BIT-IDENTICAL
+    /// TO A WHOLE ONE, WHICH ORDERING CANNOT FIX.</b> Floating-point addition is not
+    /// associative, and a holder has already summed its own advocates before the merge sees
+    /// them — so <c>(a+b)+c</c> and <c>a+(b+c)</c> are what the two arrangements compute,
+    /// and they differ in the last bits. Under <see cref="Weighing.Strongest"/> the
+    /// aggregate is a maximum and the two are exactly equal. Said out loud because
+    /// <c>SplitTests</c> asserts the strong claim on one and the weak one on the other, and
+    /// a reader who found that asymmetry without this note would take it for an oversight.
+    /// </para>
+    /// </remarks>
+    public static Vote Decide(IReadOnlyCollection<Testimony> heard, Weighing weighing)
+    {
+        ArgumentNullException.ThrowIfNull(heard);
 
-                        seat = general;
-                        handed = true;
-                        break;
-                    }
-                }
+        var cases = new Dictionary<Code, List<Advocacy>>();
 
-                loudest[expects] = (Math.Pow(seat.Accuracy, _dials.Sharpness), seat.Identity);
-                weights[expects] = loudest[expects].Weight;
+        foreach (var testimony in heard)
+        {
+            // A SILENT HOLDER IS SKIPPED AND A DEAD ONE NEVER ARRIVED, and the difference
+            // is invisible here on purpose — whether enough was heard to decide at all is
+            // the caller's question, since only the caller knows how many it asked.
+            if (testimony.Silent) continue;
+
+            foreach (var advocacy in testimony.Advocates)
+            {
+                if (!cases.TryGetValue(advocacy.Expects, out var at))
+                    cases[advocacy.Expects] = at = [];
+
+                at.Add(advocacy);
             }
+        }
+
+        if (cases.Count == 0) return default;
+
+        var weights = new Dictionary<Code, double>(cases.Count);
+        var loudest = new Dictionary<Code, (double Weight, Code By)>(cases.Count);
+
+        foreach (var (expects, at) in cases)
+        {
+            at.Sort(static (left, right) =>
+                right.Weight.CompareTo(left.Weight) is var order && order != 0
+                    ? order
+                    : left.By.CompareTo(right.By));
+
+            loudest[expects] = (at[0].Weight, at[0].By);
+
+            weights[expects] = weighing == Weighing.Strongest
+                ? at[0].Weight
+                : at.Sum(one => one.Weight);
+        }
 
         // ORDERED BY WEIGHT AND THEN BY CODE, so a tie -- which is what every
         // moment is before anything has been settled -- breaks the same way on
@@ -305,6 +448,54 @@ public sealed class Population
             Margin = ranked[0].Value - (ranked.Count > 1 ? ranked[1].Value : 0.0),
             By = loudest[ranked[0].Key].By,
         };
+    }
+
+    private Vote Predict(ImmutableArray<Commitment> firing, bool deferring)
+    {
+        if (firing.IsDefaultOrEmpty) return default;
+
+        var testimony = Speak(firing);
+
+        if (!deferring) return Decide([testimony], _dials.Weighing);
+
+        var handed_back = ImmutableArray.CreateBuilder<Advocacy>(testimony.Advocates.Length);
+
+        foreach (var advocacy in testimony.Advocates)
+        {
+            var seat = _byName[advocacy.By];
+
+            // THE SEAT CAN MOVE MORE THAN ONCE -- a grandparent takes it back from a
+            // parent that took it from a child -- and the loop is bounded by scope
+            // length, since every hand-back is strictly shorter.
+            for (var handed = true; handed;)
+            {
+                handed = false;
+
+                foreach (var general in firing)
+                {
+                    if (general.Expects != seat.Expects || !seat.Narrows(general)) continue;
+                    if (!Absorbs(general, seat)) continue;
+
+                    seat = general;
+                    handed = true;
+                    break;
+                }
+            }
+
+            // THE SUM IS REPLACED RATHER THAN ADJUSTED, which is what the seat handing
+            // back MEANS under either weighing: the expectation is worth what its rightful
+            // advocate is worth, and the crowd behind the child does not come with it.
+            handed_back.Add(new Advocacy
+            {
+                Expects = advocacy.Expects,
+                Weight = Math.Pow(seat.Accuracy, _dials.Sharpness),
+                By = seat.Identity,
+            });
+        }
+
+        return Decide(
+            [new Testimony { Advocates = handed_back.MoveToImmutable() }],
+            _dials.Weighing);
     }
 
     /// <summary>Tells everything that fired what the settlement said.</summary>

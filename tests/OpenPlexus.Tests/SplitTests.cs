@@ -1,0 +1,310 @@
+using System.Collections.Immutable;
+using OpenPlexus.Codes;
+using OpenPlexus.Commitments;
+using OpenPlexus.Machines;
+using OpenPlexus.Worlds;
+using Xunit.Abstractions;
+
+namespace OpenPlexus.Tests;
+
+/// <summary>
+/// The vote taken by several holders instead of one — <b>fork 52, and the half of it
+/// that can be answered without a socket.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>THE COMMITMENT LEARNER RUNS IN ONE PROCESS, SO C1 IS KEPT BY CONVENTION.</b> No
+/// node has ever had the OPPORTUNITY to read another's data, which is not the same as a
+/// design that forbids it — and a constraint nothing has ever been able to break is a
+/// check that cannot fire. <see cref="Population.Speak"/> is the narrow seam that makes
+/// the difference testable: a holder emits expectations and weights, and a merge that
+/// only ever sees those cannot cheat.
+/// </para>
+/// <para>
+/// <b>AND THE FIRST QUESTION IS AGREEMENT-WITH-ITSELF, WHICH HAS A KNOWN ANSWER.</b>
+/// Splitting a population changes no commitment, no accuracy and no dial — only who does
+/// the arithmetic. So a split vote that differs from a whole one under
+/// <see cref="Weighing.Strongest"/> is a DEFECT rather than a finding, and this file
+/// asserts that before it measures anything. The measurements below are only worth
+/// reading because that assertion holds.
+/// </para>
+/// <para>
+/// <b>NO SOCKET HERE ON PURPOSE, AND THE LIMIT IS STATED RATHER THAN DISCOVERED.</b> What
+/// this file exercises is the ARITHMETIC of a distributed vote and none of its transport.
+/// A green run says the fold composes; it says nothing whatever about C2, because nothing
+/// here is late, and nothing about C3, because nothing here dies. Reading it as <i>the
+/// distributed vote works</i> would be a claim about correctness doing duty as a claim
+/// about the wire — the trap this repo paid for one session ago.
+/// </para>
+/// </remarks>
+public sealed class SplitTests(ITestOutputHelper output)
+{
+    /// <summary>How long the population trains before it is asked anything.</summary>
+    /// <remarks>
+    /// <b>ENOUGH FOR THE WEIGHTS TO BE REAL AND NO LONGER.</b> This file measures whether
+    /// an arithmetic composes, and that question does not get a better answer from a
+    /// population that has learnt more — but it gets a WORSE one from a population where
+    /// every accuracy is still nought, since every weight would then be nought too and
+    /// every merge would agree for free.
+    /// </remarks>
+    private const long Rounds = 8000;
+
+    /// <summary>How many fresh moments the split is asked about.</summary>
+    private const int Asked = 4000;
+
+    /// <summary>Address bits, so the world is the six-bit multiplexer step one is judged on.</summary>
+    private const int Address = 2;
+
+    /// <summary>
+    /// A trained population, and moments it has never been taught on.
+    /// </summary>
+    /// <param name="weighing">How advocates for one expectation combine.</param>
+    /// <param name="seed">The world's generator and the brain's.</param>
+    /// <remarks>
+    /// <b>THE MOMENTS ARE DRAWN AFTER TRAINING AND NOTHING IS TAUGHT ON THEM.</b> Every
+    /// call below is one of the three read-only ones — <c>Moment</c>, <c>Firing</c>,
+    /// <c>Predict</c> — so asking four thousand questions leaves the population exactly as
+    /// the run left it. A comparison that moved a counter would be comparing two
+    /// populations rather than two ways of adding up one.
+    /// </remarks>
+    private static (Population Held, List<IReadOnlySet<Code>> Moments) Trained(
+        Weighing weighing, int seed)
+    {
+        var brain = new Brain(new CommittingSettings { Weighing = weighing }, seed);
+
+        new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, seed)
+            .Run(Rounds);
+
+        var held = brain.Held;
+
+        // A FRESH GENERATOR, SO THESE ARE NOT THE ROUNDS IT JUST SAW. Whether the
+        // population has met a moment before changes what fires, and a comparison drawn
+        // only from familiar moments would be measuring the merge on the easy half.
+        //
+        // AND THROUGH `IWorld` RATHER THAN THE WORLD'S OWN `Next`, so these moments are
+        // coded by exactly the path `Trial` used in training. `Multiplexer.Round` carries
+        // cues that are already codes, and reading them directly would skip the quantiser
+        // -- producing moments the population had never been asked in that alphabet, which
+        // is the answer-key-in-the-wrong-alphabet trap wearing a different hat.
+        IWorld<IReadOnlyList<int>> world =
+            new Multiplexer(new MultiplexerSettings { Address = Address }, seed + 1);
+
+        var sensing = new Bits(Multiplexer.Bit);
+
+        var moments = new List<IReadOnlySet<Code>>(Asked);
+
+        for (var ask = 0; ask < Asked; ask++)
+            moments.Add(held.Moment(new HashSet<Code>(sensing.Codify(world.Next().Seen))));
+
+        return (held, moments);
+    }
+
+    /// <summary>
+    /// Splits what fired between holders the way the ring would — <b>by the identity, so
+    /// the same commitment lands on the same holder every time.</b>
+    /// </summary>
+    /// <param name="firing">What fired, whole.</param>
+    /// <param name="held">The population, for the weights.</param>
+    /// <param name="holders">How many machines to spread it over.</param>
+    /// <param name="missing">A holder that says nothing at all, or -1 for none.</param>
+    /// <remarks>
+    /// <b>A MISSING HOLDER IS NOT A SILENT ONE AND THE PARAMETER IS NAMED FOR THE
+    /// DIFFERENCE.</b> A holder that fires nothing returns an empty <see cref="Testimony"/> and
+    /// has been heard from; this one is never asked, which is what a death looks like from
+    /// the outside. <see cref="Population.Decide"/> cannot tell them apart and is not
+    /// supposed to — the count of who was asked lives with the asker.
+    /// </remarks>
+    private static List<Testimony> Spread(
+        ImmutableArray<Commitment> firing, Population held, int holders, int missing = -1)
+    {
+        var shards = new List<ImmutableArray<Commitment>.Builder>(holders);
+
+        for (var holder = 0; holder < holders; holder++)
+            shards.Add(ImmutableArray.CreateBuilder<Commitment>());
+
+        foreach (var commitment in firing)
+            shards[(int)(commitment.Identity.Value % (ulong)holders)].Add(commitment);
+
+        var heard = new List<Testimony>(holders);
+
+        for (var holder = 0; holder < holders; holder++)
+        {
+            if (holder == missing) continue;
+            heard.Add(held.Speak(shards[holder].ToImmutable()));
+        }
+
+        return heard;
+    }
+
+    // ---- the check that can fire -------------------------------------------
+
+    [Fact]
+    public void A_vote_split_between_holders_is_the_same_vote()
+    {
+        // UNDER `Strongest` THE AGGREGATE IS A MAXIMUM, AND A MAXIMUM COMPOSES EXACTLY.
+        // So this is not a tolerance and must never become one: every field of the vote
+        // is bit-identical, including the margin, which is a subtraction of two doubles
+        // that were each chosen rather than accumulated.
+        var (held, moments) = Trained(Weighing.Strongest, seed: 1);
+
+        var compared = 0;
+        var contested = 0;
+
+        foreach (var moment in moments)
+        {
+            var firing = held.Firing(moment);
+            if (firing.IsDefaultOrEmpty) continue;
+
+            var whole = held.Predict(firing);
+
+            foreach (var holders in new[] { 2, 3, 5, 12 })
+            {
+                var split = Population.Decide(Spread(firing, held, holders), Weighing.Strongest);
+
+                Assert.Equal(whole.Expects, split.Expects);
+                Assert.Equal(whole.By, split.By);
+                Assert.Equal(whole.Weight, split.Weight);
+                Assert.Equal(whole.Margin, split.Margin);
+
+                compared++;
+            }
+
+            // WHETHER THE SPLIT WAS EVER LOAD-BEARING, WHICH THE EQUALITIES ABOVE CANNOT
+            // SAY. A moment where one commitment fires is split by every rule alike, so a
+            // file full of those would assert nothing and pass. This counts the moments
+            // where at least two holders had something to say.
+            if (Spread(firing, held, 12).Count(one => !one.Silent) > 1) contested++;
+        }
+
+        output.WriteLine($"{compared} comparisons, {contested} moments genuinely spread");
+
+        Assert.True(compared > 1000, $"only {compared} comparisons — the population is too quiet to test");
+
+        Assert.True(contested > 100,
+            $"only {contested} moments put advocates on more than one holder, so the merge "
+            + "was never asked to combine anything and this file is a tautology");
+    }
+
+    [Fact]
+    public void Summing_agrees_on_the_answer_and_not_on_the_last_bits()
+    {
+        // FLOATING-POINT ADDITION IS NOT ASSOCIATIVE, AND A HOLDER SUMS ITS OWN ADVOCATES
+        // BEFORE THE MERGE SEES THEM. So `(a+b)+c` and `a+(b+c)` are what the two
+        // arrangements compute and they differ in the last bits -- which no ordering rule
+        // inside `Decide` can repair, because the information was already folded away.
+        //
+        // ASSERTED AS A DIFFERENT SHAPE OF CLAIM RATHER THAN A LOOSER ONE. The DECISION is
+        // exact; the weight is within an epsilon that scales with the sum. Writing this as
+        // `Weight` within a tolerance and leaving `Expects` unasserted would hide the
+        // question anybody actually has, which is whether the machine answers differently.
+        var (held, moments) = Trained(Weighing.Summing, seed: 1);
+
+        var compared = 0;
+        var apart = 0.0;
+        var flipped = 0;
+
+        foreach (var moment in moments)
+        {
+            var firing = held.Firing(moment);
+            if (firing.IsDefaultOrEmpty) continue;
+
+            var whole = held.Predict(firing);
+            var split = Population.Decide(Spread(firing, held, 12), Weighing.Summing);
+
+            if (whole.Expects != split.Expects) flipped++;
+
+            apart = Math.Max(apart, Math.Abs(whole.Weight - split.Weight));
+            compared++;
+        }
+
+        output.WriteLine($"{compared} moments, {flipped} answered differently, "
+            + $"largest weight gap {apart:E3}");
+
+        Assert.True(compared > 500, $"only {compared} comparisons");
+
+        // THE GAP IS BOUNDED WELL ABOVE ANY PLAUSIBLE ROUNDING AND WELL BELOW ANYTHING
+        // THAT COULD MOVE A DECISION, which is the only honest place to put it. A bar at
+        // exactly zero would be asserting that C# reorders nothing; a bar at 0.01 would
+        // pass through a genuine arithmetic bug.
+        Assert.True(apart < 1e-9, $"weights differ by {apart:E3}, which is not rounding");
+
+        Assert.Equal(0, flipped);
+    }
+
+    // ---- what a missing holder costs ---------------------------------------
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_a_lost_holder_costs_the_vote_against_what_the_margin_predicted()
+    {
+        // C3 SAYS A CLUSTER VANISHING MID-THOUGHT IS NORMAL, AND NOTHING HAS EVER
+        // MEASURED WHAT THAT DOES TO AN ANSWER. In one process nothing can die, so the
+        // third outcome has only ever been exercised by unit tests -- an open defect in
+        // the plan, and the reason this sweep exists.
+        //
+        // AND THE GRID IS BUCKETED BY THE MARGIN BECAUSE THAT IS THE PREDICTION UNDER
+        // TEST. `Vote.Margin` has been computed every round for the life of the branch and
+        // called a confidence; if it is one, a wide-margin round should survive a lost
+        // holder and a thin-margin round should not. A flat grid would mean the margin is
+        // not measuring what its own documentation says.
+        //
+        // NO BAR, BECAUSE A THRESHOLD WRITTEN BEFORE THE FIRST READING IS A PREDICTION
+        // DRESSED AS A REQUIREMENT. It prints a grid and the grid is the finding.
+        var (held, moments) = Trained(Weighing.Strongest, seed: 1);
+
+        const int Holders = 12;
+        var edges = new[] { 0.0, 0.2, 0.4, 0.6, 0.8 };
+
+        var asked = new int[edges.Length];
+        var changed = new int[edges.Length];
+        var silenced = new int[edges.Length];
+
+        foreach (var moment in moments)
+        {
+            var firing = held.Firing(moment);
+            if (firing.IsDefaultOrEmpty) continue;
+
+            var whole = held.Predict(firing);
+            if (whole.Weight <= 0) continue;
+
+            // RELATIVE RATHER THAN ABSOLUTE, matching `Cycle.Confidence` exactly. Weights
+            // are accuracies raised to `Sharpness`, so an absolute margin is not
+            // comparable between two settings of a dial nobody in this file is turning.
+            var confidence = whole.Margin / whole.Weight;
+
+            var bucket = Math.Min(edges.Length - 1, (int)(confidence * edges.Length));
+
+            for (var lost = 0; lost < Holders; lost++)
+            {
+                var without = Population.Decide(
+                    Spread(firing, held, Holders, missing: lost), Weighing.Strongest);
+
+                asked[bucket]++;
+
+                if (without.Expects is null) silenced[bucket]++;
+                else if (without.Expects != whole.Expects) changed[bucket]++;
+            }
+        }
+
+        output.WriteLine("confidence | asked | answer changed | silenced");
+
+        for (var bucket = 0; bucket < edges.Length; bucket++)
+        {
+            if (asked[bucket] == 0)
+            {
+                output.WriteLine($"{edges[bucket]:F1}-{edges[bucket] + 0.2:F1} |      0 | — | —");
+                continue;
+            }
+
+            output.WriteLine(
+                $"{edges[bucket]:F1}-{edges[bucket] + 0.2:F1} | {asked[bucket],6} "
+                + $"| {changed[bucket] / (double)asked[bucket],14:F4} "
+                + $"| {silenced[bucket] / (double)asked[bucket],8:F4}");
+        }
+
+        // THE ONE ASSERTION, AND IT IS ABOUT THE INSTRUMENT RATHER THAN THE RESULT. A
+        // sweep whose every bucket is empty prints five dashes and passes, which is the
+        // failure mode this suite exists to refuse.
+        Assert.True(asked.Sum() > 1000, $"only {asked.Sum()} holder-losses examined");
+    }
+}

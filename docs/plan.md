@@ -758,4 +758,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **56** | What the repair gate's query costs on a wire. Priced: about nine asks a round, all askable at once, so one round trip. The structural cache removes a sixth. Open on building it |
 | **57** | Every node predicts its own output while the real wave verifies behind it, lossless where a learned short-circuit is not. The repair gate's query is where it first fits: a boolean usually answered no, and being wrong costs a rule. Open |
 | **58** | The gate's sign flips with the timing: after a failure it is far worse than none, and every round `Uncovered` beat `Earned`. Two cells measured here, two in the revival rows. Open on any other world |
+| **59** | `Mending.Neglected` loses or ties on both worlds measured, so the arm rule says delete it — and it is the only cell isolating the gate axis, a cost that rule does not anticipate. Open |
 | **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |

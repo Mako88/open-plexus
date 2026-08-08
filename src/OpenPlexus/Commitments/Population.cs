@@ -159,6 +159,34 @@ public sealed class Population
     /// </remarks>
     private readonly Dictionary<Code, List<Code>> _minted = [];
 
+    /// <summary>
+    /// Which holder a commitment sits on, or nothing while everything is in one place.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE GATE ON REPAIR IS THE ONE MECHANISM THAT ASKS ABOUT COMMITMENTS IT DOES NOT
+    /// OWN.</b> <see cref="Mending.Uncovered"/> refuses a repair when another firing
+    /// commitment already narrows it, and in one process <c>firing</c> is everything that
+    /// fired. On a ring it is only what this holder was placed with — measured in
+    /// <c>SplitRepairTests</c>, where at twelve holders a holder can see about a twelfth
+    /// of what covers it.
+    /// </para>
+    /// <para>
+    /// <b>SO THIS IS THE DEPLOYMENT ARRIVING RATHER THAN A TEST HOOK.</b> A holder has a
+    /// placement whether or not anything asks it, and the gate is where the answer first
+    /// differs. Left null nothing changes and the mechanism is exactly what it was, which
+    /// is the baseline every arm is measured from.
+    /// </para>
+    /// <para>
+    /// <b>AND IT REACHES NOTHING ELSE ON PURPOSE.</b> Firing, voting and settling are
+    /// untouched by it, so a run with this set differs from one without in the repair gate
+    /// ALONE — measuring one mechanism on from a known baseline rather than a sharded
+    /// world against a whole one, where four things moved and the score could not say
+    /// which.
+    /// </para>
+    /// </remarks>
+    public Func<Commitment, ulong>? Placing { get; set; }
+
     /// <param name="dials">Every number the machinery is allowed to have.</param>
     /// <param name="seed">The control arm's generator, used only when it is running.</param>
     public Population(CommittingSettings dials, int seed)
@@ -635,7 +663,7 @@ public sealed class Population
             // first would make the instrument the cost of the run.
             .Where(one =>
                 _dials.Mending == Mending.Outvoted
-                || !firing.Any(other => other.Narrows(one)))
+                || !firing.Any(other => Beside(other, one) && other.Narrows(one)))
 
             // AND THE PER-COMMITMENT HALF, WHICH ONLY `Improving` ASKS. Last again, for
             // the same reason the child test is: it walks a parent's children, and
@@ -662,6 +690,16 @@ public sealed class Population
 
         return null;
     }
+
+    /// <summary>Whether one holder can see both of these at once.</summary>
+    /// <param name="one">A commitment that might cover the other.</param>
+    /// <param name="other">The commitment being considered for repair.</param>
+    /// <remarks>
+    /// <b>TRUE OF EVERYTHING WHILE <see cref="Placing"/> IS NULL</b>, so the in-process
+    /// machine is not paying a comparison for a distribution it does not have.
+    /// </remarks>
+    private bool Beside(Commitment one, Commitment other) =>
+        Placing is null || Placing(one) == Placing(other);
 
     /// <summary>How many children a commitment has minted.</summary>
     /// <param name="name">What the commitment is called.</param>

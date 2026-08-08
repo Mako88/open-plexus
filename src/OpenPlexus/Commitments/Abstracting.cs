@@ -22,6 +22,39 @@ namespace OpenPlexus.Commitments;
 /// a second level of structure possible at all.
 /// </para>
 /// </remarks>
+/// <summary>One line of a counted table, as it crosses.</summary>
+public readonly record struct Tallied
+{
+    /// <summary>The code, or the first of the pair.</summary>
+    public required Code Left { get; init; }
+
+    /// <summary>The second of the pair, or nothing where this row is one code alone.</summary>
+    /// <remarks>
+    /// <b>ONE ROW TYPE AND NOT TWO, so a reader cannot receive half a table.</b> The two
+    /// counts are meaningless apart — a pair's frequency is tested against what its members
+    /// do separately — and two arrays are two chances for one to arrive without the other.
+    /// </remarks>
+    public required Code? Right { get; init; }
+
+    /// <summary>How many scopes it turned up in.</summary>
+    public required int Seen { get; init; }
+}
+
+/// <summary>A <see cref="Recurrence"/> as bytes, and the only form of it that travels.</summary>
+public sealed record Counts
+{
+    /// <summary>How many scopes the sender counted.</summary>
+    /// <remarks>
+    /// <b>CARRIED RATHER THAN INFERRED, because it cannot be recovered from the rows.</b>
+    /// The z the naming gate computes divides by this, so a reader that guessed it from
+    /// the table would be testing a different hypothesis from the one the sender counted.
+    /// </remarks>
+    public required int Scopes { get; init; }
+
+    /// <summary>Every code and every pair, ordered.</summary>
+    public required ImmutableArray<Tallied> Rows { get; init; }
+}
+
 /// <summary>
 /// How often each code and each pair of codes turns up across a set of scopes —
 /// <b>everything the naming gate reads, and the only thing that has to cross a wire for
@@ -97,6 +130,63 @@ public sealed class Recurrence
                     counted._together.TryGetValue(pair, out var seen);
                     counted._together[pair] = seen + 1;
                 }
+        }
+
+        return counted;
+    }
+
+    /// <summary>
+    /// These counts in a shape a wire can carry, <b>ordered so the bytes are the same on
+    /// every machine.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE WORKING TYPE CANNOT CROSS AND THAT WAS NOT NOTICED WHEN IT WAS BUILT.</b>
+    /// <see cref="Recurrence"/> keys its pairs on a tuple and keeps both tables private, so
+    /// a serialiser writes <c>Scopes</c> and drops everything else — which is worse than
+    /// writing nothing, because a plausible number and no error is indistinguishable from a
+    /// message that arrived. A merge on the far side then adds nothing to anything. That is
+    /// the edge-kind fault in <see cref="Bus.Wire"/> exactly, which arrived the same way and
+    /// was found by a round-trip test rather than by a failure.
+    /// </para>
+    /// <para>
+    /// <b>AND ORDERED RATHER THAN WHATEVER THE DICTIONARY HELD.</b> Two machines writing
+    /// the same counts must write the same bytes, or nothing downstream can compare them —
+    /// and a dictionary's walk is not stable across processes. Fork 12 does not reach the
+    /// merge, which is integer addition, but it reaches anything that hashes or logs what
+    /// crossed.
+    /// </para>
+    /// </remarks>
+    public Counts Written()
+    {
+        var rows = ImmutableArray.CreateBuilder<Tallied>(_alone.Count + _together.Count);
+
+        foreach (var code in _alone.Keys.Order())
+            rows.Add(new Tallied { Left = code, Right = null, Seen = _alone[code] });
+
+        foreach (var pair in _together.Keys.OrderBy(one => one.Left).ThenBy(one => one.Right))
+            rows.Add(new Tallied
+            {
+                Left = pair.Left,
+                Right = pair.Right,
+                Seen = _together[pair],
+            });
+
+        return new Counts { Scopes = Scopes, Rows = rows.MoveToImmutable() };
+    }
+
+    /// <summary>The counts those rows carry.</summary>
+    /// <param name="counts">What arrived.</param>
+    public static Recurrence From(Counts counts)
+    {
+        ArgumentNullException.ThrowIfNull(counts);
+
+        var counted = new Recurrence { Scopes = counts.Scopes };
+
+        foreach (var row in counts.Rows)
+        {
+            if (row.Right is { } right) counted._together[(row.Left, right)] = row.Seen;
+            else counted._alone[row.Left] = row.Seen;
         }
 
         return counted;

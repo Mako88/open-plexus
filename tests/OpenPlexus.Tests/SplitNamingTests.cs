@@ -236,6 +236,57 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void The_counts_survive_being_written_as_bytes_and_read_back()
+    {
+        // THE TYPE BUILT TO CROSS A WIRE COULD NOT CROSS ONE, AND NOTHING SAID SO.
+        // `Recurrence` keys its pairs on a tuple and keeps both tables private, so a
+        // serialiser writes the scope count and drops the tables -- `{"Scopes":110}`,
+        // printed below. That is worse than an empty object, because it LOOKS like a
+        // message: a plausible number, no throw, no warning, and a merge on the far side
+        // that adds nothing to anything. Exactly how `Graph.Kind` arrived as `default` on
+        // every edge until `Wire` grew a converter for it.
+        //
+        // SO THE ROUND TRIP IS ASSERTED ON THE ANSWER AND NOT ON THE BYTES. Two tables
+        // comparing equal says the fields survived; the same NAME coming out the far side
+        // says the statistic did, and that is the thing anything downstream depends on.
+        var (dials, all, whole) = Trained();
+
+        Assert.NotNull(whole);
+
+        var here = Recurrence.Of(all, dials);
+
+        var there = Recurrence.From(
+            OpenPlexus.Bus.Wire.Read<Counts>(OpenPlexus.Bus.Wire.Write(here.Written())));
+
+        Assert.Equal(here.Scopes, there.Scopes);
+
+        Assert.Equal(whole, Abstracting.Shared(there, dials));
+
+        // AND THE BYTES ARE THE SAME BYTES, because two machines writing one table must
+        // write one string or nothing downstream can compare what crossed. A dictionary's
+        // walk is not stable across processes, which is why `Written` orders.
+        Assert.Equal(
+            OpenPlexus.Bus.Wire.Write(here.Written()),
+            OpenPlexus.Bus.Wire.Write(there.Written()));
+
+        // THE CHECK THAT THE ROUND TRIP CARRIED ANYTHING AT ALL. An empty table writes,
+        // reads and compares equal perfectly, and would pass every line above.
+        Assert.True(here.Written().Rows.Length > 0,
+            "nothing was counted, so the round trip above moved an empty table");
+
+        // AND THE REASON THE PROJECTION EXISTS, ASSERTED RATHER THAN CLAIMED. Handing
+        // `Recurrence` straight to the serialiser is the obvious thing to write and it
+        // loses both tables in silence -- so this pins the failure the projection avoids.
+        // If a future runtime makes the direct form work, this line fails, somebody reads
+        // this comment, and `Written` can go. That is the outcome to want.
+        var naive = OpenPlexus.Bus.Wire.Write(here);
+
+        output.WriteLine($"a `Recurrence` handed straight to the wire is: {naive}");
+
+        Assert.DoesNotContain("Rows", naive, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Merging_the_counts_gets_the_whole_populations_name_back()
     {
         // WHAT THE GRID ABOVE POINTS AT, BUILT. `Recurrence` is the two frequency tables

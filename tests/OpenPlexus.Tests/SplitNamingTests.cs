@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
@@ -41,9 +42,15 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     /// <summary>Eleven bits, because fork 34 says six mints nothing to split.</summary>
     private const int Address = 3;
 
-    [Fact]
-    [Trait(Sweeps.Kind, Sweeps.Name)]
-    public void What_sharding_a_population_does_to_what_it_can_name()
+    /// <summary>A trained population, its dials, and the name it proposes whole.</summary>
+    /// <remarks>
+    /// <b>WRITTEN ONCE BECAUSE THE CLONE BUDGET REFUSED THE THIRD COPY.</b> Three tests
+    /// here each need a population and the whole-population baseline it is measured
+    /// against, and three copies of that setup is three places for the dials to drift —
+    /// which would make three grids that look comparable and are not.
+    /// </remarks>
+    private static (CommittingSettings Dials, List<Commitment> All, ImmutableArray<Code>? Whole)
+        Trained()
     {
         var dials = new CommittingSettings();
         var brain = new Brain(dials, seed: 1);
@@ -51,8 +58,31 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
         new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, seed: 1)
             .Run(Rounds);
 
-        var held = brain.Held;
-        var all = held.All.ToList();
+        var all = brain.Held.All.ToList();
+
+        return (dials, all, Abstracting.Shared(all, dials));
+    }
+
+    /// <summary>Places every commitment on a holder, the way the ring would.</summary>
+    /// <param name="all">The whole population.</param>
+    /// <param name="holders">How many machines to spread it over.</param>
+    private static List<List<Commitment>> Sharded(IEnumerable<Commitment> all, int holders)
+    {
+        var shards = new List<List<Commitment>>();
+
+        for (var holder = 0; holder < holders; holder++) shards.Add([]);
+
+        foreach (var commitment in all)
+            shards[(int)(commitment.Identity.Value % (ulong)holders)].Add(commitment);
+
+        return shards;
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_sharding_a_population_does_to_what_it_can_name()
+    {
+        var (dials, all, _) = Trained();
 
         // THE WHOLE POPULATION'S ANSWER IS THE BASELINE, and every split is measured
         // against it rather than against nothing. `Abstracting.Shared` proposes one pair,
@@ -84,12 +114,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
 
         foreach (var holders in new[] { 1, 2, 3, 5, 12 })
         {
-            var shards = new List<List<Commitment>>();
-
-            for (var holder = 0; holder < holders; holder++) shards.Add([]);
-
-            foreach (var commitment in all)
-                shards[(int)(commitment.Identity.Value % (ulong)holders)].Add(commitment);
+            var shards = Sharded(all, holders);
 
             var proposed = shards
                 .Select(shard => Abstracting.Shared(shard, dials))
@@ -131,12 +156,7 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
 
         foreach (var holders in new[] { 3, 5, 12 })
         {
-            var shards = new List<List<Commitment>>();
-
-            for (var holder = 0; holder < holders; holder++) shards.Add([]);
-
-            foreach (var commitment in all)
-                shards[(int)(commitment.Identity.Value % (ulong)holders)].Add(commitment);
+            var shards = Sharded(all, holders);
 
             var strict = shards.Count(shard => Abstracting.Shared(shard, dials) is not null);
 
@@ -152,6 +172,70 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
     }
 
     [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void What_a_dead_holder_costs_a_merged_name()
+    {
+        // C3 SAYS A CLUSTER VANISHING MID-THOUGHT IS NORMAL, AND EVERY FILE IN THIS ARC
+        // HAS CARRIED A NOTE THAT NOTHING DIES IN IT. This is the smallest honest version
+        // of that: a merge is only ever over the holders that answered, so a death is
+        // counts that never arrive.
+        //
+        // AND IT SHOULD DEGRADE RATHER THAN BREAK, WHICH IS THE PREDICTION UNDER TEST.
+        // Losing counts is losing scopes, and losing scopes is the power problem this file
+        // already measured -- so a merge missing a holder should sit somewhere between the
+        // whole population and a single shard, and the question is how many deaths it
+        // takes to fall off.
+        var (dials, all, whole) = Trained();
+
+        Assert.NotNull(whole);
+
+        const int Holders = 12;
+
+        var shards = Sharded(all, Holders);
+
+        output.WriteLine("dead | arrangements | still the whole population's name | silent");
+
+        for (var dead = 0; dead < Holders; dead++)
+        {
+            var arrangements = 0;
+            var kept = 0;
+            var silent = 0;
+
+            // EVERY WAY OF LOSING THAT MANY, UP TO A BOUND, because which holders die is
+            // not something a deployment gets to choose and one arrangement would be one
+            // sample of a distribution. Bounded by walking a stride through the
+            // combinations rather than all of them, which is stated because a truncation
+            // that goes unsaid reads as coverage.
+            for (var first = 0; first < Holders; first++)
+            {
+                var gone = new HashSet<int>();
+
+                for (var step = 0; step < dead; step++) gone.Add((first + step) % Holders);
+
+                var merged = new Recurrence();
+
+                for (var holder = 0; holder < Holders; holder++)
+                    if (!gone.Contains(holder))
+                        merged.Absorb(Recurrence.Of(shards[holder], dials));
+
+                var said = Abstracting.Shared(merged, dials);
+
+                arrangements++;
+
+                if (said is null) silent++;
+                else if (Naming.Name(said.Value) == Naming.Name(whole.Value)) kept++;
+            }
+
+            output.WriteLine(
+                $"{dead,4} | {arrangements,12} | {kept,33} | {silent,6}");
+        }
+
+        // NO BAR, because how many deaths rung five should survive has never been measured
+        // and a threshold written before the first reading would be a prediction dressed as
+        // a requirement. The grid is the finding.
+    }
+
+    [Fact]
     public void Merging_the_counts_gets_the_whole_populations_name_back()
     {
         // WHAT THE GRID ABOVE POINTS AT, BUILT. `Recurrence` is the two frequency tables
@@ -164,26 +248,13 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
         // `Population.Decide` carries a caveat that a sharded sum is not bit-identical
         // under `Summing`, because floating-point addition is not associative. Integers
         // have no such caveat, so this is an equality and must never become a tolerance.
-        var dials = new CommittingSettings();
-        var brain = new Brain(dials, seed: 1);
-
-        new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, seed: 1)
-            .Run(Rounds);
-
-        var all = brain.Held.All.ToList();
-
-        var whole = Abstracting.Shared(all, dials);
+        var (dials, all, whole) = Trained();
 
         Assert.NotNull(whole);
 
         foreach (var holders in new[] { 2, 3, 5, 12 })
         {
-            var shards = new List<List<Commitment>>();
-
-            for (var holder = 0; holder < holders; holder++) shards.Add([]);
-
-            foreach (var commitment in all)
-                shards[(int)(commitment.Identity.Value % (ulong)holders)].Add(commitment);
+            var shards = Sharded(all, holders);
 
             // COUNTED WHERE THE COMMITMENTS ARE AND MERGED WHERE NOTHING IS, so no holder
             // ever sees another's scopes -- which is the C1 claim this whole arrangement

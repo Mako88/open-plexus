@@ -501,6 +501,9 @@ change of architecture entirely.
   CONTROL'S.** Two comparable routes outsum one, so `Agreement` and `Sum` ordered
   alike everywhere and four sessions read a tautology as a bug.
 - **Measure one mechanism ON from a known baseline, never one OFF from all-on.**
+- **AND A SETTING CAN DECIDE TWO INDEPENDENT THINGS WHILE BEING NAMED FOR ONE**, so every
+  comparison against it moves both axes. The cell that separates them may already exist
+  and never have been read as a control.
 - **A small sample can look like a mechanism, AND IT HIDES A REAL EFFECT TOO.** Count
   seeds in both directions.
 - **A number in a commit message is a claim, not a record.**
@@ -728,7 +731,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **34** | Rung five names nothing at six bits and names and STACKS at eleven. The plan said this world had an answer key for it; it does not, because its structure is positional. Open |
 | **35** | More unsound commitments resident than sound ones, while the score holds. Is the vote robust to them, or are they why it stops short? Open |
 | **36** | Graded codes: does `Winnow` emitting several codes per reading make a position nameable, and what does it cost the search and the soundness check? Open |
-| **37** | The repair budget has an interior optimum moving with the relevant bits. Its driver is BUILT — `Mending.Uncovered` asks whether any firing commitment narrows this one. Best on the clean multiplexer, ruinous on `Arranged`. Open |
+| **37** | The repair budget has an interior optimum moving with the relevant bits. And `Mending.Uncovered` is two mechanisms — a gate plus every-round repair — where the gate alone is far worse than no gate at all. Open |
 | **38** | Spreading a reading over its range costs most of the score at both front ends. Is that fragmentation, or the search the extra codes buy? Open |
 | **39** | A reading under about ten dimensions has too few distinct wirings for a projection to expand into. Population coding has a floor, and it is not documented anywhere. Open |
 | **40** | Does `Surprising.Unaccounted` starve genesis? YES, and at a WORLD rather than a width. On `Arranged` it stops early and holds a fraction of the sound one-code rules the ungated arm does, behind on every seed. Closed |
@@ -748,4 +751,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **55** | Whether a blinded repair gate costs anything. Answered on the multiplexer: children minted separates decisively over twelve seeds, and accuracy, residents and sound rules all move the same way at two standard errors. Open on any other world |
 | **56** | What the repair gate's query costs on a wire. Priced: about nine asks a round, all askable at once, so one round trip. The structural cache removes a sixth. Open on building it |
 | **57** | Every node predicts its own output while the real wave verifies behind it, lossless where a learned short-circuit is not. The repair gate's query is where it first fits: a boolean usually answered no, and being wrong costs a rule. Open |
+| **58** | `Mending`'s two-by-two has three cells; every-round-with-no-gate is not a setting. Completing it is a decision about the machine rather than a measurement, and without it the interaction is a reading and not a result. Open |
 | **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |

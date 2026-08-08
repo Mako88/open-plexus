@@ -1,0 +1,76 @@
+using OpenPlexus.Codes;
+using OpenPlexus.Worlds;
+
+namespace OpenPlexus.Machines;
+
+/// <summary>
+/// The MONK's problems, end to end, against a key that says what the answer can be.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>THE ONLY WORLD HERE WHOSE CEILING IS KNOWN BEFORE THE RUN.</b> Elsewhere a
+/// disappointing score leaves two explanations standing — the learner, or the language
+/// it has to say its answer in — and no measurement separates them. <see cref="Monk"/>
+/// enumerates both: the concept is 432 instances and the scope language is 2,880
+/// conjunctions, so what a conjunction CAN say is decided rather than discovered.
+/// </para>
+/// <para>
+/// <b>SO <see cref="Learned.Found"/> IS READ AGAINST A BASIS THAT IS ITSELF THE
+/// FINDING.</b> On <see cref="Puzzle.Two"/> the minimal basis is 254 rules of which 142
+/// are whole six-attribute instances, because nothing shorter can soundly say yes — so a
+/// learner that finds all of them has MEMORISED the concept and a learner that finds few
+/// has not generalised, and for once those are not the same number.
+/// </para>
+/// </remarks>
+public sealed class MonkRun
+{
+    private readonly Monk _world;
+    private readonly Puzzle _puzzle;
+    private readonly Brain _brain;
+    private readonly Trial<IReadOnlyList<int>> _trial;
+
+    /// <param name="world">Which puzzle, and how much is held back.</param>
+    /// <param name="brain">The one brain, already configured.</param>
+    /// <param name="seed">The world's own generator.</param>
+    public MonkRun(MonkSettings world, Brain brain, int seed)
+    {
+        ArgumentNullException.ThrowIfNull(world);
+        ArgumentNullException.ThrowIfNull(brain);
+
+        _world = new Monk(world, seed);
+        _puzzle = world.Puzzle;
+        _brain = brain;
+
+        // ONE CODE PER ATTRIBUTE AND VALUE, AGAINST A DECLARED STRIDE. The jacket has
+        // four colours and the tie has two, so a stride taken from the widest attribute
+        // is the only one that cannot alias -- which is the fault `Bits` already carried
+        // once, when its only caller happened to be binary.
+        _trial = new Trial<IReadOnlyList<int>>(
+            _world, new Bits(Monk.Attribute, Monk.Stride), brain);
+    }
+
+    /// <summary>What the brain holds.</summary>
+    public Commitments.Population Held => _brain.Held;
+
+    /// <summary>What a silent arm scores, which is not a half on the second puzzle.</summary>
+    public double Chance => _world.Chance;
+
+    /// <summary>Runs the world and learns from it.</summary>
+    /// <param name="rounds">How many rounds.</param>
+    /// <param name="sweep">How often to subsume, abstract and cull.</param>
+    /// <param name="target">The trailing accuracy to wait for.</param>
+    /// <param name="window">How many answered predictions that accuracy is over.</param>
+    public Learned Run(long rounds, int sweep = 1000, double target = 0.9, int window = 2000)
+    {
+        var tally = _trial.Run(rounds, sweep, target, window);
+
+        // EVERYTHING IS CHECKABLE HERE AND THAT IS WHY THIS WORLD WAS CHOSEN. There are
+        // 432 instances however little a scope pins, so `Unchecked` is nought by
+        // construction rather than by luck -- and a soundness count quietly covering
+        // only the small rules would be the sampled-instrument fault this project keeps
+        // finding.
+        return Learned.Grade(
+            tally, Monk.Truths(_puzzle), _brain.Held, _brain.Dials.Floor,
+            Monk.Checkable, (scope, expects) => Monk.Sound(_puzzle, scope, expects));
+    }
+}

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Worlds;
 
@@ -55,6 +56,65 @@ public sealed record Learned
 
     /// <summary>Rounds run.</summary>
     public long Rounds => Tally.Rounds;
+
+    /// <summary>
+    /// Grades what a population holds against a world that can say what is true.
+    /// </summary>
+    /// <param name="tally">What the run reported.</param>
+    /// <param name="truths">The world's answer key.</param>
+    /// <param name="held">What the brain holds.</param>
+    /// <param name="floor">How much a commitment must have seen before it is judged.</param>
+    /// <param name="checkable">Whether the world can decide a scope exactly.</param>
+    /// <param name="sound">Whether a scope really does entail an expectation.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>WRITTEN ONCE BECAUSE THE CLONE BUDGET REFUSED THE SECOND COPY</b>, on the day
+    /// the second enumerable world arrived — the same thing that happened to
+    /// <see cref="Commitments.Cycle"/>, and for a better reason than tidiness. Two copies
+    /// of a grading pass are two places for <i>experienced</i>, <i>checkable</i> and
+    /// <i>sound</i> to drift apart, and a soundness count meaning one thing on one world
+    /// and something else on another is not comparable between them — which is most of
+    /// the point of having more than one world.
+    /// </para>
+    /// <para>
+    /// <b>THE SCOPES ARE SPELLED BACK OUT BEFORE THE WORLD IS ASKED.</b> A world knows
+    /// nothing about minted codes, so a rule written in them can only be checked once its
+    /// names are expanded — and a rewrite that changed what a commitment CLAIMS would
+    /// show up right here as a rule that had stopped being true.
+    /// </para>
+    /// </remarks>
+    internal static Learned Grade(
+        Tally tally,
+        ImmutableArray<Worlds.Truth> truths,
+        Commitments.Population held,
+        long floor,
+        Func<ImmutableArray<Code>, bool> checkable,
+        Func<ImmutableArray<Code>, Code, bool> sound)
+    {
+        ArgumentNullException.ThrowIfNull(held);
+        ArgumentNullException.ThrowIfNull(checkable);
+        ArgumentNullException.ThrowIfNull(sound);
+
+        var experienced = held.All
+            .Where(one => one.Seen >= floor)
+            .Select(one => (Scope: held.Names.Unfold(one.Scope), one.Expects))
+            .ToList();
+
+        var decidable = experienced.Where(one => checkable(one.Scope)).ToList();
+        var true_ = decidable.Count(one => sound(one.Scope, one.Expects));
+
+        return new Learned
+        {
+            Tally = tally,
+            Sound = true_,
+            Unsound = decidable.Count - true_,
+            Unchecked = experienced.Count - decidable.Count,
+            Truths = truths.Length,
+            Found = truths.Count(truth => held.All.Any(
+                one => one.Expects == truth.Expects
+                    && held.Names.Unfold(one.Scope).SequenceEqual(truth.Scope))),
+        };
+    }
 }
 
 /// <summary>Step one, end to end, on the world it is judged on.</summary>
@@ -88,30 +148,8 @@ public sealed class MultiplexerRun
     {
         var tally = _trial.Run(rounds, sweep, target, window);
 
-        var truths = _world.Truths();
-
-        // SPELLED BACK OUT BEFORE THE WORLD IS ASKED. A world knows nothing about
-        // minted codes, so a rule written in them can only be checked once its names
-        // are expanded -- and a rewrite that changed what a commitment CLAIMS would
-        // show up right here as a rule that had stopped being true.
-        var experienced = _brain.Held.All
-            .Where(one => one.Seen >= _brain.Dials.Floor)
-            .Select(one => (Scope: _brain.Held.Names.Unfold(one.Scope), one.Expects))
-            .ToList();
-
-        var checkable = experienced.Where(one => _world.Checkable(one.Scope)).ToList();
-        var sound = checkable.Count(one => _world.Sound(one.Scope, one.Expects));
-
-        return new Learned
-        {
-            Tally = tally,
-            Sound = sound,
-            Unsound = checkable.Count - sound,
-            Unchecked = experienced.Count - checkable.Count,
-            Truths = truths.Length,
-            Found = truths.Count(truth => _brain.Held.All.Any(
-                one => one.Expects == truth.Expects
-                    && _brain.Held.Names.Unfold(one.Scope).SequenceEqual(truth.Scope))),
-        };
+        return Learned.Grade(
+            tally, _world.Truths(), _brain.Held, _brain.Dials.Floor,
+            _world.Checkable, _world.Sound);
     }
 }

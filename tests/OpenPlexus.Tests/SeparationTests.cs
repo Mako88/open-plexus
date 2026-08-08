@@ -108,6 +108,16 @@ public sealed class SeparationTests
             Assert.Equal(Brain.Says(outcome), Multiplexer.Says(outcome));
 
         Assert.Equal(Brain.Followed, Multiplexer.Said);
+
+        // AND `Monk`, WHOSE KEY WAS WRITTEN IN ITS OWN ALPHABET FIRST AND READ ZERO FOR
+        // IT. Every rule the enumeration called true expected a code on a modality the
+        // population can never hold, so the soundness count was nought on all three
+        // puzzles and the `Found` count with it -- a blind instrument reporting a
+        // flawless-looking absence. This is the check that could have caught it.
+        Assert.Equal(Brain.Says(0), Monk.Says(holds: false));
+        Assert.Equal(Brain.Says(1), Monk.Says(holds: true));
+
+        Assert.Equal(Brain.Followed, Monk.Answered);
     }
 
     [Fact]

@@ -133,8 +133,10 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **JOHN'S SPECULATION PROPOSAL, AND IT IS EARLY RATHER THAN WRONG.** Every node predicts
   its own output at once while the real wave verifies behind it, which is lossless where a
   learned short-circuit is not.
-- **Its depth to save is not there yet** — the distributed vote is one scatter-gather, so
-  this lands when fork 32's entailment cap comes off and not before.
+- **Its depth to save is not in the vote** — that is one scatter-gather. The repair gate's
+  query is where it fits, being a boolean whose answer is usually no.
+- **AND WHAT SPECULATION COSTS WHEN WRONG IS WHAT DECIDES WHERE IT IS ALLOWED.** A mistaken
+  repair is a rule subsumption may remove; a mistaken vote is an answer already given.
 - **The two-learner head-to-head is a side quest and blocks nothing**, being cheap now
   that both are co-resident.
 - **Resist polishing step one.** It is the least informative part when it passes.
@@ -730,6 +732,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **52** | The commitment learner runs in one process, so C1 is kept by convention. Half closed: the vote's arithmetic composes across holders, exactly under `Strongest`. The transport half is open — nothing has been late or died |
 | **54** | Where between identical and disjoint streams naming stops converging. Answered, and there is no between: three quarters shared agrees as badly as nothing shared, and only identical evidence converges. One seed a row, so the ends carry it |
 | **55** | Whether a blinded repair gate costs anything. Answered on the multiplexer: children minted separates decisively over twelve seeds, and accuracy, residents and sound rules all move the same way at two standard errors. Open on any other world |
-| **56** | *Does anybody hold a strict specialisation of this scope* is a boolean, so asking keeps C1 where reading would not. What the query costs per candidate per round is unasked. Open |
-| **57** | Every node predicts its own output while the real wave verifies behind it — speculation with a verification pass, lossless where a learned short-circuit is not. Nothing to buy until fork 32's cap comes off. Open |
+| **56** | What the repair gate's query costs on a wire. Priced: about nine asks a round, all askable at once, so one round trip. The structural cache removes a sixth. Open on building it |
+| **57** | Every node predicts its own output while the real wave verifies behind it, lossless where a learned short-circuit is not. The repair gate's query is where it first fits: a boolean usually answered no, and being wrong costs a rule. Open |
 | **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |

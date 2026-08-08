@@ -314,6 +314,18 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **The table is what blows up, not the commitments.** Repair needs a table per code
   seen while firing: commitments times distinct codes, both large under population
   coding.
+- **MATCHING AND SETTLING ARE NINE TENTHS OF THE CLOCK AND THE SWEEP IS NOT THE COST**,
+  measured on a narrow world whose table never grows — so it says where the TIME goes and
+  nothing about the memory a wide one showed.
+- **A child fires only where its parent does, and matching ignores that**, going through
+  the code index instead. Rete's own problem; the wrinkle is that culling orphans a
+  child, and an orphan that stops firing reads as nothing.
+- **The tally is built for commitments repair may never read.** Nothing under the floor
+  of misses can be repaired, so gating the tally on that same floor costs one comparison
+  and may drop most of the table.
+- **And the table is a frequency count, which a sketch bounds** — at the price that
+  collisions overestimate, so the separation bar has to absorb the error or the
+  correction beside it goes back to being decorative.
 - **So the TABLE spills** — to SQLite, on the owning node, when a commitment goes
   quiet or clears its gate, rehydrated only if it becomes a candidate again.
 - **The commitment itself is four fields and stays resident**, so no index of the
@@ -647,3 +659,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **46** | Of five hundred residents, fifteen to twenty-two decide every withheld answer on `Arranged`, and the arm perfect there decides with four. A population-level arm cannot reach what it does not displace. Closed |
 | **47** | Making the vote defer unless a child is significantly better costs four points where it can fire, and is inert under a permissive subsumption by construction. The vote steers repair, so it cannot be read as a readout change. Closed |
 | **48** | The multiplexer withholds nothing, so every instrument needing a held-out set is blind on the one world where depth is genuinely needed. Can a generated world hold assignments back without the learner being able to tell? Open |
+| **49** | Matching and settling are nine tenths of the clock on a narrow world whose table never grows. Where do they go on a WIDE one, and is it the memory or the search that ends the run? Open |

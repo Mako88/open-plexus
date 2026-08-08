@@ -220,6 +220,49 @@ public sealed class SharpeningTests(ITestOutputHelper output)
 
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Where_a_run_actually_spends_itself()
+    {
+        // NOTHING HAS EVER MEASURED THIS, WHICH IS THE POINT OF THE FACT. A CIFAR run was
+        // memory-bound and every instrument on it watched the clock; the traps list
+        // records that as a cost being invisible to all of them. The truth was worse --
+        // nothing watched EITHER, so a run spending its life in a quadratic sweep and one
+        // spending it in the per-code tally report the same everything.
+        //
+        // AND THE READING THAT MATTERS IS WHICH PHASE, NEVER THE TOTAL. Matching, the
+        // tally and the sweep want three completely different fixes, and picking one
+        // before this existed would have been picking by taste.
+        //
+        // `Separations` IS THE OTHER HALF AND IT IS THE REPRODUCIBLE ONE. Entries rather
+        // than bytes, because a heap figure moves with collection timing and could never
+        // be barred; this cannot drift with the machine, so a budget on it would hold.
+        foreach (var address in new[] { 2, 3 })
+        foreach (var mending in new[] { Mending.Outvoted, Mending.Uncovered })
+        {
+            var learned = new MultiplexerRun(
+                new MultiplexerSettings { Address = address },
+                new Brain(new CommittingSettings { Mending = mending }, seed: 1),
+                seed: 1).Run(Rounds);
+
+            var spent = learned.Tally.Spent;
+
+            output.WriteLine(
+                $"{(1 << address) + address,2} bits {mending,-9} | "
+                + $"resident {learned.Resident,5} separations {learned.Tally.Separations,8} "
+                + $"({learned.Tally.Separations / (double)Math.Max(learned.Resident, 1):F0} a rule) | "
+                + $"firing {spent.Firing,8:F0} settling {spent.Settling,8:F0} "
+                + $"sweeping {spent.Sweeping,8:F0} covering {spent.Covering,7:F0} "
+                + $"mending {spent.Mending,8:F0} ms");
+        }
+
+        // NO BAR ON EITHER, AND FOR TWO DIFFERENT REASONS. A duration is not reproducible
+        // under a fixed seed and a threshold on one would fail the build on a busy
+        // machine. `Separations` COULD be barred and is not yet, because a threshold
+        // written before the first run is a prediction dressed as a check.
+        Assert.True(true);
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
     public void And_whether_a_sharp_vote_is_only_sharp_because_nothing_lies_to_it()
     {
         // THE WAY THE RESULT COULD BE A TRAP, TESTED RATHER THAN CAVEATED. Raising the

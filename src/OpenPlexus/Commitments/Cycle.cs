@@ -1,6 +1,46 @@
+using System.Diagnostics;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Commitments;
+
+/// <summary>Where a run's wall clock went, by phase, in milliseconds.</summary>
+/// <remarks>
+/// <para>
+/// <b>NO REPORT HAS EVER CARRIED A COST, AND THIS PROJECT'S OWN TRAP LIST SAYS SO.</b>
+/// <i>A cost can be in memory while every instrument watches time</i> — and the truth was
+/// worse than that: nothing watched EITHER. A run that was memory-bound and a run that was
+/// spending its life in a quadratic sweep report the same everything.
+/// </para>
+/// <para>
+/// <b>SO THE POINT IS WHICH PHASE, NEVER THE TOTAL.</b> A total says a run was slow, which
+/// anybody watching already knew. What decides where to spend an optimisation is whether
+/// the clock is in matching, in the per-code tally, or in a sweep that is quadratic in the
+/// population — and those want three completely different answers.
+/// </para>
+/// <para>
+/// <b>AND IT IS A MEASUREMENT RATHER THAN A CHECK, so nothing may assert on it.</b> A
+/// duration is not reproducible under a fixed seed, and a threshold on one would fail the
+/// build on a busy machine — which is how a timing number becomes a thing that must not
+/// change. <c>Tally.Separations</c> beside it IS reproducible, and is the one to bar.
+/// </para>
+/// </remarks>
+public sealed record Spent
+{
+    /// <summary>Gathering what fired and taking the vote.</summary>
+    public required double Firing { get; init; }
+
+    /// <summary>Telling everything that fired what the settlement said, and tallying it.</summary>
+    public required double Settling { get; init; }
+
+    /// <summary>Subsuming, abstracting and culling on the sweep.</summary>
+    public required double Sweeping { get; init; }
+
+    /// <summary>Genesis.</summary>
+    public required double Covering { get; init; }
+
+    /// <summary>Choosing a condition and minting a child.</summary>
+    public required double Mending { get; init; }
+}
 
 /// <summary>
 /// One observation's worth of learning, and the bookkeeping every world wants.
@@ -136,6 +176,29 @@ public sealed class Cycle
 
     private double _leads;
 
+    private long _firing;
+    private long _settling;
+    private long _sweeping;
+    private long _covering;
+    private long _mending;
+
+    /// <summary>Where the wall clock went, by phase.</summary>
+    /// <remarks>
+    /// <b>TICKS ARE ACCUMULATED AND DIVIDED ONCE</b>, because adding a hundred thousand
+    /// millisecond doubles loses more than the thing being measured.
+    /// </remarks>
+    public Spent Spent => new()
+    {
+        Firing = Milliseconds(_firing),
+        Settling = Milliseconds(_settling),
+        Sweeping = Milliseconds(_sweeping),
+        Covering = Milliseconds(_covering),
+        Mending = Milliseconds(_mending),
+    };
+
+    private static double Milliseconds(long ticks) =>
+        ticks * 1000.0 / Stopwatch.Frequency;
+
     /// <summary>Predicts, scores, settles, sweeps, and repairs what was wrong.</summary>
     /// <param name="moment">What is live, already folded through any minted names.</param>
     /// <param name="arrived">What followed it.</param>
@@ -145,8 +208,12 @@ public sealed class Cycle
 
         var round = Rounds++;
 
+        var at = Stopwatch.GetTimestamp();
+
         var firing = _held.Firing(moment);
         var vote = _held.Predict(firing);
+
+        at = Mark(ref _firing, at);
 
         if (vote.Expects is not { } said) Silent++;
         else
@@ -178,7 +245,14 @@ public sealed class Cycle
                 Reached = round;
         }
 
+        // THE SCORING ABOVE IS COUNTED WITH THE VOTE RATHER THAN GIVEN ITS OWN PHASE. It
+        // is a handful of comparisons and a queue push; a phase for it would report noise
+        // and invite somebody to optimise it.
+        at = Mark(ref _firing, at);
+
         _held.Settle(firing, moment, arrived);
+
+        at = Mark(ref _settling, at);
 
         // THE SWEEP IS NOT PART OF FAILING, and it sat inside the failure branch for
         // the whole of step one. Once the learner is right most of the time, the
@@ -190,6 +264,8 @@ public sealed class Cycle
             Subsumed += _held.Subsume();
             _held.Abstract();
             _held.Cull();
+
+            at = Mark(ref _sweeping, at);
         }
 
         // REPAIR NEED NOT WAIT FOR THE VOTE, AND WHETHER IT SHOULD IS AN ARM. The plan
@@ -205,6 +281,8 @@ public sealed class Cycle
             && _held.Mend(firing, arrived) is not null)
             Repaired++;
 
+        at = Mark(ref _mending, at);
+
         if (vote.Expects == arrived) return;
 
         // COVERING RUNS ONLY ON A FAILURE AND IS NOT MOVED WITH REPAIR. Genesis mints
@@ -217,8 +295,27 @@ public sealed class Cycle
         // repair's business and not genesis's. `Surprising` is the dial.
         Minted += _held.Cover(moment, arrived, firing);
 
+        at = Mark(ref _covering, at);
+
         if (_held.Dials.Mending is Mending.Outvoted or Mending.Neglected
             && _held.Mend(firing, arrived) is not null)
             Repaired++;
+
+        Mark(ref _mending, at);
+    }
+
+    /// <summary>Charges the ticks since a mark to a phase, and returns a fresh mark.</summary>
+    /// <param name="phase">The running total to add to.</param>
+    /// <param name="since">When the phase started.</param>
+    /// <remarks>
+    /// <b>ONE CALL A PHASE RATHER THAN A <c>Stopwatch</c> EACH.</b> Five allocations a
+    /// round over thirty thousand rounds is a cost the instrument would be adding to the
+    /// thing it measures; a timestamp is a single counter read.
+    /// </remarks>
+    private static long Mark(ref long phase, long since)
+    {
+        var now = Stopwatch.GetTimestamp();
+        phase += now - since;
+        return now;
     }
 }

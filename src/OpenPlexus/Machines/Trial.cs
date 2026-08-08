@@ -141,6 +141,36 @@ public sealed record Tally
     public required int Resident { get; init; }
 
     /// <summary>
+    /// Entries in every resident commitment's tally, added up.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE OBJECT THE PLAN PREDICTED WOULD BLOW UP, COUNTED RATHER THAN FEARED.</b>
+    /// <i>The table is what blows up, not the commitments</i> — commitments times distinct
+    /// codes, both large under population coding. A CIFAR run was memory-bound and every
+    /// instrument on it watched time, so what actually ended the run was invisible to all
+    /// of them.
+    /// </para>
+    /// <para>
+    /// <b>ENTRIES AND NOT BYTES, BECAUSE A COUNT IS EXACT AND REPRODUCIBLE AND A BYTE
+    /// FIGURE IS NEITHER.</b> Asking the runtime for its heap gives a number that moves
+    /// with collection timing and with everything else in the process — so it could not be
+    /// barred, and a fixed seed would not reproduce it. Each entry is two longs behind a
+    /// dictionary slot; multiply if a byte figure is wanted, and the multiplier is a fact
+    /// about the runtime rather than about the run.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE HALF OF THE COST THAT CAN BE BARRED.</b> <see cref="Spent"/> is a
+    /// wall clock and must never be asserted on; this cannot drift with the machine, so a
+    /// budget on it would hold.
+    /// </para>
+    /// </remarks>
+    public required long Separations { get; init; }
+
+    /// <summary>Where the wall clock went, by phase.</summary>
+    public required Spent Spent { get; init; }
+
+    /// <summary>
     /// How many DISTINCT moments a resident commitment stands on, on average.
     /// </summary>
     /// <remarks>
@@ -274,6 +304,8 @@ public sealed class Trial<TSeen>
             Subsumed = cycle.Subsumed,
             Minted = cycle.Minted,
             Resident = held.Count,
+            Separations = held.All.Sum(one => (long)one.Separations.Count),
+            Spent = cycle.Spent,
             Occasions = held.Count == 0 ? 0.0 : held.All.Average(one => one.Occasions),
             Named = held.Names.Count,
             Stacked = held.Names.Means.Count(one => one.Value.Any(held.Names.Knows)),

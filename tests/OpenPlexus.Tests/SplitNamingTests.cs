@@ -63,20 +63,11 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
         return (dials, all, Abstracting.Shared(all, dials));
     }
 
-    /// <summary>Places every commitment on a holder, the way the ring would.</summary>
+    /// <inheritdoc cref="Fixture.Sharded"/>
     /// <param name="all">The whole population.</param>
     /// <param name="holders">How many machines to spread it over.</param>
-    private static List<List<Commitment>> Sharded(IEnumerable<Commitment> all, int holders)
-    {
-        var shards = new List<List<Commitment>>();
-
-        for (var holder = 0; holder < holders; holder++) shards.Add([]);
-
-        foreach (var commitment in all)
-            shards[(int)(commitment.Identity.Value % (ulong)holders)].Add(commitment);
-
-        return shards;
-    }
+    private static List<List<Commitment>> Sharded(IEnumerable<Commitment> all, int holders) =>
+        Fixture.Sharded(all, holders);
 
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]

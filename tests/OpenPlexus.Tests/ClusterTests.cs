@@ -74,6 +74,23 @@ public sealed class ClusterTests : IDisposable
         public IDisposable Listen(IReceiveArrivals machine, IReadOnlyCollection<Code> codes) =>
             inner.Listen(machine, codes);
 
+        // THE LEARNING PATH IS PASSED THROUGH AND NOT COUNTED. This double exists to count
+        // ENVELOPES, because the economy claim is about how many leave; an ask is not an
+        // envelope and folding it into the same tally would make a number this file
+        // asserts on move for a reason it is not about.
+        public IDisposable Subscribe(IReceiveAsks holder) => inner.Subscribe(holder);
+
+        public IDisposable Subscribe(IReceiveAnswers asker) => inner.Subscribe(asker);
+
+        public ValueTask<IReadOnlyCollection<MachineAddress>> AskAsync(
+            Ask ask,
+            CancellationToken ct = default,
+            Action<IReadOnlyCollection<MachineAddress>>? ready = null) =>
+            inner.AskAsync(ask, ct, ready);
+
+        public ValueTask SendAsync(MachineAddress to, Answer answer, CancellationToken ct = default) =>
+            inner.SendAsync(to, answer, ct);
+
         public ValueTask PublishAsync(Settled settled, CancellationToken ct = default) =>
             inner.PublishAsync(settled, ct);
 

@@ -50,8 +50,23 @@ public sealed class Posted : IBus, IAsyncDisposable
     private readonly Dictionary<MachineAddress, IReceiveReports> _machines = [];
     private readonly List<(IReceiveArrivals Machine, HashSet<Code> Codes)> _listeners = [];
 
+    private readonly Dictionary<MachineAddress, IReceiveAsks> _holders = [];
+    private readonly Dictionary<MachineAddress, IReceiveAnswers> _askers = [];
+
     private readonly Dictionary<ClusterAddress, string> _elsewhere = [];
+
+    /// <summary>
+    /// Where a machine that is not here can be reached.
+    /// </summary>
+    /// <remarks>
+    /// <b>ONE TABLE FOR REPORTS AND ANSWERS BOTH, BECAUSE BOTH ARE ADDRESSED TO A
+    /// MACHINE.</b> A second table keyed the same way by the same type is a second chance
+    /// for one of them to be populated and the other not — and the failure would be a
+    /// return path that silently drops, which is the hardest kind here to see.
+    /// </remarks>
     private readonly Dictionary<MachineAddress, string> _reporting = [];
+
+    private readonly Dictionary<MachineAddress, string> _holding = [];
 
     private readonly HashSet<string> _peers;
 
@@ -97,6 +112,28 @@ public sealed class Posted : IBus, IAsyncDisposable
         get { lock (_gate) return [.. _clusters.Keys.Concat(_elsewhere.Keys).Order()]; }
     }
 
+    /// <summary>Every holder this machine could ask, for the tests that ask.</summary>
+    /// <remarks>
+    /// <b>SEPARATE FROM <see cref="Known"/> BECAUSE IT IS THE DENOMINATOR OF A
+    /// GATHERING.</b> How many clusters exist decides how many replies a thought waits
+    /// for; how many HOLDERS exist decides how much of a population a vote was taken over,
+    /// and a run that quietly asked eleven of twelve would score like one that asked all
+    /// twelve and be wrong about something nothing reports.
+    /// </remarks>
+    public IReadOnlyCollection<MachineAddress> Holding
+    {
+        get
+        {
+            lock (_gate)
+                return
+                [
+                    .. _holders.Keys.Concat(_holding.Keys)
+                        .Distinct()
+                        .OrderBy(one => one.Value, StringComparer.Ordinal),
+                ];
+        }
+    }
+
     /// <inheritdoc/>
     public event Action<ClusterAddress>? Deaths;
 
@@ -123,15 +160,43 @@ public sealed class Posted : IBus, IAsyncDisposable
     /// </remarks>
     private async Task AnnounceAsync(CancellationToken ct = default)
     {
-        Roster mine;
-        lock (_gate) mine = new Roster
-        {
-            Host = _me,
-            Clusters = [.. _clusters.Keys.Select(one => one.Value)],
-            Machines = [.. _machines.Keys.Select(one => one.Value)],
-        };
+        var mine = Mine();
 
         foreach (var peer in _peers) await PostAsync(peer, "announce", mine, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>What this machine holds, as it would tell anyone.</summary>
+    private Roster Mine()
+    {
+        lock (_gate)
+            return new Roster
+            {
+                Host = _me,
+                Clusters = [.. _clusters.Keys.Select(one => one.Value)],
+
+                // THE UNION, BECAUSE A MACHINE IS ANNOUNCED FOR WHERE IT CAN BE REACHED
+                // AND NOT FOR WHAT IT DOES WITH WHAT ARRIVES. An asker that takes answers
+                // and no reports is still a machine at an address, and announcing only the
+                // reporting half would leave every answer to it undeliverable.
+                Machines =
+                [
+                    .. _machines.Keys.Concat(_askers.Keys).Select(one => one.Value).Distinct(),
+                ],
+
+                Holders = [.. _holders.Keys.Select(one => one.Value)],
+            };
+    }
+
+    /// <summary>Takes in what another machine says it holds.</summary>
+    /// <param name="roster">What arrived.</param>
+    private void Absorb(Roster roster)
+    {
+        lock (_gate)
+        {
+            foreach (var one in roster.Clusters) _elsewhere[new ClusterAddress(one)] = roster.Host;
+            foreach (var one in roster.Machines) _reporting[new MachineAddress(one)] = roster.Host;
+            foreach (var one in roster.Holders) _holding[new MachineAddress(one)] = roster.Host;
+        }
     }
 
     /// <inheritdoc/>
@@ -163,6 +228,25 @@ public sealed class Posted : IBus, IAsyncDisposable
         lock (_gate) _machines.Add(machine.Address, machine);
 
         return new Leaves(() => { lock (_gate) _machines.Remove(machine.Address); });
+    }
+
+    /// <inheritdoc/>
+    public IDisposable Subscribe(IReceiveAsks holder)
+    {
+        ArgumentNullException.ThrowIfNull(holder);
+
+        // AND LEAVING IS SILENT HERE, WHICH IS THE OPPOSITE OF A CLUSTER. See `IBus`: an
+        // ask that reaches nobody is an answer that never arrives, and the asker counts
+        // that for itself. A death notice would only ever cover the polite departures.
+        return Joins.At(_gate, _holders, holder.Address, holder);
+    }
+
+    /// <inheritdoc/>
+    public IDisposable Subscribe(IReceiveAnswers asker)
+    {
+        ArgumentNullException.ThrowIfNull(asker);
+
+        return Joins.At(_gate, _askers, asker.Address, asker);
     }
 
     /// <inheritdoc/>
@@ -246,6 +330,80 @@ public sealed class Posted : IBus, IAsyncDisposable
         // report is exactly the stranded route the accounting already knows how to lose.
         if (there is not null)
             await PostAsync(there, $"report/{Uri.EscapeDataString(to.Value)}", report, ct)
+                .ConfigureAwait(false);
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask<IReadOnlyCollection<MachineAddress>> AskAsync(
+        Ask ask,
+        CancellationToken ct = default,
+        Action<IReadOnlyCollection<MachineAddress>>? ready = null)
+    {
+        ArgumentNullException.ThrowIfNull(ask);
+
+        List<(MachineAddress Who, IReceiveAsks? Here, string? There)> going;
+
+        lock (_gate)
+            going =
+            [
+                .. _holders.Select(one => (one.Key, (IReceiveAsks?)one.Value, (string?)null))
+                    .Concat(_holding
+                        .Where(one => !_holders.ContainsKey(one.Key))
+                        .Select(one => (one.Key, (IReceiveAsks?)null, (string?)one.Value)))
+                    .OrderBy(one => one.Item1.Value, StringComparer.Ordinal),
+            ];
+
+        IReadOnlyCollection<MachineAddress> everyone = [.. going.Select(one => one.Who)];
+
+        // THE ASKER RECORDS ITS GATHERING INSIDE THIS WINDOW, before anything is asked. A
+        // local holder answers by direct call and can be back before this method returns,
+        // and an answer to an ask nobody remembers is dropped.
+        ready?.Invoke(everyone);
+
+        // EVERY HOLDER ASKED AT ONCE, WHICH IS WHAT FORK 56 PRICED AND NOT WHAT THE OTHER
+        // FAN-OUT ON THIS CLASS DOES. `BroadcastAsync` awaits each post in turn, so twelve
+        // clusters cost twelve round trips end to end -- against its own remark two hundred
+        // lines up saying they are twelve posts in flight. That is left as found rather
+        // than changed here, because it is the thinking path and this is the learning one;
+        // it is a defect and it is written down as one.
+        //
+        // AND IT MATTERS HERE BECAUSE THIS IS THE THING BEING TIMED. The gate's query was
+        // priced at about nine asks a round, all askable at once, so ONE round trip -- and
+        // measuring that against a serialised fan-out would report nine.
+        await Task.WhenAll(going.Select(one => one.Here is { } here
+            ? here.DeliverAsync(ask, ct)
+            : PostAsync(one.There!, $"ask/{Uri.EscapeDataString(one.Who.Value)}", ask, ct)))
+            .ConfigureAwait(false);
+
+        return everyone;
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask SendAsync(
+        MachineAddress to, Answer answer, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(answer);
+
+        IReceiveAnswers? here;
+        string? there;
+
+        lock (_gate)
+        {
+            _askers.TryGetValue(to, out here);
+            _reporting.TryGetValue(to, out there);
+        }
+
+        if (here is not null)
+        {
+            await here.DeliverAsync(answer, ct).ConfigureAwait(false);
+            return;
+        }
+
+        // AN ANSWER WITH NOWHERE TO GO IS DROPPED, exactly as a report is. The asker may
+        // have died between asking and being answered, which C3 says is ordinary — and
+        // throwing here would make one machine's departure another machine's error.
+        if (there is not null)
+            await PostAsync(there, $"answer/{Uri.EscapeDataString(to.Value)}", answer, ct)
                 .ConfigureAwait(false);
     }
 
@@ -348,15 +506,43 @@ public sealed class Posted : IBus, IAsyncDisposable
                 await DeliverLocallyAsync(Wire.Read<Settled>(sent), ct).ConfigureAwait(false);
                 break;
 
+            case "ask":
+                IReceiveAsks? holder;
+                lock (_gate) _holders.TryGetValue(new MachineAddress(who), out holder);
+
+                if (holder is not null)
+                    await holder.DeliverAsync(Wire.Read<Ask>(sent), ct).ConfigureAwait(false);
+                break;
+
+            case "answer":
+                IReceiveAnswers? asker;
+                lock (_gate) _askers.TryGetValue(new MachineAddress(who), out asker);
+
+                if (asker is not null)
+                    await asker.DeliverAsync(Wire.Read<Answer>(sent), ct).ConfigureAwait(false);
+                break;
+
+            // AN ANNOUNCEMENT IS ANSWERED BY ONE, AND WITHOUT THAT THE CLASS'S OWN CLAIM
+            // ABOUT LATE ARRIVAL WAS HALF TRUE. A machine announces when it opens, and a
+            // peer that is not up yet drops it -- so the machine that opened FIRST tells
+            // nobody and is told by everybody. Its own routes work and nothing can route
+            // back to it, which for the thinking path is a lost report and for this one is
+            // every answer undeliverable.
+            //
+            // ONE REPLY AND NEVER A SECOND, WHICH IS WHAT THE SEPARATE PATH BUYS. A reply
+            // that was itself answered would be two machines announcing at each other for
+            // the life of the run; `announced` is the same message with no reply owed, so
+            // the exchange closes in one round trip whoever opened first.
             case "announce":
-                var roster = Wire.Read<Roster>(sent);
+                var asking = Wire.Read<Roster>(sent);
 
-                lock (_gate)
-                {
-                    foreach (var one in roster.Clusters) _elsewhere[new ClusterAddress(one)] = roster.Host;
-                    foreach (var one in roster.Machines) _reporting[new MachineAddress(one)] = roster.Host;
-                }
+                Absorb(asking);
 
+                await PostAsync(asking.Host, "announced", Mine(), ct).ConfigureAwait(false);
+                break;
+
+            case "announced":
+                Absorb(Wire.Read<Roster>(sent));
                 break;
 
             case "died":
@@ -411,24 +597,40 @@ public sealed class Posted : IBus, IAsyncDisposable
 
         /// <summary>The machines it holds.</summary>
         public required ImmutableArray<string> Machines { get; init; }
+
+        /// <summary>
+        /// The holders of commitments it has, which can be asked.
+        /// </summary>
+        /// <remarks>
+        /// <b>ANNOUNCED SEPARATELY FROM <see cref="Machines"/> BECAUSE AN ASK IS A
+        /// BROADCAST AND A REPORT IS NOT.</b> A report goes to one named machine, so the
+        /// roster only has to say where that one is; an ask goes to EVERY holder, so the
+        /// roster is what decides the denominator of a gathering. Folding them together
+        /// would put every input machine and every actuator into the vote's population
+        /// count, and each of them would then be a holder that never answers.
+        /// </remarks>
+        public ImmutableArray<string> Holders { get; init; } = [];
     }
 
-    private sealed class Leaves(Action going) : IDisposable
-    {
-        private bool _gone;
-
-        public void Dispose()
-        {
-            if (_gone) return;
-
-            _gone = true;
-            going();
-        }
-    }
-
-    /// <summary>Shuts the door.</summary>
+    /// <summary>
+    /// Shuts the door. <b>Twice is the same as once.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>AND IT THREW THE SECOND TIME UNTIL SOMETHING KILLED A MACHINE ON PURPOSE.</b>
+    /// <see cref="CancellationTokenSource.CancelAsync"/> on a disposed source is an
+    /// <see cref="ObjectDisposedException"/>, so a harness that took a machine down mid-run
+    /// and then tore the fleet down could not do both — which reads as the C3 test failing
+    /// while every assertion in it has already passed. A machine dying and later being
+    /// cleaned up is the ORDINARY sequence for this class, not a misuse of it.
+    /// </remarks>
     public async ValueTask DisposeAsync()
     {
+        lock (_gate)
+        {
+            if (_shut) return;
+            _shut = true;
+        }
+
         await _closing.CancelAsync().ConfigureAwait(false);
 
         _door.Close();
@@ -436,4 +638,6 @@ public sealed class Posted : IBus, IAsyncDisposable
 
         foreach (var client in _clients.Values) (client as IDisposable)?.Dispose();
     }
+
+    private bool _shut;
 }

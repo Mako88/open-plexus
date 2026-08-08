@@ -41,6 +41,48 @@ public interface IReceiveArrivals
 }
 
 /// <summary>
+/// Something that holds commitments and can be asked what it makes of them —
+/// <b>fork 52's transport half, and the first traffic on this bus that is LEARNING
+/// rather than thinking.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>EVERYTHING ELSE HERE CARRIES A THOUGHT ACROSS A WIRE AND NOTHING CARRIES WHAT WAS
+/// LEARNT.</b> Fork 1 is open for exactly that reason: an occasion writes its edges into
+/// locally-held clusters, so a machine can think across a wire and cannot learn across
+/// one. This is the seam where that stops being true for the commitment learner.
+/// </para>
+/// <para>
+/// <b>SEPARATE FROM <see cref="IReceiveEnvelopes"/> BECAUSE A HOLDER IS NOT A CLUSTER.</b>
+/// A cluster owns nodes and forwards routes; a holder owns commitments and answers
+/// questions about them. They are addressed differently, they die differently, and the
+/// only thing they share is a socket.
+/// </para>
+/// </remarks>
+public interface IReceiveAsks
+{
+    MachineAddress Address { get; }
+
+    Task DeliverAsync(Ask ask, CancellationToken ct = default);
+}
+
+/// <summary>
+/// Something that asked, and is owed answers.
+/// </summary>
+/// <remarks>
+/// <b>THE RETURN PATH IS A MESSAGE AND NOT A RESPONSE BODY.</b> An asker does not block on
+/// its holders — see <see cref="Ask"/> for why that matters more here than anywhere else
+/// on this bus — so an answer arrives the way a <see cref="Report"/> does, addressed to
+/// whoever asked and correlated by the ask's own id.
+/// </remarks>
+public interface IReceiveAnswers
+{
+    MachineAddress Address { get; }
+
+    Task DeliverAsync(Answer answer, CancellationToken ct = default);
+}
+
+/// <summary>
 /// How anything reaches anything else.
 /// </summary>
 /// <remarks>
@@ -59,6 +101,23 @@ public interface IBus
 
     /// <summary>A machine becomes reachable, so reports can come back to it.</summary>
     IDisposable Subscribe(IReceiveReports machine);
+
+    /// <summary>
+    /// A holder becomes askable. <b>Disposing the handle is a death, and a death here is
+    /// silence rather than an event.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>UNLIKE A CLUSTER LEAVING, AND THE ASYMMETRY IS THE POINT.</b> A route in flight
+    /// toward a dead cluster is stranded and the origin cannot write it off without being
+    /// told, so <see cref="Deaths"/> exists. An ask that reaches nobody costs an answer
+    /// that never arrives, which is a thing the asker can see for itself by counting —
+    /// and a holder that crashed could not have sent a death notice anyway, so a design
+    /// that needed one would work only for the departures that were polite.
+    /// </remarks>
+    IDisposable Subscribe(IReceiveAsks holder);
+
+    /// <summary>An asker becomes reachable, so answers can come back to it.</summary>
+    IDisposable Subscribe(IReceiveAnswers asker);
 
     /// <summary>
     /// A machine asks to hear about finished thoughts that reached any of these
@@ -112,6 +171,31 @@ public interface IBus
 
     /// <summary>Get this report back to the machine that started the thought.</summary>
     ValueTask SendAsync(MachineAddress to, Report report, CancellationToken ct = default);
+
+    /// <summary>
+    /// Put this question to every holder at once — <b>the scatter half of fork 52.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>RETURNS WHO WAS ASKED AND NEVER WHAT THEY SAID.</b> That is the whole difference
+    /// between this and the request-and-wait build it replaced: an asker learns the
+    /// denominator here and the numerator later, so a holder that never answers costs an
+    /// answer rather than a timeout. What to do with a partial gathering is the caller's
+    /// question, because only the caller knows what it asked for.
+    /// </remarks>
+    /// <param name="ask">The question.</param>
+    /// <param name="ct">Cancellation.</param>
+    /// <param name="ready">
+    /// Called with the holders about to be asked, <b>before any of them is asked</b>. An
+    /// asker has to record its gathering inside this window: a holder can answer before
+    /// this method returns, and an answer to an ask nobody remembers is dropped.
+    /// </param>
+    ValueTask<IReadOnlyCollection<MachineAddress>> AskAsync(
+        Ask ask,
+        CancellationToken ct = default,
+        Action<IReadOnlyCollection<MachineAddress>>? ready = null);
+
+    /// <summary>Get this answer back to whoever asked. The gather half.</summary>
+    ValueTask SendAsync(MachineAddress to, Answer answer, CancellationToken ct = default);
 
     /// <summary>
     /// Announce a finished thought to every machine listening for a code it

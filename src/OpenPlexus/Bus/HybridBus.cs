@@ -89,6 +89,20 @@ public sealed class HybridBus : IBus
     private readonly Dictionary<MachineAddress, IReceiveReports> _machines = [];
 
     /// <summary>
+    /// Who can be asked about commitments, and who is owed the answers.
+    /// </summary>
+    /// <remarks>
+    /// <b>HERE SO THE SIMULATOR STAYS THE HARSHER TEST OF THE SAME TRAFFIC.</b> This bus
+    /// reorders and delays on purpose and <see cref="Posted"/> does not, so an ask that
+    /// crosses a socket cleanly says the bytes and the routing are right and says nothing
+    /// about C2 — and the arm that would measure that has to exist here or the constraint
+    /// is being honoured by whichever bus was convenient.
+    /// </remarks>
+    private readonly Dictionary<MachineAddress, IReceiveAsks> _holders = [];
+
+    private readonly Dictionary<MachineAddress, IReceiveAnswers> _askers = [];
+
+    /// <summary>
     /// Who wants to hear about a finished thought reaching which code — <b>fork
     /// 11, and the routing table that lets a second output machine exist.</b>
     /// </summary>
@@ -166,6 +180,83 @@ public sealed class HybridBus : IBus
 
         lock (_gate) _machines.Add(machine.Address, machine);
         return new Leaving(this, machine.Address);
+    }
+
+    /// <inheritdoc/>
+    public IDisposable Subscribe(IReceiveAsks holder)
+    {
+        ArgumentNullException.ThrowIfNull(holder);
+
+        return Joins.At(_gate, _holders, holder.Address, holder);
+    }
+
+    /// <inheritdoc/>
+    public IDisposable Subscribe(IReceiveAnswers asker)
+    {
+        ArgumentNullException.ThrowIfNull(asker);
+
+        return Joins.At(_gate, _askers, asker.Address, asker);
+    }
+
+    /// <inheritdoc/>
+    public ValueTask<IReadOnlyCollection<MachineAddress>> AskAsync(
+        Ask ask,
+        CancellationToken ct = default,
+        Action<IReadOnlyCollection<MachineAddress>>? ready = null)
+    {
+        ArgumentNullException.ThrowIfNull(ask);
+
+        // NOT NAMED `Holder`, AND THE REASON IS A CHECK RATHER THAN A STYLE. `DeadCodeTests`
+        // asks whether the library ever NAMES a public type, and a tuple field spelt like
+        // one answers yes for free -- so `Machines.Holder` read as wired for exactly as
+        // long as this line called its second element that.
+        List<(MachineAddress Who, IReceiveAsks Asks)> everyone;
+        lock (_gate)
+        {
+            everyone =
+            [
+                .. _holders.Select(pair => (pair.Key, pair.Value))
+                    .OrderBy(one => one.Key.Value, StringComparer.Ordinal),
+            ];
+
+            _inFlight += everyone.Count;
+            _messages += everyone.Count;
+        }
+
+        IReadOnlyCollection<MachineAddress> asked = [.. everyone.Select(one => one.Who)];
+
+        // WHO IS ABOUT TO BE ASKED, BEFORE ANYONE IS ASKED -- the same window
+        // `BroadcastAsync` opens, and for the same measured reason. Dispatch is `Task.Run`,
+        // so a holder can answer before this returns, and an answer to an ask nobody
+        // remembers is dropped by design.
+        ready?.Invoke(asked);
+
+        foreach (var (_, holder) in everyone) Dispatch(() => holder.DeliverAsync(ask, ct));
+
+        return ValueTask.FromResult(asked);
+    }
+
+    /// <inheritdoc/>
+    public ValueTask SendAsync(MachineAddress to, Answer answer, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(answer);
+
+        IReceiveAnswers? receiver;
+        lock (_gate)
+        {
+            // DROPPED RATHER THAN THROWN, unlike everything else this bus refuses to
+            // route. `Unreachable` exists because with no wire an unknown address can only
+            // be a routing bug -- but an asker that has gone between asking and being
+            // answered is C3 happening, and it is the case this whole payload exists to
+            // measure.
+            if (!_askers.TryGetValue(to, out receiver)) return ValueTask.CompletedTask;
+
+            _inFlight++;
+            _reports++;
+        }
+
+        Dispatch(() => receiver.DeliverAsync(answer, ct));
+        return ValueTask.CompletedTask;
     }
 
     /// <inheritdoc/>

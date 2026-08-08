@@ -229,6 +229,19 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
             + "cannot see a caller sitting beside it.",
 
+        // AND THE NEXT UNWIRED MECHANISM ARRIVED ALONE, WHICH IS WHAT THIS FILE SAID
+        // IT WOULD BUY. Two entries, one reason, and the reason is a fork number
+        // rather than a shrug -- so what is missing is countable and says where it
+        // goes.
+        //
+        // `Holder` READ AS WIRED FOR EXACTLY AS LONG AS A TUPLE FIELD WAS SPELT LIKE
+        // IT. `HybridBus.AskAsync` named its second element `Holder`, and a scan for
+        // whether the library NAMES a type answers yes to that for free. Renaming the
+        // field is what put both of these on this list, and it is the sharper half of
+        // the finding: a budget can be satisfied by a coincidence.
+        ["Asker"] = Unmounted,
+        ["Holder"] = Unmounted,
+
         ["Probe"] = "A CONTROL ARM, SO THE LIBRARY NAMING IT WOULD BE THE FAULT. It "
             + "is the dullest learner there is, run over the same features the "
             + "commitment population reads, and what it measures is how much of a "
@@ -246,6 +259,25 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     private const string Harness =
         "a world's run is the HARNESS's entry point, so a test is its rightful "
         + "caller and the library naming it would be the surprise.";
+
+    /// <summary>
+    /// Why the two ends of fork 52's exchange are built and not yet called by anything.
+    /// </summary>
+    /// <remarks>
+    /// <b>THIS IS THE SHAPE THE BUDGET EXISTS TO KEEP HONEST RATHER THAN A LOOPHOLE, AND
+    /// THE DIFFERENCE IS WHETHER IT IS COUNTED.</b> The entry says which fork closes it,
+    /// so the next session can find the gap by reading a list instead of by noticing.
+    /// </remarks>
+    private const string Unmounted =
+        "FORK 52'S TRANSPORT IS BUILT AND THE LEARNER IS NOT ON IT, which is the "
+        + "honest state and is exactly what this list is for. `AskedTests` puts counts "
+        + "and testimony across real sockets between machines that share no object, and "
+        + "`Cycle` still calls `Abstract()` with no argument and `Predict` on its own "
+        + "population. Mounting it is not a wiring change: `Cycle.Step` is synchronous "
+        + "and a gathering arrives when it arrives, so the harness goes async with it -- "
+        + "the rewrite the plan budgets for, and fork 53's question about a loop with no "
+        + "clock. Until then a run is exactly what it was, which is the only way the "
+        + "numbers stay comparable.";
 
     /// <summary>
     /// What using a member actually looks like, as against merely spelling it.

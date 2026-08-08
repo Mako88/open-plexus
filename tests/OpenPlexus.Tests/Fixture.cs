@@ -219,6 +219,33 @@ public static class Fixture
     }
 
     /// <summary>
+    /// Places every commitment on a holder, the way the ring would.
+    /// </summary>
+    /// <param name="all">The whole population.</param>
+    /// <param name="holders">How many machines to spread it over.</param>
+    /// <remarks>
+    /// <b>SHARED BECAUSE A SECOND COPY WOULD MAKE TWO GRIDS THAT LOOK COMPARABLE AND ARE
+    /// NOT.</b> <c>SplitNamingTests</c> measured what sharding costs rung five and
+    /// <c>AskedTests</c> puts the same exchange on a socket, so a difference in HOW the
+    /// population is split would show up as a difference the wire appeared to cause.
+    /// </remarks>
+    public static List<List<Commitments.Commitment>> Sharded(
+        IEnumerable<Commitments.Commitment> all, int holders)
+    {
+        ArgumentNullException.ThrowIfNull(all);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(holders);
+
+        var shards = new List<List<Commitments.Commitment>>();
+
+        for (var holder = 0; holder < holders; holder++) shards.Add([]);
+
+        foreach (var commitment in all)
+            shards[(int)(commitment.Identity.Value % (ulong)holders)].Add(commitment);
+
+        return shards;
+    }
+
+    /// <summary>
     /// A broadcast standing on its first node, with budget to spend.
     /// </summary>
     /// <remarks>

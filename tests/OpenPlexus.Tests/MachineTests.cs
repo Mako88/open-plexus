@@ -362,6 +362,25 @@ public sealed class MachineTests : IDisposable
         public IDisposable Listen(IReceiveArrivals machine, IReadOnlyCollection<Code> codes) =>
             throw new NotSupportedException("this double does not route arrivals");
 
+        // AND NOT SILENT FOR THE LEARNING PATH EITHER, FOR THE SAME REASON. Fork 52's
+        // exchange has the identical race -- a holder can answer before `AskAsync` returns
+        // -- and it is reproduced against the real `Posted` in `AskedTests` rather than
+        // against a fake that would only ever confirm how the fake was written.
+        public IDisposable Subscribe(IReceiveAsks holder) =>
+            throw new NotSupportedException("this double does not route asks");
+
+        public IDisposable Subscribe(IReceiveAnswers asker) =>
+            throw new NotSupportedException("this double does not route answers");
+
+        public ValueTask<IReadOnlyCollection<MachineAddress>> AskAsync(
+            Ask ask,
+            CancellationToken ct = default,
+            Action<IReadOnlyCollection<MachineAddress>>? ready = null) =>
+            throw new NotSupportedException("this double does not route asks");
+
+        public ValueTask SendAsync(MachineAddress to, Answer answer, CancellationToken ct = default) =>
+            throw new NotSupportedException("this double does not route answers");
+
         public ValueTask PublishAsync(Settled settled, CancellationToken ct = default) =>
             throw new NotSupportedException("this double does not route arrivals");
 

@@ -26,25 +26,8 @@ namespace OpenPlexus.Tests;
 /// </remarks>
 public sealed class PostedTests(ITestOutputHelper output)
 {
-    /// <summary>
-    /// A port nothing else is using.
-    /// </summary>
-    /// <remarks>
-    /// <b>TAKEN FROM THE OPERATING SYSTEM RATHER THAN COUNTED UP FROM A CONSTANT.</b> A
-    /// fixed port makes a test that passes alone and fails beside anything else holding
-    /// it — including a previous run of itself that has not finished releasing it, which
-    /// is the flake that would get blamed on the bus.
-    /// </remarks>
-    private static string Free()
-    {
-        using var taken = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
-
-        taken.Start();
-        var port = ((System.Net.IPEndPoint)taken.LocalEndpoint).Port;
-        taken.Stop();
-
-        return $"http://localhost:{port}";
-    }
+    /// <inheritdoc cref="Wired.Free"/>
+    private static string Free() => Wired.Free();
 
     /// <summary>A cluster that keeps what it was handed.</summary>
     private sealed class Catches(ClusterAddress address) : IReceiveEnvelopes
@@ -91,25 +74,9 @@ public sealed class PostedTests(ITestOutputHelper output)
         ],
     };
 
-    /// <summary>Waits for a condition without deciding a miss by a deadline.</summary>
-    /// <remarks>
-    /// <b>THE TIMEOUT IS A HANG DETECTOR AND NEVER A CLAIM ABOUT SPEED</b>, exactly as
-    /// <see cref="Fixture.Patience"/> is. What is being asserted is that the message
-    /// ARRIVES, and a bound generous enough to be uninteresting is what keeps a slow
-    /// machine from being reported as a broken one.
-    /// </remarks>
-    private static async Task<bool> UntilAsync(Func<bool> done)
-    {
-        var gave = DateTime.UtcNow + TimeSpan.FromSeconds(20);
-
-        while (DateTime.UtcNow < gave)
-        {
-            if (done()) return true;
-            await Task.Delay(10).ConfigureAwait(false);
-        }
-
-        return done();
-    }
+    /// <inheritdoc cref="Wired.UntilAsync"/>
+    /// <param name="done">What is being waited for.</param>
+    private static Task<bool> UntilAsync(Func<bool> done) => Wired.UntilAsync(done);
 
     /// <summary>
     /// <b>AN ENVELOPE CROSSES A SOCKET AND ARRIVES AS ITSELF.</b>

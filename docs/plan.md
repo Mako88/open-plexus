@@ -111,6 +111,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   holder claims and `Decide` merges any number of those; a commitment never crosses.
 - **And the transport half is untouched** — nothing is late and nothing dies in any of it,
   so a green split says nothing whatever about C2 or C3.
+- **EXCEPT THAT A MERGED NAME HAS A DEATH THRESHOLD, AND IT SEPARATES TWO FAILURES.** Up to
+  a quarter of holders gone it names rightly or says nothing; past that it proposes a name
+  the whole population would not.
 - **WHAT BREAKS IS EVERY STATISTIC THAT IS POPULATION-WIDE**, and each mechanism was local
   or not by accident rather than by decision.
 - **Rung five loses the power to CERTIFY a redundancy and goes silent**; its evidence is

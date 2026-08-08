@@ -146,6 +146,48 @@ public static class Fixture
         Fleeting = fleeting,
     };
 
+    /// <summary>
+    /// Independent arms of one measurement, run at the same time, answered in order.
+    /// </summary>
+    /// <typeparam name="T">Whatever an arm reports.</typeparam>
+    /// <param name="arms">The arms, each a whole run and each ignorant of the others.</param>
+    /// <returns>What each arm returned, in the order the arms were given.</returns>
+    /// <remarks>
+    /// <para>
+    /// <b>THE SUITE IS SERIAL AND STAYS SERIAL; THIS IS THE EXEMPTION `Parallelism.cs`
+    /// ALREADY NAMES.</b> A test that genuinely needs concurrency must create it INSIDE
+    /// itself — and the reason the assembly is serialised is that numbers move with how
+    /// busy the machine is, measured: the walk's agreement with itself reads 0.8833
+    /// alone and 1.0000 under load. That is a fact about DELIVERY, and delivery is the
+    /// bus.
+    /// </para>
+    /// <para>
+    /// <b>SO THIS IS FOR THE LEARNER AND NEVER FOR THE WALK, AND THE SIGNATURE IS THE
+    /// GUARD.</b> <see cref="Machines.ArrangedRun"/>, <see cref="Machines.MultiplexerRun"/>,
+    /// <see cref="Machines.CifarRun"/> and <see cref="Machines.GradedRun"/> hold no bus
+    /// and are synchronous end to end: a fixed seed determines every number they report
+    /// whatever else the machine is doing. Every bus world answers with a
+    /// <see cref="Task{TResult}"/> instead, so an arm that would be unsafe here does not
+    /// fit the parameter — the rule is enforced by the type rather than written in a
+    /// comment nobody reads at the moment it matters.
+    /// </para>
+    /// <para>
+    /// <b>ANSWERED IN ORDER, BECAUSE THE ORDER IS WHAT THE OUTPUT AND THE ASSERTIONS
+    /// READ.</b> A grid printed in completion order is a grid whose rows move between
+    /// runs, and this project reads its grids.
+    /// </para>
+    /// </remarks>
+    public static T[] Abreast<T>(params Func<T>[] arms)
+    {
+        ArgumentNullException.ThrowIfNull(arms);
+
+        var answers = new T[arms.Length];
+
+        Parallel.For(0, arms.Length, at => answers[at] = arms[at]());
+
+        return answers;
+    }
+
     /// <summary>A code in the plain test modality.</summary>
     public static Code C(ulong value) => new(Modality: 1, value);
 

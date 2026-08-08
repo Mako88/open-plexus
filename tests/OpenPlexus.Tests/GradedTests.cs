@@ -144,9 +144,13 @@ public sealed class GradedTests(ITestOutputHelper output)
         // WHAT WOULD STRESS IT IS A WORLD WHOSE DIMENSIONS MOVE INDEPENDENTLY, which
         // this one does not have. Said here so the flat numbers are read as a
         // property of the pairing rather than as a result about population coding.
-        Assert.Equal(Run(Fronting.Winnowed, 0.0), Run(Fronting.Winnowed, 0.9));
+        var arms = Fixture.Abreast(
+            () => Run(Fronting.Winnowed, 0.0), () => Run(Fronting.Winnowed, 0.9),
+            () => Run(Fronting.Banded, 0.0), () => Run(Fronting.Banded, 0.9));
 
-        Assert.NotEqual(Run(Fronting.Banded, 0.0), Run(Fronting.Banded, 0.9));
+        Assert.Equal(arms[0], arms[1]);
+
+        Assert.NotEqual(arms[2], arms[3]);
     }
 
     [Fact]
@@ -155,7 +159,15 @@ public sealed class GradedTests(ITestOutputHelper output)
         // FORK 12 AGAIN, and a front end is a new place for it to break: `Winnow`
         // takes no seed on purpose, so two runs differing here would mean the
         // projection was not a constant of the design after all.
-        Assert.Equal(Run(Fronting.Winnowed, 0.9, seed: 5), Run(Fronting.Winnowed, 0.9, seed: 5));
-        Assert.Equal(Run(Fronting.Banded, 0.9, seed: 5), Run(Fronting.Banded, 0.9, seed: 5));
+        // AND THE TWO COPIES RUN AT THE SAME TIME NOW, WHICH ASKS MORE RATHER THAN LESS.
+        // A learner that reached its numbers through anything ambient — a static, a
+        // shared buffer, a clock — would have been free to agree with itself while the
+        // two runs were consecutive. Side by side it is not.
+        var arms = Fixture.Abreast(
+            () => Run(Fronting.Winnowed, 0.9, seed: 5), () => Run(Fronting.Winnowed, 0.9, seed: 5),
+            () => Run(Fronting.Banded, 0.9, seed: 5), () => Run(Fronting.Banded, 0.9, seed: 5));
+
+        Assert.Equal(arms[0], arms[1]);
+        Assert.Equal(arms[2], arms[3]);
     }
 }

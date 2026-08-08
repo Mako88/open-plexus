@@ -408,21 +408,38 @@ public sealed class ArrangedTests(ITestOutputHelper output)
         // and it is also how a mechanism quietly stops. On CIFAR the gate was
         // load-bearing and beat the ungated arm on every seed. Here the world is small
         // and the sound rules are one code each, so the gate may be starving it.
-        foreach (var looking in new[] { Looking.Whole, Looking.Tiled })
-        foreach (var gate in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
+        var grid =
+            (from looking in new[] { Looking.Whole, Looking.Tiled }
+             from gate in new[] { Surprising.Unaccounted, Surprising.AnyFailure }
+             select (looking, gate)).ToArray();
+
+        // FOUR WHOLE RUNS THAT SHARE NOTHING, AND THIS WAS THE SLOWEST TEST IN THE SUITE
+        // AT 184 SECONDS OF THEM WAITING FOR EACH OTHER. `ArrangedRun` holds no bus and
+        // is synchronous end to end, so a fixed seed fixes every number it reports
+        // whatever else the machine is doing -- see `Fixture.Abreast` for why that is the
+        // condition and why no bus world may go through it.
+        var arms = Fixture.Abreast(
+            [.. grid.Select<(Looking Looking, Surprising Gate), Func<(Reached Could, Grounded Got, HashSet<Code> Alone)>>(
+                one => () =>
+                {
+                    var run = new ArrangedRun(
+                        Small,
+                        new Brain(new CommittingSettings { Surprising = one.Gate }, seed: 1),
+                        one.Looking,
+                        seed: 1);
+
+                    var could = run.Reachable(depth: 1);
+                    var got = run.Run(20_000);
+
+                    // WHAT IT HOLDS, SPELLED BACK OUT, so a minted name cannot hide a
+                    // scope that is really one code wearing a hat.
+                    return (could, got, Fixture.Alone(run.Held));
+                })]);
+
+        for (var at = 0; at < grid.Length; at++)
         {
-            var run = new ArrangedRun(
-                Small,
-                new Brain(new CommittingSettings { Surprising = gate }, seed: 1),
-                looking,
-                seed: 1);
-
-            var could = run.Reachable(depth: 1);
-            var got = run.Run(20_000);
-
-            // WHAT IT HOLDS, SPELLED BACK OUT, so a minted name cannot hide a scope that
-            // is really one code wearing a hat.
-            var alone = Fixture.Alone(run.Held);
+            var (looking, gate) = grid[at];
+            var (could, got, alone) = arms[at];
 
             var found = could.Alone.Count(alone.Contains);
 

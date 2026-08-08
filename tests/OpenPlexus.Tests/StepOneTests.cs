@@ -135,9 +135,20 @@ public sealed class StepOneTests(ITestOutputHelper output)
         // a dictionary of tallies and the population is walked every round, so an
         // unstable iteration order would move the learned structure without anything
         // failing.
-        Assert.Equal(Run(address: 2, choosing: Choosing.Separating, seed: 8), Run(address: 2, choosing: Choosing.Separating, seed: 8));
-        Assert.Equal(Run(address: 2, choosing: Choosing.Present, seed: 8), Run(address: 2, choosing: Choosing.Present, seed: 8));
+        // SIDE BY SIDE RATHER THAN ONE AFTER THE OTHER, WHICH IS THE HARDER QUESTION.
+        // Consecutive runs are free to agree through anything ambient they happen to
+        // share; concurrent ones are not, and a learner with a static in it fails here
+        // and passes there.
+        var arms = Fixture.Abreast(
+            () => Run(address: 2, choosing: Choosing.Separating, seed: 8),
+            () => Run(address: 2, choosing: Choosing.Separating, seed: 8),
+            () => Run(address: 2, choosing: Choosing.Present, seed: 8),
+            () => Run(address: 2, choosing: Choosing.Present, seed: 8),
+            () => Run(address: 2, choosing: Choosing.Separating, seed: 9));
 
-        Assert.NotEqual(Run(address: 2, choosing: Choosing.Separating, seed: 8), Run(address: 2, choosing: Choosing.Separating, seed: 9));
+        Assert.Equal(arms[0], arms[1]);
+        Assert.Equal(arms[2], arms[3]);
+
+        Assert.NotEqual(arms[0], arms[4]);
     }
 }

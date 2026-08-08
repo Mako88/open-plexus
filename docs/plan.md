@@ -95,12 +95,12 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   HELD cannot reach what decides.
 - **SO THE LIVE PROBLEM IS WHICH RULE GETS THE SEAT**, and two arms at it have failed —
   see the revival rows before trying a third.
-- **Seven — Monk-2, a day's work with a published number.** A counting concept a
-  conjunctive scope CANNOT express, and the cheapest language-ceiling probe there is.
 - **Eight — the rung the failures demand, and never the rung that sounds next.** Choosing
   before a failure asks is hand-specified bias by a side door.
-- **AND NO FAILURE HAS ASKED YET.** On the one world that can say, twelve one-code rules
-  cover everything held out — so the language is nowhere near binding.
+- **AND ONE HAS ASKED NOW, WHICH IS WHAT STEP SEVEN WAS BUILT FOR.** `Monk` settles its
+  own ceiling by enumeration rather than inferring it from a score — fork 50 is the rung.
+- **Nine — the commitment learner has no bus, so C1 holds by convention.** Everything
+  that constraint exists for is untested and `Abstain` cannot fire — fork 52.
 - **The two-learner head-to-head is a side quest and blocks nothing**, being cheap now
   that both are co-resident.
 - **Resist polishing step one.** It is the least informative part when it passes.
@@ -500,6 +500,12 @@ change of architecture entirely.
   boundary codes differently run to run. Fork 12, arriving from outside.
 - **TAKING OUTPUT ZERO OF A GRAPH IS A SILENT WRONG ANSWER.** A pooled embedding and a
   per-token hidden state are both plausible tensors and only one is a reading. Name it.
+- **A MEASUREMENT INSIDE A REPORT IS ASSERTED ON BY EVERY EQUALITY READING IT.** A wall
+  clock in a record turns reproducibility red and makes every `NotEqual` beside it pass
+  for free.
+- **AN ANSWER KEY IN THE WRONG ALPHABET SCORES NOUGHT AND LOOKS LIKE A VERDICT.** A key
+  expecting a code the population can never hold reports no rule true, which reads
+  exactly like a learner holding none.
 
 ---
 
@@ -660,3 +666,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **47** | Making the vote defer unless a child is significantly better costs four points where it can fire, and is inert under a permissive subsumption by construction. The vote steers repair, so it cannot be read as a readout change. Closed |
 | **48** | The multiplexer withholds nothing, so every instrument needing a held-out set is blind on the one world where depth is genuinely needed. Can a generated world hold assignments back without the learner being able to tell? Open |
 | **49** | Matching and settling are nine tenths of the clock on a narrow world whose table never grows. Where do they go on a WIDE one, and is it the memory or the search that ends the run? Open |
+| **50** | `Monk`'s second puzzle admits no sound conjunction saying YES short of a whole instance. Which rung does that demand — a count, a negation, or a disjunction — and does the failure distinguish them? Open |
+| **51** | A code live in every moment separates nothing, so repair can never choose it — yet genesis mints on it and every commitment tallies it forever. Does refusing both help, and does it move with the world? Open |
+| **52** | The commitment learner runs in one process, so C1 is kept by convention and C3's third outcome cannot fire. What does putting the vote on the wire cost in agreement-with-itself, against the in-process arm as control? Open |
+| **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |

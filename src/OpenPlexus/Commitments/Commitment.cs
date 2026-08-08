@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Runtime.InteropServices;
 using OpenPlexus.Codes;
 
 namespace OpenPlexus.Commitments;
@@ -309,8 +310,22 @@ public sealed class Commitment
 
             if (Scope.Contains(code)) continue;
 
-            _separations.TryGetValue(code, out var seen);
-            _separations[code] = hit
+            // ONE HASH LOOKUP AND NOT TWO, WHICH IS THE WHOLE OF THIS LINE'S POINT.
+            // `TryGetValue` followed by an indexer set hashes the code twice and walks
+            // the bucket chain twice to write back a struct sixteen bytes wide. The
+            // first cost profile put settling at a third of the wall clock and this loop
+            // IS settling: it runs once per firing commitment per code in the moment,
+            // which on a wide world is the largest number in the run.
+            //
+            // THE TABLE ENDS UP IDENTICAL, ENTRY FOR ENTRY AND IN INSERTION ORDER. A
+            // code not yet present is added as a default <see cref="Separation"/> and
+            // then incremented, which is exactly what the pair of calls did — so
+            // `Tally.Separations`, the one half of the cost that CAN be barred, does not
+            // move, and `DeterminismTests` is what says so.
+            ref var seen = ref CollectionsMarshal.GetValueRefOrAddDefault(
+                _separations, code, out _);
+
+            seen = hit
                 ? seen with { InHits = seen.InHits + 1 }
                 : seen with { InMisses = seen.InMisses + 1 };
         }

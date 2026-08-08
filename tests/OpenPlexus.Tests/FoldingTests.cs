@@ -76,7 +76,7 @@ public sealed class FoldingTests(ITestOutputHelper output)
     /// <summary>How far apart two machines fold the same fresh moments.</summary>
     /// <param name="mine">One machine's population.</param>
     /// <param name="yours">The other's.</param>
-    private static (int Folded, int Apart) Compared(Population mine, Population yours)
+    internal static (int Folded, int Apart) Compared(Population mine, Population yours)
     {
         IWorld<IReadOnlyList<int>> world =
             new Multiplexer(new MultiplexerSettings { Address = Address }, seed: 99);

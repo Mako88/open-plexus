@@ -123,6 +123,11 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **A COUNT MERGES AND A STRUCTURE DOES NOT, which is the line between the two fixes.**
   `Recurrence` ships frequencies and recovers rung five exactly; `Narrows` has nothing to
   add up and wants a round trip.
+- **AND MERGING THE COUNTS IS NOT AN OPTIMISATION, IT IS THE ONLY THING THAT WORKS.**
+  Machines sharing three quarters of a stream agree on names as poorly as machines sharing
+  none; only identical evidence converges.
+- **SO THE LAN CASE IS NOT SAFE EITHER.** Twenty phones on one wifi share most of what they
+  see and not all of it, and most is worth nothing here.
 - **Repair's own choice of condition survives splitting untouched**, being per-commitment —
   so *decide local* is doing exactly what it was written to do.
 - **JOHN'S SPECULATION PROPOSAL, AND IT IS EARLY RATHER THAN WRONG.** Every node predicts
@@ -548,6 +553,9 @@ change of architecture entirely.
 - **A PREDICTION WRITTEN INTO A WIRING CHECK FAILS TWO WAYS AND READS THE SAME.** Genuinely
   unwired and wired-but-backwards are one message; assert that arms DIFFER, never which
   way.
+- **A WINNER-TAKE-ALL ARGMAX IS CHAOTIC IN ITS EVIDENCE, and two ends of a sweep cannot
+  show it.** Naming picks one pair at a time, so a small difference changes the winner and
+  everything built on it.
 - **AND A DEFAULT CAN SHORT-CIRCUIT THE MECHANISM BEING MEASURED.** `Mending.Outvoted`
   ships and skips the narrows test, so a sweep on defaults returned three identical arms
   for a gate that was never running.
@@ -720,7 +728,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **50** | `Monk`'s second puzzle admits no sound conjunction saying YES short of a whole instance. Which rung does that demand — a count, a negation, or a disjunction — and does the failure distinguish them? Open |
 | **51** | Genesis no longer roots on a code that has never varied. What is left is the TALLY: an always-present code is still an entry in every commitment's table forever, and background still roughly doubles it |
 | **52** | The commitment learner runs in one process, so C1 is kept by convention. Half closed: the vote's arithmetic composes across holders, exactly under `Strongest`. The transport half is open — nothing has been late or died |
-| **54** | Naming is deterministic in the evidence, so two holders converge on identical streams and diverge on disjoint ones. The deployment case is neither — overlapping but not identical — and it decides whether rung five needs the wire. Open |
+| **54** | Where between identical and disjoint streams naming stops converging. Answered, and there is no between: three quarters shared agrees as badly as nothing shared, and only identical evidence converges. One seed a row, so the ends carry it |
 | **55** | Whether a blinded repair gate costs anything. Answered on the multiplexer: children minted separates decisively over twelve seeds, and accuracy, residents and sound rules all move the same way at two standard errors. Open on any other world |
 | **56** | *Does anybody hold a strict specialisation of this scope* is a boolean, so asking keeps C1 where reading would not. What the query costs per candidate per round is unasked. Open |
 | **57** | Every node predicts its own output while the real wave verifies behind it — speculation with a verification pass, lossless where a learned short-circuit is not. Nothing to buy until fork 32's cap comes off. Open |

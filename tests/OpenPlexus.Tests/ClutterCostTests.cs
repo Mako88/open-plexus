@@ -102,7 +102,13 @@ public sealed class ClutterCostTests(ITestOutputHelper output)
     [Fact]
     public void Refusing_to_root_on_what_never_varies()
     {
-        int[] seeds = [1, 2, 3, 4, 5];
+        // TWELVE, BECAUSE THIS READING DECIDES WHETHER THE ARM BECOMES THE CODE. Five
+        // said 2.7 standard errors on the cluttered world and half of one on the clean,
+        // which is enough to keep measuring and not enough to delete the alternative --
+        // and deleting the alternative is what happens next, so the number that justifies
+        // it has to be the better one. `ONE SEED IS NOT A COMPARISON AND WILL HAPPILY
+        // INVERT` is in the traps list; five is not much further along.
+        int[] seeds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
         var arms = Fixture.Abreast(
         [

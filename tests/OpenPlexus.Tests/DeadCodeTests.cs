@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using OpenPlexus.Codes;
@@ -76,7 +76,7 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
     private static readonly HashSet<string> Generated = new(StringComparer.Ordinal)
     {
         "Equals", "GetHashCode", "ToString", "Deconstruct", "PrintMembers",
-        "CompareTo", "Dispose", "GetEnumerator", "Clone",
+        "CompareTo", "Dispose", "DisposeAsync", "GetEnumerator", "Clone",
     };
 
     [Fact]
@@ -219,6 +219,12 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["CifarRun"] = Harness,
         ["ArrangedRun"] = Harness,
         ["MonkRun"] = Harness,
+
+        ["Posted"] = "A TRANSPORT IS CHOSEN BY WHOEVER COMPOSES THE SYSTEM, so the "
+            + "library naming one would be the library deciding how it is deployed -- "
+            + "the same fault as a world naming a brain type, one layer out. `IBus` is "
+            + "what `src` knows about; which bus is a container's or a harness's "
+            + "decision, and `HybridBus` sits the same way.",
 
         ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
             + "cannot see a caller sitting beside it.",

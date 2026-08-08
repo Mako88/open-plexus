@@ -45,6 +45,14 @@ public sealed record Examined
     /// handful of rules are deciding the world and the rest are furniture — which would
     /// say the remaining gap is about which rule WINS rather than about which are held.
     /// </remarks>
+    /// <remarks>
+    /// <b>AND IT CAN ONLY EVER BE READ ON A WORLD THAT WITHHOLDS, WHICH IS A LIMIT ON THE
+    /// FINDING AND NOT A DETAIL.</b> A generated world holds nothing back, so
+    /// <c>Trial.Examine</c> returns nothing and this is unmeasurable on the multiplexer —
+    /// the one world where depth is genuinely needed, and therefore the one where a
+    /// handful of deciders would mean something different. <i>A finding on one world is a
+    /// finding about one world</i>, and this is currently that.
+    /// </remarks>
     public required int Deciders { get; init; }
 
     /// <summary>

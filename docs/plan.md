@@ -578,7 +578,8 @@ change of architecture entirely.
   READ.** Of five hundred residents, fifteen to twenty-two decide every withheld answer,
   and the arm that is perfect there decides with four.
 - **SO A POPULATION-LEVEL ARM CANNOT REACH WHAT IT DOES NOT DISPLACE**, which is every
-  gate, weighing and subsumption rule tried across four sessions.
+  gate, weighing and subsumption rule tried across four sessions — on ONE world, because
+  the instrument needs a withheld set and a generated world has none.
 - **THE VOTE PREFERS THE NARROWER RULE EVERY ROUND WHILE SUBSUMPTION PREFERS THE GENERAL
   ONE EVERY THOUSANDTH.** Same statistic, opposite directions, and the one acting
   constantly wins — a child displaces its parent as decider, then answers what it has

@@ -34,7 +34,7 @@ namespace OpenPlexus.Tests;
 /// A green run says the fold composes; it says nothing whatever about C2, because nothing
 /// here is late, and nothing about C3, because nothing here dies. Reading it as <i>the
 /// distributed vote works</i> would be a claim about correctness doing duty as a claim
-/// about the wire — the trap this repo paid for one session ago.
+/// about the wire — a trap already on this repo's own list.
 /// </para>
 /// </remarks>
 public sealed class SplitTests(ITestOutputHelper output)

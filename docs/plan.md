@@ -126,6 +126,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **A COUNT MERGES AND A STRUCTURE DOES NOT, which is the line between the two fixes.**
   `Recurrence` ships frequencies and recovers rung five exactly; `Narrows` has nothing to
   add up and wants a round trip.
+- **AND `Abstract` TAKES WHAT OTHERS COUNTED, so the seam is in the learner rather than
+  beside it.** It is the only operator in `Population` asking for anything off the machine;
+  everything else decides local.
 - **AND MERGING THE COUNTS IS NOT AN OPTIMISATION, IT IS THE ONLY THING THAT WORKS.**
   Machines sharing three quarters of a stream agree on names as poorly as machines sharing
   none; only identical evidence converges.
@@ -416,6 +419,8 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   provenance, `Stated`'s star-not-a-clique, `Macro`'s sorted-versus-ordered naming,
   `Kind.Role`'s argument that a cell naming no argument transfers.
 - **Cite the idea, never the type** — a cite into deleted code is how a plan rots.
+- **And never cite a TIME either** — *one session ago* is true when written and false
+  forever after, which is the same rot from the other end.
 - **BOTH LEARNERS ARE STILL CO-RESIDENT HERE, so the head-to-head needs no branch at
   all.** `Graph`, `Learning` and `Thinking` sit beside `Commitments` in this tree.
 - **So it is one world, one front end, one held-out set and TWO READERS** — the cleanest

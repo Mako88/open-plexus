@@ -6,8 +6,8 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// What over-repairing actually costs — <b>fork 55, and it is this session's own loosest
-/// claim being closed rather than a new question.</b>
+/// What a blinded repair gate costs — <b>fork 55, and the answer is not the one the
+/// question assumed.</b>
 /// </summary>
 /// <remarks>
 /// <para>
@@ -16,6 +16,13 @@ namespace OpenPlexus.Tests;
 /// in its own commit that nothing there measures what that does to accuracy. A gate that
 /// is wrong harmlessly and a gate that is wrong expensively look identical from a
 /// disagreement count, and only one of them is a reason to build the query in fork 56.
+/// </para>
+/// <para>
+/// <b>AND IT UNDER-REPAIRS RATHER THAN OVER-REPAIRING, WHICH IS WHY THE TITLE OF THIS FILE
+/// IS NOT THE QUESTION IT WAS OPENED WITH.</b> <c>Mend</c> mints once a round, so the gate
+/// never controlled how MANY repairs happen — only which commitment gets the one attempt.
+/// Admitting covered commitments puts low-accuracy generals at the front of a list ordered
+/// by accuracy ascending and they consume it. The gate aims repair; it does not limit it.
 /// </para>
 /// <para>
 /// <b>ONE MECHANISM ON FROM A KNOWN BASELINE, WHICH IS WHY <see cref="Population.Placing"/>
@@ -146,5 +153,98 @@ public sealed class GateCostTests(ITestOutputHelper output)
         // NO BAR ON THE SCORE, because what blinding the gate SHOULD cost has never been
         // measured and a threshold written before the first reading would be a prediction
         // dressed as a requirement. The tables are the finding.
+    }
+
+    /// <summary>
+    /// Four, <b>because a scene world is not a bit world and the same sweep costs an
+    /// order more.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>WRITTEN DOWN BECAUSE THE FIRST VERSION REUSED TWELVE AND WAS NOT COSTED.</b>
+    /// Thirty-six runs of <c>Arranged</c> is not a sweep anybody runs twice, and an
+    /// instrument nobody runs is worth nothing however careful it is. Four resolves a
+    /// DIRECTION and not a separation — so nothing here may be reported as a cost, only as
+    /// which way it went and whether that is worth the seeds to settle.
+    /// </remarks>
+    private const int SceneSeeds = 4;
+
+    private readonly Dictionary<(int Holders, int Seed), Grounded> _arranged = [];
+
+    /// <summary>The same three arms on the world where the gate itself is the problem.</summary>
+    /// <param name="holders">How many machines the population is spread over.</param>
+    /// <param name="seed">The world's generator and the brain's.</param>
+    private Grounded OnArranged(int holders, int seed)
+    {
+        if (_arranged.TryGetValue((holders, seed), out var already)) return already;
+
+        var brain = new Brain(new CommittingSettings { Mending = Mending.Uncovered }, seed);
+
+        if (holders > 1)
+            brain.Held.Placing = one => one.Identity.Value % (ulong)holders;
+
+        var got = new ArrangedRun(
+            new ArrangedSettings { Side = 3, Cell = 3, Clutter = 1, Hold = 4 },
+            brain,
+            Looking.Whole,
+            seed).Run(Rounds);
+
+        _arranged[(holders, seed)] = got;
+
+        return got;
+    }
+
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public async Task And_the_same_blinding_on_the_world_where_the_gate_is_the_problem()
+    {
+        // FORK 55 WAS ANSWERED ON ONE WORLD AND SAID SO. On the multiplexer, blinding the
+        // gate is worse on every metric -- and this project's standing finding is that
+        // `Mending.Uncovered` wins the clean multiplexer and RUINS `Arranged`. A mechanism
+        // that helps in one place and hurts in another cannot have one answer to *what
+        // does losing it cost*, and reporting the multiplexer's number as the cost would
+        // be a dial cashed in citing a finding from one world in ten.
+        //
+        // SO THE PREDICTION IS AN INVERSION, WHICH IS WHY THIS IS WORTH THE RUN. If the
+        // gate is what sinks this world, a holder that cannot see far enough to apply it
+        // should do BETTER blind -- and a grid that came back flat would say the gate is
+        // not what sinks it after all, which is worth as much.
+        //
+        // AND THE WITHHELD SET IS THE SCORE HERE AND NOT THE TRAILING ONE. `Arranged` is
+        // where this repo learnt that a drawn score can be perfect while the withheld one
+        // is not, so the trained number would agree with itself and say nothing.
+        var withheld = await Sweep.AcrossAsync(SceneSeeds,
+            ("whole", seed => Task.FromResult(OnArranged(1, seed).Tally.Unseen?.Accuracy ?? 0.0)),
+            ("3 holders", seed => Task.FromResult(OnArranged(3, seed).Tally.Unseen?.Accuracy ?? 0.0)),
+            ("12 holders", seed => Task.FromResult(OnArranged(12, seed).Tally.Unseen?.Accuracy ?? 0.0)));
+
+        output.WriteLine("withheld accuracy");
+        output.WriteLine(Sweep.Table(withheld));
+
+        var sound = await Sweep.AcrossAsync(SceneSeeds,
+            ("whole", seed => Task.FromResult((double)OnArranged(1, seed).Rules.Sound)),
+            ("3 holders", seed => Task.FromResult((double)OnArranged(3, seed).Rules.Sound)),
+            ("12 holders", seed => Task.FromResult((double)OnArranged(12, seed).Rules.Sound)));
+
+        output.WriteLine("sound rules");
+        output.WriteLine(Sweep.Table(sound));
+
+        var repaired = await Sweep.AcrossAsync(SceneSeeds,
+            ("whole", seed => Task.FromResult((double)OnArranged(1, seed).Tally.Repaired)),
+            ("3 holders", seed => Task.FromResult((double)OnArranged(3, seed).Tally.Repaired)),
+            ("12 holders", seed => Task.FromResult((double)OnArranged(12, seed).Tally.Repaired)));
+
+        output.WriteLine("children minted by repair");
+        output.WriteLine(Sweep.Table(repaired));
+
+        // THE WIRING CHECK AGAIN, AND A DIFFERENCE RATHER THAN A DIRECTION. The whole
+        // point of running a second world is that the direction is what might invert.
+        Assert.True(Math.Abs(repaired[2].Mean - repaired[0].Mean) > 0.0,
+            $"blinding minted {repaired[2].Mean:F1} against {repaired[0].Mean:F1} whole — "
+            + "`Placing` is not reaching `Mend` on this world");
+
+        // AND THE WITHHELD SET HAS TO EXIST, or every row above is a nullable defaulting to
+        // nought and three arms of zero agree perfectly.
+        Assert.True(withheld[0].Mean > 0.0,
+            "no withheld score came back, so every arm is a default and the grid is empty");
     }
 }

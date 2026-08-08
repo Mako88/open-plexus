@@ -17,8 +17,8 @@ namespace OpenPlexus.Tests;
 /// its <see cref="Naming"/> whole, so every shard fired against an identical moment by
 /// construction. The bit-identical result it reports is therefore a fact about the
 /// arithmetic and not about two machines — and reading it as the latter would be a
-/// simulated constraint being gentler than the real one, which is the trap this repo paid
-/// for two sessions ago in the other direction.
+/// simulated constraint being gentler than the real one, which is the trap this repo's own
+/// list already carries, running in the other direction.
 /// </para>
 /// <para>
 /// <b>BECAUSE A MOMENT IS FOLDED BEFORE ANYTHING FIRES, AND FOLDING NEEDS THE NAMES.</b>

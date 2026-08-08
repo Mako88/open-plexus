@@ -375,6 +375,62 @@ public sealed class DocsTests
             $"the code cites forks the index does not list: {string.Join(", ", dangling)}");
     }
 
+    /// <summary>The test files, by the name a comment would call them.</summary>
+    private static HashSet<string> Suites() =>
+        Tree.Sources("tests")
+            .Select(Path.GetFileNameWithoutExtension)
+            .Where(name => name is not null && name.EndsWith("Tests", StringComparison.Ordinal))
+            .Select(name => name!)
+            .ToHashSet(StringComparer.Ordinal);
+
+    [Fact]
+    public void Every_suite_the_library_names_in_a_comment_still_exists()
+    {
+        // THE SAME GHOST REFERENCE AS THE FORK CHECK, THROUGH THE ONE DOOR IT LEAVES OPEN.
+        // A `<see cref="..."/>` is enforced by the compiler and a fork number by the check
+        // above; a suite named in PROSE is enforced by nothing at all. So a library comment
+        // saying *measured in `SomeTests`* keeps compiling forever after that file is
+        // renamed, and the reader who goes looking finds nothing and cannot tell whether
+        // the measurement moved or never existed.
+        //
+        // AND IT IS A REAL PATH RATHER THAN A HYPOTHETICAL ONE. Comments in this library
+        // now cite suites for their numbers -- that is deliberate, since the plan forbids
+        // findings living in the doc, so the citation is how a mechanism points at its own
+        // evidence. Which makes the citation load-bearing and therefore worth a budget.
+        var suites = Suites();
+
+        Assert.NotEmpty(suites);
+
+        var cited = new SortedSet<string>(StringComparer.Ordinal);
+
+        foreach (var path in Tree.Sources("src"))
+            foreach (Match match in Regex.Matches(File.ReadAllText(path), @"\b(\w+Tests)\b"))
+                cited.Add(match.Groups[1].Value);
+
+        // NOT `Assert.NotEmpty` ON THE CITATIONS, because a library that names no suite is
+        // a perfectly good library and this check has nothing to say about it. The fork
+        // check can demand citations exist; this one may only demand they resolve.
+        var dangling = cited.Where(name => !suites.Contains(name)).ToList();
+
+        Assert.True(dangling.Count == 0,
+            "the library names suites that do not exist — either the file was renamed and "
+            + "the comment was not, or the measurement was never written: "
+            + string.Join(", ", dangling));
+    }
+
+    [Fact]
+    public void The_suite_check_can_still_fail()
+    {
+        // THE COMPANION, BECAUSE A LOOKUP OVER AN EMPTY SET PASSES EVERYTHING. If `Suites`
+        // returned nothing the check above would find every citation dangling and fail
+        // loudly, which is the safe direction -- but if its matching were loose enough to
+        // accept anything, it would pass in silence. This pins both ends.
+        var suites = Suites();
+
+        Assert.Contains(nameof(DocsTests), suites);
+        Assert.DoesNotContain("AWeatherBalloonTests", suites);
+    }
+
     [Fact]
     public void Every_refuted_row_says_what_would_revive_it()
     {

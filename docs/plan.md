@@ -663,6 +663,9 @@ change of architecture entirely.
 - **THREE DIALS IN A ROW HAVE A BEST VALUE THAT MOVES WITH THE WORLD.** `Sharpness`,
   `Weighing` and `Mending` each win one world and ruin another, and no combination wins
   two. That is a world reaching into the brain.
+- **AND `Mending` DID NOT SHOW THAT PATTERN ONCE ITS TWO AXES WERE SEPARATED.** Every-round
+  repair leads on both worlds measured — unseparated on one, near two standard errors on
+  the other — so the row above may be about a conflation.
 - **AND THE REASON IS NOT A LEVEL NOBODY TUNED.** *Which rule needs specialising* and
   *did the population get this wrong* are different questions, and whether they align
   is a fact about the world. No per-round switch serves both.

@@ -217,7 +217,21 @@ public sealed class Commitment
     public bool Fires(IReadOnlySet<Code> moment)
     {
         ArgumentNullException.ThrowIfNull(moment);
-        return Scope.All(moment.Contains);
+
+        // WRITTEN OUT RATHER THAN `Scope.All(moment.Contains)`, AND THE REASON IS THAT
+        // THIS IS THE HOTTEST LINE IN THE PROJECT. The first cost profile put matching
+        // at a third of the wall clock, and the elegant version pays for it three ways
+        // on every call: a delegate allocated fresh because the lambda captures
+        // `moment`, the struct enumerator boxed onto the heap to reach `IEnumerable`,
+        // and an indirect call per code where a direct one would do. Tens of millions of
+        // calls a run, every one of them allocating twice.
+        //
+        // IT SHORT-CIRCUITS WHERE `All` DID AND ANSWERS WHAT `All` ANSWERED, so nothing
+        // a run reports may move. `DeterminismTests` is what holds that down.
+        foreach (var code in Scope)
+            if (!moment.Contains(code)) return false;
+
+        return true;
     }
 
     /// <summary>Whether this commitment says everything another one says, and more.</summary>
@@ -232,9 +246,15 @@ public sealed class Commitment
     {
         ArgumentNullException.ThrowIfNull(other);
 
-        return Expects == other.Expects
-            && Scope.Length > other.Scope.Length
-            && other.Scope.All(Scope.Contains);
+        if (Expects != other.Expects || Scope.Length <= other.Scope.Length) return false;
+
+        // THE SAME REWRITE AS `Fires`, ON THE SWEEP'S SIDE. Subsumption is quadratic in
+        // the experienced population, so this runs on every pair — and it was allocating
+        // a closure for each one.
+        foreach (var code in other.Scope)
+            if (!Scope.Contains(code)) return false;
+
+        return true;
     }
 
     /// <summary>Records what a settlement said, and what was present when it fired.</summary>

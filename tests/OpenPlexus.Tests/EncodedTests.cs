@@ -165,21 +165,21 @@ public sealed class EncodedTests(ITestOutputHelper output)
 
         var drawn = Enumerable.Range(0, 1500).Select(_ => world.Next()).ToList();
 
-        List<(IReadOnlyList<double> Reading, int Outcome)> Through(Encoded? sense) =>
-        [
-            .. drawn.Select(one => (
-                Reading: sense is null ? one.Seen : sense.Of(one.Seen),
-                one.Outcome)),
-        ];
+        // THE READINGS AND THE OUTCOMES TRAVEL TOGETHER AND THE ORDER IS THE JOIN, so a
+        // front end that returns its answers in a different order than it was asked
+        // would mislabel every one of them rather than fail.
+        static List<(IReadOnlyList<double> Reading, int Outcome)> Beside(
+            IReadOnlyList<Turn<IReadOnlyList<double>>> turns,
+            IReadOnlyList<IReadOnlyList<double>> readings) =>
+            [.. turns.Select((one, at) => (readings[at], one.Outcome))];
 
-        List<(IReadOnlyList<double> Reading, int Outcome)> Exam(Encoded? sense) =>
-        [
-            .. world.Withheld.Select(one => (
-                Reading: sense is null ? one.Seen : sense.Of(one.Seen),
-                one.Outcome)),
-        ];
+        static IReadOnlyList<IReadOnlyList<double>> Seen(
+            IReadOnlyList<Turn<IReadOnlyList<double>>> turns) => [.. turns.Select(one => one.Seen)];
 
-        var raw = Probe.Fit(Through(null), Exam(null), Cifar.Classes);
+        var raw = Probe.Fit(
+            Beside(drawn, Seen(drawn)),
+            Beside(world.Withheld, Seen(world.Withheld)),
+            Cifar.Classes);
 
         output.WriteLine($"raw 32x32 colour ({world.Width,4}) : {raw.Accuracy:F3}");
 
@@ -190,7 +190,10 @@ public sealed class EncodedTests(ITestOutputHelper output)
             using var sense = new Encoded(
                 encoder, width => new Winnowing(CifarRun.Pixel, width), world.Width);
 
-            var got = Probe.Fit(Through(sense), Exam(sense), Cifar.Classes);
+            var got = Probe.Fit(
+                Beside(drawn, [.. sense.OfAll(Seen(drawn))]),
+                Beside(world.Withheld, [.. sense.OfAll(Seen(world.Withheld))]),
+                Cifar.Classes);
 
             output.WriteLine(
                 $"{Path.GetFileName(Path.GetDirectoryName(encoder.Model)),-22} "

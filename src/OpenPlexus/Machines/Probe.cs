@@ -84,6 +84,9 @@ public static class Probe
             throw new ArgumentException(
                 $"every reading must be {width} wide, and one was not", nameof(train));
 
+        var (fitting, fitted) = Dense(train, width);
+        var (scoring, scored) = Dense(test, width);
+
         var weights = new double[outcomes][];
         for (var outcome = 0; outcome < outcomes; outcome++) weights[outcome] = new double[width];
 
@@ -105,7 +108,8 @@ public static class Probe
 
             foreach (var at in order)
             {
-                var (reading, outcome) = train[at];
+                var reading = fitting[at];
+                var outcome = fitted[at];
 
                 Softmax(weights, bias, reading, scores);
 
@@ -127,15 +131,15 @@ public static class Probe
 
         var right = 0;
 
-        foreach (var (reading, outcome) in test)
+        for (var at = 0; at < scoring.Length; at++)
         {
-            Softmax(weights, bias, reading, scores);
+            Softmax(weights, bias, scoring[at], scores);
 
             var best = 0;
             for (var which = 1; which < outcomes; which++)
                 if (scores[which] > scores[best]) best = which;
 
-            if (best == outcome) right++;
+            if (best == scored[at]) right++;
         }
 
         return new Probed
@@ -146,6 +150,47 @@ public static class Probe
         };
     }
 
+    /// <summary>
+    /// The readings copied out into flat arrays, with their outcomes beside them.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE INTERFACE WAS THE COST, AND IT WAS TWO THIRDS OF THE SLOWEST TEST IN THE
+    /// SUITE.</b> The fit is 30 passes over every reading against every outcome, so a
+    /// 3,072-wide raw CIFAR probe indexes a reading about two billion times — and every
+    /// one of those went through <see cref="IReadOnlyList{T}"/>, which is a virtual call
+    /// the JIT cannot inline, cannot elide a bounds check on, and cannot hoist anything
+    /// out of. Copied once into <see cref="double"/>[] it is ordinary array indexing.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS A COPY RATHER THAN A CLEVERER LOOP BECAUSE THE ARITHMETIC MUST NOT
+    /// MOVE.</b> The same values are added in the same order, so every score this probe
+    /// has ever reported is reproduced to the last bit — which is the only kind of
+    /// speed-up a yardstick is allowed to have. Vectorising the dot product would be
+    /// faster still and would re-associate the sum, and a probe that changed its answer
+    /// when it got quicker would put its own drift into every comparison it anchors.
+    /// </para>
+    /// </remarks>
+    private static (double[][] Readings, int[] Outcomes) Dense(
+        IReadOnlyList<(IReadOnlyList<double> Reading, int Outcome)> set, int width)
+    {
+        var readings = new double[set.Count][];
+        var outcomes = new int[set.Count];
+
+        for (var at = 0; at < set.Count; at++)
+        {
+            var (reading, outcome) = set[at];
+            var row = new double[width];
+
+            for (var feature = 0; feature < width; feature++) row[feature] = reading[feature];
+
+            readings[at] = row;
+            outcomes[at] = outcome;
+        }
+
+        return (readings, outcomes);
+    }
+
     /// <summary>The class probabilities for one reading, into a reused buffer.</summary>
     /// <remarks>
     /// <b>The maximum is subtracted before exponentiating</b>, which is the standard
@@ -153,7 +198,7 @@ public static class Probe
     /// probe then reports NaN rather than a score.
     /// </remarks>
     private static void Softmax(
-        double[][] weights, double[] bias, IReadOnlyList<double> reading, double[] into)
+        double[][] weights, double[] bias, double[] reading, double[] into)
     {
         var highest = double.NegativeInfinity;
 
@@ -162,7 +207,7 @@ public static class Probe
             var row = weights[which];
             var total = bias[which];
 
-            for (var feature = 0; feature < reading.Count; feature++)
+            for (var feature = 0; feature < reading.Length; feature++)
                 total += row[feature] * reading[feature];
 
             into[which] = total;

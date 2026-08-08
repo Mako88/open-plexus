@@ -234,6 +234,49 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     }
 
     /// <summary>
+    /// Many readings through the graph at once, in the order they were handed over.
+    /// </summary>
+    /// <param name="observations">The readings, each three colour planes together.</param>
+    /// <exception cref="ArgumentOutOfRangeException">A reading is the wrong width.</exception>
+    /// <remarks>
+    /// <para>
+    /// <b>THE SLOWEST TEST IN THE SUITE WAS ONE ENCODER LOOP, AND IT WAS THIRTEEN PER
+    /// CENT OF EVERYTHING.</b> Measured: 209 seconds putting two thousand CIFAR images
+    /// through CLIP, against 21 for the probe that reads them and 3 milliseconds for the
+    /// world that draws them. Nothing about it was subtle — an image at a time, on one
+    /// core, on a machine with eight.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS A DIFFERENT PARALLELISM FROM THE ONE FORK 12 FORBIDS, WHICH IS THE
+    /// WHOLE ARGUMENT FOR IT.</b> The session stays pinned to one thread and sequential,
+    /// so no reduction inside an image is ever re-associated and no reading lands on the
+    /// other side of a band boundary. What runs at once is WHOLE IMAGES, which are
+    /// independent of one another by construction, written to their own slots and read
+    /// back in the order they arrived. <c>The_same_picture_encodes_to_the_same_codes_every_time</c>
+    /// is what holds that claim down, and it already ran two sessions to do it.
+    /// </para>
+    /// <para>
+    /// <b>ONE SESSION SHARED RATHER THAN ONE PER THREAD, BECAUSE THE WEIGHTS ARE THE
+    /// MEMORY.</b> CLIP's graph is 336 MB and a session per core would be most of a CI
+    /// runner's budget spent on eight copies of the same constants — the memory fault
+    /// this project has already had once, arriving by a road that looks like a speed-up.
+    /// <c>Run</c> is re-entrant and <see cref="Embed"/> holds nothing between calls.
+    /// </para>
+    /// </remarks>
+    /// <returns>One embedding per observation, in the same order.</returns>
+    public ImmutableArray<ImmutableArray<double>> OfAll(
+        IReadOnlyList<IReadOnlyList<double>> observations)
+    {
+        ArgumentNullException.ThrowIfNull(observations);
+
+        var embeddings = new ImmutableArray<double>[observations.Count];
+
+        Parallel.For(0, observations.Count, at => embeddings[at] = Of(observations[at]));
+
+        return [.. embeddings];
+    }
+
+    /// <summary>
     /// The embedding, computed once per distinct reading.
     /// </summary>
     /// <remarks>
@@ -256,6 +299,20 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
     /// which is the exact shape of the aliasing fault <see cref="Banded{TFrame}"/>
     /// carried for the life of the repo.
     /// </para>
+    /// <para>
+    /// <b>THE TABLE IS LOCKED AND THE GRAPH IS NOT, WHICH IS THE ONLY REASON
+    /// <see cref="OfAll"/> IS ALLOWED TO EXIST.</b> A <see cref="Dictionary{TKey,TValue}"/>
+    /// written from two threads corrupts silently rather than throwing, so it would be
+    /// the wrong picture's embedding coming back — the aliasing fault again, by yet
+    /// another road. The lock is held across a hash lookup and never across
+    /// <see cref="Embed"/>, so what threads contend for is nanoseconds against the
+    /// hundred milliseconds they spend in the graph.
+    /// </para>
+    /// <para>
+    /// <b>Two threads may compute the same reading at once and both store it, and that
+    /// is harmless</b> for the reason the memo is admissible at all: the value does not
+    /// depend on who computed it or when.
+    /// </para>
     /// </remarks>
     private ImmutableArray<double> Remembered(IReadOnlyList<double> reading)
     {
@@ -266,12 +323,15 @@ public sealed class Encoded : IQuantizer<IReadOnlyList<double>>, IDisposable
 
         var key = Agreed.Mix(hash);
 
-        if (_memo.TryGetValue(key, out var held) && held.Reading.SequenceEqual(reading))
-            return held.Embedding;
+        lock (_memo)
+        {
+            if (_memo.TryGetValue(key, out var held) && held.Reading.SequenceEqual(reading))
+                return held.Embedding;
+        }
 
         var embedding = Embed(reading);
 
-        _memo[key] = (reading, embedding);
+        lock (_memo) _memo[key] = (reading, embedding);
 
         return embedding;
     }

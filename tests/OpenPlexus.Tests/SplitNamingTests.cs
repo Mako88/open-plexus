@@ -150,4 +150,93 @@ public sealed class SplitNamingTests(ITestOutputHelper output)
         // MEASURED and a threshold written before the first reading would be a prediction
         // dressed as a requirement. The grids are the finding.
     }
+
+    [Fact]
+    public void Merging_the_counts_gets_the_whole_populations_name_back()
+    {
+        // WHAT THE GRID ABOVE POINTS AT, BUILT. `Recurrence` is the two frequency tables
+        // the gate reads and nothing else -- how often each code appeared across scopes
+        // and how often each pair appeared together. A holder counts its own and the
+        // merge adds them, which is what a G-Counter is and why this design already
+        // trusts the shape.
+        //
+        // AND EXACTLY RATHER THAN NEARLY, WHICH IS THE WHOLE POINT OF IT BEING COUNTS.
+        // `Population.Decide` carries a caveat that a sharded sum is not bit-identical
+        // under `Summing`, because floating-point addition is not associative. Integers
+        // have no such caveat, so this is an equality and must never become a tolerance.
+        var dials = new CommittingSettings();
+        var brain = new Brain(dials, seed: 1);
+
+        new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, seed: 1)
+            .Run(Rounds);
+
+        var all = brain.Held.All.ToList();
+
+        var whole = Abstracting.Shared(all, dials);
+
+        Assert.NotNull(whole);
+
+        foreach (var holders in new[] { 2, 3, 5, 12 })
+        {
+            var shards = new List<List<Commitment>>();
+
+            for (var holder = 0; holder < holders; holder++) shards.Add([]);
+
+            foreach (var commitment in all)
+                shards[(int)(commitment.Identity.Value % (ulong)holders)].Add(commitment);
+
+            // COUNTED WHERE THE COMMITMENTS ARE AND MERGED WHERE NOTHING IS, so no holder
+            // ever sees another's scopes -- which is the C1 claim this whole arrangement
+            // exists to keep, and it is kept by what the type can carry rather than by
+            // anybody being careful.
+            var merged = new Recurrence();
+
+            foreach (var shard in shards) merged.Absorb(Recurrence.Of(shard, dials));
+
+            Assert.Equal(whole, Abstracting.Shared(merged, dials));
+        }
+    }
+
+    [Fact]
+    public void And_the_merge_does_not_care_what_order_the_holders_answered_in()
+    {
+        // C2 SAYS THE ORDER IS THE NETWORK'S CHOICE, and a result that moved with a choice
+        // nobody made is fork 12 -- reopened twice already, and this is a third door.
+        // Integer addition is commutative, so the assertion is that the code actually uses
+        // it that way rather than that arithmetic works.
+        //
+        // AND THE TIE-BREAK IS THE HALF THAT WAS ACTUALLY BROKEN. `Shared` walked its pair
+        // table with a strict improvement test, so two pairs at the same z resolved by
+        // whichever the dictionary reached first -- stable in one process and nothing at
+        // all across two tables merged in different orders. Ordering the walk is what
+        // makes this test able to pass.
+        var dials = new CommittingSettings();
+        var brain = new Brain(dials, seed: 1);
+
+        new MultiplexerRun(new MultiplexerSettings { Address = Address }, brain, seed: 1)
+            .Run(Rounds);
+
+        var all = brain.Held.All.ToList();
+
+        var shards = new List<List<Commitment>>();
+
+        for (var holder = 0; holder < 5; holder++) shards.Add([]);
+
+        foreach (var commitment in all)
+            shards[(int)(commitment.Identity.Value % 5UL)].Add(commitment);
+
+        var counted = shards.Select(shard => Recurrence.Of(shard, dials)).ToList();
+
+        var forwards = new Recurrence();
+        foreach (var one in counted) forwards.Absorb(one);
+
+        var backwards = new Recurrence();
+        foreach (var one in Enumerable.Reverse(counted)) backwards.Absorb(one);
+
+        Assert.Equal(forwards.Scopes, backwards.Scopes);
+
+        Assert.Equal(
+            Abstracting.Shared(forwards, dials),
+            Abstracting.Shared(backwards, dials));
+    }
 }

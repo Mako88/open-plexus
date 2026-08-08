@@ -99,8 +99,14 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   before a failure asks is hand-specified bias by a side door.
 - **AND ONE HAS ASKED NOW, WHICH IS WHAT STEP SEVEN WAS BUILT FOR.** `Monk` settles its
   own ceiling by enumeration rather than inferring it from a score — fork 50 is the rung.
-- **Nine — the commitment learner has no bus, so C1 holds by convention.** Everything
-  that constraint exists for is untested and `Abstain` cannot fire — fork 52.
+- **Nine — the wire exists and the learners are not on it yet.** `Posted` moves envelopes,
+  reports, finished thoughts and deaths between processes over real sockets.
+- **What crosses is THINKING and never LEARNING, which is fork 1.** An occasion writes its
+  edges into locally-held clusters, so nothing learnt on one machine reaches another.
+- **And the commitment learner has no bus at all, so C1 holds by convention** — everything
+  that constraint exists for is untested and `Abstain` cannot fire. Fork 52.
+- **Distance costs the DEPTH of a thought, measured.** A round costs about four and a half
+  times the per-hop delay, so a LAN is comfortable and the internet is a slower experiment.
 - **The two-learner head-to-head is a side quest and blocks nothing**, being cheap now
   that both are co-resident.
 - **Resist polishing step one.** It is the least informative part when it passes.
@@ -504,6 +510,12 @@ change of architecture entirely.
 - **A MEASUREMENT INSIDE A REPORT IS ASSERTED ON BY EVERY EQUALITY READING IT.** A wall
   clock in a record turns reproducibility red and makes every `NotEqual` beside it pass
   for free.
+- **A CLAIM ABOUT CORRECTNESS WILL DO DUTY AS A CLAIM ABOUT THROUGHPUT UNLESS SOMEBODY
+  MEASURES.** C2 says messages are late and never said how late; tolerating lateness by
+  construction is not tolerating any amount of it.
+- **AND A SIMULATED CONSTRAINT CAN BE HARSHER THAN THE REAL ONE.** `HybridBus` reorders on
+  purpose and TCP does not, so a green distributed run is evidence about bytes and routing
+  and says nothing about C2.
 - **AN ANSWER KEY IN THE WRONG ALPHABET SCORES NOUGHT AND LOOKS LIKE A VERDICT.** A key
   expecting a code the population can never hold reports no rule true, which reads
   exactly like a learner holding none.
@@ -630,8 +642,8 @@ Never renumbered — `DocsTests` asserts each resolves.
 
 | | |
 |---|---|
-| **1** | The distributed rendezvous. Open, and inherited unchanged |
-| **3** | Cluster placement: uniform hash against prefix locality. Open |
+| **1** | The distributed rendezvous. Open, and now the thing in the way: `Posted` carries the THINKING path between machines, and `LocalRendezvous` writes edges straight into locally-held clusters, so a machine can think across a wire and cannot learn across one |
+| **3** | Cluster placement: uniform hash against prefix locality. Open, and load-bearing now rather than theoretical — the ring decides who holds a code, so two machines that disagree about it route to different places |
 | **5** | A death writes off routes into the dead cluster. Closed |
 | **6** | Broadcast the origin, route the hops. Closed |
 | **11** | A finished thought is published and routed by code, so N actuators act on one broadcast. Closed |

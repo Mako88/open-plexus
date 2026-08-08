@@ -561,6 +561,12 @@ change of architecture entirely.
 - **A WINNER-TAKE-ALL ARGMAX IS CHAOTIC IN ITS EVIDENCE, and two ends of a sweep cannot
   show it.** Naming picks one pair at a time, so a small difference changes the winner and
   everything built on it.
+- **A TYPE CAN DROP MOST OF ITSELF ON THE WIRE AND STILL WRITE A PLAUSIBLE NUMBER.** Private
+  tables and tuple keys serialise to nothing; what arrives looks like a message and merges
+  as one.
+- **SO PIN A FORMAT FAILURE WITH A CHECK RATHER THAN A COMMENT**, and assert the round trip
+  on the ANSWER — equal fields say the members survived, the same decision says the
+  arithmetic did.
 - **AND A DEFAULT CAN SHORT-CIRCUIT THE MECHANISM BEING MEASURED.** `Mending.Outvoted`
   ships and skips the narrows test, so a sweep on defaults returned three identical arms
   for a gate that was never running.

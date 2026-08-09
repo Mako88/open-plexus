@@ -873,6 +873,12 @@ change of architecture entirely.
 - **SO REPAIR CHOOSES WELL FROM THE WRONG STARTING MATERIAL.** It builds true rules on the
   skewed world and they pay nothing, because the seeds it is given are about the outcome
   that was never the problem.
+- **EXCEPT THAT THE MINORITY SEEDS ARE THERE, WHICH KILLS THAT TOO.** Genesis mints nearly
+  as many roots for the rare outcome as for the common one on both skewed widths, so the
+  starting material is not what is missing.
+- **EVERY LINK IS SOUND AND THE CHAIN MAKES NOTHING**, which is where this stands. What is
+  unmeasured is what becomes of a minority-rooted lineage between its seed and a finished
+  rule.
 
 ---
 

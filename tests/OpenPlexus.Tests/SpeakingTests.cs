@@ -1,0 +1,147 @@
+using OpenPlexus.Commitments;
+using OpenPlexus.Machines;
+using OpenPlexus.Worlds;
+using Xunit.Abstractions;
+
+namespace OpenPlexus.Tests;
+
+/// <summary>
+/// Whether an untested commitment should get a vote — <b>the defect widening surfaced,
+/// which was never about widening.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>A RULE RIGHT ONCE WEIGHS ONE AND BEATS A RULE RIGHT NINETY-FIVE TIMES IN A
+/// HUNDRED.</b> The accuracy estimate averages over a commitment's opening firings rather
+/// than running from zero, which is right — from zero a fresh rule is indistinguishable
+/// from a refuted one. But nothing anywhere separates that provisional number from an
+/// earned one, and the vote raises it to a power.
+/// </para>
+/// <para>
+/// <b>SO EVERY FRESH REPAIR CHILD HAS DECIDED ROUNDS IT HAD NO STANDING TO DECIDE, SINCE
+/// THE BRANCH BEGAN.</b> This is not a widening problem: widening merely made it loud
+/// enough to notice, by putting eighteen hundred untested rules into a population of six
+/// hundred.
+/// </para>
+/// <para>
+/// <b>AND SILENCE IS THE FAILURE MODE TO WATCH, WHICH IS WHY IT IS REPORTED HERE.</b>
+/// Refusing the young a vote can leave a moment with nobody to speak for it, and a
+/// population that answers fewer rounds scores well on the ones it does — a fallback
+/// arm nobody meant to run. A rise in <c>Silent</c> beside a rise in accuracy is that
+/// fault and not a result.
+/// </para>
+/// </remarks>
+public sealed class SpeakingTests(ITestOutputHelper output)
+{
+    private const long Rounds = 20_000;
+
+    private const int Seeds = 8;
+
+    /// <param name="address">Address bits.</param>
+    /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
+    /// <param name="speaking">Whether the untested may vote.</param>
+    /// <param name="widening">Whether anything shortens a scope.</param>
+    /// <param name="seed">The world's generator and the brain's.</param>
+    private static Learned Run(
+        int address, double skew, Speaking speaking, Widening widening, int seed) =>
+        new MultiplexerRun(
+            new MultiplexerSettings { Address = address, Skew = skew },
+            new Brain(
+                new CommittingSettings { Speaking = speaking, Widening = widening }, seed),
+            seed,
+            census: true).Run(Rounds);
+
+    /// <summary>
+    /// <b>WHETHER REFUSING THE UNTESTED A VOTE REACHES THE ROUNDS GUESSING MISSES.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>CROSSED WITH WIDENING, BECAUSE THE TWO ARE ONE QUESTION.</b> Generalisation was
+    /// refuted for flooding the population with untested rules; if that is really what
+    /// went wrong, then the same operator under an experienced-only vote should stop being
+    /// ruinous. If it is still ruinous, the flood was not the mechanism and the
+    /// generalisation is simply wrong.
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public async Task Whether_refusing_the_untested_a_vote_reaches_the_hard_rounds()
+    {
+        var cells = new (string Cell, Speaking Speaking, Widening Widening)[]
+        {
+            ("anyone", Speaking.Anyone, Widening.Never),
+            ("experienced", Speaking.Experienced, Widening.Never),
+            ("anyone+widen", Speaking.Anyone, Widening.Unmissed),
+            ("experienced+widen", Speaking.Experienced, Widening.Unmissed),
+        };
+
+        foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (2, 0.8), (3, 0.8) })
+        {
+            output.WriteLine($"--- {address + (1 << address)} bits, skew {skew:F1} ---");
+
+            foreach (var (cell, speaking, widening) in cells)
+            {
+                var once = new Dictionary<int, Learned>();
+
+                Learned Cached(int seed)
+                {
+                    if (!once.TryGetValue(seed, out var learned))
+                        once[seed] = learned = Run(address, skew, speaking, widening, seed);
+
+                    return learned;
+                }
+
+                foreach (var reading in new (string What, Func<Learned, double> Of)[]
+                {
+                    ("paying", one => one.Census!.Paying),
+                    ("recent", one => one.Recent),
+
+                    // THE EXPLANATION AND NOT THE RESULT. A gate can help for reasons
+                    // that have nothing to do with the story told about it -- fewer
+                    // voters is a different population and a different population scores
+                    // differently. This is the number that says whether untested rules
+                    // were actually deciding wrong rounds, and under `Experienced` it is
+                    // nought by construction, which is the point.
+                    ("untested", one => one.Census!.Untested),
+
+                    // BESIDE THE SCORE AND NEVER UNDER IT. A population that refuses to
+                    // answer is not a population that answers well.
+                    ("silent", one => one.Silent / (double)one.Rounds),
+                    ("sound", one => one.Sound),
+                    ("unsound", one => one.Unsound),
+                    ("residents", one => one.Resident),
+                })
+                {
+                    var arm = await Sweep.ArmAsync(
+                        reading.What,
+                        Seeds,
+                        seed => Task.FromResult(reading.Of(Cached(seed))));
+
+                    output.WriteLine(
+                        $"  {cell,-18} {reading.What,-10} | {arm.Mean,10:F3} "
+                        + $"+/-{arm.StdErr,8:F3} | n={arm.Seeds}");
+                }
+
+                output.WriteLine("");
+            }
+        }
+    }
+
+    /// <summary>
+    /// <b>THE ARM CHANGES A DECISION, asserted as a difference and never as a direction.</b>
+    /// </summary>
+    [Fact]
+    public void Refusing_the_untested_a_vote_changes_what_the_machine_answers()
+    {
+        var anyone = Run(2, skew: 0.0, Speaking.Anyone, Widening.Never, seed: 1);
+        var earned = Run(2, skew: 0.0, Speaking.Experienced, Widening.Never, seed: 1);
+
+        output.WriteLine($"anyone      | recent {anyone.Recent:F4} "
+            + $"| silent {anyone.Silent} | residents {anyone.Resident}");
+        output.WriteLine($"experienced | recent {earned.Recent:F4} "
+            + $"| silent {earned.Silent} | residents {earned.Resident}");
+
+        Assert.True(
+            anyone.Recent != earned.Recent || anyone.Resident != earned.Resident,
+            "refusing the untested a vote changed nothing at all, so either every "
+            + "commitment that fires is already past the floor or the gate is not wired");
+    }
+}

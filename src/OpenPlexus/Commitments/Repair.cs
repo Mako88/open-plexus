@@ -92,6 +92,45 @@ public enum Weighing
     Lifting,
 }
 
+/// <summary>Whether a commitment may vote before it has been tested.</summary>
+/// <remarks>
+/// <para>
+/// <b>A RULE THAT HAS BEEN RIGHT ONCE WEIGHS ONE, AND THE VOTE RAISES THAT TO A
+/// POWER.</b> <see cref="Commitment.Accuracy"/> averages over a commitment's first
+/// firings rather than running Widrow-Hoff from zero, and that is deliberate — from zero,
+/// a rule right once reads a tenth right and is indistinguishable from a refuted one, so
+/// it loses every vote it should win. The consequence is the mirror image: it reads
+/// PERFECT, and beats a rule right ninety-five times in a hundred.
+/// </para>
+/// <para>
+/// <b>SO THE VOTE CONSULTS COMMITMENTS THAT HAVE NO STATISTICS AND RANKS THEM ABOVE ONES
+/// THAT DO, and it has done since the branch began.</b> Every fresh repair child arrives
+/// at full weight, decides rounds it has no standing to decide, and only becomes honest
+/// after the population has already moved. Nothing separates a provisional weight from an
+/// earned one anywhere in this machine.
+/// </para>
+/// <para>
+/// <b>AND THE BAR NEEDS NO NEW NUMBER, WHICH IS THE ONLY REASON THIS IS BUILDABLE.</b>
+/// <see cref="CommittingSettings.Floor"/> already means <i>enough firings to judge a
+/// proportion by</i> — subsumption and culling both refuse to weigh a commitment below it.
+/// The vote is the one reader that never asked.
+/// </para>
+/// <para>
+/// <b>WHAT IT RISKS IS SILENCE, AND THAT MUST BE READ BESIDE THE SCORE.</b> A population
+/// whose experienced members do not cover a moment says nothing at all, and a silent arm
+/// scores well on the few rounds it answers — this repo's own trap about a fallback being
+/// a control arm nobody meant to run. <c>Tally.Silent</c> is where that shows.
+/// </para>
+/// </remarks>
+public enum Speaking
+{
+    /// <summary>Anything that fires votes. What has always run.</summary>
+    Anyone,
+
+    /// <summary>Only a commitment past the floor votes.</summary>
+    Experienced,
+}
+
 /// <summary>Whether anything ever makes a scope SHORTER.</summary>
 /// <remarks>
 /// <para>
@@ -543,6 +582,9 @@ public sealed record CommittingSettings
 
     /// <inheritdoc cref="Commitments.Widening"/>
     public Widening Widening { get; init; } = Widening.Never;
+
+    /// <inheritdoc cref="Commitments.Speaking"/>
+    public Speaking Speaking { get; init; } = Speaking.Anyone;
 }
 
 /// <summary>

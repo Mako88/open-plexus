@@ -170,6 +170,20 @@ public sealed class DialTests(ITestOutputHelper output)
             + "costs four points and mints three hundred more commitments, "
             + "because the vote steers repair as well as reporting it",
 
+        ["Speaking"] =
+            "whether a commitment may vote before it has been tested, and a "
+            + "mechanism against its own absence because there is no second way "
+            + "to not refuse. It needs NO NEW NUMBER, which is the only reason it "
+            + "was buildable: `Floor` already means enough firings to judge a "
+            + "proportion by, and subsumption and culling both refuse to weigh "
+            + "anything beneath it while the vote never asked. AND IT IS INERT, "
+            + "which is the finding. Untested rules DO decide wrong rounds -- "
+            + "about a sixth of them at eleven bits -- and refusing them a vote "
+            + "moves no metric on any world, because those rounds are uncovered "
+            + "anyway and the seat passes to a different wrong rule. Smallest "
+            + "exactly where the failure is total, so it is not the cause there "
+            + "either. Not a level; nothing to hunt",
+
         ["Widening"] =
             "the ladder's other direction, and a mechanism against its own absence "
             + "rather than two rules that both do something -- which the shape "
@@ -666,6 +680,6 @@ public sealed class DialTests(ITestOutputHelper output)
         // already refuted as built, which is the honest reason it is a census entry rather
         // than a default: the count grows when a mechanism is added and MEASURED, and
         // shrinks only when one is deleted with a revival row.
-        Assert.Equal(26, HandSet.Count);
+        Assert.Equal(27, HandSet.Count);
     }
 }

@@ -554,6 +554,7 @@ condition is a superstition.
 | The vote deferring to a general advocate unless the narrower earns it | Four points worse where it fires, and read-only it changes not one withheld answer | Never. The deciders earn their seats by a wide margin on drawn data |
 | Genesis rooting on a code that has never varied | 7.4 standard errors behind where there is background, 0.2 apart without it. Background becomes a PARENT and its children inherit it | A world where an always-present code is informative. None is known |
 | Handing every seat back to a general rule that has not beaten it, read-only | It changed not one withheld answer, and the in-run version cost four points | A world where drawn evidence can tell a parent from its child |
+| Refusing an untested commitment its vote | They do decide wrong rounds, and excluding them moves no metric -- the seat passes to another wrong rule | A world where the right rule is usually present and merely outvoted |
 | Generalising a rule for never being wrong | Not missing is nearly free for a narrow rule, so it picks the least-tested and mints unsound ones with wider reach | A gate reading how TESTED a rule is, not whether it was wrong |
 | Loosening the repair budget, or gating it on the parent | Six cells over eight seeds found no more of the world's rules while repairing many times over | A world where the candidates it refuses are good ones. None known |
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Each condition halves where a rule can fire, so the bar caps DEPTH by world size | A bar whose expectation shrinks with depth too |
@@ -860,9 +861,12 @@ change of architecture entirely.
 - **THE VOTE CONSULTS COMMITMENTS THAT HAVE NO STATISTICS AND RANKS THEM ABOVE ONES THAT
   DO.** The estimate averages over its first firings, so a rule right once weighs one and
   beats a rule right ninety-five times in a hundred.
-- **WHICH IS TRUE OF EVERY FRESH REPAIR CHILD TOO, not only of a generalisation**, so it
-  has been running for the life of the branch and nothing separates a provisional weight
-  from an earned one.
+- **AND IT COSTS NOTHING, WHICH IS THE FIFTH EXPLANATION THIS WEEK TO DIE TO ITS OWN
+  CONTROL.** They win about a sixth of wrong rounds at eleven bits and refusing them
+  changes no metric anywhere.
+- **BECAUSE THOSE ROUNDS WERE UNCOVERED ANYWAY.** Removing the untested winner hands the
+  seat to a different wrong rule, and the share is smallest exactly where the failure is
+  total.
 
 ---
 

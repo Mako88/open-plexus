@@ -331,6 +331,25 @@ public sealed record Census
     /// </remarks>
     public required long Deeper { get; init; }
 
+    /// <summary>Wrong rounds decided by a commitment that had not yet been tested.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>WHETHER THE PROVISIONAL WEIGHT IS ACTUALLY STEALING DECISIONS, rather than
+    /// merely being able to.</b> A commitment below the floor carries an accuracy averaged
+    /// over a handful of firings, so one that has been right once weighs a perfect one and
+    /// the vote raises that to a power. That it CAN outvote an established rule is
+    /// arithmetic; that it DOES is a measurement, and nothing had taken it.
+    /// </para>
+    /// <para>
+    /// <b>AND IT SEPARATES A FIX FROM ITS EXPLANATION.</b> Refusing the young a vote may
+    /// improve a run for reasons that have nothing to do with this — fewer voters is a
+    /// different population, and a different population scores differently. If this number
+    /// is small, then the gate helping is not the gate helping for the stated reason, and
+    /// the stated reason should go.
+    /// </para>
+    /// </remarks>
+    public required long Untested { get; init; }
+
     /// <summary>Rounds whose outcome was NOT the commonest one the world has produced.</summary>
     /// <remarks>
     /// <para>
@@ -515,7 +534,7 @@ public sealed class Trial<TSeen>
         var cycle = new Cycle(council, rounds, sweep, target, window);
 
         long codes = 0;
-        long outvoted = 0, uncovered = 0, deeper = 0, hard = 0, carried = 0;
+        long outvoted = 0, uncovered = 0, deeper = 0, hard = 0, carried = 0, untested = 0;
 
         // WHAT THE WORLD PRODUCES MOST, LEARNT AS IT GOES. Taking the base rate from the
         // world would score the machine against a number it is not allowed to see, and
@@ -570,6 +589,13 @@ public sealed class Trial<TSeen>
 
                 if (!firing.IsDefaultOrEmpty && vote.Expects != arrived)
                 {
+                    // WHO ACTUALLY DECIDED IT, AND WHETHER THEY HAD EARNED THE RIGHT.
+                    // `Vote.By` names the best advocate for the side that won, so this
+                    // costs one lookup rather than a second pass.
+                    if (firing.FirstOrDefault(one => one.Identity == vote.By) is { } winner
+                        && winner.Seen < _brain.Dials.Floor)
+                        untested++;
+
                     // A SOUND COMMITMENT THAT FIRES IS RIGHT BY DEFINITION, so the only
                     // question a wrong round raises is whether one of them was in the room
                     // and lost. Everything else is a round no vote rule could have saved.
@@ -648,6 +674,7 @@ public sealed class Trial<TSeen>
                     Outvoted = outvoted,
                     Uncovered = uncovered,
                     Deeper = deeper,
+                    Untested = untested,
                     Hard = hard,
                     Carried = carried,
                 },

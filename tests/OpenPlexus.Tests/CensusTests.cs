@@ -93,6 +93,7 @@ public sealed class CensusTests(ITestOutputHelper output)
                 $"{address + (1 << address),2} bits skew {skew:F1} | "
                 + $"wrong {census.Wrong,6} | outvoted {census.Outvoted,6} "
                 + $"| uncovered {census.Uncovered,6} | deeper {census.Deeper,6} "
+                + $"| untested {census.Untested,6} "
                 + $"| reachable {census.Reachable,6:P1} "
                 + $"| found {learned.Found}/{learned.Truths} "
                 + $"| residents {learned.Resident}");

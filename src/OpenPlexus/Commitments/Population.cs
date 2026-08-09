@@ -428,6 +428,14 @@ public sealed class Population
 
         foreach (var commitment in firing)
         {
+            // A PROVISIONAL WEIGHT IS NOT AN EARNED ONE, AND ONLY THIS READER EVER
+            // CONFLATED THEM. Below the floor an accuracy is an average over a handful of
+            // firings, so a commitment right once carries a perfect one -- and subsumption
+            // and culling both already refuse to weigh anything down here. Skipped rather
+            // than discounted, because a discount is a number and the floor is not.
+            if (_dials.Speaking == Speaking.Experienced && commitment.Seen < _dials.Floor)
+                continue;
+
             var weight = Math.Pow(commitment.Accuracy, _dials.Sharpness);
 
             // DIVIDED HERE RATHER THAN AT THE MERGE, because the merge holds no

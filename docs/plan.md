@@ -233,8 +233,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   than after a dial hunt.
 - **So subsumption and deletion are step one, not later.** Cheap genesis is only
   affordable if something clears it.
-- **`Surprise` gates genesis and has never run.** It had one caller on `csharp`, so
-  this machine's expectation was empty at every observation in every world.
+- **`Surprise` gates genesis, and it is armed and load-bearing.** Ungated covering walks
+  the whole `code -> outcome` space; gated, it leads on every seed on the multiplexer and
+  is behind on every seed on `Arranged`.
 - **A moment's prediction is a weighted vote, not a winner.** Every matching
   commitment votes for its expectation weighted by its own accuracy; highest total
   wins.
@@ -450,8 +451,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   artifact MINTS it.
 - **Counting degrades gracefully here and repairing does not.** `csharp` splits a
   boundary across two cells and averages; this fragments. Said out loud as the cost.
-- **`Winnow` is the defence and it is mounted nowhere.** Overlapping winner sets mean
-  a scope that is a SUBSET still fires, so the boundary stops being a cliff.
+- **`Winnow` is the defence and it is mounted.** Overlapping winner sets mean a scope
+  that is a SUBSET still fires, so the boundary stops being a cliff — measured against
+  bands and inside two standard errors of them.
 - **And the defence is what makes absence expensive.** The sparsity that survives a
   boundary is what unbounds the negative candidate set.
 - **What graded codes cost is SEARCH** — more possible scopes, and blame over more of
@@ -472,7 +474,7 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 | `Bus`, `Ring`, `Addresses` | The distributed half. Its PAYLOADS are rewritten, since `Envelope`, `Settled` and `Report` are made of things on the Leave list |
 | `IQuantizer`, `Coded`, `Winnow`, `Grains`, `Banded`, `Passthrough` | Front ends, independent of what consumes them |
 | `LiveSet`, `Window`, `Occasion` | Moments and the stream |
-| `Surprise` | The gate on genesis. Arm it — it ran nowhere |
+| `Surprise` | The gate on genesis. Armed, and it decided a world |
 | `Paying` | The gate on rung five. Both bars, never MDL alone |
 | `IRendezvous`, and the outstanding count inside `Thought` | The termination detection. The mechanism comes over though the type does not |
 | `Measurement`, `Questioned`, `Sweep`, `Plumbing`, `Seeds.Apart` | The harness. Its question-and-answer shape does not fit per-step prediction; budget the rewrite |
@@ -552,6 +554,7 @@ condition is a superstition.
 | The vote deferring to a general advocate unless the narrower earns it | Four points worse where it fires, and read-only it changes not one withheld answer | Never. The deciders earn their seats by a wide margin on drawn data |
 | Genesis rooting on a code that has never varied | 7.4 standard errors behind where there is background, 0.2 apart without it. Background becomes a PARENT and its children inherit it | A world where an always-present code is informative. None is known |
 | Handing every seat back to a general rule that has not beaten it, read-only | It changed not one withheld answer, and the in-run version cost four points | A world where drawn evidence can tell a parent from its child |
+| Loosening the repair budget, or gating it on the parent | Six cells over eight seeds found no more of the world's rules while repairing many times over | A world where the candidates it refuses are good ones. None known |
 | Subsumption weighed against DISTINCT occasions rather than firings | Chance on the noisy multiplexer, no sound rule left. Each condition halves where a rule can fire, so the bar caps DEPTH by world size | A bar whose expectation shrinks with depth too |
 
 ---
@@ -832,6 +835,15 @@ change of architecture entirely.
 - **AND `Weighing` MOVES THE UNCOVERED BUCKET RATHER THAN THE OUTVOTED ONE**, which makes
   the winning rule a better SEARCH wearing a readout's name. Genesis mints the identical
   count under all three; only what repair does with them differs.
+- **REPAIR RUNS FIFTEEN HUNDRED TIMES ON THE SKEWED WORLD AND FINDS NOTHING TRUE.**
+  Six-fold more repair and three-fold more residents leave `found` at exactly nought, so
+  what repair AIMS at is the defect and how much of it runs is not.
+- **AND THE VOTE REACHES WHAT THE BUDGET CANNOT.** `Weighing.Lifting` finds three of
+  sixteen there over eight seeds where every budget and mending cell finds nought, so
+  steering repair beats feeding it.
+- **THE BUDGET REFUSING NINE CANDIDATES IN TEN IS A FACT AND NOT A CAUSE**, which is a
+  share read as a bottleneck. Where a gate discards most of its input, ask what the input
+  was worth before asking for more of it.
 
 ---
 

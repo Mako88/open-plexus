@@ -32,7 +32,19 @@ public sealed class MonkRun
     /// <param name="world">Which puzzle, and how much is held back.</param>
     /// <param name="brain">The one brain, already configured.</param>
     /// <param name="seed">The world's own generator.</param>
-    public MonkRun(MonkSettings world, Brain brain, int seed)
+    /// <param name="census">
+    /// Whether to partition the wrong rounds by cause — <b>the second world that can, and
+    /// the one whose language ceiling is known in advance.</b>
+    /// </param>
+    /// <remarks>
+    /// <b>WHICH MAKES THIS THE ONLY PLACE THE CENSUS CAN BE READ AGAINST A KNOWN
+    /// CEILING.</b> On <see cref="Puzzle.Two"/> a conjunction cannot soundly say yes
+    /// short of a whole instance, so an uncovered bucket there is the SCOPE LANGUAGE
+    /// failing rather than covering failing — and on the multiplexer the same number
+    /// means the opposite, because every rule it needs is expressible. Two worlds
+    /// separate a diagnosis one cannot.
+    /// </remarks>
+    public MonkRun(MonkSettings world, Brain brain, int seed, bool census = false)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(brain);
@@ -46,7 +58,10 @@ public sealed class MonkRun
         // is the only one that cannot alias -- which is the fault `Bits` already carried
         // once, when its only caller happened to be binary.
         _trial = new Trial<IReadOnlyList<int>>(
-            _world, new Bits(Monk.Attribute, Monk.Stride), brain);
+            _world,
+            new Bits(Monk.Attribute, Monk.Stride),
+            brain,
+            census ? (scope, expects) => Monk.Sound(world.Puzzle, scope, expects) : null);
     }
 
     /// <summary>What the brain holds.</summary>

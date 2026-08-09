@@ -100,6 +100,105 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>THE SAME PARTITION ON THE WORLD WHOSE CEILING IS KNOWN IN ADVANCE — where an
+    /// uncovered round means the opposite of what it means on the multiplexer.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>ONE NUMBER, TWO DIAGNOSES, AND ONLY A SECOND WORLD SEPARATES THEM.</b> Every
+    /// rule the multiplexer needs is a conjunction the scope language can say, so an
+    /// uncovered round there is covering or repair failing to BUILD something that was
+    /// available. On <see cref="Puzzle.Two"/> nothing shorter than a whole instance can
+    /// soundly say yes — so an uncovered round is the LANGUAGE, and no gate, budget or
+    /// vote could ever have fixed it.
+    /// </para>
+    /// <para>
+    /// <b>WHICH MAKES THE PAIR THE CHECK RATHER THAN EITHER ROW.</b> A mechanism that
+    /// lowers uncovered on the multiplexer and leaves it alone on the second puzzle is
+    /// doing what it claims; one that lowers both is finding rules that cannot be true,
+    /// and the soundness count beside it should say so.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Where_the_wrong_answers_come_from_on_a_world_with_a_known_ceiling()
+    {
+        foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
+        {
+            var learned = new MonkRun(
+                new MonkSettings { Puzzle = puzzle, Withheld = 132 },
+                new Brain(new CommittingSettings(), seed: 1),
+                seed: 1,
+                census: true).Run(Rounds);
+
+            var census = learned.Census!;
+
+            output.WriteLine(
+                $"monk-{puzzle,-6} | recent {learned.Recent:F3} "
+                + $"| wrong {census.Wrong,6} | outvoted {census.Outvoted,6} "
+                + $"| uncovered {census.Uncovered,6} | reachable {census.Reachable,6:P1} "
+                + $"| found {learned.Found,3}/{learned.Truths} "
+                + $"| wanting {learned.Tally.Wanting,6:P1}");
+        }
+    }
+
+    /// <summary>
+    /// <b>WHETHER THE UNCOVERED BUCKET EMPTIES ONCE THE TRUE RULES ARE ALL HELD — the
+    /// internal claim two instruments can check and neither can alone.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>AT SIX BITS UNGATED THE RUN ENDS HOLDING ALL EIGHT TRUE RULES AND STILL REPORTS
+    /// THREE HUNDRED UNCOVERED ROUNDS.</b> Those eight partition the input space, so once
+    /// they are resident every round must have a correct advocate — which means the
+    /// uncovered rounds have to be EARLY ones, before the rules existed. That is the
+    /// parsimonious reading and it was a guess until this counted.
+    /// </para>
+    /// <para>
+    /// <b>AND IF IT IS WRONG THE FAULT IS IN MATCHING RATHER THAN IN LEARNING</b>, which
+    /// no score could distinguish. A correct rule that is resident and does not fire on a
+    /// moment it covers is a defect; a correct rule that did not exist yet is a run
+    /// getting on with it. `Found` and `Uncovered` are computed by different code from
+    /// different tables, so their agreement is a real check on both.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void The_uncovered_bucket_empties_as_the_true_rules_arrive()
+    {
+        foreach (var (address, surprising) in new[]
+        {
+            (2, Surprising.AnyFailure),
+            (2, Surprising.Unaccounted),
+            (3, Surprising.AnyFailure),
+        })
+        {
+            var brain = new Brain(
+                new CommittingSettings { Surprising = surprising }, seed: 1);
+
+            var run = new MultiplexerRun(
+                new MultiplexerSettings { Address = address },
+                brain, seed: 1, census: true);
+
+            long ran = 0;
+            var row = new List<string>();
+
+            foreach (var upto in new long[] { 2_000, 5_000, 10_000, 15_000, 20_000 })
+            {
+                // EACH CALL REPORTS ITS OWN SEGMENT, because the census accumulates per
+                // run rather than per population -- the same property that made the
+                // genesis reading possible without touching the loop.
+                var learned = run.Run(upto - ran);
+                ran = upto;
+
+                row.Add($"{upto / 1000}k:{learned.Census!.Uncovered}/{learned.Found}");
+            }
+
+            output.WriteLine(
+                $"{address + (1 << address),2} bits {surprising,-12} | "
+                + "uncovered/found by segment — " + string.Join("  ", row));
+        }
+    }
+
+    /// <summary>
     /// <b>WHAT THE TWO KNOWN GATES COST AND BUY, read on the bucket that decides it.</b>
     /// </summary>
     /// <remarks>
@@ -126,8 +225,20 @@ public sealed class CensusTests(ITestOutputHelper output)
         {
             foreach (var surprising in new[] { Surprising.Unaccounted, Surprising.AnyFailure })
             {
-                var learned = Run(address, skew, seed: 1, surprising: surprising);
+                var brain = new Brain(
+                    new CommittingSettings { Surprising = surprising }, seed: 1);
+
+                var learned = new MultiplexerRun(
+                    new MultiplexerSettings { Address = address, Skew = skew },
+                    brain, seed: 1, census: true).Run(Rounds);
+
                 var census = learned.Census!;
+
+                // THE WHOLE SPACE GENESIS CAN EVER REACH IS ONE CODE WIDE, so counting the
+                // one-code residents against it says whether covering stopped because a
+                // gate refused or because there was nothing left to mint. Those are
+                // opposite diagnoses and the mint total cannot tell them apart.
+                var roots = brain.Held.All.Count(one => one.Scope.Length == 1);
 
                 output.WriteLine(
                     $"{address + (1 << address),2} bits skew {skew:F1} {surprising,-12} | "
@@ -135,7 +246,10 @@ public sealed class CensusTests(ITestOutputHelper output)
                     + $"| outvoted {census.Outvoted,5} | uncovered {census.Uncovered,6} "
                     + $"| found {learned.Found,2}/{learned.Truths} "
                     + $"| sound {learned.Sound,4} | unsound {learned.Unsound,5} "
-                    + $"| residents {learned.Resident,5} | minted {learned.Tally.Minted,6}");
+                    + $"| residents {learned.Resident,5} | minted {learned.Tally.Minted,6} "
+                    + $"| repaired {learned.Tally.Repaired,6} "
+                    + $"| exhausted {learned.Exhausted,4} "
+                    + $"| roots {roots,3}/{2 * 2 * (address + (1 << address))}");
             }
 
             output.WriteLine("");

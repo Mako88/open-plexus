@@ -159,6 +159,46 @@ public sealed class Population
 
     private long _settlements;
 
+    private long _wrong, _atFloor, _atBudget, _atCovered, _atImproving, _reached;
+
+    /// <summary>Firing commitments that expected something other than what arrived.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE DENOMINATOR REPAIR HAS NEVER HAD.</b> <see cref="Blamed"/> counts ROUNDS
+    /// where something was repairable and <see cref="Unseparated"/> counts rounds where
+    /// nothing separated — so between them they say how often the language ran out, and
+    /// nothing at all about how many candidates the GATES threw away before the language
+    /// was ever consulted.
+    /// </para>
+    /// <para>
+    /// <b>AND THE FIVE BELOW PARTITION THIS EXACTLY</b>, each candidate charged to the
+    /// first gate that refused it, so a share that is large is a gate that is deciding
+    /// the run.
+    /// </para>
+    /// </remarks>
+    public long Wrong => _wrong;
+
+    /// <summary>Of those, refused for having missed too few times.</summary>
+    public long AtFloor => _atFloor;
+
+    /// <summary>Refused for having spent their whole repair budget.</summary>
+    public long AtBudget => _atBudget;
+
+    /// <summary>Refused because a child already covers the failure.</summary>
+    public long AtCovered => _atCovered;
+
+    /// <summary>Refused because forking them has never yet paid.</summary>
+    public long AtImproving => _atImproving;
+
+    /// <summary>Cleared every gate and was offered the candidate search.</summary>
+    /// <remarks>
+    /// <b>THE ONLY ONE OF THE FIVE THAT REACHES THE SCOPE LANGUAGE AT ALL</b>, so the
+    /// ladder's trigger is a statement about this number and not about
+    /// <see cref="Wrong"/>. A run where almost nothing reaches here has not discovered
+    /// that its language is too weak; it has discovered that its gates are strict.
+    /// </remarks>
+    public long Searched => _reached;
+
     private readonly Dictionary<Code, Commitment> _byName = [];
     private readonly Dictionary<Code, List<Commitment>> _byCode = [];
 
@@ -751,24 +791,42 @@ public sealed class Population
     /// </remarks>
     public Commitment? Mend(ImmutableArray<Commitment> firing, Code arrived)
     {
+        // WHERE THE CANDIDATES DIE, COUNTED BEFORE THE CHAIN RATHER THAN INSIDE IT. The
+        // chain below is lazy and stops at the first child it manages to add, so counting
+        // from within it would report where the EXAMINED ones died and call it where the
+        // gates refuse -- two different numbers, and only the second says what a gate
+        // excludes. This walks every wrong commitment once, in the gate order, so each is
+        // charged to its FIRST refusal and the expensive tests still run only for the
+        // handful that reach them.
+        foreach (var one in firing)
+        {
+            if (one.Expects == arrived) continue;
+
+            _wrong++;
+
+            if (!PastFloor(one)) _atFloor++;
+            else if (!PastBudget(one)) _atBudget++;
+            else if (!Uncovered(one, firing)) _atCovered++;
+            else if (!PastImproving(one)) _atImproving++;
+            else _reached++;
+        }
+
         var culprits = firing
             .Where(one => one.Expects != arrived)
-            .Where(one => one.Misses >= _dials.Floor)
-            .Where(one => Children(one.Identity) < _dials.Budget)
+            .Where(PastFloor)
+            .Where(PastBudget)
 
             // FORK 37'S DRIVER, AND IT IS LAST BECAUSE IT IS THE EXPENSIVE ONE. `Where`
             // is lazy, so this runs only for commitments that already cleared the floor
             // and the budget -- a handful, against the hundreds that fire. Putting it
             // first would make the instrument the cost of the run.
-            .Where(one =>
-                _dials.Mending == Mending.Ungated
-                || !firing.Any(other => Beside(other, one) && other.Narrows(one)))
+            .Where(one => Uncovered(one, firing))
 
             // AND THE PER-COMMITMENT HALF, WHICH ONLY `Improving` ASKS. Last again, for
             // the same reason the child test is: it walks a parent's children, and
             // `Where` is lazy, so it runs for the handful that have already cleared
             // everything else rather than for the hundreds that fire.
-            .Where(one => _dials.Mending != Mending.Improving || Improves(one))
+            .Where(PastImproving)
 
             .OrderBy(one => one.Accuracy)
             .ThenBy(one => one.Identity);
@@ -829,6 +887,30 @@ public sealed class Population
             }
         }
     }
+
+    /// <summary>Whether a commitment has missed enough times to be worth repairing.</summary>
+    /// <remarks>
+    /// <b>WRITTEN ONCE AND READ BY TWO CALLERS, WHICH IS THE POINT.</b> The chain that
+    /// DECIDES and the pass that COUNTS have to ask the identical question or the census
+    /// describes a machine that is not running — the same drift <c>Learned.Grade</c> was
+    /// written once to avoid.
+    /// </remarks>
+    private bool PastFloor(Commitment one) => one.Misses >= _dials.Floor;
+
+    /// <inheritdoc cref="PastFloor"/>
+    /// <summary>Whether a commitment has any of its repair budget left.</summary>
+    private bool PastBudget(Commitment one) => Children(one.Identity) < _dials.Budget;
+
+    /// <inheritdoc cref="PastFloor"/>
+    /// <summary>Whether no child already covers this commitment's failure.</summary>
+    private bool Uncovered(Commitment one, ImmutableArray<Commitment> firing) =>
+        _dials.Mending == Mending.Ungated
+        || !firing.Any(other => Beside(other, one) && other.Narrows(one));
+
+    /// <inheritdoc cref="PastFloor"/>
+    /// <summary>Whether forking this commitment has ever paid, where that is asked.</summary>
+    private bool PastImproving(Commitment one) =>
+        _dials.Mending != Mending.Improving || Improves(one);
 
     /// <summary>Whether one holder can see both of these at once.</summary>
     /// <param name="one">A commitment that might cover the other.</param>

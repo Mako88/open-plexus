@@ -209,6 +209,24 @@ public sealed record Tally
     /// <inheritdoc cref="Commitments.Population.Absented"/>
     public required long Absented { get; init; }
 
+    /// <inheritdoc cref="Commitments.Population.Wrong"/>
+    public required long Candidates { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.AtFloor"/>
+    public required long AtFloor { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.AtBudget"/>
+    public required long AtBudget { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.AtCovered"/>
+    public required long AtCovered { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.AtImproving"/>
+    public required long AtImproving { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.Searched"/>
+    public required long Searched { get; init; }
+
     /// <summary>
     /// The share of repairable rounds the current language could not separate.
     /// </summary>
@@ -552,6 +570,12 @@ public sealed class Trial<TSeen>
             Blamed = holding.Sum(held => held.Blamed),
             Unseparated = holding.Sum(held => held.Unseparated),
             Absented = holding.Sum(held => held.Absented),
+            Candidates = holding.Sum(held => held.Wrong),
+            AtFloor = holding.Sum(held => held.AtFloor),
+            AtBudget = holding.Sum(held => held.AtBudget),
+            AtCovered = holding.Sum(held => held.AtCovered),
+            AtImproving = holding.Sum(held => held.AtImproving),
+            Searched = holding.Sum(held => held.Searched),
             Codes = codes / (double)rounds,
             Unseen = Examine(holding),
             Census = censusing is null

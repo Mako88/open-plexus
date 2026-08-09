@@ -66,6 +66,19 @@ public sealed class ShapeTests(ITestOutputHelper output)
     {
         "world", "settings", "dials", "seed", "clusters", "replicas", "late", "primer",
         "brain", "looking", "fronting", "through",
+
+        // AN INSTRUMENT SWITCH RATHER THAN A DIAL, AND THE DIFFERENCE IS DECIDABLE: a
+        // dial changes what the run DOES and this changes only whether a reading is
+        // taken. It is on a world rather than on the brain because the census needs the
+        // world's own soundness check, which no brain may ever see -- so it could not
+        // live anywhere else without handing the learner an answer key.
+        //
+        // AND A NAME IS NOT AN ARGUMENT, WHICH IS WHAT THIS FILE'S OWN `brain` CLAUSE
+        // SAYS. `CensusTests` asserts that a run with it on and a run with it off learn
+        // identically, so the exemption is paid for by a check rather than by this
+        // comment -- and the day the census starts changing the run, that goes red here
+        // rather than silently making every censused number a different experiment.
+        "census",
     };
 
     /// <summary>

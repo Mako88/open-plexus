@@ -112,14 +112,7 @@ public sealed class BudgetTests(ITestOutputHelper output)
                     ("repaired", one => one.Tally.Repaired),
                 })
                 {
-                    var arm = await Sweep.ArmAsync(
-                        reading.What,
-                        Seeds,
-                        seed => Task.FromResult(reading.Of(Cached(seed))));
-
-                    output.WriteLine(
-                        $"  {cell,-15} {reading.What,-10} | {arm.Mean,10:F3} "
-                        + $"+/-{arm.StdErr,8:F3} | n={arm.Seeds}");
+                    await Fixture.ReadAsync(output, cell, Seeds, Cached, reading);
                 }
 
                 output.WriteLine("");

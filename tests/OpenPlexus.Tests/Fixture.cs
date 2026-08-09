@@ -1,8 +1,9 @@
-using OpenPlexus.Bus;
+﻿using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Graph;
 using OpenPlexus.Learning;
 using OpenPlexus.Worlds;
+using Xunit.Abstractions;
 
 namespace OpenPlexus.Tests;
 
@@ -321,6 +322,50 @@ public static class Fixture
         Chain = [code],
         Carried = 1.0,
     };
+
+    /// <summary>
+    /// Sweeps every reading over one cell's runs and prints a row each.
+    /// </summary>
+    /// <param name="output">Where the rows go.</param>
+    /// <param name="cell">What this row of the grid is, in the grid's own words.</param>
+    /// <param name="seeds">How many seeds each reading is taken over.</param>
+    /// <param name="cached">
+    /// One run per seed. <b>Cached by the caller and not by this</b> — six readings asked
+    /// independently would run the identical configuration six times and report one
+    /// measurement as though it were six.
+    /// </param>
+    /// <param name="readings">What to pull out of each run.</param>
+    /// <remarks>
+    /// <b>THE SAME SIX STATEMENTS WERE IN TWO GRIDS AND THE CLONE BUDGET SAID SO.</b> They
+    /// are not incidentally alike: a cell of a sweep IS a configuration, a seed count and a
+    /// list of readings, and writing that out per file is how two grids come to print
+    /// columns that look comparable while one of them quietly sweeps a different number of
+    /// seeds. The one number every reader compares across files is the standard error, and
+    /// it is a function of exactly what this takes.
+    /// </remarks>
+    public static async Task ReadAsync(
+        ITestOutputHelper output,
+        string cell,
+        int seeds,
+        Func<int, Machines.Learned> cached,
+        params (string What, Func<Machines.Learned, double> Of)[] readings)
+    {
+        ArgumentNullException.ThrowIfNull(output);
+        ArgumentNullException.ThrowIfNull(cached);
+        ArgumentNullException.ThrowIfNull(readings);
+
+        foreach (var reading in readings)
+        {
+            var arm = await Sweep.ArmAsync(
+                reading.What,
+                seeds,
+                seed => Task.FromResult(reading.Of(cached(seed)))).ConfigureAwait(false);
+
+            output.WriteLine(
+                $"  {cell,-15} {reading.What,-10} | {arm.Mean,10:F3} "
+                + $"+/-{arm.StdErr,8:F3} | n={arm.Seeds}");
+        }
+    }
 }
 
 /// <summary>

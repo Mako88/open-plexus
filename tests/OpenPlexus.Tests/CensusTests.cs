@@ -389,4 +389,58 @@ public sealed class CensusTests(ITestOutputHelper output)
             }
         }
     }
+
+    /// <summary>
+    /// <b>TAKING THE CENSUS DOES NOT CHANGE THE RUN, which is what buys its exemption
+    /// from `ShapeTests`.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>`census` IS A CONSTRUCTOR PARAMETER ON A WORLD RUN AND THE DIAL GUARD IS RIGHT
+    /// TO ASK ABOUT IT.</b> A world may say what it is looking at and never what to
+    /// conclude, and this one hands over the world's own soundness check — an answer key,
+    /// which is exactly the thing that may not reach a learner. What makes it admissible
+    /// is that the key goes to the HARNESS and not to the brain, and that is a claim about
+    /// wiring which a name in an allow-list cannot carry.
+    /// </para>
+    /// <para>
+    /// <b>SO IT IS ASSERTED ON THE ANSWER RATHER THAN ON THE ROUTING.</b> Two runs from
+    /// one seed, one censused and one not, and every number the learner produced has to
+    /// match exactly — a single leak into the population shows up as a different rule
+    /// count long before it shows up as a better score. This is also the check that would
+    /// catch the census becoming load-bearing later, which is how an instrument quietly
+    /// turns into a mechanism.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void A_censused_run_and_a_plain_one_learn_exactly_the_same_thing()
+    {
+        foreach (var (address, skew) in new[] { (2, 0.0), (2, 0.8), (3, 0.8) })
+        {
+            var settings = new MultiplexerSettings { Address = address, Skew = skew };
+
+            Learned Once(bool census) => new MultiplexerRun(
+                settings, new Brain(new CommittingSettings(), seed: 1), seed: 1, census)
+                .Run(Rounds);
+
+            var watched = Once(census: true);
+            var plain = Once(census: false);
+
+            output.WriteLine(
+                $"{address + (1 << address),2} bits skew {skew:F1} | "
+                + $"recent {plain.Recent:F4} | residents {plain.Resident} | "
+                + $"repaired {plain.Repaired} | sound {plain.Sound}");
+
+            Assert.Null(plain.Census);
+            Assert.NotNull(watched.Census);
+
+            Assert.Equal(plain.Recent, watched.Recent, 12);
+            Assert.Equal(plain.Resident, watched.Resident);
+            Assert.Equal(plain.Repaired, watched.Repaired);
+            Assert.Equal(plain.Sound, watched.Sound);
+            Assert.Equal(plain.Unsound, watched.Unsound);
+            Assert.Equal(plain.Found, watched.Found);
+            Assert.Equal(plain.Named, watched.Named);
+        }
+    }
 }

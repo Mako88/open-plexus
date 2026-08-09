@@ -1,4 +1,4 @@
-using OpenPlexus.Commitments;
+﻿using OpenPlexus.Commitments;
 using OpenPlexus.Machines;
 using OpenPlexus.Worlds;
 using Xunit.Abstractions;
@@ -60,7 +60,7 @@ public sealed class RepairingTests(ITestOutputHelper output)
 
             var taken = new Dictionary<string, Dictionary<string, Measured>>();
 
-            foreach (var (name, dials) in Arms) taken[name] = Take(settings, dials);
+            foreach (var (name, dials) in Arms) taken[name] = Take(settings, dials, Runs);
 
             output.WriteLine(
                 $"reading    {"afterfailure",-22} {"everyround",-22} sigma");
@@ -173,34 +173,15 @@ public sealed class RepairingTests(ITestOutputHelper output)
             {
                 foreach (var (name, budget) in cells)
                 {
-                    var dials = new CommittingSettings
-                    {
-                        Repairing = repairing,
-                        Budget = budget,
-                    };
-
-                    var paying = new List<double>();
-                    var recent = new List<double>();
-                    var sound = new List<double>();
-                    var repaired = new List<double>();
-
-                    for (var index = 1; index <= Curve; index++)
-                    {
-                        var seed = Seeds.Apart(index, Purpose);
-
-                        var learnt = new MultiplexerRun(
-                            settings, new Brain(dials, seed), seed, census: true)
-                            .Run(Rounds);
-
-                        paying.Add(learnt.Census!.Paying);
-                        recent.Add(learnt.Recent);
-                        sound.Add(learnt.Sound);
-                        repaired.Add(learnt.Repaired);
-                    }
+                    var taken = Take(
+                        settings,
+                        new CommittingSettings { Repairing = repairing, Budget = budget },
+                        Curve);
 
                     output.WriteLine(
-                        $"{timing,-13} {name,-6}  {Column(paying),-20} {Column(recent),-20} "
-                        + $"{Column(sound),-20} {repaired.Average():F0}");
+                        $"{timing,-13} {name,-6}  {Show(taken["paying"]),-20} "
+                        + $"{Show(taken["recent"]),-20} {Show(taken["sound"]),-20} "
+                        + $"{taken["repaired"].Mean:F0}");
                 }
             }
 
@@ -244,34 +225,15 @@ public sealed class RepairingTests(ITestOutputHelper output)
             {
                 foreach (var weighing in new[] { Weighing.Summing, Weighing.Lifting })
                 {
-                    var dials = new CommittingSettings
-                    {
-                        Repairing = repairing,
-                        Weighing = weighing,
-                    };
-
-                    var paying = new List<double>();
-                    var recent = new List<double>();
-                    var found = new List<double>();
-                    var sound = new List<double>();
-
-                    for (var index = 1; index <= Curve; index++)
-                    {
-                        var seed = Seeds.Apart(index, Purpose);
-
-                        var learnt = new MultiplexerRun(
-                            settings, new Brain(dials, seed), seed, census: true)
-                            .Run(Rounds);
-
-                        paying.Add(learnt.Census!.Paying);
-                        recent.Add(learnt.Recent);
-                        found.Add(learnt.Found);
-                        sound.Add(learnt.Sound);
-                    }
+                    var taken = Take(
+                        settings,
+                        new CommittingSettings { Repairing = repairing, Weighing = weighing },
+                        Curve);
 
                     output.WriteLine(
-                        $"{timing,-13} {weighing,-8}  {Column(paying),-20} "
-                        + $"{Column(recent),-20} {Column(found),-20} {sound.Average():F1}");
+                        $"{timing,-13} {weighing,-8}  {Show(taken["paying"]),-20} "
+                        + $"{Show(taken["recent"]),-20} {Show(taken["found"]),-20} "
+                        + $"{taken["sound"].Mean:F1}");
                 }
             }
 
@@ -315,31 +277,21 @@ public sealed class RepairingTests(ITestOutputHelper output)
                 ("everyround", Repairing.EveryRound),
             })
             {
-                var dials = new CommittingSettings { Repairing = repairing };
+                var taken = Take(
+                    new MultiplexerSettings { Address = address },
+                    new CommittingSettings { Repairing = repairing },
+                    Curve);
 
-                var named = new List<double>();
-                var stacked = new List<double>();
-                var residents = new List<double>();
-                var any = 0;
-
-                for (var index = 1; index <= Curve; index++)
-                {
-                    var seed = Seeds.Apart(index, Purpose);
-
-                    var learnt = new MultiplexerRun(
-                        new MultiplexerSettings { Address = address },
-                        new Brain(dials, seed), seed).Run(Rounds);
-
-                    named.Add(learnt.Named);
-                    stacked.Add(learnt.Stacked);
-                    residents.Add(learnt.Resident);
-
-                    if (learnt.Named > 0) any++;
-                }
+                // SEEDS RATHER THAN A MEAN, BECAUSE A MEAN OF NINE NAMES IS COMPATIBLE
+                // WITH FIVE SEEDS NAMING NOTHING. The precondition that found this had one
+                // seed and read its silence as the rung being dead; what says otherwise is
+                // how many seeds name at all, and it is a different question from how many
+                // names they mint.
+                var any = taken["named"].Values.Count(one => one > 0);
 
                 output.WriteLine(
-                    $"{timing,-13} {Column(named),-20} {Column(stacked),-20} "
-                    + $"{Column(residents),-20} {any} of {Curve}");
+                    $"{timing,-13} {Show(taken["named"]),-20} {Show(taken["stacked"]),-20} "
+                    + $"{Show(taken["residents"]),-20} {any} of {Curve}");
             }
 
             output.WriteLine("");
@@ -354,16 +306,18 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// column a control rather than a second experiment — see <c>Sweep.ArmAsync</c>, whose
     /// discipline this borrows and whose purpose word it deliberately does not reuse.
     /// </remarks>
+    /// <param name="runs">How many seeds, since a curve gets fewer than a grid.</param>
     private static Dictionary<string, Measured> Take(
-        MultiplexerSettings settings, CommittingSettings dials)
+        MultiplexerSettings settings, CommittingSettings dials, int runs)
     {
         var readings = new Dictionary<string, List<double>>
         {
             ["paying"] = [], ["recent"] = [], ["found"] = [],
             ["sound"] = [], ["unsound"] = [], ["residents"] = [], ["repaired"] = [],
+            ["named"] = [], ["stacked"] = [],
         };
 
-        for (var index = 1; index <= Runs; index++)
+        for (var index = 1; index <= runs; index++)
         {
             var seed = Seeds.Apart(index, Purpose);
             var run = new MultiplexerRun(settings, new Brain(dials, seed), seed, census: true);
@@ -377,6 +331,8 @@ public sealed class RepairingTests(ITestOutputHelper output)
             readings["unsound"].Add(learnt.Unsound);
             readings["residents"].Add(learnt.Resident);
             readings["repaired"].Add(learnt.Repaired);
+            readings["named"].Add(learnt.Named);
+            readings["stacked"].Add(learnt.Stacked);
         }
 
         return readings.ToDictionary(
@@ -389,8 +345,4 @@ public sealed class RepairingTests(ITestOutputHelper output)
     private static string Show(Measured measured) =>
         $"{measured.Mean,9:F3} +/- {measured.StdErr:F3}";
 
-    /// <inheritdoc cref="Show"/>
-    /// <param name="values">One reading, one entry a seed.</param>
-    private static string Column(IReadOnlyList<double> values) =>
-        Show(new Measured { Arm = "x", Values = values });
 }

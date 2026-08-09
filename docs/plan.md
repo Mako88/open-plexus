@@ -871,6 +871,15 @@ change of architecture entirely.
   breaking the coupling both take it to four fifths and pay.
 - **SO `Weighing.Lifting` IS NOT A VOTE RULE.** It is blame redirection implemented in the
   vote, which is why it is the only thing that has ever moved hard-round coverage.
+- **AND BREAKING THE COUPLING SURVIVED THE WORLD IT WAS PREDICTED TO RUIN.** `EveryRound`
+  leads on `Arranged` at two standard errors over eight seeds, and is inside one on both
+  even multiplexers. The kill condition was written down first and did not fire.
+- **SO `Repairing.EveryRound` IS A DEFAULT CANDIDATE AND `AfterFailure` IS NOT.** Sixteen
+  standard errors of hard-round coverage at eleven bits skewed, four of accuracy, and no
+  world measured is worse on score.
+- **ITS ONE COST IS WHAT IT HOLDS ON AN EVEN ELEVEN-BIT WORLD**: seventeen fewer sound
+  rules and a third fewer repairs at nearly five standard errors, while the score does not
+  move.
 - **AND A CHILD IS SUBSUMED ABOUT FOUR TIMES IN FIVE, WHERE THE CODE SAID IT NEVER
   HAPPENS.** A child that specialised on the wrong code is exactly as accurate as its
   parent, so the clause called unreachable is the population's main exit.

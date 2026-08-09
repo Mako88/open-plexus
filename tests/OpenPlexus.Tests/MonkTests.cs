@@ -310,55 +310,88 @@ public sealed class MonkTests(ITestOutputHelper output)
     /// </remarks>
     [Fact]
     [Trait(Sweeps.Kind, Sweeps.Name)]
-    public void Whether_the_failures_are_asking_for_a_rung()
+    public async Task Whether_the_failures_are_asking_for_a_rung()
     {
+        const int Seeds = 8;
+
+        var worlds = new (string World, Func<int, Tally> Run)[]
+        {
+            ("monk-1", seed => Monked(Puzzle.One, seed)),
+            ("monk-2", seed => Monked(Puzzle.Two, seed)),
+            ("monk-3", seed => Monked(Puzzle.Three, seed)),
+            ("plex-6", seed => Plexed(2, seed)),
+            ("plex-11", seed => Plexed(3, seed)),
+        };
+
         output.WriteLine(
-            "world | blamed | unseparated | wanting | absence would | recent | sound/unsound");
+            $"the share of repairable rounds nothing separates, and of THOSE the share an "
+            + $"absence would, over {Seeds} seeds");
 
-        foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
+        foreach (var (world, run) in worlds)
         {
-            var got = new MonkRun(
-                new MonkSettings { Puzzle = puzzle, Withheld = 132 },
-                new Brain(new CommittingSettings(), seed: 1),
-                seed: 1).Run(20_000);
+            // CACHED, SO BOTH SHARES ARE READ OFF THE SAME RUNS ON THE SAME SEEDS. `Sweep`
+            // mixes the seed counter before handing it over, because near-neighbour seeds
+            // agree more than chance allows and that agreement comes straight off the
+            // standard error -- so the sequence has to come from there rather than from a
+            // loop here, and the cache is what lets a second reading share it.
+            var ran = new Dictionary<int, Tally>();
 
-            Say($"monk-{(int)puzzle}", got.Tally, got.Recent, got.Sound, got.Unsound);
+            Tally At(int seed)
+            {
+                if (!ran.TryGetValue(seed, out var got)) ran[seed] = got = run(seed);
+                return got;
+            }
+
+            var wanting = await Sweep.ArmAsync(
+                world, Seeds, seed => Task.FromResult(At(seed).Wanting));
+
+            // AND THE SECOND SHARE IS OVER THE FIRST'S NUMERATOR, so a seed that separated
+            // everything contributes no opinion about absence rather than a nought. A
+            // nought there would say an absence did not help on a seed where nothing needed
+            // helping, which is reading a silence as a refusal.
+            var absence = new Measured
+            {
+                Arm = world,
+                Values =
+                [
+                    .. ran.Values
+                        .Where(one => one.Unseparated > 0)
+                        .Select(one => one.Absented / (double)one.Unseparated),
+                ],
+            };
+
+            output.WriteLine(
+                $"{world,-9} | wanting {wanting.Mean:F3} +/-{wanting.StdErr:F3} "
+                + $"| absence would {absence.Mean,6:F3} +/-{absence.StdErr:F3} "
+                + $"over {absence.Seeds} of {Seeds} seeds");
         }
 
-        foreach (var address in new[] { 2, 3 })
-        {
-            var got = new MultiplexerRun(
-                new MultiplexerSettings { Address = address },
-                new Brain(new CommittingSettings(), seed: 1),
-                seed: 1).Run(20_000);
+        // THE INSTRUMENT CHECK, AND IT IS THE ONE THIS FILE ALREADY HAS A PARAGRAPH ABOUT.
+        // `Wanting` is a ratio over `Blamed`, so a run where nothing was ever repairable
+        // reports nought and reads exactly like a language that described everything.
+        Assert.True(Monked(Puzzle.Two, 1).Blamed > 0,
+            "repair was never offered a culprit, so `Wanting` is a ratio over nothing");
 
-            Say($"plex-{address + (1 << address)}", got.Tally, got.Recent, got.Sound, got.Unsound);
-        }
-
-        // NO BAR ON THE SHARE, BECAUSE IT HAS NEVER BEEN READ. What is asserted is that the
-        // instrument can move at all: `Wanting` is a ratio over `Blamed`, so a run where
-        // nothing was ever repairable reports nought and reads exactly like a language that
-        // describes everything. That is this repo's oldest trap and it would land here.
-        var armed = new MonkRun(
-            new MonkSettings { Puzzle = Puzzle.Two, Withheld = 132 },
-            new Brain(new CommittingSettings(), seed: 1),
-            seed: 1).Run(20_000);
-
-        Assert.True(armed.Tally.Blamed > 0,
-            "repair was never offered a culprit, so `Wanting` is a ratio over nothing and "
-            + "its nought says the gates refused everything rather than that the language "
-            + "described everything");
+        // NO BAR ON EITHER SHARE. Which rung a failure demands has never been measured, so
+        // a threshold written before the first reading would be a prediction dressed as a
+        // requirement -- and this suite already had one of those refuted tonight.
     }
 
-    /// <summary>One row of the ladder-trigger grid.</summary>
-    /// <param name="world">Which world.</param>
-    /// <param name="tally">What the run reported.</param>
-    /// <param name="recent">The last tenth's accuracy.</param>
-    /// <param name="sound">Rules true of the world.</param>
-    /// <param name="unsound">Rules that are not.</param>
-    private void Say(string world, Tally tally, double recent, int sound, int unsound) =>
-        output.WriteLine(
-            $"{world,-9} | {tally.Blamed,6} | {tally.Unseparated,11} | {tally.Wanting,7:F3} "
-            + $"| {tally.Absented,6} ({(tally.Unseparated == 0 ? 0.0 : tally.Absented / (double)tally.Unseparated),5:F3}) "
-            + $"| {recent,6:F3} | {sound}/{unsound}");
+    /// <summary>One Monk run, reported in the terms every world shares.</summary>
+    /// <param name="puzzle">Which of the three.</param>
+    /// <param name="seed">The world's generator and the brain's.</param>
+    private static Tally Monked(Puzzle puzzle, int seed) =>
+        new MonkRun(
+            new MonkSettings { Puzzle = puzzle, Withheld = 132 },
+            new Brain(new CommittingSettings(), seed),
+            seed).Run(20_000).Tally;
+
+    /// <summary>The control from a world whose true rules ARE conjunctions.</summary>
+    /// <param name="address">Address bits.</param>
+    /// <param name="seed">The world's generator and the brain's.</param>
+    private static Tally Plexed(int address, int seed) =>
+        new MultiplexerRun(
+            new MultiplexerSettings { Address = address },
+            new Brain(new CommittingSettings(), seed),
+            seed).Run(20_000).Tally;
 }

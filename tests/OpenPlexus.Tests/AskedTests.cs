@@ -59,10 +59,32 @@ public sealed class AskedTests(ITestOutputHelper output)
     /// <summary>A population trained on the multiplexer, and the dials it ran under.</summary>
     /// <param name="address">Address bits.</param>
     /// <param name="weighing">How advocates for one expectation combine.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>THE TIMING IS PINNED HERE BECAUSE THIS FILE IS ABOUT THE WIRE AND NOT ABOUT THE
+    /// SEARCH.</b> What these tests need is a population with a sub-scope worth naming, so
+    /// that a shard failing to name it alone means something — and whether one exists is a
+    /// property of the trained population, which every repair dial moves. Inheriting the
+    /// default made a socket test depend on the search, and it went red the day the default
+    /// changed with nothing wrong on either side of the wire.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS <see cref="Repairing.AfterFailure"/> RATHER THAN THE SHIPPED ONE FOR
+    /// THE REASON THE PRECONDITION EXISTS.</b> That timing holds the larger population at
+    /// eleven bits, so it reliably has structure left over once the run's own naming has
+    /// taken what it wants. The pin is a fixture choice and says nothing about which timing
+    /// is better; <c>RepairingTests</c> is where that is measured, and it finds naming
+    /// alive under both on every seed.
+    /// </para>
+    /// </remarks>
     private static (CommittingSettings Dials, List<Commitment> All) Trained(
         int address, Weighing weighing = Weighing.Summing)
     {
-        var dials = new CommittingSettings { Weighing = weighing };
+        var dials = new CommittingSettings
+        {
+            Weighing = weighing,
+            Repairing = Repairing.AfterFailure,
+        };
         var brain = new Brain(dials, seed: 1);
 
         new MultiplexerRun(new MultiplexerSettings { Address = address }, brain, seed: 1)

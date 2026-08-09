@@ -138,6 +138,12 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **A FLEET RUN REPRODUCES ITSELF EXACTLY, so fork 12 holds across sockets.** Every merge is
   ordered before it is combined and every placement is a fact about a commitment rather than
   about who asked or who answered first.
+- **WHICH IS WHY TWO REPLICAS NEED NO MESSAGES BETWEEN THEM.** Fed one stream they mint the
+  same children independently and stay identical, so redundancy costs coordination nothing
+  and divergence becomes a free check on C2.
+- **AND A REPLICA IS DEDUPLICATED BY WHAT IT SAYS RATHER THAN BY WHO SAID IT.**
+  `Advocacy.By` already names the best advocate, so a merge can drop a duplicate exactly —
+  and only where an expectation is worth that advocate.
 - **THE CURVE SURVIVES DISTRIBUTION AND THE POPULATION DOES NOT.** A fleet scores what one
   process scores and holds twice the rules to do it, because a holder's repair gate can only
   refuse what a commitment ON THAT MACHINE covers.
@@ -193,6 +199,16 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   query is where it fits, being a boolean whose answer is usually no.
 - **AND WHAT SPECULATION COSTS WHEN WRONG IS WHAT DECIDES WHERE IT IS ALLOWED.** A mistaken
   repair is a rule subsumption may remove; a mistaken vote is an answer already given.
+- **Ten — the vote rule, which now GATES the rest rather than sitting beside it.** Deciding
+  it was a score question and is not: replication, wire deduplication and fork 29 all need
+  the scale-free one and nothing else does.
+- **Eleven — slots, because they make a death free and answer the loop's open half.** One
+  machine per slot answering is a completeness condition rather than a deadline.
+- **Twelve — placement by the minimum code**, which is cheap, priced, and the only thing
+  that stops two parents reaching one child twice. It costs balance past a dozen machines.
+- **Thirteen — rung two, whose payoff is written down BEFORE it is built.** About a third of
+  a fifth on the one world that demands it, and a settlement of latency on every negative
+  scope forever.
 - **The two-learner head-to-head is a side quest and blocks nothing**, being cheap now
   that both are co-resident.
 - **Resist polishing step one.** It is the least informative part when it passes.
@@ -367,6 +383,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   which are permitted. Weaker than mode declarations, and not nothing.
 - **And when no rung clears, that is the signal the whole design exists for.** Two
   conflated cases with nothing to tell them apart is positing with a reason.
+- **AND WHEN TWO RUNGS BOTH CLEAR, THE SHORTER DESCRIPTION CHOOSES.** That is MDL in the one
+  place it cannot mint noise, because it only ranks candidates that already beat chance —
+  which is what its revival row demands.
 - **Which can be aimed at the front end.** A failure nothing explains is a localised
   demand for RESOLUTION: winnow these moments finer. It closes the loop to perception.
 
@@ -848,7 +867,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **57** | Every node predicts its own output while the real wave verifies behind it. What it saves is a LAN millisecond and an internet hundred, so where it pays is deployment. What a holder predicts from is a commitment about one |
 | **58** | The gate's sign flips with the timing, and the whole two-by-two has been run rather than read off four rows and a revival note. What is ruinous is the gate AFTER a failure specifically. Open on any other world |
 | **59** | Dissolved rather than decided. The setting was a gate and a timing crossed, so the cell that isolated the gate axis is not a cell — it is a corner of a grid, and both axes are now settings. Closed |
-| **53** | The loop is asynchronous and holds no clock, so a fleet losing one message waits forever — correctly. Its rounds still come from the harness rather than the world, and when to act on a partial gathering is open |
+| **53** | The loop is asynchronous and holds no clock, so a fleet losing one message waits forever. ANSWERED IN PRINCIPLE by fork 62: act when one machine in every slot has answered, which is a completeness condition rather than a deadline. Unbuilt |
 | **60** | Genesis is placed and repair is not, so a fleet repairs once per HOLDER a round where one machine repairs once. How hard it searches is a deployment choice. Place repair, divide the budget, or exploit it? Open |
 | **61** | John's: place a commitment by the MINIMUM code of its sorted scope, so identical children land together and a lineage stays together. PRICED: level at three holders, three times the average at twelve, capped by a world's distinct roots |
-| **62** | John's: three static seeds place every commitment three times, so a machine dropping loses nothing and a new one rolls in. Composes only under a scale-free vote — replicas each cast one under a sum. Open |
+| **62** | John's: partition into slots and give each R machines holding identical populations. A death costs nothing while a slot survives, replicas need no messages between them, and it answers fork 53. R scales with load |

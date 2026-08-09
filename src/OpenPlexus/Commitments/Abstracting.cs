@@ -97,12 +97,39 @@ public sealed class Recurrence
     /// <summary>How often each pair appeared together, by pair.</summary>
     internal IReadOnlyDictionary<(Code Left, Code Right), int> Together => _together;
 
+    /// <summary>
+    /// Whether rung five is offered this commitment at all — <b>its denominator, in one
+    /// place because two copies is how a count comes to be read against the wrong total.</b>
+    /// </summary>
+    /// <param name="one">The commitment to ask about.</param>
+    /// <param name="dials">The gate's numbers, for the experience floor.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>ONLY EXPERIENCED COMMITMENTS PROPOSE.</b> A scope minted this round is not
+    /// evidence that anything recurs — it is evidence that covering ran.
+    /// </para>
+    /// <para>
+    /// <b>AND A ONE-CODE SCOPE HAS NO PAIR TO CONTRIBUTE, WHICH MAKES THIS RUNG'S INPUT
+    /// EXACTLY REPAIR'S SURVIVING OUTPUT.</b> Covering mints one code and nothing longer, so
+    /// every scope this admits was reached by a specialisation — and how many there are is a
+    /// fact about the repair budget and the repair timing rather than about redundancy.
+    /// <b>A naming count read without this beside it is a repair result wearing an
+    /// abstraction's name.</b>
+    /// </para>
+    /// </remarks>
+    internal static bool Eligible(Commitment one, CommittingSettings dials)
+    {
+        ArgumentNullException.ThrowIfNull(one);
+        ArgumentNullException.ThrowIfNull(dials);
+
+        return one.Seen >= dials.Floor && one.Scope.Length >= 2;
+    }
+
     /// <summary>Counts what one holder's commitments have in common.</summary>
     /// <param name="held">The commitments this holder has.</param>
     /// <param name="dials">The gate's numbers, for the experience floor.</param>
     /// <remarks>
-    /// <b>Only experienced commitments propose.</b> A scope minted this round is not
-    /// evidence that anything recurs — it is evidence that covering ran.
+    /// <b>Only experienced commitments propose</b> — see <see cref="Eligible"/>.
     /// </remarks>
     public static Recurrence Of(IEnumerable<Commitment> held, CommittingSettings dials)
     {
@@ -112,7 +139,7 @@ public sealed class Recurrence
         var counted = new Recurrence();
 
         foreach (var scope in held
-            .Where(one => one.Seen >= dials.Floor && one.Scope.Length >= 2)
+            .Where(one => Eligible(one, dials))
             .Select(one => one.Scope))
         {
             counted.Scopes++;

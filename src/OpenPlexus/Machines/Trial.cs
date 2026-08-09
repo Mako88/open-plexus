@@ -200,6 +200,30 @@ public sealed record Tally
     /// <summary>Names that stand for a set containing another name.</summary>
     public required int Stacked { get; init; }
 
+    /// <inheritdoc cref="Commitments.Recurrence.Eligible"/>
+    /// <remarks>
+    /// <b>THE DENOMINATOR <see cref="Named"/> HAS NEVER BEEN READ AGAINST, WHICH IS THIS
+    /// REPO'S OWN TRAP ABOUT A COUNT THAT PARTITIONS WHAT REACHED A MECHANISM.</b> Every
+    /// naming reading here has been an absolute count, so a cell minting more names and a
+    /// cell offered more scopes to name are one number — and the repair budget moves the
+    /// second directly. What separates them is names per eligible scope.
+    /// </remarks>
+    public required int Eligible { get; init; }
+
+    /// <summary>
+    /// Eligible scopes long enough to survive being named — <b>what recursion needs, and
+    /// the reason <see cref="Stacked"/> is not simply a smaller <see cref="Named"/>.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>NAMING A PAIR THAT IS THE WHOLE SCOPE REMOVES THAT COMMITMENT FROM
+    /// <see cref="Eligible"/> FOREVER.</b> The rewrite replaces both members with one name,
+    /// so a two-code scope becomes a one-code scope and stops contributing a pair — rung
+    /// five consuming its own trigger. Only a scope of three or more leaves something
+    /// beside the new name, which is the only route to a name standing for a name.
+    /// <b>So depth is bought by whatever makes scopes longer, and that is repair.</b>
+    /// </remarks>
+    public required int Stackable { get; init; }
+
     /// <summary>Commitments that have spent their whole repair budget.</summary>
     public required int Exhausted { get; init; }
 
@@ -655,6 +679,10 @@ public sealed class Trial<TSeen>
                 .Count(),
             Stacked = holding.Sum(held =>
                 held.Names.Means.Count(one => one.Value.Any(held.Names.Knows))),
+            Eligible = holding.Sum(held =>
+                held.All.Count(one => Recurrence.Eligible(one, _brain.Dials))),
+            Stackable = holding.Sum(held => held.All.Count(one =>
+                Recurrence.Eligible(one, _brain.Dials) && one.Scope.Length >= 3)),
             Exhausted = holding.Sum(held => held.Exhausted(_brain.Dials.Budget)),
             Blamed = holding.Sum(held => held.Blamed),
             Unseparated = holding.Sum(held => held.Unseparated),

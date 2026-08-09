@@ -57,6 +57,12 @@ public sealed record Learned
     /// <summary>Names standing for a set containing another name.</summary>
     public int Stacked => Tally.Stacked;
 
+    /// <inheritdoc cref="Tally.Eligible"/>
+    public int Eligible => Tally.Eligible;
+
+    /// <inheritdoc cref="Tally.Stackable"/>
+    public int Stackable => Tally.Stackable;
+
     /// <summary>Commitments that have spent their whole repair budget.</summary>
     public int Exhausted => Tally.Exhausted;
 

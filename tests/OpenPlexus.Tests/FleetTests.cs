@@ -257,7 +257,7 @@ public sealed class FleetTests(ITestOutputHelper output)
         // and a single method holding every cell reports nothing at all until the last one
         // finishes -- so one slow arrangement hides every reading before it.
         output.WriteLine(
-            $"{address * 2 + (1 << address)} bits, {holders} holders | seed | "
+            $"{address + (1 << address)} bits, {holders} holders | seed | "
             + "alone | spread | resident alone/spread | minted | repaired | contested");
 
         foreach (var seed in new[] { 1, 2, 3 })

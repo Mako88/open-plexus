@@ -142,6 +142,13 @@ public sealed class Fleet : ICouncil
     {
         ImmutableArray<Tabled> counted = [];
 
+        // THE TABLES ARE TAKEN BEFORE THE SETTLEMENT AND READ AFTER THE SUBSUMPTION, AND
+        // THAT IS A DIFFERENCE FROM ONE PROCESS RATHER THAN A DEFECT. Alone, `Abstract`
+        // counts its own scopes at the moment it runs, which is after `Subsume` has removed
+        // whatever it removed; here every holder's table is a snapshot from one exchange
+        // earlier. Everybody speaks from the same moment, which is the property that
+        // matters -- a holder abstracting against tables taken at different instants would
+        // be certifying a redundancy against a population that never existed.
         if (sweeping)
         {
             var counting = Stopwatch.GetTimestamp();

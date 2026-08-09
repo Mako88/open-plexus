@@ -43,6 +43,9 @@ public sealed class WeighingTests(ITestOutputHelper output)
 
     private const int Seeds = 8;
 
+    /// <summary>Four, because a scene world costs an order more than a bit world.</summary>
+    private const int SceneSeeds = 4;
+
     /// <summary>The last tenth's accuracy on the multiplexer.</summary>
     /// <param name="address">Address bits.</param>
     /// <param name="weighing">Which vote rule.</param>
@@ -77,6 +80,23 @@ public sealed class WeighingTests(ITestOutputHelper output)
             Fronting.Banded,
             seed).Run(20_000).Recent;
 
+    /// <summary>The last tenth's accuracy on the world of arrangements.</summary>
+    /// <param name="weighing">Which vote rule.</param>
+    /// <param name="seed">The world's generator and the brain's.</param>
+    /// <remarks>
+    /// <b>THE ONE WORLD WHERE THE POWER IS KNOWN TO MATTER, AND THEREFORE THE ONE THIS
+    /// GRID CANNOT LEAVE OUT.</b> <c>Arranged</c> reaches its target at a power of ten and
+    /// sits a fifth short at five — which is the per-world peak the design refuses, and
+    /// also the case where deleting the sum would cost the most if it were kept.
+    /// </remarks>
+    private static double Arranged_(Weighing weighing, int seed) =>
+        new ArrangedRun(
+            new ArrangedSettings { Side = 3, Cell = 3, Clutter = 1, Hold = 4 },
+            new Brain(
+                new CommittingSettings { Sharpness = Fixed, Weighing = weighing }, seed),
+            Looking.Whole,
+            seed).Run(20_000).Tally.Recent;
+
     /// <summary>
     /// <b>WHETHER A SUM AT ONE FIXED POWER BEATS ITS BEST ADVOCATE — a grid, and the
     /// decision rule is above rather than below.</b>
@@ -93,27 +113,28 @@ public sealed class WeighingTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public async Task Whether_a_sum_at_one_fixed_power_beats_its_best_advocate()
     {
-        var worlds = new (string World, Func<Weighing, int, double> Run)[]
+        var worlds = new (string World, int Seeds, Func<Weighing, int, double> Run)[]
         {
-            ("multiplexer-6", (weighing, seed) => Plexed(2, weighing, seed)),
-            ("multiplexer-11", (weighing, seed) => Plexed(3, weighing, seed)),
-            ("multiplexer-6-noisy", (weighing, seed) => Plexed(2, weighing, seed, noise: 0.15)),
-            ("monk-1", (weighing, seed) => Monked(Puzzle.One, weighing, seed)),
-            ("monk-2", (weighing, seed) => Monked(Puzzle.Two, weighing, seed)),
-            ("monk-3", (weighing, seed) => Monked(Puzzle.Three, weighing, seed)),
-            ("graded", (weighing, seed) => Graded_(weighing, seed)),
+            ("multiplexer-6", Seeds, (weighing, seed) => Plexed(2, weighing, seed)),
+            ("multiplexer-11", Seeds, (weighing, seed) => Plexed(3, weighing, seed)),
+            ("multiplexer-6-noisy", Seeds, (weighing, seed) => Plexed(2, weighing, seed, noise: 0.15)),
+            ("monk-1", Seeds, (weighing, seed) => Monked(Puzzle.One, weighing, seed)),
+            ("monk-2", Seeds, (weighing, seed) => Monked(Puzzle.Two, weighing, seed)),
+            ("monk-3", Seeds, (weighing, seed) => Monked(Puzzle.Three, weighing, seed)),
+            ("graded", Seeds, (weighing, seed) => Graded_(weighing, seed)),
+            ("arranged", SceneSeeds, (weighing, seed) => Arranged_(weighing, seed)),
         };
 
-        output.WriteLine($"the last tenth's accuracy, Sharpness fixed at {Fixed}, "
-            + $"{Seeds} seeds — summing first, strongest second");
+        output.WriteLine($"the last tenth's accuracy, Sharpness fixed at {Fixed} "
+            + "— summing first, strongest second");
 
         var summing = 0;
         var strongest = 0;
 
-        foreach (var (world, run) in worlds)
+        foreach (var (world, seeds, run) in worlds)
         {
             var arms = await Sweep.AcrossAsync(
-                Seeds,
+                seeds,
                 ("summing", seed => Task.FromResult(run(Weighing.Summing, seed))),
                 ("strongest", seed => Task.FromResult(run(Weighing.Strongest, seed))));
 
@@ -129,7 +150,7 @@ public sealed class WeighingTests(ITestOutputHelper output)
             output.WriteLine(
                 $"{world,-20} | summing {arms[0].Mean:F4} +/-{arms[0].StdErr:F4} "
                 + $"| strongest {arms[1].Mean:F4} +/-{arms[1].StdErr:F4} "
-                + $"| {apart,5:F1} sigma, "
+                + $"| n={arms[0].Seeds} | {apart,5:F1} sigma, "
                 + $"{(apart < 2.0 ? "level" : arms[0].Mean > arms[1].Mean ? "summing" : "strongest")}");
         }
 

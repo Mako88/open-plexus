@@ -99,16 +99,29 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   before a failure asks is hand-specified bias by a side door.
 - **AND ONE HAS ASKED NOW, WHICH IS WHAT STEP SEVEN WAS BUILT FOR.** `Monk` settles its
   own ceiling by enumeration rather than inferring it from a score — fork 50 is the rung.
-- **Nine — the wire exists and the learners are not on it yet.** `Posted` moves envelopes,
-  reports, finished thoughts and deaths between processes over real sockets.
-- **What crosses is THINKING and never LEARNING, which is fork 1.** An occasion writes its
-  edges into locally-held clusters, so nothing learnt on one machine reaches another.
+- **Nine — the wire exists and one of the two learners is now on it.** `Posted` moves
+  envelopes, reports, finished thoughts, deaths, questions and settlements over real sockets.
+- **The WALK still learns nowhere but at home, which is what is left of fork 1.** An occasion
+  writes its edges into locally-held clusters, so nothing it learns reaches another machine.
 - **AND THE COMMITMENT LEARNER IS ON A BUS AT LAST, WHICH IS FORK 52'S TRANSPORT HALF.**
   `Ask` and `Answer` carry counts and testimony between machines that share no object.
 - **PUSHED AND NEVER PULLED, WHICH IS JOHN'S RULE AND ALSO THE REVIVAL TABLE'S.** An awaited
   request would decide a missing holder by the client's timeout, which is a deadline.
-- **BUT `Cycle` STILL ASKS ONLY ITSELF.** Mounting it makes the loop async — the harness
-  rewrite this doc budgets for, and fork 53. `DeadCodeTests` counts the gap by name.
+- **AND THE LEARNER IS MOUNTED, WHICH COST THE HARNESS REWRITE THIS DOC BUDGETED FOR.**
+  `Cycle` is async over a council — one population or a fleet of them behind the same two
+  calls, so the learning loop still exists exactly once.
+- **A ROUND IS TWO ROUND TRIPS AND A SWEEP ROUND IS THREE.** A vote must come back before
+  the round can be scored, a settlement is pushed, and abstraction is the only operator
+  whose statistic is the whole population's.
+- **AND WHAT A FLEET HOLDS IS NOT DISJOINT, WHICH IS FORK 29 SHARPER THAN WRITTEN.** Genesis
+  is placed and repair is not, so two parents on two machines reach one child — held twice,
+  and a sum counts it twice.
+- **PLACING THE CHILD WOULD DELETE IT INSTEAD**, since repair is the only thing proposing a
+  scope longer than one code and nobody else would mint it. Minting it elsewhere puts a
+  commitment on the wire, which C1 refuses.
+- **A FLEET RUN REPRODUCES ITSELF EXACTLY, so fork 12 holds across sockets.** Every merge is
+  ordered before it is combined and every placement is a fact about a commitment rather than
+  about who asked or who answered first.
 - **Distance costs the DEPTH of a thought, measured.** A round costs about four and a half
   times the per-hop delay, so a LAN is comfortable and the internet is a slower experiment.
 - **AND A ROUND OF ASKS IS UNDER A MILLISECOND ON LOOPBACK**, nine holders costing two and a
@@ -600,6 +613,12 @@ change of architecture entirely.
 - **AND A TIE-BREAK BY DICTIONARY WALK IS STABLE UNTIL THERE ARE TWO TABLES.** `Shared`
   resolved equal candidates by whichever its table reached first — reproducible in one
   process, arbitrary across a merge. Fork 12 by a new door.
+- **A POLITE SHUTDOWN WAITS ON CONNECTIONS THE OTHER SIDE IS KEEPING ALIVE.** A one-second
+  run had a teardown of minutes, so a grid of them read as a deadlock and the profile said
+  the wire was fine.
+- **AND A CAST TO AN INTERFACE THE TYPE DOES NOT IMPLEMENT IS CLEANUP THAT NEVER RUNS.** It
+  compiles, reads as tidy, and does nothing — the pass-shaped defect again, wearing a
+  disposal rather than a check.
 
 ---
 
@@ -740,7 +759,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 
 | | |
 |---|---|
-| **1** | The distributed rendezvous. Open, and now the thing in the way: `Posted` carries the THINKING path between machines, and `LocalRendezvous` writes edges straight into locally-held clusters, so a machine can think across a wire and cannot learn across one |
+| **1** | The distributed rendezvous. HALF ANSWERED: the commitment learner learns across sockets now, holders settling, covering and repairing what is placed on them. `LocalRendezvous` still writes the WALK's edges into locally-held clusters, so the graph learner is where this fork stays open |
 | **3** | Cluster placement: uniform hash against prefix locality. Open, with a measured case — a uniform ring separates a child from its parent, which is the pair `Mending.Uncovered` compares. Prefix placement recovers much of it at unmeasured cost in load |
 | **5** | A death writes off routes into the dead cluster. Closed |
 | **6** | Broadcast the origin, route the hops. Closed |
@@ -756,7 +775,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **26** | Genesis mints per live code per surprise: does deletion clear them faster than surprise makes them? The question was wrong — nothing gated it, so genesis simply walked a finite space. Closed |
 | **27** | Monotone counters merge, a local decaying estimate decides. Does the local one earn its keep? Open — predicted NO on a stationary world |
 | **28** | The horizon is K occasions, K=1. Open |
-| **29** | Divergent local repair mints siblings. Predicted survivable by subsumption. Open |
+| **29** | Divergent local repair mints siblings. MEASURED, AND IT IS NOT SIBLINGS: two different parents on two machines reach the IDENTICAL child, so one rule is held twice and a sum counts its evidence per machine. Open on what that costs |
 | **30** | A negative condition needs a settled occasion, so it fires one settlement late. Open |
 | **31** | The table spills without changing what fires, and reproducibly. Open |
 | **32** | Entailment depth capped at 1, horizon at K=1. Both come off when blame diffusion has a number — a cap with no trigger is a permanent decision nobody made. Open |
@@ -779,11 +798,11 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **49** | Matching and settling are nine tenths of the clock on a narrow world whose table never grows. Where do they go on a WIDE one, and is it the memory or the search that ends the run? Open |
 | **50** | `Monk`'s second puzzle admits no sound conjunction saying YES short of a whole instance. Which rung does that demand — a count, a negation, or a disjunction — and does the failure distinguish them? Open |
 | **51** | Genesis no longer roots on a code that has never varied. What is left is the TALLY: an always-present code is still an entry in every commitment's table forever, and background still roughly doubles it |
-| **52** | The vote's arithmetic composes and its transport is real: counts and testimony cross sockets, and a dead machine is silence the asker counts. Open on C2, which TCP cannot show, and on mounting any of it in `Cycle` |
+| **52** | The vote's arithmetic composes, its transport is real, and a whole learner now runs over it — placed genesis, local repair, merged counts on the sweep. Open on C2 alone, which TCP cannot show |
 | **54** | Where between identical and disjoint streams naming stops converging. Answered, and there is no between: three quarters shared agrees as badly as nothing shared, and only identical evidence converges. One seed a row, so the ends carry it |
 | **55** | Whether a blinded repair gate costs anything. Answered on the multiplexer: children minted separates decisively over twelve seeds, and accuracy, residents and sound rules all move the same way at two standard errors. Open on any other world |
 | **56** | What the repair gate's query costs on a wire. Priced at one round trip and measured on loopback: 0.36ms at one holder, 0.93 at nine, so the fan-out is in flight at once. Open on a LAN and on building it |
 | **57** | Every node predicts its own output while the real wave verifies behind it. What it saves is a LAN millisecond and an internet hundred, so where it pays is deployment. What a holder predicts from is a commitment about one |
 | **58** | The gate's sign flips with the timing: after a failure it is far worse than none, and every round `Uncovered` beat `Earned`. Two cells measured here, two in the revival rows. Open on any other world |
 | **59** | Dissolved rather than decided. The setting was a gate and a timing crossed, so the cell that isolated the gate axis is not a cell — it is a corner of a grid, and both axes are now settings. Closed |
-| **53** | A body pushes and `IWorld` pulls, and nothing in the loop has a clock. What does a learner whose rounds arrive on the world's schedule rather than its own do differently? Open |
+| **53** | The loop is asynchronous and holds no clock, so a fleet losing one message waits forever — correctly. Its rounds still come from the harness rather than the world, and when to act on a partial gathering is open |

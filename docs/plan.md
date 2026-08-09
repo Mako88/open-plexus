@@ -132,6 +132,9 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **PLACING THE CHILD WOULD DELETE IT INSTEAD**, since repair is the only thing proposing a
   scope longer than one code and nobody else would mint it. Minting it elsewhere puts a
   commitment on the wire, which C1 refuses.
+- **AND PLACING BY ONE CODE CANNOT REACH MORE MACHINES THAN A WORLD HAS ROOTS**, which is
+  twenty-three at eleven bits. So a placement rule can be capped by the front end's
+  vocabulary, and twenty phones is already the edge.
 - **A FLEET RUN REPRODUCES ITSELF EXACTLY, so fork 12 holds across sockets.** Every merge is
   ordered before it is combined and every placement is a fact about a commitment rather than
   about who asked or who answered first.
@@ -847,5 +850,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **59** | Dissolved rather than decided. The setting was a gate and a timing crossed, so the cell that isolated the gate axis is not a cell — it is a corner of a grid, and both axes are now settings. Closed |
 | **53** | The loop is asynchronous and holds no clock, so a fleet losing one message waits forever — correctly. Its rounds still come from the harness rather than the world, and when to act on a partial gathering is open |
 | **60** | Genesis is placed and repair is not, so a fleet repairs once per HOLDER a round where one machine repairs once. How hard it searches is a deployment choice. Place repair, divide the budget, or exploit it? Open |
-| **61** | John's: place a commitment by the MINIMUM code of its sorted scope. Identical children then land together and `Add` dedups them, and a lineage rooted there stays together. Costs load balance, and `Improving` only half works so it goes |
+| **61** | John's: place a commitment by the MINIMUM code of its sorted scope, so identical children land together and a lineage stays together. PRICED: level at three holders, three times the average at twelve, capped by a world's distinct roots |
 | **62** | John's: three static seeds place every commitment three times, so a machine dropping loses nothing and a new one rolls in. Composes only under a scale-free vote — replicas each cast one under a sum. Open |

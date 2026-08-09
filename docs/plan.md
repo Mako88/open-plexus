@@ -701,6 +701,9 @@ change of architecture entirely.
   which is not a fact about the thing being repaired.
 - **A LIST THAT APPENDS A DUPLICATE IS A COUNT WEARING A SET'S SHAPE**, and every reader
   gets whichever it assumed. `_minted` was the repair budget and the child set at once.
+- **AND A READOUT ARM IS A SEARCH ARM WHEREVER THE READOUT TRIGGERS THE SEARCH.** Every
+  vote comparison in four sessions moved both, and the cell proving it is two weighings
+  building one population once the trigger is cut.
 
 ---
 
@@ -906,6 +909,15 @@ change of architecture entirely.
 - **AND IT BUYS HARD ROUNDS AND SELLS EASY ONES ON AN EVEN WORLD**, which is the first arm
   measured here whose two scores point opposite ways. Coverage rises while trailing
   accuracy falls, and no single number can rank it.
+- **UNDER `EveryRound` THE TWO WEIGHINGS BUILD THE IDENTICAL POPULATION**, to three
+  decimals on coverage, rules found and sound rules, on both skewed widths — and `Lifting`
+  still leads on trailing accuracy alone.
+- **SO `Lifting` WAS DOING TWO JOBS AND NOW DOES ONE.** Its whole effect on what gets BUILT
+  was blame redirection; the timing does that properly, and what is left is a vote rule
+  weighing a vote.
+- **AND EVERY VOTE ARM EVER MEASURED HERE WAS A SEARCH ARM TOO.** The shipped timing lets
+  the vote decide what repair runs on, so no change to it was ever only a readout. Two
+  identical columns say so.
 
 ---
 

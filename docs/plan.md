@@ -860,8 +860,23 @@ change of architecture entirely.
 - **AND EVERY LINK IS SOUND WHILE THE CHAIN MAKES NOTHING.** Minority seeds exist,
   choosing works, repair runs, true rules come out — and none of them fires where the base
   rate fails.
-- **WHAT IS UNMEASURED IS THE LINEAGE**: what becomes of a minority-rooted seed between its
-  start and a finished rule. It is the last link nothing has instrumented.
+- **AND THE LINEAGE IS MEASURED NOW, AND IT IS NOT REPAIRED AND THEN LOST — IT IS NEVER
+  BLAMED.** Four hundred to one against the majority at six bits, while the gates it never
+  reaches refuse it LESS often than they refuse the majority.
+- **BECAUSE REPAIR RUNS ONLY ON A ROUND THE VOTE GOT WRONG, AND UNDER SKEW THOSE ARE THE
+  ROUNDS THE MINORITY RULES ARE RIGHT ON.** What expected what arrived is no culprit, so
+  the only builder of hard-round rules is barred from them.
+- **AND THE ARMS THAT PAY ARE EXACTLY THE ARMS THAT REDIRECT BLAME**, over three arms and
+  two widths — a share of blame near nought pays near nought, and two unrelated ways of
+  breaking the coupling both take it to four fifths and pay.
+- **SO `Weighing.Lifting` IS NOT A VOTE RULE.** It is blame redirection implemented in the
+  vote, which is why it is the only thing that has ever moved hard-round coverage.
+- **AND A CHILD IS SUBSUMED ABOUT FOUR TIMES IN FIVE, WHERE THE CODE SAID IT NEVER
+  HAPPENS.** A child that specialised on the wrong code is exactly as accurate as its
+  parent, so the clause called unreachable is the population's main exit.
+- **AND REPAIR SPENDS MOST OF ITS BUDGET RE-DERIVING WHAT IT HOLDS.** Collisions run twenty
+  to fifty times the births at every majority rung, and a collision is charged to the
+  parent's budget exactly as a child is.
 
 ---
 
@@ -927,4 +942,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **61** | John's: place a commitment by the MINIMUM code of its sorted scope, so identical children land together and a lineage stays together. PRICED: level at three holders, three times the average at twelve, capped by a world's distinct roots |
 | **62** | John's: partition into slots and give each R machines holding identical populations. A death costs nothing while a slot survives, replicas need no messages between them, and it answers fork 53. R scales with load |
 | **63** | John's: genesis mints ONE scope over the whole scene and repeated scenes narrow it by overlap, the rest fading out. Specific-to-general, the DUAL of repair — an intersection needs two examples where the gate needs twenty misses. Open |
+| **65** | The vote decides what repair may run on, so under skew blame lands on the majority lineages alone. `Repairing.EveryRound` breaks that and pays, at four to six times the repair. Open on what it costs at width |
+| **66** | A repair collision is charged to the parent's budget exactly as a birth is, and collisions outnumber births twenty to fifty fold. Is `Budget` a search limit or a re-derivation limit? Open |
 | **64** | John's: emit *Z was absent* as its own code at settlement, so rung two needs no negation in the scope language and no new matcher. Bounded to the commitment's own hits, or the candidate set is the vocabulary. Open |

@@ -106,6 +106,138 @@ public readonly record struct Testimony
     public bool Silent => Advocates.IsDefaultOrEmpty;
 }
 
+/// <summary>How a commitment came to be held.</summary>
+/// <remarks>
+/// <b>Named at the call site rather than inferred from the scope's length</b>, because
+/// a one-code scope can arrive from genesis or from a widening and a two-code one from
+/// repair or from a rename — and a ledger that guessed would report the operator it
+/// expected instead of the one that ran.
+/// </remarks>
+public enum Birth
+{
+    /// <summary>Genesis minted it on a surprise.</summary>
+    Covered,
+
+    /// <summary>Repair added a condition to a parent.</summary>
+    Repaired,
+
+    /// <summary>A generalisation dropped a code from a parent.</summary>
+    Widened,
+
+    /// <summary>The same claim said shorter, after a name was minted.</summary>
+    Renamed,
+}
+
+/// <summary>How a commitment stopped being held.</summary>
+/// <inheritdoc cref="Birth"/>
+public enum Loss
+{
+    /// <summary>A general commitment took its place.</summary>
+    Subsumed,
+
+    /// <summary>There were too many and it was among the least accurate.</summary>
+    Culled,
+
+    /// <summary>It was rewritten over a minted name, so a <see cref="Birth.Renamed"/> answers it.</summary>
+    Renamed,
+}
+
+/// <summary>
+/// What happened to every commitment of one shape — <b>the step between a seed and a
+/// finished rule, which nothing has ever counted.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>EVERY LINK IN THE CHAIN IS VERIFIED AND THE CHAIN PRODUCES NOTHING, which is what
+/// makes a ledger the next thing rather than a seventh explanation.</b> The minority seeds
+/// are present, the separation test beats its control by the whole distance between
+/// sixteen sound rules and none, repair runs hundreds of times, true rules come out at
+/// perfect accuracy — and not one of them fires on a round the base rate gets wrong. What
+/// has never been watched is the middle: a seed is one code and a true rule is three or
+/// four, so something has to survive two or three specialisations, and whether anything
+/// does is unmeasured.
+/// </para>
+/// <para>
+/// <b>AND THE EXPECTATION IS INVARIANT DOWN A LINEAGE, WHICH IS WHAT MAKES THIS CHEAP.</b>
+/// <see cref="Population.Mend"/> builds <c>[..parent.Scope, added]</c> with the PARENT'S
+/// expectation and <see cref="Population.Widen"/> drops a code and keeps it, so every
+/// descendant of a minority-outcome seed expects the minority outcome forever. No parent
+/// pointer is needed to ask which lineage something belongs to — the expectation IS the
+/// root's, and the scope's length is how far it has got.
+/// </para>
+/// <para>
+/// <b>THE COUNTS BALANCE, AND THAT IS THE CHECK.</b> Births minus losses at one
+/// expectation and length is exactly how many of that shape are resident, computed by
+/// walking a completely different table — so a ledger that has missed a call site says so
+/// rather than quietly under-reporting a death.
+/// </para>
+/// </remarks>
+public readonly record struct Lifetime
+{
+    /// <inheritdoc cref="Birth.Covered"/>
+    public long Covered { get; init; }
+
+    /// <inheritdoc cref="Birth.Repaired"/>
+    public long Repaired { get; init; }
+
+    /// <inheritdoc cref="Birth.Widened"/>
+    public long Widened { get; init; }
+
+    /// <inheritdoc cref="Birth.Renamed"/>
+    public long Reborn { get; init; }
+
+    /// <inheritdoc cref="Loss.Subsumed"/>
+    public long Subsumed { get; init; }
+
+    /// <inheritdoc cref="Loss.Culled"/>
+    public long Culled { get; init; }
+
+    /// <inheritdoc cref="Loss.Renamed"/>
+    public long Rewritten { get; init; }
+
+    /// <summary>
+    /// Repairs that reached this shape and found it already held.
+    /// </summary>
+    /// <remarks>
+    /// <b>A COLLISION IS THE POPULATION HAVING GOT THERE FIRST, and it is counted apart
+    /// from a birth because reading it as either one is wrong.</b> As a birth it would
+    /// double-count a rule that exists once; as nothing at all it would hide the case
+    /// where repair spends its whole budget re-deriving what it already holds — which
+    /// would look exactly like a budget that was too small.
+    /// </remarks>
+    public long Collided { get; init; }
+
+    /// <summary>
+    /// Firings at this shape that expected something other than what arrived.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>WHETHER A LINEAGE IS EVEN OFFERED TO THE MACHINERY, WHICH EVERY GATE COUNT SO
+    /// FAR HAS ASSUMED.</b> <see cref="Population.Wrong"/> and the five shares under it
+    /// partition the candidates that reached <see cref="Population.Mend"/>; none of them
+    /// says which lineages reached it at all. A lineage that is never blamed is never
+    /// repaired, and from every existing instrument that is indistinguishable from a
+    /// lineage the gates refused.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE ONE NUMBER THE VOTE CAN REACH FROM THE GENERATE SIDE.</b> Under
+    /// <see cref="Repairing.AfterFailure"/> repair runs only on a round the VOTE got wrong,
+    /// so what may be blamed is decided by what the population already answers correctly —
+    /// which is not a fact about the commitment being repaired.
+    /// </para>
+    /// </remarks>
+    public long Blamed { get; init; }
+
+    /// <summary>Of those, how many cleared every gate and were offered the search.</summary>
+    public long Searched { get; init; }
+
+    /// <summary>Everything that ever entered at this shape.</summary>
+    public long Born => Covered + Repaired + Widened + Reborn;
+
+    /// <summary>Everything that ever left it.</summary>
+    public long Lost => Subsumed + Culled + Rewritten;
+}
+
 /// <summary>
 /// Every commitment a machine holds, and the four things that happen to them.
 /// </summary>
@@ -215,6 +347,9 @@ public sealed class Population
     /// </remarks>
     private readonly Dictionary<Code, List<Code>> _minted = [];
 
+    /// <inheritdoc cref="Lifetime"/>
+    private readonly Dictionary<(Code Expects, int Depth), Lifetime> _lineage = [];
+
     /// <summary>
     /// Which holder a commitment sits on, or nothing while everything is in one place.
     /// </summary>
@@ -311,6 +446,56 @@ public sealed class Population
 
     /// <summary>Every commitment, in a stable order.</summary>
     public IEnumerable<Commitment> All => _byName.Values.OrderBy(one => one.Identity);
+
+    /// <inheritdoc cref="Lifetime"/>
+    /// <remarks>
+    /// <b>KEYED BY EXPECTATION AND SCOPE LENGTH, WHICH IS A LINEAGE AND ITS RUNG.</b> See
+    /// <see cref="Lifetime"/> for why those two are enough to say which lineage a
+    /// commitment belongs to without any commitment holding a pointer to its parent.
+    /// </remarks>
+    public IReadOnlyDictionary<(Code Expects, int Depth), Lifetime> Lineages => _lineage;
+
+    /// <summary>Notes that a commitment of this shape entered.</summary>
+    /// <param name="commitment">What was added.</param>
+    /// <param name="how">Which operator added it.</param>
+    private void Born(Commitment commitment, Birth how)
+    {
+        ref var life = ref CollectionsMarshal.GetValueRefOrAddDefault(
+            _lineage, (commitment.Expects, commitment.Scope.Length), out _);
+
+        life = how switch
+        {
+            Birth.Covered => life with { Covered = life.Covered + 1 },
+            Birth.Repaired => life with { Repaired = life.Repaired + 1 },
+            Birth.Widened => life with { Widened = life.Widened + 1 },
+            _ => life with { Reborn = life.Reborn + 1 },
+        };
+    }
+
+    /// <summary>Notes a repair that reached a shape already held.</summary>
+    /// <param name="child">The child that was proposed.</param>
+    private void Collided(Commitment child)
+    {
+        ref var life = ref CollectionsMarshal.GetValueRefOrAddDefault(
+            _lineage, (child.Expects, child.Scope.Length), out _);
+
+        life = life with { Collided = life.Collided + 1 };
+    }
+
+    /// <summary>Notes a firing that expected the wrong thing, and how far it got.</summary>
+    /// <param name="one">The commitment that was wrong.</param>
+    /// <param name="searched">Whether it cleared every gate.</param>
+    private void Charge(Commitment one, bool searched)
+    {
+        ref var life = ref CollectionsMarshal.GetValueRefOrAddDefault(
+            _lineage, (one.Expects, one.Scope.Length), out _);
+
+        life = life with
+        {
+            Blamed = life.Blamed + 1,
+            Searched = life.Searched + (searched ? 1 : 0),
+        };
+    }
 
     /// <summary>What has been given a name, and what each name stands for.</summary>
     public Naming Names => _names;
@@ -661,7 +846,10 @@ public sealed class Population
             // same rules, so without this a fleet holds N copies of one population.
             if (Places is not null && !Places(proposed)) continue;
 
-            if (Add(proposed)) minted++;
+            if (!Add(proposed)) continue;
+
+            Born(proposed, Birth.Covered);
+            minted++;
         }
 
         return minted;
@@ -812,11 +1000,24 @@ public sealed class Population
 
             _wrong++;
 
+            var searched = false;
+
             if (!PastFloor(one)) _atFloor++;
             else if (!PastBudget(one)) _atBudget++;
             else if (!Uncovered(one, firing)) _atCovered++;
             else if (!PastImproving(one)) _atImproving++;
-            else _reached++;
+            else
+            {
+                _reached++;
+                searched = true;
+            }
+
+            // AND THE SAME WALK CHARGED TO A LINEAGE RATHER THAN TO A GATE. The five
+            // shares above say which gate refuses candidates; this says which lineages
+            // arrived to be refused, and a lineage that is never blamed reads identically
+            // to one every gate turned away. Read off the chain rather than recomputed,
+            // because the expensive two gates are why that chain is ordered as it is.
+            Charge(one, searched);
         }
 
         var culprits = firing
@@ -876,7 +1077,17 @@ public sealed class Population
 
                 born.Add(child.Identity);
 
-                if (Add(child)) return child;
+                if (Add(child))
+                {
+                    Born(child, Birth.Repaired);
+                    return child;
+                }
+
+                // THE RUNG WAS REACHED AND SOMETHING WAS ALREADY STANDING ON IT. Counted
+                // here rather than left silent: a lineage whose whole budget goes on
+                // re-deriving what the population holds reads, from every other
+                // instrument, as a budget that was too small.
+                Collided(child);
             }
 
             return null;
@@ -947,7 +1158,10 @@ public sealed class Population
                 // same generalisation on every holder that could see the parent.
                 if (Places is not null && !Places(proposed)) continue;
 
-                if (Add(proposed)) widened++;
+                if (!Add(proposed)) continue;
+
+                Born(proposed, Birth.Widened);
+                widened++;
             }
         }
 
@@ -1063,7 +1277,7 @@ public sealed class Population
                     break;
                 }
 
-        foreach (var one in doomed) Remove(one);
+        foreach (var one in doomed) Remove(one, Loss.Subsumed);
 
         return doomed.Count;
     }
@@ -1074,11 +1288,14 @@ public sealed class Population
     /// <param name="general">The commitment that would stay.</param>
     /// <param name="specific">The commitment that would go.</param>
     /// <remarks>
-    /// <b>UNDER <see cref="Subsuming.Weaker"/> A HAIR OF ADVANTAGE SAVES THE CHILD, AND A
-    /// CHILD ALMOST ALWAYS HAS ONE.</b> It fires less often and has stored more of what
-    /// it fired on, so <i>equally accurate</i> is a measure-zero event and the clause is
-    /// unreachable — which is why nothing in any measured population has ever been
-    /// subsumed. The other rule asks the child to be SIGNIFICANTLY better against its own
+    /// <b>UNDER <see cref="Subsuming.Weaker"/> A HAIR OF ADVANTAGE SAVES THE CHILD, AND
+    /// THE CLAIM THAT IT ALWAYS HAS ONE IS REFUTED BY <see cref="Lineages"/>.</b> The
+    /// argument was that a child fires less often and has stored more of what it fired on,
+    /// so <i>equally accurate</i> is a measure-zero event and this path is unreachable —
+    /// and the ladder counts it firing on about four repair children in five, at every rung
+    /// and on every world measured. A child that has specialised on the wrong code is
+    /// exactly as accurate as its parent and is absorbed, which is this working rather than
+    /// failing. The other rule asks the child to be SIGNIFICANTLY better against its own
     /// smaller sample, by the two-proportion test the repair gate already uses.
     /// </remarks>
     private bool Absorbs(Commitment general, Commitment specific)
@@ -1157,8 +1374,10 @@ public sealed class Population
 
             shorter.Carry(one);
 
-            Remove(one);
+            Remove(one, Loss.Renamed);
+
             Add(shorter);
+            Born(shorter, Birth.Renamed);
 
             said++;
         }
@@ -1223,14 +1442,33 @@ public sealed class Population
             .Take(Count - _dials.Capacity)
             .ToList();
 
-        foreach (var one in doomed) Remove(one);
+        foreach (var one in doomed) Remove(one, Loss.Culled);
 
         return doomed.Count;
     }
 
-    private void Remove(Commitment commitment)
+    /// <summary>Drops a commitment and says which operator dropped it.</summary>
+    /// <param name="commitment">What is going.</param>
+    /// <param name="loss">Which operator is dropping it.</param>
+    /// <remarks>
+    /// <b>THE REASON IS A PARAMETER RATHER THAN A GUESS FROM THE CALLER'S NAME</b>, for
+    /// the reason <see cref="Birth"/> gives: <see cref="Abstract"/> removes and adds the
+    /// same claim, and a ledger that read that as a death would report a lineage dying at
+    /// exactly the rung where it was compressed.
+    /// </remarks>
+    private void Remove(Commitment commitment, Loss loss)
     {
         if (!_byName.Remove(commitment.Identity)) return;
+
+        ref var life = ref CollectionsMarshal.GetValueRefOrAddDefault(
+            _lineage, (commitment.Expects, commitment.Scope.Length), out _);
+
+        life = loss switch
+        {
+            Loss.Subsumed => life with { Subsumed = life.Subsumed + 1 },
+            Loss.Culled => life with { Culled = life.Culled + 1 },
+            _ => life with { Rewritten = life.Rewritten + 1 },
+        };
 
         foreach (var code in commitment.Scope)
             if (_byCode.TryGetValue(code, out var at))

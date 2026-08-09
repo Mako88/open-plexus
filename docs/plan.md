@@ -909,6 +909,12 @@ change of architecture entirely.
 - **AND IT BUYS HARD ROUNDS AND SELLS EASY ONES ON AN EVEN WORLD**, which is the first arm
   measured here whose two scores point opposite ways. Coverage rises while trailing
   accuracy falls, and no single number can rank it.
+- **AND IT IS A DOSE RESPONSE RATHER THAN A STEP.** Over five tilts the minority's blame
+  share and the hard rounds carried fall together and monotonically, while the arm that
+  never consults the vote stays flat on coverage.
+- **AND AT THE STEEPEST TILT THE SHIPPED ARM'S ACCURACY RISES WHILE ITS COVERAGE REACHES
+  NOUGHT**, which is the base-rate trap drawn as a curve: the score goes up as the learning
+  goes away.
 - **UNDER `EveryRound` THE TWO WEIGHINGS BUILD THE IDENTICAL POPULATION**, to three
   decimals on coverage, rules found and sound rules, on both skewed widths — and `Lifting`
   still leads on trailing accuracy alone.

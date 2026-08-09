@@ -220,6 +220,79 @@ public sealed class LineageTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// <b>THE MECHANISM AS A CURVE RATHER THAN AS TWO POINTS.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE READING SO FAR IS AN EVEN WORLD AND A SKEWED ONE, WHICH IS TWO POINTS AND A
+    /// STORY JOINING THEM.</b> If blame starvation is really what stops the lineages, then
+    /// the minority's share of blame should fall smoothly as the world tilts, hard-round
+    /// coverage should fall with it, and the arm that does not consult the vote should be
+    /// flat across the whole range. Three curves with one shape is a mechanism; a step
+    /// between two cells is a pair of measurements.
+    /// </para>
+    /// <para>
+    /// <b>AND IT CAN COME OUT WRONG IN A WAY THE TWO POINTS COULD NOT.</b> A threshold — the
+    /// shipped arm holding up to some tilt and then collapsing — would say something is
+    /// switching rather than starving, and the explanation would need the switch. What is
+    /// predicted is monotone and gradual in both.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void How_blame_and_coverage_fall_together_as_the_world_tilts()
+    {
+        output.WriteLine($"=== 6 bits, {Seeds} seeds, blame share is the minority's");
+        output.WriteLine(
+            "skew   drawn    afterfailure                     everyround");
+        output.WriteLine(
+            "               blame   paying  recent            blame   paying  recent");
+
+        foreach (var skew in new[] { 0.0, 0.5, 0.65, 0.8, 0.9 })
+        {
+            var settings = new MultiplexerSettings { Address = 2, Skew = skew };
+            var minority = Minority(settings);
+
+            var row = new List<string>();
+            var drawn = 0.0;
+
+            foreach (var repairing in new[] { Repairing.AfterFailure, Repairing.EveryRound })
+            {
+                var dials = new CommittingSettings { Repairing = repairing };
+
+                double blame = 0, paying = 0, recent = 0;
+
+                for (var seed = 1; seed <= Seeds; seed++)
+                {
+                    var brain = new Brain(dials, seed);
+                    var learnt = new MultiplexerRun(settings, brain, seed, census: true)
+                        .Run(Rounds);
+
+                    var all = brain.Held.Lineages.Values.Sum(one => one.Blamed);
+
+                    var mine = brain.Held.Lineages
+                        .Where(one => one.Key.Expects == minority)
+                        .Sum(one => one.Value.Blamed);
+
+                    blame += all == 0 ? 0.0 : mine / (double)all;
+                    paying += learnt.Census!.Paying;
+                    recent += learnt.Recent;
+
+                    // HOW OFTEN THE RARE OUTCOME ACTUALLY ARRIVED, taken from the census
+                    // rather than from the setting -- `Skew` is a property of the BITS and
+                    // the outcome's rate is what the multiplexer makes of them, which is
+                    // not the same number and would misread the whole x axis.
+                    drawn = learnt.Census.Hard / (double)learnt.Rounds;
+                }
+
+                row.Add($"{blame / Seeds,6:P1}  {paying / Seeds,6:P1}  {recent / Seeds,6:F3}");
+            }
+
+            output.WriteLine(
+                $"{skew,4:F2}  {drawn,6:P1}   {row[0],-32}  {row[1]}");
+        }
+    }
+
     /// <summary>Adds one seed's ledger into a running total.</summary>
     /// <param name="into">What has been summed so far.</param>
     /// <param name="one">This seed's counts.</param>

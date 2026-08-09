@@ -536,6 +536,77 @@ public static class Repair
         return Normal.Tail(strongest) * candidates <= dials.Alpha ? best : null;
     }
 
+
+    /// <summary>
+    /// The code whose ABSENCE separates this commitment's misses from its hits, or
+    /// nothing — <b>rung two's candidate, as an instrument rather than a rung.</b>
+    /// </summary>
+    /// <param name="parent">The commitment being asked about.</param>
+    /// <param name="dials">Every number the machinery is allowed to have.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>NOTHING CALLS THIS TO MINT ANYTHING, AND THAT IS THE POINT.</b> The plan's rule
+    /// is that a rung is admitted when no expression in the current language separates the
+    /// failures from the hits, and that choosing one before a failure asks is
+    /// hand-specified bias by a side door. So the honest order is to measure whether the
+    /// rounds nothing separates would have separated on an ABSENCE, and to build the rung
+    /// only if they would. This answers that and changes no behaviour.
+    /// </para>
+    /// <para>
+    /// <b>THE SAME STATISTIC WITH ITS ARGUMENTS SWAPPED, WHICH IS THE WHOLE OF THE
+    /// DIFFERENCE.</b> <see cref="Discriminator"/> wants a code that leads in the HITS,
+    /// because a conjunctive child keeps the firings that code was in. A negated child
+    /// keeps the firings it was ABSENT from, so its condition must lead in the MISSES —
+    /// the plan says this in one sentence and says that conflating the two is how one
+    /// description fits neither.
+    /// </para>
+    /// <para>
+    /// <b>AND THE CANDIDATE SET IS BOUNDED BY WHAT HAS BEEN SEEN HERE.</b> Under sparse
+    /// coding almost every code is absent from almost every moment, so a negated candidate
+    /// drawn from everything would be hopeless and the correction below would be paying for
+    /// a search nobody should have run. <i>Z, which I have seen here before, is missing
+    /// now</i> — so a code with no hits behind it is not admissible, and the table repair
+    /// already keeps is where that is read.
+    /// </para>
+    /// <para>
+    /// <b>IT COSTS A SECOND WALK OF THE TABLE AND ONLY WHERE NOTHING SEPARATED</b>, which
+    /// is a small share of a small share of rounds. Said out loud because the walk it
+    /// mirrors is deliberately last in its own chain for exactly this reason.
+    /// </para>
+    /// </remarks>
+    /// <returns>The code whose absence separates, or nothing.</returns>
+    public static Code? Absent(Commitment parent, CommittingSettings dials)
+    {
+        ArgumentNullException.ThrowIfNull(parent);
+        ArgumentNullException.ThrowIfNull(dials);
+
+        if (parent.Misses < dials.Floor || parent.Hits == 0) return null;
+
+        Code? best = null;
+        var strongest = 0.0;
+        var candidates = 0;
+
+        foreach (var (code, seen) in parent.Separations)
+        {
+            // SEEN HERE BEFORE, OR IT IS NOT A THING THAT IS MISSING.
+            if (seen.InHits == 0) continue;
+
+            candidates++;
+
+            var z = Divergence(seen.InMisses, parent.Misses, seen.InHits, parent.Hits);
+
+            if (z <= strongest) continue;
+
+            strongest = z;
+            best = code;
+        }
+
+        if (best is null || candidates == 0) return null;
+
+        // THE SAME BLUNT CORRECTION, over the admissible set rather than the whole table.
+        return Normal.Tail(strongest) * candidates <= dials.Alpha ? best : null;
+    }
+
     /// <summary>
     /// How many standard errors one hit rate leads another, positive when the first leads.
     /// </summary>

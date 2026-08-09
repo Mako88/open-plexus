@@ -654,6 +654,20 @@ public sealed class Population
     /// </remarks>
     public long Unseparated { get; private set; }
 
+    /// <summary>
+    /// Of the rounds nothing separated, how many an ABSENCE would have separated.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE HALF OF FORK 50 A SHARE CANNOT ANSWER.</b> <see cref="Unseparated"/> says the
+    /// language is short and says nothing about what would lengthen it — a counting
+    /// concept, a negation and a disjunction all produce failures a conjunction cannot
+    /// describe. This asks the one of those three that is cheap to ask: whether a code the
+    /// commitment has seen before and is now MISSING separates its misses from its hits.
+    /// High, and rung two is demanded specifically; low, and negation is not the answer and
+    /// the demand is for something far more expensive.
+    /// </remarks>
+    public long Absented { get; private set; }
+
     /// <summary>Repairs the worst commitment that just failed, if any has earned it.</summary>
     /// <param name="firing">What fired.</param>
     /// <param name="arrived">What followed.</param>
@@ -695,6 +709,7 @@ public sealed class Population
         // second is the only thing that may ever summon a rung.
         var blamed = false;
         var separated = false;
+        var absent = false;
 
         try
         {
@@ -702,7 +717,16 @@ public sealed class Population
             {
                 blamed = true;
 
-                if (Repair.Discriminator(culprit, _dials, _blind) is not { } added) continue;
+                if (Repair.Discriminator(culprit, _dials, _blind) is not { } added)
+                {
+                    // THE PROBE, AND IT MINTS NOTHING. See `Absented`: asked only where the
+                    // present-code search came back empty, so it costs a second walk of one
+                    // table on a small share of a small share of rounds -- and it may not
+                    // change what this method does, or the instrument would be the rung.
+                    if (!absent && Repair.Absent(culprit, _dials) is not null) absent = true;
+
+                    continue;
+                }
 
                 // THE LANGUAGE REACHED, WHICH IS TRUE EVEN IF THE CHILD IS ALREADY HELD.
                 // A collision is the population having got there first, and reading it as
@@ -726,7 +750,12 @@ public sealed class Population
             if (blamed)
             {
                 Blamed++;
-                if (!separated) Unseparated++;
+
+                if (!separated)
+                {
+                    Unseparated++;
+                    if (absent) Absented++;
+                }
             }
         }
     }

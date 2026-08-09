@@ -205,6 +205,9 @@ public sealed record Tally
     /// <inheritdoc cref="Commitments.Population.Unseparated"/>
     public required long Unseparated { get; init; }
 
+    /// <inheritdoc cref="Commitments.Population.Absented"/>
+    public required long Absented { get; init; }
+
     /// <summary>
     /// The share of repairable rounds the current language could not separate.
     /// </summary>
@@ -405,6 +408,7 @@ public sealed class Trial<TSeen>
             Exhausted = holding.Sum(held => held.Exhausted(_brain.Dials.Budget)),
             Blamed = holding.Sum(held => held.Blamed),
             Unseparated = holding.Sum(held => held.Unseparated),
+            Absented = holding.Sum(held => held.Absented),
             Codes = codes / (double)rounds,
             Unseen = Examine(holding),
         };

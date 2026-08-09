@@ -312,7 +312,8 @@ public sealed class MonkTests(ITestOutputHelper output)
     [Trait(Sweeps.Kind, Sweeps.Name)]
     public void Whether_the_failures_are_asking_for_a_rung()
     {
-        output.WriteLine("world | blamed | unseparated | wanting | recent | sound/unsound");
+        output.WriteLine(
+            "world | blamed | unseparated | wanting | absence would | recent | sound/unsound");
 
         foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
         {
@@ -358,5 +359,6 @@ public sealed class MonkTests(ITestOutputHelper output)
     private void Say(string world, Tally tally, double recent, int sound, int unsound) =>
         output.WriteLine(
             $"{world,-9} | {tally.Blamed,6} | {tally.Unseparated,11} | {tally.Wanting,7:F3} "
+            + $"| {tally.Absented,6} ({(tally.Unseparated == 0 ? 0.0 : tally.Absented / (double)tally.Unseparated),5:F3}) "
             + $"| {recent,6:F3} | {sound}/{unsound}");
 }

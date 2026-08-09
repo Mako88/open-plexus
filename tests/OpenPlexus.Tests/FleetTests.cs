@@ -277,6 +277,78 @@ public sealed class FleetTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>WHETHER THE FLEET'S ADVANTAGE IS THE REPAIR GATE TURNED DOWN, AND NOT THE WIRE
+    /// AT ALL.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE CONTROL WAS ALREADY IN THE CODEBASE AND WAS BUILT FOR EXACTLY THIS.</b>
+    /// <see cref="Population.Placing"/> tells the repair gate which of the commitments it
+    /// can see are notionally elsewhere, so a run with it set has a fleet's GATE and one
+    /// process's POPULATION. That splits the two things distribution does at once, and
+    /// nothing else can: a sharded run moves both and a whole run moves neither.
+    /// </para>
+    /// <para>
+    /// <b>SO THE THREE ARMS ANSWER THE QUESTION BETWEEN THEM.</b> If placed-alone lands on
+    /// the fleet, the advantage is the gate and the wire contributes nothing; if it lands
+    /// on alone, the advantage is the population being split and the gate is innocent. Both
+    /// readings are useful and only one of them is the story the eleven-bit row was written
+    /// up as, which is why this exists rather than a paragraph asserting it.
+    /// </para>
+    /// <para>
+    /// <b>ELEVEN BITS, BECAUSE SIX HAS NOTHING TO SEPARATE.</b> The fleet is level with one
+    /// process at the narrow width and ahead at the wide one, so the wide one is where an
+    /// explanation has something to explain.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public async Task Whether_the_fleets_advantage_is_the_repair_gate_rather_than_the_wire()
+    {
+        const long Rounds = 8000;
+        const int Holders = 3;
+        const int Address = 3;
+
+        var dials = new CommittingSettings();
+
+        output.WriteLine(
+            "eleven bits | seed | alone | placed alone | fleet | residents | repaired");
+
+        foreach (var seed in new[] { 1, 2, 3 })
+        {
+            var (here, held) = Alone_(dials, Address, Rounds, seed);
+
+            // THE GATE OF A FLEET AND THE POPULATION OF ONE MACHINE. `Placing` is read by
+            // `Mend` alone -- firing, voting and settling never see it -- so this run
+            // differs from the one above in the repair gate and in nothing else.
+            var placed = new Brain(dials, seed);
+
+            placed.Held.Placing = one => one.Identity.Value % Holders;
+
+            var world = new Multiplexer(new MultiplexerSettings { Address = Address }, seed);
+
+            var apart = new Trial<IReadOnlyList<int>>(
+                world, new Bits(Multiplexer.Bit), placed).Run(Rounds);
+
+            var (there, fleet, council) = await Spread(dials, Address, Rounds, seed, Holders);
+
+            await using var running = fleet;
+
+            Assert.Equal(Holders, council.Asked);
+
+            output.WriteLine(
+                $"{seed,12} | {here.Recent,5:F3} | {apart.Recent,12:F3} | {there.Recent,5:F3} "
+                + $"| {held.Count}/{placed.Held.Count}/{there.Resident} "
+                + $"| {here.Repaired}/{apart.Repaired}/{there.Repaired}");
+        }
+
+        // NO BAR, BECAUSE THE POINT IS WHICH TWO OF THREE ARMS LAND TOGETHER AND THAT HAS
+        // NEVER BEEN READ. A threshold written before the first reading would be a
+        // prediction dressed as a requirement, and this file already has one prediction in
+        // it that the grid refuted.
+    }
+
+    /// <summary>
     /// <b>AND A FLEET RUN REPRODUCES ITSELF, WHICH A WIRE COULD EASILY HAVE COST.</b>
     /// </summary>
     /// <remarks>

@@ -129,8 +129,14 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   first split rather than per machine. That is the number that says whether twenty phones
   are worse than two.
 - **AND AT ELEVEN BITS IT IS AHEAD ON TWO SEEDS OF THREE, WHICH INVERTS THE SIX-BIT
-  READING.** Sharding turns the repair gate down, and whether that costs or pays is a fact
-  about how much a world needs repairing.
+  READING.** Genesis is placed and repair is not, so a fleet mints one child per HOLDER per
+  round where one machine mints one.
+- **SO HOW HARD A FLEET SEARCHES IS A DEPLOYMENT CHOICE**, which is a world reaching into
+  the brain one level out. It pays where the true rules are conjunctions and costs a little
+  where they are one code.
+- **AND THE REPAIR GATE HAD NOTHING TO DO WITH IT, WHICH A CONTROL SAID AND AN ARGUMENT DID
+  NOT.** `Mending` ships ungated, so the clause reading a placement never runs and a
+  simulated shard is bit-identical to no shard.
 - **Distance costs the DEPTH of a thought, measured.** A round costs about four and a half
   times the per-hop delay, so a LAN is comfortable and the internet is a slower experiment.
 - **AND A ROUND OF ASKS IS UNDER A MILLISECOND ON LOOPBACK**, nine holders costing two and a

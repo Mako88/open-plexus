@@ -6,10 +6,19 @@ using Xunit.Abstractions;
 namespace OpenPlexus.Tests;
 
 /// <summary>
-/// The two vote rules at ONE fixed power — <b>the trigger `DialTests` wrote down for
+/// The three vote rules at ONE fixed power — <b>the trigger `DialTests` wrote down for
 /// deleting two entries of its own census.</b>
 /// </summary>
 /// <remarks>
+/// <para>
+/// <b>AND THE THIRD ARM IS SCORED ON THE SAME GRID RATHER THAN ON ITS OWN.</b>
+/// <see cref="Weighing.Lifting"/> asks for the answer its evidence most moved from that
+/// answer's base rate, which is scale-free exactly as <see cref="Weighing.Strongest"/>
+/// is — so it composes with replication and wire deduplication, and the question it has
+/// to answer is only whether it SCORES. Its cost is written down in its own remarks
+/// before this ran: it reopens <c>Sharpness</c> as a live axis, which the census had
+/// closed under the maximum.
+/// </para>
 /// <para>
 /// <b>THE RULE IS DECIDED IN ADVANCE, WHICH IS WHAT MAKES THIS A TEST AND NOT A HUNT.</b>
 /// <c>Sharpness</c> decides nothing under <see cref="Weighing.Strongest"/> — measured, and
@@ -51,9 +60,11 @@ public sealed class WeighingTests(ITestOutputHelper output)
     /// <param name="weighing">Which vote rule.</param>
     /// <param name="seed">The world's generator and the brain's.</param>
     /// <param name="noise">How often the world lies.</param>
-    private static double Plexed(int address, Weighing weighing, int seed, double noise = 0.0) =>
+    /// <param name="skew">How often a data bit is one, or zero to leave them even.</param>
+    private static double Plexed(
+        int address, Weighing weighing, int seed, double noise = 0.0, double skew = 0.0) =>
         new MultiplexerRun(
-            new MultiplexerSettings { Address = address, Noise = noise },
+            new MultiplexerSettings { Address = address, Noise = noise, Skew = skew },
             new Brain(
                 new CommittingSettings { Sharpness = Fixed, Weighing = weighing }, seed),
             seed).Run(20_000).Recent;
@@ -118,6 +129,15 @@ public sealed class WeighingTests(ITestOutputHelper output)
             ("multiplexer-6", Seeds, (weighing, seed) => Plexed(2, weighing, seed)),
             ("multiplexer-11", Seeds, (weighing, seed) => Plexed(3, weighing, seed)),
             ("multiplexer-6-noisy", Seeds, (weighing, seed) => Plexed(2, weighing, seed, noise: 0.15)),
+
+            // THE ONLY TWO ROWS ON THIS GRID WHERE THE DIVISOR HAS ANYTHING TO DO. Every
+            // other world draws its two outcomes to within a percent of even, so a rule
+            // that divides by a base rate divides by a constant and cannot move an argmax
+            // -- eight rows of it read as a measured verdict and were a fact about the
+            // bench. Four to one here, and the rules are the SAME rules: only how often
+            // the answer is one differs from the row three above.
+            ("multiplexer-6-skewed", Seeds, (weighing, seed) => Plexed(2, weighing, seed, skew: 0.8)),
+            ("multiplexer-11-skewed", Seeds, (weighing, seed) => Plexed(3, weighing, seed, skew: 0.8)),
             ("monk-1", Seeds, (weighing, seed) => Monked(Puzzle.One, weighing, seed)),
             ("monk-2", Seeds, (weighing, seed) => Monked(Puzzle.Two, weighing, seed)),
             ("monk-3", Seeds, (weighing, seed) => Monked(Puzzle.Three, weighing, seed)),
@@ -126,37 +146,55 @@ public sealed class WeighingTests(ITestOutputHelper output)
         };
 
         output.WriteLine($"the last tenth's accuracy, Sharpness fixed at {Fixed} "
-            + "— summing first, strongest second");
+            + "— summing, strongest, lifting");
 
-        var summing = 0;
-        var strongest = 0;
+        // THE SKEWED ROWS HAVE A FLOOR OF 0.80 AND THE OTHERS HAVE 0.50, so a number on
+        // one is not a number on the other. Always answering the commoner outcome scores
+        // four in five there while holding no rule at all -- the arms are still
+        // comparable to each other, which is what this grid asks, but the column must
+        // never be read down. `LiftingTests` carries the found-of-truths reading, which
+        // is the one a majority guess cannot reach.
+        output.WriteLine("the skewed rows are 4:1, so guessing the commoner answer scores "
+            + "0.80 there against 0.50 everywhere else");
+
+        var led = new Dictionary<string, int>
+        {
+            ["summing"] = 0,
+            ["strongest"] = 0,
+            ["lifting"] = 0,
+        };
 
         foreach (var (world, seeds, run) in worlds)
         {
             var arms = await Sweep.AcrossAsync(
                 seeds,
                 ("summing", seed => Task.FromResult(run(Weighing.Summing, seed))),
-                ("strongest", seed => Task.FromResult(run(Weighing.Strongest, seed))));
+                ("strongest", seed => Task.FromResult(run(Weighing.Strongest, seed))),
+                ("lifting", seed => Task.FromResult(run(Weighing.Lifting, seed))));
 
-            var apart = arms[1].Separation(arms[0]);
+            // TWO STANDARD ERRORS CLEAR OF EVERY OTHER ARM, AND THE MIDDLE IS COUNTED AS
+            // NEITHER. A world where the arms are level is not a world any of them wins --
+            // counting it for whichever is nominally ahead is how a grid of coin flips
+            // becomes a verdict. With three arms the bar is against the RUNNER-UP rather
+            // than against one nominated control, or the third arm would be scored on a
+            // comparison the other two were not.
+            var ranked = arms.OrderByDescending(one => one.Mean).ToList();
+            var apart = ranked[0].Separation(ranked[1]);
 
-            // TWO STANDARD ERRORS EITHER WAY, AND THE MIDDLE IS COUNTED AS NEITHER. A world
-            // where the arms are level is not a world where the sum wins, and it is not a
-            // world where it loses -- counting it for whichever is nominally ahead is how a
-            // grid of coin flips becomes a verdict.
-            if (apart >= 2.0 && arms[0].Mean > arms[1].Mean) summing++;
-            if (apart >= 2.0 && arms[1].Mean > arms[0].Mean) strongest++;
+            if (apart >= 2.0) led[ranked[0].Arm]++;
 
             output.WriteLine(
-                $"{world,-20} | summing {arms[0].Mean:F4} +/-{arms[0].StdErr:F4} "
-                + $"| strongest {arms[1].Mean:F4} +/-{arms[1].StdErr:F4} "
-                + $"| n={arms[0].Seeds} | {apart,5:F1} sigma, "
-                + $"{(apart < 2.0 ? "level" : arms[0].Mean > arms[1].Mean ? "summing" : "strongest")}");
+                $"{world,-20} | "
+                + string.Join(" | ", arms.Select(one =>
+                    $"{one.Arm} {one.Mean:F4} +/-{one.StdErr:F4}"))
+                + $" | n={arms[0].Seeds} | {apart,5:F1} sigma over the second, "
+                + $"{(apart < 2.0 ? "level" : ranked[0].Arm)}");
         }
 
         output.WriteLine(
-            $"summing leads on {summing} of {worlds.Length} worlds, strongest on "
-            + $"{strongest} — the rule is that a sum needs more than one to keep "
-            + "`Summing` and `Sharpness` in the census");
+            string.Join(", ", led.Select(one => $"{one.Key} leads on {one.Value}"))
+            + $" of {worlds.Length} worlds — the rule is that a sum needs more than "
+            + "one to keep `Summing` and `Sharpness` in the census, and `Lifting` "
+            + "needs to beat `Strongest` somewhere to be worth the axis it reopens");
     }
 }

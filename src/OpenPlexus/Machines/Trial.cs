@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
 using OpenPlexus.Worlds;
@@ -239,6 +240,81 @@ public sealed record Tally
     /// that cannot fire reading as a failure instead of as absent.
     /// </remarks>
     public required Examined? Unseen { get; init; }
+
+    /// <summary>
+    /// The wrong rounds split by cause, or nothing where the world cannot say what is
+    /// true.
+    /// </summary>
+    /// <remarks>
+    /// <b>NOTHING RATHER THAN ZERO, for the same reason <see cref="Unseen"/> is.</b> A
+    /// census of nought outvoted and nought uncovered is what a perfect run looks like and
+    /// also what an unasked question looks like, and those are opposite readings.
+    /// </remarks>
+    public Census? Census { get; init; }
+}
+
+/// <summary>
+/// The WRONG rounds, partitioned by cause — <b>the reading no counter here has ever
+/// carried.</b>
+/// </summary>
+/// <remarks>
+/// <para>
+/// <b>EVERY FAILURE IN THIS REPO HAS BEEN ONE INCREMENT OF ONE NUMBER, AND FOUR SESSIONS
+/// OF ARMS WERE AIMED WITHOUT IT.</b> Gates, weighing rules and subsumption bars all
+/// attack the case where the right rule is HELD and loses. Nothing measured whether that
+/// is where the failures are, so every one of those arms may have been aimed at a bucket
+/// with almost nothing in it — which would explain a table of level results better than
+/// any of the mechanisms did.
+/// </para>
+/// <para>
+/// <b>THE PARTITION IS EXACT RATHER THAN HEURISTIC, AND ONLY A WORLD WITH ENUMERABLE
+/// TRUTH CAN GIVE IT.</b> A sound commitment that fires is right by definition, so on a
+/// world that never lies a wrong answer means an UNSOUND rule won. What separates the two
+/// diagnoses is whether a sound advocate for the right answer was in the room at all.
+/// </para>
+/// <para>
+/// <b>AND THE SPLIT DECIDES WHERE WORK GOES.</b> <see cref="Outvoted"/> is a readout
+/// failure and the vote or subsumption owns it; <see cref="Uncovered"/> is a coverage
+/// failure and genesis or repair owns it. They have opposite fixes, and a rule that helps
+/// one can cost the other.
+/// </para>
+/// </remarks>
+public sealed record Census
+{
+    /// <summary>Wrong rounds where a SOUND advocate for the right answer fired and lost.</summary>
+    /// <remarks>
+    /// <b>THE RULE WAS PRESENT, CORRECT, AND MATCHED THE MOMENT.</b> Nothing was missing
+    /// and nothing needed minting — the population knew and did not say so, which is the
+    /// failure every arm tried so far was built for.
+    /// </remarks>
+    public required long Outvoted { get; init; }
+
+    /// <summary>Wrong rounds where nothing sound advocating the right answer fired at all.</summary>
+    /// <remarks>
+    /// <b>NO VOTE RULE CAN REACH THESE, WHICH IS WHY THEY ARE COUNTED APART.</b> A merge
+    /// cannot promote an advocate that was never in the room, so a change to how weights
+    /// combine is inert on every round in this bucket however good it is.
+    /// </remarks>
+    public required long Uncovered { get; init; }
+
+    /// <summary>
+    /// Of the <see cref="Outvoted"/>, how many were lost to a winner with a LONGER scope.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE OVER-SPECIALISATION HYPOTHESIS AS A NUMBER RATHER THAN A STORY.</b> The plan
+    /// says the vote prefers the narrower rule every round while subsumption prefers the
+    /// general one every thousandth, so a child displaces its parent as decider and then
+    /// answers what it has never seen. If that is what is happening this is most of
+    /// <see cref="Outvoted"/>; if it is near nought the story is wrong and the winner is
+    /// something else.
+    /// </remarks>
+    public required long Deeper { get; init; }
+
+    /// <summary>Wrong rounds counted here at all.</summary>
+    public long Wrong => Outvoted + Uncovered;
+
+    /// <summary>The share of wrong rounds a vote rule could in principle have saved.</summary>
+    public double Reachable => Wrong == 0 ? 0.0 : Outvoted / (double)Wrong;
 }
 
 /// <summary>
@@ -264,11 +340,35 @@ public sealed class Trial<TSeen>
     private readonly IWorld<TSeen> _world;
     private readonly IQuantizer<TSeen> _sensing;
     private readonly Brain _brain;
+    private readonly Func<ImmutableArray<Code>, Code, bool>? _sound;
 
     /// <param name="world">The problem.</param>
     /// <param name="sensing">The translation between it and the brain.</param>
     /// <param name="brain">The one brain, already configured.</param>
-    public Trial(IWorld<TSeen> world, IQuantizer<TSeen> sensing, Brain brain)
+    /// <param name="sound">
+    /// Whether a scope-and-expectation is TRUE of the world, or nothing where the world
+    /// cannot say — <b>the oracle the failure census is made of.</b>
+    /// </param>
+    /// <remarks>
+    /// <para>
+    /// <b>A DELEGATE RATHER THAN A WORLD, BECAUSE A TRIAL MAY NOT KNOW WHICH WORLD IT IS
+    /// RUNNING.</b> Naming <c>Multiplexer</c> here would put one world's vocabulary in
+    /// front of every other one and would fail <c>SeparationTests</c> from the other
+    /// direction — a question only some worlds can answer arrives as a function some
+    /// callers pass.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS OFF UNLESS ASKED FOR, BECAUSE IT COSTS A SECOND MATCH EVERY ROUND.</b>
+    /// Matching is nine tenths of the clock on a narrow world, so a census left on by
+    /// default would roughly double every run this repo has ever timed — and it says
+    /// nothing on a world whose truth cannot be enumerated anyway.
+    /// </para>
+    /// </remarks>
+    public Trial(
+        IWorld<TSeen> world,
+        IQuantizer<TSeen> sensing,
+        Brain brain,
+        Func<ImmutableArray<Code>, Code, bool>? sound = null)
     {
         ArgumentNullException.ThrowIfNull(world);
         ArgumentNullException.ThrowIfNull(sensing);
@@ -277,6 +377,7 @@ public sealed class Trial<TSeen>
         _world = world;
         _sensing = sensing;
         _brain = brain;
+        _sound = sound;
     }
 
     /// <summary>What a blind guess scores on this world.</summary>
@@ -362,6 +463,13 @@ public sealed class Trial<TSeen>
         var cycle = new Cycle(council, rounds, sweep, target, window);
 
         long codes = 0;
+        long outvoted = 0, uncovered = 0, deeper = 0;
+
+        // ONE POPULATION OR NONE, BECAUSE THE CENSUS ASKS WHAT A MACHINE HELD. On a fleet
+        // no single population is the one that voted, and reaching into all of them to
+        // find out would be the experimenter answering a question C1 says a machine may
+        // not ask. Left null, every count below stays nought and the report says so.
+        var censusing = _sound is not null && holding.Count == 1 ? holding[0] : null;
 
         for (long round = 0; round < rounds; round++)
         {
@@ -369,6 +477,41 @@ public sealed class Trial<TSeen>
 
             var said = _sensing.Codify(turn.Seen);
             codes += said.Count;
+
+            // TAKEN BEFORE THE STEP, BECAUSE THE STEP TEACHES. `Settle`, `Cover` and
+            // `Mend` all move the population, so the same three read-only calls after it
+            // would be asking a different machine what it thought a moment ago. These are
+            // the same calls `Examine` is built out of and they change nothing.
+            if (censusing is not null && turn.Outcome is { } expected)
+            {
+                var arrived = Brain.Says(expected);
+                var firing = censusing.Firing(censusing.Moment(new HashSet<Code>(said)));
+                var vote = censusing.Predict(firing);
+
+                if (!firing.IsDefaultOrEmpty && vote.Expects != arrived)
+                {
+                    // A SOUND COMMITMENT THAT FIRES IS RIGHT BY DEFINITION, so the only
+                    // question a wrong round raises is whether one of them was in the room
+                    // and lost. Everything else is a round no vote rule could have saved.
+                    var advocate = firing.FirstOrDefault(one =>
+                        one.Expects == arrived && _sound!(one.Scope, one.Expects));
+
+                    if (advocate is null) uncovered++;
+                    else
+                    {
+                        outvoted++;
+
+                        // THE WINNER'S OWN SCOPE, FOUND BY THE IDENTITY THE VOTE ALREADY
+                        // REPORTS. `Vote.By` names the best advocate for the side that
+                        // won, so no second search is needed to ask whether a child beat
+                        // a parent.
+                        var won = firing.FirstOrDefault(one => one.Identity == vote.By);
+
+                        if (won is not null && won.Scope.Length > advocate.Scope.Length)
+                            deeper++;
+                    }
+                }
+            }
 
             // A ROUND THE WORLD COULD NOT SETTLE PASSES NOTHING RATHER THAN A NUMBER, and
             // that is the whole of what arms `Abstain`. Every world that always knows its
@@ -411,6 +554,9 @@ public sealed class Trial<TSeen>
             Absented = holding.Sum(held => held.Absented),
             Codes = codes / (double)rounds,
             Unseen = Examine(holding),
+            Census = censusing is null
+                ? null
+                : new Census { Outvoted = outvoted, Uncovered = uncovered, Deeper = deeper },
         };
     }
 

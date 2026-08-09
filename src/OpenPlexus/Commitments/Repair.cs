@@ -48,6 +48,48 @@ public enum Weighing
     /// vote also steers repair.
     /// </remarks>
     Strongest,
+
+    /// <summary>
+    /// An expectation is worth how far its best advocate moves it from its own base
+    /// rate — <b>the answer the evidence most changed the mind about.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>JOHN'S: THE MOST NOVEL ANSWER THAT IS ALSO THE BEST GROUNDED, AND THERE IS
+    /// EXACTLY ONE READING OF <i>NOVEL</i> THAT SURVIVES.</b> <i>Few advocates</i> is
+    /// <see cref="Summing"/> upside down and changes with replication, so three copies of
+    /// a population would vote differently from one. <i>A young advocate</i> prefers the
+    /// rules that have no statistics yet, which is the strength-versus-accuracy
+    /// refutation arriving from the far end. What is left is a property of the ANSWER —
+    /// how often that outcome happens at all — which no amount of copying can move.
+    /// </para>
+    /// <para>
+    /// <b>WHICH MAKES IT LIFT, AND ASSOCIATION RULE MINING HIT THIS EXACT PROBLEM
+    /// FIRST.</b> Confidence alone favours whatever is common, because a rule predicting
+    /// the usual outcome is right by default; dividing by the base rate asks instead how
+    /// much the scope CHANGED the odds. Borrowed as the problem rather than as the
+    /// mechanism — the quantity here is a commitment's own accuracy over the share of
+    /// moments its expectation was live.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS SCALE-FREE IN THE SAME WAY <see cref="Strongest"/> IS, WHICH IS THE
+    /// PROPERTY THAT MADE IT WORTH BUILDING.</b> The aggregate is a maximum, so a crowd
+    /// still cannot outvote one commitment that is always right, replicas stay invisible
+    /// to the vote, and a sharded vote is bit-identical to a whole one — every holder
+    /// witnesses every moment, so the divisor is the same number on all of them.
+    /// </para>
+    /// <para>
+    /// <b>WHAT IT COSTS IS WRITTEN DOWN BEFORE THE GRID RUNS, TWICE.</b> A rare
+    /// expectation divides by a small number, so this arm will prefer an unusual answer
+    /// on thin evidence wherever the base rates are skewed — the multiplexer's outcomes
+    /// are near balanced and will barely move, and <see cref="Worlds.Arranged"/> is where
+    /// it should show. AND <see cref="CommittingSettings.Sharpness"/> BECOMES A LIVE AXIS
+    /// AGAIN: the argmax of <c>max(a)^S</c> never moves with <c>S</c>, but the argmax of
+    /// <c>max(a)^S / p</c> does, so the dead column `DialTests` recorded under
+    /// <see cref="Strongest"/> is not dead here and is unmeasured.
+    /// </para>
+    /// </remarks>
+    Lifting,
 }
 
 /// <summary>What it takes for a narrower commitment to survive beside a general one.</summary>

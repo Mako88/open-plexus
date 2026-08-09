@@ -669,6 +669,19 @@ change of architecture entirely.
 - **AND A CAST TO AN INTERFACE THE TYPE DOES NOT IMPLEMENT IS CLEANUP THAT NEVER RUNS.** It
   compiles, reads as tidy, and does nothing — the pass-shaped defect again, wearing a
   disposal rather than a check.
+- **EVERY WORLD ON THE BENCH DREW ITS OUTCOMES EVENLY AND NOTHING MEASURED THAT.** Any
+  mechanism keyed on how COMMON an answer is was untestable here for the life of the
+  branch while reading as tested.
+- **AND A GRID OF IDENTICAL ROWS IS A VERDICT ON THE WORLDS RATHER THAN ON THE ARM.**
+  Dividing by a constant cannot move an argmax, so eight rows four decimals apart were
+  the bench saying it had no question.
+- **AN ESTIMATE IS NOISE BEFORE IT IS A STATISTIC, AND A CHAOTIC RUN KEEPS THE
+  PERTURBATION.** A divisor 1.36 at fifty rounds and 1.01 at twenty thousand mints a
+  different population, so a mid-run reading and an end-of-run one are different
+  measurements.
+- **A `readonly record struct` HOLDING AN `ImmutableArray` COMPARES BY THE ARRAY'S
+  IDENTITY.** Two separately built keys with identical contents are never equal, so an
+  equality asserted on one fails on a world it has no complaint about.
 
 ---
 
@@ -807,6 +820,18 @@ change of architecture entirely.
   computed from inside can tell that this is such a world.
 - **MORE UNSOUND RULES WITH FEWER SOUND ONES SCORED HIGHER THERE**, so what the withheld
   score tracks is not how much of the world the population has got right.
+- **GENESIS STOPS AT ABOUT ROUND FIVE HUNDRED AND NEVER RUNS AGAIN.** Fourteen mints in the
+  first hundred rounds and nought in the next nineteen thousand, at both widths and both
+  skews. Everything after is repair on whatever the opening minted.
+- **AND TWO THIRDS OF WRONG ANSWERS ARE ROUNDS NO SOUND RULE ADVOCATED**, rising to all of
+  them on the skewed world. No vote rule can reach those, so every gate, weighing and
+  subsumption arm was aimed at a third of the problem.
+- **THE OVER-SPECIALISATION STORY IS REFUTED BY ITS OWN NUMBER.** A child beat a sound
+  parent on 2 of 436 wrong rounds at six bits and 46 of 982 at eleven, so the vote
+  preferring the narrower rule costs nothing measurable.
+- **AND `Weighing` MOVES THE UNCOVERED BUCKET RATHER THAN THE OUTVOTED ONE**, which makes
+  the winning rule a better SEARCH wearing a readout's name. Genesis mints the identical
+  count under all three; only what repair does with them differs.
 
 ---
 
@@ -871,3 +896,5 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **60** | Genesis is placed and repair is not, so a fleet repairs once per HOLDER a round where one machine repairs once. How hard it searches is a deployment choice. Place repair, divide the budget, or exploit it? Open |
 | **61** | John's: place a commitment by the MINIMUM code of its sorted scope, so identical children land together and a lineage stays together. PRICED: level at three holders, three times the average at twelve, capped by a world's distinct roots |
 | **62** | John's: partition into slots and give each R machines holding identical populations. A death costs nothing while a slot survives, replicas need no messages between them, and it answers fork 53. R scales with load |
+| **63** | John's: genesis mints ONE scope over the whole scene and repeated scenes narrow it by overlap, the rest fading out. Specific-to-general, the DUAL of repair — an intersection needs two examples where the gate needs twenty misses. Open |
+| **64** | John's: emit *Z was absent* as its own code at settlement, so rung two needs no negation in the scope language and no new matcher. Bounded to the commitment's own hits, or the candidate set is the vocabulary. Open |

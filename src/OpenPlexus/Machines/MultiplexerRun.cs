@@ -42,6 +42,9 @@ public sealed record Learned
     /// <summary>Rounds the world could not say the outcome of.</summary>
     public long Abstained => Tally.Abstained;
 
+    /// <inheritdoc cref="Tally.Census"/>
+    public Census? Census => Tally.Census;
+
     /// <summary>The round a trailing window first held the target.</summary>
     public long Reached => Tally.Reached;
 
@@ -130,13 +133,19 @@ public sealed class MultiplexerRun
     /// <param name="world">The shape of the world.</param>
     /// <param name="brain">The one brain, already configured.</param>
     /// <param name="seed">The world's own generator.</param>
-    public MultiplexerRun(MultiplexerSettings world, Brain brain, int seed)
+    /// <param name="census">
+    /// Whether to partition the wrong rounds by cause — <b>off by default, because it
+    /// costs a second match every round.</b>
+    /// </param>
+    public MultiplexerRun(MultiplexerSettings world, Brain brain, int seed, bool census = false)
     {
         ArgumentNullException.ThrowIfNull(brain);
 
         _world = new Multiplexer(world, seed);
         _brain = brain;
-        _trial = new Trial<IReadOnlyList<int>>(_world, new Bits(Multiplexer.Bit), brain);
+
+        _trial = new Trial<IReadOnlyList<int>>(
+            _world, new Bits(Multiplexer.Bit), brain, census ? _world.Sound : null);
     }
 
     /// <summary>What the brain holds.</summary>

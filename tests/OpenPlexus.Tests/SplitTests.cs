@@ -138,14 +138,30 @@ public sealed class SplitTests(ITestOutputHelper output)
 
     // ---- the check that can fire -------------------------------------------
 
-    [Fact]
-    public void A_vote_split_between_holders_is_the_same_vote()
+    /// <summary>
+    /// <b>BOTH SCALE-FREE RULES, BECAUSE THE PROPERTY IS THE AGGREGATE AND NOT THE
+    /// WEIGHT.</b>
+    /// </summary>
+    /// <param name="weighing">Which of the two maximum-shaped rules.</param>
+    /// <remarks>
+    /// <b><see cref="Weighing.Lifting"/> DIVIDES BEFORE THE MAXIMUM AND THE MERGE NEVER
+    /// SEES THE DIVISOR</b>, which is exactly why it has to be asserted rather than
+    /// argued: the base rate is read from <see cref="Population.Witness"/>'s table on
+    /// whichever machine is speaking, so this passing is the claim that every holder has
+    /// the same table. Were the divisor ever to become a per-holder quantity — a count of
+    /// what that machine HOLDS rather than of what the world DID — this is the check that
+    /// would go red, and nothing else here would.
+    /// </remarks>
+    [Theory]
+    [InlineData(Weighing.Strongest)]
+    [InlineData(Weighing.Lifting)]
+    public void A_vote_split_between_holders_is_the_same_vote(Weighing weighing)
     {
-        // UNDER `Strongest` THE AGGREGATE IS A MAXIMUM, AND A MAXIMUM COMPOSES EXACTLY.
+        // THE AGGREGATE IS A MAXIMUM UNDER BOTH, AND A MAXIMUM COMPOSES EXACTLY.
         // So this is not a tolerance and must never become one: every field of the vote
         // is bit-identical, including the margin, which is a subtraction of two doubles
         // that were each chosen rather than accumulated.
-        var (held, moments) = Trained(Weighing.Strongest, seed: 1);
+        var (held, moments) = Trained(weighing, seed: 1);
 
         var compared = 0;
         var contested = 0;
@@ -159,7 +175,7 @@ public sealed class SplitTests(ITestOutputHelper output)
 
             foreach (var holders in new[] { 2, 3, 5, 12 })
             {
-                var split = Population.Decide(Spread(firing, held, holders), Weighing.Strongest);
+                var split = Population.Decide(Spread(firing, held, holders), weighing);
 
                 Assert.Equal(whole.Expects, split.Expects);
                 Assert.Equal(whole.By, split.By);

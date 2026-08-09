@@ -26,6 +26,36 @@ public sealed record MultiplexerSettings
     public double Noise { get; init; }
 
     /// <summary>
+    /// How often a DATA bit is drawn as one, in 0..1 — <b>zero leaves them even, which
+    /// is every multiplexer this repo has ever run.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NO WORLD HERE HAS EVER HAD SKEWED OUTCOMES, AND NOTHING MEASURED THAT.</b> Every
+    /// world on the bench draws two outcomes about evenly — the multiplexer to within three
+    /// parts in a thousand — so any mechanism whose behaviour depends on how COMMON an
+    /// answer is has been untestable for the life of the branch while reading as tested.
+    /// What found it was a vote rule that divides by an outcome's base rate: it ran on
+    /// eight worlds and could not move, because dividing every candidate by the same
+    /// number cannot move an argmax.
+    /// </para>
+    /// <para>
+    /// <b>THE ADDRESS BITS STAY EVEN, WHICH IS WHAT MAKES THIS A CONTROL RATHER THAN A NEW
+    /// WORLD.</b> Skewing them would make some address values rare and quietly change how
+    /// often each true rule can be exercised, so two arms would differ in the outcome
+    /// distribution AND in how much evidence each rule got. Only the data bits move here,
+    /// so <see cref="Multiplexer.Truths"/> is unchanged, soundness still enumerates, and
+    /// the single thing that differs from the shipped world is how often the answer is one.
+    /// </para>
+    /// <para>
+    /// <b>AND ZERO CONSUMES THE GENERATOR EXACTLY AS IT DID BEFORE THIS EXISTED</b>, which
+    /// is the same promise <c>Clutter</c> makes and for the same reason: a dial that shifts
+    /// the stream at its default retires every number the world has ever produced.
+    /// </para>
+    /// </remarks>
+    public double Skew { get; init; }
+
+    /// <summary>
     /// How many rounds between redrawing which data bit each address selects.
     /// </summary>
     /// <remarks>
@@ -450,7 +480,15 @@ public sealed class Multiplexer : IWorld<IReadOnlyList<int>>, IWithholds<IReadOn
             // THE INFORMATIVE BITS ARE DRAWN AND THE CLUTTER IS NOT, so a clutter dial
             // takes nothing from the generator and a run with none is bit-for-bit the run
             // that existed before the dial did.
-            for (var which = 0; which < Informative; which++) bits[which] = _rng.Next(2);
+            //
+            // AND A SKEW TOUCHES THE DATA BITS ONLY, which is what leaves `Truths` true
+            // and every address equally exercised. At zero this is `_rng.Next(2)` for
+            // every bit, so the stream is the one every earlier measurement was taken on.
+            for (var which = 0; which < Informative; which++)
+                bits[which] = _settings.Skew <= 0.0 || which < _settings.Address
+                    ? _rng.Next(2)
+                    : _rng.NextDouble() < _settings.Skew ? 1 : 0;
+
             for (var which = Informative; which < bits.Length; which++) bits[which] = 1;
         }
         while (_kept is not null && !_kept.Contains(Assignment(bits)));

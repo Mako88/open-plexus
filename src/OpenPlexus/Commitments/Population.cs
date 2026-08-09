@@ -143,6 +143,22 @@ public sealed class Population
 
     private long _moments;
 
+    /// <summary>
+    /// Per code: how many settlements it was the thing that ARRIVED.
+    /// </summary>
+    /// <remarks>
+    /// <b>A SECOND TABLE, BECAUSE <see cref="_liveness"/> COUNTS THE WRONG SIDE OF THE
+    /// ROUND AND READS AS AN ANSWER ANYWAY.</b> What is live in a moment is the evidence;
+    /// what arrives is the outcome, and on a world where those are different alphabets the
+    /// first table has no entry for an expectation at all. <see cref="Rate"/> was mounted
+    /// on it and returned the smoothing floor for every expectation — identical divisors,
+    /// so <see cref="Weighing.Lifting"/> ran on eight worlds and moved nothing, which read
+    /// exactly like a rule that had been measured and found inert.
+    /// </remarks>
+    private readonly Dictionary<Code, long> _arrivals = [];
+
+    private long _settlements;
+
     private readonly Dictionary<Code, Commitment> _byName = [];
     private readonly Dictionary<Code, List<Commitment>> _byCode = [];
 
@@ -374,6 +390,14 @@ public sealed class Population
         {
             var weight = Math.Pow(commitment.Accuracy, _dials.Sharpness);
 
+            // DIVIDED HERE RATHER THAN AT THE MERGE, because the merge holds no
+            // population and therefore no table of what this world does. It changes
+            // nothing about the arithmetic: the divisor is one number per expectation
+            // and every holder has the same one, so scaling before the maximum and
+            // scaling after it are the same operation.
+            if (_dials.Weighing == Weighing.Lifting)
+                weight /= Rate(commitment.Expects);
+
             if (!loudest.TryGetValue(commitment.Expects, out var best) || weight > best.Weight)
                 loudest[commitment.Expects] = (weight, commitment.Identity);
 
@@ -383,9 +407,9 @@ public sealed class Population
             // never takes the count out of the decision. See `CommittingSettings.Weighing`.
             weights[commitment.Expects] =
                 weights.TryGetValue(commitment.Expects, out var so_far)
-                    ? _dials.Weighing == Weighing.Strongest
-                        ? Math.Max(so_far, weight)
-                        : so_far + weight
+                    ? _dials.Weighing == Weighing.Summing
+                        ? so_far + weight
+                        : Math.Max(so_far, weight)
                     : weight;
         }
 
@@ -480,9 +504,13 @@ public sealed class Population
 
             loudest[expects] = (at[0].Weight, at[0].By);
 
-            weights[expects] = weighing == Weighing.Strongest
-                ? at[0].Weight
-                : at.Sum(one => one.Weight);
+            // A MAXIMUM FOR BOTH SCALE-FREE RULES, and the difference between them has
+            // already happened by here. `Lifting` divides by the base rate in `Speak`,
+            // where the table is; what arrives at the merge is a weight either way, and
+            // the merge may not know which kind it is holding.
+            weights[expects] = weighing == Weighing.Summing
+                ? at.Sum(one => one.Weight)
+                : at[0].Weight;
         }
 
         // ORDERED BY WEIGHT AND THEN BY CODE, so a tie -- which is what every
@@ -506,6 +534,17 @@ public sealed class Population
     public void Settle(ImmutableArray<Commitment> firing, IReadOnlySet<Code> moment, Code? arrived)
     {
         ArgumentNullException.ThrowIfNull(moment);
+
+        // COUNTED BEFORE ANYTHING IS TOLD, AND WHATEVER FIRED. A base rate is a fact
+        // about the WORLD, so a holder that held nothing relevant this round must still
+        // count what happened -- otherwise the divisor would be a fact about a
+        // population, it would differ per machine, and a sharded vote would stop being
+        // the whole vote. An abstain is not an arrival and is not counted.
+        if (arrived is { } outcome)
+        {
+            _settlements++;
+            _arrivals[outcome] = _arrivals.GetValueOrDefault(outcome) + 1;
+        }
 
         foreach (var commitment in firing)
             commitment.Settle(
@@ -608,6 +647,37 @@ public sealed class Population
             seen = seen with { Live = seen.Live + 1 };
         }
     }
+
+    /// <summary>
+    /// The share of moments a code has been live in — <b>an expectation's base rate, and
+    /// the divisor <see cref="Weighing.Lifting"/> is made of.</b>
+    /// </summary>
+    /// <param name="code">The code to ask about.</param>
+    /// <remarks>
+    /// <para>
+    /// <b>OVER SETTLEMENTS AND NEVER OVER MOMENTS, WHICH IS THE WHOLE OF WHAT THIS GOT
+    /// WRONG FIRST.</b> The obvious table was <see cref="Witness"/>'s, which already
+    /// counts how often a code is around and cost nothing to read. It counts the wrong
+    /// side of the round: an expectation is what ARRIVES, and on any world whose outcome
+    /// alphabet differs from its input alphabet no expectation is in that table at all —
+    /// so every divisor came back at the smoothing floor, every divisor was therefore
+    /// EQUAL, and dividing by a constant cannot move an argmax.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE SAME NUMBER ON EVERY MACHINE, WHICH IS WHAT LETS A LIFTED VOTE
+    /// SHARD EXACTLY.</b> A holder witnesses every moment it is asked to vote on whether
+    /// it holds anything relevant or not, so this is a count over the WORLD'S stream and
+    /// not over a population — replicas cannot move it and neither can a split.
+    /// </para>
+    /// <para>
+    /// <b>SMOOTHED, BECAUSE AN UNWITNESSED EXPECTATION WOULD DIVIDE BY NOUGHT.</b> Under
+    /// C2 a holder can hold a commitment about an outcome whose arrival it never saw, so
+    /// the unsmoothed ratio has a hole in it exactly where lateness put one. Laplace is
+    /// the arbitrary-free choice and it is stated rather than tuned.
+    /// </para>
+    /// </remarks>
+    public double Rate(Code code) =>
+        (_arrivals.GetValueOrDefault(code) + 1.0) / (_settlements + 1.0);
 
     /// <summary>Whether a code has been absent from a moment since it first appeared.</summary>
     /// <param name="code">The code to ask about.</param>

@@ -867,6 +867,12 @@ change of architecture entirely.
 - **BECAUSE THOSE ROUNDS WERE UNCOVERED ANYWAY.** Removing the untested winner hands the
   seat to a different wrong rule, and the share is smallest exactly where the failure is
   total.
+- **REPAIR'S CHOICE OF CONDITION IS THE MOST LOAD-BEARING THING MEASURED, AND IT PASSES ITS
+  OWN KILL CONDITION.** Drawing the condition at random holds no sound rule on any world
+  while repairing ten to thirty times more.
+- **SO REPAIR CHOOSES WELL FROM THE WRONG STARTING MATERIAL.** It builds true rules on the
+  skewed world and they pay nothing, because the seeds it is given are about the outcome
+  that was never the problem.
 
 ---
 

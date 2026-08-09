@@ -99,6 +99,15 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
   before a failure asks is hand-specified bias by a side door.
 - **AND ONE HAS ASKED NOW, WHICH IS WHAT STEP SEVEN WAS BUILT FOR.** `Monk` settles its
   own ceiling by enumeration rather than inferring it from a score — fork 50 is the rung.
+- **AND THE ASKING IS A NUMBER RATHER THAN AN ARGUMENT AT LAST.** The share of repairable
+  rounds nothing in the language separates is a third on the counting concept and under two
+  in a hundred on every other world measured.
+- **THE CONDITION WAS DECIDABLE AND COMPUTED EVERY ROUND SINCE THE BRANCH BEGAN**, and read
+  by nothing — `Repair.Discriminator` coming back empty IS the rule the ladder is admitted
+  by. `Tally.Wanting` counts it.
+- **WHICH RUNG IT DEMANDS IS STILL OPEN**, because a share says the language is short and
+  not what would lengthen it. Whether a negated candidate would have separated those rounds
+  is the next reading.
 - **Nine — the wire exists and one of the two learners is now on it.** `Posted` moves
   envelopes, reports, finished thoughts, deaths, questions and settlements over real sockets.
 - **The WALK still learns nowhere but at home, which is what is left of fork 1.** An occasion
@@ -823,7 +832,7 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **47** | Making the vote defer costs four points where it can fire, and reading a trained population back that way changes not one withheld answer. Closed, and the arm is deleted with a revival row |
 | **48** | Can a generated world hold assignments back without the learner being able to tell? Closed — it can, and the draw rejects rather than picks, so a run withholding nothing keeps every number the world ever produced |
 | **49** | Matching and settling are nine tenths of the clock on a narrow world whose table never grows. Where do they go on a WIDE one, and is it the memory or the search that ends the run? Open |
-| **50** | `Monk`'s second puzzle admits no sound conjunction saying YES short of a whole instance. Which rung does that demand — a count, a negation, or a disjunction — and does the failure distinguish them? Open |
+| **50** | `Monk`'s second puzzle admits no sound conjunction short of a whole instance. HALF ANSWERED: the failure asks measurably — a third of its repairable rounds separate on nothing, against under two in a hundred elsewhere. Which rung it demands is open |
 | **51** | Genesis no longer roots on a code that has never varied. What is left is the TALLY: an always-present code is still an entry in every commitment's table forever, and background still roughly doubles it |
 | **52** | The vote's arithmetic composes, its transport is real, and a whole learner now runs over it — placed genesis, local repair, merged counts on the sweep. Open on C2 alone, which TCP cannot show |
 | **54** | Where between identical and disjoint streams naming stops converging. Answered, and there is no between: three quarters shared agrees as badly as nothing shared, and only identical evidence converges. One seed a row, so the ends carry it |

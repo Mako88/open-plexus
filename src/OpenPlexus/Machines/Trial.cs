@@ -199,6 +199,25 @@ public sealed record Tally
     /// <summary>Commitments that have spent their whole repair budget.</summary>
     public required int Exhausted { get; init; }
 
+    /// <summary>Rounds where repair had a commitment it was allowed to fix.</summary>
+    public required long Blamed { get; init; }
+
+    /// <inheritdoc cref="Commitments.Population.Unseparated"/>
+    public required long Unseparated { get; init; }
+
+    /// <summary>
+    /// The share of repairable rounds the current language could not separate.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE LADDER'S TRIGGER, AS A NUMBER RATHER THAN AN ARGUMENT.</b> The plan says a
+    /// rung is admitted when and only when no expression in the current language separates
+    /// the failures from the hits, and that choosing one before a failure asks is
+    /// hand-specified bias by a side door. This is what asking looks like: near nought the
+    /// scope language is finding conditions and a rung would be a guess, near one it is
+    /// being handed failures it cannot describe.
+    /// </remarks>
+    public double Wanting => Blamed == 0 ? 0.0 : Unseparated / (double)Blamed;
+
     /// <summary>How many codes one round produced, on average.</summary>
     /// <remarks>
     /// <b>The cost side of a front end.</b> One allowed to say four times as much has
@@ -384,6 +403,8 @@ public sealed class Trial<TSeen>
             Stacked = holding.Sum(held =>
                 held.Names.Means.Count(one => one.Value.Any(held.Names.Knows))),
             Exhausted = holding.Sum(held => held.Exhausted(_brain.Dials.Budget)),
+            Blamed = holding.Sum(held => held.Blamed),
+            Unseparated = holding.Sum(held => held.Unseparated),
             Codes = codes / (double)rounds,
             Unseen = Examine(holding),
         };

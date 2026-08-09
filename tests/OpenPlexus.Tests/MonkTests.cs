@@ -279,4 +279,84 @@ public sealed class MonkTests(ITestOutputHelper output)
             Assert.True(got.Found > 0, $"{puzzle} matched none of the {got.Truths} minimal rules");
         }
     }
+
+    /// <summary>
+    /// <b>WHETHER THE FAILURES ARE ASKING FOR A RUNG — fork 50, as a number.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE LADDER'S RULE IS DECIDABLE AND WAS BEING READ BY NOTHING.</b> The plan says
+    /// a rung is admitted when and only when no expression in the current language
+    /// separates the failures from the hits, and that choosing one before a failure asks is
+    /// hand-specified bias by a side door — the fault that killed ILP. That condition is
+    /// exactly <c>Repair.Discriminator</c> coming back empty, which has happened every run
+    /// since the branch began and has never been counted. <c>Tally.Wanting</c> is the count.
+    /// </para>
+    /// <para>
+    /// <b>THE PREDICTION, WRITTEN BEFORE THE FIRST READING AND NOT IN AN ASSERTION.</b>
+    /// <see cref="Puzzle.Two"/> is a counting concept: EXACTLY TWO of six attributes hold
+    /// their first value, which a conjunction cannot say at any depth. So its failures
+    /// should be the ones nothing separates, and <see cref="Puzzle.One"/> and
+    /// <see cref="Puzzle.Three"/> — a disjunction of two conjunctions, and the same with
+    /// noise — should be far lower. The multiplexer is the control from another world
+    /// entirely, where the true rules ARE conjunctions and this should be near nought.
+    /// </para>
+    /// <para>
+    /// <b>AND IF THE NUMBER IS FLAT ACROSS ALL FOUR, THE RUNG IS NOT WHAT IS MISSING.</b>
+    /// That is the outcome worth most: it would say `Monk-2`'s ceiling is the floor, the
+    /// budget or the gates refusing to repair rather than the language failing to describe,
+    /// and every argument for rung two so far has been an argument.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public void Whether_the_failures_are_asking_for_a_rung()
+    {
+        output.WriteLine("world | blamed | unseparated | wanting | recent | sound/unsound");
+
+        foreach (var puzzle in new[] { Puzzle.One, Puzzle.Two, Puzzle.Three })
+        {
+            var got = new MonkRun(
+                new MonkSettings { Puzzle = puzzle, Withheld = 132 },
+                new Brain(new CommittingSettings(), seed: 1),
+                seed: 1).Run(20_000);
+
+            Say($"monk-{(int)puzzle}", got.Tally, got.Recent, got.Sound, got.Unsound);
+        }
+
+        foreach (var address in new[] { 2, 3 })
+        {
+            var got = new MultiplexerRun(
+                new MultiplexerSettings { Address = address },
+                new Brain(new CommittingSettings(), seed: 1),
+                seed: 1).Run(20_000);
+
+            Say($"plex-{address + (1 << address)}", got.Tally, got.Recent, got.Sound, got.Unsound);
+        }
+
+        // NO BAR ON THE SHARE, BECAUSE IT HAS NEVER BEEN READ. What is asserted is that the
+        // instrument can move at all: `Wanting` is a ratio over `Blamed`, so a run where
+        // nothing was ever repairable reports nought and reads exactly like a language that
+        // describes everything. That is this repo's oldest trap and it would land here.
+        var armed = new MonkRun(
+            new MonkSettings { Puzzle = Puzzle.Two, Withheld = 132 },
+            new Brain(new CommittingSettings(), seed: 1),
+            seed: 1).Run(20_000);
+
+        Assert.True(armed.Tally.Blamed > 0,
+            "repair was never offered a culprit, so `Wanting` is a ratio over nothing and "
+            + "its nought says the gates refused everything rather than that the language "
+            + "described everything");
+    }
+
+    /// <summary>One row of the ladder-trigger grid.</summary>
+    /// <param name="world">Which world.</param>
+    /// <param name="tally">What the run reported.</param>
+    /// <param name="recent">The last tenth's accuracy.</param>
+    /// <param name="sound">Rules true of the world.</param>
+    /// <param name="unsound">Rules that are not.</param>
+    private void Say(string world, Tally tally, double recent, int sound, int unsound) =>
+        output.WriteLine(
+            $"{world,-9} | {tally.Blamed,6} | {tally.Unseparated,11} | {tally.Wanting,7:F3} "
+            + $"| {recent,6:F3} | {sound}/{unsound}");
 }

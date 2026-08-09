@@ -619,6 +619,41 @@ public sealed class Population
     private bool Varied(Code code) =>
         _liveness.TryGetValue(code, out var seen) && seen.Live < (_moments - seen.First + 1);
 
+    /// <summary>
+    /// Rounds where repair had a commitment it was allowed to fix.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE DENOMINATOR OF THE LADDER'S TRIGGER, AND WITHOUT IT THE NUMERATOR SAYS
+    /// NOTHING.</b> A run that never repairs because the floor and the budget refuse
+    /// everything looks, from the score, exactly like a run whose language cannot express
+    /// what separates its failures — and those are opposite diagnoses. One says the gates
+    /// are too tight and the other says the rung is needed.
+    /// </remarks>
+    public long Blamed { get; private set; }
+
+    /// <summary>
+    /// Of those, rounds where <b>no condition cleared the bar for any culprit.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THIS IS THE SIGNAL THE WHOLE DESIGN EXISTS FOR, AND IT HAS BEEN COMPUTED EVERY
+    /// ROUND AND READ BY NOTHING.</b> The plan says the language extends when, and only
+    /// when, no expression in the current one separates the failures from the hits — and
+    /// that <i>is decidable and already computed</i>, because it is exactly what
+    /// <see cref="Repair.Discriminator"/> returning nothing means. Choosing a rung before
+    /// this number is read is hand-specified bias by a side door, which is the fault that
+    /// killed ILP.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS NOT MERELY <i>REPAIR FOUND NOTHING</i>, WHICH IS A WEAKER EVENT.</b> A
+    /// child that clears the bar and collides with a name already held is the language
+    /// REACHING and the population already holding the answer; counting that here would
+    /// read a success as a ceiling. Only a round where every eligible culprit was offered
+    /// the whole candidate set and none of it separated counts.
+    /// </para>
+    /// </remarks>
+    public long Unseparated { get; private set; }
+
     /// <summary>Repairs the worst commitment that just failed, if any has earned it.</summary>
     /// <param name="firing">What fired.</param>
     /// <param name="arrived">What followed.</param>
@@ -654,21 +689,46 @@ public sealed class Population
             .OrderBy(one => one.Accuracy)
             .ThenBy(one => one.Identity);
 
-        foreach (var culprit in culprits)
+        // COUNTED ON EVERY PATH OUT, INCLUDING THE ONE THAT SUCCEEDS. See `Unseparated`:
+        // the two flags separate "nothing was allowed to be repaired" from "everything
+        // allowed was offered the whole candidate set and none of it separated", and the
+        // second is the only thing that may ever summon a rung.
+        var blamed = false;
+        var separated = false;
+
+        try
         {
-            if (Repair.Discriminator(culprit, _dials, _blind) is not { } added) continue;
+            foreach (var culprit in culprits)
+            {
+                blamed = true;
 
-            var child = new Commitment([.. culprit.Scope, added], culprit.Expects);
+                if (Repair.Discriminator(culprit, _dials, _blind) is not { } added) continue;
 
-            if (!_minted.TryGetValue(culprit.Identity, out var born))
-                _minted[culprit.Identity] = born = [];
+                // THE LANGUAGE REACHED, WHICH IS TRUE EVEN IF THE CHILD IS ALREADY HELD.
+                // A collision is the population having got there first, and reading it as
+                // a ceiling would turn a success into a demand for a rung.
+                separated = true;
 
-            born.Add(child.Identity);
+                var child = new Commitment([.. culprit.Scope, added], culprit.Expects);
 
-            if (Add(child)) return child;
+                if (!_minted.TryGetValue(culprit.Identity, out var born))
+                    _minted[culprit.Identity] = born = [];
+
+                born.Add(child.Identity);
+
+                if (Add(child)) return child;
+            }
+
+            return null;
         }
-
-        return null;
+        finally
+        {
+            if (blamed)
+            {
+                Blamed++;
+                if (!separated) Unseparated++;
+            }
+        }
     }
 
     /// <summary>Whether one holder can see both of these at once.</summary>

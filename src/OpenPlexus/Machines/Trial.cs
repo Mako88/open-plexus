@@ -267,13 +267,14 @@ public sealed class Trial<TSeen>
     /// <param name="window">How many answered predictions that accuracy is over.</param>
     /// <remarks>
     /// <b>The held-out examination is taken at the END and is also callable at any
-    /// point</b> — see <see cref="Examine"/>. A curve over it says something a single
+    /// point</b> — see <see cref="Examine()"/>. A curve over it says something a single
     /// endpoint cannot: whether the gap to the drawn bag OPENS as the population fills,
     /// which is what memorising looks like from outside.
     /// </remarks>
     public Tally Run(long rounds, int sweep = 1000, double target = 0.9, int window = 2000)
     {
-        var running = RunAsync(new Alone(_brain.Held), rounds, sweep, target, window);
+        var running = RunAsync(
+            new Alone(_brain.Held), [_brain.Held], rounds, sweep, target, window);
 
         // A COUNCIL THAT WOULD HAVE MADE THIS WAIT IS REFUSED RATHER THAN WAITED FOR, and
         // that is what keeps sync-over-async to one line that cannot fire. `Alone`
@@ -291,6 +292,9 @@ public sealed class Trial<TSeen>
 
     /// <summary>Runs the world through the translation into whoever holds the commitments.</summary>
     /// <param name="council">One population, or a fleet of them.</param>
+    /// <param name="holding">
+    /// Whose commitments to report on — <b>one machine's, or every machine's.</b>
+    /// </param>
     /// <param name="rounds">How many rounds.</param>
     /// <param name="sweep">How often to subsume, abstract and cull.</param>
     /// <param name="target">The trailing accuracy <see cref="Tally.Reached"/> waits for.</param>
@@ -306,15 +310,24 @@ public sealed class Trial<TSeen>
     /// one that keeps every recorded number comparable.
     /// </para>
     /// <para>
-    /// <b>THE TALLY IS READ OFF THE BRAIN AND NOT OFF THE COUNCIL.</b> Residents, tables
-    /// and names are facts about what a machine holds; on a fleet they are facts about
-    /// several, and adding them up is not the same number. Said out loud because a
-    /// distributed run reporting one machine's residents would look exactly like a
-    /// distributed run reporting the fleet's.
+    /// <b>THE POPULATIONS ARE HANDED IN RATHER THAN READ OFF THE COUNCIL, AND C1 IS
+    /// WHY.</b> An asker cannot report what a fleet holds because it may not know:
+    /// residents, tables and names are facts about machines it is only allowed to ask
+    /// questions of. Whoever composed the fleet holds those references, which is the
+    /// experimenter standing outside the machine — the same position <c>Examine</c> has
+    /// always been read from.
+    /// </para>
+    /// <para>
+    /// <b>AND EVERY POPULATION FIGURE IS AN AGGREGATE, WHICH FOR ONE MACHINE IS ITSELF.</b>
+    /// Residents, tables and exhausted rules add up; occasions is the mean over every
+    /// resident anywhere; names are counted DISTINCT across holders, because two machines
+    /// minting the same name is the mechanism working and counting it twice would read as
+    /// the opposite.
     /// </para>
     /// </remarks>
     public async Task<Tally> RunAsync(
         ICouncil council,
+        IReadOnlyList<Population> holding,
         long rounds,
         int sweep = 1000,
         double target = 0.9,
@@ -322,8 +335,8 @@ public sealed class Trial<TSeen>
         CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(council);
+        ArgumentNullException.ThrowIfNull(holding);
 
-        var held = _brain.Held;
         var cycle = new Cycle(council, rounds, sweep, target, window);
 
         long codes = 0;
@@ -357,15 +370,22 @@ public sealed class Trial<TSeen>
             Repaired = cycle.Repaired,
             Subsumed = cycle.Subsumed,
             Minted = cycle.Minted,
-            Resident = held.Count,
-            Separations = held.All.Sum(one => (long)one.Separations.Count),
+            Resident = holding.Sum(held => held.Count),
+            Separations = holding.Sum(
+                held => held.All.Sum(one => (long)one.Separations.Count)),
             Spent = cycle.Spent,
-            Occasions = held.Count == 0 ? 0.0 : held.All.Average(one => one.Occasions),
-            Named = held.Names.Count,
-            Stacked = held.Names.Means.Count(one => one.Value.Any(held.Names.Knows)),
-            Exhausted = held.Exhausted(_brain.Dials.Budget),
+            Occasions = holding.Sum(held => held.Count) == 0
+                ? 0.0
+                : holding.SelectMany(held => held.All).Average(one => one.Occasions),
+            Named = holding
+                .SelectMany(held => held.Names.Means.Select(one => one.Key))
+                .Distinct()
+                .Count(),
+            Stacked = holding.Sum(held =>
+                held.Names.Means.Count(one => one.Value.Any(held.Names.Knows))),
+            Exhausted = holding.Sum(held => held.Exhausted(_brain.Dials.Budget)),
             Codes = codes / (double)rounds,
-            Unseen = Examine(),
+            Unseen = Examine(holding),
         };
     }
 
@@ -393,7 +413,18 @@ public sealed class Trial<TSeen>
     /// always was.
     /// </para>
     /// </remarks>
-    public Examined? Examine()
+    public Examined? Examine() => Examine([_brain.Held]);
+
+    /// <summary>The same examination, put to however many machines hold the population.</summary>
+    /// <param name="holding">Whose commitments to ask.</param>
+    /// <remarks>
+    /// <b>EACH FOLDS THE MOMENT THROUGH ITS OWN NAMES AND SPEAKS FOR ITSELF, AND THE MERGE
+    /// IS THE SAME ARITHMETIC THE WIRE USES.</b> <c>Population.Predict</c> is
+    /// <c>Decide</c> over one testimony, so a fleet of one reaches the identical vote by
+    /// the identical route — which is what makes a distributed examination comparable with
+    /// every one taken before there was a wire, rather than a second instrument.
+    /// </remarks>
+    private Examined? Examine(IReadOnlyList<Population> holding)
     {
         if (_world is not IWithholds<TSeen> withholding) return null;
 
@@ -406,8 +437,6 @@ public sealed class Trial<TSeen>
         // as a question nobody asked. `WithheldTests` names that trap and this is where it
         // would have arrived from.
         if (withholding.Withheld.Count == 0) return null;
-
-        var held = _brain.Held;
 
         var answered = 0;
         var right = 0;
@@ -423,10 +452,17 @@ public sealed class Trial<TSeen>
 
         foreach (var turn in answerable)
         {
-            var moment = held.Moment(new HashSet<Code>(_sensing.Codify(turn.Seen)));
+            var said_ = _sensing.Codify(turn.Seen);
 
-            var firing = held.Firing(moment);
-            var vote = held.Predict(firing);
+            var heard = holding
+                .Select(held =>
+                {
+                    var moment = held.Moment(new HashSet<Code>(said_));
+                    return held.Speak(held.Firing(moment));
+                })
+                .ToList();
+
+            var vote = Population.Decide(heard, _brain.Dials.Weighing);
 
             if (vote.Expects is not { } said) continue;
 

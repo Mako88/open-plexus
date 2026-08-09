@@ -136,8 +136,34 @@ public sealed class Alone : ICouncil
         Mending = Milliseconds(_mending),
     };
 
+    /// <summary>
+    /// What the last ask's firing has to say, with nothing of the commitments in it.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE HALF OF A VOTE A MACHINE MAY COMPUTE ALONE, AND THE REASON A HOLDER IS A
+    /// THIN THING.</b> <c>Machines.Holder</c> answers a vote with this and a settlement
+    /// with <see cref="Tell"/>, so every phase of a round lives here and exactly here
+    /// whether there is one machine or twenty — which is what stops a fleet growing a
+    /// second copy of the learning loop.
+    /// </remarks>
+    public Testimony Said => _held.Speak(_firing);
+
     /// <inheritdoc/>
-    public ValueTask<Vote> AskAsync(IReadOnlySet<Code> raw, CancellationToken ct = default)
+    public ValueTask<Vote> AskAsync(IReadOnlySet<Code> raw, CancellationToken ct = default) =>
+        ValueTask.FromResult(Ask(raw));
+
+    /// <summary>
+    /// The same ask, and <b>the shape everything here is really in.</b>
+    /// </summary>
+    /// <param name="raw">What the front end said, before any minted name is folded in.</param>
+    /// <remarks>
+    /// <b>SYNCHRONOUS BECAUSE IT IS, RATHER THAN WRAPPED BECAUSE THE INTERFACE IS.</b> A
+    /// council of one never waits for anything, and a holder answering an ask over a wire
+    /// wants the answer on the thread the transport handed it. Writing the task first and
+    /// unwrapping it at every call site would put a sync-over-async at each of them; this
+    /// way there is exactly one place where the two shapes meet, and it is the line above.
+    /// </remarks>
+    public Vote Ask(IReadOnlySet<Code> raw)
     {
         ArgumentNullException.ThrowIfNull(raw);
 
@@ -156,12 +182,32 @@ public sealed class Alone : ICouncil
 
         Mark(ref _firingTicks, at);
 
-        return ValueTask.FromResult(vote);
+        return vote;
     }
 
     /// <inheritdoc/>
     public ValueTask<Learnt> TellAsync(
-        Code? arrived, bool wrong, bool sweeping, CancellationToken ct = default)
+        Code? arrived, bool wrong, bool sweeping, CancellationToken ct = default) =>
+        ValueTask.FromResult(Tell(arrived, wrong, sweeping));
+
+    /// <summary>
+    /// The same round, told what the other holders counted.
+    /// </summary>
+    /// <param name="arrived">What followed, or nothing where the settlement could not say.</param>
+    /// <param name="wrong">Whether the fleet's vote missed.</param>
+    /// <param name="sweeping">Whether this is a sweep round.</param>
+    /// <param name="heard">
+    /// What the OTHER holders counted, or nothing where this machine is alone.
+    /// </param>
+    /// <remarks>
+    /// <b>ONE EXTRA ARGUMENT AND NOT AN EXTRA METHOD BODY, WHICH IS THE WHOLE POINT.</b>
+    /// Abstraction is the only operator here whose statistic is the whole population's, so
+    /// it is the only thing a holder cannot decide by itself — and it is one parameter deep
+    /// rather than a second arrangement of the round. The interface does not carry it
+    /// because a council of one has nobody to hear from.
+    /// </remarks>
+    public Learnt Tell(
+        Code? arrived, bool wrong, bool sweeping, Recurrence? heard = null)
     {
         var at = Stopwatch.GetTimestamp();
 
@@ -182,7 +228,7 @@ public sealed class Alone : ICouncil
         if (sweeping)
         {
             subsumed = _held.Subsume();
-            _held.Abstract();
+            _held.Abstract(heard);
             _held.Cull();
 
             at = Mark(ref _sweeping, at);
@@ -193,12 +239,7 @@ public sealed class Alone : ICouncil
         // something to have arrived; no repair, because blame needs a failure. A monotone
         // counter cannot retract a slur.
         if (arrived is not { } outcome)
-            return ValueTask.FromResult(new Learnt
-            {
-                Minted = 0,
-                Repaired = 0,
-                Subsumed = subsumed,
-            });
+            return new Learnt { Minted = 0, Repaired = 0, Subsumed = subsumed };
 
         long repaired = 0;
 
@@ -213,12 +254,7 @@ public sealed class Alone : ICouncil
         at = Mark(ref _mending, at);
 
         if (!wrong)
-            return ValueTask.FromResult(new Learnt
-            {
-                Minted = 0,
-                Repaired = repaired,
-                Subsumed = subsumed,
-            });
+            return new Learnt { Minted = 0, Repaired = repaired, Subsumed = subsumed };
 
         // COVERING RUNS ONLY ON A FAILURE AND IS NOT MOVED WITH REPAIR. Genesis mints per
         // live code, so running it every round walks the whole `code -> outcome` space --
@@ -235,12 +271,7 @@ public sealed class Alone : ICouncil
 
         Mark(ref _mending, at);
 
-        return ValueTask.FromResult(new Learnt
-        {
-            Minted = minted,
-            Repaired = repaired,
-            Subsumed = subsumed,
-        });
+        return new Learnt { Minted = minted, Repaired = repaired, Subsumed = subsumed };
     }
 
     private static double Milliseconds(long ticks) =>

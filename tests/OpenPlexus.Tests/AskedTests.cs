@@ -97,122 +97,6 @@ public sealed class AskedTests(ITestOutputHelper output)
         return moments;
     }
 
-    /// <summary>
-    /// One asker and several holders, each in its own <see cref="Posted"/> on its own port.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// <b>SEPARATE BUSES AND SEPARATE PORTS IS WHAT MAKES THIS A DISTRIBUTED TEST AT
-    /// ALL.</b> Two holders on one bus would share a dictionary, which is the arrangement
-    /// every measurement in this project has been taken under and the one
-    /// <see cref="Posted"/> exists to stop being the only one.
-    /// </para>
-    /// <para>
-    /// <b>THE ASKER OPENS FIRST AND THE ANNOUNCE-BACK IS WHY THAT IS SAFE.</b> A machine
-    /// announces when it opens and a peer that is not up yet drops it, so whoever opens
-    /// first would otherwise tell nobody where it is — and every answer to it would have
-    /// nowhere to go. <see cref="Posted"/> answers an announcement with one, so the roster
-    /// converges whatever order the fleet came up in.
-    /// </para>
-    /// </remarks>
-    private sealed class Fleet : IAsyncDisposable
-    {
-        private readonly List<IDisposable> _handles = [];
-        private readonly List<Posted> _machines = [];
-        private Posted _asking = null!;
-
-        /// <summary>The machine that puts the questions.</summary>
-        public Asker Asker { get; private set; } = null!;
-
-        /// <summary>What each holder holds, in holder order.</summary>
-        public List<Population> Held { get; } = [];
-
-        /// <summary>The holders themselves, in holder order.</summary>
-        public List<Holder> Holders { get; } = [];
-
-        /// <summary>Brings up an asker and one holder per shard, and waits for the roster.</summary>
-        /// <param name="shards">A population, already placed on holders.</param>
-        /// <param name="dials">The brain's numbers.</param>
-        public static async Task<Fleet> OpenAsync(
-            IReadOnlyList<List<Commitment>> shards, CommittingSettings dials)
-        {
-            var fleet = new Fleet();
-
-            var hosts = Enumerable.Range(0, shards.Count + 1).Select(_ => Wired.Free()).ToList();
-            var peers = hosts.Select(one => new Peer(one)).ToList();
-
-            fleet._asking = new Posted(hosts[0], peers);
-            fleet.Asker = new Asker(new MachineAddress("asker"), fleet._asking);
-            fleet._handles.Add(fleet._asking.Subscribe(fleet.Asker));
-
-            for (var at = 0; at < shards.Count; at++)
-            {
-                var bus = new Posted(hosts[at + 1], peers);
-                var held = new Population(dials, seed: 1);
-
-                foreach (var commitment in shards[at]) held.Add(commitment);
-
-                var holder = new Holder(new MachineAddress($"holder-{at}"), held, bus);
-
-                fleet._handles.Add(bus.Subscribe(holder));
-                fleet._machines.Add(bus);
-                fleet.Held.Add(held);
-                fleet.Holders.Add(holder);
-            }
-
-            await fleet._asking.OpenAsync().ConfigureAwait(false);
-
-            foreach (var bus in fleet._machines) await bus.OpenAsync().ConfigureAwait(false);
-
-            if (!await Wired.UntilAsync(() => fleet._asking.Holding.Count == shards.Count)
-                .ConfigureAwait(false))
-                throw new InvalidOperationException(
-                    $"only {fleet._asking.Holding.Count} of {shards.Count} holders announced");
-
-            // AND ONE ASK THROWN AWAY, WHICH IS THE BARRIER THE ROSTER ALONE CANNOT BE.
-            // Knowing where the holders are says the outbound half converged; nothing
-            // observable says the holders know where to send an answer, and that is the
-            // direction the announce-back exists for. A round trip completing is the only
-            // honest check of it, and doing it here keeps every measurement below from
-            // paying for the first one.
-            using var warming = await fleet.Asker
-                .AskAsync(Wanted.Counts).ConfigureAwait(false);
-
-            if (!await Wired.ArrivedAsync(warming.Everyone).ConfigureAwait(false))
-                throw new InvalidOperationException(
-                    $"{warming.Heard} of {warming.Asked} answers came back, so the return "
-                    + "path never converged");
-
-            return fleet;
-        }
-
-        /// <summary>
-        /// One holder's machine closes its door — <b>C3, and not a polite departure.</b>
-        /// </summary>
-        /// <param name="which">Which holder dies.</param>
-        /// <remarks>
-        /// <b>THE WHOLE MACHINE RATHER THAN THE SUBSCRIPTION, BECAUSE THOSE ARE DIFFERENT
-        /// DEATHS.</b> Dropping a subscription leaves a listener that accepts the ask and
-        /// routes it nowhere; closing the door refuses the connection, which is what a
-        /// phone going into a tunnel does. The second is the one the design claims to
-        /// survive, and it is the harsher of the two.
-        /// </remarks>
-        public async Task KillAsync(int which)
-        {
-            await _machines[which].DisposeAsync().ConfigureAwait(false);
-        }
-
-        /// <inheritdoc/>
-        public async ValueTask DisposeAsync()
-        {
-            foreach (var handle in _handles) handle.Dispose();
-
-            foreach (var bus in _machines) await bus.DisposeAsync().ConfigureAwait(false);
-
-            await _asking.DisposeAsync().ConfigureAwait(false);
-        }
-    }
-
     // ---- what crosses ------------------------------------------------------
 
     /// <summary>
@@ -235,7 +119,7 @@ public sealed class AskedTests(ITestOutputHelper output)
 
         const int Holders = 3;
 
-        await using var fleet = await Fleet.OpenAsync(Fixture.Sharded(all, Holders), dials);
+        await using var fleet = await Ported.OpenAsync(Fixture.Sharded(all, Holders), dials);
 
         // ALONE THEY NAME NOTHING, ASSERTED BEFORE THE EXCHANGE. If a shard could name
         // something by itself this world does not show the problem being fixed, and the
@@ -291,7 +175,7 @@ public sealed class AskedTests(ITestOutputHelper output)
 
         const int Holders = 3;
 
-        await using var fleet = await Fleet.OpenAsync(Fixture.Sharded(all, Holders), dials);
+        await using var fleet = await Ported.OpenAsync(Fixture.Sharded(all, Holders), dials);
 
         var compared = 0;
         var contested = 0;
@@ -360,10 +244,10 @@ public sealed class AskedTests(ITestOutputHelper output)
 
         const int Holders = 4;
 
-        await using var fleet = await Fleet.OpenAsync(Fixture.Sharded(all, Holders), dials);
+        await using var fleet = await Ported.OpenAsync(Fixture.Sharded(all, Holders), dials);
 
         // WHAT EACH HOLDER HAD ANSWERED BEFORE THE DEATH -- one apiece, from the warm-up
-        // ask that `Fleet` throws away.
+        // ask that `Ported` throws away.
         var before = fleet.Holders.Select(one => one.Answered).ToList();
 
         await fleet.KillAsync(0);
@@ -479,7 +363,7 @@ public sealed class AskedTests(ITestOutputHelper output)
             $"every one of {Holders} holders advocates on the scarcest moment drawn, so "
             + "there is no death here that leaves anyone answering");
 
-        await using var fleet = await Fleet.OpenAsync(shards, dials);
+        await using var fleet = await Ported.OpenAsync(shards, dials);
 
         // THE VOTE BEFORE THE DEATHS, so what follows is a change rather than a machine
         // that never worked. An assertion that something went silent is worth nothing
@@ -554,7 +438,7 @@ public sealed class AskedTests(ITestOutputHelper output)
 
         foreach (var holders in new[] { 1, 3, 9 })
         {
-            await using var fleet = await Fleet.OpenAsync(Fixture.Sharded(all, holders), dials);
+            await using var fleet = await Ported.OpenAsync(Fixture.Sharded(all, holders), dials);
 
             var clock = Stopwatch.StartNew();
             var asks = 0;

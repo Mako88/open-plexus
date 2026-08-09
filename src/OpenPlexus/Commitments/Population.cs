@@ -187,6 +187,35 @@ public sealed class Population
     /// </remarks>
     public Func<Commitment, ulong>? Placing { get; set; }
 
+    /// <summary>
+    /// Whether a commitment genesis proposes belongs on this machine, or nothing where it
+    /// is the only machine.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>GENESIS IS THE ONE OPERATOR THAT WOULD RUN N TIMES ON A FLEET AND MINT ONE
+    /// THING.</b> Every holder sees every observation, so every holder is surprised by the
+    /// same failure and proposes the same one-code rules — a fleet of twelve holding twelve
+    /// copies of one population, which is not a shard and is not a distribution. Placement
+    /// is what makes the copies disjoint, and it is a fact about the commitment rather than
+    /// about the moment, so every machine reaches the same answer without being told.
+    /// </para>
+    /// <para>
+    /// <b>AND IT GATES GENESIS ALONE, WHICH DECIDES WHERE A REPAIR'S CHILD LIVES.</b> A
+    /// child hashes wherever it hashes, and refusing it here would delete it outright —
+    /// nothing else mints it, because repair is the only thing that proposes a scope longer
+    /// than one code. So a child stays with its parent, which is also what makes
+    /// <see cref="Mending.Uncovered"/> answerable locally: the one commitment that could
+    /// cover a child is on the same machine as the child. Fork 3 is whether that locality
+    /// is worth what a uniform ring gives up.
+    /// </para>
+    /// <para>
+    /// <b>NULL IS EVERY MEASUREMENT EVER TAKEN</b>, so a one-process run does not pay a
+    /// predicate for a distribution it does not have.
+    /// </para>
+    /// </remarks>
+    public Func<Commitment, bool>? Places { get; set; }
+
     /// <param name="dials">Every number the machinery is allowed to have.</param>
     /// <param name="seed">The control arm's generator, used only when it is running.</param>
     public Population(CommittingSettings dials, int seed)
@@ -529,7 +558,14 @@ public sealed class Population
             // been absent* has one answer and needs nothing.
             if (!Varied(code)) continue;
 
-            if (Add(new Commitment([code], arrived))) minted++;
+            var proposed = new Commitment([code], arrived);
+
+            // AND THE THIRD GATE ASKS WHOSE IT IS, which is nothing at all on one machine.
+            // See `Places`: every holder is surprised by the same failure and proposes the
+            // same rules, so without this a fleet holds N copies of one population.
+            if (Places is not null && !Places(proposed)) continue;
+
+            if (Add(proposed)) minted++;
         }
 
         return minted;

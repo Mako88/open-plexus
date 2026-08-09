@@ -99,6 +99,40 @@ public sealed class Posted : IBus, IAsyncDisposable
 
     private readonly string _me;
 
+    private long _dropped;
+    private long _refused;
+
+    /// <summary>
+    /// Messages this machine could not hand over, and gave up on.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A BUS THAT DROPS SILENTLY NEEDS A COUNT, OR THE LOSS IS A FACT NOTHING CAN
+    /// SEE.</b> Every failed post here is swallowed on purpose — a machine that is not
+    /// there is C3 rather than an error — and that reasoning is right for a DEATH and
+    /// wrong for a hiccup. The two are the same event to <see cref="PostAsync"/> and they
+    /// are completely different to whoever was waiting, because a fleet gathers from a
+    /// denominator: one lost answer and the gathering never completes, forever, on a
+    /// machine that is alive and idle.
+    /// </para>
+    /// <para>
+    /// <b>AND THIS REPO'S OWN TRAP LIST IS ABOUT EXACTLY THIS SHAPE.</b> A cost can be in
+    /// memory while every instrument watches time; here a loss was on the wire while every
+    /// instrument watched arrivals. What could be seen was how many answers came back, and
+    /// what could not was whether an ask ever left.
+    /// </para>
+    /// </remarks>
+    public long Dropped => Interlocked.Read(ref _dropped);
+
+    /// <summary>Messages this machine took delivery of and then could not act on.</summary>
+    /// <remarks>
+    /// <b>THE OTHER END OF THE SAME SILENCE, AND IT IS A DIFFERENT FAULT.</b> A drop is
+    /// the sender failing to hand it over; this is the receiver accepting the bytes and
+    /// throwing while reading or dispatching them. From the waiting asker they are one
+    /// event — no answer — and only one of them is about the network.
+    /// </remarks>
+    public long Refused => Interlocked.Read(ref _refused);
+
     /// <param name="me">This machine's own base address, which peers will post back to.</param>
     /// <param name="peers">Every other machine's base address.</param>
     /// <exception cref="ArgumentException">The address is not one a listener can hold.</exception>
@@ -552,6 +586,11 @@ public sealed class Posted : IBus, IAsyncDisposable
             // ERROR. C2 makes a lost message indistinguishable from a late one, and the
             // sender is not waiting on this answer anyway -- so failing loudly here would
             // only produce noise nobody reads.
+            //
+            // AND COUNTED, FOR THE REASON `Refused` GIVES: nobody reads noise, and nobody
+            // could read a nought either.
+            Interlocked.Increment(ref _refused);
+
             asked.Response.StatusCode = (int)HttpStatusCode.Accepted;
         }
         finally
@@ -654,6 +693,10 @@ public sealed class Posted : IBus, IAsyncDisposable
             // C3: A MACHINE THAT IS NOT THERE IS NORMAL AND NOT AN ERROR. The design says
             // a cluster vanishing mid-thought is expected, so a refused connection is the
             // same event arriving by a faster road than a timeout.
+            //
+            // AND IT IS COUNTED NOW, BECAUSE THE SENTENCE ABOVE IS TRUE OF A DEATH AND
+            // FALSE OF A HICCUP. See `Dropped`.
+            Interlocked.Increment(ref _dropped);
         }
     }
 
@@ -715,10 +758,28 @@ public sealed class Posted : IBus, IAsyncDisposable
 
         await _closing.CancelAsync().ConfigureAwait(false);
 
-        _door.Close();
+        // ABORTED RATHER THAN CLOSED, AND THE DIFFERENCE WAS MINUTES A MACHINE.
+        //
+        // `Close` is the polite shutdown: it waits for the request queue to drain, and
+        // every peer holds a keep-alive connection to this listener that nothing on this
+        // side can shut. A fleet coming down therefore paid a wait per machine that grew
+        // with how many peers were pointed at it -- a run of six hundred rounds took under
+        // a second and the teardown around it took minutes, which is what made a grid of
+        // twelve fleets look exactly like a deadlock.
+        //
+        // AND ABORT IS THE HONEST SEMANTICS HERE ANYWAY, WHICH IS WHY THIS IS NOT A
+        // WORKAROUND. C3 says a machine vanishing mid-thought is normal; a phone going into
+        // a tunnel does not drain its request queue first. What this discards is exactly
+        // what a death discards.
+        _door.Abort();
         _closing.Dispose();
 
-        foreach (var client in _clients.Values) (client as IDisposable)?.Dispose();
+        // AND THE CLIENTS ARE NOT DISPOSED, BECAUSE THEY CANNOT BE. `ISimpleClient` has no
+        // `Dispose`, so the line that used to sit here -- `(client as IDisposable)?.Dispose()`
+        // -- read as cleanup and did nothing at all, which is this repo's oldest shape of
+        // defect wearing a tidy face. One client per host is what keeps a fan-out from
+        // paying a handshake per peer; what it costs is that a machine's connection pool
+        // outlives the machine, and only a process ending collects it.
     }
 
     private bool _shut;

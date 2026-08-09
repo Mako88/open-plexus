@@ -28,6 +28,53 @@ public enum Wanted
 
     /// <summary>How often each code and each pair recurs across this holder's scopes.</summary>
     Counts,
+
+    /// <summary>
+    /// What the settlement said, so this holder can learn from it — <b>the only ask that
+    /// is a telling.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>IT IS HERE RATHER THAN IN A MESSAGE OF ITS OWN BECAUSE THE ACCOUNTING IS THE
+    /// SAME ACCOUNTING.</b> A settlement goes to every holder at once and each says what
+    /// it did with it, which is scatter and gather — and a second payload pair would be a
+    /// second place for <i>how many did I tell</i> to be tracked. The plan's own trap list
+    /// is about a mechanism that is local or population-wide by accident.
+    /// </para>
+    /// <para>
+    /// <b>AND IT CARRIES THE MOMENT AGAIN RATHER THAN NAMING THE VOTE IT SETTLES.</b> A
+    /// holder that had to remember what it fired on would be holding state keyed by an ask
+    /// that C2 permits never to be followed up, and a settlement arriving for a forgotten
+    /// vote would be a round that silently taught nobody. Re-matching costs the match
+    /// again — which is nine tenths of this machine's clock, said out loud as the price.
+    /// </para>
+    /// </remarks>
+    Settle,
+}
+
+/// <summary>One holder's counts, as told to the others.</summary>
+/// <remarks>
+/// <para>
+/// <b>EVERY HOLDER'S TABLE GOES TO EVERY HOLDER, AND EACH DROPS ITS OWN ROW.</b>
+/// <see cref="Commitments.Population.Abstract"/> takes what OTHERS counted and adds it to
+/// what it counts here, so a table that already included this machine would weigh its own
+/// scopes twice — silently, plausibly, and in the direction that makes a redundancy look
+/// better certified than it is.
+/// </para>
+/// <para>
+/// <b>SO THE EXCLUSION HAPPENS AT THE READER RATHER THAN THE WRITER.</b> One broadcast
+/// carrying N tables is one message; N broadcasts each carrying the merge of the other N-1
+/// is N messages that differ, which is a scatter that has stopped being a broadcast. What
+/// it costs is that every holder receives its own counts back and throws them away.
+/// </para>
+/// </remarks>
+public readonly record struct Tabled
+{
+    /// <summary>Which holder counted this.</summary>
+    public required MachineAddress From { get; init; }
+
+    /// <summary>What recurs across its scopes.</summary>
+    public required Counts Counted { get; init; }
 }
 
 /// <summary>
@@ -85,6 +132,36 @@ public sealed record Ask
     /// <see cref="Population.Moment"/>.
     /// </remarks>
     public ImmutableArray<Code> Moment { get; init; } = [];
+
+    /// <summary>
+    /// What followed the moment, for a <see cref="Wanted.Settle"/> — <b>nothing where the
+    /// settlement could not say, which is the third verdict.</b>
+    /// </summary>
+    public Code? Arrived { get; init; }
+
+    /// <summary>
+    /// Whether the vote missed, for a <see cref="Wanted.Settle"/>.
+    /// </summary>
+    /// <remarks>
+    /// <b>THE FLEET'S VERDICT AND NEVER A HOLDER'S, WHICH IS WHY IT TRAVELS.</b> Genesis is
+    /// gated on the population having no account of what happened, and a shard that had
+    /// nothing to say about a moment the fleet answered correctly has not witnessed a
+    /// failure. Letting each holder decide for itself would mint on every machine that
+    /// happened to be quiet, which is ungated genesis arriving through the distribution.
+    /// </remarks>
+    public bool Wrong { get; init; }
+
+    /// <summary>Whether this is a sweep round, for a <see cref="Wanted.Settle"/>.</summary>
+    /// <remarks>
+    /// <b>THE CALENDAR IS THE LOOP'S AND THE SWEEP IS THE HOLDER'S.</b> A fleet whose
+    /// members counted their own rounds would sweep at different moments, and rung five's
+    /// evidence is the whole population at one instant.
+    /// </remarks>
+    public bool Sweeping { get; init; }
+
+    /// <inheritdoc cref="Tabled"/>
+    /// <remarks><b>Empty except on a sweep round.</b></remarks>
+    public ImmutableArray<Tabled> Counted { get; init; } = [];
 }
 
 /// <summary>
@@ -125,4 +202,14 @@ public sealed record Answer
 
     /// <summary>What recurs across its scopes, for <see cref="Wanted.Counts"/>.</summary>
     public Counts? Counted { get; init; }
+
+    /// <summary>What it added, for a <see cref="Wanted.Settle"/>.</summary>
+    /// <remarks>
+    /// <b>THREE COUNTS AND NOT A COMMITMENT, WHICH IS THE SAME RULE AS EVERYTHING ELSE
+    /// HERE.</b> A reader learns how many rules a machine minted and never what any of them
+    /// is. Without it a fleet's <c>Minted</c>, <c>Repaired</c> and <c>Subsumed</c> would all
+    /// read nought while the machines behind it were learning — the shape of failure where
+    /// a mechanism works and nothing can see that it did.
+    /// </remarks>
+    public Commitments.Learnt? Did { get; init; }
 }

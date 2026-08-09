@@ -229,18 +229,18 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         ["Felt"] = "used by `Sensing`, which shares its file — the own-file rule "
             + "cannot see a caller sitting beside it.",
 
-        // AND THE NEXT UNWIRED MECHANISM ARRIVED ALONE, WHICH IS WHAT THIS FILE SAID
-        // IT WOULD BUY. Two entries, one reason, and the reason is a fork number
-        // rather than a shrug -- so what is missing is countable and says where it
-        // goes.
+        // AND BOTH ENTRIES CHANGED THEIR REASON RATHER THAN THEIR STATUS, WHICH IS THE
+        // MORE INTERESTING OUTCOME. `Asker` came off this list because `Fleet` names it,
+        // and the two that remain are not unmounted any more -- they are the deployment,
+        // and a library that named its own deployment would be deciding it.
         //
         // `Holder` READ AS WIRED FOR EXACTLY AS LONG AS A TUPLE FIELD WAS SPELT LIKE
         // IT. `HybridBus.AskAsync` named its second element `Holder`, and a scan for
         // whether the library NAMES a type answers yes to that for free. Renaming the
-        // field is what put both of these on this list, and it is the sharper half of
-        // the finding: a budget can be satisfied by a coincidence.
-        ["Asker"] = Unmounted,
-        ["Holder"] = Unmounted,
+        // field is what put it on this list, and it is the sharper half of the finding: a
+        // budget can be satisfied by a coincidence.
+        ["Holder"] = Composed,
+        ["Fleet"] = Composed,
 
         ["Probe"] = "A CONTROL ARM, SO THE LIBRARY NAMING IT WOULD BE THE FAULT. It "
             + "is the dullest learner there is, run over the same features the "
@@ -261,23 +261,22 @@ public sealed class DeadCodeTests(ITestOutputHelper output)
         + "caller and the library naming it would be the surprise.";
 
     /// <summary>
-    /// Why the two ends of fork 52's exchange are built and not yet called by anything.
+    /// Why a role in a deployment is not named by the library it is deployed from.
     /// </summary>
     /// <remarks>
-    /// <b>THIS IS THE SHAPE THE BUDGET EXISTS TO KEEP HONEST RATHER THAN A LOOPHOLE, AND
-    /// THE DIFFERENCE IS WHETHER IT IS COUNTED.</b> The entry says which fork closes it,
-    /// so the next session can find the gap by reading a list instead of by noticing.
+    /// <b>THE SAME REASON `Posted` CARRIES, ONE LAYER UP, AND IT REPLACED A BETTER-KNOWN
+    /// ONE.</b> These two used to say <i>fork 52's transport is built and the learner is
+    /// not on it</i>, which was the honest state and is exactly what this list is for.
+    /// The learner is on it now, and what is left is not a gap: a library that constructed
+    /// its own holders would be a library that had decided how many machines there are.
     /// </remarks>
-    private const string Unmounted =
-        "FORK 52'S TRANSPORT IS BUILT AND THE LEARNER IS NOT ON IT, which is the "
-        + "honest state and is exactly what this list is for. `AskedTests` puts counts "
-        + "and testimony across real sockets between machines that share no object, and "
-        + "`Cycle` still calls `Abstract()` with no argument and `Predict` on its own "
-        + "population. Mounting it is not a wiring change: `Cycle.Step` is synchronous "
-        + "and a gathering arrives when it arrives, so the harness goes async with it -- "
-        + "the rewrite the plan budgets for, and fork 53's question about a loop with no "
-        + "clock. Until then a run is exactly what it was, which is the only way the "
-        + "numbers stay comparable.";
+    private const string Composed =
+        "A DEPLOYMENT IS CHOSEN BY WHOEVER COMPOSES THE SYSTEM, so the library naming one "
+        + "would be the library deciding how it is run -- the same fault as a world naming "
+        + "a brain type, one layer out. `ICouncil` is what `src` knows about, and whether "
+        + "the council behind it is one population or twelve machines on twelve ports is a "
+        + "container's decision. `Posted` sits the same way, and `FleetTests` is what runs "
+        + "a whole learner over these.";
 
     /// <summary>
     /// What using a member actually looks like, as against merely spelling it.

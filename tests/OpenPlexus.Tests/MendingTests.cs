@@ -182,4 +182,78 @@ public sealed class MendingTests(ITestOutputHelper output)
         // FOUR SEEDS RESOLVES A DIRECTION AND NOT A SEPARATION, so nothing here may be
         // reported as a cost -- only as which rows landed together.
     }
+
+    /// <summary>
+    /// <b>THE TWO CELLS NOTHING HAS EVER RUN — the whole grid, at last.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>UNREACHABLE RATHER THAN REFUSED, WHICH IS THE DIFFERENCE THAT MAKES THIS WORTH
+    /// DOING.</b> One enum decided both axes and no value of it landed on <i>ungated,
+    /// every round</i> or <i>improving, after a failure</i> — so those two are not arms
+    /// somebody tried and dropped, they are corners of a two-by-two that could not be
+    /// spelled. <see cref="Fixture.Reachable"/> holds them apart from
+    /// <see cref="Fixture.Repairs"/> so the four rows every commit is labelled by are the
+    /// same four rows.
+    /// </para>
+    /// <para>
+    /// <b>THE PREDICTION, WRITTEN BEFORE THE FIRST READING AND NOT IN AN ASSERTION.</b>
+    /// The timing is the load-bearing axis — every-round repair leads on both worlds
+    /// measured — and the gate's sign flips with it: every round <c>Uncovered</c> beat
+    /// <c>Earned</c>, and after a failure the gate is six and a half standard errors
+    /// BEHIND no gate at all. If the timing is what carries and the gate is a second-order
+    /// correction, <i>every round, no gate</i> should sit at or above the best row here
+    /// and nothing has ever looked at it.
+    /// </para>
+    /// <para>
+    /// <b>AND THE OTHER NEW CELL IS THE ONE THAT SHOULD BE WORST, WHICH IS WHAT MAKES IT
+    /// A CONTROL RATHER THAN A SIXTH GUESS.</b> <i>Improving, after a failure</i> stacks
+    /// the two brakes that were each measured as costly on their own — waiting for the
+    /// vote to be wrong, and then also asking whether forking has ever paid. A grid where
+    /// it is not last would say the two brakes are not additive, which is a fact about
+    /// them nothing has established either.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    [Trait(Sweeps.Kind, Sweeps.Name)]
+    public async Task The_two_cells_the_split_made_reachable()
+    {
+        var all = Fixture.Repairs.Concat(Fixture.Reachable).ToArray();
+
+        foreach (var (name, metric) in new (string, Func<Learned, double>)[]
+        {
+            ("recent accuracy", one => one.Recent),
+            ("sound commitments", one => one.Sound),
+            ("unsound commitments", one => one.Unsound),
+            ("resident commitments", one => one.Resident),
+            ("children minted by repair", one => one.Repaired),
+        })
+        {
+            output.WriteLine(name);
+
+            output.WriteLine(Sweep.Table(await Sweep.AcrossAsync(Seeds,
+                [.. all.Select<(string Arm, Mending Gate, Repairing When),
+                    (string, Func<int, Task<double>>)>(
+                    one => (one.Arm, seed => Task.FromResult(
+                        metric(Run(one.Gate, one.When, seed)))))])));
+        }
+
+        // THE ONE ASSERTION IS THAT THE NEW CELLS ARE REACHABLE AT ALL, which is not
+        // trivial and is exactly the shape of failure this repo keeps finding: a
+        // combination that compiles, runs, and quietly behaves as one of the cells beside
+        // it would print six rows and mean four. If ungated-every-round mints the same
+        // number of children as gated-every-round, the gate is not being read.
+        var repaired = await Sweep.AcrossAsync(Seeds,
+            [.. all.Select<(string Arm, Mending Gate, Repairing When),
+                (string, Func<int, Task<double>>)>(
+                one => (one.Arm, seed => Task.FromResult(
+                    (double)Run(one.Gate, one.When, seed).Repaired)))]);
+
+        Assert.NotEqual(repaired[2].Mean, repaired[4].Mean);
+        Assert.NotEqual(repaired[1].Mean, repaired[5].Mean);
+
+        // NO BAR ON ANY SCORE, because the prediction above is a prediction. A threshold
+        // written before the first reading fails identically whether the wiring is broken
+        // or the guess is backwards.
+    }
 }

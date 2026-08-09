@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using OpenPlexus.Bus;
 using OpenPlexus.Codes;
 using OpenPlexus.Commitments;
@@ -148,6 +149,50 @@ public sealed class Gathering : IDisposable
         return Population.Decide(said, weighing);
     }
 
+    /// <summary>What every answering holder added, added up.</summary>
+    /// <remarks>
+    /// <b>THREE COUNTS AND NOT A POPULATION, WHICH IS WHAT C1 LEAVES A FLEET ABLE TO
+    /// REPORT.</b> How many rules a machine minted is a number; which rules they are is the
+    /// thing that may never leave. So a distributed run can say how hard it searched and
+    /// cannot say what it holds, and the second of those is a fact an experimenter outside
+    /// the machine assembles rather than one the machine reports about itself.
+    /// </remarks>
+    public Learnt Added()
+    {
+        long minted = 0, repaired = 0, subsumed = 0;
+
+        lock (_gate)
+            foreach (var answer in _heard.Values)
+            {
+                if (answer.Did is not { } did) continue;
+
+                minted += did.Minted;
+                repaired += did.Repaired;
+                subsumed += did.Subsumed;
+            }
+
+        return new Learnt { Minted = minted, Repaired = repaired, Subsumed = subsumed };
+    }
+
+    /// <summary>Every answering holder's table, with the holder it came from.</summary>
+    /// <remarks>
+    /// <b>KEPT APART RATHER THAN MERGED, BECAUSE THE MERGE EACH HOLDER NEEDS EXCLUDES
+    /// ITSELF.</b> <see cref="Merged"/> is the asker's own view and is what a name is
+    /// certified against; this is what goes back out, so that every holder can add up the
+    /// others and leave its own row alone — see <see cref="Tabled"/>.
+    /// </remarks>
+    public ImmutableArray<Tabled> Tables()
+    {
+        lock (_gate)
+            return
+            [
+                .. _heard.Values
+                    .Where(one => one.Counted is not null)
+                    .OrderBy(one => one.From.Value, StringComparer.Ordinal)
+                    .Select(one => new Tabled { From = one.From, Counted = one.Counted! }),
+            ];
+    }
+
     /// <summary>Every answering holder's counts, added up.</summary>
     /// <remarks>
     /// <b>INTEGER ADDITION, SO NO ORDERING CAVEAT APPLIES AND THE ORDER IS FIXED
@@ -225,17 +270,60 @@ public sealed class Asker : IReceiveAnswers
     /// is the same measured race <c>BroadcastAsync</c> opens its <c>ready</c> window for,
     /// and it lost reports the first time nobody accounted for it.
     /// </remarks>
-    public async Task<Gathering> AskAsync(
-        Wanted wants, IReadOnlySet<Code>? moment = null, CancellationToken ct = default)
-    {
-        var ask = new Ask
+    public Task<Gathering> AskAsync(
+        Wanted wants, IReadOnlySet<Code>? moment = null, CancellationToken ct = default) =>
+        ScatterAsync(new Ask
         {
             Broadcast = BroadcastId.New(),
             ReturnTo = Address,
             Wants = wants,
             Moment = moment is null ? [] : [.. moment.Order()],
-        };
+        }, ct);
 
+    /// <summary>
+    /// Tells every holder what the settlement said, and returns where what they did with
+    /// it lands.
+    /// </summary>
+    /// <param name="moment">What was live, carried again so nobody has to remember it.</param>
+    /// <param name="arrived">What followed, or nothing where the settlement could not say.</param>
+    /// <param name="wrong">Whether the fleet's vote missed.</param>
+    /// <param name="sweeping">Whether this is a sweep round.</param>
+    /// <param name="counted">Every holder's table, for a sweep. Empty otherwise.</param>
+    /// <param name="ct">Cancellation.</param>
+    /// <remarks>
+    /// <b>THE SAME SCATTER AS A QUESTION, WHICH IS WHY IT IS AN <see cref="Ask"/>.</b> A
+    /// settlement goes to every holder at once and each says what it added, so the
+    /// accounting — how many did I tell, how many answered — is one mechanism rather than
+    /// two. What makes it a telling rather than a question is only which fields are filled.
+    /// </remarks>
+    public Task<Gathering> TellAsync(
+        IReadOnlySet<Code> moment,
+        Code? arrived,
+        bool wrong,
+        bool sweeping,
+        ImmutableArray<Tabled> counted,
+        CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(moment);
+
+        return ScatterAsync(new Ask
+        {
+            Broadcast = BroadcastId.New(),
+            ReturnTo = Address,
+            Wants = Wanted.Settle,
+            Moment = [.. moment.Order()],
+            Arrived = arrived,
+            Wrong = wrong,
+            Sweeping = sweeping,
+            Counted = counted.IsDefault ? [] : counted,
+        }, ct);
+    }
+
+    /// <summary>Puts one ask to every holder and opens the gathering its answers land in.</summary>
+    /// <param name="ask">The question, or the telling.</param>
+    /// <param name="ct">Cancellation.</param>
+    private async Task<Gathering> ScatterAsync(Ask ask, CancellationToken ct)
+    {
         Gathering? gathering = null;
 
         await _bus.AskAsync(ask, ct, asked =>

@@ -253,6 +253,30 @@ public static class Fixture
         ];
 
     /// <summary>
+    /// The two cells the split made reachable, <b>which have never been run.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A SEPARATE ROW RATHER THAN TWO MORE ENTRIES ABOVE, AND THE REASON IS THAT THEY
+    /// ARE NOT THE SAME KIND OF THING.</b> <see cref="Repairs"/> is a historical record —
+    /// four arrangements that shipped, that every commit's numbers are labelled by, and
+    /// that four files sweep. These two were never REFUSED; they were unreachable, because
+    /// one enum decided both axes and no value of it landed here.
+    /// </para>
+    /// <para>
+    /// <b>SO A GRID THAT WANTS ALL SIX CONCATENATES, AND ONE THAT WANTS THE OLD FOUR IS
+    /// UNTOUCHED.</b> Adding these above would silently widen every existing sweep, and the
+    /// four rows those sweeps print would stop being the four rows their commits recorded.
+    /// </para>
+    /// </remarks>
+    public static readonly (string Arm, Commitments.Mending Gate, Commitments.Repairing When)[]
+        Reachable =
+        [
+            ("every round, no gate", Commitments.Mending.Ungated, Commitments.Repairing.EveryRound),
+            ("after failure, gate, paid", Commitments.Mending.Improving, Commitments.Repairing.AfterFailure),
+        ];
+
+    /// <summary>
     /// Places every commitment on a holder, the way the ring would.
     /// </summary>
     /// <param name="all">The whole population.</param>

@@ -122,6 +122,12 @@ Carried unchanged from `csharp`. They are about the machine, not the architectur
 - **A FLEET RUN REPRODUCES ITSELF EXACTLY, so fork 12 holds across sockets.** Every merge is
   ordered before it is combined and every placement is a fact about a commitment rather than
   about who asked or who answered first.
+- **THE CURVE SURVIVES DISTRIBUTION AND THE POPULATION DOES NOT.** A fleet scores what one
+  process scores and holds twice the rules to do it, because a holder's repair gate can only
+  refuse what a commitment ON THAT MACHINE covers.
+- **AND SIX HOLDERS COST NO MORE THAN THREE**, so what distribution costs is paid at the
+  first split rather than per machine. That is the number that says whether twenty phones
+  are worse than two.
 - **Distance costs the DEPTH of a thought, measured.** A round costs about four and a half
   times the per-hop delay, so a LAN is comfortable and the internet is a slower experiment.
 - **AND A ROUND OF ASKS IS UNDER A MILLISECOND ON LOOPBACK**, nine holders costing two and a

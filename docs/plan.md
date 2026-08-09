@@ -639,9 +639,9 @@ change of architecture entirely.
 - **`Abstain` FIRES AT LAST, AND WHAT ARMED IT WAS A SIGNATURE AND NOT A FLEET.** The loop
   took a non-nullable outcome, so no number of machines and no number of deaths could ever
   have produced one.
-- **AND IT HAS ONLY EVER FIRED FROM A WORLD GOING QUIET, NEVER FROM A DEATH.** A death does
-  silence the vote, measured — but the outcome still arrives locally, so the distributed
-  half waits on the learner being mounted.
+- **AND IT HAS ONLY EVER FIRED FROM A QUIET WORLD, NEVER FROM A DEATH.** A death silences
+  the vote, measured — but a run losing a holder waits on its gathering forever, so this is
+  behind fork 53 rather than behind the mount.
 - **A QUIET WORLD COSTS AN OBSERVATION AND NOT A RULE**, which is the primitive's claim
   measured rather than argued. What it does to a world that is quiet MOST of the time is
   unmeasured.

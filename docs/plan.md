@@ -885,9 +885,15 @@ change of architecture entirely.
 - **AND BREAKING THE COUPLING SURVIVED THE WORLD IT WAS PREDICTED TO RUIN.** `EveryRound`
   leads on `Arranged` at two standard errors over eight seeds, and is inside one on both
   even multiplexers. The kill condition was written down first and did not fire.
-- **SO `Repairing.EveryRound` IS A DEFAULT CANDIDATE AND `AfterFailure` IS NOT.** Sixteen
-  standard errors of hard-round coverage at eleven bits skewed, four of accuracy, and no
-  world measured is worse on score.
+- **SO `Repairing.EveryRound` SHIPS AND `AfterFailure` IS THE CONTROL.** Sixteen standard
+  errors of hard-round coverage at eleven bits skewed, four of accuracy, and no world
+  measured is worse on score.
+- **AND IT COSTS ABOUT A QUARTER OF THE NAMES**, which no grid here would have shown
+  because every reading was about rules. Rung five still fires on every seed at eleven
+  bits, and names nothing at six under either timing.
+- **A SOCKET TEST INHERITED A REPAIR DIAL AND WENT RED WITH NOTHING WRONG ON THE WIRE.**
+  Its precondition needs a population with something left to name, which every search dial
+  moves. Pinned where the fixture is built.
 - **ITS ONE COST IS WHAT IT HOLDS ON AN EVEN ELEVEN-BIT WORLD**: seventeen fewer sound
   rules and a third fewer repairs at nearly five standard errors, while the score does not
   move.

@@ -369,14 +369,34 @@ public enum Mending
 /// </remarks>
 public enum Repairing
 {
-    /// <summary>Every round, whatever the vote said.</summary>
+    /// <summary>Every round, whatever the vote said. What ships.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE DEFAULT BECAUSE IT WON EVERYWHERE IT WAS ASKED, WHICH TOOK A LEDGER TO
+    /// SEE.</b> Sixteen standard errors of hard-round coverage at eleven bits skewed, six
+    /// of true rules found, two on <see cref="Worlds.Arranged"/> — the world fork 58
+    /// predicted it would die on — and inside one standard error on both even multiplexers.
+    /// <c>RepairingTests</c> holds the grid and <c>LineageTests</c> holds the mechanism.
+    /// </para>
+    /// <para>
+    /// <b>AND IT IS THE ONLY THING HERE THAT SEPARATES THE READOUT FROM THE SEARCH.</b>
+    /// Under <see cref="AfterFailure"/> the vote decides what repair may run on, so a
+    /// weighing rule and a search rule are one change — measured, not argued:
+    /// <see cref="Weighing.Summing"/> and <see cref="Weighing.Lifting"/> build populations
+    /// identical to three decimals under this timing and quite different ones under the
+    /// other. Every vote arm in this repo's history moved two things at once.
+    /// </para>
+    /// </remarks>
     EveryRound,
 
-    /// <summary>Only on a round the population got wrong. What ships.</summary>
+    /// <summary>Only on a round the population got wrong.</summary>
     /// <remarks>
-    /// <b>THE DEFAULT BECAUSE IT IS WHAT EVERY EXISTING NUMBER WAS TAKEN UNDER</b>, and
-    /// not because it won. Changing a shipped default and separating an axis in one edit
-    /// would move every measurement in the repo while calling itself a refactor.
+    /// <b>WHAT SHIPPED UNTIL THE LEDGER, AND IT STARVES A LINEAGE OF BLAME.</b> Under skew
+    /// nearly every round the vote gets wrong is a round the rare outcome arrived on, and a
+    /// commitment that expected what arrived cannot be a culprit — so the rules that would
+    /// carry the hard rounds are never offered to repair at all, four hundred to one against
+    /// the common ones at six bits. It is kept as the control that shows this, and because
+    /// the blame it withholds is a dose response rather than a switch.
     /// </remarks>
     AfterFailure,
 }
@@ -601,7 +621,7 @@ public sealed record CommittingSettings
     public Mending Mending { get; init; } = Mending.Ungated;
 
     /// <inheritdoc cref="Commitments.Repairing"/>
-    public Repairing Repairing { get; init; } = Repairing.AfterFailure;
+    public Repairing Repairing { get; init; } = Repairing.EveryRound;
 
     /// <inheritdoc cref="Commitments.Budgeting"/>
     public Budgeting Budgeting { get; init; } = Budgeting.Attempts;

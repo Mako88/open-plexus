@@ -279,6 +279,73 @@ public sealed class RepairingTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// <b>WHETHER THE NEW TIMING STARVES RUNG FIVE, WHICH A PRECONDITION FOUND BY
+    /// FAILING.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>`AskedTests` ASSERTS THAT A TRAINED POPULATION HAS SOMETHING WORTH NAMING BEFORE
+    /// IT TESTS THE WIRE, AND UNDER <see cref="Repairing.EveryRound"/> IT HAS NOT.</b>
+    /// <see cref="Abstracting.Shared"/> came back empty at eleven bits, which is a fact
+    /// about the population rather than about the socket — and it is the one cost of this
+    /// timing that no grid here would have shown, because every reading taken so far is
+    /// about rules and none is about NAMES.
+    /// </para>
+    /// <para>
+    /// <b>AND THE PLAN PUTS ABSTRACTION SECOND IN THE WHOLE ORDER OF WORK</b> — <i>if
+    /// abstraction fails nothing downstream matters</i> — so a default that buys coverage
+    /// and costs naming is not obviously a win, whatever the score does. This measures it
+    /// rather than reasoning from the one seed the precondition happened to use.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void What_the_new_timing_costs_the_rung_that_mints_names()
+    {
+        foreach (var address in new[] { 2, 3 })
+        {
+            output.WriteLine($"=== {address + (1 << address)} bits even, {Curve} seeds");
+            output.WriteLine(
+                $"timing        {"named",-20} {"stacked",-20} {"residents",-20} "
+                + "seeds naming something");
+
+            foreach (var (timing, repairing) in new[]
+            {
+                ("afterfailure", Repairing.AfterFailure),
+                ("everyround", Repairing.EveryRound),
+            })
+            {
+                var dials = new CommittingSettings { Repairing = repairing };
+
+                var named = new List<double>();
+                var stacked = new List<double>();
+                var residents = new List<double>();
+                var any = 0;
+
+                for (var index = 1; index <= Curve; index++)
+                {
+                    var seed = Seeds.Apart(index, Purpose);
+
+                    var learnt = new MultiplexerRun(
+                        new MultiplexerSettings { Address = address },
+                        new Brain(dials, seed), seed).Run(Rounds);
+
+                    named.Add(learnt.Named);
+                    stacked.Add(learnt.Stacked);
+                    residents.Add(learnt.Resident);
+
+                    if (learnt.Named > 0) any++;
+                }
+
+                output.WriteLine(
+                    $"{timing,-13} {Column(named),-20} {Column(stacked),-20} "
+                    + $"{Column(residents),-20} {any} of {Curve}");
+            }
+
+            output.WriteLine("");
+        }
+    }
+
     /// <summary>Every reading one arm produces on one world, across the seeds.</summary>
     /// <param name="settings">The world.</param>
     /// <param name="dials">The arm.</param>

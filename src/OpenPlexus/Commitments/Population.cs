@@ -210,6 +210,15 @@ public sealed class Population
     /// is worth what a uniform ring gives up.
     /// </para>
     /// <para>
+    /// <b>AND THE ASYMMETRY HAS A PRICE NOBODY DESIGNED, WHICH IS FORK 60.</b> <c>Mend</c>
+    /// mints at most one child per call and the loop calls it once a round per POPULATION —
+    /// so a fleet of three repairs up to three times a round where one machine repairs
+    /// once, while genesis, being placed, mints exactly what one machine would. How hard a
+    /// fleet searches is then a function of how many machines it has, which is a deployment
+    /// reaching into the brain one level out from the rule about worlds. Measured at eleven
+    /// bits, where it PAYS.
+    /// </para>
+    /// <para>
     /// <b>NULL IS EVERY MEASUREMENT EVER TAKEN</b>, so a one-process run does not pay a
     /// predicate for a distribution it does not have.
     /// </para>

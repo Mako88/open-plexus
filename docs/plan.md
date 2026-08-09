@@ -833,3 +833,4 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **58** | The gate's sign flips with the timing, and the whole two-by-two has been run rather than read off four rows and a revival note. What is ruinous is the gate AFTER a failure specifically. Open on any other world |
 | **59** | Dissolved rather than decided. The setting was a gate and a timing crossed, so the cell that isolated the gate axis is not a cell — it is a corner of a grid, and both axes are now settings. Closed |
 | **53** | The loop is asynchronous and holds no clock, so a fleet losing one message waits forever — correctly. Its rounds still come from the harness rather than the world, and when to act on a partial gathering is open |
+| **60** | Genesis is placed and repair is not, so a fleet repairs once per HOLDER a round where one machine repairs once. How hard it searches is a deployment choice. Place repair, divide the budget, or exploit it? Open |

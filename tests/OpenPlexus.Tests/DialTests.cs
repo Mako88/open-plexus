@@ -122,6 +122,21 @@ public sealed class DialTests(ITestOutputHelper output)
             + "attempt rather than limit it, and ungated burns per-parent budgets "
             + "on parents something else already covers",
 
+        ["Budgeting"] =
+            "NOT A DIAL AND NOT A LEVEL -- IT IS WHICH QUESTION `Budget` ASKS, and "
+            + "one of the two answers cannot bind at all on any world here. A child "
+            + "adds ONE code, so a parent's distinct children are capped by the "
+            + "vocabulary: twelve at six bits and twenty-two at eleven, against a "
+            + "budget of sixty-four. So `Children` is a FREE budget wearing a "
+            + "limit's name, `Attempts` is a re-derivation limit, and every number "
+            + "this repo has ever taken under `Budget` was taken under the second. "
+            + "That is also why its optimum moved with the relevant bits, which the "
+            + "plan carried as a puzzle for the life of the branch -- how often a "
+            + "parent re-derives is a function of width and nothing else about the "
+            + "search is. A controller would be hunting a level that is not there. "
+            + "`BudgetingTests` holds the grid and a tripwire that goes red the day "
+            + "a world's vocabulary reaches the budget",
+
         ["Repairing"] =
             "OPEN, AND IT ARRIVES BY SEPARATION RATHER THAN BY INVENTION, which is "
             + "why the count rising is the finding rather than the cost. It was "
@@ -680,6 +695,21 @@ public sealed class DialTests(ITestOutputHelper output)
         // already refuted as built, which is the honest reason it is a census entry rather
         // than a default: the count grows when a mechanism is added and MEASURED, and
         // shrinks only when one is deleted with a revival row.
-        Assert.Equal(27, HandSet.Count);
+        //
+        // AND TWENTY-EIGHT IS `Budgeting`, WHICH IS THE ONLY ONE HERE THAT ADDS NO FREEDOM
+        // AT ALL. It does not set a level or pick between two behaviours a world could
+        // want differently -- it says which QUESTION `Budget` is asking, and the answer
+        // turned out to be that the shipped one has never asked about children. A child
+        // adds one code, so distinct children are capped by the vocabulary far below the
+        // budget, and `Children` cannot bind on any world this repo has.
+        //
+        // SO THE HONEST END OF THIS ROW IS A DELETION AND IT NEEDS THE WORLD THAT WOULD
+        // SHOW IT. By this file's own rule an arm only lives while it is compared, and
+        // `Children` is currently indistinguishable from removing the budget -- but
+        // `BudgetTests` says removing it outright is worse at every width under the
+        // shipped timing, so the two are not the same claim and the cell that separates
+        // them is a world whose vocabulary reaches sixty-four. `BudgetingTests` carries
+        // the tripwire that fires on the day one arrives.
+        Assert.Equal(28, HandSet.Count);
     }
 }

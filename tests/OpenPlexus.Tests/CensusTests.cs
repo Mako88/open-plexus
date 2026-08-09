@@ -100,6 +100,51 @@ public sealed class CensusTests(ITestOutputHelper output)
     }
 
     /// <summary>
+    /// <b>WHETHER THE TRUE RULES IT HOLDS COVER THE ROUNDS GUESSING GETS WRONG — the
+    /// reading `Found` should have been.</b>
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>A DOZEN PERFECTLY ACCURATE TRUE RULES AND AN ANSWER KEY SCORING NOUGHT ARE THE
+    /// SAME RUN.</b> On the skewed multiplexer every data bit is one four times in five,
+    /// so <i>all four data bits are one</i> holds on about two rounds in five and entails
+    /// the answer whatever the address selects. That rule is sound, never misses, and is
+    /// not in the key — this repo's own trap about a single answer key marking the basis
+    /// rather than the learner, walked into again.
+    /// </para>
+    /// <para>
+    /// <b>AND IT STILL HAS NOT LEARNT THE WORLD, WHICH IS WHAT THIS SEPARATES.</b> That
+    /// rule fires exactly when guessing the commoner answer already works, so it buys
+    /// nothing. <see cref="Census.Paying"/> asks the question no alternative rule set can
+    /// game: of the rounds where the base rate is WRONG, how many had a true rule present
+    /// and firing.
+    /// </para>
+    /// </remarks>
+    [Fact]
+    public void Whether_the_true_rules_cover_the_rounds_that_guessing_misses()
+    {
+        output.WriteLine("hard: rounds whose answer was not the commonest one");
+        output.WriteLine("carried: of those, how many had a sound rule fire and say so");
+        output.WriteLine("");
+
+        foreach (var (address, skew) in new[] { (2, 0.0), (3, 0.0), (2, 0.8), (3, 0.8) })
+        {
+            foreach (var weighing in new[] { Weighing.Summing, Weighing.Lifting })
+            {
+                var learned = Run(address, skew, seed: 1, weighing);
+                var census = learned.Census!;
+
+                output.WriteLine(
+                    $"{address + (1 << address),2} bits skew {skew:F1} {weighing,-10} | "
+                    + $"recent {learned.Recent:F3} | hard {census.Hard,6} "
+                    + $"| carried {census.Carried,6} | paying {census.Paying,7:P1} "
+                    + $"| found {learned.Found,2}/{learned.Truths} "
+                    + $"| sound {learned.Sound,3}");
+            }
+        }
+    }
+
+    /// <summary>
     /// <b>THE SAME PARTITION ON THE WORLD WHOSE CEILING IS KNOWN IN ADVANCE — where an
     /// uncovered round means the opposite of what it means on the multiplexer.</b>
     /// </summary>

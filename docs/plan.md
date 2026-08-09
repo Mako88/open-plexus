@@ -844,6 +844,18 @@ change of architecture entirely.
 - **THE BUDGET REFUSING NINE CANDIDATES IN TEN IS A FACT AND NOT A CAUSE**, which is a
   share read as a bottleneck. Where a gate discards most of its input, ask what the input
   was worth before asking for more of it.
+- **IT HOLDS TRUE RULES THAT FIRE ONLY WHERE GUESSING ALREADY WORKS.** On the skewed
+  world not one of nearly four thousand hard rounds has a sound rule advocating
+  correctly, while sound rules sit resident at perfect accuracy.
+- **AND `Found` MARKS THE BASIS RATHER THAN THE LEARNER, WHICH THIS DOC ALREADY WARNED.**
+  A world admits several correct rule sets; skew makes an all-agree rule cheap, sound and
+  useless. `Census.Paying` is the reading that cannot be gamed.
+- **AND ACCURACY SEPARATES TRUTH FROM FALSEHOOD BEST ON THE WORLD IT LEARNS LEAST**, so
+  the fitness signal is not what fails there. The gap is widest under skew and narrowest
+  at eleven bits even.
+- **AND THE VOTE RULE'S SIGN FLIPS ON THAT READING, WHICH NO SCORE SHOWED.** A sum
+  carries most hard rounds where outcomes are even and none at all where they are skewed;
+  dividing by the base rate inverts both.
 
 ---
 

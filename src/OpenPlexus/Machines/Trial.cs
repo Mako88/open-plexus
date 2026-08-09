@@ -328,11 +328,42 @@ public sealed record Census
     /// </remarks>
     public required long Deeper { get; init; }
 
+    /// <summary>Rounds whose outcome was NOT the commonest one the world has produced.</summary>
+    /// <remarks>
+    /// <para>
+    /// <b>THE ONLY ROUNDS THAT CAN DISTINGUISH KNOWING FROM GUESSING.</b> A machine
+    /// holding nothing answers the commonest outcome and is right on every other round,
+    /// so a score over all rounds pays it for the base rate. On a world drawn four to one
+    /// that is eighty percent for free.
+    /// </para>
+    /// <para>
+    /// <b>THE COMMONEST IS TAKEN FROM WHAT HAS ARRIVED RATHER THAN DECLARED</b>, because
+    /// a world does not tell anyone its base rate and a harness that knew it would be
+    /// scoring against a fact the learner cannot see.
+    /// </para>
+    /// </remarks>
+    public required long Hard { get; init; }
+
+    /// <summary>Of those, how many had a SOUND rule fire and advocate the right answer.</summary>
+    /// <remarks>
+    /// <b>THE INSTRUMENT `Found` SHOULD HAVE BEEN ALL ALONG.</b> A world admits several
+    /// correct rule sets and this repo has a trap saying so — scoring against one answer
+    /// key marks the basis rather than the learner, and a run holding a dozen perfectly
+    /// accurate true rules can read as having learnt nothing. What cannot be gamed is
+    /// whether the true rules a machine holds actually FIRE where the base rate fails: a
+    /// rule that is true and only covers what guessing already gets right has bought
+    /// nothing whatever it is called.
+    /// </remarks>
+    public required long Carried { get; init; }
+
     /// <summary>Wrong rounds counted here at all.</summary>
     public long Wrong => Outvoted + Uncovered;
 
     /// <summary>The share of wrong rounds a vote rule could in principle have saved.</summary>
     public double Reachable => Wrong == 0 ? 0.0 : Outvoted / (double)Wrong;
+
+    /// <summary>The share of the hard rounds some true rule was there for.</summary>
+    public double Paying => Hard == 0 ? 0.0 : Carried / (double)Hard;
 }
 
 /// <summary>
@@ -481,7 +512,14 @@ public sealed class Trial<TSeen>
         var cycle = new Cycle(council, rounds, sweep, target, window);
 
         long codes = 0;
-        long outvoted = 0, uncovered = 0, deeper = 0;
+        long outvoted = 0, uncovered = 0, deeper = 0, hard = 0, carried = 0;
+
+        // WHAT THE WORLD PRODUCES MOST, LEARNT AS IT GOES. Taking the base rate from the
+        // world would score the machine against a number it is not allowed to see, and
+        // declaring it up front would make every skewed world need a hand-written
+        // constant. Two outcomes is the common case and this is a walk over a table with
+        // two entries in it.
+        var arrivals = new Dictionary<Code, long>();
 
         // ONE POPULATION OR NONE, BECAUSE THE CENSUS ASKS WHAT A MACHINE HELD. On a fleet
         // no single population is the one that voted, and reaching into all of them to
@@ -505,6 +543,27 @@ public sealed class Trial<TSeen>
                 var arrived = Brain.Says(expected);
                 var firing = censusing.Firing(censusing.Moment(new HashSet<Code>(said)));
                 var vote = censusing.Predict(firing);
+
+                // WHETHER A TRUE RULE WAS THERE, ASKED ON EVERY ROUND AND NOT ONLY ON THE
+                // WRONG ONES. The wrong rounds say what went astray; this says whether
+                // anything the machine holds is EARNING its keep where the base rate
+                // cannot -- and a rule can be perfectly true, perfectly accurate and
+                // still never fire on a round that guessing would have missed.
+                arrivals[arrived] = arrivals.GetValueOrDefault(arrived) + 1;
+
+                var commonest = arrivals.Count == 1
+                    ? arrived
+                    : arrivals.OrderByDescending(one => one.Value).ThenBy(one => one.Key)
+                        .First().Key;
+
+                if (arrived != commonest)
+                {
+                    hard++;
+
+                    if (!firing.IsDefaultOrEmpty && firing.Any(one =>
+                        one.Expects == arrived && _sound!(one.Scope, one.Expects)))
+                        carried++;
+                }
 
                 if (!firing.IsDefaultOrEmpty && vote.Expects != arrived)
                 {
@@ -580,7 +639,14 @@ public sealed class Trial<TSeen>
             Unseen = Examine(holding),
             Census = censusing is null
                 ? null
-                : new Census { Outvoted = outvoted, Uncovered = uncovered, Deeper = deeper },
+                : new Census
+                {
+                    Outvoted = outvoted,
+                    Uncovered = uncovered,
+                    Deeper = deeper,
+                    Hard = hard,
+                    Carried = carried,
+                },
         };
     }
 

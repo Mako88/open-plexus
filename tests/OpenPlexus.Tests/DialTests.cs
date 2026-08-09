@@ -114,7 +114,13 @@ public sealed class DialTests(ITestOutputHelper output)
             + "gate at all, and on `Arranged` it is inert in both to three metrics. "
             + "Not a level, so not a controller's job; the driver would be "
             + "something that says whether specialising works on this world, which "
-            + "is fork 45",
+            + "is fork 45. AND THE WHOLE TWO-BY-TWO HAS NOW BEEN RUN rather than "
+            + "read off four rows and a revival note: every round the gate is worth "
+            + "about two standard errors, and ungated every round mints the FEWEST "
+            + "children of the six while holding the fewest residents and the "
+            + "fewest unsound rules -- so what it does every round is aim the "
+            + "attempt rather than limit it, and ungated burns per-parent budgets "
+            + "on parents something else already covers",
 
         ["Repairing"] =
             "OPEN, AND IT ARRIVES BY SEPARATION RATHER THAN BY INVENTION, which is "
@@ -127,7 +133,11 @@ public sealed class DialTests(ITestOutputHelper output)
             + "standard errors on `Arranged`. Not a level either. The plan's own "
             + "argument says it should not need one -- an outvoted commitment "
             + "accrues its own hits and misses, and waiting for the vote to be "
-            + "wrong is what stopped it spending them",
+            + "wrong is what stopped it spending them. AND IT IS NOT THE WHOLE "
+            + "STORY EITHER, which the six-cell grid says and four rows could not: "
+            + "ungated after a failure sits WITH the every-round group, so the "
+            + "ruinous cell is the gate after a failure specifically rather than "
+            + "the timing on its own",
 
         ["Subsuming"] =
             "OPEN, AND THE FIRST OF THESE WHOSE DIRECTION FOLLOWS FROM THE WORLD "

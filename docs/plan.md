@@ -707,6 +707,12 @@ change of architecture entirely.
 - **AND THE REASON IS NOT A LEVEL NOBODY TUNED.** *Which rule needs specialising* and
   *did the population get this wrong* are different questions, and whether they align
   is a fact about the world. No per-round switch serves both.
+- **AND UNGATED EVERY ROUND MINTS THE FEWEST CHILDREN OF THE SIX, WHICH IS THE GATE AIMING
+  RATHER THAN LIMITING.** It holds the fewest residents and the fewest unsound rules and
+  still scores below both neighbours.
+- **SO THE AXIS IS NOT TIMING THEN GATE.** Ungated after a failure sits with the every-round
+  group, so what is ruinous is the gate after a failure specifically — and the paid test
+  adds nothing once repair waits for the vote.
 - **AND `Sharpness` IS NOT AN AXIS UNDER `Strongest` AT ALL, WHICH IS THE SECOND LEG
   FLAGGED.** Raising to a power is monotone, so the argmax never moves: three powers, one
   identical run, at both widths. It is a parameter of `Summing`.
@@ -803,6 +809,6 @@ Never renumbered — `DocsTests` asserts each resolves.
 | **55** | Whether a blinded repair gate costs anything. Answered on the multiplexer: children minted separates decisively over twelve seeds, and accuracy, residents and sound rules all move the same way at two standard errors. Open on any other world |
 | **56** | What the repair gate's query costs on a wire. Priced at one round trip and measured on loopback: 0.36ms at one holder, 0.93 at nine, so the fan-out is in flight at once. Open on a LAN and on building it |
 | **57** | Every node predicts its own output while the real wave verifies behind it. What it saves is a LAN millisecond and an internet hundred, so where it pays is deployment. What a holder predicts from is a commitment about one |
-| **58** | The gate's sign flips with the timing: after a failure it is far worse than none, and every round `Uncovered` beat `Earned`. Two cells measured here, two in the revival rows. Open on any other world |
+| **58** | The gate's sign flips with the timing, and the whole two-by-two has been run rather than read off four rows and a revival note. What is ruinous is the gate AFTER a failure specifically. Open on any other world |
 | **59** | Dissolved rather than decided. The setting was a gate and a timing crossed, so the cell that isolated the gate axis is not a cell — it is a corner of a grid, and both axes are now settings. Closed |
 | **53** | The loop is asynchronous and holds no clock, so a fleet losing one message waits forever — correctly. Its rounds still come from the harness rather than the world, and when to act on a partial gathering is open |

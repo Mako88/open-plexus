@@ -891,6 +891,12 @@ change of architecture entirely.
 - **AND IT COSTS ABOUT A QUARTER OF THE NAMES**, which no grid here would have shown
   because every reading was about rules. Rung five still fires on every seed at eleven
   bits, and names nothing at six under either timing.
+- **AND THAT COST IS THE BUDGET'S RATHER THAN THE TIMING'S, WHICH INVERTS THE ORDERING.**
+  With the budget counting children the new timing mints the MOST names and more than
+  doubles the stacking, on top of the most sound rules.
+- **SO THE LAST OPEN TRADE IS COVERAGE AND NAMES AGAINST TRAILING ACCURACY**, and no
+  single number ranks it. Everything the machine holds goes up; what it scores on an even
+  world goes down.
 - **A SOCKET TEST INHERITED A REPAIR DIAL AND WENT RED WITH NOTHING WRONG ON THE WIRE.**
   Its precondition needs a population with something left to name, which every search dial
   moves. Pinned where the fixture is built.

@@ -306,6 +306,54 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// column a control rather than a second experiment — see <c>Sweep.ArmAsync</c>, whose
     /// discipline this borrows and whose purpose word it deliberately does not reuse.
     /// </remarks>
+    /// <summary>
+    /// <b>WHETHER THE NAMES COME BACK WITH THE RULES ONCE THE BUDGET STOPS BINDING.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>THE NAMING COST AND THE SMALLER POPULATION ARE THE SAME OBSERVATION, AND ONE OF
+    /// THEM IS ALREADY KNOWN TO BE THE BUDGET'S.</b> <see cref="Repairing.EveryRound"/>
+    /// walks the culprits every round rather than on the wrong seventh, so a parent spends
+    /// its ATTEMPTS about seven times faster — and `BudgetingTests` shows that with the
+    /// budget counting distinct children instead, the same timing holds 126.6 sound rules
+    /// against 99.6 rather than fewer. Rung five names a sub-scope that enough commitments
+    /// share, so if the missing names were missing residents they come back here; if they
+    /// do not, the naming cost is the timing's own and belongs beside it as a price.
+    /// </remarks>
+    [Fact]
+    public void Whether_the_names_return_when_the_budget_counts_children()
+    {
+        output.WriteLine($"=== 11 bits even, {Curve} seeds");
+        output.WriteLine(
+            $"timing        budget    {"named",-20} {"stacked",-20} "
+            + $"{"residents",-20} {"sound",-20} seeds naming");
+
+        foreach (var (timing, repairing) in new[]
+        {
+            ("afterfailure", Repairing.AfterFailure),
+            ("everyround", Repairing.EveryRound),
+        })
+        {
+            foreach (var (name, budgeting) in new[]
+            {
+                ("attempts", Budgeting.Attempts),
+                ("children", Budgeting.Children),
+            })
+            {
+                var taken = Take(
+                    new MultiplexerSettings { Address = 3 },
+                    new CommittingSettings { Repairing = repairing, Budgeting = budgeting },
+                    Curve);
+
+                var any = taken["named"].Values.Count(one => one > 0);
+
+                output.WriteLine(
+                    $"{timing,-13} {name,-8}  {Show(taken["named"]),-20} "
+                    + $"{Show(taken["stacked"]),-20} {Show(taken["residents"]),-20} "
+                    + $"{Show(taken["sound"]),-20} {any} of {Curve}");
+            }
+        }
+    }
+
     /// <param name="runs">How many seeds, since a curve gets fewer than a grid.</param>
     private static Dictionary<string, Measured> Take(
         MultiplexerSettings settings, CommittingSettings dials, int runs)

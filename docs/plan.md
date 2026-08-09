@@ -716,6 +716,12 @@ change of architecture entirely.
 - **AND `Sharpness` IS NOT AN AXIS UNDER `Strongest` AT ALL, WHICH IS THE SECOND LEG
   FLAGGED.** Raising to a power is monotone, so the argmax never moves: three powers, one
   identical run, at both widths. It is a parameter of `Summing`.
+- **AND AT ONE FIXED POWER THE SUM WINS NOWHERE, WHICH KILLED NEITHER ARM.** Eight worlds
+  and no separation either way, so the pre-registered trigger fired on a question whose
+  answer is that neither rule wins.
+- **BECAUSE THE PER-WORLD OPTIMUM IS ONE LEVEL UP FROM WHERE IT WAS LOOKED FOR.** Deleting
+  the sum costs the multiplexer four points and two of its eight true rules, and buys six
+  on `Arranged` — so the CHOICE moves with the world.
 - **SO TWO OF THE THREE ARE NOT INDEPENDENT, AND A GRID SWEPT OVER BOTH HAS A DEAD
   COLUMN.** `DialTests` has the near miss — *the limit of high sharpness* — which is a
   claim about `Summing` and weaker than a dial that stops existing.

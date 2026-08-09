@@ -620,10 +620,30 @@ public sealed class DialTests(ITestOutputHelper output)
         // only fall is a number people keep by hiding things inside existing names, which
         // is exactly what happened here.
         //
-        // AND IT SHOULD FALL TO TWENTY-THREE ON THE MEASUREMENT THIS SPLIT MAKES POSSIBLE.
-        // `Sharpness` is now a parameter of `Summing` rather than a dial of the brain --
-        // it decides nothing at all under `Strongest` -- so `Strongest` against `Summing`
-        // at ONE fixed power kills either two entries or none.
+        // AND IT DID NOT FALL TO TWENTY-THREE, WHICH IS THE MEASUREMENT ANSWERING A
+        // DIFFERENT QUESTION FROM THE ONE THIS FILE ASKED. The trigger was `Strongest`
+        // against `Summing` at ONE fixed power on more than one world, and at the shipped
+        // power of five over eight worlds the sum led on NONE of them -- so by the rule as
+        // written both entries went.
+        //
+        // THE DELETION WAS CARRIED OUT AND THEN UNDONE, WHICH IS WHY THIS IS EVIDENCE AND
+        // NOT A HESITATION. With the sum gone, the six-bit multiplexer falls from 0.963 to
+        // 0.926 on seed one and finds five of the world's eight rules where the sum finds
+        // seven, holding 31 residents against 47. And `Abstracting.Shared` returns NOTHING
+        // at eleven bits, so rung five names nothing and the three tests that measure the
+        // counts merge lose their subject entirely.
+        //
+        // SO THE RULE ASKED WHETHER THE SUM WINS AND THE ANSWER IS THAT NEITHER DOES.
+        // `Arranged` is six points better without a power at all; `Multiplexer` is four
+        // worse and holds a third fewer true rules. That is a best value that MOVES WITH
+        // THE WORLD -- which is the defect the row above already names, arriving one level
+        // up: it is not `Sharpness` that has a per-world optimum, it is the choice between
+        // the two rules. Deleting an arm does not remove the world-dependence, it picks a
+        // side and stops measuring.
+        //
+        // WHAT WOULD DECIDE IT IS A THIRD SHAPE THAT NEEDS NO NUMBER AND WINS BOTH, or a
+        // signal computed inside a run that says which world this is. Fork 45 is the same
+        // question about the repair gate, and neither has one.
         Assert.Equal(25, HandSet.Count);
     }
 }

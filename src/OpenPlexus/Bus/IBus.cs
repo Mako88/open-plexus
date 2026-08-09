@@ -42,15 +42,15 @@ public interface IReceiveArrivals
 
 /// <summary>
 /// Something that holds commitments and can be asked what it makes of them —
-/// <b>fork 52's transport half, and the first traffic on this bus that is LEARNING
-/// rather than thinking.</b>
+/// <b>fork 52, and the only traffic on this bus that is LEARNING rather than thinking.</b>
 /// </summary>
 /// <remarks>
 /// <para>
 /// <b>EVERYTHING ELSE HERE CARRIES A THOUGHT ACROSS A WIRE AND NOTHING CARRIES WHAT WAS
 /// LEARNT.</b> Fork 1 is open for exactly that reason: an occasion writes its edges into
 /// locally-held clusters, so a machine can think across a wire and cannot learn across
-/// one. This is the seam where that stops being true for the commitment learner.
+/// one. A whole commitment learner now runs over this — see <c>Machines.Fleet</c> — so
+/// what is left of that fork is the walk.
 /// </para>
 /// <para>
 /// <b>SEPARATE FROM <see cref="IReceiveEnvelopes"/> BECAUSE A HOLDER IS NOT A CLUSTER.</b>

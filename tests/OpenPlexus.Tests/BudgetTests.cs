@@ -97,6 +97,13 @@ public sealed class BudgetTests(ITestOutputHelper output)
 
                 foreach (var reading in new (string What, Func<Learned, double> Of)[]
                 {
+                    // FIRST, BECAUSE `found` LED THIS GRID TO THE WRONG VERDICT ONCE.
+                    // Every cell reported nought true rules and the conclusion drawn was
+                    // that none of them learns anything -- which is what a run holding
+                    // sound rules from a DIFFERENT correct rule set also reports. What
+                    // cannot be gamed that way is whether a true rule fires on a round
+                    // the base rate gets wrong.
+                    ("paying", one => one.Census!.Paying),
                     ("found", one => one.Found),
                     ("recent", one => one.Recent),
                     ("uncovered", one => one.Census!.Uncovered),

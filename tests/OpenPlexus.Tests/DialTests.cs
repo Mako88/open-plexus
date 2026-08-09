@@ -170,6 +170,22 @@ public sealed class DialTests(ITestOutputHelper output)
             + "costs four points and mints three hundred more commitments, "
             + "because the vote steers repair as well as reporting it",
 
+        ["Widening"] =
+            "the ladder's other direction, and a mechanism against its own absence "
+            + "rather than two rules that both do something -- which the shape "
+            + "forbids, since there is no second way to not shorten a scope. "
+            + "Measured ON from the baseline every earlier number was taken under, "
+            + "which is what this repo's trap list asks for. NOT A LEVEL: whether "
+            + "anything generalises is not a quantity. AND IT IS REFUTED AS BUILT, "
+            + "which is why it ships off. `Unmissed` selects the commitments with "
+            + "the LEAST evidence -- never having missed is nearly free for a "
+            + "narrow rule, because a narrow rule barely fires -- and dropping a "
+            + "code from a sound scope usually makes it unsound, so it mints about "
+            + "four wrong rules per right one and each has wider reach than its "
+            + "parent. It buys hard-round coverage at eleven bits and costs "
+            + "accuracy on every world. The driver would be a gate that reads how "
+            + "much a rule has been TESTED rather than whether it has been wrong",
+
         ["Choosing"] =
             "the control arm, and a choice between two rules that both do "
             + "something rather than a mechanism and its own absence. WHICH rule "
@@ -644,6 +660,12 @@ public sealed class DialTests(ITestOutputHelper output)
         // WHAT WOULD DECIDE IT IS A THIRD SHAPE THAT NEEDS NO NUMBER AND WINS BOTH, or a
         // signal computed inside a run that says which world this is. Fork 45 is the same
         // question about the repair gate, and neither has one.
-        Assert.Equal(25, HandSet.Count);
+        // AND TWENTY-SIX IS `Widening`, WHICH IS THE LADDER'S OTHER DIRECTION ARRIVING AS
+        // AN ARM RATHER THAN AS A SETTING. It ships OFF, so every number recorded before
+        // it existed still stands and it is measured on from a known baseline -- and it is
+        // already refuted as built, which is the honest reason it is a census entry rather
+        // than a default: the count grows when a mechanism is added and MEASURED, and
+        // shrinks only when one is deleted with a revival row.
+        Assert.Equal(26, HandSet.Count);
     }
 }

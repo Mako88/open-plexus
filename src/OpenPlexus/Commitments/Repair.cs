@@ -92,6 +92,59 @@ public enum Weighing
     Lifting,
 }
 
+/// <summary>Whether anything ever makes a scope SHORTER.</summary>
+/// <remarks>
+/// <para>
+/// <b>THE LADDER HAS ONLY EVER GONE ONE WAY, AND THE PLAN SAYS WHAT THAT COSTS.</b>
+/// <i>A specialise-only machine is arbitrarily accurate and conceptless</i> — genesis
+/// mints one code, repair only adds, and subsumption only deletes, so a commitment that
+/// is too narrow can never become less so. It can only be replaced by a luckier seed that
+/// never arrives, because genesis saturates its whole space in the opening rounds.
+/// </para>
+/// <para>
+/// <b>AND THE PROBLEM IS MEASURED NOW RATHER THAN ARGUED.</b> On the skewed multiplexer
+/// the machine holds sound rules at perfect accuracy that fire on not one of nearly four
+/// thousand rounds the base rate gets wrong — true, never mistaken, and too specific to
+/// pay for themselves. That is what a missing generalisation operator looks like from
+/// outside.
+/// </para>
+/// <para>
+/// <b>AN ARM AND NOT A REPLACEMENT, measured ON from a known baseline.</b> This repo's
+/// own trap says to measure one mechanism on from a baseline rather than one off from
+/// all-on, so <see cref="Never"/> is what ships and every number recorded before it
+/// existed was taken under it.
+/// </para>
+/// </remarks>
+public enum Widening
+{
+    /// <summary>Nothing shortens a scope. Every measurement before this existed.</summary>
+    Never,
+
+    /// <summary>
+    /// A commitment that has never once been wrong proposes each of itself with one code
+    /// removed.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <b>NEVER MISSED IS THE GATE BECAUSE IT NEEDS NO NUMBER</b>, exactly as
+    /// <c>Varied</c> asks whether a code has ever been absent rather than comparing a
+    /// base rate against a threshold. A rule that has been wrong has already been told
+    /// where one of its edges is; a rule that has never been wrong has been told only
+    /// that it has not been asked widely enough to find out.
+    /// </para>
+    /// <para>
+    /// <b>AND IT GENERATES RATHER THAN CHOOSES, WHICH THE TABLE FORCES.</b> Repair picks
+    /// its added code from the tally of what came ALONG, and that tally skips scope codes
+    /// on purpose since every one of them is present in every firing. So nothing in this
+    /// machine can say which scope code is the redundant one — the honest answer is to
+    /// propose all of them and let the bars that judge a repair judge these too:
+    /// subsumption already prefers the general one where both are equally accurate, and
+    /// culling already removes what turns out to be wrong.
+    /// </para>
+    /// </remarks>
+    Unmissed,
+}
+
 /// <summary>What it takes for a narrower commitment to survive beside a general one.</summary>
 /// <remarks>
 /// <para>
@@ -487,6 +540,9 @@ public sealed record CommittingSettings
     /// tell a mechanism from the narrowing that ANY added condition buys.
     /// </remarks>
     public Choosing Choosing { get; init; } = Choosing.Separating;
+
+    /// <inheritdoc cref="Commitments.Widening"/>
+    public Widening Widening { get; init; } = Widening.Never;
 }
 
 /// <summary>

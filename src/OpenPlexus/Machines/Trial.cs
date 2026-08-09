@@ -126,6 +126,9 @@ public sealed record Tally
     /// </remarks>
     public required long Subsumed { get; init; }
 
+    /// <inheritdoc cref="Commitments.Cycle.Widened"/>
+    public required long Widened { get; init; }
+
     /// <summary>Commitments minted by genesis, before anything culled them.</summary>
     /// <remarks>
     /// <b>The rate genesis ran at, which <see cref="Resident"/> cannot show.</b> A
@@ -611,6 +614,7 @@ public sealed class Trial<TSeen>
             Reached = cycle.Reached,
             Repaired = cycle.Repaired,
             Subsumed = cycle.Subsumed,
+            Widened = cycle.Widened,
             Minted = cycle.Minted,
             Resident = holding.Sum(held => held.Count),
             Separations = holding.Sum(

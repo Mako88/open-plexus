@@ -888,6 +888,64 @@ public sealed class Population
         }
     }
 
+    /// <summary>
+    /// Proposes each experienced never-wrong commitment with one code taken out —
+    /// <b>the only thing here that makes a scope shorter.</b>
+    /// </summary>
+    /// <returns>How many were new.</returns>
+    /// <remarks>
+    /// <para>
+    /// <b>THE MIRROR OF <see cref="Mend"/>, AND ON THE SWEEP RATHER THAN ON A FAILURE.</b>
+    /// A failure is what summons a repair; nothing summons a generalisation, because the
+    /// commitment asking for one is by construction the one that has never been wrong. So
+    /// its trigger is redundancy in the same sense rung five's is, and it runs where the
+    /// other periodic operators run.
+    /// </para>
+    /// <para>
+    /// <b>AND IT ADDS WITHOUT REMOVING, exactly as repair does.</b> The narrow parent
+    /// keeps its counts and its place; if the shorter rule is equally accurate,
+    /// <see cref="Subsume"/> is already the mechanism that drops the longer one, and if it
+    /// is not, its own accuracy will say so and culling already reads that. Nothing here
+    /// decides — it proposes, and the bars that exist judge.
+    /// </para>
+    /// <para>
+    /// <b>A ONE-CODE SCOPE IS LEFT ALONE, because the empty scope fires on everything and
+    /// says nothing.</b> A commitment that matches every moment is a base rate wearing a
+    /// rule's clothes, and this design has a trap for exactly that shape.
+    /// </para>
+    /// </remarks>
+    public int Widen()
+    {
+        if (_dials.Widening == Widening.Never) return 0;
+
+        var widened = 0;
+
+        // A COPY, BECAUSE `Add` WRITES TO WHAT THIS WALKS. Every other sweep operator
+        // here takes one for the same reason, and a run that mutated mid-walk would be
+        // ordering-dependent in a way fork 12 has already been reopened over twice.
+        foreach (var one in All.ToList())
+        {
+            if (one.Scope.Length < 2) continue;
+            if (one.Seen < _dials.Floor || one.Misses > 0) continue;
+
+            foreach (var dropped in one.Scope)
+            {
+                var shorter = one.Scope.Where(code => code != dropped).ToImmutableArray();
+
+                var proposed = new Commitment(shorter, one.Expects);
+
+                // THE PLACEMENT GATE AGAIN, AND IT HAS TO BE ASKED HERE TOO. A shorter
+                // scope has a different minimum code, so a fleet would otherwise mint the
+                // same generalisation on every holder that could see the parent.
+                if (Places is not null && !Places(proposed)) continue;
+
+                if (Add(proposed)) widened++;
+            }
+        }
+
+        return widened;
+    }
+
     /// <summary>Whether a commitment has missed enough times to be worth repairing.</summary>
     /// <remarks>
     /// <b>WRITTEN ONCE AND READ BY TWO CALLERS, WHICH IS THE POINT.</b> The chain that

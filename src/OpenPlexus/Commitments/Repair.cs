@@ -381,6 +381,49 @@ public enum Repairing
     AfterFailure,
 }
 
+/// <summary>What a repair budget is spent on.</summary>
+/// <remarks>
+/// <para>
+/// <b>A PARENT'S CHILDREN ARE RECORDED AS A LIST AND THE SAME NAME GOES IN TWICE, so the
+/// budget has always counted ATTEMPTS.</b> <see cref="Population.Mend"/> notes the child
+/// before asking whether it was new, and a repair that reaches a scope the population
+/// already holds is exactly as expensive to the budget as one that mints something. What
+/// <see cref="CommittingSettings.Budget"/> limits is therefore how many times a parent may
+/// separate, not how many distinct children it may have.
+/// </para>
+/// <para>
+/// <b>AND THE LADDER SAYS THAT IS MOST OF IT.</b> <c>LineageTests</c> counts collisions at
+/// twenty to fifty times the births at every majority rung, so a parent under a budget of
+/// sixty-four spends nearly all of it re-deriving what it holds. That would explain the
+/// plan's standing puzzle about this number better than any property of the search does —
+/// an interior optimum moving with the relevant bits is what a re-derivation limit looks
+/// like from outside, because how often a parent re-derives moves with the width.
+/// </para>
+/// <para>
+/// <b>AND IT IS ONLY ASKABLE NOW, WHICH IS WHY IT WAS NOT ASKED BEFORE.</b> Loosening the
+/// budget on the skewed world bought nothing, measured over eight seeds — but under
+/// <see cref="Repairing.AfterFailure"/> the lineages that needed the budget were never
+/// blamed, so nothing was waiting on it. The question is a different one once blame
+/// reaches them.
+/// </para>
+/// </remarks>
+public enum Budgeting
+{
+    /// <summary>Every separation a parent makes spends one. What has always run.</summary>
+    Attempts,
+
+    /// <summary>
+    /// Only a child this parent has not reached before spends one.
+    /// </summary>
+    /// <remarks>
+    /// <b>DISTINCT CHILDREN RATHER THAN SUCCESSFUL ADDS, which is the difference that
+    /// matters when something is culled.</b> A child minted, deleted and re-derived is one
+    /// child a parent has thought of twice; counting adds would charge it twice and make
+    /// the budget depend on what the CULL did, which is not a fact about the search.
+    /// </remarks>
+    Children,
+}
+
 /// <summary>Every number the commitment machinery is allowed to have.</summary>
 public sealed record CommittingSettings
 {
@@ -559,6 +602,9 @@ public sealed record CommittingSettings
 
     /// <inheritdoc cref="Commitments.Repairing"/>
     public Repairing Repairing { get; init; } = Repairing.AfterFailure;
+
+    /// <inheritdoc cref="Commitments.Budgeting"/>
+    public Budgeting Budgeting { get; init; } = Budgeting.Attempts;
 
     /// <summary>What it takes for a narrower commitment to survive beside a general one.</summary>
     /// <remarks>

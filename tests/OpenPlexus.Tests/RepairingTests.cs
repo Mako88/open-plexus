@@ -33,6 +33,9 @@ public sealed class RepairingTests(ITestOutputHelper output)
     private const long Rounds = 20_000;
     private const int Runs = 8;
 
+    /// <summary>Seeds a budget CURVE gets, against the grid's eight.</summary>
+    private const int Curve = 6;
+
     /// <summary>Fixed forever — see <c>Sweep</c>, whose purpose this deliberately is not.</summary>
     private const uint Purpose = 0x5EED_0065;
 
@@ -131,6 +134,151 @@ public sealed class RepairingTests(ITestOutputHelper output)
         }
     }
 
+    /// <summary>
+    /// <b>PEAK TO PEAK, WHICH THE GRID ABOVE DOES NOT DO AND A TRAP NAMES BY NAME.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>TWO ARMS CAN PEAK AT DIFFERENT BUDGETS, AND THESE TWO SPEND ONE AT DIFFERENT
+    /// RATES BY CONSTRUCTION.</b> <see cref="Repairing.EveryRound"/> walks the culprits on
+    /// every round and <see cref="Repairing.AfterFailure"/> on the wrong seventh of them,
+    /// so at one fixed <see cref="CommittingSettings.Budget"/> the arms are not offered the
+    /// same search — which makes the grid above a comparison at ONE point of a curve whose
+    /// shape is unmeasured. Six seeds rather than eight, because this is a curve and the
+    /// grid above is the reading.
+    /// </remarks>
+    [Fact]
+    public void Whether_the_timing_still_leads_when_each_arm_is_given_its_own_budget()
+    {
+        const int Unlimited = int.MaxValue;
+
+        var cells = new (string Name, int Budget)[]
+        {
+            ("16", 16), ("64", 64), ("free", Unlimited),
+        };
+
+        foreach (var (address, skew) in new[] { (3, 0.0), (3, 0.8) })
+        {
+            var settings = new MultiplexerSettings { Address = address, Skew = skew };
+
+            output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
+                + $"{Curve} seeds");
+            output.WriteLine(
+                $"timing        budget  {"paying",-20} {"recent",-20} {"sound",-20} repaired");
+
+            foreach (var (timing, repairing) in new[]
+            {
+                ("afterfailure", Repairing.AfterFailure),
+                ("everyround", Repairing.EveryRound),
+            })
+            {
+                foreach (var (name, budget) in cells)
+                {
+                    var dials = new CommittingSettings
+                    {
+                        Repairing = repairing,
+                        Budget = budget,
+                    };
+
+                    var paying = new List<double>();
+                    var recent = new List<double>();
+                    var sound = new List<double>();
+                    var repaired = new List<double>();
+
+                    for (var index = 1; index <= Curve; index++)
+                    {
+                        var seed = Seeds.Apart(index, Purpose);
+
+                        var learnt = new MultiplexerRun(
+                            settings, new Brain(dials, seed), seed, census: true)
+                            .Run(Rounds);
+
+                        paying.Add(learnt.Census!.Paying);
+                        recent.Add(learnt.Recent);
+                        sound.Add(learnt.Sound);
+                        repaired.Add(learnt.Repaired);
+                    }
+
+                    output.WriteLine(
+                        $"{timing,-13} {name,-6}  {Column(paying),-20} {Column(recent),-20} "
+                        + $"{Column(sound),-20} {repaired.Average():F0}");
+                }
+            }
+
+            output.WriteLine("");
+        }
+    }
+
+    /// <summary>
+    /// <b>WHETHER THE TWO THINGS THAT REDIRECT BLAME ARE ONE THING, WHICH DECIDES WHAT
+    /// SHIPS.</b>
+    /// </summary>
+    /// <remarks>
+    /// <b>IF BOTH ACT ON THE SAME COUPLING THEY DO NOT ADD, AND THAT IS THE PREDICTION.</b>
+    /// <see cref="Weighing.Lifting"/> reaches the blame by making the vote say the rare
+    /// answer and <see cref="Repairing.EveryRound"/> by not consulting the vote at all, so
+    /// under the second the first has nothing left to redirect. A full two-by-two says
+    /// whether that is right — and it matters for what ships, because
+    /// <see cref="Weighing.Lifting"/> carries a cost the plan wrote down before it was ever
+    /// run: a rare expectation divides by a small number, so it prefers an unusual answer
+    /// on thin evidence. A dial kept for a job another dial already does is a cost with no
+    /// benefit.
+    /// </remarks>
+    [Fact]
+    public void Whether_lifting_still_buys_anything_once_repair_stops_waiting_for_the_vote()
+    {
+        foreach (var (address, skew) in new[] { (2, 0.8), (3, 0.8) })
+        {
+            var settings = new MultiplexerSettings { Address = address, Skew = skew };
+
+            output.WriteLine($"=== {address + (1 << address)} bits, skew {skew:F1}, "
+                + $"{Curve} seeds");
+            output.WriteLine(
+                $"timing        weighing  {"paying",-20} {"recent",-20} "
+                + $"{"found",-20} sound");
+
+            foreach (var (timing, repairing) in new[]
+            {
+                ("afterfailure", Repairing.AfterFailure),
+                ("everyround", Repairing.EveryRound),
+            })
+            {
+                foreach (var weighing in new[] { Weighing.Summing, Weighing.Lifting })
+                {
+                    var dials = new CommittingSettings
+                    {
+                        Repairing = repairing,
+                        Weighing = weighing,
+                    };
+
+                    var paying = new List<double>();
+                    var recent = new List<double>();
+                    var found = new List<double>();
+                    var sound = new List<double>();
+
+                    for (var index = 1; index <= Curve; index++)
+                    {
+                        var seed = Seeds.Apart(index, Purpose);
+
+                        var learnt = new MultiplexerRun(
+                            settings, new Brain(dials, seed), seed, census: true)
+                            .Run(Rounds);
+
+                        paying.Add(learnt.Census!.Paying);
+                        recent.Add(learnt.Recent);
+                        found.Add(learnt.Found);
+                        sound.Add(learnt.Sound);
+                    }
+
+                    output.WriteLine(
+                        $"{timing,-13} {weighing,-8}  {Column(paying),-20} "
+                        + $"{Column(recent),-20} {Column(found),-20} {sound.Average():F1}");
+                }
+            }
+
+            output.WriteLine("");
+        }
+    }
+
     /// <summary>Every reading one arm produces on one world, across the seeds.</summary>
     /// <param name="settings">The world.</param>
     /// <param name="dials">The arm.</param>
@@ -173,4 +321,9 @@ public sealed class RepairingTests(ITestOutputHelper output)
     /// <param name="measured">What was taken.</param>
     private static string Show(Measured measured) =>
         $"{measured.Mean,9:F3} +/- {measured.StdErr:F3}";
+
+    /// <inheritdoc cref="Show"/>
+    /// <param name="values">One reading, one entry a seed.</param>
+    private static string Column(IReadOnlyList<double> values) =>
+        Show(new Measured { Arm = "x", Values = values });
 }

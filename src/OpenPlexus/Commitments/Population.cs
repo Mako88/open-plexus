@@ -106,6 +106,17 @@ public readonly record struct Testimony
     public bool Silent => Advocates.IsDefaultOrEmpty;
 }
 
+/// <summary>What one parent's repair budget has gone on.</summary>
+/// <inheritdoc cref="Budgeting"/>
+internal sealed class Forks
+{
+    /// <summary>Every separation this parent has made, re-derivations included.</summary>
+    public long Attempts { get; set; }
+
+    /// <summary>The distinct children it has reached.</summary>
+    public HashSet<Code> Names { get; } = [];
+}
+
 /// <summary>How a commitment came to be held.</summary>
 /// <remarks>
 /// <b>Named at the call site rather than inferred from the scope's length</b>, because
@@ -338,14 +349,24 @@ public sealed class Population
     /// What each commitment has forked into, by name.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// <b>NAMES RATHER THAN A COUNT, so a parent can be asked whether forking PAID.</b>
     /// The count alone answers only how many times it has been tried, which is what a
     /// budget needs and not what a decision does — see
     /// <see cref="Mending.Improving"/>. A child that has since been culled simply
     /// stops being found, which is the right answer: what is not resident is not
     /// evidence.
+    /// </para>
+    /// <para>
+    /// <b>AND BOTH, BECAUSE THEY ARE DIFFERENT NUMBERS AND THIS WAS A LIST THAT HELD ONE OF
+    /// THEM TWICE.</b> A repair reaching a scope the population already holds appended the
+    /// same name again, so the names were a multiset — the attempt count wearing the shape
+    /// of a child set. Counting the distinct entries of that list on every gate was
+    /// quadratic in a parent's attempts and made the instrument the cost of the run, which
+    /// is the reason this is two fields rather than one derived from the other.
+    /// </para>
     /// </remarks>
-    private readonly Dictionary<Code, List<Code>> _minted = [];
+    private readonly Dictionary<Code, Forks> _minted = [];
 
     /// <inheritdoc cref="Lifetime"/>
     private readonly Dictionary<(Code Expects, int Depth), Lifetime> _lineage = [];
@@ -1073,9 +1094,10 @@ public sealed class Population
                 var child = new Commitment([.. culprit.Scope, added], culprit.Expects);
 
                 if (!_minted.TryGetValue(culprit.Identity, out var born))
-                    _minted[culprit.Identity] = born = [];
+                    _minted[culprit.Identity] = born = new Forks();
 
-                born.Add(child.Identity);
+                born.Attempts++;
+                born.Names.Add(child.Identity);
 
                 if (Add(child))
                 {
@@ -1202,10 +1224,13 @@ public sealed class Population
     private bool Beside(Commitment one, Commitment other) =>
         Placing is null || Placing(one) == Placing(other);
 
-    /// <summary>How many children a commitment has minted.</summary>
+    /// <summary>What a commitment's repair budget has been spent on.</summary>
     /// <param name="name">What the commitment is called.</param>
+    /// <inheritdoc cref="Budgeting"/>
     private int Children(Code name) =>
-        _minted.TryGetValue(name, out var born) ? born.Count : 0;
+        !_minted.TryGetValue(name, out var born) ? 0
+        : _dials.Budgeting == Budgeting.Attempts ? (int)born.Attempts
+        : born.Names.Count;
 
     /// <summary>
     /// Whether forking this commitment has ever produced a better one.
@@ -1223,7 +1248,7 @@ public sealed class Population
 
         var living = false;
 
-        foreach (var name in born)
+        foreach (var name in born.Names)
         {
             if (!_byName.TryGetValue(name, out var child)) continue;
 

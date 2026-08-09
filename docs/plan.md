@@ -693,6 +693,14 @@ change of architecture entirely.
 - **A `readonly record struct` HOLDING AN `ImmutableArray` COMPARES BY THE ARRAY'S
   IDENTITY.** Two separately built keys with identical contents are never equal, so an
   equality asserted on one fails on a world it has no complaint about.
+- **AN EXACT PARTITION OF WHAT REACHED A MECHANISM SAYS NOTHING ABOUT WHAT NEVER
+  REACHED IT.** Five gate shares summed to the candidates exactly and read as complete;
+  the lineage that mattered was absent from the denominator.
+- **AND A GENERATE-SIDE OPERATOR TRIGGERED BY THE VOTE'S ERRORS INHERITS THE VOTE'S BLIND
+  SPOTS.** What may be repaired is then decided by what is already answered correctly,
+  which is not a fact about the thing being repaired.
+- **A LIST THAT APPENDS A DUPLICATE IS A COUNT WEARING A SET'S SHAPE**, and every reader
+  gets whichever it assumed. `_minted` was the repair budget and the child set at once.
 
 ---
 
@@ -886,6 +894,18 @@ change of architecture entirely.
 - **AND REPAIR SPENDS MOST OF ITS BUDGET RE-DERIVING WHAT IT HOLDS.** Collisions run twenty
   to fifty times the births at every majority rung, and a collision is charged to the
   parent's budget exactly as a child is.
+- **SO `Budget` HAS NEVER LIMITED CHILDREN AND CANNOT.** A child adds one code, so distinct
+  children are capped by the vocabulary — twenty-two at eleven bits against a budget of
+  sixty-four. Every number ever taken under it is a re-derivation limit.
+- **AND THAT IS WHY ITS OPTIMUM MOVED WITH THE RELEVANT BITS**, which this doc has carried
+  as a puzzle since the branch began: how often a parent re-derives is a function of width,
+  and nothing else about the search is.
+- **FREEING IT PAYS ONLY ONCE BLAME REACHES THE LINEAGES, WHICH IS WHY IT READ AS INERT.**
+  Free under the shipped timing carries no hard round at all; free under `EveryRound`
+  carries most of them and more than doubles the sound rules.
+- **AND IT BUYS HARD ROUNDS AND SELLS EASY ONES ON AN EVEN WORLD**, which is the first arm
+  measured here whose two scores point opposite ways. Coverage rises while trailing
+  accuracy falls, and no single number can rank it.
 
 ---
 
